@@ -1,0 +1,15 @@
+linters:
+  enable:
+    - goconst
+    - gocritic
+    - gofmt
+    - govet
+    - prealloc
+    - unconvert
+    - unused
+    - errcheck
+    - ineffassign
+    - containedctx
+    - tenv
+    - musttag
+
