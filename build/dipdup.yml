@@ -4,12 +4,10 @@ log_level: ${LOG_LEVEL:-info}
 
 indexer:
   name: ${INDEXER_NAME:-dipdup_celestia_indexer}
-
+  timeout: ${INDEXER_REQUEST_TIMEOUT:-10}
   node:
     url: ${CELESTIA_NODE_URL}
     requests_per_second: ${CELESTIA_NODE_RPS:-5}
-
-  timeout: ${INDEXER_REQUEST_TIMEOUT:-10}
 
 database:
   kind: postgres
