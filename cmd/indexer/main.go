@@ -16,9 +16,12 @@ var rootCmd = &cobra.Command{
 }
 
 func main() {
-	_, err := initLogConfig()
-
+	cfg, err := initConfig()
 	if err != nil {
+		return
+	}
+
+	if err = initLogger(cfg.LogLevel); err != nil {
 		return
 	}
 

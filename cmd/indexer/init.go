@@ -9,12 +9,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func initLogConfig() (*Config, error) {
+func init() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{
 		Out:        os.Stdout,
 		TimeFormat: "2023-08-17 12:03:04",
 	})
+}
 
+func initConfig() (*Config, error) {
 	configPath := rootCmd.PersistentFlags().StringP("config", "c", "dipdup.yml", "path to YAML config file")
 	if err := rootCmd.Execute(); err != nil {
 		log.Panic().Err(err).Msg("command line execute")
@@ -36,10 +38,14 @@ func initLogConfig() (*Config, error) {
 		cfg.LogLevel = zerolog.LevelInfoValue
 	}
 
-	logLevel, err := zerolog.ParseLevel(cfg.LogLevel)
+	return &cfg, nil
+}
+
+func initLogger(level string) error {
+	logLevel, err := zerolog.ParseLevel(level)
 	if err != nil {
 		log.Panic().Err(err).Msg("parsing log level")
-		return nil, err
+		return err
 	}
 	zerolog.SetGlobalLevel(logLevel)
 	zerolog.CallerMarshalFunc = func(pc uintptr, file string, line int) string {
@@ -55,5 +61,5 @@ func initLogConfig() (*Config, error) {
 	}
 	log.Logger = log.Logger.With().Caller().Logger()
 
-	return &cfg, nil
+	return nil
 }
