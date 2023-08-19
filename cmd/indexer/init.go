@@ -12,7 +12,7 @@ import (
 func init() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{
 		Out:        os.Stdout,
-		TimeFormat: "2023-08-17 12:03:04",
+		TimeFormat: "2006-01-02 15:04:05",
 	})
 }
 
