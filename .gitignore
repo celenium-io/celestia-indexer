@@ -22,3 +22,5 @@ go.work
 
 *.env
 
+# IDE and other 3rd party tools
+.idea
