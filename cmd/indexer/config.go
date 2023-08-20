@@ -7,7 +7,7 @@ import (
 
 type Config struct {
 	config.Config `yaml:",inline"`
-	LogLevel      string         `yaml:"log_level" validate:"omitempty,oneof=debug trace info warn error fatal panic"`
+	LogLevel      string         `validate:"omitempty,oneof=debug trace info warn error fatal panic" yaml:"log_level"`
 	Indexer       indexer.Config `yaml:"indexer"`
 }
 

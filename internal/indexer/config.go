@@ -1,12 +1,12 @@
 package indexer
 
 type Config struct {
-	Name    string `yaml:"name" validate:"omitempty"`
-	Timeout int    `yaml:"timeout" validate:"omitempty"`
-	Node    *Node  `yaml:"node" validate:"omitempty"`
+	Name    string `validate:"omitempty" yaml:"name"`
+	Timeout int    `validate:"omitempty" yaml:"timeout"`
+	Node    *Node  `validate:"omitempty" yaml:"node"`
 }
 
 type Node struct {
-	Url string `yaml:"url" validate:"omitempty,url"`
-	Rps int    `yaml:"requests_per_second" validate:"omitempty,min=1"`
+	Url string `validate:"omitempty,url"   yaml:"url"`
+	Rps int    `validate:"omitempty,min=1" yaml:"requests_per_second"`
 }

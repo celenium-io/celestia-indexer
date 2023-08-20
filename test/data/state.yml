@@ -1,0 +1,8 @@
+- id: 1
+  last_height: 1000
+  last_time: '2023-07-04T03:10:57+00:00'
+  name: test_indexer
+  total_tx: 394067
+  total_accounts: 12512357
+  total_namespaces: 1000
+  total_namspaces_size: 324234
