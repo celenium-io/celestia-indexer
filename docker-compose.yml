@@ -2,9 +2,9 @@ version: "3.6"
 
 services:
   indexer:
-    image: ghcr.io/dipdup-io/celestia-indexer:master
+    image: ghcr.io/dipdup-io/celestia-indexer:${TAG:-master}
     build:
-        dockerfile: build/Dockerfile
+        dockerfile: build/indexer/Dockerfile
         context: .
     env_file:
       - .env
@@ -17,6 +17,20 @@ services:
       options:
         max-size: 10m
         max-file: "5"
+
+  api:
+    restart: always
+    image: ghcr.io/dipdup-io/celestia-api:${TAG:-master}
+    build:
+      context: .
+      dockerfile: build/api/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - db
+    ports:
+      - 127.0.0.1:9876:9876
+    logging: *celestia-dipdup-logging
 
   db:
     image: postgres:15

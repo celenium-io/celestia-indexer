@@ -20,8 +20,8 @@ func NewAddress(db *database.Bun) *Address {
 	}
 }
 
-// GetByHash -
-func (a *Address) GetByHash(ctx context.Context, hash []byte) (address storage.Address, err error) {
+// ByHash -
+func (a *Address) ByHash(ctx context.Context, hash []byte) (address storage.Address, err error) {
 	err = a.DB().NewSelect().Model(&address).
 		Where("hash = ?", hash).
 		Scan(ctx)

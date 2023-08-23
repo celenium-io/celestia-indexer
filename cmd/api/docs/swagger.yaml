@@ -1,0 +1,784 @@
+basePath: /v1
+definitions:
+  handler.Address:
+    description: Celestia address information
+    properties:
+      balance:
+        example: "10000000000"
+        type: string
+      first_height:
+        example: 100
+        type: integer
+      hash:
+        example: celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60
+        type: string
+      id:
+        example: 321
+        type: integer
+    type: object
+  handler.Block:
+    properties:
+      app_hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        type: string
+      consensus_hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        type: string
+      data_hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        type: string
+      events_count:
+        example: 18
+        type: integer
+      evidence_hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        type: string
+      hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        type: string
+      height:
+        example: 100
+        type: integer
+      id:
+        example: 321
+        type: integer
+      last_commit_hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        type: string
+      last_results_hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        type: string
+      next_validators_hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        type: string
+      parent_hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        type: string
+      proposer_address:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        type: string
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        type: string
+      tx_count:
+        example: 12
+        type: integer
+      validators_hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        type: string
+      version_app:
+        example: "1"
+        type: string
+      version_block:
+        example: "11"
+        type: string
+    type: object
+  handler.Error:
+    properties:
+      message:
+        type: string
+    type: object
+  handler.Event:
+    properties:
+      data:
+        additionalProperties: {}
+        type: object
+      height:
+        example: 100
+        format: int64
+        type: integer
+      id:
+        example: 321
+        format: int64
+        type: integer
+      position:
+        example: 1
+        format: int64
+        type: integer
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
+      tx_id:
+        example: 11
+        format: int64
+        type: integer
+      type:
+        enum:
+        - coin_received
+        - coinbase
+        - coin_spent
+        - burn
+        - mint
+        - message
+        - proposer_reward
+        - rewards
+        - commission
+        - liveness
+        - attestation_request
+        - transfer
+        - pay_for_blobs
+        - redelegate
+        - withdraw_rewards
+        - withdraw_commission
+        - create_validator
+        - delegate
+        - edit_validator
+        - unbond
+        - tx
+        - unknown
+        example: commission
+        format: string
+        type: string
+    type: object
+  handler.Message:
+    properties:
+      data:
+        additionalProperties: {}
+        type: object
+      height:
+        example: 100
+        format: int64
+        type: integer
+      id:
+        example: 321
+        format: int64
+        type: integer
+      position:
+        example: 2
+        format: int64
+        type: integer
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
+      tx_id:
+        example: 11
+        format: int64
+        type: integer
+      type:
+        enum:
+        - WithdrawValidatorCommission
+        - WithdrawDelegatorReward
+        - EditValidator
+        - BeginRedelegate
+        - CreateValidator
+        - Delegate
+        - Undelegate
+        - Unjail
+        - Send
+        - CreateVestingAccount
+        - CreatePeriodicVestingAccount
+        - PayForBlobs
+        example: CreatePeriodicVestingAccount
+        format: string
+        type: string
+    type: object
+  handler.Namespace:
+    properties:
+      hash:
+        example: U3dhZ2dlciByb2Nrcw==
+        format: base64
+        type: string
+      id:
+        example: 321
+        format: integer
+        type: integer
+      namespace_id:
+        example: 4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02
+        format: binary
+        type: string
+      size:
+        example: 12345
+        format: integer
+        type: integer
+      version:
+        format: byte
+        type: integer
+    type: object
+  handler.State:
+    properties:
+      id:
+        example: 321
+        format: int64
+        type: integer
+      last_height:
+        example: 100
+        format: int64
+        type: integer
+      last_time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
+      name:
+        example: indexer
+        format: string
+        type: string
+      total_accounts:
+        example: 43
+        format: int64
+        type: integer
+      total_namespace_size:
+        example: 56789
+        format: int64
+        type: integer
+      total_namespaces:
+        example: 312
+        format: int64
+        type: integer
+      total_tx:
+        example: 23456
+        format: int64
+        type: integer
+    type: object
+  handler.Tx:
+    properties:
+      codespace:
+        example: sdk
+        format: string
+        type: string
+      error:
+        example: ""
+        format: string
+        type: string
+      events_count:
+        example: 2
+        format: int64
+        type: integer
+      fee:
+        example: "9348"
+        format: int64
+        type: string
+      gas_used:
+        example: 4253
+        format: int64
+        type: integer
+      gas_wanted:
+        example: 9348
+        format: int64
+        type: integer
+      hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        format: binary
+        type: string
+      height:
+        example: 100
+        format: int64
+        type: integer
+      id:
+        example: 321
+        format: int64
+        type: integer
+      memo:
+        example: Transfer to private account
+        format: string
+        type: string
+      messages_count:
+        example: 1
+        format: int64
+        type: integer
+      position:
+        example: 11
+        format: int64
+        type: integer
+      status:
+        enum:
+        - success
+        - failed
+        example: success
+        format: string
+        type: string
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
+      timeout_height:
+        example: 0
+        format: int64
+        type: integer
+    type: object
+host: 127.0.0.1
+info:
+  contact: {}
+  description: This is docs of Celestia indexer API.
+  title: Swagger Celestia Indexer API
+  version: "1.0"
+paths:
+  /v1/address:
+    get:
+      description: List address info
+      operationId: list-address
+      parameters:
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Sort order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.Address'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: List address info
+      tags:
+      - address
+  /v1/address/{hash}:
+    get:
+      description: Get address info
+      operationId: get-address
+      parameters:
+      - description: Hash
+        in: path
+        maxLength: 48
+        minLength: 48
+        name: hash
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Address'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get address info
+      tags:
+      - address
+  /v1/block:
+    get:
+      description: List blocks info
+      operationId: list-block
+      parameters:
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Sort order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.Block'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: List blocks info
+      tags:
+      - block
+  /v1/block/{height}:
+    get:
+      description: Get block info
+      operationId: get-block
+      parameters:
+      - description: Block height
+        in: path
+        minimum: 1
+        name: height
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Block'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get block info
+      tags:
+      - block
+  /v1/block/{height}/events:
+    get:
+      description: Get events from begin and end of block
+      operationId: get-block-events
+      parameters:
+      - description: Block height
+        in: path
+        minimum: 1
+        name: height
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.Event'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get events from begin and end of block
+      tags:
+      - block
+  /v1/head:
+    get:
+      description: Get current indexer head
+      operationId: head
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.State'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get current indexer head
+      tags:
+      - general
+  /v1/namespace:
+    get:
+      description: List namespace info
+      operationId: list-namespace
+      parameters:
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Sort order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.Block'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: List namespace info
+      tags:
+      - namespace
+  /v1/namespace/{id}:
+    get:
+      description: Returns array of namespace versions
+      operationId: get-namespace
+      parameters:
+      - description: Namespace id in hexadecimal
+        in: path
+        maxLength: 56
+        minLength: 56
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.Namespace'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get namespace info
+      tags:
+      - namespace
+  /v1/namespace/{id}/{version}:
+    get:
+      description: Returns namespace by version byte and namespace id
+      operationId: get-namespace-by-version-and-id
+      parameters:
+      - description: Namespace id in hexadecimal
+        in: path
+        maxLength: 56
+        minLength: 56
+        name: id
+        required: true
+        type: string
+      - description: Version of namespace
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Namespace'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get namespace info by id and version
+      tags:
+      - namespace
+  /v1/namespace_by_hash/{hash}:
+    get:
+      description: Returns namespace by base64 encoded identity
+      operationId: get-namespace-base64
+      parameters:
+      - description: Base64-encoded namespace id and version
+        in: path
+        name: hash
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Namespace'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get namespace info by base64
+      tags:
+      - namespace
+  /v1/tx:
+    get:
+      description: List transactions info
+      operationId: list-transactions
+      parameters:
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Sort order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.Tx'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: List transactions info
+      tags:
+      - transactions
+  /v1/tx/{hash}:
+    get:
+      description: Get transaction by hash
+      operationId: get-transaction
+      parameters:
+      - description: Transaction hash in hexadecimal
+        in: path
+        maxLength: 64
+        minLength: 64
+        name: hash
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Tx'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get transaction by hash
+      tags:
+      - transactions
+  /v1/tx/{hash}/events:
+    get:
+      description: Get transaction events
+      operationId: get-transaction-events
+      parameters:
+      - description: Transaction hash in hexadecimal
+        in: path
+        maxLength: 64
+        minLength: 64
+        name: hash
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.Event'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get transaction events
+      tags:
+      - transactions
+  /v1/tx/{hash}/messages:
+    get:
+      description: Get transaction messages
+      operationId: get-transaction-messages
+      parameters:
+      - description: Transaction hash in hexadecimal
+        in: path
+        maxLength: 64
+        minLength: 64
+        name: hash
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.Message'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get transaction messages
+      tags:
+      - transactions
+swagger: "2.0"

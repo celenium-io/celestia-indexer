@@ -1,15 +1,18 @@
 package storage
 
 import (
+	"context"
 	"time"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
 
-// IMessage -
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IMessage interface {
 	storage.Table[*Message]
+
+	ByTxId(ctx context.Context, txId uint64) ([]Message, error)
 }
 
 // Message -
@@ -21,7 +24,7 @@ type Message struct {
 	Time     time.Time      `bun:"time,pk,notnull"           comment:"The time of block"`
 	Position uint64         `bun:"position"                  comment:"Position in transaction"`
 	Type     MsgType        `bun:",type:msg_type"            comment:"Message type"`
-	TxId     *uint64        `bun:"tx_id"                     comment:"Parent transaction id"`
+	TxId     uint64         `bun:"tx_id"                     comment:"Parent transaction id"`
 	Data     map[string]any `bun:"data,type:jsonb"           comment:"Message data"`
 }
 

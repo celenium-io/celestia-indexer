@@ -16,3 +16,9 @@ database:
   user: ${POSTGRES_USER}
   password: ${POSTGRES_PASSWORD}
   database: ${POSTGRES_DB:-celestia}
+
+api:
+  bind: ${API_BIND:-0.0.0.0:9876}
+  rate_limit: ${API_RATE_LIMIT:-0}
+  prometheus: ${API_PROMETHEUS_ENABLED:-true}
+  request_timeout: ${API_REQUEST_TIMEOUT:-30}

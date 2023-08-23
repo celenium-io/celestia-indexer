@@ -8,16 +8,17 @@ import (
 	"github.com/uptrace/bun"
 )
 
-// IBlock -
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IBlock interface {
 	storage.Table[*Block]
 
 	Last(ctx context.Context) (Block, error)
+	ByHeight(ctx context.Context, height uint64) (Block, error)
 }
 
 // Block -
 type Block struct {
-	bun.BaseModel `bun:"table:block" comment:"Table with celestia blocks."`
+	bun.BaseModel `bun:"table:block" comment:"Table with celestia blocks." json:"-"`
 
 	Id           uint64    `bun:",pk,notnull,autoincrement" comment:"Unique internal identity"`
 	Height       uint64    `bun:"height"                    comment:"The number (height) of this block"`
@@ -25,7 +26,8 @@ type Block struct {
 	VersionBlock string    `bun:"version_block"             comment:"Block version"`
 	VersionApp   string    `bun:"version_app"               comment:"App version"`
 
-	TxCount uint64 `bun:"tx_count" comment:"Count of transactions in block"`
+	TxCount     uint64 `bun:"tx_count"     comment:"Count of transactions in block"`
+	EventsCount uint64 `bun:"events_count" comment:"Count of events in begin and end of block"`
 
 	Hash               []byte `bun:"hash"                 comment:"Block hash"`
 	ParentHash         []byte `bun:"parent_hash"          comment:"Hash of parent block"`
@@ -39,7 +41,8 @@ type Block struct {
 	EvidenceHash       []byte `bun:"evidence_hash"        comment:"Evidence hash"`
 	ProposerAddress    []byte `bun:"proposer_address"     comment:"Proposer address"`
 
-	Txs []Tx `bun:"rel:has-many"`
+	Txs    []Tx    `bun:"rel:has-many" json:"-"`
+	Events []Event `bun:"rel:has-many" json:"-"`
 }
 
 // TableName -

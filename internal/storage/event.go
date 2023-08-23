@@ -1,15 +1,19 @@
 package storage
 
 import (
+	"context"
 	"time"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
 
-// IEvent -
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IEvent interface {
 	storage.Table[*Event]
+
+	ByTxId(ctx context.Context, txId uint64) ([]Event, error)
+	ByBlock(ctx context.Context, height uint64) ([]Event, error)
 }
 
 // Event -

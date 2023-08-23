@@ -22,7 +22,7 @@ func NewBlocks(db *database.Bun) *Blocks {
 
 // ByHeight -
 func (b *Blocks) ByHeight(ctx context.Context, height uint64) (block storage.Block, err error) {
-	err = b.DB().NewSelect().Model(&block).Where("id = ?", height).Limit(1).Scan(ctx)
+	err = b.DB().NewSelect().Model(&block).Where("height = ?", height).Limit(1).Scan(ctx)
 	return
 }
 

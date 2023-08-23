@@ -14,6 +14,7 @@ jobs:
           version: v1.54.1
           args: --timeout=4m
   test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: install Go
@@ -33,4 +34,4 @@ jobs:
           GO111MODULE: on
         run: |
           go mod download
-          go test ./...
+          go test -p 8 ./...

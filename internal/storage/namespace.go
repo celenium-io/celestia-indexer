@@ -1,13 +1,18 @@
 package storage
 
 import (
+	"context"
+
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
 
-// IAddress -
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type INamespace interface {
 	storage.Table[*Namespace]
+
+	ByNamespaceId(ctx context.Context, namespaceId []byte) ([]Namespace, error)
+	ByNamespaceIdAndVersion(ctx context.Context, namespaceId []byte, version byte) (Namespace, error)
 }
 
 // Namespace -

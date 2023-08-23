@@ -4,6 +4,9 @@ export $(shell sed 's/=.*//' .env)
 indexer:
 	cd cmd/indexer && go run . -c ../../build/dipdup.yml
 
+api:
+	cd cmd/api && go run . -c ../../build/dipdup.yml
+
 build:
 	docker-compose up -d -- build
 
@@ -11,11 +14,14 @@ lint:
 	golangci-lint run
 
 test:
-	go test ./...
+	go test -p 8 -timeout 60s ./...
 
 ## adr: Generate ADR from template. Must set NUM and TITLE parameters.
 adr:
 	@echo "Generating ADR"
 	@cp adr/adr-template.md adr/adr-$(NUM)-$(TITLE).md
 
-.PHONY: indexer build lint test adr
+mock:
+	go generate ./internal/storage
+
+.PHONY: indexer api build lint test adr

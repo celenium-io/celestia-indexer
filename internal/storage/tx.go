@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"time"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -8,9 +9,11 @@ import (
 	"github.com/uptrace/bun"
 )
 
-// ITx -
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type ITx interface {
 	storage.Table[*Tx]
+
+	ByHash(ctx context.Context, hash []byte) (Tx, error)
 }
 
 // Tx -

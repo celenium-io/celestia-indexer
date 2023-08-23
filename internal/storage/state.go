@@ -8,7 +8,7 @@ import (
 	"github.com/uptrace/bun"
 )
 
-// IState -
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IState interface {
 	storage.Table[*State]
 

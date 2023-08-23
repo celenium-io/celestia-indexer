@@ -22,6 +22,7 @@ type ModuleTestSuite struct {
 	suite.Suite
 	psqlContainer *database.PostgreSQLContainer
 	storage       postgres.Storage
+	pm            database.RangePartitionManager
 }
 
 // SetupSuite -
@@ -39,7 +40,7 @@ func (s *ModuleTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
 
-	storage, err := postgres.Create(ctx, config.Database{
+	strg, err := postgres.Create(ctx, config.Database{
 		Kind:     config.DBKindPostgres,
 		User:     s.psqlContainer.Config.User,
 		Database: s.psqlContainer.Config.Database,
@@ -48,7 +49,13 @@ func (s *ModuleTestSuite) SetupSuite() {
 		Port:     s.psqlContainer.MappedPort().Int(),
 	})
 	s.Require().NoError(err)
-	s.storage = storage
+	s.storage = strg
+
+	s.pm = database.NewPartitionManager(s.storage.Connection(), database.PartitionByYear)
+	currentTime, err := time.Parse(time.RFC3339, "2023-07-04T03:10:57+00:00")
+	s.Require().NoError(err)
+	err = s.pm.CreatePartitions(ctx, currentTime, storage.Tx{}.TableName(), storage.Event{}.TableName(), storage.Message{}.TableName())
+	s.Require().NoError(err)
 }
 
 // TearDownSuite -
