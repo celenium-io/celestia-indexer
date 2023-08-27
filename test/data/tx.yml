@@ -12,6 +12,7 @@
   status: success
   codespace: sdk
   memo: memo
+  message_types: 68
 - id: 2
   hash: 0x652452A670011D629CC116E510BA88C1CABE061336661B1F3D206D248BD55811
   height: 1000
@@ -21,8 +22,9 @@
   gas_used: 77483
   timeout_height: 0
   events_count: 1
-  messages_count: 2
+  messages_count: 1
   fee: 80410
   status: success
   codespace:
   memo: memo2
+  message_types: 256

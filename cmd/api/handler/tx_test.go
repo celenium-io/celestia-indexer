@@ -6,12 +6,14 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/mock"
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/dipdup-io/celestia-indexer/internal/test_suite"
 	"github.com/labstack/echo/v4"
 	"github.com/shopspring/decimal"
@@ -34,7 +36,7 @@ var (
 		EventsCount:   10,
 		MessagesCount: 2,
 		Fee:           decimal.RequireFromString("80410"),
-		Status:        storage.StatusSuccess,
+		Status:        types.StatusSuccess,
 		Codespace:     "sdk",
 		Memo:          "memo",
 	}
@@ -103,7 +105,7 @@ func (s *TxTestSuite) TestGet() {
 	s.Require().EqualValues(2, tx.MessagesCount)
 	s.Require().Equal("memo", tx.Memo)
 	s.Require().Equal("sdk", tx.Codespace)
-	s.Require().Equal(string(storage.StatusSuccess), tx.Status)
+	s.Require().Equal(string(types.StatusSuccess), tx.Status)
 }
 
 func (s *TxTestSuite) TestGetInvalidTx() {
@@ -124,15 +126,22 @@ func (s *TxTestSuite) TestGetInvalidTx() {
 }
 
 func (s *TxTestSuite) TestList() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	q := make(url.Values)
+	q.Set("limit", "2")
+	q.Set("offset", "0")
+	q.Set("sort", "desc")
+	q.Set("status", "success")
+	q.Set("msg_type", "Unjail,Send")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
 
 	s.tx.EXPECT().
-		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return([]*storage.Tx{
-			&testTx,
+		Filter(gomock.Any(), gomock.Any()).
+		Return([]storage.Tx{
+			testTx,
 		}, nil)
 
 	s.Require().NoError(s.handler.List(c))
@@ -157,7 +166,142 @@ func (s *TxTestSuite) TestList() {
 	s.Require().EqualValues(2, tx.MessagesCount)
 	s.Require().Equal("memo", tx.Memo)
 	s.Require().Equal("sdk", tx.Codespace)
-	s.Require().Equal(string(storage.StatusSuccess), tx.Status)
+	s.Require().Equal(string(types.StatusSuccess), tx.Status)
+}
+
+func (s *TxTestSuite) TestListValidationStatusError() {
+	q := make(url.Values)
+	q.Set("limit", "2")
+	q.Set("offset", "0")
+	q.Set("sort", "desc")
+	q.Set("status", "invalid")
+	q.Set("msg_type", "Unjail,Send")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx")
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusBadRequest, rec.Code)
+
+	var e Error
+	err := json.NewDecoder(rec.Body).Decode(&e)
+	s.Require().NoError(err)
+	s.Contains(e.Message, "validation")
+}
+
+func (s *TxTestSuite) TestListValidationMsgTypeError() {
+	q := make(url.Values)
+	q.Set("limit", "2")
+	q.Set("offset", "0")
+	q.Set("sort", "desc")
+	q.Set("status", "success")
+	q.Set("msg_type", "invalid,Send")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx")
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusBadRequest, rec.Code)
+
+	var e Error
+	err := json.NewDecoder(rec.Body).Decode(&e)
+	s.Require().NoError(err)
+	s.Contains(e.Message, "validation")
+}
+
+func (s *TxTestSuite) TestListTime() {
+	q := make(url.Values)
+	q.Set("limit", "2")
+	q.Set("offset", "0")
+	q.Set("sort", "desc")
+	q.Set("status", "success")
+	q.Set("msg_type", "Send")
+	q.Set("from", "1692880000")
+	q.Set("to", "1692890000")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx")
+
+	s.tx.EXPECT().
+		Filter(gomock.Any(), gomock.Any()).
+		Return([]storage.Tx{
+			testTx,
+		}, nil)
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var txs []responses.Tx
+	err := json.NewDecoder(rec.Body).Decode(&txs)
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+
+	tx := txs[0]
+	s.Require().EqualValues(1, tx.Id)
+	s.Require().EqualValues(100, tx.Height)
+	s.Require().Equal(testTime, tx.Time)
+	s.Require().Equal(testTxHash, strings.ToUpper(tx.Hash))
+	s.Require().EqualValues(2, tx.Position)
+	s.Require().EqualValues(80410, tx.GasWanted)
+	s.Require().EqualValues(77483, tx.GasUsed)
+	s.Require().Equal("80410", tx.Fee)
+	s.Require().EqualValues(0, tx.TimeoutHeight)
+	s.Require().EqualValues(10, tx.EventsCount)
+	s.Require().EqualValues(2, tx.MessagesCount)
+	s.Require().Equal("memo", tx.Memo)
+	s.Require().Equal("sdk", tx.Codespace)
+	s.Require().Equal(string(types.StatusSuccess), tx.Status)
+}
+
+func (s *TxTestSuite) TestListHeight() {
+	q := make(url.Values)
+	q.Set("limit", "2")
+	q.Set("offset", "0")
+	q.Set("sort", "desc")
+	q.Set("status", "success")
+	q.Set("msg_type", "Send")
+	q.Set("height", "1000")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx")
+
+	s.tx.EXPECT().
+		Filter(gomock.Any(), gomock.Any()).
+		Return([]storage.Tx{
+			testTx,
+		}, nil)
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var txs []responses.Tx
+	err := json.NewDecoder(rec.Body).Decode(&txs)
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+
+	tx := txs[0]
+	s.Require().EqualValues(1, tx.Id)
+	s.Require().EqualValues(100, tx.Height)
+	s.Require().Equal(testTime, tx.Time)
+	s.Require().Equal(testTxHash, strings.ToUpper(tx.Hash))
+	s.Require().EqualValues(2, tx.Position)
+	s.Require().EqualValues(80410, tx.GasWanted)
+	s.Require().EqualValues(77483, tx.GasUsed)
+	s.Require().Equal("80410", tx.Fee)
+	s.Require().EqualValues(0, tx.TimeoutHeight)
+	s.Require().EqualValues(10, tx.EventsCount)
+	s.Require().EqualValues(2, tx.MessagesCount)
+	s.Require().Equal("memo", tx.Memo)
+	s.Require().Equal("sdk", tx.Codespace)
+	s.Require().Equal(string(types.StatusSuccess), tx.Status)
 }
 
 func (s *TxTestSuite) TestGetEvents() {
@@ -180,7 +324,7 @@ func (s *TxTestSuite) TestGetEvents() {
 				Height:   100,
 				Time:     testTime,
 				Position: 2,
-				Type:     storage.EventTypeBurn,
+				Type:     types.EventTypeBurn,
 				TxId:     testsuite.Ptr(uint64(1)),
 				Data: map[string]any{
 					"test": "value",
@@ -200,7 +344,7 @@ func (s *TxTestSuite) TestGetEvents() {
 	s.Require().EqualValues(2, events[0].Position)
 	s.Require().Equal(testTime, events[0].Time)
 	s.Require().EqualValues(1, events[0].TxId)
-	s.Require().EqualValues(string(storage.EventTypeBurn), events[0].Type)
+	s.Require().EqualValues(string(types.EventTypeBurn), events[0].Type)
 }
 
 func (s *TxTestSuite) TestGetMessage() {
@@ -223,7 +367,7 @@ func (s *TxTestSuite) TestGetMessage() {
 				Height:   100,
 				Time:     testTime,
 				Position: 2,
-				Type:     storage.MsgTypeBeginRedelegate,
+				Type:     types.MsgTypeBeginRedelegate,
 				TxId:     1,
 				Data: map[string]any{
 					"test": "value",
@@ -243,5 +387,5 @@ func (s *TxTestSuite) TestGetMessage() {
 	s.Require().EqualValues(2, msgs[0].Position)
 	s.Require().Equal(testTime, msgs[0].Time)
 	s.Require().EqualValues(1, msgs[0].TxId)
-	s.Require().EqualValues(string(storage.MsgTypeBeginRedelegate), msgs[0].Type)
+	s.Require().EqualValues(string(types.MsgTypeBeginRedelegate), msgs[0].Type)
 }

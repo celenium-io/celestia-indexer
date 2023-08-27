@@ -118,6 +118,45 @@ func (c *ITxCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, 
 	return c
 }
 
+// Filter mocks base method.
+func (m *MockITx) Filter(ctx context.Context, fltrs storage.TxFilter) ([]storage.Tx, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Filter", ctx, fltrs)
+	ret0, _ := ret[0].([]storage.Tx)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Filter indicates an expected call of Filter.
+func (mr *MockITxMockRecorder) Filter(ctx, fltrs any) *ITxFilterCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Filter", reflect.TypeOf((*MockITx)(nil).Filter), ctx, fltrs)
+	return &ITxFilterCall{Call: call}
+}
+
+// ITxFilterCall wrap *gomock.Call
+type ITxFilterCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *ITxFilterCall) Return(arg0 []storage.Tx, arg1 error) *ITxFilterCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *ITxFilterCall) Do(f func(context.Context, storage.TxFilter) ([]storage.Tx, error)) *ITxFilterCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *ITxFilterCall) DoAndReturn(f func(context.Context, storage.TxFilter) ([]storage.Tx, error)) *ITxFilterCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // GetByID mocks base method.
 func (m *MockITx) GetByID(ctx context.Context, id uint64) (*storage.Tx, error) {
 	m.ctrl.T.Helper()

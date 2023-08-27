@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
@@ -14,6 +15,7 @@ type IBlock interface {
 
 	Last(ctx context.Context) (Block, error)
 	ByHeight(ctx context.Context, height uint64) (Block, error)
+	ByHash(ctx context.Context, hash []byte) (Block, error)
 }
 
 // Block -
@@ -26,8 +28,9 @@ type Block struct {
 	VersionBlock string    `bun:"version_block"             comment:"Block version"`
 	VersionApp   string    `bun:"version_app"               comment:"App version"`
 
-	TxCount     uint64 `bun:"tx_count"     comment:"Count of transactions in block"`
-	EventsCount uint64 `bun:"events_count" comment:"Count of events in begin and end of block"`
+	TxCount      uint64            `bun:"tx_count"                comment:"Count of transactions in block"`
+	EventsCount  uint64            `bun:"events_count"            comment:"Count of events in begin and end of block"`
+	MessageTypes types.MsgTypeBits `bun:"message_types,type:int8" comment:"Bit mask with containing messages"`
 
 	Hash               []byte `bun:"hash"                 comment:"Block hash"`
 	ParentHash         []byte `bun:"parent_hash"          comment:"Hash of parent block"`
@@ -40,6 +43,8 @@ type Block struct {
 	LastResultsHash    []byte `bun:"last_results_hash"    comment:"Last results hash"`
 	EvidenceHash       []byte `bun:"evidence_hash"        comment:"Evidence hash"`
 	ProposerAddress    []byte `bun:"proposer_address"     comment:"Proposer address"`
+
+	ChainId string `bun:"-"` // internal field for filling state
 
 	Txs    []Tx    `bun:"rel:has-many" json:"-"`
 	Events []Event `bun:"rel:has-many" json:"-"`

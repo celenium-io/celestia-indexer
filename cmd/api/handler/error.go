@@ -9,6 +9,7 @@ import (
 
 var (
 	errInvalidNamespaceLength = errors.New("invalid namespace: should be 29 bytes length")
+	errInvalidHashLength      = errors.New("invalid hash: should be 32 bytes length")
 )
 
 type NoRows interface {

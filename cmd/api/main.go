@@ -16,14 +16,14 @@ var rootCmd = &cobra.Command{
 	Short: "DipDup Verticals | Celestia API",
 }
 
-// @title Swagger Celestia Indexer API
-// @version 1.0
-// @description This is docs of Celestia indexer API.
+//	@title			Swagger Celestia Indexer API
+//	@version		1.0
+//	@description	This is docs of Celestia indexer API.
 
-// @host 127.0.0.1
-// @BasePath /v1
+//	@host		127.0.0.1
+//	@BasePath	/v1
 
-// @query.collection.format multi
+// @query.collection.format	multi
 func main() {
 	cfg, err := initConfig()
 	if err != nil {
@@ -38,7 +38,7 @@ func main() {
 
 	db := initDatabase(cfg.Database)
 	e := initEcho(cfg.ApiConfig)
-	initHandlers(ctx, e, cfg.ApiConfig, db)
+	initHandlers(ctx, e, *cfg, db)
 
 	go func() {
 		if err := e.Start(cfg.ApiConfig.Bind); err != nil && errors.Is(err, http.ErrServerClosed) {

@@ -22,3 +22,11 @@ api:
   rate_limit: ${API_RATE_LIMIT:-0}
   prometheus: ${API_PROMETHEUS_ENABLED:-true}
   request_timeout: ${API_REQUEST_TIMEOUT:-30}
+  blob_receiver: node_rpc
+
+datasources:
+  node_rpc:
+    url: ${CELESTIA_NODE_URL}
+    kind: celestia_node_rpc
+    timeout: ${CELESTIA_NODE_TIMEOUT:-10}
+    rps: ${CELESTIA_NODE_RPS:-10}

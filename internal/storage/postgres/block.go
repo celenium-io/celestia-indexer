@@ -31,3 +31,9 @@ func (b *Blocks) Last(ctx context.Context) (block storage.Block, err error) {
 	err = b.DB().NewSelect().Model(&block).Order("id desc").Limit(1).Scan(ctx)
 	return
 }
+
+// ByHeight -
+func (b *Blocks) ByHash(ctx context.Context, hash []byte) (block storage.Block, err error) {
+	err = b.DB().NewSelect().Model(&block).Where("hash = ?", hash).Limit(1).Scan(ctx)
+	return
+}

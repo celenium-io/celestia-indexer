@@ -8,8 +8,10 @@ import (
 	"time"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/go-lib/database"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/suite"
@@ -134,6 +136,22 @@ func (s *StorageTestSuite) TestBlockByHeight() {
 	s.Require().Equal(hash, block.Hash)
 }
 
+func (s *StorageTestSuite) TestBlockByHash() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
+	s.Require().NoError(err)
+
+	block, err := s.storage.Blocks.ByHash(ctx, hash)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1000, block.Height)
+	s.Require().EqualValues("1", block.VersionApp)
+	s.Require().EqualValues("11", block.VersionBlock)
+	s.Require().EqualValues(0, block.TxCount)
+	s.Require().Equal(hash, block.Hash)
+}
+
 func (s *StorageTestSuite) TestAddressByHash() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
@@ -159,7 +177,7 @@ func (s *StorageTestSuite) TestEventByTxId() {
 	s.Require().EqualValues(2, events[0].Id)
 	s.Require().EqualValues(1000, events[0].Height)
 	s.Require().EqualValues(1, events[0].Position)
-	s.Require().Equal(storage.EventTypeMint, events[0].Type)
+	s.Require().Equal(types.EventTypeMint, events[0].Type)
 }
 
 func (s *StorageTestSuite) TestEventByBlock() {
@@ -172,7 +190,7 @@ func (s *StorageTestSuite) TestEventByBlock() {
 	s.Require().EqualValues(1, events[0].Id)
 	s.Require().EqualValues(1000, events[0].Height)
 	s.Require().EqualValues(0, events[0].Position)
-	s.Require().Equal(storage.EventTypeBurn, events[0].Type)
+	s.Require().Equal(types.EventTypeBurn, events[0].Type)
 }
 
 func (s *StorageTestSuite) TestMessageByTxId() {
@@ -185,7 +203,7 @@ func (s *StorageTestSuite) TestMessageByTxId() {
 	s.Require().EqualValues(1, msgs[0].Id)
 	s.Require().EqualValues(1000, msgs[0].Height)
 	s.Require().EqualValues(0, msgs[0].Position)
-	s.Require().Equal(storage.MsgTypeWithdrawDelegatorReward, msgs[0].Type)
+	s.Require().Equal(types.MsgTypeWithdrawDelegatorReward, msgs[0].Type)
 }
 
 func (s *StorageTestSuite) TestNamespaceId() {
@@ -245,10 +263,130 @@ func (s *StorageTestSuite) TestTxByHash() {
 	s.Require().EqualValues(1, tx.EventsCount)
 	s.Require().EqualValues(2, tx.MessagesCount)
 	s.Require().Equal(txHash, tx.Hash)
-	s.Require().Equal(storage.StatusSuccess, tx.Status)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
 	s.Require().Equal("memo", tx.Memo)
 	s.Require().Equal("sdk", tx.Codespace)
 	s.Require().Equal("80410", tx.Fee.String())
+}
+
+func (s *StorageTestSuite) TestTxFilterSuccessUnjailAsc() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Sort:         sdk.SortOrderAsc,
+		Limit:        10,
+		Offset:       0,
+		MessageTypes: types.NewMsgTypeBitMask(types.MsgTypeUnjail),
+		Status:       []string{string(types.StatusSuccess)},
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+
+	tx := txs[0]
+
+	s.Require().EqualValues(2, tx.Id)
+	s.Require().EqualValues(1, tx.Position)
+	s.Require().EqualValues(1000, tx.Height)
+	s.Require().EqualValues(0, tx.TimeoutHeight)
+	s.Require().EqualValues(80410, tx.GasWanted)
+	s.Require().EqualValues(77483, tx.GasUsed)
+	s.Require().EqualValues(1, tx.EventsCount)
+	s.Require().EqualValues(1, tx.MessagesCount)
+	s.Require().EqualValues(256, tx.MessageTypes.Bits)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
+	s.Require().Equal("memo2", tx.Memo)
+	s.Require().Equal("", tx.Codespace)
+	s.Require().Equal("80410", tx.Fee.String())
+}
+
+func (s *StorageTestSuite) TestTxFilterSuccessDesc() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Sort:   sdk.SortOrderDesc,
+		Limit:  10,
+		Offset: 0,
+		Status: []string{string(types.StatusSuccess)},
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 2)
+
+	tx := txs[0]
+
+	s.Require().EqualValues(2, tx.Id)
+	s.Require().EqualValues(1, tx.Position)
+	s.Require().EqualValues(1000, tx.Height)
+	s.Require().EqualValues(0, tx.TimeoutHeight)
+	s.Require().EqualValues(80410, tx.GasWanted)
+	s.Require().EqualValues(77483, tx.GasUsed)
+	s.Require().EqualValues(1, tx.EventsCount)
+	s.Require().EqualValues(1, tx.MessagesCount)
+	s.Require().EqualValues(256, tx.MessageTypes.Bits)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
+	s.Require().Equal("memo2", tx.Memo)
+	s.Require().Equal("", tx.Codespace)
+	s.Require().Equal("80410", tx.Fee.String())
+}
+
+func (s *StorageTestSuite) TestTxFilterHeight() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Sort:   sdk.SortOrderDesc,
+		Limit:  10,
+		Offset: 0,
+		Status: []string{string(types.StatusSuccess)},
+		Height: 1000,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 2)
+
+	tx := txs[0]
+
+	s.Require().EqualValues(2, tx.Id)
+	s.Require().EqualValues(1, tx.Position)
+	s.Require().EqualValues(1000, tx.Height)
+	s.Require().EqualValues(0, tx.TimeoutHeight)
+	s.Require().EqualValues(80410, tx.GasWanted)
+	s.Require().EqualValues(77483, tx.GasUsed)
+	s.Require().EqualValues(1, tx.EventsCount)
+	s.Require().EqualValues(1, tx.MessagesCount)
+	s.Require().EqualValues(256, tx.MessageTypes.Bits)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
+	s.Require().Equal("memo2", tx.Memo)
+	s.Require().Equal("", tx.Codespace)
+	s.Require().Equal("80410", tx.Fee.String())
+}
+
+func (s *StorageTestSuite) TestTxFilterTime() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Limit:    10,
+		TimeFrom: time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 2)
+
+	txs, err = s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Limit:  10,
+		TimeTo: time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 0)
+
+	txs, err = s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Limit: 10,
+
+		TimeFrom: time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
+		TimeTo:   time.Date(2023, 7, 5, 0, 0, 0, 0, time.UTC),
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 2)
 }
 
 func (s *StorageTestSuite) TestNotify() {

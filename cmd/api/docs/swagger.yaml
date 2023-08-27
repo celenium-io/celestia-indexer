@@ -1,6 +1,41 @@
 basePath: /v1
 definitions:
-  handler.Address:
+  SearchResponse-responses_Searchable:
+    properties:
+      result:
+        description: 'Search result. Can be one of folowwing types: Block, Address,
+          Namespace, Tx'
+        type: object
+      type:
+        description: Result type which is in the result. Can be 'block', 'address',
+          'namespace', 'tx'
+        type: string
+    type: object
+  blob.Blob:
+    properties:
+      commitment:
+        example: vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg=
+        format: base64
+        type: string
+      data:
+        example: b2sgZGVtbyBkYQ==
+        format: base64
+        type: string
+      namespace:
+        example: AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0=
+        format: base64
+        type: string
+      share_version:
+        example: 0
+        format: integer
+        type: integer
+    type: object
+  handler.Error:
+    properties:
+      message:
+        type: string
+    type: object
+  responses.Address:
     description: Celestia address information
     properties:
       balance:
@@ -16,7 +51,7 @@ definitions:
         example: 321
         type: integer
     type: object
-  handler.Block:
+  responses.Block:
     properties:
       app_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
@@ -48,6 +83,13 @@ definitions:
       last_results_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
+      message_types:
+        example:
+        - MsgSend
+        - MsgUnjail
+        items:
+          type: string
+        type: array
       next_validators_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
@@ -73,12 +115,7 @@ definitions:
         example: "11"
         type: string
     type: object
-  handler.Error:
-    properties:
-      message:
-        type: string
-    type: object
-  handler.Event:
+  responses.Event:
     properties:
       data:
         additionalProperties: {}
@@ -131,7 +168,7 @@ definitions:
         format: string
         type: string
     type: object
-  handler.Message:
+  responses.Message:
     properties:
       data:
         additionalProperties: {}
@@ -174,7 +211,7 @@ definitions:
         format: string
         type: string
     type: object
-  handler.Namespace:
+  responses.Namespace:
     properties:
       hash:
         example: U3dhZ2dlciByb2Nrcw==
@@ -188,6 +225,9 @@ definitions:
         example: 4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02
         format: binary
         type: string
+      reserved:
+        example: true
+        type: boolean
       size:
         example: 12345
         format: integer
@@ -196,7 +236,7 @@ definitions:
         format: byte
         type: integer
     type: object
-  handler.State:
+  responses.State:
     properties:
       id:
         example: 321
@@ -231,7 +271,7 @@ definitions:
         format: int64
         type: integer
     type: object
-  handler.Tx:
+  responses.Tx:
     properties:
       codespace:
         example: sdk
@@ -273,6 +313,13 @@ definitions:
         example: Transfer to private account
         format: string
         type: string
+      message_types:
+        example:
+        - MsgSend
+        - MsgUnjail
+        items:
+          type: string
+        type: array
       messages_count:
         example: 1
         format: int64
@@ -332,7 +379,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/handler.Address'
+              $ref: '#/definitions/responses.Address'
             type: array
         "400":
           description: Bad Request
@@ -363,7 +410,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.Address'
+            $ref: '#/definitions/responses.Address'
         "204":
           description: No Content
         "400":
@@ -405,7 +452,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/handler.Block'
+              $ref: '#/definitions/responses.Block'
             type: array
         "400":
           description: Bad Request
@@ -435,7 +482,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.Block'
+            $ref: '#/definitions/responses.Block'
         "204":
           description: No Content
         "400":
@@ -467,7 +514,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/handler.Event'
+              $ref: '#/definitions/responses.Event'
             type: array
         "400":
           description: Bad Request
@@ -490,7 +537,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.State'
+            $ref: '#/definitions/responses.State'
         "204":
           description: No Content
         "400":
@@ -532,7 +579,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/handler.Block'
+              $ref: '#/definitions/responses.Block'
             type: array
         "400":
           description: Bad Request
@@ -564,7 +611,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/handler.Namespace'
+              $ref: '#/definitions/responses.Namespace'
             type: array
         "400":
           description: Bad Request
@@ -600,7 +647,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.Namespace'
+            $ref: '#/definitions/responses.Namespace'
         "204":
           description: No Content
         "400":
@@ -630,7 +677,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.Namespace'
+            $ref: '#/definitions/responses.Namespace'
         "204":
           description: No Content
         "400":
@@ -644,6 +691,72 @@ paths:
       summary: Get namespace info by base64
       tags:
       - namespace
+  /v1/namespace_by_hash/{hash}/{height}:
+    get:
+      description: Returns blob (bytes array)
+      operationId: get-namespace-blob
+      parameters:
+      - description: Base64-encoded namespace id and version
+        in: path
+        name: hash
+        required: true
+        type: string
+      - description: Block heigth
+        in: path
+        minimum: 1
+        name: height
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/blob.Blob'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get namespace blob on height
+      tags:
+      - namespace
+  /v1/search:
+    get:
+      description: Search entity by hash (block, tx, account and namespace)
+      operationId: search
+      parameters:
+      - description: Search string
+        in: query
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SearchResponse-responses_Searchable'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Search by hash
+      tags:
+      - search
   /v1/tx:
     get:
       description: List transactions info
@@ -665,6 +778,42 @@ paths:
         in: query
         name: sort
         type: string
+      - description: Comma-separated status list
+        enum:
+        - success
+        - failed
+        in: query
+        name: status
+        type: string
+      - description: Comma-separated message types list
+        enum:
+        - WithdrawValidatorCommission
+        - WithdrawDelegatorReward
+        - EditValidator
+        - BeginRedelegate
+        - CreateValidator
+        - Delegate
+        - Undelegate
+        - Unjail
+        - Send
+        - CreateVestingAccount
+        - CreatePeriodicVestingAccount
+        - PayForBlobs
+        in: query
+        name: msg_type
+        type: string
+      - description: Time from in unix timestamp
+        in: query
+        name: from
+        type: integer
+      - description: Time to in unix timestamp
+        in: query
+        name: to
+        type: integer
+      - description: Block number
+        in: query
+        name: height
+        type: integer
       produces:
       - application/json
       responses:
@@ -672,7 +821,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/handler.Tx'
+              $ref: '#/definitions/responses.Tx'
             type: array
         "400":
           description: Bad Request
@@ -703,7 +852,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.Tx'
+            $ref: '#/definitions/responses.Tx'
         "204":
           description: No Content
         "400":
@@ -736,7 +885,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/handler.Event'
+              $ref: '#/definitions/responses.Event'
             type: array
         "400":
           description: Bad Request
@@ -768,7 +917,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/handler.Message'
+              $ref: '#/definitions/responses.Message'
             type: array
         "400":
           description: Bad Request

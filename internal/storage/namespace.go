@@ -23,6 +23,7 @@ type Namespace struct {
 	Version     byte   `bun:"version"                   comment:"Namespace version"`
 	NamespaceID []byte `bun:"namespace_id"              comment:"Namespace identity"`
 	Size        uint64 `bun:"size"                      comment:"Namespace size"`
+	Reserved    bool   `bun:"reserved"                  comment:"If namespace is reserved flag is true"`
 }
 
 // TableName -

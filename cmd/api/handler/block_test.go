@@ -11,6 +11,7 @@ import (
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/mock"
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -19,11 +20,12 @@ import (
 var (
 	testBlock = storage.Block{
 		Id:           1,
-		Hash:         []byte{0, 1, 2, 3, 4, 5, 6, 7},
+		Hash:         []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31},
 		Height:       100,
 		VersionBlock: "11",
 		VersionApp:   "1",
 		Time:         testTime,
+		MessageTypes: types.NewMsgTypeBitMask(types.MsgTypeSend),
 	}
 
 	testTime = time.Date(2023, 8, 1, 1, 1, 0, 0, time.UTC)
@@ -81,8 +83,9 @@ func (s *BlockTestSuite) TestGet() {
 	s.Require().EqualValues(100, block.Height)
 	s.Require().Equal("1", block.VersionApp)
 	s.Require().Equal("11", block.VersionBlock)
-	s.Require().Equal("0001020304050607", block.Hash)
+	s.Require().Equal("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", block.Hash)
 	s.Require().Equal(testTime, block.Time)
+	s.Require().Equal([]string{string(types.MsgTypeSend)}, block.MessageTypes)
 }
 
 func (s *BlockTestSuite) TestGetInvalidBlockHeight() {
@@ -125,8 +128,9 @@ func (s *BlockTestSuite) TestList() {
 	s.Require().EqualValues(100, blocks[0].Height)
 	s.Require().Equal("1", blocks[0].VersionApp)
 	s.Require().Equal("11", blocks[0].VersionBlock)
-	s.Require().Equal("0001020304050607", blocks[0].Hash)
+	s.Require().Equal("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", blocks[0].Hash)
 	s.Require().Equal(testTime, blocks[0].Time)
+	s.Require().Equal([]string{string(types.MsgTypeSend)}, blocks[0].MessageTypes)
 }
 
 func (s *BlockTestSuite) TestGetEvents() {
@@ -145,7 +149,7 @@ func (s *BlockTestSuite) TestGetEvents() {
 				Height:   100,
 				Time:     testTime,
 				Position: 2,
-				Type:     storage.EventTypeBurn,
+				Type:     types.EventTypeBurn,
 				TxId:     nil,
 				Data: map[string]any{
 					"test": "value",
@@ -164,5 +168,5 @@ func (s *BlockTestSuite) TestGetEvents() {
 	s.Require().EqualValues(100, events[0].Height)
 	s.Require().EqualValues(2, events[0].Position)
 	s.Require().Equal(testTime, events[0].Time)
-	s.Require().Equal(string(storage.EventTypeBurn), events[0].Type)
+	s.Require().Equal(string(types.EventTypeBurn), events[0].Type)
 }

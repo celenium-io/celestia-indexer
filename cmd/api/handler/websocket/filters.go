@@ -2,7 +2,7 @@ package websocket
 
 import (
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/pkg/errors"
 )
 
@@ -52,16 +52,9 @@ func newTxFilters() *txFilters {
 	}
 }
 
-var (
-	availiableStatus = map[string]struct{}{
-		string(storage.StatusSuccess): {},
-		string(storage.StatusFailed):  {},
-	}
-)
-
 func (f *txFilters) Fill(msg TransactionFilters) error {
 	for i := range msg.Status {
-		if _, ok := availiableStatus[msg.Status[i]]; !ok {
+		if !types.IsStatus(msg.Status[i]) {
 			return errors.Wrapf(ErrUnavailiableFilter, "status %s", msg.Status[i])
 		}
 		f.status[msg.Status[i]] = struct{}{}

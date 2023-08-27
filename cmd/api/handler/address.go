@@ -23,23 +23,21 @@ type getAddressRequest struct {
 }
 
 // Get godoc
-// @Summary Get address info
-// @Description Get address info
-// @Tags address
-// @ID get-address
-// @Param hash path string true "Hash" minlength(48) maxlength(48)
-// @Produce  json
-// @Success 200 {object} Address
-// @Success 204
-// @Failure 400 {object} Error
-// @Failure 500 {object} Error
-// @Router /v1/address/{hash} [get]
+//
+//	@Summary		Get address info
+//	@Description	Get address info
+//	@Tags			address
+//	@ID				get-address
+//	@Param			hash	path	string	true	"Hash"	minlength(48)	maxlength(48)
+//	@Produce		json
+//	@Success		200	{object}	responses.Address
+//	@Success		204
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address/{hash} [get]
 func (handler *AddressHandler) Get(c echo.Context) error {
-	req := new(getAddressRequest)
-	if err := c.Bind(req); err != nil {
-		return badRequestError(c, err)
-	}
-	if err := c.Validate(req); err != nil {
+	req, err := bindAndValidate[getAddressRequest](c)
+	if err != nil {
 		return badRequestError(c, err)
 	}
 
@@ -61,24 +59,22 @@ func (handler *AddressHandler) Get(c echo.Context) error {
 }
 
 // List godoc
-// @Summary List address info
-// @Description List address info
-// @Tags address
-// @ID list-address
-// @Param limit  query integer false "Count of requested entities" mininum(1) maximum(100)
-// @Param offset query integer false "Offset" mininum(1)
-// @Param sort   query string  false "Sort order" Enums(asc, desc)
-// @Produce  json
-// @Success 200 {array} Address
-// @Failure 400 {object} Error
-// @Failure 500 {object} Error
-// @Router /v1/address [get]
+//
+//	@Summary		List address info
+//	@Description	List address info
+//	@Tags			address
+//	@ID				list-address
+//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
+//	@Produce		json
+//	@Success		200	{array}		responses.Address
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address [get]
 func (handler *AddressHandler) List(c echo.Context) error {
-	req := new(limitOffsetPagination)
-	if err := c.Bind(req); err != nil {
-		return badRequestError(c, err)
-	}
-	if err := c.Validate(req); err != nil {
+	req, err := bindAndValidate[limitOffsetPagination](c)
+	if err != nil {
 		return badRequestError(c, err)
 	}
 	req.SetDefault()

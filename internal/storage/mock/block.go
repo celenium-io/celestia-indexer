@@ -40,6 +40,45 @@ func (m *MockIBlock) EXPECT() *MockIBlockMockRecorder {
 	return m.recorder
 }
 
+// ByHash mocks base method.
+func (m *MockIBlock) ByHash(ctx context.Context, hash []byte) (storage.Block, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ByHash", ctx, hash)
+	ret0, _ := ret[0].(storage.Block)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ByHash indicates an expected call of ByHash.
+func (mr *MockIBlockMockRecorder) ByHash(ctx, hash any) *IBlockByHashCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByHash", reflect.TypeOf((*MockIBlock)(nil).ByHash), ctx, hash)
+	return &IBlockByHashCall{Call: call}
+}
+
+// IBlockByHashCall wrap *gomock.Call
+type IBlockByHashCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IBlockByHashCall) Return(arg0 storage.Block, arg1 error) *IBlockByHashCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IBlockByHashCall) Do(f func(context.Context, []byte) (storage.Block, error)) *IBlockByHashCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IBlockByHashCall) DoAndReturn(f func(context.Context, []byte) (storage.Block, error)) *IBlockByHashCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // ByHeight mocks base method.
 func (m *MockIBlock) ByHeight(ctx context.Context, height uint64) (storage.Block, error) {
 	m.ctrl.T.Helper()

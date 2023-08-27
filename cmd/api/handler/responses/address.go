@@ -3,7 +3,8 @@ package responses
 import "github.com/dipdup-io/celestia-indexer/internal/storage"
 
 // Address model info
-// @Description Celestia address information
+//
+//	@Description	Celestia address information
 type Address struct {
 	Id      uint64 `example:"321"                                             json:"id"           swaggertype:"integer"`
 	Height  uint64 `example:"100"                                             json:"first_height" swaggertype:"integer"`
@@ -22,4 +23,8 @@ func NewAddress(addr storage.Address) (Address, error) {
 		Balance: addr.Balance.String(),
 		Hash:    hash,
 	}, nil
+}
+
+func (Address) SearchType() string {
+	return "address"
 }

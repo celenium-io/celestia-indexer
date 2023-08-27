@@ -1,4 +1,4 @@
-package storage
+package types
 
 // MsgType -
 type MsgType string
@@ -19,3 +19,24 @@ const (
 	MsgTypeCreatePeriodicVestingAccount MsgType = "CreatePeriodicVestingAccount"
 	MsgTypePayForBlobs                  MsgType = "PayForBlobs"
 )
+
+var availiableMsgTypes = map[string]struct{}{
+	string(MsgTypeUnknown):                      {},
+	string(MsgTypeWithdrawValidatorCommission):  {},
+	string(MsgTypeWithdrawDelegatorReward):      {},
+	string(MsgTypeEditValidator):                {},
+	string(MsgTypeBeginRedelegate):              {},
+	string(MsgTypeCreateValidator):              {},
+	string(MsgTypeDelegate):                     {},
+	string(MsgTypeUndelegate):                   {},
+	string(MsgTypeUnjail):                       {},
+	string(MsgTypeSend):                         {},
+	string(MsgTypeCreateVestingAccount):         {},
+	string(MsgTypeCreatePeriodicVestingAccount): {},
+	string(MsgTypePayForBlobs):                  {},
+}
+
+func IsMsgType(val string) bool {
+	_, ok := availiableMsgTypes[val]
+	return ok
+}

@@ -2,11 +2,14 @@ package handler
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/blob"
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/mock"
@@ -29,10 +32,11 @@ var (
 // NamespaceTestSuite -
 type NamespaceTestSuite struct {
 	suite.Suite
-	namespaces *mock.MockINamespace
-	echo       *echo.Echo
-	handler    *NamespaceHandler
-	ctrl       *gomock.Controller
+	namespaces   *mock.MockINamespace
+	blobReceiver *blob.MockReceiver
+	echo         *echo.Echo
+	handler      *NamespaceHandler
+	ctrl         *gomock.Controller
 }
 
 // SetupSuite -
@@ -41,7 +45,8 @@ func (s *NamespaceTestSuite) SetupSuite() {
 	s.echo.Validator = NewCelestiaApiValidator()
 	s.ctrl = gomock.NewController(s.T())
 	s.namespaces = mock.NewMockINamespace(s.ctrl)
-	s.handler = NewNamespaceHandler(s.namespaces)
+	s.blobReceiver = blob.NewMockReceiver(s.ctrl)
+	s.handler = NewNamespaceHandler(s.namespaces, s.blobReceiver)
 }
 
 // TearDownSuite -
@@ -171,4 +176,53 @@ func (s *NamespaceTestSuite) TestGetByHash() {
 	s.Require().EqualValues(1, namespace.Version)
 	s.Require().Equal(testNamespaceId, namespace.NamespaceID)
 	s.Require().Equal(testNamespaceBase64, namespace.Hash)
+}
+
+func (s *NamespaceTestSuite) TestGetBlob() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/namespace_by_hash/:hash/:height")
+	c.SetParamNames("hash", "height")
+	c.SetParamValues(testNamespaceBase64, "1000")
+
+	result := make([]blob.Blob, 2)
+
+	for i := 0; i < len(result); i++ {
+		result[i].Namespace = testNamespaceBase64
+
+		data := make([]byte, 88)
+		_, err := rand.Read(data)
+		s.Require().NoError(err)
+		result[i].Data = base64.URLEncoding.EncodeToString(data)
+
+		commitment := make([]byte, 32)
+		_, err = rand.Read(commitment)
+		s.Require().NoError(err)
+		result[i].Commitment = base64.URLEncoding.EncodeToString(commitment)
+
+		result[i].ShareVersion = 0
+	}
+
+	s.blobReceiver.EXPECT().
+		Blobs(gomock.Any(), uint64(1000), testNamespaceBase64).
+		Return(result, nil).
+		MaxTimes(1).
+		MinTimes(1)
+
+	s.Require().NoError(s.handler.GetBlob(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var blobs []blob.Blob
+	err := json.NewDecoder(rec.Body).Decode(&blobs)
+	s.Require().NoError(err)
+
+	s.Require().Len(blobs, 2)
+
+	blob := blobs[0]
+	s.Require().EqualValues(result[0].ShareVersion, blob.ShareVersion)
+	s.Require().Equal(result[0].Namespace, blob.Namespace)
+	s.Require().Equal(result[0].Data, blob.Data)
+	s.Require().Equal(result[0].Commitment, blob.Commitment)
+
 }

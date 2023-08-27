@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -10,6 +11,7 @@ import (
 
 	_ "github.com/dipdup-io/celestia-indexer/cmd/api/docs"
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler"
+	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/blob"
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/websocket"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
 	"github.com/dipdup-net/go-lib/config"
@@ -166,7 +168,7 @@ func initDatabase(cfg config.Database) postgres.Storage {
 	return db
 }
 
-func initHandlers(ctx context.Context, e *echo.Echo, cfg ApiConfig, db postgres.Storage) {
+func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Storage) {
 	v1 := e.Group("v1")
 
 	stateHandlers := handler.NewStateHandler(db.State)
@@ -196,7 +198,16 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg ApiConfig, db postgres.
 		txGroup.GET("/:hash/messages", txHandlers.GetMessages)
 	}
 
-	namespaceHandlers := handler.NewNamespaceHandler(db.Namespace)
+	datasource, ok := cfg.DataSources[cfg.ApiConfig.BlobReceiver]
+	if !ok {
+		panic(fmt.Sprintf("unknown data source pointed in blob_receiver: %s", cfg.ApiConfig.BlobReceiver))
+	}
+
+	blobReceiver := blob.NewNode(datasource.URL).
+		WithAuthToken(os.Getenv("CELESTIA_NODE_AUTH_TOKEN")).
+		WithRateLimit(datasource.RequestsPerSecond)
+
+	namespaceHandlers := handler.NewNamespaceHandler(db.Namespace, blobReceiver)
 	namespaceGroup := v1.Group("/namespace")
 	{
 		namespaceGroup.GET("", namespaceHandlers.List)
@@ -204,9 +215,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg ApiConfig, db postgres.
 		namespaceGroup.GET("/:id/:version", namespaceHandlers.GetWithVersion)
 	}
 
-	v1.GET("/namespace_by_hash/:hash", namespaceHandlers.GetByHash)
+	namespaceByHash := v1.Group("/namespace_by_hash")
+	{
+		namespaceByHash.GET("/:hash", namespaceHandlers.GetByHash)
+		namespaceByHash.GET("/:hash/:height", namespaceHandlers.GetBlob)
+	}
 
-	if cfg.Prometheus {
+	if cfg.ApiConfig.Prometheus {
 		v1.GET("/metrics", echoprometheus.NewHandler())
 	}
 

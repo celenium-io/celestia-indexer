@@ -13,4 +13,5 @@ type ApiConfig struct {
 	RateLimit      float64 `validate:"omitempty,min=0"        yaml:"rate_limit"`
 	Prometheus     bool    `validate:"omitempty"              yaml:"prometheus"`
 	RequestTimeout int     `validate:"omitempty,min=1"        yaml:"request_timeout"`
+	BlobReceiver   string  `validate:"required"               yaml:"blob_receiver"`
 }

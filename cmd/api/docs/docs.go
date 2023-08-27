@@ -58,7 +58,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handler.Address"
+                                "$ref": "#/definitions/responses.Address"
                             }
                         }
                     },
@@ -103,7 +103,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Address"
+                            "$ref": "#/definitions/responses.Address"
                         }
                     },
                     "204": {
@@ -166,7 +166,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handler.Block"
+                                "$ref": "#/definitions/responses.Block"
                             }
                         }
                     },
@@ -210,7 +210,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Block"
+                            "$ref": "#/definitions/responses.Block"
                         }
                     },
                     "204": {
@@ -258,7 +258,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handler.Event"
+                                "$ref": "#/definitions/responses.Event"
                             }
                         }
                     },
@@ -292,7 +292,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.State"
+                            "$ref": "#/definitions/responses.State"
                         }
                     },
                     "204": {
@@ -355,7 +355,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handler.Block"
+                                "$ref": "#/definitions/responses.Block"
                             }
                         }
                     },
@@ -402,7 +402,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handler.Namespace"
+                                "$ref": "#/definitions/responses.Namespace"
                             }
                         }
                     },
@@ -454,7 +454,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Namespace"
+                            "$ref": "#/definitions/responses.Namespace"
                         }
                     },
                     "204": {
@@ -499,7 +499,105 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Namespace"
+                            "$ref": "#/definitions/responses.Namespace"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/namespace_by_hash/{hash}/{height}": {
+            "get": {
+                "description": "Returns blob (bytes array)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "namespace"
+                ],
+                "summary": "Get namespace blob on height",
+                "operationId": "get-namespace-blob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Base64-encoded namespace id and version",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Block heigth",
+                        "name": "height",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/blob.Blob"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/search": {
+            "get": {
+                "description": "Search entity by hash (block, tx, account and namespace)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "Search by hash",
+                "operationId": "search",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search string",
+                        "name": "query",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SearchResponse-responses_Searchable"
                         }
                     },
                     "204": {
@@ -554,6 +652,54 @@ const docTemplate = `{
                         "description": "Sort order",
                         "name": "sort",
                         "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "success",
+                            "failed"
+                        ],
+                        "type": "string",
+                        "description": "Comma-separated status list",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "WithdrawValidatorCommission",
+                            "WithdrawDelegatorReward",
+                            "EditValidator",
+                            "BeginRedelegate",
+                            "CreateValidator",
+                            "Delegate",
+                            "Undelegate",
+                            "Unjail",
+                            "Send",
+                            "CreateVestingAccount",
+                            "CreatePeriodicVestingAccount",
+                            "PayForBlobs"
+                        ],
+                        "type": "string",
+                        "description": "Comma-separated message types list",
+                        "name": "msg_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Block number",
+                        "name": "height",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -562,7 +708,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handler.Tx"
+                                "$ref": "#/definitions/responses.Tx"
                             }
                         }
                     },
@@ -607,7 +753,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Tx"
+                            "$ref": "#/definitions/responses.Tx"
                         }
                     },
                     "204": {
@@ -656,7 +802,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handler.Event"
+                                "$ref": "#/definitions/responses.Event"
                             }
                         }
                     },
@@ -703,7 +849,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handler.Message"
+                                "$ref": "#/definitions/responses.Message"
                             }
                         }
                     },
@@ -724,7 +870,53 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handler.Address": {
+        "SearchResponse-responses_Searchable": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "description": "Search result. Can be one of folowwing types: Block, Address, Namespace, Tx",
+                    "type": "object"
+                },
+                "type": {
+                    "description": "Result type which is in the result. Can be 'block', 'address', 'namespace', 'tx'",
+                    "type": "string"
+                }
+            }
+        },
+        "blob.Blob": {
+            "type": "object",
+            "properties": {
+                "commitment": {
+                    "type": "string",
+                    "format": "base64",
+                    "example": "vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg="
+                },
+                "data": {
+                    "type": "string",
+                    "format": "base64",
+                    "example": "b2sgZGVtbyBkYQ=="
+                },
+                "namespace": {
+                    "type": "string",
+                    "format": "base64",
+                    "example": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="
+                },
+                "share_version": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 0
+                }
+            }
+        },
+        "handler.Error": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.Address": {
             "description": "Celestia address information",
             "type": "object",
             "properties": {
@@ -746,7 +938,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.Block": {
+        "responses.Block": {
             "type": "object",
             "properties": {
                 "app_hash": {
@@ -789,6 +981,16 @@ const docTemplate = `{
                     "type": "string",
                     "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
                 },
+                "message_types": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "MsgSend",
+                        "MsgUnjail"
+                    ]
+                },
                 "next_validators_hash": {
                     "type": "string",
                     "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
@@ -823,15 +1025,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.Error": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "handler.Event": {
+        "responses.Event": {
             "type": "object",
             "properties": {
                 "data": {
@@ -894,7 +1088,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.Message": {
+        "responses.Message": {
             "type": "object",
             "properties": {
                 "data": {
@@ -947,7 +1141,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.Namespace": {
+        "responses.Namespace": {
             "type": "object",
             "properties": {
                 "hash": {
@@ -965,6 +1159,10 @@ const docTemplate = `{
                     "format": "binary",
                     "example": "4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02"
                 },
+                "reserved": {
+                    "type": "boolean",
+                    "example": true
+                },
                 "size": {
                     "type": "integer",
                     "format": "integer",
@@ -976,7 +1174,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.State": {
+        "responses.State": {
             "type": "object",
             "properties": {
                 "id": {
@@ -1021,7 +1219,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.Tx": {
+        "responses.Tx": {
             "type": "object",
             "properties": {
                 "codespace": {
@@ -1073,6 +1271,16 @@ const docTemplate = `{
                     "type": "string",
                     "format": "string",
                     "example": "Transfer to private account"
+                },
+                "message_types": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "MsgSend",
+                        "MsgUnjail"
+                    ]
                 },
                 "messages_count": {
                     "type": "integer",

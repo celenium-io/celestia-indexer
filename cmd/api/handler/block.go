@@ -25,23 +25,21 @@ type getBlockRequest struct {
 }
 
 // Get godoc
-// @Summary Get block info
-// @Description Get block info
-// @Tags block
-// @ID get-block
-// @Param height path integer true "Block height" minimum(1)
-// @Produce  json
-// @Success 200 {object} Block
-// @Success 204
-// @Failure 400 {object} Error
-// @Failure 500 {object} Error
-// @Router /v1/block/{height} [get]
+//
+//	@Summary		Get block info
+//	@Description	Get block info
+//	@Tags			block
+//	@ID				get-block
+//	@Param			height	path	integer	true	"Block height"	minimum(1)
+//	@Produce		json
+//	@Success		200	{object}	responses.Block
+//	@Success		204
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/block/{height} [get]
 func (handler *BlockHandler) Get(c echo.Context) error {
-	req := new(getBlockRequest)
-	if err := c.Bind(req); err != nil {
-		return badRequestError(c, err)
-	}
-	if err := c.Validate(req); err != nil {
+	req, err := bindAndValidate[getBlockRequest](c)
+	if err != nil {
 		return badRequestError(c, err)
 	}
 
@@ -54,24 +52,22 @@ func (handler *BlockHandler) Get(c echo.Context) error {
 }
 
 // List godoc
-// @Summary List blocks info
-// @Description List blocks info
-// @Tags block
-// @ID list-block
-// @Param limit  query integer false "Count of requested entities" mininum(1) maximum(100)
-// @Param offset query integer false "Offset" mininum(1)
-// @Param sort   query string  false "Sort order" Enums(asc, desc)
-// @Produce json
-// @Success 200 {array} Block
-// @Failure 400 {object} Error
-// @Failure 500 {object} Error
-// @Router /v1/block [get]
+//
+//	@Summary		List blocks info
+//	@Description	List blocks info
+//	@Tags			block
+//	@ID				list-block
+//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
+//	@Produce		json
+//	@Success		200	{array}		responses.Block
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/block [get]
 func (handler *BlockHandler) List(c echo.Context) error {
-	req := new(limitOffsetPagination)
-	if err := c.Bind(req); err != nil {
-		return badRequestError(c, err)
-	}
-	if err := c.Validate(req); err != nil {
+	req, err := bindAndValidate[limitOffsetPagination](c)
+	if err != nil {
 		return badRequestError(c, err)
 	}
 	req.SetDefault()
@@ -90,22 +86,20 @@ func (handler *BlockHandler) List(c echo.Context) error {
 }
 
 // GetEvents godoc
-// @Summary Get events from begin and end of block
-// @Description Get events from begin and end of block
-// @Tags block
-// @ID get-block-events
-// @Param height path integer true "Block height" minimum(1)
-// @Produce json
-// @Success 200 {array} Event
-// @Failure 400 {object} Error
-// @Failure 500 {object} Error
-// @Router /v1/block/{height}/events [get]
+//
+//	@Summary		Get events from begin and end of block
+//	@Description	Get events from begin and end of block
+//	@Tags			block
+//	@ID				get-block-events
+//	@Param			height	path	integer	true	"Block height"	minimum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Event
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/block/{height}/events [get]
 func (handler *BlockHandler) GetEvents(c echo.Context) error {
-	req := new(getBlockRequest)
-	if err := c.Bind(req); err != nil {
-		return badRequestError(c, err)
-	}
-	if err := c.Validate(req); err != nil {
+	req, err := bindAndValidate[getBlockRequest](c)
+	if err != nil {
 		return badRequestError(c, err)
 	}
 

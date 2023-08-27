@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
@@ -23,7 +24,7 @@ type Message struct {
 	Height   uint64         `bun:",notnull"                  comment:"The number (height) of this block"`
 	Time     time.Time      `bun:"time,pk,notnull"           comment:"The time of block"`
 	Position uint64         `bun:"position"                  comment:"Position in transaction"`
-	Type     MsgType        `bun:",type:msg_type"            comment:"Message type"`
+	Type     types.MsgType  `bun:",type:msg_type"            comment:"Message type"`
 	TxId     uint64         `bun:"tx_id"                     comment:"Parent transaction id"`
 	Data     map[string]any `bun:"data,type:jsonb"           comment:"Message data"`
 }

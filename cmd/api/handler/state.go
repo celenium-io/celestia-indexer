@@ -20,16 +20,17 @@ func NewStateHandler(state storage.IState) *StateHandler {
 }
 
 // Head godoc
-// @Summary Get current indexer head
-// @Description Get current indexer head
-// @Tags general
-// @ID head
-// @Produce  json
-// @Success 200 {object} State
-// @Success 204
-// @Failure 400 {object} Error
-// @Failure 500 {object} Error
-// @Router /v1/head [get]
+//
+//	@Summary		Get current indexer head
+//	@Description	Get current indexer head
+//	@Tags			general
+//	@ID				head
+//	@Produce		json
+//	@Success		200	{object}	responses.State
+//	@Success		204
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/head [get]
 func (sh *StateHandler) Head(c echo.Context) error {
 	state, err := sh.state.List(c.Request().Context(), 1, 0, sdk.SortOrderAsc)
 	if err != nil {

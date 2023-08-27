@@ -1,4 +1,4 @@
-package storage
+package types
 
 // EventType -
 type EventType string
