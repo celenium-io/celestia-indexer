@@ -2,11 +2,14 @@
   version: 0
   namespace_id: 0x5F7A8DDFE6136FE76B65B9066D4F816D707F
   size: 1234
+  pfd_count: 3
 - id: 2
   version: 1
   namespace_id: 0x5F7A8DDFE6136FE76B65B9066D4F816D707F
   size: 1255
+  pfd_count: 2
 - id: 3
   version: 0
   namespace_id: 0x62491A45621ABEA79EBA193FD2944B5B9EBD
   size: 12
+  pfd_count: 1

@@ -157,6 +157,9 @@ func (module *Module) updateState(block storage.Block) {
 	module.state.LastHeight = block.Height
 	module.state.LastTime = block.Time
 	module.state.TotalTx += block.TxCount
+	module.state.TotalNamespaceSize = block.NamespaceSize
+	module.state.TotalFee = module.state.TotalFee.Add(block.Fee)
+	// TODO: update TotalAccounts
 	module.state.ChainId = block.ChainId
 	// TODO: update rest fields
 }
@@ -178,8 +181,9 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 	}
 
 	var (
-		messages = make([]any, 0)
-		events   = make([]any, len(block.Events))
+		messages   = make([]any, 0)
+		events     = make([]any, len(block.Events))
+		namespaces = make(map[string]storage.Namespace, 0)
 	)
 
 	for i := range block.Events {
@@ -190,11 +194,32 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 		for j := range block.Txs[i].Messages {
 			block.Txs[i].Messages[j].TxId = block.Txs[i].Id
 			messages = append(messages, &block.Txs[i].Messages[j])
+
+			for k := range block.Txs[i].Messages[j].Namespace {
+				key := block.Txs[i].Messages[j].Namespace[k].String()
+				if ns, ok := namespaces[key]; ok {
+					ns.PfdCount += 1
+				} else {
+					block.Txs[i].Messages[j].Namespace[k].PfdCount = 1
+					namespaces[key] = block.Txs[i].Messages[j].Namespace[k]
+				}
+			}
 		}
 
 		for j := range block.Txs[i].Events {
 			block.Txs[i].Events[j].TxId = &block.Txs[i].Id
 			events = append(events, &block.Txs[i].Events[j])
+		}
+	}
+
+	if len(namespaces) > 0 {
+		data := make([]storage.Namespace, 0, len(namespaces))
+		for _, ns := range namespaces {
+			data = append(data, ns)
+		}
+
+		if err := tx.SaveNamespaces(ctx, data...); err != nil {
+			return tx.HandleError(ctx, err)
 		}
 	}
 
@@ -210,7 +235,27 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 		}
 	}
 
-	// TODO: save addresses and namespaces
+	var namespaceActions []any
+	for _, m := range messages {
+		msg, ok := m.(storage.Message)
+		if !ok {
+			continue
+		}
+		for _, ns := range msg.Namespace {
+			namespaceActions = append(namespaceActions, &storage.NamespaceAction{
+				MsgId:       msg.Id,
+				NamespaceId: ns.ID,
+				Time:        msg.Time,
+			})
+		}
+	}
+	if len(namespaceActions) > 0 {
+		if err := tx.BulkSave(ctx, namespaceActions); err != nil {
+			return tx.HandleError(ctx, err)
+		}
+	}
+
+	// TODO: save addresses
 
 	module.updateState(block)
 	if err := tx.Update(ctx, module.state); err != nil {
@@ -220,7 +265,11 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 	if err := tx.Flush(ctx); err != nil {
 		return tx.HandleError(ctx, err)
 	}
-	module.log.Info().Uint64("height", block.Id).Msg("block saved")
+	module.log.Info().
+		Uint64("height", block.Id).
+		Uint64("block_ns_size", block.NamespaceSize).
+		Str("block_fee", block.Fee.String()).
+		Msg("block saved")
 	return nil
 }
 

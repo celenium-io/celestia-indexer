@@ -11,6 +11,7 @@ import (
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/mock"
 	"github.com/labstack/echo/v4"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -59,7 +60,7 @@ func (s *StateTestSuite) TestHead() {
 				LastTime:           testTime,
 				TotalTx:            1234,
 				TotalAccounts:      123,
-				TotalNamespaces:    2,
+				TotalFee:           decimal.RequireFromString("2"),
 				TotalNamespaceSize: 30,
 			},
 		}, nil)
@@ -75,7 +76,7 @@ func (s *StateTestSuite) TestHead() {
 	s.Require().EqualValues(100, state.LastHeight)
 	s.Require().EqualValues(1234, state.TotalTx)
 	s.Require().EqualValues(123, state.TotalAccounts)
-	s.Require().EqualValues(2, state.TotalNamespaces)
+	s.Require().Equal("2", state.TotalFee)
 	s.Require().EqualValues(30, state.TotalNamespaceSize)
 	s.Require().Equal(testTime, state.LastTime)
 }

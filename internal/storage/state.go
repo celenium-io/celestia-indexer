@@ -28,8 +28,9 @@ type State struct {
 	TotalTx            uint64          `bun:"total_tx"                  comment:"Transactions count in celestia"`
 	TotalAccounts      uint64          `bun:"total_accounts"            comment:"Accounts count in celestia"`
 	TotalNamespaces    uint64          `bun:"total_namespaces"          comment:"Namespaces count in celestia"`
-	TotalNamespaceSize uint64          `bun:"total_namspaces_size"      comment:"Total namespace size"`
+	TotalNamespaceSize uint64          `bun:"total_namespaces_size"     comment:"Total namespace size"`
 	TotalSupply        decimal.Decimal `bun:"total_supply,type:numeric" comment:"Total supply in celestia"`
+	TotalFee           decimal.Decimal `bun:"total_fee,type:numeric"    comment:"Total paid fee"`
 }
 
 // TableName -

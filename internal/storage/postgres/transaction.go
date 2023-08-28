@@ -7,18 +7,15 @@ import (
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 )
 
-// Transaction -
 type Transaction struct {
 	storage.Transaction
 }
 
-// BeginTransaction -
 func BeginTransaction(ctx context.Context, tx storage.Transactable) (Transaction, error) {
 	t, err := tx.BeginTransaction(ctx)
 	return Transaction{t}, err
 }
 
-// SaveTransactions -
 func (tx Transaction) SaveTransactions(ctx context.Context, txs ...models.Tx) error {
 	switch len(txs) {
 	case 0:
@@ -32,4 +29,19 @@ func (tx Transaction) SaveTransactions(ctx context.Context, txs ...models.Tx) er
 		}
 		return tx.BulkSave(ctx, arr)
 	}
+}
+
+func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...models.Namespace) error {
+	if len(namespaces) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&namespaces).
+		Column("version", "namespace_id", "pfd_count", "size").
+		On("CONFLICT ON CONSTRAINT namespace_id_version_idx DO UPDATE").
+		Set("size = EXCLUDED.size + namespace.size").
+		Set("pfd_count = EXCLUDED.pfd_count + namespace.pfd_count").
+		Returning("id").
+		Exec(ctx)
+	return err
 }

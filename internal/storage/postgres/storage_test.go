@@ -91,7 +91,7 @@ func (s *StorageTestSuite) TestStateGetByName() {
 	s.Require().EqualValues(1000, state.LastHeight)
 	s.Require().EqualValues(394067, state.TotalTx)
 	s.Require().EqualValues(12512357, state.TotalAccounts)
-	s.Require().EqualValues(1000, state.TotalNamespaces)
+	s.Require().Equal("172635712635813", state.TotalFee.String())
 	s.Require().EqualValues(324234, state.TotalNamespaceSize)
 	s.Require().Equal(testIndexerName, state.Name)
 }
