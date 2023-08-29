@@ -312,6 +312,45 @@ func (c *INamespaceListCall) DoAndReturn(f func(context.Context, uint64, uint64,
 	return c
 }
 
+// Messages mocks base method.
+func (m *MockINamespace) Messages(ctx context.Context, id uint64, limit, offset int) ([]storage.NamespaceMessage, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Messages", ctx, id, limit, offset)
+	ret0, _ := ret[0].([]storage.NamespaceMessage)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Messages indicates an expected call of Messages.
+func (mr *MockINamespaceMockRecorder) Messages(ctx, id, limit, offset any) *INamespaceMessagesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Messages", reflect.TypeOf((*MockINamespace)(nil).Messages), ctx, id, limit, offset)
+	return &INamespaceMessagesCall{Call: call}
+}
+
+// INamespaceMessagesCall wrap *gomock.Call
+type INamespaceMessagesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *INamespaceMessagesCall) Return(arg0 []storage.NamespaceMessage, arg1 error) *INamespaceMessagesCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *INamespaceMessagesCall) Do(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *INamespaceMessagesCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Save mocks base method.
 func (m_2 *MockINamespace) Save(ctx context.Context, m *storage.Namespace) error {
 	m_2.ctrl.T.Helper()

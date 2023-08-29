@@ -205,3 +205,59 @@ func (handler *NamespaceHandler) GetBlob(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, blobs)
 }
+
+type getNamespaceMessages struct {
+	Id      string `param:"id"      validate:"required,hexadecimal,len=56"`
+	Version byte   `param:"version" validate:"required"`
+	Limit   uint64 `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset  uint64 `query:"offset"  validate:"omitempty,min=0"`
+}
+
+// GetMessages godoc
+//
+//	@Summary		Get namespace messages by id and version
+//	@Description	Returns namespace messages by version byte and namespace id
+//	@Tags			namespace
+//	@ID				get-namespace-messages
+//	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
+//	@Param			version	path	integer	true	"Version of namespace"
+//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Produce		json
+//	@Success		200	{array}	responses.NamespaceMessage
+//	@Success		204
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/namespace/{id}/{version}/messages [get]
+func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
+	req, err := bindAndValidate[getNamespaceMessages](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	namespaceId, err := hex.DecodeString(req.Id)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	ns, err := handler.namespace.ByNamespaceIdAndVersion(c.Request().Context(), namespaceId, req.Version)
+	if err := handleError(c, err, handler.namespace); err != nil {
+		return err
+	}
+
+	messages, err := handler.namespace.Messages(c.Request().Context(), ns.ID, int(req.Limit), int(req.Offset))
+	if err := handleError(c, err, handler.namespace); err != nil {
+		return err
+	}
+
+	response := make([]responses.NamespaceMessage, len(messages))
+	for i := range response {
+		msg, err := responses.NewNamespaceMessage(messages[i])
+		if err := handleError(c, err, handler.namespace); err != nil {
+			return err
+		}
+		response[i] = msg
+	}
+
+	return c.JSON(http.StatusOK, response)
+}

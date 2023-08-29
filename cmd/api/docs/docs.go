@@ -475,6 +475,76 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/namespace/{id}/{version}/messages": {
+            "get": {
+                "description": "Returns namespace messages by version byte and namespace id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "namespace"
+                ],
+                "summary": "Get namespace messages by id and version",
+                "operationId": "get-namespace-messages",
+                "parameters": [
+                    {
+                        "maxLength": 56,
+                        "minLength": 56,
+                        "type": "string",
+                        "description": "Namespace id in hexadecimal",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Version of namespace",
+                        "name": "version",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.NamespaceMessage"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/namespace_by_hash/{hash}": {
             "get": {
                 "description": "Returns namespace by base64 encoded identity",
@@ -597,7 +667,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SearchResponse-responses_Searchable"
+                            "$ref": "#/definitions/responses.SearchResponse-responses_Searchable"
                         }
                     },
                     "204": {
@@ -870,19 +940,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "SearchResponse-responses_Searchable": {
-            "type": "object",
-            "properties": {
-                "result": {
-                    "description": "Search result. Can be one of folowwing types: Block, Address, Namespace, Tx",
-                    "type": "object"
-                },
-                "type": {
-                    "description": "Result type which is in the result. Can be 'block', 'address', 'namespace', 'tx'",
-                    "type": "string"
-                }
-            }
-        },
         "blob.Blob": {
             "type": "object",
             "properties": {
@@ -1179,6 +1236,70 @@ const docTemplate = `{
                 "version": {
                     "type": "integer",
                     "format": "byte"
+                }
+            }
+        },
+        "responses.NamespaceMessage": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "position": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 2
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "tx": {
+                    "$ref": "#/definitions/responses.Tx"
+                },
+                "type": {
+                    "type": "string",
+                    "format": "string",
+                    "enum": [
+                        "WithdrawValidatorCommission",
+                        "WithdrawDelegatorReward",
+                        "EditValidator",
+                        "BeginRedelegate",
+                        "CreateValidator",
+                        "Delegate",
+                        "Undelegate",
+                        "Unjail",
+                        "Send",
+                        "CreateVestingAccount",
+                        "CreatePeriodicVestingAccount",
+                        "PayForBlobs"
+                    ],
+                    "example": "CreatePeriodicVestingAccount"
+                }
+            }
+        },
+        "responses.SearchResponse-responses_Searchable": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "description": "Search result. Can be one of folowwing types: Block, Address, Namespace, Tx",
+                    "type": "object"
+                },
+                "type": {
+                    "description": "Result type which is in the result. Can be 'block', 'address', 'namespace', 'tx'",
+                    "type": "string"
                 }
             }
         },

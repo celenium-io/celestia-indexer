@@ -14,6 +14,7 @@ type INamespace interface {
 
 	ByNamespaceId(ctx context.Context, namespaceId []byte) ([]Namespace, error)
 	ByNamespaceIdAndVersion(ctx context.Context, namespaceId []byte, version byte) (Namespace, error)
+	Messages(ctx context.Context, id uint64, limit, offset int) ([]NamespaceMessage, error)
 }
 
 // Namespace -

@@ -1,16 +1,5 @@
 basePath: /v1
 definitions:
-  SearchResponse-responses_Searchable:
-    properties:
-      result:
-        description: 'Search result. Can be one of folowwing types: Block, Address,
-          Namespace, Tx'
-        type: object
-      type:
-        description: Result type which is in the result. Can be 'block', 'address',
-          'namespace', 'tx'
-        type: string
-    type: object
   blob.Blob:
     properties:
       commitment:
@@ -241,6 +230,58 @@ definitions:
       version:
         format: byte
         type: integer
+    type: object
+  responses.NamespaceMessage:
+    properties:
+      data:
+        additionalProperties: {}
+        type: object
+      height:
+        example: 100
+        format: int64
+        type: integer
+      id:
+        example: 321
+        format: int64
+        type: integer
+      position:
+        example: 2
+        format: int64
+        type: integer
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
+      tx:
+        $ref: '#/definitions/responses.Tx'
+      type:
+        enum:
+        - WithdrawValidatorCommission
+        - WithdrawDelegatorReward
+        - EditValidator
+        - BeginRedelegate
+        - CreateValidator
+        - Delegate
+        - Undelegate
+        - Unjail
+        - Send
+        - CreateVestingAccount
+        - CreatePeriodicVestingAccount
+        - PayForBlobs
+        example: CreatePeriodicVestingAccount
+        format: string
+        type: string
+    type: object
+  responses.SearchResponse-responses_Searchable:
+    properties:
+      result:
+        description: 'Search result. Can be one of folowwing types: Block, Address,
+          Namespace, Tx'
+        type: object
+      type:
+        description: Result type which is in the result. Can be 'block', 'address',
+          'namespace', 'tx'
+        type: string
     type: object
   responses.State:
     properties:
@@ -667,6 +708,54 @@ paths:
       summary: Get namespace info by id and version
       tags:
       - namespace
+  /v1/namespace/{id}/{version}/messages:
+    get:
+      description: Returns namespace messages by version byte and namespace id
+      operationId: get-namespace-messages
+      parameters:
+      - description: Namespace id in hexadecimal
+        in: path
+        maxLength: 56
+        minLength: 56
+        name: id
+        required: true
+        type: string
+      - description: Version of namespace
+        in: path
+        name: version
+        required: true
+        type: integer
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.NamespaceMessage'
+            type: array
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get namespace messages by id and version
+      tags:
+      - namespace
   /v1/namespace_by_hash/{hash}:
     get:
       description: Returns namespace by base64 encoded identity
@@ -749,7 +838,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/SearchResponse-responses_Searchable'
+            $ref: '#/definitions/responses.SearchResponse-responses_Searchable'
         "204":
           description: No Content
         "400":

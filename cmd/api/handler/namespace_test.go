@@ -13,6 +13,7 @@ import (
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/mock"
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -225,4 +226,52 @@ func (s *NamespaceTestSuite) TestGetBlob() {
 	s.Require().Equal(result[0].Data, blob.Data)
 	s.Require().Equal(result[0].Commitment, blob.Commitment)
 
+}
+
+func (s *NamespaceTestSuite) TestGetMessages() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/namespace/:id/:version/messages")
+	c.SetParamNames("id", "version")
+	c.SetParamValues(testNamespaceId, "1")
+
+	s.namespaces.EXPECT().
+		ByNamespaceIdAndVersion(gomock.Any(), testNamespace.NamespaceID, byte(1)).
+		Return(testNamespace, nil)
+
+	s.namespaces.EXPECT().
+		Messages(gomock.Any(), testNamespace.ID, 0, 0).
+		Return([]storage.NamespaceMessage{
+			{
+				NamespaceId: testNamespace.ID,
+				MsgId:       1,
+				Message: &storage.Message{
+					Id:       1,
+					TxId:     2,
+					Position: 3,
+					Type:     types.MsgTypeBeginRedelegate,
+					Height:   100,
+					Time:     testTime,
+				},
+				TxId: 1,
+				Tx:   &testTx,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.GetMessages(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var msgs []responses.NamespaceMessage
+	err := json.NewDecoder(rec.Body).Decode(&msgs)
+	s.Require().NoError(err)
+	s.Require().Len(msgs, 1)
+
+	msg := msgs[0]
+	s.Require().EqualValues(1, msg.Id)
+	s.Require().EqualValues(100, msg.Height)
+	s.Require().EqualValues(3, msg.Position)
+	s.Require().Equal(testTime, msg.Time)
+	s.Require().EqualValues(string(types.MsgTypeBeginRedelegate), msg.Type)
+	s.Require().EqualValues(1, msg.Tx.Id)
 }

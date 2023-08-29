@@ -19,10 +19,9 @@ var rootCmd = &cobra.Command{
 //	@title			Swagger Celestia Indexer API
 //	@version		1.0
 //	@description	This is docs of Celestia indexer API.
-
 //	@host		127.0.0.1
 //	@BasePath	/v1
-
+//
 // @query.collection.format	multi
 func main() {
 	cfg, err := initConfig()

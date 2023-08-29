@@ -11,7 +11,7 @@ type SearchResponse[T Searchable] struct {
 	Result T `json:"result" swaggertype:"object"`
 	// Result type which is in the result. Can be 'block', 'address', 'namespace', 'tx'
 	Type string `json:"type"`
-} // @name SearchResponse
+} //	@name	SearchResponse
 
 func NewSearchResponse[T Searchable](val T) SearchResponse[T] {
 	return SearchResponse[T]{

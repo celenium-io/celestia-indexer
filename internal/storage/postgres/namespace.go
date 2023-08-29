@@ -36,3 +36,18 @@ func (n *Namespace) ByNamespaceIdAndVersion(ctx context.Context, namespaceId []b
 		Scan(ctx)
 	return
 }
+
+// Messages -
+func (n *Namespace) Messages(ctx context.Context, id uint64, limit, offset int) (msgs []storage.NamespaceMessage, err error) {
+	query := n.DB().NewSelect().Model(&msgs).
+		Where("namespace_message.namespace_id = ?", id).
+		Order("namespace_message.time desc").
+		Relation("Message").
+		Relation("Tx")
+	query = limitScope(query, limit)
+	if offset > 0 {
+		query = query.Offset(offset)
+	}
+	err = query.Scan(ctx)
+	return
+}

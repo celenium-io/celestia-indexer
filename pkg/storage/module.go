@@ -235,22 +235,23 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 		}
 	}
 
-	var namespaceActions []any
+	var namespaceMsgs []any
 	for _, m := range messages {
 		msg, ok := m.(storage.Message)
 		if !ok {
 			continue
 		}
 		for _, ns := range msg.Namespace {
-			namespaceActions = append(namespaceActions, &storage.NamespaceAction{
+			namespaceMsgs = append(namespaceMsgs, &storage.NamespaceMessage{
 				MsgId:       msg.Id,
 				NamespaceId: ns.ID,
 				Time:        msg.Time,
+				TxId:        msg.TxId,
 			})
 		}
 	}
-	if len(namespaceActions) > 0 {
-		if err := tx.BulkSave(ctx, namespaceActions); err != nil {
+	if len(namespaceMsgs) > 0 {
+		if err := tx.BulkSave(ctx, namespaceMsgs); err != nil {
 			return tx.HandleError(ctx, err)
 		}
 	}
