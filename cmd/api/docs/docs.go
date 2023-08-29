@@ -961,6 +961,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
                 },
+                "fee": {
+                    "type": "string",
+                    "example": "28347628346"
+                },
                 "hash": {
                     "type": "string",
                     "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
@@ -990,6 +994,10 @@ const docTemplate = `{
                         "MsgSend",
                         "MsgUnjail"
                     ]
+                },
+                "namespace_size": {
+                    "type": "integer",
+                    "example": 12354
                 },
                 "next_validators_hash": {
                     "type": "string",
@@ -1202,15 +1210,15 @@ const docTemplate = `{
                     "format": "int64",
                     "example": 43
                 },
+                "total_fee": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "312"
+                },
                 "total_namespace_size": {
                     "type": "integer",
                     "format": "int64",
                     "example": 56789
-                },
-                "total_namespaces": {
-                    "type": "integer",
-                    "format": "int64",
-                    "example": 312
                 },
                 "total_tx": {
                     "type": "integer",

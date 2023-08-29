@@ -150,3 +150,67 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 		})
 	}
 }
+
+func TestMsgTypeBits_SetBit(t *testing.T) {
+	tests := []struct {
+		name  string
+		value MsgType
+		want  MsgTypeBits
+	}{
+		{
+			name:  "test 1",
+			value: MsgTypeBeginRedelegate,
+			want:  NewMsgTypeBitMask(MsgTypeBeginRedelegate),
+		}, {
+			name:  "test 2",
+			value: MsgType("unknown"),
+			want:  NewMsgTypeBitMask(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mask := &MsgTypeBits{
+				Bits: 0,
+			}
+			mask.SetBit(tt.value)
+			require.EqualValues(t, tt.want.Bits, mask.Bits)
+		})
+	}
+}
+
+func TestMsgTypeBits_HasOne(t *testing.T) {
+	tests := []struct {
+		name  string
+		mask  MsgTypeBits
+		value MsgTypeBits
+		want  bool
+	}{
+		{
+			name:  "test 1",
+			mask:  NewMsgTypeBitMask(MsgTypeBeginRedelegate),
+			value: NewMsgTypeBitMask(MsgTypeBeginRedelegate),
+			want:  true,
+		}, {
+			name:  "test 2",
+			mask:  NewMsgTypeBitMask(MsgTypeBeginRedelegate, MsgTypeDelegate, MsgTypeSend),
+			value: NewMsgTypeBitMask(MsgTypeBeginRedelegate),
+			want:  true,
+		}, {
+			name:  "test 3",
+			mask:  NewMsgTypeBitMask(MsgTypeBeginRedelegate),
+			value: NewMsgTypeBitMask(MsgTypeBeginRedelegate, MsgTypeDelegate, MsgTypeSend),
+			want:  true,
+		}, {
+			name:  "test 4",
+			mask:  NewMsgTypeBitMask(MsgTypeBeginRedelegate),
+			value: NewMsgTypeBitMask(MsgTypeDelegate, MsgTypeSend),
+			want:  false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			has := tt.mask.HasOne(tt.value)
+			require.Equal(t, tt.want, has)
+		})
+	}
+}

@@ -30,36 +30,40 @@ const (
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
 	var mask MsgTypeBits
 	for i := range values {
-		switch values[i] {
-		case MsgTypeUnknown:
-			mask.Set(Bits(MsgTypeBitsUnknown))
-		case MsgTypeWithdrawValidatorCommission:
-			mask.Set(Bits(MsgTypeBitsWithdrawValidatorCommission))
-		case MsgTypeWithdrawDelegatorReward:
-			mask.Set(Bits(MsgTypeBitsWithdrawDelegatorReward))
-		case MsgTypeEditValidator:
-			mask.Set(Bits(MsgTypeBitsEditValidator))
-		case MsgTypeBeginRedelegate:
-			mask.Set(Bits(MsgTypeBitsBeginRedelegate))
-		case MsgTypeCreateValidator:
-			mask.Set(Bits(MsgTypeBitsCreateValidator))
-		case MsgTypeUndelegate:
-			mask.Set(Bits(MsgTypeBitsUndelegate))
-		case MsgTypeUnjail:
-			mask.Set(Bits(MsgTypeBitsUnjail))
-		case MsgTypeSend:
-			mask.Set(Bits(MsgTypeBitsSend))
-		case MsgTypeCreateVestingAccount:
-			mask.Set(Bits(MsgTypeBitsCreateVestingAccount))
-		case MsgTypeCreatePeriodicVestingAccount:
-			mask.Set(Bits(MsgTypeBitsCreatePeriodicVestingAccount))
-		case MsgTypePayForBlobs:
-			mask.Set(Bits(MsgTypeBitsPayForBlobs))
-		case MsgTypeDelegate:
-			mask.Set(Bits(MsgTypeBitsDelegate))
-		}
+		mask.SetBit(values[i])
 	}
 	return mask
+}
+
+func (mask *MsgTypeBits) SetBit(value MsgType) {
+	switch value {
+	case MsgTypeUnknown:
+		mask.Set(Bits(MsgTypeBitsUnknown))
+	case MsgTypeWithdrawValidatorCommission:
+		mask.Set(Bits(MsgTypeBitsWithdrawValidatorCommission))
+	case MsgTypeWithdrawDelegatorReward:
+		mask.Set(Bits(MsgTypeBitsWithdrawDelegatorReward))
+	case MsgTypeEditValidator:
+		mask.Set(Bits(MsgTypeBitsEditValidator))
+	case MsgTypeBeginRedelegate:
+		mask.Set(Bits(MsgTypeBitsBeginRedelegate))
+	case MsgTypeCreateValidator:
+		mask.Set(Bits(MsgTypeBitsCreateValidator))
+	case MsgTypeUndelegate:
+		mask.Set(Bits(MsgTypeBitsUndelegate))
+	case MsgTypeUnjail:
+		mask.Set(Bits(MsgTypeBitsUnjail))
+	case MsgTypeSend:
+		mask.Set(Bits(MsgTypeBitsSend))
+	case MsgTypeCreateVestingAccount:
+		mask.Set(Bits(MsgTypeBitsCreateVestingAccount))
+	case MsgTypeCreatePeriodicVestingAccount:
+		mask.Set(Bits(MsgTypeBitsCreatePeriodicVestingAccount))
+	case MsgTypePayForBlobs:
+		mask.Set(Bits(MsgTypeBitsPayForBlobs))
+	case MsgTypeDelegate:
+		mask.Set(Bits(MsgTypeBitsDelegate))
+	}
 }
 
 func (mask MsgTypeBits) Names() []string {
@@ -119,6 +123,10 @@ func (mask MsgTypeBits) Names() []string {
 	}
 
 	return names
+}
+
+func (mask MsgTypeBits) HasOne(value MsgTypeBits) bool {
+	return mask.Bits&value.Bits > 0
 }
 
 var _ sql.Scanner = (*MsgTypeBits)(nil)

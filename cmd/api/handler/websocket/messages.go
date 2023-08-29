@@ -27,5 +27,6 @@ type Unsubscribe struct {
 }
 
 type TransactionFilters struct {
-	Status []string `json:"status,omitempty"`
+	Status   []string `json:"status,omitempty"`
+	Messages []string `json:"msg_type,omitempty"`
 }

@@ -35,17 +35,22 @@ func newClient(id uint64, ws *websocket.Conn, manager *Manager) *Client {
 		id:      id,
 		ws:      ws,
 		manager: manager,
-		filters: newFilters(),
 		ch:      make(chan any, 1024),
 		wg:      new(sync.WaitGroup),
 	}
 }
 
 func (c *Client) ApplyFilters(msg Subscribe) error {
+	if c.filters == nil {
+		c.filters = &filters{}
+	}
 	switch msg.Channel {
 	case ChannelHead:
 		c.filters.head = true
 	case ChannelTx:
+		if c.filters.tx == nil {
+			c.filters.tx = newTxFilters()
+		}
 		var fltr TransactionFilters
 		if err := json.Unmarshal(msg.Filters, &fltr); err != nil {
 			return err

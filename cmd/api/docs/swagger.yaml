@@ -68,6 +68,9 @@ definitions:
       evidence_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
+      fee:
+        example: "28347628346"
+        type: string
       hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
@@ -90,6 +93,9 @@ definitions:
         items:
           type: string
         type: array
+      namespace_size:
+        example: 12354
+        type: integer
       next_validators_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
@@ -258,12 +264,12 @@ definitions:
         example: 43
         format: int64
         type: integer
+      total_fee:
+        example: "312"
+        format: string
+        type: string
       total_namespace_size:
         example: 56789
-        format: int64
-        type: integer
-      total_namespaces:
-        example: 312
         format: int64
         type: integer
       total_tx:

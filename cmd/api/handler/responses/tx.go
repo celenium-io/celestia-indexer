@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 )
 
 type Tx struct {
@@ -26,6 +27,8 @@ type Tx struct {
 	MessageTypes []string `example:"MsgSend,MsgUnjail" json:"message_types" swaggertype:"array,string"`
 
 	Status string `enums:"success,failed" example:"success" format:"string" json:"status" swaggettype:"string"`
+
+	MsgTypeMask types.MsgTypeBits `json:"-"`
 }
 
 func NewTx(tx storage.Tx) Tx {
@@ -46,6 +49,7 @@ func NewTx(tx storage.Tx) Tx {
 		Hash:          hex.EncodeToString(tx.Hash),
 		Memo:          tx.Memo,
 		MessageTypes:  tx.MessageTypes.Names(),
+		MsgTypeMask:   tx.MessageTypes,
 	}
 }
 
