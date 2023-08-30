@@ -4,7 +4,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/dipdup-net/go-lib/config"
+	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
+	goLibConfig "github.com/dipdup-net/go-lib/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -16,7 +17,7 @@ func init() {
 	})
 }
 
-func initConfig() (*Config, error) {
+func initConfig() (*config.Config, error) {
 	configPath := rootCmd.PersistentFlags().StringP("config", "c", "dipdup.yml", "path to YAML config file")
 	if err := rootCmd.Execute(); err != nil {
 		log.Panic().Err(err).Msg("command line execute")
@@ -28,8 +29,8 @@ func initConfig() (*Config, error) {
 		return nil, err
 	}
 
-	var cfg Config
-	if err := config.Parse(*configPath, &cfg); err != nil {
+	var cfg config.Config
+	if err := goLibConfig.Parse(*configPath, &cfg); err != nil {
 		log.Panic().Err(err).Msg("parsing config file")
 		return nil, err
 	}

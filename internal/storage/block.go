@@ -19,12 +19,14 @@ type IBlock interface {
 	ByHash(ctx context.Context, hash []byte) (Block, error)
 }
 
+type Level uint64
+
 // Block -
 type Block struct {
 	bun.BaseModel `bun:"table:block" comment:"Table with celestia blocks." json:"-"`
 
 	Id           uint64    `bun:",pk,notnull,autoincrement" comment:"Unique internal identity"`
-	Height       uint64    `bun:"height"                    comment:"The number (height) of this block"`
+	Height       Level     `bun:"height"                    comment:"The number (height) of this block"`
 	Time         time.Time `bun:"time"                      comment:"The time of block"`
 	VersionBlock string    `bun:"version_block"             comment:"Block version"`
 	VersionApp   string    `bun:"version_app"               comment:"App version"`

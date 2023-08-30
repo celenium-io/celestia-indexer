@@ -64,7 +64,7 @@ func TestWebsocket(t *testing.T) {
 
 				payload, err := json.Marshal(storage.Block{
 					Id:     id,
-					Height: id,
+					Height: storage.Level(id),
 					Time:   time.Now(),
 					Hash:   hash,
 				})

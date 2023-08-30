@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/dipdup-io/celestia-indexer/internal/indexer"
+	"github.com/dipdup-io/celestia-indexer/pkg/indexer"
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -32,7 +32,7 @@ func main() {
 	notifyCtx, notifyCancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	defer notifyCancel()
 
-	indexerModule := indexer.New(cfg.Indexer)
+	indexerModule := indexer.New(*cfg)
 	if err := indexerModule.Start(ctx); err != nil {
 		log.Panic().Err(err).Msg("indexer module start")
 		return
@@ -41,7 +41,7 @@ func main() {
 	<-notifyCtx.Done()
 	cancel()
 
-	if err := indexerModule.Stop(); err != nil {
+	if err := indexerModule.Close(); err != nil {
 		log.Panic().Err(err).Msg("stopping indexer")
 	}
 

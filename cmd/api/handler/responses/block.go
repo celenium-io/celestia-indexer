@@ -34,7 +34,7 @@ type Block struct {
 func NewBlock(block storage.Block) Block {
 	return Block{
 		Id:                 block.Id,
-		Height:             block.Height,
+		Height:             uint64(block.Height),
 		Time:               block.Time,
 		VersionBlock:       block.VersionBlock,
 		VersionApp:         block.VersionApp,

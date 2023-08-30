@@ -21,7 +21,7 @@ func NewState(state storage.State) State {
 	return State{
 		Id:                 state.ID,
 		Name:               state.Name,
-		LastHeight:         state.LastHeight,
+		LastHeight:         uint64(state.LastHeight),
 		LastTime:           state.LastTime,
 		TotalTx:            state.TotalTx,
 		TotalAccounts:      state.TotalAccounts,
