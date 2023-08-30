@@ -18,13 +18,13 @@ type IMessage interface {
 
 // Message -
 type Message struct {
-	bun.BaseModel `bun:"message" comment:"Table with celestia messages." partition:"RANGE(time)"`
+	bun.BaseModel `bun:"message" comment:"Table with celestia messages."`
 
 	Id       uint64         `bun:"id,type:bigint,pk,notnull" comment:"Unique internal id"`
-	Height   uint64         `bun:",notnull"                  comment:"The number (height) of this block"`
-	Time     time.Time      `bun:"time,pk,notnull"           comment:"The time of block"`
+	Height   uint64         `bun:",notnull"                  comment:"The number (height) of this block" stats:"func:min max,filterable"`
+	Time     time.Time      `bun:"time,pk,notnull"           comment:"The time of block"                 stats:"func:min max,filterable"`
 	Position uint64         `bun:"position"                  comment:"Position in transaction"`
-	Type     types.MsgType  `bun:",type:msg_type"            comment:"Message type"`
+	Type     types.MsgType  `bun:",type:msg_type"            comment:"Message type"                      stats:"filterable"`
 	TxId     uint64         `bun:"tx_id"                     comment:"Parent transaction id"`
 	Data     map[string]any `bun:"data,type:jsonb"           comment:"Message data"`
 

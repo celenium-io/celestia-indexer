@@ -22,7 +22,6 @@ type ModuleTestSuite struct {
 	suite.Suite
 	psqlContainer *database.PostgreSQLContainer
 	storage       postgres.Storage
-	pm            database.RangePartitionManager
 }
 
 // SetupSuite -
@@ -35,7 +34,7 @@ func (s *ModuleTestSuite) SetupSuite() {
 		Password: "password",
 		Database: "db_test",
 		Port:     5432,
-		Image:    "postgres:15",
+		Image:    "timescale/timescaledb:latest-pg15",
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
@@ -50,12 +49,6 @@ func (s *ModuleTestSuite) SetupSuite() {
 	})
 	s.Require().NoError(err)
 	s.storage = strg
-
-	s.pm = database.NewPartitionManager(s.storage.Connection(), database.PartitionByYear)
-	currentTime, err := time.Parse(time.RFC3339, "2023-07-04T03:10:57+00:00")
-	s.Require().NoError(err)
-	err = s.pm.CreatePartitions(ctx, currentTime, storage.Tx{}.TableName(), storage.Event{}.TableName(), storage.Message{}.TableName())
-	s.Require().NoError(err)
 }
 
 // TearDownSuite -
@@ -73,8 +66,9 @@ func (s *ModuleTestSuite) TestBlockLast() {
 
 	fixtures, err := testfixtures.New(
 		testfixtures.Database(db),
-		testfixtures.Dialect("postgres"),
+		testfixtures.Dialect("timescaledb"),
 		testfixtures.Directory("../../test/data"),
+		testfixtures.UseAlterConstraint(),
 	)
 	s.Require().NoError(err)
 	s.Require().NoError(fixtures.Load())

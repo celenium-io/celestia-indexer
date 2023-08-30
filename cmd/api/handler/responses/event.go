@@ -7,13 +7,13 @@ import (
 )
 
 type Event struct {
-	Id       uint64    `example:"321"                       format:"int64"     json:"id"              swaggettype:"integer"`
-	Height   uint64    `example:"100"                       format:"int64"     json:"height"          swaggettype:"integer"`
-	Time     time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"            swaggettype:"string"`
-	Position uint64    `example:"1"                         format:"int64"     json:"position"        swaggettype:"integer"`
-	TxId     uint64    `example:"11"                        format:"int64"     json:"tx_id,omitempty" swaggettype:"integer"`
+	Id       uint64    `example:"321"                       format:"int64"     json:"id"              swaggertype:"integer"`
+	Height   uint64    `example:"100"                       format:"int64"     json:"height"          swaggertype:"integer"`
+	Time     time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"            swaggertype:"string"`
+	Position uint64    `example:"1"                         format:"int64"     json:"position"        swaggertype:"integer"`
+	TxId     uint64    `example:"11"                        format:"int64"     json:"tx_id,omitempty" swaggertype:"integer"`
 
-	Type string `enums:"coin_received,coinbase,coin_spent,burn,mint,message,proposer_reward,rewards,commission,liveness,attestation_request,transfer,pay_for_blobs,redelegate,withdraw_rewards,withdraw_commission,create_validator,delegate,edit_validator,unbond,tx,unknown" example:"commission" format:"string" json:"type" swaggettype:"string"`
+	Type string `enums:"coin_received,coinbase,coin_spent,burn,mint,message,proposer_reward,rewards,commission,liveness,attestation_request,transfer,pay_for_blobs,redelegate,withdraw_rewards,withdraw_commission,create_validator,delegate,edit_validator,unbond,tx,unknown" example:"commission" format:"string" json:"type" swaggertype:"string"`
 
 	Data map[string]any `json:"data"`
 }

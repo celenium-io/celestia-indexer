@@ -33,7 +33,7 @@ services:
     logging: *celestia-dipdup-logging
 
   db:
-    image: postgres:15
+    image: timescale/timescaledb:latest-pg15
     restart: always
     volumes:
       - db:/var/lib/postgres/data

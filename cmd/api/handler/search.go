@@ -45,17 +45,17 @@ var (
 
 // Get godoc
 //
-//	@Summary		Search by hash
-//	@Description	Search entity by hash (block, tx, account and namespace)
-//	@Tags			search
-//	@ID				search
-//	@Param			query	query	string	true	"Search string"
-//	@Produce		json
-//	@Success		200	{object}	responses.SearchResponse[responses.Searchable]
-//	@Success		204
-//	@Failure		400	{object}	Error
-//	@Failure		500	{object}	Error
-//	@Router			/v1/search [get]
+//	@Summary				Search by hash
+//	@Description.markdown	search
+//	@Tags					search
+//	@ID						search
+//	@Param					query	query	string	true	"Search string"
+//	@Produce				json
+//	@Success				200	{object}	responses.SearchResponse[responses.Searchable]
+//	@Success				204
+//	@Failure				400	{object}	Error
+//	@Failure				500	{object}	Error
+//	@Router					/v1/search [get]
 func (handler SearchHandler) Search(c echo.Context) error {
 	req, err := bindAndValidate[searchRequest](c)
 	if err != nil {

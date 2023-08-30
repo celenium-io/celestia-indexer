@@ -222,6 +222,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		namespaceByHash.GET("/:hash/:height", namespaceHandlers.GetBlob)
 	}
 
+	statsHandler := handler.NewStatsHandler(db.Stats)
+	stats := v1.Group("/stats")
+	{
+		stats.GET("/summary/:table/:function", statsHandler.Summary)
+		stats.GET("/histogram/:table/:function/:timeframe", statsHandler.Histogram)
+	}
+
 	if cfg.ApiConfig.Prometheus {
 		v1.GET("/metrics", echoprometheus.NewHandler())
 	}

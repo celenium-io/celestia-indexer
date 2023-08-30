@@ -31,24 +31,24 @@ type TxFilter struct {
 
 // Tx -
 type Tx struct {
-	bun.BaseModel `bun:"tx" comment:"Table with celestia transactions." partition:"RANGE(time)"`
+	bun.BaseModel `bun:"tx" comment:"Table with celestia transactions."`
 
 	Id            uint64            `bun:"id,type:bigint,pk,notnull" comment:"Unique internal id"`
-	Height        uint64            `bun:",notnull"                  comment:"The number (height) of this block"`
-	Time          time.Time         `bun:"time,pk,notnull"           comment:"The time of block"`
+	Height        uint64            `bun:",notnull"                  comment:"The number (height) of this block"                 stats:"func:min max,filterable"`
+	Time          time.Time         `bun:"time,pk,notnull"           comment:"The time of block"                                 stats:"func:min max,filterable"`
 	Position      uint64            `bun:"position"                  comment:"Position in block"`
-	GasWanted     uint64            `bun:"gas_wanted"                comment:"Gas wanted"`
-	GasUsed       uint64            `bun:"gas_used"                  comment:"Gas used"`
-	TimeoutHeight uint64            `bun:"timeout_height"            comment:"Block height until which the transaction is valid"`
-	EventsCount   uint64            `bun:"events_count"              comment:"Events count in transaction"`
-	MessagesCount uint64            `bun:"messages_count"            comment:"Messages count in transaction"`
-	Fee           decimal.Decimal   `bun:",type:numeric"             comment:"Paid fee"`
-	Status        types.Status      `bun:",type:status"              comment:"Transaction status"`
+	GasWanted     uint64            `bun:"gas_wanted"                comment:"Gas wanted"                                        stats:"func:min max sum avg"`
+	GasUsed       uint64            `bun:"gas_used"                  comment:"Gas used"                                          stats:"func:min max sum avg"`
+	TimeoutHeight uint64            `bun:"timeout_height"            comment:"Block height until which the transaction is valid" stats:"func:min max avg"`
+	EventsCount   uint64            `bun:"events_count"              comment:"Events count in transaction"                       stats:"func:min max sum avg"`
+	MessagesCount uint64            `bun:"messages_count"            comment:"Messages count in transaction"                     stats:"func:min max sum avg"`
+	Fee           decimal.Decimal   `bun:"fee,type:numeric"          comment:"Paid fee"                                          stats:"func:min max sum avg"`
+	Status        types.Status      `bun:"status,type:status"        comment:"Transaction status"                                stats:"filterable"`
 	Error         string            `bun:"error"                     comment:"Error string if failed"`
-	Codespace     string            `bun:"codespace"                 comment:"Codespace"`
+	Codespace     string            `bun:"codespace"                 comment:"Codespace"                                         stats:"filterable"`
 	Hash          []byte            `bun:"hash"                      comment:"Transaction hash"`
 	Memo          string            `bun:"memo"                      comment:"Note or comment to send with the transaction"`
-	MessageTypes  types.MsgTypeBits `bun:"message_types,type:int8"   comment:"Bit mask with containing messages"`
+	MessageTypes  types.MsgTypeBits `bun:"message_types,type:int8"   comment:"Bit mask with containing messages"                 stats:"filterable"`
 
 	Messages []Message `bun:"rel:has-many"`
 	Events   []Event   `bun:"rel:has-many"`

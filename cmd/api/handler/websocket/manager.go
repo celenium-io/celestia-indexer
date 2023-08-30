@@ -47,6 +47,14 @@ func NewManager(factory storage.ListenerFactory) *Manager {
 	return manager
 }
 
+// Handle godoc
+//
+//	@Summary				Websocket API
+//	@Description.markdown	websocket
+//	@Tags					websocket
+//	@ID						websocket
+//	@Produce				json
+//	@Router					/v1/ws [get]
 func (manager *Manager) Handle(c echo.Context) error {
 	ws, err := manager.upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {

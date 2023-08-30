@@ -638,7 +638,7 @@
         },
         "/v1/search": {
             "get": {
-                "description": "Search entity by hash (block, tx, account and namespace)",
+                "description": "Endpoint finds entity by hash (block, address, namespace and tx)\n\n### Block\n\nBlock will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`. Hash should be hexademical and has length 64.\n\n#### Example response \n\n```json\n{\n    \"type\": \"block\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Block type\n    }\n}\n```\n\n### Tx\n\nTx will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`. Tx should be hexademical and has length 64.\n\n#### Example response \n\n```json\n{\n    \"type\": \"tx\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Tx type\n    }\n}\n```\n\n### Address\n\nAddress will be found by its hash. Hash example: `celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60`. Address has prefix `celestia` and has length 47. Also it should be decoded by `bech32`.\n\n#### Example response \n\n```json\n{\n    \"type\": \"address\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\",\n        \"height\": 100,\n        \"balance\": \"6525472354\"\n    }\n}\n```\n\n### Namespace\n\nNamespace can be found by base64 hash and identity pair version + namespace id. \nHash example: `U3dhZ2dlciByb2Nrcw==`. \nIdentity pair example: `014723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02`\n\n#### Example response \n\n```json\n{\n    \"type\": \"namespace\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"U3dhZ2dlciByb2Nrcw==\",\n        \"version\": 1,\n        \"namespace_id\": \"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02\"\n        // ... rest fields from response.Namespace type\n    }\n}\n```\n",
                 "produces": [
                     "application/json"
                 ],
@@ -665,6 +665,183 @@
                     },
                     "204": {
                         "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/stats/histogram/{table}/{function}/{timeframe}": {
+            "get": {
+                "description": "Returns histogram by table, function and timeframe\n\n### Parameters\n\n`table`, `function` and `column` parameters are the same as summary endpoint.\n\n\n### Timeframe\n\n* `hour`\n* `day`\n* `week`\n* `month`\n* `year`",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get histogram",
+                "operationId": "stats-histogram",
+                "parameters": [
+                    {
+                        "enum": [
+                            "block",
+                            "tx",
+                            "event",
+                            "message"
+                        ],
+                        "type": "string",
+                        "description": "Table name",
+                        "name": "table",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "min",
+                            "max",
+                            "avg",
+                            "sum",
+                            "count"
+                        ],
+                        "type": "string",
+                        "description": "Function name",
+                        "name": "function",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "hour",
+                            "day",
+                            "week",
+                            "month",
+                            "year"
+                        ],
+                        "type": "string",
+                        "description": "Timeframe",
+                        "name": "timeframe",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Column name which will be used for computation. Optional for count",
+                        "name": "column",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.HistogramItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/stats/summary/{table}/{function}": {
+            "get": {
+                "description": "Returns string value by passed table and function.\n\n### Availiable tables\n* `block`\n* `tx`\n* `message`\n* `event`\n\n\n### Availiable functions\n* `sum`\n* `min`\n* `max`\n* `avg`\n* `count`\n\n\n`Column` query parameter is required for functions `sum`, `min`, `max` and `avg` and should not pass for `count`.\n\n\n###  Availiable columns and functions for tables:\n\n#### Block\n* `height`         -- min max\n* `time`           -- min max\n* `tx_count`       -- min max sum avg\n* `events_count`   -- min max sum avg\n* `namespace_size` -- min max sum avg\n* `fee`            -- min max sum avg\n\n#### Tx\n* `height`         -- min max\n* `time`           -- min max\n* `gas_wanted`     -- min max sum avg\n* `gas_used`       -- min max sum avg\n* `timeout_height` -- min max avg\n* `events_count`   -- min max sum avg\n* `messages_count` -- min max sum avg\n* `fee`            -- min max sum avg\n\n#### Event\n* `height`         -- min max\n* `time`           -- min max\n\n#### Message\n* `height`         -- min max\n* `time`           -- min max",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get value by table and function",
+                "operationId": "stats-summary",
+                "parameters": [
+                    {
+                        "enum": [
+                            "block",
+                            "tx",
+                            "event",
+                            "message"
+                        ],
+                        "type": "string",
+                        "description": "Table name",
+                        "name": "table",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "min",
+                            "max",
+                            "avg",
+                            "sum",
+                            "count"
+                        ],
+                        "type": "string",
+                        "description": "Function name",
+                        "name": "function",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Column name which will be used for computation. Optional for count.",
+                        "name": "column",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -930,6 +1107,20 @@
                     }
                 }
             }
+        },
+        "/v1/ws": {
+            "get": {
+                "description": "## Documentation for websocket API\n\n### Subscribe\n\nTo receive updates from websocket API send `subscribe` request to server.\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n        \"filters\": {\n            // pass channel filters\n        }\n    }\n}\n```\n\nNow 2 channels are supported:\n\n* `head` - receive information about new block. Channel does not have any filters. Subscribe message should looks like:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"head\"\n    }\n}\n```\n\nIn that channel messages of `responses.Block` type will be sent.\n\n* `tx` - receive information about new transactions. The channel has filters for target receiving information. Now 2 filters are supported:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"tx\",\n        \"filters\": {\n            \"status\": [  // array of transaction status. Can be emtpy.\n                \"success\", \n                \"failed\"\n            ],\n            \"msg_type\": [  // array of containing message types status. Can be emtpy.\n                \"WithdrawValidatorCommission\",\n                \"WithdrawDelegatorReward\",\n                \"EditValidator\",\n                \"BeginRedelegate\",\n                \"CreateValidator\",\n                \"Delegate\",\n                \"Undelegate\",\n                \"Unjail\",\n                \"Send\",\n                \"CreateVestingAccount\",\n                \"CreatePeriodicVestingAccount\",\n                \"PayForBlobs\"\n            ]\n        }\n    }\n}\n```\n\nIf all filers are empty subscription to all transaction will be created.\n\nIn that channel messages of `responses.TX` type will be sent.\n\n\n### Unsubscribe\n\nTo unsubscribe send `unsubscribe` message containing one of channel name describing above.\n\n\n```json\n{\n    \"method\": \"unsubscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n    }\n}\n```\n",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "websocket"
+                ],
+                "summary": "Websocket API",
+                "operationId": "websocket",
+                "responses": {}
+            }
         }
     },
     "definitions": {
@@ -1143,6 +1334,21 @@
                         "unknown"
                     ],
                     "example": "commission"
+                }
+            }
+        },
+        "responses.HistogramItem": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "value": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "2223424"
                 }
             }
         },

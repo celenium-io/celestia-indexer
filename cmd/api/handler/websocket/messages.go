@@ -18,12 +18,12 @@ type Message struct {
 }
 
 type Subscribe struct {
-	Channel string `json:"channel" validate:"required,oneof=head"`
+	Channel string `json:"channel" validate:"required,oneof=head tx"`
 	Filters []byte `json:"filters" validate:"required"`
 }
 
 type Unsubscribe struct {
-	Channel string `json:"channel" validate:"required,oneof=head"`
+	Channel string `json:"channel" validate:"required,oneof=head tx"`
 }
 
 type TransactionFilters struct {

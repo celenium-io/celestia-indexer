@@ -23,18 +23,18 @@ type Level uint64
 
 // Block -
 type Block struct {
-	bun.BaseModel `bun:"table:block" comment:"Table with celestia blocks." json:"-"`
+	bun.BaseModel `bun:"table:block" comment:"Table with celestia blocks."`
 
 	Id           uint64    `bun:",pk,notnull,autoincrement" comment:"Unique internal identity"`
-	Height       Level     `bun:"height"                    comment:"The number (height) of this block"`
-	Time         time.Time `bun:"time"                      comment:"The time of block"`
+	Height       Level     `bun:"height"                    comment:"The number (height) of this block" stats:"func:min max,filterable"`
+	Time         time.Time `bun:"time,pk,notnull"           comment:"The time of block"                 stats:"func:min max,filterable"`
 	VersionBlock string    `bun:"version_block"             comment:"Block version"`
 	VersionApp   string    `bun:"version_app"               comment:"App version"`
 
-	TxCount       uint64            `bun:"tx_count"                comment:"Count of transactions in block"`
-	EventsCount   uint64            `bun:"events_count"            comment:"Count of events in begin and end of block"`
+	TxCount       uint64            `bun:"tx_count"                comment:"Count of transactions in block"                 stats:"func:min max sum avg"`
+	EventsCount   uint64            `bun:"events_count"            comment:"Count of events in begin and end of block"      stats:"func:min max sum avg"`
+	NamespaceSize uint64            `bun:"namespace_size"          comment:"Summary block namespace size from pay for blob" stats:"func:min max sum avg"`
 	MessageTypes  types.MsgTypeBits `bun:"message_types,type:int8" comment:"Bit mask with containing messages"`
-	NamespaceSize uint64            `bun:"namespace_size"          comment:"Summary block namespace size from pay for blob"`
 
 	Hash               []byte `bun:"hash"                 comment:"Block hash"`
 	ParentHash         []byte `bun:"parent_hash"          comment:"Hash of parent block"`
@@ -48,11 +48,11 @@ type Block struct {
 	EvidenceHash       []byte `bun:"evidence_hash"        comment:"Evidence hash"`
 	ProposerAddress    []byte `bun:"proposer_address"     comment:"Proposer address"`
 
-	Fee     decimal.Decimal `bun:"fee,type:numeric" comment:"Summary block fee"`
+	Fee     decimal.Decimal `bun:"fee,type:numeric" comment:"Summary block fee" stats:"func:min max sum avg"`
 	ChainId string          `bun:"-"` // internal field for filling state
 
-	Txs    []Tx    `bun:"rel:has-many" json:"-"`
-	Events []Event `bun:"rel:has-many" json:"-"`
+	Txs    []Tx    `bun:"rel:has-many"`
+	Events []Event `bun:"rel:has-many"`
 }
 
 // TableName -
