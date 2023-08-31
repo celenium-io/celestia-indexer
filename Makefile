@@ -8,7 +8,14 @@ api:
 	cd cmd/api && go run . -c ../../build/dipdup.yml
 
 build:
-	docker-compose up -d -- build
+	cd cmd/indexer && go build -a -o ../../bin/indexer .
+	cd cmd/api && go build -a -o ../../bin/api .
+
+clean:
+	rm -rf bin
+
+compose:
+	docker-compose up -d --build
 
 lint:
 	golangci-lint run
@@ -27,4 +34,4 @@ mock:
 api-docs:
 	cd cmd/api && swag init --md markdown
 
-.PHONY: indexer api build lint test adr
+.PHONY: indexer api build clean compose lint test adr mock
