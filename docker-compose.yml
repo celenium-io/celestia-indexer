@@ -20,7 +20,7 @@ services:
 
   api:
     restart: always
-    image: ghcr.io/dipdup-io/celestia-api:${TAG:-master}
+    image: ghcr.io/dipdup-io/celestia-indexer-api:${TAG:-master}
     build:
       context: .
       dockerfile: build/api/Dockerfile

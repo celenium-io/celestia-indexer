@@ -16,7 +16,7 @@ jobs:
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       DOCKER_REGISTRY: ghcr.io
-      DOCKER_IMAGE_NAME: ${{ github.repository }}
+      DOCKER_IMAGE_BASE: ${{ github.repository }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -31,11 +31,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Indexer
+
       - name: Indexer image tags & labels
-        id: meta
+        id: meta-indexer
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_BASE }}
 
       - name: Indexer image build & push
         uses: docker/build-push-action@v2
@@ -45,5 +47,24 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-indexer.outputs.tags }}
+          labels: ${{ steps.meta-indexer.outputs.labels }}
+
+      # API
+
+      - name: API image tags & labels
+        id: meta-api
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_BASE }}-api
+
+      - name: API image build & push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: build/api/Dockerfile
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ steps.meta-api.outputs.tags }}
+          labels: ${{ steps.meta-api.outputs.labels }}
