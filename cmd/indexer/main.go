@@ -32,11 +32,13 @@ func main() {
 	notifyCtx, notifyCancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	defer notifyCancel()
 
-	indexerModule := indexer.New(*cfg)
-	if err := indexerModule.Start(ctx); err != nil {
-		log.Panic().Err(err).Msg("indexer module start")
+	indexerModule, err := indexer.New(ctx, *cfg)
+	if err != nil {
+		log.Panic().Err(err).Msg("error during indexer module creation")
 		return
 	}
+
+	indexerModule.Start(ctx)
 
 	<-notifyCtx.Done()
 	cancel()

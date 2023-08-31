@@ -1,1 +1,2 @@
 go.sum merge=union
+cmd/api/docs linguist-generated=true

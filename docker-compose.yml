@@ -10,7 +10,7 @@ services:
       - .env
     restart: always
     environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
       - db
     logging: &celestia-dipdup-logging
@@ -37,7 +37,6 @@ services:
     restart: always
     volumes:
       - db:/var/lib/postgres/data
-      - /etc/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
     ports:
       - 127.0.0.1:5432:5432
     environment:
@@ -51,9 +50,5 @@ services:
       timeout: 5s
       retries: 5
     logging: *celestia-dipdup-logging
-    command:
-      - "postgres"
-      - "-c"
-      - "config_file=${POSTGRES_CONFIG:-/etc/postgresql/postgresql.conf}"
 volumes:
   db:

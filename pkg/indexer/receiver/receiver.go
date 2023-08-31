@@ -29,8 +29,8 @@ type Receiver struct {
 	wg      *sync.WaitGroup
 }
 
-func New(cfg config.Config, api node.API) *Receiver {
-	receiver := &Receiver{
+func NewModule(cfg config.Config, api node.API) Receiver {
+	receiver := Receiver{
 		api:     api,
 		cfg:     cfg,
 		outputs: map[string]*modules.Output{BlocksOutput: modules.NewOutput(BlocksOutput)},
