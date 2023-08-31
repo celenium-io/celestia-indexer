@@ -22,7 +22,7 @@ datasources:
     timeout: ${CELESTIA_NODE_TIMEOUT:-10}
 
 api:
-  bind: ${API_HOST:-0.0.0.0}:${API_PORT:9876}
+  bind: ${API_HOST:-0.0.0.0}:${API_PORT:-9876}
   rate_limit: ${API_RATE_LIMIT:-0}
   prometheus: ${API_PROMETHEUS_ENABLED:-true}
   request_timeout: ${API_REQUEST_TIMEOUT:-30}
