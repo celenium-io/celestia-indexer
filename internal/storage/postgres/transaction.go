@@ -37,11 +37,61 @@ func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...models.N
 	}
 
 	_, err := tx.Tx().NewInsert().Model(&namespaces).
-		Column("version", "namespace_id", "pfd_count", "size").
+		Column("version", "namespace_id", "pfd_count", "size", "first_height").
 		On("CONFLICT ON CONSTRAINT namespace_id_version_idx DO UPDATE").
 		Set("size = EXCLUDED.size + namespace.size").
 		Set("pfd_count = EXCLUDED.pfd_count + namespace.pfd_count").
 		Returning("id").
 		Exec(ctx)
 	return err
+}
+
+func (tx Transaction) LastBlock(ctx context.Context) (block models.Block, err error) {
+	err = tx.Tx().NewSelect().Model(&block).Order("id desc").Limit(1).Scan(ctx)
+	return
+}
+
+func (tx Transaction) State(ctx context.Context, name string) (state models.State, err error) {
+	err = tx.Tx().NewSelect().Model(&state).Where("name = ?", name).Scan(ctx)
+	return
+}
+
+func (tx Transaction) Namespace(ctx context.Context, id uint64) (ns models.Namespace, err error) {
+	err = tx.Tx().NewSelect().Model(&ns).Where("id = ?", id).Scan(ctx)
+	return
+}
+
+func (tx Transaction) RollbackBlock(ctx context.Context, height models.Level) (block models.Block, err error) {
+	_, err = tx.Tx().NewDelete().Model(&block).Where("height = ?", height).Returning("*").Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackAddresses(ctx context.Context, height models.Level) (address []models.Address, err error) {
+	_, err = tx.Tx().NewDelete().Model(&address).Where("height = ?", height).Returning("*").Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackTxs(ctx context.Context, height models.Level) (txs []models.Tx, err error) {
+	_, err = tx.Tx().NewDelete().Model(&txs).Where("height = ?", height).Returning("*").Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackEvents(ctx context.Context, height models.Level) (events []models.Event, err error) {
+	_, err = tx.Tx().NewDelete().Model(&events).Where("height = ?", height).Returning("*").Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackMessages(ctx context.Context, height models.Level) (msgs []models.Message, err error) {
+	_, err = tx.Tx().NewDelete().Model(&msgs).Where("height = ?", height).Returning("*").Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackNamespaceMessages(ctx context.Context, height models.Level) (msgs []models.NamespaceMessage, err error) {
+	_, err = tx.Tx().NewDelete().Model(&msgs).Where("height = ?", height).Returning("*").Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackNamespaces(ctx context.Context, height models.Level) (ns []models.Namespace, err error) {
+	_, err = tx.Tx().NewDelete().Model(&ns).Where("first_height = ?", height).Returning("*").Exec(ctx)
+	return
 }

@@ -2,10 +2,10 @@ package storage
 
 import (
 	"context"
-	"sync"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
+	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
@@ -18,13 +18,19 @@ const InputName = "data"
 
 const defaultIndexerName = "celestia-indexer"
 
-// Module -
+// Module - saves received from input block to storage.
+//
+//	                     |----------------|
+//	                     |                |
+//	-- storage.Block ->  |     MODULE     |
+//	                     |                |
+//	                     |----------------|
 type Module struct {
 	storage postgres.Storage
 	input   *modules.Input
 	state   *storage.State
 	log     zerolog.Logger
-	wg      *sync.WaitGroup
+	g       workerpool.Group
 }
 
 // NewModule -
@@ -35,7 +41,7 @@ func NewModule(pg postgres.Storage, opts ...ModuleOption) Module {
 		state: &storage.State{
 			Name: defaultIndexerName,
 		},
-		wg: new(sync.WaitGroup),
+		g: workerpool.NewGroup(),
 	}
 	m.log = log.With().Str("module", m.Name()).Logger()
 
@@ -81,13 +87,10 @@ func (module *Module) Start(ctx context.Context) {
 		return
 	}
 
-	module.wg.Add(1)
-	go module.listen(ctx)
+	module.g.GoCtx(ctx, module.listen)
 }
 
 func (module *Module) listen(ctx context.Context) {
-	defer module.wg.Done()
-
 	module.log.Info().Msg("module started")
 
 	for {
@@ -120,7 +123,7 @@ func (module *Module) listen(ctx context.Context) {
 // Close -
 func (module *Module) Close() error {
 	module.log.Info().Msg("closing module...")
-	module.wg.Wait()
+	module.g.Wait()
 
 	return module.input.Close()
 }
@@ -244,8 +247,9 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 		for _, ns := range msg.Namespace {
 			namespaceMsgs = append(namespaceMsgs, &storage.NamespaceMessage{
 				MsgId:       msg.Id,
-				NamespaceId: ns.ID,
+				NamespaceId: ns.Id,
 				Time:        msg.Time,
+				Height:      storage.Level(msg.Height),
 				TxId:        msg.TxId,
 			})
 		}

@@ -21,7 +21,8 @@ type INamespace interface {
 type Namespace struct {
 	bun.BaseModel `bun:"namespace" comment:"Table with celestia namespaces."`
 
-	ID          uint64 `bun:"id,pk,autoincrement"                          comment:"Unique internal identity"`
+	Id          uint64 `bun:"id,pk,autoincrement"                          comment:"Unique internal identity"`
+	FirstHeight Level  `bun:"first_height,notnull"                         comment:"Block height of the first message changing the namespace"`
 	Version     byte   `bun:"version,unique:namespace_id_version_idx"      comment:"Namespace version"`
 	NamespaceID []byte `bun:"namespace_id,unique:namespace_id_version_idx" comment:"Namespace identity"`
 	Size        uint64 `bun:"size"                                         comment:"Namespace size"`

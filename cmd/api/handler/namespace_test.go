@@ -21,7 +21,7 @@ import (
 
 var (
 	testNamespace = storage.Namespace{
-		ID:          1,
+		Id:          1,
 		Version:     1,
 		NamespaceID: []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7},
 		Size:        100,
@@ -241,10 +241,10 @@ func (s *NamespaceTestSuite) TestGetMessages() {
 		Return(testNamespace, nil)
 
 	s.namespaces.EXPECT().
-		Messages(gomock.Any(), testNamespace.ID, 0, 0).
+		Messages(gomock.Any(), testNamespace.Id, 0, 0).
 		Return([]storage.NamespaceMessage{
 			{
-				NamespaceId: testNamespace.ID,
+				NamespaceId: testNamespace.Id,
 				MsgId:       1,
 				Message: &storage.Message{
 					Id:       1,

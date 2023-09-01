@@ -54,7 +54,7 @@ func (s *StateTestSuite) TestHead() {
 		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return([]*storage.State{
 			{
-				ID:                 1,
+				Id:                 1,
 				Name:               "test",
 				LastHeight:         100,
 				LastTime:           testTime,

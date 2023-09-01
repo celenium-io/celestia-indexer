@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/btcsuite/btcutil v1.0.2
-	github.com/dipdup-io/workerpool v0.0.3
+	github.com/dipdup-io/workerpool v0.0.4
 	github.com/dipdup-net/go-lib v0.3.3
 	github.com/dipdup-net/indexer-sdk v0.0.1
 	github.com/go-playground/validator/v10 v10.15.1

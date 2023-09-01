@@ -19,7 +19,7 @@ type State struct {
 
 func NewState(state storage.State) State {
 	return State{
-		Id:                 state.ID,
+		Id:                 state.Id,
 		Name:               state.Name,
 		LastHeight:         uint64(state.LastHeight),
 		LastTime:           state.LastTime,

@@ -19,3 +19,18 @@
   type: Unjail
   tx_id: 2
   data: null
+- id: 4
+  height: 1000
+  time: '2023-07-04T03:10:57+00:00'
+  position: 3
+  type: PayForBlobs
+  tx_id: 2
+  data:
+    namespaces:
+      - AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACt6d6t6d4=
+    blob_sizes:
+      - 12
+    share_commitments:
+      - 0CsLX630cjij9DR6nqoWfQcCH2pCQSoSuq63dTkd4Bw=
+    share_versions:
+      - 0

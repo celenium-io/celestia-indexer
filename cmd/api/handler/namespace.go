@@ -245,7 +245,7 @@ func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
 		return err
 	}
 
-	messages, err := handler.namespace.Messages(c.Request().Context(), ns.ID, int(req.Limit), int(req.Offset))
+	messages, err := handler.namespace.Messages(c.Request().Context(), ns.Id, int(req.Limit), int(req.Offset))
 	if err := handleError(c, err, handler.namespace); err != nil {
 		return err
 	}

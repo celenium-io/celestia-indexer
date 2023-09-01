@@ -88,7 +88,7 @@ func (s *StatsTestSuite) TestCountBlock() {
 			want:  "3",
 		}, {
 			table: "message",
-			want:  "3",
+			want:  "4",
 		},
 	}
 
@@ -596,27 +596,27 @@ func (s *StatsTestSuite) TestHistogramCount() {
 			timeframe: storage.TimeframeHour,
 			table:     "message",
 			wantDate:  time.Date(2023, 7, 4, 3, 0, 0, 0, time.UTC),
-			want:      "3",
+			want:      "4",
 		}, {
 			timeframe: storage.TimeframeDay,
 			table:     "message",
 			wantDate:  time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
-			want:      "3",
+			want:      "4",
 		}, {
 			timeframe: storage.TimeframeWeek,
 			table:     "message",
 			wantDate:  time.Date(2023, 7, 3, 0, 0, 0, 0, time.UTC),
-			want:      "3",
+			want:      "4",
 		}, {
 			timeframe: storage.TimeframeMonth,
 			table:     "message",
 			wantDate:  time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC),
-			want:      "3",
+			want:      "4",
 		}, {
 			timeframe: storage.TimeframeYear,
 			table:     "message",
 			wantDate:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-			want:      "3",
+			want:      "4",
 		}, {
 			timeframe: storage.TimeframeHour,
 			table:     "event",

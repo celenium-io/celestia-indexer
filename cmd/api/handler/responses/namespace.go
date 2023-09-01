@@ -18,7 +18,7 @@ type Namespace struct {
 
 func NewNamespace(ns storage.Namespace) Namespace {
 	return Namespace{
-		ID:          ns.ID,
+		ID:          ns.Id,
 		Size:        ns.Size,
 		Version:     ns.Version,
 		NamespaceID: hex.EncodeToString(ns.NamespaceID),

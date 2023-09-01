@@ -81,7 +81,7 @@ func (s *StorageTestSuite) TestStateGetByName() {
 
 	state, err := s.storage.State.ByName(ctx, testIndexerName)
 	s.Require().NoError(err)
-	s.Require().EqualValues(1, state.ID)
+	s.Require().EqualValues(1, state.Id)
 	s.Require().EqualValues(1000, state.LastHeight)
 	s.Require().EqualValues(394067, state.TotalTx)
 	s.Require().EqualValues(12512357, state.TotalAccounts)
@@ -211,12 +211,12 @@ func (s *StorageTestSuite) TestNamespaceId() {
 	s.Require().NoError(err)
 	s.Require().Len(namespaces, 2)
 
-	s.Require().EqualValues(1, namespaces[0].ID)
+	s.Require().EqualValues(1, namespaces[0].Id)
 	s.Require().EqualValues(0, namespaces[0].Version)
 	s.Require().EqualValues(1234, namespaces[0].Size)
 	s.Require().Equal(namespaceId, namespaces[0].NamespaceID)
 
-	s.Require().EqualValues(2, namespaces[1].ID)
+	s.Require().EqualValues(2, namespaces[1].Id)
 	s.Require().EqualValues(1, namespaces[1].Version)
 	s.Require().EqualValues(1255, namespaces[1].Size)
 	s.Require().Equal(namespaceId, namespaces[1].NamespaceID)
@@ -232,7 +232,7 @@ func (s *StorageTestSuite) TestNamespaceIdAndVersion() {
 	namespace, err := s.storage.Namespace.ByNamespaceIdAndVersion(ctx, namespaceId, 1)
 	s.Require().NoError(err)
 
-	s.Require().EqualValues(2, namespace.ID)
+	s.Require().EqualValues(2, namespace.Id)
 	s.Require().EqualValues(1, namespace.Version)
 	s.Require().EqualValues(1255, namespace.Size)
 	s.Require().Equal(namespaceId, namespace.NamespaceID)
