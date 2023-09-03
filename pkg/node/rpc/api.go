@@ -3,11 +3,13 @@ package rpc
 import (
 	"context"
 	"encoding/json"
-	"github.com/rs/zerolog"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/rs/zerolog/log"
@@ -67,6 +69,8 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 		}
 	}
 
+	start := time.Now()
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
 		return err
@@ -76,13 +80,26 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 	if err != nil {
 		return err
 	}
+	defer closeWithLogError(response.Body, api.log)
 
-	defer func(b io.ReadCloser) {
-		if err := b.Close(); err != nil {
-			log.Err(err).Msg("api close GET body request")
-		}
-	}(response.Body)
+	if response.StatusCode != http.StatusOK {
+		return errors.Errorf("invalid status: %d", response.StatusCode)
+	}
+
+	api.log.Trace().
+		Int64("ms", time.Since(start).Milliseconds()).
+		Str("url", u.String()).
+		Msg("request")
 
 	err = json.NewDecoder(response.Body).Decode(output)
 	return err
+}
+
+func closeWithLogError(stream io.ReadCloser, log zerolog.Logger) {
+	if _, err := io.Copy(io.Discard, stream); err != nil {
+		log.Err(err).Msg("api copy GET body response to discard")
+	}
+	if err := stream.Close(); err != nil {
+		log.Err(err).Msg("api close GET body request")
+	}
 }

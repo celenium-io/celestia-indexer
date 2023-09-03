@@ -9,11 +9,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/blob"
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/mock"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	nodeMock "github.com/dipdup-io/celestia-indexer/pkg/node/mock"
+	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/node/types"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -34,7 +35,7 @@ var (
 type NamespaceTestSuite struct {
 	suite.Suite
 	namespaces   *mock.MockINamespace
-	blobReceiver *blob.MockReceiver
+	blobReceiver *nodeMock.MockCelestiaNodeApi
 	echo         *echo.Echo
 	handler      *NamespaceHandler
 	ctrl         *gomock.Controller
@@ -46,7 +47,7 @@ func (s *NamespaceTestSuite) SetupSuite() {
 	s.echo.Validator = NewCelestiaApiValidator()
 	s.ctrl = gomock.NewController(s.T())
 	s.namespaces = mock.NewMockINamespace(s.ctrl)
-	s.blobReceiver = blob.NewMockReceiver(s.ctrl)
+	s.blobReceiver = nodeMock.NewMockCelestiaNodeApi(s.ctrl)
 	s.handler = NewNamespaceHandler(s.namespaces, s.blobReceiver)
 }
 
@@ -187,7 +188,7 @@ func (s *NamespaceTestSuite) TestGetBlob() {
 	c.SetParamNames("hash", "height")
 	c.SetParamValues(testNamespaceBase64, "1000")
 
-	result := make([]blob.Blob, 2)
+	result := make([]nodeTypes.Blob, 2)
 
 	for i := 0; i < len(result); i++ {
 		result[i].Namespace = testNamespaceBase64
@@ -214,7 +215,7 @@ func (s *NamespaceTestSuite) TestGetBlob() {
 	s.Require().NoError(s.handler.GetBlob(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var blobs []blob.Blob
+	var blobs []nodeTypes.Blob
 	err := json.NewDecoder(rec.Body).Decode(&blobs)
 	s.Require().NoError(err)
 

@@ -617,18 +617,12 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/blob.Blob"
+                                "$ref": "#/definitions/responses.Blob"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handler.Error"
                         }
@@ -660,7 +654,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SearchResponse-responses_Searchable"
+                            "$ref": "#/definitions/responses.SearchResponse-responses_Searchable"
                         }
                     },
                     "204": {
@@ -1124,44 +1118,6 @@
         }
     },
     "definitions": {
-        "SearchResponse-responses_Searchable": {
-            "type": "object",
-            "properties": {
-                "result": {
-                    "description": "Search result. Can be one of folowwing types: Block, Address, Namespace, Tx",
-                    "type": "object"
-                },
-                "type": {
-                    "description": "Result type which is in the result. Can be 'block', 'address', 'namespace', 'tx'",
-                    "type": "string"
-                }
-            }
-        },
-        "blob.Blob": {
-            "type": "object",
-            "properties": {
-                "commitment": {
-                    "type": "string",
-                    "format": "base64",
-                    "example": "vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg="
-                },
-                "data": {
-                    "type": "string",
-                    "format": "base64",
-                    "example": "b2sgZGVtbyBkYQ=="
-                },
-                "namespace": {
-                    "type": "string",
-                    "format": "base64",
-                    "example": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="
-                },
-                "share_version": {
-                    "type": "integer",
-                    "format": "integer",
-                    "example": 0
-                }
-            }
-        },
         "handler.Error": {
             "type": "object",
             "properties": {
@@ -1189,6 +1145,31 @@
                 "id": {
                     "type": "integer",
                     "example": 321
+                }
+            }
+        },
+        "responses.Blob": {
+            "type": "object",
+            "properties": {
+                "commitment": {
+                    "type": "string",
+                    "format": "base64",
+                    "example": "vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg="
+                },
+                "data": {
+                    "type": "string",
+                    "format": "base64",
+                    "example": "b2sgZGVtbyBkYQ=="
+                },
+                "namespace": {
+                    "type": "string",
+                    "format": "base64",
+                    "example": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="
+                },
+                "share_version": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 0
                 }
             }
         },
@@ -1499,6 +1480,19 @@
                         "PayForBlobs"
                     ],
                     "example": "CreatePeriodicVestingAccount"
+                }
+            }
+        },
+        "responses.SearchResponse-responses_Searchable": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "description": "Search result. Can be one of folowwing types: Block, Address, Namespace, Tx",
+                    "type": "object"
+                },
+                "type": {
+                    "description": "Result type which is in the result. Can be 'block', 'address', 'namespace', 'tx'",
+                    "type": "string"
                 }
             }
         },

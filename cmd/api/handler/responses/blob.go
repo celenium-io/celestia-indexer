@@ -1,12 +1,6 @@
-package blob
+package responses
 
-import "context"
-
-//go:generate mockgen -source=$GOFILE -destination=mock.go -package=blob -typed
-type Receiver interface {
-	Blobs(ctx context.Context, height uint64, hash ...string) ([]Blob, error)
-}
-
+// structure is only for documentation
 type Blob struct {
 	Namespace    string `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="     format:"base64"  json:"namespace"     swaggertype:"string"`
 	Data         string `example:"b2sgZGVtbyBkYQ=="                             format:"base64"  json:"data"          swaggertype:"string"`

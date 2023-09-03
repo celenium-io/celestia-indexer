@@ -10,7 +10,6 @@ require (
 	github.com/go-playground/validator/v10 v10.15.1
 	github.com/go-testfixtures/testfixtures/v3 v3.9.0
 	github.com/goccy/go-json v0.10.2
-	github.com/golang/mock v1.6.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/labstack/echo-contrib v0.15.0
 	github.com/labstack/echo/v4 v4.11.1

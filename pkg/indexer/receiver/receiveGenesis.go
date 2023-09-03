@@ -3,7 +3,7 @@ package receiver
 import "context"
 
 func (r *Receiver) receiveGenesis(ctx context.Context) error {
-	genesis, err := r.api.GetGenesis(ctx)
+	genesis, err := r.api.Genesis(ctx)
 	if err != nil {
 		return err
 	}

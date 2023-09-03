@@ -1,35 +1,5 @@
 basePath: /v1
 definitions:
-  SearchResponse-responses_Searchable:
-    properties:
-      result:
-        description: 'Search result. Can be one of folowwing types: Block, Address,
-          Namespace, Tx'
-        type: object
-      type:
-        description: Result type which is in the result. Can be 'block', 'address',
-          'namespace', 'tx'
-        type: string
-    type: object
-  blob.Blob:
-    properties:
-      commitment:
-        example: vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg=
-        format: base64
-        type: string
-      data:
-        example: b2sgZGVtbyBkYQ==
-        format: base64
-        type: string
-      namespace:
-        example: AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0=
-        format: base64
-        type: string
-      share_version:
-        example: 0
-        format: integer
-        type: integer
-    type: object
   handler.Error:
     properties:
       message:
@@ -49,6 +19,25 @@ definitions:
         type: string
       id:
         example: 321
+        type: integer
+    type: object
+  responses.Blob:
+    properties:
+      commitment:
+        example: vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg=
+        format: base64
+        type: string
+      data:
+        example: b2sgZGVtbyBkYQ==
+        format: base64
+        type: string
+      namespace:
+        example: AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0=
+        format: base64
+        type: string
+      share_version:
+        example: 0
+        format: integer
         type: integer
     type: object
   responses.Block:
@@ -292,6 +281,17 @@ definitions:
         - PayForBlobs
         example: CreatePeriodicVestingAccount
         format: string
+        type: string
+    type: object
+  responses.SearchResponse-responses_Searchable:
+    properties:
+      result:
+        description: 'Search result. Can be one of folowwing types: Block, Address,
+          Namespace, Tx'
+        type: object
+      type:
+        description: Result type which is in the result. Can be 'block', 'address',
+          'namespace', 'tx'
         type: string
     type: object
   responses.State:
@@ -820,14 +820,10 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/blob.Blob'
+              $ref: '#/definitions/responses.Blob'
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.Error'
-        "500":
-          description: Internal Server Error
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get namespace blob on height
@@ -871,7 +867,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/SearchResponse-responses_Searchable'
+            $ref: '#/definitions/responses.SearchResponse-responses_Searchable'
         "204":
           description: No Content
         "400":

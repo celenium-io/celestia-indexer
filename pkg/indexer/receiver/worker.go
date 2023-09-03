@@ -2,10 +2,11 @@ package receiver
 
 import (
 	"context"
+	"time"
+
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
-	"time"
 )
 
 func (r *Receiver) worker(ctx context.Context, level storage.Level) {
@@ -41,12 +42,12 @@ func (r *Receiver) worker(ctx context.Context, level storage.Level) {
 }
 
 func (r *Receiver) blockData(ctx context.Context, level storage.Level) (types.BlockData, error) {
-	block, err := r.api.GetBlock(ctx, level)
+	block, err := r.api.Block(ctx, level)
 	if err != nil {
 		return types.BlockData{}, err
 	}
 
-	blockResults, err := r.api.GetBlockResults(ctx, level)
+	blockResults, err := r.api.BlockResults(ctx, level)
 	if err != nil {
 		return types.BlockData{}, err
 	}

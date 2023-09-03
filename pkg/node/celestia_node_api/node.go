@@ -1,4 +1,4 @@
-package blob
+package celestianodeapi
 
 import (
 	"bytes"
@@ -9,40 +9,12 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
 	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
-)
-
-type jsonRpcRequest struct {
-	Method  string `json:"method"`
-	Params  []any  `json:"params"`
-	Id      uint64 `json:"id"`
-	JsonRpc string `json:"jsonrpc"`
-}
-
-type jsonRpcResponse[T any] struct {
-	Id      uint64 `json:"id"`
-	JsonRpc string `json:"jsonrpc"`
-	Error   *Error `json:"error,omitempty"`
-	Result  T      `json:"result"`
-}
-
-// Error -
-type Error struct {
-	Code    int64           `json:"code"`
-	Message string          `json:"message"`
-	Data    json.RawMessage `json:"data"`
-}
-
-// Error -
-func (e Error) Error() string {
-	return fmt.Sprintf("code=%d message=%s data=%s", e.Code, e.Message, string(e.Data))
-}
-
-// errors
-var (
-	ErrRequest = errors.New("request error")
 )
 
 type Node struct {
@@ -51,10 +23,11 @@ type Node struct {
 	host           string
 	jsonRpcVersion string
 	token          string
-	id             *atomic.Uint64
+	id             *atomic.Int64
+	log            zerolog.Logger
 }
 
-func NewNode(baseUrl string) *Node {
+func New(baseUrl string) *Node {
 	t := http.DefaultTransport.(*http.Transport).Clone()
 	t.MaxIdleConns = 10
 	t.MaxConnsPerHost = 10
@@ -66,7 +39,8 @@ func NewNode(baseUrl string) *Node {
 			Transport: t,
 		},
 		jsonRpcVersion: "2.0",
-		id:             new(atomic.Uint64),
+		id:             new(atomic.Int64),
+		log:            log.With().Str("module", "celestia_node_api").Logger(),
 	}
 }
 
@@ -77,7 +51,7 @@ func (node *Node) WithRateLimit(requestPerSecond int) *Node {
 	return node
 }
 
-func (node *Node) WithStartId(id uint64) *Node {
+func (node *Node) WithStartId(id int64) *Node {
 	if id > 0 {
 		node.id.Store(id)
 	}
@@ -97,25 +71,8 @@ func (node *Node) WithAuthToken(token string) *Node {
 	}
 	return node
 }
-
-func (node *Node) Blobs(ctx context.Context, height uint64, hash ...string) ([]Blob, error) {
-	if len(hash) == 0 {
-		return nil, nil
-	}
-
-	var response jsonRpcResponse[[]Blob]
-	if err := node.post(ctx, "blob.GetAll", []any{height, hash}, &response); err != nil {
-		return nil, err
-	}
-
-	if response.Error != nil {
-		return nil, errors.Wrapf(ErrRequest, "request %d error: %s", response.Id, response.Error.Error())
-	}
-	return response.Result, nil
-}
-
 func (node *Node) post(ctx context.Context, method string, params []any, output any) error {
-	query := jsonRpcRequest{
+	query := types.Request{
 		JsonRpc: node.jsonRpcVersion,
 		Id:      node.id.Add(1),
 		Method:  method,
@@ -140,23 +97,33 @@ func (node *Node) post(ctx context.Context, method string, params []any, output 
 		}
 	}
 
+	start := time.Now()
+
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return err
 	}
-	defer response.Body.Close()
+	defer closeWithLogError(response.Body, node.log)
 
-	buffer := new(bytes.Buffer)
-	if _, err := io.Copy(buffer, response.Body); err != nil {
-		return err
-	}
+	node.log.Trace().
+		Int64("ms", time.Since(start).Milliseconds()).
+		Str("method", query.Method).
+		Int64("request_id", query.Id).
+		Msg("request")
 
 	if response.StatusCode != http.StatusOK {
-		return errors.Errorf("invalid status: %d %s", response.StatusCode, buffer.String())
+		return errors.Errorf("invalid status: %d", response.StatusCode)
 	}
 
-	if err := json.NewDecoder(buffer).DecodeContext(ctx, output); err != nil {
-		return err
+	err = json.NewDecoder(response.Body).DecodeContext(ctx, output)
+	return err
+}
+
+func closeWithLogError(stream io.ReadCloser, log zerolog.Logger) {
+	if _, err := io.Copy(io.Discard, stream); err != nil {
+		log.Err(err).Msg("api copy GET body response to discard")
 	}
-	return nil
+	if err := stream.Close(); err != nil {
+		log.Err(err).Msg("api close GET body request")
+	}
 }
