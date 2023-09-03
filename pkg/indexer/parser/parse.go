@@ -4,43 +4,46 @@ import (
 	"context"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/shopspring/decimal"
-	"strconv"
 )
 
-func (p *Parser) parse(ctx context.Context, resultBlock types.ResultBlock) error {
-	p.log.Info().Int64("height", resultBlock.Block.Height).Msg("parsing block...")
+func (p *Parser) parse(ctx context.Context, b types.BlockData) error {
+	p.log.Info().Int64("height", b.Block.Height).Msg("parsing block...")
 
 	block := storage.Block{
-		Height:       storage.Level(resultBlock.Block.Height),
-		Time:         resultBlock.Block.Time,
-		VersionBlock: strconv.FormatUint(resultBlock.Block.Version.Block, 10), // should we use string in storage type?
-		VersionApp:   strconv.FormatUint(resultBlock.Block.Version.App, 10),   // should we use string in storage type?
+		Height:       b.Height,
+		Time:         b.Block.Time,
+		VersionBlock: b.Block.Version.Block,
+		VersionApp:   b.Block.Version.App,
 
-		TxCount:       0, // TODO
-		EventsCount:   0, // TODO
-		MessageTypes:  storageTypes.MsgTypeBits{},
-		NamespaceSize: 0, // "Summary block namespace size from pay for blob"` // should it be in block?
+		TxCount:      uint64(len(b.Block.Data.Txs)),
+		EventsCount:  uint64(len(b.BeginBlockEvents) + len(b.EndBlockEvents)),
+		MessageTypes: storageTypes.MsgTypeBits{}, // TODO init
+		BlobsSize:    0,
 
-		Hash:               []byte(resultBlock.BlockID.Hash), // create a Hex type for common usage through indexer app
-		ParentHash:         []byte(resultBlock.Block.LastBlockID.Hash),
-		LastCommitHash:     []byte(resultBlock.Block.LastCommitHash),
-		DataHash:           []byte(resultBlock.Block.DataHash),
-		ValidatorsHash:     []byte(resultBlock.Block.ValidatorsHash),
-		NextValidatorsHash: []byte(resultBlock.Block.NextValidatorsHash),
-		ConsensusHash:      []byte(resultBlock.Block.ConsensusHash),
-		AppHash:            []byte(resultBlock.Block.AppHash),
-		LastResultsHash:    []byte(resultBlock.Block.LastResultsHash),
-		EvidenceHash:       []byte(resultBlock.Block.EvidenceHash),
-		ProposerAddress:    []byte(resultBlock.Block.ProposerAddress),
+		Hash:               []byte(b.BlockID.Hash), // TODO create a Hex type for common usage through indexer app
+		ParentHash:         []byte(b.Block.LastBlockID.Hash),
+		LastCommitHash:     b.Block.LastCommitHash,
+		DataHash:           b.Block.DataHash,
+		ValidatorsHash:     b.Block.ValidatorsHash,
+		NextValidatorsHash: b.Block.NextValidatorsHash,
+		ConsensusHash:      b.Block.ConsensusHash,
+		AppHash:            b.Block.AppHash,
+		LastResultsHash:    b.Block.LastResultsHash,
+		EvidenceHash:       b.Block.EvidenceHash,
+		ProposerAddress:    b.Block.ProposerAddress,
 
-		Fee:     decimal.Zero, // TODO
-		ChainId: resultBlock.Block.ChainID,
+		Fee:     decimal.Zero, // TODO sum of auth_info.fee // RESEARCH: done
+		ChainId: b.Block.ChainID,
 
-		Txs:    make([]storage.Tx, 0),    // TODO
-		Events: make([]storage.Event, 0), // TODO
+		Txs:    parseTxs(b),
+		Events: nil,
 	}
+
+	block.Events = parseEvents(b, b.ResultBlockResults.BeginBlockEvents)
+	endEvents := parseEvents(b, b.ResultBlockResults.EndBlockEvents)
+	block.Events = append(block.Events, endEvents...)
 
 	p.output.Push(block)
 	return nil

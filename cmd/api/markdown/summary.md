@@ -25,7 +25,7 @@ Returns string value by passed table and function.
 * `time`           -- min max
 * `tx_count`       -- min max sum avg
 * `events_count`   -- min max sum avg
-* `namespace_size` -- min max sum avg
+* `blobs_size`     -- min max sum avg
 * `fee`            -- min max sum avg
 
 #### Tx

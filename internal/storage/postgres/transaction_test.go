@@ -84,12 +84,12 @@ func (s *StorageTestSuite) TestSaveNamespaces() {
 		{
 			Version:     0,
 			NamespaceID: namespaceId,
-			PfdCount:    2,
+			PfbCount:    2,
 			Size:        100,
 		}, {
 			Version:     2,
 			NamespaceID: namespaceId,
-			PfdCount:    1,
+			PfbCount:    1,
 			Size:        11,
 		},
 	}
@@ -108,7 +108,7 @@ func (s *StorageTestSuite) TestSaveNamespaces() {
 
 	s.Require().EqualValues(1, ns1.Id)
 	s.Require().EqualValues(0, ns1.Version)
-	s.Require().EqualValues(5, ns1.PfdCount)
+	s.Require().EqualValues(5, ns1.PfbCount)
 	s.Require().EqualValues(1334, ns1.Size)
 	s.Require().Equal(namespaceId, ns1.NamespaceID)
 
@@ -117,7 +117,7 @@ func (s *StorageTestSuite) TestSaveNamespaces() {
 
 	s.Require().Greater(ns2.Id, uint64(0))
 	s.Require().EqualValues(2, ns2.Version)
-	s.Require().EqualValues(1, ns2.PfdCount)
+	s.Require().EqualValues(1, ns2.PfbCount)
 	s.Require().EqualValues(11, ns2.Size)
 	s.Require().Equal(namespaceId, ns2.NamespaceID)
 }
@@ -364,7 +364,7 @@ func (s *StorageTestSuite) TestRollbackNamespaceMessages() {
 	s.Require().EqualValues(394067, state.TotalTx)
 	s.Require().EqualValues(12512357, state.TotalAccounts)
 	s.Require().Equal("172635712635813", state.TotalFee.String())
-	s.Require().EqualValues(324234, state.TotalNamespaceSize)
+	s.Require().EqualValues(324234, state.TotalBlobsSize)
 	s.Require().Equal(testIndexerName, state.Name)
 
 	s.Require().NoError(tx.Flush(ctx))

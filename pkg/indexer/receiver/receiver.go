@@ -5,7 +5,7 @@ import (
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-io/celestia-indexer/pkg/node"
-	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/pkg/errors"
@@ -24,7 +24,7 @@ type Receiver struct {
 	cfg     config.Config
 	outputs map[string]*modules.Output
 	pool    *workerpool.Pool[storage.Level]
-	blocks  chan types.ResultBlock
+	blocks  chan types.BlockData
 	log     zerolog.Logger
 	wg      *sync.WaitGroup
 }
@@ -34,7 +34,7 @@ func NewModule(cfg config.Config, api node.API) Receiver {
 		api:     api,
 		cfg:     cfg,
 		outputs: map[string]*modules.Output{BlocksOutput: modules.NewOutput(BlocksOutput)},
-		blocks:  make(chan types.ResultBlock, cfg.Indexer.ThreadsCount*10),
+		blocks:  make(chan types.BlockData, cfg.Indexer.ThreadsCount*10),
 		log:     log.With().Str("module", name).Logger(),
 		wg:      new(sync.WaitGroup),
 	}

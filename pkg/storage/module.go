@@ -7,7 +7,6 @@ import (
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
 	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
-	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -113,9 +112,9 @@ func (module *Module) listen(ctx context.Context) {
 				continue
 			}
 
-			if err := module.notify(ctx, block); err != nil {
-				module.log.Err(err).Msg("block notification error")
-			}
+			// if err := module.notify(ctx, block); err != nil {
+			//	module.log.Err(err).Msg("block notification error")
+			//}
 		}
 	}
 }
@@ -160,7 +159,7 @@ func (module *Module) updateState(block storage.Block) {
 	module.state.LastHeight = block.Height
 	module.state.LastTime = block.Time
 	module.state.TotalTx += block.TxCount
-	module.state.TotalNamespaceSize = block.NamespaceSize
+	module.state.TotalBlobsSize = block.BlobsSize
 	module.state.TotalFee = module.state.TotalFee.Add(block.Fee)
 	// TODO: update TotalAccounts
 	module.state.ChainId = block.ChainId
@@ -201,9 +200,9 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 			for k := range block.Txs[i].Messages[j].Namespace {
 				key := block.Txs[i].Messages[j].Namespace[k].String()
 				if ns, ok := namespaces[key]; ok {
-					ns.PfdCount += 1
+					ns.PfbCount += 1
 				} else {
-					block.Txs[i].Messages[j].Namespace[k].PfdCount = 1
+					block.Txs[i].Messages[j].Namespace[k].PfbCount = 1
 					namespaces[key] = block.Txs[i].Messages[j].Namespace[k]
 				}
 			}
@@ -272,29 +271,30 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 	}
 	module.log.Info().
 		Uint64("height", block.Id).
-		Uint64("block_ns_size", block.NamespaceSize).
+		Uint64("block_ns_size", block.BlobsSize).
 		Str("block_fee", block.Fee.String()).
 		Msg("block saved")
 	return nil
 }
 
-func (module *Module) notify(ctx context.Context, block storage.Block) error {
-	data, err := json.MarshalContext(ctx, block, json.UnorderedMap())
-	if err != nil {
-		return err
-	}
-	if err := module.storage.Notificator.Notify(ctx, storage.ChannelHead, string(data)); err != nil {
-		return err
-	}
-
-	for i := range block.Txs {
-		data, err := json.MarshalContext(ctx, block.Txs[i], json.UnorderedMap())
-		if err != nil {
-			return err
-		}
-		if err := module.storage.Notificator.Notify(ctx, storage.ChannelTx, string(data)); err != nil {
-			return err
-		}
-	}
-	return nil
-}
+// notify -
+// func (module *Module) notify(ctx context.Context, block storage.Block) error {
+//	data, err := json.MarshalContext(ctx, block, json.UnorderedMap())
+//	if err != nil {
+//		return err
+//	}
+//	if err := module.storage.Notificator.Notify(ctx, storage.ChannelHead, string(data)); err != nil {
+//		return err
+//	}
+//
+//	for i := range block.Txs {
+//		data, err := json.MarshalContext(ctx, block.Txs[i], json.UnorderedMap())
+//		if err != nil {
+//			return err
+//		}
+//		if err := module.storage.Notificator.Notify(ctx, storage.ChannelTx, string(data)); err != nil {
+//			return err
+//		}
+//	}
+//	return nil
+//}

@@ -86,7 +86,7 @@ func (s *StorageTestSuite) TestStateGetByName() {
 	s.Require().EqualValues(394067, state.TotalTx)
 	s.Require().EqualValues(12512357, state.TotalAccounts)
 	s.Require().Equal("172635712635813", state.TotalFee.String())
-	s.Require().EqualValues(324234, state.TotalNamespaceSize)
+	s.Require().EqualValues(324234, state.TotalBlobsSize)
 	s.Require().Equal(testIndexerName, state.Name)
 }
 
@@ -105,8 +105,8 @@ func (s *StorageTestSuite) TestBlockLast() {
 	block, err := s.storage.Blocks.Last(ctx)
 	s.Require().NoError(err)
 	s.Require().EqualValues(1000, block.Height)
-	s.Require().EqualValues("1", block.VersionApp)
-	s.Require().EqualValues("11", block.VersionBlock)
+	s.Require().EqualValues(1, block.VersionApp)
+	s.Require().EqualValues(11, block.VersionBlock)
 	s.Require().EqualValues(0, block.TxCount)
 
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
@@ -121,8 +121,8 @@ func (s *StorageTestSuite) TestBlockByHeight() {
 	block, err := s.storage.Blocks.ByHeight(ctx, 1000)
 	s.Require().NoError(err)
 	s.Require().EqualValues(1000, block.Height)
-	s.Require().EqualValues("1", block.VersionApp)
-	s.Require().EqualValues("11", block.VersionBlock)
+	s.Require().EqualValues(1, block.VersionApp)
+	s.Require().EqualValues(11, block.VersionBlock)
 	s.Require().EqualValues(0, block.TxCount)
 
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
@@ -140,8 +140,8 @@ func (s *StorageTestSuite) TestBlockByHash() {
 	block, err := s.storage.Blocks.ByHash(ctx, hash)
 	s.Require().NoError(err)
 	s.Require().EqualValues(1000, block.Height)
-	s.Require().EqualValues("1", block.VersionApp)
-	s.Require().EqualValues("11", block.VersionBlock)
+	s.Require().EqualValues(1, block.VersionApp)
+	s.Require().EqualValues(11, block.VersionBlock)
 	s.Require().EqualValues(0, block.TxCount)
 	s.Require().Equal(hash, block.Hash)
 }

@@ -58,10 +58,10 @@ func (module *Module) namespaces(
 		}
 
 		if diff, ok := diffs[nsId]; ok {
-			diff.PfdCount -= 1
+			diff.PfbCount -= 1
 			diff.Size -= size
 		} else {
-			ns.PfdCount -= 1
+			ns.PfbCount -= 1
 			ns.Size -= size
 			diffs[nsId] = &ns
 		}

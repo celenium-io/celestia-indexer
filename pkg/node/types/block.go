@@ -3,7 +3,6 @@ package types
 import (
 	"time"
 
-	"github.com/tendermint/tendermint/libs/bytes"
 	"github.com/tendermint/tendermint/types"
 )
 
@@ -41,26 +40,26 @@ type Header struct {
 	LastBlockID types.BlockID `json:"last_block_id"`
 
 	// hashes of block data
-	LastCommitHash bytes.HexBytes `json:"last_commit_hash"` // commit from validators from the last block
-	DataHash       bytes.HexBytes `json:"data_hash"`        // transactions
+	LastCommitHash []byte `json:"last_commit_hash"` // commit from validators from the last block
+	DataHash       []byte `json:"data_hash"`        // transactions
 
 	// hashes from the app output from the prev block
-	ValidatorsHash     bytes.HexBytes `json:"validators_hash"`      // validators for the current block
-	NextValidatorsHash bytes.HexBytes `json:"next_validators_hash"` // validators for the next block
-	ConsensusHash      bytes.HexBytes `json:"consensus_hash"`       // consensus params for current block
-	AppHash            bytes.HexBytes `json:"app_hash"`             // state after txs from the previous block
+	ValidatorsHash     []byte `json:"validators_hash"`      // validators for the current block
+	NextValidatorsHash []byte `json:"next_validators_hash"` // validators for the next block
+	ConsensusHash      []byte `json:"consensus_hash"`       // consensus params for current block
+	AppHash            []byte `json:"app_hash"`             // state after txs from the previous block
 	// root hash of all results from the txs from the previous block
-	// see `deterministicResponseDeliverTx` to understand which parts of a tx is hashed into here
-	LastResultsHash bytes.HexBytes `json:"last_results_hash"`
+	// see `deterministicResponseDeliverTx` to understand which parts of a tx are hashed into here
+	LastResultsHash []byte `json:"last_results_hash"`
 
 	// consensus info
-	EvidenceHash    bytes.HexBytes `json:"evidence_hash"`    // evidence included in the block
-	ProposerAddress types.Address  `json:"proposer_address"` // original proposer of the block
+	EvidenceHash    []byte `json:"evidence_hash"`    // evidence included in the block
+	ProposerAddress []byte `json:"proposer_address"` // original proposer of the block
 }
 
 // Data contains all the available Data of the block.
 // Data with reserved namespaces (Txs, IntermediateStateRoots, Evidence) and
-// Celestia application specific Blobs.
+// Celestia application-specific Blobs.
 type Data struct {
 	// Txs that will be applied by state @ block.Height+1.
 	// NOTE: not all txs here are valid.  We're just agreeing on the order first.

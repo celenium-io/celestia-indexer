@@ -15,7 +15,7 @@ const (
 	EventTypeRewards            EventType = "rewards"
 	EventTypeCommission         EventType = "commission"
 	EventTypeLiveness           EventType = "liveness"
-	EventTypeAttestationRequest EventType = "attestation_request"
+	EventTypeAttestationRequest EventType = "AttestationRequest"
 	EventTypeTransfer           EventType = "transfer"
 	EventTypePayForBlobs        EventType = "pay_for_blobs"
 	EventTypeRedelegate         EventType = "redelegate"

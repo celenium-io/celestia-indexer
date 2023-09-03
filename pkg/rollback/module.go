@@ -210,7 +210,7 @@ func (module *Module) rollbackBlock(ctx context.Context, height storage.Level) e
 	state.LastHeight = newBlock.Height
 	state.LastTime = newBlock.Time
 	state.TotalTx -= block.TxCount
-	state.TotalNamespaceSize -= block.NamespaceSize
+	state.TotalBlobsSize -= block.BlobsSize
 	state.TotalNamespaces -= uint64(len(ns))
 	state.TotalAccounts -= uint64(len(addresses))
 	state.TotalFee = state.TotalFee.Sub(block.Fee)

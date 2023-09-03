@@ -21,7 +21,7 @@ type Event struct {
 func NewEvent(event storage.Event) Event {
 	result := Event{
 		Id:       event.Id,
-		Height:   event.Height,
+		Height:   uint64(event.Height),
 		Time:     event.Time,
 		Position: event.Position,
 		Type:     string(event.Type),

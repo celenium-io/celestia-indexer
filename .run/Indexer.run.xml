@@ -21,6 +21,12 @@
     <method v="2">
       <option name="NpmBeforeRunTask" enabled="true">
         <package-json value="$PROJECT_DIR$/.run/package.json" />
+        <command value="stop" />
+        <node-interpreter value="project" />
+        <envs />
+      </option>
+      <option name="NpmBeforeRunTask" enabled="true">
+        <package-json value="$PROJECT_DIR$/.run/package.json" />
         <command value="start" />
         <node-interpreter value="project" />
         <envs />

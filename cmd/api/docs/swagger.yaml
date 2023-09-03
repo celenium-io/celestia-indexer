@@ -1,5 +1,16 @@
 basePath: /v1
 definitions:
+  SearchResponse-responses_Searchable:
+    properties:
+      result:
+        description: 'Search result. Can be one of folowwing types: Block, Address,
+          Namespace, Tx'
+        type: object
+      type:
+        description: Result type which is in the result. Can be 'block', 'address',
+          'namespace', 'tx'
+        type: string
+    type: object
   blob.Blob:
     properties:
       commitment:
@@ -45,6 +56,9 @@ definitions:
       app_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
+      blobs_size:
+        example: 12354
+        type: integer
       consensus_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
@@ -82,9 +96,6 @@ definitions:
         items:
           type: string
         type: array
-      namespace_size:
-        example: 12354
-        type: integer
       next_validators_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
@@ -283,17 +294,6 @@ definitions:
         format: string
         type: string
     type: object
-  responses.SearchResponse-responses_Searchable:
-    properties:
-      result:
-        description: 'Search result. Can be one of folowwing types: Block, Address,
-          Namespace, Tx'
-        type: object
-      type:
-        description: Result type which is in the result. Can be 'block', 'address',
-          'namespace', 'tx'
-        type: string
-    type: object
   responses.State:
     properties:
       id:
@@ -316,14 +316,14 @@ definitions:
         example: 43
         format: int64
         type: integer
+      total_blobs_size:
+        example: 56789
+        format: int64
+        type: integer
       total_fee:
         example: "312"
         format: string
         type: string
-      total_namespace_size:
-        example: 56789
-        format: int64
-        type: integer
       total_tx:
         example: 23456
         format: int64
@@ -871,7 +871,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.SearchResponse-responses_Searchable'
+            $ref: '#/definitions/SearchResponse-responses_Searchable'
         "204":
           description: No Content
         "400":
@@ -999,7 +999,7 @@ paths:
         * `time`           -- min max
         * `tx_count`       -- min max sum avg
         * `events_count`   -- min max sum avg
-        * `namespace_size` -- min max sum avg
+        * `blobs_size`     -- min max sum avg
         * `fee`            -- min max sum avg
 
         #### Tx
@@ -1269,7 +1269,7 @@ paths:
         \               \"Send\",\n                \"CreateVestingAccount\",\n                \"CreatePeriodicVestingAccount\",\n
         \               \"PayForBlobs\"\n            ]\n        }\n    }\n}\n```\n\nIf
         all filers are empty subscription to all transaction will be created.\n\nIn
-        that channel messages of `responses.TX` type will be sent.\n\n\n### Unsubscribe\n\nTo
+        that channel messages of `responses.Tx` type will be sent.\n\n\n### Unsubscribe\n\nTo
         unsubscribe send `unsubscribe` message containing one of channel name describing
         above.\n\n\n```json\n{\n    \"method\": \"unsubscribe\",\n    \"body\": {\n
         \       \"channel\": \"<CHANNEL_NAME>\",\n    }\n}\n```\n"

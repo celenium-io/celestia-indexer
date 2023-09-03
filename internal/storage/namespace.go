@@ -26,7 +26,7 @@ type Namespace struct {
 	Version     byte   `bun:"version,unique:namespace_id_version_idx"      comment:"Namespace version"`
 	NamespaceID []byte `bun:"namespace_id,unique:namespace_id_version_idx" comment:"Namespace identity"`
 	Size        uint64 `bun:"size"                                         comment:"Namespace size"`
-	PfdCount    uint64 `bun:"pfd_count"                                    comment:"Count of pay for blobs messages for the namespace"`
+	PfbCount    uint64 `bun:"pfb_count"                                    comment:"Count of pay for blobs messages for the namespace"`
 	Reserved    bool   `bun:"reserved"                                     comment:"If namespace is reserved flag is true"`
 }
 

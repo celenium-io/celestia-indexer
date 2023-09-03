@@ -10,5 +10,6 @@ import (
 type API interface {
 	GetHead(ctx context.Context) (types.ResultBlock, error)
 	GetBlock(ctx context.Context, level storage.Level) (types.ResultBlock, error)
+	GetBlockResults(ctx context.Context, level storage.Level) (types.ResultBlockResults, error)
 	GetGenesis(ctx context.Context) (types.Genesis, error)
 }

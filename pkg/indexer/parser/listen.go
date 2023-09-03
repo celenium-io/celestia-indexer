@@ -2,7 +2,7 @@ package parser
 
 import (
 	"context"
-	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 )
 
 func (p *Parser) listen(ctx context.Context) {
@@ -20,7 +20,7 @@ func (p *Parser) listen(ctx context.Context) {
 				continue
 			}
 
-			block, ok := msg.(types.ResultBlock)
+			block, ok := msg.(types.BlockData)
 			if !ok {
 				p.log.Warn().Msgf("invalid message type: %T", msg)
 				continue

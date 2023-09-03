@@ -1,6 +1,9 @@
 -include .env
 export $(shell sed 's/=.*//' .env)
 
+init:
+	chmod +x init.dev.sh && ./init.dev.sh
+
 indexer:
 	cd cmd/indexer && go run . -c ../../build/dipdup.yml
 
@@ -34,4 +37,4 @@ mock:
 api-docs:
 	cd cmd/api && swag init --md markdown
 
-.PHONY: indexer api build clean compose lint test adr mock
+.PHONY: init indexer api build clean compose lint test adr mock

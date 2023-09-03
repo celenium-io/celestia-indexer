@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-const path = "block"
+const pathBlock = "block"
 
 type getBlockResult struct {
 	Result types.ResultBlock `json:"result"`
@@ -20,7 +20,7 @@ func (api *API) GetBlock(ctx context.Context, level storage.Level) (types.Result
 	}
 
 	var gbr getBlockResult
-	if err := api.get(ctx, path, args, &gbr); err != nil {
+	if err := api.get(ctx, pathBlock, args, &gbr); err != nil {
 		api.log.Err(err).Msg("node get block request")
 		return types.ResultBlock{}, err
 	}

@@ -34,7 +34,7 @@ type Tx struct {
 func NewTx(tx storage.Tx) Tx {
 	return Tx{
 		Id:            tx.Id,
-		Height:        tx.Height,
+		Height:        uint64(tx.Height),
 		Time:          tx.Time,
 		Position:      tx.Position,
 		GasWanted:     tx.GasWanted,

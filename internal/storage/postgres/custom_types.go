@@ -20,7 +20,7 @@ const (
 	eventType = `DO $$
 	BEGIN
 		IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'event_type') THEN
-			CREATE TYPE event_type AS ENUM ('coin_received', 'coinbase', 'coin_spent', 'burn', 'mint', 'message', 'proposer_reward', 'rewards', 'commission', 'liveness', 'attestation_request', 'transfer', 'pay_for_blobs', 'redelegate', 'withdraw_rewards', 'withdraw_commission', 'create_validator', 'delegate', 'edit_validator', 'unbond', 'tx', 'unknown');
+			CREATE TYPE event_type AS ENUM ('coin_received', 'coinbase', 'coin_spent', 'burn', 'mint', 'message', 'proposer_reward', 'rewards', 'commission', 'liveness', 'AttestationRequest', 'transfer', 'pay_for_blobs', 'redelegate', 'withdraw_rewards', 'withdraw_commission', 'create_validator', 'delegate', 'edit_validator', 'unbond', 'tx', 'unknown');
 		END IF;
 	END$$;`
 
