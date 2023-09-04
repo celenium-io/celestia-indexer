@@ -86,15 +86,21 @@ func (handler *TxHandler) List(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	txs, err := handler.tx.Filter(c.Request().Context(), storage.TxFilter{
-		Limit:    int(req.Limit),
-		Offset:   int(req.Offset),
-		Sort:     pgSort(req.Sort),
-		Status:   req.Status,
-		TimeFrom: time.Unix(req.From, 0).UTC(),
-		TimeTo:   time.Unix(req.To, 0).UTC(),
-		Height:   req.Height,
-	})
+	fltrs := storage.TxFilter{
+		Limit:  int(req.Limit),
+		Offset: int(req.Offset),
+		Sort:   pgSort(req.Sort),
+		Status: req.Status,
+		Height: req.Height,
+	}
+	if req.From > 0 {
+		fltrs.TimeFrom = time.Unix(req.From, 0).UTC()
+	}
+	if req.To > 0 {
+		fltrs.TimeTo = time.Unix(req.To, 0).UTC()
+	}
+
+	txs, err := handler.tx.Filter(c.Request().Context(), fltrs)
 	if err := handleError(c, err, handler.tx); err != nil {
 		return err
 	}
