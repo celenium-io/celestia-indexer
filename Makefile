@@ -37,4 +37,4 @@ mock:
 api-docs:
 	cd cmd/api && swag init --md markdown
 
-.PHONY: init indexer api build clean compose lint test adr mock
+.PHONY: init indexer api build clean compose lint test adr mock api-docs
