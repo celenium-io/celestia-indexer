@@ -59,3 +59,11 @@ func (tx *Tx) Filter(ctx context.Context, fltrs storage.TxFilter) (txs []storage
 	err = query.Scan(ctx)
 	return
 }
+
+func (tx *Tx) ByIdWithRelations(ctx context.Context, id uint64) (transaction storage.Tx, err error) {
+	err = tx.DB().NewSelect().Model(&transaction).
+		Where("id = ?", id).
+		Relation("Messages").
+		Scan(ctx)
+	return
+}

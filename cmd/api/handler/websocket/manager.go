@@ -16,12 +16,12 @@ type Manager struct {
 	clientId *atomic.Uint64
 	clients  Map[uint64, *Client]
 
-	head    *Channel[responses.Block]
-	tx      *Channel[responses.Tx]
+	head    *Channel[storage.Block, responses.Block]
+	tx      *Channel[storage.Tx, responses.Tx]
 	factory storage.ListenerFactory
 }
 
-func NewManager(factory storage.ListenerFactory) *Manager {
+func NewManager(factory storage.ListenerFactory, blockRepo storage.IBlock, txRepo storage.ITx) *Manager {
 	manager := &Manager{
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
@@ -32,15 +32,17 @@ func NewManager(factory storage.ListenerFactory) *Manager {
 		factory:  factory,
 	}
 
-	manager.head = NewChannel[responses.Block](
+	manager.head = NewChannel[storage.Block, responses.Block](
 		storage.ChannelHead,
 		HeadProcessor,
+		newBlockRepo(blockRepo),
 		HeadFilter{},
 	)
 
-	manager.tx = NewChannel[responses.Tx](
+	manager.tx = NewChannel[storage.Tx, responses.Tx](
 		storage.ChannelTx,
 		TxProcessor,
+		newTxRepo(txRepo),
 		TxFilter{},
 	)
 

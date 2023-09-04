@@ -399,6 +399,30 @@ func (s *StorageTestSuite) TestTxFilterTime() {
 	s.Require().Len(txs, 2)
 }
 
+func (s *StorageTestSuite) TestTxByIdWithRelations() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := s.storage.Tx.ByIdWithRelations(ctx, 2)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(2, tx.Id)
+	s.Require().EqualValues(1, tx.Position)
+	s.Require().EqualValues(1000, tx.Height)
+	s.Require().EqualValues(0, tx.TimeoutHeight)
+	s.Require().EqualValues(80410, tx.GasWanted)
+	s.Require().EqualValues(77483, tx.GasUsed)
+	s.Require().EqualValues(1, tx.EventsCount)
+	s.Require().EqualValues(1, tx.MessagesCount)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
+	s.Require().Equal("memo2", tx.Memo)
+	s.Require().Equal("", tx.Codespace)
+	s.Require().Equal("80410", tx.Fee.String())
+	s.Require().EqualValues(256, tx.MessageTypes.Bits)
+
+	s.Require().Len(tx.Messages, 2)
+}
+
 func (s *StorageTestSuite) TestNotify() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

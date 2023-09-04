@@ -79,6 +79,45 @@ func (c *ITxByHashCall) DoAndReturn(f func(context.Context, []byte) (storage.Tx,
 	return c
 }
 
+// ByIdWithRelations mocks base method.
+func (m *MockITx) ByIdWithRelations(ctx context.Context, id uint64) (storage.Tx, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ByIdWithRelations", ctx, id)
+	ret0, _ := ret[0].(storage.Tx)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ByIdWithRelations indicates an expected call of ByIdWithRelations.
+func (mr *MockITxMockRecorder) ByIdWithRelations(ctx, id any) *ITxByIdWithRelationsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByIdWithRelations", reflect.TypeOf((*MockITx)(nil).ByIdWithRelations), ctx, id)
+	return &ITxByIdWithRelationsCall{Call: call}
+}
+
+// ITxByIdWithRelationsCall wrap *gomock.Call
+type ITxByIdWithRelationsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *ITxByIdWithRelationsCall) Return(arg0 storage.Tx, arg1 error) *ITxByIdWithRelationsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *ITxByIdWithRelationsCall) Do(f func(context.Context, uint64) (storage.Tx, error)) *ITxByIdWithRelationsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *ITxByIdWithRelationsCall) DoAndReturn(f func(context.Context, uint64) (storage.Tx, error)) *ITxByIdWithRelationsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // CursorList mocks base method.
 func (m *MockITx) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Tx, error) {
 	m.ctrl.T.Helper()

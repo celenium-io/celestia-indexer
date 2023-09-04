@@ -9,43 +9,49 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type processor[M any] func(payload string) (M, error)
+type identifiable[M any] interface {
+	GetById(ctx context.Context, id uint64) (M, error)
+}
 
-type Channel[M any] struct {
+type processor[I, M any] func(ctx context.Context, payload string, repo identifiable[I]) (M, error)
+
+type Channel[I, M any] struct {
 	storageChannelName string
 	clients            Map[uint64, *Client]
 	listener           storage.Listener
 	log                zerolog.Logger
-	processor          processor[M]
+	processor          processor[I, M]
 	filters            Filterable[M]
+	repo               identifiable[I]
 
 	wg *sync.WaitGroup
 }
 
-func NewChannel[M any](storageChannelName string, processor processor[M], filters Filterable[M]) *Channel[M] {
-	return &Channel[M]{
+func NewChannel[I, M any](storageChannelName string, processor processor[I, M], repo identifiable[I], filters Filterable[M]) *Channel[I, M] {
+	return &Channel[I, M]{
 		storageChannelName: storageChannelName,
 		clients:            NewMap[uint64, *Client](),
 		processor:          processor,
 		filters:            filters,
+		repo:               repo,
 		log:                log.With().Str("channel", storageChannelName).Logger(),
 		wg:                 new(sync.WaitGroup),
 	}
 }
 
-func (channel *Channel[M]) AddClient(c *Client) {
+func (channel *Channel[I, M]) AddClient(c *Client) {
 	channel.clients.Set(c.id, c)
 }
 
-func (channel *Channel[M]) RemoveClient(id uint64) {
+func (channel *Channel[I, M]) RemoveClient(id uint64) {
 	channel.clients.Delete(id)
 }
 
-func (channel *Channel[M]) String() string {
+func (channel *Channel[I, M]) String() string {
 	return channel.storageChannelName
 }
 
-func (channel *Channel[M]) Start(ctx context.Context, factory storage.ListenerFactory) {
+func (channel *Channel[I, M]) Start(ctx context.Context, factory storage.ListenerFactory) {
 	if channel.processor == nil {
 		channel.log.Panic().Msg("nil processor in channel")
 		return
@@ -69,7 +75,7 @@ func (channel *Channel[M]) Start(ctx context.Context, factory storage.ListenerFa
 	go channel.waitMessage(ctx)
 }
 
-func (channel *Channel[M]) waitMessage(ctx context.Context) {
+func (channel *Channel[I, M]) waitMessage(ctx context.Context) {
 	defer channel.wg.Done()
 
 	for {
@@ -89,7 +95,7 @@ func (channel *Channel[M]) waitMessage(ctx context.Context) {
 
 			log.Debug().Str("channel", channel.storageChannelName).Msg("message received")
 
-			notification, err := channel.processor(msg.Extra)
+			notification, err := channel.processor(ctx, msg.Extra, channel.repo)
 			if err != nil {
 				channel.log.Err(err).Msg("processing channel message")
 				continue
@@ -107,7 +113,7 @@ func (channel *Channel[M]) waitMessage(ctx context.Context) {
 	}
 }
 
-func (channel *Channel[M]) Close() error {
+func (channel *Channel[I, M]) Close() error {
 	channel.wg.Wait()
 
 	if channel.listener != nil {

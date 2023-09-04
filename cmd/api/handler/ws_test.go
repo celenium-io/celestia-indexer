@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -45,6 +46,20 @@ func TestWebsocket(t *testing.T) {
 	headListener.EXPECT().Close().Return(nil).MaxTimes(1)
 	txListener.EXPECT().Close().Return(nil).MaxTimes(1)
 
+	blockMock := mock.NewMockIBlock(ctrl)
+	for i := 0; i < 10; i++ {
+		hash := make([]byte, 32)
+		_, err := rand.Read(hash)
+		require.NoError(t, err)
+
+		blockMock.EXPECT().GetByID(ctx, uint64(i)).Return(&storage.Block{
+			Id:     uint64(i),
+			Height: storage.Level(i),
+			Time:   time.Now(),
+			Hash:   hash,
+		}, nil).MaxTimes(1)
+	}
+
 	go func() {
 		ticker := time.NewTicker(time.Second)
 		defer ticker.Stop()
@@ -58,26 +73,14 @@ func TestWebsocket(t *testing.T) {
 			case <-ticker.C:
 				id++
 
-				hash := make([]byte, 32)
-				_, err := rand.Read(hash)
-				require.NoError(t, err)
-
-				payload, err := json.Marshal(storage.Block{
-					Id:     id,
-					Height: storage.Level(id),
-					Time:   time.Now(),
-					Hash:   hash,
-				})
-				require.NoError(t, err)
-
 				headChannel <- &pq.Notification{
 					Channel: storage.ChannelHead,
-					Extra:   string(payload),
+					Extra:   strconv.FormatUint(id, 10),
 				}
 			}
 		}
 	}()
-	manager := ws.NewManager(listenerFactory)
+	manager := ws.NewManager(listenerFactory, blockMock, nil)
 	manager.Start(ctx)
 
 	server := httptest.NewServer(http.HandlerFunc(

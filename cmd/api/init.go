@@ -248,7 +248,7 @@ var (
 )
 
 func initWebsocket(ctx context.Context, db postgres.Storage, group *echo.Group) {
-	wsManager = websocket.NewManager(db)
+	wsManager = websocket.NewManager(db, db.Blocks, db.Tx)
 	wsManager.Start(ctx)
 	group.GET("/ws", wsManager.Handle)
 }

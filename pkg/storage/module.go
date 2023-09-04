@@ -2,6 +2,8 @@ package storage
 
 import (
 	"context"
+	"strconv"
+	"time"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
@@ -72,7 +74,7 @@ func (module *Module) initState(ctx context.Context) error {
 
 	case module.storage.State.IsNoRows(err):
 		module.log.Info().Msg("state is not found. creating empty state...")
-		return module.storage.State.Update(ctx, module.state)
+		return module.storage.State.Save(ctx, module.state)
 
 	default:
 		return errors.Wrap(err, "state loading")
@@ -112,9 +114,9 @@ func (module *Module) listen(ctx context.Context) {
 				continue
 			}
 
-			// if err := module.notify(ctx, block); err != nil {
-			//	module.log.Err(err).Msg("block notification error")
-			//}
+			if err := module.notify(ctx, block); err != nil {
+				module.log.Err(err).Msg("block notification error")
+			}
 		}
 	}
 }
@@ -166,6 +168,7 @@ func (module *Module) updateState(block storage.Block) {
 }
 
 func (module *Module) saveBlock(ctx context.Context, block storage.Block) error {
+	start := time.Now()
 	module.log.Info().Uint64("height", uint64(block.Height)).Msg("saving block...")
 	tx, err := postgres.BeginTransaction(ctx, module.storage.Transactable)
 	if err != nil {
@@ -273,28 +276,22 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 		Uint64("height", block.Id).
 		Uint64("block_ns_size", block.BlobsSize).
 		Str("block_fee", block.Fee.String()).
+		Int64("ms", time.Since(start).Milliseconds()).
 		Msg("block saved")
 	return nil
 }
 
-// notify -
-// func (module *Module) notify(ctx context.Context, block storage.Block) error {
-//	data, err := json.MarshalContext(ctx, block, json.UnorderedMap())
-//	if err != nil {
-//		return err
-//	}
-//	if err := module.storage.Notificator.Notify(ctx, storage.ChannelHead, string(data)); err != nil {
-//		return err
-//	}
-//
-//	for i := range block.Txs {
-//		data, err := json.MarshalContext(ctx, block.Txs[i], json.UnorderedMap())
-//		if err != nil {
-//			return err
-//		}
-//		if err := module.storage.Notificator.Notify(ctx, storage.ChannelTx, string(data)); err != nil {
-//			return err
-//		}
-//	}
-//	return nil
-//}
+func (module *Module) notify(ctx context.Context, block storage.Block) error {
+	blockId := strconv.FormatUint(block.Id, 10)
+	if err := module.storage.Notificator.Notify(ctx, storage.ChannelHead, blockId); err != nil {
+		return err
+	}
+
+	for i := range block.Txs {
+		txId := strconv.FormatUint(block.Txs[i].Id, 10)
+		if err := module.storage.Notificator.Notify(ctx, storage.ChannelTx, txId); err != nil {
+			return err
+		}
+	}
+	return nil
+}

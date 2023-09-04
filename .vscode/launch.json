@@ -15,6 +15,17 @@
                 "../../build/dipdup.yml",
             ],
             "envFile": "${workspaceFolder}/.env"
+        }, {
+            "name": "Launch Indexer",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/cmd/indexer",
+            "args": [
+                "-c",
+                "../../build/dipdup.yml",
+            ],
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
