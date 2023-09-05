@@ -2,7 +2,8 @@ Endpoint finds entity by hash (block, address, namespace and tx)
 
 ### Block
 
-Block will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`. Hash should be hexademical and has length 64.
+Block will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`.
+Hash should be hexadecimal and has a length of 64.
 
 #### Example response 
 
@@ -19,7 +20,8 @@ Block will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1
 
 ### Tx
 
-Tx will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`. Tx should be hexademical and has length 64.
+Tx will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`.
+Tx should be hexadecimal and has a length of 64.
 
 #### Example response 
 
@@ -36,7 +38,10 @@ Tx will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CAB
 
 ### Address
 
-Address will be found by its hash. Hash example: `celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60`. Address has prefix `celestia` and has length 47. Also it should be decoded by `bech32`.
+The Address will be found by its hash.
+Hash example: `celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60`.
+Address has prefix `celestia` and has length 47.
+Also, it should be decoded by `bech32`.
 
 #### Example response 
 

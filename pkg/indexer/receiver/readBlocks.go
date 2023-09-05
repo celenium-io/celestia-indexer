@@ -12,7 +12,7 @@ func (r *Receiver) readBlocks(ctx context.Context) error {
 		return err
 	}
 
-	startLevel := storage.Level(1) // TODO read from current state
+	startLevel := storage.Level(r.cfg.Indexer.StartLevel) // TODO read from current state
 	headLevel := storage.Level(head.Block.Height)
 
 	for level := startLevel; level <= headLevel; level++ {

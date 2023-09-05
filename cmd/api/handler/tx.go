@@ -70,7 +70,7 @@ func (handler *TxHandler) Get(c echo.Context) error {
 //	@Param			offset		query	integer	false	"Offset"								mininum(1)
 //	@Param			sort		query	string	false	"Sort order"							Enums(asc, desc)
 //	@Param			status		query	string	false	"Comma-separated status list"			Enums(success, failed)
-//	@Param			msg_type	query	string	false	"Comma-separated message types list"	Enums(WithdrawValidatorCommission,WithdrawDelegatorReward,EditValidator,BeginRedelegate,CreateValidator,Delegate,Undelegate,Unjail,Send,CreateVestingAccount,CreatePeriodicVestingAccount,PayForBlobs)
+//	@Param			msg_type	query	string	false	"Comma-separated message types list"	Enums(MsgWithdrawValidatorCommission,MsgWithdrawDelegatorReward,MsgEditValidator,MsgBeginRedelegate,MsgCreateValidator,MsgDelegate,MsgUndelegate,MsgUnjail,MsgSend,MsgCreateVestingAccount,MsgCreatePeriodicVestingAccount,MsgPayForBlobs,MsgGrantAllowance)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"			mininum(1)
 //	@Param			to			query	integer	false	"Time to in unix timestamp"				mininum(1)
 //	@Param			height		query	integer	false	"Block number"							mininum(1)

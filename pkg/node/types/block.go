@@ -37,7 +37,7 @@ type Header struct {
 	Time    time.Time `json:"time"`
 
 	// prev block info
-	LastBlockID types.BlockID `json:"last_block_id"`
+	LastBlockID types.BlockID `json:"last_block_id"` // TODO check if hash unmarshales correctly with HexBytes type
 
 	// hashes of block data
 	LastCommitHash []byte `json:"last_commit_hash"` // commit from validators from the last block

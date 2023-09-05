@@ -275,7 +275,7 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 				MsgId:       msg.Id,
 				NamespaceId: ns.Id,
 				Time:        msg.Time,
-				Height:      storage.Level(msg.Height),
+				Height:      msg.Height,
 				TxId:        msg.TxId,
 			})
 		}

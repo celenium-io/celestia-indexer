@@ -131,7 +131,7 @@ func (s *TxTestSuite) TestList() {
 	q.Set("offset", "0")
 	q.Set("sort", "desc")
 	q.Set("status", "success")
-	q.Set("msg_type", "Unjail,Send")
+	q.Set("msg_type", "MsgUnjail,MsgSend")
 
 	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
@@ -175,7 +175,7 @@ func (s *TxTestSuite) TestListValidationStatusError() {
 	q.Set("offset", "0")
 	q.Set("sort", "desc")
 	q.Set("status", "invalid")
-	q.Set("msg_type", "Unjail,Send")
+	q.Set("msg_type", "MsgUnjail,MsgSend")
 
 	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
@@ -197,7 +197,7 @@ func (s *TxTestSuite) TestListValidationMsgTypeError() {
 	q.Set("offset", "0")
 	q.Set("sort", "desc")
 	q.Set("status", "success")
-	q.Set("msg_type", "invalid,Send")
+	q.Set("msg_type", "invalid,MsgSend")
 
 	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
@@ -219,7 +219,7 @@ func (s *TxTestSuite) TestListTime() {
 	q.Set("offset", "0")
 	q.Set("sort", "desc")
 	q.Set("status", "success")
-	q.Set("msg_type", "Send")
+	q.Set("msg_type", "MsgSend")
 	q.Set("from", "1692880000")
 	q.Set("to", "1692890000")
 
@@ -265,7 +265,7 @@ func (s *TxTestSuite) TestListHeight() {
 	q.Set("offset", "0")
 	q.Set("sort", "desc")
 	q.Set("status", "success")
-	q.Set("msg_type", "Send")
+	q.Set("msg_type", "MsgSend")
 	q.Set("height", "1000")
 
 	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)

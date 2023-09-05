@@ -17,7 +17,7 @@ const (
 	EventTypeLiveness           EventType = "liveness"
 	EventTypeAttestationRequest EventType = "AttestationRequest"
 	EventTypeTransfer           EventType = "transfer"
-	EventTypePayForBlobs        EventType = "pay_for_blobs"
+	EventTypePayForBlobs        EventType = "celestia.blob.v1.EventPayForBlobs"
 	EventTypeRedelegate         EventType = "redelegate"
 	EventTypeWithdrawRewards    EventType = "withdraw_rewards"
 	EventTypeWaithdrawComission EventType = "withdraw_commission"
@@ -26,4 +26,8 @@ const (
 	EventTypeEditValidator      EventType = "edit_validator"
 	EventTypeUnbond             EventType = "unbond"
 	EventTypeTx                 EventType = "tx"
+	EventTypeUseFeegrant        EventType = "use_feegrant"
+	EventTypeRevokeFeegrant     EventType = "revoke_feegrant"
+	EventTypeSetFeegrant        EventType = "set_feegrant"
+	EventTypeUpdateFeegrant     EventType = "update_feegrant"
 )

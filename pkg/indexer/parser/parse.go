@@ -5,11 +5,17 @@ import (
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
 
 func (p *Parser) parse(ctx context.Context, b types.BlockData) error {
 	p.log.Info().Int64("height", b.Block.Height).Msg("parsing block...")
+
+	txs, err := parseTxs(b)
+	if err != nil {
+		return errors.Wrapf(err, "while parsing block on level=%d", b.Height)
+	}
 
 	block := storage.Block{
 		Height:       b.Height,
@@ -19,10 +25,10 @@ func (p *Parser) parse(ctx context.Context, b types.BlockData) error {
 
 		TxCount:      uint64(len(b.Block.Data.Txs)),
 		EventsCount:  uint64(len(b.BeginBlockEvents) + len(b.EndBlockEvents)),
-		MessageTypes: storageTypes.MsgTypeBits{}, // TODO init
+		MessageTypes: storageTypes.NewMsgTypeBitMask(),
 		BlobsSize:    0,
 
-		Hash:               []byte(b.BlockID.Hash), // TODO create a Hex type for common usage through indexer app
+		Hash:               []byte(b.BlockID.Hash),
 		ParentHash:         []byte(b.Block.LastBlockID.Hash),
 		LastCommitHash:     b.Block.LastCommitHash,
 		DataHash:           b.Block.DataHash,
@@ -34,11 +40,17 @@ func (p *Parser) parse(ctx context.Context, b types.BlockData) error {
 		EvidenceHash:       b.Block.EvidenceHash,
 		ProposerAddress:    b.Block.ProposerAddress,
 
-		Fee:     decimal.Zero, // TODO sum of auth_info.fee // RESEARCH: done
+		Fee:     decimal.Zero,
 		ChainId: b.Block.ChainID,
 
-		Txs:    parseTxs(b),
+		Txs:    txs,
 		Events: nil,
+	}
+
+	for _, tx := range txs {
+		block.Fee = block.Fee.Add(tx.Fee)
+		block.MessageTypes.Set(tx.MessageTypes.Bits)
+		block.BlobsSize += tx.BlobsSize
 	}
 
 	block.Events = parseEvents(b, b.ResultBlockResults.BeginBlockEvents)

@@ -747,7 +747,7 @@ const docTemplate = `{
         },
         "/v1/search": {
             "get": {
-                "description": "Endpoint finds entity by hash (block, address, namespace and tx)\n\n### Block\n\nBlock will be found by its hash. Hash example: ` + "`" + `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF` + "`" + `. Hash should be hexademical and has length 64.\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"block\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Block type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Tx\n\nTx will be found by its hash. Hash example: ` + "`" + `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF` + "`" + `. Tx should be hexademical and has length 64.\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"tx\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Tx type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Address\n\nAddress will be found by its hash. Hash example: ` + "`" + `celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60` + "`" + `. Address has prefix ` + "`" + `celestia` + "`" + ` and has length 47. Also it should be decoded by ` + "`" + `bech32` + "`" + `.\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"address\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\",\n        \"height\": 100,\n        \"balance\": \"6525472354\"\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Namespace\n\nNamespace can be found by base64 hash and identity pair version + namespace id. \nHash example: ` + "`" + `U3dhZ2dlciByb2Nrcw==` + "`" + `. \nIdentity pair example: ` + "`" + `014723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02` + "`" + `\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"namespace\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"U3dhZ2dlciByb2Nrcw==\",\n        \"version\": 1,\n        \"namespace_id\": \"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02\"\n        // ... rest fields from response.Namespace type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
+                "description": "Endpoint finds entity by hash (block, address, namespace and tx)\n\n### Block\n\nBlock will be found by its hash. Hash example: ` + "`" + `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF` + "`" + `.\nHash should be hexadecimal and has a length of 64.\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"block\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Block type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Tx\n\nTx will be found by its hash. Hash example: ` + "`" + `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF` + "`" + `.\nTx should be hexadecimal and has a length of 64.\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"tx\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Tx type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Address\n\nThe Address will be found by its hash.\nHash example: ` + "`" + `celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60` + "`" + `.\nAddress has prefix ` + "`" + `celestia` + "`" + ` and has length 47.\nAlso, it should be decoded by ` + "`" + `bech32` + "`" + `.\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"address\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\",\n        \"height\": 100,\n        \"balance\": \"6525472354\"\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Namespace\n\nNamespace can be found by base64 hash and identity pair version + namespace id. \nHash example: ` + "`" + `U3dhZ2dlciByb2Nrcw==` + "`" + `. \nIdentity pair example: ` + "`" + `014723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02` + "`" + `\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"namespace\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"U3dhZ2dlciByb2Nrcw==\",\n        \"version\": 1,\n        \"namespace_id\": \"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02\"\n        // ... rest fields from response.Namespace type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
                 "produces": [
                     "application/json"
                 ],
@@ -1014,18 +1014,19 @@ const docTemplate = `{
                     },
                     {
                         "enum": [
-                            "WithdrawValidatorCommission",
-                            "WithdrawDelegatorReward",
-                            "EditValidator",
-                            "BeginRedelegate",
-                            "CreateValidator",
-                            "Delegate",
-                            "Undelegate",
-                            "Unjail",
-                            "Send",
-                            "CreateVestingAccount",
-                            "CreatePeriodicVestingAccount",
-                            "PayForBlobs"
+                            "MsgWithdrawValidatorCommission",
+                            "MsgWithdrawDelegatorReward",
+                            "MsgEditValidator",
+                            "MsgBeginRedelegate",
+                            "MsgCreateValidator",
+                            "MsgDelegate",
+                            "MsgUndelegate",
+                            "MsgUnjail",
+                            "MsgSend",
+                            "MsgCreateVestingAccount",
+                            "MsgCreatePeriodicVestingAccount",
+                            "MsgPayForBlobs",
+                            "MsgGrantAllowance"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1219,7 +1220,7 @@ const docTemplate = `{
         },
         "/v1/ws": {
             "get": {
-                "description": "## Documentation for websocket API\n\n### Subscribe\n\nTo receive updates from websocket API send ` + "`" + `subscribe` + "`" + ` request to server.\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n        \"filters\": {\n            // pass channel filters\n        }\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nNow 2 channels are supported:\n\n* ` + "`" + `head` + "`" + ` - receive information about new block. Channel does not have any filters. Subscribe message should looks like:\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"head\"\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nIn that channel messages of ` + "`" + `responses.Block` + "`" + ` type will be sent.\n\n* ` + "`" + `tx` + "`" + ` - receive information about new transactions. The channel has filters for target receiving information. Now 2 filters are supported:\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"tx\",\n        \"filters\": {\n            \"status\": [  // array of transaction status. Can be emtpy.\n                \"success\", \n                \"failed\"\n            ],\n            \"msg_type\": [  // array of containing message types status. Can be emtpy.\n                \"WithdrawValidatorCommission\",\n                \"WithdrawDelegatorReward\",\n                \"EditValidator\",\n                \"BeginRedelegate\",\n                \"CreateValidator\",\n                \"Delegate\",\n                \"Undelegate\",\n                \"Unjail\",\n                \"Send\",\n                \"CreateVestingAccount\",\n                \"CreatePeriodicVestingAccount\",\n                \"PayForBlobs\"\n            ]\n        }\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nIf all filers are empty subscription to all transaction will be created.\n\nIn that channel messages of ` + "`" + `responses.Tx` + "`" + ` type will be sent.\n\n\n### Unsubscribe\n\nTo unsubscribe send ` + "`" + `unsubscribe` + "`" + ` message containing one of channel name describing above.\n\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"unsubscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
+                "description": "## Documentation for websocket API\n\n### Subscribe\n\nTo receive updates from websocket API send ` + "`" + `subscribe` + "`" + ` request to server.\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n        \"filters\": {\n            // pass channel filters\n        }\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nNow 2 channels are supported:\n\n* ` + "`" + `head` + "`" + ` - receive information about new block. Channel does not have any filters. Subscribe message should looks like:\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"head\"\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nIn that channel messages of ` + "`" + `responses.Block` + "`" + ` type will be sent.\n\n* ` + "`" + `tx` + "`" + ` - receive information about new transactions. The channel has filters for target receiving information. Now 2 filters are supported:\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"tx\",\n        \"filters\": {\n            \"status\": [  // array of transaction status. Can be emtpy.\n                \"success\", \n                \"failed\"\n            ],\n            \"msg_type\": [  // array of containing message types status. Can be emtpy.\n                \"MsgWithdrawValidatorCommission\",\n                \"MsgWithdrawDelegatorReward\",\n                \"MsgEditValidator\",\n                \"MsgBeginRedelegate\",\n                \"MsgCreateValidator\",\n                \"MsgDelegate\",\n                \"MsgUndelegate\",\n                \"MsgUnjail\",\n                \"MsgSend\",\n                \"MsgCreateVestingAccount\",\n                \"MsgCreatePeriodicVestingAccount\",\n                \"MsgPayForBlobs\",\n                \"MsgGrantAllowance\"\n            ]\n        }\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nIf all filers are empty subscription to all transaction will be created.\n\nIn that channel messages of ` + "`" + `responses.Tx` + "`" + ` type will be sent.\n\n\n### Unsubscribe\n\nTo unsubscribe send ` + "`" + `unsubscribe` + "`" + ` message containing one of channel name describing above.\n\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"unsubscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
                 "produces": [
                     "application/json"
                 ],
@@ -1444,7 +1445,7 @@ const docTemplate = `{
                         "liveness",
                         "attestation_request",
                         "transfer",
-                        "pay_for_blobs",
+                        "celestia.blob.v1.EventPayForBlobs",
                         "redelegate",
                         "withdraw_rewards",
                         "withdraw_commission",
@@ -1453,6 +1454,10 @@ const docTemplate = `{
                         "edit_validator",
                         "unbond",
                         "tx",
+                        "use_feegrant",
+                        "revoke_feegrant",
+                        "set_feegrant",
+                        "update_feegrant",
                         "unknown"
                     ],
                     "example": "commission"
@@ -1510,20 +1515,21 @@ const docTemplate = `{
                     "type": "string",
                     "format": "string",
                     "enum": [
-                        "WithdrawValidatorCommission",
-                        "WithdrawDelegatorReward",
-                        "EditValidator",
-                        "BeginRedelegate",
-                        "CreateValidator",
-                        "Delegate",
-                        "Undelegate",
-                        "Unjail",
-                        "Send",
-                        "CreateVestingAccount",
-                        "CreatePeriodicVestingAccount",
-                        "PayForBlobs"
+                        "MsgWithdrawValidatorCommission",
+                        "MsgWithdrawDelegatorReward",
+                        "MsgEditValidator",
+                        "MsgBeginRedelegate",
+                        "MsgCreateValidator",
+                        "MsgDelegate",
+                        "MsgUndelegate",
+                        "MsgUnjail",
+                        "MsgSend",
+                        "MsgCreateVestingAccount",
+                        "MsgCreatePeriodicVestingAccount",
+                        "MsgPayForBlobs",
+                        "MsgGrantAllowance"
                     ],
-                    "example": "CreatePeriodicVestingAccount"
+                    "example": "MsgCreatePeriodicVestingAccount"
                 }
             }
         },
@@ -1594,20 +1600,21 @@ const docTemplate = `{
                     "type": "string",
                     "format": "string",
                     "enum": [
-                        "WithdrawValidatorCommission",
-                        "WithdrawDelegatorReward",
-                        "EditValidator",
-                        "BeginRedelegate",
-                        "CreateValidator",
-                        "Delegate",
-                        "Undelegate",
-                        "Unjail",
-                        "Send",
-                        "CreateVestingAccount",
-                        "CreatePeriodicVestingAccount",
-                        "PayForBlobs"
+                        "MsgWithdrawValidatorCommission",
+                        "MsgWithdrawDelegatorReward",
+                        "MsgEditValidator",
+                        "MsgBeginRedelegate",
+                        "MsgCreateValidator",
+                        "MsgDelegate",
+                        "MsgUndelegate",
+                        "MsgUnjail",
+                        "MsgSend",
+                        "MsgCreateVestingAccount",
+                        "MsgCreatePeriodicVestingAccount",
+                        "MsgPayForBlobs",
+                        "MsgGrantAllowance"
                     ],
-                    "example": "CreatePeriodicVestingAccount"
+                    "example": "MsgCreatePeriodicVestingAccount"
                 }
             }
         },

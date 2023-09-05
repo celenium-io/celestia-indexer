@@ -160,7 +160,7 @@ definitions:
         - liveness
         - attestation_request
         - transfer
-        - pay_for_blobs
+        - celestia.blob.v1.EventPayForBlobs
         - redelegate
         - withdraw_rewards
         - withdraw_commission
@@ -169,6 +169,10 @@ definitions:
         - edit_validator
         - unbond
         - tx
+        - use_feegrant
+        - revoke_feegrant
+        - set_feegrant
+        - update_feegrant
         - unknown
         example: commission
         format: string
@@ -212,19 +216,20 @@ definitions:
         type: integer
       type:
         enum:
-        - WithdrawValidatorCommission
-        - WithdrawDelegatorReward
-        - EditValidator
-        - BeginRedelegate
-        - CreateValidator
-        - Delegate
-        - Undelegate
-        - Unjail
-        - Send
-        - CreateVestingAccount
-        - CreatePeriodicVestingAccount
-        - PayForBlobs
-        example: CreatePeriodicVestingAccount
+        - MsgWithdrawValidatorCommission
+        - MsgWithdrawDelegatorReward
+        - MsgEditValidator
+        - MsgBeginRedelegate
+        - MsgCreateValidator
+        - MsgDelegate
+        - MsgUndelegate
+        - MsgUnjail
+        - MsgSend
+        - MsgCreateVestingAccount
+        - MsgCreatePeriodicVestingAccount
+        - MsgPayForBlobs
+        - MsgGrantAllowance
+        example: MsgCreatePeriodicVestingAccount
         format: string
         type: string
     type: object
@@ -278,19 +283,20 @@ definitions:
         $ref: '#/definitions/responses.Tx'
       type:
         enum:
-        - WithdrawValidatorCommission
-        - WithdrawDelegatorReward
-        - EditValidator
-        - BeginRedelegate
-        - CreateValidator
-        - Delegate
-        - Undelegate
-        - Unjail
-        - Send
-        - CreateVestingAccount
-        - CreatePeriodicVestingAccount
-        - PayForBlobs
-        example: CreatePeriodicVestingAccount
+        - MsgWithdrawValidatorCommission
+        - MsgWithdrawDelegatorReward
+        - MsgEditValidator
+        - MsgBeginRedelegate
+        - MsgCreateValidator
+        - MsgDelegate
+        - MsgUndelegate
+        - MsgUnjail
+        - MsgSend
+        - MsgCreateVestingAccount
+        - MsgCreatePeriodicVestingAccount
+        - MsgPayForBlobs
+        - MsgGrantAllowance
+        example: MsgCreatePeriodicVestingAccount
         format: string
         type: string
     type: object
@@ -909,20 +915,20 @@ paths:
   /v1/search:
     get:
       description: "Endpoint finds entity by hash (block, address, namespace and tx)\n\n###
-        Block\n\nBlock will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`.
-        Hash should be hexademical and has length 64.\n\n#### Example response \n\n```json\n{\n
+        Block\n\nBlock will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`.\nHash
+        should be hexadecimal and has a length of 64.\n\n#### Example response \n\n```json\n{\n
         \   \"type\": \"block\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\":
         \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        //
         ... rest fields from response.Block type\n    }\n}\n```\n\n### Tx\n\nTx will
-        be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`.
-        Tx should be hexademical and has length 64.\n\n#### Example response \n\n```json\n{\n
+        be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`.\nTx
+        should be hexadecimal and has a length of 64.\n\n#### Example response \n\n```json\n{\n
         \   \"type\": \"tx\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\":
         \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        //
-        ... rest fields from response.Tx type\n    }\n}\n```\n\n### Address\n\nAddress
-        will be found by its hash. Hash example: `celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60`.
-        Address has prefix `celestia` and has length 47. Also it should be decoded
-        by `bech32`.\n\n#### Example response \n\n```json\n{\n    \"type\": \"address\",\n
-        \   \"result\": {\n        \"id\": 1,\n        \"hash\": \"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\",\n
+        ... rest fields from response.Tx type\n    }\n}\n```\n\n### Address\n\nThe
+        Address will be found by its hash.\nHash example: `celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60`.\nAddress
+        has prefix `celestia` and has length 47.\nAlso, it should be decoded by `bech32`.\n\n####
+        Example response \n\n```json\n{\n    \"type\": \"address\",\n    \"result\":
+        {\n        \"id\": 1,\n        \"hash\": \"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\",\n
         \       \"height\": 100,\n        \"balance\": \"6525472354\"\n    }\n}\n```\n\n###
         Namespace\n\nNamespace can be found by base64 hash and identity pair version
         + namespace id. \nHash example: `U3dhZ2dlciByb2Nrcw==`. \nIdentity pair example:
@@ -1176,18 +1182,19 @@ paths:
         type: string
       - description: Comma-separated message types list
         enum:
-        - WithdrawValidatorCommission
-        - WithdrawDelegatorReward
-        - EditValidator
-        - BeginRedelegate
-        - CreateValidator
-        - Delegate
-        - Undelegate
-        - Unjail
-        - Send
-        - CreateVestingAccount
-        - CreatePeriodicVestingAccount
-        - PayForBlobs
+        - MsgWithdrawValidatorCommission
+        - MsgWithdrawDelegatorReward
+        - MsgEditValidator
+        - MsgBeginRedelegate
+        - MsgCreateValidator
+        - MsgDelegate
+        - MsgUndelegate
+        - MsgUnjail
+        - MsgSend
+        - MsgCreateVestingAccount
+        - MsgCreatePeriodicVestingAccount
+        - MsgPayForBlobs
+        - MsgGrantAllowance
         in: query
         name: msg_type
         type: string
@@ -1335,12 +1342,13 @@ paths:
         \       \"filters\": {\n            \"status\": [  // array of transaction
         status. Can be emtpy.\n                \"success\", \n                \"failed\"\n
         \           ],\n            \"msg_type\": [  // array of containing message
-        types status. Can be emtpy.\n                \"WithdrawValidatorCommission\",\n
-        \               \"WithdrawDelegatorReward\",\n                \"EditValidator\",\n
-        \               \"BeginRedelegate\",\n                \"CreateValidator\",\n
-        \               \"Delegate\",\n                \"Undelegate\",\n                \"Unjail\",\n
-        \               \"Send\",\n                \"CreateVestingAccount\",\n                \"CreatePeriodicVestingAccount\",\n
-        \               \"PayForBlobs\"\n            ]\n        }\n    }\n}\n```\n\nIf
+        types status. Can be emtpy.\n                \"MsgWithdrawValidatorCommission\",\n
+        \               \"MsgWithdrawDelegatorReward\",\n                \"MsgEditValidator\",\n
+        \               \"MsgBeginRedelegate\",\n                \"MsgCreateValidator\",\n
+        \               \"MsgDelegate\",\n                \"MsgUndelegate\",\n                \"MsgUnjail\",\n
+        \               \"MsgSend\",\n                \"MsgCreateVestingAccount\",\n
+        \               \"MsgCreatePeriodicVestingAccount\",\n                \"MsgPayForBlobs\",\n
+        \               \"MsgGrantAllowance\"\n            ]\n        }\n    }\n}\n```\n\nIf
         all filers are empty subscription to all transaction will be created.\n\nIn
         that channel messages of `responses.Tx` type will be sent.\n\n\n### Unsubscribe\n\nTo
         unsubscribe send `unsubscribe` message containing one of channel name describing

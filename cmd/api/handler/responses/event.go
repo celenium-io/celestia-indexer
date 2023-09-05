@@ -13,7 +13,7 @@ type Event struct {
 	Position uint64    `example:"1"                         format:"int64"     json:"position"        swaggertype:"integer"`
 	TxId     uint64    `example:"11"                        format:"int64"     json:"tx_id,omitempty" swaggertype:"integer"`
 
-	Type string `enums:"coin_received,coinbase,coin_spent,burn,mint,message,proposer_reward,rewards,commission,liveness,attestation_request,transfer,pay_for_blobs,redelegate,withdraw_rewards,withdraw_commission,create_validator,delegate,edit_validator,unbond,tx,unknown" example:"commission" format:"string" json:"type" swaggertype:"string"`
+	Type string `enums:"coin_received,coinbase,coin_spent,burn,mint,message,proposer_reward,rewards,commission,liveness,attestation_request,transfer,celestia.blob.v1.EventPayForBlobs,redelegate,withdraw_rewards,withdraw_commission,create_validator,delegate,edit_validator,unbond,tx,use_feegrant,revoke_feegrant,set_feegrant,update_feegrant,unknown" example:"commission" format:"string" json:"type" swaggertype:"string"`
 
 	Data map[string]any `json:"data"`
 }

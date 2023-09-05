@@ -5,47 +5,68 @@ import (
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/node/types"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
-	"github.com/shopspring/decimal"
+	"github.com/pkg/errors"
 )
 
-func parseTxs(b types.BlockData) []storage.Tx {
+func parseTxs(b types.BlockData) ([]storage.Tx, error) {
 	txs := make([]storage.Tx, len(b.TxsResults))
 
 	for i, txRes := range b.TxsResults {
-		tx := parseTx(b, i, txRes)
-		txs[i] = tx
+		t, err := parseTx(b, i, txRes)
+		if err != nil {
+			return nil, err
+		}
+
+		txs[i] = t
 	}
 
-	return txs
+	return txs, nil
 }
 
-func parseTx(b types.BlockData, index int, txRes *nodeTypes.ResponseDeliverTx) storage.Tx {
-	tx := storage.Tx{
+func parseTx(b types.BlockData, index int, txRes *nodeTypes.ResponseDeliverTx) (storage.Tx, error) {
+	d, err := decodeTx(b, index)
+	if err != nil {
+		return storage.Tx{}, errors.Wrapf(err, "while parsing Tx on index %d", index)
+	}
+
+	t := storage.Tx{
 		Height:        b.Height,
 		Time:          b.Block.Time,
 		Position:      uint64(index),
 		GasWanted:     uint64(txRes.GasWanted),
 		GasUsed:       uint64(txRes.GasUsed),
-		TimeoutHeight: 0, // TODO like nodes.guru
+		TimeoutHeight: d.timeoutHeight,
 		EventsCount:   uint64(len(txRes.Events)),
-		MessagesCount: 0,            // TODO
-		Fee:           decimal.Zero, // TODO like nodes.guru
+		MessagesCount: uint64(len(d.messages)),
+		Fee:           d.fee,
 		Status:        storageTypes.StatusSuccess,
 		Codespace:     txRes.Codespace,
-		Hash:          make([]byte, 0),            // TODO like nodes.guru
-		Memo:          "",                         // TODO like nodes.guru
-		MessageTypes:  storageTypes.MsgTypeBits{}, // TODO
+		Hash:          b.Block.Txs[index].Hash(),
+		Memo:          d.memo,
+		MessageTypes:  storageTypes.NewMsgTypeBitMask(),
 
-		Messages: nil, // make([]storage.Message, 0), // TODO
-		Events:   nil,
+		Messages:  make([]storage.Message, len(d.messages)),
+		Events:    nil,
+		BlobsSize: 0,
 	}
 
 	if txRes.Code != 0 {
-		tx.Status = storageTypes.StatusFailed
-		tx.Error = txRes.Log
+		t.Status = storageTypes.StatusFailed
+		t.Error = txRes.Log
 	}
 
-	tx.Events = parseEvents(b, txRes.Events)
+	t.Events = parseEvents(b, txRes.Events)
 
-	return tx
+	for position, sdkMsg := range d.messages {
+		msg, blobsSize, err := decodeMsg(b, sdkMsg, position)
+		if err != nil {
+			return storage.Tx{}, errors.Wrapf(err, "while parsing tx=%v on index=%d", t.Hash, t.Position)
+		}
+
+		t.Messages[position] = msg
+		t.MessageTypes.SetBit(msg.Type)
+		t.BlobsSize += blobsSize
+	}
+
+	return t, nil
 }

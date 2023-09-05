@@ -158,7 +158,7 @@ func (s *AddressTestSuite) TestListHeight() {
 	q.Set("offset", "0")
 	q.Set("sort", "desc")
 	q.Set("status", "success")
-	q.Set("msg_type", "Send")
+	q.Set("msg_type", "MsgSend")
 	q.Set("height", "1000")
 
 	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)

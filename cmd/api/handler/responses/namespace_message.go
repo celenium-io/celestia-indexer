@@ -13,7 +13,7 @@ type NamespaceMessage struct {
 	Time     time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"     swaggertype:"string"`
 	Position uint64    `example:"2"                         format:"int64"     json:"position" swaggertype:"integer"`
 
-	Type string `enums:"WithdrawValidatorCommission,WithdrawDelegatorReward,EditValidator,BeginRedelegate,CreateValidator,Delegate,Undelegate,Unjail,Send,CreateVestingAccount,CreatePeriodicVestingAccount,PayForBlobs" example:"CreatePeriodicVestingAccount" format:"string" json:"type" swaggertype:"string"`
+	Type string `enums:"MsgWithdrawValidatorCommission,MsgWithdrawDelegatorReward,MsgEditValidator,MsgBeginRedelegate,MsgCreateValidator,MsgDelegate,MsgUndelegate,MsgUnjail,MsgSend,MsgCreateVestingAccount,MsgCreatePeriodicVestingAccount,MsgPayForBlobs,MsgGrantAllowance" example:"MsgCreatePeriodicVestingAccount" format:"string" json:"type" swaggertype:"string"`
 
 	Data map[string]any `json:"data"`
 	Tx   Tx             `json:"tx"`
@@ -29,7 +29,7 @@ func NewNamespaceMessage(msg storage.NamespaceMessage) (NamespaceMessage, error)
 
 	return NamespaceMessage{
 		Id:       msg.Message.Id,
-		Height:   msg.Message.Height,
+		Height:   uint64(msg.Message.Height),
 		Time:     msg.Message.Time,
 		Position: msg.Message.Position,
 		Type:     string(msg.Message.Type),

@@ -44,18 +44,19 @@ In that channel messages of `responses.Block` type will be sent.
                 "failed"
             ],
             "msg_type": [  // array of containing message types status. Can be emtpy.
-                "WithdrawValidatorCommission",
-                "WithdrawDelegatorReward",
-                "EditValidator",
-                "BeginRedelegate",
-                "CreateValidator",
-                "Delegate",
-                "Undelegate",
-                "Unjail",
-                "Send",
-                "CreateVestingAccount",
-                "CreatePeriodicVestingAccount",
-                "PayForBlobs"
+                "MsgWithdrawValidatorCommission",
+                "MsgWithdrawDelegatorReward",
+                "MsgEditValidator",
+                "MsgBeginRedelegate",
+                "MsgCreateValidator",
+                "MsgDelegate",
+                "MsgUndelegate",
+                "MsgUnjail",
+                "MsgSend",
+                "MsgCreateVestingAccount",
+                "MsgCreatePeriodicVestingAccount",
+                "MsgPayForBlobs",
+                "MsgGrantAllowance"
             ]
         }
     }

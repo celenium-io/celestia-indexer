@@ -25,7 +25,7 @@ type Namespace struct {
 	FirstHeight Level  `bun:"first_height,notnull"                         comment:"Block height of the first message changing the namespace"`
 	Version     byte   `bun:"version,unique:namespace_id_version_idx"      comment:"Namespace version"`
 	NamespaceID []byte `bun:"namespace_id,unique:namespace_id_version_idx" comment:"Namespace identity"`
-	Size        uint64 `bun:"size"                                         comment:"Namespace size"`
+	Size        uint64 `bun:"size"                                         comment:"Blobs size"`
 	PfbCount    uint64 `bun:"pfb_count"                                    comment:"Count of pay for blobs messages for the namespace"`
 	Reserved    bool   `bun:"reserved"                                     comment:"If namespace is reserved flag is true"`
 }
