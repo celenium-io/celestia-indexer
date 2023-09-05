@@ -6,7 +6,6 @@ import (
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
-	"github.com/uptrace/bun"
 )
 
 // Tx -
@@ -30,31 +29,7 @@ func (tx *Tx) ByHash(ctx context.Context, hash []byte) (transaction storage.Tx, 
 
 func (tx *Tx) Filter(ctx context.Context, fltrs storage.TxFilter) (txs []storage.Tx, err error) {
 	query := tx.DB().NewSelect().Model(&txs).Offset(fltrs.Offset)
-	query = limitScope(query, fltrs.Limit)
-	query = sortScope(query, "id", fltrs.Sort)
-
-	if !fltrs.MessageTypes.Empty() {
-		query = query.Where("message_types & ? > 0", fltrs.MessageTypes)
-	}
-
-	if len(fltrs.Status) > 0 {
-		query = query.WhereGroup(" AND ", func(sq *bun.SelectQuery) *bun.SelectQuery {
-			for i := range fltrs.Status {
-				sq = sq.WhereOr("status = ?", fltrs.Status[i])
-			}
-			return sq
-		})
-	}
-	if fltrs.Height > 0 {
-		query = query.Where("height = ?", fltrs.Height)
-	}
-
-	if !fltrs.TimeFrom.IsZero() {
-		query = query.Where("time >= ?", fltrs.TimeFrom)
-	}
-	if !fltrs.TimeTo.IsZero() {
-		query = query.Where("time < ?", fltrs.TimeTo)
-	}
+	query = txFilter(query, fltrs)
 
 	err = query.Scan(ctx)
 	return
@@ -66,4 +41,24 @@ func (tx *Tx) ByIdWithRelations(ctx context.Context, id uint64) (transaction sto
 		Relation("Messages").
 		Scan(ctx)
 	return
+}
+
+func (tx *Tx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxFilter) ([]storage.Tx, error) {
+	var relations []storage.TxAddress
+	query := tx.DB().NewSelect().
+		Model(&relations).
+		Where("address_id = ?", addressId).
+		Relation("Tx")
+
+	query = txFilter(query, fltrs)
+
+	if err := query.Scan(ctx); err != nil {
+		return nil, err
+	}
+
+	transactions := make([]storage.Tx, len(relations))
+	for i := range relations {
+		transactions[i] = *relations[i].Tx
+	}
+	return transactions, nil
 }

@@ -174,11 +174,12 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	stateHandlers := handler.NewStateHandler(db.State)
 	v1.GET("/head", stateHandlers.Head)
 
-	addessHandlers := handler.NewAddressHandler(db.Address)
+	addessHandlers := handler.NewAddressHandler(db.Address, db.Tx)
 	addressGroup := v1.Group("/address")
 	{
 		addressGroup.GET("", addessHandlers.List)
 		addressGroup.GET("/:hash", addessHandlers.Get)
+		addressGroup.GET("/:hash/txs", addessHandlers.Transactions)
 	}
 
 	blockHandlers := handler.NewBlockHandler(db.Blocks, db.Event)

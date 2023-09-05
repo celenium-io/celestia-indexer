@@ -37,3 +37,32 @@ func timeframeScope(q *bun.SelectQuery, tf storage.Timeframe) (*bun.SelectQuery,
 		return nil, errors.Errorf("unexpected timeframe %s", tf)
 	}
 }
+
+func txFilter(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
+	query = limitScope(query, fltrs.Limit)
+	query = sortScope(query, "id", fltrs.Sort)
+
+	if !fltrs.MessageTypes.Empty() {
+		query = query.Where("message_types & ? > 0", fltrs.MessageTypes)
+	}
+
+	if len(fltrs.Status) > 0 {
+		query = query.WhereGroup(" AND ", func(sq *bun.SelectQuery) *bun.SelectQuery {
+			for i := range fltrs.Status {
+				sq = sq.WhereOr("status = ?", fltrs.Status[i])
+			}
+			return sq
+		})
+	}
+	if fltrs.Height > 0 {
+		query = query.Where("height = ?", fltrs.Height)
+	}
+
+	if !fltrs.TimeFrom.IsZero() {
+		query = query.Where("time >= ?", fltrs.TimeFrom)
+	}
+	if !fltrs.TimeTo.IsZero() {
+		query = query.Where("time < ?", fltrs.TimeTo)
+	}
+	return query
+}

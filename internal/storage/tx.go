@@ -17,6 +17,7 @@ type ITx interface {
 	ByHash(ctx context.Context, hash []byte) (Tx, error)
 	Filter(ctx context.Context, fltrs TxFilter) ([]Tx, error)
 	ByIdWithRelations(ctx context.Context, id uint64) (Tx, error)
+	ByAddress(ctx context.Context, addressId uint64, fltrs TxFilter) ([]Tx, error)
 }
 
 type TxFilter struct {
@@ -51,8 +52,9 @@ type Tx struct {
 	Memo          string            `bun:"memo,type:text"              comment:"Note or comment to send with the transaction"`
 	MessageTypes  types.MsgTypeBits `bun:"message_types,type:int8"     comment:"Bit mask with containing messages"                 stats:"filterable"`
 
-	Messages []Message `bun:"rel:has-many,join:id=tx_id"`
-	Events   []Event   `bun:"rel:has-many"`
+	Messages  []Message         `bun:"rel:has-many,join:id=tx_id"`
+	Events    []Event           `bun:"rel:has-many"`
+	Addresses []AddressWithType `bun:"m2m:tx_address,join:Tx=Address"`
 }
 
 // TableName -

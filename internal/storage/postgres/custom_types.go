@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/rs/zerolog/log"
 	"github.com/uptrace/bun"
@@ -30,6 +31,13 @@ const (
 			CREATE TYPE status AS ENUM ('success', 'failed');
 		END IF;
 	END$$;`
+
+	createTypeQuery = `DO $$
+	BEGIN
+		IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ?) THEN
+			CREATE TYPE ? AS ENUM (?);
+		END IF;
+	END$$;`
 )
 
 func createTypes(ctx context.Context, conn *database.Bun) error {
@@ -42,6 +50,15 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 		if _, err := tx.ExecContext(ctx, statusType); err != nil {
+			return err
+		}
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"tx_address_type",
+			bun.Safe("tx_address_type"),
+			bun.In(types.TxAddressTypeValues()),
+		); err != nil {
 			return err
 		}
 		return nil

@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
 	"testing"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"github.com/dipdup-net/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/go-testfixtures/testfixtures/v3"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -120,6 +122,55 @@ func (s *StorageTestSuite) TestSaveNamespaces() {
 	s.Require().EqualValues(1, ns2.PfbCount)
 	s.Require().EqualValues(11, ns2.Size)
 	s.Require().Equal(namespaceId, ns2.NamespaceID)
+}
+
+func (s *StorageTestSuite) TestSaveAddresses() {
+	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
+	s.Require().NoError(err)
+
+	fixtures, err := testfixtures.New(
+		testfixtures.Database(db),
+		testfixtures.Dialect("timescaledb"),
+		testfixtures.Directory("../../../test/data"),
+		testfixtures.UseAlterConstraint(),
+	)
+	s.Require().NoError(err)
+	s.Require().NoError(fixtures.Load())
+	s.Require().NoError(db.Close())
+
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	addresses := make([]storage.Address, 5)
+	for i := 0; i < 5; i++ {
+		addresses[i].Height = uint64(10000 + i)
+		addresses[i].Balance = decimal.NewFromInt(int64(i * 100))
+		hash := make([]byte, 32)
+		_, err := rand.Read(hash)
+		s.NoError(err)
+		addresses[i].Hash = hash
+	}
+
+	err = tx.SaveAddresses(ctx, addresses...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	s.Require().Greater(addresses[0].Id, uint64(0))
+	s.Require().Greater(addresses[1].Id, uint64(0))
+
+	for i := 0; i < 5; i++ {
+		address, err := s.storage.Address.GetByID(ctx, addresses[i].Id)
+		s.Require().NoError(err)
+
+		s.Require().EqualValues(10000+i, address.Height)
+		s.Require().EqualValues(i*100, address.Balance.IntPart())
+		s.Require().Len(address.Hash, 32)
+	}
 }
 
 func (s *StorageTestSuite) TestRollbackBlock() {

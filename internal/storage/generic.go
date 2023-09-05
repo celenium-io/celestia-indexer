@@ -16,6 +16,7 @@ var Models = []any{
 	&Event{},
 	&Namespace{},
 	&NamespaceMessage{},
+	&TxAddress{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed

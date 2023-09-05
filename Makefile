@@ -32,7 +32,7 @@ adr:
 	@cp adr/adr-template.md adr/adr-$(NUM)-$(TITLE).md
 
 mock:
-	go generate ./internal/storage
+	go generate -v ./internal/storage ./internal/storage/types
 
 api-docs:
 	cd cmd/api && swag init --md markdown

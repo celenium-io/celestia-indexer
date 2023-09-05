@@ -10,6 +10,7 @@ import (
 var (
 	errInvalidNamespaceLength = errors.New("invalid namespace: should be 29 bytes length")
 	errInvalidHashLength      = errors.New("invalid hash: should be 32 bytes length")
+	errInvalidAddress         = errors.New("invalid address")
 )
 
 type NoRows interface {
@@ -38,6 +39,9 @@ func handleError(c echo.Context, err error, noRows NoRows) error {
 	}
 	if noRows.IsNoRows(err) {
 		return c.NoContent(http.StatusNoContent)
+	}
+	if errors.Is(err, errInvalidAddress) {
+		return badRequestError(c, err)
 	}
 	return internalServerError(c, err)
 }

@@ -1,0 +1,6 @@
+- tx_id: 1
+  address_id: 1
+  type: fromAddress
+- tx_id: 1
+  address_id: 2
+  type: toAddress

@@ -117,6 +117,115 @@
                 }
             }
         },
+        "/v1/address/{hash}/txs": {
+            "get": {
+                "description": "Get address transactions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Get address transactions",
+                "operationId": "address-transactions",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "success",
+                            "failed"
+                        ],
+                        "type": "string",
+                        "description": "Comma-separated status list",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "WithdrawValidatorCommission",
+                            "WithdrawDelegatorReward",
+                            "EditValidator",
+                            "BeginRedelegate",
+                            "CreateValidator",
+                            "Delegate",
+                            "Undelegate",
+                            "Unjail",
+                            "Send",
+                            "CreateVestingAccount",
+                            "CreatePeriodicVestingAccount",
+                            "PayForBlobs"
+                        ],
+                        "type": "string",
+                        "description": "Comma-separated message types list",
+                        "name": "msg_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Block number",
+                        "name": "height",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Tx"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/block": {
             "get": {
                 "description": "List blocks info",
@@ -654,7 +763,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.SearchResponse-responses_Searchable"
+                            "$ref": "#/definitions/SearchResponse-responses_Searchable"
                         }
                     },
                     "204": {
@@ -1118,6 +1227,19 @@
         }
     },
     "definitions": {
+        "SearchResponse-responses_Searchable": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "description": "Search result. Can be one of folowwing types: Block, Address, Namespace, Tx",
+                    "type": "object"
+                },
+                "type": {
+                    "description": "Result type which is in the result. Can be 'block', 'address', 'namespace', 'tx'",
+                    "type": "string"
+                }
+            }
+        },
         "handler.Error": {
             "type": "object",
             "properties": {
@@ -1480,19 +1602,6 @@
                         "PayForBlobs"
                     ],
                     "example": "CreatePeriodicVestingAccount"
-                }
-            }
-        },
-        "responses.SearchResponse-responses_Searchable": {
-            "type": "object",
-            "properties": {
-                "result": {
-                    "description": "Search result. Can be one of folowwing types: Block, Address, Namespace, Tx",
-                    "type": "object"
-                },
-                "type": {
-                    "description": "Result type which is in the result. Can be 'block', 'address', 'namespace', 'tx'",
-                    "type": "string"
                 }
             }
         },

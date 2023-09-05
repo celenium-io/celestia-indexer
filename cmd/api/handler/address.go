@@ -1,20 +1,25 @@
 package handler
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 type AddressHandler struct {
 	address storage.IAddress
+	txs     storage.ITx
 }
 
-func NewAddressHandler(address storage.IAddress) *AddressHandler {
+func NewAddressHandler(address storage.IAddress, txs storage.ITx) *AddressHandler {
 	return &AddressHandler{
 		address: address,
+		txs:     txs,
 	}
 }
 
@@ -41,15 +46,11 @@ func (handler *AddressHandler) Get(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	hash, err := responses.DecodeAddress(req.Hash)
-	if err != nil {
-		return badRequestError(c, err)
-	}
-
-	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	address, err := getAddressByStringHash(c.Request().Context(), handler.address, req.Hash)
 	if err := handleError(c, err, handler.address); err != nil {
 		return err
 	}
+
 	response, err := responses.NewAddress(address)
 	if err := handleError(c, err, handler.address); err != nil {
 		return err
@@ -93,4 +94,69 @@ func (handler *AddressHandler) List(c echo.Context) error {
 	}
 
 	return returnArray(c, response)
+}
+
+// Transactions godoc
+//
+//	@Summary		Get address transactions
+//	@Description	Get address transactions
+//	@Tags			address
+//	@ID				address-transactions
+//	@Param			limit		query	integer	false	"Count of requested entities"			mininum(1)	maximum(100)
+//	@Param			offset		query	integer	false	"Offset"								mininum(1)
+//	@Param			sort		query	string	false	"Sort order"							Enums(asc, desc)
+//	@Param			status		query	string	false	"Comma-separated status list"			Enums(success, failed)
+//	@Param			msg_type	query	string	false	"Comma-separated message types list"	Enums(WithdrawValidatorCommission,WithdrawDelegatorReward,EditValidator,BeginRedelegate,CreateValidator,Delegate,Undelegate,Unjail,Send,CreateVestingAccount,CreatePeriodicVestingAccount,PayForBlobs)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"			mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"				mininum(1)
+//	@Param			height		query	integer	false	"Block number"							mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Tx
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address/{hash}/txs [get]
+func (handler *AddressHandler) Transactions(c echo.Context) error {
+	req, err := bindAndValidate[addressTxRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	address, err := getAddressByStringHash(c.Request().Context(), handler.address, req.Hash)
+	if err := handleError(c, err, handler.address); err != nil {
+		return err
+	}
+
+	fltrs := storage.TxFilter{
+		Limit:  int(req.Limit),
+		Offset: int(req.Offset),
+		Sort:   pgSort(req.Sort),
+		Status: req.Status,
+		Height: req.Height,
+	}
+	if req.From > 0 {
+		fltrs.TimeFrom = time.Unix(req.From, 0).UTC()
+	}
+	if req.To > 0 {
+		fltrs.TimeTo = time.Unix(req.To, 0).UTC()
+	}
+
+	txs, err := handler.txs.ByAddress(c.Request().Context(), address.Id, fltrs)
+	if err := handleError(c, err, handler.txs); err != nil {
+		return err
+	}
+	response := make([]responses.Tx, len(txs))
+	for i := range txs {
+		response[i] = responses.NewTx(txs[i])
+	}
+	return returnArray(c, response)
+}
+
+func getAddressByStringHash(ctx context.Context, repo storage.IAddress, address string) (storage.Address, error) {
+	hash, err := responses.DecodeAddress(address)
+	if err != nil {
+		return storage.Address{}, errors.Wrap(errInvalidAddress, address)
+	}
+
+	return repo.ByHash(ctx, hash)
 }

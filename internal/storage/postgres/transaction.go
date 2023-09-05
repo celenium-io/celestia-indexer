@@ -46,6 +46,20 @@ func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...models.N
 	return err
 }
 
+func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...models.Address) error {
+	if len(addresses) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&addresses).
+		Column("height", "balance", "hash").
+		On("CONFLICT ON CONSTRAINT address_hash DO UPDATE").
+		Set("balance = EXCLUDED.balance + address.balance").
+		Returning("id").
+		Exec(ctx)
+	return err
+}
+
 func (tx Transaction) LastBlock(ctx context.Context) (block models.Block, err error) {
 	err = tx.Tx().NewSelect().Model(&block).Order("id desc").Limit(1).Scan(ctx)
 	return

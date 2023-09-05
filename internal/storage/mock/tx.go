@@ -40,6 +40,45 @@ func (m *MockITx) EXPECT() *MockITxMockRecorder {
 	return m.recorder
 }
 
+// ByAddress mocks base method.
+func (m *MockITx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxFilter) ([]storage.Tx, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ByAddress", ctx, addressId, fltrs)
+	ret0, _ := ret[0].([]storage.Tx)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ByAddress indicates an expected call of ByAddress.
+func (mr *MockITxMockRecorder) ByAddress(ctx, addressId, fltrs any) *ITxByAddressCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByAddress", reflect.TypeOf((*MockITx)(nil).ByAddress), ctx, addressId, fltrs)
+	return &ITxByAddressCall{Call: call}
+}
+
+// ITxByAddressCall wrap *gomock.Call
+type ITxByAddressCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *ITxByAddressCall) Return(arg0 []storage.Tx, arg1 error) *ITxByAddressCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *ITxByAddressCall) Do(f func(context.Context, uint64, storage.TxFilter) ([]storage.Tx, error)) *ITxByAddressCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *ITxByAddressCall) DoAndReturn(f func(context.Context, uint64, storage.TxFilter) ([]storage.Tx, error)) *ITxByAddressCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // ByHash mocks base method.
 func (m *MockITx) ByHash(ctx context.Context, hash []byte) (storage.Tx, error) {
 	m.ctrl.T.Helper()

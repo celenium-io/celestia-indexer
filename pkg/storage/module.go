@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"encoding/hex"
 	"strconv"
 	"time"
 
@@ -153,7 +154,7 @@ func (module *Module) AttachTo(name string, input *modules.Input) error {
 	return nil
 }
 
-func (module *Module) updateState(block storage.Block) {
+func (module *Module) updateState(block storage.Block, totalAccounts uint64) {
 	if storage.Level(block.Id) <= module.state.LastHeight {
 		return
 	}
@@ -161,9 +162,9 @@ func (module *Module) updateState(block storage.Block) {
 	module.state.LastHeight = block.Height
 	module.state.LastTime = block.Time
 	module.state.TotalTx += block.TxCount
+	module.state.TotalAccounts += totalAccounts
 	module.state.TotalBlobsSize = block.BlobsSize
 	module.state.TotalFee = module.state.TotalFee.Add(block.Fee)
-	// TODO: update TotalAccounts
 	module.state.ChainId = block.ChainId
 }
 
@@ -189,6 +190,9 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 		messages   = make([]any, 0)
 		events     = make([]any, len(block.Events))
 		namespaces = make(map[string]storage.Namespace, 0)
+		addresses  = make(map[string]storage.Address, 0)
+
+		totalAccounts uint64
 	)
 
 	for i := range block.Events {
@@ -215,12 +219,32 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 			block.Txs[i].Events[j].TxId = &block.Txs[i].Id
 			events = append(events, &block.Txs[i].Events[j])
 		}
+
+		for j := range block.Txs[i].Addresses {
+			key := hex.EncodeToString(block.Txs[i].Addresses[j].Hash)
+			if _, ok := addresses[key]; !ok {
+				addresses[key] = block.Txs[i].Addresses[j].Address
+			}
+		}
+
+		totalAccounts += uint64(len(block.Txs[i].Addresses))
+	}
+
+	if len(addresses) > 0 {
+		data := make([]storage.Address, 0, len(addresses))
+		for i := range addresses {
+			data = append(data, addresses[i])
+		}
+
+		if err := tx.SaveAddresses(ctx, data...); err != nil {
+			return tx.HandleError(ctx, err)
+		}
 	}
 
 	if len(namespaces) > 0 {
 		data := make([]storage.Namespace, 0, len(namespaces))
-		for _, ns := range namespaces {
-			data = append(data, ns)
+		for i := range namespaces {
+			data = append(data, namespaces[i])
 		}
 
 		if err := tx.SaveNamespaces(ctx, data...); err != nil {
@@ -262,9 +286,23 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 		}
 	}
 
-	// TODO: save addresses
+	var txAddresses []any
+	for _, tx := range block.Txs {
+		for _, address := range tx.Addresses {
+			txAddresses = append(txAddresses, &storage.TxAddress{
+				TxId:      tx.Id,
+				AddressId: address.Id,
+				Type:      address.Type,
+			})
+		}
+	}
+	if len(txAddresses) > 0 {
+		if err := tx.BulkSave(ctx, txAddresses); err != nil {
+			return tx.HandleError(ctx, err)
+		}
+	}
 
-	module.updateState(block)
+	module.updateState(block, totalAccounts)
 	if err := tx.Update(ctx, module.state); err != nil {
 		return tx.HandleError(ctx, err)
 	}

@@ -423,6 +423,34 @@ func (s *StorageTestSuite) TestTxByIdWithRelations() {
 	s.Require().Len(tx.Messages, 2)
 }
 
+func (s *StorageTestSuite) TestTxByAddressAndTime() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	txs, err := s.storage.Tx.ByAddress(ctx, 1, storage.TxFilter{
+		Limit:    10,
+		TimeFrom: time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+
+	txs, err = s.storage.Tx.ByAddress(ctx, 1, storage.TxFilter{
+		Limit:  10,
+		TimeTo: time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 0)
+
+	txs, err = s.storage.Tx.ByAddress(ctx, 1, storage.TxFilter{
+		Limit: 10,
+
+		TimeFrom: time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
+		TimeTo:   time.Date(2023, 7, 5, 0, 0, 0, 0, time.UTC),
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+}
+
 func (s *StorageTestSuite) TestNotify() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

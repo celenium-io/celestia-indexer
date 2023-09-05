@@ -19,10 +19,10 @@ type IAddress interface {
 type Address struct {
 	bun.BaseModel `bun:"address" comment:"Table with celestia addresses."`
 
-	Id      uint64          `bun:"id,type:bigint,pk,notnull" comment:"Unique internal identity"`
-	Height  uint64          `bun:"height"                    comment:"Block number of the first address occurrence."`
-	Hash    []byte          `bun:",unique:address_hash"      comment:"Address hash."`
-	Balance decimal.Decimal `bun:",type:numeric"             comment:"Address balance"`
+	Id      uint64          `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
+	Height  uint64          `bun:"height"                      comment:"Block number of the first address occurrence."`
+	Hash    []byte          `bun:",unique:address_hash"        comment:"Address hash."`
+	Balance decimal.Decimal `bun:",type:numeric"               comment:"Address balance"`
 }
 
 // TableName -
