@@ -37,89 +37,89 @@ func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
 
 func (mask *MsgTypeBits) SetBit(value MsgType) {
 	switch value {
-	case MsgTypeUnknown:
+	case MsgUnknown:
 		mask.Set(Bits(MsgTypeBitsUnknown))
-	case MsgTypeWithdrawValidatorCommission:
+	case MsgWithdrawValidatorCommission:
 		mask.Set(Bits(MsgTypeBitsWithdrawValidatorCommission))
-	case MsgTypeWithdrawDelegatorReward:
+	case MsgWithdrawDelegatorReward:
 		mask.Set(Bits(MsgTypeBitsWithdrawDelegatorReward))
-	case MsgTypeEditValidator:
+	case MsgEditValidator:
 		mask.Set(Bits(MsgTypeBitsEditValidator))
-	case MsgTypeBeginRedelegate:
+	case MsgBeginRedelegate:
 		mask.Set(Bits(MsgTypeBitsBeginRedelegate))
-	case MsgTypeCreateValidator:
+	case MsgCreateValidator:
 		mask.Set(Bits(MsgTypeBitsCreateValidator))
-	case MsgTypeUndelegate:
+	case MsgUndelegate:
 		mask.Set(Bits(MsgTypeBitsUndelegate))
-	case MsgTypeUnjail:
+	case MsgUnjail:
 		mask.Set(Bits(MsgTypeBitsUnjail))
-	case MsgTypeSend:
+	case MsgSend:
 		mask.Set(Bits(MsgTypeBitsSend))
-	case MsgTypeCreateVestingAccount:
+	case MsgCreateVestingAccount:
 		mask.Set(Bits(MsgTypeBitsCreateVestingAccount))
-	case MsgTypeCreatePeriodicVestingAccount:
+	case MsgCreatePeriodicVestingAccount:
 		mask.Set(Bits(MsgTypeBitsCreatePeriodicVestingAccount))
-	case MsgTypePayForBlobs:
+	case MsgPayForBlobs:
 		mask.Set(Bits(MsgTypeBitsPayForBlobs))
-	case MsgTypeDelegate:
+	case MsgDelegate:
 		mask.Set(Bits(MsgTypeBitsDelegate))
 	}
 }
 
-func (mask MsgTypeBits) Names() []string {
-	names := make([]string, mask.CountBits())
+func (mask MsgTypeBits) Names() []MsgType {
+	names := make([]MsgType, mask.CountBits())
 	var i int
 
 	if mask.Has(Bits(MsgTypeBitsUnknown)) {
-		names[i] = string(MsgTypeUnknown)
+		names[i] = MsgUnknown
 		i++
 	}
 	if mask.Has(Bits(MsgTypeBitsDelegate)) {
-		names[i] = string(MsgTypeDelegate)
+		names[i] = MsgDelegate
 		i++
 	}
 	if mask.Has(Bits(MsgTypeBitsWithdrawValidatorCommission)) {
-		names[i] = string(MsgTypeWithdrawValidatorCommission)
+		names[i] = MsgWithdrawValidatorCommission
 		i++
 	}
 	if mask.Has(Bits(MsgTypeBitsWithdrawDelegatorReward)) {
-		names[i] = string(MsgTypeWithdrawDelegatorReward)
+		names[i] = MsgWithdrawDelegatorReward
 		i++
 	}
 	if mask.Has(Bits(MsgTypeBitsEditValidator)) {
-		names[i] = string(MsgTypeEditValidator)
+		names[i] = MsgEditValidator
 		i++
 	}
 	if mask.Has(Bits(MsgTypeBitsBeginRedelegate)) {
-		names[i] = string(MsgTypeBeginRedelegate)
+		names[i] = MsgBeginRedelegate
 		i++
 	}
 	if mask.Has(Bits(MsgTypeBitsCreateValidator)) {
-		names[i] = string(MsgTypeCreateValidator)
+		names[i] = MsgCreateValidator
 		i++
 	}
 	if mask.Has(Bits(MsgTypeBitsUndelegate)) {
-		names[i] = string(MsgTypeUndelegate)
+		names[i] = MsgUndelegate
 		i++
 	}
 	if mask.Has(Bits(MsgTypeBitsUnjail)) {
-		names[i] = string(MsgTypeUnjail)
+		names[i] = MsgUnjail
 		i++
 	}
 	if mask.Has(Bits(MsgTypeBitsSend)) {
-		names[i] = string(MsgTypeSend)
+		names[i] = MsgSend
 		i++
 	}
 	if mask.Has(Bits(MsgTypeBitsCreateVestingAccount)) {
-		names[i] = string(MsgTypeCreateVestingAccount)
+		names[i] = MsgCreateVestingAccount
 		i++
 	}
 	if mask.Has(Bits(MsgTypeBitsCreatePeriodicVestingAccount)) {
-		names[i] = string(MsgTypeCreatePeriodicVestingAccount)
+		names[i] = MsgCreatePeriodicVestingAccount
 		i++
 	}
 	if mask.Has(Bits(MsgTypeBitsPayForBlobs)) {
-		names[i] = string(MsgTypePayForBlobs)
+		names[i] = MsgPayForBlobs
 	}
 
 	return names

@@ -31,10 +31,10 @@ adr:
 	@echo "Generating ADR"
 	@cp adr/adr-template.md adr/adr-$(NUM)-$(TITLE).md
 
-mock:
+generate:
 	go generate -v ./internal/storage ./internal/storage/types
 
 api-docs:
-	cd cmd/api && swag init --md markdown
+	cd cmd/api && swag init --md markdown -parseDependency 2
 
 .PHONY: init indexer api build clean compose lint test adr mock api-docs

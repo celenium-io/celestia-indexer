@@ -125,7 +125,7 @@ func (s *SearchTestSuite) TestSearchBlock() {
 	s.Require().Equal("11", response.Result.VersionBlock)
 	s.Require().Equal("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", response.Result.Hash)
 	s.Require().Equal(testTime, response.Result.Time)
-	s.Require().Equal([]string{string(types.MsgTypeSend)}, response.Result.MessageTypes)
+	s.Require().Equal([]types.MsgType{types.MsgSend}, response.Result.MessageTypes)
 }
 
 func (s *SearchTestSuite) TestSearchTx() {
@@ -161,7 +161,7 @@ func (s *SearchTestSuite) TestSearchTx() {
 	s.Require().EqualValues(2, response.Result.MessagesCount)
 	s.Require().Equal("memo", response.Result.Memo)
 	s.Require().Equal("sdk", response.Result.Codespace)
-	s.Require().Equal(string(types.StatusSuccess), response.Result.Status)
+	s.Require().Equal(types.StatusSuccess, response.Result.Status)
 }
 
 func (s *SearchTestSuite) TestSearchNamespaceById() {

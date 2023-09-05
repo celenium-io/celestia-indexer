@@ -40,23 +40,10 @@ In that channel messages of `responses.Block` type will be sent.
         "channel": "tx",
         "filters": {
             "status": [  // array of transaction status. Can be emtpy.
-                "success", 
-                "failed"
+                types.Status
             ],
             "msg_type": [  // array of containing message types status. Can be emtpy.
-                "MsgWithdrawValidatorCommission",
-                "MsgWithdrawDelegatorReward",
-                "MsgEditValidator",
-                "MsgBeginRedelegate",
-                "MsgCreateValidator",
-                "MsgDelegate",
-                "MsgUndelegate",
-                "MsgUnjail",
-                "MsgSend",
-                "MsgCreateVestingAccount",
-                "MsgCreatePeriodicVestingAccount",
-                "MsgPayForBlobs",
-                "MsgGrantAllowance"
+                types.MsgType
             ]
         }
     }

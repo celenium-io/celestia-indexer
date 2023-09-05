@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"testing"
+
 	"cosmossdk.io/math"
 	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
 	cosmosCodecTypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -12,7 +14,6 @@ import (
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func createMsgPayForBlob() cosmosTypes.Msg {
@@ -40,7 +41,7 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 		Height:   blob.Height,
 		Time:     now,
 		Position: 0,
-		Type:     storageTypes.MsgTypePayForBlobs,
+		Type:     storageTypes.MsgPayForBlobs,
 		TxId:     0,
 		Data:     structs.Map(msgPayForBlob),
 		Namespace: []storage.Namespace{
@@ -87,7 +88,7 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 		Height:    blob.Height,
 		Time:      now,
 		Position:  0,
-		Type:      storageTypes.MsgTypeDelegate,
+		Type:      storageTypes.MsgDelegate,
 		TxId:      0,
 		Data:      structs.Map(msgDelegate),
 		Namespace: nil,
@@ -126,7 +127,7 @@ func TestDecodeMsg_SuccessOnMsgSend(t *testing.T) {
 		Height:    blob.Height,
 		Time:      now,
 		Position:  0,
-		Type:      storageTypes.MsgTypeSend,
+		Type:      storageTypes.MsgSend,
 		TxId:      0,
 		Data:      structs.Map(msgSend),
 		Namespace: nil,
@@ -160,7 +161,7 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 		Height:    blob.Height,
 		Time:      now,
 		Position:  4,
-		Type:      storageTypes.MsgTypeGrantAllowance,
+		Type:      storageTypes.MsgGrantAllowance,
 		TxId:      0,
 		Data:      structs.Map(msgGrantAllowance),
 		Namespace: nil,
@@ -196,7 +197,7 @@ func TestDecodeMsg_MsgUnknown(t *testing.T) {
 		Height:    blob.Height,
 		Time:      now,
 		Position:  0,
-		Type:      storageTypes.MsgTypeUnknown,
+		Type:      storageTypes.MsgUnknown,
 		TxId:      0,
 		Data:      structs.Map(msgUnknown),
 		Namespace: nil,

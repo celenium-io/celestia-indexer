@@ -52,23 +52,24 @@ func newFilters() *filters {
 }
 
 type txFilters struct {
-	status map[string]struct{}
+	status map[types.Status]struct{}
 	msgs   types.MsgTypeBits
 }
 
 func newTxFilters() *txFilters {
 	return &txFilters{
-		status: make(map[string]struct{}, 2),
+		status: make(map[types.Status]struct{}, 2),
 		msgs:   types.NewMsgTypeBitMask(),
 	}
 }
 
 func (f *txFilters) Fill(msg TransactionFilters) error {
 	for i := range msg.Status {
-		if !types.IsStatus(msg.Status[i]) {
+		status, err := types.ParseStatus(msg.Status[i])
+		if err != nil {
 			return errors.Wrapf(ErrUnavailiableFilter, "status %s", msg.Status[i])
 		}
-		f.status[msg.Status[i]] = struct{}{}
+		f.status[status] = struct{}{}
 	}
 
 	for i := range msg.Messages {

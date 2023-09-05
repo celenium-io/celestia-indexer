@@ -197,7 +197,7 @@ func (s *StorageTestSuite) TestMessageByTxId() {
 	s.Require().EqualValues(1, msgs[0].Id)
 	s.Require().EqualValues(1000, msgs[0].Height)
 	s.Require().EqualValues(0, msgs[0].Position)
-	s.Require().Equal(types.MsgTypeWithdrawDelegatorReward, msgs[0].Type)
+	s.Require().Equal(types.MsgWithdrawDelegatorReward, msgs[0].Type)
 }
 
 func (s *StorageTestSuite) TestNamespaceId() {
@@ -250,7 +250,7 @@ func (s *StorageTestSuite) TestNamespaceMessages() {
 	s.Require().EqualValues(3, msg.MsgId)
 	s.Require().EqualValues(2, msg.NamespaceId)
 	s.Require().NotNil(msg.Message)
-	s.Require().Equal(types.MsgTypeUnjail, msg.Message.Type)
+	s.Require().Equal(types.MsgUnjail, msg.Message.Type)
 	s.Require().EqualValues(2, msg.Tx.Id)
 }
 
@@ -287,7 +287,7 @@ func (s *StorageTestSuite) TestTxFilterSuccessUnjailAsc() {
 		Sort:         sdk.SortOrderAsc,
 		Limit:        10,
 		Offset:       0,
-		MessageTypes: types.NewMsgTypeBitMask(types.MsgTypeUnjail),
+		MessageTypes: types.NewMsgTypeBitMask(types.MsgUnjail),
 		Status:       []string{string(types.StatusSuccess)},
 	})
 	s.Require().NoError(err)

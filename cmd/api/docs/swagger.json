@@ -164,18 +164,20 @@
                     },
                     {
                         "enum": [
-                            "WithdrawValidatorCommission",
-                            "WithdrawDelegatorReward",
-                            "EditValidator",
-                            "BeginRedelegate",
-                            "CreateValidator",
-                            "Delegate",
-                            "Undelegate",
-                            "Unjail",
-                            "Send",
-                            "CreateVestingAccount",
-                            "CreatePeriodicVestingAccount",
-                            "PayForBlobs"
+                            "MsgUnknown",
+                            "MsgWithdrawValidatorCommission",
+                            "MsgWithdrawDelegatorReward",
+                            "MsgEditValidator",
+                            "MsgBeginRedelegate",
+                            "MsgCreateValidator",
+                            "MsgDelegate",
+                            "MsgUndelegate",
+                            "MsgUnjail",
+                            "MsgSend",
+                            "MsgCreateVestingAccount",
+                            "MsgCreatePeriodicVestingAccount",
+                            "MsgPayForBlobs",
+                            "MsgGrantAllowance"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1008,6 +1010,7 @@
                     },
                     {
                         "enum": [
+                            "MsgUnknown",
                             "MsgWithdrawValidatorCommission",
                             "MsgWithdrawDelegatorReward",
                             "MsgEditValidator",
@@ -1214,7 +1217,7 @@
         },
         "/v1/ws": {
             "get": {
-                "description": "## Documentation for websocket API\n\n### Subscribe\n\nTo receive updates from websocket API send `subscribe` request to server.\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n        \"filters\": {\n            // pass channel filters\n        }\n    }\n}\n```\n\nNow 2 channels are supported:\n\n* `head` - receive information about new block. Channel does not have any filters. Subscribe message should looks like:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"head\"\n    }\n}\n```\n\nIn that channel messages of `responses.Block` type will be sent.\n\n* `tx` - receive information about new transactions. The channel has filters for target receiving information. Now 2 filters are supported:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"tx\",\n        \"filters\": {\n            \"status\": [  // array of transaction status. Can be emtpy.\n                \"success\", \n                \"failed\"\n            ],\n            \"msg_type\": [  // array of containing message types status. Can be emtpy.\n                \"MsgWithdrawValidatorCommission\",\n                \"MsgWithdrawDelegatorReward\",\n                \"MsgEditValidator\",\n                \"MsgBeginRedelegate\",\n                \"MsgCreateValidator\",\n                \"MsgDelegate\",\n                \"MsgUndelegate\",\n                \"MsgUnjail\",\n                \"MsgSend\",\n                \"MsgCreateVestingAccount\",\n                \"MsgCreatePeriodicVestingAccount\",\n                \"MsgPayForBlobs\",\n                \"MsgGrantAllowance\"\n            ]\n        }\n    }\n}\n```\n\nIf all filers are empty subscription to all transaction will be created.\n\nIn that channel messages of `responses.Tx` type will be sent.\n\n\n### Unsubscribe\n\nTo unsubscribe send `unsubscribe` message containing one of channel name describing above.\n\n\n```json\n{\n    \"method\": \"unsubscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n    }\n}\n```\n",
+                "description": "## Documentation for websocket API\n\n### Subscribe\n\nTo receive updates from websocket API send `subscribe` request to server.\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n        \"filters\": {\n            // pass channel filters\n        }\n    }\n}\n```\n\nNow 2 channels are supported:\n\n* `head` - receive information about new block. Channel does not have any filters. Subscribe message should looks like:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"head\"\n    }\n}\n```\n\nIn that channel messages of `responses.Block` type will be sent.\n\n* `tx` - receive information about new transactions. The channel has filters for target receiving information. Now 2 filters are supported:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"tx\",\n        \"filters\": {\n            \"status\": [  // array of transaction status. Can be emtpy.\n                types.Status\n            ],\n            \"msg_type\": [  // array of containing message types status. Can be emtpy.\n                types.MsgType\n            ]\n        }\n    }\n}\n```\n\nIf all filers are empty subscription to all transaction will be created.\n\nIn that channel messages of `responses.Tx` type will be sent.\n\n\n### Unsubscribe\n\nTo unsubscribe send `unsubscribe` message containing one of channel name describing above.\n\n\n```json\n{\n    \"method\": \"unsubscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n    }\n}\n```\n",
                 "produces": [
                     "application/json"
                 ],
@@ -1424,35 +1427,10 @@
                     "example": 11
                 },
                 "type": {
-                    "type": "string",
-                    "format": "string",
-                    "enum": [
-                        "coin_received",
-                        "coinbase",
-                        "coin_spent",
-                        "burn",
-                        "mint",
-                        "message",
-                        "proposer_reward",
-                        "rewards",
-                        "commission",
-                        "liveness",
-                        "attestation_request",
-                        "transfer",
-                        "celestia.blob.v1.EventPayForBlobs",
-                        "redelegate",
-                        "withdraw_rewards",
-                        "withdraw_commission",
-                        "create_validator",
-                        "delegate",
-                        "edit_validator",
-                        "unbond",
-                        "tx",
-                        "use_feegrant",
-                        "revoke_feegrant",
-                        "set_feegrant",
-                        "update_feegrant",
-                        "unknown"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/types.EventType"
+                        }
                     ],
                     "example": "commission"
                 }
@@ -1506,22 +1484,10 @@
                     "example": 11
                 },
                 "type": {
-                    "type": "string",
-                    "format": "string",
-                    "enum": [
-                        "MsgWithdrawValidatorCommission",
-                        "MsgWithdrawDelegatorReward",
-                        "MsgEditValidator",
-                        "MsgBeginRedelegate",
-                        "MsgCreateValidator",
-                        "MsgDelegate",
-                        "MsgUndelegate",
-                        "MsgUnjail",
-                        "MsgSend",
-                        "MsgCreateVestingAccount",
-                        "MsgCreatePeriodicVestingAccount",
-                        "MsgPayForBlobs",
-                        "MsgGrantAllowance"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/types.MsgType"
+                        }
                     ],
                     "example": "MsgCreatePeriodicVestingAccount"
                 }
@@ -1713,7 +1679,7 @@
                 "message_types": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.MsgType"
                     },
                     "example": [
                         "MsgSend",
@@ -1731,11 +1697,10 @@
                     "example": 11
                 },
                 "status": {
-                    "type": "string",
-                    "format": "string",
-                    "enum": [
-                        "success",
-                        "failed"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/types.Status"
+                        }
                     ],
                     "example": "success"
                 },
@@ -1750,6 +1715,109 @@
                     "example": 0
                 }
             }
+        },
+        "types.EventType": {
+            "type": "string",
+            "enum": [
+                "unknown",
+                "coin_received",
+                "coinbase",
+                "coin_spent",
+                "burn",
+                "mint",
+                "message",
+                "proposer_reward",
+                "rewards",
+                "commission",
+                "liveness",
+                "transfer",
+                "celestia.blob.v1.EventPayForBlobs",
+                "redelegate",
+                "withdraw_rewards",
+                "withdraw_commission",
+                "create_validator",
+                "delegate",
+                "edit_validator",
+                "unbond",
+                "tx",
+                "use_feegrant",
+                "revoke_feegrant",
+                "set_feegrant",
+                "update_feegrant"
+            ],
+            "x-enum-varnames": [
+                "EventTypeUnknown",
+                "EventTypeCoinReceived",
+                "EventTypeCoinbase",
+                "EventTypeCoinSpent",
+                "EventTypeBurn",
+                "EventTypeMint",
+                "EventTypeMessage",
+                "EventTypeProposerReward",
+                "EventTypeRewards",
+                "EventTypeCommission",
+                "EventTypeLiveness",
+                "EventTypeTransfer",
+                "EventTypePayForBlobs",
+                "EventTypeRedelegate",
+                "EventTypeWithdrawRewards",
+                "EventTypeWithdrawCommission",
+                "EventTypeCreateValidator",
+                "EventTypeDelegate",
+                "EventTypeEditValidator",
+                "EventTypeUnbond",
+                "EventTypeTx",
+                "EventTypeUseFeegrant",
+                "EventTypeRevokeFeegrant",
+                "EventTypeSetFeegrant",
+                "EventTypeUpdateFeegrant"
+            ]
+        },
+        "types.MsgType": {
+            "type": "string",
+            "enum": [
+                "MsgUnknown",
+                "MsgWithdrawValidatorCommission",
+                "MsgWithdrawDelegatorReward",
+                "MsgEditValidator",
+                "MsgBeginRedelegate",
+                "MsgCreateValidator",
+                "MsgDelegate",
+                "MsgUndelegate",
+                "MsgUnjail",
+                "MsgSend",
+                "MsgCreateVestingAccount",
+                "MsgCreatePeriodicVestingAccount",
+                "MsgPayForBlobs",
+                "MsgGrantAllowance"
+            ],
+            "x-enum-varnames": [
+                "MsgUnknown",
+                "MsgWithdrawValidatorCommission",
+                "MsgWithdrawDelegatorReward",
+                "MsgEditValidator",
+                "MsgBeginRedelegate",
+                "MsgCreateValidator",
+                "MsgDelegate",
+                "MsgUndelegate",
+                "MsgUnjail",
+                "MsgSend",
+                "MsgCreateVestingAccount",
+                "MsgCreatePeriodicVestingAccount",
+                "MsgPayForBlobs",
+                "MsgGrantAllowance"
+            ]
+        },
+        "types.Status": {
+            "type": "string",
+            "enum": [
+                "success",
+                "failed"
+            ],
+            "x-enum-varnames": [
+                "StatusSuccess",
+                "StatusFailed"
+            ]
         }
     }
 }

@@ -105,7 +105,7 @@ func (s *TxTestSuite) TestGet() {
 	s.Require().EqualValues(2, tx.MessagesCount)
 	s.Require().Equal("memo", tx.Memo)
 	s.Require().Equal("sdk", tx.Codespace)
-	s.Require().Equal(string(types.StatusSuccess), tx.Status)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
 }
 
 func (s *TxTestSuite) TestGetInvalidTx() {
@@ -166,7 +166,7 @@ func (s *TxTestSuite) TestList() {
 	s.Require().EqualValues(2, tx.MessagesCount)
 	s.Require().Equal("memo", tx.Memo)
 	s.Require().Equal("sdk", tx.Codespace)
-	s.Require().Equal(string(types.StatusSuccess), tx.Status)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
 }
 
 func (s *TxTestSuite) TestListValidationStatusError() {
@@ -256,7 +256,7 @@ func (s *TxTestSuite) TestListTime() {
 	s.Require().EqualValues(2, tx.MessagesCount)
 	s.Require().Equal("memo", tx.Memo)
 	s.Require().Equal("sdk", tx.Codespace)
-	s.Require().Equal(string(types.StatusSuccess), tx.Status)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
 }
 
 func (s *TxTestSuite) TestListHeight() {
@@ -301,7 +301,7 @@ func (s *TxTestSuite) TestListHeight() {
 	s.Require().EqualValues(2, tx.MessagesCount)
 	s.Require().Equal("memo", tx.Memo)
 	s.Require().Equal("sdk", tx.Codespace)
-	s.Require().Equal(string(types.StatusSuccess), tx.Status)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
 }
 
 func (s *TxTestSuite) TestGetEvents() {
@@ -367,7 +367,7 @@ func (s *TxTestSuite) TestGetMessage() {
 				Height:   100,
 				Time:     testTime,
 				Position: 2,
-				Type:     types.MsgTypeBeginRedelegate,
+				Type:     types.MsgBeginRedelegate,
 				TxId:     1,
 				Data: map[string]any{
 					"test": "value",
@@ -387,5 +387,5 @@ func (s *TxTestSuite) TestGetMessage() {
 	s.Require().EqualValues(2, msgs[0].Position)
 	s.Require().Equal(testTime, msgs[0].Time)
 	s.Require().EqualValues(1, msgs[0].TxId)
-	s.Require().EqualValues(string(types.MsgTypeBeginRedelegate), msgs[0].Type)
+	s.Require().EqualValues(string(types.MsgBeginRedelegate), msgs[0].Type)
 }

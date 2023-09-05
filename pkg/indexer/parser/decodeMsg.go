@@ -1,6 +1,9 @@
 package parser
 
 import (
+	"reflect"
+	"strings"
+
 	"github.com/celestiaorg/celestia-app/pkg/namespace"
 	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
@@ -9,15 +12,13 @@ import (
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/fatih/structs"
 	"github.com/pkg/errors"
-	"reflect"
-	"strings"
 )
 
 func decodeMsg(b types.BlockData, msg cosmosTypes.Msg, position int) (storage.Message, uint64, error) {
 	fullMsgType := reflect.TypeOf(msg).String()
 	msgTypeName := fullMsgType[strings.LastIndex(fullMsgType, ".")+1:]
-	msgType := storageTypes.MsgTypeUnknown
-	if storageTypes.IsMsgType(msgTypeName) {
+	msgType := storageTypes.MsgUnknown
+	if _, err := storageTypes.ParseMsgType(msgTypeName); err == nil {
 		msgType = storageTypes.MsgType(msgTypeName)
 	}
 
@@ -31,7 +32,7 @@ func decodeMsg(b types.BlockData, msg cosmosTypes.Msg, position int) (storage.Me
 
 	var blobsSize uint64
 	// Decode Namespaces
-	if msgType == storageTypes.MsgTypePayForBlobs {
+	if msgType == storageTypes.MsgPayForBlobs {
 		payForBlobsMsg, ok := msg.(*appBlobTypes.MsgPayForBlobs)
 		if !ok {
 			return storage.Message{}, 0, errors.Errorf("error on decoding %T", msg)

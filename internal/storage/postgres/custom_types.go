@@ -11,27 +11,6 @@ import (
 )
 
 const (
-	msgType = `DO $$
-	BEGIN
-		IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'msg_type') THEN
-			CREATE TYPE msg_type AS ENUM ('MsgPayForBlobs', 'MsgCreatePeriodicVestingAccount', 'MsgCreateVestingAccount', 'MsgSend', 'MsgUnjail', 'MsgUndelegate', 'MsgDelegate', 'MsgCreateValidator', 'MsgBeginRedelegate', 'MsgEditValidator', 'MsgWithdrawDelegatorReward', 'MsgWithdrawValidatorCommission', 'MsgGrantAllowance', 'MsgUnknown');
-		END IF;
-	END$$;`
-
-	eventType = `DO $$
-	BEGIN
-		IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'event_type') THEN
-			CREATE TYPE event_type AS ENUM ('coin_received', 'coinbase', 'coin_spent', 'burn', 'mint', 'message', 'proposer_reward', 'rewards', 'commission', 'liveness', 'AttestationRequest', 'transfer', 'celestia.blob.v1.EventPayForBlobs', 'redelegate', 'withdraw_rewards', 'withdraw_commission', 'create_validator', 'delegate', 'edit_validator', 'unbond', 'tx', 'use_feegrant', 'revoke_feegrant', 'set_feegrant', 'update_feegrant', 'unknown');
-		END IF;
-	END$$;`
-
-	statusType = `DO $$
-	BEGIN
-		IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status') THEN
-			CREATE TYPE status AS ENUM ('success', 'failed');
-		END IF;
-	END$$;`
-
 	createTypeQuery = `DO $$
 	BEGIN
 		IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ?) THEN
@@ -43,15 +22,36 @@ const (
 func createTypes(ctx context.Context, conn *database.Bun) error {
 	log.Info().Msg("creating custom types...")
 	return conn.DB().RunInTx(ctx, &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
-		if _, err := tx.ExecContext(ctx, msgType); err != nil {
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"event_type",
+			bun.Safe("event_type"),
+			bun.In(types.EventTypeValues()),
+		); err != nil {
 			return err
 		}
-		if _, err := tx.ExecContext(ctx, eventType); err != nil {
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"msg_type",
+			bun.Safe("msg_type"),
+			bun.In(types.MsgTypeValues()),
+		); err != nil {
 			return err
 		}
-		if _, err := tx.ExecContext(ctx, statusType); err != nil {
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"status",
+			bun.Safe("status"),
+			bun.In(types.StatusValues()),
+		); err != nil {
 			return err
 		}
+
 		if _, err := tx.ExecContext(
 			ctx,
 			createTypeQuery,

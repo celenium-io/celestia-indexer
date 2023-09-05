@@ -208,5 +208,5 @@ func (s *AddressTestSuite) TestListHeight() {
 	s.Require().EqualValues(2, tx.MessagesCount)
 	s.Require().Equal("memo", tx.Memo)
 	s.Require().Equal("sdk", tx.Codespace)
-	s.Require().Equal(string(types.StatusSuccess), tx.Status)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
 }

@@ -10,60 +10,60 @@ func TestMsgTypeBits_Names(t *testing.T) {
 	tests := []struct {
 		name string
 		Bits Bits
-		want []string
+		want []MsgType
 	}{
 		{
-			name: string(MsgTypeBeginRedelegate),
+			name: string(MsgBeginRedelegate),
 			Bits: Bits(MsgTypeBitsBeginRedelegate),
-			want: []string{string(MsgTypeBeginRedelegate)},
+			want: []MsgType{MsgBeginRedelegate},
 		}, {
-			name: string(MsgTypeWithdrawValidatorCommission),
+			name: string(MsgWithdrawValidatorCommission),
 			Bits: Bits(MsgTypeBitsWithdrawValidatorCommission),
-			want: []string{string(MsgTypeWithdrawValidatorCommission)},
+			want: []MsgType{MsgWithdrawValidatorCommission},
 		}, {
-			name: string(MsgTypeCreatePeriodicVestingAccount),
+			name: string(MsgCreatePeriodicVestingAccount),
 			Bits: Bits(MsgTypeBitsCreatePeriodicVestingAccount),
-			want: []string{string(MsgTypeCreatePeriodicVestingAccount)},
+			want: []MsgType{MsgCreatePeriodicVestingAccount},
 		}, {
-			name: string(MsgTypeCreateValidator),
+			name: string(MsgCreateValidator),
 			Bits: Bits(MsgTypeBitsCreateValidator),
-			want: []string{string(MsgTypeCreateValidator)},
+			want: []MsgType{MsgCreateValidator},
 		}, {
-			name: string(MsgTypeCreateVestingAccount),
+			name: string(MsgCreateVestingAccount),
 			Bits: Bits(MsgTypeBitsCreateVestingAccount),
-			want: []string{string(MsgTypeCreateVestingAccount)},
+			want: []MsgType{MsgCreateVestingAccount},
 		}, {
-			name: string(MsgTypeDelegate),
+			name: string(MsgDelegate),
 			Bits: Bits(MsgTypeBitsDelegate),
-			want: []string{string(MsgTypeDelegate)},
+			want: []MsgType{MsgDelegate},
 		}, {
-			name: string(MsgTypeEditValidator),
+			name: string(MsgEditValidator),
 			Bits: Bits(MsgTypeBitsEditValidator),
-			want: []string{string(MsgTypeEditValidator)},
+			want: []MsgType{MsgEditValidator},
 		}, {
-			name: string(MsgTypePayForBlobs),
+			name: string(MsgPayForBlobs),
 			Bits: Bits(MsgTypeBitsPayForBlobs),
-			want: []string{string(MsgTypePayForBlobs)},
+			want: []MsgType{MsgPayForBlobs},
 		}, {
-			name: string(MsgTypeSend),
+			name: string(MsgSend),
 			Bits: Bits(MsgTypeBitsSend),
-			want: []string{string(MsgTypeSend)},
+			want: []MsgType{MsgSend},
 		}, {
-			name: string(MsgTypeUndelegate),
+			name: string(MsgUndelegate),
 			Bits: Bits(MsgTypeBitsUndelegate),
-			want: []string{string(MsgTypeUndelegate)},
+			want: []MsgType{MsgUndelegate},
 		}, {
-			name: string(MsgTypeUnjail),
+			name: string(MsgUnjail),
 			Bits: Bits(MsgTypeBitsUnjail),
-			want: []string{string(MsgTypeUnjail)},
+			want: []MsgType{MsgUnjail},
 		}, {
-			name: string(MsgTypeUnknown),
+			name: string(MsgUnknown),
 			Bits: Bits(MsgTypeBitsUnknown),
-			want: []string{string(MsgTypeUnknown)},
+			want: []MsgType{MsgUnknown},
 		}, {
-			name: string(MsgTypeWithdrawDelegatorReward),
+			name: string(MsgWithdrawDelegatorReward),
 			Bits: Bits(MsgTypeBitsWithdrawDelegatorReward),
-			want: []string{string(MsgTypeWithdrawDelegatorReward)},
+			want: []MsgType{MsgWithdrawDelegatorReward},
 		},
 	}
 	for _, tt := range tests {
@@ -88,59 +88,59 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			want:   MsgTypeBits{Bits(0)},
 		}, {
 			name:   "test 1",
-			values: []MsgType{MsgTypeBeginRedelegate},
+			values: []MsgType{MsgBeginRedelegate},
 			want:   MsgTypeBits{Bits(MsgTypeBitsBeginRedelegate)},
 		}, {
 			name:   "test 2",
-			values: []MsgType{MsgTypeWithdrawValidatorCommission},
+			values: []MsgType{MsgWithdrawValidatorCommission},
 			want:   MsgTypeBits{Bits(MsgTypeBitsWithdrawValidatorCommission)},
 		}, {
 			name:   "test 3",
-			values: []MsgType{MsgTypeCreatePeriodicVestingAccount},
+			values: []MsgType{MsgCreatePeriodicVestingAccount},
 			want:   MsgTypeBits{Bits(MsgTypeBitsCreatePeriodicVestingAccount)},
 		}, {
 			name:   "test 4",
-			values: []MsgType{MsgTypeCreateValidator},
+			values: []MsgType{MsgCreateValidator},
 			want:   MsgTypeBits{Bits(MsgTypeBitsCreateValidator)},
 		}, {
 			name:   "test 5",
-			values: []MsgType{MsgTypeCreateVestingAccount},
+			values: []MsgType{MsgCreateVestingAccount},
 			want:   MsgTypeBits{Bits(MsgTypeBitsCreateVestingAccount)},
 		}, {
 			name:   "test 6",
-			values: []MsgType{MsgTypeDelegate},
+			values: []MsgType{MsgDelegate},
 			want:   MsgTypeBits{Bits(MsgTypeBitsDelegate)},
 		}, {
 			name:   "test 7",
-			values: []MsgType{MsgTypeEditValidator},
+			values: []MsgType{MsgEditValidator},
 			want:   MsgTypeBits{Bits(MsgTypeBitsEditValidator)},
 		}, {
 			name:   "test 8",
-			values: []MsgType{MsgTypePayForBlobs},
+			values: []MsgType{MsgPayForBlobs},
 			want:   MsgTypeBits{Bits(MsgTypeBitsPayForBlobs)},
 		}, {
 			name:   "test 9",
-			values: []MsgType{MsgTypeSend},
+			values: []MsgType{MsgSend},
 			want:   MsgTypeBits{Bits(MsgTypeBitsSend)},
 		}, {
 			name:   "test 10",
-			values: []MsgType{MsgTypeUndelegate},
+			values: []MsgType{MsgUndelegate},
 			want:   MsgTypeBits{Bits(MsgTypeBitsUndelegate)},
 		}, {
 			name:   "test 11",
-			values: []MsgType{MsgTypeUnjail},
+			values: []MsgType{MsgUnjail},
 			want:   MsgTypeBits{Bits(MsgTypeBitsUnjail)},
 		}, {
 			name:   "test 12",
-			values: []MsgType{MsgTypeUnknown},
+			values: []MsgType{MsgUnknown},
 			want:   MsgTypeBits{Bits(MsgTypeBitsUnknown)},
 		}, {
 			name:   "test 13",
-			values: []MsgType{MsgTypeWithdrawDelegatorReward},
+			values: []MsgType{MsgWithdrawDelegatorReward},
 			want:   MsgTypeBits{Bits(MsgTypeBitsWithdrawDelegatorReward)},
 		}, {
 			name:   "test 14",
-			values: []MsgType{MsgTypeWithdrawDelegatorReward, MsgTypeBeginRedelegate},
+			values: []MsgType{MsgWithdrawDelegatorReward, MsgBeginRedelegate},
 			want:   MsgTypeBits{Bits(20)},
 		},
 	}
@@ -159,8 +159,8 @@ func TestMsgTypeBits_SetBit(t *testing.T) {
 	}{
 		{
 			name:  "test 1",
-			value: MsgTypeBeginRedelegate,
-			want:  NewMsgTypeBitMask(MsgTypeBeginRedelegate),
+			value: MsgBeginRedelegate,
+			want:  NewMsgTypeBitMask(MsgBeginRedelegate),
 		}, {
 			name:  "test 2",
 			value: MsgType("unknown"),
@@ -187,23 +187,23 @@ func TestMsgTypeBits_HasOne(t *testing.T) {
 	}{
 		{
 			name:  "test 1",
-			mask:  NewMsgTypeBitMask(MsgTypeBeginRedelegate),
-			value: NewMsgTypeBitMask(MsgTypeBeginRedelegate),
+			mask:  NewMsgTypeBitMask(MsgBeginRedelegate),
+			value: NewMsgTypeBitMask(MsgBeginRedelegate),
 			want:  true,
 		}, {
 			name:  "test 2",
-			mask:  NewMsgTypeBitMask(MsgTypeBeginRedelegate, MsgTypeDelegate, MsgTypeSend),
-			value: NewMsgTypeBitMask(MsgTypeBeginRedelegate),
+			mask:  NewMsgTypeBitMask(MsgBeginRedelegate, MsgDelegate, MsgSend),
+			value: NewMsgTypeBitMask(MsgBeginRedelegate),
 			want:  true,
 		}, {
 			name:  "test 3",
-			mask:  NewMsgTypeBitMask(MsgTypeBeginRedelegate),
-			value: NewMsgTypeBitMask(MsgTypeBeginRedelegate, MsgTypeDelegate, MsgTypeSend),
+			mask:  NewMsgTypeBitMask(MsgBeginRedelegate),
+			value: NewMsgTypeBitMask(MsgBeginRedelegate, MsgDelegate, MsgSend),
 			want:  true,
 		}, {
 			name:  "test 4",
-			mask:  NewMsgTypeBitMask(MsgTypeBeginRedelegate),
-			value: NewMsgTypeBitMask(MsgTypeDelegate, MsgTypeSend),
+			mask:  NewMsgTypeBitMask(MsgBeginRedelegate),
+			value: NewMsgTypeBitMask(MsgDelegate, MsgSend),
 			want:  false,
 		},
 	}

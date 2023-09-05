@@ -21,9 +21,9 @@ func TestTxFilter_Filter(t *testing.T) {
 				filters: &filters{},
 			},
 			msg: responses.Tx{
-				Status: string(types.StatusSuccess),
-				MessageTypes: []string{
-					string(types.MsgTypeBeginRedelegate),
+				Status: types.StatusSuccess,
+				MessageTypes: []types.MsgType{
+					types.MsgBeginRedelegate,
 				},
 			},
 			want: false,
@@ -32,13 +32,13 @@ func TestTxFilter_Filter(t *testing.T) {
 			c: &Client{
 				filters: &filters{
 					tx: &txFilters{
-						msgs: types.NewMsgTypeBitMask(types.MsgTypeBeginRedelegate),
+						msgs: types.NewMsgTypeBitMask(types.MsgBeginRedelegate),
 					},
 				},
 			},
 			msg: responses.Tx{
-				Status:      string(types.StatusSuccess),
-				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgTypeBeginRedelegate),
+				Status:      types.StatusSuccess,
+				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgBeginRedelegate),
 			},
 			want: true,
 		}, {
@@ -46,13 +46,13 @@ func TestTxFilter_Filter(t *testing.T) {
 			c: &Client{
 				filters: &filters{
 					tx: &txFilters{
-						msgs: types.NewMsgTypeBitMask(types.MsgTypeSend),
+						msgs: types.NewMsgTypeBitMask(types.MsgSend),
 					},
 				},
 			},
 			msg: responses.Tx{
-				Status:      string(types.StatusSuccess),
-				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgTypeBeginRedelegate),
+				Status:      types.StatusSuccess,
+				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgBeginRedelegate),
 			},
 			want: false,
 		}, {
@@ -60,15 +60,15 @@ func TestTxFilter_Filter(t *testing.T) {
 			c: &Client{
 				filters: &filters{
 					tx: &txFilters{
-						status: map[string]struct{}{
-							string(types.StatusSuccess): {},
+						status: map[types.Status]struct{}{
+							types.StatusSuccess: {},
 						},
 					},
 				},
 			},
 			msg: responses.Tx{
-				Status:      string(types.StatusSuccess),
-				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgTypeBeginRedelegate),
+				Status:      types.StatusSuccess,
+				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgBeginRedelegate),
 			},
 			want: true,
 		}, {
@@ -76,15 +76,15 @@ func TestTxFilter_Filter(t *testing.T) {
 			c: &Client{
 				filters: &filters{
 					tx: &txFilters{
-						status: map[string]struct{}{
-							string(types.StatusFailed): {},
+						status: map[types.Status]struct{}{
+							types.StatusFailed: {},
 						},
 					},
 				},
 			},
 			msg: responses.Tx{
-				Status:      string(types.StatusSuccess),
-				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgTypeBeginRedelegate),
+				Status:      types.StatusSuccess,
+				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgBeginRedelegate),
 			},
 			want: false,
 		}, {
@@ -92,16 +92,16 @@ func TestTxFilter_Filter(t *testing.T) {
 			c: &Client{
 				filters: &filters{
 					tx: &txFilters{
-						status: map[string]struct{}{
-							string(types.StatusSuccess): {},
+						status: map[types.Status]struct{}{
+							types.StatusSuccess: {},
 						},
-						msgs: types.NewMsgTypeBitMask(types.MsgTypeSend),
+						msgs: types.NewMsgTypeBitMask(types.MsgSend),
 					},
 				},
 			},
 			msg: responses.Tx{
-				Status:      string(types.StatusSuccess),
-				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgTypeSend),
+				Status:      types.StatusSuccess,
+				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgSend),
 			},
 			want: true,
 		}, {
@@ -109,16 +109,16 @@ func TestTxFilter_Filter(t *testing.T) {
 			c: &Client{
 				filters: &filters{
 					tx: &txFilters{
-						status: map[string]struct{}{
-							string(types.StatusFailed): {},
+						status: map[types.Status]struct{}{
+							types.StatusFailed: {},
 						},
-						msgs: types.NewMsgTypeBitMask(types.MsgTypeSend),
+						msgs: types.NewMsgTypeBitMask(types.MsgSend),
 					},
 				},
 			},
 			msg: responses.Tx{
-				Status:      string(types.StatusSuccess),
-				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgTypeSend),
+				Status:      types.StatusSuccess,
+				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgSend),
 			},
 			want: false,
 		}, {
@@ -126,16 +126,16 @@ func TestTxFilter_Filter(t *testing.T) {
 			c: &Client{
 				filters: &filters{
 					tx: &txFilters{
-						status: map[string]struct{}{
-							string(types.StatusFailed): {},
+						status: map[types.Status]struct{}{
+							types.StatusFailed: {},
 						},
-						msgs: types.NewMsgTypeBitMask(types.MsgTypeBeginRedelegate),
+						msgs: types.NewMsgTypeBitMask(types.MsgBeginRedelegate),
 					},
 				},
 			},
 			msg: responses.Tx{
-				Status:      string(types.StatusSuccess),
-				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgTypeSend),
+				Status:      types.StatusSuccess,
+				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgSend),
 			},
 			want: false,
 		}, {
@@ -144,8 +144,8 @@ func TestTxFilter_Filter(t *testing.T) {
 				filters: newFilters(),
 			},
 			msg: responses.Tx{
-				Status:      string(types.StatusSuccess),
-				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgTypeSend),
+				Status:      types.StatusSuccess,
+				MsgTypeMask: types.NewMsgTypeBitMask(types.MsgSend),
 			},
 			want: true,
 		},

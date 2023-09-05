@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 )
 
 type Message struct {
@@ -13,7 +14,7 @@ type Message struct {
 	Position uint64    `example:"2"                         format:"int64"     json:"position"        swaggertype:"integer"`
 	TxId     uint64    `example:"11"                        format:"int64"     json:"tx_id,omitempty" swaggertype:"integer"`
 
-	Type string `enums:"MsgWithdrawValidatorCommission,MsgWithdrawDelegatorReward,MsgEditValidator,MsgBeginRedelegate,MsgCreateValidator,MsgDelegate,MsgUndelegate,MsgUnjail,MsgSend,MsgCreateVestingAccount,MsgCreatePeriodicVestingAccount,MsgPayForBlobs,MsgGrantAllowance" example:"MsgCreatePeriodicVestingAccount" format:"string" json:"type" swaggertype:"string"`
+	Type types.MsgType `example:"MsgCreatePeriodicVestingAccount" json:"type"`
 
 	Data map[string]any `json:"data"`
 }
@@ -24,7 +25,7 @@ func NewMessage(msg storage.Message) Message {
 		Height:   uint64(msg.Height),
 		Time:     msg.Time,
 		Position: msg.Position,
-		Type:     string(msg.Type),
+		Type:     msg.Type,
 		TxId:     msg.TxId,
 		Data:     msg.Data,
 	}

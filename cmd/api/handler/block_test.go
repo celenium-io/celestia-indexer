@@ -25,7 +25,7 @@ var (
 		VersionBlock: 11,
 		VersionApp:   1,
 		Time:         testTime,
-		MessageTypes: types.NewMsgTypeBitMask(types.MsgTypeSend),
+		MessageTypes: types.NewMsgTypeBitMask(types.MsgSend),
 	}
 
 	testTime = time.Date(2023, 8, 1, 1, 1, 0, 0, time.UTC)
@@ -85,7 +85,7 @@ func (s *BlockTestSuite) TestGet() {
 	s.Require().Equal("11", block.VersionBlock)
 	s.Require().Equal("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", block.Hash)
 	s.Require().Equal(testTime, block.Time)
-	s.Require().Equal([]string{string(types.MsgTypeSend)}, block.MessageTypes)
+	s.Require().Equal([]types.MsgType{types.MsgSend}, block.MessageTypes)
 }
 
 func (s *BlockTestSuite) TestGetInvalidBlockHeight() {
@@ -130,7 +130,7 @@ func (s *BlockTestSuite) TestList() {
 	s.Require().Equal("11", blocks[0].VersionBlock)
 	s.Require().Equal("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", blocks[0].Hash)
 	s.Require().Equal(testTime, blocks[0].Time)
-	s.Require().Equal([]string{string(types.MsgTypeSend)}, blocks[0].MessageTypes)
+	s.Require().Equal([]types.MsgType{types.MsgSend}, blocks[0].MessageTypes)
 }
 
 func (s *BlockTestSuite) TestGetEvents() {
@@ -168,5 +168,5 @@ func (s *BlockTestSuite) TestGetEvents() {
 	s.Require().EqualValues(100, events[0].Height)
 	s.Require().EqualValues(2, events[0].Position)
 	s.Require().Equal(testTime, events[0].Time)
-	s.Require().Equal(string(types.EventTypeBurn), events[0].Type)
+	s.Require().Equal(types.EventTypeBurn, events[0].Type)
 }

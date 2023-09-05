@@ -24,9 +24,8 @@ type Tx struct {
 	Memo          string    `example:"Transfer to private account"                                      format:"string"    json:"memo,omitempty"      swaggertype:"string"`
 	Time          time.Time `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                swaggertype:"string"`
 
-	MessageTypes []string `example:"MsgSend,MsgUnjail" json:"message_types" swaggertype:"array,string"`
-
-	Status string `enums:"success,failed" example:"success" format:"string" json:"status" swaggertype:"string"`
+	MessageTypes []types.MsgType `example:"MsgSend,MsgUnjail" json:"message_types"`
+	Status       types.Status    `example:"success"           json:"status"`
 
 	MsgTypeMask types.MsgTypeBits `json:"-"`
 }
@@ -43,7 +42,7 @@ func NewTx(tx storage.Tx) Tx {
 		EventsCount:   tx.EventsCount,
 		MessagesCount: tx.MessagesCount,
 		Fee:           tx.Fee.String(),
-		Status:        string(tx.Status),
+		Status:        tx.Status,
 		Error:         tx.Error,
 		Codespace:     tx.Codespace,
 		Hash:          hex.EncodeToString(tx.Hash),

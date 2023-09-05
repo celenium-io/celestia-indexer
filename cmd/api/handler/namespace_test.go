@@ -251,7 +251,7 @@ func (s *NamespaceTestSuite) TestGetMessages() {
 					Id:       1,
 					TxId:     2,
 					Position: 3,
-					Type:     types.MsgTypeBeginRedelegate,
+					Type:     types.MsgBeginRedelegate,
 					Height:   100,
 					Time:     testTime,
 				},
@@ -273,6 +273,6 @@ func (s *NamespaceTestSuite) TestGetMessages() {
 	s.Require().EqualValues(100, msg.Height)
 	s.Require().EqualValues(3, msg.Position)
 	s.Require().Equal(testTime, msg.Time)
-	s.Require().EqualValues(string(types.MsgTypeBeginRedelegate), msg.Type)
+	s.Require().EqualValues(string(types.MsgBeginRedelegate), msg.Type)
 	s.Require().EqualValues(1, msg.Tx.Id)
 }

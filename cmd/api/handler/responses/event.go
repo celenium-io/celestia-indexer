@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 )
 
 type Event struct {
@@ -13,7 +14,7 @@ type Event struct {
 	Position uint64    `example:"1"                         format:"int64"     json:"position"        swaggertype:"integer"`
 	TxId     uint64    `example:"11"                        format:"int64"     json:"tx_id,omitempty" swaggertype:"integer"`
 
-	Type string `enums:"coin_received,coinbase,coin_spent,burn,mint,message,proposer_reward,rewards,commission,liveness,attestation_request,transfer,celestia.blob.v1.EventPayForBlobs,redelegate,withdraw_rewards,withdraw_commission,create_validator,delegate,edit_validator,unbond,tx,use_feegrant,revoke_feegrant,set_feegrant,update_feegrant,unknown" example:"commission" format:"string" json:"type" swaggertype:"string"`
+	Type types.EventType `example:"commission" json:"type"`
 
 	Data map[string]any `json:"data"`
 }
@@ -24,7 +25,7 @@ func NewEvent(event storage.Event) Event {
 		Height:   uint64(event.Height),
 		Time:     event.Time,
 		Position: event.Position,
-		Type:     string(event.Type),
+		Type:     event.Type,
 		Data:     event.Data,
 	}
 

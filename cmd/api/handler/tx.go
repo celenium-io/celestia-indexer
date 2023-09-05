@@ -66,14 +66,14 @@ func (handler *TxHandler) Get(c echo.Context) error {
 //	@Description	List transactions info
 //	@Tags			transactions
 //	@ID				list-transactions
-//	@Param			limit		query	integer	false	"Count of requested entities"			mininum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"								mininum(1)
-//	@Param			sort		query	string	false	"Sort order"							Enums(asc, desc)
-//	@Param			status		query	string	false	"Comma-separated status list"			Enums(success, failed)
-//	@Param			msg_type	query	string	false	"Comma-separated message types list"	Enums(MsgWithdrawValidatorCommission,MsgWithdrawDelegatorReward,MsgEditValidator,MsgBeginRedelegate,MsgCreateValidator,MsgDelegate,MsgUndelegate,MsgUnjail,MsgSend,MsgCreateVestingAccount,MsgCreatePeriodicVestingAccount,MsgPayForBlobs,MsgGrantAllowance)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"			mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"				mininum(1)
-//	@Param			height		query	integer	false	"Block number"							mininum(1)
+//	@Param			limit		query	integer			false	"Count of requested entities"			mininum(1)	maximum(100)
+//	@Param			offset		query	integer			false	"Offset"								mininum(1)
+//	@Param			sort		query	string			false	"Sort order"							Enums(asc, desc)
+//	@Param			status		query	types.Status	false	"Comma-separated status list"
+//	@Param			msg_type	query	types.MsgType	false	"Comma-separated message types list"
+//	@Param			from		query	integer			false	"Time from in unix timestamp"			mininum(1)
+//	@Param			to			query	integer			false	"Time to in unix timestamp"				mininum(1)
+//	@Param			height		query	integer			false	"Block number"							mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error

@@ -62,12 +62,14 @@ func addressValidator() validator.Func {
 
 func statusValidator() validator.Func {
 	return func(fl validator.FieldLevel) bool {
-		return types.IsStatus(fl.Field().String())
+		_, err := types.ParseStatus(fl.Field().String())
+		return err == nil
 	}
 }
 
 func msgTypeValidator() validator.Func {
 	return func(fl validator.FieldLevel) bool {
-		return types.IsMsgType(fl.Field().String())
+		_, err := types.ParseMsgType(fl.Field().String())
+		return err == nil
 	}
 }
