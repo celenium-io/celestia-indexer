@@ -146,7 +146,7 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 
 	addresses := make([]storage.Address, 5)
 	for i := 0; i < 5; i++ {
-		addresses[i].Height = uint64(10000 + i)
+		addresses[i].Height = storage.Level(10000 + i)
 		addresses[i].Balance = decimal.NewFromInt(int64(i * 100))
 		hash := make([]byte, 32)
 		_, err := rand.Read(hash)

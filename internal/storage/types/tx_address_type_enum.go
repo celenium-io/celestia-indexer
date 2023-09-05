@@ -25,6 +25,12 @@ const (
 	TxAddressTypeFromAddress TxAddressType = "fromAddress"
 	// TxAddressTypeToAddress is a TxAddressType of type toAddress.
 	TxAddressTypeToAddress TxAddressType = "toAddress"
+	// TxAddressTypeGrantee is a TxAddressType of type grantee.
+	TxAddressTypeGrantee TxAddressType = "grantee"
+	// TxAddressTypeGranter is a TxAddressType of type granter.
+	TxAddressTypeGranter TxAddressType = "granter"
+	// TxAddressTypeSigner is a TxAddressType of type signer.
+	TxAddressTypeSigner TxAddressType = "signer"
 )
 
 var ErrInvalidTxAddressType = errors.New("not a valid TxAddressType")
@@ -38,6 +44,9 @@ func TxAddressTypeValues() []TxAddressType {
 		TxAddressTypeValidatorDstAddress,
 		TxAddressTypeFromAddress,
 		TxAddressTypeToAddress,
+		TxAddressTypeGrantee,
+		TxAddressTypeGranter,
+		TxAddressTypeSigner,
 	}
 }
 
@@ -60,6 +69,9 @@ var _TxAddressTypeValue = map[string]TxAddressType{
 	"validatorDstAddress": TxAddressTypeValidatorDstAddress,
 	"fromAddress":         TxAddressTypeFromAddress,
 	"toAddress":           TxAddressTypeToAddress,
+	"grantee":             TxAddressTypeGrantee,
+	"granter":             TxAddressTypeGranter,
+	"signer":              TxAddressTypeSigner,
 }
 
 // ParseTxAddressType attempts to convert a string to a TxAddressType.

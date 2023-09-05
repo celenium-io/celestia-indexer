@@ -34,8 +34,8 @@ func (r *Receiver) worker(ctx context.Context, level storage.Level) {
 		break
 	}
 
-	r.log.Info().
-		Int64("height", int64(result.Height)).
+	r.log.Debug().
+		Uint64("height", uint64(result.Height)).
 		Int64("ms", time.Since(start).Milliseconds()).
 		Msg("received block data")
 	r.blocks <- result

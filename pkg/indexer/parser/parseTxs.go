@@ -47,6 +47,7 @@ func parseTx(b types.BlockData, index int, txRes *nodeTypes.ResponseDeliverTx) (
 
 		Messages:  make([]storage.Message, len(d.messages)),
 		Events:    nil,
+		Addresses: make([]storage.AddressWithType, 0),
 		BlobsSize: 0,
 	}
 
@@ -58,14 +59,15 @@ func parseTx(b types.BlockData, index int, txRes *nodeTypes.ResponseDeliverTx) (
 	t.Events = parseEvents(b, txRes.Events)
 
 	for position, sdkMsg := range d.messages {
-		msg, blobsSize, err := decodeMsg(b, sdkMsg, position)
+		dm, err := decodeMsg(b, sdkMsg, position)
 		if err != nil {
 			return storage.Tx{}, errors.Wrapf(err, "while parsing tx=%v on index=%d", t.Hash, t.Position)
 		}
 
-		t.Messages[position] = msg
-		t.MessageTypes.SetBit(msg.Type)
-		t.BlobsSize += blobsSize
+		t.Messages[position] = dm.msg
+		t.MessageTypes.SetBit(dm.msg.Type)
+		t.BlobsSize += dm.blobsSize
+		t.Addresses = append(t.Addresses, dm.addresses...)
 	}
 
 	return t, nil

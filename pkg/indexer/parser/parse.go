@@ -7,10 +7,14 @@ import (
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
+	"time"
 )
 
 func (p *Parser) parse(ctx context.Context, b types.BlockData) error {
-	p.log.Info().Int64("height", b.Block.Height).Msg("parsing block...")
+	start := time.Now()
+	p.log.Info().
+		Int64("height", b.Block.Height).
+		Msg("parsing block...")
 
 	txs, err := parseTxs(b)
 	if err != nil {
@@ -56,6 +60,11 @@ func (p *Parser) parse(ctx context.Context, b types.BlockData) error {
 	block.Events = parseEvents(b, b.ResultBlockResults.BeginBlockEvents)
 	endEvents := parseEvents(b, b.ResultBlockResults.EndBlockEvents)
 	block.Events = append(block.Events, endEvents...)
+
+	p.log.Debug().
+		Uint64("height", uint64(block.Height)).
+		Int64("ms", time.Since(start).Milliseconds()).
+		Msg("parsed block")
 
 	p.output.Push(block)
 	return nil

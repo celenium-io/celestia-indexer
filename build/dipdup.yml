@@ -5,7 +5,7 @@ log_level: ${LOG_LEVEL:-info}
 indexer:
   name: ${INDEXER_NAME:-dipdup_celestia_indexer}
   threads_count: ${INDEXER_THREADS_COUNT:-1}
-  start_level: 412000 # 1 # TODO remove in production
+  start_level: 1 # TODO remove in production
 
 database:
   kind: postgres

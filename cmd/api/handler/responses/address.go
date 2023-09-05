@@ -19,7 +19,7 @@ func NewAddress(addr storage.Address) (Address, error) {
 	}
 	return Address{
 		Id:      addr.Id,
-		Height:  addr.Height,
+		Height:  uint64(addr.Height),
 		Balance: addr.Balance.String(),
 		Hash:    hash,
 	}, nil
