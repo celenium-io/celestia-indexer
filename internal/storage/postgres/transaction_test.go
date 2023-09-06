@@ -82,7 +82,7 @@ func (s *StorageTestSuite) TestSaveNamespaces() {
 	s.Require().NoError(err)
 
 	namespaceId := []byte{0x5F, 0x7A, 0x8D, 0xDF, 0xE6, 0x13, 0x6F, 0xE7, 0x6B, 0x65, 0xB9, 0x06, 0x6D, 0x4F, 0x81, 0x6D, 0x70, 0x7F}
-	namespaces := []storage.Namespace{
+	namespaces := []*storage.Namespace{
 		{
 			Version:     0,
 			NamespaceID: namespaceId,
@@ -144,14 +144,17 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	addresses := make([]storage.Address, 5)
+	addresses := make([]*storage.Address, 0, 5)
 	for i := 0; i < 5; i++ {
-		addresses[i].Height = storage.Level(10000 + i)
-		addresses[i].Balance = decimal.NewFromInt(int64(i * 100))
 		hash := make([]byte, 32)
 		_, err := rand.Read(hash)
 		s.NoError(err)
-		addresses[i].Hash = hash
+
+		addresses = append(addresses, &storage.Address{
+			Height:  storage.Level(10000 + i),
+			Balance: decimal.NewFromInt(int64(i * 100)),
+			Hash:    hash,
+		})
 	}
 
 	err = tx.SaveAddresses(ctx, addresses...)
@@ -171,6 +174,27 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 		s.Require().EqualValues(i*100, address.Balance.IntPart())
 		s.Require().Len(address.Hash, 32)
 	}
+}
+
+func (s *StorageTestSuite) TestSaveTxAddresses() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	addresses := make([]storage.TxAddress, 5)
+	for i := 0; i < 5; i++ {
+		addresses[i].AddressId = uint64(i)
+		addresses[i].TxId = uint64(5 - i)
+		addresses[i].Type = types.TxAddressTypeFromAddress
+	}
+
+	err = tx.SaveTxAddresses(ctx, addresses...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
 }
 
 func (s *StorageTestSuite) TestRollbackBlock() {

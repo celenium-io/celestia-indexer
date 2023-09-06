@@ -31,7 +31,7 @@ func (tx Transaction) SaveTransactions(ctx context.Context, txs ...models.Tx) er
 	}
 }
 
-func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...models.Namespace) error {
+func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...*models.Namespace) error {
 	if len(namespaces) == 0 {
 		return nil
 	}
@@ -46,7 +46,7 @@ func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...models.N
 	return err
 }
 
-func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...models.Address) error {
+func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...*models.Address) error {
 	if len(addresses) == 0 {
 		return nil
 	}
@@ -57,6 +57,15 @@ func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...models.Add
 		Set("balance = EXCLUDED.balance + address.balance").
 		Returning("id").
 		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveTxAddresses(ctx context.Context, addresses ...models.TxAddress) error {
+	if len(addresses) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&addresses).Exec(ctx)
 	return err
 }
 
