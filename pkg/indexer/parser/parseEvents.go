@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"encoding/base64"
+
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/node/types"
@@ -28,8 +30,20 @@ func parseEvent(b types.BlockData, eN nodeTypes.Event, index int) storage.Event 
 	}
 
 	for _, attr := range eN.Attributes {
-		event.Data[string(attr.Key)] = attr.Value // TODO: create actual unmarshalling bytes
+		key := decodeEventAttribute(attr.Key)
+		value := decodeEventAttribute(attr.Value)
+		event.Data[key] = value
 	}
 
 	return event
+}
+
+var b64 = base64.StdEncoding
+
+func decodeEventAttribute(data string) string {
+	dst, err := b64.DecodeString(data)
+	if err != nil {
+		return data
+	}
+	return string(dst)
 }

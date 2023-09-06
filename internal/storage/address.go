@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"encoding/hex"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/shopspring/decimal"
@@ -28,4 +29,8 @@ type Address struct {
 // TableName -
 func (Address) TableName() string {
 	return "address"
+}
+
+func (address Address) String() string {
+	return hex.EncodeToString(address.Hash)
 }

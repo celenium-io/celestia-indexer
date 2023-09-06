@@ -1,10 +1,11 @@
 package parser
 
 import (
+	"testing"
+
 	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/node/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestDecodeTx_TxWithMemo(t *testing.T) {
@@ -16,8 +17,8 @@ func TestDecodeTx_TxWithMemo(t *testing.T) {
 		GasWanted: 200000,
 		GasUsed:   170049,
 		Events: []nodeTypes.Event{{Type: "coin_received", Attributes: []nodeTypes.EventAttribute{
-			{Key: []byte("receiver"), Value: []byte("celestia1h2kqw44hdq5dwlcvsw8f2l49lkehtf9wp95kth")},
-			{Key: []byte("amount"), Value: []byte("1562utia")},
+			{Key: "receiver", Value: "celestia1h2kqw44hdq5dwlcvsw8f2l49lkehtf9wp95kth"},
+			{Key: "amount", Value: "1562utia"},
 		}}},
 		Codespace: "",
 	}
