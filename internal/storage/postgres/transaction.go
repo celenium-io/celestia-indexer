@@ -69,6 +69,15 @@ func (tx Transaction) SaveTxAddresses(ctx context.Context, addresses ...models.T
 	return err
 }
 
+func (tx Transaction) SaveNamespaceMessage(ctx context.Context, nsMsgs ...models.NamespaceMessage) error {
+	if len(nsMsgs) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&nsMsgs).Exec(ctx)
+	return err
+}
+
 func (tx Transaction) LastBlock(ctx context.Context) (block models.Block, err error) {
 	err = tx.Tx().NewSelect().Model(&block).Order("id desc").Limit(1).Scan(ctx)
 	return

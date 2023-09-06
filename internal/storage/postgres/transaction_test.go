@@ -185,12 +185,33 @@ func (s *StorageTestSuite) TestSaveTxAddresses() {
 
 	addresses := make([]storage.TxAddress, 5)
 	for i := 0; i < 5; i++ {
-		addresses[i].AddressId = uint64(i)
+		addresses[i].AddressId = uint64(i + 1)
 		addresses[i].TxId = uint64(5 - i)
 		addresses[i].Type = types.TxAddressTypeFromAddress
 	}
 
 	err = tx.SaveTxAddresses(ctx, addresses...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *StorageTestSuite) TestSaveNamespaceMessages() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	nsMsgs := make([]storage.NamespaceMessage, 5)
+	for i := 0; i < 5; i++ {
+		nsMsgs[i].MsgId = uint64(i + 1)
+		nsMsgs[i].NamespaceId = uint64(5 - i)
+		nsMsgs[i].TxId = uint64((i + 1) * 2)
+	}
+
+	err = tx.SaveNamespaceMessage(ctx, nsMsgs...)
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))

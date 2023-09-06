@@ -205,9 +205,7 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 
 			for k := range block.Txs[i].Messages[j].Namespace {
 				key := block.Txs[i].Messages[j].Namespace[k].String()
-				if ns, ok := namespaces[key]; ok {
-					ns.PfbCount += 1
-				} else {
+				if _, ok := namespaces[key]; !ok {
 					block.Txs[i].Messages[j].Namespace[k].PfbCount = 1
 					namespaces[key] = &block.Txs[i].Messages[j].Namespace[k]
 				}
@@ -261,26 +259,27 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 		}
 	}
 
-	var namespaceMsgs []any
-	for _, m := range messages {
-		msg, ok := m.(*storage.Message)
+	var namespaceMsgs []storage.NamespaceMessage
+	for i := range messages {
+		msg, ok := messages[i].(*storage.Message)
 		if !ok {
 			continue
 		}
-		for _, ns := range msg.Namespace {
-			namespaceMsgs = append(namespaceMsgs, &storage.NamespaceMessage{
+		for j := range msg.Namespace {
+			if msg.Namespace[j].Id == 0 { // in case of duplication of writing to one namespace inside one messages
+				continue
+			}
+			namespaceMsgs = append(namespaceMsgs, storage.NamespaceMessage{
 				MsgId:       msg.Id,
-				NamespaceId: ns.Id,
+				NamespaceId: msg.Namespace[j].Id,
 				Time:        msg.Time,
 				Height:      msg.Height,
 				TxId:        msg.TxId,
 			})
 		}
 	}
-	if len(namespaceMsgs) > 0 {
-		if err := tx.BulkSave(ctx, namespaceMsgs); err != nil {
-			return tx.HandleError(ctx, err)
-		}
+	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
+		return tx.HandleError(ctx, err)
 	}
 
 	var txAddresses []storage.TxAddress
