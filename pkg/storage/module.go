@@ -2,6 +2,8 @@ package storage
 
 import (
 	"context"
+	"encoding/hex"
+	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	"strconv"
 	"time"
 
@@ -16,8 +18,6 @@ import (
 
 // InputName -
 const InputName = "data"
-
-const defaultIndexerName = "celestia-indexer"
 
 // Module - saves received from input block to storage.
 //
@@ -35,20 +35,16 @@ type Module struct {
 }
 
 // NewModule -
-func NewModule(pg postgres.Storage, opts ...ModuleOption) Module {
+func NewModule(pg postgres.Storage, cfg config.Indexer) Module {
 	m := Module{
 		storage: pg,
 		input:   modules.NewInput(InputName),
 		state: &storage.State{
-			Name: defaultIndexerName,
+			Name: cfg.Name,
 		},
 		g: workerpool.NewGroup(),
 	}
 	m.log = log.With().Str("module", m.Name()).Logger()
-
-	for i := range opts {
-		opts[i](&m)
-	}
 
 	return m
 }
@@ -68,6 +64,7 @@ func (module *Module) initState(ctx context.Context) error {
 		module.log.Info().
 			Str("indexer_name", module.state.Name).
 			Uint64("height", uint64(module.state.LastHeight)).
+			Str("hash", hex.EncodeToString(module.state.LastHash)).
 			Time("last_updated", module.state.LastTime).
 			Msg("current state")
 		return nil
@@ -159,6 +156,7 @@ func (module *Module) updateState(block storage.Block, totalAccounts uint64) {
 	}
 
 	module.state.LastHeight = block.Height
+	module.state.LastHash = block.Hash
 	module.state.LastTime = block.Time
 	module.state.TotalTx += block.TxCount
 	module.state.TotalAccounts += totalAccounts

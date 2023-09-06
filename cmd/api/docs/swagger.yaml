@@ -261,6 +261,10 @@ definitions:
     type: object
   responses.State:
     properties:
+      hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        format: string
+        type: string
       id:
         example: 321
         format: int64

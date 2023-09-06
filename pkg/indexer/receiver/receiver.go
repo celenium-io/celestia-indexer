@@ -21,25 +21,42 @@ const (
 
 type Receiver struct {
 	api     node.API
-	cfg     config.Config
+	cfg     config.Indexer
 	outputs map[string]*modules.Output
 	pool    *workerpool.Pool[storage.Level]
 	blocks  chan types.BlockData
+	level   storage.Level
+	hash    []byte
+	mx      *sync.RWMutex
 	log     zerolog.Logger
 	wg      *sync.WaitGroup
 }
 
-func NewModule(cfg config.Config, api node.API) Receiver {
+func NewModule(cfg config.Indexer, api node.API, state *storage.State) Receiver {
+	var level storage.Level
+	var hash []byte
+
+	if state == nil {
+		level = storage.Level(cfg.StartLevel)
+		// TODO-DISCUSS check for hash changed of state last block
+	} else {
+		level = state.LastHeight
+		hash = state.LastHash
+	}
+
 	receiver := Receiver{
 		api:     api,
 		cfg:     cfg,
 		outputs: map[string]*modules.Output{BlocksOutput: modules.NewOutput(BlocksOutput)},
-		blocks:  make(chan types.BlockData, cfg.Indexer.ThreadsCount*10),
+		blocks:  make(chan types.BlockData, cfg.ThreadsCount*10),
+		level:   level,
+		hash:    hash,
+		mx:      new(sync.RWMutex),
 		log:     log.With().Str("module", name).Logger(),
 		wg:      new(sync.WaitGroup),
 	}
 
-	receiver.pool = workerpool.NewPool(receiver.worker, int(cfg.Indexer.ThreadsCount))
+	receiver.pool = workerpool.NewPool(receiver.worker, int(cfg.ThreadsCount))
 
 	return receiver
 }
@@ -56,10 +73,8 @@ func (r *Receiver) Start(ctx context.Context) {
 	r.wg.Add(1)
 	go r.sequencer(ctx)
 
-	if err := r.readBlocks(ctx); err != nil {
-		r.log.Err(err).Msg("read block")
-		return
-	}
+	r.wg.Add(1)
+	go r.sync(ctx)
 }
 
 func (r *Receiver) Close() error {
@@ -95,4 +110,19 @@ func (r *Receiver) AttachTo(outputName string, input *modules.Input) error {
 
 	output.Attach(input)
 	return nil
+}
+
+func (r *Receiver) Level() (storage.Level, []byte) {
+	r.mx.RLock()
+	defer r.mx.RUnlock()
+
+	return r.level, r.hash
+}
+
+func (r *Receiver) setLevel(level storage.Level, hash []byte) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+
+	r.level = level
+	r.hash = hash
 }

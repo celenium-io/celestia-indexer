@@ -65,7 +65,7 @@ func (p *Parser) parse(ctx context.Context, b types.BlockData) error {
 	p.log.Debug().
 		Uint64("height", uint64(block.Height)).
 		Int64("ms", time.Since(start).Milliseconds()).
-		Msg("parsed block")
+		Msg("block parsed")
 
 	p.output.Push(block)
 	return nil

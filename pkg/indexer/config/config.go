@@ -1,6 +1,8 @@
 package config
 
-import "github.com/dipdup-net/go-lib/config"
+import (
+	"github.com/dipdup-net/go-lib/config"
+)
 
 type Config struct {
 	config.Config `yaml:",inline"`
@@ -12,6 +14,7 @@ type Indexer struct {
 	Name         string `validate:"omitempty"       yaml:"name"`
 	ThreadsCount uint32 `validate:"omitempty,min=1" yaml:"threads_count"`
 	StartLevel   int64  `validate:"omitempty"       yaml:"start_level"`
+	BlockPeriod  int64  `validate:"omitempty"       yaml:"block_period"`
 }
 
 // Substitute -

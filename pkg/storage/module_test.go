@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/hex"
+	indexerCfg "github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	"testing"
 	"time"
 
@@ -77,7 +78,7 @@ func (s *ModuleTestSuite) TestBlockLast() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer ctxCancel()
 
-	module := NewModule(s.storage, WithIndexerName(testIndexerName))
+	module := NewModule(s.storage, indexerCfg.Indexer{Name: testIndexerName})
 	module.Start(ctx)
 
 	hash, err := hex.DecodeString("F44BC94BF7D064ADF82618F2691D2353161DE232ECB3091B7E5C89B453C79456")

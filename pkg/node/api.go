@@ -9,6 +9,7 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type API interface {
+	Status(ctx context.Context) (types.Status, error)
 	Head(ctx context.Context) (types.ResultBlock, error)
 	Block(ctx context.Context, level storage.Level) (types.ResultBlock, error)
 	BlockResults(ctx context.Context, level storage.Level) (types.ResultBlockResults, error)

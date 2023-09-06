@@ -1587,6 +1587,11 @@ const docTemplate = `{
         "responses.State": {
             "type": "object",
             "properties": {
+                "hash": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
                 "id": {
                     "type": "integer",
                     "format": "int64",

@@ -2,6 +2,7 @@ package indexer
 
 import (
 	"context"
+	internalStorage "github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/parser"
 	"github.com/dipdup-io/celestia-indexer/pkg/node"
 	"github.com/dipdup-io/celestia-indexer/pkg/node/rpc"
@@ -27,9 +28,18 @@ type Indexer struct {
 }
 
 func New(ctx context.Context, cfg config.Config) (Indexer, error) {
+	pg, err := postgres.Create(ctx, cfg.Database)
+	if err != nil {
+		return Indexer{}, errors.Wrap(err, "while creating pg context")
+	}
+
+	state, err := LoadState(pg, ctx, cfg.Indexer.Name)
+	if err != nil {
+		return Indexer{}, errors.Wrap(err, "while loading state")
+	}
 
 	api := rpc.NewAPI(cfg.DataSources["node_rpc"])
-	r := receiver.NewModule(cfg, &api)
+	r := receiver.NewModule(cfg.Indexer, &api, state)
 
 	p := parser.NewModule()
 	pInput, err := p.Input(parser.BlocksInput)
@@ -40,12 +50,7 @@ func New(ctx context.Context, cfg config.Config) (Indexer, error) {
 		return Indexer{}, err
 	}
 
-	pg, err := postgres.Create(ctx, cfg.Database)
-	if err != nil {
-		log.Err(err).Msg("creating pg context in indexer")
-	}
-
-	s := storage.NewModule(pg)
+	s := storage.NewModule(pg, cfg.Indexer)
 	sInput, err := s.Input(storage.InputName)
 	if err != nil {
 		return Indexer{}, errors.Wrap(err, "cannot find input in storage")
@@ -68,9 +73,9 @@ func New(ctx context.Context, cfg config.Config) (Indexer, error) {
 func (i *Indexer) Start(ctx context.Context) {
 	i.log.Info().Msg("starting...")
 
-	go i.storage.Start(ctx)
-	go i.parser.Start(ctx)
-	go i.receiver.Start(ctx)
+	i.storage.Start(ctx)
+	i.parser.Start(ctx)
+	i.receiver.Start(ctx)
 }
 
 func (i *Indexer) Close() error {
@@ -82,4 +87,17 @@ func (i *Indexer) Close() error {
 	}
 
 	return nil
+}
+
+func LoadState(pg postgres.Storage, ctx context.Context, indexerName string) (*internalStorage.State, error) {
+	state, err := pg.State.ByName(ctx, indexerName)
+	if err != nil {
+		if pg.State.IsNoRows(err) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &state, nil
 }
