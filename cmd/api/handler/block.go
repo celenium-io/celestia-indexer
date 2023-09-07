@@ -9,19 +9,23 @@ import (
 )
 
 type BlockHandler struct {
-	block  storage.IBlock
-	events storage.IEvent
+	block      storage.IBlock
+	blockStats storage.IBlockStats
+	events     storage.IEvent
 }
 
-func NewBlockHandler(block storage.IBlock, events storage.IEvent) *BlockHandler {
+func NewBlockHandler(block storage.IBlock, blockStats storage.IBlockStats, events storage.IEvent) *BlockHandler {
 	return &BlockHandler{
-		block:  block,
-		events: events,
+		block:      block,
+		blockStats: blockStats,
+		events:     events,
 	}
 }
 
 type getBlockRequest struct {
 	Height uint64 `param:"height" validate:"required,min=1"`
+
+	Stats bool `query:"stats" validate:"omitempty"`
 }
 
 // Get godoc
@@ -31,6 +35,7 @@ type getBlockRequest struct {
 //	@Tags			block
 //	@ID				get-block
 //	@Param			height	path	integer	true	"Block height"	minimum(1)
+//	@Param			stats	query	boolean	false 	"Need join stats for block"
 //	@Produce		json
 //	@Success		200	{object}	responses.Block
 //	@Success		204
@@ -48,7 +53,23 @@ func (handler *BlockHandler) Get(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, responses.NewBlock(block))
+	return c.JSON(http.StatusOK, responses.NewBlock(block, req.Stats))
+}
+
+type blockListRequest struct {
+	Limit  uint64 `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset uint64 `query:"offset" validate:"omitempty,min=0"`
+	Sort   string `query:"sort"   validate:"omitempty,oneof=asc desc"`
+	Stats  bool   `query:"stats"  validate:"omitempty"`
+}
+
+func (p *blockListRequest) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+	if p.Sort == "" {
+		p.Sort = asc
+	}
 }
 
 // List godoc
@@ -60,26 +81,27 @@ func (handler *BlockHandler) Get(c echo.Context) error {
 //	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						mininum(1)
 //	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
+//	@Param			stats	query	boolean	false 	"Need join stats for block"
 //	@Produce		json
 //	@Success		200	{array}		responses.Block
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/block [get]
 func (handler *BlockHandler) List(c echo.Context) error {
-	req, err := bindAndValidate[limitOffsetPagination](c)
+	req, err := bindAndValidate[blockListRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
 	req.SetDefault()
 
-	blocks, err := handler.block.List(c.Request().Context(), req.Limit, req.Offset, pgSort(req.Sort))
+	blocks, err := handler.block.ListWithStats(c.Request().Context(), req.Stats, req.Limit, req.Offset, pgSort(req.Sort))
 	if err := handleError(c, err, handler.block); err != nil {
 		return err
 	}
 
 	response := make([]responses.Block, len(blocks))
 	for i := range blocks {
-		response[i] = responses.NewBlock(*blocks[i])
+		response[i] = responses.NewBlock(blocks[i], false)
 	}
 
 	return returnArray(c, response)
@@ -114,4 +136,29 @@ func (handler *BlockHandler) GetEvents(c echo.Context) error {
 	}
 
 	return returnArray(c, response)
+}
+
+// GetStats godoc
+//
+//	@Summary		Get block stats by height
+//	@Description	Get block stats by height
+//	@Tags			block
+//	@ID				get-block-stats
+//	@Param			height	path	integer	true	"Block height"	minimum(1)
+//	@Produce		json
+//	@Success		200	{object}		responses.BlockStats
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/block/{height}/stats [get]
+func (handler *BlockHandler) GetStats(c echo.Context) error {
+	req, err := bindAndValidate[getBlockRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	stats, err := handler.blockStats.ByHeight(c.Request().Context(), req.Height)
+	if err := handleError(c, err, handler.events); err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, responses.NewBlockStats(stats))
 }

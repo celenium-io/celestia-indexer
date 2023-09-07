@@ -11,6 +11,7 @@ var Models = []any{
 	&State{},
 	&Address{},
 	&Block{},
+	&BlockStats{},
 	&Tx{},
 	&Message{},
 	&Event{},

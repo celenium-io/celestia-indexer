@@ -3,10 +3,11 @@ package storage
 import (
 	"context"
 	"encoding/hex"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"strconv"
 	"time"
+
+	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
@@ -159,10 +160,11 @@ func (module *Module) updateState(block storage.Block, totalAccounts uint64) {
 	module.state.LastHeight = block.Height
 	module.state.LastHash = block.Hash
 	module.state.LastTime = block.Time
-	module.state.TotalTx += block.TxCount
+	module.state.TotalTx += block.Stats.TxCount
 	module.state.TotalAccounts += totalAccounts
-	module.state.TotalBlobsSize = block.BlobsSize
-	module.state.TotalFee = module.state.TotalFee.Add(block.Fee)
+	module.state.TotalBlobsSize = block.Stats.BlobsSize
+	module.state.TotalFee = module.state.TotalFee.Add(block.Stats.Fee)
+	module.state.TotalSupply = module.state.TotalSupply.Add(block.Stats.SupplyChange)
 	module.state.ChainId = block.ChainId
 }
 
@@ -177,6 +179,10 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 
 	block.Id = uint64(block.Height)
 	if err := tx.Add(ctx, &block); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
+	if err := tx.Add(ctx, &block.Stats); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
@@ -306,8 +312,8 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 	}
 	module.log.Info().
 		Uint64("height", block.Id).
-		Uint64("block_ns_size", block.BlobsSize).
-		Str("block_fee", block.Fee.String()).
+		Uint64("block_ns_size", block.Stats.BlobsSize).
+		Str("block_fee", block.Stats.Fee.String()).
 		Int64("ms", time.Since(start).Milliseconds()).
 		Msg("block saved")
 	return nil

@@ -36,7 +36,7 @@ func HeadProcessor(ctx context.Context, payload string, repo identifiable[storag
 		return responses.Block{}, errors.Wrap(err, "receive block by id")
 	}
 
-	return responses.NewBlock(b), nil
+	return responses.NewBlock(b, false), nil
 }
 
 type txRepo struct {

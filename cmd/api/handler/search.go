@@ -119,7 +119,7 @@ func (handler SearchHandler) searchHash(c echo.Context, search string) error {
 
 	block, err := handler.block.ByHash(c.Request().Context(), data)
 	if err == nil {
-		return c.JSON(http.StatusOK, responses.NewSearchResponse(responses.NewBlock(block)))
+		return c.JSON(http.StatusOK, responses.NewSearchResponse(responses.NewBlock(block, false)))
 	}
 	if !handler.tx.IsNoRows(err) {
 		return internalServerError(c, err)

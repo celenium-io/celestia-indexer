@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 	"time"
 
@@ -27,6 +28,22 @@ var (
 		Time:         testTime,
 		MessageTypes: types.NewMsgTypeBitMask(types.MsgSend),
 	}
+	testBlockStats = storage.BlockStats{
+		TxCount:     1,
+		EventsCount: 2,
+		Time:        testTime,
+		Height:      100,
+	}
+	testBlockWithStats = storage.Block{
+		Id:           1,
+		Hash:         []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31},
+		Height:       100,
+		VersionBlock: 11,
+		VersionApp:   1,
+		Time:         testTime,
+		MessageTypes: types.NewMsgTypeBitMask(types.MsgSend),
+		Stats:        testBlockStats,
+	}
 
 	testTime = time.Date(2023, 8, 1, 1, 1, 0, 0, time.UTC)
 )
@@ -34,11 +51,12 @@ var (
 // BlockTestSuite -
 type BlockTestSuite struct {
 	suite.Suite
-	blocks  *mock.MockIBlock
-	events  *mock.MockIEvent
-	echo    *echo.Echo
-	handler *BlockHandler
-	ctrl    *gomock.Controller
+	blocks     *mock.MockIBlock
+	blockStats *mock.MockIBlockStats
+	events     *mock.MockIEvent
+	echo       *echo.Echo
+	handler    *BlockHandler
+	ctrl       *gomock.Controller
 }
 
 // SetupSuite -
@@ -47,8 +65,9 @@ func (s *BlockTestSuite) SetupSuite() {
 	s.echo.Validator = NewCelestiaApiValidator()
 	s.ctrl = gomock.NewController(s.T())
 	s.blocks = mock.NewMockIBlock(s.ctrl)
+	s.blockStats = mock.NewMockIBlockStats(s.ctrl)
 	s.events = mock.NewMockIEvent(s.ctrl)
-	s.handler = NewBlockHandler(s.blocks, s.events)
+	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events)
 }
 
 // TearDownSuite -
@@ -86,6 +105,71 @@ func (s *BlockTestSuite) TestGet() {
 	s.Require().Equal("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", block.Hash)
 	s.Require().Equal(testTime, block.Time)
 	s.Require().Equal([]types.MsgType{types.MsgSend}, block.MessageTypes)
+	s.Require().Nil(block.Stats)
+}
+
+func (s *BlockTestSuite) TestGetWithoutStats() {
+	q := make(url.Values)
+	q.Set("stats", "false")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/block/:height")
+	c.SetParamNames("height")
+	c.SetParamValues("100")
+
+	s.blocks.EXPECT().
+		ByHeight(gomock.Any(), uint64(100)).
+		Return(testBlock, nil)
+
+	s.Require().NoError(s.handler.Get(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var block responses.Block
+	err := json.NewDecoder(rec.Body).Decode(&block)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1, block.Id)
+	s.Require().EqualValues(100, block.Height)
+	s.Require().Equal("1", block.VersionApp)
+	s.Require().Equal("11", block.VersionBlock)
+	s.Require().Equal("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", block.Hash)
+	s.Require().Equal(testTime, block.Time)
+	s.Require().Equal([]types.MsgType{types.MsgSend}, block.MessageTypes)
+	s.Require().Nil(block.Stats)
+}
+
+func (s *BlockTestSuite) TestGetWithStats() {
+	q := make(url.Values)
+	q.Set("stats", "true")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/block/:height")
+	c.SetParamNames("height")
+	c.SetParamValues("100")
+
+	s.blocks.EXPECT().
+		ByHeight(gomock.Any(), uint64(100)).
+		Return(testBlockWithStats, nil)
+
+	s.Require().NoError(s.handler.Get(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var block responses.Block
+	err := json.NewDecoder(rec.Body).Decode(&block)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1, block.Id)
+	s.Require().EqualValues(100, block.Height)
+	s.Require().Equal("1", block.VersionApp)
+	s.Require().Equal("11", block.VersionBlock)
+	s.Require().Equal("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", block.Hash)
+	s.Require().Equal(testTime, block.Time)
+	s.Require().Equal([]types.MsgType{types.MsgSend}, block.MessageTypes)
+	s.Require().NotNil(block.Stats)
+	s.Require().EqualValues(1, block.Stats.TxCount)
+	s.Require().EqualValues(2, block.Stats.EventsCount)
 }
 
 func (s *BlockTestSuite) TestGetInvalidBlockHeight() {
@@ -112,9 +196,9 @@ func (s *BlockTestSuite) TestList() {
 	c.SetPath("/block")
 
 	s.blocks.EXPECT().
-		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return([]*storage.Block{
-			&testBlock,
+		ListWithStats(gomock.Any(), false, gomock.Any(), gomock.Any(), gomock.Any()).
+		Return([]storage.Block{
+			testBlock,
 		}, nil)
 
 	s.Require().NoError(s.handler.List(c))
@@ -169,4 +253,26 @@ func (s *BlockTestSuite) TestGetEvents() {
 	s.Require().EqualValues(2, events[0].Position)
 	s.Require().Equal(testTime, events[0].Time)
 	s.Require().Equal(types.EventTypeBurn, events[0].Type)
+}
+
+func (s *BlockTestSuite) TestGetStats() {
+	req := httptest.NewRequest(http.MethodGet, "/?", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/block/:height/stats")
+	c.SetParamNames("height")
+	c.SetParamValues("100")
+
+	s.blockStats.EXPECT().
+		ByHeight(gomock.Any(), uint64(100)).
+		Return(testBlockStats, nil)
+
+	s.Require().NoError(s.handler.GetStats(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var stats responses.BlockStats
+	err := json.NewDecoder(rec.Body).Decode(&stats)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1, stats.TxCount)
+	s.Require().EqualValues(2, stats.EventsCount)
 }

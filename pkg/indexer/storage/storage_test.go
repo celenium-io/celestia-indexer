@@ -4,9 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"encoding/hex"
-	indexerCfg "github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	"testing"
 	"time"
+
+	indexerCfg "github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
@@ -98,7 +99,6 @@ func (s *ModuleTestSuite) TestBlockLast() {
 	s.Require().EqualValues(1001, block.Height)
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
-	s.Require().EqualValues(0, block.TxCount)
 	s.Require().Equal(hash, block.Hash)
 
 	state, err := s.storage.State.ByName(ctx, testIndexerName)

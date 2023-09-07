@@ -24,6 +24,28 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// Block
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Address)(nil)).
+			Index("block_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// BlockStats
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Address)(nil)).
+			Index("block_stats_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		// Tx
 		if _, err := tx.NewCreateIndex().
 			IfNotExists().

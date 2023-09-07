@@ -351,6 +351,45 @@ func (c *IBlockListCall) DoAndReturn(f func(context.Context, uint64, uint64, sto
 	return c
 }
 
+// ListWithStats mocks base method.
+func (m *MockIBlock) ListWithStats(ctx context.Context, stats bool, limit, offset uint64, order storage0.SortOrder) ([]storage.Block, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListWithStats", ctx, stats, limit, offset, order)
+	ret0, _ := ret[0].([]storage.Block)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListWithStats indicates an expected call of ListWithStats.
+func (mr *MockIBlockMockRecorder) ListWithStats(ctx, stats, limit, offset, order any) *IBlockListWithStatsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListWithStats", reflect.TypeOf((*MockIBlock)(nil).ListWithStats), ctx, stats, limit, offset, order)
+	return &IBlockListWithStatsCall{Call: call}
+}
+
+// IBlockListWithStatsCall wrap *gomock.Call
+type IBlockListWithStatsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IBlockListWithStatsCall) Return(arg0 []storage.Block, arg1 error) *IBlockListWithStatsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IBlockListWithStatsCall) Do(f func(context.Context, bool, uint64, uint64, storage0.SortOrder) ([]storage.Block, error)) *IBlockListWithStatsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IBlockListWithStatsCall) DoAndReturn(f func(context.Context, bool, uint64, uint64, storage0.SortOrder) ([]storage.Block, error)) *IBlockListWithStatsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Save mocks base method.
 func (m_2 *MockIBlock) Save(ctx context.Context, m *storage.Block) error {
 	m_2.ctrl.T.Helper()

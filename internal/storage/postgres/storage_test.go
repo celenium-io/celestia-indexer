@@ -107,7 +107,7 @@ func (s *StorageTestSuite) TestBlockLast() {
 	s.Require().EqualValues(1000, block.Height)
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
-	s.Require().EqualValues(0, block.TxCount)
+	s.Require().EqualValues(0, block.Stats.TxCount)
 
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
 	s.Require().NoError(err)
@@ -123,7 +123,7 @@ func (s *StorageTestSuite) TestBlockByHeight() {
 	s.Require().EqualValues(1000, block.Height)
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
-	s.Require().EqualValues(0, block.TxCount)
+	s.Require().EqualValues(0, block.Stats.TxCount)
 
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
 	s.Require().NoError(err)
@@ -142,7 +142,7 @@ func (s *StorageTestSuite) TestBlockByHash() {
 	s.Require().EqualValues(1000, block.Height)
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
-	s.Require().EqualValues(0, block.TxCount)
+	s.Require().EqualValues(0, block.Stats.TxCount)
 	s.Require().Equal(hash, block.Hash)
 }
 

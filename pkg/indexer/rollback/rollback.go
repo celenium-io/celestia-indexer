@@ -3,6 +3,7 @@ package rollback
 import (
 	"bytes"
 	"context"
+
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 
@@ -186,7 +187,10 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	}
 	defer tx.Close(ctx)
 
-	block, err := tx.RollbackBlock(ctx, height)
+	if err := tx.RollbackBlock(ctx, height); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+	blockStats, err := tx.RollbackBlockStats(ctx, height)
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
@@ -234,11 +238,12 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	}
 	state.LastHeight = newBlock.Height
 	state.LastTime = newBlock.Time
-	state.TotalTx -= block.TxCount
-	state.TotalBlobsSize -= block.BlobsSize
+	state.TotalTx -= blockStats.TxCount
+	state.TotalBlobsSize -= blockStats.BlobsSize
 	state.TotalNamespaces -= uint64(len(ns))
 	state.TotalAccounts -= uint64(len(addresses))
-	state.TotalFee = state.TotalFee.Sub(block.Fee)
+	state.TotalFee = state.TotalFee.Sub(blockStats.Fee)
+	state.TotalSupply = state.TotalSupply.Sub(blockStats.SupplyChange)
 
 	totalSupplyDiff, err := module.totalSupplyDiff(ctx, events)
 	if err != nil {

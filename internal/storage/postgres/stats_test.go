@@ -78,7 +78,7 @@ func (s *StatsTestSuite) TestCountBlock() {
 
 	tests := []test{
 		{
-			table: "block",
+			table: "block_stats",
 			want:  "2",
 		}, {
 			table: "tx",
@@ -112,7 +112,7 @@ func (s *StatsTestSuite) TestCountBlockNoData() {
 
 	tests := []test{
 		{
-			table: "block",
+			table: "block_stats",
 		}, {
 			table: "tx",
 		}, {
@@ -146,22 +146,22 @@ func (s *StatsTestSuite) TestSummaryBlock() {
 	tests := []test{
 		// Block tests
 		{
-			table:    "block",
+			table:    "block_stats",
 			column:   "fee",
 			function: "sum",
 			want:     "4599819996",
 		}, {
-			table:    "block",
+			table:    "block_stats",
 			column:   "fee",
 			function: "avg",
 			want:     "2299909998",
 		}, {
-			table:    "block",
+			table:    "block_stats",
 			column:   "fee",
 			function: "min",
 			want:     "1726351723",
 		}, {
-			table:    "block",
+			table:    "block_stats",
 			column:   "fee",
 			function: "max",
 			want:     "2873468273",
@@ -224,140 +224,140 @@ func (s *StatsTestSuite) TestHistogramBlock() {
 		// Block tests
 		{
 			timeframe: storage.TimeframeHour,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "sum",
 			wantDate:  time.Date(2023, 7, 4, 3, 0, 0, 0, time.UTC),
 			want:      "4599819996",
 		}, {
 			timeframe: storage.TimeframeDay,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "sum",
 			wantDate:  time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
 			want:      "4599819996",
 		}, {
 			timeframe: storage.TimeframeWeek,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "sum",
 			wantDate:  time.Date(2023, 7, 3, 0, 0, 0, 0, time.UTC),
 			want:      "4599819996",
 		}, {
 			timeframe: storage.TimeframeMonth,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "sum",
 			wantDate:  time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC),
 			want:      "4599819996",
 		}, {
 			timeframe: storage.TimeframeYear,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "sum",
 			wantDate:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 			want:      "4599819996",
 		}, {
 			timeframe: storage.TimeframeHour,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "avg",
 			wantDate:  time.Date(2023, 7, 4, 3, 0, 0, 0, time.UTC),
 			want:      "2299909998",
 		}, {
 			timeframe: storage.TimeframeDay,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "avg",
 			wantDate:  time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
 			want:      "2299909998",
 		}, {
 			timeframe: storage.TimeframeWeek,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "avg",
 			wantDate:  time.Date(2023, 7, 3, 0, 0, 0, 0, time.UTC),
 			want:      "2299909998",
 		}, {
 			timeframe: storage.TimeframeMonth,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "avg",
 			wantDate:  time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC),
 			want:      "2299909998",
 		}, {
 			timeframe: storage.TimeframeYear,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "avg",
 			wantDate:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 			want:      "2299909998",
 		}, {
 			timeframe: storage.TimeframeHour,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "min",
 			wantDate:  time.Date(2023, 7, 4, 3, 0, 0, 0, time.UTC),
 			want:      "1726351723",
 		}, {
 			timeframe: storage.TimeframeDay,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "min",
 			wantDate:  time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
 			want:      "1726351723",
 		}, {
 			timeframe: storage.TimeframeWeek,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "min",
 			wantDate:  time.Date(2023, 7, 3, 0, 0, 0, 0, time.UTC),
 			want:      "1726351723",
 		}, {
 			timeframe: storage.TimeframeMonth,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "min",
 			wantDate:  time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC),
 			want:      "1726351723",
 		}, {
 			timeframe: storage.TimeframeYear,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "min",
 			wantDate:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 			want:      "1726351723",
 		}, {
 			timeframe: storage.TimeframeHour,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "max",
 			wantDate:  time.Date(2023, 7, 4, 3, 0, 0, 0, time.UTC),
 			want:      "2873468273",
 		}, {
 			timeframe: storage.TimeframeDay,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "max",
 			wantDate:  time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
 			want:      "2873468273",
 		}, {
 			timeframe: storage.TimeframeWeek,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "max",
 			wantDate:  time.Date(2023, 7, 3, 0, 0, 0, 0, time.UTC),
 			want:      "2873468273",
 		}, {
 			timeframe: storage.TimeframeMonth,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "max",
 			wantDate:  time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC),
 			want:      "2873468273",
 		}, {
 			timeframe: storage.TimeframeYear,
-			table:     "block",
+			table:     "block_stats",
 			column:    "fee",
 			function:  "max",
 			wantDate:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
@@ -544,27 +544,27 @@ func (s *StatsTestSuite) TestHistogramCount() {
 	tests := []test{
 		{
 			timeframe: storage.TimeframeHour,
-			table:     "block",
+			table:     "block_stats",
 			wantDate:  time.Date(2023, 7, 4, 3, 0, 0, 0, time.UTC),
 			want:      "2",
 		}, {
 			timeframe: storage.TimeframeDay,
-			table:     "block",
+			table:     "block_stats",
 			wantDate:  time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
 			want:      "2",
 		}, {
 			timeframe: storage.TimeframeWeek,
-			table:     "block",
+			table:     "block_stats",
 			wantDate:  time.Date(2023, 7, 3, 0, 0, 0, 0, time.UTC),
 			want:      "2",
 		}, {
 			timeframe: storage.TimeframeMonth,
-			table:     "block",
+			table:     "block_stats",
 			wantDate:  time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC),
 			want:      "2",
 		}, {
 			timeframe: storage.TimeframeYear,
-			table:     "block",
+			table:     "block_stats",
 			wantDate:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 			want:      "2",
 		}, {

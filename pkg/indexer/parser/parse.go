@@ -28,10 +28,7 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 		VersionBlock: b.Block.Version.Block,
 		VersionApp:   b.Block.Version.App,
 
-		TxCount:      uint64(len(b.Block.Data.Txs)),
-		EventsCount:  uint64(len(b.BeginBlockEvents) + len(b.EndBlockEvents)),
 		MessageTypes: storageTypes.NewMsgTypeBitMask(),
-		BlobsSize:    0,
 
 		Hash:               []byte(b.BlockID.Hash),
 		ParentHash:         []byte(b.Block.LastBlockID.Hash),
@@ -45,20 +42,39 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 		EvidenceHash:       b.Block.EvidenceHash,
 		ProposerAddress:    b.Block.ProposerAddress,
 
-		Fee:     decimal.Zero,
 		ChainId: b.Block.ChainID,
 
 		Txs:    txs,
 		Events: nil,
+
+		Stats: storage.BlockStats{
+			Height:        b.Height,
+			Time:          b.Block.Time,
+			TxCount:       uint64(len(b.Block.Data.Txs)),
+			EventsCount:   uint64(len(b.BeginBlockEvents) + len(b.EndBlockEvents)),
+			BlobsSize:     0,
+			Fee:           decimal.Zero,
+			SupplyChange:  decimal.Zero,
+			InflationRate: decimal.Zero,
+		},
 	}
 
 	for _, tx := range txs {
-		block.Fee = block.Fee.Add(tx.Fee)
+		block.Stats.Fee = block.Stats.Fee.Add(tx.Fee)
 		block.MessageTypes.Set(tx.MessageTypes.Bits)
-		block.BlobsSize += tx.BlobsSize
+		block.Stats.BlobsSize += tx.BlobsSize
 	}
 
 	block.Events = parseEvents(b, b.ResultBlockResults.BeginBlockEvents)
+
+	var bbeResult beginBlockEventsResult
+	if err := bbeResult.Fill(block.Events); err != nil {
+		return err
+	}
+
+	block.Stats.InflationRate = bbeResult.InflationRate
+	block.Stats.SupplyChange = bbeResult.SupplyChange
+
 	endEvents := parseEvents(b, b.ResultBlockResults.EndBlockEvents)
 	block.Events = append(block.Events, endEvents...)
 

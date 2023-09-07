@@ -15,10 +15,6 @@ type Block struct {
 	Time               time.Time `example:"2023-07-04T03:10:57+00:00"                                        json:"time"                 swaggertype:"string"`
 	VersionBlock       string    `example:"11"                                                               json:"version_block"        swaggertype:"string"`
 	VersionApp         string    `example:"1"                                                                json:"version_app"          swaggertype:"string"`
-	TxCount            uint64    `example:"12"                                                               json:"tx_count"             swaggertype:"integer"`
-	EventsCount        uint64    `example:"18"                                                               json:"events_count"         swaggertype:"integer"`
-	BlobsSize          uint64    `example:"12354"                                                            json:"blobs_size"           swaggertype:"integer"`
-	Fee                string    `example:"28347628346"                                                      json:"fee"                  swaggertype:"string"`
 	Hash               string    `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"hash"                 swaggertype:"string"`
 	ParentHash         string    `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"parent_hash"          swaggertype:"string"`
 	LastCommitHash     string    `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"last_commit_hash"     swaggertype:"string"`
@@ -32,19 +28,17 @@ type Block struct {
 	ProposerAddress    string    `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"proposer_address"     swaggertype:"string"`
 
 	MessageTypes []types.MsgType `example:"MsgSend,MsgUnjail" json:"message_types" swaggertype:"array,string"`
+
+	Stats *BlockStats `json:"stats,omitempty"`
 }
 
-func NewBlock(block storage.Block) Block {
-	return Block{
+func NewBlock(block storage.Block, withStats bool) Block {
+	result := Block{
 		Id:                 block.Id,
 		Height:             uint64(block.Height),
 		Time:               block.Time,
 		VersionBlock:       strconv.FormatUint(block.VersionBlock, 10),
 		VersionApp:         strconv.FormatUint(block.VersionApp, 10),
-		TxCount:            block.TxCount,
-		EventsCount:        block.EventsCount,
-		BlobsSize:          block.BlobsSize,
-		Fee:                block.Fee.String(),
 		Hash:               hex.EncodeToString(block.Hash),
 		ParentHash:         hex.EncodeToString(block.ParentHash),
 		LastCommitHash:     hex.EncodeToString(block.LastCommitHash),
@@ -58,8 +52,33 @@ func NewBlock(block storage.Block) Block {
 		ProposerAddress:    hex.EncodeToString(block.ProposerAddress),
 		MessageTypes:       block.MessageTypes.Names(),
 	}
+
+	if withStats {
+		result.Stats = NewBlockStats(block.Stats)
+	}
+	return result
 }
 
 func (Block) SearchType() string {
 	return "block"
+}
+
+type BlockStats struct {
+	TxCount       uint64 `example:"12"          json:"tx_count"       swaggertype:"integer"`
+	EventsCount   uint64 `example:"18"          json:"events_count"   swaggertype:"integer"`
+	BlobsSize     uint64 `example:"12354"       json:"blobs_size"     swaggertype:"integer"`
+	Fee           string `example:"28347628346" json:"fee"            swaggertype:"string"`
+	SupplyChange  string `example:"8635234"     json:"supply_change"  swaggertype:"string"`
+	InflationRate string `example:"0.0800000"   json:"inflation_rate" swaggertype:"string"`
+}
+
+func NewBlockStats(stats storage.BlockStats) *BlockStats {
+	return &BlockStats{
+		TxCount:       stats.TxCount,
+		EventsCount:   stats.EventsCount,
+		BlobsSize:     stats.BlobsSize,
+		Fee:           stats.Fee.String(),
+		SupplyChange:  stats.SupplyChange.String(),
+		InflationRate: stats.InflationRate.String(),
+	}
 }

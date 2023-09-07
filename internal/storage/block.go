@@ -2,12 +2,12 @@ package storage
 
 import (
 	"context"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"time"
+
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -18,6 +18,7 @@ type IBlock interface {
 	Last(ctx context.Context) (Block, error)
 	ByHeight(ctx context.Context, height uint64) (Block, error)
 	ByHash(ctx context.Context, hash []byte) (Block, error)
+	ListWithStats(ctx context.Context, stats bool, limit, offset uint64, order storage.SortOrder) ([]Block, error)
 }
 
 // Block -
@@ -30,9 +31,6 @@ type Block struct {
 	VersionBlock uint64         `bun:"version_block"             comment:"Block version"`
 	VersionApp   uint64         `bun:"version_app"               comment:"App version"`
 
-	TxCount      uint64            `bun:"tx_count"                comment:"Count of transactions in block"            stats:"func:min max sum avg"`
-	EventsCount  uint64            `bun:"events_count"            comment:"Count of events in begin and end of block" stats:"func:min max sum avg"`
-	BlobsSize    uint64            `bun:"blobs_size"              comment:"Summary blocks size from pay for blob"     stats:"func:min max sum avg"`
 	MessageTypes types.MsgTypeBits `bun:"message_types,type:int8" comment:"Bit mask with containing messages"`
 
 	Hash               []byte `bun:"hash"                 comment:"Block hash"`
@@ -47,11 +45,11 @@ type Block struct {
 	EvidenceHash       []byte `bun:"evidence_hash"        comment:"Evidence hash"`
 	ProposerAddress    []byte `bun:"proposer_address"     comment:"Proposer address"`
 
-	Fee     decimal.Decimal `bun:"fee,type:numeric" comment:"Summary block fee" stats:"func:min max sum avg"`
-	ChainId string          `bun:"-"` // internal field for filling state
+	ChainId string `bun:"-"` // internal field for filling state
 
-	Txs    []Tx    `bun:"rel:has-many"`
-	Events []Event `bun:"rel:has-many"`
+	Txs    []Tx       `bun:"rel:has-many"`
+	Events []Event    `bun:"rel:has-many"`
+	Stats  BlockStats `bun:"rel:has-one,join:height=height"`
 }
 
 // TableName -

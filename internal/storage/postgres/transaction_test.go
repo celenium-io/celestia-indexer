@@ -4,9 +4,10 @@ import (
 	"context"
 	"crypto/rand"
 	"database/sql"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"testing"
 	"time"
+
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
@@ -239,13 +240,41 @@ func (s *StorageTestSuite) TestRollbackBlock() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	oldBlock, err := tx.RollbackBlock(ctx, 1000)
+	err = tx.RollbackBlock(ctx, 1000)
 	s.Require().NoError(err)
-	s.Require().EqualValues(1000, oldBlock.Height)
 
 	newHead, err := tx.LastBlock(ctx)
 	s.Require().NoError(err)
 	s.Require().EqualValues(999, newHead.Height)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+}
+
+func (s *StorageTestSuite) TestRollbackBlockStats() {
+	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
+	s.Require().NoError(err)
+
+	fixtures, err := testfixtures.New(
+		testfixtures.Database(db),
+		testfixtures.Dialect("timescaledb"),
+		testfixtures.Directory("../../../test/data"),
+		testfixtures.UseAlterConstraint(),
+	)
+	s.Require().NoError(err)
+	s.Require().NoError(fixtures.Load())
+	s.Require().NoError(db.Close())
+
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	stats, err := tx.RollbackBlockStats(ctx, 1000)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1000, stats.Height)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))

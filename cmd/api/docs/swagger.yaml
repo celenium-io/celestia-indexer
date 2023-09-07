@@ -64,23 +64,14 @@ definitions:
       app_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
-      blobs_size:
-        example: 12354
-        type: integer
       consensus_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
       data_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
-      events_count:
-        example: 18
-        type: integer
       evidence_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
-        type: string
-      fee:
-        example: "28347628346"
         type: string
       hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
@@ -113,12 +104,11 @@ definitions:
       proposer_address:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
+      stats:
+        $ref: '#/definitions/responses.BlockStats'
       time:
         example: "2023-07-04T03:10:57+00:00"
         type: string
-      tx_count:
-        example: 12
-        type: integer
       validators_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
@@ -128,6 +118,27 @@ definitions:
       version_block:
         example: "11"
         type: string
+    type: object
+  responses.BlockStats:
+    properties:
+      blobs_size:
+        example: 12354
+        type: integer
+      events_count:
+        example: 18
+        type: integer
+      fee:
+        example: "28347628346"
+        type: string
+      inflation_rate:
+        example: "0.0800000"
+        type: string
+      supply_change:
+        example: "8635234"
+        type: string
+      tx_count:
+        example: 12
+        type: integer
     type: object
   responses.Event:
     properties:
@@ -644,6 +655,10 @@ paths:
         in: query
         name: sort
         type: string
+      - description: Need join stats for block
+        in: query
+        name: stats
+        type: boolean
       produces:
       - application/json
       responses:
@@ -675,6 +690,10 @@ paths:
         name: height
         required: true
         type: integer
+      - description: Need join stats for block
+        in: query
+        name: stats
+        type: boolean
       produces:
       - application/json
       responses:
@@ -724,6 +743,35 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get events from begin and end of block
+      tags:
+      - block
+  /v1/block/{height}/stats:
+    get:
+      description: Get block stats by height
+      operationId: get-block-stats
+      parameters:
+      - description: Block height
+        in: path
+        minimum: 1
+        name: height
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.BlockStats'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get block stats by height
       tags:
       - block
   /v1/head:

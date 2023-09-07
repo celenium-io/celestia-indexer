@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	models "github.com/dipdup-io/celestia-indexer/internal/storage"
@@ -94,8 +95,16 @@ func (tx Transaction) Namespace(ctx context.Context, id uint64) (ns models.Names
 	return
 }
 
-func (tx Transaction) RollbackBlock(ctx context.Context, height types.Level) (block models.Block, err error) {
-	_, err = tx.Tx().NewDelete().Model(&block).Where("height = ?", height).Returning("*").Exec(ctx)
+func (tx Transaction) RollbackBlock(ctx context.Context, height types.Level) error {
+	_, err := tx.Tx().NewDelete().
+		Model((*models.Block)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) RollbackBlockStats(ctx context.Context, height types.Level) (stats models.BlockStats, err error) {
+	_, err = tx.Tx().NewDelete().Model(&stats).Where("height = ?", height).Returning("*").Exec(ctx)
 	return
 }
 

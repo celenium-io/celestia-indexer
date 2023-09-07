@@ -20,6 +20,7 @@ type Storage struct {
 	cfg config.Database
 
 	Blocks      models.IBlock
+	BlockStats  models.IBlockStats
 	Tx          models.ITx
 	Message     models.IMessage
 	Event       models.IEvent
@@ -43,6 +44,7 @@ func Create(ctx context.Context, cfg config.Database) (Storage, error) {
 		cfg:         cfg,
 		Storage:     strg,
 		Blocks:      NewBlocks(strg.Connection()),
+		BlockStats:  NewBlockStats(strg.Connection()),
 		Message:     NewMessage(strg.Connection()),
 		Event:       NewEvent(strg.Connection()),
 		Address:     NewAddress(strg.Connection()),
@@ -101,6 +103,7 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 	return conn.DB().RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
 		for _, model := range []storage.Model{
 			&models.Block{},
+			&models.BlockStats{},
 			&models.Tx{},
 			&models.Message{},
 			&models.Event{},
