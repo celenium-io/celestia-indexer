@@ -1250,6 +1250,17 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_dipdup-io_celestia-indexer_internal_storage_types.Status": {
+            "type": "string",
+            "enum": [
+                "success",
+                "failed"
+            ],
+            "x-enum-varnames": [
+                "StatusSuccess",
+                "StatusFailed"
+            ]
+        },
         "handler.Error": {
             "type": "object",
             "properties": {
@@ -1710,7 +1721,7 @@ const docTemplate = `{
                 "status": {
                     "allOf": [
                         {
-                            "$ref": "#/definitions/types.Status"
+                            "$ref": "#/definitions/github_com_dipdup-io_celestia-indexer_internal_storage_types.Status"
                         }
                     ],
                     "example": "success"
@@ -1819,17 +1830,6 @@ const docTemplate = `{
                 "MsgCreatePeriodicVestingAccount",
                 "MsgPayForBlobs",
                 "MsgGrantAllowance"
-            ]
-        },
-        "types.Status": {
-            "type": "string",
-            "enum": [
-                "success",
-                "failed"
-            ],
-            "x-enum-varnames": [
-                "StatusSuccess",
-                "StatusFailed"
             ]
         }
     }
