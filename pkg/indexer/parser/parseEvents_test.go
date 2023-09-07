@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/node/types"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -12,21 +11,21 @@ import (
 
 func TestParseEvents_EmptyEventsResults(t *testing.T) {
 	block := types.BlockData{
-		ResultBlockResults: nodeTypes.ResultBlockResults{
-			TxsResults: make([]*nodeTypes.ResponseDeliverTx, 0),
+		ResultBlockResults: types.ResultBlockResults{
+			TxsResults: make([]*types.ResponseDeliverTx, 0),
 		},
 	}
 
-	resultEvents := parseEvents(block, make([]nodeTypes.Event, 0))
+	resultEvents := parseEvents(block, make([]types.Event, 0))
 
 	assert.Empty(t, resultEvents)
 }
 
 func TestParseEvents_SuccessTx(t *testing.T) {
-	events := []nodeTypes.Event{
+	events := []types.Event{
 		{
 			Type: "coin_spent",
-			Attributes: []nodeTypes.EventAttribute{
+			Attributes: []types.EventAttribute{
 				{
 					Key:   "c3BlbmRlcg==",
 					Value: "Y2VsZXN0aWExdjY5bnB6NncwN3h0NGhkdWU5eGR3a3V4eHZ2ZDZlYTl5MjZlcXI=",
@@ -41,7 +40,7 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 		},
 	}
 
-	txRes := nodeTypes.ResponseDeliverTx{
+	txRes := types.ResponseDeliverTx{
 		Code:      0,
 		Data:      []byte{},
 		Log:       "[]",

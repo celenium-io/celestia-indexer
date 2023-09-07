@@ -1,9 +1,9 @@
 package parser
 
 import (
+	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"testing"
 
-	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/node/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )

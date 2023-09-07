@@ -1,14 +1,17 @@
 package types
 
-import "time"
+import (
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"time"
+)
 
 type Genesis struct {
-	GenesisTime     time.Time       `json:"genesis_time"`
-	ChainID         string          `json:"chain_id"`
-	InitialHeight   int64           `json:"initial_height,string"`
-	ConsensusParams ConsensusParams `json:"consensus_params"`
-	AppHash         string          `json:"app_hash"`
-	AppState        AppState        `json:"app_state"`
+	GenesisTime     time.Time             `json:"genesis_time"`
+	ChainID         string                `json:"chain_id"`
+	InitialHeight   int64                 `json:"initial_height,string"`
+	ConsensusParams types.ConsensusParams `json:"consensus_params"`
+	AppHash         string                `json:"app_hash"`
+	AppState        AppState              `json:"app_state"`
 }
 
 type AuthParams struct {

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"time"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
@@ -19,17 +20,15 @@ type IBlock interface {
 	ByHash(ctx context.Context, hash []byte) (Block, error)
 }
 
-type Level uint64
-
 // Block -
 type Block struct {
 	bun.BaseModel `bun:"table:block" comment:"Table with celestia blocks."`
 
-	Id           uint64    `bun:",pk,notnull,autoincrement" comment:"Unique internal identity"`
-	Height       Level     `bun:"height"                    comment:"The number (height) of this block" stats:"func:min max,filterable"`
-	Time         time.Time `bun:"time,pk,notnull"           comment:"The time of block"                 stats:"func:min max,filterable"`
-	VersionBlock uint64    `bun:"version_block"             comment:"Block version"`
-	VersionApp   uint64    `bun:"version_app"               comment:"App version"`
+	Id           uint64         `bun:",pk,notnull,autoincrement" comment:"Unique internal identity"`
+	Height       pkgTypes.Level `bun:"height"                    comment:"The number (height) of this block" stats:"func:min max,filterable"`
+	Time         time.Time      `bun:"time,pk,notnull"           comment:"The time of block"                 stats:"func:min max,filterable"`
+	VersionBlock uint64         `bun:"version_block"             comment:"Block version"`
+	VersionApp   uint64         `bun:"version_app"               comment:"App version"`
 
 	TxCount      uint64            `bun:"tx_count"                comment:"Count of transactions in block"            stats:"func:min max sum avg"`
 	EventsCount  uint64            `bun:"events_count"            comment:"Count of events in begin and end of block" stats:"func:min max sum avg"`

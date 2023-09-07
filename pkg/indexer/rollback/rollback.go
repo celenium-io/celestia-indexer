@@ -3,6 +3,8 @@ package rollback
 import (
 	"bytes"
 	"context"
+	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
@@ -39,16 +41,12 @@ type Module struct {
 	g         workerpool.Group
 }
 
-type ModuleConfig struct {
-	IndexerName string
-}
-
 func NewModule(
 	tx sdk.Transactable,
 	state storage.IState,
 	blocks storage.IBlock,
 	node rpc.API,
-	cfg ModuleConfig,
+	cfg config.Indexer,
 ) *Module {
 	module := Module{
 		tx:        tx,
@@ -57,7 +55,7 @@ func NewModule(
 		node:      node,
 		input:     modules.NewInput(InputName),
 		output:    modules.NewOutput(OutputName),
-		indexName: cfg.IndexerName,
+		indexName: cfg.Name,
 		g:         workerpool.NewGroup(),
 	}
 	module.log = log.With().Str("module", module.Name()).Logger()
@@ -181,7 +179,7 @@ func (module *Module) finish(ctx context.Context) error {
 	return nil
 }
 
-func (module *Module) rollbackBlock(ctx context.Context, height storage.Level) error {
+func (module *Module) rollbackBlock(ctx context.Context, height types.Level) error {
 	tx, err := postgres.BeginTransaction(ctx, module.tx)
 	if err != nil {
 		return err

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"time"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -22,7 +23,7 @@ type State struct {
 
 	Id              uint64          `bun:",pk,autoincrement"         comment:"Unique internal identity"`
 	Name            string          `bun:",unique:state_name"        comment:"Indexer name"`
-	LastHeight      Level           `bun:"last_height"               comment:"Last block height"`
+	LastHeight      types.Level     `bun:"last_height"               comment:"Last block height"`
 	LastHash        []byte          `bun:"last_hash"                 comment:"Last block hash"`
 	LastTime        time.Time       `bun:"last_time"                 comment:"Time of last block"`
 	ChainId         string          `bun:"chain_id"                  comment:"Celestia chain id"`

@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	models "github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -93,37 +94,37 @@ func (tx Transaction) Namespace(ctx context.Context, id uint64) (ns models.Names
 	return
 }
 
-func (tx Transaction) RollbackBlock(ctx context.Context, height models.Level) (block models.Block, err error) {
+func (tx Transaction) RollbackBlock(ctx context.Context, height types.Level) (block models.Block, err error) {
 	_, err = tx.Tx().NewDelete().Model(&block).Where("height = ?", height).Returning("*").Exec(ctx)
 	return
 }
 
-func (tx Transaction) RollbackAddresses(ctx context.Context, height models.Level) (address []models.Address, err error) {
+func (tx Transaction) RollbackAddresses(ctx context.Context, height types.Level) (address []models.Address, err error) {
 	_, err = tx.Tx().NewDelete().Model(&address).Where("height = ?", height).Returning("*").Exec(ctx)
 	return
 }
 
-func (tx Transaction) RollbackTxs(ctx context.Context, height models.Level) (txs []models.Tx, err error) {
+func (tx Transaction) RollbackTxs(ctx context.Context, height types.Level) (txs []models.Tx, err error) {
 	_, err = tx.Tx().NewDelete().Model(&txs).Where("height = ?", height).Returning("*").Exec(ctx)
 	return
 }
 
-func (tx Transaction) RollbackEvents(ctx context.Context, height models.Level) (events []models.Event, err error) {
+func (tx Transaction) RollbackEvents(ctx context.Context, height types.Level) (events []models.Event, err error) {
 	_, err = tx.Tx().NewDelete().Model(&events).Where("height = ?", height).Returning("*").Exec(ctx)
 	return
 }
 
-func (tx Transaction) RollbackMessages(ctx context.Context, height models.Level) (msgs []models.Message, err error) {
+func (tx Transaction) RollbackMessages(ctx context.Context, height types.Level) (msgs []models.Message, err error) {
 	_, err = tx.Tx().NewDelete().Model(&msgs).Where("height = ?", height).Returning("*").Exec(ctx)
 	return
 }
 
-func (tx Transaction) RollbackNamespaceMessages(ctx context.Context, height models.Level) (msgs []models.NamespaceMessage, err error) {
+func (tx Transaction) RollbackNamespaceMessages(ctx context.Context, height types.Level) (msgs []models.NamespaceMessage, err error) {
 	_, err = tx.Tx().NewDelete().Model(&msgs).Where("height = ?", height).Returning("*").Exec(ctx)
 	return
 }
 
-func (tx Transaction) RollbackNamespaces(ctx context.Context, height models.Level) (ns []models.Namespace, err error) {
+func (tx Transaction) RollbackNamespaces(ctx context.Context, height types.Level) (ns []models.Namespace, err error) {
 	_, err = tx.Tx().NewDelete().Model(&ns).Where("first_height = ?", height).Returning("*").Exec(ctx)
 	return
 }

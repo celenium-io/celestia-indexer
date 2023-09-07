@@ -68,7 +68,7 @@ func (s *ModuleTestSuite) TestBlockLast() {
 	fixtures, err := testfixtures.New(
 		testfixtures.Database(db),
 		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../test/data"),
+		testfixtures.Directory("../../../test/data"),
 		testfixtures.UseAlterConstraint(),
 	)
 	s.Require().NoError(err)

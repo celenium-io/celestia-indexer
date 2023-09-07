@@ -19,32 +19,39 @@ const (
 	BlocksOutput = "blocks"
 )
 
-type Receiver struct {
+// Module - runs through chain with aim ti catch up head and identifies either block is fits in sequence or signals of rollback.
+//
+//	|----------------|
+//	|                | -- types.BlockData ->
+//	|     MODULE     |
+//	|                | -- types.Level ->
+//	|----------------|
+type Module struct {
 	api     node.API
 	cfg     config.Indexer
 	outputs map[string]*modules.Output
-	pool    *workerpool.Pool[storage.Level]
+	pool    *workerpool.Pool[types.Level]
 	blocks  chan types.BlockData
-	level   storage.Level
+	level   types.Level
 	hash    []byte
 	mx      *sync.RWMutex
 	log     zerolog.Logger
-	wg      *sync.WaitGroup
+	g       workerpool.Group
 }
 
-func NewModule(cfg config.Indexer, api node.API, state *storage.State) Receiver {
-	var level storage.Level
+func NewModule(cfg config.Indexer, api node.API, state *storage.State) Module {
+	var level types.Level
 	var hash []byte
 
 	if state == nil {
-		level = storage.Level(cfg.StartLevel)
+		level = types.Level(cfg.StartLevel)
 		// TODO-DISCUSS check for hash changed of state last block
 	} else {
 		level = state.LastHeight
 		hash = state.LastHash
 	}
 
-	receiver := Receiver{
+	receiver := Module{
 		api:     api,
 		cfg:     cfg,
 		outputs: map[string]*modules.Output{BlocksOutput: modules.NewOutput(BlocksOutput)},
@@ -53,7 +60,7 @@ func NewModule(cfg config.Indexer, api node.API, state *storage.State) Receiver 
 		hash:    hash,
 		mx:      new(sync.RWMutex),
 		log:     log.With().Str("module", name).Logger(),
-		wg:      new(sync.WaitGroup),
+		g:       workerpool.NewGroup(),
 	}
 
 	receiver.pool = workerpool.NewPool(receiver.worker, int(cfg.ThreadsCount))
@@ -62,24 +69,21 @@ func NewModule(cfg config.Indexer, api node.API, state *storage.State) Receiver 
 }
 
 // Name -
-func (*Receiver) Name() string {
+func (*Module) Name() string {
 	return name
 }
 
-func (r *Receiver) Start(ctx context.Context) {
+func (r *Module) Start(ctx context.Context) {
 	r.log.Info().Msg("starting receiver...")
 	r.pool.Start(ctx)
 
-	r.wg.Add(1)
-	go r.sequencer(ctx)
-
-	r.wg.Add(1)
-	go r.sync(ctx)
+	r.g.GoCtx(ctx, r.sequencer)
+	r.g.GoCtx(ctx, r.sync)
 }
 
-func (r *Receiver) Close() error {
+func (r *Module) Close() error {
 	r.log.Info().Msg("closing...")
-	r.wg.Wait()
+	r.g.Wait()
 
 	if err := r.pool.Close(); err != nil {
 		return err
@@ -90,7 +94,7 @@ func (r *Receiver) Close() error {
 	return nil
 }
 
-func (r *Receiver) Output(name string) (*modules.Output, error) {
+func (r *Module) Output(name string) (*modules.Output, error) {
 	output, ok := r.outputs[name]
 	if !ok {
 		return nil, errors.Wrap(modules.ErrUnknownOutput, name)
@@ -98,11 +102,11 @@ func (r *Receiver) Output(name string) (*modules.Output, error) {
 	return output, nil
 }
 
-func (r *Receiver) Input(name string) (*modules.Input, error) {
+func (r *Module) Input(name string) (*modules.Input, error) {
 	return nil, errors.Wrap(modules.ErrUnknownInput, name)
 }
 
-func (r *Receiver) AttachTo(outputName string, input *modules.Input) error {
+func (r *Module) AttachTo(outputName string, input *modules.Input) error {
 	output, err := r.Output(outputName)
 	if err != nil {
 		return err
@@ -112,14 +116,14 @@ func (r *Receiver) AttachTo(outputName string, input *modules.Input) error {
 	return nil
 }
 
-func (r *Receiver) Level() (storage.Level, []byte) {
+func (r *Module) Level() (types.Level, []byte) {
 	r.mx.RLock()
 	defer r.mx.RUnlock()
 
 	return r.level, r.hash
 }
 
-func (r *Receiver) setLevel(level storage.Level, hash []byte) {
+func (r *Module) setLevel(level types.Level, hash []byte) {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 

@@ -2,12 +2,11 @@ package receiver
 
 import (
 	"context"
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
-
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
 )
 
-func (r *Receiver) readBlocks(ctx context.Context) error {
+func (r *Module) readBlocks(ctx context.Context) error {
 	headLevel, err := r.headLevel(ctx)
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
@@ -28,11 +27,11 @@ func (r *Receiver) readBlocks(ctx context.Context) error {
 	return nil
 }
 
-func (r *Receiver) headLevel(ctx context.Context) (storage.Level, error) {
+func (r *Module) headLevel(ctx context.Context) (types.Level, error) {
 	status, err := r.api.Status(ctx)
 	if err != nil {
 		return 0, err
 	}
 
-	return storage.Level(status.SyncInfo.LatestBlockHeight), nil
+	return types.Level(status.SyncInfo.LatestBlockHeight), nil
 }

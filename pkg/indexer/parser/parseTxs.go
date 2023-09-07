@@ -3,7 +3,6 @@ package parser
 import (
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/node/types"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 )
@@ -23,7 +22,7 @@ func parseTxs(b types.BlockData) ([]storage.Tx, error) {
 	return txs, nil
 }
 
-func parseTx(b types.BlockData, index int, txRes *nodeTypes.ResponseDeliverTx) (storage.Tx, error) {
+func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (storage.Tx, error) {
 	d, err := decodeTx(b, index)
 	if err != nil {
 		return storage.Tx{}, errors.Wrapf(err, "while parsing Tx on index %d", index)

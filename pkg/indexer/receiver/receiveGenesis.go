@@ -2,7 +2,7 @@ package receiver
 
 import "context"
 
-func (r *Receiver) receiveGenesis(ctx context.Context) error {
+func (r *Module) receiveGenesis(ctx context.Context) error {
 	genesis, err := r.api.Genesis(ctx)
 	if err != nil {
 		return err

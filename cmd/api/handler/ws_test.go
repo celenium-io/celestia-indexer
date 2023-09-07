@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"crypto/rand"
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -54,7 +55,7 @@ func TestWebsocket(t *testing.T) {
 
 		blockMock.EXPECT().GetByID(ctx, uint64(i)).Return(&storage.Block{
 			Id:     uint64(i),
-			Height: storage.Level(i),
+			Height: types.Level(i),
 			Time:   time.Now(),
 			Hash:   hash,
 		}, nil).MaxTimes(1)

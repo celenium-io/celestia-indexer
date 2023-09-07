@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func (r *Receiver) sync(ctx context.Context) {
+func (r *Module) sync(ctx context.Context) {
 	if err := r.readBlocks(ctx); err != nil {
 		r.log.Err(err).Msg("while reading blocks")
 		return

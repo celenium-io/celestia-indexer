@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"strconv"
 	"time"
 
@@ -151,7 +152,7 @@ func (module *Module) AttachTo(name string, input *modules.Input) error {
 }
 
 func (module *Module) updateState(block storage.Block, totalAccounts uint64) {
-	if storage.Level(block.Id) <= module.state.LastHeight {
+	if types.Level(block.Id) <= module.state.LastHeight {
 		return
 	}
 

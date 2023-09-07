@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"database/sql"
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"testing"
 	"time"
 
@@ -151,7 +152,7 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 		s.NoError(err)
 
 		addresses = append(addresses, &storage.Address{
-			Height:  storage.Level(10000 + i),
+			Height:  pkgTypes.Level(10000 + i),
 			Balance: decimal.NewFromInt(int64(i * 100)),
 			Hash:    hash,
 		})

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"time"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
@@ -36,7 +37,7 @@ type Tx struct {
 	bun.BaseModel `bun:"tx" comment:"Table with celestia transactions."`
 
 	Id            uint64          `bun:"id,autoincrement,pk,notnull" comment:"Unique internal id"`
-	Height        Level           `bun:",notnull"                    comment:"The number (height) of this block"                 stats:"func:min max,filterable"`
+	Height        pkgTypes.Level  `bun:",notnull"                    comment:"The number (height) of this block"                 stats:"func:min max,filterable"`
 	Time          time.Time       `bun:"time,pk,notnull"             comment:"The time of block"                                 stats:"func:min max,filterable"`
 	Position      uint64          `bun:"position"                    comment:"Position in block"`
 	GasWanted     uint64          `bun:"gas_wanted"                  comment:"Gas wanted"                                        stats:"func:min max sum avg"`
