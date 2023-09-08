@@ -82,7 +82,7 @@ func createAddresses(data addressesData, level types.Level) []storage.AddressWit
 			Type: d.t,
 			Address: storage.Address{
 				Height:  level,
-				Hash:    []byte(d.address),
+				Hash:    d.address,
 				Balance: decimal.Zero,
 			},
 		}

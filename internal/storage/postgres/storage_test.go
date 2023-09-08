@@ -111,7 +111,7 @@ func (s *StorageTestSuite) TestBlockLast() {
 
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
 	s.Require().NoError(err)
-	s.Require().Equal(hash, block.Hash)
+	s.Require().Equal(hash, block.Hash.Bytes())
 }
 
 func (s *StorageTestSuite) TestBlockByHeight() {
@@ -127,7 +127,7 @@ func (s *StorageTestSuite) TestBlockByHeight() {
 
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
 	s.Require().NoError(err)
-	s.Require().Equal(hash, block.Hash)
+	s.Require().Equal(hash, block.Hash.Bytes())
 }
 
 func (s *StorageTestSuite) TestBlockByHash() {
@@ -143,22 +143,19 @@ func (s *StorageTestSuite) TestBlockByHash() {
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
 	s.Require().EqualValues(0, block.Stats.TxCount)
-	s.Require().Equal(hash, block.Hash)
+	s.Require().Equal(hash, block.Hash.Bytes())
 }
 
 func (s *StorageTestSuite) TestAddressByHash() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	hash, err := hex.DecodeString("5F7A8DDFE6136FE76B65B9066D4F816D707F")
-	s.Require().NoError(err)
-
-	address, err := s.storage.Address.ByHash(ctx, hash)
+	address, err := s.storage.Address.ByHash(ctx, "celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8")
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, address.Id)
 	s.Require().EqualValues(100, address.Height)
 	s.Require().Equal("123", address.Balance.String())
-	s.Require().Equal(hash, address.Hash)
+	s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", address.Hash)
 }
 
 func (s *StorageTestSuite) TestEventByTxId() {

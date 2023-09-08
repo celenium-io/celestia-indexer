@@ -41,7 +41,7 @@ func (m *MockIAddress) EXPECT() *MockIAddressMockRecorder {
 }
 
 // ByHash mocks base method.
-func (m *MockIAddress) ByHash(ctx context.Context, hash []byte) (storage.Address, error) {
+func (m *MockIAddress) ByHash(ctx context.Context, hash string) (storage.Address, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByHash", ctx, hash)
 	ret0, _ := ret[0].(storage.Address)
@@ -68,13 +68,13 @@ func (c *IAddressByHashCall) Return(arg0 storage.Address, arg1 error) *IAddressB
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IAddressByHashCall) Do(f func(context.Context, []byte) (storage.Address, error)) *IAddressByHashCall {
+func (c *IAddressByHashCall) Do(f func(context.Context, string) (storage.Address, error)) *IAddressByHashCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IAddressByHashCall) DoAndReturn(f func(context.Context, []byte) (storage.Address, error)) *IAddressByHashCall {
+func (c *IAddressByHashCall) DoAndReturn(f func(context.Context, string) (storage.Address, error)) *IAddressByHashCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

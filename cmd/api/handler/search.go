@@ -85,19 +85,11 @@ func (handler SearchHandler) Search(c echo.Context) error {
 }
 
 func (handler SearchHandler) searchAddress(c echo.Context, search string) error {
-	data, err := responses.DecodeAddress(search)
-	if err != nil {
-		return badRequestError(c, err)
-	}
-	address, err := handler.address.ByHash(c.Request().Context(), data)
+	address, err := handler.address.ByHash(c.Request().Context(), search)
 	if err := handleError(c, err, handler.address); err != nil {
 		return err
 	}
-	response, err := responses.NewAddress(address)
-	if err != nil {
-		return internalServerError(c, err)
-	}
-	return c.JSON(http.StatusOK, responses.NewSearchResponse(response))
+	return c.JSON(http.StatusOK, responses.NewSearchResponse(responses.NewAddress(address)))
 }
 
 func (handler SearchHandler) searchHash(c echo.Context, search string) error {

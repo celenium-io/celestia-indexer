@@ -12,17 +12,13 @@ type Address struct {
 	Hash    string `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"hash"         swaggertype:"string"`
 }
 
-func NewAddress(addr storage.Address) (Address, error) {
-	hash, err := EncodeAddress(addr.Hash)
-	if err != nil {
-		return Address{}, err
-	}
+func NewAddress(addr storage.Address) Address {
 	return Address{
 		Id:      addr.Id,
 		Height:  uint64(addr.Height),
 		Balance: addr.Balance.String(),
-		Hash:    hash,
-	}, nil
+		Hash:    addr.Hash,
+	}
 }
 
 func (Address) SearchType() string {

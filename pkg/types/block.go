@@ -40,21 +40,21 @@ type Header struct {
 	LastBlockID types.BlockID `json:"last_block_id"` // TODO check if hash unmarshales correctly with HexBytes type
 
 	// hashes of block data
-	LastCommitHash []byte `json:"last_commit_hash"` // commit from validators from the last block
-	DataHash       []byte `json:"data_hash"`        // transactions
+	LastCommitHash Hex `json:"last_commit_hash"` // commit from validators from the last block
+	DataHash       Hex `json:"data_hash"`        // transactions
 
 	// hashes from the app output from the prev block
-	ValidatorsHash     []byte `json:"validators_hash"`      // validators for the current block
-	NextValidatorsHash []byte `json:"next_validators_hash"` // validators for the next block
-	ConsensusHash      []byte `json:"consensus_hash"`       // consensus params for current block
-	AppHash            []byte `json:"app_hash"`             // state after txs from the previous block
+	ValidatorsHash     Hex `json:"validators_hash"`      // validators for the current block
+	NextValidatorsHash Hex `json:"next_validators_hash"` // validators for the next block
+	ConsensusHash      Hex `json:"consensus_hash"`       // consensus params for current block
+	AppHash            Hex `json:"app_hash"`             // state after txs from the previous block
 	// root hash of all results from the txs from the previous block
 	// see `deterministicResponseDeliverTx` to understand which parts of a tx are hashed into here
-	LastResultsHash []byte `json:"last_results_hash"`
+	LastResultsHash Hex `json:"last_results_hash"`
 
 	// consensus info
-	EvidenceHash    []byte `json:"evidence_hash"`    // evidence included in the block
-	ProposerAddress []byte `json:"proposer_address"` // original proposer of the block
+	EvidenceHash    Hex `json:"evidence_hash"`    // evidence included in the block
+	ProposerAddress Hex `json:"proposer_address"` // original proposer of the block
 }
 
 // Data contains all the available Data of the block.

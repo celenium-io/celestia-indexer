@@ -61,14 +61,11 @@ func (s *AddressTestSuite) TestGet() {
 	c.SetParamNames("hash")
 	c.SetParamValues(testAddress)
 
-	hash, err := responses.DecodeAddress(testAddress)
-	s.Require().NoError(err)
-
 	s.address.EXPECT().
-		ByHash(gomock.Any(), hash).
+		ByHash(gomock.Any(), testAddress).
 		Return(storage.Address{
 			Id:      1,
-			Hash:    hash,
+			Hash:    testAddress,
 			Height:  100,
 			Balance: decimal.RequireFromString("100"),
 		}, nil)
@@ -77,7 +74,7 @@ func (s *AddressTestSuite) TestGet() {
 	s.Require().Equal(http.StatusOK, rec.Code)
 
 	var address responses.Address
-	err = json.NewDecoder(rec.Body).Decode(&address)
+	err := json.NewDecoder(rec.Body).Decode(&address)
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, address.Id)
 	s.Require().EqualValues(100, address.Height)
@@ -125,15 +122,12 @@ func (s *AddressTestSuite) TestList() {
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address")
 
-	hash, err := responses.DecodeAddress(testAddress)
-	s.Require().NoError(err)
-
 	s.address.EXPECT().
 		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return([]*storage.Address{
 			{
 				Id:      1,
-				Hash:    hash,
+				Hash:    testAddress,
 				Height:  100,
 				Balance: decimal.RequireFromString("100"),
 			},
@@ -143,7 +137,7 @@ func (s *AddressTestSuite) TestList() {
 	s.Require().Equal(http.StatusOK, rec.Code)
 
 	var address []responses.Address
-	err = json.NewDecoder(rec.Body).Decode(&address)
+	err := json.NewDecoder(rec.Body).Decode(&address)
 	s.Require().NoError(err)
 	s.Require().Len(address, 1)
 	s.Require().EqualValues(1, address[0].Id)
@@ -168,14 +162,11 @@ func (s *AddressTestSuite) TestListHeight() {
 	c.SetParamNames("hash")
 	c.SetParamValues(testAddress)
 
-	hash, err := responses.DecodeAddress(testAddress)
-	s.Require().NoError(err)
-
 	s.address.EXPECT().
-		ByHash(gomock.Any(), hash).
+		ByHash(gomock.Any(), testAddress).
 		Return(storage.Address{
 			Id:      1,
-			Hash:    hash,
+			Hash:    testAddress,
 			Height:  100,
 			Balance: decimal.RequireFromString("100"),
 		}, nil)
@@ -190,7 +181,7 @@ func (s *AddressTestSuite) TestListHeight() {
 	s.Require().Equal(http.StatusOK, rec.Code)
 
 	var txs []responses.Tx
-	err = json.NewDecoder(rec.Body).Decode(&txs)
+	err := json.NewDecoder(rec.Body).Decode(&txs)
 	s.Require().NoError(err)
 	s.Require().Len(txs, 1)
 

@@ -2,7 +2,7 @@ package storage
 
 import (
 	"context"
-	"encoding/hex"
+
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -14,7 +14,7 @@ import (
 type IAddress interface {
 	storage.Table[*Address]
 
-	ByHash(ctx context.Context, hash []byte) (Address, error)
+	ByHash(ctx context.Context, hash string) (Address, error)
 }
 
 // Address -
@@ -23,7 +23,7 @@ type Address struct {
 
 	Id      uint64          `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
 	Height  types.Level     `bun:"height"                      comment:"Block number of the first address occurrence."`
-	Hash    []byte          `bun:",unique:address_hash"        comment:"Address hash."`
+	Hash    string          `bun:",unique:address_hash"        comment:"Address hash."`
 	Balance decimal.Decimal `bun:",type:numeric"               comment:"Address balance"`
 }
 
@@ -33,5 +33,5 @@ func (Address) TableName() string {
 }
 
 func (address Address) String() string {
-	return hex.EncodeToString(address.Hash)
+	return address.Hash
 }

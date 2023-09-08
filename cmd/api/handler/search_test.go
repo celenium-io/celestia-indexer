@@ -66,14 +66,11 @@ func (s *SearchTestSuite) TestSearchAddress() {
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
 
-	hash, err := responses.DecodeAddress(testAddress)
-	s.Require().NoError(err)
-
 	s.address.EXPECT().
-		ByHash(gomock.Any(), hash).
+		ByHash(gomock.Any(), testAddress).
 		Return(storage.Address{
 			Id:      1,
-			Hash:    hash,
+			Hash:    testAddress,
 			Height:  100,
 			Balance: decimal.RequireFromString("100"),
 		}, nil)
@@ -82,7 +79,7 @@ func (s *SearchTestSuite) TestSearchAddress() {
 	s.Require().Equal(http.StatusOK, rec.Code)
 
 	var response responses.SearchResponse[responses.Address]
-	err = json.NewDecoder(rec.Body).Decode(&response)
+	err := json.NewDecoder(rec.Body).Decode(&response)
 	s.Require().NoError(err)
 	s.Require().Equal("address", response.Type)
 	s.Require().EqualValues(1, response.Result.Id)
@@ -123,7 +120,7 @@ func (s *SearchTestSuite) TestSearchBlock() {
 	s.Require().EqualValues(100, response.Result.Height)
 	s.Require().Equal("1", response.Result.VersionApp)
 	s.Require().Equal("11", response.Result.VersionBlock)
-	s.Require().Equal("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", response.Result.Hash)
+	s.Require().Equal("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F", response.Result.Hash.String())
 	s.Require().Equal(testTime, response.Result.Time)
 	s.Require().Equal([]types.MsgType{types.MsgSend}, response.Result.MessageTypes)
 }

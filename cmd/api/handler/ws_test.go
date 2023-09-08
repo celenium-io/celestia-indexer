@@ -3,13 +3,14 @@ package handler
 import (
 	"context"
 	"crypto/rand"
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
 	ws "github.com/dipdup-io/celestia-indexer/cmd/api/handler/websocket"
@@ -153,7 +154,7 @@ func TestWebsocket(t *testing.T) {
 			require.Greater(t, block.Id, uint64(0))
 			require.Greater(t, block.Height, uint64(0))
 			require.False(t, block.Time.IsZero())
-			require.Len(t, block.Hash, 64)
+			require.Len(t, block.Hash, 32)
 
 			log.Info().
 				Uint64("height", block.Height).

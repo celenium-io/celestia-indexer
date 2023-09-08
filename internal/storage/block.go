@@ -33,17 +33,17 @@ type Block struct {
 
 	MessageTypes types.MsgTypeBits `bun:"message_types,type:int8" comment:"Bit mask with containing messages"`
 
-	Hash               []byte `bun:"hash"                 comment:"Block hash"`
-	ParentHash         []byte `bun:"parent_hash"          comment:"Hash of parent block"`
-	LastCommitHash     []byte `bun:"last_commit_hash"     comment:"Last commit hash"`
-	DataHash           []byte `bun:"data_hash"            comment:"Data hash"`
-	ValidatorsHash     []byte `bun:"validators_hash"      comment:"Validators hash"`
-	NextValidatorsHash []byte `bun:"next_validators_hash" comment:"Next validators hash"`
-	ConsensusHash      []byte `bun:"consensus_hash"       comment:"Consensus hash"`
-	AppHash            []byte `bun:"app_hash"             comment:"App hash"`
-	LastResultsHash    []byte `bun:"last_results_hash"    comment:"Last results hash"`
-	EvidenceHash       []byte `bun:"evidence_hash"        comment:"Evidence hash"`
-	ProposerAddress    []byte `bun:"proposer_address"     comment:"Proposer address"`
+	Hash               pkgTypes.Hex `bun:"hash"                 comment:"Block hash"`
+	ParentHash         pkgTypes.Hex `bun:"parent_hash"          comment:"Hash of parent block"`
+	LastCommitHash     pkgTypes.Hex `bun:"last_commit_hash"     comment:"Last commit hash"`
+	DataHash           pkgTypes.Hex `bun:"data_hash"            comment:"Data hash"`
+	ValidatorsHash     pkgTypes.Hex `bun:"validators_hash"      comment:"Validators hash"`
+	NextValidatorsHash pkgTypes.Hex `bun:"next_validators_hash" comment:"Next validators hash"`
+	ConsensusHash      pkgTypes.Hex `bun:"consensus_hash"       comment:"Consensus hash"`
+	AppHash            pkgTypes.Hex `bun:"app_hash"             comment:"App hash"`
+	LastResultsHash    pkgTypes.Hex `bun:"last_results_hash"    comment:"Last results hash"`
+	EvidenceHash       pkgTypes.Hex `bun:"evidence_hash"        comment:"Evidence hash"`
+	ProposerAddress    pkgTypes.Hex `bun:"proposer_address"     comment:"Proposer address"`
 
 	ChainId string `bun:"-"` // internal field for filling state
 

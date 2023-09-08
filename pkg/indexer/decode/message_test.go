@@ -55,7 +55,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawValidatorCommission(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x"),
+				Hash:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 				Balance: decimal.Zero,
 			},
 		},
@@ -102,7 +102,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawDelegatorReward(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76"),
+				Hash:    "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
 				Balance: decimal.Zero,
 			},
 		},
@@ -111,7 +111,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawDelegatorReward(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x"),
+				Hash:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 				Balance: decimal.Zero,
 			},
 		},
@@ -167,7 +167,7 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x"),
+				Hash:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 				Balance: decimal.Zero,
 			},
 		},
@@ -215,7 +215,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76"),
+				Hash:    "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
 				Balance: decimal.Zero,
 			},
 		},
@@ -224,7 +224,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x"),
+				Hash:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 				Balance: decimal.Zero,
 			},
 		},
@@ -233,7 +233,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestiavaloper1fg9l3xvfuu9wxremv2288777zawysg4r40gw7x"),
+				Hash:    "celestiavaloper1fg9l3xvfuu9wxremv2288777zawysg4r40gw7x",
 				Balance: decimal.Zero,
 			},
 		},
@@ -286,7 +286,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre77"),
+				Hash:    "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre77",
 				Balance: decimal.Zero,
 			},
 		},
@@ -295,7 +295,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw7x"),
+				Hash:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw7x",
 				Balance: decimal.Zero,
 			},
 		},
@@ -347,7 +347,7 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia1A2kqw44hdq5dwlcvsw8f2l49lkehtf9wp95kth"),
+				Hash:    "celestia1A2kqw44hdq5dwlcvsw8f2l49lkehtf9wp95kth",
 				Balance: decimal.Zero,
 			},
 		},
@@ -356,7 +356,7 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40g77x"),
+				Hash:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40g77x",
 				Balance: decimal.Zero,
 			},
 		},
@@ -406,7 +406,7 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia1A2kqw44hdq5dwlcvsw8f2l49lkehtf9wp99kth"),
+				Hash:    "celestia1A2kqw44hdq5dwlcvsw8f2l49lkehtf9wp99kth",
 				Balance: decimal.Zero,
 			},
 		},
@@ -415,7 +415,7 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40g88x"),
+				Hash:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40g88x",
 				Balance: decimal.Zero,
 			},
 		},
@@ -460,7 +460,7 @@ func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40g11x"),
+				Hash:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40g11x",
 				Balance: decimal.Zero,
 			},
 		},
@@ -513,7 +513,7 @@ func TestDecodeMsg_SuccessOnMsgSend(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia10a0qvvg53svyfvmuf5azx779xrpwn9lxzlfkn7"),
+				Hash:    "celestia10a0qvvg53svyfvmuf5azx779xrpwn9lxzlfkn7",
 				Balance: decimal.Zero,
 			},
 		},
@@ -522,7 +522,7 @@ func TestDecodeMsg_SuccessOnMsgSend(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l"),
+				Hash:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 				Balance: decimal.Zero,
 			},
 		},
@@ -577,7 +577,7 @@ func TestDecodeMsg_SuccessOnMsgCreateVestingAccount(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia10a0qvvg53svyfvmuf5azx779xrpwn9lxzlfkn7"),
+				Hash:    "celestia10a0qvvg53svyfvmuf5azx779xrpwn9lxzlfkn7",
 				Balance: decimal.Zero,
 			},
 		},
@@ -586,7 +586,7 @@ func TestDecodeMsg_SuccessOnMsgCreateVestingAccount(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l"),
+				Hash:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 				Balance: decimal.Zero,
 			},
 		},
@@ -635,7 +635,7 @@ func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia10a0qvvg53svyfvmuf5azx779xrpwn9lxzlfkn7"),
+				Hash:    "celestia10a0qvvg53svyfvmuf5azx779xrpwn9lxzlfkn7",
 				Balance: decimal.Zero,
 			},
 		},
@@ -644,7 +644,7 @@ func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l"),
+				Hash:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 				Balance: decimal.Zero,
 			},
 		},
@@ -703,7 +703,7 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkr777"),
+				Hash:    "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkr777",
 				Balance: decimal.Zero,
 			},
 		},
@@ -751,7 +751,7 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia1l9qjhhnxc0t6tt93q8396gu0vttwlcc238gyvr"),
+				Hash:    "celestia1l9qjhhnxc0t6tt93q8396gu0vttwlcc238gyvr",
 				Balance: decimal.Zero,
 			},
 		},
@@ -760,7 +760,7 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 			Address: storage.Address{
 				Id:      0,
 				Height:  blob.Height,
-				Hash:    []byte("celestia1vut644llcgwyvysmma6ww2xkmdytc8xspty5kx"),
+				Hash:    "celestia1vut644llcgwyvysmma6ww2xkmdytc8xspty5kx",
 				Balance: decimal.Zero,
 			},
 		},

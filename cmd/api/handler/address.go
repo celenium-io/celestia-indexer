@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"net/http"
 	"time"
 
@@ -9,7 +8,6 @@ import (
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	_ "github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 )
 
 type AddressHandler struct {
@@ -47,17 +45,12 @@ func (handler *AddressHandler) Get(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	address, err := getAddressByStringHash(c.Request().Context(), handler.address, req.Hash)
+	address, err := handler.address.ByHash(c.Request().Context(), req.Hash)
 	if err := handleError(c, err, handler.address); err != nil {
 		return err
 	}
 
-	response, err := responses.NewAddress(address)
-	if err := handleError(c, err, handler.address); err != nil {
-		return err
-	}
-
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, responses.NewAddress(address))
 }
 
 // List godoc
@@ -88,10 +81,7 @@ func (handler *AddressHandler) List(c echo.Context) error {
 
 	response := make([]responses.Address, len(address))
 	for i := range address {
-		response[i], err = responses.NewAddress(*address[i])
-		if err := handleError(c, err, handler.address); err != nil {
-			return err
-		}
+		response[i] = responses.NewAddress(*address[i])
 	}
 
 	return returnArray(c, response)
@@ -123,7 +113,7 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	address, err := getAddressByStringHash(c.Request().Context(), handler.address, req.Hash)
+	address, err := handler.address.ByHash(c.Request().Context(), req.Hash)
 	if err := handleError(c, err, handler.address); err != nil {
 		return err
 	}
@@ -151,13 +141,4 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 		response[i] = responses.NewTx(txs[i])
 	}
 	return returnArray(c, response)
-}
-
-func getAddressByStringHash(ctx context.Context, repo storage.IAddress, address string) (storage.Address, error) {
-	hash, err := responses.DecodeAddress(address)
-	if err != nil {
-		return storage.Address{}, errors.Wrap(errInvalidAddress, address)
-	}
-
-	return repo.ByHash(ctx, hash)
 }

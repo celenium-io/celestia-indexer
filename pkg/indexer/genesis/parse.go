@@ -114,7 +114,7 @@ func (module *Module) parseAccounts(accounts []types.Accounts, height pkgTypes.L
 	for i := range accounts {
 		address := storage.Address{
 			Height:  height,
-			Hash:    []byte(accounts[i].Address),
+			Hash:    accounts[i].Address,
 			Balance: decimal.Zero,
 		}
 		data.addresses[address.String()] = &address
@@ -128,7 +128,7 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 			continue
 		}
 		address := storage.Address{
-			Hash:    []byte(balances[i].Address),
+			Hash:    balances[i].Address,
 			Height:  height,
 			Balance: decimal.Zero,
 		}

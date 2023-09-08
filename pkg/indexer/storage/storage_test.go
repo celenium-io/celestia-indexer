@@ -99,7 +99,7 @@ func (s *ModuleTestSuite) TestBlockLast() {
 	s.Require().EqualValues(1001, block.Height)
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
-	s.Require().Equal(hash, block.Hash)
+	s.Require().Equal(hash, block.Hash.Bytes())
 
 	state, err := s.storage.State.ByName(ctx, testIndexerName)
 	s.Require().NoError(err)

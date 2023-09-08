@@ -2,11 +2,11 @@ package postgres
 
 import (
 	"context"
-	"crypto/rand"
 	"database/sql"
 	"testing"
 	"time"
 
+	"github.com/btcsuite/btcutil/bech32"
 	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
@@ -149,13 +149,19 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 	addresses := make([]*storage.Address, 0, 5)
 	for i := 0; i < 5; i++ {
 		hash := make([]byte, 32)
-		_, err := rand.Read(hash)
+		for j := 0; j < 31; j++ {
+			hash[j] = byte(j)
+		}
+		hash[31] = byte(i)
+		s.NoError(err)
+
+		addr, err := bech32.Encode("celestia", hash)
 		s.NoError(err)
 
 		addresses = append(addresses, &storage.Address{
 			Height:  pkgTypes.Level(10000 + i),
 			Balance: decimal.NewFromInt(int64(i * 100)),
-			Hash:    hash,
+			Hash:    addr,
 		})
 	}
 
@@ -174,7 +180,7 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 
 		s.Require().EqualValues(10000+i, address.Height)
 		s.Require().EqualValues(i*100, address.Balance.IntPart())
-		s.Require().Len(address.Hash, 32)
+		s.Require().Len(address.Hash, 47)
 	}
 }
 
