@@ -1,4 +1,4 @@
-package parser
+package decode
 
 import (
 	"github.com/celestiaorg/celestia-app/app"
@@ -11,15 +11,15 @@ import (
 	tmTypes "github.com/tendermint/tendermint/types"
 )
 
-type decodedTx struct {
-	authInfo      tx.AuthInfo
-	timeoutHeight uint64
-	memo          string
-	messages      []cosmosTypes.Msg
-	fee           decimal.Decimal
+type DecodedTx struct {
+	AuthInfo      tx.AuthInfo
+	TimeoutHeight uint64
+	Memo          string
+	Messages      []cosmosTypes.Msg
+	Fee           decimal.Decimal
 }
 
-func decodeTx(b types.BlockData, index int) (d decodedTx, err error) {
+func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
 	cfg, decoder := createDecoder()
 
 	raw := b.Block.Txs[index]
@@ -27,12 +27,12 @@ func decodeTx(b types.BlockData, index int) (d decodedTx, err error) {
 		raw = bTx.Tx
 	}
 
-	d.authInfo, d.fee, err = decodeAuthInfo(cfg, raw)
+	d.AuthInfo, d.Fee, err = decodeAuthInfo(cfg, raw)
 	if err != nil {
 		return
 	}
 
-	d.timeoutHeight, d.memo, d.messages, err = decodeCosmosTx(decoder, raw)
+	d.TimeoutHeight, d.Memo, d.Messages, err = decodeCosmosTx(decoder, raw)
 	return
 }
 
@@ -81,4 +81,9 @@ func decodeAuthInfo(cfg encoding.Config, raw tmTypes.Tx) (tx.AuthInfo, decimal.D
 func createDecoder() (encoding.Config, cosmosTypes.TxDecoder) {
 	cfg := encoding.MakeConfig(app.ModuleEncodingRegisters...)
 	return cfg, cfg.TxConfig.TxDecoder()
+}
+
+func JsonTx(raw []byte) (cosmosTypes.Tx, error) {
+	cfg := encoding.MakeConfig(app.ModuleEncodingRegisters...)
+	return cfg.TxConfig.TxJSONDecoder()(raw)
 }

@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"encoding/hex"
 	"strconv"
 	"time"
 
@@ -29,22 +28,20 @@ const InputName = "data"
 //	                     |                |
 //	                     |----------------|
 type Module struct {
-	storage postgres.Storage
-	input   *modules.Input
-	state   *storage.State
-	log     zerolog.Logger
-	g       workerpool.Group
+	storage     postgres.Storage
+	input       *modules.Input
+	indexerName string
+	log         zerolog.Logger
+	g           workerpool.Group
 }
 
 // NewModule -
 func NewModule(pg postgres.Storage, cfg config.Indexer) Module {
 	m := Module{
-		storage: pg,
-		input:   modules.NewInput(InputName),
-		state: &storage.State{
-			Name: cfg.Name,
-		},
-		g: workerpool.NewGroup(),
+		storage:     pg,
+		input:       modules.NewInput(InputName),
+		indexerName: cfg.Name,
+		g:           workerpool.NewGroup(),
 	}
 	m.log = log.With().Str("module", m.Name()).Logger()
 
@@ -56,37 +53,8 @@ func (*Module) Name() string {
 	return "storage"
 }
 
-func (module *Module) initState(ctx context.Context) error {
-	module.log.Info().Msg("loading current state from database...")
-
-	state, err := module.storage.State.ByName(ctx, module.state.Name)
-	switch {
-	case err == nil:
-		module.state = &state
-		module.log.Info().
-			Str("indexer_name", module.state.Name).
-			Uint64("height", uint64(module.state.LastHeight)).
-			Str("hash", hex.EncodeToString(module.state.LastHash)).
-			Time("last_updated", module.state.LastTime).
-			Msg("current state")
-		return nil
-
-	case module.storage.State.IsNoRows(err):
-		module.log.Info().Msg("state is not found. creating empty state...")
-		return module.storage.State.Save(ctx, module.state)
-
-	default:
-		return errors.Wrap(err, "state loading")
-	}
-}
-
 // Start -
 func (module *Module) Start(ctx context.Context) {
-	if err := module.initState(ctx); err != nil {
-		module.log.Err(err).Msg("error during storage module initialization")
-		return
-	}
-
 	module.g.GoCtx(ctx, module.listen)
 }
 
@@ -152,20 +120,20 @@ func (module *Module) AttachTo(name string, input *modules.Input) error {
 	return nil
 }
 
-func (module *Module) updateState(block storage.Block, totalAccounts uint64) {
-	if types.Level(block.Id) <= module.state.LastHeight {
+func (module *Module) updateState(block storage.Block, totalAccounts uint64, state *storage.State) {
+	if types.Level(block.Id) <= state.LastHeight {
 		return
 	}
 
-	module.state.LastHeight = block.Height
-	module.state.LastHash = block.Hash
-	module.state.LastTime = block.Time
-	module.state.TotalTx += block.Stats.TxCount
-	module.state.TotalAccounts += totalAccounts
-	module.state.TotalBlobsSize = block.Stats.BlobsSize
-	module.state.TotalFee = module.state.TotalFee.Add(block.Stats.Fee)
-	module.state.TotalSupply = module.state.TotalSupply.Add(block.Stats.SupplyChange)
-	module.state.ChainId = block.ChainId
+	state.LastHeight = block.Height
+	state.LastHash = block.Hash
+	state.LastTime = block.Time
+	state.TotalTx += block.Stats.TxCount
+	state.TotalAccounts += totalAccounts
+	state.TotalBlobsSize = block.Stats.BlobsSize
+	state.TotalFee = state.TotalFee.Add(block.Stats.Fee)
+	state.TotalSupply = state.TotalSupply.Add(block.Stats.SupplyChange)
+	state.ChainId = block.ChainId
 }
 
 func (module *Module) saveBlock(ctx context.Context, block storage.Block) error {
@@ -177,7 +145,11 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 	}
 	defer tx.Close(ctx)
 
-	block.Id = uint64(block.Height)
+	state, err := tx.State(ctx, module.indexerName)
+	if err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
 	if err := tx.Add(ctx, &block); err != nil {
 		return tx.HandleError(ctx, err)
 	}
@@ -302,8 +274,8 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 		return tx.HandleError(ctx, err)
 	}
 
-	module.updateState(block, totalAccounts)
-	if err := tx.Update(ctx, module.state); err != nil {
+	module.updateState(block, totalAccounts, &state)
+	if err := tx.Update(ctx, &state); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 

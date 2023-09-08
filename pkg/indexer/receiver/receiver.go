@@ -2,6 +2,8 @@ package receiver
 
 import (
 	"context"
+	"sync"
+
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-io/celestia-indexer/pkg/node"
@@ -11,12 +13,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"sync"
 )
 
 const (
-	name         = "receiver"
-	BlocksOutput = "blocks"
+	name          = "receiver"
+	BlocksOutput  = "blocks"
+	GenesisOutput = "genesis"
+
+	GenesisDoneInput = "genesis_done"
 )
 
 // Module - runs through chain with aim ti catch up head and identifies either block is fits in sequence or signals of rollback.
@@ -27,40 +31,49 @@ const (
 //	|                | -- types.Level ->
 //	|----------------|
 type Module struct {
-	api     node.API
-	cfg     config.Indexer
-	outputs map[string]*modules.Output
-	pool    *workerpool.Pool[types.Level]
-	blocks  chan types.BlockData
-	level   types.Level
-	hash    []byte
-	mx      *sync.RWMutex
-	log     zerolog.Logger
-	g       workerpool.Group
+	api         node.API
+	cfg         config.Indexer
+	inputs      map[string]*modules.Input
+	outputs     map[string]*modules.Output
+	pool        *workerpool.Pool[types.Level]
+	blocks      chan types.BlockData
+	level       types.Level
+	hash        []byte
+	needGenesis bool
+	mx          *sync.RWMutex
+	log         zerolog.Logger
+	g           workerpool.Group
 }
 
 func NewModule(cfg config.Indexer, api node.API, state *storage.State) Module {
-	var level types.Level
-	var hash []byte
-
-	if state == nil {
+	var (
 		level = types.Level(cfg.StartLevel)
+		hash  []byte
+	)
+
+	if state != nil {
 		// TODO-DISCUSS check for hash changed of state last block
-	} else {
 		level = state.LastHeight
 		hash = state.LastHash
 	}
 
 	receiver := Module{
-		api:     api,
-		cfg:     cfg,
-		outputs: map[string]*modules.Output{BlocksOutput: modules.NewOutput(BlocksOutput)},
-		blocks:  make(chan types.BlockData, cfg.ThreadsCount*10),
-		level:   level,
-		hash:    hash,
-		mx:      new(sync.RWMutex),
-		log:     log.With().Str("module", name).Logger(),
-		g:       workerpool.NewGroup(),
+		api: api,
+		cfg: cfg,
+		inputs: map[string]*modules.Input{
+			GenesisDoneInput: modules.NewInput(GenesisDoneInput),
+		},
+		outputs: map[string]*modules.Output{
+			BlocksOutput:  modules.NewOutput(BlocksOutput),
+			GenesisOutput: modules.NewOutput(GenesisOutput),
+		},
+		blocks:      make(chan types.BlockData, cfg.ThreadsCount*10),
+		level:       level,
+		hash:        hash,
+		needGenesis: state == nil,
+		mx:          new(sync.RWMutex),
+		log:         log.With().Str("module", name).Logger(),
+		g:           workerpool.NewGroup(),
 	}
 
 	receiver.pool = workerpool.NewPool(receiver.worker, int(cfg.ThreadsCount))
@@ -77,6 +90,13 @@ func (r *Module) Start(ctx context.Context) {
 	r.log.Info().Msg("starting receiver...")
 	r.pool.Start(ctx)
 
+	if r.needGenesis {
+		if err := r.receiveGenesis(ctx); err != nil {
+			log.Err(err).Msg("receiving genesis error")
+			return
+		}
+	}
+
 	r.g.GoCtx(ctx, r.sequencer)
 	r.g.GoCtx(ctx, r.sync)
 }
@@ -91,6 +111,12 @@ func (r *Module) Close() error {
 
 	close(r.blocks)
 
+	for name, input := range r.inputs {
+		if err := input.Close(); err != nil {
+			return errors.Wrapf(err, "closing error of '%s' input", name)
+		}
+	}
+
 	return nil
 }
 
@@ -103,7 +129,11 @@ func (r *Module) Output(name string) (*modules.Output, error) {
 }
 
 func (r *Module) Input(name string) (*modules.Input, error) {
-	return nil, errors.Wrap(modules.ErrUnknownInput, name)
+	input, ok := r.inputs[name]
+	if !ok {
+		return nil, errors.Wrap(modules.ErrUnknownInput, name)
+	}
+	return input, nil
 }
 
 func (r *Module) AttachTo(outputName string, input *modules.Input) error {

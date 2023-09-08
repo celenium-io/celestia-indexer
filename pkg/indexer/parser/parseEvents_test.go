@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/dipdup-io/celestia-indexer/internal/test_suite"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -50,7 +51,7 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 		Events:    events,
 		Codespace: "celestia-explorer",
 	}
-	block, now := createBlock(txRes, 1)
+	block, now := testsuite.CreateTestBlock(txRes, 1)
 
 	resultEvents := parseEvents(block, events)
 

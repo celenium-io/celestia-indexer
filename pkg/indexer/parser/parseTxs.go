@@ -3,6 +3,7 @@ package parser
 import (
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	"github.com/dipdup-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 )
@@ -23,7 +24,7 @@ func parseTxs(b types.BlockData) ([]storage.Tx, error) {
 }
 
 func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (storage.Tx, error) {
-	d, err := decodeTx(b, index)
+	d, err := decode.Tx(b, index)
 	if err != nil {
 		return storage.Tx{}, errors.Wrapf(err, "while parsing Tx on index %d", index)
 	}
@@ -34,17 +35,17 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (stor
 		Position:      uint64(index),
 		GasWanted:     uint64(txRes.GasWanted),
 		GasUsed:       uint64(txRes.GasUsed),
-		TimeoutHeight: d.timeoutHeight,
+		TimeoutHeight: d.TimeoutHeight,
 		EventsCount:   uint64(len(txRes.Events)),
-		MessagesCount: uint64(len(d.messages)),
-		Fee:           d.fee,
+		MessagesCount: uint64(len(d.Messages)),
+		Fee:           d.Fee,
 		Status:        storageTypes.StatusSuccess,
 		Codespace:     txRes.Codespace,
 		Hash:          b.Block.Txs[index].Hash(),
-		Memo:          d.memo,
+		Memo:          d.Memo,
 		MessageTypes:  storageTypes.NewMsgTypeBitMask(),
 
-		Messages:  make([]storage.Message, len(d.messages)),
+		Messages:  make([]storage.Message, len(d.Messages)),
 		Events:    nil,
 		Addresses: make([]storage.AddressWithType, 0),
 		BlobsSize: 0,
@@ -56,16 +57,16 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (stor
 	}
 
 	t.Events = parseEvents(b, txRes.Events)
-	for position, sdkMsg := range d.messages {
-		dm, err := decodeMsg(b, sdkMsg, position)
+	for position, sdkMsg := range d.Messages {
+		dm, err := decode.Message(sdkMsg, b.Height, b.Block.Time, position)
 		if err != nil {
 			return storage.Tx{}, errors.Wrapf(err, "while parsing tx=%v on index=%d", t.Hash, t.Position)
 		}
 
-		t.Messages[position] = dm.msg
-		t.MessageTypes.SetBit(dm.msg.Type)
-		t.BlobsSize += dm.blobsSize
-		t.Addresses = append(t.Addresses, dm.addresses...)
+		t.Messages[position] = dm.Msg
+		t.MessageTypes.SetBit(dm.Msg.Type)
+		t.BlobsSize += dm.BlobsSize
+		t.Addresses = append(t.Addresses, dm.Addresses...)
 	}
 
 	return t, nil

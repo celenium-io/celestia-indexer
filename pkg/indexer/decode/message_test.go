@@ -1,6 +1,8 @@
-package parser
+package decode
 
 import (
+	"testing"
+
 	"cosmossdk.io/math"
 	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
 	cosmosCodecTypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -13,10 +15,10 @@ import (
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/dipdup-io/celestia-indexer/internal/test_suite"
 	"github.com/fatih/structs"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 // MsgWithdrawValidatorCommission
@@ -31,10 +33,10 @@ func createMsgWithdrawValidatorCommission() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnMsgWithdrawValidatorCommission(t *testing.T) {
 	m := createMsgWithdrawValidatorCommission()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, m, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -60,9 +62,9 @@ func TestDecodeMsg_SuccessOnMsgWithdrawValidatorCommission(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgWithdrawDelegatorReward
@@ -78,10 +80,10 @@ func createMsgWithdrawDelegatorReward() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnMsgWithdrawDelegatorReward(t *testing.T) {
 	m := createMsgWithdrawDelegatorReward()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, m, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -116,9 +118,9 @@ func TestDecodeMsg_SuccessOnMsgWithdrawDelegatorReward(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgEditValidator
@@ -143,10 +145,10 @@ func createMsgEditValidator() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 	m := createMsgEditValidator()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, m, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -172,9 +174,9 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgBeginRedelegate
@@ -191,10 +193,10 @@ func createMsgBeginRedelegate() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 	m := createMsgBeginRedelegate()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, m, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -238,9 +240,9 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgCreateValidator
@@ -262,10 +264,10 @@ func createMsgCreateValidator() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 	m := createMsgCreateValidator()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, m, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -300,9 +302,9 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgDelegate
@@ -323,10 +325,10 @@ func createMsgDelegate() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 	msgDelegate := createMsgDelegate()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, msgDelegate, position)
+	dm, err := Message(msgDelegate, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -361,9 +363,9 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgUndelegate
@@ -382,10 +384,10 @@ func createMsgUndelegate() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 	m := createMsgUndelegate()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, m, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -420,9 +422,9 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgUnjail
@@ -436,10 +438,10 @@ func createMsgUnjail() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 	m := createMsgUnjail()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, m, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -465,9 +467,9 @@ func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgSend
@@ -489,10 +491,10 @@ func createMsgSend() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnMsgSend(t *testing.T) {
 	msgSend := createMsgSend()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, msgSend, position)
+	dm, err := Message(msgSend, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -527,9 +529,9 @@ func TestDecodeMsg_SuccessOnMsgSend(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgCreateVestingAccount
@@ -553,10 +555,10 @@ func createMsgCreateVestingAccount() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnMsgCreateVestingAccount(t *testing.T) {
 	m := createMsgCreateVestingAccount()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, m, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -591,9 +593,9 @@ func TestDecodeMsg_SuccessOnMsgCreateVestingAccount(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgCreatePeriodicVestingAccount
@@ -611,10 +613,10 @@ func createMsgCreatePeriodicVestingAccount() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 	msgCreatePeriodicVestingAccount := createMsgCreatePeriodicVestingAccount()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, msgCreatePeriodicVestingAccount, position)
+	dm, err := Message(msgCreatePeriodicVestingAccount, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -649,9 +651,9 @@ func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgPayForBlob
@@ -669,10 +671,10 @@ func createMsgPayForBlob() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 	msgPayForBlob := createMsgPayForBlob()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, msgPayForBlob, position)
+	dm, err := Message(msgPayForBlob, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:       0,
@@ -708,9 +710,9 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(1), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(1), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgGrantAllowance
@@ -727,10 +729,10 @@ func createMsgGrantAllowance() cosmosTypes.Msg {
 
 func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 	m := createMsgGrantAllowance()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 4
 
-	dm, err := decodeMsg(blob, m, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -765,9 +767,9 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
-	assert.Equal(t, addressesExpected, dm.addresses)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgUnknown
@@ -787,10 +789,10 @@ func createMsgUnknown() cosmosTypes.Msg {
 
 func TestDecodeMsg_MsgUnknown(t *testing.T) {
 	msgUnknown := createMsgUnknown()
-	blob, now := createEmptyBlock()
+	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decodeMsg(blob, msgUnknown, position)
+	dm, err := Message(msgUnknown, blob.Height, blob.Block.Time, position)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -804,6 +806,6 @@ func TestDecodeMsg_MsgUnknown(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.blobsSize)
-	assert.Equal(t, msgExpected, dm.msg)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
 }

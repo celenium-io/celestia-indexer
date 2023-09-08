@@ -1,6 +1,8 @@
-package parser
+package decode
 
 import (
+	"time"
+
 	"github.com/celestiaorg/celestia-app/pkg/namespace"
 	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
@@ -18,47 +20,47 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type decodedMsg struct {
-	msg       storage.Message
-	blobsSize uint64
-	addresses []storage.AddressWithType
+type DecodedMsg struct {
+	Msg       storage.Message
+	BlobsSize uint64
+	Addresses []storage.AddressWithType
 }
 
-func decodeMsg(b types.BlockData, msg cosmosTypes.Msg, position int) (d decodedMsg, err error) {
-	d.msg.Height = b.Height
-	d.msg.Time = b.Block.Time
-	d.msg.Position = uint64(position)
-	d.msg.Data = structs.Map(msg)
+func Message(msg cosmosTypes.Msg, height types.Level, time time.Time, position int) (d DecodedMsg, err error) {
+	d.Msg.Height = height
+	d.Msg.Time = time
+	d.Msg.Position = uint64(position)
+	d.Msg.Data = structs.Map(msg)
 
 	switch typedMsg := msg.(type) {
 	case *cosmosDistributionTypes.MsgWithdrawValidatorCommission:
-		d.msg.Type, d.addresses, err = handleMsgWithdrawValidatorCommission(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, err = handleMsgWithdrawValidatorCommission(height, typedMsg)
 	case *cosmosDistributionTypes.MsgWithdrawDelegatorReward:
-		d.msg.Type, d.addresses, err = handleMsgWithdrawDelegatorReward(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, err = handleMsgWithdrawDelegatorReward(height, typedMsg)
 	case *cosmosStakingTypes.MsgEditValidator:
-		d.msg.Type, d.addresses, err = handleMsgEditValidator(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, err = handleMsgEditValidator(height, typedMsg)
 	case *cosmosStakingTypes.MsgBeginRedelegate:
-		d.msg.Type, d.addresses, err = handleMsgBeginRedelegate(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, err = handleMsgBeginRedelegate(height, typedMsg)
 	case *cosmosStakingTypes.MsgCreateValidator:
-		d.msg.Type, d.addresses, err = handleMsgCreateValidator(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, err = handleMsgCreateValidator(height, typedMsg)
 	case *cosmosStakingTypes.MsgDelegate:
-		d.msg.Type, d.addresses, err = handleMsgDelegate(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, err = handleMsgDelegate(height, typedMsg)
 	case *cosmosStakingTypes.MsgUndelegate:
-		d.msg.Type, d.addresses, err = handleMsgUndelegate(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, err = handleMsgUndelegate(height, typedMsg)
 	case *cosmosSlashingTypes.MsgUnjail:
-		d.msg.Type, d.addresses, err = handleMsgUnjail(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, err = handleMsgUnjail(height, typedMsg)
 	case *cosmosBankTypes.MsgSend:
-		d.msg.Type, d.addresses, err = handleMsgSend(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, err = handleMsgSend(height, typedMsg)
 	case *cosmosVestingTypes.MsgCreateVestingAccount:
-		d.msg.Type, d.addresses, err = handleMsgCreateVestingAccount(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, err = handleMsgCreateVestingAccount(height, typedMsg)
 	case *cosmosVestingTypes.MsgCreatePeriodicVestingAccount:
-		d.msg.Type, d.addresses, err = handleMsgCreatePeriodicVestingAccount(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, err = handleMsgCreatePeriodicVestingAccount(height, typedMsg)
 	case *appBlobTypes.MsgPayForBlobs:
-		d.msg.Type, d.addresses, d.msg.Namespace, d.blobsSize, err = handleMsgPayForBlobs(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, d.Msg.Namespace, d.BlobsSize, err = handleMsgPayForBlobs(height, typedMsg)
 	case *cosmosFeegrant.MsgGrantAllowance:
-		d.msg.Type, d.addresses, err = handleMsgGrantAllowance(b.Height, typedMsg)
+		d.Msg.Type, d.Addresses, err = handleMsgGrantAllowance(height, typedMsg)
 	default:
-		d.msg.Type = storageTypes.MsgUnknown
+		d.Msg.Type = storageTypes.MsgUnknown
 	}
 
 	if err != nil {

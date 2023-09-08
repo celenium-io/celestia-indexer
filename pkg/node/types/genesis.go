@@ -1,8 +1,11 @@
 package types
 
 import (
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"encoding/json"
 	"time"
+
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/tendermint/tendermint/libs/bytes"
 )
 
 type Genesis struct {
@@ -10,7 +13,7 @@ type Genesis struct {
 	ChainID         string                `json:"chain_id"`
 	InitialHeight   int64                 `json:"initial_height,string"`
 	ConsensusParams types.ConsensusParams `json:"consensus_params"`
-	AppHash         string                `json:"app_hash"`
+	AppHash         bytes.HexBytes        `json:"app_hash"`
 	AppState        AppState              `json:"app_state"`
 }
 
@@ -177,7 +180,7 @@ type Messages struct {
 type Body struct {
 	Messages                    []Messages    `json:"messages"`
 	Memo                        string        `json:"memo"`
-	TimeoutHeight               string        `json:"timeout_height"`
+	TimeoutHeight               uint64        `json:"timeout_height,string"`
 	ExtensionOptions            []interface{} `json:"extension_options"`
 	NonCriticalExtensionOptions []interface{} `json:"non_critical_extension_options"`
 }
@@ -216,7 +219,7 @@ type GenTxs struct {
 }
 
 type Genutil struct {
-	GenTxs []GenTxs `json:"gen_txs"`
+	GenTxs []json.RawMessage `json:"gen_txs"`
 }
 
 type DepositParams struct {
