@@ -3,13 +3,13 @@ package rollback
 import (
 	"bytes"
 	"context"
+	"github.com/dipdup-io/celestia-indexer/pkg/node"
 
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
-	"github.com/dipdup-io/celestia-indexer/pkg/node/rpc"
 	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -34,7 +34,7 @@ type Module struct {
 	tx        sdk.Transactable
 	state     storage.IState
 	blocks    storage.IBlock
-	node      rpc.API
+	node      node.API
 	indexName string
 	input     *modules.Input
 	output    *modules.Output
@@ -46,7 +46,7 @@ func NewModule(
 	tx sdk.Transactable,
 	state storage.IState,
 	blocks storage.IBlock,
-	node rpc.API,
+	node node.API,
 	cfg config.Indexer,
 ) *Module {
 	module := Module{

@@ -17,15 +17,15 @@ type Module struct {
 }
 
 const (
-	name        = "parser"
-	BlocksInput = "blocks"
-	DataOutput  = "data"
+	name       = "parser"
+	InputName  = "blocks"
+	OutputName = "data"
 )
 
 func NewModule() Module {
 	return Module{
-		input:  modules.NewInput(BlocksInput),
-		output: modules.NewOutput(DataOutput),
+		input:  modules.NewInput(InputName),
+		output: modules.NewOutput(OutputName),
 		log:    log.With().Str("module", name).Logger(),
 		g:      workerpool.NewGroup(),
 	}
@@ -49,7 +49,7 @@ func (p *Module) Close() error {
 }
 
 func (p *Module) Output(name string) (*modules.Output, error) {
-	if name != DataOutput {
+	if name != OutputName {
 		return nil, errors.Wrap(modules.ErrUnknownOutput, name)
 	}
 
@@ -57,7 +57,7 @@ func (p *Module) Output(name string) (*modules.Output, error) {
 }
 
 func (p *Module) Input(name string) (*modules.Input, error) {
-	if name != BlocksInput {
+	if name != InputName {
 		return nil, errors.Wrap(modules.ErrUnknownInput, name)
 	}
 	return p.input, nil

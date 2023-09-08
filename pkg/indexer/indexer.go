@@ -7,6 +7,7 @@ import (
 	internalStorage "github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/genesis"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/parser"
+	"github.com/dipdup-io/celestia-indexer/pkg/indexer/rollback"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/storage"
 	"github.com/dipdup-io/celestia-indexer/pkg/node"
 	"github.com/dipdup-io/celestia-indexer/pkg/node/rpc"
@@ -25,6 +26,7 @@ type Indexer struct {
 	receiver *receiver.Module
 	parser   *parser.Module
 	storage  *storage.Module
+	rollback *rollback.Module
 	genesis  *genesis.Module
 	wg       *sync.WaitGroup
 	log      zerolog.Logger
@@ -36,30 +38,24 @@ func New(ctx context.Context, cfg config.Config) (Indexer, error) {
 		return Indexer{}, errors.Wrap(err, "while creating pg context")
 	}
 
-	state, err := LoadState(pg, ctx, cfg.Indexer.Name)
+	api, r, err := createReceiver(ctx, cfg, pg)
 	if err != nil {
-		return Indexer{}, errors.Wrap(err, "while loading state")
+		return Indexer{}, errors.Wrap(err, "while creating receiver module")
 	}
 
-	api := rpc.NewAPI(cfg.DataSources["node_rpc"])
-	r := receiver.NewModule(cfg.Indexer, &api, state)
-
-	p := parser.NewModule()
-	pInput, err := p.Input(parser.BlocksInput)
+	rb, err := createRollback(r, pg, &api, cfg.Indexer)
 	if err != nil {
-		return Indexer{}, errors.Wrap(err, "cannot find input in parser")
-	}
-	if err = r.AttachTo(receiver.BlocksOutput, pInput); err != nil {
-		return Indexer{}, err
+		return Indexer{}, errors.Wrap(err, "while creating rollback module")
 	}
 
-	s := storage.NewModule(pg, cfg.Indexer)
-	sInput, err := s.Input(storage.InputName)
+	p, err := createParser(r)
 	if err != nil {
-		return Indexer{}, errors.Wrap(err, "cannot find input in storage")
+		return Indexer{}, errors.Wrap(err, "while creating parser module")
 	}
-	if err = p.AttachTo(parser.DataOutput, sInput); err != nil {
-		return Indexer{}, err
+
+	s, err := createStorage(pg, cfg, p)
+	if err != nil {
+		return Indexer{}, errors.Wrap(err, "while creating storage module")
 	}
 
 	genesisModule := genesis.NewModule(pg, cfg.Indexer)
@@ -84,6 +80,7 @@ func New(ctx context.Context, cfg config.Config) (Indexer, error) {
 		receiver: &r,
 		parser:   &p,
 		storage:  &s,
+		rollback: rb,
 		genesis:  &genesisModule,
 		wg:       new(sync.WaitGroup),
 		log:      log.With().Str("module", "indexer").Logger(),
@@ -119,7 +116,72 @@ func (i *Indexer) Close() error {
 	return nil
 }
 
-func LoadState(pg postgres.Storage, ctx context.Context, indexerName string) (*internalStorage.State, error) {
+func createReceiver(ctx context.Context, cfg config.Config, pg postgres.Storage) (rpc.API, receiver.Module, error) {
+	state, err := loadState(pg, ctx, cfg.Indexer.Name)
+	if err != nil {
+		return rpc.API{}, receiver.Module{}, errors.Wrap(err, "while loading state")
+	}
+
+	api := rpc.NewAPI(cfg.DataSources["node_rpc"])
+	receiverModule := receiver.NewModule(cfg.Indexer, &api, state)
+	return api, receiverModule, nil
+}
+
+func createRollback(r receiver.Module, pg postgres.Storage, api node.API, cfg config.Indexer) (*rollback.Module, error) {
+	rollbackModule := rollback.NewModule(pg.Transactable, pg.State, pg.Blocks, api, cfg)
+
+	// rollback <- listen signal -- receiver
+	rbInput, err := rollbackModule.Input(rollback.InputName)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = r.AttachTo(receiver.RollbackOutput, rbInput); err != nil {
+		return nil, errors.Wrap(err, "while attaching rollback to receiver")
+	}
+
+	// receiver <- listen state -- rollback
+	rInput, err := r.Input(receiver.RollbackInput)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = rollbackModule.AttachTo(rollback.OutputName, rInput); err != nil {
+		return nil, errors.Wrap(err, "while attaching receiver to rollback")
+	}
+
+	return rollbackModule, nil
+}
+
+func createParser(r receiver.Module) (parser.Module, error) {
+	parserModule := parser.NewModule()
+	pInput, err := parserModule.Input(parser.InputName)
+	if err != nil {
+		return parser.Module{}, err
+	}
+
+	if err = r.AttachTo(receiver.BlocksOutput, pInput); err != nil {
+		return parser.Module{}, errors.Wrap(err, "while attaching parser to receiver")
+	}
+
+	return parserModule, nil
+}
+
+func createStorage(pg postgres.Storage, cfg config.Config, p parser.Module) (storage.Module, error) {
+	s := storage.NewModule(pg, cfg.Indexer)
+	sInput, err := s.Input(storage.InputName)
+	if err != nil {
+		return storage.Module{}, err
+	}
+
+	if err = p.AttachTo(parser.OutputName, sInput); err != nil {
+		return storage.Module{}, err
+	}
+
+	return s, nil
+}
+
+func loadState(pg postgres.Storage, ctx context.Context, indexerName string) (*internalStorage.State, error) {
 	state, err := pg.State.ByName(ctx, indexerName)
 	if err != nil {
 		if pg.State.IsNoRows(err) {

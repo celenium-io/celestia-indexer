@@ -16,33 +16,38 @@ import (
 )
 
 const (
-	name          = "receiver"
-	BlocksOutput  = "blocks"
-	GenesisOutput = "genesis"
-
+	name             = "receiver"
+	BlocksOutput     = "blocks"
+	RollbackOutput   = "signal"
+	RollbackInput    = "state"
+	GenesisOutput    = "genesis"
 	GenesisDoneInput = "genesis_done"
 )
 
 // Module - runs through chain with aim ti catch up head and identifies either block is fits in sequence or signals of rollback.
 //
-//	|----------------|
-//	|                | -- types.BlockData ->
-//	|     MODULE     |
-//	|                | -- types.Level ->
-//	|----------------|
+//		|----------------|
+//		|                | -- types.BlockData -> BlocksOutput
+//		|     MODULE     |
+//		|    Receiver    | -- struct{}        -> RollbackOutput
+//		|                | <- storage.State   -- RollbackInput
+//	    |----------------|
 type Module struct {
-	api         node.API
-	cfg         config.Indexer
-	inputs      map[string]*modules.Input
-	outputs     map[string]*modules.Output
-	pool        *workerpool.Pool[types.Level]
-	blocks      chan types.BlockData
-	level       types.Level
-	hash        []byte
-	needGenesis bool
-	mx          *sync.RWMutex
-	log         zerolog.Logger
-	g           workerpool.Group
+	api              node.API
+	cfg              config.Indexer
+	inputs           map[string]*modules.Input
+	outputs          map[string]*modules.Output
+	stateInput       *modules.Input
+	pool             *workerpool.Pool[types.Level]
+	blocks           chan types.BlockData
+	level            types.Level
+	hash             []byte
+	needGenesis      bool
+	mx               *sync.RWMutex
+	log              zerolog.Logger
+	rollbackSync     *sync.WaitGroup
+	g                workerpool.Group
+	cancelReadBlocks context.CancelFunc
 }
 
 func NewModule(cfg config.Indexer, api node.API, state *storage.State) Module {
@@ -61,19 +66,23 @@ func NewModule(cfg config.Indexer, api node.API, state *storage.State) Module {
 		api: api,
 		cfg: cfg,
 		inputs: map[string]*modules.Input{
+			RollbackInput:    modules.NewInput(RollbackInput),
 			GenesisDoneInput: modules.NewInput(GenesisDoneInput),
 		},
 		outputs: map[string]*modules.Output{
-			BlocksOutput:  modules.NewOutput(BlocksOutput),
-			GenesisOutput: modules.NewOutput(GenesisOutput),
+			BlocksOutput:   modules.NewOutput(BlocksOutput),
+			RollbackOutput: modules.NewOutput(RollbackOutput),
+			GenesisOutput:  modules.NewOutput(GenesisOutput),
 		},
-		blocks:      make(chan types.BlockData, cfg.ThreadsCount*10),
-		level:       level,
-		hash:        hash,
-		needGenesis: state == nil,
-		mx:          new(sync.RWMutex),
-		log:         log.With().Str("module", name).Logger(),
-		g:           workerpool.NewGroup(),
+		stateInput:   modules.NewInput(RollbackInput),
+		blocks:       make(chan types.BlockData, cfg.ThreadsCount*10),
+		needGenesis:  state == nil,
+		level:        level,
+		hash:         hash,
+		mx:           new(sync.RWMutex),
+		log:          log.With().Str("module", name).Logger(),
+		rollbackSync: new(sync.WaitGroup),
+		g:            workerpool.NewGroup(),
 	}
 
 	receiver.pool = workerpool.NewPool(receiver.worker, int(cfg.ThreadsCount))
@@ -99,6 +108,7 @@ func (r *Module) Start(ctx context.Context) {
 
 	r.g.GoCtx(ctx, r.sequencer)
 	r.g.GoCtx(ctx, r.sync)
+	r.g.GoCtx(ctx, r.rollback)
 }
 
 func (r *Module) Close() error {
@@ -159,4 +169,29 @@ func (r *Module) setLevel(level types.Level, hash []byte) {
 
 	r.level = level
 	r.hash = hash
+}
+
+func (r *Module) rollback(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case msg, ok := <-r.inputs[RollbackInput].Listen():
+			r.rollbackSync.Done()
+
+			if !ok {
+				r.log.Warn().Msg("can't read message from rollback input")
+				continue
+			}
+
+			state, ok := msg.(storage.State)
+			if !ok {
+				r.log.Warn().Msgf("invalid message type: %T", msg)
+				continue
+			}
+
+			r.setLevel(state.LastHeight, state.LastHash)
+			r.log.Info().Msgf("caught rollack to level=%d", state.LastHeight)
+		}
+	}
 }

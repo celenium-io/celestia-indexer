@@ -6,7 +6,9 @@ import (
 )
 
 func (r *Module) sync(ctx context.Context) {
-	if err := r.readBlocks(ctx); err != nil {
+	var blocksCtx context.Context
+	blocksCtx, r.cancelReadBlocks = context.WithCancel(ctx)
+	if err := r.readBlocks(blocksCtx); err != nil {
 		r.log.Err(err).Msg("while reading blocks")
 		return
 	}
@@ -15,11 +17,14 @@ func (r *Module) sync(ctx context.Context) {
 	defer ticker.Stop()
 
 	for {
+		r.rollbackSync.Wait()
+
 		select {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			if err := r.readBlocks(ctx); err != nil {
+			blocksCtx, r.cancelReadBlocks = context.WithCancel(ctx)
+			if err := r.readBlocks(blocksCtx); err != nil {
 				r.log.Err(err).Msg("while reading blocks by timer")
 				return
 			}
