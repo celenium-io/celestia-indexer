@@ -65,6 +65,8 @@ const (
 	EventTypeSetFeegrant EventType = "set_feegrant"
 	// EventTypeUpdateFeegrant is a EventType of type update_feegrant.
 	EventTypeUpdateFeegrant EventType = "update_feegrant"
+	// EventTypeSlash is a EventType of type slash.
+	EventTypeSlash EventType = "slash"
 )
 
 var ErrInvalidEventType = errors.New("not a valid EventType")
@@ -98,6 +100,7 @@ func EventTypeValues() []EventType {
 		EventTypeRevokeFeegrant,
 		EventTypeSetFeegrant,
 		EventTypeUpdateFeegrant,
+		EventTypeSlash,
 	}
 }
 
@@ -140,6 +143,7 @@ var _EventTypeValue = map[string]EventType{
 	"revoke_feegrant":                   EventTypeRevokeFeegrant,
 	"set_feegrant":                      EventTypeSetFeegrant,
 	"update_feegrant":                   EventTypeUpdateFeegrant,
+	"slash":                             EventTypeSlash,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

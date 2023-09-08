@@ -9,18 +9,11 @@ import (
 
 func (r *Module) sequencer(ctx context.Context) {
 	orderedBlocks := map[int64]types.BlockData{}
+	var prevBlockHash []byte
 	l, _ := r.Level()
 	currentBlock := int64(l)
-	fromRollback := false
 
 	for {
-		r.rollbackSync.Wait()
-		if fromRollback {
-			l, _ := r.Level()
-			currentBlock = int64(l)
-			fromRollback = false
-		}
-
 		select {
 		case <-ctx.Done():
 			return
@@ -38,21 +31,9 @@ func (r *Module) sequencer(ctx context.Context) {
 			}
 
 			if b, ok := orderedBlocks[currentBlock]; ok {
-				prevB, ok := orderedBlocks[currentBlock-1]
-
-				if ok {
-					if !bytes.Equal(b.Block.LastBlockID.Hash, prevB.BlockID.Hash) {
-						r.log.Info().
-							Str("current.lastBlockHash", hex.EncodeToString(b.Block.LastBlockID.Hash)).
-							Str("prevBlockHash", hex.EncodeToString(prevB.BlockID.Hash)).
-							Uint64("level", uint64(b.Height)).
-							Msg("rollback detected")
-
-						r.rollbackSync.Add(1)
-						r.cancelReadBlocks()
-						fromRollback = true
-						r.outputs[RollbackOutput].Push(struct{}{})
-
+				if prevBlockHash != nil {
+					if !bytes.Equal(b.Block.LastBlockID.Hash, prevBlockHash) {
+						prevBlockHash, currentBlock, orderedBlocks = r.startRollback(ctx, b, prevBlockHash)
 						break
 					}
 				} // TODO else: check with block from storage?
@@ -61,10 +42,62 @@ func (r *Module) sequencer(ctx context.Context) {
 				r.setLevel(types.Level(currentBlock), b.BlockID.Hash)
 				r.log.Debug().Msgf("put in order block=%d", currentBlock)
 
+				prevBlockHash = b.BlockID.Hash
+				delete(orderedBlocks, currentBlock)
 				currentBlock += 1
-			} else {
-				break
 			}
 		}
+	}
+}
+
+func (r *Module) startRollback(
+	ctx context.Context,
+	b types.BlockData,
+	prevBlockHash []byte,
+) ([]byte, int64, map[int64]types.BlockData) {
+	r.log.Info().
+		Str("current.lastBlockHash", hex.EncodeToString(b.Block.LastBlockID.Hash)).
+		Str("prevBlockHash", hex.EncodeToString(prevBlockHash)).
+		Uint64("level", uint64(b.Height)).
+		Msg("rollback detected")
+
+	// Pause all receiver routines
+	r.rollbackSync.Add(1)
+
+	// Stop readBlocks
+	if r.cancelReadBlocks != nil {
+		r.cancelReadBlocks()
+	}
+
+	// Stop pool workers
+	if r.cancelWorkers != nil {
+		r.cancelWorkers()
+	}
+
+	clearChannel(r.blocks)
+
+	// Start rollback
+	r.outputs[RollbackOutput].Push(struct{}{})
+
+	// Wait until rollback will be finished
+	r.rollbackSync.Wait()
+
+	// Reset sequencer state
+	level, hash := r.Level()
+	currentBlock := int64(level)
+	prevBlockHash = hash
+	orderedBlocks := map[int64]types.BlockData{}
+
+	// Restart workers pool that read blocks
+	workersCtx, cancelWorkers := context.WithCancel(ctx)
+	r.cancelWorkers = cancelWorkers
+	r.pool.Start(workersCtx)
+
+	return prevBlockHash, currentBlock, orderedBlocks
+}
+
+func clearChannel(blocks <-chan types.BlockData) {
+	for len(blocks) > 0 {
+		<-blocks
 	}
 }

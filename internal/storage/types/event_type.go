@@ -28,7 +28,8 @@ package types
 		use_feegrant,
 		revoke_feegrant,
 		set_feegrant,
-		update_feegrant
+		update_feegrant,
+		slash
 	)
 */
 //go:generate go-enum --marshal --sql --values

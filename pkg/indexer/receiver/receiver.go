@@ -2,8 +2,6 @@ package receiver
 
 import (
 	"context"
-	"sync"
-
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-io/celestia-indexer/pkg/node"
@@ -13,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"sync"
 )
 
 const (
@@ -37,7 +36,6 @@ type Module struct {
 	cfg              config.Indexer
 	inputs           map[string]*modules.Input
 	outputs          map[string]*modules.Output
-	stateInput       *modules.Input
 	pool             *workerpool.Pool[types.Level]
 	blocks           chan types.BlockData
 	level            types.Level
@@ -47,19 +45,16 @@ type Module struct {
 	log              zerolog.Logger
 	rollbackSync     *sync.WaitGroup
 	g                workerpool.Group
+	cancelWorkers    context.CancelFunc
 	cancelReadBlocks context.CancelFunc
 }
 
 func NewModule(cfg config.Indexer, api node.API, state *storage.State) Module {
-	var (
-		level = types.Level(cfg.StartLevel)
-		hash  []byte
-	)
-
+	level := types.Level(cfg.StartLevel)
+	var lastHash []byte
 	if state != nil {
-		// TODO-DISCUSS check for hash changed of state last block
 		level = state.LastHeight
-		hash = state.LastHash
+		lastHash = state.LastHash
 	}
 
 	receiver := Module{
@@ -74,11 +69,10 @@ func NewModule(cfg config.Indexer, api node.API, state *storage.State) Module {
 			RollbackOutput: modules.NewOutput(RollbackOutput),
 			GenesisOutput:  modules.NewOutput(GenesisOutput),
 		},
-		stateInput:   modules.NewInput(RollbackInput),
 		blocks:       make(chan types.BlockData, cfg.ThreadsCount*10),
 		needGenesis:  state == nil,
 		level:        level,
-		hash:         hash,
+		hash:         lastHash,
 		mx:           new(sync.RWMutex),
 		log:          log.With().Str("module", name).Logger(),
 		rollbackSync: new(sync.WaitGroup),
@@ -97,7 +91,9 @@ func (*Module) Name() string {
 
 func (r *Module) Start(ctx context.Context) {
 	r.log.Info().Msg("starting receiver...")
-	r.pool.Start(ctx)
+	workersCtx, cancelWorkers := context.WithCancel(ctx)
+	r.cancelWorkers = cancelWorkers
+	r.pool.Start(workersCtx)
 
 	if r.needGenesis {
 		if err := r.receiveGenesis(ctx); err != nil {
@@ -177,8 +173,6 @@ func (r *Module) rollback(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case msg, ok := <-r.inputs[RollbackInput].Listen():
-			r.rollbackSync.Done()
-
 			if !ok {
 				r.log.Warn().Msg("can't read message from rollback input")
 				continue
@@ -191,7 +185,9 @@ func (r *Module) rollback(ctx context.Context) {
 			}
 
 			r.setLevel(state.LastHeight, state.LastHash)
-			r.log.Info().Msgf("caught rollack to level=%d", state.LastHeight)
+			r.log.Info().Msgf("caught return from rollback to level=%d", state.LastHeight)
+
+			r.rollbackSync.Done()
 		}
 	}
 }
