@@ -83,6 +83,6 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 		Int64("ms", time.Since(start).Milliseconds()).
 		Msg("block parsed")
 
-	p.output.Push(block)
+	p.outputs[OutputName].Push(block)
 	return nil
 }

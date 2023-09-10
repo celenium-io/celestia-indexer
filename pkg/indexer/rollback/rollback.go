@@ -22,6 +22,7 @@ import (
 const (
 	InputName  = "signal"
 	OutputName = "state"
+	StopOutput = "stop"
 )
 
 // Module - executes rollback on signal from input and notify all subscribers about new state after rollback operation.
@@ -38,7 +39,7 @@ type Module struct {
 	node      node.API
 	indexName string
 	input     *modules.Input
-	output    *modules.Output
+	outputs   map[string]*modules.Output
 	log       zerolog.Logger
 	g         workerpool.Group
 }
@@ -49,20 +50,23 @@ func NewModule(
 	blocks storage.IBlock,
 	node node.API,
 	cfg config.Indexer,
-) *Module {
+) Module {
 	module := Module{
-		tx:        tx,
-		state:     state,
-		blocks:    blocks,
-		node:      node,
-		input:     modules.NewInput(InputName),
-		output:    modules.NewOutput(OutputName),
+		tx:     tx,
+		state:  state,
+		blocks: blocks,
+		node:   node,
+		input:  modules.NewInput(InputName),
+		outputs: map[string]*modules.Output{
+			OutputName: modules.NewOutput(OutputName),
+			StopOutput: modules.NewOutput(StopOutput),
+		},
 		indexName: cfg.Name,
 		g:         workerpool.NewGroup(),
 	}
 	module.log = log.With().Str("module", module.Name()).Logger()
 
-	return &module
+	return module
 }
 
 func (*Module) Name() string {
@@ -104,10 +108,11 @@ func (module *Module) Close() error {
 
 // Output -
 func (module *Module) Output(name string) (*modules.Output, error) {
-	if name != OutputName {
+	output, ok := module.outputs[name]
+	if !ok {
 		return nil, errors.Wrap(modules.ErrUnknownOutput, name)
 	}
-	return module.output, nil
+	return output, nil
 }
 
 // Input -
@@ -172,7 +177,7 @@ func (module *Module) finish(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	module.output.Push(newState)
+	module.outputs[OutputName].Push(newState)
 
 	log.Info().
 		Uint64("new_height", uint64(newState.LastHeight)).

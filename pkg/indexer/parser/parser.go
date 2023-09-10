@@ -10,24 +10,28 @@ import (
 )
 
 type Module struct {
-	input  *modules.Input
-	output *modules.Output
-	log    zerolog.Logger
-	g      workerpool.Group
+	input   *modules.Input
+	outputs map[string]*modules.Output
+	log     zerolog.Logger
+	g       workerpool.Group
 }
 
 const (
 	name       = "parser"
 	InputName  = "blocks"
 	OutputName = "data"
+	StopOutput = "stop"
 )
 
 func NewModule() Module {
 	return Module{
-		input:  modules.NewInput(InputName),
-		output: modules.NewOutput(OutputName),
-		log:    log.With().Str("module", name).Logger(),
-		g:      workerpool.NewGroup(),
+		input: modules.NewInput(InputName),
+		outputs: map[string]*modules.Output{
+			OutputName: modules.NewOutput(OutputName),
+			StopOutput: modules.NewOutput(StopOutput),
+		},
+		log: log.With().Str("module", name).Logger(),
+		g:   workerpool.NewGroup(),
 	}
 }
 
@@ -49,11 +53,11 @@ func (p *Module) Close() error {
 }
 
 func (p *Module) Output(name string) (*modules.Output, error) {
-	if name != OutputName {
+	output, ok := p.outputs[name]
+	if !ok {
 		return nil, errors.Wrap(modules.ErrUnknownOutput, name)
 	}
-
-	return p.output, nil
+	return output, nil
 }
 
 func (p *Module) Input(name string) (*modules.Input, error) {

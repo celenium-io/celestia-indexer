@@ -5,6 +5,8 @@ import (
 	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -21,6 +23,7 @@ const (
 type Module struct {
 	input *modules.Input
 	stop  context.CancelFunc
+	log   zerolog.Logger
 	g     workerpool.Group
 }
 
@@ -30,6 +33,7 @@ func NewModule(cancelFunc context.CancelFunc) Module {
 		stop:  cancelFunc,
 		g:     workerpool.NewGroup(),
 	}
+	m.log = log.With().Str("module", m.Name()).Logger()
 
 	return m
 }
@@ -49,7 +53,9 @@ func (s *Module) listen(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-s.input.Listen():
+			log.Info().Msg("stop signal received")
 			if s.stop != nil {
+				log.Info().Msg("cancelling global indexer context...")
 				s.stop()
 			}
 		}

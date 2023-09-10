@@ -17,8 +17,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// InputName -
-const InputName = "data"
+const (
+	InputName  = "data"
+	StopOutput = "stop"
+)
 
 // Module - saves received from input block to storage.
 //
@@ -30,6 +32,7 @@ const InputName = "data"
 type Module struct {
 	storage     postgres.Storage
 	input       *modules.Input
+	output      *modules.Output
 	indexerName string
 	log         zerolog.Logger
 	g           workerpool.Group
@@ -40,6 +43,7 @@ func NewModule(pg postgres.Storage, cfg config.Indexer) Module {
 	m := Module{
 		storage:     pg,
 		input:       modules.NewInput(InputName),
+		output:      modules.NewOutput(StopOutput),
 		indexerName: cfg.Name,
 		g:           workerpool.NewGroup(),
 	}
@@ -98,7 +102,10 @@ func (module *Module) Close() error {
 
 // Output -
 func (module *Module) Output(name string) (*modules.Output, error) {
-	return nil, errors.Wrap(modules.ErrUnknownOutput, name)
+	if name != StopOutput {
+		return nil, errors.Wrap(modules.ErrUnknownOutput, name)
+	}
+	return module.output, nil
 }
 
 // Input -

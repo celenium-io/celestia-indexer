@@ -2,6 +2,7 @@ package indexer
 
 import (
 	"context"
+	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"sync"
 
 	internalStorage "github.com/dipdup-io/celestia-indexer/internal/storage"
@@ -21,18 +22,19 @@ import (
 )
 
 type Indexer struct {
-	cfg      config.Config
-	api      node.API
-	receiver *receiver.Module
-	parser   *parser.Module
-	storage  *storage.Module
-	rollback *rollback.Module
-	genesis  *genesis.Module
-	wg       *sync.WaitGroup
-	log      zerolog.Logger
+	cfg          config.Config
+	api          node.API
+	receiver     *receiver.Module
+	parser       *parser.Module
+	storage      *storage.Module
+	rollback     *rollback.Module
+	genesis      *genesis.Module
+	stopperInput *modules.Input
+	wg           *sync.WaitGroup
+	log          zerolog.Logger
 }
 
-func New(ctx context.Context, cfg config.Config) (Indexer, error) {
+func New(ctx context.Context, cfg config.Config, stopperInput *modules.Input) (Indexer, error) {
 	pg, err := postgres.Create(ctx, cfg.Database)
 	if err != nil {
 		return Indexer{}, errors.Wrap(err, "while creating pg context")
@@ -63,16 +65,22 @@ func New(ctx context.Context, cfg config.Config) (Indexer, error) {
 		return Indexer{}, errors.Wrap(err, "while creating genesis module")
 	}
 
+	err = attachStopper(stopperInput, r, p, s, rb, genesisModule)
+	if err != nil {
+		return Indexer{}, errors.Wrap(err, "while creating stopper module")
+	}
+
 	return Indexer{
-		cfg:      cfg,
-		api:      &api,
-		receiver: &r,
-		parser:   &p,
-		storage:  &s,
-		rollback: rb,
-		genesis:  &genesisModule,
-		wg:       new(sync.WaitGroup),
-		log:      log.With().Str("module", "indexer").Logger(),
+		cfg:          cfg,
+		api:          &api,
+		receiver:     &r,
+		parser:       &p,
+		storage:      &s,
+		rollback:     &rb,
+		genesis:      &genesisModule,
+		stopperInput: stopperInput,
+		wg:           new(sync.WaitGroup),
+		log:          log.With().Str("module", "indexer").Logger(),
 	}, nil
 }
 
@@ -119,27 +127,27 @@ func createReceiver(ctx context.Context, cfg config.Config, pg postgres.Storage)
 	return api, receiverModule, nil
 }
 
-func createRollback(r receiver.Module, pg postgres.Storage, api node.API, cfg config.Indexer) (*rollback.Module, error) {
+func createRollback(r receiver.Module, pg postgres.Storage, api node.API, cfg config.Indexer) (rollback.Module, error) {
 	rollbackModule := rollback.NewModule(pg.Transactable, pg.State, pg.Blocks, api, cfg)
 
 	// rollback <- listen signal -- receiver
 	rbInput, err := rollbackModule.Input(rollback.InputName)
 	if err != nil {
-		return nil, err
+		return rollback.Module{}, err
 	}
 
 	if err = r.AttachTo(receiver.RollbackOutput, rbInput); err != nil {
-		return nil, errors.Wrap(err, "while attaching rollback to receiver")
+		return rollback.Module{}, errors.Wrap(err, "while attaching rollback to receiver")
 	}
 
 	// receiver <- listen state -- rollback
 	rInput, err := r.Input(receiver.RollbackInput)
 	if err != nil {
-		return nil, err
+		return rollback.Module{}, err
 	}
 
 	if err = rollbackModule.AttachTo(rollback.OutputName, rInput); err != nil {
-		return nil, errors.Wrap(err, "while attaching receiver to rollback")
+		return rollback.Module{}, errors.Wrap(err, "while attaching receiver to rollback")
 	}
 
 	return rollbackModule, nil
@@ -190,6 +198,30 @@ func createGenesis(pg postgres.Storage, cfg config.Config, r receiver.Module) (g
 		return genesis.Module{}, err
 	}
 	return genesisModule, nil
+}
+
+func attachStopper(stopperInput *modules.Input, r receiver.Module, p parser.Module, s storage.Module, rb rollback.Module, g genesis.Module) error {
+	if err := r.AttachTo(receiver.StopOutput, stopperInput); err != nil {
+		return errors.Wrap(err, "while attaching stopper to receiver")
+	}
+
+	if err := p.AttachTo(parser.StopOutput, stopperInput); err != nil {
+		return errors.Wrap(err, "while attaching stopper to parser")
+	}
+
+	if err := s.AttachTo(storage.StopOutput, stopperInput); err != nil {
+		return errors.Wrap(err, "while attaching stopper to storage")
+	}
+
+	if err := rb.AttachTo(rollback.StopOutput, stopperInput); err != nil {
+		return errors.Wrap(err, "while attaching stopper to rollback")
+	}
+
+	if err := g.AttachTo(genesis.StopOutput, stopperInput); err != nil {
+		return errors.Wrap(err, "while attaching stopper to genesis")
+	}
+
+	return nil
 }
 
 func loadState(pg postgres.Storage, ctx context.Context, indexerName string) (*internalStorage.State, error) {

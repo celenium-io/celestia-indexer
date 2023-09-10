@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/dipdup-io/celestia-indexer/pkg/stopper"
 	"os"
 	"os/signal"
 	"syscall"
@@ -32,7 +33,14 @@ func main() {
 	notifyCtx, notifyCancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	defer notifyCancel()
 
-	indexerModule, err := indexer.New(ctx, *cfg)
+	stopperModule := stopper.NewModule(cancel)
+	stopperInput, err := stopperModule.Input(stopper.InputName)
+	if err != nil {
+		log.Err(err).Msg("while getting stopper input")
+		return
+	}
+
+	indexerModule, err := indexer.New(ctx, *cfg, stopperInput)
 	if err != nil {
 		log.Panic().Err(err).Msg("error during indexer module creation")
 		return

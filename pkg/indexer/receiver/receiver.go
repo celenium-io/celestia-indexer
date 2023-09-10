@@ -21,9 +21,10 @@ const (
 	RollbackInput    = "state"
 	GenesisOutput    = "genesis"
 	GenesisDoneInput = "genesis_done"
+	StopOutput       = "stop"
 )
 
-// Module - runs through chain with aim ti catch up head and identifies either block is fits in sequence or signals of rollback.
+// Module - runs through a chain with aim ti catch-up head and identifies either block is fits in sequence or signals of rollback.
 //
 //		|----------------|
 //		|                | -- types.BlockData -> BlocksOutput
@@ -68,6 +69,7 @@ func NewModule(cfg config.Indexer, api node.API, state *storage.State) Module {
 			BlocksOutput:   modules.NewOutput(BlocksOutput),
 			RollbackOutput: modules.NewOutput(RollbackOutput),
 			GenesisOutput:  modules.NewOutput(GenesisOutput),
+			StopOutput:     modules.NewOutput(StopOutput),
 		},
 		blocks:       make(chan types.BlockData, cfg.ThreadsCount*10),
 		needGenesis:  state == nil,

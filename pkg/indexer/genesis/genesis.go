@@ -17,6 +17,7 @@ import (
 const (
 	InputName  = "block"
 	OutputName = "finished"
+	StopOutput = "stop"
 )
 
 // Module - saves received from input genesis block to storage and notify if it was success.
@@ -29,7 +30,7 @@ const (
 type Module struct {
 	storage     postgres.Storage
 	input       *modules.Input
-	output      *modules.Output
+	outputs     map[string]*modules.Output
 	indexerName string
 	log         zerolog.Logger
 	g           workerpool.Group
@@ -38,9 +39,12 @@ type Module struct {
 // NewModule -
 func NewModule(pg postgres.Storage, cfg config.Indexer) Module {
 	m := Module{
-		storage:     pg,
-		input:       modules.NewInput(InputName),
-		output:      modules.NewOutput(OutputName),
+		storage: pg,
+		input:   modules.NewInput(InputName),
+		outputs: map[string]*modules.Output{
+			OutputName: modules.NewOutput(OutputName),
+			StopOutput: modules.NewOutput(StopOutput),
+		},
 		indexerName: cfg.Name,
 		g:           workerpool.NewGroup(),
 	}
@@ -92,7 +96,7 @@ func (module *Module) listen(ctx context.Context) {
 			}
 			module.log.Info().Msg("saved genesis message")
 
-			module.output.Push(struct{}{})
+			module.outputs[OutputName].Push(struct{}{})
 			return
 		}
 	}
@@ -108,10 +112,11 @@ func (module *Module) Close() error {
 
 // Output -
 func (module *Module) Output(name string) (*modules.Output, error) {
-	if name != OutputName {
+	output, ok := module.outputs[name]
+	if !ok {
 		return nil, errors.Wrap(modules.ErrUnknownOutput, name)
 	}
-	return module.output, nil
+	return output, nil
 }
 
 // Input -
