@@ -11,7 +11,8 @@ package types
 		toAddress,
 		grantee,
 		granter,
-		signer
+		signer,
+		withdraw
 	)
 */
 //go:generate go-enum --marshal --sql --values

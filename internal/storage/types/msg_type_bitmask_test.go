@@ -64,6 +64,18 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			name: string(MsgWithdrawDelegatorReward),
 			Bits: Bits(MsgTypeBitsWithdrawDelegatorReward),
 			want: []MsgType{MsgWithdrawDelegatorReward},
+		}, {
+			name: string(MsgGrantAllowance),
+			Bits: Bits(MsgTypeBitsGrantAllowance),
+			want: []MsgType{MsgGrantAllowance},
+		}, {
+			name: string(MsgRegisterEVMAddress),
+			Bits: Bits(MsgTypeBitsRegisterEVMAddress),
+			want: []MsgType{MsgRegisterEVMAddress},
+		}, {
+			name: string(MsgSetWithdrawAddress),
+			Bits: Bits(MsgTypeBitsSetWithdrawAddress),
+			want: []MsgType{MsgSetWithdrawAddress},
 		},
 	}
 	for _, tt := range tests {
@@ -142,6 +154,18 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			name:   "test 14",
 			values: []MsgType{MsgWithdrawDelegatorReward, MsgBeginRedelegate},
 			want:   MsgTypeBits{Bits(20)},
+		}, {
+			name:   "test 15",
+			values: []MsgType{MsgGrantAllowance},
+			want:   MsgTypeBits{Bits(MsgTypeBitsGrantAllowance)},
+		}, {
+			name:   "test 16",
+			values: []MsgType{MsgRegisterEVMAddress},
+			want:   MsgTypeBits{Bits(MsgTypeBitsRegisterEVMAddress)},
+		}, {
+			name:   "test 17",
+			values: []MsgType{MsgSetWithdrawAddress},
+			want:   MsgTypeBits{Bits(MsgTypeBitsSetWithdrawAddress)},
 		},
 	}
 	for _, tt := range tests {

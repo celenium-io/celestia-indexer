@@ -177,7 +177,9 @@
                             "MsgCreateVestingAccount",
                             "MsgCreatePeriodicVestingAccount",
                             "MsgPayForBlobs",
-                            "MsgGrantAllowance"
+                            "MsgGrantAllowance",
+                            "MsgRegisterEVMAddress",
+                            "MsgSetWithdrawAddress"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1078,7 +1080,9 @@
                             "MsgCreateVestingAccount",
                             "MsgCreatePeriodicVestingAccount",
                             "MsgPayForBlobs",
-                            "MsgGrantAllowance"
+                            "MsgGrantAllowance",
+                            "MsgRegisterEVMAddress",
+                            "MsgSetWithdrawAddress"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1831,7 +1835,8 @@
                 "use_feegrant",
                 "revoke_feegrant",
                 "set_feegrant",
-                "update_feegrant"
+                "update_feegrant",
+                "slash"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -1859,7 +1864,8 @@
                 "EventTypeUseFeegrant",
                 "EventTypeRevokeFeegrant",
                 "EventTypeSetFeegrant",
-                "EventTypeUpdateFeegrant"
+                "EventTypeUpdateFeegrant",
+                "EventTypeSlash"
             ]
         },
         "types.MsgType": {
@@ -1878,7 +1884,9 @@
                 "MsgCreateVestingAccount",
                 "MsgCreatePeriodicVestingAccount",
                 "MsgPayForBlobs",
-                "MsgGrantAllowance"
+                "MsgGrantAllowance",
+                "MsgRegisterEVMAddress",
+                "MsgSetWithdrawAddress"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -1894,7 +1902,9 @@
                 "MsgCreateVestingAccount",
                 "MsgCreatePeriodicVestingAccount",
                 "MsgPayForBlobs",
-                "MsgGrantAllowance"
+                "MsgGrantAllowance",
+                "MsgRegisterEVMAddress",
+                "MsgSetWithdrawAddress"
             ]
         }
     }

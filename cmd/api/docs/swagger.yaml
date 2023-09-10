@@ -415,6 +415,7 @@ definitions:
     - revoke_feegrant
     - set_feegrant
     - update_feegrant
+    - slash
     type: string
     x-enum-varnames:
     - EventTypeUnknown
@@ -443,6 +444,7 @@ definitions:
     - EventTypeRevokeFeegrant
     - EventTypeSetFeegrant
     - EventTypeUpdateFeegrant
+    - EventTypeSlash
   types.MsgType:
     enum:
     - MsgUnknown
@@ -459,6 +461,8 @@ definitions:
     - MsgCreatePeriodicVestingAccount
     - MsgPayForBlobs
     - MsgGrantAllowance
+    - MsgRegisterEVMAddress
+    - MsgSetWithdrawAddress
     type: string
     x-enum-varnames:
     - MsgUnknown
@@ -475,6 +479,8 @@ definitions:
     - MsgCreatePeriodicVestingAccount
     - MsgPayForBlobs
     - MsgGrantAllowance
+    - MsgRegisterEVMAddress
+    - MsgSetWithdrawAddress
 host: 127.0.0.1
 info:
   contact: {}
@@ -599,6 +605,8 @@ paths:
         - MsgCreatePeriodicVestingAccount
         - MsgPayForBlobs
         - MsgGrantAllowance
+        - MsgRegisterEVMAddress
+        - MsgSetWithdrawAddress
         in: query
         name: msg_type
         type: string
@@ -1302,6 +1310,8 @@ paths:
         - MsgCreatePeriodicVestingAccount
         - MsgPayForBlobs
         - MsgGrantAllowance
+        - MsgRegisterEVMAddress
+        - MsgSetWithdrawAddress
         in: query
         name: msg_type
         type: string

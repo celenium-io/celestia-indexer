@@ -183,7 +183,9 @@ const docTemplate = `{
                             "MsgCreateVestingAccount",
                             "MsgCreatePeriodicVestingAccount",
                             "MsgPayForBlobs",
-                            "MsgGrantAllowance"
+                            "MsgGrantAllowance",
+                            "MsgRegisterEVMAddress",
+                            "MsgSetWithdrawAddress"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1084,7 +1086,9 @@ const docTemplate = `{
                             "MsgCreateVestingAccount",
                             "MsgCreatePeriodicVestingAccount",
                             "MsgPayForBlobs",
-                            "MsgGrantAllowance"
+                            "MsgGrantAllowance",
+                            "MsgRegisterEVMAddress",
+                            "MsgSetWithdrawAddress"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1837,7 +1841,8 @@ const docTemplate = `{
                 "use_feegrant",
                 "revoke_feegrant",
                 "set_feegrant",
-                "update_feegrant"
+                "update_feegrant",
+                "slash"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -1865,7 +1870,8 @@ const docTemplate = `{
                 "EventTypeUseFeegrant",
                 "EventTypeRevokeFeegrant",
                 "EventTypeSetFeegrant",
-                "EventTypeUpdateFeegrant"
+                "EventTypeUpdateFeegrant",
+                "EventTypeSlash"
             ]
         },
         "types.MsgType": {
@@ -1884,7 +1890,9 @@ const docTemplate = `{
                 "MsgCreateVestingAccount",
                 "MsgCreatePeriodicVestingAccount",
                 "MsgPayForBlobs",
-                "MsgGrantAllowance"
+                "MsgGrantAllowance",
+                "MsgRegisterEVMAddress",
+                "MsgSetWithdrawAddress"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -1900,7 +1908,9 @@ const docTemplate = `{
                 "MsgCreateVestingAccount",
                 "MsgCreatePeriodicVestingAccount",
                 "MsgPayForBlobs",
-                "MsgGrantAllowance"
+                "MsgGrantAllowance",
+                "MsgRegisterEVMAddress",
+                "MsgSetWithdrawAddress"
             ]
         }
     }

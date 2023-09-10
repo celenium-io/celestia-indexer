@@ -41,6 +41,10 @@ const (
 	MsgPayForBlobs MsgType = "MsgPayForBlobs"
 	// MsgGrantAllowance is a MsgType of type MsgGrantAllowance.
 	MsgGrantAllowance MsgType = "MsgGrantAllowance"
+	// MsgRegisterEVMAddress is a MsgType of type MsgRegisterEVMAddress.
+	MsgRegisterEVMAddress MsgType = "MsgRegisterEVMAddress"
+	// MsgSetWithdrawAddress is a MsgType of type MsgSetWithdrawAddress.
+	MsgSetWithdrawAddress MsgType = "MsgSetWithdrawAddress"
 )
 
 var ErrInvalidMsgType = errors.New("not a valid MsgType")
@@ -62,6 +66,8 @@ func MsgTypeValues() []MsgType {
 		MsgCreatePeriodicVestingAccount,
 		MsgPayForBlobs,
 		MsgGrantAllowance,
+		MsgRegisterEVMAddress,
+		MsgSetWithdrawAddress,
 	}
 }
 
@@ -92,6 +98,8 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgCreatePeriodicVestingAccount": MsgCreatePeriodicVestingAccount,
 	"MsgPayForBlobs":                  MsgPayForBlobs,
 	"MsgGrantAllowance":               MsgGrantAllowance,
+	"MsgRegisterEVMAddress":           MsgRegisterEVMAddress,
+	"MsgSetWithdrawAddress":           MsgSetWithdrawAddress,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.

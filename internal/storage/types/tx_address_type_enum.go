@@ -31,6 +31,8 @@ const (
 	TxAddressTypeGranter TxAddressType = "granter"
 	// TxAddressTypeSigner is a TxAddressType of type signer.
 	TxAddressTypeSigner TxAddressType = "signer"
+	// TxAddressTypeWithdraw is a TxAddressType of type withdraw.
+	TxAddressTypeWithdraw TxAddressType = "withdraw"
 )
 
 var ErrInvalidTxAddressType = errors.New("not a valid TxAddressType")
@@ -47,6 +49,7 @@ func TxAddressTypeValues() []TxAddressType {
 		TxAddressTypeGrantee,
 		TxAddressTypeGranter,
 		TxAddressTypeSigner,
+		TxAddressTypeWithdraw,
 	}
 }
 
@@ -72,6 +75,7 @@ var _TxAddressTypeValue = map[string]TxAddressType{
 	"grantee":             TxAddressTypeGrantee,
 	"granter":             TxAddressTypeGranter,
 	"signer":              TxAddressTypeSigner,
+	"withdraw":            TxAddressTypeWithdraw,
 }
 
 // ParseTxAddressType attempts to convert a string to a TxAddressType.

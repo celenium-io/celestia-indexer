@@ -5,6 +5,7 @@ import (
 
 	"github.com/celestiaorg/celestia-app/pkg/namespace"
 	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
+	qgbTypes "github.com/celestiaorg/celestia-app/x/qgb/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -59,6 +60,10 @@ func Message(msg cosmosTypes.Msg, height types.Level, time time.Time, position i
 		d.Msg.Type, d.Addresses, d.Msg.Namespace, d.BlobsSize, err = handleMsgPayForBlobs(height, typedMsg)
 	case *cosmosFeegrant.MsgGrantAllowance:
 		d.Msg.Type, d.Addresses, err = handleMsgGrantAllowance(height, typedMsg)
+	case *qgbTypes.MsgRegisterEVMAddress:
+		d.Msg.Type, d.Addresses, err = handleMsgRegisterEVMAddress(height, typedMsg)
+	case *cosmosDistributionTypes.MsgSetWithdrawAddress:
+		d.Msg.Type, d.Addresses, err = handleMsgSetWithdrawalAddress(height, typedMsg)
 	default:
 		d.Msg.Type = storageTypes.MsgUnknown
 	}
@@ -230,6 +235,24 @@ func handleMsgGrantAllowance(level types.Level, m *cosmosFeegrant.MsgGrantAllowa
 	addresses, err := createAddresses(addressesData{
 		{t: storageTypes.TxAddressTypeGranter, address: m.Granter},
 		{t: storageTypes.TxAddressTypeGrantee, address: m.Grantee},
+	}, level)
+	return msgType, addresses, err
+}
+
+func handleMsgRegisterEVMAddress(level types.Level, m *qgbTypes.MsgRegisterEVMAddress) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgRegisterEVMAddress
+	addresses, err := createAddresses(addressesData{
+		{t: storageTypes.TxAddressTypeValidatorAddress, address: m.ValidatorAddress},
+		// TODO: think about EVM addresses
+	}, level)
+	return msgType, addresses, err
+}
+
+func handleMsgSetWithdrawalAddress(level types.Level, m *cosmosDistributionTypes.MsgSetWithdrawAddress) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgSetWithdrawAddress
+	addresses, err := createAddresses(addressesData{
+		{t: storageTypes.TxAddressTypeDelegatorAddress, address: m.DelegatorAddress},
+		{t: storageTypes.TxAddressTypeWithdraw, address: m.WithdrawAddress},
 	}, level)
 	return msgType, addresses, err
 }

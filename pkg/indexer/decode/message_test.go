@@ -5,6 +5,7 @@ import (
 
 	"cosmossdk.io/math"
 	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
+	qgbTypes "github.com/celestiaorg/celestia-app/x/qgb/types"
 	cosmosCodecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
@@ -149,7 +150,6 @@ func createMsgEditValidator() cosmosTypes.Msg {
 		ValidatorAddress:  "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 		CommissionRate:    nil,
 		MinSelfDelegation: nil,
-		EvmAddress:        "0x10E0271ec47d55511a047516f2a7301801d55eaB",
 	}
 
 	return &m
@@ -284,7 +284,6 @@ func createMsgCreateValidator() cosmosTypes.Msg {
 		ValidatorAddress:  "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 		Pubkey:            nil,
 		Value:             cosmosTypes.Coin{},
-		EvmAddress:        "",
 	}
 
 	return &m
@@ -852,6 +851,115 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 				Hash:    []byte{0x64, 0xd3, 0xfc, 0x6a, 0x2a, 0x52, 0x4e, 0x2f, 0x60, 0x3f, 0x51, 0xc7, 0xee, 0x4e, 0x8d, 0x35, 0xf7, 0x23, 0x22, 0xf8},
 				Balance: storage.Balance{
 					Id:    0,
+					Total: decimal.Zero,
+				},
+			},
+		},
+	}
+
+	assert.NoError(t, err)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
+}
+
+// MsgRegisterEvmAddress
+
+func createMsgRegisterEvmAddress() cosmosTypes.Msg {
+	m := qgbTypes.MsgRegisterEVMAddress{
+		ValidatorAddress: "celestiavaloper1f5crra7r5m9kd6saw077u76x0n7dyjkkzk0qup",
+		EvmAddress:       "0xfDC46fBDd8AF50d9Bf7536Bf44ce8560E423352c",
+	}
+
+	return &m
+}
+
+func TestDecodeMsg_SuccessOnMsgRegisterEvmAddress(t *testing.T) {
+	m := createMsgRegisterEvmAddress()
+	blob, now := testsuite.EmptyBlock()
+	position := 4
+
+	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+
+	msgExpected := storage.Message{
+		Id:        0,
+		Height:    blob.Height,
+		Time:      now,
+		Position:  4,
+		Type:      storageTypes.MsgRegisterEVMAddress,
+		TxId:      0,
+		Data:      structs.Map(m),
+		Namespace: nil,
+	}
+
+	addressesExpected := []storage.AddressWithType{
+		{
+			Type: storageTypes.TxAddressTypeValidatorAddress,
+			Address: storage.Address{
+				Id:      0,
+				Height:  blob.Height,
+				Address: "celestiavaloper1f5crra7r5m9kd6saw077u76x0n7dyjkkzk0qup",
+				Hash:    []byte{0x4d, 0x30, 0x31, 0xf7, 0xc3, 0xa6, 0xcb, 0x66, 0xea, 0x1d, 0x73, 0xfd, 0xee, 0x7b, 0x46, 0x7c, 0xfc, 0xd2, 0x4a, 0xd6},
+				Balance: storage.Balance{
+					Total: decimal.Zero,
+				},
+			},
+		},
+	}
+
+	assert.NoError(t, err)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
+}
+
+func createMsgSetWithdrawAddress() cosmosTypes.Msg {
+	m := cosmosDistributionTypes.MsgSetWithdrawAddress{
+		DelegatorAddress: "celestia1u5pshtqpexjmuudrvq6q335qym2zggzhp7kq0p",
+		WithdrawAddress:  "celestia1nasjhf82cjuk3mxyhzw6ntpc66exzfe7qhl256",
+	}
+
+	return &m
+}
+
+func TestDecodeMsg_SuccessOnMsgSetWithdrawAddress(t *testing.T) {
+	m := createMsgSetWithdrawAddress()
+	blob, now := testsuite.EmptyBlock()
+	position := 4
+
+	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+
+	msgExpected := storage.Message{
+		Id:        0,
+		Height:    blob.Height,
+		Time:      now,
+		Position:  4,
+		Type:      storageTypes.MsgSetWithdrawAddress,
+		TxId:      0,
+		Data:      structs.Map(m),
+		Namespace: nil,
+	}
+
+	addressesExpected := []storage.AddressWithType{
+		{
+			Type: storageTypes.TxAddressTypeDelegatorAddress,
+			Address: storage.Address{
+				Id:      0,
+				Height:  blob.Height,
+				Address: "celestia1u5pshtqpexjmuudrvq6q335qym2zggzhp7kq0p",
+				Hash:    []byte{0xe5, 0x3, 0xb, 0xac, 0x1, 0xc9, 0xa5, 0xbe, 0x71, 0xa3, 0x60, 0x34, 0x8, 0xc6, 0x80, 0x26, 0xd4, 0x24, 0x20, 0x57},
+				Balance: storage.Balance{
+					Total: decimal.Zero,
+				},
+			},
+		}, {
+			Type: storageTypes.TxAddressTypeWithdraw,
+			Address: storage.Address{
+				Id:      0,
+				Height:  blob.Height,
+				Address: "celestia1nasjhf82cjuk3mxyhzw6ntpc66exzfe7qhl256",
+				Hash:    []byte{0x9f, 0x61, 0x2b, 0xa4, 0xea, 0xc4, 0xb9, 0x68, 0xec, 0xc4, 0xb8, 0x9d, 0xa9, 0xac, 0x38, 0xd6, 0xb2, 0x61, 0x27, 0x3e},
+				Balance: storage.Balance{
 					Total: decimal.Zero,
 				},
 			},
