@@ -3,6 +3,7 @@ package rollback
 import (
 	"bytes"
 	"context"
+
 	"github.com/dipdup-io/celestia-indexer/pkg/node"
 
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
@@ -221,6 +222,10 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	}
 	ns, err := tx.RollbackNamespaces(ctx, height)
 	if err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
+	if err := tx.RollbackValidators(ctx, height); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 

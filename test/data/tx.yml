@@ -28,3 +28,18 @@
   codespace:
   memo: memo2
   message_types: 256
+- id: 3
+  hash: 0xBA37478C3E9A804697271ACC474D484E9160899C86E551D737EEA819FCC75003
+  height: 999
+  time: '2023-07-04T03:10:56+00:00'
+  position: 0
+  gas_wanted: 80410
+  gas_used: 77483
+  timeout_height: 0
+  events_count: 0
+  messages_count: 1
+  fee: 80410
+  status: success
+  codespace:
+  memo:
+  message_types: 32

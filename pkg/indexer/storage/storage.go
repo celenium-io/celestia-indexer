@@ -236,7 +236,10 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 		}
 	}
 
-	var namespaceMsgs []storage.NamespaceMessage
+	var (
+		namespaceMsgs []storage.NamespaceMessage
+		validators    = make([]*storage.Validator, 0)
+	)
 	for i := range messages {
 		msg, ok := messages[i].(*storage.Message)
 		if !ok {
@@ -254,8 +257,16 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 				TxId:        msg.TxId,
 			})
 		}
+
+		if msg.Validator != nil {
+			msg.Validator.MsgId = msg.Id
+			validators = append(validators, msg.Validator)
+		}
 	}
 	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+	if err := tx.SaveValidators(ctx, validators...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 

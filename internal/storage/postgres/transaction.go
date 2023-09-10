@@ -80,6 +80,25 @@ func (tx Transaction) SaveNamespaceMessage(ctx context.Context, nsMsgs ...models
 	return err
 }
 
+func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.Validator) error {
+	if len(validators) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&validators).
+		On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
+		Set("moniker = EXCLUDED.moniker").
+		Set("website = EXCLUDED.website").
+		Set("identity = EXCLUDED.identity").
+		Set("contacts = EXCLUDED.contacts").
+		Set("details = EXCLUDED.details").
+		Set("rate = EXCLUDED.rate").
+		Set("min_self_delegation = EXCLUDED.min_self_delegation").
+		Returning("id").
+		Exec(ctx)
+	return err
+}
+
 func (tx Transaction) LastBlock(ctx context.Context) (block models.Block, err error) {
 	err = tx.Tx().NewSelect().Model(&block).Order("id desc").Limit(1).Scan(ctx)
 	return
@@ -135,5 +154,10 @@ func (tx Transaction) RollbackNamespaceMessages(ctx context.Context, height type
 
 func (tx Transaction) RollbackNamespaces(ctx context.Context, height types.Level) (ns []models.Namespace, err error) {
 	_, err = tx.Tx().NewDelete().Model(&ns).Where("first_height = ?", height).Returning("*").Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackValidators(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.Validator)(nil)).Where("height = ?", height).Returning("*").Exec(ctx)
 	return
 }

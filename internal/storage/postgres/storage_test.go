@@ -318,21 +318,21 @@ func (s *StorageTestSuite) TestTxFilterSuccessDesc() {
 		Status: []string{string(types.StatusSuccess)},
 	})
 	s.Require().NoError(err)
-	s.Require().Len(txs, 2)
+	s.Require().Len(txs, 3)
 
 	tx := txs[0]
 
-	s.Require().EqualValues(2, tx.Id)
-	s.Require().EqualValues(1, tx.Position)
-	s.Require().EqualValues(1000, tx.Height)
+	s.Require().EqualValues(3, tx.Id)
+	s.Require().EqualValues(0, tx.Position)
+	s.Require().EqualValues(999, tx.Height)
 	s.Require().EqualValues(0, tx.TimeoutHeight)
 	s.Require().EqualValues(80410, tx.GasWanted)
 	s.Require().EqualValues(77483, tx.GasUsed)
-	s.Require().EqualValues(1, tx.EventsCount)
+	s.Require().EqualValues(0, tx.EventsCount)
 	s.Require().EqualValues(1, tx.MessagesCount)
-	s.Require().EqualValues(256, tx.MessageTypes.Bits)
+	s.Require().EqualValues(32, tx.MessageTypes.Bits)
 	s.Require().Equal(types.StatusSuccess, tx.Status)
-	s.Require().Equal("memo2", tx.Memo)
+	s.Require().Equal("", tx.Memo)
 	s.Require().Equal("", tx.Codespace)
 	s.Require().Equal("80410", tx.Fee.String())
 }
@@ -377,7 +377,7 @@ func (s *StorageTestSuite) TestTxFilterTime() {
 		TimeFrom: time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
 	})
 	s.Require().NoError(err)
-	s.Require().Len(txs, 2)
+	s.Require().Len(txs, 3)
 
 	txs, err = s.storage.Tx.Filter(ctx, storage.TxFilter{
 		Limit:  10,
@@ -393,7 +393,7 @@ func (s *StorageTestSuite) TestTxFilterTime() {
 		TimeTo:   time.Date(2023, 7, 5, 0, 0, 0, 0, time.UTC),
 	})
 	s.Require().NoError(err)
-	s.Require().Len(txs, 2)
+	s.Require().Len(txs, 3)
 }
 
 func (s *StorageTestSuite) TestTxByIdWithRelations() {
@@ -446,6 +446,24 @@ func (s *StorageTestSuite) TestTxByAddressAndTime() {
 	})
 	s.Require().NoError(err)
 	s.Require().Len(txs, 1)
+}
+
+func (s *StorageTestSuite) TestValidatorByAddress() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	validator, err := s.storage.Validator.ByAddress(ctx, "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw")
+	s.Require().NoError(err)
+
+	s.Require().Equal("celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw", validator.Address)
+	s.Require().Equal("celestia17vmk8m246t648hpmde2q7kp4ft9uwrayps85dg", validator.Delegator)
+	s.Require().Equal("Conqueror", validator.Moniker)
+	s.Require().Equal("https://github.com/DasRasyo", validator.Website)
+	s.Require().Equal("EAD22B173DE57E6A", validator.Identity)
+	s.Require().Equal("https://t.me/DasRasyo || conqueror.prime", validator.Contacts)
+	s.Require().Equal("1", validator.MinSelfDelegation.String())
+	s.Require().Equal("0.2", validator.MaxRate.String())
+	s.Require().EqualValues(4, validator.MsgId)
 }
 
 func (s *StorageTestSuite) TestNotify() {

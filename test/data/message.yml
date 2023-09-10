@@ -34,3 +34,10 @@
       - 0CsLX630cjij9DR6nqoWfQcCH2pCQSoSuq63dTkd4Bw=
     share_versions:
       - 0
+- id: 5
+  height: 999
+  position: 0
+  time: '2023-07-04T03:11:57+00:00'
+  type: MsgCreateValidator
+  tx_id: 3
+  data: null

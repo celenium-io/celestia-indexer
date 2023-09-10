@@ -70,7 +70,7 @@ func (s *StatsTestSuite) TearDownSuite() {
 	s.Require().NoError(s.psqlContainer.Terminate(ctx))
 }
 
-func (s *StatsTestSuite) TestCountBlock() {
+func (s *StatsTestSuite) TestCount() {
 	type test struct {
 		table string
 		want  string
@@ -82,13 +82,13 @@ func (s *StatsTestSuite) TestCountBlock() {
 			want:  "2",
 		}, {
 			table: "tx",
-			want:  "2",
+			want:  "3",
 		}, {
 			table: "event",
 			want:  "3",
 		}, {
 			table: "message",
-			want:  "4",
+			want:  "5",
 		},
 	}
 
@@ -105,7 +105,7 @@ func (s *StatsTestSuite) TestCountBlock() {
 	}
 }
 
-func (s *StatsTestSuite) TestCountBlockNoData() {
+func (s *StatsTestSuite) TestCountNoData() {
 	type test struct {
 		table string
 	}
@@ -171,7 +171,7 @@ func (s *StatsTestSuite) TestSummaryBlock() {
 			table:    "tx",
 			column:   "fee",
 			function: "sum",
-			want:     "160820",
+			want:     "241230",
 		}, {
 			table:    "tx",
 			column:   "fee",
@@ -209,7 +209,7 @@ func (s *StatsTestSuite) TestSummaryBlock() {
 	}
 }
 
-func (s *StatsTestSuite) TestHistogramBlock() {
+func (s *StatsTestSuite) TestHistogram() {
 
 	type test struct {
 		timeframe storage.Timeframe
@@ -370,35 +370,35 @@ func (s *StatsTestSuite) TestHistogramBlock() {
 			column:    "fee",
 			function:  "sum",
 			wantDate:  time.Date(2023, 7, 4, 3, 0, 0, 0, time.UTC),
-			want:      "160820",
+			want:      "241230",
 		}, {
 			timeframe: storage.TimeframeDay,
 			table:     "tx",
 			column:    "fee",
 			function:  "sum",
 			wantDate:  time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
-			want:      "160820",
+			want:      "241230",
 		}, {
 			timeframe: storage.TimeframeWeek,
 			table:     "tx",
 			column:    "fee",
 			function:  "sum",
 			wantDate:  time.Date(2023, 7, 3, 0, 0, 0, 0, time.UTC),
-			want:      "160820",
+			want:      "241230",
 		}, {
 			timeframe: storage.TimeframeMonth,
 			table:     "tx",
 			column:    "fee",
 			function:  "sum",
 			wantDate:  time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC),
-			want:      "160820",
+			want:      "241230",
 		}, {
 			timeframe: storage.TimeframeYear,
 			table:     "tx",
 			column:    "fee",
 			function:  "sum",
 			wantDate:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-			want:      "160820",
+			want:      "241230",
 		}, {
 			timeframe: storage.TimeframeHour,
 			table:     "tx",
@@ -571,52 +571,52 @@ func (s *StatsTestSuite) TestHistogramCount() {
 			timeframe: storage.TimeframeHour,
 			table:     "tx",
 			wantDate:  time.Date(2023, 7, 4, 3, 0, 0, 0, time.UTC),
-			want:      "2",
+			want:      "3",
 		}, {
 			timeframe: storage.TimeframeDay,
 			table:     "tx",
 			wantDate:  time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
-			want:      "2",
+			want:      "3",
 		}, {
 			timeframe: storage.TimeframeWeek,
 			table:     "tx",
 			wantDate:  time.Date(2023, 7, 3, 0, 0, 0, 0, time.UTC),
-			want:      "2",
+			want:      "3",
 		}, {
 			timeframe: storage.TimeframeMonth,
 			table:     "tx",
 			wantDate:  time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC),
-			want:      "2",
+			want:      "3",
 		}, {
 			timeframe: storage.TimeframeYear,
 			table:     "tx",
 			wantDate:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-			want:      "2",
+			want:      "3",
 		}, {
 			timeframe: storage.TimeframeHour,
 			table:     "message",
 			wantDate:  time.Date(2023, 7, 4, 3, 0, 0, 0, time.UTC),
-			want:      "4",
+			want:      "5",
 		}, {
 			timeframe: storage.TimeframeDay,
 			table:     "message",
 			wantDate:  time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
-			want:      "4",
+			want:      "5",
 		}, {
 			timeframe: storage.TimeframeWeek,
 			table:     "message",
 			wantDate:  time.Date(2023, 7, 3, 0, 0, 0, 0, time.UTC),
-			want:      "4",
+			want:      "5",
 		}, {
 			timeframe: storage.TimeframeMonth,
 			table:     "message",
 			wantDate:  time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC),
-			want:      "4",
+			want:      "5",
 		}, {
 			timeframe: storage.TimeframeYear,
 			table:     "message",
 			wantDate:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-			want:      "4",
+			want:      "5",
 		}, {
 			timeframe: storage.TimeframeHour,
 			table:     "event",

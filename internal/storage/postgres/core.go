@@ -28,6 +28,7 @@ type Storage struct {
 	Namespace   models.INamespace
 	State       models.IState
 	Stats       models.IStats
+	Validator   models.IValidator
 	Notificator *Notificator
 
 	PartitionManager database.RangePartitionManager
@@ -52,6 +53,7 @@ func Create(ctx context.Context, cfg config.Database) (Storage, error) {
 		State:       NewState(strg.Connection()),
 		Namespace:   NewNamespace(strg.Connection()),
 		Stats:       NewStats(strg.Connection()),
+		Validator:   NewValidator(strg.Connection()),
 		Notificator: NewNotificator(cfg, strg.Connection().DB()),
 
 		PartitionManager: database.NewPartitionManager(strg.Connection(), database.PartitionByMonth),

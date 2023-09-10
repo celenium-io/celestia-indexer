@@ -2,8 +2,9 @@ package storage
 
 import (
 	"context"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"time"
+
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -30,6 +31,7 @@ type Message struct {
 	Data     map[string]any `bun:"data,type:jsonb"             comment:"Message data"`
 
 	Namespace []Namespace `bun:"m2m:namespace_message,join:Message=Namespace"`
+	Validator *Validator  `bun:"belong-to"`
 }
 
 // TableName -
