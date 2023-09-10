@@ -14,13 +14,13 @@ import (
 	"github.com/dipdup-io/celestia-indexer/internal/storage/mock"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
 
-const (
-	testAddress = "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+var (
+	testAddress     = "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+	testHashAddress = []byte{0x96, 0xa, 0xa0, 0x36, 0x6b, 0x25, 0x4e, 0x1e, 0xa7, 0x9b, 0xda, 0x46, 0x7e, 0xb3, 0xaa, 0x5c, 0x97, 0xcb, 0xa5, 0xae}
 )
 
 // AddressTestSuite -
@@ -62,12 +62,12 @@ func (s *AddressTestSuite) TestGet() {
 	c.SetParamValues(testAddress)
 
 	s.address.EXPECT().
-		ByHash(gomock.Any(), testAddress).
+		ByHash(gomock.Any(), testHashAddress).
 		Return(storage.Address{
 			Id:      1,
-			Hash:    testAddress,
+			Hash:    testHashAddress,
+			Address: testAddress,
 			Height:  100,
-			Balance: decimal.RequireFromString("100"),
 		}, nil)
 
 	s.Require().NoError(s.handler.Get(c))
@@ -78,7 +78,6 @@ func (s *AddressTestSuite) TestGet() {
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, address.Id)
 	s.Require().EqualValues(100, address.Height)
-	s.Require().Equal("100", address.Balance)
 	s.Require().Equal(testAddress, address.Hash)
 }
 
@@ -127,9 +126,9 @@ func (s *AddressTestSuite) TestList() {
 		Return([]*storage.Address{
 			{
 				Id:      1,
-				Hash:    testAddress,
+				Hash:    testHashAddress,
+				Address: testAddress,
 				Height:  100,
-				Balance: decimal.RequireFromString("100"),
 			},
 		}, nil)
 
@@ -142,7 +141,6 @@ func (s *AddressTestSuite) TestList() {
 	s.Require().Len(address, 1)
 	s.Require().EqualValues(1, address[0].Id)
 	s.Require().EqualValues(100, address[0].Height)
-	s.Require().Equal("100", address[0].Balance)
 	s.Require().Equal(testAddress, address[0].Hash)
 }
 
@@ -163,12 +161,12 @@ func (s *AddressTestSuite) TestListHeight() {
 	c.SetParamValues(testAddress)
 
 	s.address.EXPECT().
-		ByHash(gomock.Any(), testAddress).
+		ByHash(gomock.Any(), testHashAddress).
 		Return(storage.Address{
 			Id:      1,
-			Hash:    testAddress,
+			Hash:    testHashAddress,
+			Address: testAddress,
 			Height:  100,
-			Balance: decimal.RequireFromString("100"),
 		}, nil)
 
 	s.txs.EXPECT().

@@ -1,0 +1,1329 @@
+{
+    "genesis_time": "2023-09-06T03:15:51.510579711Z",
+    "chain_id": "mocha-4",
+    "initial_height": "1",
+    "consensus_params": {
+        "block": {
+            "max_bytes": "1974272",
+            "max_gas": "-1",
+            "time_iota_ms": "1000"
+        },
+        "evidence": {
+            "max_age_num_blocks": "120934",
+            "max_age_duration": "1814000000000000",
+            "max_bytes": "1048576"
+        },
+        "validator": {
+            "pub_key_types": [
+                "ed25519"
+            ]
+        },
+        "version": {}
+    },
+    "app_hash": "",
+    "app_state": {
+        "auth": {
+            "params": {
+                "max_memo_characters": "256",
+                "tx_sig_limit": "7",
+                "tx_size_cost_per_byte": "10",
+                "sig_verify_cost_ed25519": "590",
+                "sig_verify_cost_secp256k1": "1000"
+            },
+            "accounts": [
+                {
+                    "@type": "/cosmos.auth.v1beta1.BaseAccount",
+                    "address": "celestia1qqqpkhsnpyvtzx4knu53zsdfn7l88czztlp8tt",
+                    "pub_key": null,
+                    "account_number": "66419",
+                    "sequence": "0"
+                },
+                {
+                    "@type": "/cosmos.vesting.v1beta1.PeriodicVestingAccount",
+                    "base_vesting_account": {
+                        "base_account": {
+                            "address": "celestia1qsfn7xq3spe6g3cvth7p6ld4ea8y0t262udez6",
+                            "pub_key": {
+                                "@type": "/cosmos.crypto.secp256k1.PubKey",
+                                "key": "AwSFN6IX91DkyOaeN252NR3PV/rcl8ahQAMQczeCC4//"
+                            },
+                            "account_number": "56868",
+                            "sequence": "6"
+                        },
+                        "original_vesting": [
+                            {
+                                "denom": "utia",
+                                "amount": "1000000"
+                            }
+                        ],
+                        "delegated_free": [
+                            {
+                                "denom": "utia",
+                                "amount": "200000"
+                            }
+                        ],
+                        "delegated_vesting": [
+                            {
+                                "denom": "utia",
+                                "amount": "800000"
+                            }
+                        ],
+                        "end_time": "1723387303"
+                    },
+                    "start_time": "1689255703",
+                    "vesting_periods": [
+                        {
+                            "length": "3600",
+                            "amount": [
+                                {
+                                    "denom": "utia",
+                                    "amount": "200000"
+                                }
+                            ]
+                        },
+                        {
+                            "length": "2592000",
+                            "amount": [
+                                {
+                                    "denom": "utia",
+                                    "amount": "500000"
+                                }
+                            ]
+                        },
+                        {
+                            "length": "31536000",
+                            "amount": [
+                                {
+                                    "denom": "utia",
+                                    "amount": "300000"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "@type": "/cosmos.auth.v1beta1.ModuleAccount",
+                    "base_account": {
+                        "address": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
+                        "pub_key": null,
+                        "account_number": "23",
+                        "sequence": "0"
+                    },
+                    "name": "bonded_tokens_pool",
+                    "permissions": [
+                        "burner",
+                        "staking"
+                    ]
+                },
+                {
+                    "@type": "/cosmos.vesting.v1beta1.ContinuousVestingAccount",
+                    "base_vesting_account": {
+                        "base_account": {
+                            "address": "celestia10n95tmwqtc5ua47m9vu52p7xwcf6gcdtjj9rfh",
+                            "pub_key": {
+                                "@type": "/cosmos.crypto.secp256k1.PubKey",
+                                "key": "Aq6sWXmFAuttVSE6beWe1/FHVaJi9K5lqhcJUQ25xkMa"
+                            },
+                            "account_number": "56858",
+                            "sequence": "5"
+                        },
+                        "original_vesting": [
+                            {
+                                "denom": "utia",
+                                "amount": "1000000"
+                            }
+                        ],
+                        "delegated_free": [],
+                        "delegated_vesting": [
+                            {
+                                "denom": "utia",
+                                "amount": "500000"
+                            }
+                        ],
+                        "end_time": "1691913280"
+                    },
+                    "start_time": "1689247569"
+                },
+                {
+                    "@type": "/cosmos.vesting.v1beta1.DelayedVestingAccount",
+                    "base_vesting_account": {
+                        "base_account": {
+                            "address": "celestia1e6mspkfqg9ud33m4ek3je0glzrlc9f0px9h40k",
+                            "pub_key": {
+                                "@type": "/cosmos.crypto.secp256k1.PubKey",
+                                "key": "Aocikeh4wsdYEooUiMMe9ztj4sgBj4P+GRJWX7MX9I93"
+                            },
+                            "account_number": "56989",
+                            "sequence": "9"
+                        },
+                        "original_vesting": [
+                            {
+                                "denom": "utia",
+                                "amount": "1000000"
+                            }
+                        ],
+                        "delegated_free": [],
+                        "delegated_vesting": [
+                            {
+                                "denom": "utia",
+                                "amount": "500000"
+                            }
+                        ],
+                        "end_time": "1691913280"
+                    }
+                }
+            ]
+        },
+        "authz": {
+            "authorization": []
+        },
+        "bank": {
+            "params": {
+                "send_enabled": [],
+                "default_send_enabled": true
+            },
+            "balances": [
+                {
+                    "address": "celestia1fp2vrft3mw5zarh7d6378g6lwayk0mjhu6ntlw",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "198673045"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1mjgra352a6m7dmlcn06rczvexvhtrwqchf365z",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1e60tqsg4ds8suyv648as5qp9lkghhac8fzcd6t",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia17ng66pdus6yn97gvxyfermsqqqy6wl7vs6pm2g",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1326hxm4ff4n5kh8jfl96nx66mws9mete4754df",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1t8umt6juvtfhjuqulvup7lmtmfqgllhddch87j",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9997261"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1hzvrlefv9n90ae4h2flcn6sqrjt4hw4zq68sqk",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1ljay439f474mvc8hfkmhfwl99l5ljd3hysadfs",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "4996967"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia19xnqpuwcst093dch950gnn7jznsw5y2ny76f0h",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1d75hl3vw0epl894fqxvzrqyug3df7xjzahcvt2",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia14ms08zsgxfy942jnyk5ccuutqnkhkm4hrh0l63",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "8996967"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1f774wumvandm35s3pvdulhcghhw0w8lzhc64mk",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9447363"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia19ufnfp5cwqcrmtswgsl7fry02jw4r6hgsqsjtr",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1k2mw0wwr7lqu7hxe77rxkkjqr5uzpxcvhw3rpj",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "2000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia18mxn0z3p6ry28gmg8n5wp7efpwd44psvtq2644",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia18a40lhk5z2f6eknz36ywvvnvltvufmqpv80w66",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1jr3e6d7etlul8urdt2z53whfpsgzp07vl25ldd",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1yv7nlgwpv7vpgsmt4w8lprk68yt8es7h7kjkq2",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1jhz0v3v93kqz0rlpytpw3aaad5cyusx9lg7hqc",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "30000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1gqh6r72jq8d3p4ww9rqrwjm5jeq7z4t5wmnzfj",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia16ee6ayanm3rqnzeyfgcxrslmqgz4ylsy0ucvdm",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1fpyrg5cphhmqvlc22echqqyvft2vs76q4955fn",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "20000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1xud2xaa67evy4m60cxq9pzprcn07up6nex57se",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1csljs3cc0y6xqg98nnemd9t6luanpzl3td0un5",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "5000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia15apalyc47py2tenuyzkcm9wtckjqss8392602h",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia153l0ef0gkl39248wv974njckgjv57a5mpeq483",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia13r63zflde0v3wnf259wg7s58salze4ers9r8fj",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "100000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1sqmaqd3tahhk5v6lq6hxy7369e66q9sja9lgc4",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "4500000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1rhp5uk8t7wkpqqw8a4u8clsh0sh9hsv5tgcz65",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "49032399"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1w8f36ha38suyqmxaadac520exv2h579x0yc53e",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "20000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia19tg7cc5dvh4ltlf6slwrzpgxuqqdxcwryxgkpr",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9997353"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia19rvrlesg8vfvga3p5f794zuyakafan7xr5g6xd",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1xpjt2scrgx9r4fjly38a8702rve9hmx2c42d4d",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia15qpjzpxe8hfg73vgpzvgp06uxrnrfevvvmf7zw",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "14098194"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia10nwcsn9zdjxzdnqmfqzfs6z4jjke55rtqjsd0h",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1uuuepgpdqhjp8t0rdz2u74m5840qf90ngs0y27",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1fe57xdwrmwcls4wuxs9el5s952hmpza3r20zfk",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9993000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1tc0p26tx7pzfc3u65shg480uaz83ez3y0nm72q",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1z93mfe4vkujepxddhcce7rtxa6ngd9xqky56gc",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1g9kj650xt5nqx623z69mllycsd5rzhr9aj33n3",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "4846779"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia107n0wflnrv9ahlmqfmycwv8hxu8qjt36vrgxkz",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1yr0vsp8srramlufd7270npclqd82gvuf2shcef",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1dtd6xu9ucdur8wy2q2qxxfjmt4w7da6n24588x",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9872934"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1fjyt2pc67hma0p0xxsajgwa4crlzz6skxec32n",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9997318"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1ra87halm9xf4qt9tzfw286kmtasusp6p2vrhkc",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "40000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1eg2qvndx0q4vef3k6ajzfctsscu484xsvspeza",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1d8jkfx8fz4q2p8uxzh8l06nhtl2ltx6vv44xyw",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1jq7vd7s30tsrj97yl44n325kwfcr247aqnlmjh",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1yjkvvs4k23qm6j3n8tdx44mdqamht2t6xhej9d",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "202100"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1qxqrcdjw8wlz8g5jntnd4y3twt5phf2awtwhq7",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1596j2p8j3c64a7esjkd5842puamw56pd6uprsl",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10009"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1sk5kc50fc7rz0sv2kst8r9ewsw6p0j87qht4jf",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1whapw729q6cl9rnnp7eawnffhgv8cxl9chpvkm",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1a53zp9ee6mzgqgvsv8r5ps0gmrdtruly7k6940",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9995186"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1vema5jzgsq9zjpydrggdzghw80a3haajlwflzy",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "8998787"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1jpsa8sm7xjegs7x69jxlly3gwd3tazsk34ra00",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1l9ejcuavkq8jyvrfdeks7crgpzklpzen5kstpf",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1z0pv5tta73pnt0vzkfspqeg99hs6nd6phafu3g",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1mtl6uxep77y305ktzu2zxtq73qm73yheez73ax",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "501702"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1h0qwepcp75k36pfpsx62qr6r2zcd7kp07tmf5f",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "11590000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia18k85qm7gn6z9kpkjrxmwevnfv2w8jc9qjzmxzp",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1kpg9yz0r7dxgaqs6hymlfn5znn96vhkns3t7es",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "20113827"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1q42lycjh2tnen3mk7ssfqgdx6s8p6hpctlfknh",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1w4hrjkmj42058xhn8xgu38v40e2tzcy7wxaa3g",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia160r54w9qqtlaawvapkp3j9mum5w2xahewe2umg",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia129ejpd3493wgr7acm4dkh5rv3nxcev4nr4kjnq",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "49000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1eeml58n2mm8nu2ysa5xyjhaefv0jugwenkuh5r",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1eznmugp6jdagqpgc7a7m8lhgwtd6jpp5vvujn5",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "4997353"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1udeqr9wqzxxm0wewunc8v0n4d5qz8umadv23pq",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9999000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia144eace3uq60m45uyh4a0m86qtt0j5tv0qxklfx",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia16ypgrt6h330hgv32pvj2js7sr4pj9wm900x8d7",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9445840"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia19hdlex34cvs55p9pvquqqurwnsj659wr46h579",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9820386"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1d86m0dlqsqktfuy0gaqgsftysjj0gq0tdkkw20",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia18wdqyman8qkkq07m83fztkps5y8snn3cnmn8yr",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "30000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia19rvvmhy672g2zz2sk5fcu80xz5plcvttlfc6wf",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9958146"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1cxqr3g4qxfmnjzjvesmc3p7uzmw9t4h97520d2",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "5600000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1679pd0ft4qk9hva7mvxnz0a99yuetwcngyqtx2",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9820384"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1wd6c0lrv20609al7n4k7kjvl0r3mrjp9uy08u8",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "4494010"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1gjd84duh74hllewxz7yxd3ejghhppx4n8fek3c",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1vx47kq5jw2s608ehctyj506dqjnawtdxj2r0ng",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9991000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1crs0rhd7ed796jld2emfrfh369rl6guncrmq2f",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1mc7hhv7v5q3zun4ej8sr3us4ymlgaudt8aurmh",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9978320"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1l9crcsjxdjagh7zyzqctxzet20qagjq2xdma3l",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "20000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia18qv7jk9gcvesc5q72e747mqedxnekav9wp9zwp",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9884718"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1w0f0jkzcyqjdqmtu4u4hxuawhtgn7k9t529qfg",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1t50kxcczgl7sp3eerdumgfdhr4vtdnpqf5rh4p",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "11100000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1hjh6tty9p2v0qt4lxk3peuf7f0pagffve9xxkt",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10004853"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia17ukx7m07ss89w3x7nndazg573m2xpahlqhsp98",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1uxvlz3dk8mhew8puvjuw22e9p6pgetm6kj07dy",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1e8zksdgmtefdsrepxj43frhfhtcrav2y9qrjpw",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "100000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1mscc7ls60nxqucjgm9snt53ew7v79l8yspp58p",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "72635429"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1s04jwpxzupta4n7xl63dnh8x22nyksa2sac34v",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia10ll7teakpgcnx3ldjf3mj0unymx0639ut6r552",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "8996971"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1f32u33m8yrvw0qfmrm5vcahyp0vup7gkhk509l",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1ptgm0h2cde94jj9gh56ypgncvthyayswmtdn4j",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1tje54fylpcznwr2hfyh0a9ttnqhf53k42mwa75",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "8997319"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1n0plnmjsv6lajwsfhhqh0nwfd7q7yvwwflqqqd",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1eje5exh4r9x3qvt666g53nkh6hy544t7d8w8um",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "1000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia13qczddxetqaa0f35f55k5q6g3jke0gmjwsmtzp",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "9897352"
+                        }
+                    ]
+                },
+                {
+                    "address": "celestia1d2plqeyrd6spqunxvrmryezmug0sl5teq03xnu",
+                    "coins": [
+                        {
+                            "denom": "utia",
+                            "amount": "30000000"
+                        }
+                    ]
+                }
+            ],
+            "supply": [
+                {
+                    "denom": "utia",
+                    "amount": "1069361107788442"
+                }
+            ],
+            "denom_metadata": [
+                {
+                    "description": "The native staking token of the Celestia network.",
+                    "denom_units": [
+                        {
+                            "denom": "utia",
+                            "exponent": 0,
+                            "aliases": [
+                                "microtia"
+                            ]
+                        },
+                        {
+                            "denom": "TIA",
+                            "exponent": 6,
+                            "aliases": []
+                        }
+                    ],
+                    "base": "utia",
+                    "display": "TIA",
+                    "name": "TIA",
+                    "symbol": "TIA",
+                    "uri": "",
+                    "uri_hash": ""
+                }
+            ]
+        },
+        "blob": {
+            "params": {
+                "gas_per_blob_byte": 8,
+                "gov_max_square_size": "64"
+            }
+        },
+        "capability": {
+            "index": "1",
+            "owners": []
+        },
+        "crisis": {
+            "constant_fee": {
+                "denom": "utia",
+                "amount": "1000"
+            }
+        },
+        "distribution": {
+            "params": {
+                "community_tax": "0.200000000000000000",
+                "base_proposer_reward": "0.000000000000000000",
+                "bonus_proposer_reward": "0.000000000000000000",
+                "withdraw_addr_enabled": true
+            },
+            "fee_pool": {
+                "community_pool": []
+            },
+            "delegator_withdraw_infos": [],
+            "previous_proposer": "",
+            "outstanding_rewards": [],
+            "validator_accumulated_commissions": [],
+            "validator_historical_rewards": [],
+            "validator_current_rewards": [],
+            "delegator_starting_infos": [],
+            "validator_slash_events": []
+        },
+        "evidence": {
+            "evidence": []
+        },
+        "feegrant": {
+            "allowances": []
+        },
+        "genutil": {
+            "gen_txs": [
+                {
+                    "body": {
+                        "messages": [
+                            {
+                                "@type": "/cosmos.staking.v1beta1.MsgCreateValidator",
+                                "description": {
+                                    "moniker": "DAS-MOCHA",
+                                    "identity": "5537C0472199D5",
+                                    "website": "",
+                                    "security_contact": "",
+                                    "details": "Uncle Ed. \ud83c\udf7b\ud83e\udd1d \ud83c\udf52\ud83e\uded0  modular enthusiast \ud83c\udf4b\ud83e\udd5d validators are cucks to social consensus"
+                                },
+                                "commission": {
+                                    "rate": "0.050000000000000000",
+                                    "max_rate": "0.200000000000000000",
+                                    "max_change_rate": "0.010000000000000000"
+                                },
+                                "min_self_delegation": "1",
+                                "delegator_address": "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
+                                "validator_address": "celestiavaloper17adsjkuecgjheugrdrwdqv9uh3qkrfmjqeqycq",
+                                "pubkey": {
+                                    "@type": "/cosmos.crypto.ed25519.PubKey",
+                                    "key": "l/qNaf4JDxnhP+6Pf+2OSAJYksSIkjyefYCDvZPoahA="
+                                },
+                                "value": {
+                                    "denom": "utia",
+                                    "amount": "20000000000000"
+                                }
+                            }
+                        ],
+                        "memo": "34499b1ac473fbb03894c883178ecc83f0d6eaf6@64.227.18.169:26656",
+                        "timeout_height": "0",
+                        "extension_options": [],
+                        "non_critical_extension_options": []
+                    },
+                    "auth_info": {
+                        "signer_infos": [
+                            {
+                                "public_key": {
+                                    "@type": "/cosmos.crypto.secp256k1.PubKey",
+                                    "key": "AgUFkl9aRf308IJdj57URnXjOCaNVGUdTJGPaV+MiOac"
+                                },
+                                "mode_info": {
+                                    "single": {
+                                        "mode": "SIGN_MODE_DIRECT"
+                                    }
+                                },
+                                "sequence": "169"
+                            }
+                        ],
+                        "fee": {
+                            "amount": [],
+                            "gas_limit": "210000",
+                            "payer": "",
+                            "granter": ""
+                        },
+                        "tip": null
+                    },
+                    "signatures": [
+                        "BtDcA1Sz8pob49V+23XCC8ivlohjY6AqxMVYDaSp5K0AtM836mnDpL0p4uvGQa84yKH+I92bblBuH2Tc/kHqNA=="
+                    ]
+                }
+            ]
+        },
+        "gov": {
+            "starting_proposal_id": "1",
+            "deposits": [],
+            "votes": [],
+            "proposals": [],
+            "deposit_params": {
+                "min_deposit": [
+                    {
+                        "denom": "utia",
+                        "amount": "1000000000"
+                    }
+                ],
+                "max_deposit_period": "172800s"
+            },
+            "voting_params": {
+                "voting_period": "172800s"
+            },
+            "tally_params": {
+                "quorum": "0.334000000000000000",
+                "threshold": "0.500000000000000000",
+                "veto_threshold": "0.334000000000000000"
+            }
+        },
+        "ibc": {
+            "client_genesis": {
+                "clients": [],
+                "clients_consensus": [],
+                "clients_metadata": [],
+                "params": {
+                    "allowed_clients": [
+                        "06-solomachine",
+                        "07-tendermint"
+                    ]
+                },
+                "create_localhost": false,
+                "next_client_sequence": "0"
+            },
+            "connection_genesis": {
+                "connections": [],
+                "client_connection_paths": [],
+                "next_connection_sequence": "0",
+                "params": {
+                    "max_expected_time_per_block": "75000000000"
+                }
+            },
+            "channel_genesis": {
+                "channels": [],
+                "acknowledgements": [],
+                "commitments": [],
+                "receipts": [],
+                "send_sequences": [],
+                "recv_sequences": [],
+                "ack_sequences": [],
+                "next_channel_sequence": "0"
+            }
+        },
+        "mint": {
+            "bond_denom": "utia"
+        },
+        "params": null,
+        "qgb": {
+            "params": {
+                "data_commitment_window": "400"
+            }
+        },
+        "slashing": {
+            "params": {
+                "signed_blocks_window": "15000",
+                "min_signed_per_window": "0.050000000000000000",
+                "downtime_jail_duration": "60s",
+                "slash_fraction_double_sign": "0.050000000000000000",
+                "slash_fraction_downtime": "0.010000000000000000"
+            },
+            "signing_infos": [],
+            "missed_blocks": []
+        },
+        "staking": {
+            "params": {
+                "unbonding_time": "1814400s",
+                "max_validators": 100,
+                "max_entries": 7,
+                "historical_entries": 10000,
+                "bond_denom": "utia",
+                "min_commission_rate": "0.050000000000000000"
+            },
+            "last_total_power": "0",
+            "last_validator_powers": [],
+            "validators": [],
+            "delegations": [],
+            "unbonding_delegations": [],
+            "redelegations": [],
+            "exported": false
+        },
+        "transfer": {
+            "port_id": "transfer",
+            "denom_traces": [],
+            "params": {
+                "send_enabled": true,
+                "receive_enabled": true
+            }
+        },
+        "vesting": {}
+    }
+}

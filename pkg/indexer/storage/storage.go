@@ -196,8 +196,10 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 
 		for j := range block.Txs[i].Addresses {
 			key := block.Txs[i].Addresses[j].String()
-			if _, ok := addresses[key]; !ok {
+			if addr, ok := addresses[key]; !ok {
 				addresses[key] = &block.Txs[i].Addresses[j].Address
+			} else {
+				addr.Balance.Total = addr.Balance.Total.Add(block.Txs[i].Addresses[j].Address.Balance.Total)
 			}
 		}
 	}
@@ -209,6 +211,15 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 		}
 
 		if err := tx.SaveAddresses(ctx, data...); err != nil {
+			return tx.HandleError(ctx, err)
+		}
+
+		balances := make([]storage.Balance, 0)
+		for i := range data {
+			data[i].Balance.Id = data[i].Id
+			balances = append(balances, data[i].Balance)
+		}
+		if err := tx.SaveBalances(ctx, balances...); err != nil {
 			return tx.HandleError(ctx, err)
 		}
 	}

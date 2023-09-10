@@ -16,7 +16,6 @@ import (
 	"github.com/dipdup-io/celestia-indexer/internal/storage/mock"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -67,12 +66,12 @@ func (s *SearchTestSuite) TestSearchAddress() {
 	c.SetPath("/search")
 
 	s.address.EXPECT().
-		ByHash(gomock.Any(), testAddress).
+		ByHash(gomock.Any(), testHashAddress).
 		Return(storage.Address{
 			Id:      1,
-			Hash:    testAddress,
+			Hash:    testHashAddress,
+			Address: testAddress,
 			Height:  100,
-			Balance: decimal.RequireFromString("100"),
 		}, nil)
 
 	s.Require().NoError(s.handler.Search(c))
@@ -84,7 +83,6 @@ func (s *SearchTestSuite) TestSearchAddress() {
 	s.Require().Equal("address", response.Type)
 	s.Require().EqualValues(1, response.Result.Id)
 	s.Require().EqualValues(100, response.Result.Height)
-	s.Require().Equal("100", response.Result.Balance)
 	s.Require().Equal(testAddress, response.Result.Hash)
 }
 

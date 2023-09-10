@@ -2,8 +2,9 @@ package storage
 
 import (
 	"context"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"time"
+
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"

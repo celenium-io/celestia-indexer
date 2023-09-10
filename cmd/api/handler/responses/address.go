@@ -16,8 +16,8 @@ func NewAddress(addr storage.Address) Address {
 	return Address{
 		Id:      addr.Id,
 		Height:  uint64(addr.Height),
-		Balance: addr.Balance.String(),
-		Hash:    addr.Hash,
+		Hash:    addr.Address,
+		Balance: addr.Balance.Total.String(),
 	}
 }
 

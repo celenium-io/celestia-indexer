@@ -7,6 +7,7 @@ import (
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	_ "github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/labstack/echo/v4"
 )
 
@@ -45,7 +46,12 @@ func (handler *AddressHandler) Get(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	address, err := handler.address.ByHash(c.Request().Context(), req.Hash)
+	_, hash, err := types.Address(req.Hash).Decode()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	address, err := handler.address.ByHash(c.Request().Context(), hash)
 	if err := handleError(c, err, handler.address); err != nil {
 		return err
 	}
@@ -113,7 +119,12 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	address, err := handler.address.ByHash(c.Request().Context(), req.Hash)
+	_, hash, err := types.Address(req.Hash).Decode()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	address, err := handler.address.ByHash(c.Request().Context(), hash)
 	if err := handleError(c, err, handler.address); err != nil {
 		return err
 	}

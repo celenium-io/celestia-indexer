@@ -54,10 +54,22 @@ func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...*models.Ad
 	}
 
 	_, err := tx.Tx().NewInsert().Model(&addresses).
-		Column("height", "balance", "hash").
-		On("CONFLICT ON CONSTRAINT address_hash DO UPDATE").
-		Set("balance = EXCLUDED.balance + address.balance").
+		Column("address", "height", "hash").
+		On("CONFLICT ON CONSTRAINT address_hash DO NOTHING").
 		Returning("id").
+		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveBalances(ctx context.Context, balances ...models.Balance) error {
+	if len(balances) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&balances).
+		Column("id", "total").
+		On("CONFLICT (id) DO UPDATE").
+		Set("total = EXCLUDED.total + balance.total").
 		Exec(ctx)
 	return err
 }

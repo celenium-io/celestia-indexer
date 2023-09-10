@@ -32,15 +32,24 @@ type BaseAccount struct {
 	Sequence      string      `json:"sequence"`
 }
 
+type BaseVestingAccount struct {
+	BaseAccount      BaseAccount `json:"base_account"`
+	OriginalVesting  []Coins     `json:"original_vesting"`
+	DelegatedFree    []Coins     `json:"delegated_free"`
+	DelegatedVesting []Coins     `json:"delegated_vesting"`
+	EndTime          string      `json:"end_time"`
+}
+
 type Accounts struct {
-	Type          string        `json:"@type"`
-	Address       string        `json:"address,omitempty"`
-	PubKey        interface{}   `json:"pub_key,omitempty"`
-	AccountNumber string        `json:"account_number,omitempty"`
-	Sequence      string        `json:"sequence,omitempty"`
-	BaseAccount   BaseAccount   `json:"base_account,omitempty"`
-	Name          string        `json:"name,omitempty"`
-	Permissions   []interface{} `json:"permissions,omitempty"`
+	Type               string             `json:"@type"`
+	Address            string             `json:"address,omitempty"`
+	PubKey             interface{}        `json:"pub_key,omitempty"`
+	AccountNumber      string             `json:"account_number,omitempty"`
+	Sequence           string             `json:"sequence,omitempty"`
+	BaseAccount        BaseAccount        `json:"base_account,omitempty"`
+	BaseVestingAccount BaseVestingAccount `json:"base_vesting_account,omitempty"`
+	Name               string             `json:"name,omitempty"`
+	Permissions        []interface{}      `json:"permissions,omitempty"`
 }
 
 type Auth struct {

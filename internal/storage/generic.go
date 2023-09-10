@@ -9,6 +9,7 @@ import (
 
 var Models = []any{
 	&State{},
+	&Balance{},
 	&Address{},
 	&Block{},
 	&BlockStats{},

@@ -1,6 +1,8 @@
 package genesis
 
 import (
+	"strings"
+
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
@@ -113,10 +115,40 @@ func (module *Module) parseTotalSupply(supply []types.Supply, block *storage.Blo
 func (module *Module) parseAccounts(accounts []types.Accounts, height pkgTypes.Level, data *parsedData) error {
 	for i := range accounts {
 		address := storage.Address{
-			Height:  height,
-			Hash:    accounts[i].Address,
-			Balance: decimal.Zero,
+			Height: height,
+			Balance: storage.Balance{
+				Total: decimal.Zero,
+			},
 		}
+
+		var readableAddress string
+
+		switch {
+		case strings.Contains(accounts[i].Type, "PeriodicVestingAccount"):
+			readableAddress = accounts[i].BaseVestingAccount.BaseAccount.Address
+
+		case strings.Contains(accounts[i].Type, "ModuleAccount"):
+			readableAddress = accounts[i].BaseAccount.Address
+
+		case strings.Contains(accounts[i].Type, "BaseAccount"):
+			readableAddress = accounts[i].Address
+
+		case strings.Contains(accounts[i].Type, "ContinuousVestingAccount"):
+			readableAddress = accounts[i].BaseVestingAccount.BaseAccount.Address
+
+		case strings.Contains(accounts[i].Type, "DelayedVestingAccount"):
+			readableAddress = accounts[i].BaseVestingAccount.BaseAccount.Address
+
+		default:
+			return errors.Errorf("unknown account type: %s", accounts[i].Type)
+		}
+
+		_, hash, err := pkgTypes.Address(readableAddress).Decode()
+		if err != nil {
+			return err
+		}
+		address.Hash = hash
+		address.Address = readableAddress
 		data.addresses[address.String()] = &address
 	}
 	return nil
@@ -127,17 +159,25 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 		if len(balances[i].Coins) == 0 {
 			continue
 		}
+
+		_, hash, err := pkgTypes.Address(balances[i].Address).Decode()
+		if err != nil {
+			return err
+		}
 		address := storage.Address{
-			Hash:    balances[i].Address,
+			Hash:    hash,
+			Address: balances[i].Address,
 			Height:  height,
-			Balance: decimal.Zero,
+			Balance: storage.Balance{
+				Total: decimal.Zero,
+			},
 		}
 		if balance, err := decimal.NewFromString(balances[i].Coins[0].Amount); err == nil {
-			address.Balance = address.Balance.Add(balance)
+			address.Balance.Total = address.Balance.Total.Add(balance)
 		}
 
 		if addr, ok := data.addresses[address.String()]; ok {
-			addr.Balance = addr.Balance.Add(address.Balance)
+			addr.Balance.Total = addr.Balance.Total.Add(address.Balance.Total)
 		} else {
 			data.addresses[address.String()] = &address
 		}

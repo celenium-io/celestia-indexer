@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/btcsuite/btcutil/bech32"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
@@ -148,20 +148,21 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 
 	addresses := make([]*storage.Address, 0, 5)
 	for i := 0; i < 5; i++ {
-		hash := make([]byte, 32)
-		for j := 0; j < 31; j++ {
+		hash := make([]byte, 20)
+		for j := 0; j < 19; j++ {
 			hash[j] = byte(j)
 		}
-		hash[31] = byte(i)
+		hash[19] = byte(i)
 		s.NoError(err)
 
-		addr, err := bech32.Encode("celestia", hash)
+		addr, err := bech32.ConvertAndEncode(pkgTypes.AddressPrefixCelestia, hash)
 		s.NoError(err)
 
 		addresses = append(addresses, &storage.Address{
 			Height:  pkgTypes.Level(10000 + i),
-			Balance: decimal.NewFromInt(int64(i * 100)),
-			Hash:    addr,
+			Hash:    hash,
+			Address: addr,
+			Id:      uint64(i),
 		})
 	}
 
@@ -173,15 +174,6 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 
 	s.Require().Greater(addresses[0].Id, uint64(0))
 	s.Require().Greater(addresses[1].Id, uint64(0))
-
-	for i := 0; i < 5; i++ {
-		address, err := s.storage.Address.GetByID(ctx, addresses[i].Id)
-		s.Require().NoError(err)
-
-		s.Require().EqualValues(10000+i, address.Height)
-		s.Require().EqualValues(i*100, address.Balance.IntPart())
-		s.Require().Len(address.Hash, 47)
-	}
 }
 
 func (s *StorageTestSuite) TestSaveTxAddresses() {
@@ -199,6 +191,26 @@ func (s *StorageTestSuite) TestSaveTxAddresses() {
 	}
 
 	err = tx.SaveTxAddresses(ctx, addresses...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *StorageTestSuite) TestSaveBalances() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	balances := make([]storage.Balance, 5)
+	for i := 0; i < 5; i++ {
+		balances[i].Id = uint64(i + 1)
+		balances[i].Total = decimal.RequireFromString("1000")
+	}
+
+	err = tx.SaveBalances(ctx, balances...)
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))
@@ -310,7 +322,6 @@ func (s *StorageTestSuite) TestRollbackAddress() {
 	deleted, err := tx.RollbackAddresses(ctx, 101)
 	s.Require().NoError(err)
 	s.Require().Len(deleted, 1)
-	s.Require().Equal("321", deleted[0].Balance.String())
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))

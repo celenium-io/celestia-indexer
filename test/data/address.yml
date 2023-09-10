@@ -1,8 +1,8 @@
 - id: 1
   height: 100
-  balance: 123
-  hash: celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8
+  address: celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8
+  hash: 0xdece425b75d67115bda877e1e7a1f262f6fa51d6
 - id: 2
   height: 101
-  balance: 321
-  hash: celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60
+  address: celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60
+  hash: 0x960aa0366b254e1ea79bda467eb3aa5c97cba5ae

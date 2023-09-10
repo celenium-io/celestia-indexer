@@ -150,12 +150,12 @@ func (s *StorageTestSuite) TestAddressByHash() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	address, err := s.storage.Address.ByHash(ctx, "celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8")
+	hash := []byte{0xde, 0xce, 0x42, 0x5b, 0x75, 0xd6, 0x71, 0x15, 0xbd, 0xa8, 0x77, 0xe1, 0xe7, 0xa1, 0xf2, 0x62, 0xf6, 0xfa, 0x51, 0xd6}
+	address, err := s.storage.Address.ByHash(ctx, hash)
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, address.Id)
 	s.Require().EqualValues(100, address.Height)
-	s.Require().Equal("123", address.Balance.String())
-	s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", address.Hash)
+	s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", address.Address)
 }
 
 func (s *StorageTestSuite) TestEventByTxId() {

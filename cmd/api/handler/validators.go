@@ -3,8 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/btcsuite/btcutil/bech32"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
@@ -37,16 +38,16 @@ func (v *CelestiaApiValidator) Validate(i interface{}) error {
 func isAddress(address string) bool {
 	switch len(address) {
 	case 47:
-		return validateAddress(address, "celestia")
+		return validateAddress(address, pkgTypes.AddressPrefixCelestia)
 	case 54:
-		return validateAddress(address, "celestiavaloper")
+		return validateAddress(address, pkgTypes.AddressPrefixValoper)
 	default:
 		return false
 	}
 }
 
 func validateAddress(address string, wantPrefix string) bool {
-	prefix, _, err := bech32.Decode(address)
+	prefix, _, err := bech32.DecodeAndConvert(address)
 	if err != nil {
 		return false
 	}
