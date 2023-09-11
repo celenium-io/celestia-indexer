@@ -80,7 +80,7 @@ func (module *Module) listen(ctx context.Context) {
 				continue
 			}
 
-			if err := module.saveBlock(ctx, block); err != nil {
+			if err := module.saveBlock(ctx, &block); err != nil {
 				module.log.Err(err).Msg("block saving error")
 				continue
 			}
@@ -127,7 +127,7 @@ func (module *Module) AttachTo(name string, input *modules.Input) error {
 	return nil
 }
 
-func (module *Module) updateState(block storage.Block, totalAccounts uint64, state *storage.State) {
+func (module *Module) updateState(block *storage.Block, totalAccounts uint64, state *storage.State) {
 	if types.Level(block.Id) <= state.LastHeight {
 		return
 	}
@@ -143,7 +143,7 @@ func (module *Module) updateState(block storage.Block, totalAccounts uint64, sta
 	state.ChainId = block.ChainId
 }
 
-func (module *Module) saveBlock(ctx context.Context, block storage.Block) error {
+func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error {
 	start := time.Now()
 	module.log.Info().Uint64("height", uint64(block.Height)).Msg("saving block...")
 	tx, err := postgres.BeginTransaction(ctx, module.storage.Transactable)
@@ -157,7 +157,7 @@ func (module *Module) saveBlock(ctx context.Context, block storage.Block) error 
 		return tx.HandleError(ctx, err)
 	}
 
-	if err := tx.Add(ctx, &block); err != nil {
+	if err := tx.Add(ctx, block); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 

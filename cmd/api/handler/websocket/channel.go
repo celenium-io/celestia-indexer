@@ -93,7 +93,10 @@ func (channel *Channel[I, M]) waitMessage(ctx context.Context) {
 				continue
 			}
 
-			log.Debug().Str("channel", channel.storageChannelName).Msg("message received")
+			log.Debug().
+				Str("channel", msg.Channel).
+				Str("payload", msg.Extra).
+				Msg("message received")
 
 			notification, err := channel.processor(ctx, msg.Extra, channel.repo)
 			if err != nil {
