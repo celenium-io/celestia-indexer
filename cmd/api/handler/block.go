@@ -101,7 +101,7 @@ func (handler *BlockHandler) List(c echo.Context) error {
 
 	response := make([]responses.Block, len(blocks))
 	for i := range blocks {
-		response[i] = responses.NewBlock(blocks[i], false)
+		response[i] = responses.NewBlock(blocks[i], req.Stats)
 	}
 
 	return returnArray(c, response)
