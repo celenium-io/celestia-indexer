@@ -466,6 +466,45 @@ func (s *StorageTestSuite) TestValidatorByAddress() {
 	s.Require().EqualValues(4, validator.MsgId)
 }
 
+func (s *StorageTestSuite) TestConstantGet() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	c, err := s.storage.Constants.Get(ctx, types.ModuleNameBlob, "gas_per_blob_byte")
+	s.Require().NoError(err)
+
+	s.Require().EqualValues("8", c.Value)
+}
+
+func (s *StorageTestSuite) TestConstantByModule() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	c, err := s.storage.Constants.ByModule(ctx, types.ModuleNameAuth)
+	s.Require().NoError(err)
+	s.Require().Len(c, 2)
+
+	s.Require().EqualValues("256", c[0].Value)
+	s.Require().EqualValues("10", c[1].Value)
+}
+
+func (s *StorageTestSuite) TestDenomMetadata() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	metadata, err := s.storage.DenomMetadata.All(ctx)
+	s.Require().NoError(err)
+	s.Require().Len(metadata, 1)
+
+	m := metadata[0]
+	s.Require().EqualValues("utia", m.Base)
+	s.Require().EqualValues("TIA", m.Display)
+	s.Require().EqualValues("TIA", m.Symbol)
+	s.Require().EqualValues("TIA", m.Name)
+	s.Require().EqualValues("The native staking token of the Celestia network.", m.Description)
+	s.Require().Greater(len(m.Units), 0)
+}
+
 func (s *StorageTestSuite) TestNotify() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

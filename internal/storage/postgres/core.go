@@ -19,17 +19,19 @@ type Storage struct {
 
 	cfg config.Database
 
-	Blocks      models.IBlock
-	BlockStats  models.IBlockStats
-	Tx          models.ITx
-	Message     models.IMessage
-	Event       models.IEvent
-	Address     models.IAddress
-	Namespace   models.INamespace
-	State       models.IState
-	Stats       models.IStats
-	Validator   models.IValidator
-	Notificator *Notificator
+	Blocks        models.IBlock
+	BlockStats    models.IBlockStats
+	Constants     models.IConstant
+	DenomMetadata models.IDenomMetadata
+	Tx            models.ITx
+	Message       models.IMessage
+	Event         models.IEvent
+	Address       models.IAddress
+	Namespace     models.INamespace
+	State         models.IState
+	Stats         models.IStats
+	Validator     models.IValidator
+	Notificator   *Notificator
 
 	PartitionManager database.RangePartitionManager
 }
@@ -42,19 +44,21 @@ func Create(ctx context.Context, cfg config.Database) (Storage, error) {
 	}
 
 	s := Storage{
-		cfg:         cfg,
-		Storage:     strg,
-		Blocks:      NewBlocks(strg.Connection()),
-		BlockStats:  NewBlockStats(strg.Connection()),
-		Message:     NewMessage(strg.Connection()),
-		Event:       NewEvent(strg.Connection()),
-		Address:     NewAddress(strg.Connection()),
-		Tx:          NewTx(strg.Connection()),
-		State:       NewState(strg.Connection()),
-		Namespace:   NewNamespace(strg.Connection()),
-		Stats:       NewStats(strg.Connection()),
-		Validator:   NewValidator(strg.Connection()),
-		Notificator: NewNotificator(cfg, strg.Connection().DB()),
+		cfg:           cfg,
+		Storage:       strg,
+		Blocks:        NewBlocks(strg.Connection()),
+		BlockStats:    NewBlockStats(strg.Connection()),
+		Constants:     NewConstant(strg.Connection()),
+		DenomMetadata: NewDenomMetadata(strg.Connection()),
+		Message:       NewMessage(strg.Connection()),
+		Event:         NewEvent(strg.Connection()),
+		Address:       NewAddress(strg.Connection()),
+		Tx:            NewTx(strg.Connection()),
+		State:         NewState(strg.Connection()),
+		Namespace:     NewNamespace(strg.Connection()),
+		Stats:         NewStats(strg.Connection()),
+		Validator:     NewValidator(strg.Connection()),
+		Notificator:   NewNotificator(cfg, strg.Connection().DB()),
 
 		PartitionManager: database.NewPartitionManager(strg.Connection(), database.PartitionByMonth),
 	}

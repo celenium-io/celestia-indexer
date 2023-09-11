@@ -14,13 +14,17 @@ import (
 )
 
 type parsedData struct {
-	block     storage.Block
-	addresses map[string]*storage.Address
+	block         storage.Block
+	addresses     map[string]*storage.Address
+	constants     []storage.Constant
+	denomMetadata []storage.DenomMetadata
 }
 
 func newParsedData() parsedData {
 	return parsedData{
-		addresses: make(map[string]*storage.Address),
+		addresses:     make(map[string]*storage.Address),
+		constants:     make([]storage.Constant, 0),
+		denomMetadata: make([]storage.DenomMetadata, 0),
 	}
 }
 
@@ -88,6 +92,9 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 
 		block.Txs = append(block.Txs, tx)
 	}
+
+	module.parseDenomMetadata(genesis.AppState.Bank.DenomMetadata, &data)
+	module.parseConstants(genesis.AppState, &data)
 
 	module.parseTotalSupply(genesis.AppState.Bank.Supply, &block)
 

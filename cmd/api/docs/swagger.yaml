@@ -140,6 +140,42 @@ definitions:
         example: 12
         type: integer
     type: object
+  responses.Constants:
+    properties:
+      denom_metadata:
+        items:
+          $ref: '#/definitions/responses.DenomMetadata'
+        type: array
+      module:
+        additionalProperties:
+          $ref: '#/definitions/responses.Params'
+        type: object
+    type: object
+  responses.DenomMetadata:
+    properties:
+      base:
+        example: utia
+        type: string
+      description:
+        example: Some description
+        type: string
+      display:
+        example: TIA
+        type: string
+      name:
+        example: TIA
+        type: string
+      symbol:
+        example: TIA
+        type: string
+      units:
+        items:
+          type: integer
+        type: array
+      uri:
+        example: https://example.com
+        type: string
+    type: object
   responses.Event:
     properties:
       data:
@@ -277,6 +313,10 @@ definitions:
         example: MsgCreatePeriodicVestingAccount
         format: string
         type: string
+    type: object
+  responses.Params:
+    additionalProperties:
+      type: string
     type: object
   responses.State:
     properties:
@@ -782,6 +822,26 @@ paths:
       summary: Get block stats by height
       tags:
       - block
+  /v1/constants:
+    get:
+      description: Get network constants
+      operationId: get-constants
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Constants'
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get network constants
+      tags:
+      - general
   /v1/head:
     get:
       description: Get current indexer head

@@ -444,6 +444,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/constants": {
+            "get": {
+                "description": "Get network constants",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "general"
+                ],
+                "summary": "Get network constants",
+                "operationId": "get-constants",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Constants"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/head": {
             "get": {
                 "description": "Get current indexer head",
@@ -1486,6 +1516,58 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.Constants": {
+            "type": "object",
+            "properties": {
+                "denom_metadata": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responses.DenomMetadata"
+                    }
+                },
+                "module": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/responses.Params"
+                    }
+                }
+            }
+        },
+        "responses.DenomMetadata": {
+            "type": "object",
+            "properties": {
+                "base": {
+                    "type": "string",
+                    "example": "utia"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Some description"
+                },
+                "display": {
+                    "type": "string",
+                    "example": "TIA"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "TIA"
+                },
+                "symbol": {
+                    "type": "string",
+                    "example": "TIA"
+                },
+                "units": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "uri": {
+                    "type": "string",
+                    "example": "https://example.com"
+                }
+            }
+        },
         "responses.Event": {
             "type": "object",
             "properties": {
@@ -1668,6 +1750,12 @@ const docTemplate = `{
                     ],
                     "example": "MsgCreatePeriodicVestingAccount"
                 }
+            }
+        },
+        "responses.Params": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
             }
         },
         "responses.State": {

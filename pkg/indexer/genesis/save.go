@@ -17,6 +17,16 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 	}
 	defer tx.Close(ctx)
 
+	if err := tx.SaveConstants(ctx, data.constants...); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
+	for i := range data.denomMetadata {
+		if err := tx.Add(ctx, &data.denomMetadata[i]); err != nil {
+			return tx.HandleError(ctx, err)
+		}
+	}
+
 	if err := tx.Add(ctx, &data.block); err != nil {
 		return tx.HandleError(ctx, err)
 	}

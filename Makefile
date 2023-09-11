@@ -35,6 +35,6 @@ generate:
 	go generate -v ./internal/storage ./internal/storage/types
 
 api-docs:
-	cd cmd/api && swag init --md markdown -parseDependency 2
+	cd cmd/api && swag init --md markdown -parseDependency --parseInternal --parseDepth 1
 
 .PHONY: init indexer api build clean compose lint test adr mock api-docs

@@ -9,6 +9,8 @@ import (
 
 var Models = []any{
 	&State{},
+	&Constant{},
+	&DenomMetadata{},
 	&Balance{},
 	&Address{},
 	&Block{},

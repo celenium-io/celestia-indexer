@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
@@ -71,6 +72,10 @@ type Coins struct {
 	Amount string `json:"amount"`
 }
 
+func (c Coins) String() string {
+	return fmt.Sprintf("%s%s", c.Amount, c.Denom)
+}
+
 type Balances struct {
 	Address string  `json:"address"`
 	Coins   []Coins `json:"coins"`
@@ -81,21 +86,15 @@ type Supply struct {
 	Amount string `json:"amount"`
 }
 
-type DenomUnits struct {
-	Denom    string   `json:"denom"`
-	Exponent int      `json:"exponent"`
-	Aliases  []string `json:"aliases"`
-}
-
 type DenomMetadata struct {
-	Description string       `json:"description"`
-	DenomUnits  []DenomUnits `json:"denom_units"`
-	Base        string       `json:"base"`
-	Display     string       `json:"display"`
-	Name        string       `json:"name"`
-	Symbol      string       `json:"symbol"`
-	URI         string       `json:"uri"`
-	URIHash     string       `json:"uri_hash"`
+	Description string          `json:"description"`
+	DenomUnits  json.RawMessage `json:"denom_units"`
+	Base        string          `json:"base"`
+	Display     string          `json:"display"`
+	Name        string          `json:"name"`
+	Symbol      string          `json:"symbol"`
+	URI         string          `json:"uri"`
+	URIHash     string          `json:"uri_hash"`
 }
 
 type Bank struct {
@@ -368,7 +367,7 @@ type AppState struct {
 	Auth         Auth         `json:"auth"`
 	Authz        Authz        `json:"authz"`
 	Bank         Bank         `json:"bank"`
-	Blob         Blob         `json:"blob"`
+	Blob         BlobState    `json:"blob"`
 	Capability   Capability   `json:"capability"`
 	Crisis       Crisis       `json:"crisis"`
 	Distribution Distribution `json:"distribution"`

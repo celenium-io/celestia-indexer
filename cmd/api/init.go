@@ -173,6 +173,8 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 
 	stateHandlers := handler.NewStateHandler(db.State)
 	v1.GET("/head", stateHandlers.Head)
+	constantsHandler := handler.NewConstantHandler(db.Constants, db.DenomMetadata, db.Address)
+	v1.GET("/constants", constantsHandler.Get)
 
 	addessHandlers := handler.NewAddressHandler(db.Address, db.Tx)
 	addressGroup := v1.Group("/address")

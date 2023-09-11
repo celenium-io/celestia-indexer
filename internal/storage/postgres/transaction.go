@@ -18,6 +18,15 @@ func BeginTransaction(ctx context.Context, tx storage.Transactable) (Transaction
 	return Transaction{t}, err
 }
 
+func (tx Transaction) SaveConstants(ctx context.Context, constants ...models.Constant) error {
+	if len(constants) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&constants).Exec(ctx)
+	return err
+}
+
 func (tx Transaction) SaveTransactions(ctx context.Context, txs ...models.Tx) error {
 	switch len(txs) {
 	case 0:

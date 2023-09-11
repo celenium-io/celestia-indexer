@@ -61,6 +61,16 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 		); err != nil {
 			return err
 		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"module_name",
+			bun.Safe("module_name"),
+			bun.In(types.ModuleNameValues()),
+		); err != nil {
+			return err
+		}
 		return nil
 	})
 }
