@@ -1,6 +1,7 @@
 package decode
 
 import (
+	"github.com/rs/zerolog/log"
 	"time"
 
 	"github.com/celestiaorg/celestia-app/pkg/namespace"
@@ -65,6 +66,7 @@ func Message(msg cosmosTypes.Msg, height types.Level, time time.Time, position i
 	case *cosmosDistributionTypes.MsgSetWithdrawAddress:
 		d.Msg.Type, d.Msg.Addresses, err = handleMsgSetWithdrawalAddress(height, typedMsg)
 	default:
+		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)
 		d.Msg.Type = storageTypes.MsgUnknown
 	}
 

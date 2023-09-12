@@ -26,6 +26,10 @@ type ResponseDeliverTx struct {
 	Codespace string  `json:"codespace,omitempty"         protobuf:"bytes,8,opt,name=codespace,proto3"`
 }
 
+func (tx *ResponseDeliverTx) IsFailed() bool {
+	return tx.Code != 0
+}
+
 // Event allows application developers to attach additional information to
 // ResponseBeginBlock, ResponseEndBlock, ResponseCheckTx and ResponseDeliverTx.
 // Later transactions may be queried using these events.

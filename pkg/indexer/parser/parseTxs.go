@@ -68,7 +68,7 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (stor
 		})
 	}
 
-	if txRes.Code != 0 {
+	if txRes.IsFailed() {
 		t.Status = storageTypes.StatusFailed
 		t.Error = txRes.Log
 	}
@@ -78,6 +78,11 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (stor
 		dm, err := decode.Message(sdkMsg, b.Height, b.Block.Time, position)
 		if err != nil {
 			return storage.Tx{}, errors.Wrapf(err, "while parsing tx=%v on index=%d", t.Hash, t.Position)
+		}
+
+		if txRes.IsFailed() {
+			dm.Msg.Namespace = nil
+			dm.BlobsSize = 0
 		}
 
 		t.Messages[position] = dm.Msg
