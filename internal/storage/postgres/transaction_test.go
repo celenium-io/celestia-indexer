@@ -146,6 +146,7 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
+	replyAddress := storage.Address{}
 	addresses := make([]*storage.Address, 0, 5)
 	for i := 0; i < 5; i++ {
 		hash := make([]byte, 20)
@@ -164,6 +165,12 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 			Address: addr,
 			Id:      uint64(i),
 		})
+
+		if i == 2 {
+			replyAddress.Address = addresses[i].Address
+			replyAddress.Hash = addresses[i].Hash
+			replyAddress.Height = addresses[i].Height + 1
+		}
 	}
 
 	err = tx.SaveAddresses(ctx, addresses...)
@@ -174,6 +181,16 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 
 	s.Require().Greater(addresses[0].Id, uint64(0))
 	s.Require().Greater(addresses[1].Id, uint64(0))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.SaveAddresses(ctx, &replyAddress)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+	s.Require().Equal(replyAddress.Id, addresses[2].Id)
 }
 
 func (s *StorageTestSuite) TestSaveTxAddresses() {
@@ -183,14 +200,34 @@ func (s *StorageTestSuite) TestSaveTxAddresses() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	addresses := make([]storage.TxAddress, 5)
+	addresses := make([]storage.Signer, 5)
 	for i := 0; i < 5; i++ {
 		addresses[i].AddressId = uint64(i + 1)
 		addresses[i].TxId = uint64(5 - i)
-		addresses[i].Type = types.TxAddressTypeFromAddress
 	}
 
-	err = tx.SaveTxAddresses(ctx, addresses...)
+	err = tx.SaveSigners(ctx, addresses...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *StorageTestSuite) TestSaveMsgAddresses() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	addresses := make([]storage.MsgAddress, 5)
+	for i := 0; i < 5; i++ {
+		addresses[i].AddressId = uint64(i + 1)
+		addresses[i].MsgId = uint64(5 - i)
+		addresses[i].Type = types.MsgAddressTypeValues()[i]
+	}
+
+	err = tx.SaveMsgAddresses(ctx, addresses...)
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))

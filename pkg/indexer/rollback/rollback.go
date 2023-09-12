@@ -204,38 +204,27 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
-	_, err = tx.RollbackTxs(ctx, height)
+
+	if err := module.rollbackTransactions(ctx, tx, height); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
+	totalNamespaces, err := module.rollbackMessages(ctx, tx, height)
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
-	msgs, err := tx.RollbackMessages(ctx, height)
-	if err != nil {
-		return tx.HandleError(ctx, err)
-	}
+
 	events, err := tx.RollbackEvents(ctx, height)
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
-	if err := module.balances(ctx, events, addresses); err != nil {
-		return tx.HandleError(ctx, err)
-	}
-
-	nsMsgs, err := tx.RollbackNamespaceMessages(ctx, height)
-	if err != nil {
-		return tx.HandleError(ctx, err)
-	}
-	ns, err := tx.RollbackNamespaces(ctx, height)
-	if err != nil {
+	if err := module.rollbackBalances(ctx, events, addresses); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
 	if err := tx.RollbackValidators(ctx, height); err != nil {
 		return tx.HandleError(ctx, err)
-	}
-
-	if err := module.namespaces(ctx, tx, nsMsgs, ns, msgs); err != nil {
-		return tx.HandleError(ctx, errors.Wrap(err, "namespace rollback"))
 	}
 
 	newBlock, err := tx.LastBlock(ctx)
@@ -250,16 +239,10 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	state.LastTime = newBlock.Time
 	state.TotalTx -= blockStats.TxCount
 	state.TotalBlobsSize -= blockStats.BlobsSize
-	state.TotalNamespaces -= uint64(len(ns))
+	state.TotalNamespaces -= totalNamespaces
 	state.TotalAccounts -= uint64(len(addresses))
 	state.TotalFee = state.TotalFee.Sub(blockStats.Fee)
 	state.TotalSupply = state.TotalSupply.Sub(blockStats.SupplyChange)
-
-	totalSupplyDiff, err := module.totalSupplyDiff(ctx, events)
-	if err != nil {
-		return tx.HandleError(ctx, err)
-	}
-	state.TotalSupply = state.TotalSupply.Add(totalSupplyDiff)
 
 	if err := tx.Update(ctx, &state); err != nil {
 		return tx.HandleError(ctx, err)

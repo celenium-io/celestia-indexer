@@ -106,7 +106,7 @@ func (handler *NamespaceHandler) GetByHash(c echo.Context) error {
 
 type getNamespaceWithVersionRequest struct {
 	Id      string `param:"id"      validate:"required,hexadecimal,len=56"`
-	Version byte   `param:"version" validate:"required"`
+	Version byte   `param:"version"`
 }
 
 // GetWithVersion godoc
@@ -207,7 +207,7 @@ func (handler *NamespaceHandler) GetBlob(c echo.Context) error {
 
 type getNamespaceMessages struct {
 	Id      string `param:"id"      validate:"required,hexadecimal,len=56"`
-	Version byte   `param:"version" validate:"required"`
+	Version byte   `param:"version"`
 	Limit   uint64 `query:"limit"   validate:"omitempty,min=1,max=100"`
 	Offset  uint64 `query:"offset"  validate:"omitempty,min=0"`
 }

@@ -40,7 +40,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 	}
 
 	var (
-		messages   = make([]any, 0)
+		messages   = make([]*storage.Message, 0)
 		events     = make([]any, len(data.block.Events))
 		namespaces = make(map[string]*storage.Namespace, 0)
 	)
@@ -68,12 +68,12 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 			events = append(events, &data.block.Txs[i].Events[j])
 		}
 
-		for j := range data.block.Txs[i].Addresses {
-			key := data.block.Txs[i].Addresses[j].String()
+		for j := range data.block.Txs[i].Signers {
+			key := data.block.Txs[i].Signers[j].String()
 			if addr, ok := data.addresses[key]; !ok {
-				data.addresses[key] = &data.block.Txs[i].Addresses[j].Address
+				data.addresses[key] = &data.block.Txs[i].Signers[j]
 			} else {
-				addr.Balance.Total = addr.Balance.Total.Add(data.block.Txs[i].Addresses[j].Address.Balance.Total)
+				addr.Balance.Total = addr.Balance.Total.Add(data.block.Txs[i].Signers[j].Balance.Total)
 			}
 		}
 	}
@@ -108,10 +108,8 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		}
 	}
 
-	if len(messages) > 0 {
-		if err := tx.BulkSave(ctx, messages); err != nil {
-			return tx.HandleError(ctx, err)
-		}
+	if err := tx.SaveMessages(ctx, messages...); err != nil {
+		return tx.HandleError(ctx, err)
 	}
 
 	if len(events) > 0 {
@@ -122,20 +120,16 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 
 	var namespaceMsgs []storage.NamespaceMessage
 	for i := range messages {
-		msg, ok := messages[i].(*storage.Message)
-		if !ok {
-			continue
-		}
-		for j := range msg.Namespace {
-			if msg.Namespace[j].Id == 0 { // in case of duplication of writing to one namespace inside one messages
+		for j := range messages[i].Namespace {
+			if messages[i].Namespace[j].Id == 0 { // in case of duplication of writing to one namespace inside one messages
 				continue
 			}
 			namespaceMsgs = append(namespaceMsgs, storage.NamespaceMessage{
-				MsgId:       msg.Id,
-				NamespaceId: msg.Namespace[j].Id,
-				Time:        msg.Time,
-				Height:      msg.Height,
-				TxId:        msg.TxId,
+				MsgId:       messages[i].Id,
+				NamespaceId: messages[i].Namespace[j].Id,
+				Time:        messages[i].Time,
+				Height:      messages[i].Height,
+				TxId:        messages[i].TxId,
 			})
 		}
 	}
@@ -143,18 +137,17 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		return tx.HandleError(ctx, err)
 	}
 
-	var txAddresses []storage.TxAddress
+	var signers []storage.Signer
 	for _, transaction := range data.block.Txs {
-		for _, address := range transaction.Addresses {
-			txAddresses = append(txAddresses, storage.TxAddress{
+		for _, address := range transaction.Signers {
+			signers = append(signers, storage.Signer{
 				TxId:      transaction.Id,
 				AddressId: address.Id,
-				Type:      address.Type,
 			})
 		}
 	}
 
-	if err := tx.SaveTxAddresses(ctx, txAddresses...); err != nil {
+	if err := tx.SaveSigners(ctx, signers...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 

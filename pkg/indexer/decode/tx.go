@@ -17,6 +17,7 @@ type DecodedTx struct {
 	Memo          string
 	Messages      []cosmosTypes.Msg
 	Fee           decimal.Decimal
+	Signers       map[string]struct{}
 }
 
 func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
@@ -33,13 +34,24 @@ func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
 	}
 
 	d.TimeoutHeight, d.Memo, d.Messages, err = decodeCosmosTx(decoder, raw)
+	if err != nil {
+		return
+	}
+
+	d.Signers = make(map[string]struct{})
+	for i := range d.Messages {
+		for _, signer := range d.Messages[i].GetSigners() {
+			d.Signers[signer.String()] = struct{}{}
+		}
+	}
+
 	return
 }
 
 func decodeCosmosTx(decoder cosmosTypes.TxDecoder, raw tmTypes.Tx) (timeoutHeight uint64, memo string, messages []cosmosTypes.Msg, err error) {
-	txDecoded, e := decoder(raw)
-	if e != nil {
-		err = errors.Wrap(e, "decoding tx error")
+	txDecoded, err := decoder(raw)
+	if err != nil {
+		err = errors.Wrap(err, "decoding tx error")
 		return
 	}
 

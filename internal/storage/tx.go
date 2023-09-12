@@ -55,9 +55,9 @@ type Tx struct {
 	Memo         string            `bun:"memo,type:text"          comment:"Note or comment to send with the transaction"`
 	MessageTypes types.MsgTypeBits `bun:"message_types,type:int8" comment:"Bit mask with containing messages"            stats:"filterable"`
 
-	Messages  []Message         `bun:"rel:has-many,join:id=tx_id"`
-	Events    []Event           `bun:"rel:has-many"`
-	Addresses []AddressWithType `bun:"m2m:tx_address,join:Tx=Address"`
+	Messages []Message `bun:"rel:has-many,join:id=tx_id"`
+	Events   []Event   `bun:"rel:has-many"`
+	Signers  []Address `bun:"m2m:signer,join:Tx=Address"`
 
 	BlobsSize uint64 `bun:"-"`
 }

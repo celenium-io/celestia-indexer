@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
-	"github.com/dipdup-io/celestia-indexer/pkg/stopper"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/dipdup-io/celestia-indexer/pkg/stopper"
 
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer"
 
@@ -46,6 +47,7 @@ func main() {
 		return
 	}
 
+	stopperModule.Start(ctx)
 	indexerModule.Start(ctx)
 
 	<-notifyCtx.Done()

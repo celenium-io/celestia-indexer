@@ -44,7 +44,7 @@ func (tx *Tx) ByIdWithRelations(ctx context.Context, id uint64) (transaction sto
 }
 
 func (tx *Tx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxFilter) ([]storage.Tx, error) {
-	var relations []storage.TxAddress
+	var relations []storage.Signer
 	query := tx.DB().NewSelect().
 		Model(&relations).
 		Where("address_id = ?", addressId).

@@ -6,6 +6,7 @@ import (
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 )
 
 func parseTxs(b types.BlockData) ([]storage.Tx, error) {
@@ -47,8 +48,24 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (stor
 
 		Messages:  make([]storage.Message, len(d.Messages)),
 		Events:    nil,
-		Addresses: make([]storage.AddressWithType, 0),
+		Signers:   make([]storage.Address, 0),
 		BlobsSize: 0,
+	}
+
+	for signer := range d.Signers {
+		_, hash, err := types.Address(signer).Decode()
+		if err != nil {
+			return t, errors.Wrapf(err, "decode signer: %s", signer)
+		}
+
+		t.Signers = append(t.Signers, storage.Address{
+			Address: signer,
+			Height:  t.Height,
+			Hash:    hash,
+			Balance: storage.Balance{
+				Total: decimal.Zero,
+			},
+		})
 	}
 
 	if txRes.Code != 0 {
@@ -66,7 +83,6 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (stor
 		t.Messages[position] = dm.Msg
 		t.MessageTypes.SetBit(dm.Msg.Type)
 		t.BlobsSize += dm.BlobsSize
-		t.Addresses = append(t.Addresses, dm.Addresses...)
 	}
 
 	return t, nil

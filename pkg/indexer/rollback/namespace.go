@@ -12,7 +12,7 @@ import (
 
 var errInvalidPayForBlob = errors.New("invalid MsgPayForBlob content")
 
-func (module *Module) namespaces(
+func (module *Module) rollbackNamespaces(
 	ctx context.Context,
 	tx postgres.Transaction,
 	nsMsgs []storage.NamespaceMessage,

@@ -30,8 +30,9 @@ type Message struct {
 	TxId     uint64         `bun:"tx_id"                       comment:"Parent transaction id"`
 	Data     map[string]any `bun:"data,type:jsonb"             comment:"Message data"`
 
-	Namespace []Namespace `bun:"m2m:namespace_message,join:Message=Namespace"`
-	Validator *Validator  `bun:"belong-to"`
+	Namespace []Namespace       `bun:"m2m:namespace_message,join:Message=Namespace"`
+	Validator *Validator        `bun:"rel:belongs-to"`
+	Addresses []AddressWithType `bun:"-"`
 }
 
 // TableName -

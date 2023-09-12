@@ -1,6 +1,6 @@
 package types
 
-// swagger:enum TxAddressType
+// swagger:enum MsgAddressType
 /*
 	ENUM(
 		validatorAddress,
@@ -16,4 +16,4 @@ package types
 	)
 */
 //go:generate go-enum --marshal --sql --values
-type TxAddressType string
+type MsgAddressType string

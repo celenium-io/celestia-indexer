@@ -55,9 +55,9 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 		if _, err := tx.ExecContext(
 			ctx,
 			createTypeQuery,
-			"tx_address_type",
-			bun.Safe("tx_address_type"),
-			bun.In(types.TxAddressTypeValues()),
+			"msg_address_type",
+			bun.Safe("msg_address_type"),
+			bun.In(types.MsgAddressTypeValues()),
 		); err != nil {
 			return err
 		}

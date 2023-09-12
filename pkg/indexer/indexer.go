@@ -2,8 +2,9 @@ package indexer
 
 import (
 	"context"
-	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"sync"
+
+	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 
 	internalStorage "github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/genesis"

@@ -32,7 +32,7 @@ const (
 type Module struct {
 	storage     postgres.Storage
 	input       *modules.Input
-	output      *modules.Output
+	stop        *modules.Output
 	indexerName string
 	log         zerolog.Logger
 	g           workerpool.Group
@@ -43,7 +43,7 @@ func NewModule(pg postgres.Storage, cfg config.Indexer) Module {
 	m := Module{
 		storage:     pg,
 		input:       modules.NewInput(InputName),
-		output:      modules.NewOutput(StopOutput),
+		stop:        modules.NewOutput(StopOutput),
 		indexerName: cfg.Name,
 		g:           workerpool.NewGroup(),
 	}
@@ -82,6 +82,7 @@ func (module *Module) listen(ctx context.Context) {
 
 			if err := module.saveBlock(ctx, &block); err != nil {
 				module.log.Err(err).Msg("block saving error")
+				module.stop.Push(struct{}{})
 				continue
 			}
 
@@ -105,7 +106,7 @@ func (module *Module) Output(name string) (*modules.Output, error) {
 	if name != StopOutput {
 		return nil, errors.Wrap(modules.ErrUnknownOutput, name)
 	}
-	return module.output, nil
+	return module.stop, nil
 }
 
 // Input -
@@ -170,12 +171,10 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 	}
 
 	var (
-		messages   = make([]any, 0)
+		messages   = make([]*storage.Message, 0)
 		events     = make([]any, len(block.Events))
 		namespaces = make(map[string]*storage.Namespace, 0)
 		addresses  = make(map[string]*storage.Address, 0)
-
-		totalAccounts uint64
 	)
 
 	for i := range block.Events {
@@ -201,51 +200,23 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 			events = append(events, &block.Txs[i].Events[j])
 		}
 
-		for j := range block.Txs[i].Addresses {
-			key := block.Txs[i].Addresses[j].String()
+		for j := range block.Txs[i].Signers {
+			key := block.Txs[i].Signers[j].String()
 			if addr, ok := addresses[key]; !ok {
-				addresses[key] = &block.Txs[i].Addresses[j].Address
+				addresses[key] = &block.Txs[i].Signers[j]
 			} else {
-				addr.Balance.Total = addr.Balance.Total.Add(block.Txs[i].Addresses[j].Address.Balance.Total)
+				addr.Balance.Total = addr.Balance.Total.Add(block.Txs[i].Signers[j].Balance.Total)
 			}
 		}
 	}
 
-	if len(addresses) > 0 {
-		data := make([]*storage.Address, 0, len(addresses))
-		for key := range addresses {
-			data = append(data, addresses[key])
-		}
-
-		if err := tx.SaveAddresses(ctx, data...); err != nil {
-			return tx.HandleError(ctx, err)
-		}
-
-		balances := make([]storage.Balance, 0)
-		for i := range data {
-			data[i].Balance.Id = data[i].Id
-			balances = append(balances, data[i].Balance)
-		}
-		if err := tx.SaveBalances(ctx, balances...); err != nil {
-			return tx.HandleError(ctx, err)
-		}
+	addrToId, err := module.saveAddresses(ctx, tx, addresses)
+	if err != nil {
+		return tx.HandleError(ctx, err)
 	}
 
-	if len(namespaces) > 0 {
-		data := make([]*storage.Namespace, 0, len(namespaces))
-		for key := range namespaces {
-			data = append(data, namespaces[key])
-		}
-
-		if err := tx.SaveNamespaces(ctx, data...); err != nil {
-			return tx.HandleError(ctx, err)
-		}
-	}
-
-	if len(messages) > 0 {
-		if err := tx.BulkSave(ctx, messages); err != nil {
-			return tx.HandleError(ctx, err)
-		}
+	if err := module.saveSigners(ctx, tx, addrToId, block.Txs); err != nil {
+		return tx.HandleError(ctx, err)
 	}
 
 	if len(events) > 0 {
@@ -254,56 +225,15 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 		}
 	}
 
-	var (
-		namespaceMsgs []storage.NamespaceMessage
-		validators    = make([]*storage.Validator, 0)
-	)
-	for i := range messages {
-		msg, ok := messages[i].(*storage.Message)
-		if !ok {
-			continue
-		}
-		for j := range msg.Namespace {
-			if msg.Namespace[j].Id == 0 { // in case of duplication of writing to one namespace inside one messages
-				continue
-			}
-			namespaceMsgs = append(namespaceMsgs, storage.NamespaceMessage{
-				MsgId:       msg.Id,
-				NamespaceId: msg.Namespace[j].Id,
-				Time:        msg.Time,
-				Height:      msg.Height,
-				TxId:        msg.TxId,
-			})
-		}
-
-		if msg.Validator != nil {
-			msg.Validator.MsgId = msg.Id
-			validators = append(validators, msg.Validator)
-		}
-	}
-	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
-		return tx.HandleError(ctx, err)
-	}
-	if err := tx.SaveValidators(ctx, validators...); err != nil {
+	if err := module.saveNamespaces(ctx, tx, namespaces); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
-	var txAddresses []storage.TxAddress
-	for _, transaction := range block.Txs {
-		for _, address := range transaction.Addresses {
-			txAddresses = append(txAddresses, storage.TxAddress{
-				TxId:      transaction.Id,
-				AddressId: address.Id,
-				Type:      address.Type,
-			})
-		}
-	}
-
-	if err := tx.SaveTxAddresses(ctx, txAddresses...); err != nil {
+	if err := module.saveMessages(ctx, tx, messages, addrToId); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
-	module.updateState(block, totalAccounts, &state)
+	module.updateState(block, 0, &state) // TODO: pass total accounts
 	if err := tx.Update(ctx, &state); err != nil {
 		return tx.HandleError(ctx, err)
 	}

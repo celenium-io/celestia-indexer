@@ -74,7 +74,8 @@ func initDatabase(ctx context.Context, conn *database.Bun) error {
 	// register many-to-many relationships
 	conn.DB().RegisterModel(
 		(*models.NamespaceMessage)(nil),
-		(*models.TxAddress)(nil),
+		(*models.Signer)(nil),
+		(*models.MsgAddress)(nil),
 	)
 
 	if err := database.CreateTables(ctx, conn, models.Models...); err != nil {

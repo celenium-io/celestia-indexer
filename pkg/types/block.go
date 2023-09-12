@@ -14,10 +14,10 @@ type ResultBlock struct {
 
 // Block defines the atomic unit of a CometBFT blockchain.
 type Block struct {
-	Header     `json:"header"`
-	Data       `json:"data"`
-	Evidence   types.EvidenceData `json:"evidence"`
-	LastCommit *Commit            `json:"last_commit"`
+	Header `json:"header"`
+	Data   `json:"data"`
+	// Evidence   types.EvidenceData `json:"evidence"`
+	LastCommit *Commit `json:"last_commit"`
 }
 
 // Consensus captures the consensus rules for processing a block in the blockchain,

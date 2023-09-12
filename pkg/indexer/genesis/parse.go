@@ -73,9 +73,8 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 			Memo:          memoTx.GetMemo(),
 			MessageTypes:  storageTypes.NewMsgTypeBitMask(),
 
-			Messages:  make([]storage.Message, len(txDecoded.GetMsgs())),
-			Events:    nil,
-			Addresses: make([]storage.AddressWithType, 0),
+			Messages: make([]storage.Message, len(txDecoded.GetMsgs())),
+			Events:   nil,
 		}
 
 		for msgIndex, msg := range txDecoded.GetMsgs() {
@@ -87,7 +86,6 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 			tx.Messages[msgIndex] = decoded.Msg
 			tx.MessageTypes.SetBit(decoded.Msg.Type)
 			tx.BlobsSize += decoded.BlobsSize
-			tx.Addresses = append(tx.Addresses, decoded.Addresses...)
 		}
 
 		block.Txs = append(block.Txs, tx)
