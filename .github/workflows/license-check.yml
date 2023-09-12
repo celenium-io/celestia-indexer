@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     name: License Check
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: LavyshAlexander/go-licenses-action@46ff6dea75572b9eb60f6ccb7b600e959b79047c
         with:
           allowed-licenses: MIT,Apache-1.0,Apache-1.1,Apache-2.0,BSD-2-Clause-FreeBSD,BSD-2-Clause-NetBSD,BSD-2-Clause,BSD-3-Clause-Attribution,BSD-3-Clause-Clear,BSD-3-Clause-LBNL,BSD-3-Clause,BSD-4-Clause,BSD-4-Clause-UC,BSD-Protection,ISC,LGPL-2.0,LGPL-2.1,LGPL-3.0,LGPLLR,MPL-1.0,MPL-1.1,MPL-2.0,Unlicense
