@@ -20,6 +20,7 @@ package types
 		AttestationRequest,
 		withdraw_rewards,
 		withdraw_commission,
+		set_withdraw_address,
 		create_validator,
 		delegate,
 		edit_validator,

@@ -81,7 +81,9 @@ func (module *Module) listen(ctx context.Context) {
 			}
 
 			if err := module.saveBlock(ctx, &block); err != nil {
-				module.log.Err(err).Msg("block saving error")
+				module.log.Err(err).
+					Uint64("height", uint64(block.Height)).
+					Msg("block saving error")
 				module.stop.Push(struct{}{})
 				continue
 			}
