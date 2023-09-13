@@ -19,7 +19,7 @@ var rootCmd = &cobra.Command{
 // @title						Swagger Celestia Indexer API
 // @version					1.0
 // @description				This is docs of Celestia indexer API.
-// @host						127.0.0.1
+// @host						https://api.celestia.dipdup.net
 // @BasePath					/v1
 //
 // @query.collection.format	multi
@@ -30,6 +30,10 @@ func main() {
 	}
 
 	if err = initLogger(cfg.LogLevel); err != nil {
+		return
+	}
+
+	if err := initProflier(cfg.Profiler); err != nil {
 		return
 	}
 
@@ -54,5 +58,11 @@ func main() {
 
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
+	}
+
+	if prscp != nil {
+		if err := prscp.Stop(); err != nil {
+			e.Logger.Fatal(err)
+		}
 	}
 }

@@ -521,7 +521,7 @@ definitions:
     - MsgGrantAllowance
     - MsgRegisterEVMAddress
     - MsgSetWithdrawAddress
-host: 127.0.0.1
+host: https://api.celestia.dipdup.net
 info:
   contact: {}
   description: This is docs of Celestia indexer API.

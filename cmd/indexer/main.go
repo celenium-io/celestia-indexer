@@ -28,6 +28,9 @@ func main() {
 	if err = initLogger(cfg.LogLevel); err != nil {
 		return
 	}
+	if err = initProflier(cfg.Profiler); err != nil {
+		return
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -55,6 +58,12 @@ func main() {
 
 	if err := indexerModule.Close(); err != nil {
 		log.Panic().Err(err).Msg("stopping indexer")
+	}
+
+	if prscp != nil {
+		if err := prscp.Stop(); err != nil {
+			log.Panic().Err(err).Msg("stopping pyroscope")
+		}
 	}
 
 	log.Info().Msg("stopped")

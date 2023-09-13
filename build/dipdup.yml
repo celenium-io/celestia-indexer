@@ -29,3 +29,8 @@ api:
   prometheus: ${API_PROMETHEUS_ENABLED:-true}
   request_timeout: ${API_REQUEST_TIMEOUT:-30}
   blob_receiver: node_rpc
+
+profiler:
+  server: ${PROFILER_SERVER}
+  project: celestia
+  app_name: celestia-indexer

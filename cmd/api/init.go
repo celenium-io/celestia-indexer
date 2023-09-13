@@ -12,12 +12,14 @@ import (
 	_ "github.com/dipdup-io/celestia-indexer/cmd/api/docs"
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler"
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/websocket"
+	"github.com/dipdup-io/celestia-indexer/internal/profiler"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
 	nodeApi "github.com/dipdup-io/celestia-indexer/pkg/node/celestia_node_api"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/pyroscope-io/client/pyroscope"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -77,6 +79,13 @@ func initLogger(level string) error {
 	log.Logger = log.Logger.With().Caller().Logger()
 
 	return nil
+}
+
+var prscp *pyroscope.Profiler
+
+func initProflier(cfg *profiler.Config) (err error) {
+	prscp, err = profiler.New(cfg, "api")
+	return
 }
 
 func initEcho(cfg ApiConfig) *echo.Echo {
@@ -155,6 +164,7 @@ func initEcho(cfg ApiConfig) *echo.Echo {
 	if cfg.RateLimit > 0 {
 		e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(cfg.RateLimit))))
 	}
+
 	return e
 }
 

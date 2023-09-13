@@ -1,13 +1,15 @@
 package config
 
 import (
+	"github.com/dipdup-io/celestia-indexer/internal/profiler"
 	"github.com/dipdup-net/go-lib/config"
 )
 
 type Config struct {
 	config.Config `yaml:",inline"`
-	LogLevel      string  `validate:"omitempty,oneof=debug trace info warn error fatal panic" yaml:"log_level"`
-	Indexer       Indexer `yaml:"indexer"`
+	LogLevel      string           `validate:"omitempty,oneof=debug trace info warn error fatal panic" yaml:"log_level"`
+	Indexer       Indexer          `yaml:"indexer"`
+	Profiler      *profiler.Config `validate:"omitempty"                                               yaml:"profiler"`
 }
 
 type Indexer struct {

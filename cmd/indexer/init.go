@@ -4,8 +4,10 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/dipdup-io/celestia-indexer/internal/profiler"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	goLibConfig "github.com/dipdup-net/go-lib/config"
+	"github.com/pyroscope-io/client/pyroscope"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -63,4 +65,11 @@ func initLogger(level string) error {
 	log.Logger = log.Logger.With().Caller().Logger()
 
 	return nil
+}
+
+var prscp *pyroscope.Profiler
+
+func initProflier(cfg *profiler.Config) (err error) {
+	prscp, err = profiler.New(cfg, "indexer")
+	return
 }
