@@ -18,7 +18,7 @@ func TestTxFilter_Filter(t *testing.T) {
 		{
 			name: "test 1",
 			c: &Client{
-				filters: &filters{},
+				filters: &Filters{},
 			},
 			msg: responses.Tx{
 				Status: types.StatusSuccess,
@@ -30,7 +30,7 @@ func TestTxFilter_Filter(t *testing.T) {
 		}, {
 			name: "test 2",
 			c: &Client{
-				filters: &filters{
+				filters: &Filters{
 					tx: &txFilters{
 						msgs: types.NewMsgTypeBitMask(types.MsgBeginRedelegate),
 					},
@@ -44,7 +44,7 @@ func TestTxFilter_Filter(t *testing.T) {
 		}, {
 			name: "test 3",
 			c: &Client{
-				filters: &filters{
+				filters: &Filters{
 					tx: &txFilters{
 						msgs: types.NewMsgTypeBitMask(types.MsgSend),
 					},
@@ -58,7 +58,7 @@ func TestTxFilter_Filter(t *testing.T) {
 		}, {
 			name: "test 4",
 			c: &Client{
-				filters: &filters{
+				filters: &Filters{
 					tx: &txFilters{
 						status: map[types.Status]struct{}{
 							types.StatusSuccess: {},
@@ -74,7 +74,7 @@ func TestTxFilter_Filter(t *testing.T) {
 		}, {
 			name: "test 5",
 			c: &Client{
-				filters: &filters{
+				filters: &Filters{
 					tx: &txFilters{
 						status: map[types.Status]struct{}{
 							types.StatusFailed: {},
@@ -90,7 +90,7 @@ func TestTxFilter_Filter(t *testing.T) {
 		}, {
 			name: "test 6",
 			c: &Client{
-				filters: &filters{
+				filters: &Filters{
 					tx: &txFilters{
 						status: map[types.Status]struct{}{
 							types.StatusSuccess: {},
@@ -107,7 +107,7 @@ func TestTxFilter_Filter(t *testing.T) {
 		}, {
 			name: "test 7",
 			c: &Client{
-				filters: &filters{
+				filters: &Filters{
 					tx: &txFilters{
 						status: map[types.Status]struct{}{
 							types.StatusFailed: {},
@@ -124,7 +124,7 @@ func TestTxFilter_Filter(t *testing.T) {
 		}, {
 			name: "test 8",
 			c: &Client{
-				filters: &filters{
+				filters: &Filters{
 					tx: &txFilters{
 						status: map[types.Status]struct{}{
 							types.StatusFailed: {},
@@ -152,7 +152,7 @@ func TestTxFilter_Filter(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := new(TxFilter).Filter(tt.c, tt.msg)
+			got := new(TxFilter).Filter(tt.c, &tt.msg)
 			require.Equal(t, tt.want, got)
 		})
 	}

@@ -1,0 +1,5110 @@
+{
+	"info": {
+		"_postman_id": "c81db145-9b14-46d2-8cbd-7e3a3714097f",
+		"name": "Celestia Indexer API",
+		"description": "This is docs of Celestia indexer API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7213180"
+	},
+	"item": [
+		{
+			"name": "v1",
+			"item": [
+				{
+					"name": "address",
+					"item": [
+						{
+							"name": "{hash}",
+							"item": [
+								{
+									"name": "txs",
+									"item": [
+										{
+											"name": "Get address transactions",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response status code is 200\", function () {",
+															"  pm.expect(pm.response.code).to.equal(200);",
+															"});",
+															"",
+															"",
+															"pm.test(\"The response is an array with at least one element\", function () {",
+															"  const responseData = pm.response.json();",
+															"",
+															"  pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1);",
+															"});",
+															"",
+															"",
+															"pm.test(\"Gas used is less than or equal to gas wanted\", function () {",
+															"    const responseData = pm.response.json();",
+															"    ",
+															"    pm.expect(responseData).to.be.an('array');",
+															"    responseData.forEach(function (transaction) {",
+															"        pm.expect(transaction.gas_used).to.be.at.most(transaction.gas_wanted);",
+															"    });",
+															"});",
+															"",
+															"",
+															"pm.test(\"The hash field is a non-empty string\", function () {",
+															"  const responseData = pm.response.json();",
+															"  ",
+															"  pm.expect(responseData).to.be.an('array');",
+															"  responseData.forEach(function(item) {",
+															"    pm.expect(item.hash).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");",
+															"  });",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/address/:hash/txs?limit=10&offset=0&sort=asc&status=success&msg_type=MsgPayForBlobs",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"address",
+														":hash",
+														"txs"
+													],
+													"query": [
+														{
+															"key": "limit",
+															"value": "10",
+															"description": "Count of requested entities"
+														},
+														{
+															"key": "offset",
+															"value": "0",
+															"description": "Offset"
+														},
+														{
+															"key": "sort",
+															"value": "asc",
+															"description": "Sort order"
+														},
+														{
+															"key": "status",
+															"value": "success",
+															"description": "Comma-separated status list"
+														},
+														{
+															"key": "msg_type",
+															"value": "MsgPayForBlobs",
+															"description": "Comma-separated message types list"
+														},
+														{
+															"key": "from",
+															"value": "",
+															"description": "Time from in unix timestamp",
+															"disabled": true
+														},
+														{
+															"key": "to",
+															"value": "",
+															"description": "Time to in unix timestamp",
+															"disabled": true
+														}
+													],
+													"variable": [
+														{
+															"key": "hash",
+															"value": "celestia1k8elrzpvg8clnh6yt8p6hj32dqahwc74gnhpla"
+														}
+													]
+												},
+												"description": "Get address transactions"
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/address/:hash/txs?limit=<integer>&offset=<integer>&sort=desc&status=failed&msg_type=MsgPayForBlobs&from=<integer>&to=<integer>&height=<integer>",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"address",
+																":hash",
+																"txs"
+															],
+															"query": [
+																{
+																	"key": "limit",
+																	"value": "<integer>",
+																	"description": "Count of requested entities"
+																},
+																{
+																	"key": "offset",
+																	"value": "<integer>",
+																	"description": "Offset"
+																},
+																{
+																	"key": "sort",
+																	"value": "desc",
+																	"description": "Sort order"
+																},
+																{
+																	"key": "status",
+																	"value": "failed",
+																	"description": "Comma-separated status list"
+																},
+																{
+																	"key": "msg_type",
+																	"value": "MsgPayForBlobs",
+																	"description": "Comma-separated message types list"
+																},
+																{
+																	"key": "from",
+																	"value": "<integer>",
+																	"description": "Time from in unix timestamp"
+																},
+																{
+																	"key": "to",
+																	"value": "<integer>",
+																	"description": "Time to in unix timestamp"
+																},
+																{
+																	"key": "height",
+																	"value": "<integer>",
+																	"description": "Block number"
+																}
+															],
+															"variable": [
+																{
+																	"key": "hash"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "[\n  {\n    \"codespace\": \"<string>\",\n    \"error\": \"<string>\",\n    \"events_count\": \"<long>\",\n    \"fee\": \"<int64>\",\n    \"gas_used\": \"<long>\",\n    \"gas_wanted\": \"<long>\",\n    \"hash\": \"<string>\",\n    \"height\": \"<long>\",\n    \"id\": \"<long>\",\n    \"memo\": \"<string>\",\n    \"message_types\": [\n      \"MsgDelegate\",\n      \"MsgCreateVestingAccount\"\n    ],\n    \"messages_count\": \"<long>\",\n    \"position\": \"<long>\",\n    \"status\": \"failed\",\n    \"time\": \"<dateTime>\",\n    \"timeout_height\": \"<long>\"\n  },\n  {\n    \"codespace\": \"<string>\",\n    \"error\": \"<string>\",\n    \"events_count\": \"<long>\",\n    \"fee\": \"<int64>\",\n    \"gas_used\": \"<long>\",\n    \"gas_wanted\": \"<long>\",\n    \"hash\": \"<string>\",\n    \"height\": \"<long>\",\n    \"id\": \"<long>\",\n    \"memo\": \"<string>\",\n    \"message_types\": [\n      \"MsgWithdrawDelegatorReward\",\n      \"MsgWithdrawDelegatorReward\"\n    ],\n    \"messages_count\": \"<long>\",\n    \"position\": \"<long>\",\n    \"status\": \"failed\",\n    \"time\": \"<dateTime>\",\n    \"timeout_height\": \"<long>\"\n  }\n]"
+												},
+												{
+													"name": "Bad Request",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/address/:hash/txs?limit=<integer>&offset=<integer>&sort=desc&status=failed&msg_type=MsgPayForBlobs&from=<integer>&to=<integer>&height=<integer>",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"address",
+																":hash",
+																"txs"
+															],
+															"query": [
+																{
+																	"key": "limit",
+																	"value": "<integer>",
+																	"description": "Count of requested entities"
+																},
+																{
+																	"key": "offset",
+																	"value": "<integer>",
+																	"description": "Offset"
+																},
+																{
+																	"key": "sort",
+																	"value": "desc",
+																	"description": "Sort order"
+																},
+																{
+																	"key": "status",
+																	"value": "failed",
+																	"description": "Comma-separated status list"
+																},
+																{
+																	"key": "msg_type",
+																	"value": "MsgPayForBlobs",
+																	"description": "Comma-separated message types list"
+																},
+																{
+																	"key": "from",
+																	"value": "<integer>",
+																	"description": "Time from in unix timestamp"
+																},
+																{
+																	"key": "to",
+																	"value": "<integer>",
+																	"description": "Time to in unix timestamp"
+																},
+																{
+																	"key": "height",
+																	"value": "<integer>",
+																	"description": "Block number"
+																}
+															],
+															"variable": [
+																{
+																	"key": "hash"
+																}
+															]
+														}
+													},
+													"status": "Bad Request",
+													"code": 400,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												},
+												{
+													"name": "Internal Server Error",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/address/:hash/txs?limit=<integer>&offset=<integer>&sort=desc&status=failed&msg_type=MsgPayForBlobs&from=<integer>&to=<integer>&height=<integer>",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"address",
+																":hash",
+																"txs"
+															],
+															"query": [
+																{
+																	"key": "limit",
+																	"value": "<integer>",
+																	"description": "Count of requested entities"
+																},
+																{
+																	"key": "offset",
+																	"value": "<integer>",
+																	"description": "Offset"
+																},
+																{
+																	"key": "sort",
+																	"value": "desc",
+																	"description": "Sort order"
+																},
+																{
+																	"key": "status",
+																	"value": "failed",
+																	"description": "Comma-separated status list"
+																},
+																{
+																	"key": "msg_type",
+																	"value": "MsgPayForBlobs",
+																	"description": "Comma-separated message types list"
+																},
+																{
+																	"key": "from",
+																	"value": "<integer>",
+																	"description": "Time from in unix timestamp"
+																},
+																{
+																	"key": "to",
+																	"value": "<integer>",
+																	"description": "Time to in unix timestamp"
+																},
+																{
+																	"key": "height",
+																	"value": "<integer>",
+																	"description": "Block number"
+																}
+															],
+															"variable": [
+																{
+																	"key": "hash"
+																}
+															]
+														}
+													},
+													"status": "Internal Server Error",
+													"code": 500,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "Get address info",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response status code is 200\", function () {",
+													"  pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"",
+													"pm.test(\"Response has required fields\", function () {",
+													"  const responseData = pm.response.json();",
+													"  ",
+													"  pm.expect(responseData).to.be.an('object');",
+													"  pm.expect(responseData).to.have.property('id');",
+													"  pm.expect(responseData).to.have.property('first_height');",
+													"  pm.expect(responseData).to.have.property('balance');",
+													"  pm.expect(responseData).to.have.property('hash');",
+													"});",
+													"",
+													"",
+													"pm.test(\"Id is a non-negative integer\", function () {",
+													"  const responseData = pm.response.json();",
+													"  ",
+													"  pm.expect(responseData).to.be.an('object');",
+													"  pm.expect(responseData.id).to.exist.and.to.be.a('number');",
+													"  pm.expect(responseData.id).to.be.at.least(0, \"Id should be a non-negative integer\");",
+													"});",
+													"",
+													"",
+													"pm.test(\"first_height is a non-negative integer\", function () {",
+													"    const responseData = pm.response.json();",
+													"    ",
+													"    pm.expect(responseData.first_height).to.be.a('number');",
+													"    pm.expect(responseData.first_height).to.be.at.least(0);",
+													"});",
+													"",
+													"",
+													"pm.test(\"Balance is a string\", function () {",
+													"  const responseData = pm.response.json();",
+													"  ",
+													"  pm.expect(responseData.balance).to.be.a('string');",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/address/:hash",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"address",
+												":hash"
+											],
+											"variable": [
+												{
+													"key": "hash",
+													"value": "celestia1zfdnkkq690del5955lj3hjt8hrl2w6j3698gtw"
+												}
+											]
+										},
+										"description": "Get address info"
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/address/:hash",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"address",
+														":hash"
+													],
+													"variable": [
+														{
+															"key": "hash"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"balance\": \"<string>\",\n  \"first_height\": \"<integer>\",\n  \"hash\": \"<string>\",\n  \"id\": \"<integer>\"\n}"
+										},
+										{
+											"name": "No Content",
+											"originalRequest": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/v1/address/:hash",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"address",
+														":hash"
+													],
+													"variable": [
+														{
+															"key": "hash"
+														}
+													]
+												}
+											},
+											"status": "No Content",
+											"code": 204,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										},
+										{
+											"name": "Bad Request",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/address/:hash",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"address",
+														":hash"
+													],
+													"variable": [
+														{
+															"key": "hash"
+														}
+													]
+												}
+											},
+											"status": "Bad Request",
+											"code": 400,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Internal Server Error",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/address/:hash",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"address",
+														":hash"
+													],
+													"variable": [
+														{
+															"key": "hash"
+														}
+													]
+												}
+											},
+											"status": "Internal Server Error",
+											"code": 500,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"message\": \"<string>\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "List address info",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"  pm.response.to.have.status(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response is an array\", function () {",
+											"  pm.expect(pm.response.json()).to.be.an('array');",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response array contains at least one element\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+											"});",
+											"",
+											"",
+											"pm.test(\"Validate id and first_height are non-negative integers\", function () {",
+											"  const responseData = pm.response.json();",
+											"",
+											"  pm.expect(responseData).to.be.an('array');",
+											"",
+											"  responseData.forEach(function(item) {",
+											"    pm.expect(item.id).to.be.a('number').and.to.be.at.least(0);",
+											"    pm.expect(item.first_height).to.be.a('number').and.to.be.at.least(0);",
+											"  });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/address?limit=10&offset=0&sort=asc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"address"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10",
+											"description": "Count of requested entities"
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"description": "Offset"
+										},
+										{
+											"key": "sort",
+											"value": "asc",
+											"description": "Sort order"
+										}
+									]
+								},
+								"description": "List address info"
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/address?limit=<integer>&offset=<integer>&sort=desc",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"address"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Count of requested entities"
+												},
+												{
+													"key": "offset",
+													"value": "<integer>",
+													"description": "Offset"
+												},
+												{
+													"key": "sort",
+													"value": "desc",
+													"description": "Sort order"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"balance\": \"<string>\",\n    \"first_height\": \"<integer>\",\n    \"hash\": \"<string>\",\n    \"id\": \"<integer>\"\n  },\n  {\n    \"balance\": \"<string>\",\n    \"first_height\": \"<integer>\",\n    \"hash\": \"<string>\",\n    \"id\": \"<integer>\"\n  }\n]"
+								},
+								{
+									"name": "Bad Request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/address?limit=<integer>&offset=<integer>&sort=desc",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"address"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Count of requested entities"
+												},
+												{
+													"key": "offset",
+													"value": "<integer>",
+													"description": "Offset"
+												},
+												{
+													"key": "sort",
+													"value": "desc",
+													"description": "Sort order"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"<string>\"\n}"
+								},
+								{
+									"name": "Internal Server Error",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/address?limit=<integer>&offset=<integer>&sort=desc",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"address"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Count of requested entities"
+												},
+												{
+													"key": "offset",
+													"value": "<integer>",
+													"description": "Offset"
+												},
+												{
+													"key": "sort",
+													"value": "desc",
+													"description": "Sort order"
+												}
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"<string>\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "block",
+					"item": [
+						{
+							"name": "{height}",
+							"item": [
+								{
+									"name": "events",
+									"item": [
+										{
+											"name": "Get events from begin and end of block",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test('Response status code is 200', function () {",
+															"    pm.response.to.have.status(200);",
+															"})",
+															"",
+															"pm.test('Time field is in a valid date format', function () {",
+															"    const responseData = pm.response.json();",
+															"    pm.expect(responseData).to.be.an('array');",
+															"    responseData.forEach(function (event) {",
+															"        pm.expect(event.time).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{0,6}Z$/, 'Time field should be in valid date format');",
+															"    });",
+															"})"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/block/:height/events",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"block",
+														":height",
+														"events"
+													],
+													"variable": [
+														{
+															"key": "height",
+															"value": "20655"
+														}
+													]
+												},
+												"description": "Get events from begin and end of block"
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/block/:height/events",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"block",
+																":height",
+																"events"
+															],
+															"variable": [
+																{
+																	"key": "height"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "[\n  {\n    \"data\": {\n      \"aliqua_07a\": {}\n    },\n    \"height\": \"<long>\",\n    \"id\": \"<long>\",\n    \"position\": \"<long>\",\n    \"time\": \"<dateTime>\",\n    \"tx_id\": \"<long>\",\n    \"type\": \"set_feegrant\"\n  },\n  {\n    \"data\": {\n      \"aliqua7\": {},\n      \"laboris_a\": {}\n    },\n    \"height\": \"<long>\",\n    \"id\": \"<long>\",\n    \"position\": \"<long>\",\n    \"time\": \"<dateTime>\",\n    \"tx_id\": \"<long>\",\n    \"type\": \"coinbase\"\n  }\n]"
+												},
+												{
+													"name": "Bad Request",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/block/:height/events",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"block",
+																":height",
+																"events"
+															],
+															"variable": [
+																{
+																	"key": "height"
+																}
+															]
+														}
+													},
+													"status": "Bad Request",
+													"code": 400,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												},
+												{
+													"name": "Internal Server Error",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/block/:height/events",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"block",
+																":height",
+																"events"
+															],
+															"variable": [
+																{
+																	"key": "height"
+																}
+															]
+														}
+													},
+													"status": "Internal Server Error",
+													"code": 500,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "stats",
+									"item": [
+										{
+											"name": "Get block stats by height",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"",
+															"pm.test(\"Response has the required fields\", function () {",
+															"  const responseData = pm.response.json();",
+															"",
+															"  pm.expect(responseData).to.be.an('object');",
+															"  pm.expect(responseData.tx_count).to.exist;",
+															"  pm.expect(responseData.events_count).to.exist;",
+															"  pm.expect(responseData.blobs_size).to.exist;",
+															"  pm.expect(responseData.fee).to.exist;",
+															"  pm.expect(responseData.supply_change).to.exist;",
+															"  pm.expect(responseData.inflation_rate).to.exist;",
+															"});",
+															"",
+															"",
+															"pm.test(\"tx_count is a non-negative integer\", function () {",
+															"    const responseData = pm.response.json();",
+															"    ",
+															"    pm.expect(responseData.tx_count).to.be.a('number');",
+															"    pm.expect(responseData.tx_count).to.be.at.least(0);",
+															"});",
+															"",
+															"",
+															"pm.test(\"events_count is a non-negative integer\", function () {",
+															"    const responseData = pm.response.json();",
+															"    ",
+															"    pm.expect(responseData.events_count).to.be.a('number');",
+															"    pm.expect(responseData.events_count).to.be.at.least(0, \"Value should be non-negative\");",
+															"});",
+															"",
+															"",
+															"pm.test(\"blobs_size is a non-negative integer\", function () {",
+															"  const responseData = pm.response.json();",
+															"",
+															"  pm.expect(responseData).to.be.an('object');",
+															"  pm.expect(responseData.blobs_size).to.be.a('number').and.to.be.at.least(0, \"blobs_size should be a non-negative integer\");",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/block/:height/stats",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"block",
+														":height",
+														"stats"
+													],
+													"variable": [
+														{
+															"key": "height",
+															"value": "20655"
+														}
+													]
+												},
+												"description": "Get block stats by height"
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/block/:height/stats",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"block",
+																":height",
+																"stats"
+															],
+															"variable": [
+																{
+																	"key": "height"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"blobs_size\": \"<integer>\",\n  \"events_count\": \"<integer>\",\n  \"fee\": \"<string>\",\n  \"inflation_rate\": \"<string>\",\n  \"supply_change\": \"<string>\",\n  \"tx_count\": \"<integer>\"\n}"
+												},
+												{
+													"name": "Bad Request",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/block/:height/stats",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"block",
+																":height",
+																"stats"
+															],
+															"variable": [
+																{
+																	"key": "height"
+																}
+															]
+														}
+													},
+													"status": "Bad Request",
+													"code": 400,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												},
+												{
+													"name": "Internal Server Error",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/block/:height/stats",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"block",
+																":height",
+																"stats"
+															],
+															"variable": [
+																{
+																	"key": "height"
+																}
+															]
+														}
+													},
+													"status": "Internal Server Error",
+													"code": 500,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "Get block info",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response status code is 200\", function () {",
+													"  pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"",
+													"pm.test(\"The id field is a non-negative integer\", function () {",
+													"    const responseData = pm.response.json();",
+													"    ",
+													"    pm.expect(responseData.id).to.be.a('number');",
+													"    pm.expect(responseData.id).to.be.at.least(0);",
+													"});",
+													"",
+													"",
+													"pm.test(\"The height field is a non-negative integer\", function () {",
+													"  const responseData = pm.response.json();",
+													"",
+													"  pm.expect(responseData.height).to.be.a('number');",
+													"  pm.expect(responseData.height).to.be.at.least(0, \"Value should be non-negative\");",
+													"});",
+													"",
+													"",
+													"pm.test(\"Validate the 'time' field is in a valid date format\", function () {",
+													"    const responseData = pm.response.json();",
+													"    ",
+													"    pm.expect(responseData).to.be.an('object');",
+													"    pm.expect(responseData.time).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{0,6}Z$/, \"Value should be in valid date format\");",
+													"});",
+													"",
+													"",
+													"pm.test(\"Validate tx_count field is a non-negative integer\", function () {",
+													"  const responseData = pm.response.json();",
+													"  ",
+													"  pm.expect(responseData).to.be.an('object');",
+													"  pm.expect(responseData.stats.tx_count).to.exist.and.to.be.a('number');",
+													"  pm.expect(responseData.stats.tx_count).to.be.at.least(0);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/block/:height?stats=true",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"block",
+												":height"
+											],
+											"query": [
+												{
+													"key": "stats",
+													"value": "true",
+													"description": "Need join stats for block"
+												}
+											],
+											"variable": [
+												{
+													"key": "height",
+													"value": "20655"
+												}
+											]
+										},
+										"description": "Get block info"
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/block/:height?stats=<boolean>",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"block",
+														":height"
+													],
+													"query": [
+														{
+															"key": "stats",
+															"value": "<boolean>",
+															"description": "Need join stats for block"
+														}
+													],
+													"variable": [
+														{
+															"key": "height"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"app_hash\": \"<string>\",\n  \"consensus_hash\": \"<string>\",\n  \"data_hash\": \"<string>\",\n  \"evidence_hash\": \"<string>\",\n  \"hash\": \"<string>\",\n  \"height\": \"<integer>\",\n  \"id\": \"<integer>\",\n  \"last_commit_hash\": \"<string>\",\n  \"last_results_hash\": \"<string>\",\n  \"message_types\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"next_validators_hash\": \"<string>\",\n  \"parent_hash\": \"<string>\",\n  \"proposer_address\": \"<string>\",\n  \"stats\": {\n    \"blobs_size\": \"<integer>\",\n    \"events_count\": \"<integer>\",\n    \"fee\": \"<string>\",\n    \"inflation_rate\": \"<string>\",\n    \"supply_change\": \"<string>\",\n    \"tx_count\": \"<integer>\"\n  },\n  \"time\": \"<string>\",\n  \"validators_hash\": \"<string>\",\n  \"version_app\": \"<string>\",\n  \"version_block\": \"<string>\"\n}"
+										},
+										{
+											"name": "No Content",
+											"originalRequest": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/v1/block/:height?stats=<boolean>",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"block",
+														":height"
+													],
+													"query": [
+														{
+															"key": "stats",
+															"value": "<boolean>",
+															"description": "Need join stats for block"
+														}
+													],
+													"variable": [
+														{
+															"key": "height"
+														}
+													]
+												}
+											},
+											"status": "No Content",
+											"code": 204,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										},
+										{
+											"name": "Bad Request",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/block/:height?stats=<boolean>",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"block",
+														":height"
+													],
+													"query": [
+														{
+															"key": "stats",
+															"value": "<boolean>",
+															"description": "Need join stats for block"
+														}
+													],
+													"variable": [
+														{
+															"key": "height"
+														}
+													]
+												}
+											},
+											"status": "Bad Request",
+											"code": 400,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Internal Server Error",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/block/:height?stats=<boolean>",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"block",
+														":height"
+													],
+													"query": [
+														{
+															"key": "stats",
+															"value": "<boolean>",
+															"description": "Need join stats for block"
+														}
+													],
+													"variable": [
+														{
+															"key": "height"
+														}
+													]
+												}
+											},
+											"status": "Internal Server Error",
+											"code": 500,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"message\": \"<string>\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "List blocks info",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"  pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response is an array with at least one element\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1);",
+											"});",
+											"",
+											"",
+											"pm.test(\"tx_count in stats is a non-negative integer\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('array');",
+											"    responseData.forEach(function(block) {",
+											"        pm.expect(block.stats).to.exist;",
+											"        pm.expect(block.stats.tx_count).to.be.a('number');",
+											"        pm.expect(block.stats.tx_count).to.be.at.least(0);",
+											"    });",
+											"});",
+											"",
+											"",
+											"pm.test(\"events_count in stats is a non-negative integer\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+											"    ",
+											"    responseData.forEach(function(block) {",
+											"        pm.expect(block.stats).to.exist.and.to.be.an('object');",
+											"        pm.expect(block.stats.events_count).to.exist.and.to.be.a('number').and.to.satisfy(function(value) {",
+											"            return value >= 0;",
+											"        }, \"Value should be a non-negative integer\");",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/block?limit=10&offset=0&sort=desc&stats=true",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"block"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10",
+											"description": "Count of requested entities"
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"description": "Offset"
+										},
+										{
+											"key": "sort",
+											"value": "desc",
+											"description": "Sort order"
+										},
+										{
+											"key": "stats",
+											"value": "true",
+											"description": "Need join stats for block"
+										}
+									]
+								},
+								"description": "List blocks info"
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/block?limit=<integer>&offset=<integer>&sort=desc&stats=<boolean>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"block"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Count of requested entities"
+												},
+												{
+													"key": "offset",
+													"value": "<integer>",
+													"description": "Offset"
+												},
+												{
+													"key": "sort",
+													"value": "desc",
+													"description": "Sort order"
+												},
+												{
+													"key": "stats",
+													"value": "<boolean>",
+													"description": "Need join stats for block"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"app_hash\": \"<string>\",\n    \"consensus_hash\": \"<string>\",\n    \"data_hash\": \"<string>\",\n    \"evidence_hash\": \"<string>\",\n    \"hash\": \"<string>\",\n    \"height\": \"<integer>\",\n    \"id\": \"<integer>\",\n    \"last_commit_hash\": \"<string>\",\n    \"last_results_hash\": \"<string>\",\n    \"message_types\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"next_validators_hash\": \"<string>\",\n    \"parent_hash\": \"<string>\",\n    \"proposer_address\": \"<string>\",\n    \"stats\": {\n      \"blobs_size\": \"<integer>\",\n      \"events_count\": \"<integer>\",\n      \"fee\": \"<string>\",\n      \"inflation_rate\": \"<string>\",\n      \"supply_change\": \"<string>\",\n      \"tx_count\": \"<integer>\"\n    },\n    \"time\": \"<string>\",\n    \"validators_hash\": \"<string>\",\n    \"version_app\": \"<string>\",\n    \"version_block\": \"<string>\"\n  },\n  {\n    \"app_hash\": \"<string>\",\n    \"consensus_hash\": \"<string>\",\n    \"data_hash\": \"<string>\",\n    \"evidence_hash\": \"<string>\",\n    \"hash\": \"<string>\",\n    \"height\": \"<integer>\",\n    \"id\": \"<integer>\",\n    \"last_commit_hash\": \"<string>\",\n    \"last_results_hash\": \"<string>\",\n    \"message_types\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"next_validators_hash\": \"<string>\",\n    \"parent_hash\": \"<string>\",\n    \"proposer_address\": \"<string>\",\n    \"stats\": {\n      \"blobs_size\": \"<integer>\",\n      \"events_count\": \"<integer>\",\n      \"fee\": \"<string>\",\n      \"inflation_rate\": \"<string>\",\n      \"supply_change\": \"<string>\",\n      \"tx_count\": \"<integer>\"\n    },\n    \"time\": \"<string>\",\n    \"validators_hash\": \"<string>\",\n    \"version_app\": \"<string>\",\n    \"version_block\": \"<string>\"\n  }\n]"
+								},
+								{
+									"name": "Bad Request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/block?limit=<integer>&offset=<integer>&sort=desc&stats=<boolean>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"block"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Count of requested entities"
+												},
+												{
+													"key": "offset",
+													"value": "<integer>",
+													"description": "Offset"
+												},
+												{
+													"key": "sort",
+													"value": "desc",
+													"description": "Sort order"
+												},
+												{
+													"key": "stats",
+													"value": "<boolean>",
+													"description": "Need join stats for block"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"<string>\"\n}"
+								},
+								{
+									"name": "Internal Server Error",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/block?limit=<integer>&offset=<integer>&sort=desc&stats=<boolean>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"block"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Count of requested entities"
+												},
+												{
+													"key": "offset",
+													"value": "<integer>",
+													"description": "Offset"
+												},
+												{
+													"key": "sort",
+													"value": "desc",
+													"description": "Sort order"
+												},
+												{
+													"key": "stats",
+													"value": "<boolean>",
+													"description": "Need join stats for block"
+												}
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"<string>\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "head",
+					"item": [
+						{
+							"name": "Get current indexer head",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Id is a non-negative integer\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.id).to.be.a('number');",
+											"    pm.expect(responseData.id).to.be.at.least(0, \"Id should be a non-negative integer\");",
+											"});",
+											"",
+											"",
+											"pm.test(\"last_height is a non-negative integer\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.last_height).to.be.a('number').and.to.be.at.least(0);",
+											"});",
+											"",
+											"",
+											"pm.test(\"total_tx is a non-negative integer\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.total_tx).to.exist.and.to.be.a('number');",
+											"    pm.expect(responseData.total_tx).to.be.at.least(0, \"total_tx should be a non-negative integer\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/head",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"head"
+									]
+								},
+								"description": "Get current indexer head"
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/head",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"head"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"hash\": \"<string>\",\n  \"id\": \"<long>\",\n  \"last_height\": \"<long>\",\n  \"last_time\": \"<dateTime>\",\n  \"name\": \"<string>\",\n  \"total_accounts\": \"<long>\",\n  \"total_blobs_size\": \"<long>\",\n  \"total_fee\": \"<string>\",\n  \"total_tx\": \"<long>\"\n}"
+								},
+								{
+									"name": "No Content",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/v1/head",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"head"
+											]
+										}
+									},
+									"status": "No Content",
+									"code": 204,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								},
+								{
+									"name": "Bad Request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/head",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"head"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"<string>\"\n}"
+								},
+								{
+									"name": "Internal Server Error",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/head",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"head"
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"<string>\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "namespace",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "{version}",
+									"item": [
+										{
+											"name": "messages",
+											"item": [
+												{
+													"name": "Get namespace messages by id and version",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Response status code is 200\", function () {",
+																	"    pm.expect(pm.response.code).to.equal(200);",
+																	"});",
+																	"",
+																	"",
+																	"pm.test(\"Id is a non-negative integer\", function () {",
+																	"    const responseData = pm.response.json();",
+																	"    ",
+																	"    responseData.forEach(function(message) {",
+																	"        pm.expect(message.id).to.be.a('number').and.to.be.at.least(0);",
+																	"    });",
+																	"});",
+																	"",
+																	"",
+																	"pm.test(\"Height is a non-negative integer\", function () {",
+																	"  const responseData = pm.response.json();",
+																	"",
+																	"  pm.expect(responseData).to.be.an('array');",
+																	"  responseData.forEach(function (message) {",
+																	"    pm.expect(message.height).to.be.a('number');",
+																	"    pm.expect(message.height).to.be.at.least(0);",
+																	"  });",
+																	"});",
+																	"",
+																	"",
+																	"pm.test(\"Time is a valid date string\", function () {",
+																	"    const responseData = pm.response.json();",
+																	"    ",
+																	"    pm.expect(responseData).to.be.an('array');",
+																	"    responseData.forEach(function (message) {",
+																	"        pm.expect(message.time).to.be.a('string').and.to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{0,6}Z$/, \"Time should be a valid date string\");",
+																	"    });",
+																	"});"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/namespace/:id/:version/messages?limit=10&offset=0",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"namespace",
+																":id",
+																":version",
+																"messages"
+															],
+															"query": [
+																{
+																	"key": "limit",
+																	"value": "10",
+																	"description": "Count of requested entities"
+																},
+																{
+																	"key": "offset",
+																	"value": "0",
+																	"description": "Offset"
+																}
+															],
+															"variable": [
+																{
+																	"key": "id",
+																	"value": "000000000000000000000000000000000000c00e5d67c2755389aded"
+																},
+																{
+																	"key": "version",
+																	"value": "0"
+																}
+															]
+														},
+														"description": "Returns namespace messages by version byte and namespace id"
+													},
+													"response": [
+														{
+															"name": "OK",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "application/json"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/v1/namespace/:id/:version/messages?limit=<integer>&offset=<integer>",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"v1",
+																		"namespace",
+																		":id",
+																		":version",
+																		"messages"
+																	],
+																	"query": [
+																		{
+																			"key": "limit",
+																			"value": "<integer>",
+																			"description": "Count of requested entities"
+																		},
+																		{
+																			"key": "offset",
+																			"value": "<integer>",
+																			"description": "Offset"
+																		}
+																	],
+																	"variable": [
+																		{
+																			"key": "id"
+																		},
+																		{
+																			"key": "version"
+																		}
+																	]
+																}
+															},
+															"status": "OK",
+															"code": 200,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "[\n  {\n    \"data\": {\n      \"Excepteur_b9\": {},\n      \"ullamco_4\": {}\n    },\n    \"height\": \"<long>\",\n    \"id\": \"<long>\",\n    \"position\": \"<long>\",\n    \"time\": \"<dateTime>\",\n    \"tx\": {\n      \"codespace\": \"<string>\",\n      \"error\": \"<string>\",\n      \"events_count\": \"<long>\",\n      \"fee\": \"<int64>\",\n      \"gas_used\": \"<long>\",\n      \"gas_wanted\": \"<long>\",\n      \"hash\": \"<string>\",\n      \"height\": \"<long>\",\n      \"id\": \"<long>\",\n      \"memo\": \"<string>\",\n      \"message_types\": [\n        \"MsgWithdrawDelegatorReward\",\n        \"MsgCreateValidator\"\n      ],\n      \"messages_count\": \"<long>\",\n      \"position\": \"<long>\",\n      \"status\": \"success\",\n      \"time\": \"<dateTime>\",\n      \"timeout_height\": \"<long>\"\n    },\n    \"type\": \"MsgCreatePeriodicVestingAccount\"\n  },\n  {\n    \"data\": {\n      \"officia_011\": {}\n    },\n    \"height\": \"<long>\",\n    \"id\": \"<long>\",\n    \"position\": \"<long>\",\n    \"time\": \"<dateTime>\",\n    \"tx\": {\n      \"codespace\": \"<string>\",\n      \"error\": \"<string>\",\n      \"events_count\": \"<long>\",\n      \"fee\": \"<int64>\",\n      \"gas_used\": \"<long>\",\n      \"gas_wanted\": \"<long>\",\n      \"hash\": \"<string>\",\n      \"height\": \"<long>\",\n      \"id\": \"<long>\",\n      \"memo\": \"<string>\",\n      \"message_types\": [\n        \"MsgCreateValidator\",\n        \"MsgEditValidator\"\n      ],\n      \"messages_count\": \"<long>\",\n      \"position\": \"<long>\",\n      \"status\": \"failed\",\n      \"time\": \"<dateTime>\",\n      \"timeout_height\": \"<long>\"\n    },\n    \"type\": \"MsgBeginRedelegate\"\n  }\n]"
+														},
+														{
+															"name": "No Content",
+															"originalRequest": {
+																"method": "GET",
+																"header": [],
+																"url": {
+																	"raw": "{{baseUrl}}/v1/namespace/:id/:version/messages?limit=<integer>&offset=<integer>",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"v1",
+																		"namespace",
+																		":id",
+																		":version",
+																		"messages"
+																	],
+																	"query": [
+																		{
+																			"key": "limit",
+																			"value": "<integer>",
+																			"description": "Count of requested entities"
+																		},
+																		{
+																			"key": "offset",
+																			"value": "<integer>",
+																			"description": "Offset"
+																		}
+																	],
+																	"variable": [
+																		{
+																			"key": "id"
+																		},
+																		{
+																			"key": "version"
+																		}
+																	]
+																}
+															},
+															"status": "No Content",
+															"code": 204,
+															"_postman_previewlanguage": "text",
+															"header": [],
+															"cookie": [],
+															"body": ""
+														},
+														{
+															"name": "Bad Request",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "application/json"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/v1/namespace/:id/:version/messages?limit=<integer>&offset=<integer>",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"v1",
+																		"namespace",
+																		":id",
+																		":version",
+																		"messages"
+																	],
+																	"query": [
+																		{
+																			"key": "limit",
+																			"value": "<integer>",
+																			"description": "Count of requested entities"
+																		},
+																		{
+																			"key": "offset",
+																			"value": "<integer>",
+																			"description": "Offset"
+																		}
+																	],
+																	"variable": [
+																		{
+																			"key": "id"
+																		},
+																		{
+																			"key": "version"
+																		}
+																	]
+																}
+															},
+															"status": "Bad Request",
+															"code": 400,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"message\": \"<string>\"\n}"
+														},
+														{
+															"name": "Internal Server Error",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "application/json"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/v1/namespace/:id/:version/messages?limit=<integer>&offset=<integer>",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"v1",
+																		"namespace",
+																		":id",
+																		":version",
+																		"messages"
+																	],
+																	"query": [
+																		{
+																			"key": "limit",
+																			"value": "<integer>",
+																			"description": "Count of requested entities"
+																		},
+																		{
+																			"key": "offset",
+																			"value": "<integer>",
+																			"description": "Offset"
+																		}
+																	],
+																	"variable": [
+																		{
+																			"key": "id"
+																		},
+																		{
+																			"key": "version"
+																		}
+																	]
+																}
+															},
+															"status": "Internal Server Error",
+															"code": 500,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"message\": \"<string>\"\n}"
+														}
+													]
+												}
+											]
+										},
+										{
+											"name": "Get namespace info by id and version",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response status code is 200\", function () {",
+															"  pm.response.to.have.status(200);",
+															"});",
+															"",
+															"",
+															"pm.test(\"Id is a non-negative integer\", function () {",
+															"    const responseData = pm.response.json();",
+															"    ",
+															"    pm.expect(responseData).to.be.an('object');",
+															"    pm.expect(responseData.id).to.exist.and.to.be.a('number');",
+															"    pm.expect(responseData.id).to.be.at.least(0, \"Id should be a non-negative integer\");",
+															"});",
+															"",
+															"",
+															"pm.test(\"Size is a non-negative integer\", function () {",
+															"    const responseData = pm.response.json();",
+															"",
+															"    pm.expect(responseData).to.be.an('object');",
+															"    pm.expect(responseData.size).to.be.a('number');",
+															"    pm.expect(responseData.size).to.be.at.least(0);",
+															"});",
+															"",
+															"",
+															"pm.test(\"Version is a non-negative integer\", function () {",
+															"  const responseData = pm.response.json();",
+															"  ",
+															"  pm.expect(responseData.version).to.be.a('number');",
+															"  pm.expect(responseData.version).to.be.above(-1);",
+															"});",
+															"",
+															"",
+															"pm.test(\"Namespace ID is a non-empty string\", function () {",
+															"    const responseData = pm.response.json();",
+															"    ",
+															"    pm.expect(responseData.namespace_id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/namespace/:id/:version",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"namespace",
+														":id",
+														":version"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "000000000000000000000000000000000000c00e5d67c2755389aded"
+														},
+														{
+															"key": "version",
+															"value": "0"
+														}
+													]
+												},
+												"description": "Returns namespace by version byte and namespace id"
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/namespace/:id/:version",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"namespace",
+																":id",
+																":version"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																},
+																{
+																	"key": "version"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"hash\": \"<string>\",\n  \"id\": \"<integer>\",\n  \"namespace_id\": \"<string>\",\n  \"reserved\": \"<boolean>\",\n  \"size\": \"<integer>\",\n  \"version\": \"<integer>\"\n}"
+												},
+												{
+													"name": "No Content",
+													"originalRequest": {
+														"method": "GET",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}/v1/namespace/:id/:version",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"namespace",
+																":id",
+																":version"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																},
+																{
+																	"key": "version"
+																}
+															]
+														}
+													},
+													"status": "No Content",
+													"code": 204,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												},
+												{
+													"name": "Bad Request",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/namespace/:id/:version",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"namespace",
+																":id",
+																":version"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																},
+																{
+																	"key": "version"
+																}
+															]
+														}
+													},
+													"status": "Bad Request",
+													"code": 400,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												},
+												{
+													"name": "Internal Server Error",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/namespace/:id/:version",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"namespace",
+																":id",
+																":version"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																},
+																{
+																	"key": "version"
+																}
+															]
+														}
+													},
+													"status": "Internal Server Error",
+													"code": 500,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "Get namespace info",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response status code is 200\", function () {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"",
+													"pm.test(\"Id is a non-negative integer\", function () {",
+													"    const responseData = pm.response.json();",
+													"    ",
+													"    pm.expect(responseData).to.be.an('array');",
+													"    responseData.forEach(function(item) {",
+													"        pm.expect(item.id).to.exist.and.to.be.a('number').and.to.be.at.least(0);",
+													"    });",
+													"});",
+													"",
+													"",
+													"pm.test(\"Size is a non-negative integer\", function () {",
+													"    const responseData = pm.response.json();",
+													"    ",
+													"    pm.expect(responseData).to.be.an('array');",
+													"    responseData.forEach(function (item) {",
+													"        pm.expect(item.size).to.be.a('number').and.to.be.at.least(0, \"Size should be a non-negative integer\");",
+													"    });",
+													"});",
+													"",
+													"",
+													"pm.test(\"Version is a non-negative integer\", function () {",
+													"    const responseData = pm.response.json();",
+													"    ",
+													"    responseData.forEach(function(data) {",
+													"        pm.expect(data.version).to.be.a('number').and.to.be.at.least(0);",
+													"    });",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/namespace/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"namespace",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "000000000000000000000000000000000000c00e5d67c2755389aded"
+												}
+											]
+										},
+										"description": "Returns array of namespace versions"
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/namespace/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"namespace",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "[\n  {\n    \"hash\": \"<string>\",\n    \"id\": \"<integer>\",\n    \"namespace_id\": \"<string>\",\n    \"reserved\": \"<boolean>\",\n    \"size\": \"<integer>\",\n    \"version\": \"<integer>\"\n  },\n  {\n    \"hash\": \"<string>\",\n    \"id\": \"<integer>\",\n    \"namespace_id\": \"<string>\",\n    \"reserved\": \"<boolean>\",\n    \"size\": \"<integer>\",\n    \"version\": \"<integer>\"\n  }\n]"
+										},
+										{
+											"name": "Bad Request",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/namespace/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"namespace",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Bad Request",
+											"code": 400,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Internal Server Error",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/namespace/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"namespace",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Internal Server Error",
+											"code": 500,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"message\": \"<string>\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "List namespace info",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Validate the response is an array with at least one element\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Id is a non-negative integer\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1);",
+											"    ",
+											"    responseData.forEach(function(item) {",
+											"        pm.expect(item.id).to.be.a('number').and.to.be.at.least(0);",
+											"    });",
+											"});",
+											"",
+											"",
+											"pm.test(\"Size is a non-negative integer\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('array');",
+											"    ",
+											"    responseData.forEach(function(data) {",
+											"        pm.expect(data.size).to.be.a('number').and.to.be.at.least(0);",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/namespace?limit=10&offset=0&sort=asc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"namespace"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10",
+											"description": "Count of requested entities"
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"description": "Offset"
+										},
+										{
+											"key": "sort",
+											"value": "asc",
+											"description": "Sort order"
+										}
+									]
+								},
+								"description": "List namespace info"
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "http://api.celestia.dipdup.net/v1/namespace?limit=<integer>&offset=<integer>&sort=desc",
+											"protocol": "http",
+											"host": [
+												"api",
+												"celestia",
+												"dipdup",
+												"net"
+											],
+											"path": [
+												"v1",
+												"namespace"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Count of requested entities"
+												},
+												{
+													"key": "offset",
+													"value": "<integer>",
+													"description": "Offset"
+												},
+												{
+													"key": "sort",
+													"value": "desc",
+													"description": "Sort order"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"app_hash\": \"<string>\",\n    \"consensus_hash\": \"<string>\",\n    \"data_hash\": \"<string>\",\n    \"evidence_hash\": \"<string>\",\n    \"hash\": \"<string>\",\n    \"height\": \"<integer>\",\n    \"id\": \"<integer>\",\n    \"last_commit_hash\": \"<string>\",\n    \"last_results_hash\": \"<string>\",\n    \"message_types\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"next_validators_hash\": \"<string>\",\n    \"parent_hash\": \"<string>\",\n    \"proposer_address\": \"<string>\",\n    \"stats\": {\n      \"blobs_size\": \"<integer>\",\n      \"events_count\": \"<integer>\",\n      \"fee\": \"<string>\",\n      \"inflation_rate\": \"<string>\",\n      \"supply_change\": \"<string>\",\n      \"tx_count\": \"<integer>\"\n    },\n    \"time\": \"<string>\",\n    \"validators_hash\": \"<string>\",\n    \"version_app\": \"<string>\",\n    \"version_block\": \"<string>\"\n  },\n  {\n    \"app_hash\": \"<string>\",\n    \"consensus_hash\": \"<string>\",\n    \"data_hash\": \"<string>\",\n    \"evidence_hash\": \"<string>\",\n    \"hash\": \"<string>\",\n    \"height\": \"<integer>\",\n    \"id\": \"<integer>\",\n    \"last_commit_hash\": \"<string>\",\n    \"last_results_hash\": \"<string>\",\n    \"message_types\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"next_validators_hash\": \"<string>\",\n    \"parent_hash\": \"<string>\",\n    \"proposer_address\": \"<string>\",\n    \"stats\": {\n      \"blobs_size\": \"<integer>\",\n      \"events_count\": \"<integer>\",\n      \"fee\": \"<string>\",\n      \"inflation_rate\": \"<string>\",\n      \"supply_change\": \"<string>\",\n      \"tx_count\": \"<integer>\"\n    },\n    \"time\": \"<string>\",\n    \"validators_hash\": \"<string>\",\n    \"version_app\": \"<string>\",\n    \"version_block\": \"<string>\"\n  }\n]"
+								},
+								{
+									"name": "Bad Request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/namespace?limit=<integer>&offset=<integer>&sort=desc",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"namespace"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Count of requested entities"
+												},
+												{
+													"key": "offset",
+													"value": "<integer>",
+													"description": "Offset"
+												},
+												{
+													"key": "sort",
+													"value": "desc",
+													"description": "Sort order"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"<string>\"\n}"
+								},
+								{
+									"name": "Internal Server Error",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/namespace?limit=<integer>&offset=<integer>&sort=desc",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"namespace"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Count of requested entities"
+												},
+												{
+													"key": "offset",
+													"value": "<integer>",
+													"description": "Offset"
+												},
+												{
+													"key": "sort",
+													"value": "desc",
+													"description": "Sort order"
+												}
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"<string>\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "namespace_by_hash",
+					"item": [
+						{
+							"name": "{hash}",
+							"item": [
+								{
+									"name": "{height}",
+									"item": [
+										{
+											"name": "Get namespace blob on height",
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/namespace_by_hash/:hash/:height",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"namespace_by_hash",
+														":hash",
+														":height"
+													],
+													"variable": [
+														{
+															"key": "hash",
+															"value": "AAAAAAAAAAAAAAAAAAAAAAAAAMAOXWfCdVOJre0="
+														},
+														{
+															"key": "height",
+															"value": "20635"
+														}
+													]
+												},
+												"description": "Returns blob (bytes array)"
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "http://api.celestia.dipdup.net/v1/namespace_by_hash/:hash/:height",
+															"protocol": "http",
+															"host": [
+																"api",
+																"celestia",
+																"dipdup",
+																"net"
+															],
+															"path": [
+																"v1",
+																"namespace_by_hash",
+																":hash",
+																":height"
+															],
+															"variable": [
+																{
+																	"key": "hash"
+																},
+																{
+																	"key": "height"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "[\n  {\n    \"commitment\": \"<string>\",\n    \"data\": \"<string>\",\n    \"namespace\": \"<string>\",\n    \"share_version\": \"<integer>\"\n  },\n  {\n    \"commitment\": \"<string>\",\n    \"data\": \"<string>\",\n    \"namespace\": \"<string>\",\n    \"share_version\": \"<integer>\"\n  }\n]"
+												},
+												{
+													"name": "Bad Request",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/namespace_by_hash/:hash/:height",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"namespace_by_hash",
+																":hash",
+																":height"
+															],
+															"variable": [
+																{
+																	"key": "hash"
+																},
+																{
+																	"key": "height"
+																}
+															]
+														}
+													},
+													"status": "Bad Request",
+													"code": 400,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "Get namespace info by base64",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response status code is 200\", function () {",
+													"  pm.response.to.have.status(200);",
+													"});",
+													"",
+													"",
+													"pm.test(\"Validate that the 'id' is a non-negative integer\", function () {",
+													"  const responseData = pm.response.json();",
+													"  ",
+													"  pm.expect(responseData).to.be.an('object');",
+													"  pm.expect(responseData.id).to.be.a('number').and.to.be.at.least(0);",
+													"});",
+													"",
+													"",
+													"pm.test(\"The size is a non-negative integer\", function () {",
+													"    const responseData = pm.response.json();",
+													"    ",
+													"    pm.expect(responseData.size).to.exist.and.to.be.a('number');",
+													"    pm.expect(responseData.size).to.satisfy((size) => size >= 0, \"Size must be a non-negative integer\");",
+													"});",
+													"",
+													"",
+													"pm.test(\"Validate that the 'version' is a non-negative integer\", function () {",
+													"  const responseData = pm.response.json();",
+													"",
+													"  pm.expect(responseData).to.be.an('object');",
+													"  pm.expect(responseData.version).to.exist.and.to.be.a('number');",
+													"  pm.expect(responseData.version).to.be.at.least(0, \"Value should be a non-negative integer\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/namespace_by_hash/:hash",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"namespace_by_hash",
+												":hash"
+											],
+											"variable": [
+												{
+													"key": "hash",
+													"value": "AAAAAAAAAAAAAAAAAAAAAAAAAMAOXWfCdVOJre0="
+												}
+											]
+										},
+										"description": "Returns namespace by base64 encoded identity"
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "http://api.celestia.dipdup.net/v1/namespace_by_hash/:hash",
+													"protocol": "http",
+													"host": [
+														"api",
+														"celestia",
+														"dipdup",
+														"net"
+													],
+													"path": [
+														"v1",
+														"namespace_by_hash",
+														":hash"
+													],
+													"variable": [
+														{
+															"key": "hash"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"hash\": \"<string>\",\n  \"id\": \"<integer>\",\n  \"namespace_id\": \"<string>\",\n  \"reserved\": \"<boolean>\",\n  \"size\": \"<integer>\",\n  \"version\": \"<integer>\"\n}"
+										},
+										{
+											"name": "No Content",
+											"originalRequest": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/v1/namespace_by_hash/:hash",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"namespace_by_hash",
+														":hash"
+													],
+													"variable": [
+														{
+															"key": "hash"
+														}
+													]
+												}
+											},
+											"status": "No Content",
+											"code": 204,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										},
+										{
+											"name": "Bad Request",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/namespace_by_hash/:hash",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"namespace_by_hash",
+														":hash"
+													],
+													"variable": [
+														{
+															"key": "hash"
+														}
+													]
+												}
+											},
+											"status": "Bad Request",
+											"code": 400,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Internal Server Error",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/namespace_by_hash/:hash",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"namespace_by_hash",
+														":hash"
+													],
+													"variable": [
+														{
+															"key": "hash"
+														}
+													]
+												}
+											},
+											"status": "Internal Server Error",
+											"code": 500,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"message\": \"<string>\"\n}"
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "search",
+					"item": [
+						{
+							"name": "Search by hash",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"The 'result' object is present in the response\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.result).to.exist;",
+											"});",
+											"",
+											"",
+											"pm.test(\"Validate type field is a non-empty string\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.type).to.exist.and.to.be.a('string').and.to.have.length.above(0, \"Type field should not be empty\");",
+											"});",
+											"",
+											"",
+											"pm.test(\"Validate the id field is a non-negative integer\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.result.id).to.be.a('number').and.to.be.at.least(0);",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/search?query=AAAAAAAAAAAAAAAAAAAAAAAAAMAOXWfCdVOJre0=",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "AAAAAAAAAAAAAAAAAAAAAAAAAMAOXWfCdVOJre0=",
+											"description": "(Required) Search string"
+										}
+									]
+								},
+								"description": "Endpoint finds entity by hash (block, address, namespace and tx)\n\n### Block\n\nBlock will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`.\nHash should be hexadecimal and has a length of 64.\n\n#### Example response \n\n```json\n{\n    \"type\": \"block\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Block type\n    }\n}\n```\n\n### Tx\n\nTx will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`.\nTx should be hexadecimal and has a length of 64.\n\n#### Example response \n\n```json\n{\n    \"type\": \"tx\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Tx type\n    }\n}\n```\n\n### Address\n\nThe Address will be found by its hash.\nHash example: `celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60`.\nAddress has prefix `celestia` and has length 47.\nAlso, it should be decoded by `bech32`.\n\n#### Example response \n\n```json\n{\n    \"type\": \"address\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\",\n        \"height\": 100,\n        \"balance\": \"6525472354\"\n    }\n}\n```\n\n### Namespace\n\nNamespace can be found by base64 hash and identity pair version + namespace id. \nHash example: `U3dhZ2dlciByb2Nrcw==`. \nIdentity pair example: `014723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02`\n\n#### Example response \n\n```json\n{\n    \"type\": \"namespace\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"U3dhZ2dlciByb2Nrcw==\",\n        \"version\": 1,\n        \"namespace_id\": \"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02\"\n        // ... rest fields from response.Namespace type\n    }\n}\n```\n"
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "http://api.celestia.dipdup.net/v1/search?query=<string>",
+											"protocol": "http",
+											"host": [
+												"api",
+												"celestia",
+												"dipdup",
+												"net"
+											],
+											"path": [
+												"v1",
+												"search"
+											],
+											"query": [
+												{
+													"key": "query",
+													"value": "<string>",
+													"description": "(Required) Search string"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"result\": {},\n  \"type\": \"<string>\"\n}"
+								},
+								{
+									"name": "No Content",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/v1/search?query=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"search"
+											],
+											"query": [
+												{
+													"key": "query",
+													"value": "<string>",
+													"description": "(Required) Search string"
+												}
+											]
+										}
+									},
+									"status": "No Content",
+									"code": 204,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								},
+								{
+									"name": "Bad Request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/search?query=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"search"
+											],
+											"query": [
+												{
+													"key": "query",
+													"value": "<string>",
+													"description": "(Required) Search string"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"<string>\"\n}"
+								},
+								{
+									"name": "Internal Server Error",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/search?query=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"search"
+											],
+											"query": [
+												{
+													"key": "query",
+													"value": "<string>",
+													"description": "(Required) Search string"
+												}
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"<string>\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "stats",
+					"item": [
+						{
+							"name": "histogram",
+							"item": [
+								{
+									"name": "{table}",
+									"item": [
+										{
+											"name": "{function}",
+											"item": [
+												{
+													"name": "{timeframe}",
+													"item": [
+														{
+															"name": "Get histogram",
+															"event": [
+																{
+																	"listen": "test",
+																	"script": {
+																		"exec": [
+																			"pm.test(\"Response status code is 200\", function () {",
+																			"    pm.response.to.have.status(200);",
+																			"});",
+																			"",
+																			"",
+																			"pm.test(\"Response is an array\", function () {",
+																			"  pm.expect(pm.response.json()).to.be.an('array');",
+																			"});",
+																			"",
+																			"",
+																			"pm.test(\"Response array has at least one element\", function () {",
+																			"    const responseData = pm.response.json();",
+																			"",
+																			"    pm.expect(responseData).to.be.an('array').and.to.have.lengthOf.at.least(1);",
+																			"});",
+																			"",
+																			"",
+																			"pm.test(\"Each element in the response array has a non-empty 'time' field\", function () {",
+																			"    const responseData = pm.response.json();",
+																			"    ",
+																			"    pm.expect(responseData).to.be.an('array');",
+																			"    responseData.forEach(function(element) {",
+																			"        pm.expect(element.time).to.exist.and.to.have.lengthOf.at.least(1, \"Value should not be empty\");",
+																			"    });",
+																			"});",
+																			"",
+																			"",
+																			"pm.test(\"Each element in the response array has a non-empty 'value' field\", function () {",
+																			"    const responseData = pm.response.json();",
+																			"    ",
+																			"    pm.expect(responseData).to.be.an('array');",
+																			"    ",
+																			"    responseData.forEach(function (element) {",
+																			"        pm.expect(element).to.be.an('object');",
+																			"        pm.expect(element.value).to.exist.and.to.not.be.empty;",
+																			"    });",
+																			"});"
+																		],
+																		"type": "text/javascript"
+																	}
+																}
+															],
+															"request": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "application/json"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/v1/stats/histogram/:table/:function/:timeframe",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"v1",
+																		"stats",
+																		"histogram",
+																		":table",
+																		":function",
+																		":timeframe"
+																	],
+																	"query": [
+																		{
+																			"key": "column",
+																			"value": "<string>",
+																			"description": "Column name which will be used for computation. Optional for count",
+																			"disabled": true
+																		},
+																		{
+																			"key": "from",
+																			"value": "<integer>",
+																			"description": "Time from in unix timestamp",
+																			"disabled": true
+																		},
+																		{
+																			"key": "to",
+																			"value": "<integer>",
+																			"description": "Time to in unix timestamp",
+																			"disabled": true
+																		}
+																	],
+																	"variable": [
+																		{
+																			"key": "table",
+																			"value": "event"
+																		},
+																		{
+																			"key": "function",
+																			"value": "count"
+																		},
+																		{
+																			"key": "timeframe",
+																			"value": "day"
+																		}
+																	]
+																},
+																"description": "Returns histogram by table, function and timeframe\n\n### Parameters\n\n`table`, `function` and `column` parameters are the same as summary endpoint.\n\n\n### Timeframe\n\n* `hour`\n* `day`\n* `week`\n* `month`\n* `year`"
+															},
+															"response": [
+																{
+																	"name": "OK",
+																	"originalRequest": {
+																		"method": "GET",
+																		"header": [
+																			{
+																				"key": "Accept",
+																				"value": "application/json"
+																			}
+																		],
+																		"url": {
+																			"raw": "{{baseUrl}}/v1/stats/histogram/:table/:function/:timeframe?column=<string>&from=<integer>&to=<integer>",
+																			"host": [
+																				"{{baseUrl}}"
+																			],
+																			"path": [
+																				"v1",
+																				"stats",
+																				"histogram",
+																				":table",
+																				":function",
+																				":timeframe"
+																			],
+																			"query": [
+																				{
+																					"key": "column",
+																					"value": "<string>",
+																					"description": "Column name which will be used for computation. Optional for count"
+																				},
+																				{
+																					"key": "from",
+																					"value": "<integer>",
+																					"description": "Time from in unix timestamp"
+																				},
+																				{
+																					"key": "to",
+																					"value": "<integer>",
+																					"description": "Time to in unix timestamp"
+																				}
+																			],
+																			"variable": [
+																				{
+																					"key": "table"
+																				},
+																				{
+																					"key": "function"
+																				},
+																				{
+																					"key": "timeframe"
+																				}
+																			]
+																		}
+																	},
+																	"status": "OK",
+																	"code": 200,
+																	"_postman_previewlanguage": "json",
+																	"header": [
+																		{
+																			"key": "Content-Type",
+																			"value": "application/json"
+																		}
+																	],
+																	"cookie": [],
+																	"body": "[\n  {\n    \"time\": \"<dateTime>\",\n    \"value\": \"<string>\"\n  },\n  {\n    \"time\": \"<dateTime>\",\n    \"value\": \"<string>\"\n  }\n]"
+																},
+																{
+																	"name": "Bad Request",
+																	"originalRequest": {
+																		"method": "GET",
+																		"header": [
+																			{
+																				"key": "Accept",
+																				"value": "application/json"
+																			}
+																		],
+																		"url": {
+																			"raw": "{{baseUrl}}/v1/stats/histogram/:table/:function/:timeframe?column=<string>&from=<integer>&to=<integer>",
+																			"host": [
+																				"{{baseUrl}}"
+																			],
+																			"path": [
+																				"v1",
+																				"stats",
+																				"histogram",
+																				":table",
+																				":function",
+																				":timeframe"
+																			],
+																			"query": [
+																				{
+																					"key": "column",
+																					"value": "<string>",
+																					"description": "Column name which will be used for computation. Optional for count"
+																				},
+																				{
+																					"key": "from",
+																					"value": "<integer>",
+																					"description": "Time from in unix timestamp"
+																				},
+																				{
+																					"key": "to",
+																					"value": "<integer>",
+																					"description": "Time to in unix timestamp"
+																				}
+																			],
+																			"variable": [
+																				{
+																					"key": "table"
+																				},
+																				{
+																					"key": "function"
+																				},
+																				{
+																					"key": "timeframe"
+																				}
+																			]
+																		}
+																	},
+																	"status": "Bad Request",
+																	"code": 400,
+																	"_postman_previewlanguage": "json",
+																	"header": [
+																		{
+																			"key": "Content-Type",
+																			"value": "application/json"
+																		}
+																	],
+																	"cookie": [],
+																	"body": "{\n  \"message\": \"<string>\"\n}"
+																},
+																{
+																	"name": "Internal Server Error",
+																	"originalRequest": {
+																		"method": "GET",
+																		"header": [
+																			{
+																				"key": "Accept",
+																				"value": "application/json"
+																			}
+																		],
+																		"url": {
+																			"raw": "{{baseUrl}}/v1/stats/histogram/:table/:function/:timeframe?column=<string>&from=<integer>&to=<integer>",
+																			"host": [
+																				"{{baseUrl}}"
+																			],
+																			"path": [
+																				"v1",
+																				"stats",
+																				"histogram",
+																				":table",
+																				":function",
+																				":timeframe"
+																			],
+																			"query": [
+																				{
+																					"key": "column",
+																					"value": "<string>",
+																					"description": "Column name which will be used for computation. Optional for count"
+																				},
+																				{
+																					"key": "from",
+																					"value": "<integer>",
+																					"description": "Time from in unix timestamp"
+																				},
+																				{
+																					"key": "to",
+																					"value": "<integer>",
+																					"description": "Time to in unix timestamp"
+																				}
+																			],
+																			"variable": [
+																				{
+																					"key": "table"
+																				},
+																				{
+																					"key": "function"
+																				},
+																				{
+																					"key": "timeframe"
+																				}
+																			]
+																		}
+																	},
+																	"status": "Internal Server Error",
+																	"code": 500,
+																	"_postman_previewlanguage": "json",
+																	"header": [
+																		{
+																			"key": "Content-Type",
+																			"value": "application/json"
+																		}
+																	],
+																	"cookie": [],
+																	"body": "{\n  \"message\": \"<string>\"\n}"
+																}
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "summary",
+							"item": [
+								{
+									"name": "{table}",
+									"item": [
+										{
+											"name": "{function}",
+											"item": [
+												{
+													"name": "Get value by table and function",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Response status code is 200\", function () {",
+																	"  pm.expect(pm.response.code).to.equal(200);",
+																	"});",
+																	"",
+																	"",
+																	"pm.test(\"Response body is a string\", function () {",
+																	"    pm.expect(pm.response.text()).to.be.a('string');",
+																	"});",
+																	"",
+																	"",
+																	"pm.test(\"Response body is not empty\", function () {",
+																	"    pm.expect(pm.response.text()).to.not.be.empty;",
+																	"});",
+																	"",
+																	"",
+																	"pm.test(\"Response body is a valid\", function () {",
+																	"    const responseData = pm.response.text();",
+																	"    ",
+																	"    pm.expect(responseData).to.be.a(\"string\");",
+																	"    pm.expect(parseInt(responseData)).to.be.a('number');",
+																	"});",
+																	""
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/stats/summary/:table/:function",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"stats",
+																"summary",
+																":table",
+																":function"
+															],
+															"query": [
+																{
+																	"key": "column",
+																	"value": "<string>",
+																	"description": "Column name which will be used for computation. Optional for count.",
+																	"disabled": true
+																},
+																{
+																	"key": "from",
+																	"value": "<integer>",
+																	"description": "Time from in unix timestamp",
+																	"disabled": true
+																},
+																{
+																	"key": "to",
+																	"value": "<integer>",
+																	"description": "Time to in unix timestamp",
+																	"disabled": true
+																}
+															],
+															"variable": [
+																{
+																	"key": "table",
+																	"value": "event"
+																},
+																{
+																	"key": "function",
+																	"value": "count"
+																}
+															]
+														},
+														"description": "Returns string value by passed table and function.\n\n### Availiable tables\n* `block`\n* `tx`\n* `message`\n* `event`\n\n\n### Availiable functions\n* `sum`\n* `min`\n* `max`\n* `avg`\n* `count`\n\n\n`Column` query parameter is required for functions `sum`, `min`, `max` and `avg` and should not pass for `count`.\n\n\n###  Availiable columns and functions for tables:\n\n#### Block\n* `height`         -- min max\n* `time`           -- min max\n* `tx_count`       -- min max sum avg\n* `events_count`   -- min max sum avg\n* `blobs_size`     -- min max sum avg\n* `fee`            -- min max sum avg\n\n#### Tx\n* `height`         -- min max\n* `time`           -- min max\n* `gas_wanted`     -- min max sum avg\n* `gas_used`       -- min max sum avg\n* `timeout_height` -- min max avg\n* `events_count`   -- min max sum avg\n* `messages_count` -- min max sum avg\n* `fee`            -- min max sum avg\n\n#### Event\n* `height`         -- min max\n* `time`           -- min max\n\n#### Message\n* `height`         -- min max\n* `time`           -- min max"
+													},
+													"response": [
+														{
+															"name": "OK",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "application/json"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/v1/stats/summary/:table/:function?column=<string>&from=<integer>&to=<integer>",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"v1",
+																		"stats",
+																		"summary",
+																		":table",
+																		":function"
+																	],
+																	"query": [
+																		{
+																			"key": "column",
+																			"value": "<string>",
+																			"description": "Column name which will be used for computation. Optional for count."
+																		},
+																		{
+																			"key": "from",
+																			"value": "<integer>",
+																			"description": "Time from in unix timestamp"
+																		},
+																		{
+																			"key": "to",
+																			"value": "<integer>",
+																			"description": "Time to in unix timestamp"
+																		}
+																	],
+																	"variable": [
+																		{
+																			"key": "table"
+																		},
+																		{
+																			"key": "function"
+																		}
+																	]
+																}
+															},
+															"status": "OK",
+															"code": 200,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "<string>"
+														},
+														{
+															"name": "Bad Request",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "application/json"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/v1/stats/summary/:table/:function?column=<string>&from=<integer>&to=<integer>",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"v1",
+																		"stats",
+																		"summary",
+																		":table",
+																		":function"
+																	],
+																	"query": [
+																		{
+																			"key": "column",
+																			"value": "<string>",
+																			"description": "Column name which will be used for computation. Optional for count."
+																		},
+																		{
+																			"key": "from",
+																			"value": "<integer>",
+																			"description": "Time from in unix timestamp"
+																		},
+																		{
+																			"key": "to",
+																			"value": "<integer>",
+																			"description": "Time to in unix timestamp"
+																		}
+																	],
+																	"variable": [
+																		{
+																			"key": "table"
+																		},
+																		{
+																			"key": "function"
+																		}
+																	]
+																}
+															},
+															"status": "Bad Request",
+															"code": 400,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"message\": \"<string>\"\n}"
+														},
+														{
+															"name": "Internal Server Error",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "application/json"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/v1/stats/summary/:table/:function?column=<string>&from=<integer>&to=<integer>",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"v1",
+																		"stats",
+																		"summary",
+																		":table",
+																		":function"
+																	],
+																	"query": [
+																		{
+																			"key": "column",
+																			"value": "<string>",
+																			"description": "Column name which will be used for computation. Optional for count."
+																		},
+																		{
+																			"key": "from",
+																			"value": "<integer>",
+																			"description": "Time from in unix timestamp"
+																		},
+																		{
+																			"key": "to",
+																			"value": "<integer>",
+																			"description": "Time to in unix timestamp"
+																		}
+																	],
+																	"variable": [
+																		{
+																			"key": "table"
+																		},
+																		{
+																			"key": "function"
+																		}
+																	]
+																}
+															},
+															"status": "Internal Server Error",
+															"code": 500,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"message\": \"<string>\"\n}"
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "tx",
+					"item": [
+						{
+							"name": "{hash}",
+							"item": [
+								{
+									"name": "events",
+									"item": [
+										{
+											"name": "Get transaction events",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response status code is 200\", function () {",
+															"  pm.expect(pm.response.code).to.equal(200);",
+															"});",
+															"",
+															"",
+															"pm.test(\"Verify that the response body is an array\", function () {",
+															"  pm.expect(pm.response.json()).to.be.an('array');",
+															"});",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/tx/:hash/events",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"tx",
+														":hash",
+														"events"
+													],
+													"variable": [
+														{
+															"key": "hash",
+															"value": "70da440c6c29f7966dba52fb0677888d69895e7aa51018647064f294af1980bc"
+														}
+													]
+												},
+												"description": "Get transaction events"
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/tx/:hash/events",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"tx",
+																":hash",
+																"events"
+															],
+															"variable": [
+																{
+																	"key": "hash"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "[\n  {\n    \"data\": {\n      \"aliqua_07a\": {}\n    },\n    \"height\": \"<long>\",\n    \"id\": \"<long>\",\n    \"position\": \"<long>\",\n    \"time\": \"<dateTime>\",\n    \"tx_id\": \"<long>\",\n    \"type\": \"set_feegrant\"\n  },\n  {\n    \"data\": {\n      \"aliqua7\": {},\n      \"laboris_a\": {}\n    },\n    \"height\": \"<long>\",\n    \"id\": \"<long>\",\n    \"position\": \"<long>\",\n    \"time\": \"<dateTime>\",\n    \"tx_id\": \"<long>\",\n    \"type\": \"coinbase\"\n  }\n]"
+												},
+												{
+													"name": "Bad Request",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/tx/:hash/events",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"tx",
+																":hash",
+																"events"
+															],
+															"variable": [
+																{
+																	"key": "hash"
+																}
+															]
+														}
+													},
+													"status": "Bad Request",
+													"code": 400,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												},
+												{
+													"name": "Internal Server Error",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/tx/:hash/events",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"tx",
+																":hash",
+																"events"
+															],
+															"variable": [
+																{
+																	"key": "hash"
+																}
+															]
+														}
+													},
+													"status": "Internal Server Error",
+													"code": 500,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "messages",
+									"item": [
+										{
+											"name": "Get transaction messages",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response status code is 200\", function () {",
+															"    pm.expect(pm.response.code).to.equal(200);",
+															"});",
+															"",
+															"",
+															"pm.test(\"The response is an array\", function () {",
+															"  const responseData = pm.response.json();",
+															"  ",
+															"  pm.expect(responseData).to.be.an('array');",
+															"});",
+															"",
+															"",
+															"pm.test(\"The 'id' field is a non-negative integer\", function () {",
+															"    const responseData = pm.response.json();",
+															"    ",
+															"    responseData.forEach(function(item) {",
+															"        pm.expect(item.id).to.be.a('number');",
+															"        pm.expect(item.id).to.be.at.least(0);",
+															"    });",
+															"});",
+															"",
+															"",
+															"pm.test(\"The height field is a non-negative integer\", function () {",
+															"    const responseData = pm.response.json();",
+															"    ",
+															"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+															"    ",
+															"    responseData.forEach(function (message) {",
+															"        pm.expect(message.height).to.be.a('number').and.to.be.at.least(0);",
+															"    });",
+															"});",
+															"",
+															"",
+															"pm.test(\"The time field is in a valid date format\", function () {",
+															"    const responseData = pm.response.json();",
+															"    ",
+															"    pm.expect(responseData).to.be.an('array');",
+															"    responseData.forEach(function (message) {",
+															"        pm.expect(message.time).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{0,6}Z$/, \"The time field should be in a valid date format\");",
+															"    });",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/tx/:hash/messages",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"tx",
+														":hash",
+														"messages"
+													],
+													"variable": [
+														{
+															"key": "hash",
+															"value": "70da440c6c29f7966dba52fb0677888d69895e7aa51018647064f294af1980bc"
+														}
+													]
+												},
+												"description": "Get transaction messages"
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/tx/:hash/messages",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"tx",
+																":hash",
+																"messages"
+															],
+															"variable": [
+																{
+																	"key": "hash"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "[\n  {\n    \"data\": {\n      \"in57\": {},\n      \"sit_0\": {}\n    },\n    \"height\": \"<long>\",\n    \"id\": \"<long>\",\n    \"position\": \"<long>\",\n    \"time\": \"<dateTime>\",\n    \"tx_id\": \"<long>\",\n    \"type\": \"MsgUnjail\"\n  },\n  {\n    \"data\": {\n      \"nisi6\": {},\n      \"qui_\": {},\n      \"id__95\": {}\n    },\n    \"height\": \"<long>\",\n    \"id\": \"<long>\",\n    \"position\": \"<long>\",\n    \"time\": \"<dateTime>\",\n    \"tx_id\": \"<long>\",\n    \"type\": \"MsgUnknown\"\n  }\n]"
+												},
+												{
+													"name": "Bad Request",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/tx/:hash/messages",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"tx",
+																":hash",
+																"messages"
+															],
+															"variable": [
+																{
+																	"key": "hash"
+																}
+															]
+														}
+													},
+													"status": "Bad Request",
+													"code": 400,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												},
+												{
+													"name": "Internal Server Error",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/v1/tx/:hash/messages",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"tx",
+																":hash",
+																"messages"
+															],
+															"variable": [
+																{
+																	"key": "hash"
+																}
+															]
+														}
+													},
+													"status": "Internal Server Error",
+													"code": 500,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"message\": \"<string>\"\n}"
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "Get transaction by hash",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response status code is 200\", function () {",
+													"  pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"",
+													"pm.test(\"id is a non-negative integer\", function () {",
+													"  const responseData = pm.response.json();",
+													"  ",
+													"  pm.expect(responseData).to.be.an('object');",
+													"  pm.expect(responseData.id).to.be.a('number').and.to.be.at.least(0, \"id should be a non-negative integer\");",
+													"});",
+													"",
+													"",
+													"pm.test(\"Height is a non-negative integer\", function () {",
+													"  const responseData = pm.response.json();",
+													"  ",
+													"  pm.expect(responseData).to.be.an('object');",
+													"  pm.expect(responseData.height).to.be.a('number').and.to.be.at.least(0, \"Height should be a non-negative integer\");",
+													"});",
+													"",
+													"",
+													"pm.test(\"Position is a non-negative integer\", function () {",
+													"    const responseData = pm.response.json();",
+													"    ",
+													"    pm.expect(responseData.position).to.exist.and.to.be.a('number');",
+													"    pm.expect(responseData.position).to.be.at.least(0);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/tx/:hash",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"tx",
+												":hash"
+											],
+											"variable": [
+												{
+													"key": "hash",
+													"value": "70da440c6c29f7966dba52fb0677888d69895e7aa51018647064f294af1980bc"
+												}
+											]
+										},
+										"description": "Get transaction by hash"
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/tx/:hash",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"tx",
+														":hash"
+													],
+													"variable": [
+														{
+															"key": "hash"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"codespace\": \"<string>\",\n  \"error\": \"<string>\",\n  \"events_count\": \"<long>\",\n  \"fee\": \"<int64>\",\n  \"gas_used\": \"<long>\",\n  \"gas_wanted\": \"<long>\",\n  \"hash\": \"<string>\",\n  \"height\": \"<long>\",\n  \"id\": \"<long>\",\n  \"memo\": \"<string>\",\n  \"message_types\": [\n    \"MsgUndelegate\",\n    \"MsgBeginRedelegate\"\n  ],\n  \"messages_count\": \"<long>\",\n  \"position\": \"<long>\",\n  \"status\": \"failed\",\n  \"time\": \"<dateTime>\",\n  \"timeout_height\": \"<long>\"\n}"
+										},
+										{
+											"name": "No Content",
+											"originalRequest": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/v1/tx/:hash",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"tx",
+														":hash"
+													],
+													"variable": [
+														{
+															"key": "hash"
+														}
+													]
+												}
+											},
+											"status": "No Content",
+											"code": 204,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										},
+										{
+											"name": "Bad Request",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/tx/:hash",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"tx",
+														":hash"
+													],
+													"variable": [
+														{
+															"key": "hash"
+														}
+													]
+												}
+											},
+											"status": "Bad Request",
+											"code": 400,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Internal Server Error",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/v1/tx/:hash",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"tx",
+														":hash"
+													],
+													"variable": [
+														{
+															"key": "hash"
+														}
+													]
+												}
+											},
+											"status": "Internal Server Error",
+											"code": 500,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"message\": \"<string>\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "List transactions info",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"  pm.response.to.have.status(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response body is an array\", function () {",
+											"  pm.expect(pm.response.json()).to.be.an('array');",
+											"});",
+											"",
+											"",
+											"pm.test(\"The 'id' field is a non-negative integer\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+											"    responseData.forEach(function (item) {",
+											"        pm.expect(item.id).to.be.a('number').and.to.be.at.least(0);",
+											"    });",
+											"});",
+											"",
+											"",
+											"pm.test(\"The height field is a non-negative integer\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('array');",
+											"    ",
+											"    responseData.forEach(function(item) {",
+											"        pm.expect(item.height).to.be.a('number').and.to.be.at.least(0);",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/tx?limit=10&offset=0&sort=asc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"tx"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10",
+											"description": "Count of requested entities"
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"description": "Offset"
+										},
+										{
+											"key": "sort",
+											"value": "asc",
+											"description": "Sort order"
+										},
+										{
+											"key": "status",
+											"value": "",
+											"description": "Comma-separated status list",
+											"disabled": true
+										},
+										{
+											"key": "msg_type",
+											"value": "",
+											"description": "Comma-separated message types list",
+											"disabled": true
+										},
+										{
+											"key": "from",
+											"value": "",
+											"description": "Time from in unix timestamp",
+											"disabled": true
+										},
+										{
+											"key": "to",
+											"value": "",
+											"description": "Time to in unix timestamp",
+											"disabled": true
+										},
+										{
+											"key": "height",
+											"value": "",
+											"description": "Block number",
+											"disabled": true
+										}
+									]
+								},
+								"description": "List transactions info"
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/tx?limit=<integer>&offset=<integer>&sort=desc&status=failed&msg_type=MsgPayForBlobs&from=<integer>&to=<integer>&height=<integer>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"tx"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Count of requested entities"
+												},
+												{
+													"key": "offset",
+													"value": "<integer>",
+													"description": "Offset"
+												},
+												{
+													"key": "sort",
+													"value": "desc",
+													"description": "Sort order"
+												},
+												{
+													"key": "status",
+													"value": "failed",
+													"description": "Comma-separated status list"
+												},
+												{
+													"key": "msg_type",
+													"value": "MsgPayForBlobs",
+													"description": "Comma-separated message types list"
+												},
+												{
+													"key": "from",
+													"value": "<integer>",
+													"description": "Time from in unix timestamp"
+												},
+												{
+													"key": "to",
+													"value": "<integer>",
+													"description": "Time to in unix timestamp"
+												},
+												{
+													"key": "height",
+													"value": "<integer>",
+													"description": "Block number"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"codespace\": \"<string>\",\n    \"error\": \"<string>\",\n    \"events_count\": \"<long>\",\n    \"fee\": \"<int64>\",\n    \"gas_used\": \"<long>\",\n    \"gas_wanted\": \"<long>\",\n    \"hash\": \"<string>\",\n    \"height\": \"<long>\",\n    \"id\": \"<long>\",\n    \"memo\": \"<string>\",\n    \"message_types\": [\n      \"MsgDelegate\",\n      \"MsgCreateVestingAccount\"\n    ],\n    \"messages_count\": \"<long>\",\n    \"position\": \"<long>\",\n    \"status\": \"failed\",\n    \"time\": \"<dateTime>\",\n    \"timeout_height\": \"<long>\"\n  },\n  {\n    \"codespace\": \"<string>\",\n    \"error\": \"<string>\",\n    \"events_count\": \"<long>\",\n    \"fee\": \"<int64>\",\n    \"gas_used\": \"<long>\",\n    \"gas_wanted\": \"<long>\",\n    \"hash\": \"<string>\",\n    \"height\": \"<long>\",\n    \"id\": \"<long>\",\n    \"memo\": \"<string>\",\n    \"message_types\": [\n      \"MsgWithdrawDelegatorReward\",\n      \"MsgWithdrawDelegatorReward\"\n    ],\n    \"messages_count\": \"<long>\",\n    \"position\": \"<long>\",\n    \"status\": \"failed\",\n    \"time\": \"<dateTime>\",\n    \"timeout_height\": \"<long>\"\n  }\n]"
+								},
+								{
+									"name": "Bad Request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/tx?limit=<integer>&offset=<integer>&sort=desc&status=failed&msg_type=MsgPayForBlobs&from=<integer>&to=<integer>&height=<integer>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"tx"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Count of requested entities"
+												},
+												{
+													"key": "offset",
+													"value": "<integer>",
+													"description": "Offset"
+												},
+												{
+													"key": "sort",
+													"value": "desc",
+													"description": "Sort order"
+												},
+												{
+													"key": "status",
+													"value": "failed",
+													"description": "Comma-separated status list"
+												},
+												{
+													"key": "msg_type",
+													"value": "MsgPayForBlobs",
+													"description": "Comma-separated message types list"
+												},
+												{
+													"key": "from",
+													"value": "<integer>",
+													"description": "Time from in unix timestamp"
+												},
+												{
+													"key": "to",
+													"value": "<integer>",
+													"description": "Time to in unix timestamp"
+												},
+												{
+													"key": "height",
+													"value": "<integer>",
+													"description": "Block number"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"<string>\"\n}"
+								},
+								{
+									"name": "Internal Server Error",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v1/tx?limit=<integer>&offset=<integer>&sort=desc&status=failed&msg_type=MsgPayForBlobs&from=<integer>&to=<integer>&height=<integer>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"tx"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Count of requested entities"
+												},
+												{
+													"key": "offset",
+													"value": "<integer>",
+													"description": "Offset"
+												},
+												{
+													"key": "sort",
+													"value": "desc",
+													"description": "Sort order"
+												},
+												{
+													"key": "status",
+													"value": "failed",
+													"description": "Comma-separated status list"
+												},
+												{
+													"key": "msg_type",
+													"value": "MsgPayForBlobs",
+													"description": "Comma-separated message types list"
+												},
+												{
+													"key": "from",
+													"value": "<integer>",
+													"description": "Time from in unix timestamp"
+												},
+												{
+													"key": "to",
+													"value": "<integer>",
+													"description": "Time to in unix timestamp"
+												},
+												{
+													"key": "height",
+													"value": "<integer>",
+													"description": "Block number"
+												}
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"message\": \"<string>\"\n}"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "//127.0.0.1/v1"
+		}
+	]
+}

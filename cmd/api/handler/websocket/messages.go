@@ -1,5 +1,7 @@
 package websocket
 
+import "github.com/goccy/go-json"
+
 // methods
 const (
 	MethodSubscribe   = "subscribe"
@@ -13,13 +15,13 @@ const (
 )
 
 type Message struct {
-	Method string `json:"method" validate:"required,oneof=subscribe,unsubscribe"`
-	Body   []byte `json:"body"   validate:"required"`
+	Method string          `json:"method" validate:"required,oneof=subscribe,unsubscribe"`
+	Body   json.RawMessage `json:"body"   validate:"required"`
 }
 
 type Subscribe struct {
-	Channel string `json:"channel" validate:"required,oneof=head tx"`
-	Filters []byte `json:"filters" validate:"required"`
+	Channel string          `json:"channel" validate:"required,oneof=head tx"`
+	Filters json.RawMessage `json:"filters" validate:"required"`
 }
 
 type Unsubscribe struct {

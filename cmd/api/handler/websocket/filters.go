@@ -7,26 +7,34 @@ import (
 )
 
 type Filterable[M any] interface {
-	Filter(c *Client, msg M) bool
+	Filter(c client, msg M) bool
 }
 
 type HeadFilter struct{}
 
-func (hf HeadFilter) Filter(c *Client, msg responses.Block) bool {
-	if c.filters == nil {
+func (hf HeadFilter) Filter(c client, msg *responses.Block) bool {
+	if msg == nil {
 		return false
 	}
-	return c.filters.head
+	fltrs := c.Filters()
+	if fltrs == nil {
+		return false
+	}
+	return fltrs.head
 }
 
 type TxFilter struct{}
 
-func (hf TxFilter) Filter(c *Client, msg responses.Tx) bool {
-	if c.filters == nil || c.filters.tx == nil {
+func (hf TxFilter) Filter(c client, msg *responses.Tx) bool {
+	if msg == nil {
+		return false
+	}
+	fltrs := c.Filters()
+	if fltrs == nil || fltrs.tx == nil {
 		return false
 	}
 
-	fltr := c.filters.tx
+	fltr := fltrs.tx
 	if len(fltr.status) > 0 {
 		if _, ok := fltr.status[msg.Status]; !ok {
 			return false
@@ -40,13 +48,13 @@ func (hf TxFilter) Filter(c *Client, msg responses.Tx) bool {
 	return true
 }
 
-type filters struct {
+type Filters struct {
 	head bool
 	tx   *txFilters
 }
 
-func newFilters() *filters {
-	return &filters{
+func newFilters() *Filters {
+	return &Filters{
 		tx: newTxFilters(),
 	}
 }

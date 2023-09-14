@@ -5,6 +5,8 @@ import (
 	"sync"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/lib/pq"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -17,7 +19,7 @@ type processor[I, M any] func(ctx context.Context, payload string, repo identifi
 
 type Channel[I, M any] struct {
 	storageChannelName string
-	clients            Map[uint64, *Client]
+	clients            Map[uint64, client]
 	listener           storage.Listener
 	log                zerolog.Logger
 	processor          processor[I, M]
@@ -30,7 +32,7 @@ type Channel[I, M any] struct {
 func NewChannel[I, M any](storageChannelName string, processor processor[I, M], repo identifiable[I], filters Filterable[M]) *Channel[I, M] {
 	return &Channel[I, M]{
 		storageChannelName: storageChannelName,
-		clients:            NewMap[uint64, *Client](),
+		clients:            NewMap[uint64, client](),
 		processor:          processor,
 		filters:            filters,
 		repo:               repo,
@@ -39,8 +41,8 @@ func NewChannel[I, M any](storageChannelName string, processor processor[I, M], 
 	}
 }
 
-func (channel *Channel[I, M]) AddClient(c *Client) {
-	channel.clients.Set(c.id, c)
+func (channel *Channel[I, M]) AddClient(c client) {
+	channel.clients.Set(c.Id(), c)
 }
 
 func (channel *Channel[I, M]) RemoveClient(id uint64) {
@@ -93,27 +95,38 @@ func (channel *Channel[I, M]) waitMessage(ctx context.Context) {
 				continue
 			}
 
-			log.Debug().
-				Str("channel", msg.Channel).
-				Str("payload", msg.Extra).
-				Msg("message received")
-
-			notification, err := channel.processor(ctx, msg.Extra, channel.repo)
-			if err != nil {
-				channel.log.Err(err).Msg("processing channel message")
-				continue
+			if err := channel.processMessage(ctx, msg); err != nil {
+				log.Err(err).
+					Str("msg", msg.Channel).
+					Str("payload", msg.Extra).
+					Msg("processing channel message")
 			}
 
-			if err := channel.clients.Range(func(_ uint64, value *Client) (error, bool) {
-				if channel.filters.Filter(value, notification) {
-					value.Notify(notification)
-				}
-				return nil, false
-			}); err != nil {
-				channel.log.Err(err).Msg("write message to client")
-			}
 		}
 	}
+}
+
+func (channel *Channel[I, M]) processMessage(ctx context.Context, msg *pq.Notification) error {
+	log.Trace().
+		Str("channel", msg.Channel).
+		Str("payload", msg.Extra).
+		Msg("message received")
+
+	notification, err := channel.processor(ctx, msg.Extra, channel.repo)
+	if err != nil {
+		return errors.Wrap(err, "processing channel message")
+	}
+
+	if err := channel.clients.Range(func(_ uint64, value client) (error, bool) {
+		if channel.filters.Filter(value, notification) {
+			value.Notify(notification)
+		}
+		return nil, false
+	}); err != nil {
+		return errors.Wrap(err, "write message to client")
+	}
+
+	return nil
 }
 
 func (channel *Channel[I, M]) Close() error {

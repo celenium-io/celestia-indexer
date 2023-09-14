@@ -88,6 +88,23 @@ func initProflier(cfg *profiler.Config) (err error) {
 	return
 }
 
+func websocketSkipper(c echo.Context) bool {
+	return strings.Contains(c.Request().URL.Path, "ws")
+}
+
+func gzipSkipper(c echo.Context) bool {
+	if strings.Contains(c.Request().URL.Path, "swagger") {
+		return true
+	}
+	if strings.Contains(c.Request().URL.Path, "metrics") {
+		return true
+	}
+	if strings.Contains(c.Request().URL.Path, "ws") {
+		return true
+	}
+	return false
+}
+
 func initEcho(cfg ApiConfig) *echo.Echo {
 	e := echo.New()
 	e.Validator = handler.NewCelestiaApiValidator()
@@ -132,19 +149,15 @@ func initEcho(cfg ApiConfig) *echo.Echo {
 		},
 	}))
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
-		Skipper: func(c echo.Context) bool {
-			if strings.Contains(c.Request().URL.Path, "swagger") {
-				return true
-			}
-			if strings.Contains(c.Request().URL.Path, "metrics") {
-				return true
-			}
-			return false
-		},
+		Skipper: gzipSkipper,
 	}))
-	e.Use(middleware.Decompress())
+	e.Use(middleware.DecompressWithConfig(middleware.DecompressConfig{
+		Skipper: websocketSkipper,
+	}))
 	e.Use(middleware.BodyLimit("2M"))
-	e.Use(middleware.CSRF())
+	e.Use(middleware.CSRFWithConfig(
+		middleware.CSRFConfig{Skipper: websocketSkipper},
+	))
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
 	e.Pre(middleware.RemoveTrailingSlash())
@@ -154,15 +167,22 @@ func initEcho(cfg ApiConfig) *echo.Echo {
 		timeout = time.Duration(cfg.RequestTimeout) * time.Second
 	}
 	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
-		Skipper: middleware.DefaultSkipper,
+		Skipper: websocketSkipper,
 		Timeout: timeout,
 	}))
 
 	if cfg.Prometheus {
-		e.Use(echoprometheus.NewMiddleware("celestia_api"))
+		e.Use(echoprometheus.NewMiddlewareWithConfig(echoprometheus.MiddlewareConfig{
+			Namespace: "celestia_api",
+			Skipper:   websocketSkipper,
+		}))
 	}
 	if cfg.RateLimit > 0 {
-		e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(cfg.RateLimit))))
+		e.Use(middleware.RateLimiterWithConfig(middleware.RateLimiterConfig{
+			Skipper: websocketSkipper,
+			Store:   middleware.NewRateLimiterMemoryStore(rate.Limit(cfg.RateLimit)),
+		}))
+
 	}
 
 	return e

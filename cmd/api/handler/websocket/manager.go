@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"context"
+	"net/http"
 	"sync/atomic"
 
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
@@ -16,8 +17,8 @@ type Manager struct {
 	clientId *atomic.Uint64
 	clients  Map[uint64, *Client]
 
-	head    *Channel[storage.Block, responses.Block]
-	tx      *Channel[storage.Tx, responses.Tx]
+	head    *Channel[storage.Block, *responses.Block]
+	tx      *Channel[storage.Tx, *responses.Tx]
 	factory storage.ListenerFactory
 }
 
@@ -26,20 +27,23 @@ func NewManager(factory storage.ListenerFactory, blockRepo storage.IBlock, txRep
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
 		},
 		clientId: new(atomic.Uint64),
 		clients:  NewMap[uint64, *Client](),
 		factory:  factory,
 	}
 
-	manager.head = NewChannel[storage.Block, responses.Block](
+	manager.head = NewChannel[storage.Block, *responses.Block](
 		storage.ChannelHead,
 		HeadProcessor,
 		newBlockRepo(blockRepo),
 		HeadFilter{},
 	)
 
-	manager.tx = NewChannel[storage.Tx, responses.Tx](
+	manager.tx = NewChannel[storage.Tx, *responses.Tx](
 		storage.ChannelTx,
 		TxProcessor,
 		newTxRepo(txRepo),
@@ -65,15 +69,20 @@ func (manager *Manager) Handle(c echo.Context) error {
 	ws.SetReadLimit(1024 * 10) // 10KB
 
 	sId := manager.clientId.Add(1)
-	sub := newClient(sId, ws, manager)
+	sub := newClient(sId, manager)
 
 	manager.clients.Set(sId, sub)
 
-	go sub.ReadMessages(c.Request().Context(), ws, sub, c.Logger())
-	go sub.WriteMessages(c.Request().Context(), c.Logger())
+	ctx, cancel := context.WithCancel(c.Request().Context())
+	sub.WriteMessages(ctx, ws, c.Logger())
+	sub.ReadMessages(ctx, ws, sub, c.Logger())
+	cancel()
 
-	c.Logger().Infof("client %d connected", sId)
-	return nil
+	if err := sub.Close(); err != nil {
+		return err
+	}
+
+	return ws.Close()
 }
 
 func (manager *Manager) Start(ctx context.Context) {

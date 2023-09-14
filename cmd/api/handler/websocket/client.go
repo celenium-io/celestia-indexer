@@ -3,14 +3,26 @@ package websocket
 import (
 	"context"
 	"io"
-	"sync"
 	"time"
 
+	"github.com/dipdup-io/workerpool"
 	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
+
+type client interface {
+	Id() uint64
+	ApplyFilters(msg Subscribe) error
+	DetachFilters(msg Unsubscribe) error
+	Notify(msg any)
+	WriteMessages(ctx context.Context, ws *websocket.Conn, log echo.Logger)
+	ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Client, log echo.Logger)
+	Filters() *Filters
+
+	io.Closer
+}
 
 const (
 	// pongWait is how long we will await a pong response from client
@@ -23,26 +35,32 @@ const (
 
 type Client struct {
 	id      uint64
-	ws      *websocket.Conn
 	manager *Manager
-	filters *filters
+	filters *Filters
 	ch      chan any
-	wg      *sync.WaitGroup
+	g       workerpool.Group
 }
 
-func newClient(id uint64, ws *websocket.Conn, manager *Manager) *Client {
+func newClient(id uint64, manager *Manager) *Client {
 	return &Client{
 		id:      id,
-		ws:      ws,
 		manager: manager,
 		ch:      make(chan any, 1024),
-		wg:      new(sync.WaitGroup),
+		g:       workerpool.NewGroup(),
 	}
+}
+
+func (c *Client) Id() uint64 {
+	return c.id
+}
+
+func (c *Client) Filters() *Filters {
+	return c.filters
 }
 
 func (c *Client) ApplyFilters(msg Subscribe) error {
 	if c.filters == nil {
-		c.filters = &filters{}
+		c.filters = &Filters{}
 	}
 	switch msg.Channel {
 	case ChannelHead:
@@ -65,6 +83,9 @@ func (c *Client) ApplyFilters(msg Subscribe) error {
 }
 
 func (c *Client) DetachFilters(msg Unsubscribe) error {
+	if c.filters == nil {
+		return nil
+	}
 	switch msg.Channel {
 	case ChannelHead:
 		c.filters.head = false
@@ -81,20 +102,12 @@ func (c *Client) Notify(msg any) {
 }
 
 func (c *Client) Close() error {
-	c.wg.Wait()
-
-	if err := c.ws.Close(); err != nil {
-		return err
-	}
-
+	c.g.Wait()
 	close(c.ch)
 	return nil
 }
 
-func (c *Client) WriteMessages(ctx context.Context, log echo.Logger) {
-	c.wg.Add(1)
-	defer c.wg.Done()
-
+func (c *Client) writeThread(ctx context.Context, ws *websocket.Conn, log echo.Logger) {
 	ticker := time.NewTicker(pingInterval)
 	defer ticker.Stop()
 
@@ -104,38 +117,42 @@ func (c *Client) WriteMessages(ctx context.Context, log echo.Logger) {
 			return
 
 		case <-ticker.C:
-			if err := c.ws.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+			if err := ws.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 				log.Errorf("writemsg: %s", err)
 				return
 			}
 
 		case msg, ok := <-c.ch:
 			if !ok {
-				if err := c.ws.WriteMessage(websocket.CloseMessage, nil); err != nil {
+				if err := ws.WriteMessage(websocket.CloseMessage, nil); err != nil {
 					log.Errorf("send close message: %s", err)
 				}
 				return
 			}
 
-			if err := c.ws.WriteJSON(msg); err != nil {
-				log.Errorf("send head: %s", err)
+			if err := ws.WriteJSON(msg); err != nil {
+				log.Errorf("send client message: %s", err)
 			}
 		}
 	}
 }
 
-func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Client, log echo.Logger) {
-	c.wg.Add(1)
-	defer func() {
-		c.wg.Done()
-		c.manager.clients.Delete(sub.id)
-	}()
+func (c *Client) WriteMessages(ctx context.Context, ws *websocket.Conn, log echo.Logger) {
+	c.g.GoCtx(ctx, func(ctx context.Context) {
+		c.writeThread(ctx, ws, log)
+	})
+}
 
-	if err := c.ws.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
+func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Client, log echo.Logger) {
+	defer c.manager.clients.Delete(sub.id)
+
+	if err := ws.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
 		log.Error(err)
 		return
 	}
-	c.ws.SetPongHandler(c.pongHandler)
+	ws.SetPongHandler(func(_ string) error {
+		return ws.SetReadDeadline(time.Now().Add(pongWait))
+	})
 
 	for {
 		select {
@@ -148,7 +165,7 @@ func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Clie
 					return
 				case err == ErrTimeout:
 					return
-				case websocket.IsCloseError(err, websocket.CloseAbnormalClosure):
+				case websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseAbnormalClosure):
 					return
 				}
 				log.Errorf("read websocket message: %s", err.Error())
@@ -157,14 +174,9 @@ func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Clie
 	}
 }
 
-// pongHandler is used to handle PongMessages for the Client
-func (c *Client) pongHandler(pongMsg string) error {
-	return c.ws.SetReadDeadline(time.Now().Add(pongWait))
-}
-
 func (c *Client) read(ctx context.Context, ws *websocket.Conn) error {
 	var msg Message
-	if err := c.ws.ReadJSON(&msg); err != nil {
+	if err := ws.ReadJSON(&msg); err != nil {
 		return err
 	}
 
@@ -180,7 +192,7 @@ func (c *Client) read(ctx context.Context, ws *websocket.Conn) error {
 
 func (c *Client) handleSubscribeMessage(ctx context.Context, msg Message) error {
 	var subscribeMsg Subscribe
-	if err := json.UnmarshalContext(ctx, msg.Body, &subscribeMsg); err != nil {
+	if err := json.Unmarshal(msg.Body, &subscribeMsg); err != nil {
 		return err
 	}
 
@@ -194,7 +206,7 @@ func (c *Client) handleSubscribeMessage(ctx context.Context, msg Message) error 
 
 func (c *Client) handleUnsubscribeMessage(ctx context.Context, msg Message) error {
 	var unsubscribeMsg Unsubscribe
-	if err := json.UnmarshalContext(ctx, msg.Body, &unsubscribeMsg); err != nil {
+	if err := json.Unmarshal(msg.Body, &unsubscribeMsg); err != nil {
 		return err
 	}
 	if err := c.DetachFilters(unsubscribeMsg); err != nil {

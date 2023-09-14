@@ -54,4 +54,9 @@ check-licences:
     	--ignore github.com/golang/snappy \
     	--ignore golang.org/x/crypto/chacha20
 
+test-api:
+	# to install newman:
+	# npm install -g newman
+	newman run ./test/newman/tests.json -e ./test/newman/env.json
+
 .PHONY: init indexer api build clean compose lint test adr mock api-docs check-licences
