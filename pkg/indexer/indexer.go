@@ -2,6 +2,7 @@ package indexer
 
 import (
 	"context"
+	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
 	"sync"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
@@ -23,19 +24,19 @@ import (
 )
 
 type Indexer struct {
-	cfg          config.Config
-	api          node.API
-	receiver     *receiver.Module
-	parser       *parser.Module
-	storage      *storage.Module
-	rollback     *rollback.Module
-	genesis      *genesis.Module
-	stopperInput *modules.Input
-	wg           *sync.WaitGroup
-	log          zerolog.Logger
+	cfg      config.Config
+	api      node.API
+	receiver *receiver.Module
+	parser   *parser.Module
+	storage  *storage.Module
+	rollback *rollback.Module
+	genesis  *genesis.Module
+	stopper  modules.Module
+	wg       *sync.WaitGroup
+	log      zerolog.Logger
 }
 
-func New(ctx context.Context, cfg config.Config, stopperInput *modules.Input) (Indexer, error) {
+func New(ctx context.Context, cfg config.Config, stopperModule modules.Module) (Indexer, error) {
 	pg, err := postgres.Create(ctx, cfg.Database)
 	if err != nil {
 		return Indexer{}, errors.Wrap(err, "while creating pg context")
@@ -66,22 +67,22 @@ func New(ctx context.Context, cfg config.Config, stopperInput *modules.Input) (I
 		return Indexer{}, errors.Wrap(err, "while creating genesis module")
 	}
 
-	err = attachStopper(stopperInput, r, p, s, rb, genesisModule)
+	err = attachStopper(stopperModule, r, p, s, rb, genesisModule)
 	if err != nil {
 		return Indexer{}, errors.Wrap(err, "while creating stopper module")
 	}
 
 	return Indexer{
-		cfg:          cfg,
-		api:          &api,
-		receiver:     &r,
-		parser:       &p,
-		storage:      &s,
-		rollback:     &rb,
-		genesis:      &genesisModule,
-		stopperInput: stopperInput,
-		wg:           new(sync.WaitGroup),
-		log:          log.With().Str("module", "indexer").Logger(),
+		cfg:      cfg,
+		api:      &api,
+		receiver: r,
+		parser:   p,
+		storage:  s,
+		rollback: rb,
+		genesis:  genesisModule,
+		stopper:  stopperModule,
+		wg:       new(sync.WaitGroup),
+		log:      log.With().Str("module", "indexer").Logger(),
 	}, nil
 }
 
@@ -117,108 +118,86 @@ func (i *Indexer) Close() error {
 	return nil
 }
 
-func createReceiver(ctx context.Context, cfg config.Config, pg postgres.Storage) (rpc.API, receiver.Module, error) {
+func createReceiver(ctx context.Context, cfg config.Config, pg postgres.Storage) (rpc.API, *receiver.Module, error) {
 	state, err := loadState(pg, ctx, cfg.Indexer.Name)
 	if err != nil {
-		return rpc.API{}, receiver.Module{}, errors.Wrap(err, "while loading state")
+		return rpc.API{}, nil, errors.Wrap(err, "while loading state")
 	}
 
 	api := rpc.NewAPI(cfg.DataSources["node_rpc"])
 	receiverModule := receiver.NewModule(cfg.Indexer, &api, state)
-	return api, receiverModule, nil
+	return api, &receiverModule, nil
 }
 
-func createRollback(r receiver.Module, pg postgres.Storage, api node.API, cfg config.Indexer) (rollback.Module, error) {
+func createRollback(receiverModule modules.Module, pg postgres.Storage, api node.API, cfg config.Indexer) (*rollback.Module, error) {
 	rollbackModule := rollback.NewModule(pg.Transactable, pg.State, pg.Blocks, api, cfg)
 
 	// rollback <- listen signal -- receiver
-	rbInput, err := rollbackModule.Input(rollback.InputName)
-	if err != nil {
-		return rollback.Module{}, err
-	}
-
-	if err = r.AttachTo(receiver.RollbackOutput, rbInput); err != nil {
-		return rollback.Module{}, errors.Wrap(err, "while attaching rollback to receiver")
+	if err := rollbackModule.AttachTo(receiverModule, receiver.RollbackOutput, rollback.InputName); err != nil {
+		return nil, errors.Wrap(err, "while attaching rollback to receiver")
 	}
 
 	// receiver <- listen state -- rollback
-	rInput, err := r.Input(receiver.RollbackInput)
-	if err != nil {
-		return rollback.Module{}, err
+	if err := receiverModule.AttachTo(&rollbackModule, rollback.OutputName, receiver.RollbackInput); err != nil {
+		return nil, errors.Wrap(err, "while attaching receiver to rollback")
 	}
 
-	if err = rollbackModule.AttachTo(rollback.OutputName, rInput); err != nil {
-		return rollback.Module{}, errors.Wrap(err, "while attaching receiver to rollback")
-	}
-
-	return rollbackModule, nil
+	return &rollbackModule, nil
 }
 
-func createParser(r receiver.Module) (parser.Module, error) {
+func createParser(receiverModule modules.Module) (*parser.Module, error) {
 	parserModule := parser.NewModule()
-	pInput, err := parserModule.Input(parser.InputName)
-	if err != nil {
-		return parser.Module{}, err
+
+	if err := parserModule.AttachTo(receiverModule, receiver.BlocksOutput, parser.InputName); err != nil {
+		return nil, errors.Wrap(err, "while attaching parser to receiver")
 	}
 
-	if err = r.AttachTo(receiver.BlocksOutput, pInput); err != nil {
-		return parser.Module{}, errors.Wrap(err, "while attaching parser to receiver")
-	}
-
-	return parserModule, nil
+	return &parserModule, nil
 }
 
-func createStorage(pg postgres.Storage, cfg config.Config, p parser.Module) (storage.Module, error) {
-	s := storage.NewModule(pg, cfg.Indexer)
-	sInput, err := s.Input(storage.InputName)
-	if err != nil {
-		return storage.Module{}, err
+func createStorage(pg postgres.Storage, cfg config.Config, parserModule modules.Module) (*storage.Module, error) {
+	storageModule := storage.NewModule(pg, cfg.Indexer)
+
+	if err := storageModule.AttachTo(parserModule, parser.OutputName, storage.InputName); err != nil {
+		return nil, errors.Wrap(err, "while attaching storage to parser")
 	}
 
-	if err = p.AttachTo(parser.OutputName, sInput); err != nil {
-		return storage.Module{}, err
-	}
-
-	return s, nil
+	return &storageModule, nil
 }
 
-func createGenesis(pg postgres.Storage, cfg config.Config, r receiver.Module) (genesis.Module, error) {
+func createGenesis(pg postgres.Storage, cfg config.Config, receiverModule modules.Module) (*genesis.Module, error) {
 	genesisModule := genesis.NewModule(pg, cfg.Indexer)
-	gInput, err := genesisModule.Input(genesis.InputName)
-	if err != nil {
-		return genesis.Module{}, errors.Wrap(err, "cannot find input in genesis")
+
+	if err := genesisModule.AttachTo(receiverModule, receiver.GenesisOutput, genesis.InputName); err != nil {
+		return nil, errors.Wrap(err, "while attaching genesis to receiver")
 	}
-	if err = r.AttachTo(receiver.GenesisOutput, gInput); err != nil {
-		return genesis.Module{}, err
+
+	genesisModulePtr := &genesisModule
+	if err := receiverModule.AttachTo(genesisModulePtr, genesis.OutputName, receiver.GenesisDoneInput); err != nil {
+		return nil, errors.Wrap(err, "while attaching receiver to genesis")
 	}
-	receiverGenesisDone, err := r.Input(receiver.GenesisDoneInput)
-	if err != nil {
-		return genesis.Module{}, errors.Wrap(err, "cannot find input in receiver")
-	}
-	if err = genesisModule.AttachTo(genesis.OutputName, receiverGenesisDone); err != nil {
-		return genesis.Module{}, err
-	}
-	return genesisModule, nil
+
+	return genesisModulePtr, nil
 }
 
-func attachStopper(stopperInput *modules.Input, r receiver.Module, p parser.Module, s storage.Module, rb rollback.Module, g genesis.Module) error {
-	if err := r.AttachTo(receiver.StopOutput, stopperInput); err != nil {
+func attachStopper(stopperModule modules.Module, receiverModule modules.Module, parserModule modules.Module, storageModule modules.Module, rollbackModule modules.Module, genesisModule modules.Module) error {
+	if err := stopperModule.AttachTo(receiverModule, receiver.StopOutput, stopper.InputName); err != nil {
 		return errors.Wrap(err, "while attaching stopper to receiver")
 	}
 
-	if err := p.AttachTo(parser.StopOutput, stopperInput); err != nil {
+	if err := stopperModule.AttachTo(parserModule, parser.StopOutput, stopper.InputName); err != nil {
 		return errors.Wrap(err, "while attaching stopper to parser")
 	}
 
-	if err := s.AttachTo(storage.StopOutput, stopperInput); err != nil {
+	if err := stopperModule.AttachTo(storageModule, storage.StopOutput, stopper.InputName); err != nil {
 		return errors.Wrap(err, "while attaching stopper to storage")
 	}
 
-	if err := rb.AttachTo(rollback.StopOutput, stopperInput); err != nil {
+	if err := stopperModule.AttachTo(rollbackModule, rollback.StopOutput, stopper.InputName); err != nil {
 		return errors.Wrap(err, "while attaching stopper to rollback")
 	}
 
-	if err := g.AttachTo(genesis.StopOutput, stopperInput); err != nil {
+	if err := stopperModule.AttachTo(genesisModule, genesis.StopOutput, stopper.InputName); err != nil {
 		return errors.Wrap(err, "while attaching stopper to genesis")
 	}
 

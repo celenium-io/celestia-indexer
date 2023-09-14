@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"context"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"net/http"
 	"sync/atomic"
 
@@ -15,7 +16,7 @@ import (
 type Manager struct {
 	upgrader websocket.Upgrader
 	clientId *atomic.Uint64
-	clients  Map[uint64, *Client]
+	clients  *sdkSync.Map[uint64, *Client]
 
 	head    *Channel[storage.Block, *responses.Block]
 	tx      *Channel[storage.Tx, *responses.Tx]
@@ -32,7 +33,7 @@ func NewManager(factory storage.ListenerFactory, blockRepo storage.IBlock, txRep
 			},
 		},
 		clientId: new(atomic.Uint64),
-		clients:  NewMap[uint64, *Client](),
+		clients:  sdkSync.NewMap[uint64, *Client](),
 		factory:  factory,
 	}
 

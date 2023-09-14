@@ -11,11 +11,9 @@ import (
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
-	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -33,16 +31,15 @@ const (
 //	                |                |
 //	                |----------------|
 type Module struct {
+	modules.BaseModule
 	tx        sdk.Transactable
 	state     storage.IState
 	blocks    storage.IBlock
 	node      node.API
 	indexName string
-	input     *modules.Input
-	outputs   map[string]*modules.Output
-	log       zerolog.Logger
-	g         workerpool.Group
 }
+
+var _ modules.Module = (*Module)(nil)
 
 func NewModule(
 	tx sdk.Transactable,
@@ -52,47 +49,42 @@ func NewModule(
 	cfg config.Indexer,
 ) Module {
 	module := Module{
-		tx:     tx,
-		state:  state,
-		blocks: blocks,
-		node:   node,
-		input:  modules.NewInput(InputName),
-		outputs: map[string]*modules.Output{
-			OutputName: modules.NewOutput(OutputName),
-			StopOutput: modules.NewOutput(StopOutput),
-		},
-		indexName: cfg.Name,
-		g:         workerpool.NewGroup(),
+		BaseModule: modules.New("rollback"),
+		tx:         tx,
+		state:      state,
+		blocks:     blocks,
+		node:       node,
+		indexName:  cfg.Name,
 	}
-	module.log = log.With().Str("module", module.Name()).Logger()
+
+	module.CreateInput(InputName)
+	module.CreateOutput(OutputName)
+	module.CreateOutput(StopOutput)
 
 	return module
 }
 
-func (*Module) Name() string {
-	return "rollback"
-}
-
 // Start -
 func (module *Module) Start(ctx context.Context) {
-	module.g.GoCtx(ctx, module.listen)
+	module.G.GoCtx(ctx, module.listen)
 }
 
 func (module *Module) listen(ctx context.Context) {
-	module.log.Info().Msg("module started")
+	module.Log.Info().Msg("module started")
+	input := module.MustInput(InputName)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case _, ok := <-module.input.Listen():
+		case _, ok := <-input.Listen():
 			if !ok {
-				module.log.Warn().Msg("can't read message from input")
+				module.Log.Warn().Msg("can't read message from input")
 				return
 			}
 
 			if err := module.rollback(ctx); err != nil {
-				module.log.Err(err).Msgf("error occured")
+				module.Log.Err(err).Msgf("error occured")
 			}
 		}
 	}
@@ -100,37 +92,8 @@ func (module *Module) listen(ctx context.Context) {
 
 // Close -
 func (module *Module) Close() error {
-	module.log.Info().Msg("closing module...")
-	module.g.Wait()
-
-	return module.input.Close()
-}
-
-// Output -
-func (module *Module) Output(name string) (*modules.Output, error) {
-	output, ok := module.outputs[name]
-	if !ok {
-		return nil, errors.Wrap(modules.ErrUnknownOutput, name)
-	}
-	return output, nil
-}
-
-// Input -
-func (module *Module) Input(name string) (*modules.Input, error) {
-	if name != InputName {
-		return nil, errors.Wrap(modules.ErrUnknownInput, name)
-	}
-	return module.input, nil
-}
-
-// AttachTo -
-func (module *Module) AttachTo(name string, input *modules.Input) error {
-	output, err := module.Output(name)
-	if err != nil {
-		return err
-	}
-
-	output.Attach(input)
+	module.Log.Info().Msg("closing module...")
+	module.G.Wait()
 	return nil
 }
 
@@ -177,7 +140,7 @@ func (module *Module) finish(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	module.outputs[OutputName].Push(newState)
+	module.MustInput(OutputName).Push(newState)
 
 	log.Info().
 		Uint64("new_height", uint64(newState.LastHeight)).

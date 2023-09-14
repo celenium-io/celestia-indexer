@@ -38,9 +38,9 @@ func (r *Module) sequencer(ctx context.Context) {
 					}
 				} // TODO else: check with block from storage?
 
-				r.outputs[BlocksOutput].Push(b)
+				r.MustOutput(BlocksOutput).Push(b)
 				r.setLevel(types.Level(currentBlock), b.BlockID.Hash)
-				r.log.Debug().Msgf("put in order block=%d", currentBlock)
+				r.Log.Debug().Msgf("put in order block=%d", currentBlock)
 
 				prevBlockHash = b.BlockID.Hash
 				delete(orderedBlocks, currentBlock)
@@ -55,7 +55,7 @@ func (r *Module) startRollback(
 	b types.BlockData,
 	prevBlockHash []byte,
 ) ([]byte, int64, map[int64]types.BlockData) {
-	r.log.Info().
+	r.Log.Info().
 		Str("current.lastBlockHash", hex.EncodeToString(b.Block.LastBlockID.Hash)).
 		Str("prevBlockHash", hex.EncodeToString(prevBlockHash)).
 		Uint64("level", uint64(b.Height)).
@@ -77,7 +77,7 @@ func (r *Module) startRollback(
 	clearChannel(r.blocks)
 
 	// Start rollback
-	r.outputs[RollbackOutput].Push(struct{}{})
+	r.MustOutput(RollbackOutput).Push(struct{}{})
 
 	// Wait until rollback will be finished
 	r.rollbackSync.Wait()

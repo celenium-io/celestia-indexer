@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"context"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"sync"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
@@ -19,7 +20,7 @@ type processor[I, M any] func(ctx context.Context, payload string, repo identifi
 
 type Channel[I, M any] struct {
 	storageChannelName string
-	clients            Map[uint64, client]
+	clients            *sdkSync.Map[uint64, client]
 	listener           storage.Listener
 	log                zerolog.Logger
 	processor          processor[I, M]
@@ -32,7 +33,7 @@ type Channel[I, M any] struct {
 func NewChannel[I, M any](storageChannelName string, processor processor[I, M], repo identifiable[I], filters Filterable[M]) *Channel[I, M] {
 	return &Channel[I, M]{
 		storageChannelName: storageChannelName,
-		clients:            NewMap[uint64, client](),
+		clients:            sdkSync.NewMap[uint64, client](),
 		processor:          processor,
 		filters:            filters,
 		repo:               repo,

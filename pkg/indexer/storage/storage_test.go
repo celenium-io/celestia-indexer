@@ -85,7 +85,7 @@ func (s *ModuleTestSuite) TestBlockLast() {
 	hash, err := hex.DecodeString("F44BC94BF7D064ADF82618F2691D2353161DE232ECB3091B7E5C89B453C79456")
 	s.Require().NoError(err)
 
-	module.input.Push(storage.Block{
+	module.MustInput(InputName).Push(storage.Block{
 		Height:       1001,
 		Hash:         hash,
 		VersionBlock: 11,

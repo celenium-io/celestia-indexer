@@ -10,7 +10,7 @@ import (
 
 func (module *Module) save(ctx context.Context, data parsedData) error {
 	start := time.Now()
-	module.log.Info().Uint64("height", uint64(data.block.Height)).Msg("saving block...")
+	module.Log.Info().Uint64("height", uint64(data.block.Height)).Msg("saving block...")
 	tx, err := postgres.BeginTransaction(ctx, module.storage.Transactable)
 	if err != nil {
 		return err
@@ -168,7 +168,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 	if err := tx.Flush(ctx); err != nil {
 		return tx.HandleError(ctx, err)
 	}
-	module.log.Info().
+	module.Log.Info().
 		Uint64("height", data.block.Id).
 		Uint64("block_ns_size", data.block.Stats.BlobsSize).
 		Str("block_fee", data.block.Stats.Fee.String()).

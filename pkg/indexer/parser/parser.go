@@ -2,77 +2,39 @@ package parser
 
 import (
 	"context"
-	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
-	"github.com/pkg/errors"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 type Module struct {
-	input   *modules.Input
-	outputs map[string]*modules.Output
-	log     zerolog.Logger
-	g       workerpool.Group
+	modules.BaseModule
 }
 
+var _ modules.Module = (*Module)(nil)
+
 const (
-	name       = "parser"
 	InputName  = "blocks"
 	OutputName = "data"
 	StopOutput = "stop"
 )
 
 func NewModule() Module {
-	return Module{
-		input: modules.NewInput(InputName),
-		outputs: map[string]*modules.Output{
-			OutputName: modules.NewOutput(OutputName),
-			StopOutput: modules.NewOutput(StopOutput),
-		},
-		log: log.With().Str("module", name).Logger(),
-		g:   workerpool.NewGroup(),
+	m := Module{
+		BaseModule: modules.New("parser"),
 	}
-}
+	m.CreateInput(InputName)
+	m.CreateOutput(OutputName)
+	m.CreateOutput(StopOutput)
 
-// Name -
-func (*Module) Name() string {
-	return name
+	return m
 }
 
 func (p *Module) Start(ctx context.Context) {
-	p.log.Info().Msg("starting parser module...")
-	p.g.GoCtx(ctx, p.listen)
+	p.Log.Info().Msg("starting parser module...")
+	p.G.GoCtx(ctx, p.listen)
 }
 
 func (p *Module) Close() error {
-	p.log.Info().Msg("closing...")
-	p.g.Wait()
-
-	return p.input.Close()
-}
-
-func (p *Module) Output(name string) (*modules.Output, error) {
-	output, ok := p.outputs[name]
-	if !ok {
-		return nil, errors.Wrap(modules.ErrUnknownOutput, name)
-	}
-	return output, nil
-}
-
-func (p *Module) Input(name string) (*modules.Input, error) {
-	if name != InputName {
-		return nil, errors.Wrap(modules.ErrUnknownInput, name)
-	}
-	return p.input, nil
-}
-
-func (p *Module) AttachTo(name string, input *modules.Input) error {
-	output, err := p.Output(name)
-	if err != nil {
-		return err
-	}
-
-	output.Attach(input)
+	p.Log.Info().Msg("closing...")
+	p.G.Wait()
 	return nil
 }

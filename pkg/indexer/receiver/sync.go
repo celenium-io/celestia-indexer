@@ -10,7 +10,7 @@ func (r *Module) sync(ctx context.Context) {
 	var blocksCtx context.Context
 	blocksCtx, r.cancelReadBlocks = context.WithCancel(ctx)
 	if err := r.readBlocks(blocksCtx); err != nil && !errors.Is(err, context.Canceled) {
-		r.log.Err(err).Msg("while reading blocks")
+		r.Log.Err(err).Msg("while reading blocks")
 		return
 	}
 
@@ -26,7 +26,7 @@ func (r *Module) sync(ctx context.Context) {
 		case <-ticker.C:
 			blocksCtx, r.cancelReadBlocks = context.WithCancel(ctx)
 			if err := r.readBlocks(blocksCtx); err != nil && !errors.Is(err, context.Canceled) {
-				r.log.Err(err).Msg("while reading blocks by timer")
+				r.Log.Err(err).Msg("while reading blocks by timer")
 				return
 			}
 		}

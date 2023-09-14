@@ -10,11 +10,7 @@ import (
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
-	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
-	"github.com/pkg/errors"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -30,66 +26,61 @@ const (
 //	                     |                |
 //	                     |----------------|
 type Module struct {
+	modules.BaseModule
 	storage     postgres.Storage
-	input       *modules.Input
-	stop        *modules.Output
 	indexerName string
-	log         zerolog.Logger
-	g           workerpool.Group
 }
+
+var _ modules.Module = (*Module)(nil)
 
 // NewModule -
 func NewModule(pg postgres.Storage, cfg config.Indexer) Module {
 	m := Module{
+		BaseModule:  modules.New("storage"),
 		storage:     pg,
-		input:       modules.NewInput(InputName),
-		stop:        modules.NewOutput(StopOutput),
 		indexerName: cfg.Name,
-		g:           workerpool.NewGroup(),
 	}
-	m.log = log.With().Str("module", m.Name()).Logger()
+
+	m.CreateInput(InputName)
+	m.CreateOutput(StopOutput)
 
 	return m
 }
 
-// Name -
-func (*Module) Name() string {
-	return "storage"
-}
-
 // Start -
 func (module *Module) Start(ctx context.Context) {
-	module.g.GoCtx(ctx, module.listen)
+	module.G.GoCtx(ctx, module.listen)
 }
 
 func (module *Module) listen(ctx context.Context) {
-	module.log.Info().Msg("module started")
+	module.Log.Info().Msg("module started")
+	input := module.MustInput(InputName)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case msg, ok := <-module.input.Listen():
+		case msg, ok := <-input.Listen():
 			if !ok {
-				module.log.Warn().Msg("can't read message from input")
+				module.Log.Warn().Msg("can't read message from input")
 				continue
 			}
 			block, ok := msg.(storage.Block)
 			if !ok {
-				module.log.Warn().Msgf("invalid message type: %T", msg)
+				module.Log.Warn().Msgf("invalid message type: %T", msg)
 				continue
 			}
 
 			if err := module.saveBlock(ctx, &block); err != nil {
-				module.log.Err(err).
+				module.Log.Err(err).
 					Uint64("height", uint64(block.Height)).
 					Msg("block saving error")
-				module.stop.Push(struct{}{})
+				module.MustOutput(StopOutput).Push(struct{}{})
 				continue
 			}
 
 			if err := module.notify(ctx, block); err != nil {
-				module.log.Err(err).Msg("block notification error")
+				module.Log.Err(err).Msg("block notification error")
 			}
 		}
 	}
@@ -97,36 +88,8 @@ func (module *Module) listen(ctx context.Context) {
 
 // Close -
 func (module *Module) Close() error {
-	module.log.Info().Msg("closing module...")
-	module.g.Wait()
-
-	return module.input.Close()
-}
-
-// Output -
-func (module *Module) Output(name string) (*modules.Output, error) {
-	if name != StopOutput {
-		return nil, errors.Wrap(modules.ErrUnknownOutput, name)
-	}
-	return module.stop, nil
-}
-
-// Input -
-func (module *Module) Input(name string) (*modules.Input, error) {
-	if name != InputName {
-		return nil, errors.Wrap(modules.ErrUnknownInput, name)
-	}
-	return module.input, nil
-}
-
-// AttachTo -
-func (module *Module) AttachTo(name string, input *modules.Input) error {
-	output, err := module.Output(name)
-	if err != nil {
-		return err
-	}
-
-	output.Attach(input)
+	module.Log.Info().Msg("closing module...")
+	module.G.Wait()
 	return nil
 }
 
@@ -148,7 +111,7 @@ func (module *Module) updateState(block *storage.Block, totalAccounts uint64, st
 
 func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error {
 	start := time.Now()
-	module.log.Info().Uint64("height", uint64(block.Height)).Msg("saving block...")
+	module.Log.Info().Uint64("height", uint64(block.Height)).Msg("saving block...")
 	tx, err := postgres.BeginTransaction(ctx, module.storage.Transactable)
 	if err != nil {
 		return err
@@ -243,7 +206,7 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 	if err := tx.Flush(ctx); err != nil {
 		return tx.HandleError(ctx, err)
 	}
-	module.log.Info().
+	module.Log.Info().
 		Uint64("height", block.Id).
 		Uint64("block_ns_size", block.Stats.BlobsSize).
 		Str("block_fee", block.Stats.Fee.String()).

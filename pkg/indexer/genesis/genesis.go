@@ -6,11 +6,7 @@ import (
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
-	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
-	"github.com/pkg/errors"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 // constants
@@ -28,75 +24,68 @@ const (
 //	                     |                |
 //	                     |----------------|
 type Module struct {
+	modules.BaseModule
 	storage     postgres.Storage
-	input       *modules.Input
-	outputs     map[string]*modules.Output
 	indexerName string
-	log         zerolog.Logger
-	g           workerpool.Group
 }
+
+var _ modules.Module = (*Module)(nil)
 
 // NewModule -
 func NewModule(pg postgres.Storage, cfg config.Indexer) Module {
 	m := Module{
-		storage: pg,
-		input:   modules.NewInput(InputName),
-		outputs: map[string]*modules.Output{
-			OutputName: modules.NewOutput(OutputName),
-			StopOutput: modules.NewOutput(StopOutput),
-		},
+		BaseModule:  modules.New("genesis"),
+		storage:     pg,
 		indexerName: cfg.Name,
-		g:           workerpool.NewGroup(),
 	}
-	m.log = log.With().Str("module", m.Name()).Logger()
+
+	m.CreateInput(InputName)
+	m.CreateOutput(OutputName)
+	m.CreateOutput(StopOutput)
 
 	return m
 }
 
-// Name -
-func (*Module) Name() string {
-	return "genesis"
-}
-
 // Start -
 func (module *Module) Start(ctx context.Context) {
-	module.g.GoCtx(ctx, module.listen)
+	module.G.GoCtx(ctx, module.listen)
 }
 
 func (module *Module) listen(ctx context.Context) {
-	module.log.Info().Msg("module started")
+	module.Log.Info().Msg("module started")
+	input := module.MustInput(InputName)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case msg, ok := <-module.input.Listen():
+		case msg, ok := <-input.Listen():
 			if !ok {
-				module.log.Warn().Msg("can't read message from input")
+				module.Log.Warn().Msg("can't read message from input")
 				return
 			}
 			genesis, ok := msg.(types.Genesis)
 			if !ok {
-				module.log.Warn().Msgf("invalid message type: %T", msg)
+				module.Log.Warn().Msgf("invalid message type: %T", msg)
 				return
 			}
 
-			module.log.Info().Msg("received genesis message")
+			module.Log.Info().Msg("received genesis message")
 
 			block, err := module.parse(genesis)
 			if err != nil {
-				module.log.Err(err).Msgf("parsing genesis block")
+				module.Log.Err(err).Msgf("parsing genesis block")
 				return
 			}
-			module.log.Info().Msg("parsed genesis message")
+			module.Log.Info().Msg("parsed genesis message")
 
 			if err := module.save(ctx, block); err != nil {
-				module.log.Err(err).Msg("saving genesis block error")
+				module.Log.Err(err).Msg("saving genesis block error")
 				return
 			}
-			module.log.Info().Msg("saved genesis message")
+			module.Log.Info().Msg("saved genesis message")
 
-			module.outputs[OutputName].Push(struct{}{})
+			module.MustOutput(OutputName).Push(struct{}{})
 			return
 		}
 	}
@@ -104,36 +93,7 @@ func (module *Module) listen(ctx context.Context) {
 
 // Close -
 func (module *Module) Close() error {
-	module.log.Info().Msg("closing module...")
-	module.g.Wait()
-
-	return module.input.Close()
-}
-
-// Output -
-func (module *Module) Output(name string) (*modules.Output, error) {
-	output, ok := module.outputs[name]
-	if !ok {
-		return nil, errors.Wrap(modules.ErrUnknownOutput, name)
-	}
-	return output, nil
-}
-
-// Input -
-func (module *Module) Input(name string) (*modules.Input, error) {
-	if name != InputName {
-		return nil, errors.Wrap(modules.ErrUnknownInput, name)
-	}
-	return module.input, nil
-}
-
-// AttachTo -
-func (module *Module) AttachTo(name string, input *modules.Input) error {
-	output, err := module.Output(name)
-	if err != nil {
-		return err
-	}
-
-	output.Attach(input)
+	module.Log.Info().Msg("closing module...")
+	module.G.Wait()
 	return nil
 }

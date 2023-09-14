@@ -3,21 +3,22 @@ package receiver
 import "context"
 
 func (r *Module) receiveGenesis(ctx context.Context) error {
-	r.log.Info().Msg("receiving genesis block")
+	r.Log.Info().Msg("receiving genesis block")
 	genesis, err := r.api.Genesis(ctx)
 	if err != nil {
 		return err
 	}
 
-	r.log.Info().Msgf("got initial height of genesis block: %d", genesis.InitialHeight)
-	r.outputs[GenesisOutput].Push(genesis)
+	r.Log.Info().Msgf("got initial height of genesis block: %d", genesis.InitialHeight)
+	r.MustOutput(GenesisOutput).Push(genesis)
+	genesisDoneInput := r.MustInput(GenesisDoneInput)
 
-	// Wait until genesis block will be saved
+	// Wait until the genesis block will be saved
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
-		case <-r.inputs[GenesisDoneInput].Listen():
+		case <-genesisDoneInput.Listen():
 			return nil
 		}
 	}

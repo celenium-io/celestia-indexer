@@ -2,11 +2,10 @@ package main
 
 import (
 	"context"
+	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/dipdup-io/celestia-indexer/pkg/stopper"
 
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer"
 
@@ -38,13 +37,7 @@ func main() {
 	defer notifyCancel()
 
 	stopperModule := stopper.NewModule(cancel)
-	stopperInput, err := stopperModule.Input(stopper.InputName)
-	if err != nil {
-		log.Err(err).Msg("while getting stopper input")
-		return
-	}
-
-	indexerModule, err := indexer.New(ctx, *cfg, stopperInput)
+	indexerModule, err := indexer.New(ctx, *cfg, &stopperModule)
 	if err != nil {
 		log.Panic().Err(err).Msg("error during indexer module creation")
 		return

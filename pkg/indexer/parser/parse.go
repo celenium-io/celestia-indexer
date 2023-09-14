@@ -13,7 +13,7 @@ import (
 
 func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 	start := time.Now()
-	p.log.Info().
+	p.Log.Info().
 		Int64("height", b.Block.Height).
 		Msg("parsing block...")
 
@@ -78,11 +78,12 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 	endEvents := parseEvents(b, b.ResultBlockResults.EndBlockEvents)
 	block.Events = append(block.Events, endEvents...)
 
-	p.log.Debug().
+	p.Log.Debug().
 		Uint64("height", uint64(block.Height)).
 		Int64("ms", time.Since(start).Milliseconds()).
 		Msg("block parsed")
 
-	p.outputs[OutputName].Push(block)
+	output := p.MustOutput(OutputName)
+	output.Push(block)
 	return nil
 }

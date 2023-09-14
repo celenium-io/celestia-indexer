@@ -24,7 +24,7 @@ func (r *Module) worker(ctx context.Context, level types.Level) {
 			if errors.Is(err, context.Canceled) {
 				return
 			}
-			r.log.Err(err).Uint64("height", uint64(level)).Msg("get block request")
+			r.Log.Err(err).Uint64("height", uint64(level)).Msg("get block request")
 			time.Sleep(time.Second)
 			continue
 		}
@@ -33,7 +33,7 @@ func (r *Module) worker(ctx context.Context, level types.Level) {
 		break
 	}
 
-	r.log.Debug().
+	r.Log.Debug().
 		Uint64("height", uint64(result.Height)).
 		Int64("ms", time.Since(start).Milliseconds()).
 		Msg("received block data")
