@@ -2,6 +2,8 @@ package receiver
 
 import (
 	"context"
+	"sync"
+
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-io/celestia-indexer/pkg/node"
@@ -9,7 +11,6 @@ import (
 	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/rs/zerolog/log"
-	"sync"
 )
 
 const (

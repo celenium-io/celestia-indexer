@@ -20,9 +20,11 @@ type DecodedTx struct {
 	Signers       map[string]struct{}
 }
 
-func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
-	cfg, decoder := createDecoder()
+var (
+	cfg, decoder = createDecoder()
+)
 
+func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
 	raw := b.Block.Txs[index]
 	if bTx, isBlob := tmTypes.UnmarshalBlobTx(raw); isBlob {
 		raw = bTx.Tx
