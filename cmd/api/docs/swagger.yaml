@@ -285,6 +285,8 @@ definitions:
         example: 321
         format: int64
         type: integer
+      namespace:
+        $ref: '#/definitions/responses.Namespace'
       position:
         example: 2
         format: int64
@@ -446,6 +448,7 @@ definitions:
     - AttestationRequest
     - withdraw_rewards
     - withdraw_commission
+    - set_withdraw_address
     - create_validator
     - delegate
     - edit_validator
@@ -475,6 +478,7 @@ definitions:
     - EventTypeAttestationRequest
     - EventTypeWithdrawRewards
     - EventTypeWithdrawCommission
+    - EventTypeSetWithdrawAddress
     - EventTypeCreateValidator
     - EventTypeDelegate
     - EventTypeEditValidator
@@ -793,6 +797,46 @@ paths:
       summary: Get events from begin and end of block
       tags:
       - block
+  /v1/block/{height}/namespace:
+    get:
+      description: Get namesapces affected in the block
+      operationId: get-block-namespaces
+      parameters:
+      - description: Block height
+        in: path
+        minimum: 1
+        name: height
+        required: true
+        type: integer
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.NamespaceMessage'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get namesapces affected in the block
+      tags:
+      - block
   /v1/block/{height}/stats:
     get:
       description: Get block stats by height
@@ -894,7 +938,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/responses.Block'
+              $ref: '#/definitions/responses.Namespace'
             type: array
         "400":
           description: Bad Request
@@ -1277,9 +1321,11 @@ paths:
       - description: Table name
         enum:
         - block
+        - block_stats
         - tx
         - event
         - message
+        - validator
         in: path
         name: table
         required: true

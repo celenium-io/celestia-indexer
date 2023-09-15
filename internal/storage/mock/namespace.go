@@ -351,6 +351,45 @@ func (c *INamespaceMessagesCall) DoAndReturn(f func(context.Context, uint64, int
 	return c
 }
 
+// MessagesByHeight mocks base method.
+func (m *MockINamespace) MessagesByHeight(ctx context.Context, height uint64, limit, offset int) ([]storage.NamespaceMessage, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MessagesByHeight", ctx, height, limit, offset)
+	ret0, _ := ret[0].([]storage.NamespaceMessage)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MessagesByHeight indicates an expected call of MessagesByHeight.
+func (mr *MockINamespaceMockRecorder) MessagesByHeight(ctx, height, limit, offset any) *INamespaceMessagesByHeightCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagesByHeight", reflect.TypeOf((*MockINamespace)(nil).MessagesByHeight), ctx, height, limit, offset)
+	return &INamespaceMessagesByHeightCall{Call: call}
+}
+
+// INamespaceMessagesByHeightCall wrap *gomock.Call
+type INamespaceMessagesByHeightCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *INamespaceMessagesByHeightCall) Return(arg0 []storage.NamespaceMessage, arg1 error) *INamespaceMessagesByHeightCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *INamespaceMessagesByHeightCall) Do(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesByHeightCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *INamespaceMessagesByHeightCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesByHeightCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Save mocks base method.
 func (m_2 *MockINamespace) Save(ctx context.Context, m *storage.Namespace) error {
 	m_2.ctrl.T.Helper()

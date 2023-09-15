@@ -126,6 +126,10 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 				return err
 			}
 		}
+
+		if err := stats.InitModel(&models.Validator{}); err != nil {
+			return err
+		}
 		return nil
 	})
 }

@@ -47,6 +47,8 @@ const (
 	EventTypeWithdrawRewards EventType = "withdraw_rewards"
 	// EventTypeWithdrawCommission is a EventType of type withdraw_commission.
 	EventTypeWithdrawCommission EventType = "withdraw_commission"
+	// EventTypeSetWithdrawAddress is a EventType of type set_withdraw_address.
+	EventTypeSetWithdrawAddress EventType = "set_withdraw_address"
 	// EventTypeCreateValidator is a EventType of type create_validator.
 	EventTypeCreateValidator EventType = "create_validator"
 	// EventTypeDelegate is a EventType of type delegate.
@@ -91,6 +93,7 @@ func EventTypeValues() []EventType {
 		EventTypeAttestationRequest,
 		EventTypeWithdrawRewards,
 		EventTypeWithdrawCommission,
+		EventTypeSetWithdrawAddress,
 		EventTypeCreateValidator,
 		EventTypeDelegate,
 		EventTypeEditValidator,
@@ -134,6 +137,7 @@ var _EventTypeValue = map[string]EventType{
 	"AttestationRequest":                EventTypeAttestationRequest,
 	"withdraw_rewards":                  EventTypeWithdrawRewards,
 	"withdraw_commission":               EventTypeWithdrawCommission,
+	"set_withdraw_address":              EventTypeSetWithdrawAddress,
 	"create_validator":                  EventTypeCreateValidator,
 	"delegate":                          EventTypeDelegate,
 	"edit_validator":                    EventTypeEditValidator,

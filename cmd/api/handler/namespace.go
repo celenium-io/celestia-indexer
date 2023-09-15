@@ -152,7 +152,7 @@ func (handler *NamespaceHandler) GetWithVersion(c echo.Context) error {
 //	@Param			offset	query	integer	false	"Offset"						mininum(1)
 //	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
 //	@Produce		json
-//	@Success		200	{array}		responses.Block
+//	@Success		200	{array}		responses.Namespace
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/namespace [get]

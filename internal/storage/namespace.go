@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"fmt"
+
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -16,6 +17,7 @@ type INamespace interface {
 	ByNamespaceId(ctx context.Context, namespaceId []byte) ([]Namespace, error)
 	ByNamespaceIdAndVersion(ctx context.Context, namespaceId []byte, version byte) (Namespace, error)
 	Messages(ctx context.Context, id uint64, limit, offset int) ([]NamespaceMessage, error)
+	MessagesByHeight(ctx context.Context, height uint64, limit, offset int) ([]NamespaceMessage, error)
 }
 
 // Namespace -

@@ -12,14 +12,25 @@ type BlockHandler struct {
 	block      storage.IBlock
 	blockStats storage.IBlockStats
 	events     storage.IEvent
+	namespace  storage.INamespace
 }
 
-func NewBlockHandler(block storage.IBlock, blockStats storage.IBlockStats, events storage.IEvent) *BlockHandler {
+func NewBlockHandler(
+	block storage.IBlock,
+	blockStats storage.IBlockStats,
+	events storage.IEvent,
+	namespace storage.INamespace,
+) *BlockHandler {
 	return &BlockHandler{
 		block:      block,
 		blockStats: blockStats,
 		events:     events,
+		namespace:  namespace,
 	}
+}
+
+type getBlockByHeightRequest struct {
+	Height uint64 `param:"height" validate:"required,min=1"`
 }
 
 type getBlockRequest struct {
@@ -120,7 +131,7 @@ func (handler *BlockHandler) List(c echo.Context) error {
 //	@Failure		500	{object}	Error
 //	@Router			/v1/block/{height}/events [get]
 func (handler *BlockHandler) GetEvents(c echo.Context) error {
-	req, err := bindAndValidate[getBlockRequest](c)
+	req, err := bindAndValidate[getBlockByHeightRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
@@ -146,12 +157,12 @@ func (handler *BlockHandler) GetEvents(c echo.Context) error {
 //	@ID				get-block-stats
 //	@Param			height	path	integer	true	"Block height"	minimum(1)
 //	@Produce		json
-//	@Success		200	{object}		responses.BlockStats
+//	@Success		200	{object}	responses.BlockStats
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/block/{height}/stats [get]
 func (handler *BlockHandler) GetStats(c echo.Context) error {
-	req, err := bindAndValidate[getBlockRequest](c)
+	req, err := bindAndValidate[getBlockByHeightRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
@@ -161,4 +172,41 @@ func (handler *BlockHandler) GetStats(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, responses.NewBlockStats(stats))
+}
+
+// GetNamespaces godoc
+//
+//	@Summary		Get namesapces affected in the block
+//	@Description	Get namesapces affected in the block
+//	@Tags			block
+//	@ID				get-block-namespaces
+//	@Param			height	path	integer	true	"Block height"					minimum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Produce		json
+//	@Success		200	{array} 	responses.NamespaceMessage
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/block/{height}/namespace [get]
+func (handler *BlockHandler) GetNamespaces(c echo.Context) error {
+	req, err := bindAndValidate[namespacesByHeightRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	messages, err := handler.namespace.MessagesByHeight(c.Request().Context(), req.Height, int(req.Limit), int(req.Offset))
+	if err := handleError(c, err, handler.events); err != nil {
+		return err
+	}
+	response := make([]responses.NamespaceMessage, len(messages))
+	for i := range response {
+		msg, err := responses.NewNamespaceMessage(messages[i])
+		if err := handleError(c, err, handler.namespace); err != nil {
+			return err
+		}
+		response[i] = msg
+	}
+
+	return c.JSON(http.StatusOK, response)
 }

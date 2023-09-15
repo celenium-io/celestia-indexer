@@ -15,8 +15,9 @@ type NamespaceMessage struct {
 
 	Type string `enums:"MsgWithdrawValidatorCommission,MsgWithdrawDelegatorReward,MsgEditValidator,MsgBeginRedelegate,MsgCreateValidator,MsgDelegate,MsgUndelegate,MsgUnjail,MsgSend,MsgCreateVestingAccount,MsgCreatePeriodicVestingAccount,MsgPayForBlobs,MsgGrantAllowance" example:"MsgCreatePeriodicVestingAccount" format:"string" json:"type" swaggertype:"string"`
 
-	Data map[string]any `json:"data"`
-	Tx   Tx             `json:"tx"`
+	Data      map[string]any `json:"data"`
+	Tx        Tx             `json:"tx"`
+	Namespace Namespace      `json:"namespace"`
 }
 
 func NewNamespaceMessage(msg storage.NamespaceMessage) (NamespaceMessage, error) {
@@ -26,14 +27,18 @@ func NewNamespaceMessage(msg storage.NamespaceMessage) (NamespaceMessage, error)
 	if msg.Tx == nil {
 		return NamespaceMessage{}, errors.New("nil tx in namespace message constructor")
 	}
+	if msg.Namespace == nil {
+		return NamespaceMessage{}, errors.New("nil namespace in namespace message constructor")
+	}
 
 	return NamespaceMessage{
-		Id:       msg.Message.Id,
-		Height:   uint64(msg.Message.Height),
-		Time:     msg.Message.Time,
-		Position: msg.Message.Position,
-		Type:     string(msg.Message.Type),
-		Data:     msg.Message.Data,
-		Tx:       NewTx(*msg.Tx),
+		Id:        msg.Message.Id,
+		Height:    uint64(msg.Message.Height),
+		Time:      msg.Message.Time,
+		Position:  msg.Message.Position,
+		Type:      string(msg.Message.Type),
+		Data:      msg.Message.Data,
+		Tx:        NewTx(*msg.Tx),
+		Namespace: NewNamespace(*msg.Namespace),
 	}, nil
 }

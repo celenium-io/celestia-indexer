@@ -101,3 +101,15 @@ func (p *addressTxRequest) SetDefault() {
 		p.Sort = asc
 	}
 }
+
+type namespacesByHeightRequest struct {
+	Limit  uint64 `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset uint64 `query:"offset" validate:"omitempty,min=0"`
+	Height uint64 `param:"height" validate:"required,min=1"`
+}
+
+func (p *namespacesByHeightRequest) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+}

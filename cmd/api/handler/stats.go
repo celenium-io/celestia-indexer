@@ -19,7 +19,7 @@ func NewStatsHandler(repo storage.IStats) StatsHandler {
 }
 
 type summaryRequest struct {
-	Table    string `example:"block"      param:"table"    swaggertype:"string"  validate:"required,oneof=block tx event message"`
+	Table    string `example:"block"      param:"table"    swaggertype:"string"  validate:"required,oneof=block block_stats tx event message validator"`
 	Function string `example:"count"      param:"function" swaggertype:"string"  validate:"required,oneof=avg sum min max count"`
 	Column   string `example:"fee"        query:"column"   swaggertype:"string"  validate:"omitempty"`
 	From     uint64 `example:"1692892095" query:"from"     swaggertype:"integer" validate:"omitempty,min=1"`
@@ -32,7 +32,7 @@ type summaryRequest struct {
 //	@Description.markdown	summary
 //	@Tags					stats
 //	@ID						stats-summary
-//	@Param					table		path	string	true	"Table name"	Enums(block, tx, event, message)
+//	@Param					table		path	string	true	"Table name"	Enums(block, block_stats, tx, event, message, validator)
 //	@Param					function	path	string	true	"Function name"	Enums(min, max, avg, sum, count)
 //	@Param					column		query	string	false	"Column name which will be used for computation. Optional for count."
 //	@Param					from		query	integer	false	"Time from in unix timestamp"	mininum(1)

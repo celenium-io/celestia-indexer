@@ -54,6 +54,7 @@ type BlockTestSuite struct {
 	blocks     *mock.MockIBlock
 	blockStats *mock.MockIBlockStats
 	events     *mock.MockIEvent
+	namespace  *mock.MockINamespace
 	echo       *echo.Echo
 	handler    *BlockHandler
 	ctrl       *gomock.Controller
@@ -67,7 +68,8 @@ func (s *BlockTestSuite) SetupSuite() {
 	s.blocks = mock.NewMockIBlock(s.ctrl)
 	s.blockStats = mock.NewMockIBlockStats(s.ctrl)
 	s.events = mock.NewMockIEvent(s.ctrl)
-	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events)
+	s.namespace = mock.NewMockINamespace(s.ctrl)
+	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events, s.namespace)
 }
 
 // TearDownSuite -
@@ -275,4 +277,49 @@ func (s *BlockTestSuite) TestGetStats() {
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, stats.TxCount)
 	s.Require().EqualValues(2, stats.EventsCount)
+}
+
+func (s *BlockTestSuite) TestGetNamespaces() {
+	req := httptest.NewRequest(http.MethodGet, "/?", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/block/:height/namespace")
+	c.SetParamNames("height")
+	c.SetParamValues("100")
+
+	s.namespace.EXPECT().
+		MessagesByHeight(gomock.Any(), uint64(100), int(10), int(0)).
+		Return([]storage.NamespaceMessage{
+			{
+				NamespaceId: testNamespace.Id,
+				MsgId:       1,
+				Message: &storage.Message{
+					Id:       1,
+					TxId:     2,
+					Position: 3,
+					Type:     types.MsgBeginRedelegate,
+					Height:   100,
+					Time:     testTime,
+				},
+				TxId:      1,
+				Tx:        &testTx,
+				Namespace: &testNamespace,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.GetNamespaces(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var msgs []responses.NamespaceMessage
+	err := json.NewDecoder(rec.Body).Decode(&msgs)
+	s.Require().NoError(err)
+	s.Require().Len(msgs, 1)
+
+	msg := msgs[0]
+	s.Require().EqualValues(1, msg.Id)
+	s.Require().EqualValues(100, msg.Height)
+	s.Require().EqualValues(3, msg.Position)
+	s.Require().Equal(testTime, msg.Time)
+	s.Require().EqualValues(string(types.MsgBeginRedelegate), msg.Type)
+	s.Require().EqualValues(1, msg.Tx.Id)
 }

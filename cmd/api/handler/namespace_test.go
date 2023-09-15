@@ -255,8 +255,9 @@ func (s *NamespaceTestSuite) TestGetMessages() {
 					Height:   100,
 					Time:     testTime,
 				},
-				TxId: 1,
-				Tx:   &testTx,
+				TxId:      1,
+				Tx:        &testTx,
+				Namespace: &testNamespace,
 			},
 		}, nil)
 

@@ -246,9 +246,30 @@ func (s *StorageTestSuite) TestNamespaceMessages() {
 	msg := msgs[0]
 	s.Require().EqualValues(3, msg.MsgId)
 	s.Require().EqualValues(2, msg.NamespaceId)
+	s.Require().NotNil(msg.Namespace)
 	s.Require().NotNil(msg.Message)
+	s.Require().NotNil(msg.Tx)
 	s.Require().Equal(types.MsgUnjail, msg.Message.Type)
 	s.Require().EqualValues(2, msg.Tx.Id)
+}
+
+func (s *StorageTestSuite) TestNamespaceMessagesByHeight() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	msgs, err := s.storage.Namespace.MessagesByHeight(ctx, 1000, 10, 0)
+	s.Require().NoError(err)
+	s.Require().Len(msgs, 1)
+
+	msg := msgs[0]
+	s.Require().EqualValues(3, msg.MsgId)
+	s.Require().EqualValues(2, msg.NamespaceId)
+	s.Require().NotNil(msg.Namespace)
+	s.Require().NotNil(msg.Message)
+	s.Require().NotNil(msg.Tx)
+	s.Require().Equal(types.MsgUnjail, msg.Message.Type)
+	s.Require().EqualValues(2, msg.Tx.Id)
+	s.Require().EqualValues(1255, msg.Namespace.Size)
 }
 
 func (s *StorageTestSuite) TestTxByHash() {

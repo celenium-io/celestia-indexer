@@ -40,6 +40,45 @@ func (m *MockIConstant) EXPECT() *MockIConstantMockRecorder {
 	return m.recorder
 }
 
+// All mocks base method.
+func (m *MockIConstant) All(ctx context.Context) ([]storage.Constant, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "All", ctx)
+	ret0, _ := ret[0].([]storage.Constant)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// All indicates an expected call of All.
+func (mr *MockIConstantMockRecorder) All(ctx any) *IConstantAllCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "All", reflect.TypeOf((*MockIConstant)(nil).All), ctx)
+	return &IConstantAllCall{Call: call}
+}
+
+// IConstantAllCall wrap *gomock.Call
+type IConstantAllCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IConstantAllCall) Return(arg0 []storage.Constant, arg1 error) *IConstantAllCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IConstantAllCall) Do(f func(context.Context) ([]storage.Constant, error)) *IConstantAllCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IConstantAllCall) DoAndReturn(f func(context.Context) ([]storage.Constant, error)) *IConstantAllCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // ByModule mocks base method.
 func (m *MockIConstant) ByModule(ctx context.Context, module types.ModuleName) ([]storage.Constant, error) {
 	m.ctrl.T.Helper()

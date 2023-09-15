@@ -401,6 +401,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/block/{height}/namespace": {
+            "get": {
+                "description": "Get namesapces affected in the block",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "block"
+                ],
+                "summary": "Get namesapces affected in the block",
+                "operationId": "get-block-namespaces",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Block height",
+                        "name": "height",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.NamespaceMessage"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/block/{height}/stats": {
             "get": {
                 "description": "Get block stats by height",
@@ -552,7 +611,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/responses.Block"
+                                "$ref": "#/definitions/responses.Namespace"
                             }
                         }
                     },
@@ -991,9 +1050,11 @@ const docTemplate = `{
                     {
                         "enum": [
                             "block",
+                            "block_stats",
                             "tx",
                             "event",
-                            "message"
+                            "message",
+                            "validator"
                         ],
                         "type": "string",
                         "description": "Table name",
@@ -1717,6 +1778,9 @@ const docTemplate = `{
                     "format": "int64",
                     "example": 321
                 },
+                "namespace": {
+                    "$ref": "#/definitions/responses.Namespace"
+                },
                 "position": {
                     "type": "integer",
                     "format": "int64",
@@ -1921,6 +1985,7 @@ const docTemplate = `{
                 "AttestationRequest",
                 "withdraw_rewards",
                 "withdraw_commission",
+                "set_withdraw_address",
                 "create_validator",
                 "delegate",
                 "edit_validator",
@@ -1950,6 +2015,7 @@ const docTemplate = `{
                 "EventTypeAttestationRequest",
                 "EventTypeWithdrawRewards",
                 "EventTypeWithdrawCommission",
+                "EventTypeSetWithdrawAddress",
                 "EventTypeCreateValidator",
                 "EventTypeDelegate",
                 "EventTypeEditValidator",
