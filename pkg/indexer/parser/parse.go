@@ -78,7 +78,7 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 	endEvents := parseEvents(b, b.ResultBlockResults.EndBlockEvents)
 	block.Events = append(block.Events, endEvents...)
 
-	p.Log.Debug().
+	p.Log.Info().
 		Uint64("height", uint64(block.Height)).
 		Int64("ms", time.Since(start).Milliseconds()).
 		Msg("block parsed")

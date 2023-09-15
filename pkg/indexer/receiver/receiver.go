@@ -135,7 +135,7 @@ func (r *Module) rollback(ctx context.Context) {
 			return
 		case msg, ok := <-rollbackInput.Listen():
 			if !ok {
-				r.Log.Warn().Msg("can't read message from rollback input")
+				r.Log.Warn().Msg("can't read message from rollback input, channel is closed and drained")
 				continue
 			}
 
@@ -147,7 +147,6 @@ func (r *Module) rollback(ctx context.Context) {
 
 			r.setLevel(state.LastHeight, state.LastHash)
 			r.Log.Info().Msgf("caught return from rollback to level=%d", state.LastHeight)
-
 			r.rollbackSync.Done()
 		}
 	}

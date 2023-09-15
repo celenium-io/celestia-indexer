@@ -16,8 +16,9 @@ func (p *Module) listen(ctx context.Context) {
 			return
 		case msg, ok := <-input.Listen():
 			if !ok {
-				p.Log.Warn().Msg("can't read message from input")
-				continue
+				p.Log.Warn().Msg("can't read message from input, it was drained and closed")
+				p.MustOutput(StopOutput).Push(struct{}{})
+				return
 			}
 
 			block, ok := msg.(types.BlockData)
@@ -27,7 +28,10 @@ func (p *Module) listen(ctx context.Context) {
 			}
 
 			if err := p.parse(ctx, block); err != nil {
-				p.Log.Err(err).Msg("block parsing error")
+				p.Log.Err(err).
+					Uint64("height", uint64(block.Height)).
+					Msg("block parsing error")
+				p.MustOutput(StopOutput).Push(struct{}{})
 				continue
 			}
 		}

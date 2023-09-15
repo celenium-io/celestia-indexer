@@ -71,7 +71,7 @@ func decodeCosmosTx(decoder cosmosTypes.TxDecoder, raw tmTypes.Tx) (timeoutHeigh
 func decodeAuthInfo(cfg encoding.Config, raw tmTypes.Tx) (tx.AuthInfo, decimal.Decimal, error) {
 	var txRaw tx.TxRaw
 	if e := cfg.Codec.Unmarshal(raw, &txRaw); e != nil {
-		return tx.AuthInfo{}, decimal.Decimal{}, errors.Wrap(e, "unmarshaling tx error")
+		return tx.AuthInfo{}, decimal.Decimal{}, errors.Wrap(e, "unmarshalling tx error")
 	}
 
 	var authInfo tx.AuthInfo
