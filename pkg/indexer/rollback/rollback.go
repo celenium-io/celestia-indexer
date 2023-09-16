@@ -79,12 +79,13 @@ func (module *Module) listen(ctx context.Context) {
 			return
 		case _, ok := <-input.Listen():
 			if !ok {
-				module.Log.Warn().Msg("can't read message from input")
+				module.Log.Warn().Msg("can't read message from input, channel was dried and closed")
+				module.MustOutput(StopOutput).Push(struct{}{})
 				return
 			}
 
 			if err := module.rollback(ctx); err != nil {
-				module.Log.Err(err).Msgf("error occured")
+				module.Log.Err(err).Msgf("error occurred")
 			}
 		}
 	}
@@ -140,7 +141,7 @@ func (module *Module) finish(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	module.MustInput(OutputName).Push(newState)
+	module.MustOutput(OutputName).Push(newState)
 
 	log.Info().
 		Uint64("new_height", uint64(newState.LastHeight)).
@@ -199,6 +200,7 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 		return tx.HandleError(ctx, err)
 	}
 	state.LastHeight = newBlock.Height
+	state.LastHash = newBlock.Hash
 	state.LastTime = newBlock.Time
 	state.TotalTx -= blockStats.TxCount
 	state.TotalBlobsSize -= blockStats.BlobsSize

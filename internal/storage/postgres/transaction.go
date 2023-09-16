@@ -208,7 +208,6 @@ func (tx Transaction) RollbackSigners(ctx context.Context, txIds []uint64) (err 
 	_, err = tx.Tx().NewDelete().
 		Model((*models.Signer)(nil)).
 		Where("tx_id IN (?)", bun.In(txIds)).
-		Returning("*").
 		Exec(ctx)
 	return
 }
@@ -217,7 +216,6 @@ func (tx Transaction) RollbackMessageAddresses(ctx context.Context, msgIds []uin
 	_, err = tx.Tx().NewDelete().
 		Model((*models.MsgAddress)(nil)).
 		Where("msg_id IN (?)", bun.In(msgIds)).
-		Returning("*").
 		Exec(ctx)
 	return
 }

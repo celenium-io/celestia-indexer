@@ -1,0 +1,9 @@
+- module: auth
+  name: max_memo_characters
+  value: "256"
+- module: auth
+  name: tx_size_cost_per_byte
+  value: "10"
+- module: blob
+  name: gas_per_blob_byte
+  value: "8"

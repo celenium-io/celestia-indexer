@@ -32,18 +32,19 @@ adr:
 	@cp adr/adr-template.md adr/adr-$(NUM)-$(TITLE).md
 
 generate:
-	go generate -v ./internal/storage ./internal/storage/types
+	go generate -v ./internal/storage ./internal/storage/types ./pkg/node
 
 api-docs:
 	cd cmd/api && swag init --md markdown -parseDependency --parseInternal --parseDepth 1
 
-check-licences:
+check-licenses:
 	go-licenses check ./... \
+		--include_tests \
     	--allowed_licenses=MIT,Apache-1.0,Apache-1.1,Apache-2.0,BSD-2-Clause-FreeBSD,BSD-2-Clause-NetBSD,BSD-2-Clause,BSD-3-Clause-Attribution,BSD-3-Clause-Clear,BSD-3-Clause-LBNL,BSD-3-Clause,BSD-4-Clause,BSD-4-Clause-UC,BSD-Protection,ISC,LGPL-2.0,LGPL-2.1,LGPL-3.0,LGPLLR,MPL-1.0,MPL-1.1,MPL-2.0,Unlicense \
     	--ignore github.com/ethereum/go-ethereum \
     	--ignore github.com/regen-network/cosmos-proto \
     	--ignore github.com/modern-go/reflect2 \
-    	--ignore golang.org/x/sys/unix \
+    	--ignore golang.org/x/sys \
     	--ignore mellium.im/sasl \
     	--ignore github.com/klauspost/compress/zstd/internal/xxhash \
     	--ignore github.com/mattn/go-sqlite3 \
@@ -52,11 +53,10 @@ check-licences:
     	--ignore github.com/klauspost/cpuid/v2 \
     	--ignore filippo.io/edwards25519/field \
     	--ignore github.com/golang/snappy \
-    	--ignore golang.org/x/crypto/chacha20
+    	--ignore golang.org/x/crypto/chacha20 \
+    	--ignore github.com/pierrec/lz4/v4
 
 test-api:
-	# to install newman:
-	# npm install -g newman
 	newman run ./test/newman/tests.json -e ./test/newman/env.json
 
-.PHONY: init indexer api build clean compose lint test adr mock api-docs check-licences
+.PHONY: init indexer api build clean compose lint test adr mock api-docs check-licenses

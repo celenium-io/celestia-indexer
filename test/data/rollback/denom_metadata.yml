@@ -1,0 +1,12 @@
+- id: 1
+  description: The native staking token of the Celestia network.
+  name: TIA
+  symbol: TIA
+  base: utia
+  display: TIA
+  uri:
+  units:
+    - denom: utia
+      exponent: 0
+    - denom: TIA
+      exponent: 6

@@ -1,0 +1,43 @@
+- id: 1
+  height: 1000
+  time: '2023-07-04T03:10:57+00:00'
+  position: 0
+  type: MsgWithdrawDelegatorReward
+  tx_id: 1
+  data: null
+- id: 2
+  height: 1000
+  time: '2023-07-04T03:10:57+00:00'
+  position: 1
+  type: MsgDelegate
+  tx_id: 1
+  data: null
+- id: 3
+  height: 1000
+  time: '2023-07-04T03:10:57+00:00'
+  position: 2
+  type: MsgUnjail
+  tx_id: 2
+  data: null
+- id: 4
+  height: 1000
+  time: '2023-07-04T03:10:57+00:00'
+  position: 3
+  type: MsgPayForBlobs
+  tx_id: 2
+  data:
+    namespaces:
+      - AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACt6d6t6d4=
+    blob_sizes:
+      - 12
+    share_commitments:
+      - 0CsLX630cjij9DR6nqoWfQcCH2pCQSoSuq63dTkd4Bw=
+    share_versions:
+      - 0
+- id: 5
+  height: 999
+  position: 0
+  time: '2023-07-04T03:11:57+00:00'
+  type: MsgCreateValidator
+  tx_id: 3
+  data: null

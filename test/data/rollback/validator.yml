@@ -1,0 +1,14 @@
+- id: 1
+  address: celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw
+  delegator: celestia17vmk8m246t648hpmde2q7kp4ft9uwrayps85dg
+  rate: 0.070000000000000000
+  max_rate: 0.200000000000000000
+  max_change_rate: 0.010000000000000000
+  min_self_delegation: 1
+  moniker: Conqueror
+  identity: EAD22B173DE57E6A
+  website: https://github.com/DasRasyo
+  contacts: https://t.me/DasRasyo || conqueror.prime
+  details: Stake with me
+  msg_id: 4
+  height: 999
