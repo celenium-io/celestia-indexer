@@ -37,7 +37,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawValidatorCommission(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -90,7 +90,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawDelegatorReward(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -165,7 +165,7 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -229,7 +229,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -315,7 +315,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -395,7 +395,7 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(msgDelegate, blob.Height, blob.Block.Time, position)
+	dm, err := Message(msgDelegate, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -465,7 +465,7 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -530,7 +530,7 @@ func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -588,7 +588,7 @@ func TestDecodeMsg_SuccessOnMsgSend(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(msgSend, blob.Height, blob.Block.Time, position)
+	dm, err := Message(msgSend, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -663,7 +663,7 @@ func TestDecodeMsg_SuccessOnMsgCreateVestingAccount(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -732,7 +732,7 @@ func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(msgCreatePeriodicVestingAccount, blob.Height, blob.Block.Time, position)
+	dm, err := Message(msgCreatePeriodicVestingAccount, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -801,7 +801,7 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(msgPayForBlob, blob.Height, blob.Block.Time, position)
+	dm, err := Message(msgPayForBlob, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -865,7 +865,7 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 4
 
-	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -932,7 +932,7 @@ func TestDecodeMsg_SuccessOnMsgRegisterEvmAddress(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 4
 
-	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -982,7 +982,7 @@ func TestDecodeMsg_SuccessOnMsgSetWithdrawAddress(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 4
 
-	dm, err := Message(m, blob.Height, blob.Block.Time, position)
+	dm, err := Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -1050,7 +1050,7 @@ func TestDecodeMsg_MsgUnknown(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := Message(msgUnknown, blob.Height, blob.Block.Time, position)
+	dm, err := Message(msgUnknown, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
 
 	msgExpected := storage.Message{
 		Id:        0,

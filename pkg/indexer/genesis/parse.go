@@ -78,7 +78,7 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 		}
 
 		for msgIndex, msg := range txDecoded.GetMsgs() {
-			decoded, err := decode.Message(msg, block.Height, block.Time, msgIndex)
+			decoded, err := decode.Message(msg, block.Height, block.Time, msgIndex, storageTypes.StatusSuccess)
 			if err != nil {
 				return data, errors.Wrap(err, "decode genesis message")
 			}
