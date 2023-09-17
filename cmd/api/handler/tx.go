@@ -7,7 +7,8 @@ import (
 
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	_ "github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
 )
 
@@ -88,17 +89,21 @@ func (handler *TxHandler) List(c echo.Context) error {
 	req.SetDefault()
 
 	fltrs := storage.TxFilter{
-		Limit:  int(req.Limit),
-		Offset: int(req.Offset),
-		Sort:   pgSort(req.Sort),
-		Status: req.Status,
-		Height: req.Height,
+		Limit:        int(req.Limit),
+		Offset:       int(req.Offset),
+		Sort:         pgSort(req.Sort),
+		Status:       req.Status,
+		Height:       req.Height,
+		MessageTypes: types.NewMsgTypeBitMask(),
 	}
 	if req.From > 0 {
 		fltrs.TimeFrom = time.Unix(req.From, 0).UTC()
 	}
 	if req.To > 0 {
 		fltrs.TimeTo = time.Unix(req.To, 0).UTC()
+	}
+	for i := range req.MsgType {
+		fltrs.MessageTypes.SetBit(storageTypes.MsgType(req.MsgType[i]))
 	}
 
 	txs, err := handler.tx.Filter(c.Request().Context(), fltrs)
