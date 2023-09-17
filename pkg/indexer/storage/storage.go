@@ -103,7 +103,7 @@ func (module *Module) updateState(block *storage.Block, totalAccounts uint64, st
 	state.LastTime = block.Time
 	state.TotalTx += block.Stats.TxCount
 	state.TotalAccounts += totalAccounts
-	state.TotalBlobsSize = block.Stats.BlobsSize
+	state.TotalBlobsSize += block.Stats.BlobsSize
 	state.TotalFee = state.TotalFee.Add(block.Stats.Fee)
 	state.TotalSupply = state.TotalSupply.Add(block.Stats.SupplyChange)
 	state.ChainId = block.ChainId
