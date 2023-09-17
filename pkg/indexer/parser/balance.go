@@ -8,6 +8,8 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+const defaultCurrency = "utia"
+
 func parseCoinSpent(data map[string]any, height pkgTypes.Level) (*storage.Address, error) {
 	coinSpent, err := decode.NewCoinSpent(data)
 	if err != nil {
@@ -21,16 +23,24 @@ func parseCoinSpent(data map[string]any, height pkgTypes.Level) (*storage.Addres
 	if err != nil {
 		return nil, errors.Wrapf(err, "decode spender: %s", coinSpent.Spender)
 	}
-	return &storage.Address{
+
+	address := &storage.Address{
 		Address:    coinSpent.Spender,
 		Hash:       hash,
 		Height:     height,
 		LastHeight: height,
 		Balance: storage.Balance{
-			Currency: coinSpent.Amount.Denom,
-			Total:    decimal.NewFromBigInt(coinSpent.Amount.Amount.Neg().BigInt(), 0),
+			Currency: defaultCurrency,
+			Total:    decimal.Zero,
 		},
-	}, nil
+	}
+
+	if coinSpent.Amount != nil {
+		address.Balance.Currency = coinSpent.Amount.Denom
+		address.Balance.Total = decimal.NewFromBigInt(coinSpent.Amount.Amount.Neg().BigInt(), 0)
+	}
+
+	return address, nil
 }
 
 func parseCoinReceived(data map[string]any, height pkgTypes.Level) (*storage.Address, error) {
@@ -47,14 +57,21 @@ func parseCoinReceived(data map[string]any, height pkgTypes.Level) (*storage.Add
 	if err != nil {
 		return nil, errors.Wrapf(err, "decode receiver: %s", coinReceived.Receiver)
 	}
-	return &storage.Address{
+	address := &storage.Address{
 		Address:    coinReceived.Receiver,
 		Hash:       hash,
 		Height:     height,
 		LastHeight: height,
 		Balance: storage.Balance{
-			Currency: coinReceived.Amount.Denom,
-			Total:    decimal.NewFromBigInt(coinReceived.Amount.Amount.BigInt(), 0),
+			Currency: defaultCurrency,
+			Total:    decimal.Zero,
 		},
-	}, nil
+	}
+
+	if coinReceived.Amount != nil {
+		address.Balance.Currency = coinReceived.Amount.Denom
+		address.Balance.Total = decimal.NewFromBigInt(coinReceived.Amount.Amount.Neg().BigInt(), 0)
+	}
+
+	return address, nil
 }

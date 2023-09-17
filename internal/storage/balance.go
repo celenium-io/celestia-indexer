@@ -22,3 +22,7 @@ type Balance struct {
 func (Balance) TableName() string {
 	return "balance"
 }
+
+func (b Balance) IsEmpty() bool {
+	return b.Currency == "" && b.Total.IsZero()
+}
