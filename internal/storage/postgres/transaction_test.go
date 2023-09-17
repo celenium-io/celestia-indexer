@@ -173,8 +173,9 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 		}
 	}
 
-	err = tx.SaveAddresses(ctx, addresses...)
+	count1, err := tx.SaveAddresses(ctx, addresses...)
 	s.Require().NoError(err)
+	s.Require().EqualValues(5, count1)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
@@ -185,8 +186,9 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx2.SaveAddresses(ctx, &replyAddress)
+	count2, err := tx2.SaveAddresses(ctx, &replyAddress)
 	s.Require().NoError(err)
+	s.Require().EqualValues(0, count2)
 
 	s.Require().NoError(tx2.Flush(ctx))
 	s.Require().NoError(tx2.Close(ctx))

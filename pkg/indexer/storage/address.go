@@ -11,9 +11,9 @@ func (module *Module) saveAddresses(
 	ctx context.Context,
 	tx postgres.Transaction,
 	addresses map[string]*storage.Address,
-) (map[string]uint64, error) {
+) (map[string]uint64, uint64, error) {
 	if len(addresses) == 0 {
-		return nil, nil
+		return nil, 0, nil
 	}
 
 	data := make([]*storage.Address, 0, len(addresses))
@@ -21,8 +21,9 @@ func (module *Module) saveAddresses(
 		data = append(data, addresses[key])
 	}
 
-	if err := tx.SaveAddresses(ctx, data...); err != nil {
-		return nil, err
+	totalAccounts, err := tx.SaveAddresses(ctx, data...)
+	if err != nil {
+		return nil, 0, err
 	}
 
 	addToId := make(map[string]uint64)
@@ -32,8 +33,8 @@ func (module *Module) saveAddresses(
 		data[i].Balance.Id = data[i].Id
 		balances = append(balances, data[i].Balance)
 	}
-	err := tx.SaveBalances(ctx, balances...)
-	return addToId, err
+	err = tx.SaveBalances(ctx, balances...)
+	return addToId, totalAccounts, err
 }
 
 func (module *Module) saveSigners(

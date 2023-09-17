@@ -58,19 +58,41 @@ func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...*models.
 	return err
 }
 
-func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...*models.Address) error {
+type addedAddress struct {
+	bun.BaseModel `bun:"address"`
+	*models.Address
+
+	Xmax uint64 `bun:"xmax"`
+}
+
+func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...*models.Address) (uint64, error) {
 	if len(addresses) == 0 {
-		return nil
+		return 0, nil
 	}
 
-	_, err := tx.Tx().NewInsert().Model(&addresses).
+	addr := make([]addedAddress, len(addresses))
+	for i := range addresses {
+		addr[i].Address = addresses[i]
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&addr).
 		Column("address", "height", "hash").
 		On("CONFLICT ON CONSTRAINT address_idx DO UPDATE").
 		Set("hash = EXCLUDED.hash"). // update hash field which always the same only for returning id
-		Returning("id").
+		Returning("xmax, id").
 		Exec(ctx)
+	if err != nil {
+		return 0, err
+	}
 
-	return err
+	var count uint64
+	for i := range addr {
+		if addr[i].Xmax == 0 {
+			count++
+		}
+	}
+
+	return count, err
 }
 
 func (tx Transaction) SaveBalances(ctx context.Context, balances ...models.Balance) error {

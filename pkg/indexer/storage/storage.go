@@ -175,7 +175,7 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 		}
 	}
 
-	addrToId, err := module.saveAddresses(ctx, tx, addresses)
+	addrToId, totalAccounts, err := module.saveAddresses(ctx, tx, addresses)
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
@@ -198,7 +198,7 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 		return tx.HandleError(ctx, err)
 	}
 
-	module.updateState(block, 0, &state) // TODO: pass total accounts
+	module.updateState(block, totalAccounts, &state)
 	if err := tx.Update(ctx, &state); err != nil {
 		return tx.HandleError(ctx, err)
 	}

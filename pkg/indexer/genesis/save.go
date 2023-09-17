@@ -78,13 +78,15 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		}
 	}
 
+	var totalAccounts uint64
 	if len(data.addresses) > 0 {
 		entities := make([]*storage.Address, 0, len(data.addresses))
 		for key := range data.addresses {
 			entities = append(entities, data.addresses[key])
 		}
 
-		if err := tx.SaveAddresses(ctx, entities...); err != nil {
+		totalAccounts, err = tx.SaveAddresses(ctx, entities...)
+		if err != nil {
 			return tx.HandleError(ctx, err)
 		}
 
@@ -161,6 +163,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		TotalSupply:    data.block.Stats.SupplyChange,
 		TotalFee:       data.block.Stats.Fee,
 		TotalBlobsSize: data.block.Stats.BlobsSize,
+		TotalAccounts:  totalAccounts,
 	}); err != nil {
 		return tx.HandleError(ctx, err)
 	}
