@@ -2,6 +2,9 @@ package parser
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
@@ -10,8 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/tendermint/tendermint/libs/bytes"
 	tmTypes "github.com/tendermint/tendermint/types"
-	"testing"
-	"time"
 )
 
 func createModules(t *testing.T) (modules.BaseModule, string, Module) {
@@ -48,6 +49,7 @@ func getExpectedBlock() storage.Block {
 		ChainId:            "celestia-explorer-test",
 		Txs:                make([]storage.Tx, 0),
 		Events:             make([]storage.Event, 0),
+		Addresses:          make([]storage.Address, 0),
 		Stats: storage.BlockStats{
 			Id:          0,
 			Height:      100,

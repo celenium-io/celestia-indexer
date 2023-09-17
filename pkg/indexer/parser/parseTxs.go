@@ -59,9 +59,10 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (stor
 		}
 
 		t.Signers = append(t.Signers, storage.Address{
-			Address: signer,
-			Height:  t.Height,
-			Hash:    hash,
+			Address:    signer,
+			Height:     t.Height,
+			LastHeight: t.Height,
+			Hash:       hash,
 			Balance: storage.Balance{
 				Total: decimal.Zero,
 			},

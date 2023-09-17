@@ -68,10 +68,11 @@ func (s *SearchTestSuite) TestSearchAddress() {
 	s.address.EXPECT().
 		ByHash(gomock.Any(), testHashAddress).
 		Return(storage.Address{
-			Id:      1,
-			Hash:    testHashAddress,
-			Address: testAddress,
-			Height:  100,
+			Id:         1,
+			Hash:       testHashAddress,
+			Address:    testAddress,
+			Height:     100,
+			LastHeight: 100,
 		}, nil)
 
 	s.Require().NoError(s.handler.Search(c))
@@ -83,6 +84,7 @@ func (s *SearchTestSuite) TestSearchAddress() {
 	s.Require().Equal("address", response.Type)
 	s.Require().EqualValues(1, response.Result.Id)
 	s.Require().EqualValues(100, response.Result.Height)
+	s.Require().EqualValues(100, response.Result.LastHeight)
 	s.Require().Equal(testAddress, response.Result.Hash)
 }
 

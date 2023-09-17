@@ -1,4 +1,6 @@
 - id: 1
   total: 123
+  currency: utia
 - id: 2
   total: 321
+  currency: utia

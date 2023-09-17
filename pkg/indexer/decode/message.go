@@ -1,8 +1,9 @@
 package decode
 
 import (
-	"github.com/rs/zerolog/log"
 	"time"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/celestiaorg/celestia-app/pkg/namespace"
 	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
@@ -93,9 +94,10 @@ func createAddresses(data addressesData, level types.Level) ([]storage.AddressWi
 		addresses[i] = storage.AddressWithType{
 			Type: d.t,
 			Address: storage.Address{
-				Hash:    hash,
-				Height:  level,
-				Address: d.address,
+				Hash:       hash,
+				Height:     level,
+				LastHeight: level,
+				Address:    d.address,
 				Balance: storage.Balance{
 					Total: decimal.Zero,
 				},

@@ -20,10 +20,11 @@ type IAddress interface {
 type Address struct {
 	bun.BaseModel `bun:"address" comment:"Table with celestia addresses."`
 
-	Id      uint64      `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
-	Height  types.Level `bun:"height"                      comment:"Block number of the first address occurrence."`
-	Hash    []byte      `bun:"hash"                        comment:"Address hash."`
-	Address string      `bun:"address,unique:address_idx"  comment:"Human-readable ddress."`
+	Id         uint64      `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
+	Height     types.Level `bun:"height"                      comment:"Block number of the first address occurrence."`
+	LastHeight types.Level `bun:"last_height"                 comment:"Block number of the last address occurence "`
+	Hash       []byte      `bun:"hash"                        comment:"Address hash."`
+	Address    string      `bun:"address,unique:address_idx"  comment:"Human-readable ddress."`
 
 	Balance Balance `bun:"rel:has-one,join:id=id"`
 }

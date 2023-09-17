@@ -28,8 +28,7 @@ definitions:
     description: Celestia address information
     properties:
       balance:
-        example: "10000000000"
-        type: string
+        $ref: '#/definitions/responses.Balance'
       first_height:
         example: 100
         type: integer
@@ -39,6 +38,19 @@ definitions:
       id:
         example: 321
         type: integer
+      last_height:
+        example: 100
+        type: integer
+    type: object
+  responses.Balance:
+    description: Balance of address information
+    properties:
+      currency:
+        example: utia
+        type: string
+      value:
+        example: "10000000000"
+        type: string
     type: object
   responses.Blob:
     properties:

@@ -64,10 +64,11 @@ func (s *AddressTestSuite) TestGet() {
 	s.address.EXPECT().
 		ByHash(gomock.Any(), testHashAddress).
 		Return(storage.Address{
-			Id:      1,
-			Hash:    testHashAddress,
-			Address: testAddress,
-			Height:  100,
+			Id:         1,
+			Hash:       testHashAddress,
+			Address:    testAddress,
+			Height:     100,
+			LastHeight: 100,
 		}, nil)
 
 	s.Require().NoError(s.handler.Get(c))
@@ -78,6 +79,7 @@ func (s *AddressTestSuite) TestGet() {
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, address.Id)
 	s.Require().EqualValues(100, address.Height)
+	s.Require().EqualValues(100, address.LastHeight)
 	s.Require().Equal(testAddress, address.Hash)
 }
 
@@ -125,10 +127,11 @@ func (s *AddressTestSuite) TestList() {
 		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return([]*storage.Address{
 			{
-				Id:      1,
-				Hash:    testHashAddress,
-				Address: testAddress,
-				Height:  100,
+				Id:         1,
+				Hash:       testHashAddress,
+				Address:    testAddress,
+				Height:     100,
+				LastHeight: 100,
 			},
 		}, nil)
 
@@ -141,6 +144,7 @@ func (s *AddressTestSuite) TestList() {
 	s.Require().Len(address, 1)
 	s.Require().EqualValues(1, address[0].Id)
 	s.Require().EqualValues(100, address[0].Height)
+	s.Require().EqualValues(100, address[0].LastHeight)
 	s.Require().Equal(testAddress, address[0].Hash)
 }
 
@@ -163,10 +167,11 @@ func (s *AddressTestSuite) TestListHeight() {
 	s.address.EXPECT().
 		ByHash(gomock.Any(), testHashAddress).
 		Return(storage.Address{
-			Id:      1,
-			Hash:    testHashAddress,
-			Address: testAddress,
-			Height:  100,
+			Id:         1,
+			Hash:       testHashAddress,
+			Address:    testAddress,
+			Height:     100,
+			LastHeight: 100,
 		}, nil)
 
 	s.txs.EXPECT().

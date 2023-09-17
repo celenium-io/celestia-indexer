@@ -59,24 +59,30 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 		},
 	}
 
+	allEvents := make([]storage.Event, 0)
+
+	block.Events = parseEvents(b, b.ResultBlockResults.BeginBlockEvents)
+	allEvents = append(allEvents, block.Events...)
+
 	for _, tx := range txs {
 		block.Stats.Fee = block.Stats.Fee.Add(tx.Fee)
 		block.MessageTypes.Set(tx.MessageTypes.Bits)
 		block.Stats.BlobsSize += tx.BlobsSize
+		allEvents = append(allEvents, tx.Events...)
 	}
-
-	block.Events = parseEvents(b, b.ResultBlockResults.BeginBlockEvents)
-
-	var bbeResult beginBlockEventsResult
-	if err := bbeResult.Fill(block.Events); err != nil {
-		return err
-	}
-
-	block.Stats.InflationRate = bbeResult.InflationRate
-	block.Stats.SupplyChange = bbeResult.SupplyChange
 
 	endEvents := parseEvents(b, b.ResultBlockResults.EndBlockEvents)
 	block.Events = append(block.Events, endEvents...)
+	allEvents = append(allEvents, endEvents...)
+
+	var eventsResult eventsResult
+	if err := eventsResult.Fill(allEvents); err != nil {
+		return err
+	}
+
+	block.Stats.InflationRate = eventsResult.InflationRate
+	block.Stats.SupplyChange = eventsResult.SupplyChange
+	block.Addresses = eventsResult.Addresses
 
 	p.Log.Info().
 		Uint64("height", uint64(block.Height)).

@@ -14,8 +14,9 @@ type IBalance interface {
 type Balance struct {
 	bun.BaseModel `bun:"balance" comment:"Table with account balances."`
 
-	Id    uint64          `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
-	Total decimal.Decimal `bun:"total,type:numeric"          comment:"Total account balance"`
+	Id       uint64          `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
+	Currency string          `bun:"currency,pk,notnull"         comment:"Balance currency"`
+	Total    decimal.Decimal `bun:"total,type:numeric"          comment:"Total account balance"`
 }
 
 func (Balance) TableName() string {

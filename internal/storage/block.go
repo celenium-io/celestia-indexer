@@ -45,7 +45,8 @@ type Block struct {
 	EvidenceHash       pkgTypes.Hex `bun:"evidence_hash"        comment:"Evidence hash"`
 	ProposerAddress    pkgTypes.Hex `bun:"proposer_address"     comment:"Proposer address"`
 
-	ChainId string `bun:"-"` // internal field for filling state
+	ChainId   string    `bun:"-"` // internal field for filling state
+	Addresses []Address `bun:"-"` // internal field for balance passing
 
 	Txs    []Tx       `bun:"rel:has-many"`
 	Events []Event    `bun:"rel:has-many"`

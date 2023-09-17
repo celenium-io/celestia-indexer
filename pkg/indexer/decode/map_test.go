@@ -1,4 +1,4 @@
-package parser
+package decode
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_getDecimalFromMap(t *testing.T) {
+func TestDecimalFromMap(t *testing.T) {
 	tests := []struct {
 		name string
 		m    map[string]any
@@ -15,42 +15,51 @@ func Test_getDecimalFromMap(t *testing.T) {
 	}{
 		{
 			name: "test 1",
-			m:    map[string]any{},
-			key:  "any_key",
-			want: "0",
+			m: map[string]any{
+				"amount": "123utia",
+			},
+			key:  "amount",
+			want: "123",
 		}, {
 			name: "test 2",
 			m: map[string]any{
-				"any_key": "qwertyui",
+				"amount": "123utia",
 			},
-			key:  "any_key",
+			key:  "invalid",
 			want: "0",
 		}, {
 			name: "test 3",
 			m: map[string]any{
-				"any_key": 123123,
+				"amount": "123uta",
 			},
-			key:  "any_key",
-			want: "0",
+			key:  "amount",
+			want: "123",
 		}, {
 			name: "test 4",
 			m: map[string]any{
-				"any_key": "123123",
+				"amount": 123,
 			},
-			key:  "any_key",
-			want: "123123",
+			key:  "amount",
+			want: "0",
 		}, {
 			name: "test 5",
 			m: map[string]any{
-				"any_key": "123123utia",
+				"amount": "123test",
 			},
-			key:  "any_key",
-			want: "123123",
+			key:  "amount",
+			want: "123",
+		}, {
+			name: "test 6",
+			m: map[string]any{
+				"amount": "1-23test",
+			},
+			key:  "amount",
+			want: "0",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := getDecimalFromMap(tt.m, tt.key)
+			got := DecimalFromMap(tt.m, tt.key)
 			require.Equal(t, tt.want, got.String())
 		})
 	}

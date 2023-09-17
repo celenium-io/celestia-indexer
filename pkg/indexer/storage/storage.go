@@ -142,6 +142,15 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 		addresses  = make(map[string]*storage.Address, 0)
 	)
 
+	for i := range block.Addresses {
+		key := block.Addresses[i].String()
+		if addr, ok := addresses[key]; !ok {
+			addresses[key] = &block.Addresses[i]
+		} else {
+			addr.Balance.Total = addr.Balance.Total.Add(block.Addresses[i].Balance.Total)
+		}
+	}
+
 	for i := range block.Events {
 		events[i] = &block.Events[i]
 	}
@@ -167,10 +176,8 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 
 		for j := range block.Txs[i].Signers {
 			key := block.Txs[i].Signers[j].String()
-			if addr, ok := addresses[key]; !ok {
+			if _, ok := addresses[key]; !ok {
 				addresses[key] = &block.Txs[i].Signers[j]
-			} else {
-				addr.Balance.Total = addr.Balance.Total.Add(block.Txs[i].Signers[j].Balance.Total)
 			}
 		}
 	}

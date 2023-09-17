@@ -183,7 +183,7 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 		return tx.HandleError(ctx, err)
 	}
 
-	if err := module.rollbackBalances(ctx, events, addresses); err != nil {
+	if err := module.rollbackBalances(ctx, tx, events, addresses); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
