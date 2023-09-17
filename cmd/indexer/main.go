@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
-	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
 
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer"
 
