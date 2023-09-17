@@ -9,11 +9,18 @@ import (
 	"github.com/uptrace/bun"
 )
 
+type AddressListFilter struct {
+	Limit  int
+	Offset int
+	Sort   storage.SortOrder
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IAddress interface {
 	storage.Table[*Address]
 
 	ByHash(ctx context.Context, hash []byte) (Address, error)
+	ListWithBalance(ctx context.Context, fltrs AddressListFilter) ([]Address, error)
 }
 
 // Address -

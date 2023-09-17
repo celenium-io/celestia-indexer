@@ -28,3 +28,14 @@ func (a *Address) ByHash(ctx context.Context, hash []byte) (address storage.Addr
 		Scan(ctx)
 	return
 }
+
+func (a *Address) ListWithBalance(ctx context.Context, fltrs storage.AddressListFilter) (result []storage.Address, err error) {
+	query := a.DB().NewSelect().Model(&result).
+		Offset(fltrs.Offset).
+		Relation("Balance")
+
+	query = addressListFilter(query, fltrs)
+
+	err = query.Scan(ctx)
+	return
+}

@@ -65,29 +65,35 @@ func (handler *AddressHandler) Get(c echo.Context) error {
 //	@Description	List address info
 //	@Tags			address
 //	@ID				list-address
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
-//	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
+//	@Param			limit		query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset		query	integer	false	"Offset"						mininum(1)
+//	@Param			sort		query	string	false	"Sort order"					Enums(asc, desc)
 //	@Produce		json
 //	@Success		200	{array}		responses.Address
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/address [get]
 func (handler *AddressHandler) List(c echo.Context) error {
-	req, err := bindAndValidate[limitOffsetPagination](c)
+	req, err := bindAndValidate[addressListRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
 	req.SetDefault()
 
-	address, err := handler.address.List(c.Request().Context(), req.Limit, req.Offset, pgSort(req.Sort))
+	fltrs := storage.AddressListFilter{
+		Limit:  int(req.Limit),
+		Offset: int(req.Offset),
+		Sort:   pgSort(req.Sort),
+	}
+
+	address, err := handler.address.ListWithBalance(c.Request().Context(), fltrs)
 	if err := handleError(c, err, handler.address); err != nil {
 		return err
 	}
 
 	response := make([]responses.Address, len(address))
 	for i := range address {
-		response[i] = responses.NewAddress(*address[i])
+		response[i] = responses.NewAddress(address[i])
 	}
 
 	return returnArray(c, response)

@@ -14,6 +14,7 @@ import (
 	"github.com/dipdup-io/celestia-indexer/internal/storage/mock"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -124,14 +125,22 @@ func (s *AddressTestSuite) TestList() {
 	c.SetPath("/address")
 
 	s.address.EXPECT().
-		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return([]*storage.Address{
+		ListWithBalance(gomock.Any(), storage.AddressListFilter{
+			Limit:  10,
+			Offset: 0,
+			Sort:   pgSort("asc"),
+		}).
+		Return([]storage.Address{
 			{
 				Id:         1,
 				Hash:       testHashAddress,
 				Address:    testAddress,
 				Height:     100,
 				LastHeight: 100,
+				Balance: storage.Balance{
+					Currency: "utia",
+					Total:    decimal.RequireFromString("100"),
+				},
 			},
 		}, nil)
 
@@ -146,6 +155,8 @@ func (s *AddressTestSuite) TestList() {
 	s.Require().EqualValues(100, address[0].Height)
 	s.Require().EqualValues(100, address[0].LastHeight)
 	s.Require().Equal(testAddress, address[0].Hash)
+	s.Require().Equal("100", address[0].Balance.Value)
+	s.Require().Equal("utia", address[0].Balance.Currency)
 }
 
 func (s *AddressTestSuite) TestListHeight() {

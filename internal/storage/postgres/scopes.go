@@ -66,3 +66,9 @@ func txFilter(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
 	}
 	return query
 }
+
+func addressListFilter(query *bun.SelectQuery, fltrs storage.AddressListFilter) *bun.SelectQuery {
+	query = limitScope(query, fltrs.Limit)
+	query = sortScope(query, "id", fltrs.Sort)
+	return query
+}

@@ -27,6 +27,26 @@ func (p *limitOffsetPagination) SetDefault() {
 	}
 }
 
+type addressListRequest struct {
+	Limit    uint64 `query:"limit"    validate:"omitempty,min=1,max=100"`
+	Offset   uint64 `query:"offset"   validate:"omitempty,min=0"`
+	Sort     string `query:"sort"     validate:"omitempty,oneof=asc desc"`
+	Balances *bool  `query:"balances" validate:"omitempty"`
+}
+
+func (p *addressListRequest) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+	if p.Sort == "" {
+		p.Sort = asc
+	}
+	if p.Balances == nil {
+		b := true
+		p.Balances = &b
+	}
+}
+
 func pgSort(sort string) storage.SortOrder {
 	switch sort {
 	case asc:

@@ -273,6 +273,45 @@ func (c *IAddressListCall) DoAndReturn(f func(context.Context, uint64, uint64, s
 	return c
 }
 
+// ListWithBalance mocks base method.
+func (m *MockIAddress) ListWithBalance(ctx context.Context, fltrs storage.AddressListFilter) ([]storage.Address, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListWithBalance", ctx, fltrs)
+	ret0, _ := ret[0].([]storage.Address)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListWithBalance indicates an expected call of ListWithBalance.
+func (mr *MockIAddressMockRecorder) ListWithBalance(ctx, fltrs any) *IAddressListWithBalanceCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListWithBalance", reflect.TypeOf((*MockIAddress)(nil).ListWithBalance), ctx, fltrs)
+	return &IAddressListWithBalanceCall{Call: call}
+}
+
+// IAddressListWithBalanceCall wrap *gomock.Call
+type IAddressListWithBalanceCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IAddressListWithBalanceCall) Return(arg0 []storage.Address, arg1 error) *IAddressListWithBalanceCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IAddressListWithBalanceCall) Do(f func(context.Context, storage.AddressListFilter) ([]storage.Address, error)) *IAddressListWithBalanceCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IAddressListWithBalanceCall) DoAndReturn(f func(context.Context, storage.AddressListFilter) ([]storage.Address, error)) *IAddressListWithBalanceCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Save mocks base method.
 func (m_2 *MockIAddress) Save(ctx context.Context, m *storage.Address) error {
 	m_2.ctrl.T.Helper()
