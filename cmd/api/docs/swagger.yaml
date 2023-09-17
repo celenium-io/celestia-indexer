@@ -354,6 +354,10 @@ definitions:
         example: "312"
         format: string
         type: string
+      total_supply:
+        example: "312"
+        format: string
+        type: string
       total_tx:
         example: 23456
         format: int64

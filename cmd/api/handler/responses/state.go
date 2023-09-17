@@ -17,6 +17,7 @@ type State struct {
 	TotalAccounts  uint64    `example:"43"                                                               format:"int64"     json:"total_accounts"   swaggertype:"integer"`
 	TotalFee       string    `example:"312"                                                              format:"string"    json:"total_fee"        swaggertype:"string"`
 	TotalBlobsSize uint64    `example:"56789"                                                            format:"int64"     json:"total_blobs_size" swaggertype:"integer"`
+	TotalSupply    string    `example:"312"                                                              format:"string"    json:"total_supply"     swaggertype:"string"`
 }
 
 func NewState(state storage.State) State {
@@ -30,5 +31,6 @@ func NewState(state storage.State) State {
 		TotalAccounts:  state.TotalAccounts,
 		TotalFee:       state.TotalFee.String(),
 		TotalBlobsSize: state.TotalBlobsSize,
+		TotalSupply:    state.TotalSupply.String(),
 	}
 }

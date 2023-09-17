@@ -1865,6 +1865,11 @@ const docTemplate = `{
                     "format": "string",
                     "example": "312"
                 },
+                "total_supply": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "312"
+                },
                 "total_tx": {
                     "type": "integer",
                     "format": "int64",
