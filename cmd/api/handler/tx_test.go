@@ -274,7 +274,14 @@ func (s *TxTestSuite) TestListHeight() {
 	c.SetPath("/tx")
 
 	s.tx.EXPECT().
-		Filter(gomock.Any(), gomock.Any()).
+		Filter(gomock.Any(), storage.TxFilter{
+			Limit:        2,
+			Offset:       0,
+			Sort:         pgSort("desc"),
+			Status:       []string{"success"},
+			Height:       1000,
+			MessageTypes: types.NewMsgTypeBitMask(types.MsgSend),
+		}).
 		Return([]storage.Tx{
 			testTx,
 		}, nil)
