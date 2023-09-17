@@ -139,7 +139,7 @@ func (handler SearchHandler) searchNamespaceById(c echo.Context, search string) 
 }
 
 func (handler SearchHandler) searchNamespaceByBase64(c echo.Context, search string) error {
-	data, err := base64.URLEncoding.DecodeString(search)
+	data, err := base64.StdEncoding.DecodeString(search)
 	if err != nil {
 		return badRequestError(c, err)
 	}

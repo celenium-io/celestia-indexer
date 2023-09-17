@@ -87,7 +87,7 @@ func (handler *NamespaceHandler) GetByHash(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	hash, err := base64.URLEncoding.DecodeString(req.Hash)
+	hash, err := base64.StdEncoding.DecodeString(req.Hash)
 	if err != nil {
 		return badRequestError(c, err)
 	}

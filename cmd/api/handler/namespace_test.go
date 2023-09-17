@@ -196,12 +196,12 @@ func (s *NamespaceTestSuite) TestGetBlob() {
 		data := make([]byte, 88)
 		_, err := rand.Read(data)
 		s.Require().NoError(err)
-		result[i].Data = base64.URLEncoding.EncodeToString(data)
+		result[i].Data = base64.StdEncoding.EncodeToString(data)
 
 		commitment := make([]byte, 32)
 		_, err = rand.Read(commitment)
 		s.Require().NoError(err)
-		result[i].Commitment = base64.URLEncoding.EncodeToString(commitment)
+		result[i].Commitment = base64.StdEncoding.EncodeToString(commitment)
 
 		result[i].ShareVersion = 0
 	}

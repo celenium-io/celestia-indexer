@@ -1,7 +1,6 @@
 package responses
 
 import (
-	"encoding/base64"
 	"encoding/hex"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
@@ -22,7 +21,7 @@ func NewNamespace(ns storage.Namespace) Namespace {
 		Size:        ns.Size,
 		Version:     ns.Version,
 		NamespaceID: hex.EncodeToString(ns.NamespaceID),
-		Hash:        base64.URLEncoding.EncodeToString(append([]byte{ns.Version}, ns.NamespaceID...)),
+		Hash:        ns.Hash(),
 		Reserved:    ns.Reserved,
 	}
 }

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
@@ -40,4 +41,8 @@ func (Namespace) TableName() string {
 
 func (ns Namespace) String() string {
 	return fmt.Sprintf("%x%x", ns.Version, ns.NamespaceID)
+}
+
+func (ns Namespace) Hash() string {
+	return base64.StdEncoding.EncodeToString(append([]byte{ns.Version}, ns.NamespaceID...))
 }

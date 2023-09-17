@@ -112,7 +112,7 @@ func newNamespaceSize(data map[string]any) (namespaceSize, error) {
 		if !ok {
 			return nil, errors.Wrapf(errInvalidPayForBlob, "%##v", data)
 		}
-		data, err := base64.URLEncoding.DecodeString(nsString)
+		data, err := base64.StdEncoding.DecodeString(nsString)
 		if err != nil {
 			return nil, errors.Wrap(err, nsString)
 		}
