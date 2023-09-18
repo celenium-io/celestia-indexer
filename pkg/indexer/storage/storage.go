@@ -162,9 +162,12 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 
 			for k := range block.Txs[i].Messages[j].Namespace {
 				key := block.Txs[i].Messages[j].Namespace[k].String()
-				if _, ok := namespaces[key]; !ok {
+				if ns, ok := namespaces[key]; !ok {
 					block.Txs[i].Messages[j].Namespace[k].PfbCount = 1
 					namespaces[key] = &block.Txs[i].Messages[j].Namespace[k]
+				} else { // TODO: unit test
+					ns.PfbCount += 1
+					ns.Size += block.Txs[i].Messages[j].Namespace[k].Size
 				}
 			}
 		}
