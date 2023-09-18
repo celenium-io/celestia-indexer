@@ -1765,6 +1765,11 @@
                     "format": "binary",
                     "example": "4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02"
                 },
+                "pfb_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 12
+                },
                 "reserved": {
                     "type": "boolean",
                     "example": true

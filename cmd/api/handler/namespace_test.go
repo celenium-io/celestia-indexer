@@ -26,6 +26,7 @@ var (
 		Version:     1,
 		NamespaceID: []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7},
 		Size:        100,
+		PfbCount:    12,
 	}
 	testNamespaceId     = "00010203040506070809000102030405060708090001020304050607"
 	testNamespaceBase64 = "AQABAgMEBQYHCAkAAQIDBAUGBwgJAAECAwQFBgc="
@@ -83,6 +84,7 @@ func (s *NamespaceTestSuite) TestGet() {
 	s.Require().EqualValues(1, namespace[0].ID)
 	s.Require().EqualValues(100, namespace[0].Size)
 	s.Require().EqualValues(1, namespace[0].Version)
+	s.Require().EqualValues(12, namespace[0].PfbCount)
 	s.Require().Equal(testNamespaceId, namespace[0].NamespaceID)
 	s.Require().Equal(testNamespaceBase64, namespace[0].Hash)
 }
@@ -126,6 +128,7 @@ func (s *NamespaceTestSuite) TestList() {
 	s.Require().EqualValues(1, namespaces[0].ID)
 	s.Require().EqualValues(100, namespaces[0].Size)
 	s.Require().EqualValues(1, namespaces[0].Version)
+	s.Require().EqualValues(12, namespaces[0].PfbCount)
 	s.Require().Equal(testNamespaceId, namespaces[0].NamespaceID)
 	s.Require().Equal(testNamespaceBase64, namespaces[0].Hash)
 }
@@ -151,6 +154,7 @@ func (s *NamespaceTestSuite) TestGetWithVersion() {
 	s.Require().EqualValues(1, namespace.ID)
 	s.Require().EqualValues(100, namespace.Size)
 	s.Require().EqualValues(1, namespace.Version)
+	s.Require().EqualValues(12, namespace.PfbCount)
 	s.Require().Equal(testNamespaceId, namespace.NamespaceID)
 	s.Require().Equal(testNamespaceBase64, namespace.Hash)
 }
@@ -176,6 +180,7 @@ func (s *NamespaceTestSuite) TestGetByHash() {
 	s.Require().EqualValues(1, namespace.ID)
 	s.Require().EqualValues(100, namespace.Size)
 	s.Require().EqualValues(1, namespace.Version)
+	s.Require().EqualValues(12, namespace.PfbCount)
 	s.Require().Equal(testNamespaceId, namespace.NamespaceID)
 	s.Require().Equal(testNamespaceBase64, namespace.Hash)
 }

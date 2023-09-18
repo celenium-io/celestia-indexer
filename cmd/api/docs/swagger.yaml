@@ -273,6 +273,10 @@ definitions:
         example: 4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02
         format: binary
         type: string
+      pfb_count:
+        example: 12
+        format: integer
+        type: integer
       reserved:
         example: true
         type: boolean
