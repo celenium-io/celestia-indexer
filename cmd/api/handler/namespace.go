@@ -267,7 +267,30 @@ func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
 		response[i] = msg
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return returnArray(c, response)
+}
+
+// GetActive godoc
+//
+//	@Summary		Get last used namespace
+//	@Description	Get last used namespace
+//	@Tags			namespace
+//	@ID				get-namespace-active
+//	@Produce		json
+//	@Success		200	{array}		responses.ActiveNamespace
+//	@Failure		500	{object}	Error
+//	@Router			/v1/namespace/active [get]
+func (handler *NamespaceHandler) GetActive(c echo.Context) error {
+	active, err := handler.namespace.Active(c.Request().Context(), 5)
+	if err := handleError(c, err, handler.namespace); err != nil {
+		return err
+	}
+
+	response := make([]responses.ActiveNamespace, len(active))
+	for i := range response {
+		response[i] = responses.NewActiveNamespace(active[i])
+	}
+	return returnArray(c, response)
 }
 
 // Count godoc

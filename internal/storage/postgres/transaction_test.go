@@ -536,7 +536,7 @@ func (s *StorageTestSuite) TestRollbackNamespaceMessages() {
 
 	deleted, err := tx.RollbackNamespaceMessages(ctx, 1000)
 	s.Require().NoError(err)
-	s.Require().Len(deleted, 1)
+	s.Require().Len(deleted, 3)
 	s.Require().EqualValues(2, deleted[0].NamespaceId)
 
 	ns, err := tx.Namespace(ctx, 2)

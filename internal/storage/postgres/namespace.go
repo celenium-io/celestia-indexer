@@ -68,3 +68,21 @@ func (n *Namespace) MessagesByHeight(ctx context.Context, height uint64, limit, 
 	err = query.Scan(ctx)
 	return
 }
+
+func (n *Namespace) Active(ctx context.Context, top int) (ns []storage.ActiveNamespace, err error) {
+	subQuery := n.DB().NewSelect().
+		ColumnExpr("namespace_id, max(msg_id) as msg_id, max(height) as height, max(time) as time").
+		Model((*storage.NamespaceMessage)(nil)).
+		Group("namespace_id").
+		Order("msg_id desc")
+	subQuery = limitScope(subQuery, top)
+
+	err = n.DB().NewSelect().
+		ColumnExpr("action.time as time, action.height as height, namespace.*").
+		TableExpr("(?) as action", subQuery).
+		Join("LEFT JOIN namespace").
+		JoinOn("namespace.id = action.namespace_id").
+		Order("msg_id desc").
+		Scan(ctx, &ns)
+	return
+}

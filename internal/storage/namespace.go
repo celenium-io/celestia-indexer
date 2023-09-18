@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"time"
 
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
@@ -19,6 +21,7 @@ type INamespace interface {
 	ByNamespaceIdAndVersion(ctx context.Context, namespaceId []byte, version byte) (Namespace, error)
 	Messages(ctx context.Context, id uint64, limit, offset int) ([]NamespaceMessage, error)
 	MessagesByHeight(ctx context.Context, height uint64, limit, offset int) ([]NamespaceMessage, error)
+	Active(ctx context.Context, top int) ([]ActiveNamespace, error)
 }
 
 // Namespace -
@@ -45,4 +48,10 @@ func (ns Namespace) String() string {
 
 func (ns Namespace) Hash() string {
 	return base64.StdEncoding.EncodeToString(append([]byte{ns.Version}, ns.NamespaceID...))
+}
+
+type ActiveNamespace struct {
+	Namespace
+	Height pkgTypes.Level `bun:"height"`
+	Time   time.Time      `bun:"time"`
 }

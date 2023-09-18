@@ -266,7 +266,7 @@ func (s *StorageTestSuite) TestNamespaceMessages() {
 
 	msgs, err := s.storage.Namespace.Messages(ctx, 2, 10, 0)
 	s.Require().NoError(err)
-	s.Require().Len(msgs, 1)
+	s.Require().Len(msgs, 2)
 
 	msg := msgs[0]
 	s.Require().EqualValues(3, msg.MsgId)
@@ -282,9 +282,9 @@ func (s *StorageTestSuite) TestNamespaceMessagesByHeight() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	msgs, err := s.storage.Namespace.MessagesByHeight(ctx, 1000, 10, 0)
+	msgs, err := s.storage.Namespace.MessagesByHeight(ctx, 1000, 2, 0)
 	s.Require().NoError(err)
-	s.Require().Len(msgs, 1)
+	s.Require().Len(msgs, 2)
 
 	msg := msgs[0]
 	s.Require().EqualValues(3, msg.MsgId)
@@ -295,6 +295,21 @@ func (s *StorageTestSuite) TestNamespaceMessagesByHeight() {
 	s.Require().Equal(types.MsgUnjail, msg.Message.Type)
 	s.Require().EqualValues(2, msg.Tx.Id)
 	s.Require().EqualValues(1255, msg.Namespace.Size)
+}
+
+func (s *StorageTestSuite) TestNamespaceActive() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	ns, err := s.storage.Namespace.Active(ctx, 2)
+	s.Require().NoError(err)
+	s.Require().Len(ns, 2)
+
+	namespace := ns[0]
+	s.Require().EqualValues(1000, namespace.Height)
+	s.Require().EqualValues(2, namespace.Id)
+	s.Require().NotNil(namespace.Namespace)
+	s.Require().EqualValues(1255, namespace.Namespace.Size)
 }
 
 func (s *StorageTestSuite) TestTxByHash() {
