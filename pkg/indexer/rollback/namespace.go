@@ -72,7 +72,8 @@ func (module *Module) rollbackNamespaces(
 		namespaces = append(namespaces, diffs[key])
 	}
 
-	return tx.SaveNamespaces(ctx, namespaces...)
+	_, err := tx.SaveNamespaces(ctx, namespaces...)
+	return err
 }
 
 type namespaceSize map[string]uint64

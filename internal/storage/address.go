@@ -29,9 +29,9 @@ type Address struct {
 
 	Id         uint64      `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
 	Height     types.Level `bun:"height"                      comment:"Block number of the first address occurrence."`
-	LastHeight types.Level `bun:"last_height"                 comment:"Block number of the last address occurence "`
+	LastHeight types.Level `bun:"last_height"                 comment:"Block number of the last address occurrence."`
 	Hash       []byte      `bun:"hash"                        comment:"Address hash."`
-	Address    string      `bun:"address,unique:address_idx"  comment:"Human-readable ddress."`
+	Address    string      `bun:"address,unique:address_idx"  comment:"Human-readable address."`
 
 	Balance Balance `bun:"rel:has-one,join:id=id"`
 }

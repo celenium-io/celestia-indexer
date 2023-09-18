@@ -11,9 +11,9 @@ func (module *Module) saveNamespaces(
 	ctx context.Context,
 	tx postgres.Transaction,
 	namespaces map[string]*storage.Namespace,
-) error {
+) (uint64, error) {
 	if len(namespaces) == 0 {
-		return nil
+		return 0, nil
 	}
 
 	data := make([]*storage.Namespace, 0, len(namespaces))
@@ -21,9 +21,10 @@ func (module *Module) saveNamespaces(
 		data = append(data, namespaces[key])
 	}
 
-	if err := tx.SaveNamespaces(ctx, data...); err != nil {
-		return tx.HandleError(ctx, err)
+	totalNamespaces, err := tx.SaveNamespaces(ctx, data...)
+	if err != nil {
+		return 0, tx.HandleError(ctx, err)
 	}
 
-	return nil
+	return totalNamespaces, nil
 }

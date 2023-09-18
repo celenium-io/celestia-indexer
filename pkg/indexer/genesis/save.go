@@ -99,13 +99,15 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		}
 	}
 
+	var totalNamespaces uint64
 	if len(namespaces) > 0 {
 		entities := make([]*storage.Namespace, 0, len(namespaces))
 		for key := range namespaces {
 			entities = append(entities, namespaces[key])
 		}
 
-		if err := tx.SaveNamespaces(ctx, entities...); err != nil {
+		totalNamespaces, err = tx.SaveNamespaces(ctx, entities...)
+		if err != nil {
 			return tx.HandleError(ctx, err)
 		}
 	}
@@ -154,16 +156,17 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 	}
 
 	if err := tx.Add(ctx, &storage.State{
-		Name:           module.indexerName,
-		LastHeight:     data.block.Height,
-		LastTime:       data.block.Time,
-		LastHash:       data.block.Hash,
-		ChainId:        data.block.ChainId,
-		TotalTx:        data.block.Stats.TxCount,
-		TotalSupply:    data.block.Stats.SupplyChange,
-		TotalFee:       data.block.Stats.Fee,
-		TotalBlobsSize: data.block.Stats.BlobsSize,
-		TotalAccounts:  totalAccounts,
+		Name:            module.indexerName,
+		LastHeight:      data.block.Height,
+		LastTime:        data.block.Time,
+		LastHash:        data.block.Hash,
+		ChainId:         data.block.ChainId,
+		TotalTx:         data.block.Stats.TxCount,
+		TotalSupply:     data.block.Stats.SupplyChange,
+		TotalFee:        data.block.Stats.Fee,
+		TotalBlobsSize:  data.block.Stats.BlobsSize,
+		TotalAccounts:   totalAccounts,
+		TotalNamespaces: totalNamespaces,
 	}); err != nil {
 		return tx.HandleError(ctx, err)
 	}

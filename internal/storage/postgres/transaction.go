@@ -43,19 +43,42 @@ func (tx Transaction) SaveTransactions(ctx context.Context, txs ...models.Tx) er
 	}
 }
 
-func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...*models.Namespace) error {
+type addedNamespace struct {
+	bun.BaseModel `bun:"namespace"`
+	*models.Namespace
+
+	Xmax uint64 `bun:"xmax"`
+}
+
+func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...*models.Namespace) (uint64, error) {
 	if len(namespaces) == 0 {
-		return nil
+		return 0, nil
 	}
 
-	_, err := tx.Tx().NewInsert().Model(&namespaces).
+	addedNamespaces := make([]addedNamespace, len(namespaces))
+	for i := range namespaces {
+		addedNamespaces[i].Namespace = namespaces[i]
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&addedNamespaces).
 		Column("version", "namespace_id", "pfb_count", "size", "first_height").
 		On("CONFLICT ON CONSTRAINT namespace_id_version_idx DO UPDATE").
-		Set("size = EXCLUDED.size + namespace.size").
-		Set("pfb_count = EXCLUDED.pfb_count + namespace.pfb_count").
+		Set("size = EXCLUDED.size + added_namespace.size").
+		Set("pfb_count = EXCLUDED.pfb_count + added_namespace.pfb_count").
 		Returning("id").
 		Exec(ctx)
-	return err
+	if err != nil {
+		return 0, err
+	}
+
+	var count uint64
+	for i := range addedNamespaces {
+		if addedNamespaces[i].Xmax == 0 {
+			count++
+		}
+	}
+
+	return count, err
 }
 
 type addedAddress struct {

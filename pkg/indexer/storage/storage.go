@@ -93,7 +93,7 @@ func (module *Module) Close() error {
 	return nil
 }
 
-func (module *Module) updateState(block *storage.Block, totalAccounts uint64, state *storage.State) {
+func (module *Module) updateState(block *storage.Block, totalAccounts uint64, totalNamespaces uint64, state *storage.State) {
 	if types.Level(block.Id) <= state.LastHeight {
 		return
 	}
@@ -103,6 +103,7 @@ func (module *Module) updateState(block *storage.Block, totalAccounts uint64, st
 	state.LastTime = block.Time
 	state.TotalTx += block.Stats.TxCount
 	state.TotalAccounts += totalAccounts
+	state.TotalNamespaces += totalNamespaces
 	state.TotalBlobsSize += block.Stats.BlobsSize
 	state.TotalFee = state.TotalFee.Add(block.Stats.Fee)
 	state.TotalSupply = state.TotalSupply.Add(block.Stats.SupplyChange)
@@ -201,7 +202,8 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 		}
 	}
 
-	if err := module.saveNamespaces(ctx, tx, namespaces); err != nil {
+	totalNamespaces, err := module.saveNamespaces(ctx, tx, namespaces)
+	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
@@ -209,7 +211,7 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 		return tx.HandleError(ctx, err)
 	}
 
-	module.updateState(block, totalAccounts, &state)
+	module.updateState(block, totalAccounts, totalNamespaces, &state)
 	if err := tx.Update(ctx, &state); err != nil {
 		return tx.HandleError(ctx, err)
 	}
