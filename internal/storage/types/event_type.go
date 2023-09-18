@@ -15,7 +15,9 @@ package types
 		commission,
 		liveness,
 		transfer,
+
 		celestia.blob.v1.EventPayForBlobs,
+
 		redelegate,
 		AttestationRequest,
 		withdraw_rewards,
@@ -26,11 +28,18 @@ package types
 		edit_validator,
 		unbond,
 		tx,
+
 		use_feegrant,
 		revoke_feegrant,
 		set_feegrant,
 		update_feegrant,
-		slash
+		slash,
+
+		proposal_vote,
+		proposal_deposit,
+		submit_proposal,
+
+		cosmos.authz.v1beta1.EventGrant
 	)
 */
 //go:generate go-enum --marshal --sql --values

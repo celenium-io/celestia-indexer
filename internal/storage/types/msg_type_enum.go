@@ -39,12 +39,20 @@ const (
 	MsgCreatePeriodicVestingAccount MsgType = "MsgCreatePeriodicVestingAccount"
 	// MsgPayForBlobs is a MsgType of type MsgPayForBlobs.
 	MsgPayForBlobs MsgType = "MsgPayForBlobs"
+	// MsgGrant is a MsgType of type MsgGrant.
+	MsgGrant MsgType = "MsgGrant"
 	// MsgGrantAllowance is a MsgType of type MsgGrantAllowance.
 	MsgGrantAllowance MsgType = "MsgGrantAllowance"
 	// MsgRegisterEVMAddress is a MsgType of type MsgRegisterEVMAddress.
 	MsgRegisterEVMAddress MsgType = "MsgRegisterEVMAddress"
 	// MsgSetWithdrawAddress is a MsgType of type MsgSetWithdrawAddress.
 	MsgSetWithdrawAddress MsgType = "MsgSetWithdrawAddress"
+	// MsgVote is a MsgType of type MsgVote.
+	MsgVote MsgType = "MsgVote"
+	// MsgVoteWeighted is a MsgType of type MsgVoteWeighted.
+	MsgVoteWeighted MsgType = "MsgVoteWeighted"
+	// MsgSubmitProposal is a MsgType of type MsgSubmitProposal.
+	MsgSubmitProposal MsgType = "MsgSubmitProposal"
 )
 
 var ErrInvalidMsgType = errors.New("not a valid MsgType")
@@ -65,9 +73,13 @@ func MsgTypeValues() []MsgType {
 		MsgCreateVestingAccount,
 		MsgCreatePeriodicVestingAccount,
 		MsgPayForBlobs,
+		MsgGrant,
 		MsgGrantAllowance,
 		MsgRegisterEVMAddress,
 		MsgSetWithdrawAddress,
+		MsgVote,
+		MsgVoteWeighted,
+		MsgSubmitProposal,
 	}
 }
 
@@ -97,9 +109,13 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgCreateVestingAccount":         MsgCreateVestingAccount,
 	"MsgCreatePeriodicVestingAccount": MsgCreatePeriodicVestingAccount,
 	"MsgPayForBlobs":                  MsgPayForBlobs,
+	"MsgGrant":                        MsgGrant,
 	"MsgGrantAllowance":               MsgGrantAllowance,
 	"MsgRegisterEVMAddress":           MsgRegisterEVMAddress,
 	"MsgSetWithdrawAddress":           MsgSetWithdrawAddress,
+	"MsgVote":                         MsgVote,
+	"MsgVoteWeighted":                 MsgVoteWeighted,
+	"MsgSubmitProposal":               MsgSubmitProposal,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.

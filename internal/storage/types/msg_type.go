@@ -16,9 +16,14 @@ package types
 		MsgCreateVestingAccount,
 		MsgCreatePeriodicVestingAccount,
 		MsgPayForBlobs,
+		MsgGrant,
 		MsgGrantAllowance,
 		MsgRegisterEVMAddress,
-		MsgSetWithdrawAddress
+		MsgSetWithdrawAddress,
+
+		MsgVote,
+		MsgVoteWeighted,
+		MsgSubmitProposal,
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix

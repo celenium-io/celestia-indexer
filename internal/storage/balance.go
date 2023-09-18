@@ -26,3 +26,9 @@ func (Balance) TableName() string {
 func (b Balance) IsEmpty() bool {
 	return b.Currency == "" && b.Total.IsZero()
 }
+
+func EmptyBalance() Balance {
+	return Balance{
+		Total: decimal.Zero,
+	}
+}

@@ -183,9 +183,13 @@ const docTemplate = `{
                             "MsgCreateVestingAccount",
                             "MsgCreatePeriodicVestingAccount",
                             "MsgPayForBlobs",
+                            "MsgGrant",
                             "MsgGrantAllowance",
                             "MsgRegisterEVMAddress",
-                            "MsgSetWithdrawAddress"
+                            "MsgSetWithdrawAddress",
+                            "MsgVote",
+                            "MsgVoteWeighted",
+                            "MsgSubmitProposal"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1177,9 +1181,13 @@ const docTemplate = `{
                             "MsgCreateVestingAccount",
                             "MsgCreatePeriodicVestingAccount",
                             "MsgPayForBlobs",
+                            "MsgGrant",
                             "MsgGrantAllowance",
                             "MsgRegisterEVMAddress",
-                            "MsgSetWithdrawAddress"
+                            "MsgSetWithdrawAddress",
+                            "MsgVote",
+                            "MsgVoteWeighted",
+                            "MsgSubmitProposal"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -2017,7 +2025,11 @@ const docTemplate = `{
                 "revoke_feegrant",
                 "set_feegrant",
                 "update_feegrant",
-                "slash"
+                "slash",
+                "proposal_vote",
+                "proposal_deposit",
+                "submit_proposal",
+                "cosmos.authz.v1beta1.EventGrant"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -2047,7 +2059,11 @@ const docTemplate = `{
                 "EventTypeRevokeFeegrant",
                 "EventTypeSetFeegrant",
                 "EventTypeUpdateFeegrant",
-                "EventTypeSlash"
+                "EventTypeSlash",
+                "EventTypeProposalVote",
+                "EventTypeProposalDeposit",
+                "EventTypeSubmitProposal",
+                "EventTypeCosmosauthzv1beta1EventGrant"
             ]
         },
         "types.MsgType": {
@@ -2066,9 +2082,13 @@ const docTemplate = `{
                 "MsgCreateVestingAccount",
                 "MsgCreatePeriodicVestingAccount",
                 "MsgPayForBlobs",
+                "MsgGrant",
                 "MsgGrantAllowance",
                 "MsgRegisterEVMAddress",
-                "MsgSetWithdrawAddress"
+                "MsgSetWithdrawAddress",
+                "MsgVote",
+                "MsgVoteWeighted",
+                "MsgSubmitProposal"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -2084,9 +2104,13 @@ const docTemplate = `{
                 "MsgCreateVestingAccount",
                 "MsgCreatePeriodicVestingAccount",
                 "MsgPayForBlobs",
+                "MsgGrant",
                 "MsgGrantAllowance",
                 "MsgRegisterEVMAddress",
-                "MsgSetWithdrawAddress"
+                "MsgSetWithdrawAddress",
+                "MsgVote",
+                "MsgVoteWeighted",
+                "MsgSubmitProposal"
             ]
         }
     }

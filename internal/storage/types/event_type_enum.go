@@ -69,6 +69,14 @@ const (
 	EventTypeUpdateFeegrant EventType = "update_feegrant"
 	// EventTypeSlash is a EventType of type slash.
 	EventTypeSlash EventType = "slash"
+	// EventTypeProposalVote is a EventType of type proposal_vote.
+	EventTypeProposalVote EventType = "proposal_vote"
+	// EventTypeProposalDeposit is a EventType of type proposal_deposit.
+	EventTypeProposalDeposit EventType = "proposal_deposit"
+	// EventTypeSubmitProposal is a EventType of type submit_proposal.
+	EventTypeSubmitProposal EventType = "submit_proposal"
+	// EventTypeCosmosauthzv1beta1EventGrant is a EventType of type cosmos.authz.v1beta1.EventGrant.
+	EventTypeCosmosauthzv1beta1EventGrant EventType = "cosmos.authz.v1beta1.EventGrant"
 )
 
 var ErrInvalidEventType = errors.New("not a valid EventType")
@@ -104,6 +112,10 @@ func EventTypeValues() []EventType {
 		EventTypeSetFeegrant,
 		EventTypeUpdateFeegrant,
 		EventTypeSlash,
+		EventTypeProposalVote,
+		EventTypeProposalDeposit,
+		EventTypeSubmitProposal,
+		EventTypeCosmosauthzv1beta1EventGrant,
 	}
 }
 
@@ -148,6 +160,10 @@ var _EventTypeValue = map[string]EventType{
 	"set_feegrant":                      EventTypeSetFeegrant,
 	"update_feegrant":                   EventTypeUpdateFeegrant,
 	"slash":                             EventTypeSlash,
+	"proposal_vote":                     EventTypeProposalVote,
+	"proposal_deposit":                  EventTypeProposalDeposit,
+	"submit_proposal":                   EventTypeSubmitProposal,
+	"cosmos.authz.v1beta1.EventGrant":   EventTypeCosmosauthzv1beta1EventGrant,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

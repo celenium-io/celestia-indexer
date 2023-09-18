@@ -475,6 +475,10 @@ definitions:
     - set_feegrant
     - update_feegrant
     - slash
+    - proposal_vote
+    - proposal_deposit
+    - submit_proposal
+    - cosmos.authz.v1beta1.EventGrant
     type: string
     x-enum-varnames:
     - EventTypeUnknown
@@ -505,6 +509,10 @@ definitions:
     - EventTypeSetFeegrant
     - EventTypeUpdateFeegrant
     - EventTypeSlash
+    - EventTypeProposalVote
+    - EventTypeProposalDeposit
+    - EventTypeSubmitProposal
+    - EventTypeCosmosauthzv1beta1EventGrant
   types.MsgType:
     enum:
     - MsgUnknown
@@ -520,9 +528,13 @@ definitions:
     - MsgCreateVestingAccount
     - MsgCreatePeriodicVestingAccount
     - MsgPayForBlobs
+    - MsgGrant
     - MsgGrantAllowance
     - MsgRegisterEVMAddress
     - MsgSetWithdrawAddress
+    - MsgVote
+    - MsgVoteWeighted
+    - MsgSubmitProposal
     type: string
     x-enum-varnames:
     - MsgUnknown
@@ -538,9 +550,13 @@ definitions:
     - MsgCreateVestingAccount
     - MsgCreatePeriodicVestingAccount
     - MsgPayForBlobs
+    - MsgGrant
     - MsgGrantAllowance
     - MsgRegisterEVMAddress
     - MsgSetWithdrawAddress
+    - MsgVote
+    - MsgVoteWeighted
+    - MsgSubmitProposal
 host: https://api.celestia.dipdup.net
 info:
   contact: {}
@@ -664,9 +680,13 @@ paths:
         - MsgCreateVestingAccount
         - MsgCreatePeriodicVestingAccount
         - MsgPayForBlobs
+        - MsgGrant
         - MsgGrantAllowance
         - MsgRegisterEVMAddress
         - MsgSetWithdrawAddress
+        - MsgVote
+        - MsgVoteWeighted
+        - MsgSubmitProposal
         in: query
         name: msg_type
         type: string
@@ -1431,9 +1451,13 @@ paths:
         - MsgCreateVestingAccount
         - MsgCreatePeriodicVestingAccount
         - MsgPayForBlobs
+        - MsgGrant
         - MsgGrantAllowance
         - MsgRegisterEVMAddress
         - MsgSetWithdrawAddress
+        - MsgVote
+        - MsgVoteWeighted
+        - MsgSubmitProposal
         in: query
         name: msg_type
         type: string

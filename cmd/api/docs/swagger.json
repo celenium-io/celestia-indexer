@@ -177,9 +177,13 @@
                             "MsgCreateVestingAccount",
                             "MsgCreatePeriodicVestingAccount",
                             "MsgPayForBlobs",
+                            "MsgGrant",
                             "MsgGrantAllowance",
                             "MsgRegisterEVMAddress",
-                            "MsgSetWithdrawAddress"
+                            "MsgSetWithdrawAddress",
+                            "MsgVote",
+                            "MsgVoteWeighted",
+                            "MsgSubmitProposal"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1171,9 +1175,13 @@
                             "MsgCreateVestingAccount",
                             "MsgCreatePeriodicVestingAccount",
                             "MsgPayForBlobs",
+                            "MsgGrant",
                             "MsgGrantAllowance",
                             "MsgRegisterEVMAddress",
-                            "MsgSetWithdrawAddress"
+                            "MsgSetWithdrawAddress",
+                            "MsgVote",
+                            "MsgVoteWeighted",
+                            "MsgSubmitProposal"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -2011,7 +2019,11 @@
                 "revoke_feegrant",
                 "set_feegrant",
                 "update_feegrant",
-                "slash"
+                "slash",
+                "proposal_vote",
+                "proposal_deposit",
+                "submit_proposal",
+                "cosmos.authz.v1beta1.EventGrant"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -2041,7 +2053,11 @@
                 "EventTypeRevokeFeegrant",
                 "EventTypeSetFeegrant",
                 "EventTypeUpdateFeegrant",
-                "EventTypeSlash"
+                "EventTypeSlash",
+                "EventTypeProposalVote",
+                "EventTypeProposalDeposit",
+                "EventTypeSubmitProposal",
+                "EventTypeCosmosauthzv1beta1EventGrant"
             ]
         },
         "types.MsgType": {
@@ -2060,9 +2076,13 @@
                 "MsgCreateVestingAccount",
                 "MsgCreatePeriodicVestingAccount",
                 "MsgPayForBlobs",
+                "MsgGrant",
                 "MsgGrantAllowance",
                 "MsgRegisterEVMAddress",
-                "MsgSetWithdrawAddress"
+                "MsgSetWithdrawAddress",
+                "MsgVote",
+                "MsgVoteWeighted",
+                "MsgSubmitProposal"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -2078,9 +2098,13 @@
                 "MsgCreateVestingAccount",
                 "MsgCreatePeriodicVestingAccount",
                 "MsgPayForBlobs",
+                "MsgGrant",
                 "MsgGrantAllowance",
                 "MsgRegisterEVMAddress",
-                "MsgSetWithdrawAddress"
+                "MsgSetWithdrawAddress",
+                "MsgVote",
+                "MsgVoteWeighted",
+                "MsgSubmitProposal"
             ]
         }
     }
