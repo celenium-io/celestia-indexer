@@ -33,6 +33,7 @@ var (
 		EventsCount: 2,
 		Time:        testTime,
 		Height:      100,
+		BlockTime:   11043,
 	}
 	testBlockWithStats = storage.Block{
 		Id:           1,
@@ -279,6 +280,7 @@ func (s *BlockTestSuite) TestGetStats() {
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, stats.TxCount)
 	s.Require().EqualValues(2, stats.EventsCount)
+	s.Require().EqualValues(11043, stats.BlockTime)
 }
 
 func (s *BlockTestSuite) TestGetNamespaces() {

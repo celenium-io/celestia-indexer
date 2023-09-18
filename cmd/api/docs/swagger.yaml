@@ -136,6 +136,9 @@ definitions:
       blobs_size:
         example: 12354
         type: integer
+      block_time:
+        example: 12354
+        type: integer
       events_count:
         example: 18
         type: integer

@@ -6,6 +6,7 @@
   fee: 2873468273
   supply_change: 30930476
   inflation_rate: 0.080000000000000000
+  block_time: 11000
 
 - id: 1
   height: 999
@@ -15,3 +16,4 @@
   fee: 1726351723
   supply_change: 20930476
   inflation_rate: 0.080000000000000000
+  block_time: 11423

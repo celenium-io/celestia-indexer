@@ -70,6 +70,7 @@ type BlockStats struct {
 	Fee           string `example:"28347628346" json:"fee"            swaggertype:"string"`
 	SupplyChange  string `example:"8635234"     json:"supply_change"  swaggertype:"string"`
 	InflationRate string `example:"0.0800000"   json:"inflation_rate" swaggertype:"string"`
+	BlockTime     uint64 `example:"12354"       json:"block_time"     swaggertype:"integer"`
 }
 
 func NewBlockStats(stats storage.BlockStats) *BlockStats {
@@ -80,5 +81,6 @@ func NewBlockStats(stats storage.BlockStats) *BlockStats {
 		Fee:           stats.Fee.String(),
 		SupplyChange:  stats.SupplyChange.String(),
 		InflationRate: stats.InflationRate.String(),
+		BlockTime:     stats.BlockTime,
 	}
 }

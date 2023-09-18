@@ -122,6 +122,7 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
+	block.Stats.BlockTime = uint64(block.Time.Sub(state.LastTime).Milliseconds())
 
 	if err := tx.Add(ctx, block); err != nil {
 		return tx.HandleError(ctx, err)
