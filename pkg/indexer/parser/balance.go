@@ -70,7 +70,7 @@ func parseCoinReceived(data map[string]any, height pkgTypes.Level) (*storage.Add
 
 	if coinReceived.Amount != nil {
 		address.Balance.Currency = coinReceived.Amount.Denom
-		address.Balance.Total = decimal.NewFromBigInt(coinReceived.Amount.Amount.Neg().BigInt(), 0)
+		address.Balance.Total = decimal.NewFromBigInt(coinReceived.Amount.Amount.BigInt(), 0) // TODO: unit test
 	}
 
 	return address, nil
