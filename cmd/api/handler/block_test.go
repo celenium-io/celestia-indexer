@@ -55,6 +55,7 @@ type BlockTestSuite struct {
 	blockStats *mock.MockIBlockStats
 	events     *mock.MockIEvent
 	namespace  *mock.MockINamespace
+	state      *mock.MockIState
 	echo       *echo.Echo
 	handler    *BlockHandler
 	ctrl       *gomock.Controller
@@ -69,7 +70,8 @@ func (s *BlockTestSuite) SetupSuite() {
 	s.blockStats = mock.NewMockIBlockStats(s.ctrl)
 	s.events = mock.NewMockIEvent(s.ctrl)
 	s.namespace = mock.NewMockINamespace(s.ctrl)
-	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events, s.namespace)
+	s.state = mock.NewMockIState(s.ctrl)
+	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events, s.namespace, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -322,4 +324,23 @@ func (s *BlockTestSuite) TestGetNamespaces() {
 	s.Require().Equal(testTime, msg.Time)
 	s.Require().EqualValues(string(types.MsgBeginRedelegate), msg.Type)
 	s.Require().EqualValues(1, msg.Tx.Id)
+}
+
+func (s *BlockTestSuite) TestCount() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/address/count")
+
+	s.state.EXPECT().
+		ByName(gomock.Any(), testIndexerName).
+		Return(testState, nil)
+
+	s.Require().NoError(s.handler.Count(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var count uint64
+	err := json.NewDecoder(rec.Body).Decode(&count)
+	s.Require().NoError(err)
+	s.Require().EqualValues(80001, count)
 }

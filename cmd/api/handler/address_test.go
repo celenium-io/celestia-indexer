@@ -20,6 +20,15 @@ import (
 )
 
 var (
+	testIndexerName = "test_indexer"
+	testState       = storage.State{
+		Name:            testIndexerName,
+		LastHeight:      80000,
+		LastTime:        testTime,
+		TotalTx:         14149240,
+		TotalAccounts:   123123,
+		TotalNamespaces: 123,
+	}
 	testAddress     = "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
 	testHashAddress = []byte{0x96, 0xa, 0xa0, 0x36, 0x6b, 0x25, 0x4e, 0x1e, 0xa7, 0x9b, 0xda, 0x46, 0x7e, 0xb3, 0xaa, 0x5c, 0x97, 0xcb, 0xa5, 0xae}
 )
@@ -29,6 +38,7 @@ type AddressTestSuite struct {
 	suite.Suite
 	address *mock.MockIAddress
 	txs     *mock.MockITx
+	state   *mock.MockIState
 	echo    *echo.Echo
 	handler *AddressHandler
 	ctrl    *gomock.Controller
@@ -41,7 +51,8 @@ func (s *AddressTestSuite) SetupSuite() {
 	s.ctrl = gomock.NewController(s.T())
 	s.address = mock.NewMockIAddress(s.ctrl)
 	s.txs = mock.NewMockITx(s.ctrl)
-	s.handler = NewAddressHandler(s.address, s.txs)
+	s.state = mock.NewMockIState(s.ctrl)
+	s.handler = NewAddressHandler(s.address, s.txs, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -214,4 +225,23 @@ func (s *AddressTestSuite) TestListHeight() {
 	s.Require().Equal("memo", tx.Memo)
 	s.Require().Equal("sdk", tx.Codespace)
 	s.Require().Equal(types.StatusSuccess, tx.Status)
+}
+
+func (s *AddressTestSuite) TestCount() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/address/count")
+
+	s.state.EXPECT().
+		ByName(gomock.Any(), testIndexerName).
+		Return(testState, nil)
+
+	s.Require().NoError(s.handler.Count(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var count uint64
+	err := json.NewDecoder(rec.Body).Decode(&count)
+	s.Require().NoError(err)
+	s.Require().EqualValues(123123, count)
 }

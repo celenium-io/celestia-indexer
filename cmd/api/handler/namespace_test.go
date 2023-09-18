@@ -36,6 +36,7 @@ var (
 type NamespaceTestSuite struct {
 	suite.Suite
 	namespaces   *mock.MockINamespace
+	state        *mock.MockIState
 	blobReceiver *nodeMock.MockCelestiaNodeApi
 	echo         *echo.Echo
 	handler      *NamespaceHandler
@@ -48,8 +49,9 @@ func (s *NamespaceTestSuite) SetupSuite() {
 	s.echo.Validator = NewCelestiaApiValidator()
 	s.ctrl = gomock.NewController(s.T())
 	s.namespaces = mock.NewMockINamespace(s.ctrl)
+	s.state = mock.NewMockIState(s.ctrl)
 	s.blobReceiver = nodeMock.NewMockCelestiaNodeApi(s.ctrl)
-	s.handler = NewNamespaceHandler(s.namespaces, s.blobReceiver)
+	s.handler = NewNamespaceHandler(s.namespaces, s.state, testIndexerName, s.blobReceiver)
 }
 
 // TearDownSuite -
@@ -281,4 +283,23 @@ func (s *NamespaceTestSuite) TestGetMessages() {
 	s.Require().Equal(testTime, msg.Time)
 	s.Require().EqualValues(string(types.MsgBeginRedelegate), msg.Type)
 	s.Require().EqualValues(1, msg.Tx.Id)
+}
+
+func (s *NamespaceTestSuite) TestCount() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/namespace/count")
+
+	s.state.EXPECT().
+		ByName(gomock.Any(), testIndexerName).
+		Return(testState, nil)
+
+	s.Require().NoError(s.handler.Count(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var count uint64
+	err := json.NewDecoder(rec.Body).Decode(&count)
+	s.Require().NoError(err)
+	s.Require().EqualValues(123, count)
 }

@@ -726,6 +726,24 @@ paths:
       summary: Get address transactions
       tags:
       - address
+  /v1/address/count:
+    get:
+      description: Get count of addresses in network
+      operationId: get-address-count
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get count of addresses in network
+      tags:
+      - address
   /v1/block:
     get:
       description: List blocks info
@@ -904,6 +922,24 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get block stats by height
+      tags:
+      - block
+  /v1/block/count:
+    get:
+      description: Get count of blocks in network
+      operationId: get-block-count
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get count of blocks in network
       tags:
       - block
   /v1/constants:
@@ -1106,6 +1142,24 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get namespace messages by id and version
+      tags:
+      - namespace
+  /v1/namespace/count:
+    get:
+      description: Get count of namespaces in network
+      operationId: get-namespace-count
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get count of namespaces in network
       tags:
       - namespace
   /v1/namespace_by_hash/{hash}:
@@ -1591,6 +1645,24 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get transaction messages
+      tags:
+      - transactions
+  /v1/tx/count:
+    get:
+      description: Get count of transactions in network
+      operationId: get-transactions-count
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get count of transactions in network
       tags:
       - transactions
   /v1/ws:

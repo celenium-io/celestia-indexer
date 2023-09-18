@@ -76,6 +76,33 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/address/count": {
+            "get": {
+                "description": "Get count of addresses in network",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Get count of addresses in network",
+                "operationId": "get-address-count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/address/{hash}": {
             "get": {
                 "description": "Get address info",
@@ -296,6 +323,33 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/block/count": {
+            "get": {
+                "description": "Get count of blocks in network",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "block"
+                ],
+                "summary": "Get count of blocks in network",
+                "operationId": "get-block-count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
                         }
                     },
                     "500": {
@@ -623,6 +677,33 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/namespace/count": {
+            "get": {
+                "description": "Get count of namespaces in network",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "namespace"
+                ],
+                "summary": "Get count of namespaces in network",
+                "operationId": "get-namespace-count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
                         }
                     },
                     "500": {
@@ -1227,6 +1308,33 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/tx/count": {
+            "get": {
+                "description": "Get count of transactions in network",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Get count of transactions in network",
+                "operationId": "get-transactions-count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
                         }
                     },
                     "500": {

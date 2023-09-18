@@ -9,10 +9,12 @@ import (
 )
 
 type BlockHandler struct {
-	block      storage.IBlock
-	blockStats storage.IBlockStats
-	events     storage.IEvent
-	namespace  storage.INamespace
+	block       storage.IBlock
+	blockStats  storage.IBlockStats
+	events      storage.IEvent
+	namespace   storage.INamespace
+	state       storage.IState
+	indexerName string
 }
 
 func NewBlockHandler(
@@ -20,12 +22,16 @@ func NewBlockHandler(
 	blockStats storage.IBlockStats,
 	events storage.IEvent,
 	namespace storage.INamespace,
+	state storage.IState,
+	indexerName string,
 ) *BlockHandler {
 	return &BlockHandler{
-		block:      block,
-		blockStats: blockStats,
-		events:     events,
-		namespace:  namespace,
+		block:       block,
+		blockStats:  blockStats,
+		events:      events,
+		namespace:   namespace,
+		state:       state,
+		indexerName: indexerName,
 	}
 }
 
@@ -209,4 +215,22 @@ func (handler *BlockHandler) GetNamespaces(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+// Count godoc
+//
+//	@Summary		Get count of blocks in network
+//	@Description	Get count of blocks in network
+//	@Tags			block
+//	@ID				get-block-count
+//	@Produce		json
+//	@Success		200	{integer}   uint64
+//	@Failure		500	{object}	Error
+//	@Router			/v1/block/count [get]
+func (handler *BlockHandler) Count(c echo.Context) error {
+	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
+	if err := handleError(c, err, handler.state); err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, state.LastHeight+1) // + genesis block
 }

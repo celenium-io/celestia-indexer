@@ -12,14 +12,23 @@ import (
 )
 
 type AddressHandler struct {
-	address storage.IAddress
-	txs     storage.ITx
+	address     storage.IAddress
+	txs         storage.ITx
+	state       storage.IState
+	indexerName string
 }
 
-func NewAddressHandler(address storage.IAddress, txs storage.ITx) *AddressHandler {
+func NewAddressHandler(
+	address storage.IAddress,
+	txs storage.ITx,
+	state storage.IState,
+	indexerName string,
+) *AddressHandler {
 	return &AddressHandler{
-		address: address,
-		txs:     txs,
+		address:     address,
+		txs:         txs,
+		state:       state,
+		indexerName: indexerName,
 	}
 }
 
@@ -158,4 +167,22 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 		response[i] = responses.NewTx(txs[i])
 	}
 	return returnArray(c, response)
+}
+
+// Count godoc
+//
+//	@Summary		Get count of addresses in network
+//	@Description	Get count of addresses in network
+//	@Tags			address
+//	@ID				get-address-count
+//	@Produce		json
+//	@Success		200	{integer}   uint64
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address/count [get]
+func (handler *AddressHandler) Count(c echo.Context) error {
+	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
+	if err := handleError(c, err, handler.state); err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, state.TotalAccounts)
 }

@@ -13,14 +13,23 @@ import (
 )
 
 type NamespaceHandler struct {
-	namespace storage.INamespace
-	blob      node.CelestiaNodeApi
+	namespace   storage.INamespace
+	blob        node.CelestiaNodeApi
+	state       storage.IState
+	indexerName string
 }
 
-func NewNamespaceHandler(namespace storage.INamespace, blob node.CelestiaNodeApi) *NamespaceHandler {
+func NewNamespaceHandler(
+	namespace storage.INamespace,
+	state storage.IState,
+	indexerName string,
+	blob node.CelestiaNodeApi,
+) *NamespaceHandler {
 	return &NamespaceHandler{
-		namespace: namespace,
-		blob:      blob,
+		namespace:   namespace,
+		blob:        blob,
+		state:       state,
+		indexerName: indexerName,
 	}
 }
 
@@ -259,4 +268,22 @@ func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+// Count godoc
+//
+//	@Summary		Get count of namespaces in network
+//	@Description	Get count of namespaces in network
+//	@Tags			namespace
+//	@ID				get-namespace-count
+//	@Produce		json
+//	@Success		200	{integer}   uint64
+//	@Failure		500	{object}	Error
+//	@Router			/v1/namespace/count [get]
+func (handler *NamespaceHandler) Count(c echo.Context) error {
+	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
+	if err := handleError(c, err, handler.state); err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, state.TotalNamespaces)
 }

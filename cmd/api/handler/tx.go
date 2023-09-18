@@ -13,16 +13,26 @@ import (
 )
 
 type TxHandler struct {
-	tx       storage.ITx
-	events   storage.IEvent
-	messages storage.IMessage
+	tx          storage.ITx
+	events      storage.IEvent
+	messages    storage.IMessage
+	state       storage.IState
+	indexerName string
 }
 
-func NewTxHandler(tx storage.ITx, events storage.IEvent, messages storage.IMessage) *TxHandler {
+func NewTxHandler(
+	tx storage.ITx,
+	events storage.IEvent,
+	messages storage.IMessage,
+	state storage.IState,
+	indexerName string,
+) *TxHandler {
 	return &TxHandler{
-		tx:       tx,
-		events:   events,
-		messages: messages,
+		tx:          tx,
+		events:      events,
+		messages:    messages,
+		state:       state,
+		indexerName: indexerName,
 	}
 }
 
@@ -193,4 +203,22 @@ func (handler *TxHandler) GetMessages(c echo.Context) error {
 		response[i] = responses.NewMessage(messages[i])
 	}
 	return returnArray(c, response)
+}
+
+// Count godoc
+//
+//	@Summary		Get count of transactions in network
+//	@Description	Get count of transactions in network
+//	@Tags			transactions
+//	@ID				get-transactions-count
+//	@Produce		json
+//	@Success		200	{integer}   uint64
+//	@Failure		500	{object}	Error
+//	@Router			/v1/tx/count [get]
+func (handler *TxHandler) Count(c echo.Context) error {
+	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
+	if err := handleError(c, err, handler.state); err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, state.TotalTx)
 }

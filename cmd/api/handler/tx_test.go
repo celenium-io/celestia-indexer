@@ -48,6 +48,7 @@ type TxTestSuite struct {
 	tx       *mock.MockITx
 	events   *mock.MockIEvent
 	messages *mock.MockIMessage
+	state    *mock.MockIState
 	echo     *echo.Echo
 	handler  *TxHandler
 	ctrl     *gomock.Controller
@@ -60,8 +61,9 @@ func (s *TxTestSuite) SetupSuite() {
 	s.ctrl = gomock.NewController(s.T())
 	s.tx = mock.NewMockITx(s.ctrl)
 	s.events = mock.NewMockIEvent(s.ctrl)
+	s.state = mock.NewMockIState(s.ctrl)
 	s.messages = mock.NewMockIMessage(s.ctrl)
-	s.handler = NewTxHandler(s.tx, s.events, s.messages)
+	s.handler = NewTxHandler(s.tx, s.events, s.messages, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -395,4 +397,23 @@ func (s *TxTestSuite) TestGetMessage() {
 	s.Require().Equal(testTime, msgs[0].Time)
 	s.Require().EqualValues(1, msgs[0].TxId)
 	s.Require().EqualValues(string(types.MsgBeginRedelegate), msgs[0].Type)
+}
+
+func (s *TxTestSuite) TestCount() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx/count")
+
+	s.state.EXPECT().
+		ByName(gomock.Any(), testIndexerName).
+		Return(testState, nil)
+
+	s.Require().NoError(s.handler.Count(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var count uint64
+	err := json.NewDecoder(rec.Body).Decode(&count)
+	s.Require().NoError(err)
+	s.Require().EqualValues(14149240, count)
 }
