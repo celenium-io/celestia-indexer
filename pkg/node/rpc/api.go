@@ -2,11 +2,12 @@ package rpc
 
 import (
 	"context"
-	"github.com/goccy/go-json"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -82,16 +83,16 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 	}
 	defer closeWithLogError(response.Body, api.log)
 
-	if response.StatusCode != http.StatusOK {
-		return errors.Errorf("invalid status: %d", response.StatusCode)
-	}
-
 	api.log.Trace().
 		Int64("ms", time.Since(start).Milliseconds()).
 		Str("url", u.String()).
 		Msg("request")
 
-	err = json.NewDecoder(response.Body).Decode(output)
+	if response.StatusCode != http.StatusOK {
+		return errors.Errorf("invalid status: %d", response.StatusCode)
+	}
+
+	err = json.NewDecoder(response.Body).DecodeWithOption(output)
 	return err
 }
 

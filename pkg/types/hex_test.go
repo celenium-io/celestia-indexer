@@ -38,6 +38,11 @@ func TestHex_UnmarshalJSON(t *testing.T) {
 			name:    "test 5",
 			json:    []byte(`{"field": 1234}`),
 			wantErr: true,
+		}, {
+			name:    "test 6",
+			json:    []byte(`{"field": ""}`),
+			want:    []byte{},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -50,6 +55,17 @@ func TestHex_UnmarshalJSON(t *testing.T) {
 			}
 		})
 	}
+}
+
+func BenchmarkHex_UnmarshalJSON(b *testing.B) {
+	s := `"76F1EC28D93B06EC8497360745E289AC40137254DC1D5607405B5A8C886EF5DF"`
+	b.Run("hex unmarshal json", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			var h Hex
+			err := json.Unmarshal([]byte(s), &h)
+			require.NoError(b, err)
+		}
+	})
 }
 
 func TestHex_MarshalJSON(t *testing.T) {

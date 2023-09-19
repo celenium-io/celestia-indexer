@@ -4,6 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"encoding/hex"
+	"testing"
+	"time"
+
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	indexerCfg "github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-io/celestia-indexer/pkg/node/mock"
@@ -11,11 +14,7 @@ import (
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/shopspring/decimal"
-	"github.com/tendermint/tendermint/libs/bytes"
-	tmTypes "github.com/tendermint/tendermint/types"
 	"go.uber.org/mock/gomock"
-	"testing"
-	"time"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
 	"github.com/dipdup-net/go-lib/config"
@@ -93,9 +92,9 @@ func (s *ModuleTestSuite) InitApi(configureApi func()) {
 	}
 }
 
-func GetResultBlock(hash bytes.HexBytes) types.ResultBlock {
+func GetResultBlock(hash types.Hex) types.ResultBlock {
 	return types.ResultBlock{
-		BlockID: tmTypes.BlockID{
+		BlockID: types.BlockId{
 			Hash: hash,
 		},
 	}
@@ -109,12 +108,12 @@ func (s *ModuleTestSuite) TestModule_SuccessOnRollbackTwoBlocks() {
 	s.InitApi(func() {
 		s.api.EXPECT().
 			Block(gomock.Any(), types.Level(1001)).
-			Return(GetResultBlock(bytes.HexBytes{42}), nil). // not equal with block in storage
+			Return(GetResultBlock(types.Hex{42}), nil). // not equal with block in storage
 			MaxTimes(1)
 
 		s.api.EXPECT().
 			Block(gomock.Any(), types.Level(1000)).
-			Return(GetResultBlock(bytes.HexBytes{42}), nil). // not equal with block in storage
+			Return(GetResultBlock(types.Hex{42}), nil). // not equal with block in storage
 			MaxTimes(1)
 
 		s.api.EXPECT().
@@ -187,7 +186,7 @@ func (s *ModuleTestSuite) TestModule_OnClosedInput() {
 	s.InitApi(func() {
 		s.api.EXPECT().
 			Block(gomock.Any(), gomock.Any()).
-			Return(GetResultBlock(bytes.HexBytes{42}), nil).
+			Return(GetResultBlock(types.Hex{42}), nil).
 			MaxTimes(0)
 	})
 
