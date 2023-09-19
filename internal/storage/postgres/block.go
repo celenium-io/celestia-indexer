@@ -50,13 +50,21 @@ func (b *Blocks) ByHash(ctx context.Context, hash []byte) (block storage.Block, 
 
 // ListWithStats -
 func (b *Blocks) ListWithStats(ctx context.Context, stats bool, limit, offset uint64, order sdk.SortOrder) (blocks []storage.Block, err error) {
-	query := b.DB().NewSelect().Model(&blocks)
-	query = postgres.Pagination(query, limit, offset, order)
+	subQuery := b.DB().NewSelect().Model(&blocks)
+	subQuery = postgres.Pagination(subQuery, limit, offset, order)
 
 	if stats {
-		query = query.Relation("Stats")
+		query := b.DB().NewSelect().
+			ColumnExpr("block.*").
+			ColumnExpr("stats.id AS stats__id, stats.height AS stats__height, stats.time AS stats__time, stats.tx_count AS stats__tx_count, stats.events_count AS stats__events_count, stats.blobs_size AS stats__blobs_size, stats.block_time AS stats__block_time, stats.supply_change AS stats__supply_change, stats.inflation_rate AS stats__inflation_rate, stats.fee AS stats__fee").
+			TableExpr("(?) as block", subQuery).
+			Join("LEFT JOIN block_stats as stats").
+			JoinOn("stats.height = block.height")
+		query = sortScope(query, "block.id", order)
+		err = query.Scan(ctx, &blocks)
+		return
 	}
 
-	err = query.Scan(ctx)
+	err = subQuery.Scan(ctx)
 	return
 }

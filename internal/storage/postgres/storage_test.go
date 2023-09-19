@@ -146,6 +146,33 @@ func (s *StorageTestSuite) TestBlockByHash() {
 	s.Require().Equal(hash, block.Hash.Bytes())
 }
 
+func (s *StorageTestSuite) TestBlockListWithStats() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	blocks, err := s.storage.Blocks.ListWithStats(ctx, true, 10, 0, sdk.SortOrderDesc)
+	s.Require().NoError(err)
+	s.Require().Len(blocks, 2)
+
+	block := blocks[0]
+	s.Require().EqualValues(1000, block.Height)
+	s.Require().EqualValues(1, block.VersionApp)
+	s.Require().EqualValues(11, block.VersionBlock)
+	s.Require().EqualValues(0, block.Stats.TxCount)
+	s.Require().EqualValues(11000, block.Stats.BlockTime)
+
+	blocks, err = s.storage.Blocks.ListWithStats(ctx, false, 10, 0, sdk.SortOrderDesc)
+	s.Require().NoError(err)
+	s.Require().Len(blocks, 2)
+
+	block = blocks[0]
+	s.Require().EqualValues(1000, block.Height)
+	s.Require().EqualValues(1, block.VersionApp)
+	s.Require().EqualValues(11, block.VersionBlock)
+	s.Require().EqualValues(0, block.Stats.TxCount)
+	s.Require().EqualValues(0, block.Stats.BlockTime)
+}
+
 func (s *StorageTestSuite) TestAddressByHash() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
