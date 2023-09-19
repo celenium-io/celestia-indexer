@@ -262,7 +262,8 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	namespaceByHash := v1.Group("/namespace_by_hash")
 	{
 		namespaceByHash.GET("/:hash", namespaceHandlers.GetByHash)
-		namespaceByHash.GET("/:hash/:height", namespaceHandlers.GetBlob)
+		namespaceByHash.GET("/:hash/:height", namespaceHandlers.GetBlobs)
+		namespaceByHash.GET("/:hash/:height/:commitment", namespaceHandlers.GetBlob)
 	}
 
 	statsHandler := handler.NewStatsHandler(db.Stats)

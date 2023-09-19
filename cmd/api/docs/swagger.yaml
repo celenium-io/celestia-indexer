@@ -1254,8 +1254,8 @@ paths:
       - namespace
   /v1/namespace_by_hash/{hash}/{height}:
     get:
-      description: Returns blob (bytes array)
-      operationId: get-namespace-blob
+      description: Returns blobs
+      operationId: get-namespace-blobs
       parameters:
       - description: Base64-encoded namespace id and version
         in: path
@@ -1281,7 +1281,42 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handler.Error'
-      summary: Get namespace blob on height
+      summary: Get namespace blobs on height
+      tags:
+      - namespace
+  /v1/namespace_by_hash/{hash}/{height}/{commitment}:
+    get:
+      description: Returns blob
+      operationId: get-namespace-blob
+      parameters:
+      - description: Base64-encoded namespace id and version
+        in: path
+        name: hash
+        required: true
+        type: string
+      - description: Block heigth
+        in: path
+        minimum: 1
+        name: height
+        required: true
+        type: integer
+      - description: Blob commitment
+        in: path
+        name: commitment
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Blob'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get namespace blob by commitment on height
       tags:
       - namespace
   /v1/search:

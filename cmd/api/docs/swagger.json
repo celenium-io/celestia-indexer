@@ -957,15 +957,15 @@
         },
         "/v1/namespace_by_hash/{hash}/{height}": {
             "get": {
-                "description": "Returns blob (bytes array)",
+                "description": "Returns blobs",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "namespace"
                 ],
-                "summary": "Get namespace blob on height",
-                "operationId": "get-namespace-blob",
+                "summary": "Get namespace blobs on height",
+                "operationId": "get-namespace-blobs",
                 "parameters": [
                     {
                         "type": "string",
@@ -991,6 +991,57 @@
                             "items": {
                                 "$ref": "#/definitions/responses.Blob"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/namespace_by_hash/{hash}/{height}/{commitment}": {
+            "get": {
+                "description": "Returns blob",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "namespace"
+                ],
+                "summary": "Get namespace blob by commitment on height",
+                "operationId": "get-namespace-blob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Base64-encoded namespace id and version",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Block heigth",
+                        "name": "height",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Blob commitment",
+                        "name": "commitment",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Blob"
                         }
                     },
                     "400": {

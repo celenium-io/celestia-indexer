@@ -183,25 +183,25 @@ func (handler *NamespaceHandler) List(c echo.Context) error {
 	return returnArray(c, response)
 }
 
-type getBlobRequest struct {
+type getBlobsRequest struct {
 	Hash   string `param:"hash"   validate:"required,base64"`
 	Height uint64 `param:"height" validation:"required,min=1"`
 }
 
-// GetBlob godoc
+// GetBlobs godoc
 //
-//	@Summary		Get namespace blob on height
-//	@Description	Returns blob (bytes array)
+//	@Summary		Get namespace blobs on height
+//	@Description	Returns blobs
 //	@Tags			namespace
-//	@ID				get-namespace-blob
+//	@ID				get-namespace-blobs
 //	@Param			hash	path	string	true	"Base64-encoded namespace id and version"
 //	@Param			height	path	integer	true	"Block heigth"	minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Blob
 //	@Failure		400	{object}	Error
 //	@Router			/v1/namespace_by_hash/{hash}/{height} [get]
-func (handler *NamespaceHandler) GetBlob(c echo.Context) error {
-	req, err := bindAndValidate[getBlobRequest](c)
+func (handler *NamespaceHandler) GetBlobs(c echo.Context) error {
+	req, err := bindAndValidate[getBlobsRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
@@ -212,6 +212,39 @@ func (handler *NamespaceHandler) GetBlob(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, blobs)
+}
+
+type getBlobRequest struct {
+	Hash       string `param:"hash"       validate:"required,base64"`
+	Height     uint64 `param:"height"     validation:"required,min=1"`
+	Commitment string `param:"commitment" validate:"required,base64"`
+}
+
+// GetBlob godoc
+//
+//	@Summary		Get namespace blob by commitment on height
+//	@Description	Returns blob
+//	@Tags			namespace
+//	@ID				get-namespace-blob
+//	@Param			hash		path	string	true	"Base64-encoded namespace id and version"
+//	@Param			height		path	integer	true	"Block heigth"	minimum(1)
+//	@Param			commitment	path	string	true	"Blob commitment"
+//	@Produce		json
+//	@Success		200	{object}	responses.Blob
+//	@Failure		400	{object}	Error
+//	@Router			/v1/namespace_by_hash/{hash}/{height}/{commitment} [get]
+func (handler *NamespaceHandler) GetBlob(c echo.Context) error {
+	req, err := bindAndValidate[getBlobRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	blob, err := handler.blob.Blob(c.Request().Context(), req.Height, req.Hash, req.Commitment)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	return c.JSON(http.StatusOK, blob)
 }
 
 type getNamespaceMessages struct {

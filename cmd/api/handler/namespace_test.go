@@ -187,7 +187,7 @@ func (s *NamespaceTestSuite) TestGetByHash() {
 	s.Require().Equal(testNamespaceBase64, namespace.Hash)
 }
 
-func (s *NamespaceTestSuite) TestGetBlob() {
+func (s *NamespaceTestSuite) TestGetBlobs() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
@@ -219,7 +219,7 @@ func (s *NamespaceTestSuite) TestGetBlob() {
 		MaxTimes(1).
 		MinTimes(1)
 
-	s.Require().NoError(s.handler.GetBlob(c))
+	s.Require().NoError(s.handler.GetBlobs(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
 	var blobs []nodeTypes.Blob
@@ -233,6 +233,45 @@ func (s *NamespaceTestSuite) TestGetBlob() {
 	s.Require().Equal(result[0].Namespace, blob.Namespace)
 	s.Require().Equal(result[0].Data, blob.Data)
 	s.Require().Equal(result[0].Commitment, blob.Commitment)
+
+}
+
+func (s *NamespaceTestSuite) TestGetBlob() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/namespace_by_hash/:hash/:height/:commitment")
+	c.SetParamNames("hash", "height", "commitment")
+	c.SetParamValues(testNamespaceBase64, "1000", "Bw==")
+
+	data := make([]byte, 88)
+	_, err := rand.Read(data)
+	s.Require().NoError(err)
+
+	result := nodeTypes.Blob{
+		Namespace:    testNamespaceBase64,
+		Data:         base64.StdEncoding.EncodeToString(data),
+		Commitment:   "Bw==",
+		ShareVersion: 0,
+	}
+
+	s.blobReceiver.EXPECT().
+		Blob(gomock.Any(), uint64(1000), testNamespaceBase64, "Bw==").
+		Return(result, nil).
+		MaxTimes(1).
+		MinTimes(1)
+
+	s.Require().NoError(s.handler.GetBlob(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var blob nodeTypes.Blob
+	err = json.NewDecoder(rec.Body).Decode(&blob)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(0, blob.ShareVersion)
+	s.Require().Equal(testNamespaceBase64, blob.Namespace)
+	s.Require().Equal(result.Data, blob.Data)
+	s.Require().Equal("Bw==", blob.Commitment)
 
 }
 

@@ -2,6 +2,7 @@ package node
 
 import (
 	"context"
+
 	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
@@ -19,4 +20,5 @@ type API interface {
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type CelestiaNodeApi interface {
 	Blobs(ctx context.Context, height uint64, hash ...string) ([]types.Blob, error)
+	Blob(ctx context.Context, height uint64, namespace, commitment string) (types.Blob, error)
 }

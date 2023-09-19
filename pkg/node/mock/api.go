@@ -258,6 +258,45 @@ func (m *MockCelestiaNodeApi) EXPECT() *MockCelestiaNodeApiMockRecorder {
 	return m.recorder
 }
 
+// Blob mocks base method.
+func (m *MockCelestiaNodeApi) Blob(ctx context.Context, height uint64, namespace, commitment string) (types.Blob, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Blob", ctx, height, namespace, commitment)
+	ret0, _ := ret[0].(types.Blob)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Blob indicates an expected call of Blob.
+func (mr *MockCelestiaNodeApiMockRecorder) Blob(ctx, height, namespace, commitment any) *CelestiaNodeApiBlobCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Blob", reflect.TypeOf((*MockCelestiaNodeApi)(nil).Blob), ctx, height, namespace, commitment)
+	return &CelestiaNodeApiBlobCall{Call: call}
+}
+
+// CelestiaNodeApiBlobCall wrap *gomock.Call
+type CelestiaNodeApiBlobCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *CelestiaNodeApiBlobCall) Return(arg0 types.Blob, arg1 error) *CelestiaNodeApiBlobCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *CelestiaNodeApiBlobCall) Do(f func(context.Context, uint64, string, string) (types.Blob, error)) *CelestiaNodeApiBlobCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *CelestiaNodeApiBlobCall) DoAndReturn(f func(context.Context, uint64, string, string) (types.Blob, error)) *CelestiaNodeApiBlobCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Blobs mocks base method.
 func (m *MockCelestiaNodeApi) Blobs(ctx context.Context, height uint64, hash ...string) ([]types.Blob, error) {
 	m.ctrl.T.Helper()
