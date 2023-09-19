@@ -4,17 +4,16 @@ import (
 	"context"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
 )
 
-func (module *Module) saveMessages(
+func saveMessages(
 	ctx context.Context,
-	tx postgres.Transaction,
+	tx storage.Transaction,
 	messages []*storage.Message,
 	addrToId map[string]uint64,
 ) error {
 	if err := tx.SaveMessages(ctx, messages...); err != nil {
-		return nil
+		return err
 	}
 
 	var (
@@ -70,13 +69,13 @@ func (module *Module) saveMessages(
 	}
 
 	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
-		return nil
+		return err
 	}
 	if err := tx.SaveValidators(ctx, validators...); err != nil {
-		return nil
+		return err
 	}
 	if err := tx.SaveMsgAddresses(ctx, msgAddress...); err != nil {
-		return nil
+		return err
 	}
 
 	return nil

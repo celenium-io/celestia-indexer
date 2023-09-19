@@ -14,7 +14,7 @@ type Transaction struct {
 	storage.Transaction
 }
 
-func BeginTransaction(ctx context.Context, tx storage.Transactable) (Transaction, error) {
+func BeginTransaction(ctx context.Context, tx storage.Transactable) (models.Transaction, error) {
 	t, err := tx.BeginTransaction(ctx)
 	return Transaction{t}, err
 }

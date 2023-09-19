@@ -7,10 +7,9 @@ import (
 	"testing"
 	"time"
 
-	indexerCfg "github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
-
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
+	indexerCfg "github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/go-testfixtures/testfixtures/v3"
@@ -79,7 +78,7 @@ func (s *ModuleTestSuite) TestBlockLast() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer ctxCancel()
 
-	module := NewModule(s.storage, indexerCfg.Indexer{Name: testIndexerName})
+	module := NewModule(s.storage.Transactable, s.storage.Notificator, indexerCfg.Indexer{Name: testIndexerName})
 	module.Start(ctx)
 
 	hash, err := hex.DecodeString("F44BC94BF7D064ADF82618F2691D2353161DE232ECB3091B7E5C89B453C79456")

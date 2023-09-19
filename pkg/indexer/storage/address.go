@@ -4,12 +4,11 @@ import (
 	"context"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
 )
 
-func (module *Module) saveAddresses(
+func saveAddresses(
 	ctx context.Context,
-	tx postgres.Transaction,
+	tx storage.Transaction,
 	addresses map[string]*storage.Address,
 ) (map[string]uint64, uint64, error) {
 	if len(addresses) == 0 {
@@ -37,9 +36,9 @@ func (module *Module) saveAddresses(
 	return addToId, totalAccounts, err
 }
 
-func (module *Module) saveSigners(
+func saveSigners(
 	ctx context.Context,
-	tx postgres.Transaction,
+	tx storage.Transaction,
 	addrToId map[string]uint64,
 	txs []storage.Tx,
 ) error {

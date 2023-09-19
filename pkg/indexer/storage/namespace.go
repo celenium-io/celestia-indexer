@@ -4,12 +4,11 @@ import (
 	"context"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
 )
 
-func (module *Module) saveNamespaces(
+func saveNamespaces(
 	ctx context.Context,
-	tx postgres.Transaction,
+	tx storage.Transaction,
 	namespaces map[string]*storage.Namespace,
 ) (uint64, error) {
 	if len(namespaces) == 0 {
@@ -23,7 +22,7 @@ func (module *Module) saveNamespaces(
 
 	totalNamespaces, err := tx.SaveNamespaces(ctx, data...)
 	if err != nil {
-		return 0, tx.HandleError(ctx, err)
+		return 0, err
 	}
 
 	return totalNamespaces, nil

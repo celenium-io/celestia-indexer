@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/decode"
 	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
@@ -12,7 +11,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func (module *Module) rollbackBalances(ctx context.Context, tx postgres.Transaction, deletedEvents []storage.Event, deletedAddresses []storage.Address) error {
+func (module *Module) rollbackBalances(ctx context.Context, tx storage.Transaction, deletedEvents []storage.Event, deletedAddresses []storage.Address) error {
 	var (
 		ids     = make([]uint64, len(deletedAddresses))
 		deleted = make(map[string]struct{}, len(deletedAddresses))

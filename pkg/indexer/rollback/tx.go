@@ -3,11 +3,11 @@ package rollback
 import (
 	"context"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
+	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 )
 
-func (module *Module) rollbackTransactions(ctx context.Context, tx postgres.Transaction, height types.Level) error {
+func (module *Module) rollbackTransactions(ctx context.Context, tx storage.Transaction, height types.Level) error {
 	txs, err := tx.RollbackTxs(ctx, height)
 	if err != nil {
 		return nil

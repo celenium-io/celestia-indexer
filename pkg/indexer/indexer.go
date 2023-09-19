@@ -2,8 +2,9 @@ package indexer
 
 import (
 	"context"
-	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
 	"sync"
+
+	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 
@@ -156,7 +157,7 @@ func createParser(receiverModule modules.Module) (*parser.Module, error) {
 }
 
 func createStorage(pg postgres.Storage, cfg config.Config, parserModule modules.Module) (*storage.Module, error) {
-	storageModule := storage.NewModule(pg, cfg.Indexer)
+	storageModule := storage.NewModule(pg.Transactable, pg.Notificator, cfg.Indexer)
 
 	if err := storageModule.AttachTo(parserModule, parser.OutputName, storage.InputName); err != nil {
 		return nil, errors.Wrap(err, "while attaching storage to parser")
