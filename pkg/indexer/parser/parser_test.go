@@ -68,10 +68,6 @@ func getBlock() types.BlockData {
 		ResultBlock: types.ResultBlock{
 			BlockID: types.BlockId{
 				Hash: types.Hex{0x0, 0x0, 0x0, 0x2},
-				PartSetHeader: types.PartSetHeader{
-					Total: 0,
-					Hash:  nil,
-				},
 			},
 			Block: &types.Block{
 				Header: types.Header{
@@ -84,10 +80,6 @@ func getBlock() types.BlockData {
 					Time:    time.Time{},
 					LastBlockID: types.BlockId{
 						Hash: types.Hex{0x0, 0x0, 0x0, 0x1},
-						PartSetHeader: types.PartSetHeader{
-							Total: 0,
-							Hash:  nil,
-						},
 					},
 					LastCommitHash:     types.Hex{0x0, 0x0, 0x1, 0x1},
 					DataHash:           types.Hex{0x0, 0x0, 0x1, 0x2},
@@ -103,7 +95,6 @@ func getBlock() types.BlockData {
 					Txs:        nil,
 					SquareSize: 0,
 				},
-				LastCommit: nil,
 			},
 		},
 		ResultBlockResults: types.ResultBlockResults{

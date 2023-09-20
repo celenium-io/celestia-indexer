@@ -13,21 +13,21 @@ type ResultBlock struct {
 }
 
 type BlockId struct {
-	Hash          Hex           `json:"hash"`
-	PartSetHeader PartSetHeader `json:"parts"`
+	Hash Hex `json:"hash"`
+	// PartSetHeader PartSetHeader `json:"parts"`
 }
 
-type PartSetHeader struct {
-	Total int `json:"total"`
-	Hash  Hex `json:"hash"`
-}
+// type PartSetHeader struct {
+//	Total int `json:"total"`
+//	Hash  Hex `json:"hash"`
+// }
 
 // Block defines the atomic unit of a CometBFT blockchain.
 type Block struct {
 	Header `json:"header"`
 	Data   `json:"data"`
 	// Evidence   types.EvidenceData `json:"evidence"`
-	LastCommit *Commit `json:"last_commit"`
+	// LastCommit *Commit `json:"last_commit"`
 }
 
 // Consensus captures the consensus rules for processing a block in the blockchain,
@@ -85,13 +85,13 @@ type Data struct {
 
 // Commit contains the evidence that a block was committed by a set of validators.
 // NOTE: Commit is empty for height 1, but never nil.
-type Commit struct {
-	// NOTE: The signatures are in order of address to preserve the bonded
-	// ValidatorSet order.
-	// Any peer with a block can gossip signatures by index with a peer without
-	// recalculating the active ValidatorSet.
-	Height     int64             `json:"height,string"`
-	Round      int32             `json:"round"`
-	BlockID    BlockId           `json:"block_id"`
-	Signatures []types.CommitSig `json:"signatures"`
-}
+// type Commit struct {
+// 	// NOTE: The signatures are in order of address to preserve the bonded
+// 	// ValidatorSet order.
+// 	// Any peer with a block can gossip signatures by index with a peer without
+// 	// recalculating the active ValidatorSet.
+// 	Height     int64             `json:"height,string"`
+// 	Round      int32             `json:"round"`
+// 	BlockID    BlockId           `json:"block_id"`
+// 	Signatures []types.CommitSig `json:"signatures"`
+// }
