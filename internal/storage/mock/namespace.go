@@ -157,6 +157,45 @@ func (c *INamespaceByNamespaceIdAndVersionCall) DoAndReturn(f func(context.Conte
 	return c
 }
 
+// CountMessagesByHeight mocks base method.
+func (m *MockINamespace) CountMessagesByHeight(ctx context.Context, height uint64) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountMessagesByHeight", ctx, height)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountMessagesByHeight indicates an expected call of CountMessagesByHeight.
+func (mr *MockINamespaceMockRecorder) CountMessagesByHeight(ctx, height any) *INamespaceCountMessagesByHeightCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountMessagesByHeight", reflect.TypeOf((*MockINamespace)(nil).CountMessagesByHeight), ctx, height)
+	return &INamespaceCountMessagesByHeightCall{Call: call}
+}
+
+// INamespaceCountMessagesByHeightCall wrap *gomock.Call
+type INamespaceCountMessagesByHeightCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *INamespaceCountMessagesByHeightCall) Return(arg0 int, arg1 error) *INamespaceCountMessagesByHeightCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *INamespaceCountMessagesByHeightCall) Do(f func(context.Context, uint64) (int, error)) *INamespaceCountMessagesByHeightCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *INamespaceCountMessagesByHeightCall) DoAndReturn(f func(context.Context, uint64) (int, error)) *INamespaceCountMessagesByHeightCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // CursorList mocks base method.
 func (m *MockINamespace) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Namespace, error) {
 	m.ctrl.T.Helper()

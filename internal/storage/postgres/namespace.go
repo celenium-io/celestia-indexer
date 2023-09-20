@@ -69,6 +69,12 @@ func (n *Namespace) MessagesByHeight(ctx context.Context, height uint64, limit, 
 	return
 }
 
+func (n *Namespace) CountMessagesByHeight(ctx context.Context, height uint64) (int, error) {
+	return n.DB().NewSelect().Model((*storage.NamespaceMessage)(nil)).
+		Where("namespace_message.height = ?", height).
+		Count(ctx)
+}
+
 func (n *Namespace) Active(ctx context.Context, top int) (ns []storage.ActiveNamespace, err error) {
 	subQuery := n.DB().NewSelect().
 		ColumnExpr("namespace_id, max(msg_id) as msg_id, max(height) as height, max(time) as time").

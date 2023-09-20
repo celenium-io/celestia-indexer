@@ -512,6 +512,43 @@
                 }
             }
         },
+        "/v1/block/{height}/namespace/count": {
+            "get": {
+                "description": "Get count of affected in the block namespaces",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "block"
+                ],
+                "summary": "Get count of affected in the block namespaces",
+                "operationId": "get-block-namespaces-count",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Block height",
+                        "name": "height",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/block/{height}/stats": {
             "get": {
                 "description": "Get block stats by height",

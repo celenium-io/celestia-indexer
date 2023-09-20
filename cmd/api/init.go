@@ -223,10 +223,14 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	{
 		blockGroup.GET("", blockHandlers.List)
 		blockGroup.GET("/count", blockHandlers.Count)
-		blockGroup.GET("/:height", blockHandlers.Get)
-		blockGroup.GET("/:height/events", blockHandlers.GetEvents)
-		blockGroup.GET("/:height/stats", blockHandlers.GetStats)
-		blockGroup.GET("/:height/namespace", blockHandlers.GetNamespaces)
+		heightGroup := blockGroup.Group("/:height")
+		{
+			heightGroup.GET("", blockHandlers.Get)
+			heightGroup.GET("/events", blockHandlers.GetEvents)
+			heightGroup.GET("/stats", blockHandlers.GetStats)
+			heightGroup.GET("/namespace", blockHandlers.GetNamespaces)
+			heightGroup.GET("/namespace/count", blockHandlers.GetNamespacesCount)
+		}
 	}
 
 	txHandlers := handler.NewTxHandler(db.Tx, db.Event, db.Message, db.State, cfg.Indexer.Name)

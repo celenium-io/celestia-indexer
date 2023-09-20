@@ -229,6 +229,31 @@ func (handler *BlockHandler) GetNamespaces(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+// GetNamespacesCount godoc
+//
+//	@Summary		Get count of affected in the block namespaces
+//	@Description	Get count of affected in the block namespaces
+//	@Tags			block
+//	@ID				get-block-namespaces-count
+//	@Param			height	path	integer	true	"Block height"	minimum(1)
+//	@Produce		json
+//	@Success		200	{integer} 	uint64
+//	@Failure		500	{object}	Error
+//	@Router			/v1/block/{height}/namespace/count [get]
+func (handler *BlockHandler) GetNamespacesCount(c echo.Context) error {
+	req, err := bindAndValidate[getBlockByHeightRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	count, err := handler.namespace.CountMessagesByHeight(c.Request().Context(), req.Height)
+	if err := handleError(c, err, handler.namespace); err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, count)
+}
+
 // Count godoc
 //
 //	@Summary		Get count of blocks in network

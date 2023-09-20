@@ -361,6 +361,27 @@ func (s *BlockTestSuite) TestGetNamespaces() {
 	s.Require().EqualValues(1, msg.Tx.Id)
 }
 
+func (s *BlockTestSuite) TestGetNamespacesCount() {
+	req := httptest.NewRequest(http.MethodGet, "/?", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/block/:height/namespace/count")
+	c.SetParamNames("height")
+	c.SetParamValues("100")
+
+	s.namespace.EXPECT().
+		CountMessagesByHeight(gomock.Any(), uint64(100)).
+		Return(12, nil)
+
+	s.Require().NoError(s.handler.GetNamespacesCount(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var count int
+	err := json.NewDecoder(rec.Body).Decode(&count)
+	s.Require().NoError(err)
+	s.Require().EqualValues(count, 12)
+}
+
 func (s *BlockTestSuite) TestCount() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()

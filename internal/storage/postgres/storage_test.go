@@ -4,9 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"encoding/hex"
-	"github.com/shopspring/decimal"
 	"testing"
 	"time"
+
+	"github.com/shopspring/decimal"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
@@ -364,6 +365,15 @@ func (s *StorageTestSuite) TestNamespaceMessagesByHeight() {
 	s.Require().Equal(types.MsgUnjail, msg.Message.Type)
 	s.Require().EqualValues(2, msg.Tx.Id)
 	s.Require().EqualValues(1255, msg.Namespace.Size)
+}
+
+func (s *StorageTestSuite) TestNamespaceCountMessagesByHeight() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	count, err := s.storage.Namespace.CountMessagesByHeight(ctx, 1000)
+	s.Require().NoError(err)
+	s.Require().EqualValues(count, 3)
 }
 
 func (s *StorageTestSuite) TestNamespaceActive() {

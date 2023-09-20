@@ -21,6 +21,7 @@ type INamespace interface {
 	ByNamespaceIdAndVersion(ctx context.Context, namespaceId []byte, version byte) (Namespace, error)
 	Messages(ctx context.Context, id uint64, limit, offset int) ([]NamespaceMessage, error)
 	MessagesByHeight(ctx context.Context, height uint64, limit, offset int) ([]NamespaceMessage, error)
+	CountMessagesByHeight(ctx context.Context, height uint64) (int, error)
 	Active(ctx context.Context, top int) ([]ActiveNamespace, error)
 }
 

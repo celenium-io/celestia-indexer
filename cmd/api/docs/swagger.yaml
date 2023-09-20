@@ -938,6 +938,31 @@ paths:
       summary: Get namesapces affected in the block
       tags:
       - block
+  /v1/block/{height}/namespace/count:
+    get:
+      description: Get count of affected in the block namespaces
+      operationId: get-block-namespaces-count
+      parameters:
+      - description: Block height
+        in: path
+        minimum: 1
+        name: height
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get count of affected in the block namespaces
+      tags:
+      - block
   /v1/block/{height}/stats:
     get:
       description: Get block stats by height
