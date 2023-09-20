@@ -22,13 +22,18 @@ datasources:
     url: ${CELESTIA_NODE_URL}
     rps: ${CELESTIA_NODE_RPS:-5}
     timeout: ${CELESTIA_NODE_TIMEOUT:-10}
+  dal_api:
+    kind: celestia_api
+    url: ${CELESTIA_DAL_API_URL}
+    rps: ${CELESTIA_DAL_API_RPS:-5}
+    timeout: ${CELESTIA_DAL_API_TIMEOUT:-10}
 
 api:
   bind: ${API_HOST:-0.0.0.0}:${API_PORT:-9876}
   rate_limit: ${API_RATE_LIMIT:-0}
   prometheus: ${API_PROMETHEUS_ENABLED:-true}
   request_timeout: ${API_REQUEST_TIMEOUT:-30}
-  blob_receiver: node_rpc
+  blob_receiver: dal_api
 
 profiler:
   server: ${PROFILER_SERVER}
