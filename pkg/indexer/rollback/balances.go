@@ -3,6 +3,7 @@ package rollback
 import (
 	"context"
 
+	"github.com/dipdup-io/celestia-indexer/internal/consts"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/decode"
@@ -29,6 +30,21 @@ func (module *Module) rollbackBalances(ctx context.Context, tx storage.Transacti
 		return nil
 	}
 
+	updates, err := getBalanceUpdates(ctx, tx, deleted, deletedEvents)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.SaveAddresses(ctx, updates...)
+	return err
+}
+
+func getBalanceUpdates(
+	ctx context.Context,
+	tx storage.Transaction,
+	deletedAddress map[string]struct{},
+	deletedEvents []storage.Event,
+) ([]*storage.Address, error) {
 	updates := make(map[string]*storage.Address)
 
 	for _, event := range deletedEvents {
@@ -42,25 +58,27 @@ func (module *Module) rollbackBalances(ctx context.Context, tx storage.Transacti
 			address, err = coinSpent(event.Data)
 		case types.EventTypeCoinReceived:
 			address, err = coinReceived(event.Data)
+		default:
+			continue
 		}
 
 		if err != nil {
-			return err
+			return nil, err
 		}
-		if address != nil {
-			if _, ok := deleted[address.Address]; ok {
-				continue
+
+		if _, ok := deletedAddress[address.Address]; ok {
+			continue
+		}
+
+		if addr, ok := updates[address.Address]; ok {
+			addr.Balance.Total = addr.Balance.Total.Add(address.Balance.Total)
+		} else {
+			lastHeight, err := tx.LastAddressAction(ctx, address.Hash)
+			if err != nil {
+				return nil, err
 			}
-			if addr, ok := updates[address.Address]; ok {
-				addr.Balance.Total = addr.Balance.Total.Add(address.Balance.Total)
-			} else {
-				lastHeight, err := tx.LastAddressAction(ctx, address.Hash)
-				if err != nil {
-					return err
-				}
-				address.Height = pkgTypes.Level(lastHeight)
-				updates[address.Address] = address
-			}
+			address.LastHeight = pkgTypes.Level(lastHeight)
+			updates[address.Address] = address
 		}
 	}
 
@@ -68,9 +86,7 @@ func (module *Module) rollbackBalances(ctx context.Context, tx storage.Transacti
 	for _, addr := range updates {
 		result = append(result, addr)
 	}
-
-	_, err := tx.SaveAddresses(ctx, result...)
-	return err
+	return result, nil
 }
 
 func coinSpent(data map[string]any) (*storage.Address, error) {
@@ -79,20 +95,22 @@ func coinSpent(data map[string]any) (*storage.Address, error) {
 		return nil, err
 	}
 
-	if coinSpent.Spender == "" {
-		return nil, nil
-	}
 	_, hash, err := pkgTypes.Address(coinSpent.Spender).Decode()
 	if err != nil {
 		return nil, errors.Wrapf(err, "decode spender: %s", coinSpent.Spender)
 	}
+	balance := storage.Balance{
+		Currency: consts.DefaultCurrency,
+		Total:    decimal.Zero,
+	}
+	if coinSpent.Amount != nil {
+		balance.Total = decimal.NewFromBigInt(coinSpent.Amount.Amount.BigInt(), 0)
+		balance.Currency = coinSpent.Amount.Denom
+	}
 	return &storage.Address{
 		Address: coinSpent.Spender,
 		Hash:    hash,
-		Balance: storage.Balance{
-			Currency: coinSpent.Amount.Denom,
-			Total:    decimal.NewFromBigInt(coinSpent.Amount.Amount.BigInt(), 0),
-		},
+		Balance: balance,
 	}, nil
 }
 
@@ -102,20 +120,23 @@ func coinReceived(data map[string]any) (*storage.Address, error) {
 		return nil, err
 	}
 
-	if coinReceived.Receiver == "" {
-		return nil, nil
-	}
-
 	_, hash, err := pkgTypes.Address(coinReceived.Receiver).Decode()
 	if err != nil {
 		return nil, errors.Wrapf(err, "decode receiver: %s", coinReceived.Receiver)
 	}
+
+	balance := storage.Balance{
+		Currency: consts.DefaultCurrency,
+		Total:    decimal.Zero,
+	}
+	if coinReceived.Amount != nil {
+		balance.Total = decimal.NewFromBigInt(coinReceived.Amount.Amount.Neg().BigInt(), 0)
+		balance.Currency = coinReceived.Amount.Denom
+	}
+
 	return &storage.Address{
 		Address: coinReceived.Receiver,
 		Hash:    hash,
-		Balance: storage.Balance{
-			Currency: coinReceived.Amount.Denom,
-			Total:    decimal.NewFromBigInt(coinReceived.Amount.Amount.Neg().BigInt(), 0),
-		},
+		Balance: balance,
 	}, nil
 }

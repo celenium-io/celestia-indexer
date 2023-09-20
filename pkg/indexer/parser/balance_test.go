@@ -3,6 +3,7 @@ package parser
 import (
 	"testing"
 
+	"github.com/dipdup-io/celestia-indexer/internal/consts"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/shopspring/decimal"
@@ -35,7 +36,7 @@ func Test_parseCoinSpent(t *testing.T) {
 				Address:    testAddress,
 				Hash:       testHashAddress,
 				Balance: storage.Balance{
-					Currency: "utia",
+					Currency: consts.DefaultCurrency,
 					Total:    decimal.RequireFromString("-123"),
 				},
 			},
@@ -52,7 +53,7 @@ func Test_parseCoinSpent(t *testing.T) {
 				Address:    testAddress,
 				Hash:       testHashAddress,
 				Balance: storage.Balance{
-					Currency: "utia",
+					Currency: consts.DefaultCurrency,
 					Total:    decimal.Zero,
 				},
 			},
