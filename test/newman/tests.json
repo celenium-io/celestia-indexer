@@ -419,10 +419,12 @@
 													"});",
 													"",
 													"",
-													"pm.test(\"Balance is a string\", function () {",
+													"pm.test(\"Balance is valid\", function () {",
 													"  const responseData = pm.response.json();",
 													"  ",
-													"  pm.expect(responseData.balance).to.be.a('string');",
+													"  pm.expect(responseData.balance).to.be.a('object');",
+													"  pm.expect(responseData.balance.currency).to.be.a('string');",
+													"  pm.expect(responseData.balance.value).to.be.a('string');",
 													"});"
 												],
 												"type": "text/javascript"
@@ -835,6 +837,66 @@
 									"body": "{\n  \"message\": \"<string>\"\n}"
 								}
 							]
+						},
+						{
+							"name": "Count",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"  pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response is a number and positive\", function () {",
+											"  pm.expect(pm.response.json()).to.be.an('number').and.to.be.at.least(1);;",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/v1/address/count",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"address",
+										"count"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/v1/address/count",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"address",
+												"count"
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								}
+							]
 						}
 					]
 				},
@@ -1226,6 +1288,126 @@
 													],
 													"cookie": [],
 													"body": "{\n  \"message\": \"<string>\"\n}"
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "namespace",
+									"item": [
+										{
+											"name": "Get affected namespaces",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response status code is 200\", function () {",
+															"  pm.response.to.have.status(200);",
+															"});",
+															"",
+															"",
+															"pm.test(\"Response body is an array\", function () {",
+															"  pm.expect(pm.response.json()).to.be.an('array');",
+															"});",
+															"",
+															"",
+															"pm.test(\"The 'id' field is a non-negative integer\", function () {",
+															"    const responseData = pm.response.json();",
+															"",
+															"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+															"    responseData.forEach(function (item) {",
+															"        pm.expect(item.id).to.be.a('number').and.to.be.at.least(0);",
+															"    });",
+															"});",
+															"",
+															"",
+															"pm.test(\"The height field is a non-negative integer\", function () {",
+															"    const responseData = pm.response.json();",
+															"    ",
+															"    pm.expect(responseData).to.be.an('array');",
+															"    ",
+															"    responseData.forEach(function(item) {",
+															"        pm.expect(item.height).to.be.a('number').and.to.be.at.least(0);",
+															"    });",
+															"});",
+															"",
+															"",
+															"pm.test(\"The 'tx' field exists\", function () {",
+															"    const responseData = pm.response.json();",
+															"",
+															"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+															"    responseData.forEach(function(item) {",
+															"        pm.expect(item.tx).to.be.a('object').that.is.not.empty;",
+															"    });",
+															"});",
+															"",
+															"",
+															"pm.test(\"The 'namespace' field exists\", function () {",
+															"    const responseData = pm.response.json();",
+															"",
+															"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+															"    responseData.forEach(function(item) {",
+															"        pm.expect(item.namespace).to.be.a('object').that.is.not.empty;",
+															"    });",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/v1/block/:height/namespace",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"v1",
+														"block",
+														":height",
+														"namespace"
+													],
+													"variable": [
+														{
+															"key": "height",
+															"value": "20345"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}/v1/block/:height/namespace",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"block",
+																":height",
+																"namespace"
+															],
+															"variable": [
+																{
+																	"key": "height",
+																	"value": "20345"
+																}
+															]
+														}
+													},
+													"_postman_previewlanguage": null,
+													"header": null,
+													"cookie": [],
+													"body": null
 												}
 											]
 										}
@@ -1747,6 +1929,66 @@
 									],
 									"cookie": [],
 									"body": "{\n  \"message\": \"<string>\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Count",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"  pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response is a number and positive\", function () {",
+											"  pm.expect(pm.response.json()).to.be.an('number').and.to.be.at.least(1);;",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/v1/block/count",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"block",
+										"count"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/v1/block/count",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"block",
+												"count"
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
 								}
 							]
 						}
@@ -2795,13 +3037,9 @@
 											}
 										],
 										"url": {
-											"raw": "http://api.celestia.dipdup.net/v1/namespace?limit=<integer>&offset=<integer>&sort=desc",
-											"protocol": "http",
+											"raw": "{{baseUrl}}/v1/namespace?limit=<integer>&offset=<integer>&sort=desc",
 											"host": [
-												"api",
-												"celestia",
-												"dipdup",
-												"net"
+												"{{baseUrl}}"
 											],
 											"path": [
 												"v1",
@@ -2939,6 +3177,147 @@
 									"body": "{\n  \"message\": \"<string>\"\n}"
 								}
 							]
+						},
+						{
+							"name": "Active",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"  pm.response.to.have.status(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response body is an array\", function () {",
+											"  pm.expect(pm.response.json()).to.be.an('array');",
+											"});",
+											"",
+											"",
+											"pm.test(\"The 'id' field is a non-negative integer\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+											"    responseData.forEach(function (item) {",
+											"        pm.expect(item.id).to.be.a('number').and.to.be.at.least(0);",
+											"    });",
+											"});",
+											"",
+											"",
+											"pm.test(\"The height field is a non-negative integer\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('array');",
+											"    ",
+											"    responseData.forEach(function(item) {",
+											"        pm.expect(item.height).to.be.a('number').and.to.be.at.least(0);",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/v1/namespace/active",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"namespace",
+										"active"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/v1/namespace/active",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"namespace",
+												"active"
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								}
+							]
+						},
+						{
+							"name": "Count",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"  pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response is a number and positive\", function () {",
+											"  pm.expect(pm.response.json()).to.be.an('number').and.to.be.at.least(1);;",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/v1/namespace/count",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"namespace",
+										"count"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/v1/namespace/count",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"namespace",
+												"count"
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								}
+							]
 						}
 					]
 				},
@@ -2952,7 +3331,86 @@
 									"name": "{height}",
 									"item": [
 										{
-											"name": "Get namespace blob on height",
+											"name": "{commitment}",
+											"item": [
+												{
+													"name": "Get blob",
+													"request": {
+														"method": "GET",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}/v1/namespace_by_hash/:hash/:height/:commitment",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"v1",
+																"namespace_by_hash",
+																":hash",
+																":height",
+																":commitment"
+															],
+															"variable": [
+																{
+																	"key": "hash",
+																	"value": ""
+																},
+																{
+																	"key": "height",
+																	"value": ""
+																},
+																{
+																	"key": "commitment",
+																	"value": ""
+																}
+															]
+														}
+													},
+													"response": [
+														{
+															"name": "OK",
+															"originalRequest": {
+																"method": "GET",
+																"header": [],
+																"url": {
+																	"raw": "{{baseUrl}}/v1/namespace_by_hash/:hash/:height/:commitment",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"v1",
+																		"namespace_by_hash",
+																		":hash",
+																		":height",
+																		":commitment"
+																	],
+																	"variable": [
+																		{
+																			"key": "hash",
+																			"value": "AAAAAAAAAAAAAAAAAAAAAAAAAMAOXWfCdVOJre0="
+																		},
+																		{
+																			"key": "height",
+																			"value": "20345"
+																		},
+																		{
+																			"key": "commitment",
+																			"value": "rEF89bSQk/MQ4wsNjGKcNKMJDSXHUCLPW/Xd2zKauJU="
+																		}
+																	]
+																}
+															},
+															"_postman_previewlanguage": null,
+															"header": null,
+															"cookie": [],
+															"body": null
+														}
+													]
+												}
+											]
+										},
+										{
+											"name": "Get namespace blobs on height",
 											"request": {
 												"method": "GET",
 												"header": [
@@ -2997,13 +3455,9 @@
 															}
 														],
 														"url": {
-															"raw": "http://api.celestia.dipdup.net/v1/namespace_by_hash/:hash/:height",
-															"protocol": "http",
+															"raw": "{{baseUrl}}/v1/namespace_by_hash/:hash/:height",
 															"host": [
-																"api",
-																"celestia",
-																"dipdup",
-																"net"
+																"{{baseUrl}}"
 															],
 															"path": [
 																"v1",
@@ -3159,13 +3613,9 @@
 													}
 												],
 												"url": {
-													"raw": "http://api.celestia.dipdup.net/v1/namespace_by_hash/:hash",
-													"protocol": "http",
+													"raw": "{{baseUrl}}/v1/namespace_by_hash/:hash",
 													"host": [
-														"api",
-														"celestia",
-														"dipdup",
-														"net"
+														"{{baseUrl}}"
 													],
 													"path": [
 														"v1",
@@ -3386,13 +3836,9 @@
 											}
 										],
 										"url": {
-											"raw": "http://api.celestia.dipdup.net/v1/search?query=<string>",
-											"protocol": "http",
+											"raw": "{{baseUrl}}/v1/search?query=<string>",
 											"host": [
-												"api",
-												"celestia",
-												"dipdup",
-												"net"
+												"{{baseUrl}}"
 											],
 											"path": [
 												"v1",
@@ -5095,16 +5541,176 @@
 									"body": "{\n  \"message\": \"<string>\"\n}"
 								}
 							]
+						},
+						{
+							"name": "Count",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"  pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response is a number and positive\", function () {",
+											"  pm.expect(pm.response.json()).to.be.an('number').and.to.be.at.least(1);;",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/v1/tx/count",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"tx",
+										"count"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/v1/tx/count",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"tx",
+												"count"
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "constants",
+					"item": [
+						{
+							"name": "Get constants",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"  pm.response.to.have.status(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response body is an object\", function () {",
+											"  pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"The 'module' field exists\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object').that.is.not.empty;",
+											"    pm.expect(responseData.module).to.be.an('object').that.is.not.empty;",
+											"});",
+											"",
+											"pm.test(\"The 'denom_metadata' field exists and not empty\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.be.an('object').that.is.not.empty;",
+											"    pm.expect(responseData.denom_metadata).to.be.an('array').that.is.not.empty;",
+											"    responseData.denom_metadata.forEach(function (item) {",
+											"        pm.expect(item.base).to.be.a('string');",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/v1/constants",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"constants"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/v1/constants",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v1",
+												"constants"
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								}
+							]
 						}
 					]
 				}
 			]
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
 			"key": "baseUrl",
-			"value": "//127.0.0.1/v1"
+			"value": "http://127.0.0.1:9876"
 		}
 	]
 }
