@@ -10,6 +10,7 @@ import (
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/rs/zerolog/log"
 )
 
@@ -39,6 +40,7 @@ type Module struct {
 	level            types.Level
 	hash             []byte
 	needGenesis      bool
+	taskQueue        *sdkSync.Map[types.Level, struct{}]
 	mx               *sync.RWMutex
 	rollbackSync     *sync.WaitGroup
 	cancelWorkers    context.CancelFunc
@@ -63,6 +65,7 @@ func NewModule(cfg config.Indexer, api node.API, state *storage.State) Module {
 		needGenesis:  state == nil,
 		level:        level,
 		hash:         lastHash,
+		taskQueue:    sdkSync.NewMap[types.Level, struct{}](),
 		mx:           new(sync.RWMutex),
 		rollbackSync: new(sync.WaitGroup),
 	}
@@ -145,6 +148,7 @@ func (r *Module) rollback(ctx context.Context) {
 				continue
 			}
 
+			r.taskQueue.Clear()
 			r.setLevel(state.LastHeight, state.LastHash)
 			r.Log.Info().Msgf("caught return from rollback to level=%d", state.LastHeight)
 			r.rollbackSync.Done()

@@ -2,6 +2,7 @@ package receiver
 
 import (
 	"context"
+
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 )
@@ -20,7 +21,10 @@ func (r *Module) readBlocks(ctx context.Context) error {
 		case <-ctx.Done():
 			return nil
 		default:
-			r.pool.AddTask(level)
+			if _, ok := r.taskQueue.Get(level); !ok {
+				r.taskQueue.Set(level, struct{}{})
+				r.pool.AddTask(level)
+			}
 		}
 	}
 

@@ -9,6 +9,8 @@ import (
 )
 
 func (r *Module) worker(ctx context.Context, level types.Level) {
+	defer r.taskQueue.Delete(level)
+
 	start := time.Now()
 
 	var result types.BlockData
