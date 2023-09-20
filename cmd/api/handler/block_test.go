@@ -156,7 +156,7 @@ func (s *BlockTestSuite) TestGetWithStats() {
 	c.SetParamValues("100")
 
 	s.blocks.EXPECT().
-		ByHeight(gomock.Any(), uint64(100)).
+		ByHeightWithStats(gomock.Any(), uint64(100)).
 		Return(testBlockWithStats, nil)
 
 	s.Require().NoError(s.handler.Get(c))
@@ -201,10 +201,43 @@ func (s *BlockTestSuite) TestList() {
 	c.SetPath("/block")
 
 	s.blocks.EXPECT().
-		ListWithStats(gomock.Any(), false, gomock.Any(), gomock.Any(), gomock.Any()).
-		Return([]storage.Block{
-			testBlock,
-		}, nil)
+		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Return([]*storage.Block{
+			&testBlock,
+		}, nil).
+		MaxTimes(1)
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var blocks []responses.Block
+	err := json.NewDecoder(rec.Body).Decode(&blocks)
+	s.Require().NoError(err)
+	s.Require().Len(blocks, 1)
+	s.Require().EqualValues(1, blocks[0].Id)
+	s.Require().EqualValues(100, blocks[0].Height)
+	s.Require().Equal("1", blocks[0].VersionApp)
+	s.Require().Equal("11", blocks[0].VersionBlock)
+	s.Require().Equal("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F", blocks[0].Hash.String())
+	s.Require().Equal(testTime, blocks[0].Time)
+	s.Require().Equal([]types.MsgType{types.MsgSend}, blocks[0].MessageTypes)
+}
+
+func (s *BlockTestSuite) TestListWithStats() {
+	q := make(url.Values)
+	q.Set("stats", "true")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/block")
+
+	s.blocks.EXPECT().
+		ListWithStats(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Return([]*storage.Block{
+			&testBlockWithStats,
+		}, nil).
+		MaxTimes(1)
 
 	s.Require().NoError(s.handler.List(c))
 	s.Require().Equal(http.StatusOK, rec.Code)

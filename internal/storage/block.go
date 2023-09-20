@@ -17,8 +17,9 @@ type IBlock interface {
 
 	Last(ctx context.Context) (Block, error)
 	ByHeight(ctx context.Context, height uint64) (Block, error)
+	ByHeightWithStats(ctx context.Context, height uint64) (Block, error)
 	ByHash(ctx context.Context, hash []byte) (Block, error)
-	ListWithStats(ctx context.Context, stats bool, limit, offset uint64, order storage.SortOrder) ([]Block, error)
+	ListWithStats(ctx context.Context, limit, offset uint64, order storage.SortOrder) ([]*Block, error)
 }
 
 // Block -

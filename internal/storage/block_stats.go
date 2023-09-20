@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
 	"time"
 
 	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
@@ -28,6 +29,8 @@ type BlockStats struct {
 	SupplyChange  decimal.Decimal `bun:",type:numeric"    comment:"Change of total supply in the block"                     stats:"func:min max sum avg"`
 	InflationRate decimal.Decimal `bun:",type:numeric"    comment:"Inflation rate"                                          stats:"func:min max avg"`
 	Fee           decimal.Decimal `bun:"fee,type:numeric" comment:"Summary block fee"                                       stats:"func:min max sum avg"`
+
+	MessagesCounts map[types.MsgType]int64 `bun:"-"`
 }
 
 func (BlockStats) TableName() string {

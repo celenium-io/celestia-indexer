@@ -185,6 +185,9 @@ definitions:
       inflation_rate:
         example: "0.0800000"
         type: string
+      messages_counts:
+        example: '{MsgPayForBlobs:10,MsgUnjail:1}'
+        type: string
       supply_change:
         example: "8635234"
         type: string

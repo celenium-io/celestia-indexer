@@ -65,7 +65,13 @@ func (handler *BlockHandler) Get(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	block, err := handler.block.ByHeight(c.Request().Context(), req.Height)
+	var block storage.Block
+	if req.Stats {
+		block, err = handler.block.ByHeightWithStats(c.Request().Context(), req.Height)
+	} else {
+		block, err = handler.block.ByHeight(c.Request().Context(), req.Height)
+	}
+
 	if err := handleError(c, err, handler.block); err != nil {
 		return err
 	}
@@ -111,14 +117,20 @@ func (handler *BlockHandler) List(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	blocks, err := handler.block.ListWithStats(c.Request().Context(), req.Stats, req.Limit, req.Offset, pgSort(req.Sort))
+	var blocks []*storage.Block
+	if req.Stats {
+		blocks, err = handler.block.ListWithStats(c.Request().Context(), req.Limit, req.Offset, pgSort(req.Sort))
+	} else {
+		blocks, err = handler.block.List(c.Request().Context(), req.Limit, req.Offset, pgSort(req.Sort))
+	}
+
 	if err := handleError(c, err, handler.block); err != nil {
 		return err
 	}
 
 	response := make([]responses.Block, len(blocks))
 	for i := range blocks {
-		response[i] = responses.NewBlock(blocks[i], req.Stats)
+		response[i] = responses.NewBlock(*blocks[i], req.Stats)
 	}
 
 	return returnArray(c, response)

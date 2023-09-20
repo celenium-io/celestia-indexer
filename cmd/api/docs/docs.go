@@ -1833,6 +1833,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "0.0800000"
                 },
+                "messages_counts": {
+                    "type": "string",
+                    "example": "{MsgPayForBlobs:10,MsgUnjail:1}"
+                },
                 "supply_change": {
                     "type": "string",
                     "example": "8635234"
