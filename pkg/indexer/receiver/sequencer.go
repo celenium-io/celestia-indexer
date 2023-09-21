@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
+
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 )
 

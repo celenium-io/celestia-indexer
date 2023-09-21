@@ -16,7 +16,10 @@ func (r *Module) readBlocks(ctx context.Context) error {
 		return err
 	}
 
-	for level, _ := r.Level(); level <= headLevel; level++ {
+	level, _ := r.Level()
+	level += 1
+
+	for ; level <= headLevel; level++ {
 		select {
 		case <-ctx.Done():
 			return nil
