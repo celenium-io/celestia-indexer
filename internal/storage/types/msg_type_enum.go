@@ -43,6 +43,10 @@ const (
 	MsgPayForBlobs MsgType = "MsgPayForBlobs"
 	// MsgGrant is a MsgType of type MsgGrant.
 	MsgGrant MsgType = "MsgGrant"
+	// MsgExec is a MsgType of type MsgExec.
+	MsgExec MsgType = "MsgExec"
+	// MsgRevoke is a MsgType of type MsgRevoke.
+	MsgRevoke MsgType = "MsgRevoke"
 	// MsgGrantAllowance is a MsgType of type MsgGrantAllowance.
 	MsgGrantAllowance MsgType = "MsgGrantAllowance"
 	// MsgRegisterEVMAddress is a MsgType of type MsgRegisterEVMAddress.
@@ -77,6 +81,8 @@ func MsgTypeValues() []MsgType {
 		MsgCreatePeriodicVestingAccount,
 		MsgPayForBlobs,
 		MsgGrant,
+		MsgExec,
+		MsgRevoke,
 		MsgGrantAllowance,
 		MsgRegisterEVMAddress,
 		MsgSetWithdrawAddress,
@@ -114,6 +120,8 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgCreatePeriodicVestingAccount": MsgCreatePeriodicVestingAccount,
 	"MsgPayForBlobs":                  MsgPayForBlobs,
 	"MsgGrant":                        MsgGrant,
+	"MsgExec":                         MsgExec,
+	"MsgRevoke":                       MsgRevoke,
 	"MsgGrantAllowance":               MsgGrantAllowance,
 	"MsgRegisterEVMAddress":           MsgRegisterEVMAddress,
 	"MsgSetWithdrawAddress":           MsgSetWithdrawAddress,
