@@ -14,7 +14,7 @@ import (
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/websocket"
 	"github.com/dipdup-io/celestia-indexer/internal/profiler"
 	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
-	nodeApi "github.com/dipdup-io/celestia-indexer/pkg/node/celestia_node_api"
+	nodeApi "github.com/dipdup-io/celestia-indexer/pkg/node/dal"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"

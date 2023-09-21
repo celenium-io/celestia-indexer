@@ -17,31 +17,31 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockAPI is a mock of API interface.
-type MockAPI struct {
+// MockApi is a mock of Api interface.
+type MockApi struct {
 	ctrl     *gomock.Controller
-	recorder *MockAPIMockRecorder
+	recorder *MockApiMockRecorder
 }
 
-// MockAPIMockRecorder is the mock recorder for MockAPI.
-type MockAPIMockRecorder struct {
-	mock *MockAPI
+// MockApiMockRecorder is the mock recorder for MockApi.
+type MockApiMockRecorder struct {
+	mock *MockApi
 }
 
-// NewMockAPI creates a new mock instance.
-func NewMockAPI(ctrl *gomock.Controller) *MockAPI {
-	mock := &MockAPI{ctrl: ctrl}
-	mock.recorder = &MockAPIMockRecorder{mock}
+// NewMockApi creates a new mock instance.
+func NewMockApi(ctrl *gomock.Controller) *MockApi {
+	mock := &MockApi{ctrl: ctrl}
+	mock.recorder = &MockApiMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockAPI) EXPECT() *MockAPIMockRecorder {
+func (m *MockApi) EXPECT() *MockApiMockRecorder {
 	return m.recorder
 }
 
 // Block mocks base method.
-func (m *MockAPI) Block(ctx context.Context, level types0.Level) (types0.ResultBlock, error) {
+func (m *MockApi) Block(ctx context.Context, level types0.Level) (types0.ResultBlock, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Block", ctx, level)
 	ret0, _ := ret[0].(types0.ResultBlock)
@@ -50,37 +50,37 @@ func (m *MockAPI) Block(ctx context.Context, level types0.Level) (types0.ResultB
 }
 
 // Block indicates an expected call of Block.
-func (mr *MockAPIMockRecorder) Block(ctx, level any) *APIBlockCall {
+func (mr *MockApiMockRecorder) Block(ctx, level any) *ApiBlockCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Block", reflect.TypeOf((*MockAPI)(nil).Block), ctx, level)
-	return &APIBlockCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Block", reflect.TypeOf((*MockApi)(nil).Block), ctx, level)
+	return &ApiBlockCall{Call: call}
 }
 
-// APIBlockCall wrap *gomock.Call
-type APIBlockCall struct {
+// ApiBlockCall wrap *gomock.Call
+type ApiBlockCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *APIBlockCall) Return(arg0 types0.ResultBlock, arg1 error) *APIBlockCall {
+func (c *ApiBlockCall) Return(arg0 types0.ResultBlock, arg1 error) *ApiBlockCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *APIBlockCall) Do(f func(context.Context, types0.Level) (types0.ResultBlock, error)) *APIBlockCall {
+func (c *ApiBlockCall) Do(f func(context.Context, types0.Level) (types0.ResultBlock, error)) *ApiBlockCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *APIBlockCall) DoAndReturn(f func(context.Context, types0.Level) (types0.ResultBlock, error)) *APIBlockCall {
+func (c *ApiBlockCall) DoAndReturn(f func(context.Context, types0.Level) (types0.ResultBlock, error)) *ApiBlockCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // BlockResults mocks base method.
-func (m *MockAPI) BlockResults(ctx context.Context, level types0.Level) (types0.ResultBlockResults, error) {
+func (m *MockApi) BlockResults(ctx context.Context, level types0.Level) (types0.ResultBlockResults, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "BlockResults", ctx, level)
 	ret0, _ := ret[0].(types0.ResultBlockResults)
@@ -89,37 +89,37 @@ func (m *MockAPI) BlockResults(ctx context.Context, level types0.Level) (types0.
 }
 
 // BlockResults indicates an expected call of BlockResults.
-func (mr *MockAPIMockRecorder) BlockResults(ctx, level any) *APIBlockResultsCall {
+func (mr *MockApiMockRecorder) BlockResults(ctx, level any) *ApiBlockResultsCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BlockResults", reflect.TypeOf((*MockAPI)(nil).BlockResults), ctx, level)
-	return &APIBlockResultsCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BlockResults", reflect.TypeOf((*MockApi)(nil).BlockResults), ctx, level)
+	return &ApiBlockResultsCall{Call: call}
 }
 
-// APIBlockResultsCall wrap *gomock.Call
-type APIBlockResultsCall struct {
+// ApiBlockResultsCall wrap *gomock.Call
+type ApiBlockResultsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *APIBlockResultsCall) Return(arg0 types0.ResultBlockResults, arg1 error) *APIBlockResultsCall {
+func (c *ApiBlockResultsCall) Return(arg0 types0.ResultBlockResults, arg1 error) *ApiBlockResultsCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *APIBlockResultsCall) Do(f func(context.Context, types0.Level) (types0.ResultBlockResults, error)) *APIBlockResultsCall {
+func (c *ApiBlockResultsCall) Do(f func(context.Context, types0.Level) (types0.ResultBlockResults, error)) *ApiBlockResultsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *APIBlockResultsCall) DoAndReturn(f func(context.Context, types0.Level) (types0.ResultBlockResults, error)) *APIBlockResultsCall {
+func (c *ApiBlockResultsCall) DoAndReturn(f func(context.Context, types0.Level) (types0.ResultBlockResults, error)) *ApiBlockResultsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Genesis mocks base method.
-func (m *MockAPI) Genesis(ctx context.Context) (types.Genesis, error) {
+func (m *MockApi) Genesis(ctx context.Context) (types.Genesis, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Genesis", ctx)
 	ret0, _ := ret[0].(types.Genesis)
@@ -128,37 +128,37 @@ func (m *MockAPI) Genesis(ctx context.Context) (types.Genesis, error) {
 }
 
 // Genesis indicates an expected call of Genesis.
-func (mr *MockAPIMockRecorder) Genesis(ctx any) *APIGenesisCall {
+func (mr *MockApiMockRecorder) Genesis(ctx any) *ApiGenesisCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Genesis", reflect.TypeOf((*MockAPI)(nil).Genesis), ctx)
-	return &APIGenesisCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Genesis", reflect.TypeOf((*MockApi)(nil).Genesis), ctx)
+	return &ApiGenesisCall{Call: call}
 }
 
-// APIGenesisCall wrap *gomock.Call
-type APIGenesisCall struct {
+// ApiGenesisCall wrap *gomock.Call
+type ApiGenesisCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *APIGenesisCall) Return(arg0 types.Genesis, arg1 error) *APIGenesisCall {
+func (c *ApiGenesisCall) Return(arg0 types.Genesis, arg1 error) *ApiGenesisCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *APIGenesisCall) Do(f func(context.Context) (types.Genesis, error)) *APIGenesisCall {
+func (c *ApiGenesisCall) Do(f func(context.Context) (types.Genesis, error)) *ApiGenesisCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *APIGenesisCall) DoAndReturn(f func(context.Context) (types.Genesis, error)) *APIGenesisCall {
+func (c *ApiGenesisCall) DoAndReturn(f func(context.Context) (types.Genesis, error)) *ApiGenesisCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Head mocks base method.
-func (m *MockAPI) Head(ctx context.Context) (types0.ResultBlock, error) {
+func (m *MockApi) Head(ctx context.Context) (types0.ResultBlock, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Head", ctx)
 	ret0, _ := ret[0].(types0.ResultBlock)
@@ -167,37 +167,37 @@ func (m *MockAPI) Head(ctx context.Context) (types0.ResultBlock, error) {
 }
 
 // Head indicates an expected call of Head.
-func (mr *MockAPIMockRecorder) Head(ctx any) *APIHeadCall {
+func (mr *MockApiMockRecorder) Head(ctx any) *ApiHeadCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Head", reflect.TypeOf((*MockAPI)(nil).Head), ctx)
-	return &APIHeadCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Head", reflect.TypeOf((*MockApi)(nil).Head), ctx)
+	return &ApiHeadCall{Call: call}
 }
 
-// APIHeadCall wrap *gomock.Call
-type APIHeadCall struct {
+// ApiHeadCall wrap *gomock.Call
+type ApiHeadCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *APIHeadCall) Return(arg0 types0.ResultBlock, arg1 error) *APIHeadCall {
+func (c *ApiHeadCall) Return(arg0 types0.ResultBlock, arg1 error) *ApiHeadCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *APIHeadCall) Do(f func(context.Context) (types0.ResultBlock, error)) *APIHeadCall {
+func (c *ApiHeadCall) Do(f func(context.Context) (types0.ResultBlock, error)) *ApiHeadCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *APIHeadCall) DoAndReturn(f func(context.Context) (types0.ResultBlock, error)) *APIHeadCall {
+func (c *ApiHeadCall) DoAndReturn(f func(context.Context) (types0.ResultBlock, error)) *ApiHeadCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Status mocks base method.
-func (m *MockAPI) Status(ctx context.Context) (types.Status, error) {
+func (m *MockApi) Status(ctx context.Context) (types.Status, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Status", ctx)
 	ret0, _ := ret[0].(types.Status)
@@ -206,60 +206,60 @@ func (m *MockAPI) Status(ctx context.Context) (types.Status, error) {
 }
 
 // Status indicates an expected call of Status.
-func (mr *MockAPIMockRecorder) Status(ctx any) *APIStatusCall {
+func (mr *MockApiMockRecorder) Status(ctx any) *ApiStatusCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Status", reflect.TypeOf((*MockAPI)(nil).Status), ctx)
-	return &APIStatusCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Status", reflect.TypeOf((*MockApi)(nil).Status), ctx)
+	return &ApiStatusCall{Call: call}
 }
 
-// APIStatusCall wrap *gomock.Call
-type APIStatusCall struct {
+// ApiStatusCall wrap *gomock.Call
+type ApiStatusCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *APIStatusCall) Return(arg0 types.Status, arg1 error) *APIStatusCall {
+func (c *ApiStatusCall) Return(arg0 types.Status, arg1 error) *ApiStatusCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *APIStatusCall) Do(f func(context.Context) (types.Status, error)) *APIStatusCall {
+func (c *ApiStatusCall) Do(f func(context.Context) (types.Status, error)) *ApiStatusCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *APIStatusCall) DoAndReturn(f func(context.Context) (types.Status, error)) *APIStatusCall {
+func (c *ApiStatusCall) DoAndReturn(f func(context.Context) (types.Status, error)) *ApiStatusCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
-// MockCelestiaNodeApi is a mock of CelestiaNodeApi interface.
-type MockCelestiaNodeApi struct {
+// MockDalApi is a mock of DalApi interface.
+type MockDalApi struct {
 	ctrl     *gomock.Controller
-	recorder *MockCelestiaNodeApiMockRecorder
+	recorder *MockDalApiMockRecorder
 }
 
-// MockCelestiaNodeApiMockRecorder is the mock recorder for MockCelestiaNodeApi.
-type MockCelestiaNodeApiMockRecorder struct {
-	mock *MockCelestiaNodeApi
+// MockDalApiMockRecorder is the mock recorder for MockDalApi.
+type MockDalApiMockRecorder struct {
+	mock *MockDalApi
 }
 
-// NewMockCelestiaNodeApi creates a new mock instance.
-func NewMockCelestiaNodeApi(ctrl *gomock.Controller) *MockCelestiaNodeApi {
-	mock := &MockCelestiaNodeApi{ctrl: ctrl}
-	mock.recorder = &MockCelestiaNodeApiMockRecorder{mock}
+// NewMockDalApi creates a new mock instance.
+func NewMockDalApi(ctrl *gomock.Controller) *MockDalApi {
+	mock := &MockDalApi{ctrl: ctrl}
+	mock.recorder = &MockDalApiMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCelestiaNodeApi) EXPECT() *MockCelestiaNodeApiMockRecorder {
+func (m *MockDalApi) EXPECT() *MockDalApiMockRecorder {
 	return m.recorder
 }
 
 // Blob mocks base method.
-func (m *MockCelestiaNodeApi) Blob(ctx context.Context, height uint64, namespace, commitment string) (types.Blob, error) {
+func (m *MockDalApi) Blob(ctx context.Context, height uint64, namespace, commitment string) (types.Blob, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Blob", ctx, height, namespace, commitment)
 	ret0, _ := ret[0].(types.Blob)
@@ -268,37 +268,37 @@ func (m *MockCelestiaNodeApi) Blob(ctx context.Context, height uint64, namespace
 }
 
 // Blob indicates an expected call of Blob.
-func (mr *MockCelestiaNodeApiMockRecorder) Blob(ctx, height, namespace, commitment any) *CelestiaNodeApiBlobCall {
+func (mr *MockDalApiMockRecorder) Blob(ctx, height, namespace, commitment any) *DalApiBlobCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Blob", reflect.TypeOf((*MockCelestiaNodeApi)(nil).Blob), ctx, height, namespace, commitment)
-	return &CelestiaNodeApiBlobCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Blob", reflect.TypeOf((*MockDalApi)(nil).Blob), ctx, height, namespace, commitment)
+	return &DalApiBlobCall{Call: call}
 }
 
-// CelestiaNodeApiBlobCall wrap *gomock.Call
-type CelestiaNodeApiBlobCall struct {
+// DalApiBlobCall wrap *gomock.Call
+type DalApiBlobCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *CelestiaNodeApiBlobCall) Return(arg0 types.Blob, arg1 error) *CelestiaNodeApiBlobCall {
+func (c *DalApiBlobCall) Return(arg0 types.Blob, arg1 error) *DalApiBlobCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *CelestiaNodeApiBlobCall) Do(f func(context.Context, uint64, string, string) (types.Blob, error)) *CelestiaNodeApiBlobCall {
+func (c *DalApiBlobCall) Do(f func(context.Context, uint64, string, string) (types.Blob, error)) *DalApiBlobCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *CelestiaNodeApiBlobCall) DoAndReturn(f func(context.Context, uint64, string, string) (types.Blob, error)) *CelestiaNodeApiBlobCall {
+func (c *DalApiBlobCall) DoAndReturn(f func(context.Context, uint64, string, string) (types.Blob, error)) *DalApiBlobCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Blobs mocks base method.
-func (m *MockCelestiaNodeApi) Blobs(ctx context.Context, height uint64, hash ...string) ([]types.Blob, error) {
+func (m *MockDalApi) Blobs(ctx context.Context, height uint64, hash ...string) ([]types.Blob, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, height}
 	for _, a := range hash {
@@ -311,32 +311,32 @@ func (m *MockCelestiaNodeApi) Blobs(ctx context.Context, height uint64, hash ...
 }
 
 // Blobs indicates an expected call of Blobs.
-func (mr *MockCelestiaNodeApiMockRecorder) Blobs(ctx, height any, hash ...any) *CelestiaNodeApiBlobsCall {
+func (mr *MockDalApiMockRecorder) Blobs(ctx, height any, hash ...any) *DalApiBlobsCall {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, height}, hash...)
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Blobs", reflect.TypeOf((*MockCelestiaNodeApi)(nil).Blobs), varargs...)
-	return &CelestiaNodeApiBlobsCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Blobs", reflect.TypeOf((*MockDalApi)(nil).Blobs), varargs...)
+	return &DalApiBlobsCall{Call: call}
 }
 
-// CelestiaNodeApiBlobsCall wrap *gomock.Call
-type CelestiaNodeApiBlobsCall struct {
+// DalApiBlobsCall wrap *gomock.Call
+type DalApiBlobsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *CelestiaNodeApiBlobsCall) Return(arg0 []types.Blob, arg1 error) *CelestiaNodeApiBlobsCall {
+func (c *DalApiBlobsCall) Return(arg0 []types.Blob, arg1 error) *DalApiBlobsCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *CelestiaNodeApiBlobsCall) Do(f func(context.Context, uint64, ...string) ([]types.Blob, error)) *CelestiaNodeApiBlobsCall {
+func (c *DalApiBlobsCall) Do(f func(context.Context, uint64, ...string) ([]types.Blob, error)) *DalApiBlobsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *CelestiaNodeApiBlobsCall) DoAndReturn(f func(context.Context, uint64, ...string) ([]types.Blob, error)) *CelestiaNodeApiBlobsCall {
+func (c *DalApiBlobsCall) DoAndReturn(f func(context.Context, uint64, ...string) ([]types.Blob, error)) *DalApiBlobsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

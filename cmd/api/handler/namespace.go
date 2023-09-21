@@ -14,7 +14,7 @@ import (
 
 type NamespaceHandler struct {
 	namespace   storage.INamespace
-	blob        node.CelestiaNodeApi
+	blob        node.DalApi
 	state       storage.IState
 	indexerName string
 }
@@ -23,7 +23,7 @@ func NewNamespaceHandler(
 	namespace storage.INamespace,
 	state storage.IState,
 	indexerName string,
-	blob node.CelestiaNodeApi,
+	blob node.DalApi,
 ) *NamespaceHandler {
 	return &NamespaceHandler{
 		namespace:   namespace,

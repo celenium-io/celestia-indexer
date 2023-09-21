@@ -35,7 +35,7 @@ type Module struct {
 	tx        sdk.Transactable
 	state     storage.IState
 	blocks    storage.IBlock
-	node      node.API
+	node      node.Api
 	indexName string
 }
 
@@ -45,7 +45,7 @@ func NewModule(
 	tx sdk.Transactable,
 	state storage.IState,
 	blocks storage.IBlock,
-	node node.API,
+	node node.Api,
 	cfg config.Indexer,
 ) Module {
 	module := Module{

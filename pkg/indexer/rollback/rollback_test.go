@@ -29,7 +29,7 @@ type ModuleTestSuite struct {
 	suite.Suite
 	psqlContainer *database.PostgreSQLContainer
 	storage       postgres.Storage
-	api           *mock.MockAPI
+	api           *mock.MockApi
 }
 
 // SetupSuite -
@@ -85,7 +85,7 @@ func (s *ModuleTestSuite) InitDb(path string) {
 
 func (s *ModuleTestSuite) InitApi(configureApi func()) {
 	ctrl := gomock.NewController(s.T())
-	s.api = mock.NewMockAPI(ctrl)
+	s.api = mock.NewMockApi(ctrl)
 
 	if configureApi != nil {
 		configureApi()

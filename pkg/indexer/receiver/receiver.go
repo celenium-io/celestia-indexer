@@ -33,7 +33,7 @@ const (
 //	    |----------------|
 type Module struct {
 	modules.BaseModule
-	api              node.API
+	api              node.Api
 	cfg              config.Indexer
 	pool             *workerpool.Pool[types.Level]
 	blocks           chan types.BlockData
@@ -49,7 +49,7 @@ type Module struct {
 
 var _ modules.Module = (*Module)(nil)
 
-func NewModule(cfg config.Indexer, api node.API, state *storage.State) Module {
+func NewModule(cfg config.Indexer, api node.Api, state *storage.State) Module {
 	level := types.Level(cfg.StartLevel)
 	var lastHash []byte
 	if state != nil {

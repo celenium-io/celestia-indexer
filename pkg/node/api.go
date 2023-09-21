@@ -9,7 +9,7 @@ import (
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
-type API interface {
+type Api interface {
 	Status(ctx context.Context) (types.Status, error)
 	Head(ctx context.Context) (pkgTypes.ResultBlock, error)
 	Block(ctx context.Context, level pkgTypes.Level) (pkgTypes.ResultBlock, error)
@@ -18,7 +18,7 @@ type API interface {
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
-type CelestiaNodeApi interface {
+type DalApi interface {
 	Blobs(ctx context.Context, height uint64, hash ...string) ([]types.Blob, error)
 	Blob(ctx context.Context, height uint64, namespace, commitment string) (types.Blob, error)
 }

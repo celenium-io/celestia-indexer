@@ -1,4 +1,4 @@
-package celestianodeapi
+package dal
 
 import (
 	"context"

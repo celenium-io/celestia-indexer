@@ -26,7 +26,7 @@ import (
 
 type Indexer struct {
 	cfg      config.Config
-	api      node.API
+	api      node.Api
 	receiver *receiver.Module
 	parser   *parser.Module
 	storage  *storage.Module
@@ -130,7 +130,7 @@ func createReceiver(ctx context.Context, cfg config.Config, pg postgres.Storage)
 	return api, &receiverModule, nil
 }
 
-func createRollback(receiverModule modules.Module, pg postgres.Storage, api node.API, cfg config.Indexer) (*rollback.Module, error) {
+func createRollback(receiverModule modules.Module, pg postgres.Storage, api node.Api, cfg config.Indexer) (*rollback.Module, error) {
 	rollbackModule := rollback.NewModule(pg.Transactable, pg.State, pg.Blocks, api, cfg)
 
 	// rollback <- listen signal -- receiver

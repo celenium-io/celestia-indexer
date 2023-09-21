@@ -1,4 +1,4 @@
-package celestianodeapi
+package dal
 
 import (
 	"bytes"
@@ -40,7 +40,7 @@ func New(baseUrl string) *Node {
 		},
 		jsonRpcVersion: "2.0",
 		id:             new(atomic.Int64),
-		log:            log.With().Str("module", "celestia_node_api").Logger(),
+		log:            log.With().Str("module", "dal").Logger(),
 	}
 }
 

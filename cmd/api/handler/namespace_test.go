@@ -37,7 +37,7 @@ type NamespaceTestSuite struct {
 	suite.Suite
 	namespaces   *mock.MockINamespace
 	state        *mock.MockIState
-	blobReceiver *nodeMock.MockCelestiaNodeApi
+	blobReceiver *nodeMock.MockDalApi
 	echo         *echo.Echo
 	handler      *NamespaceHandler
 	ctrl         *gomock.Controller
@@ -50,7 +50,7 @@ func (s *NamespaceTestSuite) SetupSuite() {
 	s.ctrl = gomock.NewController(s.T())
 	s.namespaces = mock.NewMockINamespace(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.blobReceiver = nodeMock.NewMockCelestiaNodeApi(s.ctrl)
+	s.blobReceiver = nodeMock.NewMockDalApi(s.ctrl)
 	s.handler = NewNamespaceHandler(s.namespaces, s.state, testIndexerName, s.blobReceiver)
 }
 
