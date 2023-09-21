@@ -11,7 +11,7 @@ import (
 func MsgEditValidator(level types.Level, status storageTypes.Status, m *cosmosStakingTypes.MsgEditValidator) (storageTypes.MsgType, []storage.AddressWithType, *storage.Validator, error) {
 	msgType := storageTypes.MsgEditValidator
 	addresses, err := createAddresses(addressesData{
-		{t: storageTypes.MsgAddressTypeValidatorAddress, address: m.ValidatorAddress},
+		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 	}, level)
 	if status == storageTypes.StatusFailed {
 		return msgType, addresses, nil, nil
@@ -41,9 +41,9 @@ func MsgEditValidator(level types.Level, status storageTypes.Status, m *cosmosSt
 func MsgBeginRedelegate(level types.Level, m *cosmosStakingTypes.MsgBeginRedelegate) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgBeginRedelegate
 	addresses, err := createAddresses(addressesData{
-		{t: storageTypes.MsgAddressTypeDelegatorAddress, address: m.DelegatorAddress},
-		{t: storageTypes.MsgAddressTypeValidatorSrcAddress, address: m.ValidatorSrcAddress},
-		{t: storageTypes.MsgAddressTypeValidatorDstAddress, address: m.ValidatorDstAddress},
+		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
+		{t: storageTypes.MsgAddressTypeValidatorSrc, address: m.ValidatorSrcAddress},
+		{t: storageTypes.MsgAddressTypeValidatorDst, address: m.ValidatorDstAddress},
 	}, level)
 	return msgType, addresses, err
 }
@@ -51,8 +51,8 @@ func MsgBeginRedelegate(level types.Level, m *cosmosStakingTypes.MsgBeginRedeleg
 func MsgCreateValidator(level types.Level, status storageTypes.Status, m *cosmosStakingTypes.MsgCreateValidator) (storageTypes.MsgType, []storage.AddressWithType, *storage.Validator, error) {
 	msgType := storageTypes.MsgCreateValidator
 	addresses, err := createAddresses(addressesData{
-		{t: storageTypes.MsgAddressTypeDelegatorAddress, address: m.DelegatorAddress},
-		{t: storageTypes.MsgAddressTypeValidatorAddress, address: m.ValidatorAddress},
+		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
+		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 	}, level)
 	if status == storageTypes.StatusFailed {
 		return msgType, addresses, nil, nil
@@ -95,8 +95,8 @@ func MsgCreateValidator(level types.Level, status storageTypes.Status, m *cosmos
 func MsgDelegate(level types.Level, m *cosmosStakingTypes.MsgDelegate) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgDelegate
 	addresses, err := createAddresses(addressesData{
-		{t: storageTypes.MsgAddressTypeDelegatorAddress, address: m.DelegatorAddress},
-		{t: storageTypes.MsgAddressTypeValidatorAddress, address: m.ValidatorAddress},
+		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
+		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 	}, level)
 	return msgType, addresses, err
 }
@@ -104,8 +104,8 @@ func MsgDelegate(level types.Level, m *cosmosStakingTypes.MsgDelegate) (storageT
 func MsgUndelegate(level types.Level, m *cosmosStakingTypes.MsgUndelegate) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgUndelegate
 	addresses, err := createAddresses(addressesData{
-		{t: storageTypes.MsgAddressTypeDelegatorAddress, address: m.DelegatorAddress},
-		{t: storageTypes.MsgAddressTypeValidatorAddress, address: m.ValidatorAddress},
+		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
+		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 	}, level)
 	return msgType, addresses, err
 }

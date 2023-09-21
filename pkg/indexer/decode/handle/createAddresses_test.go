@@ -39,8 +39,8 @@ func TestCreateAddresses_SingleAddress(t *testing.T) {
 
 func TestCreateAddresses_ListOfAddresses(t *testing.T) {
 	data := addressesData{
-		{t: storageTypes.MsgAddressTypeDelegatorAddress, address: "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37"},
-		{t: storageTypes.MsgAddressTypeValidatorAddress, address: "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym"},
+		{t: storageTypes.MsgAddressTypeDelegator, address: "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37"},
+		{t: storageTypes.MsgAddressTypeValidator, address: "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym"},
 	}
 	level := types.Level(235236)
 
@@ -51,7 +51,7 @@ func TestCreateAddresses_ListOfAddresses(t *testing.T) {
 
 	addressesExpected := []storage.AddressWithType{
 		{
-			Type: storageTypes.MsgAddressTypeDelegatorAddress,
+			Type: storageTypes.MsgAddressTypeDelegator,
 			Address: storage.Address{
 				Id:         0,
 				Height:     types.Level(235236),
@@ -65,7 +65,7 @@ func TestCreateAddresses_ListOfAddresses(t *testing.T) {
 			},
 		},
 		{
-			Type: storageTypes.MsgAddressTypeValidatorAddress,
+			Type: storageTypes.MsgAddressTypeValidator,
 			Address: storage.Address{
 				Id:         0,
 				Height:     types.Level(235236),

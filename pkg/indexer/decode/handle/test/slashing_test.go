@@ -31,7 +31,7 @@ func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 
 	addressesExpected := []storage.AddressWithType{
 		{
-			Type: storageTypes.MsgAddressTypeValidatorAddress,
+			Type: storageTypes.MsgAddressTypeValidator,
 			Address: storage.Address{
 				Id:         0,
 				Height:     blob.Height,

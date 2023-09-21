@@ -563,8 +563,10 @@ definitions:
   types.MsgType:
     enum:
     - MsgUnknown
-    - MsgWithdrawValidatorCommission
+    - MsgSetWithdrawAddress
     - MsgWithdrawDelegatorReward
+    - MsgWithdrawValidatorCommission
+    - MsgFundCommunityPool
     - MsgEditValidator
     - MsgBeginRedelegate
     - MsgCreateValidator
@@ -572,21 +574,25 @@ definitions:
     - MsgUndelegate
     - MsgUnjail
     - MsgSend
+    - MsgMultiSend
     - MsgCreateVestingAccount
     - MsgCreatePeriodicVestingAccount
     - MsgPayForBlobs
     - MsgGrant
+    - MsgExec
+    - MsgRevoke
     - MsgGrantAllowance
     - MsgRegisterEVMAddress
-    - MsgSetWithdrawAddress
     - MsgVote
     - MsgVoteWeighted
     - MsgSubmitProposal
     type: string
     x-enum-varnames:
     - MsgUnknown
-    - MsgWithdrawValidatorCommission
+    - MsgSetWithdrawAddress
     - MsgWithdrawDelegatorReward
+    - MsgWithdrawValidatorCommission
+    - MsgFundCommunityPool
     - MsgEditValidator
     - MsgBeginRedelegate
     - MsgCreateValidator
@@ -594,13 +600,15 @@ definitions:
     - MsgUndelegate
     - MsgUnjail
     - MsgSend
+    - MsgMultiSend
     - MsgCreateVestingAccount
     - MsgCreatePeriodicVestingAccount
     - MsgPayForBlobs
     - MsgGrant
+    - MsgExec
+    - MsgRevoke
     - MsgGrantAllowance
     - MsgRegisterEVMAddress
-    - MsgSetWithdrawAddress
     - MsgVote
     - MsgVoteWeighted
     - MsgSubmitProposal
@@ -715,8 +723,10 @@ paths:
       - description: Comma-separated message types list
         enum:
         - MsgUnknown
-        - MsgWithdrawValidatorCommission
+        - MsgSetWithdrawAddress
         - MsgWithdrawDelegatorReward
+        - MsgWithdrawValidatorCommission
+        - MsgFundCommunityPool
         - MsgEditValidator
         - MsgBeginRedelegate
         - MsgCreateValidator
@@ -724,13 +734,15 @@ paths:
         - MsgUndelegate
         - MsgUnjail
         - MsgSend
+        - MsgMultiSend
         - MsgCreateVestingAccount
         - MsgCreatePeriodicVestingAccount
         - MsgPayForBlobs
         - MsgGrant
+        - MsgExec
+        - MsgRevoke
         - MsgGrantAllowance
         - MsgRegisterEVMAddress
-        - MsgSetWithdrawAddress
         - MsgVote
         - MsgVoteWeighted
         - MsgSubmitProposal
@@ -1620,8 +1632,10 @@ paths:
       - description: Comma-separated message types list
         enum:
         - MsgUnknown
-        - MsgWithdrawValidatorCommission
+        - MsgSetWithdrawAddress
         - MsgWithdrawDelegatorReward
+        - MsgWithdrawValidatorCommission
+        - MsgFundCommunityPool
         - MsgEditValidator
         - MsgBeginRedelegate
         - MsgCreateValidator
@@ -1629,13 +1643,15 @@ paths:
         - MsgUndelegate
         - MsgUnjail
         - MsgSend
+        - MsgMultiSend
         - MsgCreateVestingAccount
         - MsgCreatePeriodicVestingAccount
         - MsgPayForBlobs
         - MsgGrant
+        - MsgExec
+        - MsgRevoke
         - MsgGrantAllowance
         - MsgRegisterEVMAddress
-        - MsgSetWithdrawAddress
         - MsgVote
         - MsgVoteWeighted
         - MsgSubmitProposal

@@ -13,14 +13,16 @@ import (
 )
 
 const (
-	// MsgAddressTypeValidatorAddress is a MsgAddressType of type validatorAddress.
-	MsgAddressTypeValidatorAddress MsgAddressType = "validatorAddress"
-	// MsgAddressTypeDelegatorAddress is a MsgAddressType of type delegatorAddress.
-	MsgAddressTypeDelegatorAddress MsgAddressType = "delegatorAddress"
-	// MsgAddressTypeValidatorSrcAddress is a MsgAddressType of type validatorSrcAddress.
-	MsgAddressTypeValidatorSrcAddress MsgAddressType = "validatorSrcAddress"
-	// MsgAddressTypeValidatorDstAddress is a MsgAddressType of type validatorDstAddress.
-	MsgAddressTypeValidatorDstAddress MsgAddressType = "validatorDstAddress"
+	// MsgAddressTypeValidator is a MsgAddressType of type validator.
+	MsgAddressTypeValidator MsgAddressType = "validator"
+	// MsgAddressTypeDelegator is a MsgAddressType of type delegator.
+	MsgAddressTypeDelegator MsgAddressType = "delegator"
+	// MsgAddressTypeDepositor is a MsgAddressType of type depositor.
+	MsgAddressTypeDepositor MsgAddressType = "depositor"
+	// MsgAddressTypeValidatorSrc is a MsgAddressType of type validatorSrc.
+	MsgAddressTypeValidatorSrc MsgAddressType = "validatorSrc"
+	// MsgAddressTypeValidatorDst is a MsgAddressType of type validatorDst.
+	MsgAddressTypeValidatorDst MsgAddressType = "validatorDst"
 	// MsgAddressTypeFromAddress is a MsgAddressType of type fromAddress.
 	MsgAddressTypeFromAddress MsgAddressType = "fromAddress"
 	// MsgAddressTypeToAddress is a MsgAddressType of type toAddress.
@@ -48,10 +50,11 @@ var ErrInvalidMsgAddressType = errors.New("not a valid MsgAddressType")
 // MsgAddressTypeValues returns a list of the values for MsgAddressType
 func MsgAddressTypeValues() []MsgAddressType {
 	return []MsgAddressType{
-		MsgAddressTypeValidatorAddress,
-		MsgAddressTypeDelegatorAddress,
-		MsgAddressTypeValidatorSrcAddress,
-		MsgAddressTypeValidatorDstAddress,
+		MsgAddressTypeValidator,
+		MsgAddressTypeDelegator,
+		MsgAddressTypeDepositor,
+		MsgAddressTypeValidatorSrc,
+		MsgAddressTypeValidatorDst,
 		MsgAddressTypeFromAddress,
 		MsgAddressTypeToAddress,
 		MsgAddressTypeInput,
@@ -78,20 +81,21 @@ func (x MsgAddressType) IsValid() bool {
 }
 
 var _MsgAddressTypeValue = map[string]MsgAddressType{
-	"validatorAddress":    MsgAddressTypeValidatorAddress,
-	"delegatorAddress":    MsgAddressTypeDelegatorAddress,
-	"validatorSrcAddress": MsgAddressTypeValidatorSrcAddress,
-	"validatorDstAddress": MsgAddressTypeValidatorDstAddress,
-	"fromAddress":         MsgAddressTypeFromAddress,
-	"toAddress":           MsgAddressTypeToAddress,
-	"input":               MsgAddressTypeInput,
-	"output":              MsgAddressTypeOutput,
-	"grantee":             MsgAddressTypeGrantee,
-	"granter":             MsgAddressTypeGranter,
-	"signer":              MsgAddressTypeSigner,
-	"withdraw":            MsgAddressTypeWithdraw,
-	"voter":               MsgAddressTypeVoter,
-	"proposer":            MsgAddressTypeProposer,
+	"validator":    MsgAddressTypeValidator,
+	"delegator":    MsgAddressTypeDelegator,
+	"depositor":    MsgAddressTypeDepositor,
+	"validatorSrc": MsgAddressTypeValidatorSrc,
+	"validatorDst": MsgAddressTypeValidatorDst,
+	"fromAddress":  MsgAddressTypeFromAddress,
+	"toAddress":    MsgAddressTypeToAddress,
+	"input":        MsgAddressTypeInput,
+	"output":       MsgAddressTypeOutput,
+	"grantee":      MsgAddressTypeGrantee,
+	"granter":      MsgAddressTypeGranter,
+	"signer":       MsgAddressTypeSigner,
+	"withdraw":     MsgAddressTypeWithdraw,
+	"voter":        MsgAddressTypeVoter,
+	"proposer":     MsgAddressTypeProposer,
 }
 
 // ParseMsgAddressType attempts to convert a string to a MsgAddressType.

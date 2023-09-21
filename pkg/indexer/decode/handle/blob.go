@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// MsgPayForBlobs pays for the inclusion of a blob in the block.
 func MsgPayForBlobs(level types.Level, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []storage.AddressWithType, []storage.Namespace, uint64, error) {
 	var blobsSize uint64
 	namespaces := make([]storage.Namespace, len(m.Namespaces))

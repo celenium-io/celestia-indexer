@@ -15,10 +15,14 @@ import (
 const (
 	// MsgUnknown is a MsgType of type MsgUnknown.
 	MsgUnknown MsgType = "MsgUnknown"
-	// MsgWithdrawValidatorCommission is a MsgType of type MsgWithdrawValidatorCommission.
-	MsgWithdrawValidatorCommission MsgType = "MsgWithdrawValidatorCommission"
+	// MsgSetWithdrawAddress is a MsgType of type MsgSetWithdrawAddress.
+	MsgSetWithdrawAddress MsgType = "MsgSetWithdrawAddress"
 	// MsgWithdrawDelegatorReward is a MsgType of type MsgWithdrawDelegatorReward.
 	MsgWithdrawDelegatorReward MsgType = "MsgWithdrawDelegatorReward"
+	// MsgWithdrawValidatorCommission is a MsgType of type MsgWithdrawValidatorCommission.
+	MsgWithdrawValidatorCommission MsgType = "MsgWithdrawValidatorCommission"
+	// MsgFundCommunityPool is a MsgType of type MsgFundCommunityPool.
+	MsgFundCommunityPool MsgType = "MsgFundCommunityPool"
 	// MsgEditValidator is a MsgType of type MsgEditValidator.
 	MsgEditValidator MsgType = "MsgEditValidator"
 	// MsgBeginRedelegate is a MsgType of type MsgBeginRedelegate.
@@ -51,8 +55,6 @@ const (
 	MsgGrantAllowance MsgType = "MsgGrantAllowance"
 	// MsgRegisterEVMAddress is a MsgType of type MsgRegisterEVMAddress.
 	MsgRegisterEVMAddress MsgType = "MsgRegisterEVMAddress"
-	// MsgSetWithdrawAddress is a MsgType of type MsgSetWithdrawAddress.
-	MsgSetWithdrawAddress MsgType = "MsgSetWithdrawAddress"
 	// MsgVote is a MsgType of type MsgVote.
 	MsgVote MsgType = "MsgVote"
 	// MsgVoteWeighted is a MsgType of type MsgVoteWeighted.
@@ -67,8 +69,10 @@ var ErrInvalidMsgType = errors.New("not a valid MsgType")
 func MsgTypeValues() []MsgType {
 	return []MsgType{
 		MsgUnknown,
-		MsgWithdrawValidatorCommission,
+		MsgSetWithdrawAddress,
 		MsgWithdrawDelegatorReward,
+		MsgWithdrawValidatorCommission,
+		MsgFundCommunityPool,
 		MsgEditValidator,
 		MsgBeginRedelegate,
 		MsgCreateValidator,
@@ -85,7 +89,6 @@ func MsgTypeValues() []MsgType {
 		MsgRevoke,
 		MsgGrantAllowance,
 		MsgRegisterEVMAddress,
-		MsgSetWithdrawAddress,
 		MsgVote,
 		MsgVoteWeighted,
 		MsgSubmitProposal,
@@ -106,8 +109,10 @@ func (x MsgType) IsValid() bool {
 
 var _MsgTypeValue = map[string]MsgType{
 	"MsgUnknown":                      MsgUnknown,
-	"MsgWithdrawValidatorCommission":  MsgWithdrawValidatorCommission,
+	"MsgSetWithdrawAddress":           MsgSetWithdrawAddress,
 	"MsgWithdrawDelegatorReward":      MsgWithdrawDelegatorReward,
+	"MsgWithdrawValidatorCommission":  MsgWithdrawValidatorCommission,
+	"MsgFundCommunityPool":            MsgFundCommunityPool,
 	"MsgEditValidator":                MsgEditValidator,
 	"MsgBeginRedelegate":              MsgBeginRedelegate,
 	"MsgCreateValidator":              MsgCreateValidator,
@@ -124,7 +129,6 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgRevoke":                       MsgRevoke,
 	"MsgGrantAllowance":               MsgGrantAllowance,
 	"MsgRegisterEVMAddress":           MsgRegisterEVMAddress,
-	"MsgSetWithdrawAddress":           MsgSetWithdrawAddress,
 	"MsgVote":                         MsgVote,
 	"MsgVoteWeighted":                 MsgVoteWeighted,
 	"MsgSubmitProposal":               MsgSubmitProposal,

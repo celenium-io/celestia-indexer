@@ -7,10 +7,11 @@ import (
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 )
 
+// MsgUnjail defines the Msg/Unjail request type
 func MsgUnjail(level types.Level, m *cosmosSlashingTypes.MsgUnjail) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgUnjail
 	addresses, err := createAddresses(addressesData{
-		{t: storageTypes.MsgAddressTypeValidatorAddress, address: m.ValidatorAddr},
+		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddr},
 	}, level)
 	return msgType, addresses, err
 }

@@ -4,8 +4,12 @@ package types
 /*
 	ENUM(
 		MsgUnknown,
-		MsgWithdrawValidatorCommission,
+
+		MsgSetWithdrawAddress,
 		MsgWithdrawDelegatorReward,
+		MsgWithdrawValidatorCommission,
+		MsgFundCommunityPool,
+
 		MsgEditValidator,
 		MsgBeginRedelegate,
 		MsgCreateValidator,
@@ -27,7 +31,6 @@ package types
 		MsgGrantAllowance,
 
 		MsgRegisterEVMAddress,
-		MsgSetWithdrawAddress,
 
 		MsgVote,
 		MsgVoteWeighted,

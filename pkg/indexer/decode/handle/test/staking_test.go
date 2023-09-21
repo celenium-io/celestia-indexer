@@ -42,7 +42,7 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 
 	addressesExpected := []storage.AddressWithType{
 		{
-			Type: storageTypes.MsgAddressTypeValidatorAddress,
+			Type: storageTypes.MsgAddressTypeValidator,
 			Address: storage.Address{
 				Id:         0,
 				Height:     blob.Height,
@@ -106,7 +106,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 
 	addressesExpected := []storage.AddressWithType{
 		{
-			Type: storageTypes.MsgAddressTypeDelegatorAddress,
+			Type: storageTypes.MsgAddressTypeDelegator,
 			Address: storage.Address{
 				Id:         0,
 				Height:     blob.Height,
@@ -120,7 +120,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 			},
 		},
 		{
-			Type: storageTypes.MsgAddressTypeValidatorSrcAddress,
+			Type: storageTypes.MsgAddressTypeValidatorSrc,
 			Address: storage.Address{
 				Id:         0,
 				Height:     blob.Height,
@@ -134,7 +134,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 			},
 		},
 		{
-			Type: storageTypes.MsgAddressTypeValidatorDstAddress,
+			Type: storageTypes.MsgAddressTypeValidatorDst,
 			Address: storage.Address{
 				Id:         0,
 				Height:     blob.Height,
@@ -192,7 +192,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 
 	addressesExpected := []storage.AddressWithType{
 		{
-			Type: storageTypes.MsgAddressTypeDelegatorAddress,
+			Type: storageTypes.MsgAddressTypeDelegator,
 			Address: storage.Address{
 				Id:         0,
 				Height:     blob.Height,
@@ -206,7 +206,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 			},
 		},
 		{
-			Type: storageTypes.MsgAddressTypeValidatorAddress,
+			Type: storageTypes.MsgAddressTypeValidator,
 			Address: storage.Address{
 				Id:         0,
 				Height:     blob.Height,
@@ -272,7 +272,7 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 
 	addressesExpected := []storage.AddressWithType{
 		{
-			Type: storageTypes.MsgAddressTypeDelegatorAddress,
+			Type: storageTypes.MsgAddressTypeDelegator,
 			Address: storage.Address{
 				Id:         0,
 				Height:     blob.Height,
@@ -286,7 +286,7 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 			},
 		},
 		{
-			Type: storageTypes.MsgAddressTypeValidatorAddress,
+			Type: storageTypes.MsgAddressTypeValidator,
 			Address: storage.Address{
 				Id:         0,
 				Height:     blob.Height,
@@ -342,7 +342,7 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 
 	addressesExpected := []storage.AddressWithType{
 		{
-			Type: storageTypes.MsgAddressTypeDelegatorAddress,
+			Type: storageTypes.MsgAddressTypeDelegator,
 			Address: storage.Address{
 				Id:         0,
 				Height:     blob.Height,
@@ -356,7 +356,7 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 			},
 		},
 		{
-			Type: storageTypes.MsgAddressTypeValidatorAddress,
+			Type: storageTypes.MsgAddressTypeValidator,
 			Address: storage.Address{
 				Id:         0,
 				Height:     blob.Height,

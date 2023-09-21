@@ -175,14 +175,14 @@ func Test_saveMessages(t *testing.T) {
 						TxId:     2,
 						Addresses: []storage.AddressWithType{
 							{
-								Type: types.MsgAddressTypeDelegatorAddress,
+								Type: types.MsgAddressTypeDelegator,
 								Address: storage.Address{
 									Address:    "address3",
 									Height:     100,
 									LastHeight: 100,
 								},
 							}, {
-								Type: types.MsgAddressTypeValidatorAddress,
+								Type: types.MsgAddressTypeValidator,
 								Address: storage.Address{
 									Address:    "address1",
 									Height:     100,
