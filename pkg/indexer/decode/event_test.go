@@ -53,3 +53,49 @@ func TestNewCoinSpent(t *testing.T) {
 		})
 	}
 }
+
+func TestNewCoinReceived(t *testing.T) {
+	tests := []struct {
+		name     string
+		m        map[string]any
+		wantBody CoinReceived
+		wantErr  bool
+	}{
+		{
+			name: "test 1",
+			m: map[string]any{
+				"receiver": "receiver",
+				"amount":   "42utia",
+			},
+			wantBody: CoinReceived{
+				Receiver: "receiver",
+				Amount:   testsuite.Ptr(types.NewCoin("utia", types.NewInt(42))),
+			},
+		}, {
+			name: "test 2",
+			m: map[string]any{
+				"invalid": "invalid",
+				"amount":  "13utia",
+			},
+			wantErr:  true,
+			wantBody: CoinReceived{},
+		}, {
+			name: "test 3",
+			m: map[string]any{
+				"receiver": "receiver",
+				"amount":   "invalid",
+			},
+			wantErr: true,
+			wantBody: CoinReceived{
+				Receiver: "receiver",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotBody, err := NewCoinReceived(tt.m)
+			require.True(t, (err != nil) == tt.wantErr)
+			require.Equal(t, tt.wantBody, gotBody)
+		})
+	}
+}
