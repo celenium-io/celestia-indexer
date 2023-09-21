@@ -6,10 +6,12 @@ import (
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 )
 
-type addressesData []struct {
+type addressData struct {
 	t       storageTypes.MsgAddressType
 	address string
 }
+
+type addressesData []addressData
 
 func createAddresses(data addressesData, level types.Level) ([]storage.AddressWithType, error) {
 	addresses := make([]storage.AddressWithType, len(data))

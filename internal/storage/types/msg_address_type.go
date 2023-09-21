@@ -7,8 +7,12 @@ package types
 		delegatorAddress,
 		validatorSrcAddress,
 		validatorDstAddress,
+
 		fromAddress,
 		toAddress,
+		input,
+		output,
+
 		grantee,
 		granter,
 		signer,

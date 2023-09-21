@@ -25,6 +25,10 @@ const (
 	MsgAddressTypeFromAddress MsgAddressType = "fromAddress"
 	// MsgAddressTypeToAddress is a MsgAddressType of type toAddress.
 	MsgAddressTypeToAddress MsgAddressType = "toAddress"
+	// MsgAddressTypeInput is a MsgAddressType of type input.
+	MsgAddressTypeInput MsgAddressType = "input"
+	// MsgAddressTypeOutput is a MsgAddressType of type output.
+	MsgAddressTypeOutput MsgAddressType = "output"
 	// MsgAddressTypeGrantee is a MsgAddressType of type grantee.
 	MsgAddressTypeGrantee MsgAddressType = "grantee"
 	// MsgAddressTypeGranter is a MsgAddressType of type granter.
@@ -50,6 +54,8 @@ func MsgAddressTypeValues() []MsgAddressType {
 		MsgAddressTypeValidatorDstAddress,
 		MsgAddressTypeFromAddress,
 		MsgAddressTypeToAddress,
+		MsgAddressTypeInput,
+		MsgAddressTypeOutput,
 		MsgAddressTypeGrantee,
 		MsgAddressTypeGranter,
 		MsgAddressTypeSigner,
@@ -78,6 +84,8 @@ var _MsgAddressTypeValue = map[string]MsgAddressType{
 	"validatorDstAddress": MsgAddressTypeValidatorDstAddress,
 	"fromAddress":         MsgAddressTypeFromAddress,
 	"toAddress":           MsgAddressTypeToAddress,
+	"input":               MsgAddressTypeInput,
+	"output":              MsgAddressTypeOutput,
 	"grantee":             MsgAddressTypeGrantee,
 	"granter":             MsgAddressTypeGranter,
 	"signer":              MsgAddressTypeSigner,
