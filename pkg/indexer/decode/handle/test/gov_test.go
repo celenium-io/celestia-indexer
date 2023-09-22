@@ -57,6 +57,107 @@ func createExpectations(
 	return addressesExpected, msgExpected
 }
 
+// v1.MsgSubmitProposal
+
+func createMsgSubmitProposalV1() types.Msg {
+	// Data from: ADDAF8EA30C75A7B3A069B1F9E24975CA6EA769CC42A850AD816432B4B0BE38F
+	m := cosmosGovTypesV1.MsgSubmitProposal{
+		Messages:       make([]*codecTypes.Any, 0),
+		InitialDeposit: make([]types.Coin, 0),
+		Proposer:       "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		Metadata:       "",
+	}
+
+	return &m
+}
+
+func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
+	m := createMsgSubmitProposalV1()
+	blob, now := testsuite.EmptyBlock()
+	position := 7
+
+	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+
+	addressesExpected, msgExpected := createExpectations(
+		blob, now, m, position,
+		storageTypes.MsgAddressTypeProposer,
+		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
+		storageTypes.MsgSubmitProposal,
+	)
+
+	assert.NoError(t, err)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
+}
+
+// v1beta1.MsgSubmitProposal
+
+func createMsgSubmitProposalV1Beta1() types.Msg {
+	// Data from: ADDAF8EA30C75A7B3A069B1F9E24975CA6EA769CC42A850AD816432B4B0BE38F
+	m := cosmosGovTypesV1Beta1.MsgSubmitProposal{
+		Content:        nil,
+		InitialDeposit: make(types.Coins, 0),
+		Proposer:       "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+	}
+
+	return &m
+}
+
+func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1(t *testing.T) {
+	m := createMsgSubmitProposalV1Beta1()
+	blob, now := testsuite.EmptyBlock()
+	position := 8
+
+	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+
+	addressesExpected, msgExpected := createExpectations(
+		blob, now, m, position,
+		storageTypes.MsgAddressTypeProposer,
+		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
+		storageTypes.MsgSubmitProposal,
+	)
+
+	assert.NoError(t, err)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
+}
+
+// MsgExecLegacyContent
+
+func createMsgExecLegacyContent() types.Msg {
+	m := cosmosGovTypesV1.MsgExecLegacyContent{
+		Authority: "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		Content:   nil,
+	}
+
+	return &m
+}
+
+func TestDecodeMsg_SuccessOnMsgExecLegacyContent(t *testing.T) {
+	m := createMsgExecLegacyContent()
+	blob, now := testsuite.EmptyBlock()
+	position := 9
+
+	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+
+	addressesExpected, msgExpected := createExpectations(
+		blob, now, m, position,
+		storageTypes.MsgAddressTypeAuthority,
+		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
+		storageTypes.MsgExecLegacyContent,
+	)
+
+	assert.NoError(t, err)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
+}
+
 // v1.MsgVote
 
 func createMsgVoteV1() types.Msg {
@@ -191,22 +292,20 @@ func TestDecodeMsg_SuccessOnMsgVoteWeighted_V1Beta1(t *testing.T) {
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
-// v1.MsgSubmitProposal
+// v1.MsgDeposit
 
-func createMsgSubmitProposalV1() types.Msg {
-	// Data from: ADDAF8EA30C75A7B3A069B1F9E24975CA6EA769CC42A850AD816432B4B0BE38F
-	m := cosmosGovTypesV1.MsgSubmitProposal{
-		Messages:       make([]*codecTypes.Any, 0),
-		InitialDeposit: make([]types.Coin, 0),
-		Proposer:       "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
-		Metadata:       "",
+func createMsgDepositV1() types.Msg {
+	m := cosmosGovTypesV1.MsgDeposit{
+		ProposalId: 1,
+		Depositor:  "celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
+		Amount:     make([]types.Coin, 0),
 	}
 
 	return &m
 }
 
-func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
-	m := createMsgSubmitProposalV1()
+func TestDecodeMsg_SuccessMsgDeposit_V1(t *testing.T) {
+	m := createMsgDepositV1()
 	blob, now := testsuite.EmptyBlock()
 	position := 7
 
@@ -214,33 +313,31 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
 
 	addressesExpected, msgExpected := createExpectations(
 		blob, now, m, position,
-		storageTypes.MsgAddressTypeProposer,
-		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
-		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
-		storageTypes.MsgSubmitProposal,
+		storageTypes.MsgAddressTypeDepositor,
+		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
+		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
+		storageTypes.MsgDeposit,
 	)
-
 	assert.NoError(t, err)
 	assert.Equal(t, uint64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
 
-// v1beta1.MsgSubmitProposal
+// v1beta1.MsgDeposit
 
-func createMsgSubmitProposalV1Beta1() types.Msg {
-	// Data from: ADDAF8EA30C75A7B3A069B1F9E24975CA6EA769CC42A850AD816432B4B0BE38F
-	m := cosmosGovTypesV1Beta1.MsgSubmitProposal{
-		Content:        nil,
-		InitialDeposit: make(types.Coins, 0),
-		Proposer:       "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+func createMsgDepositV1Beta1() types.Msg {
+	m := cosmosGovTypesV1Beta1.MsgDeposit{
+		ProposalId: 1,
+		Depositor:  "celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
+		Amount:     make(types.Coins, 0),
 	}
 
 	return &m
 }
 
-func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1(t *testing.T) {
-	m := createMsgSubmitProposalV1Beta1()
+func TestDecodeMsg_SuccessOnMsgDeposit_V1Beta1(t *testing.T) {
+	m := createMsgDepositV1Beta1()
 	blob, now := testsuite.EmptyBlock()
 	position := 8
 
@@ -248,10 +345,10 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1(t *testing.T) {
 
 	addressesExpected, msgExpected := createExpectations(
 		blob, now, m, position,
-		storageTypes.MsgAddressTypeProposer,
-		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
-		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
-		storageTypes.MsgSubmitProposal,
+		storageTypes.MsgAddressTypeDepositor,
+		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
+		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
+		storageTypes.MsgDeposit,
 	)
 
 	assert.NoError(t, err)

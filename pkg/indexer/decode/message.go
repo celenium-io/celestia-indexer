@@ -109,6 +109,12 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRevoke(height, typedMsg)
 
 	// gov module
+	case *cosmosGovTypesV1.MsgSubmitProposal:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitProposal(height, typedMsg.Proposer)
+	case *cosmosGovTypesV1Beta1.MsgSubmitProposal:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitProposal(height, typedMsg.Proposer)
+	case *cosmosGovTypesV1.MsgExecLegacyContent:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgExecLegacyContent(height, typedMsg)
 	case *cosmosGovTypesV1.MsgVote:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgVote(height, typedMsg.Voter)
 	case *cosmosGovTypesV1Beta1.MsgVote:
@@ -117,10 +123,10 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgVoteWeighted(height, typedMsg.Voter)
 	case *cosmosGovTypesV1Beta1.MsgVoteWeighted:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgVoteWeighted(height, typedMsg.Voter)
-	case *cosmosGovTypesV1.MsgSubmitProposal:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitProposal(height, typedMsg.Proposer)
-	case *cosmosGovTypesV1Beta1.MsgSubmitProposal:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitProposal(height, typedMsg.Proposer)
+	case *cosmosGovTypesV1.MsgDeposit:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgDeposit(height, typedMsg.Depositor)
+	case *cosmosGovTypesV1Beta1.MsgDeposit:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgDeposit(height, typedMsg.Depositor)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)
