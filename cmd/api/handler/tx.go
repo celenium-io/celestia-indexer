@@ -86,6 +86,7 @@ func (handler *TxHandler) Get(c echo.Context) error {
 //	@Param			from		query	integer			false	"Time from in unix timestamp"			mininum(1)
 //	@Param			to			query	integer			false	"Time to in unix timestamp"				mininum(1)
 //	@Param			height		query	integer			false	"Block number"							mininum(1)
+//	@Param			messages	query	boolean			false	"If true join messages"					mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
@@ -105,6 +106,7 @@ func (handler *TxHandler) List(c echo.Context) error {
 		Status:       req.Status,
 		Height:       req.Height,
 		MessageTypes: types.NewMsgTypeBitMask(),
+		WithMessages: req.Messages,
 	}
 	if req.From > 0 {
 		fltrs.TimeFrom = time.Unix(req.From, 0).UTC()

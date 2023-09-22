@@ -1428,6 +1428,12 @@ const docTemplate = `{
                         "description": "Block number",
                         "name": "height",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "If true join messages",
+                        "name": "messages",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2326,6 +2332,12 @@ const docTemplate = `{
                         "MsgSend",
                         "MsgUnjail"
                     ]
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responses.Message"
+                    }
                 },
                 "messages_count": {
                     "type": "integer",

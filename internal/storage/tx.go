@@ -32,6 +32,7 @@ type TxFilter struct {
 	Height       uint64
 	TimeFrom     time.Time
 	TimeTo       time.Time
+	WithMessages bool
 }
 
 // Tx -

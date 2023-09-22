@@ -536,6 +536,23 @@ func (s *StorageTestSuite) TestTxFilterTime() {
 	s.Require().Len(txs, 4)
 }
 
+func (s *StorageTestSuite) TestTxFilterWithRelations() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Limit:        1,
+		WithMessages: true,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+
+	tx := txs[0]
+	s.Require().Len(tx.Messages, 2)
+	s.Require().EqualValues(1, tx.Messages[0].Id)
+	s.Require().EqualValues(2, tx.Messages[1].Id)
+}
+
 func (s *StorageTestSuite) TestTxByIdWithRelations() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

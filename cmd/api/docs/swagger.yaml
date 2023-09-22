@@ -471,6 +471,10 @@ definitions:
         items:
           $ref: '#/definitions/types.MsgType'
         type: array
+      messages:
+        items:
+          $ref: '#/definitions/responses.Message'
+        type: array
       messages_count:
         example: 1
         format: int64
@@ -1690,6 +1694,10 @@ paths:
         in: query
         name: height
         type: integer
+      - description: If true join messages
+        in: query
+        name: messages
+        type: boolean
       produces:
       - application/json
       responses:

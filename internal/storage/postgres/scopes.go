@@ -64,6 +64,9 @@ func txFilter(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
 	if !fltrs.TimeTo.IsZero() {
 		query = query.Where("time < ?", fltrs.TimeTo)
 	}
+	if fltrs.WithMessages {
+		query = query.Relation("Messages")
+	}
 	return query
 }
 

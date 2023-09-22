@@ -24,6 +24,8 @@ type Tx struct {
 	Memo          string    `example:"Transfer to private account"                                      format:"string"    json:"memo,omitempty"      swaggertype:"string"`
 	Time          time.Time `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                swaggertype:"string"`
 
+	Messages []Message `json:"messages,omitempty"`
+
 	MessageTypes []types.MsgType `example:"MsgSend,MsgUnjail" json:"message_types"`
 	Status       types.Status    `example:"success"           json:"status"`
 
@@ -31,7 +33,7 @@ type Tx struct {
 }
 
 func NewTx(tx storage.Tx) Tx {
-	return Tx{
+	result := Tx{
 		Id:            tx.Id,
 		Height:        uint64(tx.Height),
 		Time:          tx.Time,
@@ -49,7 +51,14 @@ func NewTx(tx storage.Tx) Tx {
 		Memo:          tx.Memo,
 		MessageTypes:  tx.MessageTypes.Names(),
 		MsgTypeMask:   tx.MessageTypes,
+		Messages:      make([]Message, 0),
 	}
+
+	for i := range tx.Messages {
+		result.Messages = append(result.Messages, NewMessage(tx.Messages[i]))
+	}
+
+	return result
 }
 
 func (Tx) SearchType() string {

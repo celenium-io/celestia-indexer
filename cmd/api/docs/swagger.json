@@ -1422,6 +1422,12 @@
                         "description": "Block number",
                         "name": "height",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "If true join messages",
+                        "name": "messages",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2320,6 +2326,12 @@
                         "MsgSend",
                         "MsgUnjail"
                     ]
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responses.Message"
+                    }
                 },
                 "messages_count": {
                     "type": "integer",

@@ -39,6 +39,12 @@ var (
 		Status:        types.StatusSuccess,
 		Codespace:     "sdk",
 		Memo:          "memo",
+		Messages: []storage.Message{
+			{
+				Id:   1,
+				Type: types.MsgSend,
+			},
+		},
 	}
 )
 
@@ -269,6 +275,7 @@ func (s *TxTestSuite) TestListHeight() {
 	q.Set("status", "success")
 	q.Set("msg_type", "MsgSend")
 	q.Set("height", "1000")
+	q.Set("messages", "true")
 
 	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
@@ -283,6 +290,7 @@ func (s *TxTestSuite) TestListHeight() {
 			Status:       []string{"success"},
 			Height:       1000,
 			MessageTypes: types.NewMsgTypeBitMask(types.MsgSend),
+			WithMessages: true,
 		}).
 		Return([]storage.Tx{
 			testTx,
@@ -311,6 +319,8 @@ func (s *TxTestSuite) TestListHeight() {
 	s.Require().Equal("memo", tx.Memo)
 	s.Require().Equal("sdk", tx.Codespace)
 	s.Require().Equal(types.StatusSuccess, tx.Status)
+
+	s.Require().Len(tx.Messages, 1)
 }
 
 func (s *TxTestSuite) TestGetEvents() {
