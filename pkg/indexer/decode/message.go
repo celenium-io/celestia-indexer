@@ -66,6 +66,8 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgBeginRedelegate(height, typedMsg)
 	case *cosmosStakingTypes.MsgUndelegate:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUndelegate(height, typedMsg)
+	case *cosmosStakingTypes.MsgCancelUnbondingDelegation:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCancelUnbondingDelegation(height, typedMsg)
 
 	// slashing module
 	case *cosmosSlashingTypes.MsgUnjail:

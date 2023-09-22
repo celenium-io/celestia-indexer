@@ -10,11 +10,14 @@ package types
 		MsgWithdrawValidatorCommission,
 		MsgFundCommunityPool,
 
-		MsgEditValidator,
-		MsgBeginRedelegate,
+
 		MsgCreateValidator,
+		MsgEditValidator,
 		MsgDelegate,
+		MsgBeginRedelegate,
 		MsgUndelegate,
+		MsgCancelUnbondingDelegation,
+
 		MsgUnjail,
 
 		MsgSend,
@@ -29,12 +32,15 @@ package types
 		MsgRevoke,
 
 		MsgGrantAllowance,
+		MsgRevokeAllowance,
 
 		MsgRegisterEVMAddress,
 
+		MsgSubmitProposal,
+		MsgExecLegacyContent,
 		MsgVote,
 		MsgVoteWeighted,
-		MsgSubmitProposal,
+		MsgDeposit,
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix

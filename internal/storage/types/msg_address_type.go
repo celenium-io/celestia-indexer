@@ -22,6 +22,7 @@ package types
 
 		voter,
 		proposer,
+		authority,
 	)
 */
 //go:generate go-enum --marshal --sql --values

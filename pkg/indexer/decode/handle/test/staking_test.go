@@ -388,3 +388,74 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
+
+// MsgCancelUnbondingDelegation
+
+func createMsgCancelUnbondingDelegation() types.Msg {
+	m := cosmosStakingTypes.MsgCancelUnbondingDelegation{
+		DelegatorAddress: "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
+		ValidatorAddress: "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym",
+		Amount: types.Coin{
+			Denom:  "utia",
+			Amount: math.NewInt(1001),
+		},
+		CreationHeight: 100,
+	}
+	return &m
+}
+
+func TestDecodeMsg_SuccessOnMsgCancelUnbondingDelegation(t *testing.T) {
+	m := createMsgCancelUnbondingDelegation()
+	blob, now := testsuite.EmptyBlock()
+	position := 0
+
+	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+
+	addressesExpected := []storage.AddressWithType{
+		{
+			Type: storageTypes.MsgAddressTypeDelegator,
+			Address: storage.Address{
+				Id:         0,
+				Height:     blob.Height,
+				LastHeight: blob.Height,
+				Address:    "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
+				Hash:       []byte{0x61, 0x20, 0x87, 0x60, 0xbb, 0x25, 0x92, 0x2a, 0x2a, 0xa5, 0x41, 0x57, 0x79, 0x7d, 0x29, 0x36, 0xa7, 0x7e, 0xbe, 0xd6},
+				Balance: storage.Balance{
+					Id:    0,
+					Total: decimal.Zero,
+				},
+			},
+		},
+		{
+			Type: storageTypes.MsgAddressTypeValidator,
+			Address: storage.Address{
+				Id:         0,
+				Height:     blob.Height,
+				LastHeight: blob.Height,
+				Address:    "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym",
+				Hash:       []byte{0xf3, 0xc0, 0x5, 0x68, 0x19, 0x9b, 0xaa, 0xa7, 0xf1, 0x2d, 0xa0, 0x48, 0xf1, 0xd0, 0xb6, 0xa, 0x22, 0xb9, 0x2b, 0x7e},
+				Balance: storage.Balance{
+					Id:    0,
+					Total: decimal.Zero,
+				},
+			},
+		},
+	}
+
+	msgExpected := storage.Message{
+		Id:        0,
+		Height:    blob.Height,
+		Time:      now,
+		Position:  0,
+		Type:      storageTypes.MsgCancelUnbondingDelegation,
+		TxId:      0,
+		Data:      structs.Map(m),
+		Namespace: nil,
+		Addresses: addressesExpected,
+	}
+
+	assert.NoError(t, err)
+	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
+}
