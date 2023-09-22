@@ -7,7 +7,7 @@ import (
 	"github.com/dipdup-io/celestia-indexer/internal/profiler"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	goLibConfig "github.com/dipdup-net/go-lib/config"
-	"github.com/pyroscope-io/client/pyroscope"
+	"github.com/grafana/pyroscope-go"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
