@@ -2,10 +2,11 @@ package websocket
 
 import (
 	"context"
+
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
-	"sync"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/dipdup-io/workerpool"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -27,7 +28,7 @@ type Channel[I, M any] struct {
 	filters            Filterable[M]
 	repo               identifiable[I]
 
-	wg *sync.WaitGroup
+	g workerpool.Group
 }
 
 func NewChannel[I, M any](storageChannelName string, processor processor[I, M], repo identifiable[I], filters Filterable[M]) *Channel[I, M] {
@@ -38,7 +39,7 @@ func NewChannel[I, M any](storageChannelName string, processor processor[I, M], 
 		filters:            filters,
 		repo:               repo,
 		log:                log.With().Str("channel", storageChannelName).Logger(),
-		wg:                 new(sync.WaitGroup),
+		g:                  workerpool.NewGroup(),
 	}
 }
 
@@ -74,13 +75,11 @@ func (channel *Channel[I, M]) Start(ctx context.Context, factory storage.Listene
 		channel.log.Panic().Err(err).Msg("subscribe on storage channel")
 		return
 	}
-	channel.wg.Add(1)
-	go channel.waitMessage(ctx)
+
+	channel.g.GoCtx(ctx, channel.waitMessage)
 }
 
 func (channel *Channel[I, M]) waitMessage(ctx context.Context) {
-	defer channel.wg.Done()
-
 	for {
 		select {
 		case <-ctx.Done():
@@ -93,6 +92,10 @@ func (channel *Channel[I, M]) waitMessage(ctx context.Context) {
 				channel.log.Error().
 					Str("msg", msg.Channel).
 					Msg("unexpected channel message")
+				continue
+			}
+
+			if channel.clients.Len() == 0 {
 				continue
 			}
 
@@ -131,7 +134,7 @@ func (channel *Channel[I, M]) processMessage(ctx context.Context, msg *pq.Notifi
 }
 
 func (channel *Channel[I, M]) Close() error {
-	channel.wg.Wait()
+	channel.g.Wait()
 
 	if channel.listener != nil {
 		if err := channel.listener.Close(); err != nil {
