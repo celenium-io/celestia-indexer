@@ -24,7 +24,9 @@ package types
 		MsgMultiSend,
 
 		MsgCreateVestingAccount,
+		MsgCreatePermanentLockedAccount,
 		MsgCreatePeriodicVestingAccount,
+
 		MsgPayForBlobs,
 
 		MsgGrant,

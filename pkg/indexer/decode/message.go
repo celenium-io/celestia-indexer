@@ -83,6 +83,8 @@ func Message(
 	// vesting module
 	case *cosmosVestingTypes.MsgCreateVestingAccount:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateVestingAccount(height, typedMsg)
+	case *cosmosVestingTypes.MsgCreatePermanentLockedAccount:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreatePermanentLockedAccount(height, typedMsg)
 	case *cosmosVestingTypes.MsgCreatePeriodicVestingAccount:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreatePeriodicVestingAccount(height, typedMsg)
 

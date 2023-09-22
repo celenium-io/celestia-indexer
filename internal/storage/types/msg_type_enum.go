@@ -43,6 +43,8 @@ const (
 	MsgMultiSend MsgType = "MsgMultiSend"
 	// MsgCreateVestingAccount is a MsgType of type MsgCreateVestingAccount.
 	MsgCreateVestingAccount MsgType = "MsgCreateVestingAccount"
+	// MsgCreatePermanentLockedAccount is a MsgType of type MsgCreatePermanentLockedAccount.
+	MsgCreatePermanentLockedAccount MsgType = "MsgCreatePermanentLockedAccount"
 	// MsgCreatePeriodicVestingAccount is a MsgType of type MsgCreatePeriodicVestingAccount.
 	MsgCreatePeriodicVestingAccount MsgType = "MsgCreatePeriodicVestingAccount"
 	// MsgPayForBlobs is a MsgType of type MsgPayForBlobs.
@@ -91,6 +93,7 @@ func MsgTypeValues() []MsgType {
 		MsgSend,
 		MsgMultiSend,
 		MsgCreateVestingAccount,
+		MsgCreatePermanentLockedAccount,
 		MsgCreatePeriodicVestingAccount,
 		MsgPayForBlobs,
 		MsgGrant,
@@ -135,6 +138,7 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgSend":                         MsgSend,
 	"MsgMultiSend":                    MsgMultiSend,
 	"MsgCreateVestingAccount":         MsgCreateVestingAccount,
+	"MsgCreatePermanentLockedAccount": MsgCreatePermanentLockedAccount,
 	"MsgCreatePeriodicVestingAccount": MsgCreatePeriodicVestingAccount,
 	"MsgPayForBlobs":                  MsgPayForBlobs,
 	"MsgGrant":                        MsgGrant,

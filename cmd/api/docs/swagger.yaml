@@ -567,25 +567,30 @@ definitions:
     - MsgWithdrawDelegatorReward
     - MsgWithdrawValidatorCommission
     - MsgFundCommunityPool
-    - MsgEditValidator
-    - MsgBeginRedelegate
     - MsgCreateValidator
+    - MsgEditValidator
     - MsgDelegate
+    - MsgBeginRedelegate
     - MsgUndelegate
+    - MsgCancelUnbondingDelegation
     - MsgUnjail
     - MsgSend
     - MsgMultiSend
     - MsgCreateVestingAccount
+    - MsgCreatePermanentLockedAccount
     - MsgCreatePeriodicVestingAccount
     - MsgPayForBlobs
     - MsgGrant
     - MsgExec
     - MsgRevoke
     - MsgGrantAllowance
+    - MsgRevokeAllowance
     - MsgRegisterEVMAddress
+    - MsgSubmitProposal
+    - MsgExecLegacyContent
     - MsgVote
     - MsgVoteWeighted
-    - MsgSubmitProposal
+    - MsgDeposit
     type: string
     x-enum-varnames:
     - MsgUnknown
@@ -593,25 +598,30 @@ definitions:
     - MsgWithdrawDelegatorReward
     - MsgWithdrawValidatorCommission
     - MsgFundCommunityPool
-    - MsgEditValidator
-    - MsgBeginRedelegate
     - MsgCreateValidator
+    - MsgEditValidator
     - MsgDelegate
+    - MsgBeginRedelegate
     - MsgUndelegate
+    - MsgCancelUnbondingDelegation
     - MsgUnjail
     - MsgSend
     - MsgMultiSend
     - MsgCreateVestingAccount
+    - MsgCreatePermanentLockedAccount
     - MsgCreatePeriodicVestingAccount
     - MsgPayForBlobs
     - MsgGrant
     - MsgExec
     - MsgRevoke
     - MsgGrantAllowance
+    - MsgRevokeAllowance
     - MsgRegisterEVMAddress
+    - MsgSubmitProposal
+    - MsgExecLegacyContent
     - MsgVote
     - MsgVoteWeighted
-    - MsgSubmitProposal
+    - MsgDeposit
 host: https://api.celestia.dipdup.net
 info:
   contact: {}
@@ -727,25 +737,30 @@ paths:
         - MsgWithdrawDelegatorReward
         - MsgWithdrawValidatorCommission
         - MsgFundCommunityPool
-        - MsgEditValidator
-        - MsgBeginRedelegate
         - MsgCreateValidator
+        - MsgEditValidator
         - MsgDelegate
+        - MsgBeginRedelegate
         - MsgUndelegate
+        - MsgCancelUnbondingDelegation
         - MsgUnjail
         - MsgSend
         - MsgMultiSend
         - MsgCreateVestingAccount
+        - MsgCreatePermanentLockedAccount
         - MsgCreatePeriodicVestingAccount
         - MsgPayForBlobs
         - MsgGrant
         - MsgExec
         - MsgRevoke
         - MsgGrantAllowance
+        - MsgRevokeAllowance
         - MsgRegisterEVMAddress
+        - MsgSubmitProposal
+        - MsgExecLegacyContent
         - MsgVote
         - MsgVoteWeighted
-        - MsgSubmitProposal
+        - MsgDeposit
         in: query
         name: msg_type
         type: string
@@ -1636,25 +1651,30 @@ paths:
         - MsgWithdrawDelegatorReward
         - MsgWithdrawValidatorCommission
         - MsgFundCommunityPool
-        - MsgEditValidator
-        - MsgBeginRedelegate
         - MsgCreateValidator
+        - MsgEditValidator
         - MsgDelegate
+        - MsgBeginRedelegate
         - MsgUndelegate
+        - MsgCancelUnbondingDelegation
         - MsgUnjail
         - MsgSend
         - MsgMultiSend
         - MsgCreateVestingAccount
+        - MsgCreatePermanentLockedAccount
         - MsgCreatePeriodicVestingAccount
         - MsgPayForBlobs
         - MsgGrant
         - MsgExec
         - MsgRevoke
         - MsgGrantAllowance
+        - MsgRevokeAllowance
         - MsgRegisterEVMAddress
+        - MsgSubmitProposal
+        - MsgExecLegacyContent
         - MsgVote
         - MsgVoteWeighted
-        - MsgSubmitProposal
+        - MsgDeposit
         in: query
         name: msg_type
         type: string
