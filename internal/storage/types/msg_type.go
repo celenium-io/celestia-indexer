@@ -10,7 +10,6 @@ package types
 		MsgWithdrawValidatorCommission,
 		MsgFundCommunityPool,
 
-
 		MsgCreateValidator,
 		MsgEditValidator,
 		MsgDelegate,

@@ -440,7 +440,7 @@ func (s *StorageTestSuite) TestTxFilterSuccessUnjailAsc() {
 	s.Require().EqualValues(77483, tx.GasUsed)
 	s.Require().EqualValues(1, tx.EventsCount)
 	s.Require().EqualValues(1, tx.MessagesCount)
-	s.Require().EqualValues(256, tx.MessageTypes.Bits)
+	s.Require().EqualValues(2048, tx.MessageTypes.Bits)
 	s.Require().Equal(types.StatusSuccess, tx.Status)
 	s.Require().Equal("memo2", tx.Memo)
 	s.Require().Equal("", tx.Codespace)
@@ -501,7 +501,7 @@ func (s *StorageTestSuite) TestTxFilterHeight() {
 	s.Require().EqualValues(77483, tx.GasUsed)
 	s.Require().EqualValues(1, tx.EventsCount)
 	s.Require().EqualValues(1, tx.MessagesCount)
-	s.Require().EqualValues(256, tx.MessageTypes.Bits)
+	s.Require().EqualValues(2048, tx.MessageTypes.Bits)
 	s.Require().Equal(types.StatusSuccess, tx.Status)
 	s.Require().Equal("memo2", tx.Memo)
 	s.Require().Equal("", tx.Codespace)
@@ -572,7 +572,7 @@ func (s *StorageTestSuite) TestTxByIdWithRelations() {
 	s.Require().Equal("memo2", tx.Memo)
 	s.Require().Equal("", tx.Codespace)
 	s.Require().Equal("80410", tx.Fee.String())
-	s.Require().EqualValues(256, tx.MessageTypes.Bits)
+	s.Require().EqualValues(2048, tx.MessageTypes.Bits)
 
 	s.Require().Len(tx.Messages, 2)
 }

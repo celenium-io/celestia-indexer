@@ -28,7 +28,7 @@
   status: success
   codespace:
   memo: memo2
-  message_types: 256
+  message_types: 2048
   
 - id: 3
   hash: 0xBA37478C3E9A804697271ACC474D484E9160899C86E551D737EEA819FCC75003
