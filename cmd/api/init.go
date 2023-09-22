@@ -238,6 +238,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	{
 		txGroup.GET("", txHandlers.List)
 		txGroup.GET("/count", txHandlers.Count)
+		txGroup.GET("/genesis", txHandlers.Genesis)
 		txGroup.GET("/:hash", txHandlers.Get)
 		txGroup.GET("/:hash/events", txHandlers.GetEvents)
 		txGroup.GET("/:hash/messages", txHandlers.GetMessages)

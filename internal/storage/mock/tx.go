@@ -235,6 +235,45 @@ func (c *ITxFilterCall) DoAndReturn(f func(context.Context, storage.TxFilter) ([
 	return c
 }
 
+// Genesis mocks base method.
+func (m *MockITx) Genesis(ctx context.Context, limit, offset int, sortOrder storage0.SortOrder) ([]storage.Tx, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Genesis", ctx, limit, offset, sortOrder)
+	ret0, _ := ret[0].([]storage.Tx)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Genesis indicates an expected call of Genesis.
+func (mr *MockITxMockRecorder) Genesis(ctx, limit, offset, sortOrder any) *ITxGenesisCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Genesis", reflect.TypeOf((*MockITx)(nil).Genesis), ctx, limit, offset, sortOrder)
+	return &ITxGenesisCall{Call: call}
+}
+
+// ITxGenesisCall wrap *gomock.Call
+type ITxGenesisCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *ITxGenesisCall) Return(arg0 []storage.Tx, arg1 error) *ITxGenesisCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *ITxGenesisCall) Do(f func(context.Context, int, int, storage0.SortOrder) ([]storage.Tx, error)) *ITxGenesisCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *ITxGenesisCall) DoAndReturn(f func(context.Context, int, int, storage0.SortOrder) ([]storage.Tx, error)) *ITxGenesisCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // GetByID mocks base method.
 func (m *MockITx) GetByID(ctx context.Context, id uint64) (*storage.Tx, error) {
 	m.ctrl.T.Helper()

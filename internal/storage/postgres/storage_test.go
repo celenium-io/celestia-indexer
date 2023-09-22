@@ -373,7 +373,7 @@ func (s *StorageTestSuite) TestNamespaceCountMessagesByHeight() {
 
 	count, err := s.storage.Namespace.CountMessagesByHeight(ctx, 1000)
 	s.Require().NoError(err)
-	s.Require().EqualValues(count, 3)
+	s.Require().EqualValues(count, 2)
 }
 
 func (s *StorageTestSuite) TestNamespaceActive() {
@@ -458,9 +458,9 @@ func (s *StorageTestSuite) TestTxFilterSuccessDesc() {
 		Status: []string{string(types.StatusSuccess)},
 	})
 	s.Require().NoError(err)
-	s.Require().Len(txs, 3)
+	s.Require().Len(txs, 4)
 
-	tx := txs[0]
+	tx := txs[1]
 
 	s.Require().EqualValues(3, tx.Id)
 	s.Require().EqualValues(0, tx.Position)
@@ -517,7 +517,7 @@ func (s *StorageTestSuite) TestTxFilterTime() {
 		TimeFrom: time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
 	})
 	s.Require().NoError(err)
-	s.Require().Len(txs, 3)
+	s.Require().Len(txs, 4)
 
 	txs, err = s.storage.Tx.Filter(ctx, storage.TxFilter{
 		Limit:  10,
@@ -533,7 +533,7 @@ func (s *StorageTestSuite) TestTxFilterTime() {
 		TimeTo:   time.Date(2023, 7, 5, 0, 0, 0, 0, time.UTC),
 	})
 	s.Require().NoError(err)
-	s.Require().Len(txs, 3)
+	s.Require().Len(txs, 4)
 }
 
 func (s *StorageTestSuite) TestTxByIdWithRelations() {
@@ -558,6 +558,30 @@ func (s *StorageTestSuite) TestTxByIdWithRelations() {
 	s.Require().EqualValues(256, tx.MessageTypes.Bits)
 
 	s.Require().Len(tx.Messages, 2)
+}
+
+func (s *StorageTestSuite) TestTxGenesis() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	txs, err := s.storage.Tx.Genesis(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+
+	tx := txs[0]
+	s.Require().EqualValues(4, tx.Id)
+	s.Require().EqualValues(0, tx.Position)
+	s.Require().EqualValues(0, tx.Height)
+	s.Require().EqualValues(0, tx.TimeoutHeight)
+	s.Require().EqualValues(0, tx.GasWanted)
+	s.Require().EqualValues(0, tx.GasUsed)
+	s.Require().EqualValues(0, tx.EventsCount)
+	s.Require().EqualValues(1, tx.MessagesCount)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
+	s.Require().Equal("34499b1ac473fbb03894c883178ecc83f0d6eaf6@64.227.18.169:26656", tx.Memo)
+	s.Require().Equal("", tx.Codespace)
+	s.Require().Equal("0", tx.Fee.String())
+	s.Require().EqualValues(32, tx.MessageTypes.Bits)
 }
 
 func (s *StorageTestSuite) TestTxByAddressAndTime() {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 )
 
@@ -61,4 +62,13 @@ func (tx *Tx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxF
 		transactions[i] = *relations[i].Tx
 	}
 	return transactions, nil
+}
+
+func (tx *Tx) Genesis(ctx context.Context, limit, offset int, sortOrder sdk.SortOrder) (txs []storage.Tx, err error) {
+	query := tx.DB().NewSelect().Model(&txs).Offset(offset).Where("hash IS NULL")
+	query = limitScope(query, limit)
+	query = sortScope(query, "id", sortOrder)
+
+	err = query.Scan(ctx)
+	return
 }

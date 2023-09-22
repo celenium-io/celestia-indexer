@@ -10,6 +10,6 @@
   height: 1000
 - msg_id: 1
   namespace_id: 2
-  time: '2023-07-04T03:10:57+00:00'
+  time: '2023-06-04T03:10:57+00:00'
   tx_id: 4
-  height: 1000
+  height: 0

@@ -20,6 +20,7 @@ type ITx interface {
 	Filter(ctx context.Context, fltrs TxFilter) ([]Tx, error)
 	ByIdWithRelations(ctx context.Context, id uint64) (Tx, error)
 	ByAddress(ctx context.Context, addressId uint64, fltrs TxFilter) ([]Tx, error)
+	Genesis(ctx context.Context, limit, offset int, sortOrder storage.SortOrder) ([]Tx, error)
 }
 
 type TxFilter struct {

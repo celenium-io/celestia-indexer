@@ -417,3 +417,35 @@ func (s *TxTestSuite) TestCount() {
 	s.Require().NoError(err)
 	s.Require().EqualValues(14149240, count)
 }
+
+func (s *TxTestSuite) TestGenesis() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx/genesis")
+
+	s.tx.EXPECT().
+		Genesis(gomock.Any(), 10, 0, gomock.Any()).
+		Return([]storage.Tx{
+			{
+				Id:            1,
+				MessagesCount: 1,
+				Status:        types.StatusSuccess,
+				MessageTypes:  types.NewMsgTypeBitMask(types.MsgCreateValidator),
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Genesis(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var txs []responses.Tx
+	err := json.NewDecoder(rec.Body).Decode(&txs)
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+
+	tx := txs[0]
+	s.Require().EqualValues(1, tx.Id)
+	s.Require().EqualValues(1, tx.MessagesCount)
+	s.Require().EqualValues(types.StatusSuccess, tx.Status)
+	s.Require().EqualValues([]types.MsgType{types.MsgCreateValidator}, tx.MessageTypes)
+}

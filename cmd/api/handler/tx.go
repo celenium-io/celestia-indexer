@@ -222,3 +222,35 @@ func (handler *TxHandler) Count(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, state.TotalTx)
 }
+
+// Genesis godoc
+//
+//	@Summary		List genesis transactions info
+//	@Description	List genesis transactions info
+//	@Tags			transactions
+//	@ID				list-genesis -transactions
+//	@Param			limit		query	integer			false	"Count of requested entities"			mininum(1)	maximum(100)
+//	@Param			offset		query	integer			false	"Offset"								mininum(1)
+//	@Param			sort		query	string			false	"Sort order"					mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Tx
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/tx/genesis [get]
+func (handler *TxHandler) Genesis(c echo.Context) error {
+	req, err := bindAndValidate[limitOffsetPagination](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	txs, err := handler.tx.Genesis(c.Request().Context(), int(req.Limit), int(req.Offset), pgSort(req.Sort))
+	if err := handleError(c, err, handler.tx); err != nil {
+		return err
+	}
+	response := make([]responses.Tx, len(txs))
+	for i := range txs {
+		response[i] = responses.NewTx(txs[i])
+	}
+	return returnArray(c, response)
+}

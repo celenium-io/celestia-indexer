@@ -45,3 +45,19 @@
   codespace:
   memo:
   message_types: 32
+
+- id: 4
+  hash: 
+  height: 0
+  time: '2023-07-04T03:00:00+00:00'
+  position: 0
+  gas_wanted: 0
+  gas_used: 0
+  timeout_height: 0
+  events_count: 0
+  messages_count: 1
+  fee: 0
+  status: success
+  codespace:
+  memo: 34499b1ac473fbb03894c883178ecc83f0d6eaf6@64.227.18.169:26656
+  message_types: 32
