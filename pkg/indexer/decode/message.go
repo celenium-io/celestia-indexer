@@ -93,6 +93,8 @@ func Message(
 	// feegrant module
 	case *cosmosFeegrant.MsgGrantAllowance:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgGrantAllowance(height, typedMsg)
+	case *cosmosFeegrant.MsgRevokeAllowance:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRevokeAllowance(height, typedMsg)
 
 	// qgb module
 	case *qgbTypes.MsgRegisterEVMAddress:
