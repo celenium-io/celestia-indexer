@@ -1,13 +1,15 @@
 package profiler
 
 import (
+	"fmt"
+	"runtime"
+
 	"github.com/pyroscope-io/client/pyroscope"
 )
 
 type Config struct {
-	Server          string `validate:"omitempty,http_url" yaml:"server"`
-	Project         string `validate:"omitempty"          yaml:"project"`
-	ApplicationName string `validate:"omitempty"          yaml:"app_name"`
+	Server  string `validate:"omitempty,http_url" yaml:"server"`
+	Project string `validate:"omitempty"          yaml:"project"`
 }
 
 func New(cfg *Config, service string) (*pyroscope.Profiler, error) {
@@ -15,8 +17,11 @@ func New(cfg *Config, service string) (*pyroscope.Profiler, error) {
 		return nil, nil
 	}
 
+	runtime.SetMutexProfileFraction(5)
+	runtime.SetBlockProfileRate(5)
+
 	return pyroscope.Start(pyroscope.Config{
-		ApplicationName: cfg.ApplicationName,
+		ApplicationName: fmt.Sprintf("%s-%s", cfg.Project, service),
 		ServerAddress:   cfg.Server,
 		Tags: map[string]string{
 			"project": cfg.Project,

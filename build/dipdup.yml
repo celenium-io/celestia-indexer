@@ -38,4 +38,3 @@ api:
 profiler:
   server: ${PROFILER_SERVER}
   project: celestia
-  app_name: celestia-indexer
