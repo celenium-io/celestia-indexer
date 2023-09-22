@@ -5,7 +5,6 @@ log_level: ${LOG_LEVEL:-info}
 indexer:
   name: ${INDEXER_NAME:-dipdup_celestia_indexer}
   threads_count: ${INDEXER_THREADS_COUNT:-1}
-  start_level: ${INDEXER_START_LEVEL:-1} # TODO remove in production
   block_period: ${INDEXER_BLOCK_PERIOD:-15} # seconds
 
 database:
