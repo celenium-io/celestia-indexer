@@ -147,7 +147,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 
 	var (
 		messages   = make([]*storage.Message, 0)
-		events     = make([]any, len(block.Events))
+		events     = make([]storage.Event, 0)
 		namespaces = make(map[string]*storage.Namespace, 0)
 		addresses  = make(map[string]*storage.Address, 0)
 	)
@@ -161,9 +161,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		}
 	}
 
-	for i := range block.Events {
-		events[i] = &block.Events[i]
-	}
+	events = append(events, block.Events...)
 
 	for i := range block.Txs {
 		for j := range block.Txs[i].Messages {
@@ -174,7 +172,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 
 		for j := range block.Txs[i].Events {
 			block.Txs[i].Events[j].TxId = &block.Txs[i].Id
-			events = append(events, &block.Txs[i].Events[j])
+			events = append(events, block.Txs[i].Events[j])
 		}
 
 		for j := range block.Txs[i].Signers {
@@ -194,10 +192,8 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return err
 	}
 
-	if len(events) > 0 {
-		if err := tx.BulkSave(ctx, events); err != nil {
-			return err
-		}
+	if err := tx.SaveEvents(ctx, events...); err != nil {
+		return err
 	}
 
 	totalNamespaces, err := saveNamespaces(ctx, tx, namespaces)

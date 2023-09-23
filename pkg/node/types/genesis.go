@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
-	"github.com/tendermint/tendermint/libs/bytes"
 )
 
 type Genesis struct {
@@ -14,7 +13,7 @@ type Genesis struct {
 	ChainID         string                `json:"chain_id"`
 	InitialHeight   int64                 `json:"initial_height,string"`
 	ConsensusParams types.ConsensusParams `json:"consensus_params"`
-	AppHash         bytes.HexBytes        `json:"app_hash"`
+	AppHash         types.Hex             `json:"app_hash"`
 	AppState        AppState              `json:"app_state"`
 }
 

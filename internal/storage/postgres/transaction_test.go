@@ -615,6 +615,85 @@ func (s *StorageTestSuite) TestLastAddressAction() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
+func (s *StorageTestSuite) TestSaveEvents() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	events := []storage.Event{
+		{
+			Height:   100,
+			Position: 0,
+			Type:     types.EventTypeBurn,
+			TxId:     testsuite.Ptr(uint64(1)),
+			Data: map[string]any{
+				"address": "address",
+				"value":   "value",
+			},
+		}, {
+			Height:   100,
+			Position: 1,
+			Type:     types.EventTypeCoinSpent,
+			TxId:     nil,
+			Data: map[string]any{
+				"address": "address",
+				"value":   "value",
+			},
+		},
+	}
+
+	err = tx.SaveEvents(ctx, events...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	saved, err := s.storage.Event.List(ctx, 2, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(saved, 2)
+}
+
+func (s *StorageTestSuite) TestSaveEventsWithCopy() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	events := make([]storage.Event, 100)
+	for i := 0; i < 100; i++ {
+		events[i].Height = 100
+		events[i].Position = uint64(i)
+		events[i].Type = types.EventTypeBurn
+		events[i].TxId = testsuite.Ptr(uint64(i))
+		events[i].Data = map[string]any{
+			"address": "address",
+			"value":   "value",
+		}
+	}
+
+	err = tx.SaveEvents(ctx, events...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	saved, err := s.storage.Event.List(ctx, 100, 0, sdk.SortOrderDesc)
+	s.Require().NoError(err)
+	s.Require().Len(saved, 100)
+
+	for i := 0; i < 100; i++ {
+		s.Require().EqualValues(100, saved[i].Height)
+		s.Require().EqualValues(99-i, saved[i].Position)
+		s.Require().EqualValues(types.EventTypeBurn, saved[i].Type)
+		s.Require().NotNil(saved[i].TxId)
+		s.Require().NotNil(saved[i].Data)
+		s.Require().Len(saved[i].Data, 2)
+	}
+}
+
 func TestSuiteTransaction_Run(t *testing.T) {
 	suite.Run(t, new(TransactionTestSuite))
 }

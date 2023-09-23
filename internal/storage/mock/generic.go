@@ -1327,6 +1327,49 @@ func (c *TransactionSaveConstantsCall) DoAndReturn(f func(context.Context, ...st
 	return c
 }
 
+// SaveEvents mocks base method.
+func (m *MockTransaction) SaveEvents(ctx context.Context, events ...storage.Event) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range events {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveEvents", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveEvents indicates an expected call of SaveEvents.
+func (mr *MockTransactionMockRecorder) SaveEvents(ctx any, events ...any) *TransactionSaveEventsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, events...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveEvents", reflect.TypeOf((*MockTransaction)(nil).SaveEvents), varargs...)
+	return &TransactionSaveEventsCall{Call: call}
+}
+
+// TransactionSaveEventsCall wrap *gomock.Call
+type TransactionSaveEventsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionSaveEventsCall) Return(arg0 error) *TransactionSaveEventsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionSaveEventsCall) Do(f func(context.Context, ...storage.Event) error) *TransactionSaveEventsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionSaveEventsCall) DoAndReturn(f func(context.Context, ...storage.Event) error) *TransactionSaveEventsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // SaveMessages mocks base method.
 func (m *MockTransaction) SaveMessages(ctx context.Context, msgs ...*storage.Message) error {
 	m.ctrl.T.Helper()

@@ -59,6 +59,7 @@ type Transaction interface {
 	SaveMsgAddresses(ctx context.Context, addresses ...MsgAddress) error
 	SaveNamespaceMessage(ctx context.Context, nsMsgs ...NamespaceMessage) error
 	SaveValidators(ctx context.Context, validators ...*Validator) error
+	SaveEvents(ctx context.Context, events ...Event) error
 	LastBlock(ctx context.Context) (block Block, err error)
 	State(ctx context.Context, name string) (state State, err error)
 	Namespace(ctx context.Context, id uint64) (ns Namespace, err error)

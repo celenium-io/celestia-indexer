@@ -131,6 +131,25 @@ func (tx Transaction) SaveBalances(ctx context.Context, balances ...models.Balan
 	return err
 }
 
+func (tx Transaction) SaveEvents(ctx context.Context, events ...models.Event) error {
+	switch {
+	case len(events) == 0:
+		return nil
+	case len(events) < 20:
+		data := make([]any, len(events))
+		for i := range events {
+			data[i] = &events[i]
+		}
+		return tx.BulkSave(ctx, data)
+	default:
+		copiable := make([]storage.Copiable, len(events))
+		for i := range events {
+			copiable[i] = events[i]
+		}
+		return tx.CopyFrom(ctx, "event", copiable)
+	}
+}
+
 func (tx Transaction) SaveMessages(ctx context.Context, msgs ...*models.Message) error {
 	if len(msgs) == 0 {
 		return nil
