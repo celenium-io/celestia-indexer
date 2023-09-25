@@ -155,3 +155,7 @@ func (r *Module) rollback(ctx context.Context) {
 		}
 	}
 }
+
+func (r *Module) stopAll() {
+	r.MustOutput(StopOutput).Push(struct{}{})
+}

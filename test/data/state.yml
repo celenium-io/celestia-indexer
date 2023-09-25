@@ -1,5 +1,6 @@
 - id: 1
   last_height: 1000
+  last_hash: 0x6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF
   last_time: '2023-07-04T03:10:57+00:00'
   name: test_indexer
   total_tx: 394067

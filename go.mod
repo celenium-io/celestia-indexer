@@ -7,7 +7,7 @@ require (
 	github.com/celestiaorg/celestia-app v1.0.0-rc14
 	github.com/cosmos/cosmos-sdk v0.46.14
 	github.com/dipdup-io/workerpool v0.0.4
-	github.com/dipdup-net/go-lib v0.3.3
+	github.com/dipdup-net/go-lib v0.3.5
 	github.com/dipdup-net/indexer-sdk v0.0.3
 	github.com/fatih/structs v1.1.0
 	github.com/go-playground/validator/v10 v10.15.1

@@ -10,24 +10,30 @@ import (
 
 func (r *Module) sequencer(ctx context.Context) {
 	orderedBlocks := map[int64]types.BlockData{}
-	var prevBlockHash []byte
-	l, _ := r.Level()
+	l, prevBlockHash := r.Level()
 	currentBlock := int64(l + 1)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case block := <-r.blocks:
+		case block, ok := <-r.blocks:
+			if !ok {
+				r.Log.Warn().Msg("can't read message from blocks input, channel was dried and closed")
+				r.stopAll()
+				return
+			}
+
 			orderedBlocks[block.Block.Height] = block
 
-			if b, ok := orderedBlocks[currentBlock]; ok {
+			b, ok := orderedBlocks[currentBlock]
+			for ok {
 				if prevBlockHash != nil {
 					if !bytes.Equal(b.Block.LastBlockID.Hash, prevBlockHash) {
 						prevBlockHash, currentBlock, orderedBlocks = r.startRollback(ctx, b, prevBlockHash)
 						break
 					}
-				} // TODO else: check with block from storage?
+				}
 
 				r.MustOutput(BlocksOutput).Push(b)
 				r.setLevel(types.Level(currentBlock), b.BlockID.Hash)
@@ -38,6 +44,8 @@ func (r *Module) sequencer(ctx context.Context) {
 				prevBlockHash = b.BlockID.Hash
 				delete(orderedBlocks, currentBlock)
 				currentBlock += 1
+
+				b, ok = orderedBlocks[currentBlock]
 			}
 		}
 	}
@@ -75,7 +83,7 @@ func (r *Module) startRollback(
 	// Wait until rollback will be finished
 	r.rollbackSync.Wait()
 
-	// Reset sequencer state
+	// Reset empty state
 	level, hash := r.Level()
 	currentBlock := int64(level)
 	prevBlockHash = hash
