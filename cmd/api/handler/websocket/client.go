@@ -163,9 +163,7 @@ func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Clie
 				switch {
 				case err == io.EOF:
 					return
-				case err == ErrTimeout:
-					return
-				case websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseAbnormalClosure):
+				case websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseAbnormalClosure, websocket.CloseGoingAway):
 					return
 				}
 				log.Errorf("read websocket message: %s", err.Error())
