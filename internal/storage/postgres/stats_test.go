@@ -94,7 +94,6 @@ func (s *StatsTestSuite) TestCount() {
 
 	for i := range tests {
 		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer ctxCancel()
 
 		count, err := s.storage.Stats.Count(ctx, storage.CountRequest{
 			Table: tests[i].table,
@@ -102,6 +101,8 @@ func (s *StatsTestSuite) TestCount() {
 		})
 		s.Require().NoError(err)
 		s.Require().EqualValues(tests[i].want, count)
+
+		ctxCancel()
 	}
 }
 
@@ -124,7 +125,6 @@ func (s *StatsTestSuite) TestCountNoData() {
 
 	for i := range tests {
 		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer ctxCancel()
 
 		count, err := s.storage.Stats.Count(ctx, storage.CountRequest{
 			Table: tests[i].table,
@@ -132,6 +132,8 @@ func (s *StatsTestSuite) TestCountNoData() {
 		})
 		s.Require().NoError(err)
 		s.Require().EqualValues("0", count)
+
+		ctxCancel()
 	}
 }
 
@@ -192,7 +194,6 @@ func (s *StatsTestSuite) TestSummaryBlock() {
 
 	for i := range tests {
 		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer ctxCancel()
 
 		summary, err := s.storage.Stats.Summary(ctx, storage.SummaryRequest{
 			CountRequest: storage.CountRequest{
@@ -206,6 +207,8 @@ func (s *StatsTestSuite) TestSummaryBlock() {
 
 		parts := strings.Split(summary, ".")
 		s.Require().Equal(tests[i].want, parts[0])
+
+		ctxCancel()
 	}
 }
 
@@ -509,7 +512,6 @@ func (s *StatsTestSuite) TestHistogram() {
 
 	for i := range tests {
 		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer ctxCancel()
 
 		histogram, err := s.storage.Stats.Histogram(ctx,
 			storage.HistogramRequest{
@@ -530,6 +532,8 @@ func (s *StatsTestSuite) TestHistogram() {
 		parts := strings.Split(item.Value, ".")
 		s.Require().Equal(tests[i].want, parts[0])
 		s.Require().True(item.Time.Equal(tests[i].wantDate))
+
+		ctxCancel()
 	}
 }
 
@@ -647,7 +651,6 @@ func (s *StatsTestSuite) TestHistogramCount() {
 
 	for i := range tests {
 		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer ctxCancel()
 
 		histogram, err := s.storage.Stats.HistogramCount(ctx,
 			storage.HistogramCountRequest{
@@ -663,6 +666,8 @@ func (s *StatsTestSuite) TestHistogramCount() {
 		item := histogram[0]
 		s.Require().Equal(tests[i].want, item.Value)
 		s.Require().True(item.Time.Equal(tests[i].wantDate))
+
+		ctxCancel()
 	}
 }
 
