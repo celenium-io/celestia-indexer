@@ -18,11 +18,11 @@ func newBlockRepo(repo storage.IBlock) blockRepo {
 }
 
 func (block blockRepo) GetById(ctx context.Context, id uint64) (storage.Block, error) {
-	b, err := block.repo.GetByID(ctx, id)
+	b, err := block.repo.ByIdWithRelations(ctx, id)
 	if err != nil {
 		return storage.Block{}, err
 	}
-	return *b, nil
+	return b, nil
 }
 
 func HeadProcessor(ctx context.Context, payload string, repo identifiable[storage.Block]) (*responses.Block, error) {
@@ -48,14 +48,14 @@ func newTxRepo(repo storage.ITx) txRepo {
 	return txRepo{repo}
 }
 
-func (block txRepo) GetById(ctx context.Context, id uint64) (storage.Tx, error) {
-	return block.repo.ByIdWithRelations(ctx, id)
+func (tx txRepo) GetById(ctx context.Context, id uint64) (storage.Tx, error) {
+	return tx.repo.ByIdWithRelations(ctx, id)
 }
 
 func TxProcessor(ctx context.Context, payload string, repo identifiable[storage.Tx]) (*responses.Tx, error) {
 	txId, err := strconv.ParseUint(payload, 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "parse block id")
+		return nil, errors.Wrap(err, "parse tx id")
 	}
 
 	tx, err := repo.GetById(ctx, txId)

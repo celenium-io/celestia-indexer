@@ -69,6 +69,38 @@ func (b *Blocks) ByHeightWithStats(ctx context.Context, height uint64) (block st
 	return
 }
 
+// ByIdWithRelations -
+func (b *Blocks) ByIdWithRelations(ctx context.Context, id uint64) (block storage.Block, err error) {
+
+	err = b.DB().NewSelect().Model(&block).
+		Where("block.id = ?", id).
+		Relation("Stats").
+		Limit(1).
+		Scan(ctx)
+
+	if err != nil {
+		return
+	}
+
+	var msgsStats []typeCount
+	err = b.DB().NewSelect().Model((*storage.Message)(nil)).
+		ColumnExpr("message.type, count(*)").
+		Where("message.height = ?", block.Height).
+		Group("message.type").
+		Scan(ctx, &msgsStats)
+
+	if err != nil {
+		return
+	}
+
+	block.Stats.MessagesCounts = make(map[storageTypes.MsgType]int64)
+	for _, stat := range msgsStats {
+		block.Stats.MessagesCounts[stat.Type] = stat.Count
+	}
+
+	return
+}
+
 // Last -
 func (b *Blocks) Last(ctx context.Context) (block storage.Block, err error) {
 	err = b.DB().NewSelect().Model(&block).Order("id desc").Limit(1).Scan(ctx)

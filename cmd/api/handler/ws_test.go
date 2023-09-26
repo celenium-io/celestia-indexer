@@ -54,7 +54,7 @@ func TestWebsocket(t *testing.T) {
 		_, err := rand.Read(hash)
 		require.NoError(t, err)
 
-		blockMock.EXPECT().GetByID(ctx, uint64(i)).Return(&storage.Block{
+		blockMock.EXPECT().ByIdWithRelations(ctx, uint64(i)).Return(storage.Block{
 			Id:     uint64(i),
 			Height: types.Level(i),
 			Time:   time.Now(),

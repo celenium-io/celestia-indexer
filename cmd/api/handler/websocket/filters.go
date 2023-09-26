@@ -75,7 +75,7 @@ func (f *txFilters) Fill(msg TransactionFilters) error {
 	for i := range msg.Status {
 		status, err := types.ParseStatus(msg.Status[i])
 		if err != nil {
-			return errors.Wrapf(ErrUnavailiableFilter, "status %s", msg.Status[i])
+			return errors.Wrapf(ErrUnavailableFilter, "status %s", msg.Status[i])
 		}
 		f.status[status] = struct{}{}
 	}

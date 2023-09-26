@@ -157,6 +157,45 @@ func (c *IBlockByHeightWithStatsCall) DoAndReturn(f func(context.Context, uint64
 	return c
 }
 
+// ByIdWithRelations mocks base method.
+func (m *MockIBlock) ByIdWithRelations(ctx context.Context, id uint64) (storage.Block, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ByIdWithRelations", ctx, id)
+	ret0, _ := ret[0].(storage.Block)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ByIdWithRelations indicates an expected call of ByIdWithRelations.
+func (mr *MockIBlockMockRecorder) ByIdWithRelations(ctx, id any) *IBlockByIdWithRelationsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByIdWithRelations", reflect.TypeOf((*MockIBlock)(nil).ByIdWithRelations), ctx, id)
+	return &IBlockByIdWithRelationsCall{Call: call}
+}
+
+// IBlockByIdWithRelationsCall wrap *gomock.Call
+type IBlockByIdWithRelationsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IBlockByIdWithRelationsCall) Return(arg0 storage.Block, arg1 error) *IBlockByIdWithRelationsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IBlockByIdWithRelationsCall) Do(f func(context.Context, uint64) (storage.Block, error)) *IBlockByIdWithRelationsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IBlockByIdWithRelationsCall) DoAndReturn(f func(context.Context, uint64) (storage.Block, error)) *IBlockByIdWithRelationsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // CursorList mocks base method.
 func (m *MockIBlock) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Block, error) {
 	m.ctrl.T.Helper()
