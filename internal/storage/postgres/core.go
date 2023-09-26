@@ -32,8 +32,6 @@ type Storage struct {
 	Stats         models.IStats
 	Validator     models.IValidator
 	Notificator   *Notificator
-
-	PartitionManager database.RangePartitionManager
 }
 
 // Create -
@@ -59,8 +57,6 @@ func Create(ctx context.Context, cfg config.Database) (Storage, error) {
 		Stats:         NewStats(strg.Connection()),
 		Validator:     NewValidator(strg.Connection()),
 		Notificator:   NewNotificator(cfg, strg.Connection().DB()),
-
-		PartitionManager: database.NewPartitionManager(strg.Connection(), database.PartitionByMonth),
 	}
 
 	return s, nil
