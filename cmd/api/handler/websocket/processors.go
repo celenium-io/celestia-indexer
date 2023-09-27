@@ -36,7 +36,7 @@ func HeadProcessor(ctx context.Context, payload string, repo identifiable[storag
 		return nil, errors.Wrap(err, "receive block by id")
 	}
 
-	block := responses.NewBlock(b, false)
+	block := responses.NewBlock(b, true)
 	return &block, nil
 }
 
