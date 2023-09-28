@@ -30,7 +30,7 @@ func parseEvent(b types.BlockData, eN types.Event, index int) storage.Event {
 	event := storage.Event{
 		Height:   b.Height,
 		Time:     b.Block.Time,
-		Position: uint64(index),
+		Position: int64(index),
 		Type:     eventType,
 		Data:     make(map[string]any),
 	}

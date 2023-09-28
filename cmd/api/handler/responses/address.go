@@ -1,23 +1,26 @@
 package responses
 
-import "github.com/dipdup-io/celestia-indexer/internal/storage"
+import (
+	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+)
 
 // Address model info
 //
 //	@Description	Celestia address information
 type Address struct {
-	Id         uint64  `example:"321"                                             json:"id"           swaggertype:"integer"`
-	Height     uint64  `example:"100"                                             json:"first_height" swaggertype:"integer"`
-	LastHeight uint64  `example:"100"                                             json:"last_height"  swaggertype:"integer"`
-	Hash       string  `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"hash"         swaggertype:"string"`
-	Balance    Balance `json:"balance"`
+	Id         uint64         `example:"321"                                             json:"id"           swaggertype:"integer"`
+	Height     pkgTypes.Level `example:"100"                                             json:"first_height" swaggertype:"integer"`
+	LastHeight pkgTypes.Level `example:"100"                                             json:"last_height"  swaggertype:"integer"`
+	Hash       string         `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"hash"         swaggertype:"string"`
+	Balance    Balance        `json:"balance"`
 }
 
 func NewAddress(addr storage.Address) Address {
 	return Address{
 		Id:         addr.Id,
-		Height:     uint64(addr.Height),
-		LastHeight: uint64(addr.LastHeight),
+		Height:     addr.Height,
+		LastHeight: addr.LastHeight,
 		Hash:       addr.Address,
 		Balance: Balance{
 			Currency: addr.Balance.Currency,

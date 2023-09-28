@@ -665,7 +665,7 @@ func (s *StorageTestSuite) TestSaveEventsWithCopy() {
 	events := make([]storage.Event, 100)
 	for i := 0; i < 100; i++ {
 		events[i].Height = 100
-		events[i].Position = uint64(i)
+		events[i].Position = int64(i)
 		events[i].Type = types.EventTypeBurn
 		events[i].TxId = testsuite.Ptr(uint64(i))
 		events[i].Data = map[string]any{

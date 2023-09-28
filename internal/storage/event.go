@@ -27,7 +27,7 @@ type Event struct {
 	Id       uint64          `bun:"id,pk,notnull,autoincrement" comment:"Unique internal id"`
 	Height   pkgTypes.Level  `bun:"height,notnull"              comment:"The number (height) of this block" stats:"func:min max,filterable"`
 	Time     time.Time       `bun:"time,pk,notnull"             comment:"The time of block"                 stats:"func:min max,filterable"`
-	Position uint64          `bun:"position"                    comment:"Position in transaction"`
+	Position int64           `bun:"position"                    comment:"Position in transaction"`
 	Type     types.EventType `bun:",type:event_type"            comment:"Event type"                        stats:"filterable"`
 	TxId     *uint64         `bun:"tx_id"                       comment:"Transaction id"`
 	Data     map[string]any  `bun:"data,type:jsonb"             comment:"Event data"`
