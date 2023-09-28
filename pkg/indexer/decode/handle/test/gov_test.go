@@ -47,7 +47,7 @@ func createExpectations(
 		Id:        0,
 		Height:    blob.Height,
 		Time:      now,
-		Position:  uint64(position),
+		Position:  int64(position),
 		Type:      txType,
 		TxId:      0,
 		Data:      structs.Map(m),

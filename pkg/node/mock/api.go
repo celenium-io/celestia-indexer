@@ -259,7 +259,7 @@ func (m *MockDalApi) EXPECT() *MockDalApiMockRecorder {
 }
 
 // Blob mocks base method.
-func (m *MockDalApi) Blob(ctx context.Context, height uint64, namespace, commitment string) (types.Blob, error) {
+func (m *MockDalApi) Blob(ctx context.Context, height types0.Level, namespace, commitment string) (types.Blob, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Blob", ctx, height, namespace, commitment)
 	ret0, _ := ret[0].(types.Blob)
@@ -286,19 +286,19 @@ func (c *DalApiBlobCall) Return(arg0 types.Blob, arg1 error) *DalApiBlobCall {
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *DalApiBlobCall) Do(f func(context.Context, uint64, string, string) (types.Blob, error)) *DalApiBlobCall {
+func (c *DalApiBlobCall) Do(f func(context.Context, types0.Level, string, string) (types.Blob, error)) *DalApiBlobCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *DalApiBlobCall) DoAndReturn(f func(context.Context, uint64, string, string) (types.Blob, error)) *DalApiBlobCall {
+func (c *DalApiBlobCall) DoAndReturn(f func(context.Context, types0.Level, string, string) (types.Blob, error)) *DalApiBlobCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Blobs mocks base method.
-func (m *MockDalApi) Blobs(ctx context.Context, height uint64, hash ...string) ([]types.Blob, error) {
+func (m *MockDalApi) Blobs(ctx context.Context, height types0.Level, hash ...string) ([]types.Blob, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, height}
 	for _, a := range hash {
@@ -330,13 +330,13 @@ func (c *DalApiBlobsCall) Return(arg0 []types.Blob, arg1 error) *DalApiBlobsCall
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *DalApiBlobsCall) Do(f func(context.Context, uint64, ...string) ([]types.Blob, error)) *DalApiBlobsCall {
+func (c *DalApiBlobsCall) Do(f func(context.Context, types0.Level, ...string) ([]types.Blob, error)) *DalApiBlobsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *DalApiBlobsCall) DoAndReturn(f func(context.Context, uint64, ...string) ([]types.Blob, error)) *DalApiBlobsCall {
+func (c *DalApiBlobsCall) DoAndReturn(f func(context.Context, types0.Level, ...string) ([]types.Blob, error)) *DalApiBlobsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -40,7 +40,7 @@ func Message(
 ) (d DecodedMsg, err error) {
 	d.Msg.Height = height
 	d.Msg.Time = time
-	d.Msg.Position = uint64(position)
+	d.Msg.Position = int64(position)
 	d.Msg.Data = structs.Map(msg)
 
 	switch typedMsg := msg.(type) {

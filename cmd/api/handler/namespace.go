@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/base64"
 	"encoding/hex"
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"net/http"
 
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
@@ -184,8 +185,8 @@ func (handler *NamespaceHandler) List(c echo.Context) error {
 }
 
 type getBlobsRequest struct {
-	Hash   string `param:"hash"   validate:"required,base64"`
-	Height uint64 `param:"height" validation:"required,min=1"`
+	Hash   string      `param:"hash"   validate:"required,base64"`
+	Height types.Level `param:"height" validation:"required,min=1"`
 }
 
 // GetBlobs godoc
@@ -215,9 +216,9 @@ func (handler *NamespaceHandler) GetBlobs(c echo.Context) error {
 }
 
 type getBlobRequest struct {
-	Hash       string `param:"hash"       validate:"required,base64"`
-	Height     uint64 `param:"height"     validation:"required,min=1"`
-	Commitment string `param:"commitment" validate:"required,base64"`
+	Hash       string      `param:"hash"       validate:"required,base64"`
+	Height     types.Level `param:"height"     validation:"required,min=1"`
+	Commitment string      `param:"commitment" validate:"required,base64"`
 }
 
 // GetBlob godoc

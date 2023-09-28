@@ -209,13 +209,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	searchHandler := handler.NewSearchHandler(db.Address, db.Blocks, db.Namespace, db.Tx)
 	v1.GET("/search", searchHandler.Search)
 
-	addessHandlers := handler.NewAddressHandler(db.Address, db.Tx, db.State, cfg.Indexer.Name)
+	addressHandlers := handler.NewAddressHandler(db.Address, db.Tx, db.State, cfg.Indexer.Name)
 	addressGroup := v1.Group("/address")
 	{
-		addressGroup.GET("", addessHandlers.List)
-		addressGroup.GET("/count", addessHandlers.Count)
-		addressGroup.GET("/:hash", addessHandlers.Get)
-		addressGroup.GET("/:hash/txs", addessHandlers.Transactions)
+		addressGroup.GET("", addressHandlers.List)
+		addressGroup.GET("/count", addressHandlers.Count)
+		addressGroup.GET("/:hash", addressHandlers.Get)
+		addressGroup.GET("/:hash/txs", addressHandlers.Transactions)
 	}
 
 	blockHandlers := handler.NewBlockHandler(db.Blocks, db.BlockStats, db.Event, db.Namespace, db.State, cfg.Indexer.Name)

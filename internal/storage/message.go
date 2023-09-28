@@ -25,7 +25,7 @@ type Message struct {
 	Id       uint64         `bun:"id,pk,notnull,autoincrement" comment:"Unique internal id"`
 	Height   pkgTypes.Level `bun:",notnull"                    comment:"The number (height) of this block" stats:"func:min max,filterable"`
 	Time     time.Time      `bun:"time,pk,notnull"             comment:"The time of block"                 stats:"func:min max,filterable"`
-	Position uint64         `bun:"position"                    comment:"Position in transaction"`
+	Position int64          `bun:"position"                    comment:"Position in transaction"`
 	Type     types.MsgType  `bun:",type:msg_type"              comment:"Message type"                      stats:"filterable"`
 	TxId     uint64         `bun:"tx_id"                       comment:"Parent transaction id"`
 	Data     map[string]any `bun:"data,type:jsonb"             comment:"Message data"`

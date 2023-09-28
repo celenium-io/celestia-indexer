@@ -19,6 +19,6 @@ type Api interface {
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type DalApi interface {
-	Blobs(ctx context.Context, height uint64, hash ...string) ([]types.Blob, error)
-	Blob(ctx context.Context, height uint64, namespace, commitment string) (types.Blob, error)
+	Blobs(ctx context.Context, height pkgTypes.Level, hash ...string) ([]types.Blob, error)
+	Blob(ctx context.Context, height pkgTypes.Level, namespace, commitment string) (types.Blob, error)
 }
