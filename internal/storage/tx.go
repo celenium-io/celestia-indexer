@@ -42,12 +42,12 @@ type Tx struct {
 	Id            uint64          `bun:"id,autoincrement,pk,notnull" comment:"Unique internal id"`
 	Height        pkgTypes.Level  `bun:",notnull"                    comment:"The number (height) of this block"                 stats:"func:min max,filterable"`
 	Time          time.Time       `bun:"time,pk,notnull"             comment:"The time of block"                                 stats:"func:min max,filterable"`
-	Position      uint64          `bun:"position"                    comment:"Position in block"`
-	GasWanted     uint64          `bun:"gas_wanted"                  comment:"Gas wanted"                                        stats:"func:min max sum avg"`
-	GasUsed       uint64          `bun:"gas_used"                    comment:"Gas used"                                          stats:"func:min max sum avg"`
+	Position      int64           `bun:"position"                    comment:"Position in block"`
+	GasWanted     int64           `bun:"gas_wanted"                  comment:"Gas wanted"                                        stats:"func:min max sum avg"`
+	GasUsed       int64           `bun:"gas_used"                    comment:"Gas used"                                          stats:"func:min max sum avg"`
 	TimeoutHeight uint64          `bun:"timeout_height"              comment:"Block height until which the transaction is valid" stats:"func:min max avg"`
-	EventsCount   uint64          `bun:"events_count"                comment:"Events count in transaction"                       stats:"func:min max sum avg"`
-	MessagesCount uint64          `bun:"messages_count"              comment:"Messages count in transaction"                     stats:"func:min max sum avg"`
+	EventsCount   int64           `bun:"events_count"                comment:"Events count in transaction"                       stats:"func:min max sum avg"`
+	MessagesCount int64           `bun:"messages_count"              comment:"Messages count in transaction"                     stats:"func:min max sum avg"`
 	Fee           decimal.Decimal `bun:"fee,type:numeric"            comment:"Paid fee"                                          stats:"func:min max sum avg"`
 	Status        types.Status    `bun:"status,type:status"          comment:"Transaction status"                                stats:"filterable"`
 

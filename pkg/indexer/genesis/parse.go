@@ -65,9 +65,9 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 		tx := storage.Tx{
 			Height:        block.Height,
 			Time:          block.Time,
-			Position:      uint64(index),
+			Position:      int64(index),
 			TimeoutHeight: txWithTimeoutHeight.GetTimeoutHeight(),
-			MessagesCount: uint64(len(txDecoded.GetMsgs())),
+			MessagesCount: int64(len(txDecoded.GetMsgs())),
 			Fee:           decimal.Zero,
 			Status:        storageTypes.StatusSuccess,
 			Memo:          memoTx.GetMemo(),
