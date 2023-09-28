@@ -1,3 +1,3 @@
 package types
 
-type Level uint64
+type Level int64

@@ -2,13 +2,14 @@ package dal
 
 import (
 	"context"
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
 	"github.com/pkg/errors"
 )
 
 // Blobs - returns all blobs under the given namespaces and height.
-func (node *Node) Blobs(ctx context.Context, height uint64, namespaces ...string) ([]types.Blob, error) {
+func (node *Node) Blobs(ctx context.Context, height pkgTypes.Level, namespaces ...string) ([]types.Blob, error) {
 	if len(namespaces) == 0 {
 		return nil, nil
 	}
@@ -25,7 +26,7 @@ func (node *Node) Blobs(ctx context.Context, height uint64, namespaces ...string
 }
 
 // Blob - retrieves the blob by commitment under the given namespace and height.
-func (node *Node) Blob(ctx context.Context, height uint64, namespace, commitment string) (types.Blob, error) {
+func (node *Node) Blob(ctx context.Context, height pkgTypes.Level, namespace, commitment string) (types.Blob, error) {
 	var response types.Response[types.Blob]
 	if err := node.post(ctx, "blob.Get", []any{height, namespace, commitment}, &response); err != nil {
 		return response.Result, err
@@ -38,7 +39,7 @@ func (node *Node) Blob(ctx context.Context, height uint64, namespace, commitment
 }
 
 // Proofs - retrieves proofs in the given namespaces at the given height by commitment.
-func (node *Node) Proofs(ctx context.Context, height uint64, namespace, commitment string) ([]types.Proof, error) {
+func (node *Node) Proofs(ctx context.Context, height pkgTypes.Level, namespace, commitment string) ([]types.Proof, error) {
 	var response types.Response[[]types.Proof]
 	if err := node.post(ctx, "blob.GetProof", []any{height, namespace, commitment}, &response); err != nil {
 		return response.Result, err

@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
@@ -54,7 +55,7 @@ func (n *Namespace) Messages(ctx context.Context, id uint64, limit, offset int) 
 }
 
 // MessagesByHeight -
-func (n *Namespace) MessagesByHeight(ctx context.Context, height uint64, limit, offset int) (msgs []storage.NamespaceMessage, err error) {
+func (n *Namespace) MessagesByHeight(ctx context.Context, height pkgTypes.Level, limit, offset int) (msgs []storage.NamespaceMessage, err error) {
 	query := n.DB().NewSelect().Model(&msgs).
 		Where("namespace_message.height = ?", height).
 		Order("namespace_message.time desc").
@@ -69,7 +70,7 @@ func (n *Namespace) MessagesByHeight(ctx context.Context, height uint64, limit, 
 	return
 }
 
-func (n *Namespace) CountMessagesByHeight(ctx context.Context, height uint64) (int, error) {
+func (n *Namespace) CountMessagesByHeight(ctx context.Context, height pkgTypes.Level) (int, error) {
 	return n.DB().NewSelect().Model((*storage.NamespaceMessage)(nil)).
 		Where("namespace_message.height = ?", height).
 		Count(ctx)

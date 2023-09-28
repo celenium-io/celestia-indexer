@@ -80,7 +80,7 @@ func TestDecodeMsg_SuccessOnMsgGrant(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -133,7 +133,7 @@ func TestDecodeMsg_SuccessOnMsgExec(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -201,7 +201,7 @@ func TestDecodeMsg_SuccessOnMsgRevoke(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }

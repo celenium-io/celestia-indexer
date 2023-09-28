@@ -50,8 +50,8 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 		Stats: storage.BlockStats{
 			Height:        b.Height,
 			Time:          b.Block.Time,
-			TxCount:       uint64(len(b.Block.Data.Txs)),
-			EventsCount:   uint64(len(b.BeginBlockEvents) + len(b.EndBlockEvents)),
+			TxCount:       int64(len(b.Block.Data.Txs)),
+			EventsCount:   int64(len(b.BeginBlockEvents) + len(b.EndBlockEvents)),
 			BlobsSize:     0,
 			Fee:           decimal.Zero,
 			SupplyChange:  decimal.Zero,

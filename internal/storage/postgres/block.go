@@ -24,7 +24,7 @@ func NewBlocks(db *database.Bun) *Blocks {
 }
 
 // ByHeight -
-func (b *Blocks) ByHeight(ctx context.Context, height uint64) (block storage.Block, err error) {
+func (b *Blocks) ByHeight(ctx context.Context, height types.Level) (block storage.Block, err error) {
 	err = b.DB().NewSelect().Model(&block).
 		Where("block.height = ?", height).
 		Limit(1).
@@ -38,7 +38,7 @@ type typeCount struct {
 }
 
 // ByHeightWithStats -
-func (b *Blocks) ByHeightWithStats(ctx context.Context, height uint64) (block storage.Block, err error) {
+func (b *Blocks) ByHeightWithStats(ctx context.Context, height types.Level) (block storage.Block, err error) {
 
 	err = b.DB().NewSelect().Model(&block).
 		Where("block.height = ?", height).
@@ -142,11 +142,11 @@ func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order 
 		return
 	}
 
-	heights := make([]uint64, len(blocks))
-	blocksHeighMap := make(map[types.Level]*storage.Block)
+	heights := make([]types.Level, len(blocks))
+	blocksHeightMap := make(map[types.Level]*storage.Block)
 	for i, b := range blocks {
-		heights[i] = uint64(b.Height)
-		blocksHeighMap[b.Height] = b
+		heights[i] = b.Height
+		blocksHeightMap[b.Height] = b
 	}
 
 	var listTypeCounts []listTypeCount
@@ -164,11 +164,11 @@ func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order 
 	}
 
 	for _, stat := range listTypeCounts {
-		if blocksHeighMap[stat.Height].Stats.MessagesCounts == nil {
-			blocksHeighMap[stat.Height].Stats.MessagesCounts = make(map[storageTypes.MsgType]int64)
+		if blocksHeightMap[stat.Height].Stats.MessagesCounts == nil {
+			blocksHeightMap[stat.Height].Stats.MessagesCounts = make(map[storageTypes.MsgType]int64)
 		}
 
-		blocksHeighMap[stat.Height].Stats.MessagesCounts[stat.Type] = stat.Count
+		blocksHeightMap[stat.Height].Stats.MessagesCounts[stat.Type] = stat.Count
 	}
 
 	return

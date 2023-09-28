@@ -160,10 +160,10 @@ func (s *ModuleTestSuite) TestModule_SuccessOnRollbackTwoBlocks() {
 			s.Require().Equal(types.Level(999), state.LastHeight)
 			s.Require().Equal(expectedHash, state.LastHash)
 			s.Require().Equal("2023-07-04 03:10:56", state.LastTime.Format(time.DateTime))
-			s.Require().Equal(uint64(1), state.TotalTx)
-			s.Require().Equal(uint64(324234-100-900), state.TotalBlobsSize)
-			s.Require().Equal(uint64(1000-3), state.TotalNamespaces)
-			s.Require().Equal(uint64(12512357-1), state.TotalAccounts)
+			s.Require().Equal(int64(1), state.TotalTx)
+			s.Require().Equal(int64(324234-100-900), state.TotalBlobsSize)
+			s.Require().Equal(int64(1000-3), state.TotalNamespaces)
+			s.Require().Equal(int64(12512357-1), state.TotalAccounts)
 
 			expectedFee := decimal.NewFromInt(172635712635813).
 				Sub(decimal.NewFromInt(497012)).

@@ -44,8 +44,8 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 	assert.Equal(t, now, f.Time)
 	assert.Equal(t, storageTypes.StatusSuccess, f.Status)
 	assert.Equal(t, "", f.Error)
-	assert.Equal(t, uint64(12000), f.GasWanted)
-	assert.Equal(t, uint64(1000), f.GasUsed)
+	assert.Equal(t, int64(12000), f.GasWanted)
+	assert.Equal(t, int64(1000), f.GasUsed)
 	assert.Equal(t, "celestia-explorer", f.Codespace)
 }
 
@@ -71,8 +71,8 @@ func TestParseTxs_FailedTx(t *testing.T) {
 	assert.Equal(t, now, f.Time)
 	assert.Equal(t, storageTypes.StatusFailed, f.Status)
 	assert.Equal(t, "something wierd happened", f.Error)
-	assert.Equal(t, uint64(12000), f.GasWanted)
-	assert.Equal(t, uint64(1000), f.GasUsed)
+	assert.Equal(t, int64(12000), f.GasWanted)
+	assert.Equal(t, int64(1000), f.GasUsed)
 	assert.Equal(t, "celestia-explorer", f.Codespace)
 }
 
@@ -98,7 +98,7 @@ func TestParseTxs_FailedTxWithNonstandardErrorCode(t *testing.T) {
 	assert.Equal(t, now, f.Time)
 	assert.Equal(t, storageTypes.StatusFailed, f.Status)
 	assert.Equal(t, "something unusual happened", f.Error)
-	assert.Equal(t, uint64(12000), f.GasWanted)
-	assert.Equal(t, uint64(1000), f.GasUsed)
+	assert.Equal(t, int64(12000), f.GasWanted)
+	assert.Equal(t, int64(1000), f.GasUsed)
 	assert.Equal(t, "celestia-explorer", f.Codespace)
 }

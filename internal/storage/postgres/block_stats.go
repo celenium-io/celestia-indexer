@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
@@ -21,7 +22,7 @@ func NewBlockStats(db *database.Bun) *BlockStats {
 }
 
 // ByHeight -
-func (b *BlockStats) ByHeight(ctx context.Context, height uint64) (stats storage.BlockStats, err error) {
+func (b *BlockStats) ByHeight(ctx context.Context, height pkgTypes.Level) (stats storage.BlockStats, err error) {
 	err = b.db.DB().NewSelect().Model(&stats).
 		Where("height = ?", height).
 		Limit(1).

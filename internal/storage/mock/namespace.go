@@ -13,6 +13,7 @@ import (
 	reflect "reflect"
 
 	storage "github.com/dipdup-io/celestia-indexer/internal/storage"
+	types "github.com/dipdup-io/celestia-indexer/pkg/types"
 	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -158,7 +159,7 @@ func (c *INamespaceByNamespaceIdAndVersionCall) DoAndReturn(f func(context.Conte
 }
 
 // CountMessagesByHeight mocks base method.
-func (m *MockINamespace) CountMessagesByHeight(ctx context.Context, height uint64) (int, error) {
+func (m *MockINamespace) CountMessagesByHeight(ctx context.Context, height types.Level) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CountMessagesByHeight", ctx, height)
 	ret0, _ := ret[0].(int)
@@ -185,13 +186,13 @@ func (c *INamespaceCountMessagesByHeightCall) Return(arg0 int, arg1 error) *INam
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceCountMessagesByHeightCall) Do(f func(context.Context, uint64) (int, error)) *INamespaceCountMessagesByHeightCall {
+func (c *INamespaceCountMessagesByHeightCall) Do(f func(context.Context, types.Level) (int, error)) *INamespaceCountMessagesByHeightCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceCountMessagesByHeightCall) DoAndReturn(f func(context.Context, uint64) (int, error)) *INamespaceCountMessagesByHeightCall {
+func (c *INamespaceCountMessagesByHeightCall) DoAndReturn(f func(context.Context, types.Level) (int, error)) *INamespaceCountMessagesByHeightCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -430,7 +431,7 @@ func (c *INamespaceMessagesCall) DoAndReturn(f func(context.Context, uint64, int
 }
 
 // MessagesByHeight mocks base method.
-func (m *MockINamespace) MessagesByHeight(ctx context.Context, height uint64, limit, offset int) ([]storage.NamespaceMessage, error) {
+func (m *MockINamespace) MessagesByHeight(ctx context.Context, height types.Level, limit, offset int) ([]storage.NamespaceMessage, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MessagesByHeight", ctx, height, limit, offset)
 	ret0, _ := ret[0].([]storage.NamespaceMessage)
@@ -457,13 +458,13 @@ func (c *INamespaceMessagesByHeightCall) Return(arg0 []storage.NamespaceMessage,
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceMessagesByHeightCall) Do(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesByHeightCall {
+func (c *INamespaceMessagesByHeightCall) Do(f func(context.Context, types.Level, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesByHeightCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceMessagesByHeightCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesByHeightCall {
+func (c *INamespaceMessagesByHeightCall) DoAndReturn(f func(context.Context, types.Level, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesByHeightCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

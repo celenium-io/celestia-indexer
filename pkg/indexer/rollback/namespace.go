@@ -75,7 +75,7 @@ func (module *Module) rollbackNamespaces(
 	return err
 }
 
-type namespaceSize map[string]uint64
+type namespaceSize map[string]int64
 
 func newNamespaceSize(data map[string]any) (namespaceSize, error) {
 	sizesRaw, ok := data["blob_sizes"]
@@ -117,7 +117,7 @@ func newNamespaceSize(data map[string]any) (namespaceSize, error) {
 			return nil, errors.Wrap(err, nsString)
 		}
 
-		size[hex.EncodeToString(data)] = uint64(nsSize)
+		size[hex.EncodeToString(data)] = int64(nsSize)
 	}
 
 	return size, nil

@@ -72,7 +72,7 @@ func TestDecodeMsg_SuccessOnMsgSetWithdrawAddress(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -139,7 +139,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawDelegatorReward(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -191,7 +191,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawValidatorCommission(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -244,7 +244,7 @@ func TestDecodeMsg_SuccessOnMsgFundCommunityPool(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }

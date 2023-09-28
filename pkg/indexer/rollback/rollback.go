@@ -205,7 +205,7 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	state.TotalTx -= blockStats.TxCount
 	state.TotalBlobsSize -= blockStats.BlobsSize
 	state.TotalNamespaces -= totalNamespaces
-	state.TotalAccounts -= uint64(len(addresses))
+	state.TotalAccounts -= int64(len(addresses))
 	state.TotalFee = state.TotalFee.Sub(blockStats.Fee)
 	state.TotalSupply = state.TotalSupply.Sub(blockStats.SupplyChange)
 

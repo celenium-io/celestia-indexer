@@ -80,7 +80,7 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -162,7 +162,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -238,11 +238,11 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 			MaxRate:           decimal.Zero,
 			MaxChangeRate:     decimal.Zero,
 			MinSelfDelegation: decimal.RequireFromString("1"),
-			Height:            uint64(blob.Height),
+			Height:            blob.Height,
 		},
 	}
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -314,7 +314,7 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -384,7 +384,7 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -455,7 +455,7 @@ func TestDecodeMsg_SuccessOnMsgCancelUnbondingDelegation(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }

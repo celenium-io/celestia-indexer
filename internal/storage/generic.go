@@ -51,8 +51,8 @@ type Transaction interface {
 
 	SaveConstants(ctx context.Context, constants ...Constant) error
 	SaveTransactions(ctx context.Context, txs ...Tx) error
-	SaveNamespaces(ctx context.Context, namespaces ...*Namespace) (uint64, error)
-	SaveAddresses(ctx context.Context, addresses ...*Address) (uint64, error)
+	SaveNamespaces(ctx context.Context, namespaces ...*Namespace) (int64, error)
+	SaveAddresses(ctx context.Context, addresses ...*Address) (int64, error)
 	SaveBalances(ctx context.Context, balances ...Balance) error
 	SaveMessages(ctx context.Context, msgs ...*Message) error
 	SaveSigners(ctx context.Context, addresses ...Signer) error

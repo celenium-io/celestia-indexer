@@ -1198,14 +1198,14 @@ func (c *TransactionRollbackValidatorsCall) DoAndReturn(f func(context.Context, 
 }
 
 // SaveAddresses mocks base method.
-func (m *MockTransaction) SaveAddresses(ctx context.Context, addresses ...*storage.Address) (uint64, error) {
+func (m *MockTransaction) SaveAddresses(ctx context.Context, addresses ...*storage.Address) (int64, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
 	for _, a := range addresses {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SaveAddresses", varargs...)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1224,19 +1224,19 @@ type TransactionSaveAddressesCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *TransactionSaveAddressesCall) Return(arg0 uint64, arg1 error) *TransactionSaveAddressesCall {
+func (c *TransactionSaveAddressesCall) Return(arg0 int64, arg1 error) *TransactionSaveAddressesCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *TransactionSaveAddressesCall) Do(f func(context.Context, ...*storage.Address) (uint64, error)) *TransactionSaveAddressesCall {
+func (c *TransactionSaveAddressesCall) Do(f func(context.Context, ...*storage.Address) (int64, error)) *TransactionSaveAddressesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *TransactionSaveAddressesCall) DoAndReturn(f func(context.Context, ...*storage.Address) (uint64, error)) *TransactionSaveAddressesCall {
+func (c *TransactionSaveAddressesCall) DoAndReturn(f func(context.Context, ...*storage.Address) (int64, error)) *TransactionSaveAddressesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1500,14 +1500,14 @@ func (c *TransactionSaveNamespaceMessageCall) DoAndReturn(f func(context.Context
 }
 
 // SaveNamespaces mocks base method.
-func (m *MockTransaction) SaveNamespaces(ctx context.Context, namespaces ...*storage.Namespace) (uint64, error) {
+func (m *MockTransaction) SaveNamespaces(ctx context.Context, namespaces ...*storage.Namespace) (int64, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
 	for _, a := range namespaces {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SaveNamespaces", varargs...)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1526,19 +1526,19 @@ type TransactionSaveNamespacesCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *TransactionSaveNamespacesCall) Return(arg0 uint64, arg1 error) *TransactionSaveNamespacesCall {
+func (c *TransactionSaveNamespacesCall) Return(arg0 int64, arg1 error) *TransactionSaveNamespacesCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *TransactionSaveNamespacesCall) Do(f func(context.Context, ...*storage.Namespace) (uint64, error)) *TransactionSaveNamespacesCall {
+func (c *TransactionSaveNamespacesCall) Do(f func(context.Context, ...*storage.Namespace) (int64, error)) *TransactionSaveNamespacesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *TransactionSaveNamespacesCall) DoAndReturn(f func(context.Context, ...*storage.Namespace) (uint64, error)) *TransactionSaveNamespacesCall {
+func (c *TransactionSaveNamespacesCall) DoAndReturn(f func(context.Context, ...*storage.Namespace) (int64, error)) *TransactionSaveNamespacesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

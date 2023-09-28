@@ -1,6 +1,7 @@
 package handler
 
 import (
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"strings"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -124,9 +125,9 @@ func (p *addressTxRequest) SetDefault() {
 }
 
 type namespacesByHeightRequest struct {
-	Limit  uint64 `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset uint64 `query:"offset" validate:"omitempty,min=0"`
-	Height uint64 `param:"height" validate:"required,min=1"`
+	Limit  uint64         `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset uint64         `query:"offset" validate:"omitempty,min=0"`
+	Height pkgTypes.Level `param:"height" validate:"required,min=1"`
 }
 
 func (p *namespacesByHeightRequest) SetDefault() {
