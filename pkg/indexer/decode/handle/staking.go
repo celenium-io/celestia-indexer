@@ -27,7 +27,7 @@ func MsgCreateValidator(level types.Level, status storageTypes.Status, m *cosmos
 		Website:           m.Description.Website,
 		Details:           m.Description.Details,
 		Contacts:          m.Description.SecurityContact,
-		Height:            uint64(level),
+		Height:            level,
 		Rate:              decimal.Zero,
 		MaxRate:           decimal.Zero,
 		MaxChangeRate:     decimal.Zero,
@@ -70,7 +70,7 @@ func MsgEditValidator(level types.Level, status storageTypes.Status, m *cosmosSt
 		Website:           m.Description.Website,
 		Details:           m.Description.Details,
 		Contacts:          m.Description.SecurityContact,
-		Height:            uint64(level),
+		Height:            level,
 		Rate:              decimal.Zero,
 		MinSelfDelegation: decimal.Zero,
 	}

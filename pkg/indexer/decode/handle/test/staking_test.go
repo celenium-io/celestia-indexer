@@ -238,7 +238,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 			MaxRate:           decimal.Zero,
 			MaxChangeRate:     decimal.Zero,
 			MinSelfDelegation: decimal.RequireFromString("1"),
-			Height:            uint64(blob.Height),
+			Height:            blob.Height,
 		},
 	}
 	assert.NoError(t, err)
