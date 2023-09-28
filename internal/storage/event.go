@@ -17,7 +17,7 @@ type IEvent interface {
 	storage.Table[*Event]
 
 	ByTxId(ctx context.Context, txId uint64) ([]Event, error)
-	ByBlock(ctx context.Context, height uint64) ([]Event, error)
+	ByBlock(ctx context.Context, height pkgTypes.Level) ([]Event, error)
 }
 
 // Event -

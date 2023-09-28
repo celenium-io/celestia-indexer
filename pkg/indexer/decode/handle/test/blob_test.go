@@ -73,7 +73,7 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(1), dm.BlobsSize)
+	assert.Equal(t, int64(1), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }

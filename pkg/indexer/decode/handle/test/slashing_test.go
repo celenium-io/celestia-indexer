@@ -58,7 +58,7 @@ func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 		Addresses: addressesExpected,
 	}
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }

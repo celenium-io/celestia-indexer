@@ -101,7 +101,7 @@ func (s *StorageTestSuite) TestSaveNamespaces() {
 
 	countAddedNamespaces, err := tx.SaveNamespaces(ctx, namespaces...)
 	s.Require().NoError(err)
-	s.Require().Equal(uint64(2), countAddedNamespaces)
+	s.Require().Equal(int64(2), countAddedNamespaces)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))

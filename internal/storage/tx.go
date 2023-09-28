@@ -61,7 +61,7 @@ type Tx struct {
 	Events   []Event   `bun:"rel:has-many"`
 	Signers  []Address `bun:"m2m:signer,join:Tx=Address"`
 
-	BlobsSize uint64 `bun:"-"`
+	BlobsSize int64 `bun:"-"`
 }
 
 // TableName -

@@ -24,7 +24,7 @@ func NewBlocks(db *database.Bun) *Blocks {
 }
 
 // ByHeight -
-func (b *Blocks) ByHeight(ctx context.Context, height uint64) (block storage.Block, err error) {
+func (b *Blocks) ByHeight(ctx context.Context, height types.Level) (block storage.Block, err error) {
 	err = b.DB().NewSelect().Model(&block).
 		Where("block.height = ?", height).
 		Limit(1).
@@ -38,7 +38,7 @@ type typeCount struct {
 }
 
 // ByHeightWithStats -
-func (b *Blocks) ByHeightWithStats(ctx context.Context, height uint64) (block storage.Block, err error) {
+func (b *Blocks) ByHeightWithStats(ctx context.Context, height types.Level) (block storage.Block, err error) {
 
 	err = b.DB().NewSelect().Model(&block).
 		Where("block.height = ?", height).

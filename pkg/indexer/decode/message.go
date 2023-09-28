@@ -27,7 +27,7 @@ import (
 
 type DecodedMsg struct {
 	Msg       storage.Message
-	BlobsSize uint64
+	BlobsSize int64
 	Addresses []storage.AddressWithType
 }
 

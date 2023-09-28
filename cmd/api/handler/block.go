@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"net/http"
 
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
@@ -36,11 +37,11 @@ func NewBlockHandler(
 }
 
 type getBlockByHeightRequest struct {
-	Height uint64 `param:"height" validate:"required,min=1"`
+	Height types.Level `param:"height" validate:"required,min=1"`
 }
 
 type getBlockRequest struct {
-	Height uint64 `param:"height" validate:"required,min=1"`
+	Height types.Level `param:"height" validate:"required,min=1"`
 
 	Stats bool `query:"stats" validate:"omitempty"`
 }

@@ -119,7 +119,7 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 	module.Log.Info().
 		Uint64("height", uint64(block.Height)).
 		Time("block_time", block.Time).
-		Uint64("block_ns_size", block.Stats.BlobsSize).
+		Int64("block_ns_size", block.Stats.BlobsSize).
 		Str("block_fee", block.Stats.Fee.String()).
 		Int64("ms", time.Since(start).Milliseconds()).
 		Msg("block saved")

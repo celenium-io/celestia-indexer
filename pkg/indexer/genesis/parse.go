@@ -39,7 +39,7 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 		Stats: storage.BlockStats{
 			Time:          genesis.GenesisTime,
 			Height:        pkgTypes.Level(genesis.InitialHeight - 1),
-			TxCount:       uint64(len(genesis.AppState.Genutil.GenTxs)),
+			TxCount:       int64(len(genesis.AppState.Genutil.GenTxs)),
 			EventsCount:   0,
 			Fee:           decimal.Zero,
 			SupplyChange:  decimal.Zero,
