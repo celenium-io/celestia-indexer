@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	"time"
+)
 
 type Status struct {
 	NodeInfo      NodeInfo      `json:"node_info"`
@@ -31,15 +34,15 @@ type ProtocolVersion struct {
 }
 
 type SyncInfo struct {
-	LatestBlockHash     []byte    `json:"latest_block_hash"`
-	LatestAppHash       []byte    `json:"latest_app_hash"`
-	LatestBlockHeight   int64     `json:"latest_block_height,string"`
-	LatestBlockTime     time.Time `json:"latest_block_time"`
-	EarliestBlockHash   []byte    `json:"earliest_block_hash"`
-	EarliestAppHash     []byte    `json:"earliest_app_hash"`
-	EarliestBlockHeight int64     `json:"earliest_block_height,string"`
-	EarliestBlockTime   time.Time `json:"earliest_block_time"`
-	CatchingUp          bool      `json:"catching_up"`
+	LatestBlockHash     []byte         `json:"latest_block_hash"`
+	LatestAppHash       []byte         `json:"latest_app_hash"`
+	LatestBlockHeight   pkgTypes.Level `json:"latest_block_height,string"`
+	LatestBlockTime     time.Time      `json:"latest_block_time"`
+	EarliestBlockHash   []byte         `json:"earliest_block_hash"`
+	EarliestAppHash     []byte         `json:"earliest_app_hash"`
+	EarliestBlockHeight pkgTypes.Level `json:"earliest_block_height,string"`
+	EarliestBlockTime   time.Time      `json:"earliest_block_time"`
+	CatchingUp          bool           `json:"catching_up"`
 }
 
 type ValidatorInfo struct {

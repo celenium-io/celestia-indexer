@@ -39,7 +39,7 @@ func (node *Node) Blob(ctx context.Context, height pkgTypes.Level, namespace, co
 }
 
 // Proofs - retrieves proofs in the given namespaces at the given height by commitment.
-func (node *Node) Proofs(ctx context.Context, height int64, namespace, commitment string) ([]types.Proof, error) {
+func (node *Node) Proofs(ctx context.Context, height pkgTypes.Level, namespace, commitment string) ([]types.Proof, error) {
 	var response types.Response[[]types.Proof]
 	if err := node.post(ctx, "blob.GetProof", []any{height, namespace, commitment}, &response); err != nil {
 		return response.Result, err

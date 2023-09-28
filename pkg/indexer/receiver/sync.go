@@ -69,5 +69,5 @@ func (r *Module) headLevel(ctx context.Context) (types.Level, error) {
 		return 0, err
 	}
 
-	return types.Level(status.SyncInfo.LatestBlockHeight), nil
+	return status.SyncInfo.LatestBlockHeight, nil
 }
