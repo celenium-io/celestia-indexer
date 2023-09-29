@@ -42,7 +42,8 @@ type getBlockByHeightRequest struct {
 
 type getBlockRequest struct {
 	Height types.Level `param:"height" validate:"required,min=0"`
-	Stats  bool        `query:"stats" validate:"omitempty"`
+
+	Stats bool `query:"stats" validate:"omitempty"`
 }
 
 // Get godoc
