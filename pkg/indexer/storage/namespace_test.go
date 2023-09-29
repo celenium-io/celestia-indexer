@@ -14,7 +14,7 @@ func Test_saveNamespaces(t *testing.T) {
 	tests := []struct {
 		name       string
 		namespaces map[string]*storage.Namespace
-		want       uint64
+		want       int64
 		wantErr    bool
 	}{
 		{
@@ -43,9 +43,9 @@ func Test_saveNamespaces(t *testing.T) {
 			tx.EXPECT().SaveNamespaces(gomock.Any(), gomock.Any()).
 				MaxTimes(1).
 				MinTimes(1).
-				DoAndReturn(func(_ context.Context, ns ...*storage.Namespace) (uint64, error) {
+				DoAndReturn(func(_ context.Context, ns ...*storage.Namespace) (int64, error) {
 					require.Equal(t, len(tt.namespaces), len(ns))
-					return uint64(len(ns)), nil
+					return int64(len(ns)), nil
 				})
 
 			got, err := saveNamespaces(context.Background(), tx, tt.namespaces)

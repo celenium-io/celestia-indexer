@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -94,7 +95,7 @@ func (s *BlockTestSuite) TestGet() {
 	c.SetParamValues("100")
 
 	s.blocks.EXPECT().
-		ByHeight(gomock.Any(), uint64(100)).
+		ByHeight(gomock.Any(), pkgTypes.Level(100)).
 		Return(testBlock, nil)
 
 	s.Require().NoError(s.handler.Get(c))
@@ -125,7 +126,7 @@ func (s *BlockTestSuite) TestGetWithoutStats() {
 	c.SetParamValues("100")
 
 	s.blocks.EXPECT().
-		ByHeight(gomock.Any(), uint64(100)).
+		ByHeight(gomock.Any(), pkgTypes.Level(100)).
 		Return(testBlock, nil)
 
 	s.Require().NoError(s.handler.Get(c))
@@ -156,7 +157,7 @@ func (s *BlockTestSuite) TestGetWithStats() {
 	c.SetParamValues("100")
 
 	s.blocks.EXPECT().
-		ByHeightWithStats(gomock.Any(), uint64(100)).
+		ByHeightWithStats(gomock.Any(), pkgTypes.Level(100)).
 		Return(testBlockWithStats, nil)
 
 	s.Require().NoError(s.handler.Get(c))
@@ -264,7 +265,7 @@ func (s *BlockTestSuite) TestGetEvents() {
 	c.SetParamValues("100")
 
 	s.events.EXPECT().
-		ByBlock(gomock.Any(), uint64(100)).
+		ByBlock(gomock.Any(), pkgTypes.Level(100)).
 		Return([]storage.Event{
 			{
 				Id:       1,
@@ -302,7 +303,7 @@ func (s *BlockTestSuite) TestGetStats() {
 	c.SetParamValues("100")
 
 	s.blockStats.EXPECT().
-		ByHeight(gomock.Any(), uint64(100)).
+		ByHeight(gomock.Any(), pkgTypes.Level(100)).
 		Return(testBlockStats, nil)
 
 	s.Require().NoError(s.handler.GetStats(c))
@@ -325,7 +326,7 @@ func (s *BlockTestSuite) TestGetNamespaces() {
 	c.SetParamValues("100")
 
 	s.namespace.EXPECT().
-		MessagesByHeight(gomock.Any(), uint64(100), int(10), int(0)).
+		MessagesByHeight(gomock.Any(), pkgTypes.Level(100), int(10), int(0)).
 		Return([]storage.NamespaceMessage{
 			{
 				NamespaceId: testNamespace.Id,
@@ -370,7 +371,7 @@ func (s *BlockTestSuite) TestGetNamespacesCount() {
 	c.SetParamValues("100")
 
 	s.namespace.EXPECT().
-		CountMessagesByHeight(gomock.Any(), uint64(100)).
+		CountMessagesByHeight(gomock.Any(), pkgTypes.Level(100)).
 		Return(12, nil)
 
 	s.Require().NoError(s.handler.GetNamespacesCount(c))

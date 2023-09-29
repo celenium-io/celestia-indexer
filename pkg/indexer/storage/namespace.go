@@ -10,7 +10,7 @@ func saveNamespaces(
 	ctx context.Context,
 	tx storage.Transaction,
 	namespaces map[string]*storage.Namespace,
-) (uint64, error) {
+) (int64, error) {
 	if len(namespaces) == 0 {
 		return 0, nil
 	}

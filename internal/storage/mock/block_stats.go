@@ -13,6 +13,7 @@ import (
 	reflect "reflect"
 
 	storage "github.com/dipdup-io/celestia-indexer/internal/storage"
+	types "github.com/dipdup-io/celestia-indexer/pkg/types"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -40,7 +41,7 @@ func (m *MockIBlockStats) EXPECT() *MockIBlockStatsMockRecorder {
 }
 
 // ByHeight mocks base method.
-func (m *MockIBlockStats) ByHeight(ctx context.Context, height uint64) (storage.BlockStats, error) {
+func (m *MockIBlockStats) ByHeight(ctx context.Context, height types.Level) (storage.BlockStats, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByHeight", ctx, height)
 	ret0, _ := ret[0].(storage.BlockStats)
@@ -67,13 +68,13 @@ func (c *IBlockStatsByHeightCall) Return(arg0 storage.BlockStats, arg1 error) *I
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlockStatsByHeightCall) Do(f func(context.Context, uint64) (storage.BlockStats, error)) *IBlockStatsByHeightCall {
+func (c *IBlockStatsByHeightCall) Do(f func(context.Context, types.Level) (storage.BlockStats, error)) *IBlockStatsByHeightCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlockStatsByHeightCall) DoAndReturn(f func(context.Context, uint64) (storage.BlockStats, error)) *IBlockStatsByHeightCall {
+func (c *IBlockStatsByHeightCall) DoAndReturn(f func(context.Context, types.Level) (storage.BlockStats, error)) *IBlockStatsByHeightCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

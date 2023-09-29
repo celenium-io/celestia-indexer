@@ -84,7 +84,7 @@ func TestDecodeMsg_SuccessOnMsgCreateVestingAccount(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -152,7 +152,7 @@ func TestDecodeMsg_SuccessOnMsgCreatePermanentLockedAccount(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -221,7 +221,7 @@ func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }

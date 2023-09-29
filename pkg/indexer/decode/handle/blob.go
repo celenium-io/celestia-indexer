@@ -10,8 +10,8 @@ import (
 )
 
 // MsgPayForBlobs pays for the inclusion of a blob in the block.
-func MsgPayForBlobs(level types.Level, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []storage.AddressWithType, []storage.Namespace, uint64, error) {
-	var blobsSize uint64
+func MsgPayForBlobs(level types.Level, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []storage.AddressWithType, []storage.Namespace, int64, error) {
+	var blobsSize int64
 	namespaces := make([]storage.Namespace, len(m.Namespaces))
 
 	for nsI, ns := range m.Namespaces {
@@ -21,7 +21,7 @@ func MsgPayForBlobs(level types.Level, m *appBlobTypes.MsgPayForBlobs) (storageT
 		}
 
 		appNS := namespace.Namespace{Version: ns[0], ID: ns[1:]}
-		size := uint64(m.BlobSizes[nsI])
+		size := int64(m.BlobSizes[nsI])
 		blobsSize += size
 		namespaces[nsI] = storage.Namespace{
 			FirstHeight: level,

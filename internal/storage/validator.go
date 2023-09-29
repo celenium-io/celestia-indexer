@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/shopspring/decimal"
@@ -33,8 +34,8 @@ type Validator struct {
 	MaxChangeRate     decimal.Decimal `bun:"max_change_rate,type:numeric"     comment:"Maximum daily increase of the validator commission, as a fraction"`
 	MinSelfDelegation decimal.Decimal `bun:"min_self_delegation,type:numeric" comment:""`
 
-	MsgId  uint64 `bun:"msg_id" comment:"Message id when validator was created"`
-	Height uint64 `bun:"height" comment:"Height when validator was created"`
+	MsgId  uint64         `bun:"msg_id" comment:"Message id when validator was created"`
+	Height pkgTypes.Level `bun:"height" comment:"Height when validator was created"`
 }
 
 func (Validator) TableName() string {

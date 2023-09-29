@@ -47,7 +47,7 @@ func createExpectations(
 		Id:        0,
 		Height:    blob.Height,
 		Time:      now,
-		Position:  uint64(position),
+		Position:  int64(position),
 		Type:      txType,
 		TxId:      0,
 		Data:      structs.Map(m),
@@ -87,7 +87,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
 	)
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -121,7 +121,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1(t *testing.T) {
 	)
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -153,7 +153,7 @@ func TestDecodeMsg_SuccessOnMsgExecLegacyContent(t *testing.T) {
 	)
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -188,7 +188,7 @@ func TestDecodeMsg_SuccessOnMsgVote_V1(t *testing.T) {
 	)
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -221,7 +221,7 @@ func TestDecodeMsg_SuccessOnMsgVote_V1Beta1(t *testing.T) {
 		storageTypes.MsgVote,
 	)
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -254,7 +254,7 @@ func TestDecodeMsg_SuccessOnMsgVoteWeighted_V1(t *testing.T) {
 		storageTypes.MsgVoteWeighted,
 	)
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -287,7 +287,7 @@ func TestDecodeMsg_SuccessOnMsgVoteWeighted_V1Beta1(t *testing.T) {
 	)
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -319,7 +319,7 @@ func TestDecodeMsg_SuccessMsgDeposit_V1(t *testing.T) {
 		storageTypes.MsgDeposit,
 	)
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
@@ -352,7 +352,7 @@ func TestDecodeMsg_SuccessOnMsgDeposit_V1Beta1(t *testing.T) {
 	)
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), dm.BlobsSize)
+	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }

@@ -10,7 +10,7 @@ func saveAddresses(
 	ctx context.Context,
 	tx storage.Transaction,
 	addresses map[string]*storage.Address,
-) (map[string]uint64, uint64, error) {
+) (map[string]uint64, int64, error) {
 	if len(addresses) == 0 {
 		return nil, 0, nil
 	}

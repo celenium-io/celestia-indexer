@@ -13,6 +13,7 @@ import (
 	reflect "reflect"
 
 	storage "github.com/dipdup-io/celestia-indexer/internal/storage"
+	types "github.com/dipdup-io/celestia-indexer/pkg/types"
 	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -41,7 +42,7 @@ func (m *MockIEvent) EXPECT() *MockIEventMockRecorder {
 }
 
 // ByBlock mocks base method.
-func (m *MockIEvent) ByBlock(ctx context.Context, height uint64) ([]storage.Event, error) {
+func (m *MockIEvent) ByBlock(ctx context.Context, height types.Level) ([]storage.Event, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByBlock", ctx, height)
 	ret0, _ := ret[0].([]storage.Event)
@@ -68,13 +69,13 @@ func (c *IEventByBlockCall) Return(arg0 []storage.Event, arg1 error) *IEventByBl
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IEventByBlockCall) Do(f func(context.Context, uint64) ([]storage.Event, error)) *IEventByBlockCall {
+func (c *IEventByBlockCall) Do(f func(context.Context, types.Level) ([]storage.Event, error)) *IEventByBlockCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IEventByBlockCall) DoAndReturn(f func(context.Context, uint64) ([]storage.Event, error)) *IEventByBlockCall {
+func (c *IEventByBlockCall) DoAndReturn(f func(context.Context, types.Level) ([]storage.Event, error)) *IEventByBlockCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

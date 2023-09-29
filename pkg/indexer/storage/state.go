@@ -5,7 +5,7 @@ import (
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 )
 
-func updateState(block *storage.Block, totalAccounts uint64, totalNamespaces uint64, state *storage.State) {
+func updateState(block *storage.Block, totalAccounts int64, totalNamespaces int64, state *storage.State) {
 	if types.Level(block.Id) <= state.LastHeight {
 		return
 	}

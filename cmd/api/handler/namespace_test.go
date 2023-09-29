@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -214,7 +215,7 @@ func (s *NamespaceTestSuite) TestGetBlobs() {
 	}
 
 	s.blobReceiver.EXPECT().
-		Blobs(gomock.Any(), uint64(1000), testNamespaceBase64).
+		Blobs(gomock.Any(), pkgTypes.Level(1000), testNamespaceBase64).
 		Return(result, nil).
 		MaxTimes(1).
 		MinTimes(1)
@@ -256,7 +257,7 @@ func (s *NamespaceTestSuite) TestGetBlob() {
 	}
 
 	s.blobReceiver.EXPECT().
-		Blob(gomock.Any(), uint64(1000), testNamespaceBase64, "Bw==").
+		Blob(gomock.Any(), pkgTypes.Level(1000), testNamespaceBase64, "Bw==").
 		Return(result, nil).
 		MaxTimes(1).
 		MinTimes(1)

@@ -101,7 +101,7 @@ func (s *StorageTestSuite) TestSaveNamespaces() {
 
 	countAddedNamespaces, err := tx.SaveNamespaces(ctx, namespaces...)
 	s.Require().NoError(err)
-	s.Require().Equal(uint64(2), countAddedNamespaces)
+	s.Require().Equal(int64(2), countAddedNamespaces)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
@@ -665,7 +665,7 @@ func (s *StorageTestSuite) TestSaveEventsWithCopy() {
 	events := make([]storage.Event, 100)
 	for i := 0; i < 100; i++ {
 		events[i].Height = 100
-		events[i].Position = uint64(i)
+		events[i].Position = int64(i)
 		events[i].Type = types.EventTypeBurn
 		events[i].TxId = testsuite.Ptr(uint64(i))
 		events[i].Data = map[string]any{

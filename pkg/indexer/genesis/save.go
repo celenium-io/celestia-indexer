@@ -78,7 +78,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		}
 	}
 
-	var totalAccounts uint64
+	var totalAccounts int64
 	if len(data.addresses) > 0 {
 		entities := make([]*storage.Address, 0, len(data.addresses))
 		for key := range data.addresses {
@@ -99,7 +99,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		}
 	}
 
-	var totalNamespaces uint64
+	var totalNamespaces int64
 	if len(namespaces) > 0 {
 		entities := make([]*storage.Namespace, 0, len(namespaces))
 		for key := range namespaces {
@@ -176,7 +176,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 	}
 	module.Log.Info().
 		Uint64("height", data.block.Id).
-		Uint64("block_ns_size", data.block.Stats.BlobsSize).
+		Int64("block_ns_size", data.block.Stats.BlobsSize).
 		Str("block_fee", data.block.Stats.Fee.String()).
 		Int64("ms", time.Since(start).Milliseconds()).
 		Msg("block saved")

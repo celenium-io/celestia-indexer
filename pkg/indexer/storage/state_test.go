@@ -11,8 +11,8 @@ import (
 func Test_updateState(t *testing.T) {
 	type args struct {
 		block           *storage.Block
-		totalAccounts   uint64
-		totalNamespaces uint64
+		totalAccounts   int64
+		totalNamespaces int64
 		state           *storage.State
 	}
 

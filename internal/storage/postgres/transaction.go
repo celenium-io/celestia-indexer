@@ -50,7 +50,7 @@ type addedNamespace struct {
 	Xmax uint64 `bun:"xmax"`
 }
 
-func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...*models.Namespace) (uint64, error) {
+func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...*models.Namespace) (int64, error) {
 	if len(namespaces) == 0 {
 		return 0, nil
 	}
@@ -71,7 +71,7 @@ func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...*models.
 		return 0, err
 	}
 
-	var count uint64
+	var count int64
 	for i := range addedNamespaces {
 		if addedNamespaces[i].Xmax == 0 {
 			count++
@@ -88,7 +88,7 @@ type addedAddress struct {
 	Xmax uint64 `bun:"xmax"`
 }
 
-func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...*models.Address) (uint64, error) {
+func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...*models.Address) (int64, error) {
 	if len(addresses) == 0 {
 		return 0, nil
 	}
@@ -108,7 +108,7 @@ func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...*models.Ad
 		return 0, err
 	}
 
-	var count uint64
+	var count int64
 	for i := range addr {
 		if addr[i].Xmax == 0 {
 			count++

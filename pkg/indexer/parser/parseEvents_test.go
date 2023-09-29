@@ -60,7 +60,7 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 	e := resultEvents[0]
 	assert.Equal(t, block.Height, e.Height)
 	assert.Equal(t, now, e.Time)
-	assert.Equal(t, uint64(0), e.Position)
+	assert.Equal(t, int64(0), e.Position)
 	assert.Equal(t, storageTypes.EventTypeCoinSpent, e.Type)
 	assert.Nil(t, e.TxId)
 

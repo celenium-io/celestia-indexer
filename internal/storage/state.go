@@ -27,10 +27,10 @@ type State struct {
 	LastHash        []byte          `bun:"last_hash"                 comment:"Last block hash"`
 	LastTime        time.Time       `bun:"last_time"                 comment:"Time of last block"`
 	ChainId         string          `bun:"chain_id"                  comment:"Celestia chain id"`
-	TotalTx         uint64          `bun:"total_tx"                  comment:"Transactions count in celestia"`
-	TotalAccounts   uint64          `bun:"total_accounts"            comment:"Accounts count in celestia"`
-	TotalNamespaces uint64          `bun:"total_namespaces"          comment:"Namespaces count in celestia"`
-	TotalBlobsSize  uint64          `bun:"total_blobs_size"          comment:"Total blobs size"`
+	TotalTx         int64           `bun:"total_tx"                  comment:"Transactions count in celestia"`
+	TotalAccounts   int64           `bun:"total_accounts"            comment:"Accounts count in celestia"`
+	TotalNamespaces int64           `bun:"total_namespaces"          comment:"Namespaces count in celestia"`
+	TotalBlobsSize  int64           `bun:"total_blobs_size"          comment:"Total blobs size"`
 	TotalSupply     decimal.Decimal `bun:"total_supply,type:numeric" comment:"Total supply in celestia"`
 	TotalFee        decimal.Decimal `bun:"total_fee,type:numeric"    comment:"Total paid fee"`
 }

@@ -81,7 +81,7 @@ func Test_saveAddresses(t *testing.T) {
 		name      string
 		addresses map[string]*storage.Address
 		addr      map[string]uint64
-		total     uint64
+		total     int64
 		wantErr   bool
 	}{
 		{
@@ -139,9 +139,9 @@ func Test_saveAddresses(t *testing.T) {
 			SaveAddresses(gomock.Any(), gomock.Any()).
 			MaxTimes(1).
 			MinTimes(0).
-			DoAndReturn(func(_ context.Context, addresses ...*storage.Address) (uint64, error) {
+			DoAndReturn(func(_ context.Context, addresses ...*storage.Address) (int64, error) {
 				require.Equal(t, len(tt.addresses), len(addresses))
-				var count uint64
+				var count int64
 				for i := range addresses {
 					addresses[i].Id = uint64(i + 1)
 

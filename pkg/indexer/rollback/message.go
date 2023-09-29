@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (module *Module) rollbackMessages(ctx context.Context, tx storage.Transaction, height types.Level) (uint64, error) {
+func (module *Module) rollbackMessages(ctx context.Context, tx storage.Transaction, height types.Level) (int64, error) {
 	msgs, err := tx.RollbackMessages(ctx, height)
 	if err != nil {
 		return 0, err
@@ -40,5 +40,5 @@ func (module *Module) rollbackMessages(ctx context.Context, tx storage.Transacti
 		return 0, errors.Wrap(err, "namespace rollback")
 	}
 
-	return uint64(len(ns)), nil
+	return int64(len(ns)), nil
 }
