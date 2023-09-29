@@ -144,8 +144,6 @@ func (c *Client) WriteMessages(ctx context.Context, ws *websocket.Conn, log echo
 }
 
 func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Client, log echo.Logger) {
-	defer c.manager.clients.Delete(sub.id)
-
 	if err := ws.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
 		log.Error(err)
 		return
@@ -164,6 +162,8 @@ func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Clie
 				case err == io.EOF:
 					return
 				case websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseAbnormalClosure, websocket.CloseGoingAway):
+					c.manager.RemoveClientFromChannel(ChannelHead, c)
+					c.manager.RemoveClientFromChannel(ChannelTx, c)
 					return
 				}
 				log.Errorf("read websocket message: %s", err.Error())

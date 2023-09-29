@@ -2,9 +2,10 @@ package websocket
 
 import (
 	"context"
-	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"net/http"
 	"sync/atomic"
+
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 
 	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/dipdup-io/celestia-indexer/internal/storage"
@@ -77,6 +78,7 @@ func (manager *Manager) Handle(c echo.Context) error {
 	ctx, cancel := context.WithCancel(c.Request().Context())
 	sub.WriteMessages(ctx, ws, c.Logger())
 	sub.ReadMessages(ctx, ws, sub, c.Logger())
+	manager.clients.Delete(sId)
 	cancel()
 
 	if err := sub.Close(); err != nil {
@@ -117,7 +119,7 @@ func (manager *Manager) AddClientToChannel(channel string, client *Client) {
 	case ChannelTx:
 		manager.tx.AddClient(client)
 	default:
-		log.Error().Str("channel", channel).Msg("unknwon channel name")
+		log.Error().Str("channel", channel).Msg("unknown channel name")
 	}
 }
 
@@ -128,6 +130,6 @@ func (manager *Manager) RemoveClientFromChannel(channel string, client *Client) 
 	case ChannelTx:
 		manager.tx.RemoveClient(client.id)
 	default:
-		log.Error().Str("channel", channel).Msg("unknwon channel name")
+		log.Error().Str("channel", channel).Msg("unknown channel name")
 	}
 }
