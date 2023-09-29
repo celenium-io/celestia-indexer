@@ -36,11 +36,11 @@ func NewBlockHandler(
 }
 
 type getBlockByHeightRequest struct {
-	Height uint64 `param:"height" validate:"required,min=1"`
+	Height uint64 `param:"height" validate:"required,min=0"`
 }
 
 type getBlockRequest struct {
-	Height uint64 `param:"height" validate:"required,min=1"`
+	Height uint64 `param:"height" validate:"required,min=0"`
 
 	Stats bool `query:"stats" validate:"omitempty"`
 }
