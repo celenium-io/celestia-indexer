@@ -79,10 +79,16 @@ func decodeAuthInfo(cfg encoding.Config, raw tmTypes.Tx) (tx.AuthInfo, decimal.D
 		return tx.AuthInfo{}, decimal.Decimal{}, errors.Wrap(e, "decoding tx auth_info error")
 	}
 	amount := authInfo.GetFee().GetAmount()
+
+	if amount == nil {
+		return authInfo, decimal.Zero, nil
+	}
+
 	if len(amount) > 1 {
 		// TODO stop indexer if tx is not in failed status
 		return tx.AuthInfo{}, decimal.Decimal{}, errors.Errorf("found fee in %d currencies", len(amount))
 	}
+
 	ok, utiaCoin := amount.Find("utia")
 	if !ok {
 		// TODO stop indexer if tx is not in failed status
