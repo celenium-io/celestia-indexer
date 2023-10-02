@@ -104,6 +104,5 @@ func createDecoder() (encoding.Config, cosmosTypes.TxDecoder) {
 }
 
 func JsonTx(raw []byte) (cosmosTypes.Tx, error) {
-	cfg := encoding.MakeConfig(app.ModuleEncodingRegisters...)
 	return cfg.TxConfig.TxJSONDecoder()(raw)
 }
