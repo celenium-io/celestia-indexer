@@ -3,6 +3,7 @@ package websocket
 import (
 	"context"
 	"io"
+	"net"
 	"time"
 
 	"github.com/dipdup-io/workerpool"
@@ -158,10 +159,20 @@ func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Clie
 			return
 		default:
 			if err := c.read(ctx, ws); err != nil {
+				timeoutErr, ok := err.(net.Error)
+
 				switch {
 				case err == io.EOF:
 					return
-				case websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseAbnormalClosure, websocket.CloseGoingAway):
+				case errors.Is(err, websocket.ErrCloseSent):
+					return
+				case ok && timeoutErr.Timeout():
+					return
+				case websocket.IsCloseError(err,
+					websocket.CloseNormalClosure,
+					websocket.CloseAbnormalClosure,
+					websocket.CloseNoStatusReceived,
+					websocket.CloseGoingAway):
 					c.manager.RemoveClientFromChannel(ChannelHead, c)
 					c.manager.RemoveClientFromChannel(ChannelTx, c)
 					return
