@@ -65,7 +65,7 @@ func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...*models.
 		On("CONFLICT ON CONSTRAINT namespace_id_version_idx DO UPDATE").
 		Set("size = EXCLUDED.size + added_namespace.size").
 		Set("pfb_count = EXCLUDED.pfb_count + added_namespace.pfb_count").
-		Returning("id").
+		Returning("xmax, id").
 		Exec(ctx)
 	if err != nil {
 		return 0, err
