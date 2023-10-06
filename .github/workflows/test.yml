@@ -25,6 +25,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Install Go
         uses: actions/setup-go@v4
         with:
@@ -37,9 +38,19 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+
       - name: Golang tests
         env:
           GO111MODULE: on
         run: |
           go mod download
           go test -p 8 ./...
+
+      - name: Update coverage report
+        uses: ncruces/go-coverage-report@v0.2.5
+        with:
+          report: 'true'
+          chart: 'true'
+          amend: 'true'
+          reuse-go: 'true'
+        continue-on-error: true

@@ -2,6 +2,7 @@
 [![Build Status](https://github.com/dipdup-io/celestia-indexer/workflows/Build/badge.svg)](https://github.com/dipdup-io/celestia-indexer/actions?query=branch%3Amaster+workflow%3A%22Build%22)
 [![made_with golang](https://img.shields.io/badge/made_with-golang-blue.svg)](https://golang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Go Coverage](https://github.com/dipdup-io/celestia-indexer/wiki/coverage.svg)](https://raw.githack.com/wiki/dipdup-io/celestia-indexer/coverage.html)
 
 # Celestia Indexer #
 
