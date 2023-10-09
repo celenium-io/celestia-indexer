@@ -1,6 +1,6 @@
 module github.com/dipdup-io/celestia-indexer
 
-go 1.20
+go 1.21.2
 
 require (
 	cosmossdk.io/math v1.0.0-rc.0
