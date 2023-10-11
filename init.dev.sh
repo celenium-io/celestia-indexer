@@ -21,3 +21,6 @@ go install github.com/google/go-licenses@latest
 
 # for api test, should have npm installed
 npm install -g newman
+
+# for setting up license header in each source code file
+go install github.com/vvuwei/update-license@v0.0.1

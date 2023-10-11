@@ -59,4 +59,11 @@ check-licenses:
 test-api:
 	newman run ./test/newman/tests.json -e ./test/newman/env.json
 
-.PHONY: init indexer api build clean compose lint test adr mock api-docs check-licenses
+cover:
+	go test ./... -coverpkg=./... -coverprofile ./coverage.out
+	go tool cover -func ./coverage.out
+
+license-header:
+	update-license -path=./ -license=./LICENSE-HEADER
+
+.PHONY: init indexer api build clean compose lint test adr mock api-docs check-licenses cover license-header
