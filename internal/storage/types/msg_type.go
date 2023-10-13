@@ -45,6 +45,8 @@ package types
 		MsgVote,
 		MsgVoteWeighted,
 		MsgDeposit,
+
+		IBCTransfer,
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix

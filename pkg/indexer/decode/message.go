@@ -5,6 +5,7 @@ package decode
 
 import (
 	"github.com/cosmos/cosmos-sdk/x/authz"
+	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 	"github.com/dipdup-io/celestia-indexer/pkg/indexer/decode/handle"
 	"time"
 
@@ -132,6 +133,10 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgDeposit(height, typedMsg.Depositor)
 	case *cosmosGovTypesV1Beta1.MsgDeposit:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgDeposit(height, typedMsg.Depositor)
+
+	// ibc module
+	case *ibcTypes.MsgTransfer:
+		d.Msg.Type, d.Msg.Addresses, err = handle.IBCTransfer(height, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)

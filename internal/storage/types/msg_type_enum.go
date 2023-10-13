@@ -74,6 +74,8 @@ const (
 	MsgVoteWeighted MsgType = "MsgVoteWeighted"
 	// MsgDeposit is a MsgType of type MsgDeposit.
 	MsgDeposit MsgType = "MsgDeposit"
+	// IBCTransfer is a MsgType of type IBCTransfer.
+	IBCTransfer MsgType = "IBCTransfer"
 )
 
 var ErrInvalidMsgType = errors.New("not a valid MsgType")
@@ -110,6 +112,7 @@ func MsgTypeValues() []MsgType {
 		MsgVote,
 		MsgVoteWeighted,
 		MsgDeposit,
+		IBCTransfer,
 	}
 }
 
@@ -155,6 +158,7 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgVote":                         MsgVote,
 	"MsgVoteWeighted":                 MsgVoteWeighted,
 	"MsgDeposit":                      MsgDeposit,
+	"IBCTransfer":                     IBCTransfer,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.

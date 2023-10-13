@@ -595,6 +595,7 @@ definitions:
     - MsgVote
     - MsgVoteWeighted
     - MsgDeposit
+    - IBCTransfer
     type: string
     x-enum-varnames:
     - MsgUnknown
@@ -626,6 +627,7 @@ definitions:
     - MsgVote
     - MsgVoteWeighted
     - MsgDeposit
+    - IBCTransfer
 host: https://api.celestia.dipdup.net
 info:
   contact: {}
@@ -765,6 +767,7 @@ paths:
         - MsgVote
         - MsgVoteWeighted
         - MsgDeposit
+        - IBCTransfer
         in: query
         name: msg_type
         type: string
@@ -1679,6 +1682,7 @@ paths:
         - MsgVote
         - MsgVoteWeighted
         - MsgDeposit
+        - IBCTransfer
         in: query
         name: msg_type
         type: string

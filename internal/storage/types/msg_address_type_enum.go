@@ -48,6 +48,10 @@ const (
 	MsgAddressTypeProposer MsgAddressType = "proposer"
 	// MsgAddressTypeAuthority is a MsgAddressType of type authority.
 	MsgAddressTypeAuthority MsgAddressType = "authority"
+	// MsgAddressTypeSender is a MsgAddressType of type sender.
+	MsgAddressTypeSender MsgAddressType = "sender"
+	// MsgAddressTypeReceiver is a MsgAddressType of type receiver.
+	MsgAddressTypeReceiver MsgAddressType = "receiver"
 )
 
 var ErrInvalidMsgAddressType = errors.New("not a valid MsgAddressType")
@@ -71,6 +75,8 @@ func MsgAddressTypeValues() []MsgAddressType {
 		MsgAddressTypeVoter,
 		MsgAddressTypeProposer,
 		MsgAddressTypeAuthority,
+		MsgAddressTypeSender,
+		MsgAddressTypeReceiver,
 	}
 }
 
@@ -103,6 +109,8 @@ var _MsgAddressTypeValue = map[string]MsgAddressType{
 	"voter":        MsgAddressTypeVoter,
 	"proposer":     MsgAddressTypeProposer,
 	"authority":    MsgAddressTypeAuthority,
+	"sender":       MsgAddressTypeSender,
+	"receiver":     MsgAddressTypeReceiver,
 }
 
 // ParseMsgAddressType attempts to convert a string to a MsgAddressType.

@@ -228,7 +228,8 @@ const docTemplate = `{
                             "MsgExecLegacyContent",
                             "MsgVote",
                             "MsgVoteWeighted",
-                            "MsgDeposit"
+                            "MsgDeposit",
+                            "IBCTransfer"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1407,7 +1408,8 @@ const docTemplate = `{
                             "MsgExecLegacyContent",
                             "MsgVote",
                             "MsgVoteWeighted",
-                            "MsgDeposit"
+                            "MsgDeposit",
+                            "IBCTransfer"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -2474,7 +2476,8 @@ const docTemplate = `{
                 "MsgExecLegacyContent",
                 "MsgVote",
                 "MsgVoteWeighted",
-                "MsgDeposit"
+                "MsgDeposit",
+                "IBCTransfer"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -2505,7 +2508,8 @@ const docTemplate = `{
                 "MsgExecLegacyContent",
                 "MsgVote",
                 "MsgVoteWeighted",
-                "MsgDeposit"
+                "MsgDeposit",
+                "IBCTransfer"
             ]
         }
     }
