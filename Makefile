@@ -64,6 +64,6 @@ cover:
 	go tool cover -func ./coverage.out
 
 license-header:
-	update-license -path=./ -license=./LICENSE-HEADER
+	update-license -path=./ -license=./HEADER
 
 .PHONY: init indexer api build clean compose lint test adr mock api-docs check-licenses cover license-header
