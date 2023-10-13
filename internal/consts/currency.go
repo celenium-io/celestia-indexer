@@ -3,6 +3,13 @@
 
 package consts
 
+type Denom string
+
+const (
+	Utia Denom = "utia"
+	Tia  Denom = "tia"
+)
+
 const (
 	DefaultCurrency = "utia"
 )

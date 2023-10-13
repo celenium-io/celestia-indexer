@@ -8,6 +8,7 @@ import (
 	"github.com/celestiaorg/celestia-app/app/encoding"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx"
+	"github.com/dipdup-io/celestia-indexer/internal/consts"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -81,24 +82,54 @@ func decodeAuthInfo(cfg encoding.Config, raw tmTypes.Tx) (tx.AuthInfo, decimal.D
 	if e := cfg.Codec.Unmarshal(txRaw.AuthInfoBytes, &authInfo); e != nil {
 		return tx.AuthInfo{}, decimal.Decimal{}, errors.Wrap(e, "decoding tx auth_info error")
 	}
+
+	fee, err := decodeFee(authInfo)
+	if err != nil {
+		return authInfo, decimal.Zero, err
+	}
+
+	return authInfo, fee, nil
+}
+
+func decodeFee(authInfo tx.AuthInfo) (decimal.Decimal, error) {
 	amount := authInfo.GetFee().GetAmount()
 
 	if amount == nil {
-		return authInfo, decimal.Zero, nil
+		return decimal.Zero, nil
 	}
 
 	if len(amount) > 1 {
 		// TODO stop indexer if tx is not in failed status
-		return tx.AuthInfo{}, decimal.Decimal{}, errors.Errorf("found fee in %d currencies", len(amount))
+		return decimal.Zero, errors.Errorf("found fee in %d currencies", len(amount))
 	}
 
-	ok, utiaCoin := amount.Find("utia")
+	fee, ok := getFeeInDenom(amount, consts.Utia)
 	if !ok {
-		// TODO stop indexer if tx is not in failed status
-		return tx.AuthInfo{}, decimal.Decimal{}, errors.New("while getting fee amount in utia")
+		if fee, ok = getFeeInDenom(amount, consts.Tia); !ok {
+			// TODO stop indexer if tx is not in failed status
+			return decimal.Zero, errors.New("couldn't find fee amount in utia or in tia denom")
+		}
 	}
-	fee := decimal.NewFromBigInt(utiaCoin.Amount.BigInt(), 0)
-	return authInfo, fee, nil
+
+	return fee, nil
+}
+
+func getFeeInDenom(amount cosmosTypes.Coins, denom consts.Denom) (decimal.Decimal, bool) {
+	ok, utiaCoin := amount.Find(string(denom))
+	if !ok {
+		return decimal.Zero, false
+	}
+
+	switch denom {
+	case consts.Utia:
+		fee := decimal.NewFromBigInt(utiaCoin.Amount.BigInt(), 0)
+		return fee, true
+	case consts.Tia:
+		fee := decimal.NewFromBigInt(utiaCoin.Amount.BigInt(), 6)
+		return fee, true
+	default:
+		return decimal.Zero, false
+	}
 }
 
 func createDecoder() (encoding.Config, cosmosTypes.TxDecoder) {
