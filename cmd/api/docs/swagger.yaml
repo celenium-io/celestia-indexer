@@ -530,6 +530,8 @@ definitions:
     - proposal_deposit
     - submit_proposal
     - cosmos.authz.v1beta1.EventGrant
+    - send_packet
+    - ibc_transfer
     type: string
     x-enum-varnames:
     - EventTypeUnknown
@@ -564,6 +566,8 @@ definitions:
     - EventTypeProposalDeposit
     - EventTypeSubmitProposal
     - EventTypeCosmosauthzv1beta1EventGrant
+    - EventTypeSendPacket
+    - EventTypeIbcTransfer
   types.MsgType:
     enum:
     - MsgUnknown

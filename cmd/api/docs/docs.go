@@ -2408,7 +2408,9 @@ const docTemplate = `{
                 "proposal_vote",
                 "proposal_deposit",
                 "submit_proposal",
-                "cosmos.authz.v1beta1.EventGrant"
+                "cosmos.authz.v1beta1.EventGrant",
+                "send_packet",
+                "ibc_transfer"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -2442,7 +2444,9 @@ const docTemplate = `{
                 "EventTypeProposalVote",
                 "EventTypeProposalDeposit",
                 "EventTypeSubmitProposal",
-                "EventTypeCosmosauthzv1beta1EventGrant"
+                "EventTypeCosmosauthzv1beta1EventGrant",
+                "EventTypeSendPacket",
+                "EventTypeIbcTransfer"
             ]
         },
         "types.MsgType": {
