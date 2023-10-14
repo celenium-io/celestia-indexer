@@ -17,7 +17,8 @@ func IBCTransfer(level types.Level, m *ibcTypes.MsgTransfer) (storageTypes.MsgTy
 	msgType := storageTypes.IBCTransfer
 	addresses, err := createAddresses(addressesData{
 		{t: storageTypes.MsgAddressTypeSender, address: m.Sender},
-		{t: storageTypes.MsgAddressTypeReceiver, address: m.Receiver},
+		// {t: storageTypes.MsgAddressTypeReceiver,
+		// address: m.Receiver}, // TODO: is it data to do IBC Transfer on cosmos network?
 	}, level)
 	return msgType, addresses, err
 }

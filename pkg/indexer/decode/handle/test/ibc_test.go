@@ -56,20 +56,6 @@ func TestDecodeMsg_SuccessOnIBCMsgTransfer(t *testing.T) {
 				},
 			},
 		},
-		{
-			Type: storageTypes.MsgAddressTypeReceiver,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
-				Hash:       []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x0, 0x2e, 0x81, 0xcb, 0x8b, 0x27, 0x27, 0xe1, 0x0, 0x68},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
-			},
-		},
 	}
 
 	msgExpected := storage.Message{
