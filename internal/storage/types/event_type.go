@@ -42,7 +42,10 @@ package types
 		proposal_deposit,
 		submit_proposal,
 
-		cosmos.authz.v1beta1.EventGrant
+		cosmos.authz.v1beta1.EventGrant,
+
+		send_packet,
+		ibc_transfer
 	)
 */
 //go:generate go-enum --marshal --sql --values
