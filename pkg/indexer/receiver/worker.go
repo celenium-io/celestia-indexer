@@ -24,7 +24,7 @@ func (r *Module) worker(ctx context.Context, level types.Level) {
 		default:
 		}
 
-		block, err := r.blockData(ctx, level)
+		block, err := r.api.BlockData(ctx, level)
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				return
@@ -46,18 +46,4 @@ func (r *Module) worker(ctx context.Context, level types.Level) {
 		Int64("ms", time.Since(start).Milliseconds()).
 		Msg("received block")
 	r.blocks <- result
-}
-
-func (r *Module) blockData(ctx context.Context, level types.Level) (types.BlockData, error) {
-	block, err := r.api.Block(ctx, level)
-	if err != nil {
-		return types.BlockData{}, err
-	}
-
-	blockResults, err := r.api.BlockResults(ctx, level)
-	if err != nil {
-		return types.BlockData{}, err
-	}
-
-	return types.BlockData{ResultBlock: block, ResultBlockResults: blockResults}, nil
 }

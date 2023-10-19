@@ -5,14 +5,15 @@ package receiver
 
 import (
 	"context"
+	"sort"
+	"time"
+
 	ic "github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
 	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/node/types"
 	"github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
 	"github.com/pkg/errors"
 	"go.uber.org/mock/gomock"
-	"sort"
-	"time"
 )
 
 func (s *ModuleTestSuite) TestModule_SyncGracefullyStops() {
@@ -82,14 +83,13 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 
 		for i := types.Level(1); i <= blockCount; i++ {
 			s.api.EXPECT().
-				Block(gomock.Any(), i).
-				Return(getResultBlock(i), nil).
-				MaxTimes(1)
-
-			s.api.EXPECT().
-				BlockResults(gomock.Any(), i).
-				Return(getResultBlockResults(i), nil).
-				MaxTimes(1)
+				BlockData(gomock.Any(), i).
+				Return(types.BlockData{
+					ResultBlock:        getResultBlock(i),
+					ResultBlockResults: getResultBlockResults(i),
+				}, nil).
+				MaxTimes(1).
+				MinTimes(1)
 		}
 	})
 

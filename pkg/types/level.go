@@ -3,4 +3,10 @@
 
 package types
 
+import "fmt"
+
 type Level int64
+
+func (l Level) String() string {
+	return fmt.Sprintf("%d", l)
+}

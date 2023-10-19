@@ -6,6 +6,7 @@ require (
 	cosmossdk.io/math v1.1.2
 	github.com/celestiaorg/celestia-app v1.0.0
 	github.com/cosmos/cosmos-sdk v0.46.14
+	github.com/cosmos/ibc-go/v6 v6.2.0
 	github.com/dipdup-io/workerpool v0.0.4
 	github.com/dipdup-net/go-lib v0.3.5
 	github.com/dipdup-net/indexer-sdk v0.0.3
@@ -75,7 +76,6 @@ require (
 	github.com/cosmos/gogoproto v1.4.11 // indirect
 	github.com/cosmos/gorocksdb v1.2.0 // indirect
 	github.com/cosmos/iavl v0.19.6 // indirect
-	github.com/cosmos/ibc-go/v6 v6.2.0 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.13.1 // indirect
 	github.com/cpuguy83/dockercfg v0.3.1 // indirect
 	github.com/crate-crypto/go-kzg-4844 v0.3.0 // indirect

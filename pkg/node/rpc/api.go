@@ -4,12 +4,14 @@
 package rpc
 
 import (
+	"bytes"
 	"context"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
 	"github.com/goccy/go-json"
 
 	"github.com/pkg/errors"
@@ -50,7 +52,6 @@ func NewAPI(cfg config.DataSource) API {
 	}
 }
 
-// get -
 func (api *API) get(ctx context.Context, path string, args map[string]string, output any) error {
 	u, err := url.Parse(api.cfg.URL)
 	if err != nil {
@@ -90,6 +91,49 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 		Int64("ms", time.Since(start).Milliseconds()).
 		Str("url", u.String()).
 		Msg("request")
+
+	if response.StatusCode != http.StatusOK {
+		return errors.Errorf("invalid status: %d", response.StatusCode)
+	}
+
+	err = json.NewDecoder(response.Body).DecodeWithOption(output)
+	return err
+}
+
+func (api *API) post(ctx context.Context, requests []types.Request, output any) error {
+	u, err := url.Parse(api.cfg.URL)
+	if err != nil {
+		return err
+	}
+
+	body := new(bytes.Buffer)
+	if err := json.NewEncoder(body).Encode(requests); err != nil {
+		return errors.Wrap(err, "invalid bulk post request")
+	}
+
+	if api.rateLimit != nil {
+		if err := api.rateLimit.Wait(ctx); err != nil {
+			return err
+		}
+	}
+
+	start := time.Now()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), body)
+	if err != nil {
+		return err
+	}
+
+	response, err := api.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer closeWithLogError(response.Body, api.log)
+
+	api.log.Trace().
+		Int64("ms", time.Since(start).Milliseconds()).
+		Str("url", u.String()).
+		Msg("post request")
 
 	if response.StatusCode != http.StatusOK {
 		return errors.Errorf("invalid status: %d", response.StatusCode)
