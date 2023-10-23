@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
 type Block struct {

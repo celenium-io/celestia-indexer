@@ -4,7 +4,7 @@
 package handler
 
 import (
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"strings"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"

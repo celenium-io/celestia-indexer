@@ -5,7 +5,7 @@ package parser
 
 import (
 	"context"
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
 func (p *Module) listen(ctx context.Context) {

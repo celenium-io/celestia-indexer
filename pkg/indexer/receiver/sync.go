@@ -5,7 +5,7 @@ package receiver
 
 import (
 	"context"
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"time"
 )

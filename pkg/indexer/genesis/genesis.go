@@ -6,9 +6,9 @@ package genesis
 import (
 	"context"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
-	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
+	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 )
 

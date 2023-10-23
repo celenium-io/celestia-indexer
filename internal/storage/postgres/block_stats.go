@@ -5,10 +5,10 @@ package postgres
 
 import (
 	"context"
-	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
 )
 

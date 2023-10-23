@@ -6,7 +6,7 @@ package responses
 import (
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 )
 
 type HistogramItem struct {

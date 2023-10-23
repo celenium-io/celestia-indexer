@@ -8,9 +8,9 @@ import (
 	"sort"
 	"time"
 
-	ic "github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
-	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/node/types"
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	ic "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
+	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/node/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
 	"github.com/pkg/errors"
 	"go.uber.org/mock/gomock"

@@ -4,7 +4,7 @@
 package mock
 
 import (
-	models "github.com/dipdup-io/celestia-indexer/internal/storage"
+	models "github.com/celenium-io/celestia-indexer/internal/storage"
 	gomock "go.uber.org/mock/gomock"
 )
 

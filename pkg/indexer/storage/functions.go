@@ -3,7 +3,7 @@
 
 package storage
 
-import "github.com/dipdup-io/celestia-indexer/internal/storage"
+import "github.com/celenium-io/celestia-indexer/internal/storage"
 
 func setNamespacesFromMessage(msg storage.Message, namespaces map[string]*storage.Namespace) {
 	for i := range msg.Namespace {

@@ -6,10 +6,10 @@ package postgres
 import (
 	"context"
 
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/uptrace/bun"
 
-	models "github.com/dipdup-io/celestia-indexer/internal/storage"
+	models "github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 )
 

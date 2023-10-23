@@ -4,8 +4,8 @@
 package storage
 
 import (
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
 func updateState(block *storage.Block, totalAccounts int64, totalNamespaces int64, state *storage.State) {

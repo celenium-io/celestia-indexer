@@ -4,8 +4,8 @@
 package responses
 
 import (
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"reflect"

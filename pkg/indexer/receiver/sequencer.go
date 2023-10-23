@@ -8,7 +8,7 @@ import (
 	"context"
 	"encoding/hex"
 
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
 func (r *Module) sequencer(ctx context.Context) {

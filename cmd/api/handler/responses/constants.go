@@ -4,7 +4,7 @@
 package responses
 
 import (
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/goccy/go-json"
 )
 

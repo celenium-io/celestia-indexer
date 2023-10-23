@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/types/bech32"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )

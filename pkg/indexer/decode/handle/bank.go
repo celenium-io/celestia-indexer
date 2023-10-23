@@ -5,9 +5,9 @@ package handle
 
 import (
 	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
 // MsgSend represents a message to send coins from one account to another.

@@ -6,9 +6,9 @@ package parser
 import (
 	"testing"
 
-	"github.com/dipdup-io/celestia-indexer/internal/consts"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/internal/consts"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
