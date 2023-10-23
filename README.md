@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Coverage](https://github.com/celenium-io/celestia-indexer/wiki/coverage.svg)](https://raw.githack.com/wiki/celenium-io/celestia-indexer/coverage.html)
 
-# Celestia Indexer #
+# Celestia Indexer | Celenium #
 
 This is an indexing layer for Celestia DA written in Golang that operates on top of the [Celestia Full node](https://docs.celestia.org/nodes/consensus-full-node/) and stores data in a Postgres database.
 
