@@ -4,13 +4,16 @@
 package decode
 
 import (
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/handle"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
-	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/handle"
 	"time"
 
 	"github.com/rs/zerolog/log"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
 	qgbTypes "github.com/celestiaorg/celestia-app/x/qgb/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
@@ -22,9 +25,6 @@ import (
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	cosmosSlashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/celenium-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/fatih/structs"
 	"github.com/pkg/errors"
 )

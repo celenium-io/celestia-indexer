@@ -4,10 +4,10 @@
 package handle
 
 import (
-	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 )
 
 // MsgSubmitProposal defines a sdk.Msg type that supports submitting arbitrary

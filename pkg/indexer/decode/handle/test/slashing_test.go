@@ -4,12 +4,12 @@
 package handle_test
 
 import (
-	"github.com/cosmos/cosmos-sdk/types"
-	cosmosSlashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
+	"github.com/cosmos/cosmos-sdk/types"
+	cosmosSlashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/fatih/structs"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"

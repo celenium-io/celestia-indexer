@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/types/bech32"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"

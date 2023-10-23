@@ -4,10 +4,10 @@
 package handle
 
 import (
-	qgbTypes "github.com/celestiaorg/celestia-app/x/qgb/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	qgbTypes "github.com/celestiaorg/celestia-app/x/qgb/types"
 )
 
 // MsgRegisterEVMAddress registers an evm address to a validator.

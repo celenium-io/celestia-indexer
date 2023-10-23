@@ -4,10 +4,10 @@
 package decode
 
 import (
+	"github.com/celenium-io/celestia-indexer/internal/consts"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/celenium-io/celestia-indexer/internal/consts"
 	"testing"
 
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"

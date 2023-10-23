@@ -4,10 +4,10 @@
 package handle
 
 import (
-	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
 // MsgSend represents a message to send coins from one account to another.

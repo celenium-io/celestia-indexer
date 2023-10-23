@@ -6,8 +6,8 @@ package decode
 import (
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )
 

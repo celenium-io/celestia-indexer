@@ -4,10 +4,10 @@
 package handle
 
 import (
-	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/cosmos/cosmos-sdk/x/feegrant"
 )
 
 // MsgGrantAllowance adds permission for Grantee to spend up to Allowance

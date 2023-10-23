@@ -6,12 +6,12 @@ package genesis
 import (
 	"strings"
 
-	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )

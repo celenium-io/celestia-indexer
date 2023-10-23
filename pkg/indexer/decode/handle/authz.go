@@ -4,10 +4,10 @@
 package handle
 
 import (
-	"github.com/cosmos/cosmos-sdk/x/authz"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 )
 
 // MsgGrant is a request type for Grant method. It declares authorization to the grantee

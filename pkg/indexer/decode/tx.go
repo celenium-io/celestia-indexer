@@ -4,12 +4,12 @@
 package decode
 
 import (
+	"github.com/celenium-io/celestia-indexer/internal/consts"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/celestiaorg/celestia-app/app"
 	"github.com/celestiaorg/celestia-app/app/encoding"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx"
-	"github.com/celenium-io/celestia-indexer/internal/consts"
-	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	tmTypes "github.com/tendermint/tendermint/types"

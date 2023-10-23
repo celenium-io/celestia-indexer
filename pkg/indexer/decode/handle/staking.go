@@ -4,10 +4,10 @@
 package handle
 
 import (
-	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/shopspring/decimal"
 )
 

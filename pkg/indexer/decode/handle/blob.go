@@ -4,11 +4,11 @@
 package handle
 
 import (
-	"github.com/celestiaorg/celestia-app/pkg/namespace"
-	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/celestiaorg/celestia-app/pkg/namespace"
+	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
 	"github.com/pkg/errors"
 )
 

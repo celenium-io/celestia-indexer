@@ -4,10 +4,10 @@
 package handle
 
 import (
-	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 )
 
 // IBCTransfer defines a msg to transfer fungible tokens (i.e., Coins) between
