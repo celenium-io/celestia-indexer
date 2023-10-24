@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
-	indexerCfg "github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
+	indexerCfg "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/go-testfixtures/testfixtures/v3"

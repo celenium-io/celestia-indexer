@@ -7,8 +7,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/dipdup-io/celestia-indexer/internal/profiler"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
+	"github.com/celenium-io/celestia-indexer/internal/profiler"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	goLibConfig "github.com/dipdup-net/go-lib/config"
 	"github.com/grafana/pyroscope-go"
 	"github.com/rs/zerolog"

@@ -11,18 +11,18 @@ import (
 
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 
-	internalStorage "github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/genesis"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/parser"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/rollback"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/storage"
-	"github.com/dipdup-io/celestia-indexer/pkg/node"
-	"github.com/dipdup-io/celestia-indexer/pkg/node/rpc"
+	internalStorage "github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/genesis"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/parser"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/rollback"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/storage"
+	"github.com/celenium-io/celestia-indexer/pkg/node"
+	"github.com/celenium-io/celestia-indexer/pkg/node/rpc"
 	"github.com/pkg/errors"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/receiver"
+	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/receiver"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )

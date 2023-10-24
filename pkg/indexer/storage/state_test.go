@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/shopspring/decimal"
 )
 

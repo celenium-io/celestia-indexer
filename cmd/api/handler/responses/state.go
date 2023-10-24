@@ -5,10 +5,10 @@ package responses
 
 import (
 	"encoding/hex"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 )
 
 type State struct {

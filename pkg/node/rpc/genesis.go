@@ -7,7 +7,7 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
+	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 )

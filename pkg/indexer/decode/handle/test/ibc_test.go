@@ -4,13 +4,13 @@
 package handle
 
 import (
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/cosmos/cosmos-sdk/types"
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 	ibcCoreClientTypes "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/dipdup-io/celestia-indexer/internal/test_suite"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/fatih/structs"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"

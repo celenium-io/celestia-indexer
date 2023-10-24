@@ -6,8 +6,8 @@ package rollback
 import (
 	"context"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
 func (module *Module) rollbackTransactions(ctx context.Context, tx storage.Transaction, height types.Level) error {

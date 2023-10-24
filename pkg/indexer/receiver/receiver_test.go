@@ -5,10 +5,10 @@ package receiver
 
 import (
 	"context"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	ic "github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
-	"github.com/dipdup-io/celestia-indexer/pkg/node/mock"
-	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/node/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	ic "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
+	"github.com/celenium-io/celestia-indexer/pkg/node/mock"
+	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
 	"go.uber.org/mock/gomock"
 	"testing"

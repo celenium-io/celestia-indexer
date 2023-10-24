@@ -4,8 +4,8 @@
 package responses
 
 import (
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
 // Address model info

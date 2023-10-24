@@ -7,8 +7,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 )
 
 func (module *Module) save(ctx context.Context, data parsedData) error {

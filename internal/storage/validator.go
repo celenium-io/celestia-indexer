@@ -5,7 +5,7 @@ package storage
 
 import (
 	"context"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/shopspring/decimal"

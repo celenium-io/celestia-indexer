@@ -10,17 +10,17 @@ ENV GOOS=linux
 RUN apk --no-cache add ca-certificates
 RUN apk add --update git
 
-RUN mkdir -p $GOPATH/src/github.com/dipdup-io/celestia-indexer/
+RUN mkdir -p $GOPATH/src/github.com/celenium-io/celestia-indexer/
 
-COPY ./go.* $GOPATH/src/github.com/dipdup-io/celestia-indexer/
-WORKDIR $GOPATH/src/github.com/dipdup-io/celestia-indexer
+COPY ./go.* $GOPATH/src/github.com/celenium-io/celestia-indexer/
+WORKDIR $GOPATH/src/github.com/celenium-io/celestia-indexer
 RUN go mod download
 
 COPY cmd/api cmd/api
 COPY internal internal
 COPY pkg pkg
 
-WORKDIR $GOPATH/src/github.com/dipdup-io/celestia-indexer/cmd/api/
+WORKDIR $GOPATH/src/github.com/celenium-io/celestia-indexer/cmd/api/
 RUN go build -a -installsuffix cgo -o /go/bin/api .
 
 # ---------------------------------------------------------------------

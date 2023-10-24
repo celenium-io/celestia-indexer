@@ -13,12 +13,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 
-	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
-	ws "github.com/dipdup-io/celestia-indexer/cmd/api/handler/websocket"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/mock"
+	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	ws "github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"

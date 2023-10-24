@@ -6,7 +6,7 @@ package testsuite
 import (
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	tmTypes "github.com/tendermint/tendermint/types"
 )
 

@@ -4,10 +4,10 @@
 package decode
 
 import (
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/dipdup-io/celestia-indexer/internal/test_suite"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
 	"testing"

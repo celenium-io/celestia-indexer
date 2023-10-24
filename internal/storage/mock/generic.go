@@ -12,8 +12,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	storage "github.com/dipdup-io/celestia-indexer/internal/storage"
-	types "github.com/dipdup-io/celestia-indexer/pkg/types"
+	storage "github.com/celenium-io/celestia-indexer/internal/storage"
+	types "github.com/celenium-io/celestia-indexer/pkg/types"
 	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	pq "github.com/lib/pq"
 	bun "github.com/uptrace/bun"

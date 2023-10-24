@@ -4,7 +4,7 @@
 package types
 
 import (
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"time"
 )
 

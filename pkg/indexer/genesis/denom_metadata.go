@@ -4,8 +4,8 @@
 package genesis
 
 import (
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 )
 
 func (module *Module) parseDenomMetadata(raw []types.DenomMetadata, data *parsedData) {

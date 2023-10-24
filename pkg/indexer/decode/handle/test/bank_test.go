@@ -5,12 +5,12 @@ package handle_test
 
 import (
 	"cosmossdk.io/math"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/internal/test_suite"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-io/celestia-indexer/internal/test_suite"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/fatih/structs"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"

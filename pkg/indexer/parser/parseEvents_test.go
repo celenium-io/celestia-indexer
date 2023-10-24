@@ -6,9 +6,9 @@ package parser
 import (
 	"testing"
 
-	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/dipdup-io/celestia-indexer/internal/test_suite"
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

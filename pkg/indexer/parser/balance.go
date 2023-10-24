@@ -4,10 +4,10 @@
 package parser
 
 import (
-	"github.com/dipdup-io/celestia-indexer/internal/consts"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/decode"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/internal/consts"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )

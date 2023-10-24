@@ -7,8 +7,8 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/pkg/errors"
 )
 

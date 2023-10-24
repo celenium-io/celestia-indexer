@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/dipdup-io/celestia-indexer/internal/test_suite"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
