@@ -6,6 +6,7 @@ package decode
 import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/handle"
 	"github.com/cosmos/cosmos-sdk/x/authz"
+	crisisTypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 	"time"
 
@@ -137,6 +138,10 @@ func Message(
 	// ibc module
 	case *ibcTypes.MsgTransfer:
 		d.Msg.Type, d.Msg.Addresses, err = handle.IBCTransfer(height, typedMsg)
+
+	// crisis module
+	case *crisisTypes.MsgVerifyInvariant:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgVerifyInvariant(height, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)
