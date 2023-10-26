@@ -4,7 +4,7 @@
 package config
 
 import (
-	"github.com/dipdup-io/celestia-indexer/internal/profiler"
+	"github.com/celenium-io/celestia-indexer/internal/profiler"
 	"github.com/dipdup-net/go-lib/config"
 )
 

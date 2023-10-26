@@ -10,8 +10,8 @@ import (
 
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 
-	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"

@@ -4,7 +4,7 @@
 package storage
 
 import (
-	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/uptrace/bun"
 )
 

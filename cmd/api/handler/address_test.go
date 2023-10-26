@@ -6,19 +6,20 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/mock"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/suite"
-	"go.uber.org/mock/gomock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/labstack/echo/v4"
+	"github.com/shopspring/decimal"
+	"github.com/stretchr/testify/suite"
+	"go.uber.org/mock/gomock"
 )
 
 var (

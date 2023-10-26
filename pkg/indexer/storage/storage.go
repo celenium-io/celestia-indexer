@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/config"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/postgres"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 )

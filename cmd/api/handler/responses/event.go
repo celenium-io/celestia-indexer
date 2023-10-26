@@ -4,11 +4,11 @@
 package responses
 
 import (
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 )
 
 type Event struct {

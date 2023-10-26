@@ -12,8 +12,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	types "github.com/dipdup-io/celestia-indexer/pkg/node/types"
-	types0 "github.com/dipdup-io/celestia-indexer/pkg/types"
+	types "github.com/celenium-io/celestia-indexer/pkg/node/types"
+	types0 "github.com/celenium-io/celestia-indexer/pkg/types"
 	gomock "go.uber.org/mock/gomock"
 )
 

@@ -7,7 +7,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/internal/stats"
+	"github.com/celenium-io/celestia-indexer/internal/stats"
 	"github.com/pkg/errors"
 )
 

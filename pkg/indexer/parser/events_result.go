@@ -4,9 +4,9 @@
 package parser
 
 import (
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/decode"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )

@@ -6,9 +6,9 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/go-testfixtures/testfixtures/v3"

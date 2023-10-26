@@ -7,9 +7,9 @@ import (
 	"encoding/base64"
 	"github.com/rs/zerolog/log"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
 func parseEvents(b types.BlockData, events []types.Event) []storage.Event {

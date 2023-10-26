@@ -4,14 +4,14 @@
 package decode
 
 import (
+	"github.com/celenium-io/celestia-indexer/internal/consts"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/dipdup-io/celestia-indexer/internal/consts"
 	"testing"
 
-	testsuite "github.com/dipdup-io/celestia-indexer/internal/test_suite"
-	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"

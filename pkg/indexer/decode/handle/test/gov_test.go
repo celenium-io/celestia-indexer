@@ -4,15 +4,15 @@
 package handle_test
 
 import (
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/internal/test_suite"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
+	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	codecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-io/celestia-indexer/internal/test_suite"
-	"github.com/dipdup-io/celestia-indexer/pkg/indexer/decode"
-	nodeTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
 	"github.com/fatih/structs"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"

@@ -6,7 +6,7 @@ package storage
 import (
 	"context"
 
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"

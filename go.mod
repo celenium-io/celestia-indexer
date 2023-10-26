@@ -1,4 +1,4 @@
-module github.com/dipdup-io/celestia-indexer
+module github.com/celenium-io/celestia-indexer
 
 go 1.21.2
 

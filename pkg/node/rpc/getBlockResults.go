@@ -5,10 +5,10 @@ package rpc
 
 import (
 	"context"
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"strconv"
 
-	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
+	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/pkg/errors"
 )
 

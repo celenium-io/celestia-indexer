@@ -6,7 +6,7 @@ package storage
 import (
 	"context"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 )
 
 func saveNamespaces(

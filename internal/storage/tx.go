@@ -7,9 +7,9 @@ import (
 	"context"
 	"time"
 
-	pkgTypes "github.com/dipdup-io/celestia-indexer/pkg/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"

@@ -7,8 +7,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/mock"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )

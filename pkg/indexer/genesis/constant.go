@@ -6,9 +6,9 @@ package genesis
 import (
 	"strconv"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-io/celestia-indexer/pkg/node/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 )
 
 func (module *Module) parseConstants(appState types.AppState, data *parsedData) {

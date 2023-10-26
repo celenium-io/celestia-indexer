@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
-	_ "github.com/dipdup-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	_ "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/labstack/echo/v4"
 )
 

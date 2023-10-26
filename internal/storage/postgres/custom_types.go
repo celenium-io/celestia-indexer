@@ -7,7 +7,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/rs/zerolog/log"
 	"github.com/uptrace/bun"

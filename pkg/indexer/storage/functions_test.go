@@ -6,7 +6,7 @@ package storage
 import (
 	"testing"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/stretchr/testify/require"
 )
 

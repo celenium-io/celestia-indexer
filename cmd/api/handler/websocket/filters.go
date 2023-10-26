@@ -4,8 +4,8 @@
 package websocket
 
 import (
-	"github.com/dipdup-io/celestia-indexer/cmd/api/handler/responses"
-	"github.com/dipdup-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/pkg/errors"
 )
 

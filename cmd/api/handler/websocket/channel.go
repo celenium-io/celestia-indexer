@@ -8,7 +8,7 @@ import (
 
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 
-	"github.com/dipdup-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/workerpool"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"

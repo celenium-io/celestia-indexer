@@ -7,7 +7,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/lib/pq"
 )

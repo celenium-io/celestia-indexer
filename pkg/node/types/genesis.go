@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dipdup-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
 type Genesis struct {
