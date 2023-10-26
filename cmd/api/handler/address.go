@@ -117,14 +117,15 @@ func (handler *AddressHandler) List(c echo.Context) error {
 //	@Description	Get address transactions
 //	@Tags			address
 //	@ID				address-transactions
-//	@Param			limit		query	integer	false	"Count of requested entities"			mininum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"								mininum(1)
+//	@Param			hash	path	string	true	"Hash"	minlength(48)	maxlength(48)
+//	@Param			limit		query	integer	false	"Count of requested entities"			minimum(1)	maximum(100)
+//	@Param			offset		query	integer	false	"Offset"								minimum(1)
 //	@Param			sort		query	string	false	"Sort order"							Enums(asc, desc)
 //	@Param			status		query	types.Status	false	"Comma-separated status list"
 //	@Param			msg_type	query	types.MsgType	false	"Comma-separated message types list"
-//	@Param			from		query	integer	false	"Time from in unix timestamp"			mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"				mininum(1)
-//	@Param			height		query	integer	false	"Block number"							mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"			minimum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"				minimum(1)
+//	@Param			height		query	integer	false	"Block number"							minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
@@ -169,6 +170,77 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 	for i := range txs {
 		response[i] = responses.NewTx(txs[i])
 	}
+	return returnArray(c, response)
+}
+
+type getAddressMessages struct {
+	Hash   string `param:"hash"   validate:"required,address"`
+	Limit  uint64 `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset uint64 `query:"offset" validate:"omitempty,min=0"`
+	Sort   string `query:"sort"   validate:"omitempty,oneof=asc desc"`
+}
+
+func (p *getAddressMessages) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+	if p.Sort == "" {
+		p.Sort = asc
+	}
+}
+
+func (p *getAddressMessages) ToFilters() storage.AddressMsgsFilter {
+	return storage.AddressMsgsFilter{
+		Limit:  int(p.Limit),
+		Offset: int(p.Offset),
+		Sort:   pgSort(p.Sort),
+	}
+}
+
+// Messages godoc
+//
+//	@Summary		Get address messages
+//	@Description	Get address messages
+//	@Tags			address
+//	@ID				address-messages
+//	@Param			hash	    path	string	true	"Hash"	minlength(48)	maxlength(48)
+//	@Param			limit		query	integer	false	"Count of requested entities"			minimum(1)	maximum(100)
+//	@Param			offset		query	integer	false	"Offset"								minimum(1)
+//	@Param			sort		query	string	false	"Sort order"							Enums(asc, desc)
+//	@Produce		json
+//	@Success		200	{array}		responses.Message
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address/{hash}/messages [get]
+func (handler *AddressHandler) Messages(c echo.Context) error {
+	req, err := bindAndValidate[getAddressMessages](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	req.SetDefault()
+
+	_, hash, err := types.Address(req.Hash).Decode()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	if err := handleError(c, err, handler.address); err != nil {
+		return err
+	}
+
+	filters := req.ToFilters()
+	msgs, err := handler.address.Messages(c.Request().Context(), address.Id, filters)
+	if err := handleError(c, err, handler.txs); err != nil {
+		return err
+	}
+
+	response := make([]responses.Message, len(msgs))
+	for i := range msgs {
+		response[i] = responses.NewMessageForAddress(msgs[i])
+	}
+
 	return returnArray(c, response)
 }
 

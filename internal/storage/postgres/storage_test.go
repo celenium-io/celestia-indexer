@@ -292,6 +292,27 @@ func (s *StorageTestSuite) TestAddressList() {
 	s.Require().Equal("utia", addresses[1].Balance.Currency)
 }
 
+func (s *StorageTestSuite) TestAddressMessages() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	messages, err := s.storage.Address.Messages(ctx, 1, storage.AddressMsgsFilter{
+		Limit:  10,
+		Offset: 0,
+		Sort:   sdk.SortOrderAsc,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(messages, 1)
+
+	s.Require().EqualValues(types.MsgAddressTypeFromAddress, messages[0].Type)
+
+	msg := messages[0].Msg
+	s.Require().EqualValues(1, msg.Id)
+	s.Require().EqualValues(1000, msg.Height)
+	s.Require().EqualValues(0, msg.Position)
+	s.Require().Equal(types.MsgWithdrawDelegatorReward, msg.Type)
+}
+
 func (s *StorageTestSuite) TestEventByTxId() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

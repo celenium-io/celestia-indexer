@@ -274,18 +274,18 @@ func (c *IAddressListCall) DoAndReturn(f func(context.Context, uint64, uint64, s
 }
 
 // ListWithBalance mocks base method.
-func (m *MockIAddress) ListWithBalance(ctx context.Context, fltrs storage.AddressListFilter) ([]storage.Address, error) {
+func (m *MockIAddress) ListWithBalance(ctx context.Context, filters storage.AddressListFilter) ([]storage.Address, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListWithBalance", ctx, fltrs)
+	ret := m.ctrl.Call(m, "ListWithBalance", ctx, filters)
 	ret0, _ := ret[0].([]storage.Address)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListWithBalance indicates an expected call of ListWithBalance.
-func (mr *MockIAddressMockRecorder) ListWithBalance(ctx, fltrs any) *IAddressListWithBalanceCall {
+func (mr *MockIAddressMockRecorder) ListWithBalance(ctx, filters any) *IAddressListWithBalanceCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListWithBalance", reflect.TypeOf((*MockIAddress)(nil).ListWithBalance), ctx, fltrs)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListWithBalance", reflect.TypeOf((*MockIAddress)(nil).ListWithBalance), ctx, filters)
 	return &IAddressListWithBalanceCall{Call: call}
 }
 
@@ -308,6 +308,45 @@ func (c *IAddressListWithBalanceCall) Do(f func(context.Context, storage.Address
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *IAddressListWithBalanceCall) DoAndReturn(f func(context.Context, storage.AddressListFilter) ([]storage.Address, error)) *IAddressListWithBalanceCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Messages mocks base method.
+func (m *MockIAddress) Messages(ctx context.Context, id uint64, filters storage.AddressMsgsFilter) ([]storage.MsgAddress, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Messages", ctx, id, filters)
+	ret0, _ := ret[0].([]storage.MsgAddress)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Messages indicates an expected call of Messages.
+func (mr *MockIAddressMockRecorder) Messages(ctx, id, filters any) *IAddressMessagesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Messages", reflect.TypeOf((*MockIAddress)(nil).Messages), ctx, id, filters)
+	return &IAddressMessagesCall{Call: call}
+}
+
+// IAddressMessagesCall wrap *gomock.Call
+type IAddressMessagesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IAddressMessagesCall) Return(arg0 []storage.MsgAddress, arg1 error) *IAddressMessagesCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IAddressMessagesCall) Do(f func(context.Context, uint64, storage.AddressMsgsFilter) ([]storage.MsgAddress, error)) *IAddressMessagesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IAddressMessagesCall) DoAndReturn(f func(context.Context, uint64, storage.AddressMsgsFilter) ([]storage.MsgAddress, error)) *IAddressMessagesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

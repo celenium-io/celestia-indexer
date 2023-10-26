@@ -26,3 +26,4 @@ go.work
 
 # IDE and other 3rd party tools
 .idea
+*.private.*

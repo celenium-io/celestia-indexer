@@ -34,3 +34,15 @@ func NewMessage(msg storage.Message) Message {
 		Data:     msg.Data,
 	}
 }
+
+func NewMessageForAddress(msg storage.MsgAddress) Message {
+	return Message{
+		Id:       msg.MsgId,
+		Height:   msg.Msg.Height,
+		Time:     msg.Msg.Time,
+		Position: msg.Msg.Position,
+		TxId:     msg.Msg.TxId,
+		Type:     msg.Msg.Type,
+		Data:     msg.Msg.Data,
+	}
+}

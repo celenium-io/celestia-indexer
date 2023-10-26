@@ -1,0 +1,6 @@
+### GET namespace messages
+http://{{host}}/v1/namespace/00000000000000000000000000000000000042690c204d39600fddd3/0/messages?limit=2
+
+### GET namespace messages
+http://{{host}}/v1/namespace/00000000000000000000000000000000000042690c204d39600fddd3/0/messages?limit=2
+

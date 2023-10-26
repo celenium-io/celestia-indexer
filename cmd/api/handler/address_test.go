@@ -230,6 +230,60 @@ func (s *AddressTestSuite) TestListHeight() {
 	s.Require().Equal(types.StatusSuccess, tx.Status)
 }
 
+func (s *AddressTestSuite) TestMessages() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+	q.Set("sort", "desc")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/address/:hash/messages")
+	c.SetParamNames("hash")
+	c.SetParamValues(testAddress)
+
+	s.address.EXPECT().
+		ByHash(gomock.Any(), testHashAddress).
+		Return(storage.Address{
+			Id:      1,
+			Hash:    testHashAddress,
+			Address: testAddress,
+		}, nil)
+
+	s.address.EXPECT().
+		Messages(gomock.Any(), uint64(1), gomock.Any()).
+		Return([]storage.MsgAddress{
+			{
+				AddressId: 1,
+				MsgId:     1,
+				Type:      types.MsgAddressTypeDelegator,
+				Msg: &storage.Message{
+					Id:       1,
+					Height:   1000,
+					Position: 0,
+					Type:     types.MsgWithdrawDelegatorReward,
+					TxId:     1,
+					Data:     nil,
+				},
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Messages(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var msgs []responses.Message
+	err := json.NewDecoder(rec.Body).Decode(&msgs)
+	s.Require().NoError(err)
+	s.Require().Len(msgs, 1)
+
+	msg := msgs[0]
+	s.Require().EqualValues(1, msg.Id)
+	s.Require().EqualValues(1000, msg.Height)
+	s.Require().Equal(int64(0), msg.Position)
+	s.Require().EqualValues(types.MsgWithdrawDelegatorReward, msg.Type)
+}
+
 func (s *AddressTestSuite) TestCount() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
