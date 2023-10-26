@@ -237,6 +237,9 @@ func (handler *AddressHandler) Messages(c echo.Context) error {
 	}
 
 	response := make([]responses.Message, len(msgs))
+	for i := range msgs {
+		response[i] = responses.NewMessageForAddress(msgs[i])
+	}
 
 	return returnArray(c, response)
 }
