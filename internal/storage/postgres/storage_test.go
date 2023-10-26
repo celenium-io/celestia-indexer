@@ -304,6 +304,8 @@ func (s *StorageTestSuite) TestAddressMessages() {
 	s.Require().NoError(err)
 	s.Require().Len(messages, 1)
 
+	s.Require().EqualValues(types.MsgAddressTypeFromAddress, messages[0].Type)
+
 	msg := messages[0].Msg
 	s.Require().EqualValues(1, msg.Id)
 	s.Require().EqualValues(1000, msg.Height)
