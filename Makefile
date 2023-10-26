@@ -26,6 +26,7 @@ lint:
 test:
 	go test -p 8 -timeout 60s ./...
 
+## Make green comment
 gc:
 	make lint && make test
 	git commit -am "$(m)"
@@ -40,6 +41,10 @@ generate:
 
 api-docs:
 	cd cmd/api && swag init --md markdown -parseDependency --parseInternal --parseDepth 1
+
+## Generate all code and docs
+ga:
+	make generate && make api-docs
 
 check-licenses:
 	go-licenses check ./... \
