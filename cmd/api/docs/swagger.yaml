@@ -602,6 +602,7 @@ definitions:
     - IBCTransfer
     - MsgVerifyInvariant
     - MsgSubmitEvidence
+    - MsgSendNFT
     type: string
     x-enum-varnames:
     - MsgUnknown
@@ -636,6 +637,7 @@ definitions:
     - IBCTransfer
     - MsgVerifyInvariant
     - MsgSubmitEvidence
+    - MsgSendNFT
 host: https://api.celestia.dipdup.net
 info:
   contact: {}
@@ -837,6 +839,7 @@ paths:
         - IBCTransfer
         - MsgVerifyInvariant
         - MsgSubmitEvidence
+        - MsgSendNFT
         in: query
         name: msg_type
         type: string
@@ -1757,6 +1760,7 @@ paths:
         - IBCTransfer
         - MsgVerifyInvariant
         - MsgSubmitEvidence
+        - MsgSendNFT
         in: query
         name: msg_type
         type: string

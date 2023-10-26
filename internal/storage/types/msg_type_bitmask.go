@@ -60,6 +60,8 @@ const (
 	MsgTypeBitsVerifyInvariant
 
 	MsgTypeBitsSubmitEvidence
+
+	MsgTypeBitsSendNFT
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
@@ -146,6 +148,8 @@ func (mask *MsgTypeBits) SetBit(value MsgType) {
 		mask.Set(Bits(MsgTypeBitsVerifyInvariant))
 	case MsgSubmitEvidence:
 		mask.Set(Bits(MsgTypeBitsSubmitEvidence))
+	case MsgSendNFT:
+		mask.Set(Bits(MsgTypeBitsSendNFT))
 	}
 }
 
@@ -288,6 +292,10 @@ func (mask MsgTypeBits) Names() []MsgType {
 	}
 	if mask.Has(Bits(MsgTypeBitsSubmitEvidence)) {
 		names[i] = MsgSubmitEvidence
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsSendNFT)) {
+		names[i] = MsgSendNFT
 		// i++
 	}
 

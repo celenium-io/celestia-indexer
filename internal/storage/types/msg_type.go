@@ -51,6 +51,8 @@ package types
 		MsgVerifyInvariant,
 
 		MsgSubmitEvidence,
+
+		MsgSendNFT,
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix

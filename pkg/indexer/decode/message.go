@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	crisisTypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	evidenceTypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
+	"github.com/cosmos/cosmos-sdk/x/nft"
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 	"time"
 
@@ -147,6 +148,10 @@ func Message(
 	// evidence module
 	case *evidenceTypes.MsgSubmitEvidence:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitEvidence(height, typedMsg)
+
+	// nft module
+	case *nft.MsgSend:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSendNFT(height, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)

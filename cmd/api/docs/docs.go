@@ -311,7 +311,8 @@ const docTemplate = `{
                             "MsgDeposit",
                             "IBCTransfer",
                             "MsgVerifyInvariant",
-                            "MsgSubmitEvidence"
+                            "MsgSubmitEvidence",
+                            "MsgSendNFT"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1496,7 +1497,8 @@ const docTemplate = `{
                             "MsgDeposit",
                             "IBCTransfer",
                             "MsgVerifyInvariant",
-                            "MsgSubmitEvidence"
+                            "MsgSubmitEvidence",
+                            "MsgSendNFT"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -2570,7 +2572,8 @@ const docTemplate = `{
                 "MsgDeposit",
                 "IBCTransfer",
                 "MsgVerifyInvariant",
-                "MsgSubmitEvidence"
+                "MsgSubmitEvidence",
+                "MsgSendNFT"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -2604,7 +2607,8 @@ const docTemplate = `{
                 "MsgDeposit",
                 "IBCTransfer",
                 "MsgVerifyInvariant",
-                "MsgSubmitEvidence"
+                "MsgSubmitEvidence",
+                "MsgSendNFT"
             ]
         }
     }

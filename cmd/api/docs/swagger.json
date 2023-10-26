@@ -305,7 +305,8 @@
                             "MsgDeposit",
                             "IBCTransfer",
                             "MsgVerifyInvariant",
-                            "MsgSubmitEvidence"
+                            "MsgSubmitEvidence",
+                            "MsgSendNFT"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1490,7 +1491,8 @@
                             "MsgDeposit",
                             "IBCTransfer",
                             "MsgVerifyInvariant",
-                            "MsgSubmitEvidence"
+                            "MsgSubmitEvidence",
+                            "MsgSendNFT"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -2564,7 +2566,8 @@
                 "MsgDeposit",
                 "IBCTransfer",
                 "MsgVerifyInvariant",
-                "MsgSubmitEvidence"
+                "MsgSubmitEvidence",
+                "MsgSendNFT"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -2598,7 +2601,8 @@
                 "MsgDeposit",
                 "IBCTransfer",
                 "MsgVerifyInvariant",
-                "MsgSubmitEvidence"
+                "MsgSubmitEvidence",
+                "MsgSendNFT"
             ]
         }
     }
