@@ -1,0 +1,16 @@
+################################################ Local
+
+### GET All indexed addresses
+http://{{host}}/v1/address
+
+### Get count of all indexed addresses
+http://{{host}}/v1/address/count
+
+### Get specific address data
+http://{{host}}/v1/address/celestia1z4909eqzfzngegw43tr2vle7d69fhww4hmmusw
+
+### Get specific address transactions
+http://{{host}}/v1/address/celestia1z4909eqzfzngegw43tr2vle7d69fhww4hmmusw/txs
+
+### Get specific address messages
+http://{{host}}/v1/address/celestia1z4909eqzfzngegw43tr2vle7d69fhww4hmmusw/messages

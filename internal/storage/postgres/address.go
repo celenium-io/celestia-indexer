@@ -32,13 +32,21 @@ func (a *Address) ByHash(ctx context.Context, hash []byte) (address storage.Addr
 	return
 }
 
-func (a *Address) ListWithBalance(ctx context.Context, fltrs storage.AddressListFilter) (result []storage.Address, err error) {
+func (a *Address) ListWithBalance(ctx context.Context, filters storage.AddressListFilter) (result []storage.Address, err error) {
 	query := a.DB().NewSelect().Model(&result).
-		Offset(fltrs.Offset).
+		Offset(filters.Offset).
 		Relation("Balance")
 
-	query = addressListFilter(query, fltrs)
+	query = addressListFilter(query, filters)
 
 	err = query.Scan(ctx)
+	return
+}
+
+func (a *Address) Messages(ctx context.Context, id uint64, filters storage.AddressMsgsFilter) (msgs []storage.MsgAddress, err error) {
+	err = a.DB().NewSelect().Model(&msgs).
+		Where("address_id = ?", id).
+		Relation("Msg").
+		Scan(ctx)
 	return
 }

@@ -219,6 +219,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		addressGroup.GET("/count", addressHandlers.Count)
 		addressGroup.GET("/:hash", addressHandlers.Get)
 		addressGroup.GET("/:hash/txs", addressHandlers.Transactions)
+		addressGroup.GET("/:hash/messages", addressHandlers.Messages)
 	}
 
 	blockHandlers := handler.NewBlockHandler(db.Blocks, db.BlockStats, db.Event, db.Namespace, db.State, cfg.Indexer.Name)
