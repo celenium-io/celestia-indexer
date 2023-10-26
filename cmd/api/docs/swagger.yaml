@@ -600,6 +600,7 @@ definitions:
     - MsgVoteWeighted
     - MsgDeposit
     - IBCTransfer
+    - MsgVerifyInvariant
     type: string
     x-enum-varnames:
     - MsgUnknown
@@ -632,6 +633,7 @@ definitions:
     - MsgVoteWeighted
     - MsgDeposit
     - IBCTransfer
+    - MsgVerifyInvariant
 host: https://api.celestia.dipdup.net
 info:
   contact: {}
@@ -831,6 +833,7 @@ paths:
         - MsgVoteWeighted
         - MsgDeposit
         - IBCTransfer
+        - MsgVerifyInvariant
         in: query
         name: msg_type
         type: string
@@ -1749,6 +1752,7 @@ paths:
         - MsgVoteWeighted
         - MsgDeposit
         - IBCTransfer
+        - MsgVerifyInvariant
         in: query
         name: msg_type
         type: string
