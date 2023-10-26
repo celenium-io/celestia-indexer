@@ -26,6 +26,10 @@ lint:
 test:
 	go test -p 8 -timeout 60s ./...
 
+gc:
+	make lint && make test
+	git commit -am "$(m)"
+
 ## adr: Generate ADR from template. Must set NUM and TITLE parameters.
 adr:
 	@echo "Generating ADR"

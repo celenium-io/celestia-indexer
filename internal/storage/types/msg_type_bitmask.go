@@ -54,6 +54,8 @@ const (
 	MsgTypeBitsVote
 	MsgTypeBitsVoteWeighted
 	MsgTypeBitsDeposit
+
+	MsgTypeBitsIBCTransfer
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
@@ -134,7 +136,8 @@ func (mask *MsgTypeBits) SetBit(value MsgType) {
 		mask.Set(Bits(MsgTypeBitsVoteWeighted))
 	case MsgDeposit:
 		mask.Set(Bits(MsgTypeBitsDeposit))
-
+	case IBCTransfer:
+		mask.Set(Bits(MsgTypeBitsIBCTransfer))
 	}
 }
 
@@ -265,6 +268,10 @@ func (mask MsgTypeBits) Names() []MsgType {
 	}
 	if mask.Has(Bits(MsgTypeBitsDeposit)) {
 		names[i] = MsgDeposit
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsIBCTransfer)) {
+		names[i] = IBCTransfer
 		// i++
 	}
 
