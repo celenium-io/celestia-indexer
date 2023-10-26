@@ -11,7 +11,7 @@ definitions:
           'namespace', 'tx'
         type: string
     type: object
-  github_com_dipdup-io_celestia-indexer_internal_storage_types.Status:
+  github_com_celenium-io_celestia-indexer_internal_storage_types.Status:
     enum:
     - success
     - failed
@@ -485,7 +485,7 @@ definitions:
         type: integer
       status:
         allOf:
-        - $ref: '#/definitions/github_com_dipdup-io_celestia-indexer_internal_storage_types.Status'
+        - $ref: '#/definitions/github_com_celenium-io_celestia-indexer_internal_storage_types.Status'
         example: success
       time:
         example: "2023-07-04T03:10:57+00:00"

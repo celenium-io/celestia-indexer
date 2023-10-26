@@ -1803,7 +1803,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_dipdup-io_celestia-indexer_internal_storage_types.Status": {
+        "github_com_celenium-io_celestia-indexer_internal_storage_types.Status": {
             "type": "string",
             "enum": [
                 "success",
@@ -2440,7 +2440,7 @@ const docTemplate = `{
                 "status": {
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_dipdup-io_celestia-indexer_internal_storage_types.Status"
+                            "$ref": "#/definitions/github_com_celenium-io_celestia-indexer_internal_storage_types.Status"
                         }
                     ],
                     "example": "success"
