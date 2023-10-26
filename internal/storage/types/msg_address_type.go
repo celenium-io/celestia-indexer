@@ -29,6 +29,8 @@ package types
 
 		sender,
 		receiver,
+
+		submitter,
 	)
 */
 //go:generate go-enum --marshal --sql --values

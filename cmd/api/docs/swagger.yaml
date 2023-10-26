@@ -601,6 +601,7 @@ definitions:
     - MsgDeposit
     - IBCTransfer
     - MsgVerifyInvariant
+    - MsgSubmitEvidence
     type: string
     x-enum-varnames:
     - MsgUnknown
@@ -634,6 +635,7 @@ definitions:
     - MsgDeposit
     - IBCTransfer
     - MsgVerifyInvariant
+    - MsgSubmitEvidence
 host: https://api.celestia.dipdup.net
 info:
   contact: {}
@@ -834,6 +836,7 @@ paths:
         - MsgDeposit
         - IBCTransfer
         - MsgVerifyInvariant
+        - MsgSubmitEvidence
         in: query
         name: msg_type
         type: string
@@ -1753,6 +1756,7 @@ paths:
         - MsgDeposit
         - IBCTransfer
         - MsgVerifyInvariant
+        - MsgSubmitEvidence
         in: query
         name: msg_type
         type: string

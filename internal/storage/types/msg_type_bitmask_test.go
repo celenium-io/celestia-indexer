@@ -139,6 +139,10 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			name: string(MsgVerifyInvariant),
 			Bits: Bits(MsgTypeBitsVerifyInvariant),
 			want: []MsgType{MsgVerifyInvariant},
+		}, {
+			name: string(MsgSubmitEvidence),
+			Bits: Bits(MsgTypeBitsSubmitEvidence),
+			want: []MsgType{MsgSubmitEvidence},
 		},
 	}
 	for _, tt := range tests {
@@ -285,6 +289,10 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			name:   "test 31",
 			values: []MsgType{MsgVerifyInvariant},
 			want:   MsgTypeBits{Bits(MsgTypeBitsVerifyInvariant)},
+		}, {
+			name:   "test 31",
+			values: []MsgType{MsgSubmitEvidence},
+			want:   MsgTypeBits{Bits(MsgTypeBitsSubmitEvidence)},
 		},
 
 		{

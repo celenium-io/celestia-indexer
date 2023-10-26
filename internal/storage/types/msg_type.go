@@ -49,6 +49,8 @@ package types
 		IBCTransfer,
 
 		MsgVerifyInvariant,
+
+		MsgSubmitEvidence,
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix

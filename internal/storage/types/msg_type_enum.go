@@ -75,6 +75,8 @@ const (
 	IBCTransfer MsgType = "IBCTransfer"
 	// MsgVerifyInvariant is a MsgType of type MsgVerifyInvariant.
 	MsgVerifyInvariant MsgType = "MsgVerifyInvariant"
+	// MsgSubmitEvidence is a MsgType of type MsgSubmitEvidence.
+	MsgSubmitEvidence MsgType = "MsgSubmitEvidence"
 )
 
 var ErrInvalidMsgType = errors.New("not a valid MsgType")
@@ -113,6 +115,7 @@ func MsgTypeValues() []MsgType {
 		MsgDeposit,
 		IBCTransfer,
 		MsgVerifyInvariant,
+		MsgSubmitEvidence,
 	}
 }
 
@@ -160,6 +163,7 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgDeposit":                      MsgDeposit,
 	"IBCTransfer":                     IBCTransfer,
 	"MsgVerifyInvariant":              MsgVerifyInvariant,
+	"MsgSubmitEvidence":               MsgSubmitEvidence,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.

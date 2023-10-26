@@ -304,7 +304,8 @@
                             "MsgVoteWeighted",
                             "MsgDeposit",
                             "IBCTransfer",
-                            "MsgVerifyInvariant"
+                            "MsgVerifyInvariant",
+                            "MsgSubmitEvidence"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1488,7 +1489,8 @@
                             "MsgVoteWeighted",
                             "MsgDeposit",
                             "IBCTransfer",
-                            "MsgVerifyInvariant"
+                            "MsgVerifyInvariant",
+                            "MsgSubmitEvidence"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -2561,7 +2563,8 @@
                 "MsgVoteWeighted",
                 "MsgDeposit",
                 "IBCTransfer",
-                "MsgVerifyInvariant"
+                "MsgVerifyInvariant",
+                "MsgSubmitEvidence"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -2594,7 +2597,8 @@
                 "MsgVoteWeighted",
                 "MsgDeposit",
                 "IBCTransfer",
-                "MsgVerifyInvariant"
+                "MsgVerifyInvariant",
+                "MsgSubmitEvidence"
             ]
         }
     }

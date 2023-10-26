@@ -58,6 +58,8 @@ const (
 	MsgTypeBitsIBCTransfer
 
 	MsgTypeBitsVerifyInvariant
+
+	MsgTypeBitsSubmitEvidence
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
@@ -142,6 +144,8 @@ func (mask *MsgTypeBits) SetBit(value MsgType) {
 		mask.Set(Bits(MsgTypeBitsIBCTransfer))
 	case MsgVerifyInvariant:
 		mask.Set(Bits(MsgTypeBitsVerifyInvariant))
+	case MsgSubmitEvidence:
+		mask.Set(Bits(MsgTypeBitsSubmitEvidence))
 	}
 }
 
@@ -280,6 +284,10 @@ func (mask MsgTypeBits) Names() []MsgType {
 	}
 	if mask.Has(Bits(MsgTypeBitsVerifyInvariant)) {
 		names[i] = MsgVerifyInvariant
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsSubmitEvidence)) {
+		names[i] = MsgSubmitEvidence
 		// i++
 	}
 
