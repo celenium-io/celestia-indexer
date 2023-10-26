@@ -144,6 +144,78 @@
                 }
             }
         },
+        "/v1/address/{hash}/messages": {
+            "get": {
+                "description": "Get address messages",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Get address messages",
+                "operationId": "address-messages",
+                "parameters": [
+                    {
+                        "maxLength": 48,
+                        "minLength": 48,
+                        "type": "string",
+                        "description": "Hash",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Message"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/address/{hash}/txs": {
             "get": {
                 "description": "Get address transactions",
@@ -157,13 +229,24 @@
                 "operationId": "address-transactions",
                 "parameters": [
                     {
+                        "maxLength": 48,
+                        "minLength": 48,
+                        "type": "string",
+                        "description": "Hash",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -228,18 +311,21 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Block number",
                         "name": "height",
