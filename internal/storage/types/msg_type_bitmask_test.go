@@ -135,6 +135,10 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			name: string(IBCTransfer),
 			Bits: Bits(MsgTypeBitsIBCTransfer),
 			want: []MsgType{IBCTransfer},
+		}, {
+			name: string(MsgVerifyInvariant),
+			Bits: Bits(MsgTypeBitsVerifyInvariant),
+			want: []MsgType{MsgVerifyInvariant},
 		},
 	}
 	for _, tt := range tests {
@@ -278,6 +282,12 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			values: []MsgType{IBCTransfer},
 			want:   MsgTypeBits{Bits(MsgTypeBitsIBCTransfer)},
 		}, {
+			name:   "test 31",
+			values: []MsgType{MsgVerifyInvariant},
+			want:   MsgTypeBits{Bits(MsgTypeBitsVerifyInvariant)},
+		},
+
+		{
 			name:   "test combo",
 			values: []MsgType{MsgWithdrawDelegatorReward, MsgBeginRedelegate},
 			want:   MsgTypeBits{Bits(260)},
