@@ -10,6 +10,7 @@ import (
 	evidenceTypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
 	"github.com/cosmos/cosmos-sdk/x/nft"
+	upgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 	"time"
 
@@ -183,6 +184,12 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgExecGroup(height, typedMsg)
 	case *group.MsgLeaveGroup:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgLeaveGroup(height, typedMsg)
+
+	// upgrade module
+	case *upgrade.MsgSoftwareUpgrade:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSoftwareUpgrade(height, typedMsg)
+	case *upgrade.MsgCancelUpgrade:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCancelUpgrade(height, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)
