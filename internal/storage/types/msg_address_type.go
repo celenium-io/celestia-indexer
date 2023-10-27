@@ -40,6 +40,8 @@ package types
 
 		owner,
 
+		relayer,
+		payee,
 	)
 */
 //go:generate go-enum --marshal --sql --values

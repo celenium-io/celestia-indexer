@@ -12,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/nft"
 	upgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	interchainAccounts "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/controller/types"
+	fee "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/types"
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 	"time"
 
@@ -197,6 +198,16 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRegisterInterchainAccount(height, typedMsg)
 	case *interchainAccounts.MsgSendTx:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSendTx(height, typedMsg)
+
+	// fee module
+	case *fee.MsgRegisterPayee:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRegisterPayee(height, typedMsg)
+	case *fee.MsgRegisterCounterpartyPayee:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRegisterCounterpartyPayee(height, typedMsg)
+	case *fee.MsgPayPacketFee:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgPayPacketFee(height, typedMsg)
+	case *fee.MsgPayPacketFeeAsync:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgPayPacketFeeAsync()
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)
