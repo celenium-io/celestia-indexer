@@ -617,6 +617,33 @@ definitions:
     - MsgVoteGroup
     - MsgExecGroup
     - MsgLeaveGroup
+    - MsgSoftwareUpgrade
+    - MsgCancelUpgrade
+    - MsgRegisterInterchainAccount
+    - MsgSendTx
+    - MsgRegisterPayee
+    - MsgRegisterCounterpartyPayee
+    - MsgPayPacketFee
+    - MsgPayPacketFeeAsync
+    - MsgTransfer
+    - MsgCreateClient
+    - MsgUpdateClient
+    - MsgUpgradeClient
+    - MsgSubmitMisbehaviour
+    - MsgConnectionOpenInit
+    - MsgConnectionOpenTry
+    - MsgConnectionOpenAck
+    - MsgConnectionOpenConfirm
+    - MsgChannelOpenInit
+    - MsgChannelOpenTry
+    - MsgChannelOpenAck
+    - MsgChannelOpenConfirm
+    - MsgChannelCloseInit
+    - MsgChannelCloseConfirm
+    - MsgRecvPacket
+    - MsgTimeout
+    - MsgTimeoutOnClose
+    - MsgAcknowledgement
     type: string
     x-enum-varnames:
     - MsgUnknown
@@ -666,6 +693,33 @@ definitions:
     - MsgVoteGroup
     - MsgExecGroup
     - MsgLeaveGroup
+    - MsgSoftwareUpgrade
+    - MsgCancelUpgrade
+    - MsgRegisterInterchainAccount
+    - MsgSendTx
+    - MsgRegisterPayee
+    - MsgRegisterCounterpartyPayee
+    - MsgPayPacketFee
+    - MsgPayPacketFeeAsync
+    - MsgTransfer
+    - MsgCreateClient
+    - MsgUpdateClient
+    - MsgUpgradeClient
+    - MsgSubmitMisbehaviour
+    - MsgConnectionOpenInit
+    - MsgConnectionOpenTry
+    - MsgConnectionOpenAck
+    - MsgConnectionOpenConfirm
+    - MsgChannelOpenInit
+    - MsgChannelOpenTry
+    - MsgChannelOpenAck
+    - MsgChannelOpenConfirm
+    - MsgChannelCloseInit
+    - MsgChannelCloseConfirm
+    - MsgRecvPacket
+    - MsgTimeout
+    - MsgTimeoutOnClose
+    - MsgAcknowledgement
 host: https://api.celestia.dipdup.net
 info:
   contact: {}
@@ -882,6 +936,33 @@ paths:
         - MsgVoteGroup
         - MsgExecGroup
         - MsgLeaveGroup
+        - MsgSoftwareUpgrade
+        - MsgCancelUpgrade
+        - MsgRegisterInterchainAccount
+        - MsgSendTx
+        - MsgRegisterPayee
+        - MsgRegisterCounterpartyPayee
+        - MsgPayPacketFee
+        - MsgPayPacketFeeAsync
+        - MsgTransfer
+        - MsgCreateClient
+        - MsgUpdateClient
+        - MsgUpgradeClient
+        - MsgSubmitMisbehaviour
+        - MsgConnectionOpenInit
+        - MsgConnectionOpenTry
+        - MsgConnectionOpenAck
+        - MsgConnectionOpenConfirm
+        - MsgChannelOpenInit
+        - MsgChannelOpenTry
+        - MsgChannelOpenAck
+        - MsgChannelOpenConfirm
+        - MsgChannelCloseInit
+        - MsgChannelCloseConfirm
+        - MsgRecvPacket
+        - MsgTimeout
+        - MsgTimeoutOnClose
+        - MsgAcknowledgement
         in: query
         name: msg_type
         type: string
@@ -1826,6 +1907,33 @@ paths:
         - MsgVoteGroup
         - MsgExecGroup
         - MsgLeaveGroup
+        - MsgSoftwareUpgrade
+        - MsgCancelUpgrade
+        - MsgRegisterInterchainAccount
+        - MsgSendTx
+        - MsgRegisterPayee
+        - MsgRegisterCounterpartyPayee
+        - MsgPayPacketFee
+        - MsgPayPacketFeeAsync
+        - MsgTransfer
+        - MsgCreateClient
+        - MsgUpdateClient
+        - MsgUpgradeClient
+        - MsgSubmitMisbehaviour
+        - MsgConnectionOpenInit
+        - MsgConnectionOpenTry
+        - MsgConnectionOpenAck
+        - MsgConnectionOpenConfirm
+        - MsgChannelOpenInit
+        - MsgChannelOpenTry
+        - MsgChannelOpenAck
+        - MsgChannelOpenConfirm
+        - MsgChannelCloseInit
+        - MsgChannelCloseConfirm
+        - MsgRecvPacket
+        - MsgTimeout
+        - MsgTimeoutOnClose
+        - MsgAcknowledgement
         in: query
         name: msg_type
         type: string

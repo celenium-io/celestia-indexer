@@ -77,6 +77,40 @@ const (
 	MsgTypeBitsVoteGroup
 	MsgTypeBitsExecGroup
 	MsgTypeBitsLeaveGroup
+
+	MsgTypeBitsSoftwareUpgrade
+	MsgTypeBitsCancelUpgrade
+
+	MsgTypeBitsRegisterInterchainAccount
+	MsgTypeBitsSendTx
+
+	MsgTypeBitsRegisterPayee
+	MsgTypeBitsRegisterCounterpartyPayee
+	MsgTypeBitsPayPacketFee
+	MsgTypeBitsPayPacketFeeAsync
+
+	MsgTypeBitsTransfer
+
+	MsgTypeBitsCreateClient
+	MsgTypeBitsUpdateClient
+	MsgTypeBitsUpgradeClient
+	MsgTypeBitsSubmitMisbehaviour
+
+	MsgTypeBitsConnectionOpenInit
+	MsgTypeBitsConnectionOpenTry
+	MsgTypeBitsConnectionOpenAck
+	MsgTypeBitsConnectionOpenConfirm
+
+	// MsgTypeBitsChannelOpenInit
+	// MsgTypeBitsChannelOpenTry
+	// MsgTypeBitsChannelOpenAck
+	// MsgTypeBitsChannelOpenConfirm
+	// MsgTypeBitsChannelCloseInit
+	// MsgTypeBitsChannelCloseConfirm
+	// MsgTypeBitsRecvPacket
+	// MsgTypeBitsTimeout
+	// MsgTypeBitsTimeoutOnClose
+	// MsgTypeBitsAcknowledgement
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
@@ -194,6 +228,62 @@ func (mask *MsgTypeBits) SetBit(value MsgType) {
 		mask.Set(Bits(MsgTypeBitsExecGroup))
 	case MsgLeaveGroup:
 		mask.Set(Bits(MsgTypeBitsLeaveGroup))
+
+	case MsgSoftwareUpgrade:
+		mask.Set(Bits(MsgTypeBitsSoftwareUpgrade))
+	case MsgCancelUpgrade:
+		mask.Set(Bits(MsgTypeBitsCancelUpgrade))
+	case MsgRegisterInterchainAccount:
+		mask.Set(Bits(MsgTypeBitsRegisterInterchainAccount))
+	case MsgSendTx:
+		mask.Set(Bits(MsgTypeBitsSendTx))
+	case MsgRegisterPayee:
+		mask.Set(Bits(MsgTypeBitsRegisterPayee))
+	case MsgRegisterCounterpartyPayee:
+		mask.Set(Bits(MsgTypeBitsRegisterCounterpartyPayee))
+	case MsgPayPacketFee:
+		mask.Set(Bits(MsgTypeBitsPayPacketFee))
+	case MsgPayPacketFeeAsync:
+		mask.Set(Bits(MsgTypeBitsPayPacketFeeAsync))
+	case MsgTransfer:
+		mask.Set(Bits(MsgTypeBitsTransfer))
+	case MsgCreateClient:
+		mask.Set(Bits(MsgTypeBitsCreateClient))
+	case MsgUpdateClient:
+		mask.Set(Bits(MsgTypeBitsUpdateClient))
+	case MsgUpgradeClient:
+		mask.Set(Bits(MsgTypeBitsUpgradeClient))
+	case MsgSubmitMisbehaviour:
+		mask.Set(Bits(MsgTypeBitsSubmitMisbehaviour))
+	case MsgConnectionOpenInit:
+		mask.Set(Bits(MsgTypeBitsConnectionOpenInit))
+	case MsgConnectionOpenTry:
+		mask.Set(Bits(MsgTypeBitsConnectionOpenTry))
+	case MsgConnectionOpenAck:
+		mask.Set(Bits(MsgTypeBitsConnectionOpenAck))
+	case MsgConnectionOpenConfirm:
+		mask.Set(Bits(MsgTypeBitsConnectionOpenConfirm))
+
+		// case MsgChannelOpenInit:
+		// 	mask.Set(Bits(MsgTypeBitsChannelOpenInit))
+		// case MsgChannelOpenTry:
+		// 	mask.Set(Bits(MsgTypeBitsChannelOpenTry))
+		// case MsgChannelOpenAck:
+		// 	mask.Set(Bits(MsgTypeBitsChannelOpenAck))
+		// case MsgChannelOpenConfirm:
+		// 	mask.Set(Bits(MsgTypeBitsChannelOpenConfirm))
+		// case MsgChannelCloseInit:
+		// 	mask.Set(Bits(MsgTypeBitsChannelCloseInit))
+		// case MsgChannelCloseConfirm:
+		// 	mask.Set(Bits(MsgTypeBitsChannelCloseConfirm))
+		// case MsgRecvPacket:
+		// 	mask.Set(Bits(MsgTypeBitsRecvPacket))
+		// case MsgTimeout:
+		// 	mask.Set(Bits(MsgTypeBitsTimeout))
+		// case MsgTimeoutOnClose:
+		// 	mask.Set(Bits(MsgTypeBitsTimeoutOnClose))
+		// case MsgAcknowledgement:
+		// 	mask.Set(Bits(MsgTypeBitsAcknowledgement))
 	}
 }
 
@@ -401,8 +491,118 @@ func (mask MsgTypeBits) Names() []MsgType {
 	}
 	if mask.Has(Bits(MsgTypeBitsLeaveGroup)) {
 		names[i] = MsgLeaveGroup
+		i++
+	}
+
+	if mask.Has(Bits(MsgTypeBitsSoftwareUpgrade)) {
+		names[i] = MsgSoftwareUpgrade
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsCancelUpgrade)) {
+		names[i] = MsgCancelUpgrade
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsRegisterInterchainAccount)) {
+		names[i] = MsgRegisterInterchainAccount
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsSendTx)) {
+		names[i] = MsgSendTx
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsRegisterPayee)) {
+		names[i] = MsgRegisterPayee
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsRegisterCounterpartyPayee)) {
+		names[i] = MsgRegisterCounterpartyPayee
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsPayPacketFee)) {
+		names[i] = MsgPayPacketFee
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsPayPacketFeeAsync)) {
+		names[i] = MsgPayPacketFeeAsync
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsTransfer)) {
+		names[i] = MsgTransfer
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsCreateClient)) {
+		names[i] = MsgCreateClient
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsUpdateClient)) {
+		names[i] = MsgUpdateClient
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsUpgradeClient)) {
+		names[i] = MsgUpgradeClient
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsSubmitMisbehaviour)) {
+		names[i] = MsgSubmitMisbehaviour
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsConnectionOpenInit)) {
+		names[i] = MsgConnectionOpenInit
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsConnectionOpenTry)) {
+		names[i] = MsgConnectionOpenTry
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsConnectionOpenAck)) {
+		names[i] = MsgConnectionOpenAck
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsConnectionOpenConfirm)) {
+		names[i] = MsgConnectionOpenConfirm
 		// i++
 	}
+
+	// if mask.Has(Bits(MsgTypeBitsChannelOpenInit)) {
+	// 	names[i] = MsgChannelOpenInit
+	// 	i++
+	// }
+	// if mask.Has(Bits(MsgTypeBitsChannelOpenTry)) {
+	// 	names[i] = MsgChannelOpenTry
+	// 	i++
+	// }
+	// if mask.Has(Bits(MsgTypeBitsChannelOpenAck)) {
+	// 	names[i] = MsgChannelOpenAck
+	// 	i++
+	// }
+	// if mask.Has(Bits(MsgTypeBitsChannelOpenConfirm)) {
+	// 	names[i] = MsgChannelOpenConfirm
+	// 	i++
+	// }
+	// if mask.Has(Bits(MsgTypeBitsChannelCloseInit)) {
+	// 	names[i] = MsgChannelCloseInit
+	// 	i++
+	// }
+	// if mask.Has(Bits(MsgTypeBitsChannelCloseConfirm)) {
+	// 	names[i] = MsgChannelCloseConfirm
+	// 	i++
+	// }
+	// if mask.Has(Bits(MsgTypeBitsRecvPacket)) {
+	// 	names[i] = MsgRecvPacket
+	// 	i++
+	// }
+	// if mask.Has(Bits(MsgTypeBitsTimeout)) {
+	// 	names[i] = MsgTimeout
+	// 	i++
+	// }
+	// if mask.Has(Bits(MsgTypeBitsTimeoutOnClose)) {
+	// 	names[i] = MsgTimeoutOnClose
+	// 	i++
+	// }
+	// if mask.Has(Bits(MsgTypeBitsAcknowledgement)) {
+	// 	names[i] = MsgAcknowledgement
+	// 	// i++
+	// }
 
 	return names
 }

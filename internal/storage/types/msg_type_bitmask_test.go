@@ -199,7 +199,116 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			name: string(MsgLeaveGroup),
 			Bits: Bits(MsgTypeBitsLeaveGroup),
 			want: []MsgType{MsgLeaveGroup},
+		}, {
+			name: string(MsgSoftwareUpgrade),
+			Bits: Bits(MsgTypeBitsSoftwareUpgrade),
+			want: []MsgType{MsgSoftwareUpgrade},
+		}, {
+			name: string(MsgCancelUpgrade),
+			Bits: Bits(MsgTypeBitsCancelUpgrade),
+			want: []MsgType{MsgCancelUpgrade},
+		}, {
+			name: string(MsgRegisterInterchainAccount),
+			Bits: Bits(MsgTypeBitsRegisterInterchainAccount),
+			want: []MsgType{MsgRegisterInterchainAccount},
+		}, {
+			name: string(MsgSendTx),
+			Bits: Bits(MsgTypeBitsSendTx),
+			want: []MsgType{MsgSendTx},
+		}, {
+			name: string(MsgRegisterPayee),
+			Bits: Bits(MsgTypeBitsRegisterPayee),
+			want: []MsgType{MsgRegisterPayee},
+		}, {
+			name: string(MsgRegisterCounterpartyPayee),
+			Bits: Bits(MsgTypeBitsRegisterCounterpartyPayee),
+			want: []MsgType{MsgRegisterCounterpartyPayee},
+		}, {
+			name: string(MsgPayPacketFee),
+			Bits: Bits(MsgTypeBitsPayPacketFee),
+			want: []MsgType{MsgPayPacketFee},
+		}, {
+			name: string(MsgPayPacketFeeAsync),
+			Bits: Bits(MsgTypeBitsPayPacketFeeAsync),
+			want: []MsgType{MsgPayPacketFeeAsync},
+		}, {
+			name: string(MsgTransfer),
+			Bits: Bits(MsgTypeBitsTransfer),
+			want: []MsgType{MsgTransfer},
+		}, {
+			name: string(MsgCreateClient),
+			Bits: Bits(MsgTypeBitsCreateClient),
+			want: []MsgType{MsgCreateClient},
+		}, {
+			name: string(MsgUpdateClient),
+			Bits: Bits(MsgTypeBitsUpdateClient),
+			want: []MsgType{MsgUpdateClient},
+		}, {
+			name: string(MsgUpgradeClient),
+			Bits: Bits(MsgTypeBitsUpgradeClient),
+			want: []MsgType{MsgUpgradeClient},
+		}, {
+			name: string(MsgSubmitMisbehaviour),
+			Bits: Bits(MsgTypeBitsSubmitMisbehaviour),
+			want: []MsgType{MsgSubmitMisbehaviour},
+		}, {
+			name: string(MsgConnectionOpenInit),
+			Bits: Bits(MsgTypeBitsConnectionOpenInit),
+			want: []MsgType{MsgConnectionOpenInit},
+		}, {
+			name: string(MsgConnectionOpenTry),
+			Bits: Bits(MsgTypeBitsConnectionOpenTry),
+			want: []MsgType{MsgConnectionOpenTry},
+		}, {
+			name: string(MsgConnectionOpenAck),
+			Bits: Bits(MsgTypeBitsConnectionOpenAck),
+			want: []MsgType{MsgConnectionOpenAck},
+		}, {
+			name: string(MsgConnectionOpenConfirm),
+			Bits: Bits(MsgTypeBitsConnectionOpenConfirm),
+			want: []MsgType{MsgConnectionOpenConfirm},
 		},
+		// {
+		// 	name: string(MsgChannelOpenInit),
+		// 	Bits: Bits(MsgTypeBitsChannelOpenInit),
+		// 	want: []MsgType{MsgChannelOpenInit},
+		// }, {
+		// 	name: string(MsgChannelOpenTry),
+		// 	Bits: Bits(MsgTypeBitsChannelOpenTry),
+		// 	want: []MsgType{MsgChannelOpenTry},
+		// }, {
+		// 	name: string(MsgChannelOpenAck),
+		// 	Bits: Bits(MsgTypeBitsChannelOpenAck),
+		// 	want: []MsgType{MsgChannelOpenAck},
+		// }, {
+		// 	name: string(MsgChannelOpenConfirm),
+		// 	Bits: Bits(MsgTypeBitsChannelOpenConfirm),
+		// 	want: []MsgType{MsgChannelOpenConfirm},
+		// }, {
+		// 	name: string(MsgChannelCloseInit),
+		// 	Bits: Bits(MsgTypeBitsChannelCloseInit),
+		// 	want: []MsgType{MsgChannelCloseInit},
+		// }, {
+		// 	name: string(MsgChannelCloseConfirm),
+		// 	Bits: Bits(MsgTypeBitsChannelCloseConfirm),
+		// 	want: []MsgType{MsgChannelCloseConfirm},
+		// }, {
+		// 	name: string(MsgRecvPacket),
+		// 	Bits: Bits(MsgTypeBitsRecvPacket),
+		// 	want: []MsgType{MsgRecvPacket},
+		// }, {
+		// 	name: string(MsgTimeout),
+		// 	Bits: Bits(MsgTypeBitsTimeout),
+		// 	want: []MsgType{MsgTimeout},
+		// }, {
+		// 	name: string(MsgTimeoutOnClose),
+		// 	Bits: Bits(MsgTypeBitsTimeoutOnClose),
+		// 	want: []MsgType{MsgTimeoutOnClose},
+		// }, {
+		// 	name: string(MsgAcknowledgement),
+		// 	Bits: Bits(MsgTypeBitsAcknowledgement),
+		// 	want: []MsgType{MsgAcknowledgement},
+		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -409,7 +518,117 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			name:   "test 47",
 			values: []MsgType{MsgLeaveGroup},
 			want:   MsgTypeBits{Bits(MsgTypeBitsLeaveGroup)},
+		}, {
+			name:   "test 48",
+			values: []MsgType{MsgSoftwareUpgrade},
+			want:   MsgTypeBits{Bits(MsgTypeBitsSoftwareUpgrade)},
+		}, {
+			name:   "test 49",
+			values: []MsgType{MsgCancelUpgrade},
+			want:   MsgTypeBits{Bits(MsgTypeBitsCancelUpgrade)},
+		}, {
+			name:   "test 50",
+			values: []MsgType{MsgRegisterInterchainAccount},
+			want:   MsgTypeBits{Bits(MsgTypeBitsRegisterInterchainAccount)},
+		}, {
+			name:   "test 51",
+			values: []MsgType{MsgSendTx},
+			want:   MsgTypeBits{Bits(MsgTypeBitsSendTx)},
+		}, {
+			name:   "test 52",
+			values: []MsgType{MsgRegisterPayee},
+			want:   MsgTypeBits{Bits(MsgTypeBitsRegisterPayee)},
+		}, {
+			name:   "test 53",
+			values: []MsgType{MsgRegisterCounterpartyPayee},
+			want:   MsgTypeBits{Bits(MsgTypeBitsRegisterCounterpartyPayee)},
+		}, {
+			name:   "test 54",
+			values: []MsgType{MsgPayPacketFee},
+			want:   MsgTypeBits{Bits(MsgTypeBitsPayPacketFee)},
+		}, {
+			name:   "test 55",
+			values: []MsgType{MsgPayPacketFeeAsync},
+			want:   MsgTypeBits{Bits(MsgTypeBitsPayPacketFeeAsync)},
+		}, {
+			name:   "test 56",
+			values: []MsgType{MsgTransfer},
+			want:   MsgTypeBits{Bits(MsgTypeBitsTransfer)},
+		}, {
+			name:   "test 57",
+			values: []MsgType{MsgCreateClient},
+			want:   MsgTypeBits{Bits(MsgTypeBitsCreateClient)},
+		}, {
+			name:   "test 58",
+			values: []MsgType{MsgUpdateClient},
+			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateClient)},
+		}, {
+			name:   "test 59",
+			values: []MsgType{MsgUpgradeClient},
+			want:   MsgTypeBits{Bits(MsgTypeBitsUpgradeClient)},
+		}, {
+			name:   "test 60",
+			values: []MsgType{MsgSubmitMisbehaviour},
+			want:   MsgTypeBits{Bits(MsgTypeBitsSubmitMisbehaviour)},
+		}, {
+			name:   "test 61",
+			values: []MsgType{MsgConnectionOpenInit},
+			want:   MsgTypeBits{Bits(MsgTypeBitsConnectionOpenInit)},
+		}, {
+			name:   "test 62",
+			values: []MsgType{MsgConnectionOpenTry},
+			want:   MsgTypeBits{Bits(MsgTypeBitsConnectionOpenTry)},
+		}, {
+			name:   "test 63",
+			values: []MsgType{MsgConnectionOpenAck},
+			want:   MsgTypeBits{Bits(MsgTypeBitsConnectionOpenAck)},
+		}, {
+			name:   "test 64",
+			values: []MsgType{MsgConnectionOpenConfirm},
+			want:   MsgTypeBits{Bits(MsgTypeBitsConnectionOpenConfirm)},
 		},
+
+		// {
+		// 	name:   "test 65",
+		// 	values: []MsgType{MsgChannelOpenInit},
+		// 	want:   MsgTypeBits{Bits(MsgTypeBitsChannelOpenInit)},
+		// }, {
+		// 	name:   "test 66",
+		// 	values: []MsgType{MsgChannelOpenTry},
+		// 	want:   MsgTypeBits{Bits(MsgTypeBitsChannelOpenTry)},
+		// }, {
+		// 	name:   "test 67",
+		// 	values: []MsgType{MsgChannelOpenAck},
+		// 	want:   MsgTypeBits{Bits(MsgTypeBitsChannelOpenAck)},
+		// }, {
+		// 	name:   "test 68",
+		// 	values: []MsgType{MsgChannelOpenConfirm},
+		// 	want:   MsgTypeBits{Bits(MsgTypeBitsChannelOpenConfirm)},
+		// }, {
+		// 	name:   "test 69",
+		// 	values: []MsgType{MsgChannelCloseInit},
+		// 	want:   MsgTypeBits{Bits(MsgTypeBitsChannelCloseInit)},
+		// }, {
+		// 	name:   "test 70",
+		// 	values: []MsgType{MsgChannelCloseConfirm},
+		// 	want:   MsgTypeBits{Bits(MsgTypeBitsChannelCloseConfirm)},
+		// }, {
+		// 	name:   "test 71",
+		// 	values: []MsgType{MsgRecvPacket},
+		// 	want:   MsgTypeBits{Bits(MsgTypeBitsRecvPacket)},
+		// }, {
+		// 	name:   "test 72",
+		// 	values: []MsgType{MsgTimeout},
+		// 	want:   MsgTypeBits{Bits(MsgTypeBitsTimeout)},
+		// }, {
+		// 	name:   "test 73",
+		// 	values: []MsgType{MsgTimeoutOnClose},
+		// 	want:   MsgTypeBits{Bits(MsgTypeBitsTimeoutOnClose)},
+		// }, {
+		// 	name:   "test 74",
+		// 	values: []MsgType{MsgAcknowledgement},
+		// 	want:   MsgTypeBits{Bits(MsgTypeBitsAcknowledgement)},
+		// },
 
 		{
 			name:   "test combo",

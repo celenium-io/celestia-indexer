@@ -107,6 +107,60 @@ const (
 	MsgExecGroup MsgType = "MsgExecGroup"
 	// MsgLeaveGroup is a MsgType of type MsgLeaveGroup.
 	MsgLeaveGroup MsgType = "MsgLeaveGroup"
+	// MsgSoftwareUpgrade is a MsgType of type MsgSoftwareUpgrade.
+	MsgSoftwareUpgrade MsgType = "MsgSoftwareUpgrade"
+	// MsgCancelUpgrade is a MsgType of type MsgCancelUpgrade.
+	MsgCancelUpgrade MsgType = "MsgCancelUpgrade"
+	// MsgRegisterInterchainAccount is a MsgType of type MsgRegisterInterchainAccount.
+	MsgRegisterInterchainAccount MsgType = "MsgRegisterInterchainAccount"
+	// MsgSendTx is a MsgType of type MsgSendTx.
+	MsgSendTx MsgType = "MsgSendTx"
+	// MsgRegisterPayee is a MsgType of type MsgRegisterPayee.
+	MsgRegisterPayee MsgType = "MsgRegisterPayee"
+	// MsgRegisterCounterpartyPayee is a MsgType of type MsgRegisterCounterpartyPayee.
+	MsgRegisterCounterpartyPayee MsgType = "MsgRegisterCounterpartyPayee"
+	// MsgPayPacketFee is a MsgType of type MsgPayPacketFee.
+	MsgPayPacketFee MsgType = "MsgPayPacketFee"
+	// MsgPayPacketFeeAsync is a MsgType of type MsgPayPacketFeeAsync.
+	MsgPayPacketFeeAsync MsgType = "MsgPayPacketFeeAsync"
+	// MsgTransfer is a MsgType of type MsgTransfer.
+	MsgTransfer MsgType = "MsgTransfer"
+	// MsgCreateClient is a MsgType of type MsgCreateClient.
+	MsgCreateClient MsgType = "MsgCreateClient"
+	// MsgUpdateClient is a MsgType of type MsgUpdateClient.
+	MsgUpdateClient MsgType = "MsgUpdateClient"
+	// MsgUpgradeClient is a MsgType of type MsgUpgradeClient.
+	MsgUpgradeClient MsgType = "MsgUpgradeClient"
+	// MsgSubmitMisbehaviour is a MsgType of type MsgSubmitMisbehaviour.
+	MsgSubmitMisbehaviour MsgType = "MsgSubmitMisbehaviour"
+	// MsgConnectionOpenInit is a MsgType of type MsgConnectionOpenInit.
+	MsgConnectionOpenInit MsgType = "MsgConnectionOpenInit"
+	// MsgConnectionOpenTry is a MsgType of type MsgConnectionOpenTry.
+	MsgConnectionOpenTry MsgType = "MsgConnectionOpenTry"
+	// MsgConnectionOpenAck is a MsgType of type MsgConnectionOpenAck.
+	MsgConnectionOpenAck MsgType = "MsgConnectionOpenAck"
+	// MsgConnectionOpenConfirm is a MsgType of type MsgConnectionOpenConfirm.
+	MsgConnectionOpenConfirm MsgType = "MsgConnectionOpenConfirm"
+	// MsgChannelOpenInit is a MsgType of type MsgChannelOpenInit.
+	MsgChannelOpenInit MsgType = "MsgChannelOpenInit"
+	// MsgChannelOpenTry is a MsgType of type MsgChannelOpenTry.
+	MsgChannelOpenTry MsgType = "MsgChannelOpenTry"
+	// MsgChannelOpenAck is a MsgType of type MsgChannelOpenAck.
+	MsgChannelOpenAck MsgType = "MsgChannelOpenAck"
+	// MsgChannelOpenConfirm is a MsgType of type MsgChannelOpenConfirm.
+	MsgChannelOpenConfirm MsgType = "MsgChannelOpenConfirm"
+	// MsgChannelCloseInit is a MsgType of type MsgChannelCloseInit.
+	MsgChannelCloseInit MsgType = "MsgChannelCloseInit"
+	// MsgChannelCloseConfirm is a MsgType of type MsgChannelCloseConfirm.
+	MsgChannelCloseConfirm MsgType = "MsgChannelCloseConfirm"
+	// MsgRecvPacket is a MsgType of type MsgRecvPacket.
+	MsgRecvPacket MsgType = "MsgRecvPacket"
+	// MsgTimeout is a MsgType of type MsgTimeout.
+	MsgTimeout MsgType = "MsgTimeout"
+	// MsgTimeoutOnClose is a MsgType of type MsgTimeoutOnClose.
+	MsgTimeoutOnClose MsgType = "MsgTimeoutOnClose"
+	// MsgAcknowledgement is a MsgType of type MsgAcknowledgement.
+	MsgAcknowledgement MsgType = "MsgAcknowledgement"
 )
 
 var ErrInvalidMsgType = errors.New("not a valid MsgType")
@@ -161,6 +215,33 @@ func MsgTypeValues() []MsgType {
 		MsgVoteGroup,
 		MsgExecGroup,
 		MsgLeaveGroup,
+		MsgSoftwareUpgrade,
+		MsgCancelUpgrade,
+		MsgRegisterInterchainAccount,
+		MsgSendTx,
+		MsgRegisterPayee,
+		MsgRegisterCounterpartyPayee,
+		MsgPayPacketFee,
+		MsgPayPacketFeeAsync,
+		MsgTransfer,
+		MsgCreateClient,
+		MsgUpdateClient,
+		MsgUpgradeClient,
+		MsgSubmitMisbehaviour,
+		MsgConnectionOpenInit,
+		MsgConnectionOpenTry,
+		MsgConnectionOpenAck,
+		MsgConnectionOpenConfirm,
+		MsgChannelOpenInit,
+		MsgChannelOpenTry,
+		MsgChannelOpenAck,
+		MsgChannelOpenConfirm,
+		MsgChannelCloseInit,
+		MsgChannelCloseConfirm,
+		MsgRecvPacket,
+		MsgTimeout,
+		MsgTimeoutOnClose,
+		MsgAcknowledgement,
 	}
 }
 
@@ -224,6 +305,33 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgVoteGroup":                       MsgVoteGroup,
 	"MsgExecGroup":                       MsgExecGroup,
 	"MsgLeaveGroup":                      MsgLeaveGroup,
+	"MsgSoftwareUpgrade":                 MsgSoftwareUpgrade,
+	"MsgCancelUpgrade":                   MsgCancelUpgrade,
+	"MsgRegisterInterchainAccount":       MsgRegisterInterchainAccount,
+	"MsgSendTx":                          MsgSendTx,
+	"MsgRegisterPayee":                   MsgRegisterPayee,
+	"MsgRegisterCounterpartyPayee":       MsgRegisterCounterpartyPayee,
+	"MsgPayPacketFee":                    MsgPayPacketFee,
+	"MsgPayPacketFeeAsync":               MsgPayPacketFeeAsync,
+	"MsgTransfer":                        MsgTransfer,
+	"MsgCreateClient":                    MsgCreateClient,
+	"MsgUpdateClient":                    MsgUpdateClient,
+	"MsgUpgradeClient":                   MsgUpgradeClient,
+	"MsgSubmitMisbehaviour":              MsgSubmitMisbehaviour,
+	"MsgConnectionOpenInit":              MsgConnectionOpenInit,
+	"MsgConnectionOpenTry":               MsgConnectionOpenTry,
+	"MsgConnectionOpenAck":               MsgConnectionOpenAck,
+	"MsgConnectionOpenConfirm":           MsgConnectionOpenConfirm,
+	"MsgChannelOpenInit":                 MsgChannelOpenInit,
+	"MsgChannelOpenTry":                  MsgChannelOpenTry,
+	"MsgChannelOpenAck":                  MsgChannelOpenAck,
+	"MsgChannelOpenConfirm":              MsgChannelOpenConfirm,
+	"MsgChannelCloseInit":                MsgChannelCloseInit,
+	"MsgChannelCloseConfirm":             MsgChannelCloseConfirm,
+	"MsgRecvPacket":                      MsgRecvPacket,
+	"MsgTimeout":                         MsgTimeout,
+	"MsgTimeoutOnClose":                  MsgTimeoutOnClose,
+	"MsgAcknowledgement":                 MsgAcknowledgement,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.
