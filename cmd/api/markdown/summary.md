@@ -2,6 +2,7 @@ Returns string value by passed table and function.
 
 ### Availiable tables
 * `block`
+* `block_stats`
 * `tx`
 * `message`
 * `event`
@@ -23,9 +24,16 @@ Returns string value by passed table and function.
 #### Block
 * `height`         -- min max
 * `time`           -- min max
+
+#### Block stats
+* `height`         -- min max
+* `time`           -- min max
 * `tx_count`       -- min max sum avg
 * `events_count`   -- min max sum avg
 * `blobs_size`     -- min max sum avg
+* `block_time`     -- min max sum avg
+* `supply_chnge`   -- min max sum avg
+* `inflation_rate` -- min max avg
 * `fee`            -- min max sum avg
 
 #### Tx

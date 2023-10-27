@@ -76,7 +76,7 @@ func (sh StatsHandler) Summary(c echo.Context) error {
 }
 
 type histogramRequest struct {
-	Table     string `example:"block"      param:"table"     swaggertype:"string"  validate:"required,oneof=block tx event message"`
+	Table     string `example:"block"      param:"table"     swaggertype:"string"  validate:"required,oneof=block block_stats tx event message"`
 	Function  string `example:"count"      param:"function"  swaggertype:"string"  validate:"required,oneof=avg sum min max count"`
 	Timeframe string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day week month year"`
 	Column    string `example:"fee"        query:"column"    swaggertype:"string"  validate:"omitempty"`
@@ -90,7 +90,7 @@ type histogramRequest struct {
 //	@Description.markdown	histogram
 //	@Tags					stats
 //	@ID						stats-histogram
-//	@Param					table		path	string	true	"Table name"	Enums(block, tx, event, message)
+//	@Param					table		path	string	true	"Table name"	Enums(block, block_stats, tx, event, message)
 //	@Param					function	path	string	true	"Function name"	Enums(min, max, avg, sum, count)
 //	@Param					timeframe	path	string	true	"Timeframe"		Enums(hour, day, week, month, year)
 //	@Param					column		query	string	false	"Column name which will be used for computation. Optional for count"
