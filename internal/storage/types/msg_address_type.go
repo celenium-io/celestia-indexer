@@ -37,6 +37,9 @@ package types
 		groupPolicyAddress,
 		executor,
 		groupMember,
+
+		owner,
+
 	)
 */
 //go:generate go-enum --marshal --sql --values

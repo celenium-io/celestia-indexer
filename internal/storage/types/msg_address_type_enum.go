@@ -61,6 +61,8 @@ const (
 	MsgAddressTypeExecutor MsgAddressType = "executor"
 	// MsgAddressTypeGroupMember is a MsgAddressType of type groupMember.
 	MsgAddressTypeGroupMember MsgAddressType = "groupMember"
+	// MsgAddressTypeOwner is a MsgAddressType of type owner.
+	MsgAddressTypeOwner MsgAddressType = "owner"
 )
 
 var ErrInvalidMsgAddressType = errors.New("not a valid MsgAddressType")
@@ -92,6 +94,7 @@ func MsgAddressTypeValues() []MsgAddressType {
 		MsgAddressTypeGroupPolicyAddress,
 		MsgAddressTypeExecutor,
 		MsgAddressTypeGroupMember,
+		MsgAddressTypeOwner,
 	}
 }
 
@@ -132,6 +135,7 @@ var _MsgAddressTypeValue = map[string]MsgAddressType{
 	"groupPolicyAddress": MsgAddressTypeGroupPolicyAddress,
 	"executor":           MsgAddressTypeExecutor,
 	"groupMember":        MsgAddressTypeGroupMember,
+	"owner":              MsgAddressTypeOwner,
 }
 
 // ParseMsgAddressType attempts to convert a string to a MsgAddressType.

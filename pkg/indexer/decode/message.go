@@ -11,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/group"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 	upgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	interchainAccounts "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/controller/types"
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 	"time"
 
@@ -190,6 +191,12 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSoftwareUpgrade(height, typedMsg)
 	case *upgrade.MsgCancelUpgrade:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCancelUpgrade(height, typedMsg)
+
+	// interchainAccounts module
+	case *interchainAccounts.MsgRegisterInterchainAccount:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRegisterInterchainAccount(height, typedMsg)
+	case *interchainAccounts.MsgSendTx:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSendTx(height, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)
