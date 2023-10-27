@@ -1,0 +1,24 @@
+### Get blocks list
+http://{{host}}/v1/block
+
+### Get blocks count
+http://{{host}}/v1/block/count
+
+### Get genesis block
+http://{{host}}/v1/block/0
+
+### Get block by height
+http://{{host}}/v1/block/12
+
+### Get block events
+http://{{host}}/v1/block/20345/events
+
+### Get block stats
+http://{{host}}/v1/block/20345/stats
+
+### Get block namespaces
+http://{{host}}/v1/block/20345/namespace
+
+### Get block namespaces count
+http://{{host}}/v1/block/20345/namespace/count
+
