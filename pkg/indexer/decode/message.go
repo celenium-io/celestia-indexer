@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	crisisTypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	evidenceTypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
+	"github.com/cosmos/cosmos-sdk/x/group"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 	"time"
@@ -152,6 +153,36 @@ func Message(
 	// nft module
 	case *nft.MsgSend:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSendNFT(height, typedMsg)
+
+	// group module
+	case *group.MsgCreateGroup:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateGroup(height, typedMsg)
+	case *group.MsgUpdateGroupMembers:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateGroupMembers(height, typedMsg)
+	case *group.MsgUpdateGroupAdmin:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateGroupAdmin(height, typedMsg)
+	case *group.MsgUpdateGroupMetadata:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateGroupMetadata(height, typedMsg)
+	case *group.MsgCreateGroupPolicy:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateGroupPolicy(height, typedMsg)
+	case *group.MsgUpdateGroupPolicyAdmin:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateGroupPolicyAdmin(height, typedMsg)
+	case *group.MsgCreateGroupWithPolicy:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateGroupWithPolicy(height, typedMsg)
+	case *group.MsgUpdateGroupPolicyDecisionPolicy:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateGroupPolicyDecisionPolicy(height, typedMsg)
+	case *group.MsgUpdateGroupPolicyMetadata:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateGroupPolicyMetadata(height, typedMsg)
+	case *group.MsgSubmitProposal:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitProposalGroup(height, typedMsg)
+	case *group.MsgWithdrawProposal:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgWithdrawProposal(height, typedMsg)
+	case *group.MsgVote:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgVoteGroup(height, typedMsg)
+	case *group.MsgExec:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgExecGroup(height, typedMsg)
+	case *group.MsgLeaveGroup:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgLeaveGroup(height, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)

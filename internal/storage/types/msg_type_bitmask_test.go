@@ -144,9 +144,61 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			Bits: Bits(MsgTypeBitsSubmitEvidence),
 			want: []MsgType{MsgSubmitEvidence},
 		}, {
-			name: string(MsgSendNFT),
-			Bits: Bits(MsgTypeBitsSendNFT),
-			want: []MsgType{MsgSendNFT},
+			name: string(MsgCreateGroup),
+			Bits: Bits(MsgTypeBitsCreateGroup),
+			want: []MsgType{MsgCreateGroup},
+		}, {
+			name: string(MsgUpdateGroupMembers),
+			Bits: Bits(MsgTypeBitsUpdateGroupMembers),
+			want: []MsgType{MsgUpdateGroupMembers},
+		}, {
+			name: string(MsgUpdateGroupAdmin),
+			Bits: Bits(MsgTypeBitsUpdateGroupAdmin),
+			want: []MsgType{MsgUpdateGroupAdmin},
+		}, {
+			name: string(MsgUpdateGroupMetadata),
+			Bits: Bits(MsgTypeBitsUpdateGroupMetadata),
+			want: []MsgType{MsgUpdateGroupMetadata},
+		}, {
+			name: string(MsgCreateGroupPolicy),
+			Bits: Bits(MsgTypeBitsCreateGroupPolicy),
+			want: []MsgType{MsgCreateGroupPolicy},
+		}, {
+			name: string(MsgUpdateGroupPolicyAdmin),
+			Bits: Bits(MsgTypeBitsUpdateGroupPolicyAdmin),
+			want: []MsgType{MsgUpdateGroupPolicyAdmin},
+		}, {
+			name: string(MsgCreateGroupWithPolicy),
+			Bits: Bits(MsgTypeBitsCreateGroupWithPolicy),
+			want: []MsgType{MsgCreateGroupWithPolicy},
+		}, {
+			name: string(MsgUpdateGroupPolicyDecisionPolicy),
+			Bits: Bits(MsgTypeBitsUpdateGroupPolicyDecisionPolicy),
+			want: []MsgType{MsgUpdateGroupPolicyDecisionPolicy},
+		}, {
+			name: string(MsgUpdateGroupPolicyMetadata),
+			Bits: Bits(MsgTypeBitsUpdateGroupPolicyMetadata),
+			want: []MsgType{MsgUpdateGroupPolicyMetadata},
+		}, {
+			name: string(MsgSubmitProposalGroup),
+			Bits: Bits(MsgTypeBitsSubmitProposalGroup),
+			want: []MsgType{MsgSubmitProposalGroup},
+		}, {
+			name: string(MsgWithdrawProposal),
+			Bits: Bits(MsgTypeBitsWithdrawProposal),
+			want: []MsgType{MsgWithdrawProposal},
+		}, {
+			name: string(MsgVoteGroup),
+			Bits: Bits(MsgTypeBitsVoteGroup),
+			want: []MsgType{MsgVoteGroup},
+		}, {
+			name: string(MsgExecGroup),
+			Bits: Bits(MsgTypeBitsExecGroup),
+			want: []MsgType{MsgExecGroup},
+		}, {
+			name: string(MsgLeaveGroup),
+			Bits: Bits(MsgTypeBitsLeaveGroup),
+			want: []MsgType{MsgLeaveGroup},
 		},
 	}
 	for _, tt := range tests {
@@ -301,6 +353,62 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			name:   "test 33",
 			values: []MsgType{MsgSendNFT},
 			want:   MsgTypeBits{Bits(MsgTypeBitsSendNFT)},
+		}, {
+			name:   "test 34",
+			values: []MsgType{MsgCreateGroup},
+			want:   MsgTypeBits{Bits(MsgTypeBitsCreateGroup)},
+		}, {
+			name:   "test 35",
+			values: []MsgType{MsgUpdateGroupMembers},
+			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateGroupMembers)},
+		}, {
+			name:   "test 36",
+			values: []MsgType{MsgUpdateGroupAdmin},
+			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateGroupAdmin)},
+		}, {
+			name:   "test 37",
+			values: []MsgType{MsgUpdateGroupMetadata},
+			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateGroupMetadata)},
+		}, {
+			name:   "test 38",
+			values: []MsgType{MsgCreateGroupPolicy},
+			want:   MsgTypeBits{Bits(MsgTypeBitsCreateGroupPolicy)},
+		}, {
+			name:   "test 39",
+			values: []MsgType{MsgUpdateGroupPolicyAdmin},
+			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateGroupPolicyAdmin)},
+		}, {
+			name:   "test 40",
+			values: []MsgType{MsgCreateGroupWithPolicy},
+			want:   MsgTypeBits{Bits(MsgTypeBitsCreateGroupWithPolicy)},
+		}, {
+			name:   "test 41",
+			values: []MsgType{MsgUpdateGroupPolicyDecisionPolicy},
+			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateGroupPolicyDecisionPolicy)},
+		}, {
+			name:   "test 42",
+			values: []MsgType{MsgUpdateGroupPolicyMetadata},
+			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateGroupPolicyMetadata)},
+		}, {
+			name:   "test 43",
+			values: []MsgType{MsgSubmitProposalGroup},
+			want:   MsgTypeBits{Bits(MsgTypeBitsSubmitProposalGroup)},
+		}, {
+			name:   "test 44",
+			values: []MsgType{MsgWithdrawProposal},
+			want:   MsgTypeBits{Bits(MsgTypeBitsWithdrawProposal)},
+		}, {
+			name:   "test 45",
+			values: []MsgType{MsgVoteGroup},
+			want:   MsgTypeBits{Bits(MsgTypeBitsVoteGroup)},
+		}, {
+			name:   "test 46",
+			values: []MsgType{MsgExecGroup},
+			want:   MsgTypeBits{Bits(MsgTypeBitsExecGroup)},
+		}, {
+			name:   "test 47",
+			values: []MsgType{MsgLeaveGroup},
+			want:   MsgTypeBits{Bits(MsgTypeBitsLeaveGroup)},
 		},
 
 		{

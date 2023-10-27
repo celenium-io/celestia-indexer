@@ -53,6 +53,22 @@ package types
 		MsgSubmitEvidence,
 
 		MsgSendNFT,
+
+		MsgCreateGroup,
+		MsgUpdateGroupMembers,
+		MsgUpdateGroupAdmin,
+		MsgUpdateGroupMetadata,
+		MsgCreateGroupPolicy,
+		MsgUpdateGroupPolicyAdmin,
+		MsgCreateGroupWithPolicy,
+		MsgUpdateGroupPolicyDecisionPolicy,
+		MsgUpdateGroupPolicyMetadata,
+		MsgSubmitProposalGroup,
+		MsgWithdrawProposal,
+		MsgVoteGroup,
+		MsgExecGroup,
+		MsgLeaveGroup,
+
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix

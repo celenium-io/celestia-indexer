@@ -603,6 +603,20 @@ definitions:
     - MsgVerifyInvariant
     - MsgSubmitEvidence
     - MsgSendNFT
+    - MsgCreateGroup
+    - MsgUpdateGroupMembers
+    - MsgUpdateGroupAdmin
+    - MsgUpdateGroupMetadata
+    - MsgCreateGroupPolicy
+    - MsgUpdateGroupPolicyAdmin
+    - MsgCreateGroupWithPolicy
+    - MsgUpdateGroupPolicyDecisionPolicy
+    - MsgUpdateGroupPolicyMetadata
+    - MsgSubmitProposalGroup
+    - MsgWithdrawProposal
+    - MsgVoteGroup
+    - MsgExecGroup
+    - MsgLeaveGroup
     type: string
     x-enum-varnames:
     - MsgUnknown
@@ -638,6 +652,20 @@ definitions:
     - MsgVerifyInvariant
     - MsgSubmitEvidence
     - MsgSendNFT
+    - MsgCreateGroup
+    - MsgUpdateGroupMembers
+    - MsgUpdateGroupAdmin
+    - MsgUpdateGroupMetadata
+    - MsgCreateGroupPolicy
+    - MsgUpdateGroupPolicyAdmin
+    - MsgCreateGroupWithPolicy
+    - MsgUpdateGroupPolicyDecisionPolicy
+    - MsgUpdateGroupPolicyMetadata
+    - MsgSubmitProposalGroup
+    - MsgWithdrawProposal
+    - MsgVoteGroup
+    - MsgExecGroup
+    - MsgLeaveGroup
 host: https://api.celestia.dipdup.net
 info:
   contact: {}
@@ -840,6 +868,20 @@ paths:
         - MsgVerifyInvariant
         - MsgSubmitEvidence
         - MsgSendNFT
+        - MsgCreateGroup
+        - MsgUpdateGroupMembers
+        - MsgUpdateGroupAdmin
+        - MsgUpdateGroupMetadata
+        - MsgCreateGroupPolicy
+        - MsgUpdateGroupPolicyAdmin
+        - MsgCreateGroupWithPolicy
+        - MsgUpdateGroupPolicyDecisionPolicy
+        - MsgUpdateGroupPolicyMetadata
+        - MsgSubmitProposalGroup
+        - MsgWithdrawProposal
+        - MsgVoteGroup
+        - MsgExecGroup
+        - MsgLeaveGroup
         in: query
         name: msg_type
         type: string
@@ -1770,6 +1812,20 @@ paths:
         - MsgVerifyInvariant
         - MsgSubmitEvidence
         - MsgSendNFT
+        - MsgCreateGroup
+        - MsgUpdateGroupMembers
+        - MsgUpdateGroupAdmin
+        - MsgUpdateGroupMetadata
+        - MsgCreateGroupPolicy
+        - MsgUpdateGroupPolicyAdmin
+        - MsgCreateGroupWithPolicy
+        - MsgUpdateGroupPolicyDecisionPolicy
+        - MsgUpdateGroupPolicyMetadata
+        - MsgSubmitProposalGroup
+        - MsgWithdrawProposal
+        - MsgVoteGroup
+        - MsgExecGroup
+        - MsgLeaveGroup
         in: query
         name: msg_type
         type: string

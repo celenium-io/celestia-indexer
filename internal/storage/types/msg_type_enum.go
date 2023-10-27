@@ -79,6 +79,34 @@ const (
 	MsgSubmitEvidence MsgType = "MsgSubmitEvidence"
 	// MsgSendNFT is a MsgType of type MsgSendNFT.
 	MsgSendNFT MsgType = "MsgSendNFT"
+	// MsgCreateGroup is a MsgType of type MsgCreateGroup.
+	MsgCreateGroup MsgType = "MsgCreateGroup"
+	// MsgUpdateGroupMembers is a MsgType of type MsgUpdateGroupMembers.
+	MsgUpdateGroupMembers MsgType = "MsgUpdateGroupMembers"
+	// MsgUpdateGroupAdmin is a MsgType of type MsgUpdateGroupAdmin.
+	MsgUpdateGroupAdmin MsgType = "MsgUpdateGroupAdmin"
+	// MsgUpdateGroupMetadata is a MsgType of type MsgUpdateGroupMetadata.
+	MsgUpdateGroupMetadata MsgType = "MsgUpdateGroupMetadata"
+	// MsgCreateGroupPolicy is a MsgType of type MsgCreateGroupPolicy.
+	MsgCreateGroupPolicy MsgType = "MsgCreateGroupPolicy"
+	// MsgUpdateGroupPolicyAdmin is a MsgType of type MsgUpdateGroupPolicyAdmin.
+	MsgUpdateGroupPolicyAdmin MsgType = "MsgUpdateGroupPolicyAdmin"
+	// MsgCreateGroupWithPolicy is a MsgType of type MsgCreateGroupWithPolicy.
+	MsgCreateGroupWithPolicy MsgType = "MsgCreateGroupWithPolicy"
+	// MsgUpdateGroupPolicyDecisionPolicy is a MsgType of type MsgUpdateGroupPolicyDecisionPolicy.
+	MsgUpdateGroupPolicyDecisionPolicy MsgType = "MsgUpdateGroupPolicyDecisionPolicy"
+	// MsgUpdateGroupPolicyMetadata is a MsgType of type MsgUpdateGroupPolicyMetadata.
+	MsgUpdateGroupPolicyMetadata MsgType = "MsgUpdateGroupPolicyMetadata"
+	// MsgSubmitProposalGroup is a MsgType of type MsgSubmitProposalGroup.
+	MsgSubmitProposalGroup MsgType = "MsgSubmitProposalGroup"
+	// MsgWithdrawProposal is a MsgType of type MsgWithdrawProposal.
+	MsgWithdrawProposal MsgType = "MsgWithdrawProposal"
+	// MsgVoteGroup is a MsgType of type MsgVoteGroup.
+	MsgVoteGroup MsgType = "MsgVoteGroup"
+	// MsgExecGroup is a MsgType of type MsgExecGroup.
+	MsgExecGroup MsgType = "MsgExecGroup"
+	// MsgLeaveGroup is a MsgType of type MsgLeaveGroup.
+	MsgLeaveGroup MsgType = "MsgLeaveGroup"
 )
 
 var ErrInvalidMsgType = errors.New("not a valid MsgType")
@@ -119,6 +147,20 @@ func MsgTypeValues() []MsgType {
 		MsgVerifyInvariant,
 		MsgSubmitEvidence,
 		MsgSendNFT,
+		MsgCreateGroup,
+		MsgUpdateGroupMembers,
+		MsgUpdateGroupAdmin,
+		MsgUpdateGroupMetadata,
+		MsgCreateGroupPolicy,
+		MsgUpdateGroupPolicyAdmin,
+		MsgCreateGroupWithPolicy,
+		MsgUpdateGroupPolicyDecisionPolicy,
+		MsgUpdateGroupPolicyMetadata,
+		MsgSubmitProposalGroup,
+		MsgWithdrawProposal,
+		MsgVoteGroup,
+		MsgExecGroup,
+		MsgLeaveGroup,
 	}
 }
 
@@ -135,39 +177,53 @@ func (x MsgType) IsValid() bool {
 }
 
 var _MsgTypeValue = map[string]MsgType{
-	"MsgUnknown":                      MsgUnknown,
-	"MsgSetWithdrawAddress":           MsgSetWithdrawAddress,
-	"MsgWithdrawDelegatorReward":      MsgWithdrawDelegatorReward,
-	"MsgWithdrawValidatorCommission":  MsgWithdrawValidatorCommission,
-	"MsgFundCommunityPool":            MsgFundCommunityPool,
-	"MsgCreateValidator":              MsgCreateValidator,
-	"MsgEditValidator":                MsgEditValidator,
-	"MsgDelegate":                     MsgDelegate,
-	"MsgBeginRedelegate":              MsgBeginRedelegate,
-	"MsgUndelegate":                   MsgUndelegate,
-	"MsgCancelUnbondingDelegation":    MsgCancelUnbondingDelegation,
-	"MsgUnjail":                       MsgUnjail,
-	"MsgSend":                         MsgSend,
-	"MsgMultiSend":                    MsgMultiSend,
-	"MsgCreateVestingAccount":         MsgCreateVestingAccount,
-	"MsgCreatePermanentLockedAccount": MsgCreatePermanentLockedAccount,
-	"MsgCreatePeriodicVestingAccount": MsgCreatePeriodicVestingAccount,
-	"MsgPayForBlobs":                  MsgPayForBlobs,
-	"MsgGrant":                        MsgGrant,
-	"MsgExec":                         MsgExec,
-	"MsgRevoke":                       MsgRevoke,
-	"MsgGrantAllowance":               MsgGrantAllowance,
-	"MsgRevokeAllowance":              MsgRevokeAllowance,
-	"MsgRegisterEVMAddress":           MsgRegisterEVMAddress,
-	"MsgSubmitProposal":               MsgSubmitProposal,
-	"MsgExecLegacyContent":            MsgExecLegacyContent,
-	"MsgVote":                         MsgVote,
-	"MsgVoteWeighted":                 MsgVoteWeighted,
-	"MsgDeposit":                      MsgDeposit,
-	"IBCTransfer":                     IBCTransfer,
-	"MsgVerifyInvariant":              MsgVerifyInvariant,
-	"MsgSubmitEvidence":               MsgSubmitEvidence,
-	"MsgSendNFT":                      MsgSendNFT,
+	"MsgUnknown":                         MsgUnknown,
+	"MsgSetWithdrawAddress":              MsgSetWithdrawAddress,
+	"MsgWithdrawDelegatorReward":         MsgWithdrawDelegatorReward,
+	"MsgWithdrawValidatorCommission":     MsgWithdrawValidatorCommission,
+	"MsgFundCommunityPool":               MsgFundCommunityPool,
+	"MsgCreateValidator":                 MsgCreateValidator,
+	"MsgEditValidator":                   MsgEditValidator,
+	"MsgDelegate":                        MsgDelegate,
+	"MsgBeginRedelegate":                 MsgBeginRedelegate,
+	"MsgUndelegate":                      MsgUndelegate,
+	"MsgCancelUnbondingDelegation":       MsgCancelUnbondingDelegation,
+	"MsgUnjail":                          MsgUnjail,
+	"MsgSend":                            MsgSend,
+	"MsgMultiSend":                       MsgMultiSend,
+	"MsgCreateVestingAccount":            MsgCreateVestingAccount,
+	"MsgCreatePermanentLockedAccount":    MsgCreatePermanentLockedAccount,
+	"MsgCreatePeriodicVestingAccount":    MsgCreatePeriodicVestingAccount,
+	"MsgPayForBlobs":                     MsgPayForBlobs,
+	"MsgGrant":                           MsgGrant,
+	"MsgExec":                            MsgExec,
+	"MsgRevoke":                          MsgRevoke,
+	"MsgGrantAllowance":                  MsgGrantAllowance,
+	"MsgRevokeAllowance":                 MsgRevokeAllowance,
+	"MsgRegisterEVMAddress":              MsgRegisterEVMAddress,
+	"MsgSubmitProposal":                  MsgSubmitProposal,
+	"MsgExecLegacyContent":               MsgExecLegacyContent,
+	"MsgVote":                            MsgVote,
+	"MsgVoteWeighted":                    MsgVoteWeighted,
+	"MsgDeposit":                         MsgDeposit,
+	"IBCTransfer":                        IBCTransfer,
+	"MsgVerifyInvariant":                 MsgVerifyInvariant,
+	"MsgSubmitEvidence":                  MsgSubmitEvidence,
+	"MsgSendNFT":                         MsgSendNFT,
+	"MsgCreateGroup":                     MsgCreateGroup,
+	"MsgUpdateGroupMembers":              MsgUpdateGroupMembers,
+	"MsgUpdateGroupAdmin":                MsgUpdateGroupAdmin,
+	"MsgUpdateGroupMetadata":             MsgUpdateGroupMetadata,
+	"MsgCreateGroupPolicy":               MsgCreateGroupPolicy,
+	"MsgUpdateGroupPolicyAdmin":          MsgUpdateGroupPolicyAdmin,
+	"MsgCreateGroupWithPolicy":           MsgCreateGroupWithPolicy,
+	"MsgUpdateGroupPolicyDecisionPolicy": MsgUpdateGroupPolicyDecisionPolicy,
+	"MsgUpdateGroupPolicyMetadata":       MsgUpdateGroupPolicyMetadata,
+	"MsgSubmitProposalGroup":             MsgSubmitProposalGroup,
+	"MsgWithdrawProposal":                MsgWithdrawProposal,
+	"MsgVoteGroup":                       MsgVoteGroup,
+	"MsgExecGroup":                       MsgExecGroup,
+	"MsgLeaveGroup":                      MsgLeaveGroup,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.

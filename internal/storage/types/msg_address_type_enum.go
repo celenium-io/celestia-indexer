@@ -51,6 +51,16 @@ const (
 	MsgAddressTypeReceiver MsgAddressType = "receiver"
 	// MsgAddressTypeSubmitter is a MsgAddressType of type submitter.
 	MsgAddressTypeSubmitter MsgAddressType = "submitter"
+	// MsgAddressTypeAdmin is a MsgAddressType of type admin.
+	MsgAddressTypeAdmin MsgAddressType = "admin"
+	// MsgAddressTypeNewAdmin is a MsgAddressType of type newAdmin.
+	MsgAddressTypeNewAdmin MsgAddressType = "newAdmin"
+	// MsgAddressTypeGroupPolicyAddress is a MsgAddressType of type groupPolicyAddress.
+	MsgAddressTypeGroupPolicyAddress MsgAddressType = "groupPolicyAddress"
+	// MsgAddressTypeExecutor is a MsgAddressType of type executor.
+	MsgAddressTypeExecutor MsgAddressType = "executor"
+	// MsgAddressTypeGroupMember is a MsgAddressType of type groupMember.
+	MsgAddressTypeGroupMember MsgAddressType = "groupMember"
 )
 
 var ErrInvalidMsgAddressType = errors.New("not a valid MsgAddressType")
@@ -77,6 +87,11 @@ func MsgAddressTypeValues() []MsgAddressType {
 		MsgAddressTypeSender,
 		MsgAddressTypeReceiver,
 		MsgAddressTypeSubmitter,
+		MsgAddressTypeAdmin,
+		MsgAddressTypeNewAdmin,
+		MsgAddressTypeGroupPolicyAddress,
+		MsgAddressTypeExecutor,
+		MsgAddressTypeGroupMember,
 	}
 }
 
@@ -93,25 +108,30 @@ func (x MsgAddressType) IsValid() bool {
 }
 
 var _MsgAddressTypeValue = map[string]MsgAddressType{
-	"validator":    MsgAddressTypeValidator,
-	"delegator":    MsgAddressTypeDelegator,
-	"depositor":    MsgAddressTypeDepositor,
-	"validatorSrc": MsgAddressTypeValidatorSrc,
-	"validatorDst": MsgAddressTypeValidatorDst,
-	"fromAddress":  MsgAddressTypeFromAddress,
-	"toAddress":    MsgAddressTypeToAddress,
-	"input":        MsgAddressTypeInput,
-	"output":       MsgAddressTypeOutput,
-	"grantee":      MsgAddressTypeGrantee,
-	"granter":      MsgAddressTypeGranter,
-	"signer":       MsgAddressTypeSigner,
-	"withdraw":     MsgAddressTypeWithdraw,
-	"voter":        MsgAddressTypeVoter,
-	"proposer":     MsgAddressTypeProposer,
-	"authority":    MsgAddressTypeAuthority,
-	"sender":       MsgAddressTypeSender,
-	"receiver":     MsgAddressTypeReceiver,
-	"submitter":    MsgAddressTypeSubmitter,
+	"validator":          MsgAddressTypeValidator,
+	"delegator":          MsgAddressTypeDelegator,
+	"depositor":          MsgAddressTypeDepositor,
+	"validatorSrc":       MsgAddressTypeValidatorSrc,
+	"validatorDst":       MsgAddressTypeValidatorDst,
+	"fromAddress":        MsgAddressTypeFromAddress,
+	"toAddress":          MsgAddressTypeToAddress,
+	"input":              MsgAddressTypeInput,
+	"output":             MsgAddressTypeOutput,
+	"grantee":            MsgAddressTypeGrantee,
+	"granter":            MsgAddressTypeGranter,
+	"signer":             MsgAddressTypeSigner,
+	"withdraw":           MsgAddressTypeWithdraw,
+	"voter":              MsgAddressTypeVoter,
+	"proposer":           MsgAddressTypeProposer,
+	"authority":          MsgAddressTypeAuthority,
+	"sender":             MsgAddressTypeSender,
+	"receiver":           MsgAddressTypeReceiver,
+	"submitter":          MsgAddressTypeSubmitter,
+	"admin":              MsgAddressTypeAdmin,
+	"newAdmin":           MsgAddressTypeNewAdmin,
+	"groupPolicyAddress": MsgAddressTypeGroupPolicyAddress,
+	"executor":           MsgAddressTypeExecutor,
+	"groupMember":        MsgAddressTypeGroupMember,
 }
 
 // ParseMsgAddressType attempts to convert a string to a MsgAddressType.

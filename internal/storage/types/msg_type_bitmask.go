@@ -62,6 +62,21 @@ const (
 	MsgTypeBitsSubmitEvidence
 
 	MsgTypeBitsSendNFT
+
+	MsgTypeBitsCreateGroup
+	MsgTypeBitsUpdateGroupMembers
+	MsgTypeBitsUpdateGroupAdmin
+	MsgTypeBitsUpdateGroupMetadata
+	MsgTypeBitsCreateGroupPolicy
+	MsgTypeBitsUpdateGroupPolicyAdmin
+	MsgTypeBitsCreateGroupWithPolicy
+	MsgTypeBitsUpdateGroupPolicyDecisionPolicy
+	MsgTypeBitsUpdateGroupPolicyMetadata
+	MsgTypeBitsSubmitProposalGroup
+	MsgTypeBitsWithdrawProposal
+	MsgTypeBitsVoteGroup
+	MsgTypeBitsExecGroup
+	MsgTypeBitsLeaveGroup
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
@@ -150,6 +165,35 @@ func (mask *MsgTypeBits) SetBit(value MsgType) {
 		mask.Set(Bits(MsgTypeBitsSubmitEvidence))
 	case MsgSendNFT:
 		mask.Set(Bits(MsgTypeBitsSendNFT))
+
+	case MsgCreateGroup:
+		mask.Set(Bits(MsgTypeBitsCreateGroup))
+	case MsgUpdateGroupMembers:
+		mask.Set(Bits(MsgTypeBitsUpdateGroupMembers))
+	case MsgUpdateGroupAdmin:
+		mask.Set(Bits(MsgTypeBitsUpdateGroupAdmin))
+	case MsgUpdateGroupMetadata:
+		mask.Set(Bits(MsgTypeBitsUpdateGroupMetadata))
+	case MsgCreateGroupPolicy:
+		mask.Set(Bits(MsgTypeBitsCreateGroupPolicy))
+	case MsgUpdateGroupPolicyAdmin:
+		mask.Set(Bits(MsgTypeBitsUpdateGroupPolicyAdmin))
+	case MsgCreateGroupWithPolicy:
+		mask.Set(Bits(MsgTypeBitsCreateGroupWithPolicy))
+	case MsgUpdateGroupPolicyDecisionPolicy:
+		mask.Set(Bits(MsgTypeBitsUpdateGroupPolicyDecisionPolicy))
+	case MsgUpdateGroupPolicyMetadata:
+		mask.Set(Bits(MsgTypeBitsUpdateGroupPolicyMetadata))
+	case MsgSubmitProposalGroup:
+		mask.Set(Bits(MsgTypeBitsSubmitProposalGroup))
+	case MsgWithdrawProposal:
+		mask.Set(Bits(MsgTypeBitsWithdrawProposal))
+	case MsgVoteGroup:
+		mask.Set(Bits(MsgTypeBitsVoteGroup))
+	case MsgExecGroup:
+		mask.Set(Bits(MsgTypeBitsExecGroup))
+	case MsgLeaveGroup:
+		mask.Set(Bits(MsgTypeBitsLeaveGroup))
 	}
 }
 
@@ -282,20 +326,81 @@ func (mask MsgTypeBits) Names() []MsgType {
 		names[i] = MsgDeposit
 		i++
 	}
+
 	if mask.Has(Bits(MsgTypeBitsIBCTransfer)) {
 		names[i] = IBCTransfer
 		i++
 	}
+
 	if mask.Has(Bits(MsgTypeBitsVerifyInvariant)) {
 		names[i] = MsgVerifyInvariant
 		i++
 	}
+
 	if mask.Has(Bits(MsgTypeBitsSubmitEvidence)) {
 		names[i] = MsgSubmitEvidence
 		i++
 	}
+
 	if mask.Has(Bits(MsgTypeBitsSendNFT)) {
 		names[i] = MsgSendNFT
+		i++
+	}
+
+	if mask.Has(Bits(MsgTypeBitsCreateGroup)) {
+		names[i] = MsgCreateGroup
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsUpdateGroupMembers)) {
+		names[i] = MsgUpdateGroupMembers
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsUpdateGroupAdmin)) {
+		names[i] = MsgUpdateGroupAdmin
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsUpdateGroupMetadata)) {
+		names[i] = MsgUpdateGroupMetadata
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsCreateGroupPolicy)) {
+		names[i] = MsgCreateGroupPolicy
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsUpdateGroupPolicyAdmin)) {
+		names[i] = MsgUpdateGroupPolicyAdmin
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsCreateGroupWithPolicy)) {
+		names[i] = MsgCreateGroupWithPolicy
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsUpdateGroupPolicyDecisionPolicy)) {
+		names[i] = MsgUpdateGroupPolicyDecisionPolicy
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsUpdateGroupPolicyMetadata)) {
+		names[i] = MsgUpdateGroupPolicyMetadata
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsSubmitProposalGroup)) {
+		names[i] = MsgSubmitProposalGroup
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsWithdrawProposal)) {
+		names[i] = MsgWithdrawProposal
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsVoteGroup)) {
+		names[i] = MsgVoteGroup
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsExecGroup)) {
+		names[i] = MsgExecGroup
+		i++
+	}
+	if mask.Has(Bits(MsgTypeBitsLeaveGroup)) {
+		names[i] = MsgLeaveGroup
 		// i++
 	}
 
