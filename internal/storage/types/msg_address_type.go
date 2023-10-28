@@ -29,6 +29,19 @@ package types
 
 		sender,
 		receiver,
+
+		submitter,
+
+		admin,
+		newAdmin,
+		groupPolicyAddress,
+		executor,
+		groupMember,
+
+		owner,
+
+		relayer,
+		payee,
 	)
 */
 //go:generate go-enum --marshal --sql --values

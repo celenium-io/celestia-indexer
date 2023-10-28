@@ -600,6 +600,50 @@ definitions:
     - MsgVoteWeighted
     - MsgDeposit
     - IBCTransfer
+    - MsgVerifyInvariant
+    - MsgSubmitEvidence
+    - MsgSendNFT
+    - MsgCreateGroup
+    - MsgUpdateGroupMembers
+    - MsgUpdateGroupAdmin
+    - MsgUpdateGroupMetadata
+    - MsgCreateGroupPolicy
+    - MsgUpdateGroupPolicyAdmin
+    - MsgCreateGroupWithPolicy
+    - MsgUpdateGroupPolicyDecisionPolicy
+    - MsgUpdateGroupPolicyMetadata
+    - MsgSubmitProposalGroup
+    - MsgWithdrawProposal
+    - MsgVoteGroup
+    - MsgExecGroup
+    - MsgLeaveGroup
+    - MsgSoftwareUpgrade
+    - MsgCancelUpgrade
+    - MsgRegisterInterchainAccount
+    - MsgSendTx
+    - MsgRegisterPayee
+    - MsgRegisterCounterpartyPayee
+    - MsgPayPacketFee
+    - MsgPayPacketFeeAsync
+    - MsgTransfer
+    - MsgCreateClient
+    - MsgUpdateClient
+    - MsgUpgradeClient
+    - MsgSubmitMisbehaviour
+    - MsgConnectionOpenInit
+    - MsgConnectionOpenTry
+    - MsgConnectionOpenAck
+    - MsgConnectionOpenConfirm
+    - MsgChannelOpenInit
+    - MsgChannelOpenTry
+    - MsgChannelOpenAck
+    - MsgChannelOpenConfirm
+    - MsgChannelCloseInit
+    - MsgChannelCloseConfirm
+    - MsgRecvPacket
+    - MsgTimeout
+    - MsgTimeoutOnClose
+    - MsgAcknowledgement
     type: string
     x-enum-varnames:
     - MsgUnknown
@@ -632,6 +676,50 @@ definitions:
     - MsgVoteWeighted
     - MsgDeposit
     - IBCTransfer
+    - MsgVerifyInvariant
+    - MsgSubmitEvidence
+    - MsgSendNFT
+    - MsgCreateGroup
+    - MsgUpdateGroupMembers
+    - MsgUpdateGroupAdmin
+    - MsgUpdateGroupMetadata
+    - MsgCreateGroupPolicy
+    - MsgUpdateGroupPolicyAdmin
+    - MsgCreateGroupWithPolicy
+    - MsgUpdateGroupPolicyDecisionPolicy
+    - MsgUpdateGroupPolicyMetadata
+    - MsgSubmitProposalGroup
+    - MsgWithdrawProposal
+    - MsgVoteGroup
+    - MsgExecGroup
+    - MsgLeaveGroup
+    - MsgSoftwareUpgrade
+    - MsgCancelUpgrade
+    - MsgRegisterInterchainAccount
+    - MsgSendTx
+    - MsgRegisterPayee
+    - MsgRegisterCounterpartyPayee
+    - MsgPayPacketFee
+    - MsgPayPacketFeeAsync
+    - MsgTransfer
+    - MsgCreateClient
+    - MsgUpdateClient
+    - MsgUpgradeClient
+    - MsgSubmitMisbehaviour
+    - MsgConnectionOpenInit
+    - MsgConnectionOpenTry
+    - MsgConnectionOpenAck
+    - MsgConnectionOpenConfirm
+    - MsgChannelOpenInit
+    - MsgChannelOpenTry
+    - MsgChannelOpenAck
+    - MsgChannelOpenConfirm
+    - MsgChannelCloseInit
+    - MsgChannelCloseConfirm
+    - MsgRecvPacket
+    - MsgTimeout
+    - MsgTimeoutOnClose
+    - MsgAcknowledgement
 host: https://api.celestia.dipdup.net
 info:
   contact: {}
@@ -831,6 +919,50 @@ paths:
         - MsgVoteWeighted
         - MsgDeposit
         - IBCTransfer
+        - MsgVerifyInvariant
+        - MsgSubmitEvidence
+        - MsgSendNFT
+        - MsgCreateGroup
+        - MsgUpdateGroupMembers
+        - MsgUpdateGroupAdmin
+        - MsgUpdateGroupMetadata
+        - MsgCreateGroupPolicy
+        - MsgUpdateGroupPolicyAdmin
+        - MsgCreateGroupWithPolicy
+        - MsgUpdateGroupPolicyDecisionPolicy
+        - MsgUpdateGroupPolicyMetadata
+        - MsgSubmitProposalGroup
+        - MsgWithdrawProposal
+        - MsgVoteGroup
+        - MsgExecGroup
+        - MsgLeaveGroup
+        - MsgSoftwareUpgrade
+        - MsgCancelUpgrade
+        - MsgRegisterInterchainAccount
+        - MsgSendTx
+        - MsgRegisterPayee
+        - MsgRegisterCounterpartyPayee
+        - MsgPayPacketFee
+        - MsgPayPacketFeeAsync
+        - MsgTransfer
+        - MsgCreateClient
+        - MsgUpdateClient
+        - MsgUpgradeClient
+        - MsgSubmitMisbehaviour
+        - MsgConnectionOpenInit
+        - MsgConnectionOpenTry
+        - MsgConnectionOpenAck
+        - MsgConnectionOpenConfirm
+        - MsgChannelOpenInit
+        - MsgChannelOpenTry
+        - MsgChannelOpenAck
+        - MsgChannelOpenConfirm
+        - MsgChannelCloseInit
+        - MsgChannelCloseConfirm
+        - MsgRecvPacket
+        - MsgTimeout
+        - MsgTimeoutOnClose
+        - MsgAcknowledgement
         in: query
         name: msg_type
         type: string
@@ -1758,6 +1890,50 @@ paths:
         - MsgVoteWeighted
         - MsgDeposit
         - IBCTransfer
+        - MsgVerifyInvariant
+        - MsgSubmitEvidence
+        - MsgSendNFT
+        - MsgCreateGroup
+        - MsgUpdateGroupMembers
+        - MsgUpdateGroupAdmin
+        - MsgUpdateGroupMetadata
+        - MsgCreateGroupPolicy
+        - MsgUpdateGroupPolicyAdmin
+        - MsgCreateGroupWithPolicy
+        - MsgUpdateGroupPolicyDecisionPolicy
+        - MsgUpdateGroupPolicyMetadata
+        - MsgSubmitProposalGroup
+        - MsgWithdrawProposal
+        - MsgVoteGroup
+        - MsgExecGroup
+        - MsgLeaveGroup
+        - MsgSoftwareUpgrade
+        - MsgCancelUpgrade
+        - MsgRegisterInterchainAccount
+        - MsgSendTx
+        - MsgRegisterPayee
+        - MsgRegisterCounterpartyPayee
+        - MsgPayPacketFee
+        - MsgPayPacketFeeAsync
+        - MsgTransfer
+        - MsgCreateClient
+        - MsgUpdateClient
+        - MsgUpgradeClient
+        - MsgSubmitMisbehaviour
+        - MsgConnectionOpenInit
+        - MsgConnectionOpenTry
+        - MsgConnectionOpenAck
+        - MsgConnectionOpenConfirm
+        - MsgChannelOpenInit
+        - MsgChannelOpenTry
+        - MsgChannelOpenAck
+        - MsgChannelOpenConfirm
+        - MsgChannelCloseInit
+        - MsgChannelCloseConfirm
+        - MsgRecvPacket
+        - MsgTimeout
+        - MsgTimeoutOnClose
+        - MsgAcknowledgement
         in: query
         name: msg_type
         type: string

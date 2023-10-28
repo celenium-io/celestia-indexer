@@ -47,6 +47,61 @@ package types
 		MsgDeposit,
 
 		IBCTransfer,
+
+		MsgVerifyInvariant,
+
+		MsgSubmitEvidence,
+
+		MsgSendNFT,
+
+		MsgCreateGroup,
+		MsgUpdateGroupMembers,
+		MsgUpdateGroupAdmin,
+		MsgUpdateGroupMetadata,
+		MsgCreateGroupPolicy,
+		MsgUpdateGroupPolicyAdmin,
+		MsgCreateGroupWithPolicy,
+		MsgUpdateGroupPolicyDecisionPolicy,
+		MsgUpdateGroupPolicyMetadata,
+		MsgSubmitProposalGroup,
+		MsgWithdrawProposal,
+		MsgVoteGroup,
+		MsgExecGroup,
+		MsgLeaveGroup,
+
+		MsgSoftwareUpgrade,
+		MsgCancelUpgrade,
+
+		MsgRegisterInterchainAccount,
+		MsgSendTx,
+
+		MsgRegisterPayee,
+		MsgRegisterCounterpartyPayee,
+		MsgPayPacketFee,
+		MsgPayPacketFeeAsync,
+
+		MsgTransfer,
+
+		MsgCreateClient,
+		MsgUpdateClient,
+		MsgUpgradeClient,
+		MsgSubmitMisbehaviour,
+
+		MsgConnectionOpenInit,
+		MsgConnectionOpenTry,
+		MsgConnectionOpenAck,
+		MsgConnectionOpenConfirm,
+
+		MsgChannelOpenInit,
+		MsgChannelOpenTry,
+		MsgChannelOpenAck,
+		MsgChannelOpenConfirm,
+		MsgChannelCloseInit,
+		MsgChannelCloseConfirm,
+		MsgRecvPacket,
+		MsgTimeout,
+		MsgTimeoutOnClose,
+		MsgAcknowledgement,
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix

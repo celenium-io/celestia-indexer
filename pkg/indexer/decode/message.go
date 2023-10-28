@@ -6,7 +6,16 @@ package decode
 import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/handle"
 	"github.com/cosmos/cosmos-sdk/x/authz"
+	crisisTypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
+	evidenceTypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
+	"github.com/cosmos/cosmos-sdk/x/group"
+	"github.com/cosmos/cosmos-sdk/x/nft"
+	upgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	interchainAccounts "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/controller/types"
+	fee "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/types"
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
+	coreClient "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
+	coreConnection "github.com/cosmos/ibc-go/v6/modules/core/03-connection/types"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -137,6 +146,94 @@ func Message(
 	// ibc module
 	case *ibcTypes.MsgTransfer:
 		d.Msg.Type, d.Msg.Addresses, err = handle.IBCTransfer(height, typedMsg)
+
+	// crisis module
+	case *crisisTypes.MsgVerifyInvariant:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgVerifyInvariant(height, typedMsg)
+
+	// evidence module
+	case *evidenceTypes.MsgSubmitEvidence:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitEvidence(height, typedMsg)
+
+	// nft module
+	case *nft.MsgSend:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSendNFT(height, typedMsg)
+
+	// group module
+	case *group.MsgCreateGroup:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateGroup(height, typedMsg)
+	case *group.MsgUpdateGroupMembers:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateGroupMembers(height, typedMsg)
+	case *group.MsgUpdateGroupAdmin:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateGroupAdmin(height, typedMsg)
+	case *group.MsgUpdateGroupMetadata:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateGroupMetadata(height, typedMsg)
+	case *group.MsgCreateGroupPolicy:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateGroupPolicy(height, typedMsg)
+	case *group.MsgUpdateGroupPolicyAdmin:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateGroupPolicyAdmin(height, typedMsg)
+	case *group.MsgCreateGroupWithPolicy:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateGroupWithPolicy(height, typedMsg)
+	case *group.MsgUpdateGroupPolicyDecisionPolicy:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateGroupPolicyDecisionPolicy(height, typedMsg)
+	case *group.MsgUpdateGroupPolicyMetadata:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateGroupPolicyMetadata(height, typedMsg)
+	case *group.MsgSubmitProposal:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitProposalGroup(height, typedMsg)
+	case *group.MsgWithdrawProposal:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgWithdrawProposal(height, typedMsg)
+	case *group.MsgVote:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgVoteGroup(height, typedMsg)
+	case *group.MsgExec:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgExecGroup(height, typedMsg)
+	case *group.MsgLeaveGroup:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgLeaveGroup(height, typedMsg)
+
+	// upgrade module
+	case *upgrade.MsgSoftwareUpgrade:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSoftwareUpgrade(height, typedMsg)
+	case *upgrade.MsgCancelUpgrade:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCancelUpgrade(height, typedMsg)
+
+	// interchainAccounts module
+	case *interchainAccounts.MsgRegisterInterchainAccount:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRegisterInterchainAccount(height, typedMsg)
+	case *interchainAccounts.MsgSendTx:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSendTx(height, typedMsg)
+
+	// fee module
+	case *fee.MsgRegisterPayee:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRegisterPayee(height, typedMsg)
+	case *fee.MsgRegisterCounterpartyPayee:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRegisterCounterpartyPayee(height, typedMsg)
+	case *fee.MsgPayPacketFee:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgPayPacketFee(height, typedMsg)
+	case *fee.MsgPayPacketFeeAsync:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgPayPacketFeeAsync()
+
+	// transfer module
+	// case *transferTypes.MsgTransfer:
+	// 	d.Msg.Type, d.Msg.Addresses, err = handle.MsgTransfer()
+
+	// coreClient module
+	case *coreClient.MsgCreateClient:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateClient(height, typedMsg)
+	case *coreClient.MsgUpdateClient:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateClient(height, typedMsg)
+	case *coreClient.MsgUpgradeClient:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpgradeClient(height, typedMsg)
+	case *coreClient.MsgSubmitMisbehaviour:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitMisbehaviour(height, typedMsg)
+
+	// coreConnection module
+	case *coreConnection.MsgConnectionOpenInit:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgConnectionOpenInit(height, typedMsg)
+	case *coreConnection.MsgConnectionOpenTry:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgConnectionOpenTry(height, typedMsg)
+	case *coreConnection.MsgConnectionOpenAck:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgConnectionOpenAck(height, typedMsg)
+	case *coreConnection.MsgConnectionOpenConfirm:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgConnectionOpenConfirm(height, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)
