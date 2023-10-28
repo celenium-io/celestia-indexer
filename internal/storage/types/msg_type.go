@@ -102,7 +102,6 @@ package types
 		MsgTimeout,
 		MsgTimeoutOnClose,
 		MsgAcknowledgement,
-
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix
