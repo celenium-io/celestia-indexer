@@ -14,6 +14,7 @@ import (
 	interchainAccounts "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/controller/types"
 	fee "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/types"
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
+	coreClient "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -208,6 +209,20 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgPayPacketFee(height, typedMsg)
 	case *fee.MsgPayPacketFeeAsync:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgPayPacketFeeAsync()
+
+	// transfer module
+	// case *transferTypes.MsgTransfer:
+	// 	d.Msg.Type, d.Msg.Addresses, err = handle.MsgTransfer()
+
+	// coreClient module
+	case *coreClient.MsgCreateClient:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateClient(height, typedMsg)
+	case *coreClient.MsgUpdateClient:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateClient(height, typedMsg)
+	case *coreClient.MsgUpgradeClient:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpgradeClient(height, typedMsg)
+	case *coreClient.MsgSubmitMisbehaviour:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitMisbehaviour(height, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)
