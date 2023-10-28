@@ -15,6 +15,7 @@ import (
 	fee "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/types"
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 	coreClient "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
+	coreConnection "github.com/cosmos/ibc-go/v6/modules/core/03-connection/types"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -223,6 +224,16 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpgradeClient(height, typedMsg)
 	case *coreClient.MsgSubmitMisbehaviour:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitMisbehaviour(height, typedMsg)
+
+	// coreConnection module
+	case *coreConnection.MsgConnectionOpenInit:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgConnectionOpenInit(height, typedMsg)
+	case *coreConnection.MsgConnectionOpenTry:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgConnectionOpenTry(height, typedMsg)
+	case *coreConnection.MsgConnectionOpenAck:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgConnectionOpenAck(height, typedMsg)
+	case *coreConnection.MsgConnectionOpenConfirm:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgConnectionOpenConfirm(height, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)
