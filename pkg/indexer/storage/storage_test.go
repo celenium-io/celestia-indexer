@@ -12,6 +12,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	indexerCfg "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/go-lib/database"
@@ -93,6 +94,7 @@ func (s *ModuleTestSuite) TestBlockLast() {
 		VersionBlock: 11,
 		VersionApp:   1,
 		Time:         time.Date(2023, 7, 4, 3, 11, 26, 0, time.UTC),
+		MessageTypes: types.NewMsgTypeBitMask(),
 	})
 	time.Sleep(time.Second)
 

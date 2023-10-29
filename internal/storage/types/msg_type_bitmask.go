@@ -6,6 +6,7 @@ package types
 import (
 	"database/sql"
 	"database/sql/driver"
+	"fmt"
 
 	"github.com/pkg/errors"
 )
@@ -14,8 +15,12 @@ type MsgTypeBits struct {
 	Bits
 }
 
+func NewMsgTypeBits() MsgTypeBits {
+	return MsgTypeBits{NewEmptyBits()}
+}
+
 const (
-	MsgTypeBitsUnknown uint64 = 1 << iota
+	MsgTypeBitsUnknown int = iota
 
 	MsgTypeBitsSetWithdrawAddress
 	MsgTypeBitsWithdrawDelegatorReward
@@ -101,189 +106,189 @@ const (
 	MsgTypeBitsConnectionOpenAck
 	MsgTypeBitsConnectionOpenConfirm
 
-	// MsgTypeBitsChannelOpenInit
-	// MsgTypeBitsChannelOpenTry
-	// MsgTypeBitsChannelOpenAck
-	// MsgTypeBitsChannelOpenConfirm
-	// MsgTypeBitsChannelCloseInit
-	// MsgTypeBitsChannelCloseConfirm
-	// MsgTypeBitsRecvPacket
-	// MsgTypeBitsTimeout
-	// MsgTypeBitsTimeoutOnClose
-	// MsgTypeBitsAcknowledgement
+	MsgTypeBitsChannelOpenInit
+	MsgTypeBitsChannelOpenTry
+	MsgTypeBitsChannelOpenAck
+	MsgTypeBitsChannelOpenConfirm
+	MsgTypeBitsChannelCloseInit
+	MsgTypeBitsChannelCloseConfirm
+	MsgTypeBitsRecvPacket
+	MsgTypeBitsTimeout
+	MsgTypeBitsTimeoutOnClose
+	MsgTypeBitsAcknowledgement
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
-	var mask MsgTypeBits
+	mask := NewMsgTypeBits()
 	for i := range values {
-		mask.SetBit(values[i])
+		mask.SetByMsgType(values[i])
 	}
 	return mask
 }
 
-func (mask *MsgTypeBits) SetBit(value MsgType) {
+func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 	switch value {
 	case MsgUnknown:
-		mask.Set(Bits(MsgTypeBitsUnknown))
+		mask.SetBit(MsgTypeBitsUnknown)
 
 	case MsgSetWithdrawAddress:
-		mask.Set(Bits(MsgTypeBitsSetWithdrawAddress))
+		mask.SetBit(MsgTypeBitsSetWithdrawAddress)
 	case MsgWithdrawDelegatorReward:
-		mask.Set(Bits(MsgTypeBitsWithdrawDelegatorReward))
+		mask.SetBit(MsgTypeBitsWithdrawDelegatorReward)
 	case MsgWithdrawValidatorCommission:
-		mask.Set(Bits(MsgTypeBitsWithdrawValidatorCommission))
+		mask.SetBit(MsgTypeBitsWithdrawValidatorCommission)
 	case MsgFundCommunityPool:
-		mask.Set(Bits(MsgTypeBitsFundCommunityPool))
+		mask.SetBit(MsgTypeBitsFundCommunityPool)
 
 	case MsgCreateValidator:
-		mask.Set(Bits(MsgTypeBitsCreateValidator))
+		mask.SetBit(MsgTypeBitsCreateValidator)
 	case MsgEditValidator:
-		mask.Set(Bits(MsgTypeBitsEditValidator))
+		mask.SetBit(MsgTypeBitsEditValidator)
 	case MsgDelegate:
-		mask.Set(Bits(MsgTypeBitsDelegate))
+		mask.SetBit(MsgTypeBitsDelegate)
 	case MsgBeginRedelegate:
-		mask.Set(Bits(MsgTypeBitsBeginRedelegate))
+		mask.SetBit(MsgTypeBitsBeginRedelegate)
 	case MsgUndelegate:
-		mask.Set(Bits(MsgTypeBitsUndelegate))
+		mask.SetBit(MsgTypeBitsUndelegate)
 	case MsgCancelUnbondingDelegation:
-		mask.Set(Bits(MsgTypeBitsCancelUnbondingDelegation))
+		mask.SetBit(MsgTypeBitsCancelUnbondingDelegation)
 
 	case MsgUnjail:
-		mask.Set(Bits(MsgTypeBitsUnjail))
+		mask.SetBit(MsgTypeBitsUnjail)
 
 	case MsgSend:
-		mask.Set(Bits(MsgTypeBitsSend))
+		mask.SetBit(MsgTypeBitsSend)
 	case MsgMultiSend:
-		mask.Set(Bits(MsgTypeBitsMultiSend))
+		mask.SetBit(MsgTypeBitsMultiSend)
 
 	case MsgCreateVestingAccount:
-		mask.Set(Bits(MsgTypeBitsCreateVestingAccount))
+		mask.SetBit(MsgTypeBitsCreateVestingAccount)
 	case MsgCreatePermanentLockedAccount:
-		mask.Set(Bits(MsgTypeBitsCreatePermanentLockedAccount))
+		mask.SetBit(MsgTypeBitsCreatePermanentLockedAccount)
 	case MsgCreatePeriodicVestingAccount:
-		mask.Set(Bits(MsgTypeBitsCreatePeriodicVestingAccount))
+		mask.SetBit(MsgTypeBitsCreatePeriodicVestingAccount)
 
 	case MsgPayForBlobs:
-		mask.Set(Bits(MsgTypeBitsPayForBlobs))
+		mask.SetBit(MsgTypeBitsPayForBlobs)
 
 	case MsgGrant:
-		mask.Set(Bits(MsgTypeBitsGrant))
+		mask.SetBit(MsgTypeBitsGrant)
 	case MsgExec:
-		mask.Set(Bits(MsgTypeBitsExec))
+		mask.SetBit(MsgTypeBitsExec)
 	case MsgRevoke:
-		mask.Set(Bits(MsgTypeBitsRevoke))
+		mask.SetBit(MsgTypeBitsRevoke)
 
 	case MsgGrantAllowance:
-		mask.Set(Bits(MsgTypeBitsGrantAllowance))
+		mask.SetBit(MsgTypeBitsGrantAllowance)
 	case MsgRevokeAllowance:
-		mask.Set(Bits(MsgTypeBitsRevokeAllowance))
+		mask.SetBit(MsgTypeBitsRevokeAllowance)
 
 	case MsgRegisterEVMAddress:
-		mask.Set(Bits(MsgTypeBitsRegisterEVMAddress))
+		mask.SetBit(MsgTypeBitsRegisterEVMAddress)
 
 	case MsgSubmitProposal:
-		mask.Set(Bits(MsgTypeBitsSubmitProposal))
+		mask.SetBit(MsgTypeBitsSubmitProposal)
 	case MsgExecLegacyContent:
-		mask.Set(Bits(MsgTypeBitsExecLegacyContent))
+		mask.SetBit(MsgTypeBitsExecLegacyContent)
 	case MsgVote:
-		mask.Set(Bits(MsgTypeBitsVote))
+		mask.SetBit(MsgTypeBitsVote)
 	case MsgVoteWeighted:
-		mask.Set(Bits(MsgTypeBitsVoteWeighted))
+		mask.SetBit(MsgTypeBitsVoteWeighted)
 	case MsgDeposit:
-		mask.Set(Bits(MsgTypeBitsDeposit))
+		mask.SetBit(MsgTypeBitsDeposit)
 	case IBCTransfer:
-		mask.Set(Bits(MsgTypeBitsIBCTransfer))
+		mask.SetBit(MsgTypeBitsIBCTransfer)
 	case MsgVerifyInvariant:
-		mask.Set(Bits(MsgTypeBitsVerifyInvariant))
+		mask.SetBit(MsgTypeBitsVerifyInvariant)
 	case MsgSubmitEvidence:
-		mask.Set(Bits(MsgTypeBitsSubmitEvidence))
+		mask.SetBit(MsgTypeBitsSubmitEvidence)
 	case MsgSendNFT:
-		mask.Set(Bits(MsgTypeBitsSendNFT))
+		mask.SetBit(MsgTypeBitsSendNFT)
 
 	case MsgCreateGroup:
-		mask.Set(Bits(MsgTypeBitsCreateGroup))
+		mask.SetBit(MsgTypeBitsCreateGroup)
 	case MsgUpdateGroupMembers:
-		mask.Set(Bits(MsgTypeBitsUpdateGroupMembers))
+		mask.SetBit(MsgTypeBitsUpdateGroupMembers)
 	case MsgUpdateGroupAdmin:
-		mask.Set(Bits(MsgTypeBitsUpdateGroupAdmin))
+		mask.SetBit(MsgTypeBitsUpdateGroupAdmin)
 	case MsgUpdateGroupMetadata:
-		mask.Set(Bits(MsgTypeBitsUpdateGroupMetadata))
+		mask.SetBit(MsgTypeBitsUpdateGroupMetadata)
 	case MsgCreateGroupPolicy:
-		mask.Set(Bits(MsgTypeBitsCreateGroupPolicy))
+		mask.SetBit(MsgTypeBitsCreateGroupPolicy)
 	case MsgUpdateGroupPolicyAdmin:
-		mask.Set(Bits(MsgTypeBitsUpdateGroupPolicyAdmin))
+		mask.SetBit(MsgTypeBitsUpdateGroupPolicyAdmin)
 	case MsgCreateGroupWithPolicy:
-		mask.Set(Bits(MsgTypeBitsCreateGroupWithPolicy))
+		mask.SetBit(MsgTypeBitsCreateGroupWithPolicy)
 	case MsgUpdateGroupPolicyDecisionPolicy:
-		mask.Set(Bits(MsgTypeBitsUpdateGroupPolicyDecisionPolicy))
+		mask.SetBit(MsgTypeBitsUpdateGroupPolicyDecisionPolicy)
 	case MsgUpdateGroupPolicyMetadata:
-		mask.Set(Bits(MsgTypeBitsUpdateGroupPolicyMetadata))
+		mask.SetBit(MsgTypeBitsUpdateGroupPolicyMetadata)
 	case MsgSubmitProposalGroup:
-		mask.Set(Bits(MsgTypeBitsSubmitProposalGroup))
+		mask.SetBit(MsgTypeBitsSubmitProposalGroup)
 	case MsgWithdrawProposal:
-		mask.Set(Bits(MsgTypeBitsWithdrawProposal))
+		mask.SetBit(MsgTypeBitsWithdrawProposal)
 	case MsgVoteGroup:
-		mask.Set(Bits(MsgTypeBitsVoteGroup))
+		mask.SetBit(MsgTypeBitsVoteGroup)
 	case MsgExecGroup:
-		mask.Set(Bits(MsgTypeBitsExecGroup))
+		mask.SetBit(MsgTypeBitsExecGroup)
 	case MsgLeaveGroup:
-		mask.Set(Bits(MsgTypeBitsLeaveGroup))
+		mask.SetBit(MsgTypeBitsLeaveGroup)
 
 	case MsgSoftwareUpgrade:
-		mask.Set(Bits(MsgTypeBitsSoftwareUpgrade))
+		mask.SetBit(MsgTypeBitsSoftwareUpgrade)
 	case MsgCancelUpgrade:
-		mask.Set(Bits(MsgTypeBitsCancelUpgrade))
+		mask.SetBit(MsgTypeBitsCancelUpgrade)
 	case MsgRegisterInterchainAccount:
-		mask.Set(Bits(MsgTypeBitsRegisterInterchainAccount))
+		mask.SetBit(MsgTypeBitsRegisterInterchainAccount)
 	case MsgSendTx:
-		mask.Set(Bits(MsgTypeBitsSendTx))
+		mask.SetBit(MsgTypeBitsSendTx)
 	case MsgRegisterPayee:
-		mask.Set(Bits(MsgTypeBitsRegisterPayee))
+		mask.SetBit(MsgTypeBitsRegisterPayee)
 	case MsgRegisterCounterpartyPayee:
-		mask.Set(Bits(MsgTypeBitsRegisterCounterpartyPayee))
+		mask.SetBit(MsgTypeBitsRegisterCounterpartyPayee)
 	case MsgPayPacketFee:
-		mask.Set(Bits(MsgTypeBitsPayPacketFee))
+		mask.SetBit(MsgTypeBitsPayPacketFee)
 	case MsgPayPacketFeeAsync:
-		mask.Set(Bits(MsgTypeBitsPayPacketFeeAsync))
+		mask.SetBit(MsgTypeBitsPayPacketFeeAsync)
 	case MsgTransfer:
-		mask.Set(Bits(MsgTypeBitsTransfer))
+		mask.SetBit(MsgTypeBitsTransfer)
 	case MsgCreateClient:
-		mask.Set(Bits(MsgTypeBitsCreateClient))
+		mask.SetBit(MsgTypeBitsCreateClient)
 	case MsgUpdateClient:
-		mask.Set(Bits(MsgTypeBitsUpdateClient))
+		mask.SetBit(MsgTypeBitsUpdateClient)
 	case MsgUpgradeClient:
-		mask.Set(Bits(MsgTypeBitsUpgradeClient))
+		mask.SetBit(MsgTypeBitsUpgradeClient)
 	case MsgSubmitMisbehaviour:
-		mask.Set(Bits(MsgTypeBitsSubmitMisbehaviour))
+		mask.SetBit(MsgTypeBitsSubmitMisbehaviour)
 	case MsgConnectionOpenInit:
-		mask.Set(Bits(MsgTypeBitsConnectionOpenInit))
+		mask.SetBit(MsgTypeBitsConnectionOpenInit)
 	case MsgConnectionOpenTry:
-		mask.Set(Bits(MsgTypeBitsConnectionOpenTry))
+		mask.SetBit(MsgTypeBitsConnectionOpenTry)
 	case MsgConnectionOpenAck:
-		mask.Set(Bits(MsgTypeBitsConnectionOpenAck))
+		mask.SetBit(MsgTypeBitsConnectionOpenAck)
 	case MsgConnectionOpenConfirm:
-		mask.Set(Bits(MsgTypeBitsConnectionOpenConfirm))
+		mask.SetBit(MsgTypeBitsConnectionOpenConfirm)
 
-		// case MsgChannelOpenInit:
-		// 	mask.Set(Bits(MsgTypeBitsChannelOpenInit))
-		// case MsgChannelOpenTry:
-		// 	mask.Set(Bits(MsgTypeBitsChannelOpenTry))
-		// case MsgChannelOpenAck:
-		// 	mask.Set(Bits(MsgTypeBitsChannelOpenAck))
-		// case MsgChannelOpenConfirm:
-		// 	mask.Set(Bits(MsgTypeBitsChannelOpenConfirm))
-		// case MsgChannelCloseInit:
-		// 	mask.Set(Bits(MsgTypeBitsChannelCloseInit))
-		// case MsgChannelCloseConfirm:
-		// 	mask.Set(Bits(MsgTypeBitsChannelCloseConfirm))
-		// case MsgRecvPacket:
-		// 	mask.Set(Bits(MsgTypeBitsRecvPacket))
-		// case MsgTimeout:
-		// 	mask.Set(Bits(MsgTypeBitsTimeout))
-		// case MsgTimeoutOnClose:
-		// 	mask.Set(Bits(MsgTypeBitsTimeoutOnClose))
-		// case MsgAcknowledgement:
-		// 	mask.Set(Bits(MsgTypeBitsAcknowledgement))
+	case MsgChannelOpenInit:
+		mask.SetBit(MsgTypeBitsChannelOpenInit)
+	case MsgChannelOpenTry:
+		mask.SetBit(MsgTypeBitsChannelOpenTry)
+	case MsgChannelOpenAck:
+		mask.SetBit(MsgTypeBitsChannelOpenAck)
+	case MsgChannelOpenConfirm:
+		mask.SetBit(MsgTypeBitsChannelOpenConfirm)
+	case MsgChannelCloseInit:
+		mask.SetBit(MsgTypeBitsChannelCloseInit)
+	case MsgChannelCloseConfirm:
+		mask.SetBit(MsgTypeBitsChannelCloseConfirm)
+	case MsgRecvPacket:
+		mask.SetBit(MsgTypeBitsRecvPacket)
+	case MsgTimeout:
+		mask.SetBit(MsgTypeBitsTimeout)
+	case MsgTimeoutOnClose:
+		mask.SetBit(MsgTypeBitsTimeoutOnClose)
+	case MsgAcknowledgement:
+		mask.SetBit(MsgTypeBitsAcknowledgement)
 	}
 }
 
@@ -291,334 +296,337 @@ func (mask MsgTypeBits) Names() []MsgType {
 	names := make([]MsgType, mask.CountBits())
 	var i int
 
-	if mask.Has(Bits(MsgTypeBitsUnknown)) {
+	if mask.HasBit(MsgTypeBitsUnknown) {
 		names[i] = MsgUnknown
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsSetWithdrawAddress)) {
+	if mask.HasBit(MsgTypeBitsSetWithdrawAddress) {
 		names[i] = MsgSetWithdrawAddress
 	}
-	if mask.Has(Bits(MsgTypeBitsWithdrawDelegatorReward)) {
+	if mask.HasBit(MsgTypeBitsWithdrawDelegatorReward) {
 		names[i] = MsgWithdrawDelegatorReward
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsWithdrawValidatorCommission)) {
+	if mask.HasBit(MsgTypeBitsWithdrawValidatorCommission) {
 		names[i] = MsgWithdrawValidatorCommission
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsFundCommunityPool)) {
+	if mask.HasBit(MsgTypeBitsFundCommunityPool) {
 		names[i] = MsgFundCommunityPool
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsCreateValidator)) {
+	if mask.HasBit(MsgTypeBitsCreateValidator) {
 		names[i] = MsgCreateValidator
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsEditValidator)) {
+	if mask.HasBit(MsgTypeBitsEditValidator) {
 		names[i] = MsgEditValidator
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsDelegate)) {
+	if mask.HasBit(MsgTypeBitsDelegate) {
 		names[i] = MsgDelegate
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsBeginRedelegate)) {
+	if mask.HasBit(MsgTypeBitsBeginRedelegate) {
 		names[i] = MsgBeginRedelegate
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsUndelegate)) {
+	if mask.HasBit(MsgTypeBitsUndelegate) {
 		names[i] = MsgUndelegate
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsCancelUnbondingDelegation)) {
+	if mask.HasBit(MsgTypeBitsCancelUnbondingDelegation) {
 		names[i] = MsgCancelUnbondingDelegation
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsUnjail)) {
+	if mask.HasBit(MsgTypeBitsUnjail) {
 		names[i] = MsgUnjail
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsSend)) {
+	if mask.HasBit(MsgTypeBitsSend) {
 		names[i] = MsgSend
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsMultiSend)) {
+	if mask.HasBit(MsgTypeBitsMultiSend) {
 		names[i] = MsgMultiSend
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsCreateVestingAccount)) {
+	if mask.HasBit(MsgTypeBitsCreateVestingAccount) {
 		names[i] = MsgCreateVestingAccount
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsCreatePermanentLockedAccount)) {
+	if mask.HasBit(MsgTypeBitsCreatePermanentLockedAccount) {
 		names[i] = MsgCreatePermanentLockedAccount
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsCreatePeriodicVestingAccount)) {
+	if mask.HasBit(MsgTypeBitsCreatePeriodicVestingAccount) {
 		names[i] = MsgCreatePeriodicVestingAccount
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsPayForBlobs)) {
+	if mask.HasBit(MsgTypeBitsPayForBlobs) {
 		names[i] = MsgPayForBlobs
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsGrant)) {
+	if mask.HasBit(MsgTypeBitsGrant) {
 		names[i] = MsgGrant
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsExec)) {
+	if mask.HasBit(MsgTypeBitsExec) {
 		names[i] = MsgExec
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsRevoke)) {
+	if mask.HasBit(MsgTypeBitsRevoke) {
 		names[i] = MsgRevoke
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsGrantAllowance)) {
+	if mask.HasBit(MsgTypeBitsGrantAllowance) {
 		names[i] = MsgGrantAllowance
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsRevokeAllowance)) {
+	if mask.HasBit(MsgTypeBitsRevokeAllowance) {
 		names[i] = MsgRevokeAllowance
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsRegisterEVMAddress)) {
+	if mask.HasBit(MsgTypeBitsRegisterEVMAddress) {
 		names[i] = MsgRegisterEVMAddress
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsSubmitProposal)) {
+	if mask.HasBit(MsgTypeBitsSubmitProposal) {
 		names[i] = MsgSubmitProposal
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsExecLegacyContent)) {
+	if mask.HasBit(MsgTypeBitsExecLegacyContent) {
 		names[i] = MsgExecLegacyContent
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsVote)) {
+	if mask.HasBit(MsgTypeBitsVote) {
 		names[i] = MsgVote
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsVoteWeighted)) {
+	if mask.HasBit(MsgTypeBitsVoteWeighted) {
 		names[i] = MsgVoteWeighted
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsDeposit)) {
+	if mask.HasBit(MsgTypeBitsDeposit) {
 		names[i] = MsgDeposit
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsIBCTransfer)) {
+	if mask.HasBit(MsgTypeBitsIBCTransfer) {
 		names[i] = IBCTransfer
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsVerifyInvariant)) {
+	if mask.HasBit(MsgTypeBitsVerifyInvariant) {
 		names[i] = MsgVerifyInvariant
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsSubmitEvidence)) {
+	if mask.HasBit(MsgTypeBitsSubmitEvidence) {
 		names[i] = MsgSubmitEvidence
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsSendNFT)) {
+	if mask.HasBit(MsgTypeBitsSendNFT) {
 		names[i] = MsgSendNFT
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsCreateGroup)) {
+	if mask.HasBit(MsgTypeBitsCreateGroup) {
 		names[i] = MsgCreateGroup
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsUpdateGroupMembers)) {
+	if mask.HasBit(MsgTypeBitsUpdateGroupMembers) {
 		names[i] = MsgUpdateGroupMembers
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsUpdateGroupAdmin)) {
+	if mask.HasBit(MsgTypeBitsUpdateGroupAdmin) {
 		names[i] = MsgUpdateGroupAdmin
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsUpdateGroupMetadata)) {
+	if mask.HasBit(MsgTypeBitsUpdateGroupMetadata) {
 		names[i] = MsgUpdateGroupMetadata
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsCreateGroupPolicy)) {
+	if mask.HasBit(MsgTypeBitsCreateGroupPolicy) {
 		names[i] = MsgCreateGroupPolicy
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsUpdateGroupPolicyAdmin)) {
+	if mask.HasBit(MsgTypeBitsUpdateGroupPolicyAdmin) {
 		names[i] = MsgUpdateGroupPolicyAdmin
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsCreateGroupWithPolicy)) {
+	if mask.HasBit(MsgTypeBitsCreateGroupWithPolicy) {
 		names[i] = MsgCreateGroupWithPolicy
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsUpdateGroupPolicyDecisionPolicy)) {
+	if mask.HasBit(MsgTypeBitsUpdateGroupPolicyDecisionPolicy) {
 		names[i] = MsgUpdateGroupPolicyDecisionPolicy
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsUpdateGroupPolicyMetadata)) {
+	if mask.HasBit(MsgTypeBitsUpdateGroupPolicyMetadata) {
 		names[i] = MsgUpdateGroupPolicyMetadata
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsSubmitProposalGroup)) {
+	if mask.HasBit(MsgTypeBitsSubmitProposalGroup) {
 		names[i] = MsgSubmitProposalGroup
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsWithdrawProposal)) {
+	if mask.HasBit(MsgTypeBitsWithdrawProposal) {
 		names[i] = MsgWithdrawProposal
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsVoteGroup)) {
+	if mask.HasBit(MsgTypeBitsVoteGroup) {
 		names[i] = MsgVoteGroup
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsExecGroup)) {
+	if mask.HasBit(MsgTypeBitsExecGroup) {
 		names[i] = MsgExecGroup
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsLeaveGroup)) {
+	if mask.HasBit(MsgTypeBitsLeaveGroup) {
 		names[i] = MsgLeaveGroup
 		i++
 	}
 
-	if mask.Has(Bits(MsgTypeBitsSoftwareUpgrade)) {
+	if mask.HasBit(MsgTypeBitsSoftwareUpgrade) {
 		names[i] = MsgSoftwareUpgrade
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsCancelUpgrade)) {
+	if mask.HasBit(MsgTypeBitsCancelUpgrade) {
 		names[i] = MsgCancelUpgrade
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsRegisterInterchainAccount)) {
+	if mask.HasBit(MsgTypeBitsRegisterInterchainAccount) {
 		names[i] = MsgRegisterInterchainAccount
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsSendTx)) {
+	if mask.HasBit(MsgTypeBitsSendTx) {
 		names[i] = MsgSendTx
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsRegisterPayee)) {
+	if mask.HasBit(MsgTypeBitsRegisterPayee) {
 		names[i] = MsgRegisterPayee
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsRegisterCounterpartyPayee)) {
+	if mask.HasBit(MsgTypeBitsRegisterCounterpartyPayee) {
 		names[i] = MsgRegisterCounterpartyPayee
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsPayPacketFee)) {
+	if mask.HasBit(MsgTypeBitsPayPacketFee) {
 		names[i] = MsgPayPacketFee
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsPayPacketFeeAsync)) {
+	if mask.HasBit(MsgTypeBitsPayPacketFeeAsync) {
 		names[i] = MsgPayPacketFeeAsync
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsTransfer)) {
+	if mask.HasBit(MsgTypeBitsTransfer) {
 		names[i] = MsgTransfer
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsCreateClient)) {
+	if mask.HasBit(MsgTypeBitsCreateClient) {
 		names[i] = MsgCreateClient
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsUpdateClient)) {
+	if mask.HasBit(MsgTypeBitsUpdateClient) {
 		names[i] = MsgUpdateClient
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsUpgradeClient)) {
+	if mask.HasBit(MsgTypeBitsUpgradeClient) {
 		names[i] = MsgUpgradeClient
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsSubmitMisbehaviour)) {
+	if mask.HasBit(MsgTypeBitsSubmitMisbehaviour) {
 		names[i] = MsgSubmitMisbehaviour
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsConnectionOpenInit)) {
+	if mask.HasBit(MsgTypeBitsConnectionOpenInit) {
 		names[i] = MsgConnectionOpenInit
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsConnectionOpenTry)) {
+	if mask.HasBit(MsgTypeBitsConnectionOpenTry) {
 		names[i] = MsgConnectionOpenTry
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsConnectionOpenAck)) {
+	if mask.HasBit(MsgTypeBitsConnectionOpenAck) {
 		names[i] = MsgConnectionOpenAck
 		i++
 	}
-	if mask.Has(Bits(MsgTypeBitsConnectionOpenConfirm)) {
+	if mask.HasBit(MsgTypeBitsConnectionOpenConfirm) {
 		names[i] = MsgConnectionOpenConfirm
-		// i++
+		i++
 	}
 
-	// if mask.Has(Bits(MsgTypeBitsChannelOpenInit)) {
-	// 	names[i] = MsgChannelOpenInit
-	// 	i++
-	// }
-	// if mask.Has(Bits(MsgTypeBitsChannelOpenTry)) {
-	// 	names[i] = MsgChannelOpenTry
-	// 	i++
-	// }
-	// if mask.Has(Bits(MsgTypeBitsChannelOpenAck)) {
-	// 	names[i] = MsgChannelOpenAck
-	// 	i++
-	// }
-	// if mask.Has(Bits(MsgTypeBitsChannelOpenConfirm)) {
-	// 	names[i] = MsgChannelOpenConfirm
-	// 	i++
-	// }
-	// if mask.Has(Bits(MsgTypeBitsChannelCloseInit)) {
-	// 	names[i] = MsgChannelCloseInit
-	// 	i++
-	// }
-	// if mask.Has(Bits(MsgTypeBitsChannelCloseConfirm)) {
-	// 	names[i] = MsgChannelCloseConfirm
-	// 	i++
-	// }
-	// if mask.Has(Bits(MsgTypeBitsRecvPacket)) {
-	// 	names[i] = MsgRecvPacket
-	// 	i++
-	// }
-	// if mask.Has(Bits(MsgTypeBitsTimeout)) {
-	// 	names[i] = MsgTimeout
-	// 	i++
-	// }
-	// if mask.Has(Bits(MsgTypeBitsTimeoutOnClose)) {
-	// 	names[i] = MsgTimeoutOnClose
-	// 	i++
-	// }
-	// if mask.Has(Bits(MsgTypeBitsAcknowledgement)) {
-	// 	names[i] = MsgAcknowledgement
-	// 	// i++
-	// }
+	if mask.HasBit(MsgTypeBitsChannelOpenInit) {
+		names[i] = MsgChannelOpenInit
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsChannelOpenTry) {
+		names[i] = MsgChannelOpenTry
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsChannelOpenAck) {
+		names[i] = MsgChannelOpenAck
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsChannelOpenConfirm) {
+		names[i] = MsgChannelOpenConfirm
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsChannelCloseInit) {
+		names[i] = MsgChannelCloseInit
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsChannelCloseConfirm) {
+		names[i] = MsgChannelCloseConfirm
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsRecvPacket) {
+		names[i] = MsgRecvPacket
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsTimeout) {
+		names[i] = MsgTimeout
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsTimeoutOnClose) {
+		names[i] = MsgTimeoutOnClose
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsAcknowledgement) {
+		names[i] = MsgAcknowledgement
+		// i++
+	}
 
 	return names
 }
 
 func (mask MsgTypeBits) HasOne(value MsgTypeBits) bool {
-	return mask.Bits&value.Bits > 0
+	return mask.value.And(mask.value, value.value).Cmp(zero) > 0
 }
 
 var _ sql.Scanner = (*MsgTypeBits)(nil)
 
 func (mask *MsgTypeBits) Scan(src interface{}) (err error) {
 	switch val := src.(type) {
-	case int64:
-		mask.Bits = Bits(val)
+	case []byte:
+		mask.Bits, err = NewBitsFromString(string(val))
+		if err != nil {
+			return err
+		}
 	case nil:
-		mask.Bits = 0
+		mask.Bits = NewEmptyBits()
 	default:
 		return errors.Errorf("unknown bits database type: %T", src)
 	}
@@ -628,5 +636,8 @@ func (mask *MsgTypeBits) Scan(src interface{}) (err error) {
 var _ driver.Valuer = (*MsgTypeBits)(nil)
 
 func (mask MsgTypeBits) Value() (driver.Value, error) {
-	return uint64(mask.Bits), nil
+	if mask.value == nil {
+		return fmt.Sprintf("%073b", 0), nil
+	}
+	return fmt.Sprintf("%073b", mask.value), nil
 }

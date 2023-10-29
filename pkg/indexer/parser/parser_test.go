@@ -36,7 +36,7 @@ func getExpectedBlock() storage.Block {
 		Time:               time.Time{},
 		VersionBlock:       1,
 		VersionApp:         2,
-		MessageTypes:       storageTypes.MsgTypeBits{},
+		MessageTypes:       storageTypes.NewMsgTypeBitMask(),
 		Hash:               types.Hex{0x0, 0x0, 0x0, 0x2},
 		ParentHash:         types.Hex{0x0, 0x0, 0x0, 0x1},
 		LastCommitHash:     types.Hex{0x0, 0x0, 0x1, 0x1},

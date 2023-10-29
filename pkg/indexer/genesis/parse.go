@@ -48,6 +48,7 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 			SupplyChange:  decimal.Zero,
 			InflationRate: decimal.Zero,
 		},
+		MessageTypes: storageTypes.NewMsgTypeBits(),
 	}
 
 	for index, genTx := range genesis.AppState.Genutil.GenTxs {
@@ -87,7 +88,8 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 			}
 
 			tx.Messages[msgIndex] = decoded.Msg
-			tx.MessageTypes.SetBit(decoded.Msg.Type)
+			tx.MessageTypes.SetByMsgType(decoded.Msg.Type)
+			block.MessageTypes.SetByMsgType(decoded.Msg.Type)
 			tx.BlobsSize += decoded.BlobsSize
 		}
 

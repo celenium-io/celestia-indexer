@@ -6,8 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "https://api.celestia.dipdup.net",
-    "basePath": "/v1",
+    "host": "api.celestia.dipdup.net",
     "paths": {
         "/v1/address": {
             "get": {

@@ -54,11 +54,11 @@ type Tx struct {
 	Fee           decimal.Decimal `bun:"fee,type:numeric"            comment:"Paid fee"                                          stats:"func:min max sum avg"`
 	Status        types.Status    `bun:"status,type:status"          comment:"Transaction status"                                stats:"filterable"`
 
-	Error        string            `bun:"error,type:text"         comment:"Error string if failed"`
-	Codespace    string            `bun:"codespace,type:text"     comment:"Codespace"                                    stats:"filterable"`
-	Hash         []byte            `bun:"hash"                    comment:"Transaction hash"`
-	Memo         string            `bun:"memo,type:text"          comment:"Note or comment to send with the transaction"`
-	MessageTypes types.MsgTypeBits `bun:"message_types,type:int8" comment:"Bit mask with containing messages"            stats:"filterable"`
+	Error        string            `bun:"error,type:text"            comment:"Error string if failed"`
+	Codespace    string            `bun:"codespace,type:text"        comment:"Codespace"                                    stats:"filterable"`
+	Hash         []byte            `bun:"hash"                       comment:"Transaction hash"`
+	Memo         string            `bun:"memo,type:text"             comment:"Note or comment to send with the transaction"`
+	MessageTypes types.MsgTypeBits `bun:"message_types,type:bit(73)" comment:"Bit mask with containing messages"            stats:"filterable"`
 
 	Messages []Message `bun:"rel:has-many,join:id=tx_id"`
 	Events   []Event   `bun:"rel:has-many"`

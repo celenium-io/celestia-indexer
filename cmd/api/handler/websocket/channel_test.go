@@ -12,6 +12,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -108,7 +109,8 @@ func BenchmarkProcessingMessage(b *testing.B) {
 			blockRepo.EXPECT().
 				GetByID(gomock.Any(), height).
 				Return(&storage.Block{
-					Height: types.Level(height),
+					Height:       types.Level(height),
+					MessageTypes: storageTypes.NewMsgTypeBits(),
 				}, nil).
 				MaxTimes(1)
 

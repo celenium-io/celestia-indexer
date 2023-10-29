@@ -11,310 +11,311 @@ import (
 
 func TestMsgTypeBits_Names(t *testing.T) {
 	tests := []struct {
-		name string
-		Bits Bits
-		want []MsgType
+		name    string
+		msgType int
+		want    []MsgType
 	}{
 		{
-			name: string(MsgUnknown),
-			Bits: Bits(MsgTypeBitsUnknown),
-			want: []MsgType{MsgUnknown},
+			name:    string(MsgUnknown),
+			msgType: MsgTypeBitsUnknown,
+			want:    []MsgType{MsgUnknown},
 		}, {
-			name: string(MsgSetWithdrawAddress),
-			Bits: Bits(MsgTypeBitsSetWithdrawAddress),
-			want: []MsgType{MsgSetWithdrawAddress},
+			name:    string(MsgSetWithdrawAddress),
+			msgType: MsgTypeBitsSetWithdrawAddress,
+			want:    []MsgType{MsgSetWithdrawAddress},
 		}, {
-			name: string(MsgWithdrawDelegatorReward),
-			Bits: Bits(MsgTypeBitsWithdrawDelegatorReward),
-			want: []MsgType{MsgWithdrawDelegatorReward},
+			name:    string(MsgWithdrawDelegatorReward),
+			msgType: MsgTypeBitsWithdrawDelegatorReward,
+			want:    []MsgType{MsgWithdrawDelegatorReward},
 		}, {
-			name: string(MsgWithdrawValidatorCommission),
-			Bits: Bits(MsgTypeBitsWithdrawValidatorCommission),
-			want: []MsgType{MsgWithdrawValidatorCommission},
+			name:    string(MsgWithdrawValidatorCommission),
+			msgType: MsgTypeBitsWithdrawValidatorCommission,
+			want:    []MsgType{MsgWithdrawValidatorCommission},
 		}, {
-			name: string(MsgFundCommunityPool),
-			Bits: Bits(MsgTypeBitsFundCommunityPool),
-			want: []MsgType{MsgFundCommunityPool},
+			name:    string(MsgFundCommunityPool),
+			msgType: MsgTypeBitsFundCommunityPool,
+			want:    []MsgType{MsgFundCommunityPool},
 		}, {
-			name: string(MsgCreateValidator),
-			Bits: Bits(MsgTypeBitsCreateValidator),
-			want: []MsgType{MsgCreateValidator},
+			name:    string(MsgCreateValidator),
+			msgType: MsgTypeBitsCreateValidator,
+			want:    []MsgType{MsgCreateValidator},
 		}, {
-			name: string(MsgEditValidator),
-			Bits: Bits(MsgTypeBitsEditValidator),
-			want: []MsgType{MsgEditValidator},
+			name:    string(MsgEditValidator),
+			msgType: MsgTypeBitsEditValidator,
+			want:    []MsgType{MsgEditValidator},
 		}, {
-			name: string(MsgDelegate),
-			Bits: Bits(MsgTypeBitsDelegate),
-			want: []MsgType{MsgDelegate},
+			name:    string(MsgDelegate),
+			msgType: MsgTypeBitsDelegate,
+			want:    []MsgType{MsgDelegate},
 		}, {
-			name: string(MsgBeginRedelegate),
-			Bits: Bits(MsgTypeBitsBeginRedelegate),
-			want: []MsgType{MsgBeginRedelegate},
+			name:    string(MsgBeginRedelegate),
+			msgType: MsgTypeBitsBeginRedelegate,
+			want:    []MsgType{MsgBeginRedelegate},
 		}, {
-			name: string(MsgUndelegate),
-			Bits: Bits(MsgTypeBitsUndelegate),
-			want: []MsgType{MsgUndelegate},
+			name:    string(MsgUndelegate),
+			msgType: MsgTypeBitsUndelegate,
+			want:    []MsgType{MsgUndelegate},
 		}, {
-			name: string(MsgCancelUnbondingDelegation),
-			Bits: Bits(MsgTypeBitsCancelUnbondingDelegation),
-			want: []MsgType{MsgCancelUnbondingDelegation},
+			name:    string(MsgCancelUnbondingDelegation),
+			msgType: MsgTypeBitsCancelUnbondingDelegation,
+			want:    []MsgType{MsgCancelUnbondingDelegation},
 		}, {
-			name: string(MsgUnjail),
-			Bits: Bits(MsgTypeBitsUnjail),
-			want: []MsgType{MsgUnjail},
+			name:    string(MsgUnjail),
+			msgType: MsgTypeBitsUnjail,
+			want:    []MsgType{MsgUnjail},
 		}, {
-			name: string(MsgSend),
-			Bits: Bits(MsgTypeBitsSend),
-			want: []MsgType{MsgSend},
+			name:    string(MsgSend),
+			msgType: MsgTypeBitsSend,
+			want:    []MsgType{MsgSend},
 		}, {
-			name: string(MsgMultiSend),
-			Bits: Bits(MsgTypeBitsMultiSend),
-			want: []MsgType{MsgMultiSend},
+			name:    string(MsgMultiSend),
+			msgType: MsgTypeBitsMultiSend,
+			want:    []MsgType{MsgMultiSend},
 		}, {
-			name: string(MsgCreateVestingAccount),
-			Bits: Bits(MsgTypeBitsCreateVestingAccount),
-			want: []MsgType{MsgCreateVestingAccount},
+			name:    string(MsgCreateVestingAccount),
+			msgType: MsgTypeBitsCreateVestingAccount,
+			want:    []MsgType{MsgCreateVestingAccount},
 		}, {
-			name: string(MsgCreatePermanentLockedAccount),
-			Bits: Bits(MsgTypeBitsCreatePermanentLockedAccount),
-			want: []MsgType{MsgCreatePermanentLockedAccount},
+			name:    string(MsgCreatePermanentLockedAccount),
+			msgType: MsgTypeBitsCreatePermanentLockedAccount,
+			want:    []MsgType{MsgCreatePermanentLockedAccount},
 		}, {
-			name: string(MsgCreatePeriodicVestingAccount),
-			Bits: Bits(MsgTypeBitsCreatePeriodicVestingAccount),
-			want: []MsgType{MsgCreatePeriodicVestingAccount},
+			name:    string(MsgCreatePeriodicVestingAccount),
+			msgType: MsgTypeBitsCreatePeriodicVestingAccount,
+			want:    []MsgType{MsgCreatePeriodicVestingAccount},
 		}, {
-			name: string(MsgPayForBlobs),
-			Bits: Bits(MsgTypeBitsPayForBlobs),
-			want: []MsgType{MsgPayForBlobs},
+			name:    string(MsgPayForBlobs),
+			msgType: MsgTypeBitsPayForBlobs,
+			want:    []MsgType{MsgPayForBlobs},
 		}, {
-			name: string(MsgGrant),
-			Bits: Bits(MsgTypeBitsGrant),
-			want: []MsgType{MsgGrant},
+			name:    string(MsgGrant),
+			msgType: MsgTypeBitsGrant,
+			want:    []MsgType{MsgGrant},
 		}, {
-			name: string(MsgExec),
-			Bits: Bits(MsgTypeBitsExec),
-			want: []MsgType{MsgExec},
+			name:    string(MsgExec),
+			msgType: MsgTypeBitsExec,
+			want:    []MsgType{MsgExec},
 		}, {
-			name: string(MsgRevoke),
-			Bits: Bits(MsgTypeBitsRevoke),
-			want: []MsgType{MsgRevoke},
+			name:    string(MsgRevoke),
+			msgType: MsgTypeBitsRevoke,
+			want:    []MsgType{MsgRevoke},
 		}, {
-			name: string(MsgGrantAllowance),
-			Bits: Bits(MsgTypeBitsGrantAllowance),
-			want: []MsgType{MsgGrantAllowance},
+			name:    string(MsgGrantAllowance),
+			msgType: MsgTypeBitsGrantAllowance,
+			want:    []MsgType{MsgGrantAllowance},
 		}, {
-			name: string(MsgRevokeAllowance),
-			Bits: Bits(MsgTypeBitsRevokeAllowance),
-			want: []MsgType{MsgRevokeAllowance},
+			name:    string(MsgRevokeAllowance),
+			msgType: MsgTypeBitsRevokeAllowance,
+			want:    []MsgType{MsgRevokeAllowance},
 		}, {
-			name: string(MsgRegisterEVMAddress),
-			Bits: Bits(MsgTypeBitsRegisterEVMAddress),
-			want: []MsgType{MsgRegisterEVMAddress},
+			name:    string(MsgRegisterEVMAddress),
+			msgType: MsgTypeBitsRegisterEVMAddress,
+			want:    []MsgType{MsgRegisterEVMAddress},
 		}, {
-			name: string(MsgSubmitProposal),
-			Bits: Bits(MsgTypeBitsSubmitProposal),
-			want: []MsgType{MsgSubmitProposal},
+			name:    string(MsgSubmitProposal),
+			msgType: MsgTypeBitsSubmitProposal,
+			want:    []MsgType{MsgSubmitProposal},
 		}, {
-			name: string(MsgExecLegacyContent),
-			Bits: Bits(MsgTypeBitsExecLegacyContent),
-			want: []MsgType{MsgExecLegacyContent},
+			name:    string(MsgExecLegacyContent),
+			msgType: MsgTypeBitsExecLegacyContent,
+			want:    []MsgType{MsgExecLegacyContent},
 		}, {
-			name: string(MsgVote),
-			Bits: Bits(MsgTypeBitsVote),
-			want: []MsgType{MsgVote},
+			name:    string(MsgVote),
+			msgType: MsgTypeBitsVote,
+			want:    []MsgType{MsgVote},
 		}, {
-			name: string(MsgVoteWeighted),
-			Bits: Bits(MsgTypeBitsVoteWeighted),
-			want: []MsgType{MsgVoteWeighted},
+			name:    string(MsgVoteWeighted),
+			msgType: MsgTypeBitsVoteWeighted,
+			want:    []MsgType{MsgVoteWeighted},
 		}, {
-			name: string(MsgDeposit),
-			Bits: Bits(MsgTypeBitsDeposit),
-			want: []MsgType{MsgDeposit},
+			name:    string(MsgDeposit),
+			msgType: MsgTypeBitsDeposit,
+			want:    []MsgType{MsgDeposit},
 		}, {
-			name: string(IBCTransfer),
-			Bits: Bits(MsgTypeBitsIBCTransfer),
-			want: []MsgType{IBCTransfer},
+			name:    string(IBCTransfer),
+			msgType: MsgTypeBitsIBCTransfer,
+			want:    []MsgType{IBCTransfer},
 		}, {
-			name: string(MsgVerifyInvariant),
-			Bits: Bits(MsgTypeBitsVerifyInvariant),
-			want: []MsgType{MsgVerifyInvariant},
+			name:    string(MsgVerifyInvariant),
+			msgType: MsgTypeBitsVerifyInvariant,
+			want:    []MsgType{MsgVerifyInvariant},
 		}, {
-			name: string(MsgSubmitEvidence),
-			Bits: Bits(MsgTypeBitsSubmitEvidence),
-			want: []MsgType{MsgSubmitEvidence},
+			name:    string(MsgSubmitEvidence),
+			msgType: MsgTypeBitsSubmitEvidence,
+			want:    []MsgType{MsgSubmitEvidence},
 		}, {
-			name: string(MsgCreateGroup),
-			Bits: Bits(MsgTypeBitsCreateGroup),
-			want: []MsgType{MsgCreateGroup},
+			name:    string(MsgCreateGroup),
+			msgType: MsgTypeBitsCreateGroup,
+			want:    []MsgType{MsgCreateGroup},
 		}, {
-			name: string(MsgUpdateGroupMembers),
-			Bits: Bits(MsgTypeBitsUpdateGroupMembers),
-			want: []MsgType{MsgUpdateGroupMembers},
+			name:    string(MsgUpdateGroupMembers),
+			msgType: MsgTypeBitsUpdateGroupMembers,
+			want:    []MsgType{MsgUpdateGroupMembers},
 		}, {
-			name: string(MsgUpdateGroupAdmin),
-			Bits: Bits(MsgTypeBitsUpdateGroupAdmin),
-			want: []MsgType{MsgUpdateGroupAdmin},
+			name:    string(MsgUpdateGroupAdmin),
+			msgType: MsgTypeBitsUpdateGroupAdmin,
+			want:    []MsgType{MsgUpdateGroupAdmin},
 		}, {
-			name: string(MsgUpdateGroupMetadata),
-			Bits: Bits(MsgTypeBitsUpdateGroupMetadata),
-			want: []MsgType{MsgUpdateGroupMetadata},
+			name:    string(MsgUpdateGroupMetadata),
+			msgType: MsgTypeBitsUpdateGroupMetadata,
+			want:    []MsgType{MsgUpdateGroupMetadata},
 		}, {
-			name: string(MsgCreateGroupPolicy),
-			Bits: Bits(MsgTypeBitsCreateGroupPolicy),
-			want: []MsgType{MsgCreateGroupPolicy},
+			name:    string(MsgCreateGroupPolicy),
+			msgType: MsgTypeBitsCreateGroupPolicy,
+			want:    []MsgType{MsgCreateGroupPolicy},
 		}, {
-			name: string(MsgUpdateGroupPolicyAdmin),
-			Bits: Bits(MsgTypeBitsUpdateGroupPolicyAdmin),
-			want: []MsgType{MsgUpdateGroupPolicyAdmin},
+			name:    string(MsgUpdateGroupPolicyAdmin),
+			msgType: MsgTypeBitsUpdateGroupPolicyAdmin,
+			want:    []MsgType{MsgUpdateGroupPolicyAdmin},
 		}, {
-			name: string(MsgCreateGroupWithPolicy),
-			Bits: Bits(MsgTypeBitsCreateGroupWithPolicy),
-			want: []MsgType{MsgCreateGroupWithPolicy},
+			name:    string(MsgCreateGroupWithPolicy),
+			msgType: MsgTypeBitsCreateGroupWithPolicy,
+			want:    []MsgType{MsgCreateGroupWithPolicy},
 		}, {
-			name: string(MsgUpdateGroupPolicyDecisionPolicy),
-			Bits: Bits(MsgTypeBitsUpdateGroupPolicyDecisionPolicy),
-			want: []MsgType{MsgUpdateGroupPolicyDecisionPolicy},
+			name:    string(MsgUpdateGroupPolicyDecisionPolicy),
+			msgType: MsgTypeBitsUpdateGroupPolicyDecisionPolicy,
+			want:    []MsgType{MsgUpdateGroupPolicyDecisionPolicy},
 		}, {
-			name: string(MsgUpdateGroupPolicyMetadata),
-			Bits: Bits(MsgTypeBitsUpdateGroupPolicyMetadata),
-			want: []MsgType{MsgUpdateGroupPolicyMetadata},
+			name:    string(MsgUpdateGroupPolicyMetadata),
+			msgType: MsgTypeBitsUpdateGroupPolicyMetadata,
+			want:    []MsgType{MsgUpdateGroupPolicyMetadata},
 		}, {
-			name: string(MsgSubmitProposalGroup),
-			Bits: Bits(MsgTypeBitsSubmitProposalGroup),
-			want: []MsgType{MsgSubmitProposalGroup},
+			name:    string(MsgSubmitProposalGroup),
+			msgType: MsgTypeBitsSubmitProposalGroup,
+			want:    []MsgType{MsgSubmitProposalGroup},
 		}, {
-			name: string(MsgWithdrawProposal),
-			Bits: Bits(MsgTypeBitsWithdrawProposal),
-			want: []MsgType{MsgWithdrawProposal},
+			name:    string(MsgWithdrawProposal),
+			msgType: MsgTypeBitsWithdrawProposal,
+			want:    []MsgType{MsgWithdrawProposal},
 		}, {
-			name: string(MsgVoteGroup),
-			Bits: Bits(MsgTypeBitsVoteGroup),
-			want: []MsgType{MsgVoteGroup},
+			name:    string(MsgVoteGroup),
+			msgType: MsgTypeBitsVoteGroup,
+			want:    []MsgType{MsgVoteGroup},
 		}, {
-			name: string(MsgExecGroup),
-			Bits: Bits(MsgTypeBitsExecGroup),
-			want: []MsgType{MsgExecGroup},
+			name:    string(MsgExecGroup),
+			msgType: MsgTypeBitsExecGroup,
+			want:    []MsgType{MsgExecGroup},
 		}, {
-			name: string(MsgLeaveGroup),
-			Bits: Bits(MsgTypeBitsLeaveGroup),
-			want: []MsgType{MsgLeaveGroup},
+			name:    string(MsgLeaveGroup),
+			msgType: MsgTypeBitsLeaveGroup,
+			want:    []MsgType{MsgLeaveGroup},
 		}, {
-			name: string(MsgSoftwareUpgrade),
-			Bits: Bits(MsgTypeBitsSoftwareUpgrade),
-			want: []MsgType{MsgSoftwareUpgrade},
+			name:    string(MsgSoftwareUpgrade),
+			msgType: MsgTypeBitsSoftwareUpgrade,
+			want:    []MsgType{MsgSoftwareUpgrade},
 		}, {
-			name: string(MsgCancelUpgrade),
-			Bits: Bits(MsgTypeBitsCancelUpgrade),
-			want: []MsgType{MsgCancelUpgrade},
+			name:    string(MsgCancelUpgrade),
+			msgType: MsgTypeBitsCancelUpgrade,
+			want:    []MsgType{MsgCancelUpgrade},
 		}, {
-			name: string(MsgRegisterInterchainAccount),
-			Bits: Bits(MsgTypeBitsRegisterInterchainAccount),
-			want: []MsgType{MsgRegisterInterchainAccount},
+			name:    string(MsgRegisterInterchainAccount),
+			msgType: MsgTypeBitsRegisterInterchainAccount,
+			want:    []MsgType{MsgRegisterInterchainAccount},
 		}, {
-			name: string(MsgSendTx),
-			Bits: Bits(MsgTypeBitsSendTx),
-			want: []MsgType{MsgSendTx},
+			name:    string(MsgSendTx),
+			msgType: MsgTypeBitsSendTx,
+			want:    []MsgType{MsgSendTx},
 		}, {
-			name: string(MsgRegisterPayee),
-			Bits: Bits(MsgTypeBitsRegisterPayee),
-			want: []MsgType{MsgRegisterPayee},
+			name:    string(MsgRegisterPayee),
+			msgType: MsgTypeBitsRegisterPayee,
+			want:    []MsgType{MsgRegisterPayee},
 		}, {
-			name: string(MsgRegisterCounterpartyPayee),
-			Bits: Bits(MsgTypeBitsRegisterCounterpartyPayee),
-			want: []MsgType{MsgRegisterCounterpartyPayee},
+			name:    string(MsgRegisterCounterpartyPayee),
+			msgType: MsgTypeBitsRegisterCounterpartyPayee,
+			want:    []MsgType{MsgRegisterCounterpartyPayee},
 		}, {
-			name: string(MsgPayPacketFee),
-			Bits: Bits(MsgTypeBitsPayPacketFee),
-			want: []MsgType{MsgPayPacketFee},
+			name:    string(MsgPayPacketFee),
+			msgType: MsgTypeBitsPayPacketFee,
+			want:    []MsgType{MsgPayPacketFee},
 		}, {
-			name: string(MsgPayPacketFeeAsync),
-			Bits: Bits(MsgTypeBitsPayPacketFeeAsync),
-			want: []MsgType{MsgPayPacketFeeAsync},
+			name:    string(MsgPayPacketFeeAsync),
+			msgType: MsgTypeBitsPayPacketFeeAsync,
+			want:    []MsgType{MsgPayPacketFeeAsync},
 		}, {
-			name: string(MsgTransfer),
-			Bits: Bits(MsgTypeBitsTransfer),
-			want: []MsgType{MsgTransfer},
+			name:    string(MsgTransfer),
+			msgType: MsgTypeBitsTransfer,
+			want:    []MsgType{MsgTransfer},
 		}, {
-			name: string(MsgCreateClient),
-			Bits: Bits(MsgTypeBitsCreateClient),
-			want: []MsgType{MsgCreateClient},
+			name:    string(MsgCreateClient),
+			msgType: MsgTypeBitsCreateClient,
+			want:    []MsgType{MsgCreateClient},
 		}, {
-			name: string(MsgUpdateClient),
-			Bits: Bits(MsgTypeBitsUpdateClient),
-			want: []MsgType{MsgUpdateClient},
+			name:    string(MsgUpdateClient),
+			msgType: MsgTypeBitsUpdateClient,
+			want:    []MsgType{MsgUpdateClient},
 		}, {
-			name: string(MsgUpgradeClient),
-			Bits: Bits(MsgTypeBitsUpgradeClient),
-			want: []MsgType{MsgUpgradeClient},
+			name:    string(MsgUpgradeClient),
+			msgType: MsgTypeBitsUpgradeClient,
+			want:    []MsgType{MsgUpgradeClient},
 		}, {
-			name: string(MsgSubmitMisbehaviour),
-			Bits: Bits(MsgTypeBitsSubmitMisbehaviour),
-			want: []MsgType{MsgSubmitMisbehaviour},
+			name:    string(MsgSubmitMisbehaviour),
+			msgType: MsgTypeBitsSubmitMisbehaviour,
+			want:    []MsgType{MsgSubmitMisbehaviour},
 		}, {
-			name: string(MsgConnectionOpenInit),
-			Bits: Bits(MsgTypeBitsConnectionOpenInit),
-			want: []MsgType{MsgConnectionOpenInit},
+			name:    string(MsgConnectionOpenInit),
+			msgType: MsgTypeBitsConnectionOpenInit,
+			want:    []MsgType{MsgConnectionOpenInit},
 		}, {
-			name: string(MsgConnectionOpenTry),
-			Bits: Bits(MsgTypeBitsConnectionOpenTry),
-			want: []MsgType{MsgConnectionOpenTry},
+			name:    string(MsgConnectionOpenTry),
+			msgType: MsgTypeBitsConnectionOpenTry,
+			want:    []MsgType{MsgConnectionOpenTry},
 		}, {
-			name: string(MsgConnectionOpenAck),
-			Bits: Bits(MsgTypeBitsConnectionOpenAck),
-			want: []MsgType{MsgConnectionOpenAck},
+			name:    string(MsgConnectionOpenAck),
+			msgType: MsgTypeBitsConnectionOpenAck,
+			want:    []MsgType{MsgConnectionOpenAck},
 		}, {
-			name: string(MsgConnectionOpenConfirm),
-			Bits: Bits(MsgTypeBitsConnectionOpenConfirm),
-			want: []MsgType{MsgConnectionOpenConfirm},
+			name:    string(MsgConnectionOpenConfirm),
+			msgType: MsgTypeBitsConnectionOpenConfirm,
+			want:    []MsgType{MsgConnectionOpenConfirm},
 		},
-		// {
-		// 	name: string(MsgChannelOpenInit),
-		// 	Bits: Bits(MsgTypeBitsChannelOpenInit),
-		// 	want: []MsgType{MsgChannelOpenInit},
-		// }, {
-		// 	name: string(MsgChannelOpenTry),
-		// 	Bits: Bits(MsgTypeBitsChannelOpenTry),
-		// 	want: []MsgType{MsgChannelOpenTry},
-		// }, {
-		// 	name: string(MsgChannelOpenAck),
-		// 	Bits: Bits(MsgTypeBitsChannelOpenAck),
-		// 	want: []MsgType{MsgChannelOpenAck},
-		// }, {
-		// 	name: string(MsgChannelOpenConfirm),
-		// 	Bits: Bits(MsgTypeBitsChannelOpenConfirm),
-		// 	want: []MsgType{MsgChannelOpenConfirm},
-		// }, {
-		// 	name: string(MsgChannelCloseInit),
-		// 	Bits: Bits(MsgTypeBitsChannelCloseInit),
-		// 	want: []MsgType{MsgChannelCloseInit},
-		// }, {
-		// 	name: string(MsgChannelCloseConfirm),
-		// 	Bits: Bits(MsgTypeBitsChannelCloseConfirm),
-		// 	want: []MsgType{MsgChannelCloseConfirm},
-		// }, {
-		// 	name: string(MsgRecvPacket),
-		// 	Bits: Bits(MsgTypeBitsRecvPacket),
-		// 	want: []MsgType{MsgRecvPacket},
-		// }, {
-		// 	name: string(MsgTimeout),
-		// 	Bits: Bits(MsgTypeBitsTimeout),
-		// 	want: []MsgType{MsgTimeout},
-		// }, {
-		// 	name: string(MsgTimeoutOnClose),
-		// 	Bits: Bits(MsgTypeBitsTimeoutOnClose),
-		// 	want: []MsgType{MsgTimeoutOnClose},
-		// }, {
-		// 	name: string(MsgAcknowledgement),
-		// 	Bits: Bits(MsgTypeBitsAcknowledgement),
-		// 	want: []MsgType{MsgAcknowledgement},
-		// },
+		{
+			name:    string(MsgChannelOpenInit),
+			msgType: MsgTypeBitsChannelOpenInit,
+			want:    []MsgType{MsgChannelOpenInit},
+		}, {
+			name:    string(MsgChannelOpenTry),
+			msgType: MsgTypeBitsChannelOpenTry,
+			want:    []MsgType{MsgChannelOpenTry},
+		}, {
+			name:    string(MsgChannelOpenAck),
+			msgType: MsgTypeBitsChannelOpenAck,
+			want:    []MsgType{MsgChannelOpenAck},
+		}, {
+			name:    string(MsgChannelOpenConfirm),
+			msgType: MsgTypeBitsChannelOpenConfirm,
+			want:    []MsgType{MsgChannelOpenConfirm},
+		}, {
+			name:    string(MsgChannelCloseInit),
+			msgType: MsgTypeBitsChannelCloseInit,
+			want:    []MsgType{MsgChannelCloseInit},
+		}, {
+			name:    string(MsgChannelCloseConfirm),
+			msgType: MsgTypeBitsChannelCloseConfirm,
+			want:    []MsgType{MsgChannelCloseConfirm},
+		}, {
+			name:    string(MsgRecvPacket),
+			msgType: MsgTypeBitsRecvPacket,
+			want:    []MsgType{MsgRecvPacket},
+		}, {
+			name:    string(MsgTimeout),
+			msgType: MsgTypeBitsTimeout,
+			want:    []MsgType{MsgTimeout},
+		}, {
+			name:    string(MsgTimeoutOnClose),
+			msgType: MsgTypeBitsTimeoutOnClose,
+			want:    []MsgType{MsgTimeoutOnClose},
+		}, {
+			name:    string(MsgAcknowledgement),
+			msgType: MsgTypeBitsAcknowledgement,
+			want:    []MsgType{MsgAcknowledgement},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mask := MsgTypeBits{
-				Bits: tt.Bits,
+				Bits: NewEmptyBits(),
 			}
+			mask.SetBit(tt.msgType)
 			require.Equal(t, tt.want, mask.Names())
 		})
 	}
@@ -329,311 +330,311 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 		{
 			name:   "test 0",
 			values: nil,
-			want:   MsgTypeBits{Bits(0)},
+			want:   MsgTypeBits{NewBits(0)},
 		}, {
 			name:   "test 1",
 			values: []MsgType{MsgUnknown},
-			want:   MsgTypeBits{Bits(MsgTypeBitsUnknown)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUnknown)},
 		}, {
 			name:   "test 2",
 			values: []MsgType{MsgSetWithdrawAddress},
-			want:   MsgTypeBits{Bits(MsgTypeBitsSetWithdrawAddress)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSetWithdrawAddress)},
 		}, {
 			name:   "test 3",
 			values: []MsgType{MsgWithdrawDelegatorReward},
-			want:   MsgTypeBits{Bits(MsgTypeBitsWithdrawDelegatorReward)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsWithdrawDelegatorReward)},
 		}, {
 			name:   "test 4",
 			values: []MsgType{MsgWithdrawValidatorCommission},
-			want:   MsgTypeBits{Bits(MsgTypeBitsWithdrawValidatorCommission)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsWithdrawValidatorCommission)},
 		}, {
 			name:   "test 5",
 			values: []MsgType{MsgFundCommunityPool},
-			want:   MsgTypeBits{Bits(MsgTypeBitsFundCommunityPool)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsFundCommunityPool)},
 		}, {
 			name:   "test 6",
 			values: []MsgType{MsgCreateValidator},
-			want:   MsgTypeBits{Bits(MsgTypeBitsCreateValidator)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCreateValidator)},
 		}, {
 			name:   "test 7",
 			values: []MsgType{MsgEditValidator},
-			want:   MsgTypeBits{Bits(MsgTypeBitsEditValidator)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsEditValidator)},
 		}, {
 			name:   "test 8",
 			values: []MsgType{MsgDelegate},
-			want:   MsgTypeBits{Bits(MsgTypeBitsDelegate)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsDelegate)},
 		}, {
 			name:   "test 9",
 			values: []MsgType{MsgBeginRedelegate},
-			want:   MsgTypeBits{Bits(MsgTypeBitsBeginRedelegate)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsBeginRedelegate)},
 		}, {
 			name:   "test 10",
 			values: []MsgType{MsgUndelegate},
-			want:   MsgTypeBits{Bits(MsgTypeBitsUndelegate)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUndelegate)},
 		}, {
 			name:   "test 11",
 			values: []MsgType{MsgCancelUnbondingDelegation},
-			want:   MsgTypeBits{Bits(MsgTypeBitsCancelUnbondingDelegation)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCancelUnbondingDelegation)},
 		}, {
 			name:   "test 12",
 			values: []MsgType{MsgUnjail},
-			want:   MsgTypeBits{Bits(MsgTypeBitsUnjail)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUnjail)},
 		}, {
 			name:   "test 13",
 			values: []MsgType{MsgSend},
-			want:   MsgTypeBits{Bits(MsgTypeBitsSend)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSend)},
 		}, {
 			name:   "test 14",
 			values: []MsgType{MsgMultiSend},
-			want:   MsgTypeBits{Bits(MsgTypeBitsMultiSend)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsMultiSend)},
 		}, {
 			name:   "test 15",
 			values: []MsgType{MsgCreateVestingAccount},
-			want:   MsgTypeBits{Bits(MsgTypeBitsCreateVestingAccount)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCreateVestingAccount)},
 		}, {
 			name:   "test 16",
 			values: []MsgType{MsgCreatePermanentLockedAccount},
-			want:   MsgTypeBits{Bits(MsgTypeBitsCreatePermanentLockedAccount)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCreatePermanentLockedAccount)},
 		}, {
 			name:   "test 17",
 			values: []MsgType{MsgCreatePeriodicVestingAccount},
-			want:   MsgTypeBits{Bits(MsgTypeBitsCreatePeriodicVestingAccount)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCreatePeriodicVestingAccount)},
 		}, {
 			name:   "test 18",
 			values: []MsgType{MsgPayForBlobs},
-			want:   MsgTypeBits{Bits(MsgTypeBitsPayForBlobs)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsPayForBlobs)},
 		}, {
 			name:   "test 19",
 			values: []MsgType{MsgGrant},
-			want:   MsgTypeBits{Bits(MsgTypeBitsGrant)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsGrant)},
 		}, {
 			name:   "test 20",
 			values: []MsgType{MsgExec},
-			want:   MsgTypeBits{Bits(MsgTypeBitsExec)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsExec)},
 		}, {
 			name:   "test 21",
 			values: []MsgType{MsgRevoke},
-			want:   MsgTypeBits{Bits(MsgTypeBitsRevoke)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsRevoke)},
 		}, {
 			name:   "test 22",
 			values: []MsgType{MsgGrantAllowance},
-			want:   MsgTypeBits{Bits(MsgTypeBitsGrantAllowance)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsGrantAllowance)},
 		}, {
 			name:   "test 23",
 			values: []MsgType{MsgRevokeAllowance},
-			want:   MsgTypeBits{Bits(MsgTypeBitsRevokeAllowance)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsRevokeAllowance)},
 		}, {
 			name:   "test 24",
 			values: []MsgType{MsgRegisterEVMAddress},
-			want:   MsgTypeBits{Bits(MsgTypeBitsRegisterEVMAddress)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsRegisterEVMAddress)},
 		}, {
 			name:   "test 25",
 			values: []MsgType{MsgSubmitProposal},
-			want:   MsgTypeBits{Bits(MsgTypeBitsSubmitProposal)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSubmitProposal)},
 		}, {
 			name:   "test 26",
 			values: []MsgType{MsgExecLegacyContent},
-			want:   MsgTypeBits{Bits(MsgTypeBitsExecLegacyContent)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsExecLegacyContent)},
 		}, {
 			name:   "test 27",
 			values: []MsgType{MsgVote},
-			want:   MsgTypeBits{Bits(MsgTypeBitsVote)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsVote)},
 		}, {
 			name:   "test 28",
 			values: []MsgType{MsgVoteWeighted},
-			want:   MsgTypeBits{Bits(MsgTypeBitsVoteWeighted)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsVoteWeighted)},
 		}, {
 			name:   "test 29",
 			values: []MsgType{MsgDeposit},
-			want:   MsgTypeBits{Bits(MsgTypeBitsDeposit)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsDeposit)},
 		}, {
 			name:   "test 30",
 			values: []MsgType{IBCTransfer},
-			want:   MsgTypeBits{Bits(MsgTypeBitsIBCTransfer)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsIBCTransfer)},
 		}, {
 			name:   "test 31",
 			values: []MsgType{MsgVerifyInvariant},
-			want:   MsgTypeBits{Bits(MsgTypeBitsVerifyInvariant)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsVerifyInvariant)},
 		}, {
 			name:   "test 32",
 			values: []MsgType{MsgSubmitEvidence},
-			want:   MsgTypeBits{Bits(MsgTypeBitsSubmitEvidence)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSubmitEvidence)},
 		}, {
 			name:   "test 33",
 			values: []MsgType{MsgSendNFT},
-			want:   MsgTypeBits{Bits(MsgTypeBitsSendNFT)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSendNFT)},
 		}, {
 			name:   "test 34",
 			values: []MsgType{MsgCreateGroup},
-			want:   MsgTypeBits{Bits(MsgTypeBitsCreateGroup)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCreateGroup)},
 		}, {
 			name:   "test 35",
 			values: []MsgType{MsgUpdateGroupMembers},
-			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateGroupMembers)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateGroupMembers)},
 		}, {
 			name:   "test 36",
 			values: []MsgType{MsgUpdateGroupAdmin},
-			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateGroupAdmin)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateGroupAdmin)},
 		}, {
 			name:   "test 37",
 			values: []MsgType{MsgUpdateGroupMetadata},
-			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateGroupMetadata)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateGroupMetadata)},
 		}, {
 			name:   "test 38",
 			values: []MsgType{MsgCreateGroupPolicy},
-			want:   MsgTypeBits{Bits(MsgTypeBitsCreateGroupPolicy)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCreateGroupPolicy)},
 		}, {
 			name:   "test 39",
 			values: []MsgType{MsgUpdateGroupPolicyAdmin},
-			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateGroupPolicyAdmin)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateGroupPolicyAdmin)},
 		}, {
 			name:   "test 40",
 			values: []MsgType{MsgCreateGroupWithPolicy},
-			want:   MsgTypeBits{Bits(MsgTypeBitsCreateGroupWithPolicy)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCreateGroupWithPolicy)},
 		}, {
 			name:   "test 41",
 			values: []MsgType{MsgUpdateGroupPolicyDecisionPolicy},
-			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateGroupPolicyDecisionPolicy)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateGroupPolicyDecisionPolicy)},
 		}, {
 			name:   "test 42",
 			values: []MsgType{MsgUpdateGroupPolicyMetadata},
-			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateGroupPolicyMetadata)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateGroupPolicyMetadata)},
 		}, {
 			name:   "test 43",
 			values: []MsgType{MsgSubmitProposalGroup},
-			want:   MsgTypeBits{Bits(MsgTypeBitsSubmitProposalGroup)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSubmitProposalGroup)},
 		}, {
 			name:   "test 44",
 			values: []MsgType{MsgWithdrawProposal},
-			want:   MsgTypeBits{Bits(MsgTypeBitsWithdrawProposal)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsWithdrawProposal)},
 		}, {
 			name:   "test 45",
 			values: []MsgType{MsgVoteGroup},
-			want:   MsgTypeBits{Bits(MsgTypeBitsVoteGroup)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsVoteGroup)},
 		}, {
 			name:   "test 46",
 			values: []MsgType{MsgExecGroup},
-			want:   MsgTypeBits{Bits(MsgTypeBitsExecGroup)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsExecGroup)},
 		}, {
 			name:   "test 47",
 			values: []MsgType{MsgLeaveGroup},
-			want:   MsgTypeBits{Bits(MsgTypeBitsLeaveGroup)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsLeaveGroup)},
 		}, {
 			name:   "test 48",
 			values: []MsgType{MsgSoftwareUpgrade},
-			want:   MsgTypeBits{Bits(MsgTypeBitsSoftwareUpgrade)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSoftwareUpgrade)},
 		}, {
 			name:   "test 49",
 			values: []MsgType{MsgCancelUpgrade},
-			want:   MsgTypeBits{Bits(MsgTypeBitsCancelUpgrade)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCancelUpgrade)},
 		}, {
 			name:   "test 50",
 			values: []MsgType{MsgRegisterInterchainAccount},
-			want:   MsgTypeBits{Bits(MsgTypeBitsRegisterInterchainAccount)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsRegisterInterchainAccount)},
 		}, {
 			name:   "test 51",
 			values: []MsgType{MsgSendTx},
-			want:   MsgTypeBits{Bits(MsgTypeBitsSendTx)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSendTx)},
 		}, {
 			name:   "test 52",
 			values: []MsgType{MsgRegisterPayee},
-			want:   MsgTypeBits{Bits(MsgTypeBitsRegisterPayee)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsRegisterPayee)},
 		}, {
 			name:   "test 53",
 			values: []MsgType{MsgRegisterCounterpartyPayee},
-			want:   MsgTypeBits{Bits(MsgTypeBitsRegisterCounterpartyPayee)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsRegisterCounterpartyPayee)},
 		}, {
 			name:   "test 54",
 			values: []MsgType{MsgPayPacketFee},
-			want:   MsgTypeBits{Bits(MsgTypeBitsPayPacketFee)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsPayPacketFee)},
 		}, {
 			name:   "test 55",
 			values: []MsgType{MsgPayPacketFeeAsync},
-			want:   MsgTypeBits{Bits(MsgTypeBitsPayPacketFeeAsync)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsPayPacketFeeAsync)},
 		}, {
 			name:   "test 56",
 			values: []MsgType{MsgTransfer},
-			want:   MsgTypeBits{Bits(MsgTypeBitsTransfer)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsTransfer)},
 		}, {
 			name:   "test 57",
 			values: []MsgType{MsgCreateClient},
-			want:   MsgTypeBits{Bits(MsgTypeBitsCreateClient)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCreateClient)},
 		}, {
 			name:   "test 58",
 			values: []MsgType{MsgUpdateClient},
-			want:   MsgTypeBits{Bits(MsgTypeBitsUpdateClient)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateClient)},
 		}, {
 			name:   "test 59",
 			values: []MsgType{MsgUpgradeClient},
-			want:   MsgTypeBits{Bits(MsgTypeBitsUpgradeClient)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpgradeClient)},
 		}, {
 			name:   "test 60",
 			values: []MsgType{MsgSubmitMisbehaviour},
-			want:   MsgTypeBits{Bits(MsgTypeBitsSubmitMisbehaviour)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSubmitMisbehaviour)},
 		}, {
 			name:   "test 61",
 			values: []MsgType{MsgConnectionOpenInit},
-			want:   MsgTypeBits{Bits(MsgTypeBitsConnectionOpenInit)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsConnectionOpenInit)},
 		}, {
 			name:   "test 62",
 			values: []MsgType{MsgConnectionOpenTry},
-			want:   MsgTypeBits{Bits(MsgTypeBitsConnectionOpenTry)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsConnectionOpenTry)},
 		}, {
 			name:   "test 63",
 			values: []MsgType{MsgConnectionOpenAck},
-			want:   MsgTypeBits{Bits(MsgTypeBitsConnectionOpenAck)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsConnectionOpenAck)},
 		}, {
 			name:   "test 64",
 			values: []MsgType{MsgConnectionOpenConfirm},
-			want:   MsgTypeBits{Bits(MsgTypeBitsConnectionOpenConfirm)},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsConnectionOpenConfirm)},
 		},
 
-		// {
-		// 	name:   "test 65",
-		// 	values: []MsgType{MsgChannelOpenInit},
-		// 	want:   MsgTypeBits{Bits(MsgTypeBitsChannelOpenInit)},
-		// }, {
-		// 	name:   "test 66",
-		// 	values: []MsgType{MsgChannelOpenTry},
-		// 	want:   MsgTypeBits{Bits(MsgTypeBitsChannelOpenTry)},
-		// }, {
-		// 	name:   "test 67",
-		// 	values: []MsgType{MsgChannelOpenAck},
-		// 	want:   MsgTypeBits{Bits(MsgTypeBitsChannelOpenAck)},
-		// }, {
-		// 	name:   "test 68",
-		// 	values: []MsgType{MsgChannelOpenConfirm},
-		// 	want:   MsgTypeBits{Bits(MsgTypeBitsChannelOpenConfirm)},
-		// }, {
-		// 	name:   "test 69",
-		// 	values: []MsgType{MsgChannelCloseInit},
-		// 	want:   MsgTypeBits{Bits(MsgTypeBitsChannelCloseInit)},
-		// }, {
-		// 	name:   "test 70",
-		// 	values: []MsgType{MsgChannelCloseConfirm},
-		// 	want:   MsgTypeBits{Bits(MsgTypeBitsChannelCloseConfirm)},
-		// }, {
-		// 	name:   "test 71",
-		// 	values: []MsgType{MsgRecvPacket},
-		// 	want:   MsgTypeBits{Bits(MsgTypeBitsRecvPacket)},
-		// }, {
-		// 	name:   "test 72",
-		// 	values: []MsgType{MsgTimeout},
-		// 	want:   MsgTypeBits{Bits(MsgTypeBitsTimeout)},
-		// }, {
-		// 	name:   "test 73",
-		// 	values: []MsgType{MsgTimeoutOnClose},
-		// 	want:   MsgTypeBits{Bits(MsgTypeBitsTimeoutOnClose)},
-		// }, {
-		// 	name:   "test 74",
-		// 	values: []MsgType{MsgAcknowledgement},
-		// 	want:   MsgTypeBits{Bits(MsgTypeBitsAcknowledgement)},
-		// },
+		{
+			name:   "test 65",
+			values: []MsgType{MsgChannelOpenInit},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsChannelOpenInit)},
+		}, {
+			name:   "test 66",
+			values: []MsgType{MsgChannelOpenTry},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsChannelOpenTry)},
+		}, {
+			name:   "test 67",
+			values: []MsgType{MsgChannelOpenAck},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsChannelOpenAck)},
+		}, {
+			name:   "test 68",
+			values: []MsgType{MsgChannelOpenConfirm},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsChannelOpenConfirm)},
+		}, {
+			name:   "test 69",
+			values: []MsgType{MsgChannelCloseInit},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsChannelCloseInit)},
+		}, {
+			name:   "test 70",
+			values: []MsgType{MsgChannelCloseConfirm},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsChannelCloseConfirm)},
+		}, {
+			name:   "test 71",
+			values: []MsgType{MsgRecvPacket},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsRecvPacket)},
+		}, {
+			name:   "test 72",
+			values: []MsgType{MsgTimeout},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsTimeout)},
+		}, {
+			name:   "test 73",
+			values: []MsgType{MsgTimeoutOnClose},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsTimeoutOnClose)},
+		}, {
+			name:   "test 74",
+			values: []MsgType{MsgAcknowledgement},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsAcknowledgement)},
+		},
 
 		{
 			name:   "test combo",
 			values: []MsgType{MsgWithdrawDelegatorReward, MsgBeginRedelegate},
-			want:   MsgTypeBits{Bits(260)},
+			want:   MsgTypeBits{NewBits(260)},
 		},
 	}
 	for _, tt := range tests {
@@ -643,7 +644,7 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 	}
 }
 
-func TestMsgTypeBits_SetBit(t *testing.T) {
+func TestMsgTypeBits_SetByMsgType(t *testing.T) {
 	tests := []struct {
 		name  string
 		value MsgType
@@ -662,9 +663,9 @@ func TestMsgTypeBits_SetBit(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mask := &MsgTypeBits{
-				Bits: 0,
+				Bits: NewEmptyBits(),
 			}
-			mask.SetBit(tt.value)
+			mask.SetByMsgType(tt.value)
 			require.EqualValues(t, tt.want.Bits, mask.Bits)
 		})
 	}
