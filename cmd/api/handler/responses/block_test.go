@@ -4,13 +4,14 @@
 package responses
 
 import (
+	"reflect"
+	"testing"
+	"time"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	"reflect"
-	"testing"
-	"time"
 )
 
 func TestBlock_SearchType(t *testing.T) {
@@ -39,7 +40,7 @@ func TestNewBlock(t *testing.T) {
 					VersionBlock: 10,
 					VersionApp:   11,
 					MessageTypes: storageTypes.MsgTypeBits{
-						Bits: 1,
+						Bits: storageTypes.NewBits(1),
 					},
 					Hash:               []byte{0x01},
 					ParentHash:         []byte{0x02},
@@ -88,7 +89,7 @@ func TestNewBlock(t *testing.T) {
 					VersionBlock: 10,
 					VersionApp:   11,
 					MessageTypes: storageTypes.MsgTypeBits{
-						Bits: 1,
+						Bits: storageTypes.NewBits(1),
 					},
 					Hash:               []byte{0x01},
 					ParentHash:         []byte{0x02},

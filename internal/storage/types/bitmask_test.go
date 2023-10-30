@@ -18,24 +18,24 @@ func TestBits_Set(t *testing.T) {
 	}{
 		{
 			name: "test 1",
-			b:    0,
-			flag: 1,
-			want: 1,
+			b:    NewEmptyBits(),
+			flag: NewBits(1),
+			want: NewBits(1),
 		}, {
 			name: "test 2",
-			b:    1,
-			flag: 1,
-			want: 1,
+			b:    NewBits(1),
+			flag: NewBits(1),
+			want: NewBits(1),
 		}, {
 			name: "test 3",
-			b:    1,
-			flag: 0,
-			want: 1,
+			b:    NewBits(1),
+			flag: NewEmptyBits(),
+			want: NewBits(1),
 		}, {
 			name: "test 4",
-			b:    0,
-			flag: 0,
-			want: 0,
+			b:    NewEmptyBits(),
+			flag: NewEmptyBits(),
+			want: NewEmptyBits(),
 		},
 	}
 	for _, tt := range tests {
@@ -55,30 +55,30 @@ func TestBits_Clear(t *testing.T) {
 	}{
 		{
 			name: "test 1",
-			b:    1,
-			flag: 1,
-			want: 0,
+			b:    NewBits(1),
+			flag: NewBits(1),
+			want: NewEmptyBits(),
 		}, {
 			name: "test 2",
-			b:    0,
-			flag: 1,
-			want: 0,
+			b:    NewBits(0),
+			flag: NewBits(1),
+			want: NewBits(0),
 		}, {
 			name: "test 3",
-			b:    1,
-			flag: 0,
-			want: 1,
+			b:    NewBits(1),
+			flag: NewBits(0),
+			want: NewBits(1),
 		}, {
 			name: "test 3",
-			b:    0,
-			flag: 0,
-			want: 0,
+			b:    NewBits(0),
+			flag: NewBits(0),
+			want: NewBits(0),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.b.Clear(tt.flag)
-			require.EqualValues(t, tt.want, tt.b)
+			require.EqualValues(t, tt.want.value.Uint64(), tt.b.value.Uint64())
 		})
 	}
 }
@@ -92,23 +92,23 @@ func TestBits_Has(t *testing.T) {
 	}{
 		{
 			name: "test 1",
-			b:    0,
-			flag: 0,
+			b:    NewBits(0),
+			flag: NewBits(0),
 			want: false,
 		}, {
 			name: "test 2",
-			b:    1,
-			flag: 0,
+			b:    NewBits(1),
+			flag: NewBits(0),
 			want: false,
 		}, {
 			name: "test 3",
-			b:    0,
-			flag: 1,
+			b:    NewBits(0),
+			flag: NewBits(1),
 			want: false,
 		}, {
 			name: "test 4",
-			b:    1,
-			flag: 1,
+			b:    NewBits(1),
+			flag: NewBits(1),
 			want: true,
 		},
 	}
@@ -128,19 +128,19 @@ func TestBits_CountBits(t *testing.T) {
 	}{
 		{
 			name: "test 1",
-			b:    0,
+			b:    NewBits(0),
 			want: 0,
 		}, {
 			name: "test 2",
-			b:    1,
+			b:    NewBits(1),
 			want: 1,
 		}, {
 			name: "test 3",
-			b:    2,
+			b:    NewBits(2),
 			want: 1,
 		}, {
 			name: "test 3",
-			b:    3,
+			b:    NewBits(3),
 			want: 2,
 		},
 	}
@@ -162,17 +162,53 @@ func TestBits_Empty(t *testing.T) {
 	}{
 		{
 			name: "test 1",
-			b:    0,
+			b:    NewBits(0),
 			want: true,
 		}, {
 			name: "test 2",
-			b:    1,
+			b:    NewBits(1),
 			want: false,
+		}, {
+			name: "test 3",
+			b:    Bits{},
+			want: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			require.Equal(t, tt.want, tt.b.Empty())
+		})
+	}
+}
+
+func TestBits_SetBit(t *testing.T) {
+	tests := []struct {
+		name   string
+		value  Bits
+		number int
+		want   Bits
+	}{
+		{
+			name:   "test 1",
+			value:  NewBits(1),
+			number: 2,
+			want:   NewBits(5),
+		}, {
+			name:   "test 2",
+			value:  NewBits(1),
+			number: 1,
+			want:   NewBits(3),
+		}, {
+			name:   "test 1",
+			value:  NewBits(1),
+			number: 0,
+			want:   NewBits(1),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.value.SetBit(tt.number)
+			require.EqualValues(t, tt.want, tt.value)
 		})
 	}
 }
