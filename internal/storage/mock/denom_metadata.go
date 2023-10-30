@@ -8,6 +8,7 @@
 //
 //	mockgen -source=denom_metadata.go -destination=mock/denom_metadata.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 

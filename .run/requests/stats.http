@@ -1,0 +1,2 @@
+### Get validators
+http://{{host}}/v1/summary/validator/count

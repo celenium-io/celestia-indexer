@@ -8,6 +8,7 @@
 //
 //	mockgen -source=event.go -destination=mock/event.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 

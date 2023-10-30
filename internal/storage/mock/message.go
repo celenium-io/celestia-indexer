@@ -8,6 +8,7 @@
 //
 //	mockgen -source=message.go -destination=mock/message.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 

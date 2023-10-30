@@ -8,6 +8,7 @@
 //
 //	mockgen -source=block_stats.go -destination=mock/block_stats.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
