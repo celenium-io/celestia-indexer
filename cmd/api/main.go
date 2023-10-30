@@ -20,10 +20,9 @@ var rootCmd = &cobra.Command{
 }
 
 // @title						Swagger Celestia Indexer API
-// @version					1.0
-// @description				This is docs of Celestia indexer API.
-// @host						https://api.celestia.dipdup.net
-// @BasePath					/v1
+// @version					    1.0
+// @description				    This is docs of Celestia indexer API.
+// @host						api.celestia.dipdup.net
 //
 // @query.collection.format	multi
 func main() {

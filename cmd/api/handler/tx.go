@@ -118,7 +118,7 @@ func (handler *TxHandler) List(c echo.Context) error {
 		fltrs.TimeTo = time.Unix(req.To, 0).UTC()
 	}
 	for i := range req.MsgType {
-		fltrs.MessageTypes.SetBit(storageTypes.MsgType(req.MsgType[i]))
+		fltrs.MessageTypes.SetByMsgType(storageTypes.MsgType(req.MsgType[i]))
 	}
 
 	txs, err := handler.tx.Filter(c.Request().Context(), fltrs)

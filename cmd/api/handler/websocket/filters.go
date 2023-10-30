@@ -84,7 +84,7 @@ func (f *txFilters) Fill(msg TransactionFilters) error {
 	}
 
 	for i := range msg.Messages {
-		f.msgs.SetBit(types.MsgType(msg.Messages[i]))
+		f.msgs.SetByMsgType(types.MsgType(msg.Messages[i]))
 	}
 
 	return nil

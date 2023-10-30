@@ -42,6 +42,7 @@ var (
 		Status:        types.StatusSuccess,
 		Codespace:     "sdk",
 		Memo:          "memo",
+		MessageTypes:  types.NewMsgTypeBitMask(types.MsgSend),
 		Messages: []storage.Message{
 			{
 				Id:   1,

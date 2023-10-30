@@ -90,7 +90,7 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (stor
 		}
 
 		t.Messages[position] = dm.Msg
-		t.MessageTypes.SetBit(dm.Msg.Type)
+		t.MessageTypes.SetByMsgType(dm.Msg.Type)
 		t.BlobsSize += dm.BlobsSize
 	}
 

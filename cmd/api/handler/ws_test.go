@@ -19,6 +19,7 @@ import (
 	ws "github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -58,10 +59,11 @@ func TestWebsocket(t *testing.T) {
 		require.NoError(t, err)
 
 		blockMock.EXPECT().ByIdWithRelations(ctx, uint64(i)).Return(storage.Block{
-			Id:     uint64(i),
-			Height: types.Level(i),
-			Time:   time.Now(),
-			Hash:   hash,
+			Id:           uint64(i),
+			Height:       types.Level(i),
+			Time:         time.Now(),
+			Hash:         hash,
+			MessageTypes: storageTypes.NewMsgTypeBits(),
 		}, nil).MaxTimes(1)
 	}
 

@@ -46,7 +46,7 @@ func txFilter(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
 	query = sortScope(query, "id", fltrs.Sort)
 
 	if !fltrs.MessageTypes.Empty() {
-		query = query.Where("message_types & ? > 0", fltrs.MessageTypes)
+		query = query.Where("bit_count(message_types & ?::bit(73)) > 0", fltrs.MessageTypes)
 	}
 
 	if len(fltrs.Status) > 0 {
