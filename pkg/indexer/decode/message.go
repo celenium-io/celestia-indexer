@@ -16,6 +16,7 @@ import (
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 	coreClient "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
 	coreConnection "github.com/cosmos/ibc-go/v6/modules/core/03-connection/types"
+	coreChannel "github.com/cosmos/ibc-go/v6/modules/core/04-channel/types"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -234,6 +235,28 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgConnectionOpenAck(height, typedMsg)
 	case *coreConnection.MsgConnectionOpenConfirm:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgConnectionOpenConfirm(height, typedMsg)
+
+	// coreChannel module
+	case *coreChannel.MsgChannelOpenInit:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgChannelOpenInit(height, typedMsg)
+	case *coreChannel.MsgChannelOpenTry:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgChannelOpenTry(height, typedMsg)
+	case *coreChannel.MsgChannelOpenAck:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgChannelOpenAck(height, typedMsg)
+	case *coreChannel.MsgChannelOpenConfirm:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgChannelOpenConfirm(height, typedMsg)
+	case *coreChannel.MsgChannelCloseInit:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgChannelCloseInit(height, typedMsg)
+	case *coreChannel.MsgChannelCloseConfirm:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgChannelCloseConfirm(height, typedMsg)
+	case *coreChannel.MsgRecvPacket:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRecvPacket(height, typedMsg)
+	case *coreChannel.MsgTimeout:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgTimeout(height, typedMsg)
+	case *coreChannel.MsgTimeoutOnClose:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgTimeoutOnClose(height, typedMsg)
+	case *coreChannel.MsgAcknowledgement:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgAcknowledgement(height, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)
