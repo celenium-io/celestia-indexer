@@ -19,10 +19,13 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	nodeApi "github.com/celenium-io/celestia-indexer/pkg/node/dal"
 	"github.com/dipdup-net/go-lib/config"
+	"github.com/getsentry/sentry-go"
+	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/grafana/pyroscope-go"
 	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -108,7 +111,7 @@ func gzipSkipper(c echo.Context) bool {
 	return false
 }
 
-func initEcho(cfg ApiConfig) *echo.Echo {
+func initEcho(cfg ApiConfig, env string) *echo.Echo {
 	e := echo.New()
 	e.Validator = handler.NewCelestiaApiValidator()
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
@@ -186,6 +189,10 @@ func initEcho(cfg ApiConfig) *echo.Echo {
 			Store:   middleware.NewRateLimiterMemoryStore(rate.Limit(cfg.RateLimit)),
 		}))
 
+	}
+
+	if err := initSentry(e, cfg.SentryDsn, env); err != nil {
+		log.Err(err).Msg("sentry")
 	}
 
 	return e
@@ -294,6 +301,28 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	for _, route := range e.Routes() {
 		log.Info().Msgf("[%s] %s -> %s", route.Method, route.Path, route.Name)
 	}
+}
+
+func initSentry(e *echo.Echo, dsn, environment string) error {
+	if dsn == "" {
+		return nil
+	}
+
+	if err := sentry.Init(sentry.ClientOptions{
+		Dsn:              dsn,
+		AttachStacktrace: true,
+		Environment:      environment,
+		BeforeSend: func(event *sentry.Event, hint *sentry.EventHint) *sentry.Event {
+			log.Info().Str("message", "sentry").Msg(event.Message)
+			return event
+		},
+	}); err != nil {
+		return errors.Wrap(err, "initialization")
+	}
+
+	e.Use(sentryecho.New(sentryecho.Options{}))
+
+	return nil
 }
 
 var (
