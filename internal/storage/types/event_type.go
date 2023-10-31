@@ -56,6 +56,7 @@ package types
 		connection_open_try,
 		connection_open_init,
 		connection_open_confirm,
+		connection_open_ack,
 
 		channel_open_try,
 		channel_open_init,

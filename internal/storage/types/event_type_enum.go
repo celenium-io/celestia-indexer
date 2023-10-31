@@ -95,6 +95,8 @@ const (
 	EventTypeConnectionOpenInit EventType = "connection_open_init"
 	// EventTypeConnectionOpenConfirm is a EventType of type connection_open_confirm.
 	EventTypeConnectionOpenConfirm EventType = "connection_open_confirm"
+	// EventTypeConnectionOpenAck is a EventType of type connection_open_ack.
+	EventTypeConnectionOpenAck EventType = "connection_open_ack"
 	// EventTypeChannelOpenTry is a EventType of type channel_open_try.
 	EventTypeChannelOpenTry EventType = "channel_open_try"
 	// EventTypeChannelOpenInit is a EventType of type channel_open_init.
@@ -151,6 +153,7 @@ func EventTypeValues() []EventType {
 		EventTypeConnectionOpenTry,
 		EventTypeConnectionOpenInit,
 		EventTypeConnectionOpenConfirm,
+		EventTypeConnectionOpenAck,
 		EventTypeChannelOpenTry,
 		EventTypeChannelOpenInit,
 		EventTypeChannelOpenConfirm,
@@ -212,6 +215,7 @@ var _EventTypeValue = map[string]EventType{
 	"connection_open_try":               EventTypeConnectionOpenTry,
 	"connection_open_init":              EventTypeConnectionOpenInit,
 	"connection_open_confirm":           EventTypeConnectionOpenConfirm,
+	"connection_open_ack":               EventTypeConnectionOpenAck,
 	"channel_open_try":                  EventTypeChannelOpenTry,
 	"channel_open_init":                 EventTypeChannelOpenInit,
 	"channel_open_confirm":              EventTypeChannelOpenConfirm,
