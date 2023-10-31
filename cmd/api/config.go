@@ -15,6 +15,7 @@ type Config struct {
 	ApiConfig      ApiConfig             `validate:"required"                                                yaml:"api"`
 	Profiler       *profiler.Config      `validate:"omitempty"                                               yaml:"profiler"`
 	Indexer        indexerConfig.Indexer `validate:"required"                                                yaml:"indexer"`
+	Environment    string                `validate:"omitempty,oneof=development production"                  yaml:"environment"`
 }
 
 type ApiConfig struct {
@@ -23,4 +24,5 @@ type ApiConfig struct {
 	Prometheus     bool    `validate:"omitempty"              yaml:"prometheus"`
 	RequestTimeout int     `validate:"omitempty,min=1"        yaml:"request_timeout"`
 	BlobReceiver   string  `validate:"required"               yaml:"blob_receiver"`
+	SentryDsn      string  `validate:"omitempty"              yaml:"sentry_dsn"`
 }
