@@ -7,6 +7,7 @@ import (
 	"context"
 	"io"
 	"net"
+	"sync/atomic"
 	"time"
 
 	"github.com/dipdup-io/workerpool"
@@ -43,14 +44,19 @@ type Client struct {
 	filters *Filters
 	ch      chan any
 	g       workerpool.Group
+
+	closed *atomic.Bool
 }
 
 func newClient(id uint64, manager *Manager) *Client {
+	closed := new(atomic.Bool)
+	closed.Store(false)
 	return &Client{
 		id:      id,
 		manager: manager,
 		ch:      make(chan any, 1024),
 		g:       workerpool.NewGroup(),
+		closed:  closed,
 	}
 }
 
@@ -102,11 +108,15 @@ func (c *Client) DetachFilters(msg Unsubscribe) error {
 }
 
 func (c *Client) Notify(msg any) {
+	if c.closed.Load() {
+		return
+	}
 	c.ch <- msg
 }
 
 func (c *Client) Close() error {
 	c.g.Wait()
+	c.closed.Store(true)
 	close(c.ch)
 	return nil
 }
