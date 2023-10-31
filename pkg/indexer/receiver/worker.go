@@ -24,7 +24,7 @@ func (r *Module) worker(ctx context.Context, level types.Level) {
 		default:
 		}
 
-		block, err := r.api.BlockData(ctx, level)
+		block, err := r.api.BlockDataGet(ctx, level)
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				return
