@@ -105,6 +105,10 @@ const (
 	EventTypeChannelOpenConfirm EventType = "channel_open_confirm"
 	// EventTypeChannelOpenAck is a EventType of type channel_open_ack.
 	EventTypeChannelOpenAck EventType = "channel_open_ack"
+	// EventTypeRecvPacket is a EventType of type recv_packet.
+	EventTypeRecvPacket EventType = "recv_packet"
+	// EventTypeWriteAcknowledgement is a EventType of type write_acknowledgement.
+	EventTypeWriteAcknowledgement EventType = "write_acknowledgement"
 )
 
 var ErrInvalidEventType = errors.New("not a valid EventType")
@@ -158,6 +162,8 @@ func EventTypeValues() []EventType {
 		EventTypeChannelOpenInit,
 		EventTypeChannelOpenConfirm,
 		EventTypeChannelOpenAck,
+		EventTypeRecvPacket,
+		EventTypeWriteAcknowledgement,
 	}
 }
 
@@ -220,6 +226,8 @@ var _EventTypeValue = map[string]EventType{
 	"channel_open_init":                 EventTypeChannelOpenInit,
 	"channel_open_confirm":              EventTypeChannelOpenConfirm,
 	"channel_open_ack":                  EventTypeChannelOpenAck,
+	"recv_packet":                       EventTypeRecvPacket,
+	"write_acknowledgement":             EventTypeWriteAcknowledgement,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

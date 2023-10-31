@@ -547,6 +547,8 @@ definitions:
     - channel_open_init
     - channel_open_confirm
     - channel_open_ack
+    - recv_packet
+    - write_acknowledgement
     type: string
     x-enum-varnames:
     - EventTypeUnknown
@@ -595,6 +597,8 @@ definitions:
     - EventTypeChannelOpenInit
     - EventTypeChannelOpenConfirm
     - EventTypeChannelOpenAck
+    - EventTypeRecvPacket
+    - EventTypeWriteAcknowledgement
   types.MsgType:
     enum:
     - MsgUnknown
