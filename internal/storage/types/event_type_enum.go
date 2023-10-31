@@ -85,8 +85,24 @@ const (
 	EventTypeFungibleTokenPacket EventType = "fungible_token_packet"
 	// EventTypeAcknowledgePacket is a EventType of type acknowledge_packet.
 	EventTypeAcknowledgePacket EventType = "acknowledge_packet"
+	// EventTypeCreateClient is a EventType of type create_client.
+	EventTypeCreateClient EventType = "create_client"
 	// EventTypeUpdateClient is a EventType of type update_client.
 	EventTypeUpdateClient EventType = "update_client"
+	// EventTypeConnectionOpenTry is a EventType of type connection_open_try.
+	EventTypeConnectionOpenTry EventType = "connection_open_try"
+	// EventTypeConnectionOpenInit is a EventType of type connection_open_init.
+	EventTypeConnectionOpenInit EventType = "connection_open_init"
+	// EventTypeConnectionOpenConfirm is a EventType of type connection_open_confirm.
+	EventTypeConnectionOpenConfirm EventType = "connection_open_confirm"
+	// EventTypeChannelOpenTry is a EventType of type channel_open_try.
+	EventTypeChannelOpenTry EventType = "channel_open_try"
+	// EventTypeChannelOpenInit is a EventType of type channel_open_init.
+	EventTypeChannelOpenInit EventType = "channel_open_init"
+	// EventTypeChannelOpenConfirm is a EventType of type channel_open_confirm.
+	EventTypeChannelOpenConfirm EventType = "channel_open_confirm"
+	// EventTypeChannelOpenAck is a EventType of type channel_open_ack.
+	EventTypeChannelOpenAck EventType = "channel_open_ack"
 )
 
 var ErrInvalidEventType = errors.New("not a valid EventType")
@@ -130,7 +146,15 @@ func EventTypeValues() []EventType {
 		EventTypeIbcTransfer,
 		EventTypeFungibleTokenPacket,
 		EventTypeAcknowledgePacket,
+		EventTypeCreateClient,
 		EventTypeUpdateClient,
+		EventTypeConnectionOpenTry,
+		EventTypeConnectionOpenInit,
+		EventTypeConnectionOpenConfirm,
+		EventTypeChannelOpenTry,
+		EventTypeChannelOpenInit,
+		EventTypeChannelOpenConfirm,
+		EventTypeChannelOpenAck,
 	}
 }
 
@@ -183,7 +207,15 @@ var _EventTypeValue = map[string]EventType{
 	"ibc_transfer":                      EventTypeIbcTransfer,
 	"fungible_token_packet":             EventTypeFungibleTokenPacket,
 	"acknowledge_packet":                EventTypeAcknowledgePacket,
+	"create_client":                     EventTypeCreateClient,
 	"update_client":                     EventTypeUpdateClient,
+	"connection_open_try":               EventTypeConnectionOpenTry,
+	"connection_open_init":              EventTypeConnectionOpenInit,
+	"connection_open_confirm":           EventTypeConnectionOpenConfirm,
+	"channel_open_try":                  EventTypeChannelOpenTry,
+	"channel_open_init":                 EventTypeChannelOpenInit,
+	"channel_open_confirm":              EventTypeChannelOpenConfirm,
+	"channel_open_ack":                  EventTypeChannelOpenAck,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

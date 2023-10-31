@@ -49,7 +49,18 @@ package types
 
 		fungible_token_packet,
 		acknowledge_packet,
-		update_client
+
+		create_client,
+		update_client,
+
+		connection_open_try,
+		connection_open_init,
+		connection_open_confirm,
+
+		channel_open_try,
+		channel_open_init,
+		channel_open_confirm,
+		channel_open_ack
 	)
 */
 //go:generate go-enum --marshal --sql --values
