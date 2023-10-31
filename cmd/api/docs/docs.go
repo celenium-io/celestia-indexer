@@ -2587,7 +2587,19 @@ const docTemplate = `{
                 "submit_proposal",
                 "cosmos.authz.v1beta1.EventGrant",
                 "send_packet",
-                "ibc_transfer"
+                "ibc_transfer",
+                "fungible_token_packet",
+                "acknowledge_packet",
+                "create_client",
+                "update_client",
+                "connection_open_try",
+                "connection_open_init",
+                "connection_open_confirm",
+                "connection_open_ack",
+                "channel_open_try",
+                "channel_open_init",
+                "channel_open_confirm",
+                "channel_open_ack"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -2623,7 +2635,19 @@ const docTemplate = `{
                 "EventTypeSubmitProposal",
                 "EventTypeCosmosauthzv1beta1EventGrant",
                 "EventTypeSendPacket",
-                "EventTypeIbcTransfer"
+                "EventTypeIbcTransfer",
+                "EventTypeFungibleTokenPacket",
+                "EventTypeAcknowledgePacket",
+                "EventTypeCreateClient",
+                "EventTypeUpdateClient",
+                "EventTypeConnectionOpenTry",
+                "EventTypeConnectionOpenInit",
+                "EventTypeConnectionOpenConfirm",
+                "EventTypeConnectionOpenAck",
+                "EventTypeChannelOpenTry",
+                "EventTypeChannelOpenInit",
+                "EventTypeChannelOpenConfirm",
+                "EventTypeChannelOpenAck"
             ]
         },
         "types.MsgType": {

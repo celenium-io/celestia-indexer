@@ -81,6 +81,30 @@ const (
 	EventTypeSendPacket EventType = "send_packet"
 	// EventTypeIbcTransfer is a EventType of type ibc_transfer.
 	EventTypeIbcTransfer EventType = "ibc_transfer"
+	// EventTypeFungibleTokenPacket is a EventType of type fungible_token_packet.
+	EventTypeFungibleTokenPacket EventType = "fungible_token_packet"
+	// EventTypeAcknowledgePacket is a EventType of type acknowledge_packet.
+	EventTypeAcknowledgePacket EventType = "acknowledge_packet"
+	// EventTypeCreateClient is a EventType of type create_client.
+	EventTypeCreateClient EventType = "create_client"
+	// EventTypeUpdateClient is a EventType of type update_client.
+	EventTypeUpdateClient EventType = "update_client"
+	// EventTypeConnectionOpenTry is a EventType of type connection_open_try.
+	EventTypeConnectionOpenTry EventType = "connection_open_try"
+	// EventTypeConnectionOpenInit is a EventType of type connection_open_init.
+	EventTypeConnectionOpenInit EventType = "connection_open_init"
+	// EventTypeConnectionOpenConfirm is a EventType of type connection_open_confirm.
+	EventTypeConnectionOpenConfirm EventType = "connection_open_confirm"
+	// EventTypeConnectionOpenAck is a EventType of type connection_open_ack.
+	EventTypeConnectionOpenAck EventType = "connection_open_ack"
+	// EventTypeChannelOpenTry is a EventType of type channel_open_try.
+	EventTypeChannelOpenTry EventType = "channel_open_try"
+	// EventTypeChannelOpenInit is a EventType of type channel_open_init.
+	EventTypeChannelOpenInit EventType = "channel_open_init"
+	// EventTypeChannelOpenConfirm is a EventType of type channel_open_confirm.
+	EventTypeChannelOpenConfirm EventType = "channel_open_confirm"
+	// EventTypeChannelOpenAck is a EventType of type channel_open_ack.
+	EventTypeChannelOpenAck EventType = "channel_open_ack"
 )
 
 var ErrInvalidEventType = errors.New("not a valid EventType")
@@ -122,6 +146,18 @@ func EventTypeValues() []EventType {
 		EventTypeCosmosauthzv1beta1EventGrant,
 		EventTypeSendPacket,
 		EventTypeIbcTransfer,
+		EventTypeFungibleTokenPacket,
+		EventTypeAcknowledgePacket,
+		EventTypeCreateClient,
+		EventTypeUpdateClient,
+		EventTypeConnectionOpenTry,
+		EventTypeConnectionOpenInit,
+		EventTypeConnectionOpenConfirm,
+		EventTypeConnectionOpenAck,
+		EventTypeChannelOpenTry,
+		EventTypeChannelOpenInit,
+		EventTypeChannelOpenConfirm,
+		EventTypeChannelOpenAck,
 	}
 }
 
@@ -172,6 +208,18 @@ var _EventTypeValue = map[string]EventType{
 	"cosmos.authz.v1beta1.EventGrant":   EventTypeCosmosauthzv1beta1EventGrant,
 	"send_packet":                       EventTypeSendPacket,
 	"ibc_transfer":                      EventTypeIbcTransfer,
+	"fungible_token_packet":             EventTypeFungibleTokenPacket,
+	"acknowledge_packet":                EventTypeAcknowledgePacket,
+	"create_client":                     EventTypeCreateClient,
+	"update_client":                     EventTypeUpdateClient,
+	"connection_open_try":               EventTypeConnectionOpenTry,
+	"connection_open_init":              EventTypeConnectionOpenInit,
+	"connection_open_confirm":           EventTypeConnectionOpenConfirm,
+	"connection_open_ack":               EventTypeConnectionOpenAck,
+	"channel_open_try":                  EventTypeChannelOpenTry,
+	"channel_open_init":                 EventTypeChannelOpenInit,
+	"channel_open_confirm":              EventTypeChannelOpenConfirm,
+	"channel_open_ack":                  EventTypeChannelOpenAck,
 }
 
 // ParseEventType attempts to convert a string to a EventType.
