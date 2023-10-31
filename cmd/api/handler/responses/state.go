@@ -5,8 +5,9 @@ package responses
 
 import (
 	"encoding/hex"
-	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"time"
+
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 )
@@ -22,6 +23,7 @@ type State struct {
 	TotalFee       string         `example:"312"                                                              format:"string"    json:"total_fee"        swaggertype:"string"`
 	TotalBlobsSize int64          `example:"56789"                                                            format:"int64"     json:"total_blobs_size" swaggertype:"integer"`
 	TotalSupply    string         `example:"312"                                                              format:"string"    json:"total_supply"     swaggertype:"string"`
+	Synced         bool           `example:"true"                                                             format:"boolean"   json:"synced"           swaggertype:"boolean"`
 }
 
 func NewState(state storage.State) State {
@@ -36,5 +38,6 @@ func NewState(state storage.State) State {
 		TotalFee:       state.TotalFee.String(),
 		TotalBlobsSize: state.TotalBlobsSize,
 		TotalSupply:    state.TotalSupply.String(),
+		Synced:         !state.LastTime.UTC().Add(2 * time.Minute).Before(time.Now().UTC()),
 	}
 }

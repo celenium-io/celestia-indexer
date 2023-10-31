@@ -400,6 +400,10 @@ definitions:
         example: indexer
         format: string
         type: string
+      synced:
+        example: true
+        format: boolean
+        type: boolean
       total_accounts:
         example: 43
         format: int64
