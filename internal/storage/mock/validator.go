@@ -5,7 +5,6 @@
 //
 //	mockgen -source=validator.go -destination=mock/validator.go -package=mock -typed
 //
-
 // Package mock is a generated GoMock package.
 package mock
 

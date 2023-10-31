@@ -637,7 +637,7 @@ var _ driver.Valuer = (*MsgTypeBits)(nil)
 
 func (mask MsgTypeBits) Value() (driver.Value, error) {
 	if mask.value == nil {
-		return fmt.Sprintf("%073b", 0), nil
+		return fmt.Sprintf("%074b", 0), nil
 	}
-	return fmt.Sprintf("%073b", mask.value), nil
+	return fmt.Sprintf("%074b", mask.value), nil
 }
