@@ -2599,7 +2599,9 @@ const docTemplate = `{
                 "channel_open_try",
                 "channel_open_init",
                 "channel_open_confirm",
-                "channel_open_ack"
+                "channel_open_ack",
+                "recv_packet",
+                "write_acknowledgement"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -2647,7 +2649,9 @@ const docTemplate = `{
                 "EventTypeChannelOpenTry",
                 "EventTypeChannelOpenInit",
                 "EventTypeChannelOpenConfirm",
-                "EventTypeChannelOpenAck"
+                "EventTypeChannelOpenAck",
+                "EventTypeRecvPacket",
+                "EventTypeWriteAcknowledgement"
             ]
         },
         "types.MsgType": {
