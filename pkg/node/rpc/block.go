@@ -79,3 +79,21 @@ func (api *API) BlockData(ctx context.Context, level pkgTypes.Level) (pkgTypes.B
 	blockData.ResultBlockResults = results.Result
 	return blockData, nil
 }
+
+func (api *API) BlockDataGet(ctx context.Context, level pkgTypes.Level) (pkgTypes.BlockData, error) {
+	var blockData pkgTypes.BlockData
+
+	block, err := api.Block(ctx, level)
+	if err != nil {
+		return blockData, errors.Wrapf(types.ErrRequest, "request error: %s", err.Error())
+	}
+
+	results, err := api.BlockResults(ctx, level)
+	if err != nil {
+		return blockData, errors.Wrapf(types.ErrRequest, "request error: %s", err.Error())
+	}
+
+	blockData.ResultBlock = block
+	blockData.ResultBlockResults = results
+	return blockData, nil
+}

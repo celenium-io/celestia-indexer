@@ -83,7 +83,8 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 
 		for i := types.Level(1); i <= blockCount; i++ {
 			s.api.EXPECT().
-				BlockData(gomock.Any(), i).
+				// BlockData(gomock.Any(), i).
+				BlockDataGet(gomock.Any(), i).
 				Return(types.BlockData{
 					ResultBlock:        getResultBlock(i),
 					ResultBlockResults: getResultBlockResults(i),
