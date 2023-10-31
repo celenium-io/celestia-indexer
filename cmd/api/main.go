@@ -42,7 +42,7 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 
 	db := initDatabase(cfg.Database)
-	e := initEcho(cfg.ApiConfig)
+	e := initEcho(cfg.ApiConfig, cfg.Environment)
 	initHandlers(ctx, e, *cfg, db)
 
 	go func() {
@@ -54,8 +54,10 @@ func main() {
 	<-ctx.Done()
 	cancel()
 
-	if err := wsManager.Close(); err != nil {
-		e.Logger.Fatal(err)
+	if wsManager != nil {
+		if err := wsManager.Close(); err != nil {
+			e.Logger.Fatal(err)
+		}
 	}
 
 	if err := e.Shutdown(ctx); err != nil {

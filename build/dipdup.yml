@@ -33,6 +33,9 @@ api:
   prometheus: ${API_PROMETHEUS_ENABLED:-true}
   request_timeout: ${API_REQUEST_TIMEOUT:-30}
   blob_receiver: dal_api
+  sentry_dsn: ${SENTRY_DSN}
+
+environment: ${CELENIUM_ENV:-production}
 
 profiler:
   server: ${PROFILER_SERVER}
