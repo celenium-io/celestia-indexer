@@ -36,7 +36,7 @@ func (h *Hex) UnmarshalJSON(data []byte) error {
 	}
 	length := len(data)
 	if length%2 == 1 {
-		return errors.Errorf("odd hex lenght: %d %v", length, data)
+		return errors.Errorf("odd hex length: %d %v", length, data)
 	}
 	if data[0] != '"' || data[length-1] != '"' {
 		return errors.Errorf("hex should be quotted string: got=%s", data)

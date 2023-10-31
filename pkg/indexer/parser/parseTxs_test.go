@@ -56,7 +56,7 @@ func TestParseTxs_FailedTx(t *testing.T) {
 	txRes := types.ResponseDeliverTx{
 		Code:      1,
 		Data:      []byte{},
-		Log:       "something wierd happened",
+		Log:       "something weird happened",
 		Info:      "info",
 		GasWanted: 12000,
 		GasUsed:   1000,
@@ -73,7 +73,7 @@ func TestParseTxs_FailedTx(t *testing.T) {
 	f := resultTxs[0]
 	assert.Equal(t, now, f.Time)
 	assert.Equal(t, storageTypes.StatusFailed, f.Status)
-	assert.Equal(t, "something wierd happened", f.Error)
+	assert.Equal(t, "something weird happened", f.Error)
 	assert.Equal(t, int64(12000), f.GasWanted)
 	assert.Equal(t, int64(1000), f.GasUsed)
 	assert.Equal(t, "celestia-explorer", f.Codespace)
