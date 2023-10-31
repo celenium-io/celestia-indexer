@@ -45,7 +45,11 @@ package types
 		cosmos.authz.v1beta1.EventGrant,
 
 		send_packet,
-		ibc_transfer
+		ibc_transfer,
+
+		fungible_token_packet,
+		acknowledge_packet,
+		update_client
 	)
 */
 //go:generate go-enum --marshal --sql --values

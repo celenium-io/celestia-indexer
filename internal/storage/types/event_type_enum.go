@@ -81,6 +81,12 @@ const (
 	EventTypeSendPacket EventType = "send_packet"
 	// EventTypeIbcTransfer is a EventType of type ibc_transfer.
 	EventTypeIbcTransfer EventType = "ibc_transfer"
+	// EventTypeFungibleTokenPacket is a EventType of type fungible_token_packet.
+	EventTypeFungibleTokenPacket EventType = "fungible_token_packet"
+	// EventTypeAcknowledgePacket is a EventType of type acknowledge_packet.
+	EventTypeAcknowledgePacket EventType = "acknowledge_packet"
+	// EventTypeUpdateClient is a EventType of type update_client.
+	EventTypeUpdateClient EventType = "update_client"
 )
 
 var ErrInvalidEventType = errors.New("not a valid EventType")
@@ -122,6 +128,9 @@ func EventTypeValues() []EventType {
 		EventTypeCosmosauthzv1beta1EventGrant,
 		EventTypeSendPacket,
 		EventTypeIbcTransfer,
+		EventTypeFungibleTokenPacket,
+		EventTypeAcknowledgePacket,
+		EventTypeUpdateClient,
 	}
 }
 
@@ -172,6 +181,9 @@ var _EventTypeValue = map[string]EventType{
 	"cosmos.authz.v1beta1.EventGrant":   EventTypeCosmosauthzv1beta1EventGrant,
 	"send_packet":                       EventTypeSendPacket,
 	"ibc_transfer":                      EventTypeIbcTransfer,
+	"fungible_token_packet":             EventTypeFungibleTokenPacket,
+	"acknowledge_packet":                EventTypeAcknowledgePacket,
+	"update_client":                     EventTypeUpdateClient,
 }
 
 // ParseEventType attempts to convert a string to a EventType.
