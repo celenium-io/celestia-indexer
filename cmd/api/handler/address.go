@@ -64,8 +64,8 @@ func (handler *AddressHandler) Get(c echo.Context) error {
 	}
 
 	address, err := handler.address.ByHash(c.Request().Context(), hash)
-	if err := handleError(c, err, handler.address); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.address)
 	}
 
 	return c.JSON(http.StatusOK, responses.NewAddress(address))
@@ -99,8 +99,8 @@ func (handler *AddressHandler) List(c echo.Context) error {
 	}
 
 	address, err := handler.address.ListWithBalance(c.Request().Context(), fltrs)
-	if err := handleError(c, err, handler.address); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.address)
 	}
 
 	response := make([]responses.Address, len(address))
@@ -144,8 +144,8 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 	}
 
 	address, err := handler.address.ByHash(c.Request().Context(), hash)
-	if err := handleError(c, err, handler.address); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.address)
 	}
 
 	fltrs := storage.TxFilter{
@@ -163,8 +163,8 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 	}
 
 	txs, err := handler.txs.ByAddress(c.Request().Context(), address.Id, fltrs)
-	if err := handleError(c, err, handler.txs); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.address)
 	}
 	response := make([]responses.Tx, len(txs))
 	for i := range txs {
@@ -226,14 +226,14 @@ func (handler *AddressHandler) Messages(c echo.Context) error {
 	}
 
 	address, err := handler.address.ByHash(c.Request().Context(), hash)
-	if err := handleError(c, err, handler.address); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.address)
 	}
 
 	filters := req.ToFilters()
 	msgs, err := handler.address.Messages(c.Request().Context(), address.Id, filters)
-	if err := handleError(c, err, handler.txs); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.address)
 	}
 
 	response := make([]responses.Message, len(msgs))
@@ -256,8 +256,8 @@ func (handler *AddressHandler) Messages(c echo.Context) error {
 //	@Router			/v1/address/count [get]
 func (handler *AddressHandler) Count(c echo.Context) error {
 	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
-	if err := handleError(c, err, handler.state); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.address)
 	}
 	return c.JSON(http.StatusOK, state.TotalAccounts)
 }

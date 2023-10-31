@@ -95,8 +95,8 @@ func (handler SearchHandler) searchAddress(c echo.Context, search string) error 
 	}
 
 	address, err := handler.address.ByHash(c.Request().Context(), hash)
-	if err := handleError(c, err, handler.address); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.address)
 	}
 	return c.JSON(http.StatusOK, responses.NewSearchResponse(responses.NewAddress(address)))
 }
@@ -157,8 +157,8 @@ func (handler SearchHandler) getNamespace(c echo.Context, data []byte) error {
 	version := data[0]
 	namespaceId := data[1:]
 	ns, err := handler.namespace.ByNamespaceIdAndVersion(c.Request().Context(), namespaceId, version)
-	if err := handleError(c, err, handler.namespace); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.namespace)
 	}
 	response := responses.NewNamespace(ns)
 	return c.JSON(http.StatusOK, responses.NewSearchResponse(response))

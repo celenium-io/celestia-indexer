@@ -4,8 +4,9 @@
 package handler
 
 import (
-	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"net/http"
+
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -76,8 +77,8 @@ func (handler *BlockHandler) Get(c echo.Context) error {
 		block, err = handler.block.ByHeight(c.Request().Context(), req.Height)
 	}
 
-	if err := handleError(c, err, handler.block); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.block)
 	}
 
 	return c.JSON(http.StatusOK, responses.NewBlock(block, req.Stats))
@@ -128,8 +129,8 @@ func (handler *BlockHandler) List(c echo.Context) error {
 		blocks, err = handler.block.List(c.Request().Context(), req.Limit, req.Offset, pgSort(req.Sort))
 	}
 
-	if err := handleError(c, err, handler.block); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.block)
 	}
 
 	response := make([]responses.Block, len(blocks))
@@ -159,8 +160,8 @@ func (handler *BlockHandler) GetEvents(c echo.Context) error {
 	}
 
 	events, err := handler.events.ByBlock(c.Request().Context(), req.Height)
-	if err := handleError(c, err, handler.events); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.block)
 	}
 
 	response := make([]responses.Event, len(events))
@@ -190,8 +191,8 @@ func (handler *BlockHandler) GetStats(c echo.Context) error {
 	}
 
 	stats, err := handler.blockStats.ByHeight(c.Request().Context(), req.Height)
-	if err := handleError(c, err, handler.events); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.block)
 	}
 	return c.JSON(http.StatusOK, responses.NewBlockStats(stats))
 }
@@ -218,14 +219,14 @@ func (handler *BlockHandler) GetNamespaces(c echo.Context) error {
 	req.SetDefault()
 
 	messages, err := handler.namespace.MessagesByHeight(c.Request().Context(), req.Height, int(req.Limit), int(req.Offset))
-	if err := handleError(c, err, handler.events); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.block)
 	}
 	response := make([]responses.NamespaceMessage, len(messages))
 	for i := range response {
 		msg, err := responses.NewNamespaceMessage(messages[i])
-		if err := handleError(c, err, handler.namespace); err != nil {
-			return err
+		if err != nil {
+			return handleError(c, err, handler.block)
 		}
 		response[i] = msg
 	}
@@ -251,8 +252,8 @@ func (handler *BlockHandler) GetNamespacesCount(c echo.Context) error {
 	}
 
 	count, err := handler.namespace.CountMessagesByHeight(c.Request().Context(), req.Height)
-	if err := handleError(c, err, handler.namespace); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.block)
 	}
 
 	return c.JSON(http.StatusOK, count)
@@ -270,8 +271,8 @@ func (handler *BlockHandler) GetNamespacesCount(c echo.Context) error {
 //	@Router			/v1/block/count [get]
 func (handler *BlockHandler) Count(c echo.Context) error {
 	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
-	if err := handleError(c, err, handler.state); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.block)
 	}
 	return c.JSON(http.StatusOK, state.LastHeight+1) // + genesis block
 }

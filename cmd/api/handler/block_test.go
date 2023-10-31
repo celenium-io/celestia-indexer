@@ -5,13 +5,15 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
-	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
 	"time"
+
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -115,6 +117,26 @@ func (s *BlockTestSuite) TestGet() {
 	s.Require().Equal(testTime, block.Time)
 	s.Require().Equal([]types.MsgType{types.MsgSend}, block.MessageTypes)
 	s.Require().Nil(block.Stats)
+}
+
+func (s *BlockTestSuite) TestGetNoContent() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/block/:height")
+	c.SetParamNames("height")
+	c.SetParamValues("100")
+
+	s.blocks.EXPECT().
+		ByHeight(gomock.Any(), pkgTypes.Level(100)).
+		Return(storage.Block{}, sql.ErrNoRows)
+
+	s.blocks.EXPECT().
+		IsNoRows(gomock.Any()).
+		Return(true)
+
+	s.Require().NoError(s.handler.Get(c))
+	s.Require().Equal(http.StatusNoContent, rec.Code)
 }
 
 func (s *BlockTestSuite) TestGetWithoutStats() {
