@@ -6,8 +6,9 @@ package handler
 import (
 	"encoding/base64"
 	"encoding/hex"
-	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"net/http"
+
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -65,8 +66,8 @@ func (handler *NamespaceHandler) Get(c echo.Context) error {
 	}
 
 	namespace, err := handler.namespace.ByNamespaceId(c.Request().Context(), namespaceId)
-	if err := handleError(c, err, handler.namespace); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.namespace)
 	}
 
 	response := make([]responses.Namespace, len(namespace))
@@ -111,8 +112,8 @@ func (handler *NamespaceHandler) GetByHash(c echo.Context) error {
 	namespaceId := hash[1:]
 
 	namespace, err := handler.namespace.ByNamespaceIdAndVersion(c.Request().Context(), namespaceId, version)
-	if err := handleError(c, err, handler.namespace); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.namespace)
 	}
 	return c.JSON(http.StatusOK, responses.NewNamespace(namespace))
 }
@@ -148,8 +149,8 @@ func (handler *NamespaceHandler) GetWithVersion(c echo.Context) error {
 	}
 
 	namespace, err := handler.namespace.ByNamespaceIdAndVersion(c.Request().Context(), namespaceId, req.Version)
-	if err := handleError(c, err, handler.namespace); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.namespace)
 	}
 
 	return c.JSON(http.StatusOK, responses.NewNamespace(namespace))
@@ -177,8 +178,8 @@ func (handler *NamespaceHandler) List(c echo.Context) error {
 	req.SetDefault()
 
 	namespace, err := handler.namespace.List(c.Request().Context(), req.Limit, req.Offset, pgSort(req.Sort))
-	if err := handleError(c, err, handler.namespace); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.namespace)
 	}
 	response := make([]responses.Namespace, len(namespace))
 	for i := range namespace {
@@ -286,20 +287,20 @@ func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
 	}
 
 	ns, err := handler.namespace.ByNamespaceIdAndVersion(c.Request().Context(), namespaceId, req.Version)
-	if err := handleError(c, err, handler.namespace); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.namespace)
 	}
 
 	messages, err := handler.namespace.Messages(c.Request().Context(), ns.Id, int(req.Limit), int(req.Offset))
-	if err := handleError(c, err, handler.namespace); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.namespace)
 	}
 
 	response := make([]responses.NamespaceMessage, len(messages))
 	for i := range response {
 		msg, err := responses.NewNamespaceMessage(messages[i])
-		if err := handleError(c, err, handler.namespace); err != nil {
-			return err
+		if err != nil {
+			return handleError(c, err, handler.namespace)
 		}
 		response[i] = msg
 	}
@@ -319,8 +320,8 @@ func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
 //	@Router			/v1/namespace/active [get]
 func (handler *NamespaceHandler) GetActive(c echo.Context) error {
 	active, err := handler.namespace.Active(c.Request().Context(), 5)
-	if err := handleError(c, err, handler.namespace); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.namespace)
 	}
 
 	response := make([]responses.ActiveNamespace, len(active))
@@ -342,8 +343,8 @@ func (handler *NamespaceHandler) GetActive(c echo.Context) error {
 //	@Router			/v1/namespace/count [get]
 func (handler *NamespaceHandler) Count(c echo.Context) error {
 	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
-	if err := handleError(c, err, handler.state); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.namespace)
 	}
 	return c.JSON(http.StatusOK, state.TotalNamespaces)
 }
