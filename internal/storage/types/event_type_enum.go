@@ -109,6 +109,16 @@ const (
 	EventTypeRecvPacket EventType = "recv_packet"
 	// EventTypeWriteAcknowledgement is a EventType of type write_acknowledgement.
 	EventTypeWriteAcknowledgement EventType = "write_acknowledgement"
+	// EventTypeTimeout is a EventType of type timeout.
+	EventTypeTimeout EventType = "timeout"
+	// EventTypeTimeoutPacket is a EventType of type timeout_packet.
+	EventTypeTimeoutPacket EventType = "timeout_packet"
+	// EventTypeCosmosauthzv1beta1EventRevoke is a EventType of type cosmos.authz.v1beta1.EventRevoke.
+	EventTypeCosmosauthzv1beta1EventRevoke EventType = "cosmos.authz.v1beta1.EventRevoke"
+	// EventTypeCosmosauthzv1EventRevoke is a EventType of type cosmos.authz.v1.EventRevoke.
+	EventTypeCosmosauthzv1EventRevoke EventType = "cosmos.authz.v1.EventRevoke"
+	// EventTypeCancelUnbondingDelegation is a EventType of type cancel_unbonding_delegation.
+	EventTypeCancelUnbondingDelegation EventType = "cancel_unbonding_delegation"
 )
 
 var ErrInvalidEventType = errors.New("not a valid EventType")
@@ -164,6 +174,11 @@ func EventTypeValues() []EventType {
 		EventTypeChannelOpenAck,
 		EventTypeRecvPacket,
 		EventTypeWriteAcknowledgement,
+		EventTypeTimeout,
+		EventTypeTimeoutPacket,
+		EventTypeCosmosauthzv1beta1EventRevoke,
+		EventTypeCosmosauthzv1EventRevoke,
+		EventTypeCancelUnbondingDelegation,
 	}
 }
 
@@ -228,6 +243,11 @@ var _EventTypeValue = map[string]EventType{
 	"channel_open_ack":                  EventTypeChannelOpenAck,
 	"recv_packet":                       EventTypeRecvPacket,
 	"write_acknowledgement":             EventTypeWriteAcknowledgement,
+	"timeout":                           EventTypeTimeout,
+	"timeout_packet":                    EventTypeTimeoutPacket,
+	"cosmos.authz.v1beta1.EventRevoke":  EventTypeCosmosauthzv1beta1EventRevoke,
+	"cosmos.authz.v1.EventRevoke":       EventTypeCosmosauthzv1EventRevoke,
+	"cancel_unbonding_delegation":       EventTypeCancelUnbondingDelegation,
 }
 
 // ParseEventType attempts to convert a string to a EventType.
