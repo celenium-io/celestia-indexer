@@ -68,8 +68,8 @@ func (handler *TxHandler) Get(c echo.Context) error {
 	}
 
 	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
-	if err := handleError(c, err, handler.tx); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.tx)
 	}
 
 	return c.JSON(http.StatusOK, responses.NewTx(tx))
@@ -122,8 +122,8 @@ func (handler *TxHandler) List(c echo.Context) error {
 	}
 
 	txs, err := handler.tx.Filter(c.Request().Context(), fltrs)
-	if err := handleError(c, err, handler.tx); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.tx)
 	}
 	response := make([]responses.Tx, len(txs))
 	for i := range txs {
@@ -156,13 +156,13 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 	}
 
 	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
-	if err := handleError(c, err, handler.tx); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.tx)
 	}
 
 	events, err := handler.events.ByTxId(c.Request().Context(), tx.Id)
-	if err := handleError(c, err, handler.tx); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.tx)
 	}
 	response := make([]responses.Event, len(events))
 	for i := range events {
@@ -195,13 +195,13 @@ func (handler *TxHandler) GetMessages(c echo.Context) error {
 	}
 
 	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
-	if err := handleError(c, err, handler.tx); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.tx)
 	}
 
 	messages, err := handler.messages.ByTxId(c.Request().Context(), tx.Id)
-	if err := handleError(c, err, handler.tx); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.tx)
 	}
 	response := make([]responses.Message, len(messages))
 	for i := range messages {
@@ -222,8 +222,8 @@ func (handler *TxHandler) GetMessages(c echo.Context) error {
 //	@Router			/v1/tx/count [get]
 func (handler *TxHandler) Count(c echo.Context) error {
 	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
-	if err := handleError(c, err, handler.state); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.tx)
 	}
 	return c.JSON(http.StatusOK, state.TotalTx)
 }
@@ -250,8 +250,8 @@ func (handler *TxHandler) Genesis(c echo.Context) error {
 	req.SetDefault()
 
 	txs, err := handler.tx.Genesis(c.Request().Context(), int(req.Limit), int(req.Offset), pgSort(req.Sort))
-	if err := handleError(c, err, handler.tx); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.tx)
 	}
 	response := make([]responses.Tx, len(txs))
 	for i := range txs {

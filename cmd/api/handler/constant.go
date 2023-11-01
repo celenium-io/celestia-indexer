@@ -37,12 +37,12 @@ func NewConstantHandler(constants storage.IConstant, denomMetadata storage.IDeno
 //	@Router			/v1/constants [get]
 func (handler *ConstantHandler) Get(c echo.Context) error {
 	consts, err := handler.constants.All(c.Request().Context())
-	if err := handleError(c, err, handler.address); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.address)
 	}
 	dm, err := handler.denomMetadata.All(c.Request().Context())
-	if err := handleError(c, err, handler.address); err != nil {
-		return err
+	if err != nil {
+		return handleError(c, err, handler.address)
 	}
 	return c.JSON(http.StatusOK, responses.NewConstants(consts, dm))
 }
