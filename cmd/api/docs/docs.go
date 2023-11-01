@@ -2601,7 +2601,12 @@ const docTemplate = `{
                 "channel_open_confirm",
                 "channel_open_ack",
                 "recv_packet",
-                "write_acknowledgement"
+                "write_acknowledgement",
+                "timeout",
+                "timeout_packet",
+                "cosmos.authz.v1beta1.EventRevoke",
+                "cosmos.authz.v1.EventRevoke",
+                "cancel_unbonding_delegation"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -2651,7 +2656,12 @@ const docTemplate = `{
                 "EventTypeChannelOpenConfirm",
                 "EventTypeChannelOpenAck",
                 "EventTypeRecvPacket",
-                "EventTypeWriteAcknowledgement"
+                "EventTypeWriteAcknowledgement",
+                "EventTypeTimeout",
+                "EventTypeTimeoutPacket",
+                "EventTypeCosmosauthzv1beta1EventRevoke",
+                "EventTypeCosmosauthzv1EventRevoke",
+                "EventTypeCancelUnbondingDelegation"
             ]
         },
         "types.MsgType": {
