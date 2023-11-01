@@ -507,6 +507,36 @@ func (s *StorageTestSuite) TestTxFilterSuccessUnjailAsc() {
 	s.Require().Equal("80410", tx.Fee.String())
 }
 
+func (s *StorageTestSuite) TestTxFilterExcludedMessageTypes() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Sort:                 sdk.SortOrderAsc,
+		Limit:                10,
+		Offset:               0,
+		ExcludedMessageTypes: types.NewMsgTypeBitMask(types.MsgUnjail),
+		Height:               1000,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+
+	tx := txs[0]
+
+	s.Require().EqualValues(1, tx.Id)
+	s.Require().EqualValues(0, tx.Position)
+	s.Require().EqualValues(1000, tx.Height)
+	s.Require().EqualValues(0, tx.TimeoutHeight)
+	s.Require().EqualValues(80410, tx.GasWanted)
+	s.Require().EqualValues(77483, tx.GasUsed)
+	s.Require().EqualValues(1, tx.EventsCount)
+	s.Require().EqualValues(2, tx.MessagesCount)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
+	s.Require().Equal("memo", tx.Memo)
+	s.Require().Equal("sdk", tx.Codespace)
+	s.Require().Equal("80410", tx.Fee.String())
+}
+
 func (s *StorageTestSuite) TestTxFilterSuccessDesc() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

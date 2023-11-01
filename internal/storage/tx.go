@@ -27,15 +27,16 @@ type ITx interface {
 }
 
 type TxFilter struct {
-	Limit        int
-	Offset       int
-	Sort         storage.SortOrder
-	Status       []string
-	MessageTypes types.MsgTypeBits
-	Height       uint64
-	TimeFrom     time.Time
-	TimeTo       time.Time
-	WithMessages bool
+	Limit                int
+	Offset               int
+	Sort                 storage.SortOrder
+	Status               []string
+	MessageTypes         types.MsgTypeBits
+	ExcludedMessageTypes types.MsgTypeBits
+	Height               uint64
+	TimeFrom             time.Time
+	TimeTo               time.Time
+	WithMessages         bool
 }
 
 // Tx -

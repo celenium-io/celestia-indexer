@@ -288,13 +288,71 @@ func (s *TxTestSuite) TestListHeight() {
 
 	s.tx.EXPECT().
 		Filter(gomock.Any(), storage.TxFilter{
-			Limit:        2,
-			Offset:       0,
-			Sort:         pgSort("desc"),
-			Status:       []string{"success"},
-			Height:       1000,
-			MessageTypes: types.NewMsgTypeBitMask(types.MsgSend),
-			WithMessages: true,
+			Limit:                2,
+			Offset:               0,
+			Sort:                 pgSort("desc"),
+			Status:               []string{"success"},
+			Height:               1000,
+			MessageTypes:         types.NewMsgTypeBitMask(types.MsgSend),
+			ExcludedMessageTypes: types.NewMsgTypeBitMask(),
+			WithMessages:         true,
+		}).
+		Return([]storage.Tx{
+			testTx,
+		}, nil)
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var txs []responses.Tx
+	err := json.NewDecoder(rec.Body).Decode(&txs)
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+
+	tx := txs[0]
+	s.Require().EqualValues(1, tx.Id)
+	s.Require().EqualValues(100, tx.Height)
+	s.Require().Equal(testTime, tx.Time)
+	s.Require().Equal(testTxHash, strings.ToUpper(tx.Hash))
+	s.Require().EqualValues(2, tx.Position)
+	s.Require().EqualValues(80410, tx.GasWanted)
+	s.Require().EqualValues(77483, tx.GasUsed)
+	s.Require().Equal("80410", tx.Fee)
+	s.Require().EqualValues(0, tx.TimeoutHeight)
+	s.Require().EqualValues(10, tx.EventsCount)
+	s.Require().EqualValues(2, tx.MessagesCount)
+	s.Require().Equal("memo", tx.Memo)
+	s.Require().Equal("sdk", tx.Codespace)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
+
+	s.Require().Len(tx.Messages, 1)
+}
+
+func (s *TxTestSuite) TestListExcludedMessages() {
+	q := make(url.Values)
+	q.Set("limit", "2")
+	q.Set("offset", "0")
+	q.Set("sort", "desc")
+	q.Set("status", "success")
+	q.Set("excluded_msg_type", "MsgSend")
+	q.Set("height", "1000")
+	q.Set("messages", "true")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx")
+
+	s.tx.EXPECT().
+		Filter(gomock.Any(), storage.TxFilter{
+			Limit:                2,
+			Offset:               0,
+			Sort:                 pgSort("desc"),
+			Status:               []string{"success"},
+			Height:               1000,
+			ExcludedMessageTypes: types.NewMsgTypeBitMask(types.MsgSend),
+			MessageTypes:         types.NewMsgTypeBitMask(),
+			WithMessages:         true,
 		}).
 		Return([]storage.Tx{
 			testTx,

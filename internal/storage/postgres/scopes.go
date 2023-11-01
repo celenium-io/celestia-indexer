@@ -49,6 +49,10 @@ func txFilter(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
 		query = query.Where("bit_count(message_types & ?::bit(74)) > 0", fltrs.MessageTypes)
 	}
 
+	if !fltrs.ExcludedMessageTypes.Empty() {
+		query = query.Where("bit_count(message_types & ~(?::bit(74))) > 0", fltrs.ExcludedMessageTypes)
+	}
+
 	if len(fltrs.Status) > 0 {
 		query = query.WhereGroup(" AND ", func(sq *bun.SelectQuery) *bun.SelectQuery {
 			for i := range fltrs.Status {
