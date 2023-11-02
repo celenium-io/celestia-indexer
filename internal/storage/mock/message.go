@@ -5,7 +5,6 @@
 //
 //	mockgen -source=message.go -destination=mock/message.go -package=mock -typed
 //
-
 // Package mock is a generated GoMock package.
 package mock
 
@@ -270,6 +269,45 @@ func (c *IMessageListCall) Do(f func(context.Context, uint64, uint64, storage0.S
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *IMessageListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Message, error)) *IMessageListCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// ListWithTx mocks base method.
+func (m *MockIMessage) ListWithTx(ctx context.Context, filters storage.MessageListWithTxFilters) ([]storage.MessageWithTx, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListWithTx", ctx, filters)
+	ret0, _ := ret[0].([]storage.MessageWithTx)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListWithTx indicates an expected call of ListWithTx.
+func (mr *MockIMessageMockRecorder) ListWithTx(ctx, filters any) *IMessageListWithTxCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListWithTx", reflect.TypeOf((*MockIMessage)(nil).ListWithTx), ctx, filters)
+	return &IMessageListWithTxCall{Call: call}
+}
+
+// IMessageListWithTxCall wrap *gomock.Call
+type IMessageListWithTxCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IMessageListWithTxCall) Return(arg0 []storage.MessageWithTx, arg1 error) *IMessageListWithTxCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IMessageListWithTxCall) Do(f func(context.Context, storage.MessageListWithTxFilters) ([]storage.MessageWithTx, error)) *IMessageListWithTxCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IMessageListWithTxCall) DoAndReturn(f func(context.Context, storage.MessageListWithTxFilters) ([]storage.MessageWithTx, error)) *IMessageListWithTxCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

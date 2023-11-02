@@ -229,7 +229,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		addressGroup.GET("/:hash/messages", addressHandlers.Messages)
 	}
 
-	blockHandlers := handler.NewBlockHandler(db.Blocks, db.BlockStats, db.Event, db.Namespace, db.State, cfg.Indexer.Name)
+	blockHandlers := handler.NewBlockHandler(db.Blocks, db.BlockStats, db.Event, db.Namespace, db.Message, db.State, cfg.Indexer.Name)
 	blockGroup := v1.Group("/block")
 	{
 		blockGroup.GET("", blockHandlers.List)
@@ -238,6 +238,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		{
 			heightGroup.GET("", blockHandlers.Get)
 			heightGroup.GET("/events", blockHandlers.GetEvents)
+			heightGroup.GET("/messages", blockHandlers.GetMessages)
 			heightGroup.GET("/stats", blockHandlers.GetStats)
 			heightGroup.GET("/namespace", blockHandlers.GetNamespaces)
 			heightGroup.GET("/namespace/count", blockHandlers.GetNamespacesCount)

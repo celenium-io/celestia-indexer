@@ -14,11 +14,27 @@ import (
 	"github.com/uptrace/bun"
 )
 
+type MessageListWithTxFilters struct {
+	Height               pkgTypes.Level
+	Limit                int
+	Offset               int
+	ExcludedMessageTypes []string
+	MessageTypes         []string
+}
+
+type MessageWithTx struct {
+	bun.BaseModel `bun:"message,alias:message" comment:"Table with celestia messages."`
+
+	Message
+	Tx *Tx `bun:"rel:belongs-to"`
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IMessage interface {
 	storage.Table[*Message]
 
 	ByTxId(ctx context.Context, txId uint64) ([]Message, error)
+	ListWithTx(ctx context.Context, filters MessageListWithTxFilters) ([]MessageWithTx, error)
 }
 
 // Message -

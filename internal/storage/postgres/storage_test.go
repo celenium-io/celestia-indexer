@@ -352,6 +352,46 @@ func (s *StorageTestSuite) TestMessageByTxId() {
 	s.Require().Equal(types.MsgWithdrawDelegatorReward, msgs[0].Type)
 }
 
+func (s *StorageTestSuite) TestMessageListWithTx() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	msgs, err := s.storage.Message.ListWithTx(ctx, storage.MessageListWithTxFilters{
+		Limit:                10,
+		Offset:               0,
+		Height:               1000,
+		MessageTypes:         []string{types.MsgWithdrawDelegatorReward.String(), types.MsgUnjail.String()},
+		ExcludedMessageTypes: []string{types.MsgUnjail.String()},
+	})
+	s.Require().NoError(err)
+	s.Require().Len(msgs, 1)
+
+	s.Require().EqualValues(1, msgs[0].Id)
+	s.Require().EqualValues(1000, msgs[0].Height)
+	s.Require().EqualValues(0, msgs[0].Position)
+	s.Require().Equal(types.MsgWithdrawDelegatorReward, msgs[0].Type)
+	s.Require().NotNil(msgs[0].Tx)
+
+	tx := msgs[0].Tx
+
+	s.Require().EqualValues(1, tx.Id)
+	s.Require().EqualValues(0, tx.Position)
+	s.Require().EqualValues(1000, tx.Height)
+	s.Require().EqualValues(0, tx.TimeoutHeight)
+	s.Require().EqualValues(80410, tx.GasWanted)
+	s.Require().EqualValues(77483, tx.GasUsed)
+	s.Require().EqualValues(1, tx.EventsCount)
+	s.Require().EqualValues(2, tx.MessagesCount)
+
+	txHash, err := hex.DecodeString("652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF")
+	s.Require().NoError(err)
+	s.Require().Equal(txHash, tx.Hash)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
+	s.Require().Equal("memo", tx.Memo)
+	s.Require().Equal("sdk", tx.Codespace)
+	s.Require().Equal("80410", tx.Fee.String())
+}
+
 func (s *StorageTestSuite) TestNamespaceId() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

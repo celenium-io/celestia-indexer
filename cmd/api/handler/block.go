@@ -18,6 +18,7 @@ type BlockHandler struct {
 	blockStats  storage.IBlockStats
 	events      storage.IEvent
 	namespace   storage.INamespace
+	message     storage.IMessage
 	state       storage.IState
 	indexerName string
 }
@@ -27,6 +28,7 @@ func NewBlockHandler(
 	blockStats storage.IBlockStats,
 	events storage.IEvent,
 	namespace storage.INamespace,
+	message storage.IMessage,
 	state storage.IState,
 	indexerName string,
 ) *BlockHandler {
@@ -35,6 +37,7 @@ func NewBlockHandler(
 		blockStats:  blockStats,
 		events:      events,
 		namespace:   namespace,
+		message:     message,
 		state:       state,
 		indexerName: indexerName,
 	}
@@ -199,8 +202,8 @@ func (handler *BlockHandler) GetStats(c echo.Context) error {
 
 // GetNamespaces godoc
 //
-//	@Summary		Get namesapces affected in the block
-//	@Description	Get namesapces affected in the block
+//	@Summary		Get namespaces affected in the block
+//	@Description	Get namespaces affected in the block
 //	@Tags			block
 //	@ID				get-block-namespaces
 //	@Param			height	path	integer	true	"Block height"					minimum(1)
@@ -275,4 +278,48 @@ func (handler *BlockHandler) Count(c echo.Context) error {
 		return handleError(c, err, handler.block)
 	}
 	return c.JSON(http.StatusOK, state.LastHeight+1) // + genesis block
+}
+
+// GetMessages godoc
+//
+//	@Summary		Get messages contained in the block
+//	@Description	Get messages contained in the block
+//	@Tags			block
+//	@ID				get-block-messages
+//	@Param			height				path	integer	true	"Block height"					minimum(1)
+//	@Param			limit				query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset				query	integer	false	"Offset"						mininum(1)
+//	@Param			msg_type			query	types.MsgType	false	"Comma-separated message types list"
+//	@Param			excluded_msg_type	query	types.MsgType	false	"Comma-separated message types which should be excluded from list"
+//	@Produce		json
+//	@Success		200	{array} 	responses.Message
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/block/{height}/messages [get]
+func (handler *BlockHandler) GetMessages(c echo.Context) error {
+	req, err := bindAndValidate[listMessageByBlockRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	fltrs := storage.MessageListWithTxFilters{
+		Limit:                int(req.Limit),
+		Offset:               int(req.Offset),
+		Height:               req.Height,
+		MessageTypes:         req.MsgType,
+		ExcludedMessageTypes: req.ExcludedMsgType,
+	}
+
+	messages, err := handler.message.ListWithTx(c.Request().Context(), fltrs)
+	if err != nil {
+		return handleError(c, err, handler.block)
+	}
+	response := make([]responses.Message, len(messages))
+	for i := range response {
+		msg := responses.NewMessageWithTx(messages[i])
+		response[i] = msg
+	}
+
+	return c.JSON(http.StatusOK, response)
 }

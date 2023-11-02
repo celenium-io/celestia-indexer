@@ -592,16 +592,239 @@
                 }
             }
         },
-        "/v1/block/{height}/namespace": {
+        "/v1/block/{height}/messages": {
             "get": {
-                "description": "Get namesapces affected in the block",
+                "description": "Get messages contained in the block",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "block"
                 ],
-                "summary": "Get namesapces affected in the block",
+                "summary": "Get messages contained in the block",
+                "operationId": "get-block-messages",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Block height",
+                        "name": "height",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "MsgUnknown",
+                            "MsgSetWithdrawAddress",
+                            "MsgWithdrawDelegatorReward",
+                            "MsgWithdrawValidatorCommission",
+                            "MsgFundCommunityPool",
+                            "MsgCreateValidator",
+                            "MsgEditValidator",
+                            "MsgDelegate",
+                            "MsgBeginRedelegate",
+                            "MsgUndelegate",
+                            "MsgCancelUnbondingDelegation",
+                            "MsgUnjail",
+                            "MsgSend",
+                            "MsgMultiSend",
+                            "MsgCreateVestingAccount",
+                            "MsgCreatePermanentLockedAccount",
+                            "MsgCreatePeriodicVestingAccount",
+                            "MsgPayForBlobs",
+                            "MsgGrant",
+                            "MsgExec",
+                            "MsgRevoke",
+                            "MsgGrantAllowance",
+                            "MsgRevokeAllowance",
+                            "MsgRegisterEVMAddress",
+                            "MsgSubmitProposal",
+                            "MsgExecLegacyContent",
+                            "MsgVote",
+                            "MsgVoteWeighted",
+                            "MsgDeposit",
+                            "IBCTransfer",
+                            "MsgVerifyInvariant",
+                            "MsgSubmitEvidence",
+                            "MsgSendNFT",
+                            "MsgCreateGroup",
+                            "MsgUpdateGroupMembers",
+                            "MsgUpdateGroupAdmin",
+                            "MsgUpdateGroupMetadata",
+                            "MsgCreateGroupPolicy",
+                            "MsgUpdateGroupPolicyAdmin",
+                            "MsgCreateGroupWithPolicy",
+                            "MsgUpdateGroupPolicyDecisionPolicy",
+                            "MsgUpdateGroupPolicyMetadata",
+                            "MsgSubmitProposalGroup",
+                            "MsgWithdrawProposal",
+                            "MsgVoteGroup",
+                            "MsgExecGroup",
+                            "MsgLeaveGroup",
+                            "MsgSoftwareUpgrade",
+                            "MsgCancelUpgrade",
+                            "MsgRegisterInterchainAccount",
+                            "MsgSendTx",
+                            "MsgRegisterPayee",
+                            "MsgRegisterCounterpartyPayee",
+                            "MsgPayPacketFee",
+                            "MsgPayPacketFeeAsync",
+                            "MsgTransfer",
+                            "MsgCreateClient",
+                            "MsgUpdateClient",
+                            "MsgUpgradeClient",
+                            "MsgSubmitMisbehaviour",
+                            "MsgConnectionOpenInit",
+                            "MsgConnectionOpenTry",
+                            "MsgConnectionOpenAck",
+                            "MsgConnectionOpenConfirm",
+                            "MsgChannelOpenInit",
+                            "MsgChannelOpenTry",
+                            "MsgChannelOpenAck",
+                            "MsgChannelOpenConfirm",
+                            "MsgChannelCloseInit",
+                            "MsgChannelCloseConfirm",
+                            "MsgRecvPacket",
+                            "MsgTimeout",
+                            "MsgTimeoutOnClose",
+                            "MsgAcknowledgement"
+                        ],
+                        "type": "string",
+                        "description": "Comma-separated message types list",
+                        "name": "msg_type",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "MsgUnknown",
+                            "MsgSetWithdrawAddress",
+                            "MsgWithdrawDelegatorReward",
+                            "MsgWithdrawValidatorCommission",
+                            "MsgFundCommunityPool",
+                            "MsgCreateValidator",
+                            "MsgEditValidator",
+                            "MsgDelegate",
+                            "MsgBeginRedelegate",
+                            "MsgUndelegate",
+                            "MsgCancelUnbondingDelegation",
+                            "MsgUnjail",
+                            "MsgSend",
+                            "MsgMultiSend",
+                            "MsgCreateVestingAccount",
+                            "MsgCreatePermanentLockedAccount",
+                            "MsgCreatePeriodicVestingAccount",
+                            "MsgPayForBlobs",
+                            "MsgGrant",
+                            "MsgExec",
+                            "MsgRevoke",
+                            "MsgGrantAllowance",
+                            "MsgRevokeAllowance",
+                            "MsgRegisterEVMAddress",
+                            "MsgSubmitProposal",
+                            "MsgExecLegacyContent",
+                            "MsgVote",
+                            "MsgVoteWeighted",
+                            "MsgDeposit",
+                            "IBCTransfer",
+                            "MsgVerifyInvariant",
+                            "MsgSubmitEvidence",
+                            "MsgSendNFT",
+                            "MsgCreateGroup",
+                            "MsgUpdateGroupMembers",
+                            "MsgUpdateGroupAdmin",
+                            "MsgUpdateGroupMetadata",
+                            "MsgCreateGroupPolicy",
+                            "MsgUpdateGroupPolicyAdmin",
+                            "MsgCreateGroupWithPolicy",
+                            "MsgUpdateGroupPolicyDecisionPolicy",
+                            "MsgUpdateGroupPolicyMetadata",
+                            "MsgSubmitProposalGroup",
+                            "MsgWithdrawProposal",
+                            "MsgVoteGroup",
+                            "MsgExecGroup",
+                            "MsgLeaveGroup",
+                            "MsgSoftwareUpgrade",
+                            "MsgCancelUpgrade",
+                            "MsgRegisterInterchainAccount",
+                            "MsgSendTx",
+                            "MsgRegisterPayee",
+                            "MsgRegisterCounterpartyPayee",
+                            "MsgPayPacketFee",
+                            "MsgPayPacketFeeAsync",
+                            "MsgTransfer",
+                            "MsgCreateClient",
+                            "MsgUpdateClient",
+                            "MsgUpgradeClient",
+                            "MsgSubmitMisbehaviour",
+                            "MsgConnectionOpenInit",
+                            "MsgConnectionOpenTry",
+                            "MsgConnectionOpenAck",
+                            "MsgConnectionOpenConfirm",
+                            "MsgChannelOpenInit",
+                            "MsgChannelOpenTry",
+                            "MsgChannelOpenAck",
+                            "MsgChannelOpenConfirm",
+                            "MsgChannelCloseInit",
+                            "MsgChannelCloseConfirm",
+                            "MsgRecvPacket",
+                            "MsgTimeout",
+                            "MsgTimeoutOnClose",
+                            "MsgAcknowledgement"
+                        ],
+                        "type": "string",
+                        "description": "Comma-separated message types which should be excluded from list",
+                        "name": "excluded_msg_type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Message"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/block/{height}/namespace": {
+            "get": {
+                "description": "Get namespaces affected in the block",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "block"
+                ],
+                "summary": "Get namespaces affected in the block",
                 "operationId": "get-block-namespaces",
                 "parameters": [
                     {
@@ -2352,6 +2575,9 @@
                     "type": "string",
                     "format": "date-time",
                     "example": "2023-07-04T03:10:57+00:00"
+                },
+                "tx": {
+                    "$ref": "#/definitions/responses.Tx"
                 },
                 "tx_id": {
                     "type": "integer",

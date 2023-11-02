@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 	"time"
 
@@ -61,6 +62,7 @@ type BlockTestSuite struct {
 	blocks     *mock.MockIBlock
 	blockStats *mock.MockIBlockStats
 	events     *mock.MockIEvent
+	message    *mock.MockIMessage
 	namespace  *mock.MockINamespace
 	state      *mock.MockIState
 	echo       *echo.Echo
@@ -77,8 +79,9 @@ func (s *BlockTestSuite) SetupSuite() {
 	s.blockStats = mock.NewMockIBlockStats(s.ctrl)
 	s.events = mock.NewMockIEvent(s.ctrl)
 	s.namespace = mock.NewMockINamespace(s.ctrl)
+	s.message = mock.NewMockIMessage(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events, s.namespace, s.state, testIndexerName)
+	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events, s.namespace, s.message, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -425,4 +428,73 @@ func (s *BlockTestSuite) TestCount() {
 	err := json.NewDecoder(rec.Body).Decode(&count)
 	s.Require().NoError(err)
 	s.Require().EqualValues(80001, count)
+}
+
+func (s *BlockTestSuite) TestGetMessages() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+	q.Set("msg_type", "MsgSend")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/block/:height/messages")
+	c.SetParamNames("height")
+	c.SetParamValues("1000")
+
+	s.message.EXPECT().
+		ListWithTx(gomock.Any(), storage.MessageListWithTxFilters{
+			Limit:                10,
+			Offset:               0,
+			MessageTypes:         []string{"MsgSend"},
+			ExcludedMessageTypes: nil,
+			Height:               1000,
+		}).
+		Return([]storage.MessageWithTx{
+			{
+				Message: storage.Message{
+					Id:       1,
+					TxId:     2,
+					Position: 3,
+					Type:     types.MsgSend,
+					Height:   100,
+					Time:     testTime,
+				},
+				Tx: &testTx,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.GetMessages(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var msgs []responses.Message
+	err := json.NewDecoder(rec.Body).Decode(&msgs)
+	s.Require().NoError(err)
+	s.Require().Len(msgs, 1)
+
+	msg := msgs[0]
+	s.Require().EqualValues(1, msg.Id)
+	s.Require().EqualValues(100, msg.Height)
+	s.Require().EqualValues(3, msg.Position)
+	s.Require().Equal(testTime, msg.Time)
+	s.Require().EqualValues(string(types.MsgSend), msg.Type)
+	s.Require().EqualValues(1, msg.Tx.Id)
+	s.Require().NotNil(msg.Tx)
+
+	tx := msg.Tx
+	s.Require().EqualValues(1, tx.Id)
+	s.Require().EqualValues(100, tx.Height)
+	s.Require().Equal(testTime, tx.Time)
+	s.Require().Equal(testTxHash, strings.ToUpper(tx.Hash))
+	s.Require().EqualValues(2, tx.Position)
+	s.Require().EqualValues(80410, tx.GasWanted)
+	s.Require().EqualValues(77483, tx.GasUsed)
+	s.Require().Equal("80410", tx.Fee)
+	s.Require().EqualValues(0, tx.TimeoutHeight)
+	s.Require().EqualValues(10, tx.EventsCount)
+	s.Require().EqualValues(2, tx.MessagesCount)
+	s.Require().Equal("memo", tx.Memo)
+	s.Require().Equal("sdk", tx.Codespace)
+	s.Require().Equal(types.StatusSuccess, tx.Status)
 }
