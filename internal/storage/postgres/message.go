@@ -30,3 +30,11 @@ func (m *Message) ByTxId(ctx context.Context, txId uint64) (messages []storage.M
 		Scan(ctx)
 	return
 }
+
+func (m *Message) ListWithTx(ctx context.Context, filters storage.MessageListWithTxFilters) (msgs []storage.MessageWithTx, err error) {
+	query := m.DB().NewSelect().Model(&msgs).Offset(filters.Offset)
+	query = messagesFilter(query, filters)
+
+	err = query.Relation("Tx").Scan(ctx)
+	return
+}

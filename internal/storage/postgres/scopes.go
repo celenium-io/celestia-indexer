@@ -78,3 +78,19 @@ func addressListFilter(query *bun.SelectQuery, fltrs storage.AddressListFilter) 
 	query = sortScope(query, "id", fltrs.Sort)
 	return query
 }
+
+func messagesFilter(query *bun.SelectQuery, fltrs storage.MessageListWithTxFilters) *bun.SelectQuery {
+	query = limitScope(query, fltrs.Limit)
+
+	if len(fltrs.MessageTypes) > 0 {
+		query = query.Where("type IN (?)", bun.In(fltrs.MessageTypes))
+	}
+	if len(fltrs.ExcludedMessageTypes) > 0 {
+		query = query.Where("type NOT IN (?)", bun.In(fltrs.ExcludedMessageTypes))
+	}
+	if fltrs.Height > 0 {
+		query = query.Where("message.height = ?", fltrs.Height)
+	}
+
+	return query
+}

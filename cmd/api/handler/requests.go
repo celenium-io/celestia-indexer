@@ -4,8 +4,9 @@
 package handler
 
 import (
-	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"strings"
+
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
@@ -134,6 +135,20 @@ type namespacesByHeightRequest struct {
 }
 
 func (p *namespacesByHeightRequest) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+}
+
+type listMessageByBlockRequest struct {
+	Height          pkgTypes.Level `param:"height"            validate:"required,min=1"`
+	Limit           uint64         `query:"limit"             validate:"omitempty,min=1,max=100"`
+	Offset          uint64         `query:"offset"            validate:"omitempty,min=0"`
+	MsgType         StringArray    `query:"msg_type"          validate:"omitempty,dive,msg_type"`
+	ExcludedMsgType StringArray    `query:"excluded_msg_type" validate:"omitempty,dive,msg_type"`
+}
+
+func (p *listMessageByBlockRequest) SetDefault() {
 	if p.Limit == 0 {
 		p.Limit = 10
 	}

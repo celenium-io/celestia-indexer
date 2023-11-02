@@ -21,6 +21,8 @@ type Message struct {
 	Type types.MsgType `example:"MsgCreatePeriodicVestingAccount" json:"type"`
 
 	Data map[string]any `json:"data"`
+
+	Tx *Tx `json:"tx,omitempty"`
 }
 
 func NewMessage(msg storage.Message) Message {
@@ -45,4 +47,23 @@ func NewMessageForAddress(msg storage.MsgAddress) Message {
 		Type:     msg.Msg.Type,
 		Data:     msg.Msg.Data,
 	}
+}
+
+func NewMessageWithTx(msg storage.MessageWithTx) Message {
+	message := Message{
+		Id:       msg.Id,
+		Height:   msg.Height,
+		Time:     msg.Time,
+		Position: msg.Position,
+		Type:     msg.Type,
+		TxId:     msg.TxId,
+		Data:     msg.Data,
+	}
+
+	if msg.Tx != nil {
+		tx := NewTx(*msg.Tx)
+		message.Tx = &tx
+	}
+
+	return message
 }

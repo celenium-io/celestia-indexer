@@ -292,6 +292,8 @@ definitions:
         example: "2023-07-04T03:10:57+00:00"
         format: date-time
         type: string
+      tx:
+        $ref: '#/definitions/responses.Tx'
       tx_id:
         example: 11
         format: int64
@@ -1171,9 +1173,207 @@ paths:
       summary: Get events from begin and end of block
       tags:
       - block
+  /v1/block/{height}/messages:
+    get:
+      description: Get messages contained in the block
+      operationId: get-block-messages
+      parameters:
+      - description: Block height
+        in: path
+        minimum: 1
+        name: height
+        required: true
+        type: integer
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Comma-separated message types list
+        enum:
+        - MsgUnknown
+        - MsgSetWithdrawAddress
+        - MsgWithdrawDelegatorReward
+        - MsgWithdrawValidatorCommission
+        - MsgFundCommunityPool
+        - MsgCreateValidator
+        - MsgEditValidator
+        - MsgDelegate
+        - MsgBeginRedelegate
+        - MsgUndelegate
+        - MsgCancelUnbondingDelegation
+        - MsgUnjail
+        - MsgSend
+        - MsgMultiSend
+        - MsgCreateVestingAccount
+        - MsgCreatePermanentLockedAccount
+        - MsgCreatePeriodicVestingAccount
+        - MsgPayForBlobs
+        - MsgGrant
+        - MsgExec
+        - MsgRevoke
+        - MsgGrantAllowance
+        - MsgRevokeAllowance
+        - MsgRegisterEVMAddress
+        - MsgSubmitProposal
+        - MsgExecLegacyContent
+        - MsgVote
+        - MsgVoteWeighted
+        - MsgDeposit
+        - IBCTransfer
+        - MsgVerifyInvariant
+        - MsgSubmitEvidence
+        - MsgSendNFT
+        - MsgCreateGroup
+        - MsgUpdateGroupMembers
+        - MsgUpdateGroupAdmin
+        - MsgUpdateGroupMetadata
+        - MsgCreateGroupPolicy
+        - MsgUpdateGroupPolicyAdmin
+        - MsgCreateGroupWithPolicy
+        - MsgUpdateGroupPolicyDecisionPolicy
+        - MsgUpdateGroupPolicyMetadata
+        - MsgSubmitProposalGroup
+        - MsgWithdrawProposal
+        - MsgVoteGroup
+        - MsgExecGroup
+        - MsgLeaveGroup
+        - MsgSoftwareUpgrade
+        - MsgCancelUpgrade
+        - MsgRegisterInterchainAccount
+        - MsgSendTx
+        - MsgRegisterPayee
+        - MsgRegisterCounterpartyPayee
+        - MsgPayPacketFee
+        - MsgPayPacketFeeAsync
+        - MsgTransfer
+        - MsgCreateClient
+        - MsgUpdateClient
+        - MsgUpgradeClient
+        - MsgSubmitMisbehaviour
+        - MsgConnectionOpenInit
+        - MsgConnectionOpenTry
+        - MsgConnectionOpenAck
+        - MsgConnectionOpenConfirm
+        - MsgChannelOpenInit
+        - MsgChannelOpenTry
+        - MsgChannelOpenAck
+        - MsgChannelOpenConfirm
+        - MsgChannelCloseInit
+        - MsgChannelCloseConfirm
+        - MsgRecvPacket
+        - MsgTimeout
+        - MsgTimeoutOnClose
+        - MsgAcknowledgement
+        in: query
+        name: msg_type
+        type: string
+      - description: Comma-separated message types which should be excluded from list
+        enum:
+        - MsgUnknown
+        - MsgSetWithdrawAddress
+        - MsgWithdrawDelegatorReward
+        - MsgWithdrawValidatorCommission
+        - MsgFundCommunityPool
+        - MsgCreateValidator
+        - MsgEditValidator
+        - MsgDelegate
+        - MsgBeginRedelegate
+        - MsgUndelegate
+        - MsgCancelUnbondingDelegation
+        - MsgUnjail
+        - MsgSend
+        - MsgMultiSend
+        - MsgCreateVestingAccount
+        - MsgCreatePermanentLockedAccount
+        - MsgCreatePeriodicVestingAccount
+        - MsgPayForBlobs
+        - MsgGrant
+        - MsgExec
+        - MsgRevoke
+        - MsgGrantAllowance
+        - MsgRevokeAllowance
+        - MsgRegisterEVMAddress
+        - MsgSubmitProposal
+        - MsgExecLegacyContent
+        - MsgVote
+        - MsgVoteWeighted
+        - MsgDeposit
+        - IBCTransfer
+        - MsgVerifyInvariant
+        - MsgSubmitEvidence
+        - MsgSendNFT
+        - MsgCreateGroup
+        - MsgUpdateGroupMembers
+        - MsgUpdateGroupAdmin
+        - MsgUpdateGroupMetadata
+        - MsgCreateGroupPolicy
+        - MsgUpdateGroupPolicyAdmin
+        - MsgCreateGroupWithPolicy
+        - MsgUpdateGroupPolicyDecisionPolicy
+        - MsgUpdateGroupPolicyMetadata
+        - MsgSubmitProposalGroup
+        - MsgWithdrawProposal
+        - MsgVoteGroup
+        - MsgExecGroup
+        - MsgLeaveGroup
+        - MsgSoftwareUpgrade
+        - MsgCancelUpgrade
+        - MsgRegisterInterchainAccount
+        - MsgSendTx
+        - MsgRegisterPayee
+        - MsgRegisterCounterpartyPayee
+        - MsgPayPacketFee
+        - MsgPayPacketFeeAsync
+        - MsgTransfer
+        - MsgCreateClient
+        - MsgUpdateClient
+        - MsgUpgradeClient
+        - MsgSubmitMisbehaviour
+        - MsgConnectionOpenInit
+        - MsgConnectionOpenTry
+        - MsgConnectionOpenAck
+        - MsgConnectionOpenConfirm
+        - MsgChannelOpenInit
+        - MsgChannelOpenTry
+        - MsgChannelOpenAck
+        - MsgChannelOpenConfirm
+        - MsgChannelCloseInit
+        - MsgChannelCloseConfirm
+        - MsgRecvPacket
+        - MsgTimeout
+        - MsgTimeoutOnClose
+        - MsgAcknowledgement
+        in: query
+        name: excluded_msg_type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.Message'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get messages contained in the block
+      tags:
+      - block
   /v1/block/{height}/namespace:
     get:
-      description: Get namesapces affected in the block
+      description: Get namespaces affected in the block
       operationId: get-block-namespaces
       parameters:
       - description: Block height
@@ -1208,7 +1408,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handler.Error'
-      summary: Get namesapces affected in the block
+      summary: Get namespaces affected in the block
       tags:
       - block
   /v1/block/{height}/namespace/count:
