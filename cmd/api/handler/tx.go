@@ -81,15 +81,16 @@ func (handler *TxHandler) Get(c echo.Context) error {
 //	@Description	List transactions info
 //	@Tags			transactions
 //	@ID				list-transactions
-//	@Param			limit		query	integer			false	"Count of requested entities"			mininum(1)	maximum(100)
-//	@Param			offset		query	integer			false	"Offset"								mininum(1)
-//	@Param			sort		query	string			false	"Sort order"							Enums(asc, desc)
-//	@Param			status		query	types.Status	false	"Comma-separated status list"
-//	@Param			msg_type	query	types.MsgType	false	"Comma-separated message types list"
-//	@Param			from		query	integer			false	"Time from in unix timestamp"			mininum(1)
-//	@Param			to			query	integer			false	"Time to in unix timestamp"				mininum(1)
-//	@Param			height		query	integer			false	"Block number"							mininum(1)
-//	@Param			messages	query	boolean			false	"If true join messages"					mininum(1)
+//	@Param			limit		 		query	integer			false	"Count of requested entities"			mininum(1)	maximum(100)
+//	@Param			offset		 		query	integer			false	"Offset"								mininum(1)
+//	@Param			sort		 		query	string			false	"Sort order"							Enums(asc, desc)
+//	@Param			status		 		query	types.Status	false	"Comma-separated status list"
+//	@Param			msg_type	 		query	types.MsgType	false	"Comma-separated message types list"
+//	@Param			excluded_msg_type   query	types.MsgType	false	"Comma-separated message types list which should be excluded"
+//	@Param			from		 		query	integer			false	"Time from in unix timestamp"			mininum(1)
+//	@Param			to			 		query	integer			false	"Time to in unix timestamp"				mininum(1)
+//	@Param			height		 		query	integer			false	"Block number"							mininum(1)
+//	@Param			messages	 		query	boolean			false	"If true join messages"					mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
@@ -103,13 +104,14 @@ func (handler *TxHandler) List(c echo.Context) error {
 	req.SetDefault()
 
 	fltrs := storage.TxFilter{
-		Limit:        int(req.Limit),
-		Offset:       int(req.Offset),
-		Sort:         pgSort(req.Sort),
-		Status:       req.Status,
-		Height:       req.Height,
-		MessageTypes: types.NewMsgTypeBitMask(),
-		WithMessages: req.Messages,
+		Limit:                int(req.Limit),
+		Offset:               int(req.Offset),
+		Sort:                 pgSort(req.Sort),
+		Status:               req.Status,
+		Height:               req.Height,
+		MessageTypes:         types.NewMsgTypeBitMask(),
+		ExcludedMessageTypes: types.NewMsgTypeBitMask(),
+		WithMessages:         req.Messages,
 	}
 	if req.From > 0 {
 		fltrs.TimeFrom = time.Unix(req.From, 0).UTC()
@@ -119,6 +121,9 @@ func (handler *TxHandler) List(c echo.Context) error {
 	}
 	for i := range req.MsgType {
 		fltrs.MessageTypes.SetByMsgType(storageTypes.MsgType(req.MsgType[i]))
+	}
+	for i := range req.ExcludedMsgType {
+		fltrs.ExcludedMessageTypes.SetByMsgType(storageTypes.MsgType(req.ExcludedMsgType[i]))
 	}
 
 	txs, err := handler.tx.Filter(c.Request().Context(), fltrs)

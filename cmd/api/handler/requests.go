@@ -4,8 +4,9 @@
 package handler
 
 import (
-	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"strings"
+
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
@@ -63,13 +64,14 @@ func pgSort(sort string) storage.SortOrder {
 }
 
 type txListRequest struct {
-	Limit    uint64      `query:"limit"    validate:"omitempty,min=1,max=100"`
-	Offset   uint64      `query:"offset"   validate:"omitempty,min=0"`
-	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
-	Height   uint64      `query:"height"   validate:"omitempty,min=1"`
-	Status   StringArray `query:"status"   validate:"omitempty,dive,status"`
-	MsgType  StringArray `query:"msg_type" validate:"omitempty,dive,msg_type"`
-	Messages bool        `query:"messages" validate:"omitempty"`
+	Limit           uint64      `query:"limit"             validate:"omitempty,min=1,max=100"`
+	Offset          uint64      `query:"offset"            validate:"omitempty,min=0"`
+	Sort            string      `query:"sort"              validate:"omitempty,oneof=asc desc"`
+	Height          uint64      `query:"height"            validate:"omitempty,min=1"`
+	Status          StringArray `query:"status"            validate:"omitempty,dive,status"`
+	MsgType         StringArray `query:"msg_type"          validate:"omitempty,dive,msg_type"`
+	ExcludedMsgType StringArray `query:"excluded_msg_type" validate:"omitempty,dive,msg_type"`
+	Messages        bool        `query:"messages"          validate:"omitempty"`
 
 	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1"`
 	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`
