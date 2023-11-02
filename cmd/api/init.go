@@ -20,7 +20,6 @@ import (
 	nodeApi "github.com/celenium-io/celestia-indexer/pkg/node/dal"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/getsentry/sentry-go"
-	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/grafana/pyroscope-go"
 	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
@@ -313,15 +312,13 @@ func initSentry(e *echo.Echo, dsn, environment string) error {
 		Dsn:              dsn,
 		AttachStacktrace: true,
 		Environment:      environment,
-		BeforeSend: func(event *sentry.Event, hint *sentry.EventHint) *sentry.Event {
-			log.Info().Str("message", "sentry").Msg(event.Message)
-			return event
-		},
+		EnableTracing:    true,
+		TracesSampleRate: 1.0,
 	}); err != nil {
 		return errors.Wrap(err, "initialization")
 	}
 
-	e.Use(sentryecho.New(sentryecho.Options{}))
+	e.Use(SentryMiddleware())
 
 	return nil
 }
