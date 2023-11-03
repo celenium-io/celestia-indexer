@@ -11,6 +11,7 @@ require (
 	github.com/dipdup-net/go-lib v0.3.5
 	github.com/dipdup-net/indexer-sdk v0.0.3
 	github.com/fatih/structs v1.1.0
+	github.com/getsentry/sentry-go v0.25.0
 	github.com/go-playground/validator/v10 v10.15.1
 	github.com/go-testfixtures/testfixtures/v3 v3.9.0
 	github.com/goccy/go-json v0.10.2
@@ -97,7 +98,6 @@ require (
 	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
-	github.com/getsentry/sentry-go v0.25.0 // indirect
 	github.com/go-faster/city v1.0.1 // indirect
 	github.com/go-faster/errors v0.6.1 // indirect
 	github.com/go-kit/kit v0.12.0 // indirect
