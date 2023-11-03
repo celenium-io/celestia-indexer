@@ -295,7 +295,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 
 	v1.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	// initWebsocket(ctx, db, v1)
+	initWebsocket(ctx, db, v1)
 
 	log.Info().Msg("API routes:")
 	for _, route := range e.Routes() {
@@ -327,8 +327,8 @@ var (
 	wsManager *websocket.Manager
 )
 
-// func initWebsocket(ctx context.Context, db postgres.Storage, group *echo.Group) {
-// 	wsManager = websocket.NewManager(db, db.Blocks, db.Tx)
-// 	wsManager.Start(ctx)
-// 	group.GET("/ws", wsManager.Handle)
-// }
+func initWebsocket(ctx context.Context, db postgres.Storage, group *echo.Group) {
+	wsManager = websocket.NewManager(db, db.Blocks, db.Tx)
+	wsManager.Start(ctx)
+	group.GET("/ws", wsManager.Handle)
+}
