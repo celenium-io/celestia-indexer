@@ -1,12 +1,12 @@
-name: Release
+name: Pre-release
 on:
   push:
     tags:
       - '^v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+$'
 
 jobs:
-  release:
-    name: Release
+  pre-release:
+    name: Pre-release
     runs-on: ubuntu-latest
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
