@@ -24,6 +24,18 @@ jobs:
           prerelease: false
           automatic_release_tag: "latest"
 
+  sentry:
+    name: Sentry release
+    runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up environment
+        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/}
+
       - name: Create Sentry release
         uses: getsentry/action-release@v1
         env:
@@ -33,3 +45,4 @@ jobs:
           SENTRY_URL: "${{ secrets.SENTRY_URL }}"
         with:
           environment: production
+        
