@@ -288,6 +288,43 @@ func Test_saveMessages(t *testing.T) {
 			wantValidatorsCount:       0,
 			wantMsgAddress:            3,
 			wantErr:                   false,
+		}, {
+			name: "test with duplicate message addresses",
+			args: args{
+				messages: []*storage.Message{
+					{
+						Height:   100,
+						Time:     now,
+						Position: 0,
+						Type:     types.MsgMultiSend,
+						TxId:     1,
+						Addresses: []storage.AddressWithType{
+							{
+								Type: types.MsgAddressTypeOutput,
+								Address: storage.Address{
+									Address:    "address1",
+									Height:     100,
+									LastHeight: 100,
+								},
+							}, {
+								Type: types.MsgAddressTypeOutput,
+								Address: storage.Address{
+									Address:    "address1",
+									Height:     100,
+									LastHeight: 100,
+								},
+							},
+						},
+					},
+				},
+				addrToId: map[string]uint64{
+					"address1": 1,
+				},
+			},
+			wantNamespaceMessageCount: 0,
+			wantValidatorsCount:       0,
+			wantMsgAddress:            1,
+			wantErr:                   false,
 		},
 	}
 

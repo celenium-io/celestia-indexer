@@ -25,6 +25,7 @@ func saveMessages(
 		validators    = make([]*storage.Validator, 0)
 		namespaces    = make(map[string]uint64)
 		addedMsgId    = make(map[uint64]struct{})
+		msgAddrMap    = make(map[string]struct{})
 	)
 	for i := range messages {
 		for _, ns := range messages[i].Namespace {
@@ -63,11 +64,16 @@ func saveMessages(
 			if !ok {
 				continue
 			}
-			msgAddress = append(msgAddress, storage.MsgAddress{
+			msgAddressEntity := storage.MsgAddress{
 				MsgId:     messages[i].Id,
 				AddressId: id,
 				Type:      messages[i].Addresses[j].Type,
-			})
+			}
+			key := msgAddressEntity.String()
+			if _, ok := msgAddrMap[key]; !ok {
+				msgAddress = append(msgAddress, msgAddressEntity)
+				msgAddrMap[key] = struct{}{}
+			}
 		}
 	}
 
