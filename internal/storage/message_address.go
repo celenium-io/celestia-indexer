@@ -4,6 +4,8 @@
 package storage
 
 import (
+	"fmt"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/uptrace/bun"
 )
@@ -21,6 +23,10 @@ type MsgAddress struct {
 
 func (MsgAddress) TableName() string {
 	return "msg_address"
+}
+
+func (m MsgAddress) String() string {
+	return fmt.Sprintf("%d_%d_%s", m.AddressId, m.MsgId, m.Type)
 }
 
 type AddressWithType struct {
