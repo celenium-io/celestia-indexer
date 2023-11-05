@@ -91,6 +91,10 @@ func (channel *Channel[I, M]) waitMessage(ctx context.Context) {
 			if !ok {
 				return
 			}
+			if msg == nil {
+				log.Warn().Str("channel", channel.storageChannelName).Msg("nil message")
+				continue
+			}
 			if msg.Channel != channel.storageChannelName {
 				channel.log.Error().
 					Str("msg", msg.Channel).
