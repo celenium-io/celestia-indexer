@@ -31,6 +31,8 @@ type Channel[I, M any] struct {
 	filters            Filterable[M]
 	repo               identifiable[I]
 
+	eventHandler func(ctx context.Context, event M) error
+
 	g workerpool.Group
 }
 
@@ -102,10 +104,6 @@ func (channel *Channel[I, M]) waitMessage(ctx context.Context) {
 				continue
 			}
 
-			if channel.clients.Len() == 0 {
-				continue
-			}
-
 			if err := channel.processMessage(ctx, msg); err != nil {
 				log.Err(err).
 					Str("msg", msg.Channel).
@@ -128,6 +126,14 @@ func (channel *Channel[I, M]) processMessage(ctx context.Context, msg *pq.Notifi
 		return errors.Wrap(err, "processing channel message")
 	}
 
+	if err := channel.onEvent(ctx, notification); err != nil {
+		return err
+	}
+
+	if channel.clients.Len() == 0 {
+		return nil
+	}
+
 	if err := channel.clients.Range(func(_ uint64, value client) (error, bool) {
 		if channel.filters.Filter(value, notification) {
 			value.Notify(notification)
@@ -147,6 +153,13 @@ func (channel *Channel[I, M]) Close() error {
 		if err := channel.listener.Close(); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (channel *Channel[I, M]) onEvent(ctx context.Context, event M) error {
+	if channel.eventHandler != nil {
+		return channel.eventHandler(ctx, event)
 	}
 	return nil
 }

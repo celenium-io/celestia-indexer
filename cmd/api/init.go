@@ -12,8 +12,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/cmd/api/cache"
 	_ "github.com/celenium-io/celestia-indexer/cmd/api/docs"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
+	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
 	"github.com/celenium-io/celestia-indexer/internal/profiler"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
@@ -167,6 +169,13 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 	e.Use(middleware.Secure())
 	e.Pre(middleware.RemoveTrailingSlash())
 
+	if cfg.Websocket {
+		endpointCache = cache.NewCache(cache.Config{
+			MaxEntitiesCount: 1000,
+		})
+		e.Use(cache.Middleware(endpointCache))
+	}
+
 	timeout := 30 * time.Second
 	if cfg.RequestTimeout > 0 {
 		timeout = time.Duration(cfg.RequestTimeout) * time.Second
@@ -309,7 +318,9 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 
 	v1.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	initWebsocket(ctx, db, v1)
+	if cfg.ApiConfig.Websocket {
+		initWebsocket(ctx, db, v1)
+	}
 
 	log.Info().Msg("API routes:")
 	for _, route := range e.Routes() {
@@ -338,11 +349,21 @@ func initSentry(e *echo.Echo, dsn, environment string) error {
 }
 
 var (
-	wsManager *websocket.Manager
+	wsManager     *websocket.Manager
+	endpointCache *cache.Cache
 )
 
 func initWebsocket(ctx context.Context, db postgres.Storage, group *echo.Group) {
 	wsManager = websocket.NewManager(db, db.Blocks, db.Tx)
+	wsManager.SetOnBlockReceived(clearCacheOnBlockReceived)
 	wsManager.Start(ctx)
 	group.GET("/ws", wsManager.Handle)
+}
+
+func clearCacheOnBlockReceived(ctx context.Context, _ *responses.Block) error {
+	if endpointCache == nil {
+		return nil
+	}
+	endpointCache.Clear()
+	return nil
 }

@@ -25,6 +25,8 @@ type Manager struct {
 	head    *Channel[storage.Block, *responses.Block]
 	tx      *Channel[storage.Tx, *responses.Tx]
 	factory storage.ListenerFactory
+
+	onBlockReceived func(ctx context.Context, block *responses.Block) error
 }
 
 func NewManager(factory storage.ListenerFactory, blockRepo storage.IBlock, txRepo storage.ITx) *Manager {
@@ -92,6 +94,7 @@ func (manager *Manager) Handle(c echo.Context) error {
 }
 
 func (manager *Manager) Start(ctx context.Context) {
+	manager.head.eventHandler = manager.onBlockReceived
 	manager.head.Start(ctx, manager.factory)
 	manager.tx.Start(ctx, manager.factory)
 }
@@ -135,4 +138,8 @@ func (manager *Manager) RemoveClientFromChannel(channel string, client *Client) 
 	default:
 		log.Error().Str("channel", channel).Msg("unknown channel name")
 	}
+}
+
+func (manager *Manager) SetOnBlockReceived(handler func(ctx context.Context, block *responses.Block) error) {
+	manager.onBlockReceived = handler
 }
