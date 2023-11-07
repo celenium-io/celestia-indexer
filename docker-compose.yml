@@ -2,7 +2,7 @@ version: "3.6"
 
 services:
   indexer:
-    image: ghcr.io/dipdup-io/celestia-indexer:${TAG:-master}
+    image: ghcr.io/celenium-io/celestia-indexer:${TAG:-master}
     build:
         dockerfile: build/indexer/Dockerfile
         context: .
@@ -13,14 +13,14 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
       - db
-    logging: &celestia-dipdup-logging
+    logging: &celestia-logging
       options:
         max-size: 10m
         max-file: "5"
 
   api:
     restart: always
-    image: ghcr.io/dipdup-io/celestia-indexer-api:${TAG:-master}
+    image: ghcr.io/celenium-io/celestia-indexer-api:${TAG:-master}
     build:
       context: .
       dockerfile: build/api/Dockerfile
@@ -29,26 +29,29 @@ services:
     depends_on:
       - db
     ports:
-      - 127.0.0.1:9876:9876
-    logging: *celestia-dipdup-logging
+      - "127.0.0.1:9876:9876"
+    logging: *celestia-logging
 
   db:
-    image: timescale/timescaledb:latest-pg15
+    command:
+      - -cshared_preload_libraries=timescaledb,pg_stat_statements
+      - -cpg_stat_statements.track=all
+    image: timescale/timescaledb:2.12.2-pg15
     restart: always
     volumes:
-      - db:/var/lib/postgres/data
+      - db:/var/lib/postgresql/data
     ports:
-      - 127.0.0.1:5432:5432
+      - "127.0.0.1:5432:5432"
     environment:
       - POSTGRES_HOST=${POSTGRES_HOST:-db}
-      - POSTGRES_USER=${POSTGRES_USER:-dipdup}
+      - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB:-celestia}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dipdup -d celestia"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d celestia"]
       interval: 10s
       timeout: 5s
       retries: 5
-    logging: *celestia-dipdup-logging
+    logging: *celestia-logging
 volumes:
   db:
