@@ -13,7 +13,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
       - db
-    logging: &celestia-dipdup-logging
+    logging: &celestia-logging
       options:
         max-size: 10m
         max-file: "5"
@@ -30,7 +30,7 @@ services:
       - db
     ports:
       - "127.0.0.1:9876:9876"
-    logging: *celestia-dipdup-logging
+    logging: *celestia-logging
 
   db:
     command:
@@ -52,6 +52,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    logging: *celestia-dipdup-logging
+    logging: *celestia-logging
 volumes:
   db:
