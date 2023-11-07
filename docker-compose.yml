@@ -41,11 +41,11 @@ services:
       - 127.0.0.1:5432:5432
     environment:
       - POSTGRES_HOST=${POSTGRES_HOST:-db}
-      - POSTGRES_USER=${POSTGRES_USER:-dipdup}
+      - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB:-celestia}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dipdup -d celestia"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d celestia"]
       interval: 10s
       timeout: 5s
       retries: 5
