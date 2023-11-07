@@ -212,10 +212,6 @@ func Message(
 	case *fee.MsgPayPacketFeeAsync:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgPayPacketFeeAsync()
 
-	// transfer module
-	// case *transferTypes.MsgTransfer:
-	// 	d.Msg.Type, d.Msg.Addresses, err = handle.MsgTransfer()
-
 	// coreClient module
 	case *coreClient.MsgCreateClient:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateClient(height, typedMsg)
