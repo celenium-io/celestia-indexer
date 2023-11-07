@@ -29,7 +29,7 @@ services:
     depends_on:
       - db
     ports:
-      - 127.0.0.1:9876:9876
+      - "127.0.0.1:9876:9876"
     logging: *celestia-dipdup-logging
 
   db:
@@ -41,7 +41,7 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
     ports:
-      - 127.0.0.1:5432:5432
+      - "127.0.0.1:5432:5432"
     environment:
       - POSTGRES_HOST=${POSTGRES_HOST:-db}
       - POSTGRES_USER=${POSTGRES_USER}
