@@ -8,7 +8,55 @@
 
 This is an indexing layer for Celestia DA written in Golang that operates on top of the [Celestia Full node](https://docs.celestia.org/nodes/consensus-full-node/) and stores data in a Postgres database.
 
+## Run
 
+**Prerequisites:**
+
+- Git for cloning the repository
+- [Docker](https://docs.docker.com/engine/install/) must be installed on your machine
+- [Go 1.21.2](https://go.dev/doc/install) programming language installed (for development and testing purposes)
+
+### Local run ###
+
+Clone the repository:
+
+```sh
+git clone https://github.com/celenium-io/celestia-indexer.git
+cd celestia-indexer
+```
+
+Create `.env` file and set up required environment variables:
+
+```sh
+cp .env.example .env
+vim .env
+``` 
+
+> **Required environment variables:**
+> 
+> `CELESTIA_DAL_API_URL` - uri for [Celestia Full Storage Node](https://docs.celestia.org/nodes/full-storage-node)
+> `CELESTIA_NODE_AUTH_TOKEN` - token with read access level for full storage node. You can get it from your running node instance by command `celestia full auth read`
+> `CELESTIA_NODE_URL` - uri to [Celestia Consensus Node](https://docs.celestia.org/nodes/consensus-node)
+> `POSTGRES_USER` - username for Postgres
+> `POSTGRES_PASSWORD` - password for Postgres
+>
+
+Build the Docker images for the indexer and API:
+
+```sh
+docker compose build
+```
+
+Start the services using Docker Compose:
+
+```sh
+docker compose up -d
+```
+
+This will start the indexer and API services as well as a Postgres database instance.
+The services will be configured according to the `.env` file and the `docker-compose.yml` file in the repository.
+
+≠
 ## Features ##
 
 - [x] RPC node client
