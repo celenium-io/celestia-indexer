@@ -36,7 +36,7 @@ services:
     image: timescale/timescaledb:latest-pg15
     restart: always
     volumes:
-      - db:/var/lib/postgres/data
+      - db:/var/lib/postgresql/data
     ports:
       - 127.0.0.1:5432:5432
     environment:
