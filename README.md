@@ -12,9 +12,9 @@ This is an indexing layer for Celestia DA written in Golang that operates on top
 
 **Prerequisites:**
 
-- Git for cloning the repository
-- [Docker](https://docs.docker.com/engine/install/) must be installed on your machine
-- [Go 1.21.2](https://go.dev/doc/install) programming language installed (for development and testing purposes)
+- Git
+- [Docker](https://docs.docker.com/engine/install/)
+- [Go 1.21.2](https://go.dev/doc/install) (for development and testing)
 
 ### Local run ###
 
