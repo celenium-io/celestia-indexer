@@ -12,9 +12,9 @@ This is an indexing layer for Celestia DA written in Golang that operates on top
 
 **Prerequisites:**
 
-- Git for cloning the repository
-- [Docker](https://docs.docker.com/engine/install/) must be installed on your machine
-- [Go 1.21.2](https://go.dev/doc/install) programming language installed (for development and testing purposes)
+- Git
+- [Docker](https://docs.docker.com/engine/install/)
+- [Go 1.21.2](https://go.dev/doc/install) (for development and testing)
 
 ### Local run ###
 
@@ -34,11 +34,11 @@ vim .env
 
 > **Required environment variables:**
 > 
-> `CELESTIA_DAL_API_URL` - uri for [Celestia Full Storage Node](https://docs.celestia.org/nodes/full-storage-node)
-> `CELESTIA_NODE_AUTH_TOKEN` - token with read access level for full storage node. You can get it from your running node instance by command `celestia full auth read`
-> `CELESTIA_NODE_URL` - uri to [Celestia Consensus Node](https://docs.celestia.org/nodes/consensus-node)
-> `POSTGRES_USER` - username for Postgres
-> `POSTGRES_PASSWORD` - password for Postgres
+> - `CELESTIA_DAL_API_URL` - uri for [Celestia Full Storage Node](https://docs.celestia.org/nodes/full-storage-node)
+> - `CELESTIA_NODE_AUTH_TOKEN` - token with read access level for full storage node. You can get it from your running node instance by command `celestia full auth read`
+> - `CELESTIA_NODE_URL` - uri to [Celestia Consensus Node](https://docs.celestia.org/nodes/consensus-node)
+> - `POSTGRES_USER` - username for Postgres
+> - `POSTGRES_PASSWORD` - password for Postgres
 >
 
 Build the Docker images for the indexer and API:
