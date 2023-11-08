@@ -193,6 +193,7 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 	if err := initSentry(e, cfg.SentryDsn, env); err != nil {
 		log.Err(err).Msg("sentry")
 	}
+	e.Server.IdleTimeout = time.Second * 30
 
 	return e
 }
