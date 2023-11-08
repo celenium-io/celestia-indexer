@@ -389,8 +389,8 @@ github.com/dipdup-io/workerpool v0.0.4 h1:m58fuFY3VIPRc+trWpjw2Lsm4FvIgtjP/4VRe7
 github.com/dipdup-io/workerpool v0.0.4/go.mod h1:m6YMqx7M+fORTyabHD/auKymBRpbDax0t1aPZ1i7GZA=
 github.com/dipdup-net/go-lib v0.3.5 h1:UTH3mywL0Euyq/myFJwzbg7OPy5v9zhLa8gSCiHALLE=
 github.com/dipdup-net/go-lib v0.3.5/go.mod h1:oBDOSsM/F8fEnmuDnaJ6QA/cHH4lne49ASbsh8WXDe4=
-github.com/dipdup-net/indexer-sdk v0.0.3 h1:ZdF+7qzQP2cojhYC3jRs1AvswXaRj/CnwyI1SPicWwA=
-github.com/dipdup-net/indexer-sdk v0.0.3/go.mod h1:Pi5lYyoVScktafgL7CQGfnOeYUkBiPrxqILWiS5s0Hk=
+github.com/dipdup-net/indexer-sdk v0.0.4 h1:mhTW3f4U6oc05UjxSiffOV+HIi4vQkDgOq1MbJXia8U=
+github.com/dipdup-net/indexer-sdk v0.0.4/go.mod h1:n1oBIm5MPY1WxLS9tQfTWr+Ytrwv6ThCZF7TASsJslg=
 github.com/docker/distribution v2.8.2+incompatible h1:T3de5rq0dB1j30rp0sA2rER+m322EBzniBPB6ZIzuh8=
 github.com/docker/distribution v2.8.2+incompatible/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
 github.com/docker/docker v24.0.7+incompatible h1:Wo6l37AuwP3JaMnZa226lzVXGA3F9Ig1seQen0cKYlM=
