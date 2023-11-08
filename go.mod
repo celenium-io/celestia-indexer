@@ -8,7 +8,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.46.14
 	github.com/cosmos/ibc-go/v6 v6.2.0
 	github.com/dipdup-io/workerpool v0.0.4
-	github.com/dipdup-net/go-lib v0.3.5
+	github.com/dipdup-net/go-lib v0.3.6
 	github.com/dipdup-net/indexer-sdk v0.0.4
 	github.com/fatih/structs v1.1.0
 	github.com/getsentry/sentry-go v0.25.0
