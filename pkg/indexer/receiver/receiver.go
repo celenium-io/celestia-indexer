@@ -15,6 +15,7 @@ import (
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/rs/zerolog/log"
+	"github.com/tendermint/tendermint/rpc/client/http"
 )
 
 const (
@@ -37,6 +38,7 @@ const (
 type Module struct {
 	modules.BaseModule
 	api              node.Api
+	ws               *http.HTTP
 	cfg              config.Indexer
 	pool             *workerpool.Pool[types.Level]
 	blocks           chan types.BlockData
@@ -52,7 +54,7 @@ type Module struct {
 
 var _ modules.Module = (*Module)(nil)
 
-func NewModule(cfg config.Indexer, api node.Api, state *storage.State) Module {
+func NewModule(cfg config.Indexer, api node.Api, ws *http.HTTP, state *storage.State) Module {
 	level := types.Level(cfg.StartLevel)
 	var lastHash []byte
 	if state != nil {
@@ -63,6 +65,7 @@ func NewModule(cfg config.Indexer, api node.Api, state *storage.State) Module {
 	receiver := Module{
 		BaseModule:   modules.New("receiver"),
 		api:          api,
+		ws:           ws,
 		cfg:          cfg,
 		blocks:       make(chan types.BlockData, cfg.ThreadsCount*10),
 		needGenesis:  state == nil,

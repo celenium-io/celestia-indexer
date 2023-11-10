@@ -5,14 +5,15 @@ package receiver
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	ic "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/celenium-io/celestia-indexer/pkg/node/mock"
 	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
 	"go.uber.org/mock/gomock"
-	"testing"
-	"time"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -50,7 +51,7 @@ func (s *ModuleTestSuite) createModule() Module {
 		LastTime:   time.Time{},
 		ChainId:    "explorer-test",
 	}
-	receiverModule := NewModule(cfgDefault, s.api, &state)
+	receiverModule := NewModule(cfgDefault, s.api, nil, &state)
 
 	return receiverModule
 }
@@ -61,7 +62,7 @@ func (s *ModuleTestSuite) createModuleEmptyState(cfgOptional *ic.Indexer) Module
 		cfg = *cfgOptional
 	}
 
-	receiverModule := NewModule(cfg, s.api, nil)
+	receiverModule := NewModule(cfg, s.api, nil, nil)
 	return receiverModule
 }
 
