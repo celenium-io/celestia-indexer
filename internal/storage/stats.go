@@ -19,7 +19,7 @@ type CountRequest struct {
 
 func (req CountRequest) Validate() error {
 	if _, ok := stats.Tables[req.Table]; !ok {
-		return errors.Errorf("unknown table '%s' for stats computing", req.Table)
+		return errors.Wrapf(ErrValidation, "unknown table '%s' for stats computing", req.Table)
 	}
 
 	return nil
@@ -34,16 +34,16 @@ type SummaryRequest struct {
 func (req SummaryRequest) Validate() error {
 	table, ok := stats.Tables[req.Table]
 	if !ok {
-		return errors.Errorf("unknown table '%s' for stats computing", req.Table)
+		return errors.Wrapf(ErrValidation, "unknown table '%s' for stats computing", req.Table)
 	}
 
 	column, ok := table.Columns[req.Column]
 	if !ok {
-		return errors.Errorf("unknown column '%s' in table '%s' for stats computing", req.Column, req.Table)
+		return errors.Wrapf(ErrValidation, "unknown column '%s' in table '%s' for stats computing", req.Column, req.Table)
 	}
 
 	if _, ok := column.Functions[req.Function]; !ok {
-		return errors.Errorf("unknown function '%s' for '%s'.'%s'", req.Function, req.Table, req.Column)
+		return errors.Wrapf(ErrValidation, "unknown function '%s' for '%s'.'%s'", req.Function, req.Table, req.Column)
 	}
 
 	return nil

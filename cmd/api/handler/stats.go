@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
@@ -69,6 +70,9 @@ func (sh StatsHandler) Summary(c echo.Context) error {
 		})
 	}
 	if err != nil {
+		if errors.Is(err, storage.ErrValidation) {
+			return badRequestError(c, err)
+		}
 		return internalServerError(c, err)
 	}
 
