@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
+	"github.com/tendermint/tendermint/rpc/client/http"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 
@@ -129,7 +130,16 @@ func createReceiver(ctx context.Context, cfg config.Config, pg postgres.Storage)
 	}
 
 	api := rpc.NewAPI(cfg.DataSources["node_rpc"])
-	receiverModule := receiver.NewModule(cfg.Indexer, &api, state)
+
+	var ws *http.HTTP
+	if source, ok := cfg.DataSources["node_ws"]; ok && source.URL != "" {
+		ws, err = http.New(source.URL, "/websocket")
+		if err != nil {
+			return rpc.API{}, nil, errors.Wrap(err, "create websocket")
+		}
+	}
+
+	receiverModule := receiver.NewModule(cfg.Indexer, &api, ws, state)
 	return api, &receiverModule, nil
 }
 

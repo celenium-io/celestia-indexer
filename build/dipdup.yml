@@ -21,6 +21,9 @@ datasources:
     url: ${CELESTIA_NODE_URL}
     rps: ${CELESTIA_NODE_RPS:-5}
     timeout: ${CELESTIA_NODE_TIMEOUT:-10}
+  node_ws:
+    kind: celestia_node_ws
+    url: ${CELESTIA_NODE_WS_URL}
   dal_api:
     kind: celestia_api
     url: ${CELESTIA_DAL_API_URL}
