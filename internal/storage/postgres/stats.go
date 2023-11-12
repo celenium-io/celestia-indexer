@@ -110,7 +110,7 @@ func (s Stats) Histogram(ctx context.Context, req storage.HistogramRequest) (res
 }
 
 func (s Stats) TPS(ctx context.Context) (response storage.TPS, err error) {
-	if err = s.db.DB().NewSelect().Table("tx_count_hourly").
+	if err = s.db.DB().NewSelect().Table(storage.ViewTxCountHourly).
 		ColumnExpr("max(tps) as high, min(tps) as low").
 		Where("timestamp > date_trunc('hour', now()) - '1 week'::interval").
 		Where("timestamp < date_trunc('hour', now())").
@@ -146,9 +146,18 @@ func (s Stats) TPS(ctx context.Context) (response storage.TPS, err error) {
 }
 
 func (s Stats) TxCountForLast24h(ctx context.Context) (response []storage.TxCountForLast24hItem, err error) {
-	err = s.db.DB().NewSelect().Table("tx_count_hourly").
+	err = s.db.DB().NewSelect().Table(storage.ViewTxCountHourly).
 		Where("timestamp > date_trunc('hour', now()) - '25 hours'::interval").
 		Where("timestamp < date_trunc('hour', now())").
+		Scan(ctx, &response)
+	return
+}
+
+func (s Stats) GasPriceHourly(ctx context.Context) (response []storage.GasCandle, err error) {
+	err = s.db.DB().NewSelect().Table(storage.ViewGasPriceCandlesticksHourly).
+		ColumnExpr(`high(value) as high, low(value) as low, timestamp, volume(value) as volume, fee, gas_used`).
+		Where("timestamp > date_trunc('hour', now()) - '1 week'::interval").
+		Order("timestamp desc").
 		Scan(ctx, &response)
 	return
 }

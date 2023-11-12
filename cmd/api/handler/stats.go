@@ -143,7 +143,7 @@ func (sh StatsHandler) Histogram(c echo.Context) error {
 		response[i] = responses.NewHistogramItem(histogram[i])
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return returnArray(c, response)
 }
 
 // TPS godoc
@@ -183,5 +183,28 @@ func (sh StatsHandler) TxCountHourly24h(c echo.Context) error {
 	for i := range histogram {
 		response[i] = responses.NewTxCountHistogramItem(histogram[i])
 	}
-	return c.JSON(http.StatusOK, response)
+	return returnArray(c, response)
+}
+
+// GasPriceHourly godoc
+//
+//	@Summary				Get candles for gas price
+//	@Description        	Get candles for gas price with volume, average gas efficiency and fee for an hour
+//	@Tags					stats
+//	@ID						stats-gas-price-hourly
+//	@Produce				json
+//	@Success				200	{array}     responses.GasPriceCandle
+//	@Failure				500	{object}	Error
+//	@Router					/v1/stats/gas_price/hourly [get]
+func (sh StatsHandler) GasPriceHourly(c echo.Context) error {
+	histogram, err := sh.repo.GasPriceHourly(c.Request().Context())
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	response := make([]responses.GasPriceCandle, len(histogram))
+	for i := range histogram {
+		response[i] = responses.NewGasPriceCandle(histogram[i])
+	}
+	return returnArray(c, response)
 }

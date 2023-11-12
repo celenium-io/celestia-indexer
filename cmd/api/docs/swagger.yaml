@@ -260,6 +260,41 @@ definitions:
         - $ref: '#/definitions/types.EventType'
         example: commission
     type: object
+  responses.GasPriceCandle:
+    properties:
+      avg_gas_efficiency:
+        example: "0.45282"
+        format: string
+        type: string
+      avg_gas_price:
+        example: "0.45282"
+        format: string
+        type: string
+      fee:
+        example: 1283518
+        format: integer
+        type: number
+      high:
+        example: "0.17632"
+        format: string
+        type: string
+      low:
+        example: "0.11882"
+        format: string
+        type: string
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
+      total_gas_limit:
+        example: "1213134"
+        format: string
+        type: string
+      total_gas_used:
+        example: "0.45282"
+        format: string
+        type: string
+    type: object
   responses.HistogramItem:
     properties:
       time:
@@ -1906,6 +1941,27 @@ paths:
       summary: Search by hash
       tags:
       - search
+  /v1/stats/gas_price/hourly:
+    get:
+      description: Get candles for gas price with volume, average gas efficiency and
+        fee for an hour
+      operationId: stats-gas-price-hourly
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.GasPriceCandle'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get candles for gas price
+      tags:
+      - stats
   /v1/stats/histogram/{table}/{function}/{timeframe}:
     get:
       description: |-

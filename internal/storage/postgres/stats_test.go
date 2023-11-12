@@ -696,6 +696,15 @@ func (s *StatsTestSuite) TestTxCountForLast24h() {
 	s.Require().Len(items, 0)
 }
 
+func (s *StatsTestSuite) TestGasPriceHourly() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	items, err := s.storage.Stats.GasPriceHourly(ctx)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
+}
+
 func TestSuiteStats_Run(t *testing.T) {
 	suite.Run(t, new(StatsTestSuite))
 }

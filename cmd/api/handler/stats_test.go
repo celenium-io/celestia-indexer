@@ -258,3 +258,41 @@ func (s *StatsTestSuite) TestTxCount24h() {
 	s.Require().EqualValues(0.01, item.TPS)
 	s.Require().True(testTime.Equal(item.Time))
 }
+
+func (s *StatsTestSuite) TestGasPriceHourly() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/gas_price/hourly")
+
+	s.stats.EXPECT().
+		GasPriceHourly(gomock.Any()).
+		Return([]storage.GasCandle{
+			{
+				Time:    testTime,
+				High:    1,
+				Low:     .0001,
+				Volume:  123400,
+				GasUsed: 13761,
+				Fee:     1267351,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.GasPriceHourly(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response []responses.GasPriceCandle
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 1)
+
+	item := response[0]
+	s.Require().EqualValues("1", item.High)
+	s.Require().EqualValues("0.0001", item.Low)
+	s.Require().EqualValues("123400", item.TotalGasLimit)
+	s.Require().EqualValues("13761", item.TotalGasUsed)
+	s.Require().EqualValues(1267351, item.Fee)
+	s.Require().EqualValues("10.270267423014587", item.AvgGasPrice)
+	s.Require().EqualValues("0.11151539708265802", item.GasEfficiency)
+	s.Require().True(testTime.Equal(item.Time))
+}

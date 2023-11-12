@@ -290,6 +290,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		stats.GET("/histogram/:table/:function/:timeframe", statsHandler.Histogram)
 		stats.GET("/tps", statsHandler.TPS)
 		stats.GET("/tx_count_24h", statsHandler.TxCountHourly24h)
+
+		gasPrice := stats.Group("/gas_price")
+		{
+			gasPrice.GET("/hourly", statsHandler.GasPriceHourly)
+		}
 	}
 
 	if cfg.ApiConfig.Prometheus {

@@ -78,6 +78,45 @@ func (c *IStatsCountCall) DoAndReturn(f func(context.Context, storage.CountReque
 	return c
 }
 
+// GasPriceHourly mocks base method.
+func (m *MockIStats) GasPriceHourly(ctx context.Context) ([]storage.GasCandle, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GasPriceHourly", ctx)
+	ret0, _ := ret[0].([]storage.GasCandle)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GasPriceHourly indicates an expected call of GasPriceHourly.
+func (mr *MockIStatsMockRecorder) GasPriceHourly(ctx any) *IStatsGasPriceHourlyCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GasPriceHourly", reflect.TypeOf((*MockIStats)(nil).GasPriceHourly), ctx)
+	return &IStatsGasPriceHourlyCall{Call: call}
+}
+
+// IStatsGasPriceHourlyCall wrap *gomock.Call
+type IStatsGasPriceHourlyCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IStatsGasPriceHourlyCall) Return(arg0 []storage.GasCandle, arg1 error) *IStatsGasPriceHourlyCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IStatsGasPriceHourlyCall) Do(f func(context.Context) ([]storage.GasCandle, error)) *IStatsGasPriceHourlyCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IStatsGasPriceHourlyCall) DoAndReturn(f func(context.Context) ([]storage.GasCandle, error)) *IStatsGasPriceHourlyCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Histogram mocks base method.
 func (m *MockIStats) Histogram(ctx context.Context, req storage.HistogramRequest) ([]storage.HistogramItem, error) {
 	m.ctrl.T.Helper()
