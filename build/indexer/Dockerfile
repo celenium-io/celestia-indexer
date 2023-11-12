@@ -32,6 +32,7 @@ WORKDIR /app/celestia-indexer/
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /go/bin/indexer /go/bin/indexer
-COPY build/dipdup.yml ./
+COPY configs/dipdup.yml ./
+COPY database database
 
 ENTRYPOINT ["/go/bin/indexer", "-c", "dipdup.yml"]

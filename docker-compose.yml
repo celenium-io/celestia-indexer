@@ -36,7 +36,7 @@ services:
     command:
       - -cshared_preload_libraries=timescaledb,pg_stat_statements
       - -cpg_stat_statements.track=all
-    image: timescale/timescaledb:2.12.2-pg15
+    image: timescale/timescaledb-ha:pg15-latest
     restart: always
     volumes:
       - db:/var/lib/postgresql/data

@@ -41,7 +41,7 @@ func main() {
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 
-	db := initDatabase(cfg.Database)
+	db := initDatabase(cfg.Database, cfg.Indexer.ViewsDir)
 	e := initEcho(cfg.ApiConfig, cfg.Environment)
 	initHandlers(ctx, e, *cfg, db)
 

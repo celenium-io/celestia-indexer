@@ -427,6 +427,25 @@ definitions:
         format: int64
         type: integer
     type: object
+  responses.TPS:
+    properties:
+      change_last_hour_pct:
+        example: 0.275
+        format: float
+        type: number
+      current:
+        example: 0.567
+        format: float
+        type: number
+      high:
+        example: 1.023
+        format: float
+        type: number
+      low:
+        example: 0.123
+        format: float
+        type: number
+    type: object
   responses.Tx:
     properties:
       codespace:
@@ -500,6 +519,21 @@ definitions:
         example: 0
         format: int64
         type: integer
+    type: object
+  responses.TxCountHistogramItem:
+    properties:
+      count:
+        example: 2223424
+        format: integer
+        type: integer
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
+      tps:
+        example: 0.13521
+        format: float
+        type: number
     type: object
   types.EventType:
     enum:
@@ -2069,6 +2103,44 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get value by table and function
+      tags:
+      - stats
+  /v1/stats/tps:
+    get:
+      description: Returns transaction per seconds statistics
+      operationId: stats-tps
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.TPS'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get tps
+      tags:
+      - stats
+  /v1/stats/tx_count_24h:
+    get:
+      description: Get tx count histogram for last 24 hours by hour
+      operationId: stats-tx-count-24h
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.TxCountHistogramItem'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get tx count histogram for last 24 hours by hour
       tags:
       - stats
   /v1/tx:

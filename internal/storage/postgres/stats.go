@@ -108,3 +108,47 @@ func (s Stats) Histogram(ctx context.Context, req storage.HistogramRequest) (res
 	err = query.Scan(ctx, &response)
 	return
 }
+
+func (s Stats) TPS(ctx context.Context) (response storage.TPS, err error) {
+	if err = s.db.DB().NewSelect().Table("tx_count_hourly").
+		ColumnExpr("max(tps) as high, min(tps) as low").
+		Where("timestamp > date_trunc('hour', now()) - '1 week'::interval").
+		Where("timestamp < date_trunc('hour', now())").
+		Scan(ctx, &response.High, &response.Low); err != nil {
+		return
+	}
+
+	if err = s.db.DB().NewSelect().Model((*storage.BlockStats)(nil)).
+		ColumnExpr("sum(tx_count)/3600.0").
+		Where("time > now() - '1 hour'::interval").
+		Scan(ctx, &response.Current); err != nil {
+		return
+	}
+	var prev float64
+	if err = s.db.DB().NewSelect().Model((*storage.BlockStats)(nil)).
+		ColumnExpr("sum(tx_count)/3600.0").
+		Where("time > now() - '2 hour'::interval").
+		Where("time <= now() - '1 hour'::interval").
+		Scan(ctx, &prev); err != nil {
+		return
+	}
+
+	switch {
+	case prev == 0 && response.Current == 0:
+		response.ChangeLastHourPct = 0
+	case prev == 0 && response.Current > 0:
+		response.ChangeLastHourPct = 1
+	default:
+		response.ChangeLastHourPct = (response.Current - prev) / prev
+	}
+
+	return
+}
+
+func (s Stats) TxCountForLast24h(ctx context.Context) (response []storage.TxCountForLast24hItem, err error) {
+	err = s.db.DB().NewSelect().Table("tx_count_hourly").
+		Where("timestamp > date_trunc('hour', now()) - '25 hours'::interval").
+		Where("timestamp < date_trunc('hour', now())").
+		Scan(ctx, &response)
+	return
+}

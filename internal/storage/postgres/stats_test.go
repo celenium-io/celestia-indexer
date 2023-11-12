@@ -34,7 +34,7 @@ func (s *StatsTestSuite) SetupSuite() {
 		Password: "password",
 		Database: "db_test",
 		Port:     5432,
-		Image:    "timescale/timescaledb:latest-pg15",
+		Image:    "timescale/timescaledb-ha:pg15-latest",
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
@@ -46,7 +46,7 @@ func (s *StatsTestSuite) SetupSuite() {
 		Password: s.psqlContainer.Config.Password,
 		Host:     s.psqlContainer.Config.Host,
 		Port:     s.psqlContainer.MappedPort().Int(),
-	})
+	}, "../../../database/views")
 	s.Require().NoError(err)
 	s.storage = strg
 
@@ -672,6 +672,28 @@ func (s *StatsTestSuite) TestHistogramCount() {
 
 		ctxCancel()
 	}
+}
+
+func (s *StatsTestSuite) TestTPS() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tps, err := s.storage.Stats.TPS(ctx)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(0, tps.High)
+	s.Require().EqualValues(0, tps.Low)
+	s.Require().EqualValues(0, tps.Current)
+	s.Require().EqualValues(0, tps.ChangeLastHourPct)
+}
+
+func (s *StatsTestSuite) TestTxCountForLast24h() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	items, err := s.storage.Stats.TxCountForLast24h(ctx)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
 }
 
 func TestSuiteStats_Run(t *testing.T) {

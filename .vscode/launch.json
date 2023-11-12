@@ -12,7 +12,7 @@
             "program": "${workspaceFolder}/cmd/api",
             "args": [
                 "-c",
-                "../../build/dipdup.yml",
+                "../../configs/dipdup.yml",
             ],
             "envFile": "${workspaceFolder}/.env"
         }, {
@@ -23,7 +23,7 @@
             "program": "${workspaceFolder}/cmd/indexer",
             "args": [
                 "-c",
-                "../../build/dipdup.yml",
+                "../../configs/dipdup.yml",
             ],
             "envFile": "${workspaceFolder}/.env"
         }

@@ -2,7 +2,7 @@
   <configuration default="false" name="Indexer" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="celestia-indexer" />
     <working_directory value="$PROJECT_DIR$" />
-    <parameters value="-c build/dipdup.yml" />
+    <parameters value="-c configs/dipdup.yml" />
     <EXTENSION ID="net.ashald.envfile">
       <option name="IS_ENABLED" value="true" />
       <option name="IS_SUBST" value="false" />

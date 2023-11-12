@@ -42,7 +42,7 @@ type Indexer struct {
 }
 
 func New(ctx context.Context, cfg config.Config, stopperModule modules.Module) (Indexer, error) {
-	pg, err := postgres.Create(ctx, cfg.Database)
+	pg, err := postgres.Create(ctx, cfg.Database, cfg.Indexer.ViewsDir)
 	if err != nil {
 		return Indexer{}, errors.Wrap(err, "while creating pg context")
 	}

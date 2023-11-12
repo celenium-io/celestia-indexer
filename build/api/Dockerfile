@@ -32,6 +32,7 @@ WORKDIR /app/api
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /go/bin/api /go/bin/api
-COPY ./build/dipdup.yml ./
+COPY ./configs/dipdup.yml ./
+COPY database database
 
 ENTRYPOINT ["/go/bin/api", "-c", "dipdup.yml"]

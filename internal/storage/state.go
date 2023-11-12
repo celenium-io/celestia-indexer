@@ -5,8 +5,9 @@ package storage
 
 import (
 	"context"
-	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"time"
+
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/shopspring/decimal"

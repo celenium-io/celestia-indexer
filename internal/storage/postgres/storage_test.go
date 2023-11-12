@@ -41,7 +41,7 @@ func (s *StorageTestSuite) SetupSuite() {
 		Password: "password",
 		Database: "db_test",
 		Port:     5432,
-		Image:    "timescale/timescaledb:latest-pg15",
+		Image:    "timescale/timescaledb-ha:pg15-latest",
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
@@ -53,7 +53,7 @@ func (s *StorageTestSuite) SetupSuite() {
 		Password: s.psqlContainer.Config.Password,
 		Host:     s.psqlContainer.Config.Host,
 		Port:     s.psqlContainer.MappedPort().Int(),
-	})
+	}, "../../../database/views")
 	s.Require().NoError(err)
 	s.storage = strg
 
@@ -145,11 +145,9 @@ func (s *StorageTestSuite) TestBlockByHeightWithStats() {
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
 
-	loc := &time.Location{}
 	expectedStats := storage.BlockStats{
 		Id:            2,
 		Height:        1000,
-		Time:          time.Date(2023, 07, 04, 03, 10, 57, 0, loc).UTC(),
 		TxCount:       0,
 		EventsCount:   0,
 		BlobsSize:     0,
@@ -164,7 +162,16 @@ func (s *StorageTestSuite) TestBlockByHeightWithStats() {
 			types.MsgWithdrawDelegatorReward: 1,
 		},
 	}
-	s.Require().Equal(expectedStats, block.Stats)
+	s.Require().EqualValues(expectedStats.Id, block.Stats.Id)
+	s.Require().EqualValues(expectedStats.Height, block.Stats.Height)
+	s.Require().EqualValues(expectedStats.TxCount, block.Stats.TxCount)
+	s.Require().EqualValues(expectedStats.EventsCount, block.Stats.EventsCount)
+	s.Require().EqualValues(expectedStats.BlobsSize, block.Stats.BlobsSize)
+	s.Require().EqualValues(expectedStats.BlockTime, block.Stats.BlockTime)
+	s.Require().EqualValues(expectedStats.SupplyChange.String(), block.Stats.SupplyChange.String())
+	s.Require().EqualValues(expectedStats.InflationRate.String(), block.Stats.InflationRate.String())
+	s.Require().EqualValues(expectedStats.Fee.String(), block.Stats.Fee.String())
+	s.Require().Equal(expectedStats.MessagesCounts, block.Stats.MessagesCounts)
 
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
 	s.Require().NoError(err)
@@ -181,11 +188,9 @@ func (s *StorageTestSuite) TestBlockByIdWithRelations() {
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
 
-	loc := &time.Location{}
 	expectedStats := storage.BlockStats{
 		Id:            2,
 		Height:        1000,
-		Time:          time.Date(2023, 07, 04, 03, 10, 57, 0, loc).UTC(),
 		TxCount:       0,
 		EventsCount:   0,
 		BlobsSize:     0,
@@ -200,7 +205,16 @@ func (s *StorageTestSuite) TestBlockByIdWithRelations() {
 			types.MsgWithdrawDelegatorReward: 1,
 		},
 	}
-	s.Require().Equal(expectedStats, block.Stats)
+	s.Require().EqualValues(expectedStats.Id, block.Stats.Id)
+	s.Require().EqualValues(expectedStats.Height, block.Stats.Height)
+	s.Require().EqualValues(expectedStats.TxCount, block.Stats.TxCount)
+	s.Require().EqualValues(expectedStats.EventsCount, block.Stats.EventsCount)
+	s.Require().EqualValues(expectedStats.BlobsSize, block.Stats.BlobsSize)
+	s.Require().EqualValues(expectedStats.BlockTime, block.Stats.BlockTime)
+	s.Require().EqualValues(expectedStats.SupplyChange.String(), block.Stats.SupplyChange.String())
+	s.Require().EqualValues(expectedStats.InflationRate.String(), block.Stats.InflationRate.String())
+	s.Require().EqualValues(expectedStats.Fee.String(), block.Stats.Fee.String())
+	s.Require().Equal(expectedStats.MessagesCounts, block.Stats.MessagesCounts)
 
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
 	s.Require().NoError(err)

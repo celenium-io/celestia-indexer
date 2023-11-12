@@ -6,6 +6,9 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"testing"
+	"time"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
@@ -14,8 +17,6 @@ import (
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
-	"testing"
-	"time"
 )
 
 // BlockStatsTestSuite -
@@ -35,7 +36,7 @@ func (s *BlockStatsTestSuite) SetupSuite() {
 		Password: "password",
 		Database: "db_test",
 		Port:     5432,
-		Image:    "timescale/timescaledb:latest-pg15",
+		Image:    "timescale/timescaledb-ha:pg15-latest",
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
@@ -47,7 +48,7 @@ func (s *BlockStatsTestSuite) SetupSuite() {
 		Password: s.psqlContainer.Config.Password,
 		Host:     s.psqlContainer.Config.Host,
 		Port:     s.psqlContainer.MappedPort().Int(),
-	})
+	}, "../../../database/views")
 	s.Require().NoError(err)
 	s.storage = strg
 

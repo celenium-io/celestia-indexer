@@ -39,7 +39,7 @@ func (s *ModuleTestSuite) SetupSuite() {
 		Password: "password",
 		Database: "db_test",
 		Port:     5432,
-		Image:    "timescale/timescaledb:latest-pg15",
+		Image:    "timescale/timescaledb-ha:pg15-latest",
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
@@ -51,7 +51,7 @@ func (s *ModuleTestSuite) SetupSuite() {
 		Password: s.psqlContainer.Config.Password,
 		Host:     s.psqlContainer.Config.Host,
 		Port:     s.psqlContainer.MappedPort().Int(),
-	})
+	}, "../../../database/views")
 	s.Require().NoError(err)
 	s.storage = strg
 }
