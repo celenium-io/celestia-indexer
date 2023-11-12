@@ -33,7 +33,7 @@ type StorageTestSuite struct {
 
 // SetupSuite -
 func (s *StorageTestSuite) SetupSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer ctxCancel()
 
 	psqlContainer, err := database.NewPostgreSQLContainer(ctx, database.PostgreSQLContainerConfig{
