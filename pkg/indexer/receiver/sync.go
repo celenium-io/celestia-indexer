@@ -15,9 +15,13 @@ import (
 func (r *Module) sync(ctx context.Context) {
 	var blocksCtx context.Context
 	blocksCtx, r.cancelReadBlocks = context.WithCancel(ctx)
-	if err := r.readBlocks(blocksCtx); err != nil && !errors.Is(err, context.Canceled) {
+	if err := r.readBlocks(blocksCtx); err != nil {
 		r.Log.Err(err).Msg("while reading blocks")
 		r.stopAll()
+		return
+	}
+
+	if ctx.Err() != nil {
 		return
 	}
 

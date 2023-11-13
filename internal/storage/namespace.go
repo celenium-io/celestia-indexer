@@ -25,20 +25,22 @@ type INamespace interface {
 	Messages(ctx context.Context, id uint64, limit, offset int) ([]NamespaceMessage, error)
 	MessagesByHeight(ctx context.Context, height pkgTypes.Level, limit, offset int) ([]NamespaceMessage, error)
 	CountMessagesByHeight(ctx context.Context, height pkgTypes.Level) (int, error)
-	Active(ctx context.Context, top int) ([]ActiveNamespace, error)
+	Active(ctx context.Context, sortField string, top int) ([]Namespace, error)
 }
 
 // Namespace -
 type Namespace struct {
 	bun.BaseModel `bun:"namespace" comment:"Table with celestia namespaces."`
 
-	Id          uint64      `bun:"id,pk,autoincrement"                          comment:"Unique internal identity"`
-	FirstHeight types.Level `bun:"first_height,notnull"                         comment:"Block height of the first message changing the namespace"`
-	Version     byte        `bun:"version,unique:namespace_id_version_idx"      comment:"Namespace version"`
-	NamespaceID []byte      `bun:"namespace_id,unique:namespace_id_version_idx" comment:"Namespace identity"`
-	Size        int64       `bun:"size"                                         comment:"Blobs size"`
-	PfbCount    int64       `bun:"pfb_count"                                    comment:"Count of pay for blobs messages for the namespace"`
-	Reserved    bool        `bun:"reserved,default:false"                       comment:"If namespace is reserved flag is true"`
+	Id              uint64      `bun:"id,pk,autoincrement"                          comment:"Unique internal identity"`
+	FirstHeight     types.Level `bun:"first_height,notnull"                         comment:"Block height of the first message changing the namespace"`
+	LastHeight      types.Level `bun:"last_height,notnull"                          comment:"Block height of the last message changing the namespace"`
+	Version         byte        `bun:"version,unique:namespace_id_version_idx"      comment:"Namespace version"`
+	NamespaceID     []byte      `bun:"namespace_id,unique:namespace_id_version_idx" comment:"Namespace identity"`
+	Size            int64       `bun:"size"                                         comment:"Blobs size"`
+	PfbCount        int64       `bun:"pfb_count"                                    comment:"Count of pay for blobs messages for the namespace"`
+	Reserved        bool        `bun:"reserved,default:false"                       comment:"If namespace is reserved flag is true"`
+	LastMessageTime time.Time   `bun:"last_message_time"                            comment:"Time when last pay for blob was sent"`
 }
 
 // TableName -
@@ -52,10 +54,4 @@ func (ns Namespace) String() string {
 
 func (ns Namespace) Hash() string {
 	return base64.StdEncoding.EncodeToString(append([]byte{ns.Version}, ns.NamespaceID...))
-}
-
-type ActiveNamespace struct {
-	Namespace
-	Height pkgTypes.Level `bun:"height"`
-	Time   time.Time      `bun:"time"`
 }

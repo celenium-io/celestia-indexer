@@ -4,6 +4,8 @@
 package decode
 
 import (
+	"time"
+
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/handle"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	crisisTypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
@@ -17,7 +19,6 @@ import (
 	coreClient "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
 	coreConnection "github.com/cosmos/ibc-go/v6/modules/core/03-connection/types"
 	coreChannel "github.com/cosmos/ibc-go/v6/modules/core/04-channel/types"
-	"time"
 
 	"github.com/rs/zerolog/log"
 
@@ -104,7 +105,7 @@ func Message(
 
 	// blob module
 	case *appBlobTypes.MsgPayForBlobs:
-		d.Msg.Type, d.Msg.Addresses, d.Msg.Namespace, d.BlobsSize, err = handle.MsgPayForBlobs(height, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.Namespace, d.BlobsSize, err = handle.MsgPayForBlobs(height, time, typedMsg)
 
 	// feegrant module
 	case *cosmosFeegrant.MsgGrantAllowance:

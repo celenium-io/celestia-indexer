@@ -8,10 +8,12 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
+
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -26,11 +28,13 @@ import (
 
 var (
 	testNamespace = storage.Namespace{
-		Id:          1,
-		Version:     1,
-		NamespaceID: []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7},
-		Size:        100,
-		PfbCount:    12,
+		Id:              1,
+		Version:         1,
+		NamespaceID:     []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7},
+		Size:            100,
+		PfbCount:        12,
+		LastHeight:      100,
+		LastMessageTime: testTime,
 	}
 	testNamespaceId     = "00010203040506070809000102030405060708090001020304050607"
 	testNamespaceBase64 = "AQABAgMEBQYHCAkAAQIDBAUGBwgJAAECAwQFBgc="
@@ -354,26 +358,55 @@ func (s *NamespaceTestSuite) TestGetActive() {
 	c.SetPath("/namespace/active")
 
 	s.namespaces.EXPECT().
-		Active(gomock.Any(), 5).
-		Return([]storage.ActiveNamespace{
-			{
-				Height:    100,
-				Time:      testTime,
-				Namespace: testNamespace,
-			},
+		Active(gomock.Any(), "", 5).
+		Return([]storage.Namespace{
+			testNamespace,
 		}, nil)
 
 	s.Require().NoError(s.handler.GetActive(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var ns []responses.ActiveNamespace
+	var ns []responses.Namespace
 	err := json.NewDecoder(rec.Body).Decode(&ns)
 	s.Require().NoError(err)
 	s.Require().Len(ns, 1)
 
 	namespace := ns[0]
 	s.Require().Equal("00010203040506070809000102030405060708090001020304050607", namespace.NamespaceID)
-	s.Require().EqualValues(100, namespace.Height)
+	s.Require().EqualValues(100, namespace.LastHeight)
 	s.Require().EqualValues(100, namespace.Size)
-	s.Require().Equal(testTime, namespace.Time)
+	s.Require().Equal(testTime, namespace.LastMessageTime)
+}
+
+func (s *NamespaceTestSuite) TestGetActiveWithSort() {
+	for _, field := range []string{"pfb_count", "time", "size"} {
+		q := make(url.Values)
+		q.Set("sort", field)
+
+		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+		rec := httptest.NewRecorder()
+		c := s.echo.NewContext(req, rec)
+		c.SetPath("/namespace/active")
+
+		s.namespaces.EXPECT().
+			Active(gomock.Any(), field, 5).
+			Return([]storage.Namespace{
+				testNamespace,
+			}, nil)
+
+		s.Require().NoError(s.handler.GetActive(c))
+		s.Require().Equal(http.StatusOK, rec.Code)
+
+		var ns []responses.Namespace
+		err := json.NewDecoder(rec.Body).Decode(&ns)
+		s.Require().NoError(err)
+		s.Require().Len(ns, 1)
+
+		namespace := ns[0]
+		s.Require().Equal("00010203040506070809000102030405060708090001020304050607", namespace.NamespaceID)
+		s.Require().EqualValues(100, namespace.LastHeight)
+		s.Require().EqualValues(100, namespace.Size)
+		s.Require().Equal(testTime, namespace.LastMessageTime)
+
+	}
 }

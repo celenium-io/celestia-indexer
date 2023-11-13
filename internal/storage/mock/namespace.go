@@ -42,18 +42,18 @@ func (m *MockINamespace) EXPECT() *MockINamespaceMockRecorder {
 }
 
 // Active mocks base method.
-func (m *MockINamespace) Active(ctx context.Context, top int) ([]storage.ActiveNamespace, error) {
+func (m *MockINamespace) Active(ctx context.Context, sortField string, top int) ([]storage.Namespace, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Active", ctx, top)
-	ret0, _ := ret[0].([]storage.ActiveNamespace)
+	ret := m.ctrl.Call(m, "Active", ctx, sortField, top)
+	ret0, _ := ret[0].([]storage.Namespace)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Active indicates an expected call of Active.
-func (mr *MockINamespaceMockRecorder) Active(ctx, top any) *INamespaceActiveCall {
+func (mr *MockINamespaceMockRecorder) Active(ctx, sortField, top any) *INamespaceActiveCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Active", reflect.TypeOf((*MockINamespace)(nil).Active), ctx, top)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Active", reflect.TypeOf((*MockINamespace)(nil).Active), ctx, sortField, top)
 	return &INamespaceActiveCall{Call: call}
 }
 
@@ -63,19 +63,19 @@ type INamespaceActiveCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceActiveCall) Return(arg0 []storage.ActiveNamespace, arg1 error) *INamespaceActiveCall {
+func (c *INamespaceActiveCall) Return(arg0 []storage.Namespace, arg1 error) *INamespaceActiveCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceActiveCall) Do(f func(context.Context, int) ([]storage.ActiveNamespace, error)) *INamespaceActiveCall {
+func (c *INamespaceActiveCall) Do(f func(context.Context, string, int) ([]storage.Namespace, error)) *INamespaceActiveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceActiveCall) DoAndReturn(f func(context.Context, int) ([]storage.ActiveNamespace, error)) *INamespaceActiveCall {
+func (c *INamespaceActiveCall) DoAndReturn(f func(context.Context, string, int) ([]storage.Namespace, error)) *INamespaceActiveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -480,15 +480,42 @@ func (s *StorageTestSuite) TestNamespaceActive() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	ns, err := s.storage.Namespace.Active(ctx, 2)
+	ns, err := s.storage.Namespace.Active(ctx, "", 2)
 	s.Require().NoError(err)
 	s.Require().Len(ns, 2)
 
 	namespace := ns[0]
-	s.Require().EqualValues(1000, namespace.Height)
+	s.Require().EqualValues(1000, namespace.LastHeight)
+	s.Require().EqualValues(3, namespace.Id)
+	s.Require().EqualValues(12, namespace.Size)
+}
+
+func (s *StorageTestSuite) TestNamespaceActiveByPfbCount() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	ns, err := s.storage.Namespace.Active(ctx, "pfb_count", 2)
+	s.Require().NoError(err)
+	s.Require().Len(ns, 2)
+
+	namespace := ns[0]
+	s.Require().EqualValues(1000, namespace.LastHeight)
+	s.Require().EqualValues(1, namespace.Id)
+	s.Require().EqualValues(1234, namespace.Size)
+}
+
+func (s *StorageTestSuite) TestNamespaceActiveBySize() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	ns, err := s.storage.Namespace.Active(ctx, "size", 2)
+	s.Require().NoError(err)
+	s.Require().Len(ns, 2)
+
+	namespace := ns[0]
+	s.Require().EqualValues(1000, namespace.LastHeight)
 	s.Require().EqualValues(2, namespace.Id)
-	s.Require().NotNil(namespace.Namespace)
-	s.Require().EqualValues(1255, namespace.Namespace.Size)
+	s.Require().EqualValues(1255, namespace.Size)
 }
 
 func (s *StorageTestSuite) TestTxByHash() {

@@ -71,6 +71,12 @@ func (module *Module) rollbackNamespaces(
 
 	namespaces := make([]*storage.Namespace, 0, len(diffs))
 	for key := range diffs {
+		last, err := tx.LastNamespaceMessage(ctx, diffs[key].Id)
+		if err != nil {
+			return errors.Wrap(err, "receiving last namespace message")
+		}
+		diffs[key].LastHeight = last.Height
+		diffs[key].LastMessageTime = last.Time
 		namespaces = append(namespaces, diffs[key])
 	}
 

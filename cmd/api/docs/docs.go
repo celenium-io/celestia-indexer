@@ -1099,13 +1099,26 @@ const docTemplate = `{
                 ],
                 "summary": "Get last used namespace",
                 "operationId": "get-namespace-active",
+                "parameters": [
+                    {
+                        "enum": [
+                            "time",
+                            "pfb_count",
+                            "size"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/responses.ActiveNamespace"
+                                "$ref": "#/definitions/responses.Namespace"
                             }
                         }
                     },
@@ -2216,54 +2229,6 @@ const docTemplate = `{
                 }
             }
         },
-        "responses.ActiveNamespace": {
-            "type": "object",
-            "properties": {
-                "hash": {
-                    "type": "string",
-                    "format": "base64",
-                    "example": "U3dhZ2dlciByb2Nrcw=="
-                },
-                "height": {
-                    "type": "integer",
-                    "format": "int64",
-                    "example": 100
-                },
-                "id": {
-                    "type": "integer",
-                    "format": "integer",
-                    "example": 321
-                },
-                "namespace_id": {
-                    "type": "string",
-                    "format": "binary",
-                    "example": "4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02"
-                },
-                "pfb_count": {
-                    "type": "integer",
-                    "format": "integer",
-                    "example": 12
-                },
-                "reserved": {
-                    "type": "boolean",
-                    "example": true
-                },
-                "size": {
-                    "type": "integer",
-                    "format": "integer",
-                    "example": 12345
-                },
-                "time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "2023-07-04T03:10:57+00:00"
-                },
-                "version": {
-                    "type": "integer",
-                    "format": "byte"
-                }
-            }
-        },
         "responses.Address": {
             "description": "Celestia address information",
             "type": "object",
@@ -2613,6 +2578,16 @@ const docTemplate = `{
                     "type": "integer",
                     "format": "integer",
                     "example": 321
+                },
+                "last_height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "last_message_time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
                 },
                 "namespace_id": {
                     "type": "string",

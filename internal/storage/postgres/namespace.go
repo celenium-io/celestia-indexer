@@ -5,7 +5,9 @@ package postgres
 
 import (
 	"context"
+
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/uptrace/bun"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
@@ -79,20 +81,22 @@ func (n *Namespace) CountMessagesByHeight(ctx context.Context, height pkgTypes.L
 		Count(ctx)
 }
 
-func (n *Namespace) Active(ctx context.Context, top int) (ns []storage.ActiveNamespace, err error) {
-	subQuery := n.DB().NewSelect().
-		ColumnExpr("namespace_id, max(msg_id) as msg_id, max(height) as height, max(time) as time").
-		Model((*storage.NamespaceMessage)(nil)).
-		Group("namespace_id").
-		Order("msg_id desc")
-	subQuery = limitScope(subQuery, top)
+func (n *Namespace) Active(ctx context.Context, sortField string, top int) (ns []storage.Namespace, err error) {
+	var field string
+	switch sortField {
+	case "time":
+		field = "last_message_time"
+	case "pfb_count":
+		field = "pfb_count"
+	case "size":
+		field = "size"
+	default:
+		field = "last_message_time"
+	}
 
-	err = n.DB().NewSelect().
-		ColumnExpr("action.time as time, action.height as height, namespace.*").
-		TableExpr("(?) as action", subQuery).
-		Join("LEFT JOIN namespace").
-		JoinOn("namespace.id = action.namespace_id").
-		Order("msg_id desc").
-		Scan(ctx, &ns)
+	query := n.DB().NewSelect().Model(&ns).OrderExpr("? desc", bun.Safe(field))
+	limitScope(query, top)
+
+	err = query.Scan(ctx)
 	return
 }
