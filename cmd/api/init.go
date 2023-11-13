@@ -290,6 +290,12 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		stats.GET("/histogram/:table/:function/:timeframe", statsHandler.Histogram)
 	}
 
+	gasHandler := handler.NewGasHandler()
+	gas := v1.Group("/gas")
+	{
+		gas.GET("/estimate_for_pfb", gasHandler.EstimateForPfb)
+	}
+
 	if cfg.ApiConfig.Prometheus {
 		v1.GET("/metrics", echoprometheus.NewHandler())
 	}
