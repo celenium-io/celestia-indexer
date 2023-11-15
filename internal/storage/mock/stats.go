@@ -78,6 +78,45 @@ func (c *IStatsCountCall) DoAndReturn(f func(context.Context, storage.CountReque
 	return c
 }
 
+// GasPriceHourly mocks base method.
+func (m *MockIStats) GasPriceHourly(ctx context.Context) ([]storage.GasCandle, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GasPriceHourly", ctx)
+	ret0, _ := ret[0].([]storage.GasCandle)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GasPriceHourly indicates an expected call of GasPriceHourly.
+func (mr *MockIStatsMockRecorder) GasPriceHourly(ctx any) *IStatsGasPriceHourlyCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GasPriceHourly", reflect.TypeOf((*MockIStats)(nil).GasPriceHourly), ctx)
+	return &IStatsGasPriceHourlyCall{Call: call}
+}
+
+// IStatsGasPriceHourlyCall wrap *gomock.Call
+type IStatsGasPriceHourlyCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IStatsGasPriceHourlyCall) Return(arg0 []storage.GasCandle, arg1 error) *IStatsGasPriceHourlyCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IStatsGasPriceHourlyCall) Do(f func(context.Context) ([]storage.GasCandle, error)) *IStatsGasPriceHourlyCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IStatsGasPriceHourlyCall) DoAndReturn(f func(context.Context) ([]storage.GasCandle, error)) *IStatsGasPriceHourlyCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Histogram mocks base method.
 func (m *MockIStats) Histogram(ctx context.Context, req storage.HistogramRequest) ([]storage.HistogramItem, error) {
 	m.ctrl.T.Helper()
@@ -191,6 +230,84 @@ func (c *IStatsSummaryCall) Do(f func(context.Context, storage.SummaryRequest) (
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *IStatsSummaryCall) DoAndReturn(f func(context.Context, storage.SummaryRequest) (string, error)) *IStatsSummaryCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// TPS mocks base method.
+func (m *MockIStats) TPS(ctx context.Context) (storage.TPS, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TPS", ctx)
+	ret0, _ := ret[0].(storage.TPS)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TPS indicates an expected call of TPS.
+func (mr *MockIStatsMockRecorder) TPS(ctx any) *IStatsTPSCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TPS", reflect.TypeOf((*MockIStats)(nil).TPS), ctx)
+	return &IStatsTPSCall{Call: call}
+}
+
+// IStatsTPSCall wrap *gomock.Call
+type IStatsTPSCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IStatsTPSCall) Return(arg0 storage.TPS, arg1 error) *IStatsTPSCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IStatsTPSCall) Do(f func(context.Context) (storage.TPS, error)) *IStatsTPSCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IStatsTPSCall) DoAndReturn(f func(context.Context) (storage.TPS, error)) *IStatsTPSCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// TxCountForLast24h mocks base method.
+func (m *MockIStats) TxCountForLast24h(ctx context.Context) ([]storage.TxCountForLast24hItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TxCountForLast24h", ctx)
+	ret0, _ := ret[0].([]storage.TxCountForLast24hItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TxCountForLast24h indicates an expected call of TxCountForLast24h.
+func (mr *MockIStatsMockRecorder) TxCountForLast24h(ctx any) *IStatsTxCountForLast24hCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TxCountForLast24h", reflect.TypeOf((*MockIStats)(nil).TxCountForLast24h), ctx)
+	return &IStatsTxCountForLast24hCall{Call: call}
+}
+
+// IStatsTxCountForLast24hCall wrap *gomock.Call
+type IStatsTxCountForLast24hCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IStatsTxCountForLast24hCall) Return(arg0 []storage.TxCountForLast24hItem, arg1 error) *IStatsTxCountForLast24hCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IStatsTxCountForLast24hCall) Do(f func(context.Context) ([]storage.TxCountForLast24hItem, error)) *IStatsTxCountForLast24hCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IStatsTxCountForLast24hCall) DoAndReturn(f func(context.Context) ([]storage.TxCountForLast24hItem, error)) *IStatsTxCountForLast24hCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

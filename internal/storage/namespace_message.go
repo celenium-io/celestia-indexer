@@ -4,8 +4,9 @@
 package storage
 
 import (
-	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"time"
+
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/uptrace/bun"
 )

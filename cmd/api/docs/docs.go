@@ -1504,6 +1504,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/stats/gas_price/hourly": {
+            "get": {
+                "description": "Get candles for gas price with volume, average gas efficiency and fee for an hour",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get candles for gas price",
+                "operationId": "stats-gas-price-hourly",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.GasPriceCandle"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/stats/histogram/{table}/{function}/{timeframe}": {
             "get": {
                 "description": "Returns histogram by table, function and timeframe\n\n### Parameters\n\n` + "`" + `table` + "`" + `, ` + "`" + `function` + "`" + ` and ` + "`" + `column` + "`" + ` parameters are the same as summary endpoint.\n\n\n### Timeframe\n\n* ` + "`" + `hour` + "`" + `\n* ` + "`" + `day` + "`" + `\n* ` + "`" + `week` + "`" + `\n* ` + "`" + `month` + "`" + `\n* ` + "`" + `year` + "`" + `",
@@ -1673,6 +1703,63 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/stats/tps": {
+            "get": {
+                "description": "Returns transaction per seconds statistics",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get tps",
+                "operationId": "stats-tps",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.TPS"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/stats/tx_count_24h": {
+            "get": {
+                "description": "Get tx count histogram for last 24 hours by hour",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get tx count histogram for last 24 hours by hour",
+                "operationId": "stats-tx-count-24h",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.TxCountHistogramItem"
+                            }
                         }
                     },
                     "500": {
@@ -2541,6 +2628,51 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.GasPriceCandle": {
+            "type": "object",
+            "properties": {
+                "avg_gas_efficiency": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.45282"
+                },
+                "avg_gas_price": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.45282"
+                },
+                "fee": {
+                    "type": "number",
+                    "format": "integer",
+                    "example": 1283518
+                },
+                "high": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.17632"
+                },
+                "low": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.11882"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "total_gas_limit": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "1213134"
+                },
+                "total_gas_used": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.45282"
+                }
+            }
+        },
         "responses.HistogramItem": {
             "type": "object",
             "properties": {
@@ -2760,6 +2892,31 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.TPS": {
+            "type": "object",
+            "properties": {
+                "change_last_hour_pct": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.275
+                },
+                "current": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.567
+                },
+                "high": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 1.023
+                },
+                "low": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.123
+                }
+            }
+        },
         "responses.Tx": {
             "type": "object",
             "properties": {
@@ -2856,6 +3013,26 @@ const docTemplate = `{
                     "type": "integer",
                     "format": "int64",
                     "example": 0
+                }
+            }
+        },
+        "responses.TxCountHistogramItem": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 2223424
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "tps": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.13521
                 }
             }
         },

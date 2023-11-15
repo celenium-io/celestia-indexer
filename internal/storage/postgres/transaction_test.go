@@ -32,7 +32,7 @@ type TransactionTestSuite struct {
 
 // SetupSuite -
 func (s *TransactionTestSuite) SetupSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer ctxCancel()
 
 	psqlContainer, err := database.NewPostgreSQLContainer(ctx, database.PostgreSQLContainerConfig{
@@ -40,7 +40,7 @@ func (s *TransactionTestSuite) SetupSuite() {
 		Password: "password",
 		Database: "db_test",
 		Port:     5432,
-		Image:    "timescale/timescaledb:latest-pg15",
+		Image:    "timescale/timescaledb-ha:pg15-latest",
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
@@ -52,7 +52,7 @@ func (s *TransactionTestSuite) SetupSuite() {
 		Password: s.psqlContainer.Config.Password,
 		Host:     s.psqlContainer.Config.Host,
 		Port:     s.psqlContainer.MappedPort().Int(),
-	})
+	}, "../../../database/views")
 	s.Require().NoError(err)
 	s.storage = strg
 }

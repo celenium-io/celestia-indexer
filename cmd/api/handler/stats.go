@@ -143,5 +143,68 @@ func (sh StatsHandler) Histogram(c echo.Context) error {
 		response[i] = responses.NewHistogramItem(histogram[i])
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return returnArray(c, response)
+}
+
+// TPS godoc
+//
+//	@Summary				Get tps
+//	@Description        	Returns transaction per seconds statistics
+//	@Tags					stats
+//	@ID						stats-tps
+//	@Produce				json
+//	@Success				200	{object}    responses.TPS
+//	@Failure				500	{object}	Error
+//	@Router					/v1/stats/tps [get]
+func (sh StatsHandler) TPS(c echo.Context) error {
+	tps, err := sh.repo.TPS(c.Request().Context())
+	if err != nil {
+		return internalServerError(c, err)
+	}
+	return c.JSON(http.StatusOK, responses.NewTPS(tps))
+}
+
+// TxCountHourly24h godoc
+//
+//	@Summary				Get tx count histogram for last 24 hours by hour
+//	@Description        	Get tx count histogram for last 24 hours by hour
+//	@Tags					stats
+//	@ID						stats-tx-count-24h
+//	@Produce				json
+//	@Success				200	{array}     responses.TxCountHistogramItem
+//	@Failure				500	{object}	Error
+//	@Router					/v1/stats/tx_count_24h [get]
+func (sh StatsHandler) TxCountHourly24h(c echo.Context) error {
+	histogram, err := sh.repo.TxCountForLast24h(c.Request().Context())
+	if err != nil {
+		return internalServerError(c, err)
+	}
+	response := make([]responses.TxCountHistogramItem, len(histogram))
+	for i := range histogram {
+		response[i] = responses.NewTxCountHistogramItem(histogram[i])
+	}
+	return returnArray(c, response)
+}
+
+// GasPriceHourly godoc
+//
+//	@Summary				Get candles for gas price
+//	@Description        	Get candles for gas price with volume, average gas efficiency and fee for an hour
+//	@Tags					stats
+//	@ID						stats-gas-price-hourly
+//	@Produce				json
+//	@Success				200	{array}     responses.GasPriceCandle
+//	@Failure				500	{object}	Error
+//	@Router					/v1/stats/gas_price/hourly [get]
+func (sh StatsHandler) GasPriceHourly(c echo.Context) error {
+	histogram, err := sh.repo.GasPriceHourly(c.Request().Context())
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	response := make([]responses.GasPriceCandle, len(histogram))
+	for i := range histogram {
+		response[i] = responses.NewGasPriceCandle(histogram[i])
+	}
+	return returnArray(c, response)
 }

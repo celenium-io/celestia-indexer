@@ -20,6 +20,7 @@ type Indexer struct {
 	ThreadsCount uint32 `validate:"omitempty,min=1" yaml:"threads_count"`
 	StartLevel   int64  `validate:"omitempty"       yaml:"start_level"`
 	BlockPeriod  int64  `validate:"omitempty"       yaml:"block_period"`
+	ViewsDir     string `validate:"omitempty,dir"   yaml:"views_dir"`
 }
 
 // Substitute -

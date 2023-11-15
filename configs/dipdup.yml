@@ -6,6 +6,7 @@ indexer:
   name: ${INDEXER_NAME:-dipdup_celestia_indexer}
   threads_count: ${INDEXER_THREADS_COUNT:-1}
   block_period: ${INDEXER_BLOCK_PERIOD:-15} # seconds
+  views_dir: ${INDEXER_VIEWS_DIR:-./database/views}
 
 database:
   kind: postgres

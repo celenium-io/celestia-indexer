@@ -198,10 +198,10 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 	return e
 }
 
-func initDatabase(cfg config.Database) postgres.Storage {
+func initDatabase(cfg config.Database, viewsDir string) postgres.Storage {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	db, err := postgres.Create(ctx, cfg)
+	db, err := postgres.Create(ctx, cfg, viewsDir)
 	if err != nil {
 		panic(err)
 	}
@@ -288,6 +288,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	{
 		stats.GET("/summary/:table/:function", statsHandler.Summary)
 		stats.GET("/histogram/:table/:function/:timeframe", statsHandler.Histogram)
+		stats.GET("/tps", statsHandler.TPS)
+		stats.GET("/tx_count_24h", statsHandler.TxCountHourly24h)
+
+		gasPrice := stats.Group("/gas_price")
+		{
+			gasPrice.GET("/hourly", statsHandler.GasPriceHourly)
+		}
 	}
 
 	if cfg.ApiConfig.Prometheus {

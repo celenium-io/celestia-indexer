@@ -5,10 +5,10 @@ init:
 	chmod +x init.dev.sh && ./init.dev.sh
 
 indexer:
-	cd cmd/indexer && go run . -c ../../build/dipdup.yml
+	cd cmd/indexer && go run . -c ../../configs/dipdup.yml
 
 api:
-	cd cmd/api && go run . -c ../../build/dipdup.yml
+	cd cmd/api && go run . -c ../../configs/dipdup.yml
 
 build:
 	cd cmd/indexer && go build -a -o ../../bin/indexer .

@@ -88,10 +88,35 @@ type HistogramItem struct {
 	Value string    `bun:"value"`
 }
 
+type TPS struct {
+	Low               float64
+	High              float64
+	Current           float64
+	ChangeLastHourPct float64
+}
+
+type TxCountForLast24hItem struct {
+	Time    time.Time `bun:"timestamp"`
+	TxCount int64     `bun:"tx_count"`
+	TPS     float64   `bun:"tps"`
+}
+
+type GasCandle struct {
+	High    float64   `bun:"high"`
+	Low     float64   `bun:"low"`
+	Volume  float64   `bun:"volume"`
+	GasUsed int64     `bun:"gas_used"`
+	Fee     int64     `bun:"fee"`
+	Time    time.Time `bun:"timestamp"`
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IStats interface {
 	Count(ctx context.Context, req CountRequest) (string, error)
 	Summary(ctx context.Context, req SummaryRequest) (string, error)
 	HistogramCount(ctx context.Context, req HistogramCountRequest) ([]HistogramItem, error)
 	Histogram(ctx context.Context, req HistogramRequest) ([]HistogramItem, error)
+	TPS(ctx context.Context) (TPS, error)
+	TxCountForLast24h(ctx context.Context) ([]TxCountForLast24hItem, error)
+	GasPriceHourly(ctx context.Context) ([]GasCandle, error)
 }

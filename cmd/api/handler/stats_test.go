@@ -200,3 +200,99 @@ func (s *StatsTestSuite) TestHistogramCountBlocksBadRequest() {
 	s.Require().NoError(s.handler.Histogram(c))
 	s.Require().Equal(http.StatusBadRequest, rec.Code)
 }
+
+func (s *StatsTestSuite) TestTPS() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/tps")
+
+	s.stats.EXPECT().
+		TPS(gomock.Any()).
+		Return(storage.TPS{
+			Current:           0.3,
+			High:              1,
+			Low:               0.1,
+			ChangeLastHourPct: 0.12,
+		}, nil)
+
+	s.Require().NoError(s.handler.TPS(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response responses.TPS
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(0.3, response.Current)
+	s.Require().EqualValues(1, response.High)
+	s.Require().EqualValues(0.1, response.Low)
+	s.Require().EqualValues(0.12, response.ChangeLastHourPct)
+}
+
+func (s *StatsTestSuite) TestTxCount24h() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/tx_count_24h")
+
+	s.stats.EXPECT().
+		TxCountForLast24h(gomock.Any()).
+		Return([]storage.TxCountForLast24hItem{
+			{
+				Time:    testTime,
+				TxCount: 100,
+				TPS:     0.01,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.TxCountHourly24h(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response []responses.TxCountHistogramItem
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 1)
+
+	item := response[0]
+	s.Require().EqualValues(100, item.Count)
+	s.Require().EqualValues(0.01, item.TPS)
+	s.Require().True(testTime.Equal(item.Time))
+}
+
+func (s *StatsTestSuite) TestGasPriceHourly() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/gas_price/hourly")
+
+	s.stats.EXPECT().
+		GasPriceHourly(gomock.Any()).
+		Return([]storage.GasCandle{
+			{
+				Time:    testTime,
+				High:    1,
+				Low:     .0001,
+				Volume:  123400,
+				GasUsed: 13761,
+				Fee:     1267351,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.GasPriceHourly(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response []responses.GasPriceCandle
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 1)
+
+	item := response[0]
+	s.Require().EqualValues("1", item.High)
+	s.Require().EqualValues("0.0001", item.Low)
+	s.Require().EqualValues("123400", item.TotalGasLimit)
+	s.Require().EqualValues("13761", item.TotalGasUsed)
+	s.Require().EqualValues(1267351, item.Fee)
+	s.Require().EqualValues("10.270267423014587", item.AvgGasPrice)
+	s.Require().EqualValues("0.11151539708265802", item.GasEfficiency)
+	s.Require().True(testTime.Equal(item.Time))
+}
