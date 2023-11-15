@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
 )
 
@@ -60,24 +61,24 @@ func (c *Cache) Clear() {
 }
 
 type CacheMiddleware struct {
-	cache *Cache
+	cache   *Cache
+	skipper middleware.Skipper
 }
 
-func Middleware(cache *Cache) echo.MiddlewareFunc {
+func Middleware(cache *Cache, skipper middleware.Skipper) echo.MiddlewareFunc {
 	mdlwr := CacheMiddleware{
-		cache: cache,
+		cache:   cache,
+		skipper: skipper,
 	}
 	return mdlwr.Handler
 }
 
-func (m *CacheMiddleware) isCacheable(req *http.Request) bool {
-	return req.Method == http.MethodGet
-}
-
 func (m *CacheMiddleware) Handler(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if !m.isCacheable(c.Request()) {
-			return next(c)
+		if m.skipper != nil {
+			if m.skipper(c) {
+				return next(c)
+			}
 		}
 		path := c.Request().URL.String()
 
