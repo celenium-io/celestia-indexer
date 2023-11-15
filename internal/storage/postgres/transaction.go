@@ -64,10 +64,12 @@ func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...*models.
 	}
 
 	_, err := tx.Tx().NewInsert().Model(&addedNamespaces).
-		Column("version", "namespace_id", "pfb_count", "size", "first_height").
+		Column("version", "namespace_id", "pfb_count", "size", "first_height", "last_height", "last_message_time").
 		On("CONFLICT ON CONSTRAINT namespace_id_version_idx DO UPDATE").
 		Set("size = EXCLUDED.size + added_namespace.size").
 		Set("pfb_count = EXCLUDED.pfb_count + added_namespace.pfb_count").
+		Set("last_height = EXCLUDED.last_height").
+		Set("last_message_time = EXCLUDED.last_message_time").
 		Returning("xmax, id").
 		Exec(ctx)
 	if err != nil {
@@ -314,4 +316,14 @@ func (tx Transaction) LastAddressAction(ctx context.Context, address []byte) (ui
 		}).
 		Scan(ctx, &height)
 	return height, err
+}
+
+func (tx Transaction) LastNamespaceMessage(ctx context.Context, nsId uint64) (msg models.NamespaceMessage, err error) {
+	err = tx.Tx().NewSelect().
+		Model(&msg).
+		Where("namespace_id = ?", nsId).
+		Order("msg_id desc").
+		Limit(1).
+		Scan(ctx)
+	return
 }

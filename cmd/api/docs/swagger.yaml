@@ -23,43 +23,6 @@ definitions:
       message:
         type: string
     type: object
-  responses.ActiveNamespace:
-    properties:
-      hash:
-        example: U3dhZ2dlciByb2Nrcw==
-        format: base64
-        type: string
-      height:
-        example: 100
-        format: int64
-        type: integer
-      id:
-        example: 321
-        format: integer
-        type: integer
-      namespace_id:
-        example: 4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02
-        format: binary
-        type: string
-      pfb_count:
-        example: 12
-        format: integer
-        type: integer
-      reserved:
-        example: true
-        type: boolean
-      size:
-        example: 12345
-        format: integer
-        type: integer
-      time:
-        example: "2023-07-04T03:10:57+00:00"
-        format: date-time
-        type: string
-      version:
-        format: byte
-        type: integer
-    type: object
   responses.Address:
     description: Celestia address information
     properties:
@@ -348,6 +311,14 @@ definitions:
         example: 321
         format: integer
         type: integer
+      last_height:
+        example: 100
+        format: int64
+        type: integer
+      last_message_time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
       namespace_id:
         example: 4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02
         format: binary
@@ -1758,6 +1729,15 @@ paths:
     get:
       description: Get last used namespace
       operationId: get-namespace-active
+      parameters:
+      - description: Sort field
+        enum:
+        - time
+        - pfb_count
+        - size
+        in: query
+        name: sort
+        type: string
       produces:
       - application/json
       responses:
@@ -1765,7 +1745,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/responses.ActiveNamespace'
+              $ref: '#/definitions/responses.Namespace'
             type: array
         "500":
           description: Internal Server Error

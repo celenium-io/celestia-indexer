@@ -308,25 +308,35 @@ func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+type getActiveRequest struct {
+	Sort string `query:"sort" validate:"omitempty,oneof=time pfb_count size"`
+}
+
 // GetActive godoc
 //
 //	@Summary		Get last used namespace
 //	@Description	Get last used namespace
 //	@Tags			namespace
 //	@ID				get-namespace-active
+//	@Param			sort	query	string	false	"Sort field"	Enums(time,pfb_count,size)
 //	@Produce		json
-//	@Success		200	{array}		responses.ActiveNamespace
+//	@Success		200	{array}		responses.Namespace
 //	@Failure		500	{object}	Error
 //	@Router			/v1/namespace/active [get]
 func (handler *NamespaceHandler) GetActive(c echo.Context) error {
-	active, err := handler.namespace.Active(c.Request().Context(), 5)
+	req, err := bindAndValidate[getActiveRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	active, err := handler.namespace.Active(c.Request().Context(), req.Sort, 5)
 	if err != nil {
 		return handleError(c, err, handler.namespace)
 	}
 
-	response := make([]responses.ActiveNamespace, len(active))
+	response := make([]responses.Namespace, len(active))
 	for i := range response {
-		response[i] = responses.NewActiveNamespace(active[i])
+		response[i] = responses.NewNamespace(active[i])
 	}
 	return returnArray(c, response)
 }

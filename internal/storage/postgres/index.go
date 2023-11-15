@@ -149,6 +149,30 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Namespace)(nil)).
+			Index("namespace_last_action_idx").
+			Column("last_message_time").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Namespace)(nil)).
+			Index("namespace_pfb_count_idx").
+			Column("pfb_count").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Namespace)(nil)).
+			Index("namespace_size_idx").
+			Column("size").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		return nil
 	})

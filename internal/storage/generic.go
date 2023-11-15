@@ -80,6 +80,7 @@ type Transaction interface {
 	RollbackMessageAddresses(ctx context.Context, msgIds []uint64) (err error)
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	LastAddressAction(ctx context.Context, address []byte) (uint64, error)
+	LastNamespaceMessage(ctx context.Context, nsId uint64) (msg NamespaceMessage, err error)
 }
 
 const (

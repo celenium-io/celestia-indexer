@@ -4,6 +4,8 @@
 package handle
 
 import (
+	"time"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -13,7 +15,7 @@ import (
 )
 
 // MsgPayForBlobs pays for the inclusion of a blob in the block.
-func MsgPayForBlobs(level types.Level, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []storage.AddressWithType, []storage.Namespace, int64, error) {
+func MsgPayForBlobs(level types.Level, blockTime time.Time, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []storage.AddressWithType, []storage.Namespace, int64, error) {
 	var blobsSize int64
 	uniqueNs := make(map[string]*storage.Namespace)
 
@@ -27,12 +29,14 @@ func MsgPayForBlobs(level types.Level, m *appBlobTypes.MsgPayForBlobs) (storageT
 		size := int64(m.BlobSizes[nsI])
 		blobsSize += size
 		namespace := storage.Namespace{
-			FirstHeight: level,
-			Version:     appNS.Version,
-			NamespaceID: appNS.ID,
-			Size:        size,
-			PfbCount:    1,
-			Reserved:    appNS.IsReserved(),
+			FirstHeight:     level,
+			Version:         appNS.Version,
+			NamespaceID:     appNS.ID,
+			Size:            size,
+			PfbCount:        1,
+			Reserved:        appNS.IsReserved(),
+			LastHeight:      level,
+			LastMessageTime: blockTime,
 		}
 		if n, ok := uniqueNs[namespace.String()]; ok {
 			n.Size += size

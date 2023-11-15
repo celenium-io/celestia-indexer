@@ -695,6 +695,45 @@ func (c *TransactionLastBlockCall) DoAndReturn(f func(context.Context) (storage.
 	return c
 }
 
+// LastNamespaceMessage mocks base method.
+func (m *MockTransaction) LastNamespaceMessage(ctx context.Context, nsId uint64) (storage.NamespaceMessage, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LastNamespaceMessage", ctx, nsId)
+	ret0, _ := ret[0].(storage.NamespaceMessage)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LastNamespaceMessage indicates an expected call of LastNamespaceMessage.
+func (mr *MockTransactionMockRecorder) LastNamespaceMessage(ctx, nsId any) *TransactionLastNamespaceMessageCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastNamespaceMessage", reflect.TypeOf((*MockTransaction)(nil).LastNamespaceMessage), ctx, nsId)
+	return &TransactionLastNamespaceMessageCall{Call: call}
+}
+
+// TransactionLastNamespaceMessageCall wrap *gomock.Call
+type TransactionLastNamespaceMessageCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionLastNamespaceMessageCall) Return(msg storage.NamespaceMessage, err error) *TransactionLastNamespaceMessageCall {
+	c.Call = c.Call.Return(msg, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionLastNamespaceMessageCall) Do(f func(context.Context, uint64) (storage.NamespaceMessage, error)) *TransactionLastNamespaceMessageCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionLastNamespaceMessageCall) DoAndReturn(f func(context.Context, uint64) (storage.NamespaceMessage, error)) *TransactionLastNamespaceMessageCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Namespace mocks base method.
 func (m *MockTransaction) Namespace(ctx context.Context, id uint64) (storage.Namespace, error) {
 	m.ctrl.T.Helper()

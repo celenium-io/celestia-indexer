@@ -87,24 +87,31 @@ func (s *StorageTestSuite) TestSaveNamespaces() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
+	testTime := time.Now().UTC()
 	existedNamespace := testsuite.MustHexDecode("62491A45621ABEA79EBA193FD2944B5B9EBD")
 	namespaceId := []byte{0x5F, 0x7A, 0x8D, 0xDF, 0xE6, 0x13, 0x6F, 0xE7, 0x6B, 0x65, 0xB9, 0x06, 0x6D, 0x4F, 0x81, 0x6D, 0x70, 0x7F}
 	namespaces := []*storage.Namespace{
 		{
-			Version:     0,
-			NamespaceID: namespaceId,
-			PfbCount:    2,
-			Size:        100,
+			Version:         0,
+			NamespaceID:     namespaceId,
+			PfbCount:        2,
+			Size:            100,
+			LastHeight:      1001,
+			LastMessageTime: testTime,
 		}, {
-			Version:     2,
-			NamespaceID: namespaceId,
-			PfbCount:    1,
-			Size:        11,
+			Version:         2,
+			NamespaceID:     namespaceId,
+			PfbCount:        1,
+			Size:            11,
+			LastHeight:      1001,
+			LastMessageTime: testTime,
 		}, {
-			Version:     0,
-			NamespaceID: existedNamespace,
-			PfbCount:    1,
-			Size:        12,
+			Version:         0,
+			NamespaceID:     existedNamespace,
+			PfbCount:        1,
+			Size:            12,
+			LastHeight:      1001,
+			LastMessageTime: testTime,
 		},
 	}
 
@@ -126,6 +133,8 @@ func (s *StorageTestSuite) TestSaveNamespaces() {
 	s.Require().EqualValues(0, ns1.Version)
 	s.Require().EqualValues(5, ns1.PfbCount)
 	s.Require().EqualValues(1334, ns1.Size)
+	s.Require().EqualValues(1001, ns1.LastHeight)
+	s.Require().Equal(testTime.Unix(), ns1.LastMessageTime.Unix())
 	s.Require().Equal(namespaceId, ns1.NamespaceID)
 
 	ns2, err := s.storage.Namespace.ByNamespaceIdAndVersion(ctx, namespaceId, 2)
@@ -135,6 +144,8 @@ func (s *StorageTestSuite) TestSaveNamespaces() {
 	s.Require().EqualValues(2, ns2.Version)
 	s.Require().EqualValues(1, ns2.PfbCount)
 	s.Require().EqualValues(11, ns2.Size)
+	s.Require().EqualValues(1001, ns2.LastHeight)
+	s.Require().Equal(testTime.Unix(), ns2.LastMessageTime.Unix())
 	s.Require().Equal(namespaceId, ns2.NamespaceID)
 
 	ns3, err := s.storage.Namespace.ByNamespaceIdAndVersion(ctx, existedNamespace, 0)
@@ -144,6 +155,8 @@ func (s *StorageTestSuite) TestSaveNamespaces() {
 	s.Require().EqualValues(0, ns3.Version)
 	s.Require().EqualValues(2, ns3.PfbCount)
 	s.Require().EqualValues(24, ns3.Size)
+	s.Require().EqualValues(1001, ns3.LastHeight)
+	s.Require().Equal(testTime.Unix(), ns3.LastMessageTime.Unix())
 	s.Require().Equal(existedNamespace, ns3.NamespaceID)
 }
 
