@@ -25,4 +25,5 @@ type ApiConfig struct {
 	RequestTimeout int     `validate:"omitempty,min=1"        yaml:"request_timeout"`
 	BlobReceiver   string  `validate:"required"               yaml:"blob_receiver"`
 	SentryDsn      string  `validate:"omitempty"              yaml:"sentry_dsn"`
+	Websocket      bool    `validate:"omitempty"              yaml:"websocket"`
 }
