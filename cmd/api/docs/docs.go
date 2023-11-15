@@ -991,6 +991,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/gas/estimate_for_pfb": {
+            "get": {
+                "description": "Get estimated gas for pay for blob message with certain values of blob sizes",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gas"
+                ],
+                "summary": "Get estimated gas for pay for blob",
+                "operationId": "gas-estimate-for-pfb",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Comma-separated array on blob sizes",
+                        "name": "sizes",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/head": {
             "get": {
                 "description": "Get current indexer head",

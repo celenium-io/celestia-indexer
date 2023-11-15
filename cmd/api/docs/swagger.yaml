@@ -1543,6 +1543,31 @@ paths:
       summary: Get network constants
       tags:
       - general
+  /v1/gas/estimate_for_pfb:
+    get:
+      description: Get estimated gas for pay for blob message with certain values
+        of blob sizes
+      operationId: gas-estimate-for-pfb
+      parameters:
+      - description: Comma-separated array on blob sizes
+        in: query
+        name: sizes
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get estimated gas for pay for blob
+      tags:
+      - gas
   /v1/head:
     get:
       description: Get current indexer head
