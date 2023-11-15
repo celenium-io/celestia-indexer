@@ -106,7 +106,17 @@ func gzipSkipper(c echo.Context) bool {
 	if strings.Contains(c.Request().URL.Path, "metrics") {
 		return true
 	}
-	if strings.Contains(c.Request().URL.Path, "ws") {
+	return websocketSkipper(c)
+}
+
+func cacheSkipper(c echo.Context) bool {
+	if c.Request().Method != http.MethodGet {
+		return true
+	}
+	if websocketSkipper(c) {
+		return true
+	}
+	if strings.Contains(c.Request().URL.Path, "metrics") {
 		return true
 	}
 	return false
@@ -173,7 +183,7 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 		endpointCache = cache.NewCache(cache.Config{
 			MaxEntitiesCount: 1000,
 		})
-		e.Use(cache.Middleware(endpointCache))
+		e.Use(cache.Middleware(endpointCache, cacheSkipper))
 	}
 
 	timeout := 30 * time.Second
