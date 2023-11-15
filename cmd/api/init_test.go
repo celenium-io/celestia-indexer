@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	_ "github.com/celenium-io/celestia-indexer/cmd/api/docs"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 )
