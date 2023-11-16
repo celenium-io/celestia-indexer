@@ -1005,7 +1005,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Comma-separated array on blob sizes",
+                        "description": "Comma-separated array of blob sizes",
                         "name": "sizes",
                         "in": "query",
                         "required": true
@@ -2398,6 +2398,11 @@ const docTemplate = `{
                     "type": "string",
                     "format": "base64",
                     "example": "vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg="
+                },
+                "content_type": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "image/png"
                 },
                 "data": {
                     "type": "string",
