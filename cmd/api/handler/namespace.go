@@ -249,7 +249,12 @@ func (handler *NamespaceHandler) GetBlob(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	return c.JSON(http.StatusOK, blob)
+	response, err := responses.NewBlob(blob)
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 type getNamespaceMessages struct {
