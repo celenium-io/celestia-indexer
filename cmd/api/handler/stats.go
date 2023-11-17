@@ -9,16 +9,21 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
 )
 
 type StatsHandler struct {
-	repo storage.IStats
+	repo   storage.IStats
+	nsRepo storage.INamespace
+	state  storage.IState
 }
 
-func NewStatsHandler(repo storage.IStats) StatsHandler {
+func NewStatsHandler(repo storage.IStats, nsRepo storage.INamespace, state storage.IState) StatsHandler {
 	return StatsHandler{
-		repo: repo,
+		repo:   repo,
+		nsRepo: nsRepo,
+		state:  state,
 	}
 }
 
@@ -206,5 +211,44 @@ func (sh StatsHandler) GasPriceHourly(c echo.Context) error {
 	for i := range histogram {
 		response[i] = responses.NewGasPriceCandle(histogram[i])
 	}
+	return returnArray(c, response)
+}
+
+// NamespaceUsage godoc
+//
+//	@Summary				Get namespaces with sorting by size.
+//	@Description        	Get namespaces with sorting by size. Returns top 100 namespaces. Namespaces which is not included to top 100 grouped into 'others' item
+//	@Tags					stats
+//	@ID						stats-namespace-usage
+//	@Produce				json
+//	@Success				200	{array}     responses.NamespaceUsage
+//	@Failure				500	{object}	Error
+//	@Router					/v1/stats/namespace/usage [get]
+func (sh StatsHandler) NamespaceUsage(c echo.Context) error {
+	namespaces, err := sh.nsRepo.Active(c.Request().Context(), "size", 100)
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	var top100Size int64
+	response := make([]responses.NamespaceUsage, len(namespaces))
+	for i := range namespaces {
+		response[i] = responses.NewNamespaceUsage(namespaces[i])
+		top100Size += response[i].Size
+	}
+
+	state, err := sh.state.List(c.Request().Context(), 1, 0, sdk.SortOrderAsc)
+	if err != nil {
+		return internalServerError(c, err)
+	}
+	if len(state) == 0 {
+		return returnArray(c, response)
+	}
+
+	response = append(response, responses.NamespaceUsage{
+		Name: "others",
+		Size: state[0].TotalBlobsSize - top100Size,
+	})
+
 	return returnArray(c, response)
 }

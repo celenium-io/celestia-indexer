@@ -14,6 +14,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -23,6 +24,8 @@ import (
 type StatsTestSuite struct {
 	suite.Suite
 	stats   *mock.MockIStats
+	ns      *mock.MockINamespace
+	state   *mock.MockIState
 	echo    *echo.Echo
 	handler StatsHandler
 	ctrl    *gomock.Controller
@@ -34,7 +37,9 @@ func (s *StatsTestSuite) SetupSuite() {
 	s.echo.Validator = NewCelestiaApiValidator()
 	s.ctrl = gomock.NewController(s.T())
 	s.stats = mock.NewMockIStats(s.ctrl)
-	s.handler = NewStatsHandler(s.stats)
+	s.ns = mock.NewMockINamespace(s.ctrl)
+	s.state = mock.NewMockIState(s.ctrl)
+	s.handler = NewStatsHandler(s.stats, s.ns, s.state)
 }
 
 // TearDownSuite -
@@ -295,4 +300,39 @@ func (s *StatsTestSuite) TestGasPriceHourly() {
 	s.Require().EqualValues("10.270267423014587", item.AvgGasPrice)
 	s.Require().EqualValues("0.11151539708265802", item.GasEfficiency)
 	s.Require().True(testTime.Equal(item.Time))
+}
+
+func (s *StatsTestSuite) TestNamespaceUsage() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/namespace/usage")
+
+	s.ns.EXPECT().
+		Active(gomock.Any(), "size", 100).
+		Return([]storage.Namespace{
+			testNamespace,
+		}, nil)
+
+	s.state.EXPECT().
+		List(gomock.Any(), uint64(1), uint64(0), sdk.SortOrderAsc).
+		Return([]*storage.State{
+			&testState,
+		}, nil)
+
+	s.Require().NoError(s.handler.NamespaceUsage(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response []responses.NamespaceUsage
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 2)
+
+	item0 := response[0]
+	s.Require().Equal(testNamespace.String(), item0.Name)
+	s.Require().Equal(testNamespace.Size, item0.Size)
+
+	item1 := response[1]
+	s.Require().Equal("others", item1.Name)
+	s.Require().EqualValues(900, item1.Size)
 }
