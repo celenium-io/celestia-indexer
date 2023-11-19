@@ -64,3 +64,15 @@ func NewGasPriceCandle(item storage.GasCandle) GasPriceCandle {
 func formatFoat64(value float64) string {
 	return strconv.FormatFloat(value, 'f', -1, 64)
 }
+
+type NamespaceUsage struct {
+	Name string `example:"00112233" format:"string"  json:"name" swaggertype:"string"`
+	Size int64  `example:"1283518"  format:"integer" json:"size" swaggertype:"number"`
+}
+
+func NewNamespaceUsage(ns storage.Namespace) NamespaceUsage {
+	return NamespaceUsage{
+		Name: ns.String(),
+		Size: ns.Size,
+	}
+}

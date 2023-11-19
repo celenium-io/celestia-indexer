@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/cache"
-	_ "github.com/celenium-io/celestia-indexer/cmd/api/docs"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
@@ -302,7 +301,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		namespaceByHash.GET("/:hash/:height/:commitment", namespaceHandlers.GetBlob)
 	}
 
-	statsHandler := handler.NewStatsHandler(db.Stats)
+	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.State)
 	stats := v1.Group("/stats")
 	{
 		stats.GET("/summary/:table/:function", statsHandler.Summary)
@@ -313,6 +312,10 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		gasPrice := stats.Group("/gas_price")
 		{
 			gasPrice.GET("/hourly", statsHandler.GasPriceHourly)
+		}
+		namespace := stats.Group("/namespace")
+		{
+			namespace.GET("/usage", statsHandler.NamespaceUsage)
 		}
 	}
 
