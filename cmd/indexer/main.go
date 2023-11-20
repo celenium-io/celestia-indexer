@@ -19,7 +19,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "indexer",
-	Short: "DipDup Verticals | Celestia Indexer",
+	Short: "DipDup Verticals | Celenium Indexer",
 }
 
 func main() {

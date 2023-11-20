@@ -12,17 +12,19 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
+	_ "github.com/celenium-io/celestia-indexer/cmd/api/docs"
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "api",
-	Short: "DipDup Verticals | Celestia API",
+	Short: "DipDup Verticals | Celenium API",
 }
 
-// @title						Swagger Celestia Indexer API
+// @title						Swagger Celenium API
 // @version					    1.0
-// @description				    This is docs of Celestia indexer API.
-// @host						api.celestia.dipdup.net
+// @description				    This is docs of Celenium API.
+// @host						api.celenium.io
 //
 // @query.collection.format	multi
 func main() {

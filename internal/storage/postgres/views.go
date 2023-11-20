@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"bytes"
 	"context"
 	"os"
 	"path/filepath"
@@ -26,9 +27,21 @@ func (s Storage) createViews(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
-		if _, err := s.Connection().DB().NewRaw(string(raw)).Exec(ctx); err != nil {
-			return errors.Wrapf(err, "creating view '%s'", files[i].Name())
+		queries := bytes.Split(raw, []byte{';'})
+		if len(queries) == 0 {
+			continue
 		}
+
+		for _, query := range queries {
+			query = bytes.TrimLeft(query, "\n ")
+			if len(query) == 0 {
+				continue
+			}
+			if _, err := s.Connection().DB().NewRaw(string(query)).Exec(ctx); err != nil {
+				return errors.Wrapf(err, "creating view '%s'", files[i].Name())
+			}
+		}
+
 	}
 
 	return nil

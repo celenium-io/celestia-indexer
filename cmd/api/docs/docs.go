@@ -1553,36 +1553,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/stats/gas_price/hourly": {
-            "get": {
-                "description": "Get candles for gas price with volume, average gas efficiency and fee for an hour",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "stats"
-                ],
-                "summary": "Get candles for gas price",
-                "operationId": "stats-gas-price-hourly",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/responses.GasPriceCandle"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/stats/histogram/{table}/{function}/{timeframe}": {
             "get": {
                 "description": "Returns histogram by table, function and timeframe\n\n### Parameters\n\n` + "`" + `table` + "`" + `, ` + "`" + `function` + "`" + ` and ` + "`" + `column` + "`" + ` parameters are the same as summary endpoint.\n\n\n### Timeframe\n\n* ` + "`" + `hour` + "`" + `\n* ` + "`" + `day` + "`" + `\n* ` + "`" + `week` + "`" + `\n* ` + "`" + `month` + "`" + `\n* ` + "`" + `year` + "`" + `",
@@ -1663,6 +1633,121 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/responses.HistogramItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/stats/namespace/usage": {
+            "get": {
+                "description": "Get namespaces with sorting by size. Returns top 100 namespaces. Namespaces which is not included to top 100 grouped into 'others' item",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get namespaces with sorting by size.",
+                "operationId": "stats-namespace-usage",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.NamespaceUsage"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/stats/series/{name}/{timeframe}": {
+            "get": {
+                "description": "Get histogram with precomputed stats by series name and timeframe",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get histogram with precomputed stats",
+                "operationId": "stats-series",
+                "parameters": [
+                    {
+                        "enum": [
+                            "hour",
+                            "day",
+                            "week",
+                            "month",
+                            "year"
+                        ],
+                        "type": "string",
+                        "description": "Timeframe",
+                        "name": "timeframe",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "blobs_size",
+                            "tps",
+                            "bps",
+                            "fee",
+                            "supply_change",
+                            "block_time",
+                            "tx_count",
+                            "events_count",
+                            "gas_price",
+                            "gas_efficiency",
+                            "gas_used",
+                            "gas_limit"
+                        ],
+                        "type": "string",
+                        "description": "Series name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.SeriesItem"
                             }
                         }
                     },
@@ -2522,6 +2607,14 @@ const docTemplate = `{
                     "type": "string",
                     "example": "28347628346"
                 },
+                "gas_limit": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "gas_used": {
+                    "type": "integer",
+                    "example": 1234
+                },
                 "inflation_rate": {
                     "type": "string",
                     "example": "0.0800000"
@@ -2631,51 +2724,6 @@ const docTemplate = `{
                         }
                     ],
                     "example": "commission"
-                }
-            }
-        },
-        "responses.GasPriceCandle": {
-            "type": "object",
-            "properties": {
-                "avg_gas_efficiency": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "0.45282"
-                },
-                "avg_gas_price": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "0.45282"
-                },
-                "fee": {
-                    "type": "number",
-                    "format": "integer",
-                    "example": 1283518
-                },
-                "high": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "0.17632"
-                },
-                "low": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "0.11882"
-                },
-                "time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "2023-07-04T03:10:57+00:00"
-                },
-                "total_gas_limit": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "1213134"
-                },
-                "total_gas_used": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "0.45282"
                 }
             }
         },
@@ -2842,10 +2890,50 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.NamespaceUsage": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "00112233"
+                },
+                "size": {
+                    "type": "number",
+                    "format": "integer",
+                    "example": 1283518
+                }
+            }
+        },
         "responses.Params": {
             "type": "object",
             "additionalProperties": {
                 "type": "string"
+            }
+        },
+        "responses.SeriesItem": {
+            "type": "object",
+            "properties": {
+                "max": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.17632"
+                },
+                "min": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.17632"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "value": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.17632"
+                }
             }
         },
         "responses.State": {
@@ -3326,11 +3414,11 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "api.celestia.dipdup.net",
+	Host:             "api.celenium.io",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "Swagger Celestia Indexer API",
-	Description:      "This is docs of Celestia indexer API.",
+	Title:            "Swagger Celenium API",
+	Description:      "This is docs of Celenium API.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
