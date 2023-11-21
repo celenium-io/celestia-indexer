@@ -7,7 +7,9 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 )
 
@@ -22,9 +24,19 @@ func MsgCreateValidator(level types.Level, status storageTypes.Status, m *cosmos
 		return msgType, addresses, nil, nil
 	}
 
+	var consAddress string
+	if m.Pubkey != nil {
+		pk, ok := m.Pubkey.GetCachedValue().(cryptotypes.PubKey)
+		if ok {
+			log.Warn().Msg("can't decode consensus address of validator")
+			consAddress = pk.Address().String()
+		}
+	}
+
 	validator := storage.Validator{
 		Delegator:         m.DelegatorAddress,
 		Address:           m.ValidatorAddress,
+		ConsAddress:       consAddress,
 		Moniker:           m.Description.Moniker,
 		Identity:          m.Description.Identity,
 		Website:           m.Description.Website,
