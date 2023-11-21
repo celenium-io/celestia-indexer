@@ -2382,6 +2382,113 @@
                 }
             }
         },
+        "/v1/validators": {
+            "get": {
+                "description": "List validators",
+                "produces": [
+                    "application/json",
+                    "application/json"
+                ],
+                "tags": [
+                    "validator"
+                ],
+                "summary": "List validators",
+                "operationId": "list-validator",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Validator"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/validators/{id}": {
+            "get": {
+                "description": "Get validator info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "validator"
+                ],
+                "summary": "Get validator info",
+                "operationId": "get-validator",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal validator id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Validator"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/ws": {
             "get": {
                 "description": "## Documentation for websocket API\n\n### Subscribe\n\nTo receive updates from websocket API send `subscribe` request to server.\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n        \"filters\": {\n            // pass channel filters\n        }\n    }\n}\n```\n\nNow 2 channels are supported:\n\n* `head` - receive information about new block. Channel does not have any filters. Subscribe message should looks like:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"head\"\n    }\n}\n```\n\nIn that channel messages of `responses.Block` type will be sent.\n\n* `tx` - receive information about new transactions. The channel has filters for target receiving information. Now 2 filters are supported:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"tx\",\n        \"filters\": {\n            \"status\": [  // array of transaction status. Can be emtpy.\n                types.Status\n            ],\n            \"msg_type\": [  // array of containing message types status. Can be emtpy.\n                types.MsgType\n            ]\n        }\n    }\n}\n```\n\nIf all filers are empty subscription to all transaction will be created.\n\nIn that channel messages of `responses.Tx` type will be sent.\n\n\n### Unsubscribe\n\nTo unsubscribe send `unsubscribe` message containing one of channel name describing above.\n\n\n```json\n{\n    \"method\": \"unsubscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n    }\n}\n```\n",
@@ -2557,7 +2664,7 @@
                     "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
                 },
                 "proposer": {
-                    "$ref": "#/definitions/responses.Validator"
+                    "$ref": "#/definitions/responses.ShortValidator"
                 },
                 "stats": {
                     "$ref": "#/definitions/responses.BlockStats"
@@ -2925,6 +3032,23 @@
                     "type": "string",
                     "format": "string",
                     "example": "0.17632"
+                }
+            }
+        },
+        "responses.ShortValidator": {
+            "type": "object",
+            "properties": {
+                "cons_address": {
+                    "type": "string",
+                    "example": "E641C7A2C964833E556AEF934FBF166B712874B6"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 321
+                },
+                "moniker": {
+                    "type": "string",
+                    "example": "Easy 2 Stake"
                 }
             }
         },

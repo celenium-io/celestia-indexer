@@ -117,7 +117,7 @@ definitions:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
       proposer:
-        $ref: '#/definitions/responses.Validator'
+        $ref: '#/definitions/responses.ShortValidator'
       stats:
         $ref: '#/definitions/responses.BlockStats'
       time:
@@ -388,6 +388,18 @@ definitions:
       value:
         example: "0.17632"
         format: string
+        type: string
+    type: object
+  responses.ShortValidator:
+    properties:
+      cons_address:
+        example: E641C7A2C964833E556AEF934FBF166B712874B6
+        type: string
+      id:
+        example: 321
+        type: integer
+      moniker:
+        example: Easy 2 Stake
         type: string
     type: object
   responses.State:
@@ -2686,6 +2698,78 @@ paths:
       summary: List genesis transactions info
       tags:
       - transactions
+  /v1/validators:
+    get:
+      description: List validators
+      operationId: list-validator
+      parameters:
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Sort order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.Validator'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: List validators
+      tags:
+      - validator
+  /v1/validators/{id}:
+    get:
+      description: Get validator info
+      operationId: get-validator
+      parameters:
+      - description: Internal validator id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Validator'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get validator info
+      tags:
+      - validator
   /v1/ws:
     get:
       description: |
