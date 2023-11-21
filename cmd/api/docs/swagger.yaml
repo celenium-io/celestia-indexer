@@ -148,6 +148,12 @@ definitions:
       fee:
         example: "28347628346"
         type: string
+      gas_limit:
+        example: 1234
+        type: integer
+      gas_used:
+        example: 1234
+        type: integer
       inflation_rate:
         example: "0.0800000"
         type: string
@@ -226,41 +232,6 @@ definitions:
         allOf:
         - $ref: '#/definitions/types.EventType'
         example: commission
-    type: object
-  responses.GasPriceCandle:
-    properties:
-      avg_gas_efficiency:
-        example: "0.45282"
-        format: string
-        type: string
-      avg_gas_price:
-        example: "0.45282"
-        format: string
-        type: string
-      fee:
-        example: 1283518
-        format: integer
-        type: number
-      high:
-        example: "0.17632"
-        format: string
-        type: string
-      low:
-        example: "0.11882"
-        format: string
-        type: string
-      time:
-        example: "2023-07-04T03:10:57+00:00"
-        format: date-time
-        type: string
-      total_gas_limit:
-        example: "1213134"
-        format: string
-        type: string
-      total_gas_used:
-        example: "0.45282"
-        format: string
-        type: string
     type: object
   responses.HistogramItem:
     properties:
@@ -386,9 +357,39 @@ definitions:
         format: string
         type: string
     type: object
+  responses.NamespaceUsage:
+    properties:
+      name:
+        example: "00112233"
+        format: string
+        type: string
+      size:
+        example: 1283518
+        format: integer
+        type: number
+    type: object
   responses.Params:
     additionalProperties:
       type: string
+    type: object
+  responses.SeriesItem:
+    properties:
+      max:
+        example: "0.17632"
+        format: string
+        type: string
+      min:
+        example: "0.17632"
+        format: string
+        type: string
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
+      value:
+        example: "0.17632"
+        format: string
+        type: string
     type: object
   responses.State:
     properties:
@@ -807,11 +808,11 @@ definitions:
     - MsgTimeout
     - MsgTimeoutOnClose
     - MsgAcknowledgement
-host: api.celestia.dipdup.net
+host: api.celenium.io
 info:
   contact: {}
-  description: This is docs of Celestia indexer API.
-  title: Swagger Celestia Indexer API
+  description: This is docs of Celenium API.
+  title: Swagger Celenium API
   version: "1.0"
 paths:
   /v1/address:
@@ -1950,27 +1951,6 @@ paths:
       summary: Search by hash
       tags:
       - search
-  /v1/stats/gas_price/hourly:
-    get:
-      description: Get candles for gas price with volume, average gas efficiency and
-        fee for an hour
-      operationId: stats-gas-price-hourly
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/responses.GasPriceCandle'
-            type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handler.Error'
-      summary: Get candles for gas price
-      tags:
-      - stats
   /v1/stats/histogram/{table}/{function}/{timeframe}:
     get:
       description: |-
@@ -2054,6 +2034,89 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get histogram
+      tags:
+      - stats
+  /v1/stats/namespace/usage:
+    get:
+      description: Get namespaces with sorting by size. Returns top 100 namespaces.
+        Namespaces which is not included to top 100 grouped into 'others' item
+      operationId: stats-namespace-usage
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.NamespaceUsage'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get namespaces with sorting by size.
+      tags:
+      - stats
+  /v1/stats/series/{name}/{timeframe}:
+    get:
+      description: Get histogram with precomputed stats by series name and timeframe
+      operationId: stats-series
+      parameters:
+      - description: Timeframe
+        enum:
+        - hour
+        - day
+        - week
+        - month
+        - year
+        in: path
+        name: timeframe
+        required: true
+        type: string
+      - description: Series name
+        enum:
+        - blobs_size
+        - tps
+        - bps
+        - fee
+        - supply_change
+        - block_time
+        - tx_count
+        - events_count
+        - gas_price
+        - gas_efficiency
+        - gas_used
+        - gas_limit
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Time from in unix timestamp
+        in: query
+        name: from
+        type: integer
+      - description: Time to in unix timestamp
+        in: query
+        name: to
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.SeriesItem'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get histogram with precomputed stats
       tags:
       - stats
   /v1/stats/summary/{table}/{function}:

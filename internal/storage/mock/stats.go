@@ -78,45 +78,6 @@ func (c *IStatsCountCall) DoAndReturn(f func(context.Context, storage.CountReque
 	return c
 }
 
-// GasPriceHourly mocks base method.
-func (m *MockIStats) GasPriceHourly(ctx context.Context) ([]storage.GasCandle, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GasPriceHourly", ctx)
-	ret0, _ := ret[0].([]storage.GasCandle)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GasPriceHourly indicates an expected call of GasPriceHourly.
-func (mr *MockIStatsMockRecorder) GasPriceHourly(ctx any) *IStatsGasPriceHourlyCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GasPriceHourly", reflect.TypeOf((*MockIStats)(nil).GasPriceHourly), ctx)
-	return &IStatsGasPriceHourlyCall{Call: call}
-}
-
-// IStatsGasPriceHourlyCall wrap *gomock.Call
-type IStatsGasPriceHourlyCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *IStatsGasPriceHourlyCall) Return(arg0 []storage.GasCandle, arg1 error) *IStatsGasPriceHourlyCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *IStatsGasPriceHourlyCall) Do(f func(context.Context) ([]storage.GasCandle, error)) *IStatsGasPriceHourlyCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsGasPriceHourlyCall) DoAndReturn(f func(context.Context) ([]storage.GasCandle, error)) *IStatsGasPriceHourlyCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // Histogram mocks base method.
 func (m *MockIStats) Histogram(ctx context.Context, req storage.HistogramRequest) ([]storage.HistogramItem, error) {
 	m.ctrl.T.Helper()
@@ -191,6 +152,45 @@ func (c *IStatsHistogramCountCall) Do(f func(context.Context, storage.HistogramC
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *IStatsHistogramCountCall) DoAndReturn(f func(context.Context, storage.HistogramCountRequest) ([]storage.HistogramItem, error)) *IStatsHistogramCountCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Series mocks base method.
+func (m *MockIStats) Series(ctx context.Context, timeframe storage.Timeframe, name string, req storage.SeriesRequest) ([]storage.SeriesItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Series", ctx, timeframe, name, req)
+	ret0, _ := ret[0].([]storage.SeriesItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Series indicates an expected call of Series.
+func (mr *MockIStatsMockRecorder) Series(ctx, timeframe, name, req any) *IStatsSeriesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Series", reflect.TypeOf((*MockIStats)(nil).Series), ctx, timeframe, name, req)
+	return &IStatsSeriesCall{Call: call}
+}
+
+// IStatsSeriesCall wrap *gomock.Call
+type IStatsSeriesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IStatsSeriesCall) Return(arg0 []storage.SeriesItem, arg1 error) *IStatsSeriesCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IStatsSeriesCall) Do(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsSeriesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IStatsSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsSeriesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -309,13 +309,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		stats.GET("/tps", statsHandler.TPS)
 		stats.GET("/tx_count_24h", statsHandler.TxCountHourly24h)
 
-		gasPrice := stats.Group("/gas_price")
-		{
-			gasPrice.GET("/hourly", statsHandler.GasPriceHourly)
-		}
 		namespace := stats.Group("/namespace")
 		{
 			namespace.GET("/usage", statsHandler.NamespaceUsage)
+		}
+		series := stats.Group("/series")
+		{
+			series.GET("/:name/:timeframe", statsHandler.Series)
 		}
 	}
 

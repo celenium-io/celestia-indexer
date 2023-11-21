@@ -7,6 +7,9 @@
   supply_change: 30930476
   inflation_rate: 0.080000000000000000
   block_time: 11000
+  blobs_size: 1234
+  gas_limit: 160820
+  gas_used: 154966
 
 - id: 1
   height: 999
@@ -17,3 +20,6 @@
   supply_change: 20930476
   inflation_rate: 0.080000000000000000
   block_time: 11423
+  blobs_size: 2412
+  gas_limit: 80410
+  gas_used: 77483

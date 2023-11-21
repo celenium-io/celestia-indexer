@@ -264,44 +264,6 @@ func (s *StatsTestSuite) TestTxCount24h() {
 	s.Require().True(testTime.Equal(item.Time))
 }
 
-func (s *StatsTestSuite) TestGasPriceHourly() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	c := s.echo.NewContext(req, rec)
-	c.SetPath("/v1/stats/gas_price/hourly")
-
-	s.stats.EXPECT().
-		GasPriceHourly(gomock.Any()).
-		Return([]storage.GasCandle{
-			{
-				Time:    testTime,
-				High:    1,
-				Low:     .0001,
-				Volume:  123400,
-				GasUsed: 13761,
-				Fee:     1267351,
-			},
-		}, nil)
-
-	s.Require().NoError(s.handler.GasPriceHourly(c))
-	s.Require().Equal(http.StatusOK, rec.Code)
-
-	var response []responses.GasPriceCandle
-	err := json.NewDecoder(rec.Body).Decode(&response)
-	s.Require().NoError(err)
-	s.Require().Len(response, 1)
-
-	item := response[0]
-	s.Require().EqualValues("1", item.High)
-	s.Require().EqualValues("0.0001", item.Low)
-	s.Require().EqualValues("123400", item.TotalGasLimit)
-	s.Require().EqualValues("13761", item.TotalGasUsed)
-	s.Require().EqualValues(1267351, item.Fee)
-	s.Require().EqualValues("10.270267423014587", item.AvgGasPrice)
-	s.Require().EqualValues("0.11151539708265802", item.GasEfficiency)
-	s.Require().True(testTime.Equal(item.Time))
-}
-
 func (s *StatsTestSuite) TestNamespaceUsage() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
@@ -335,4 +297,61 @@ func (s *StatsTestSuite) TestNamespaceUsage() {
 	item1 := response[1]
 	s.Require().Equal("others", item1.Name)
 	s.Require().EqualValues(900, item1.Size)
+}
+
+func (s *StatsTestSuite) TestBlockStatsHistogram() {
+	for _, name := range []string{
+		storage.SeriesBPS,
+		storage.SeriesBlobsSize,
+		storage.SeriesBlockTime,
+		storage.SeriesEventsCount,
+		storage.SeriesFee,
+		storage.SeriesSupplyChange,
+		storage.SeriesTPS,
+		storage.SeriesTxCount,
+		storage.SeriesGasEfficiency,
+		storage.SeriesGasLimit,
+		storage.SeriesGasPrice,
+		storage.SeriesGasUsed,
+	} {
+
+		for _, tf := range []storage.Timeframe{
+			storage.TimeframeHour,
+			storage.TimeframeDay,
+			storage.TimeframeWeek,
+			storage.TimeframeMonth,
+			storage.TimeframeYear,
+		} {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/v1/stats/series/:name/:timeframe")
+			c.SetParamNames("name", "timeframe")
+			c.SetParamValues(name, string(tf))
+
+			s.stats.EXPECT().
+				Series(gomock.Any(), tf, name, gomock.Any()).
+				Return([]storage.SeriesItem{
+					{
+						Time:  testTime,
+						Value: "11234",
+						Max:   "782634",
+						Min:   "69.6665479793",
+					},
+				}, nil)
+
+			s.Require().NoError(s.handler.Series(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
+
+			var response []responses.SeriesItem
+			err := json.NewDecoder(rec.Body).Decode(&response)
+			s.Require().NoError(err)
+			s.Require().Len(response, 1)
+
+			item := response[0]
+			s.Require().Equal("11234", item.Value)
+			s.Require().Equal("782634", item.Max)
+			s.Require().Equal("69.6665479793", item.Min)
+		}
+	}
 }
