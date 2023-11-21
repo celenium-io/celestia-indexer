@@ -16,6 +16,7 @@ import (
 const (
 	AddressPrefixCelestia = "celestia"
 	AddressPrefixValoper  = "celestiavaloper"
+	AddressPrefixValCons  = "celestiavalcons"
 )
 
 type Address string

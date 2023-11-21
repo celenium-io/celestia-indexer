@@ -46,6 +46,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		messages   = make([]*storage.Message, 0)
 		events     = make([]any, len(data.block.Events))
 		namespaces = make(map[string]*storage.Namespace, 0)
+		validators = make([]*storage.Validator, 0)
 	)
 
 	for i := range data.block.Events {
@@ -63,6 +64,10 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 					data.block.Txs[i].Messages[j].Namespace[k].PfbCount = 1
 					namespaces[key] = &data.block.Txs[i].Messages[j].Namespace[k]
 				}
+			}
+
+			if data.block.Txs[i].Messages[j].Validator != nil {
+				validators = append(validators, data.block.Txs[i].Messages[j].Validator)
 			}
 		}
 
@@ -116,6 +121,10 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 	}
 
 	if err := tx.SaveMessages(ctx, messages...); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
+	if err := tx.SaveValidators(ctx, validators...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
