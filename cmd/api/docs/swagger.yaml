@@ -116,9 +116,8 @@ definitions:
       parent_hash:
         example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
         type: string
-      proposer_address:
-        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
-        type: string
+      proposer:
+        $ref: '#/definitions/responses.Validator'
       stats:
         $ref: '#/definitions/responses.BlockStats'
       time:
@@ -545,6 +544,48 @@ definitions:
         example: 0.13521
         format: float
         type: number
+    type: object
+  responses.Validator:
+    properties:
+      address:
+        example: celestiavaloper1un77nfm6axkhkupe8fk4xl6fd4adz3y59fucpu
+        type: string
+      cons_address:
+        example: E641C7A2C964833E556AEF934FBF166B712874B6
+        type: string
+      contacts:
+        example: security@0xfury.com
+        type: string
+      delegator:
+        example: celestia1un77nfm6axkhkupe8fk4xl6fd4adz3y5qk7ph6
+        type: string
+      details:
+        example: Some long text about validator
+        type: string
+      id:
+        example: 321
+        type: integer
+      identity:
+        example: 2C877AC873132C91
+        type: string
+      max_change_rate:
+        example: "0.01"
+        type: string
+      max_rate:
+        example: "0.1"
+        type: string
+      min_self_delegation:
+        example: "1"
+        type: string
+      moniker:
+        example: Easy 2 Stake
+        type: string
+      rate:
+        example: "0.03"
+        type: string
+      website:
+        example: https://www.easy2stake.com/
+        type: string
     type: object
   types.EventType:
     enum:

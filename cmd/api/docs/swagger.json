@@ -2556,9 +2556,8 @@
                     "type": "string",
                     "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
                 },
-                "proposer_address": {
-                    "type": "string",
-                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                "proposer": {
+                    "$ref": "#/definitions/responses.Validator"
                 },
                 "stats": {
                     "$ref": "#/definitions/responses.BlockStats"
@@ -3130,6 +3129,63 @@
                     "type": "number",
                     "format": "float",
                     "example": 0.13521
+                }
+            }
+        },
+        "responses.Validator": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "celestiavaloper1un77nfm6axkhkupe8fk4xl6fd4adz3y59fucpu"
+                },
+                "cons_address": {
+                    "type": "string",
+                    "example": "E641C7A2C964833E556AEF934FBF166B712874B6"
+                },
+                "contacts": {
+                    "type": "string",
+                    "example": "security@0xfury.com"
+                },
+                "delegator": {
+                    "type": "string",
+                    "example": "celestia1un77nfm6axkhkupe8fk4xl6fd4adz3y5qk7ph6"
+                },
+                "details": {
+                    "type": "string",
+                    "example": "Some long text about validator"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 321
+                },
+                "identity": {
+                    "type": "string",
+                    "example": "2C877AC873132C91"
+                },
+                "max_change_rate": {
+                    "type": "string",
+                    "example": "0.01"
+                },
+                "max_rate": {
+                    "type": "string",
+                    "example": "0.1"
+                },
+                "min_self_delegation": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "moniker": {
+                    "type": "string",
+                    "example": "Easy 2 Stake"
+                },
+                "rate": {
+                    "type": "string",
+                    "example": "0.03"
+                },
+                "website": {
+                    "type": "string",
+                    "example": "https://www.easy2stake.com/"
                 }
             }
         },

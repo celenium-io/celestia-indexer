@@ -43,7 +43,7 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 		AppHash:            b.Block.AppHash,
 		LastResultsHash:    b.Block.LastResultsHash,
 		EvidenceHash:       b.Block.EvidenceHash,
-		ProposerAddress:    b.Block.ProposerAddress,
+		ProposerAddress:    b.Block.ProposerAddress.String(),
 
 		ChainId: b.Block.ChainID,
 

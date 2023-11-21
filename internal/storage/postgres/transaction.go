@@ -344,3 +344,14 @@ func (tx Transaction) LastNamespaceMessage(ctx context.Context, nsId uint64) (ms
 		Scan(ctx)
 	return
 }
+
+func (tx Transaction) GetProposerId(ctx context.Context, address string) (id uint64, err error) {
+	err = tx.Tx().NewSelect().
+		Model((*models.Validator)(nil)).
+		Column("id").
+		Where("cons_address = ?", address).
+		Order("msg_id desc").
+		Limit(1).
+		Scan(ctx, &id)
+	return
+}

@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -30,6 +31,9 @@ func NewBlocks(db *database.Bun) *Blocks {
 func (b *Blocks) ByHeight(ctx context.Context, height types.Level) (block storage.Block, err error) {
 	err = b.DB().NewSelect().Model(&block).
 		Where("block.height = ?", height).
+		Relation("Proposer", func(sq *bun.SelectQuery) *bun.SelectQuery {
+			return sq.Column("id", "cons_address", "moniker")
+		}).
 		Limit(1).
 		Scan(ctx)
 	return
@@ -46,6 +50,9 @@ func (b *Blocks) ByHeightWithStats(ctx context.Context, height types.Level) (blo
 	err = b.DB().NewSelect().Model(&block).
 		Where("block.height = ?", height).
 		Relation("Stats").
+		Relation("Proposer", func(sq *bun.SelectQuery) *bun.SelectQuery {
+			return sq.Column("id", "cons_address", "moniker")
+		}).
 		Limit(1).
 		Scan(ctx)
 
@@ -78,6 +85,9 @@ func (b *Blocks) ByIdWithRelations(ctx context.Context, id uint64) (block storag
 	err = b.DB().NewSelect().Model(&block).
 		Where("block.id = ?", id).
 		Relation("Stats").
+		Relation("Proposer", func(sq *bun.SelectQuery) *bun.SelectQuery {
+			return sq.Column("id", "cons_address", "moniker")
+		}).
 		Limit(1).
 		Scan(ctx)
 
@@ -106,7 +116,13 @@ func (b *Blocks) ByIdWithRelations(ctx context.Context, id uint64) (block storag
 
 // Last -
 func (b *Blocks) Last(ctx context.Context) (block storage.Block, err error) {
-	err = b.DB().NewSelect().Model(&block).Order("id desc").Limit(1).Scan(ctx)
+	err = b.DB().NewSelect().Model(&block).
+		Relation("Proposer", func(sq *bun.SelectQuery) *bun.SelectQuery {
+			return sq.Column("id", "cons_address", "moniker")
+		}).
+		Order("id desc").
+		Limit(1).
+		Scan(ctx)
 	return
 }
 
@@ -116,6 +132,9 @@ func (b *Blocks) ByHash(ctx context.Context, hash []byte) (block storage.Block, 
 		Model(&block).
 		Where("hash = ?", hash).
 		Relation("Stats").
+		Relation("Proposer", func(sq *bun.SelectQuery) *bun.SelectQuery {
+			return sq.Column("id", "cons_address", "moniker")
+		}).
 		Limit(1).
 		Scan(ctx)
 	return
@@ -134,10 +153,11 @@ func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order 
 
 	query := b.DB().NewSelect().
 		ColumnExpr("block.*").
+		ColumnExpr("v.id AS proposer__id, v.cons_address as proposer__cons_address, v.moniker as proposer__moniker").
 		ColumnExpr("stats.id AS stats__id, stats.height AS stats__height, stats.time AS stats__time, stats.tx_count AS stats__tx_count, stats.events_count AS stats__events_count, stats.blobs_size AS stats__blobs_size, stats.block_time AS stats__block_time, stats.supply_change AS stats__supply_change, stats.inflation_rate AS stats__inflation_rate, stats.fee AS stats__fee").
 		TableExpr("(?) as block", subQuery).
-		Join("LEFT JOIN block_stats as stats").
-		JoinOn("stats.height = block.height")
+		Join("LEFT JOIN block_stats as stats ON stats.height = block.height").
+		Join("LEFT JOIN validator as v ON v.id = block.proposer_id")
 	query = sortScope(query, "block.id", order)
 	err = query.Scan(ctx, &blocks)
 

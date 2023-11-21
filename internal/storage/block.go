@@ -48,14 +48,16 @@ type Block struct {
 	AppHash            pkgTypes.Hex `bun:"app_hash"             comment:"App hash"`
 	LastResultsHash    pkgTypes.Hex `bun:"last_results_hash"    comment:"Last results hash"`
 	EvidenceHash       pkgTypes.Hex `bun:"evidence_hash"        comment:"Evidence hash"`
-	ProposerAddress    pkgTypes.Hex `bun:"proposer_address"     comment:"Proposer address"`
+	ProposerId         uint64       `bun:"proposer_id,nullzero" comment:"Proposer internal id"`
 
-	ChainId   string    `bun:"-"` // internal field for filling state
-	Addresses []Address `bun:"-"` // internal field for balance passing
+	ChainId         string    `bun:"-"` // internal field for filling state
+	ProposerAddress string    `bun:"-"` // internal field for proposer
+	Addresses       []Address `bun:"-"` // internal field for balance passing
 
-	Txs    []Tx       `bun:"rel:has-many"`
-	Events []Event    `bun:"rel:has-many"`
-	Stats  BlockStats `bun:"rel:has-one,join:height=height"`
+	Txs      []Tx       `bun:"rel:has-many"`
+	Events   []Event    `bun:"rel:has-many"`
+	Stats    BlockStats `bun:"rel:has-one,join:height=height"`
+	Proposer Validator  `bun:"rel:belongs-to"`
 }
 
 // TableName -

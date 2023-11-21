@@ -81,6 +81,7 @@ type Transaction interface {
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	LastAddressAction(ctx context.Context, address []byte) (uint64, error)
 	LastNamespaceMessage(ctx context.Context, nsId uint64) (msg NamespaceMessage, err error)
+	GetProposerId(ctx context.Context, address string) (uint64, error)
 }
 
 const (

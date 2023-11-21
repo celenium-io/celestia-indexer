@@ -579,6 +579,45 @@ func (c *TransactionFlushCall) DoAndReturn(f func(context.Context) error) *Trans
 	return c
 }
 
+// GetProposerId mocks base method.
+func (m *MockTransaction) GetProposerId(ctx context.Context, address string) (uint64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProposerId", ctx, address)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProposerId indicates an expected call of GetProposerId.
+func (mr *MockTransactionMockRecorder) GetProposerId(ctx, address any) *TransactionGetProposerIdCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProposerId", reflect.TypeOf((*MockTransaction)(nil).GetProposerId), ctx, address)
+	return &TransactionGetProposerIdCall{Call: call}
+}
+
+// TransactionGetProposerIdCall wrap *gomock.Call
+type TransactionGetProposerIdCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionGetProposerIdCall) Return(arg0 uint64, arg1 error) *TransactionGetProposerIdCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionGetProposerIdCall) Do(f func(context.Context, string) (uint64, error)) *TransactionGetProposerIdCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionGetProposerIdCall) DoAndReturn(f func(context.Context, string) (uint64, error)) *TransactionGetProposerIdCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // HandleError mocks base method.
 func (m *MockTransaction) HandleError(ctx context.Context, err error) error {
 	m.ctrl.T.Helper()

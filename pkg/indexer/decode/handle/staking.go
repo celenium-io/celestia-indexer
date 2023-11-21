@@ -28,8 +28,9 @@ func MsgCreateValidator(level types.Level, status storageTypes.Status, m *cosmos
 	if m.Pubkey != nil {
 		pk, ok := m.Pubkey.GetCachedValue().(cryptotypes.PubKey)
 		if ok {
-			log.Warn().Msg("can't decode consensus address of validator")
 			consAddress = pk.Address().String()
+		} else {
+			log.Warn().Msg("can't decode consensus address of validator")
 		}
 	}
 
