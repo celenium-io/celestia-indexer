@@ -2916,6 +2916,11 @@ const docTemplate = `{
                     "format": "date-time",
                     "example": "2023-07-04T03:10:57+00:00"
                 },
+                "name": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "name"
+                },
                 "namespace_id": {
                     "type": "string",
                     "format": "binary",
