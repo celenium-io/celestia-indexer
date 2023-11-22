@@ -47,7 +47,7 @@ func (Namespace) SearchType() string {
 
 func decodeName(nsId []byte) string {
 	var (
-		trimmed     = bytes.Trim(nsId, "\x00")
+		trimmed     = bytes.TrimLeft(nsId, "\x00")
 		data        = make([]byte, 0)
 		isDecodable = true
 	)
