@@ -42,6 +42,11 @@ var (
 		Height:      100,
 		BlockTime:   11043,
 	}
+	testValidator = storage.Validator{
+		Id:          1,
+		Moniker:     "moniker",
+		ConsAddress: "012345",
+	}
 	testBlockWithStats = storage.Block{
 		Id:           1,
 		Hash:         []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31},
@@ -51,6 +56,7 @@ var (
 		Time:         testTime,
 		MessageTypes: types.NewMsgTypeBitMask(types.MsgSend),
 		Stats:        testBlockStats,
+		Proposer:     testValidator,
 	}
 
 	testTime = time.Date(2023, 8, 1, 1, 1, 0, 0, time.UTC)

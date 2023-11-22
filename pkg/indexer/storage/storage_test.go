@@ -89,12 +89,13 @@ func (s *ModuleTestSuite) TestBlockLast() {
 	s.Require().NoError(err)
 
 	module.MustInput(InputName).Push(storage.Block{
-		Height:       1001,
-		Hash:         hash,
-		VersionBlock: 11,
-		VersionApp:   1,
-		Time:         time.Date(2023, 7, 4, 3, 11, 26, 0, time.UTC),
-		MessageTypes: types.NewMsgTypeBitMask(),
+		Height:          1001,
+		Hash:            hash,
+		VersionBlock:    11,
+		VersionApp:      1,
+		ProposerAddress: "81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8",
+		Time:            time.Date(2023, 7, 4, 3, 11, 26, 0, time.UTC),
+		MessageTypes:    types.NewMsgTypeBitMask(),
 	})
 	time.Sleep(time.Second)
 

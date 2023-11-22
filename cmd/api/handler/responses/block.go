@@ -28,7 +28,8 @@ type Block struct {
 	AppHash            pkgTypes.Hex `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"app_hash"             swaggertype:"string"`
 	LastResultsHash    pkgTypes.Hex `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"last_results_hash"    swaggertype:"string"`
 	EvidenceHash       pkgTypes.Hex `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"evidence_hash"        swaggertype:"string"`
-	ProposerAddress    pkgTypes.Hex `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"proposer_address"     swaggertype:"string"`
+
+	Proposer *ShortValidator `json:"proposer,omitempty"`
 
 	MessageTypes []types.MsgType `example:"MsgSend,MsgUnjail" json:"message_types" swaggertype:"array,string"`
 
@@ -52,9 +53,9 @@ func NewBlock(block storage.Block, withStats bool) Block {
 		AppHash:            block.AppHash,
 		LastResultsHash:    block.LastResultsHash,
 		EvidenceHash:       block.EvidenceHash,
-		ProposerAddress:    block.ProposerAddress,
 		MessageTypes:       block.MessageTypes.Names(),
 	}
+	result.Proposer = NewShortValidator(block.Proposer)
 
 	if withStats {
 		result.Stats = NewBlockStats(block.Stats)

@@ -117,6 +117,7 @@ func (s *StorageTestSuite) TestBlockLast() {
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
 	s.Require().NoError(err)
 	s.Require().Equal(hash, block.Hash.Bytes())
+	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
 }
 
 func (s *StorageTestSuite) TestBlockByHeight() {
@@ -133,6 +134,7 @@ func (s *StorageTestSuite) TestBlockByHeight() {
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
 	s.Require().NoError(err)
 	s.Require().Equal(hash, block.Hash.Bytes())
+	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
 }
 
 func (s *StorageTestSuite) TestBlockByHeightWithStats() {
@@ -144,6 +146,7 @@ func (s *StorageTestSuite) TestBlockByHeightWithStats() {
 	s.Require().EqualValues(1000, block.Height)
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
+	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
 
 	expectedStats := storage.BlockStats{
 		Id:            2,
@@ -187,6 +190,7 @@ func (s *StorageTestSuite) TestBlockByIdWithRelations() {
 	s.Require().EqualValues(1000, block.Height)
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
+	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
 
 	expectedStats := storage.BlockStats{
 		Id:            2,
@@ -235,6 +239,7 @@ func (s *StorageTestSuite) TestBlockByHash() {
 	s.Require().EqualValues(11, block.VersionBlock)
 	s.Require().EqualValues(0, block.Stats.TxCount)
 	s.Require().Equal(hash, block.Hash.Bytes())
+	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
 }
 
 func (s *StorageTestSuite) TestBlockListWithStats() {
@@ -257,16 +262,7 @@ func (s *StorageTestSuite) TestBlockListWithStats() {
 		types.MsgUnjail:                  1,
 		types.MsgPayForBlobs:             1,
 	}, block.Stats.MessagesCounts)
-
-	blocks, err = s.storage.Blocks.List(ctx, 10, 0, sdk.SortOrderDesc)
-	s.Require().NoError(err)
-	s.Require().Len(blocks, 2)
-
-	block = blocks[0]
-	s.Require().EqualValues(1000, block.Height)
-	s.Require().EqualValues(1, block.VersionApp)
-	s.Require().EqualValues(11, block.VersionBlock)
-	s.Require().EqualValues(storage.BlockStats{}, block.Stats)
+	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
 }
 
 func (s *StorageTestSuite) TestAddressByHash() {

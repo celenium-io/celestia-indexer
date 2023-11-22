@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
+	"github.com/pkg/errors"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
@@ -135,6 +136,12 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return err
 	}
 	block.Stats.BlockTime = uint64(block.Time.Sub(state.LastTime).Milliseconds())
+
+	proposerId, err := tx.GetProposerId(ctx, block.ProposerAddress)
+	if err != nil {
+		return errors.Wrap(err, "can't find block proposer")
+	}
+	block.ProposerId = proposerId
 
 	if err := tx.Add(ctx, block); err != nil {
 		return err

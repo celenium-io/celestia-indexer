@@ -47,7 +47,7 @@ func getExpectedBlock() storage.Block {
 		AppHash:            types.Hex{0x0, 0x0, 0x1, 0x6},
 		LastResultsHash:    types.Hex{0x0, 0x0, 0x1, 0x7},
 		EvidenceHash:       types.Hex{0x0, 0x0, 0x1, 0x8},
-		ProposerAddress:    types.Hex{0x0, 0x0, 0x1, 0x9},
+		ProposerAddress:    types.Hex{0x0, 0x0, 0x1, 0x9}.String(),
 		ChainId:            "celestia-explorer-test",
 		Txs:                make([]storage.Tx, 0),
 		Events:             make([]storage.Event, 0),

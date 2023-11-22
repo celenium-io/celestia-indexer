@@ -191,23 +191,40 @@ func (tx Transaction) SaveNamespaceMessage(ctx context.Context, nsMsgs ...models
 	return err
 }
 
+const doNotModify = "[do-not-modify]"
+
 func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.Validator) error {
 	if len(validators) == 0 {
 		return nil
 	}
 
-	_, err := tx.Tx().NewInsert().Model(&validators).
-		On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
-		Set("moniker = EXCLUDED.moniker").
-		Set("website = EXCLUDED.website").
-		Set("identity = EXCLUDED.identity").
-		Set("contacts = EXCLUDED.contacts").
-		Set("details = EXCLUDED.details").
-		Set("rate = EXCLUDED.rate").
-		Set("min_self_delegation = EXCLUDED.min_self_delegation").
-		Returning("id").
-		Exec(ctx)
-	return err
+	for i := range validators {
+		query := tx.Tx().NewInsert().Model(validators[i]).
+			On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
+			Set("rate = EXCLUDED.rate").
+			Set("min_self_delegation = EXCLUDED.min_self_delegation")
+
+		if validators[i].Moniker != doNotModify {
+			query.Set("moniker = EXCLUDED.moniker")
+		}
+		if validators[i].Website != doNotModify {
+			query.Set("website = EXCLUDED.website")
+		}
+		if validators[i].Identity != doNotModify {
+			query.Set("identity = EXCLUDED.identity")
+		}
+		if validators[i].Contacts != doNotModify {
+			query.Set("contacts = EXCLUDED.contacts")
+		}
+		if validators[i].Details != doNotModify {
+			query.Set("details = EXCLUDED.details")
+		}
+		if _, err := query.Returning("id").Exec(ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (tx Transaction) LastBlock(ctx context.Context) (block models.Block, err error) {
@@ -325,5 +342,16 @@ func (tx Transaction) LastNamespaceMessage(ctx context.Context, nsId uint64) (ms
 		Order("msg_id desc").
 		Limit(1).
 		Scan(ctx)
+	return
+}
+
+func (tx Transaction) GetProposerId(ctx context.Context, address string) (id uint64, err error) {
+	err = tx.Tx().NewSelect().
+		Model((*models.Validator)(nil)).
+		Column("id").
+		Where("cons_address = ?", address).
+		Order("msg_id desc").
+		Limit(1).
+		Scan(ctx, &id)
 	return
 }

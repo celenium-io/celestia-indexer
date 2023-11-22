@@ -4,7 +4,6 @@
 package responses
 
 import (
-	"reflect"
 	"testing"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestBlock_SearchType(t *testing.T) {
@@ -52,8 +52,12 @@ func TestNewBlock(t *testing.T) {
 					AppHash:            []byte{0x08},
 					LastResultsHash:    []byte{0x09},
 					EvidenceHash:       []byte{0x10},
-					ProposerAddress:    []byte{0x11},
 					ChainId:            "dipdup",
+					Proposer: storage.Validator{
+						Id:          1,
+						Moniker:     "moniker",
+						ConsAddress: "001122",
+					},
 				},
 				withStats: false,
 			},
@@ -73,9 +77,13 @@ func TestNewBlock(t *testing.T) {
 				AppHash:            []byte{0x08},
 				LastResultsHash:    []byte{0x09},
 				EvidenceHash:       []byte{0x10},
-				ProposerAddress:    []byte{0x11},
 				MessageTypes:       []storageTypes.MsgType{storageTypes.MsgUnknown},
-				Stats:              nil,
+				Proposer: &ShortValidator{
+					Id:          1,
+					Moniker:     "moniker",
+					ConsAddress: "001122",
+				},
+				Stats: nil,
 			},
 		},
 
@@ -101,8 +109,12 @@ func TestNewBlock(t *testing.T) {
 					AppHash:            []byte{0x08},
 					LastResultsHash:    []byte{0x09},
 					EvidenceHash:       []byte{0x10},
-					ProposerAddress:    []byte{0x11},
 					ChainId:            "dipdup",
+					Proposer: storage.Validator{
+						Id:          1,
+						Moniker:     "moniker",
+						ConsAddress: "001122",
+					},
 					Stats: storage.BlockStats{
 						Id:            1000,
 						Height:        1000,
@@ -139,8 +151,12 @@ func TestNewBlock(t *testing.T) {
 				AppHash:            []byte{0x08},
 				LastResultsHash:    []byte{0x09},
 				EvidenceHash:       []byte{0x10},
-				ProposerAddress:    []byte{0x11},
 				MessageTypes:       []storageTypes.MsgType{storageTypes.MsgUnknown},
+				Proposer: &ShortValidator{
+					Id:          1,
+					Moniker:     "moniker",
+					ConsAddress: "001122",
+				},
 				Stats: &BlockStats{
 					TxCount:       6,
 					EventsCount:   10,
@@ -160,9 +176,8 @@ func TestNewBlock(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewBlock(tt.args.block, tt.args.withStats); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewBlock() = %v, want %v", got, tt.want)
-			}
+			got := NewBlock(tt.args.block, tt.args.withStats)
+			require.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -215,9 +230,8 @@ func TestNewBlockStats(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewBlockStats(tt.args.stats); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewBlockStats() = %v, want %v", got, tt.want)
-			}
+			got := NewBlockStats(tt.args.stats)
+			require.Equal(t, tt.want, got)
 		})
 	}
 }

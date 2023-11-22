@@ -726,6 +726,21 @@ func (s *StorageTestSuite) TestSaveEventsWithCopy() {
 	}
 }
 
+func (s *StorageTestSuite) TestGetProposerId() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	id, err := tx.GetProposerId(ctx, "81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8")
+	s.Require().NoError(err)
+	s.Require().EqualValues(1, id)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
 func TestSuiteTransaction_Run(t *testing.T) {
 	suite.Run(t, new(TransactionTestSuite))
 }

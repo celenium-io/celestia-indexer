@@ -301,6 +301,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		namespaceByHash.GET("/:hash/:height/:commitment", namespaceHandlers.GetBlob)
 	}
 
+	validatorsHandler := handler.NewValidatorHandler(db.Validator)
+	validators := v1.Group("/validators")
+	{
+		validators.GET("", validatorsHandler.List)
+		validators.GET("/:id", validatorsHandler.Get)
+	}
+
 	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.State)
 	stats := v1.Group("/stats")
 	{

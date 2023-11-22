@@ -5,6 +5,7 @@ package storage
 
 import (
 	"context"
+
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -22,9 +23,10 @@ type IValidator interface {
 type Validator struct {
 	bun.BaseModel `bun:"validator" comment:"Table with celestia validators."`
 
-	Id        uint64 `bun:"id,pk,notnull,autoincrement"                comment:"Unique internal identity"`
-	Delegator string `bun:"delegator,type:text"                        comment:"Delegator address"`
-	Address   string `bun:"address,unique:address_validator,type:text" comment:"Validator address"`
+	Id          uint64 `bun:"id,pk,notnull,autoincrement"                comment:"Unique internal identity"`
+	Delegator   string `bun:"delegator,type:text"                        comment:"Delegator address"`
+	Address     string `bun:"address,unique:address_validator,type:text" comment:"Validator address"`
+	ConsAddress string `bun:"cons_address,unique:cons_address_validator" comment:"Consensus address"`
 
 	Moniker  string `bun:"moniker,type:text"  comment:"Human-readable name for the validator"`
 	Website  string `bun:"website,type:text"  comment:"Website link"`

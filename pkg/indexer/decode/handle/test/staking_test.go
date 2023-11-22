@@ -4,17 +4,20 @@
 package handle_test
 
 import (
+	"testing"
+
 	"cosmossdk.io/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/celenium-io/celestia-indexer/internal/test_suite"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/fatih/structs"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 // MsgEditValidator
@@ -172,14 +175,17 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 
 // MsgCreateValidator
 
+var pk = ed25519.GenPrivKeyFromSecret([]byte{0, 1, 2, 3})
+
 func createMsgCreateValidator() types.Msg {
+	pkAny, _ := codectypes.NewAnyWithValue(pk.PubKey())
 	m := cosmosStakingTypes.MsgCreateValidator{
 		Description:       cosmosStakingTypes.Description{},
 		Commission:        cosmosStakingTypes.CommissionRates{},
 		MinSelfDelegation: types.NewInt(1),
 		DelegatorAddress:  "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
 		ValidatorAddress:  "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
-		Pubkey:            nil,
+		Pubkey:            pkAny,
 		Value:             types.Coin{},
 	}
 
@@ -237,6 +243,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 		Validator: &storage.Validator{
 			Delegator:         "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
 			Address:           "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
+			ConsAddress:       "A8BEA00847066E6C765E7B064DD79265406D402B",
 			Rate:              decimal.Zero,
 			MaxRate:           decimal.Zero,
 			MaxChangeRate:     decimal.Zero,
