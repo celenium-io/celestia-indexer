@@ -29,7 +29,7 @@ type Block struct {
 	LastResultsHash    pkgTypes.Hex `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"last_results_hash"    swaggertype:"string"`
 	EvidenceHash       pkgTypes.Hex `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"evidence_hash"        swaggertype:"string"`
 
-	Proposer *ShortValidator `json:"proposer"`
+	Proposer *ShortValidator `json:"proposer,omitempty"`
 
 	MessageTypes []types.MsgType `example:"MsgSend,MsgUnjail" json:"message_types" swaggertype:"array,string"`
 
