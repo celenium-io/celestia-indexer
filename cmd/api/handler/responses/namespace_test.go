@@ -33,7 +33,7 @@ func Test_decodeName(t *testing.T) {
 			nsId: "00000000000000000000000000000000000000e6edd3ffbef8c700d8",
 			want: "e6edd3ffbef8c700d8",
 		}, {
-			name: "test 1",
+			name: "test 5",
 			nsId: "00000000000000000000000000000000006d656d657300",
 			want: "6d656d657300",
 		},
