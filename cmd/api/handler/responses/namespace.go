@@ -21,6 +21,7 @@ type Namespace struct {
 	PfbCount        int64          `example:"12"                                                       format:"integer"   json:"pfb_count"         swaggertype:"integer"`
 	LastHeight      pkgTypes.Level `example:"100"                                                      format:"int64"     json:"last_height"       swaggertype:"integer"`
 	LastMessageTime time.Time      `example:"2023-07-04T03:10:57+00:00"                                format:"date-time" json:"last_message_time" swaggertype:"string"`
+	Name            string         `example:"name"                                                     format:"string"    json:"name"              swaggertype:"string"`
 	Reserved        bool           `example:"true"                                                     json:"reserved"`
 }
 
@@ -30,6 +31,7 @@ func NewNamespace(ns storage.Namespace) Namespace {
 		Size:            ns.Size,
 		Version:         ns.Version,
 		NamespaceID:     hex.EncodeToString(ns.NamespaceID),
+		Name:            decodeName(ns.NamespaceID),
 		Hash:            ns.Hash(),
 		Reserved:        ns.Reserved,
 		PfbCount:        ns.PfbCount,
@@ -40,4 +42,23 @@ func NewNamespace(ns storage.Namespace) Namespace {
 
 func (Namespace) SearchType() string {
 	return "namespace"
+}
+
+func decodeName(nsId []byte) string {
+	isDecodable := true
+	data := make([]byte, 0)
+	for i := range nsId {
+		if nsId[i] == 0 {
+			continue
+		}
+		if nsId[i] < 0x20 || nsId[i] > 0x7f {
+			isDecodable = false
+		}
+		data = append(data, nsId[i])
+	}
+
+	if isDecodable {
+		return string(data)
+	}
+	return hex.EncodeToString(data)
 }
