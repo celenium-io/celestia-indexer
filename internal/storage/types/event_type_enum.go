@@ -62,6 +62,10 @@ const (
 	EventTypeUnbond EventType = "unbond"
 	// EventTypeTx is a EventType of type tx.
 	EventTypeTx EventType = "tx"
+	// EventTypeCompleteRedelegation is a EventType of type complete_redelegation.
+	EventTypeCompleteRedelegation EventType = "complete_redelegation"
+	// EventTypeCompleteUnbonding is a EventType of type complete_unbonding.
+	EventTypeCompleteUnbonding EventType = "complete_unbonding"
 	// EventTypeUseFeegrant is a EventType of type use_feegrant.
 	EventTypeUseFeegrant EventType = "use_feegrant"
 	// EventTypeRevokeFeegrant is a EventType of type revoke_feegrant.
@@ -152,6 +156,8 @@ func EventTypeValues() []EventType {
 		EventTypeEditValidator,
 		EventTypeUnbond,
 		EventTypeTx,
+		EventTypeCompleteRedelegation,
+		EventTypeCompleteUnbonding,
 		EventTypeUseFeegrant,
 		EventTypeRevokeFeegrant,
 		EventTypeSetFeegrant,
@@ -221,6 +227,8 @@ var _EventTypeValue = map[string]EventType{
 	"edit_validator":                    EventTypeEditValidator,
 	"unbond":                            EventTypeUnbond,
 	"tx":                                EventTypeTx,
+	"complete_redelegation":             EventTypeCompleteRedelegation,
+	"complete_unbonding":                EventTypeCompleteUnbonding,
 	"use_feegrant":                      EventTypeUseFeegrant,
 	"revoke_feegrant":                   EventTypeRevokeFeegrant,
 	"set_feegrant":                      EventTypeSetFeegrant,
