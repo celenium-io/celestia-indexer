@@ -624,6 +624,8 @@ definitions:
     - edit_validator
     - unbond
     - tx
+    - complete_redelegation
+    - complete_unbonding
     - use_feegrant
     - revoke_feegrant
     - set_feegrant
@@ -679,6 +681,8 @@ definitions:
     - EventTypeEditValidator
     - EventTypeUnbond
     - EventTypeTx
+    - EventTypeCompleteRedelegation
+    - EventTypeCompleteUnbonding
     - EventTypeUseFeegrant
     - EventTypeRevokeFeegrant
     - EventTypeSetFeegrant

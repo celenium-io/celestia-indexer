@@ -31,6 +31,8 @@ package types
 		edit_validator,
 		unbond,
 		tx,
+		complete_redelegation,
+		complete_unbonding
 
 		use_feegrant,
 		revoke_feegrant,
