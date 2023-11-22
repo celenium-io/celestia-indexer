@@ -4,6 +4,7 @@
 package responses
 
 import (
+	"bytes"
 	"encoding/hex"
 	"time"
 
@@ -45,16 +46,16 @@ func (Namespace) SearchType() string {
 }
 
 func decodeName(nsId []byte) string {
-	isDecodable := true
-	data := make([]byte, 0)
-	for i := range nsId {
-		if nsId[i] == 0 {
-			continue
-		}
-		if nsId[i] < 0x20 || nsId[i] > 0x7f {
+	var (
+		trimmed     = bytes.Trim(nsId, "\x00")
+		data        = make([]byte, 0)
+		isDecodable = true
+	)
+	for i := range trimmed {
+		if trimmed[i] < 0x20 || trimmed[i] > 0x7f {
 			isDecodable = false
 		}
-		data = append(data, nsId[i])
+		data = append(data, trimmed[i])
 	}
 
 	if isDecodable {

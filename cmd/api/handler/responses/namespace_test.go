@@ -28,6 +28,10 @@ func Test_decodeName(t *testing.T) {
 			name: "test 3",
 			nsId: "0000000000000000000000000000000000000000e6edd3ffbef8c7d8",
 			want: "e6edd3ffbef8c7d8",
+		}, {
+			name: "test 4",
+			nsId: "00000000000000000000000000000000000000e6edd3ffbef8c700d8",
+			want: "e6edd3ffbef8c700d8",
 		},
 	}
 	for _, tt := range tests {
