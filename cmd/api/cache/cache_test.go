@@ -12,7 +12,7 @@ import (
 
 func TestCache_SetGet(t *testing.T) {
 	t.Run("set and get key from cache", func(t *testing.T) {
-		c := NewCache(Config{MaxEntitiesCount: 2})
+		c := NewCache(Config{MaxEntitiesCount: 2}, nil)
 		c.Set("test", []byte{0, 1, 2, 3})
 
 		got, ok := c.Get("test")
@@ -24,7 +24,7 @@ func TestCache_SetGet(t *testing.T) {
 	})
 
 	t.Run("overflow set queue", func(t *testing.T) {
-		c := NewCache(Config{MaxEntitiesCount: 2})
+		c := NewCache(Config{MaxEntitiesCount: 2}, nil)
 		for i := 0; i < 100; i++ {
 			c.Set(fmt.Sprintf("%d", i), []byte{byte(i)})
 		}
@@ -47,7 +47,7 @@ func TestCache_SetGet(t *testing.T) {
 
 func TestCache_Clear(t *testing.T) {
 	t.Run("set and get key from cache", func(t *testing.T) {
-		c := NewCache(Config{MaxEntitiesCount: 100})
+		c := NewCache(Config{MaxEntitiesCount: 100}, nil)
 		for i := 0; i < 100; i++ {
 			c.Set(fmt.Sprintf("%d", i), []byte{byte(i)})
 		}

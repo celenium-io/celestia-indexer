@@ -8,8 +8,10 @@ import (
 	"net/http"
 	"sync/atomic"
 
+	"github.com/dipdup-io/workerpool"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 
+	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/gorilla/websocket"
@@ -21,15 +23,15 @@ type Manager struct {
 	upgrader websocket.Upgrader
 	clientId *atomic.Uint64
 	clients  *sdkSync.Map[uint64, *Client]
+	observer *bus.Observer
 
-	head    *Channel[storage.Block, *responses.Block]
-	tx      *Channel[storage.Tx, *responses.Tx]
-	factory storage.ListenerFactory
+	head *Channel[storage.Block, *responses.Block]
+	tx   *Channel[storage.Tx, *responses.Tx]
 
-	onBlockReceived func(ctx context.Context, block *responses.Block) error
+	g workerpool.Group
 }
 
-func NewManager(factory storage.ListenerFactory, blockRepo storage.IBlock, txRepo storage.ITx) *Manager {
+func NewManager(observer *bus.Observer) *Manager {
 	manager := &Manager{
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
@@ -38,26 +40,40 @@ func NewManager(factory storage.ListenerFactory, blockRepo storage.IBlock, txRep
 				return true
 			},
 		},
+		observer: observer,
 		clientId: new(atomic.Uint64),
 		clients:  sdkSync.NewMap[uint64, *Client](),
-		factory:  factory,
+		g:        workerpool.NewGroup(),
 	}
 
 	manager.head = NewChannel[storage.Block, *responses.Block](
-		storage.ChannelHead,
-		HeadProcessor,
-		newBlockRepo(blockRepo),
+		headProcessor,
 		HeadFilter{},
 	)
 
 	manager.tx = NewChannel[storage.Tx, *responses.Tx](
-		storage.ChannelTx,
-		TxProcessor,
-		newTxRepo(txRepo),
+		txProcessor,
 		TxFilter{},
 	)
 
 	return manager
+}
+
+func (manager *Manager) listen(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case block := <-manager.observer.Blocks():
+			if err := manager.head.processMessage(*block); err != nil {
+				log.Err(err).Msg("handle block")
+			}
+		case tx := <-manager.observer.Txs():
+			if err := manager.tx.processMessage(*tx); err != nil {
+				log.Err(err).Msg("handle block")
+			}
+		}
+	}
 }
 
 // Handle godoc
@@ -94,28 +110,18 @@ func (manager *Manager) Handle(c echo.Context) error {
 }
 
 func (manager *Manager) Start(ctx context.Context) {
-	manager.head.eventHandler = manager.onBlockReceived
-	manager.head.Start(ctx, manager.factory)
-	manager.tx.Start(ctx, manager.factory)
+	manager.g.GoCtx(ctx, manager.listen)
 }
 
 func (manager *Manager) Close() error {
-	if err := manager.clients.Range(func(_ uint64, value *Client) (error, bool) {
+	manager.g.Wait()
+
+	return manager.clients.Range(func(_ uint64, value *Client) (error, bool) {
 		if err := value.Close(); err != nil {
 			return err, false
 		}
 		return nil, false
-	}); err != nil {
-		return err
-	}
-	if err := manager.head.Close(); err != nil {
-		return err
-	}
-	if err := manager.tx.Close(); err != nil {
-		return err
-	}
-
-	return nil
+	})
 }
 
 func (manager *Manager) AddClientToChannel(channel string, client *Client) {
@@ -138,8 +144,4 @@ func (manager *Manager) RemoveClientFromChannel(channel string, client *Client) 
 	default:
 		log.Error().Str("channel", channel).Msg("unknown channel name")
 	}
-}
-
-func (manager *Manager) SetOnBlockReceived(handler func(ctx context.Context, block *responses.Block) error) {
-	manager.onBlockReceived = handler
 }

@@ -5,20 +5,16 @@ package websocket
 
 import (
 	"context"
-	"strconv"
 	"sync"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
-	"github.com/lib/pq"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/mock/gomock"
 )
 
 const clientsTestCount = uint64(1000)
@@ -85,13 +81,8 @@ func (c *testHeadClient) Close() error {
 }
 
 func BenchmarkProcessingMessage(b *testing.B) {
-	ctrl := gomock.NewController(b)
-	defer ctrl.Finish()
-	blockRepo := mock.NewMockIBlock(ctrl)
 	channel := NewChannel[storage.Block, *responses.Block](
-		storage.ChannelHead,
-		HeadProcessor,
-		newBlockRepo(blockRepo),
+		headProcessor,
 		HeadFilter{},
 	)
 
@@ -106,17 +97,11 @@ func BenchmarkProcessingMessage(b *testing.B) {
 	b.Run("websocket_process_message", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			height := uint64(i)
-			blockRepo.EXPECT().
-				GetByID(gomock.Any(), height).
-				Return(&storage.Block{
-					Height:       types.Level(height),
-					MessageTypes: storageTypes.NewMsgTypeBits(),
-				}, nil).
-				MaxTimes(1)
 
-			err := channel.processMessage(ctx, &pq.Notification{
-				Channel: storage.ChannelHead,
-				Extra:   strconv.FormatUint(height, 10),
+			err := channel.processMessage(storage.Block{
+				Id:           height,
+				Height:       types.Level(height),
+				MessageTypes: storageTypes.NewMsgTypeBits(),
 			})
 			require.NoError(b, err)
 		}
