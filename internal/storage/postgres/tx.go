@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
@@ -73,5 +74,14 @@ func (tx *Tx) Genesis(ctx context.Context, limit, offset int, sortOrder sdk.Sort
 	query = sortScope(query, "id", sortOrder)
 
 	err = query.Scan(ctx)
+	return
+}
+
+func (tx *Tx) Gas(ctx context.Context, height types.Level) (response []storage.Gas, err error) {
+	err = tx.DB().NewSelect().
+		Model((*storage.Tx)(nil)).
+		ColumnExpr("gas_wanted, gas_used, fee, (CASE WHEN gas_wanted > 0 THEN fee / gas_wanted ELSE 0 END) as gas_price").
+		Where("height = ?", height).
+		Scan(ctx, &response)
 	return
 }

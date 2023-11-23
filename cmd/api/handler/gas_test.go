@@ -11,22 +11,32 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/mock/gomock"
 )
 
 // GasTestSuite -
 type GasTestSuite struct {
 	suite.Suite
-	echo    *echo.Echo
-	handler GasHandler
+	echo       *echo.Echo
+	state      *mock.MockIState
+	txs        *mock.MockITx
+	blockStats *mock.MockIBlockStats
+	handler    GasHandler
+	ctrl       *gomock.Controller
 }
 
 // SetupSuite -
 func (s *GasTestSuite) SetupSuite() {
 	s.echo = echo.New()
 	s.echo.Validator = NewCelestiaApiValidator()
-	s.handler = NewGasHandler()
+	s.ctrl = gomock.NewController(s.T())
+	s.state = mock.NewMockIState(s.ctrl)
+	s.txs = mock.NewMockITx(s.ctrl)
+	s.blockStats = mock.NewMockIBlockStats(s.ctrl)
+	s.handler = NewGasHandler(s.state, s.txs, s.blockStats)
 }
 
 // TearDownSuite -

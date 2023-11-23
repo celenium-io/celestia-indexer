@@ -1030,6 +1030,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/gas/price": {
+            "get": {
+                "description": "Get estimated gas price based on historical data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gas"
+                ],
+                "summary": "Get estimated gas price",
+                "operationId": "gas-price",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.GasPrice"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/head": {
             "get": {
                 "description": "Get current indexer head",
@@ -2917,6 +2947,67 @@ const docTemplate = `{
                         }
                     ],
                     "example": "commission"
+                }
+            }
+        },
+        "responses.GasBlock": {
+            "type": "object",
+            "properties": {
+                "avg_gas_price": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.12345"
+                },
+                "gas_used_ratio": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.12345"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 12345
+                },
+                "total_fee": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "1972367126"
+                },
+                "total_gas_used": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 56789
+                },
+                "total_gas_wanted": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 86756
+                }
+            }
+        },
+        "responses.GasPrice": {
+            "type": "object",
+            "properties": {
+                "computed_blocks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responses.GasBlock"
+                    }
+                },
+                "fast": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.1234"
+                },
+                "median": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.1234"
+                },
+                "slow": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.1234"
                 }
             }
         },

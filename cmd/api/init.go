@@ -332,10 +332,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	gasHandler := handler.NewGasHandler()
+	gasHandler := handler.NewGasHandler(db.State, db.Tx, db.BlockStats)
 	gas := v1.Group("/gas")
 	{
 		gas.GET("/estimate_for_pfb", gasHandler.EstimateForPfb)
+		gas.GET("/price", gasHandler.EstimatePrice)
 	}
 
 	if cfg.ApiConfig.Prometheus {
