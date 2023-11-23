@@ -12,11 +12,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/cmd/api/cache"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
-	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
 	"github.com/celenium-io/celestia-indexer/internal/profiler"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	nodeApi "github.com/celenium-io/celestia-indexer/pkg/node/dal"
 	"github.com/dipdup-net/go-lib/config"
@@ -178,13 +179,6 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 	e.Use(middleware.Secure())
 	e.Pre(middleware.RemoveTrailingSlash())
 
-	if cfg.Websocket {
-		endpointCache = cache.NewCache(cache.Config{
-			MaxEntitiesCount: 1000,
-		})
-		e.Use(cache.Middleware(endpointCache, cacheSkipper))
-	}
-
 	timeout := 30 * time.Second
 	if cfg.RequestTimeout > 0 {
 		timeout = time.Duration(cfg.RequestTimeout) * time.Second
@@ -214,6 +208,17 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 	e.Server.IdleTimeout = time.Second * 30
 
 	return e
+}
+
+var dispatcher *bus.Dispatcher
+
+func initDispatcher(ctx context.Context, db postgres.Storage) {
+	d, err := bus.NewDispatcher(db, db.Blocks, db.Tx)
+	if err != nil {
+		panic(err)
+	}
+	dispatcher = d
+	dispatcher.Start(ctx)
 }
 
 func initDatabase(cfg config.Database, viewsDir string) postgres.Storage {
@@ -374,16 +379,17 @@ var (
 )
 
 func initWebsocket(ctx context.Context, db postgres.Storage, group *echo.Group) {
-	wsManager = websocket.NewManager(db, db.Blocks, db.Tx)
-	wsManager.SetOnBlockReceived(clearCacheOnBlockReceived)
+	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelTx)
+	wsManager = websocket.NewManager(observer)
 	wsManager.Start(ctx)
 	group.GET("/ws", wsManager.Handle)
 }
 
-func clearCacheOnBlockReceived(ctx context.Context, _ *responses.Block) error {
-	if endpointCache == nil {
-		return nil
-	}
-	endpointCache.Clear()
-	return nil
+func initCache(ctx context.Context, e *echo.Echo) {
+	observer := dispatcher.Observe(storage.ChannelHead)
+	endpointCache = cache.NewCache(cache.Config{
+		MaxEntitiesCount: 1000,
+	}, observer)
+	e.Use(cache.Middleware(endpointCache, cacheSkipper))
+	endpointCache.Start(ctx)
 }

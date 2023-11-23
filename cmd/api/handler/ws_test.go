@@ -15,6 +15,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 
+	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	ws "github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -33,26 +34,23 @@ func TestWebsocket(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	listenerFactory := mock.NewMockListenerFactory(ctrl)
-	headListener := mock.NewMockListener(ctrl)
-	txListener := mock.NewMockListener(ctrl)
+	listener := mock.NewMockListener(ctrl)
 
-	listenerFactory.EXPECT().CreateListener().Return(headListener).MaxTimes(1)
-	listenerFactory.EXPECT().CreateListener().Return(txListener).MaxTimes(1)
+	listenerFactory.EXPECT().CreateListener().Return(listener).MaxTimes(1)
+
+	headChannel := make(chan *pq.Notification, 10)
+	listener.EXPECT().Listen().Return(headChannel).AnyTimes()
+	listener.EXPECT().Subscribe(gomock.Any(), storage.ChannelHead).Return(nil).MaxTimes(1)
+	listener.EXPECT().Close().Return(nil).MaxTimes(1)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	headChannel := make(chan *pq.Notification, 10)
-	headListener.EXPECT().Listen().Return(headChannel).AnyTimes()
-	txChannel := make(chan *pq.Notification, 10)
-	txListener.EXPECT().Listen().Return(txChannel).AnyTimes()
-
-	headListener.EXPECT().Subscribe(gomock.Any(), storage.ChannelHead).Return(nil).MaxTimes(1)
-	txListener.EXPECT().Subscribe(gomock.Any(), storage.ChannelTx).Return(nil).MaxTimes(1)
-
-	headListener.EXPECT().Close().Return(nil).MaxTimes(1)
-	txListener.EXPECT().Close().Return(nil).MaxTimes(1)
-
 	blockMock := mock.NewMockIBlock(ctrl)
+	dispatcher, err := bus.NewDispatcher(listenerFactory, blockMock, nil)
+	require.NoError(t, err)
+	dispatcher.Start(ctx)
+	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelTx)
+
 	for i := 0; i < 10; i++ {
 		hash := make([]byte, 32)
 		_, err := rand.Read(hash)
@@ -64,6 +62,7 @@ func TestWebsocket(t *testing.T) {
 			Time:         time.Now(),
 			Hash:         hash,
 			MessageTypes: storageTypes.NewMsgTypeBits(),
+			Stats:        testBlock.Stats,
 		}, nil).MaxTimes(1)
 	}
 
@@ -87,7 +86,7 @@ func TestWebsocket(t *testing.T) {
 			}
 		}
 	}()
-	manager := ws.NewManager(listenerFactory, blockMock, nil)
+	manager := ws.NewManager(observer)
 	manager.Start(ctx)
 
 	server := httptest.NewServer(http.HandlerFunc(
@@ -143,7 +142,6 @@ func TestWebsocket(t *testing.T) {
 			require.NoError(t, err, "closing manager")
 
 			close(headChannel)
-			close(txChannel)
 			return
 		default:
 			err := dialed.SetReadDeadline(time.Now().Add(time.Second * 3))

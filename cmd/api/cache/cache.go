@@ -4,9 +4,12 @@
 package cache
 
 import (
+	"context"
 	"net/http"
 	"sync"
 
+	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
+	"github.com/dipdup-io/workerpool"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
@@ -14,23 +17,47 @@ import (
 
 type Cache struct {
 	maxEntitiesCount int
+	observer         *bus.Observer
 
 	m     map[string][]byte
 	queue []string
 	mx    *sync.RWMutex
+	g     workerpool.Group
 }
 
 type Config struct {
 	MaxEntitiesCount int
 }
 
-func NewCache(cfg Config) *Cache {
+func NewCache(cfg Config, observer *bus.Observer) *Cache {
 	return &Cache{
 		maxEntitiesCount: cfg.MaxEntitiesCount,
+		observer:         observer,
 		m:                make(map[string][]byte),
 		queue:            make([]string, cfg.MaxEntitiesCount),
 		mx:               new(sync.RWMutex),
+		g:                workerpool.NewGroup(),
 	}
+}
+
+func (c *Cache) Start(ctx context.Context) {
+	c.g.GoCtx(ctx, c.listen)
+}
+
+func (c *Cache) listen(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-c.observer.Blocks():
+			c.Clear()
+		}
+	}
+}
+
+func (c *Cache) Close() error {
+	c.g.Wait()
+	return nil
 }
 
 func (c *Cache) Get(key string) ([]byte, bool) {

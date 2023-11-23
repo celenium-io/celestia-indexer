@@ -45,7 +45,9 @@ func main() {
 
 	db := initDatabase(cfg.Database, cfg.Indexer.ViewsDir)
 	e := initEcho(cfg.ApiConfig, cfg.Environment)
+	initDispatcher(ctx, db)
 	initHandlers(ctx, e, *cfg, db)
+	initCache(ctx, e)
 
 	go func() {
 		if err := e.Start(cfg.ApiConfig.Bind); err != nil && errors.Is(err, http.ErrServerClosed) {
@@ -58,6 +60,16 @@ func main() {
 
 	if wsManager != nil {
 		if err := wsManager.Close(); err != nil {
+			e.Logger.Fatal(err)
+		}
+	}
+	if endpointCache != nil {
+		if err := endpointCache.Close(); err != nil {
+			e.Logger.Fatal(err)
+		}
+	}
+	if dispatcher != nil {
+		if err := dispatcher.Close(); err != nil {
 			e.Logger.Fatal(err)
 		}
 	}
