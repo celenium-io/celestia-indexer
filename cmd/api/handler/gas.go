@@ -5,6 +5,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"sort"
 	"strconv"
@@ -72,7 +73,7 @@ func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 }
 
 const (
-	estimationGasPriceBlocksCount = 100
+	estimationGasPriceBlocksCount = 10
 )
 
 // EstimatePrice godoc
@@ -147,19 +148,19 @@ func (handler GasHandler) EstimatePrice(c echo.Context) error {
 				Height:       uint64(gp.stats.Height),
 				GasWanted:    uint64(gp.stats.GasLimit),
 				GasUsed:      uint64(gp.stats.GasUsed),
-				Fee:          gp.stats.Fee.String(),
+				Fee:          gp.stats.Fee.StringFixed(0),
 				GasPrice:     "0",
 				GasUsedRatio: "0",
 				TxCount:      uint64(gp.stats.TxCount),
 				Percentiles: []string{
-					gp.percentiles[0].String(),
-					gp.percentiles[1].String(),
-					gp.percentiles[2].String(),
+					gp.percentiles[0].StringFixed(8),
+					gp.percentiles[1].StringFixed(8),
+					gp.percentiles[2].StringFixed(8),
 				},
 			}
 			if gp.stats.GasLimit > 0 {
-				block.GasUsedRatio = decimal.NewFromInt(gp.stats.GasUsed).Div(decimal.NewFromInt(gp.stats.GasLimit)).String()
-				block.GasPrice = gp.stats.Fee.Div(decimal.NewFromInt(gp.stats.GasLimit)).String()
+				block.GasUsedRatio = fmt.Sprintf("%.8f", float64(gp.stats.GasUsed)/float64(gp.stats.GasLimit))
+				block.GasPrice = fmt.Sprintf("%.8f", gp.stats.Fee.InexactFloat64()/float64(gp.stats.GasLimit))
 			}
 
 			gas.blocks = append(gas.blocks, block)
@@ -195,9 +196,9 @@ func newGasPrice() gasPrice {
 
 func (gp gasPrice) toResponse() responses.GasPrice {
 	return responses.GasPrice{
-		Slow:           gp.percentiles[0].String(),
-		Median:         gp.percentiles[1].String(),
-		Fast:           gp.percentiles[2].String(),
+		Slow:           gp.percentiles[0].StringFixed(8),
+		Median:         gp.percentiles[1].StringFixed(8),
+		Fast:           gp.percentiles[2].StringFixed(8),
 		ComputedBlocks: gp.blocks,
 	}
 }
@@ -240,7 +241,7 @@ func (handler GasHandler) computeGasPriceEstimationForBlock(ctx context.Context,
 		if txs[txIndex].GasPrice.LessThan(minGasPrice) {
 			gp.percentiles[txIndex] = minGasPrice.Copy()
 		} else {
-			gp.percentiles[i] = txs[txIndex].GasPrice
+			gp.percentiles[i] = txs[txIndex].GasPrice.Copy()
 		}
 	}
 
