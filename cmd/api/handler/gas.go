@@ -72,7 +72,7 @@ func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 }
 
 const (
-	estimationGasPriceBlocksCount = 5
+	estimationGasPriceBlocksCount = 100
 )
 
 // EstimatePrice godoc
@@ -98,14 +98,29 @@ func (handler GasHandler) EstimatePrice(c echo.Context) error {
 	state := states[0]
 	lastBlockHeight := state.LastHeight - estimationGasPriceBlocksCount
 
+	blockStats, err := handler.blockStats.LastFrom(ctx, state.LastHeight, estimationGasPriceBlocksCount)
+	if err != nil {
+		return handleError(c, err, handler.state)
+	}
+	mappedBlockStats := make(map[types.Level]storage.BlockStats, estimationGasPriceBlocksCount)
+	for i := range blockStats {
+		mappedBlockStats[blockStats[i].Height] = blockStats[i]
+	}
+
 	var (
 		wg     sync.WaitGroup
 		result = make(chan gasPrice, estimationGasPriceBlocksCount)
 		errs   = make(chan error)
 	)
 	for height := state.LastHeight; height > lastBlockHeight; height-- {
+		stats, ok := mappedBlockStats[height]
+		if !ok {
+			return c.JSON(http.StatusInternalServerError, Error{
+				Message: "unknown height",
+			})
+		}
 		wg.Add(1)
-		go handler.computeGasPriceEstimationForBlock(ctx, height, result, errs, &wg)
+		go handler.computeGasPriceEstimationForBlock(ctx, height, stats, result, errs, &wg)
 	}
 	wg.Wait()
 
@@ -120,24 +135,34 @@ func (handler GasHandler) EstimatePrice(c echo.Context) error {
 		case err := <-errs:
 			return internalServerError(c, err)
 		case gp := <-result:
+			if gp.stats.TxCount == 0 {
+				continue
+			}
+
 			gas.percentiles[0] = gas.percentiles[0].Add(gp.percentiles[0])
 			gas.percentiles[1] = gas.percentiles[1].Add(gp.percentiles[1])
 			gas.percentiles[2] = gas.percentiles[2].Add(gp.percentiles[2])
 
-			gas.blocks = append(gas.blocks, responses.GasBlock{
+			block := responses.GasBlock{
 				Height:       uint64(gp.stats.Height),
 				GasWanted:    uint64(gp.stats.GasLimit),
 				GasUsed:      uint64(gp.stats.GasUsed),
 				Fee:          gp.stats.Fee.String(),
-				GasPrice:     gp.stats.Fee.Div(decimal.NewFromInt(gp.stats.GasLimit)).String(),
-				GasUsedRatio: decimal.NewFromInt(gp.stats.GasUsed).Div(decimal.NewFromInt(gp.stats.GasLimit)).String(),
+				GasPrice:     "0",
+				GasUsedRatio: "0",
 				TxCount:      uint64(gp.stats.TxCount),
 				Percentiles: []string{
 					gp.percentiles[0].String(),
 					gp.percentiles[1].String(),
 					gp.percentiles[2].String(),
 				},
-			})
+			}
+			if gp.stats.GasLimit > 0 {
+				block.GasUsedRatio = decimal.NewFromInt(gp.stats.GasUsed).Div(decimal.NewFromInt(gp.stats.GasLimit)).String()
+				block.GasPrice = gp.stats.Fee.Div(decimal.NewFromInt(gp.stats.GasLimit)).String()
+			}
+
+			gas.blocks = append(gas.blocks, block)
 
 			if len(result) == 0 {
 				gas.percentiles[0] = gas.percentiles[0].Div(decimal.NewFromInt(estimationGasPriceBlocksCount))
@@ -181,16 +206,14 @@ var (
 	minGasPrice = decimal.NewFromFloat(appconsts.DefaultMinGasPrice)
 )
 
-func (handler GasHandler) computeGasPriceEstimationForBlock(ctx context.Context, height types.Level, result chan<- gasPrice, errs chan<- error, wg *sync.WaitGroup) {
+func (handler GasHandler) computeGasPriceEstimationForBlock(ctx context.Context, height types.Level, block storage.BlockStats, result chan<- gasPrice, errs chan<- error, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	block, err := handler.blockStats.ByHeight(ctx, height)
-	if err != nil {
-		errs <- err
-		return
-	}
+	gp := newGasPrice()
+	gp.stats = block
+
 	if block.TxCount == 0 {
-		result <- newGasPrice()
+		result <- gp
 		return
 	}
 
@@ -202,7 +225,6 @@ func (handler GasHandler) computeGasPriceEstimationForBlock(ctx context.Context,
 	sort.Sort(storage.ByGasPrice(txs))
 
 	var (
-		gp      = newGasPrice()
 		sumGas  = txs[0].GasWanted
 		txIndex = 0
 	)
