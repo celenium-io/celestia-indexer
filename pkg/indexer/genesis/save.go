@@ -146,6 +146,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 				Time:        messages[i].Time,
 				Height:      messages[i].Height,
 				TxId:        messages[i].TxId,
+				Size:        uint64(messages[i].Namespace[j].Size),
 			})
 		}
 	}

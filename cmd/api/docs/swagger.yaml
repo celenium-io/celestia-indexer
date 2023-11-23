@@ -2097,6 +2097,66 @@ paths:
       summary: Get histogram
       tags:
       - stats
+  /v1/stats/namespace/series/{id}/{name}/{timeframe}:
+    get:
+      description: Get histogram for namespace with precomputed stats by series name
+        and timeframe
+      operationId: stats-ns-series
+      parameters:
+      - description: Namespace id in hexadecimal
+        in: path
+        maxLength: 56
+        minLength: 56
+        name: id
+        required: true
+        type: string
+      - description: Timeframe
+        enum:
+        - hour
+        - day
+        - week
+        - month
+        - year
+        in: path
+        name: timeframe
+        required: true
+        type: string
+      - description: Series name
+        enum:
+        - pfb_count
+        - size
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Time from in unix timestamp
+        in: query
+        name: from
+        type: integer
+      - description: Time to in unix timestamp
+        in: query
+        name: to
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.SeriesItem'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get histogram for namespace with precomputed stats
+      tags:
+      - stats
   /v1/stats/namespace/usage:
     get:
       description: Get namespaces with sorting by size. Returns top 100 namespaces.

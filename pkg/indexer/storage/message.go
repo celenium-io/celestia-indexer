@@ -51,6 +51,7 @@ func saveMessages(
 				Time:        messages[i].Time,
 				Height:      messages[i].Height,
 				TxId:        messages[i].TxId,
+				Size:        uint64(ns.Size),
 			})
 		}
 

@@ -126,6 +126,8 @@ const (
 	SeriesGasUsed       = "gas_used"
 	SeriesGasLimit      = "gas_limit"
 	SeriesGasEfficiency = "gas_efficiency"
+	SeriesNsPfbCount    = "pfb_count"
+	SeriesNsSize        = "size"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -137,4 +139,5 @@ type IStats interface {
 	TPS(ctx context.Context) (TPS, error)
 	TxCountForLast24h(ctx context.Context) ([]TxCountForLast24hItem, error)
 	Series(ctx context.Context, timeframe Timeframe, name string, req SeriesRequest) ([]SeriesItem, error)
+	NamespaceSeries(ctx context.Context, timeframe Timeframe, name string, nsId uint64, req SeriesRequest) (response []SeriesItem, err error)
 }

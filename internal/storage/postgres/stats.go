@@ -212,3 +212,42 @@ func (s Stats) Series(ctx context.Context, timeframe storage.Timeframe, name str
 	err = query.Limit(100).Scan(ctx, &response)
 	return
 }
+
+func (s Stats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe, name string, nsId uint64, req storage.SeriesRequest) (response []storage.SeriesItem, err error) {
+	var view string
+	switch timeframe {
+	case storage.TimeframeHour:
+		view = storage.ViewNamespaceStatsByHour
+	case storage.TimeframeDay:
+		view = storage.ViewNamespaceStatsByDay
+	case storage.TimeframeWeek:
+		view = storage.ViewNamespaceStatsByWeek
+	case storage.TimeframeMonth:
+		view = storage.ViewNamespaceStatsByMonth
+	case storage.TimeframeYear:
+		view = storage.ViewNamespaceStatsByYear
+	default:
+		return nil, errors.Errorf("unexpected timeframe %s", timeframe)
+	}
+
+	query := s.db.DB().NewSelect().Table(view).Where("namespace_id = ?", nsId)
+
+	switch name {
+	case storage.SeriesNsPfbCount:
+		query.ColumnExpr("ts, pfb_count as value")
+	case storage.SeriesNsSize:
+		query.ColumnExpr("ts, size as value")
+	default:
+		return nil, errors.Errorf("unexpected series name: %s", name)
+	}
+
+	if req.From > 0 {
+		query = query.Where("time >= to_timestamp(?)", req.From)
+	}
+	if req.To > 0 {
+		query = query.Where("time < to_timestamp(?)", req.To)
+	}
+
+	err = query.Limit(100).Scan(ctx, &response)
+	return
+}
