@@ -232,39 +232,8 @@ definitions:
         - $ref: '#/definitions/types.EventType'
         example: commission
     type: object
-  responses.GasBlock:
-    properties:
-      avg_gas_price:
-        example: "0.12345"
-        format: string
-        type: string
-      gas_used_ratio:
-        example: "0.12345"
-        format: string
-        type: string
-      height:
-        example: 12345
-        format: int64
-        type: integer
-      total_fee:
-        example: "1972367126"
-        format: string
-        type: string
-      total_gas_used:
-        example: 56789
-        format: int64
-        type: integer
-      total_gas_wanted:
-        example: 86756
-        format: int64
-        type: integer
-    type: object
   responses.GasPrice:
     properties:
-      computed_blocks:
-        items:
-          $ref: '#/definitions/responses.GasBlock'
-        type: array
       fast:
         example: "0.1234"
         format: string
@@ -1691,12 +1660,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.GasPrice'
-        "204":
-          description: No Content
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handler.Error'
       summary: Get estimated gas price
       tags:
       - gas
