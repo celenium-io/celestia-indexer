@@ -355,3 +355,52 @@ func (s *StatsTestSuite) TestBlockStatsHistogram() {
 		}
 	}
 }
+
+func (s *StatsTestSuite) TestNamespaceStatsHistogram() {
+	for _, name := range []string{
+		storage.SeriesNsPfbCount,
+		storage.SeriesNsSize,
+	} {
+
+		for _, tf := range []storage.Timeframe{
+			storage.TimeframeHour,
+			storage.TimeframeDay,
+			storage.TimeframeWeek,
+			storage.TimeframeMonth,
+			storage.TimeframeYear,
+		} {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/v1/stats/namespace/series/:id/:name/:timeframe")
+			c.SetParamNames("id", "name", "timeframe")
+			c.SetParamValues("000000000000000000000000000000000000000008E5F679BF7116CB", name, string(tf))
+
+			s.ns.EXPECT().
+				ByNamespaceId(gomock.Any(), gomock.Any()).
+				Return([]storage.Namespace{
+					testNamespace,
+				}, nil)
+
+			s.stats.EXPECT().
+				NamespaceSeries(gomock.Any(), tf, name, testNamespace.Id, gomock.Any()).
+				Return([]storage.SeriesItem{
+					{
+						Time:  testTime,
+						Value: "11234",
+					},
+				}, nil)
+
+			s.Require().NoError(s.handler.NamespaceSeries(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
+
+			var response []responses.SeriesItem
+			err := json.NewDecoder(rec.Body).Decode(&response)
+			s.Require().NoError(err)
+			s.Require().Len(response, 1)
+
+			item := response[0]
+			s.Require().Equal("11234", item.Value)
+		}
+	}
+}

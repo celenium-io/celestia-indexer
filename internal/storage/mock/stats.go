@@ -159,6 +159,45 @@ func (c *IStatsHistogramCountCall) DoAndReturn(f func(context.Context, storage.H
 	return c
 }
 
+// NamespaceSeries mocks base method.
+func (m *MockIStats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe, name string, nsId uint64, req storage.SeriesRequest) ([]storage.SeriesItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NamespaceSeries", ctx, timeframe, name, nsId, req)
+	ret0, _ := ret[0].([]storage.SeriesItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NamespaceSeries indicates an expected call of NamespaceSeries.
+func (mr *MockIStatsMockRecorder) NamespaceSeries(ctx, timeframe, name, nsId, req any) *IStatsNamespaceSeriesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NamespaceSeries", reflect.TypeOf((*MockIStats)(nil).NamespaceSeries), ctx, timeframe, name, nsId, req)
+	return &IStatsNamespaceSeriesCall{Call: call}
+}
+
+// IStatsNamespaceSeriesCall wrap *gomock.Call
+type IStatsNamespaceSeriesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IStatsNamespaceSeriesCall) Return(response []storage.SeriesItem, err error) *IStatsNamespaceSeriesCall {
+	c.Call = c.Call.Return(response, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IStatsNamespaceSeriesCall) Do(f func(context.Context, storage.Timeframe, string, uint64, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsNamespaceSeriesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IStatsNamespaceSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, uint64, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsNamespaceSeriesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Series mocks base method.
 func (m *MockIStats) Series(ctx context.Context, timeframe storage.Timeframe, name string, req storage.SeriesRequest) ([]storage.SeriesItem, error) {
 	m.ctrl.T.Helper()

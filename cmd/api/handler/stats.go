@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"encoding/hex"
 	"errors"
 	"net/http"
 
@@ -262,6 +263,69 @@ func (sh StatsHandler) Series(c echo.Context) error {
 		From: req.From,
 		To:   req.To,
 	})
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	response := make([]responses.SeriesItem, len(histogram))
+	for i := range histogram {
+		response[i] = responses.NewSeriesItem(histogram[i])
+	}
+	return returnArray(c, response)
+}
+
+type namespaceSeriesRequest struct {
+	Id         string `example:"0011223344" param:"id"        swaggertype:"string"  validate:"required,hexadecimal,len=56"`
+	Timeframe  string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day week month year"`
+	SeriesName string `example:"size"       param:"name"      swaggertype:"string"  validate:"required,oneof=pfb_count size"`
+	From       uint64 `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To         uint64 `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
+// NamespaceSeries godoc
+//
+//	@Summary				Get histogram for namespace with precomputed stats
+//	@Description        	Get histogram for namespace with precomputed stats by series name and timeframe
+//	@Tags					stats
+//	@ID						stats-ns-series
+//	@Param			        id      	path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
+//	@Param					timeframe	path	string	true	"Timeframe"		Enums(hour, day, week, month, year)
+//	@Param					name     	path	string	true	"Series name"	Enums(pfb_count, size)
+//	@Param					from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param					to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Produce				json
+//	@Success				200	{array}     responses.SeriesItem
+//	@Failure				400	{object}	Error
+//	@Failure				500	{object}	Error
+//	@Router					/v1/stats/namespace/series/{id}/{name}/{timeframe} [get]
+func (sh StatsHandler) NamespaceSeries(c echo.Context) error {
+	req, err := bindAndValidate[namespaceSeriesRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	namespaceId, err := hex.DecodeString(req.Id)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	namespace, err := sh.nsRepo.ByNamespaceId(c.Request().Context(), namespaceId)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+	if len(namespace) == 0 {
+		return c.JSON(http.StatusOK, []any{})
+	}
+
+	histogram, err := sh.repo.NamespaceSeries(
+		c.Request().Context(),
+		storage.Timeframe(req.Timeframe),
+		req.SeriesName,
+		namespace[0].Id,
+		storage.SeriesRequest{
+			From: req.From,
+			To:   req.To,
+		})
 	if err != nil {
 		return internalServerError(c, err)
 	}

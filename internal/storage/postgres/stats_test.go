@@ -705,6 +705,15 @@ func (s *StatsTestSuite) TestSeries() {
 	s.Require().Len(items, 0)
 }
 
+func (s *StatsTestSuite) TestNamespaceSeries() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	items, err := s.storage.Stats.NamespaceSeries(ctx, storage.TimeframeHour, storage.SeriesNsSize, 1, storage.SeriesRequest{})
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
+}
+
 func TestSuiteStats_Run(t *testing.T) {
 	suite.Run(t, new(StatsTestSuite))
 }

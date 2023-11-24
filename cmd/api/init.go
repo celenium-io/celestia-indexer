@@ -324,6 +324,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		namespace := stats.Group("/namespace")
 		{
 			namespace.GET("/usage", statsHandler.NamespaceUsage)
+			namespace.GET("/series/:id/:name/:timeframe", statsHandler.NamespaceSeries)
 		}
 		series := stats.Group("/series")
 		{
