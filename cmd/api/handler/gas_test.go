@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
@@ -25,6 +26,7 @@ type GasTestSuite struct {
 	txs        *mock.MockITx
 	blockStats *mock.MockIBlockStats
 	handler    GasHandler
+	tracker    *gas.Tracker
 	ctrl       *gomock.Controller
 }
 
@@ -36,11 +38,16 @@ func (s *GasTestSuite) SetupSuite() {
 	s.state = mock.NewMockIState(s.ctrl)
 	s.txs = mock.NewMockITx(s.ctrl)
 	s.blockStats = mock.NewMockIBlockStats(s.ctrl)
-	s.handler = NewGasHandler(s.state, s.txs, s.blockStats)
+	s.tracker = gas.NewTracker(s.state, s.blockStats, s.txs, nil)
+	s.handler = NewGasHandler(s.state, s.txs, s.blockStats, s.tracker)
 }
 
 // TearDownSuite -
 func (s *GasTestSuite) TearDownSuite() {
+	if s.tracker != nil {
+		err := s.tracker.Close()
+		s.Require().NoError(err)
+	}
 	s.Require().NoError(s.echo.Shutdown(context.Background()))
 }
 
