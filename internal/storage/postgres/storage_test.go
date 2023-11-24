@@ -796,6 +796,27 @@ func (s *StorageTestSuite) TestTxByAddressAndTime() {
 	s.Require().Len(txs, 1)
 }
 
+func (s *StorageTestSuite) TestTxGas() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	txs, err := s.storage.Tx.Gas(ctx, 1000)
+	s.Require().NoError(err)
+	s.Require().Len(txs, 2)
+
+	tx0 := txs[0]
+	s.Require().EqualValues(80410, tx0.GasWanted)
+	s.Require().EqualValues(77483, tx0.GasUsed)
+	s.Require().EqualValues("80410", tx0.Fee.String())
+	s.Require().EqualValues("1", tx0.GasPrice.String())
+
+	tx1 := txs[1]
+	s.Require().EqualValues(80410, tx1.GasWanted)
+	s.Require().EqualValues(77483, tx1.GasUsed)
+	s.Require().EqualValues("80410", tx1.Fee.String())
+	s.Require().EqualValues("1", tx1.GasPrice.String())
+}
+
 func (s *StorageTestSuite) TestValidatorByAddress() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

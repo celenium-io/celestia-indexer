@@ -64,3 +64,10 @@ func (q *queue) Range(handler func(item info) (bool, error)) error {
 	}
 	return nil
 }
+
+func (q *queue) Size() int {
+	q.mx.RLock()
+	defer q.mx.RUnlock()
+
+	return len(q.data)
+}

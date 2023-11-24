@@ -178,10 +178,11 @@ func (tracker *Tracker) computeMetrics() error {
 	if err != nil {
 		return err
 	}
+	count := int64(tracker.q.Size())
 
-	slow = slow.Div(decimal.NewFromInt(blockCount))
-	median = median.Div(decimal.NewFromInt(blockCount))
-	fast = fast.Div(decimal.NewFromInt(blockCount))
+	slow = slow.Div(decimal.NewFromInt(count))
+	median = median.Div(decimal.NewFromInt(count))
+	fast = fast.Div(decimal.NewFromInt(count))
 
 	tracker.mx.Lock()
 	{
