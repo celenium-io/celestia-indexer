@@ -291,7 +291,7 @@ func (s *StatsTestSuite) TestNamespaceUsage() {
 	s.Require().Len(response, 2)
 
 	item0 := response[0]
-	s.Require().Equal(testNamespace.String(), item0.Name)
+	s.Require().Equal("010203040506070809000102030405060708090001020304050607", item0.Name)
 	s.Require().Equal(testNamespace.Size, item0.Size)
 
 	item1 := response[1]
