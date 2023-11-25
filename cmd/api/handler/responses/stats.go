@@ -46,7 +46,7 @@ type NamespaceUsage struct {
 
 func NewNamespaceUsage(ns storage.Namespace) NamespaceUsage {
 	return NamespaceUsage{
-		Name: ns.String(),
+		Name: decodeName(ns.NamespaceID),
 		Size: ns.Size,
 	}
 }
