@@ -46,6 +46,7 @@ func main() {
 	db := initDatabase(cfg.Database, cfg.Indexer.ViewsDir)
 	e := initEcho(cfg.ApiConfig, cfg.Environment)
 	initDispatcher(ctx, db)
+	initGasTracker(ctx, db)
 	initHandlers(ctx, e, *cfg, db)
 	initCache(ctx, e)
 
@@ -57,6 +58,12 @@ func main() {
 
 	<-ctx.Done()
 	cancel()
+
+	if gasTracker != nil {
+		if err := gasTracker.Close(); err != nil {
+			e.Logger.Fatal(err)
+		}
+	}
 
 	if wsManager != nil {
 		if err := wsManager.Close(); err != nil {

@@ -24,7 +24,21 @@ type ITx interface {
 	ByIdWithRelations(ctx context.Context, id uint64) (Tx, error)
 	ByAddress(ctx context.Context, addressId uint64, fltrs TxFilter) ([]Tx, error)
 	Genesis(ctx context.Context, limit, offset int, sortOrder storage.SortOrder) ([]Tx, error)
+	Gas(ctx context.Context, height pkgTypes.Level) ([]Gas, error)
 }
+
+type Gas struct {
+	GasWanted int64           `bun:"gas_wanted"`
+	GasUsed   int64           `bun:"gas_used"`
+	Fee       decimal.Decimal `bun:"fee"`
+	GasPrice  decimal.Decimal `bun:"gas_price"`
+}
+
+type ByGasPrice []Gas
+
+func (gp ByGasPrice) Len() int           { return len(gp) }
+func (gp ByGasPrice) Less(i, j int) bool { return gp[j].GasPrice.GreaterThan(gp[i].GasPrice) }
+func (gp ByGasPrice) Swap(i, j int)      { gp[i], gp[j] = gp[j], gp[i] }
 
 type TxFilter struct {
 	Limit                int

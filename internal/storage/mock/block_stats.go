@@ -81,3 +81,42 @@ func (c *IBlockStatsByHeightCall) DoAndReturn(f func(context.Context, types.Leve
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
+
+// LastFrom mocks base method.
+func (m *MockIBlockStats) LastFrom(ctx context.Context, head types.Level, limit int) ([]storage.BlockStats, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LastFrom", ctx, head, limit)
+	ret0, _ := ret[0].([]storage.BlockStats)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LastFrom indicates an expected call of LastFrom.
+func (mr *MockIBlockStatsMockRecorder) LastFrom(ctx, head, limit any) *IBlockStatsLastFromCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastFrom", reflect.TypeOf((*MockIBlockStats)(nil).LastFrom), ctx, head, limit)
+	return &IBlockStatsLastFromCall{Call: call}
+}
+
+// IBlockStatsLastFromCall wrap *gomock.Call
+type IBlockStatsLastFromCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IBlockStatsLastFromCall) Return(arg0 []storage.BlockStats, arg1 error) *IBlockStatsLastFromCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IBlockStatsLastFromCall) Do(f func(context.Context, types.Level, int) ([]storage.BlockStats, error)) *IBlockStatsLastFromCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IBlockStatsLastFromCall) DoAndReturn(f func(context.Context, types.Level, int) ([]storage.BlockStats, error)) *IBlockStatsLastFromCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}

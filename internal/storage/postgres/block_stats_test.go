@@ -125,6 +125,19 @@ func (s *BlockStatsTestSuite) TestByHeight() {
 	}
 }
 
+func (s *BlockStatsTestSuite) TestLastFrom() {
+	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelCtx()
+
+	got, err := s.storage.BlockStats.LastFrom(ctx, 999, 1)
+	s.Require().NoError(err)
+	s.Require().Len(got, 1)
+
+	item := got[0]
+	s.Require().EqualValues(1, item.Id)
+	s.Require().EqualValues(999, item.Height)
+}
+
 func TestSuiteBlockStats_Run(t *testing.T) {
 	suite.Run(t, new(BlockStatsTestSuite))
 }

@@ -1020,6 +1020,27 @@
                 }
             }
         },
+        "/v1/gas/price": {
+            "get": {
+                "description": "Get estimated gas price based on historical data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gas"
+                ],
+                "summary": "Get estimated gas price",
+                "operationId": "gas-price",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.GasPrice"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/head": {
             "get": {
                 "description": "Get current indexer head",
@@ -2907,6 +2928,26 @@
                         }
                     ],
                     "example": "commission"
+                }
+            }
+        },
+        "responses.GasPrice": {
+            "type": "object",
+            "properties": {
+                "fast": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.1234"
+                },
+                "median": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.1234"
+                },
+                "slow": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.1234"
                 }
             }
         },

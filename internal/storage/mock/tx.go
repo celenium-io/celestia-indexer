@@ -16,6 +16,7 @@ import (
 	reflect "reflect"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
+	types "github.com/celenium-io/celestia-indexer/pkg/types"
 	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -234,6 +235,45 @@ func (c *ITxFilterCall) Do(f func(context.Context, storage.TxFilter) ([]storage.
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *ITxFilterCall) DoAndReturn(f func(context.Context, storage.TxFilter) ([]storage.Tx, error)) *ITxFilterCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Gas mocks base method.
+func (m *MockITx) Gas(ctx context.Context, height types.Level) ([]storage.Gas, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Gas", ctx, height)
+	ret0, _ := ret[0].([]storage.Gas)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Gas indicates an expected call of Gas.
+func (mr *MockITxMockRecorder) Gas(ctx, height any) *ITxGasCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Gas", reflect.TypeOf((*MockITx)(nil).Gas), ctx, height)
+	return &ITxGasCall{Call: call}
+}
+
+// ITxGasCall wrap *gomock.Call
+type ITxGasCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *ITxGasCall) Return(arg0 []storage.Gas, arg1 error) *ITxGasCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *ITxGasCall) Do(f func(context.Context, types.Level) ([]storage.Gas, error)) *ITxGasCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *ITxGasCall) DoAndReturn(f func(context.Context, types.Level) ([]storage.Gas, error)) *ITxGasCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

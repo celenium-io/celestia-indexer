@@ -232,6 +232,21 @@ definitions:
         - $ref: '#/definitions/types.EventType'
         example: commission
     type: object
+  responses.GasPrice:
+    properties:
+      fast:
+        example: "0.1234"
+        format: string
+        type: string
+      median:
+        example: "0.1234"
+        format: string
+        type: string
+      slow:
+        example: "0.1234"
+        format: string
+        type: string
+    type: object
   responses.HistogramItem:
     properties:
       time:
@@ -1632,6 +1647,20 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get estimated gas for pay for blob
+      tags:
+      - gas
+  /v1/gas/price:
+    get:
+      description: Get estimated gas price based on historical data
+      operationId: gas-price
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.GasPrice'
+      summary: Get estimated gas price
       tags:
       - gas
   /v1/head:

@@ -14,6 +14,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/cmd/api/cache"
+	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
 	"github.com/celenium-io/celestia-indexer/internal/profiler"
@@ -332,10 +333,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	gasHandler := handler.NewGasHandler()
+	gasHandler := handler.NewGasHandler(db.State, db.Tx, db.BlockStats, gasTracker)
 	gas := v1.Group("/gas")
 	{
 		gas.GET("/estimate_for_pfb", gasHandler.EstimateForPfb)
+		gas.GET("/price", gasHandler.EstimatePrice)
 	}
 
 	if cfg.ApiConfig.Prometheus {
@@ -393,4 +395,15 @@ func initCache(ctx context.Context, e *echo.Echo) {
 	}, observer)
 	e.Use(cache.Middleware(endpointCache, cacheSkipper))
 	endpointCache.Start(ctx)
+}
+
+var gasTracker *gas.Tracker
+
+func initGasTracker(ctx context.Context, db postgres.Storage) {
+	observer := dispatcher.Observe(storage.ChannelHead)
+	gasTracker = gas.NewTracker(db.State, db.BlockStats, db.Tx, observer)
+	if err := gasTracker.Init(ctx); err != nil {
+		panic(err)
+	}
+	gasTracker.Start(ctx)
 }

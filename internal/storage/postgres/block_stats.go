@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
@@ -51,5 +52,14 @@ func (b *BlockStats) ByHeight(ctx context.Context, height pkgTypes.Level) (stats
 		stats.MessagesCounts[stat.Type] = stat.Count
 	}
 
+	return
+}
+
+func (b *BlockStats) LastFrom(ctx context.Context, head pkgTypes.Level, limit int) (stats []storage.BlockStats, err error) {
+	err = b.db.DB().NewSelect().Model(&stats).
+		Where("height <= ?", head).
+		Limit(limit).
+		Order("id desc").
+		Scan(ctx)
 	return
 }
