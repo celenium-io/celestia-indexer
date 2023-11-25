@@ -24,11 +24,15 @@ func (r *Module) worker(ctx context.Context, level types.Level) {
 		default:
 		}
 
-		block, err := r.api.BlockDataGet(ctx, level)
+		requestTimeout, cancel := context.WithTimeout(ctx, time.Second*10)
+		block, err := r.api.BlockDataGet(requestTimeout, level)
 		if err != nil {
+			cancel()
+
 			if errors.Is(err, context.Canceled) {
 				return
 			}
+
 			r.Log.Err(err).
 				Uint64("height", uint64(level)).
 				Msg("while getting block data")
@@ -38,6 +42,7 @@ func (r *Module) worker(ctx context.Context, level types.Level) {
 		}
 
 		result = block
+		cancel()
 		break
 	}
 
