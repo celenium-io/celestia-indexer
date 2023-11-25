@@ -22,6 +22,10 @@ import (
 	"golang.org/x/time/rate"
 )
 
+const (
+	celeniumUserAgent = "Celenium Indexer"
+)
+
 type API struct {
 	client    *http.Client
 	cfg       config.DataSource
@@ -80,6 +84,7 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 	if err != nil {
 		return err
 	}
+	req.Header.Set("User-Agent", celeniumUserAgent)
 
 	response, err := api.client.Do(req)
 	if err != nil {
@@ -123,6 +128,7 @@ func (api *API) post(ctx context.Context, requests []types.Request, output any) 
 	if err != nil {
 		return err
 	}
+	req.Header.Set("User-Agent", celeniumUserAgent)
 
 	response, err := api.client.Do(req)
 	if err != nil {
