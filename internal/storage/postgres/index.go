@@ -182,6 +182,16 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// Validator
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Validator)(nil)).
+			Index("validator_cons_address_idx").
+			Column("cons_address").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }
