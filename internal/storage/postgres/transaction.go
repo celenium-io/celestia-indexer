@@ -200,7 +200,7 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 
 	for i := range validators {
 		query := tx.Tx().NewInsert().Model(validators[i]).
-			On("CONFLICT ON CONSTRAINT cons_address_validator DO UPDATE").
+			On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
 			Set("rate = EXCLUDED.rate").
 			Set("min_self_delegation = EXCLUDED.min_self_delegation")
 
