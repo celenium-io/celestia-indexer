@@ -25,7 +25,7 @@ type Validator struct {
 
 	Id          uint64 `bun:"id,pk,notnull,autoincrement"                comment:"Unique internal identity"`
 	Delegator   string `bun:"delegator,type:text"                        comment:"Delegator address"`
-	Address     string `bun:"address,unique:address_validator,type:text" comment:"Validator address"`
+	Address     string `bun:"address,type:text"                          comment:"Validator address"`
 	ConsAddress string `bun:"cons_address,unique:cons_address_validator" comment:"Consensus address"`
 
 	Moniker  string `bun:"moniker,type:text"  comment:"Human-readable name for the validator"`
