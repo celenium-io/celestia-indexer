@@ -1,7 +1,7 @@
 CREATE MATERIALIZED VIEW IF NOT EXISTS block_stats_by_month
 WITH (timescaledb.continuous, timescaledb.materialized_only=true) AS
 	select 
-		time_bucket('1 month'::interval, day.ts) AS ts,
+		time_bucket('1 month', day.ts) AS ts,
 		sum(blobs_size)/(count(*) * 86400.0) as bps,
 		max(bps_max) as bps_max,
 		min(bps_min) as bps_min,
@@ -22,14 +22,4 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=true) AS
 	group by 1
 	order by 1 desc;
 
-SELECT add_continuous_aggregate_policy('block_stats_by_month',
-  start_offset => NULL,
-  end_offset => INTERVAL '1 minute',
-  schedule_interval => INTERVAL '1 hour',
-  if_not_exists => true)
-WHERE NOT (SELECT EXISTS (
-    SELECT FROM 
-        "_timescaledb_catalog".continuous_agg
-    WHERE user_view_schema = 'public' AND user_view_name = 'block_stats_by_month'
-    )
-);
+CALL add_view_refresh_job('block_stats_by_month', INTERVAL '10 minute', INTERVAL '1 hour');

@@ -20,8 +20,8 @@ import (
 type Storage struct {
 	*postgres.Storage
 
-	cfg      config.Database
-	viewsDir string
+	cfg        config.Database
+	scriptsDir string
 
 	Blocks        models.IBlock
 	BlockStats    models.IBlockStats
@@ -39,7 +39,7 @@ type Storage struct {
 }
 
 // Create -
-func Create(ctx context.Context, cfg config.Database, viewsDir string) (Storage, error) {
+func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storage, error) {
 	strg, err := postgres.Create(ctx, cfg, initDatabase)
 	if err != nil {
 		return Storage{}, err
@@ -47,7 +47,7 @@ func Create(ctx context.Context, cfg config.Database, viewsDir string) (Storage,
 
 	s := Storage{
 		cfg:           cfg,
-		viewsDir:      viewsDir,
+		scriptsDir:    scriptsDir,
 		Storage:       strg,
 		Blocks:        NewBlocks(strg.Connection()),
 		BlockStats:    NewBlockStats(strg.Connection()),
@@ -64,7 +64,10 @@ func Create(ctx context.Context, cfg config.Database, viewsDir string) (Storage,
 		Notificator:   NewNotificator(cfg, strg.Connection().DB()),
 	}
 
-	if err := s.createViews(ctx, strg.Connection()); err != nil {
+	if err := s.createScripts(ctx, strg.Connection(), "functions", false); err != nil {
+		return s, errors.Wrap(err, "creating views")
+	}
+	if err := s.createScripts(ctx, strg.Connection(), "views", true); err != nil {
 		return s, errors.Wrap(err, "creating views")
 	}
 
