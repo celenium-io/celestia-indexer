@@ -4,6 +4,7 @@
 package responses
 
 import (
+	"encoding/hex"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -40,14 +41,18 @@ func NewTxCountHistogramItem(item storage.TxCountForLast24hItem) TxCountHistogra
 }
 
 type NamespaceUsage struct {
-	Name string `example:"00112233" format:"string"  json:"name" swaggertype:"string"`
-	Size int64  `example:"1283518"  format:"integer" json:"size" swaggertype:"number"`
+	Name        string `example:"00112233"                                                 format:"string"  json:"name"                   swaggertype:"string"`
+	Version     *byte  `examle:"1"                                                         format:"byte"    json:"version,omitempty"      swaggertype:"integer"`
+	NamespaceID string `example:"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02" format:"binary"  json:"namespace_id,omitempty" swaggertype:"string"`
+	Size        int64  `example:"1283518"                                                  format:"integer" json:"size"                   swaggertype:"number"`
 }
 
 func NewNamespaceUsage(ns storage.Namespace) NamespaceUsage {
 	return NamespaceUsage{
-		Name: decodeName(ns.NamespaceID),
-		Size: ns.Size,
+		Name:        decodeName(ns.NamespaceID),
+		Size:        ns.Size,
+		Version:     &ns.Version,
+		NamespaceID: hex.EncodeToString(ns.NamespaceID),
 	}
 }
 

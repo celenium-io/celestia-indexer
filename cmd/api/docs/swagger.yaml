@@ -381,10 +381,17 @@ definitions:
         example: "00112233"
         format: string
         type: string
+      namespace_id:
+        example: 4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02
+        format: binary
+        type: string
       size:
         example: 1283518
         format: integer
         type: number
+      version:
+        format: byte
+        type: integer
     type: object
   responses.Params:
     additionalProperties:
@@ -2191,6 +2198,12 @@ paths:
       description: Get namespaces with sorting by size. Returns top 100 namespaces.
         Namespaces which is not included to top 100 grouped into 'others' item
       operationId: stats-namespace-usage
+      parameters:
+      - description: Count of entities
+        in: query
+        maximum: 100
+        name: top
+        type: integer
       produces:
       - application/json
       responses:

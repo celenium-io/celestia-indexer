@@ -265,13 +265,16 @@ func (s *StatsTestSuite) TestTxCount24h() {
 }
 
 func (s *StatsTestSuite) TestNamespaceUsage() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	q := make(url.Values)
+	q.Set("top", "1")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/namespace/usage")
 
 	s.ns.EXPECT().
-		Active(gomock.Any(), "size", 100).
+		Active(gomock.Any(), "size", 1).
 		Return([]storage.Namespace{
 			testNamespace,
 		}, nil)
@@ -293,10 +296,14 @@ func (s *StatsTestSuite) TestNamespaceUsage() {
 	item0 := response[0]
 	s.Require().Equal("010203040506070809000102030405060708090001020304050607", item0.Name)
 	s.Require().Equal(testNamespace.Size, item0.Size)
+	s.Require().Equal("00010203040506070809000102030405060708090001020304050607", item0.NamespaceID)
+	s.Require().NotNil(item0.Version)
+	s.Require().EqualValues(1, *item0.Version)
 
 	item1 := response[1]
 	s.Require().Equal("others", item1.Name)
 	s.Require().EqualValues(900, item1.Size)
+	s.Require().Nil(item1.Version)
 }
 
 func (s *StatsTestSuite) TestBlockStatsHistogram() {
