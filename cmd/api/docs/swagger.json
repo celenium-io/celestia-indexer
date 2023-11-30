@@ -1760,6 +1760,15 @@
                 ],
                 "summary": "Get namespaces with sorting by size.",
                 "operationId": "stats-namespace-usage",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of entities",
+                        "name": "top",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -3127,10 +3136,19 @@
                     "format": "string",
                     "example": "00112233"
                 },
+                "namespace_id": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02"
+                },
                 "size": {
                     "type": "number",
                     "format": "integer",
                     "example": 1283518
+                },
+                "version": {
+                    "type": "integer",
+                    "format": "byte"
                 }
             }
         },

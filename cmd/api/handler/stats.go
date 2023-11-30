@@ -192,18 +192,32 @@ func (sh StatsHandler) TxCountHourly24h(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+type namespaceUsageRequest struct {
+	Top *int `example:"100" query:"top" validate:"omitempty,min=1,max=100"`
+}
+
 // NamespaceUsage godoc
 //
 //	@Summary				Get namespaces with sorting by size.
 //	@Description        	Get namespaces with sorting by size. Returns top 100 namespaces. Namespaces which is not included to top 100 grouped into 'others' item
 //	@Tags					stats
 //	@ID						stats-namespace-usage
+//	@Param					top		query	integer	false	"Count of entities"	mininum(1) maximum(100)
 //	@Produce				json
 //	@Success				200	{array}     responses.NamespaceUsage
 //	@Failure				500	{object}	Error
 //	@Router					/v1/stats/namespace/usage [get]
 func (sh StatsHandler) NamespaceUsage(c echo.Context) error {
-	namespaces, err := sh.nsRepo.Active(c.Request().Context(), "size", 100)
+	req, err := bindAndValidate[namespaceUsageRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	if req.Top == nil {
+		top := 10
+		req.Top = &top
+	}
+
+	namespaces, err := sh.nsRepo.Active(c.Request().Context(), "size", *req.Top)
 	if err != nil {
 		return internalServerError(c, err)
 	}
@@ -224,8 +238,9 @@ func (sh StatsHandler) NamespaceUsage(c echo.Context) error {
 	}
 
 	response = append(response, responses.NamespaceUsage{
-		Name: "others",
-		Size: state[0].TotalBlobsSize - top100Size,
+		Name:    "others",
+		Size:    state[0].TotalBlobsSize - top100Size,
+		Version: nil,
 	})
 
 	return returnArray(c, response)
