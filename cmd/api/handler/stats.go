@@ -217,7 +217,7 @@ func (sh StatsHandler) NamespaceUsage(c echo.Context) error {
 		req.Top = &top
 	}
 
-	namespaces, err := sh.nsRepo.Active(c.Request().Context(), "size", *req.Top)
+	namespaces, err := sh.nsRepo.ListWithSort(c.Request().Context(), "size", sdk.SortOrderDesc, *req.Top, 0)
 	if err != nil {
 		return internalServerError(c, err)
 	}

@@ -1708,12 +1708,20 @@ paths:
         in: query
         name: offset
         type: integer
-      - description: Sort order
+      - description: 'Sort order. Default: desc'
         enum:
         - asc
         - desc
         in: query
         name: sort
+        type: string
+      - description: Sort field. If it's empty internal id is used
+        enum:
+        - time
+        - pfb_count
+        - size
+        in: query
+        name: sort_by
         type: string
       produces:
       - application/json

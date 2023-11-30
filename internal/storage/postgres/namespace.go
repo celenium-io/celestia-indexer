@@ -7,10 +7,10 @@ import (
 	"context"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/uptrace/bun"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 )
 
@@ -81,7 +81,7 @@ func (n *Namespace) CountMessagesByHeight(ctx context.Context, height pkgTypes.L
 		Count(ctx)
 }
 
-func (n *Namespace) Active(ctx context.Context, sortField string, top int) (ns []storage.Namespace, err error) {
+func (n *Namespace) ListWithSort(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) (ns []storage.Namespace, err error) {
 	var field string
 	switch sortField {
 	case "time":
@@ -91,12 +91,17 @@ func (n *Namespace) Active(ctx context.Context, sortField string, top int) (ns [
 	case "size":
 		field = "size"
 	default:
-		field = "last_message_time"
+		field = "id"
 	}
 
-	query := n.DB().NewSelect().Model(&ns).OrderExpr("? desc", bun.Safe(field))
-	limitScope(query, top)
+	if offset < 0 {
+		offset = 0
+	}
 
-	err = query.Scan(ctx)
+	query := n.DB().NewSelect().Model(&ns)
+	limitScope(query, limit)
+	sortScope(query, field, sort)
+
+	err = query.Offset(offset).Scan(ctx)
 	return
 }

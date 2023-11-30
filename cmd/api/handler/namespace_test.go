@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -123,9 +124,9 @@ func (s *NamespaceTestSuite) TestList() {
 	c.SetPath("/namespace")
 
 	s.namespaces.EXPECT().
-		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return([]*storage.Namespace{
-			&testNamespace,
+		ListWithSort(gomock.Any(), "", sdk.SortOrderDesc, 10, 0).
+		Return([]storage.Namespace{
+			testNamespace,
 		}, nil)
 
 	s.Require().NoError(s.handler.List(c))
@@ -141,6 +142,59 @@ func (s *NamespaceTestSuite) TestList() {
 	s.Require().EqualValues(12, namespaces[0].PfbCount)
 	s.Require().Equal(testNamespaceId, namespaces[0].NamespaceID)
 	s.Require().Equal(testNamespaceBase64, namespaces[0].Hash)
+}
+
+func (s *NamespaceTestSuite) TestListWithSort() {
+	for _, request := range []namespaceList{
+		{
+			Sort:   "asc",
+			SortBy: "size",
+		}, {
+			Sort:   "desc",
+			SortBy: "size",
+		}, {
+			Sort:   "asc",
+			SortBy: "pfb_count",
+		}, {
+			Sort:   "asc",
+			SortBy: "pfb_count",
+		}, {
+			Sort:   "asc",
+			SortBy: "time",
+		}, {
+			Sort:   "asc",
+			SortBy: "time",
+		},
+	} {
+		q := make(url.Values)
+		q.Set("sort", request.Sort)
+		q.Set("sort_by", request.SortBy)
+
+		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+		rec := httptest.NewRecorder()
+		c := s.echo.NewContext(req, rec)
+		c.SetPath("/namespace")
+
+		s.namespaces.EXPECT().
+			ListWithSort(gomock.Any(), request.SortBy, pgSort(request.Sort), 10, 0).
+			Return([]storage.Namespace{
+				testNamespace,
+			}, nil)
+
+		s.Require().NoError(s.handler.List(c))
+		s.Require().Equal(http.StatusOK, rec.Code)
+
+		var namespaces []responses.Namespace
+		err := json.NewDecoder(rec.Body).Decode(&namespaces)
+		s.Require().NoError(err)
+		s.Require().Len(namespaces, 1)
+		s.Require().EqualValues(1, namespaces[0].ID)
+		s.Require().EqualValues(100, namespaces[0].Size)
+		s.Require().EqualValues(1, namespaces[0].Version)
+		s.Require().EqualValues(12, namespaces[0].PfbCount)
+		s.Require().Equal(testNamespaceId, namespaces[0].NamespaceID)
+		s.Require().Equal(testNamespaceBase64, namespaces[0].Hash)
+	}
 }
 
 func (s *NamespaceTestSuite) TestGetWithVersion() {
@@ -358,7 +412,7 @@ func (s *NamespaceTestSuite) TestGetActive() {
 	c.SetPath("/namespace/active")
 
 	s.namespaces.EXPECT().
-		Active(gomock.Any(), "", 5).
+		ListWithSort(gomock.Any(), "", sdk.SortOrderDesc, 5, 0).
 		Return([]storage.Namespace{
 			testNamespace,
 		}, nil)
@@ -389,7 +443,7 @@ func (s *NamespaceTestSuite) TestGetActiveWithSort() {
 		c.SetPath("/namespace/active")
 
 		s.namespaces.EXPECT().
-			Active(gomock.Any(), field, 5).
+			ListWithSort(gomock.Any(), field, sdk.SortOrderDesc, 5, 0).
 			Return([]storage.Namespace{
 				testNamespace,
 			}, nil)

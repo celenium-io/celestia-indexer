@@ -274,7 +274,7 @@ func (s *StatsTestSuite) TestNamespaceUsage() {
 	c.SetPath("/v1/stats/namespace/usage")
 
 	s.ns.EXPECT().
-		Active(gomock.Any(), "size", 1).
+		ListWithSort(gomock.Any(), "size", sdk.SortOrderDesc, 1, 0).
 		Return([]storage.Namespace{
 			testNamespace,
 		}, nil)

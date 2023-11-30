@@ -13,6 +13,7 @@ import (
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
 
@@ -25,7 +26,7 @@ type INamespace interface {
 	Messages(ctx context.Context, id uint64, limit, offset int) ([]NamespaceMessage, error)
 	MessagesByHeight(ctx context.Context, height pkgTypes.Level, limit, offset int) ([]NamespaceMessage, error)
 	CountMessagesByHeight(ctx context.Context, height pkgTypes.Level) (int, error)
-	Active(ctx context.Context, sortField string, top int) ([]Namespace, error)
+	ListWithSort(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) (ns []Namespace, err error)
 }
 
 // Namespace -
