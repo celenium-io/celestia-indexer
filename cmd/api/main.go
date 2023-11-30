@@ -43,7 +43,7 @@ func main() {
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 
-	db := initDatabase(cfg.Database, cfg.Indexer.ViewsDir)
+	db := initDatabase(cfg.Database, cfg.Indexer.ScriptsDir)
 	e := initEcho(cfg.ApiConfig, cfg.Environment)
 	initDispatcher(ctx, db)
 	initGasTracker(ctx, db)

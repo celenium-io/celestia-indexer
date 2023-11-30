@@ -1,7 +1,7 @@
 CREATE MATERIALIZED VIEW IF NOT EXISTS namespace_stats_by_year
 WITH (timescaledb.continuous, timescaledb.materialized_only=true) AS
 	select 
-		time_bucket('1 year'::interval, nm.ts) AS ts,
+		time_bucket('1 year', nm.ts) AS ts,
 		nm.namespace_id,
 		count(*) as pfb_count,
 		sum(size) as size		
@@ -9,15 +9,4 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=true) AS
 	group by 1, 2
 	order by 1 desc;
 
-
-SELECT add_continuous_aggregate_policy('namespace_stats_by_year',
-  start_offset => NULL,
-  end_offset => INTERVAL '1 minute',
-  schedule_interval => INTERVAL '1 hour',
-  if_not_exists => true)
-WHERE NOT (SELECT EXISTS (
-    SELECT FROM 
-        "_timescaledb_catalog".continuous_agg
-    WHERE user_view_schema = 'public' AND user_view_name = 'namespace_stats_by_year'
-    )
-);
+CALL add_view_refresh_job('namespace_stats_by_year', INTERVAL '10 minute', INTERVAL '1 hour');

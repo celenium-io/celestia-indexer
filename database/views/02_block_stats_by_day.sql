@@ -22,14 +22,4 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=true) AS
 	group by 1
 	order by 1 desc;
 
-SELECT add_continuous_aggregate_policy('block_stats_by_day',
-  start_offset => NULL,
-  end_offset => INTERVAL '1 minute',
-  schedule_interval => INTERVAL '1 hour',
-  if_not_exists => true)
-WHERE NOT (SELECT EXISTS (
-    SELECT FROM 
-        "_timescaledb_catalog".continuous_agg
-    WHERE user_view_schema = 'public' AND user_view_name = 'block_stats_by_day'
-    )
-);
+CALL add_view_refresh_job('block_stats_by_day', INTERVAL '1 minute', INTERVAL '1 hour');
