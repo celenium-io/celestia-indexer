@@ -203,10 +203,10 @@ func (s Stats) Series(ctx context.Context, timeframe storage.Timeframe, name str
 	}
 
 	if req.From > 0 {
-		query = query.Where("time >= to_timestamp(?)", req.From)
+		query = query.Where("ts >= to_timestamp(?)", req.From)
 	}
 	if req.To > 0 {
-		query = query.Where("time < to_timestamp(?)", req.To)
+		query = query.Where("ts < to_timestamp(?)", req.To)
 	}
 
 	err = query.Limit(100).Scan(ctx, &response)
@@ -242,10 +242,10 @@ func (s Stats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe,
 	}
 
 	if req.From > 0 {
-		query = query.Where("time >= to_timestamp(?)", req.From)
+		query = query.Where("ts >= to_timestamp(?)", req.From)
 	}
 	if req.To > 0 {
-		query = query.Where("time < to_timestamp(?)", req.To)
+		query = query.Where("ts < to_timestamp(?)", req.To)
 	}
 
 	err = query.Limit(100).Scan(ctx, &response)
