@@ -1168,7 +1168,7 @@
                             "size"
                         ],
                         "type": "string",
-                        "description": "Sort field",
+                        "description": "Sort field. Default: time",
                         "name": "sort",
                         "in": "query"
                     }

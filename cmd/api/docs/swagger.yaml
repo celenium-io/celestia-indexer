@@ -1865,7 +1865,7 @@ paths:
       description: Get last used namespace
       operationId: get-namespace-active
       parameters:
-      - description: Sort field
+      - description: 'Sort field. Default: time'
         enum:
         - time
         - pfb_count
