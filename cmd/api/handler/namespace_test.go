@@ -412,7 +412,7 @@ func (s *NamespaceTestSuite) TestGetActive() {
 	c.SetPath("/namespace/active")
 
 	s.namespaces.EXPECT().
-		ListWithSort(gomock.Any(), "", sdk.SortOrderDesc, 5, 0).
+		ListWithSort(gomock.Any(), "time", sdk.SortOrderDesc, 5, 0).
 		Return([]storage.Namespace{
 			testNamespace,
 		}, nil)
