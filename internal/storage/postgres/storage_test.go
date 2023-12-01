@@ -490,7 +490,7 @@ func (s *StorageTestSuite) TestNamespaceActive() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	ns, err := s.storage.Namespace.Active(ctx, "", 2)
+	ns, err := s.storage.Namespace.ListWithSort(ctx, "", sdk.SortOrderDesc, 2, 0)
 	s.Require().NoError(err)
 	s.Require().Len(ns, 2)
 
@@ -504,7 +504,7 @@ func (s *StorageTestSuite) TestNamespaceActiveByPfbCount() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	ns, err := s.storage.Namespace.Active(ctx, "pfb_count", 2)
+	ns, err := s.storage.Namespace.ListWithSort(ctx, "pfb_count", sdk.SortOrderDesc, 2, 0)
 	s.Require().NoError(err)
 	s.Require().Len(ns, 2)
 
@@ -518,7 +518,7 @@ func (s *StorageTestSuite) TestNamespaceActiveBySize() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	ns, err := s.storage.Namespace.Active(ctx, "size", 2)
+	ns, err := s.storage.Namespace.ListWithSort(ctx, "size", sdk.SortOrderDesc, 2, 0)
 	s.Require().NoError(err)
 	s.Require().Len(ns, 2)
 

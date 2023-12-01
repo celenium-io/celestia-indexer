@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -162,28 +163,29 @@ func (handler *NamespaceHandler) GetWithVersion(c echo.Context) error {
 //	@Description	List namespace info
 //	@Tags			namespace
 //	@ID				list-namespace
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
-//	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
+//	@Param			limit	query	integer	false	"Count of requested entities"						mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"											mininum(1)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"							Enums(asc, desc)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"		Enums(time, pfb_count, size)
 //	@Produce		json
 //	@Success		200	{array}		responses.Namespace
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/namespace [get]
 func (handler *NamespaceHandler) List(c echo.Context) error {
-	req, err := bindAndValidate[limitOffsetPagination](c)
+	req, err := bindAndValidate[namespaceList](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
 	req.SetDefault()
 
-	namespace, err := handler.namespace.List(c.Request().Context(), req.Limit, req.Offset, pgSort(req.Sort))
+	namespace, err := handler.namespace.ListWithSort(c.Request().Context(), req.SortBy, pgSort(req.Sort), req.Limit, req.Offset)
 	if err != nil {
 		return handleError(c, err, handler.namespace)
 	}
 	response := make([]responses.Namespace, len(namespace))
 	for i := range namespace {
-		response[i] = responses.NewNamespace(*namespace[i])
+		response[i] = responses.NewNamespace(namespace[i])
 	}
 	return returnArray(c, response)
 }
@@ -334,7 +336,7 @@ func (handler *NamespaceHandler) GetActive(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	active, err := handler.namespace.Active(c.Request().Context(), req.Sort, 5)
+	active, err := handler.namespace.ListWithSort(c.Request().Context(), req.Sort, sdk.SortOrderDesc, 5, 0)
 	if err != nil {
 		return handleError(c, err, handler.namespace)
 	}
