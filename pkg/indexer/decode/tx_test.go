@@ -4,11 +4,12 @@
 package decode
 
 import (
-	"github.com/celenium-io/celestia-indexer/internal/consts"
+	"testing"
+
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"testing"
 
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/types"
@@ -172,7 +173,7 @@ func TestGetFeeInDenom(t *testing.T) {
 	testCases := []struct {
 		desc        string
 		amount      types.Coins
-		denom       consts.Denom
+		denom       currency.Denom
 		expectedFee decimal.Decimal
 		expectedOk  bool
 	}{
@@ -181,7 +182,7 @@ func TestGetFeeInDenom(t *testing.T) {
 			amount: types.Coins{
 				types.NewCoin("utia", types.NewInt(1000)),
 			},
-			denom:       consts.Utia,
+			denom:       currency.Utia,
 			expectedFee: decimal.NewFromInt(1000),
 			expectedOk:  true,
 		},
@@ -190,7 +191,7 @@ func TestGetFeeInDenom(t *testing.T) {
 			amount: types.Coins{
 				types.NewCoin("tia", types.NewInt(5000000)),
 			},
-			denom:       consts.Tia,
+			denom:       currency.Tia,
 			expectedFee: decimal.NewFromInt(5000000).Shift(6),
 			expectedOk:  true,
 		},
@@ -199,7 +200,7 @@ func TestGetFeeInDenom(t *testing.T) {
 			amount: types.Coins{
 				types.NewCoin("unknown", types.NewInt(1000)),
 			},
-			denom:       consts.Utia,
+			denom:       currency.Utia,
 			expectedFee: decimal.Zero,
 			expectedOk:  false,
 		},

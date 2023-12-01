@@ -4,7 +4,7 @@
 package decode
 
 import (
-	"github.com/celenium-io/celestia-indexer/internal/consts"
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/celestiaorg/celestia-app/app"
 	"github.com/celestiaorg/celestia-app/app/encoding"
@@ -103,9 +103,9 @@ func decodeFee(authInfo tx.AuthInfo) (decimal.Decimal, error) {
 		return decimal.Zero, errors.Errorf("found fee in %d currencies", len(amount))
 	}
 
-	fee, ok := getFeeInDenom(amount, consts.Utia)
+	fee, ok := getFeeInDenom(amount, currency.Utia)
 	if !ok {
-		if fee, ok = getFeeInDenom(amount, consts.Tia); !ok {
+		if fee, ok = getFeeInDenom(amount, currency.Tia); !ok {
 			// TODO stop indexer if tx is not in failed status
 			return decimal.Zero, errors.New("couldn't find fee amount in utia or in tia denom")
 		}
@@ -114,17 +114,17 @@ func decodeFee(authInfo tx.AuthInfo) (decimal.Decimal, error) {
 	return fee, nil
 }
 
-func getFeeInDenom(amount cosmosTypes.Coins, denom consts.Denom) (decimal.Decimal, bool) {
+func getFeeInDenom(amount cosmosTypes.Coins, denom currency.Denom) (decimal.Decimal, bool) {
 	ok, utiaCoin := amount.Find(string(denom))
 	if !ok {
 		return decimal.Zero, false
 	}
 
 	switch denom {
-	case consts.Utia:
+	case currency.Utia:
 		fee := decimal.NewFromBigInt(utiaCoin.Amount.BigInt(), 0)
 		return fee, true
-	case consts.Tia:
+	case currency.Tia:
 		fee := decimal.NewFromBigInt(utiaCoin.Amount.BigInt(), 6)
 		return fee, true
 	default:

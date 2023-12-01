@@ -7,7 +7,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/celenium-io/celestia-indexer/internal/consts"
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -189,7 +189,7 @@ func Test_getBalanceUpdates(t *testing.T) {
 					Address: testAddress,
 					Hash:    testHashAddress,
 					Balance: storage.Balance{
-						Currency: consts.DefaultCurrency,
+						Currency: currency.DefaultCurrency,
 						Total:    decimal.RequireFromString("100"),
 					},
 					LastHeight: 100,
