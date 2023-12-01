@@ -6,6 +6,7 @@ package responses
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/goccy/go-json"
+	"github.com/shopspring/decimal"
 )
 
 type Constants struct {
@@ -26,6 +27,14 @@ type DenomMetadata struct {
 	Units json.RawMessage `json:"units"`
 }
 
+func roundCounstant(val string) string {
+	d, err := decimal.NewFromString(val)
+	if err != nil {
+		return val
+	}
+	return d.String()
+}
+
 func NewConstants(consts []storage.Constant, denomMetadata []storage.DenomMetadata) Constants {
 	response := Constants{
 		Module:        make(map[string]Params),
@@ -34,10 +43,10 @@ func NewConstants(consts []storage.Constant, denomMetadata []storage.DenomMetada
 
 	for i := range consts {
 		if params, ok := response.Module[string(consts[i].Module)]; ok {
-			params[consts[i].Name] = consts[i].Value
+			params[consts[i].Name] = roundCounstant(consts[i].Value)
 		} else {
 			response.Module[string(consts[i].Module)] = Params{
-				consts[i].Name: consts[i].Value,
+				consts[i].Name: roundCounstant(consts[i].Value),
 			}
 		}
 	}
