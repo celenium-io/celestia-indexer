@@ -325,7 +325,7 @@ type getActiveRequest struct {
 //	@Description	Get last used namespace
 //	@Tags			namespace
 //	@ID				get-namespace-active
-//	@Param			sort	query	string	false	"Sort field"	Enums(time,pfb_count,size)
+//	@Param			sort	query	string	false	"Sort field. Default: time"	Enums(time,pfb_count,size)
 //	@Produce		json
 //	@Success		200	{array}		responses.Namespace
 //	@Failure		500	{object}	Error
@@ -334,6 +334,10 @@ func (handler *NamespaceHandler) GetActive(c echo.Context) error {
 	req, err := bindAndValidate[getActiveRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
+	}
+
+	if req.Sort == "" {
+		req.Sort = "time"
 	}
 
 	active, err := handler.namespace.ListWithSort(c.Request().Context(), req.Sort, sdk.SortOrderDesc, 5, 0)
