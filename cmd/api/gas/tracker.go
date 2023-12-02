@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/workerpool"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -189,9 +190,9 @@ func (tracker *Tracker) computeMetrics() error {
 
 	tracker.mx.Lock()
 	{
-		tracker.gasState.Slow = slow.StringFixed(8)
-		tracker.gasState.Median = median.StringFixed(8)
-		tracker.gasState.Fast = fast.StringFixed(8)
+		tracker.gasState.Slow = currency.StringTia(slow)
+		tracker.gasState.Median = currency.StringTia(median)
+		tracker.gasState.Fast = currency.StringTia(fast)
 	}
 	tracker.mx.Unlock()
 

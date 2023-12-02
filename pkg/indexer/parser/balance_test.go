@@ -6,7 +6,7 @@ package parser
 import (
 	"testing"
 
-	"github.com/celenium-io/celestia-indexer/internal/consts"
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/shopspring/decimal"
@@ -39,7 +39,7 @@ func Test_parseCoinSpent(t *testing.T) {
 				Address:    testAddress,
 				Hash:       testHashAddress,
 				Balance: storage.Balance{
-					Currency: consts.DefaultCurrency,
+					Currency: currency.DefaultCurrency,
 					Total:    decimal.RequireFromString("-123"),
 				},
 			},
@@ -56,7 +56,7 @@ func Test_parseCoinSpent(t *testing.T) {
 				Address:    testAddress,
 				Hash:       testHashAddress,
 				Balance: storage.Balance{
-					Currency: consts.DefaultCurrency,
+					Currency: currency.DefaultCurrency,
 					Total:    decimal.Zero,
 				},
 			},

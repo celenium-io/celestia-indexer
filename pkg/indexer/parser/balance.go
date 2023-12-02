@@ -4,7 +4,7 @@
 package parser
 
 import (
-	"github.com/celenium-io/celestia-indexer/internal/consts"
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
@@ -32,7 +32,7 @@ func parseCoinSpent(data map[string]any, height pkgTypes.Level) (*storage.Addres
 		Height:     height,
 		LastHeight: height,
 		Balance: storage.Balance{
-			Currency: consts.DefaultCurrency,
+			Currency: currency.DefaultCurrency,
 			Total:    decimal.Zero,
 		},
 	}
@@ -65,7 +65,7 @@ func parseCoinReceived(data map[string]any, height pkgTypes.Level) (*storage.Add
 		Height:     height,
 		LastHeight: height,
 		Balance: storage.Balance{
-			Currency: consts.DefaultCurrency,
+			Currency: currency.DefaultCurrency,
 			Total:    decimal.Zero,
 		},
 	}

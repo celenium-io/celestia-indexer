@@ -6,7 +6,7 @@ package rollback
 import (
 	"context"
 
-	"github.com/celenium-io/celestia-indexer/internal/consts"
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
@@ -103,7 +103,7 @@ func coinSpent(data map[string]any) (*storage.Address, error) {
 		return nil, errors.Wrapf(err, "decode spender: %s", coinSpent.Spender)
 	}
 	balance := storage.Balance{
-		Currency: consts.DefaultCurrency,
+		Currency: currency.DefaultCurrency,
 		Total:    decimal.Zero,
 	}
 	if coinSpent.Amount != nil {
@@ -129,7 +129,7 @@ func coinReceived(data map[string]any) (*storage.Address, error) {
 	}
 
 	balance := storage.Balance{
-		Currency: consts.DefaultCurrency,
+		Currency: currency.DefaultCurrency,
 		Total:    decimal.Zero,
 	}
 	if coinReceived.Amount != nil {
