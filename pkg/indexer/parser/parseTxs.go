@@ -53,6 +53,7 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (stor
 		Events:    nil,
 		Signers:   make([]storage.Address, 0),
 		BlobsSize: 0,
+		BytesSize: int64(len(txRes.Data)),
 	}
 
 	for signer := range d.Signers {

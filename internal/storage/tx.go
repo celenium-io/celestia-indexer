@@ -80,6 +80,7 @@ type Tx struct {
 	Signers  []Address `bun:"m2m:signer,join:Tx=Address"`
 
 	BlobsSize int64 `bun:"-"`
+	BytesSize int64 `bun:"-"`
 }
 
 // TableName -

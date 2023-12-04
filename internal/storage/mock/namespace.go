@@ -356,18 +356,18 @@ func (c *INamespaceListCall) DoAndReturn(f func(context.Context, uint64, uint64,
 }
 
 // ListWithSort mocks base method.
-func (m *MockINamespace) ListWithSort(ctx context.Context, sortField string, sort storage0.SortOrder, top, offset int) ([]storage.Namespace, error) {
+func (m *MockINamespace) ListWithSort(ctx context.Context, sortField string, sort storage0.SortOrder, limit, offset int) ([]storage.Namespace, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListWithSort", ctx, sortField, sort, top, offset)
+	ret := m.ctrl.Call(m, "ListWithSort", ctx, sortField, sort, limit, offset)
 	ret0, _ := ret[0].([]storage.Namespace)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListWithSort indicates an expected call of ListWithSort.
-func (mr *MockINamespaceMockRecorder) ListWithSort(ctx, sortField, sort, top, offset any) *INamespaceListWithSortCall {
+func (mr *MockINamespaceMockRecorder) ListWithSort(ctx, sortField, sort, limit, offset any) *INamespaceListWithSortCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListWithSort", reflect.TypeOf((*MockINamespace)(nil).ListWithSort), ctx, sortField, sort, top, offset)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListWithSort", reflect.TypeOf((*MockINamespace)(nil).ListWithSort), ctx, sortField, sort, limit, offset)
 	return &INamespaceListWithSortCall{Call: call}
 }
 

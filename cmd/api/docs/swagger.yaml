@@ -141,11 +141,17 @@ definitions:
       block_time:
         example: 12354
         type: integer
+      bytes_in_block:
+        example: 1234
+        type: integer
       events_count:
         example: 18
         type: integer
       fee:
         example: "28347628346"
+        type: string
+      fill_rate:
+        example: "0.0800"
         type: string
       gas_limit:
         example: 1234

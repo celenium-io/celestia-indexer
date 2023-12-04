@@ -131,6 +131,7 @@ func TestNewBlock(t *testing.T) {
 							storageTypes.MsgPayForBlobs: 2,
 							storageTypes.MsgDelegate:    3,
 						},
+						BytesInBlock: 10000,
 					},
 				},
 				withStats: true,
@@ -170,6 +171,8 @@ func TestNewBlock(t *testing.T) {
 						storageTypes.MsgPayForBlobs: 2,
 						storageTypes.MsgDelegate:    3,
 					},
+					BytesInBlock: 10000,
+					FillRate:     "0.0051",
 				},
 			},
 		},
@@ -210,6 +213,7 @@ func TestNewBlockStats(t *testing.T) {
 						storageTypes.MsgPayForBlobs: 2,
 						storageTypes.MsgDelegate:    3,
 					},
+					BytesInBlock: 10000,
 				},
 			},
 			want: &BlockStats{
@@ -225,6 +229,8 @@ func TestNewBlockStats(t *testing.T) {
 					storageTypes.MsgPayForBlobs: 2,
 					storageTypes.MsgDelegate:    3,
 				},
+				BytesInBlock: 10000,
+				FillRate:     "0.0051",
 			},
 		},
 	}

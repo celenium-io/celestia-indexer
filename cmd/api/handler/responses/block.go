@@ -4,12 +4,14 @@
 package responses
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	coreTypes "github.com/tendermint/tendermint/types"
 )
 
 type Block struct {
@@ -74,11 +76,17 @@ type BlockStats struct {
 	Fee            string                  `example:"28347628346"                     json:"fee"             swaggertype:"string"`
 	SupplyChange   string                  `example:"8635234"                         json:"supply_change"   swaggertype:"string"`
 	InflationRate  string                  `example:"0.0800000"                       json:"inflation_rate"  swaggertype:"string"`
+	FillRate       string                  `example:"0.0800"                          json:"fill_rate"       swaggertype:"string"`
 	BlockTime      uint64                  `example:"12354"                           json:"block_time"      swaggertype:"integer"`
 	GasLimit       int64                   `example:"1234"                            json:"gas_limit"       swaggertype:"integer"`
 	GasUsed        int64                   `example:"1234"                            json:"gas_used"        swaggertype:"integer"`
+	BytesInBlock   int64                   `example:"1234"                            json:"bytes_in_block"  swaggertype:"integer"`
 	MessagesCounts map[types.MsgType]int64 `example:"{MsgPayForBlobs:10,MsgUnjail:1}" json:"messages_counts" swaggertype:"string"`
 }
+
+var (
+	maxSize = coreTypes.MaxDataBytesNoEvidence(1974272, 100)
+)
 
 func NewBlockStats(stats storage.BlockStats) *BlockStats {
 	return &BlockStats{
@@ -92,5 +100,7 @@ func NewBlockStats(stats storage.BlockStats) *BlockStats {
 		MessagesCounts: stats.MessagesCounts,
 		GasLimit:       stats.GasLimit,
 		GasUsed:        stats.GasUsed,
+		BytesInBlock:   stats.BytesInBlock,
+		FillRate:       fmt.Sprintf("%.4f", float64(stats.BytesInBlock)/float64(maxSize)),
 	}
 }
