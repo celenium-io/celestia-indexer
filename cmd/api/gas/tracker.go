@@ -150,7 +150,7 @@ func (tracker *Tracker) processBlock(ctx context.Context, blockStat storage.Bloc
 
 	for i, p := range percentiles {
 		threshold := uint64(float64(blockStat.GasLimit) * p)
-		for sumGas < int64(threshold) && txIndex < len(txs) {
+		for sumGas < int64(threshold) && txIndex < len(txs)-1 {
 			txIndex++
 			sumGas += txs[txIndex].GasWanted
 		}

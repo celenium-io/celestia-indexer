@@ -82,6 +82,8 @@ func (tx *Tx) Gas(ctx context.Context, height types.Level) (response []storage.G
 		Model((*storage.Tx)(nil)).
 		ColumnExpr("gas_wanted, gas_used, fee, (CASE WHEN gas_wanted > 0 THEN fee / gas_wanted ELSE 0 END) as gas_price").
 		Where("height = ?", height).
+		Where("gas_used <= gas_wanted").
+		Where("fee > 0").
 		Scan(ctx, &response)
 	return
 }
