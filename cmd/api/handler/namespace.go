@@ -223,7 +223,7 @@ func (handler *NamespaceHandler) GetBlobs(c echo.Context) error {
 
 type getBlobRequest struct {
 	Hash       string      `param:"hash"       validate:"required,base64"`
-	Height     types.Level `param:"height"     validation:"required,min=1"`
+	Height     types.Level `param:"height"     validate:"required,min=1"`
 	Commitment string      `param:"commitment" validate:"required,base64"`
 }
 
@@ -368,4 +368,43 @@ func (handler *NamespaceHandler) Count(c echo.Context) error {
 		return handleError(c, err, handler.namespace)
 	}
 	return c.JSON(http.StatusOK, state.TotalNamespaces)
+}
+
+type postBlobRequest struct {
+	Hash       string      `json:"hash"       validate:"required,base64"`
+	Height     types.Level `json:"height"     validate:"required,min=1"`
+	Commitment string      `json:"commitment" validate:"required,base64"`
+}
+
+// Blob godoc
+//
+//	@Summary		Get namespace blob by commitment on height
+//	@Description	Returns blob
+//	@Tags			namespace
+//	@ID				get-blob
+//	@Param			hash		body	string	true	"Base64-encoded namespace id and version"
+//	@Param			height		body	integer	true	"Block heigth"	minimum(1)
+//	@Param			commitment	body	string	true	"Blob commitment"
+//	@Accept 		json
+//	@Produce		json
+//	@Success		200	{object}	responses.Blob
+//	@Failure		400	{object}	Error
+//	@Router			/v1/blob [post]
+func (handler *NamespaceHandler) Blob(c echo.Context) error {
+	req, err := bindAndValidate[postBlobRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	blob, err := handler.blob.Blob(c.Request().Context(), req.Height, req.Hash, req.Commitment)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	response, err := responses.NewBlob(blob)
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	return c.JSON(http.StatusOK, response)
 }

@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/base64"
@@ -30,15 +31,15 @@ import (
 var (
 	testNamespace = storage.Namespace{
 		Id:              1,
-		Version:         1,
-		NamespaceID:     []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7},
+		Version:         0,
+		NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xfc, 0x74, 0x43, 0xb1, 0x55, 0x92, 0x1, 0x56},
 		Size:            100,
 		PfbCount:        12,
 		LastHeight:      100,
 		LastMessageTime: testTime,
 	}
-	testNamespaceId     = "00010203040506070809000102030405060708090001020304050607"
-	testNamespaceBase64 = "AQABAgMEBQYHCAkAAQIDBAUGBwgJAAECAwQFBgc="
+	testNamespaceId     = "0000000000000000000000000000000000000000fc7443b155920156"
+	testNamespaceBase64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAA/HRDsVWSAVY="
 )
 
 // NamespaceTestSuite -
@@ -94,7 +95,7 @@ func (s *NamespaceTestSuite) TestGet() {
 	s.Require().Len(namespace, 1)
 	s.Require().EqualValues(1, namespace[0].ID)
 	s.Require().EqualValues(100, namespace[0].Size)
-	s.Require().EqualValues(1, namespace[0].Version)
+	s.Require().EqualValues(0, namespace[0].Version)
 	s.Require().EqualValues(12, namespace[0].PfbCount)
 	s.Require().Equal(testNamespaceId, namespace[0].NamespaceID)
 	s.Require().Equal(testNamespaceBase64, namespace[0].Hash)
@@ -138,7 +139,7 @@ func (s *NamespaceTestSuite) TestList() {
 	s.Require().Len(namespaces, 1)
 	s.Require().EqualValues(1, namespaces[0].ID)
 	s.Require().EqualValues(100, namespaces[0].Size)
-	s.Require().EqualValues(1, namespaces[0].Version)
+	s.Require().EqualValues(0, namespaces[0].Version)
 	s.Require().EqualValues(12, namespaces[0].PfbCount)
 	s.Require().Equal(testNamespaceId, namespaces[0].NamespaceID)
 	s.Require().Equal(testNamespaceBase64, namespaces[0].Hash)
@@ -190,7 +191,7 @@ func (s *NamespaceTestSuite) TestListWithSort() {
 		s.Require().Len(namespaces, 1)
 		s.Require().EqualValues(1, namespaces[0].ID)
 		s.Require().EqualValues(100, namespaces[0].Size)
-		s.Require().EqualValues(1, namespaces[0].Version)
+		s.Require().EqualValues(0, namespaces[0].Version)
 		s.Require().EqualValues(12, namespaces[0].PfbCount)
 		s.Require().Equal(testNamespaceId, namespaces[0].NamespaceID)
 		s.Require().Equal(testNamespaceBase64, namespaces[0].Hash)
@@ -203,10 +204,10 @@ func (s *NamespaceTestSuite) TestGetWithVersion() {
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace/:id/:version")
 	c.SetParamNames("id", "version")
-	c.SetParamValues(testNamespaceId, "1")
+	c.SetParamValues(testNamespaceId, "0")
 
 	s.namespaces.EXPECT().
-		ByNamespaceIdAndVersion(gomock.Any(), testNamespace.NamespaceID, byte(1)).
+		ByNamespaceIdAndVersion(gomock.Any(), testNamespace.NamespaceID, byte(0)).
 		Return(testNamespace, nil)
 
 	s.Require().NoError(s.handler.GetWithVersion(c))
@@ -217,7 +218,7 @@ func (s *NamespaceTestSuite) TestGetWithVersion() {
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, namespace.ID)
 	s.Require().EqualValues(100, namespace.Size)
-	s.Require().EqualValues(1, namespace.Version)
+	s.Require().EqualValues(0, namespace.Version)
 	s.Require().EqualValues(12, namespace.PfbCount)
 	s.Require().Equal(testNamespaceId, namespace.NamespaceID)
 	s.Require().Equal(testNamespaceBase64, namespace.Hash)
@@ -232,7 +233,7 @@ func (s *NamespaceTestSuite) TestGetByHash() {
 	c.SetParamValues(testNamespaceBase64)
 
 	s.namespaces.EXPECT().
-		ByNamespaceIdAndVersion(gomock.Any(), testNamespace.NamespaceID, byte(1)).
+		ByNamespaceIdAndVersion(gomock.Any(), testNamespace.NamespaceID, byte(0)).
 		Return(testNamespace, nil)
 
 	s.Require().NoError(s.handler.GetByHash(c))
@@ -243,7 +244,7 @@ func (s *NamespaceTestSuite) TestGetByHash() {
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, namespace.ID)
 	s.Require().EqualValues(100, namespace.Size)
-	s.Require().EqualValues(1, namespace.Version)
+	s.Require().EqualValues(0, namespace.Version)
 	s.Require().EqualValues(12, namespace.PfbCount)
 	s.Require().Equal(testNamespaceId, namespace.NamespaceID)
 	s.Require().Equal(testNamespaceBase64, namespace.Hash)
@@ -298,55 +299,16 @@ func (s *NamespaceTestSuite) TestGetBlobs() {
 
 }
 
-func (s *NamespaceTestSuite) TestGetBlob() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	c := s.echo.NewContext(req, rec)
-	c.SetPath("/namespace_by_hash/:hash/:height/:commitment")
-	c.SetParamNames("hash", "height", "commitment")
-	c.SetParamValues(testNamespaceBase64, "1000", "Bw==")
-
-	data := make([]byte, 88)
-	_, err := rand.Read(data)
-	s.Require().NoError(err)
-
-	result := nodeTypes.Blob{
-		Namespace:    testNamespaceBase64,
-		Data:         base64.StdEncoding.EncodeToString(data),
-		Commitment:   "Bw==",
-		ShareVersion: 0,
-	}
-
-	s.blobReceiver.EXPECT().
-		Blob(gomock.Any(), pkgTypes.Level(1000), testNamespaceBase64, "Bw==").
-		Return(result, nil).
-		MaxTimes(1).
-		MinTimes(1)
-
-	s.Require().NoError(s.handler.GetBlob(c))
-	s.Require().Equal(http.StatusOK, rec.Code)
-
-	var blob nodeTypes.Blob
-	err = json.NewDecoder(rec.Body).Decode(&blob)
-	s.Require().NoError(err)
-
-	s.Require().EqualValues(0, blob.ShareVersion)
-	s.Require().Equal(testNamespaceBase64, blob.Namespace)
-	s.Require().Equal(result.Data, blob.Data)
-	s.Require().Equal("Bw==", blob.Commitment)
-
-}
-
 func (s *NamespaceTestSuite) TestGetMessages() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace/:id/:version/messages")
 	c.SetParamNames("id", "version")
-	c.SetParamValues(testNamespaceId, "1")
+	c.SetParamValues(testNamespaceId, "0")
 
 	s.namespaces.EXPECT().
-		ByNamespaceIdAndVersion(gomock.Any(), testNamespace.NamespaceID, byte(1)).
+		ByNamespaceIdAndVersion(gomock.Any(), testNamespace.NamespaceID, byte(0)).
 		Return(testNamespace, nil)
 
 	s.namespaces.EXPECT().
@@ -426,7 +388,7 @@ func (s *NamespaceTestSuite) TestGetActive() {
 	s.Require().Len(ns, 1)
 
 	namespace := ns[0]
-	s.Require().Equal("00010203040506070809000102030405060708090001020304050607", namespace.NamespaceID)
+	s.Require().Equal("0000000000000000000000000000000000000000fc7443b155920156", namespace.NamespaceID)
 	s.Require().EqualValues(100, namespace.LastHeight)
 	s.Require().EqualValues(100, namespace.Size)
 	s.Require().Equal(testTime, namespace.LastMessageTime)
@@ -457,10 +419,60 @@ func (s *NamespaceTestSuite) TestGetActiveWithSort() {
 		s.Require().Len(ns, 1)
 
 		namespace := ns[0]
-		s.Require().Equal("00010203040506070809000102030405060708090001020304050607", namespace.NamespaceID)
+		s.Require().Equal("0000000000000000000000000000000000000000fc7443b155920156", namespace.NamespaceID)
 		s.Require().EqualValues(100, namespace.LastHeight)
 		s.Require().EqualValues(100, namespace.Size)
 		s.Require().Equal(testTime, namespace.LastMessageTime)
 
 	}
+}
+
+func (s *NamespaceTestSuite) TestBlob() {
+	commitment := "ZeKGjIwsIkFsACD0wtEh/jbzzW+zIPP716VihNpm9T0="
+
+	blobReq := map[string]any{
+		"hash":       testNamespaceBase64,
+		"height":     1000,
+		"commitment": commitment,
+	}
+	stream := new(bytes.Buffer)
+	err := json.NewEncoder(stream).Encode(blobReq)
+	s.Require().NoError(err)
+
+	req := httptest.NewRequest(http.MethodPost, "/", stream)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/blob")
+
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	data := make([]byte, 88)
+	_, err = rand.Read(data)
+	s.Require().NoError(err)
+
+	result := nodeTypes.Blob{
+		Namespace:    testNamespaceBase64,
+		Data:         base64.StdEncoding.EncodeToString(data),
+		Commitment:   commitment,
+		ShareVersion: 0,
+	}
+
+	s.blobReceiver.EXPECT().
+		Blob(gomock.Any(), pkgTypes.Level(1000), testNamespaceBase64, commitment).
+		Return(result, nil).
+		MaxTimes(1).
+		MinTimes(1)
+
+	s.Require().NoError(s.handler.Blob(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var blob nodeTypes.Blob
+	err = json.NewDecoder(rec.Body).Decode(&blob)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(0, blob.ShareVersion)
+	s.Require().Equal(testNamespaceBase64, blob.Namespace)
+	s.Require().Equal(result.Data, blob.Data)
+	s.Require().Equal(commitment, blob.Commitment)
+
 }
