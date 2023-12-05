@@ -143,22 +143,30 @@ func (tracker *Tracker) processBlock(ctx context.Context, blockStat storage.Bloc
 	}
 	sort.Sort(storage.ByGasPrice(txs))
 
+	tracker.compute(txs, blockStat.GasLimit, &data)
+
+	tracker.q.Push(data)
+	return nil
+}
+
+func (tracker *Tracker) compute(txs []storage.Gas, gasLimit int64, data *info) {
+	if len(txs) == 0 {
+		return
+	}
+
 	var (
-		sumGas  = txs[0].GasWanted
 		txIndex = 0
+		sumGas  = txs[txIndex].GasWanted
 	)
 
 	for i, p := range percentiles {
-		threshold := uint64(float64(blockStat.GasLimit) * p)
+		threshold := uint64(float64(gasLimit) * p)
 		for sumGas < int64(threshold) && txIndex < len(txs)-1 {
 			txIndex++
 			sumGas += txs[txIndex].GasWanted
 		}
 		data.Percentiles[i] = txs[txIndex].GasPrice.Copy()
 	}
-
-	tracker.q.Push(data)
-	return nil
 }
 
 func (tracker *Tracker) State() GasPrice {

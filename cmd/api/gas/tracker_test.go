@@ -164,3 +164,87 @@ func TestTracker_processBlock(t *testing.T) {
 		require.EqualValues(t, "3", item.Percentiles[2].StringFixed(0))
 	})
 }
+
+func TestTracker_compute(t *testing.T) {
+	tests := []struct {
+		name     string
+		txs      []storage.Gas
+		gasLimit int64
+		want     []string
+	}{
+		{
+			name: "test 1",
+			txs: []storage.Gas{
+				{
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("1000"),
+					GasPrice:  decimal.RequireFromString("1"),
+				}, {
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("2000"),
+					GasPrice:  decimal.RequireFromString("2"),
+				}, {
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("3000"),
+					GasPrice:  decimal.RequireFromString("3"),
+				},
+			},
+			gasLimit: 3000,
+			want:     []string{"1", "2", "3"},
+		}, {
+			name: "test 2",
+			txs: []storage.Gas{
+				{
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("1000"),
+					GasPrice:  decimal.RequireFromString("1"),
+				}, {
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("1000"),
+					GasPrice:  decimal.RequireFromString("1"),
+				}, {
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("1000"),
+					GasPrice:  decimal.RequireFromString("1"),
+				}, {
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("1000"),
+					GasPrice:  decimal.RequireFromString("1"),
+				}, {
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("1000"),
+					GasPrice:  decimal.RequireFromString("1"),
+				},
+			},
+			gasLimit: 8000000,
+			want:     []string{"1", "1", "1"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tracker := NewTracker(nil, nil, nil, nil)
+			data := info{
+				GasUsedRatio: decimal.New(0, 1),
+				Percentiles:  make([]decimal.Decimal, 0),
+			}
+			for range percentiles {
+				data.Percentiles = append(data.Percentiles, decimal.New(0, 1))
+			}
+
+			tracker.compute(tt.txs, tt.gasLimit, &data)
+
+			require.Len(t, data.Percentiles, 3)
+			require.EqualValues(t, tt.want[0], data.Percentiles[0].StringFixed(0))
+			require.EqualValues(t, tt.want[1], data.Percentiles[1].StringFixed(0))
+			require.EqualValues(t, tt.want[2], data.Percentiles[2].StringFixed(0))
+		})
+	}
+}
