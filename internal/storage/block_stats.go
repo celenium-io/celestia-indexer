@@ -36,6 +36,7 @@ type BlockStats struct {
 	SupplyChange  decimal.Decimal `bun:",type:numeric"    comment:"Change of total supply in the block"                     stats:"func:min max sum avg"`
 	InflationRate decimal.Decimal `bun:",type:numeric"    comment:"Inflation rate"                                          stats:"func:min max avg"`
 	Fee           decimal.Decimal `bun:"fee,type:numeric" comment:"Summary block fee"                                       stats:"func:min max sum avg"`
+	BytesInBlock  int64           `bun:"bytes_in_block"   comment:"Size of all transactions in bytes"                       stats:"func:min max sum avg"`
 
 	MessagesCounts map[types.MsgType]int64 `bun:"-"`
 }

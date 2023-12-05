@@ -97,7 +97,7 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 	}
 
 	module.parseDenomMetadata(genesis.AppState.Bank.DenomMetadata, &data)
-	module.parseConstants(genesis.AppState, &data)
+	module.parseConstants(genesis.AppState, genesis.ConsensusParams, &data)
 
 	module.parseTotalSupply(genesis.AppState.Bank.Supply, &block)
 

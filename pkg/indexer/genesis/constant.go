@@ -5,13 +5,47 @@ package genesis
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
-func (module *Module) parseConstants(appState types.AppState, data *parsedData) {
+func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes.ConsensusParams, data *parsedData) {
+	// consensus
+	data.constants = append(data.constants, storage.Constant{
+		Module: storageTypes.ModuleNameConsensus,
+		Name:   "block_max_bytes",
+		Value:  strconv.FormatInt(consensus.Block.MaxBytes, 10),
+	})
+	data.constants = append(data.constants, storage.Constant{
+		Module: storageTypes.ModuleNameConsensus,
+		Name:   "block_max_gas",
+		Value:  strconv.FormatInt(consensus.Block.MaxGas, 10),
+	})
+	data.constants = append(data.constants, storage.Constant{
+		Module: storageTypes.ModuleNameConsensus,
+		Name:   "evidence_max_age_num_blocks",
+		Value:  strconv.FormatInt(consensus.Evidence.MaxAgeNumBlocks, 10),
+	})
+	data.constants = append(data.constants, storage.Constant{
+		Module: storageTypes.ModuleNameConsensus,
+		Name:   "evidence_max_bytes",
+		Value:  strconv.FormatInt(consensus.Evidence.MaxBytes, 10),
+	})
+	data.constants = append(data.constants, storage.Constant{
+		Module: storageTypes.ModuleNameConsensus,
+		Name:   "evidence_max_age_duration",
+		Value:  consensus.Evidence.MaxAgeDuration.String(),
+	})
+	data.constants = append(data.constants, storage.Constant{
+		Module: storageTypes.ModuleNameConsensus,
+		Name:   "validator_pub_key_types",
+		Value:  strings.Join(consensus.Validator.PubKeyTypes, ", "),
+	})
+
 	// auth
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameAuth,

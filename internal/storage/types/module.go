@@ -13,7 +13,8 @@ package types
 		indexer,
 		gov,
 		slashing,
-		staking
+		staking,
+		consensus
 	)
 */
 //go:generate go-enum --marshal --sql --values
