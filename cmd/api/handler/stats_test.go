@@ -294,11 +294,11 @@ func (s *StatsTestSuite) TestNamespaceUsage() {
 	s.Require().Len(response, 2)
 
 	item0 := response[0]
-	s.Require().Equal("010203040506070809000102030405060708090001020304050607", item0.Name)
+	s.Require().Equal("fc7443b155920156", item0.Name)
 	s.Require().Equal(testNamespace.Size, item0.Size)
-	s.Require().Equal("00010203040506070809000102030405060708090001020304050607", item0.NamespaceID)
+	s.Require().Equal("0000000000000000000000000000000000000000fc7443b155920156", item0.NamespaceID)
 	s.Require().NotNil(item0.Version)
-	s.Require().EqualValues(1, *item0.Version)
+	s.Require().EqualValues(0, *item0.Version)
 
 	item1 := response[1]
 	s.Require().Equal("others", item1.Name)

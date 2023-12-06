@@ -1196,6 +1196,46 @@ paths:
       summary: Get count of addresses in network
       tags:
       - address
+  /v1/blob:
+    post:
+      consumes:
+      - application/json
+      description: Returns blob
+      operationId: get-blob
+      parameters:
+      - description: Base64-encoded namespace id and version
+        in: body
+        name: hash
+        required: true
+        schema:
+          type: string
+      - description: Block heigth
+        in: body
+        minimum: 1
+        name: height
+        required: true
+        schema:
+          type: integer
+      - description: Blob commitment
+        in: body
+        name: commitment
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Blob'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get namespace blob by commitment on height
+      tags:
+      - namespace
   /v1/block:
     get:
       description: List blocks info

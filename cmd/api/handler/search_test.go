@@ -166,7 +166,7 @@ func (s *SearchTestSuite) TestSearchTx() {
 
 func (s *SearchTestSuite) TestSearchNamespaceById() {
 	q := make(url.Values)
-	q.Set("query", "01"+testNamespaceId)
+	q.Set("query", "00"+testNamespaceId)
 
 	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
@@ -186,7 +186,7 @@ func (s *SearchTestSuite) TestSearchNamespaceById() {
 	s.Require().Equal("namespace", response.Type)
 	s.Require().EqualValues(1, response.Result.ID)
 	s.Require().EqualValues(100, response.Result.Size)
-	s.Require().EqualValues(1, response.Result.Version)
+	s.Require().EqualValues(0, response.Result.Version)
 	s.Require().Equal(testNamespaceId, response.Result.NamespaceID)
 	s.Require().Equal(testNamespaceBase64, response.Result.Hash)
 }
@@ -213,7 +213,7 @@ func (s *SearchTestSuite) TestSearchNamespaceByBase64() {
 	s.Require().Equal("namespace", response.Type)
 	s.Require().EqualValues(1, response.Result.ID)
 	s.Require().EqualValues(100, response.Result.Size)
-	s.Require().EqualValues(1, response.Result.Version)
+	s.Require().EqualValues(0, response.Result.Version)
 	s.Require().Equal(testNamespaceId, response.Result.NamespaceID)
 	s.Require().Equal(testNamespaceBase64, response.Result.Hash)
 }

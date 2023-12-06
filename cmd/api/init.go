@@ -97,6 +97,9 @@ func initProflier(cfg *profiler.Config) (err error) {
 }
 
 func websocketSkipper(c echo.Context) bool {
+	if strings.Contains(c.Request().URL.Path, "blob") {
+		return true
+	}
 	return strings.Contains(c.Request().URL.Path, "ws")
 }
 
@@ -290,6 +293,8 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		WithRateLimit(datasource.RequestsPerSecond)
 
 	namespaceHandlers := handler.NewNamespaceHandler(db.Namespace, db.State, cfg.Indexer.Name, blobReceiver)
+	v1.POST("/blob", namespaceHandlers.Blob)
+
 	namespaceGroup := v1.Group("/namespace")
 	{
 		namespaceGroup.GET("", namespaceHandlers.List)
