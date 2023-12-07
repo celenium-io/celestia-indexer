@@ -123,6 +123,9 @@ func cacheSkipper(c echo.Context) bool {
 	if strings.Contains(c.Request().URL.Path, "metrics") {
 		return true
 	}
+	if strings.Contains(c.Request().URL.Path, "head") {
+		return true
+	}
 	return false
 }
 
