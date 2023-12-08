@@ -45,17 +45,25 @@ func (n *Namespace) ByNamespaceIdAndVersion(ctx context.Context, namespaceId []b
 
 // Messages -
 func (n *Namespace) Messages(ctx context.Context, id uint64, limit, offset int) (msgs []storage.NamespaceMessage, err error) {
-	query := n.DB().NewSelect().Model(&msgs).
-		Where("namespace_message.namespace_id = ?", id).
-		Order("namespace_message.time desc").
-		Relation("Namespace").
-		Relation("Message").
-		Relation("Tx")
-	query = limitScope(query, limit)
+	subQuery := n.DB().NewSelect().Model(&msgs).
+		Where("namespace_id = ?", id).
+		Order("time desc")
+
+	subQuery = limitScope(subQuery, limit)
 	if offset > 0 {
-		query = query.Offset(offset)
+		subQuery = subQuery.Offset(offset)
 	}
-	err = query.Scan(ctx)
+
+	query := n.DB().NewSelect().
+		TableExpr("(?) as msgs", subQuery).
+		ColumnExpr("msgs.*").
+		ColumnExpr("namespace.id as namespace__id, namespace.first_height as namespace__first_height, namespace.last_height as namespace__last_height, namespace.version as namespace__version, namespace.namespace_id as namespace__namespace_id, namespace.size as namespace__size, namespace.pfb_count as namespace__pfb_count, namespace.reserved as namespace__reserved, namespace.last_message_time as namespace__last_message_time").
+		ColumnExpr("message.id as message__id, message.height as message__height, message.time as message__time, message.position as message__position, message.type as message__type, message.tx_id as message__tx_id, message.data as message__data").
+		ColumnExpr("tx.id as tx__id, tx.height as tx__height, tx.time as tx__time, tx.position as tx__position, tx.gas_wanted as tx__gas_wanted, tx.gas_used as tx__gas_used, tx.timeout_height as tx__timeout_height, tx.events_count as tx__events_count, tx.messages_count as tx__messages_count, tx.fee as tx__fee, tx.status as tx__status, tx.error as tx__error, tx.codespace as tx__codespace, tx.hash as tx__hash, tx.memo as tx__memo, tx.message_types as tx__message_types").
+		Join("LEFT JOIN namespace ON namespace.id = msgs.namespace_id").
+		Join("LEFT JOIN message ON message.id = msgs.msg_id").
+		Join("LEFT JOIN tx ON tx.id = msgs.tx_id")
+	err = query.Scan(ctx, &msgs)
 	return
 }
 
