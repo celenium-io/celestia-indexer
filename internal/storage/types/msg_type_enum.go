@@ -13,6 +13,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 const (
@@ -166,7 +167,91 @@ const (
 	MsgAcknowledgement MsgType = "MsgAcknowledgement"
 )
 
-var ErrInvalidMsgType = errors.New("not a valid MsgType")
+var ErrInvalidMsgType = fmt.Errorf("not a valid MsgType, try [%s]", strings.Join(_MsgTypeNames, ", "))
+
+var _MsgTypeNames = []string{
+	string(MsgUnknown),
+	string(MsgSetWithdrawAddress),
+	string(MsgWithdrawDelegatorReward),
+	string(MsgWithdrawValidatorCommission),
+	string(MsgFundCommunityPool),
+	string(MsgCreateValidator),
+	string(MsgEditValidator),
+	string(MsgDelegate),
+	string(MsgBeginRedelegate),
+	string(MsgUndelegate),
+	string(MsgCancelUnbondingDelegation),
+	string(MsgUnjail),
+	string(MsgSend),
+	string(MsgMultiSend),
+	string(MsgCreateVestingAccount),
+	string(MsgCreatePermanentLockedAccount),
+	string(MsgCreatePeriodicVestingAccount),
+	string(MsgPayForBlobs),
+	string(MsgGrant),
+	string(MsgExec),
+	string(MsgRevoke),
+	string(MsgGrantAllowance),
+	string(MsgRevokeAllowance),
+	string(MsgRegisterEVMAddress),
+	string(MsgSubmitProposal),
+	string(MsgExecLegacyContent),
+	string(MsgVote),
+	string(MsgVoteWeighted),
+	string(MsgDeposit),
+	string(IBCTransfer),
+	string(MsgVerifyInvariant),
+	string(MsgSubmitEvidence),
+	string(MsgSendNFT),
+	string(MsgCreateGroup),
+	string(MsgUpdateGroupMembers),
+	string(MsgUpdateGroupAdmin),
+	string(MsgUpdateGroupMetadata),
+	string(MsgCreateGroupPolicy),
+	string(MsgUpdateGroupPolicyAdmin),
+	string(MsgCreateGroupWithPolicy),
+	string(MsgUpdateGroupPolicyDecisionPolicy),
+	string(MsgUpdateGroupPolicyMetadata),
+	string(MsgSubmitProposalGroup),
+	string(MsgWithdrawProposal),
+	string(MsgVoteGroup),
+	string(MsgExecGroup),
+	string(MsgLeaveGroup),
+	string(MsgSoftwareUpgrade),
+	string(MsgCancelUpgrade),
+	string(MsgRegisterInterchainAccount),
+	string(MsgSendTx),
+	string(MsgRegisterPayee),
+	string(MsgRegisterCounterpartyPayee),
+	string(MsgPayPacketFee),
+	string(MsgPayPacketFeeAsync),
+	string(MsgTransfer),
+	string(MsgCreateClient),
+	string(MsgUpdateClient),
+	string(MsgUpgradeClient),
+	string(MsgSubmitMisbehaviour),
+	string(MsgConnectionOpenInit),
+	string(MsgConnectionOpenTry),
+	string(MsgConnectionOpenAck),
+	string(MsgConnectionOpenConfirm),
+	string(MsgChannelOpenInit),
+	string(MsgChannelOpenTry),
+	string(MsgChannelOpenAck),
+	string(MsgChannelOpenConfirm),
+	string(MsgChannelCloseInit),
+	string(MsgChannelCloseConfirm),
+	string(MsgRecvPacket),
+	string(MsgTimeout),
+	string(MsgTimeoutOnClose),
+	string(MsgAcknowledgement),
+}
+
+// MsgTypeNames returns a list of possible string values of MsgType.
+func MsgTypeNames() []string {
+	tmp := make([]string, len(_MsgTypeNames))
+	copy(tmp, _MsgTypeNames)
+	return tmp
+}
 
 // MsgTypeValues returns a list of the values for MsgType
 func MsgTypeValues() []MsgType {

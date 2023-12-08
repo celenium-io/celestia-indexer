@@ -104,5 +104,5 @@ package types
 		MsgAcknowledgement,
 	)
 */
-//go:generate go-enum --marshal --sql --values --noprefix
+//go:generate go-enum --marshal --sql --values --noprefix --names
 type MsgType string

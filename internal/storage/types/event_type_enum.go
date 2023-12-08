@@ -13,6 +13,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 const (
@@ -128,7 +129,72 @@ const (
 	EventTypeCancelUnbondingDelegation EventType = "cancel_unbonding_delegation"
 )
 
-var ErrInvalidEventType = errors.New("not a valid EventType")
+var ErrInvalidEventType = fmt.Errorf("not a valid EventType, try [%s]", strings.Join(_EventTypeNames, ", "))
+
+var _EventTypeNames = []string{
+	string(EventTypeUnknown),
+	string(EventTypeCoinReceived),
+	string(EventTypeCoinbase),
+	string(EventTypeCoinSpent),
+	string(EventTypeBurn),
+	string(EventTypeMint),
+	string(EventTypeMessage),
+	string(EventTypeProposerReward),
+	string(EventTypeRewards),
+	string(EventTypeCommission),
+	string(EventTypeLiveness),
+	string(EventTypeTransfer),
+	string(EventTypeCelestiablobv1EventPayForBlobs),
+	string(EventTypeRedelegate),
+	string(EventTypeAttestationRequest),
+	string(EventTypeWithdrawRewards),
+	string(EventTypeWithdrawCommission),
+	string(EventTypeSetWithdrawAddress),
+	string(EventTypeCreateValidator),
+	string(EventTypeDelegate),
+	string(EventTypeEditValidator),
+	string(EventTypeUnbond),
+	string(EventTypeTx),
+	string(EventTypeCompleteRedelegation),
+	string(EventTypeCompleteUnbonding),
+	string(EventTypeUseFeegrant),
+	string(EventTypeRevokeFeegrant),
+	string(EventTypeSetFeegrant),
+	string(EventTypeUpdateFeegrant),
+	string(EventTypeSlash),
+	string(EventTypeProposalVote),
+	string(EventTypeProposalDeposit),
+	string(EventTypeSubmitProposal),
+	string(EventTypeCosmosauthzv1beta1EventGrant),
+	string(EventTypeSendPacket),
+	string(EventTypeIbcTransfer),
+	string(EventTypeFungibleTokenPacket),
+	string(EventTypeAcknowledgePacket),
+	string(EventTypeCreateClient),
+	string(EventTypeUpdateClient),
+	string(EventTypeConnectionOpenTry),
+	string(EventTypeConnectionOpenInit),
+	string(EventTypeConnectionOpenConfirm),
+	string(EventTypeConnectionOpenAck),
+	string(EventTypeChannelOpenTry),
+	string(EventTypeChannelOpenInit),
+	string(EventTypeChannelOpenConfirm),
+	string(EventTypeChannelOpenAck),
+	string(EventTypeRecvPacket),
+	string(EventTypeWriteAcknowledgement),
+	string(EventTypeTimeout),
+	string(EventTypeTimeoutPacket),
+	string(EventTypeCosmosauthzv1beta1EventRevoke),
+	string(EventTypeCosmosauthzv1EventRevoke),
+	string(EventTypeCancelUnbondingDelegation),
+}
+
+// EventTypeNames returns a list of possible string values of EventType.
+func EventTypeNames() []string {
+	tmp := make([]string, len(_EventTypeNames))
+	copy(tmp, _EventTypeNames)
+	return tmp
+}
 
 // EventTypeValues returns a list of the values for EventType
 func EventTypeValues() []EventType {

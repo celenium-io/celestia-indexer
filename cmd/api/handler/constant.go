@@ -46,3 +46,16 @@ func (handler *ConstantHandler) Get(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, responses.NewConstants(consts, dm))
 }
+
+// Enums godoc
+//
+//	@Summary		Get celenium enumerators
+//	@Description	Get celenium enumerators
+//	@Tags			general
+//	@ID				get-enums
+//	@Produce		json
+//	@Success		200	{object}	responses.Enums
+//	@Router			/v1/enums [get]
+func (handler *ConstantHandler) Enums(c echo.Context) error {
+	return c.JSON(http.StatusOK, responses.NewEnums())
+}
