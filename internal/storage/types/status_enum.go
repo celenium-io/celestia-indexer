@@ -13,6 +13,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 const (
@@ -22,7 +23,19 @@ const (
 	StatusFailed Status = "failed"
 )
 
-var ErrInvalidStatus = errors.New("not a valid Status")
+var ErrInvalidStatus = fmt.Errorf("not a valid Status, try [%s]", strings.Join(_StatusNames, ", "))
+
+var _StatusNames = []string{
+	string(StatusSuccess),
+	string(StatusFailed),
+}
+
+// StatusNames returns a list of possible string values of Status.
+func StatusNames() []string {
+	tmp := make([]string, len(_StatusNames))
+	copy(tmp, _StatusNames)
+	return tmp
+}
 
 // StatusValues returns a list of the values for Status
 func StatusValues() []Status {

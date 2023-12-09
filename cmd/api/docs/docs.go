@@ -1054,6 +1054,27 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/enums": {
+            "get": {
+                "description": "Get celenium enumerators",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "general"
+                ],
+                "summary": "Get celenium enumerators",
+                "operationId": "get-enums",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Enums"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/gas/estimate_for_pfb": {
             "get": {
                 "description": "Get estimated gas for pay for blob message with certain values of blob sizes",
@@ -2984,6 +3005,29 @@ const docTemplate = `{
                 "uri": {
                     "type": "string",
                     "example": "https://example.com"
+                }
+            }
+        },
+        "responses.Enums": {
+            "type": "object",
+            "properties": {
+                "event_type": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "message_type": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "status": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

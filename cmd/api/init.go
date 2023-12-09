@@ -245,6 +245,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	v1.GET("/head", stateHandlers.Head)
 	constantsHandler := handler.NewConstantHandler(db.Constants, db.DenomMetadata, db.Address)
 	v1.GET("/constants", constantsHandler.Get)
+	v1.GET("/enums", constantsHandler.Enums)
 
 	searchHandler := handler.NewSearchHandler(db.Address, db.Blocks, db.Namespace, db.Tx)
 	v1.GET("/search", searchHandler.Search)

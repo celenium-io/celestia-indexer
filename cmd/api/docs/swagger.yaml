@@ -208,6 +208,21 @@ definitions:
         example: https://example.com
         type: string
     type: object
+  responses.Enums:
+    properties:
+      event_type:
+        items:
+          type: string
+        type: array
+      message_type:
+        items:
+          type: string
+        type: array
+      status:
+        items:
+          type: string
+        type: array
+    type: object
   responses.Event:
     properties:
       data:
@@ -1675,6 +1690,20 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get network constants
+      tags:
+      - general
+  /v1/enums:
+    get:
+      description: Get celenium enumerators
+      operationId: get-enums
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Enums'
+      summary: Get celenium enumerators
       tags:
       - general
   /v1/gas/estimate_for_pfb:

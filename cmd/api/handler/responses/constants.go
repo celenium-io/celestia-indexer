@@ -5,6 +5,7 @@ package responses
 
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/goccy/go-json"
 	"github.com/shopspring/decimal"
 )
@@ -62,4 +63,18 @@ func NewConstants(consts []storage.Constant, denomMetadata []storage.DenomMetada
 	}
 
 	return response
+}
+
+type Enums struct {
+	Status      []string `json:"status"`
+	MessageType []string `json:"message_type"`
+	EventType   []string `json:"event_type"`
+}
+
+func NewEnums() Enums {
+	return Enums{
+		Status:      types.StatusNames(),
+		MessageType: types.MsgTypeNames(),
+		EventType:   types.EventTypeNames(),
+	}
 }

@@ -10,5 +10,5 @@ package types
 		failed
 	)
 */
-//go:generate go-enum --marshal --sql --values
+//go:generate go-enum --marshal --sql --values --names
 type Status string

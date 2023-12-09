@@ -76,5 +76,5 @@ package types
 		cancel_unbonding_delegation
 	)
 */
-//go:generate go-enum --marshal --sql --values
+//go:generate go-enum --marshal --sql --values --names
 type EventType string
