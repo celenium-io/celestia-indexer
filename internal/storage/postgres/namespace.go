@@ -62,7 +62,8 @@ func (n *Namespace) Messages(ctx context.Context, id uint64, limit, offset int) 
 		ColumnExpr("tx.id as tx__id, tx.height as tx__height, tx.time as tx__time, tx.position as tx__position, tx.gas_wanted as tx__gas_wanted, tx.gas_used as tx__gas_used, tx.timeout_height as tx__timeout_height, tx.events_count as tx__events_count, tx.messages_count as tx__messages_count, tx.fee as tx__fee, tx.status as tx__status, tx.error as tx__error, tx.codespace as tx__codespace, tx.hash as tx__hash, tx.memo as tx__memo, tx.message_types as tx__message_types").
 		Join("LEFT JOIN namespace ON namespace.id = msgs.namespace_id").
 		Join("LEFT JOIN message ON message.id = msgs.msg_id").
-		Join("LEFT JOIN tx ON tx.id = msgs.tx_id")
+		Join("LEFT JOIN tx ON tx.id = msgs.tx_id").
+		Order("msgs.time desc")
 	err = query.Scan(ctx, &msgs)
 	return
 }
