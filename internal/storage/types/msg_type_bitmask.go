@@ -303,6 +303,7 @@ func (mask MsgTypeBits) Names() []MsgType {
 
 	if mask.HasBit(MsgTypeBitsSetWithdrawAddress) {
 		names[i] = MsgSetWithdrawAddress
+		i++
 	}
 	if mask.HasBit(MsgTypeBitsWithdrawDelegatorReward) {
 		names[i] = MsgWithdrawDelegatorReward
