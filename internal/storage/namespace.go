@@ -27,6 +27,8 @@ type INamespace interface {
 	MessagesByHeight(ctx context.Context, height pkgTypes.Level, limit, offset int) ([]NamespaceMessage, error)
 	CountMessagesByHeight(ctx context.Context, height pkgTypes.Level) (int, error)
 	ListWithSort(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) (ns []Namespace, err error)
+	MessagesByTxId(ctx context.Context, txId uint64, limit, offset int) ([]NamespaceMessage, error)
+	CountMessagesByTxId(ctx context.Context, txId uint64) (int, error)
 }
 
 // Namespace -

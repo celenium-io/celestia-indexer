@@ -72,7 +72,6 @@ func (n *Namespace) Messages(ctx context.Context, id uint64, limit, offset int) 
 func (n *Namespace) MessagesByHeight(ctx context.Context, height pkgTypes.Level, limit, offset int) (msgs []storage.NamespaceMessage, err error) {
 	query := n.DB().NewSelect().Model(&msgs).
 		Where("namespace_message.height = ?", height).
-		Order("namespace_message.time desc").
 		Relation("Namespace").
 		Relation("Message").
 		Relation("Tx")
@@ -113,4 +112,24 @@ func (n *Namespace) ListWithSort(ctx context.Context, sortField string, sort sdk
 
 	err = query.Offset(offset).Scan(ctx)
 	return
+}
+
+func (n *Namespace) MessagesByTxId(ctx context.Context, txId uint64, limit, offset int) (msgs []storage.NamespaceMessage, err error) {
+	query := n.DB().NewSelect().Model(&msgs).
+		Where("namespace_message.tx_id = ?", txId).
+		Relation("Namespace").
+		Relation("Message").
+		Relation("Tx")
+	query = limitScope(query, limit)
+	if offset > 0 {
+		query = query.Offset(offset)
+	}
+	err = query.Scan(ctx)
+	return
+}
+
+func (n *Namespace) CountMessagesByTxId(ctx context.Context, txId uint64) (int, error) {
+	return n.DB().NewSelect().Model((*storage.NamespaceMessage)(nil)).
+		Where("namespace_message.tx_id = ?", txId).
+		Count(ctx)
 }

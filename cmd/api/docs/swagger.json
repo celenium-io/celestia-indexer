@@ -2400,7 +2400,7 @@
                     "transactions"
                 ],
                 "summary": "List genesis transactions info",
-                "operationId": "list-genesis -transactions",
+                "operationId": "list-genesis-transactions",
                 "parameters": [
                     {
                         "maximum": 100,
@@ -2416,6 +2416,10 @@
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
                         "type": "string",
                         "description": "Sort order",
                         "name": "sort",
@@ -2571,6 +2575,110 @@
                             "items": {
                                 "$ref": "#/definitions/responses.Message"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/tx/{hash}/namespace": {
+            "get": {
+                "description": "List namespaces affected by transaction",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "List namespaces affected by transaction",
+                "operationId": "list-namespaces-transactions",
+                "parameters": [
+                    {
+                        "maxLength": 64,
+                        "minLength": 64,
+                        "type": "string",
+                        "description": "Transaction hash in hexadecimal",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.NamespaceMessage"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/tx/{hash}/namespace/count": {
+            "get": {
+                "description": "Count of namespaces affected by transaction",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Count of namespaces affected by transaction",
+                "operationId": "list-namespaces-count-transactions",
+                "parameters": [
+                    {
+                        "maxLength": 64,
+                        "minLength": 64,
+                        "type": "string",
+                        "description": "Transaction hash in hexadecimal",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
                         }
                     },
                     "400": {
