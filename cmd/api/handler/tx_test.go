@@ -55,13 +55,14 @@ var (
 // TxTestSuite -
 type TxTestSuite struct {
 	suite.Suite
-	tx       *mock.MockITx
-	events   *mock.MockIEvent
-	messages *mock.MockIMessage
-	state    *mock.MockIState
-	echo     *echo.Echo
-	handler  *TxHandler
-	ctrl     *gomock.Controller
+	tx        *mock.MockITx
+	events    *mock.MockIEvent
+	messages  *mock.MockIMessage
+	namespace *mock.MockINamespace
+	state     *mock.MockIState
+	echo      *echo.Echo
+	handler   *TxHandler
+	ctrl      *gomock.Controller
 }
 
 // SetupSuite -
@@ -71,9 +72,10 @@ func (s *TxTestSuite) SetupSuite() {
 	s.ctrl = gomock.NewController(s.T())
 	s.tx = mock.NewMockITx(s.ctrl)
 	s.events = mock.NewMockIEvent(s.ctrl)
+	s.namespace = mock.NewMockINamespace(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
 	s.messages = mock.NewMockIMessage(s.ctrl)
-	s.handler = NewTxHandler(s.tx, s.events, s.messages, s.state, testIndexerName)
+	s.handler = NewTxHandler(s.tx, s.events, s.messages, s.namespace, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -520,4 +522,84 @@ func (s *TxTestSuite) TestGenesis() {
 	s.Require().EqualValues(1, tx.MessagesCount)
 	s.Require().EqualValues(types.StatusSuccess, tx.Status)
 	s.Require().EqualValues([]types.MsgType{types.MsgCreateValidator}, tx.MessageTypes)
+}
+
+func (s *TxTestSuite) TestNamespaces() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx/:hash/namespace")
+	c.SetParamNames("hash")
+	c.SetParamValues(testTxHash)
+
+	s.tx.EXPECT().
+		ByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx, nil).
+		MaxTimes(1)
+
+	s.namespace.EXPECT().
+		MessagesByTxId(gomock.Any(), testTx.Id, 10, 0).
+		Return([]storage.NamespaceMessage{
+			{
+				TxId:        testTx.Id,
+				MsgId:       2,
+				NamespaceId: testNamespace.Id,
+				Time:        testTime,
+				Height:      1000,
+				Size:        100,
+				Message: &storage.Message{
+					Id: 2,
+				},
+				Tx:        &testTx,
+				Namespace: &testNamespace,
+			}, {
+				TxId:        testTx.Id,
+				MsgId:       3,
+				NamespaceId: testNamespace.Id,
+				Time:        testTime,
+				Height:      1000,
+				Size:        150,
+				Message: &storage.Message{
+					Id: 3,
+				},
+				Tx:        &testTx,
+				Namespace: &testNamespace,
+			},
+		}, nil).
+		MaxTimes(1)
+
+	s.Require().NoError(s.handler.Namespaces(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var msgs []responses.NamespaceMessage
+	err := json.NewDecoder(rec.Body).Decode(&msgs)
+	s.Require().NoError(err)
+	s.Require().Len(msgs, 2)
+}
+
+func (s *TxTestSuite) TestNamespaceCount() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx/:hash/namespace/count")
+	c.SetParamNames("hash")
+	c.SetParamValues(testTxHash)
+
+	s.tx.EXPECT().
+		ByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx, nil).
+		MaxTimes(1)
+
+	s.namespace.EXPECT().
+		CountMessagesByTxId(gomock.Any(), testTx.Id).
+		Return(1234, nil).
+		MaxTimes(1)
+
+	s.Require().NoError(s.handler.NamespacesCount(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var count int
+	err := json.NewDecoder(rec.Body).Decode(&count)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1234, count)
 }

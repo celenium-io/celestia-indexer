@@ -19,6 +19,7 @@ type TxHandler struct {
 	tx          storage.ITx
 	events      storage.IEvent
 	messages    storage.IMessage
+	namespaces  storage.INamespace
 	state       storage.IState
 	indexerName string
 }
@@ -27,6 +28,7 @@ func NewTxHandler(
 	tx storage.ITx,
 	events storage.IEvent,
 	messages storage.IMessage,
+	namespaces storage.INamespace,
 	state storage.IState,
 	indexerName string,
 ) *TxHandler {
@@ -34,6 +36,7 @@ func NewTxHandler(
 		tx:          tx,
 		events:      events,
 		messages:    messages,
+		namespaces:  namespaces,
 		state:       state,
 		indexerName: indexerName,
 	}
@@ -238,10 +241,10 @@ func (handler *TxHandler) Count(c echo.Context) error {
 //	@Summary		List genesis transactions info
 //	@Description	List genesis transactions info
 //	@Tags			transactions
-//	@ID				list-genesis -transactions
-//	@Param			limit		query	integer			false	"Count of requested entities"			mininum(1)	maximum(100)
-//	@Param			offset		query	integer			false	"Offset"								mininum(1)
-//	@Param			sort		query	string			false	"Sort order"					mininum(1)
+//	@ID				list-genesis-transactions
+//	@Param			limit		query	integer			false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset		query	integer			false	"Offset"						mininum(1)
+//	@Param			sort		query	string			false	"Sort order"					Enums(asc, desc)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
@@ -263,4 +266,84 @@ func (handler *TxHandler) Genesis(c echo.Context) error {
 		response[i] = responses.NewTx(txs[i])
 	}
 	return returnArray(c, response)
+}
+
+// Namespaces godoc
+//
+//	@Summary		List namespaces affected by transaction
+//	@Description	List namespaces affected by transaction
+//	@Tags			transactions
+//	@ID				list-namespaces-transactions
+//	@Param			hash	path	string	        true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
+//	@Param			limit	query	integer			false	"Count of requested entities"		mininum(1)	maximum(100)
+//	@Param			offset	query	integer			false	"Offset"							mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.NamespaceMessage
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/tx/{hash}/namespace [get]
+func (handler *TxHandler) Namespaces(c echo.Context) error {
+	req, err := bindAndValidate[listForTx](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	hash, err := hex.DecodeString(req.Hash)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
+	if err != nil {
+		return handleError(c, err, handler.tx)
+	}
+
+	messages, err := handler.namespaces.MessagesByTxId(c.Request().Context(), tx.Id, int(req.Limit), int(req.Offset))
+	if err != nil {
+		return handleError(c, err, handler.tx)
+	}
+	response := make([]responses.NamespaceMessage, len(messages))
+	for i := range messages {
+		response[i], err = responses.NewNamespaceMessage(messages[i])
+		if err != nil {
+			return handleError(c, err, handler.tx)
+		}
+	}
+	return returnArray(c, response)
+}
+
+// NamespacesCount godoc
+//
+//	@Summary		Count of namespaces affected by transaction
+//	@Description	Count of namespaces affected by transaction
+//	@Tags			transactions
+//	@ID				list-namespaces-count-transactions
+//	@Param			hash	path	string	        true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
+//	@Produce		json
+//	@Success		200	{integer} 	uint64
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/tx/{hash}/namespace/count [get]
+func (handler *TxHandler) NamespacesCount(c echo.Context) error {
+	req, err := bindAndValidate[getTxRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	hash, err := hex.DecodeString(req.Hash)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
+	if err != nil {
+		return handleError(c, err, handler.tx)
+	}
+
+	count, err := handler.namespaces.CountMessagesByTxId(c.Request().Context(), tx.Id)
+	if err != nil {
+		return handleError(c, err, handler.tx)
+	}
+	return c.JSON(http.StatusOK, count)
 }

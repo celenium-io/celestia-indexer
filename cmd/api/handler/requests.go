@@ -170,3 +170,15 @@ func (p *namespaceList) SetDefault() {
 		p.Sort = desc
 	}
 }
+
+type listForTx struct {
+	Hash   string `param:"hash"   validate:"required,hexadecimal,len=64"`
+	Limit  uint64 `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset uint64 `query:"offset" validate:"omitempty,min=0"`
+}
+
+func (p *listForTx) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+}

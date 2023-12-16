@@ -276,7 +276,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	txHandlers := handler.NewTxHandler(db.Tx, db.Event, db.Message, db.State, cfg.Indexer.Name)
+	txHandlers := handler.NewTxHandler(db.Tx, db.Event, db.Message, db.Namespace, db.State, cfg.Indexer.Name)
 	txGroup := v1.Group("/tx")
 	{
 		txGroup.GET("", txHandlers.List)
@@ -285,6 +285,8 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		txGroup.GET("/:hash", txHandlers.Get)
 		txGroup.GET("/:hash/events", txHandlers.GetEvents)
 		txGroup.GET("/:hash/messages", txHandlers.GetMessages)
+		txGroup.GET("/:hash/namespace", txHandlers.Namespaces)
+		txGroup.GET("/:hash/namespace/count", txHandlers.NamespacesCount)
 	}
 
 	datasource, ok := cfg.DataSources[cfg.ApiConfig.BlobReceiver]
