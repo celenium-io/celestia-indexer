@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
-	"github.com/goccy/go-json"
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -21,6 +21,8 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 const (
 	celeniumUserAgent = "Celenium Indexer"
@@ -101,7 +103,7 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 		return errors.Errorf("invalid status: %d", response.StatusCode)
 	}
 
-	err = json.NewDecoder(response.Body).DecodeWithOption(output)
+	err = json.NewDecoder(response.Body).Decode(output)
 	return err
 }
 
@@ -145,7 +147,7 @@ func (api *API) post(ctx context.Context, requests []types.Request, output any) 
 		return errors.Errorf("invalid status: %d", response.StatusCode)
 	}
 
-	err = json.NewDecoder(response.Body).DecodeWithOption(output)
+	err = json.NewDecoder(response.Body).Decode(output)
 	return err
 }
 
