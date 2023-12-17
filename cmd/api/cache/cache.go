@@ -70,13 +70,17 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 func (c *Cache) Set(key string, data []byte) {
 	c.mx.Lock()
 	queueIdx := len(c.m)
-	c.m[key] = data
-	if queueIdx == c.maxEntitiesCount {
-		keyForRemove := c.queue[queueIdx-1]
-		c.queue = append([]string{key}, c.queue[:queueIdx-1]...)
-		delete(c.m, keyForRemove)
+	if _, ok := c.m[key]; ok {
+		c.m[key] = data
 	} else {
-		c.queue[queueIdx] = key
+		c.m[key] = data
+		if queueIdx == c.maxEntitiesCount {
+			keyForRemove := c.queue[queueIdx-1]
+			c.queue = append([]string{key}, c.queue[:queueIdx-1]...)
+			delete(c.m, keyForRemove)
+		} else {
+			c.queue[queueIdx] = key
+		}
 	}
 	c.mx.Unlock()
 }

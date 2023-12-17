@@ -5,6 +5,7 @@ package cache
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -42,6 +43,27 @@ func TestCache_SetGet(t *testing.T) {
 
 		_, exists := c.Get("0")
 		require.False(t, exists)
+	})
+
+	t.Run("overflow set queue multithread", func(t *testing.T) {
+		c := NewCache(Config{MaxEntitiesCount: 2}, nil)
+
+		var wg sync.WaitGroup
+
+		for i := 0; i < 10; i++ {
+			wg.Add(1)
+			go func(c *Cache, wg *sync.WaitGroup) {
+				defer wg.Done()
+				for i := 0; i < 100; i++ {
+					c.Set(fmt.Sprintf("%d", i), []byte{byte(i)})
+				}
+			}(c, &wg)
+		}
+
+		wg.Wait()
+
+		require.Len(t, c.queue, 2)
+		require.Len(t, c.m, 2)
 	})
 }
 
