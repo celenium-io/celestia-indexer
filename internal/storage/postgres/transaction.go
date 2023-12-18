@@ -173,6 +173,15 @@ func (tx Transaction) SaveSigners(ctx context.Context, addresses ...models.Signe
 	return err
 }
 
+func (tx Transaction) SaveBlobLogs(ctx context.Context, logs ...models.BlobLog) error {
+	if len(logs) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&logs).Exec(ctx)
+	return err
+}
+
 func (tx Transaction) SaveMsgAddresses(ctx context.Context, addresses ...models.MsgAddress) error {
 	if len(addresses) == 0 {
 		return nil
@@ -286,7 +295,12 @@ func (tx Transaction) RollbackNamespaces(ctx context.Context, height types.Level
 }
 
 func (tx Transaction) RollbackValidators(ctx context.Context, height types.Level) (err error) {
-	_, err = tx.Tx().NewDelete().Model((*models.Validator)(nil)).Where("height = ?", height).Returning("*").Exec(ctx)
+	_, err = tx.Tx().NewDelete().Model((*models.Validator)(nil)).Where("height = ?", height).Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackBlobLog(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.BlobLog)(nil)).Where("height = ?", height).Exec(ctx)
 	return
 }
 

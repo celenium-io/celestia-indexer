@@ -192,6 +192,32 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// Blob log
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.BlobLog)(nil)).
+			Index("blob_log_namespace_id_idx").
+			Column("namespace_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.BlobLog)(nil)).
+			Index("blob_log_signer_id_idx").
+			Column("signer_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.BlobLog)(nil)).
+			Index("blob_log_tx_id_idx").
+			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

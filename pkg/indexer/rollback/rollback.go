@@ -194,6 +194,10 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 		return tx.HandleError(ctx, err)
 	}
 
+	if err := tx.RollbackBlobLog(ctx, height); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
 	newBlock, err := tx.LastBlock(ctx)
 	if err != nil {
 		return tx.HandleError(ctx, err)

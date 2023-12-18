@@ -20,6 +20,7 @@ import (
 
 type NamespaceHandler struct {
 	namespace   storage.INamespace
+	blobLogs    storage.IBlobLog
 	blob        node.DalApi
 	state       storage.IState
 	indexerName string
@@ -27,12 +28,14 @@ type NamespaceHandler struct {
 
 func NewNamespaceHandler(
 	namespace storage.INamespace,
+	blobLogs storage.IBlobLog,
 	state storage.IState,
 	indexerName string,
 	blob node.DalApi,
 ) *NamespaceHandler {
 	return &NamespaceHandler{
 		namespace:   namespace,
+		blobLogs:    blobLogs,
 		blob:        blob,
 		state:       state,
 		indexerName: indexerName,
@@ -221,44 +224,6 @@ func (handler *NamespaceHandler) GetBlobs(c echo.Context) error {
 	return c.JSON(http.StatusOK, blobs)
 }
 
-type getBlobRequest struct {
-	Hash       string      `param:"hash"       validate:"required,base64"`
-	Height     types.Level `param:"height"     validate:"required,min=1"`
-	Commitment string      `param:"commitment" validate:"required,base64"`
-}
-
-// GetBlob godoc
-//
-//	@Summary		Get namespace blob by commitment on height
-//	@Description	Returns blob
-//	@Tags			namespace
-//	@ID				get-namespace-blob
-//	@Param			hash		path	string	true	"Base64-encoded namespace id and version"
-//	@Param			height		path	integer	true	"Block heigth"	minimum(1)
-//	@Param			commitment	path	string	true	"Blob commitment"
-//	@Produce		json
-//	@Success		200	{object}	responses.Blob
-//	@Failure		400	{object}	Error
-//	@Router			/v1/namespace_by_hash/{hash}/{height}/{commitment} [get]
-func (handler *NamespaceHandler) GetBlob(c echo.Context) error {
-	req, err := bindAndValidate[getBlobRequest](c)
-	if err != nil {
-		return badRequestError(c, err)
-	}
-
-	blob, err := handler.blob.Blob(c.Request().Context(), req.Height, req.Hash, req.Commitment)
-	if err != nil {
-		return badRequestError(c, err)
-	}
-
-	response, err := responses.NewBlob(blob)
-	if err != nil {
-		return internalServerError(c, err)
-	}
-
-	return c.JSON(http.StatusOK, response)
-}
-
 type getNamespaceMessages struct {
 	Id      string `param:"id"      validate:"required,hexadecimal,len=56"`
 	Version byte   `param:"version"`
@@ -407,4 +372,78 @@ func (handler *NamespaceHandler) Blob(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+type getBlobLogsForNamespace struct {
+	Id      string `param:"id"      validate:"required,hexadecimal,len=56"`
+	Version byte   `param:"version"`
+	Limit   uint64 `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset  uint64 `query:"offset"  validate:"omitempty,min=0"`
+	Sort    string `query:"sort"    validate:"omitempty,oneof=asc desc"`
+	SortBy  string `query:"sort_by" validate:"omitempty,oneof=time size"`
+}
+
+func (req *getBlobLogsForNamespace) SetDefault() {
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
+	if req.Sort == "" {
+		req.Sort = "desc"
+	}
+}
+
+// GetBlobLogs godoc
+//
+//	@Summary		Get blob changes for namespace
+//	@Description	Returns blob changes for namespace
+//	@Tags			namespace
+//	@ID				get-blob-logs
+//	@Param			id		path	string	true	"Namespace id in hexadecimal"						minlength(56)	maxlength(56)
+//	@Param			version	path	integer	true	"Version of namespace"
+//	@Param			limit	query	integer	false	"Count of requested entities"						mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"											mininum(1)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"							Enums(asc, desc)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"		Enums(time, size)
+//	@Produce		json
+//	@Success		200	{array}	    responses.BlobLog
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/namespace/{id}/{version}/blobs [get]
+func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
+	req, err := bindAndValidate[getBlobLogsForNamespace](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	namespaceId, err := hex.DecodeString(req.Id)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	ns, err := handler.namespace.ByNamespaceIdAndVersion(c.Request().Context(), namespaceId, req.Version)
+	if err != nil {
+		return handleError(c, err, handler.namespace)
+	}
+
+	logs, err := handler.blobLogs.ByNamespace(
+		c.Request().Context(),
+		ns.Id,
+		storage.BlobLogFilters{
+			Limit:  int(req.Limit),
+			Offset: int(req.Offset),
+			Sort:   pgSort(req.Sort),
+			SortBy: req.SortBy,
+		},
+	)
+	if err != nil {
+		return handleError(c, err, handler.namespace)
+	}
+
+	response := make([]responses.BlobLog, len(logs))
+	for i := range response {
+		response[i] = responses.NewBlobLog(logs[i])
+	}
+
+	return returnArray(c, response)
 }

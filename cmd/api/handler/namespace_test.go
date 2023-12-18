@@ -46,6 +46,7 @@ var (
 type NamespaceTestSuite struct {
 	suite.Suite
 	namespaces   *mock.MockINamespace
+	blobLogs     *mock.MockIBlobLog
 	state        *mock.MockIState
 	blobReceiver *nodeMock.MockDalApi
 	echo         *echo.Echo
@@ -59,9 +60,10 @@ func (s *NamespaceTestSuite) SetupSuite() {
 	s.echo.Validator = NewCelestiaApiValidator()
 	s.ctrl = gomock.NewController(s.T())
 	s.namespaces = mock.NewMockINamespace(s.ctrl)
+	s.blobLogs = mock.NewMockIBlobLog(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
 	s.blobReceiver = nodeMock.NewMockDalApi(s.ctrl)
-	s.handler = NewNamespaceHandler(s.namespaces, s.state, testIndexerName, s.blobReceiver)
+	s.handler = NewNamespaceHandler(s.namespaces, s.blobLogs, s.state, testIndexerName, s.blobReceiver)
 }
 
 // TearDownSuite -
@@ -475,4 +477,54 @@ func (s *NamespaceTestSuite) TestBlob() {
 	s.Require().Equal(result.Data, blob.Data)
 	s.Require().Equal(commitment, blob.Commitment)
 
+}
+
+func (s *NamespaceTestSuite) TestGetLogs() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/namespace/:id/:version/logs")
+	c.SetParamNames("id", "version")
+	c.SetParamValues(testNamespaceId, "0")
+
+	s.namespaces.EXPECT().
+		ByNamespaceIdAndVersion(gomock.Any(), testNamespace.NamespaceID, byte(0)).
+		Return(testNamespace, nil)
+
+	s.blobLogs.EXPECT().
+		ByNamespace(gomock.Any(), testNamespace.Id, storage.BlobLogFilters{
+			Limit: 10,
+			Sort:  "desc",
+		}).
+		Return([]storage.BlobLog{
+			{
+				NamespaceId: testNamespace.Id,
+				MsgId:       1,
+				TxId:        1,
+				SignerId:    1,
+				Signer: &storage.Address{
+					Address: testAddress,
+				},
+				Commitment: "test_commitment",
+				Size:       1000,
+				Height:     10000,
+				Time:       testTime,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.GetBlobLogs(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var logs []responses.BlobLog
+	err := json.NewDecoder(rec.Body).Decode(&logs)
+	s.Require().NoError(err)
+	s.Require().Len(logs, 1)
+
+	l := logs[0]
+	s.Require().EqualValues(10000, l.Height)
+	s.Require().Equal(testTime, l.Time)
+	s.Require().Equal(testAddress, l.Signer)
+	s.Require().Equal("test_commitment", l.Commitment)
+	s.Require().EqualValues(1000, l.Size)
+	s.Require().Nil(l.Namespace)
 }

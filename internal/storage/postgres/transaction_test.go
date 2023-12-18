@@ -314,6 +314,29 @@ func (s *StorageTestSuite) TestSaveNamespaceMessages() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
+func (s *StorageTestSuite) TestSaveBlobLogs() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	blobLogs := make([]storage.BlobLog, 5)
+	for i := 0; i < 5; i++ {
+		blobLogs[i].MsgId = uint64(i + 1)
+		blobLogs[i].NamespaceId = uint64(5 - i)
+		blobLogs[i].TxId = uint64((i + 1) * 2)
+		blobLogs[i].Time = time.Now()
+		blobLogs[i].Height = 1000
+	}
+
+	err = tx.SaveBlobLogs(ctx, blobLogs...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
 func (s *StorageTestSuite) TestRollbackBlock() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
@@ -510,6 +533,68 @@ func (s *StorageTestSuite) TestRollbackMessages() {
 	items, err := s.storage.Message.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
 	s.Require().Len(items, 1)
+}
+
+func (s *StorageTestSuite) TestRollbackBlobLogs() {
+	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
+	s.Require().NoError(err)
+
+	fixtures, err := testfixtures.New(
+		testfixtures.Database(db),
+		testfixtures.Dialect("timescaledb"),
+		testfixtures.Directory("../../../test/data"),
+		testfixtures.UseAlterConstraint(),
+	)
+	s.Require().NoError(err)
+	s.Require().NoError(fixtures.Load())
+	s.Require().NoError(db.Close())
+
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackBlobLog(ctx, 1000)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.BlobLogs.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+}
+
+func (s *StorageTestSuite) TestRollbackValidators() {
+	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
+	s.Require().NoError(err)
+
+	fixtures, err := testfixtures.New(
+		testfixtures.Database(db),
+		testfixtures.Dialect("timescaledb"),
+		testfixtures.Directory("../../../test/data"),
+		testfixtures.UseAlterConstraint(),
+	)
+	s.Require().NoError(err)
+	s.Require().NoError(fixtures.Load())
+	s.Require().NoError(db.Close())
+
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackValidators(ctx, 999)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.Validator.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
 }
 
 func (s *StorageTestSuite) TestRollbackNamespaces() {

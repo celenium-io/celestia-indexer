@@ -4,6 +4,7 @@
 package handle
 
 import (
+	"encoding/base64"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -15,14 +16,19 @@ import (
 )
 
 // MsgPayForBlobs pays for the inclusion of a blob in the block.
-func MsgPayForBlobs(level types.Level, blockTime time.Time, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []storage.AddressWithType, []storage.Namespace, int64, error) {
+func MsgPayForBlobs(level types.Level, blockTime time.Time, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []storage.AddressWithType, []storage.Namespace, []*storage.BlobLog, int64, error) {
 	var blobsSize int64
 	uniqueNs := make(map[string]*storage.Namespace)
+	blobLogs := make([]*storage.BlobLog, 0)
 
 	for nsI, ns := range m.Namespaces {
 		if len(m.BlobSizes) < nsI {
-			return storageTypes.MsgUnknown, nil, nil, 0, errors.Errorf(
+			return storageTypes.MsgUnknown, nil, nil, nil, 0, errors.Errorf(
 				"blob sizes length=%d is less then namespaces index=%d", len(m.BlobSizes), nsI)
+		}
+		if len(m.ShareCommitments) < nsI {
+			return storageTypes.MsgUnknown, nil, nil, nil, 0, errors.Errorf(
+				"share commitment sizes length=%d is less then namespaces index=%d", len(m.ShareCommitments), nsI)
 		}
 
 		appNS := namespace.Namespace{Version: ns[0], ID: ns[1:]}
@@ -43,6 +49,16 @@ func MsgPayForBlobs(level types.Level, blockTime time.Time, m *appBlobTypes.MsgP
 		} else {
 			uniqueNs[namespace.String()] = &namespace
 		}
+
+		blobLog := &storage.BlobLog{
+			Commitment: base64.StdEncoding.EncodeToString(m.ShareCommitments[nsI]),
+			Size:       size,
+			Namespace:  &namespace,
+			Height:     level,
+			Time:       blockTime,
+		}
+
+		blobLogs = append(blobLogs, blobLog)
 	}
 
 	namespaces := make([]storage.Namespace, 0, len(uniqueNs))
@@ -54,5 +70,11 @@ func MsgPayForBlobs(level types.Level, blockTime time.Time, m *appBlobTypes.MsgP
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, level)
 
-	return storageTypes.MsgPayForBlobs, addresses, namespaces, blobsSize, err
+	for i := range blobLogs {
+		blobLogs[i].Signer = &storage.Address{
+			Address: m.Signer,
+		}
+	}
+
+	return storageTypes.MsgPayForBlobs, addresses, namespaces, blobLogs, blobsSize, err
 }

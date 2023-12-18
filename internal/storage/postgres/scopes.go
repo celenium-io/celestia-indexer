@@ -10,6 +10,10 @@ import (
 	"github.com/uptrace/bun"
 )
 
+const (
+	sizeColumn = "size"
+)
+
 func limitScope(q *bun.SelectQuery, limit int) *bun.SelectQuery {
 	if limit < 1 || limit > 100 {
 		limit = 10

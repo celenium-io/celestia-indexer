@@ -96,8 +96,8 @@ func (n *Namespace) ListWithSort(ctx context.Context, sortField string, sort sdk
 		field = "last_message_time"
 	case "pfb_count":
 		field = "pfb_count"
-	case "size":
-		field = "size"
+	case sizeColumn:
+		field = sizeColumn
 	default:
 		field = "id"
 	}
