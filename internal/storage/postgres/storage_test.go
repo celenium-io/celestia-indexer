@@ -822,6 +822,16 @@ func (s *StorageTestSuite) TestTxByAddressAndTime() {
 	})
 	s.Require().NoError(err)
 	s.Require().Len(txs, 1)
+
+	txs, err = s.storage.Tx.ByAddress(ctx, 1, storage.TxFilter{
+		Limit:  10,
+		Offset: 1,
+
+		TimeFrom: time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
+		TimeTo:   time.Date(2023, 7, 5, 0, 0, 0, 0, time.UTC),
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 0)
 }
 
 func (s *StorageTestSuite) TestTxGas() {

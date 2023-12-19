@@ -53,7 +53,8 @@ func (tx *Tx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxF
 	query := tx.DB().NewSelect().
 		Model(&relations).
 		Where("address_id = ?", addressId).
-		Relation("Tx")
+		Relation("Tx").
+		Offset(fltrs.Offset)
 
 	query = txFilter(query, fltrs)
 
