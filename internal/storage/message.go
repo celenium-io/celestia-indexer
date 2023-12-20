@@ -52,6 +52,7 @@ type Message struct {
 	Namespace []Namespace       `bun:"m2m:namespace_message,join:Message=Namespace"`
 	Validator *Validator        `bun:"rel:belongs-to"`
 	Addresses []AddressWithType `bun:"-"`
+	BlobLogs  []*BlobLog        `bun:"-"`
 }
 
 // TableName -

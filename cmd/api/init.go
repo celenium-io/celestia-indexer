@@ -298,7 +298,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		WithAuthToken(os.Getenv("CELESTIA_NODE_AUTH_TOKEN")).
 		WithRateLimit(datasource.RequestsPerSecond)
 
-	namespaceHandlers := handler.NewNamespaceHandler(db.Namespace, db.State, cfg.Indexer.Name, blobReceiver)
+	namespaceHandlers := handler.NewNamespaceHandler(db.Namespace, db.BlobLogs, db.State, cfg.Indexer.Name, blobReceiver)
 	v1.POST("/blob", namespaceHandlers.Blob)
 
 	namespaceGroup := v1.Group("/namespace")
@@ -309,13 +309,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		namespaceGroup.GET("/:id", namespaceHandlers.Get)
 		namespaceGroup.GET("/:id/:version", namespaceHandlers.GetWithVersion)
 		namespaceGroup.GET("/:id/:version/messages", namespaceHandlers.GetMessages)
+		namespaceGroup.GET("/:id/:version/logs", namespaceHandlers.GetBlobLogs)
 	}
 
 	namespaceByHash := v1.Group("/namespace_by_hash")
 	{
 		namespaceByHash.GET("/:hash", namespaceHandlers.GetByHash)
 		namespaceByHash.GET("/:hash/:height", namespaceHandlers.GetBlobs)
-		namespaceByHash.GET("/:hash/:height/:commitment", namespaceHandlers.GetBlob)
 	}
 
 	validatorsHandler := handler.NewValidatorHandler(db.Validator)

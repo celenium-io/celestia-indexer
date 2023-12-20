@@ -370,6 +370,12 @@ func Test_saveMessages(t *testing.T) {
 				return nil
 			})
 
+		tx.EXPECT().
+			SaveBlobLogs(gomock.Any(), gomock.Any()).
+			MaxTimes(1).
+			MinTimes(1).
+			Return(nil)
+
 		t.Run(tt.name, func(t *testing.T) {
 			err := saveMessages(context.Background(), tx, tt.args.messages, tt.args.addrToId)
 			require.Equal(t, tt.wantErr, err != nil)

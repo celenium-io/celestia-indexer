@@ -76,6 +76,28 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 			},
 		},
 		Addresses: addressesExpected,
+		BlobLogs: []*storage.BlobLog{
+			{
+				Height:     blob.Height,
+				Time:       now,
+				Size:       1,
+				Commitment: "sByGdyB1V2vnQ3n/0Wo0Y1i3VSRDiWLHkJ8Nsm++eSQ=",
+				Namespace: &storage.Namespace{
+					Id:              0,
+					FirstHeight:     blob.Height,
+					Version:         0,
+					NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+					Size:            1,
+					PfbCount:        1,
+					Reserved:        false,
+					LastHeight:      blob.Height,
+					LastMessageTime: blob.Block.Time,
+				},
+				Signer: &storage.Address{
+					Address: "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
+				},
+			},
+		},
 	}
 
 	assert.NoError(t, err)
@@ -149,6 +171,66 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 			},
 		},
 		Addresses: addressesExpected,
+		BlobLogs: []*storage.BlobLog{
+			{
+				Height:     blob.Height,
+				Time:       now,
+				Size:       1,
+				Commitment: "sByGdyB1V2vnQ3n/0Wo0Y1i3VSRDiWLHkJ8Nsm++eSQ=",
+				Namespace: &storage.Namespace{
+					Id:              0,
+					FirstHeight:     blob.Height,
+					Version:         0,
+					NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+					Size:            6,
+					PfbCount:        1,
+					Reserved:        false,
+					LastHeight:      blob.Height,
+					LastMessageTime: blob.Block.Time,
+				},
+				Signer: &storage.Address{
+					Address: "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
+				},
+			}, {
+				Height:     blob.Height,
+				Time:       now,
+				Size:       2,
+				Commitment: "sByGdyB1V2vnQ3n/0Wo0Y1i3VSRDiWLHkJ8Nsm++eSU=",
+				Namespace: &storage.Namespace{
+					Id:              0,
+					FirstHeight:     blob.Height,
+					Version:         0,
+					NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+					Size:            2,
+					PfbCount:        1,
+					Reserved:        false,
+					LastHeight:      blob.Height,
+					LastMessageTime: blob.Block.Time,
+				},
+				Signer: &storage.Address{
+					Address: "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
+				},
+			}, {
+				Height:     blob.Height,
+				Time:       now,
+				Size:       3,
+				Commitment: "sByGdyB1V2vnQ3n/0Wo0Y1i3VSRDiWLHkJ8Nsm++eSY=",
+				Namespace: &storage.Namespace{
+					Id:              0,
+					FirstHeight:     blob.Height,
+					Version:         0,
+					NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+					Size:            3,
+					PfbCount:        1,
+					Reserved:        false,
+					LastHeight:      blob.Height,
+					LastMessageTime: blob.Block.Time,
+				},
+				Signer: &storage.Address{
+					Address: "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
+				},
+			},
+		},
 	}
 
 	assert.NoError(t, err)

@@ -892,6 +892,44 @@ func (c *TransactionRollbackAddressesCall) DoAndReturn(f func(context.Context, t
 	return c
 }
 
+// RollbackBlobLog mocks base method.
+func (m *MockTransaction) RollbackBlobLog(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackBlobLog", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackBlobLog indicates an expected call of RollbackBlobLog.
+func (mr *MockTransactionMockRecorder) RollbackBlobLog(ctx, height any) *TransactionRollbackBlobLogCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackBlobLog", reflect.TypeOf((*MockTransaction)(nil).RollbackBlobLog), ctx, height)
+	return &TransactionRollbackBlobLogCall{Call: call}
+}
+
+// TransactionRollbackBlobLogCall wrap *gomock.Call
+type TransactionRollbackBlobLogCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionRollbackBlobLogCall) Return(arg0 error) *TransactionRollbackBlobLogCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionRollbackBlobLogCall) Do(f func(context.Context, types.Level) error) *TransactionRollbackBlobLogCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionRollbackBlobLogCall) DoAndReturn(f func(context.Context, types.Level) error) *TransactionRollbackBlobLogCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // RollbackBlock mocks base method.
 func (m *MockTransaction) RollbackBlock(ctx context.Context, height types.Level) error {
 	m.ctrl.T.Helper()
@@ -1361,6 +1399,49 @@ func (c *TransactionSaveBalancesCall) Do(f func(context.Context, ...storage.Bala
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *TransactionSaveBalancesCall) DoAndReturn(f func(context.Context, ...storage.Balance) error) *TransactionSaveBalancesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveBlobLogs mocks base method.
+func (m *MockTransaction) SaveBlobLogs(ctx context.Context, logs ...storage.BlobLog) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range logs {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveBlobLogs", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveBlobLogs indicates an expected call of SaveBlobLogs.
+func (mr *MockTransactionMockRecorder) SaveBlobLogs(ctx any, logs ...any) *TransactionSaveBlobLogsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, logs...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveBlobLogs", reflect.TypeOf((*MockTransaction)(nil).SaveBlobLogs), varargs...)
+	return &TransactionSaveBlobLogsCall{Call: call}
+}
+
+// TransactionSaveBlobLogsCall wrap *gomock.Call
+type TransactionSaveBlobLogsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionSaveBlobLogsCall) Return(arg0 error) *TransactionSaveBlobLogsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionSaveBlobLogsCall) Do(f func(context.Context, ...storage.BlobLog) error) *TransactionSaveBlobLogsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionSaveBlobLogsCall) DoAndReturn(f func(context.Context, ...storage.BlobLog) error) *TransactionSaveBlobLogsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

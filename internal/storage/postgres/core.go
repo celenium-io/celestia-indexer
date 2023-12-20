@@ -25,6 +25,7 @@ type Storage struct {
 
 	Blocks        models.IBlock
 	BlockStats    models.IBlockStats
+	BlobLogs      models.IBlobLog
 	Constants     models.IConstant
 	DenomMetadata models.IDenomMetadata
 	Tx            models.ITx
@@ -51,6 +52,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		Storage:       strg,
 		Blocks:        NewBlocks(strg.Connection()),
 		BlockStats:    NewBlockStats(strg.Connection()),
+		BlobLogs:      NewBlobLog(strg.Connection()),
 		Constants:     NewConstant(strg.Connection()),
 		DenomMetadata: NewDenomMetadata(strg.Connection()),
 		Message:       NewMessage(strg.Connection()),
@@ -123,6 +125,7 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 			&models.Message{},
 			&models.Event{},
 			&models.NamespaceMessage{},
+			&models.BlobLog{},
 		} {
 			if _, err := tx.ExecContext(ctx,
 				`SELECT create_hypertable(?, 'time', chunk_time_interval => INTERVAL '1 month', if_not_exists => TRUE);`,

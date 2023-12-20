@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/pkg/errors"
 )
 
 func saveMessages(
@@ -22,6 +23,7 @@ func saveMessages(
 	var (
 		namespaceMsgs []storage.NamespaceMessage
 		msgAddress    []storage.MsgAddress
+		blobLogs      = make([]storage.BlobLog, 0)
 		validators    = make([]*storage.Validator, 0)
 		namespaces    = make(map[string]uint64)
 		addedMsgId    = make(map[uint64]struct{})
@@ -76,6 +78,30 @@ func saveMessages(
 				msgAddrMap[key] = struct{}{}
 			}
 		}
+
+		for j := range messages[i].BlobLogs {
+			if messages[i].BlobLogs[j].Namespace == nil {
+				return errors.New("nil namespace in pay for blob message")
+			}
+			nsId, ok := namespaces[messages[i].BlobLogs[j].Namespace.String()]
+			if !ok {
+				return errors.Errorf("can't find namespace for pay for blob message: %s", messages[i].BlobLogs[j].Namespace.String())
+			}
+			if messages[i].BlobLogs[j].Signer == nil {
+				return errors.New("nil signer address in pay for blob message")
+			}
+			signerId, ok := addrToId[messages[i].BlobLogs[j].Signer.Address]
+			if !ok {
+				return errors.Errorf("can't find signer address for pay for blob message: %s", messages[i].BlobLogs[j].Signer.Address)
+			}
+
+			messages[i].BlobLogs[j].MsgId = messages[i].Id
+			messages[i].BlobLogs[j].TxId = messages[i].TxId
+			messages[i].BlobLogs[j].SignerId = signerId
+			messages[i].BlobLogs[j].NamespaceId = nsId
+
+			blobLogs = append(blobLogs, *messages[i].BlobLogs[j])
+		}
 	}
 
 	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
@@ -85,6 +111,9 @@ func saveMessages(
 		return err
 	}
 	if err := tx.SaveMsgAddresses(ctx, msgAddress...); err != nil {
+		return err
+	}
+	if err := tx.SaveBlobLogs(ctx, blobLogs...); err != nil {
 		return err
 	}
 
