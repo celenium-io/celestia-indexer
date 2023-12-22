@@ -17,13 +17,15 @@ import (
 type StatsHandler struct {
 	repo   storage.IStats
 	nsRepo storage.INamespace
+	price  storage.IPrice
 	state  storage.IState
 }
 
-func NewStatsHandler(repo storage.IStats, nsRepo storage.INamespace, state storage.IState) StatsHandler {
+func NewStatsHandler(repo storage.IStats, nsRepo storage.INamespace, price storage.IPrice, state storage.IState) StatsHandler {
 	return StatsHandler{
 		repo:   repo,
 		nsRepo: nsRepo,
+		price:  price,
 		state:  state,
 	}
 }
@@ -350,4 +352,62 @@ func (sh StatsHandler) NamespaceSeries(c echo.Context) error {
 		response[i] = responses.NewSeriesItem(histogram[i])
 	}
 	return returnArray(c, response)
+}
+
+type priceSeriesRequest struct {
+	Timeframe string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=1m 1h 1d"`
+	From      uint64 `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To        uint64 `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
+// PriceSeries godoc
+//
+//	@Summary				Get histogram with TIA price
+//	@Description        	Get histogram with TIA price
+//	@Tags					stats
+//	@ID						stats-price-series
+//	@Param					timeframe	path	string	true	"Timeframe"		Enums(1m, 1h, 1d)
+//	@Param					from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param					to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Produce				json
+//	@Success				200	{array}     responses.Price
+//	@Failure				400	{object}	Error
+//	@Failure				500	{object}	Error
+//	@Router					/v1/stats/price/series/{timeframe} [get]
+func (sh StatsHandler) PriceSeries(c echo.Context) error {
+	req, err := bindAndValidate[priceSeriesRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	histogram, err := sh.price.Get(c.Request().Context(), req.Timeframe, int64(req.From), int64(req.To), 100)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	response := make([]responses.Price, len(histogram))
+	for i := range histogram {
+		response[i] = responses.NewPrice(histogram[i])
+	}
+	return returnArray(c, response)
+}
+
+// PriceCurrent godoc
+//
+//	@Summary				Get current TIA price
+//	@Description        	Get current TIA price
+//	@Tags					stats
+//	@ID						stats-price-current
+//	@Produce				json
+//	@Success				200	{object}    responses.Price
+//	@Failure				400	{object}	Error
+//	@Failure				500	{object}	Error
+//	@Router					/v1/stats/price/current [get]
+func (sh StatsHandler) PriceCurrent(c echo.Context) error {
+	price, err := sh.price.Last(c.Request().Context())
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewPrice(price))
 }

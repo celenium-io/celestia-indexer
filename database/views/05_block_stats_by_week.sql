@@ -1,5 +1,5 @@
 CREATE MATERIALIZED VIEW IF NOT EXISTS block_stats_by_week
-WITH (timescaledb.continuous, timescaledb.materialized_only=true) AS
+WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
 	select 
 		time_bucket('1 week'::interval, day.ts) AS ts,
 		sum(blobs_size)/(7 * 86400.0) as bps,

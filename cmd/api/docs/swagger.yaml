@@ -418,6 +418,29 @@ definitions:
     additionalProperties:
       type: string
     type: object
+  responses.Price:
+    properties:
+      close:
+        example: "0.17632"
+        format: string
+        type: string
+      high:
+        example: "0.17632"
+        format: string
+        type: string
+      low:
+        example: "0.17632"
+        format: string
+        type: string
+      open:
+        example: "0.17632"
+        format: string
+        type: string
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
+    type: object
   responses.SeriesItem:
     properties:
       max:
@@ -2301,6 +2324,70 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get namespaces with sorting by size.
+      tags:
+      - stats
+  /v1/stats/price/current:
+    get:
+      description: Get current TIA price
+      operationId: stats-price-current
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Price'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get current TIA price
+      tags:
+      - stats
+  /v1/stats/price/series/{timeframe}:
+    get:
+      description: Get histogram with TIA price
+      operationId: stats-price-series
+      parameters:
+      - description: Timeframe
+        enum:
+        - 1m
+        - 1h
+        - 1d
+        in: path
+        name: timeframe
+        required: true
+        type: string
+      - description: Time from in unix timestamp
+        in: query
+        name: from
+        type: integer
+      - description: Time to in unix timestamp
+        in: query
+        name: to
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.Price'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get histogram with TIA price
       tags:
       - stats
   /v1/stats/series/{name}/{timeframe}:

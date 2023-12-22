@@ -16,6 +16,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -25,6 +26,7 @@ type StatsTestSuite struct {
 	suite.Suite
 	stats   *mock.MockIStats
 	ns      *mock.MockINamespace
+	price   *mock.MockIPrice
 	state   *mock.MockIState
 	echo    *echo.Echo
 	handler StatsHandler
@@ -37,9 +39,10 @@ func (s *StatsTestSuite) SetupSuite() {
 	s.echo.Validator = NewCelestiaApiValidator()
 	s.ctrl = gomock.NewController(s.T())
 	s.stats = mock.NewMockIStats(s.ctrl)
+	s.price = mock.NewMockIPrice(s.ctrl)
 	s.ns = mock.NewMockINamespace(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewStatsHandler(s.stats, s.ns, s.state)
+	s.handler = NewStatsHandler(s.stats, s.ns, s.price, s.state)
 }
 
 // TearDownSuite -
@@ -410,4 +413,74 @@ func (s *StatsTestSuite) TestNamespaceStatsHistogram() {
 			s.Require().Equal("11234", item.Value)
 		}
 	}
+}
+
+func (s *StatsTestSuite) TestPriceSeries() {
+	for _, tf := range []string{
+		storage.PriceTimeframeDay,
+		storage.PriceTimeframeHour,
+		storage.PriceTimeframeMinute,
+	} {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		c := s.echo.NewContext(req, rec)
+		c.SetPath("/v1/stats/price/series/:timeframe")
+		c.SetParamNames("timeframe")
+		c.SetParamValues(tf)
+
+		s.price.EXPECT().
+			Get(gomock.Any(), tf, int64(0), int64(0), 100).
+			Return([]storage.Price{
+				{
+					Time:  testTime,
+					Open:  decimal.RequireFromString("0.1"),
+					High:  decimal.RequireFromString("0.2"),
+					Low:   decimal.RequireFromString("0.01"),
+					Close: decimal.RequireFromString("0.15"),
+				},
+			}, nil)
+
+		s.Require().NoError(s.handler.PriceSeries(c))
+		s.Require().Equal(http.StatusOK, rec.Code)
+
+		var response []responses.Price
+		err := json.NewDecoder(rec.Body).Decode(&response)
+		s.Require().NoError(err)
+		s.Require().Len(response, 1)
+
+		item := response[0]
+		s.Require().Equal("0.1", item.Open)
+		s.Require().Equal("0.2", item.High)
+		s.Require().Equal("0.01", item.Low)
+		s.Require().Equal("0.15", item.Close)
+	}
+}
+
+func (s *StatsTestSuite) TestPriceCurrent() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/price/current")
+
+	s.price.EXPECT().
+		Last(gomock.Any()).
+		Return(storage.Price{
+			Time:  testTime,
+			Open:  decimal.RequireFromString("0.1"),
+			High:  decimal.RequireFromString("0.2"),
+			Low:   decimal.RequireFromString("0.01"),
+			Close: decimal.RequireFromString("0.15"),
+		}, nil)
+
+	s.Require().NoError(s.handler.PriceCurrent(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response responses.Price
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+
+	s.Require().Equal("0.1", response.Open)
+	s.Require().Equal("0.2", response.High)
+	s.Require().Equal("0.01", response.Low)
+	s.Require().Equal("0.15", response.Close)
 }

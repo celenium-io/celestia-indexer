@@ -325,13 +325,19 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		validators.GET("/:id", validatorsHandler.Get)
 	}
 
-	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.State)
+	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.Price, db.State)
 	stats := v1.Group("/stats")
 	{
 		stats.GET("/summary/:table/:function", statsHandler.Summary)
 		stats.GET("/histogram/:table/:function/:timeframe", statsHandler.Histogram)
 		stats.GET("/tps", statsHandler.TPS)
 		stats.GET("/tx_count_24h", statsHandler.TxCountHourly24h)
+
+		price := stats.Group("/price")
+		{
+			price.GET("/current", statsHandler.PriceCurrent)
+			price.GET("/series/:timeframe", statsHandler.PriceSeries)
+		}
 
 		namespace := stats.Group("/namespace")
 		{

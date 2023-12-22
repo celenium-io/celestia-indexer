@@ -1,5 +1,5 @@
 CREATE MATERIALIZED VIEW IF NOT EXISTS block_stats_by_month
-WITH (timescaledb.continuous, timescaledb.materialized_only=true) AS
+WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
 	select 
 		time_bucket('1 month', day.ts) AS ts,
 		sum(blobs_size)/(count(*) * 86400.0) as bps,

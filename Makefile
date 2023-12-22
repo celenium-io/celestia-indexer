@@ -10,6 +10,9 @@ indexer:
 api:
 	cd cmd/api && go run . -c ../../configs/dipdup.yml
 
+quotes:
+	cd cmd/quotes && go run . -c ../../configs/dipdup.yml
+
 build:
 	cd cmd/indexer && go build -a -o ../../bin/indexer .
 	cd cmd/api && go build -a -o ../../bin/api .
@@ -37,7 +40,7 @@ adr:
 	@cp adr/adr-template.md adr/adr-$(NUM)-$(TITLE).md
 
 generate:
-	go generate -v ./internal/storage ./internal/storage/types ./pkg/node
+	go generate -v ./internal/storage ./internal/storage/types ./pkg/node ./internal/binance
 
 api-docs:
 	cd cmd/api && swag init --md markdown -parseDependency --parseInternal --parseDepth 1

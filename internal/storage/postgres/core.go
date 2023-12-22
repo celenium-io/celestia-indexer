@@ -33,6 +33,7 @@ type Storage struct {
 	Event         models.IEvent
 	Address       models.IAddress
 	Namespace     models.INamespace
+	Price         models.IPrice
 	State         models.IState
 	Stats         models.IStats
 	Validator     models.IValidator
@@ -58,6 +59,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		Message:       NewMessage(strg.Connection()),
 		Event:         NewEvent(strg.Connection()),
 		Address:       NewAddress(strg.Connection()),
+		Price:         NewPrice(strg.Connection()),
 		Tx:            NewTx(strg.Connection()),
 		State:         NewState(strg.Connection()),
 		Namespace:     NewNamespace(strg.Connection()),
@@ -126,6 +128,7 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 			&models.Event{},
 			&models.NamespaceMessage{},
 			&models.BlobLog{},
+			&models.Price{},
 		} {
 			if _, err := tx.ExecContext(ctx,
 				`SELECT create_hypertable(?, 'time', chunk_time_interval => INTERVAL '1 month', if_not_exists => TRUE);`,
