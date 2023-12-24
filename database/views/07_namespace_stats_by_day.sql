@@ -3,7 +3,7 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=true) AS
 	select 
 		time_bucket('1 day'::interval, nm.ts) AS ts,
 		nm.namespace_id,
-		count(*) as pfb_count,
+		sum(pfb_count) as pfb_count,
 		sum(size) as size		
 	from namespace_stats_by_hour as nm
 	group by 1, 2
