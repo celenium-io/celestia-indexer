@@ -532,7 +532,7 @@ func (s *StorageTestSuite) TestNamespaceActiveByPfbCount() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	ns, err := s.storage.Namespace.ListWithSort(ctx, "pfb_count", sdk.SortOrderDesc, 2, 0)
+	ns, err := s.storage.Namespace.ListWithSort(ctx, pfbCountColumn, sdk.SortOrderDesc, 2, 0)
 	s.Require().NoError(err)
 	s.Require().Len(ns, 2)
 
@@ -554,6 +554,15 @@ func (s *StorageTestSuite) TestNamespaceActiveBySize() {
 	s.Require().EqualValues(1000, namespace.LastHeight)
 	s.Require().EqualValues(2, namespace.Id)
 	s.Require().EqualValues(1255, namespace.Size)
+}
+
+func (s *StorageTestSuite) TestNamespaceGetByIds() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	ns, err := s.storage.Namespace.GetByIds(ctx, 1, 2, 3)
+	s.Require().NoError(err)
+	s.Require().Len(ns, 3)
 }
 
 func (s *StorageTestSuite) TestTxByHash() {
@@ -937,6 +946,43 @@ func (s *StorageTestSuite) TestDenomMetadata() {
 	s.Require().EqualValues("TIA", m.Name)
 	s.Require().EqualValues("The native staking token of the Celestia network.", m.Description)
 	s.Require().Greater(len(m.Units), 0)
+}
+
+func (s *StorageTestSuite) TestRollupLeaderboard() {
+	for _, column := range []string{
+		sizeColumn, blobsCountColumn, timeColumn, "",
+	} {
+		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer ctxCancel()
+
+		rollups, err := s.storage.Rollup.Leaderboard(ctx, column, sdk.SortOrderDesc, 10, 0)
+		s.Require().NoError(err)
+		s.Require().Len(rollups, 1)
+
+		rollup := rollups[0]
+		s.Require().EqualValues("Rollup 1", rollup.Name)
+		s.Require().EqualValues("The best rollup ever", rollup.Description)
+		s.Require().EqualValues(20, rollup.Size)
+		s.Require().EqualValues(1, rollup.BlobsCount)
+	}
+}
+
+func (s *StorageTestSuite) TestRollupNamespaces() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	nsIds, err := s.storage.Rollup.Namespaces(ctx, 1, 10, 0)
+	s.Require().NoError(err)
+	s.Require().Len(nsIds, 3)
+}
+
+func (s *StorageTestSuite) TestRollupProviders() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	providers, err := s.storage.Rollup.Providers(ctx, 1)
+	s.Require().NoError(err)
+	s.Require().Len(providers, 3)
 }
 
 func (s *StorageTestSuite) TestNotify() {

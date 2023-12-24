@@ -1,0 +1,14 @@
+- id: 1
+  name: Rollup 1
+  description: The best rollup ever
+  website: https://rollup1.com
+  twitter: https://x.com/rollup1
+  github: https://github.com/rollup1
+  logo: https://rollup1.com/image.png
+- id: 2
+  name: Rollup 2
+  description: The second
+  website: https://rollup2.com
+  twitter: https://x.com/rollup2
+  github: https://github.com/rollup2
+  logo: https://rollup2.com/image.png

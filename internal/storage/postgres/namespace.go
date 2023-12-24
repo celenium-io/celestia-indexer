@@ -7,6 +7,7 @@ import (
 	"context"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/uptrace/bun"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
@@ -92,10 +93,10 @@ func (n *Namespace) CountMessagesByHeight(ctx context.Context, height pkgTypes.L
 func (n *Namespace) ListWithSort(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) (ns []storage.Namespace, err error) {
 	var field string
 	switch sortField {
-	case "time":
+	case timeColumn:
 		field = "last_message_time"
-	case "pfb_count":
-		field = "pfb_count"
+	case pfbCountColumn:
+		field = pfbCountColumn
 	case sizeColumn:
 		field = sizeColumn
 	default:
@@ -132,4 +133,13 @@ func (n *Namespace) CountMessagesByTxId(ctx context.Context, txId uint64) (int, 
 	return n.DB().NewSelect().Model((*storage.NamespaceMessage)(nil)).
 		Where("namespace_message.tx_id = ?", txId).
 		Count(ctx)
+}
+
+func (n *Namespace) GetByIds(ctx context.Context, ids ...uint64) (ns []storage.Namespace, err error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
+	err = n.DB().NewSelect().Model(&ns).Where("id IN (?)", bun.In(ids)).Scan(ctx)
+	return
 }

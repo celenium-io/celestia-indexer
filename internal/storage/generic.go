@@ -30,6 +30,8 @@ var Models = []any{
 	&Validator{},
 	&BlobLog{},
 	&Price{},
+	&Rollup{},
+	&RollupProvider{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -69,6 +71,9 @@ type Transaction interface {
 	LastBlock(ctx context.Context) (block Block, err error)
 	State(ctx context.Context, name string) (state State, err error)
 	Namespace(ctx context.Context, id uint64) (ns Namespace, err error)
+	SaveRollup(ctx context.Context, rollup *Rollup) error
+	UpdateRollup(ctx context.Context, rollup *Rollup) error
+	SaveProviders(ctx context.Context, providers ...RollupProvider) error
 
 	RollbackBlock(ctx context.Context, height types.Level) error
 	RollbackBlockStats(ctx context.Context, height types.Level) (stats BlockStats, err error)
@@ -86,6 +91,8 @@ type Transaction interface {
 	LastAddressAction(ctx context.Context, address []byte) (uint64, error)
 	LastNamespaceMessage(ctx context.Context, nsId uint64) (msg NamespaceMessage, err error)
 	GetProposerId(ctx context.Context, address string) (uint64, error)
+	DeleteProviders(ctx context.Context, rollupId uint64) error
+	DeleteRollup(ctx context.Context, rollupId uint64) error
 }
 
 const (

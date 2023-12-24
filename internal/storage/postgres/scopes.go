@@ -11,7 +11,10 @@ import (
 )
 
 const (
-	sizeColumn = "size"
+	sizeColumn       = "size"
+	timeColumn       = "time"
+	pfbCountColumn   = "pfb_count"
+	blobsCountColumn = "blobs_count"
 )
 
 func limitScope(q *bun.SelectQuery, limit int) *bun.SelectQuery {

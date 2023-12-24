@@ -52,3 +52,9 @@ func handleError(c echo.Context, err error, noRows NoRows) error {
 	}
 	return internalServerError(c, err)
 }
+
+func success(c echo.Context) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "success",
+	})
+}

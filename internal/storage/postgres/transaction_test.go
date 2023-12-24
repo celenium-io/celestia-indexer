@@ -826,6 +826,49 @@ func (s *StorageTestSuite) TestGetProposerId() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
+func (s *StorageTestSuite) TestSaveUpdateAndDeleteRollup() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	rollup := &storage.Rollup{
+		Name:        "Rollup 2",
+		Description: "The second",
+		Website:     "https://website.com",
+		Twitter:     "https://x.com/rollup2",
+	}
+	err = tx.SaveRollup(ctx, rollup)
+	s.Require().NoError(err)
+	s.Require().Greater(rollup.Id, uint64(0))
+
+	rollup.GitHub = "https://github.com/rollup2"
+	err = tx.UpdateRollup(ctx, rollup)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	newRollup, err := s.storage.Rollup.GetByID(ctx, rollup.Id)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(rollup.Name, newRollup.Name)
+	s.Require().EqualValues(rollup.Description, newRollup.Description)
+	s.Require().EqualValues(rollup.Website, newRollup.Website)
+	s.Require().EqualValues(rollup.GitHub, newRollup.GitHub)
+	s.Require().EqualValues(rollup.Twitter, newRollup.Twitter)
+
+	tx, err = BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.DeleteRollup(ctx, newRollup.Id)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
 func TestSuiteTransaction_Run(t *testing.T) {
 	suite.Run(t, new(TransactionTestSuite))
 }

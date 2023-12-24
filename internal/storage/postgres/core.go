@@ -37,6 +37,7 @@ type Storage struct {
 	State         models.IState
 	Stats         models.IStats
 	Validator     models.IValidator
+	Rollup        models.IRollup
 	Notificator   *Notificator
 }
 
@@ -65,6 +66,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		Namespace:     NewNamespace(strg.Connection()),
 		Stats:         NewStats(strg.Connection()),
 		Validator:     NewValidator(strg.Connection()),
+		Rollup:        NewRollup(strg.Connection()),
 		Notificator:   NewNotificator(cfg, strg.Connection().DB()),
 	}
 
@@ -88,6 +90,7 @@ func initDatabase(ctx context.Context, conn *database.Bun) error {
 		(*models.NamespaceMessage)(nil),
 		(*models.Signer)(nil),
 		(*models.MsgAddress)(nil),
+		(*models.RollupProvider)(nil),
 	)
 
 	if err := database.CreateTables(ctx, conn, models.Models...); err != nil {
