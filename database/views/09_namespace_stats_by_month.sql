@@ -3,7 +3,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS namespace_stats_by_month
     select 
       time_bucket('1 month', nm.ts) AS ts,
       nm.namespace_id,
-      count(*) as pfb_count,
+		  sum(pfb_count) as pfb_count,
       sum(size) as size		
     from namespace_stats_by_day as nm
     group by 1, 2

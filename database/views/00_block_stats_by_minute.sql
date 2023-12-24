@@ -9,6 +9,7 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=true) AS
 		max(case when block_time > 0 then tx_count::float/(block_time/1000.0) else 0 end) as tps_max,
 		min(case when block_time > 0 then tx_count::float/(block_time/1000.0) else 0 end) as tps_min,
 		avg(block_time) as block_time,
+		percentile_agg(block_time) as block_time_pct,
 		sum(blobs_size) as blobs_size,
 		sum(tx_count) as tx_count,
 		sum(events_count) as events_count,
