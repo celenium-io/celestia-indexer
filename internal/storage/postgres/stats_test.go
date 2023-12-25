@@ -702,7 +702,7 @@ func (s *StatsTestSuite) TestSeries() {
 
 	items, err := s.storage.Stats.Series(ctx, storage.TimeframeHour, storage.SeriesBlobsSize, storage.SeriesRequest{})
 	s.Require().NoError(err)
-	s.Require().Len(items, 0)
+	s.Require().Len(items, 1)
 }
 
 func (s *StatsTestSuite) TestSeriesWithFrom() {
@@ -722,7 +722,7 @@ func (s *StatsTestSuite) TestNamespaceSeries() {
 
 	items, err := s.storage.Stats.NamespaceSeries(ctx, storage.TimeframeHour, storage.SeriesNsSize, 1, storage.SeriesRequest{})
 	s.Require().NoError(err)
-	s.Require().Len(items, 0)
+	s.Require().Len(items, 1)
 }
 
 func TestSuiteStats_Run(t *testing.T) {

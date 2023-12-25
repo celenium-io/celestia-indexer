@@ -1,5 +1,5 @@
 CREATE MATERIALIZED VIEW IF NOT EXISTS namespace_stats_by_day
-WITH (timescaledb.continuous, timescaledb.materialized_only=true) AS
+WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
 	select 
 		time_bucket('1 day'::interval, nm.ts) AS ts,
 		nm.namespace_id,

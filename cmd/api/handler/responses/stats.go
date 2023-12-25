@@ -71,3 +71,21 @@ func NewSeriesItem(item storage.SeriesItem) SeriesItem {
 		Min:   item.Min,
 	}
 }
+
+type Price struct {
+	Time  time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"  swaggertype:"string"`
+	Open  string    `example:"0.17632"                   format:"string"    json:"open"  swaggertype:"string"`
+	High  string    `example:"0.17632"                   format:"string"    json:"high"  swaggertype:"string"`
+	Low   string    `example:"0.17632"                   format:"string"    json:"low"   swaggertype:"string"`
+	Close string    `example:"0.17632"                   format:"string"    json:"close" swaggertype:"string"`
+}
+
+func NewPrice(price storage.Price) Price {
+	return Price{
+		Time:  price.Time,
+		Open:  price.Open.String(),
+		High:  price.High.String(),
+		Low:   price.Low.String(),
+		Close: price.Close.String(),
+	}
+}

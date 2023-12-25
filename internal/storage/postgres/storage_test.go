@@ -969,6 +969,35 @@ func (s *StorageTestSuite) TestNotify() {
 	}
 }
 
+func (s *StorageTestSuite) TestPriceGet() {
+	for _, tf := range []string{
+		storage.PriceTimeframeDay,
+		storage.PriceTimeframeHour,
+		storage.PriceTimeframeMinute,
+	} {
+
+		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer ctxCancel()
+
+		candles, err := s.storage.Price.Get(ctx, tf, 0, 0, 1)
+		s.Require().NoError(err)
+		s.Require().Len(candles, 1)
+	}
+}
+
+func (s *StorageTestSuite) TestPriceLast() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	candle, err := s.storage.Price.Last(ctx)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues("1.789", candle.Open.String())
+	s.Require().EqualValues("2.0001", candle.High.String())
+	s.Require().EqualValues("0.9999", candle.Low.String())
+	s.Require().EqualValues("1.345", candle.Close.String())
+}
+
 func TestSuiteStorage_Run(t *testing.T) {
 	suite.Run(t, new(StorageTestSuite))
 }
