@@ -15,7 +15,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/node"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 )
 
 type NamespaceHandler struct {
@@ -83,7 +82,7 @@ func (handler *NamespaceHandler) Get(c echo.Context) error {
 }
 
 type getNamespaceByHashRequest struct {
-	Hash string `param:"hash" validate:"required,base64"`
+	Hash string `param:"hash" validate:"required,base64,namespace"`
 }
 
 // GetByHash godoc
@@ -109,9 +108,7 @@ func (handler *NamespaceHandler) GetByHash(c echo.Context) error {
 	if err != nil {
 		return badRequestError(c, err)
 	}
-	if len(hash) != 29 {
-		return badRequestError(c, errors.Wrapf(errInvalidNamespaceLength, "got %d", len(hash)))
-	}
+
 	version := hash[0]
 	namespaceId := hash[1:]
 

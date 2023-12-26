@@ -278,6 +278,50 @@ func (c *INamespaceGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*st
 	return c
 }
 
+// GetByIds mocks base method.
+func (m *MockINamespace) GetByIds(ctx context.Context, ids ...uint64) ([]storage.Namespace, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range ids {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetByIds", varargs...)
+	ret0, _ := ret[0].([]storage.Namespace)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByIds indicates an expected call of GetByIds.
+func (mr *MockINamespaceMockRecorder) GetByIds(ctx any, ids ...any) *INamespaceGetByIdsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, ids...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByIds", reflect.TypeOf((*MockINamespace)(nil).GetByIds), varargs...)
+	return &INamespaceGetByIdsCall{Call: call}
+}
+
+// INamespaceGetByIdsCall wrap *gomock.Call
+type INamespaceGetByIdsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *INamespaceGetByIdsCall) Return(ns []storage.Namespace, err error) *INamespaceGetByIdsCall {
+	c.Call = c.Call.Return(ns, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *INamespaceGetByIdsCall) Do(f func(context.Context, ...uint64) ([]storage.Namespace, error)) *INamespaceGetByIdsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *INamespaceGetByIdsCall) DoAndReturn(f func(context.Context, ...uint64) ([]storage.Namespace, error)) *INamespaceGetByIdsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // IsNoRows mocks base method.
 func (m *MockINamespace) IsNoRows(err error) bool {
 	m.ctrl.T.Helper()

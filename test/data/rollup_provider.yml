@@ -1,0 +1,12 @@
+- rollup_id: 1
+  namespace_id: 1
+  address_id: 1
+- rollup_id: 1
+  namespace_id: 2
+  address_id: 1
+- rollup_id: 2
+  namespace_id: 2
+  address_id: 2
+- rollup_id: 3
+  namespace_id: 0
+  address_id: 2

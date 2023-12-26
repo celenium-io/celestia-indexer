@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"encoding/base64"
 	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -26,6 +27,9 @@ func NewCelestiaApiValidator() *CelestiaApiValidator {
 		panic(err)
 	}
 	if err := v.RegisterValidation("msg_type", msgTypeValidator()); err != nil {
+		panic(err)
+	}
+	if err := v.RegisterValidation("namespace", namespaceValidator()); err != nil {
 		panic(err)
 	}
 	return &CelestiaApiValidator{validator: v}
@@ -75,5 +79,22 @@ func msgTypeValidator() validator.Func {
 	return func(fl validator.FieldLevel) bool {
 		_, err := types.ParseMsgType(fl.Field().String())
 		return err == nil
+	}
+}
+
+func isNamespace(s string) bool {
+	hash, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		return false
+	}
+	if len(hash) != 29 {
+		return false
+	}
+	return true
+}
+
+func namespaceValidator() validator.Func {
+	return func(fl validator.FieldLevel) bool {
+		return isNamespace(fl.Field().String())
 	}
 }

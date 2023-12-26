@@ -45,6 +45,7 @@ type BlobLog struct {
 	Signer     string         `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" format:"string"    json:"signer"     swaggertype:"string"`
 
 	Namespace *Namespace `json:"namespace,omitempty"`
+	Tx        *Tx        `json:"tx,omitempty"`
 }
 
 func NewBlobLog(blob storage.BlobLog) BlobLog {
@@ -61,6 +62,10 @@ func NewBlobLog(blob storage.BlobLog) BlobLog {
 	}
 	if blob.Signer != nil {
 		b.Signer = blob.Signer.Address
+	}
+	if blob.Tx != nil {
+		tx := NewTx(*blob.Tx)
+		b.Tx = &tx
 	}
 
 	return b

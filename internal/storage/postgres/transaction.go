@@ -369,3 +369,71 @@ func (tx Transaction) GetProposerId(ctx context.Context, address string) (id uin
 		Scan(ctx, &id)
 	return
 }
+
+func (tx Transaction) SaveRollup(ctx context.Context, rollup *models.Rollup) error {
+	if rollup == nil {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(rollup).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) error {
+	if rollup == nil || rollup.IsEmpty() {
+		return nil
+	}
+
+	query := tx.Tx().NewUpdate().Model(rollup).WherePK()
+
+	if rollup.Name != "" {
+		query = query.Set("name = ?", rollup.Name)
+	}
+	if rollup.Description != "" {
+		query = query.Set("description = ?", rollup.Description)
+	}
+	if rollup.Twitter != "" {
+		query = query.Set("twitter = ?", rollup.Twitter)
+	}
+	if rollup.GitHub != "" {
+		query = query.Set("github = ?", rollup.GitHub)
+	}
+	if rollup.Website != "" {
+		query = query.Set("website = ?", rollup.Website)
+	}
+	if rollup.Logo != "" {
+		query = query.Set("logo = ?", rollup.Logo)
+	}
+
+	_, err := query.Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveProviders(ctx context.Context, providers ...models.RollupProvider) error {
+	if len(providers) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&providers).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) DeleteProviders(ctx context.Context, rollupId uint64) error {
+	if rollupId == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewDelete().
+		Model((*models.RollupProvider)(nil)).
+		Where("rollup_id = ?", rollupId).
+		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) DeleteRollup(ctx context.Context, rollupId uint64) error {
+	if rollupId == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewDelete().
+		Model((*models.Rollup)(nil)).
+		Where("id = ?", rollupId).
+		Exec(ctx)
+	return err
+}

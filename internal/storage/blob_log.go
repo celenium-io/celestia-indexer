@@ -25,6 +25,7 @@ type IBlobLog interface {
 	storage.Table[*BlobLog]
 
 	ByNamespace(ctx context.Context, nsId uint64, fltrs BlobLogFilters) ([]BlobLog, error)
+	ByProviders(ctx context.Context, providers []RollupProvider, fltrs BlobLogFilters) ([]BlobLog, error)
 }
 
 type BlobLog struct {

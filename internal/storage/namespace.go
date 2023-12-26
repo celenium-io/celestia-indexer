@@ -29,6 +29,7 @@ type INamespace interface {
 	ListWithSort(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) (ns []Namespace, err error)
 	MessagesByTxId(ctx context.Context, txId uint64, limit, offset int) ([]NamespaceMessage, error)
 	CountMessagesByTxId(ctx context.Context, txId uint64) (int, error)
+	GetByIds(ctx context.Context, ids ...uint64) (ns []Namespace, err error)
 }
 
 // Namespace -

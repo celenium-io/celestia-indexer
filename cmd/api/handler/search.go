@@ -44,7 +44,6 @@ type searchRequest struct {
 var (
 	hashRegexp      = regexp.MustCompile("[a-fA-f0-9]{64}")
 	namespaceRegexp = regexp.MustCompile("[a-fA-f0-9]{58}")
-	base64Regexp    = regexp.MustCompile("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$")
 )
 
 // Get godoc
@@ -79,7 +78,7 @@ func (handler SearchHandler) Search(c echo.Context) error {
 		if err := handler.searchNamespaceById(c, req.Search); err != nil {
 			return internalServerError(c, err)
 		}
-	case base64Regexp.MatchString(req.Search):
+	case isNamespace(req.Search):
 		if err := handler.searchNamespaceByBase64(c, req.Search); err != nil {
 			return internalServerError(c, err)
 		}
@@ -134,9 +133,6 @@ func (handler SearchHandler) searchNamespaceById(c echo.Context, search string) 
 	if err != nil {
 		return badRequestError(c, err)
 	}
-	if len(data) != 29 {
-		return badRequestError(c, errors.Wrapf(errInvalidNamespaceLength, "got %d", len(data)))
-	}
 
 	return handler.getNamespace(c, data)
 }
@@ -145,9 +141,6 @@ func (handler SearchHandler) searchNamespaceByBase64(c echo.Context, search stri
 	data, err := base64.StdEncoding.DecodeString(search)
 	if err != nil {
 		return badRequestError(c, err)
-	}
-	if len(data) != 29 {
-		return badRequestError(c, errors.Wrapf(errInvalidNamespaceLength, "got %d", len(data)))
 	}
 
 	return handler.getNamespace(c, data)

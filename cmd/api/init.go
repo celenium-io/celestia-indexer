@@ -97,10 +97,17 @@ func initProflier(cfg *profiler.Config) (err error) {
 }
 
 func websocketSkipper(c echo.Context) bool {
+	return strings.Contains(c.Request().URL.Path, "ws")
+}
+
+func postSkipper(c echo.Context) bool {
 	if strings.Contains(c.Request().URL.Path, "blob") {
 		return true
 	}
-	return strings.Contains(c.Request().URL.Path, "ws")
+	if strings.Contains(c.Request().URL.Path, "auth/rollup") {
+		return true
+	}
+	return false
 }
 
 func gzipSkipper(c echo.Context) bool {
@@ -180,7 +187,11 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 	}))
 	e.Use(middleware.BodyLimit("2M"))
 	e.Use(middleware.CSRFWithConfig(
-		middleware.CSRFConfig{Skipper: websocketSkipper},
+		middleware.CSRFConfig{
+			Skipper: func(c echo.Context) bool {
+				return websocketSkipper(c) || postSkipper(c)
+			},
+		},
 	))
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
@@ -365,6 +376,38 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 
 	if cfg.ApiConfig.Websocket {
 		initWebsocket(ctx, db, v1)
+	}
+
+	rollupHandler := handler.NewRollupHandler(db.Rollup, db.Namespace, db.BlobLogs)
+	rollups := v1.Group("/rollup")
+	{
+		rollups.GET("", rollupHandler.Leaderboard)
+		rollup := rollups.Group("/:id")
+		{
+			rollup.GET("", rollupHandler.Get)
+			rollup.GET("/namespaces", rollupHandler.GetNamespaces)
+			rollup.GET("/blobs", rollupHandler.GetBlobs)
+			rollup.GET("/stats/:name/:timeframe", rollupHandler.Stats)
+		}
+	}
+
+	auth := v1.Group("/auth")
+	{
+		keyMiddleware := middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
+			KeyLookup: "header:Authorization",
+			Validator: func(key string, c echo.Context) (bool, error) {
+				return key == os.Getenv("API_AUTH_KEY"), nil
+			},
+		})
+		auth.Use(keyMiddleware)
+
+		rollupAuthHandler := handler.NewRollupAuthHandler(db.Rollup, db.Address, db.Namespace, db.Transactable)
+		rollup := auth.Group("/rollup")
+		{
+			rollup.POST("/new", rollupAuthHandler.Create)
+			rollup.PATCH("/:id", rollupAuthHandler.Update)
+			rollup.DELETE("/:id", rollupAuthHandler.Delete)
+		}
 	}
 
 	log.Info().Msg("API routes:")
