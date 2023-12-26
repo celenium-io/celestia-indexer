@@ -18,7 +18,7 @@ type RollupProvider struct {
 	bun.BaseModel `bun:"rollup_provider" comment:"Table with data providers for rollups."`
 
 	RollupId    uint64 `bun:"rollup_id,pk"    comment:"Unique internal rollup identity"`
-	NamespaceId uint64 `bun:"namespace_id,pk" comment:"Namespace identity"`
+	NamespaceId uint64 `bun:"namespace_id,pk" comment:"Namespace identity. May be NULL"`
 	AddressId   uint64 `bun:"address_id,pk"   comment:"Celestia address of data provider"`
 }
 

@@ -76,7 +76,7 @@ func (s *RollupTestSuite) TestLeaderboard() {
 	c.SetPath("/rollup")
 
 	s.rollups.EXPECT().
-		Leaderboard(gomock.Any(), "", sdk.SortOrderDesc, 10, 0).
+		Leaderboard(gomock.Any(), "size", sdk.SortOrderDesc, 10, 0).
 		Return([]storage.RollupWithStats{testRollupWithStats}, nil)
 
 	s.Require().NoError(s.handler.Leaderboard(c))
@@ -163,9 +163,8 @@ func (s *RollupTestSuite) TestGetBlobs() {
 		Providers(gomock.Any(), uint64(1)).
 		Return([]storage.RollupProvider{
 			{
-				NamespaceId: 1,
-				AddressId:   1,
-				RollupId:    1,
+				AddressId: 1,
+				RollupId:  1,
 			}, {
 				NamespaceId: 1,
 				AddressId:   2,

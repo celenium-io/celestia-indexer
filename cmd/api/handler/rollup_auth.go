@@ -46,7 +46,7 @@ type createRollupRequest struct {
 }
 
 type rollupProvider struct {
-	Namespace string `json:"namespace" validate:"required,base64,namespace"`
+	Namespace string `json:"namespace" validate:"omitempty,base64,namespace"`
 	Address   string `json:"address"   validate:"required,address"`
 }
 
@@ -108,15 +108,17 @@ func (handler RollupAuthHandler) createProviders(ctx context.Context, rollupId u
 		}
 		providers[i].AddressId = address.Id
 
-		hashNs, err := base64.StdEncoding.DecodeString(data[i].Namespace)
-		if err != nil {
-			return nil, err
+		if data[i].Namespace != "" {
+			hashNs, err := base64.StdEncoding.DecodeString(data[i].Namespace)
+			if err != nil {
+				return nil, err
+			}
+			ns, err := handler.namespace.ByNamespaceIdAndVersion(ctx, hashNs[1:], hashNs[0])
+			if err != nil {
+				return nil, err
+			}
+			providers[i].NamespaceId = ns.Id
 		}
-		ns, err := handler.namespace.ByNamespaceIdAndVersion(ctx, hashNs[1:], hashNs[0])
-		if err != nil {
-			return nil, err
-		}
-		providers[i].NamespaceId = ns.Id
 	}
 	return providers, nil
 }

@@ -43,7 +43,7 @@ func (r *Rollup) Leaderboard(ctx context.Context, sortField string, sort sdk.Sor
 
 	leaderboardQuery := r.DB().NewSelect().TableExpr("(?) as agg", timeAggQuery).
 		ColumnExpr("sum(size) as size, sum(blobs_count) as blobs_count, max(last_time) as last_time, rollup_id").
-		Join("inner join rollup_provider as rp on rp.namespace_id = agg.namespace_id and rp.address_id = agg.signer_id").
+		Join("inner join rollup_provider as rp on rp.address_id = agg.signer_id AND (rp.namespace_id = agg.namespace_id OR rp.namespace_id = 0)").
 		Group("rollup_id")
 
 	leaderboardQuery = sortScope(leaderboardQuery, sortField, sort)
@@ -60,8 +60,9 @@ func (r *Rollup) Leaderboard(ctx context.Context, sortField string, sort sdk.Sor
 }
 
 func (r *Rollup) Namespaces(ctx context.Context, rollupId uint64, limit, offset int) (namespaceIds []uint64, err error) {
-	query := r.DB().NewSelect().Model((*storage.RollupProvider)(nil)).
-		ColumnExpr("distinct namespace_id").
+	query := r.DB().NewSelect().TableExpr("rollup_stats_by_hour as r").
+		ColumnExpr("distinct r.namespace_id").
+		Join("inner join rollup_provider as rp on rp.address_id = r.signer_id AND (rp.namespace_id = r.namespace_id OR rp.namespace_id = 0)").
 		Where("rollup_id = ?", rollupId)
 	if offset > 0 {
 		query = query.Offset(offset)
@@ -119,9 +120,12 @@ func (r *Rollup) Stats(ctx context.Context, rollupId uint64, timeframe, column s
 
 	for i := range providers {
 		query.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
-			return sq.
-				Where("namespace_id = ?", providers[i].NamespaceId).
-				Where("signer_id = ?", providers[i].AddressId)
+			if providers[i].NamespaceId > 0 {
+				return sq.
+					Where("namespace_id = ?", providers[i].NamespaceId).
+					Where("signer_id = ?", providers[i].AddressId)
+			}
+			return sq.Where("signer_id = ?", providers[i].AddressId)
 		})
 	}
 

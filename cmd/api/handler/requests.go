@@ -197,6 +197,9 @@ func (p *rollupList) SetDefault() {
 	if p.Sort == "" {
 		p.Sort = desc
 	}
+	if p.SortBy == "" {
+		p.SortBy = "size"
+	}
 }
 
 type getById struct {

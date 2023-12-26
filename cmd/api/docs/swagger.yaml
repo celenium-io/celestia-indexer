@@ -468,6 +468,80 @@ definitions:
         format: date-time
         type: string
     type: object
+  responses.Rollup:
+    properties:
+      description:
+        example: Long rollup description
+        format: string
+        type: string
+      github:
+        example: https://github.com/account
+        format: string
+        type: string
+      id:
+        example: 321
+        format: integer
+        type: integer
+      logo:
+        example: https://some_link.com/image.png
+        format: string
+        type: string
+      name:
+        example: Rollup name
+        format: string
+        type: string
+      twitter:
+        example: https://x.com/account
+        format: string
+        type: string
+      website:
+        example: https://website.com
+        format: string
+        type: string
+    type: object
+  responses.RollupWithStats:
+    properties:
+      blobs_count:
+        example: 2
+        format: integer
+        type: integer
+      description:
+        example: Long rollup description
+        format: string
+        type: string
+      github:
+        example: https://github.com/account
+        format: string
+        type: string
+      id:
+        example: 321
+        format: integer
+        type: integer
+      last_message_time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
+      logo:
+        example: https://some_link.com/image.png
+        format: string
+        type: string
+      name:
+        example: Rollup name
+        format: string
+        type: string
+      size:
+        example: 1000
+        format: integer
+        type: integer
+      twitter:
+        example: https://x.com/account
+        format: string
+        type: string
+      website:
+        example: https://website.com
+        format: string
+        type: string
+    type: object
   responses.SeriesItem:
     properties:
       max:

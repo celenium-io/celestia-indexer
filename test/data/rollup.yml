@@ -12,3 +12,10 @@
   twitter: https://x.com/rollup2
   github: https://github.com/rollup2
   logo: https://rollup2.com/image.png
+- id: 3
+  name: Rollup 3
+  description: The third
+  website: https://rollup3.com
+  twitter: https://x.com/rollup3
+  github: https://github.com/rollup3
+  logo: https://rollup3.com/image.png
