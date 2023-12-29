@@ -25,6 +25,11 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 		return errors.Wrapf(err, "while parsing block on level=%d", b.Height)
 	}
 
+	var bytesInBlock int64
+	for i := range b.Block.Txs {
+		bytesInBlock += int64(len(b.Block.Txs[i]))
+	}
+
 	block := storage.Block{
 		Height:       b.Height,
 		Time:         b.Block.Time,
@@ -59,6 +64,7 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 			Fee:           decimal.Zero,
 			SupplyChange:  decimal.Zero,
 			InflationRate: decimal.Zero,
+			BytesInBlock:  bytesInBlock,
 		},
 	}
 
@@ -73,7 +79,6 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 		block.Stats.BlobsSize += tx.BlobsSize
 		block.Stats.GasLimit += tx.GasWanted
 		block.Stats.GasUsed += tx.GasUsed
-		block.Stats.BytesInBlock += tx.BytesSize
 		allEvents = append(allEvents, tx.Events...)
 	}
 
