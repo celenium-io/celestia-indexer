@@ -164,11 +164,11 @@ func (p *getRollupPagesWithSort) SetDefault() {
 //	@Description	Get rollup blobs
 //	@Tags			rollup
 //	@ID				get-rollup-blobs
-//	@Param			id		path	integer	true	"Internal identity"									mininum(1)
-//	@Param			limit	query	integer	false	"Count of requested entities"						mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"											mininum(1)
-//	@Param			sort	query	string	false	"Sort order. Default: desc"							Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"		Enums(time, size)
+//	@Param			id		path	integer	true	"Internal identity"								mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"										mininum(1)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
@@ -220,7 +220,7 @@ type rollupStatsRequest struct {
 //	@Tags			rollup
 //	@ID				get-rollup-stats
 //	@Param			id			path	integer	true	"Internal identity"				mininum(1)
-//	@Param			name     	path	string	true	"Series name"					Enums(blobs_count, size)
+//	@Param			name		path	string	true	"Series name"					Enums(blobs_count, size)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
 //	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)

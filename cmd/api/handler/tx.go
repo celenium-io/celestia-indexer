@@ -84,16 +84,16 @@ func (handler *TxHandler) Get(c echo.Context) error {
 //	@Description	List transactions info
 //	@Tags			transactions
 //	@ID				list-transactions
-//	@Param			limit		 		query	integer			false	"Count of requested entities"			mininum(1)	maximum(100)
-//	@Param			offset		 		query	integer			false	"Offset"								mininum(1)
-//	@Param			sort		 		query	string			false	"Sort order"							Enums(asc, desc)
-//	@Param			status		 		query	types.Status	false	"Comma-separated status list"
-//	@Param			msg_type	 		query	types.MsgType	false	"Comma-separated message types list"
-//	@Param			excluded_msg_type   query	types.MsgType	false	"Comma-separated message types list which should be excluded"
-//	@Param			from		 		query	integer			false	"Time from in unix timestamp"			mininum(1)
-//	@Param			to			 		query	integer			false	"Time to in unix timestamp"				mininum(1)
-//	@Param			height		 		query	integer			false	"Block number"							mininum(1)
-//	@Param			messages	 		query	boolean			false	"If true join messages"					mininum(1)
+//	@Param			limit				query	integer			false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset				query	integer			false	"Offset"						mininum(1)
+//	@Param			sort				query	string			false	"Sort order"					Enums(asc, desc)
+//	@Param			status				query	types.Status	false	"Comma-separated status list"
+//	@Param			msg_type			query	types.MsgType	false	"Comma-separated message types list"
+//	@Param			excluded_msg_type	query	types.MsgType	false	"Comma-separated message types list which should be excluded"
+//	@Param			from				query	integer			false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to					query	integer			false	"Time to in unix timestamp"		mininum(1)
+//	@Param			height				query	integer			false	"Block number"					mininum(1)
+//	@Param			messages			query	boolean			false	"If true join messages"			mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
@@ -225,7 +225,7 @@ func (handler *TxHandler) GetMessages(c echo.Context) error {
 //	@Tags			transactions
 //	@ID				get-transactions-count
 //	@Produce		json
-//	@Success		200	{integer}   uint64
+//	@Success		200	{integer}	uint64
 //	@Failure		500	{object}	Error
 //	@Router			/v1/tx/count [get]
 func (handler *TxHandler) Count(c echo.Context) error {
@@ -242,9 +242,9 @@ func (handler *TxHandler) Count(c echo.Context) error {
 //	@Description	List genesis transactions info
 //	@Tags			transactions
 //	@ID				list-genesis-transactions
-//	@Param			limit		query	integer			false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset		query	integer			false	"Offset"						mininum(1)
-//	@Param			sort		query	string			false	"Sort order"					Enums(asc, desc)
+//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
@@ -274,9 +274,9 @@ func (handler *TxHandler) Genesis(c echo.Context) error {
 //	@Description	List namespaces affected by transaction
 //	@Tags			transactions
 //	@ID				list-namespaces-transactions
-//	@Param			hash	path	string	        true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
-//	@Param			limit	query	integer			false	"Count of requested entities"		mininum(1)	maximum(100)
-//	@Param			offset	query	integer			false	"Offset"							mininum(1)
+//	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
+//	@Param			limit	query	integer	false	"Count of requested entities"		mininum(1)		maximum(100)
+//	@Param			offset	query	integer	false	"Offset"							mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.NamespaceMessage
 //	@Failure		400	{object}	Error
@@ -319,9 +319,9 @@ func (handler *TxHandler) Namespaces(c echo.Context) error {
 //	@Description	Count of namespaces affected by transaction
 //	@Tags			transactions
 //	@ID				list-namespaces-count-transactions
-//	@Param			hash	path	string	        true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
+//	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
 //	@Produce		json
-//	@Success		200	{integer} 	uint64
+//	@Success		200	{integer}	uint64
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/tx/{hash}/namespace/count [get]

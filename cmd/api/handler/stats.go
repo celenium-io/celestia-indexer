@@ -156,14 +156,14 @@ func (sh StatsHandler) Histogram(c echo.Context) error {
 
 // TPS godoc
 //
-//	@Summary				Get tps
-//	@Description        	Returns transaction per seconds statistics
-//	@Tags					stats
-//	@ID						stats-tps
-//	@Produce				json
-//	@Success				200	{object}    responses.TPS
-//	@Failure				500	{object}	Error
-//	@Router					/v1/stats/tps [get]
+//	@Summary		Get tps
+//	@Description	Returns transaction per seconds statistics
+//	@Tags			stats
+//	@ID				stats-tps
+//	@Produce		json
+//	@Success		200	{object}	responses.TPS
+//	@Failure		500	{object}	Error
+//	@Router			/v1/stats/tps [get]
 func (sh StatsHandler) TPS(c echo.Context) error {
 	tps, err := sh.repo.TPS(c.Request().Context())
 	if err != nil {
@@ -174,14 +174,14 @@ func (sh StatsHandler) TPS(c echo.Context) error {
 
 // TxCountHourly24h godoc
 //
-//	@Summary				Get tx count histogram for last 24 hours by hour
-//	@Description        	Get tx count histogram for last 24 hours by hour
-//	@Tags					stats
-//	@ID						stats-tx-count-24h
-//	@Produce				json
-//	@Success				200	{array}     responses.TxCountHistogramItem
-//	@Failure				500	{object}	Error
-//	@Router					/v1/stats/tx_count_24h [get]
+//	@Summary		Get tx count histogram for last 24 hours by hour
+//	@Description	Get tx count histogram for last 24 hours by hour
+//	@Tags			stats
+//	@ID				stats-tx-count-24h
+//	@Produce		json
+//	@Success		200	{array}		responses.TxCountHistogramItem
+//	@Failure		500	{object}	Error
+//	@Router			/v1/stats/tx_count_24h [get]
 func (sh StatsHandler) TxCountHourly24h(c echo.Context) error {
 	histogram, err := sh.repo.TxCountForLast24h(c.Request().Context())
 	if err != nil {
@@ -200,15 +200,15 @@ type namespaceUsageRequest struct {
 
 // NamespaceUsage godoc
 //
-//	@Summary				Get namespaces with sorting by size.
-//	@Description        	Get namespaces with sorting by size. Returns top 100 namespaces. Namespaces which is not included to top 100 grouped into 'others' item
-//	@Tags					stats
-//	@ID						stats-namespace-usage
-//	@Param					top		query	integer	false	"Count of entities"	mininum(1) maximum(100)
-//	@Produce				json
-//	@Success				200	{array}     responses.NamespaceUsage
-//	@Failure				500	{object}	Error
-//	@Router					/v1/stats/namespace/usage [get]
+//	@Summary		Get namespaces with sorting by size.
+//	@Description	Get namespaces with sorting by size. Returns top 100 namespaces. Namespaces which is not included to top 100 grouped into 'others' item
+//	@Tags			stats
+//	@ID				stats-namespace-usage
+//	@Param			top	query	integer	false	"Count of entities"	mininum(1)	maximum(100)
+//	@Produce		json
+//	@Success		200	{array}		responses.NamespaceUsage
+//	@Failure		500	{object}	Error
+//	@Router			/v1/stats/namespace/usage [get]
 func (sh StatsHandler) NamespaceUsage(c echo.Context) error {
 	req, err := bindAndValidate[namespaceUsageRequest](c)
 	if err != nil {
@@ -257,19 +257,19 @@ type seriesRequest struct {
 
 // Series godoc
 //
-//	@Summary				Get histogram with precomputed stats
-//	@Description        	Get histogram with precomputed stats by series name and timeframe
-//	@Tags					stats
-//	@ID						stats-series
-//	@Param					timeframe	path	string	true	"Timeframe"		Enums(hour, day, week, month, year)
-//	@Param					name     	path	string	true	"Series name"	Enums(blobs_size, tps, bps, fee, supply_change, block_time, tx_count, events_count, gas_price, gas_efficiency, gas_used, gas_limit)
-//	@Param					from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param					to			query	integer	false	"Time to in unix timestamp"		mininum(1)
-//	@Produce				json
-//	@Success				200	{array}     responses.SeriesItem
-//	@Failure				400	{object}	Error
-//	@Failure				500	{object}	Error
-//	@Router					/v1/stats/series/{name}/{timeframe} [get]
+//	@Summary		Get histogram with precomputed stats
+//	@Description	Get histogram with precomputed stats by series name and timeframe
+//	@Tags			stats
+//	@ID				stats-series
+//	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, week, month, year)
+//	@Param			name		path	string	true	"Series name"					Enums(blobs_size, tps, bps, fee, supply_change, block_time, tx_count, events_count, gas_price, gas_efficiency, gas_used, gas_limit)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.SeriesItem
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/stats/series/{name}/{timeframe} [get]
 func (sh StatsHandler) Series(c echo.Context) error {
 	req, err := bindAndValidate[seriesRequest](c)
 	if err != nil {
@@ -301,20 +301,20 @@ type namespaceSeriesRequest struct {
 
 // NamespaceSeries godoc
 //
-//	@Summary				Get histogram for namespace with precomputed stats
-//	@Description        	Get histogram for namespace with precomputed stats by series name and timeframe
-//	@Tags					stats
-//	@ID						stats-ns-series
-//	@Param			        id      	path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
-//	@Param					timeframe	path	string	true	"Timeframe"		Enums(hour, day, week, month, year)
-//	@Param					name     	path	string	true	"Series name"	Enums(pfb_count, size)
-//	@Param					from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param					to			query	integer	false	"Time to in unix timestamp"		mininum(1)
-//	@Produce				json
-//	@Success				200	{array}     responses.SeriesItem
-//	@Failure				400	{object}	Error
-//	@Failure				500	{object}	Error
-//	@Router					/v1/stats/namespace/series/{id}/{name}/{timeframe} [get]
+//	@Summary		Get histogram for namespace with precomputed stats
+//	@Description	Get histogram for namespace with precomputed stats by series name and timeframe
+//	@Tags			stats
+//	@ID				stats-ns-series
+//	@Param			id			path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
+//	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, week, month, year)
+//	@Param			name		path	string	true	"Series name"					Enums(pfb_count, size)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.SeriesItem
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/stats/namespace/series/{id}/{name}/{timeframe} [get]
 func (sh StatsHandler) NamespaceSeries(c echo.Context) error {
 	req, err := bindAndValidate[namespaceSeriesRequest](c)
 	if err != nil {
@@ -362,18 +362,18 @@ type priceSeriesRequest struct {
 
 // PriceSeries godoc
 //
-//	@Summary				Get histogram with TIA price
-//	@Description        	Get histogram with TIA price
-//	@Tags					stats
-//	@ID						stats-price-series
-//	@Param					timeframe	path	string	true	"Timeframe"		Enums(1m, 1h, 1d)
-//	@Param					from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param					to			query	integer	false	"Time to in unix timestamp"		mininum(1)
-//	@Produce				json
-//	@Success				200	{array}     responses.Price
-//	@Failure				400	{object}	Error
-//	@Failure				500	{object}	Error
-//	@Router					/v1/stats/price/series/{timeframe} [get]
+//	@Summary		Get histogram with TIA price
+//	@Description	Get histogram with TIA price
+//	@Tags			stats
+//	@ID				stats-price-series
+//	@Param			timeframe	path	string	true	"Timeframe"						Enums(1m, 1h, 1d)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Price
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/stats/price/series/{timeframe} [get]
 func (sh StatsHandler) PriceSeries(c echo.Context) error {
 	req, err := bindAndValidate[priceSeriesRequest](c)
 	if err != nil {
@@ -394,15 +394,15 @@ func (sh StatsHandler) PriceSeries(c echo.Context) error {
 
 // PriceCurrent godoc
 //
-//	@Summary				Get current TIA price
-//	@Description        	Get current TIA price
-//	@Tags					stats
-//	@ID						stats-price-current
-//	@Produce				json
-//	@Success				200	{object}    responses.Price
-//	@Failure				400	{object}	Error
-//	@Failure				500	{object}	Error
-//	@Router					/v1/stats/price/current [get]
+//	@Summary		Get current TIA price
+//	@Description	Get current TIA price
+//	@Tags			stats
+//	@ID				stats-price-current
+//	@Produce		json
+//	@Success		200	{object}	responses.Price
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/stats/price/current [get]
 func (sh StatsHandler) PriceCurrent(c echo.Context) error {
 	price, err := sh.price.Last(c.Request().Context())
 	if err != nil {

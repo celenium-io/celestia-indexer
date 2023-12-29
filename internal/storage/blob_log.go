@@ -26,6 +26,7 @@ type IBlobLog interface {
 
 	ByNamespace(ctx context.Context, nsId uint64, fltrs BlobLogFilters) ([]BlobLog, error)
 	ByProviders(ctx context.Context, providers []RollupProvider, fltrs BlobLogFilters) ([]BlobLog, error)
+	BySigner(ctx context.Context, signerId uint64, fltrs BlobLogFilters) ([]BlobLog, error)
 }
 
 type BlobLog struct {

@@ -65,7 +65,7 @@ func (handler *ValidatorHandler) Get(c echo.Context) error {
 //	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
 //	@Produce		json
 //	@Produce		json
-//	@Success		200	{array}	responses.Validator
+//	@Success		200	{array}		responses.Validator
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/validators [get]
