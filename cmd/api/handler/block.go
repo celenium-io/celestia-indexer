@@ -60,7 +60,7 @@ type getBlockRequest struct {
 //	@Tags			block
 //	@ID				get-block
 //	@Param			height	path	integer	true	"Block height"	minimum(1)
-//	@Param			stats	query	boolean	false 	"Need join stats for block"
+//	@Param			stats	query	boolean	false	"Need join stats for block"
 //	@Produce		json
 //	@Success		200	{object}	responses.Block
 //	@Success		204
@@ -112,7 +112,7 @@ func (p *blockListRequest) SetDefault() {
 //	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						mininum(1)
 //	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
-//	@Param			stats	query	boolean	false 	"Need join stats for block"
+//	@Param			stats	query	boolean	false	"Need join stats for block"
 //	@Produce		json
 //	@Success		200	{array}		responses.Block
 //	@Failure		400	{object}	Error
@@ -210,7 +210,7 @@ func (handler *BlockHandler) GetStats(c echo.Context) error {
 //	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						mininum(1)
 //	@Produce		json
-//	@Success		200	{array} 	responses.NamespaceMessage
+//	@Success		200	{array}		responses.NamespaceMessage
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/block/{height}/namespace [get]
@@ -245,7 +245,7 @@ func (handler *BlockHandler) GetNamespaces(c echo.Context) error {
 //	@ID				get-block-namespaces-count
 //	@Param			height	path	integer	true	"Block height"	minimum(1)
 //	@Produce		json
-//	@Success		200	{integer} 	uint64
+//	@Success		200	{integer}	uint64
 //	@Failure		500	{object}	Error
 //	@Router			/v1/block/{height}/namespace/count [get]
 func (handler *BlockHandler) GetNamespacesCount(c echo.Context) error {
@@ -269,7 +269,7 @@ func (handler *BlockHandler) GetNamespacesCount(c echo.Context) error {
 //	@Tags			block
 //	@ID				get-block-count
 //	@Produce		json
-//	@Success		200	{integer}   uint64
+//	@Success		200	{integer}	uint64
 //	@Failure		500	{object}	Error
 //	@Router			/v1/block/count [get]
 func (handler *BlockHandler) Count(c echo.Context) error {
@@ -286,13 +286,13 @@ func (handler *BlockHandler) Count(c echo.Context) error {
 //	@Description	Get messages contained in the block
 //	@Tags			block
 //	@ID				get-block-messages
-//	@Param			height				path	integer	true	"Block height"					minimum(1)
-//	@Param			limit				query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset				query	integer	false	"Offset"						mininum(1)
+//	@Param			height				path	integer			true	"Block height"					minimum(1)
+//	@Param			limit				query	integer			false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset				query	integer			false	"Offset"						mininum(1)
 //	@Param			msg_type			query	types.MsgType	false	"Comma-separated message types list"
 //	@Param			excluded_msg_type	query	types.MsgType	false	"Comma-separated message types which should be excluded from list"
 //	@Produce		json
-//	@Success		200	{array} 	responses.Message
+//	@Success		200	{array}		responses.Message
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/block/{height}/messages [get]

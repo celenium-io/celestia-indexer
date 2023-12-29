@@ -46,7 +46,7 @@ type estimatePfbGas struct {
 //	@Description	Get estimated gas for pay for blob message with certain values of blob sizes
 //	@Tags			gas
 //	@ID				gas-estimate-for-pfb
-//	@Param			sizes	query	string	true 	"Comma-separated array of blob sizes"
+//	@Param			sizes	query	string	true	"Comma-separated array of blob sizes"
 //	@Produce		json
 //	@Success		200	{object}	uint64
 //	@Failure		400	{object}	Error

@@ -40,12 +40,13 @@ var (
 // AddressTestSuite -
 type AddressTestSuite struct {
 	suite.Suite
-	address *mock.MockIAddress
-	txs     *mock.MockITx
-	state   *mock.MockIState
-	echo    *echo.Echo
-	handler *AddressHandler
-	ctrl    *gomock.Controller
+	address  *mock.MockIAddress
+	txs      *mock.MockITx
+	blobLogs *mock.MockIBlobLog
+	state    *mock.MockIState
+	echo     *echo.Echo
+	handler  *AddressHandler
+	ctrl     *gomock.Controller
 }
 
 // SetupSuite -
@@ -55,8 +56,9 @@ func (s *AddressTestSuite) SetupSuite() {
 	s.ctrl = gomock.NewController(s.T())
 	s.address = mock.NewMockIAddress(s.ctrl)
 	s.txs = mock.NewMockITx(s.ctrl)
+	s.blobLogs = mock.NewMockIBlobLog(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewAddressHandler(s.address, s.txs, s.state, testIndexerName)
+	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -283,6 +285,65 @@ func (s *AddressTestSuite) TestMessages() {
 	s.Require().EqualValues(1000, msg.Height)
 	s.Require().Equal(int64(0), msg.Position)
 	s.Require().EqualValues(types.MsgWithdrawDelegatorReward, msg.Type)
+}
+
+func (s *AddressTestSuite) TestBlobs() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+	q.Set("sort", "desc")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/address/:hash/blobs")
+	c.SetParamNames("hash")
+	c.SetParamValues(testAddress)
+
+	s.address.EXPECT().
+		ByHash(gomock.Any(), testHashAddress).
+		Return(storage.Address{
+			Id:      1,
+			Hash:    testHashAddress,
+			Address: testAddress,
+		}, nil)
+
+	s.blobLogs.EXPECT().
+		BySigner(gomock.Any(), uint64(1), storage.BlobLogFilters{
+			Limit: 10,
+			Sort:  "desc",
+		}).
+		Return([]storage.BlobLog{
+			{
+				NamespaceId: testNamespace.Id,
+				MsgId:       1,
+				TxId:        1,
+				SignerId:    1,
+				Signer: &storage.Address{
+					Address: testAddress,
+				},
+				Commitment: "test_commitment",
+				Size:       1000,
+				Height:     10000,
+				Time:       testTime,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Blobs(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var logs []responses.BlobLog
+	err := json.NewDecoder(rec.Body).Decode(&logs)
+	s.Require().NoError(err)
+	s.Require().Len(logs, 1)
+
+	l := logs[0]
+	s.Require().EqualValues(10000, l.Height)
+	s.Require().Equal(testTime, l.Time)
+	s.Require().Equal(testAddress, l.Signer)
+	s.Require().Equal("test_commitment", l.Commitment)
+	s.Require().EqualValues(1000, l.Size)
+	s.Require().Nil(l.Namespace)
 }
 
 func (s *AddressTestSuite) TestCount() {

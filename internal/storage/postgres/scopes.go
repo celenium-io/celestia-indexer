@@ -105,3 +105,21 @@ func messagesFilter(query *bun.SelectQuery, fltrs storage.MessageListWithTxFilte
 
 	return query
 }
+
+func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.SelectQuery {
+	if fltrs.Offset > 0 {
+		query.Offset(fltrs.Offset)
+	}
+
+	query = limitScope(query, fltrs.Limit)
+
+	switch fltrs.SortBy {
+	case sizeColumn, timeColumn:
+		query = sortScope(query, fltrs.SortBy, fltrs.Sort)
+	case "":
+		query = sortScope(query, "id", fltrs.Sort)
+	default:
+		return query
+	}
+	return query
+}

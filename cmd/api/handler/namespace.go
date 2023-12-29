@@ -163,10 +163,10 @@ func (handler *NamespaceHandler) GetWithVersion(c echo.Context) error {
 //	@Description	List namespace info
 //	@Tags			namespace
 //	@ID				list-namespace
-//	@Param			limit	query	integer	false	"Count of requested entities"						mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"											mininum(1)
-//	@Param			sort	query	string	false	"Sort order. Default: desc"							Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"		Enums(time, pfb_count, size)
+//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"										mininum(1)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, pfb_count, size)
 //	@Produce		json
 //	@Success		200	{array}		responses.Namespace
 //	@Failure		400	{object}	Error
@@ -321,7 +321,7 @@ func (handler *NamespaceHandler) GetActive(c echo.Context) error {
 //	@Tags			namespace
 //	@ID				get-namespace-count
 //	@Produce		json
-//	@Success		200	{integer}   uint64
+//	@Success		200	{integer}	uint64
 //	@Failure		500	{object}	Error
 //	@Router			/v1/namespace/count [get]
 func (handler *NamespaceHandler) Count(c echo.Context) error {
@@ -347,7 +347,7 @@ type postBlobRequest struct {
 //	@Param			hash		body	string	true	"Base64-encoded namespace id and version"
 //	@Param			height		body	integer	true	"Block heigth"	minimum(1)
 //	@Param			commitment	body	string	true	"Blob commitment"
-//	@Accept 		json
+//	@Accept			json
 //	@Produce		json
 //	@Success		200	{object}	responses.Blob
 //	@Failure		400	{object}	Error
@@ -395,14 +395,14 @@ func (req *getBlobLogsForNamespace) SetDefault() {
 //	@Description	Returns blob changes for namespace
 //	@Tags			namespace
 //	@ID				get-blob-logs
-//	@Param			id		path	string	true	"Namespace id in hexadecimal"						minlength(56)	maxlength(56)
+//	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
 //	@Param			version	path	integer	true	"Version of namespace"
-//	@Param			limit	query	integer	false	"Count of requested entities"						mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"											mininum(1)
-//	@Param			sort	query	string	false	"Sort order. Default: desc"							Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"		Enums(time, size)
+//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"										mininum(1)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
 //	@Produce		json
-//	@Success		200	{array}	    responses.BlobLog
+//	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/namespace/{id}/{version}/blobs [get]

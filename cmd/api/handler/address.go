@@ -17,6 +17,7 @@ import (
 type AddressHandler struct {
 	address     storage.IAddress
 	txs         storage.ITx
+	blobLogs    storage.IBlobLog
 	state       storage.IState
 	indexerName string
 }
@@ -24,12 +25,14 @@ type AddressHandler struct {
 func NewAddressHandler(
 	address storage.IAddress,
 	txs storage.ITx,
+	blobLogs storage.IBlobLog,
 	state storage.IState,
 	indexerName string,
 ) *AddressHandler {
 	return &AddressHandler{
 		address:     address,
 		txs:         txs,
+		blobLogs:    blobLogs,
 		state:       state,
 		indexerName: indexerName,
 	}
@@ -77,9 +80,9 @@ func (handler *AddressHandler) Get(c echo.Context) error {
 //	@Description	List address info
 //	@Tags			address
 //	@ID				list-address
-//	@Param			limit		query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"						mininum(1)
-//	@Param			sort		query	string	false	"Sort order"					Enums(asc, desc)
+//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
 //	@Produce		json
 //	@Success		200	{array}		responses.Address
 //	@Failure		400	{object}	Error
@@ -117,15 +120,15 @@ func (handler *AddressHandler) List(c echo.Context) error {
 //	@Description	Get address transactions
 //	@Tags			address
 //	@ID				address-transactions
-//	@Param			hash	path	string	true	"Hash"	minlength(48)	maxlength(48)
-//	@Param			limit		query	integer	false	"Count of requested entities"			minimum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"								minimum(1)
-//	@Param			sort		query	string	false	"Sort order"							Enums(asc, desc)
+//	@Param			hash		path	string			true	"Hash"							minlength(48)	maxlength(48)
+//	@Param			limit		query	integer			false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset		query	integer			false	"Offset"						minimum(1)
+//	@Param			sort		query	string			false	"Sort order"					Enums(asc, desc)
 //	@Param			status		query	types.Status	false	"Comma-separated status list"
 //	@Param			msg_type	query	types.MsgType	false	"Comma-separated message types list"
-//	@Param			from		query	integer	false	"Time from in unix timestamp"			minimum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"				minimum(1)
-//	@Param			height		query	integer	false	"Block number"							minimum(1)
+//	@Param			from		query	integer			false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer			false	"Time to in unix timestamp"		minimum(1)
+//	@Param			height		query	integer			false	"Block number"					minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
@@ -203,10 +206,10 @@ func (p *getAddressMessages) ToFilters() storage.AddressMsgsFilter {
 //	@Description	Get address messages
 //	@Tags			address
 //	@ID				address-messages
-//	@Param			hash	    path	string	true	"Hash"	minlength(48)	maxlength(48)
-//	@Param			limit		query	integer	false	"Count of requested entities"			minimum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"								minimum(1)
-//	@Param			sort		query	string	false	"Sort order"							Enums(asc, desc)
+//	@Param			hash	path	string	true	"Hash"							minlength(48)	maxlength(48)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
 //	@Produce		json
 //	@Success		200	{array}		responses.Message
 //	@Failure		400	{object}	Error
@@ -244,6 +247,78 @@ func (handler *AddressHandler) Messages(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+type getBlobLogsForAddress struct {
+	Hash   string `param:"hash"    validate:"required,address"`
+	Limit  uint64 `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset uint64 `query:"offset"  validate:"omitempty,min=0"`
+	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
+	SortBy string `query:"sort_by" validate:"omitempty,oneof=time size"`
+}
+
+func (req *getBlobLogsForAddress) SetDefault() {
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
+	if req.Sort == "" {
+		req.Sort = "desc"
+	}
+}
+
+// Blobs godoc
+//
+//	@Summary		Get blobs pushed by address
+//	@Description	Get blobs pushed by address
+//	@Tags			address
+//	@ID				address-blobs
+//	@Param			hash	path	string	true	"Hash"											minlength(48)	maxlength(48)
+//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)		maximum(100)
+//	@Param			offset	query	integer	false	"Offset"										minimum(1)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
+//	@Produce		json
+//	@Success		200	{array}		responses.BlobLog
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address/{hash}/blobs [get]
+func (handler *AddressHandler) Blobs(c echo.Context) error {
+	req, err := bindAndValidate[getBlobLogsForAddress](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	_, hash, err := types.Address(req.Hash).Decode()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	logs, err := handler.blobLogs.BySigner(
+		c.Request().Context(),
+		address.Id,
+		storage.BlobLogFilters{
+			Limit:  int(req.Limit),
+			Offset: int(req.Offset),
+			Sort:   pgSort(req.Sort),
+			SortBy: req.SortBy,
+		},
+	)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	response := make([]responses.BlobLog, len(logs))
+	for i := range response {
+		response[i] = responses.NewBlobLog(logs[i])
+	}
+
+	return returnArray(c, response)
+}
+
 // Count godoc
 //
 //	@Summary		Get count of addresses in network
@@ -251,7 +326,7 @@ func (handler *AddressHandler) Messages(c echo.Context) error {
 //	@Tags			address
 //	@ID				get-address-count
 //	@Produce		json
-//	@Success		200	{integer}   uint64
+//	@Success		200	{integer}	uint64
 //	@Failure		500	{object}	Error
 //	@Router			/v1/address/count [get]
 func (handler *AddressHandler) Count(c echo.Context) error {

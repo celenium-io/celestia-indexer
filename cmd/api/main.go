@@ -21,10 +21,10 @@ var rootCmd = &cobra.Command{
 	Short: "DipDup Verticals | Celenium API",
 }
 
-// @title						Swagger Celenium API
-// @version					    1.0
-// @description				    This is docs of Celenium API.
-// @host						api.celenium.io
+// @title					Swagger Celenium API
+// @version					1.0
+// @description				This is docs of Celenium API.
+// @host					api.celenium.io
 //
 // @query.collection.format	multi
 func main() {
