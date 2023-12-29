@@ -306,21 +306,43 @@ func (s *StorageTestSuite) TestAddressMessages() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	messages, err := s.storage.Address.Messages(ctx, 1, storage.AddressMsgsFilter{
+	messages, err := s.storage.Message.ByAddress(ctx, 1, storage.AddressMsgsFilter{
 		Limit:  10,
 		Offset: 0,
 		Sort:   sdk.SortOrderAsc,
 	})
 	s.Require().NoError(err)
-	s.Require().Len(messages, 1)
-
-	s.Require().EqualValues(types.MsgAddressTypeFromAddress, messages[0].Type)
+	s.Require().Len(messages, 2)
 
 	msg := messages[0].Msg
 	s.Require().EqualValues(1, msg.Id)
 	s.Require().EqualValues(1000, msg.Height)
 	s.Require().EqualValues(0, msg.Position)
+	s.Require().EqualValues(types.MsgAddressTypeFromAddress, messages[0].Type)
 	s.Require().Equal(types.MsgWithdrawDelegatorReward, msg.Type)
+	s.Require().NotNil(messages[0].Tx)
+}
+
+func (s *StorageTestSuite) TestAddressMessagesWithType() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	messages, err := s.storage.Message.ByAddress(ctx, 1, storage.AddressMsgsFilter{
+		Limit:        10,
+		Offset:       0,
+		Sort:         sdk.SortOrderAsc,
+		MessageTypes: []string{"MsgWithdrawDelegatorReward", "MsgDelegate"},
+	})
+	s.Require().NoError(err)
+	s.Require().Len(messages, 2)
+
+	msg := messages[0].Msg
+	s.Require().EqualValues(1, msg.Id)
+	s.Require().EqualValues(1000, msg.Height)
+	s.Require().EqualValues(0, msg.Position)
+	s.Require().EqualValues(types.MsgAddressTypeFromAddress, messages[0].Type)
+	s.Require().Equal(types.MsgWithdrawDelegatorReward, msg.Type)
+	s.Require().NotNil(messages[0].Tx)
 }
 
 func (s *StorageTestSuite) TestEventByTxId() {

@@ -37,18 +37,6 @@ func NewMessage(msg storage.Message) Message {
 	}
 }
 
-func NewMessageForAddress(msg storage.MsgAddress) Message {
-	return Message{
-		Id:       msg.MsgId,
-		Height:   msg.Msg.Height,
-		Time:     msg.Msg.Time,
-		Position: msg.Msg.Position,
-		TxId:     msg.Msg.TxId,
-		Type:     msg.Msg.Type,
-		Data:     msg.Msg.Data,
-	}
-}
-
 func NewMessageWithTx(msg storage.MessageWithTx) Message {
 	message := Message{
 		Id:       msg.Id,
@@ -65,5 +53,32 @@ func NewMessageWithTx(msg storage.MessageWithTx) Message {
 		message.Tx = &tx
 	}
 
+	return message
+}
+
+type MessageForAddress struct {
+	Id       uint64         `example:"321"                       format:"int64"     json:"id"              swaggertype:"integer"`
+	Height   pkgTypes.Level `example:"100"                       format:"int64"     json:"height"          swaggertype:"integer"`
+	Time     time.Time      `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"            swaggertype:"string"`
+	Position int64          `example:"2"                         format:"int64"     json:"position"        swaggertype:"integer"`
+	TxId     uint64         `example:"11"                        format:"int64"     json:"tx_id,omitempty" swaggertype:"integer"`
+
+	Type types.MsgType `example:"MsgCreatePeriodicVestingAccount" json:"type"`
+
+	Data map[string]any `json:"data"`
+	Tx   TxForAddress   `json:"tx"`
+}
+
+func NewMessageForAddress(msg storage.AddressMessageWithTx) MessageForAddress {
+	message := MessageForAddress{
+		Id:       msg.MsgId,
+		Height:   msg.Msg.Height,
+		Time:     msg.Msg.Time,
+		Position: msg.Msg.Position,
+		TxId:     msg.Msg.TxId,
+		Type:     msg.Msg.Type,
+		Data:     msg.Msg.Data,
+		Tx:       NewTxForAddress(msg.Tx),
+	}
 	return message
 }

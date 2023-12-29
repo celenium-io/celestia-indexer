@@ -22,11 +22,26 @@ type MessageListWithTxFilters struct {
 	MessageTypes         []string
 }
 
+type AddressMsgsFilter struct {
+	Limit        int
+	Offset       int
+	Sort         storage.SortOrder
+	MessageTypes []string
+}
+
 type MessageWithTx struct {
-	bun.BaseModel `bun:"message,alias:message" comment:"Table with celestia messages."`
+	bun.BaseModel `bun:"message,alias:message"`
 
 	Message
 	Tx *Tx `bun:"rel:belongs-to"`
+}
+
+type AddressMessageWithTx struct {
+	bun.BaseModel `bun:"message,alias:message"`
+
+	MsgAddress
+	Msg *Message `bun:"rel:belongs-to,join:msg_id=id"`
+	Tx  *Tx      `bun:"rel:belongs-to,join:msg__tx_id=id"`
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -35,6 +50,7 @@ type IMessage interface {
 
 	ByTxId(ctx context.Context, txId uint64) ([]Message, error)
 	ListWithTx(ctx context.Context, filters MessageListWithTxFilters) ([]MessageWithTx, error)
+	ByAddress(ctx context.Context, id uint64, filters AddressMsgsFilter) ([]AddressMessageWithTx, error)
 }
 
 // Message -

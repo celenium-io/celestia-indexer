@@ -43,6 +43,7 @@ type AddressTestSuite struct {
 	address  *mock.MockIAddress
 	txs      *mock.MockITx
 	blobLogs *mock.MockIBlobLog
+	messages *mock.MockIMessage
 	state    *mock.MockIState
 	echo     *echo.Echo
 	handler  *AddressHandler
@@ -57,8 +58,9 @@ func (s *AddressTestSuite) SetupSuite() {
 	s.address = mock.NewMockIAddress(s.ctrl)
 	s.txs = mock.NewMockITx(s.ctrl)
 	s.blobLogs = mock.NewMockIBlobLog(s.ctrl)
+	s.messages = mock.NewMockIMessage(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.state, testIndexerName)
+	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.messages, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -254,13 +256,15 @@ func (s *AddressTestSuite) TestMessages() {
 			Address: testAddress,
 		}, nil)
 
-	s.address.EXPECT().
-		Messages(gomock.Any(), uint64(1), gomock.Any()).
-		Return([]storage.MsgAddress{
+	s.messages.EXPECT().
+		ByAddress(gomock.Any(), uint64(1), gomock.Any()).
+		Return([]storage.AddressMessageWithTx{
 			{
-				AddressId: 1,
-				MsgId:     1,
-				Type:      types.MsgAddressTypeDelegator,
+				MsgAddress: storage.MsgAddress{
+					AddressId: 1,
+					MsgId:     1,
+					Type:      types.MsgAddressTypeDelegator,
+				},
 				Msg: &storage.Message{
 					Id:       1,
 					Height:   1000,
@@ -268,6 +272,12 @@ func (s *AddressTestSuite) TestMessages() {
 					Type:     types.MsgWithdrawDelegatorReward,
 					TxId:     1,
 					Data:     nil,
+				},
+				Tx: &storage.Tx{
+					Id:            1,
+					MessageTypes:  types.NewMsgTypeBitMask(types.MsgWithdrawDelegatorReward),
+					MessagesCount: 1,
+					Status:        types.StatusSuccess,
 				},
 			},
 		}, nil)
@@ -285,6 +295,7 @@ func (s *AddressTestSuite) TestMessages() {
 	s.Require().EqualValues(1000, msg.Height)
 	s.Require().Equal(int64(0), msg.Position)
 	s.Require().EqualValues(types.MsgWithdrawDelegatorReward, msg.Type)
+	s.Require().NotNil(msg.Tx)
 }
 
 func (s *AddressTestSuite) TestBlobs() {

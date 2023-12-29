@@ -18,19 +18,12 @@ type AddressListFilter struct {
 	Sort   storage.SortOrder
 }
 
-type AddressMsgsFilter struct {
-	Limit  int
-	Offset int
-	Sort   storage.SortOrder
-}
-
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IAddress interface {
 	storage.Table[*Address]
 
 	ByHash(ctx context.Context, hash []byte) (Address, error)
 	ListWithBalance(ctx context.Context, filters AddressListFilter) ([]Address, error)
-	Messages(ctx context.Context, id uint64, filters AddressMsgsFilter) ([]MsgAddress, error)
 }
 
 // Address -
