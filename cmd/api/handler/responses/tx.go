@@ -5,8 +5,9 @@ package responses
 
 import (
 	"encoding/hex"
-	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"time"
+
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -67,4 +68,25 @@ func NewTx(tx storage.Tx) Tx {
 
 func (Tx) SearchType() string {
 	return "tx"
+}
+
+type TxForAddress struct {
+	MessagesCount int64  `example:"1"                                                                format:"int64"  json:"messages_count" swaggertype:"integer"`
+	Hash          string `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary" json:"hash"           swaggertype:"string"`
+	Fee           string `example:"9348"                                                             format:"int64"  json:"fee"            swaggertype:"string"`
+
+	MessageTypes []types.MsgType `example:"MsgSend,MsgUnjail" json:"message_types"`
+	Status       types.Status    `example:"success"           json:"status"`
+}
+
+func NewTxForAddress(tx *storage.Tx) TxForAddress {
+	result := TxForAddress{
+		MessagesCount: tx.MessagesCount,
+		Fee:           tx.Fee.String(),
+		Status:        tx.Status,
+		Hash:          hex.EncodeToString(tx.Hash),
+		MessageTypes:  tx.MessageTypes.Names(),
+	}
+
+	return result
 }

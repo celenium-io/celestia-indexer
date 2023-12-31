@@ -18,6 +18,7 @@ type AddressHandler struct {
 	address     storage.IAddress
 	txs         storage.ITx
 	blobLogs    storage.IBlobLog
+	messages    storage.IMessage
 	state       storage.IState
 	indexerName string
 }
@@ -26,6 +27,7 @@ func NewAddressHandler(
 	address storage.IAddress,
 	txs storage.ITx,
 	blobLogs storage.IBlobLog,
+	messages storage.IMessage,
 	state storage.IState,
 	indexerName string,
 ) *AddressHandler {
@@ -33,6 +35,7 @@ func NewAddressHandler(
 		address:     address,
 		txs:         txs,
 		blobLogs:    blobLogs,
+		messages:    messages,
 		state:       state,
 		indexerName: indexerName,
 	}
@@ -177,10 +180,11 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 }
 
 type getAddressMessages struct {
-	Hash   string `param:"hash"   validate:"required,address"`
-	Limit  uint64 `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset uint64 `query:"offset" validate:"omitempty,min=0"`
-	Sort   string `query:"sort"   validate:"omitempty,oneof=asc desc"`
+	Hash    string      `param:"hash"     validate:"required,address"`
+	Limit   uint64      `query:"limit"    validate:"omitempty,min=1,max=100"`
+	Offset  uint64      `query:"offset"   validate:"omitempty,min=0"`
+	Sort    string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
+	MsgType StringArray `query:"msg_type" validate:"omitempty,dive,msg_type"`
 }
 
 func (p *getAddressMessages) SetDefault() {
@@ -190,13 +194,17 @@ func (p *getAddressMessages) SetDefault() {
 	if p.Sort == "" {
 		p.Sort = asc
 	}
+	if p.MsgType == nil {
+		p.MsgType = make(StringArray, 0)
+	}
 }
 
 func (p *getAddressMessages) ToFilters() storage.AddressMsgsFilter {
 	return storage.AddressMsgsFilter{
-		Limit:  int(p.Limit),
-		Offset: int(p.Offset),
-		Sort:   pgSort(p.Sort),
+		Limit:        int(p.Limit),
+		Offset:       int(p.Offset),
+		Sort:         pgSort(p.Sort),
+		MessageTypes: p.MsgType,
 	}
 }
 
@@ -211,7 +219,7 @@ func (p *getAddressMessages) ToFilters() storage.AddressMsgsFilter {
 //	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
 //	@Produce		json
-//	@Success		200	{array}		responses.Message
+//	@Success		200	{array}		responses.MessageForAddress
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/address/{hash}/messages [get]
@@ -234,12 +242,12 @@ func (handler *AddressHandler) Messages(c echo.Context) error {
 	}
 
 	filters := req.ToFilters()
-	msgs, err := handler.address.Messages(c.Request().Context(), address.Id, filters)
+	msgs, err := handler.messages.ByAddress(c.Request().Context(), address.Id, filters)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
 
-	response := make([]responses.Message, len(msgs))
+	response := make([]responses.MessageForAddress, len(msgs))
 	for i := range msgs {
 		response[i] = responses.NewMessageForAddress(msgs[i])
 	}
