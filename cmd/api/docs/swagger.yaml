@@ -338,6 +338,38 @@ definitions:
         - $ref: '#/definitions/types.MsgType'
         example: MsgCreatePeriodicVestingAccount
     type: object
+  responses.MessageForAddress:
+    properties:
+      data:
+        additionalProperties: {}
+        type: object
+      height:
+        example: 100
+        format: int64
+        type: integer
+      id:
+        example: 321
+        format: int64
+        type: integer
+      position:
+        example: 2
+        format: int64
+        type: integer
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
+      tx:
+        $ref: '#/definitions/responses.TxForAddress'
+      tx_id:
+        example: 11
+        format: int64
+        type: integer
+      type:
+        allOf:
+        - $ref: '#/definitions/types.MsgType'
+        example: MsgCreatePeriodicVestingAccount
+    type: object
   responses.Namespace:
     properties:
       hash:
@@ -727,6 +759,32 @@ definitions:
         example: 0.13521
         format: float
         type: number
+    type: object
+  responses.TxForAddress:
+    properties:
+      fee:
+        example: "9348"
+        format: int64
+        type: string
+      hash:
+        example: 652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF
+        format: binary
+        type: string
+      message_types:
+        example:
+        - MsgSend
+        - MsgUnjail
+        items:
+          $ref: '#/definitions/types.MsgType'
+        type: array
+      messages_count:
+        example: 1
+        format: int64
+        type: integer
+      status:
+        allOf:
+        - $ref: '#/definitions/github_com_celenium-io_celestia-indexer_internal_storage_types.Status'
+        example: success
     type: object
   responses.Validator:
     properties:
@@ -1210,7 +1268,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/responses.Message'
+              $ref: '#/definitions/responses.MessageForAddress'
             type: array
         "400":
           description: Bad Request
