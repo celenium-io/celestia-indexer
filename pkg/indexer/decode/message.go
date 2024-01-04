@@ -105,7 +105,7 @@ func Message(
 
 	// blob module
 	case *appBlobTypes.MsgPayForBlobs:
-		d.Msg.Type, d.Msg.Addresses, d.Msg.Namespace, d.Msg.BlobLogs, d.BlobsSize, err = handle.MsgPayForBlobs(height, time, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.Namespace, d.Msg.BlobLogs, d.BlobsSize, err = handle.MsgPayForBlobs(height, time, status, typedMsg)
 
 	// feegrant module
 	case *cosmosFeegrant.MsgGrantAllowance:
