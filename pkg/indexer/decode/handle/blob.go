@@ -16,7 +16,7 @@ import (
 )
 
 // MsgPayForBlobs pays for the inclusion of a blob in the block.
-func MsgPayForBlobs(level types.Level, blockTime time.Time, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []storage.AddressWithType, []storage.Namespace, []*storage.BlobLog, int64, error) {
+func MsgPayForBlobs(level types.Level, blockTime time.Time, status storageTypes.Status, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []storage.AddressWithType, []storage.Namespace, []*storage.BlobLog, int64, error) {
 	var blobsSize int64
 	uniqueNs := make(map[string]*storage.Namespace)
 	blobLogs := make([]*storage.BlobLog, 0)
@@ -50,15 +50,19 @@ func MsgPayForBlobs(level types.Level, blockTime time.Time, m *appBlobTypes.MsgP
 			uniqueNs[namespace.String()] = &namespace
 		}
 
-		blobLog := &storage.BlobLog{
-			Commitment: base64.StdEncoding.EncodeToString(m.ShareCommitments[nsI]),
-			Size:       size,
-			Namespace:  &namespace,
-			Height:     level,
-			Time:       blockTime,
+		if status == storageTypes.StatusSuccess {
+			blobLog := &storage.BlobLog{
+				Commitment: base64.StdEncoding.EncodeToString(m.ShareCommitments[nsI]),
+				Size:       size,
+				Namespace:  &namespace,
+				Height:     level,
+				Time:       blockTime,
+				Signer: &storage.Address{
+					Address: m.Signer,
+				},
+			}
+			blobLogs = append(blobLogs, blobLog)
 		}
-
-		blobLogs = append(blobLogs, blobLog)
 	}
 
 	namespaces := make([]storage.Namespace, 0, len(uniqueNs))
@@ -69,12 +73,6 @@ func MsgPayForBlobs(level types.Level, blockTime time.Time, m *appBlobTypes.MsgP
 	addresses, err := createAddresses(addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, level)
-
-	for i := range blobLogs {
-		blobLogs[i].Signer = &storage.Address{
-			Address: m.Signer,
-		}
-	}
 
 	return storageTypes.MsgPayForBlobs, addresses, namespaces, blobLogs, blobsSize, err
 }

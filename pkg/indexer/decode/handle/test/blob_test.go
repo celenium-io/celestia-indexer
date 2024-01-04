@@ -238,3 +238,58 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
+
+func TestDecodeMsg_FailedOnPayForBlob(t *testing.T) {
+	msgPayForBlob := createMsgPayForBlob()
+	blob, now := testsuite.EmptyBlock()
+	position := 0
+
+	dm, err := decode.Message(msgPayForBlob, blob.Height, blob.Block.Time, position, storageTypes.StatusFailed)
+
+	addressesExpected := []storage.AddressWithType{
+		{
+			Type: storageTypes.MsgAddressTypeSigner,
+			Address: storage.Address{
+				Id:         0,
+				Height:     blob.Height,
+				LastHeight: blob.Height,
+				Address:    "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
+				Hash:       []byte{0x16, 0x53, 0x23, 0x70, 0x15, 0x89, 0xb7, 0x20, 0x14, 0xd5, 0xbd, 0xdc, 0xa8, 0xba, 0xcc, 0x60, 0xb5, 0x5, 0xd3, 0x97},
+				Balance: storage.Balance{
+					Id:    0,
+					Total: decimal.Zero,
+				},
+			},
+		},
+	}
+
+	msgExpected := storage.Message{
+		Id:       0,
+		Height:   blob.Height,
+		Time:     now,
+		Position: 0,
+		Type:     storageTypes.MsgPayForBlobs,
+		TxId:     0,
+		Data:     structs.Map(msgPayForBlob),
+		Namespace: []storage.Namespace{
+			{
+				Id:              0,
+				FirstHeight:     blob.Height,
+				Version:         0,
+				NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+				Size:            1,
+				PfbCount:        1,
+				Reserved:        false,
+				LastHeight:      blob.Height,
+				LastMessageTime: blob.Block.Time,
+			},
+		},
+		Addresses: addressesExpected,
+		BlobLogs:  []*storage.BlobLog{},
+	}
+
+	assert.NoError(t, err)
+	assert.Equal(t, int64(1), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+	assert.Equal(t, addressesExpected, dm.Addresses)
+}

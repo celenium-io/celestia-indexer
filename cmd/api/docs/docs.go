@@ -288,7 +288,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/responses.Message"
+                                "$ref": "#/definitions/responses.MessageForAddress"
                             }
                         }
                     },
@@ -3843,6 +3843,51 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.MessageForAddress": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "position": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 2
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "tx": {
+                    "$ref": "#/definitions/responses.TxForAddress"
+                },
+                "tx_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 11
+                },
+                "type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/types.MsgType"
+                        }
+                    ],
+                    "example": "MsgCreatePeriodicVestingAccount"
+                }
+            }
+        },
         "responses.Namespace": {
             "type": "object",
             "properties": {
@@ -4349,6 +4394,44 @@ const docTemplate = `{
                     "type": "number",
                     "format": "float",
                     "example": 0.13521
+                }
+            }
+        },
+        "responses.TxForAddress": {
+            "type": "object",
+            "properties": {
+                "fee": {
+                    "type": "string",
+                    "format": "int64",
+                    "example": "9348"
+                },
+                "hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "message_types": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.MsgType"
+                    },
+                    "example": [
+                        "MsgSend",
+                        "MsgUnjail"
+                    ]
+                },
+                "messages_count": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1
+                },
+                "status": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_celenium-io_celestia-indexer_internal_storage_types.Status"
+                        }
+                    ],
+                    "example": "success"
                 }
             }
         },
