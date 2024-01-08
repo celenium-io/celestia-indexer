@@ -324,7 +324,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		namespaceGroup.GET("/:id", namespaceHandlers.Get)
 		namespaceGroup.GET("/:id/:version", namespaceHandlers.GetWithVersion)
 		namespaceGroup.GET("/:id/:version/messages", namespaceHandlers.GetMessages)
-		namespaceGroup.GET("/:id/:version/logs", namespaceHandlers.GetBlobLogs)
+		namespaceGroup.GET("/:id/:version/blobs", namespaceHandlers.GetBlobLogs)
 	}
 
 	namespaceByHash := v1.Group("/namespace_by_hash")
