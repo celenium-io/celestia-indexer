@@ -43,6 +43,7 @@ type Namespace struct {
 	NamespaceID     []byte      `bun:"namespace_id,unique:namespace_id_version_idx" comment:"Namespace identity"`
 	Size            int64       `bun:"size"                                         comment:"Blobs size"`
 	PfbCount        int64       `bun:"pfb_count"                                    comment:"Count of pay for blobs messages for the namespace"`
+	BlobsCount      int64       `bun:"blobs_count"                                  comment:"Count of blobs sent to namespace"`
 	Reserved        bool        `bun:"reserved,default:false"                       comment:"If namespace is reserved flag is true"`
 	LastMessageTime time.Time   `bun:"last_message_time"                            comment:"Time when last pay for blob was sent"`
 }
@@ -58,4 +59,19 @@ func (ns Namespace) String() string {
 
 func (ns Namespace) Hash() string {
 	return base64.StdEncoding.EncodeToString(append([]byte{ns.Version}, ns.NamespaceID...))
+}
+
+func (ns Namespace) Copy() *Namespace {
+	return &Namespace{
+		Id:              ns.Id,
+		FirstHeight:     ns.FirstHeight,
+		LastHeight:      ns.LastHeight,
+		Version:         ns.Version,
+		NamespaceID:     ns.NamespaceID,
+		Size:            ns.Size,
+		PfbCount:        ns.PfbCount,
+		BlobsCount:      ns.BlobsCount,
+		Reserved:        ns.Reserved,
+		LastMessageTime: ns.LastMessageTime,
+	}
 }
