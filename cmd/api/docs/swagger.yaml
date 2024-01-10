@@ -372,6 +372,10 @@ definitions:
     type: object
   responses.Namespace:
     properties:
+      blobs_count:
+        example: 10000
+        format: integer
+        type: integer
       hash:
         example: U3dhZ2dlciByb2Nrcw==
         format: base64

@@ -64,12 +64,13 @@ func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...*models.
 	}
 
 	_, err := tx.Tx().NewInsert().Model(&addedNamespaces).
-		Column("version", "namespace_id", "pfb_count", "size", "first_height", "last_height", "last_message_time").
+		Column("version", "namespace_id", "pfb_count", "size", "first_height", "last_height", "last_message_time", "blobs_count").
 		On("CONFLICT ON CONSTRAINT namespace_id_version_idx DO UPDATE").
 		Set("size = EXCLUDED.size + added_namespace.size").
 		Set("pfb_count = EXCLUDED.pfb_count + added_namespace.pfb_count").
 		Set("last_height = EXCLUDED.last_height").
 		Set("last_message_time = EXCLUDED.last_message_time").
+		Set("blobs_count = EXCLUDED.blobs_count + added_namespace.blobs_count").
 		Returning("xmax, id").
 		Exec(ctx)
 	if err != nil {

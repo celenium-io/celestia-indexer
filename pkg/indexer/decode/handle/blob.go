@@ -44,13 +44,9 @@ func MsgPayForBlobs(level types.Level, blockTime time.Time, status storageTypes.
 			LastHeight:      level,
 			LastMessageTime: blockTime,
 		}
-		if n, ok := uniqueNs[namespace.String()]; ok {
-			n.Size += size
-		} else {
-			uniqueNs[namespace.String()] = &namespace
-		}
 
 		if status == storageTypes.StatusSuccess {
+			namespace.BlobsCount = 1
 			blobLog := &storage.BlobLog{
 				Commitment: base64.StdEncoding.EncodeToString(m.ShareCommitments[nsI]),
 				Size:       size,
@@ -62,6 +58,13 @@ func MsgPayForBlobs(level types.Level, blockTime time.Time, status storageTypes.
 				},
 			}
 			blobLogs = append(blobLogs, blobLog)
+		}
+
+		if n, ok := uniqueNs[namespace.String()]; ok {
+			n.Size += size
+			n.BlobsCount += namespace.BlobsCount
+		} else {
+			uniqueNs[namespace.String()] = namespace.Copy()
 		}
 	}
 
