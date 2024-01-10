@@ -38,7 +38,6 @@ func MsgPayForBlobs(level types.Level, blockTime time.Time, status storageTypes.
 			FirstHeight:     level,
 			Version:         appNS.Version,
 			NamespaceID:     appNS.ID,
-			Size:            size,
 			PfbCount:        1,
 			Reserved:        appNS.IsReserved(),
 			LastHeight:      level,
@@ -47,6 +46,8 @@ func MsgPayForBlobs(level types.Level, blockTime time.Time, status storageTypes.
 
 		if status == storageTypes.StatusSuccess {
 			namespace.BlobsCount = 1
+			namespace.Size = size
+
 			blobLog := &storage.BlobLog{
 				Commitment: base64.StdEncoding.EncodeToString(m.ShareCommitments[nsI]),
 				Size:       size,

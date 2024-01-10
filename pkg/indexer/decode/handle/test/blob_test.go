@@ -283,7 +283,7 @@ func TestDecodeMsg_FailedOnPayForBlob(t *testing.T) {
 				FirstHeight:     blob.Height,
 				Version:         0,
 				NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
-				Size:            1,
+				Size:            0,
 				PfbCount:        1,
 				Reserved:        false,
 				LastHeight:      blob.Height,
