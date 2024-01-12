@@ -27,7 +27,8 @@ func NewBlobLog(db *database.Bun) *BlobLog {
 func (bl *BlobLog) ByNamespace(ctx context.Context, nsId uint64, fltrs storage.BlobLogFilters) (logs []storage.BlobLog, err error) {
 	query := bl.DB().NewSelect().Model(&logs).
 		Where("blob_log.namespace_id = ?", nsId).
-		Relation("Signer")
+		Relation("Signer").
+		Relation("Tx")
 
 	query = blobLogFilters(query, fltrs)
 
