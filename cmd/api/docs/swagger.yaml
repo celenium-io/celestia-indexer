@@ -80,6 +80,10 @@ definitions:
         example: vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg=
         format: base64
         type: string
+      content_type:
+        example: image/png
+        format: string
+        type: string
       height:
         example: 100
         format: integer
