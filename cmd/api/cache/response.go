@@ -63,8 +63,8 @@ func (r *ResponseRecorder) Result() *CacheEntry {
 
 func copyHeaders(src, dst http.Header) {
 	for k, v := range src {
-		for _, v := range v {
-			dst.Set(k, v)
+		for _, val := range v {
+			dst.Set(k, val)
 		}
 	}
 }

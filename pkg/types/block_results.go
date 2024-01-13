@@ -45,8 +45,8 @@ type Event struct {
 
 // EventAttribute is a single key-value pair, associated with an event.
 type EventAttribute struct {
-	Key   string `json:"key,omitempty"   protobuf:"bytes,1,opt,name=key,proto3"`
-	Value string `json:"value,omitempty" protobuf:"bytes,2,opt,name=value,proto3"`
+	Key   []byte `json:"key,omitempty"   protobuf:"bytes,1,opt,name=key,proto3"`
+	Value []byte `json:"value,omitempty" protobuf:"bytes,2,opt,name=value,proto3"`
 	Index bool   `json:"index,omitempty" protobuf:"varint,3,opt,name=index,proto3"`
 }
 

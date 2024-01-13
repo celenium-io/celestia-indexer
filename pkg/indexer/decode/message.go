@@ -92,7 +92,6 @@ func Message(
 	case *cosmosBankTypes.MsgSend:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSend(height, typedMsg)
 	case *cosmosBankTypes.MsgMultiSend:
-		log.Warn().Msg("MsgMultiSend detected")
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgMultiSend(height, typedMsg)
 
 	// vesting module

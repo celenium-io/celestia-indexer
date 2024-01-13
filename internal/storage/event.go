@@ -8,12 +8,14 @@ import (
 	"time"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/goccy/go-json"
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IEvent interface {
@@ -50,14 +52,12 @@ func (e Event) Columns() []string {
 
 func (e Event) Flat() []any {
 	data := []any{
-		e.Height, e.Time, e.Position, e.Type, e.TxId,
+		e.Height, e.Time, e.Position, e.Type, e.TxId, nil,
 	}
-	if len(data) > 0 {
-		raw, err := json.MarshalWithOption(e.Data, json.UnorderedMap(), json.DisableNormalizeUTF8())
+	if len(e.Data) > 0 {
+		raw, err := json.MarshalToString(e.Data)
 		if err == nil {
-			data = append(data, string(raw))
-		} else {
-			data = append(data, nil)
+			data[5] = raw
 		}
 	}
 	return data

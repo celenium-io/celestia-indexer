@@ -17,51 +17,45 @@ import (
 func parseTxs(b types.BlockData) ([]storage.Tx, error) {
 	txs := make([]storage.Tx, len(b.TxsResults))
 
-	for i, txRes := range b.TxsResults {
-		t, err := parseTx(b, i, txRes)
-		if err != nil {
+	for i := range b.TxsResults {
+		if err := parseTx(b, i, b.TxsResults[i], &txs[i]); err != nil {
 			return nil, err
 		}
-
-		txs[i] = t
 	}
 
 	return txs, nil
 }
 
-func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (storage.Tx, error) {
+func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx, t *storage.Tx) error {
 	d, err := decode.Tx(b, index)
 	if err != nil {
-		return storage.Tx{}, errors.Wrapf(err, "while parsing Tx on index %d", index)
+		return errors.Wrapf(err, "while parsing Tx on index %d", index)
 	}
 
-	t := storage.Tx{
-		Height:        b.Height,
-		Time:          b.Block.Time,
-		Position:      int64(index),
-		GasWanted:     txRes.GasWanted,
-		GasUsed:       txRes.GasUsed,
-		TimeoutHeight: d.TimeoutHeight,
-		EventsCount:   int64(len(txRes.Events)),
-		MessagesCount: int64(len(d.Messages)),
-		Fee:           d.Fee,
-		Status:        storageTypes.StatusSuccess,
-		Codespace:     txRes.Codespace,
-		Hash:          b.Block.Txs[index].Hash(),
-		Memo:          d.Memo,
-		MessageTypes:  storageTypes.NewMsgTypeBitMask(),
-
-		Messages:  make([]storage.Message, len(d.Messages)),
-		Events:    nil,
-		Signers:   make([]storage.Address, 0),
-		BlobsSize: 0,
-		BytesSize: int64(len(txRes.Data)),
-	}
+	t.Height = b.Height
+	t.Time = b.Block.Time
+	t.Position = int64(index)
+	t.GasWanted = txRes.GasWanted
+	t.GasUsed = txRes.GasUsed
+	t.TimeoutHeight = d.TimeoutHeight
+	t.EventsCount = int64(len(txRes.Events))
+	t.MessagesCount = int64(len(d.Messages))
+	t.Fee = d.Fee
+	t.Status = storageTypes.StatusSuccess
+	t.Codespace = txRes.Codespace
+	t.Hash = b.Block.Txs[index].Hash()
+	t.Memo = d.Memo
+	t.MessageTypes = storageTypes.NewMsgTypeBitMask()
+	t.Messages = make([]storage.Message, len(d.Messages))
+	t.Events = nil
+	t.Signers = make([]storage.Address, 0)
+	t.BlobsSize = 0
+	t.BytesSize = int64(len(txRes.Data))
 
 	for signer := range d.Signers {
 		_, hash, err := types.Address(signer).Decode()
 		if err != nil {
-			return t, errors.Wrapf(err, "decode signer: %s", signer)
+			return errors.Wrapf(err, "decode signer: %s", signer)
 		}
 
 		t.Signers = append(t.Signers, storage.Address{
@@ -81,10 +75,10 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (stor
 	}
 
 	t.Events = parseEvents(b, txRes.Events)
-	for position, sdkMsg := range d.Messages {
-		dm, err := decode.Message(sdkMsg, b.Height, b.Block.Time, position, t.Status)
+	for i := range d.Messages {
+		dm, err := decode.Message(d.Messages[i], b.Height, b.Block.Time, i, t.Status)
 		if err != nil {
-			return storage.Tx{}, errors.Wrapf(err, "while parsing tx=%v on index=%d", t.Hash, t.Position)
+			return errors.Wrapf(err, "while parsing tx=%v on index=%d", t.Hash, t.Position)
 		}
 
 		if len(dm.Msg.BlobLogs) > 0 && len(d.Blobs) == len(dm.Msg.BlobLogs) {
@@ -98,10 +92,10 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (stor
 			dm.BlobsSize = 0
 		}
 
-		t.Messages[position] = dm.Msg
+		t.Messages[i] = dm.Msg
 		t.MessageTypes.SetByMsgType(dm.Msg.Type)
 		t.BlobsSize += dm.BlobsSize
 	}
 
-	return t, nil
+	return nil
 }

@@ -4,8 +4,11 @@
 package parser
 
 import (
+	"encoding/json"
 	"testing"
+	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -26,23 +29,24 @@ func TestParseEvents_EmptyEventsResults(t *testing.T) {
 }
 
 func TestParseEvents_SuccessTx(t *testing.T) {
-	events := []types.Event{
-		{
-			Type: "coin_spent",
-			Attributes: []types.EventAttribute{
-				{
-					Key:   "c3BlbmRlcg==",
-					Value: "Y2VsZXN0aWExdjY5bnB6NncwN3h0NGhkdWU5eGR3a3V4eHZ2ZDZlYTl5MjZlcXI=",
-					Index: true,
-				},
-				{
-					Key:   "YW1vdW50",
-					Value: "NzAwMDB1dGlh",
-					Index: true,
-				},
+	raw := `[{
+		"type": "coin_spent",
+		"attributes": [
+			{
+				"key": "c3BlbmRlcg==",
+				"value": "Y2VsZXN0aWExcDMzMHN0YXB1c3lrZnNzNDdxcmhxbHVram5jdmd5emY2Z2R1ZnM=",
+				"index": true
 			},
-		},
-	}
+			{
+				"key": "YW1vdW50",
+				"value": "NDA0OTR1dGlh",
+				"index": true
+			}
+		]
+	}]`
+	var events []types.Event
+	err := json.Unmarshal([]byte(raw), &events)
+	require.NoError(t, err)
 
 	txRes := types.ResponseDeliverTx{
 		Code:      0,
@@ -68,48 +72,48 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 	assert.Nil(t, e.TxId)
 
 	attrs := map[string]any{
-		"spender": "celestia1v69npz6w07xt4hdue9xdwkuxxvvd6ea9y26eqr",
-		"amount":  "70000utia",
+		"spender": "celestia1p330stapusykfss47qrhqlukjncvgyzf6gdufs",
+		"amount":  "40494utia",
 	}
 	assert.Equal(t, attrs, e.Data)
 }
 
-func Test_decodeEventAttribute(t *testing.T) {
-	tests := []struct {
-		name string
-		data string
-		want string
-	}{
-		{
-			name: "test 1",
-			data: "Y2VsZXN0aWExczQ1NXJoenh3Yzh3YzlrcXBoeHV0NzUyNHVtMDY3YzhwZGNjamo=",
-			want: "celestia1s455rhzxwc8wc9kqphxut7524um067c8pdccjj",
-		}, {
-			name: "test 2",
-			data: "c3BlbmRlcg==",
-			want: "spender",
-		}, {
-			name: "test 3",
-			data: "YW1vdW50",
-			want: "amount",
-		}, {
-			name: "test 4",
-			data: "NzAwMDB1dGlh",
-			want: "70000utia",
-		}, {
-			name: "test 5",
-			data: "bW9kdWxl",
-			want: "module",
-		}, {
-			name: "test 6",
-			data: "cmVjZWl2ZXI=",
-			want: "receiver",
+func BenchmarkParseEvent(b *testing.B) {
+	block := types.BlockData{
+		ResultBlock: types.ResultBlock{
+			Block: &types.Block{
+				Header: types.Header{
+					Time: time.Now(),
+				},
+			},
+		},
+		ResultBlockResults: types.ResultBlockResults{
+			Height: 100,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := decodeEventAttribute(tt.data)
-			require.Equal(t, tt.want, got)
-		})
-	}
+	raw := `{
+		"type": "coin_spent",
+		"attributes": [
+			{
+				"key": "c3BlbmRlcg==",
+				"value": "Y2VsZXN0aWExcDMzMHN0YXB1c3lrZnNzNDdxcmhxbHVram5jdmd5emY2Z2R1ZnM=",
+				"index": true
+			},
+			{
+				"key": "YW1vdW50",
+				"value": "NDA0OTR1dGlh",
+				"index": true
+			}
+		]
+	}`
+	var event types.Event
+	err := json.Unmarshal([]byte(raw), &event)
+	require.NoError(b, err)
+
+	resultEvent := storage.Event{}
+	b.Run("parse event", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			parseEvent(block, event, 10, &resultEvent)
+		}
+	})
 }

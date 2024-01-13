@@ -86,8 +86,8 @@ func getBalanceUpdates(
 	}
 
 	result := make([]*storage.Address, 0, len(updates))
-	for _, addr := range updates {
-		result = append(result, addr)
+	for i := range updates {
+		result = append(result, updates[i])
 	}
 	return result, nil
 }
