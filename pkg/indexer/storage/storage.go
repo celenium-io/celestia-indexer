@@ -51,7 +51,7 @@ func NewModule(
 		indexerName: cfg.Name,
 	}
 
-	m.CreateInput(InputName)
+	m.CreateInputWithCapacity(InputName, 16)
 	m.CreateOutput(StopOutput)
 
 	return m
@@ -126,6 +126,7 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 		Int64("block_ns_size", block.Stats.BlobsSize).
 		Str("block_fee", block.Stats.Fee.String()).
 		Int64("ms", time.Since(start).Milliseconds()).
+		Int("tx_count", len(block.Txs)).
 		Msg("block saved")
 	return nil
 }
@@ -155,9 +156,12 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return err
 	}
 
+	if err := tx.SaveEvents(ctx, block.Events...); err != nil {
+		return err
+	}
+
 	var (
 		messages   = make([]*storage.Message, 0)
-		events     = block.Events
 		namespaces = make(map[string]*storage.Namespace, 0)
 		addresses  = make(map[string]*storage.Address, 0)
 	)
@@ -171,8 +175,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		}
 	}
 
-	// events = append(events, block.Events...)
-
+	events := make([]storage.Event, 0, 10000)
 	for i := range block.Txs {
 		for j := range block.Txs[i].Messages {
 			block.Txs[i].Messages[j].TxId = block.Txs[i].Id
@@ -182,7 +185,14 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 
 		for j := range block.Txs[i].Events {
 			block.Txs[i].Events[j].TxId = &block.Txs[i].Id
-			events = append(events, block.Txs[i].Events[j])
+		}
+
+		events = append(events, block.Txs[i].Events...)
+		if len(events) >= 10000 {
+			if err := tx.SaveEvents(ctx, events...); err != nil {
+				return err
+			}
+			events = make([]storage.Event, 0, 10000)
 		}
 
 		for j := range block.Txs[i].Signers {
@@ -192,6 +202,11 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 			}
 		}
 	}
+	if len(events) > 0 {
+		if err := tx.SaveEvents(ctx, events...); err != nil {
+			return err
+		}
+	}
 
 	addrToId, totalAccounts, err := saveAddresses(ctx, tx, addresses)
 	if err != nil {
@@ -199,10 +214,6 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 	}
 
 	if err := saveSigners(ctx, tx, addrToId, block.Txs); err != nil {
-		return err
-	}
-
-	if err := tx.SaveEvents(ctx, events...); err != nil {
 		return err
 	}
 
