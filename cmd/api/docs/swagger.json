@@ -3474,6 +3474,11 @@
                     "format": "base64",
                     "example": "vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg="
                 },
+                "content_type": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "image/png"
+                },
                 "height": {
                     "type": "integer",
                     "format": "integer",

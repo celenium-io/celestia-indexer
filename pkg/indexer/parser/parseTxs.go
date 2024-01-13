@@ -4,6 +4,8 @@
 package parser
 
 import (
+	"net/http"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
@@ -83,6 +85,12 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx) (stor
 		dm, err := decode.Message(sdkMsg, b.Height, b.Block.Time, position, t.Status)
 		if err != nil {
 			return storage.Tx{}, errors.Wrapf(err, "while parsing tx=%v on index=%d", t.Hash, t.Position)
+		}
+
+		if len(dm.Msg.BlobLogs) > 0 && len(d.Blobs) == len(dm.Msg.BlobLogs) {
+			for i := range dm.Msg.BlobLogs {
+				dm.Msg.BlobLogs[i].ContentType = http.DetectContentType(d.Blobs[i].Data)
+			}
 		}
 
 		if txRes.IsFailed() {

@@ -12,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
+	blobTypes "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmTypes "github.com/tendermint/tendermint/types"
 )
 
@@ -22,6 +23,7 @@ type DecodedTx struct {
 	Messages      []cosmosTypes.Msg
 	Fee           decimal.Decimal
 	Signers       map[string]struct{}
+	Blobs         []*blobTypes.Blob
 }
 
 var (
@@ -32,6 +34,7 @@ func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
 	raw := b.Block.Txs[index]
 	if bTx, isBlob := tmTypes.UnmarshalBlobTx(raw); isBlob {
 		raw = bTx.Tx
+		d.Blobs = bTx.Blobs
 	}
 
 	d.AuthInfo, d.Fee, err = decodeAuthInfo(cfg, raw)
