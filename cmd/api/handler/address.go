@@ -9,7 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	_ "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/labstack/echo/v4"
 )
@@ -155,17 +155,21 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 	}
 
 	fltrs := storage.TxFilter{
-		Limit:  int(req.Limit),
-		Offset: int(req.Offset),
-		Sort:   pgSort(req.Sort),
-		Status: req.Status,
-		Height: req.Height,
+		Limit:        int(req.Limit),
+		Offset:       int(req.Offset),
+		Sort:         pgSort(req.Sort),
+		Status:       req.Status,
+		Height:       req.Height,
+		MessageTypes: storageTypes.NewMsgTypeBitMask(),
 	}
 	if req.From > 0 {
 		fltrs.TimeFrom = time.Unix(req.From, 0).UTC()
 	}
 	if req.To > 0 {
 		fltrs.TimeTo = time.Unix(req.To, 0).UTC()
+	}
+	for i := range req.MsgType {
+		fltrs.MessageTypes.SetByMsgType(storageTypes.MsgType(req.MsgType[i]))
 	}
 
 	txs, err := handler.txs.ByAddress(c.Request().Context(), address.Id, fltrs)
