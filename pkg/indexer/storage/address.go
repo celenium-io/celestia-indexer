@@ -29,11 +29,11 @@ func saveAddresses(
 	}
 
 	addToId := make(map[string]uint64)
-	balances := make([]storage.Balance, 0)
+	balances := make([]storage.Balance, len(data))
 	for i := range data {
 		addToId[data[i].Address] = data[i].Id
 		data[i].Balance.Id = data[i].Id
-		balances = append(balances, data[i].Balance)
+		balances[i] = data[i].Balance
 	}
 	err = tx.SaveBalances(ctx, balances...)
 	return addToId, totalAccounts, err
@@ -50,11 +50,11 @@ func saveSigners(
 	}
 
 	var txAddresses []storage.Signer
-	for _, transaction := range txs {
-		for _, signer := range transaction.Signers {
-			if addrId, ok := addrToId[signer.Address]; ok {
+	for i := range txs {
+		for j := range txs[i].Signers {
+			if addrId, ok := addrToId[txs[i].Signers[j].Address]; ok {
 				txAddresses = append(txAddresses, storage.Signer{
-					TxId:      transaction.Id,
+					TxId:      txs[i].Id,
 					AddressId: addrId,
 				})
 			}

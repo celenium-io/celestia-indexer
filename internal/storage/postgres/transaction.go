@@ -142,11 +142,8 @@ func (tx Transaction) SaveEvents(ctx context.Context, events ...models.Event) er
 	case len(events) == 0:
 		return nil
 	case len(events) < 20:
-		data := make([]any, len(events))
-		for i := range events {
-			data[i] = &events[i]
-		}
-		return tx.BulkSave(ctx, data)
+		_, err := tx.Tx().NewInsert().Model(&events).Exec(ctx)
+		return err
 	default:
 		copiable := make([]storage.Copiable, len(events))
 		for i := range events {

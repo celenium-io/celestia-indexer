@@ -4,7 +4,6 @@
 package parser
 
 import (
-	"encoding/base64"
 	"github.com/rs/zerolog/log"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -15,44 +14,28 @@ import (
 func parseEvents(b types.BlockData, events []types.Event) []storage.Event {
 	result := make([]storage.Event, len(events))
 
-	for i, eN := range events {
-		eS := parseEvent(b, eN, i)
-		result[i] = eS
+	for i := range events {
+		parseEvent(b, events[i], i, &result[i])
 	}
 
 	return result
 }
 
-func parseEvent(b types.BlockData, eN types.Event, index int) storage.Event {
+func parseEvent(b types.BlockData, eN types.Event, index int, resultEvent *storage.Event) {
 	eventType, err := storageTypes.ParseEventType(eN.Type)
 	if err != nil {
 		log.Err(err).Msgf("got type %v", eN.Type)
 		eventType = storageTypes.EventTypeUnknown
 	}
 
-	event := storage.Event{
-		Height:   b.Height,
-		Time:     b.Block.Time,
-		Position: int64(index),
-		Type:     eventType,
-		Data:     make(map[string]any),
+	resultEvent.Height = b.Height
+	resultEvent.Time = b.Block.Time
+	resultEvent.Position = int64(index)
+	resultEvent.Type = eventType
+	resultEvent.Data = make(map[string]any, len(eN.Attributes))
+
+	for i := range eN.Attributes {
+		key := string(eN.Attributes[i].Key)
+		resultEvent.Data[key] = string(eN.Attributes[i].Value)
 	}
-
-	for _, attr := range eN.Attributes {
-		key := decodeEventAttribute(attr.Key)
-		value := decodeEventAttribute(attr.Value)
-		event.Data[key] = value
-	}
-
-	return event
-}
-
-var b64 = base64.StdEncoding
-
-func decodeEventAttribute(data string) string {
-	dst, err := b64.DecodeString(data)
-	if err != nil {
-		return data
-	}
-	return string(dst)
 }

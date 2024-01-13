@@ -73,13 +73,13 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 	block.Events = parseEvents(b, b.ResultBlockResults.BeginBlockEvents)
 	allEvents = append(allEvents, block.Events...)
 
-	for _, tx := range txs {
-		block.Stats.Fee = block.Stats.Fee.Add(tx.Fee)
-		block.MessageTypes.Set(tx.MessageTypes.Bits)
-		block.Stats.BlobsSize += tx.BlobsSize
-		block.Stats.GasLimit += tx.GasWanted
-		block.Stats.GasUsed += tx.GasUsed
-		allEvents = append(allEvents, tx.Events...)
+	for i := range txs {
+		block.Stats.Fee = block.Stats.Fee.Add(txs[i].Fee)
+		block.MessageTypes.Set(txs[i].MessageTypes.Bits)
+		block.Stats.BlobsSize += txs[i].BlobsSize
+		block.Stats.GasLimit += txs[i].GasWanted
+		block.Stats.GasUsed += txs[i].GasUsed
+		allEvents = append(allEvents, txs[i].Events...)
 	}
 
 	endEvents := parseEvents(b, b.ResultBlockResults.EndBlockEvents)

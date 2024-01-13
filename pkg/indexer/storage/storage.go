@@ -157,7 +157,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 
 	var (
 		messages   = make([]*storage.Message, 0)
-		events     = make([]storage.Event, 0)
+		events     = block.Events
 		namespaces = make(map[string]*storage.Namespace, 0)
 		addresses  = make(map[string]*storage.Address, 0)
 	)
@@ -171,7 +171,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		}
 	}
 
-	events = append(events, block.Events...)
+	// events = append(events, block.Events...)
 
 	for i := range block.Txs {
 		for j := range block.Txs[i].Messages {
@@ -224,6 +224,11 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 }
 
 func (module *Module) notify(ctx context.Context, block storage.Block) error {
+	if time.Since(block.Time) > time.Hour {
+		// do not notify all about events if initial indexing is in progress
+		return nil
+	}
+
 	blockId := strconv.FormatUint(block.Id, 10)
 	if err := module.notificator.Notify(ctx, storage.ChannelHead, blockId); err != nil {
 		return err

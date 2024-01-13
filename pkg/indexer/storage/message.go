@@ -30,20 +30,21 @@ func saveMessages(
 		msgAddrMap    = make(map[string]struct{})
 	)
 	for i := range messages {
-		for _, ns := range messages[i].Namespace {
-			nsId := ns.Id
+		for j := range messages[i].Namespace {
+			nsId := messages[i].Namespace[j].Id
+			key := messages[i].Namespace[j].String()
 			if nsId == 0 {
 				if _, ok := addedMsgId[messages[i].Id]; ok { // in case of duplication of writing to one namespace inside one messages
 					continue
 				}
 
-				id, ok := namespaces[ns.String()]
+				id, ok := namespaces[key]
 				if !ok {
 					continue
 				}
 				nsId = id
 			} else {
-				namespaces[ns.String()] = nsId
+				namespaces[key] = nsId
 			}
 
 			addedMsgId[messages[i].Id] = struct{}{}
@@ -53,7 +54,7 @@ func saveMessages(
 				Time:        messages[i].Time,
 				Height:      messages[i].Height,
 				TxId:        messages[i].TxId,
-				Size:        uint64(ns.Size),
+				Size:        uint64(messages[i].Namespace[j].Size),
 			})
 		}
 
