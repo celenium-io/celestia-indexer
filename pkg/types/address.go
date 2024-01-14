@@ -41,3 +41,11 @@ func (a Address) Decimal() (decimal.Decimal, error) {
 	}
 	return decimal.Zero, errors.Errorf("invalid decoded address: %x %s", data, a)
 }
+
+func NewAddressFromBytes(data []byte) (Address, error) {
+	s, err := bech32.ConvertAndEncode(AddressPrefixCelestia, data)
+	if err != nil {
+		return "", nil
+	}
+	return Address(s), nil
+}

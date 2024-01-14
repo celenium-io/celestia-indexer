@@ -5,6 +5,7 @@ package parser
 
 import (
 	"context"
+
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 )
 
@@ -24,7 +25,7 @@ func NewModule() Module {
 	m := Module{
 		BaseModule: modules.New("parser"),
 	}
-	m.CreateInput(InputName)
+	m.CreateInputWithCapacity(InputName, 32)
 	m.CreateOutput(OutputName)
 	m.CreateOutput(StopOutput)
 

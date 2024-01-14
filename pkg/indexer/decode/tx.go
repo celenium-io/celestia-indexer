@@ -22,7 +22,7 @@ type DecodedTx struct {
 	Memo          string
 	Messages      []cosmosTypes.Msg
 	Fee           decimal.Decimal
-	Signers       map[string]struct{}
+	Signers       map[types.Address][]byte
 	Blobs         []*blobTypes.Blob
 }
 
@@ -47,10 +47,18 @@ func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
 		return
 	}
 
-	d.Signers = make(map[string]struct{})
+	d.Signers = make(map[types.Address][]byte)
 	for i := range d.Messages {
 		for _, signer := range d.Messages[i].GetSigners() {
-			d.Signers[signer.String()] = struct{}{}
+			if signer.Empty() {
+				continue
+			}
+			signerBytes := signer.Bytes()
+			address, err := types.NewAddressFromBytes(signerBytes)
+			if err != nil {
+				return d, err
+			}
+			d.Signers[address] = signerBytes
 		}
 	}
 

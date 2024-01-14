@@ -7,11 +7,15 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	jsoniter "github.com/json-iterator/go"
+	"github.com/lib/pq"
 	"github.com/uptrace/bun"
 
 	models "github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type Transaction struct {
 	storage.Transaction
@@ -145,11 +149,32 @@ func (tx Transaction) SaveEvents(ctx context.Context, events ...models.Event) er
 		_, err := tx.Tx().NewInsert().Model(&events).Exec(ctx)
 		return err
 	default:
-		copiable := make([]storage.Copiable, len(events))
-		for i := range events {
-			copiable[i] = events[i]
+		stmt, err := tx.Tx().PrepareContext(ctx,
+			pq.CopyIn("event", "height", "time", "position", "type", "tx_id", "data"),
+		)
+		if err != nil {
+			return err
 		}
-		return tx.CopyFrom(ctx, "event", copiable)
+
+		for i := range events {
+			var s *string
+			if len(events[i].Data) > 0 {
+				raw, err := json.MarshalToString(events[i].Data)
+				if err == nil {
+					s = &raw
+				}
+			}
+
+			if _, err := stmt.ExecContext(ctx, events[i].Height, events[i].Time, events[i].Position, events[i].Type, events[i].TxId, s); err != nil {
+				return err
+			}
+		}
+
+		if _, err := stmt.ExecContext(ctx); err != nil {
+			return err
+		}
+
+		return stmt.Close()
 	}
 }
 

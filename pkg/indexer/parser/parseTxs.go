@@ -52,17 +52,12 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx, t *st
 	t.BlobsSize = 0
 	t.BytesSize = int64(len(txRes.Data))
 
-	for signer := range d.Signers {
-		_, hash, err := types.Address(signer).Decode()
-		if err != nil {
-			return errors.Wrapf(err, "decode signer: %s", signer)
-		}
-
+	for signer, signerBytes := range d.Signers {
 		t.Signers = append(t.Signers, storage.Address{
-			Address:    signer,
+			Address:    signer.String(),
 			Height:     t.Height,
 			LastHeight: t.Height,
-			Hash:       hash,
+			Hash:       signerBytes,
 			Balance: storage.Balance{
 				Total: decimal.Zero,
 			},
