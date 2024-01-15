@@ -20,6 +20,7 @@ type TxHandler struct {
 	events      storage.IEvent
 	messages    storage.IMessage
 	namespaces  storage.INamespace
+	blobLogs    storage.IBlobLog
 	state       storage.IState
 	indexerName string
 }
@@ -29,6 +30,7 @@ func NewTxHandler(
 	events storage.IEvent,
 	messages storage.IMessage,
 	namespaces storage.INamespace,
+	blobLogs storage.IBlobLog,
 	state storage.IState,
 	indexerName string,
 ) *TxHandler {
@@ -37,6 +39,7 @@ func NewTxHandler(
 		events:      events,
 		messages:    messages,
 		namespaces:  namespaces,
+		blobLogs:    blobLogs,
 		state:       state,
 		indexerName: indexerName,
 	}
@@ -362,6 +365,112 @@ func (handler *TxHandler) NamespacesCount(c echo.Context) error {
 	count, err := handler.namespaces.CountMessagesByTxId(c.Request().Context(), tx.Id)
 	if err != nil {
 		return handleError(c, err, handler.tx)
+	}
+	return c.JSON(http.StatusOK, count)
+}
+
+type getBlobsForTx struct {
+	Hash   string `param:"hash"    validate:"required,hexadecimal,len=64"`
+	Limit  uint64 `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset uint64 `query:"offset"  validate:"omitempty,min=0"`
+	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
+	SortBy string `query:"sort_by" validate:"omitempty,oneof=time size"`
+}
+
+func (req *getBlobsForTx) SetDefault() {
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
+	if req.Sort == "" {
+		req.Sort = desc
+	}
+}
+
+// Blobs godoc
+//
+//	@Summary		List blobs which was pushed by transaction
+//	@Description	List blobs which was pushed by transaction
+//	@Tags			transactions
+//	@ID				list-transaction-blobs
+//	@Param			hash	path	string	true	"Transaction hash in hexadecimal"				minlength(64)	maxlength(64)
+//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"										mininum(1)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
+//	@Produce		json
+//	@Success		200	{array}		responses.BlobLog
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/tx/{hash}/blobs [get]
+func (handler *TxHandler) Blobs(c echo.Context) error {
+	req, err := bindAndValidate[getBlobsForTx](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	hash, err := hex.DecodeString(req.Hash)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
+	if err != nil {
+		return handleError(c, err, handler.tx)
+	}
+
+	blobs, err := handler.blobLogs.ByTxId(
+		c.Request().Context(),
+		tx.Id,
+		storage.BlobLogFilters{
+			Limit:  int(req.Limit),
+			Offset: int(req.Offset),
+			Sort:   pgSort(req.Sort),
+			SortBy: req.SortBy,
+		},
+	)
+	if err != nil {
+		return handleError(c, err, handler.blobLogs)
+	}
+
+	response := make([]responses.BlobLog, len(blobs))
+	for i := range blobs {
+		response[i] = responses.NewBlobLog(blobs[i])
+	}
+	return returnArray(c, response)
+}
+
+// BlobsCount godoc
+//
+//	@Summary		Count of blobs which was pushed by transaction
+//	@Description	Count of blobs which was pushed by transaction
+//	@Tags			transactions
+//	@ID				transaction-blobs-count
+//	@Param			hash	path	string	true	"Transaction hash in hexadecimal"				minlength(64)	maxlength(64)
+//	@Produce		json
+//	@Success		200	{integer}	uint64
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/tx/{hash}/blobs/count [get]
+func (handler *TxHandler) BlobsCount(c echo.Context) error {
+	req, err := bindAndValidate[getTxRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	hash, err := hex.DecodeString(req.Hash)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
+	if err != nil {
+		return handleError(c, err, handler.tx)
+	}
+
+	count, err := handler.blobLogs.CountByTxId(c.Request().Context(), tx.Id)
+	if err != nil {
+		return handleError(c, err, handler.blobLogs)
 	}
 	return c.JSON(http.StatusOK, count)
 }

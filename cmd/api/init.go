@@ -275,7 +275,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	blockHandlers := handler.NewBlockHandler(db.Blocks, db.BlockStats, db.Event, db.Namespace, db.Message, db.State, cfg.Indexer.Name)
+	blockHandlers := handler.NewBlockHandler(db.Blocks, db.BlockStats, db.Event, db.Namespace, db.Message, db.BlobLogs, db.State, cfg.Indexer.Name)
 	blockGroup := v1.Group("/block")
 	{
 		blockGroup.GET("", blockHandlers.List)
@@ -288,20 +288,27 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			heightGroup.GET("/stats", blockHandlers.GetStats)
 			heightGroup.GET("/namespace", blockHandlers.GetNamespaces)
 			heightGroup.GET("/namespace/count", blockHandlers.GetNamespacesCount)
+			heightGroup.GET("/blobs", blockHandlers.Blobs)
+			heightGroup.GET("/blobs/count", blockHandlers.BlobsCount)
 		}
 	}
 
-	txHandlers := handler.NewTxHandler(db.Tx, db.Event, db.Message, db.Namespace, db.State, cfg.Indexer.Name)
+	txHandlers := handler.NewTxHandler(db.Tx, db.Event, db.Message, db.Namespace, db.BlobLogs, db.State, cfg.Indexer.Name)
 	txGroup := v1.Group("/tx")
 	{
 		txGroup.GET("", txHandlers.List)
 		txGroup.GET("/count", txHandlers.Count)
 		txGroup.GET("/genesis", txHandlers.Genesis)
-		txGroup.GET("/:hash", txHandlers.Get)
-		txGroup.GET("/:hash/events", txHandlers.GetEvents)
-		txGroup.GET("/:hash/messages", txHandlers.GetMessages)
-		txGroup.GET("/:hash/namespace", txHandlers.Namespaces)
-		txGroup.GET("/:hash/namespace/count", txHandlers.NamespacesCount)
+		hashGroup := txGroup.Group("/:hash")
+		{
+			hashGroup.GET("", txHandlers.Get)
+			hashGroup.GET("/events", txHandlers.GetEvents)
+			hashGroup.GET("/messages", txHandlers.GetMessages)
+			hashGroup.GET("/namespace", txHandlers.Namespaces)
+			hashGroup.GET("/namespace/count", txHandlers.NamespacesCount)
+			hashGroup.GET("/blobs", txHandlers.Blobs)
+			hashGroup.GET("/blobs/count", txHandlers.BlobsCount)
+		}
 	}
 
 	datasource, ok := cfg.DataSources[cfg.ApiConfig.BlobReceiver]

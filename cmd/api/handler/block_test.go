@@ -70,6 +70,7 @@ type BlockTestSuite struct {
 	events     *mock.MockIEvent
 	message    *mock.MockIMessage
 	namespace  *mock.MockINamespace
+	blobLogs   *mock.MockIBlobLog
 	state      *mock.MockIState
 	echo       *echo.Echo
 	handler    *BlockHandler
@@ -85,9 +86,10 @@ func (s *BlockTestSuite) SetupSuite() {
 	s.blockStats = mock.NewMockIBlockStats(s.ctrl)
 	s.events = mock.NewMockIEvent(s.ctrl)
 	s.namespace = mock.NewMockINamespace(s.ctrl)
+	s.blobLogs = mock.NewMockIBlobLog(s.ctrl)
 	s.message = mock.NewMockIMessage(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events, s.namespace, s.message, s.state, testIndexerName)
+	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events, s.namespace, s.message, s.blobLogs, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -413,6 +415,64 @@ func (s *BlockTestSuite) TestGetNamespacesCount() {
 		Return(12, nil)
 
 	s.Require().NoError(s.handler.GetNamespacesCount(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var count int
+	err := json.NewDecoder(rec.Body).Decode(&count)
+	s.Require().NoError(err)
+	s.Require().EqualValues(count, 12)
+}
+
+func (s *BlockTestSuite) TestBlobs() {
+	req := httptest.NewRequest(http.MethodGet, "/?", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/block/:height/blobs")
+	c.SetParamNames("height")
+	c.SetParamValues("100")
+
+	s.blobLogs.EXPECT().
+		ByHeight(gomock.Any(), pkgTypes.Level(100), gomock.Any()).
+		Return([]storage.BlobLog{
+			{
+				NamespaceId: testNamespace.Id,
+				MsgId:       1,
+				Message: &storage.Message{
+					Id:       1,
+					TxId:     2,
+					Position: 3,
+					Type:     types.MsgBeginRedelegate,
+					Height:   100,
+					Time:     testTime,
+				},
+				TxId:      1,
+				Tx:        &testTx,
+				Namespace: &testNamespace,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Blobs(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var logs []responses.BlobLog
+	err := json.NewDecoder(rec.Body).Decode(&logs)
+	s.Require().NoError(err)
+	s.Require().Len(logs, 1)
+}
+
+func (s *BlockTestSuite) TestGetBlobsCount() {
+	req := httptest.NewRequest(http.MethodGet, "/?", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/block/:height/blobs/count")
+	c.SetParamNames("height")
+	c.SetParamValues("100")
+
+	s.blobLogs.EXPECT().
+		CountByHeight(gomock.Any(), pkgTypes.Level(100)).
+		Return(12, nil)
+
+	s.Require().NoError(s.handler.BlobsCount(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
 	var count int

@@ -385,7 +385,7 @@ func (req *getBlobLogsForNamespace) SetDefault() {
 		req.Limit = 10
 	}
 	if req.Sort == "" {
-		req.Sort = "desc"
+		req.Sort = desc
 	}
 }
 

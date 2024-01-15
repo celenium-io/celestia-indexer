@@ -18,6 +18,7 @@ type BlockHandler struct {
 	blockStats  storage.IBlockStats
 	events      storage.IEvent
 	namespace   storage.INamespace
+	blobLogs    storage.IBlobLog
 	message     storage.IMessage
 	state       storage.IState
 	indexerName string
@@ -29,6 +30,7 @@ func NewBlockHandler(
 	events storage.IEvent,
 	namespace storage.INamespace,
 	message storage.IMessage,
+	blobLogs storage.IBlobLog,
 	state storage.IState,
 	indexerName string,
 ) *BlockHandler {
@@ -37,6 +39,7 @@ func NewBlockHandler(
 		blockStats:  blockStats,
 		events:      events,
 		namespace:   namespace,
+		blobLogs:    blobLogs,
 		message:     message,
 		state:       state,
 		indexerName: indexerName,
@@ -337,4 +340,91 @@ func (handler *BlockHandler) GetMessages(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+type getBlobsForBlock struct {
+	Height types.Level `param:"height"  validate:"min=0"`
+	Limit  uint64      `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset uint64      `query:"offset"  validate:"omitempty,min=0"`
+	Sort   string      `query:"sort"    validate:"omitempty,oneof=asc desc"`
+	SortBy string      `query:"sort_by" validate:"omitempty,oneof=time size"`
+}
+
+func (req *getBlobsForBlock) SetDefault() {
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
+	if req.Sort == "" {
+		req.Sort = desc
+	}
+}
+
+// Blobs godoc
+//
+//	@Summary		List blobs which was pushed in the block
+//	@Description	List blobs which was pushed in the block
+//	@Tags			block
+//	@ID				get-block-blobs
+//	@Param			height	path	integer	true	"Block height"									minimum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"										mininum(1)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
+//	@Produce		json
+//	@Success		200	{array}		responses.BlobLog
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/block/{height}/blobs [get]
+func (handler *BlockHandler) Blobs(c echo.Context) error {
+	req, err := bindAndValidate[getBlobsForBlock](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	blobs, err := handler.blobLogs.ByHeight(
+		c.Request().Context(),
+		req.Height,
+		storage.BlobLogFilters{
+			Limit:  int(req.Limit),
+			Offset: int(req.Offset),
+			Sort:   pgSort(req.Sort),
+			SortBy: req.SortBy,
+		},
+	)
+	if err != nil {
+		return handleError(c, err, handler.blobLogs)
+	}
+
+	response := make([]responses.BlobLog, len(blobs))
+	for i := range blobs {
+		response[i] = responses.NewBlobLog(blobs[i])
+	}
+	return returnArray(c, response)
+}
+
+// BlobsCount godoc
+//
+//	@Summary		Count of blobs which was pushed by transaction
+//	@Description	Count of blobs which was pushed by transaction
+//	@Tags			block
+//	@ID				block-blobs-count
+//	@Param			height	path	integer	true	"Block height"	minimum(1)
+//	@Produce		json
+//	@Success		200	{integer}	uint64
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/block/{height}/blobs/count [get]
+func (handler *BlockHandler) BlobsCount(c echo.Context) error {
+	req, err := bindAndValidate[getBlockByHeightRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	count, err := handler.blobLogs.CountByHeight(c.Request().Context(), req.Height)
+	if err != nil {
+		return handleError(c, err, handler.blobLogs)
+	}
+
+	return c.JSON(http.StatusOK, count)
 }

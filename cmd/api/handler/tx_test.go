@@ -59,6 +59,7 @@ type TxTestSuite struct {
 	events    *mock.MockIEvent
 	messages  *mock.MockIMessage
 	namespace *mock.MockINamespace
+	blobLogs  *mock.MockIBlobLog
 	state     *mock.MockIState
 	echo      *echo.Echo
 	handler   *TxHandler
@@ -73,9 +74,10 @@ func (s *TxTestSuite) SetupSuite() {
 	s.tx = mock.NewMockITx(s.ctrl)
 	s.events = mock.NewMockIEvent(s.ctrl)
 	s.namespace = mock.NewMockINamespace(s.ctrl)
+	s.blobLogs = mock.NewMockIBlobLog(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
 	s.messages = mock.NewMockIMessage(s.ctrl)
-	s.handler = NewTxHandler(s.tx, s.events, s.messages, s.namespace, s.state, testIndexerName)
+	s.handler = NewTxHandler(s.tx, s.events, s.messages, s.namespace, s.blobLogs, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -604,6 +606,86 @@ func (s *TxTestSuite) TestNamespaceCount() {
 		MaxTimes(1)
 
 	s.Require().NoError(s.handler.NamespacesCount(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var count int
+	err := json.NewDecoder(rec.Body).Decode(&count)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1234, count)
+}
+
+func (s *TxTestSuite) TestBlobs() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx/:hash/blobs")
+	c.SetParamNames("hash")
+	c.SetParamValues(testTxHash)
+
+	s.tx.EXPECT().
+		ByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx, nil).
+		MaxTimes(1)
+
+	s.blobLogs.EXPECT().
+		ByTxId(gomock.Any(), testTx.Id, gomock.Any()).
+		Return([]storage.BlobLog{
+			{
+				TxId:        testTx.Id,
+				MsgId:       2,
+				NamespaceId: testNamespace.Id,
+				Time:        testTime,
+				Height:      1000,
+				Size:        100,
+				Message: &storage.Message{
+					Id: 2,
+				},
+				Tx:        &testTx,
+				Namespace: &testNamespace,
+			}, {
+				TxId:        testTx.Id,
+				MsgId:       3,
+				NamespaceId: testNamespace.Id,
+				Time:        testTime,
+				Height:      1000,
+				Size:        150,
+				Message: &storage.Message{
+					Id: 3,
+				},
+				Tx:        &testTx,
+				Namespace: &testNamespace,
+			},
+		}, nil).
+		MaxTimes(1)
+
+	s.Require().NoError(s.handler.Blobs(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var logs []responses.BlobLog
+	err := json.NewDecoder(rec.Body).Decode(&logs)
+	s.Require().NoError(err)
+	s.Require().Len(logs, 2)
+}
+
+func (s *TxTestSuite) TestBlobsCount() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx/:hash/blobs/count")
+	c.SetParamNames("hash")
+	c.SetParamValues(testTxHash)
+
+	s.tx.EXPECT().
+		ByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx, nil).
+		MaxTimes(1)
+
+	s.blobLogs.EXPECT().
+		CountByTxId(gomock.Any(), testTx.Id).
+		Return(1234, nil).
+		MaxTimes(1)
+
+	s.Require().NoError(s.handler.BlobsCount(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
 	var count int
