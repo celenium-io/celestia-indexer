@@ -291,7 +291,11 @@ func (s *BlockTestSuite) TestListWithStats() {
 }
 
 func (s *BlockTestSuite) TestGetEvents() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	q := make(url.Values)
+	q.Set("limit", "2")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/events")
@@ -299,7 +303,7 @@ func (s *BlockTestSuite) TestGetEvents() {
 	c.SetParamValues("100")
 
 	s.events.EXPECT().
-		ByBlock(gomock.Any(), pkgTypes.Level(100)).
+		ByBlock(gomock.Any(), pkgTypes.Level(100), 2, 0).
 		Return([]storage.Event{
 			{
 				Id:       1,

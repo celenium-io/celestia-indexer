@@ -388,7 +388,11 @@ func (s *TxTestSuite) TestListExcludedMessages() {
 }
 
 func (s *TxTestSuite) TestGetEvents() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	q := make(url.Values)
+	q.Set("limit", "2")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx/:hash/events")
@@ -400,7 +404,7 @@ func (s *TxTestSuite) TestGetEvents() {
 		Return(testTx, nil)
 
 	s.events.EXPECT().
-		ByTxId(gomock.Any(), uint64(1)).
+		ByTxId(gomock.Any(), uint64(1), 2, 0).
 		Return([]storage.Event{
 			{
 				Id:       1,
@@ -431,7 +435,11 @@ func (s *TxTestSuite) TestGetEvents() {
 }
 
 func (s *TxTestSuite) TestGetMessage() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	q := make(url.Values)
+	q.Set("limit", "2")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx/:hash/events")
@@ -443,7 +451,7 @@ func (s *TxTestSuite) TestGetMessage() {
 		Return(testTx, nil)
 
 	s.messages.EXPECT().
-		ByTxId(gomock.Any(), uint64(1)).
+		ByTxId(gomock.Any(), uint64(1), 2, 0).
 		Return([]storage.Message{
 			{
 				Id:       1,

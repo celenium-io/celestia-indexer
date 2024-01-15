@@ -21,8 +21,8 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 type IEvent interface {
 	storage.Table[*Event]
 
-	ByTxId(ctx context.Context, txId uint64) ([]Event, error)
-	ByBlock(ctx context.Context, height pkgTypes.Level) ([]Event, error)
+	ByTxId(ctx context.Context, txId uint64, limit, offset int) ([]Event, error)
+	ByBlock(ctx context.Context, height pkgTypes.Level, limit, offset int) ([]Event, error)
 }
 
 // Event -

@@ -1589,6 +1589,15 @@ paths:
         name: height
         required: true
         type: integer
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
@@ -3345,6 +3354,15 @@ paths:
         name: hash
         required: true
         type: string
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
@@ -3377,6 +3395,15 @@ paths:
         name: hash
         required: true
         type: string
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:

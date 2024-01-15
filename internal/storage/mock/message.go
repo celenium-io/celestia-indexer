@@ -83,18 +83,18 @@ func (c *IMessageByAddressCall) DoAndReturn(f func(context.Context, uint64, stor
 }
 
 // ByTxId mocks base method.
-func (m *MockIMessage) ByTxId(ctx context.Context, txId uint64) ([]storage.Message, error) {
+func (m *MockIMessage) ByTxId(ctx context.Context, txId uint64, limit, offset int) ([]storage.Message, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ByTxId", ctx, txId)
+	ret := m.ctrl.Call(m, "ByTxId", ctx, txId, limit, offset)
 	ret0, _ := ret[0].([]storage.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ByTxId indicates an expected call of ByTxId.
-func (mr *MockIMessageMockRecorder) ByTxId(ctx, txId any) *IMessageByTxIdCall {
+func (mr *MockIMessageMockRecorder) ByTxId(ctx, txId, limit, offset any) *IMessageByTxIdCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByTxId", reflect.TypeOf((*MockIMessage)(nil).ByTxId), ctx, txId)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByTxId", reflect.TypeOf((*MockIMessage)(nil).ByTxId), ctx, txId, limit, offset)
 	return &IMessageByTxIdCall{Call: call}
 }
 
@@ -110,13 +110,13 @@ func (c *IMessageByTxIdCall) Return(arg0 []storage.Message, arg1 error) *IMessag
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IMessageByTxIdCall) Do(f func(context.Context, uint64) ([]storage.Message, error)) *IMessageByTxIdCall {
+func (c *IMessageByTxIdCall) Do(f func(context.Context, uint64, int, int) ([]storage.Message, error)) *IMessageByTxIdCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IMessageByTxIdCall) DoAndReturn(f func(context.Context, uint64) ([]storage.Message, error)) *IMessageByTxIdCall {
+func (c *IMessageByTxIdCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Message, error)) *IMessageByTxIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
