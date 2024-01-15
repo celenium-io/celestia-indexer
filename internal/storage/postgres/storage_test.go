@@ -349,7 +349,7 @@ func (s *StorageTestSuite) TestEventByTxId() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	events, err := s.storage.Event.ByTxId(ctx, 1)
+	events, err := s.storage.Event.ByTxId(ctx, 1, 10, 0)
 	s.Require().NoError(err)
 	s.Require().Len(events, 1)
 	s.Require().EqualValues(2, events[0].Id)
@@ -362,7 +362,7 @@ func (s *StorageTestSuite) TestEventByBlock() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	events, err := s.storage.Event.ByBlock(ctx, 1000)
+	events, err := s.storage.Event.ByBlock(ctx, 1000, 2, 0)
 	s.Require().NoError(err)
 	s.Require().Len(events, 1)
 	s.Require().EqualValues(1, events[0].Id)
@@ -375,9 +375,9 @@ func (s *StorageTestSuite) TestMessageByTxId() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	msgs, err := s.storage.Message.ByTxId(ctx, 1)
+	msgs, err := s.storage.Message.ByTxId(ctx, 1, 1, 0)
 	s.Require().NoError(err)
-	s.Require().Len(msgs, 2)
+	s.Require().Len(msgs, 1)
 	s.Require().EqualValues(1, msgs[0].Id)
 	s.Require().EqualValues(1000, msgs[0].Height)
 	s.Require().EqualValues(0, msgs[0].Position)

@@ -48,7 +48,7 @@ type AddressMessageWithTx struct {
 type IMessage interface {
 	storage.Table[*Message]
 
-	ByTxId(ctx context.Context, txId uint64) ([]Message, error)
+	ByTxId(ctx context.Context, txId uint64, limit, offset int) ([]Message, error)
 	ListWithTx(ctx context.Context, filters MessageListWithTxFilters) ([]MessageWithTx, error)
 	ByAddress(ctx context.Context, id uint64, filters AddressMsgsFilter) ([]AddressMessageWithTx, error)
 }

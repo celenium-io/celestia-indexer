@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -25,18 +26,30 @@ func NewEvent(db *database.Bun) *Event {
 }
 
 // ByTxId -
-func (e *Event) ByTxId(ctx context.Context, txId uint64) (events []storage.Event, err error) {
-	err = e.DB().NewSelect().Model(&events).
-		Where("tx_id = ?", txId).
-		Scan(ctx)
+func (e *Event) ByTxId(ctx context.Context, txId uint64, limit, offset int) (events []storage.Event, err error) {
+	query := e.DB().NewSelect().Model(&events).
+		Where("tx_id = ?", txId)
+	query = limitScope(query, limit)
+
+	if limit > 0 {
+		query = query.Offset(offset)
+	}
+
+	err = query.Scan(ctx)
 	return
 }
 
 // ByBlock -
-func (e *Event) ByBlock(ctx context.Context, height pkgTypes.Level) (events []storage.Event, err error) {
-	err = e.DB().NewSelect().Model(&events).
+func (e *Event) ByBlock(ctx context.Context, height pkgTypes.Level, limit, offset int) (events []storage.Event, err error) {
+	query := e.DB().NewSelect().Model(&events).
 		Where("height = ?", height).
-		Where("tx_id IS NULL").
-		Scan(ctx)
+		Where("tx_id IS NULL")
+
+	query = limitScope(query, limit)
+
+	if limit > 0 {
+		query = query.Offset(offset)
+	}
+	err = query.Scan(ctx)
 	return
 }

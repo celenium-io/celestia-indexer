@@ -144,25 +144,40 @@ func (handler *BlockHandler) List(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+type getBlockEvents struct {
+	Height types.Level `param:"height" validate:"min=0"`
+	Limit  int         `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int         `query:"offset" validate:"omitempty,min=0"`
+}
+
+func (p *getBlockEvents) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+}
+
 // GetEvents godoc
 //
 //	@Summary		Get events from begin and end of block
 //	@Description	Get events from begin and end of block
 //	@Tags			block
 //	@ID				get-block-events
-//	@Param			height	path	integer	true	"Block height"	minimum(1)
+//	@Param			height	path	integer	true	"Block height"					minimum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Event
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/block/{height}/events [get]
 func (handler *BlockHandler) GetEvents(c echo.Context) error {
-	req, err := bindAndValidate[getBlockByHeightRequest](c)
+	req, err := bindAndValidate[getBlockEvents](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
+	req.SetDefault()
 
-	events, err := handler.events.ByBlock(c.Request().Context(), req.Height)
+	events, err := handler.events.ByBlock(c.Request().Context(), req.Height, req.Limit, req.Offset)
 	if err != nil {
 		return handleError(c, err, handler.block)
 	}

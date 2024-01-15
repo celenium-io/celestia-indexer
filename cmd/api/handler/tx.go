@@ -140,6 +140,18 @@ func (handler *TxHandler) List(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+type getTxRequestWithPagination struct {
+	Hash   string `param:"hash"   validate:"required,hexadecimal,len=64"`
+	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int    `query:"offset" validate:"omitempty,min=0"`
+}
+
+func (p *getTxRequestWithPagination) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+}
+
 // GetEvents godoc
 //
 //	@Summary		Get transaction events
@@ -147,16 +159,19 @@ func (handler *TxHandler) List(c echo.Context) error {
 //	@Tags			transactions
 //	@ID				get-transaction-events
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
+//	@Param			limit	query	integer	false	"Count of requested entities"		mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"							mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Event
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/tx/{hash}/events [get]
 func (handler *TxHandler) GetEvents(c echo.Context) error {
-	req, err := bindAndValidate[getTxRequest](c)
+	req, err := bindAndValidate[getTxRequestWithPagination](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
+	req.SetDefault()
 
 	hash, err := hex.DecodeString(req.Hash)
 	if err != nil {
@@ -168,7 +183,7 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 		return handleError(c, err, handler.tx)
 	}
 
-	events, err := handler.events.ByTxId(c.Request().Context(), tx.Id)
+	events, err := handler.events.ByTxId(c.Request().Context(), tx.Id, req.Limit, req.Offset)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
@@ -186,16 +201,19 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 //	@Tags			transactions
 //	@ID				get-transaction-messages
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
+//	@Param			limit	query	integer	false	"Count of requested entities"		mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"							mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Message
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/tx/{hash}/messages [get]
 func (handler *TxHandler) GetMessages(c echo.Context) error {
-	req, err := bindAndValidate[getTxRequest](c)
+	req, err := bindAndValidate[getTxRequestWithPagination](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
+	req.SetDefault()
 
 	hash, err := hex.DecodeString(req.Hash)
 	if err != nil {
@@ -207,7 +225,7 @@ func (handler *TxHandler) GetMessages(c echo.Context) error {
 		return handleError(c, err, handler.tx)
 	}
 
-	messages, err := handler.messages.ByTxId(c.Request().Context(), tx.Id)
+	messages, err := handler.messages.ByTxId(c.Request().Context(), tx.Id, req.Limit, req.Offset)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}

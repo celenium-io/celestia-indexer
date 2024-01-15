@@ -25,10 +25,15 @@ func NewMessage(db *database.Bun) *Message {
 }
 
 // ByTxId -
-func (m *Message) ByTxId(ctx context.Context, txId uint64) (messages []storage.Message, err error) {
-	err = m.DB().NewSelect().Model(&messages).
-		Where("tx_id = ?", txId).
-		Scan(ctx)
+func (m *Message) ByTxId(ctx context.Context, txId uint64, limit, offset int) (messages []storage.Message, err error) {
+	query := m.DB().NewSelect().Model(&messages).
+		Where("tx_id = ?", txId)
+	query = limitScope(query, limit)
+
+	if offset > 0 {
+		query = query.Offset(offset)
+	}
+	err = query.Scan(ctx)
 	return
 }
 
