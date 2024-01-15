@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/uptrace/bun"
@@ -70,4 +71,42 @@ func (bl *BlobLog) BySigner(ctx context.Context, signerId uint64, fltrs storage.
 
 	err = query.Scan(ctx)
 	return
+}
+
+func (bl *BlobLog) ByTxId(ctx context.Context, txId uint64, fltrs storage.BlobLogFilters) (logs []storage.BlobLog, err error) {
+	query := bl.DB().NewSelect().Model(&logs).
+		Relation("Namespace").
+		Relation("Tx").
+		Relation("Signer").
+		Where("tx_id = ?", txId)
+
+	query = blobLogFilters(query, fltrs)
+
+	err = query.Scan(ctx)
+	return
+}
+
+func (bl *BlobLog) ByHeight(ctx context.Context, height types.Level, fltrs storage.BlobLogFilters) (logs []storage.BlobLog, err error) {
+	query := bl.DB().NewSelect().Model(&logs).
+		Relation("Namespace").
+		Relation("Tx").
+		Relation("Signer").
+		Where("blob_log.height = ?", height)
+
+	query = blobLogFilters(query, fltrs)
+
+	err = query.Scan(ctx)
+	return
+}
+
+func (bl *BlobLog) CountByTxId(ctx context.Context, txId uint64) (int, error) {
+	return bl.DB().NewSelect().Model((*storage.BlobLog)(nil)).
+		Where("tx_id = ?", txId).
+		Count(ctx)
+}
+
+func (bl *BlobLog) CountByHeight(ctx context.Context, height types.Level) (int, error) {
+	return bl.DB().NewSelect().Model((*storage.BlobLog)(nil)).
+		Where("height = ?", height).
+		Count(ctx)
 }

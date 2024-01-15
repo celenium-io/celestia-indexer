@@ -1578,6 +1578,89 @@ paths:
       summary: Get block info
       tags:
       - block
+  /v1/block/{height}/blobs:
+    get:
+      description: List blobs which was pushed in the block
+      operationId: get-block-blobs
+      parameters:
+      - description: Block height
+        in: path
+        minimum: 1
+        name: height
+        required: true
+        type: integer
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: 'Sort order. Default: desc'
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort
+        type: string
+      - description: Sort field. If it's empty internal id is used
+        enum:
+        - time
+        - size
+        in: query
+        name: sort_by
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.BlobLog'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: List blobs which was pushed in the block
+      tags:
+      - block
+  /v1/block/{height}/blobs/count:
+    get:
+      description: Count of blobs which was pushed by transaction
+      operationId: block-blobs-count
+      parameters:
+      - description: Block height
+        in: path
+        minimum: 1
+        name: height
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Count of blobs which was pushed by transaction
+      tags:
+      - block
   /v1/block/{height}/events:
     get:
       description: Get events from begin and end of block
@@ -3331,6 +3414,91 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get transaction by hash
+      tags:
+      - transactions
+  /v1/tx/{hash}/blobs:
+    get:
+      description: List blobs which was pushed by transaction
+      operationId: list-transaction-blobs
+      parameters:
+      - description: Transaction hash in hexadecimal
+        in: path
+        maxLength: 64
+        minLength: 64
+        name: hash
+        required: true
+        type: string
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: 'Sort order. Default: desc'
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort
+        type: string
+      - description: Sort field. If it's empty internal id is used
+        enum:
+        - time
+        - size
+        in: query
+        name: sort_by
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.BlobLog'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: List blobs which was pushed by transaction
+      tags:
+      - transactions
+  /v1/tx/{hash}/blobs/count:
+    get:
+      description: Count of blobs which was pushed by transaction
+      operationId: transaction-blobs-count
+      parameters:
+      - description: Transaction hash in hexadecimal
+        in: path
+        maxLength: 64
+        minLength: 64
+        name: hash
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Count of blobs which was pushed by transaction
       tags:
       - transactions
   /v1/tx/{hash}/events:

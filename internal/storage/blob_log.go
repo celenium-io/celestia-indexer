@@ -27,6 +27,10 @@ type IBlobLog interface {
 	ByNamespace(ctx context.Context, nsId uint64, fltrs BlobLogFilters) ([]BlobLog, error)
 	ByProviders(ctx context.Context, providers []RollupProvider, fltrs BlobLogFilters) ([]BlobLog, error)
 	BySigner(ctx context.Context, signerId uint64, fltrs BlobLogFilters) ([]BlobLog, error)
+	ByTxId(ctx context.Context, txId uint64, fltrs BlobLogFilters) ([]BlobLog, error)
+	ByHeight(ctx context.Context, height types.Level, fltrs BlobLogFilters) ([]BlobLog, error)
+	CountByTxId(ctx context.Context, txId uint64) (int, error)
+	CountByHeight(ctx context.Context, height types.Level) (int, error)
 }
 
 type BlobLog struct {

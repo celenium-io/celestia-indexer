@@ -16,6 +16,7 @@ import (
 	reflect "reflect"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
+	types "github.com/celenium-io/celestia-indexer/pkg/types"
 	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -41,6 +42,45 @@ func NewMockIBlobLog(ctrl *gomock.Controller) *MockIBlobLog {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockIBlobLog) EXPECT() *MockIBlobLogMockRecorder {
 	return m.recorder
+}
+
+// ByHeight mocks base method.
+func (m *MockIBlobLog) ByHeight(ctx context.Context, height types.Level, fltrs storage.BlobLogFilters) ([]storage.BlobLog, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ByHeight", ctx, height, fltrs)
+	ret0, _ := ret[0].([]storage.BlobLog)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ByHeight indicates an expected call of ByHeight.
+func (mr *MockIBlobLogMockRecorder) ByHeight(ctx, height, fltrs any) *IBlobLogByHeightCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByHeight", reflect.TypeOf((*MockIBlobLog)(nil).ByHeight), ctx, height, fltrs)
+	return &IBlobLogByHeightCall{Call: call}
+}
+
+// IBlobLogByHeightCall wrap *gomock.Call
+type IBlobLogByHeightCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IBlobLogByHeightCall) Return(arg0 []storage.BlobLog, arg1 error) *IBlobLogByHeightCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IBlobLogByHeightCall) Do(f func(context.Context, types.Level, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogByHeightCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IBlobLogByHeightCall) DoAndReturn(f func(context.Context, types.Level, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogByHeightCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // ByNamespace mocks base method.
@@ -156,6 +196,123 @@ func (c *IBlobLogBySignerCall) Do(f func(context.Context, uint64, storage.BlobLo
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *IBlobLogBySignerCall) DoAndReturn(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogBySignerCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// ByTxId mocks base method.
+func (m *MockIBlobLog) ByTxId(ctx context.Context, txId uint64, fltrs storage.BlobLogFilters) ([]storage.BlobLog, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ByTxId", ctx, txId, fltrs)
+	ret0, _ := ret[0].([]storage.BlobLog)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ByTxId indicates an expected call of ByTxId.
+func (mr *MockIBlobLogMockRecorder) ByTxId(ctx, txId, fltrs any) *IBlobLogByTxIdCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByTxId", reflect.TypeOf((*MockIBlobLog)(nil).ByTxId), ctx, txId, fltrs)
+	return &IBlobLogByTxIdCall{Call: call}
+}
+
+// IBlobLogByTxIdCall wrap *gomock.Call
+type IBlobLogByTxIdCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IBlobLogByTxIdCall) Return(arg0 []storage.BlobLog, arg1 error) *IBlobLogByTxIdCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IBlobLogByTxIdCall) Do(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogByTxIdCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IBlobLogByTxIdCall) DoAndReturn(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogByTxIdCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// CountByHeight mocks base method.
+func (m *MockIBlobLog) CountByHeight(ctx context.Context, height types.Level) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountByHeight", ctx, height)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountByHeight indicates an expected call of CountByHeight.
+func (mr *MockIBlobLogMockRecorder) CountByHeight(ctx, height any) *IBlobLogCountByHeightCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountByHeight", reflect.TypeOf((*MockIBlobLog)(nil).CountByHeight), ctx, height)
+	return &IBlobLogCountByHeightCall{Call: call}
+}
+
+// IBlobLogCountByHeightCall wrap *gomock.Call
+type IBlobLogCountByHeightCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IBlobLogCountByHeightCall) Return(arg0 int, arg1 error) *IBlobLogCountByHeightCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IBlobLogCountByHeightCall) Do(f func(context.Context, types.Level) (int, error)) *IBlobLogCountByHeightCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IBlobLogCountByHeightCall) DoAndReturn(f func(context.Context, types.Level) (int, error)) *IBlobLogCountByHeightCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// CountByTxId mocks base method.
+func (m *MockIBlobLog) CountByTxId(ctx context.Context, txId uint64) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountByTxId", ctx, txId)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountByTxId indicates an expected call of CountByTxId.
+func (mr *MockIBlobLogMockRecorder) CountByTxId(ctx, txId any) *IBlobLogCountByTxIdCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountByTxId", reflect.TypeOf((*MockIBlobLog)(nil).CountByTxId), ctx, txId)
+	return &IBlobLogCountByTxIdCall{Call: call}
+}
+
+// IBlobLogCountByTxIdCall wrap *gomock.Call
+type IBlobLogCountByTxIdCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IBlobLogCountByTxIdCall) Return(arg0 int, arg1 error) *IBlobLogCountByTxIdCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IBlobLogCountByTxIdCall) Do(f func(context.Context, uint64) (int, error)) *IBlobLogCountByTxIdCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IBlobLogCountByTxIdCall) DoAndReturn(f func(context.Context, uint64) (int, error)) *IBlobLogCountByTxIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
