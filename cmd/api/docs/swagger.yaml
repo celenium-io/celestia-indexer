@@ -355,6 +355,10 @@ definitions:
         example: 321
         format: int64
         type: integer
+      invocation_type:
+        allOf:
+        - $ref: '#/definitions/types.MsgAddressType'
+        example: fromAddress
       position:
         example: 2
         format: int64
@@ -950,6 +954,64 @@ definitions:
     - EventTypeCosmosauthzv1beta1EventRevoke
     - EventTypeCosmosauthzv1EventRevoke
     - EventTypeCancelUnbondingDelegation
+  types.MsgAddressType:
+    enum:
+    - validator
+    - delegator
+    - depositor
+    - validatorSrc
+    - validatorDst
+    - fromAddress
+    - toAddress
+    - input
+    - output
+    - grantee
+    - granter
+    - signer
+    - withdraw
+    - voter
+    - proposer
+    - authority
+    - sender
+    - receiver
+    - submitter
+    - admin
+    - newAdmin
+    - groupPolicyAddress
+    - executor
+    - groupMember
+    - owner
+    - relayer
+    - payee
+    type: string
+    x-enum-varnames:
+    - MsgAddressTypeValidator
+    - MsgAddressTypeDelegator
+    - MsgAddressTypeDepositor
+    - MsgAddressTypeValidatorSrc
+    - MsgAddressTypeValidatorDst
+    - MsgAddressTypeFromAddress
+    - MsgAddressTypeToAddress
+    - MsgAddressTypeInput
+    - MsgAddressTypeOutput
+    - MsgAddressTypeGrantee
+    - MsgAddressTypeGranter
+    - MsgAddressTypeSigner
+    - MsgAddressTypeWithdraw
+    - MsgAddressTypeVoter
+    - MsgAddressTypeProposer
+    - MsgAddressTypeAuthority
+    - MsgAddressTypeSender
+    - MsgAddressTypeReceiver
+    - MsgAddressTypeSubmitter
+    - MsgAddressTypeAdmin
+    - MsgAddressTypeNewAdmin
+    - MsgAddressTypeGroupPolicyAddress
+    - MsgAddressTypeExecutor
+    - MsgAddressTypeGroupMember
+    - MsgAddressTypeOwner
+    - MsgAddressTypeRelayer
+    - MsgAddressTypePayee
   types.MsgType:
     enum:
     - MsgUnknown

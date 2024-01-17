@@ -4232,6 +4232,14 @@ const docTemplate = `{
                     "format": "int64",
                     "example": 321
                 },
+                "invocation_type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/types.MsgAddressType"
+                        }
+                    ],
+                    "example": "fromAddress"
+                },
                 "position": {
                     "type": "integer",
                     "format": "int64",
@@ -4984,6 +4992,67 @@ const docTemplate = `{
                 "EventTypeCosmosauthzv1beta1EventRevoke",
                 "EventTypeCosmosauthzv1EventRevoke",
                 "EventTypeCancelUnbondingDelegation"
+            ]
+        },
+        "types.MsgAddressType": {
+            "type": "string",
+            "enum": [
+                "validator",
+                "delegator",
+                "depositor",
+                "validatorSrc",
+                "validatorDst",
+                "fromAddress",
+                "toAddress",
+                "input",
+                "output",
+                "grantee",
+                "granter",
+                "signer",
+                "withdraw",
+                "voter",
+                "proposer",
+                "authority",
+                "sender",
+                "receiver",
+                "submitter",
+                "admin",
+                "newAdmin",
+                "groupPolicyAddress",
+                "executor",
+                "groupMember",
+                "owner",
+                "relayer",
+                "payee"
+            ],
+            "x-enum-varnames": [
+                "MsgAddressTypeValidator",
+                "MsgAddressTypeDelegator",
+                "MsgAddressTypeDepositor",
+                "MsgAddressTypeValidatorSrc",
+                "MsgAddressTypeValidatorDst",
+                "MsgAddressTypeFromAddress",
+                "MsgAddressTypeToAddress",
+                "MsgAddressTypeInput",
+                "MsgAddressTypeOutput",
+                "MsgAddressTypeGrantee",
+                "MsgAddressTypeGranter",
+                "MsgAddressTypeSigner",
+                "MsgAddressTypeWithdraw",
+                "MsgAddressTypeVoter",
+                "MsgAddressTypeProposer",
+                "MsgAddressTypeAuthority",
+                "MsgAddressTypeSender",
+                "MsgAddressTypeReceiver",
+                "MsgAddressTypeSubmitter",
+                "MsgAddressTypeAdmin",
+                "MsgAddressTypeNewAdmin",
+                "MsgAddressTypeGroupPolicyAddress",
+                "MsgAddressTypeExecutor",
+                "MsgAddressTypeGroupMember",
+                "MsgAddressTypeOwner",
+                "MsgAddressTypeRelayer",
+                "MsgAddressTypePayee"
             ]
         },
         "types.MsgType": {
