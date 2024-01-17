@@ -63,7 +63,8 @@ type MessageForAddress struct {
 	Position int64          `example:"2"                         format:"int64"     json:"position"        swaggertype:"integer"`
 	TxId     uint64         `example:"11"                        format:"int64"     json:"tx_id,omitempty" swaggertype:"integer"`
 
-	Type types.MsgType `example:"MsgCreatePeriodicVestingAccount" json:"type"`
+	Type           types.MsgType        `example:"MsgCreatePeriodicVestingAccount" json:"type"`
+	InvocationType types.MsgAddressType `example:"fromAddress"                     json:"invocation_type"`
 
 	Data map[string]any `json:"data"`
 	Tx   TxForAddress   `json:"tx"`
@@ -71,14 +72,15 @@ type MessageForAddress struct {
 
 func NewMessageForAddress(msg storage.AddressMessageWithTx) MessageForAddress {
 	message := MessageForAddress{
-		Id:       msg.MsgId,
-		Height:   msg.Msg.Height,
-		Time:     msg.Msg.Time,
-		Position: msg.Msg.Position,
-		TxId:     msg.Msg.TxId,
-		Type:     msg.Msg.Type,
-		Data:     msg.Msg.Data,
-		Tx:       NewTxForAddress(msg.Tx),
+		Id:             msg.MsgId,
+		Height:         msg.Msg.Height,
+		Time:           msg.Msg.Time,
+		Position:       msg.Msg.Position,
+		TxId:           msg.Msg.TxId,
+		Type:           msg.Msg.Type,
+		Data:           msg.Msg.Data,
+		Tx:             NewTxForAddress(msg.Tx),
+		InvocationType: msg.Type,
 	}
 	return message
 }
