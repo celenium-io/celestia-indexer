@@ -35,7 +35,7 @@ type Event struct {
 	Position int64           `bun:"position"                    comment:"Position in transaction"`
 	Type     types.EventType `bun:",type:event_type"            comment:"Event type"                        stats:"filterable"`
 	TxId     *uint64         `bun:"tx_id"                       comment:"Transaction id"`
-	Data     map[string]any  `bun:"data,type:jsonb"             comment:"Event data"`
+	Data     map[string]any  `bun:"data,type:jsonb,nullzero"    comment:"Event data"`
 }
 
 // TableName -
