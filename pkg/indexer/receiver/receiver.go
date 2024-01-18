@@ -27,7 +27,9 @@ const (
 	StopOutput       = "stop"
 )
 
-// Module - runs through a chain with aim ti catch-up head and identifies either block is fits in sequence or signals of rollback.
+// Module - runs through a chain aiming to catch up the head
+//
+//			and identifies whether the block fits in sequence or signals of rollback.
 //
 //		|----------------|
 //		|                | -- types.BlockData -> BlocksOutput
