@@ -66,8 +66,7 @@ func (s *TransactionTestSuite) TearDownSuite() {
 	s.Require().NoError(s.psqlContainer.Terminate(ctx))
 }
 
-func (s *TransactionTestSuite) TestSaveNamespaces() {
-
+func (s *TransactionTestSuite) BeforeTest(suiteName, testName string) {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -80,7 +79,9 @@ func (s *TransactionTestSuite) TestSaveNamespaces() {
 	s.Require().NoError(err)
 	s.Require().NoError(fixtures.Load())
 	s.Require().NoError(db.Close())
+}
 
+func (s *TransactionTestSuite) TestSaveNamespaces() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -161,19 +162,6 @@ func (s *TransactionTestSuite) TestSaveNamespaces() {
 }
 
 func (s *TransactionTestSuite) TestSaveAddresses() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -338,19 +326,6 @@ func (s *TransactionTestSuite) TestSaveBlobLogs() {
 }
 
 func (s *TransactionTestSuite) TestRollbackBlock() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -370,19 +345,6 @@ func (s *TransactionTestSuite) TestRollbackBlock() {
 }
 
 func (s *TransactionTestSuite) TestRollbackBlockStats() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -399,19 +361,6 @@ func (s *TransactionTestSuite) TestRollbackBlockStats() {
 }
 
 func (s *TransactionTestSuite) TestRollbackAddress() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -431,19 +380,6 @@ func (s *TransactionTestSuite) TestRollbackAddress() {
 }
 
 func (s *TransactionTestSuite) TestRollbackTxs() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -465,19 +401,6 @@ func (s *TransactionTestSuite) TestRollbackTxs() {
 }
 
 func (s *TransactionTestSuite) TestRollbackEvents() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -500,19 +423,6 @@ func (s *TransactionTestSuite) TestRollbackEvents() {
 }
 
 func (s *TransactionTestSuite) TestRollbackMessages() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -536,19 +446,6 @@ func (s *TransactionTestSuite) TestRollbackMessages() {
 }
 
 func (s *TransactionTestSuite) TestRollbackBlobLogs() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -567,19 +464,6 @@ func (s *TransactionTestSuite) TestRollbackBlobLogs() {
 }
 
 func (s *TransactionTestSuite) TestRollbackValidators() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -598,19 +482,6 @@ func (s *TransactionTestSuite) TestRollbackValidators() {
 }
 
 func (s *TransactionTestSuite) TestRollbackNamespaces() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -633,19 +504,6 @@ func (s *TransactionTestSuite) TestRollbackNamespaces() {
 }
 
 func (s *TransactionTestSuite) TestRollbackNamespaceMessages() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -676,19 +534,6 @@ func (s *TransactionTestSuite) TestRollbackNamespaceMessages() {
 }
 
 func (s *TransactionTestSuite) TestDeleteBalances() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -703,19 +548,6 @@ func (s *TransactionTestSuite) TestDeleteBalances() {
 }
 
 func (s *TransactionTestSuite) TestLastAddressAction() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
