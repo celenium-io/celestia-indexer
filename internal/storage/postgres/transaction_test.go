@@ -66,7 +66,7 @@ func (s *TransactionTestSuite) TearDownSuite() {
 	s.Require().NoError(s.psqlContainer.Terminate(ctx))
 }
 
-func (s *StorageTestSuite) TestSaveNamespaces() {
+func (s *TransactionTestSuite) TestSaveNamespaces() {
 
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
@@ -160,7 +160,7 @@ func (s *StorageTestSuite) TestSaveNamespaces() {
 	s.Require().Equal(existedNamespace, ns3.NamespaceID)
 }
 
-func (s *StorageTestSuite) TestSaveAddresses() {
+func (s *TransactionTestSuite) TestSaveAddresses() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -231,7 +231,7 @@ func (s *StorageTestSuite) TestSaveAddresses() {
 	s.Require().Equal(replyAddress.Id, addresses[2].Id)
 }
 
-func (s *StorageTestSuite) TestSaveTxAddresses() {
+func (s *TransactionTestSuite) TestSaveTxAddresses() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -251,7 +251,7 @@ func (s *StorageTestSuite) TestSaveTxAddresses() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
-func (s *StorageTestSuite) TestSaveMsgAddresses() {
+func (s *TransactionTestSuite) TestSaveMsgAddresses() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -272,7 +272,7 @@ func (s *StorageTestSuite) TestSaveMsgAddresses() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
-func (s *StorageTestSuite) TestSaveBalances() {
+func (s *TransactionTestSuite) TestSaveBalances() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -293,7 +293,7 @@ func (s *StorageTestSuite) TestSaveBalances() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
-func (s *StorageTestSuite) TestSaveNamespaceMessages() {
+func (s *TransactionTestSuite) TestSaveNamespaceMessages() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -314,7 +314,7 @@ func (s *StorageTestSuite) TestSaveNamespaceMessages() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
-func (s *StorageTestSuite) TestSaveBlobLogs() {
+func (s *TransactionTestSuite) TestSaveBlobLogs() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -337,7 +337,7 @@ func (s *StorageTestSuite) TestSaveBlobLogs() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
-func (s *StorageTestSuite) TestRollbackBlock() {
+func (s *TransactionTestSuite) TestRollbackBlock() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -369,7 +369,7 @@ func (s *StorageTestSuite) TestRollbackBlock() {
 
 }
 
-func (s *StorageTestSuite) TestRollbackBlockStats() {
+func (s *TransactionTestSuite) TestRollbackBlockStats() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -398,7 +398,7 @@ func (s *StorageTestSuite) TestRollbackBlockStats() {
 
 }
 
-func (s *StorageTestSuite) TestRollbackAddress() {
+func (s *TransactionTestSuite) TestRollbackAddress() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -430,7 +430,7 @@ func (s *StorageTestSuite) TestRollbackAddress() {
 	s.Require().Len(items, 1)
 }
 
-func (s *StorageTestSuite) TestRollbackTxs() {
+func (s *TransactionTestSuite) TestRollbackTxs() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -464,7 +464,7 @@ func (s *StorageTestSuite) TestRollbackTxs() {
 	s.Require().Len(items, 2)
 }
 
-func (s *StorageTestSuite) TestRollbackEvents() {
+func (s *TransactionTestSuite) TestRollbackEvents() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -499,7 +499,7 @@ func (s *StorageTestSuite) TestRollbackEvents() {
 	s.Require().Len(items, 0)
 }
 
-func (s *StorageTestSuite) TestRollbackMessages() {
+func (s *TransactionTestSuite) TestRollbackMessages() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -535,7 +535,7 @@ func (s *StorageTestSuite) TestRollbackMessages() {
 	s.Require().Len(items, 1)
 }
 
-func (s *StorageTestSuite) TestRollbackBlobLogs() {
+func (s *TransactionTestSuite) TestRollbackBlobLogs() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -566,7 +566,7 @@ func (s *StorageTestSuite) TestRollbackBlobLogs() {
 	s.Require().Len(items, 1)
 }
 
-func (s *StorageTestSuite) TestRollbackValidators() {
+func (s *TransactionTestSuite) TestRollbackValidators() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -597,7 +597,7 @@ func (s *StorageTestSuite) TestRollbackValidators() {
 	s.Require().Len(items, 0)
 }
 
-func (s *StorageTestSuite) TestRollbackNamespaces() {
+func (s *TransactionTestSuite) TestRollbackNamespaces() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -632,7 +632,7 @@ func (s *StorageTestSuite) TestRollbackNamespaces() {
 	s.Require().Len(items, 0)
 }
 
-func (s *StorageTestSuite) TestRollbackNamespaceMessages() {
+func (s *TransactionTestSuite) TestRollbackNamespaceMessages() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -675,7 +675,7 @@ func (s *StorageTestSuite) TestRollbackNamespaceMessages() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
-func (s *StorageTestSuite) TestDeleteBalances() {
+func (s *TransactionTestSuite) TestDeleteBalances() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -702,7 +702,7 @@ func (s *StorageTestSuite) TestDeleteBalances() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
-func (s *StorageTestSuite) TestLastAddressAction() {
+func (s *TransactionTestSuite) TestLastAddressAction() {
 	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
@@ -732,7 +732,7 @@ func (s *StorageTestSuite) TestLastAddressAction() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
-func (s *StorageTestSuite) TestSaveEvents() {
+func (s *TransactionTestSuite) TestSaveEvents() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -772,7 +772,7 @@ func (s *StorageTestSuite) TestSaveEvents() {
 	s.Require().Len(saved, 2)
 }
 
-func (s *StorageTestSuite) TestSaveEventsWithCopy() {
+func (s *TransactionTestSuite) TestSaveEventsWithCopy() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -811,7 +811,7 @@ func (s *StorageTestSuite) TestSaveEventsWithCopy() {
 	}
 }
 
-func (s *StorageTestSuite) TestGetProposerId() {
+func (s *TransactionTestSuite) TestGetProposerId() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -826,7 +826,7 @@ func (s *StorageTestSuite) TestGetProposerId() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
-func (s *StorageTestSuite) TestSaveUpdateAndDeleteRollup() {
+func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 

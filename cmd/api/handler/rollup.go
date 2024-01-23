@@ -209,8 +209,8 @@ type rollupStatsRequest struct {
 	Id         uint64 `example:"1"          param:"id"        swaggertype:"integer" validate:"required,min=1"`
 	Timeframe  string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day month"`
 	SeriesName string `example:"tps"        param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_count size"`
-	From       uint64 `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
-	To         uint64 `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
+	From       int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To         int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
 }
 
 // Stats godoc
@@ -235,10 +235,13 @@ func (handler RollupHandler) Stats(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	histogram, err := handler.rollups.Stats(c.Request().Context(), req.Id, req.Timeframe, req.SeriesName, storage.SeriesRequest{
-		From: req.From,
-		To:   req.To,
-	})
+	histogram, err := handler.rollups.Stats(
+		c.Request().Context(),
+		req.Id,
+		req.Timeframe,
+		req.SeriesName,
+		storage.NewSeriesRequest(req.From, req.To),
+	)
 	if err != nil {
 		return handleError(c, err, handler.rollups)
 	}

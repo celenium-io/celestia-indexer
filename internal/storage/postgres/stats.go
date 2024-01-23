@@ -202,11 +202,11 @@ func (s Stats) Series(ctx context.Context, timeframe storage.Timeframe, name str
 		return nil, errors.Errorf("unexpected series name: %s", name)
 	}
 
-	if req.From > 0 {
-		query = query.Where("ts >= to_timestamp(?)", req.From)
+	if !req.From.IsZero() {
+		query = query.Where("ts >= ?", req.From)
 	}
-	if req.To > 0 {
-		query = query.Where("ts < to_timestamp(?)", req.To)
+	if !req.To.IsZero() {
+		query = query.Where("ts < ?", req.To)
 	}
 
 	err = query.Limit(100).Scan(ctx, &response)
@@ -241,11 +241,11 @@ func (s Stats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe,
 		return nil, errors.Errorf("unexpected series name: %s", name)
 	}
 
-	if req.From > 0 {
-		query = query.Where("ts >= to_timestamp(?)", req.From)
+	if !req.From.IsZero() {
+		query = query.Where("ts >= ?", req.From)
 	}
-	if req.To > 0 {
-		query = query.Where("ts < to_timestamp(?)", req.To)
+	if !req.To.IsZero() {
+		query = query.Where("ts < ?", req.To)
 	}
 
 	err = query.Limit(100).Scan(ctx, &response)

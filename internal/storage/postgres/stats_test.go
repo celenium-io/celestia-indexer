@@ -710,7 +710,7 @@ func (s *StatsTestSuite) TestSeriesWithFrom() {
 	defer ctxCancel()
 
 	items, err := s.storage.Stats.Series(ctx, storage.TimeframeHour, storage.SeriesBlobsSize, storage.SeriesRequest{
-		From: 1701192801,
+		From: time.Unix(1701192801, 0).UTC(),
 	})
 	s.Require().NoError(err)
 	s.Require().Len(items, 0)

@@ -102,8 +102,19 @@ type TxCountForLast24hItem struct {
 }
 
 type SeriesRequest struct {
-	From uint64
-	To   uint64
+	From time.Time
+	To   time.Time
+}
+
+func NewSeriesRequest(from, to int64) SeriesRequest {
+	var seriesRequest SeriesRequest
+	if from > 0 {
+		seriesRequest.From = time.Unix(from, 0).UTC()
+	}
+	if to > 0 {
+		seriesRequest.To = time.Unix(to, 0).UTC()
+	}
+	return seriesRequest
 }
 
 type SeriesItem struct {
