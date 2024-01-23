@@ -178,7 +178,7 @@ func (s *AddressTestSuite) TestList() {
 	s.Require().Equal("utia", address[0].Balance.Currency)
 }
 
-func (s *AddressTestSuite) TestListHeight() {
+func (s *AddressTestSuite) TestTransactions() {
 	q := make(url.Values)
 	q.Set("limit", "2")
 	q.Set("offset", "0")

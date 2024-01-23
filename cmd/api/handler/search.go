@@ -46,7 +46,7 @@ var (
 	namespaceRegexp = regexp.MustCompile("[a-fA-f0-9]{58}")
 )
 
-// Get godoc
+// Search godoc
 //
 //	@Summary				Search by hash
 //	@Description.markdown	search

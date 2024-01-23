@@ -251,8 +251,8 @@ func (sh StatsHandler) NamespaceUsage(c echo.Context) error {
 type seriesRequest struct {
 	Timeframe  string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day week month year"`
 	SeriesName string `example:"tps"        param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_size tps bps fee supply_change block_time tx_count events_count gas_price gas_efficiency gas_used gas_limit"`
-	From       uint64 `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
-	To         uint64 `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
+	From       int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To         int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
 }
 
 // Series godoc
@@ -276,10 +276,12 @@ func (sh StatsHandler) Series(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	histogram, err := sh.repo.Series(c.Request().Context(), storage.Timeframe(req.Timeframe), req.SeriesName, storage.SeriesRequest{
-		From: req.From,
-		To:   req.To,
-	})
+	histogram, err := sh.repo.Series(
+		c.Request().Context(),
+		storage.Timeframe(req.Timeframe),
+		req.SeriesName,
+		storage.NewSeriesRequest(req.From, req.To),
+	)
 	if err != nil {
 		return internalServerError(c, err)
 	}
@@ -295,8 +297,8 @@ type namespaceSeriesRequest struct {
 	Id         string `example:"0011223344" param:"id"        swaggertype:"string"  validate:"required,hexadecimal,len=56"`
 	Timeframe  string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day week month year"`
 	SeriesName string `example:"size"       param:"name"      swaggertype:"string"  validate:"required,oneof=pfb_count size"`
-	From       uint64 `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
-	To         uint64 `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
+	From       int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To         int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
 }
 
 // NamespaceSeries godoc
@@ -339,10 +341,8 @@ func (sh StatsHandler) NamespaceSeries(c echo.Context) error {
 		storage.Timeframe(req.Timeframe),
 		req.SeriesName,
 		namespace[0].Id,
-		storage.SeriesRequest{
-			From: req.From,
-			To:   req.To,
-		})
+		storage.NewSeriesRequest(req.From, req.To),
+	)
 	if err != nil {
 		return internalServerError(c, err)
 	}

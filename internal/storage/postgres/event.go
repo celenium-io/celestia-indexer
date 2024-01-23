@@ -31,7 +31,7 @@ func (e *Event) ByTxId(ctx context.Context, txId uint64, limit, offset int) (eve
 		Where("tx_id = ?", txId)
 	query = limitScope(query, limit)
 
-	if limit > 0 {
+	if offset > 0 {
 		query = query.Offset(offset)
 	}
 
@@ -47,7 +47,7 @@ func (e *Event) ByBlock(ctx context.Context, height pkgTypes.Level, limit, offse
 
 	query = limitScope(query, limit)
 
-	if limit > 0 {
+	if offset > 0 {
 		query = query.Offset(offset)
 	}
 	err = query.Scan(ctx)

@@ -111,10 +111,10 @@ func (r *Rollup) Stats(ctx context.Context, rollupId uint64, timeframe, column s
 		return nil, errors.Errorf("invalid column: %s", column)
 	}
 
-	if req.From > 0 {
+	if !req.From.IsZero() {
 		query = query.Where("time >= ?", req.From)
 	}
-	if req.To > 0 {
+	if !req.To.IsZero() {
 		query = query.Where("time < ?", req.To)
 	}
 

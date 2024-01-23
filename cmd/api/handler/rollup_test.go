@@ -212,7 +212,7 @@ func (s *RollupTestSuite) TestStats() {
 			c.SetParamValues("1", name, tf)
 
 			s.rollups.EXPECT().
-				Stats(gomock.Any(), uint64(1), tf, name, storage.SeriesRequest{}).
+				Stats(gomock.Any(), uint64(1), tf, name, storage.NewSeriesRequest(0, 0)).
 				Return([]storage.HistogramItem{
 					{
 						Value: "0.1",
