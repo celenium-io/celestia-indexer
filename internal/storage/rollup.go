@@ -19,7 +19,9 @@ type IRollup interface {
 	Leaderboard(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) ([]RollupWithStats, error)
 	Namespaces(ctx context.Context, rollupId uint64, limit, offset int) (namespaceIds []uint64, err error)
 	Providers(ctx context.Context, rollupId uint64) (providers []RollupProvider, err error)
-	Stats(ctx context.Context, rollupId uint64, timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
+	Stats(ctx context.Context, rollupId uint64) (RollupStats, error)
+	Series(ctx context.Context, rollupId uint64, timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
+	Count(ctx context.Context) (int64, error)
 }
 
 // Rollup -
@@ -53,7 +55,10 @@ func (r Rollup) IsEmpty() bool {
 
 type RollupWithStats struct {
 	Rollup
+	RollupStats
+}
 
+type RollupStats struct {
 	Size           int64     `bun:"size"`
 	BlobsCount     int64     `bun:"blobs_count"`
 	LastActionTime time.Time `bun:"last_time"`
