@@ -1089,6 +1089,17 @@ func (s *StorageTestSuite) TestRollupLeaderboard() {
 	}
 }
 
+func (s *StorageTestSuite) TestRollupStats() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	rollup, err := s.storage.Rollup.Stats(ctx, 1)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(30, rollup.Size)
+	s.Require().EqualValues(2, rollup.BlobsCount)
+}
+
 func (s *StorageTestSuite) TestRollupNamespaces() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

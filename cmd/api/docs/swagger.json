@@ -2021,6 +2021,33 @@
                 }
             }
         },
+        "/v1/rollup/count": {
+            "get": {
+                "description": "Get count of rollups in network",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rollup"
+                ],
+                "summary": "Get count of rollups in network",
+                "operationId": "get-rollups-count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/rollup/{id}": {
             "get": {
                 "description": "Get rollup info",

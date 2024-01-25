@@ -393,6 +393,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	rollups := v1.Group("/rollup")
 	{
 		rollups.GET("", rollupHandler.Leaderboard)
+		rollups.GET("/count", rollupHandler.Count)
 		rollup := rollups.Group("/:id")
 		{
 			rollup.GET("", rollupHandler.Get)

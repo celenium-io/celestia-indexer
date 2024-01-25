@@ -52,10 +52,12 @@ func (r *Rollup) Leaderboard(ctx context.Context, sortField string, sort sdk.Sor
 	}
 	leaderboardQuery = limitScope(leaderboardQuery, limit)
 
-	err = r.DB().NewSelect().Table("leaderboard").With("leaderboard", leaderboardQuery).
+	query := r.DB().NewSelect().Table("leaderboard").With("leaderboard", leaderboardQuery).
 		ColumnExpr("size, blobs_count, last_time, rollup.*").
-		Join("inner join rollup on rollup.id = leaderboard.rollup_id").
-		Scan(ctx, &rollups)
+		Join("inner join rollup on rollup.id = leaderboard.rollup_id")
+
+	query = sortScope(query, sortField, sort)
+	err = query.Scan(ctx, &rollups)
 	return
 }
 
@@ -79,7 +81,7 @@ func (r *Rollup) Providers(ctx context.Context, rollupId uint64) (providers []st
 	return
 }
 
-func (r *Rollup) Stats(ctx context.Context, rollupId uint64, timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
+func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
 	providers, err := r.Providers(ctx, rollupId)
 	if err != nil {
 		return nil, err
@@ -131,5 +133,38 @@ func (r *Rollup) Stats(ctx context.Context, rollupId uint64, timeframe, column s
 
 	err = query.Scan(ctx, &items)
 
+	return
+}
+
+func (r *Rollup) Count(ctx context.Context) (int64, error) {
+	count, err := r.DB().NewSelect().Model((*storage.Rollup)(nil)).Count(ctx)
+	return int64(count), err
+}
+
+func (r *Rollup) Stats(ctx context.Context, rollupId uint64) (stats storage.RollupStats, err error) {
+	providers, err := r.Providers(ctx, rollupId)
+	if err != nil {
+		return
+	}
+
+	if len(providers) == 0 {
+		return
+	}
+
+	query := r.DB().NewSelect().Table("rollup_stats_by_month").
+		ColumnExpr("sum(blobs_count) as blobs_count, sum(size) as size, max(last_time) as last_time")
+
+	for i := range providers {
+		query.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
+			if providers[i].NamespaceId > 0 {
+				return sq.
+					Where("namespace_id = ?", providers[i].NamespaceId).
+					Where("signer_id = ?", providers[i].AddressId)
+			}
+			return sq.Where("signer_id = ?", providers[i].AddressId)
+		})
+	}
+
+	err = query.Scan(ctx, &stats)
 	return
 }

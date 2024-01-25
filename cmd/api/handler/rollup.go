@@ -85,7 +85,15 @@ func (handler RollupHandler) Get(c echo.Context) error {
 	if err != nil {
 		return handleError(c, err, handler.rollups)
 	}
-	return c.JSON(http.StatusOK, responses.NewRollup(rollup))
+
+	stats, err := handler.rollups.Stats(c.Request().Context(), rollup.Id)
+	if err != nil {
+		return handleError(c, err, handler.rollups)
+	}
+	return c.JSON(http.StatusOK, responses.NewRollupWithStats(storage.RollupWithStats{
+		Rollup:      *rollup,
+		RollupStats: stats,
+	}))
 }
 
 type getRollupPages struct {
@@ -235,7 +243,7 @@ func (handler RollupHandler) Stats(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	histogram, err := handler.rollups.Stats(
+	histogram, err := handler.rollups.Series(
 		c.Request().Context(),
 		req.Id,
 		req.Timeframe,
@@ -251,4 +259,22 @@ func (handler RollupHandler) Stats(c echo.Context) error {
 		response[i] = responses.NewHistogramItem(histogram[i])
 	}
 	return returnArray(c, response)
+}
+
+// Count godoc
+//
+//	@Summary		Get count of rollups in network
+//	@Description	Get count of rollups in network
+//	@Tags			rollup
+//	@ID				get-rollups-count
+//	@Produce		json
+//	@Success		200	{integer}	uint64
+//	@Failure		500	{object}	Error
+//	@Router			/v1/rollup/count [get]
+func (handler RollupHandler) Count(c echo.Context) error {
+	count, err := handler.rollups.Count(c.Request().Context())
+	if err != nil {
+		return handleError(c, err, handler.rollups)
+	}
+	return c.JSON(http.StatusOK, count)
 }

@@ -2810,6 +2810,24 @@ paths:
       summary: Get rollup stats
       tags:
       - rollup
+  /v1/rollup/count:
+    get:
+      description: Get count of rollups in network
+      operationId: get-rollups-count
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get count of rollups in network
+      tags:
+      - rollup
   /v1/search:
     get:
       description: "Endpoint finds entity by hash (block, address, namespace and tx)\n\n###

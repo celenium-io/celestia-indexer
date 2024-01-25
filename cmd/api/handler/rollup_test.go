@@ -30,10 +30,12 @@ var (
 		Logo:        "image.png",
 	}
 	testRollupWithStats = storage.RollupWithStats{
-		Rollup:         testRollup,
-		BlobsCount:     100,
-		Size:           1000,
-		LastActionTime: testTime,
+		Rollup: testRollup,
+		RollupStats: storage.RollupStats{
+			BlobsCount:     100,
+			Size:           1000,
+			LastActionTime: testTime,
+		},
 	}
 )
 
@@ -107,15 +109,26 @@ func (s *RollupTestSuite) TestGet() {
 		GetByID(gomock.Any(), uint64(1)).
 		Return(&testRollup, nil)
 
+	s.rollups.EXPECT().
+		Stats(gomock.Any(), uint64(1)).
+		Return(storage.RollupStats{
+			Size:           10,
+			BlobsCount:     11,
+			LastActionTime: testTime,
+		}, nil)
+
 	s.Require().NoError(s.handler.Get(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var rollup responses.Rollup
+	var rollup responses.RollupWithStats
 	err := json.NewDecoder(rec.Body).Decode(&rollup)
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, rollup.Id)
 	s.Require().EqualValues("test rollup", rollup.Name)
 	s.Require().EqualValues("image.png", rollup.Logo)
+	s.Require().EqualValues(10, rollup.Size)
+	s.Require().EqualValues(11, rollup.BlobsCount)
+	s.Require().EqualValues(testTime, rollup.LastAction)
 }
 
 func (s *RollupTestSuite) TestGetNamespaces() {
@@ -212,7 +225,7 @@ func (s *RollupTestSuite) TestStats() {
 			c.SetParamValues("1", name, tf)
 
 			s.rollups.EXPECT().
-				Stats(gomock.Any(), uint64(1), tf, name, storage.NewSeriesRequest(0, 0)).
+				Series(gomock.Any(), uint64(1), tf, name, storage.NewSeriesRequest(0, 0)).
 				Return([]storage.HistogramItem{
 					{
 						Value: "0.1",
