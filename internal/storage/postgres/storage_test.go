@@ -1013,6 +1013,22 @@ func (s *StorageTestSuite) TestCountBlobLogsByHeight() {
 	s.Require().EqualValues(count, 4)
 }
 
+func (s *StorageTestSuite) TestBlobLogsByProviders() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	logs, err := s.storage.BlobLogs.ByProviders(ctx, []storage.RollupProvider{
+		{
+			AddressId:   1,
+			NamespaceId: 1,
+		},
+	}, storage.BlobLogFilters{
+		Limit: 10,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(logs, 1)
+}
+
 func (s *StorageTestSuite) TestValidatorByAddress() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

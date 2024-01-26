@@ -49,9 +49,11 @@ func (bl *BlobLog) ByProviders(ctx context.Context, providers []storage.RollupPr
 
 	for i := range providers {
 		query = query.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
-			return sq.
-				Where("blob_log.namespace_id = ?", providers[i].NamespaceId).
-				Where("blob_log.signer_id = ?", providers[i].AddressId)
+			sq.Where("blob_log.signer_id = ?", providers[i].AddressId)
+			if providers[i].NamespaceId > 0 {
+				sq.Where("blob_log.namespace_id = ?", providers[i].NamespaceId)
+			}
+			return sq
 		})
 	}
 
