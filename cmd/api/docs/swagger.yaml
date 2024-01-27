@@ -3146,6 +3146,7 @@ paths:
         - gas_efficiency
         - gas_used
         - gas_limit
+        - bytes_in_block
         in: path
         name: name
         required: true

@@ -139,6 +139,7 @@ const (
 	SeriesGasEfficiency = "gas_efficiency"
 	SeriesNsPfbCount    = "pfb_count"
 	SeriesNsSize        = "size"
+	SeriesBytesInBlock  = "bytes_in_block"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
