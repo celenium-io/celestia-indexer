@@ -99,3 +99,15 @@ const (
 	ChannelHead = "head"
 	ChannelTx   = "tx"
 )
+
+type SearchResult struct {
+	Id    uint64 `bun:"id"`
+	Value string `bun:"value"`
+	Type  string `bun:"type"`
+}
+
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
+type ISearch interface {
+	Search(ctx context.Context, query []byte) ([]SearchResult, error)
+	SearchText(ctx context.Context, text string) ([]SearchResult, error)
+}

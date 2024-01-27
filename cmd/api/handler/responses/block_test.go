@@ -10,15 +10,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func TestBlock_SearchType(t *testing.T) {
-	block := Block{}
-	searchType := block.SearchType()
-	assert.EqualValues(t, "block", searchType)
-}
 
 func TestNewBlock(t *testing.T) {
 	type args struct {

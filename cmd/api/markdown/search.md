@@ -1,4 +1,4 @@
-Endpoint finds entity by hash (block, address, namespace and tx)
+Endpoint finds entity by hash (block, address, validator, namespace and tx). It returns array of `responses.SearchItem` entities.
 
 ### Block
 
@@ -74,6 +74,42 @@ Identity pair example: `014723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d
         "version": 1,
         "namespace_id": "4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02"
         // ... rest fields from response.Namespace type
+    }
+}
+```
+
+### Validator
+
+Validator can be found by moniker prefix. 
+For example: names `Node 1` and `Node 2` can be found with query string `Node`
+
+#### Example response 
+
+```json
+{
+    "type": "validator",
+    "result": {
+        "id": 1,
+        "moniker": "Node 1",
+        // ... rest fields from response.Validator type
+    }
+}
+```
+
+### Rollup
+
+Rollup can be found by name prefix. 
+For example: rollup with names `Rollup 1` and `Rollup 2` can be found with query string `Rol`
+
+#### Example response 
+
+```json
+{
+    "type": "rollup",
+    "result": {
+        "id": 1,
+        "moniker": "Rollup 1",
+        // ... rest fields from response.Rollup type
     }
 }
 ```

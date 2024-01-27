@@ -65,10 +65,6 @@ func NewBlock(block storage.Block, withStats bool) Block {
 	return result
 }
 
-func (Block) SearchType() string {
-	return "block"
-}
-
 type BlockStats struct {
 	TxCount        int64                   `example:"12"                              json:"tx_count"        swaggertype:"integer"`
 	EventsCount    int64                   `example:"18"                              json:"events_count"    swaggertype:"integer"`
