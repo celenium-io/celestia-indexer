@@ -222,11 +222,12 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return err
 	}
 
-	if err := saveMessages(ctx, tx, messages, addrToId); err != nil {
+	totalValidators, err := saveMessages(ctx, tx, messages, addrToId)
+	if err != nil {
 		return err
 	}
 
-	updateState(block, totalAccounts, totalNamespaces, &state)
+	updateState(block, totalAccounts, totalNamespaces, totalValidators, &state)
 	if err := tx.Update(ctx, &state); err != nil {
 		return err
 	}

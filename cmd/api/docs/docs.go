@@ -4662,6 +4662,11 @@ const docTemplate = `{
                     "type": "integer",
                     "format": "int64",
                     "example": 23456
+                },
+                "total_validators": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
                 }
             }
         },

@@ -663,6 +663,10 @@ definitions:
         example: 23456
         format: int64
         type: integer
+      total_validators:
+        example: 100
+        format: int64
+        type: integer
     type: object
   responses.TPS:
     properties:

@@ -8,7 +8,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
-func updateState(block *storage.Block, totalAccounts int64, totalNamespaces int64, state *storage.State) {
+func updateState(block *storage.Block, totalAccounts, totalNamespaces int64, totalValidators int, state *storage.State) {
 	if types.Level(block.Id) <= state.LastHeight {
 		return
 	}
@@ -20,6 +20,7 @@ func updateState(block *storage.Block, totalAccounts int64, totalNamespaces int6
 	state.TotalAccounts += totalAccounts
 	state.TotalNamespaces += totalNamespaces
 	state.TotalBlobsSize += block.Stats.BlobsSize
+	state.TotalValidators += totalValidators
 	state.TotalFee = state.TotalFee.Add(block.Stats.Fee)
 	state.TotalSupply = state.TotalSupply.Add(block.Stats.SupplyChange)
 	state.ChainId = block.ChainId

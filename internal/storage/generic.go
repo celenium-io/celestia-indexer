@@ -66,7 +66,7 @@ type Transaction interface {
 	SaveMsgAddresses(ctx context.Context, addresses ...MsgAddress) error
 	SaveNamespaceMessage(ctx context.Context, nsMsgs ...NamespaceMessage) error
 	SaveBlobLogs(ctx context.Context, logs ...BlobLog) error
-	SaveValidators(ctx context.Context, validators ...*Validator) error
+	SaveValidators(ctx context.Context, validators ...*Validator) (int, error)
 	SaveEvents(ctx context.Context, events ...Event) error
 	LastBlock(ctx context.Context) (block Block, err error)
 	State(ctx context.Context, name string) (state State, err error)
@@ -83,7 +83,7 @@ type Transaction interface {
 	RollbackMessages(ctx context.Context, height types.Level) (msgs []Message, err error)
 	RollbackNamespaceMessages(ctx context.Context, height types.Level) (msgs []NamespaceMessage, err error)
 	RollbackNamespaces(ctx context.Context, height types.Level) (ns []Namespace, err error)
-	RollbackValidators(ctx context.Context, height types.Level) (err error)
+	RollbackValidators(ctx context.Context, height types.Level) ([]Validator, error)
 	RollbackBlobLog(ctx context.Context, height types.Level) error
 	RollbackSigners(ctx context.Context, txIds []uint64) (err error)
 	RollbackMessageAddresses(ctx context.Context, msgIds []uint64) (err error)

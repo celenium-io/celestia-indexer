@@ -225,13 +225,25 @@ func (tx Transaction) SaveNamespaceMessage(ctx context.Context, nsMsgs ...models
 
 const doNotModify = "[do-not-modify]"
 
-func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.Validator) error {
+type addedValidator struct {
+	bun.BaseModel `bun:"validator"`
+	*models.Validator
+
+	Xmax uint64 `bun:"xmax"`
+}
+
+func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.Validator) (int, error) {
 	if len(validators) == 0 {
-		return nil
+		return 0, nil
 	}
 
+	var count int
 	for i := range validators {
-		query := tx.Tx().NewInsert().Model(validators[i]).
+		model := addedValidator{
+			Validator: validators[i],
+		}
+		query := tx.Tx().NewInsert().Model(&model).
+			Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate", "max_change_rate", "min_self_delegation", "msg_id", "height").
 			On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
 			Set("rate = EXCLUDED.rate").
 			Set("min_self_delegation = EXCLUDED.min_self_delegation")
@@ -251,12 +263,16 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 		if validators[i].Details != doNotModify {
 			query.Set("details = EXCLUDED.details")
 		}
-		if _, err := query.Returning("id").Exec(ctx); err != nil {
-			return err
+		if _, err := query.Returning("xmax, id").Exec(ctx); err != nil {
+			return 0, err
+		}
+
+		if model.Xmax == 0 {
+			count++
 		}
 	}
 
-	return nil
+	return count, nil
 }
 
 func (tx Transaction) LastBlock(ctx context.Context) (block models.Block, err error) {
@@ -317,8 +333,8 @@ func (tx Transaction) RollbackNamespaces(ctx context.Context, height types.Level
 	return
 }
 
-func (tx Transaction) RollbackValidators(ctx context.Context, height types.Level) (err error) {
-	_, err = tx.Tx().NewDelete().Model((*models.Validator)(nil)).Where("height = ?", height).Exec(ctx)
+func (tx Transaction) RollbackValidators(ctx context.Context, height types.Level) (validators []models.Validator, err error) {
+	_, err = tx.Tx().NewDelete().Model(&validators).Where("height = ?", height).Returning("id").Exec(ctx)
 	return
 }
 
