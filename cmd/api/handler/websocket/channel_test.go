@@ -82,8 +82,8 @@ func (c *testHeadClient) Close() error {
 
 func BenchmarkProcessingMessage(b *testing.B) {
 	channel := NewChannel[storage.Block, *responses.Block](
-		headProcessor,
-		HeadFilter{},
+		blockProcessor,
+		BlockFilter{},
 	)
 
 	ctx, cancel := context.WithCancel(context.Background())

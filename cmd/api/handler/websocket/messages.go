@@ -13,8 +13,8 @@ const (
 
 // channels
 const (
-	ChannelHead = "head"
-	ChannelTx   = "tx"
+	ChannelHead   = "head"
+	ChannelBlocks = "blocks"
 )
 
 type Message struct {

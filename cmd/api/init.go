@@ -231,7 +231,7 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 var dispatcher *bus.Dispatcher
 
 func initDispatcher(ctx context.Context, db postgres.Storage) {
-	d, err := bus.NewDispatcher(db, db.Blocks, db.Tx)
+	d, err := bus.NewDispatcher(db, db.Blocks)
 	if err != nil {
 		panic(err)
 	}
@@ -454,7 +454,7 @@ var (
 )
 
 func initWebsocket(ctx context.Context, db postgres.Storage, group *echo.Group) {
-	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelTx)
+	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelBlock)
 	wsManager = websocket.NewManager(observer)
 	wsManager.Start(ctx)
 	group.GET("/ws", wsManager.Handle)

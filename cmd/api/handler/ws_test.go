@@ -36,20 +36,20 @@ func TestWebsocket(t *testing.T) {
 	listenerFactory := mock.NewMockListenerFactory(ctrl)
 	listener := mock.NewMockListener(ctrl)
 
-	listenerFactory.EXPECT().CreateListener().Return(listener).MaxTimes(1)
+	listenerFactory.EXPECT().CreateListener().Return(listener).Times(1)
 
 	headChannel := make(chan *pq.Notification, 10)
 	listener.EXPECT().Listen().Return(headChannel).AnyTimes()
-	listener.EXPECT().Subscribe(gomock.Any(), storage.ChannelHead).Return(nil).MaxTimes(1)
-	listener.EXPECT().Close().Return(nil).MaxTimes(1)
+	listener.EXPECT().Subscribe(gomock.Any(), storage.ChannelHead).Return(nil).Times(1)
+	listener.EXPECT().Close().Return(nil).Times(1)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
 	blockMock := mock.NewMockIBlock(ctrl)
-	dispatcher, err := bus.NewDispatcher(listenerFactory, blockMock, nil)
+	dispatcher, err := bus.NewDispatcher(listenerFactory, blockMock)
 	require.NoError(t, err)
 	dispatcher.Start(ctx)
-	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelTx)
+	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelBlock)
 
 	for i := 0; i < 10; i++ {
 		hash := make([]byte, 32)
@@ -63,7 +63,7 @@ func TestWebsocket(t *testing.T) {
 			Hash:         hash,
 			MessageTypes: storageTypes.NewMsgTypeBits(),
 			Stats:        testBlock.Stats,
-		}, nil).MaxTimes(1)
+		}, nil).Times(1)
 	}
 
 	go func() {
@@ -80,7 +80,7 @@ func TestWebsocket(t *testing.T) {
 				id++
 
 				headChannel <- &pq.Notification{
-					Channel: storage.ChannelHead,
+					Channel: storage.ChannelBlock,
 					Extra:   strconv.FormatUint(id, 10),
 				}
 			}
@@ -105,7 +105,7 @@ func TestWebsocket(t *testing.T) {
 	require.NoError(t, err, "dial")
 
 	body, err := json.Marshal(ws.Subscribe{
-		Channel: ws.ChannelHead,
+		Channel: ws.ChannelBlocks,
 	})
 	require.NoError(t, err, "marshal subscribe")
 

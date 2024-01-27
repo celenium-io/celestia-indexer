@@ -96,8 +96,8 @@ type Transaction interface {
 }
 
 const (
-	ChannelHead = "head"
-	ChannelTx   = "tx"
+	ChannelHead  = "head"
+	ChannelBlock = "block"
 )
 
 type SearchResult struct {

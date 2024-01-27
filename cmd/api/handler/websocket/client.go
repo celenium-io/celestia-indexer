@@ -75,17 +75,8 @@ func (c *Client) ApplyFilters(msg Subscribe) error {
 	switch msg.Channel {
 	case ChannelHead:
 		c.filters.head = true
-	case ChannelTx:
-		if c.filters.tx == nil {
-			c.filters.tx = newTxFilters()
-		}
-		var fltr TransactionFilters
-		if err := json.Unmarshal(msg.Filters, &fltr); err != nil {
-			return err
-		}
-		if err := c.filters.tx.Fill(fltr); err != nil {
-			return err
-		}
+	case ChannelBlocks:
+		c.filters.blocks = true
 	default:
 		return errors.Wrap(ErrUnknownChannel, msg.Channel)
 	}
@@ -99,8 +90,8 @@ func (c *Client) DetachFilters(msg Unsubscribe) error {
 	switch msg.Channel {
 	case ChannelHead:
 		c.filters.head = false
-	case ChannelTx:
-		c.filters.tx = nil
+	case ChannelBlocks:
+		c.filters.blocks = false
 	default:
 		return errors.Wrap(ErrUnknownChannel, msg.Channel)
 	}
@@ -187,7 +178,7 @@ func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Clie
 					websocket.CloseNoStatusReceived,
 					websocket.CloseGoingAway):
 					c.manager.RemoveClientFromChannel(ChannelHead, c)
-					c.manager.RemoveClientFromChannel(ChannelTx, c)
+					c.manager.RemoveClientFromChannel(ChannelBlocks, c)
 					return
 				}
 				log.Errorf("read websocket message: %s", err.Error())
