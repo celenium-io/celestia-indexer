@@ -23,4 +23,4 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
 	group by 1
 	order by 1 desc;
 
-CALL add_view_refresh_job('block_stats_by_month', INTERVAL '10 minute', INTERVAL '1 hour');
+CALL add_view_refresh_job('block_stats_by_month', NULL, INTERVAL '1 hour');

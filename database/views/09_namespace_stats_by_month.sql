@@ -9,4 +9,4 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS namespace_stats_by_month
     group by 1, 2
     order by 1 desc;
 
-CALL add_view_refresh_job('namespace_stats_by_month', INTERVAL '10 minute', INTERVAL '1 hour');
+CALL add_view_refresh_job('namespace_stats_by_month', NULL, INTERVAL '1 hour');

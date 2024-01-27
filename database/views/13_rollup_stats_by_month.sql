@@ -10,4 +10,4 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
     from rollup_stats_by_day as logs
     group by 1, 2, 3;
         
-CALL add_view_refresh_job('rollup_stats_by_month', INTERVAL '1 minute', INTERVAL '1 hour');
+CALL add_view_refresh_job('rollup_stats_by_month', NULL, INTERVAL '1 hour');
