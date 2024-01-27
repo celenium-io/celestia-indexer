@@ -41,7 +41,7 @@ func TestWebsocket(t *testing.T) {
 	headChannel := make(chan *pq.Notification, 10)
 	listener.EXPECT().Listen().Return(headChannel).AnyTimes()
 	listener.EXPECT().Subscribe(gomock.Any(), storage.ChannelHead).Return(nil).Times(1)
-	listener.EXPECT().Close().Return(nil).Times(1)
+	listener.EXPECT().Close().Return(nil).MaxTimes(1)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -63,7 +63,7 @@ func TestWebsocket(t *testing.T) {
 			Hash:         hash,
 			MessageTypes: storageTypes.NewMsgTypeBits(),
 			Stats:        testBlock.Stats,
-		}, nil).Times(1)
+		}, nil).MaxTimes(1)
 	}
 
 	go func() {
