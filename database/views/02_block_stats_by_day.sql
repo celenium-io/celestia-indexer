@@ -22,6 +22,7 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
 		(case when sum(gas_limit) > 0 then sum(gas_used) / sum(gas_limit) else 0 end) as gas_efficiency
 	from block_stats_by_hour as hour
 	group by 1
-	order by 1 desc;
+	order by 1 desc
+	with no data;
 
-CALL add_view_refresh_job('block_stats_by_day', INTERVAL '1 minute', INTERVAL '1 hour');
+CALL add_view_refresh_job('block_stats_by_day', NULL, INTERVAL '5 minute');

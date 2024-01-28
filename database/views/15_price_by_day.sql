@@ -8,6 +8,7 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
         last(price.close, price.time) as close
 	from price_by_hour as price
 	group by 1
-	order by 1 desc;
+	order by 1 desc
+	with no data;
 
-CALL add_view_refresh_job('price_by_day', INTERVAL '1 minute', INTERVAL '10 minute');
+CALL add_view_refresh_job('price_by_day', NULL, INTERVAL '5 minute');
