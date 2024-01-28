@@ -2,6 +2,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS block_stats_by_minute
 WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
 	select 
 		time_bucket('1 minute'::interval, time) AS ts,
+		sum(bytes_in_block) as bytes_in_block,
 		(sum(blobs_size)/60.0) as bps,
 		max(case when block_time > 0 then blobs_size::float/(block_time/1000.0) else 0 end) as bps_max,
 		min(case when block_time > 0 then blobs_size::float/(block_time/1000.0) else 0 end) as bps_min,

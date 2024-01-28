@@ -198,6 +198,8 @@ func (s Stats) Series(ctx context.Context, timeframe storage.Timeframe, name str
 		query.ColumnExpr("ts, gas_limit as value")
 	case storage.SeriesGasUsed:
 		query.ColumnExpr("ts, gas_used as value")
+	case storage.SeriesBytesInBlock:
+		query.ColumnExpr("ts, bytes_in_block as value")
 	default:
 		return nil, errors.Errorf("unexpected series name: %s", name)
 	}

@@ -2719,7 +2719,8 @@ const docTemplate = `{
                             "gas_price",
                             "gas_efficiency",
                             "gas_used",
-                            "gas_limit"
+                            "gas_limit",
+                            "bytes_in_block"
                         ],
                         "type": "string",
                         "description": "Series name",

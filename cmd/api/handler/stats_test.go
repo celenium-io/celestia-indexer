@@ -323,6 +323,7 @@ func (s *StatsTestSuite) TestBlockStatsHistogram() {
 		storage.SeriesGasLimit,
 		storage.SeriesGasPrice,
 		storage.SeriesGasUsed,
+		storage.SeriesBytesInBlock,
 	} {
 
 		for _, tf := range []storage.Timeframe{
