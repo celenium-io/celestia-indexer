@@ -22,6 +22,7 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
 		(case when sum(gas_limit) > 0 then sum(gas_used) / sum(gas_limit) else 0 end) as gas_efficiency
 	from block_stats_by_minute as bbm
 	group by 1
-	order by 1 desc;
+	order by 1 desc
+	with no data;
 
-CALL add_view_refresh_job('block_stats_by_hour', INTERVAL '1 minute', INTERVAL '15 minute');
+CALL add_view_refresh_job('block_stats_by_hour', NULL, INTERVAL '1 minute');

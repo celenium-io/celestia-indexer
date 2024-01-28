@@ -8,6 +8,7 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
         sum(logs.blobs_count) as blobs_count, 
         max(logs.last_time) as last_time
     from rollup_stats_by_hour as logs
-    group by 1, 2, 3;
+    group by 1, 2, 3
+	with no data;
         
-CALL add_view_refresh_job('rollup_stats_by_day', INTERVAL '1 minute', INTERVAL '1 hour');
+CALL add_view_refresh_job('rollup_stats_by_day', NULL, INTERVAL '5 minute');
