@@ -82,7 +82,7 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameBlob,
 		Name:   "gov_max_square_size",
-		Value:  appState.Auth.Params.TxSigLimit,
+		Value:  appState.Blob.Params.GovMaxSquareSize,
 	})
 
 	// crisis
