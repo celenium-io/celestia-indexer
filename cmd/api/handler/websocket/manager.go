@@ -25,8 +25,8 @@ type Manager struct {
 	clients  *sdkSync.Map[uint64, *Client]
 	observer *bus.Observer
 
-	head *Channel[storage.Block, *responses.Block]
-	tx   *Channel[storage.Tx, *responses.Tx]
+	blocks *Channel[storage.Block, *responses.Block]
+	head   *Channel[storage.State, *responses.State]
 
 	g workerpool.Group
 }
@@ -46,14 +46,14 @@ func NewManager(observer *bus.Observer) *Manager {
 		g:        workerpool.NewGroup(),
 	}
 
-	manager.head = NewChannel[storage.Block, *responses.Block](
-		headProcessor,
-		HeadFilter{},
+	manager.blocks = NewChannel[storage.Block, *responses.Block](
+		blockProcessor,
+		BlockFilter{},
 	)
 
-	manager.tx = NewChannel[storage.Tx, *responses.Tx](
-		txProcessor,
-		TxFilter{},
+	manager.head = NewChannel[storage.State, *responses.State](
+		headProcessor,
+		HeadFilter{},
 	)
 
 	return manager
@@ -65,12 +65,12 @@ func (manager *Manager) listen(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case block := <-manager.observer.Blocks():
-			if err := manager.head.processMessage(*block); err != nil {
+			if err := manager.blocks.processMessage(*block); err != nil {
 				log.Err(err).Msg("handle block")
 			}
-		case tx := <-manager.observer.Txs():
-			if err := manager.tx.processMessage(*tx); err != nil {
-				log.Err(err).Msg("handle block")
+		case state := <-manager.observer.Head():
+			if err := manager.head.processMessage(*state); err != nil {
+				log.Err(err).Msg("handle state")
 			}
 		}
 	}
@@ -128,8 +128,8 @@ func (manager *Manager) AddClientToChannel(channel string, client *Client) {
 	switch channel {
 	case ChannelHead:
 		manager.head.AddClient(client)
-	case ChannelTx:
-		manager.tx.AddClient(client)
+	case ChannelBlocks:
+		manager.blocks.AddClient(client)
 	default:
 		log.Error().Str("channel", channel).Msg("unknown channel name")
 	}
@@ -139,8 +139,8 @@ func (manager *Manager) RemoveClientFromChannel(channel string, client *Client) 
 	switch channel {
 	case ChannelHead:
 		manager.head.RemoveClient(client.id)
-	case ChannelTx:
-		manager.tx.RemoveClient(client.id)
+	case ChannelBlocks:
+		manager.blocks.RemoveClient(client.id)
 	default:
 		log.Error().Str("channel", channel).Msg("unknown channel name")
 	}

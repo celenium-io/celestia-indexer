@@ -10,10 +10,10 @@ import (
 
 type Observer struct {
 	blocks chan *storage.Block
-	txs    chan *storage.Tx
+	state  chan *storage.State
 
 	listenBlocks bool
-	listenTxs    bool
+	listenHead   bool
 
 	g workerpool.Group
 }
@@ -25,16 +25,16 @@ func NewObserver(channels ...string) *Observer {
 
 	observer := &Observer{
 		blocks: make(chan *storage.Block, 1024),
-		txs:    make(chan *storage.Tx, 1024),
+		state:  make(chan *storage.State, 1024),
 		g:      workerpool.NewGroup(),
 	}
 
 	for i := range channels {
 		switch channels[i] {
-		case storage.ChannelHead:
+		case storage.ChannelBlock:
 			observer.listenBlocks = true
-		case storage.ChannelTx:
-			observer.listenTxs = true
+		case storage.ChannelHead:
+			observer.listenHead = true
 		}
 	}
 
@@ -44,7 +44,7 @@ func NewObserver(channels ...string) *Observer {
 func (observer Observer) Close() error {
 	observer.g.Wait()
 	close(observer.blocks)
-	close(observer.txs)
+	close(observer.state)
 	return nil
 }
 
@@ -54,9 +54,9 @@ func (observer Observer) notifyBlocks(block *storage.Block) {
 	}
 }
 
-func (observer Observer) notifyTxs(tx *storage.Tx) {
-	if observer.listenTxs {
-		observer.txs <- tx
+func (observer Observer) notifyState(state *storage.State) {
+	if observer.listenHead {
+		observer.state <- state
 	}
 }
 
@@ -64,6 +64,6 @@ func (observer Observer) Blocks() <-chan *storage.Block {
 	return observer.blocks
 }
 
-func (observer Observer) Txs() <-chan *storage.Tx {
-	return observer.txs
+func (observer Observer) Head() <-chan *storage.State {
+	return observer.state
 }

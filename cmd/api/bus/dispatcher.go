@@ -10,6 +10,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/workerpool"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -18,7 +19,6 @@ import (
 type Dispatcher struct {
 	listener storage.Listener
 	blocks   storage.IBlock
-	txs      storage.ITx
 
 	mx        *sync.RWMutex
 	observers []*Observer
@@ -29,7 +29,6 @@ type Dispatcher struct {
 func NewDispatcher(
 	factory storage.ListenerFactory,
 	blocks storage.IBlock,
-	txs storage.ITx,
 ) (*Dispatcher, error) {
 	if factory == nil {
 		return nil, errors.New("nil listener factory")
@@ -38,7 +37,6 @@ func NewDispatcher(
 	return &Dispatcher{
 		listener:  listener,
 		blocks:    blocks,
-		txs:       txs,
 		observers: make([]*Observer, 0),
 		mx:        new(sync.RWMutex),
 		g:         workerpool.NewGroup(),
@@ -57,7 +55,7 @@ func (d *Dispatcher) Observe(channels ...string) *Observer {
 }
 
 func (d *Dispatcher) Start(ctx context.Context) {
-	if err := d.listener.Subscribe(ctx, storage.ChannelHead, storage.ChannelTx); err != nil {
+	if err := d.listener.Subscribe(ctx, storage.ChannelHead, storage.ChannelBlock); err != nil {
 		log.Err(err).Msg("subscribe on postgres notifications")
 		return
 	}
@@ -99,24 +97,22 @@ func (d *Dispatcher) listen(ctx context.Context) {
 }
 
 func (d *Dispatcher) handleNotification(ctx context.Context, notification *pq.Notification) error {
-	id, err := strconv.ParseUint(notification.Extra, 10, 64)
-	if err != nil {
-		return errors.Wrapf(err, "parse block id: %s", notification.Extra)
-	}
-
 	switch notification.Channel {
 	case storage.ChannelHead:
-		err = d.handleBlock(ctx, id)
-	case storage.ChannelTx:
-		err = d.handleTx(ctx, id)
+		return d.handleState(ctx, notification.Extra)
+	case storage.ChannelBlock:
+		return d.handleBlock(ctx, notification.Extra)
 	default:
-		err = errors.Errorf("unknown channel name: %s", notification.Channel)
+		return errors.Errorf("unknown channel name: %s", notification.Channel)
 	}
-
-	return err
 }
 
-func (d *Dispatcher) handleBlock(ctx context.Context, id uint64) error {
+func (d *Dispatcher) handleBlock(ctx context.Context, payload string) error {
+	id, err := strconv.ParseUint(payload, 10, 64)
+	if err != nil {
+		return errors.Wrapf(err, "parse block id: %s", payload)
+	}
+
 	block, err := d.blocks.ByIdWithRelations(ctx, id)
 	if err != nil {
 		return err
@@ -129,14 +125,15 @@ func (d *Dispatcher) handleBlock(ctx context.Context, id uint64) error {
 	return nil
 }
 
-func (d *Dispatcher) handleTx(ctx context.Context, id uint64) error {
-	tx, err := d.txs.ByIdWithRelations(ctx, id)
-	if err != nil {
+func (d *Dispatcher) handleState(ctx context.Context, payload string) error {
+	var state storage.State
+	if err := jsoniter.UnmarshalFromString(payload, &state); err != nil {
 		return err
 	}
+
 	d.mx.RLock()
 	for i := range d.observers {
-		d.observers[i].notifyTxs(&tx)
+		d.observers[i].notifyState(&state)
 	}
 	d.mx.RUnlock()
 	return nil

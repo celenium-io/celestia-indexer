@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -82,7 +83,8 @@ func (module *Module) listen(ctx context.Context) {
 				continue
 			}
 
-			if err := module.saveBlock(ctx, &block); err != nil {
+			state, err := module.saveBlock(ctx, &block)
+			if err != nil {
 				module.Log.Err(err).
 					Uint64("height", uint64(block.Height)).
 					Msg("block saving error")
@@ -90,7 +92,7 @@ func (module *Module) listen(ctx context.Context) {
 				continue
 			}
 
-			if err := module.notify(ctx, block); err != nil {
+			if err := module.notify(ctx, state, block); err != nil {
 				module.Log.Err(err).Msg("block notification error")
 			}
 		}
@@ -104,21 +106,22 @@ func (module *Module) Close() error {
 	return nil
 }
 
-func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error {
+func (module *Module) saveBlock(ctx context.Context, block *storage.Block) (storage.State, error) {
 	start := time.Now()
 	module.Log.Info().Uint64("height", uint64(block.Height)).Msg("saving block...")
 	tx, err := postgres.BeginTransaction(ctx, module.storage)
 	if err != nil {
-		return err
+		return storage.State{}, err
 	}
 	defer tx.Close(ctx)
 
-	if err := module.processBlockInTransaction(ctx, tx, block); err != nil {
-		return tx.HandleError(ctx, err)
+	state, err := module.processBlockInTransaction(ctx, tx, block)
+	if err != nil {
+		return state, tx.HandleError(ctx, err)
 	}
 
 	if err := tx.Flush(ctx); err != nil {
-		return tx.HandleError(ctx, err)
+		return state, tx.HandleError(ctx, err)
 	}
 	module.Log.Info().
 		Uint64("height", uint64(block.Height)).
@@ -128,36 +131,36 @@ func (module *Module) saveBlock(ctx context.Context, block *storage.Block) error
 		Int64("ms", time.Since(start).Milliseconds()).
 		Int("tx_count", len(block.Txs)).
 		Msg("block saved")
-	return nil
+	return state, nil
 }
 
-func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.Transaction, block *storage.Block) error {
+func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.Transaction, block *storage.Block) (storage.State, error) {
 	state, err := tx.State(ctx, module.indexerName)
 	if err != nil {
-		return err
+		return state, err
 	}
 	block.Stats.BlockTime = uint64(block.Time.Sub(state.LastTime).Milliseconds())
 
 	proposerId, err := tx.GetProposerId(ctx, block.ProposerAddress)
 	if err != nil {
-		return errors.Wrap(err, "can't find block proposer")
+		return state, errors.Wrap(err, "can't find block proposer")
 	}
 	block.ProposerId = proposerId
 
 	if err := tx.Add(ctx, block); err != nil {
-		return err
+		return state, err
 	}
 
 	if err := tx.Add(ctx, &block.Stats); err != nil {
-		return err
+		return state, err
 	}
 
 	if err := tx.SaveTransactions(ctx, block.Txs...); err != nil {
-		return err
+		return state, err
 	}
 
 	if err := tx.SaveEvents(ctx, block.Events...); err != nil {
-		return err
+		return state, err
 	}
 
 	var (
@@ -190,7 +193,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		events = append(events, block.Txs[i].Events...)
 		if len(events) >= 10000 {
 			if err := tx.SaveEvents(ctx, events...); err != nil {
-				return err
+				return state, err
 			}
 			events = make([]storage.Event, 0, 10000)
 		}
@@ -204,53 +207,52 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 	}
 	if len(events) > 0 {
 		if err := tx.SaveEvents(ctx, events...); err != nil {
-			return err
+			return state, err
 		}
 	}
 
 	addrToId, totalAccounts, err := saveAddresses(ctx, tx, addresses)
 	if err != nil {
-		return err
+		return state, err
 	}
 
 	if err := saveSigners(ctx, tx, addrToId, block.Txs); err != nil {
-		return err
+		return state, err
 	}
 
 	totalNamespaces, err := saveNamespaces(ctx, tx, namespaces)
 	if err != nil {
-		return err
+		return state, err
 	}
 
 	totalValidators, err := saveMessages(ctx, tx, messages, addrToId)
 	if err != nil {
-		return err
+		return state, err
 	}
 
 	updateState(block, totalAccounts, totalNamespaces, totalValidators, &state)
-	if err := tx.Update(ctx, &state); err != nil {
-		return err
-	}
-
-	return nil
+	err = tx.Update(ctx, &state)
+	return state, err
 }
 
-func (module *Module) notify(ctx context.Context, block storage.Block) error {
+func (module *Module) notify(ctx context.Context, state storage.State, block storage.Block) error {
 	if time.Since(block.Time) > time.Hour {
 		// do not notify all about events if initial indexing is in progress
 		return nil
 	}
 
-	blockId := strconv.FormatUint(block.Id, 10)
-	if err := module.notificator.Notify(ctx, storage.ChannelHead, blockId); err != nil {
+	rawState, err := jsoniter.MarshalToString(state)
+	if err != nil {
+		return err
+	}
+	if err := module.notificator.Notify(ctx, storage.ChannelHead, rawState); err != nil {
 		return err
 	}
 
-	for i := range block.Txs {
-		txId := strconv.FormatUint(block.Txs[i].Id, 10)
-		if err := module.notificator.Notify(ctx, storage.ChannelTx, txId); err != nil {
-			return err
-		}
+	blockId := strconv.FormatUint(block.Id, 10)
+	if err := module.notificator.Notify(ctx, storage.ChannelBlock, blockId); err != nil {
+		return err
 	}
+
 	return nil
 }
