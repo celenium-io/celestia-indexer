@@ -32,10 +32,6 @@ func NewAddress(addr storage.Address) Address {
 	}
 }
 
-func (Address) SearchType() string {
-	return "address"
-}
-
 // Balance info
 //
 //	@Description	Balance of address information

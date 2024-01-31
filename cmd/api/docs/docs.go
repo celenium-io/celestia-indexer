@@ -2321,7 +2321,7 @@ const docTemplate = `{
         },
         "/v1/search": {
             "get": {
-                "description": "Endpoint finds entity by hash (block, address, namespace and tx)\n\n### Block\n\nBlock will be found by its hash. Hash example: ` + "`" + `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF` + "`" + `.\nHash should be hexadecimal and has a length of 64.\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"block\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Block type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Tx\n\nTx will be found by its hash. Hash example: ` + "`" + `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF` + "`" + `.\nTx should be hexadecimal and has a length of 64.\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"tx\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Tx type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Address\n\nThe Address will be found by its hash.\nHash example: ` + "`" + `celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60` + "`" + `.\nAddress has prefix ` + "`" + `celestia` + "`" + ` and has length 47.\nAlso, it should be decoded by ` + "`" + `bech32` + "`" + `.\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"address\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\",\n        \"height\": 100,\n        \"balance\": \"6525472354\"\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Namespace\n\nNamespace can be found by base64 hash and identity pair version + namespace id. \nHash example: ` + "`" + `U3dhZ2dlciByb2Nrcw==` + "`" + `. \nIdentity pair example: ` + "`" + `014723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02` + "`" + `\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"namespace\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"U3dhZ2dlciByb2Nrcw==\",\n        \"version\": 1,\n        \"namespace_id\": \"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02\"\n        // ... rest fields from response.Namespace type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
+                "description": "Endpoint finds entity by hash (block, address, validator, namespace and tx). It returns array of ` + "`" + `responses.SearchItem` + "`" + ` entities.\n\n### Block\n\nBlock will be found by its hash. Hash example: ` + "`" + `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF` + "`" + `.\nHash should be hexadecimal and has a length of 64.\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"block\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Block type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Tx\n\nTx will be found by its hash. Hash example: ` + "`" + `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF` + "`" + `.\nTx should be hexadecimal and has a length of 64.\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"tx\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Tx type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Address\n\nThe Address will be found by its hash.\nHash example: ` + "`" + `celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60` + "`" + `.\nAddress has prefix ` + "`" + `celestia` + "`" + ` and has length 47.\nAlso, it should be decoded by ` + "`" + `bech32` + "`" + `.\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"address\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\",\n        \"height\": 100,\n        \"balance\": \"6525472354\"\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Namespace\n\nNamespace can be found by base64 hash and identity pair version + namespace id. \nHash example: ` + "`" + `U3dhZ2dlciByb2Nrcw==` + "`" + `. \nIdentity pair example: ` + "`" + `014723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02` + "`" + `\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"namespace\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"U3dhZ2dlciByb2Nrcw==\",\n        \"version\": 1,\n        \"namespace_id\": \"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02\"\n        // ... rest fields from response.Namespace type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Validator\n\nValidator can be found by moniker prefix. \nFor example: names ` + "`" + `Node 1` + "`" + ` and ` + "`" + `Node 2` + "`" + ` can be found with query string ` + "`" + `Node` + "`" + `\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"validator\",\n    \"result\": {\n        \"id\": 1,\n        \"moniker\": \"Node 1\",\n        // ... rest fields from response.Validator type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Rollup\n\nRollup can be found by name prefix. \nFor example: rollup with names ` + "`" + `Rollup 1` + "`" + ` and ` + "`" + `Rollup 2` + "`" + ` can be found with query string ` + "`" + `Rol` + "`" + `\n\n#### Example response \n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"type\": \"rollup\",\n    \"result\": {\n        \"id\": 1,\n        \"moniker\": \"Rollup 1\",\n        // ... rest fields from response.Rollup type\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `",
                 "produces": [
                     "application/json"
                 ],
@@ -2343,7 +2343,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SearchResponse-responses_Searchable"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.SearchItem"
+                            }
                         }
                     },
                     "204": {
@@ -3770,19 +3773,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "SearchResponse-responses_Searchable": {
-            "type": "object",
-            "properties": {
-                "result": {
-                    "description": "Search result. Can be one of folowwing types: Block, Address, Namespace, Tx",
-                    "type": "object"
-                },
-                "type": {
-                    "description": "Result type which is in the result. Can be 'block', 'address', 'namespace', 'tx'",
-                    "type": "string"
-                }
-            }
-        },
         "github_com_celenium-io_celestia-indexer_internal_storage_types.Status": {
             "type": "string",
             "enum": [
@@ -4561,6 +4551,19 @@ const docTemplate = `{
                     "type": "string",
                     "format": "string",
                     "example": "https://website.com"
+                }
+            }
+        },
+        "responses.SearchItem": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "description": "Search result. Can be one of folowwing types: Block, Address, Namespace, Tx, Validator, Rollup",
+                    "type": "object"
+                },
+                "type": {
+                    "description": "Result type which is in the result. Can be 'block', 'address', 'namespace', 'tx', 'validator', 'rollup'",
+                    "type": "string"
                 }
             }
         },

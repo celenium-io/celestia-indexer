@@ -5,19 +5,16 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"strings"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
-	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -31,6 +28,9 @@ type SearchTestSuite struct {
 	block     *mock.MockIBlock
 	namespace *mock.MockINamespace
 	tx        *mock.MockITx
+	validator *mock.MockIValidator
+	search    *mock.MockISearch
+	rollup    *mock.MockIRollup
 
 	echo    *echo.Echo
 	handler SearchHandler
@@ -46,7 +46,10 @@ func (s *SearchTestSuite) SetupSuite() {
 	s.block = mock.NewMockIBlock(s.ctrl)
 	s.namespace = mock.NewMockINamespace(s.ctrl)
 	s.tx = mock.NewMockITx(s.ctrl)
-	s.handler = NewSearchHandler(s.address, s.block, s.namespace, s.tx)
+	s.search = mock.NewMockISearch(s.ctrl)
+	s.validator = mock.NewMockIValidator(s.ctrl)
+	s.rollup = mock.NewMockIRollup(s.ctrl)
+	s.handler = NewSearchHandler(s.search, s.address, s.block, s.tx, s.namespace, s.validator, s.rollup)
 }
 
 // TearDownSuite -
@@ -81,51 +84,54 @@ func (s *SearchTestSuite) TestSearchAddress() {
 	s.Require().NoError(s.handler.Search(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var response responses.SearchResponse[responses.Address]
-	err := json.NewDecoder(rec.Body).Decode(&response)
+	var items []responses.SearchItem
+	err := json.NewDecoder(rec.Body).Decode(&items)
 	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+
+	response := items[0]
 	s.Require().Equal("address", response.Type)
-	s.Require().EqualValues(1, response.Result.Id)
-	s.Require().EqualValues(100, response.Result.Height)
-	s.Require().EqualValues(100, response.Result.LastHeight)
-	s.Require().Equal(testAddress, response.Result.Hash)
+	s.Require().NotNil(response.Result)
 }
 
 func (s *SearchTestSuite) TestSearchBlock() {
+	searchText := hex.EncodeToString(testBlock.Hash)
+
 	q := make(url.Values)
-	q.Set("query", hex.EncodeToString(testBlock.Hash))
+	q.Set("query", searchText)
 
 	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
 
-	s.tx.EXPECT().
-		ByHash(gomock.Any(), testBlock.Hash).
-		Return(storage.Tx{}, sql.ErrNoRows)
-
-	s.tx.EXPECT().
-		IsNoRows(sql.ErrNoRows).
-		Return(true)
+	s.search.EXPECT().
+		Search(gomock.Any(), testBlock.Hash).
+		Return([]storage.SearchResult{
+			{
+				Id:    1,
+				Type:  "block",
+				Value: searchText,
+			},
+		}, nil).
+		Times(1)
 
 	s.block.EXPECT().
-		ByHash(gomock.Any(), testBlock.Hash).
-		Return(testBlock, nil)
+		GetByID(gomock.Any(), uint64(1)).
+		Return(&testBlock, nil).
+		Times(1)
 
 	s.Require().NoError(s.handler.Search(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var response responses.SearchResponse[responses.Block]
-	err := json.NewDecoder(rec.Body).Decode(&response)
+	var items []responses.SearchItem
+	err := json.NewDecoder(rec.Body).Decode(&items)
 	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+
+	response := items[0]
 	s.Require().Equal("block", response.Type)
-	s.Require().EqualValues(1, response.Result.Id)
-	s.Require().EqualValues(100, response.Result.Height)
-	s.Require().Equal("1", response.Result.VersionApp)
-	s.Require().Equal("11", response.Result.VersionBlock)
-	s.Require().Equal("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F", response.Result.Hash.String())
-	s.Require().Equal(testTime, response.Result.Time)
-	s.Require().Equal([]types.MsgType{types.MsgSend}, response.Result.MessageTypes)
+	s.Require().NotNil(response.Result)
 }
 
 func (s *SearchTestSuite) TestSearchTx() {
@@ -137,31 +143,33 @@ func (s *SearchTestSuite) TestSearchTx() {
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
 
+	s.search.EXPECT().
+		Search(gomock.Any(), testTx.Hash).
+		Return([]storage.SearchResult{
+			{
+				Id:    1,
+				Type:  "tx",
+				Value: testTxHash,
+			},
+		}, nil).
+		Times(1)
+
 	s.tx.EXPECT().
-		ByHash(gomock.Any(), testTx.Hash).
-		Return(testTx, nil)
+		GetByID(gomock.Any(), uint64(1)).
+		Return(&testTx, nil).
+		Times(1)
 
 	s.Require().NoError(s.handler.Search(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var response responses.SearchResponse[responses.Tx]
-	err := json.NewDecoder(rec.Body).Decode(&response)
+	var items []responses.SearchItem
+	err := json.NewDecoder(rec.Body).Decode(&items)
 	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+
+	response := items[0]
 	s.Require().Equal("tx", response.Type)
-	s.Require().EqualValues(1, response.Result.Id)
-	s.Require().EqualValues(100, response.Result.Height)
-	s.Require().Equal(testTime, response.Result.Time)
-	s.Require().Equal(testTxHash, strings.ToUpper(response.Result.Hash))
-	s.Require().EqualValues(2, response.Result.Position)
-	s.Require().EqualValues(80410, response.Result.GasWanted)
-	s.Require().EqualValues(77483, response.Result.GasUsed)
-	s.Require().Equal("80410", response.Result.Fee)
-	s.Require().EqualValues(0, response.Result.TimeoutHeight)
-	s.Require().EqualValues(10, response.Result.EventsCount)
-	s.Require().EqualValues(2, response.Result.MessagesCount)
-	s.Require().Equal("memo", response.Result.Memo)
-	s.Require().Equal("sdk", response.Result.Codespace)
-	s.Require().Equal(types.StatusSuccess, response.Result.Status)
+	s.Require().NotNil(response.Result)
 }
 
 func (s *SearchTestSuite) TestSearchNamespaceById() {
@@ -180,15 +188,14 @@ func (s *SearchTestSuite) TestSearchNamespaceById() {
 	s.Require().NoError(s.handler.Search(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var response responses.SearchResponse[responses.Namespace]
-	err := json.NewDecoder(rec.Body).Decode(&response)
+	var items []responses.SearchItem
+	err := json.NewDecoder(rec.Body).Decode(&items)
 	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+
+	response := items[0]
 	s.Require().Equal("namespace", response.Type)
-	s.Require().EqualValues(1, response.Result.ID)
-	s.Require().EqualValues(100, response.Result.Size)
-	s.Require().EqualValues(0, response.Result.Version)
-	s.Require().Equal(testNamespaceId, response.Result.NamespaceID)
-	s.Require().Equal(testNamespaceBase64, response.Result.Hash)
+	s.Require().NotNil(response.Result)
 }
 
 func (s *SearchTestSuite) TestSearchNamespaceByBase64() {
@@ -202,20 +209,102 @@ func (s *SearchTestSuite) TestSearchNamespaceByBase64() {
 
 	s.namespace.EXPECT().
 		ByNamespaceIdAndVersion(gomock.Any(), testNamespace.NamespaceID, testNamespace.Version).
-		Return(testNamespace, nil)
+		Return(testNamespace, nil).
+		Times(1)
 
 	s.Require().NoError(s.handler.Search(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var response responses.SearchResponse[responses.Namespace]
-	err := json.NewDecoder(rec.Body).Decode(&response)
+	var items []responses.SearchItem
+	err := json.NewDecoder(rec.Body).Decode(&items)
 	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+
+	response := items[0]
 	s.Require().Equal("namespace", response.Type)
-	s.Require().EqualValues(1, response.Result.ID)
-	s.Require().EqualValues(100, response.Result.Size)
-	s.Require().EqualValues(0, response.Result.Version)
-	s.Require().Equal(testNamespaceId, response.Result.NamespaceID)
-	s.Require().Equal(testNamespaceBase64, response.Result.Hash)
+	s.Require().NotNil(response.Result)
+}
+
+func (s *SearchTestSuite) TestSearchValidator() {
+	q := make(url.Values)
+	q.Set("query", "name")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/search")
+
+	s.search.EXPECT().
+		SearchText(gomock.Any(), "name").
+		Return([]storage.SearchResult{
+			{
+				Id:    1,
+				Type:  "validator",
+				Value: "name",
+			},
+		}, nil).
+		Times(1)
+
+	s.validator.EXPECT().
+		GetByID(gomock.Any(), uint64(1)).
+		Return(&storage.Validator{
+			Moniker: "name 1",
+			Id:      1,
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.Search(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var items []responses.SearchItem
+	err := json.NewDecoder(rec.Body).Decode(&items)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+
+	response := items[0]
+	s.Require().Equal("validator", response.Type)
+	s.Require().NotNil(response.Result)
+}
+
+func (s *SearchTestSuite) TestSearchRollup() {
+	q := make(url.Values)
+	q.Set("query", "name")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/search")
+
+	s.search.EXPECT().
+		SearchText(gomock.Any(), "name").
+		Return([]storage.SearchResult{
+			{
+				Id:    1,
+				Type:  "rollup",
+				Value: "name",
+			},
+		}, nil).
+		Times(1)
+
+	s.rollup.EXPECT().
+		GetByID(gomock.Any(), uint64(1)).
+		Return(&storage.Rollup{
+			Name: "name 1",
+			Id:   1,
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.Search(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var items []responses.SearchItem
+	err := json.NewDecoder(rec.Body).Decode(&items)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+
+	response := items[0]
+	s.Require().Equal("rollup", response.Type)
+	s.Require().NotNil(response.Result)
 }
 
 func (s *SearchTestSuite) TestSearchNoResult() {
@@ -227,6 +316,11 @@ func (s *SearchTestSuite) TestSearchNoResult() {
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
 
+	s.search.EXPECT().
+		SearchText(gomock.Any(), "unknown").
+		Return([]storage.SearchResult{}, nil).
+		Times(1)
+
 	s.Require().NoError(s.handler.Search(c))
-	s.Require().Equal(http.StatusNoContent, rec.Code)
+	s.Require().Equal(http.StatusOK, rec.Code)
 }

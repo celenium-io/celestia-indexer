@@ -36,6 +36,7 @@ type Storage struct {
 	Price         models.IPrice
 	State         models.IState
 	Stats         models.IStats
+	Search        models.ISearch
 	Validator     models.IValidator
 	Rollup        models.IRollup
 	Notificator   *Notificator
@@ -65,6 +66,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		State:         NewState(strg.Connection()),
 		Namespace:     NewNamespace(strg.Connection()),
 		Stats:         NewStats(strg.Connection()),
+		Search:        NewSearch(strg.Connection()),
 		Validator:     NewValidator(strg.Connection()),
 		Rollup:        NewRollup(strg.Connection()),
 		Notificator:   NewNotificator(cfg, strg.Connection().DB()),

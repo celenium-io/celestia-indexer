@@ -43,10 +43,6 @@ func NewNamespace(ns storage.Namespace) Namespace {
 	}
 }
 
-func (Namespace) SearchType() string {
-	return "namespace"
-}
-
 func decodeName(nsId []byte) string {
 	var (
 		trimmed     = bytes.TrimLeft(nsId, "\x00")

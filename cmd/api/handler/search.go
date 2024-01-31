@@ -4,9 +4,9 @@
 package handler
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/hex"
-	"net/http"
 	"regexp"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
@@ -17,23 +17,32 @@ import (
 )
 
 type SearchHandler struct {
+	search    storage.ISearch
 	address   storage.IAddress
 	block     storage.IBlock
-	namespace storage.INamespace
 	tx        storage.ITx
+	namespace storage.INamespace
+	validator storage.IValidator
+	rollup    storage.IRollup
 }
 
 func NewSearchHandler(
+	search storage.ISearch,
 	address storage.IAddress,
 	block storage.IBlock,
-	namespace storage.INamespace,
 	tx storage.ITx,
+	namespace storage.INamespace,
+	validator storage.IValidator,
+	rollup storage.IRollup,
 ) SearchHandler {
 	return SearchHandler{
+		search:    search,
 		address:   address,
 		block:     block,
-		namespace: namespace,
 		tx:        tx,
+		namespace: namespace,
+		validator: validator,
+		rollup:    rollup,
 	}
 }
 
@@ -54,7 +63,7 @@ var (
 //	@ID						search
 //	@Param					query	query	string	true	"Search string"
 //	@Produce				json
-//	@Success				200	{object}	responses.SearchResponse[responses.Searchable]
+//	@Success				200	{array}	responses.SearchItem
 //	@Success				204
 //	@Failure				400	{object}	Error
 //	@Failure				500	{object}	Error
@@ -65,94 +74,138 @@ func (handler SearchHandler) Search(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
+	var response []responses.SearchItem
+
 	switch {
 	case isAddress(req.Search):
-		if err := handler.searchAddress(c, req.Search); err != nil {
-			return internalServerError(c, err)
-		}
+		response, err = handler.searchAddress(c.Request().Context(), req.Search)
 	case hashRegexp.MatchString(req.Search):
-		if err := handler.searchHash(c, req.Search); err != nil {
-			return internalServerError(c, err)
-		}
+		response, err = handler.searchHash(c.Request().Context(), req.Search)
 	case namespaceRegexp.MatchString(req.Search):
-		if err := handler.searchNamespaceById(c, req.Search); err != nil {
-			return internalServerError(c, err)
-		}
+		response, err = handler.searchNamespaceById(c.Request().Context(), req.Search)
 	case isNamespace(req.Search):
-		if err := handler.searchNamespaceByBase64(c, req.Search); err != nil {
-			return internalServerError(c, err)
-		}
+		response, err = handler.searchNamespaceByBase64(c.Request().Context(), req.Search)
+	default:
+		response, err = handler.searchText(c.Request().Context(), req.Search)
+	}
+	if err != nil {
+		return internalServerError(c, err)
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return returnArray(c, response)
 }
 
-func (handler SearchHandler) searchAddress(c echo.Context, search string) error {
+func (handler SearchHandler) searchAddress(ctx context.Context, search string) ([]responses.SearchItem, error) {
 	_, hash, err := types.Address(search).Decode()
 	if err != nil {
-		return badRequestError(c, err)
+		return nil, err
 	}
 
-	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	address, err := handler.address.ByHash(ctx, hash)
 	if err != nil {
-		return handleError(c, err, handler.address)
+		return nil, err
 	}
-	return c.JSON(http.StatusOK, responses.NewSearchResponse(responses.NewAddress(address)))
+
+	result := responses.SearchItem{
+		Type:   "address",
+		Result: responses.NewAddress(address),
+	}
+	return []responses.SearchItem{result}, nil
 }
 
-func (handler SearchHandler) searchHash(c echo.Context, search string) error {
+func (handler SearchHandler) searchHash(ctx context.Context, search string) ([]responses.SearchItem, error) {
 	data, err := hex.DecodeString(search)
 	if err != nil {
-		return badRequestError(c, err)
+		return nil, err
 	}
 	if len(data) != 32 {
-		return badRequestError(c, errors.Wrapf(errInvalidHashLength, "got %d", len(data)))
+		return nil, errors.Wrapf(errInvalidHashLength, "got %d", len(data))
 	}
-	tx, err := handler.tx.ByHash(c.Request().Context(), data)
-	if err == nil {
-		return c.JSON(http.StatusOK, responses.NewSearchResponse(responses.NewTx(tx)))
-	}
-
-	if !handler.tx.IsNoRows(err) {
-		return internalServerError(c, err)
+	result, err := handler.search.Search(ctx, data)
+	if err != nil {
+		return nil, err
 	}
 
-	block, err := handler.block.ByHash(c.Request().Context(), data)
-	if err == nil {
-		return c.JSON(http.StatusOK, responses.NewSearchResponse(responses.NewBlock(block, false)))
-	}
-	if !handler.tx.IsNoRows(err) {
-		return internalServerError(c, err)
+	response := make([]responses.SearchItem, len(result))
+	for i := range result {
+		response[i].Type = result[i].Type
+		switch response[i].Type {
+		case "tx":
+			tx, err := handler.tx.GetByID(ctx, result[i].Id)
+			if err != nil {
+				return nil, err
+			}
+			response[i].Result = responses.NewTx(*tx)
+		case "block":
+			block, err := handler.block.GetByID(ctx, result[i].Id)
+			if err != nil {
+				return nil, err
+			}
+			response[i].Result = responses.NewBlock(*block, false)
+		}
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return response, nil
 }
 
-func (handler SearchHandler) searchNamespaceById(c echo.Context, search string) error {
+func (handler SearchHandler) searchNamespaceById(ctx context.Context, search string) ([]responses.SearchItem, error) {
 	data, err := hex.DecodeString(search)
 	if err != nil {
-		return badRequestError(c, err)
+		return nil, err
 	}
 
-	return handler.getNamespace(c, data)
+	return handler.getNamespace(ctx, data)
 }
 
-func (handler SearchHandler) searchNamespaceByBase64(c echo.Context, search string) error {
+func (handler SearchHandler) searchNamespaceByBase64(ctx context.Context, search string) ([]responses.SearchItem, error) {
 	data, err := base64.StdEncoding.DecodeString(search)
 	if err != nil {
-		return badRequestError(c, err)
+		return nil, err
 	}
 
-	return handler.getNamespace(c, data)
+	return handler.getNamespace(ctx, data)
 }
 
-func (handler SearchHandler) getNamespace(c echo.Context, data []byte) error {
+func (handler SearchHandler) getNamespace(ctx context.Context, data []byte) ([]responses.SearchItem, error) {
 	version := data[0]
 	namespaceId := data[1:]
-	ns, err := handler.namespace.ByNamespaceIdAndVersion(c.Request().Context(), namespaceId, version)
+	ns, err := handler.namespace.ByNamespaceIdAndVersion(ctx, namespaceId, version)
 	if err != nil {
-		return handleError(c, err, handler.namespace)
+		return nil, err
 	}
-	response := responses.NewNamespace(ns)
-	return c.JSON(http.StatusOK, responses.NewSearchResponse(response))
+	result := responses.SearchItem{
+		Type:   "namespace",
+		Result: responses.NewNamespace(ns),
+	}
+	return []responses.SearchItem{result}, nil
+}
+
+func (handler SearchHandler) searchText(ctx context.Context, text string) ([]responses.SearchItem, error) {
+	result, err := handler.search.SearchText(ctx, text)
+	if err != nil {
+		return nil, err
+	}
+
+	response := make([]responses.SearchItem, len(result))
+	for i := range result {
+		response[i].Type = result[i].Type
+		switch response[i].Type {
+		case "validator":
+			validator, err := handler.validator.GetByID(ctx, result[i].Id)
+			if err != nil {
+				return nil, err
+			}
+			response[i].Result = responses.NewValidator(*validator)
+		case "rollup":
+			rollup, err := handler.rollup.GetByID(ctx, result[i].Id)
+			if err != nil {
+				return nil, err
+			}
+			response[i].Result = responses.NewRollup(rollup)
+		default:
+			return nil, errors.Errorf("unknown search text type: %s", response[i].Type)
+		}
+	}
+
+	return response, nil
 }
