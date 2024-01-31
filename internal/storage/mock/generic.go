@@ -1355,11 +1355,12 @@ func (c *TransactionRollbackTxsCall) DoAndReturn(f func(context.Context, types.L
 }
 
 // RollbackValidators mocks base method.
-func (m *MockTransaction) RollbackValidators(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackValidators(ctx context.Context, height types.Level) ([]storage.Validator, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackValidators", ctx, height)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].([]storage.Validator)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // RollbackValidators indicates an expected call of RollbackValidators.
@@ -1375,19 +1376,19 @@ type TransactionRollbackValidatorsCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *TransactionRollbackValidatorsCall) Return(err error) *TransactionRollbackValidatorsCall {
-	c.Call = c.Call.Return(err)
+func (c *TransactionRollbackValidatorsCall) Return(arg0 []storage.Validator, arg1 error) *TransactionRollbackValidatorsCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *TransactionRollbackValidatorsCall) Do(f func(context.Context, types.Level) error) *TransactionRollbackValidatorsCall {
+func (c *TransactionRollbackValidatorsCall) Do(f func(context.Context, types.Level) ([]storage.Validator, error)) *TransactionRollbackValidatorsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *TransactionRollbackValidatorsCall) DoAndReturn(f func(context.Context, types.Level) error) *TransactionRollbackValidatorsCall {
+func (c *TransactionRollbackValidatorsCall) DoAndReturn(f func(context.Context, types.Level) ([]storage.Validator, error)) *TransactionRollbackValidatorsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1949,15 +1950,16 @@ func (c *TransactionSaveTransactionsCall) DoAndReturn(f func(context.Context, ..
 }
 
 // SaveValidators mocks base method.
-func (m *MockTransaction) SaveValidators(ctx context.Context, validators ...*storage.Validator) error {
+func (m *MockTransaction) SaveValidators(ctx context.Context, validators ...*storage.Validator) (int, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
 	for _, a := range validators {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SaveValidators", varargs...)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SaveValidators indicates an expected call of SaveValidators.
@@ -1974,19 +1976,19 @@ type TransactionSaveValidatorsCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *TransactionSaveValidatorsCall) Return(arg0 error) *TransactionSaveValidatorsCall {
-	c.Call = c.Call.Return(arg0)
+func (c *TransactionSaveValidatorsCall) Return(arg0 int, arg1 error) *TransactionSaveValidatorsCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *TransactionSaveValidatorsCall) Do(f func(context.Context, ...*storage.Validator) error) *TransactionSaveValidatorsCall {
+func (c *TransactionSaveValidatorsCall) Do(f func(context.Context, ...*storage.Validator) (int, error)) *TransactionSaveValidatorsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *TransactionSaveValidatorsCall) DoAndReturn(f func(context.Context, ...*storage.Validator) error) *TransactionSaveValidatorsCall {
+func (c *TransactionSaveValidatorsCall) DoAndReturn(f func(context.Context, ...*storage.Validator) (int, error)) *TransactionSaveValidatorsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

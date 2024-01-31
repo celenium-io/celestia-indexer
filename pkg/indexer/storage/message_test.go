@@ -345,11 +345,10 @@ func Test_saveMessages(t *testing.T) {
 
 		tx.EXPECT().
 			SaveValidators(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			MinTimes(1).
-			DoAndReturn(func(_ context.Context, validators ...*storage.Validator) error {
+			Times(1).
+			DoAndReturn(func(_ context.Context, validators ...*storage.Validator) (int, error) {
 				require.Equal(t, tt.wantValidatorsCount, len(validators))
-				return nil
+				return len(validators), nil
 			})
 
 		tx.EXPECT().
@@ -377,8 +376,9 @@ func Test_saveMessages(t *testing.T) {
 			Return(nil)
 
 		t.Run(tt.name, func(t *testing.T) {
-			err := saveMessages(context.Background(), tx, tt.args.messages, tt.args.addrToId)
+			totalValidators, err := saveMessages(context.Background(), tx, tt.args.messages, tt.args.addrToId)
 			require.Equal(t, tt.wantErr, err != nil)
+			require.EqualValues(t, tt.wantValidatorsCount, totalValidators)
 		})
 	}
 }

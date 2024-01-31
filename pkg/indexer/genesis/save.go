@@ -124,7 +124,8 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		return tx.HandleError(ctx, err)
 	}
 
-	if err := tx.SaveValidators(ctx, validators...); err != nil {
+	totalValidators, err := tx.SaveValidators(ctx, validators...)
+	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
@@ -180,6 +181,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		TotalBlobsSize:  data.block.Stats.BlobsSize,
 		TotalAccounts:   totalAccounts,
 		TotalNamespaces: totalNamespaces,
+		TotalValidators: totalValidators,
 	}); err != nil {
 		return tx.HandleError(ctx, err)
 	}

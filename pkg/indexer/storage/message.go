@@ -15,9 +15,9 @@ func saveMessages(
 	tx storage.Transaction,
 	messages []*storage.Message,
 	addrToId map[string]uint64,
-) error {
+) (int, error) {
 	if err := tx.SaveMessages(ctx, messages...); err != nil {
-		return err
+		return 0, err
 	}
 
 	var (
@@ -82,18 +82,18 @@ func saveMessages(
 
 		for j := range messages[i].BlobLogs {
 			if messages[i].BlobLogs[j].Namespace == nil {
-				return errors.New("nil namespace in pay for blob message")
+				return 0, errors.New("nil namespace in pay for blob message")
 			}
 			nsId, ok := namespaces[messages[i].BlobLogs[j].Namespace.String()]
 			if !ok {
-				return errors.Errorf("can't find namespace for pay for blob message: %s", messages[i].BlobLogs[j].Namespace.String())
+				return 0, errors.Errorf("can't find namespace for pay for blob message: %s", messages[i].BlobLogs[j].Namespace.String())
 			}
 			if messages[i].BlobLogs[j].Signer == nil {
-				return errors.New("nil signer address in pay for blob message")
+				return 0, errors.New("nil signer address in pay for blob message")
 			}
 			signerId, ok := addrToId[messages[i].BlobLogs[j].Signer.Address]
 			if !ok {
-				return errors.Errorf("can't find signer address for pay for blob message: %s", messages[i].BlobLogs[j].Signer.Address)
+				return 0, errors.Errorf("can't find signer address for pay for blob message: %s", messages[i].BlobLogs[j].Signer.Address)
 			}
 
 			messages[i].BlobLogs[j].MsgId = messages[i].Id
@@ -106,17 +106,18 @@ func saveMessages(
 	}
 
 	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
-		return err
+		return 0, err
 	}
-	if err := tx.SaveValidators(ctx, validators...); err != nil {
-		return err
+	newValidatorsCount, err := tx.SaveValidators(ctx, validators...)
+	if err != nil {
+		return 0, err
 	}
 	if err := tx.SaveMsgAddresses(ctx, msgAddress...); err != nil {
-		return err
+		return 0, err
 	}
 	if err := tx.SaveBlobLogs(ctx, blobLogs...); err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	return newValidatorsCount, nil
 }

@@ -57,14 +57,15 @@ func (s *StateTestSuite) TestHead() {
 		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return([]*storage.State{
 			{
-				Id:             1,
-				Name:           "test",
-				LastHeight:     100,
-				LastTime:       testTime,
-				TotalTx:        1234,
-				TotalAccounts:  123,
-				TotalFee:       decimal.RequireFromString("2"),
-				TotalBlobsSize: 30,
+				Id:              1,
+				Name:            "test",
+				LastHeight:      100,
+				LastTime:        testTime,
+				TotalTx:         1234,
+				TotalAccounts:   123,
+				TotalFee:        decimal.RequireFromString("2"),
+				TotalBlobsSize:  30,
+				TotalValidators: 10,
 			},
 		}, nil)
 
@@ -81,6 +82,7 @@ func (s *StateTestSuite) TestHead() {
 	s.Require().EqualValues(123, state.TotalAccounts)
 	s.Require().Equal("2", state.TotalFee)
 	s.Require().EqualValues(30, state.TotalBlobsSize)
+	s.Require().EqualValues(10, state.TotalValidators)
 	s.Require().Equal(testTime, state.LastTime)
 }
 

@@ -16,6 +16,7 @@ func Test_updateState(t *testing.T) {
 		block           *storage.Block
 		totalAccounts   int64
 		totalNamespaces int64
+		totalValidators int
 		state           *storage.State
 	}
 
@@ -44,6 +45,7 @@ func Test_updateState(t *testing.T) {
 				},
 				totalAccounts:   10,
 				totalNamespaces: 12,
+				totalValidators: 3,
 				state: &storage.State{
 					Id:              1,
 					Name:            "test",
@@ -56,6 +58,7 @@ func Test_updateState(t *testing.T) {
 					TotalBlobsSize:  1,
 					TotalSupply:     decimal.RequireFromString("1000"),
 					TotalFee:        decimal.RequireFromString("10"),
+					TotalValidators: 1,
 				},
 			},
 			want: storage.State{
@@ -70,12 +73,13 @@ func Test_updateState(t *testing.T) {
 				TotalBlobsSize:  101,
 				TotalSupply:     decimal.RequireFromString("1100"),
 				TotalFee:        decimal.RequireFromString("20"),
+				TotalValidators: 4,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			updateState(tt.args.block, tt.args.totalAccounts, tt.args.totalNamespaces, tt.args.state)
+			updateState(tt.args.block, tt.args.totalAccounts, tt.args.totalNamespaces, tt.args.totalValidators, tt.args.state)
 		})
 	}
 }

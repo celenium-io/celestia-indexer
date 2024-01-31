@@ -470,8 +470,9 @@ func (s *TransactionTestSuite) TestRollbackValidators() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx.RollbackValidators(ctx, 999)
+	validators, err := tx.RollbackValidators(ctx, 999)
 	s.Require().NoError(err)
+	s.Require().Len(validators, 1)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))

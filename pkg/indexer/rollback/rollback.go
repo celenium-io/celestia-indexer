@@ -190,7 +190,8 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 		return tx.HandleError(ctx, err)
 	}
 
-	if err := tx.RollbackValidators(ctx, height); err != nil {
+	removedValidators, err := tx.RollbackValidators(ctx, height)
+	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
@@ -213,6 +214,7 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	state.TotalBlobsSize -= blockStats.BlobsSize
 	state.TotalNamespaces -= totalNamespaces
 	state.TotalAccounts -= int64(len(addresses))
+	state.TotalValidators -= len(removedValidators)
 	state.TotalFee = state.TotalFee.Sub(blockStats.Fee)
 	state.TotalSupply = state.TotalSupply.Sub(blockStats.SupplyChange)
 
