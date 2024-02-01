@@ -150,18 +150,19 @@ func TestWebsocket(t *testing.T) {
 			_, msg, err := dialed.ReadMessage()
 			require.NoError(t, err, err)
 
-			var block responses.Block
-			err = json.Unmarshal(msg, &block)
+			var notification ws.Notification[*responses.Block]
+			err = json.Unmarshal(msg, &notification)
 			require.NoError(t, err, err)
 
-			require.Greater(t, block.Id, uint64(0))
-			require.Greater(t, block.Height, uint64(0))
-			require.False(t, block.Time.IsZero())
-			require.Len(t, block.Hash, 32)
+			require.Equal(t, ws.ChannelBlocks, notification.Channel)
+			require.Greater(t, notification.Body.Id, uint64(0))
+			require.Greater(t, notification.Body.Height, uint64(0))
+			require.False(t, notification.Body.Time.IsZero())
+			require.Len(t, notification.Body.Hash, 32)
 
 			log.Info().
-				Uint64("height", block.Height).
-				Time("block_time", block.Time).
+				Uint64("height", notification.Body.Height).
+				Time("block_time", notification.Body.Time).
 				Msg("new block")
 		}
 	}
