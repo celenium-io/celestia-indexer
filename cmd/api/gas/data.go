@@ -16,13 +16,14 @@ type GasPrice struct {
 }
 
 type info struct {
-	Height       uint64
-	Percentiles  []decimal.Decimal
-	TxCount      int64
-	GasUsed      int64
-	GasWanted    int64
-	Fee          decimal.Decimal
-	GasUsedRatio decimal.Decimal
+	Height         uint64
+	Percentiles    []decimal.Decimal
+	TxCount        int64
+	GasUsed        int64
+	GasWanted      int64
+	Fee            decimal.Decimal
+	GasUsedRatio   decimal.Decimal
+	BlockOccupancy float64
 }
 
 type queue struct {

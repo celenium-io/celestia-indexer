@@ -472,7 +472,7 @@ func initCache(ctx context.Context, e *echo.Echo) {
 var gasTracker *gas.Tracker
 
 func initGasTracker(ctx context.Context, db postgres.Storage) {
-	observer := dispatcher.Observe(storage.ChannelHead)
+	observer := dispatcher.Observe(storage.ChannelBlock)
 	gasTracker = gas.NewTracker(db.State, db.BlockStats, db.Tx, observer)
 	if err := gasTracker.Init(ctx); err != nil {
 		panic(err)
