@@ -34,6 +34,7 @@ type Module struct {
 	modules.BaseModule
 	storage     sdk.Transactable
 	notificator storage.Notificator
+	validators  map[string]uint64
 	indexerName string
 }
 
@@ -49,6 +50,7 @@ func NewModule(
 		BaseModule:  modules.New("storage"),
 		storage:     storage,
 		notificator: notificator,
+		validators:  make(map[string]uint64),
 		indexerName: cfg.Name,
 	}
 
@@ -141,11 +143,19 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 	}
 	block.Stats.BlockTime = uint64(block.Time.Sub(state.LastTime).Milliseconds())
 
-	proposerId, err := tx.GetProposerId(ctx, block.ProposerAddress)
-	if err != nil {
-		return state, errors.Wrap(err, "can't find block proposer")
+	if len(module.validators) > 0 {
+		if id, ok := module.validators[block.ProposerAddress]; ok {
+			block.ProposerId = id
+		} else {
+			return state, errors.Errorf("unknown block proposer: %s", block.ProposerAddress)
+		}
+	} else {
+		proposerId, err := tx.GetProposerId(ctx, block.ProposerAddress)
+		if err != nil {
+			return state, errors.Wrap(err, "can't find block proposer")
+		}
+		block.ProposerId = proposerId
 	}
-	block.ProposerId = proposerId
 
 	if err := tx.Add(ctx, block); err != nil {
 		return state, err
@@ -225,8 +235,12 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	totalValidators, err := saveMessages(ctx, tx, messages, addrToId)
+	totalValidators, err := module.saveMessages(ctx, tx, messages, addrToId)
 	if err != nil {
+		return state, err
+	}
+
+	if err := module.saveBlockSignatures(ctx, tx, block.BlockSignatures, block.Height); err != nil {
 		return state, err
 	}
 

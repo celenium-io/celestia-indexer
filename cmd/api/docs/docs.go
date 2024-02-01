@@ -3757,9 +3757,116 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/validators/{id}/blocks": {
+            "get": {
+                "description": "Get blocks which was proposed by validator",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "validator"
+                ],
+                "summary": "Get blocks which was proposed by validator",
+                "operationId": "get-validator-blocks",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal validator id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Block"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/validators/{id}/uptime": {
+            "get": {
+                "description": "Get validator's uptime and history of signed block",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "validator"
+                ],
+                "summary": "Get validator's uptime and history of signed block",
+                "operationId": "get-validator-uptime",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal validator id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested blocks",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ValidatorUptime"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/ws": {
             "get": {
-                "description": "## Documentation for websocket API\n\n### Subscribe\n\nTo receive updates from websocket API send ` + "`" + `subscribe` + "`" + ` request to server.\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n        \"filters\": {\n            // pass channel filters\n        }\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nNow 2 channels are supported:\n\n* ` + "`" + `head` + "`" + ` - receive information about indexer state. Channel does not have any filters. Subscribe message should looks like:\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"head\"\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nIn that channel messages of ` + "`" + `responses.State` + "`" + ` type will be sent.\n\n* ` + "`" + `blocks` + "`" + ` - receive information about new blocks. Channel does not have any filters. Subscribe message should looks like:\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"blocks\"\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nIn that channel messages of ` + "`" + `responses.Block` + "`" + ` type will be sent.\n\n\n### Unsubscribe\n\nTo unsubscribe send ` + "`" + `unsubscribe` + "`" + ` message containing one of channel name describing above.\n\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"unsubscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
+                "description": "## Documentation for websocket API\n\n### Notification\n\nThe structure of notification is following in all channels:\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"channel\": \"channel_name\",\n    \"body\": \"\u003cobject or array\u003e\"  // depends on channel\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n### Subscribe\n\nTo receive updates from websocket API send ` + "`" + `subscribe` + "`" + ` request to server.\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n        \"filters\": {\n            // pass channel filters\n        }\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nNow 2 channels are supported:\n\n* ` + "`" + `head` + "`" + ` - receive information about indexer state. Channel does not have any filters. Subscribe message should looks like:\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"head\"\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nNotification body of ` + "`" + `responses.State` + "`" + ` type will be sent to the channel.\n\n* ` + "`" + `blocks` + "`" + ` - receive information about new blocks. Channel does not have any filters. Subscribe message should looks like:\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"blocks\"\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nNotification body of ` + "`" + `responses.Block` + "`" + ` type will be sent to the channel.\n\n\n### Unsubscribe\n\nTo unsubscribe send ` + "`" + `unsubscribe` + "`" + ` message containing one of channel name describing above.\n\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n    \"method\": \"unsubscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n    }\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
                 "produces": [
                     "application/json"
                 ],
@@ -4609,6 +4716,19 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.SignedBlocks": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "signed": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
         "responses.State": {
             "type": "object",
             "properties": {
@@ -4910,6 +5030,21 @@ const docTemplate = `{
                 "website": {
                     "type": "string",
                     "example": "https://www.easy2stake.com/"
+                }
+            }
+        },
+        "responses.ValidatorUptime": {
+            "type": "object",
+            "properties": {
+                "blocks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responses.SignedBlocks"
+                    }
+                },
+                "uptime": {
+                    "type": "string",
+                    "example": "0.97"
                 }
             }
         },

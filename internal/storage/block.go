@@ -23,6 +23,7 @@ type IBlock interface {
 	ByHeight(ctx context.Context, height pkgTypes.Level) (Block, error)
 	ByHeightWithStats(ctx context.Context, height pkgTypes.Level) (Block, error)
 	ByHash(ctx context.Context, hash []byte) (Block, error)
+	ByProposer(ctx context.Context, proposerId uint64, limit, offset int) ([]Block, error)
 	ListWithStats(ctx context.Context, limit, offset uint64, order storage.SortOrder) ([]*Block, error)
 }
 
@@ -50,9 +51,10 @@ type Block struct {
 	EvidenceHash       pkgTypes.Hex `bun:"evidence_hash"        comment:"Evidence hash"`
 	ProposerId         uint64       `bun:"proposer_id,nullzero" comment:"Proposer internal id"`
 
-	ChainId         string    `bun:"-"` // internal field for filling state
-	ProposerAddress string    `bun:"-"` // internal field for proposer
-	Addresses       []Address `bun:"-"` // internal field for balance passing
+	ChainId         string           `bun:"-"` // internal field for filling state
+	ProposerAddress string           `bun:"-"` // internal field for proposer
+	Addresses       []Address        `bun:"-"` // internal field for balance passing
+	BlockSignatures []BlockSignature `bun:"-"` // internal field for block signatire
 
 	Txs      []Tx       `bun:"rel:has-many"`
 	Events   []Event    `bun:"rel:has-many"`

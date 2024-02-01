@@ -5,6 +5,8 @@ package parser
 
 import (
 	"context"
+	"encoding/hex"
+	"strings"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -68,6 +70,8 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 		},
 	}
 
+	block.BlockSignatures = p.parseBlockSignatures(b.Block.LastCommit)
+
 	allEvents := make([]storage.Event, 0)
 
 	block.Events = parseEvents(b, b.ResultBlockResults.BeginBlockEvents)
@@ -103,4 +107,21 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 	output := p.MustOutput(OutputName)
 	output.Push(block)
 	return nil
+}
+
+func (p *Module) parseBlockSignatures(commit *types.Commit) []storage.BlockSignature {
+	signs := make([]storage.BlockSignature, 0)
+	for i := range commit.Signatures {
+		if commit.Signatures[i].BlockIDFlag != 2 {
+			continue
+		}
+		signs = append(signs, storage.BlockSignature{
+			Height: types.Level(commit.Height),
+			Time:   commit.Signatures[i].Timestamp,
+			Validator: &storage.Validator{
+				ConsAddress: strings.ToUpper(hex.EncodeToString(commit.Signatures[i].ValidatorAddress)),
+			},
+		})
+	}
+	return signs
 }

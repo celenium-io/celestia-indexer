@@ -23,23 +23,24 @@ type Storage struct {
 	cfg        config.Database
 	scriptsDir string
 
-	Blocks        models.IBlock
-	BlockStats    models.IBlockStats
-	BlobLogs      models.IBlobLog
-	Constants     models.IConstant
-	DenomMetadata models.IDenomMetadata
-	Tx            models.ITx
-	Message       models.IMessage
-	Event         models.IEvent
-	Address       models.IAddress
-	Namespace     models.INamespace
-	Price         models.IPrice
-	State         models.IState
-	Stats         models.IStats
-	Search        models.ISearch
-	Validator     models.IValidator
-	Rollup        models.IRollup
-	Notificator   *Notificator
+	Blocks          models.IBlock
+	BlockStats      models.IBlockStats
+	BlockSignatures models.IBlockSignature
+	BlobLogs        models.IBlobLog
+	Constants       models.IConstant
+	DenomMetadata   models.IDenomMetadata
+	Tx              models.ITx
+	Message         models.IMessage
+	Event           models.IEvent
+	Address         models.IAddress
+	Namespace       models.INamespace
+	Price           models.IPrice
+	State           models.IState
+	Stats           models.IStats
+	Search          models.ISearch
+	Validator       models.IValidator
+	Rollup          models.IRollup
+	Notificator     *Notificator
 }
 
 // Create -
@@ -50,26 +51,27 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 	}
 
 	s := Storage{
-		cfg:           cfg,
-		scriptsDir:    scriptsDir,
-		Storage:       strg,
-		Blocks:        NewBlocks(strg.Connection()),
-		BlockStats:    NewBlockStats(strg.Connection()),
-		BlobLogs:      NewBlobLog(strg.Connection()),
-		Constants:     NewConstant(strg.Connection()),
-		DenomMetadata: NewDenomMetadata(strg.Connection()),
-		Message:       NewMessage(strg.Connection()),
-		Event:         NewEvent(strg.Connection()),
-		Address:       NewAddress(strg.Connection()),
-		Price:         NewPrice(strg.Connection()),
-		Tx:            NewTx(strg.Connection()),
-		State:         NewState(strg.Connection()),
-		Namespace:     NewNamespace(strg.Connection()),
-		Stats:         NewStats(strg.Connection()),
-		Search:        NewSearch(strg.Connection()),
-		Validator:     NewValidator(strg.Connection()),
-		Rollup:        NewRollup(strg.Connection()),
-		Notificator:   NewNotificator(cfg, strg.Connection().DB()),
+		cfg:             cfg,
+		scriptsDir:      scriptsDir,
+		Storage:         strg,
+		Blocks:          NewBlocks(strg.Connection()),
+		BlockStats:      NewBlockStats(strg.Connection()),
+		BlockSignatures: NewBlockSignature(strg.Connection()),
+		BlobLogs:        NewBlobLog(strg.Connection()),
+		Constants:       NewConstant(strg.Connection()),
+		DenomMetadata:   NewDenomMetadata(strg.Connection()),
+		Message:         NewMessage(strg.Connection()),
+		Event:           NewEvent(strg.Connection()),
+		Address:         NewAddress(strg.Connection()),
+		Price:           NewPrice(strg.Connection()),
+		Tx:              NewTx(strg.Connection()),
+		State:           NewState(strg.Connection()),
+		Namespace:       NewNamespace(strg.Connection()),
+		Stats:           NewStats(strg.Connection()),
+		Search:          NewSearch(strg.Connection()),
+		Validator:       NewValidator(strg.Connection()),
+		Rollup:          NewRollup(strg.Connection()),
+		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
 	}
 
 	if err := s.createScripts(ctx, strg.Connection(), "functions", false); err != nil {

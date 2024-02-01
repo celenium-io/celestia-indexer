@@ -340,11 +340,16 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		namespaceByHash.GET("/:hash/:height", namespaceHandlers.GetBlobs)
 	}
 
-	validatorsHandler := handler.NewValidatorHandler(db.Validator)
+	validatorsHandler := handler.NewValidatorHandler(db.Validator, db.Blocks, db.BlockSignatures, db.State, cfg.Indexer.Name)
 	validators := v1.Group("/validators")
 	{
 		validators.GET("", validatorsHandler.List)
-		validators.GET("/:id", validatorsHandler.Get)
+		validator := validators.Group("/:id")
+		{
+			validator.GET("", validatorsHandler.Get)
+			validator.GET("/blocks", validatorsHandler.Blocks)
+			validator.GET("/uptime", validatorsHandler.Uptime)
+		}
 	}
 
 	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.Price, db.State)

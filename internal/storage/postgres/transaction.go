@@ -223,6 +223,14 @@ func (tx Transaction) SaveNamespaceMessage(ctx context.Context, nsMsgs ...models
 	return err
 }
 
+func (tx Transaction) SaveBlockSignatures(ctx context.Context, signs ...models.BlockSignature) error {
+	if len(signs) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&signs).Exec(ctx)
+	return err
+}
+
 const doNotModify = "[do-not-modify]"
 
 type addedValidator struct {
@@ -359,6 +367,12 @@ func (tx Transaction) RollbackMessageAddresses(ctx context.Context, msgIds []uin
 	return
 }
 
+func (tx Transaction) RollbackBlockSignatures(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.BlockSignature)(nil)).
+		Where("height = ?", height).Exec(ctx)
+	return
+}
+
 func (tx Transaction) DeleteBalances(ctx context.Context, ids []uint64) error {
 	if len(ids) == 0 {
 		return nil
@@ -475,4 +489,19 @@ func (tx Transaction) DeleteRollup(ctx context.Context, rollupId uint64) error {
 		Where("id = ?", rollupId).
 		Exec(ctx)
 	return err
+}
+
+func (tx Transaction) RetentionBlockSignatures(ctx context.Context, height types.Level) error {
+	_, err := tx.Tx().NewDelete().Model((*models.BlockSignature)(nil)).
+		Where("height <= ?", height).
+		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) Validators(ctx context.Context) (validators []models.Validator, err error) {
+	err = tx.Tx().NewSelect().
+		Model(&validators).
+		Column("id", "address", "cons_address").
+		Scan(ctx)
+	return
 }

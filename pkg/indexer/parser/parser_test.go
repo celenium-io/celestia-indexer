@@ -10,6 +10,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/shopspring/decimal"
@@ -52,6 +53,15 @@ func getExpectedBlock() storage.Block {
 		Txs:                make([]storage.Tx, 0),
 		Events:             make([]storage.Event, 0),
 		Addresses:          make([]storage.Address, 0),
+		BlockSignatures: []storage.BlockSignature{
+			{
+				Height: 999,
+				Validator: &storage.Validator{
+					ConsAddress: "960AA0366B254E1EA79BDA467EB3AA5C97CBA5AE",
+				},
+				Time: time.Time{},
+			},
+		},
 		Stats: storage.BlockStats{
 			Id:          0,
 			Height:      100,
@@ -97,6 +107,18 @@ func getBlock() types.BlockData {
 				Data: types.Data{
 					Txs:        nil,
 					SquareSize: 0,
+				},
+				LastCommit: &types.Commit{
+					Height: 999,
+					Round:  1,
+					Signatures: []tmTypes.CommitSig{
+						{
+							BlockIDFlag:      tmTypes.BlockIDFlagCommit,
+							ValidatorAddress: testHashAddress,
+							Timestamp:        time.Time{},
+							Signature:        testsuite.MustHexDecode("0011"),
+						},
+					},
 				},
 			},
 		},
