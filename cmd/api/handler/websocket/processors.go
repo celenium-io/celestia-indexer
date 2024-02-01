@@ -8,12 +8,12 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 )
 
-func blockProcessor(block storage.Block) *responses.Block {
+func blockProcessor(block storage.Block) Notification[*responses.Block] {
 	response := responses.NewBlock(block, true)
-	return &response
+	return NewBlockNotification(response)
 }
 
-func headProcessor(state storage.State) *responses.State {
+func headProcessor(state storage.State) Notification[*responses.State] {
 	response := responses.NewState(state)
-	return &response
+	return NewStateNotification(response)
 }

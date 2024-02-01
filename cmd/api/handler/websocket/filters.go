@@ -7,14 +7,14 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 )
 
-type Filterable[M any] interface {
-	Filter(c client, msg M) bool
+type Filterable[M INotification] interface {
+	Filter(c client, msg Notification[M]) bool
 }
 
 type BlockFilter struct{}
 
-func (f BlockFilter) Filter(c client, msg *responses.Block) bool {
-	if msg == nil {
+func (f BlockFilter) Filter(c client, msg Notification[*responses.Block]) bool {
+	if msg.Body == nil {
 		return false
 	}
 	fltrs := c.Filters()
@@ -26,8 +26,8 @@ func (f BlockFilter) Filter(c client, msg *responses.Block) bool {
 
 type HeadFilter struct{}
 
-func (f HeadFilter) Filter(c client, msg *responses.State) bool {
-	if msg == nil {
+func (f HeadFilter) Filter(c client, msg Notification[*responses.State]) bool {
+	if msg.Body == nil {
 		return false
 	}
 	fltrs := c.Filters()
