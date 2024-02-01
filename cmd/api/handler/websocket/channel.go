@@ -9,15 +9,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-type processor[I, M any] func(data I) M
+type processor[I any, M INotification] func(data I) Notification[M]
 
-type Channel[I, M any] struct {
+type Channel[I any, M INotification] struct {
 	clients   *sdkSync.Map[uint64, client]
 	processor processor[I, M]
 	filters   Filterable[M]
 }
 
-func NewChannel[I, M any](processor processor[I, M], filters Filterable[M]) *Channel[I, M] {
+func NewChannel[I any, M INotification](processor processor[I, M], filters Filterable[M]) *Channel[I, M] {
 	return &Channel[I, M]{
 		clients:   sdkSync.NewMap[uint64, client](),
 		processor: processor,

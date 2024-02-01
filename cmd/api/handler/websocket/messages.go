@@ -3,7 +3,10 @@
 
 package websocket
 
-import "github.com/goccy/go-json"
+import (
+	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/goccy/go-json"
+)
 
 // methods
 const (
@@ -34,4 +37,27 @@ type Unsubscribe struct {
 type TransactionFilters struct {
 	Status   []string `json:"status,omitempty"`
 	Messages []string `json:"msg_type,omitempty"`
+}
+
+type INotification interface {
+	*responses.Block | *responses.State
+}
+
+type Notification[T INotification] struct {
+	Channel string `json:"channel"`
+	Body    T      `json:"body"`
+}
+
+func NewBlockNotification(block responses.Block) Notification[*responses.Block] {
+	return Notification[*responses.Block]{
+		Channel: ChannelBlocks,
+		Body:    &block,
+	}
+}
+
+func NewStateNotification(state responses.State) Notification[*responses.State] {
+	return Notification[*responses.State]{
+		Channel: ChannelHead,
+		Body:    &state,
+	}
 }
