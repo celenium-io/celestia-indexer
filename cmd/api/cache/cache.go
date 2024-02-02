@@ -49,7 +49,7 @@ func (c *Cache) listen(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			return
-		case <-c.observer.Blocks():
+		case <-c.observer.Head():
 			c.Clear()
 		}
 	}
