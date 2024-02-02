@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func saveMessages(
+func (module *Module) saveMessages(
 	ctx context.Context,
 	tx storage.Transaction,
 	messages []*storage.Message,
@@ -112,6 +112,11 @@ func saveMessages(
 	if err != nil {
 		return 0, err
 	}
+
+	for i := range validators {
+		module.validators[validators[i].ConsAddress] = validators[i].Id
+	}
+
 	if err := tx.SaveMsgAddresses(ctx, msgAddress...); err != nil {
 		return 0, err
 	}

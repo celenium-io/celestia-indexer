@@ -325,6 +325,41 @@ func (s *TransactionTestSuite) TestSaveBlobLogs() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
+func (s *TransactionTestSuite) TestSaveBlockSignatures() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	bs := make([]storage.BlockSignature, 5)
+	for i := 0; i < 5; i++ {
+		bs[i].ValidatorId = uint64(i + 1)
+		bs[i].Height = 10000
+		bs[i].Time = time.Now()
+	}
+
+	err = tx.SaveBlockSignatures(ctx, bs...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestRollbackBlockSignatures() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackBlockSignatures(ctx, 7965)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
 func (s *TransactionTestSuite) TestRollbackBlock() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
@@ -697,6 +732,39 @@ func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 
 	err = tx.DeleteRollup(ctx, newRollup.Id)
 	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestRetentionBlockSignatures() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RetentionBlockSignatures(ctx, 999)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	signs, err := s.storage.BlockSignatures.List(ctx, 10, 0, sdk.SortOrderDesc)
+	s.Require().NoError(err)
+	s.Require().Len(signs, 1)
+}
+
+func (s *TransactionTestSuite) TestValidators() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	validators, err := tx.Validators(ctx)
+	s.Require().NoError(err)
+	s.Require().Len(validators, 1)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))

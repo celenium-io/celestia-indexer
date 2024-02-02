@@ -331,6 +331,10 @@ func Test_saveMessages(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	module := Module{
+		validators: make(map[string]uint64),
+	}
+
 	for _, tt := range tests {
 		tx := mock.NewMockTransaction(ctrl)
 
@@ -376,7 +380,7 @@ func Test_saveMessages(t *testing.T) {
 			Return(nil)
 
 		t.Run(tt.name, func(t *testing.T) {
-			totalValidators, err := saveMessages(context.Background(), tx, tt.args.messages, tt.args.addrToId)
+			totalValidators, err := module.saveMessages(context.Background(), tx, tt.args.messages, tt.args.addrToId)
 			require.Equal(t, tt.wantErr, err != nil)
 			require.EqualValues(t, tt.wantValidatorsCount, totalValidators)
 		})

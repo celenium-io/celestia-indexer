@@ -198,3 +198,18 @@ func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order 
 
 	return
 }
+
+func (b *Blocks) ByProposer(ctx context.Context, proposerId uint64, limit, offset int) (blocks []storage.Block, err error) {
+	query := b.DB().NewSelect().Model(&blocks).
+		Where("proposer_id = ?", proposerId).
+		Relation("Stats").
+		Order("id desc")
+
+	query = limitScope(query, limit)
+	if offset > 0 {
+		query = query.Offset(offset)
+	}
+
+	err = query.Scan(ctx)
+	return
+}

@@ -617,6 +617,15 @@ definitions:
         example: Easy 2 Stake
         type: string
     type: object
+  responses.SignedBlocks:
+    properties:
+      height:
+        example: 100
+        type: integer
+      signed:
+        example: true
+        type: boolean
+    type: object
   responses.State:
     properties:
       hash:
@@ -842,6 +851,16 @@ definitions:
         type: string
       website:
         example: https://www.easy2stake.com/
+        type: string
+    type: object
+  responses.ValidatorUptime:
+    properties:
+      blocks:
+        items:
+          $ref: '#/definitions/responses.SignedBlocks'
+        type: array
+      uptime:
+        example: "0.97"
         type: string
     type: object
   types.EventType:
@@ -3970,10 +3989,93 @@ paths:
       summary: Get validator info
       tags:
       - validator
+  /v1/validators/{id}/blocks:
+    get:
+      description: Get blocks which was proposed by validator
+      operationId: get-validator-blocks
+      parameters:
+      - description: Internal validator id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Block'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get blocks which was proposed by validator
+      tags:
+      - validator
+  /v1/validators/{id}/uptime:
+    get:
+      description: Get validator's uptime and history of signed block
+      operationId: get-validator-uptime
+      parameters:
+      - description: Internal validator id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Count of requested blocks
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.ValidatorUptime'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get validator's uptime and history of signed block
+      tags:
+      - validator
   /v1/ws:
     get:
       description: |
         ## Documentation for websocket API
+
+        ### Notification
+
+        The structure of notification is following in all channels:
+
+        ```json
+        {
+            "channel": "channel_name",
+            "body": "<object or array>"  // depends on channel
+        }
+        ```
 
         ### Subscribe
 
@@ -4004,7 +4106,7 @@ paths:
         }
         ```
 
-        In that channel messages of `responses.State` type will be sent.
+        Notification body of `responses.State` type will be sent to the channel.
 
         * `blocks` - receive information about new blocks. Channel does not have any filters. Subscribe message should looks like:
 
@@ -4017,7 +4119,7 @@ paths:
         }
         ```
 
-        In that channel messages of `responses.Block` type will be sent.
+        Notification body of `responses.Block` type will be sent to the channel.
 
 
         ### Unsubscribe

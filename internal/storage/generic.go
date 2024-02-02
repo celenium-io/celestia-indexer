@@ -20,6 +20,7 @@ var Models = []any{
 	&Address{},
 	&Block{},
 	&BlockStats{},
+	&BlockSignature{},
 	&Tx{},
 	&Message{},
 	&Event{},
@@ -68,12 +69,11 @@ type Transaction interface {
 	SaveBlobLogs(ctx context.Context, logs ...BlobLog) error
 	SaveValidators(ctx context.Context, validators ...*Validator) (int, error)
 	SaveEvents(ctx context.Context, events ...Event) error
-	LastBlock(ctx context.Context) (block Block, err error)
-	State(ctx context.Context, name string) (state State, err error)
-	Namespace(ctx context.Context, id uint64) (ns Namespace, err error)
 	SaveRollup(ctx context.Context, rollup *Rollup) error
 	UpdateRollup(ctx context.Context, rollup *Rollup) error
 	SaveProviders(ctx context.Context, providers ...RollupProvider) error
+	SaveBlockSignatures(ctx context.Context, signs ...BlockSignature) error
+	RetentionBlockSignatures(ctx context.Context, height types.Level) error
 
 	RollbackBlock(ctx context.Context, height types.Level) error
 	RollbackBlockStats(ctx context.Context, height types.Level) (stats BlockStats, err error)
@@ -85,14 +85,20 @@ type Transaction interface {
 	RollbackNamespaces(ctx context.Context, height types.Level) (ns []Namespace, err error)
 	RollbackValidators(ctx context.Context, height types.Level) ([]Validator, error)
 	RollbackBlobLog(ctx context.Context, height types.Level) error
+	RollbackBlockSignatures(ctx context.Context, height types.Level) (err error)
 	RollbackSigners(ctx context.Context, txIds []uint64) (err error)
 	RollbackMessageAddresses(ctx context.Context, msgIds []uint64) (err error)
 	DeleteBalances(ctx context.Context, ids []uint64) error
-	LastAddressAction(ctx context.Context, address []byte) (uint64, error)
-	LastNamespaceMessage(ctx context.Context, nsId uint64) (msg NamespaceMessage, err error)
-	GetProposerId(ctx context.Context, address string) (uint64, error)
 	DeleteProviders(ctx context.Context, rollupId uint64) error
 	DeleteRollup(ctx context.Context, rollupId uint64) error
+
+	State(ctx context.Context, name string) (state State, err error)
+	LastBlock(ctx context.Context) (block Block, err error)
+	Namespace(ctx context.Context, id uint64) (ns Namespace, err error)
+	LastNamespaceMessage(ctx context.Context, nsId uint64) (msg NamespaceMessage, err error)
+	LastAddressAction(ctx context.Context, address []byte) (uint64, error)
+	GetProposerId(ctx context.Context, address string) (uint64, error)
+	Validators(ctx context.Context) ([]Validator, error)
 }
 
 const (
