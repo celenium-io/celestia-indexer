@@ -46,16 +46,17 @@ func (s *Search) Search(ctx context.Context, query []byte) (results []storage.Se
 
 func (s *Search) SearchText(ctx context.Context, text string) (results []storage.SearchResult, err error) {
 	text = strings.ToUpper(text)
+	text = "%" + text + "%"
 	validatorQuery := s.db.DB().NewSelect().
 		Model((*storage.Validator)(nil)).
 		ColumnExpr("id, moniker as value, 'validator' as type").
-		Where("UPPER(moniker) LIKE ?", text+"%")
+		Where("moniker ILIKE ?", text)
 	rollupQuery := s.db.DB().NewSelect().
 		Model((*storage.Rollup)(nil)).
 		ColumnExpr("id, name as value, 'rollup' as type").
-		Where("UPPER(name) LIKE ?", text+"%")
+		Where("name ILIKE ?", text)
 
-	union := validatorQuery.UnionAll(rollupQuery)
+	union := rollupQuery.UnionAll(validatorQuery)
 
 	err = s.db.DB().NewSelect().
 		TableExpr("(?) as search", union).

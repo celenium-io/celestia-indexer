@@ -191,6 +191,15 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Validator)(nil)).
+			Index("validator_moniker_idx").
+			ColumnExpr("moniker gin_trgm_ops").
+			Using("GIN").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Blob log
 		if _, err := tx.NewCreateIndex().
@@ -214,6 +223,17 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Model((*storage.BlobLog)(nil)).
 			Index("blob_log_tx_id_idx").
 			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// Rollup
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Rollup)(nil)).
+			Index("rollup_name_idx").
+			ColumnExpr("name gin_trgm_ops").
+			Using("GIN").
 			Exec(ctx); err != nil {
 			return err
 		}
