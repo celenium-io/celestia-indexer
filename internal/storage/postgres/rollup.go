@@ -91,7 +91,7 @@ func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe, column 
 		return nil, nil
 	}
 
-	query := r.DB().NewSelect().Order("time desc").Limit(100)
+	query := r.DB().NewSelect().Order("time desc").Limit(100).Group("time")
 
 	switch timeframe {
 	case "hour":
@@ -106,9 +106,9 @@ func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe, column 
 
 	switch column {
 	case "blobs_count":
-		query = query.ColumnExpr("blobs_count as value, time as bucket")
+		query = query.ColumnExpr("sum(blobs_count) as value, time as bucket")
 	case "size":
-		query = query.ColumnExpr("size as value, time as bucket")
+		query = query.ColumnExpr("sum(size) as value, time as bucket")
 	default:
 		return nil, errors.Errorf("invalid column: %s", column)
 	}
