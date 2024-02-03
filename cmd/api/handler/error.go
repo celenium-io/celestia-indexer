@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 
 	sentryecho "github.com/getsentry/sentry-go/echo"
@@ -32,7 +33,9 @@ func badRequestError(c echo.Context, err error) error {
 
 func internalServerError(c echo.Context, err error) error {
 	if hub := sentryecho.GetHubFromContext(c); hub != nil {
-		hub.CaptureMessage(err.Error())
+		if !errors.Is(err, context.Canceled) {
+			hub.CaptureMessage(err.Error())
+		}
 	}
 	return c.JSON(http.StatusInternalServerError, Error{
 		Message: err.Error(),
