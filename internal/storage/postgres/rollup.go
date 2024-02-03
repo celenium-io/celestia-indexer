@@ -120,14 +120,19 @@ func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe, column 
 		query = query.Where("time < ?", req.To)
 	}
 
-	for i := range providers {
-		query.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
-			if providers[i].NamespaceId > 0 {
-				return sq.
-					Where("namespace_id = ?", providers[i].NamespaceId).
-					Where("signer_id = ?", providers[i].AddressId)
+	if len(providers) > 0 {
+		query.WhereGroup(" AND ", func(q *bun.SelectQuery) *bun.SelectQuery {
+			for i := range providers {
+				q.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
+					sq = sq.Where("signer_id = ?", providers[i].AddressId)
+					if providers[i].NamespaceId > 0 {
+						sq = sq.Where("namespace_id = ?", providers[i].NamespaceId)
+					}
+					return sq
+				})
 			}
-			return sq.Where("signer_id = ?", providers[i].AddressId)
+
+			return q
 		})
 	}
 
