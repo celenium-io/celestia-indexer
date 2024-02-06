@@ -441,6 +441,9 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 	if rollup.Name != "" {
 		query = query.Set("name = ?", rollup.Name)
 	}
+	if rollup.Slug != "" {
+		query = query.Set("slug = ?", rollup.Slug)
+	}
 	if rollup.Description != "" {
 		query = query.Set("description = ?", rollup.Description)
 	}

@@ -2058,6 +2058,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/rollup/slug/{slug}": {
+            "get": {
+                "description": "Get rollup by slug",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rollup"
+                ],
+                "summary": "Get rollup by slug",
+                "operationId": "get-rollup-by-slug",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Slug",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Rollup"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/rollup/{id}": {
             "get": {
                 "description": "Get rollup info",
@@ -4594,6 +4639,11 @@ const docTemplate = `{
                     "format": "string",
                     "example": "Rollup name"
                 },
+                "slug": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "rollup_slug"
+                },
                 "twitter": {
                     "type": "string",
                     "format": "string",
@@ -4648,6 +4698,11 @@ const docTemplate = `{
                     "type": "integer",
                     "format": "integer",
                     "example": 1000
+                },
+                "slug": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "rollup_slug"
                 },
                 "twitter": {
                     "type": "string",

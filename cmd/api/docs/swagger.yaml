@@ -523,6 +523,10 @@ definitions:
         example: Rollup name
         format: string
         type: string
+      slug:
+        example: rollup_slug
+        format: string
+        type: string
       twitter:
         example: https://x.com/account
         format: string
@@ -566,6 +570,10 @@ definitions:
         example: 1000
         format: integer
         type: integer
+      slug:
+        example: rollup_slug
+        format: string
+        type: string
       twitter:
         example: https://x.com/account
         format: string
@@ -2849,6 +2857,36 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get count of rollups in network
+      tags:
+      - rollup
+  /v1/rollup/slug/{slug}:
+    get:
+      description: Get rollup by slug
+      operationId: get-rollup-by-slug
+      parameters:
+      - description: Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Rollup'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get rollup by slug
       tags:
       - rollup
   /v1/search:

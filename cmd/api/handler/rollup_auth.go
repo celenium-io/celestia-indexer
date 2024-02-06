@@ -11,6 +11,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"github.com/gosimple/slug"
 	"github.com/labstack/echo/v4"
 )
 
@@ -76,6 +77,7 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRo
 		GitHub:      req.GitHub,
 		Twitter:     req.Twitter,
 		Logo:        req.Logo,
+		Slug:        slug.Make(req.Name),
 	}
 
 	if err := tx.SaveRollup(ctx, &rollup); err != nil {
@@ -160,6 +162,7 @@ func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRo
 	rollup := storage.Rollup{
 		Id:          req.Id,
 		Name:        req.Name,
+		Slug:        slug.Make(req.Name),
 		Description: req.Description,
 		Website:     req.Website,
 		GitHub:      req.GitHub,

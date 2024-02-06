@@ -22,19 +22,21 @@ type IRollup interface {
 	Stats(ctx context.Context, rollupId uint64) (RollupStats, error)
 	Series(ctx context.Context, rollupId uint64, timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
 	Count(ctx context.Context) (int64, error)
+	BySlug(ctx context.Context, slug string) (Rollup, error)
 }
 
 // Rollup -
 type Rollup struct {
 	bun.BaseModel `bun:"rollup" comment:"Table with rollups."`
 
-	Id          uint64 `bun:"id,pk,autoincrement" comment:"Unique internal identity"`
-	Name        string `bun:"name"                comment:"Rollup's name"`
-	Description string `bun:"description"         comment:"Rollup's description"`
-	Website     string `bun:"website"             comment:"Website"`
-	GitHub      string `bun:"github"              comment:"Github repository"`
-	Twitter     string `bun:"twitter"             comment:"Twitter account"`
-	Logo        string `bun:"logo"                comment:"Link to rollup logo"`
+	Id          uint64 `bun:"id,pk,autoincrement"     comment:"Unique internal identity"`
+	Name        string `bun:"name"                    comment:"Rollup's name"`
+	Description string `bun:"description"             comment:"Rollup's description"`
+	Website     string `bun:"website"                 comment:"Website"`
+	GitHub      string `bun:"github"                  comment:"Github repository"`
+	Twitter     string `bun:"twitter"                 comment:"Twitter account"`
+	Logo        string `bun:"logo"                    comment:"Link to rollup logo"`
+	Slug        string `bun:"slug,unique:rollup_slug" comment:"Rollup slug"`
 
 	Providers []*RollupProvider `bun:"rel:has-many,join:id=rollup_id"`
 }

@@ -17,6 +17,7 @@ type RollupWithStats struct {
 	Twitter     string `example:"https://x.com/account"           format:"string"  json:"twitter,omitempty"     swaggertype:"string"`
 	Github      string `example:"https://github.com/account"      format:"string"  json:"github,omitempty"      swaggertype:"string"`
 	Logo        string `example:"https://some_link.com/image.png" format:"string"  json:"logo,omitempty"        swaggertype:"string"`
+	Slug        string `example:"rollup_slug"                     format:"string"  json:"slug"                  swaggertype:"string"`
 
 	BlobsCount int64     `example:"2"                         format:"integer"   json:"blobs_count"       swaggertype:"integer"`
 	Size       int64     `example:"1000"                      format:"integer"   json:"size"              swaggertype:"integer"`
@@ -32,6 +33,7 @@ func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 		Twitter:     r.Twitter,
 		Website:     r.Website,
 		Logo:        r.Logo,
+		Slug:        r.Slug,
 		BlobsCount:  r.BlobsCount,
 		Size:        r.Size,
 		LastAction:  r.LastActionTime,
@@ -46,6 +48,7 @@ type Rollup struct {
 	Twitter     string `example:"https://x.com/account"           format:"string"  json:"twitter,omitempty"     swaggertype:"string"`
 	Github      string `example:"https://github.com/account"      format:"string"  json:"github,omitempty"      swaggertype:"string"`
 	Logo        string `example:"https://some_link.com/image.png" format:"string"  json:"logo,omitempty"        swaggertype:"string"`
+	Slug        string `example:"rollup_slug"                     format:"string"  json:"slug"                  swaggertype:"string"`
 }
 
 func NewRollup(r *storage.Rollup) Rollup {
@@ -57,5 +60,6 @@ func NewRollup(r *storage.Rollup) Rollup {
 		Twitter:     r.Twitter,
 		Website:     r.Website,
 		Logo:        r.Logo,
+		Slug:        r.Slug,
 	}
 }
