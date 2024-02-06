@@ -16,6 +16,7 @@ require (
 	github.com/go-testfixtures/testfixtures/v3 v3.9.0
 	github.com/goccy/go-json v0.10.2
 	github.com/gorilla/websocket v1.5.0
+	github.com/gosimple/slug v1.13.1
 	github.com/grafana/pyroscope-go v1.0.3
 	github.com/json-iterator/go v1.1.12
 	github.com/labstack/echo-contrib v0.15.0
@@ -132,7 +133,6 @@ require (
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
-	github.com/gosimple/slug v1.13.1 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.4 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
