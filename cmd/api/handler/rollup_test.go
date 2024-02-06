@@ -28,6 +28,7 @@ var (
 		GitHub:      "https://githib.com",
 		Twitter:     "https://x.com",
 		Logo:        "image.png",
+		Slug:        "test-rollup",
 	}
 	testRollupWithStats = storage.RollupWithStats{
 		Rollup: testRollup,
@@ -93,6 +94,7 @@ func (s *RollupTestSuite) TestLeaderboard() {
 	s.Require().EqualValues(1, rollup.Id)
 	s.Require().EqualValues("test rollup", rollup.Name)
 	s.Require().EqualValues("image.png", rollup.Logo)
+	s.Require().EqualValues("test-rollup", rollup.Slug)
 	s.Require().EqualValues(100, rollup.BlobsCount)
 	s.Require().EqualValues(1000, rollup.Size)
 }
@@ -126,6 +128,7 @@ func (s *RollupTestSuite) TestGet() {
 	s.Require().EqualValues(1, rollup.Id)
 	s.Require().EqualValues("test rollup", rollup.Name)
 	s.Require().EqualValues("image.png", rollup.Logo)
+	s.Require().EqualValues("test-rollup", rollup.Slug)
 	s.Require().EqualValues(10, rollup.Size)
 	s.Require().EqualValues(11, rollup.BlobsCount)
 	s.Require().EqualValues(testTime, rollup.LastAction)
@@ -242,4 +245,39 @@ func (s *RollupTestSuite) TestStats() {
 			s.Require().Len(histogram, 1)
 		}
 	}
+}
+
+func (s *RollupTestSuite) TestBySlug() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/rollup/slug/:slug")
+	c.SetParamNames("slug")
+	c.SetParamValues("test")
+
+	s.rollups.EXPECT().
+		BySlug(gomock.Any(), "test").
+		Return(testRollup, nil)
+
+	s.rollups.EXPECT().
+		Stats(gomock.Any(), uint64(1)).
+		Return(storage.RollupStats{
+			Size:           10,
+			BlobsCount:     11,
+			LastActionTime: testTime,
+		}, nil)
+
+	s.Require().NoError(s.handler.BySlug(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var rollup responses.RollupWithStats
+	err := json.NewDecoder(rec.Body).Decode(&rollup)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1, rollup.Id)
+	s.Require().EqualValues("test rollup", rollup.Name)
+	s.Require().EqualValues("test-rollup", rollup.Slug)
+	s.Require().EqualValues("image.png", rollup.Logo)
+	s.Require().EqualValues(10, rollup.Size)
+	s.Require().EqualValues(11, rollup.BlobsCount)
+	s.Require().EqualValues(testTime, rollup.LastAction)
 }

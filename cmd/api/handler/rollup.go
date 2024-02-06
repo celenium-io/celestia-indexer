@@ -278,3 +278,41 @@ func (handler RollupHandler) Count(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, count)
 }
+
+type rollupBySlugRequest struct {
+	Slug string `param:"slug" validate:"required"`
+}
+
+// BySlug godoc
+//
+//	@Summary		Get rollup by slug
+//	@Description	Get rollup by slug
+//	@Tags			rollup
+//	@ID				get-rollup-by-slug
+//	@Param			slug	path	string	true	"Slug"
+//	@Produce		json
+//	@Success		200	{object}	responses.Rollup
+//	@Success		204
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/rollup/slug/{slug} [get]
+func (handler RollupHandler) BySlug(c echo.Context) error {
+	req, err := bindAndValidate[rollupBySlugRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	rollup, err := handler.rollups.BySlug(c.Request().Context(), req.Slug)
+	if err != nil {
+		return handleError(c, err, handler.rollups)
+	}
+
+	stats, err := handler.rollups.Stats(c.Request().Context(), rollup.Id)
+	if err != nil {
+		return handleError(c, err, handler.rollups)
+	}
+	return c.JSON(http.StatusOK, responses.NewRollupWithStats(storage.RollupWithStats{
+		Rollup:      rollup,
+		RollupStats: stats,
+	}))
+}

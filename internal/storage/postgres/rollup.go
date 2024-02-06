@@ -173,3 +173,8 @@ func (r *Rollup) Stats(ctx context.Context, rollupId uint64) (stats storage.Roll
 	err = query.Scan(ctx, &stats)
 	return
 }
+
+func (r *Rollup) BySlug(ctx context.Context, slug string) (rollup storage.Rollup, err error) {
+	err = r.DB().NewSelect().Model(&rollup).Where("slug = ?", slug).Limit(1).Scan(ctx)
+	return
+}

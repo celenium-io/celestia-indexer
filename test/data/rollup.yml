@@ -5,6 +5,7 @@
   twitter: https://x.com/rollup1
   github: https://github.com/rollup1
   logo: https://rollup1.com/image.png
+  slug: rollup_1
 - id: 2
   name: Rollup 2
   description: The second
@@ -12,6 +13,7 @@
   twitter: https://x.com/rollup2
   github: https://github.com/rollup2
   logo: https://rollup2.com/image.png
+  slug: rollup_2
 - id: 3
   name: Rollup 3
   description: The third
@@ -19,3 +21,4 @@
   twitter: https://x.com/rollup3
   github: https://github.com/rollup3
   logo: https://rollup3.com/image.png
+  slug: rollup_3

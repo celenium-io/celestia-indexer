@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 PK Lab AG <contact@pklab.io>
+// SPDX-License-Identifier: MIT
+
 package postgres
 
 import (
@@ -74,4 +77,15 @@ func (s *StorageTestSuite) TestRollupSeries() {
 
 		}
 	}
+}
+
+func (s *StorageTestSuite) TestRollupBySlug() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	rollup, err := s.storage.Rollup.BySlug(ctx, "rollup_1")
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(1, rollup.Id)
+	s.Require().EqualValues("Rollup 1", rollup.Name)
 }
