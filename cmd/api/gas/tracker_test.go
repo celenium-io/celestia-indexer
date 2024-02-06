@@ -63,11 +63,12 @@ func TestTracker_processBlock(t *testing.T) {
 	t.Run("empty block", func(t *testing.T) {
 		tracker := NewTracker(nil, nil, tx, nil)
 		blockStats := storage.BlockStats{
-			Height:   1,
-			TxCount:  0,
-			GasLimit: 0,
-			GasUsed:  0,
-			Fee:      decimal.New(0, 1),
+			Height:       1,
+			TxCount:      0,
+			GasLimit:     0,
+			GasUsed:      0,
+			Fee:          decimal.New(0, 1),
+			BytesInBlock: 0,
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
@@ -78,26 +79,28 @@ func TestTracker_processBlock(t *testing.T) {
 		require.Len(t, tracker.q.data, 1)
 	})
 
-	tx.EXPECT().
-		Gas(gomock.Any(), types.Level(1)).
-		Return([]storage.Gas{
-			{
-				GasWanted: 1000,
-				GasUsed:   500,
-				Fee:       decimal.RequireFromString("2000"),
-				GasPrice:  decimal.RequireFromString("2"),
-			},
-		}, nil).
-		MaxTimes(1)
-
 	t.Run("block with transaction", func(t *testing.T) {
+
+		tx.EXPECT().
+			Gas(gomock.Any(), types.Level(1)).
+			Return([]storage.Gas{
+				{
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("2000"),
+					GasPrice:  decimal.RequireFromString("2"),
+				},
+			}, nil).
+			Times(1)
+
 		tracker := NewTracker(nil, nil, tx, nil)
 		blockStats := storage.BlockStats{
-			Height:   1,
-			TxCount:  1,
-			GasLimit: 1000,
-			GasUsed:  500,
-			Fee:      decimal.RequireFromString("2000"),
+			Height:       1,
+			TxCount:      1,
+			GasLimit:     1000,
+			GasUsed:      500,
+			Fee:          decimal.RequireFromString("2000"),
+			BytesInBlock: maxBlockSize - 1000,
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
@@ -116,36 +119,38 @@ func TestTracker_processBlock(t *testing.T) {
 		require.EqualValues(t, "2", item.Percentiles[2].StringFixed(0))
 	})
 
-	tx.EXPECT().
-		Gas(gomock.Any(), types.Level(2)).
-		Return([]storage.Gas{
-			{
-				GasWanted: 1000,
-				GasUsed:   500,
-				Fee:       decimal.RequireFromString("1000"),
-				GasPrice:  decimal.RequireFromString("1"),
-			}, {
-				GasWanted: 1000,
-				GasUsed:   500,
-				Fee:       decimal.RequireFromString("2000"),
-				GasPrice:  decimal.RequireFromString("2"),
-			}, {
-				GasWanted: 1000,
-				GasUsed:   500,
-				Fee:       decimal.RequireFromString("3000"),
-				GasPrice:  decimal.RequireFromString("3"),
-			},
-		}, nil).
-		MaxTimes(1)
-
 	t.Run("block with 3 transaction", func(t *testing.T) {
+
+		tx.EXPECT().
+			Gas(gomock.Any(), types.Level(2)).
+			Return([]storage.Gas{
+				{
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("1000"),
+					GasPrice:  decimal.RequireFromString("1"),
+				}, {
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("2000"),
+					GasPrice:  decimal.RequireFromString("2"),
+				}, {
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("3000"),
+					GasPrice:  decimal.RequireFromString("3"),
+				},
+			}, nil).
+			Times(1)
+
 		tracker := NewTracker(nil, nil, tx, nil)
 		blockStats := storage.BlockStats{
-			Height:   2,
-			TxCount:  3,
-			GasLimit: 3000,
-			GasUsed:  1500,
-			Fee:      decimal.RequireFromString("6000"),
+			Height:       2,
+			TxCount:      3,
+			GasLimit:     3000,
+			GasUsed:      1500,
+			Fee:          decimal.RequireFromString("6000"),
+			BytesInBlock: maxBlockSize - 1000,
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
@@ -162,6 +167,56 @@ func TestTracker_processBlock(t *testing.T) {
 		require.EqualValues(t, "1", item.Percentiles[0].StringFixed(0))
 		require.EqualValues(t, "2", item.Percentiles[1].StringFixed(0))
 		require.EqualValues(t, "3", item.Percentiles[2].StringFixed(0))
+	})
+
+	t.Run("empty block with 3 transaction", func(t *testing.T) {
+
+		tx.EXPECT().
+			Gas(gomock.Any(), types.Level(2)).
+			Return([]storage.Gas{
+				{
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("1000"),
+					GasPrice:  decimal.RequireFromString("1"),
+				}, {
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("2000"),
+					GasPrice:  decimal.RequireFromString("2"),
+				}, {
+					GasWanted: 1000,
+					GasUsed:   500,
+					Fee:       decimal.RequireFromString("3000"),
+					GasPrice:  decimal.RequireFromString("3"),
+				},
+			}, nil).
+			Times(1)
+
+		tracker := NewTracker(nil, nil, tx, nil)
+		blockStats := storage.BlockStats{
+			Height:       2,
+			TxCount:      3,
+			GasLimit:     3000,
+			GasUsed:      1500,
+			Fee:          decimal.RequireFromString("6000"),
+			BytesInBlock: 1000,
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+		defer cancel()
+
+		err := tracker.processBlock(ctx, blockStats)
+		require.NoError(t, err)
+		require.Len(t, tracker.q.data, 1)
+
+		item := tracker.q.data[0]
+		require.EqualValues(t, "0.50", item.GasUsedRatio.StringFixed(2))
+		require.EqualValues(t, 3, item.TxCount)
+		require.Len(t, item.Percentiles, 3)
+		require.EqualValues(t, "1", item.Percentiles[0].StringFixed(0))
+		require.EqualValues(t, "1", item.Percentiles[1].StringFixed(0))
+		require.EqualValues(t, "1", item.Percentiles[2].StringFixed(0))
 	})
 }
 

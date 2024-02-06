@@ -16,14 +16,17 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
+	coreTypes "github.com/tendermint/tendermint/types"
 )
 
 const (
-	blockCount = 100
+	blockCount        = 100
+	emptyBlockPercent = .90
 )
 
 var (
-	percentiles = []float64{.1, .5, .99}
+	percentiles  = []float64{.10, .50, .99}
+	maxBlockSize = coreTypes.MaxDataBytesNoEvidence(1974272, 100)
 )
 
 type Tracker struct {
@@ -115,13 +118,14 @@ func (tracker *Tracker) Init(ctx context.Context) error {
 
 func (tracker *Tracker) processBlock(ctx context.Context, blockStat storage.BlockStats) error {
 	data := info{
-		Height:       uint64(blockStat.Height),
-		TxCount:      blockStat.TxCount,
-		GasUsed:      blockStat.GasUsed,
-		GasWanted:    blockStat.GasLimit,
-		Fee:          blockStat.Fee,
-		GasUsedRatio: decimal.New(0, 1),
-		Percentiles:  make([]decimal.Decimal, 0),
+		Height:         uint64(blockStat.Height),
+		TxCount:        blockStat.TxCount,
+		GasUsed:        blockStat.GasUsed,
+		GasWanted:      blockStat.GasLimit,
+		Fee:            blockStat.Fee,
+		GasUsedRatio:   decimal.New(0, 1),
+		Percentiles:    make([]decimal.Decimal, 0),
+		BlockOccupancy: float64(blockStat.BytesInBlock) / float64(maxBlockSize),
 	}
 
 	for range percentiles {
@@ -144,6 +148,13 @@ func (tracker *Tracker) processBlock(ctx context.Context, blockStat storage.Bloc
 	sort.Sort(storage.ByGasPrice(txs))
 
 	tracker.compute(txs, blockStat.GasLimit, &data)
+
+	if data.BlockOccupancy < emptyBlockPercent {
+		// If block occupancy is less than empty block threshold set all percentiles to slow.
+		for i := 1; i < len(data.Percentiles); i++ {
+			data.Percentiles[i] = data.Percentiles[0].Copy()
+		}
+	}
 
 	tracker.q.Push(data)
 	return nil
