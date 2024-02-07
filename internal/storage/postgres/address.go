@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+
 	"github.com/uptrace/bun"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -34,13 +35,16 @@ func (a *Address) ByHash(ctx context.Context, hash []byte) (address storage.Addr
 }
 
 func (a *Address) ListWithBalance(ctx context.Context, filters storage.AddressListFilter) (result []storage.Address, err error) {
-	query := a.DB().NewSelect().Model(&result).
-		Offset(filters.Offset).
-		Relation("Balance")
+	addressQuery := a.DB().NewSelect().Model((*storage.Address)(nil)).
+		Offset(filters.Offset)
+	addressQuery = addressListFilter(addressQuery, filters)
 
-	query = addressListFilter(query, filters)
-
-	err = query.Scan(ctx)
+	err = a.DB().NewSelect().
+		TableExpr("(?) as address", addressQuery).
+		ColumnExpr("address.*").
+		ColumnExpr("balance.currency as balance__currency, balance.total as balance__total").
+		Join("left join balance on balance.id = address.id").
+		Scan(ctx, &result)
 	return
 }
 
