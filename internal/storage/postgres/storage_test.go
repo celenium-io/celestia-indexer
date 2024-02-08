@@ -625,7 +625,10 @@ func (s *StorageTestSuite) TestTxGas() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	txs, err := s.storage.Tx.Gas(ctx, 1000)
+	ts, err := time.Parse(time.RFC3339, "2023-07-04T03:10:57+00:00")
+	s.Require().NoError(err)
+
+	txs, err := s.storage.Tx.Gas(ctx, 1000, ts)
 	s.Require().NoError(err)
 	s.Require().Len(txs, 2)
 

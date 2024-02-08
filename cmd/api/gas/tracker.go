@@ -141,7 +141,7 @@ func (tracker *Tracker) processBlock(ctx context.Context, blockStat storage.Bloc
 		return nil
 	}
 
-	txs, err := tracker.tx.Gas(ctx, blockStat.Height)
+	txs, err := tracker.tx.Gas(ctx, blockStat.Height, blockStat.Time)
 	if err != nil {
 		return err
 	}
