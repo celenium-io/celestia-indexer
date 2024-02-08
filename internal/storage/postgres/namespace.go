@@ -71,16 +71,24 @@ func (n *Namespace) Messages(ctx context.Context, id uint64, limit, offset int) 
 
 // MessagesByHeight -
 func (n *Namespace) MessagesByHeight(ctx context.Context, height pkgTypes.Level, limit, offset int) (msgs []storage.NamespaceMessage, err error) {
-	query := n.DB().NewSelect().Model(&msgs).
-		Where("namespace_message.height = ?", height).
-		Relation("Namespace").
-		Relation("Message").
-		Relation("Tx")
-	query = limitScope(query, limit)
+	subQuery := n.DB().NewSelect().
+		Model((*storage.NamespaceMessage)(nil)).
+		Where("height = ?", height)
+
+	subQuery = limitScope(subQuery, limit)
 	if offset > 0 {
-		query = query.Offset(offset)
+		subQuery = subQuery.Offset(offset)
 	}
-	err = query.Scan(ctx)
+
+	err = n.DB().NewSelect().TableExpr("(?) as namespace_message", subQuery).
+		ColumnExpr("namespace_message.namespace_id, namespace_message.msg_id, namespace_message.tx_id, namespace_message.time, namespace_message.height, namespace_message.size").
+		ColumnExpr("namespace.id AS namespace__id, namespace.first_height AS namespace__first_height, namespace.last_height AS namespace__last_height, namespace.version AS namespace__version, namespace.namespace_id AS namespace__namespace_id, namespace.size AS namespace__size, namespace.pfb_count AS namespace__pfb_count, namespace.blobs_count AS namespace__blobs_count, namespace.reserved AS namespace__reserved, namespace.last_message_time AS namespace__last_message_time").
+		ColumnExpr("message.id AS message__id, message.height AS message__height, message.time AS message__time, message.position AS message__position, message.type AS message__type, message.tx_id AS message__tx_id, message.data AS message__data").
+		ColumnExpr("tx.id AS tx__id, tx.height AS tx__height, tx.time AS tx__time, tx.position AS tx__position, tx.gas_wanted AS tx__gas_wanted, tx.gas_used AS tx__gas_used, tx.timeout_height AS tx__timeout_height, tx.events_count AS tx__events_count, tx.messages_count AS tx__messages_count, tx.fee AS tx__fee, tx.status AS tx__status, tx.error AS tx__error, tx.codespace AS tx__codespace, tx.hash AS tx__hash, tx.memo AS tx__memo, tx.message_types AS tx__message_types").
+		Join("left join namespace on namespace.id = namespace_message.namespace_id").
+		Join("left join message on message.id = namespace_message.msg_id").
+		Join("left join tx on tx.id = namespace_message.tx_id").
+		Scan(ctx, &msgs)
 	return
 }
 
