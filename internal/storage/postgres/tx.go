@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -78,13 +79,14 @@ func (tx *Tx) Genesis(ctx context.Context, limit, offset int, sortOrder sdk.Sort
 	return
 }
 
-func (tx *Tx) Gas(ctx context.Context, height types.Level) (response []storage.Gas, err error) {
+func (tx *Tx) Gas(ctx context.Context, height types.Level, ts time.Time) (response []storage.Gas, err error) {
 	err = tx.DB().NewSelect().
 		Model((*storage.Tx)(nil)).
 		ColumnExpr("gas_wanted, gas_used, fee, (CASE WHEN gas_wanted > 0 THEN fee / gas_wanted ELSE 0 END) as gas_price").
 		Where("height = ?", height).
 		Where("gas_used <= gas_wanted").
 		Where("fee > 0").
+		Where("time = ?", ts).
 		Scan(ctx, &response)
 	return
 }

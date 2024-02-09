@@ -24,7 +24,7 @@ type ITx interface {
 	ByIdWithRelations(ctx context.Context, id uint64) (Tx, error)
 	ByAddress(ctx context.Context, addressId uint64, fltrs TxFilter) ([]Tx, error)
 	Genesis(ctx context.Context, limit, offset int, sortOrder storage.SortOrder) ([]Tx, error)
-	Gas(ctx context.Context, height pkgTypes.Level) ([]Gas, error)
+	Gas(ctx context.Context, height pkgTypes.Level, ts time.Time) ([]Gas, error)
 }
 
 type Gas struct {

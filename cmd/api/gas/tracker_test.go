@@ -59,10 +59,12 @@ func TestTracker_processBlock(t *testing.T) {
 	defer ctrl.Finish()
 
 	tx := mock.NewMockITx(ctrl)
+	ts := time.Now()
 
 	t.Run("empty block", func(t *testing.T) {
 		tracker := NewTracker(nil, nil, tx, nil)
 		blockStats := storage.BlockStats{
+			Time:         ts,
 			Height:       1,
 			TxCount:      0,
 			GasLimit:     0,
@@ -82,7 +84,7 @@ func TestTracker_processBlock(t *testing.T) {
 	t.Run("block with transaction", func(t *testing.T) {
 
 		tx.EXPECT().
-			Gas(gomock.Any(), types.Level(1)).
+			Gas(gomock.Any(), types.Level(1), gomock.Any()).
 			Return([]storage.Gas{
 				{
 					GasWanted: 1000,
@@ -95,6 +97,7 @@ func TestTracker_processBlock(t *testing.T) {
 
 		tracker := NewTracker(nil, nil, tx, nil)
 		blockStats := storage.BlockStats{
+			Time:         ts,
 			Height:       1,
 			TxCount:      1,
 			GasLimit:     1000,
@@ -122,7 +125,7 @@ func TestTracker_processBlock(t *testing.T) {
 	t.Run("block with 3 transaction", func(t *testing.T) {
 
 		tx.EXPECT().
-			Gas(gomock.Any(), types.Level(2)).
+			Gas(gomock.Any(), types.Level(2), gomock.Any()).
 			Return([]storage.Gas{
 				{
 					GasWanted: 1000,
@@ -145,6 +148,7 @@ func TestTracker_processBlock(t *testing.T) {
 
 		tracker := NewTracker(nil, nil, tx, nil)
 		blockStats := storage.BlockStats{
+			Time:         ts,
 			Height:       2,
 			TxCount:      3,
 			GasLimit:     3000,
@@ -172,7 +176,7 @@ func TestTracker_processBlock(t *testing.T) {
 	t.Run("empty block with 3 transaction", func(t *testing.T) {
 
 		tx.EXPECT().
-			Gas(gomock.Any(), types.Level(2)).
+			Gas(gomock.Any(), types.Level(2), gomock.Any()).
 			Return([]storage.Gas{
 				{
 					GasWanted: 1000,
