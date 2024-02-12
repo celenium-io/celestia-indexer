@@ -4953,6 +4953,12 @@ const docTemplate = `{
                     "format": "int64",
                     "example": 11
                 },
+                "signers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "status": {
                     "allOf": [
                         {

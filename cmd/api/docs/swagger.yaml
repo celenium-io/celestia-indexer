@@ -765,6 +765,10 @@ definitions:
         example: 11
         format: int64
         type: integer
+      signers:
+        items:
+          type: string
+        type: array
       status:
         allOf:
         - $ref: '#/definitions/github_com_celenium-io_celestia-indexer_internal_storage_types.Status'
