@@ -12,6 +12,7 @@ import (
 	"github.com/dipdup-net/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 )
 
 // Tx -
@@ -26,26 +27,92 @@ func NewTx(db *database.Bun) *Tx {
 	}
 }
 
+func (tx *Tx) getSigners(ctx context.Context, txId ...uint64) (signers []storage.Signer, err error) {
+	subQuery := tx.DB().NewSelect().
+		Model((*storage.Signer)(nil)).
+		Where("tx_id IN (?)", bun.In(txId))
+
+	err = tx.DB().NewSelect().TableExpr("(?) as signer", subQuery).
+		ColumnExpr("address.address as address__address").
+		ColumnExpr("signer.*").
+		Join("left join address on address.id = signer.address_id").
+		Scan(ctx, &signers)
+	return
+}
+
+func (tx *Tx) setSigners(ctx context.Context, txs []storage.Tx) error {
+	ids := make([]uint64, len(txs))
+	for i := range ids {
+		ids[i] = txs[i].Id
+	}
+
+	signers, err := tx.getSigners(ctx, ids...)
+	if err != nil {
+		return err
+	}
+
+	for i := range signers {
+		for j := range txs {
+			if txs[j].Id == signers[i].TxId && signers[i].Address != nil {
+				txs[j].Signers = append(txs[j].Signers, *signers[i].Address)
+				break
+			}
+		}
+	}
+	return nil
+}
+
 func (tx *Tx) ByHash(ctx context.Context, hash []byte) (transaction storage.Tx, err error) {
-	err = tx.DB().NewSelect().Model(&transaction).
+	if err = tx.DB().NewSelect().Model(&transaction).
 		Where("hash = ?", hash).
-		Scan(ctx)
+		Scan(ctx); err != nil {
+		return
+	}
+
+	signers, err := tx.getSigners(ctx, transaction.Id)
+	if err != nil {
+		return
+	}
+
+	transaction.Signers = make([]storage.Address, len(signers))
+	for i := range signers {
+		if signers[i].Address != nil {
+			transaction.Signers[i] = *signers[i].Address
+		}
+	}
 	return
 }
 
 func (tx *Tx) Filter(ctx context.Context, fltrs storage.TxFilter) (txs []storage.Tx, err error) {
 	query := tx.DB().NewSelect().Model(&txs).Offset(fltrs.Offset)
 	query = txFilter(query, fltrs)
+	if err = query.Scan(ctx); err != nil {
+		return
+	}
 
-	err = query.Scan(ctx)
+	err = tx.setSigners(ctx, txs)
 	return
 }
 
 func (tx *Tx) ByIdWithRelations(ctx context.Context, id uint64) (transaction storage.Tx, err error) {
-	err = tx.DB().NewSelect().Model(&transaction).
+	if err = tx.DB().NewSelect().Model(&transaction).
 		Where("id = ?", id).
 		Relation("Messages").
-		Scan(ctx)
+		Scan(ctx); err != nil {
+		return
+	}
+
+	signers, err := tx.getSigners(ctx, transaction.Id)
+	if err != nil {
+		return
+	}
+
+	transaction.Signers = make([]storage.Address, len(signers))
+	for i := range signers {
+		if signers[i].Address != nil {
+			transaction.Signers[i] = *signers[i].Address
+		}
+	}
 	return
 }
 

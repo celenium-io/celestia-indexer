@@ -1,2 +1,8 @@
 - tx_id: 1
   address_id: 1
+- tx_id: 2
+  address_id: 1
+- tx_id: 2
+  address_id: 2
+- tx_id: 3
+  address_id: 1
