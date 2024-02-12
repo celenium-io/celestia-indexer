@@ -4,6 +4,7 @@
   tx_count: 0
   events_count: 0
   blobs_size: 100
+  blobs_count: 2
   fee: 497012
   supply_change: 23590834
   inflation_rate: 0
@@ -17,6 +18,7 @@
   tx_count: 2
   events_count: 0
   blobs_size: 900
+  blobs_count: 2
   fee: 2873468273
   supply_change: 30930476
   inflation_rate: 0.080000000000000000
@@ -30,6 +32,7 @@
   tx_count: 1
   events_count: 0
   blobs_size: 800
+  blobs_count: 1
   fee: 1726351723
   supply_change: 20930476
   inflation_rate: 0.080000000000000000
