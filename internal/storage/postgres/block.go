@@ -81,15 +81,19 @@ func (b *Blocks) ByHeightWithStats(ctx context.Context, height types.Level) (blo
 
 // ByIdWithRelations -
 func (b *Blocks) ByIdWithRelations(ctx context.Context, id uint64) (block storage.Block, err error) {
-
-	err = b.DB().NewSelect().Model(&block).
+	subQuery := b.DB().NewSelect().Model(&block).
 		Where("block.id = ?", id).
-		Relation("Stats").
-		Relation("Proposer", func(sq *bun.SelectQuery) *bun.SelectQuery {
-			return sq.Column("id", "cons_address", "moniker")
-		}).
-		Limit(1).
-		Scan(ctx)
+		Limit(1)
+
+	err = b.DB().NewSelect().
+		ColumnExpr("block.id, block.height, block.time, block.version_block, block.version_app, block.message_types, block.hash, block.parent_hash, block.last_commit_hash, block.data_hash, block.validators_hash, block.next_validators_hash, block.consensus_hash, block.app_hash, block.last_results_hash, block.evidence_hash, block.proposer_id").
+		ColumnExpr("stats.id AS stats__id, stats.height AS stats__height, stats.time AS stats__time, stats.tx_count AS stats__tx_count, stats.events_count AS stats__events_count, stats.blobs_size AS stats__blobs_size, stats.block_time AS stats__block_time, stats.gas_limit AS stats__gas_limit, stats.gas_used AS stats__gas_used, stats.supply_change AS stats__supply_change, stats.inflation_rate AS stats__inflation_rate, stats.fee AS stats__fee, stats.bytes_in_block AS stats__bytes_in_block").
+		ColumnExpr("proposer.id AS proposer__id, proposer.cons_address AS proposer__cons_address, proposer.moniker AS proposer__moniker").
+		With("q", subQuery).
+		TableExpr("q as block").
+		Join("LEFT JOIN block_stats AS stats ON (stats.id = block.id) AND (stats.time = block.time)").
+		Join("LEFT JOIN validator AS proposer ON (proposer.id = block.proposer_id)").
+		Scan(ctx, &block)
 
 	if err != nil {
 		return
@@ -99,6 +103,7 @@ func (b *Blocks) ByIdWithRelations(ctx context.Context, id uint64) (block storag
 	err = b.DB().NewSelect().Model((*storage.Message)(nil)).
 		ColumnExpr("message.type, count(*)").
 		Where("message.height = ?", block.Height).
+		Where("message.time = ?", block.Time).
 		Group("message.type").
 		Scan(ctx, &msgsStats)
 
