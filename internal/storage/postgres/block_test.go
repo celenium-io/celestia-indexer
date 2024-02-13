@@ -62,7 +62,7 @@ func (s *StorageTestSuite) TestBlockByHeightWithStats() {
 	expectedStats := storage.BlockStats{
 		Id:            2,
 		Height:        1000,
-		TxCount:       0,
+		TxCount:       2,
 		EventsCount:   0,
 		BlobsSize:     1234,
 		BlockTime:     11000,
@@ -106,7 +106,7 @@ func (s *StorageTestSuite) TestBlockByIdWithRelations() {
 	expectedStats := storage.BlockStats{
 		Id:            2,
 		Height:        1000,
-		TxCount:       0,
+		TxCount:       2,
 		EventsCount:   0,
 		BlobsSize:     1234,
 		BlockTime:     11000,
@@ -148,7 +148,7 @@ func (s *StorageTestSuite) TestBlockByHash() {
 	s.Require().EqualValues(1000, block.Height)
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
-	s.Require().EqualValues(0, block.Stats.TxCount)
+	s.Require().EqualValues(2, block.Stats.TxCount)
 	s.Require().Equal(hash, block.Hash.Bytes())
 	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
 }
@@ -165,7 +165,7 @@ func (s *StorageTestSuite) TestBlockListWithStats() {
 	s.Require().EqualValues(1000, block.Height)
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
-	s.Require().EqualValues(0, block.Stats.TxCount)
+	s.Require().EqualValues(2, block.Stats.TxCount)
 	s.Require().EqualValues(11000, block.Stats.BlockTime)
 	s.Require().EqualValues(map[types.MsgType]int64{
 		types.MsgWithdrawDelegatorReward: 1,
@@ -189,6 +189,6 @@ func (s *StorageTestSuite) TestBlockByProposer() {
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
 	s.Require().NotNil(block.Stats)
-	s.Require().EqualValues(0, block.Stats.TxCount)
+	s.Require().EqualValues(2, block.Stats.TxCount)
 	s.Require().EqualValues(11000, block.Stats.BlockTime)
 }
