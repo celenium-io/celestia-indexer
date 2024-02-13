@@ -15,6 +15,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -304,6 +305,48 @@ func (s *SearchTestSuite) TestSearchRollup() {
 
 	response := items[0]
 	s.Require().Equal("rollup", response.Type)
+	s.Require().NotNil(response.Result)
+}
+
+func (s *SearchTestSuite) TestSearchTextNamespace() {
+	q := make(url.Values)
+	q.Set("query", "5f45")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/search")
+
+	s.search.EXPECT().
+		SearchText(gomock.Any(), "5f45").
+		Return([]storage.SearchResult{
+			{
+				Id:    1,
+				Type:  "namespace",
+				Value: "5f45",
+			},
+		}, nil).
+		Times(1)
+
+	s.namespace.EXPECT().
+		GetByID(gomock.Any(), uint64(1)).
+		Return(&storage.Namespace{
+			NamespaceID: testsuite.MustHexDecode("5f45"),
+			Version:     1,
+			Id:          1,
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.Search(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var items []responses.SearchItem
+	err := json.NewDecoder(rec.Body).Decode(&items)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+
+	response := items[0]
+	s.Require().Equal("namespace", response.Type)
 	s.Require().NotNil(response.Result)
 }
 

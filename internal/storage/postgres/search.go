@@ -57,8 +57,12 @@ func (s *Search) SearchText(ctx context.Context, text string) (results []storage
 		Model((*storage.Rollup)(nil)).
 		ColumnExpr("id, name as value, 'rollup' as type").
 		Where("name ILIKE ?", text)
+	namespaceQuery := s.db.DB().NewSelect().
+		Model((*storage.Namespace)(nil)).
+		ColumnExpr("id, encode(namespace_id, 'hex') as value, 'namespace' as type").
+		Where("encode(namespace_id, 'hex') ILIKE ?", text)
 
-	union := rollupQuery.UnionAll(validatorQuery)
+	union := rollupQuery.UnionAll(namespaceQuery).UnionAll(validatorQuery)
 
 	err = s.db.DB().NewSelect().
 		TableExpr("(?) as search", union).
