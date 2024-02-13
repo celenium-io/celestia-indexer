@@ -126,6 +126,7 @@ type SeriesItem struct {
 
 const (
 	SeriesBlobsSize     = "blobs_size"
+	SeriesBlobsCount    = "blobs_count"
 	SeriesTPS           = "tps"
 	SeriesBPS           = "bps"
 	SeriesFee           = "fee"
