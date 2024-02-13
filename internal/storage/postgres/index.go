@@ -53,6 +53,24 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Block)(nil)).
+			Index("block_hash_idx").
+			Column("hash").
+			Using("HASH").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Block)(nil)).
+			Index("block_data_hash_idx").
+			Column("data_hash").
+			Using("HASH").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// BlockStats
 		if _, err := tx.NewCreateIndex().

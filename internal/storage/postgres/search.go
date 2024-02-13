@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+	"encoding/hex"
 	"strings"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -26,8 +27,9 @@ func NewSearch(db *database.Bun) *Search {
 func (s *Search) Search(ctx context.Context, query []byte) (results []storage.SearchResult, err error) {
 	blockQuery := s.db.DB().NewSelect().
 		Model((*storage.Block)(nil)).
-		ColumnExpr("id, encode(hash, 'hex') as value, 'block' as type").
-		Where("hash = ?", query)
+		ColumnExpr("id, ? as value, 'block' as type", hex.EncodeToString(query)).
+		Where("hash = ?", query).
+		WhereOr("data_hash = ?", query)
 	txQuery := s.db.DB().NewSelect().
 		Model((*storage.Tx)(nil)).
 		ColumnExpr("id, encode(hash, 'hex') as value, 'tx' as type").
