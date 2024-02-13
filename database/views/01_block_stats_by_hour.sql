@@ -12,6 +12,7 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
 		mean(rollup(block_time_pct)) as block_time,
 		rollup(block_time_pct) as block_time_pct,
 		sum(blobs_size) as blobs_size,
+		sum(blobs_count) as blobs_count,
 		sum(tx_count) as tx_count,
 		sum(events_count) as events_count,
 		sum(fee) as fee,

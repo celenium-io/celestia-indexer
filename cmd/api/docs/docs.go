@@ -2757,6 +2757,7 @@ const docTemplate = `{
                     {
                         "enum": [
                             "blobs_size",
+                            "blobs_count",
                             "tps",
                             "bps",
                             "fee",
@@ -4138,6 +4139,10 @@ const docTemplate = `{
         "responses.BlockStats": {
             "type": "object",
             "properties": {
+                "blobs_count": {
+                    "type": "integer",
+                    "example": 100
+                },
                 "blobs_size": {
                     "type": "integer",
                     "example": 12354

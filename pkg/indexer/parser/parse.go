@@ -83,6 +83,7 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 		block.Stats.BlobsSize += txs[i].BlobsSize
 		block.Stats.GasLimit += txs[i].GasWanted
 		block.Stats.GasUsed += txs[i].GasUsed
+		block.Stats.BlobsCount += txs[i].BlobsCount
 		allEvents = append(allEvents, txs[i].Events...)
 	}
 

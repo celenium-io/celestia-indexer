@@ -155,6 +155,9 @@ definitions:
     type: object
   responses.BlockStats:
     properties:
+      blobs_count:
+        example: 100
+        type: integer
       blobs_size:
         example: 12354
         type: integer
@@ -3212,6 +3215,7 @@ paths:
       - description: Series name
         enum:
         - blobs_size
+        - blobs_count
         - tps
         - bps
         - fee

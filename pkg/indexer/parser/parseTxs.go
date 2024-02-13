@@ -80,6 +80,7 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx, t *st
 			for i := range dm.Msg.BlobLogs {
 				dm.Msg.BlobLogs[i].ContentType = http.DetectContentType(d.Blobs[i].Data)
 			}
+			t.BlobsCount += len(dm.Msg.BlobLogs)
 		}
 
 		if txRes.IsFailed() {

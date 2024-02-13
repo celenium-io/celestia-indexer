@@ -69,6 +69,7 @@ type BlockStats struct {
 	TxCount        int64                   `example:"12"                              json:"tx_count"        swaggertype:"integer"`
 	EventsCount    int64                   `example:"18"                              json:"events_count"    swaggertype:"integer"`
 	BlobsSize      int64                   `example:"12354"                           json:"blobs_size"      swaggertype:"integer"`
+	BlobsCount     int                     `example:"100"                             json:"blobs_count"     swaggertype:"integer"`
 	Fee            string                  `example:"28347628346"                     json:"fee"             swaggertype:"string"`
 	SupplyChange   string                  `example:"8635234"                         json:"supply_change"   swaggertype:"string"`
 	InflationRate  string                  `example:"0.0800000"                       json:"inflation_rate"  swaggertype:"string"`
@@ -89,6 +90,7 @@ func NewBlockStats(stats storage.BlockStats) *BlockStats {
 		TxCount:        stats.TxCount,
 		EventsCount:    stats.EventsCount,
 		BlobsSize:      stats.BlobsSize,
+		BlobsCount:     stats.BlobsCount,
 		Fee:            stats.Fee.String(),
 		SupplyChange:   stats.SupplyChange.String(),
 		InflationRate:  stats.InflationRate.String(),
