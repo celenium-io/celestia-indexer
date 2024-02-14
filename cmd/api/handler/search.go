@@ -202,6 +202,12 @@ func (handler SearchHandler) searchText(ctx context.Context, text string) ([]res
 				return nil, err
 			}
 			response[i].Result = responses.NewRollup(rollup)
+		case "namespace":
+			namespace, err := handler.namespace.GetByID(ctx, result[i].Id)
+			if err != nil {
+				return nil, err
+			}
+			response[i].Result = responses.NewNamespace(*namespace)
 		default:
 			return nil, errors.Errorf("unknown search text type: %s", response[i].Type)
 		}
