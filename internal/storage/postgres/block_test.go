@@ -176,6 +176,29 @@ func (s *StorageTestSuite) TestBlockListWithStats() {
 	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
 }
 
+func (s *StorageTestSuite) TestBlockListWithStatsAsc() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	blocks, err := s.storage.Blocks.ListWithStats(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(blocks, 2)
+
+	block := blocks[1]
+	s.Require().EqualValues(1000, block.Height)
+	s.Require().EqualValues(1, block.VersionApp)
+	s.Require().EqualValues(11, block.VersionBlock)
+	s.Require().EqualValues(2, block.Stats.TxCount)
+	s.Require().EqualValues(11000, block.Stats.BlockTime)
+	s.Require().EqualValues(map[types.MsgType]int64{
+		types.MsgWithdrawDelegatorReward: 1,
+		types.MsgDelegate:                1,
+		types.MsgUnjail:                  1,
+		types.MsgPayForBlobs:             1,
+	}, block.Stats.MessagesCounts)
+	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
+}
+
 func (s *StorageTestSuite) TestBlockByProposer() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
