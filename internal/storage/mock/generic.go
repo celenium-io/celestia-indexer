@@ -2429,6 +2429,44 @@ func (m *MockExport) EXPECT() *MockExportMockRecorder {
 	return m.recorder
 }
 
+// Close mocks base method.
+func (m *MockExport) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockExportMockRecorder) Close() *ExportCloseCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockExport)(nil).Close))
+	return &ExportCloseCall{Call: call}
+}
+
+// ExportCloseCall wrap *gomock.Call
+type ExportCloseCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *ExportCloseCall) Return(arg0 error) *ExportCloseCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *ExportCloseCall) Do(f func() error) *ExportCloseCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *ExportCloseCall) DoAndReturn(f func() error) *ExportCloseCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // ToCsv mocks base method.
 func (m *MockExport) ToCsv(ctx context.Context, writer io.Writer, query string) error {
 	m.ctrl.T.Helper()

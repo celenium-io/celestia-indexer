@@ -121,4 +121,5 @@ type ISearch interface {
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type Export interface {
 	ToCsv(ctx context.Context, writer io.Writer, query string) error
+	Close() error
 }

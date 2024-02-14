@@ -166,3 +166,13 @@ func createExtensions(ctx context.Context, conn *database.Bun) error {
 		return err
 	})
 }
+
+func (s Storage) Close() error {
+	if err := s.Export.Close(); err != nil {
+		return err
+	}
+	if err := s.Storage.Close(); err != nil {
+		return err
+	}
+	return nil
+}

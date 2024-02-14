@@ -37,6 +37,7 @@ type Indexer struct {
 	rollback *rollback.Module
 	genesis  *genesis.Module
 	stopper  modules.Module
+	pg       postgres.Storage
 	wg       *sync.WaitGroup
 	log      zerolog.Logger
 }
@@ -86,6 +87,7 @@ func New(ctx context.Context, cfg config.Config, stopperModule modules.Module) (
 		rollback: rb,
 		genesis:  genesisModule,
 		stopper:  stopperModule,
+		pg:       pg,
 		wg:       new(sync.WaitGroup),
 		log:      log.With().Str("module", "indexer").Logger(),
 	}, nil
@@ -118,6 +120,9 @@ func (i *Indexer) Close() error {
 	}
 	if err := i.rollback.Close(); err != nil {
 		log.Err(err).Msg("closing rollback")
+	}
+	if err := i.pg.Close(); err != nil {
+		log.Err(err).Msg("closing postgres connection")
 	}
 
 	return nil

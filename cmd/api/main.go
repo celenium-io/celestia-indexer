@@ -90,4 +90,7 @@ func main() {
 			e.Logger.Fatal(err)
 		}
 	}
+	if err := db.Close(); err != nil {
+		e.Logger.Fatal(err)
+	}
 }

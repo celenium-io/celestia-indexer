@@ -29,7 +29,6 @@ func NewExport(cfg config.Database) *Export {
 		cfg.Database,
 	)
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
-
 	db := bun.NewDB(sqldb, pgdialect.New())
 	return &Export{db}
 }
@@ -44,4 +43,11 @@ func (e *Export) ToCsv(ctx context.Context, writer io.Writer, query string) erro
 	rawQuery := fmt.Sprintf("COPY %s TO STDOUT WITH CSV HEADER", bun.Safe(query))
 	_, err = pgdriver.CopyTo(ctx, conn, writer, rawQuery)
 	return err
+}
+
+func (e *Export) Close() error {
+	if err := e.DB.Close(); err != nil {
+		return err
+	}
+	return nil
 }
