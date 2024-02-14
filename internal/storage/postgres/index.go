@@ -266,6 +266,17 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// BlockSignature
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.BlockSignature)(nil)).
+			Index("block_signature_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }
