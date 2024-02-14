@@ -13,6 +13,7 @@ package mock
 
 import (
 	context "context"
+	io "io"
 	reflect "reflect"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
@@ -2401,6 +2402,67 @@ func (c *ISearchSearchTextCall) Do(f func(context.Context, string) ([]storage.Se
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *ISearchSearchTextCall) DoAndReturn(f func(context.Context, string) ([]storage.SearchResult, error)) *ISearchSearchTextCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// MockExport is a mock of Export interface.
+type MockExport struct {
+	ctrl     *gomock.Controller
+	recorder *MockExportMockRecorder
+}
+
+// MockExportMockRecorder is the mock recorder for MockExport.
+type MockExportMockRecorder struct {
+	mock *MockExport
+}
+
+// NewMockExport creates a new mock instance.
+func NewMockExport(ctrl *gomock.Controller) *MockExport {
+	mock := &MockExport{ctrl: ctrl}
+	mock.recorder = &MockExportMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockExport) EXPECT() *MockExportMockRecorder {
+	return m.recorder
+}
+
+// ToCsv mocks base method.
+func (m *MockExport) ToCsv(ctx context.Context, writer io.Writer, query string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ToCsv", ctx, writer, query)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ToCsv indicates an expected call of ToCsv.
+func (mr *MockExportMockRecorder) ToCsv(ctx, writer, query any) *ExportToCsvCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ToCsv", reflect.TypeOf((*MockExport)(nil).ToCsv), ctx, writer, query)
+	return &ExportToCsvCall{Call: call}
+}
+
+// ExportToCsvCall wrap *gomock.Call
+type ExportToCsvCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *ExportToCsvCall) Return(arg0 error) *ExportToCsvCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *ExportToCsvCall) Do(f func(context.Context, io.Writer, string) error) *ExportToCsvCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *ExportToCsvCall) DoAndReturn(f func(context.Context, io.Writer, string) error) *ExportToCsvCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

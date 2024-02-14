@@ -40,6 +40,7 @@ type Storage struct {
 	Search          models.ISearch
 	Validator       models.IValidator
 	Rollup          models.IRollup
+	Export          models.Export
 	Notificator     *Notificator
 }
 
@@ -71,6 +72,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		Search:          NewSearch(strg.Connection()),
 		Validator:       NewValidator(strg.Connection()),
 		Rollup:          NewRollup(strg.Connection()),
+		Export:          NewExport(cfg),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
 	}
 
