@@ -47,6 +47,7 @@ type NamespaceTestSuite struct {
 	suite.Suite
 	namespaces   *mock.MockINamespace
 	blobLogs     *mock.MockIBlobLog
+	rollups      *mock.MockIRollup
 	state        *mock.MockIState
 	blobReceiver *nodeMock.MockDalApi
 	echo         *echo.Echo
@@ -61,9 +62,10 @@ func (s *NamespaceTestSuite) SetupSuite() {
 	s.ctrl = gomock.NewController(s.T())
 	s.namespaces = mock.NewMockINamespace(s.ctrl)
 	s.blobLogs = mock.NewMockIBlobLog(s.ctrl)
+	s.rollups = mock.NewMockIRollup(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
 	s.blobReceiver = nodeMock.NewMockDalApi(s.ctrl)
-	s.handler = NewNamespaceHandler(s.namespaces, s.blobLogs, s.state, testIndexerName, s.blobReceiver)
+	s.handler = NewNamespaceHandler(s.namespaces, s.blobLogs, s.rollups, s.state, testIndexerName, s.blobReceiver)
 }
 
 // TearDownSuite -
@@ -314,7 +316,7 @@ func (s *NamespaceTestSuite) TestGetMessages() {
 		Return(testNamespace, nil)
 
 	s.namespaces.EXPECT().
-		Messages(gomock.Any(), testNamespace.Id, 0, 0).
+		Messages(gomock.Any(), testNamespace.Id, 10, 0).
 		Return([]storage.NamespaceMessage{
 			{
 				NamespaceId: testNamespace.Id,
@@ -527,4 +529,35 @@ func (s *NamespaceTestSuite) TestGetLogs() {
 	s.Require().Equal("test_commitment", l.Commitment)
 	s.Require().EqualValues(1000, l.Size)
 	s.Require().Nil(l.Namespace)
+}
+
+func (s *NamespaceTestSuite) TestRollups() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/namespace/:id/:version/rollups")
+	c.SetParamNames("id", "version")
+	c.SetParamValues(testNamespaceId, "0")
+
+	s.namespaces.EXPECT().
+		ByNamespaceIdAndVersion(gomock.Any(), testNamespace.NamespaceID, byte(0)).
+		Return(testNamespace, nil)
+
+	s.rollups.EXPECT().
+		RollupsByNamespace(gomock.Any(), testNamespace.Id, 10, 0).
+		Return([]storage.Rollup{testRollup}, nil)
+
+	s.Require().NoError(s.handler.Rollups(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var rollups []responses.Rollup
+	err := json.NewDecoder(rec.Body).Decode(&rollups)
+	s.Require().NoError(err)
+	s.Require().Len(rollups, 1)
+
+	rollup := rollups[0]
+	s.Require().EqualValues(1, rollup.Id)
+	s.Require().EqualValues("test rollup", rollup.Name)
+	s.Require().EqualValues("image.png", rollup.Logo)
+	s.Require().EqualValues("test-rollup", rollup.Slug)
 }

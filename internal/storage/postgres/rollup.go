@@ -81,6 +81,25 @@ func (r *Rollup) Providers(ctx context.Context, rollupId uint64) (providers []st
 	return
 }
 
+func (r *Rollup) RollupsByNamespace(ctx context.Context, namespaceId uint64, limit, offset int) (rollups []storage.Rollup, err error) {
+	subQuery := r.DB().NewSelect().
+		Model((*storage.RollupProvider)(nil)).
+		Column("rollup_id").
+		Where("namespace_id = ?", namespaceId).
+		Group("rollup_id").
+		Offset(offset)
+
+	subQuery = limitScope(subQuery, limit)
+
+	err = r.DB().NewSelect().
+		With("rollups", subQuery).
+		Table("rollups").
+		ColumnExpr("rollup.*").
+		Join("left join rollup on rollup.id = rollups.rollup_id").
+		Scan(ctx, &rollups)
+	return
+}
+
 func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
 	providers, err := r.Providers(ctx, rollupId)
 	if err != nil {

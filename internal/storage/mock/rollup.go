@@ -432,6 +432,45 @@ func (c *IRollupProvidersCall) DoAndReturn(f func(context.Context, uint64) ([]st
 	return c
 }
 
+// RollupsByNamespace mocks base method.
+func (m *MockIRollup) RollupsByNamespace(ctx context.Context, namespaceId uint64, limit, offset int) ([]storage.Rollup, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollupsByNamespace", ctx, namespaceId, limit, offset)
+	ret0, _ := ret[0].([]storage.Rollup)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RollupsByNamespace indicates an expected call of RollupsByNamespace.
+func (mr *MockIRollupMockRecorder) RollupsByNamespace(ctx, namespaceId, limit, offset any) *IRollupRollupsByNamespaceCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollupsByNamespace", reflect.TypeOf((*MockIRollup)(nil).RollupsByNamespace), ctx, namespaceId, limit, offset)
+	return &IRollupRollupsByNamespaceCall{Call: call}
+}
+
+// IRollupRollupsByNamespaceCall wrap *gomock.Call
+type IRollupRollupsByNamespaceCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IRollupRollupsByNamespaceCall) Return(rollups []storage.Rollup, err error) *IRollupRollupsByNamespaceCall {
+	c.Call = c.Call.Return(rollups, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IRollupRollupsByNamespaceCall) Do(f func(context.Context, uint64, int, int) ([]storage.Rollup, error)) *IRollupRollupsByNamespaceCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IRollupRollupsByNamespaceCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Rollup, error)) *IRollupRollupsByNamespaceCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Save mocks base method.
 func (m_2 *MockIRollup) Save(ctx context.Context, m *storage.Rollup) error {
 	m_2.ctrl.T.Helper()

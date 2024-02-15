@@ -89,3 +89,16 @@ func (s *StorageTestSuite) TestRollupBySlug() {
 	s.Require().EqualValues(1, rollup.Id)
 	s.Require().EqualValues("Rollup 1", rollup.Name)
 }
+
+func (s *StorageTestSuite) TestRollupsByNamespace() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	rollups, err := s.storage.Rollup.RollupsByNamespace(ctx, 2, 10, 0)
+	s.Require().NoError(err)
+	s.Require().Len(rollups, 2)
+
+	rollup := rollups[0]
+	s.Require().Greater(rollup.Id, uint64(0))
+	s.Require().NotEmpty(rollup.Name)
+}

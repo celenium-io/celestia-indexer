@@ -275,6 +275,32 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// RollupProvider
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.RollupProvider)(nil)).
+			Index("rollup_provider_rollup_id_idx").
+			Column("rollup_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.RollupProvider)(nil)).
+			Index("rollup_provider_namespace_id_idx").
+			Column("namespace_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.RollupProvider)(nil)).
+			Index("rollup_provider_address_id_idx").
+			Column("address_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		// BlockSignature
 		if _, err := tx.NewCreateIndex().
 			IfNotExists().
