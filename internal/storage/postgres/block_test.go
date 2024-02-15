@@ -62,9 +62,10 @@ func (s *StorageTestSuite) TestBlockByHeightWithStats() {
 	expectedStats := storage.BlockStats{
 		Id:            2,
 		Height:        1000,
-		TxCount:       0,
+		TxCount:       2,
 		EventsCount:   0,
 		BlobsSize:     1234,
+		BlobsCount:    4,
 		BlockTime:     11000,
 		SupplyChange:  decimal.NewFromInt(30930476),
 		InflationRate: decimal.NewFromFloat(0.08),
@@ -81,6 +82,7 @@ func (s *StorageTestSuite) TestBlockByHeightWithStats() {
 	s.Require().EqualValues(expectedStats.TxCount, block.Stats.TxCount)
 	s.Require().EqualValues(expectedStats.EventsCount, block.Stats.EventsCount)
 	s.Require().EqualValues(expectedStats.BlobsSize, block.Stats.BlobsSize)
+	s.Require().EqualValues(expectedStats.BlobsCount, block.Stats.BlobsCount)
 	s.Require().EqualValues(expectedStats.BlockTime, block.Stats.BlockTime)
 	s.Require().EqualValues(expectedStats.SupplyChange.String(), block.Stats.SupplyChange.String())
 	s.Require().EqualValues(expectedStats.InflationRate.String(), block.Stats.InflationRate.String())
@@ -106,13 +108,14 @@ func (s *StorageTestSuite) TestBlockByIdWithRelations() {
 	expectedStats := storage.BlockStats{
 		Id:            2,
 		Height:        1000,
-		TxCount:       0,
+		TxCount:       2,
 		EventsCount:   0,
 		BlobsSize:     1234,
 		BlockTime:     11000,
 		SupplyChange:  decimal.NewFromInt(30930476),
 		InflationRate: decimal.NewFromFloat(0.08),
 		Fee:           decimal.NewFromInt(2873468273),
+		BlobsCount:    4,
 		MessagesCounts: map[types.MsgType]int64{
 			types.MsgDelegate:                1,
 			types.MsgPayForBlobs:             1,
@@ -125,6 +128,7 @@ func (s *StorageTestSuite) TestBlockByIdWithRelations() {
 	s.Require().EqualValues(expectedStats.TxCount, block.Stats.TxCount)
 	s.Require().EqualValues(expectedStats.EventsCount, block.Stats.EventsCount)
 	s.Require().EqualValues(expectedStats.BlobsSize, block.Stats.BlobsSize)
+	s.Require().EqualValues(expectedStats.BlobsCount, block.Stats.BlobsCount)
 	s.Require().EqualValues(expectedStats.BlockTime, block.Stats.BlockTime)
 	s.Require().EqualValues(expectedStats.SupplyChange.String(), block.Stats.SupplyChange.String())
 	s.Require().EqualValues(expectedStats.InflationRate.String(), block.Stats.InflationRate.String())
@@ -148,7 +152,7 @@ func (s *StorageTestSuite) TestBlockByHash() {
 	s.Require().EqualValues(1000, block.Height)
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
-	s.Require().EqualValues(0, block.Stats.TxCount)
+	s.Require().EqualValues(2, block.Stats.TxCount)
 	s.Require().Equal(hash, block.Hash.Bytes())
 	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
 }
@@ -165,8 +169,33 @@ func (s *StorageTestSuite) TestBlockListWithStats() {
 	s.Require().EqualValues(1000, block.Height)
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
-	s.Require().EqualValues(0, block.Stats.TxCount)
+	s.Require().EqualValues(2, block.Stats.TxCount)
 	s.Require().EqualValues(11000, block.Stats.BlockTime)
+	s.Require().EqualValues(4, block.Stats.BlobsCount)
+	s.Require().EqualValues(map[types.MsgType]int64{
+		types.MsgWithdrawDelegatorReward: 1,
+		types.MsgDelegate:                1,
+		types.MsgUnjail:                  1,
+		types.MsgPayForBlobs:             1,
+	}, block.Stats.MessagesCounts)
+	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
+}
+
+func (s *StorageTestSuite) TestBlockListWithStatsAsc() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	blocks, err := s.storage.Blocks.ListWithStats(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(blocks, 2)
+
+	block := blocks[1]
+	s.Require().EqualValues(1000, block.Height)
+	s.Require().EqualValues(1, block.VersionApp)
+	s.Require().EqualValues(11, block.VersionBlock)
+	s.Require().EqualValues(2, block.Stats.TxCount)
+	s.Require().EqualValues(11000, block.Stats.BlockTime)
+	s.Require().EqualValues(4, block.Stats.BlobsCount)
 	s.Require().EqualValues(map[types.MsgType]int64{
 		types.MsgWithdrawDelegatorReward: 1,
 		types.MsgDelegate:                1,
@@ -189,6 +218,7 @@ func (s *StorageTestSuite) TestBlockByProposer() {
 	s.Require().EqualValues(1, block.VersionApp)
 	s.Require().EqualValues(11, block.VersionBlock)
 	s.Require().NotNil(block.Stats)
-	s.Require().EqualValues(0, block.Stats.TxCount)
+	s.Require().EqualValues(2, block.Stats.TxCount)
 	s.Require().EqualValues(11000, block.Stats.BlockTime)
+	s.Require().EqualValues(4, block.Stats.BlobsCount)
 }
