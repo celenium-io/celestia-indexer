@@ -5,6 +5,7 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	"encoding/hex"
 	"encoding/json"
 	"net/http"
@@ -366,4 +367,30 @@ func (s *SearchTestSuite) TestSearchNoResult() {
 
 	s.Require().NoError(s.handler.Search(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
+}
+
+func (s *SearchTestSuite) TestSearchUnknownAddress() {
+	q := make(url.Values)
+	q.Set("query", testAddress)
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/search")
+
+	s.address.EXPECT().
+		ByHash(gomock.Any(), testHashAddress).
+		Return(storage.Address{}, sql.ErrNoRows)
+
+	s.address.EXPECT().
+		IsNoRows(sql.ErrNoRows).
+		Return(true)
+
+	s.Require().NoError(s.handler.Search(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var items []responses.SearchItem
+	err := json.NewDecoder(rec.Body).Decode(&items)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
 }

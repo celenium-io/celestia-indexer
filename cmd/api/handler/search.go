@@ -89,7 +89,9 @@ func (handler SearchHandler) Search(c echo.Context) error {
 		response, err = handler.searchText(c.Request().Context(), req.Search)
 	}
 	if err != nil {
-		return internalServerError(c, err)
+		if !handler.address.IsNoRows(err) {
+			return internalServerError(c, err)
+		}
 	}
 
 	return returnArray(c, response)
