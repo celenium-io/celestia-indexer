@@ -20,6 +20,7 @@ import (
 type NamespaceHandler struct {
 	namespace   storage.INamespace
 	blobLogs    storage.IBlobLog
+	rollups     storage.IRollup
 	blob        node.DalApi
 	state       storage.IState
 	indexerName string
@@ -28,6 +29,7 @@ type NamespaceHandler struct {
 func NewNamespaceHandler(
 	namespace storage.INamespace,
 	blobLogs storage.IBlobLog,
+	rollups storage.IRollup,
 	state storage.IState,
 	indexerName string,
 	blob node.DalApi,
@@ -35,6 +37,7 @@ func NewNamespaceHandler(
 	return &NamespaceHandler{
 		namespace:   namespace,
 		blobLogs:    blobLogs,
+		rollups:     rollups,
 		blob:        blob,
 		state:       state,
 		indexerName: indexerName,
@@ -221,11 +224,17 @@ func (handler *NamespaceHandler) GetBlobs(c echo.Context) error {
 	return c.JSON(http.StatusOK, blobs)
 }
 
-type getNamespaceMessages struct {
+type listByNamespace struct {
 	Id      string `param:"id"      validate:"required,hexadecimal,len=56"`
 	Version byte   `param:"version"`
-	Limit   uint64 `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset  uint64 `query:"offset"  validate:"omitempty,min=0"`
+	Limit   int    `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset  int    `query:"offset"  validate:"omitempty,min=0"`
+}
+
+func (req *listByNamespace) SetDefault() {
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
 }
 
 // GetMessages godoc
@@ -245,10 +254,11 @@ type getNamespaceMessages struct {
 //	@Failure		500	{object}	Error
 //	@Router			/v1/namespace/{id}/{version}/messages [get]
 func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
-	req, err := bindAndValidate[getNamespaceMessages](c)
+	req, err := bindAndValidate[listByNamespace](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
+	req.SetDefault()
 
 	namespaceId, err := hex.DecodeString(req.Id)
 	if err != nil {
@@ -260,7 +270,7 @@ func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
 		return handleError(c, err, handler.namespace)
 	}
 
-	messages, err := handler.namespace.Messages(c.Request().Context(), ns.Id, int(req.Limit), int(req.Offset))
+	messages, err := handler.namespace.Messages(c.Request().Context(), ns.Id, req.Limit, req.Offset)
 	if err != nil {
 		return handleError(c, err, handler.namespace)
 	}
@@ -440,6 +450,56 @@ func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 	response := make([]responses.BlobLog, len(logs))
 	for i := range response {
 		response[i] = responses.NewBlobLog(logs[i])
+	}
+
+	return returnArray(c, response)
+}
+
+// Rollups godoc
+//
+//	@Summary		List rollups using the namespace
+//	@Description	List rollups using the namespace
+//	@Tags			namespace
+//	@ID				get-namespace-rollups
+//	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
+//	@Param			version	path	integer	true	"Version of namespace"
+//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"										mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Rollup
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/namespace/{id}/{version}/rollups [get]
+func (handler *NamespaceHandler) Rollups(c echo.Context) error {
+	req, err := bindAndValidate[listByNamespace](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	namespaceId, err := hex.DecodeString(req.Id)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	ns, err := handler.namespace.ByNamespaceIdAndVersion(c.Request().Context(), namespaceId, req.Version)
+	if err != nil {
+		return handleError(c, err, handler.namespace)
+	}
+
+	rollups, err := handler.rollups.RollupsByNamespace(
+		c.Request().Context(),
+		ns.Id,
+		req.Limit,
+		req.Offset,
+	)
+	if err != nil {
+		return handleError(c, err, handler.namespace)
+	}
+
+	response := make([]responses.Rollup, len(rollups))
+	for i := range response {
+		response[i] = responses.NewRollup(&rollups[i])
 	}
 
 	return returnArray(c, response)

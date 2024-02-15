@@ -1867,6 +1867,73 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/namespace/{id}/{version}/rollups": {
+            "get": {
+                "description": "List rollups using the namespace",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "namespace"
+                ],
+                "summary": "List rollups using the namespace",
+                "operationId": "get-namespace-rollups",
+                "parameters": [
+                    {
+                        "maxLength": 56,
+                        "minLength": 56,
+                        "type": "string",
+                        "description": "Namespace id in hexadecimal",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Version of namespace",
+                        "name": "version",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Rollup"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/namespace_by_hash/{hash}": {
             "get": {
                 "description": "Returns namespace by base64 encoded identity",
