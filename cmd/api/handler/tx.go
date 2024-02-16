@@ -143,17 +143,15 @@ func (handler *TxHandler) List(c echo.Context) error {
 	return returnArray(c, response)
 }
 
-type getTxEvents struct {
+type getTxRequestWithPagination struct {
 	Hash   string `param:"hash"   validate:"required,hexadecimal,len=64"`
 	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
 	Offset int    `query:"offset" validate:"omitempty,min=0"`
-	From   int64  `query:"from"   validate:"omitempty,min=1"`
-	To     int64  `query:"to"     validate:"omitempty,min=1"`
 }
 
-func (req *getTxEvents) SetDefault() {
-	if req.Limit == 0 {
-		req.Limit = 10
+func (p *getTxRequestWithPagination) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
 	}
 }
 
@@ -172,7 +170,7 @@ func (req *getTxEvents) SetDefault() {
 //	@Failure		500	{object}	Error
 //	@Router			/v1/tx/{hash}/events [get]
 func (handler *TxHandler) GetEvents(c echo.Context) error {
-	req, err := bindAndValidate[getTxEvents](c)
+	req, err := bindAndValidate[getTxRequestWithPagination](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
@@ -203,18 +201,6 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 		response[i] = responses.NewEvent(events[i])
 	}
 	return returnArray(c, response)
-}
-
-type getTxRequestWithPagination struct {
-	Hash   string `param:"hash"   validate:"required,hexadecimal,len=64"`
-	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset" validate:"omitempty,min=0"`
-}
-
-func (p *getTxRequestWithPagination) SetDefault() {
-	if p.Limit == 0 {
-		p.Limit = 10
-	}
 }
 
 // GetMessages godoc
