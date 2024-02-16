@@ -5,10 +5,12 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
@@ -241,5 +243,13 @@ func (b *Blocks) ByProposer(ctx context.Context, proposerId uint64, limit, offse
 	}
 
 	err = query.Scan(ctx)
+	return
+}
+
+func (b *Blocks) Time(ctx context.Context, height pkgTypes.Level) (response time.Time, err error) {
+	err = b.DB().NewSelect().Model((*storage.Block)(nil)).
+		Column("time").
+		Where("height = ?", height).
+		Scan(ctx, &response)
 	return
 }

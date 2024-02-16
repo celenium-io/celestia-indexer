@@ -17,12 +17,18 @@ import (
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
+type EventFilter struct {
+	Limit  int
+	Offset int
+	Time   time.Time
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IEvent interface {
 	storage.Table[*Event]
 
-	ByTxId(ctx context.Context, txId uint64, limit, offset int) ([]Event, error)
-	ByBlock(ctx context.Context, height pkgTypes.Level, limit, offset int) ([]Event, error)
+	ByTxId(ctx context.Context, txId uint64, fltrs EventFilter) ([]Event, error)
+	ByBlock(ctx context.Context, height pkgTypes.Level, fltrs EventFilter) ([]Event, error)
 }
 
 // Event -

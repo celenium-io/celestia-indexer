@@ -180,7 +180,21 @@ func (handler *BlockHandler) GetEvents(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	events, err := handler.events.ByBlock(c.Request().Context(), req.Height, req.Limit, req.Offset)
+	blockTime, err := handler.block.Time(c.Request().Context(), req.Height)
+	if err != nil {
+		if handler.block.IsNoRows(err) {
+			return returnArray(c, []any{})
+		}
+		return internalServerError(c, err)
+	}
+
+	fltrs := storage.EventFilter{
+		Limit:  req.Limit,
+		Offset: req.Offset,
+		Time:   blockTime.UTC(),
+	}
+
+	events, err := handler.events.ByBlock(c.Request().Context(), req.Height, fltrs)
 	if err != nil {
 		return handleError(c, err, handler.block)
 	}

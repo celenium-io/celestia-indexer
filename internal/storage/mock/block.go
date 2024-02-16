@@ -14,6 +14,7 @@ package mock
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
 	types "github.com/celenium-io/celestia-indexer/pkg/types"
@@ -545,6 +546,45 @@ func (c *IBlockSaveCall) Do(f func(context.Context, *storage.Block) error) *IBlo
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *IBlockSaveCall) DoAndReturn(f func(context.Context, *storage.Block) error) *IBlockSaveCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Time mocks base method.
+func (m *MockIBlock) Time(ctx context.Context, height types.Level) (time.Time, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Time", ctx, height)
+	ret0, _ := ret[0].(time.Time)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Time indicates an expected call of Time.
+func (mr *MockIBlockMockRecorder) Time(ctx, height any) *IBlockTimeCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Time", reflect.TypeOf((*MockIBlock)(nil).Time), ctx, height)
+	return &IBlockTimeCall{Call: call}
+}
+
+// IBlockTimeCall wrap *gomock.Call
+type IBlockTimeCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IBlockTimeCall) Return(arg0 time.Time, arg1 error) *IBlockTimeCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IBlockTimeCall) Do(f func(context.Context, types.Level) (time.Time, error)) *IBlockTimeCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IBlockTimeCall) DoAndReturn(f func(context.Context, types.Level) (time.Time, error)) *IBlockTimeCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

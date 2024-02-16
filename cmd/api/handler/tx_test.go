@@ -421,7 +421,7 @@ func (s *TxTestSuite) TestGetEvents() {
 		Return(testTx, nil)
 
 	s.events.EXPECT().
-		ByTxId(gomock.Any(), uint64(1), 2, 0).
+		ByTxId(gomock.Any(), uint64(1), gomock.Any()).
 		Return([]storage.Event{
 			{
 				Id:       1,

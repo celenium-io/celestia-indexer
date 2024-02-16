@@ -186,7 +186,13 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 		return handleError(c, err, handler.tx)
 	}
 
-	events, err := handler.events.ByTxId(c.Request().Context(), tx.Id, req.Limit, req.Offset)
+	fltrs := storage.EventFilter{
+		Limit:  req.Limit,
+		Offset: req.Offset,
+		Time:   tx.Time.UTC(),
+	}
+
+	events, err := handler.events.ByTxId(c.Request().Context(), tx.Id, fltrs)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}

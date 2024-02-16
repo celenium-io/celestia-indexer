@@ -304,8 +304,13 @@ func (s *BlockTestSuite) TestGetEvents() {
 	c.SetParamNames("height")
 	c.SetParamValues("100")
 
+	s.blocks.EXPECT().
+		Time(gomock.Any(), pkgTypes.Level(100)).
+		Return(testTime, nil).
+		Times(1)
+
 	s.events.EXPECT().
-		ByBlock(gomock.Any(), pkgTypes.Level(100), 2, 0).
+		ByBlock(gomock.Any(), pkgTypes.Level(100), gomock.Any()).
 		Return([]storage.Event{
 			{
 				Id:       1,
@@ -318,7 +323,8 @@ func (s *BlockTestSuite) TestGetEvents() {
 					"test": "value",
 				},
 			},
-		}, nil)
+		}, nil).
+		Times(1)
 
 	s.Require().NoError(s.handler.GetEvents(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
