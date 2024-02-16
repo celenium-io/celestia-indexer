@@ -10,6 +10,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 )
 
@@ -30,6 +31,7 @@ func (e *Event) ByTxId(ctx context.Context, txId uint64, limit, offset int) (eve
 	query := e.DB().NewSelect().Model(&events).
 		Where("tx_id = ?", txId)
 	query = limitScope(query, limit)
+	query = sortScope(query, "id", sdk.SortOrderAsc)
 
 	if offset > 0 {
 		query = query.Offset(offset)
@@ -46,6 +48,7 @@ func (e *Event) ByBlock(ctx context.Context, height pkgTypes.Level, limit, offse
 		Where("tx_id IS NULL")
 
 	query = limitScope(query, limit)
+	query = sortScope(query, "id", sdk.SortOrderAsc)
 
 	if offset > 0 {
 		query = query.Offset(offset)
