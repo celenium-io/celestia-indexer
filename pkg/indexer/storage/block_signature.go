@@ -22,7 +22,7 @@ func (module *Module) saveBlockSignatures(
 	height types.Level,
 ) error {
 	retentionLevel := height - countOfStoringSignsInLevels
-	if retentionLevel > 0 {
+	if retentionLevel > 0 && height%10 == 0 { // make retention on every ten block
 		if err := tx.RetentionBlockSignatures(ctx, retentionLevel); err != nil {
 			return err
 		}
