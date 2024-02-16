@@ -143,15 +143,17 @@ func (handler *TxHandler) List(c echo.Context) error {
 	return returnArray(c, response)
 }
 
-type getTxRequestWithPagination struct {
+type getTxEvents struct {
 	Hash   string `param:"hash"   validate:"required,hexadecimal,len=64"`
 	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
 	Offset int    `query:"offset" validate:"omitempty,min=0"`
+	From   int64  `query:"from"   validate:"omitempty,min=1"`
+	To     int64  `query:"to"     validate:"omitempty,min=1"`
 }
 
-func (p *getTxRequestWithPagination) SetDefault() {
-	if p.Limit == 0 {
-		p.Limit = 10
+func (req *getTxEvents) SetDefault() {
+	if req.Limit == 0 {
+		req.Limit = 10
 	}
 }
 
@@ -164,17 +166,31 @@ func (p *getTxRequestWithPagination) SetDefault() {
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
 //	@Param			limit	query	integer	false	"Count of requested entities"		mininum(1)	maximum(100)
 //	@Param			offset	query	integer	false	"Offset"							mininum(1)
+//	@Param			from	query	integer	false	"Time from in unix timestamp"	    mininum(1)
+//	@Param			to		query	integer	false	"Time to in unix timestamp"		    mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Event
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/tx/{hash}/events [get]
 func (handler *TxHandler) GetEvents(c echo.Context) error {
-	req, err := bindAndValidate[getTxRequestWithPagination](c)
+	req, err := bindAndValidate[getTxEvents](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
 	req.SetDefault()
+
+	fltrs := storage.EventFilter{
+		Limit:  req.Limit,
+		Offset: req.Offset,
+	}
+
+	if req.From > 0 {
+		fltrs.From = time.Unix(req.From, 0).UTC()
+	}
+	if req.To > 0 {
+		fltrs.To = time.Unix(req.To, 0).UTC()
+	}
 
 	hash, err := hex.DecodeString(req.Hash)
 	if err != nil {
@@ -186,7 +202,7 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 		return handleError(c, err, handler.tx)
 	}
 
-	events, err := handler.events.ByTxId(c.Request().Context(), tx.Id, req.Limit, req.Offset)
+	events, err := handler.events.ByTxId(c.Request().Context(), tx.Id, fltrs)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
@@ -195,6 +211,18 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 		response[i] = responses.NewEvent(events[i])
 	}
 	return returnArray(c, response)
+}
+
+type getTxRequestWithPagination struct {
+	Hash   string `param:"hash"   validate:"required,hexadecimal,len=64"`
+	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int    `query:"offset" validate:"omitempty,min=0"`
+}
+
+func (p *getTxRequestWithPagination) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
 }
 
 // GetMessages godoc

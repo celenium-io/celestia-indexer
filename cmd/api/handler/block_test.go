@@ -305,7 +305,7 @@ func (s *BlockTestSuite) TestGetEvents() {
 	c.SetParamValues("100")
 
 	s.events.EXPECT().
-		ByBlock(gomock.Any(), pkgTypes.Level(100), 2, 0).
+		ByBlock(gomock.Any(), pkgTypes.Level(100), gomock.Any()).
 		Return([]storage.Event{
 			{
 				Id:       1,

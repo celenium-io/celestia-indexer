@@ -27,14 +27,20 @@ func NewEvent(db *database.Bun) *Event {
 }
 
 // ByTxId -
-func (e *Event) ByTxId(ctx context.Context, txId uint64, limit, offset int) (events []storage.Event, err error) {
+func (e *Event) ByTxId(ctx context.Context, txId uint64, fltrs storage.EventFilter) (events []storage.Event, err error) {
 	query := e.DB().NewSelect().Model(&events).
 		Where("tx_id = ?", txId)
-	query = limitScope(query, limit)
+	query = limitScope(query, fltrs.Limit)
 	query = sortScope(query, "id", sdk.SortOrderAsc)
 
-	if offset > 0 {
-		query = query.Offset(offset)
+	if fltrs.Offset > 0 {
+		query = query.Offset(fltrs.Offset)
+	}
+	if !fltrs.From.IsZero() {
+		query = query.Where("time >= ?", fltrs.From)
+	}
+	if !fltrs.To.IsZero() {
+		query = query.Where("time < ?", fltrs.To)
 	}
 
 	err = query.Scan(ctx)
@@ -42,16 +48,22 @@ func (e *Event) ByTxId(ctx context.Context, txId uint64, limit, offset int) (eve
 }
 
 // ByBlock -
-func (e *Event) ByBlock(ctx context.Context, height pkgTypes.Level, limit, offset int) (events []storage.Event, err error) {
+func (e *Event) ByBlock(ctx context.Context, height pkgTypes.Level, fltrs storage.EventFilter) (events []storage.Event, err error) {
 	query := e.DB().NewSelect().Model(&events).
 		Where("height = ?", height).
 		Where("tx_id IS NULL")
 
-	query = limitScope(query, limit)
+	query = limitScope(query, fltrs.Limit)
 	query = sortScope(query, "id", sdk.SortOrderAsc)
 
-	if offset > 0 {
-		query = query.Offset(offset)
+	if fltrs.Offset > 0 {
+		query = query.Offset(fltrs.Offset)
+	}
+	if !fltrs.From.IsZero() {
+		query = query.Where("time >= ?", fltrs.From)
+	}
+	if !fltrs.To.IsZero() {
+		query = query.Where("time < ?", fltrs.To)
 	}
 	err = query.Scan(ctx)
 	return
