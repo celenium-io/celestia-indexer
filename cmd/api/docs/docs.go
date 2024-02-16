@@ -3572,18 +3572,6 @@ const docTemplate = `{
                         "description": "Offset",
                         "name": "offset",
                         "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Time from in unix timestamp",
-                        "name": "from",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Time to in unix timestamp",
-                        "name": "to",
-                        "in": "query"
                     }
                 ],
                 "responses": {

@@ -3818,14 +3818,6 @@ paths:
         in: query
         name: offset
         type: integer
-      - description: Time from in unix timestamp
-        in: query
-        name: from
-        type: integer
-      - description: Time to in unix timestamp
-        in: query
-        name: to
-        type: integer
       produces:
       - application/json
       responses:

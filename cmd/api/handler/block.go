@@ -5,7 +5,6 @@ package handler
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 
@@ -152,8 +151,6 @@ type getBlockEvents struct {
 	Height types.Level `param:"height" validate:"min=0"`
 	Limit  int         `query:"limit"  validate:"omitempty,min=1,max=100"`
 	Offset int         `query:"offset" validate:"omitempty,min=0"`
-	From   int64       `query:"from"   validate:"omitempty,min=1"`
-	To     int64       `query:"to"     validate:"omitempty,min=1"`
 }
 
 func (p *getBlockEvents) SetDefault() {
@@ -183,16 +180,18 @@ func (handler *BlockHandler) GetEvents(c echo.Context) error {
 	}
 	req.SetDefault()
 
+	blockTime, err := handler.block.Time(c.Request().Context(), req.Height)
+	if err != nil {
+		if handler.block.IsNoRows(err) {
+			return returnArray(c, []any{})
+		}
+		return internalServerError(c, err)
+	}
+
 	fltrs := storage.EventFilter{
 		Limit:  req.Limit,
 		Offset: req.Offset,
-	}
-
-	if req.From > 0 {
-		fltrs.From = time.Unix(req.From, 0).UTC()
-	}
-	if req.To > 0 {
-		fltrs.To = time.Unix(req.To, 0).UTC()
+		Time:   blockTime.UTC(),
 	}
 
 	events, err := handler.events.ByBlock(c.Request().Context(), req.Height, fltrs)

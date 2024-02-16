@@ -166,8 +166,6 @@ func (req *getTxEvents) SetDefault() {
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
 //	@Param			limit	query	integer	false	"Count of requested entities"		mininum(1)	maximum(100)
 //	@Param			offset	query	integer	false	"Offset"							mininum(1)
-//	@Param			from	query	integer	false	"Time from in unix timestamp"	    mininum(1)
-//	@Param			to		query	integer	false	"Time to in unix timestamp"		    mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Event
 //	@Failure		400	{object}	Error
@@ -180,18 +178,6 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	fltrs := storage.EventFilter{
-		Limit:  req.Limit,
-		Offset: req.Offset,
-	}
-
-	if req.From > 0 {
-		fltrs.From = time.Unix(req.From, 0).UTC()
-	}
-	if req.To > 0 {
-		fltrs.To = time.Unix(req.To, 0).UTC()
-	}
-
 	hash, err := hex.DecodeString(req.Hash)
 	if err != nil {
 		return badRequestError(c, err)
@@ -200,6 +186,12 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.tx)
+	}
+
+	fltrs := storage.EventFilter{
+		Limit:  req.Limit,
+		Offset: req.Offset,
+		Time:   tx.Time.UTC(),
 	}
 
 	events, err := handler.events.ByTxId(c.Request().Context(), tx.Id, fltrs)

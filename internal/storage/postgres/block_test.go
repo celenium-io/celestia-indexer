@@ -222,3 +222,15 @@ func (s *StorageTestSuite) TestBlockByProposer() {
 	s.Require().EqualValues(11000, block.Stats.BlockTime)
 	s.Require().EqualValues(4, block.Stats.BlobsCount)
 }
+
+func (s *StorageTestSuite) TestBlockTime() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	expected, err := time.Parse(time.RFC3339, "2023-07-04T03:10:57Z")
+	s.Require().NoError(err)
+
+	blockTime, err := s.storage.Blocks.Time(ctx, 1000)
+	s.Require().NoError(err)
+	s.Require().Equal(expected.UTC(), blockTime.UTC())
+}

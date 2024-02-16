@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
@@ -36,11 +37,10 @@ func (e *Event) ByTxId(ctx context.Context, txId uint64, fltrs storage.EventFilt
 	if fltrs.Offset > 0 {
 		query = query.Offset(fltrs.Offset)
 	}
-	if !fltrs.From.IsZero() {
-		query = query.Where("time >= ?", fltrs.From)
-	}
-	if !fltrs.To.IsZero() {
-		query = query.Where("time < ?", fltrs.To)
+	if !fltrs.Time.IsZero() {
+		query = query.
+			Where("time >= ?", fltrs.Time).
+			Where("time < ?", fltrs.Time.Add(time.Second))
 	}
 
 	err = query.Scan(ctx)
@@ -59,11 +59,10 @@ func (e *Event) ByBlock(ctx context.Context, height pkgTypes.Level, fltrs storag
 	if fltrs.Offset > 0 {
 		query = query.Offset(fltrs.Offset)
 	}
-	if !fltrs.From.IsZero() {
-		query = query.Where("time >= ?", fltrs.From)
-	}
-	if !fltrs.To.IsZero() {
-		query = query.Where("time < ?", fltrs.To)
+	if !fltrs.Time.IsZero() {
+		query = query.
+			Where("time >= ?", fltrs.Time).
+			Where("time < ?", fltrs.Time.Add(time.Second))
 	}
 	err = query.Scan(ctx)
 	return

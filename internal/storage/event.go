@@ -20,8 +20,7 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 type EventFilter struct {
 	Limit  int
 	Offset int
-	From   time.Time
-	To     time.Time
+	Time   time.Time
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
