@@ -33,9 +33,10 @@ var (
 	testRollupWithStats = storage.RollupWithStats{
 		Rollup: testRollup,
 		RollupStats: storage.RollupStats{
-			BlobsCount:     100,
-			Size:           1000,
-			LastActionTime: testTime,
+			BlobsCount:      100,
+			Size:            1000,
+			LastActionTime:  testTime,
+			FirstActionTime: testTime,
 		},
 	}
 )
@@ -97,6 +98,8 @@ func (s *RollupTestSuite) TestLeaderboard() {
 	s.Require().EqualValues("test-rollup", rollup.Slug)
 	s.Require().EqualValues(100, rollup.BlobsCount)
 	s.Require().EqualValues(1000, rollup.Size)
+	s.Require().EqualValues(testTime, rollup.LastAction)
+	s.Require().EqualValues(testTime, rollup.FirstAction)
 }
 
 func (s *RollupTestSuite) TestGet() {
@@ -114,9 +117,10 @@ func (s *RollupTestSuite) TestGet() {
 	s.rollups.EXPECT().
 		Stats(gomock.Any(), uint64(1)).
 		Return(storage.RollupStats{
-			Size:           10,
-			BlobsCount:     11,
-			LastActionTime: testTime,
+			Size:            10,
+			BlobsCount:      11,
+			LastActionTime:  testTime,
+			FirstActionTime: testTime,
 		}, nil)
 
 	s.Require().NoError(s.handler.Get(c))
@@ -132,6 +136,7 @@ func (s *RollupTestSuite) TestGet() {
 	s.Require().EqualValues(10, rollup.Size)
 	s.Require().EqualValues(11, rollup.BlobsCount)
 	s.Require().EqualValues(testTime, rollup.LastAction)
+	s.Require().EqualValues(testTime, rollup.FirstAction)
 }
 
 func (s *RollupTestSuite) TestGetNamespaces() {

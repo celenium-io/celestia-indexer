@@ -6,7 +6,8 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
         logs.signer_id, 
         sum(logs.size) as size, 
         sum(logs.blobs_count) as blobs_count, 
-        max(logs.last_time) as last_time
+        max(logs.last_time) as last_time,
+        min(logs.time) as first_time
     from rollup_stats_by_hour as logs
     group by 1, 2, 3
 	with no data;

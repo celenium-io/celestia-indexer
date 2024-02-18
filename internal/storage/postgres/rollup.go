@@ -38,11 +38,11 @@ func (r *Rollup) Leaderboard(ctx context.Context, sortField string, sort sdk.Sor
 	}
 
 	timeAggQuery := r.DB().NewSelect().Table("rollup_stats_by_month").
-		ColumnExpr("sum(size) as size, sum(blobs_count) as blobs_count, max(last_time) as last_time, namespace_id, signer_id").
+		ColumnExpr("sum(size) as size, sum(blobs_count) as blobs_count, max(last_time) as last_time, min(first_time) as first_time, namespace_id, signer_id").
 		Group("namespace_id", "signer_id")
 
 	leaderboardQuery := r.DB().NewSelect().TableExpr("(?) as agg", timeAggQuery).
-		ColumnExpr("sum(size) as size, sum(blobs_count) as blobs_count, max(last_time) as last_time, rollup_id").
+		ColumnExpr("sum(size) as size, sum(blobs_count) as blobs_count, max(last_time) as last_time, min(first_time) as first_time, rollup_id").
 		Join("inner join rollup_provider as rp on rp.address_id = agg.signer_id AND (rp.namespace_id = agg.namespace_id OR rp.namespace_id = 0)").
 		Group("rollup_id")
 
@@ -53,7 +53,7 @@ func (r *Rollup) Leaderboard(ctx context.Context, sortField string, sort sdk.Sor
 	leaderboardQuery = limitScope(leaderboardQuery, limit)
 
 	query := r.DB().NewSelect().Table("leaderboard").With("leaderboard", leaderboardQuery).
-		ColumnExpr("size, blobs_count, last_time, rollup.*").
+		ColumnExpr("size, blobs_count, last_time, first_time, rollup.*").
 		Join("inner join rollup on rollup.id = leaderboard.rollup_id")
 
 	query = sortScope(query, sortField, sort)
@@ -176,7 +176,7 @@ func (r *Rollup) Stats(ctx context.Context, rollupId uint64) (stats storage.Roll
 	}
 
 	query := r.DB().NewSelect().Table("rollup_stats_by_month").
-		ColumnExpr("sum(blobs_count) as blobs_count, sum(size) as size, max(last_time) as last_time")
+		ColumnExpr("sum(blobs_count) as blobs_count, sum(size) as size, max(last_time) as last_time, min(first_time) as first_time")
 
 	for i := range providers {
 		query.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {

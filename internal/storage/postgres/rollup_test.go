@@ -27,6 +27,8 @@ func (s *StorageTestSuite) TestRollupLeaderboard() {
 		s.Require().EqualValues("The third", rollup.Description, column)
 		s.Require().EqualValues(34, rollup.Size, column)
 		s.Require().EqualValues(3, rollup.BlobsCount, column)
+		s.Require().False(rollup.LastActionTime.IsZero())
+		s.Require().False(rollup.FirstActionTime.IsZero())
 	}
 }
 
@@ -39,6 +41,8 @@ func (s *StorageTestSuite) TestRollupStats() {
 
 	s.Require().EqualValues(30, rollup.Size)
 	s.Require().EqualValues(2, rollup.BlobsCount)
+	s.Require().False(rollup.LastActionTime.IsZero())
+	s.Require().False(rollup.FirstActionTime.IsZero())
 }
 
 func (s *StorageTestSuite) TestRollupNamespaces() {

@@ -62,7 +62,8 @@ type RollupWithStats struct {
 }
 
 type RollupStats struct {
-	Size           int64     `bun:"size"`
-	BlobsCount     int64     `bun:"blobs_count"`
-	LastActionTime time.Time `bun:"last_time"`
+	Size            int64     `bun:"size"`
+	BlobsCount      int64     `bun:"blobs_count"`
+	LastActionTime  time.Time `bun:"last_time"`
+	FirstActionTime time.Time `bun:"first_time"`
 }

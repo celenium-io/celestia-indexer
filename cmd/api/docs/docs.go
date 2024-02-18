@@ -4741,6 +4741,11 @@ const docTemplate = `{
                     "format": "string",
                     "example": "Long rollup description"
                 },
+                "first_message_time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
                 "github": {
                     "type": "string",
                     "format": "string",
