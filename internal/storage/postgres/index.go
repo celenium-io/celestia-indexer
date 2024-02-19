@@ -167,6 +167,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Message)(nil)).
+			Index("message_type_idx").
+			Column("type").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Namespace
 		if _, err := tx.NewCreateIndex().
