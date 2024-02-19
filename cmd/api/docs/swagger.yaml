@@ -549,6 +549,10 @@ definitions:
         example: Long rollup description
         format: string
         type: string
+      first_message_time:
+        example: "2023-07-04T03:10:57+00:00"
+        format: date-time
+        type: string
       github:
         example: https://github.com/account
         format: string
