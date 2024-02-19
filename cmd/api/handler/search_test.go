@@ -136,6 +136,46 @@ func (s *SearchTestSuite) TestSearchBlock() {
 	s.Require().NotNil(response.Result)
 }
 
+func (s *SearchTestSuite) TestSearchBlockWith0x() {
+	searchText := "0x" + hex.EncodeToString(testBlock.Hash)
+
+	q := make(url.Values)
+	q.Set("query", searchText)
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/search")
+
+	s.search.EXPECT().
+		Search(gomock.Any(), testBlock.Hash).
+		Return([]storage.SearchResult{
+			{
+				Id:    1,
+				Type:  "block",
+				Value: searchText,
+			},
+		}, nil).
+		Times(1)
+
+	s.block.EXPECT().
+		GetByID(gomock.Any(), uint64(1)).
+		Return(&testBlock, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.Search(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var items []responses.SearchItem
+	err := json.NewDecoder(rec.Body).Decode(&items)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+
+	response := items[0]
+	s.Require().Equal("block", response.Type)
+	s.Require().NotNil(response.Result)
+}
+
 func (s *SearchTestSuite) TestSearchTx() {
 	q := make(url.Values)
 	q.Set("query", testTxHash)

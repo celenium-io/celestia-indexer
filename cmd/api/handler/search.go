@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"regexp"
+	"strings"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -51,8 +52,8 @@ type searchRequest struct {
 }
 
 var (
-	hashRegexp      = regexp.MustCompile("[a-fA-f0-9]{64}")
-	namespaceRegexp = regexp.MustCompile("[a-fA-f0-9]{58}")
+	hashRegexp      = regexp.MustCompile("^(0x)?[a-fA-f0-9]{64}$")
+	namespaceRegexp = regexp.MustCompile("^[a-fA-f0-9]{58}$")
 )
 
 // Search godoc
@@ -116,6 +117,7 @@ func (handler SearchHandler) searchAddress(ctx context.Context, search string) (
 }
 
 func (handler SearchHandler) searchHash(ctx context.Context, search string) ([]responses.SearchItem, error) {
+	search = strings.TrimPrefix(search, "0x")
 	data, err := hex.DecodeString(search)
 	if err != nil {
 		return nil, err
