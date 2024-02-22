@@ -80,6 +80,8 @@ func (handler SearchHandler) Search(c echo.Context) error {
 	switch {
 	case isAddress(req.Search):
 		response, err = handler.searchAddress(c.Request().Context(), req.Search)
+	case isValoperAddress(req.Search):
+		response, err = handler.searchValoperAddress(c.Request().Context(), req.Search)
 	case hashRegexp.MatchString(req.Search):
 		response, err = handler.searchHash(c.Request().Context(), req.Search)
 	case namespaceRegexp.MatchString(req.Search):
@@ -114,6 +116,32 @@ func (handler SearchHandler) searchAddress(ctx context.Context, search string) (
 		Result: responses.NewAddress(address),
 	}
 	return []responses.SearchItem{result}, nil
+}
+
+func (handler SearchHandler) searchValoperAddress(ctx context.Context, search string) ([]responses.SearchItem, error) {
+	_, hash, err := types.Address(search).Decode()
+	if err != nil {
+		return nil, err
+	}
+
+	address, err := handler.address.ByHash(ctx, hash)
+	if err != nil {
+		return nil, err
+	}
+	validator, err := handler.validator.ByAddress(ctx, search)
+	if err != nil {
+		return nil, err
+	}
+
+	return []responses.SearchItem{
+		{
+			Type:   "validator",
+			Result: responses.NewValidator(validator),
+		}, {
+			Type:   "address",
+			Result: responses.NewAddress(address),
+		},
+	}, nil
 }
 
 func (handler SearchHandler) searchHash(ctx context.Context, search string) ([]responses.SearchItem, error) {
