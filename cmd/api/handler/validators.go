@@ -43,17 +43,18 @@ func (v *CelestiaApiValidator) Validate(i interface{}) error {
 }
 
 func isAddress(address string) bool {
-	switch len(address) {
-	case 47:
-		return validateAddress(address, pkgTypes.AddressPrefixCelestia)
-	case 54:
-		return validateAddress(address, pkgTypes.AddressPrefixValoper)
-	default:
-		return false
-	}
+	return validateAddress(address, pkgTypes.AddressPrefixCelestia, 47)
 }
 
-func validateAddress(address string, wantPrefix string) bool {
+func isValoperAddress(address string) bool {
+	return validateAddress(address, pkgTypes.AddressPrefixValoper, 54)
+}
+
+func validateAddress(address string, wantPrefix string, length int) bool {
+	if len(address) != length {
+		return false
+	}
+
 	prefix, _, err := bech32.DecodeAndConvert(address)
 	if err != nil {
 		return false
@@ -64,7 +65,7 @@ func validateAddress(address string, wantPrefix string) bool {
 
 func addressValidator() validator.Func {
 	return func(fl validator.FieldLevel) bool {
-		return isAddress(fl.Field().String())
+		return isAddress(fl.Field().String()) || isValoperAddress(fl.Field().String())
 	}
 }
 
