@@ -14,6 +14,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	indexerCfg "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
+	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/go-testfixtures/testfixtures/v3"
@@ -88,7 +89,8 @@ func (s *ModuleTestSuite) TestBlockLast() {
 	hash, err := hex.DecodeString("F44BC94BF7D064ADF82618F2691D2353161DE232ECB3091B7E5C89B453C79456")
 	s.Require().NoError(err)
 
-	module.MustInput(InputName).Push(storage.Block{
+	dCtx := decodeContext.NewContext()
+	dCtx.Block = &storage.Block{
 		Height:          1001,
 		Hash:            hash,
 		VersionBlock:    11,
@@ -96,7 +98,9 @@ func (s *ModuleTestSuite) TestBlockLast() {
 		ProposerAddress: "81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8",
 		Time:            time.Date(2023, 7, 4, 3, 11, 26, 0, time.UTC),
 		MessageTypes:    types.NewMsgTypeBitMask(),
-	})
+	}
+
+	module.MustInput(InputName).Push(dCtx)
 	time.Sleep(time.Second)
 
 	block, err := s.storage.Blocks.Last(ctx)

@@ -1,0 +1,6 @@
+- id: 1
+  time: '2023-07-04T03:10:57+00:00'
+  height: 1000
+  validator_id: 1
+  burned: 10000
+  reason: double_sign

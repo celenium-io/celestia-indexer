@@ -250,7 +250,7 @@ func (sh StatsHandler) NamespaceUsage(c echo.Context) error {
 
 type seriesRequest struct {
 	Timeframe  string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day week month year"`
-	SeriesName string `example:"tps"        param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_size blobs_count tps bps fee supply_change block_time tx_count events_count gas_price gas_efficiency gas_used gas_limit bytes_in_block"`
+	SeriesName string `example:"tps"        param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_size blobs_count tps bps fee supply_change block_time tx_count events_count gas_price gas_efficiency gas_used gas_limit bytes_in_block rewards commissions"`
 	From       int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
 	To         int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
 }
@@ -262,7 +262,7 @@ type seriesRequest struct {
 //	@Tags			stats
 //	@ID				stats-series
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, week, month, year)
-//	@Param			name		path	string	true	"Series name"					Enums(blobs_size, blobs_count, tps, bps, fee, supply_change, block_time, tx_count, events_count, gas_price, gas_efficiency, gas_used, gas_limit, bytes_in_block)
+//	@Param			name		path	string	true	"Series name"					Enums(blobs_size, blobs_count, tps, bps, fee, supply_change, block_time, tx_count, events_count, gas_price, gas_efficiency, gas_used, gas_limit, bytes_in_block, rewards, commissions)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
 //	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
 //	@Produce		json

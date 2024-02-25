@@ -17,6 +17,8 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
 		sum(events_count) as events_count,
 		sum(fee) as fee,
 		sum(supply_change) as supply_change,
+		sum(rewards) as rewards,
+		sum(commissions) as commissions,
 		sum(gas_limit) as gas_limit,
 		sum(gas_used) as gas_used,
 		(case when sum(gas_limit) > 0 then sum(fee) / sum(gas_limit) else 0 end) as gas_price,

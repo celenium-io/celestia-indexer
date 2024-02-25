@@ -158,6 +158,8 @@ func TestNewBlock(t *testing.T) {
 					Fee:           "125",
 					SupplyChange:  "123",
 					InflationRate: "0.08",
+					Rewards:       "0",
+					Commissions:   "0",
 					BlockTime:     11000,
 					MessagesCounts: map[storageTypes.MsgType]int64{
 						storageTypes.MsgSend:        1,
@@ -216,6 +218,8 @@ func TestNewBlockStats(t *testing.T) {
 				Fee:           "125",
 				SupplyChange:  "123",
 				InflationRate: "0.08",
+				Rewards:       "0",
+				Commissions:   "0",
 				BlockTime:     11000,
 				MessagesCounts: map[storageTypes.MsgType]int64{
 					storageTypes.MsgSend:        1,

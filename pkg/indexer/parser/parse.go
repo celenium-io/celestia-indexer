@@ -11,6 +11,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	dCtx "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -22,17 +23,9 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 		Int64("height", b.Block.Height).
 		Msg("parsing block...")
 
-	txs, err := parseTxs(b)
-	if err != nil {
-		return errors.Wrapf(err, "while parsing block on level=%d", b.Height)
-	}
+	decodeCtx := dCtx.NewContext()
 
-	var bytesInBlock int64
-	for i := range b.Block.Txs {
-		bytesInBlock += int64(len(b.Block.Txs[i]))
-	}
-
-	block := storage.Block{
+	decodeCtx.Block = &storage.Block{
 		Height:       b.Height,
 		Time:         b.Block.Time,
 		VersionBlock: b.Block.Version.Block,
@@ -54,7 +47,6 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 
 		ChainId: b.Block.ChainID,
 
-		Txs:    txs,
 		Events: nil,
 
 		Stats: storage.BlockStats{
@@ -66,47 +58,41 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 			Fee:           decimal.Zero,
 			SupplyChange:  decimal.Zero,
 			InflationRate: decimal.Zero,
-			BytesInBlock:  bytesInBlock,
+			Commissions:   decimal.Zero,
+			Rewards:       decimal.Zero,
 		},
 	}
 
-	block.BlockSignatures = p.parseBlockSignatures(b.Block.LastCommit)
+	txs, err := parseTxs(decodeCtx, b)
+	if err != nil {
+		return errors.Wrapf(err, "while parsing block on level=%d", b.Height)
+	}
+	decodeCtx.Block.Txs = txs
 
-	allEvents := make([]storage.Event, 0)
-
-	block.Events = parseEvents(b, b.ResultBlockResults.BeginBlockEvents)
-	allEvents = append(allEvents, block.Events...)
-
-	for i := range txs {
-		block.Stats.Fee = block.Stats.Fee.Add(txs[i].Fee)
-		block.MessageTypes.Set(txs[i].MessageTypes.Bits)
-		block.Stats.BlobsSize += txs[i].BlobsSize
-		block.Stats.GasLimit += txs[i].GasWanted
-		block.Stats.GasUsed += txs[i].GasUsed
-		block.Stats.BlobsCount += txs[i].BlobsCount
-		allEvents = append(allEvents, txs[i].Events...)
+	for i := range b.Block.Txs {
+		decodeCtx.Block.Stats.BytesInBlock += int64(len(b.Block.Txs[i]))
 	}
 
-	endEvents := parseEvents(b, b.ResultBlockResults.EndBlockEvents)
-	block.Events = append(block.Events, endEvents...)
-	allEvents = append(allEvents, endEvents...)
+	decodeCtx.Block.BlockSignatures = p.parseBlockSignatures(b.Block.LastCommit)
 
-	var eventsResult eventsResult
-	if err := eventsResult.Fill(allEvents); err != nil {
-		return err
+	decodeCtx.Block.Events, err = parseEvents(decodeCtx, b, b.ResultBlockResults.BeginBlockEvents, false)
+	if err != nil {
+		return errors.Wrap(err, "parsing begin block events")
 	}
 
-	block.Stats.InflationRate = eventsResult.InflationRate
-	block.Stats.SupplyChange = eventsResult.SupplyChange
-	block.Addresses = eventsResult.Addresses
+	endEvents, err := parseEvents(decodeCtx, b, b.ResultBlockResults.EndBlockEvents, false)
+	if err != nil {
+		return errors.Wrap(err, "parsing begin end events")
+	}
+	decodeCtx.Block.Events = append(decodeCtx.Block.Events, endEvents...)
 
 	p.Log.Info().
-		Uint64("height", uint64(block.Height)).
+		Uint64("height", uint64(decodeCtx.Block.Height)).
 		Int64("ms", time.Since(start).Milliseconds()).
 		Msg("block parsed")
 
 	output := p.MustOutput(OutputName)
-	output.Push(block)
+	output.Push(decodeCtx)
 	return nil
 }
 

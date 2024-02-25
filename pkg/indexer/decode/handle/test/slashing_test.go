@@ -4,16 +4,18 @@
 package handle_test
 
 import (
+	"testing"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/celenium-io/celestia-indexer/internal/test_suite"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosSlashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/fatih/structs"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 // MsgUnjail
@@ -30,7 +32,13 @@ func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -42,8 +50,8 @@ func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 				Address:    "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym",
 				Hash:       []byte{0xf3, 0xc0, 0x5, 0x68, 0x19, 0x9b, 0xaa, 0xa7, 0xf1, 0x2d, 0xa0, 0x48, 0xf1, 0xd0, 0xb6, 0xa, 0x22, 0xb9, 0x2b, 0x7e},
 				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
+					Id:        0,
+					Spendable: decimal.Zero,
 				},
 			},
 		},

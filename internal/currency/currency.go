@@ -5,11 +5,9 @@ package currency
 
 import "github.com/shopspring/decimal"
 
-type Denom string
-
 const (
-	Utia Denom = "utia"
-	Tia  Denom = "tia"
+	Utia string = "utia"
+	Tia  string = "tia"
 )
 
 const (

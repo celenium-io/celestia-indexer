@@ -39,13 +39,13 @@ func (s *StorageTestSuite) TestAddressList() {
 	s.Require().EqualValues(1, addresses[0].Id)
 	s.Require().EqualValues(100, addresses[0].Height)
 	s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", addresses[0].Address)
-	s.Require().Equal("123", addresses[0].Balance.Total.String())
+	s.Require().Equal("123", addresses[0].Balance.Spendable.String())
 	s.Require().Equal("utia", addresses[0].Balance.Currency)
 
 	s.Require().EqualValues(2, addresses[1].Id)
 	s.Require().EqualValues(101, addresses[1].Height)
 	s.Require().Equal("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", addresses[1].Address)
-	s.Require().Equal("321", addresses[1].Balance.Total.String())
+	s.Require().Equal("321", addresses[1].Balance.Spendable.String())
 	s.Require().Equal("utia", addresses[1].Balance.Currency)
 }
 

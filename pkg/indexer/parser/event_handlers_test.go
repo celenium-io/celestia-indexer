@@ -8,6 +8,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
@@ -39,8 +40,10 @@ func Test_parseCoinSpent(t *testing.T) {
 				Address:    testAddress,
 				Hash:       testHashAddress,
 				Balance: storage.Balance{
-					Currency: currency.DefaultCurrency,
-					Total:    decimal.RequireFromString("-123"),
+					Currency:  currency.DefaultCurrency,
+					Spendable: decimal.RequireFromString("-123"),
+					Delegated: decimal.Zero,
+					Unbonding: decimal.Zero,
 				},
 			},
 		}, {
@@ -56,17 +59,24 @@ func Test_parseCoinSpent(t *testing.T) {
 				Address:    testAddress,
 				Hash:       testHashAddress,
 				Balance: storage.Balance{
-					Currency: currency.DefaultCurrency,
-					Total:    decimal.Zero,
+					Currency:  currency.DefaultCurrency,
+					Spendable: decimal.Zero,
+					Delegated: decimal.Zero,
+					Unbonding: decimal.Zero,
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := parseCoinSpent(tt.data, tt.height)
+			ctx := context.NewContext()
+			err := parseCoinSpent(ctx, tt.data, tt.height)
 			require.True(t, (err == nil) != tt.wantErr)
-			require.Equal(t, tt.want, got)
+			require.EqualValues(t, 1, ctx.Addresses.Len())
+			_ = ctx.Addresses.Range(func(_ string, value *storage.Address) (error, bool) {
+				require.Equal(t, tt.want, value)
+				return nil, false
+			})
 		})
 	}
 }

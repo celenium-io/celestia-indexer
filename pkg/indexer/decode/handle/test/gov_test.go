@@ -4,10 +4,14 @@
 package handle_test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/celenium-io/celestia-indexer/internal/test_suite"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	codecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types"
@@ -16,8 +20,6 @@ import (
 	"github.com/fatih/structs"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
 func createExpectations(
@@ -40,7 +42,7 @@ func createExpectations(
 				Address:    address,
 				Hash:       hash,
 				Balance: storage.Balance{
-					Total: decimal.Zero,
+					Spendable: decimal.Zero,
 				},
 			},
 		},
@@ -79,7 +81,13 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 7
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected, msgExpected := createExpectations(
 		blob, now, m, position,
@@ -113,7 +121,13 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 8
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected, msgExpected := createExpectations(
 		blob, now, m, position,
@@ -145,7 +159,13 @@ func TestDecodeMsg_SuccessOnMsgExecLegacyContent(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 9
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected, msgExpected := createExpectations(
 		blob, now, m, position,
@@ -180,7 +200,13 @@ func TestDecodeMsg_SuccessOnMsgVote_V1(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 7
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected, msgExpected := createExpectations(
 		blob, now, m, position,
@@ -214,7 +240,13 @@ func TestDecodeMsg_SuccessOnMsgVote_V1Beta1(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 8
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected, msgExpected := createExpectations(
 		blob, now, m, position,
@@ -247,7 +279,13 @@ func TestDecodeMsg_SuccessOnMsgVoteWeighted_V1(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 7
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected, msgExpected := createExpectations(
 		blob, now, m, position,
@@ -279,7 +317,13 @@ func TestDecodeMsg_SuccessOnMsgVoteWeighted_V1Beta1(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 8
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected, msgExpected := createExpectations(
 		blob, now, m, position,
@@ -312,7 +356,13 @@ func TestDecodeMsg_SuccessMsgDeposit_V1(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 7
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected, msgExpected := createExpectations(
 		blob, now, m, position,
@@ -344,7 +394,13 @@ func TestDecodeMsg_SuccessOnMsgDeposit_V1Beta1(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 8
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected, msgExpected := createExpectations(
 		blob, now, m, position,

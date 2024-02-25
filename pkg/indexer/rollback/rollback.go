@@ -190,7 +190,7 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 		return tx.HandleError(ctx, err)
 	}
 
-	removedValidators, err := tx.RollbackValidators(ctx, height)
+	vals, err := rollbackValidators(ctx, tx, height)
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
@@ -211,6 +211,7 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
+
 	state.LastHeight = newBlock.Height
 	state.LastHash = newBlock.Hash
 	state.LastTime = newBlock.Time
@@ -218,9 +219,10 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	state.TotalBlobsSize -= blockStats.BlobsSize
 	state.TotalNamespaces -= totalNamespaces
 	state.TotalAccounts -= int64(len(addresses))
-	state.TotalValidators -= len(removedValidators)
+	state.TotalValidators -= vals.count
 	state.TotalFee = state.TotalFee.Sub(blockStats.Fee)
 	state.TotalSupply = state.TotalSupply.Sub(blockStats.SupplyChange)
+	state.TotalStake = state.TotalStake.Sub(vals.stake)
 
 	if err := tx.Update(ctx, &state); err != nil {
 		return tx.HandleError(ctx, err)

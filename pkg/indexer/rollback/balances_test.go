@@ -38,8 +38,8 @@ func Test_coinReceived(t *testing.T) {
 				Hash:    testHashAddress,
 				Address: testAddress,
 				Balance: storage.Balance{
-					Currency: "utia",
-					Total:    decimal.RequireFromString("-123"),
+					Currency:  "utia",
+					Spendable: decimal.RequireFromString("-123"),
 				},
 			},
 		}, {
@@ -52,8 +52,8 @@ func Test_coinReceived(t *testing.T) {
 				Hash:    testHashAddress,
 				Address: testAddress,
 				Balance: storage.Balance{
-					Currency: "utia",
-					Total:    decimal.Zero,
+					Currency:  "utia",
+					Spendable: decimal.Zero,
 				},
 			},
 		}, {
@@ -104,8 +104,8 @@ func Test_coinSpent(t *testing.T) {
 				Hash:    testHashAddress,
 				Address: testAddress,
 				Balance: storage.Balance{
-					Currency: "utia",
-					Total:    decimal.RequireFromString("123"),
+					Currency:  "utia",
+					Spendable: decimal.RequireFromString("123"),
 				},
 			},
 		}, {
@@ -118,8 +118,8 @@ func Test_coinSpent(t *testing.T) {
 				Hash:    testHashAddress,
 				Address: testAddress,
 				Balance: storage.Balance{
-					Currency: "utia",
-					Total:    decimal.Zero,
+					Currency:  "utia",
+					Spendable: decimal.Zero,
 				},
 			},
 		}, {
@@ -189,8 +189,8 @@ func Test_getBalanceUpdates(t *testing.T) {
 					Address: testAddress,
 					Hash:    testHashAddress,
 					Balance: storage.Balance{
-						Currency: currency.DefaultCurrency,
-						Total:    decimal.RequireFromString("100"),
+						Currency:  currency.DefaultCurrency,
+						Spendable: decimal.RequireFromString("100"),
 					},
 					LastHeight: 100,
 				},

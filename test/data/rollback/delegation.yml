@@ -1,0 +1,8 @@
+- id: 1
+  address_id: 1
+  validator_id: 1
+  amount: 10000
+- id: 2
+  address_id: 2
+  validator_id: 1
+  amount: 10000

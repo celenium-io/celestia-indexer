@@ -320,6 +320,141 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// StakingLog
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.StakingLog)(nil)).
+			Index("staking_log_address_id_idx").
+			Column("address_id").
+			Where("address_id is not null").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.StakingLog)(nil)).
+			Index("staking_log_validator_id_idx").
+			Column("validator_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.StakingLog)(nil)).
+			Index("staking_log_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// Delegation
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Delegation)(nil)).
+			Index("delegation_address_id_idx").
+			Column("address_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Delegation)(nil)).
+			Index("delegation_validator_id_idx").
+			Column("validator_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Delegation)(nil)).
+			Index("delegation_amount_idx").
+			Column("amount").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// Redelegation
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Redelegation)(nil)).
+			Index("redelegation_address_id_idx").
+			Column("address_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Redelegation)(nil)).
+			Index("redelegation_amount_idx").
+			Column("amount").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Redelegation)(nil)).
+			Index("redelegation_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// Undelegation
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Undelegation)(nil)).
+			Index("undelegation_address_id_idx").
+			Column("address_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Undelegation)(nil)).
+			Index("undelegation_validator_id_idx").
+			Column("validator_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Undelegation)(nil)).
+			Index("undelegation_amount_idx").
+			Column("amount").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Undelegation)(nil)).
+			Index("undelegation_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// Jail
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Jail)(nil)).
+			Index("jail_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Jail)(nil)).
+			Index("jail_validator_id_idx").
+			Column("validator_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

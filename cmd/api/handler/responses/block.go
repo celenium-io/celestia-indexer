@@ -74,6 +74,8 @@ type BlockStats struct {
 	SupplyChange   string                  `example:"8635234"                         json:"supply_change"   swaggertype:"string"`
 	InflationRate  string                  `example:"0.0800000"                       json:"inflation_rate"  swaggertype:"string"`
 	FillRate       string                  `example:"0.0800"                          json:"fill_rate"       swaggertype:"string"`
+	Rewards        string                  `example:"102102812"                       json:"rewards"         swaggertype:"string"`
+	Commissions    string                  `example:"123133"                          json:"commissions"     swaggertype:"string"`
 	BlockTime      uint64                  `example:"12354"                           json:"block_time"      swaggertype:"integer"`
 	GasLimit       int64                   `example:"1234"                            json:"gas_limit"       swaggertype:"integer"`
 	GasUsed        int64                   `example:"1234"                            json:"gas_used"        swaggertype:"integer"`
@@ -94,6 +96,8 @@ func NewBlockStats(stats storage.BlockStats) *BlockStats {
 		Fee:            stats.Fee.String(),
 		SupplyChange:   stats.SupplyChange.String(),
 		InflationRate:  stats.InflationRate.String(),
+		Commissions:    stats.Commissions.String(),
+		Rewards:        stats.Rewards.String(),
 		BlockTime:      stats.BlockTime,
 		MessagesCounts: stats.MessagesCounts,
 		GasLimit:       stats.GasLimit,

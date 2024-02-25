@@ -46,7 +46,6 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		messages   = make([]*storage.Message, 0)
 		events     = make([]any, len(data.block.Events))
 		namespaces = make(map[string]*storage.Namespace, 0)
-		validators = make([]*storage.Validator, 0)
 	)
 
 	for i := range data.block.Events {
@@ -65,10 +64,6 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 					namespaces[key] = &data.block.Txs[i].Messages[j].Namespace[k]
 				}
 			}
-
-			if data.block.Txs[i].Messages[j].Validator != nil {
-				validators = append(validators, data.block.Txs[i].Messages[j].Validator)
-			}
 		}
 
 		for j := range data.block.Txs[i].Events {
@@ -81,7 +76,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 			if addr, ok := data.addresses[key]; !ok {
 				data.addresses[key] = &data.block.Txs[i].Signers[j]
 			} else {
-				addr.Balance.Total = addr.Balance.Total.Add(data.block.Txs[i].Signers[j].Balance.Total)
+				addr.Balance.Spendable = addr.Balance.Spendable.Add(data.block.Txs[i].Signers[j].Balance.Spendable)
 			}
 		}
 	}
@@ -124,7 +119,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		return tx.HandleError(ctx, err)
 	}
 
-	totalValidators, err := tx.SaveValidators(ctx, validators...)
+	totalValidators, err := tx.SaveValidators(ctx, data.validators...)
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}

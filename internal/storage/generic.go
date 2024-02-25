@@ -6,6 +6,7 @@ package storage
 import (
 	"context"
 	"io"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -29,6 +30,11 @@ var Models = []any{
 	&Signer{},
 	&MsgAddress{},
 	&Validator{},
+	&Delegation{},
+	&Redelegation{},
+	&Undelegation{},
+	&StakingLog{},
+	&Jail{},
 	&BlobLog{},
 	&Price{},
 	&Rollup{},
@@ -72,8 +78,17 @@ type Transaction interface {
 	SaveRollup(ctx context.Context, rollup *Rollup) error
 	UpdateRollup(ctx context.Context, rollup *Rollup) error
 	SaveProviders(ctx context.Context, providers ...RollupProvider) error
+	SaveUndelegations(ctx context.Context, undelegations ...Undelegation) error
+	SaveRedelegations(ctx context.Context, redelegations ...Redelegation) error
+	SaveDelegations(ctx context.Context, delegations ...Delegation) error
+	SaveStakingLogs(ctx context.Context, logs ...StakingLog) error
+	SaveJails(ctx context.Context, jails ...Jail) error
 	SaveBlockSignatures(ctx context.Context, signs ...BlockSignature) error
 	RetentionBlockSignatures(ctx context.Context, height types.Level) error
+	CancelUnbondings(ctx context.Context, cancellations ...Undelegation) error
+	RetentionCompletedUnbondings(ctx context.Context, blockTime time.Time) error
+	RetentionCompletedRedelegations(ctx context.Context, blockTime time.Time) error
+	Jail(ctx context.Context, ids ...uint64) error
 
 	RollbackBlock(ctx context.Context, height types.Level) error
 	RollbackBlockStats(ctx context.Context, height types.Level) (stats BlockStats, err error)
@@ -88,9 +103,15 @@ type Transaction interface {
 	RollbackBlockSignatures(ctx context.Context, height types.Level) (err error)
 	RollbackSigners(ctx context.Context, txIds []uint64) (err error)
 	RollbackMessageAddresses(ctx context.Context, msgIds []uint64) (err error)
+	RollbackUndelegations(ctx context.Context, height types.Level) (err error)
+	RollbackRedelegations(ctx context.Context, height types.Level) (err error)
+	RollbackStakingLogs(ctx context.Context, height types.Level) ([]StakingLog, error)
+	RollbackJails(ctx context.Context, height types.Level) ([]Jail, error)
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	DeleteProviders(ctx context.Context, rollupId uint64) error
 	DeleteRollup(ctx context.Context, rollupId uint64) error
+	DeleteDelegationsByValidator(ctx context.Context, ids ...uint64) error
+	UpdateValidators(ctx context.Context, validators ...*Validator) error
 
 	State(ctx context.Context, name string) (state State, err error)
 	LastBlock(ctx context.Context) (block Block, err error)

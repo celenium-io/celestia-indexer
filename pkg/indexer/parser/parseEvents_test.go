@@ -11,8 +11,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,9 +23,11 @@ func TestParseEvents_EmptyEventsResults(t *testing.T) {
 		},
 	}
 
-	resultEvents := parseEvents(block, make([]types.Event, 0))
+	ctx := context.NewContext()
+	resultEvents, err := parseEvents(ctx, block, make([]types.Event, 0), false)
+	require.NoError(t, err)
 
-	assert.Empty(t, resultEvents)
+	require.Empty(t, resultEvents)
 }
 
 func TestParseEvents_SuccessTx(t *testing.T) {
@@ -60,22 +62,24 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 	}
 	block, now := testsuite.CreateTestBlock(txRes, 1)
 
-	resultEvents := parseEvents(block, events)
+	ctx := context.NewContext()
+	resultEvents, err := parseEvents(ctx, block, events, false)
+	require.NoError(t, err)
 
-	assert.Len(t, resultEvents, 1)
+	require.Len(t, resultEvents, 1)
 
 	e := resultEvents[0]
-	assert.Equal(t, block.Height, e.Height)
-	assert.Equal(t, now, e.Time)
-	assert.Equal(t, int64(0), e.Position)
-	assert.Equal(t, storageTypes.EventTypeCoinSpent, e.Type)
-	assert.Nil(t, e.TxId)
+	require.Equal(t, block.Height, e.Height)
+	require.Equal(t, now, e.Time)
+	require.Equal(t, int64(0), e.Position)
+	require.Equal(t, storageTypes.EventTypeCoinSpent, e.Type)
+	require.Nil(t, e.TxId)
 
 	attrs := map[string]any{
 		"spender": "celestia1p330stapusykfss47qrhqlukjncvgyzf6gdufs",
 		"amount":  "40494utia",
 	}
-	assert.Equal(t, attrs, e.Data)
+	require.Equal(t, attrs, e.Data)
 }
 
 func BenchmarkParseEvent(b *testing.B) {
@@ -111,9 +115,10 @@ func BenchmarkParseEvent(b *testing.B) {
 	require.NoError(b, err)
 
 	resultEvent := storage.Event{}
+	ctx := context.NewContext()
 	b.Run("parse event", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			parseEvent(block, event, 10, &resultEvent)
+			_ = parseEvent(ctx, block, event, 10, false, &resultEvent)
 		}
 	})
 }

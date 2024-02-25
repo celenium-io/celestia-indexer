@@ -65,10 +65,10 @@ type Message struct {
 	TxId     uint64         `bun:"tx_id"                       comment:"Parent transaction id"`
 	Data     map[string]any `bun:"data,type:jsonb,nullzero"    comment:"Message data"`
 
-	Namespace []Namespace       `bun:"m2m:namespace_message,join:Message=Namespace"`
-	Validator *Validator        `bun:"rel:belongs-to"`
-	Addresses []AddressWithType `bun:"-"`
-	BlobLogs  []*BlobLog        `bun:"-"`
+	Namespace    []Namespace       `bun:"m2m:namespace_message,join:Message=Namespace"`
+	Addresses    []AddressWithType `bun:"-"`
+	BlobLogs     []*BlobLog        `bun:"-"`
+	InternalMsgs []string          `bun:"-"` // field for parsing MsgExec internal messages
 }
 
 // TableName -

@@ -22,10 +22,11 @@ import (
 // StateTestSuite -
 type StateTestSuite struct {
 	suite.Suite
-	state   *mock.MockIState
-	echo    *echo.Echo
-	handler *StateHandler
-	ctrl    *gomock.Controller
+	state      *mock.MockIState
+	validators *mock.MockIValidator
+	echo       *echo.Echo
+	handler    *StateHandler
+	ctrl       *gomock.Controller
 }
 
 // SetupSuite -
@@ -34,7 +35,8 @@ func (s *StateTestSuite) SetupSuite() {
 	s.echo.Validator = NewCelestiaApiValidator()
 	s.ctrl = gomock.NewController(s.T())
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewStateHandler(s.state)
+	s.validators = mock.NewMockIValidator(s.ctrl)
+	s.handler = NewStateHandler(s.state, s.validators)
 }
 
 // TearDownSuite -
@@ -53,6 +55,11 @@ func (s *StateTestSuite) TestHead() {
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/head")
 
+	s.validators.EXPECT().
+		TotalVotingPower(gomock.Any()).
+		Return(decimal.RequireFromString("100"), nil).
+		Times(1)
+
 	s.state.EXPECT().
 		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return([]*storage.State{
@@ -66,8 +73,10 @@ func (s *StateTestSuite) TestHead() {
 				TotalFee:        decimal.RequireFromString("2"),
 				TotalBlobsSize:  30,
 				TotalValidators: 10,
+				TotalStake:      decimal.NewFromInt(100),
 			},
-		}, nil)
+		}, nil).
+		Times(1)
 
 	s.Require().NoError(s.handler.Head(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
@@ -84,6 +93,8 @@ func (s *StateTestSuite) TestHead() {
 	s.Require().EqualValues(30, state.TotalBlobsSize)
 	s.Require().EqualValues(10, state.TotalValidators)
 	s.Require().Equal(testTime, state.LastTime)
+	s.Require().Equal("100", state.TotalVotingPower)
+	s.Require().Equal("100", state.TotalStake)
 }
 
 func (s *StateTestSuite) TestNoHead() {

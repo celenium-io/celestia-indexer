@@ -17,8 +17,9 @@ import (
 )
 
 type Dispatcher struct {
-	listener storage.Listener
-	blocks   storage.IBlock
+	listener   storage.Listener
+	blocks     storage.IBlock
+	validators storage.IValidator
 
 	mx        *sync.RWMutex
 	observers []*Observer
@@ -29,17 +30,19 @@ type Dispatcher struct {
 func NewDispatcher(
 	factory storage.ListenerFactory,
 	blocks storage.IBlock,
+	validators storage.IValidator,
 ) (*Dispatcher, error) {
 	if factory == nil {
 		return nil, errors.New("nil listener factory")
 	}
 	listener := factory.CreateListener()
 	return &Dispatcher{
-		listener:  listener,
-		blocks:    blocks,
-		observers: make([]*Observer, 0),
-		mx:        new(sync.RWMutex),
-		g:         workerpool.NewGroup(),
+		listener:   listener,
+		blocks:     blocks,
+		validators: validators,
+		observers:  make([]*Observer, 0),
+		mx:         new(sync.RWMutex),
+		g:          workerpool.NewGroup(),
 	}, nil
 }
 
@@ -130,6 +133,12 @@ func (d *Dispatcher) handleState(ctx context.Context, payload string) error {
 	if err := jsoniter.UnmarshalFromString(payload, &state); err != nil {
 		return err
 	}
+
+	power, err := d.validators.TotalVotingPower(ctx)
+	if err != nil {
+		return err
+	}
+	state.TotalVotingPower = power
 
 	d.mx.RLock()
 	for i := range d.observers {

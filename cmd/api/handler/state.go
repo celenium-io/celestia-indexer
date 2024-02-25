@@ -13,12 +13,14 @@ import (
 )
 
 type StateHandler struct {
-	state storage.IState
+	state     storage.IState
+	validator storage.IValidator
 }
 
-func NewStateHandler(state storage.IState) *StateHandler {
+func NewStateHandler(state storage.IState, validator storage.IValidator) *StateHandler {
 	return &StateHandler{
-		state: state,
+		state:     state,
+		validator: validator,
 	}
 }
 
@@ -42,6 +44,12 @@ func (sh *StateHandler) Head(c echo.Context) error {
 	if len(state) == 0 {
 		return c.NoContent(http.StatusNoContent)
 	}
+
+	votingPower, err := sh.validator.TotalVotingPower(c.Request().Context())
+	if err != nil {
+		return internalServerError(c, err)
+	}
+	state[0].TotalVotingPower = votingPower
 
 	return c.JSON(http.StatusOK, responses.NewState(*state[0]))
 }

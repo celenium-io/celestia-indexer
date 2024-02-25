@@ -27,10 +27,15 @@ func NewAddress(db *database.Bun) *Address {
 
 // ByHash -
 func (a *Address) ByHash(ctx context.Context, hash []byte) (address storage.Address, err error) {
-	err = a.DB().NewSelect().Model(&address).
-		Where("hash = ?", hash).
-		Relation("Balance").
-		Scan(ctx)
+	addressQuery := a.DB().NewSelect().
+		Model((*storage.Address)(nil)).
+		Where("hash = ?", hash)
+
+	err = a.DB().NewSelect().TableExpr("(?) as address", addressQuery).
+		ColumnExpr("address.*").
+		ColumnExpr("balance.currency as balance__currency, balance.spendable as balance__spendable, balance.delegated as balance__delegated, balance.unbonding as balance__unbonding").
+		Join("left join balance on balance.id = address.id").
+		Scan(ctx, &address)
 	return
 }
 
@@ -42,7 +47,7 @@ func (a *Address) ListWithBalance(ctx context.Context, filters storage.AddressLi
 	err = a.DB().NewSelect().
 		TableExpr("(?) as address", addressQuery).
 		ColumnExpr("address.*").
-		ColumnExpr("balance.currency as balance__currency, balance.total as balance__total").
+		ColumnExpr("balance.currency as balance__currency, balance.spendable as balance__spendable, balance.delegated as balance__delegated, balance.unbonding as balance__unbonding").
 		Join("left join balance on balance.id = address.id").
 		Scan(ctx, &result)
 	return

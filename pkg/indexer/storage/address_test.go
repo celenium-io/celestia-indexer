@@ -82,27 +82,27 @@ func TestModule_saveSigners(t *testing.T) {
 func Test_saveAddresses(t *testing.T) {
 	tests := []struct {
 		name      string
-		addresses map[string]*storage.Address
+		addresses []*storage.Address
 		addr      map[string]uint64
 		total     int64
 		wantErr   bool
 	}{
 		{
 			name:      "test 1",
-			addresses: map[string]*storage.Address{},
+			addresses: []*storage.Address{},
 			addr:      nil,
 			total:     0,
 			wantErr:   false,
 		}, {
 			name: "test 2",
-			addresses: map[string]*storage.Address{
-				"address1": {
+			addresses: []*storage.Address{
+				{
 					Address:    "address1",
 					Height:     100,
 					LastHeight: 100,
 					Balance: storage.Balance{
-						Currency: "utia",
-						Total:    decimal.RequireFromString("1"),
+						Currency:  "utia",
+						Spendable: decimal.RequireFromString("1"),
 					},
 				},
 			},
@@ -113,14 +113,14 @@ func Test_saveAddresses(t *testing.T) {
 			wantErr: false,
 		}, {
 			name: "test 3",
-			addresses: map[string]*storage.Address{
-				"address1": {
+			addresses: []*storage.Address{
+				{
 					Address:    "address1",
 					Height:     100,
 					LastHeight: 101,
 					Balance: storage.Balance{
-						Currency: "utia",
-						Total:    decimal.RequireFromString("1"),
+						Currency:  "utia",
+						Spendable: decimal.RequireFromString("1"),
 					},
 				},
 			},

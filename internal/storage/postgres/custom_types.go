@@ -74,6 +74,16 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 		); err != nil {
 			return err
 		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"staking_log_type",
+			bun.Safe("staking_log_type"),
+			bun.In(types.StakingLogTypeValues()),
+		); err != nil {
+			return err
+		}
 		return nil
 	})
 }

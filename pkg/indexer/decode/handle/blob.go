@@ -5,18 +5,17 @@ package handle
 
 import (
 	"encoding/base64"
-	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celestiaorg/celestia-app/pkg/namespace"
 	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
 	"github.com/pkg/errors"
 )
 
 // MsgPayForBlobs pays for the inclusion of a blob in the block.
-func MsgPayForBlobs(level types.Level, blockTime time.Time, status storageTypes.Status, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []storage.AddressWithType, []storage.Namespace, []*storage.BlobLog, int64, error) {
+func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []storage.AddressWithType, []storage.Namespace, []*storage.BlobLog, int64, error) {
 	var blobsSize int64
 	uniqueNs := make(map[string]*storage.Namespace)
 	blobLogs := make([]*storage.BlobLog, 0)
@@ -35,13 +34,13 @@ func MsgPayForBlobs(level types.Level, blockTime time.Time, status storageTypes.
 		size := int64(m.BlobSizes[nsI])
 		blobsSize += size
 		namespace := storage.Namespace{
-			FirstHeight:     level,
+			FirstHeight:     ctx.Block.Height,
 			Version:         appNS.Version,
 			NamespaceID:     appNS.ID,
 			PfbCount:        1,
 			Reserved:        appNS.IsReserved(),
-			LastHeight:      level,
-			LastMessageTime: blockTime,
+			LastHeight:      ctx.Block.Height,
+			LastMessageTime: ctx.Block.Time,
 		}
 
 		if status == storageTypes.StatusSuccess {
@@ -52,8 +51,8 @@ func MsgPayForBlobs(level types.Level, blockTime time.Time, status storageTypes.
 				Commitment: base64.StdEncoding.EncodeToString(m.ShareCommitments[nsI]),
 				Size:       size,
 				Namespace:  &namespace,
-				Height:     level,
-				Time:       blockTime,
+				Height:     ctx.Block.Height,
+				Time:       ctx.Block.Time,
 				Signer: &storage.Address{
 					Address: m.Signer,
 				},
@@ -76,7 +75,7 @@ func MsgPayForBlobs(level types.Level, blockTime time.Time, status storageTypes.
 
 	addresses, err := createAddresses(addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, level)
+	}, ctx.Block.Height)
 
 	return storageTypes.MsgPayForBlobs, addresses, namespaces, blobLogs, blobsSize, err
 }

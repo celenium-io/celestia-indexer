@@ -9,6 +9,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
@@ -19,6 +20,7 @@ import (
 type parsedData struct {
 	block         storage.Block
 	addresses     map[string]*storage.Address
+	validators    []*storage.Validator
 	constants     []storage.Constant
 	denomMetadata []storage.DenomMetadata
 }
@@ -26,6 +28,7 @@ type parsedData struct {
 func newParsedData() parsedData {
 	return parsedData{
 		addresses:     make(map[string]*storage.Address),
+		validators:    make([]*storage.Validator, 0),
 		constants:     make([]storage.Constant, 0),
 		denomMetadata: make([]storage.DenomMetadata, 0),
 	}
@@ -50,6 +53,9 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 		},
 		MessageTypes: storageTypes.NewMsgTypeBits(),
 	}
+
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &block
 
 	for index, genTx := range genesis.AppState.Genutil.GenTxs {
 		txDecoded, err := decode.JsonTx(genTx)
@@ -82,7 +88,7 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 		}
 
 		for msgIndex, msg := range txDecoded.GetMsgs() {
-			decoded, err := decode.Message(msg, block.Height, block.Time, msgIndex, storageTypes.StatusSuccess)
+			decoded, err := decode.Message(decodeCtx, msg, msgIndex, storageTypes.StatusSuccess)
 			if err != nil {
 				return data, errors.Wrap(err, "decode genesis message")
 			}
@@ -108,6 +114,7 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 		return data, errors.Wrap(err, "parse genesis account balances")
 	}
 
+	data.validators = decodeCtx.GetValidators()
 	data.block = block
 	return data, nil
 }
@@ -128,8 +135,10 @@ func (module *Module) parseAccounts(accounts []types.Accounts, height pkgTypes.L
 			Height:     height,
 			LastHeight: height,
 			Balance: storage.Balance{
-				Total:    decimal.Zero,
-				Currency: data.denomMetadata[0].Base,
+				Spendable: decimal.Zero,
+				Delegated: decimal.Zero,
+				Unbonding: decimal.Zero,
+				Currency:  data.denomMetadata[0].Base,
 			},
 		}
 
@@ -182,16 +191,18 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 			Height:     height,
 			LastHeight: height,
 			Balance: storage.Balance{
-				Total:    decimal.Zero,
-				Currency: balances[i].Coins[0].Denom,
+				Spendable: decimal.Zero,
+				Delegated: decimal.Zero,
+				Unbonding: decimal.Zero,
+				Currency:  balances[i].Coins[0].Denom,
 			},
 		}
 		if balance, err := decimal.NewFromString(balances[i].Coins[0].Amount); err == nil {
-			address.Balance.Total = address.Balance.Total.Add(balance)
+			address.Balance.Spendable = address.Balance.Spendable.Add(balance)
 		}
 
 		if addr, ok := data.addresses[address.String()]; ok {
-			addr.Balance.Total = addr.Balance.Total.Add(address.Balance.Total)
+			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
 		} else {
 			data.addresses[address.String()] = &address
 		}

@@ -1,6 +1,10 @@
 - id: 1
-  total: 123
+  spendable: 123
+  delegated: 0
+  unbonding: 0
   currency: utia
 - id: 2
-  total: 321
+  spendable: 321
+  delegated: 0
+  unbonding: 0
   currency: utia

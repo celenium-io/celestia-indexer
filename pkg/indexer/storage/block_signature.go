@@ -32,23 +32,12 @@ func (module *Module) saveBlockSignatures(
 		return nil
 	}
 
-	if len(module.validators) == 0 {
-		validators, err := tx.Validators(ctx)
-		if err != nil {
-			return err
-		}
-		module.validators = make(map[string]uint64)
-		for i := range validators {
-			module.validators[validators[i].ConsAddress] = validators[i].Id
-		}
-	}
-
 	for i := range signs {
 		if signs[i].Validator == nil {
 			return errors.New("nil validator of block signature")
 		}
 
-		if id, ok := module.validators[signs[i].Validator.ConsAddress]; ok {
+		if id, ok := module.validatorsByConsAddress[signs[i].Validator.ConsAddress]; ok {
 			signs[i].ValidatorId = id
 		} else {
 			return errors.Errorf("unknown validator: %s", signs[i].Validator.ConsAddress)

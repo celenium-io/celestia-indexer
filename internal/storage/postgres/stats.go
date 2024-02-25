@@ -202,6 +202,10 @@ func (s Stats) Series(ctx context.Context, timeframe storage.Timeframe, name str
 		query.ColumnExpr("ts, bytes_in_block as value")
 	case storage.SeriesBlobsCount:
 		query.ColumnExpr("ts, blobs_count as value")
+	case storage.SeriesCommissions:
+		query.ColumnExpr("ts, commissions as value")
+	case storage.SeriesRewards:
+		query.ColumnExpr("ts, rewards as value")
 	default:
 		return nil, errors.Errorf("unexpected series name: %s", name)
 	}

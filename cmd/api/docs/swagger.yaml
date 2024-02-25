@@ -36,7 +36,13 @@ definitions:
       currency:
         example: utia
         type: string
-      value:
+      delegated:
+        example: "10000000000"
+        type: string
+      spendable:
+        example: "10000000000"
+        type: string
+      unbonding:
         example: "10000000000"
         type: string
     type: object
@@ -167,6 +173,9 @@ definitions:
       bytes_in_block:
         example: 1234
         type: integer
+      commissions:
+        example: "123133"
+        type: string
       events_count:
         example: 18
         type: integer
@@ -188,6 +197,9 @@ definitions:
       messages_counts:
         example: '{MsgPayForBlobs:10,MsgUnjail:1}'
         type: string
+      rewards:
+        example: "102102812"
+        type: string
       supply_change:
         example: "8635234"
         type: string
@@ -205,6 +217,17 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/responses.Params'
         type: object
+    type: object
+  responses.Delegation:
+    properties:
+      amount:
+        example: "0.1"
+        type: string
+      delegator:
+        example: celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60
+        type: string
+      validator:
+        $ref: '#/definitions/responses.ShortValidator'
     type: object
   responses.DenomMetadata:
     properties:
@@ -301,6 +324,23 @@ definitions:
         example: "2223424"
         format: string
         type: string
+    type: object
+  responses.Jail:
+    properties:
+      height:
+        example: 100
+        type: integer
+      reason:
+        example: double_sign
+        type: string
+      spendable:
+        example: "10000000000"
+        type: string
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        type: string
+      validator:
+        $ref: '#/definitions/responses.ShortValidator'
     type: object
   responses.Message:
     properties:
@@ -504,6 +544,28 @@ definitions:
         format: date-time
         type: string
     type: object
+  responses.Redelegation:
+    properties:
+      amount:
+        example: "0.1"
+        type: string
+      completion_time:
+        example: "2023-07-04T03:10:57+00:00"
+        type: string
+      delegator:
+        example: celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60
+        type: string
+      destination:
+        $ref: '#/definitions/responses.ShortValidator'
+      height:
+        example: 100
+        type: integer
+      source:
+        $ref: '#/definitions/responses.ShortValidator'
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        type: string
+    type: object
   responses.Rollup:
     properties:
       description:
@@ -679,6 +741,10 @@ definitions:
         example: "312"
         format: string
         type: string
+      total_stake:
+        example: "312"
+        format: string
+        type: string
       total_supply:
         example: "312"
         format: string
@@ -691,6 +757,10 @@ definitions:
         example: 100
         format: int64
         type: integer
+      total_voting_power:
+        example: "312"
+        format: string
+        type: string
     type: object
   responses.TPS:
     properties:
@@ -830,10 +900,33 @@ definitions:
         - $ref: '#/definitions/github_com_celenium-io_celestia-indexer_internal_storage_types.Status'
         example: success
     type: object
+  responses.Undelegation:
+    properties:
+      amount:
+        example: "0.1"
+        type: string
+      completion_time:
+        example: "2023-07-04T03:10:57+00:00"
+        type: string
+      delegator:
+        example: celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60
+        type: string
+      height:
+        example: 100
+        type: integer
+      time:
+        example: "2023-07-04T03:10:57+00:00"
+        type: string
+      validator:
+        $ref: '#/definitions/responses.ShortValidator'
+    type: object
   responses.Validator:
     properties:
       address:
         example: celestiavaloper1un77nfm6axkhkupe8fk4xl6fd4adz3y59fucpu
+        type: string
+      commissions:
+        example: "1"
         type: string
       cons_address:
         example: E641C7A2C964833E556AEF934FBF166B712874B6
@@ -853,6 +946,9 @@ definitions:
       identity:
         example: 2C877AC873132C91
         type: string
+      jailed:
+        example: false
+        type: boolean
       max_change_rate:
         example: "0.01"
         type: string
@@ -868,9 +964,33 @@ definitions:
       rate:
         example: "0.03"
         type: string
+      rewards:
+        example: "1"
+        type: string
+      stake:
+        example: "1"
+        type: string
+      voting_power:
+        example: "1"
+        type: string
       website:
         example: https://www.easy2stake.com/
         type: string
+    type: object
+  responses.ValidatorCount:
+    properties:
+      active:
+        example: 100
+        type: integer
+      inactive:
+        example: 100
+        type: integer
+      jailed:
+        example: 100
+        type: integer
+      total:
+        example: 100
+        type: integer
     type: object
   responses.ValidatorUptime:
     properties:
@@ -1343,6 +1463,49 @@ paths:
       summary: Get blobs pushed by address
       tags:
       - address
+  /v1/address/{hash}/delegations:
+    get:
+      description: Get delegations made by address
+      operationId: address-delegations
+      parameters:
+      - description: Hash
+        in: path
+        maxLength: 48
+        minLength: 48
+        name: hash
+        required: true
+        type: string
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        minimum: 1
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.Delegation'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get delegations made by address
+      tags:
+      - address
   /v1/address/{hash}/messages:
     get:
       description: Get address messages
@@ -1470,6 +1633,49 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get address messages
+      tags:
+      - address
+  /v1/address/{hash}/redelegations:
+    get:
+      description: Get redelegations made by address
+      operationId: address-redelegations
+      parameters:
+      - description: Hash
+        in: path
+        maxLength: 48
+        minLength: 48
+        name: hash
+        required: true
+        type: string
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        minimum: 1
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.Redelegation'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get redelegations made by address
       tags:
       - address
   /v1/address/{hash}/txs:
@@ -1621,6 +1827,49 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get address transactions
+      tags:
+      - address
+  /v1/address/{hash}/undelegations:
+    get:
+      description: Get undelegations made by address
+      operationId: address-undelegations
+      parameters:
+      - description: Hash
+        in: path
+        maxLength: 48
+        minLength: 48
+        name: hash
+        required: true
+        type: string
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        minimum: 1
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.Undelegation'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get undelegations made by address
       tags:
       - address
   /v1/address/count:
@@ -3278,6 +3527,8 @@ paths:
         - gas_used
         - gas_limit
         - bytes_in_block
+        - rewards
+        - commissions
         in: path
         name: name
         required: true
@@ -4013,6 +4264,110 @@ paths:
       summary: List genesis transactions info
       tags:
       - transactions
+  /v1/validator/{id}/delegators:
+    get:
+      description: Get validator's delegators
+      operationId: validator-delegators
+      parameters:
+      - description: Internal validator id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        minimum: 1
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.Delegation'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get validator's delegators
+      tags:
+      - validator
+  /v1/validator/{id}/jails:
+    get:
+      description: Get validator's jails
+      operationId: validator-jails
+      parameters:
+      - description: Internal validator id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Count of requested entities
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        minimum: 1
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.Jail'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get validator's jails
+      tags:
+      - validator
+  /v1/validator/count:
+    get:
+      description: Get validator's count by status
+      operationId: validator-count
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.ValidatorCount'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get validator's count by status
+      tags:
+      - validator
   /v1/validators:
     get:
       description: List validators

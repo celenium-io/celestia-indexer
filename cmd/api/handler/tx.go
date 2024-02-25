@@ -110,8 +110,8 @@ func (handler *TxHandler) List(c echo.Context) error {
 	req.SetDefault()
 
 	fltrs := storage.TxFilter{
-		Limit:                int(req.Limit),
-		Offset:               int(req.Offset),
+		Limit:                req.Limit,
+		Offset:               req.Offset,
 		Sort:                 pgSort(req.Sort),
 		Status:               req.Status,
 		Height:               req.Height,
@@ -284,7 +284,7 @@ func (handler *TxHandler) Genesis(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	txs, err := handler.tx.Genesis(c.Request().Context(), int(req.Limit), int(req.Offset), pgSort(req.Sort))
+	txs, err := handler.tx.Genesis(c.Request().Context(), req.Limit, req.Offset, pgSort(req.Sort))
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}

@@ -54,8 +54,7 @@ type Block struct {
 
 	ChainId         string           `bun:"-"` // internal field for filling state
 	ProposerAddress string           `bun:"-"` // internal field for proposer
-	Addresses       []Address        `bun:"-"` // internal field for balance passing
-	BlockSignatures []BlockSignature `bun:"-"` // internal field for block signatire
+	BlockSignatures []BlockSignature `bun:"-"` // internal field for block signature
 
 	Txs      []Tx       `bun:"rel:has-many"`
 	Events   []Event    `bun:"rel:has-many"`
