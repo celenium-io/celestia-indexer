@@ -9,6 +9,7 @@ import (
 
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/cosmos/cosmos-sdk/types"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -182,8 +183,30 @@ func TestNewCommission(t *testing.T) {
 				"validator": "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
 			wantBody: Commission{
-				Amount:    testsuite.Ptr(types.NewCoin("utia", types.NewInt(256000000))),
+				Amount:    decimal.RequireFromString("256000000"),
 				Validator: "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
+			},
+			wantErr: false,
+		}, {
+			name: "test 2",
+			m: map[string]any{
+				"amount":    "469.815871531603829656utia",
+				"validator": "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
+			},
+			wantBody: Commission{
+				Amount:    decimal.RequireFromString("469.815871531603829656"),
+				Validator: "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
+			},
+			wantErr: false,
+		}, {
+			name: "test 3",
+			m: map[string]any{
+				"amount":    "",
+				"validator": "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
+			},
+			wantBody: Commission{
+				Amount:    decimal.Zero,
+				Validator: "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
 			},
 			wantErr: false,
 		},
@@ -211,7 +234,7 @@ func TestNewRewards(t *testing.T) {
 				"validator": "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
 			wantBody: Rewards{
-				Amount:    testsuite.Ptr(types.NewCoin("utia", types.NewInt(256000000))),
+				Amount:    decimal.RequireFromString("256000000"),
 				Validator: "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
 			wantErr: false,

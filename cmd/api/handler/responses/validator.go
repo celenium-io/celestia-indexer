@@ -55,8 +55,8 @@ func NewValidator(val storage.Validator) *Validator {
 		MaxChangeRate:     val.MaxChangeRate.String(),
 		MinSelfDelegation: val.MinSelfDelegation.String(),
 		Stake:             val.Stake.String(),
-		Rewards:           val.Rewards.String(),
-		Commissions:       val.Commissions.String(),
+		Rewards:           val.Rewards.Floor().String(),
+		Commissions:       val.Commissions.Floor().String(),
 		Jailed:            *val.Jailed,
 		VotingPower:       val.Stake.Div(decimal.NewFromInt(1_000_000)).Floor().String(),
 	}

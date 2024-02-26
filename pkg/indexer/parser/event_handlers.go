@@ -134,19 +134,15 @@ func parseCommission(ctx *context.Context, data map[string]any) error {
 		Stake:       decimal.Zero,
 	}
 
-	if commission.Amount != nil {
-		amount, err := decimal.NewFromString(commission.Amount.Amount.String())
-		if err != nil {
-			return err
-		}
-		validator.Commissions = amount
-		ctx.Block.Stats.Commissions = ctx.Block.Stats.Commissions.Add(amount)
+	if !commission.Amount.IsZero() {
+		validator.Commissions = commission.Amount.Copy()
+		ctx.Block.Stats.Commissions = ctx.Block.Stats.Commissions.Add(commission.Amount.Copy())
 
 		ctx.AddStakingLog(storage.StakingLog{
 			Height:    ctx.Block.Height,
 			Time:      ctx.Block.Time,
 			Validator: &validator,
-			Change:    amount.Copy(),
+			Change:    commission.Amount.Copy(),
 			Type:      types.StakingLogTypeCommissions,
 		})
 	}
@@ -172,19 +168,15 @@ func parseRewards(ctx *context.Context, data map[string]any) error {
 		Stake:       decimal.Zero,
 	}
 
-	if rewards.Amount != nil {
-		amount, err := decimal.NewFromString(rewards.Amount.Amount.String())
-		if err != nil {
-			return err
-		}
-		validator.Rewards = amount
-		ctx.Block.Stats.Rewards = ctx.Block.Stats.Rewards.Add(amount)
+	if !rewards.Amount.IsZero() {
+		validator.Rewards = rewards.Amount.Copy()
+		ctx.Block.Stats.Rewards = ctx.Block.Stats.Rewards.Add(rewards.Amount)
 
 		ctx.AddStakingLog(storage.StakingLog{
 			Height:    ctx.Block.Height,
 			Time:      ctx.Block.Time,
 			Validator: &validator,
-			Change:    amount.Copy(),
+			Change:    rewards.Amount.Copy(),
 			Type:      types.StakingLogTypeRewards,
 		})
 	}

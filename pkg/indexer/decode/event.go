@@ -91,7 +91,7 @@ func NewCompleteUnbonding(m map[string]any) (body CompleteUnbonding, err error) 
 }
 
 type Commission struct {
-	Amount    *types.Coin
+	Amount    decimal.Decimal
 	Validator string
 }
 
@@ -101,12 +101,12 @@ func NewCommission(m map[string]any) (body Commission, err error) {
 		err = errors.Errorf("validator key not found in %##v", m)
 		return
 	}
-	body.Amount, err = decoder.BalanceFromMap(m, "amount")
+	body.Amount = decoder.AmountFromMap(m, "amount")
 	return
 }
 
 type Rewards struct {
-	Amount    *types.Coin
+	Amount    decimal.Decimal
 	Validator string
 }
 
@@ -116,7 +116,7 @@ func NewRewards(m map[string]any) (body Rewards, err error) {
 		err = errors.Errorf("validator key not found in %##v", m)
 		return
 	}
-	body.Amount, err = decoder.BalanceFromMap(m, "amount")
+	body.Amount = decoder.AmountFromMap(m, "amount")
 	return
 }
 

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -54,6 +55,15 @@ func BalanceFromMap(m map[string]any, key string) (*types.Coin, error) {
 		return nil, err
 	}
 	return &coin, nil
+}
+
+func AmountFromMap(m map[string]any, key string) decimal.Decimal {
+	str := StringFromMap(m, key)
+	if str == "" {
+		return decimal.Zero
+	}
+	str = strings.TrimSuffix(str, currency.DefaultCurrency)
+	return decimal.RequireFromString(str)
 }
 
 func TimeFromMap(m map[string]any, key string) (time.Time, error) {
