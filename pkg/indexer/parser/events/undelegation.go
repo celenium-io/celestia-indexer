@@ -4,6 +4,8 @@
 package events
 
 import (
+	"time"
+
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -29,10 +31,50 @@ func handleUndelegate(ctx *context.Context, events []storage.Event, msg *storage
 }
 
 func processUndelegate(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+	var (
+		amount         = decimal.Zero
+		validator      = storage.Validator{}
+		completionTime = time.Now()
+	)
+
 	for i := *idx; i < len(events); i++ {
 		switch events[i].Type {
 		case storageTypes.EventTypeMessage:
 			if module := decoder.StringFromMap(events[i].Data, "module"); module == storageTypes.ModuleNameStaking.String() {
+				delegator := decoder.StringFromMap(events[i].Data, "sender")
+
+				address := &storage.Address{
+					Address:    delegator,
+					Height:     msg.Height,
+					LastHeight: msg.Height,
+					Balance: storage.Balance{
+						Currency:  currency.DefaultCurrency,
+						Delegated: amount.Copy().Neg(),
+						Unbonding: amount,
+					},
+				}
+				if err := ctx.AddAddress(address); err != nil {
+					return err
+				}
+
+				ctx.AddUndelegation(storage.Undelegation{
+					Validator:      &validator,
+					Address:        address,
+					Amount:         amount,
+					Time:           msg.Time,
+					Height:         msg.Height,
+					CompletionTime: completionTime,
+				})
+
+				ctx.AddStakingLog(storage.StakingLog{
+					Height:    msg.Height,
+					Time:      msg.Time,
+					Address:   address,
+					Validator: &validator,
+					Change:    amount.Copy().Neg(),
+					Type:      storageTypes.StakingLogTypeUnbonding,
+				})
+
 				*idx = i + 1
 				return nil
 			}
@@ -45,46 +87,12 @@ func processUndelegate(ctx *context.Context, events []storage.Event, msg *storag
 			if err != nil {
 				return err
 			}
-			amount := decimal.RequireFromString(unbond.Amount.Amount.String())
-			validator := storage.Validator{
-				Address: unbond.Validator,
-				Stake:   amount.Copy().Neg(),
-			}
+
+			completionTime = unbond.CompletionTime
+			amount = decimal.RequireFromString(unbond.Amount.Amount.String())
+			validator.Address = unbond.Validator
+			validator.Stake = amount.Copy().Neg()
 			ctx.AddValidator(validator)
-
-			delegator := decoder.StringFromMap(msg.Data, "DelegatorAddress")
-
-			address := &storage.Address{
-				Address:    delegator,
-				Height:     msg.Height,
-				LastHeight: msg.Height,
-				Balance: storage.Balance{
-					Currency:  currency.DefaultCurrency,
-					Delegated: amount.Copy().Neg(),
-					Unbonding: amount,
-				},
-			}
-			if err := ctx.AddAddress(address); err != nil {
-				return err
-			}
-
-			ctx.AddUndelegation(storage.Undelegation{
-				Validator:      &validator,
-				Address:        address,
-				Amount:         amount,
-				Time:           msg.Time,
-				Height:         msg.Height,
-				CompletionTime: unbond.CompletionTime,
-			})
-
-			ctx.AddStakingLog(storage.StakingLog{
-				Height:    msg.Height,
-				Time:      msg.Time,
-				Address:   address,
-				Validator: &validator,
-				Change:    amount.Copy().Neg(),
-				Type:      storageTypes.StakingLogTypeUnbonding,
-			})
 		}
 	}
 
