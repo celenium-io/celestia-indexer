@@ -14,7 +14,7 @@ import (
 // is called by a relayer on Chain A.
 func MsgChannelOpenInit(ctx *context.Context, m *coreChannel.MsgChannelOpenInit) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgChannelOpenInit
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -25,7 +25,7 @@ func MsgChannelOpenInit(ctx *context.Context, m *coreChannel.MsgChannelOpenInit)
 // value will be ignored by core IBC.
 func MsgChannelOpenTry(ctx *context.Context, m *coreChannel.MsgChannelOpenTry) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgChannelOpenTry
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -35,7 +35,7 @@ func MsgChannelOpenTry(ctx *context.Context, m *coreChannel.MsgChannelOpenTry) (
 // the change of channel state to TRYOPEN on Chain B.
 func MsgChannelOpenAck(ctx *context.Context, m *coreChannel.MsgChannelOpenAck) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgChannelOpenAck
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -45,7 +45,7 @@ func MsgChannelOpenAck(ctx *context.Context, m *coreChannel.MsgChannelOpenAck) (
 // acknowledge the change of channel state to OPEN on Chain A.
 func MsgChannelOpenConfirm(ctx *context.Context, m *coreChannel.MsgChannelOpenConfirm) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgChannelOpenConfirm
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -55,7 +55,7 @@ func MsgChannelOpenConfirm(ctx *context.Context, m *coreChannel.MsgChannelOpenCo
 // to close a channel with Chain B.
 func MsgChannelCloseInit(ctx *context.Context, m *coreChannel.MsgChannelCloseInit) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgChannelCloseInit
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -65,7 +65,7 @@ func MsgChannelCloseInit(ctx *context.Context, m *coreChannel.MsgChannelCloseIni
 // to acknowledge the change of channel state to CLOSED on Chain A.
 func MsgChannelCloseConfirm(ctx *context.Context, m *coreChannel.MsgChannelCloseConfirm) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgChannelCloseConfirm
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -74,7 +74,7 @@ func MsgChannelCloseConfirm(ctx *context.Context, m *coreChannel.MsgChannelClose
 // MsgRecvPacket receives an incoming IBC packet
 func MsgRecvPacket(ctx *context.Context, m *coreChannel.MsgRecvPacket) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgRecvPacket
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -83,7 +83,7 @@ func MsgRecvPacket(ctx *context.Context, m *coreChannel.MsgRecvPacket) (storageT
 // MsgTimeout receives a timed-out packet
 func MsgTimeout(ctx *context.Context, m *coreChannel.MsgTimeout) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgTimeout
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -92,7 +92,7 @@ func MsgTimeout(ctx *context.Context, m *coreChannel.MsgTimeout) (storageTypes.M
 // MsgTimeoutOnClose timed-out packet upon counterparty channel closure
 func MsgTimeoutOnClose(ctx *context.Context, m *coreChannel.MsgTimeoutOnClose) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgTimeoutOnClose
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -101,7 +101,7 @@ func MsgTimeoutOnClose(ctx *context.Context, m *coreChannel.MsgTimeoutOnClose) (
 // MsgAcknowledgement receives incoming IBC acknowledgement
 func MsgAcknowledgement(ctx *context.Context, m *coreChannel.MsgAcknowledgement) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgAcknowledgement
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err

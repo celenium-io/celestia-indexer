@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	interchainAccounts "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/controller/types"
 	"github.com/fatih/structs"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,10 +40,7 @@ func TestDecodeMsg_SuccessOnMsgRegisterInterchainAccount(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -91,10 +87,7 @@ func TestDecodeMsg_SuccessOnMsgSendTx(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}

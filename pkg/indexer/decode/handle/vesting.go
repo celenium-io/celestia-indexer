@@ -14,7 +14,7 @@ import (
 // account.
 func MsgCreateVestingAccount(ctx *context.Context, m *cosmosVestingTypes.MsgCreateVestingAccount) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgCreateVestingAccount
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeFromAddress, address: m.FromAddress},
 		{t: storageTypes.MsgAddressTypeToAddress, address: m.ToAddress},
 	}, ctx.Block.Height)
@@ -27,7 +27,7 @@ func MsgCreateVestingAccount(ctx *context.Context, m *cosmosVestingTypes.MsgCrea
 // Since: cosmos-sdk 0.46
 func MsgCreatePermanentLockedAccount(ctx *context.Context, m *cosmosVestingTypes.MsgCreatePermanentLockedAccount) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgCreatePermanentLockedAccount
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeFromAddress, address: m.FromAddress},
 		{t: storageTypes.MsgAddressTypeToAddress, address: m.ToAddress},
 	}, ctx.Block.Height)
@@ -40,7 +40,7 @@ func MsgCreatePermanentLockedAccount(ctx *context.Context, m *cosmosVestingTypes
 // Since: cosmos-sdk 0.46
 func MsgCreatePeriodicVestingAccount(ctx *context.Context, m *cosmosVestingTypes.MsgCreatePeriodicVestingAccount) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgCreatePeriodicVestingAccount
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeFromAddress, address: m.FromAddress},
 		{t: storageTypes.MsgAddressTypeToAddress, address: m.ToAddress},
 	}, ctx.Block.Height)

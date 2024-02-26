@@ -13,7 +13,7 @@ import (
 // MsgVerifyInvariant represents a message to verify a particular invariance.
 func MsgVerifyInvariant(ctx *context.Context, m *crisisTypes.MsgVerifyInvariant) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgVerifyInvariant
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSender, address: m.Sender},
 	}, ctx.Block.Height)
 	return msgType, addresses, err

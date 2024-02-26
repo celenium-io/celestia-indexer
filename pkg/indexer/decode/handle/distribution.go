@@ -14,7 +14,7 @@ import (
 // a delegator (or validator self-delegation).
 func MsgSetWithdrawAddress(ctx *context.Context, m *cosmosDistributionTypes.MsgSetWithdrawAddress) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSetWithdrawAddress
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
 		{t: storageTypes.MsgAddressTypeWithdraw, address: m.WithdrawAddress},
 	}, ctx.Block.Height)
@@ -25,7 +25,7 @@ func MsgSetWithdrawAddress(ctx *context.Context, m *cosmosDistributionTypes.MsgS
 // from a single validator.
 func MsgWithdrawDelegatorReward(ctx *context.Context, m *cosmosDistributionTypes.MsgWithdrawDelegatorReward) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgWithdrawDelegatorReward
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 	}, ctx.Block.Height)
@@ -37,7 +37,7 @@ func MsgWithdrawDelegatorReward(ctx *context.Context, m *cosmosDistributionTypes
 // address.
 func MsgWithdrawValidatorCommission(ctx *context.Context, m *cosmosDistributionTypes.MsgWithdrawValidatorCommission) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgWithdrawValidatorCommission
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -47,7 +47,7 @@ func MsgWithdrawValidatorCommission(ctx *context.Context, m *cosmosDistributionT
 // fund the community pool.
 func MsgFundCommunityPool(ctx *context.Context, m *cosmosDistributionTypes.MsgFundCommunityPool) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgFundCommunityPool
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeDepositor, address: m.Depositor},
 	}, ctx.Block.Height)
 	return msgType, addresses, err

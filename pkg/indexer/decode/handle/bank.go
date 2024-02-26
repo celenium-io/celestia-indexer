@@ -13,7 +13,7 @@ import (
 // MsgSend represents a message to send coins from one account to another.
 func MsgSend(ctx *context.Context, m *cosmosBankTypes.MsgSend) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSend
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeFromAddress, address: m.FromAddress},
 		{t: storageTypes.MsgAddressTypeToAddress, address: m.ToAddress},
 	}, ctx.Block.Height)
@@ -35,6 +35,6 @@ func MsgMultiSend(ctx *context.Context, m *cosmosBankTypes.MsgMultiSend) (storag
 		i++
 	}
 
-	addresses, err := createAddresses(aData, ctx.Block.Height)
+	addresses, err := createAddresses(ctx, aData, ctx.Block.Height)
 	return msgType, addresses, err
 }

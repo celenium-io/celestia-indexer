@@ -12,11 +12,11 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
-func parseEvents(ctx *context.Context, b types.BlockData, events []types.Event, failed bool) ([]storage.Event, error) {
+func parseEvents(ctx *context.Context, b types.BlockData, events []types.Event) ([]storage.Event, error) {
 	result := make([]storage.Event, len(events))
 
 	for i := range events {
-		if err := parseEvent(ctx, b, events[i], i, failed, &result[i]); err != nil {
+		if err := parseEvent(ctx, b, events[i], i, &result[i]); err != nil {
 			return nil, err
 		}
 	}
@@ -24,7 +24,7 @@ func parseEvents(ctx *context.Context, b types.BlockData, events []types.Event, 
 	return result, nil
 }
 
-func parseEvent(ctx *context.Context, b types.BlockData, eN types.Event, index int, failed bool, resultEvent *storage.Event) error {
+func parseEvent(ctx *context.Context, b types.BlockData, eN types.Event, index int, resultEvent *storage.Event) error {
 	eventType, err := storageTypes.ParseEventType(eN.Type)
 	if err != nil {
 		log.Err(err).Msgf("got type %v", eN.Type)
@@ -39,10 +39,6 @@ func parseEvent(ctx *context.Context, b types.BlockData, eN types.Event, index i
 
 	for i := range eN.Attributes {
 		resultEvent.Data[string(eN.Attributes[i].Key)] = string(eN.Attributes[i].Value)
-	}
-
-	if failed {
-		return nil
 	}
 
 	return processEvent(ctx, resultEvent)

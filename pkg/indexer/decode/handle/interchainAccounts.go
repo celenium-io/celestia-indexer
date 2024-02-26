@@ -13,7 +13,7 @@ import (
 // MsgRegisterInterchainAccount defines the payload for Msg/MsgRegisterInterchainAccount
 func MsgRegisterInterchainAccount(ctx *context.Context, m *interchainAccounts.MsgRegisterInterchainAccount) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgRegisterInterchainAccount
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeOwner, address: m.Owner},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -22,7 +22,7 @@ func MsgRegisterInterchainAccount(ctx *context.Context, m *interchainAccounts.Ms
 // MsgSendTx defines the payload for Msg/SendTx
 func MsgSendTx(ctx *context.Context, m *interchainAccounts.MsgSendTx) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSendTx
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeOwner, address: m.Owner},
 	}, ctx.Block.Height)
 	return msgType, addresses, err

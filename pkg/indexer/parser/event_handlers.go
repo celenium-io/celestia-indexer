@@ -39,7 +39,6 @@ func parseCoinSpent(ctx *context.Context, data map[string]any, height pkgTypes.L
 	}
 
 	if coinSpent.Amount != nil {
-		address.Balance.Currency = coinSpent.Amount.Denom
 		amount, err := decimal.NewFromString(coinSpent.Amount.Amount.String())
 		if err != nil {
 			return err
@@ -73,7 +72,6 @@ func parseCoinReceived(ctx *context.Context, data map[string]any, height pkgType
 	}
 
 	if coinReceived.Amount != nil {
-		address.Balance.Currency = coinReceived.Amount.Denom
 		amount, err := decimal.NewFromString(coinReceived.Amount.Amount.String())
 		if err != nil {
 			return err
@@ -107,12 +105,11 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]any, height pk
 	}
 
 	if unbonding.Amount != nil {
-		address.Balance.Currency = unbonding.Amount.Denom
 		amount, err := decimal.NewFromString(unbonding.Amount.Amount.String())
 		if err != nil {
 			return err
 		}
-		address.Balance.Unbonding = amount.Neg()
+		address.Balance.Unbonding = amount.Copy().Neg()
 	}
 	return ctx.AddAddress(address)
 }

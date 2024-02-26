@@ -14,7 +14,7 @@ import (
 // Evidence of misbehavior such as equivocation or counterfactual signing.
 func MsgSubmitEvidence(ctx *context.Context, m *evidenceTypes.MsgSubmitEvidence) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSubmitEvidence
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSubmitter, address: m.Submitter},
 	}, ctx.Block.Height)
 	return msgType, addresses, err

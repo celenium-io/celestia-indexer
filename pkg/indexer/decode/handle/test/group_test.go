@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/x/group"
 	"github.com/fatih/structs"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,10 +40,7 @@ func TestDecodeMsg_SuccessOnMsgCreateGroup(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -91,10 +87,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupMembers(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -142,10 +135,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupAdmin(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		}, {
 			Type: storageTypes.MsgAddressTypeNewAdmin,
@@ -155,10 +145,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupAdmin(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 				Hash:       []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x0, 0x2e, 0x81, 0xcb, 0x8b, 0x27, 0x27, 0xe1, 0x0, 0x68},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -205,10 +192,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupMetadata(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -255,10 +239,7 @@ func TestDecodeMsg_SuccessOnMsgCreateGroupPolicy(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -305,10 +286,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyAdmin(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -355,10 +333,7 @@ func TestDecodeMsg_SuccessOnMsgCreateGroupWithPolicy(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -406,10 +381,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyDecisionPolicy(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		}, {
 			Type: storageTypes.MsgAddressTypeGroupPolicyAddress,
@@ -419,10 +391,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyDecisionPolicy(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 				Hash:       []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x0, 0x2e, 0x81, 0xcb, 0x8b, 0x27, 0x27, 0xe1, 0x0, 0x68},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		}}
 
@@ -469,10 +438,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyMetadata(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		}, {
 			Type: storageTypes.MsgAddressTypeGroupPolicyAddress,
@@ -482,10 +448,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyMetadata(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 				Hash:       []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x0, 0x2e, 0x81, 0xcb, 0x8b, 0x27, 0x27, 0xe1, 0x0, 0x68},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		}}
 
@@ -531,10 +494,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposalGroup(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 				Hash:       []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x0, 0x2e, 0x81, 0xcb, 0x8b, 0x27, 0x27, 0xe1, 0x0, 0x68},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		}}
 
@@ -580,10 +540,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawProposal(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -630,10 +587,7 @@ func TestDecodeMsg_SuccessOnMsgVoteGroup(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -680,10 +634,7 @@ func TestDecodeMsg_SuccessOnMsgExecGroup(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -730,10 +681,7 @@ func TestDecodeMsg_SuccessOnMsgLeaveGroup(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}

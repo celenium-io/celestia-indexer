@@ -8,8 +8,8 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,8 +18,9 @@ func TestCreateAddresses_SingleAddress(t *testing.T) {
 		{t: storageTypes.MsgAddressTypeVoter, address: "celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts"},
 	}
 	level := types.Level(235236)
+	ctx := context.NewContext()
 
-	addresses, err := createAddresses(data, level)
+	addresses, err := createAddresses(ctx, data, level)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, addresses)
 	assert.Len(t, addresses, 1)
@@ -32,10 +33,7 @@ func TestCreateAddresses_SingleAddress(t *testing.T) {
 			Height:     types.Level(235236),
 			LastHeight: types.Level(235236),
 			Address:    "celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
-			Balance: storage.Balance{
-				Id:        0,
-				Spendable: decimal.Zero,
-			},
+			Balance:    storage.EmptyBalance(),
 		},
 	}
 	assert.Equal(t, expectedAddr, addr)
@@ -47,8 +45,9 @@ func TestCreateAddresses_ListOfAddresses(t *testing.T) {
 		{t: storageTypes.MsgAddressTypeValidator, address: "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym"},
 	}
 	level := types.Level(235236)
+	ctx := context.NewContext()
 
-	addresses, err := createAddresses(data, level)
+	addresses, err := createAddresses(ctx, data, level)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, addresses)
 	assert.Len(t, addresses, 2)
@@ -62,10 +61,7 @@ func TestCreateAddresses_ListOfAddresses(t *testing.T) {
 				LastHeight: types.Level(235236),
 				Address:    "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
 				Hash:       []byte{0x61, 0x20, 0x87, 0x60, 0xbb, 0x25, 0x92, 0x2a, 0x2a, 0xa5, 0x41, 0x57, 0x79, 0x7d, 0x29, 0x36, 0xa7, 0x7e, 0xbe, 0xd6},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 		{
@@ -76,10 +72,7 @@ func TestCreateAddresses_ListOfAddresses(t *testing.T) {
 				LastHeight: types.Level(235236),
 				Address:    "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym",
 				Hash:       []byte{0xf3, 0xc0, 0x5, 0x68, 0x19, 0x9b, 0xaa, 0xa7, 0xf1, 0x2d, 0xa0, 0x48, 0xf1, 0xd0, 0xb6, 0xa, 0x22, 0xb9, 0x2b, 0x7e},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -91,8 +84,9 @@ func TestCreateAddresses_ErrorOnDecodingAddress(t *testing.T) {
 		{t: storageTypes.MsgAddressTypeVoter, address: "NO_WAY_celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts"},
 	}
 	level := types.Level(235236)
+	ctx := context.NewContext()
 
-	addresses, err := createAddresses(data, level)
+	addresses, err := createAddresses(ctx, data, level)
 	assert.Error(t, err, "decoding bech32 failed: string not all lowercase or all uppercase")
 	assert.Empty(t, addresses)
 }

@@ -13,7 +13,7 @@ import (
 // MsgUnjail defines the Msg/Unjail request type
 func MsgUnjail(ctx *context.Context, m *cosmosSlashingTypes.MsgUnjail) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgUnjail
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddr},
 	}, ctx.Block.Height)
 	return msgType, addresses, err

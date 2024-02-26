@@ -13,7 +13,7 @@ import (
 // MsgSendNFT represents a message to send a nft from one account to another account.
 func MsgSendNFT(ctx *context.Context, m *nft.MsgSend) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSendNFT
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSender, address: m.Sender},
 		{t: storageTypes.MsgAddressTypeReceiver, address: m.Receiver},
 	}, ctx.Block.Height)

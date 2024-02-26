@@ -13,7 +13,7 @@ import (
 // MsgConnectionOpenInit defines the msg sent by an account on Chain A to initialize a connection with Chain B.
 func MsgConnectionOpenInit(ctx *context.Context, m *coreConnection.MsgConnectionOpenInit) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgConnectionOpenInit
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -22,7 +22,7 @@ func MsgConnectionOpenInit(ctx *context.Context, m *coreConnection.MsgConnection
 // MsgConnectionOpenTry defines a msg sent by a Relayer to try to open a connection on Chain B.
 func MsgConnectionOpenTry(ctx *context.Context, m *coreConnection.MsgConnectionOpenTry) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgConnectionOpenTry
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -32,7 +32,7 @@ func MsgConnectionOpenTry(ctx *context.Context, m *coreConnection.MsgConnectionO
 // acknowledge the change of connection state to TRYOPEN on Chain B.
 func MsgConnectionOpenAck(ctx *context.Context, m *coreConnection.MsgConnectionOpenAck) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgConnectionOpenAck
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -42,7 +42,7 @@ func MsgConnectionOpenAck(ctx *context.Context, m *coreConnection.MsgConnectionO
 // acknowledge the change of connection state to OPEN on Chain A.
 func MsgConnectionOpenConfirm(ctx *context.Context, m *coreConnection.MsgConnectionOpenConfirm) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgConnectionOpenConfirm
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err

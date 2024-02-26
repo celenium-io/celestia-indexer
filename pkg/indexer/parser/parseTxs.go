@@ -65,6 +65,8 @@ func parseTx(ctx *context.Context, b types.BlockData, index int, txRes *types.Re
 			Balance: storage.Balance{
 				Currency:  currency.DefaultCurrency,
 				Spendable: decimal.Zero,
+				Delegated: decimal.Zero,
+				Unbonding: decimal.Zero,
 			},
 		}
 		t.Signers = append(t.Signers, address)
@@ -78,7 +80,7 @@ func parseTx(ctx *context.Context, b types.BlockData, index int, txRes *types.Re
 		t.Error = txRes.Log
 	}
 
-	t.Events, err = parseEvents(ctx, b, txRes.Events, txRes.IsFailed())
+	t.Events, err = parseEvents(ctx, b, txRes.Events)
 	if err != nil {
 		return errors.Wrap(err, "parsing events")
 	}

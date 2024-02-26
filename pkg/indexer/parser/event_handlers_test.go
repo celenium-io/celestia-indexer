@@ -58,12 +58,7 @@ func Test_parseCoinSpent(t *testing.T) {
 				LastHeight: pkgTypes.Level(58000),
 				Address:    testAddress,
 				Hash:       testHashAddress,
-				Balance: storage.Balance{
-					Currency:  currency.DefaultCurrency,
-					Spendable: decimal.Zero,
-					Delegated: decimal.Zero,
-					Unbonding: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}

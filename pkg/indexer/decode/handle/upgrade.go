@@ -13,7 +13,7 @@ import (
 // MsgSoftwareUpgrade is the Msg/SoftwareUpgrade request type.
 func MsgSoftwareUpgrade(ctx *context.Context, m *upgrade.MsgSoftwareUpgrade) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSoftwareUpgrade
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -22,7 +22,7 @@ func MsgSoftwareUpgrade(ctx *context.Context, m *upgrade.MsgSoftwareUpgrade) (st
 // MsgSoftwareUpgrade is the Msg/SoftwareUpgrade request type.
 func MsgCancelUpgrade(ctx *context.Context, m *upgrade.MsgCancelUpgrade) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgCancelUpgrade
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
 	}, ctx.Block.Height)
 	return msgType, addresses, err

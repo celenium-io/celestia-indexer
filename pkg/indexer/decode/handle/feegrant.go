@@ -14,7 +14,7 @@ import (
 // of fees from the account of Granter.
 func MsgGrantAllowance(ctx *context.Context, m *feegrant.MsgGrantAllowance) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgGrantAllowance
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeGranter, address: m.Granter},
 		{t: storageTypes.MsgAddressTypeGrantee, address: m.Grantee},
 	}, ctx.Block.Height)
@@ -24,7 +24,7 @@ func MsgGrantAllowance(ctx *context.Context, m *feegrant.MsgGrantAllowance) (sto
 // MsgRevokeAllowance removes any existing Allowance from Granter to Grantee.
 func MsgRevokeAllowance(ctx *context.Context, m *feegrant.MsgRevokeAllowance) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgRevokeAllowance
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeGranter, address: m.Granter},
 		{t: storageTypes.MsgAddressTypeGrantee, address: m.Grantee},
 	}, ctx.Block.Height)

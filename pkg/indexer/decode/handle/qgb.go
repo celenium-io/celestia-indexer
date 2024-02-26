@@ -13,7 +13,7 @@ import (
 // MsgRegisterEVMAddress registers an evm address to a validator.
 func MsgRegisterEVMAddress(ctx *context.Context, m *qgbTypes.MsgRegisterEVMAddress) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgRegisterEVMAddress
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 		// TODO: think about EVM addresses
 	}, ctx.Block.Height)

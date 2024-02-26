@@ -24,7 +24,7 @@ func TestParseEvents_EmptyEventsResults(t *testing.T) {
 	}
 
 	ctx := context.NewContext()
-	resultEvents, err := parseEvents(ctx, block, make([]types.Event, 0), false)
+	resultEvents, err := parseEvents(ctx, block, make([]types.Event, 0))
 	require.NoError(t, err)
 
 	require.Empty(t, resultEvents)
@@ -63,7 +63,7 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 	block, now := testsuite.CreateTestBlock(txRes, 1)
 
 	ctx := context.NewContext()
-	resultEvents, err := parseEvents(ctx, block, events, false)
+	resultEvents, err := parseEvents(ctx, block, events)
 	require.NoError(t, err)
 
 	require.Len(t, resultEvents, 1)
@@ -118,7 +118,7 @@ func BenchmarkParseEvent(b *testing.B) {
 	ctx := context.NewContext()
 	b.Run("parse event", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			_ = parseEvent(ctx, block, event, 10, false, &resultEvent)
+			_ = parseEvent(ctx, block, event, 10, &resultEvent)
 		}
 	})
 }

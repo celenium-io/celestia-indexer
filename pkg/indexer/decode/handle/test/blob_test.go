@@ -14,7 +14,6 @@ import (
 	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/fatih/structs"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,10 +52,7 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
 				Hash:       []byte{0x16, 0x53, 0x23, 0x70, 0x15, 0x89, 0xb7, 0x20, 0x14, 0xd5, 0xbd, 0xdc, 0xa8, 0xba, 0xcc, 0x60, 0xb5, 0x5, 0xd3, 0x97},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -156,10 +152,7 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
 				Hash:       []byte{0x16, 0x53, 0x23, 0x70, 0x15, 0x89, 0xb7, 0x20, 0x14, 0xd5, 0xbd, 0xdc, 0xa8, 0xba, 0xcc, 0x60, 0xb5, 0x5, 0xd3, 0x97},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -280,10 +273,7 @@ func TestDecodeMsg_FailedOnPayForBlob(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
 				Hash:       []byte{0x16, 0x53, 0x23, 0x70, 0x15, 0x89, 0xb7, 0x20, 0x14, 0xd5, 0xbd, 0xdc, 0xa8, 0xba, 0xcc, 0x60, 0xb5, 0x5, 0xd3, 0x97},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}

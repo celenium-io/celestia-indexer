@@ -73,7 +73,7 @@ func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, m *appBlob
 		namespaces = append(namespaces, *namespace)
 	}
 
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 

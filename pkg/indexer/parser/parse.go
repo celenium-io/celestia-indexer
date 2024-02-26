@@ -75,12 +75,12 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 
 	decodeCtx.Block.BlockSignatures = p.parseBlockSignatures(b.Block.LastCommit)
 
-	decodeCtx.Block.Events, err = parseEvents(decodeCtx, b, b.ResultBlockResults.BeginBlockEvents, false)
+	decodeCtx.Block.Events, err = parseEvents(decodeCtx, b, b.ResultBlockResults.BeginBlockEvents)
 	if err != nil {
 		return errors.Wrap(err, "parsing begin block events")
 	}
 
-	endEvents, err := parseEvents(decodeCtx, b, b.ResultBlockResults.EndBlockEvents, false)
+	endEvents, err := parseEvents(decodeCtx, b, b.ResultBlockResults.EndBlockEvents)
 	if err != nil {
 		return errors.Wrap(err, "parsing begin end events")
 	}

@@ -13,7 +13,7 @@ import (
 // MsgCreateClient defines a message to create an IBC client
 func MsgCreateClient(ctx *context.Context, m *coreClient.MsgCreateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgCreateClient
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -22,7 +22,7 @@ func MsgCreateClient(ctx *context.Context, m *coreClient.MsgCreateClient) (stora
 // MsgUpdateClient defines a sdk.Msg to update an IBC client state using the given header
 func MsgUpdateClient(ctx *context.Context, m *coreClient.MsgUpdateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgUpdateClient
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -31,7 +31,7 @@ func MsgUpdateClient(ctx *context.Context, m *coreClient.MsgUpdateClient) (stora
 // MsgUpgradeClient defines a sdk.Msg to upgrade an IBC client to a new client state
 func MsgUpgradeClient(ctx *context.Context, m *coreClient.MsgUpgradeClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgUpgradeClient
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -40,7 +40,7 @@ func MsgUpgradeClient(ctx *context.Context, m *coreClient.MsgUpgradeClient) (sto
 // MsgSubmitMisbehaviour defines a sdk.Msg type that submits Evidence for light client misbehavior
 func MsgSubmitMisbehaviour(ctx *context.Context, m *coreClient.MsgSubmitMisbehaviour) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSubmitMisbehaviour
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err

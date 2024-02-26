@@ -18,7 +18,6 @@ import (
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/fatih/structs"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,9 +40,7 @@ func createExpectations(
 				LastHeight: blob.Height,
 				Address:    address,
 				Hash:       hash,
-				Balance: storage.Balance{
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}

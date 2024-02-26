@@ -15,7 +15,7 @@ import (
 // https://github.com/cosmos/ibc/tree/master/spec/app/ics-020-fungible-token-transfer#data-structures
 func IBCTransfer(ctx *context.Context, m *ibcTypes.MsgTransfer) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.IBCTransfer
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSender, address: m.Sender},
 		// {t: storageTypes.MsgAddressTypeReceiver,
 		// address: m.Receiver}, // TODO: is it data to do IBC Transfer on cosmos network?

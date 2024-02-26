@@ -4,6 +4,7 @@
 package storage
 
 import (
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
@@ -34,6 +35,9 @@ func (b Balance) IsEmpty() bool {
 
 func EmptyBalance() Balance {
 	return Balance{
+		Currency:  currency.DefaultCurrency,
 		Spendable: decimal.Zero,
+		Delegated: decimal.Zero,
+		Unbonding: decimal.Zero,
 	}
 }

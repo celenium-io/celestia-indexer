@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	coreClient "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
 	"github.com/fatih/structs"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,10 +40,7 @@ func TestDecodeMsg_SuccessOnMsgCreateClient(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -91,10 +87,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateClient(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -141,10 +134,7 @@ func TestDecodeMsg_SuccessOnMsgUpgradeClient(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -191,10 +181,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitMisbehaviour(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:        0,
-					Spendable: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}

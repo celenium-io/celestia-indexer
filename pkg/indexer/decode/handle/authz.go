@@ -15,7 +15,7 @@ import (
 // on behalf of the granter with the provided expiration time.
 func MsgGrant(ctx *context.Context, m *authz.MsgGrant) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgGrant
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeGranter, address: m.Granter},
 		{t: storageTypes.MsgAddressTypeGrantee, address: m.Grantee},
 	}, ctx.Block.Height)
@@ -27,7 +27,7 @@ func MsgGrant(ctx *context.Context, m *authz.MsgGrant) (storageTypes.MsgType, []
 // one signer corresponding to the granter of the authorization.
 func MsgExec(ctx *context.Context, status types.Status, m *authz.MsgExec) (storageTypes.MsgType, []storage.AddressWithType, []string, error) {
 	msgType := storageTypes.MsgExec
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeGrantee, address: m.Grantee},
 	}, ctx.Block.Height)
 
@@ -56,7 +56,7 @@ func MsgExec(ctx *context.Context, status types.Status, m *authz.MsgExec) (stora
 // granter's account with that has been granted to the grantee.
 func MsgRevoke(ctx *context.Context, m *authz.MsgRevoke) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgRevoke
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeGranter, address: m.Granter},
 		{t: storageTypes.MsgAddressTypeGrantee, address: m.Grantee},
 	}, ctx.Block.Height)

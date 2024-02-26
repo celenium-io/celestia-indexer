@@ -13,7 +13,7 @@ import (
 // MsgRegisterPayee defines the request type for the RegisterPayee rpc
 func MsgRegisterPayee(ctx *context.Context, m *fee.MsgRegisterPayee) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgRegisterPayee
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeRelayer, address: m.Relayer},
 		{t: storageTypes.MsgAddressTypePayee, address: m.Payee},
 	}, ctx.Block.Height)
@@ -23,7 +23,7 @@ func MsgRegisterPayee(ctx *context.Context, m *fee.MsgRegisterPayee) (storageTyp
 // MsgRegisterCounterpartyPayee defines the request type for the RegisterCounterpartyPayee rpc
 func MsgRegisterCounterpartyPayee(ctx *context.Context, m *fee.MsgRegisterCounterpartyPayee) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgRegisterCounterpartyPayee
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeRelayer, address: m.Relayer},
 		{t: storageTypes.MsgAddressTypePayee, address: m.CounterpartyPayee}, // the counterparty payee address
 	}, ctx.Block.Height)
@@ -35,7 +35,7 @@ func MsgRegisterCounterpartyPayee(ctx *context.Context, m *fee.MsgRegisterCounte
 // paid for
 func MsgPayPacketFee(ctx *context.Context, m *fee.MsgPayPacketFee) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgPayPacketFee
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	return msgType, addresses, err

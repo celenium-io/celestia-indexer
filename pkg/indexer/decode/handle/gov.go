@@ -14,7 +14,7 @@ import (
 // proposal Content.
 func MsgSubmitProposal(ctx *context.Context, proposerAddress string) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSubmitProposal
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeProposer, address: proposerAddress},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -25,6 +25,7 @@ func MsgSubmitProposal(ctx *context.Context, proposerAddress string) (storageTyp
 func MsgExecLegacyContent(ctx *context.Context, m *cosmosGovTypesV1.MsgExecLegacyContent) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgExecLegacyContent
 	addresses, err := createAddresses(
+		ctx,
 		addressesData{
 			{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
 		}, ctx.Block.Height)
@@ -34,7 +35,7 @@ func MsgExecLegacyContent(ctx *context.Context, m *cosmosGovTypesV1.MsgExecLegac
 // MsgVote defines a message to cast a vote.
 func MsgVote(ctx *context.Context, voterAddress string) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgVote
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeVoter, address: voterAddress},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -43,7 +44,7 @@ func MsgVote(ctx *context.Context, voterAddress string) (storageTypes.MsgType, [
 // MsgVoteWeighted defines a message to cast a vote.
 func MsgVoteWeighted(ctx *context.Context, voterAddress string) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgVoteWeighted
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeVoter, address: voterAddress},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
@@ -52,7 +53,7 @@ func MsgVoteWeighted(ctx *context.Context, voterAddress string) (storageTypes.Ms
 // MsgDeposit defines a message to submit a deposit to an existing proposal.
 func MsgDeposit(ctx *context.Context, depositorAddress string) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgDeposit
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeDepositor, address: depositorAddress},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
