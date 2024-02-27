@@ -217,7 +217,7 @@ func (s Stats) Series(ctx context.Context, timeframe storage.Timeframe, name str
 		query = query.Where("ts < ?", req.To)
 	}
 
-	err = query.Limit(100).Scan(ctx, &response)
+	err = query.Limit(200).Scan(ctx, &response)
 	return
 }
 
