@@ -10,6 +10,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/lib/pq"
+	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 
 	models "github.com/celenium-io/celestia-indexer/internal/storage"
@@ -234,8 +235,6 @@ func (tx Transaction) SaveBlockSignatures(ctx context.Context, signs ...models.B
 	return err
 }
 
-const doNotModify = "[do-not-modify]"
-
 type addedValidator struct {
 	bun.BaseModel `bun:"validator"`
 	*models.Validator
@@ -271,19 +270,19 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 		if !validators[i].Rewards.IsZero() {
 			query.Set("rewards = added_validator.rewards + EXCLUDED.rewards")
 		}
-		if validators[i].Moniker != doNotModify {
+		if validators[i].Moniker != models.DoNotModify {
 			query.Set("moniker = EXCLUDED.moniker")
 		}
-		if validators[i].Website != doNotModify {
+		if validators[i].Website != models.DoNotModify {
 			query.Set("website = EXCLUDED.website")
 		}
-		if validators[i].Identity != doNotModify {
+		if validators[i].Identity != models.DoNotModify {
 			query.Set("identity = EXCLUDED.identity")
 		}
-		if validators[i].Contacts != doNotModify {
+		if validators[i].Contacts != models.DoNotModify {
 			query.Set("contacts = EXCLUDED.contacts")
 		}
-		if validators[i].Details != doNotModify {
+		if validators[i].Details != models.DoNotModify {
 			query.Set("details = EXCLUDED.details")
 		}
 		if _, err := query.Returning("xmax, id").Exec(ctx); err != nil {
@@ -342,17 +341,36 @@ func (tx Transaction) SaveJails(ctx context.Context, jails ...models.Jail) error
 	return err
 }
 
-func (tx Transaction) Jail(ctx context.Context, ids ...uint64) error {
-	if len(ids) == 0 {
+func (tx Transaction) Jail(ctx context.Context, validators ...*models.Validator) error {
+	if len(validators) == 0 {
 		return nil
 	}
 
+	values := tx.Tx().NewValues(&validators)
 	_, err := tx.Tx().NewUpdate().
+		With("_data", values).
 		Model((*models.Validator)(nil)).
+		TableExpr("_data").
 		Set("jailed = true").
-		Where("id IN (?)", bun.In(ids)).
+		Set("stake = _data.stake + validator.stake").
+		Where("validator.id = _data.id").
 		Exec(ctx)
 	return err
+}
+
+func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, fraction decimal.Decimal) (balances []models.Balance, err error) {
+	if validatorId == 0 || !fraction.IsPositive() {
+		return nil, nil
+	}
+
+	fr, _ := fraction.Float64()
+	_, err = tx.Tx().NewUpdate().
+		Model((*models.Delegation)(nil)).
+		Set("amount = amount * (1 - ?)", fr).
+		Where("validator_id = ?", validatorId).
+		Returning("address_id as id, 'utia' as currency, amount / (1 - ?) - amount as delegated", fr).
+		Exec(ctx, &balances)
+	return
 }
 
 func (tx Transaction) LastBlock(ctx context.Context) (block models.Block, err error) {
@@ -609,14 +627,6 @@ func (tx Transaction) RetentionBlockSignatures(ctx context.Context, height types
 		Where("height <= ?", height).
 		Exec(ctx)
 	return err
-}
-
-func (tx Transaction) Validators(ctx context.Context) (validators []models.Validator, err error) {
-	err = tx.Tx().NewSelect().
-		Model(&validators).
-		Column("id", "address", "cons_address").
-		Scan(ctx)
-	return
 }
 
 func (tx Transaction) CancelUnbondings(ctx context.Context, cancellations ...models.Undelegation) error {

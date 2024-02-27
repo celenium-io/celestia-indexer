@@ -21,12 +21,8 @@ func parseWithdrawRewards(ctx *context.Context, msg *storage.Message, data map[s
 		return nil
 	}
 
-	validator := storage.Validator{
-		Address:     rewards.Validator,
-		Rewards:     decimal.Zero,
-		Commissions: decimal.Zero,
-		Stake:       decimal.Zero,
-	}
+	validator := storage.EmptyValidator()
+	validator.Address = rewards.Validator
 
 	if rewards.Amount != nil {
 		amount, err := decimal.NewFromString(rewards.Amount.Amount.String())

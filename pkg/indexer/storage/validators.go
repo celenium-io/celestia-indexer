@@ -9,20 +9,22 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 )
 
 func (module *Module) saveValidators(
 	ctx context.Context,
 	tx storage.Transaction,
 	validators []*storage.Validator,
-	jailed *sync.Map[string, struct{}],
+	jailed *sync.Map[string, *storage.Validator],
 	jails []storage.Jail,
 ) (int, error) {
 	if jailed.Len() > 0 {
-		jailedIds := make([]uint64, 0)
-		err := jailed.Range(func(address string, _ struct{}) (error, bool) {
+		jailedVals := make([]*storage.Validator, 0)
+		err := jailed.Range(func(address string, val *storage.Validator) (error, bool) {
 			if id, ok := module.validatorsByConsAddress[address]; ok {
-				jailedIds = append(jailedIds, id)
+				val.Id = id
+				jailedVals = append(jailedVals, val)
 				return nil, false
 			}
 
@@ -32,7 +34,7 @@ func (module *Module) saveValidators(
 			return 0, err
 		}
 
-		if err := tx.Jail(ctx, jailedIds...); err != nil {
+		if err := tx.Jail(ctx, jailedVals...); err != nil {
 			return 0, err
 		}
 	}
@@ -41,6 +43,25 @@ func (module *Module) saveValidators(
 		for i := range jails {
 			if id, ok := module.validatorsByConsAddress[jails[i].Validator.ConsAddress]; ok {
 				jails[i].ValidatorId = id
+			}
+
+			fraction := decimal.Zero
+			switch jails[i].Reason {
+			case "double_sign":
+				fraction = module.slashingForDoubleSign.Copy()
+			case "missing_signature":
+				fraction = module.slashingForDowntime.Copy()
+			}
+			if !fraction.IsPositive() {
+				continue
+			}
+
+			balanceUpdates, err := tx.UpdateSlashedDelegations(ctx, jails[i].ValidatorId, fraction)
+			if err != nil {
+				return 0, err
+			}
+			if err := tx.SaveBalances(ctx, balanceUpdates...); err != nil {
+				return 0, err
 			}
 		}
 

@@ -9,11 +9,12 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
+	"github.com/shopspring/decimal"
 )
 
 type Context struct {
 	Validators       *sync.Map[string, *storage.Validator]
-	JailedValidators *sync.Map[string, struct{}]
+	JailedValidators *sync.Map[string, *storage.Validator]
 	Addresses        *sync.Map[string, *storage.Address]
 	Delegations      *sync.Map[string, *storage.Delegation]
 
@@ -31,7 +32,7 @@ func NewContext() *Context {
 		Validators:       sync.NewMap[string, *storage.Validator](),
 		Addresses:        sync.NewMap[string, *storage.Address](),
 		Delegations:      sync.NewMap[string, *storage.Delegation](),
-		JailedValidators: sync.NewMap[string, struct{}](),
+		JailedValidators: sync.NewMap[string, *storage.Validator](),
 		Redelegations:    make([]storage.Redelegation, 0),
 		Undelegations:    make([]storage.Undelegation, 0),
 		CancelUnbonding:  make([]storage.Undelegation, 0),
@@ -81,22 +82,22 @@ func (ctx *Context) AddValidator(validator storage.Validator) {
 		if !validator.Rate.IsZero() {
 			val.Rate = validator.Rate.Copy()
 		}
-		if validator.Contacts != "" {
-			val.Contacts = validator.Contacts
-		}
 		if validator.Delegator != "" {
 			val.Delegator = validator.Delegator
 		}
-		if validator.Details != "" {
+		if validator.Contacts != storage.DoNotModify {
+			val.Contacts = validator.Contacts
+		}
+		if validator.Details != storage.DoNotModify {
 			val.Details = validator.Details
 		}
-		if validator.Identity != "" {
+		if validator.Identity != storage.DoNotModify {
 			val.Identity = validator.Identity
 		}
-		if validator.Moniker != "" {
+		if validator.Moniker != storage.DoNotModify {
 			val.Moniker = validator.Moniker
 		}
-		if validator.Website != "" {
+		if validator.Website != storage.DoNotModify {
 			val.Website = validator.Website
 		}
 	} else {
@@ -154,8 +155,13 @@ func (ctx *Context) AddCancelUndelegation(u storage.Undelegation) {
 	ctx.CancelUnbonding = append(ctx.CancelUnbonding, u)
 }
 
-func (ctx *Context) AddJailedValidator(address string) {
-	ctx.JailedValidators.Set(address, struct{}{})
+func (ctx *Context) AddJailedValidator(address string, burned decimal.Decimal) {
+	jailed := true
+	ctx.JailedValidators.Set(address, &storage.Validator{
+		ConsAddress: address,
+		Stake:       burned.Neg(),
+		Jailed:      &jailed,
+	})
 }
 
 func (ctx *Context) AddJail(j storage.Jail) {

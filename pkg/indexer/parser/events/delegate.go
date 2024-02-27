@@ -29,7 +29,12 @@ func handleDelegate(ctx *context.Context, events []storage.Event, msg *storage.M
 }
 
 func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	var delegation storage.Delegation
+	var (
+		validator  = storage.EmptyValidator()
+		delegation = storage.Delegation{
+			Validator: &validator,
+		}
+	)
 
 	for i := *idx; i < len(events); i++ {
 		switch events[i].Type {
@@ -76,10 +81,8 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 				return err
 			}
 			delegation.Amount = decimal.RequireFromString(delegate.Amount.Amount.String())
-			delegation.Validator = &storage.Validator{
-				Address: delegate.Validator,
-				Stake:   delegation.Amount,
-			}
+			delegation.Validator.Address = delegate.Validator
+			delegation.Validator.Stake = delegation.Amount
 			ctx.AddValidator(*delegation.Validator)
 		}
 

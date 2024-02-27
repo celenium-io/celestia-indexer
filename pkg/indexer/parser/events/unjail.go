@@ -41,10 +41,10 @@ func processUnjail(ctx *context.Context, events []storage.Event, msg *storage.Me
 	}
 
 	jailed := false
-	ctx.AddValidator(storage.Validator{
-		Address: sender,
-		Jailed:  &jailed,
-	})
+	v := storage.EmptyValidator()
+	v.Address = sender
+	v.Jailed = &jailed
+	ctx.AddValidator(v)
 
 	*idx += 1
 	return nil

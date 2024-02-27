@@ -21,6 +21,7 @@ import (
 	types "github.com/celenium-io/celestia-indexer/pkg/types"
 	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	pq "github.com/lib/pq"
+	decimal "github.com/shopspring/decimal"
 	bun "github.com/uptrace/bun"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -824,10 +825,10 @@ func (c *TransactionHandleErrorCall) DoAndReturn(f func(context.Context, error) 
 }
 
 // Jail mocks base method.
-func (m *MockTransaction) Jail(ctx context.Context, ids ...uint64) error {
+func (m *MockTransaction) Jail(ctx context.Context, validators ...*storage.Validator) error {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
-	for _, a := range ids {
+	for _, a := range validators {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Jail", varargs...)
@@ -836,9 +837,9 @@ func (m *MockTransaction) Jail(ctx context.Context, ids ...uint64) error {
 }
 
 // Jail indicates an expected call of Jail.
-func (mr *MockTransactionMockRecorder) Jail(ctx any, ids ...any) *TransactionJailCall {
+func (mr *MockTransactionMockRecorder) Jail(ctx any, validators ...any) *TransactionJailCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx}, ids...)
+	varargs := append([]any{ctx}, validators...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Jail", reflect.TypeOf((*MockTransaction)(nil).Jail), varargs...)
 	return &TransactionJailCall{Call: call}
 }
@@ -855,13 +856,13 @@ func (c *TransactionJailCall) Return(arg0 error) *TransactionJailCall {
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *TransactionJailCall) Do(f func(context.Context, ...uint64) error) *TransactionJailCall {
+func (c *TransactionJailCall) Do(f func(context.Context, ...*storage.Validator) error) *TransactionJailCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *TransactionJailCall) DoAndReturn(f func(context.Context, ...uint64) error) *TransactionJailCall {
+func (c *TransactionJailCall) DoAndReturn(f func(context.Context, ...*storage.Validator) error) *TransactionJailCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -2841,6 +2842,45 @@ func (c *TransactionUpdateRollupCall) DoAndReturn(f func(context.Context, *stora
 	return c
 }
 
+// UpdateSlashedDelegations mocks base method.
+func (m *MockTransaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, fraction decimal.Decimal) ([]storage.Balance, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSlashedDelegations", ctx, validatorId, fraction)
+	ret0, _ := ret[0].([]storage.Balance)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateSlashedDelegations indicates an expected call of UpdateSlashedDelegations.
+func (mr *MockTransactionMockRecorder) UpdateSlashedDelegations(ctx, validatorId, fraction any) *TransactionUpdateSlashedDelegationsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSlashedDelegations", reflect.TypeOf((*MockTransaction)(nil).UpdateSlashedDelegations), ctx, validatorId, fraction)
+	return &TransactionUpdateSlashedDelegationsCall{Call: call}
+}
+
+// TransactionUpdateSlashedDelegationsCall wrap *gomock.Call
+type TransactionUpdateSlashedDelegationsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionUpdateSlashedDelegationsCall) Return(arg0 []storage.Balance, arg1 error) *TransactionUpdateSlashedDelegationsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionUpdateSlashedDelegationsCall) Do(f func(context.Context, uint64, decimal.Decimal) ([]storage.Balance, error)) *TransactionUpdateSlashedDelegationsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionUpdateSlashedDelegationsCall) DoAndReturn(f func(context.Context, uint64, decimal.Decimal) ([]storage.Balance, error)) *TransactionUpdateSlashedDelegationsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // UpdateValidators mocks base method.
 func (m *MockTransaction) UpdateValidators(ctx context.Context, validators ...*storage.Validator) error {
 	m.ctrl.T.Helper()
@@ -2880,45 +2920,6 @@ func (c *TransactionUpdateValidatorsCall) Do(f func(context.Context, ...*storage
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *TransactionUpdateValidatorsCall) DoAndReturn(f func(context.Context, ...*storage.Validator) error) *TransactionUpdateValidatorsCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// Validators mocks base method.
-func (m *MockTransaction) Validators(ctx context.Context) ([]storage.Validator, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Validators", ctx)
-	ret0, _ := ret[0].([]storage.Validator)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Validators indicates an expected call of Validators.
-func (mr *MockTransactionMockRecorder) Validators(ctx any) *TransactionValidatorsCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validators", reflect.TypeOf((*MockTransaction)(nil).Validators), ctx)
-	return &TransactionValidatorsCall{Call: call}
-}
-
-// TransactionValidatorsCall wrap *gomock.Call
-type TransactionValidatorsCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *TransactionValidatorsCall) Return(arg0 []storage.Validator, arg1 error) *TransactionValidatorsCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *TransactionValidatorsCall) Do(f func(context.Context) ([]storage.Validator, error)) *TransactionValidatorsCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *TransactionValidatorsCall) DoAndReturn(f func(context.Context) ([]storage.Validator, error)) *TransactionValidatorsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

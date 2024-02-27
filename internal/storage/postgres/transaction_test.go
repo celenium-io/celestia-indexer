@@ -791,21 +791,6 @@ func (s *TransactionTestSuite) TestRetentionBlockSignatures() {
 	s.Require().Len(signs, 1)
 }
 
-func (s *TransactionTestSuite) TestValidators() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	validators, err := tx.Validators(ctx)
-	s.Require().NoError(err)
-	s.Require().Len(validators, 2)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-}
-
 func (s *TransactionTestSuite) TestSaveRedelegations() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
@@ -936,7 +921,10 @@ func (s *TransactionTestSuite) TestJail() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx.Jail(ctx, 2)
+	err = tx.Jail(ctx, &storage.Validator{
+		Id:    2,
+		Stake: decimal.NewFromInt(-10),
+	})
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))
@@ -946,6 +934,30 @@ func (s *TransactionTestSuite) TestJail() {
 	s.Require().NoError(err)
 	s.Require().NotNil(val.Jailed)
 	s.Require().True(*val.Jailed)
+	s.Require().Equal("1000090", val.Stake.String())
+}
+
+func (s *TransactionTestSuite) TestUpdateSlashedDelegations() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	balances, err := tx.UpdateSlashedDelegations(ctx, 1, decimal.NewFromFloat(0.01))
+	s.Require().NoError(err)
+	s.Require().Len(balances, 2)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	s.Require().Equal("100", balances[0].Delegated.String())
+	s.Require().Equal("utia", balances[0].Currency)
+	s.Require().EqualValues(1, balances[0].Id)
+
+	s.Require().Equal("100", balances[1].Delegated.String())
+	s.Require().Equal("utia", balances[1].Currency)
+	s.Require().EqualValues(2, balances[1].Id)
 }
 
 func TestSuiteTransaction_Run(t *testing.T) {

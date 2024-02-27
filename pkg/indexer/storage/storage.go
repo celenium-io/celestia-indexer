@@ -12,9 +12,11 @@ import (
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 )
@@ -34,10 +36,15 @@ const (
 type Module struct {
 	modules.BaseModule
 	storage                 sdk.Transactable
+	constants               storage.IConstant
+	validators              storage.IValidator
 	notificator             storage.Notificator
 	validatorsByConsAddress map[string]uint64
 	validatorsByAddress     map[string]uint64
-	indexerName             string
+
+	slashingForDowntime   decimal.Decimal
+	slashingForDoubleSign decimal.Decimal
+	indexerName           string
 }
 
 var _ modules.Module = (*Module)(nil)
@@ -45,15 +52,21 @@ var _ modules.Module = (*Module)(nil)
 // NewModule -
 func NewModule(
 	storage sdk.Transactable,
+	constants storage.IConstant,
+	validators storage.IValidator,
 	notificator storage.Notificator,
 	cfg config.Indexer,
 ) Module {
 	m := Module{
 		BaseModule:              modules.New("storage"),
 		storage:                 storage,
+		constants:               constants,
+		validators:              validators,
 		notificator:             notificator,
 		validatorsByConsAddress: make(map[string]uint64),
 		validatorsByAddress:     make(map[string]uint64),
+		slashingForDowntime:     decimal.Zero,
+		slashingForDoubleSign:   decimal.Zero,
 		indexerName:             cfg.Name,
 	}
 
@@ -72,23 +85,57 @@ func (module *Module) Start(ctx context.Context) {
 }
 
 func (module *Module) init(ctx context.Context) error {
-	tx, err := postgres.BeginTransaction(ctx, module.storage)
+	var (
+		limit  = 100
+		offset = 0
+		end    = false
+	)
+
+	for !end {
+		validators, err := module.validators.List(ctx, uint64(limit), uint64(offset), sdk.SortOrderDesc)
+		if err != nil {
+			return err
+		}
+		for i := range validators {
+			module.validatorsByConsAddress[validators[i].ConsAddress] = validators[i].Id
+			module.validatorsByAddress[validators[i].Address] = validators[i].Id
+		}
+		offset += len(validators)
+		end = limit > len(validators)
+	}
+
+	return module.initConstants(ctx)
+}
+
+func (module *Module) isConstantsEmpty() bool {
+	return module.slashingForDoubleSign.IsZero() || module.slashingForDowntime.IsZero()
+}
+
+func (module *Module) initConstants(ctx context.Context) error {
+	doubleSign, err := module.constants.Get(ctx, types.ModuleNameSlashing, "slash_fraction_double_sign")
+	if err != nil {
+		if module.validators.IsNoRows(err) {
+			return nil
+		}
+		return err
+	}
+	module.slashingForDoubleSign, err = decimal.NewFromString(doubleSign.Value)
 	if err != nil {
 		return err
 	}
-	defer tx.Close(ctx)
 
-	validators, err := tx.Validators(ctx)
+	downtime, err := module.constants.Get(ctx, types.ModuleNameSlashing, "slash_fraction_downtime")
 	if err != nil {
-		return tx.HandleError(ctx, err)
+		if module.validators.IsNoRows(err) {
+			return nil
+		}
+		return err
 	}
-	module.validatorsByConsAddress = make(map[string]uint64)
-	for i := range validators {
-		module.validatorsByConsAddress[validators[i].ConsAddress] = validators[i].Id
-		module.validatorsByAddress[validators[i].Address] = validators[i].Id
+	module.slashingForDoubleSign, err = decimal.NewFromString(downtime.Value)
+	if err != nil {
+		return err
 	}
-
-	return tx.Flush(ctx)
+	return nil
 }
 
 func (module *Module) listen(ctx context.Context) {
@@ -109,6 +156,13 @@ func (module *Module) listen(ctx context.Context) {
 			if !ok {
 				module.Log.Warn().Msgf("invalid message type: %T", msg)
 				continue
+			}
+
+			if module.isConstantsEmpty() {
+				if err := module.initConstants(ctx); err != nil {
+					module.Log.Warn().Err(err).Msgf("constant initialization error")
+					continue
+				}
 			}
 
 			state, err := module.saveBlock(ctx, decodedContext)

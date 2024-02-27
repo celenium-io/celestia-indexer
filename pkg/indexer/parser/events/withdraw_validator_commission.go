@@ -28,7 +28,7 @@ func handleWithdrawValidatorCommission(ctx *context.Context, events []storage.Ev
 }
 
 func processWithdrawValidatorCommission(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	var validator storage.Validator
+	var validator = storage.EmptyValidator()
 
 	for i := *idx; i < len(events); i++ {
 		switch events[i].Type {

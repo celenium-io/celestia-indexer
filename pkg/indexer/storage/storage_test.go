@@ -83,7 +83,7 @@ func (s *ModuleTestSuite) TestBlockLast() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer ctxCancel()
 
-	module := NewModule(s.storage.Transactable, s.storage.Notificator, indexerCfg.Indexer{Name: testIndexerName})
+	module := NewModule(s.storage.Transactable, s.storage.Constants, s.storage.Validator, s.storage.Notificator, indexerCfg.Indexer{Name: testIndexerName})
 	module.Start(ctx)
 
 	hash, err := hex.DecodeString("F44BC94BF7D064ADF82618F2691D2353161DE232ECB3091B7E5C89B453C79456")

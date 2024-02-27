@@ -46,15 +46,15 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 				return err
 			}
 			amount := decimal.RequireFromString(redelegate.Amount.Amount.String())
-			source := storage.Validator{
-				Address: redelegate.SrcValidator,
-				Stake:   amount.Copy().Neg(),
-			}
+
+			source := storage.EmptyValidator()
+			source.Address = redelegate.SrcValidator
+			source.Stake = amount.Copy().Neg()
 			ctx.AddValidator(source)
-			dest := storage.Validator{
-				Address: redelegate.DestValidator,
-				Stake:   amount,
-			}
+
+			dest := storage.EmptyValidator()
+			dest.Address = redelegate.DestValidator
+			dest.Stake = amount
 			ctx.AddValidator(dest)
 
 			delegator := decoder.StringFromMap(msg.Data, "DelegatorAddress")

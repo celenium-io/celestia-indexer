@@ -124,12 +124,8 @@ func parseCommission(ctx *context.Context, data map[string]any) error {
 		return nil
 	}
 
-	validator := storage.Validator{
-		Address:     commission.Validator,
-		Rewards:     decimal.Zero,
-		Commissions: decimal.Zero,
-		Stake:       decimal.Zero,
-	}
+	validator := storage.EmptyValidator()
+	validator.Address = commission.Validator
 
 	if !commission.Amount.IsZero() {
 		validator.Commissions = commission.Amount.Copy()
@@ -158,12 +154,8 @@ func parseRewards(ctx *context.Context, data map[string]any) error {
 		return nil
 	}
 
-	validator := storage.Validator{
-		Address:     rewards.Validator,
-		Rewards:     decimal.Zero,
-		Commissions: decimal.Zero,
-		Stake:       decimal.Zero,
-	}
+	validator := storage.EmptyValidator()
+	validator.Address = rewards.Validator
 
 	if !rewards.Amount.IsZero() {
 		validator.Rewards = rewards.Amount.Copy()
@@ -194,7 +186,7 @@ func parseSlash(ctx *context.Context, data map[string]any) error {
 			return err
 		}
 		consAddress := strings.ToUpper(hex.EncodeToString(hash))
-		ctx.AddJailedValidator(consAddress)
+		ctx.AddJailedValidator(consAddress, slash.BurnedCoins.Copy())
 
 		ctx.AddJail(storage.Jail{
 			Height: ctx.Block.Height,

@@ -53,3 +53,22 @@ type Validator struct {
 func (Validator) TableName() string {
 	return "validator"
 }
+
+const DoNotModify = "[do-not-modify]"
+
+func EmptyValidator() Validator {
+	return Validator{
+		Rate:              decimal.Zero,
+		MaxRate:           decimal.Zero,
+		MaxChangeRate:     decimal.Zero,
+		MinSelfDelegation: decimal.Zero,
+		Rewards:           decimal.Zero,
+		Commissions:       decimal.Zero,
+		Stake:             decimal.Zero,
+		Contacts:          DoNotModify,
+		Details:           DoNotModify,
+		Identity:          DoNotModify,
+		Moniker:           DoNotModify,
+		Website:           DoNotModify,
+	}
+}

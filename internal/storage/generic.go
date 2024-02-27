@@ -11,6 +11,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/lib/pq"
+	"github.com/shopspring/decimal"
 )
 
 var Models = []any{
@@ -81,6 +82,7 @@ type Transaction interface {
 	SaveUndelegations(ctx context.Context, undelegations ...Undelegation) error
 	SaveRedelegations(ctx context.Context, redelegations ...Redelegation) error
 	SaveDelegations(ctx context.Context, delegations ...Delegation) error
+	UpdateSlashedDelegations(ctx context.Context, validatorId uint64, fraction decimal.Decimal) ([]Balance, error)
 	SaveStakingLogs(ctx context.Context, logs ...StakingLog) error
 	SaveJails(ctx context.Context, jails ...Jail) error
 	SaveBlockSignatures(ctx context.Context, signs ...BlockSignature) error
@@ -88,7 +90,7 @@ type Transaction interface {
 	CancelUnbondings(ctx context.Context, cancellations ...Undelegation) error
 	RetentionCompletedUnbondings(ctx context.Context, blockTime time.Time) error
 	RetentionCompletedRedelegations(ctx context.Context, blockTime time.Time) error
-	Jail(ctx context.Context, ids ...uint64) error
+	Jail(ctx context.Context, validators ...*Validator) error
 
 	RollbackBlock(ctx context.Context, height types.Level) error
 	RollbackBlockStats(ctx context.Context, height types.Level) (stats BlockStats, err error)
@@ -119,7 +121,6 @@ type Transaction interface {
 	LastNamespaceMessage(ctx context.Context, nsId uint64) (msg NamespaceMessage, err error)
 	LastAddressAction(ctx context.Context, address []byte) (uint64, error)
 	GetProposerId(ctx context.Context, address string) (uint64, error)
-	Validators(ctx context.Context) ([]Validator, error)
 }
 
 const (

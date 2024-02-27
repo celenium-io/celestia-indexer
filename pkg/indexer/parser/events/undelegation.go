@@ -33,7 +33,7 @@ func handleUndelegate(ctx *context.Context, events []storage.Event, msg *storage
 func processUndelegate(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	var (
 		amount         = decimal.Zero
-		validator      = storage.Validator{}
+		validator      = storage.EmptyValidator()
 		completionTime = time.Now()
 	)
 
