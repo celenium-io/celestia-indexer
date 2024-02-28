@@ -259,3 +259,40 @@ func (s Stats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe,
 	err = query.Limit(100).Scan(ctx, &response)
 	return
 }
+
+func (s Stats) StakingSeries(ctx context.Context, timeframe storage.Timeframe, name string, validatorId uint64, req storage.SeriesRequest) (response []storage.SeriesItem, err error) {
+	var view string
+	switch timeframe {
+	case storage.TimeframeHour:
+		view = storage.ViewStakingByHour
+	case storage.TimeframeDay:
+		view = storage.ViewStakingByDay
+	case storage.TimeframeMonth:
+		view = storage.ViewStakingByMonth
+	default:
+		return nil, errors.Errorf("unexpected timeframe %s", timeframe)
+	}
+
+	query := s.db.DB().NewSelect().Table(view).Where("validator_id = ?", validatorId)
+
+	switch name {
+	case storage.SeriesRewards:
+		query.ColumnExpr("ts, rewards as value")
+	case storage.SeriesCommissions:
+		query.ColumnExpr("ts, commissions as value")
+	case storage.SeriesFlow:
+		query.ColumnExpr("ts, flow as value")
+	default:
+		return nil, errors.Errorf("unexpected series name: %s", name)
+	}
+
+	if !req.From.IsZero() {
+		query = query.Where("ts >= ?", req.From)
+	}
+	if !req.To.IsZero() {
+		query = query.Where("ts < ?", req.To)
+	}
+
+	err = query.Limit(100).Scan(ctx, &response)
+	return
+}

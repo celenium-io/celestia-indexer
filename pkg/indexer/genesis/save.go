@@ -130,6 +130,39 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		totalStake = totalStake.Add(data.validators[i].Stake)
 	}
 
+	for i := range data.stakingLogs {
+		if address, ok := data.addresses[data.stakingLogs[i].Address.Address]; ok {
+			data.stakingLogs[i].AddressId = &address.Id
+		}
+
+		for j := range data.validators {
+			if data.validators[j].Address == data.stakingLogs[i].Validator.Address {
+				data.stakingLogs[i].ValidatorId = data.validators[j].Id
+				break
+			}
+		}
+	}
+
+	if err := tx.SaveStakingLogs(ctx, data.stakingLogs...); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
+	for i := range data.delegations {
+		if address, ok := data.addresses[data.delegations[i].Address.Address]; ok {
+			data.delegations[i].AddressId = address.Id
+		}
+
+		for j := range data.validators {
+			if data.validators[j].Address == data.delegations[i].Validator.Address {
+				data.delegations[i].ValidatorId = data.validators[j].Id
+				break
+			}
+		}
+	}
+	if err := tx.SaveDelegations(ctx, data.delegations...); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
 	if len(events) > 0 {
 		if err := tx.BulkSave(ctx, events); err != nil {
 			return tx.HandleError(ctx, err)

@@ -86,10 +86,10 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
 	}
 
-	if err := s.createScripts(ctx, strg.Connection(), "functions", false); err != nil {
+	if err := s.createScripts(ctx, "functions", false); err != nil {
 		return s, errors.Wrap(err, "creating views")
 	}
-	if err := s.createScripts(ctx, strg.Connection(), "views", true); err != nil {
+	if err := s.createScripts(ctx, "views", true); err != nil {
 		return s, errors.Wrap(err, "creating views")
 	}
 

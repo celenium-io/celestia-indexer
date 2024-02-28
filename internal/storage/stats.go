@@ -143,6 +143,7 @@ const (
 	SeriesBytesInBlock  = "bytes_in_block"
 	SeriesRewards       = "rewards"
 	SeriesCommissions   = "commissions"
+	SeriesFlow          = "flow"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -155,4 +156,5 @@ type IStats interface {
 	TxCountForLast24h(ctx context.Context) ([]TxCountForLast24hItem, error)
 	Series(ctx context.Context, timeframe Timeframe, name string, req SeriesRequest) ([]SeriesItem, error)
 	NamespaceSeries(ctx context.Context, timeframe Timeframe, name string, nsId uint64, req SeriesRequest) (response []SeriesItem, err error)
+	StakingSeries(ctx context.Context, timeframe Timeframe, name string, validatorId uint64, req SeriesRequest) (response []SeriesItem, err error)
 }

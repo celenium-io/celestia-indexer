@@ -237,6 +237,45 @@ func (c *IStatsSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe
 	return c
 }
 
+// StakingSeries mocks base method.
+func (m *MockIStats) StakingSeries(ctx context.Context, timeframe storage.Timeframe, name string, validatorId uint64, req storage.SeriesRequest) ([]storage.SeriesItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StakingSeries", ctx, timeframe, name, validatorId, req)
+	ret0, _ := ret[0].([]storage.SeriesItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StakingSeries indicates an expected call of StakingSeries.
+func (mr *MockIStatsMockRecorder) StakingSeries(ctx, timeframe, name, validatorId, req any) *IStatsStakingSeriesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StakingSeries", reflect.TypeOf((*MockIStats)(nil).StakingSeries), ctx, timeframe, name, validatorId, req)
+	return &IStatsStakingSeriesCall{Call: call}
+}
+
+// IStatsStakingSeriesCall wrap *gomock.Call
+type IStatsStakingSeriesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IStatsStakingSeriesCall) Return(response []storage.SeriesItem, err error) *IStatsStakingSeriesCall {
+	c.Call = c.Call.Return(response, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IStatsStakingSeriesCall) Do(f func(context.Context, storage.Timeframe, string, uint64, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsStakingSeriesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IStatsStakingSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, uint64, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsStakingSeriesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Summary mocks base method.
 func (m *MockIStats) Summary(ctx context.Context, req storage.SummaryRequest) (string, error) {
 	m.ctrl.T.Helper()

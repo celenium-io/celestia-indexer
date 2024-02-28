@@ -378,6 +378,10 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			namespace.GET("/usage", statsHandler.NamespaceUsage)
 			namespace.GET("/series/:id/:name/:timeframe", statsHandler.NamespaceSeries)
 		}
+		staking := stats.Group("/staking")
+		{
+			staking.GET("/series/:id/:name/:timeframe", statsHandler.StakingSeries)
+		}
 		series := stats.Group("/series")
 		{
 			series.GET("/:name/:timeframe", statsHandler.Series)

@@ -21,6 +21,8 @@ type parsedData struct {
 	block         storage.Block
 	addresses     map[string]*storage.Address
 	validators    []*storage.Validator
+	stakingLogs   []storage.StakingLog
+	delegations   []storage.Delegation
 	constants     []storage.Constant
 	denomMetadata []storage.DenomMetadata
 }
@@ -29,6 +31,8 @@ func newParsedData() parsedData {
 	return parsedData{
 		addresses:     make(map[string]*storage.Address),
 		validators:    make([]*storage.Validator, 0),
+		stakingLogs:   make([]storage.StakingLog, 0),
+		delegations:   make([]storage.Delegation, 0),
 		constants:     make([]storage.Constant, 0),
 		denomMetadata: make([]storage.DenomMetadata, 0),
 	}
@@ -115,6 +119,13 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 	}
 
 	data.validators = decodeCtx.GetValidators()
+	data.stakingLogs = decodeCtx.StakingLogs
+
+	_ = decodeCtx.Delegations.Range(func(_ string, value *storage.Delegation) (error, bool) {
+		data.delegations = append(data.delegations, *value)
+		return nil, false
+	})
+
 	data.block = block
 	return data, nil
 }
