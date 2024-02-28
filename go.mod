@@ -5,7 +5,7 @@ go 1.21.2
 require (
 	cosmossdk.io/errors v1.0.0-beta.7
 	cosmossdk.io/math v1.1.2
-	github.com/celestiaorg/celestia-app v1.3.0
+	github.com/celestiaorg/celestia-app v1.6.0
 	github.com/cosmos/cosmos-sdk v0.46.14
 	github.com/cosmos/ibc-go/v6 v6.2.0
 	github.com/dipdup-io/workerpool v0.0.4
