@@ -277,20 +277,20 @@ func (s Stats) StakingSeries(ctx context.Context, timeframe storage.Timeframe, n
 
 	switch name {
 	case storage.SeriesRewards:
-		query.ColumnExpr("ts, rewards as value")
+		query.ColumnExpr("time as ts, rewards as value")
 	case storage.SeriesCommissions:
-		query.ColumnExpr("ts, commissions as value")
+		query.ColumnExpr("time as ts, commissions as value")
 	case storage.SeriesFlow:
-		query.ColumnExpr("ts, flow as value")
+		query.ColumnExpr("time as ts, flow as value")
 	default:
 		return nil, errors.Errorf("unexpected series name: %s", name)
 	}
 
 	if !req.From.IsZero() {
-		query = query.Where("ts >= ?", req.From)
+		query = query.Where("time >= ?", req.From)
 	}
 	if !req.To.IsZero() {
-		query = query.Where("ts < ?", req.To)
+		query = query.Where("time < ?", req.To)
 	}
 
 	err = query.Limit(100).Scan(ctx, &response)
