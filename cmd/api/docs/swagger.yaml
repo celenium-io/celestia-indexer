@@ -3561,6 +3561,65 @@ paths:
       summary: Get histogram with precomputed stats
       tags:
       - stats
+  /v1/stats/staking/series/{id}/{name}/{timeframe}:
+    get:
+      description: Get histogram for staking with precomputed stats by series name
+        and timeframe
+      operationId: stats-staking-series
+      parameters:
+      - description: Validator id
+        in: path
+        maxLength: 56
+        minLength: 56
+        name: id
+        required: true
+        type: string
+      - description: Timeframe
+        enum:
+        - hour
+        - day
+        - month
+        in: path
+        name: timeframe
+        required: true
+        type: string
+      - description: Series name
+        enum:
+        - rewards
+        - commissions
+        - flow
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Time from in unix timestamp
+        in: query
+        name: from
+        type: integer
+      - description: Time to in unix timestamp
+        in: query
+        name: to
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.SeriesItem'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get histogram for staking with precomputed stats
+      tags:
+      - stats
   /v1/stats/summary/{table}/{function}:
     get:
       description: |-

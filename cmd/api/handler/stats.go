@@ -426,7 +426,7 @@ type stakingSeriesRequest struct {
 //	@Description	Get histogram for staking with precomputed stats by series name and timeframe
 //	@Tags			stats
 //	@ID				stats-staking-series
-//	@Param			id			path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
+//	@Param			id			path	string	true	"Validator id"   				minlength(56)	maxlength(56)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
 //	@Param			name		path	string	true	"Series name"					Enums(rewards, commissions, flow)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
