@@ -4861,6 +4861,10 @@
         "responses.Jail": {
             "type": "object",
             "properties": {
+                "burned": {
+                    "type": "string",
+                    "example": "10000000000"
+                },
                 "height": {
                     "type": "integer",
                     "example": 100
@@ -4868,10 +4872,6 @@
                 "reason": {
                     "type": "string",
                     "example": "double_sign"
-                },
-                "spendable": {
-                    "type": "string",
-                    "example": "10000000000"
                 },
                 "time": {
                     "type": "string",

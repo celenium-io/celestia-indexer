@@ -122,10 +122,10 @@ func NewValidatorUptime(levels []types.Level, currentLevel types.Level, count ty
 }
 
 type Jail struct {
-	Height types.Level `example:"100"                       json:"height"    swaggertype:"integer"`
-	Time   time.Time   `example:"2023-07-04T03:10:57+00:00" json:"time"      swaggertype:"string"`
-	Reason string      `example:"double_sign"               json:"reason"    swaggertype:"string"`
-	Burned string      `example:"10000000000"               json:"spendable" swaggertype:"string"`
+	Height types.Level `example:"100"                       json:"height" swaggertype:"integer"`
+	Time   time.Time   `example:"2023-07-04T03:10:57+00:00" json:"time"   swaggertype:"string"`
+	Reason string      `example:"double_sign"               json:"reason" swaggertype:"string"`
+	Burned string      `example:"10000000000"               json:"burned" swaggertype:"string"`
 
 	Validator *ShortValidator `json:"validator,omitempty"`
 }

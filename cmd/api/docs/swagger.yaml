@@ -327,14 +327,14 @@ definitions:
     type: object
   responses.Jail:
     properties:
+      burned:
+        example: "10000000000"
+        type: string
       height:
         example: 100
         type: integer
       reason:
         example: double_sign
-        type: string
-      spendable:
-        example: "10000000000"
         type: string
       time:
         example: "2023-07-04T03:10:57+00:00"
