@@ -57,6 +57,12 @@ func processUndelegate(ctx *context.Context, events []storage.Event, msg *storag
 					return err
 				}
 
+				ctx.AddDelegation(storage.Delegation{
+					Address:   address,
+					Validator: &validator,
+					Amount:    amount.Copy().Neg(),
+				})
+
 				ctx.AddUndelegation(storage.Undelegation{
 					Validator:      &validator,
 					Address:        address,
