@@ -22,10 +22,10 @@ func handleUnjail(ctx *context.Context, events []storage.Event, msg *storage.Mes
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
 	*idx += 1
-	return processUnjail(ctx, events, msg, idx)
+	return processUnjail(ctx, events, idx)
 }
 
-func processUnjail(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+func processUnjail(ctx *context.Context, events []storage.Event, idx *int) error {
 	if events[*idx].Type != types.EventTypeMessage {
 		return errors.Errorf("slashing unexpected event type: %s", events[*idx].Type)
 	}

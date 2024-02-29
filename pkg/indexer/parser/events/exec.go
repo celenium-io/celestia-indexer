@@ -45,7 +45,7 @@ func handleExec(ctx *context.Context, events []storage.Event, msg *storage.Messa
 				return err
 			}
 		case "/cosmos.slashing.v1beta1.MsgUnjail":
-			if err := processUnjail(ctx, events, msg, idx); err != nil {
+			if err := processUnjail(ctx, events, idx); err != nil {
 				return err
 			}
 		}

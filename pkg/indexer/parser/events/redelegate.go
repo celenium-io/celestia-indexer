@@ -72,6 +72,16 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 				return err
 			}
 
+			ctx.AddDelegation(storage.Delegation{
+				Validator: &source,
+				Address:   address,
+				Amount:    amount.Copy().Neg(),
+			})
+			ctx.AddDelegation(storage.Delegation{
+				Validator: &dest,
+				Address:   address,
+				Amount:    amount.Copy(),
+			})
 			ctx.AddRedelegation(storage.Redelegation{
 				Source:         &source,
 				Destination:    &dest,
@@ -81,7 +91,6 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 				Height:         msg.Height,
 				CompletionTime: redelegate.CompletionTime,
 			})
-
 			ctx.AddStakingLog(storage.StakingLog{
 				Height:    msg.Height,
 				Time:      msg.Time,
