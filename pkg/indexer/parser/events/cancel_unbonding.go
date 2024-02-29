@@ -67,6 +67,12 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 				return err
 			}
 
+			ctx.AddDelegation(storage.Delegation{
+				Validator: &validator,
+				Address:   address,
+				Amount:    amount,
+			})
+
 			ctx.AddCancelUndelegation(storage.Undelegation{
 				Validator: &validator,
 				Address:   address,
