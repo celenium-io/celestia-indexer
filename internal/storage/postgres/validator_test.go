@@ -6,6 +6,8 @@ package postgres
 import (
 	"context"
 	"time"
+
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 )
 
 func (s *StorageTestSuite) TestValidatorByAddress() {
@@ -38,7 +40,9 @@ func (s *StorageTestSuite) TestListByPower() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	validators, err := s.storage.Validator.ListByPower(ctx, 10, 0)
+	validators, err := s.storage.Validator.ListByPower(ctx, storage.ValidatorFilters{
+		Limit: 10,
+	})
 	s.Require().NoError(err)
 	s.Require().Len(validators, 2)
 }

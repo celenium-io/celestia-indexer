@@ -317,18 +317,18 @@ func (c *IValidatorListCall) DoAndReturn(f func(context.Context, uint64, uint64,
 }
 
 // ListByPower mocks base method.
-func (m *MockIValidator) ListByPower(ctx context.Context, limit, offset int) ([]storage.Validator, error) {
+func (m *MockIValidator) ListByPower(ctx context.Context, fltrs storage.ValidatorFilters) ([]storage.Validator, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListByPower", ctx, limit, offset)
+	ret := m.ctrl.Call(m, "ListByPower", ctx, fltrs)
 	ret0, _ := ret[0].([]storage.Validator)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListByPower indicates an expected call of ListByPower.
-func (mr *MockIValidatorMockRecorder) ListByPower(ctx, limit, offset any) *IValidatorListByPowerCall {
+func (mr *MockIValidatorMockRecorder) ListByPower(ctx, fltrs any) *IValidatorListByPowerCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListByPower", reflect.TypeOf((*MockIValidator)(nil).ListByPower), ctx, limit, offset)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListByPower", reflect.TypeOf((*MockIValidator)(nil).ListByPower), ctx, fltrs)
 	return &IValidatorListByPowerCall{Call: call}
 }
 
@@ -344,13 +344,13 @@ func (c *IValidatorListByPowerCall) Return(arg0 []storage.Validator, arg1 error)
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IValidatorListByPowerCall) Do(f func(context.Context, int, int) ([]storage.Validator, error)) *IValidatorListByPowerCall {
+func (c *IValidatorListByPowerCall) Do(f func(context.Context, storage.ValidatorFilters) ([]storage.Validator, error)) *IValidatorListByPowerCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IValidatorListByPowerCall) DoAndReturn(f func(context.Context, int, int) ([]storage.Validator, error)) *IValidatorListByPowerCall {
+func (c *IValidatorListByPowerCall) DoAndReturn(f func(context.Context, storage.ValidatorFilters) ([]storage.Validator, error)) *IValidatorListByPowerCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

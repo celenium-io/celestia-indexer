@@ -48,13 +48,20 @@ func (v *Validator) TotalVotingPower(ctx context.Context) (decimal.Decimal, erro
 	return power, err
 }
 
-func (v *Validator) ListByPower(ctx context.Context, limit, offset int) (validators []storage.Validator, err error) {
+func (v *Validator) ListByPower(ctx context.Context, fltrs storage.ValidatorFilters) (validators []storage.Validator, err error) {
 	query := v.DB().NewSelect().Model(&validators).
 		OrderExpr("(not jailed)::int * stake desc")
 
-	query = limitScope(query, limit)
-	if offset > 0 {
-		query = query.Offset(offset)
+	query = limitScope(query, fltrs.Limit)
+	if fltrs.Offset > 0 {
+		query = query.Offset(fltrs.Offset)
+	}
+	if fltrs.Jailed != nil {
+		if *fltrs.Jailed {
+			query = query.Where("jailed = true")
+		} else {
+			query = query.Where("jailed = false")
+		}
 	}
 
 	err = query.Scan(ctx)

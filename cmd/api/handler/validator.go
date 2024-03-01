@@ -79,6 +79,18 @@ func (handler *ValidatorHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.NewValidator(*validator))
 }
 
+type validatorsPagination struct {
+	Limit  int   `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int   `query:"offset" validate:"omitempty,min=0"`
+	Jailed *bool `query:"jailed" validate:"omitempty"`
+}
+
+func (req *validatorsPagination) SetDefault() {
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
+}
+
 // List godoc
 //
 //	@Summary		List validators
@@ -87,7 +99,7 @@ func (handler *ValidatorHandler) Get(c echo.Context) error {
 //	@ID				list-validator
 //	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						mininum(1)
-//	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
+//	@Param			jailed	query	boolean	false	"Return only jailed validators"
 //	@Produce		json
 //	@Produce		json
 //	@Success		200	{array}		responses.Validator
@@ -95,13 +107,17 @@ func (handler *ValidatorHandler) Get(c echo.Context) error {
 //	@Failure		500	{object}	Error
 //	@Router			/v1/validators [get]
 func (handler *ValidatorHandler) List(c echo.Context) error {
-	req, err := bindAndValidate[limitOffsetPagination](c)
+	req, err := bindAndValidate[validatorsPagination](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
 	req.SetDefault()
 
-	validators, err := handler.validators.ListByPower(c.Request().Context(), req.Limit, req.Offset)
+	validators, err := handler.validators.ListByPower(c.Request().Context(), storage.ValidatorFilters{
+		Limit:  req.Limit,
+		Offset: req.Offset,
+		Jailed: req.Jailed,
+	})
 	if err != nil {
 		return handleError(c, err, handler.validators)
 	}
@@ -220,7 +236,7 @@ func (handler *ValidatorHandler) Uptime(c echo.Context) error {
 //	@Success		200	{array}		responses.Delegation
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/validator/{id}/delegators [get]
+//	@Router			/v1/validators/{id}/delegators [get]
 func (handler *ValidatorHandler) Delegators(c echo.Context) error {
 	req, err := bindAndValidate[validatorPageableRequest](c)
 	if err != nil {
@@ -259,7 +275,7 @@ func (handler *ValidatorHandler) Delegators(c echo.Context) error {
 //	@Success		200	{array}		responses.Jail
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/validator/{id}/jails [get]
+//	@Router			/v1/validators/{id}/jails [get]
 func (handler *ValidatorHandler) Jails(c echo.Context) error {
 	req, err := bindAndValidate[validatorPageableRequest](c)
 	if err != nil {
@@ -294,7 +310,7 @@ func (handler *ValidatorHandler) Jails(c echo.Context) error {
 //	@Success		200	{object}	responses.ValidatorCount
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/validator/count [get]
+//	@Router			/v1/validators/count [get]
 func (handler *ValidatorHandler) Count(c echo.Context) error {
 	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
 	if err != nil {

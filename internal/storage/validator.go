@@ -19,7 +19,7 @@ type IValidator interface {
 
 	ByAddress(ctx context.Context, address string) (Validator, error)
 	TotalVotingPower(ctx context.Context) (decimal.Decimal, error)
-	ListByPower(ctx context.Context, limit, offset int) ([]Validator, error)
+	ListByPower(ctx context.Context, fltrs ValidatorFilters) ([]Validator, error)
 	JailedCount(ctx context.Context) (int, error)
 }
 
@@ -71,4 +71,10 @@ func EmptyValidator() Validator {
 		Moniker:           DoNotModify,
 		Website:           DoNotModify,
 	}
+}
+
+type ValidatorFilters struct {
+	Limit  int
+	Offset int
+	Jailed *bool
 }

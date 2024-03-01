@@ -92,7 +92,9 @@ func (s *ValidatorTestSuite) TestList() {
 	c.SetPath("/validator")
 
 	s.validators.EXPECT().
-		ListByPower(gomock.Any(), 10, 0).
+		ListByPower(gomock.Any(), storage.ValidatorFilters{
+			Limit: 10,
+		}).
 		Return([]storage.Validator{
 			testValidator,
 		}, nil)
