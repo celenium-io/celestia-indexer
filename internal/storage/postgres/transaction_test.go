@@ -951,11 +951,11 @@ func (s *TransactionTestSuite) TestUpdateSlashedDelegations() {
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
 
-	s.Require().Equal("100", balances[0].Delegated.String())
+	s.Require().Equal("-100", balances[0].Delegated.String())
 	s.Require().Equal("utia", balances[0].Currency)
 	s.Require().EqualValues(1, balances[0].Id)
 
-	s.Require().Equal("100", balances[1].Delegated.String())
+	s.Require().Equal("-100", balances[1].Delegated.String())
 	s.Require().Equal("utia", balances[1].Currency)
 	s.Require().EqualValues(2, balances[1].Id)
 }

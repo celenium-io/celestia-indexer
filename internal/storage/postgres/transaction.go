@@ -368,7 +368,7 @@ func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId 
 		Model((*models.Delegation)(nil)).
 		Set("amount = amount * (1 - ?)", fr).
 		Where("validator_id = ?", validatorId).
-		Returning("address_id as id, 'utia' as currency, amount / (1 - ?) - amount as delegated", fr).
+		Returning("address_id as id, 'utia' as currency, -(amount / (1 - ?) - amount) as delegated", fr).
 		Exec(ctx, &balances)
 	return
 }
