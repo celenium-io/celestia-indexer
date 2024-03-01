@@ -6,8 +6,6 @@ package postgres
 import (
 	"context"
 
-	"github.com/uptrace/bun"
-
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
@@ -29,7 +27,9 @@ func NewAddress(db *database.Bun) *Address {
 func (a *Address) ByHash(ctx context.Context, hash []byte) (address storage.Address, err error) {
 	addressQuery := a.DB().NewSelect().
 		Model((*storage.Address)(nil)).
-		Where("hash = ?", hash)
+		Where("hash = ?", hash).
+		Order("id asc").
+		Limit(1)
 
 	err = a.DB().NewSelect().TableExpr("(?) as address", addressQuery).
 		ColumnExpr("address.*").
@@ -51,22 +51,4 @@ func (a *Address) ListWithBalance(ctx context.Context, filters storage.AddressLi
 		Join("left join balance on balance.id = address.id").
 		Scan(ctx, &result)
 	return
-}
-
-func (a *Address) Messages(ctx context.Context, id uint64, filters storage.AddressMsgsFilter) (msgs []storage.MsgAddress, err error) {
-	query := a.DB().NewSelect().Model(&msgs).
-		Where("address_id = ?", id).
-		Offset(filters.Offset).
-		Relation("Msg")
-
-	query = addressMsgsFilter(query, filters)
-
-	err = query.Scan(ctx)
-	return
-}
-
-func addressMsgsFilter(query *bun.SelectQuery, filters storage.AddressMsgsFilter) *bun.SelectQuery {
-	query = limitScope(query, filters.Limit)
-	query = sortScope(query, "msg_id", filters.Sort)
-	return query
 }

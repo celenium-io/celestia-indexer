@@ -131,7 +131,7 @@ func (module *Module) initConstants(ctx context.Context) error {
 		}
 		return err
 	}
-	module.slashingForDoubleSign, err = decimal.NewFromString(downtime.Value)
+	module.slashingForDowntime, err = decimal.NewFromString(downtime.Value)
 	if err != nil {
 		return err
 	}
