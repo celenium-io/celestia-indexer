@@ -1,9 +1,9 @@
 - id: 1
   address: celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw
   delegator: celestia17vmk8m246t648hpmde2q7kp4ft9uwrayps85dg
-  rate: 0.070000000000000000
-  max_rate: 0.200000000000000000
-  max_change_rate: 0.010000000000000000
+  rate: 0.07
+  max_rate: 0.2
+  max_change_rate: 0.01
   min_self_delegation: 1
   moniker: Conqueror
   identity: EAD22B173DE57E6A
@@ -11,5 +11,26 @@
   website: https://github.com/DasRasyo
   contacts: https://t.me/DasRasyo || conqueror.prime
   details: Stake with me
-  msg_id: 4
+  stake: 1000100
+  commissions: 1
+  rewards: 1
   height: 999
+  jailed: false
+- id: 2
+  address: celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr
+  delegator: celestia189ecvq5avj0wehrcfnagpd5sd8pup9aq7j2xd9
+  rate: 0.05
+  max_rate: 0.2
+  max_change_rate: 0.01
+  min_self_delegation: 1
+  moniker: Witval
+  identity: 51468B615127273A
+  cons_address: 57ECB5E6BB4CFBE08541B971DC240F33EEC880BD
+  website: 
+  contacts: contact@vitwit.com
+  details: Witval is the validator arm from Vitwit. We are a web3 technology consulting, services and infrastructure company. We are validating across 20+ production networks, majorly focusing on Cosmos ecosystem
+  stake: 1000100
+  commissions: 1
+  rewards: 1
+  height: 1000
+  jailed: false

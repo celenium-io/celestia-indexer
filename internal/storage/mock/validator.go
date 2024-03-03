@@ -17,6 +17,7 @@ import (
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
 	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	decimal "github.com/shopspring/decimal"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -198,6 +199,45 @@ func (c *IValidatorIsNoRowsCall) DoAndReturn(f func(error) bool) *IValidatorIsNo
 	return c
 }
 
+// JailedCount mocks base method.
+func (m *MockIValidator) JailedCount(ctx context.Context) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "JailedCount", ctx)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// JailedCount indicates an expected call of JailedCount.
+func (mr *MockIValidatorMockRecorder) JailedCount(ctx any) *IValidatorJailedCountCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JailedCount", reflect.TypeOf((*MockIValidator)(nil).JailedCount), ctx)
+	return &IValidatorJailedCountCall{Call: call}
+}
+
+// IValidatorJailedCountCall wrap *gomock.Call
+type IValidatorJailedCountCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IValidatorJailedCountCall) Return(arg0 int, arg1 error) *IValidatorJailedCountCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IValidatorJailedCountCall) Do(f func(context.Context) (int, error)) *IValidatorJailedCountCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IValidatorJailedCountCall) DoAndReturn(f func(context.Context) (int, error)) *IValidatorJailedCountCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // LastID mocks base method.
 func (m *MockIValidator) LastID(ctx context.Context) (uint64, error) {
 	m.ctrl.T.Helper()
@@ -276,6 +316,45 @@ func (c *IValidatorListCall) DoAndReturn(f func(context.Context, uint64, uint64,
 	return c
 }
 
+// ListByPower mocks base method.
+func (m *MockIValidator) ListByPower(ctx context.Context, fltrs storage.ValidatorFilters) ([]storage.Validator, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListByPower", ctx, fltrs)
+	ret0, _ := ret[0].([]storage.Validator)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListByPower indicates an expected call of ListByPower.
+func (mr *MockIValidatorMockRecorder) ListByPower(ctx, fltrs any) *IValidatorListByPowerCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListByPower", reflect.TypeOf((*MockIValidator)(nil).ListByPower), ctx, fltrs)
+	return &IValidatorListByPowerCall{Call: call}
+}
+
+// IValidatorListByPowerCall wrap *gomock.Call
+type IValidatorListByPowerCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IValidatorListByPowerCall) Return(arg0 []storage.Validator, arg1 error) *IValidatorListByPowerCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IValidatorListByPowerCall) Do(f func(context.Context, storage.ValidatorFilters) ([]storage.Validator, error)) *IValidatorListByPowerCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IValidatorListByPowerCall) DoAndReturn(f func(context.Context, storage.ValidatorFilters) ([]storage.Validator, error)) *IValidatorListByPowerCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Save mocks base method.
 func (m_2 *MockIValidator) Save(ctx context.Context, m *storage.Validator) error {
 	m_2.ctrl.T.Helper()
@@ -310,6 +389,45 @@ func (c *IValidatorSaveCall) Do(f func(context.Context, *storage.Validator) erro
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *IValidatorSaveCall) DoAndReturn(f func(context.Context, *storage.Validator) error) *IValidatorSaveCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// TotalVotingPower mocks base method.
+func (m *MockIValidator) TotalVotingPower(ctx context.Context) (decimal.Decimal, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TotalVotingPower", ctx)
+	ret0, _ := ret[0].(decimal.Decimal)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TotalVotingPower indicates an expected call of TotalVotingPower.
+func (mr *MockIValidatorMockRecorder) TotalVotingPower(ctx any) *IValidatorTotalVotingPowerCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TotalVotingPower", reflect.TypeOf((*MockIValidator)(nil).TotalVotingPower), ctx)
+	return &IValidatorTotalVotingPowerCall{Call: call}
+}
+
+// IValidatorTotalVotingPowerCall wrap *gomock.Call
+type IValidatorTotalVotingPowerCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IValidatorTotalVotingPowerCall) Return(arg0 decimal.Decimal, arg1 error) *IValidatorTotalVotingPowerCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IValidatorTotalVotingPowerCall) Do(f func(context.Context) (decimal.Decimal, error)) *IValidatorTotalVotingPowerCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IValidatorTotalVotingPowerCall) DoAndReturn(f func(context.Context) (decimal.Decimal, error)) *IValidatorTotalVotingPowerCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -5,9 +5,11 @@ package responses
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/shopspring/decimal"
 )
 
 type Validator struct {
@@ -26,6 +28,12 @@ type Validator struct {
 	MaxRate           string `example:"0.1"  json:"max_rate"            swaggertype:"string"`
 	MaxChangeRate     string `example:"0.01" json:"max_change_rate"     swaggertype:"string"`
 	MinSelfDelegation string `example:"1"    json:"min_self_delegation" swaggertype:"string"`
+	Stake             string `example:"1"    json:"stake"               swaggertype:"string"`
+	Rewards           string `example:"1"    json:"rewards"             swaggertype:"string"`
+	Commissions       string `example:"1"    json:"commissions"         swaggertype:"string"`
+	VotingPower       string `example:"1"    json:"voting_power"        swaggertype:"string"`
+
+	Jailed bool `example:"false" json:"jailed" swaggertype:"boolean"`
 }
 
 func NewValidator(val storage.Validator) *Validator {
@@ -46,6 +54,11 @@ func NewValidator(val storage.Validator) *Validator {
 		MaxRate:           val.MaxRate.String(),
 		MaxChangeRate:     val.MaxChangeRate.String(),
 		MinSelfDelegation: val.MinSelfDelegation.String(),
+		Stake:             val.Stake.String(),
+		Rewards:           val.Rewards.Floor().String(),
+		Commissions:       val.Commissions.Floor().String(),
+		Jailed:            *val.Jailed,
+		VotingPower:       val.Stake.Div(decimal.NewFromInt(1_000_000)).Floor().String(),
 	}
 }
 
@@ -106,4 +119,35 @@ func NewValidatorUptime(levels []types.Level, currentLevel types.Level, count ty
 
 	uptime.Uptime = fmt.Sprintf("%.4f", float64(levelIndex)/float64(threshold))
 	return uptime
+}
+
+type Jail struct {
+	Height types.Level `example:"100"                       json:"height" swaggertype:"integer"`
+	Time   time.Time   `example:"2023-07-04T03:10:57+00:00" json:"time"   swaggertype:"string"`
+	Reason string      `example:"double_sign"               json:"reason" swaggertype:"string"`
+	Burned string      `example:"10000000000"               json:"burned" swaggertype:"string"`
+
+	Validator *ShortValidator `json:"validator,omitempty"`
+}
+
+func NewJail(jail storage.Jail) Jail {
+	j := Jail{
+		Height: jail.Height,
+		Time:   jail.Time,
+		Reason: jail.Reason,
+		Burned: jail.Burned.String(),
+	}
+
+	if jail.Validator != nil {
+		j.Validator = NewShortValidator(*jail.Validator)
+	}
+
+	return j
+}
+
+type ValidatorCount struct {
+	Total    int `example:"100" json:"total"    swaggertype:"integer"`
+	Jailed   int `example:"100" json:"jailed"   swaggertype:"integer"`
+	Active   int `example:"100" json:"active"   swaggertype:"integer"`
+	Inactive int `example:"100" json:"inactive" swaggertype:"integer"`
 }

@@ -5,9 +5,12 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/internal/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	st "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/labstack/echo/v4"
 )
@@ -16,6 +19,9 @@ type ValidatorHandler struct {
 	validators      storage.IValidator
 	blocks          storage.IBlock
 	blockSignatures storage.IBlockSignature
+	delegations     storage.IDelegation
+	constants       storage.IConstant
+	jails           storage.IJail
 	state           storage.IState
 	indexerName     string
 }
@@ -24,6 +30,9 @@ func NewValidatorHandler(
 	validators storage.IValidator,
 	blocks storage.IBlock,
 	blockSignatures storage.IBlockSignature,
+	delegations storage.IDelegation,
+	constants storage.IConstant,
+	jails storage.IJail,
 	state storage.IState,
 	indexerName string,
 ) *ValidatorHandler {
@@ -31,6 +40,9 @@ func NewValidatorHandler(
 		validators:      validators,
 		blocks:          blocks,
 		blockSignatures: blockSignatures,
+		delegations:     delegations,
+		constants:       constants,
+		jails:           jails,
 		state:           state,
 		indexerName:     indexerName,
 	}
@@ -67,6 +79,18 @@ func (handler *ValidatorHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.NewValidator(*validator))
 }
 
+type validatorsPagination struct {
+	Limit  int   `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int   `query:"offset" validate:"omitempty,min=0"`
+	Jailed *bool `query:"jailed" validate:"omitempty"`
+}
+
+func (req *validatorsPagination) SetDefault() {
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
+}
+
 // List godoc
 //
 //	@Summary		List validators
@@ -75,7 +99,7 @@ func (handler *ValidatorHandler) Get(c echo.Context) error {
 //	@ID				list-validator
 //	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						mininum(1)
-//	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
+//	@Param			jailed	query	boolean	false	"Return only jailed validators"
 //	@Produce		json
 //	@Produce		json
 //	@Success		200	{array}		responses.Validator
@@ -83,32 +107,36 @@ func (handler *ValidatorHandler) Get(c echo.Context) error {
 //	@Failure		500	{object}	Error
 //	@Router			/v1/validators [get]
 func (handler *ValidatorHandler) List(c echo.Context) error {
-	req, err := bindAndValidate[limitOffsetPagination](c)
+	req, err := bindAndValidate[validatorsPagination](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
 	req.SetDefault()
 
-	validators, err := handler.validators.List(c.Request().Context(), req.Limit, req.Offset, pgSort(req.Sort))
+	validators, err := handler.validators.ListByPower(c.Request().Context(), storage.ValidatorFilters{
+		Limit:  req.Limit,
+		Offset: req.Offset,
+		Jailed: req.Jailed,
+	})
 	if err != nil {
 		return handleError(c, err, handler.validators)
 	}
 
 	response := make([]responses.Validator, len(validators))
 	for i := range validators {
-		response[i] = *responses.NewValidator(*validators[i])
+		response[i] = *responses.NewValidator(validators[i])
 	}
 
 	return returnArray(c, response)
 }
 
-type validatorBlocksRequest struct {
+type validatorPageableRequest struct {
 	Id     uint64 `param:"id"     validate:"required,min=1"`
 	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
 	Offset int    `query:"offset" validate:"omitempty,min=0"`
 }
 
-func (p *validatorBlocksRequest) SetDefault() {
+func (p *validatorPageableRequest) SetDefault() {
 	if p.Limit == 0 {
 		p.Limit = 10
 	}
@@ -129,7 +157,7 @@ func (p *validatorBlocksRequest) SetDefault() {
 //	@Failure		500	{object}	Error
 //	@Router			/v1/validators/{id}/blocks [get]
 func (handler *ValidatorHandler) Blocks(c echo.Context) error {
-	req, err := bindAndValidate[validatorBlocksRequest](c)
+	req, err := bindAndValidate[validatorPageableRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
@@ -193,4 +221,121 @@ func (handler *ValidatorHandler) Uptime(c echo.Context) error {
 
 	response := responses.NewValidatorUptime(levels, state.LastHeight-1, req.Limit)
 	return c.JSON(http.StatusOK, response)
+}
+
+// Delegators godoc
+//
+//	@Summary		Get validator's delegators
+//	@Description	Get validator's delegators
+//	@Tags			validator
+//	@ID				validator-delegators
+//	@Param			id		path	integer	true	"Internal validator id"
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Delegation
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/validators/{id}/delegators [get]
+func (handler *ValidatorHandler) Delegators(c echo.Context) error {
+	req, err := bindAndValidate[validatorPageableRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	delegations, err := handler.delegations.ByValidator(
+		c.Request().Context(),
+		req.Id,
+		req.Limit,
+		req.Offset,
+	)
+	if err != nil {
+		return handleError(c, err, handler.delegations)
+	}
+
+	response := make([]responses.Delegation, len(delegations))
+	for i := range response {
+		response[i] = responses.NewDelegation(delegations[i])
+	}
+
+	return returnArray(c, response)
+}
+
+// Jails godoc
+//
+//	@Summary		Get validator's jails
+//	@Description	Get validator's jails
+//	@Tags			validator
+//	@ID				validator-jails
+//	@Param			id		path	integer	true	"Internal validator id"
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Jail
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/validators/{id}/jails [get]
+func (handler *ValidatorHandler) Jails(c echo.Context) error {
+	req, err := bindAndValidate[validatorPageableRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	jails, err := handler.jails.ByValidator(
+		c.Request().Context(),
+		req.Id,
+		req.Limit,
+		req.Offset,
+	)
+	if err != nil {
+		return handleError(c, err, handler.delegations)
+	}
+
+	response := make([]responses.Jail, len(jails))
+	for i := range response {
+		response[i] = responses.NewJail(jails[i])
+	}
+	return returnArray(c, response)
+}
+
+// Count godoc
+//
+//	@Summary		Get validator's count by status
+//	@Description	Get validator's count by status
+//	@Tags			validator
+//	@ID				validator-count
+//	@Produce		json
+//	@Success		200	{object}	responses.ValidatorCount
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/validators/count [get]
+func (handler *ValidatorHandler) Count(c echo.Context) error {
+	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
+	if err != nil {
+		return handleError(c, err, handler.state)
+	}
+
+	jailed, err := handler.validators.JailedCount(c.Request().Context())
+	if err != nil {
+		return handleError(c, err, handler.validators)
+	}
+
+	constant, err := handler.constants.Get(c.Request().Context(), st.ModuleNameStaking, "max_validators")
+	if err != nil {
+		return handleError(c, err, handler.validators)
+	}
+	max, err := strconv.ParseInt(constant.Value, 10, 32)
+	if err != nil {
+		return handleError(c, err, handler.validators)
+	}
+
+	active := math.Min(int(max), state.TotalValidators-jailed)
+	return c.JSON(http.StatusOK, responses.ValidatorCount{
+		Total:    state.TotalValidators,
+		Jailed:   jailed,
+		Active:   active,
+		Inactive: state.TotalValidators - jailed - active,
+	})
 }

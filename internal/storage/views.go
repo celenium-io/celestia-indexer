@@ -15,4 +15,7 @@ const (
 	ViewNamespaceStatsByWeek  = "namespace_stats_by_week"
 	ViewNamespaceStatsByMonth = "namespace_stats_by_month"
 	ViewNamespaceStatsByYear  = "namespace_stats_by_year"
+	ViewStakingByHour         = "staking_by_hour"
+	ViewStakingByDay          = "staking_by_day"
+	ViewStakingByMonth        = "staking_by_month"
 )

@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -40,14 +41,17 @@ var (
 // AddressTestSuite -
 type AddressTestSuite struct {
 	suite.Suite
-	address  *mock.MockIAddress
-	txs      *mock.MockITx
-	blobLogs *mock.MockIBlobLog
-	messages *mock.MockIMessage
-	state    *mock.MockIState
-	echo     *echo.Echo
-	handler  *AddressHandler
-	ctrl     *gomock.Controller
+	address       *mock.MockIAddress
+	txs           *mock.MockITx
+	blobLogs      *mock.MockIBlobLog
+	messages      *mock.MockIMessage
+	delegations   *mock.MockIDelegation
+	undelegations *mock.MockIUndelegation
+	redelegations *mock.MockIRedelegation
+	state         *mock.MockIState
+	echo          *echo.Echo
+	handler       *AddressHandler
+	ctrl          *gomock.Controller
 }
 
 // SetupSuite -
@@ -59,8 +63,11 @@ func (s *AddressTestSuite) SetupSuite() {
 	s.txs = mock.NewMockITx(s.ctrl)
 	s.blobLogs = mock.NewMockIBlobLog(s.ctrl)
 	s.messages = mock.NewMockIMessage(s.ctrl)
+	s.delegations = mock.NewMockIDelegation(s.ctrl)
+	s.undelegations = mock.NewMockIUndelegation(s.ctrl)
+	s.redelegations = mock.NewMockIRedelegation(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.messages, s.state, testIndexerName)
+	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -157,8 +164,10 @@ func (s *AddressTestSuite) TestList() {
 				Height:     100,
 				LastHeight: 100,
 				Balance: storage.Balance{
-					Currency: "utia",
-					Total:    decimal.RequireFromString("100"),
+					Currency:  "utia",
+					Spendable: decimal.RequireFromString("100"),
+					Delegated: decimal.RequireFromString("1"),
+					Unbonding: decimal.RequireFromString("2"),
 				},
 			},
 		}, nil)
@@ -174,8 +183,10 @@ func (s *AddressTestSuite) TestList() {
 	s.Require().EqualValues(100, address[0].Height)
 	s.Require().EqualValues(100, address[0].LastHeight)
 	s.Require().Equal(testAddress, address[0].Hash)
-	s.Require().Equal("100", address[0].Balance.Value)
+	s.Require().Equal("100", address[0].Balance.Spendable)
 	s.Require().Equal("utia", address[0].Balance.Currency)
+	s.Require().Equal("1", address[0].Balance.Delegated)
+	s.Require().Equal("2", address[0].Balance.Unbonding)
 }
 
 func (s *AddressTestSuite) TestTransactions() {
@@ -374,4 +385,170 @@ func (s *AddressTestSuite) TestCount() {
 	err := json.NewDecoder(rec.Body).Decode(&count)
 	s.Require().NoError(err)
 	s.Require().EqualValues(123123, count)
+}
+
+func (s *AddressTestSuite) TestDelegations() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/address/:hash/delegations")
+	c.SetParamNames("hash")
+	c.SetParamValues(testAddress)
+
+	s.address.EXPECT().
+		ByHash(gomock.Any(), testHashAddress).
+		Return(storage.Address{
+			Id:      1,
+			Hash:    testHashAddress,
+			Address: testAddress,
+		}, nil)
+
+	s.delegations.EXPECT().
+		ByAddress(gomock.Any(), uint64(1), 10, 0).
+		Return([]storage.Delegation{
+			{
+				AddressId:   1,
+				ValidatorId: 1,
+				Amount:      decimal.RequireFromString("100"),
+				Validator:   &testValidator,
+				Address: &storage.Address{
+					Address: testAddress,
+					Id:      1,
+				},
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Delegations(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var delegations []responses.Delegation
+	err := json.NewDecoder(rec.Body).Decode(&delegations)
+	s.Require().NoError(err)
+	s.Require().Len(delegations, 1)
+
+	d := delegations[0]
+	s.Require().Equal("100", d.Amount)
+	s.Require().Equal(testAddress, d.Delegator)
+	s.Require().NotNil(d.Validator)
+	s.Require().Equal(testValidator.ConsAddress, d.Validator.ConsAddress)
+}
+
+func (s *AddressTestSuite) TestUndelegations() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/address/:hash/undelegations")
+	c.SetParamNames("hash")
+	c.SetParamValues(testAddress)
+
+	s.address.EXPECT().
+		ByHash(gomock.Any(), testHashAddress).
+		Return(storage.Address{
+			Id:      1,
+			Hash:    testHashAddress,
+			Address: testAddress,
+		}, nil)
+
+	s.undelegations.EXPECT().
+		ByAddress(gomock.Any(), uint64(1), 10, 0).
+		Return([]storage.Undelegation{
+			{
+				Time:        testTime,
+				Height:      1000,
+				AddressId:   1,
+				ValidatorId: 1,
+				Amount:      decimal.RequireFromString("100"),
+				Validator:   &testValidator,
+				Address: &storage.Address{
+					Address: testAddress,
+					Id:      1,
+				},
+				CompletionTime: testTime.Add(time.Hour),
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Undelegations(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var undelegations []responses.Undelegation
+	err := json.NewDecoder(rec.Body).Decode(&undelegations)
+	s.Require().NoError(err)
+	s.Require().Len(undelegations, 1)
+
+	d := undelegations[0]
+	s.Require().Equal("100", d.Amount)
+	s.Require().EqualValues(1000, d.Height)
+	s.Require().Equal(testTime, d.Time)
+	s.Require().Equal(testTime.Add(time.Hour), d.CompletionTime)
+	s.Require().Equal(testAddress, d.Delegator)
+	s.Require().NotNil(d.Validator)
+	s.Require().Equal(testValidator.ConsAddress, d.Validator.ConsAddress)
+}
+
+func (s *AddressTestSuite) TestRedelegations() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/address/:hash/redelegations")
+	c.SetParamNames("hash")
+	c.SetParamValues(testAddress)
+
+	s.address.EXPECT().
+		ByHash(gomock.Any(), testHashAddress).
+		Return(storage.Address{
+			Id:      1,
+			Hash:    testHashAddress,
+			Address: testAddress,
+		}, nil)
+
+	s.redelegations.EXPECT().
+		ByAddress(gomock.Any(), uint64(1), 10, 0).
+		Return([]storage.Redelegation{
+			{
+				Time:        testTime,
+				Height:      1000,
+				AddressId:   1,
+				SrcId:       1,
+				DestId:      1,
+				Amount:      decimal.RequireFromString("100"),
+				Source:      &testValidator,
+				Destination: &testValidator,
+				Address: &storage.Address{
+					Address: testAddress,
+					Id:      1,
+				},
+				CompletionTime: testTime.Add(time.Hour),
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Redelegations(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var redelegations []responses.Redelegation
+	err := json.NewDecoder(rec.Body).Decode(&redelegations)
+	s.Require().NoError(err)
+	s.Require().Len(redelegations, 1)
+
+	d := redelegations[0]
+	s.Require().Equal("100", d.Amount)
+	s.Require().EqualValues(1000, d.Height)
+	s.Require().Equal(testTime, d.Time)
+	s.Require().Equal(testTime.Add(time.Hour), d.CompletionTime)
+	s.Require().Equal(testAddress, d.Delegator)
+	s.Require().NotNil(d.Source)
+	s.Require().Equal(testValidator.ConsAddress, d.Source.ConsAddress)
+	s.Require().NotNil(d.Destination)
+	s.Require().Equal(testValidator.ConsAddress, d.Destination.ConsAddress)
 }

@@ -1,12 +1,16 @@
 // SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
 // SPDX-License-Identifier: MIT
 
-package decode
+package decoder
 
 import (
+	"strconv"
 	"strings"
+	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/cosmos/cosmos-sdk/types"
+	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
 
@@ -51,4 +55,37 @@ func BalanceFromMap(m map[string]any, key string) (*types.Coin, error) {
 		return nil, err
 	}
 	return &coin, nil
+}
+
+func AmountFromMap(m map[string]any, key string) decimal.Decimal {
+	str := StringFromMap(m, key)
+	if str == "" {
+		return decimal.Zero
+	}
+	str = strings.TrimSuffix(str, currency.DefaultCurrency)
+	return decimal.RequireFromString(str)
+}
+
+func TimeFromMap(m map[string]any, key string) (time.Time, error) {
+	val, ok := m[key]
+	if !ok {
+		return time.Time{}, errors.Errorf("can't find key: %s", key)
+	}
+	str, ok := val.(string)
+	if !ok {
+		return time.Time{}, errors.Errorf("key '%s' is not a string", key)
+	}
+	return time.Parse(time.RFC3339, str)
+}
+
+func Int64FromMap(m map[string]any, key string) (int64, error) {
+	val, ok := m[key]
+	if !ok {
+		return 0, errors.Errorf("can't find key: %s", key)
+	}
+	str, ok := val.(string)
+	if !ok {
+		return 0, errors.Errorf("key '%s' is not a string", key)
+	}
+	return strconv.ParseInt(str, 10, 64)
 }

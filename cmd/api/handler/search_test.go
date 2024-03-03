@@ -292,6 +292,7 @@ func (s *SearchTestSuite) TestSearchValidator() {
 		Return(&storage.Validator{
 			Moniker: "name 1",
 			Id:      1,
+			Jailed:  testsuite.Ptr(false),
 		}, nil).
 		Times(1)
 

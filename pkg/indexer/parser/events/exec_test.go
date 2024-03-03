@@ -1,0 +1,515 @@
+// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
+// SPDX-License-Identifier: MIT
+
+package events
+
+import (
+	"testing"
+
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	"github.com/stretchr/testify/require"
+)
+
+func Test_handleExec(t *testing.T) {
+	tests := []struct {
+		name   string
+		ctx    *context.Context
+		events []storage.Event
+		msg    *storage.Message
+		idx    *int
+	}{
+		{
+			name: "multiple delegations",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 844359,
+					Type:   "message",
+					Data: map[string]any{
+						"action": "/cosmos.authz.v1beta1.MsgExec",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":          "101775utia",
+						"authz_msg_index": "0",
+						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":          "101775utia",
+						"authz_msg_index": "0",
+						"receiver":        "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
+					},
+				}, {
+					Height: 844359,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":          "101775utia",
+						"authz_msg_index": "0",
+						"recipient":       "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
+						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 844359,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "0",
+						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 844359,
+					Type:   "withdraw_rewards",
+					Data: map[string]any{
+						"amount":          "101775utia",
+						"authz_msg_index": "0",
+						"delegator":       "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
+						"validator":       "celestiavaloper1j2jq259d3rrc24876gwxg0ksp0lhd8gy49k6st",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":          "101774utia",
+						"authz_msg_index": "0",
+						"spender":         "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":          "101774utia",
+						"authz_msg_index": "0",
+						"receiver":        "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
+					},
+				}, {
+					Height: 844359,
+					Type:   "delegate",
+					Data: map[string]any{
+						"amount":          "101774utia",
+						"authz_msg_index": "0",
+						"new_shares":      "101774.000000000000000000",
+						"validator":       "celestiavaloper1j2jq259d3rrc24876gwxg0ksp0lhd8gy49k6st",
+					},
+				}, {
+					Height: 844359,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "0",
+						"module":          "staking",
+						"sender":          "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":          "191045utia",
+						"authz_msg_index": "1",
+						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":          "191045utia",
+						"authz_msg_index": "1",
+						"receiver":        "celestia1gfvu3xpgze2jy20cy4lcfeq2qj3rww0a8cwuap",
+					},
+				}, {
+					Height: 844359,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":          "191045utia",
+						"authz_msg_index": "1",
+						"recipient":       "celestia1gfvu3xpgze2jy20cy4lcfeq2qj3rww0a8cwuap",
+						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 844359,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "1",
+						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 844359,
+					Type:   "withdraw_rewards",
+					Data: map[string]any{
+						"amount":          "191045utia",
+						"authz_msg_index": "1",
+						"delegator":       "celestia1gfvu3xpgze2jy20cy4lcfeq2qj3rww0a8cwuap",
+						"validator":       "celestiavaloper1j2jq259d3rrc24876gwxg0ksp0lhd8gy49k6st",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":          "191018utia",
+						"authz_msg_index": "1",
+						"spender":         "celestia1gfvu3xpgze2jy20cy4lcfeq2qj3rww0a8cwuap",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":          "191018utia",
+						"authz_msg_index": "1",
+						"receiver":        "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
+					},
+				}, {
+					Height: 844359,
+					Type:   "delegate",
+					Data: map[string]any{
+						"amount":          "191018utia",
+						"authz_msg_index": "1",
+						"new_shares":      "191018.000000000000000000",
+						"validator":       "celestiavaloper1j2jq259d3rrc24876gwxg0ksp0lhd8gy49k6st",
+					},
+				}, {
+					Height: 844359,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "1",
+						"module":          "staking",
+						"sender":          "celestia1gfvu3xpgze2jy20cy4lcfeq2qj3rww0a8cwuap",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":          "106033utia",
+						"authz_msg_index": "2",
+						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":          "106033utia",
+						"authz_msg_index": "2",
+						"receiver":        "celestia1ghwz05j5s52nyvzau08eg9rqvkzgq72r92k56d",
+					},
+				}, {
+					Height: 844359,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":          "106033utia",
+						"authz_msg_index": "2",
+						"recipient":       "celestia1ghwz05j5s52nyvzau08eg9rqvkzgq72r92k56d",
+						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 844359,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "2",
+						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 844359,
+					Type:   "withdraw_rewards",
+					Data: map[string]any{
+						"amount":          "106033utia",
+						"authz_msg_index": "2",
+						"delegator":       "celestia1ghwz05j5s52nyvzau08eg9rqvkzgq72r92k56d",
+						"validator":       "celestiavaloper1j2jq259d3rrc24876gwxg0ksp0lhd8gy49k6st",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":          "106031utia",
+						"authz_msg_index": "2",
+						"spender":         "celestia1ghwz05j5s52nyvzau08eg9rqvkzgq72r92k56d",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":          "106031utia",
+						"authz_msg_index": "2",
+						"receiver":        "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
+					},
+				}, {
+					Height: 844359,
+					Type:   "delegate",
+					Data: map[string]any{
+						"amount":          "106031utia",
+						"authz_msg_index": "2",
+						"new_shares":      "106031.000000000000000000",
+						"validator":       "celestiavaloper1j2jq259d3rrc24876gwxg0ksp0lhd8gy49k6st",
+					},
+				}, {
+					Height: 844359,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "2",
+						"module":          "staking",
+						"sender":          "celestia1ghwz05j5s52nyvzau08eg9rqvkzgq72r92k56d",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":          "114972utia",
+						"authz_msg_index": "3",
+						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":          "114972utia",
+						"authz_msg_index": "3",
+						"receiver":        "celestia1vx8nc79y47y7kuez8m9z8hxzjcu9sy8jyymfmn",
+					},
+				}, {
+					Height: 844359,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":          "114972utia",
+						"authz_msg_index": "3",
+						"recipient":       "celestia1vx8nc79y47y7kuez8m9z8hxzjcu9sy8jyymfmn",
+						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 844359,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "3",
+						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 844359,
+					Type:   "withdraw_rewards",
+					Data: map[string]any{
+						"amount":          "114972utia",
+						"authz_msg_index": "3",
+						"delegator":       "celestia1vx8nc79y47y7kuez8m9z8hxzjcu9sy8jyymfmn",
+						"validator":       "celestiavaloper1j2jq259d3rrc24876gwxg0ksp0lhd8gy49k6st",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":          "114961utia",
+						"authz_msg_index": "3",
+						"spender":         "celestia1vx8nc79y47y7kuez8m9z8hxzjcu9sy8jyymfmn",
+					},
+				}, {
+					Height: 844359,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":          "114961utia",
+						"authz_msg_index": "3",
+						"receiver":        "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
+					},
+				}, {
+					Height: 844359,
+					Type:   "delegate",
+					Data: map[string]any{
+						"amount":          "114961utia",
+						"authz_msg_index": "3",
+						"new_shares":      "114961.000000000000000000",
+						"validator":       "celestiavaloper1j2jq259d3rrc24876gwxg0ksp0lhd8gy49k6st",
+					},
+				}, {
+					Height: 844359,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "3",
+						"module":          "staking",
+						"sender":          "celestia1vx8nc79y47y7kuez8m9z8hxzjcu9sy8jyymfmn",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgDelegate,
+				Height: 844359,
+				InternalMsgs: []string{
+					"/cosmos.staking.v1beta1.MsgDelegate",
+					"/cosmos.staking.v1beta1.MsgDelegate",
+					"/cosmos.staking.v1beta1.MsgDelegate",
+					"/cosmos.staking.v1beta1.MsgDelegate",
+				},
+			},
+			idx: testsuite.Ptr(0),
+		}, {
+			name: "multiple undelegations",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 595997,
+					Type:   "message",
+					Data: map[string]any{
+						"action": "/cosmos.authz.v1beta1.MsgExec",
+					},
+				}, {
+					Height: 595997,
+					Type:   "withdraw_rewards",
+					Data: map[string]any{
+						"amount":          "0stake",
+						"authz_msg_index": "0",
+						"delegator":       "celestia1um8q93lngf6hfvslqn2nph77f2xyeklppjlxlc",
+						"validator":       "celestiavaloper1qq9dduljfua3uztkvgh6ytcahpzxs5qvkq97l3",
+					},
+				}, {
+					Height: 595997,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":          "1000utia",
+						"authz_msg_index": "0",
+						"spender":         "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
+					},
+				}, {
+					Height: 595997,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":          "1000utia",
+						"authz_msg_index": "0",
+						"receiver":        "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
+					},
+				}, {
+					Height: 595997,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":          "1000utia",
+						"authz_msg_index": "0",
+						"recipient":       "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
+						"sender":          "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
+					},
+				}, {
+					Height: 595997,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "0",
+						"sender":          "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
+					},
+				}, {
+					Height: 595997,
+					Type:   "unbond",
+					Data: map[string]any{
+						"amount":          "1000utia",
+						"authz_msg_index": "0",
+						"completion_time": "2023-12-18T18:38:51Z",
+						"validator":       "celestiavaloper1qq9dduljfua3uztkvgh6ytcahpzxs5qvkq97l3",
+					},
+				}, {
+					Height: 595997,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "0",
+						"module":          "staking",
+						"sender":          "celestia1um8q93lngf6hfvslqn2nph77f2xyeklppjlxlc",
+					},
+				}, {
+					Height: 595997,
+					Type:   "withdraw_rewards",
+					Data: map[string]any{
+						"amount":          "0stake",
+						"authz_msg_index": "1",
+						"delegator":       "celestia1um8q93lngf6hfvslqn2nph77f2xyeklppjlxlc",
+						"validator":       "celestiavaloper1qycj0ymu9fqvwgyw4xz93p3n4a83jjk7sm2wzh",
+					},
+				}, {
+					Height: 595997,
+					Type:   "unbond",
+					Data: map[string]any{
+						"amount":          "1000utia",
+						"authz_msg_index": "1",
+						"completion_time": "2023-12-18T18:38:51Z",
+						"validator":       "celestiavaloper1qycj0ymu9fqvwgyw4xz93p3n4a83jjk7sm2wzh",
+					},
+				}, {
+					Height: 595997,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "1",
+						"module":          "staking",
+						"sender":          "celestia1um8q93lngf6hfvslqn2nph77f2xyeklppjlxlc",
+					},
+				}, {
+					Height: 595997,
+					Type:   "withdraw_rewards",
+					Data: map[string]any{
+						"amount":          "0stake",
+						"authz_msg_index": "2",
+						"delegator":       "celestia1um8q93lngf6hfvslqn2nph77f2xyeklppjlxlc",
+						"validator":       "celestiavaloper1qyuwqj0cxe6hlzjru587nygwwmgh03ha9ve9ac",
+					},
+				}, {
+					Height: 595997,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":          "1000utia",
+						"authz_msg_index": "2",
+						"spender":         "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
+					},
+				}, {
+					Height: 595997,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":          "1000utia",
+						"authz_msg_index": "2",
+						"receiver":        "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
+					},
+				}, {
+					Height: 595997,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":          "1000utia",
+						"authz_msg_index": "2",
+						"recipient":       "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
+						"sender":          "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
+					},
+				}, {
+					Height: 595997,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "2",
+						"sender":          "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
+					},
+				}, {
+					Height: 595997,
+					Type:   "unbond",
+					Data: map[string]any{
+						"amount":          "1000utia",
+						"authz_msg_index": "2",
+						"completion_time": "2023-12-18T18:38:51Z",
+						"validator":       "celestiavaloper1qyuwqj0cxe6hlzjru587nygwwmgh03ha9ve9ac",
+					},
+				}, {
+					Height: 595997,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "2",
+						"module":          "staking",
+						"sender":          "celestia1um8q93lngf6hfvslqn2nph77f2xyeklppjlxlc",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgDelegate,
+				Height: 595997,
+				InternalMsgs: []string{
+					"/cosmos.staking.v1beta1.MsgUndelegate",
+					"/cosmos.staking.v1beta1.MsgUndelegate",
+					"/cosmos.staking.v1beta1.MsgUndelegate",
+				},
+			},
+			idx: testsuite.Ptr(0),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := handleExec(tt.ctx, tt.events, tt.msg, tt.idx)
+			require.NoError(t, err)
+		})
+	}
+}

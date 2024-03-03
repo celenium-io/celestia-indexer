@@ -20,6 +20,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -46,6 +47,7 @@ var (
 		Id:          1,
 		Moniker:     "moniker",
 		ConsAddress: "012345",
+		Jailed:      testsuite.Ptr(false),
 	}
 	testBlockWithStats = storage.Block{
 		Id:           1,

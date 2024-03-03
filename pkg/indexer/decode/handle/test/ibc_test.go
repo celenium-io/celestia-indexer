@@ -4,17 +4,18 @@
 package handle
 
 import (
+	"testing"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
 	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
 	ibcCoreClientTypes "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
 	"github.com/fatih/structs"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 // MsgTransfer
@@ -39,7 +40,13 @@ func TestDecodeMsg_SuccessOnIBCMsgTransfer(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decode.Message(msgSend, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, msgSend, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -50,10 +57,7 @@ func TestDecodeMsg_SuccessOnIBCMsgTransfer(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}

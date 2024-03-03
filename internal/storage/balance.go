@@ -4,6 +4,7 @@
 package storage
 
 import (
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
@@ -17,9 +18,11 @@ type IBalance interface {
 type Balance struct {
 	bun.BaseModel `bun:"balance" comment:"Table with account balances."`
 
-	Id       uint64          `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
-	Currency string          `bun:"currency,pk,notnull"         comment:"Balance currency"`
-	Total    decimal.Decimal `bun:"total,type:numeric"          comment:"Total account balance"`
+	Id        uint64          `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
+	Currency  string          `bun:"currency,pk,notnull"         comment:"Balance currency"`
+	Spendable decimal.Decimal `bun:"spendable,type:numeric"      comment:"Spendable balance"`
+	Delegated decimal.Decimal `bun:"delegated,type:numeric"      comment:"Delegated balance"`
+	Unbonding decimal.Decimal `bun:"unbonding,type:numeric"      comment:"Unbonding balance"`
 }
 
 func (Balance) TableName() string {
@@ -27,11 +30,14 @@ func (Balance) TableName() string {
 }
 
 func (b Balance) IsEmpty() bool {
-	return b.Currency == "" && b.Total.IsZero()
+	return b.Currency == "" && b.Spendable.IsZero()
 }
 
 func EmptyBalance() Balance {
 	return Balance{
-		Total: decimal.Zero,
+		Currency:  currency.DefaultCurrency,
+		Spendable: decimal.Zero,
+		Delegated: decimal.Zero,
+		Unbonding: decimal.Zero,
 	}
 }

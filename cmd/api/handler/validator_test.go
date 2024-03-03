@@ -14,8 +14,10 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	st "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/labstack/echo/v4"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -26,6 +28,9 @@ type ValidatorTestSuite struct {
 	validators      *mock.MockIValidator
 	blocks          *mock.MockIBlock
 	blockSignatures *mock.MockIBlockSignature
+	delegations     *mock.MockIDelegation
+	jails           *mock.MockIJail
+	constants       *mock.MockIConstant
 	state           *mock.MockIState
 	echo            *echo.Echo
 	handler         *ValidatorHandler
@@ -40,8 +45,11 @@ func (s *ValidatorTestSuite) SetupSuite() {
 	s.validators = mock.NewMockIValidator(s.ctrl)
 	s.blocks = mock.NewMockIBlock(s.ctrl)
 	s.blockSignatures = mock.NewMockIBlockSignature(s.ctrl)
+	s.delegations = mock.NewMockIDelegation(s.ctrl)
+	s.constants = mock.NewMockIConstant(s.ctrl)
+	s.jails = mock.NewMockIJail(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewValidatorHandler(s.validators, s.blocks, s.blockSignatures, s.state, testIndexerName)
+	s.handler = NewValidatorHandler(s.validators, s.blocks, s.blockSignatures, s.delegations, s.constants, s.jails, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -84,9 +92,11 @@ func (s *ValidatorTestSuite) TestList() {
 	c.SetPath("/validator")
 
 	s.validators.EXPECT().
-		List(gomock.Any(), uint64(10), uint64(0), pgSort("asc")).
-		Return([]*storage.Validator{
-			&testValidator,
+		ListByPower(gomock.Any(), storage.ValidatorFilters{
+			Limit: 10,
+		}).
+		Return([]storage.Validator{
+			testValidator,
 		}, nil)
 
 	s.Require().NoError(s.handler.List(c))
@@ -201,4 +211,121 @@ func (s *ValidatorTestSuite) TestUptimeUnusual() {
 	block := uptime.Blocks[0]
 	s.Require().False(block.Signed)
 	s.Require().EqualValues(3, block.Height)
+}
+
+func (s *ValidatorTestSuite) TestDelegators() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/validators/:id/delegators")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	s.delegations.EXPECT().
+		ByValidator(gomock.Any(), uint64(1), 10, 0).
+		Return([]storage.Delegation{
+			{
+				AddressId:   1,
+				ValidatorId: 1,
+				Amount:      decimal.RequireFromString("100"),
+				Validator:   &testValidator,
+				Address: &storage.Address{
+					Address: testAddress,
+					Id:      1,
+				},
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Delegators(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var delegations []responses.Delegation
+	err := json.NewDecoder(rec.Body).Decode(&delegations)
+	s.Require().NoError(err)
+	s.Require().Len(delegations, 1)
+
+	d := delegations[0]
+	s.Require().Equal("100", d.Amount)
+	s.Require().Equal(testAddress, d.Delegator)
+}
+
+func (s *ValidatorTestSuite) TestJails() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/validators/:id/jails")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	s.jails.EXPECT().
+		ByValidator(gomock.Any(), uint64(1), 10, 0).
+		Return([]storage.Jail{
+			{
+				Burned:      decimal.RequireFromString("100"),
+				Reason:      "double_sign",
+				Height:      100,
+				Time:        testTime,
+				Id:          1,
+				ValidatorId: 1,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Jails(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var jail []responses.Jail
+	err := json.NewDecoder(rec.Body).Decode(&jail)
+	s.Require().NoError(err)
+	s.Require().Len(jail, 1)
+
+	j := jail[0]
+	s.Require().Equal("100", j.Burned)
+	s.Require().Equal("double_sign", j.Reason)
+}
+
+func (s *ValidatorTestSuite) TestCount() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/validators/count")
+
+	s.state.EXPECT().
+		ByName(gomock.Any(), testIndexerName).
+		Return(storage.State{
+			LastHeight:      4,
+			TotalValidators: 10,
+		}, nil).
+		Times(1)
+
+	s.validators.EXPECT().
+		JailedCount(gomock.Any()).
+		Return(2, nil).
+		Times(1)
+
+	s.constants.EXPECT().
+		Get(gomock.Any(), st.ModuleNameStaking, "max_validators").
+		Return(storage.Constant{
+			Value: "6",
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.Count(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var count responses.ValidatorCount
+	err := json.NewDecoder(rec.Body).Decode(&count)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(10, count.Total)
+	s.Require().EqualValues(2, count.Jailed)
+	s.Require().EqualValues(6, count.Active)
+	s.Require().EqualValues(2, count.Inactive)
 }

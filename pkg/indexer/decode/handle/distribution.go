@@ -6,49 +6,49 @@ package handle
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	cosmosDistributionTypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
 // MsgSetWithdrawAddress sets the withdrawal address for
 // a delegator (or validator self-delegation).
-func MsgSetWithdrawAddress(level types.Level, m *cosmosDistributionTypes.MsgSetWithdrawAddress) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgSetWithdrawAddress(ctx *context.Context, m *cosmosDistributionTypes.MsgSetWithdrawAddress) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSetWithdrawAddress
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
 		{t: storageTypes.MsgAddressTypeWithdraw, address: m.WithdrawAddress},
-	}, level)
+	}, ctx.Block.Height)
 	return msgType, addresses, err
 }
 
 // MsgWithdrawDelegatorReward represents delegation withdrawal to a delegator
 // from a single validator.
-func MsgWithdrawDelegatorReward(level types.Level, m *cosmosDistributionTypes.MsgWithdrawDelegatorReward) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgWithdrawDelegatorReward(ctx *context.Context, m *cosmosDistributionTypes.MsgWithdrawDelegatorReward) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgWithdrawDelegatorReward
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
-	}, level)
+	}, ctx.Block.Height)
 
 	return msgType, addresses, err
 }
 
 // MsgWithdrawValidatorCommission withdraws the full commission to the validator
 // address.
-func MsgWithdrawValidatorCommission(level types.Level, m *cosmosDistributionTypes.MsgWithdrawValidatorCommission) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgWithdrawValidatorCommission(ctx *context.Context, m *cosmosDistributionTypes.MsgWithdrawValidatorCommission) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgWithdrawValidatorCommission
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
-	}, level)
+	}, ctx.Block.Height)
 	return msgType, addresses, err
 }
 
 // MsgFundCommunityPool allows an account to directly
 // fund the community pool.
-func MsgFundCommunityPool(level types.Level, m *cosmosDistributionTypes.MsgFundCommunityPool) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgFundCommunityPool(ctx *context.Context, m *cosmosDistributionTypes.MsgFundCommunityPool) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgFundCommunityPool
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeDepositor, address: m.Depositor},
-	}, level)
+	}, ctx.Block.Height)
 	return msgType, addresses, err
 }

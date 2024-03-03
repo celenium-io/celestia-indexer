@@ -235,6 +235,68 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/address/{hash}/delegations": {
+            "get": {
+                "description": "Get delegations made by address",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Get delegations made by address",
+                "operationId": "address-delegations",
+                "parameters": [
+                    {
+                        "maxLength": 48,
+                        "minLength": 48,
+                        "type": "string",
+                        "description": "Hash",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Delegation"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/address/{hash}/messages": {
             "get": {
                 "description": "Get address messages",
@@ -371,6 +433,68 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/responses.MessageForAddress"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/address/{hash}/redelegations": {
+            "get": {
+                "description": "Get redelegations made by address",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Get redelegations made by address",
+                "operationId": "address-redelegations",
+                "parameters": [
+                    {
+                        "maxLength": 48,
+                        "minLength": 48,
+                        "type": "string",
+                        "description": "Hash",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Redelegation"
                             }
                         }
                     },
@@ -556,6 +680,68 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/responses.Tx"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/address/{hash}/undelegations": {
+            "get": {
+                "description": "Get undelegations made by address",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Get undelegations made by address",
+                "operationId": "address-undelegations",
+                "parameters": [
+                    {
+                        "maxLength": 48,
+                        "minLength": 48,
+                        "type": "string",
+                        "description": "Hash",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Undelegation"
                             }
                         }
                     },
@@ -2836,7 +3022,92 @@ const docTemplate = `{
                             "gas_efficiency",
                             "gas_used",
                             "gas_limit",
-                            "bytes_in_block"
+                            "bytes_in_block",
+                            "rewards",
+                            "commissions"
+                        ],
+                        "type": "string",
+                        "description": "Series name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.SeriesItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/stats/staking/series/{id}/{name}/{timeframe}": {
+            "get": {
+                "description": "Get histogram for staking with precomputed stats by series name and timeframe",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get histogram for staking with precomputed stats",
+                "operationId": "stats-staking-series",
+                "parameters": [
+                    {
+                        "maxLength": 56,
+                        "minLength": 56,
+                        "type": "string",
+                        "description": "Validator id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "hour",
+                            "day",
+                            "month"
+                        ],
+                        "type": "string",
+                        "description": "Timeframe",
+                        "name": "timeframe",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "rewards",
+                            "commissions",
+                            "flow"
                         ],
                         "type": "string",
                         "description": "Series name",
@@ -3790,13 +4061,9 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "enum": [
-                            "asc",
-                            "desc"
-                        ],
-                        "type": "string",
-                        "description": "Sort order",
-                        "name": "sort",
+                        "type": "boolean",
+                        "description": "Return only jailed validators",
+                        "name": "jailed",
                         "in": "query"
                     }
                 ],
@@ -3808,6 +4075,39 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/responses.Validator"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/validators/count": {
+            "get": {
+                "description": "Get validator's count by status",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "validator"
+                ],
+                "summary": "Get validator's count by status",
+                "operationId": "validator-count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ValidatorCount"
                         }
                     },
                     "400": {
@@ -3908,6 +4208,126 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/responses.Block"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/validators/{id}/delegators": {
+            "get": {
+                "description": "Get validator's delegators",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "validator"
+                ],
+                "summary": "Get validator's delegators",
+                "operationId": "validator-delegators",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal validator id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Delegation"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/validators/{id}/jails": {
+            "get": {
+                "description": "Get validator's jails",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "validator"
+                ],
+                "summary": "Get validator's jails",
+                "operationId": "validator-jails",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal validator id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Jail"
+                            }
                         }
                     },
                     "400": {
@@ -4045,7 +4465,15 @@ const docTemplate = `{
                     "type": "string",
                     "example": "utia"
                 },
-                "value": {
+                "delegated": {
+                    "type": "string",
+                    "example": "10000000000"
+                },
+                "spendable": {
+                    "type": "string",
+                    "example": "10000000000"
+                },
+                "unbonding": {
                     "type": "string",
                     "example": "10000000000"
                 }
@@ -4222,6 +4650,10 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1234
                 },
+                "commissions": {
+                    "type": "string",
+                    "example": "123133"
+                },
                 "events_count": {
                     "type": "integer",
                     "example": 18
@@ -4250,6 +4682,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "{MsgPayForBlobs:10,MsgUnjail:1}"
                 },
+                "rewards": {
+                    "type": "string",
+                    "example": "102102812"
+                },
                 "supply_change": {
                     "type": "string",
                     "example": "8635234"
@@ -4274,6 +4710,22 @@ const docTemplate = `{
                     "additionalProperties": {
                         "$ref": "#/definitions/responses.Params"
                     }
+                }
+            }
+        },
+        "responses.Delegation": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "0.1"
+                },
+                "delegator": {
+                    "type": "string",
+                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                },
+                "validator": {
+                    "$ref": "#/definitions/responses.ShortValidator"
                 }
             }
         },
@@ -4409,6 +4861,30 @@ const docTemplate = `{
                     "type": "string",
                     "format": "string",
                     "example": "2223424"
+                }
+            }
+        },
+        "responses.Jail": {
+            "type": "object",
+            "properties": {
+                "burned": {
+                    "type": "string",
+                    "example": "10000000000"
+                },
+                "height": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "reason": {
+                    "type": "string",
+                    "example": "double_sign"
+                },
+                "time": {
+                    "type": "string",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "validator": {
+                    "$ref": "#/definitions/responses.ShortValidator"
                 }
             }
         },
@@ -4683,6 +5159,37 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.Redelegation": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "0.1"
+                },
+                "completion_time": {
+                    "type": "string",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "delegator": {
+                    "type": "string",
+                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                },
+                "destination": {
+                    "$ref": "#/definitions/responses.ShortValidator"
+                },
+                "height": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "source": {
+                    "$ref": "#/definitions/responses.ShortValidator"
+                },
+                "time": {
+                    "type": "string",
+                    "example": "2023-07-04T03:10:57+00:00"
+                }
+            }
+        },
         "responses.Rollup": {
             "type": "object",
             "properties": {
@@ -4909,6 +5416,11 @@ const docTemplate = `{
                     "format": "string",
                     "example": "312"
                 },
+                "total_stake": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "312"
+                },
                 "total_supply": {
                     "type": "string",
                     "format": "string",
@@ -4923,6 +5435,11 @@ const docTemplate = `{
                     "type": "integer",
                     "format": "int64",
                     "example": 100
+                },
+                "total_voting_power": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "312"
                 }
             }
         },
@@ -5114,12 +5631,44 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.Undelegation": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "0.1"
+                },
+                "completion_time": {
+                    "type": "string",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "delegator": {
+                    "type": "string",
+                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                },
+                "height": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "time": {
+                    "type": "string",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "validator": {
+                    "$ref": "#/definitions/responses.ShortValidator"
+                }
+            }
+        },
         "responses.Validator": {
             "type": "object",
             "properties": {
                 "address": {
                     "type": "string",
                     "example": "celestiavaloper1un77nfm6axkhkupe8fk4xl6fd4adz3y59fucpu"
+                },
+                "commissions": {
+                    "type": "string",
+                    "example": "1"
                 },
                 "cons_address": {
                     "type": "string",
@@ -5145,6 +5694,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "2C877AC873132C91"
                 },
+                "jailed": {
+                    "type": "boolean",
+                    "example": false
+                },
                 "max_change_rate": {
                     "type": "string",
                     "example": "0.01"
@@ -5165,9 +5718,42 @@ const docTemplate = `{
                     "type": "string",
                     "example": "0.03"
                 },
+                "rewards": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "stake": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "voting_power": {
+                    "type": "string",
+                    "example": "1"
+                },
                 "website": {
                     "type": "string",
                     "example": "https://www.easy2stake.com/"
+                }
+            }
+        },
+        "responses.ValidatorCount": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "inactive": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "jailed": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 100
                 }
             }
         },

@@ -27,7 +27,6 @@ func Test_saveMessages(t *testing.T) {
 		name                      string
 		args                      args
 		wantNamespaceMessageCount int
-		wantValidatorsCount       int
 		wantMsgAddress            int
 		wantErr                   bool
 	}{
@@ -66,7 +65,6 @@ func Test_saveMessages(t *testing.T) {
 				},
 			},
 			wantNamespaceMessageCount: 0,
-			wantValidatorsCount:       0,
 			wantMsgAddress:            2,
 			wantErr:                   false,
 		}, {
@@ -140,7 +138,6 @@ func Test_saveMessages(t *testing.T) {
 				},
 			},
 			wantNamespaceMessageCount: 2,
-			wantValidatorsCount:       0,
 			wantMsgAddress:            3,
 			wantErr:                   false,
 		}, {
@@ -193,16 +190,6 @@ func Test_saveMessages(t *testing.T) {
 								},
 							},
 						},
-						Validator: &storage.Validator{
-							Delegator: "address3",
-							Address:   "address1",
-							Moniker:   "moniker",
-							Website:   "website",
-							Identity:  "identity",
-							Contacts:  "contacts",
-							Details:   "details",
-							Height:    100,
-						},
 					},
 				},
 				addrToId: map[string]uint64{
@@ -212,7 +199,6 @@ func Test_saveMessages(t *testing.T) {
 				},
 			},
 			wantNamespaceMessageCount: 0,
-			wantValidatorsCount:       1,
 			wantMsgAddress:            4,
 			wantErr:                   false,
 		}, {
@@ -285,7 +271,6 @@ func Test_saveMessages(t *testing.T) {
 				},
 			},
 			wantNamespaceMessageCount: 1,
-			wantValidatorsCount:       0,
 			wantMsgAddress:            3,
 			wantErr:                   false,
 		}, {
@@ -322,7 +307,6 @@ func Test_saveMessages(t *testing.T) {
 				},
 			},
 			wantNamespaceMessageCount: 0,
-			wantValidatorsCount:       0,
 			wantMsgAddress:            1,
 			wantErr:                   false,
 		},
@@ -332,7 +316,7 @@ func Test_saveMessages(t *testing.T) {
 	defer ctrl.Finish()
 
 	module := Module{
-		validators: make(map[string]uint64),
+		validatorsByConsAddress: make(map[string]uint64),
 	}
 
 	for _, tt := range tests {
@@ -345,14 +329,6 @@ func Test_saveMessages(t *testing.T) {
 			DoAndReturn(func(_ context.Context, nsMsg ...storage.NamespaceMessage) error {
 				require.Equal(t, tt.wantNamespaceMessageCount, len(nsMsg))
 				return nil
-			})
-
-		tx.EXPECT().
-			SaveValidators(gomock.Any(), gomock.Any()).
-			Times(1).
-			DoAndReturn(func(_ context.Context, validators ...*storage.Validator) (int, error) {
-				require.Equal(t, tt.wantValidatorsCount, len(validators))
-				return len(validators), nil
 			})
 
 		tx.EXPECT().
@@ -380,9 +356,8 @@ func Test_saveMessages(t *testing.T) {
 			Return(nil)
 
 		t.Run(tt.name, func(t *testing.T) {
-			totalValidators, err := module.saveMessages(context.Background(), tx, tt.args.messages, tt.args.addrToId)
+			err := module.saveMessages(context.Background(), tx, tt.args.messages, tt.args.addrToId)
 			require.Equal(t, tt.wantErr, err != nil)
-			require.EqualValues(t, tt.wantValidatorsCount, totalValidators)
 		})
 	}
 }

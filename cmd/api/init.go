@@ -231,7 +231,7 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 var dispatcher *bus.Dispatcher
 
 func initDispatcher(ctx context.Context, db postgres.Storage) {
-	d, err := bus.NewDispatcher(db, db.Blocks)
+	d, err := bus.NewDispatcher(db, db.Blocks, db.Validator)
 	if err != nil {
 		panic(err)
 	}
@@ -252,7 +252,7 @@ func initDatabase(cfg config.Database, viewsDir string) postgres.Storage {
 func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Storage) {
 	v1 := e.Group("v1")
 
-	stateHandlers := handler.NewStateHandler(db.State)
+	stateHandlers := handler.NewStateHandler(db.State, db.Validator)
 	v1.GET("/head", stateHandlers.Head)
 	constantsHandler := handler.NewConstantHandler(db.Constants, db.DenomMetadata, db.Address)
 	v1.GET("/constants", constantsHandler.Get)
@@ -261,7 +261,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	searchHandler := handler.NewSearchHandler(db.Search, db.Address, db.Blocks, db.Tx, db.Namespace, db.Validator, db.Rollup)
 	v1.GET("/search", searchHandler.Search)
 
-	addressHandlers := handler.NewAddressHandler(db.Address, db.Tx, db.BlobLogs, db.Message, db.State, cfg.Indexer.Name)
+	addressHandlers := handler.NewAddressHandler(db.Address, db.Tx, db.BlobLogs, db.Message, db.Delegation, db.Undelegation, db.Redelegation, db.State, cfg.Indexer.Name)
 	addressesGroup := v1.Group("/address")
 	{
 		addressesGroup.GET("", addressHandlers.List)
@@ -272,6 +272,9 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			addressGroup.GET("/txs", addressHandlers.Transactions)
 			addressGroup.GET("/messages", addressHandlers.Messages)
 			addressGroup.GET("/blobs", addressHandlers.Blobs)
+			addressGroup.GET("/delegations", addressHandlers.Delegations)
+			addressGroup.GET("/undelegations", addressHandlers.Undelegations)
+			addressGroup.GET("/redelegations", addressHandlers.Redelegations)
 		}
 	}
 
@@ -341,15 +344,18 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		namespaceByHash.GET("/:hash/:height", namespaceHandlers.GetBlobs)
 	}
 
-	validatorsHandler := handler.NewValidatorHandler(db.Validator, db.Blocks, db.BlockSignatures, db.State, cfg.Indexer.Name)
+	validatorsHandler := handler.NewValidatorHandler(db.Validator, db.Blocks, db.BlockSignatures, db.Delegation, db.Constants, db.Jails, db.State, cfg.Indexer.Name)
 	validators := v1.Group("/validators")
 	{
 		validators.GET("", validatorsHandler.List)
+		validators.GET("/count", validatorsHandler.Count)
 		validator := validators.Group("/:id")
 		{
 			validator.GET("", validatorsHandler.Get)
 			validator.GET("/blocks", validatorsHandler.Blocks)
 			validator.GET("/uptime", validatorsHandler.Uptime)
+			validator.GET("/delegators", validatorsHandler.Delegators)
+			validator.GET("/jails", validatorsHandler.Jails)
 		}
 	}
 
@@ -371,6 +377,10 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		{
 			namespace.GET("/usage", statsHandler.NamespaceUsage)
 			namespace.GET("/series/:id/:name/:timeframe", statsHandler.NamespaceSeries)
+		}
+		staking := stats.Group("/staking")
+		{
+			staking.GET("/series/:id/:name/:timeframe", statsHandler.StakingSeries)
 		}
 		series := stats.Group("/series")
 		{

@@ -7,17 +7,19 @@ import (
 	"testing"
 
 	"cosmossdk.io/math"
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/fatih/structs"
 	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // MsgEditValidator
@@ -44,7 +46,13 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -55,11 +63,22 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 				Hash:       []byte{0x4a, 0xb, 0xf8, 0x99, 0x89, 0xe7, 0xa, 0xe3, 0xf, 0x3b, 0x62, 0x94, 0xa2, 0x97, 0x5a, 0x17, 0x5c, 0x48, 0x22, 0xa3},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
+		},
+	}
+
+	expectedValidators := map[string]*storage.Validator{
+		"celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x": {
+			Address:           "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
+			Moniker:           "newAgeValidator",
+			Identity:          "UPort:1",
+			Website:           "https://google.com",
+			Contacts:          "tryme@gmail.com",
+			Details:           "trust",
+			Rate:              decimal.Zero,
+			MinSelfDelegation: decimal.Zero,
+			Stake:             decimal.Zero,
 		},
 	}
 
@@ -73,22 +92,17 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 		Data:      structs.Map(m),
 		Namespace: nil,
 		Addresses: addressesExpected,
-		Validator: &storage.Validator{
-			Address:           "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
-			Moniker:           "newAgeValidator",
-			Identity:          "UPort:1",
-			Website:           "https://google.com",
-			Contacts:          "tryme@gmail.com",
-			Details:           "trust",
-			Rate:              decimal.Zero,
-			MinSelfDelegation: decimal.Zero,
-		},
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.Equal(t, addressesExpected, dm.Addresses)
+	for key, value := range expectedValidators {
+		val, ok := decodeCtx.Validators.Get(key)
+		require.True(t, ok)
+		require.Equal(t, value, val)
+	}
 }
 
 // MsgBeginRedelegate
@@ -98,6 +112,7 @@ func createMsgBeginRedelegate() types.Msg {
 		DelegatorAddress:    "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
 		ValidatorSrcAddress: "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 		ValidatorDstAddress: "celestiavaloper12c6cwd0kqlg48sdhjnn9f0z82g0c82fmrl7j9y",
+		Amount:              types.NewCoin(currency.Utia, types.OneInt()),
 	}
 
 	return &m
@@ -108,7 +123,13 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -119,10 +140,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
 				Hash:       []byte{0x74, 0x2b, 0x74, 0xc3, 0xe7, 0xbf, 0xc9, 0xf5, 0xc4, 0xe1, 0x5d, 0xa9, 0x89, 0x97, 0x83, 0xea, 0x9f, 0xf, 0xf1, 0x49},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 		{
@@ -133,10 +151,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 				Hash:       []byte{0x4a, 0xb, 0xf8, 0x99, 0x89, 0xe7, 0xa, 0xe3, 0xf, 0x3b, 0x62, 0x94, 0xa2, 0x97, 0x5a, 0x17, 0x5c, 0x48, 0x22, 0xa3},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 		{
@@ -147,10 +162,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestiavaloper12c6cwd0kqlg48sdhjnn9f0z82g0c82fmrl7j9y",
 				Hash:       []byte{0x56, 0x35, 0x87, 0x35, 0xf6, 0x7, 0xd1, 0x53, 0xc1, 0xb7, 0x94, 0xe6, 0x54, 0xbc, 0x47, 0x52, 0x1f, 0x83, 0xa9, 0x3b},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -167,10 +179,10 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgCreateValidator
@@ -186,7 +198,7 @@ func createMsgCreateValidator() types.Msg {
 		DelegatorAddress:  "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
 		ValidatorAddress:  "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 		Pubkey:            pkAny,
-		Value:             types.Coin{},
+		Value:             types.NewCoin("utia", types.OneInt()),
 	}
 
 	return &m
@@ -197,7 +209,13 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -208,10 +226,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
 				Hash:       []byte{0x74, 0x2b, 0x74, 0xc3, 0xe7, 0xbf, 0xc9, 0xf5, 0xc4, 0xe1, 0x5d, 0xa9, 0x89, 0x97, 0x83, 0xea, 0x9f, 0xf, 0xf1, 0x49},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 		{
@@ -222,11 +237,23 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 				Hash:       []byte{0x4a, 0xb, 0xf8, 0x99, 0x89, 0xe7, 0xa, 0xe3, 0xf, 0x3b, 0x62, 0x94, 0xa2, 0x97, 0x5a, 0x17, 0x5c, 0x48, 0x22, 0xa3},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
+		},
+	}
+
+	expectedValidators := map[string]*storage.Validator{
+		"celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x": {
+			Delegator:         "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
+			Address:           "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
+			ConsAddress:       "A8BEA00847066E6C765E7B064DD79265406D402B",
+			Rate:              decimal.Zero,
+			MaxRate:           decimal.Zero,
+			MaxChangeRate:     decimal.Zero,
+			Stake:             decimal.RequireFromString("1"),
+			MinSelfDelegation: decimal.RequireFromString("1"),
+			Height:            blob.Height,
+			Jailed:            testsuite.Ptr(false),
 		},
 	}
 
@@ -240,21 +267,16 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 		Data:      structs.Map(m),
 		Namespace: nil,
 		Addresses: addressesExpected,
-		Validator: &storage.Validator{
-			Delegator:         "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
-			Address:           "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
-			ConsAddress:       "A8BEA00847066E6C765E7B064DD79265406D402B",
-			Rate:              decimal.Zero,
-			MaxRate:           decimal.Zero,
-			MaxChangeRate:     decimal.Zero,
-			MinSelfDelegation: decimal.RequireFromString("1"),
-			Height:            blob.Height,
-		},
 	}
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.Equal(t, addressesExpected, dm.Addresses)
+	for key, value := range expectedValidators {
+		val, ok := decodeCtx.Validators.Get(key)
+		require.True(t, ok)
+		require.Equal(t, value, val)
+	}
 }
 
 // MsgDelegate
@@ -278,7 +300,13 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decode.Message(msgDelegate, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, msgDelegate, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -289,10 +317,7 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
 				Hash:       []byte{0x61, 0x20, 0x87, 0x60, 0xbb, 0x25, 0x92, 0x2a, 0x2a, 0xa5, 0x41, 0x57, 0x79, 0x7d, 0x29, 0x36, 0xa7, 0x7e, 0xbe, 0xd6},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 		{
@@ -303,10 +328,7 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestiavaloper12c6cwd0kqlg48sdhjnn9f0z82g0c82fmrl7j9y",
 				Hash:       []byte{0x56, 0x35, 0x87, 0x35, 0xf6, 0x7, 0xd1, 0x53, 0xc1, 0xb7, 0x94, 0xe6, 0x54, 0xbc, 0x47, 0x52, 0x1f, 0x83, 0xa9, 0x3b},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -323,10 +345,10 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgUndelegate
@@ -348,7 +370,13 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -359,10 +387,7 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
 				Hash:       []byte{0x61, 0x20, 0x87, 0x60, 0xbb, 0x25, 0x92, 0x2a, 0x2a, 0xa5, 0x41, 0x57, 0x79, 0x7d, 0x29, 0x36, 0xa7, 0x7e, 0xbe, 0xd6},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 		{
@@ -373,10 +398,7 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym",
 				Hash:       []byte{0xf3, 0xc0, 0x5, 0x68, 0x19, 0x9b, 0xaa, 0xa7, 0xf1, 0x2d, 0xa0, 0x48, 0xf1, 0xd0, 0xb6, 0xa, 0x22, 0xb9, 0x2b, 0x7e},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -393,10 +415,10 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.Equal(t, addressesExpected, dm.Addresses)
 }
 
 // MsgCancelUnbondingDelegation
@@ -419,7 +441,13 @@ func TestDecodeMsg_SuccessOnMsgCancelUnbondingDelegation(t *testing.T) {
 	blob, now := testsuite.EmptyBlock()
 	position := 0
 
-	dm, err := decode.Message(m, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
 
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -430,10 +458,7 @@ func TestDecodeMsg_SuccessOnMsgCancelUnbondingDelegation(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
 				Hash:       []byte{0x61, 0x20, 0x87, 0x60, 0xbb, 0x25, 0x92, 0x2a, 0x2a, 0xa5, 0x41, 0x57, 0x79, 0x7d, 0x29, 0x36, 0xa7, 0x7e, 0xbe, 0xd6},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 		{
@@ -444,10 +469,7 @@ func TestDecodeMsg_SuccessOnMsgCancelUnbondingDelegation(t *testing.T) {
 				LastHeight: blob.Height,
 				Address:    "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym",
 				Hash:       []byte{0xf3, 0xc0, 0x5, 0x68, 0x19, 0x9b, 0xaa, 0xa7, 0xf1, 0x2d, 0xa0, 0x48, 0xf1, 0xd0, 0xb6, 0xa, 0x22, 0xb9, 0x2b, 0x7e},
-				Balance: storage.Balance{
-					Id:    0,
-					Total: decimal.Zero,
-				},
+				Balance:    storage.EmptyBalance(),
 			},
 		},
 	}
@@ -464,8 +486,8 @@ func TestDecodeMsg_SuccessOnMsgCancelUnbondingDelegation(t *testing.T) {
 		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.Equal(t, addressesExpected, dm.Addresses)
 }

@@ -27,7 +27,7 @@ type DecodedTx struct {
 }
 
 var (
-	cfg, decoder = createDecoder()
+	cfg, txDecoder = createDecoder()
 )
 
 func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
@@ -42,7 +42,7 @@ func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
 		return
 	}
 
-	d.TimeoutHeight, d.Memo, d.Messages, err = decodeCosmosTx(decoder, raw)
+	d.TimeoutHeight, d.Memo, d.Messages, err = decodeCosmosTx(txDecoder, raw)
 	if err != nil {
 		return
 	}
@@ -125,8 +125,8 @@ func decodeFee(authInfo tx.AuthInfo) (decimal.Decimal, error) {
 	return fee, nil
 }
 
-func getFeeInDenom(amount cosmosTypes.Coins, denom currency.Denom) (decimal.Decimal, bool) {
-	ok, utiaCoin := amount.Find(string(denom))
+func getFeeInDenom(amount cosmosTypes.Coins, denom string) (decimal.Decimal, bool) {
+	ok, utiaCoin := amount.Find(denom)
 	if !ok {
 		return decimal.Zero, false
 	}

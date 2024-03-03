@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
 // SPDX-License-Identifier: MIT
 
-package decode
+package decoder
 
 import (
 	"testing"

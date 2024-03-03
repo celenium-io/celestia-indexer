@@ -49,3 +49,11 @@ func NewAddressFromBytes(data []byte) (Address, error) {
 	}
 	return Address(s), nil
 }
+
+func NewConsAddressFromBytes(data []byte) (Address, error) {
+	s, err := bech32.ConvertAndEncode(AddressPrefixValCons, data)
+	if err != nil {
+		return "", nil
+	}
+	return Address(s), nil
+}

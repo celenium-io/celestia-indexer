@@ -17,10 +17,15 @@ type ConstantHandler struct {
 	address       storage.IAddress
 }
 
-func NewConstantHandler(constants storage.IConstant, denomMetadata storage.IDenomMetadata, address storage.IAddress) *ConstantHandler {
+func NewConstantHandler(
+	constants storage.IConstant,
+	denomMetadata storage.IDenomMetadata,
+	address storage.IAddress,
+) *ConstantHandler {
 	return &ConstantHandler{
 		constants:     constants,
 		denomMetadata: denomMetadata,
+		address:       address,
 	}
 }
 

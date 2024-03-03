@@ -5,10 +5,12 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/lib/pq"
+	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 
 	models "github.com/celenium-io/celestia-indexer/internal/storage"
@@ -134,9 +136,11 @@ func (tx Transaction) SaveBalances(ctx context.Context, balances ...models.Balan
 	}
 
 	_, err := tx.Tx().NewInsert().Model(&balances).
-		Column("id", "currency", "total").
+		Column("id", "currency", "spendable", "delegated", "unbonding").
 		On("CONFLICT (id, currency) DO UPDATE").
-		Set("total = EXCLUDED.total + balance.total").
+		Set("spendable = EXCLUDED.spendable + balance.spendable").
+		Set("delegated = EXCLUDED.delegated + balance.delegated").
+		Set("unbonding = EXCLUDED.unbonding + balance.unbonding").
 		Exec(ctx)
 	return err
 }
@@ -231,8 +235,6 @@ func (tx Transaction) SaveBlockSignatures(ctx context.Context, signs ...models.B
 	return err
 }
 
-const doNotModify = "[do-not-modify]"
-
 type addedValidator struct {
 	bun.BaseModel `bun:"validator"`
 	*models.Validator
@@ -251,24 +253,36 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 			Validator: validators[i],
 		}
 		query := tx.Tx().NewInsert().Model(&model).
-			Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate", "max_change_rate", "min_self_delegation", "msg_id", "height").
+			Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate", "max_change_rate", "min_self_delegation", "stake", "jailed", "commissions", "rewards", "height").
 			On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
 			Set("rate = EXCLUDED.rate").
 			Set("min_self_delegation = EXCLUDED.min_self_delegation")
 
-		if validators[i].Moniker != doNotModify {
+		if !validators[i].Stake.IsZero() {
+			query.Set("stake = added_validator.stake + EXCLUDED.stake")
+		}
+		if validators[i].Jailed != nil {
+			query.Set("jailed = EXCLUDED.jailed")
+		}
+		if !validators[i].Commissions.IsZero() {
+			query.Set("commissions = added_validator.commissions + EXCLUDED.commissions")
+		}
+		if !validators[i].Rewards.IsZero() {
+			query.Set("rewards = added_validator.rewards + EXCLUDED.rewards")
+		}
+		if validators[i].Moniker != models.DoNotModify {
 			query.Set("moniker = EXCLUDED.moniker")
 		}
-		if validators[i].Website != doNotModify {
+		if validators[i].Website != models.DoNotModify {
 			query.Set("website = EXCLUDED.website")
 		}
-		if validators[i].Identity != doNotModify {
+		if validators[i].Identity != models.DoNotModify {
 			query.Set("identity = EXCLUDED.identity")
 		}
-		if validators[i].Contacts != doNotModify {
+		if validators[i].Contacts != models.DoNotModify {
 			query.Set("contacts = EXCLUDED.contacts")
 		}
-		if validators[i].Details != doNotModify {
+		if validators[i].Details != models.DoNotModify {
 			query.Set("details = EXCLUDED.details")
 		}
 		if _, err := query.Returning("xmax, id").Exec(ctx); err != nil {
@@ -281,6 +295,82 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 	}
 
 	return count, nil
+}
+
+func (tx Transaction) SaveUndelegations(ctx context.Context, undelegations ...models.Undelegation) error {
+	if len(undelegations) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&undelegations).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveRedelegations(ctx context.Context, redelegations ...models.Redelegation) error {
+	if len(redelegations) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&redelegations).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveStakingLogs(ctx context.Context, logs ...models.StakingLog) error {
+	if len(logs) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&logs).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveDelegations(ctx context.Context, delegations ...models.Delegation) error {
+	if len(delegations) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&delegations).
+		Column("id", "address_id", "validator_id", "amount").
+		On("CONFLICT ON CONSTRAINT delegation_pair DO UPDATE").
+		Set("amount = delegation.amount + EXCLUDED.amount").
+		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveJails(ctx context.Context, jails ...models.Jail) error {
+	if len(jails) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&jails).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) Jail(ctx context.Context, validators ...*models.Validator) error {
+	if len(validators) == 0 {
+		return nil
+	}
+
+	values := tx.Tx().NewValues(&validators)
+	_, err := tx.Tx().NewUpdate().
+		With("_data", values).
+		Model((*models.Validator)(nil)).
+		TableExpr("_data").
+		Set("jailed = true").
+		Set("stake = _data.stake + validator.stake").
+		Where("validator.id = _data.id").
+		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, fraction decimal.Decimal) (balances []models.Balance, err error) {
+	if validatorId == 0 || !fraction.IsPositive() {
+		return nil, nil
+	}
+
+	fr, _ := fraction.Float64()
+	_, err = tx.Tx().NewUpdate().
+		Model((*models.Delegation)(nil)).
+		Set("amount = amount * (1 - ?)", fr).
+		Where("validator_id = ?", validatorId).
+		Returning("address_id as id, 'utia' as currency, -(amount / (1 - ?) - amount) as delegated", fr).
+		Exec(ctx, &balances)
+	return
 }
 
 func (tx Transaction) LastBlock(ctx context.Context) (block models.Block, err error) {
@@ -351,6 +441,16 @@ func (tx Transaction) RollbackBlobLog(ctx context.Context, height types.Level) (
 	return
 }
 
+func (tx Transaction) RollbackUndelegations(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.Undelegation)(nil)).Where("height = ?", height).Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackRedelegations(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.Redelegation)(nil)).Where("height = ?", height).Exec(ctx)
+	return
+}
+
 func (tx Transaction) RollbackSigners(ctx context.Context, txIds []uint64) (err error) {
 	_, err = tx.Tx().NewDelete().
 		Model((*models.Signer)(nil)).
@@ -373,6 +473,22 @@ func (tx Transaction) RollbackBlockSignatures(ctx context.Context, height types.
 	return
 }
 
+func (tx Transaction) RollbackJails(ctx context.Context, height types.Level) (jails []models.Jail, err error) {
+	_, err = tx.Tx().NewDelete().Model(&jails).
+		Where("height = ?", height).
+		Returning("id, validator_id").
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackStakingLogs(ctx context.Context, height types.Level) (logs []models.StakingLog, err error) {
+	_, err = tx.Tx().NewDelete().Model(&logs).
+		Where("height = ?", height).
+		Returning("*").
+		Exec(ctx)
+	return
+}
+
 func (tx Transaction) DeleteBalances(ctx context.Context, ids []uint64) error {
 	if len(ids) == 0 {
 		return nil
@@ -381,6 +497,18 @@ func (tx Transaction) DeleteBalances(ctx context.Context, ids []uint64) error {
 	_, err := tx.Tx().NewDelete().
 		Model((*models.Balance)(nil)).
 		Where("id IN (?)", bun.In(ids)).
+		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) DeleteDelegationsByValidator(ctx context.Context, ids ...uint64) error {
+	if len(ids) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewDelete().
+		Model((*models.Delegation)(nil)).
+		Where("validator_id IN (?)", bun.In(ids)).
 		Exec(ctx)
 	return err
 }
@@ -417,7 +545,7 @@ func (tx Transaction) GetProposerId(ctx context.Context, address string) (id uin
 		Model((*models.Validator)(nil)).
 		Column("id").
 		Where("cons_address = ?", address).
-		Order("msg_id desc").
+		Order("id desc").
 		Limit(1).
 		Scan(ctx, &id)
 	return
@@ -501,10 +629,51 @@ func (tx Transaction) RetentionBlockSignatures(ctx context.Context, height types
 	return err
 }
 
-func (tx Transaction) Validators(ctx context.Context) (validators []models.Validator, err error) {
-	err = tx.Tx().NewSelect().
-		Model(&validators).
-		Column("id", "address", "cons_address").
-		Scan(ctx)
-	return
+func (tx Transaction) CancelUnbondings(ctx context.Context, cancellations ...models.Undelegation) error {
+	if len(cancellations) == 0 {
+		return nil
+	}
+
+	for i := range cancellations {
+		if _, err := tx.Tx().NewDelete().
+			Model(&cancellations[i]).
+			Where("height = ?height").
+			Where("amount = ?amount").
+			Where("validator_id = ?validator_id").
+			Where("address_id = ?address_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (tx Transaction) RetentionCompletedUnbondings(ctx context.Context, blockTime time.Time) error {
+	_, err := tx.Tx().NewDelete().Model((*models.Undelegation)(nil)).
+		Where("completion_time < ?", blockTime).
+		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) RetentionCompletedRedelegations(ctx context.Context, blockTime time.Time) error {
+	_, err := tx.Tx().NewDelete().Model((*models.Redelegation)(nil)).
+		Where("completion_time < ?", blockTime).
+		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) UpdateValidators(ctx context.Context, validators ...*models.Validator) error {
+	if len(validators) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewUpdate().Model(&validators).
+		Set("stake = validator.stake + EXCLUDED.stake").
+		Set("jailed = EXCLUDED.jailed").
+		Set("commissions = validator.commissions + EXCLUDED.commissions").
+		Set("rewards = validator.rewards + EXCLUDED.rewards").
+		Exec(ctx)
+
+	return err
 }

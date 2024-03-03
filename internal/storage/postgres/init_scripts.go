@@ -9,11 +9,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/dipdup-net/go-lib/database"
 	"github.com/pkg/errors"
 )
 
-func (s Storage) createScripts(ctx context.Context, conn *database.Bun, subFolder string, split bool) error {
+func (s Storage) createScripts(ctx context.Context, subFolder string, split bool) error {
 	scriptsDir := filepath.Join(s.scriptsDir, subFolder)
 
 	files, err := os.ReadDir(scriptsDir)

@@ -4,10 +4,13 @@
 package parser
 
 import (
+	"encoding/base64"
 	"testing"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,10 +22,19 @@ func TestParseTxs_EmptyTxsResults(t *testing.T) {
 		},
 	}
 
-	resultTxs, err := parseTxs(block)
+	decodeCtx := context.NewContext()
+	resultTxs, err := parseTxs(decodeCtx, block)
 
 	assert.NoError(t, err)
 	assert.Empty(t, resultTxs)
+}
+
+func mustDecodeBase64(s string) []byte {
+	data, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		panic(err)
+	}
+	return data
 }
 
 func TestParseTxs_SuccessTx(t *testing.T) {
@@ -33,12 +45,227 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 		Info:      "info",
 		GasWanted: 12000,
 		GasUsed:   1000,
-		Events:    nil,
 		Codespace: "celestia-explorer",
+		Events: []types.Event{
+			{
+				Type: "message",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("YWN0aW9u"),
+						Value: mustDecodeBase64("L2Nvc21vcy5zdGFraW5nLnYxYmV0YTEuTXNnQmVnaW5SZWRlbGVnYXRl"),
+						Index: true,
+					},
+				},
+			},
+			{
+				Type: "coin_spent",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("c3BlbmRlcg=="),
+						Value: mustDecodeBase64("Y2VsZXN0aWExanY2NXMzZ3JxZjZ2NmpsM2RwNHQ2Yzl0OXJrOTljZDhrNDR2bmo="),
+						Index: true,
+					}, {
+						Key:   mustDecodeBase64("YW1vdW50"),
+						Value: mustDecodeBase64("NDI3NzMxdXRpYQ=="),
+						Index: true,
+					},
+				},
+			},
+			{
+				Type: "coin_received",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("cmVjZWl2ZXI="),
+						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
+						Index: true,
+					}, {
+						Key:   mustDecodeBase64("YW1vdW50"),
+						Value: mustDecodeBase64("NDI3NzMxdXRpYQ=="),
+						Index: true,
+					},
+				},
+			},
+			{
+				Type: "transfer",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("cmVjaXBpZW50"),
+						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("c2VuZGVy"),
+						Value: mustDecodeBase64("Y2VsZXN0aWExanY2NXMzZ3JxZjZ2NmpsM2RwNHQ2Yzl0OXJrOTljZDhrNDR2bmo="),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("YW1vdW50"),
+						Value: mustDecodeBase64("NDI3NzMxdXRpYQ=="),
+						Index: true,
+					},
+				},
+			},
+			{
+				Type: "message",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("c2VuZGVy"),
+						Value: mustDecodeBase64("Y2VsZXN0aWExanY2NXMzZ3JxZjZ2NmpsM2RwNHQ2Yzl0OXJrOTljZDhrNDR2bmo="),
+						Index: true,
+					},
+				},
+			},
+			{
+				Type: "withdraw_rewards",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("YW1vdW50"),
+						Value: mustDecodeBase64("NDI3NzMxdXRpYQ=="),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("dmFsaWRhdG9y"),
+						Value: mustDecodeBase64("Y2VsZXN0aWF2YWxvcGVyMXY1aHJxbHY4ZHFnenZ5MHB3enF6ZzBneHk4OTlybTRrbHp4bTA3"),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("ZGVsZWdhdG9y"),
+						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
+						Index: true,
+					},
+				},
+			},
+			{
+				Type: "coin_spent",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("c3BlbmRlcg=="),
+						Value: mustDecodeBase64("Y2VsZXN0aWExanY2NXMzZ3JxZjZ2NmpsM2RwNHQ2Yzl0OXJrOTljZDhrNDR2bmo="),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("YW1vdW50"),
+						Value: mustDecodeBase64("NHV0aWE="),
+						Index: true,
+					},
+				},
+			},
+			{
+				Type: "coin_received",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("cmVjZWl2ZXI="),
+						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("YW1vdW50"),
+						Value: mustDecodeBase64("NHV0aWE="),
+						Index: true,
+					},
+				},
+			},
+			{
+				Type: "transfer",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("cmVjaXBpZW50"),
+						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("c2VuZGVy"),
+						Value: mustDecodeBase64("Y2VsZXN0aWExanY2NXMzZ3JxZjZ2NmpsM2RwNHQ2Yzl0OXJrOTljZDhrNDR2bmo="),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("YW1vdW50"),
+						Value: mustDecodeBase64("NHV0aWE="),
+						Index: true,
+					},
+				},
+			},
+			{
+				Type: "message",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("c2VuZGVy"),
+						Value: mustDecodeBase64("Y2VsZXN0aWExanY2NXMzZ3JxZjZ2NmpsM2RwNHQ2Yzl0OXJrOTljZDhrNDR2bmo="),
+						Index: true,
+					},
+				},
+			},
+			{
+				Type: "withdraw_rewards",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("YW1vdW50"),
+						Value: mustDecodeBase64("NHV0aWE="),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("dmFsaWRhdG9y"),
+						Value: mustDecodeBase64("Y2VsZXN0aWF2YWxvcGVyMXU4MjVzcmxkaGV2N3Q0d25kM2hwbGhycGhhaGpmazdmZjN3ZmRy"),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("ZGVsZWdhdG9y"),
+						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
+						Index: true,
+					},
+				},
+			},
+			{
+				Type: "redelegate",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("c291cmNlX3ZhbGlkYXRvcg=="),
+						Value: mustDecodeBase64("Y2VsZXN0aWF2YWxvcGVyMXY1aHJxbHY4ZHFnenZ5MHB3enF6ZzBneHk4OTlybTRrbHp4bTA3"),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("ZGVzdGluYXRpb25fdmFsaWRhdG9y"),
+						Value: mustDecodeBase64("Y2VsZXN0aWF2YWxvcGVyMXU4MjVzcmxkaGV2N3Q0d25kM2hwbGhycGhhaGpmazdmZjN3ZmRy"),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("YW1vdW50"),
+						Value: mustDecodeBase64("MjYwMjAwMDB1dGlh"),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("Y29tcGxldGlvbl90aW1l"),
+						Value: mustDecodeBase64("MjAyNC0wMy0xN1QyMjoyMjoyM1o="),
+						Index: true,
+					},
+				},
+			},
+			{
+				Type: "message",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   mustDecodeBase64("bW9kdWxl"),
+						Value: mustDecodeBase64("c3Rha2luZw=="),
+						Index: true,
+					},
+					{
+						Key:   mustDecodeBase64("c2VuZGVy"),
+						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
+						Index: true,
+					},
+				},
+			},
+		},
 	}
 	block, now := testsuite.CreateTestBlock(txRes, 3)
 
-	resultTxs, err := parseTxs(block)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height:       1000,
+		Time:         now,
+		MessageTypes: storageTypes.NewMsgTypeBitMask(),
+	}
+	resultTxs, err := parseTxs(decodeCtx, block)
 
 	assert.NoError(t, err)
 	assert.Len(t, resultTxs, 3)
@@ -65,7 +292,13 @@ func TestParseTxs_FailedTx(t *testing.T) {
 	}
 	block, now := testsuite.CreateTestBlock(txRes, 1)
 
-	resultTxs, err := parseTxs(block)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height:       1000,
+		Time:         now,
+		MessageTypes: storageTypes.NewMsgTypeBitMask(),
+	}
+	resultTxs, err := parseTxs(decodeCtx, block)
 
 	assert.NoError(t, err)
 	assert.Len(t, resultTxs, 1)
@@ -92,7 +325,13 @@ func TestParseTxs_FailedTxWithNonstandardErrorCode(t *testing.T) {
 	}
 	block, now := testsuite.CreateTestBlock(txRes, 1)
 
-	resultTxs, err := parseTxs(block)
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height:       1000,
+		Time:         now,
+		MessageTypes: storageTypes.NewMsgTypeBitMask(),
+	}
+	resultTxs, err := parseTxs(decodeCtx, block)
 
 	assert.NoError(t, err)
 	assert.Len(t, resultTxs, 1)

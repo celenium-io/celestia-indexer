@@ -6,19 +6,23 @@ package parser
 import (
 	"net/http"
 
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/parser/events"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
 
-func parseTxs(b types.BlockData) ([]storage.Tx, error) {
+func parseTxs(ctx *context.Context, b types.BlockData) ([]storage.Tx, error) {
 	txs := make([]storage.Tx, len(b.TxsResults))
 
 	for i := range b.TxsResults {
-		if err := parseTx(b, i, b.TxsResults[i], &txs[i]); err != nil {
+		if err := parseTx(ctx, b, i, b.TxsResults[i], &txs[i]); err != nil {
 			return nil, err
 		}
 	}
@@ -26,7 +30,7 @@ func parseTxs(b types.BlockData) ([]storage.Tx, error) {
 	return txs, nil
 }
 
-func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx, t *storage.Tx) error {
+func parseTx(ctx *context.Context, b types.BlockData, index int, txRes *types.ResponseDeliverTx, t *storage.Tx) error {
 	d, err := decode.Tx(b, index)
 	if err != nil {
 		return errors.Wrapf(err, "while parsing Tx on index %d", index)
@@ -53,15 +57,22 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx, t *st
 	t.BytesSize = int64(len(txRes.Data))
 
 	for signer, signerBytes := range d.Signers {
-		t.Signers = append(t.Signers, storage.Address{
+		address := storage.Address{
 			Address:    signer.String(),
 			Height:     t.Height,
 			LastHeight: t.Height,
 			Hash:       signerBytes,
 			Balance: storage.Balance{
-				Total: decimal.Zero,
+				Currency:  currency.DefaultCurrency,
+				Spendable: decimal.Zero,
+				Delegated: decimal.Zero,
+				Unbonding: decimal.Zero,
 			},
-		})
+		}
+		t.Signers = append(t.Signers, address)
+		if err := ctx.AddAddress(&address); err != nil {
+			return err
+		}
 	}
 
 	if txRes.IsFailed() {
@@ -69,9 +80,26 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx, t *st
 		t.Error = txRes.Log
 	}
 
-	t.Events = parseEvents(b, txRes.Events)
+	t.Events, err = parseEvents(ctx, b, txRes.Events)
+	if err != nil {
+		return errors.Wrap(err, "parsing events")
+	}
+
+	var eventsIdx int
+
+	// find first action
+	for i := range t.Events {
+		if t.Events[i].Type != storageTypes.EventTypeMessage {
+			continue
+		}
+		if action := decoder.StringFromMap(t.Events[i].Data, "action"); action != "" {
+			eventsIdx = i
+			break
+		}
+	}
+
 	for i := range d.Messages {
-		dm, err := decode.Message(d.Messages[i], b.Height, b.Block.Time, i, t.Status)
+		dm, err := decode.Message(ctx, d.Messages[i], i, t.Status)
 		if err != nil {
 			return errors.Wrapf(err, "while parsing tx=%v on index=%d", t.Hash, t.Position)
 		}
@@ -91,7 +119,20 @@ func parseTx(b types.BlockData, index int, txRes *types.ResponseDeliverTx, t *st
 		t.Messages[i] = dm.Msg
 		t.MessageTypes.SetByMsgType(dm.Msg.Type)
 		t.BlobsSize += dm.BlobsSize
+
+		if !txRes.IsFailed() {
+			if err := events.Handle(ctx, t.Events, &t.Messages[i], &eventsIdx); err != nil {
+				return err
+			}
+		}
 	}
+
+	ctx.Block.Stats.Fee = ctx.Block.Stats.Fee.Add(t.Fee)
+	ctx.Block.MessageTypes.Set(t.MessageTypes.Bits)
+	ctx.Block.Stats.BlobsSize += t.BlobsSize
+	ctx.Block.Stats.GasLimit += t.GasWanted
+	ctx.Block.Stats.GasUsed += t.GasUsed
+	ctx.Block.Stats.BlobsCount += t.BlobsCount
 
 	return nil
 }

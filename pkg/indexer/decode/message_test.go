@@ -4,13 +4,15 @@
 package decode
 
 import (
+	"testing"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/fatih/structs"
-	"github.com/stretchr/testify/assert"
-	"testing"
+	"github.com/stretchr/testify/require"
 )
 
 // MsgUnknown
@@ -32,8 +34,13 @@ func TestDecodeMsg_MsgUnknown(t *testing.T) {
 	msgUnknown := createMsgUnknown()
 	blob, now := testsuite.EmptyBlock()
 	position := 0
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
 
-	dm, err := Message(msgUnknown, blob.Height, blob.Block.Time, position, storageTypes.StatusSuccess)
+	dm, err := Message(decodeCtx, msgUnknown, position, storageTypes.StatusSuccess)
 
 	msgExpected := storage.Message{
 		Id:        0,
@@ -46,7 +53,7 @@ func TestDecodeMsg_MsgUnknown(t *testing.T) {
 		Namespace: nil,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }

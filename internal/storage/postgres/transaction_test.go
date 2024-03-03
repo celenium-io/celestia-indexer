@@ -270,7 +270,7 @@ func (s *TransactionTestSuite) TestSaveBalances() {
 	balances := make([]storage.Balance, 5)
 	for i := 0; i < 5; i++ {
 		balances[i].Id = uint64(i + 1)
-		balances[i].Total = decimal.RequireFromString("1000")
+		balances[i].Spendable = decimal.RequireFromString("1000")
 		balances[i].Currency = "utia"
 	}
 
@@ -514,7 +514,7 @@ func (s *TransactionTestSuite) TestRollbackValidators() {
 
 	items, err := s.storage.Validator.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 0)
+	s.Require().Len(items, 1)
 }
 
 func (s *TransactionTestSuite) TestRollbackNamespaces() {
@@ -535,6 +535,42 @@ func (s *TransactionTestSuite) TestRollbackNamespaces() {
 	s.Require().NoError(tx.Close(ctx))
 
 	items, err := s.storage.Namespace.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
+}
+
+func (s *TransactionTestSuite) TestRollbackUndelegations() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackUndelegations(ctx, 1000)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.Undelegation.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
+}
+
+func (s *TransactionTestSuite) TestRollbackRedelegations() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackRedelegations(ctx, 1000)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.Redelegation.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
 	s.Require().Len(items, 0)
 }
@@ -755,19 +791,173 @@ func (s *TransactionTestSuite) TestRetentionBlockSignatures() {
 	s.Require().Len(signs, 1)
 }
 
-func (s *TransactionTestSuite) TestValidators() {
+func (s *TransactionTestSuite) TestSaveRedelegations() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	validators, err := tx.Validators(ctx)
+	redelegations := []storage.Redelegation{
+		{
+			Height:         1000,
+			Time:           time.Now(),
+			SrcId:          2,
+			DestId:         3,
+			AddressId:      1,
+			Amount:         decimal.NewFromInt(10),
+			CompletionTime: time.Now().Add(time.Hour),
+		},
+	}
+
+	err = tx.SaveRedelegations(ctx, redelegations...)
 	s.Require().NoError(err)
-	s.Require().Len(validators, 1)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
+
+	saved, err := s.storage.Redelegation.List(ctx, 2, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(saved, 2)
+}
+
+func (s *TransactionTestSuite) TestSaveUndelegations() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	undelegations := []storage.Undelegation{
+		{
+			Height:         1000,
+			Time:           time.Now(),
+			ValidatorId:    2,
+			AddressId:      1,
+			Amount:         decimal.NewFromInt(10),
+			CompletionTime: time.Now().Add(time.Hour),
+		},
+	}
+
+	err = tx.SaveUndelegations(ctx, undelegations...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	saved, err := s.storage.Undelegation.List(ctx, 2, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(saved, 2)
+}
+
+func (s *TransactionTestSuite) TestSaveDelegations() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	delegations := []storage.Delegation{
+		{
+			ValidatorId: 2,
+			AddressId:   1,
+			Amount:      decimal.NewFromInt(10),
+		}, {
+			ValidatorId: 1,
+			AddressId:   1,
+			Amount:      decimal.NewFromInt(10),
+		},
+	}
+
+	err = tx.SaveDelegations(ctx, delegations...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	saved, err := s.storage.Delegation.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(saved, 3)
+}
+
+func (s *TransactionTestSuite) TestRetentionCompletedUnbondings() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	blockTime, err := time.Parse(time.RFC3339, "2023-07-04T03:11:57+00:00")
+	s.Require().NoError(err)
+
+	err = tx.RetentionCompletedUnbondings(ctx, blockTime)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestRetentionCompletedRedelegations() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	blockTime, err := time.Parse(time.RFC3339, "2023-07-04T03:11:57+00:00")
+	s.Require().NoError(err)
+
+	err = tx.RetentionCompletedRedelegations(ctx, blockTime)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestJail() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.Jail(ctx, &storage.Validator{
+		Id:    2,
+		Stake: decimal.NewFromInt(-10),
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	val, err := s.storage.Validator.ByAddress(ctx, "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr")
+	s.Require().NoError(err)
+	s.Require().NotNil(val.Jailed)
+	s.Require().True(*val.Jailed)
+	s.Require().Equal("1000090", val.Stake.String())
+}
+
+func (s *TransactionTestSuite) TestUpdateSlashedDelegations() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	balances, err := tx.UpdateSlashedDelegations(ctx, 1, decimal.NewFromFloat(0.01))
+	s.Require().NoError(err)
+	s.Require().Len(balances, 2)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	s.Require().Equal("-100", balances[0].Delegated.String())
+	s.Require().Equal("utia", balances[0].Currency)
+	s.Require().EqualValues(1, balances[0].Id)
+
+	s.Require().Equal("-100", balances[1].Delegated.String())
+	s.Require().Equal("utia", balances[1].Currency)
+	s.Require().EqualValues(2, balances[1].Id)
 }
 
 func TestSuiteTransaction_Run(t *testing.T) {

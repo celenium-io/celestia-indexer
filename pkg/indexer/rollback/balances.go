@@ -15,7 +15,12 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func (module *Module) rollbackBalances(ctx context.Context, tx storage.Transaction, deletedEvents []storage.Event, deletedAddresses []storage.Address) error {
+func (module *Module) rollbackBalances(
+	ctx context.Context,
+	tx storage.Transaction,
+	deletedEvents []storage.Event,
+	deletedAddresses []storage.Address,
+) error {
 	var (
 		ids     = make([]uint64, len(deletedAddresses))
 		deleted = make(map[string]struct{}, len(deletedAddresses))
@@ -74,7 +79,7 @@ func getBalanceUpdates(
 		}
 
 		if addr, ok := updates[address.Address]; ok {
-			addr.Balance.Total = addr.Balance.Total.Add(address.Balance.Total)
+			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
 		} else {
 			lastHeight, err := tx.LastAddressAction(ctx, address.Hash)
 			if err != nil {
@@ -103,11 +108,11 @@ func coinSpent(data map[string]any) (*storage.Address, error) {
 		return nil, errors.Wrapf(err, "decode spender: %s", coinSpent.Spender)
 	}
 	balance := storage.Balance{
-		Currency: currency.DefaultCurrency,
-		Total:    decimal.Zero,
+		Currency:  currency.DefaultCurrency,
+		Spendable: decimal.Zero,
 	}
 	if coinSpent.Amount != nil {
-		balance.Total = decimal.NewFromBigInt(coinSpent.Amount.Amount.BigInt(), 0)
+		balance.Spendable = decimal.NewFromBigInt(coinSpent.Amount.Amount.BigInt(), 0)
 		balance.Currency = coinSpent.Amount.Denom
 	}
 	return &storage.Address{
@@ -129,11 +134,11 @@ func coinReceived(data map[string]any) (*storage.Address, error) {
 	}
 
 	balance := storage.Balance{
-		Currency: currency.DefaultCurrency,
-		Total:    decimal.Zero,
+		Currency:  currency.DefaultCurrency,
+		Spendable: decimal.Zero,
 	}
 	if coinReceived.Amount != nil {
-		balance.Total = decimal.NewFromBigInt(coinReceived.Amount.Amount.Neg().BigInt(), 0)
+		balance.Spendable = decimal.NewFromBigInt(coinReceived.Amount.Amount.Neg().BigInt(), 0)
 		balance.Currency = coinReceived.Amount.Denom
 	}
 

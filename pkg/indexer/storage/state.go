@@ -6,9 +6,10 @@ package storage
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/shopspring/decimal"
 )
 
-func updateState(block *storage.Block, totalAccounts, totalNamespaces int64, totalValidators int, state *storage.State) {
+func updateState(block *storage.Block, totalAccounts, totalNamespaces int64, totalValidators int, totalVotingPower decimal.Decimal, state *storage.State) {
 	if types.Level(block.Id) <= state.LastHeight {
 		return
 	}
@@ -23,5 +24,6 @@ func updateState(block *storage.Block, totalAccounts, totalNamespaces int64, tot
 	state.TotalValidators += totalValidators
 	state.TotalFee = state.TotalFee.Add(block.Stats.Fee)
 	state.TotalSupply = state.TotalSupply.Add(block.Stats.SupplyChange)
+	state.TotalStake = state.TotalStake.Add(totalVotingPower)
 	state.ChainId = block.ChainId
 }

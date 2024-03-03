@@ -6,18 +6,18 @@ package handle
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 )
 
 // MsgCreateVestingAccount defines a message that enables creating a vesting
 // account.
-func MsgCreateVestingAccount(level types.Level, m *cosmosVestingTypes.MsgCreateVestingAccount) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgCreateVestingAccount(ctx *context.Context, m *cosmosVestingTypes.MsgCreateVestingAccount) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgCreateVestingAccount
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeFromAddress, address: m.FromAddress},
 		{t: storageTypes.MsgAddressTypeToAddress, address: m.ToAddress},
-	}, level)
+	}, ctx.Block.Height)
 	return msgType, addresses, err
 }
 
@@ -25,12 +25,12 @@ func MsgCreateVestingAccount(level types.Level, m *cosmosVestingTypes.MsgCreateV
 // locked account.
 //
 // Since: cosmos-sdk 0.46
-func MsgCreatePermanentLockedAccount(level types.Level, m *cosmosVestingTypes.MsgCreatePermanentLockedAccount) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgCreatePermanentLockedAccount(ctx *context.Context, m *cosmosVestingTypes.MsgCreatePermanentLockedAccount) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgCreatePermanentLockedAccount
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeFromAddress, address: m.FromAddress},
 		{t: storageTypes.MsgAddressTypeToAddress, address: m.ToAddress},
-	}, level)
+	}, ctx.Block.Height)
 	return msgType, addresses, err
 }
 
@@ -38,11 +38,11 @@ func MsgCreatePermanentLockedAccount(level types.Level, m *cosmosVestingTypes.Ms
 // account.
 //
 // Since: cosmos-sdk 0.46
-func MsgCreatePeriodicVestingAccount(level types.Level, m *cosmosVestingTypes.MsgCreatePeriodicVestingAccount) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgCreatePeriodicVestingAccount(ctx *context.Context, m *cosmosVestingTypes.MsgCreatePeriodicVestingAccount) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgCreatePeriodicVestingAccount
-	addresses, err := createAddresses(addressesData{
+	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeFromAddress, address: m.FromAddress},
 		{t: storageTypes.MsgAddressTypeToAddress, address: m.ToAddress},
-	}, level)
+	}, ctx.Block.Height)
 	return msgType, addresses, err
 }

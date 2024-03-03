@@ -11,6 +11,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	dCtx "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/shopspring/decimal"
@@ -52,7 +53,6 @@ func getExpectedBlock() storage.Block {
 		ChainId:            "celestia-explorer-test",
 		Txs:                make([]storage.Tx, 0),
 		Events:             make([]storage.Event, 0),
-		Addresses:          make([]storage.Address, 0),
 		BlockSignatures: []storage.BlockSignature{
 			{
 				Height: 999,
@@ -63,15 +63,17 @@ func getExpectedBlock() storage.Block {
 			},
 		},
 		Stats: storage.BlockStats{
-			Id:          0,
-			Height:      100,
-			Time:        time.Time{},
-			TxCount:     0,
-			EventsCount: 0,
-			BlobsSize:   0,
-			// SupplyChange: decimal.Zero,
-			// InflationRate: decimal.Zero,
-			Fee: decimal.Zero,
+			Id:            0,
+			Height:        100,
+			Time:          time.Time{},
+			TxCount:       0,
+			EventsCount:   0,
+			BlobsSize:     0,
+			SupplyChange:  decimal.Zero,
+			InflationRate: decimal.Zero,
+			Fee:           decimal.Zero,
+			Rewards:       decimal.Zero,
+			Commissions:   decimal.Zero,
 		},
 	}
 }
@@ -174,11 +176,11 @@ func TestParserModule_Success(t *testing.T) {
 		case msg, ok := <-readerModule.MustInput(readerInputName).Listen():
 			assert.True(t, ok, "received value should be delivered by successful send operation")
 
-			parsedBlock, ok := msg.(storage.Block)
+			received, ok := msg.(*dCtx.Context)
 			assert.Truef(t, ok, "invalid message type: %T", msg)
 
 			expectedBlock := getExpectedBlock()
-			assert.Equal(t, expectedBlock, parsedBlock)
+			assert.Equal(t, expectedBlock, *received.Block)
 			return
 		}
 	}

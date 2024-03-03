@@ -46,7 +46,8 @@ func TestWebsocket(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	blockMock := mock.NewMockIBlock(ctrl)
-	dispatcher, err := bus.NewDispatcher(listenerFactory, blockMock)
+	validatorsMock := mock.NewMockIValidator(ctrl)
+	dispatcher, err := bus.NewDispatcher(listenerFactory, blockMock, validatorsMock)
 	require.NoError(t, err)
 	dispatcher.Start(ctx)
 	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelBlock)

@@ -15,12 +15,15 @@ import (
 )
 
 type AddressHandler struct {
-	address     storage.IAddress
-	txs         storage.ITx
-	blobLogs    storage.IBlobLog
-	messages    storage.IMessage
-	state       storage.IState
-	indexerName string
+	address       storage.IAddress
+	txs           storage.ITx
+	blobLogs      storage.IBlobLog
+	messages      storage.IMessage
+	delegations   storage.IDelegation
+	undelegations storage.IUndelegation
+	redelegations storage.IRedelegation
+	state         storage.IState
+	indexerName   string
 }
 
 func NewAddressHandler(
@@ -28,16 +31,22 @@ func NewAddressHandler(
 	txs storage.ITx,
 	blobLogs storage.IBlobLog,
 	messages storage.IMessage,
+	delegations storage.IDelegation,
+	undelegations storage.IUndelegation,
+	redelegations storage.IRedelegation,
 	state storage.IState,
 	indexerName string,
 ) *AddressHandler {
 	return &AddressHandler{
-		address:     address,
-		txs:         txs,
-		blobLogs:    blobLogs,
-		messages:    messages,
-		state:       state,
-		indexerName: indexerName,
+		address:       address,
+		txs:           txs,
+		blobLogs:      blobLogs,
+		messages:      messages,
+		delegations:   delegations,
+		undelegations: undelegations,
+		redelegations: redelegations,
+		state:         state,
+		indexerName:   indexerName,
 	}
 }
 
@@ -99,8 +108,8 @@ func (handler *AddressHandler) List(c echo.Context) error {
 	req.SetDefault()
 
 	fltrs := storage.AddressListFilter{
-		Limit:  int(req.Limit),
-		Offset: int(req.Offset),
+		Limit:  req.Limit,
+		Offset: req.Offset,
 		Sort:   pgSort(req.Sort),
 	}
 
@@ -348,4 +357,163 @@ func (handler *AddressHandler) Count(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 	return c.JSON(http.StatusOK, state.TotalAccounts)
+}
+
+type getAddressPageable struct {
+	Hash   string `param:"hash"   validate:"required,address"`
+	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int    `query:"offset" validate:"omitempty,min=0"`
+}
+
+func (req *getAddressPageable) SetDefault() {
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
+}
+
+// Delegations godoc
+//
+//	@Summary		Get delegations made by address
+//	@Description	Get delegations made by address
+//	@Tags			address
+//	@ID				address-delegations
+//	@Param			hash	path	string	true	"Hash"							minlength(48)	maxlength(48)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Delegation
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address/{hash}/delegations [get]
+func (handler *AddressHandler) Delegations(c echo.Context) error {
+	req, err := bindAndValidate[getAddressPageable](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	_, hash, err := types.Address(req.Hash).Decode()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	delegations, err := handler.delegations.ByAddress(
+		c.Request().Context(),
+		address.Id,
+		req.Limit,
+		req.Offset,
+	)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	response := make([]responses.Delegation, len(delegations))
+	for i := range response {
+		response[i] = responses.NewDelegation(delegations[i])
+	}
+
+	return returnArray(c, response)
+}
+
+// Undelegations godoc
+//
+//	@Summary		Get undelegations made by address
+//	@Description	Get undelegations made by address
+//	@Tags			address
+//	@ID				address-undelegations
+//	@Param			hash	path	string	true	"Hash"							minlength(48)	maxlength(48)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Undelegation
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address/{hash}/undelegations [get]
+func (handler *AddressHandler) Undelegations(c echo.Context) error {
+	req, err := bindAndValidate[getAddressPageable](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	_, hash, err := types.Address(req.Hash).Decode()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	undelegations, err := handler.undelegations.ByAddress(
+		c.Request().Context(),
+		address.Id,
+		req.Limit,
+		req.Offset,
+	)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	response := make([]responses.Undelegation, len(undelegations))
+	for i := range response {
+		response[i] = responses.NewUndelegation(undelegations[i])
+	}
+
+	return returnArray(c, response)
+}
+
+// Redelegations godoc
+//
+//	@Summary		Get redelegations made by address
+//	@Description	Get redelegations made by address
+//	@Tags			address
+//	@ID				address-redelegations
+//	@Param			hash	path	string	true	"Hash"							minlength(48)	maxlength(48)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Redelegation
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address/{hash}/redelegations [get]
+func (handler *AddressHandler) Redelegations(c echo.Context) error {
+	req, err := bindAndValidate[getAddressPageable](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	_, hash, err := types.Address(req.Hash).Decode()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	redelegations, err := handler.redelegations.ByAddress(
+		c.Request().Context(),
+		address.Id,
+		req.Limit,
+		req.Offset,
+	)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	response := make([]responses.Redelegation, len(redelegations))
+	for i := range response {
+		response[i] = responses.NewRedelegation(redelegations[i])
+	}
+
+	return returnArray(c, response)
 }

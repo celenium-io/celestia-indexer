@@ -18,8 +18,8 @@ const (
 )
 
 type limitOffsetPagination struct {
-	Limit  uint64 `json:"limit"  param:"limit"  query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset uint64 `json:"offset" param:"offset" query:"offset" validate:"omitempty,min=0"`
+	Limit  int    `json:"limit"  param:"limit"  query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int    `json:"offset" param:"offset" query:"offset" validate:"omitempty,min=0"`
 	Sort   string `json:"sort"   param:"sort"   query:"sort"   validate:"omitempty,oneof=asc desc"`
 }
 
@@ -33,8 +33,8 @@ func (p *limitOffsetPagination) SetDefault() {
 }
 
 type addressListRequest struct {
-	Limit  uint64 `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset uint64 `query:"offset" validate:"omitempty,min=0"`
+	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int    `query:"offset" validate:"omitempty,min=0"`
 	Sort   string `query:"sort"   validate:"omitempty,oneof=asc desc"`
 }
 
@@ -59,8 +59,8 @@ func pgSort(sort string) storage.SortOrder {
 }
 
 type txListRequest struct {
-	Limit           uint64      `query:"limit"             validate:"omitempty,min=1,max=100"`
-	Offset          uint64      `query:"offset"            validate:"omitempty,min=0"`
+	Limit           int         `query:"limit"             validate:"omitempty,min=1,max=100"`
+	Offset          int         `query:"offset"            validate:"omitempty,min=0"`
 	Sort            string      `query:"sort"              validate:"omitempty,oneof=asc desc"`
 	Height          uint64      `query:"height"            validate:"omitempty,min=1"`
 	Status          StringArray `query:"status"            validate:"omitempty,dive,status"`

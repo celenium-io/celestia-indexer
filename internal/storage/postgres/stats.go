@@ -202,6 +202,10 @@ func (s Stats) Series(ctx context.Context, timeframe storage.Timeframe, name str
 		query.ColumnExpr("ts, bytes_in_block as value")
 	case storage.SeriesBlobsCount:
 		query.ColumnExpr("ts, blobs_count as value")
+	case storage.SeriesCommissions:
+		query.ColumnExpr("ts, commissions as value")
+	case storage.SeriesRewards:
+		query.ColumnExpr("ts, rewards as value")
 	default:
 		return nil, errors.Errorf("unexpected series name: %s", name)
 	}
@@ -213,7 +217,7 @@ func (s Stats) Series(ctx context.Context, timeframe storage.Timeframe, name str
 		query = query.Where("ts < ?", req.To)
 	}
 
-	err = query.Limit(100).Scan(ctx, &response)
+	err = query.Limit(200).Scan(ctx, &response)
 	return
 }
 
@@ -250,6 +254,43 @@ func (s Stats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe,
 	}
 	if !req.To.IsZero() {
 		query = query.Where("ts < ?", req.To)
+	}
+
+	err = query.Limit(100).Scan(ctx, &response)
+	return
+}
+
+func (s Stats) StakingSeries(ctx context.Context, timeframe storage.Timeframe, name string, validatorId uint64, req storage.SeriesRequest) (response []storage.SeriesItem, err error) {
+	var view string
+	switch timeframe {
+	case storage.TimeframeHour:
+		view = storage.ViewStakingByHour
+	case storage.TimeframeDay:
+		view = storage.ViewStakingByDay
+	case storage.TimeframeMonth:
+		view = storage.ViewStakingByMonth
+	default:
+		return nil, errors.Errorf("unexpected timeframe %s", timeframe)
+	}
+
+	query := s.db.DB().NewSelect().Table(view).Where("validator_id = ?", validatorId)
+
+	switch name {
+	case storage.SeriesRewards:
+		query.ColumnExpr("time as ts, rewards as value")
+	case storage.SeriesCommissions:
+		query.ColumnExpr("time as ts, commissions as value")
+	case storage.SeriesFlow:
+		query.ColumnExpr("time as ts, flow as value")
+	default:
+		return nil, errors.Errorf("unexpected series name: %s", name)
+	}
+
+	if !req.From.IsZero() {
+		query = query.Where("time >= ?", req.From)
+	}
+	if !req.To.IsZero() {
+		query = query.Where("time < ?", req.To)
 	}
 
 	err = query.Limit(100).Scan(ctx, &response)

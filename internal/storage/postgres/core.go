@@ -39,6 +39,11 @@ type Storage struct {
 	Stats           models.IStats
 	Search          models.ISearch
 	Validator       models.IValidator
+	DelegationLogs  models.IStakingLog
+	Delegation      models.IDelegation
+	Redelegation    models.IRedelegation
+	Undelegation    models.IUndelegation
+	Jails           models.IJail
 	Rollup          models.IRollup
 	Export          models.Export
 	Notificator     *Notificator
@@ -71,15 +76,20 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		Stats:           NewStats(strg.Connection()),
 		Search:          NewSearch(strg.Connection()),
 		Validator:       NewValidator(strg.Connection()),
+		DelegationLogs:  NewDelegationLog(strg.Connection()),
+		Delegation:      NewDelegation(strg.Connection()),
+		Redelegation:    NewRedelegation(strg.Connection()),
+		Undelegation:    NewUndelegation(strg.Connection()),
+		Jails:           NewJail(strg.Connection()),
 		Rollup:          NewRollup(strg.Connection()),
 		Export:          NewExport(cfg),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
 	}
 
-	if err := s.createScripts(ctx, strg.Connection(), "functions", false); err != nil {
+	if err := s.createScripts(ctx, "functions", false); err != nil {
 		return s, errors.Wrap(err, "creating views")
 	}
-	if err := s.createScripts(ctx, strg.Connection(), "views", true); err != nil {
+	if err := s.createScripts(ctx, "views", true); err != nil {
 		return s, errors.Wrap(err, "creating views")
 	}
 
@@ -139,6 +149,8 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 			&models.Event{},
 			&models.NamespaceMessage{},
 			&models.BlobLog{},
+			&models.Jail{},
+			&models.StakingLog{},
 			&models.Price{},
 		} {
 			if _, err := tx.ExecContext(ctx,

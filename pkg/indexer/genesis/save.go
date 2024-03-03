@@ -9,6 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
+	"github.com/shopspring/decimal"
 )
 
 func (module *Module) save(ctx context.Context, data parsedData) error {
@@ -46,7 +47,6 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		messages   = make([]*storage.Message, 0)
 		events     = make([]any, len(data.block.Events))
 		namespaces = make(map[string]*storage.Namespace, 0)
-		validators = make([]*storage.Validator, 0)
 	)
 
 	for i := range data.block.Events {
@@ -65,10 +65,6 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 					namespaces[key] = &data.block.Txs[i].Messages[j].Namespace[k]
 				}
 			}
-
-			if data.block.Txs[i].Messages[j].Validator != nil {
-				validators = append(validators, data.block.Txs[i].Messages[j].Validator)
-			}
 		}
 
 		for j := range data.block.Txs[i].Events {
@@ -81,7 +77,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 			if addr, ok := data.addresses[key]; !ok {
 				data.addresses[key] = &data.block.Txs[i].Signers[j]
 			} else {
-				addr.Balance.Total = addr.Balance.Total.Add(data.block.Txs[i].Signers[j].Balance.Total)
+				addr.Balance.Spendable = addr.Balance.Spendable.Add(data.block.Txs[i].Signers[j].Balance.Spendable)
 			}
 		}
 	}
@@ -124,8 +120,46 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		return tx.HandleError(ctx, err)
 	}
 
-	totalValidators, err := tx.SaveValidators(ctx, validators...)
+	totalValidators, err := tx.SaveValidators(ctx, data.validators...)
 	if err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
+	totalStake := decimal.NewFromInt(0)
+	for i := range data.validators {
+		totalStake = totalStake.Add(data.validators[i].Stake)
+	}
+
+	for i := range data.stakingLogs {
+		if address, ok := data.addresses[data.stakingLogs[i].Address.Address]; ok {
+			data.stakingLogs[i].AddressId = &address.Id
+		}
+
+		for j := range data.validators {
+			if data.validators[j].Address == data.stakingLogs[i].Validator.Address {
+				data.stakingLogs[i].ValidatorId = data.validators[j].Id
+				break
+			}
+		}
+	}
+
+	if err := tx.SaveStakingLogs(ctx, data.stakingLogs...); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
+	for i := range data.delegations {
+		if address, ok := data.addresses[data.delegations[i].Address.Address]; ok {
+			data.delegations[i].AddressId = address.Id
+		}
+
+		for j := range data.validators {
+			if data.validators[j].Address == data.delegations[i].Validator.Address {
+				data.delegations[i].ValidatorId = data.validators[j].Id
+				break
+			}
+		}
+	}
+	if err := tx.SaveDelegations(ctx, data.delegations...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
@@ -182,6 +216,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		TotalAccounts:   totalAccounts,
 		TotalNamespaces: totalNamespaces,
 		TotalValidators: totalValidators,
+		TotalStake:      totalStake,
 	}); err != nil {
 		return tx.HandleError(ctx, err)
 	}

@@ -18,6 +18,9 @@ type IValidator interface {
 	storage.Table[*Validator]
 
 	ByAddress(ctx context.Context, address string) (Validator, error)
+	TotalVotingPower(ctx context.Context) (decimal.Decimal, error)
+	ListByPower(ctx context.Context, fltrs ValidatorFilters) ([]Validator, error)
+	JailedCount(ctx context.Context) (int, error)
 }
 
 type Validator struct {
@@ -39,10 +42,39 @@ type Validator struct {
 	MaxChangeRate     decimal.Decimal `bun:"max_change_rate,type:numeric"     comment:"Maximum daily increase of the validator commission, as a fraction"`
 	MinSelfDelegation decimal.Decimal `bun:"min_self_delegation,type:numeric" comment:""`
 
-	MsgId  uint64         `bun:"msg_id" comment:"Message id when validator was created"`
-	Height pkgTypes.Level `bun:"height" comment:"Height when validator was created"`
+	Stake       decimal.Decimal `bun:"stake,type:numeric"       comment:"Validator's stake"`
+	Rewards     decimal.Decimal `bun:"rewards,type:numeric"     comment:"Validator's rewards"`
+	Commissions decimal.Decimal `bun:"commissions,type:numeric" comment:"Commissions"`
+	Height      pkgTypes.Level  `bun:"height"                   comment:"Height when validator was created"`
+
+	Jailed *bool `bun:"jailed" comment:"True if validator was punished"`
 }
 
 func (Validator) TableName() string {
 	return "validator"
+}
+
+const DoNotModify = "[do-not-modify]"
+
+func EmptyValidator() Validator {
+	return Validator{
+		Rate:              decimal.Zero,
+		MaxRate:           decimal.Zero,
+		MaxChangeRate:     decimal.Zero,
+		MinSelfDelegation: decimal.Zero,
+		Rewards:           decimal.Zero,
+		Commissions:       decimal.Zero,
+		Stake:             decimal.Zero,
+		Contacts:          DoNotModify,
+		Details:           DoNotModify,
+		Identity:          DoNotModify,
+		Moniker:           DoNotModify,
+		Website:           DoNotModify,
+	}
+}
+
+type ValidatorFilters struct {
+	Limit  int
+	Offset int
+	Jailed *bool
 }

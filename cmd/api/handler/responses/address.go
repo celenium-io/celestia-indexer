@@ -26,8 +26,10 @@ func NewAddress(addr storage.Address) Address {
 		LastHeight: addr.LastHeight,
 		Hash:       addr.Address,
 		Balance: Balance{
-			Currency: addr.Balance.Currency,
-			Value:    addr.Balance.Total.String(),
+			Currency:  addr.Balance.Currency,
+			Spendable: addr.Balance.Spendable.String(),
+			Delegated: addr.Balance.Delegated.String(),
+			Unbonding: addr.Balance.Unbonding.String(),
 		},
 	}
 }
@@ -36,6 +38,8 @@ func NewAddress(addr storage.Address) Address {
 //
 //	@Description	Balance of address information
 type Balance struct {
-	Currency string `example:"utia"        json:"currency" swaggertype:"string"`
-	Value    string `example:"10000000000" json:"value"    swaggertype:"string"`
+	Currency  string `example:"utia"        json:"currency"  swaggertype:"string"`
+	Spendable string `example:"10000000000" json:"spendable" swaggertype:"string"`
+	Delegated string `example:"10000000000" json:"delegated" swaggertype:"string"`
+	Unbonding string `example:"10000000000" json:"unbonding" swaggertype:"string"`
 }
