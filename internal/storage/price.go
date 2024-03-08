@@ -21,7 +21,7 @@ const (
 type IPrice interface {
 	Save(ctx context.Context, price *Price) error
 	Last(ctx context.Context) (Price, error)
-	Get(ctx context.Context, timeframe string, start, end int64, limit int) ([]Price, error)
+	Get(ctx context.Context, timeframe string, start, end time.Time, limit int) ([]Price, error)
 }
 
 type Price struct {

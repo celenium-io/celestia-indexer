@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
@@ -23,7 +24,7 @@ func NewPrice(db *database.Bun) *Price {
 	}
 }
 
-func (p *Price) Get(ctx context.Context, timeframe string, start, end int64, limit int) (price []storage.Price, err error) {
+func (p *Price) Get(ctx context.Context, timeframe string, start, end time.Time, limit int) (price []storage.Price, err error) {
 	query := p.db.DB().NewSelect()
 	switch timeframe {
 	case storage.PriceTimeframeDay:
@@ -36,10 +37,10 @@ func (p *Price) Get(ctx context.Context, timeframe string, start, end int64, lim
 		return nil, errors.Errorf("unknown price timeframe: %s", timeframe)
 	}
 
-	if start > 0 {
+	if !start.IsZero() {
 		query = query.Where("time >= ?", start)
 	}
-	if end > 0 {
+	if !end.IsZero() {
 		query = query.Where("time < ?", end)
 	}
 	limitScope(query, limit)

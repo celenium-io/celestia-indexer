@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -380,7 +381,19 @@ func (sh StatsHandler) PriceSeries(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	histogram, err := sh.price.Get(c.Request().Context(), req.Timeframe, int64(req.From), int64(req.To), 100)
+	var (
+		from time.Time
+		to   time.Time
+	)
+
+	if req.From > 0 {
+		from = time.Unix(int64(req.From), 0).UTC()
+	}
+	if req.To > 0 {
+		to = time.Unix(int64(req.To), 0).UTC()
+	}
+
+	histogram, err := sh.price.Get(c.Request().Context(), req.Timeframe, from, to, 100)
 	if err != nil {
 		return handleError(c, err, sh.nsRepo)
 	}

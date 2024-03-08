@@ -396,7 +396,7 @@ func (s *StorageTestSuite) TestPriceGet() {
 		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer ctxCancel()
 
-		candles, err := s.storage.Price.Get(ctx, tf, 0, 0, 1)
+		candles, err := s.storage.Price.Get(ctx, tf, time.Time{}, time.Time{}, 1)
 		s.Require().NoError(err)
 		s.Require().Len(candles, 1)
 	}
