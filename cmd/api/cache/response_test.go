@@ -15,3 +15,14 @@ func TestNewResponseRecorder(t *testing.T) {
 	}
 }
 
+func TestWrite(t *testing.T) {
+	w := httptest.NewRecorder()
+	recorder := NewResponseRecorder(w)
+	data := []byte("test data")
+	n, err := recorder.Write(data)
+	if err != nil || n != len(data) {
+		t.Errorf("Error writing data")
+	}
+}
+
+
