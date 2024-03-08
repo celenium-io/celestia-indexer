@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -430,7 +431,7 @@ func (s *StatsTestSuite) TestPriceSeries() {
 		c.SetParamValues(tf)
 
 		s.price.EXPECT().
-			Get(gomock.Any(), tf, int64(0), int64(0), 100).
+			Get(gomock.Any(), tf, time.Time{}, time.Time{}, 100).
 			Return([]storage.Price{
 				{
 					Time:  testTime,
