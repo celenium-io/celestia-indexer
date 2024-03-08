@@ -25,4 +25,15 @@ func TestWrite(t *testing.T) {
 	}
 }
 
+func TestCopyHeaders(t *testing.T) {
+	w := httptest.NewRecorder()
+	recorder := NewResponseRecorder(w)
+	w.Header().Set("Test-Header", "Test-Value")
+	recorder.copyHeaders()
+	if recorder.headers.Get("Test-Header") != "Test-Value" {
+		t.Errorf("Headers not copied correctly")
+	}
+}
+
+
 
