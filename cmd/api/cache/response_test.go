@@ -35,5 +35,14 @@ func TestCopyHeaders(t *testing.T) {
 	}
 }
 
+func TestWriteHeader(t *testing.T) {
+	w := httptest.NewRecorder()
+	recorder := NewResponseRecorder(w)
+	recorder.WriteHeader(http.StatusOK)
+	if recorder.status != http.StatusOK {
+		t.Errorf("Status code not set correctly")
+	}
+}
+
 
 
