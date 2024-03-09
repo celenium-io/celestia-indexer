@@ -58,3 +58,21 @@ func TestResult(t *testing.T) {
 	}
 }
 
+func TestEncodeDecode(t *testing.T) {
+	entry := &CacheEntry{
+		Header:     make(http.Header),
+		StatusCode: http.StatusOK,
+		Body:       []byte("test data"),
+ 	}
+	data, err := entry.Encode()
+	if err != nil {
+		t.Errorf("Error encoding CacheEntry")
+	}
+	newEntry := &CacheEntry{}
+	err = newEntry.Decode(data)
+	if err != nil || newEntry.StatusCode != http.StatusOK || string(newEntry.Body) != "test data" {
+		t.Errorf("Error decoding CacheEntry")
+	}
+}
+
+
