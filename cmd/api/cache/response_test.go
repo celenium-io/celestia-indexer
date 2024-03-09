@@ -44,5 +44,17 @@ func TestWriteHeader(t *testing.T) {
 	}
 }
 
-
+func TestResult(t *testing.T) {
+	w := httptest.NewRecorder()
+	recorder := NewResponseRecorder(w)
+	recorder.WriteHeader(http.StatusOK)
+	_, err := recorder.Write([]byte("test data"))
+	if err != nil {
+		t.Errorf("Error on write: %v", err)
+	}
+	result := recorder.Result()
+	if result.StatusCode != http.StatusOK || string(result.Body) != "test data" {
+		t.Errorf("Incorrect CacheEntry returned")
+	}
+}
 
