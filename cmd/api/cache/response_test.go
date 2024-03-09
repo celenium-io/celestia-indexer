@@ -75,4 +75,15 @@ func TestEncodeDecode(t *testing.T) {
 	}
 }
 
-
+func TestReplay(t *testing.T) {
+    entry := &CacheEntry{   
+        Header:     make(http.Header),
+        StatusCode: http.StatusOK,
+        Body:       []byte("test data"),
+    }
+    w := httptest.NewRecorder()
+    err := entry.Replay(w)
+    if err != nil || w.Code != http.StatusOK || w.Body.String() != "test data" {
+        t.Errorf("Error replaying CacheEntry")
+    }
+}
