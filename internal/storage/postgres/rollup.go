@@ -228,7 +228,7 @@ func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series, grou
 	case "day":
 		cte = cte.Table("rollup_stats_by_day").
 			ColumnExpr("extract(isodow from time) as name").
-			Where("time >= ?", time.Now().AddDate(0, -6, 0).UTC())
+			Where("time >= ?", time.Now().AddDate(0, -3, 0).UTC())
 	case "hour":
 		cte = cte.Table("rollup_stats_by_hour").
 			ColumnExpr("extract(hour from time) as name").
