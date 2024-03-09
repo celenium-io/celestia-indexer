@@ -23,6 +23,7 @@ type IRollup interface {
 	Stats(ctx context.Context, rollupId uint64) (RollupStats, error)
 	Series(ctx context.Context, rollupId uint64, timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
 	Count(ctx context.Context) (int64, error)
+	Distribution(ctx context.Context, rollupId uint64, series, groupBy string) (items []DistributionItem, err error)
 	BySlug(ctx context.Context, slug string) (Rollup, error)
 }
 

@@ -254,6 +254,17 @@ definitions:
         example: https://example.com
         type: string
     type: object
+  responses.DistributionItem:
+    properties:
+      name:
+        example: "12"
+        format: string
+        type: string
+      value:
+        example: "0.17632"
+        format: string
+        type: string
+    type: object
   responses.Enums:
     properties:
       event_type:
@@ -3053,6 +3064,53 @@ paths:
       summary: Get rollup blobs
       tags:
       - rollup
+  /v1/rollup/{id}/distribution/{name}/{timeframe}:
+    get:
+      description: Get rollup distribution
+      operationId: get-rollup-distribution
+      parameters:
+      - description: Internal identity
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Series name
+        enum:
+        - blobs_count
+        - size
+        - size_per_blob
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Timeframe
+        enum:
+        - hour
+        - day
+        in: path
+        name: timeframe
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.DistributionItem'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get rollup distribution
+      tags:
+      - rollup
   /v1/rollup/{id}/namespaces:
     get:
       description: Get rollup namespaces info
@@ -3106,6 +3164,7 @@ paths:
         enum:
         - blobs_count
         - size
+        - size_per_blob
         in: path
         name: name
         required: true

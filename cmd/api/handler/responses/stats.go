@@ -5,6 +5,7 @@ package responses
 
 import (
 	"encoding/hex"
+	"strconv"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -88,4 +89,24 @@ func NewPrice(price storage.Price) Price {
 		Low:   price.Low.String(),
 		Close: price.Close.String(),
 	}
+}
+
+type DistributionItem struct {
+	Name  string `example:"12"      format:"string" json:"name"  swaggertype:"string"`
+	Value string `example:"0.17632" format:"string" json:"value" swaggertype:"string"`
+}
+
+func NewDistributionItem(item storage.DistributionItem, tf string) (result DistributionItem) {
+	result.Value = item.Value
+
+	switch tf {
+	case "day":
+		result.Name = time.Weekday(item.Name).String()
+	case "hour":
+		result.Name = strconv.FormatInt(int64(item.Name), 10)
+	default:
+		result.Name = strconv.FormatInt(int64(item.Name), 10)
+	}
+
+	return
 }

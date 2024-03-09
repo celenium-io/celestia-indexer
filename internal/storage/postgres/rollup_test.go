@@ -71,7 +71,7 @@ func (s *StorageTestSuite) TestRollupSeries() {
 		"day", "hour", "month",
 	} {
 		for _, column := range []string{
-			"size", "blobs_count",
+			"size", "blobs_count", "size_per_blob",
 		} {
 			series, err := s.storage.Rollup.Series(ctx, 1, tf, column, storage.SeriesRequest{
 				From: time.Date(2023, 1, 1, 1, 1, 1, 1, time.UTC),
@@ -105,4 +105,22 @@ func (s *StorageTestSuite) TestRollupsByNamespace() {
 	rollup := rollups[0]
 	s.Require().Greater(rollup.Id, uint64(0))
 	s.Require().NotEmpty(rollup.Name)
+}
+
+func (s *StorageTestSuite) TestRollupDistribution() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	for _, groupBy := range []string{
+		"day", "hour",
+	} {
+		for _, series := range []string{
+			"size", "blobs_count", "size_per_blob",
+		} {
+			items, err := s.storage.Rollup.Distribution(ctx, 1, series, groupBy)
+			s.Require().NoError(err)
+			s.Require().Len(items, 1, groupBy, series)
+
+		}
+	}
 }

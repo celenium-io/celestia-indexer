@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
@@ -128,6 +129,8 @@ func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe, column 
 		query = query.ColumnExpr("sum(blobs_count) as value, time as bucket")
 	case "size":
 		query = query.ColumnExpr("sum(size) as value, time as bucket")
+	case "size_per_blob":
+		query = query.ColumnExpr("(sum(size) / sum(blobs_count)) as value, time as bucket")
 	default:
 		return nil, errors.Errorf("invalid column: %s", column)
 	}
@@ -195,5 +198,62 @@ func (r *Rollup) Stats(ctx context.Context, rollupId uint64) (stats storage.Roll
 
 func (r *Rollup) BySlug(ctx context.Context, slug string) (rollup storage.Rollup, err error) {
 	err = r.DB().NewSelect().Model(&rollup).Where("slug = ?", slug).Limit(1).Scan(ctx)
+	return
+}
+
+func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series, groupBy string) (items []storage.DistributionItem, err error) {
+	providers, err := r.Providers(ctx, rollupId)
+	if err != nil {
+		return
+	}
+
+	if len(providers) == 0 {
+		return
+	}
+
+	cte := r.DB().NewSelect()
+
+	for i := range providers {
+		cte.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
+			if providers[i].NamespaceId > 0 {
+				return sq.
+					Where("namespace_id = ?", providers[i].NamespaceId).
+					Where("signer_id = ?", providers[i].AddressId)
+			}
+			return sq.Where("signer_id = ?", providers[i].AddressId)
+		})
+	}
+
+	switch groupBy {
+	case "day":
+		cte = cte.Table("rollup_stats_by_day").
+			ColumnExpr("extract(isodow from time) as name").
+			Where("time >= ?", time.Now().AddDate(0, -6, 0).UTC())
+	case "hour":
+		cte = cte.Table("rollup_stats_by_hour").
+			ColumnExpr("extract(hour from time) as name").
+			Where("time >= ?", time.Now().AddDate(0, -1, 0).UTC())
+	default:
+		err = errors.Errorf("invalid distribution rollup groupBy: %s", groupBy)
+		return
+	}
+
+	switch series {
+	case "size":
+		cte = cte.ColumnExpr("size as value")
+	case "blobs_count":
+		cte = cte.ColumnExpr("blobs_count as value")
+	case "size_per_blob":
+		cte = cte.ColumnExpr("(size / blobs_count) as value")
+	default:
+		err = errors.Errorf("invalid distribution rollup series: %s", groupBy)
+		return
+	}
+
+	err = r.DB().NewSelect().
+		TableExpr("(?) as cte", cte).
+		ColumnExpr("name, avg(value) as value").
+		Group("name").
+		Scan(ctx, &items)
 	return
 }

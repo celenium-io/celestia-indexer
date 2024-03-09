@@ -160,6 +160,45 @@ func (c *IRollupCursorListCall) DoAndReturn(f func(context.Context, uint64, uint
 	return c
 }
 
+// Distribution mocks base method.
+func (m *MockIRollup) Distribution(ctx context.Context, rollupId uint64, series, groupBy string) ([]storage.DistributionItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Distribution", ctx, rollupId, series, groupBy)
+	ret0, _ := ret[0].([]storage.DistributionItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Distribution indicates an expected call of Distribution.
+func (mr *MockIRollupMockRecorder) Distribution(ctx, rollupId, series, groupBy any) *IRollupDistributionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Distribution", reflect.TypeOf((*MockIRollup)(nil).Distribution), ctx, rollupId, series, groupBy)
+	return &IRollupDistributionCall{Call: call}
+}
+
+// IRollupDistributionCall wrap *gomock.Call
+type IRollupDistributionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IRollupDistributionCall) Return(items []storage.DistributionItem, err error) *IRollupDistributionCall {
+	c.Call = c.Call.Return(items, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IRollupDistributionCall) Do(f func(context.Context, uint64, string, string) ([]storage.DistributionItem, error)) *IRollupDistributionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IRollupDistributionCall) DoAndReturn(f func(context.Context, uint64, string, string) ([]storage.DistributionItem, error)) *IRollupDistributionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // GetByID mocks base method.
 func (m *MockIRollup) GetByID(ctx context.Context, id uint64) (*storage.Rollup, error) {
 	m.ctrl.T.Helper()

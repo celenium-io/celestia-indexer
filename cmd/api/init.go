@@ -402,7 +402,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	v1.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	if cfg.ApiConfig.Websocket {
-		initWebsocket(ctx, db, v1)
+		initWebsocket(ctx, v1)
 	}
 
 	rollupHandler := handler.NewRollupHandler(db.Rollup, db.Namespace, db.BlobLogs)
@@ -417,6 +417,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			rollup.GET("/namespaces", rollupHandler.GetNamespaces)
 			rollup.GET("/blobs", rollupHandler.GetBlobs)
 			rollup.GET("/stats/:name/:timeframe", rollupHandler.Stats)
+			rollup.GET("/distribution/:name/:timeframe", rollupHandler.Distribution)
 		}
 	}
 
@@ -470,7 +471,7 @@ var (
 	endpointCache *cache.Cache
 )
 
-func initWebsocket(ctx context.Context, db postgres.Storage, group *echo.Group) {
+func initWebsocket(ctx context.Context, group *echo.Group) {
 	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelBlock)
 	wsManager = websocket.NewManager(observer)
 	wsManager.Start(ctx)

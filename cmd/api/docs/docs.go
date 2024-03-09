@@ -2479,6 +2479,74 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/rollup/{id}/distribution/{name}/{timeframe}": {
+            "get": {
+                "description": "Get rollup distribution",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rollup"
+                ],
+                "summary": "Get rollup distribution",
+                "operationId": "get-rollup-distribution",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal identity",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "blobs_count",
+                            "size",
+                            "size_per_blob"
+                        ],
+                        "type": "string",
+                        "description": "Series name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "hour",
+                            "day"
+                        ],
+                        "type": "string",
+                        "description": "Timeframe",
+                        "name": "timeframe",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.DistributionItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/rollup/{id}/namespaces": {
             "get": {
                 "description": "Get rollup namespaces info",
@@ -2559,7 +2627,8 @@ const docTemplate = `{
                     {
                         "enum": [
                             "blobs_count",
-                            "size"
+                            "size",
+                            "size_per_blob"
                         ],
                         "type": "string",
                         "description": "Series name",
@@ -4761,6 +4830,21 @@ const docTemplate = `{
                 "uri": {
                     "type": "string",
                     "example": "https://example.com"
+                }
+            }
+        },
+        "responses.DistributionItem": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "12"
+                },
+                "value": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.17632"
                 }
             }
         },
