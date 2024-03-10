@@ -63,8 +63,6 @@ func (p *Module) parse(b types.BlockData) error {
 		},
 	}
 
-	parseValidatorUpdates(decodeCtx, b.ValidatorUpdates)
-
 	txs, err := parseTxs(decodeCtx, b)
 	if err != nil {
 		return errors.Wrapf(err, "while parsing block on level=%d", b.Height)
