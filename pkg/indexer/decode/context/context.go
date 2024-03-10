@@ -9,19 +9,17 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
-	"github.com/shopspring/decimal"
 )
 
 type Context struct {
-	Validators       *sync.Map[string, *storage.Validator]
-	JailedValidators *sync.Map[string, *storage.Validator]
-	Addresses        *sync.Map[string, *storage.Address]
-	Delegations      *sync.Map[string, *storage.Delegation]
+	Validators  *sync.Map[string, *storage.Validator]
+	Addresses   *sync.Map[string, *storage.Address]
+	Delegations *sync.Map[string, *storage.Delegation]
+	Jails       *sync.Map[string, *storage.Jail]
 
 	Redelegations   []storage.Redelegation
 	Undelegations   []storage.Undelegation
 	CancelUnbonding []storage.Undelegation
-	Jails           []storage.Jail
 	StakingLogs     []storage.StakingLog
 
 	Block *storage.Block
@@ -29,15 +27,14 @@ type Context struct {
 
 func NewContext() *Context {
 	return &Context{
-		Validators:       sync.NewMap[string, *storage.Validator](),
-		Addresses:        sync.NewMap[string, *storage.Address](),
-		Delegations:      sync.NewMap[string, *storage.Delegation](),
-		JailedValidators: sync.NewMap[string, *storage.Validator](),
-		Redelegations:    make([]storage.Redelegation, 0),
-		Undelegations:    make([]storage.Undelegation, 0),
-		CancelUnbonding:  make([]storage.Undelegation, 0),
-		StakingLogs:      make([]storage.StakingLog, 0),
-		Jails:            make([]storage.Jail, 0),
+		Validators:      sync.NewMap[string, *storage.Validator](),
+		Addresses:       sync.NewMap[string, *storage.Address](),
+		Delegations:     sync.NewMap[string, *storage.Delegation](),
+		Jails:           sync.NewMap[string, *storage.Jail](),
+		Redelegations:   make([]storage.Redelegation, 0),
+		Undelegations:   make([]storage.Undelegation, 0),
+		CancelUnbonding: make([]storage.Undelegation, 0),
+		StakingLogs:     make([]storage.StakingLog, 0),
 	}
 }
 
@@ -155,17 +152,21 @@ func (ctx *Context) AddCancelUndelegation(u storage.Undelegation) {
 	ctx.CancelUnbonding = append(ctx.CancelUnbonding, u)
 }
 
-func (ctx *Context) AddJailedValidator(address string, burned decimal.Decimal) {
-	jailed := true
-	ctx.JailedValidators.Set(address, &storage.Validator{
-		ConsAddress: address,
-		Stake:       burned.Neg(),
-		Jailed:      &jailed,
-	})
-}
-
-func (ctx *Context) AddJail(j storage.Jail) {
-	ctx.Jails = append(ctx.Jails, j)
+func (ctx *Context) AddJail(jail storage.Jail) {
+	if j, ok := ctx.Jails.Get(jail.Validator.ConsAddress); ok {
+		if jail.Reason != "" {
+			j.Reason = jail.Reason
+		}
+		if !jail.Burned.IsZero() {
+			j.Validator.Stake = j.Validator.Stake.Sub(jail.Burned)
+			j.Burned = j.Burned.Add(jail.Burned)
+		}
+		if jail.Validator.Jailed != nil {
+			j.Validator.Jailed = jail.Validator.Jailed
+		}
+	} else {
+		ctx.Jails.Set(jail.Validator.ConsAddress, &jail)
+	}
 }
 
 func (ctx *Context) AddStakingLog(l storage.StakingLog) {

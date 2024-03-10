@@ -16,19 +16,43 @@ func (module *Module) saveValidators(
 	ctx context.Context,
 	tx storage.Transaction,
 	validators []*storage.Validator,
-	jailed *sync.Map[string, *storage.Validator],
-	jails []storage.Jail,
+	jails *sync.Map[string, *storage.Jail],
 ) (int, error) {
-	if jailed.Len() > 0 {
+	if jails.Len() > 0 {
 		jailedVals := make([]*storage.Validator, 0)
-		err := jailed.Range(func(address string, val *storage.Validator) (error, bool) {
+		jailsArr := make([]storage.Jail, 0)
+
+		err := jails.Range(func(address string, j *storage.Jail) (error, bool) {
 			if id, ok := module.validatorsByConsAddress[address]; ok {
-				val.Id = id
-				jailedVals = append(jailedVals, val)
+				j.ValidatorId = id
+				j.Validator.Id = id
+				jailedVals = append(jailedVals, j.Validator)
+			} else {
+				return errors.Errorf("unknown jailed validator: %s", address), false
+			}
+
+			jailsArr = append(jailsArr, *j)
+
+			fraction := decimal.Zero
+			switch j.Reason {
+			case "double_sign":
+				fraction = module.slashingForDoubleSign.Copy()
+			case "missing_signature":
+				fraction = module.slashingForDowntime.Copy()
+			}
+			if !fraction.IsPositive() {
 				return nil, false
 			}
 
-			return errors.Errorf("unknown jailed validator: %s", address), false
+			balanceUpdates, err := tx.UpdateSlashedDelegations(ctx, j.ValidatorId, fraction)
+			if err != nil {
+				return err, false
+			}
+			if err := tx.SaveBalances(ctx, balanceUpdates...); err != nil {
+				return err, false
+			}
+
+			return nil, false
 		})
 		if err != nil {
 			return 0, err
@@ -37,35 +61,8 @@ func (module *Module) saveValidators(
 		if err := tx.Jail(ctx, jailedVals...); err != nil {
 			return 0, err
 		}
-	}
 
-	if len(jails) > 0 {
-		for i := range jails {
-			if id, ok := module.validatorsByConsAddress[jails[i].Validator.ConsAddress]; ok {
-				jails[i].ValidatorId = id
-			}
-
-			fraction := decimal.Zero
-			switch jails[i].Reason {
-			case "double_sign":
-				fraction = module.slashingForDoubleSign.Copy()
-			case "missing_signature":
-				fraction = module.slashingForDowntime.Copy()
-			}
-			if !fraction.IsPositive() {
-				continue
-			}
-
-			balanceUpdates, err := tx.UpdateSlashedDelegations(ctx, jails[i].ValidatorId, fraction)
-			if err != nil {
-				return 0, err
-			}
-			if err := tx.SaveBalances(ctx, balanceUpdates...); err != nil {
-				return 0, err
-			}
-		}
-
-		if err := tx.SaveJails(ctx, jails...); err != nil {
+		if err := tx.SaveJails(ctx, jailsArr...); err != nil {
 			return 0, err
 		}
 	}

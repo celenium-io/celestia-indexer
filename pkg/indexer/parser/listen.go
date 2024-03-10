@@ -5,6 +5,7 @@ package parser
 
 import (
 	"context"
+
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
@@ -30,7 +31,7 @@ func (p *Module) listen(ctx context.Context) {
 				continue
 			}
 
-			if err := p.parse(ctx, block); err != nil {
+			if err := p.parse(block); err != nil {
 				p.Log.Err(err).
 					Uint64("height", uint64(block.Height)).
 					Msg("block parsing error")

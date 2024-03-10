@@ -4,7 +4,6 @@
 package parser
 
 import (
-	"context"
 	"encoding/hex"
 	"strings"
 	"time"
@@ -17,7 +16,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func (p *Module) parse(ctx context.Context, b types.BlockData) error {
+func (p *Module) parse(b types.BlockData) error {
 	start := time.Now()
 	p.Log.Info().
 		Int64("height", b.Block.Height).
@@ -60,8 +59,11 @@ func (p *Module) parse(ctx context.Context, b types.BlockData) error {
 			InflationRate: decimal.Zero,
 			Commissions:   decimal.Zero,
 			Rewards:       decimal.Zero,
+			SquareSize:    b.Block.Data.SquareSize,
 		},
 	}
+
+	parseValidatorUpdates(decodeCtx, b.ValidatorUpdates)
 
 	txs, err := parseTxs(decodeCtx, b)
 	if err != nil {

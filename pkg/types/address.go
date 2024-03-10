@@ -4,9 +4,11 @@
 package types
 
 import (
+	"crypto/ed25519"
 	"encoding/hex"
 	"math/big"
 
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -56,4 +58,20 @@ func NewConsAddressFromBytes(data []byte) (Address, error) {
 		return "", nil
 	}
 	return Address(s), nil
+}
+
+func NewValoperAddressFromBytes(data []byte) (Address, error) {
+	s, err := bech32.ConvertAndEncode(AddressPrefixValoper, data)
+	if err != nil {
+		return "", nil
+	}
+
+	return Address(s), nil
+}
+
+func GetConsAddressBytesFromPubKey(data []byte) []byte {
+	pk := cryptotypes.PubKey{
+		Key: ed25519.PublicKey(data),
+	}
+	return pk.Address().Bytes()
 }

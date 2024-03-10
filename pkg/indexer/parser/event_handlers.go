@@ -186,8 +186,8 @@ func parseSlash(ctx *context.Context, data map[string]any) error {
 			return err
 		}
 		consAddress := strings.ToUpper(hex.EncodeToString(hash))
-		ctx.AddJailedValidator(consAddress, slash.BurnedCoins.Copy())
 
+		jailed := true
 		ctx.AddJail(storage.Jail{
 			Height: ctx.Block.Height,
 			Time:   ctx.Block.Time,
@@ -195,6 +195,8 @@ func parseSlash(ctx *context.Context, data map[string]any) error {
 			Burned: slash.BurnedCoins,
 			Validator: &storage.Validator{
 				ConsAddress: consAddress,
+				Stake:       slash.BurnedCoins.Copy(),
+				Jailed:      &jailed,
 			},
 		})
 	}

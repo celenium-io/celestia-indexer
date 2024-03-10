@@ -200,6 +200,9 @@ definitions:
       rewards:
         example: "102102812"
         type: string
+      square_size:
+        example: 16
+        type: integer
       supply_change:
         example: "8635234"
         type: string
