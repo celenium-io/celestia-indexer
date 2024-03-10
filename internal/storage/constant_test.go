@@ -2,10 +2,10 @@ package storage
 
 import (
 	"github.com/stretchr/testify/assert"
-  "testing"
+	"testing"
 )
 
 func TestTableName(t *testing.T) {
-  constant := Constant{}
-  assert.Equal(t, "constant", constant.TableName())
+	constant := Constant{}
+	assert.Equal(t, "constant", constant.TableName())
 }
