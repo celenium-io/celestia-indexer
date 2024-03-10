@@ -1,7 +1,6 @@
 package cache
 
 import (
-	_ "bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
