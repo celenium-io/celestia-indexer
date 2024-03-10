@@ -48,12 +48,13 @@ func TestResult(t *testing.T) {
 	w := httptest.NewRecorder()
 	recorder := NewResponseRecorder(w)
 	recorder.WriteHeader(http.StatusOK)
-	_, err := recorder.Write([]byte("test data"))
+	const data = "test data"
+	_, err := recorder.Write([]byte(data))
 	if err != nil {
 		t.Errorf("Error on write: %v", err)
 	}
 	result := recorder.Result()
-	if result.StatusCode != http.StatusOK || string(result.Body) != "test data" {
+	if result.StatusCode != http.StatusOK || string(result.Body) != data {
 		t.Errorf("Incorrect CacheEntry returned")
 	}
 }
@@ -63,7 +64,7 @@ func TestEncodeDecode(t *testing.T) {
 		Header:     make(http.Header),
 		StatusCode: http.StatusOK,
 		Body:       []byte("test data"),
- 	}
+	}
 	data, err := entry.Encode()
 	if err != nil {
 		t.Errorf("Error encoding CacheEntry")
@@ -76,14 +77,14 @@ func TestEncodeDecode(t *testing.T) {
 }
 
 func TestReplay(t *testing.T) {
-    entry := &CacheEntry{   
-        Header:     make(http.Header),
-        StatusCode: http.StatusOK,
-        Body:       []byte("test data"),
-    }
-    w := httptest.NewRecorder()
-    err := entry.Replay(w)
-    if err != nil || w.Code != http.StatusOK || w.Body.String() != "test data" {
-        t.Errorf("Error replaying CacheEntry")
-    }
+	entry := &CacheEntry{
+		Header:     make(http.Header),
+		StatusCode: http.StatusOK,
+		Body:       []byte("test data"),
+	}
+	w := httptest.NewRecorder()
+	err := entry.Replay(w)
+	if err != nil || w.Code != http.StatusOK || w.Body.String() != "test data" {
+		t.Errorf("Error replaying CacheEntry")
+	}
 }
