@@ -254,6 +254,7 @@ func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series, grou
 		TableExpr("(?) as cte", cte).
 		ColumnExpr("name, avg(value) as value").
 		Group("name").
+		Order("name asc").
 		Scan(ctx, &items)
 	return
 }
