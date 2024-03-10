@@ -106,6 +106,11 @@ type SeriesRequest struct {
 	To   time.Time
 }
 
+type DistributionItem struct {
+	Name  int    `bun:"name"`
+	Value string `bun:"value"`
+}
+
 func NewSeriesRequest(from, to int64) SeriesRequest {
 	var seriesRequest SeriesRequest
 	if from > 0 {

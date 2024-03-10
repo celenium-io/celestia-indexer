@@ -223,7 +223,7 @@ func (s *RollupTestSuite) TestGetBlobs() {
 }
 
 func (s *RollupTestSuite) TestStats() {
-	for _, name := range []string{"blobs_count", "size"} {
+	for _, name := range []string{"blobs_count", "size", "size_per_blob"} {
 		for _, tf := range []string{"hour", "day", "month"} {
 			req := httptest.NewRequest(http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
@@ -248,6 +248,36 @@ func (s *RollupTestSuite) TestStats() {
 			err := json.NewDecoder(rec.Body).Decode(&histogram)
 			s.Require().NoError(err)
 			s.Require().Len(histogram, 1)
+		}
+	}
+}
+
+func (s *RollupTestSuite) TestDistribution() {
+	for _, name := range []string{"blobs_count", "size", "size_per_blob"} {
+		for _, tf := range []string{"hour", "day"} {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/rollup/:id/distribution/:name/:timeframe")
+			c.SetParamNames("id", "name", "timeframe")
+			c.SetParamValues("1", name, tf)
+
+			s.rollups.EXPECT().
+				Distribution(gomock.Any(), uint64(1), name, tf).
+				Return([]storage.DistributionItem{
+					{
+						Value: "0.1",
+						Name:  10,
+					},
+				}, nil)
+
+			s.Require().NoError(s.handler.Distribution(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
+
+			var distr []responses.DistributionItem
+			err := json.NewDecoder(rec.Body).Decode(&distr)
+			s.Require().NoError(err)
+			s.Require().Len(distr, 1)
 		}
 	}
 }
