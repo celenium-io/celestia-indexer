@@ -4755,6 +4755,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "102102812"
                 },
+                "square_size": {
+                    "type": "integer",
+                    "example": 16
+                },
                 "supply_change": {
                     "type": "string",
                     "example": "8635234"

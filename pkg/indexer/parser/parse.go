@@ -59,8 +59,11 @@ func (p *Module) parse(b types.BlockData) error {
 			InflationRate: decimal.Zero,
 			Commissions:   decimal.Zero,
 			Rewards:       decimal.Zero,
+			SquareSize:    b.Block.Data.SquareSize,
 		},
 	}
+
+	parseValidatorUpdates(decodeCtx, b.ValidatorUpdates)
 
 	txs, err := parseTxs(decodeCtx, b)
 	if err != nil {

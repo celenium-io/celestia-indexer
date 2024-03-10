@@ -80,6 +80,7 @@ type BlockStats struct {
 	GasLimit       int64                   `example:"1234"                            json:"gas_limit"       swaggertype:"integer"`
 	GasUsed        int64                   `example:"1234"                            json:"gas_used"        swaggertype:"integer"`
 	BytesInBlock   int64                   `example:"1234"                            json:"bytes_in_block"  swaggertype:"integer"`
+	SquareSize     uint64                  `example:"16"                              json:"square_size"     swaggertype:"integer"`
 	MessagesCounts map[types.MsgType]int64 `example:"{MsgPayForBlobs:10,MsgUnjail:1}" json:"messages_counts" swaggertype:"string"`
 }
 
@@ -103,6 +104,7 @@ func NewBlockStats(stats storage.BlockStats) *BlockStats {
 		GasLimit:       stats.GasLimit,
 		GasUsed:        stats.GasUsed,
 		BytesInBlock:   stats.BytesInBlock,
+		SquareSize:     stats.SquareSize,
 		FillRate:       fmt.Sprintf("%.4f", float64(stats.BytesInBlock)/float64(maxSize)),
 	}
 }

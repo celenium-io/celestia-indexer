@@ -312,7 +312,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	totalValidators, err := module.saveValidators(ctx, tx, dCtx.GetValidators(), dCtx.JailedValidators, dCtx.Jails)
+	totalValidators, err := module.saveValidators(ctx, tx, dCtx.GetValidators(), dCtx.Jails)
 	if err != nil {
 		return state, err
 	}

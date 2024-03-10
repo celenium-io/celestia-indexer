@@ -52,8 +52,17 @@ type EventAttribute struct {
 
 // ValidatorUpdate
 type ValidatorUpdate struct {
-	// PubKey any   `json:"pub_key"                protobuf:"bytes,1,opt,name=pub_key,json=pubKey,proto3"` // crypto.PublicKey
-	Power int64 `json:"power,omitempty,string" protobuf:"varint,2,opt,name=power,proto3"`
+	PubKey PubKey `json:"pub_key"`
+	Power  *int64 `json:"power,omitempty,string"`
+}
+
+type PubKey struct {
+	Sum struct {
+		Type  string `json:"type"`
+		Value struct {
+			Ed25519 []byte `json:"ed25519"`
+		} `json:"value"`
+	} `json:"Sum"`
 }
 
 // ConsensusParams contains all consensus-relevant parameters

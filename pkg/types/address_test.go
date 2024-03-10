@@ -4,6 +4,9 @@
 package types
 
 import (
+	"encoding/base64"
+	"encoding/hex"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -173,6 +176,33 @@ func TestAddress_Decode(t *testing.T) {
 				require.Equal(t, tt.want, got)
 				require.Equal(t, tt.want1, got1)
 			}
+		})
+	}
+}
+
+func TestGetConsAddressBytesFromPubKey(t *testing.T) {
+	tests := []struct {
+		name string
+		data string
+		want string
+	}{
+		{
+			name: "test 1",
+			data: "BAYGw7aWpwoWogn2t5JZdEXvu3g6CEjgpXf4aq7JjmA=",
+			want: "5BE36E57293ECCF5BE945A114F21C379B6C5F496",
+		}, {
+			name: "test 2",
+			data: "hykgLmpkKVGwfjJRxafw9ymRmckZ8b8bQ7LS6rrWi58=",
+			want: "D74EC29E6E4597943942E7E97B1F519A0615E3B4",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, err := base64.StdEncoding.DecodeString(tt.data)
+			require.NoError(t, err)
+
+			got := GetConsAddressBytesFromPubKey(b)
+			require.Equal(t, tt.want, strings.ToUpper(hex.EncodeToString(got)))
 		})
 	}
 }
