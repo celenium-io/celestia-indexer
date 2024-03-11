@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestTableName(t *testing.T) {
+func TestDenomMetadata_TableName(t *testing.T) {
 	denom_metadata := DenomMetadata{}
 	assert.Equal(t, "denom_metadata", denom_metadata.TableName())
 }

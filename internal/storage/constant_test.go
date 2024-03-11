@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestTableName(t *testing.T) {
+func TestConstant_TableName(t *testing.T) {
 	constant := Constant{}
 	assert.Equal(t, "constant", constant.TableName())
 }
