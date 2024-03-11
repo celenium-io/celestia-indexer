@@ -121,6 +121,8 @@ type Transaction interface {
 	LastNamespaceMessage(ctx context.Context, nsId uint64) (msg NamespaceMessage, err error)
 	LastAddressAction(ctx context.Context, address []byte) (uint64, error)
 	GetProposerId(ctx context.Context, address string) (uint64, error)
+	Validator(ctx context.Context, id uint64) (val Validator, err error)
+	Delegation(ctx context.Context, validatorId, addressId uint64) (val Delegation, err error)
 }
 
 const (

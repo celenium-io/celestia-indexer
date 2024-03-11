@@ -508,6 +508,45 @@ func (c *TransactionCopyFromCall) DoAndReturn(f func(context.Context, string, []
 	return c
 }
 
+// Delegation mocks base method.
+func (m *MockTransaction) Delegation(ctx context.Context, validatorId, addressId uint64) (storage.Delegation, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delegation", ctx, validatorId, addressId)
+	ret0, _ := ret[0].(storage.Delegation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Delegation indicates an expected call of Delegation.
+func (mr *MockTransactionMockRecorder) Delegation(ctx, validatorId, addressId any) *TransactionDelegationCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delegation", reflect.TypeOf((*MockTransaction)(nil).Delegation), ctx, validatorId, addressId)
+	return &TransactionDelegationCall{Call: call}
+}
+
+// TransactionDelegationCall wrap *gomock.Call
+type TransactionDelegationCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionDelegationCall) Return(val storage.Delegation, err error) *TransactionDelegationCall {
+	c.Call = c.Call.Return(val, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionDelegationCall) Do(f func(context.Context, uint64, uint64) (storage.Delegation, error)) *TransactionDelegationCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionDelegationCall) DoAndReturn(f func(context.Context, uint64, uint64) (storage.Delegation, error)) *TransactionDelegationCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // DeleteBalances mocks base method.
 func (m *MockTransaction) DeleteBalances(ctx context.Context, ids []uint64) error {
 	m.ctrl.T.Helper()
@@ -2920,6 +2959,45 @@ func (c *TransactionUpdateValidatorsCall) Do(f func(context.Context, ...*storage
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *TransactionUpdateValidatorsCall) DoAndReturn(f func(context.Context, ...*storage.Validator) error) *TransactionUpdateValidatorsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Validator mocks base method.
+func (m *MockTransaction) Validator(ctx context.Context, id uint64) (storage.Validator, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Validator", ctx, id)
+	ret0, _ := ret[0].(storage.Validator)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Validator indicates an expected call of Validator.
+func (mr *MockTransactionMockRecorder) Validator(ctx, id any) *TransactionValidatorCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validator", reflect.TypeOf((*MockTransaction)(nil).Validator), ctx, id)
+	return &TransactionValidatorCall{Call: call}
+}
+
+// TransactionValidatorCall wrap *gomock.Call
+type TransactionValidatorCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionValidatorCall) Return(val storage.Validator, err error) *TransactionValidatorCall {
+	c.Call = c.Call.Return(val, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionValidatorCall) Do(f func(context.Context, uint64) (storage.Validator, error)) *TransactionValidatorCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionValidatorCall) DoAndReturn(f func(context.Context, uint64) (storage.Validator, error)) *TransactionValidatorCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

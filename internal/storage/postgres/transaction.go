@@ -668,12 +668,30 @@ func (tx Transaction) UpdateValidators(ctx context.Context, validators ...*model
 		return nil
 	}
 
-	_, err := tx.Tx().NewUpdate().Model(&validators).
-		Set("stake = validator.stake + EXCLUDED.stake").
-		Set("jailed = EXCLUDED.jailed").
-		Set("commissions = validator.commissions + EXCLUDED.commissions").
-		Set("rewards = validator.rewards + EXCLUDED.rewards").
-		Exec(ctx)
+	values := tx.Tx().NewValues(&validators)
 
+	_, err := tx.Tx().NewUpdate().
+		With("_data", values).
+		Model((*models.Validator)(nil)).
+		TableExpr("_data").
+		Set("stake = validator.stake + _data.stake").
+		Set("jailed = _data.jailed").
+		Set("commissions = validator.commissions + _data.commissions").
+		Set("rewards = validator.rewards + _data.rewards").
+		Where("validator.id = _data.id").
+		Exec(ctx)
 	return err
+}
+
+func (tx Transaction) Validator(ctx context.Context, id uint64) (val models.Validator, err error) {
+	err = tx.Tx().NewSelect().Model(&val).Where("id = ?", id).Scan(ctx)
+	return
+}
+
+func (tx Transaction) Delegation(ctx context.Context, validatorId, addressId uint64) (val models.Delegation, err error) {
+	err = tx.Tx().NewSelect().Model(&val).
+		Where("validator_id = ?", validatorId).
+		Where("address_id = ?", addressId).
+		Scan(ctx)
+	return
 }
