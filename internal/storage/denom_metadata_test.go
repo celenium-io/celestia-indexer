@@ -1,1 +1,11 @@
 package storage
+
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
+
+func TestTableName(t *testing.T) {
+	denom_metadata := DenomMetadata{}
+	assert.Equal(t, "denom_metadata", denom_metadata.TableName())
+}
