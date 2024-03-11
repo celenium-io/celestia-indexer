@@ -81,11 +81,15 @@ func (module *Module) saveValidators(
 	}
 
 	for i := range validators {
-		if validators[i].ConsAddress == "" {
-			continue
+		if validators[i].ConsAddress != "" {
+			module.validatorsByConsAddress[validators[i].ConsAddress] = validators[i].Id
 		}
-		module.validatorsByConsAddress[validators[i].ConsAddress] = validators[i].Id
-		module.validatorsByAddress[validators[i].Address] = validators[i].Id
+		if validators[i].Address != "" {
+			module.validatorsByAddress[validators[i].Address] = validators[i].Id
+		}
+		if validators[i].Delegator != "" {
+			module.validatorsByDelegator[validators[i].Delegator] = validators[i].Id
+		}
 	}
 
 	return count, nil

@@ -41,6 +41,7 @@ type Module struct {
 	notificator             storage.Notificator
 	validatorsByConsAddress map[string]uint64
 	validatorsByAddress     map[string]uint64
+	validatorsByDelegator   map[string]uint64
 
 	slashingForDowntime   decimal.Decimal
 	slashingForDoubleSign decimal.Decimal
@@ -51,7 +52,7 @@ var _ modules.Module = (*Module)(nil)
 
 // NewModule -
 func NewModule(
-	storage sdk.Transactable,
+	tx sdk.Transactable,
 	constants storage.IConstant,
 	validators storage.IValidator,
 	notificator storage.Notificator,
@@ -59,12 +60,13 @@ func NewModule(
 ) Module {
 	m := Module{
 		BaseModule:              modules.New("storage"),
-		storage:                 storage,
+		storage:                 tx,
 		constants:               constants,
 		validators:              validators,
 		notificator:             notificator,
 		validatorsByConsAddress: make(map[string]uint64),
 		validatorsByAddress:     make(map[string]uint64),
+		validatorsByDelegator:   make(map[string]uint64),
 		slashingForDowntime:     decimal.Zero,
 		slashingForDoubleSign:   decimal.Zero,
 		indexerName:             cfg.Name,
@@ -99,6 +101,7 @@ func (module *Module) init(ctx context.Context) error {
 		for i := range validators {
 			module.validatorsByConsAddress[validators[i].ConsAddress] = validators[i].Id
 			module.validatorsByAddress[validators[i].Address] = validators[i].Id
+			module.validatorsByDelegator[validators[i].Delegator] = validators[i].Id
 		}
 		offset += len(validators)
 		end = limit > len(validators)
