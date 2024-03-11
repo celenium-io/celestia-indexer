@@ -131,6 +131,8 @@ func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe, column 
 		query = query.ColumnExpr("sum(size) as value, time as bucket")
 	case "size_per_blob":
 		query = query.ColumnExpr("(sum(size) / sum(blobs_count)) as value, time as bucket")
+	case "fee":
+		query = query.ColumnExpr("sum(fee) as value, time as bucket")
 	default:
 		return nil, errors.Errorf("invalid column: %s", column)
 	}

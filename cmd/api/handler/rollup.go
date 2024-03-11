@@ -216,7 +216,7 @@ func (handler RollupHandler) GetBlobs(c echo.Context) error {
 type rollupStatsRequest struct {
 	Id         uint64 `example:"1"          param:"id"        swaggertype:"integer" validate:"required,min=1"`
 	Timeframe  string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day month"`
-	SeriesName string `example:"tps"        param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_count size size_per_blob"`
+	SeriesName string `example:"tps"        param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_count size size_per_blob fee"`
 	From       int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
 	To         int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
 }
@@ -228,7 +228,7 @@ type rollupStatsRequest struct {
 //	@Tags			rollup
 //	@ID				get-rollup-stats
 //	@Param			id			path	integer	true	"Internal identity"				mininum(1)
-//	@Param			name		path	string	true	"Series name"					Enums(blobs_count, size, size_per_blob)
+//	@Param			name		path	string	true	"Series name"					Enums(blobs_count, size, size_per_blob, fee)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
 //	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)

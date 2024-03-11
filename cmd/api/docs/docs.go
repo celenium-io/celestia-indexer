@@ -2628,7 +2628,8 @@ const docTemplate = `{
                         "enum": [
                             "blobs_count",
                             "size",
-                            "size_per_blob"
+                            "size_per_blob",
+                            "fee"
                         ],
                         "type": "string",
                         "description": "Series name",
