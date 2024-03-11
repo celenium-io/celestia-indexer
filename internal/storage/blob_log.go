@@ -10,6 +10,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -36,12 +37,13 @@ type IBlobLog interface {
 type BlobLog struct {
 	bun.BaseModel `bun:"blob_log" comment:"Table with flatted blob entities."`
 
-	Id          uint64      `bun:"id,pk,autoincrement" comment:"Unique internal identity"`
-	Time        time.Time   `bun:"time,notnull,pk"     comment:"Message time"`
-	Height      types.Level `bun:"height"              comment:"Message block height"`
-	Size        int64       `bun:"size"                comment:"Blob size"`
-	Commitment  string      `bun:"commitment"          comment:"Blob commitment"`
-	ContentType string      `bun:"content_type"        comment:"Blob content type"`
+	Id          uint64          `bun:"id,pk,autoincrement" comment:"Unique internal identity"`
+	Time        time.Time       `bun:"time,notnull,pk"     comment:"Message time"`
+	Height      types.Level     `bun:"height"              comment:"Message block height"`
+	Size        int64           `bun:"size"                comment:"Blob size"`
+	Commitment  string          `bun:"commitment"          comment:"Blob commitment"`
+	ContentType string          `bun:"content_type"        comment:"Blob content type"`
+	Fee         decimal.Decimal `bun:"fee,type:numeric"    comment:"Fee per blob"`
 
 	SignerId    uint64 `bun:"signer_id"    comment:"Blob signer identity"`
 	NamespaceId uint64 `bun:"namespace_id" comment:"Namespace internal id"`

@@ -3168,6 +3168,7 @@ paths:
         - blobs_count
         - size
         - size_per_blob
+        - fee
         in: path
         name: name
         required: true

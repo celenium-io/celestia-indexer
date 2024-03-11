@@ -71,7 +71,7 @@ func (s *StorageTestSuite) TestRollupSeries() {
 		"day", "hour", "month",
 	} {
 		for _, column := range []string{
-			"size", "blobs_count", "size_per_blob",
+			"size", "blobs_count", "size_per_blob", "fee",
 		} {
 			series, err := s.storage.Rollup.Series(ctx, 1, tf, column, storage.SeriesRequest{
 				From: time.Date(2023, 1, 1, 1, 1, 1, 1, time.UTC),

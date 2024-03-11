@@ -107,6 +107,7 @@ func parseTx(ctx *context.Context, b types.BlockData, index int, txRes *types.Re
 		if len(dm.Msg.BlobLogs) > 0 && len(d.Blobs) == len(dm.Msg.BlobLogs) {
 			for i := range dm.Msg.BlobLogs {
 				dm.Msg.BlobLogs[i].ContentType = http.DetectContentType(d.Blobs[i].Data)
+				dm.Msg.BlobLogs[i].Fee = t.Fee.Copy()
 			}
 			t.BlobsCount += len(dm.Msg.BlobLogs)
 		}
