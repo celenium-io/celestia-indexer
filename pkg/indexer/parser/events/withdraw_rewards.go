@@ -8,6 +8,8 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
+	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
 
@@ -42,5 +44,37 @@ func parseWithdrawRewards(ctx *context.Context, msg *storage.Message, data map[s
 		Type:      storageTypes.StakingLogTypeRewards,
 	})
 
+	return nil
+}
+
+func handleWithdrawDelegatorRewards(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+	if idx == nil {
+		return errors.New("nil event index")
+	}
+	if msg == nil {
+		return errors.New("nil message in events hanler")
+	}
+	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward" {
+		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
+	}
+	*idx += 1
+	return processWithdrawDelegatorRewards(ctx, events, msg, idx)
+}
+
+func processWithdrawDelegatorRewards(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+	for i := *idx; i < len(events); i++ {
+		switch events[i].Type {
+		case storageTypes.EventTypeMessage:
+			if module := decoder.StringFromMap(events[i].Data, "module"); module == storageTypes.ModuleNameDistribution.String() {
+				*idx = i + 1
+				return nil
+			}
+		case storageTypes.EventTypeWithdrawRewards:
+			if err := parseWithdrawRewards(ctx, msg, events[i].Data); err != nil {
+				return err
+			}
+		}
+	}
+	*idx = len(events) - 1
 	return nil
 }

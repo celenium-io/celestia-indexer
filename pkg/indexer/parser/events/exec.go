@@ -44,10 +44,29 @@ func handleExec(ctx *context.Context, events []storage.Event, msg *storage.Messa
 			if err := processWithdrawValidatorCommission(ctx, events, msg, idx); err != nil {
 				return err
 			}
+		case "cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward":
+			if err := processWithdrawDelegatorRewards(ctx, events, msg, idx); err != nil {
+				return err
+			}
 		case "/cosmos.slashing.v1beta1.MsgUnjail":
 			if err := processUnjail(ctx, events, idx); err != nil {
 				return err
 			}
+		default:
+			for i := *idx; i < len(events); i++ {
+				*idx += 1
+				if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "" {
+					break
+				}
+				authMsgIdx, err := decoder.Int64FromMap(events[*idx].Data, "authz_msg_index")
+				if err != nil {
+					return err
+				}
+				if authMsgIdx != int64(i) || len(events)-1 == *idx {
+					break
+				}
+			}
+
 		}
 	}
 

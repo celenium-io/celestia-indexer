@@ -20,6 +20,7 @@ var eventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgCancelUnbondingDelegation:   handleCancelUnbonding,
 	storageTypes.MsgExec:                        handleExec,
 	storageTypes.MsgWithdrawValidatorCommission: handleWithdrawValidatorCommission,
+	storageTypes.MsgWithdrawDelegatorReward:     handleWithdrawDelegatorRewards,
 	storageTypes.MsgUnjail:                      handleUnjail,
 }
 
