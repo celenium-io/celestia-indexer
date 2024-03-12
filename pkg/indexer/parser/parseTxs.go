@@ -4,8 +4,6 @@
 package parser
 
 import (
-	"net/http"
-
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -14,7 +12,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/parser/events"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	appshares "github.com/celestiaorg/celestia-app/pkg/shares"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
@@ -105,23 +102,7 @@ func parseTx(ctx *context.Context, b types.BlockData, index int, txRes *types.Re
 			return errors.Wrapf(err, "while parsing tx=%v on index=%d", t.Hash, t.Position)
 		}
 
-		if len(dm.Msg.BlobLogs) > 0 && len(d.Blobs) == len(dm.Msg.BlobLogs) {
-			var totalSharesUsed int
-			shares := make([]int, len(dm.Msg.BlobLogs))
-			for i := range dm.Msg.BlobLogs {
-				dm.Msg.BlobLogs[i].ContentType = http.DetectContentType(d.Blobs[i].Data)
-				sharesUsed := appshares.SparseSharesNeeded(uint32(dm.Msg.BlobLogs[i].Size))
-				totalSharesUsed += sharesUsed
-				shares[i] = sharesUsed
-			}
-			t.BlobsCount += len(dm.Msg.BlobLogs)
-
-			used := decimal.NewFromInt(int64(totalSharesUsed))
-			for i := range shares {
-				part := decimal.NewFromInt(int64(shares[i])).Div(used)
-				dm.Msg.BlobLogs[i].Fee = t.Fee.Copy().Mul(part)
-			}
-		}
+		processBlob(dm.Msg.BlobLogs, d, t)
 
 		if txRes.IsFailed() {
 			dm.Msg.Namespace = nil

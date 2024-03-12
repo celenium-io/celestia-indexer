@@ -2513,6 +2513,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
       summary: Get estimated gas for pay for blob
       tags:
       - gas
