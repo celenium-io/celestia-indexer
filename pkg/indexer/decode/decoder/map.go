@@ -89,3 +89,16 @@ func Int64FromMap(m map[string]any, key string) (int64, error) {
 	}
 	return strconv.ParseInt(str, 10, 64)
 }
+
+func AuthMsgIndexFromMap(m map[string]any) (*int64, error) {
+	val, ok := m["authz_msg_index"]
+	if !ok {
+		return nil, nil
+	}
+	str, ok := val.(string)
+	if !ok {
+		return nil, errors.New("key 'auth_msg_index' is not a string")
+	}
+	i, err := strconv.ParseInt(str, 10, 64)
+	return &i, err
+}

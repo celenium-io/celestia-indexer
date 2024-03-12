@@ -669,6 +669,95 @@ func Test_handleExec(t *testing.T) {
 				},
 			},
 			idx: testsuite.Ptr(7),
+		}, {
+			name: "unknown message",
+			events: []storage.Event{
+				{
+					Height: 45631,
+					Type:   "use_feegrant",
+					Data: map[string]any{
+						"grantee": "celestia1js8h76lxsl92qpqmsgd04u52aaqp82pr9n4p8f",
+						"granter": "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
+					},
+				}, {
+					Height: 45631,
+					Type:   "update_feegrant",
+					Data: map[string]any{
+						"grantee": "celestia1js8h76lxsl92qpqmsgd04u52aaqp82pr9n4p8f",
+						"granter": "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
+					},
+				}, {
+					Height: 45631,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":  "20443utia",
+						"spender": "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
+					},
+				}, {
+					Height: 45631,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":   "20443utia",
+						"receiver": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
+					},
+				}, {
+					Height: 45631,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "20443utia",
+						"recipient": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
+						"sender":    "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
+					},
+				}, {
+					Height: 45631,
+					Type:   "message",
+					Data: map[string]any{
+						"sender": "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
+					},
+				}, {
+					Height: 45631,
+					Type:   "tx",
+					Data: map[string]any{
+						"fee":       "20443utia",
+						"fee_payer": "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
+					},
+				}, {
+					Height: 45631,
+					Type:   "tx",
+					Data: map[string]any{
+						"acc_seq": "celestia1js8h76lxsl92qpqmsgd04u52aaqp82pr9n4p8f/0",
+					},
+				}, {
+					Height: 45631,
+					Type:   "tx",
+					Data: map[string]any{
+						"signature": "wLj4V9p4OMCoP3OZLQU6RohalGFSHXQWXZ/7pMN1/FUx9n3YWh3eWwXb1PAYgkajLM3kGehn3mR770lufT7f+w==",
+					},
+				}, {
+					Height: 45631,
+					Type:   "message",
+					Data: map[string]any{
+						"action": "/cosmos.authz.v1beta1.MsgExec",
+					},
+				}, {
+					Height: 45631,
+					Type:   "cosmos.authz.v1beta1.EventGrant",
+					Data: map[string]any{
+						"authz_msg_index": "0",
+						"grantee":         "celestia10eykchznjdn8jdlwaj5v9wvlmdsp6kxx8ddhq6",
+						"granter":         "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
+						"msg_type_url":    "/cosmos.gov.v1beta1.MsgVote",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgGrant,
+				Height: 45631,
+				InternalMsgs: []string{
+					"/cosmos.authz.v1beta1.MsgGrant",
+				},
+			},
+			idx: testsuite.Ptr(9),
 		},
 	}
 	for _, tt := range tests {
