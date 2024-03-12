@@ -13,7 +13,9 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -25,6 +27,7 @@ type GasTestSuite struct {
 	echo       *echo.Echo
 	state      *mock.MockIState
 	txs        *mock.MockITx
+	constants  *mock.MockIConstant
 	blockStats *mock.MockIBlockStats
 	handler    GasHandler
 	tracker    *gas.Tracker
@@ -38,9 +41,10 @@ func (s *GasTestSuite) SetupSuite() {
 	s.ctrl = gomock.NewController(s.T())
 	s.state = mock.NewMockIState(s.ctrl)
 	s.txs = mock.NewMockITx(s.ctrl)
+	s.constants = mock.NewMockIConstant(s.ctrl)
 	s.blockStats = mock.NewMockIBlockStats(s.ctrl)
 	s.tracker = gas.NewTracker(s.state, s.blockStats, s.txs, nil)
-	s.handler = NewGasHandler(s.state, s.txs, s.blockStats, s.tracker)
+	s.handler = NewGasHandler(s.state, s.txs, s.constants, s.blockStats, s.tracker)
 }
 
 // TearDownSuite -
@@ -63,6 +67,24 @@ func (s *GasTestSuite) TestEstimateForPfb() {
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/gas/estimate_for_pfb")
+
+	s.constants.EXPECT().
+		Get(gomock.Any(), types.ModuleNameAuth, "tx_size_cost_per_byte").
+		Return(storage.Constant{
+			Module: types.ModuleNameAuth,
+			Name:   "tx_size_cost_per_byte",
+			Value:  "10",
+		}, nil).
+		Times(1)
+
+	s.constants.EXPECT().
+		Get(gomock.Any(), types.ModuleNameBlob, "gas_per_blob_byte").
+		Return(storage.Constant{
+			Module: types.ModuleNameBlob,
+			Name:   "gas_per_blob_byte",
+			Value:  "8",
+		}, nil).
+		Times(1)
 
 	s.Require().NoError(s.handler.EstimateForPfb(c))
 	s.Require().Equal(http.StatusOK, rec.Code)

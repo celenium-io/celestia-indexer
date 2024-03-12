@@ -5,6 +5,7 @@ package storage
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/uptrace/bun"
@@ -27,4 +28,20 @@ type Constant struct {
 
 func (Constant) TableName() string {
 	return "constant"
+}
+
+func (c Constant) MustUint64() uint64 {
+	i, err := strconv.ParseUint(c.Value, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	return i
+}
+
+func (c Constant) MustUint32() uint32 {
+	i, err := strconv.ParseUint(c.Value, 10, 32)
+	if err != nil {
+		panic(err)
+	}
+	return uint32(i)
 }

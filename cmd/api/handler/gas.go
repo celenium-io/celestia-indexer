@@ -10,6 +10,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	blobtypes "github.com/celestiaorg/celestia-app/x/blob/types"
 	"github.com/labstack/echo/v4"
 )
@@ -18,6 +19,7 @@ import (
 type GasHandler struct {
 	state      storage.IState
 	tx         storage.ITx
+	constant   storage.IConstant
 	blockStats storage.IBlockStats
 	tracker    *gas.Tracker
 }
@@ -25,6 +27,7 @@ type GasHandler struct {
 func NewGasHandler(
 	state storage.IState,
 	tx storage.ITx,
+	constant storage.IConstant,
 	blockStats storage.IBlockStats,
 	tracker *gas.Tracker,
 ) GasHandler {
@@ -32,6 +35,7 @@ func NewGasHandler(
 		state:      state,
 		tx:         tx,
 		blockStats: blockStats,
+		constant:   constant,
 		tracker:    tracker,
 	}
 }
@@ -50,12 +54,14 @@ type estimatePfbGas struct {
 //	@Produce		json
 //	@Success		200	{object}	uint64
 //	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
 //	@Router			/v1/gas/estimate_for_pfb [get]
 func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 	req, err := bindAndValidate[estimatePfbGas](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
+
 	sizes := make([]uint32, len(req.Sizes))
 	for i := range req.Sizes {
 		size, err := strconv.ParseUint(req.Sizes[i], 10, 32)
@@ -65,7 +71,19 @@ func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 		sizes[i] = uint32(size)
 	}
 
-	return c.JSON(http.StatusOK, blobtypes.DefaultEstimateGas(sizes))
+	gasPerBlobByteConst, err := handler.constant.Get(c.Request().Context(), types.ModuleNameBlob, "gas_per_blob_byte")
+	if err != nil {
+		return handleError(c, err, handler.tx)
+	}
+	gasPerBlobByte := gasPerBlobByteConst.MustUint32()
+
+	txSizeCostConst, err := handler.constant.Get(c.Request().Context(), types.ModuleNameAuth, "tx_size_cost_per_byte")
+	if err != nil {
+		return handleError(c, err, handler.tx)
+	}
+	txSizeCost := txSizeCostConst.MustUint64()
+
+	return c.JSON(http.StatusOK, blobtypes.EstimateGas(sizes, gasPerBlobByte, txSizeCost))
 }
 
 // EstimatePrice godoc

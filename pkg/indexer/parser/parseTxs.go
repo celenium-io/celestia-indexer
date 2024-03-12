@@ -4,8 +4,6 @@
 package parser
 
 import (
-	"net/http"
-
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -104,13 +102,7 @@ func parseTx(ctx *context.Context, b types.BlockData, index int, txRes *types.Re
 			return errors.Wrapf(err, "while parsing tx=%v on index=%d", t.Hash, t.Position)
 		}
 
-		if len(dm.Msg.BlobLogs) > 0 && len(d.Blobs) == len(dm.Msg.BlobLogs) {
-			for i := range dm.Msg.BlobLogs {
-				dm.Msg.BlobLogs[i].ContentType = http.DetectContentType(d.Blobs[i].Data)
-				dm.Msg.BlobLogs[i].Fee = t.Fee.Copy()
-			}
-			t.BlobsCount += len(dm.Msg.BlobLogs)
-		}
+		processBlob(dm.Msg.BlobLogs, d, t)
 
 		if txRes.IsFailed() {
 			dm.Msg.Namespace = nil

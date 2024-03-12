@@ -388,7 +388,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	gasHandler := handler.NewGasHandler(db.State, db.Tx, db.BlockStats, gasTracker)
+	gasHandler := handler.NewGasHandler(db.State, db.Tx, db.Constants, db.BlockStats, gasTracker)
 	gas := v1.Group("/gas")
 	{
 		gas.GET("/estimate_for_pfb", gasHandler.EstimateForPfb)
