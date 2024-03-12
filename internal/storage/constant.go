@@ -30,10 +30,18 @@ func (Constant) TableName() string {
 	return "constant"
 }
 
-func (c Constant) MustInt64() int64 {
-	i, err := strconv.ParseInt(c.Value, 10, 64)
+func (c Constant) MustUint64() uint64 {
+	i, err := strconv.ParseUint(c.Value, 10, 64)
 	if err != nil {
 		panic(err)
 	}
 	return i
+}
+
+func (c Constant) MustUint32() uint32 {
+	i, err := strconv.ParseUint(c.Value, 10, 32)
+	if err != nil {
+		panic(err)
+	}
+	return uint32(i)
 }

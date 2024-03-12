@@ -75,15 +75,15 @@ func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
-	gasPerBlobByte := gasPerBlobByteConst.MustInt64()
+	gasPerBlobByte := gasPerBlobByteConst.MustUint32()
 
 	txSizeCostConst, err := handler.constant.Get(c.Request().Context(), types.ModuleNameAuth, "tx_size_cost_per_byte")
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
-	txSizeCost := txSizeCostConst.MustInt64()
+	txSizeCost := txSizeCostConst.MustUint64()
 
-	return c.JSON(http.StatusOK, blobtypes.EstimateGas(sizes, uint32(gasPerBlobByte), uint64(txSizeCost)))
+	return c.JSON(http.StatusOK, blobtypes.EstimateGas(sizes, gasPerBlobByte, txSizeCost))
 }
 
 // EstimatePrice godoc
