@@ -53,18 +53,20 @@ func handleExec(ctx *context.Context, events []storage.Event, msg *storage.Messa
 				return err
 			}
 		default:
-			for i := *idx; i < len(events); i++ {
-				*idx += 1
-				if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "" {
-					break
-				}
-				authMsgIdx, err := decoder.Int64FromMap(events[*idx].Data, "authz_msg_index")
+			for j := *idx; j < len(events); j++ {
+				authMsgIdxPtr, err := decoder.AuthMsgIndexFromMap(events[*idx].Data)
 				if err != nil {
 					return err
 				}
-				if authMsgIdx != int64(i) || len(events)-1 == *idx {
+				if authMsgIdxPtr == nil {
 					break
 				}
+
+				if *authMsgIdxPtr != int64(i) {
+					break
+				}
+
+				*idx = j + 1
 			}
 
 		}
