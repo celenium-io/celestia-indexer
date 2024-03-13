@@ -359,13 +359,14 @@ func (handler *AddressHandler) Count(c echo.Context) error {
 	return c.JSON(http.StatusOK, state.TotalAccounts)
 }
 
-type getAddressPageable struct {
-	Hash   string `param:"hash"   validate:"required,address"`
-	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset" validate:"omitempty,min=0"`
+type getAddressDelegations struct {
+	Hash     string `param:"hash"      validate:"required,address"`
+	Limit    int    `query:"limit"     validate:"omitempty,min=1,max=100"`
+	Offset   int    `query:"offset"    validate:"omitempty,min=0"`
+	ShowZero bool   `query:"show_zero" validate:"omitempty"`
 }
 
-func (req *getAddressPageable) SetDefault() {
+func (req *getAddressDelegations) SetDefault() {
 	if req.Limit == 0 {
 		req.Limit = 10
 	}
@@ -377,16 +378,17 @@ func (req *getAddressPageable) SetDefault() {
 //	@Description	Get delegations made by address
 //	@Tags			address
 //	@ID				address-delegations
-//	@Param			hash	path	string	true	"Hash"							minlength(48)	maxlength(48)
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			hash		path	string	true	"Hash"							minlength(48)	maxlength(48)
+//	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset		query	integer	false	"Offset"						minimum(1)
+//	@Param			show_zero	query	boolean	false	"Show zero delegations"
 //	@Produce		json
 //	@Success		200	{array}		responses.Delegation
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/address/{hash}/delegations [get]
 func (handler *AddressHandler) Delegations(c echo.Context) error {
-	req, err := bindAndValidate[getAddressPageable](c)
+	req, err := bindAndValidate[getAddressDelegations](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
@@ -407,6 +409,7 @@ func (handler *AddressHandler) Delegations(c echo.Context) error {
 		address.Id,
 		req.Limit,
 		req.Offset,
+		req.ShowZero,
 	)
 	if err != nil {
 		return handleError(c, err, handler.address)
@@ -418,6 +421,18 @@ func (handler *AddressHandler) Delegations(c echo.Context) error {
 	}
 
 	return returnArray(c, response)
+}
+
+type getAddressPageable struct {
+	Hash   string `param:"hash"   validate:"required,address"`
+	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int    `query:"offset" validate:"omitempty,min=0"`
+}
+
+func (req *getAddressPageable) SetDefault() {
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
 }
 
 // Undelegations godoc

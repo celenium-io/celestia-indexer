@@ -217,6 +217,7 @@ func (s *ValidatorTestSuite) TestDelegators() {
 	q := make(url.Values)
 	q.Set("limit", "10")
 	q.Set("offset", "0")
+	q.Set("show_zero", "true")
 
 	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
@@ -226,7 +227,7 @@ func (s *ValidatorTestSuite) TestDelegators() {
 	c.SetParamValues("1")
 
 	s.delegations.EXPECT().
-		ByValidator(gomock.Any(), uint64(1), 10, 0).
+		ByValidator(gomock.Any(), uint64(1), 10, 0, true).
 		Return([]storage.Delegation{
 			{
 				AddressId:   1,

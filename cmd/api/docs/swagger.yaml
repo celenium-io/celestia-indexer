@@ -1500,6 +1500,10 @@ paths:
         minimum: 1
         name: offset
         type: integer
+      - description: Show zero delegations
+        in: query
+        name: show_zero
+        type: boolean
       produces:
       - application/json
       responses:
@@ -4517,6 +4521,10 @@ paths:
         minimum: 1
         name: offset
         type: integer
+      - description: Show zero delegations
+        in: query
+        name: show_zero
+        type: boolean
       produces:
       - application/json
       responses:

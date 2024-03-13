@@ -16,8 +16,8 @@ import (
 type IDelegation interface {
 	storage.Table[*Delegation]
 
-	ByAddress(ctx context.Context, addressId uint64, limit, offset int) ([]Delegation, error)
-	ByValidator(ctx context.Context, validatorId uint64, limit, offset int) ([]Delegation, error)
+	ByAddress(ctx context.Context, addressId uint64, limit, offset int, showZero bool) ([]Delegation, error)
+	ByValidator(ctx context.Context, validatorId uint64, limit, offset int, showZero bool) ([]Delegation, error)
 }
 
 // Delegation -

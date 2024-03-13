@@ -270,6 +270,12 @@ const docTemplate = `{
                         "description": "Offset",
                         "name": "offset",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Show zero delegations",
+                        "name": "show_zero",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -4333,6 +4339,12 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Show zero delegations",
+                        "name": "show_zero",
                         "in": "query"
                     }
                 ],

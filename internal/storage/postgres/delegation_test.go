@@ -12,7 +12,7 @@ func (s *StorageTestSuite) TestDelegationByAddress() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	delegations, err := s.storage.Delegation.ByAddress(ctx, 1, 10, 0)
+	delegations, err := s.storage.Delegation.ByAddress(ctx, 1, 10, 0, false)
 	s.Require().NoError(err)
 	s.Require().Len(delegations, 1)
 
@@ -30,7 +30,7 @@ func (s *StorageTestSuite) TestDelegationByValidator() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	delegations, err := s.storage.Delegation.ByValidator(ctx, 1, 10, 0)
+	delegations, err := s.storage.Delegation.ByValidator(ctx, 1, 10, 0, true)
 	s.Require().NoError(err)
 	s.Require().Len(delegations, 2)
 

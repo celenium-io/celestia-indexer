@@ -44,18 +44,18 @@ func (m *MockIDelegation) EXPECT() *MockIDelegationMockRecorder {
 }
 
 // ByAddress mocks base method.
-func (m *MockIDelegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int) ([]storage.Delegation, error) {
+func (m *MockIDelegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int, showZero bool) ([]storage.Delegation, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ByAddress", ctx, addressId, limit, offset)
+	ret := m.ctrl.Call(m, "ByAddress", ctx, addressId, limit, offset, showZero)
 	ret0, _ := ret[0].([]storage.Delegation)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ByAddress indicates an expected call of ByAddress.
-func (mr *MockIDelegationMockRecorder) ByAddress(ctx, addressId, limit, offset any) *IDelegationByAddressCall {
+func (mr *MockIDelegationMockRecorder) ByAddress(ctx, addressId, limit, offset, showZero any) *IDelegationByAddressCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByAddress", reflect.TypeOf((*MockIDelegation)(nil).ByAddress), ctx, addressId, limit, offset)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByAddress", reflect.TypeOf((*MockIDelegation)(nil).ByAddress), ctx, addressId, limit, offset, showZero)
 	return &IDelegationByAddressCall{Call: call}
 }
 
@@ -71,30 +71,30 @@ func (c *IDelegationByAddressCall) Return(arg0 []storage.Delegation, arg1 error)
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IDelegationByAddressCall) Do(f func(context.Context, uint64, int, int) ([]storage.Delegation, error)) *IDelegationByAddressCall {
+func (c *IDelegationByAddressCall) Do(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *IDelegationByAddressCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IDelegationByAddressCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Delegation, error)) *IDelegationByAddressCall {
+func (c *IDelegationByAddressCall) DoAndReturn(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *IDelegationByAddressCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // ByValidator mocks base method.
-func (m *MockIDelegation) ByValidator(ctx context.Context, validatorId uint64, limit, offset int) ([]storage.Delegation, error) {
+func (m *MockIDelegation) ByValidator(ctx context.Context, validatorId uint64, limit, offset int, showZero bool) ([]storage.Delegation, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ByValidator", ctx, validatorId, limit, offset)
+	ret := m.ctrl.Call(m, "ByValidator", ctx, validatorId, limit, offset, showZero)
 	ret0, _ := ret[0].([]storage.Delegation)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ByValidator indicates an expected call of ByValidator.
-func (mr *MockIDelegationMockRecorder) ByValidator(ctx, validatorId, limit, offset any) *IDelegationByValidatorCall {
+func (mr *MockIDelegationMockRecorder) ByValidator(ctx, validatorId, limit, offset, showZero any) *IDelegationByValidatorCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByValidator", reflect.TypeOf((*MockIDelegation)(nil).ByValidator), ctx, validatorId, limit, offset)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByValidator", reflect.TypeOf((*MockIDelegation)(nil).ByValidator), ctx, validatorId, limit, offset, showZero)
 	return &IDelegationByValidatorCall{Call: call}
 }
 
@@ -110,13 +110,13 @@ func (c *IDelegationByValidatorCall) Return(arg0 []storage.Delegation, arg1 erro
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IDelegationByValidatorCall) Do(f func(context.Context, uint64, int, int) ([]storage.Delegation, error)) *IDelegationByValidatorCall {
+func (c *IDelegationByValidatorCall) Do(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *IDelegationByValidatorCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IDelegationByValidatorCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Delegation, error)) *IDelegationByValidatorCall {
+func (c *IDelegationByValidatorCall) DoAndReturn(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *IDelegationByValidatorCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

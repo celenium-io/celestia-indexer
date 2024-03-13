@@ -11,19 +11,19 @@ import (
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 )
 
-// DelegationLog -
-type DelegationLog struct {
+// StakingLog -
+type StakingLog struct {
 	*postgres.Table[*storage.StakingLog]
 }
 
 // NewDelegationLog -
-func NewDelegationLog(db *database.Bun) *DelegationLog {
-	return &DelegationLog{
+func NewDelegationLog(db *database.Bun) *StakingLog {
+	return &StakingLog{
 		Table: postgres.NewTable[*storage.StakingLog](db),
 	}
 }
 
-func (d *DelegationLog) ByValidator(ctx context.Context, id uint64, limit, offset int) (logs []storage.StakingLog, err error) {
+func (d *StakingLog) ByValidator(ctx context.Context, id uint64, limit, offset int) (logs []storage.StakingLog, err error) {
 	query := d.DB().NewSelect().
 		Model(&logs).
 		Where("validator_id = ?", id)

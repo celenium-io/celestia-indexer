@@ -39,7 +39,7 @@ type Storage struct {
 	Stats           models.IStats
 	Search          models.ISearch
 	Validator       models.IValidator
-	DelegationLogs  models.IStakingLog
+	StakingLogs     models.IStakingLog
 	Delegation      models.IDelegation
 	Redelegation    models.IRedelegation
 	Undelegation    models.IUndelegation
@@ -76,7 +76,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		Stats:           NewStats(strg.Connection()),
 		Search:          NewSearch(strg.Connection()),
 		Validator:       NewValidator(strg.Connection()),
-		DelegationLogs:  NewDelegationLog(strg.Connection()),
+		StakingLogs:     NewDelegationLog(strg.Connection()),
 		Delegation:      NewDelegation(strg.Connection()),
 		Redelegation:    NewRedelegation(strg.Connection()),
 		Undelegation:    NewUndelegation(strg.Connection()),
