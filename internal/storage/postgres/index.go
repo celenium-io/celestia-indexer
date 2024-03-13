@@ -455,6 +455,33 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// Vesting account
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.VestingAccount)(nil)).
+			Index("vesting_account_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.VestingAccount)(nil)).
+			Index("vesting_account_address_id_idx").
+			Column("address_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.VestingAccount)(nil)).
+			Index("vesting_account_end_time_idx").
+			Column("end_time").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

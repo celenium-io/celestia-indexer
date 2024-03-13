@@ -93,11 +93,11 @@ func Message(
 
 	// vesting module
 	case *cosmosVestingTypes.MsgCreateVestingAccount:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateVestingAccount(ctx, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.VestingAccount, err = handle.MsgCreateVestingAccount(ctx, status, typedMsg)
 	case *cosmosVestingTypes.MsgCreatePermanentLockedAccount:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreatePermanentLockedAccount(ctx, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.VestingAccount, err = handle.MsgCreatePermanentLockedAccount(ctx, status, typedMsg)
 	case *cosmosVestingTypes.MsgCreatePeriodicVestingAccount:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreatePeriodicVestingAccount(ctx, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.VestingAccount, err = handle.MsgCreatePeriodicVestingAccount(ctx, status, typedMsg)
 
 	// blob module
 	case *appBlobTypes.MsgPayForBlobs:

@@ -84,6 +84,16 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 		); err != nil {
 			return err
 		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"vesting_type",
+			bun.Safe("vesting_type"),
+			bun.In(types.VestingTypeValues()),
+		); err != nil {
+			return err
+		}
 		return nil
 	})
 }

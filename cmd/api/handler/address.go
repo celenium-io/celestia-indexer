@@ -22,6 +22,7 @@ type AddressHandler struct {
 	delegations   storage.IDelegation
 	undelegations storage.IUndelegation
 	redelegations storage.IRedelegation
+	vestings      storage.IVestingAccount
 	state         storage.IState
 	indexerName   string
 }
@@ -34,6 +35,7 @@ func NewAddressHandler(
 	delegations storage.IDelegation,
 	undelegations storage.IUndelegation,
 	redelegations storage.IRedelegation,
+	vestings storage.IVestingAccount,
 	state storage.IState,
 	indexerName string,
 ) *AddressHandler {
@@ -45,6 +47,7 @@ func NewAddressHandler(
 		delegations:   delegations,
 		undelegations: undelegations,
 		redelegations: redelegations,
+		vestings:      vestings,
 		state:         state,
 		indexerName:   indexerName,
 	}
@@ -528,6 +531,70 @@ func (handler *AddressHandler) Redelegations(c echo.Context) error {
 	response := make([]responses.Redelegation, len(redelegations))
 	for i := range response {
 		response[i] = responses.NewRedelegation(redelegations[i])
+	}
+
+	return returnArray(c, response)
+}
+
+type getAddressVestings struct {
+	Hash      string `param:"hash"       validate:"required,address"`
+	Limit     int    `query:"limit"      validate:"omitempty,min=1,max=100"`
+	Offset    int    `query:"offset"     validate:"omitempty,min=0"`
+	ShowEnded bool   `query:"show_ended" validate:"omitempty"`
+}
+
+func (req *getAddressVestings) SetDefault() {
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
+}
+
+// Vestings godoc
+//
+//	@Summary		Get vesting for address
+//	@Description	Get vesting for address
+//	@Tags			address
+//	@ID				address-vesting
+//	@Param			hash		path	string	true	"Hash"							minlength(48)	maxlength(48)
+//	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset		query	integer	false	"Offset"						minimum(1)
+//	@Param			show_ended	query	boolean	false	"Show finished vestings delegations"
+//	@Produce		json
+//	@Success		200	{array}		responses.Vesting
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address/{hash}/vesting [get]
+func (handler *AddressHandler) Vestings(c echo.Context) error {
+	req, err := bindAndValidate[getAddressVestings](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	_, hash, err := types.Address(req.Hash).Decode()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	vestings, err := handler.vestings.ByAddress(
+		c.Request().Context(),
+		address.Id,
+		req.Limit,
+		req.Offset,
+		req.ShowEnded,
+	)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	response := make([]responses.Vesting, len(vestings))
+	for i := range response {
+		response[i] = responses.NewVesting(vestings[i])
 	}
 
 	return returnArray(c, response)

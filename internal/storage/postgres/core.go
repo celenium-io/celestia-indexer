@@ -33,6 +33,8 @@ type Storage struct {
 	Message         models.IMessage
 	Event           models.IEvent
 	Address         models.IAddress
+	VestingAccounts models.IVestingAccount
+	VestingPeriods  models.IVestingPeriod
 	Namespace       models.INamespace
 	Price           models.IPrice
 	State           models.IState
@@ -69,6 +71,8 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		Message:         NewMessage(strg.Connection()),
 		Event:           NewEvent(strg.Connection()),
 		Address:         NewAddress(strg.Connection()),
+		VestingAccounts: NewVestingAccount(strg.Connection()),
+		VestingPeriods:  NewVestingPeriod(strg.Connection()),
 		Price:           NewPrice(strg.Connection()),
 		Tx:              NewTx(strg.Connection()),
 		State:           NewState(strg.Connection()),
@@ -76,7 +80,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		Stats:           NewStats(strg.Connection()),
 		Search:          NewSearch(strg.Connection()),
 		Validator:       NewValidator(strg.Connection()),
-		StakingLogs:     NewDelegationLog(strg.Connection()),
+		StakingLogs:     NewStakingLog(strg.Connection()),
 		Delegation:      NewDelegation(strg.Connection()),
 		Redelegation:    NewRedelegation(strg.Connection()),
 		Undelegation:    NewUndelegation(strg.Connection()),

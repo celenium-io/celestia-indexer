@@ -147,6 +147,27 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		return tx.HandleError(ctx, err)
 	}
 
+	for i := range data.vestings {
+		if address, ok := data.addresses[data.vestings[i].Address.Address]; ok {
+			data.vestings[i].AddressId = address.Id
+		}
+	}
+
+	if err := tx.SaveVestingAccounts(ctx, data.vestings...); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
+	periods := make([]storage.VestingPeriod, 0)
+	for i := range data.vestings {
+		for j := range data.vestings[i].VestingPeriods {
+			data.vestings[i].VestingPeriods[j].VestingAccountId = data.vestings[i].Id
+		}
+		periods = append(periods, data.vestings[i].VestingPeriods...)
+	}
+	if err := tx.SaveVestingPeriods(ctx, periods...); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
 	for i := range data.delegations {
 		if address, ok := data.addresses[data.delegations[i].Address.Address]; ok {
 			data.delegations[i].AddressId = address.Id
