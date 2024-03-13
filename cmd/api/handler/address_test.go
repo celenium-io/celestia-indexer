@@ -391,6 +391,7 @@ func (s *AddressTestSuite) TestDelegations() {
 	q := make(url.Values)
 	q.Set("limit", "10")
 	q.Set("offset", "0")
+	q.Set("show_zero", "true")
 
 	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
@@ -408,7 +409,7 @@ func (s *AddressTestSuite) TestDelegations() {
 		}, nil)
 
 	s.delegations.EXPECT().
-		ByAddress(gomock.Any(), uint64(1), 10, 0).
+		ByAddress(gomock.Any(), uint64(1), 10, 0, true).
 		Return([]storage.Delegation{
 			{
 				AddressId:   1,

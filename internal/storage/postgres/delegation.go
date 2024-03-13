@@ -23,7 +23,7 @@ func NewDelegation(db *database.Bun) *Delegation {
 	}
 }
 
-func (d *Delegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int) (delegations []storage.Delegation, err error) {
+func (d *Delegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int, showZero bool) (delegations []storage.Delegation, err error) {
 	subQuery := d.DB().NewSelect().Model((*storage.Delegation)(nil)).
 		Where("address_id = ?", addressId).
 		Order("amount desc")
@@ -31,6 +31,9 @@ func (d *Delegation) ByAddress(ctx context.Context, addressId uint64, limit, off
 	subQuery = limitScope(subQuery, limit)
 	if offset > 0 {
 		subQuery = subQuery.Offset(offset)
+	}
+	if !showZero {
+		subQuery = subQuery.Where("amount > 0")
 	}
 
 	err = d.DB().NewSelect().
@@ -43,7 +46,7 @@ func (d *Delegation) ByAddress(ctx context.Context, addressId uint64, limit, off
 	return
 }
 
-func (d *Delegation) ByValidator(ctx context.Context, validatorId uint64, limit, offset int) (delegations []storage.Delegation, err error) {
+func (d *Delegation) ByValidator(ctx context.Context, validatorId uint64, limit, offset int, showZero bool) (delegations []storage.Delegation, err error) {
 	subQuery := d.DB().NewSelect().Model((*storage.Delegation)(nil)).
 		Where("validator_id = ?", validatorId).
 		Order("amount desc")
@@ -51,6 +54,9 @@ func (d *Delegation) ByValidator(ctx context.Context, validatorId uint64, limit,
 	subQuery = limitScope(subQuery, limit)
 	if offset > 0 {
 		subQuery = subQuery.Offset(offset)
+	}
+	if !showZero {
+		subQuery = subQuery.Where("amount > 0")
 	}
 
 	err = d.DB().NewSelect().

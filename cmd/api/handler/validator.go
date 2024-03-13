@@ -223,22 +223,36 @@ func (handler *ValidatorHandler) Uptime(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+type validatorDelegationsRequest struct {
+	Id       uint64 `param:"id"        validate:"required,min=1"`
+	Limit    int    `query:"limit"     validate:"omitempty,min=1,max=100"`
+	Offset   int    `query:"offset"    validate:"omitempty,min=0"`
+	ShowZero bool   `query:"show_zero" validate:"omitempty"`
+}
+
+func (p *validatorDelegationsRequest) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+}
+
 // Delegators godoc
 //
 //	@Summary		Get validator's delegators
 //	@Description	Get validator's delegators
 //	@Tags			validator
 //	@ID				validator-delegators
-//	@Param			id		path	integer	true	"Internal validator id"
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			id			path	integer	true	"Internal validator id"
+//	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset		query	integer	false	"Offset"						minimum(1)
+//	@Param			show_zero	query	boolean	false	"Show zero delegations"
 //	@Produce		json
 //	@Success		200	{array}		responses.Delegation
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/validators/{id}/delegators [get]
 func (handler *ValidatorHandler) Delegators(c echo.Context) error {
-	req, err := bindAndValidate[validatorPageableRequest](c)
+	req, err := bindAndValidate[validatorDelegationsRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
@@ -249,6 +263,7 @@ func (handler *ValidatorHandler) Delegators(c echo.Context) error {
 		req.Id,
 		req.Limit,
 		req.Offset,
+		req.ShowZero,
 	)
 	if err != nil {
 		return handleError(c, err, handler.delegations)
