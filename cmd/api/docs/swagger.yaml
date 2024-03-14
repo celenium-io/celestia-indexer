@@ -373,6 +373,10 @@ definitions:
         example: 2
         format: int64
         type: integer
+      size:
+        example: 2
+        format: int
+        type: integer
       time:
         example: "2023-07-04T03:10:57+00:00"
         format: date-time
@@ -408,6 +412,10 @@ definitions:
       position:
         example: 2
         format: int64
+        type: integer
+      size:
+        example: 2
+        format: int
         type: integer
       time:
         example: "2023-07-04T03:10:57+00:00"

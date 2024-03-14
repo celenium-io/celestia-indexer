@@ -70,6 +70,7 @@ func TestDecodeMsg_SuccessOnIBCMsgTransfer(t *testing.T) {
 		Type:      storageTypes.IBCTransfer,
 		TxId:      0,
 		Data:      structs.Map(msgSend),
+		Size:      105,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

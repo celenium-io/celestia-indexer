@@ -78,6 +78,7 @@ func TestDecodeMsg_SuccessOnMsgGrant(t *testing.T) {
 		Type:      storageTypes.MsgGrant,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      100,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -135,6 +136,7 @@ func TestDecodeMsg_SuccessOnMsgExec(t *testing.T) {
 		TxId:         0,
 		Data:         structs.Map(m),
 		Namespace:    nil,
+		Size:         49,
 		Addresses:    addressesExpected,
 		InternalMsgs: make([]string, 0),
 	}
@@ -203,6 +205,7 @@ func TestDecodeMsg_SuccessOnMsgRevoke(t *testing.T) {
 		Type:      storageTypes.MsgRevoke,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      108,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

@@ -65,6 +65,7 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 		Type:     storageTypes.MsgPayForBlobs,
 		TxId:     0,
 		Data:     structs.Map(msgPayForBlob),
+		Size:     119,
 		Namespace: []storage.Namespace{
 			{
 				Id:              0,
@@ -165,6 +166,7 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 		Type:     storageTypes.MsgPayForBlobs,
 		TxId:     0,
 		Data:     structs.Map(msgPayForBlob),
+		Size:     251,
 		Namespace: []storage.Namespace{
 			{
 				Id:              0,
@@ -286,6 +288,7 @@ func TestDecodeMsg_FailedOnPayForBlob(t *testing.T) {
 		Type:     storageTypes.MsgPayForBlobs,
 		TxId:     0,
 		Data:     structs.Map(msgPayForBlob),
+		Size:     119,
 		Namespace: []storage.Namespace{
 			{
 				Id:              0,

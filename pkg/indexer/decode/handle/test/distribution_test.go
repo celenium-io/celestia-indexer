@@ -73,6 +73,7 @@ func TestDecodeMsg_SuccessOnMsgSetWithdrawAddress(t *testing.T) {
 		Type:      storageTypes.MsgSetWithdrawAddress,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -140,6 +141,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawDelegatorReward(t *testing.T) {
 		Type:      storageTypes.MsgWithdrawDelegatorReward,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      105,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -195,6 +197,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawValidatorCommission(t *testing.T) {
 		Type:      storageTypes.MsgWithdrawValidatorCommission,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      56,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -250,6 +253,7 @@ func TestDecodeMsg_SuccessOnMsgFundCommunityPool(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgFundCommunityPool,
 		TxId:      0,
+		Size:      49,
 		Data:      structs.Map(m),
 		Namespace: nil,
 		Addresses: addressesExpected,

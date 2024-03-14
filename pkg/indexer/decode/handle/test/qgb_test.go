@@ -63,6 +63,7 @@ func TestDecodeMsg_SuccessOnMsgRegisterEvmAddress(t *testing.T) {
 		Type:      storageTypes.MsgRegisterEVMAddress,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      100,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

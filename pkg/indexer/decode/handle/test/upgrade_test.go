@@ -53,6 +53,7 @@ func TestDecodeMsg_SuccessOnMsgSoftwareUpgrade(t *testing.T) {
 		Type:      storageTypes.MsgSoftwareUpgrade,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      64,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -100,6 +101,7 @@ func TestDecodeMsg_SuccessOnMsgCancelUpgrade(t *testing.T) {
 		Type:      storageTypes.MsgCancelUpgrade,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

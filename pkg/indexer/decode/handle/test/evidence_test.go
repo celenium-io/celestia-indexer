@@ -61,6 +61,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitEvidence(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgSubmitEvidence,
 		TxId:      0,
+		Size:      49,
 		Data:      structs.Map(msg),
 		Namespace: nil,
 		Addresses: addressesExpected,

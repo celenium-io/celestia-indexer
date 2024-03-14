@@ -83,6 +83,7 @@ func TestDecodeMsg_SuccessOnMsgCreateVestingAccount(t *testing.T) {
 		Type:      storageTypes.MsgCreateVestingAccount,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      112,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -151,6 +152,7 @@ func TestDecodeMsg_SuccessOnMsgCreatePermanentLockedAccount(t *testing.T) {
 		Type:      storageTypes.MsgCreatePermanentLockedAccount,
 		TxId:      0,
 		Data:      structs.Map(msgCreatePeriodicVestingAccount),
+		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -220,6 +222,7 @@ func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 		Type:      storageTypes.MsgCreatePeriodicVestingAccount,
 		TxId:      0,
 		Data:      structs.Map(msgCreatePeriodicVestingAccount),
+		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
