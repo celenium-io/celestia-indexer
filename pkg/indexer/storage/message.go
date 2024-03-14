@@ -25,8 +25,9 @@ func (module *Module) saveMessages(
 	var (
 		namespaceMsgs   []storage.NamespaceMessage
 		msgAddress      []storage.MsgAddress
-		vestingAccounts = make([]*storage.VestingAccount, 0)
 		blobLogs        = make([]storage.BlobLog, 0)
+		vestingAccounts = make([]*storage.VestingAccount, 0)
+		grants          = make([]storage.Grant, 0)
 		namespaces      = make(map[string]uint64)
 		addedMsgId      = make(map[uint64]struct{})
 		msgAddrMap      = make(map[string]struct{})
@@ -94,6 +95,13 @@ func (module *Module) saveMessages(
 			messages[i].VestingAccount.TxId = &messages[i].TxId
 			vestingAccounts = append(vestingAccounts, messages[i].VestingAccount)
 		}
+
+		for j := range messages[i].Grants {
+			if err := processGrants(addrToId, &messages[i].Grants[j]); err != nil {
+				return err
+			}
+		}
+		grants = append(grants, messages[i].Grants...)
 	}
 
 	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
@@ -103,6 +111,9 @@ func (module *Module) saveMessages(
 		return err
 	}
 	if err := tx.SaveBlobLogs(ctx, blobLogs...); err != nil {
+		return err
+	}
+	if err := tx.SaveGrants(ctx, grants...); err != nil {
 		return err
 	}
 
@@ -146,5 +157,19 @@ func processPayForBlob(addrToId map[string]uint64, namespaces map[string]uint64,
 	blob.TxId = msg.TxId
 	blob.SignerId = signerId
 	blob.NamespaceId = nsId
+	return nil
+}
+
+func processGrants(addrToId map[string]uint64, grant *storage.Grant) error {
+	granteeId, ok := addrToId[grant.Grantee.Address]
+	if !ok {
+		return errors.Wrapf(errCantFindAddress, "grantee: %s", grant.Grantee.Address)
+	}
+	grant.GranteeId = granteeId
+	granterId, ok := addrToId[grant.Granter.Address]
+	if !ok {
+		return errors.Wrapf(errCantFindAddress, "granter: %s", grant.Granter.Address)
+	}
+	grant.GranterId = granterId
 	return nil
 }

@@ -1,0 +1,9 @@
+- id: 1
+  height: 1000
+  granter_id: 2
+  grantee_id: 1
+  authorization: "/cosmos.staking.v1beta1.MsgDelegate"
+  expiration: null
+  revoked: false
+  params:
+    Msg: "/cosmos.staking.v1beta1.MsgDelegate"

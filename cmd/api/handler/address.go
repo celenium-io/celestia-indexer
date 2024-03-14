@@ -23,6 +23,7 @@ type AddressHandler struct {
 	undelegations storage.IUndelegation
 	redelegations storage.IRedelegation
 	vestings      storage.IVestingAccount
+	grants        storage.IGrant
 	state         storage.IState
 	indexerName   string
 }
@@ -36,6 +37,7 @@ func NewAddressHandler(
 	undelegations storage.IUndelegation,
 	redelegations storage.IRedelegation,
 	vestings storage.IVestingAccount,
+	grants storage.IGrant,
 	state storage.IState,
 	indexerName string,
 ) *AddressHandler {
@@ -48,6 +50,7 @@ func NewAddressHandler(
 		undelegations: undelegations,
 		redelegations: redelegations,
 		vestings:      vestings,
+		grants:        grants,
 		state:         state,
 		indexerName:   indexerName,
 	}
@@ -597,5 +600,101 @@ func (handler *AddressHandler) Vestings(c echo.Context) error {
 		response[i] = responses.NewVesting(vestings[i])
 	}
 
+	return returnArray(c, response)
+}
+
+// Grants godoc
+//
+//	@Summary		Get grants made by address
+//	@Description	Get grants made by address
+//	@Tags			address
+//	@ID				address-grants
+//	@Param			hash	path	string	true	"Hash"							minlength(48)	maxlength(48)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Grant
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address/{hash}/grants [get]
+func (handler *AddressHandler) Grants(c echo.Context) error {
+	req, err := bindAndValidate[getAddressPageable](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	_, hash, err := types.Address(req.Hash).Decode()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	grants, err := handler.grants.ByGranter(
+		c.Request().Context(),
+		address.Id,
+		req.Limit,
+		req.Offset,
+	)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	response := make([]responses.Grant, len(grants))
+	for i := range response {
+		response[i] = responses.NewGrant(grants[i])
+	}
+	return returnArray(c, response)
+}
+
+// Grantee godoc
+//
+//	@Summary		Get grants where address is grantee
+//	@Description	Get grants where address is grantee
+//	@Tags			address
+//	@ID				address-grantee
+//	@Param			hash	path	string	true	"Hash"							minlength(48)	maxlength(48)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Grant
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address/{hash}/grantee [get]
+func (handler *AddressHandler) Grantee(c echo.Context) error {
+	req, err := bindAndValidate[getAddressPageable](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	_, hash, err := types.Address(req.Hash).Decode()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	grants, err := handler.grants.ByGrantee(
+		c.Request().Context(),
+		address.Id,
+		req.Limit,
+		req.Offset,
+	)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	response := make([]responses.Grant, len(grants))
+	for i := range response {
+		response[i] = responses.NewGrant(grants[i])
+	}
 	return returnArray(c, response)
 }

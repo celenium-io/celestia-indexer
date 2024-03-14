@@ -25,8 +25,10 @@ func createMsgGrant() types.Msg {
 		Granter: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
 		Grantee: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
 		Grant: authz.Grant{
-			Authorization: nil,
-			Expiration:    nil,
+			Authorization: &codecTypes.Any{
+				TypeUrl: "/cosmos.authz.v1beta1.GenericAuthorization",
+			},
+			Expiration: nil,
 		},
 	}
 
@@ -81,6 +83,22 @@ func TestDecodeMsg_SuccessOnMsgGrant(t *testing.T) {
 		Size:      100,
 		Namespace: nil,
 		Addresses: addressesExpected,
+		Grants: []storage.Grant{
+			{
+				Height: blob.Height,
+				Granter: &storage.Address{
+					Address: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
+				},
+				Grantee: &storage.Address{
+					Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
+				},
+				Authorization: "",
+				Params: map[string]any{
+					"Msg": "",
+				},
+				Time: blob.Block.Time,
+			},
+		},
 	}
 
 	assert.NoError(t, err)
@@ -208,6 +226,20 @@ func TestDecodeMsg_SuccessOnMsgRevoke(t *testing.T) {
 		Size:      108,
 		Namespace: nil,
 		Addresses: addressesExpected,
+		Grants: []storage.Grant{
+			{
+				Height: blob.Height,
+				Granter: &storage.Address{
+					Address: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
+				},
+				Grantee: &storage.Address{
+					Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
+				},
+				Authorization: "msg_type",
+				Revoked:       true,
+				Time:          blob.Block.Time,
+			},
+		},
 	}
 
 	assert.NoError(t, err)

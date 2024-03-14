@@ -253,6 +253,20 @@ func (tx Transaction) SaveVestingPeriods(ctx context.Context, periods ...models.
 	return err
 }
 
+func (tx Transaction) SaveGrants(ctx context.Context, grants ...models.Grant) error {
+	if len(grants) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().
+		Model(&grants).
+		Column("height", "time", "granter_id", "grantee_id", "authorization", "expiration", "revoked", "params").
+		On("CONFLICT ON CONSTRAINT grant_key DO UPDATE").
+		Set("revoked = EXCLUDED.revoked").
+		Exec(ctx)
+	return err
+}
+
 type addedValidator struct {
 	bun.BaseModel `bun:"validator"`
 	*models.Validator
@@ -456,6 +470,11 @@ func (tx Transaction) RollbackValidators(ctx context.Context, height types.Level
 
 func (tx Transaction) RollbackBlobLog(ctx context.Context, height types.Level) (err error) {
 	_, err = tx.Tx().NewDelete().Model((*models.BlobLog)(nil)).Where("height = ?", height).Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackGrants(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.Grant)(nil)).Where("height = ?", height).Exec(ctx)
 	return
 }
 

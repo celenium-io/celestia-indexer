@@ -119,11 +119,11 @@ func Message(
 
 	// authz module
 	case *authz.MsgGrant:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgGrant(ctx, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.Grants, err = handle.MsgGrant(ctx, status, typedMsg)
 	case *authz.MsgExec:
 		d.Msg.Type, d.Msg.Addresses, d.Msg.InternalMsgs, err = handle.MsgExec(ctx, status, typedMsg)
 	case *authz.MsgRevoke:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRevoke(ctx, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.Grants, err = handle.MsgRevoke(ctx, status, typedMsg)
 
 	// gov module
 	case *cosmosGovTypesV1.MsgSubmitProposal:

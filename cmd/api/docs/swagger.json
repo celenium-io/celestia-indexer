@@ -293,6 +293,130 @@
                 }
             }
         },
+        "/v1/address/{hash}/grantee": {
+            "get": {
+                "description": "Get grants where address is grantee",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Get grants where address is grantee",
+                "operationId": "address-grantee",
+                "parameters": [
+                    {
+                        "maxLength": 48,
+                        "minLength": 48,
+                        "type": "string",
+                        "description": "Hash",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Grant"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/address/{hash}/grants": {
+            "get": {
+                "description": "Get grants made by address",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Get grants made by address",
+                "operationId": "address-grants",
+                "parameters": [
+                    {
+                        "maxLength": 48,
+                        "minLength": 48,
+                        "type": "string",
+                        "description": "Hash",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Grant"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/address/{hash}/messages": {
             "get": {
                 "description": "Get address messages",
@@ -5066,6 +5190,43 @@
                     "type": "string",
                     "format": "string",
                     "example": "0.1234"
+                }
+            }
+        },
+        "responses.Grant": {
+            "type": "object",
+            "properties": {
+                "authorization": {
+                    "type": "string",
+                    "example": "/cosmos.staking.v1beta1.MsgDelegate"
+                },
+                "expiration": {
+                    "type": "string",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "grantee": {
+                    "type": "string",
+                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                },
+                "granter": {
+                    "type": "string",
+                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                },
+                "height": {
+                    "type": "integer",
+                    "example": 123123
+                },
+                "params": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "revoked": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "time": {
+                    "type": "string",
+                    "example": "2023-07-04T03:10:57+00:00"
                 }
             }
         },

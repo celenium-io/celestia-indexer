@@ -42,6 +42,7 @@ var Models = []any{
 	&Price{},
 	&Rollup{},
 	&RollupProvider{},
+	&Grant{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -81,6 +82,7 @@ type Transaction interface {
 	SaveValidators(ctx context.Context, validators ...*Validator) (int, error)
 	SaveEvents(ctx context.Context, events ...Event) error
 	SaveRollup(ctx context.Context, rollup *Rollup) error
+	SaveGrants(ctx context.Context, grants ...Grant) error
 	UpdateRollup(ctx context.Context, rollup *Rollup) error
 	SaveProviders(ctx context.Context, providers ...RollupProvider) error
 	SaveUndelegations(ctx context.Context, undelegations ...Undelegation) error
@@ -108,6 +110,7 @@ type Transaction interface {
 	RollbackNamespaces(ctx context.Context, height types.Level) (ns []Namespace, err error)
 	RollbackValidators(ctx context.Context, height types.Level) ([]Validator, error)
 	RollbackBlobLog(ctx context.Context, height types.Level) error
+	RollbackGrants(ctx context.Context, height types.Level) error
 	RollbackBlockSignatures(ctx context.Context, height types.Level) (err error)
 	RollbackSigners(ctx context.Context, txIds []uint64) (err error)
 	RollbackMessageAddresses(ctx context.Context, msgIds []uint64) (err error)

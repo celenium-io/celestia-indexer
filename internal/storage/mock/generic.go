@@ -1445,6 +1445,44 @@ func (c *TransactionRollbackEventsCall) DoAndReturn(f func(context.Context, type
 	return c
 }
 
+// RollbackGrants mocks base method.
+func (m *MockTransaction) RollbackGrants(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackGrants", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackGrants indicates an expected call of RollbackGrants.
+func (mr *MockTransactionMockRecorder) RollbackGrants(ctx, height any) *TransactionRollbackGrantsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackGrants", reflect.TypeOf((*MockTransaction)(nil).RollbackGrants), ctx, height)
+	return &TransactionRollbackGrantsCall{Call: call}
+}
+
+// TransactionRollbackGrantsCall wrap *gomock.Call
+type TransactionRollbackGrantsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionRollbackGrantsCall) Return(arg0 error) *TransactionRollbackGrantsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionRollbackGrantsCall) Do(f func(context.Context, types.Level) error) *TransactionRollbackGrantsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionRollbackGrantsCall) DoAndReturn(f func(context.Context, types.Level) error) *TransactionRollbackGrantsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // RollbackJails mocks base method.
 func (m *MockTransaction) RollbackJails(ctx context.Context, height types.Level) ([]storage.Jail, error) {
 	m.ctrl.T.Helper()
@@ -2244,6 +2282,49 @@ func (c *TransactionSaveEventsCall) Do(f func(context.Context, ...storage.Event)
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *TransactionSaveEventsCall) DoAndReturn(f func(context.Context, ...storage.Event) error) *TransactionSaveEventsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveGrants mocks base method.
+func (m *MockTransaction) SaveGrants(ctx context.Context, grants ...storage.Grant) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range grants {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveGrants", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveGrants indicates an expected call of SaveGrants.
+func (mr *MockTransactionMockRecorder) SaveGrants(ctx any, grants ...any) *TransactionSaveGrantsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, grants...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveGrants", reflect.TypeOf((*MockTransaction)(nil).SaveGrants), varargs...)
+	return &TransactionSaveGrantsCall{Call: call}
+}
+
+// TransactionSaveGrantsCall wrap *gomock.Call
+type TransactionSaveGrantsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionSaveGrantsCall) Return(arg0 error) *TransactionSaveGrantsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionSaveGrantsCall) Do(f func(context.Context, ...storage.Grant) error) *TransactionSaveGrantsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionSaveGrantsCall) DoAndReturn(f func(context.Context, ...storage.Grant) error) *TransactionSaveGrantsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
