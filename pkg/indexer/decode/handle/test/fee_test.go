@@ -65,6 +65,7 @@ func TestDecodeMsg_SuccessOnMsgRegisterPayee(t *testing.T) {
 		Type:      storageTypes.MsgRegisterPayee,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -124,6 +125,7 @@ func TestDecodeMsg_SuccessOnMsgRegisterCounterpartyPayee(t *testing.T) {
 		Type:      storageTypes.MsgRegisterCounterpartyPayee,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -171,6 +173,7 @@ func TestDecodeMsg_SuccessOnMsgPayPacketFee(t *testing.T) {
 		Type:      storageTypes.MsgPayPacketFee,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      51,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -202,6 +205,7 @@ func TestDecodeMsg_SuccessOnMsgPayPacketFeeAsync(t *testing.T) {
 		Type:      storageTypes.MsgPayPacketFeeAsync,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      6,
 		Namespace: nil,
 		Addresses: []storage.AddressWithType{},
 	}

@@ -56,7 +56,7 @@ func (m *Message) ByAddress(ctx context.Context, addressId uint64, filters stora
 	query = sortScope(query, "msg_id", filters.Sort)
 
 	wrapQuery := m.DB().NewSelect().TableExpr("(?) as msg_address", query).
-		ColumnExpr(`msg_address.address_id, msg_address.msg_id, msg_address.type, msg.id AS msg__id, msg.height AS msg__height, msg.time AS msg__time, msg.position AS msg__position, msg.type AS msg__type, msg.tx_id AS msg__tx_id, msg.data AS msg__data`).
+		ColumnExpr(`msg_address.address_id, msg_address.msg_id, msg_address.type, msg.id AS msg__id, msg.height AS msg__height, msg.time AS msg__time, msg.position AS msg__position, msg.type AS msg__type, msg.tx_id AS msg__tx_id, msg.size AS msg__size, msg.data AS msg__data`).
 		ColumnExpr("tx.messages_count as tx__messages_count, tx.fee as tx__fee, tx.status as tx__status, tx.hash as tx__hash, tx.message_types as tx__message_types").
 		Join("left join message as msg on msg_address.msg_id = msg.id").
 		Join("left join tx on tx.id = msg.tx_id")

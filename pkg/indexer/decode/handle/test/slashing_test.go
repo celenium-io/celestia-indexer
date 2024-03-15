@@ -61,6 +61,7 @@ func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 		Type:      storageTypes.MsgUnjail,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      56,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

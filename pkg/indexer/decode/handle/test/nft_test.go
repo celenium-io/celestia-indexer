@@ -74,6 +74,7 @@ func TestDecodeMsg_SuccessOnMsgSendNFT(t *testing.T) {
 		Type:      storageTypes.MsgSendNFT,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

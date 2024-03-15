@@ -5017,6 +5017,11 @@ const docTemplate = `{
                     "format": "int64",
                     "example": 2
                 },
+                "size": {
+                    "type": "integer",
+                    "format": "int",
+                    "example": 2
+                },
                 "time": {
                     "type": "string",
                     "format": "date-time",
@@ -5068,6 +5073,11 @@ const docTemplate = `{
                 "position": {
                     "type": "integer",
                     "format": "int64",
+                    "example": 2
+                },
+                "size": {
+                    "type": "integer",
+                    "format": "int",
                     "example": 2
                 },
                 "time": {

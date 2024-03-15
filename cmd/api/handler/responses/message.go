@@ -16,6 +16,7 @@ type Message struct {
 	Height   pkgTypes.Level `example:"100"                       format:"int64"     json:"height"          swaggertype:"integer"`
 	Time     time.Time      `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"            swaggertype:"string"`
 	Position int64          `example:"2"                         format:"int64"     json:"position"        swaggertype:"integer"`
+	Size     int            `example:"2"                         format:"int"       json:"size"            swaggertype:"integer"`
 	TxId     uint64         `example:"11"                        format:"int64"     json:"tx_id,omitempty" swaggertype:"integer"`
 
 	Type types.MsgType `example:"MsgCreatePeriodicVestingAccount" json:"type"`
@@ -33,6 +34,7 @@ func NewMessage(msg storage.Message) Message {
 		Position: msg.Position,
 		Type:     msg.Type,
 		TxId:     msg.TxId,
+		Size:     msg.Size,
 		Data:     msg.Data,
 	}
 }
@@ -45,6 +47,7 @@ func NewMessageWithTx(msg storage.MessageWithTx) Message {
 		Position: msg.Position,
 		Type:     msg.Type,
 		TxId:     msg.TxId,
+		Size:     msg.Size,
 		Data:     msg.Data,
 	}
 
@@ -61,6 +64,7 @@ type MessageForAddress struct {
 	Height   pkgTypes.Level `example:"100"                       format:"int64"     json:"height"          swaggertype:"integer"`
 	Time     time.Time      `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"            swaggertype:"string"`
 	Position int64          `example:"2"                         format:"int64"     json:"position"        swaggertype:"integer"`
+	Size     int            `example:"2"                         format:"int"       json:"size"            swaggertype:"integer"`
 	TxId     uint64         `example:"11"                        format:"int64"     json:"tx_id,omitempty" swaggertype:"integer"`
 
 	Type           types.MsgType        `example:"MsgCreatePeriodicVestingAccount" json:"type"`
@@ -78,6 +82,7 @@ func NewMessageForAddress(msg storage.AddressMessageWithTx) MessageForAddress {
 		Position:       msg.Msg.Position,
 		TxId:           msg.Msg.TxId,
 		Type:           msg.Msg.Type,
+		Size:           msg.Msg.Size,
 		Data:           msg.Msg.Data,
 		Tx:             NewTxForAddress(msg.Tx),
 		InvocationType: msg.Type,

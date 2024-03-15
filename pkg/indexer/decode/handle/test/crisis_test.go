@@ -62,6 +62,7 @@ func TestDecodeMsg_SuccessOnMsgVerifyInvariant(t *testing.T) {
 		Type:      storageTypes.MsgVerifyInvariant,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

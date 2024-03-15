@@ -76,6 +76,7 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 		Type:      storageTypes.MsgGrantAllowance,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      100,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -143,6 +144,7 @@ func TestDecodeMsg_SuccessOnMsgRevokeAllowance(t *testing.T) {
 		Type:      storageTypes.MsgRevokeAllowance,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

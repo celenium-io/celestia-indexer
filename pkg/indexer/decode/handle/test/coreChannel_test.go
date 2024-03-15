@@ -53,6 +53,7 @@ func TestDecodeMsg_SuccessOnMsgChannelOpenInit(t *testing.T) {
 		Type:      storageTypes.MsgChannelOpenInit,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      53,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -100,6 +101,7 @@ func TestDecodeMsg_SuccessOnMsgChannelOpenTry(t *testing.T) {
 		Type:      storageTypes.MsgChannelOpenTry,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      55,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -147,6 +149,7 @@ func TestDecodeMsg_SuccessOnMsgChannelOpenAck(t *testing.T) {
 		Type:      storageTypes.MsgChannelOpenAck,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      51,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -194,6 +197,7 @@ func TestDecodeMsg_SuccessOnMsgChannelOpenConfirm(t *testing.T) {
 		Type:      storageTypes.MsgChannelOpenConfirm,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      51,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -241,6 +245,7 @@ func TestDecodeMsg_SuccessOnMsgChannelCloseInit(t *testing.T) {
 		Type:      storageTypes.MsgChannelCloseInit,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -288,6 +293,7 @@ func TestDecodeMsg_SuccessOnMsgChannelCloseConfirm(t *testing.T) {
 		Type:      storageTypes.MsgChannelCloseConfirm,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      51,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -335,6 +341,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket(t *testing.T) {
 		Type:      storageTypes.MsgRecvPacket,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      55,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -382,6 +389,7 @@ func TestDecodeMsg_SuccessOnMsgTimeout(t *testing.T) {
 		Type:      storageTypes.MsgTimeout,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      55,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -429,6 +437,7 @@ func TestDecodeMsg_SuccessOnMsgTimeoutOnClose(t *testing.T) {
 		Type:      storageTypes.MsgTimeoutOnClose,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      55,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -476,6 +485,7 @@ func TestDecodeMsg_SuccessOnMsgAcknowledgement(t *testing.T) {
 		Type:      storageTypes.MsgAcknowledgement,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      55,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

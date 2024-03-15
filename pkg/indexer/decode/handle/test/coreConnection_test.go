@@ -53,6 +53,7 @@ func TestDecodeMsg_SuccessOnMsgConnectionOpenInit(t *testing.T) {
 		Type:      storageTypes.MsgConnectionOpenInit,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      53,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -100,6 +101,7 @@ func TestDecodeMsg_SuccessOnMsgConnectionOpenTry(t *testing.T) {
 		Type:      storageTypes.MsgConnectionOpenTry,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      57,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -147,6 +149,7 @@ func TestDecodeMsg_SuccessOnMsgConnectionOpenAck(t *testing.T) {
 		Type:      storageTypes.MsgConnectionOpenAck,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      53,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -194,6 +197,7 @@ func TestDecodeMsg_SuccessOnMsgConnectionOpenConfirm(t *testing.T) {
 		Type:      storageTypes.MsgConnectionOpenConfirm,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      51,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

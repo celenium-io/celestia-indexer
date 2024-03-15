@@ -53,6 +53,7 @@ func TestDecodeMsg_SuccessOnMsgCreateGroup(t *testing.T) {
 		Type:      storageTypes.MsgCreateGroup,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -100,6 +101,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupMembers(t *testing.T) {
 		Type:      storageTypes.MsgUpdateGroupMembers,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -158,6 +160,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupAdmin(t *testing.T) {
 		Type:      storageTypes.MsgUpdateGroupAdmin,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -205,6 +208,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupMetadata(t *testing.T) {
 		Type:      storageTypes.MsgUpdateGroupMetadata,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -252,6 +256,7 @@ func TestDecodeMsg_SuccessOnMsgCreateGroupPolicy(t *testing.T) {
 		Type:      storageTypes.MsgCreateGroupPolicy,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -299,6 +304,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyAdmin(t *testing.T) {
 		Type:      storageTypes.MsgUpdateGroupPolicyAdmin,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -346,6 +352,7 @@ func TestDecodeMsg_SuccessOnMsgCreateGroupWithPolicy(t *testing.T) {
 		Type:      storageTypes.MsgCreateGroupWithPolicy,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -403,6 +410,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyDecisionPolicy(t *testing.T) {
 		Type:      storageTypes.MsgUpdateGroupPolicyDecisionPolicy,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -460,6 +468,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyMetadata(t *testing.T) {
 		Type:      storageTypes.MsgUpdateGroupPolicyMetadata,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -506,6 +515,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposalGroup(t *testing.T) {
 		Type:      storageTypes.MsgSubmitProposalGroup,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -553,6 +563,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawProposal(t *testing.T) {
 		Type:      storageTypes.MsgWithdrawProposal,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -600,6 +611,7 @@ func TestDecodeMsg_SuccessOnMsgVoteGroup(t *testing.T) {
 		Type:      storageTypes.MsgVoteGroup,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -647,6 +659,7 @@ func TestDecodeMsg_SuccessOnMsgExecGroup(t *testing.T) {
 		Type:      storageTypes.MsgExecGroup,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -694,6 +707,7 @@ func TestDecodeMsg_SuccessOnMsgLeaveGroup(t *testing.T) {
 		Type:      storageTypes.MsgLeaveGroup,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

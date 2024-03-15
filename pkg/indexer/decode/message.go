@@ -44,6 +44,10 @@ type DecodedMsg struct {
 	Addresses []storage.AddressWithType
 }
 
+type measurable interface {
+	Size() int
+}
+
 func Message(
 	ctx *context.Context,
 	msg cosmosTypes.Msg,
@@ -213,7 +217,13 @@ func Message(
 	case *coreClient.MsgCreateClient:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateClient(ctx, typedMsg)
 	case *coreClient.MsgUpdateClient:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateClient(ctx, typedMsg)
+		typ, addrs, header, errParse := handle.MsgUpdateClient(ctx, status, typedMsg)
+		d.Msg.Addresses = addrs
+		d.Msg.Type = typ
+		err = errParse
+		if header != nil {
+			d.Msg.Data["Header"] = header
+		}
 	case *coreClient.MsgUpgradeClient:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpgradeClient(ctx, typedMsg)
 	case *coreClient.MsgSubmitMisbehaviour:
@@ -258,6 +268,14 @@ func Message(
 
 	if err != nil {
 		err = errors.Wrapf(err, "while decoding msg(%T) on position=%d", msg, position)
+	}
+
+	if d.Msg.Type != storageTypes.MsgUnknown {
+		if m, ok := msg.(measurable); ok {
+			d.Msg.Size = m.Size()
+		} else {
+			return d, errors.Errorf("message %T does not implement Size method: %##v", msg, msg)
+		}
 	}
 
 	d.Addresses = append(d.Addresses, d.Msg.Addresses...)

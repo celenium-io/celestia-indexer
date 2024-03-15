@@ -63,6 +63,7 @@ type Message struct {
 	Position int64          `bun:"position"                    comment:"Position in transaction"`
 	Type     types.MsgType  `bun:",type:msg_type"              comment:"Message type"                      stats:"filterable"`
 	TxId     uint64         `bun:"tx_id"                       comment:"Parent transaction id"`
+	Size     int            `bun:"size"                        comment:"Message size in bytes"`
 	Data     map[string]any `bun:"data,type:jsonb,nullzero"    comment:"Message data"`
 
 	Namespace    []Namespace       `bun:"m2m:namespace_message,join:Message=Namespace"`

@@ -30,6 +30,7 @@ func createExpectations(
 	address string,
 	hash []byte,
 	txType storageTypes.MsgType,
+	size int,
 ) ([]storage.AddressWithType, storage.Message) {
 	addressesExpected := []storage.AddressWithType{
 		{
@@ -53,6 +54,7 @@ func createExpectations(
 		Type:      txType,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      size,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -92,6 +94,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
 		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
 		storageTypes.MsgSubmitProposal,
+		49,
 	)
 
 	assert.NoError(t, err)
@@ -132,6 +135,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1(t *testing.T) {
 		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
 		storageTypes.MsgSubmitProposal,
+		49,
 	)
 
 	assert.NoError(t, err)
@@ -170,6 +174,7 @@ func TestDecodeMsg_SuccessOnMsgExecLegacyContent(t *testing.T) {
 		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
 		storageTypes.MsgExecLegacyContent,
+		49,
 	)
 
 	assert.NoError(t, err)
@@ -211,6 +216,7 @@ func TestDecodeMsg_SuccessOnMsgVote_V1(t *testing.T) {
 		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
 		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgVote,
+		53,
 	)
 
 	assert.NoError(t, err)
@@ -251,6 +257,7 @@ func TestDecodeMsg_SuccessOnMsgVote_V1Beta1(t *testing.T) {
 		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
 		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgVote,
+		53,
 	)
 	assert.NoError(t, err)
 	assert.Equal(t, int64(0), dm.BlobsSize)
@@ -290,6 +297,7 @@ func TestDecodeMsg_SuccessOnMsgVoteWeighted_V1(t *testing.T) {
 		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
 		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgVoteWeighted,
+		51,
 	)
 	assert.NoError(t, err)
 	assert.Equal(t, int64(0), dm.BlobsSize)
@@ -328,6 +336,7 @@ func TestDecodeMsg_SuccessOnMsgVoteWeighted_V1Beta1(t *testing.T) {
 		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
 		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgVoteWeighted,
+		51,
 	)
 
 	assert.NoError(t, err)
@@ -367,6 +376,7 @@ func TestDecodeMsg_SuccessMsgDeposit_V1(t *testing.T) {
 		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
 		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgDeposit,
+		51,
 	)
 	assert.NoError(t, err)
 	assert.Equal(t, int64(0), dm.BlobsSize)
@@ -405,6 +415,7 @@ func TestDecodeMsg_SuccessOnMsgDeposit_V1Beta1(t *testing.T) {
 		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
 		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgDeposit,
+		51,
 	)
 
 	assert.NoError(t, err)

@@ -90,6 +90,7 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 		Type:      storageTypes.MsgEditValidator,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      128,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -174,6 +175,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgBeginRedelegate,
 		TxId:      0,
+		Size:      172,
 		Data:      structs.Map(m),
 		Namespace: nil,
 		Addresses: addressesExpected,
@@ -265,6 +267,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 		Type:      storageTypes.MsgCreateValidator,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      201,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -341,6 +344,7 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 		Type:      storageTypes.MsgDelegate,
 		TxId:      0,
 		Data:      structs.Map(msgDelegate),
+		Size:      119,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -411,6 +415,7 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 		Type:      storageTypes.MsgUndelegate,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      119,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -482,6 +487,7 @@ func TestDecodeMsg_SuccessOnMsgCancelUnbondingDelegation(t *testing.T) {
 		Type:      storageTypes.MsgCancelUnbondingDelegation,
 		TxId:      0,
 		Data:      structs.Map(m),
+		Size:      121,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

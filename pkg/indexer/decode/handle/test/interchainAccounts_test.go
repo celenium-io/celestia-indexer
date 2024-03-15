@@ -53,6 +53,7 @@ func TestDecodeMsg_SuccessOnMsgRegisterInterchainAccount(t *testing.T) {
 		Type:      storageTypes.MsgRegisterInterchainAccount,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      49,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -100,6 +101,7 @@ func TestDecodeMsg_SuccessOnMsgSendTx(t *testing.T) {
 		Type:      storageTypes.MsgSendTx,
 		TxId:      0,
 		Data:      structs.Map(msg),
+		Size:      51,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

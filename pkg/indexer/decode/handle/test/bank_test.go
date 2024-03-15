@@ -81,6 +81,7 @@ func TestDecodeMsg_SuccessOnMsgSend(t *testing.T) {
 		Type:      storageTypes.MsgSend,
 		TxId:      0,
 		Data:      structs.Map(msgSend),
+		Size:      112,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -164,6 +165,7 @@ func TestDecodeMsg_SuccessOnMsgMultiSend(t *testing.T) {
 		Type:      storageTypes.MsgMultiSend,
 		TxId:      0,
 		Data:      structs.Map(msgMultiSend),
+		Size:      153,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
