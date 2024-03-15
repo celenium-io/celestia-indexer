@@ -25,6 +25,7 @@ type Grant struct {
 
 	Id            uint64         `bun:"id,pk,notnull,autoincrement"    comment:"Unique internal identity"`
 	Height        types.Level    `bun:"height"                         comment:"Block height"`
+	RevokeHeight  *types.Level   `bun:"revoke_height"                  comment:"Block height when grant was revoked"`
 	Time          time.Time      `bun:"time"                           comment:"The time of block"`
 	GranterId     uint64         `bun:"granter_id,unique:grant_key"    comment:"Granter internal identity"`
 	GranteeId     uint64         `bun:"grantee_id,unique:grant_key"    comment:"Grantee internal identity"`

@@ -277,7 +277,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			addressGroup.GET("/redelegations", addressHandlers.Redelegations)
 			addressGroup.GET("/vestings", addressHandlers.Vestings)
 			addressGroup.GET("/grants", addressHandlers.Grants)
-			addressGroup.GET("/grantee", addressHandlers.Grantee)
+			addressGroup.GET("/granters", addressHandlers.Grantee)
 		}
 	}
 

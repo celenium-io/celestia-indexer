@@ -109,9 +109,9 @@ func Message(
 
 	// feegrant module
 	case *cosmosFeegrant.MsgGrantAllowance:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgGrantAllowance(ctx, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.Grants, err = handle.MsgGrantAllowance(ctx, status, typedMsg)
 	case *cosmosFeegrant.MsgRevokeAllowance:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRevokeAllowance(ctx, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.Grants, err = handle.MsgRevokeAllowance(ctx, status, typedMsg)
 
 	// qgb module
 	case *qgbTypes.MsgRegisterEVMAddress:

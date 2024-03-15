@@ -228,7 +228,7 @@ func TestDecodeMsg_SuccessOnMsgRevoke(t *testing.T) {
 		Addresses: addressesExpected,
 		Grants: []storage.Grant{
 			{
-				Height: blob.Height,
+				RevokeHeight: &blob.Height,
 				Granter: &storage.Address{
 					Address: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
 				},
@@ -237,7 +237,6 @@ func TestDecodeMsg_SuccessOnMsgRevoke(t *testing.T) {
 				},
 				Authorization: "msg_type",
 				Revoked:       true,
-				Time:          blob.Block.Time,
 			},
 		},
 	}

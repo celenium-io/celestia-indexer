@@ -79,6 +79,19 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 		Size:      100,
 		Namespace: nil,
 		Addresses: addressesExpected,
+		Grants: []storage.Grant{
+			{
+				Height:        blob.Height,
+				Time:          blob.Block.Time,
+				Authorization: "fee",
+				Granter: &storage.Address{
+					Address: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
+				},
+				Grantee: &storage.Address{
+					Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
+				},
+			},
+		},
 	}
 
 	assert.NoError(t, err)
@@ -147,6 +160,19 @@ func TestDecodeMsg_SuccessOnMsgRevokeAllowance(t *testing.T) {
 		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
+		Grants: []storage.Grant{
+			{
+				RevokeHeight:  &blob.Height,
+				Revoked:       true,
+				Authorization: "fee",
+				Granter: &storage.Address{
+					Address: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
+				},
+				Grantee: &storage.Address{
+					Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
+				},
+			},
+		},
 	}
 
 	assert.NoError(t, err)

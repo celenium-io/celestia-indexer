@@ -5,5 +5,6 @@
   authorization: "/cosmos.staking.v1beta1.MsgDelegate"
   expiration: null
   revoked: false
+  revoke_height: null
   params:
     Msg: "/cosmos.staking.v1beta1.MsgDelegate"

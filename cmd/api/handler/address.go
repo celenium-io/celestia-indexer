@@ -664,7 +664,7 @@ func (handler *AddressHandler) Grants(c echo.Context) error {
 //	@Success		200	{array}		responses.Grant
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/{hash}/grantee [get]
+//	@Router			/v1/address/{hash}/granters [get]
 func (handler *AddressHandler) Grantee(c echo.Context) error {
 	req, err := bindAndValidate[getAddressPageable](c)
 	if err != nil {

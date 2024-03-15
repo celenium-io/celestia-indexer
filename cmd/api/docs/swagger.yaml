@@ -348,6 +348,9 @@ definitions:
       params:
         additionalProperties: {}
         type: object
+      revoke_height:
+        example: 123123
+        type: integer
       revoked:
         example: true
         type: boolean

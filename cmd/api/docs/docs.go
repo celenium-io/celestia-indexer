@@ -5230,6 +5230,10 @@ const docTemplate = `{
                     "type": "object",
                     "additionalProperties": {}
                 },
+                "revoke_height": {
+                    "type": "integer",
+                    "example": 123123
+                },
                 "revoked": {
                     "type": "boolean",
                     "example": true

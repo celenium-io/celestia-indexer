@@ -260,9 +260,10 @@ func (tx Transaction) SaveGrants(ctx context.Context, grants ...models.Grant) er
 
 	_, err := tx.Tx().NewInsert().
 		Model(&grants).
-		Column("height", "time", "granter_id", "grantee_id", "authorization", "expiration", "revoked", "params").
+		Column("height", "time", "granter_id", "grantee_id", "authorization", "expiration", "revoked", "revoke_height", "params").
 		On("CONFLICT ON CONSTRAINT grant_key DO UPDATE").
 		Set("revoked = EXCLUDED.revoked").
+		Set("revoke_height = EXCLUDED.revoke_height").
 		Exec(ctx)
 	return err
 }
@@ -474,7 +475,19 @@ func (tx Transaction) RollbackBlobLog(ctx context.Context, height types.Level) (
 }
 
 func (tx Transaction) RollbackGrants(ctx context.Context, height types.Level) (err error) {
-	_, err = tx.Tx().NewDelete().Model((*models.Grant)(nil)).Where("height = ?", height).Exec(ctx)
+	if _, err = tx.Tx().NewDelete().
+		Model((*models.Grant)(nil)).
+		Where("height = ?", height).
+		Exec(ctx); err != nil {
+		return err
+	}
+
+	_, err = tx.Tx().NewUpdate().
+		Model((*models.Grant)(nil)).
+		Where("revoke_height = ?", height).
+		Set("revoked = false").
+		Set("revoke_height = null").
+		Exec(ctx)
 	return
 }
 

@@ -83,8 +83,7 @@ func MsgRevoke(ctx *context.Context, status types.Status, m *authz.MsgRevoke) (s
 		},
 		Revoked:       true,
 		Authorization: m.MsgTypeUrl,
-		Height:        ctx.Block.Height,
-		Time:          ctx.Block.Time,
+		RevokeHeight:  &ctx.Block.Height,
 	}
 
 	return msgType, addresses, []storage.Grant{grant}, nil
