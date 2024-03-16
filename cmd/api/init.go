@@ -464,6 +464,7 @@ func initSentry(e *echo.Echo, dsn, environment string) error {
 		Environment:      environment,
 		EnableTracing:    true,
 		TracesSampleRate: 1.0,
+		Release:          os.Getenv("TAG"),
 	}); err != nil {
 		return errors.Wrap(err, "initialization")
 	}
