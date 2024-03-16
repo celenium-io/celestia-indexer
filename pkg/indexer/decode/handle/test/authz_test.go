@@ -80,7 +80,7 @@ func TestDecodeMsg_SuccessOnMsgGrant(t *testing.T) {
 		Type:      storageTypes.MsgGrant,
 		TxId:      0,
 		Data:      structs.Map(m),
-		Size:      100,
+		Size:      146,
 		Namespace: nil,
 		Addresses: addressesExpected,
 		Grants: []storage.Grant{
