@@ -6,6 +6,7 @@ package genesis
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
@@ -30,7 +31,10 @@ func TestParseAccounts(t *testing.T) {
 
 	module.parseDenomMetadata(g.AppState.Bank.DenomMetadata, &data)
 
-	err = module.parseAccounts(g.AppState.Auth.Accounts, 1, &data)
+	err = module.parseAccounts(g.AppState.Auth.Accounts, storage.Block{
+		Height: 1,
+		Time:   time.Now(),
+	}, &data)
 	require.NoError(t, err)
 
 	want := map[string]*storage.Address{
@@ -71,4 +75,5 @@ func TestParseAccounts(t *testing.T) {
 		},
 	}
 	require.Equal(t, want, data.addresses)
+	require.Len(t, data.vestings, 3)
 }

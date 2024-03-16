@@ -20,6 +20,8 @@ var Models = []any{
 	&DenomMetadata{},
 	&Balance{},
 	&Address{},
+	&VestingAccount{},
+	&VestingPeriod{},
 	&Block{},
 	&BlockStats{},
 	&BlockSignature{},
@@ -68,6 +70,8 @@ type Transaction interface {
 	SaveTransactions(ctx context.Context, txs ...Tx) error
 	SaveNamespaces(ctx context.Context, namespaces ...*Namespace) (int64, error)
 	SaveAddresses(ctx context.Context, addresses ...*Address) (int64, error)
+	SaveVestingAccounts(ctx context.Context, accounts ...*VestingAccount) error
+	SaveVestingPeriods(ctx context.Context, periods ...VestingPeriod) error
 	SaveBalances(ctx context.Context, balances ...Balance) error
 	SaveMessages(ctx context.Context, msgs ...*Message) error
 	SaveSigners(ctx context.Context, addresses ...Signer) error
@@ -95,6 +99,8 @@ type Transaction interface {
 	RollbackBlock(ctx context.Context, height types.Level) error
 	RollbackBlockStats(ctx context.Context, height types.Level) (stats BlockStats, err error)
 	RollbackAddresses(ctx context.Context, height types.Level) (address []Address, err error)
+	RollbackVestingAccounts(ctx context.Context, height types.Level) error
+	RollbackVestingPeriods(ctx context.Context, height types.Level) error
 	RollbackTxs(ctx context.Context, height types.Level) (txs []Tx, err error)
 	RollbackEvents(ctx context.Context, height types.Level) (events []Event, err error)
 	RollbackMessages(ctx context.Context, height types.Level) (msgs []Message, err error)

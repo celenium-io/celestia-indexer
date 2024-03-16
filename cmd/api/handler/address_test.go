@@ -48,6 +48,7 @@ type AddressTestSuite struct {
 	delegations   *mock.MockIDelegation
 	undelegations *mock.MockIUndelegation
 	redelegations *mock.MockIRedelegation
+	vestings      *mock.MockIVestingAccount
 	state         *mock.MockIState
 	echo          *echo.Echo
 	handler       *AddressHandler
@@ -66,8 +67,9 @@ func (s *AddressTestSuite) SetupSuite() {
 	s.delegations = mock.NewMockIDelegation(s.ctrl)
 	s.undelegations = mock.NewMockIUndelegation(s.ctrl)
 	s.redelegations = mock.NewMockIRedelegation(s.ctrl)
+	s.vestings = mock.NewMockIVestingAccount(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.state, testIndexerName)
+	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.vestings, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -552,4 +554,57 @@ func (s *AddressTestSuite) TestRedelegations() {
 	s.Require().Equal(testValidator.ConsAddress, d.Source.ConsAddress)
 	s.Require().NotNil(d.Destination)
 	s.Require().Equal(testValidator.ConsAddress, d.Destination.ConsAddress)
+}
+
+func (s *AddressTestSuite) TestVestings() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/address/:hash/vestings")
+	c.SetParamNames("hash")
+	c.SetParamValues(testAddress)
+
+	s.address.EXPECT().
+		ByHash(gomock.Any(), testHashAddress).
+		Return(storage.Address{
+			Id:      1,
+			Hash:    testHashAddress,
+			Address: testAddress,
+		}, nil)
+
+	s.vestings.EXPECT().
+		ByAddress(gomock.Any(), uint64(1), 10, 0, false).
+		Return([]storage.VestingAccount{
+			{
+				Time:      testTime,
+				Height:    1000,
+				AddressId: 1,
+				Amount:    decimal.RequireFromString("100"),
+				Address: &storage.Address{
+					Address: testAddress,
+					Id:      1,
+				},
+				Tx:      &testTx,
+				EndTime: &testTime,
+				Type:    types.VestingTypeDelayed,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Vestings(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var vestings []responses.Vesting
+	err := json.NewDecoder(rec.Body).Decode(&vestings)
+	s.Require().NoError(err)
+	s.Require().Len(vestings, 1)
+
+	v := vestings[0]
+	s.Require().Equal("100", v.Amount)
+	s.Require().EqualValues(1000, v.Height)
+	s.Require().Equal(testTime, v.Time)
+	s.Require().Equal(testTime, v.EndTime)
 }

@@ -16,8 +16,8 @@ type StakingLog struct {
 	*postgres.Table[*storage.StakingLog]
 }
 
-// NewDelegationLog -
-func NewDelegationLog(db *database.Bun) *StakingLog {
+// NewStakingLog -
+func NewStakingLog(db *database.Bun) *StakingLog {
 	return &StakingLog{
 		Table: postgres.NewTable[*storage.StakingLog](db),
 	}

@@ -203,6 +203,13 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 		return tx.HandleError(ctx, err)
 	}
 
+	if err := tx.RollbackVestingPeriods(ctx, height); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+	if err := tx.RollbackVestingAccounts(ctx, height); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
 	newBlock, err := tx.LastBlock(ctx)
 	if err != nil {
 		return tx.HandleError(ctx, err)

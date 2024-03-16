@@ -66,10 +66,11 @@ type Message struct {
 	Size     int            `bun:"size"                        comment:"Message size in bytes"`
 	Data     map[string]any `bun:"data,type:jsonb,nullzero"    comment:"Message data"`
 
-	Namespace    []Namespace       `bun:"m2m:namespace_message,join:Message=Namespace"`
-	Addresses    []AddressWithType `bun:"-"`
-	BlobLogs     []*BlobLog        `bun:"-"`
-	InternalMsgs []string          `bun:"-"` // field for parsing MsgExec internal messages
+	Namespace      []Namespace       `bun:"m2m:namespace_message,join:Message=Namespace"`
+	Addresses      []AddressWithType `bun:"-"`
+	BlobLogs       []*BlobLog        `bun:"-"`
+	InternalMsgs   []string          `bun:"-"` // field for parsing MsgExec internal messages
+	VestingAccount *VestingAccount   `bun:"-"` // internal field
 }
 
 // TableName -

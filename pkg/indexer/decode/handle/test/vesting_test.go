@@ -5,6 +5,7 @@ package handle_test
 
 import (
 	"testing"
+	"time"
 
 	"cosmossdk.io/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -15,6 +16,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/fatih/structs"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -86,6 +88,15 @@ func TestDecodeMsg_SuccessOnMsgCreateVestingAccount(t *testing.T) {
 		Size:      112,
 		Namespace: nil,
 		Addresses: addressesExpected,
+		VestingAccount: &storage.VestingAccount{
+			Height: blob.Height,
+			Time:   blob.Block.Time,
+			Address: &storage.Address{
+				Address: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
+			},
+			Amount: decimal.RequireFromString("1000"),
+			Type:   storageTypes.VestingTypeContinuous,
+		},
 	}
 
 	assert.NoError(t, err)
@@ -155,6 +166,15 @@ func TestDecodeMsg_SuccessOnMsgCreatePermanentLockedAccount(t *testing.T) {
 		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
+		VestingAccount: &storage.VestingAccount{
+			Height: blob.Height,
+			Time:   blob.Block.Time,
+			Address: &storage.Address{
+				Address: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
+			},
+			Amount: decimal.RequireFromString("0"),
+			Type:   storageTypes.VestingTypePermanent,
+		},
 	}
 
 	assert.NoError(t, err)
@@ -167,10 +187,15 @@ func TestDecodeMsg_SuccessOnMsgCreatePermanentLockedAccount(t *testing.T) {
 
 func createMsgCreatePeriodicVestingAccount() types.Msg {
 	m := cosmosVestingTypes.MsgCreatePeriodicVestingAccount{
-		FromAddress:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-		ToAddress:      "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
-		StartTime:      0,
-		VestingPeriods: nil,
+		FromAddress: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		ToAddress:   "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
+		StartTime:   1710357710,
+		VestingPeriods: []cosmosVestingTypes.Period{
+			{
+				Length: 1000,
+				Amount: types.NewCoins(types.NewCoin("utia", types.OneInt())),
+			},
+		},
 	}
 
 	return &m
@@ -214,6 +239,7 @@ func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 		},
 	}
 
+	startTime := time.Date(2024, 03, 13, 19, 21, 50, 0, time.UTC)
 	msgExpected := storage.Message{
 		Id:        0,
 		Height:    blob.Height,
@@ -225,6 +251,23 @@ func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 		Size:      98,
 		Namespace: nil,
 		Addresses: addressesExpected,
+		VestingAccount: &storage.VestingAccount{
+			Height: blob.Height,
+			Time:   blob.Block.Time,
+			Address: &storage.Address{
+				Address: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
+			},
+			Amount:    decimal.RequireFromString("1"),
+			Type:      storageTypes.VestingTypePeriodic,
+			StartTime: &startTime,
+			VestingPeriods: []storage.VestingPeriod{
+				{
+					Height: blob.Height,
+					Amount: decimal.RequireFromString("1"),
+					Time:   time.Date(2024, 03, 13, 19, 38, 30, 0, time.UTC),
+				},
+			},
+		},
 	}
 
 	assert.NoError(t, err)

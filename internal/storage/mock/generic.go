@@ -1870,6 +1870,82 @@ func (c *TransactionRollbackValidatorsCall) DoAndReturn(f func(context.Context, 
 	return c
 }
 
+// RollbackVestingAccounts mocks base method.
+func (m *MockTransaction) RollbackVestingAccounts(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackVestingAccounts", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackVestingAccounts indicates an expected call of RollbackVestingAccounts.
+func (mr *MockTransactionMockRecorder) RollbackVestingAccounts(ctx, height any) *TransactionRollbackVestingAccountsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackVestingAccounts", reflect.TypeOf((*MockTransaction)(nil).RollbackVestingAccounts), ctx, height)
+	return &TransactionRollbackVestingAccountsCall{Call: call}
+}
+
+// TransactionRollbackVestingAccountsCall wrap *gomock.Call
+type TransactionRollbackVestingAccountsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionRollbackVestingAccountsCall) Return(arg0 error) *TransactionRollbackVestingAccountsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionRollbackVestingAccountsCall) Do(f func(context.Context, types.Level) error) *TransactionRollbackVestingAccountsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionRollbackVestingAccountsCall) DoAndReturn(f func(context.Context, types.Level) error) *TransactionRollbackVestingAccountsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackVestingPeriods mocks base method.
+func (m *MockTransaction) RollbackVestingPeriods(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackVestingPeriods", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackVestingPeriods indicates an expected call of RollbackVestingPeriods.
+func (mr *MockTransactionMockRecorder) RollbackVestingPeriods(ctx, height any) *TransactionRollbackVestingPeriodsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackVestingPeriods", reflect.TypeOf((*MockTransaction)(nil).RollbackVestingPeriods), ctx, height)
+	return &TransactionRollbackVestingPeriodsCall{Call: call}
+}
+
+// TransactionRollbackVestingPeriodsCall wrap *gomock.Call
+type TransactionRollbackVestingPeriodsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionRollbackVestingPeriodsCall) Return(arg0 error) *TransactionRollbackVestingPeriodsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionRollbackVestingPeriodsCall) Do(f func(context.Context, types.Level) error) *TransactionRollbackVestingPeriodsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionRollbackVestingPeriodsCall) DoAndReturn(f func(context.Context, types.Level) error) *TransactionRollbackVestingPeriodsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // SaveAddresses mocks base method.
 func (m *MockTransaction) SaveAddresses(ctx context.Context, addresses ...*storage.Address) (int64, error) {
 	m.ctrl.T.Helper()
@@ -2724,6 +2800,92 @@ func (c *TransactionSaveValidatorsCall) Do(f func(context.Context, ...*storage.V
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *TransactionSaveValidatorsCall) DoAndReturn(f func(context.Context, ...*storage.Validator) (int, error)) *TransactionSaveValidatorsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveVestingAccounts mocks base method.
+func (m *MockTransaction) SaveVestingAccounts(ctx context.Context, accounts ...*storage.VestingAccount) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range accounts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveVestingAccounts", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveVestingAccounts indicates an expected call of SaveVestingAccounts.
+func (mr *MockTransactionMockRecorder) SaveVestingAccounts(ctx any, accounts ...any) *TransactionSaveVestingAccountsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, accounts...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveVestingAccounts", reflect.TypeOf((*MockTransaction)(nil).SaveVestingAccounts), varargs...)
+	return &TransactionSaveVestingAccountsCall{Call: call}
+}
+
+// TransactionSaveVestingAccountsCall wrap *gomock.Call
+type TransactionSaveVestingAccountsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionSaveVestingAccountsCall) Return(arg0 error) *TransactionSaveVestingAccountsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionSaveVestingAccountsCall) Do(f func(context.Context, ...*storage.VestingAccount) error) *TransactionSaveVestingAccountsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionSaveVestingAccountsCall) DoAndReturn(f func(context.Context, ...*storage.VestingAccount) error) *TransactionSaveVestingAccountsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveVestingPeriods mocks base method.
+func (m *MockTransaction) SaveVestingPeriods(ctx context.Context, periods ...storage.VestingPeriod) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range periods {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveVestingPeriods", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveVestingPeriods indicates an expected call of SaveVestingPeriods.
+func (mr *MockTransactionMockRecorder) SaveVestingPeriods(ctx any, periods ...any) *TransactionSaveVestingPeriodsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, periods...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveVestingPeriods", reflect.TypeOf((*MockTransaction)(nil).SaveVestingPeriods), varargs...)
+	return &TransactionSaveVestingPeriodsCall{Call: call}
+}
+
+// TransactionSaveVestingPeriodsCall wrap *gomock.Call
+type TransactionSaveVestingPeriodsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionSaveVestingPeriodsCall) Return(arg0 error) *TransactionSaveVestingPeriodsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionSaveVestingPeriodsCall) Do(f func(context.Context, ...storage.VestingPeriod) error) *TransactionSaveVestingPeriodsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionSaveVestingPeriodsCall) DoAndReturn(f func(context.Context, ...storage.VestingPeriod) error) *TransactionSaveVestingPeriodsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

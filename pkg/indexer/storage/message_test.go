@@ -324,8 +324,7 @@ func Test_saveMessages(t *testing.T) {
 
 		tx.EXPECT().
 			SaveNamespaceMessage(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			MinTimes(1).
+			Times(1).
 			DoAndReturn(func(_ context.Context, nsMsg ...storage.NamespaceMessage) error {
 				require.Equal(t, tt.wantNamespaceMessageCount, len(nsMsg))
 				return nil
@@ -333,8 +332,7 @@ func Test_saveMessages(t *testing.T) {
 
 		tx.EXPECT().
 			SaveMessages(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			MinTimes(1).
+			Times(1).
 			DoAndReturn(func(_ context.Context, msgs ...*storage.Message) error {
 				require.Equal(t, len(tt.args.messages), len(msgs))
 				return nil
@@ -342,8 +340,7 @@ func Test_saveMessages(t *testing.T) {
 
 		tx.EXPECT().
 			SaveMsgAddresses(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			MinTimes(1).
+			Times(1).
 			DoAndReturn(func(_ context.Context, msgAddr ...storage.MsgAddress) error {
 				require.Equal(t, tt.wantMsgAddress, len(msgAddr))
 				return nil
@@ -351,8 +348,17 @@ func Test_saveMessages(t *testing.T) {
 
 		tx.EXPECT().
 			SaveBlobLogs(gomock.Any(), gomock.Any()).
+			Times(1).
+			Return(nil)
+
+		tx.EXPECT().
+			SaveVestingAccounts(gomock.Any(), gomock.Any()).
 			MaxTimes(1).
-			MinTimes(1).
+			Return(nil)
+
+		tx.EXPECT().
+			SaveVestingPeriods(gomock.Any(), gomock.Any()).
+			MaxTimes(1).
 			Return(nil)
 
 		t.Run(tt.name, func(t *testing.T) {

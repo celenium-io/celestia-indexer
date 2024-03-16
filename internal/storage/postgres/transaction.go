@@ -235,6 +235,24 @@ func (tx Transaction) SaveBlockSignatures(ctx context.Context, signs ...models.B
 	return err
 }
 
+func (tx Transaction) SaveVestingAccounts(ctx context.Context, accs ...*models.VestingAccount) error {
+	if len(accs) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&accs).Returning("id").Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveVestingPeriods(ctx context.Context, periods ...models.VestingPeriod) error {
+	if len(periods) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&periods).Returning("id").Exec(ctx)
+	return err
+}
+
 type addedValidator struct {
 	bun.BaseModel `bun:"validator"`
 	*models.Validator
@@ -448,6 +466,16 @@ func (tx Transaction) RollbackUndelegations(ctx context.Context, height types.Le
 
 func (tx Transaction) RollbackRedelegations(ctx context.Context, height types.Level) (err error) {
 	_, err = tx.Tx().NewDelete().Model((*models.Redelegation)(nil)).Where("height = ?", height).Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackVestingAccounts(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.VestingAccount)(nil)).Where("height = ?", height).Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackVestingPeriods(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.VestingPeriod)(nil)).Where("height = ?", height).Exec(ctx)
 	return
 }
 

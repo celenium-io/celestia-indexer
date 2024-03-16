@@ -40,7 +40,7 @@ type BaseVestingAccount struct {
 	OriginalVesting  []Coins     `json:"original_vesting"`
 	DelegatedFree    []Coins     `json:"delegated_free"`
 	DelegatedVesting []Coins     `json:"delegated_vesting"`
-	EndTime          string      `json:"end_time"`
+	EndTime          int64       `json:"end_time,string,omitempty"`
 }
 
 type Accounts struct {
@@ -53,6 +53,13 @@ type Accounts struct {
 	BaseVestingAccount BaseVestingAccount `json:"base_vesting_account,omitempty"`
 	Name               string             `json:"name,omitempty"`
 	Permissions        []interface{}      `json:"permissions,omitempty"`
+	StartTime          *int64             `json:"start_time,string,omitempty"`
+	VestingPeriods     []VestingPeriod    `json:"vesting_periods,omitempty"`
+}
+
+type VestingPeriod struct {
+	Length int64   `json:"length,string"`
+	Amount []Coins `json:"amount"`
 }
 
 type Auth struct {

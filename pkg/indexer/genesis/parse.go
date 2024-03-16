@@ -5,6 +5,7 @@ package genesis
 
 import (
 	"strings"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -25,6 +26,7 @@ type parsedData struct {
 	delegations   []storage.Delegation
 	constants     []storage.Constant
 	denomMetadata []storage.DenomMetadata
+	vestings      []*storage.VestingAccount
 }
 
 func newParsedData() parsedData {
@@ -35,6 +37,7 @@ func newParsedData() parsedData {
 		delegations:   make([]storage.Delegation, 0),
 		constants:     make([]storage.Constant, 0),
 		denomMetadata: make([]storage.DenomMetadata, 0),
+		vestings:      make([]*storage.VestingAccount, 0),
 	}
 }
 
@@ -111,7 +114,7 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 
 	module.parseTotalSupply(genesis.AppState.Bank.Supply, &block)
 
-	if err := module.parseAccounts(genesis.AppState.Auth.Accounts, block.Height, &data); err != nil {
+	if err := module.parseAccounts(genesis.AppState.Auth.Accounts, block, &data); err != nil {
 		return data, errors.Wrap(err, "parse genesis accounts")
 	}
 	if err := module.parseBalances(genesis.AppState.Bank.Balances, block.Height, &data); err != nil {
@@ -140,11 +143,11 @@ func (module *Module) parseTotalSupply(supply []types.Supply, block *storage.Blo
 	}
 }
 
-func (module *Module) parseAccounts(accounts []types.Accounts, height pkgTypes.Level, data *parsedData) error {
+func (module *Module) parseAccounts(accounts []types.Accounts, block storage.Block, data *parsedData) error {
 	for i := range accounts {
 		address := storage.Address{
-			Height:     height,
-			LastHeight: height,
+			Height:     block.Height,
+			LastHeight: block.Height,
 			Balance: storage.Balance{
 				Spendable: decimal.Zero,
 				Delegated: decimal.Zero,
@@ -158,6 +161,9 @@ func (module *Module) parseAccounts(accounts []types.Accounts, height pkgTypes.L
 		switch {
 		case strings.Contains(accounts[i].Type, "PeriodicVestingAccount"):
 			readableAddress = accounts[i].BaseVestingAccount.BaseAccount.Address
+			if err := parseVesting(accounts[i], block, readableAddress, storageTypes.VestingTypePeriodic, data); err != nil {
+				return err
+			}
 
 		case strings.Contains(accounts[i].Type, "ModuleAccount"):
 			readableAddress = accounts[i].BaseAccount.Address
@@ -167,9 +173,15 @@ func (module *Module) parseAccounts(accounts []types.Accounts, height pkgTypes.L
 
 		case strings.Contains(accounts[i].Type, "ContinuousVestingAccount"):
 			readableAddress = accounts[i].BaseVestingAccount.BaseAccount.Address
+			if err := parseVesting(accounts[i], block, readableAddress, storageTypes.VestingTypeContinuous, data); err != nil {
+				return err
+			}
 
 		case strings.Contains(accounts[i].Type, "DelayedVestingAccount"):
 			readableAddress = accounts[i].BaseVestingAccount.BaseAccount.Address
+			if err := parseVesting(accounts[i], block, readableAddress, storageTypes.VestingTypeDelayed, data); err != nil {
+				return err
+			}
 
 		default:
 			return errors.Errorf("unknown account type: %s", accounts[i].Type)
@@ -219,5 +231,66 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 		}
 	}
 
+	return nil
+}
+
+func getAmountFromOriginalVesting(vestings []types.Coins) (decimal.Decimal, error) {
+	var amount = decimal.Zero.Copy()
+
+	for i := range vestings {
+		val, err := decimal.NewFromString(vestings[i].Amount)
+		if err != nil {
+			return amount, err
+		}
+		amount = amount.Add(val)
+	}
+
+	return amount, nil
+}
+
+func parseVesting(acc types.Accounts, block storage.Block, address string, typ storageTypes.VestingType, data *parsedData) error {
+	amount, err := getAmountFromOriginalVesting(acc.BaseVestingAccount.OriginalVesting)
+	if err != nil {
+		return err
+	}
+
+	v := storage.VestingAccount{
+		Height: block.Height,
+		Time:   block.Time,
+		Address: &storage.Address{
+			Address: address,
+		},
+		Type:           typ,
+		Amount:         amount,
+		VestingPeriods: make([]storage.VestingPeriod, 0),
+	}
+
+	if acc.BaseVestingAccount.EndTime > 0 {
+		t := time.Unix(acc.BaseVestingAccount.EndTime, 0).UTC()
+		v.EndTime = &t
+	}
+
+	var periodTime = v.Time
+	if acc.StartTime != nil {
+		t := time.Unix(*acc.StartTime, 0).UTC()
+		v.StartTime = &t
+		periodTime = t
+	}
+
+	for i := range acc.VestingPeriods {
+		period := storage.VestingPeriod{
+			Height: v.Height,
+		}
+		amount, err := getAmountFromOriginalVesting(acc.VestingPeriods[i].Amount)
+		if err != nil {
+			return err
+		}
+		period.Amount = amount
+		periodTime = periodTime.Add(time.Second * time.Duration(acc.VestingPeriods[i].Length))
+		period.Time = periodTime
+		v.VestingPeriods = append(v.VestingPeriods, period)
+	}
+
+	data.vestings = append(data.vestings, &v)
 	return nil
 }

@@ -23,12 +23,13 @@ func (module *Module) saveMessages(
 	}
 
 	var (
-		namespaceMsgs []storage.NamespaceMessage
-		msgAddress    []storage.MsgAddress
-		blobLogs      = make([]storage.BlobLog, 0)
-		namespaces    = make(map[string]uint64)
-		addedMsgId    = make(map[uint64]struct{})
-		msgAddrMap    = make(map[string]struct{})
+		namespaceMsgs   []storage.NamespaceMessage
+		msgAddress      []storage.MsgAddress
+		vestingAccounts = make([]*storage.VestingAccount, 0)
+		blobLogs        = make([]storage.BlobLog, 0)
+		namespaces      = make(map[string]uint64)
+		addedMsgId      = make(map[uint64]struct{})
+		msgAddrMap      = make(map[string]struct{})
 	)
 	for i := range messages {
 		for j := range messages[i].Namespace {
@@ -83,6 +84,16 @@ func (module *Module) saveMessages(
 
 			blobLogs = append(blobLogs, *messages[i].BlobLogs[j])
 		}
+
+		if messages[i].VestingAccount != nil {
+			addrId, ok := addrToId[messages[i].VestingAccount.Address.Address]
+			if !ok {
+				continue
+			}
+			messages[i].VestingAccount.AddressId = addrId
+			messages[i].VestingAccount.TxId = &messages[i].TxId
+			vestingAccounts = append(vestingAccounts, messages[i].VestingAccount)
+		}
 	}
 
 	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
@@ -93,6 +104,24 @@ func (module *Module) saveMessages(
 	}
 	if err := tx.SaveBlobLogs(ctx, blobLogs...); err != nil {
 		return err
+	}
+
+	if len(vestingAccounts) > 0 {
+		if err := tx.SaveVestingAccounts(ctx, vestingAccounts...); err != nil {
+			return err
+		}
+
+		vestingPeriods := make([]storage.VestingPeriod, 0)
+		for i := range vestingAccounts {
+			for j := range vestingAccounts[i].VestingPeriods {
+				vestingAccounts[i].VestingPeriods[j].VestingAccountId = vestingAccounts[i].Id
+			}
+			vestingPeriods = append(vestingPeriods, vestingAccounts[i].VestingPeriods...)
+		}
+
+		if err := tx.SaveVestingPeriods(ctx, vestingPeriods...); err != nil {
+			return err
+		}
 	}
 
 	return nil

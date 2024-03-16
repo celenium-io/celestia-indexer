@@ -1,0 +1,8 @@
+- id: 1
+  address_id: 1
+  height: 0
+  time: '2023-01-01T00:00:00Z'
+  amount: 100000
+  start_time: null
+  end_time: '2024-01-01T00:00:00Z'
+  type: delayed
