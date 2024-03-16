@@ -427,6 +427,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			rollup.GET("/blobs", rollupHandler.GetBlobs)
 			rollup.GET("/stats/:name/:timeframe", rollupHandler.Stats)
 			rollup.GET("/distribution/:name/:timeframe", rollupHandler.Distribution)
+			rollup.GET("/export", rollupHandler.ExportBlobs)
 		}
 	}
 

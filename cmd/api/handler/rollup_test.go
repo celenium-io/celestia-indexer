@@ -316,3 +316,35 @@ func (s *RollupTestSuite) TestBySlug() {
 	s.Require().EqualValues(11, rollup.BlobsCount)
 	s.Require().EqualValues(testTime, rollup.LastAction)
 }
+
+func (s *RollupTestSuite) TestByExportBlobs() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/rollup/:id/export")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	s.rollups.EXPECT().
+		Providers(gomock.Any(), uint64(1)).
+		Return([]storage.RollupProvider{
+			{
+				RollupId:    1,
+				NamespaceId: 2,
+				AddressId:   3,
+			},
+		}, nil)
+
+	s.blobs.EXPECT().
+		ExportByProviders(gomock.Any(), []storage.RollupProvider{
+			{
+				RollupId:    1,
+				NamespaceId: 2,
+				AddressId:   3,
+			},
+		}, gomock.Any()).
+		Return(nil)
+
+	s.Require().NoError(s.handler.ExportBlobs(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+}

@@ -40,7 +40,7 @@ func (e *Export) ToCsv(ctx context.Context, writer io.Writer, query string) erro
 	}
 	defer conn.Close()
 
-	rawQuery := fmt.Sprintf("COPY %s TO STDOUT WITH CSV HEADER", bun.Safe(query))
+	rawQuery := fmt.Sprintf("COPY (%s) TO STDOUT WITH CSV HEADER", bun.Safe(query))
 	_, err = pgdriver.CopyTo(ctx, conn, writer, rawQuery)
 	return err
 }

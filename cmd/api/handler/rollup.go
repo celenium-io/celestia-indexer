@@ -359,3 +359,42 @@ func (handler RollupHandler) Distribution(c echo.Context) error {
 	}
 	return returnArray(c, response)
 }
+
+// ExportBlobs godoc
+//
+//	@Summary		Export rollup blobs
+//	@Description	Export rollup blobs
+//	@Tags			rollup
+//	@ID				rollup-export
+//	@Param			id			path	integer	true	"Internal identity"				mininum(1)
+//	@Success		200
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/rollup/{id}/export [get]
+func (handler RollupHandler) ExportBlobs(c echo.Context) error {
+	req, err := bindAndValidate[getById](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	providers, err := handler.rollups.Providers(c.Request().Context(), req.Id)
+	if err != nil {
+		return handleError(c, err, handler.rollups)
+	}
+	if len(providers) == 0 {
+		return c.JSON(http.StatusOK, []any{})
+	}
+
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlain)
+	c.Response().WriteHeader(http.StatusOK)
+
+	err = handler.blobs.ExportByProviders(
+		c.Request().Context(),
+		providers,
+		c.Response(),
+	)
+	if err != nil {
+		return handleError(c, err, handler.rollups)
+	}
+	return nil
+}
