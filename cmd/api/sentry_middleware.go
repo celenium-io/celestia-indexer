@@ -47,14 +47,14 @@ func handleSentry(next echo.HandlerFunc) echo.HandlerFunc {
 		}()
 
 		req = req.WithContext(transaction.Context())
-		hub.Scope().SetRequest(req)
-		hub.Scope().SetUser(sentry.User{
-			IPAddress: ctx.RealIP(),
+		sentry.ConfigureScope(func(scope *sentry.Scope) {
+			scope.SetUser(sentry.User{
+				IPAddress: ctx.RealIP(),
+			})
+			scope.SetRequest(req)
 		})
 		ctx.Set("sentry", hub)
-		transaction.SetTag("method", req.Method)
 		transaction.SetTag("user-agent", req.UserAgent())
-		transaction.SetTag("ip", ctx.RealIP())
 
 		defer recoverWithSentry(hub, req)
 
