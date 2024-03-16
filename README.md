@@ -3,6 +3,7 @@
 [![made_with golang](https://img.shields.io/badge/made_with-golang-blue.svg)](https://golang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Coverage](https://github.com/celenium-io/celestia-indexer/wiki/coverage.svg)](https://raw.githack.com/wiki/celenium-io/celestia-indexer/coverage.html)
+[![Latest release](https://img.shields.io/github/v/release/celenium-io/celestia-indexer.svg)](https://github.com/celenium-io/celestia-indexer/releases)
 
 # Celestia Indexer | Celenium #
 
