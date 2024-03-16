@@ -248,7 +248,7 @@ func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 		Type:      storageTypes.MsgCreatePeriodicVestingAccount,
 		TxId:      0,
 		Data:      structs.Map(msgCreatePeriodicVestingAccount),
-		Size:      98,
+		Size:      120,
 		Namespace: nil,
 		Addresses: addressesExpected,
 		VestingAccount: &storage.VestingAccount{
