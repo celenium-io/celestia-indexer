@@ -12,7 +12,7 @@ require (
 	github.com/dipdup-net/go-lib v0.4.0
 	github.com/dipdup-net/indexer-sdk v0.0.5
 	github.com/fatih/structs v1.1.0
-	github.com/getsentry/sentry-go v0.25.0
+	github.com/getsentry/sentry-go v0.27.0
 	github.com/go-playground/validator/v10 v10.18.0
 	github.com/go-testfixtures/testfixtures/v3 v3.9.0
 	github.com/goccy/go-json v0.10.2
