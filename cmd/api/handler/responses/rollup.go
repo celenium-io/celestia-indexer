@@ -40,7 +40,7 @@ func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 		Size:        r.Size,
 		LastAction:  r.LastActionTime,
 		FirstAction: r.FirstActionTime,
-		Fee:         r.Fee.String(),
+		Fee:         r.Fee.StringFixed(0),
 	}
 }
 
