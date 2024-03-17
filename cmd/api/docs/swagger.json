@@ -2741,6 +2741,54 @@
                 }
             }
         },
+        "/v1/rollup/{id}/export": {
+            "get": {
+                "description": "Export rollup blobs",
+                "tags": [
+                    "rollup"
+                ],
+                "summary": "Export rollup blobs",
+                "operationId": "rollup-export",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal identity",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/rollup/{id}/namespaces": {
             "get": {
                 "description": "Get rollup namespaces info",

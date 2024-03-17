@@ -5,6 +5,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -360,6 +361,12 @@ func (handler RollupHandler) Distribution(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+type exportBlobsRequest struct {
+	Id   uint64 `example:"10"         param:"id"   swaggertype:"integer" validate:"required,min=1"`
+	From int64  `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1"`
+	To   int64  `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
 // ExportBlobs godoc
 //
 //	@Summary		Export rollup blobs
@@ -367,12 +374,14 @@ func (handler RollupHandler) Distribution(c echo.Context) error {
 //	@Tags			rollup
 //	@ID				rollup-export
 //	@Param			id			path	integer	true	"Internal identity"				mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
 //	@Success		200
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/v1/rollup/{id}/export [get]
 func (handler RollupHandler) ExportBlobs(c echo.Context) error {
-	req, err := bindAndValidate[getById](c)
+	req, err := bindAndValidate[exportBlobsRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
@@ -388,9 +397,22 @@ func (handler RollupHandler) ExportBlobs(c echo.Context) error {
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlain)
 	c.Response().WriteHeader(http.StatusOK)
 
+	var (
+		from time.Time
+		to   time.Time
+	)
+	if req.From > 0 {
+		from = time.Unix(req.From, 0)
+	}
+	if req.To > 0 {
+		to = time.Unix(req.To, 0)
+	}
+
 	err = handler.blobs.ExportByProviders(
 		c.Request().Context(),
 		providers,
+		from,
+		to,
 		c.Response(),
 	)
 	if err != nil {

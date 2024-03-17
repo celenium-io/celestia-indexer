@@ -80,14 +80,45 @@ func (bl *BlobLog) ByProviders(ctx context.Context, providers []storage.RollupPr
 	return
 }
 
-func (bl *BlobLog) ExportByProviders(ctx context.Context, providers []storage.RollupProvider, stream io.Writer) (err error) {
+const (
+	maxExportPeriodInMonth = 1
+)
+
+func (bl *BlobLog) ExportByProviders(ctx context.Context, providers []storage.RollupProvider, from, to time.Time, stream io.Writer) (err error) {
 	if len(providers) == 0 {
 		return nil
 	}
 
 	blobQuery := bl.DB().NewSelect().
-		Model((*storage.BlobLog)(nil)).
-		Where("time > ?", time.Now().AddDate(0, -1, 0).UTC())
+		Model((*storage.BlobLog)(nil))
+
+	switch {
+	case from.IsZero() && to.IsZero():
+		blobQuery = blobQuery.
+			Where("time >= ?", time.Now().AddDate(0, -maxExportPeriodInMonth, 0).UTC())
+
+	case !from.IsZero() && to.IsZero():
+		blobQuery = blobQuery.
+			Where("time >= ?", from.UTC()).
+			Where("time < ?", from.AddDate(0, maxExportPeriodInMonth, 0).UTC())
+
+	case from.IsZero() && !to.IsZero():
+		blobQuery = blobQuery.
+			Where("time < ?", to.UTC()).
+			Where("time >= ?", to.AddDate(0, -maxExportPeriodInMonth, 0).UTC())
+
+	case !from.IsZero() && !to.IsZero():
+		if to.Sub(from) > time.Hour*24*30 {
+			blobQuery = blobQuery.
+				Where("time >= ?", from.UTC()).
+				Where("time < ?", from.AddDate(0, maxExportPeriodInMonth, 0).UTC())
+		} else {
+			blobQuery = blobQuery.
+				Where("time >= ?", from.UTC()).
+				Where("time < ?", to.UTC())
+		}
+
+	}
 
 	for i := range providers {
 		blobQuery = blobQuery.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {

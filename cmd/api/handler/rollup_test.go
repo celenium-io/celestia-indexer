@@ -342,7 +342,7 @@ func (s *RollupTestSuite) TestByExportBlobs() {
 				NamespaceId: 2,
 				AddressId:   3,
 			},
-		}, gomock.Any()).
+		}, gomock.Any(), gomock.Any(), gomock.Any()).
 		Return(nil)
 
 	s.Require().NoError(s.handler.ExportBlobs(c))

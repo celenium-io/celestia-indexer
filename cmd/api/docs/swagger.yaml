@@ -3339,6 +3339,38 @@ paths:
       summary: Get rollup distribution
       tags:
       - rollup
+  /v1/rollup/{id}/export:
+    get:
+      description: Export rollup blobs
+      operationId: rollup-export
+      parameters:
+      - description: Internal identity
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Time from in unix timestamp
+        in: query
+        name: from
+        type: integer
+      - description: Time to in unix timestamp
+        in: query
+        name: to
+        type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Export rollup blobs
+      tags:
+      - rollup
   /v1/rollup/{id}/namespaces:
     get:
       description: Get rollup namespaces info
