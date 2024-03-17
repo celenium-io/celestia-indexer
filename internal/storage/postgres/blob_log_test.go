@@ -4,7 +4,10 @@
 package postgres
 
 import (
+	"bytes"
 	"context"
+	"encoding/csv"
+	"io"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -158,4 +161,26 @@ func (s *StorageTestSuite) TestBlobLogsByProviders() {
 	s.Require().NotNil(log.Tx)
 	s.Require().NotNil(log.Namespace)
 	s.Require().NotNil(log.Signer)
+}
+
+func (s *StorageTestSuite) TestBlobLogsExportByProviders() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	buf := new(bytes.Buffer)
+
+	err := s.storage.BlobLogs.ExportByProviders(ctx, []storage.RollupProvider{
+		{
+			AddressId:   1,
+			NamespaceId: 1,
+		},
+	}, time.Time{}, time.Time{}, buf)
+	s.Require().NoError(err)
+
+	reader := csv.NewReader(buf)
+
+	for rows, err := reader.Read(); err != io.EOF; rows, err = reader.Read() {
+		s.Require().NoError(err)
+		s.Require().Len(rows, 9)
+	}
 }

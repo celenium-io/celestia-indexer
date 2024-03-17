@@ -48,8 +48,9 @@ type Storage struct {
 	Jails           models.IJail
 	Rollup          models.IRollup
 	Grants          models.IGrant
-	Export          models.Export
 	Notificator     *Notificator
+
+	export models.Export
 }
 
 // Create -
@@ -59,6 +60,8 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		return Storage{}, err
 	}
 
+	export := NewExport(cfg)
+
 	s := Storage{
 		cfg:             cfg,
 		scriptsDir:      scriptsDir,
@@ -66,7 +69,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		Blocks:          NewBlocks(strg.Connection()),
 		BlockStats:      NewBlockStats(strg.Connection()),
 		BlockSignatures: NewBlockSignature(strg.Connection()),
-		BlobLogs:        NewBlobLog(strg.Connection()),
+		BlobLogs:        NewBlobLog(strg.Connection(), export),
 		Constants:       NewConstant(strg.Connection()),
 		DenomMetadata:   NewDenomMetadata(strg.Connection()),
 		Message:         NewMessage(strg.Connection()),
@@ -88,8 +91,9 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		Jails:           NewJail(strg.Connection()),
 		Rollup:          NewRollup(strg.Connection()),
 		Grants:          NewGrant(strg.Connection()),
-		Export:          NewExport(cfg),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
+
+		export: export,
 	}
 
 	if err := s.createScripts(ctx, "functions", false); err != nil {
@@ -186,7 +190,7 @@ func createExtensions(ctx context.Context, conn *database.Bun) error {
 }
 
 func (s Storage) Close() error {
-	if err := s.Export.Close(); err != nil {
+	if err := s.export.Close(); err != nil {
 		return err
 	}
 	if err := s.Storage.Close(); err != nil {

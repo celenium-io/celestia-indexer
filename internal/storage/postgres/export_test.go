@@ -15,7 +15,7 @@ func (s *StorageTestSuite) TestExportToCsv() {
 	defer ctxCancel()
 
 	var buf bytes.Buffer
-	err := s.storage.Export.ToCsv(ctx, &buf, "address")
+	err := s.storage.export.ToCsv(ctx, &buf, "select * from address")
 	s.Require().NoError(err)
 
 	reader := csv.NewReader(bytes.NewReader(buf.Bytes()))

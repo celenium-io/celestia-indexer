@@ -13,7 +13,9 @@ package mock
 
 import (
 	context "context"
+	io "io"
 	reflect "reflect"
+	time "time"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
 	types "github.com/celenium-io/celestia-indexer/pkg/types"
@@ -352,6 +354,44 @@ func (c *IBlobLogCursorListCall) Do(f func(context.Context, uint64, uint64, stor
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *IBlobLogCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlobLog, error)) *IBlobLogCursorListCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// ExportByProviders mocks base method.
+func (m *MockIBlobLog) ExportByProviders(ctx context.Context, providers []storage.RollupProvider, from, to time.Time, stream io.Writer) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExportByProviders", ctx, providers, from, to, stream)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExportByProviders indicates an expected call of ExportByProviders.
+func (mr *MockIBlobLogMockRecorder) ExportByProviders(ctx, providers, from, to, stream any) *IBlobLogExportByProvidersCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExportByProviders", reflect.TypeOf((*MockIBlobLog)(nil).ExportByProviders), ctx, providers, from, to, stream)
+	return &IBlobLogExportByProvidersCall{Call: call}
+}
+
+// IBlobLogExportByProvidersCall wrap *gomock.Call
+type IBlobLogExportByProvidersCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IBlobLogExportByProvidersCall) Return(err error) *IBlobLogExportByProvidersCall {
+	c.Call = c.Call.Return(err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IBlobLogExportByProvidersCall) Do(f func(context.Context, []storage.RollupProvider, time.Time, time.Time, io.Writer) error) *IBlobLogExportByProvidersCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IBlobLogExportByProvidersCall) DoAndReturn(f func(context.Context, []storage.RollupProvider, time.Time, time.Time, io.Writer) error) *IBlobLogExportByProvidersCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

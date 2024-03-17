@@ -5,6 +5,8 @@ package postgres
 
 import (
 	"context"
+	"io"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -16,12 +18,15 @@ import (
 // BlobLog -
 type BlobLog struct {
 	*postgres.Table[*storage.BlobLog]
+
+	export *Export
 }
 
 // NewBlobLog -
-func NewBlobLog(db *database.Bun) *BlobLog {
+func NewBlobLog(db *database.Bun, export *Export) *BlobLog {
 	return &BlobLog{
-		Table: postgres.NewTable[*storage.BlobLog](db),
+		Table:  postgres.NewTable[*storage.BlobLog](db),
+		export: export,
 	}
 }
 
@@ -72,6 +77,71 @@ func (bl *BlobLog) ByProviders(ctx context.Context, providers []storage.RollupPr
 		Join("left join namespace as ns on ns.id = blob_log.namespace_id").
 		Join("left join tx on tx.id = blob_log.tx_id").
 		Scan(ctx, &logs)
+	return
+}
+
+const (
+	maxExportPeriodInMonth = 1
+)
+
+func (bl *BlobLog) ExportByProviders(ctx context.Context, providers []storage.RollupProvider, from, to time.Time, stream io.Writer) (err error) {
+	if len(providers) == 0 {
+		return nil
+	}
+
+	blobQuery := bl.DB().NewSelect().
+		Model((*storage.BlobLog)(nil))
+
+	switch {
+	case from.IsZero() && to.IsZero():
+		blobQuery = blobQuery.
+			Where("time >= ?", time.Now().AddDate(0, -maxExportPeriodInMonth, 0).UTC())
+
+	case !from.IsZero() && to.IsZero():
+		blobQuery = blobQuery.
+			Where("time >= ?", from.UTC()).
+			Where("time < ?", from.AddDate(0, maxExportPeriodInMonth, 0).UTC())
+
+	case from.IsZero() && !to.IsZero():
+		blobQuery = blobQuery.
+			Where("time < ?", to.UTC()).
+			Where("time >= ?", to.AddDate(0, -maxExportPeriodInMonth, 0).UTC())
+
+	case !from.IsZero() && !to.IsZero():
+		if to.Sub(from) > time.Hour*24*30 {
+			blobQuery = blobQuery.
+				Where("time >= ?", from.UTC()).
+				Where("time < ?", from.AddDate(0, maxExportPeriodInMonth, 0).UTC())
+		} else {
+			blobQuery = blobQuery.
+				Where("time >= ?", from.UTC()).
+				Where("time < ?", to.UTC())
+		}
+
+	}
+
+	for i := range providers {
+		blobQuery = blobQuery.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
+			sq.Where("blob_log.signer_id = ?", providers[i].AddressId)
+			if providers[i].NamespaceId > 0 {
+				sq.Where("blob_log.namespace_id = ?", providers[i].NamespaceId)
+			}
+			return sq
+		})
+	}
+
+	query := bl.DB().NewSelect().
+		ColumnExpr("blob_log.time, blob_log.height, blob_log.size, blob_log.commitment, blob_log.content_type").
+		ColumnExpr("signer.address as signer").
+		ColumnExpr("ns.version as namespace_version, ns.namespace_id as namespace_namespace_id").
+		ColumnExpr("tx.hash as tx_hash").
+		TableExpr("(?) as blob_log", blobQuery).
+		Join("left join address as signer on signer.id = blob_log.signer_id").
+		Join("left join namespace as ns on ns.id = blob_log.namespace_id").
+		Join("left join tx on tx.id = blob_log.tx_id").
+		String()
+
+	err = bl.export.ToCsv(ctx, stream, query)
 	return
 }
 
