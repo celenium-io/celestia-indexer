@@ -69,6 +69,7 @@ type Message struct {
 	Namespace      []Namespace       `bun:"m2m:namespace_message,join:Message=Namespace"`
 	Addresses      []AddressWithType `bun:"-"`
 	BlobLogs       []*BlobLog        `bun:"-"`
+	Grants         []Grant           `bun:"-"`
 	InternalMsgs   []string          `bun:"-"` // field for parsing MsgExec internal messages
 	VestingAccount *VestingAccount   `bun:"-"` // internal field
 }

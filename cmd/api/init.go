@@ -261,7 +261,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	searchHandler := handler.NewSearchHandler(db.Search, db.Address, db.Blocks, db.Tx, db.Namespace, db.Validator, db.Rollup)
 	v1.GET("/search", searchHandler.Search)
 
-	addressHandlers := handler.NewAddressHandler(db.Address, db.Tx, db.BlobLogs, db.Message, db.Delegation, db.Undelegation, db.Redelegation, db.VestingAccounts, db.State, cfg.Indexer.Name)
+	addressHandlers := handler.NewAddressHandler(db.Address, db.Tx, db.BlobLogs, db.Message, db.Delegation, db.Undelegation, db.Redelegation, db.VestingAccounts, db.Grants, db.State, cfg.Indexer.Name)
 	addressesGroup := v1.Group("/address")
 	{
 		addressesGroup.GET("", addressHandlers.List)
@@ -276,6 +276,8 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			addressGroup.GET("/undelegations", addressHandlers.Undelegations)
 			addressGroup.GET("/redelegations", addressHandlers.Redelegations)
 			addressGroup.GET("/vestings", addressHandlers.Vestings)
+			addressGroup.GET("/grants", addressHandlers.Grants)
+			addressGroup.GET("/granters", addressHandlers.Grantee)
 		}
 	}
 

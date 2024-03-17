@@ -47,6 +47,7 @@ type Storage struct {
 	Undelegation    models.IUndelegation
 	Jails           models.IJail
 	Rollup          models.IRollup
+	Grants          models.IGrant
 	Export          models.Export
 	Notificator     *Notificator
 }
@@ -86,6 +87,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storag
 		Undelegation:    NewUndelegation(strg.Connection()),
 		Jails:           NewJail(strg.Connection()),
 		Rollup:          NewRollup(strg.Connection()),
+		Grants:          NewGrant(strg.Connection()),
 		Export:          NewExport(cfg),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
 	}

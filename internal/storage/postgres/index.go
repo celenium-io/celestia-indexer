@@ -482,6 +482,33 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// Grant
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Grant)(nil)).
+			Index("grant_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Grant)(nil)).
+			Index("grant_granter_id_idx").
+			Column("granter_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Grant)(nil)).
+			Index("grant_grantee_id_idx").
+			Column("grantee_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

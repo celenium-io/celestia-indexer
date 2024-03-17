@@ -202,6 +202,9 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	if err := tx.RollbackBlobLog(ctx, height); err != nil {
 		return tx.HandleError(ctx, err)
 	}
+	if err := tx.RollbackGrants(ctx, height); err != nil {
+		return tx.HandleError(ctx, err)
+	}
 
 	if err := tx.RollbackVestingPeriods(ctx, height); err != nil {
 		return tx.HandleError(ctx, err)

@@ -361,6 +361,12 @@ func Test_saveMessages(t *testing.T) {
 			MaxTimes(1).
 			Return(nil)
 
+		tx.EXPECT().
+			SaveGrants(gomock.Any(), gomock.Any()).
+			MaxTimes(1).
+			MinTimes(1).
+			Return(nil)
+
 		t.Run(tt.name, func(t *testing.T) {
 			err := module.saveMessages(context.Background(), tx, tt.args.messages, tt.args.addrToId)
 			require.Equal(t, tt.wantErr, err != nil)
