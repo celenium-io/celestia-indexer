@@ -182,7 +182,7 @@ type rollupList struct {
 	Limit  int    `query:"limit"   validate:"omitempty,min=1,max=100"`
 	Offset int    `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
-	SortBy string `query:"sort_by" validate:"omitempty,oneof=time blobs_count size"`
+	SortBy string `query:"sort_by" validate:"omitempty,oneof=time blobs_count size fee"`
 }
 
 func (p *rollupList) SetDefault() {

@@ -38,7 +38,7 @@ func NewRollupHandler(
 //	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						mininum(1)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"		Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field. Default: size"		Enums(time, blobs_count, size)
+//	@Param			sort_by	query	string	false	"Sort field. Default: size"		Enums(time, blobs_count, size, "fee")
 //	@Produce		json
 //	@Success		200	{array}		responses.RollupWithStats
 //	@Failure		400	{object}	Error
@@ -320,7 +320,7 @@ func (handler RollupHandler) BySlug(c echo.Context) error {
 type rollupDistributionRequest struct {
 	Id         uint64 `example:"1"    param:"id"        swaggertype:"integer" validate:"required,min=1"`
 	Timeframe  string `example:"hour" param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day"`
-	SeriesName string `example:"tps"  param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_count size size_per_blob"`
+	SeriesName string `example:"tps"  param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_count size size_per_blob fee_per_blob"`
 }
 
 // Distribution godoc
@@ -330,7 +330,7 @@ type rollupDistributionRequest struct {
 //	@Tags			rollup
 //	@ID				get-rollup-distribution
 //	@Param			id			path	integer	true	"Internal identity"				mininum(1)
-//	@Param			name		path	string	true	"Series name"					Enums(blobs_count, size, size_per_blob)
+//	@Param			name		path	string	true	"Series name"					Enums(blobs_count, size, size_per_blob, fee_per_blob)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day)
 //	@Produce		json
 //	@Success		200	{array}		responses.DistributionItem

@@ -9,6 +9,7 @@ import (
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -63,8 +64,9 @@ type RollupWithStats struct {
 }
 
 type RollupStats struct {
-	Size            int64     `bun:"size"`
-	BlobsCount      int64     `bun:"blobs_count"`
-	LastActionTime  time.Time `bun:"last_time"`
-	FirstActionTime time.Time `bun:"first_time"`
+	Size            int64           `bun:"size"`
+	BlobsCount      int64           `bun:"blobs_count"`
+	LastActionTime  time.Time       `bun:"last_time"`
+	FirstActionTime time.Time       `bun:"first_time"`
+	Fee             decimal.Decimal `bun:"fee"`
 }

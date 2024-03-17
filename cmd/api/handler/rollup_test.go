@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
@@ -74,32 +75,42 @@ func TestSuiteRollup_Run(t *testing.T) {
 }
 
 func (s *RollupTestSuite) TestLeaderboard() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	c := s.echo.NewContext(req, rec)
-	c.SetPath("/rollup")
+	for _, sort := range []string{
+		"fee",
+		"blobs_count",
+		"time",
+		"size",
+	} {
+		q := make(url.Values)
+		q.Add("sort_by", sort)
 
-	s.rollups.EXPECT().
-		Leaderboard(gomock.Any(), "size", sdk.SortOrderDesc, 10, 0).
-		Return([]storage.RollupWithStats{testRollupWithStats}, nil)
+		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+		rec := httptest.NewRecorder()
+		c := s.echo.NewContext(req, rec)
+		c.SetPath("/rollup")
 
-	s.Require().NoError(s.handler.Leaderboard(c))
-	s.Require().Equal(http.StatusOK, rec.Code)
+		s.rollups.EXPECT().
+			Leaderboard(gomock.Any(), sort, sdk.SortOrderDesc, 10, 0).
+			Return([]storage.RollupWithStats{testRollupWithStats}, nil)
 
-	var rollups []responses.RollupWithStats
-	err := json.NewDecoder(rec.Body).Decode(&rollups)
-	s.Require().NoError(err)
-	s.Require().Len(rollups, 1)
+		s.Require().NoError(s.handler.Leaderboard(c))
+		s.Require().Equal(http.StatusOK, rec.Code)
 
-	rollup := rollups[0]
-	s.Require().EqualValues(1, rollup.Id)
-	s.Require().EqualValues("test rollup", rollup.Name)
-	s.Require().EqualValues("image.png", rollup.Logo)
-	s.Require().EqualValues("test-rollup", rollup.Slug)
-	s.Require().EqualValues(100, rollup.BlobsCount)
-	s.Require().EqualValues(1000, rollup.Size)
-	s.Require().EqualValues(testTime, rollup.LastAction)
-	s.Require().EqualValues(testTime, rollup.FirstAction)
+		var rollups []responses.RollupWithStats
+		err := json.NewDecoder(rec.Body).Decode(&rollups)
+		s.Require().NoError(err)
+		s.Require().Len(rollups, 1)
+
+		rollup := rollups[0]
+		s.Require().EqualValues(1, rollup.Id)
+		s.Require().EqualValues("test rollup", rollup.Name)
+		s.Require().EqualValues("image.png", rollup.Logo)
+		s.Require().EqualValues("test-rollup", rollup.Slug)
+		s.Require().EqualValues(100, rollup.BlobsCount)
+		s.Require().EqualValues(1000, rollup.Size)
+		s.Require().EqualValues(testTime, rollup.LastAction)
+		s.Require().EqualValues(testTime, rollup.FirstAction)
+	}
 }
 
 func (s *RollupTestSuite) TestGet() {
@@ -223,7 +234,7 @@ func (s *RollupTestSuite) TestGetBlobs() {
 }
 
 func (s *RollupTestSuite) TestStats() {
-	for _, name := range []string{"blobs_count", "size", "size_per_blob"} {
+	for _, name := range []string{"blobs_count", "size", "size_per_blob", "fee"} {
 		for _, tf := range []string{"hour", "day", "month"} {
 			req := httptest.NewRequest(http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
@@ -253,7 +264,7 @@ func (s *RollupTestSuite) TestStats() {
 }
 
 func (s *RollupTestSuite) TestDistribution() {
-	for _, name := range []string{"blobs_count", "size", "size_per_blob"} {
+	for _, name := range []string{"blobs_count", "size", "size_per_blob", "fee_per_blob"} {
 		for _, tf := range []string{"hour", "day"} {
 			req := httptest.NewRequest(http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()

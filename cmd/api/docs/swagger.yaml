@@ -633,6 +633,10 @@ definitions:
         example: Long rollup description
         format: string
         type: string
+      fee:
+        example: "123.456789"
+        format: string
+        type: string
       first_message_time:
         example: "2023-07-04T03:10:57+00:00"
         format: date-time
@@ -3070,6 +3074,7 @@ paths:
         - time
         - blobs_count
         - size
+        - '"fee"'
         in: query
         name: sort_by
         type: string
@@ -3191,6 +3196,7 @@ paths:
         - blobs_count
         - size
         - size_per_blob
+        - fee_per_blob
         in: path
         name: name
         required: true

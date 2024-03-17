@@ -2331,7 +2331,8 @@ const docTemplate = `{
                         "enum": [
                             "time",
                             "blobs_count",
-                            "size"
+                            "size",
+                            "\"fee\""
                         ],
                         "type": "string",
                         "description": "Sort field. Default: size",
@@ -2582,7 +2583,8 @@ const docTemplate = `{
                         "enum": [
                             "blobs_count",
                             "size",
-                            "size_per_blob"
+                            "size_per_blob",
+                            "fee_per_blob"
                         ],
                         "type": "string",
                         "description": "Series name",
@@ -5487,6 +5489,11 @@ const docTemplate = `{
                     "type": "string",
                     "format": "string",
                     "example": "Long rollup description"
+                },
+                "fee": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123.456789"
                 },
                 "first_message_time": {
                     "type": "string",

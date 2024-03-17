@@ -31,7 +31,7 @@ func (r *Rollup) Leaderboard(ctx context.Context, sortField string, sort sdk.Sor
 	switch sortField {
 	case timeColumn:
 		sortField = "last_time"
-	case sizeColumn, blobsCountColumn:
+	case sizeColumn, blobsCountColumn, feeColumn:
 	case "":
 		sortField = sizeColumn
 	default:
@@ -39,11 +39,11 @@ func (r *Rollup) Leaderboard(ctx context.Context, sortField string, sort sdk.Sor
 	}
 
 	timeAggQuery := r.DB().NewSelect().Table("rollup_stats_by_month").
-		ColumnExpr("sum(size) as size, sum(blobs_count) as blobs_count, max(last_time) as last_time, min(first_time) as first_time, namespace_id, signer_id").
+		ColumnExpr("sum(size) as size, sum(blobs_count) as blobs_count, max(last_time) as last_time, min(first_time) as first_time, sum(fee) as fee, namespace_id, signer_id").
 		Group("namespace_id", "signer_id")
 
 	leaderboardQuery := r.DB().NewSelect().TableExpr("(?) as agg", timeAggQuery).
-		ColumnExpr("sum(size) as size, sum(blobs_count) as blobs_count, max(last_time) as last_time, min(first_time) as first_time, rollup_id").
+		ColumnExpr("sum(size) as size, sum(blobs_count) as blobs_count, max(last_time) as last_time, min(first_time) as first_time, sum(fee) as fee, rollup_id").
 		Join("inner join rollup_provider as rp on rp.address_id = agg.signer_id AND (rp.namespace_id = agg.namespace_id OR rp.namespace_id = 0)").
 		Group("rollup_id")
 
@@ -54,7 +54,7 @@ func (r *Rollup) Leaderboard(ctx context.Context, sortField string, sort sdk.Sor
 	leaderboardQuery = limitScope(leaderboardQuery, limit)
 
 	query := r.DB().NewSelect().Table("leaderboard").With("leaderboard", leaderboardQuery).
-		ColumnExpr("size, blobs_count, last_time, first_time, rollup.*").
+		ColumnExpr("size, blobs_count, last_time, first_time, fee, rollup.*").
 		Join("inner join rollup on rollup.id = leaderboard.rollup_id")
 
 	query = sortScope(query, sortField, sort)
@@ -181,7 +181,7 @@ func (r *Rollup) Stats(ctx context.Context, rollupId uint64) (stats storage.Roll
 	}
 
 	query := r.DB().NewSelect().Table("rollup_stats_by_month").
-		ColumnExpr("sum(blobs_count) as blobs_count, sum(size) as size, max(last_time) as last_time, min(first_time) as first_time")
+		ColumnExpr("sum(blobs_count) as blobs_count, sum(size) as size, max(last_time) as last_time, min(first_time) as first_time, sum(fee) as fee")
 
 	for i := range providers {
 		query.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
@@ -247,6 +247,8 @@ func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series, grou
 		cte = cte.ColumnExpr("blobs_count as value")
 	case "size_per_blob":
 		cte = cte.ColumnExpr("(size / blobs_count) as value")
+	case "fee_per_blob":
+		cte = cte.ColumnExpr("(fee / blobs_count) as value")
 	default:
 		err = errors.Errorf("invalid distribution rollup series: %s", groupBy)
 		return
