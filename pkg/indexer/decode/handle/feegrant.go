@@ -87,15 +87,14 @@ func parseGrantFee(m *feegrant.MsgGrantAllowance, g *storage.Grant) error {
 		if err := body.Unmarshal(m.Allowance.Value); err != nil {
 			return err
 		}
+
+		var basic feegrant.BasicAllowance
+		if err := basic.Unmarshal(body.Allowance.Value); err != nil {
+			return err
+		}
 		g.Params = structs.Map(body)
-		allow, err := body.GetAllowance()
-		if err != nil {
-			return err
-		}
-		g.Expiration, err = allow.ExpiresAt()
-		if err != nil {
-			return err
-		}
+		g.Params["Allowance"] = basic
+		g.Expiration = basic.Expiration
 	}
 	return nil
 }
