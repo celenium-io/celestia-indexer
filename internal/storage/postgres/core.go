@@ -14,6 +14,7 @@ import (
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Storage -
@@ -197,4 +198,14 @@ func (s Storage) Close() error {
 		return err
 	}
 	return nil
+}
+
+func (s Storage) SetTracer(tp trace.TracerProvider) {
+	s.Connection().DB().AddQueryHook(
+		NewSentryHook(
+			s.cfg.Database,
+			tp.Tracer("db"),
+			true,
+		),
+	)
 }
