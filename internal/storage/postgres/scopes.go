@@ -15,6 +15,7 @@ const (
 	timeColumn       = "time"
 	pfbCountColumn   = "pfb_count"
 	blobsCountColumn = "blobs_count"
+	feeColumn        = "fee"
 )
 
 func limitScope(q *bun.SelectQuery, limit int) *bun.SelectQuery {

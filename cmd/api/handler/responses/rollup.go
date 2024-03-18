@@ -23,6 +23,7 @@ type RollupWithStats struct {
 	Size        int64     `example:"1000"                      format:"integer"   json:"size"               swaggertype:"integer"`
 	LastAction  time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"last_message_time"  swaggertype:"string"`
 	FirstAction time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"first_message_time" swaggertype:"string"`
+	Fee         string    `example:"123.456789"                format:"string"    json:"fee"                swaggertype:"string"`
 }
 
 func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
@@ -39,6 +40,7 @@ func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 		Size:        r.Size,
 		LastAction:  r.LastActionTime,
 		FirstAction: r.FirstActionTime,
+		Fee:         r.Fee.StringFixed(0),
 	}
 }
 

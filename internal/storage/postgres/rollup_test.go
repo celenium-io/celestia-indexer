@@ -13,7 +13,7 @@ import (
 
 func (s *StorageTestSuite) TestRollupLeaderboard() {
 	for _, column := range []string{
-		sizeColumn, blobsCountColumn, timeColumn, "",
+		sizeColumn, blobsCountColumn, timeColumn, feeColumn, "",
 	} {
 		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer ctxCancel()
@@ -29,6 +29,7 @@ func (s *StorageTestSuite) TestRollupLeaderboard() {
 		s.Require().EqualValues(3, rollup.BlobsCount, column)
 		s.Require().False(rollup.LastActionTime.IsZero())
 		s.Require().False(rollup.FirstActionTime.IsZero())
+		s.Require().Equal("7000", rollup.Fee.String())
 	}
 }
 
@@ -43,6 +44,7 @@ func (s *StorageTestSuite) TestRollupStats() {
 	s.Require().EqualValues(2, rollup.BlobsCount)
 	s.Require().False(rollup.LastActionTime.IsZero())
 	s.Require().False(rollup.FirstActionTime.IsZero())
+	s.Require().Equal("2000", rollup.Fee.String())
 }
 
 func (s *StorageTestSuite) TestRollupNamespaces() {
@@ -115,7 +117,7 @@ func (s *StorageTestSuite) TestRollupDistribution() {
 		"day", "hour",
 	} {
 		for _, series := range []string{
-			"size", "blobs_count", "size_per_blob",
+			"size", "blobs_count", "size_per_blob", "fee_per_blob",
 		} {
 			items, err := s.storage.Rollup.Distribution(ctx, 1, series, groupBy)
 			s.Require().NoError(err)
