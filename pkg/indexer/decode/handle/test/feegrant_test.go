@@ -4,7 +4,9 @@
 package handle_test
 
 import (
+	"encoding/hex"
 	"testing"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -21,10 +23,14 @@ import (
 // MsgGrantAllowance
 
 func createMsgGrantAllowance() types.Msg {
+	val, _ := hex.DecodeString("0a330a272f636f736d6f732e6665656772616e742e763162657461312e4261736963416c6c6f77616e63651208120608a7a5858a12121d2f636f736d6f732e617574687a2e763162657461312e4d736745786563")
 	m := feegrant.MsgGrantAllowance{
-		Granter:   "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
-		Grantee:   "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
-		Allowance: codecTypes.UnsafePackAny(feegrant.BasicAllowance{}),
+		Granter: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
+		Grantee: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
+		Allowance: &codecTypes.Any{
+			TypeUrl: "/cosmos.feegrant.v1beta1.AllowedMsgAllowance",
+			Value:   val,
+		},
 	}
 
 	return &m
@@ -68,6 +74,7 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 		},
 	}
 
+	expiration := time.Date(2123, 10, 13, 18, 47, 3, 0, time.UTC)
 	msgExpected := storage.Message{
 		Id:        0,
 		Height:    blob.Height,
@@ -76,7 +83,7 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 		Type:      storageTypes.MsgGrantAllowance,
 		TxId:      0,
 		Data:      structs.Map(m),
-		Size:      100,
+		Size:      233,
 		Namespace: nil,
 		Addresses: addressesExpected,
 		Grants: []storage.Grant{
@@ -89,6 +96,16 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 				},
 				Grantee: &storage.Address{
 					Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
+				},
+				Expiration: &expiration,
+				Params: map[string]any{
+					"Allowance": feegrant.BasicAllowance{
+						SpendLimit: nil,
+						Expiration: &expiration,
+					},
+					"AllowedMessages": []string{
+						"/cosmos.authz.v1beta1.MsgExec",
+					},
 				},
 			},
 		},
