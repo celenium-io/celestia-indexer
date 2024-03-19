@@ -5,6 +5,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -40,4 +41,8 @@ type Grant struct {
 
 func (Grant) TableName() string {
 	return "grant"
+}
+
+func (g Grant) String() string {
+	return fmt.Sprintf("%s_%s_%s", g.Authorization, g.Granter.Address, g.Grantee.Address)
 }
