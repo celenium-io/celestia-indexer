@@ -40,7 +40,7 @@ func NewStateHandler(state storage.IState, validator storage.IValidator, indexer
 func (sh *StateHandler) Head(c echo.Context) error {
 	state, err := sh.state.ByName(c.Request().Context(), sh.indexerName)
 	if err != nil {
-		return internalServerError(c, err)
+		return handleError(c, err, sh.state)
 	}
 
 	votingPower, err := sh.validator.TotalVotingPower(c.Request().Context())

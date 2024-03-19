@@ -5,6 +5,7 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -102,8 +103,14 @@ func (s *StateTestSuite) TestNoHead() {
 	c.SetPath("/head")
 
 	s.state.EXPECT().
-		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return([]*storage.State{}, nil)
+		ByName(gomock.Any(), testIndexerName).
+		Return(storage.State{}, sql.ErrNoRows).
+		Times(1)
+
+	s.state.EXPECT().
+		IsNoRows(sql.ErrNoRows).
+		Return(true).
+		Times(1)
 
 	s.Require().NoError(s.handler.Head(c))
 	s.Require().Equal(http.StatusNoContent, rec.Code)
