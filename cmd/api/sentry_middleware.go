@@ -29,6 +29,7 @@ func handleSentry(next echo.HandlerFunc) echo.HandlerFunc {
 		if client := hub.Client(); client != nil {
 			client.SetSDKIdentifier(sdkIdentifier)
 		}
+		ctx.Set("sentry", hub)
 
 		req := ctx.Request()
 		options := []sentry.SpanOption{
@@ -53,11 +54,10 @@ func handleSentry(next echo.HandlerFunc) echo.HandlerFunc {
 			})
 			scope.SetRequest(req)
 		})
-		ctx.Set("sentry", hub)
-		transaction.SetTag("user-agent", req.UserAgent())
 
 		defer recoverWithSentry(hub, req)
 
+		ctx.SetRequest(req)
 		return next(ctx)
 	}
 }

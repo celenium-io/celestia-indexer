@@ -8,19 +8,20 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
 )
 
 type StateHandler struct {
-	state     storage.IState
-	validator storage.IValidator
+	state       storage.IState
+	validator   storage.IValidator
+	indexerName string
 }
 
-func NewStateHandler(state storage.IState, validator storage.IValidator) *StateHandler {
+func NewStateHandler(state storage.IState, validator storage.IValidator, indexerName string) *StateHandler {
 	return &StateHandler{
-		state:     state,
-		validator: validator,
+		state:       state,
+		validator:   validator,
+		indexerName: indexerName,
 	}
 }
 
@@ -37,19 +38,16 @@ func NewStateHandler(state storage.IState, validator storage.IValidator) *StateH
 //	@Failure		500	{object}	Error
 //	@Router			/v1/head [get]
 func (sh *StateHandler) Head(c echo.Context) error {
-	state, err := sh.state.List(c.Request().Context(), 1, 0, sdk.SortOrderAsc)
+	state, err := sh.state.ByName(c.Request().Context(), sh.indexerName)
 	if err != nil {
-		return internalServerError(c, err)
-	}
-	if len(state) == 0 {
-		return c.NoContent(http.StatusNoContent)
+		return handleError(c, err, sh.state)
 	}
 
 	votingPower, err := sh.validator.TotalVotingPower(c.Request().Context())
 	if err != nil {
 		return internalServerError(c, err)
 	}
-	state[0].TotalVotingPower = votingPower
+	state.TotalVotingPower = votingPower
 
-	return c.JSON(http.StatusOK, responses.NewState(*state[0]))
+	return c.JSON(http.StatusOK, responses.NewState(state))
 }

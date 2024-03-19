@@ -5,6 +5,7 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -36,7 +37,7 @@ func (s *StateTestSuite) SetupSuite() {
 	s.ctrl = gomock.NewController(s.T())
 	s.state = mock.NewMockIState(s.ctrl)
 	s.validators = mock.NewMockIValidator(s.ctrl)
-	s.handler = NewStateHandler(s.state, s.validators)
+	s.handler = NewStateHandler(s.state, s.validators, testIndexerName)
 }
 
 // TearDownSuite -
@@ -61,20 +62,18 @@ func (s *StateTestSuite) TestHead() {
 		Times(1)
 
 	s.state.EXPECT().
-		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return([]*storage.State{
-			{
-				Id:              1,
-				Name:            "test",
-				LastHeight:      100,
-				LastTime:        testTime,
-				TotalTx:         1234,
-				TotalAccounts:   123,
-				TotalFee:        decimal.RequireFromString("2"),
-				TotalBlobsSize:  30,
-				TotalValidators: 10,
-				TotalStake:      decimal.NewFromInt(100),
-			},
+		ByName(gomock.Any(), testIndexerName).
+		Return(storage.State{
+			Id:              1,
+			Name:            testIndexerName,
+			LastHeight:      100,
+			LastTime:        testTime,
+			TotalTx:         1234,
+			TotalAccounts:   123,
+			TotalFee:        decimal.RequireFromString("2"),
+			TotalBlobsSize:  30,
+			TotalValidators: 10,
+			TotalStake:      decimal.NewFromInt(100),
 		}, nil).
 		Times(1)
 
@@ -85,7 +84,7 @@ func (s *StateTestSuite) TestHead() {
 	err := json.NewDecoder(rec.Body).Decode(&state)
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, state.Id)
-	s.Require().EqualValues("test", state.Name)
+	s.Require().EqualValues(testIndexerName, state.Name)
 	s.Require().EqualValues(100, state.LastHeight)
 	s.Require().EqualValues(1234, state.TotalTx)
 	s.Require().EqualValues(123, state.TotalAccounts)
@@ -104,8 +103,14 @@ func (s *StateTestSuite) TestNoHead() {
 	c.SetPath("/head")
 
 	s.state.EXPECT().
-		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return([]*storage.State{}, nil)
+		ByName(gomock.Any(), testIndexerName).
+		Return(storage.State{}, sql.ErrNoRows).
+		Times(1)
+
+	s.state.EXPECT().
+		IsNoRows(sql.ErrNoRows).
+		Return(true).
+		Times(1)
 
 	s.Require().NoError(s.handler.Head(c))
 	s.Require().Equal(http.StatusNoContent, rec.Code)
