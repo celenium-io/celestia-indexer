@@ -27,7 +27,7 @@ func (module *Module) saveMessages(
 		msgAddress      []storage.MsgAddress
 		blobLogs        = make([]storage.BlobLog, 0)
 		vestingAccounts = make([]*storage.VestingAccount, 0)
-		grants          = make([]storage.Grant, 0)
+		grants          = make(map[string]storage.Grant)
 		namespaces      = make(map[string]uint64)
 		addedMsgId      = make(map[uint64]struct{})
 		msgAddrMap      = make(map[string]struct{})
@@ -100,8 +100,8 @@ func (module *Module) saveMessages(
 			if err := processGrants(addrToId, &messages[i].Grants[j]); err != nil {
 				return err
 			}
+			grants[messages[i].Grants[j].String()] = messages[i].Grants[j]
 		}
-		grants = append(grants, messages[i].Grants...)
 	}
 
 	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
@@ -113,7 +113,13 @@ func (module *Module) saveMessages(
 	if err := tx.SaveBlobLogs(ctx, blobLogs...); err != nil {
 		return err
 	}
-	if err := tx.SaveGrants(ctx, grants...); err != nil {
+
+	grantsArr := make([]storage.Grant, 0)
+	for _, g := range grants {
+		grantsArr = append(grantsArr, g)
+	}
+
+	if err := tx.SaveGrants(ctx, grantsArr...); err != nil {
 		return err
 	}
 
