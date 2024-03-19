@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"strconv"
 
 	"go.opentelemetry.io/otel/attribute"
@@ -30,9 +32,7 @@ func NewSentryHook(dbName string, tracer trace.Tracer, formatQueries bool) *Sent
 	return h
 }
 
-func (h *SentryHook) Init(db *bun.DB) {
-	// otelsql.ReportDBStatsMetrics(db.DB, otelsql.WithAttributes(labels...))
-}
+func (h *SentryHook) Init(db *bun.DB) {}
 
 func (h *SentryHook) BeforeQuery(ctx context.Context, event *bun.QueryEvent) context.Context {
 	ctx, _ = h.tracer.Start(ctx, "db", trace.WithSpanKind(trace.SpanKindClient))
@@ -47,22 +47,23 @@ func (h *SentryHook) AfterQuery(ctx context.Context, event *bun.QueryEvent) {
 		return
 	}
 
-	span := root.StartChild(operation)
+	span := root.StartChild(operation, sentry.WithOpName("db"))
 	defer span.Finish()
 
 	query := h.eventQuery(event)
 
+	span.Description = query
 	span.SetData("db.statement", query)
-	span.SetData("db.operation", operation)
-	span.SetData("db.name", h.dbName)
+	span.SetTag("db.operation", operation)
+	span.SetTag("db.name", h.dbName)
 	if event.IQuery != nil {
 		if tableName := event.IQuery.GetTableName(); tableName != "" {
-			span.SetData("db.sql.table", tableName)
+			span.SetTag("db.sql.table", tableName)
 		}
 	}
 
 	if sys := dbSystem(event.DB); sys.Valid() {
-		span.SetData(string(sys.Key), sys.Value.AsString())
+		span.SetTag(string(sys.Key), sys.Value.AsString())
 	}
 	if event.Result != nil {
 		if n, _ := event.Result.RowsAffected(); n > 0 {
@@ -70,13 +71,14 @@ func (h *SentryHook) AfterQuery(ctx context.Context, event *bun.QueryEvent) {
 		}
 	}
 
-	// switch event.Err {
-	// case nil, sql.ErrNoRows, sql.ErrTxDone:
-	// 	// ignore
-	// default:
-	// 	span.RecordError(event.Err)
-	// 	span.SetStatus(codes.Error, event.Err.Error())
-	// }
+	switch event.Err {
+	case nil, sql.ErrNoRows, sql.ErrTxDone:
+		// ignore
+	default:
+		span.SetTag("exception.message", event.Err.Error())
+		span.SetTag("exception.type", fmt.Sprintf("%T", event.Err))
+		// span.SetStatus(codes.Error, event.Err.Error())
+	}
 }
 
 func (h *SentryHook) eventQuery(event *bun.QueryEvent) string {

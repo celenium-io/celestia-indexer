@@ -54,7 +54,6 @@ func handleSentry(next echo.HandlerFunc) echo.HandlerFunc {
 			})
 			scope.SetRequest(req)
 		})
-		transaction.SetTag("user-agent", req.UserAgent())
 
 		defer recoverWithSentry(hub, req)
 
