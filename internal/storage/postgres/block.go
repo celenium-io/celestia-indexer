@@ -58,7 +58,7 @@ func (b *Blocks) ByHeightWithStats(ctx context.Context, height types.Level) (blo
 		ColumnExpr("proposer.id AS proposer__id, proposer.cons_address AS proposer__cons_address, proposer.moniker AS proposer__moniker").
 		With("q", subQuery).
 		TableExpr("q as block").
-		Join("LEFT JOIN block_stats AS stats ON (stats.id = block.id) AND (stats.time = block.time)").
+		Join("LEFT JOIN block_stats AS stats ON (stats.height = block.height) AND (stats.time = block.time)").
 		Join("LEFT JOIN validator AS proposer ON (proposer.id = block.proposer_id)").
 		Scan(ctx, &block)
 
@@ -101,7 +101,7 @@ func (b *Blocks) ByIdWithRelations(ctx context.Context, id uint64) (block storag
 		ColumnExpr("proposer.id AS proposer__id, proposer.cons_address AS proposer__cons_address, proposer.moniker AS proposer__moniker").
 		With("q", subQuery).
 		TableExpr("q as block").
-		Join("LEFT JOIN block_stats AS stats ON (stats.id = block.id) AND (stats.time = block.time)").
+		Join("LEFT JOIN block_stats AS stats ON (stats.height = block.height) AND (stats.time = block.time)").
 		Join("LEFT JOIN validator AS proposer ON (proposer.id = block.proposer_id)").
 		Scan(ctx, &block)
 
@@ -156,7 +156,7 @@ func (b *Blocks) ByHash(ctx context.Context, hash []byte) (block storage.Block, 
 		ColumnExpr("proposer.id AS proposer__id, proposer.cons_address AS proposer__cons_address, proposer.moniker AS proposer__moniker").
 		With("q", subQuery).
 		TableExpr("q as block").
-		Join("LEFT JOIN block_stats AS stats ON (stats.id = block.id) AND (stats.time = block.time)").
+		Join("LEFT JOIN block_stats AS stats ON (stats.height = block.height) AND (stats.time = block.time)").
 		Join("LEFT JOIN validator AS proposer ON (proposer.id = block.proposer_id)").
 		Scan(ctx, &block)
 
