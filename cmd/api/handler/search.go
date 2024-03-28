@@ -52,7 +52,7 @@ type searchRequest struct {
 }
 
 var (
-	hashRegexp      = regexp.MustCompile("^(0x)?[a-fA-f0-9]{64}$")
+	hashRegexp      = regexp.MustCompile("^(0x)?[a-fA-F0-9]{64}$")
 	namespaceRegexp = regexp.MustCompile("^[a-fA-f0-9]{58}$")
 )
 

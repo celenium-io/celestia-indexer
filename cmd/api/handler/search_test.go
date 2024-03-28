@@ -176,6 +176,24 @@ func (s *SearchTestSuite) TestSearchBlockWith0x() {
 	s.Require().NotNil(response.Result)
 }
 
+func (s *SearchTestSuite) TestSearchBlockWithInvalidHash() {
+	q := make(url.Values)
+	q.Set("query", "EDBOFE1DAA9BB1FDA0879F1EB4F285399B6F74CB1B0C420600642682043EE41E")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/search")
+
+	s.search.EXPECT().
+		SearchText(gomock.Any(), gomock.Any()).
+		Return([]storage.SearchResult{}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.Search(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+}
+
 func (s *SearchTestSuite) TestSearchTx() {
 	q := make(url.Values)
 	q.Set("query", testTxHash)
