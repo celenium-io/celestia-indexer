@@ -139,6 +139,7 @@ func (bl *BlobLog) ExportByProviders(ctx context.Context, providers []storage.Ro
 		Join("left join address as signer on signer.id = blob_log.signer_id").
 		Join("left join namespace as ns on ns.id = blob_log.namespace_id").
 		Join("left join tx on tx.id = blob_log.tx_id").
+		Order("blob_log.time desc").
 		String()
 
 	err = bl.export.ToCsv(ctx, stream, query)
