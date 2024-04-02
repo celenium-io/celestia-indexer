@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -329,7 +330,11 @@ func (s *RollupTestSuite) TestBySlug() {
 }
 
 func (s *RollupTestSuite) TestByExportBlobs() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	q := make(url.Values)
+	q.Set("from", "1")
+	q.Set("to", "2")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/rollup/:id/export")
@@ -346,6 +351,8 @@ func (s *RollupTestSuite) TestByExportBlobs() {
 			},
 		}, nil)
 
+	from := time.Unix(1, 0).UTC()
+	to := time.Unix(2, 0).UTC()
 	s.blobs.EXPECT().
 		ExportByProviders(gomock.Any(), []storage.RollupProvider{
 			{
@@ -353,7 +360,7 @@ func (s *RollupTestSuite) TestByExportBlobs() {
 				NamespaceId: 2,
 				AddressId:   3,
 			},
-		}, gomock.Any(), gomock.Any(), gomock.Any()).
+		}, from, to, gomock.Any()).
 		Return(nil)
 
 	s.Require().NoError(s.handler.ExportBlobs(c))

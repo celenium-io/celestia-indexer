@@ -402,10 +402,10 @@ func (handler RollupHandler) ExportBlobs(c echo.Context) error {
 		to   time.Time
 	)
 	if req.From > 0 {
-		from = time.Unix(req.From, 0)
+		from = time.Unix(req.From, 0).UTC()
 	}
 	if req.To > 0 {
-		to = time.Unix(req.To, 0)
+		to = time.Unix(req.To, 0).UTC()
 	}
 
 	err = handler.blobs.ExportByProviders(
