@@ -6,6 +6,7 @@ package postgres
 import (
 	"context"
 	"io"
+	"log"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -99,36 +100,39 @@ func (bl *BlobLog) ExportByProviders(ctx context.Context, providers []storage.Ro
 
 	case !from.IsZero() && to.IsZero():
 		blobQuery = blobQuery.
-			Where("time >= ?", from.UTC()).
+			Where("time >= ?", from).
 			Where("time < ?", from.AddDate(0, maxExportPeriodInMonth, 0).UTC())
 
 	case from.IsZero() && !to.IsZero():
 		blobQuery = blobQuery.
-			Where("time < ?", to.UTC()).
+			Where("time < ?", to).
 			Where("time >= ?", to.AddDate(0, -maxExportPeriodInMonth, 0).UTC())
 
 	case !from.IsZero() && !to.IsZero():
 		if to.Sub(from) > time.Hour*24*30 {
 			blobQuery = blobQuery.
-				Where("time >= ?", from.UTC()).
+				Where("time >= ?", from).
 				Where("time < ?", from.AddDate(0, maxExportPeriodInMonth, 0).UTC())
 		} else {
 			blobQuery = blobQuery.
-				Where("time >= ?", from.UTC()).
-				Where("time < ?", to.UTC())
+				Where("time >= ?", from).
+				Where("time < ?", to)
 		}
 
 	}
 
-	for i := range providers {
-		blobQuery = blobQuery.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
-			sq.Where("blob_log.signer_id = ?", providers[i].AddressId)
-			if providers[i].NamespaceId > 0 {
-				sq.Where("blob_log.namespace_id = ?", providers[i].NamespaceId)
-			}
-			return sq
-		})
-	}
+	blobQuery = blobQuery.WhereGroup(" AND ", func(q *bun.SelectQuery) *bun.SelectQuery {
+		for i := range providers {
+			q = q.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
+				sq.Where("blob_log.signer_id = ?", providers[i].AddressId)
+				if providers[i].NamespaceId > 0 {
+					sq.Where("blob_log.namespace_id = ?", providers[i].NamespaceId)
+				}
+				return sq
+			})
+		}
+		return q
+	})
 
 	query := bl.DB().NewSelect().
 		ColumnExpr("blob_log.time, blob_log.height, blob_log.size, blob_log.commitment, blob_log.content_type").
@@ -141,6 +145,8 @@ func (bl *BlobLog) ExportByProviders(ctx context.Context, providers []storage.Ro
 		Join("left join tx on tx.id = blob_log.tx_id").
 		Order("blob_log.time desc").
 		String()
+
+	log.Print(query)
 
 	err = bl.export.ToCsv(ctx, stream, query)
 	return

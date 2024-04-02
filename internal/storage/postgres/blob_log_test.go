@@ -169,18 +169,23 @@ func (s *StorageTestSuite) TestBlobLogsExportByProviders() {
 
 	buf := new(bytes.Buffer)
 
+	from := time.Date(2023, 7, 1, 3, 10, 0, 0, time.UTC)
+	to := time.Date(2023, 7, 5, 3, 10, 0, 0, time.UTC)
 	err := s.storage.BlobLogs.ExportByProviders(ctx, []storage.RollupProvider{
 		{
 			AddressId:   1,
 			NamespaceId: 1,
 		},
-	}, time.Time{}, time.Time{}, buf)
+	}, from, to, buf)
 	s.Require().NoError(err)
 
 	reader := csv.NewReader(buf)
 
-	for rows, err := reader.Read(); err != io.EOF; rows, err = reader.Read() {
+	var count int
+	for columns, err := reader.Read(); err != io.EOF; columns, err = reader.Read() {
 		s.Require().NoError(err)
-		s.Require().Len(rows, 9)
+		s.Require().Len(columns, 9)
+		count++
 	}
+	s.Require().EqualValues(2, count)
 }
