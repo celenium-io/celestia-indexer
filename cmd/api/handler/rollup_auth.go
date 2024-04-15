@@ -43,6 +43,9 @@ type createRollupRequest struct {
 	GitHub      string           `json:"github"      validate:"omitempty,url"`
 	Twitter     string           `json:"twitter"     validate:"omitempty,url"`
 	Logo        string           `json:"logo"        validate:"omitempty,url"`
+	L2Beat      string           `json:"l2_beat"     validate:"omitempty,url"`
+	Bridge      string           `json:"bridge"      validate:"omitempty,url"`
+	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
 	Providers   []rollupProvider `json:"providers"   validate:"required,min=1"`
 }
 
@@ -71,13 +74,16 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRo
 	}
 
 	rollup := storage.Rollup{
-		Name:        req.Name,
-		Description: req.Description,
-		Website:     req.Website,
-		GitHub:      req.GitHub,
-		Twitter:     req.Twitter,
-		Logo:        req.Logo,
-		Slug:        slug.Make(req.Name),
+		Name:           req.Name,
+		Description:    req.Description,
+		Website:        req.Website,
+		GitHub:         req.GitHub,
+		Twitter:        req.Twitter,
+		Logo:           req.Logo,
+		L2Beat:         req.L2Beat,
+		BridgeContract: req.Bridge,
+		Links:          req.Links,
+		Slug:           slug.Make(req.Name),
 	}
 
 	if err := tx.SaveRollup(ctx, &rollup); err != nil {
@@ -133,6 +139,9 @@ type updateRollupRequest struct {
 	GitHub      string           `json:"github"      validate:"omitempty,url"`
 	Twitter     string           `json:"twitter"     validate:"omitempty,url"`
 	Logo        string           `json:"logo"        validate:"omitempty,url"`
+	L2Beat      string           `json:"l2_beat"     validate:"omitempty,url"`
+	Bridge      string           `json:"bridge"      validate:"omitempty,url"`
+	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
 	Providers   []rollupProvider `json:"providers"   validate:"omitempty,min=1"`
 }
 
@@ -160,14 +169,17 @@ func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRo
 	}
 
 	rollup := storage.Rollup{
-		Id:          req.Id,
-		Name:        req.Name,
-		Slug:        slug.Make(req.Name),
-		Description: req.Description,
-		Website:     req.Website,
-		GitHub:      req.GitHub,
-		Twitter:     req.Twitter,
-		Logo:        req.Logo,
+		Id:             req.Id,
+		Name:           req.Name,
+		Slug:           slug.Make(req.Name),
+		Description:    req.Description,
+		Website:        req.Website,
+		GitHub:         req.GitHub,
+		Twitter:        req.Twitter,
+		Logo:           req.Logo,
+		L2Beat:         req.L2Beat,
+		BridgeContract: req.Bridge,
+		Links:          req.Links,
 	}
 
 	if err := tx.UpdateRollup(ctx, &rollup); err != nil {
