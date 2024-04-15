@@ -32,14 +32,17 @@ type IRollup interface {
 type Rollup struct {
 	bun.BaseModel `bun:"rollup" comment:"Table with rollups."`
 
-	Id          uint64 `bun:"id,pk,autoincrement"     comment:"Unique internal identity"`
-	Name        string `bun:"name"                    comment:"Rollup's name"`
-	Description string `bun:"description"             comment:"Rollup's description"`
-	Website     string `bun:"website"                 comment:"Website"`
-	GitHub      string `bun:"github"                  comment:"Github repository"`
-	Twitter     string `bun:"twitter"                 comment:"Twitter account"`
-	Logo        string `bun:"logo"                    comment:"Link to rollup logo"`
-	Slug        string `bun:"slug,unique:rollup_slug" comment:"Rollup slug"`
+	Id             uint64   `bun:"id,pk,autoincrement"     comment:"Unique internal identity"`
+	Name           string   `bun:"name"                    comment:"Rollup's name"`
+	Description    string   `bun:"description"             comment:"Rollup's description"`
+	Website        string   `bun:"website"                 comment:"Website"`
+	GitHub         string   `bun:"github"                  comment:"Github repository"`
+	Twitter        string   `bun:"twitter"                 comment:"Twitter account"`
+	Logo           string   `bun:"logo"                    comment:"Link to rollup logo"`
+	Slug           string   `bun:"slug,unique:rollup_slug" comment:"Rollup slug"`
+	BridgeContract string   `bun:"bridge_contract"         comment:"Link to bridge contract"`
+	L2Beat         string   `bun:"l2_beat"                 comment:"Link to L2 Beat"`
+	Links          []string `bun:"links,array"             comment:"Other links to rollup related sites"`
 
 	Providers []*RollupProvider `bun:"rel:has-many,join:id=rollup_id"`
 }
@@ -55,7 +58,10 @@ func (r Rollup) IsEmpty() bool {
 		r.Name == "" &&
 		r.Twitter == "" &&
 		r.Website == "" &&
-		r.Logo == ""
+		r.Logo == "" &&
+		r.L2Beat == "" &&
+		r.BridgeContract == "" &&
+		r.Links == nil
 }
 
 type RollupWithStats struct {

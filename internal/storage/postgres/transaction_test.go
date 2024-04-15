@@ -730,6 +730,8 @@ func (s *TransactionTestSuite) TestGetProposerId() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
+const testLink = "test_link"
+
 func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
@@ -738,10 +740,13 @@ func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 	s.Require().NoError(err)
 
 	rollup := &storage.Rollup{
-		Name:        "Rollup 2",
-		Description: "The second",
-		Website:     "https://website.com",
-		Twitter:     "https://x.com/rollup2",
+		Name:           "Rollup 2",
+		Description:    "The second",
+		Website:        "https://website.com",
+		Twitter:        "https://x.com/rollup2",
+		L2Beat:         testLink,
+		BridgeContract: testLink,
+		Links:          []string{testLink},
 	}
 	err = tx.SaveRollup(ctx, rollup)
 	s.Require().NoError(err)
@@ -762,6 +767,9 @@ func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 	s.Require().EqualValues(rollup.Website, newRollup.Website)
 	s.Require().EqualValues(rollup.GitHub, newRollup.GitHub)
 	s.Require().EqualValues(rollup.Twitter, newRollup.Twitter)
+	s.Require().EqualValues(testLink, newRollup.L2Beat)
+	s.Require().EqualValues(testLink, newRollup.BridgeContract)
+	s.Require().Len(newRollup.Links, 1)
 
 	tx, err = BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)

@@ -647,6 +647,15 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 	if rollup.Logo != "" {
 		query = query.Set("logo = ?", rollup.Logo)
 	}
+	if rollup.L2Beat != "" {
+		query = query.Set("l2_beat = ?", rollup.L2Beat)
+	}
+	if rollup.BridgeContract != "" {
+		query = query.Set("bridge_contract = ?", rollup.BridgeContract)
+	}
+	if rollup.Links != nil {
+		query = query.Set("links = ?", pq.Array(rollup.Links))
+	}
 
 	_, err := query.Exec(ctx)
 	return err
