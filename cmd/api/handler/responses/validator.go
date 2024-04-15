@@ -92,7 +92,6 @@ type SignedBlocks struct {
 func NewValidatorUptime(levels []types.Level, currentLevel types.Level, count types.Level) (uptime ValidatorUptime) {
 	var (
 		levelIndex = 0
-		blockIndex = 0
 		threshold  = count
 	)
 
@@ -100,21 +99,20 @@ func NewValidatorUptime(levels []types.Level, currentLevel types.Level, count ty
 		threshold = currentLevel
 	}
 
-	uptime.Blocks = make([]SignedBlocks, threshold)
+	uptime.Blocks = make([]SignedBlocks, 0)
 	for i := currentLevel; i > currentLevel-threshold; i-- {
 		if levelIndex < len(levels) && levels[levelIndex] == i {
 			levelIndex++
-			uptime.Blocks[blockIndex] = SignedBlocks{
+			uptime.Blocks = append(uptime.Blocks, SignedBlocks{
 				Signed: true,
 				Height: i,
-			}
+			})
 		} else {
-			uptime.Blocks[blockIndex] = SignedBlocks{
+			uptime.Blocks = append(uptime.Blocks, SignedBlocks{
 				Signed: false,
 				Height: i,
-			}
+			})
 		}
-		blockIndex++
 	}
 
 	uptime.Uptime = fmt.Sprintf("%.4f", float64(levelIndex)/float64(threshold))

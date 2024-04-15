@@ -7,7 +7,7 @@ require (
 	cosmossdk.io/math v1.1.2
 	github.com/celestiaorg/celestia-app v1.7.0
 	github.com/cosmos/cosmos-sdk v0.46.16
-	github.com/cosmos/ibc-go/v6 v6.2.0
+	github.com/cosmos/ibc-go/v6 v6.3.0
 	github.com/dipdup-io/workerpool v0.0.4
 	github.com/dipdup-net/go-lib v0.4.0
 	github.com/dipdup-net/indexer-sdk v0.0.5
