@@ -259,7 +259,7 @@ require (
 )
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/celestiaorg/cosmos-sdk v1.22.0-sdk-v0.46.16
+	github.com/cosmos/cosmos-sdk => github.com/celestiaorg/cosmos-sdk v1.20.1-sdk-v0.46.16
 	github.com/filecoin-project/dagstore => github.com/celestiaorg/dagstore v0.0.0-20230413141458-735ab09a15d6
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/ipfs/go-verifcid => github.com/celestiaorg/go-verifcid v0.0.1-lazypatch
