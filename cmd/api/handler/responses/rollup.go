@@ -10,16 +10,17 @@ import (
 )
 
 type RollupWithStats struct {
-	Id             uint64 `example:"321"                             format:"integer" json:"id"                    swaggertype:"integer"`
-	Name           string `example:"Rollup name"                     format:"string"  json:"name"                  swaggertype:"string"`
-	Description    string `example:"Long rollup description"         format:"string"  json:"description,omitempty" swaggertype:"string"`
-	Website        string `example:"https://website.com"             format:"string"  json:"website,omitempty"     swaggertype:"string"`
-	Twitter        string `example:"https://x.com/account"           format:"string"  json:"twitter,omitempty"     swaggertype:"string"`
-	Github         string `example:"https://github.com/account"      format:"string"  json:"github,omitempty"      swaggertype:"string"`
-	Logo           string `example:"https://some_link.com/image.png" format:"string"  json:"logo,omitempty"        swaggertype:"string"`
-	Slug           string `example:"rollup_slug"                     format:"string"  json:"slug"                  swaggertype:"string"`
-	L2Beat         string `example:"https://github.com/account"      format:"string"  json:"l2_beat,omitempty"     swaggertype:"string"`
-	BridgeContract string `example:"https://github.com/account"      format:"string"  json:"bridge,omitempty"      swaggertype:"string"`
+	Id             uint64 `example:"321"                                       format:"integer" json:"id"                    swaggertype:"integer"`
+	Name           string `example:"Rollup name"                               format:"string"  json:"name"                  swaggertype:"string"`
+	Description    string `example:"Long rollup description"                   format:"string"  json:"description,omitempty" swaggertype:"string"`
+	Website        string `example:"https://website.com"                       format:"string"  json:"website,omitempty"     swaggertype:"string"`
+	Twitter        string `example:"https://x.com/account"                     format:"string"  json:"twitter,omitempty"     swaggertype:"string"`
+	Github         string `example:"https://github.com/account"                format:"string"  json:"github,omitempty"      swaggertype:"string"`
+	Logo           string `example:"https://some_link.com/image.png"           format:"string"  json:"logo,omitempty"        swaggertype:"string"`
+	Slug           string `example:"rollup_slug"                               format:"string"  json:"slug"                  swaggertype:"string"`
+	L2Beat         string `example:"https://l2beat.com/scaling/projects/karak" format:"string"  json:"l2_beat,omitempty"     swaggertype:"string"`
+	Explorer       string `example:"https://explorer.karak.network/"           format:"string"  json:"explorer,omitempty"    swaggertype:"string"`
+	BridgeContract string `example:"https://github.com/account"                format:"string"  json:"bridge,omitempty"      swaggertype:"string"`
 
 	BlobsCount  int64     `example:"2"                         format:"integer"   json:"blobs_count"        swaggertype:"integer"`
 	Size        int64     `example:"1000"                      format:"integer"   json:"size"               swaggertype:"integer"`
@@ -40,6 +41,7 @@ func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 		Website:        r.Website,
 		Logo:           r.Logo,
 		L2Beat:         r.L2Beat,
+		Explorer:       r.Explorer,
 		BridgeContract: r.BridgeContract,
 		Links:          r.Links,
 		Slug:           r.Slug,
@@ -61,6 +63,7 @@ type Rollup struct {
 	Logo           string `example:"https://some_link.com/image.png" format:"string"  json:"logo,omitempty"        swaggertype:"string"`
 	Slug           string `example:"rollup_slug"                     format:"string"  json:"slug"                  swaggertype:"string"`
 	L2Beat         string `example:"https://github.com/account"      format:"string"  json:"l2_beat,omitempty"     swaggertype:"string"`
+	Explorer       string `example:"https://explorer.karak.network/" format:"string"  json:"explorer,omitempty"    swaggertype:"string"`
 	BridgeContract string `example:"https://github.com/account"      format:"string"  json:"bridge,omitempty"      swaggertype:"string"`
 
 	Links []string `json:"links,omitempty"`
@@ -78,6 +81,7 @@ func NewRollup(r *storage.Rollup) Rollup {
 		Slug:           r.Slug,
 		L2Beat:         r.L2Beat,
 		BridgeContract: r.BridgeContract,
+		Explorer:       r.Explorer,
 		Links:          r.Links,
 	}
 }

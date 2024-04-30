@@ -650,6 +650,9 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 	if rollup.L2Beat != "" {
 		query = query.Set("l2_beat = ?", rollup.L2Beat)
 	}
+	if rollup.Explorer != "" {
+		query = query.Set("explorer = ?", rollup.Explorer)
+	}
 	if rollup.BridgeContract != "" {
 		query = query.Set("bridge_contract = ?", rollup.BridgeContract)
 	}
