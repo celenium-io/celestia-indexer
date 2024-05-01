@@ -42,6 +42,7 @@ type Rollup struct {
 	Slug           string   `bun:"slug,unique:rollup_slug" comment:"Rollup slug"`
 	BridgeContract string   `bun:"bridge_contract"         comment:"Link to bridge contract"`
 	L2Beat         string   `bun:"l2_beat"                 comment:"Link to L2 Beat"`
+	Explorer       string   `bun:"explorer"                comment:"Link to chain explorer"`
 	Links          []string `bun:"links,array"             comment:"Other links to rollup related sites"`
 
 	Providers []*RollupProvider `bun:"rel:has-many,join:id=rollup_id"`
@@ -61,6 +62,7 @@ func (r Rollup) IsEmpty() bool {
 		r.Logo == "" &&
 		r.L2Beat == "" &&
 		r.BridgeContract == "" &&
+		r.Explorer == "" &&
 		r.Links == nil
 }
 
