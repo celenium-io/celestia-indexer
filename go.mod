@@ -5,9 +5,9 @@ go 1.22.1
 require (
 	cosmossdk.io/errors v1.0.0
 	cosmossdk.io/math v1.1.2
-	github.com/celestiaorg/celestia-app v1.7.0
+	github.com/celestiaorg/celestia-app v1.8.0
 	github.com/cosmos/cosmos-sdk v0.46.16
-	github.com/cosmos/ibc-go/v6 v6.3.0
+	github.com/cosmos/ibc-go/v6 v6.3.1
 	github.com/dipdup-io/workerpool v0.0.4
 	github.com/dipdup-net/go-lib v0.4.0
 	github.com/dipdup-net/indexer-sdk v0.0.5
@@ -264,5 +264,5 @@ replace (
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/ipfs/go-verifcid => github.com/celestiaorg/go-verifcid v0.0.1-lazypatch
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
-	github.com/tendermint/tendermint => github.com/celestiaorg/celestia-core v1.29.0-tm-v0.34.29
+	github.com/tendermint/tendermint => github.com/celestiaorg/celestia-core v1.35.0-tm-v0.34.29
 )
