@@ -146,21 +146,24 @@ func (s *StorageTestSuite) TestBlobLogsByProviders() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	logs, err := s.storage.BlobLogs.ByProviders(ctx, []storage.RollupProvider{
-		{
-			AddressId:   1,
-			NamespaceId: 1,
-		},
-	}, storage.BlobLogFilters{
-		Limit: 10,
-	})
-	s.Require().NoError(err)
-	s.Require().Len(logs, 1)
+	for _, sortBy := range []string{"", "time", "size"} {
+		logs, err := s.storage.BlobLogs.ByProviders(ctx, []storage.RollupProvider{
+			{
+				AddressId:   1,
+				NamespaceId: 1,
+			},
+		}, storage.BlobLogFilters{
+			Limit:  10,
+			SortBy: sortBy,
+		})
+		s.Require().NoError(err)
+		s.Require().Len(logs, 1)
 
-	log := logs[0]
-	s.Require().NotNil(log.Tx)
-	s.Require().NotNil(log.Namespace)
-	s.Require().NotNil(log.Signer)
+		log := logs[0]
+		s.Require().NotNil(log.Tx)
+		s.Require().NotNil(log.Namespace)
+		s.Require().NotNil(log.Signer)
+	}
 }
 
 func (s *StorageTestSuite) TestBlobLogsExportByProviders() {

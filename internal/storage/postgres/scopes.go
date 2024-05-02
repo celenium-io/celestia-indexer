@@ -4,6 +4,8 @@
 package postgres
 
 import (
+	"fmt"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/pkg/errors"
@@ -113,12 +115,15 @@ func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.S
 	}
 
 	query = limitScope(query, fltrs.Limit)
+	return blobLogSort(query, fltrs)
+}
 
+func blobLogSort(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.SelectQuery {
 	switch fltrs.SortBy {
 	case sizeColumn, timeColumn:
-		query = sortScope(query, fltrs.SortBy, fltrs.Sort)
+		query = sortScope(query, fmt.Sprintf("blob_log.%s", fltrs.SortBy), fltrs.Sort)
 	case "":
-		query = sortScope(query, "id", fltrs.Sort)
+		query = sortScope(query, "blob_log.id", fltrs.Sort)
 	default:
 		return query
 	}
