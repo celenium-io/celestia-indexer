@@ -620,8 +620,16 @@ definitions:
     type: object
   responses.Rollup:
     properties:
+      bridge:
+        example: https://github.com/account
+        format: string
+        type: string
       description:
         example: Long rollup description
+        format: string
+        type: string
+      explorer:
+        example: https://explorer.karak.network/
         format: string
         type: string
       github:
@@ -632,6 +640,14 @@ definitions:
         example: 321
         format: integer
         type: integer
+      l2_beat:
+        example: https://github.com/account
+        format: string
+        type: string
+      links:
+        items:
+          type: string
+        type: array
       logo:
         example: https://some_link.com/image.png
         format: string
@@ -659,8 +675,16 @@ definitions:
         example: 2
         format: integer
         type: integer
+      bridge:
+        example: https://github.com/account
+        format: string
+        type: string
       description:
         example: Long rollup description
+        format: string
+        type: string
+      explorer:
+        example: https://explorer.karak.network/
         format: string
         type: string
       fee:
@@ -679,10 +703,18 @@ definitions:
         example: 321
         format: integer
         type: integer
+      l2_beat:
+        example: https://l2beat.com/scaling/projects/karak
+        format: string
+        type: string
       last_message_time:
         example: "2023-07-04T03:10:57+00:00"
         format: date-time
         type: string
+      links:
+        items:
+          type: string
+        type: array
       logo:
         example: https://some_link.com/image.png
         format: string
@@ -1483,8 +1515,8 @@ paths:
       parameters:
       - description: Hash
         in: path
-        maxLength: 48
-        minLength: 48
+        maxLength: 47
+        minLength: 47
         name: hash
         required: true
         type: string
@@ -1515,8 +1547,8 @@ paths:
       parameters:
       - description: Hash
         in: path
-        maxLength: 48
-        minLength: 48
+        maxLength: 47
+        minLength: 47
         name: hash
         required: true
         type: string
@@ -1572,8 +1604,8 @@ paths:
       parameters:
       - description: Hash
         in: path
-        maxLength: 48
-        minLength: 48
+        maxLength: 47
+        minLength: 47
         name: hash
         required: true
         type: string
@@ -1612,15 +1644,15 @@ paths:
       summary: Get delegations made by address
       tags:
       - address
-  /v1/address/{hash}/grantee:
+  /v1/address/{hash}/granters:
     get:
       description: Get grants where address is grantee
       operationId: address-grantee
       parameters:
       - description: Hash
         in: path
-        maxLength: 48
-        minLength: 48
+        maxLength: 47
+        minLength: 47
         name: hash
         required: true
         type: string
@@ -1662,8 +1694,8 @@ paths:
       parameters:
       - description: Hash
         in: path
-        maxLength: 48
-        minLength: 48
+        maxLength: 47
+        minLength: 47
         name: hash
         required: true
         type: string
@@ -1705,8 +1737,8 @@ paths:
       parameters:
       - description: Hash
         in: path
-        maxLength: 48
-        minLength: 48
+        maxLength: 47
+        minLength: 47
         name: hash
         required: true
         type: string
@@ -1834,8 +1866,8 @@ paths:
       parameters:
       - description: Hash
         in: path
-        maxLength: 48
-        minLength: 48
+        maxLength: 47
+        minLength: 47
         name: hash
         required: true
         type: string
@@ -1877,8 +1909,8 @@ paths:
       parameters:
       - description: Hash
         in: path
-        maxLength: 48
-        minLength: 48
+        maxLength: 47
+        minLength: 47
         name: hash
         required: true
         type: string
@@ -2028,8 +2060,8 @@ paths:
       parameters:
       - description: Hash
         in: path
-        maxLength: 48
-        minLength: 48
+        maxLength: 47
+        minLength: 47
         name: hash
         required: true
         type: string
@@ -2071,8 +2103,8 @@ paths:
       parameters:
       - description: Hash
         in: path
-        maxLength: 48
-        minLength: 48
+        maxLength: 47
+        minLength: 47
         name: hash
         required: true
         type: string

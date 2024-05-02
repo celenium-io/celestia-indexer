@@ -109,8 +109,8 @@
                 "operationId": "get-address",
                 "parameters": [
                     {
-                        "maxLength": 48,
-                        "minLength": 48,
+                        "maxLength": 47,
+                        "minLength": 47,
                         "type": "string",
                         "description": "Hash",
                         "name": "hash",
@@ -156,8 +156,8 @@
                 "operationId": "address-blobs",
                 "parameters": [
                     {
-                        "maxLength": 48,
-                        "minLength": 48,
+                        "maxLength": 47,
+                        "minLength": 47,
                         "type": "string",
                         "description": "Hash",
                         "name": "hash",
@@ -238,8 +238,8 @@
                 "operationId": "address-delegations",
                 "parameters": [
                     {
-                        "maxLength": 48,
-                        "minLength": 48,
+                        "maxLength": 47,
+                        "minLength": 47,
                         "type": "string",
                         "description": "Hash",
                         "name": "hash",
@@ -293,7 +293,7 @@
                 }
             }
         },
-        "/v1/address/{hash}/grantee": {
+        "/v1/address/{hash}/granters": {
             "get": {
                 "description": "Get grants where address is grantee",
                 "produces": [
@@ -306,8 +306,8 @@
                 "operationId": "address-grantee",
                 "parameters": [
                     {
-                        "maxLength": 48,
-                        "minLength": 48,
+                        "maxLength": 47,
+                        "minLength": 47,
                         "type": "string",
                         "description": "Hash",
                         "name": "hash",
@@ -368,8 +368,8 @@
                 "operationId": "address-grants",
                 "parameters": [
                     {
-                        "maxLength": 48,
-                        "minLength": 48,
+                        "maxLength": 47,
+                        "minLength": 47,
                         "type": "string",
                         "description": "Hash",
                         "name": "hash",
@@ -430,8 +430,8 @@
                 "operationId": "address-messages",
                 "parameters": [
                     {
-                        "maxLength": 48,
-                        "minLength": 48,
+                        "maxLength": 47,
+                        "minLength": 47,
                         "type": "string",
                         "description": "Hash",
                         "name": "hash",
@@ -584,8 +584,8 @@
                 "operationId": "address-redelegations",
                 "parameters": [
                     {
-                        "maxLength": 48,
-                        "minLength": 48,
+                        "maxLength": 47,
+                        "minLength": 47,
                         "type": "string",
                         "description": "Hash",
                         "name": "hash",
@@ -646,8 +646,8 @@
                 "operationId": "address-transactions",
                 "parameters": [
                     {
-                        "maxLength": 48,
-                        "minLength": 48,
+                        "maxLength": 47,
+                        "minLength": 47,
                         "type": "string",
                         "description": "Hash",
                         "name": "hash",
@@ -831,8 +831,8 @@
                 "operationId": "address-undelegations",
                 "parameters": [
                     {
-                        "maxLength": 48,
-                        "minLength": 48,
+                        "maxLength": 47,
+                        "minLength": 47,
                         "type": "string",
                         "description": "Hash",
                         "name": "hash",
@@ -893,8 +893,8 @@
                 "operationId": "address-vesting",
                 "parameters": [
                     {
-                        "maxLength": 48,
-                        "minLength": 48,
+                        "maxLength": 47,
+                        "minLength": 47,
                         "type": "string",
                         "description": "Hash",
                         "name": "hash",
@@ -5638,10 +5638,20 @@
         "responses.Rollup": {
             "type": "object",
             "properties": {
+                "bridge": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://github.com/account"
+                },
                 "description": {
                     "type": "string",
                     "format": "string",
                     "example": "Long rollup description"
+                },
+                "explorer": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://explorer.karak.network/"
                 },
                 "github": {
                     "type": "string",
@@ -5652,6 +5662,17 @@
                     "type": "integer",
                     "format": "integer",
                     "example": 321
+                },
+                "l2_beat": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://github.com/account"
+                },
+                "links": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "logo": {
                     "type": "string",
@@ -5688,10 +5709,20 @@
                     "format": "integer",
                     "example": 2
                 },
+                "bridge": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://github.com/account"
+                },
                 "description": {
                     "type": "string",
                     "format": "string",
                     "example": "Long rollup description"
+                },
+                "explorer": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://explorer.karak.network/"
                 },
                 "fee": {
                     "type": "string",
@@ -5713,10 +5744,21 @@
                     "format": "integer",
                     "example": 321
                 },
+                "l2_beat": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://l2beat.com/scaling/projects/karak"
+                },
                 "last_message_time": {
                     "type": "string",
                     "format": "date-time",
                     "example": "2023-07-04T03:10:57+00:00"
+                },
+                "links": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "logo": {
                     "type": "string",
