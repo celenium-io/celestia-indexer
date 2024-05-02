@@ -142,7 +142,7 @@ type updateRollupRequest struct {
 	Twitter     string           `json:"twitter"     validate:"omitempty,url"`
 	Logo        string           `json:"logo"        validate:"omitempty,url"`
 	L2Beat      string           `json:"l2_beat"     validate:"omitempty,url"`
-	Bridge      string           `json:"bridge"      validate:"omitempty,url"`
+	Bridge      string           `json:"bridge"      validate:"omitempty,eth_addr"`
 	Explorer    string           `json:"explorer"    validate:"omitempty,url"`
 	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
 	Providers   []rollupProvider `json:"providers"   validate:"omitempty,min=1"`
