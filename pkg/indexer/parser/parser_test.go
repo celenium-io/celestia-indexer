@@ -14,6 +14,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	dCtx "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
@@ -27,7 +28,7 @@ func createModules(t *testing.T) (modules.BaseModule, string, Module) {
 	writerModule := modules.New("writer-module")
 	outputName := "write"
 	writerModule.CreateOutput(outputName)
-	parserModule := NewModule()
+	parserModule := NewModule(config.Indexer{})
 
 	err := parserModule.AttachTo(&writerModule, outputName, InputName)
 	assert.NoError(t, err)

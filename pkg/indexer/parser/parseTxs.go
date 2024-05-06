@@ -16,11 +16,11 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func parseTxs(ctx *context.Context, b types.BlockData) ([]storage.Tx, error) {
+func (p *Module) parseTxs(ctx *context.Context, b types.BlockData) ([]storage.Tx, error) {
 	txs := make([]storage.Tx, len(b.TxsResults))
 
 	for i := range b.TxsResults {
-		if err := parseTx(ctx, b, i, b.TxsResults[i], &txs[i]); err != nil {
+		if err := p.parseTx(ctx, b, i, b.TxsResults[i], &txs[i]); err != nil {
 			return nil, err
 		}
 	}
@@ -28,7 +28,7 @@ func parseTxs(ctx *context.Context, b types.BlockData) ([]storage.Tx, error) {
 	return txs, nil
 }
 
-func parseTx(ctx *context.Context, b types.BlockData, index int, txRes *types.ResponseDeliverTx, t *storage.Tx) error {
+func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txRes *types.ResponseDeliverTx, t *storage.Tx) error {
 	d, err := decode.Tx(b, index)
 	if err != nil {
 		return errors.Wrapf(err, "while parsing Tx on index %d", index)
@@ -119,6 +119,8 @@ func parseTx(ctx *context.Context, b types.BlockData, index int, txRes *types.Re
 			}
 		}
 	}
+
+	p.notifyBlobs(b.Height, d.Blobs)
 
 	ctx.Block.Stats.Fee = ctx.Block.Stats.Fee.Add(t.Fee)
 	ctx.Block.MessageTypes.Set(t.MessageTypes.Bits)

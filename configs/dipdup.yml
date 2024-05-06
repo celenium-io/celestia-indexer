@@ -7,6 +7,7 @@ indexer:
   threads_count: ${INDEXER_THREADS_COUNT:-1}
   block_period: ${INDEXER_BLOCK_PERIOD:-15} # seconds
   scripts_dir: ${INDEXER_SCRIPTS_DIR:-./database}
+  blob_saver: ${INDEXER_BLOB_SAVER}
 
 database:
   kind: postgres
