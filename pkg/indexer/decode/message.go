@@ -126,7 +126,7 @@ func Message(
 			return d, err
 		}
 
-		msgs := make([]map[string]any, 0)
+		msgs := make([]any, 0)
 		for i := range typedMsg.Msgs {
 			msg, err := cosmosTypes.GetMsgFromTypeURL(cfg.Codec, typedMsg.Msgs[i].TypeUrl)
 			if err != nil {
