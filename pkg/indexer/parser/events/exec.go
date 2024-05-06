@@ -33,7 +33,10 @@ func handleExec(ctx *context.Context, events []storage.Event, msg *storage.Messa
 				return err
 			}
 		case "/cosmos.staking.v1beta1.MsgBeginRedelegate":
-			if err := processRedelegate(ctx, events, msg, idx); err != nil {
+			msgs := msg.Data["Msgs"].([]map[string]any)
+			if err := processRedelegate(ctx, events, &storage.Message{
+				Data: msgs[i],
+			}, idx); err != nil {
 				return err
 			}
 		case "/cosmos.staking.v1beta1.MsgUndelegate":

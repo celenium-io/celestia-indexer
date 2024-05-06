@@ -5,6 +5,9 @@ package parser
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -16,6 +19,7 @@ import (
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	tmTypes "github.com/tendermint/tendermint/types"
 )
 
@@ -259,4 +263,51 @@ func TestModule_OnParseError(t *testing.T) {
 			return
 		}
 	}
+}
+
+func getBlockByHeight(height uint64) (types.BlockData, error) {
+	blockFile, err := os.Open(fmt.Sprintf("../../../test/json/block_%d.json", height))
+	if err != nil {
+		return types.BlockData{}, err
+	}
+	defer blockFile.Close()
+
+	var block types.ResultBlock
+	if err := json.NewDecoder(blockFile).Decode(&block); err != nil {
+		return types.BlockData{}, err
+	}
+
+	blockResultsFile, err := os.Open(fmt.Sprintf("../../../test/json/results_%d.json", height))
+	if err != nil {
+		return types.BlockData{}, err
+	}
+	defer blockResultsFile.Close()
+
+	var blockResults types.ResultBlockResults
+	if err := json.NewDecoder(blockResultsFile).Decode(&blockResults); err != nil {
+		return types.BlockData{}, err
+	}
+
+	return types.BlockData{
+		ResultBlock:        block,
+		ResultBlockResults: blockResults,
+	}, nil
+}
+
+func TestModule_1768659(t *testing.T) {
+	writerModule, writerOutputName, parserModule := createModules(t)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*1)
+	defer cancel()
+
+	parserModule.Start(ctx)
+
+	block, err := getBlockByHeight(1768659)
+	require.NoError(t, err)
+	writerModule.MustOutput(writerOutputName).Push(block)
+
+	<-ctx.Done()
+
+	err = parserModule.Close()
+	require.NoError(t, err)
 }
