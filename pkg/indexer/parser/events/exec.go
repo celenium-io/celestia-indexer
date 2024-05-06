@@ -33,7 +33,17 @@ func handleExec(ctx *context.Context, events []storage.Event, msg *storage.Messa
 				return err
 			}
 		case "/cosmos.staking.v1beta1.MsgBeginRedelegate":
-			if err := processRedelegate(ctx, events, msg, idx); err != nil {
+			msgsAny, ok := msg.Data["Msgs"]
+			if !ok {
+				return errors.Errorf("can't find Msgs key in MsgExec: %##v", msg.Data)
+			}
+			msgs, ok := msgsAny.([]map[string]any)
+			if !ok {
+				return errors.Errorf("invalid type of Msgs in MsgExec: %T", msgsAny)
+			}
+			if err := processRedelegate(ctx, events, &storage.Message{
+				Data: msgs[i],
+			}, idx); err != nil {
 				return err
 			}
 		case "/cosmos.staking.v1beta1.MsgUndelegate":

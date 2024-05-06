@@ -122,6 +122,23 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, d.Msg.Grants, err = handle.MsgGrant(ctx, status, typedMsg)
 	case *authz.MsgExec:
 		d.Msg.Type, d.Msg.Addresses, d.Msg.InternalMsgs, err = handle.MsgExec(ctx, status, typedMsg)
+		if err != nil {
+			return d, err
+		}
+
+		msgs := make([]any, 0)
+		for i := range typedMsg.Msgs {
+			msg, err := cosmosTypes.GetMsgFromTypeURL(cfg.Codec, typedMsg.Msgs[i].TypeUrl)
+			if err != nil {
+				return d, err
+			}
+			if err := cfg.Codec.UnpackAny(typedMsg.Msgs[i], &msg); err != nil {
+				return d, err
+			}
+			msgs = append(msgs, structs.Map(msg))
+		}
+		d.Msg.Data["Msgs"] = msgs
+
 	case *authz.MsgRevoke:
 		d.Msg.Type, d.Msg.Addresses, d.Msg.Grants, err = handle.MsgRevoke(ctx, status, typedMsg)
 
