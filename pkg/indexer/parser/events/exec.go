@@ -37,12 +37,16 @@ func handleExec(ctx *context.Context, events []storage.Event, msg *storage.Messa
 			if !ok {
 				return errors.Errorf("can't find Msgs key in MsgExec: %##v", msg.Data)
 			}
-			msgs, ok := msgsAny.([]map[string]any)
+			msgsArr, ok := msgsAny.([]any)
 			if !ok {
-				return errors.Errorf("invalid type of Msgs in MsgExec: %T", msgsAny)
+				return errors.Errorf("Msgs is not an array in MsgExec: %T", msgsAny)
+			}
+			msgs, ok := msgsArr[i].(map[string]any)
+			if !ok {
+				return errors.Errorf("Msgs invalid type in MsgExec: %T", msgsArr[i])
 			}
 			if err := processRedelegate(ctx, events, &storage.Message{
-				Data: msgs[i],
+				Data: msgs,
 			}, idx); err != nil {
 				return err
 			}
