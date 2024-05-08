@@ -4912,6 +4912,9 @@ const docTemplate = `{
                 "namespace": {
                     "$ref": "#/definitions/responses.Namespace"
                 },
+                "rollup": {
+                    "$ref": "#/definitions/responses.ShortRollup"
+                },
                 "signer": {
                     "type": "string",
                     "format": "string",
@@ -5834,6 +5837,31 @@ const docTemplate = `{
                     "type": "string",
                     "format": "string",
                     "example": "0.17632"
+                }
+            }
+        },
+        "responses.ShortRollup": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 321
+                },
+                "logo": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://some_link.com/image.png"
+                },
+                "name": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Rollup name"
+                },
+                "slug": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "rollup_slug"
                 }
             }
         },
