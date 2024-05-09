@@ -353,6 +353,45 @@ func (c *IAddressSaveCall) DoAndReturn(f func(context.Context, *storage.Address)
 	return c
 }
 
+// Series mocks base method.
+func (m *MockIAddress) Series(ctx context.Context, addressId uint64, timeframe storage.Timeframe, column string, req storage.SeriesRequest) ([]storage.HistogramItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Series", ctx, addressId, timeframe, column, req)
+	ret0, _ := ret[0].([]storage.HistogramItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Series indicates an expected call of Series.
+func (mr *MockIAddressMockRecorder) Series(ctx, addressId, timeframe, column, req any) *IAddressSeriesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Series", reflect.TypeOf((*MockIAddress)(nil).Series), ctx, addressId, timeframe, column, req)
+	return &IAddressSeriesCall{Call: call}
+}
+
+// IAddressSeriesCall wrap *gomock.Call
+type IAddressSeriesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IAddressSeriesCall) Return(items []storage.HistogramItem, err error) *IAddressSeriesCall {
+	c.Call = c.Call.Return(items, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IAddressSeriesCall) Do(f func(context.Context, uint64, storage.Timeframe, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *IAddressSeriesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IAddressSeriesCall) DoAndReturn(f func(context.Context, uint64, storage.Timeframe, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *IAddressSeriesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Update mocks base method.
 func (m_2 *MockIAddress) Update(ctx context.Context, m *storage.Address) error {
 	m_2.ctrl.T.Helper()

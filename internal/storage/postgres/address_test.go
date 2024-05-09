@@ -91,3 +91,15 @@ func (s *StorageTestSuite) TestAddressMessagesWithType() {
 	s.Require().Equal(types.MsgWithdrawDelegatorReward, msg.Type)
 	s.Require().NotNil(messages[0].Tx)
 }
+
+func (s *StorageTestSuite) TestAddressStats() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	series, err := s.storage.Address.Series(ctx, 1, storage.TimeframeHour, "count", storage.NewSeriesRequest(0, 0))
+	s.Require().NoError(err)
+	s.Require().Len(series, 1)
+
+	item := series[0]
+	s.Require().Equal("3", item.Value)
+}

@@ -720,3 +720,45 @@ func (s *AddressTestSuite) TestGrantee() {
 	s.Require().NotNil(g.Params)
 	s.Require().False(g.Revoked)
 }
+
+func (s *AddressTestSuite) TestStats() {
+	for _, name := range []string{"count", "fee", "gas_used", "gas_wanted"} {
+		for _, tf := range []string{"hour", "day", "month"} {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/address/:hash/stats/:name/:timeframe")
+			c.SetParamNames("hash", "name", "timeframe")
+			c.SetParamValues(testAddress, name, tf)
+
+			s.address.EXPECT().
+				ByHash(gomock.Any(), testHashAddress).
+				Return(storage.Address{
+					Id:      1,
+					Hash:    testHashAddress,
+					Address: testAddress,
+				}, nil)
+
+			s.address.EXPECT().
+				Series(gomock.Any(), uint64(1), storage.Timeframe(tf), name, gomock.Any()).
+				Return([]storage.HistogramItem{
+					{
+						Time:  testTime,
+						Value: "1000",
+					},
+				}, nil)
+
+			s.Require().NoError(s.handler.Stats(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
+
+			var items []responses.HistogramItem
+			err := json.NewDecoder(rec.Body).Decode(&items)
+			s.Require().NoError(err)
+			s.Require().Len(items, 1)
+
+			g := items[0]
+			s.Require().Equal(testTime, g.Time)
+			s.Require().Equal("1000", g.Value)
+		}
+	}
+}

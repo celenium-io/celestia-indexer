@@ -1902,6 +1902,65 @@ paths:
       summary: Get redelegations made by address
       tags:
       - address
+  /v1/address/{hash}/stats/{name}/{timeframe}:
+    get:
+      description: Get address stats
+      operationId: address-stats
+      parameters:
+      - description: Hash
+        in: path
+        maxLength: 47
+        minLength: 47
+        name: hash
+        required: true
+        type: string
+      - description: Series name
+        enum:
+        - gas_used
+        - gas_wanted
+        - fee
+        - count
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Timeframe
+        enum:
+        - hour
+        - day
+        - month
+        in: path
+        name: timeframe
+        required: true
+        type: string
+      - description: Time from in unix timestamp
+        in: query
+        name: from
+        type: integer
+      - description: Time to in unix timestamp
+        in: query
+        name: to
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.HistogramItem'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get address stats
+      tags:
+      - address
   /v1/address/{hash}/txs:
     get:
       description: Get address transactions
