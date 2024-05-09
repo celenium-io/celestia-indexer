@@ -85,3 +85,22 @@ func NewRollup(r *storage.Rollup) Rollup {
 		Links:          r.Links,
 	}
 }
+
+type ShortRollup struct {
+	Id   uint64 `example:"321"                             format:"integer" json:"id"             swaggertype:"integer"`
+	Name string `example:"Rollup name"                     format:"string"  json:"name"           swaggertype:"string"`
+	Logo string `example:"https://some_link.com/image.png" format:"string"  json:"logo,omitempty" swaggertype:"string"`
+	Slug string `example:"rollup_slug"                     format:"string"  json:"slug"           swaggertype:"string"`
+}
+
+func NewShortRollup(r *storage.Rollup) *ShortRollup {
+	if r == nil {
+		return nil
+	}
+	return &ShortRollup{
+		Id:   r.Id,
+		Name: r.Name,
+		Logo: r.Logo,
+		Slug: r.Slug,
+	}
+}

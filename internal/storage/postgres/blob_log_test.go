@@ -95,6 +95,9 @@ func (s *StorageTestSuite) TestBlobLogsTx() {
 	s.Require().NotNil(log.Namespace)
 	s.Require().NotNil(log.TxId)
 	s.Require().NotNil(log.Signer)
+
+	s.Require().NotNil(log.Rollup)
+	s.Require().Equal("Rollup 1", log.Rollup.Name)
 }
 
 func (s *StorageTestSuite) TestCountBlobLogsTx() {
@@ -131,6 +134,9 @@ func (s *StorageTestSuite) TestBlobLogsByHeight() {
 	s.Require().NotNil(log.Namespace)
 	s.Require().NotNil(log.Tx)
 	s.Require().NotNil(log.Signer)
+
+	s.Require().NotNil(log.Rollup)
+	s.Require().Equal("Rollup 1", log.Rollup.Name)
 }
 
 func (s *StorageTestSuite) TestCountBlobLogsByHeight() {

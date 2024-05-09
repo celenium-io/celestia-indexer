@@ -85,6 +85,8 @@ definitions:
         type: integer
       namespace:
         $ref: '#/definitions/responses.Namespace'
+      rollup:
+        $ref: '#/definitions/responses.ShortRollup'
       signer:
         example: celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60
         format: string
@@ -767,6 +769,25 @@ definitions:
         type: string
       value:
         example: "0.17632"
+        format: string
+        type: string
+    type: object
+  responses.ShortRollup:
+    properties:
+      id:
+        example: 321
+        format: integer
+        type: integer
+      logo:
+        example: https://some_link.com/image.png
+        format: string
+        type: string
+      name:
+        example: Rollup name
+        format: string
+        type: string
+      slug:
+        example: rollup_slug
         format: string
         type: string
     type: object

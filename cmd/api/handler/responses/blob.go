@@ -46,6 +46,7 @@ type BlobLog struct {
 	ContentType string         `example:"image/png"                                       format:"string"    json:"content_type"     swaggertype:"string"`
 	Namespace   *Namespace     `json:"namespace,omitempty"`
 	Tx          *Tx            `json:"tx,omitempty"`
+	Rollup      *ShortRollup   `json:"rollup,omitempty"`
 }
 
 func NewBlobLog(blob storage.BlobLog) BlobLog {
@@ -55,6 +56,7 @@ func NewBlobLog(blob storage.BlobLog) BlobLog {
 		Height:      blob.Height,
 		Time:        blob.Time,
 		ContentType: blob.ContentType,
+		Rollup:      NewShortRollup(blob.Rollup),
 	}
 
 	if blob.Namespace != nil {

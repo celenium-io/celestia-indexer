@@ -56,6 +56,7 @@ type BlobLog struct {
 	Namespace *Namespace `bun:"rel:belongs-to,join:namespace_id=id"`
 	Tx        *Tx        `bun:"rel:belongs-to,join:tx_id=id"`
 	Signer    *Address   `bun:"rel:belongs-to,join:signer_id=id"`
+	Rollup    *Rollup    `bun:"rel:belongs-to"`
 }
 
 func (BlobLog) TableName() string {
