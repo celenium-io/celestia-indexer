@@ -52,7 +52,7 @@ func (r2 *R2) Init(ctx context.Context) error {
 			URL: r2.cfg.R2Url(),
 		}, nil
 	})
-	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(),
+	cfg, err := awsConfig.LoadDefaultConfig(ctx,
 		awsConfig.WithEndpointResolverWithOptions(r2Resolver),
 		awsConfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(r2.cfg.AccessKeyId, r2.cfg.AccessKeySecret, "")),
 		awsConfig.WithRegion("auto"),
