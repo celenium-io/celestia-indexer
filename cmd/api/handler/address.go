@@ -698,3 +698,61 @@ func (handler *AddressHandler) Grantee(c echo.Context) error {
 	}
 	return returnArray(c, response)
 }
+
+type addressStatsRequest struct {
+	Hash       string `example:"celestia1glfkehhpvl55amdew2fnm6wxt7egy560mxdrj7" param:"hash"      swaggertype:"string"  validate:"required,address"`
+	Timeframe  string `example:"hour"                                            param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day month"`
+	SeriesName string `example:"tps"                                             param:"name"      swaggertype:"string"  validate:"required,oneof=gas_used gas_wanted fee count"`
+	From       int64  `example:"1692892095"                                      query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To         int64  `example:"1692892095"                                      query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
+// Stats godoc
+//
+//	@Summary		Get address stats
+//	@Description	Get address stats
+//	@Tags			address
+//	@ID				address-stats
+//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			name		path	string	true	"Series name"					Enums(gas_used, gas_wanted, fee, count)
+//	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.HistogramItem
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/address/{hash}/stats/{name}/{timeframe} [get]
+func (handler *AddressHandler) Stats(c echo.Context) error {
+	req, err := bindAndValidate[addressStatsRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	_, hash, err := types.Address(req.Hash).Decode()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	series, err := handler.address.Series(
+		c.Request().Context(),
+		address.Id,
+		storage.Timeframe(req.Timeframe),
+		req.SeriesName,
+		storage.NewSeriesRequest(req.From, req.To),
+	)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	response := make([]responses.HistogramItem, len(series))
+	for i := range series {
+		response[i] = responses.NewHistogramItem(series[i])
+	}
+	return returnArray(c, response)
+}

@@ -91,3 +91,30 @@ func (s *StorageTestSuite) TestAddressMessagesWithType() {
 	s.Require().Equal(types.MsgWithdrawDelegatorReward, msg.Type)
 	s.Require().NotNil(messages[0].Tx)
 }
+
+func (s *StorageTestSuite) TestAddressStats() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	for _, name := range []string{"count", "fee", "gas_wanted", "gas_used"} {
+		for _, tf := range []storage.Timeframe{storage.TimeframeHour, storage.TimeframeDay, storage.TimeframeMonth} {
+			series, err := s.storage.Address.Series(ctx, 1, tf, name, storage.NewSeriesRequest(0, 0))
+			s.Require().NoError(err)
+			s.Require().Len(series, 1)
+
+			item := series[0]
+			s.Require().NotEqual("0", item.Value)
+		}
+	}
+}
+
+func (s *StorageTestSuite) TestAddressStatsError() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	_, err := s.storage.Address.Series(ctx, 1, storage.TimeframeDay, "invalid", storage.NewSeriesRequest(0, 0))
+	s.Require().Error(err)
+
+	_, err = s.storage.Address.Series(ctx, 1, storage.TimeframeYear, "count", storage.NewSeriesRequest(0, 0))
+	s.Require().Error(err)
+}

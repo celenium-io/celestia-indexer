@@ -281,6 +281,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			addressGroup.GET("/vestings", addressHandlers.Vestings)
 			addressGroup.GET("/grants", addressHandlers.Grants)
 			addressGroup.GET("/granters", addressHandlers.Grantee)
+			addressGroup.GET("/stats/:name/:timeframe", addressHandlers.Stats)
 		}
 	}
 
