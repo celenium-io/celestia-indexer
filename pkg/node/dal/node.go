@@ -102,7 +102,7 @@ func (node *Node) post(ctx context.Context, method string, params []any, output 
 
 	start := time.Now()
 
-	response, err := http.DefaultClient.Do(request)
+	response, err := node.client.Do(request)
 	if err != nil {
 		return err
 	}
