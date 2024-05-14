@@ -226,7 +226,7 @@ func (sh StatsHandler) NamespaceUsage(c echo.Context) error {
 	}
 
 	var top100Size int64
-	response := make([]responses.NamespaceUsage, len(namespaces))
+	response := make([]responses.NamespaceUsage, len(namespaces)+1)
 	for i := range namespaces {
 		response[i] = responses.NewNamespaceUsage(namespaces[i])
 		top100Size += response[i].Size
@@ -240,11 +240,11 @@ func (sh StatsHandler) NamespaceUsage(c echo.Context) error {
 		return returnArray(c, response)
 	}
 
-	response = append(response, responses.NamespaceUsage{
+	response[len(namespaces)] = responses.NamespaceUsage{
 		Name:    "others",
 		Size:    state[0].TotalBlobsSize - top100Size,
 		Version: nil,
-	})
+	}
 
 	return returnArray(c, response)
 }
