@@ -36,3 +36,11 @@ type Storage interface {
 	Head(ctx context.Context) (uint64, error)
 	UpdateHead(ctx context.Context, head uint64) error
 }
+
+func Base64ToUrl(s string) (string, error) {
+	b, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
+}

@@ -6,9 +6,11 @@ package blob
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -17,6 +19,8 @@ import (
 	serviceS3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	s3Types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/aws/smithy-go"
+	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/node/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/rs/zerolog/log"
 )
 
@@ -136,4 +140,42 @@ func (r2 R2) UpdateHead(ctx context.Context, head uint64) error {
 		Body:   bytes.NewBuffer(data),
 	})
 	return err
+}
+
+func (r2 R2) Blob(ctx context.Context, height pkgTypes.Level, namespace, commitment string) (blob nodeTypes.Blob, err error) {
+	ns, err := Base64ToUrl(namespace)
+	if err != nil {
+		return
+	}
+	cm, err := Base64ToUrl(commitment)
+	if err != nil {
+		return
+	}
+
+	fileName := fmt.Sprintf("%s/%d/%s", ns, height, cm)
+
+	obj, err := r2.client.GetObject(ctx, &serviceS3.GetObjectInput{
+		Bucket: aws.String(r2.cfg.BucketName),
+		Key:    aws.String(fileName),
+	})
+	if err != nil {
+		return
+	}
+
+	buf := new(bytes.Buffer)
+	encoder := base64.NewEncoder(base64.StdEncoding, buf)
+	if _, err := io.Copy(encoder, obj.Body); err != nil {
+		return blob, err
+	}
+	if err := encoder.Close(); err != nil {
+		return blob, err
+	}
+	blob.Data = buf.String()
+	blob.ShareVersion = 0
+
+	return
+}
+
+func (r2 R2) Blobs(ctx context.Context, height pkgTypes.Level, hash ...string) ([]nodeTypes.Blob, error) {
+	return nil, errors.New("not implemented")
 }
