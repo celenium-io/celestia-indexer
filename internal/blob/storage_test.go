@@ -26,7 +26,7 @@ func TestBlob_String(t *testing.T) {
 			},
 			commitment: []byte{0x02},
 			height:     100,
-			want:       "AQ==/100/Ag==",
+			want:       "AAE=/100/Ag==",
 		},
 	}
 	for _, tt := range tests {
