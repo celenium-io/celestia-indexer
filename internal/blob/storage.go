@@ -19,7 +19,8 @@ type Blob struct {
 }
 
 func (blob Blob) String() string {
-	ns := base64.URLEncoding.EncodeToString(blob.NamespaceId)
+	hash := []byte{byte(blob.ShareVersion)}
+	ns := base64.URLEncoding.EncodeToString(append(hash, blob.NamespaceId...))
 	cm := base64.URLEncoding.EncodeToString(blob.Commitment)
 	return fmt.Sprintf("%s/%d/%s", ns, blob.Height, cm)
 }

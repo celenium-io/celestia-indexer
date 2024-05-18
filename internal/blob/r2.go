@@ -172,6 +172,8 @@ func (r2 R2) Blob(ctx context.Context, height pkgTypes.Level, namespace, commitm
 	}
 	blob.Data = buf.String()
 	blob.ShareVersion = 0
+	blob.Commitment = commitment
+	blob.Namespace = namespace
 
 	return
 }

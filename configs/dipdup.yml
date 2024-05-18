@@ -42,7 +42,7 @@ api:
   rate_limit: ${API_RATE_LIMIT:-0}
   prometheus: ${API_PROMETHEUS_ENABLED:-true}
   request_timeout: ${API_REQUEST_TIMEOUT:-30}
-  blob_receiver: dal_api
+  blob_receiver: ${BLOB_RECEIVER:-dal_api}
   sentry_dsn: ${SENTRY_DSN}
   websocket: ${API_WEBSOCKET_ENABLED:-true}
 
