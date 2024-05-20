@@ -43,6 +43,7 @@ type Rollup struct {
 	BridgeContract string   `bun:"bridge_contract"         comment:"Link to bridge contract"`
 	L2Beat         string   `bun:"l2_beat"                 comment:"Link to L2 Beat"`
 	Explorer       string   `bun:"explorer"                comment:"Link to chain explorer"`
+	Stack          string   `bun:"stack"                   comment:"Underlaying stack"`
 	Links          []string `bun:"links,array"             comment:"Other links to rollup related sites"`
 
 	Providers []*RollupProvider `bun:"rel:has-many,join:id=rollup_id"`
@@ -63,6 +64,7 @@ func (r Rollup) IsEmpty() bool {
 		r.L2Beat == "" &&
 		r.BridgeContract == "" &&
 		r.Explorer == "" &&
+		r.Stack == "" &&
 		r.Links == nil
 }
 

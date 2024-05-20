@@ -662,6 +662,10 @@ definitions:
         example: rollup_slug
         format: string
         type: string
+      stack:
+        example: op_stack
+        format: string
+        type: string
       twitter:
         example: https://x.com/account
         format: string
@@ -731,6 +735,10 @@ definitions:
         type: integer
       slug:
         example: rollup_slug
+        format: string
+        type: string
+      stack:
+        example: op_stack
         format: string
         type: string
       twitter:

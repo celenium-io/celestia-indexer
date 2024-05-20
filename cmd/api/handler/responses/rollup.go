@@ -21,6 +21,7 @@ type RollupWithStats struct {
 	L2Beat         string `example:"https://l2beat.com/scaling/projects/karak" format:"string"  json:"l2_beat,omitempty"     swaggertype:"string"`
 	Explorer       string `example:"https://explorer.karak.network/"           format:"string"  json:"explorer,omitempty"    swaggertype:"string"`
 	BridgeContract string `example:"https://github.com/account"                format:"string"  json:"bridge,omitempty"      swaggertype:"string"`
+	Stack          string `example:"op_stack"                                  format:"string"  json:"stack,omitempty"       swaggertype:"string"`
 
 	BlobsCount  int64     `example:"2"                         format:"integer"   json:"blobs_count"        swaggertype:"integer"`
 	Size        int64     `example:"1000"                      format:"integer"   json:"size"               swaggertype:"integer"`
@@ -44,6 +45,7 @@ func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 		Explorer:       r.Explorer,
 		BridgeContract: r.BridgeContract,
 		Links:          r.Links,
+		Stack:          r.Stack,
 		Slug:           r.Slug,
 		BlobsCount:     r.BlobsCount,
 		Size:           r.Size,
@@ -65,6 +67,7 @@ type Rollup struct {
 	L2Beat         string `example:"https://github.com/account"      format:"string"  json:"l2_beat,omitempty"     swaggertype:"string"`
 	Explorer       string `example:"https://explorer.karak.network/" format:"string"  json:"explorer,omitempty"    swaggertype:"string"`
 	BridgeContract string `example:"https://github.com/account"      format:"string"  json:"bridge,omitempty"      swaggertype:"string"`
+	Stack          string `example:"op_stack"                        format:"string"  json:"stack,omitempty"       swaggertype:"string"`
 
 	Links []string `json:"links,omitempty"`
 }
@@ -81,6 +84,7 @@ func NewRollup(r *storage.Rollup) Rollup {
 		Slug:           r.Slug,
 		L2Beat:         r.L2Beat,
 		BridgeContract: r.BridgeContract,
+		Stack:          r.Stack,
 		Explorer:       r.Explorer,
 		Links:          r.Links,
 	}
