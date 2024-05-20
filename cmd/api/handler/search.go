@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
@@ -75,6 +76,18 @@ func (handler SearchHandler) Search(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
+	data := make([]responses.SearchItem, 0)
+
+	if height, err := strconv.ParseUint(req.Search, 10, 64); err == nil {
+		block, err := handler.block.ByHeight(c.Request().Context(), types.Level(height))
+		if err == nil {
+			data = append(data, responses.SearchItem{
+				Type:   "block",
+				Result: block,
+			})
+		}
+	}
+
 	var response []responses.SearchItem
 
 	switch {
@@ -97,7 +110,8 @@ func (handler SearchHandler) Search(c echo.Context) error {
 		}
 	}
 
-	return returnArray(c, response)
+	data = append(data, response...)
+	return returnArray(c, data)
 }
 
 func (handler SearchHandler) searchAddress(ctx context.Context, search string) ([]responses.SearchItem, error) {
