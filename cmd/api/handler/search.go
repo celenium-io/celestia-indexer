@@ -78,7 +78,7 @@ func (handler SearchHandler) Search(c echo.Context) error {
 
 	data := make([]responses.SearchItem, 0)
 
-	if height, err := strconv.ParseUint(req.Search, 10, 64); err == nil {
+	if height, err := strconv.ParseInt(req.Search, 10, 64); err == nil {
 		block, err := handler.block.ByHeight(c.Request().Context(), types.Level(height))
 		if err == nil {
 			data = append(data, responses.SearchItem{
