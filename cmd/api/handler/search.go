@@ -83,7 +83,7 @@ func (handler SearchHandler) Search(c echo.Context) error {
 		if err == nil {
 			data = append(data, responses.SearchItem{
 				Type:   "block",
-				Result: block,
+				Result: responses.NewBlock(block, false),
 			})
 		}
 	}
