@@ -167,6 +167,10 @@ func (s *SearchTestSuite) TestSearchBlockByHeight() {
 	response := items[0]
 	s.Require().Equal("block", response.Type)
 	s.Require().NotNil(response.Result)
+	block, ok := response.Result.(map[string]any)
+	s.Require().True(ok)
+	_, ok = block["id"]
+	s.Require().True(ok)
 }
 
 func (s *SearchTestSuite) TestSearchBlockWith0x() {
