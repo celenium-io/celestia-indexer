@@ -571,6 +571,29 @@ definitions:
         format: byte
         type: integer
     type: object
+  responses.ODS:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/responses.ODSItem'
+        type: array
+      width:
+        example: 2
+        type: integer
+    type: object
+  responses.ODSItem:
+    properties:
+      from:
+        items:
+          type: integer
+        type: array
+      namespace:
+        type: string
+      to:
+        items:
+          type: integer
+        type: array
+    type: object
   responses.Params:
     additionalProperties:
       type: string
@@ -2745,6 +2768,35 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get count of affected in the block namespaces
+      tags:
+      - block
+  /v1/block/{height}/ods:
+    get:
+      description: ODS for block
+      operationId: block-ods
+      parameters:
+      - description: Block height
+        in: path
+        minimum: 1
+        name: height
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.ODS'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: ODS for block
       tags:
       - block
   /v1/block/{height}/stats:

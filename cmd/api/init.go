@@ -21,6 +21,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	nodeApi "github.com/celenium-io/celestia-indexer/pkg/node/dal"
+	"github.com/celenium-io/celestia-indexer/pkg/node/rpc"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/getsentry/sentry-go"
 	sentryotel "github.com/getsentry/sentry-go/otel"
@@ -284,8 +285,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			addressGroup.GET("/stats/:name/:timeframe", addressHandlers.Stats)
 		}
 	}
+	ds, ok := cfg.DataSources["node_rpc"]
+	if !ok {
+		panic("can't find node data source: node_rpc")
+	}
+	node := rpc.NewAPI(ds)
 
-	blockHandlers := handler.NewBlockHandler(db.Blocks, db.BlockStats, db.Event, db.Namespace, db.Message, db.BlobLogs, db.State, cfg.Indexer.Name)
+	blockHandlers := handler.NewBlockHandler(db.Blocks, db.BlockStats, db.Event, db.Namespace, db.Message, db.BlobLogs, db.State, &node, cfg.Indexer.Name)
 	blockGroup := v1.Group("/block")
 	{
 		blockGroup.GET("", blockHandlers.List)
@@ -300,6 +306,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			heightGroup.GET("/namespace/count", blockHandlers.GetNamespacesCount)
 			heightGroup.GET("/blobs", blockHandlers.Blobs)
 			heightGroup.GET("/blobs/count", blockHandlers.BlobsCount)
+			heightGroup.GET("/ods", blockHandlers.BlockODS)
 		}
 	}
 

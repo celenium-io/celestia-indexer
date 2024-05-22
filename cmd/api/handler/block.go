@@ -6,7 +6,12 @@ package handler
 import (
 	"net/http"
 
+	"github.com/celenium-io/celestia-indexer/pkg/node"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/celestiaorg/celestia-app/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/pkg/da"
+	"github.com/celestiaorg/go-square/shares"
+	"github.com/celestiaorg/go-square/square"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -21,6 +26,7 @@ type BlockHandler struct {
 	blobLogs    storage.IBlobLog
 	message     storage.IMessage
 	state       storage.IState
+	node        node.Api
 	indexerName string
 }
 
@@ -32,6 +38,7 @@ func NewBlockHandler(
 	message storage.IMessage,
 	blobLogs storage.IBlobLog,
 	state storage.IState,
+	node node.Api,
 	indexerName string,
 ) *BlockHandler {
 	return &BlockHandler{
@@ -42,6 +49,7 @@ func NewBlockHandler(
 		blobLogs:    blobLogs,
 		message:     message,
 		state:       state,
+		node:        node,
 		indexerName: indexerName,
 	}
 }
@@ -441,4 +449,61 @@ func (handler *BlockHandler) BlobsCount(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, count)
+}
+
+// BlockODS godoc
+//
+//	@Summary		ODS for block
+//	@Description	ODS for block
+//	@Tags			block
+//	@ID				block-ods
+//	@Param			height	path	integer	true	"Block height"	minimum(1)
+//	@Produce		json
+//	@Success		200	{object}	responses.ODS
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/v1/block/{height}/ods [get]
+func (handler *BlockHandler) BlockODS(c echo.Context) error {
+	req, err := bindAndValidate[getBlockByHeightRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	b, err := handler.block.ByHeightWithStats(c.Request().Context(), req.Height)
+	if err != nil {
+		return handleError(c, err, handler.block)
+	}
+
+	if b.Stats.TxCount == 0 {
+		return c.JSON(http.StatusOK, responses.ODS{
+			Width: 0,
+			Items: make([]responses.ODSItem, 0),
+		})
+	}
+
+	block, err := handler.node.Block(c.Request().Context(), req.Height)
+	if err != nil {
+		return handleError(c, err, handler.block)
+	}
+
+	dataSquare, err := square.Construct(
+		block.Block.Data.Txs.ToSliceOfBytes(),
+		appconsts.SquareSizeUpperBound(0),
+		appconsts.SubtreeRootThreshold(0),
+	)
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	eds, err := da.ExtendShares(shares.ToBytes(dataSquare))
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	ods, err := responses.NewODS(eds)
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	return c.JSON(http.StatusOK, ods)
 }

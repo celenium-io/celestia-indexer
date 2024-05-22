@@ -1748,6 +1748,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/block/{height}/ods": {
+            "get": {
+                "description": "ODS for block",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "block"
+                ],
+                "summary": "ODS for block",
+                "operationId": "block-ods",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Block height",
+                        "name": "height",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ODS"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/block/{height}/stats": {
             "get": {
                 "description": "Get block stats by height",
@@ -5662,6 +5705,41 @@ const docTemplate = `{
                 "version": {
                     "type": "integer",
                     "format": "byte"
+                }
+            }
+        },
+        "responses.ODS": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responses.ODSItem"
+                    }
+                },
+                "width": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
+        "responses.ODSItem": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "to": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

@@ -14,6 +14,7 @@ import (
 	"testing"
 	"time"
 
+	nodeMock "github.com/celenium-io/celestia-indexer/pkg/node/mock"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
@@ -74,6 +75,7 @@ type BlockTestSuite struct {
 	namespace  *mock.MockINamespace
 	blobLogs   *mock.MockIBlobLog
 	state      *mock.MockIState
+	node       *nodeMock.MockApi
 	echo       *echo.Echo
 	handler    *BlockHandler
 	ctrl       *gomock.Controller
@@ -91,7 +93,8 @@ func (s *BlockTestSuite) SetupSuite() {
 	s.blobLogs = mock.NewMockIBlobLog(s.ctrl)
 	s.message = mock.NewMockIMessage(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events, s.namespace, s.message, s.blobLogs, s.state, testIndexerName)
+	s.node = nodeMock.NewMockApi(s.ctrl)
+	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events, s.namespace, s.message, s.blobLogs, s.state, s.node, testIndexerName)
 }
 
 // TearDownSuite -
