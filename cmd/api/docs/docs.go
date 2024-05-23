@@ -5629,6 +5629,25 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.NamespaceKind": {
+            "type": "string",
+            "enum": [
+                "pay_for_blob",
+                "tail_padding",
+                "tx",
+                "parity_shares",
+                "primary_reserved_padding",
+                "namespace"
+            ],
+            "x-enum-varnames": [
+                "PayForBlobNamespace",
+                "TailPaddingNamespace",
+                "TxNamespace",
+                "ParitySharesNamespace",
+                "PrimaryReservedNamespace",
+                "DefaultNamespace"
+            ]
+        },
         "responses.NamespaceMessage": {
             "type": "object",
             "properties": {
@@ -5740,6 +5759,9 @@ const docTemplate = `{
                     "items": {
                         "type": "integer"
                     }
+                },
+                "type": {
+                    "$ref": "#/definitions/responses.NamespaceKind"
                 }
             }
         },

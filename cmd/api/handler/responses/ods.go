@@ -6,6 +6,7 @@ package responses
 import (
 	"encoding/base64"
 
+	"github.com/celestiaorg/go-square/namespace"
 	"github.com/celestiaorg/go-square/shares"
 	"github.com/celestiaorg/rsmt2d"
 )
@@ -17,9 +18,10 @@ type ODS struct {
 }
 
 type ODSItem struct {
-	From      []uint `json:"from"`
-	To        []uint `json:"to"`
-	Namespace string `json:"namespace"`
+	From      []uint        `json:"from"`
+	To        []uint        `json:"to"`
+	Namespace string        `json:"namespace"`
+	Type      NamespaceKind `json:"type"`
 }
 
 func NewODS(eds *rsmt2d.ExtendedDataSquare) (ODS, error) {
@@ -48,6 +50,7 @@ func NewODS(eds *rsmt2d.ExtendedDataSquare) (ODS, error) {
 				current = ODSItem{
 					From:      []uint{i, j},
 					Namespace: base64Namespace,
+					Type:      getNamespaceType(namespace),
 				}
 			}
 			current.To = []uint{i, j}
@@ -56,4 +59,32 @@ func NewODS(eds *rsmt2d.ExtendedDataSquare) (ODS, error) {
 	ods.Items = append(ods.Items, current)
 
 	return ods, nil
+}
+
+type NamespaceKind string
+
+const (
+	PayForBlobNamespace      NamespaceKind = "pay_for_blob"
+	TailPaddingNamespace     NamespaceKind = "tail_padding"
+	TxNamespace              NamespaceKind = "tx"
+	ParitySharesNamespace    NamespaceKind = "parity_shares"
+	PrimaryReservedNamespace NamespaceKind = "primary_reserved_padding"
+	DefaultNamespace         NamespaceKind = "namespace"
+)
+
+func getNamespaceType(ns namespace.Namespace) NamespaceKind {
+	switch {
+	case ns.IsPayForBlob():
+		return PayForBlobNamespace
+	case ns.IsTailPadding():
+		return TailPaddingNamespace
+	case ns.IsTx():
+		return TxNamespace
+	case ns.IsParityShares():
+		return ParitySharesNamespace
+	case ns.IsPrimaryReservedPadding():
+		return PrimaryReservedNamespace
+	default:
+		return DefaultNamespace
+	}
 }
