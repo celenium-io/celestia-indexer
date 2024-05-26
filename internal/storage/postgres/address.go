@@ -95,3 +95,14 @@ func (a *Address) Series(ctx context.Context, addressId uint64, timeframe storag
 
 	return
 }
+
+// IdByHash -
+func (a *Address) IdByHash(ctx context.Context, hash []byte) (id uint64, err error) {
+	err = a.DB().NewSelect().
+		Model((*storage.Address)(nil)).
+		Column("id").
+		Where("hash = ?", hash).
+		Limit(1).
+		Scan(ctx, &id)
+	return
+}

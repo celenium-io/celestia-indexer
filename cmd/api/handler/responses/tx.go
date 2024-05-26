@@ -30,7 +30,7 @@ type Tx struct {
 	Time          time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                swaggertype:"string"`
 
 	Messages []Message `json:"messages,omitempty"`
-	Signers  []string  `json:"signers"`
+	Signers  []string  `json:"signers,omitempty"`
 
 	MessageTypes []types.MsgType `example:"MsgSend,MsgUnjail" json:"message_types"`
 	Status       types.Status    `example:"success"           json:"status"`

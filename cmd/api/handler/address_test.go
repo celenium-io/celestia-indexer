@@ -210,14 +210,9 @@ func (s *AddressTestSuite) TestTransactions() {
 	c.SetParamValues(testAddress)
 
 	s.address.EXPECT().
-		ByHash(gomock.Any(), testHashAddress).
-		Return(storage.Address{
-			Id:         1,
-			Hash:       testHashAddress,
-			Address:    testAddress,
-			Height:     100,
-			LastHeight: 100,
-		}, nil)
+		IdByHash(gomock.Any(), testHashAddress).
+		Return(uint64(1), nil).
+		Times(1)
 
 	s.txs.EXPECT().
 		ByAddress(gomock.Any(), uint64(1), gomock.Any()).
@@ -264,12 +259,9 @@ func (s *AddressTestSuite) TestMessages() {
 	c.SetParamValues(testAddress)
 
 	s.address.EXPECT().
-		ByHash(gomock.Any(), testHashAddress).
-		Return(storage.Address{
-			Id:      1,
-			Hash:    testHashAddress,
-			Address: testAddress,
-		}, nil)
+		IdByHash(gomock.Any(), testHashAddress).
+		Return(uint64(1), nil).
+		Times(1)
 
 	s.messages.EXPECT().
 		ByAddress(gomock.Any(), uint64(1), gomock.Any()).
@@ -327,12 +319,9 @@ func (s *AddressTestSuite) TestBlobs() {
 	c.SetParamValues(testAddress)
 
 	s.address.EXPECT().
-		ByHash(gomock.Any(), testHashAddress).
-		Return(storage.Address{
-			Id:      1,
-			Hash:    testHashAddress,
-			Address: testAddress,
-		}, nil)
+		IdByHash(gomock.Any(), testHashAddress).
+		Return(uint64(1), nil).
+		Times(1)
 
 	s.blobLogs.EXPECT().
 		BySigner(gomock.Any(), uint64(1), storage.BlobLogFilters{
@@ -405,12 +394,9 @@ func (s *AddressTestSuite) TestDelegations() {
 	c.SetParamValues(testAddress)
 
 	s.address.EXPECT().
-		ByHash(gomock.Any(), testHashAddress).
-		Return(storage.Address{
-			Id:      1,
-			Hash:    testHashAddress,
-			Address: testAddress,
-		}, nil)
+		IdByHash(gomock.Any(), testHashAddress).
+		Return(uint64(1), nil).
+		Times(1)
 
 	s.delegations.EXPECT().
 		ByAddress(gomock.Any(), uint64(1), 10, 0, true).
@@ -455,12 +441,9 @@ func (s *AddressTestSuite) TestUndelegations() {
 	c.SetParamValues(testAddress)
 
 	s.address.EXPECT().
-		ByHash(gomock.Any(), testHashAddress).
-		Return(storage.Address{
-			Id:      1,
-			Hash:    testHashAddress,
-			Address: testAddress,
-		}, nil)
+		IdByHash(gomock.Any(), testHashAddress).
+		Return(uint64(1), nil).
+		Times(1)
 
 	s.undelegations.EXPECT().
 		ByAddress(gomock.Any(), uint64(1), 10, 0).
@@ -511,12 +494,9 @@ func (s *AddressTestSuite) TestRedelegations() {
 	c.SetParamValues(testAddress)
 
 	s.address.EXPECT().
-		ByHash(gomock.Any(), testHashAddress).
-		Return(storage.Address{
-			Id:      1,
-			Hash:    testHashAddress,
-			Address: testAddress,
-		}, nil)
+		IdByHash(gomock.Any(), testHashAddress).
+		Return(uint64(1), nil).
+		Times(1)
 
 	s.redelegations.EXPECT().
 		ByAddress(gomock.Any(), uint64(1), 10, 0).
@@ -571,12 +551,9 @@ func (s *AddressTestSuite) TestVestings() {
 	c.SetParamValues(testAddress)
 
 	s.address.EXPECT().
-		ByHash(gomock.Any(), testHashAddress).
-		Return(storage.Address{
-			Id:      1,
-			Hash:    testHashAddress,
-			Address: testAddress,
-		}, nil)
+		IdByHash(gomock.Any(), testHashAddress).
+		Return(uint64(1), nil).
+		Times(1)
 
 	s.vestings.EXPECT().
 		ByAddress(gomock.Any(), uint64(1), 10, 0, false).
@@ -624,12 +601,9 @@ func (s *AddressTestSuite) TestGrants() {
 	c.SetParamValues(testAddress)
 
 	s.address.EXPECT().
-		ByHash(gomock.Any(), testHashAddress).
-		Return(storage.Address{
-			Id:      1,
-			Hash:    testHashAddress,
-			Address: testAddress,
-		}, nil)
+		IdByHash(gomock.Any(), testHashAddress).
+		Return(uint64(1), nil).
+		Times(1)
 
 	s.grants.EXPECT().
 		ByGranter(gomock.Any(), uint64(1), 10, 0).
@@ -679,12 +653,9 @@ func (s *AddressTestSuite) TestGrantee() {
 	c.SetParamValues(testAddress)
 
 	s.address.EXPECT().
-		ByHash(gomock.Any(), testHashAddress).
-		Return(storage.Address{
-			Id:      1,
-			Hash:    testHashAddress,
-			Address: testAddress,
-		}, nil)
+		IdByHash(gomock.Any(), testHashAddress).
+		Return(uint64(1), nil).
+		Times(1)
 
 	s.grants.EXPECT().
 		ByGrantee(gomock.Any(), uint64(1), 10, 0).
@@ -732,12 +703,9 @@ func (s *AddressTestSuite) TestStats() {
 			c.SetParamValues(testAddress, name, tf)
 
 			s.address.EXPECT().
-				ByHash(gomock.Any(), testHashAddress).
-				Return(storage.Address{
-					Id:      1,
-					Hash:    testHashAddress,
-					Address: testAddress,
-				}, nil)
+				IdByHash(gomock.Any(), testHashAddress).
+				Return(uint64(1), nil).
+				Times(1)
 
 			s.address.EXPECT().
 				Series(gomock.Any(), uint64(1), storage.Timeframe(tf), name, gomock.Any()).
@@ -746,7 +714,8 @@ func (s *AddressTestSuite) TestStats() {
 						Time:  testTime,
 						Value: "1000",
 					},
-				}, nil)
+				}, nil).
+				Times(1)
 
 			s.Require().NoError(s.handler.Stats(c))
 			s.Require().Equal(http.StatusOK, rec.Code)

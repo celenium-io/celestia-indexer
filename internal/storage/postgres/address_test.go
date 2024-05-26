@@ -118,3 +118,13 @@ func (s *StorageTestSuite) TestAddressStatsError() {
 	_, err = s.storage.Address.Series(ctx, 1, storage.TimeframeYear, "count", storage.NewSeriesRequest(0, 0))
 	s.Require().Error(err)
 }
+
+func (s *StorageTestSuite) TestAddressIdByHash() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	hash := []byte{0xde, 0xce, 0x42, 0x5b, 0x75, 0xd6, 0x71, 0x15, 0xbd, 0xa8, 0x77, 0xe1, 0xe7, 0xa1, 0xf2, 0x62, 0xf6, 0xfa, 0x51, 0xd6}
+	id, err := s.storage.Address.IdByHash(ctx, hash)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1, id)
+}

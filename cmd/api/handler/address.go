@@ -164,7 +164,7 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
@@ -187,7 +187,7 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 		fltrs.MessageTypes.SetByMsgType(storageTypes.MsgType(req.MsgType[i]))
 	}
 
-	txs, err := handler.txs.ByAddress(c.Request().Context(), address.Id, fltrs)
+	txs, err := handler.txs.ByAddress(c.Request().Context(), addressId, fltrs)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
@@ -256,13 +256,13 @@ func (handler *AddressHandler) Messages(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
 
 	filters := req.ToFilters()
-	msgs, err := handler.messages.ByAddress(c.Request().Context(), address.Id, filters)
+	msgs, err := handler.messages.ByAddress(c.Request().Context(), addressId, filters)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
@@ -320,14 +320,14 @@ func (handler *AddressHandler) Blobs(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
 
 	logs, err := handler.blobLogs.BySigner(
 		c.Request().Context(),
-		address.Id,
+		addressId,
 		storage.BlobLogFilters{
 			Limit:  int(req.Limit),
 			Offset: int(req.Offset),
@@ -405,14 +405,14 @@ func (handler *AddressHandler) Delegations(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
 
 	delegations, err := handler.delegations.ByAddress(
 		c.Request().Context(),
-		address.Id,
+		addressId,
 		req.Limit,
 		req.Offset,
 		req.ShowZero,
@@ -467,14 +467,14 @@ func (handler *AddressHandler) Undelegations(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
 
 	undelegations, err := handler.undelegations.ByAddress(
 		c.Request().Context(),
-		address.Id,
+		addressId,
 		req.Limit,
 		req.Offset,
 	)
@@ -516,14 +516,14 @@ func (handler *AddressHandler) Redelegations(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
 
 	redelegations, err := handler.redelegations.ByAddress(
 		c.Request().Context(),
-		address.Id,
+		addressId,
 		req.Limit,
 		req.Offset,
 	)
@@ -579,14 +579,14 @@ func (handler *AddressHandler) Vestings(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
 
 	vestings, err := handler.vestings.ByAddress(
 		c.Request().Context(),
-		address.Id,
+		addressId,
 		req.Limit,
 		req.Offset,
 		req.ShowEnded,
@@ -629,14 +629,14 @@ func (handler *AddressHandler) Grants(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
 
 	grants, err := handler.grants.ByGranter(
 		c.Request().Context(),
-		address.Id,
+		addressId,
 		req.Limit,
 		req.Offset,
 	)
@@ -677,14 +677,14 @@ func (handler *AddressHandler) Grantee(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
 
 	grants, err := handler.grants.ByGrantee(
 		c.Request().Context(),
-		address.Id,
+		addressId,
 		req.Limit,
 		req.Offset,
 	)
@@ -734,14 +734,14 @@ func (handler *AddressHandler) Stats(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	address, err := handler.address.ByHash(c.Request().Context(), hash)
+	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
 
 	series, err := handler.address.Series(
 		c.Request().Context(),
-		address.Id,
+		addressId,
 		storage.Timeframe(req.Timeframe),
 		req.SeriesName,
 		storage.NewSeriesRequest(req.From, req.To),
