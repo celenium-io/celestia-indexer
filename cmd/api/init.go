@@ -143,15 +143,6 @@ func initEcho(cfg ApiConfig, db postgres.Storage, env string) *echo.Echo {
 	e := echo.New()
 	e.Validator = handler.NewCelestiaApiValidator()
 
-	timeout := 30 * time.Second
-	if cfg.RequestTimeout > 0 {
-		timeout = time.Duration(cfg.RequestTimeout) * time.Second
-	}
-	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
-		Skipper: websocketSkipper,
-		Timeout: timeout,
-	}))
-
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogURI:       true,
 		LogStatus:    true,
@@ -192,6 +183,17 @@ func initEcho(cfg ApiConfig, db postgres.Storage, env string) *echo.Echo {
 			return nil
 		},
 	}))
+
+	timeout := 30 * time.Second
+	if cfg.RequestTimeout > 0 {
+		timeout = time.Duration(cfg.RequestTimeout) * time.Second
+	}
+	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
+		Skipper:      websocketSkipper,
+		Timeout:      timeout,
+		ErrorMessage: `{"message":"timeout"}`,
+	}))
+
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Skipper: gzipSkipper,
 	}))

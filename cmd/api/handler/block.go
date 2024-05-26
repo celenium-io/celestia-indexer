@@ -185,7 +185,7 @@ func (handler *BlockHandler) GetEvents(c echo.Context) error {
 		if handler.block.IsNoRows(err) {
 			return returnArray(c, []any{})
 		}
-		return internalServerError(c, err)
+		return handleError(c, err, handler.block)
 	}
 
 	fltrs := storage.EventFilter{

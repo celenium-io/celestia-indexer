@@ -45,7 +45,7 @@ func (sh *StateHandler) Head(c echo.Context) error {
 
 	votingPower, err := sh.validator.TotalVotingPower(c.Request().Context())
 	if err != nil {
-		return internalServerError(c, err)
+		return handleError(c, err, sh.state)
 	}
 	state.TotalVotingPower = votingPower
 
