@@ -6,6 +6,7 @@ package handler
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -14,7 +15,9 @@ import (
 	"testing"
 	"time"
 
+	nodeMock "github.com/celenium-io/celestia-indexer/pkg/node/mock"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	tmTypes "github.com/tendermint/tendermint/types"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -74,6 +77,7 @@ type BlockTestSuite struct {
 	namespace  *mock.MockINamespace
 	blobLogs   *mock.MockIBlobLog
 	state      *mock.MockIState
+	node       *nodeMock.MockApi
 	echo       *echo.Echo
 	handler    *BlockHandler
 	ctrl       *gomock.Controller
@@ -91,7 +95,8 @@ func (s *BlockTestSuite) SetupSuite() {
 	s.blobLogs = mock.NewMockIBlobLog(s.ctrl)
 	s.message = mock.NewMockIMessage(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events, s.namespace, s.message, s.blobLogs, s.state, testIndexerName)
+	s.node = nodeMock.NewMockApi(s.ctrl)
+	s.handler = NewBlockHandler(s.blocks, s.blockStats, s.events, s.namespace, s.message, s.blobLogs, s.state, s.node, testIndexerName)
 }
 
 // TearDownSuite -
@@ -575,4 +580,52 @@ func (s *BlockTestSuite) TestGetMessages() {
 	s.Require().Equal("memo", tx.Memo)
 	s.Require().Equal("sdk", tx.Codespace)
 	s.Require().Equal(types.StatusSuccess, tx.Status)
+}
+
+func (s *BlockTestSuite) TestBlockODS() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/block/:height/ods")
+	c.SetParamNames("height")
+	c.SetParamValues("100")
+
+	s.blocks.EXPECT().
+		ByHeightWithStats(gomock.Any(), pkgTypes.Level(100)).
+		Return(testBlockWithStats, nil).
+		Times(1)
+
+	rawTxs := []string{
+		"CpkBCpYBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEnYKL2NlbGVzdGlhMW5lNGhsMHZqczJmcjVtbXprYWF2YXFlOWtrODdlbmU5YXp5bjVsEi9jZWxlc3RpYTFram15N3Zoeno5NTRycWUyOTNmeGdjNjN1anF5eTBubmUwemtrahoSCgR1dGlhEgoxOTQzMTMwNDI0EmgKUQpGCh8vY29zbW9zLmNyeXB0by5zZWNwMjU2azEuUHViS2V5EiMKIQOyjTDvB2Ur253W9bSWnQjNXUSEKQLqXmGJAIbEsGlBmxIECgIIARjNExITCg0KBHV0aWESBTI1MDAwEJChDxpAImupFuuJjoWgZXJvdIvRhuIPUcu4d4NfScVAnlH2974PIOnVljFM4rmYcSQt3U9IHDxg1HN4cF5h6lZrXVURoQ==",
+		"CpcBCpQBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEnQKL2NlbGVzdGlhMWR6bnN6dDVrMjBqODdwa3VmYXdydXpyMnJ6a3JqZ3hsY210cjM5Ei9jZWxlc3RpYTF0d2dwYzdjbXg0dGczeXZtOXFubDB2YWs3a3l4MG1leDA0enR2YRoQCgR1dGlhEgg0MTUwMDAwMBJkCk4KRgofL2Nvc21vcy5jcnlwdG8uc2VjcDI1NmsxLlB1YktleRIjCiECOYBKFkZUA9pt+sASM0MZmm9wCO00o9MnPz46qcJKjd0SBAoCCH8SEgoMCgR1dGlhEgQ5MDAwEJC/BRpAdBYZN/811Z5V/uKRC5MLV83TF/vcWxKGLVvNbA3CG04M7PLM5xJn/YLqWkIgEM6k8XUvd/4Uf2z4T6k+M/5MQw==",
+		"Cs0CCqABCp0BCiAvY2VsZXN0aWEuYmxvYi52MS5Nc2dQYXlGb3JCbG9icxJ5Ci9jZWxlc3RpYTF1bTlxdDB6dWVsMGY0a3JlenZ1ejRrYTQ0M2syaHc1cGd4NDJmbhIdAAAAAAAAAAAAAAAAAAAAAAAAAAAAY2NsYWJzMDEaAt4EIiABYhBkLI4ANqUrn22XSeofPm3//nJBIe4RSOk/3tm3RUIBABJmClAKRgofL2Nvc21vcy5jcnlwdG8uc2VjcDI1NmsxLlB1YktleRIjCiEDKvAge1/isZG9nUxUjNWtsjHf0t3EAIwrXEONbjGBiVYSBAoCCAEYBRISCgwKBHV0aWESBDgzOTAQtI8FGkCaSY/c4H0h2HOeNv7C5Uu8YiuRShagt02sn8DDgSQ2qiVEQhZ+/cyh101cU8B+fFvojCjJ41gFIqC5gmplAg27Ev8EChwAAAAAAAAAAAAAAAAAAAAAAAAAAGNjbGFiczAxEt4EewogICJuYW1lIjogIjUzMjk3ODY1MTQ1XzJhZTk1ODg4MzFfNmsuanBnIiwKICAibWltZVR5cGUiOiAiaW1hZ2UvanBlZyIsCiAgInNpemUiOiA0NjIxMDk2LAogICJjaHVua3MiOiBbCiAgICB7ICJibG9iIjogIjE4OTcyLzYzNjM2YzYxNjI3MzMwMzEvNzcwMmU5ZmJjYTFlYmQxYjViMDkzZTZiOTcyMTZhMDAyYTkyNjhiN2ZiODlhNzg0ODgxZWU4NTEwZGI2NTM1MiIsICJzaXplIjogMTUwMDAwMCB9LAogICAgeyAiYmxvYiI6ICIxODk3My82MzYzNmM2MTYyNzMzMDMxLzUzMDBhOWJkZTdiZGE4MTgwOGYxZjAyNTkyYzRlZDUxMWMwN2EyYTlhNjQzM2I5Zjc4YmM4OTMxM2NkOTU3YmUiLCAic2l6ZSI6IDE1MDAwMDAgfSwKICAgIHsgImJsb2IiOiAiMTg5NzQvNjM2MzZjNjE2MjczMzAzMS9lYTA0NmIxZmQ0ZGU2OTI3Yzg0MWViNjA3YjFmZjhmZGQ2ZWJlYTQxZWM0ZTk4Zjk4NTIwMjkzNTIyN2M2YmM4IiwgInNpemUiOiAxNTAwMDAwIH0sCiAgICB7ICJibG9iIjogIjE4OTc1LzYzNjM2YzYxNjI3MzMwMzEvODUwZjg5Y2M1MmM5ODI4NzM2MTRhYWQzYmQyOGM2MTEzNmE1MWY3NTAwNjcwZGEzODhiOTEzMzk0YzQwODM3OCIsICJzaXplIjogMTIxMDk2IH0KICBdCn0KGgRCTE9C",
+	}
+
+	txs := make(tmTypes.Txs, 0)
+	for i := range rawTxs {
+		t, err := base64.StdEncoding.DecodeString(rawTxs[i])
+		s.Require().NoError(err)
+		txs = append(txs, t)
+	}
+
+	s.node.EXPECT().
+		Block(gomock.Any(), pkgTypes.Level(100)).
+		Return(pkgTypes.ResultBlock{
+			Block: &pkgTypes.Block{
+				Data: pkgTypes.Data{
+					Txs: txs,
+				},
+			},
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.BlockODS(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var ods responses.ODS
+	err := json.NewDecoder(rec.Body).Decode(&ods)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(4, ods.Width)
+	s.Require().Len(ods.Items, 4)
 }
