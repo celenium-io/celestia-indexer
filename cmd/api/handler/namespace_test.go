@@ -563,7 +563,7 @@ func (s *NamespaceTestSuite) TestRollups() {
 }
 
 func (s *NamespaceTestSuite) TestBlobWithMetadata() {
-	commitment := "ZeKGjIwsIkFsACD0wtEh/jbzzW+zIPP716VihNpm9T0="
+	commitment := "ZeKGjIwsIkFsACD0wtEh/jbzzW+zIPP716VihNpm9T1="
 
 	blobReq := map[string]any{
 		"hash":       testNamespaceBase64,
@@ -594,7 +594,7 @@ func (s *NamespaceTestSuite) TestBlobWithMetadata() {
 	}
 
 	s.blobLogs.EXPECT().
-		Blob(gomock.Any(), pkgTypes.Level(1000), uint64(1), "ZeKGjIwsIkFsACD0wtEh/jbzzW+zIPP716VihNpm9T0=").
+		Blob(gomock.Any(), pkgTypes.Level(1000), uint64(1), "ZeKGjIwsIkFsACD0wtEh/jbzzW+zIPP716VihNpm9T1=").
 		Return(storage.BlobLog{
 			NamespaceId: testNamespace.Id,
 			MsgId:       1,
@@ -605,7 +605,7 @@ func (s *NamespaceTestSuite) TestBlobWithMetadata() {
 			},
 			Commitment: "test_commitment",
 			Size:       1000,
-			Height:     10000,
+			Height:     1000,
 			Time:       testTime,
 		}, nil).
 		Times(1)
