@@ -19,6 +19,8 @@ type Blob struct {
 	ShareVersion int    `example:"0"                                            format:"integer" json:"share_version" swaggertype:"integer"`
 	Commitment   string `example:"vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg=" format:"base64"  json:"commitment"    swaggertype:"string"`
 	ContentType  string `example:"image/png"                                    format:"string"  json:"content_type"  swaggertype:"string"`
+
+	Metadata *BlobLog `json:"metadata,omitempty"`
 }
 
 func NewBlob(blob types.Blob) (Blob, error) {

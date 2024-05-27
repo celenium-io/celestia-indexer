@@ -34,6 +34,7 @@ type IBlobLog interface {
 	CountByTxId(ctx context.Context, txId uint64) (int, error)
 	CountByHeight(ctx context.Context, height types.Level) (int, error)
 	ExportByProviders(ctx context.Context, providers []RollupProvider, from, to time.Time, stream io.Writer) (err error)
+	Blob(ctx context.Context, height types.Level, nsId uint64, commitment string) (BlobLog, error)
 }
 
 type BlobLog struct {

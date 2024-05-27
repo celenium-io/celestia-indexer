@@ -60,6 +60,8 @@ definitions:
         example: b2sgZGVtbyBkYQ==
         format: base64
         type: string
+      metadata:
+        $ref: '#/definitions/responses.BlobLog'
       namespace:
         example: AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0=
         format: base64

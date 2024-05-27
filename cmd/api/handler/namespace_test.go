@@ -470,7 +470,7 @@ func (s *NamespaceTestSuite) TestBlob() {
 	s.Require().NoError(s.handler.Blob(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var blob nodeTypes.Blob
+	var blob responses.Blob
 	err = json.NewDecoder(rec.Body).Decode(&blob)
 	s.Require().NoError(err)
 
@@ -560,4 +560,76 @@ func (s *NamespaceTestSuite) TestRollups() {
 	s.Require().EqualValues("test rollup", rollup.Name)
 	s.Require().EqualValues("image.png", rollup.Logo)
 	s.Require().EqualValues("test-rollup", rollup.Slug)
+}
+
+func (s *NamespaceTestSuite) TestBlobWithMetadata() {
+	commitment := "ZeKGjIwsIkFsACD0wtEh/jbzzW+zIPP716VihNpm9T0="
+
+	blobReq := map[string]any{
+		"hash":       testNamespaceBase64,
+		"height":     1000,
+		"commitment": commitment,
+		"metadata":   true,
+	}
+	stream := new(bytes.Buffer)
+	err := json.NewEncoder(stream).Encode(blobReq)
+	s.Require().NoError(err)
+
+	req := httptest.NewRequest(http.MethodPost, "/", stream)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/blob")
+
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	data := make([]byte, 88)
+	_, err = rand.Read(data)
+	s.Require().NoError(err)
+
+	result := nodeTypes.Blob{
+		Namespace:    testNamespaceBase64,
+		Data:         base64.StdEncoding.EncodeToString(data),
+		Commitment:   commitment,
+		ShareVersion: 0,
+	}
+
+	s.blobLogs.EXPECT().
+		Blob(gomock.Any(), pkgTypes.Level(1000), uint64(1), "ZeKGjIwsIkFsACD0wtEh/jbzzW+zIPP716VihNpm9T0=").
+		Return(storage.BlobLog{
+			NamespaceId: testNamespace.Id,
+			MsgId:       1,
+			TxId:        1,
+			SignerId:    1,
+			Signer: &storage.Address{
+				Address: testAddress,
+			},
+			Commitment: "test_commitment",
+			Size:       1000,
+			Height:     10000,
+			Time:       testTime,
+		}, nil).
+		Times(1)
+
+	s.namespaces.EXPECT().
+		ByNamespaceIdAndVersion(gomock.Any(), gomock.Any(), uint8(0)).
+		Return(testNamespace, nil).
+		Times(1)
+
+	s.blobReceiver.EXPECT().
+		Blob(gomock.Any(), pkgTypes.Level(1000), testNamespaceBase64, commitment).
+		Return(result, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.Blob(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var blob responses.Blob
+	err = json.NewDecoder(rec.Body).Decode(&blob)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(0, blob.ShareVersion)
+	s.Require().Equal(testNamespaceBase64, blob.Namespace)
+	s.Require().Equal(result.Data, blob.Data)
+	s.Require().Equal(commitment, blob.Commitment)
+	s.Require().NotNil(blob.Metadata)
 }

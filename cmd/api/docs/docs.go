@@ -5009,6 +5009,9 @@ const docTemplate = `{
                     "format": "base64",
                     "example": "b2sgZGVtbyBkYQ=="
                 },
+                "metadata": {
+                    "$ref": "#/definitions/responses.BlobLog"
+                },
                 "namespace": {
                     "type": "string",
                     "format": "base64",
