@@ -45,8 +45,13 @@ func handleError(c echo.Context, err error, noRows NoRows) error {
 	if err == nil {
 		return nil
 	}
-	if err.Error() == errCancelRequest || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+	if err.Error() == errCancelRequest {
 		return nil
+	}
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		return c.JSON(http.StatusBadGateway, Error{
+			Message: err.Error(),
+		})
 	}
 	if noRows.IsNoRows(err) {
 		return c.NoContent(http.StatusNoContent)
