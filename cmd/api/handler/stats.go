@@ -82,7 +82,7 @@ func (sh StatsHandler) Summary(c echo.Context) error {
 		if errors.Is(err, storage.ErrValidation) {
 			return badRequestError(c, err)
 		}
-		return internalServerError(c, err)
+		return handleError(c, err, sh.nsRepo)
 	}
 
 	return c.JSON(http.StatusOK, summary)
@@ -144,7 +144,7 @@ func (sh StatsHandler) Histogram(c echo.Context) error {
 		})
 	}
 	if err != nil {
-		return internalServerError(c, err)
+		return handleError(c, err, sh.nsRepo)
 	}
 
 	response := make([]responses.HistogramItem, len(histogram))
@@ -168,7 +168,7 @@ func (sh StatsHandler) Histogram(c echo.Context) error {
 func (sh StatsHandler) TPS(c echo.Context) error {
 	tps, err := sh.repo.TPS(c.Request().Context())
 	if err != nil {
-		return internalServerError(c, err)
+		return handleError(c, err, sh.nsRepo)
 	}
 	return c.JSON(http.StatusOK, responses.NewTPS(tps))
 }
@@ -186,7 +186,7 @@ func (sh StatsHandler) TPS(c echo.Context) error {
 func (sh StatsHandler) TxCountHourly24h(c echo.Context) error {
 	histogram, err := sh.repo.TxCountForLast24h(c.Request().Context())
 	if err != nil {
-		return internalServerError(c, err)
+		return handleError(c, err, sh.nsRepo)
 	}
 	response := make([]responses.TxCountHistogramItem, len(histogram))
 	for i := range histogram {
@@ -222,7 +222,7 @@ func (sh StatsHandler) NamespaceUsage(c echo.Context) error {
 
 	namespaces, err := sh.nsRepo.ListWithSort(c.Request().Context(), "size", sdk.SortOrderDesc, *req.Top, 0)
 	if err != nil {
-		return internalServerError(c, err)
+		return handleError(c, err, sh.nsRepo)
 	}
 
 	var top100Size int64
@@ -234,7 +234,7 @@ func (sh StatsHandler) NamespaceUsage(c echo.Context) error {
 
 	state, err := sh.state.List(c.Request().Context(), 1, 0, sdk.SortOrderAsc)
 	if err != nil {
-		return internalServerError(c, err)
+		return handleError(c, err, sh.nsRepo)
 	}
 	if len(state) == 0 {
 		return returnArray(c, response)
@@ -284,7 +284,7 @@ func (sh StatsHandler) Series(c echo.Context) error {
 		storage.NewSeriesRequest(req.From, req.To),
 	)
 	if err != nil {
-		return internalServerError(c, err)
+		return handleError(c, err, sh.nsRepo)
 	}
 
 	response := make([]responses.SeriesItem, len(histogram))
@@ -345,7 +345,7 @@ func (sh StatsHandler) NamespaceSeries(c echo.Context) error {
 		storage.NewSeriesRequest(req.From, req.To),
 	)
 	if err != nil {
-		return internalServerError(c, err)
+		return handleError(c, err, sh.nsRepo)
 	}
 
 	response := make([]responses.SeriesItem, len(histogram))
@@ -419,7 +419,7 @@ func (sh StatsHandler) PriceSeries(c echo.Context) error {
 func (sh StatsHandler) PriceCurrent(c echo.Context) error {
 	price, err := sh.price.Last(c.Request().Context())
 	if err != nil {
-		return internalServerError(c, err)
+		return handleError(c, err, sh.nsRepo)
 	}
 
 	return c.JSON(http.StatusOK, responses.NewPrice(price))
@@ -463,7 +463,7 @@ func (sh StatsHandler) StakingSeries(c echo.Context) error {
 		storage.NewSeriesRequest(req.From, req.To),
 	)
 	if err != nil {
-		return internalServerError(c, err)
+		return handleError(c, err, sh.nsRepo)
 	}
 
 	response := make([]responses.SeriesItem, len(histogram))

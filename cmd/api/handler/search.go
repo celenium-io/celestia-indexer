@@ -106,7 +106,7 @@ func (handler SearchHandler) Search(c echo.Context) error {
 	}
 	if err != nil {
 		if !handler.address.IsNoRows(err) {
-			return internalServerError(c, err)
+			return handleError(c, err, handler.address)
 		}
 	}
 

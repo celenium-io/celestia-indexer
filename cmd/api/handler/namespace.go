@@ -375,7 +375,7 @@ func (handler *NamespaceHandler) Blob(c echo.Context) error {
 
 	response, err := responses.NewBlob(blob)
 	if err != nil {
-		return internalServerError(c, err)
+		return handleError(c, err, handler.blobLogs)
 	}
 
 	return c.JSON(http.StatusOK, response)

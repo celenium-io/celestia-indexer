@@ -15,6 +15,7 @@ import (
 var (
 	errInvalidHashLength = errors.New("invalid hash: should be 32 bytes length")
 	errInvalidAddress    = errors.New("invalid address")
+	errCancelRequest     = "pq: canceling statement due to user request"
 )
 
 type NoRows interface {
@@ -33,9 +34,7 @@ func badRequestError(c echo.Context, err error) error {
 
 func internalServerError(c echo.Context, err error) error {
 	if hub := sentryecho.GetHubFromContext(c); hub != nil {
-		if !errors.Is(err, context.Canceled) {
-			hub.CaptureMessage(err.Error())
-		}
+		hub.CaptureMessage(err.Error())
 	}
 	return c.JSON(http.StatusInternalServerError, Error{
 		Message: err.Error(),
@@ -45,6 +44,14 @@ func internalServerError(c echo.Context, err error) error {
 func handleError(c echo.Context, err error, noRows NoRows) error {
 	if err == nil {
 		return nil
+	}
+	if err.Error() == errCancelRequest {
+		return nil
+	}
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		return c.JSON(http.StatusBadGateway, Error{
+			Message: err.Error(),
+		})
 	}
 	if noRows.IsNoRows(err) {
 		return c.NoContent(http.StatusNoContent)
