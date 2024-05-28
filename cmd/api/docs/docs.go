@@ -6085,6 +6085,11 @@ const docTemplate = `{
         "responses.State": {
             "type": "object",
             "properties": {
+                "chain_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "mocha-4"
+                },
                 "hash": {
                     "type": "string",
                     "format": "string",
