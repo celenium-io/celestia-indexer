@@ -15,6 +15,7 @@ import (
 type State struct {
 	Id               uint64         `example:"321"                                                              format:"int64"     json:"id"                 swaggertype:"integer"`
 	Name             string         `example:"indexer"                                                          format:"string"    json:"name"               swaggertype:"string"`
+	ChainId          string         `example:"mocha-4"                                                          format:"string"    json:"chain_id"           swaggertype:"string"`
 	LastHeight       pkgTypes.Level `example:"100"                                                              format:"int64"     json:"last_height"        swaggertype:"integer"`
 	LastHash         string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"string"    json:"hash"               swaggertype:"string"`
 	LastTime         time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"last_time"          swaggertype:"string"`
@@ -33,6 +34,7 @@ func NewState(state storage.State) State {
 	return State{
 		Id:               state.Id,
 		Name:             state.Name,
+		ChainId:          state.ChainId,
 		LastHeight:       state.LastHeight,
 		LastHash:         hex.EncodeToString(state.LastHash),
 		LastTime:         state.LastTime,
