@@ -343,9 +343,10 @@ func (handler *NamespaceHandler) Count(c echo.Context) error {
 }
 
 type postBlobRequest struct {
-	Hash       string      `json:"hash"       validate:"required,base64"`
+	Hash       string      `json:"hash"       validate:"required,namespace"`
 	Height     types.Level `json:"height"     validate:"required,min=1"`
 	Commitment string      `json:"commitment" validate:"required,base64"`
+	Metadata   bool        `json:"metadata"   validate:"omitempty"`
 }
 
 // Blob godoc
@@ -376,6 +377,26 @@ func (handler *NamespaceHandler) Blob(c echo.Context) error {
 	response, err := responses.NewBlob(blob)
 	if err != nil {
 		return handleError(c, err, handler.blobLogs)
+	}
+
+	if req.Metadata {
+		namespaceId, err := base64.StdEncoding.DecodeString(req.Hash)
+		if err != nil {
+			return handleError(c, err, handler.namespace)
+		}
+
+		ns, err := handler.namespace.ByNamespaceIdAndVersion(c.Request().Context(), namespaceId[1:], namespaceId[0])
+		if err != nil {
+			return handleError(c, err, handler.namespace)
+		}
+
+		blobMetadata, err := handler.blobLogs.Blob(c.Request().Context(), req.Height, ns.Id, req.Commitment)
+		if err != nil {
+			return handleError(c, err, handler.namespace)
+		}
+
+		metadata := responses.NewBlobLog(blobMetadata)
+		response.Metadata = &metadata
 	}
 
 	return c.JSON(http.StatusOK, response)

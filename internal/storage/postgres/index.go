@@ -271,6 +271,15 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.BlobLog)(nil)).
+			Index("blob_log_commitment_idx").
+			Column("commitment").
+			Using("HASH").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Rollup
 		if _, err := tx.NewCreateIndex().
