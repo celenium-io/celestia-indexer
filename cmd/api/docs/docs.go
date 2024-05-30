@@ -52,6 +52,18 @@ const docTemplate = `{
                         "description": "Sort order",
                         "name": "sort",
                         "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "id",
+                            "delegated",
+                            "spendable",
+                            "unbonding"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
                     }
                 ],
                 "responses": {

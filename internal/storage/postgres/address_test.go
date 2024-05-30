@@ -39,7 +39,7 @@ func (s *StorageTestSuite) TestAddressList() {
 	s.Require().EqualValues(1, addresses[0].Id)
 	s.Require().EqualValues(100, addresses[0].Height)
 	s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", addresses[0].Address)
-	s.Require().Equal("123", addresses[0].Balance.Spendable.String())
+	s.Require().Equal("432", addresses[0].Balance.Spendable.String())
 	s.Require().Equal("utia", addresses[0].Balance.Currency)
 
 	s.Require().EqualValues(2, addresses[1].Id)
@@ -47,6 +47,62 @@ func (s *StorageTestSuite) TestAddressList() {
 	s.Require().Equal("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", addresses[1].Address)
 	s.Require().Equal("321", addresses[1].Balance.Spendable.String())
 	s.Require().Equal("utia", addresses[1].Balance.Currency)
+}
+
+func (s *StorageTestSuite) TestAddressListWithSortDesc() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	for _, field := range []string{"delegated", "spendable", "unbonding"} {
+		addresses, err := s.storage.Address.ListWithBalance(ctx, storage.AddressListFilter{
+			Limit:     10,
+			Offset:    0,
+			Sort:      sdk.SortOrderDesc,
+			SortField: field,
+		})
+		s.Require().NoError(err)
+		s.Require().Len(addresses, 2)
+
+		s.Require().EqualValues(1, addresses[0].Id)
+		s.Require().EqualValues(100, addresses[0].Height)
+		s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", addresses[0].Address)
+		s.Require().Equal("432", addresses[0].Balance.Spendable.String())
+		s.Require().Equal("utia", addresses[0].Balance.Currency)
+
+		s.Require().EqualValues(2, addresses[1].Id)
+		s.Require().EqualValues(101, addresses[1].Height)
+		s.Require().Equal("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", addresses[1].Address)
+		s.Require().Equal("321", addresses[1].Balance.Spendable.String())
+		s.Require().Equal("utia", addresses[1].Balance.Currency)
+	}
+}
+
+func (s *StorageTestSuite) TestAddressListWithSortAsc() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	for _, field := range []string{"delegated", "spendable", "unbonding"} {
+		addresses, err := s.storage.Address.ListWithBalance(ctx, storage.AddressListFilter{
+			Limit:     10,
+			Offset:    0,
+			Sort:      sdk.SortOrderAsc,
+			SortField: field,
+		})
+		s.Require().NoError(err)
+		s.Require().Len(addresses, 2)
+
+		s.Require().EqualValues(1, addresses[1].Id, field)
+		s.Require().EqualValues(100, addresses[1].Height)
+		s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", addresses[1].Address)
+		s.Require().Equal("432", addresses[1].Balance.Spendable.String())
+		s.Require().Equal("utia", addresses[1].Balance.Currency)
+
+		s.Require().EqualValues(2, addresses[0].Id)
+		s.Require().EqualValues(101, addresses[0].Height)
+		s.Require().Equal("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", addresses[0].Address)
+		s.Require().Equal("321", addresses[0].Balance.Spendable.String())
+		s.Require().Equal("utia", addresses[0].Balance.Currency)
+	}
 }
 
 func (s *StorageTestSuite) TestAddressMessages() {

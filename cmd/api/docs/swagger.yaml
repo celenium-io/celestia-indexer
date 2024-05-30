@@ -1556,6 +1556,15 @@ paths:
         in: query
         name: sort
         type: string
+      - description: Sort field
+        enum:
+        - id
+        - delegated
+        - spendable
+        - unbonding
+        in: query
+        name: sort_by
+        type: string
       produces:
       - application/json
       responses:
