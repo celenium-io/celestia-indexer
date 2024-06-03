@@ -63,7 +63,7 @@ func (p *Module) parse(b types.BlockData) error {
 		},
 	}
 
-	txs, err := parseTxs(decodeCtx, b)
+	txs, err := p.parseTxs(decodeCtx, b)
 	if err != nil {
 		return errors.Wrapf(err, "while parsing block on level=%d", b.Height)
 	}
@@ -93,6 +93,9 @@ func (p *Module) parse(b types.BlockData) error {
 
 	output := p.MustOutput(OutputName)
 	output.Push(decodeCtx)
+
+	p.notifyBlobsEndOfBlock(b.Height)
+
 	return nil
 }
 

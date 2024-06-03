@@ -6,27 +6,33 @@ package parser
 import (
 	"context"
 
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 )
 
 type Module struct {
 	modules.BaseModule
+
+	cfg config.Indexer
 }
 
 var _ modules.Module = (*Module)(nil)
 
 const (
-	InputName  = "blocks"
-	OutputName = "data"
-	StopOutput = "stop"
+	InputName       = "blocks"
+	OutputName      = "data"
+	OutputBlobsName = "blobs"
+	StopOutput      = "stop"
 )
 
-func NewModule() Module {
+func NewModule(cfg config.Indexer) Module {
 	m := Module{
 		BaseModule: modules.New("parser"),
+		cfg:        cfg,
 	}
 	m.CreateInputWithCapacity(InputName, 32)
 	m.CreateOutput(OutputName)
+	m.CreateOutput(OutputBlobsName)
 	m.CreateOutput(StopOutput)
 
 	return m

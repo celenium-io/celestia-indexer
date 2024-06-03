@@ -5,7 +5,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -17,9 +16,11 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
+	"github.com/celenium-io/celestia-indexer/internal/blob"
 	"github.com/celenium-io/celestia-indexer/internal/profiler"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
+	"github.com/celenium-io/celestia-indexer/pkg/node"
 	nodeApi "github.com/celenium-io/celestia-indexer/pkg/node/dal"
 	"github.com/celenium-io/celestia-indexer/pkg/node/rpc"
 	"github.com/dipdup-net/go-lib/config"
@@ -331,14 +332,10 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	datasource, ok := cfg.DataSources[cfg.ApiConfig.BlobReceiver]
-	if !ok {
-		panic(fmt.Sprintf("unknown data source pointed in blob_receiver: %s", cfg.ApiConfig.BlobReceiver))
+	blobReceiver, err := initBlobReceiver(ctx, cfg)
+	if err != nil {
+		panic(err)
 	}
-
-	blobReceiver := nodeApi.New(datasource.URL).
-		WithAuthToken(os.Getenv("CELESTIA_NODE_AUTH_TOKEN")).
-		WithRateLimit(datasource.RequestsPerSecond)
 
 	namespaceHandlers := handler.NewNamespaceHandler(db.Namespace, db.BlobLogs, db.Rollup, db.State, cfg.Indexer.Name, blobReceiver)
 	v1.POST("/blob", namespaceHandlers.Blob)
@@ -529,4 +526,27 @@ func initGasTracker(ctx context.Context, db postgres.Storage) {
 		panic(err)
 	}
 	gasTracker.Start(ctx)
+}
+
+func initBlobReceiver(ctx context.Context, cfg Config) (node.DalApi, error) {
+	switch cfg.ApiConfig.BlobReceiver {
+	case "r2":
+		r2 := blob.NewR2(blob.R2Config{
+			BucketName:      os.Getenv("R2_BUCKET"),
+			AccountId:       os.Getenv("R2_ACCOUNT_ID"),
+			AccessKeyId:     os.Getenv("R2_ACCESS_KEY_ID"),
+			AccessKeySecret: os.Getenv("R2_ACCESS_KEY_SECRET"),
+		})
+		err := r2.Init(ctx)
+		return r2, err
+	default:
+		datasource, ok := cfg.DataSources[cfg.ApiConfig.BlobReceiver]
+		if !ok {
+			return nil, errors.Errorf("unknown data source pointed in blob_receiver: %s", cfg.ApiConfig.BlobReceiver)
+		}
+
+		return nodeApi.New(datasource.URL).
+			WithAuthToken(os.Getenv("CELESTIA_NODE_AUTH_TOKEN")).
+			WithRateLimit(datasource.RequestsPerSecond), nil
+	}
 }

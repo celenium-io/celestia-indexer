@@ -10,6 +10,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/stretchr/testify/assert"
@@ -22,8 +23,9 @@ func TestParseTxs_EmptyTxsResults(t *testing.T) {
 		},
 	}
 
+	p := NewModule(config.Indexer{})
 	decodeCtx := context.NewContext()
-	resultTxs, err := parseTxs(decodeCtx, block)
+	resultTxs, err := p.parseTxs(decodeCtx, block)
 
 	assert.NoError(t, err)
 	assert.Empty(t, resultTxs)
@@ -265,7 +267,8 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 		Time:         now,
 		MessageTypes: storageTypes.NewMsgTypeBitMask(),
 	}
-	resultTxs, err := parseTxs(decodeCtx, block)
+	p := NewModule(config.Indexer{})
+	resultTxs, err := p.parseTxs(decodeCtx, block)
 
 	assert.NoError(t, err)
 	assert.Len(t, resultTxs, 3)
@@ -298,7 +301,9 @@ func TestParseTxs_FailedTx(t *testing.T) {
 		Time:         now,
 		MessageTypes: storageTypes.NewMsgTypeBitMask(),
 	}
-	resultTxs, err := parseTxs(decodeCtx, block)
+
+	p := NewModule(config.Indexer{})
+	resultTxs, err := p.parseTxs(decodeCtx, block)
 
 	assert.NoError(t, err)
 	assert.Len(t, resultTxs, 1)
@@ -331,7 +336,9 @@ func TestParseTxs_FailedTxWithNonstandardErrorCode(t *testing.T) {
 		Time:         now,
 		MessageTypes: storageTypes.NewMsgTypeBitMask(),
 	}
-	resultTxs, err := parseTxs(decodeCtx, block)
+
+	p := NewModule(config.Indexer{})
+	resultTxs, err := p.parseTxs(decodeCtx, block)
 
 	assert.NoError(t, err)
 	assert.Len(t, resultTxs, 1)
