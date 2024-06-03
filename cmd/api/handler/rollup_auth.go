@@ -46,6 +46,7 @@ type createRollupRequest struct {
 	L2Beat      string           `json:"l2_beat"     validate:"omitempty,url"`
 	Bridge      string           `json:"bridge"      validate:"omitempty,eth_addr"`
 	Explorer    string           `json:"explorer"    validate:"omitempty,url"`
+	Stack       string           `json:"stack"       validate:"omitempty"`
 	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
 	Providers   []rollupProvider `json:"providers"   validate:"required,min=1"`
 }
@@ -84,6 +85,7 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRo
 		L2Beat:         req.L2Beat,
 		Explorer:       req.Explorer,
 		BridgeContract: req.Bridge,
+		Stack:          req.Stack,
 		Links:          req.Links,
 		Slug:           slug.Make(req.Name),
 	}
@@ -144,6 +146,7 @@ type updateRollupRequest struct {
 	L2Beat      string           `json:"l2_beat"     validate:"omitempty,url"`
 	Bridge      string           `json:"bridge"      validate:"omitempty,eth_addr"`
 	Explorer    string           `json:"explorer"    validate:"omitempty,url"`
+	Stack       string           `json:"stack"       validate:"omitempty"`
 	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
 	Providers   []rollupProvider `json:"providers"   validate:"omitempty,min=1"`
 }
@@ -183,6 +186,7 @@ func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRo
 		L2Beat:         req.L2Beat,
 		Explorer:       req.Explorer,
 		BridgeContract: req.Bridge,
+		Stack:          req.Stack,
 		Links:          req.Links,
 	}
 

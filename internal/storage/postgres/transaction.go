@@ -656,6 +656,9 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 	if rollup.BridgeContract != "" {
 		query = query.Set("bridge_contract = ?", rollup.BridgeContract)
 	}
+	if rollup.Stack != "" {
+		query = query.Set("stack = ?", rollup.Stack)
+	}
 	if rollup.Links != nil {
 		query = query.Set("links = ?", pq.Array(rollup.Links))
 	}

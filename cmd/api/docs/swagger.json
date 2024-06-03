@@ -5891,6 +5891,11 @@
                     "format": "string",
                     "example": "rollup_slug"
                 },
+                "stack": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "op_stack"
+                },
                 "twitter": {
                     "type": "string",
                     "format": "string",
@@ -5981,6 +5986,11 @@
                     "type": "string",
                     "format": "string",
                     "example": "rollup_slug"
+                },
+                "stack": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "op_stack"
                 },
                 "twitter": {
                     "type": "string",
