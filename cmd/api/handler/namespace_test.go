@@ -562,14 +562,13 @@ func (s *NamespaceTestSuite) TestRollups() {
 	s.Require().EqualValues("test-rollup", rollup.Slug)
 }
 
-func (s *NamespaceTestSuite) TestBlobWithMetadata() {
+func (s *NamespaceTestSuite) TestBlobMetadata() {
 	commitment := "ZeKGjIwsIkFsACD0wtEh/jbzzW+zIPP716VihNpm9T1="
 
 	blobReq := map[string]any{
 		"hash":       testNamespaceBase64,
 		"height":     1000,
 		"commitment": commitment,
-		"metadata":   true,
 	}
 	stream := new(bytes.Buffer)
 	err := json.NewEncoder(stream).Encode(blobReq)
@@ -578,20 +577,13 @@ func (s *NamespaceTestSuite) TestBlobWithMetadata() {
 	req := httptest.NewRequest(http.MethodPost, "/", stream)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
-	c.SetPath("/blob")
+	c.SetPath("/blob/metadata")
 
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 	data := make([]byte, 88)
 	_, err = rand.Read(data)
 	s.Require().NoError(err)
-
-	result := nodeTypes.Blob{
-		Namespace:    testNamespaceBase64,
-		Data:         base64.StdEncoding.EncodeToString(data),
-		Commitment:   commitment,
-		ShareVersion: 0,
-	}
 
 	s.blobLogs.EXPECT().
 		Blob(gomock.Any(), pkgTypes.Level(1000), uint64(1), "ZeKGjIwsIkFsACD0wtEh/jbzzW+zIPP716VihNpm9T1=").
@@ -607,6 +599,8 @@ func (s *NamespaceTestSuite) TestBlobWithMetadata() {
 			Size:       1000,
 			Height:     1000,
 			Time:       testTime,
+			Tx:         &testTx,
+			Namespace:  &testNamespace,
 		}, nil).
 		Times(1)
 
@@ -615,21 +609,13 @@ func (s *NamespaceTestSuite) TestBlobWithMetadata() {
 		Return(testNamespace, nil).
 		Times(1)
 
-	s.blobReceiver.EXPECT().
-		Blob(gomock.Any(), pkgTypes.Level(1000), testNamespaceBase64, commitment).
-		Return(result, nil).
-		Times(1)
-
-	s.Require().NoError(s.handler.Blob(c))
+	s.Require().NoError(s.handler.BlobMetadata(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var blob responses.Blob
+	var blob responses.BlobLog
 	err = json.NewDecoder(rec.Body).Decode(&blob)
 	s.Require().NoError(err)
-
-	s.Require().EqualValues(0, blob.ShareVersion)
-	s.Require().Equal(testNamespaceBase64, blob.Namespace)
-	s.Require().Equal(result.Data, blob.Data)
-	s.Require().Equal(commitment, blob.Commitment)
-	s.Require().NotNil(blob.Metadata)
+	s.Require().NotNil(blob.Namespace)
+	s.Require().NotNil(blob.Tx)
+	s.Require().NotNil(blob.Signer)
 }

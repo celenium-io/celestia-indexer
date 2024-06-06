@@ -60,8 +60,6 @@ definitions:
         example: b2sgZGVtbyBkYQ==
         format: base64
         type: string
-      metadata:
-        $ref: '#/definitions/responses.BlobLog'
       namespace:
         example: AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0=
         format: base64
@@ -2343,6 +2341,46 @@ paths:
           schema:
             $ref: '#/definitions/handler.Error'
       summary: Get namespace blob by commitment on height
+      tags:
+      - namespace
+  /v1/blob/metadata:
+    post:
+      consumes:
+      - application/json
+      description: Returns blob metadata
+      operationId: get-blob-metadata
+      parameters:
+      - description: Base64-encoded namespace id and version
+        in: body
+        name: hash
+        required: true
+        schema:
+          type: string
+      - description: Block heigth
+        in: body
+        minimum: 1
+        name: height
+        required: true
+        schema:
+          type: integer
+      - description: Blob commitment
+        in: body
+        name: commitment
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.BlobLog'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Error'
+      summary: Get blob metadata by commitment on height
       tags:
       - namespace
   /v1/block:
