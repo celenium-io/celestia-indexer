@@ -464,8 +464,8 @@ func (s *TxTestSuite) TestGetMessage() {
 	c.SetParamValues(testTxHash)
 
 	s.tx.EXPECT().
-		ByHash(gomock.Any(), testTxHashBytes).
-		Return(testTx, nil)
+		IdByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx.Id, nil)
 
 	s.messages.EXPECT().
 		ByTxId(gomock.Any(), uint64(1), 2, 0).
@@ -560,9 +560,9 @@ func (s *TxTestSuite) TestNamespaces() {
 	c.SetParamValues(testTxHash)
 
 	s.tx.EXPECT().
-		ByHash(gomock.Any(), testTxHashBytes).
-		Return(testTx, nil).
-		MaxTimes(1)
+		IdByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx.Id, nil).
+		Times(1)
 
 	s.namespace.EXPECT().
 		MessagesByTxId(gomock.Any(), testTx.Id, 10, 0).
@@ -593,7 +593,7 @@ func (s *TxTestSuite) TestNamespaces() {
 				Namespace: &testNamespace,
 			},
 		}, nil).
-		MaxTimes(1)
+		Times(1)
 
 	s.Require().NoError(s.handler.Namespaces(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
@@ -613,14 +613,14 @@ func (s *TxTestSuite) TestNamespaceCount() {
 	c.SetParamValues(testTxHash)
 
 	s.tx.EXPECT().
-		ByHash(gomock.Any(), testTxHashBytes).
-		Return(testTx, nil).
-		MaxTimes(1)
+		IdByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx.Id, nil).
+		Times(1)
 
 	s.namespace.EXPECT().
 		CountMessagesByTxId(gomock.Any(), testTx.Id).
 		Return(1234, nil).
-		MaxTimes(1)
+		Times(1)
 
 	s.Require().NoError(s.handler.NamespacesCount(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
@@ -640,9 +640,9 @@ func (s *TxTestSuite) TestBlobs() {
 	c.SetParamValues(testTxHash)
 
 	s.tx.EXPECT().
-		ByHash(gomock.Any(), testTxHashBytes).
-		Return(testTx, nil).
-		MaxTimes(1)
+		IdByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx.Id, nil).
+		Times(1)
 
 	s.blobLogs.EXPECT().
 		ByTxId(gomock.Any(), testTx.Id, gomock.Any()).
@@ -673,7 +673,7 @@ func (s *TxTestSuite) TestBlobs() {
 				Namespace: &testNamespace,
 			},
 		}, nil).
-		MaxTimes(1)
+		Times(1)
 
 	s.Require().NoError(s.handler.Blobs(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
@@ -693,14 +693,14 @@ func (s *TxTestSuite) TestBlobsCount() {
 	c.SetParamValues(testTxHash)
 
 	s.tx.EXPECT().
-		ByHash(gomock.Any(), testTxHashBytes).
-		Return(testTx, nil).
-		MaxTimes(1)
+		IdByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx.Id, nil).
+		Times(1)
 
 	s.blobLogs.EXPECT().
 		CountByTxId(gomock.Any(), testTx.Id).
 		Return(1234, nil).
-		MaxTimes(1)
+		Times(1)
 
 	s.Require().NoError(s.handler.BlobsCount(c))
 	s.Require().Equal(http.StatusOK, rec.Code)

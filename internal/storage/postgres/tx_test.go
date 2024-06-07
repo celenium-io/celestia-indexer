@@ -40,6 +40,18 @@ func (s *StorageTestSuite) TestTxByHash() {
 	s.Require().Len(tx.Signers, 1)
 }
 
+func (s *StorageTestSuite) TestTxIdByHash() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	txHash, err := hex.DecodeString("652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF")
+	s.Require().NoError(err)
+
+	id, err := s.storage.Tx.IdByHash(ctx, txHash)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1, id)
+}
+
 func (s *StorageTestSuite) TestTxFilterSuccessUnjailAsc() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
