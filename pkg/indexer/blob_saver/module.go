@@ -60,7 +60,7 @@ func NewModule(
 		kind:       kind,
 	}
 
-	m.CreateInputWithCapacity(InputName, 128)
+	m.CreateInputWithCapacity(InputName, 1024)
 	m.CreateOutput(StopOutput)
 
 	return &m, nil
