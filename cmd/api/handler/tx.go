@@ -229,12 +229,12 @@ func (handler *TxHandler) GetMessages(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
+	txId, err := handler.tx.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
 
-	messages, err := handler.messages.ByTxId(c.Request().Context(), tx.Id, req.Limit, req.Offset)
+	messages, err := handler.messages.ByTxId(c.Request().Context(), txId, req.Limit, req.Offset)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
@@ -321,12 +321,12 @@ func (handler *TxHandler) Namespaces(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
+	txId, err := handler.tx.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
 
-	messages, err := handler.namespaces.MessagesByTxId(c.Request().Context(), tx.Id, int(req.Limit), int(req.Offset))
+	messages, err := handler.namespaces.MessagesByTxId(c.Request().Context(), txId, int(req.Limit), int(req.Offset))
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
@@ -363,12 +363,12 @@ func (handler *TxHandler) NamespacesCount(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
+	txId, err := handler.tx.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
 
-	count, err := handler.namespaces.CountMessagesByTxId(c.Request().Context(), tx.Id)
+	count, err := handler.namespaces.CountMessagesByTxId(c.Request().Context(), txId)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
@@ -420,14 +420,14 @@ func (handler *TxHandler) Blobs(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
+	txId, err := handler.tx.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
 
 	blobs, err := handler.blobLogs.ByTxId(
 		c.Request().Context(),
-		tx.Id,
+		txId,
 		storage.BlobLogFilters{
 			Limit:  int(req.Limit),
 			Offset: int(req.Offset),
@@ -469,12 +469,12 @@ func (handler *TxHandler) BlobsCount(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
+	txId, err := handler.tx.IdByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
 
-	count, err := handler.blobLogs.CountByTxId(c.Request().Context(), tx.Id)
+	count, err := handler.blobLogs.CountByTxId(c.Request().Context(), txId)
 	if err != nil {
 		return handleError(c, err, handler.blobLogs)
 	}

@@ -157,3 +157,12 @@ func (tx *Tx) Gas(ctx context.Context, height types.Level, ts time.Time) (respon
 		Scan(ctx, &response)
 	return
 }
+
+func (tx *Tx) IdByHash(ctx context.Context, hash []byte) (id uint64, err error) {
+	err = tx.DB().NewSelect().
+		Model((*storage.Tx)(nil)).
+		Column("id").
+		Where("hash = ?", hash).
+		Scan(ctx, &id)
+	return
+}
