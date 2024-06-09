@@ -11,7 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"sync"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
@@ -21,6 +21,7 @@ import (
 	"github.com/aws/smithy-go"
 	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/node/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/dipdup-io/workerpool"
 	"github.com/rs/zerolog/log"
 )
 
@@ -42,12 +43,16 @@ func (cfg R2Config) R2Url() string {
 type R2 struct {
 	cfg    R2Config
 	client *serviceS3.Client
+	pool   *workerpool.Pool[Blob]
 }
 
 func NewR2(cfg R2Config) R2 {
-	return R2{
+	r2 := R2{
 		cfg: cfg,
 	}
+	r2.pool = workerpool.NewPool(r2.saveBlob, 16)
+
+	return r2
 }
 
 func (r2 *R2) Init(ctx context.Context) error {
@@ -86,24 +91,11 @@ func (r2 R2) SaveBulk(ctx context.Context, blobs []Blob) error {
 		return nil
 	}
 
-	var wg sync.WaitGroup
-	var e error
 	for i := range blobs {
-		wg.Add(1)
-		go func(blob Blob, wg *sync.WaitGroup) {
-			defer wg.Done()
-
-			log.Info().Str("blob", blob.String()).Msg("saving blob...")
-			if err := r2.Save(ctx, blob); err != nil {
-				if e == nil {
-					e = err
-				}
-			}
-		}(blobs[i], &wg)
+		r2.pool.AddTask(blobs[i])
 	}
-	wg.Wait()
 
-	return e
+	return nil
 }
 
 func (r2 R2) Head(ctx context.Context) (uint64, error) {
@@ -180,4 +172,16 @@ func (r2 R2) Blob(ctx context.Context, height pkgTypes.Level, namespace, commitm
 
 func (r2 R2) Blobs(ctx context.Context, height pkgTypes.Level, hash ...string) ([]nodeTypes.Blob, error) {
 	return nil, errors.New("not implemented")
+}
+
+func (r2 R2) saveBlob(ctx context.Context, blob Blob) {
+	timeoutCtx, cancel := context.WithTimeout(ctx, time.Second*30)
+	defer cancel()
+
+	log.Info().Str("blob", blob.String()).Int("size", blob.Size()).Msg("saving blob...")
+	if err := r2.Save(timeoutCtx, blob); err != nil {
+		log.Err(err).Str("blob", blob.String()).Int("size", blob.Size()).Msg("blob saving")
+		// if error occurred try again
+		r2.pool.AddTask(blob)
+	}
 }
