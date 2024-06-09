@@ -50,7 +50,6 @@ func NewR2(cfg R2Config) R2 {
 	r2 := R2{
 		cfg: cfg,
 	}
-	r2.pool = workerpool.NewPool(r2.saveBlob, 16)
 
 	return r2
 }
@@ -72,6 +71,7 @@ func (r2 *R2) Init(ctx context.Context) error {
 	}
 
 	r2.client = serviceS3.NewFromConfig(cfg)
+	r2.pool = workerpool.NewPool(r2.saveBlob, 16)
 	r2.pool.Start(ctx)
 	return nil
 }
@@ -87,7 +87,7 @@ func (r2 R2) Save(ctx context.Context, blob Blob) error {
 	return err
 }
 
-func (r2 *R2) SaveBulk(ctx context.Context, blobs []Blob) error {
+func (r2 R2) SaveBulk(ctx context.Context, blobs []Blob) error {
 	if len(blobs) == 0 {
 		return nil
 	}
