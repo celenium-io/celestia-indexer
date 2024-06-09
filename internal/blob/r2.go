@@ -72,6 +72,7 @@ func (r2 *R2) Init(ctx context.Context) error {
 	}
 
 	r2.client = serviceS3.NewFromConfig(cfg)
+	r2.pool.Start(ctx)
 	return nil
 }
 
