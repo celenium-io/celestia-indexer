@@ -50,7 +50,6 @@ func NewR2(cfg R2Config) R2 {
 	r2 := R2{
 		cfg: cfg,
 	}
-	r2.pool = workerpool.NewPool(r2.saveBlob, 16)
 
 	return r2
 }
@@ -72,6 +71,7 @@ func (r2 *R2) Init(ctx context.Context) error {
 	}
 
 	r2.client = serviceS3.NewFromConfig(cfg)
+	r2.pool = workerpool.NewPool(r2.saveBlob, 16)
 	r2.pool.Start(ctx)
 	return nil
 }
@@ -175,7 +175,7 @@ func (r2 R2) Blobs(ctx context.Context, height pkgTypes.Level, hash ...string) (
 	return nil, errors.New("not implemented")
 }
 
-func (r2 R2) saveBlob(ctx context.Context, blob Blob) {
+func (r2 *R2) saveBlob(ctx context.Context, blob Blob) {
 	timeoutCtx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
 
