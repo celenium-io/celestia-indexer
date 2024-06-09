@@ -1104,6 +1104,66 @@
                 }
             }
         },
+        "/v1/blob/metadata": {
+            "post": {
+                "description": "Returns blob metadata",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "namespace"
+                ],
+                "summary": "Get blob metadata by commitment on height",
+                "operationId": "get-blob-metadata",
+                "parameters": [
+                    {
+                        "description": "Base64-encoded namespace id and version",
+                        "name": "hash",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "minimum": 1,
+                        "description": "Block heigth",
+                        "name": "height",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Blob commitment",
+                        "name": "commitment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.BlobLog"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/block": {
             "get": {
                 "description": "List blocks info",
@@ -5010,9 +5070,6 @@
                     "type": "string",
                     "format": "base64",
                     "example": "b2sgZGVtbyBkYQ=="
-                },
-                "metadata": {
-                    "$ref": "#/definitions/responses.BlobLog"
                 },
                 "namespace": {
                     "type": "string",

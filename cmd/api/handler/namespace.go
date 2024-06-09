@@ -346,7 +346,6 @@ type postBlobRequest struct {
 	Hash       string      `json:"hash"       validate:"required,namespace"`
 	Height     types.Level `json:"height"     validate:"required,min=1"`
 	Commitment string      `json:"commitment" validate:"required,base64"`
-	Metadata   bool        `json:"metadata"   validate:"omitempty"`
 }
 
 // Blob godoc
@@ -379,27 +378,44 @@ func (handler *NamespaceHandler) Blob(c echo.Context) error {
 		return handleError(c, err, handler.blobLogs)
 	}
 
-	if req.Metadata {
-		namespaceId, err := base64.StdEncoding.DecodeString(req.Hash)
-		if err != nil {
-			return handleError(c, err, handler.namespace)
-		}
+	return c.JSON(http.StatusOK, response)
+}
 
-		ns, err := handler.namespace.ByNamespaceIdAndVersion(c.Request().Context(), namespaceId[1:], namespaceId[0])
-		if err != nil {
-			return handleError(c, err, handler.namespace)
-		}
-
-		blobMetadata, err := handler.blobLogs.Blob(c.Request().Context(), req.Height, ns.Id, req.Commitment)
-		if err != nil {
-			return handleError(c, err, handler.namespace)
-		}
-
-		metadata := responses.NewBlobLog(blobMetadata)
-		response.Metadata = &metadata
+// BlobMetadata godoc
+//
+//	@Summary		Get blob metadata by commitment on height
+//	@Description	Returns blob metadata
+//	@Tags			namespace
+//	@ID				get-blob-metadata
+//	@Param			hash		body	string	true	"Base64-encoded namespace id and version"
+//	@Param			height		body	integer	true	"Block heigth"	minimum(1)
+//	@Param			commitment	body	string	true	"Blob commitment"
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	responses.BlobLog
+//	@Failure		400	{object}	Error
+//	@Router			/v1/blob/metadata [post]
+func (handler *NamespaceHandler) BlobMetadata(c echo.Context) error {
+	req, err := bindAndValidate[postBlobRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	namespaceId, err := base64.StdEncoding.DecodeString(req.Hash)
+	if err != nil {
+		return handleError(c, err, handler.namespace)
 	}
 
-	return c.JSON(http.StatusOK, response)
+	ns, err := handler.namespace.ByNamespaceIdAndVersion(c.Request().Context(), namespaceId[1:], namespaceId[0])
+	if err != nil {
+		return handleError(c, err, handler.namespace)
+	}
+
+	blobMetadata, err := handler.blobLogs.Blob(c.Request().Context(), req.Height, ns.Id, req.Commitment)
+	if err != nil {
+		return handleError(c, err, handler.namespace)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewBlobLog(blobMetadata))
 }
 
 type getBlobLogsForNamespace struct {

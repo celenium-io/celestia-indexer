@@ -338,7 +338,12 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	}
 
 	namespaceHandlers := handler.NewNamespaceHandler(db.Namespace, db.BlobLogs, db.Rollup, db.State, cfg.Indexer.Name, blobReceiver)
-	v1.POST("/blob", namespaceHandlers.Blob)
+
+	blobGroup := v1.Group("blob")
+	{
+		blobGroup.POST("", namespaceHandlers.Blob)
+		blobGroup.POST("/metadata", namespaceHandlers.BlobMetadata)
+	}
 
 	namespaceGroup := v1.Group("/namespace")
 	{
