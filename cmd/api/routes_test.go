@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
@@ -21,7 +22,6 @@ func TestRoutes(t *testing.T) {
 		"/v1/rollup/:id/stats/:name/:timeframe GET":           {},
 		"/v1/stats/histogram/:table/:function/:timeframe GET": {},
 		"/v1/gas/estimate_for_pfb GET":                        {},
-		"/v1/auth/rollup/* echo_route_not_found":              {},
 		"/v1/tx/count GET":                                    {},
 		"/v1/namespace/:id/:version/rollups GET":              {},
 		"/v1/namespace_by_hash/:hash/:height GET":             {},
@@ -33,7 +33,6 @@ func TestRoutes(t *testing.T) {
 		"/v1/search GET":                                      {},
 		"/v1/stats/staking/series/:id/:name/:timeframe GET":   {},
 		"/v1/rollup/:id GET":                                  {},
-		"/v1/auth/rollup echo_route_not_found":                {},
 		"/v1/auth/rollup/new POST":                            {},
 		"/v1/address/:hash GET":                               {},
 		"/v1/address/:hash/txs GET":                           {},
@@ -42,7 +41,6 @@ func TestRoutes(t *testing.T) {
 		"/v1/tx GET":                                          {},
 		"/v1/namespace/:id/:version/blobs GET":                {},
 		"/v1/rollup/:id/namespaces GET":                       {},
-		"/v1/auth/* echo_route_not_found":                     {},
 		"/v1/block GET":                                       {},
 		"/v1/tx/:hash/namespace GET":                          {},
 		"/v1/tx/:hash/blobs/count GET":                        {},
@@ -57,7 +55,6 @@ func TestRoutes(t *testing.T) {
 		"/v1/namespace/active GET":                            {},
 		"/v1/namespace_by_hash/:hash GET":                     {},
 		"/v1/vesting/:id/periods GET":                         {},
-		"/v1/auth echo_route_not_found":                       {},
 		"/v1/constants GET":                                   {},
 		"/v1/address GET":                                     {},
 		"/v1/block/:height/blobs GET":                         {},
@@ -132,6 +129,21 @@ func TestRoutes(t *testing.T) {
 	for _, route := range e.Routes() {
 		key := fmt.Sprintf("%s %s", route.Path, route.Method)
 		_, ok := expectedRoutes[key]
-		require.True(t, ok, key)
+		require.True(t, ok, "routes in expected", key)
+	}
+
+	for key := range expectedRoutes {
+		parts := strings.Split(key, " ")
+		method := parts[1]
+		path := parts[0]
+
+		var found bool
+		for _, route := range e.Routes() {
+			if route.Path == path && route.Method == method {
+				found = true
+				break
+			}
+		}
+		require.True(t, found, "expected in routes", key)
 	}
 }

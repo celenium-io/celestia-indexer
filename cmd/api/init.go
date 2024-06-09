@@ -455,14 +455,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 				return key == os.Getenv("API_AUTH_KEY"), nil
 			},
 		})
-		auth.Use(keyMiddleware)
 
 		rollupAuthHandler := handler.NewRollupAuthHandler(db.Rollup, db.Address, db.Namespace, db.Transactable)
 		rollup := auth.Group("/rollup")
 		{
-			rollup.POST("/new", rollupAuthHandler.Create)
-			rollup.PATCH("/:id", rollupAuthHandler.Update)
-			rollup.DELETE("/:id", rollupAuthHandler.Delete)
+			rollup.POST("/new", rollupAuthHandler.Create, keyMiddleware)
+			rollup.PATCH("/:id", rollupAuthHandler.Update, keyMiddleware)
+			rollup.DELETE("/:id", rollupAuthHandler.Delete, keyMiddleware)
 		}
 	}
 
