@@ -87,7 +87,7 @@ func (r2 R2) Save(ctx context.Context, blob Blob) error {
 	return err
 }
 
-func (r2 R2) SaveBulk(ctx context.Context, blobs []Blob) error {
+func (r2 *R2) SaveBulk(ctx context.Context, blobs []Blob) error {
 	if len(blobs) == 0 {
 		return nil
 	}
@@ -175,7 +175,7 @@ func (r2 R2) Blobs(ctx context.Context, height pkgTypes.Level, hash ...string) (
 	return nil, errors.New("not implemented")
 }
 
-func (r2 R2) saveBlob(ctx context.Context, blob Blob) {
+func (r2 *R2) saveBlob(ctx context.Context, blob Blob) {
 	timeoutCtx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
 
