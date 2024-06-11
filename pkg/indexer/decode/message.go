@@ -6,6 +6,7 @@ package decode
 import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/handle"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	crisisTypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	evidenceTypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
@@ -74,6 +75,15 @@ func Message(
 	// staking module
 	case *cosmosStakingTypes.MsgCreateValidator:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateValidator(ctx, status, typedMsg)
+		if err != nil {
+			return d, err
+		}
+		if pk, ok := typedMsg.Pubkey.GetCachedValue().(cryptotypes.PubKey); ok {
+			d.Msg.Data["Pubkey"] = map[string]any{
+				"key":  pk.Bytes(),
+				"type": pk.Type(),
+			}
+		}
 	case *cosmosStakingTypes.MsgEditValidator:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgEditValidator(ctx, status, typedMsg)
 	case *cosmosStakingTypes.MsgDelegate:
