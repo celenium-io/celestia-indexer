@@ -333,15 +333,6 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 		if _, err := tx.NewCreateIndex().
 			IfNotExists().
 			Model((*storage.StakingLog)(nil)).
-			Index("staking_log_address_id_idx").
-			Column("address_id").
-			Where("address_id is not null").
-			Exec(ctx); err != nil {
-			return err
-		}
-		if _, err := tx.NewCreateIndex().
-			IfNotExists().
-			Model((*storage.StakingLog)(nil)).
 			Index("staking_log_validator_id_idx").
 			Column("validator_id").
 			Exec(ctx); err != nil {

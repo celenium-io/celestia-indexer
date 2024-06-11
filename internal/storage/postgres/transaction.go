@@ -8,16 +8,14 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	jsoniter "github.com/json-iterator/go"
 	"github.com/lib/pq"
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
+	"github.com/vmihailenco/msgpack/v5"
 
 	models "github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 )
-
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type Transaction struct {
 	storage.Transaction
@@ -161,11 +159,10 @@ func (tx Transaction) SaveEvents(ctx context.Context, events ...models.Event) er
 		}
 
 		for i := range events {
-			var s *string
+			var s []byte
 			if len(events[i].Data) > 0 {
-				raw, err := json.MarshalToString(events[i].Data)
-				if err == nil {
-					s = &raw
+				if raw, err := msgpack.Marshal(events[i].Data); err == nil {
+					s = raw
 				}
 			}
 
