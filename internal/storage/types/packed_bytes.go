@@ -15,6 +15,9 @@ type PackedBytes map[string]any
 var _ sql.Scanner = (*PackedBytes)(nil)
 
 func (pb *PackedBytes) Scan(src interface{}) error {
+	if src == nil {
+		return nil
+	}
 	b, ok := src.([]byte)
 	if !ok {
 		return errors.Errorf("invalid packed bytes type: %T", src)
