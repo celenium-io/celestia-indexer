@@ -3184,6 +3184,18 @@ paths:
         in: query
         name: sort_by
         type: string
+      - description: Commitment value in URLbase64 format
+        in: query
+        name: commitment
+        type: string
+      - description: Time from in unix timestamp
+        in: query
+        name: from
+        type: integer
+      - description: Time to in unix timestamp
+        in: query
+        name: to
+        type: integer
       produces:
       - application/json
       responses:

@@ -119,7 +119,17 @@ func messagesFilter(query *bun.SelectQuery, fltrs storage.MessageListWithTxFilte
 
 func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.SelectQuery {
 	if fltrs.Offset > 0 {
-		query.Offset(fltrs.Offset)
+		query = query.Offset(fltrs.Offset)
+	}
+
+	if !fltrs.From.IsZero() {
+		query = query.Where("time >= ?", fltrs.From)
+	}
+	if !fltrs.To.IsZero() {
+		query = query.Where("time < ?", fltrs.To)
+	}
+	if fltrs.Commitment != "" {
+		query = query.Where("commitment = ?", fltrs.Commitment)
 	}
 
 	query = limitScope(query, fltrs.Limit)
