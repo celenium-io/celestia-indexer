@@ -405,9 +405,12 @@ func (handler *BlockHandler) Blobs(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	block, err := handler.block.ByHeight(c.Request().Context(), req.Height)
+	blockTime, err := handler.block.Time(c.Request().Context(), req.Height)
 	if err != nil {
-		return handleError(c, err, handler.blobLogs)
+		if handler.block.IsNoRows(err) {
+			return returnArray(c, []any{})
+		}
+		return handleError(c, err, handler.block)
 	}
 
 	blobs, err := handler.blobLogs.ByHeight(
@@ -419,8 +422,8 @@ func (handler *BlockHandler) Blobs(c echo.Context) error {
 			Sort:   pgSort(req.Sort),
 			SortBy: req.SortBy,
 			// using time filters to take certain partition
-			From: block.Time,
-			To:   block.Time.Add(time.Minute),
+			From: blockTime,
+			To:   blockTime.Add(time.Minute),
 		},
 	)
 	if err != nil {

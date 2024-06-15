@@ -445,8 +445,8 @@ func (s *BlockTestSuite) TestBlobs() {
 	c.SetParamValues("100")
 
 	s.blocks.EXPECT().
-		ByHeight(gomock.Any(), pkgTypes.Level(100)).
-		Return(testBlock, nil).
+		Time(gomock.Any(), pkgTypes.Level(100)).
+		Return(testBlock.Time, nil).
 		Times(1)
 
 	s.blobLogs.EXPECT().
