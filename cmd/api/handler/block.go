@@ -481,12 +481,12 @@ func (handler *BlockHandler) BlockODS(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	b, err := handler.block.ByHeightWithStats(c.Request().Context(), req.Height)
+	blockStats, err := handler.blockStats.ByHeight(c.Request().Context(), req.Height)
 	if err != nil {
 		return handleError(c, err, handler.block)
 	}
 
-	if b.Stats.TxCount == 0 {
+	if blockStats.TxCount == 0 {
 		return c.JSON(http.StatusOK, responses.ODS{
 			Width: 0,
 			Items: make([]responses.ODSItem, 0),
