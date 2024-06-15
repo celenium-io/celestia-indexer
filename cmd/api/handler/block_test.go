@@ -595,9 +595,9 @@ func (s *BlockTestSuite) TestBlockODS() {
 	c.SetParamNames("height")
 	c.SetParamValues("100")
 
-	s.blocks.EXPECT().
-		ByHeightWithStats(gomock.Any(), pkgTypes.Level(100)).
-		Return(testBlockWithStats, nil).
+	s.blockStats.EXPECT().
+		ByHeight(gomock.Any(), pkgTypes.Level(100)).
+		Return(testBlockStats, nil).
 		Times(1)
 
 	rawTxs := []string{
