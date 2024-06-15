@@ -5,6 +5,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -404,6 +405,11 @@ func (handler *BlockHandler) Blobs(c echo.Context) error {
 	}
 	req.SetDefault()
 
+	block, err := handler.block.ByHeight(c.Request().Context(), req.Height)
+	if err != nil {
+		return handleError(c, err, handler.blobLogs)
+	}
+
 	blobs, err := handler.blobLogs.ByHeight(
 		c.Request().Context(),
 		req.Height,
@@ -412,6 +418,9 @@ func (handler *BlockHandler) Blobs(c echo.Context) error {
 			Offset: int(req.Offset),
 			Sort:   pgSort(req.Sort),
 			SortBy: req.SortBy,
+			// using time filters to take certain partition
+			From: block.Time,
+			To:   block.Time.Add(time.Minute),
 		},
 	)
 	if err != nil {
