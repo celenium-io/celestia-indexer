@@ -28,9 +28,7 @@ func NewAddress(db *database.Bun) *Address {
 func (a *Address) ByHash(ctx context.Context, hash []byte) (address storage.Address, err error) {
 	addressQuery := a.DB().NewSelect().
 		Model((*storage.Address)(nil)).
-		Where("hash = ?", hash).
-		Order("id asc").
-		Limit(1)
+		Where("hash = ?", hash)
 
 	err = a.DB().NewSelect().TableExpr("(?) as address", addressQuery).
 		ColumnExpr("address.*").
@@ -103,7 +101,6 @@ func (a *Address) IdByHash(ctx context.Context, hash []byte) (id uint64, err err
 		Model((*storage.Address)(nil)).
 		Column("id").
 		Where("hash = ?", hash).
-		Limit(1).
 		Scan(ctx, &id)
 	return
 }
