@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/go-lib/database"
@@ -41,11 +40,6 @@ func (b *Blocks) ByHeight(ctx context.Context, height types.Level) (block storag
 	return
 }
 
-type typeCount struct {
-	Type  storageTypes.MsgType `bun:"type"`
-	Count int64                `bun:"count"`
-}
-
 // ByHeightWithStats -
 func (b *Blocks) ByHeightWithStats(ctx context.Context, height types.Level) (block storage.Block, err error) {
 	subQuery := b.DB().NewSelect().Model(&block).
@@ -61,30 +55,6 @@ func (b *Blocks) ByHeightWithStats(ctx context.Context, height types.Level) (blo
 		Join("LEFT JOIN block_stats AS stats ON (stats.height = block.height) AND (stats.time = block.time)").
 		Join("LEFT JOIN validator AS proposer ON (proposer.id = block.proposer_id)").
 		Scan(ctx, &block)
-
-	if err != nil {
-		return
-	}
-
-	block.Stats.MessagesCounts = make(map[storageTypes.MsgType]int64)
-
-	if block.Stats.TxCount > 0 {
-		var msgsStats []typeCount
-		err = b.DB().NewSelect().Model((*storage.Message)(nil)).
-			ColumnExpr("message.type, count(*)").
-			Where("message.height = ?", height).
-			Where("message.time = ?", block.Time).
-			Group("message.type").
-			Scan(ctx, &msgsStats)
-
-		if err != nil {
-			return
-		}
-
-		for _, stat := range msgsStats {
-			block.Stats.MessagesCounts[stat.Type] = stat.Count
-		}
-	}
 
 	return
 }
@@ -104,30 +74,6 @@ func (b *Blocks) ByIdWithRelations(ctx context.Context, id uint64) (block storag
 		Join("LEFT JOIN block_stats AS stats ON (stats.height = block.height) AND (stats.time = block.time)").
 		Join("LEFT JOIN validator AS proposer ON (proposer.id = block.proposer_id)").
 		Scan(ctx, &block)
-
-	if err != nil {
-		return
-	}
-
-	block.Stats.MessagesCounts = make(map[storageTypes.MsgType]int64)
-
-	if block.Stats.TxCount > 0 {
-		var msgsStats []typeCount
-		err = b.DB().NewSelect().Model((*storage.Message)(nil)).
-			ColumnExpr("message.type, count(*)").
-			Where("message.height = ?", block.Height).
-			Where("message.time = ?", block.Time).
-			Group("message.type").
-			Scan(ctx, &msgsStats)
-
-		if err != nil {
-			return
-		}
-
-		for _, stat := range msgsStats {
-			block.Stats.MessagesCounts[stat.Type] = stat.Count
-		}
-	}
 
 	return
 }
@@ -163,12 +109,6 @@ func (b *Blocks) ByHash(ctx context.Context, hash []byte) (block storage.Block, 
 	return
 }
 
-type listTypeCount struct {
-	Height types.Level          `bun:"height"`
-	Type   storageTypes.MsgType `bun:"type"`
-	Count  int64                `bun:"count"`
-}
-
 // ListWithStats -
 func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order sdk.SortOrder) (blocks []*storage.Block, err error) {
 	subQuery := b.DB().NewSelect().Model(&blocks)
@@ -185,49 +125,7 @@ func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order 
 		Join("LEFT JOIN validator as v ON v.id = block.proposer_id")
 	query = sortScope(query, "block.id", order)
 
-	if err = query.Scan(ctx, &blocks); err != nil {
-		return
-	}
-
-	if len(blocks) == 0 {
-		return
-	}
-
-	var (
-		heights         = make([]types.Level, len(blocks))
-		blocksHeightMap = make(map[types.Level]*storage.Block)
-		startTime       = blocks[len(blocks)-1].Time
-		endTime         = blocks[0].Time
-	)
-
-	if order == sdk.SortOrderAsc {
-		startTime, endTime = endTime, startTime
-	}
-
-	for i := range blocks {
-		heights[i] = blocks[i].Height
-		blocksHeightMap[blocks[i].Height] = blocks[i]
-		blocks[i].Stats.MessagesCounts = make(map[storageTypes.MsgType]int64)
-	}
-
-	var listTypeCounts []listTypeCount
-	queryMsgsCounts := b.DB().NewSelect().Model((*storage.Message)(nil)).
-		ColumnExpr("message.height, message.type, count(*)").
-		Where("message.height IN (?)", bun.In(heights)).
-		Where("message.time >= ?", startTime).
-		Where("message.time <= ?", endTime).
-		Group("message.type").
-		Group("message.height")
-
-	queryMsgsCounts = sortScope(queryMsgsCounts, "message.height", order)
-	if err = queryMsgsCounts.Scan(ctx, &listTypeCounts); err != nil {
-		return
-	}
-
-	for _, stat := range listTypeCounts {
-		blocksHeightMap[stat.Height].Stats.MessagesCounts[stat.Type] = stat.Count
-	}
-
+	err = query.Scan(ctx, &blocks)
 	return
 }
 

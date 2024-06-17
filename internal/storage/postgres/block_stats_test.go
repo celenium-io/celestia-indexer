@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/go-lib/database"
@@ -88,12 +87,6 @@ func (s *BlockStatsTestSuite) TestByHeight() {
 				Id:           2,
 				Height:       1000,
 				SupplyChange: decimal.NewFromInt(30930476),
-				MessagesCounts: map[storageTypes.MsgType]int64{
-					storageTypes.MsgWithdrawDelegatorReward: 1,
-					storageTypes.MsgDelegate:                1,
-					storageTypes.MsgUnjail:                  1,
-					storageTypes.MsgPayForBlobs:             1,
-				},
 			},
 		},
 		{
@@ -103,9 +96,6 @@ func (s *BlockStatsTestSuite) TestByHeight() {
 				Id:           1,
 				Height:       999,
 				SupplyChange: decimal.NewFromInt(20930476),
-				MessagesCounts: map[storageTypes.MsgType]int64{
-					storageTypes.MsgCreateValidator: 1,
-				},
 			},
 		},
 	}
@@ -120,7 +110,6 @@ func (s *BlockStatsTestSuite) TestByHeight() {
 			s.Require().Equal(tt.want.Id, got.Id)
 			s.Require().Equal(tt.want.Height, got.Height)
 			s.Require().Equal(tt.want.SupplyChange, got.SupplyChange)
-			s.Require().Equal(tt.want.MessagesCounts, got.MessagesCounts)
 		})
 	}
 }

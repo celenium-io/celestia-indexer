@@ -7,8 +7,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
@@ -41,8 +39,6 @@ type BlockStats struct {
 	Commissions   decimal.Decimal `bun:"commissions,type:numeric" comment:"Total commissions per block"                                       stats:"func:min max sum avg"`
 	BytesInBlock  int64           `bun:"bytes_in_block"           comment:"Size of all transactions in bytes"                                 stats:"func:min max sum avg"`
 	SquareSize    uint64          `bun:"square_size"              comment:"Size of the square after splitting all the block data into shares"`
-
-	MessagesCounts map[types.MsgType]int64 `bun:"-"`
 }
 
 func (BlockStats) TableName() string {
