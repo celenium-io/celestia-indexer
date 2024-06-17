@@ -66,22 +66,21 @@ func NewBlock(block storage.Block, withStats bool) Block {
 }
 
 type BlockStats struct {
-	TxCount        int64                   `example:"12"                              json:"tx_count"        swaggertype:"integer"`
-	EventsCount    int64                   `example:"18"                              json:"events_count"    swaggertype:"integer"`
-	BlobsSize      int64                   `example:"12354"                           json:"blobs_size"      swaggertype:"integer"`
-	BlobsCount     int                     `example:"100"                             json:"blobs_count"     swaggertype:"integer"`
-	Fee            string                  `example:"28347628346"                     json:"fee"             swaggertype:"string"`
-	SupplyChange   string                  `example:"8635234"                         json:"supply_change"   swaggertype:"string"`
-	InflationRate  string                  `example:"0.0800000"                       json:"inflation_rate"  swaggertype:"string"`
-	FillRate       string                  `example:"0.0800"                          json:"fill_rate"       swaggertype:"string"`
-	Rewards        string                  `example:"102102812"                       json:"rewards"         swaggertype:"string"`
-	Commissions    string                  `example:"123133"                          json:"commissions"     swaggertype:"string"`
-	BlockTime      uint64                  `example:"12354"                           json:"block_time"      swaggertype:"integer"`
-	GasLimit       int64                   `example:"1234"                            json:"gas_limit"       swaggertype:"integer"`
-	GasUsed        int64                   `example:"1234"                            json:"gas_used"        swaggertype:"integer"`
-	BytesInBlock   int64                   `example:"1234"                            json:"bytes_in_block"  swaggertype:"integer"`
-	SquareSize     uint64                  `example:"16"                              json:"square_size"     swaggertype:"integer"`
-	MessagesCounts map[types.MsgType]int64 `example:"{MsgPayForBlobs:10,MsgUnjail:1}" json:"messages_counts" swaggertype:"string"`
+	TxCount       int64  `example:"12"          json:"tx_count"       swaggertype:"integer"`
+	EventsCount   int64  `example:"18"          json:"events_count"   swaggertype:"integer"`
+	BlobsSize     int64  `example:"12354"       json:"blobs_size"     swaggertype:"integer"`
+	BlobsCount    int    `example:"100"         json:"blobs_count"    swaggertype:"integer"`
+	Fee           string `example:"28347628346" json:"fee"            swaggertype:"string"`
+	SupplyChange  string `example:"8635234"     json:"supply_change"  swaggertype:"string"`
+	InflationRate string `example:"0.0800000"   json:"inflation_rate" swaggertype:"string"`
+	FillRate      string `example:"0.0800"      json:"fill_rate"      swaggertype:"string"`
+	Rewards       string `example:"102102812"   json:"rewards"        swaggertype:"string"`
+	Commissions   string `example:"123133"      json:"commissions"    swaggertype:"string"`
+	BlockTime     uint64 `example:"12354"       json:"block_time"     swaggertype:"integer"`
+	GasLimit      int64  `example:"1234"        json:"gas_limit"      swaggertype:"integer"`
+	GasUsed       int64  `example:"1234"        json:"gas_used"       swaggertype:"integer"`
+	BytesInBlock  int64  `example:"1234"        json:"bytes_in_block" swaggertype:"integer"`
+	SquareSize    uint64 `example:"16"          json:"square_size"    swaggertype:"integer"`
 }
 
 var (
@@ -90,21 +89,20 @@ var (
 
 func NewBlockStats(stats storage.BlockStats) *BlockStats {
 	return &BlockStats{
-		TxCount:        stats.TxCount,
-		EventsCount:    stats.EventsCount,
-		BlobsSize:      stats.BlobsSize,
-		BlobsCount:     stats.BlobsCount,
-		Fee:            stats.Fee.String(),
-		SupplyChange:   stats.SupplyChange.String(),
-		InflationRate:  stats.InflationRate.String(),
-		Commissions:    stats.Commissions.String(),
-		Rewards:        stats.Rewards.String(),
-		BlockTime:      stats.BlockTime,
-		MessagesCounts: stats.MessagesCounts,
-		GasLimit:       stats.GasLimit,
-		GasUsed:        stats.GasUsed,
-		BytesInBlock:   stats.BytesInBlock,
-		SquareSize:     stats.SquareSize,
-		FillRate:       fmt.Sprintf("%.4f", float64(stats.BytesInBlock)/float64(maxSize)),
+		TxCount:       stats.TxCount,
+		EventsCount:   stats.EventsCount,
+		BlobsSize:     stats.BlobsSize,
+		BlobsCount:    stats.BlobsCount,
+		Fee:           stats.Fee.String(),
+		SupplyChange:  stats.SupplyChange.String(),
+		InflationRate: stats.InflationRate.String(),
+		Commissions:   stats.Commissions.String(),
+		Rewards:       stats.Rewards.String(),
+		BlockTime:     stats.BlockTime,
+		GasLimit:      stats.GasLimit,
+		GasUsed:       stats.GasUsed,
+		BytesInBlock:  stats.BytesInBlock,
+		SquareSize:    stats.SquareSize,
+		FillRate:      fmt.Sprintf("%.4f", float64(stats.BytesInBlock)/float64(maxSize)),
 	}
 }

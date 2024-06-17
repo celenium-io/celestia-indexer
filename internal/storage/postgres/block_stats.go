@@ -6,7 +6,6 @@ package postgres
 import (
 	"context"
 
-	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -31,26 +30,6 @@ func (b *BlockStats) ByHeight(ctx context.Context, height pkgTypes.Level) (stats
 		Where("height = ?", height).
 		Limit(1).
 		Scan(ctx)
-
-	if err != nil {
-		return
-	}
-
-	var msgsStats []typeCount
-	err = b.db.DB().NewSelect().Model((*storage.Message)(nil)).
-		ColumnExpr("message.type, count(*)").
-		Where("message.height = ?", height).
-		Group("message.type").
-		Scan(ctx, &msgsStats)
-
-	if err != nil {
-		return
-	}
-
-	stats.MessagesCounts = make(map[storageTypes.MsgType]int64)
-	for _, stat := range msgsStats {
-		stats.MessagesCounts[stat.Type] = stat.Count
-	}
 
 	return
 }

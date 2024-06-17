@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/shopspring/decimal"
 )
@@ -70,12 +69,6 @@ func (s *StorageTestSuite) TestBlockByHeightWithStats() {
 		SupplyChange:  decimal.NewFromInt(30930476),
 		InflationRate: decimal.NewFromFloat(0.08),
 		Fee:           decimal.NewFromInt(2873468273),
-		MessagesCounts: map[types.MsgType]int64{
-			types.MsgDelegate:                1,
-			types.MsgPayForBlobs:             1,
-			types.MsgUnjail:                  1,
-			types.MsgWithdrawDelegatorReward: 1,
-		},
 	}
 	s.Require().EqualValues(expectedStats.Id, block.Stats.Id)
 	s.Require().EqualValues(expectedStats.Height, block.Stats.Height)
@@ -87,7 +80,6 @@ func (s *StorageTestSuite) TestBlockByHeightWithStats() {
 	s.Require().EqualValues(expectedStats.SupplyChange.String(), block.Stats.SupplyChange.String())
 	s.Require().EqualValues(expectedStats.InflationRate.String(), block.Stats.InflationRate.String())
 	s.Require().EqualValues(expectedStats.Fee.String(), block.Stats.Fee.String())
-	s.Require().Equal(expectedStats.MessagesCounts, block.Stats.MessagesCounts)
 
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
 	s.Require().NoError(err)
@@ -116,12 +108,6 @@ func (s *StorageTestSuite) TestBlockByIdWithRelations() {
 		InflationRate: decimal.NewFromFloat(0.08),
 		Fee:           decimal.NewFromInt(2873468273),
 		BlobsCount:    4,
-		MessagesCounts: map[types.MsgType]int64{
-			types.MsgDelegate:                1,
-			types.MsgPayForBlobs:             1,
-			types.MsgUnjail:                  1,
-			types.MsgWithdrawDelegatorReward: 1,
-		},
 	}
 	s.Require().EqualValues(expectedStats.Id, block.Stats.Id)
 	s.Require().EqualValues(expectedStats.Height, block.Stats.Height)
@@ -133,7 +119,6 @@ func (s *StorageTestSuite) TestBlockByIdWithRelations() {
 	s.Require().EqualValues(expectedStats.SupplyChange.String(), block.Stats.SupplyChange.String())
 	s.Require().EqualValues(expectedStats.InflationRate.String(), block.Stats.InflationRate.String())
 	s.Require().EqualValues(expectedStats.Fee.String(), block.Stats.Fee.String())
-	s.Require().Equal(expectedStats.MessagesCounts, block.Stats.MessagesCounts)
 
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
 	s.Require().NoError(err)
@@ -172,12 +157,6 @@ func (s *StorageTestSuite) TestBlockListWithStats() {
 	s.Require().EqualValues(2, block.Stats.TxCount)
 	s.Require().EqualValues(11000, block.Stats.BlockTime)
 	s.Require().EqualValues(4, block.Stats.BlobsCount)
-	s.Require().EqualValues(map[types.MsgType]int64{
-		types.MsgWithdrawDelegatorReward: 1,
-		types.MsgDelegate:                1,
-		types.MsgUnjail:                  1,
-		types.MsgPayForBlobs:             1,
-	}, block.Stats.MessagesCounts)
 	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
 }
 
@@ -196,12 +175,6 @@ func (s *StorageTestSuite) TestBlockListWithStatsAsc() {
 	s.Require().EqualValues(2, block.Stats.TxCount)
 	s.Require().EqualValues(11000, block.Stats.BlockTime)
 	s.Require().EqualValues(4, block.Stats.BlobsCount)
-	s.Require().EqualValues(map[types.MsgType]int64{
-		types.MsgWithdrawDelegatorReward: 1,
-		types.MsgDelegate:                1,
-		types.MsgUnjail:                  1,
-		types.MsgPayForBlobs:             1,
-	}, block.Stats.MessagesCounts)
 	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", block.Proposer.ConsAddress)
 }
 
