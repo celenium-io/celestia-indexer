@@ -477,12 +477,16 @@ func initSentry(e *echo.Echo, db postgres.Storage, dsn, environment string) erro
 	}
 
 	if err := sentry.Init(sentry.ClientOptions{
-		Dsn:              dsn,
-		AttachStacktrace: true,
-		Environment:      environment,
-		EnableTracing:    true,
-		TracesSampleRate: 1.0,
-		Release:          os.Getenv("TAG"),
+		Dsn:                dsn,
+		AttachStacktrace:   true,
+		Environment:        environment,
+		EnableTracing:      true,
+		TracesSampleRate:   1.0,
+		ProfilesSampleRate: 1.0,
+		Release:            os.Getenv("TAG"),
+		IgnoreTransactions: []string{
+			"GET /v1/ws",
+		},
 	}); err != nil {
 		return errors.Wrap(err, "initialization")
 	}
