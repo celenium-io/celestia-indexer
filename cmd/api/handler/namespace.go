@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"net/http"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -419,12 +420,27 @@ func (handler *NamespaceHandler) BlobMetadata(c echo.Context) error {
 }
 
 type getBlobLogsForNamespace struct {
-	Id      string `param:"id"      validate:"required,hexadecimal,len=56"`
-	Version byte   `param:"version"`
-	Limit   uint64 `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset  uint64 `query:"offset"  validate:"omitempty,min=0"`
-	Sort    string `query:"sort"    validate:"omitempty,oneof=asc desc"`
-	SortBy  string `query:"sort_by" validate:"omitempty,oneof=time size"`
+	Id         string `param:"id"         validate:"required,hexadecimal,len=56"`
+	Version    byte   `param:"version"`
+	Limit      uint64 `query:"limit"      validate:"omitempty,min=1,max=100"`
+	Offset     uint64 `query:"offset"     validate:"omitempty,min=0"`
+	Sort       string `query:"sort"       validate:"omitempty,oneof=asc desc"`
+	SortBy     string `query:"sort_by"    validate:"omitempty,oneof=time size"`
+	Commitment string `query:"commitment" validate:"omitempty,base64url"`
+
+	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1"`
+	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
+func (req getBlobLogsForNamespace) getCommitment() (string, error) {
+	if req.Commitment == "" {
+		return "", nil
+	}
+	data, err := base64.URLEncoding.DecodeString(req.Commitment)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(data), nil
 }
 
 func (req *getBlobLogsForNamespace) SetDefault() {
@@ -442,12 +458,15 @@ func (req *getBlobLogsForNamespace) SetDefault() {
 //	@Description	Returns blob changes for namespace
 //	@Tags			namespace
 //	@ID				get-blob-logs
-//	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
-//	@Param			version	path	integer	true	"Version of namespace"
-//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"										mininum(1)
-//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
+//	@Param			id			path	string	true	"Namespace id in hexadecimal"					minlength(56)	maxlength(56)
+//	@Param			version		path	integer	true	"Version of namespace"
+//	@Param			limit		query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset		query	integer	false	"Offset"										mininum(1)
+//	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			sort_by	    query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
+//	@Param			commitment	query	string	false	"Commitment value in URLbase64 format"
+//	@Param			from		query	integer	false	"Time from in unix timestamp"					mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"						mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
@@ -460,6 +479,11 @@ func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 	}
 	req.SetDefault()
 
+	cm, err := req.getCommitment()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
 	namespaceId, err := hex.DecodeString(req.Id)
 	if err != nil {
 		return badRequestError(c, err)
@@ -470,15 +494,25 @@ func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 		return handleError(c, err, handler.namespace)
 	}
 
+	fltrs := storage.BlobLogFilters{
+		Limit:      int(req.Limit),
+		Offset:     int(req.Offset),
+		Sort:       pgSort(req.Sort),
+		SortBy:     req.SortBy,
+		Commitment: cm,
+	}
+
+	if req.From > 0 {
+		fltrs.From = time.Unix(req.From, 0).UTC()
+	}
+	if req.To > 0 {
+		fltrs.To = time.Unix(req.To, 0).UTC()
+	}
+
 	logs, err := handler.blobLogs.ByNamespace(
 		c.Request().Context(),
 		ns.Id,
-		storage.BlobLogFilters{
-			Limit:  int(req.Limit),
-			Offset: int(req.Offset),
-			Sort:   pgSort(req.Sort),
-			SortBy: req.SortBy,
-		},
+		fltrs,
 	)
 	if err != nil {
 		return handleError(c, err, handler.namespace)

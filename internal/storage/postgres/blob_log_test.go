@@ -44,6 +44,96 @@ func (s *StorageTestSuite) TestBlobLogsByNamespace() {
 	s.Require().EqualValues(4, log.Tx.Id)
 }
 
+func (s *StorageTestSuite) TestBlobLogsByNamespaceAndCommitment() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	logs, err := s.storage.BlobLogs.ByNamespace(ctx, 2, storage.BlobLogFilters{
+		Limit:      2,
+		Offset:     0,
+		Sort:       sdk.SortOrderAsc,
+		SortBy:     "size",
+		Commitment: "0CsLX630cjij9DR6nqoWfQcCH2pCQSoSuq63dTkd4Bw=",
+	})
+	s.Require().NoError(err)
+	s.Require().Len(logs, 1)
+
+	log := logs[0]
+	s.Require().EqualValues(3, log.Id)
+	s.Require().EqualValues(1000, log.Height)
+	s.Require().EqualValues("0CsLX630cjij9DR6nqoWfQcCH2pCQSoSuq63dTkd4Bw=", log.Commitment)
+	s.Require().EqualValues(12, log.Size)
+	s.Require().EqualValues(2, log.NamespaceId)
+	s.Require().EqualValues(2, log.SignerId)
+	s.Require().EqualValues(1, log.MsgId)
+	s.Require().EqualValues(2, log.TxId)
+
+	s.Require().NotNil(log.Signer)
+	s.Require().EqualValues("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", log.Signer.Address)
+
+	s.Require().NotNil(log.Tx)
+}
+
+func (s *StorageTestSuite) TestBlobLogsByNamespaceAndTime() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	logs, err := s.storage.BlobLogs.ByNamespace(ctx, 2, storage.BlobLogFilters{
+		Limit:  1,
+		Offset: 0,
+		Sort:   sdk.SortOrderAsc,
+		SortBy: "time",
+		From:   time.Date(2023, 7, 3, 11, 0, 0, 0, time.UTC),
+	})
+	s.Require().NoError(err)
+	s.Require().Len(logs, 1)
+
+	log := logs[0]
+	s.Require().EqualValues(3, log.Id)
+	s.Require().EqualValues(1000, log.Height)
+	s.Require().EqualValues("0CsLX630cjij9DR6nqoWfQcCH2pCQSoSuq63dTkd4Bw=", log.Commitment)
+	s.Require().EqualValues(12, log.Size)
+	s.Require().EqualValues(2, log.NamespaceId)
+	s.Require().EqualValues(2, log.SignerId)
+	s.Require().EqualValues(1, log.MsgId)
+	s.Require().EqualValues(2, log.TxId)
+
+	s.Require().NotNil(log.Signer)
+	s.Require().EqualValues("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", log.Signer.Address)
+
+	s.Require().NotNil(log.Tx)
+}
+
+func (s *StorageTestSuite) TestBlobLogsByNamespaceAndToTime() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	logs, err := s.storage.BlobLogs.ByNamespace(ctx, 2, storage.BlobLogFilters{
+		Limit:  1,
+		Offset: 0,
+		Sort:   sdk.SortOrderDesc,
+		SortBy: "time",
+		To:     time.Date(2023, 7, 4, 13, 0, 0, 0, time.UTC),
+	})
+	s.Require().NoError(err)
+	s.Require().Len(logs, 1)
+
+	log := logs[0]
+	s.Require().EqualValues(3, log.Id)
+	s.Require().EqualValues(1000, log.Height)
+	s.Require().EqualValues("0CsLX630cjij9DR6nqoWfQcCH2pCQSoSuq63dTkd4Bw=", log.Commitment)
+	s.Require().EqualValues(12, log.Size)
+	s.Require().EqualValues(2, log.NamespaceId)
+	s.Require().EqualValues(2, log.SignerId)
+	s.Require().EqualValues(1, log.MsgId)
+	s.Require().EqualValues(2, log.TxId)
+
+	s.Require().NotNil(log.Signer)
+	s.Require().EqualValues("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", log.Signer.Address)
+
+	s.Require().NotNil(log.Tx)
+}
+
 func (s *StorageTestSuite) TestBlobLogsSigner() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

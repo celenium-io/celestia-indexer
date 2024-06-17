@@ -5,6 +5,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -404,6 +405,14 @@ func (handler *BlockHandler) Blobs(c echo.Context) error {
 	}
 	req.SetDefault()
 
+	blockTime, err := handler.block.Time(c.Request().Context(), req.Height)
+	if err != nil {
+		if handler.block.IsNoRows(err) {
+			return returnArray(c, []any{})
+		}
+		return handleError(c, err, handler.block)
+	}
+
 	blobs, err := handler.blobLogs.ByHeight(
 		c.Request().Context(),
 		req.Height,
@@ -412,6 +421,9 @@ func (handler *BlockHandler) Blobs(c echo.Context) error {
 			Offset: int(req.Offset),
 			Sort:   pgSort(req.Sort),
 			SortBy: req.SortBy,
+			// using time filters to take certain partition
+			From: blockTime,
+			To:   blockTime.Add(time.Minute),
 		},
 	)
 	if err != nil {
@@ -469,12 +481,12 @@ func (handler *BlockHandler) BlockODS(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	b, err := handler.block.ByHeightWithStats(c.Request().Context(), req.Height)
+	blockStats, err := handler.blockStats.ByHeight(c.Request().Context(), req.Height)
 	if err != nil {
 		return handleError(c, err, handler.block)
 	}
 
-	if b.Stats.TxCount == 0 {
+	if blockStats.TxCount == 0 {
 		return c.JSON(http.StatusOK, responses.ODS{
 			Width: 0,
 			Items: make([]responses.ODSItem, 0),

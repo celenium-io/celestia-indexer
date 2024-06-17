@@ -444,6 +444,11 @@ func (s *BlockTestSuite) TestBlobs() {
 	c.SetParamNames("height")
 	c.SetParamValues("100")
 
+	s.blocks.EXPECT().
+		Time(gomock.Any(), pkgTypes.Level(100)).
+		Return(testBlock.Time, nil).
+		Times(1)
+
 	s.blobLogs.EXPECT().
 		ByHeight(gomock.Any(), pkgTypes.Level(100), gomock.Any()).
 		Return([]storage.BlobLog{
@@ -590,9 +595,9 @@ func (s *BlockTestSuite) TestBlockODS() {
 	c.SetParamNames("height")
 	c.SetParamValues("100")
 
-	s.blocks.EXPECT().
-		ByHeightWithStats(gomock.Any(), pkgTypes.Level(100)).
-		Return(testBlockWithStats, nil).
+	s.blockStats.EXPECT().
+		ByHeight(gomock.Any(), pkgTypes.Level(100)).
+		Return(testBlockStats, nil).
 		Times(1)
 
 	rawTxs := []string{

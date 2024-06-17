@@ -16,10 +16,13 @@ import (
 )
 
 type BlobLogFilters struct {
-	Limit  int
-	Offset int
-	Sort   sdk.SortOrder
-	SortBy string
+	Limit      int
+	Offset     int
+	Sort       sdk.SortOrder
+	SortBy     string
+	From       time.Time
+	To         time.Time
+	Commitment string
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
