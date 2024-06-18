@@ -182,7 +182,9 @@ func (r2 *R2) saveBlob(ctx context.Context, blob Blob) {
 	log.Info().Str("blob", blob.String()).Int("size", blob.Size()).Msg("saving blob...")
 	if err := r2.Save(timeoutCtx, blob); err != nil {
 		log.Err(err).Str("blob", blob.String()).Int("size", blob.Size()).Msg("blob saving")
-		// if error occurred try again
-		r2.pool.AddTask(blob)
+		go func() {
+			// if error occurred try again
+			r2.pool.AddTask(blob)
+		}()
 	}
 }
