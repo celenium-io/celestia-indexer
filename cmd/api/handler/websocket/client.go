@@ -162,7 +162,7 @@ func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Clie
 		case <-ctx.Done():
 			return
 		default:
-			if err := c.read(ctx, ws); err != nil {
+			if err := c.read(ws); err != nil {
 				timeoutErr, ok := err.(net.Error)
 
 				switch {
@@ -187,7 +187,7 @@ func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Clie
 	}
 }
 
-func (c *Client) read(ctx context.Context, ws *websocket.Conn) error {
+func (c *Client) read(ws *websocket.Conn) error {
 	var msg Message
 	if err := ws.ReadJSON(&msg); err != nil {
 		return err
@@ -195,15 +195,15 @@ func (c *Client) read(ctx context.Context, ws *websocket.Conn) error {
 
 	switch msg.Method {
 	case MethodSubscribe:
-		return c.handleSubscribeMessage(ctx, msg)
+		return c.handleSubscribeMessage(msg)
 	case MethodUnsubscribe:
-		return c.handleUnsubscribeMessage(ctx, msg)
+		return c.handleUnsubscribeMessage(msg)
 	default:
 		return errors.Wrap(ErrUnknownMethod, msg.Method)
 	}
 }
 
-func (c *Client) handleSubscribeMessage(ctx context.Context, msg Message) error {
+func (c *Client) handleSubscribeMessage(msg Message) error {
 	var subscribeMsg Subscribe
 	if err := json.Unmarshal(msg.Body, &subscribeMsg); err != nil {
 		return err
@@ -217,7 +217,7 @@ func (c *Client) handleSubscribeMessage(ctx context.Context, msg Message) error 
 	return nil
 }
 
-func (c *Client) handleUnsubscribeMessage(ctx context.Context, msg Message) error {
+func (c *Client) handleUnsubscribeMessage(msg Message) error {
 	var unsubscribeMsg Unsubscribe
 	if err := json.Unmarshal(msg.Body, &unsubscribeMsg); err != nil {
 		return err

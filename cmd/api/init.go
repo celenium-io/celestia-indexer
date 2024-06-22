@@ -5,6 +5,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -33,10 +34,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.opentelemetry.io/otel"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"golang.org/x/time/rate"
+
+	"github.com/MarceloPetrucio/go-scalar-api-reference"
 )
 
 func init() {
@@ -306,8 +308,6 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			heightGroup.GET("/events", blockHandlers.GetEvents)
 			heightGroup.GET("/messages", blockHandlers.GetMessages)
 			heightGroup.GET("/stats", blockHandlers.GetStats)
-			heightGroup.GET("/namespace", blockHandlers.GetNamespaces)
-			heightGroup.GET("/namespace/count", blockHandlers.GetNamespacesCount)
 			heightGroup.GET("/blobs", blockHandlers.Blobs)
 			heightGroup.GET("/blobs/count", blockHandlers.BlobsCount)
 			heightGroup.GET("/ods", blockHandlers.BlockODS)
@@ -325,8 +325,6 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			hashGroup.GET("", txHandlers.Get)
 			hashGroup.GET("/events", txHandlers.GetEvents)
 			hashGroup.GET("/messages", txHandlers.GetMessages)
-			hashGroup.GET("/namespace", txHandlers.Namespaces)
-			hashGroup.GET("/namespace/count", txHandlers.NamespacesCount)
 			hashGroup.GET("/blobs", txHandlers.Blobs)
 			hashGroup.GET("/blobs/count", txHandlers.BlobsCount)
 		}
@@ -382,7 +380,6 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	stats := v1.Group("/stats")
 	{
 		stats.GET("/summary/:table/:function", statsHandler.Summary)
-		stats.GET("/histogram/:table/:function/:timeframe", statsHandler.Histogram)
 		stats.GET("/tps", statsHandler.TPS)
 		stats.GET("/tx_count_24h", statsHandler.TxCountHourly24h)
 
@@ -424,7 +421,35 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		v1.GET("/metrics", echoprometheus.NewHandler())
 	}
 
-	v1.GET("/swagger/*", echoSwagger.WrapHandler)
+	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
+		SpecURL: "./docs/swagger.json",
+		CustomOptions: scalar.CustomOptions{
+			PageTitle: "Celenium API",
+		},
+		DarkMode:    true,
+		ShowSidebar: true,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	v1.GET("/docs", func(c echo.Context) error {
+		return c.HTML(http.StatusOK, htmlContent)
+	})
+
+	f, err := os.Open("./docs/swagger.json")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	docsJson, err := io.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
+	v1.GET("/swagger/doc.json", func(c echo.Context) error {
+		return c.Blob(http.StatusOK, "application/json", docsJson)
+	})
 
 	if cfg.ApiConfig.Websocket {
 		initWebsocket(ctx, v1)

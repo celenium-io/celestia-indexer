@@ -60,56 +60,6 @@ func (s Stats) Summary(ctx context.Context, req storage.SummaryRequest) (string,
 	return value, err
 }
 
-func (s Stats) HistogramCount(ctx context.Context, req storage.HistogramCountRequest) (response []storage.HistogramItem, err error) {
-	if err := req.Validate(); err != nil {
-		return nil, err
-	}
-	query := s.db.DB().NewSelect().Table(req.Table).
-		ColumnExpr(`COUNT(*) as value`).
-		Group("bucket").
-		Order("bucket desc")
-
-	query, err = timeframeScope(query, req.Timeframe)
-	if err != nil {
-		return
-	}
-
-	if req.From > 0 {
-		query = query.Where("time >= to_timestamp(?)", req.From)
-	}
-	if req.To > 0 {
-		query = query.Where("time < to_timestamp(?)", req.To)
-	}
-
-	err = query.Scan(ctx, &response)
-	return
-}
-
-func (s Stats) Histogram(ctx context.Context, req storage.HistogramRequest) (response []storage.HistogramItem, err error) {
-	if err := req.Validate(); err != nil {
-		return nil, err
-	}
-	query := s.db.DB().NewSelect().Table(req.Table).
-		ColumnExpr(`? (?) as value`, bun.Safe(req.Function), bun.Safe(req.Column)).
-		Group("bucket").
-		Order("bucket desc")
-
-	query, err = timeframeScope(query, req.Timeframe)
-	if err != nil {
-		return
-	}
-
-	if req.From > 0 {
-		query = query.Where("time >= to_timestamp(?)", req.From)
-	}
-	if req.To > 0 {
-		query = query.Where("time < to_timestamp(?)", req.To)
-	}
-
-	err = query.Scan(ctx, &response)
-	return
-}
-
 func (s Stats) TPS(ctx context.Context) (response storage.TPS, err error) {
 	if err = s.db.DB().NewSelect().Table(storage.ViewBlockStatsByHour).
 		ColumnExpr("max(tps) as high, min(tps) as low").

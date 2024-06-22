@@ -38,7 +38,7 @@ type getVestingPeriodsRequest struct {
 //	@Success		200	{object}	responses.VestingPeriod
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/vesting/{id}/periods [get]
+//	@Router			/vesting/{id}/periods [get]
 func (handler *VestingHandler) Periods(c echo.Context) error {
 	req, err := bindAndValidate[getVestingPeriodsRequest](c)
 	if err != nil {

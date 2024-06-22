@@ -109,18 +109,6 @@ func (p *addressTxRequest) SetDefault() {
 	}
 }
 
-type namespacesByHeightRequest struct {
-	Limit  uint64         `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset uint64         `query:"offset" validate:"omitempty,min=0"`
-	Height pkgTypes.Level `param:"height" validate:"required,min=1"`
-}
-
-func (p *namespacesByHeightRequest) SetDefault() {
-	if p.Limit == 0 {
-		p.Limit = 10
-	}
-}
-
 type listMessageByBlockRequest struct {
 	Height          pkgTypes.Level `param:"height"            validate:"required,min=1"`
 	Limit           uint64         `query:"limit"             validate:"omitempty,min=1,max=100"`
@@ -148,18 +136,6 @@ func (p *namespaceList) SetDefault() {
 	}
 	if p.Sort == "" {
 		p.Sort = desc
-	}
-}
-
-type listForTx struct {
-	Hash   string `param:"hash"   validate:"required,hexadecimal,len=64"`
-	Limit  uint64 `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset uint64 `query:"offset" validate:"omitempty,min=0"`
-}
-
-func (p *listForTx) SetDefault() {
-	if p.Limit == 0 {
-		p.Limit = 10
 	}
 }
 

@@ -39,7 +39,7 @@ func NewConstantHandler(
 //	@Success		200	{object}	responses.Constants
 //	@Success		204
 //	@Failure		500	{object}	Error
-//	@Router			/v1/constants [get]
+//	@Router			/constants [get]
 func (handler *ConstantHandler) Get(c echo.Context) error {
 	consts, err := handler.constants.All(c.Request().Context())
 	if err != nil {
@@ -60,7 +60,7 @@ func (handler *ConstantHandler) Get(c echo.Context) error {
 //	@ID				get-enums
 //	@Produce		json
 //	@Success		200	{object}	responses.Enums
-//	@Router			/v1/enums [get]
+//	@Router			/enums [get]
 func (handler *ConstantHandler) Enums(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.NewEnums())
 }

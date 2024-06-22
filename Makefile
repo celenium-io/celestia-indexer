@@ -43,7 +43,7 @@ generate:
 	go generate -v ./internal/blob ./internal/storage ./internal/storage/types ./pkg/node ./internal/binance
 
 api-docs:
-	cd cmd/api && swag init --md markdown -parseDependency --parseInternal --parseDepth 1
+	cd cmd/api && swag init --md markdown -parseDependency --parseInternal --parseDepth 1 --outputTypes json
 
 ## Generate all code and docs
 ga:

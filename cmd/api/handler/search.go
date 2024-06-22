@@ -69,7 +69,7 @@ var (
 //	@Success				204
 //	@Failure				400	{object}	Error
 //	@Failure				500	{object}	Error
-//	@Router					/v1/search [get]
+//	@Router					/search [get]
 func (handler SearchHandler) Search(c echo.Context) error {
 	req, err := bindAndValidate[searchRequest](c)
 	if err != nil {

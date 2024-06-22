@@ -16,7 +16,6 @@ import (
 	reflect "reflect"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
-	types "github.com/celenium-io/celestia-indexer/pkg/types"
 	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -118,84 +117,6 @@ func (c *INamespaceByNamespaceIdAndVersionCall) Do(f func(context.Context, []byt
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *INamespaceByNamespaceIdAndVersionCall) DoAndReturn(f func(context.Context, []byte, byte) (storage.Namespace, error)) *INamespaceByNamespaceIdAndVersionCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// CountMessagesByHeight mocks base method.
-func (m *MockINamespace) CountMessagesByHeight(ctx context.Context, height types.Level) (int, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CountMessagesByHeight", ctx, height)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CountMessagesByHeight indicates an expected call of CountMessagesByHeight.
-func (mr *MockINamespaceMockRecorder) CountMessagesByHeight(ctx, height any) *INamespaceCountMessagesByHeightCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountMessagesByHeight", reflect.TypeOf((*MockINamespace)(nil).CountMessagesByHeight), ctx, height)
-	return &INamespaceCountMessagesByHeightCall{Call: call}
-}
-
-// INamespaceCountMessagesByHeightCall wrap *gomock.Call
-type INamespaceCountMessagesByHeightCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *INamespaceCountMessagesByHeightCall) Return(arg0 int, arg1 error) *INamespaceCountMessagesByHeightCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *INamespaceCountMessagesByHeightCall) Do(f func(context.Context, types.Level) (int, error)) *INamespaceCountMessagesByHeightCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceCountMessagesByHeightCall) DoAndReturn(f func(context.Context, types.Level) (int, error)) *INamespaceCountMessagesByHeightCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// CountMessagesByTxId mocks base method.
-func (m *MockINamespace) CountMessagesByTxId(ctx context.Context, txId uint64) (int, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CountMessagesByTxId", ctx, txId)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CountMessagesByTxId indicates an expected call of CountMessagesByTxId.
-func (mr *MockINamespaceMockRecorder) CountMessagesByTxId(ctx, txId any) *INamespaceCountMessagesByTxIdCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountMessagesByTxId", reflect.TypeOf((*MockINamespace)(nil).CountMessagesByTxId), ctx, txId)
-	return &INamespaceCountMessagesByTxIdCall{Call: call}
-}
-
-// INamespaceCountMessagesByTxIdCall wrap *gomock.Call
-type INamespaceCountMessagesByTxIdCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *INamespaceCountMessagesByTxIdCall) Return(arg0 int, arg1 error) *INamespaceCountMessagesByTxIdCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *INamespaceCountMessagesByTxIdCall) Do(f func(context.Context, uint64) (int, error)) *INamespaceCountMessagesByTxIdCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceCountMessagesByTxIdCall) DoAndReturn(f func(context.Context, uint64) (int, error)) *INamespaceCountMessagesByTxIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -512,84 +433,6 @@ func (c *INamespaceMessagesCall) Do(f func(context.Context, uint64, int, int) ([
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *INamespaceMessagesCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// MessagesByHeight mocks base method.
-func (m *MockINamespace) MessagesByHeight(ctx context.Context, height types.Level, limit, offset int) ([]storage.NamespaceMessage, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MessagesByHeight", ctx, height, limit, offset)
-	ret0, _ := ret[0].([]storage.NamespaceMessage)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// MessagesByHeight indicates an expected call of MessagesByHeight.
-func (mr *MockINamespaceMockRecorder) MessagesByHeight(ctx, height, limit, offset any) *INamespaceMessagesByHeightCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagesByHeight", reflect.TypeOf((*MockINamespace)(nil).MessagesByHeight), ctx, height, limit, offset)
-	return &INamespaceMessagesByHeightCall{Call: call}
-}
-
-// INamespaceMessagesByHeightCall wrap *gomock.Call
-type INamespaceMessagesByHeightCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *INamespaceMessagesByHeightCall) Return(arg0 []storage.NamespaceMessage, arg1 error) *INamespaceMessagesByHeightCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *INamespaceMessagesByHeightCall) Do(f func(context.Context, types.Level, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesByHeightCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceMessagesByHeightCall) DoAndReturn(f func(context.Context, types.Level, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesByHeightCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// MessagesByTxId mocks base method.
-func (m *MockINamespace) MessagesByTxId(ctx context.Context, txId uint64, limit, offset int) ([]storage.NamespaceMessage, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MessagesByTxId", ctx, txId, limit, offset)
-	ret0, _ := ret[0].([]storage.NamespaceMessage)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// MessagesByTxId indicates an expected call of MessagesByTxId.
-func (mr *MockINamespaceMockRecorder) MessagesByTxId(ctx, txId, limit, offset any) *INamespaceMessagesByTxIdCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagesByTxId", reflect.TypeOf((*MockINamespace)(nil).MessagesByTxId), ctx, txId, limit, offset)
-	return &INamespaceMessagesByTxIdCall{Call: call}
-}
-
-// INamespaceMessagesByTxIdCall wrap *gomock.Call
-type INamespaceMessagesByTxIdCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *INamespaceMessagesByTxIdCall) Return(arg0 []storage.NamespaceMessage, arg1 error) *INamespaceMessagesByTxIdCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *INamespaceMessagesByTxIdCall) Do(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesByTxIdCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceMessagesByTxIdCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesByTxIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

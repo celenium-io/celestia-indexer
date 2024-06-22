@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -24,11 +23,7 @@ type INamespace interface {
 	ByNamespaceId(ctx context.Context, namespaceId []byte) ([]Namespace, error)
 	ByNamespaceIdAndVersion(ctx context.Context, namespaceId []byte, version byte) (Namespace, error)
 	Messages(ctx context.Context, id uint64, limit, offset int) ([]NamespaceMessage, error)
-	MessagesByHeight(ctx context.Context, height pkgTypes.Level, limit, offset int) ([]NamespaceMessage, error)
-	CountMessagesByHeight(ctx context.Context, height pkgTypes.Level) (int, error)
 	ListWithSort(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) (ns []Namespace, err error)
-	MessagesByTxId(ctx context.Context, txId uint64, limit, offset int) ([]NamespaceMessage, error)
-	CountMessagesByTxId(ctx context.Context, txId uint64) (int, error)
 	GetByIds(ctx context.Context, ids ...uint64) (ns []Namespace, err error)
 }
 

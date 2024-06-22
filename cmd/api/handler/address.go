@@ -72,7 +72,7 @@ type getAddressRequest struct {
 //	@Success		204
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/{hash} [get]
+//	@Router			/address/{hash} [get]
 func (handler *AddressHandler) Get(c echo.Context) error {
 	req, err := bindAndValidate[getAddressRequest](c)
 	if err != nil {
@@ -122,7 +122,7 @@ func (p *addressListRequest) SetDefault() {
 //	@Success		200	{array}		responses.Address
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address [get]
+//	@Router			/address [get]
 func (handler *AddressHandler) List(c echo.Context) error {
 	req, err := bindAndValidate[addressListRequest](c)
 	if err != nil {
@@ -169,7 +169,7 @@ func (handler *AddressHandler) List(c echo.Context) error {
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/{hash}/txs [get]
+//	@Router			/address/{hash}/txs [get]
 func (handler *AddressHandler) Transactions(c echo.Context) error {
 	req, err := bindAndValidate[addressTxRequest](c)
 	if err != nil {
@@ -260,7 +260,7 @@ func (p *getAddressMessages) ToFilters() storage.AddressMsgsFilter {
 //	@Success		200	{array}		responses.MessageForAddress
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/{hash}/messages [get]
+//	@Router			/address/{hash}/messages [get]
 func (handler *AddressHandler) Messages(c echo.Context) error {
 	req, err := bindAndValidate[getAddressMessages](c)
 	if err != nil {
@@ -325,7 +325,7 @@ func (req *getBlobLogsForAddress) SetDefault() {
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/{hash}/blobs [get]
+//	@Router			/address/{hash}/blobs [get]
 func (handler *AddressHandler) Blobs(c echo.Context) error {
 	req, err := bindAndValidate[getBlobLogsForAddress](c)
 	if err != nil {
@@ -374,7 +374,7 @@ func (handler *AddressHandler) Blobs(c echo.Context) error {
 //	@Produce		json
 //	@Success		200	{integer}	uint64
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/count [get]
+//	@Router			/address/count [get]
 func (handler *AddressHandler) Count(c echo.Context) error {
 	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
 	if err != nil {
@@ -410,7 +410,7 @@ func (req *getAddressDelegations) SetDefault() {
 //	@Success		200	{array}		responses.Delegation
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/{hash}/delegations [get]
+//	@Router			/address/{hash}/delegations [get]
 func (handler *AddressHandler) Delegations(c echo.Context) error {
 	req, err := bindAndValidate[getAddressDelegations](c)
 	if err != nil {
@@ -472,7 +472,7 @@ func (req *getAddressPageable) SetDefault() {
 //	@Success		200	{array}		responses.Undelegation
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/{hash}/undelegations [get]
+//	@Router			/address/{hash}/undelegations [get]
 func (handler *AddressHandler) Undelegations(c echo.Context) error {
 	req, err := bindAndValidate[getAddressPageable](c)
 	if err != nil {
@@ -521,7 +521,7 @@ func (handler *AddressHandler) Undelegations(c echo.Context) error {
 //	@Success		200	{array}		responses.Redelegation
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/{hash}/redelegations [get]
+//	@Router			/address/{hash}/redelegations [get]
 func (handler *AddressHandler) Redelegations(c echo.Context) error {
 	req, err := bindAndValidate[getAddressPageable](c)
 	if err != nil {
@@ -584,7 +584,7 @@ func (req *getAddressVestings) SetDefault() {
 //	@Success		200	{array}		responses.Vesting
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/{hash}/vesting [get]
+//	@Router			/address/{hash}/vesting [get]
 func (handler *AddressHandler) Vestings(c echo.Context) error {
 	req, err := bindAndValidate[getAddressVestings](c)
 	if err != nil {
@@ -634,7 +634,7 @@ func (handler *AddressHandler) Vestings(c echo.Context) error {
 //	@Success		200	{array}		responses.Grant
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/{hash}/grants [get]
+//	@Router			/address/{hash}/grants [get]
 func (handler *AddressHandler) Grants(c echo.Context) error {
 	req, err := bindAndValidate[getAddressPageable](c)
 	if err != nil {
@@ -682,7 +682,7 @@ func (handler *AddressHandler) Grants(c echo.Context) error {
 //	@Success		200	{array}		responses.Grant
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/{hash}/granters [get]
+//	@Router			/address/{hash}/granters [get]
 func (handler *AddressHandler) Grantee(c echo.Context) error {
 	req, err := bindAndValidate[getAddressPageable](c)
 	if err != nil {
@@ -740,7 +740,7 @@ type addressStatsRequest struct {
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/address/{hash}/stats/{name}/{timeframe} [get]
+//	@Router			/address/{hash}/stats/{name}/{timeframe} [get]
 func (handler *AddressHandler) Stats(c echo.Context) error {
 	req, err := bindAndValidate[addressStatsRequest](c)
 	if err != nil {
