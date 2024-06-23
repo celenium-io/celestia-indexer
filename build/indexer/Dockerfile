@@ -8,7 +8,6 @@ ENV GO111MODULE=on
 ENV GOOS=linux
 
 RUN apk --no-cache add ca-certificates
-RUN apk add --update git musl-dev gcc build-base
 
 RUN mkdir -p $GOPATH/src/github.com/celenium-io/celestia-indexer/
 
