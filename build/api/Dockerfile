@@ -8,7 +8,6 @@ ENV GO111MODULE=on
 ENV GOOS=linux
 
 RUN apk --no-cache add ca-certificates
-RUN apk add --update git
 
 RUN mkdir -p $GOPATH/src/github.com/celenium-io/celestia-indexer/
 
@@ -34,5 +33,6 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /go/bin/api /go/bin/api
 COPY ./configs/dipdup.yml ./
 COPY database database
+COPY cmd/api/docs docs
 
 ENTRYPOINT ["/go/bin/api", "-c", "dipdup.yml"]
