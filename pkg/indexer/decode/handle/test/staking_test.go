@@ -259,6 +259,11 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 		},
 	}
 
+	data := structs.Map(m)
+	data["Pubkey"] = map[string]any{
+		"key":  pk.PubKey().Bytes(),
+		"type": "ed25519",
+	}
 	msgExpected := storage.Message{
 		Id:        0,
 		Height:    blob.Height,
@@ -266,7 +271,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgCreateValidator,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      data,
 		Size:      201,
 		Namespace: nil,
 		Addresses: addressesExpected,

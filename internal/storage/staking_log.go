@@ -4,7 +4,6 @@
 package storage
 
 import (
-	"context"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -17,8 +16,6 @@ import (
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IStakingLog interface {
 	storage.Table[*StakingLog]
-
-	ByValidator(ctx context.Context, validatorId uint64, limit, offset int) ([]StakingLog, error)
 }
 
 // Delegation -

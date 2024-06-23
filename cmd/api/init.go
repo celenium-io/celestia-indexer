@@ -507,7 +507,7 @@ func initSentry(e *echo.Echo, db postgres.Storage, dsn, environment string) erro
 		Environment:        environment,
 		EnableTracing:      true,
 		TracesSampleRate:   1.0,
-		ProfilesSampleRate: 1.0,
+		ProfilesSampleRate: 0.25,
 		Release:            os.Getenv("TAG"),
 		IgnoreTransactions: []string{
 			"GET /v1/ws",

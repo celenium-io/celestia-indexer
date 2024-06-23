@@ -43,45 +43,6 @@ func (m *MockIStakingLog) EXPECT() *MockIStakingLogMockRecorder {
 	return m.recorder
 }
 
-// ByValidator mocks base method.
-func (m *MockIStakingLog) ByValidator(ctx context.Context, validatorId uint64, limit, offset int) ([]storage.StakingLog, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ByValidator", ctx, validatorId, limit, offset)
-	ret0, _ := ret[0].([]storage.StakingLog)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ByValidator indicates an expected call of ByValidator.
-func (mr *MockIStakingLogMockRecorder) ByValidator(ctx, validatorId, limit, offset any) *IStakingLogByValidatorCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByValidator", reflect.TypeOf((*MockIStakingLog)(nil).ByValidator), ctx, validatorId, limit, offset)
-	return &IStakingLogByValidatorCall{Call: call}
-}
-
-// IStakingLogByValidatorCall wrap *gomock.Call
-type IStakingLogByValidatorCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *IStakingLogByValidatorCall) Return(arg0 []storage.StakingLog, arg1 error) *IStakingLogByValidatorCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *IStakingLogByValidatorCall) Do(f func(context.Context, uint64, int, int) ([]storage.StakingLog, error)) *IStakingLogByValidatorCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStakingLogByValidatorCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.StakingLog, error)) *IStakingLogByValidatorCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // CursorList mocks base method.
 func (m *MockIStakingLog) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.StakingLog, error) {
 	m.ctrl.T.Helper()
