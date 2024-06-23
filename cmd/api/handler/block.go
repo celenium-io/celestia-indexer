@@ -78,7 +78,7 @@ type getBlockRequest struct {
 //	@Success		204
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/block/{height} [get]
+//	@Router			/block/{height} [get]
 func (handler *BlockHandler) Get(c echo.Context) error {
 	req, err := bindAndValidate[getBlockRequest](c)
 	if err != nil {
@@ -129,7 +129,7 @@ func (p *blockListRequest) SetDefault() {
 //	@Success		200	{array}		responses.Block
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/block [get]
+//	@Router			/block [get]
 func (handler *BlockHandler) List(c echo.Context) error {
 	req, err := bindAndValidate[blockListRequest](c)
 	if err != nil {
@@ -181,7 +181,7 @@ func (p *getBlockEvents) SetDefault() {
 //	@Success		200	{array}		responses.Event
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/block/{height}/events [get]
+//	@Router			/block/{height}/events [get]
 func (handler *BlockHandler) GetEvents(c echo.Context) error {
 	req, err := bindAndValidate[getBlockEvents](c)
 	if err != nil {
@@ -227,7 +227,7 @@ func (handler *BlockHandler) GetEvents(c echo.Context) error {
 //	@Success		200	{object}	responses.BlockStats
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/block/{height}/stats [get]
+//	@Router			/block/{height}/stats [get]
 func (handler *BlockHandler) GetStats(c echo.Context) error {
 	req, err := bindAndValidate[getBlockByHeightRequest](c)
 	if err != nil {
@@ -241,68 +241,6 @@ func (handler *BlockHandler) GetStats(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.NewBlockStats(stats))
 }
 
-// GetNamespaces godoc
-//
-//	@Summary		Get namespaces affected in the block
-//	@Description	Get namespaces affected in the block
-//	@Tags			block
-//	@ID				get-block-namespaces
-//	@Param			height	path	integer	true	"Block height"					minimum(1)
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
-//	@Produce		json
-//	@Success		200	{array}		responses.NamespaceMessage
-//	@Failure		400	{object}	Error
-//	@Failure		500	{object}	Error
-//	@Router			/v1/block/{height}/namespace [get]
-func (handler *BlockHandler) GetNamespaces(c echo.Context) error {
-	req, err := bindAndValidate[namespacesByHeightRequest](c)
-	if err != nil {
-		return badRequestError(c, err)
-	}
-	req.SetDefault()
-
-	messages, err := handler.namespace.MessagesByHeight(c.Request().Context(), req.Height, int(req.Limit), int(req.Offset))
-	if err != nil {
-		return handleError(c, err, handler.block)
-	}
-	response := make([]responses.NamespaceMessage, len(messages))
-	for i := range response {
-		msg, err := responses.NewNamespaceMessage(messages[i])
-		if err != nil {
-			return handleError(c, err, handler.block)
-		}
-		response[i] = msg
-	}
-
-	return c.JSON(http.StatusOK, response)
-}
-
-// GetNamespacesCount godoc
-//
-//	@Summary		Get count of affected in the block namespaces
-//	@Description	Get count of affected in the block namespaces
-//	@Tags			block
-//	@ID				get-block-namespaces-count
-//	@Param			height	path	integer	true	"Block height"	minimum(1)
-//	@Produce		json
-//	@Success		200	{integer}	uint64
-//	@Failure		500	{object}	Error
-//	@Router			/v1/block/{height}/namespace/count [get]
-func (handler *BlockHandler) GetNamespacesCount(c echo.Context) error {
-	req, err := bindAndValidate[getBlockByHeightRequest](c)
-	if err != nil {
-		return badRequestError(c, err)
-	}
-
-	count, err := handler.namespace.CountMessagesByHeight(c.Request().Context(), req.Height)
-	if err != nil {
-		return handleError(c, err, handler.block)
-	}
-
-	return c.JSON(http.StatusOK, count)
-}
-
 // Count godoc
 //
 //	@Summary		Get count of blocks in network
@@ -312,7 +250,7 @@ func (handler *BlockHandler) GetNamespacesCount(c echo.Context) error {
 //	@Produce		json
 //	@Success		200	{integer}	uint64
 //	@Failure		500	{object}	Error
-//	@Router			/v1/block/count [get]
+//	@Router			/block/count [get]
 func (handler *BlockHandler) Count(c echo.Context) error {
 	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
 	if err != nil {
@@ -336,7 +274,7 @@ func (handler *BlockHandler) Count(c echo.Context) error {
 //	@Success		200	{array}		responses.Message
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/block/{height}/messages [get]
+//	@Router			/block/{height}/messages [get]
 func (handler *BlockHandler) GetMessages(c echo.Context) error {
 	req, err := bindAndValidate[listMessageByBlockRequest](c)
 	if err != nil {
@@ -397,7 +335,7 @@ func (req *getBlobsForBlock) SetDefault() {
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/block/{height}/blobs [get]
+//	@Router			/block/{height}/blobs [get]
 func (handler *BlockHandler) Blobs(c echo.Context) error {
 	req, err := bindAndValidate[getBlobsForBlock](c)
 	if err != nil {
@@ -448,7 +386,7 @@ func (handler *BlockHandler) Blobs(c echo.Context) error {
 //	@Success		200	{integer}	uint64
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/block/{height}/blobs/count [get]
+//	@Router			/block/{height}/blobs/count [get]
 func (handler *BlockHandler) BlobsCount(c echo.Context) error {
 	req, err := bindAndValidate[getBlockByHeightRequest](c)
 	if err != nil {
@@ -471,10 +409,11 @@ func (handler *BlockHandler) BlobsCount(c echo.Context) error {
 //	@ID				block-ods
 //	@Param			height	path	integer	true	"Block height"	minimum(1)
 //	@Produce		json
+//	@x-internal		true
 //	@Success		200	{object}	responses.ODS
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/block/{height}/ods [get]
+//	@Router			/block/{height}/ods [get]
 func (handler *BlockHandler) BlockODS(c echo.Context) error {
 	req, err := bindAndValidate[getBlockByHeightRequest](c)
 	if err != nil {

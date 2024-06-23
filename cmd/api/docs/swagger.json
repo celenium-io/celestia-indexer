@@ -2,13 +2,14 @@
     "swagger": "2.0",
     "info": {
         "description": "This is docs of Celenium API.",
-        "title": "Swagger Celenium API",
+        "title": "Celenium API",
         "contact": {},
         "version": "1.0"
     },
     "host": "api.celenium.io",
+    "basePath": "/v1",
     "paths": {
-        "/v1/address": {
+        "/address": {
             "get": {
                 "description": "List address info",
                 "produces": [
@@ -81,7 +82,7 @@
                 }
             }
         },
-        "/v1/address/count": {
+        "/address/count": {
             "get": {
                 "description": "Get count of addresses in network",
                 "produces": [
@@ -108,7 +109,7 @@
                 }
             }
         },
-        "/v1/address/{hash}": {
+        "/address/{hash}": {
             "get": {
                 "description": "Get address info",
                 "produces": [
@@ -155,7 +156,7 @@
                 }
             }
         },
-        "/v1/address/{hash}/blobs": {
+        "/address/{hash}/blobs": {
             "get": {
                 "description": "Get blobs pushed by address",
                 "produces": [
@@ -237,7 +238,7 @@
                 }
             }
         },
-        "/v1/address/{hash}/delegations": {
+        "/address/{hash}/delegations": {
             "get": {
                 "description": "Get delegations made by address",
                 "produces": [
@@ -305,7 +306,7 @@
                 }
             }
         },
-        "/v1/address/{hash}/granters": {
+        "/address/{hash}/granters": {
             "get": {
                 "description": "Get grants where address is grantee",
                 "produces": [
@@ -367,7 +368,7 @@
                 }
             }
         },
-        "/v1/address/{hash}/grants": {
+        "/address/{hash}/grants": {
             "get": {
                 "description": "Get grants made by address",
                 "produces": [
@@ -429,7 +430,7 @@
                 }
             }
         },
-        "/v1/address/{hash}/messages": {
+        "/address/{hash}/messages": {
             "get": {
                 "description": "Get address messages",
                 "produces": [
@@ -583,7 +584,7 @@
                 }
             }
         },
-        "/v1/address/{hash}/redelegations": {
+        "/address/{hash}/redelegations": {
             "get": {
                 "description": "Get redelegations made by address",
                 "produces": [
@@ -645,7 +646,7 @@
                 }
             }
         },
-        "/v1/address/{hash}/stats/{name}/{timeframe}": {
+        "/address/{hash}/stats/{name}/{timeframe}": {
             "get": {
                 "description": "Get address stats",
                 "produces": [
@@ -729,7 +730,7 @@
                 }
             }
         },
-        "/v1/address/{hash}/txs": {
+        "/address/{hash}/txs": {
             "get": {
                 "description": "Get address transactions",
                 "produces": [
@@ -914,7 +915,7 @@
                 }
             }
         },
-        "/v1/address/{hash}/undelegations": {
+        "/address/{hash}/undelegations": {
             "get": {
                 "description": "Get undelegations made by address",
                 "produces": [
@@ -976,7 +977,7 @@
                 }
             }
         },
-        "/v1/address/{hash}/vesting": {
+        "/address/{hash}/vesting": {
             "get": {
                 "description": "Get vesting for address",
                 "produces": [
@@ -1044,7 +1045,7 @@
                 }
             }
         },
-        "/v1/blob": {
+        "/blob": {
             "post": {
                 "description": "Returns blob",
                 "consumes": [
@@ -1104,7 +1105,7 @@
                 }
             }
         },
-        "/v1/blob/metadata": {
+        "/blob/metadata": {
             "post": {
                 "description": "Returns blob metadata",
                 "consumes": [
@@ -1164,7 +1165,7 @@
                 }
             }
         },
-        "/v1/block": {
+        "/block": {
             "get": {
                 "description": "List blocks info",
                 "produces": [
@@ -1231,7 +1232,7 @@
                 }
             }
         },
-        "/v1/block/count": {
+        "/block/count": {
             "get": {
                 "description": "Get count of blocks in network",
                 "produces": [
@@ -1258,7 +1259,7 @@
                 }
             }
         },
-        "/v1/block/{height}": {
+        "/block/{height}": {
             "get": {
                 "description": "Get block info",
                 "produces": [
@@ -1310,7 +1311,7 @@
                 }
             }
         },
-        "/v1/block/{height}/blobs": {
+        "/block/{height}/blobs": {
             "get": {
                 "description": "List blobs which was pushed in the block",
                 "produces": [
@@ -1389,7 +1390,7 @@
                 }
             }
         },
-        "/v1/block/{height}/blobs/count": {
+        "/block/{height}/blobs/count": {
             "get": {
                 "description": "Count of blobs which was pushed by transaction",
                 "produces": [
@@ -1432,7 +1433,7 @@
                 }
             }
         },
-        "/v1/block/{height}/events": {
+        "/block/{height}/events": {
             "get": {
                 "description": "Get events from begin and end of block",
                 "produces": [
@@ -1491,7 +1492,7 @@
                 }
             }
         },
-        "/v1/block/{height}/messages": {
+        "/block/{height}/messages": {
             "get": {
                 "description": "Get messages contained in the block",
                 "produces": [
@@ -1714,103 +1715,7 @@
                 }
             }
         },
-        "/v1/block/{height}/namespace": {
-            "get": {
-                "description": "Get namespaces affected in the block",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "block"
-                ],
-                "summary": "Get namespaces affected in the block",
-                "operationId": "get-block-namespaces",
-                "parameters": [
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "Block height",
-                        "name": "height",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "maximum": 100,
-                        "type": "integer",
-                        "description": "Count of requested entities",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Offset",
-                        "name": "offset",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/responses.NamespaceMessage"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/block/{height}/namespace/count": {
-            "get": {
-                "description": "Get count of affected in the block namespaces",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "block"
-                ],
-                "summary": "Get count of affected in the block namespaces",
-                "operationId": "get-block-namespaces-count",
-                "parameters": [
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "Block height",
-                        "name": "height",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/block/{height}/ods": {
+        "/block/{height}/ods": {
             "get": {
                 "description": "ODS for block",
                 "produces": [
@@ -1850,10 +1755,11 @@
                             "$ref": "#/definitions/handler.Error"
                         }
                     }
-                }
+                },
+                "x-internal": true
             }
         },
-        "/v1/block/{height}/stats": {
+        "/block/{height}/stats": {
             "get": {
                 "description": "Get block stats by height",
                 "produces": [
@@ -1896,7 +1802,7 @@
                 }
             }
         },
-        "/v1/constants": {
+        "/constants": {
             "get": {
                 "description": "Get network constants",
                 "produces": [
@@ -1926,7 +1832,7 @@
                 }
             }
         },
-        "/v1/enums": {
+        "/enums": {
             "get": {
                 "description": "Get celenium enumerators",
                 "produces": [
@@ -1947,7 +1853,7 @@
                 }
             }
         },
-        "/v1/gas/estimate_for_pfb": {
+        "/gas/estimate_for_pfb": {
             "get": {
                 "description": "Get estimated gas for pay for blob message with certain values of blob sizes",
                 "produces": [
@@ -1989,7 +1895,7 @@
                 }
             }
         },
-        "/v1/gas/price": {
+        "/gas/price": {
             "get": {
                 "description": "Get estimated gas price based on historical data",
                 "produces": [
@@ -2010,7 +1916,7 @@
                 }
             }
         },
-        "/v1/head": {
+        "/head": {
             "get": {
                 "description": "Get current indexer head",
                 "produces": [
@@ -2046,7 +1952,7 @@
                 }
             }
         },
-        "/v1/namespace": {
+        "/namespace": {
             "get": {
                 "description": "List namespace info",
                 "produces": [
@@ -2118,7 +2024,7 @@
                 }
             }
         },
-        "/v1/namespace/active": {
+        "/namespace/active": {
             "get": {
                 "description": "Get last used namespace",
                 "produces": [
@@ -2161,7 +2067,7 @@
                 }
             }
         },
-        "/v1/namespace/count": {
+        "/namespace/count": {
             "get": {
                 "description": "Get count of namespaces in network",
                 "produces": [
@@ -2188,7 +2094,7 @@
                 }
             }
         },
-        "/v1/namespace/{id}": {
+        "/namespace/{id}": {
             "get": {
                 "description": "Returns array of namespace versions",
                 "produces": [
@@ -2235,7 +2141,7 @@
                 }
             }
         },
-        "/v1/namespace/{id}/{version}": {
+        "/namespace/{id}/{version}": {
             "get": {
                 "description": "Returns namespace by version byte and namespace id",
                 "produces": [
@@ -2289,7 +2195,7 @@
                 }
             }
         },
-        "/v1/namespace/{id}/{version}/blobs": {
+        "/namespace/{id}/{version}/blobs": {
             "get": {
                 "description": "Returns blob changes for namespace",
                 "produces": [
@@ -2394,7 +2300,7 @@
                 }
             }
         },
-        "/v1/namespace/{id}/{version}/messages": {
+        "/namespace/{id}/{version}/messages": {
             "get": {
                 "description": "Returns namespace messages by version byte and namespace id",
                 "produces": [
@@ -2464,7 +2370,7 @@
                 }
             }
         },
-        "/v1/namespace/{id}/{version}/rollups": {
+        "/namespace/{id}/{version}/rollups": {
             "get": {
                 "description": "List rollups using the namespace",
                 "produces": [
@@ -2531,7 +2437,7 @@
                 }
             }
         },
-        "/v1/namespace_by_hash/{hash}": {
+        "/namespace_by_hash/{hash}": {
             "get": {
                 "description": "Returns namespace by base64 encoded identity",
                 "produces": [
@@ -2576,7 +2482,7 @@
                 }
             }
         },
-        "/v1/namespace_by_hash/{hash}/{height}": {
+        "/namespace_by_hash/{hash}/{height}": {
             "get": {
                 "description": "Returns blobs",
                 "produces": [
@@ -2623,7 +2529,7 @@
                 }
             }
         },
-        "/v1/rollup": {
+        "/rollup": {
             "get": {
                 "description": "List rollups info",
                 "produces": [
@@ -2696,7 +2602,7 @@
                 }
             }
         },
-        "/v1/rollup/count": {
+        "/rollup/count": {
             "get": {
                 "description": "Get count of rollups in network",
                 "produces": [
@@ -2723,7 +2629,7 @@
                 }
             }
         },
-        "/v1/rollup/slug/{slug}": {
+        "/rollup/slug/{slug}": {
             "get": {
                 "description": "Get rollup by slug",
                 "produces": [
@@ -2768,7 +2674,7 @@
                 }
             }
         },
-        "/v1/rollup/{id}": {
+        "/rollup/{id}": {
             "get": {
                 "description": "Get rollup info",
                 "produces": [
@@ -2813,7 +2719,7 @@
                 }
             }
         },
-        "/v1/rollup/{id}/blobs": {
+        "/rollup/{id}/blobs": {
             "get": {
                 "description": "Get rollup blobs",
                 "produces": [
@@ -2891,7 +2797,7 @@
                 }
             }
         },
-        "/v1/rollup/{id}/distribution/{name}/{timeframe}": {
+        "/rollup/{id}/distribution/{name}/{timeframe}": {
             "get": {
                 "description": "Get rollup distribution",
                 "produces": [
@@ -2960,7 +2866,7 @@
                 }
             }
         },
-        "/v1/rollup/{id}/export": {
+        "/rollup/{id}/export": {
             "get": {
                 "description": "Export rollup blobs",
                 "tags": [
@@ -3008,7 +2914,7 @@
                 }
             }
         },
-        "/v1/rollup/{id}/namespaces": {
+        "/rollup/{id}/namespaces": {
             "get": {
                 "description": "Get rollup namespaces info",
                 "produces": [
@@ -3066,7 +2972,7 @@
                 }
             }
         },
-        "/v1/rollup/{id}/stats/{name}/{timeframe}": {
+        "/rollup/{id}/stats/{name}/{timeframe}": {
             "get": {
                 "description": "Get rollup stats",
                 "produces": [
@@ -3148,7 +3054,7 @@
                 }
             }
         },
-        "/v1/search": {
+        "/search": {
             "get": {
                 "description": "Endpoint finds entity by hash (block, address, validator, namespace and tx). It returns array of `responses.SearchItem` entities.\n\n### Block\n\nBlock will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`.\nHash should be hexadecimal and has a length of 64.\n\n#### Example response \n\n```json\n{\n    \"type\": \"block\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Block type\n    }\n}\n```\n\n### Tx\n\nTx will be found by its hash. Hash example: `652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF`.\nTx should be hexadecimal and has a length of 64.\n\n#### Example response \n\n```json\n{\n    \"type\": \"tx\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF\",\n        // ... rest fields from response.Tx type\n    }\n}\n```\n\n### Address\n\nThe Address will be found by its hash.\nHash example: `celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60`.\nAddress has prefix `celestia` and has length 47.\nAlso, it should be decoded by `bech32`.\n\n#### Example response \n\n```json\n{\n    \"type\": \"address\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\",\n        \"height\": 100,\n        \"balance\": \"6525472354\"\n    }\n}\n```\n\n### Namespace\n\nNamespace can be found by base64 hash and identity pair version + namespace id. \nHash example: `U3dhZ2dlciByb2Nrcw==`. \nIdentity pair example: `014723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02`\n\n#### Example response \n\n```json\n{\n    \"type\": \"namespace\",\n    \"result\": {\n        \"id\": 1,\n        \"hash\": \"U3dhZ2dlciByb2Nrcw==\",\n        \"version\": 1,\n        \"namespace_id\": \"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02\"\n        // ... rest fields from response.Namespace type\n    }\n}\n```\n\n### Validator\n\nValidator can be found by moniker prefix. \nFor example: names `Node 1` and `Node 2` can be found with query string `Node`\n\n#### Example response \n\n```json\n{\n    \"type\": \"validator\",\n    \"result\": {\n        \"id\": 1,\n        \"moniker\": \"Node 1\",\n        // ... rest fields from response.Validator type\n    }\n}\n```\n\n### Rollup\n\nRollup can be found by name prefix. \nFor example: rollup with names `Rollup 1` and `Rollup 2` can be found with query string `Rol`\n\n#### Example response \n\n```json\n{\n    \"type\": \"rollup\",\n    \"result\": {\n        \"id\": 1,\n        \"moniker\": \"Rollup 1\",\n        // ... rest fields from response.Rollup type\n    }\n}\n```",
                 "produces": [
@@ -3196,105 +3102,7 @@
                 }
             }
         },
-        "/v1/stats/histogram/{table}/{function}/{timeframe}": {
-            "get": {
-                "description": "Returns histogram by table, function and timeframe\n\n### Parameters\n\n`table`, `function` and `column` parameters are the same as summary endpoint.\n\n\n### Timeframe\n\n* `hour`\n* `day`\n* `week`\n* `month`\n* `year`",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "stats"
-                ],
-                "summary": "Get histogram",
-                "operationId": "stats-histogram",
-                "parameters": [
-                    {
-                        "enum": [
-                            "block",
-                            "block_stats",
-                            "tx",
-                            "event",
-                            "message"
-                        ],
-                        "type": "string",
-                        "description": "Table name",
-                        "name": "table",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "enum": [
-                            "min",
-                            "max",
-                            "avg",
-                            "sum",
-                            "count"
-                        ],
-                        "type": "string",
-                        "description": "Function name",
-                        "name": "function",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "enum": [
-                            "hour",
-                            "day",
-                            "week",
-                            "month",
-                            "year"
-                        ],
-                        "type": "string",
-                        "description": "Timeframe",
-                        "name": "timeframe",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Column name which will be used for computation. Optional for count",
-                        "name": "column",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Time from in unix timestamp",
-                        "name": "from",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Time to in unix timestamp",
-                        "name": "to",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/responses.HistogramItem"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/stats/namespace/series/{id}/{name}/{timeframe}": {
+        "/stats/namespace/series/{id}/{name}/{timeframe}": {
             "get": {
                 "description": "Get histogram for namespace with precomputed stats by series name and timeframe",
                 "produces": [
@@ -3378,7 +3186,7 @@
                 }
             }
         },
-        "/v1/stats/namespace/usage": {
+        "/stats/namespace/usage": {
             "get": {
                 "description": "Get namespaces with sorting by size. Returns top 100 namespaces. Namespaces which is not included to top 100 grouped into 'others' item",
                 "produces": [
@@ -3417,7 +3225,7 @@
                 }
             }
         },
-        "/v1/stats/price/current": {
+        "/stats/price/current": {
             "get": {
                 "description": "Get current TIA price",
                 "produces": [
@@ -3450,7 +3258,7 @@
                 }
             }
         },
-        "/v1/stats/price/series/{timeframe}": {
+        "/stats/price/series/{timeframe}": {
             "get": {
                 "description": "Get histogram with TIA price",
                 "produces": [
@@ -3512,7 +3320,7 @@
                 }
             }
         },
-        "/v1/stats/series/{name}/{timeframe}": {
+        "/stats/series/{name}/{timeframe}": {
             "get": {
                 "description": "Get histogram with precomputed stats by series name and timeframe",
                 "produces": [
@@ -3601,7 +3409,7 @@
                 }
             }
         },
-        "/v1/stats/staking/series/{id}/{name}/{timeframe}": {
+        "/stats/staking/series/{id}/{name}/{timeframe}": {
             "get": {
                 "description": "Get histogram for staking with precomputed stats by series name and timeframe",
                 "produces": [
@@ -3684,7 +3492,7 @@
                 }
             }
         },
-        "/v1/stats/summary/{table}/{function}": {
+        "/stats/summary/{table}/{function}": {
             "get": {
                 "description": "Returns string value by passed table and function.\n\n### Availiable tables\n* `block`\n* `block_stats`\n* `tx`\n* `message`\n* `event`\n\n\n### Availiable functions\n* `sum`\n* `min`\n* `max`\n* `avg`\n* `count`\n\n\n`Column` query parameter is required for functions `sum`, `min`, `max` and `avg` and should not pass for `count`.\n\n\n###  Availiable columns and functions for tables:\n\n#### Block\n* `height`         -- min max\n* `time`           -- min max\n\n#### Block stats\n* `height`         -- min max\n* `time`           -- min max\n* `tx_count`       -- min max sum avg\n* `events_count`   -- min max sum avg\n* `blobs_size`     -- min max sum avg\n* `block_time`     -- min max sum avg\n* `supply_chnge`   -- min max sum avg\n* `inflation_rate` -- min max avg\n* `fee`            -- min max sum avg\n\n#### Tx\n* `height`         -- min max\n* `time`           -- min max\n* `gas_wanted`     -- min max sum avg\n* `gas_used`       -- min max sum avg\n* `timeout_height` -- min max avg\n* `events_count`   -- min max sum avg\n* `messages_count` -- min max sum avg\n* `fee`            -- min max sum avg\n\n#### Event\n* `height`         -- min max\n* `time`           -- min max\n\n#### Message\n* `height`         -- min max\n* `time`           -- min max",
                 "produces": [
@@ -3766,7 +3574,7 @@
                 }
             }
         },
-        "/v1/stats/tps": {
+        "/stats/tps": {
             "get": {
                 "description": "Returns transaction per seconds statistics",
                 "produces": [
@@ -3790,10 +3598,11 @@
                             "$ref": "#/definitions/handler.Error"
                         }
                     }
-                }
+                },
+                "x-internal": true
             }
         },
-        "/v1/stats/tx_count_24h": {
+        "/stats/tx_count_24h": {
             "get": {
                 "description": "Get tx count histogram for last 24 hours by hour",
                 "produces": [
@@ -3820,10 +3629,11 @@
                             "$ref": "#/definitions/handler.Error"
                         }
                     }
-                }
+                },
+                "x-internal": true
             }
         },
-        "/v1/tx": {
+        "/tx": {
             "get": {
                 "description": "List transactions info",
                 "produces": [
@@ -4082,7 +3892,7 @@
                 }
             }
         },
-        "/v1/tx/count": {
+        "/tx/count": {
             "get": {
                 "description": "Get count of transactions in network",
                 "produces": [
@@ -4109,7 +3919,7 @@
                 }
             }
         },
-        "/v1/tx/genesis": {
+        "/tx/genesis": {
             "get": {
                 "description": "List genesis transactions info",
                 "produces": [
@@ -4170,7 +3980,7 @@
                 }
             }
         },
-        "/v1/tx/{hash}": {
+        "/tx/{hash}": {
             "get": {
                 "description": "Get transaction by hash",
                 "produces": [
@@ -4217,7 +4027,7 @@
                 }
             }
         },
-        "/v1/tx/{hash}/blobs": {
+        "/tx/{hash}/blobs": {
             "get": {
                 "description": "List blobs which was pushed by transaction",
                 "produces": [
@@ -4297,7 +4107,7 @@
                 }
             }
         },
-        "/v1/tx/{hash}/blobs/count": {
+        "/tx/{hash}/blobs/count": {
             "get": {
                 "description": "Count of blobs which was pushed by transaction",
                 "produces": [
@@ -4341,7 +4151,7 @@
                 }
             }
         },
-        "/v1/tx/{hash}/events": {
+        "/tx/{hash}/events": {
             "get": {
                 "description": "Get transaction events",
                 "produces": [
@@ -4401,7 +4211,7 @@
                 }
             }
         },
-        "/v1/tx/{hash}/messages": {
+        "/tx/{hash}/messages": {
             "get": {
                 "description": "Get transaction messages",
                 "produces": [
@@ -4461,111 +4271,7 @@
                 }
             }
         },
-        "/v1/tx/{hash}/namespace": {
-            "get": {
-                "description": "List namespaces affected by transaction",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "transactions"
-                ],
-                "summary": "List namespaces affected by transaction",
-                "operationId": "list-namespaces-transactions",
-                "parameters": [
-                    {
-                        "maxLength": 64,
-                        "minLength": 64,
-                        "type": "string",
-                        "description": "Transaction hash in hexadecimal",
-                        "name": "hash",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "maximum": 100,
-                        "type": "integer",
-                        "description": "Count of requested entities",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Offset",
-                        "name": "offset",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/responses.NamespaceMessage"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/tx/{hash}/namespace/count": {
-            "get": {
-                "description": "Count of namespaces affected by transaction",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "transactions"
-                ],
-                "summary": "Count of namespaces affected by transaction",
-                "operationId": "list-namespaces-count-transactions",
-                "parameters": [
-                    {
-                        "maxLength": 64,
-                        "minLength": 64,
-                        "type": "string",
-                        "description": "Transaction hash in hexadecimal",
-                        "name": "hash",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/validators": {
+        "/validators": {
             "get": {
                 "description": "List validators",
                 "produces": [
@@ -4623,7 +4329,7 @@
                 }
             }
         },
-        "/v1/validators/count": {
+        "/validators/count": {
             "get": {
                 "description": "Get validator's count by status",
                 "produces": [
@@ -4656,7 +4362,7 @@
                 }
             }
         },
-        "/v1/validators/{id}": {
+        "/validators/{id}": {
             "get": {
                 "description": "Get validator info",
                 "produces": [
@@ -4701,7 +4407,7 @@
                 }
             }
         },
-        "/v1/validators/{id}/blocks": {
+        "/validators/{id}/blocks": {
             "get": {
                 "description": "Get blocks which was proposed by validator",
                 "produces": [
@@ -4756,7 +4462,7 @@
                 }
             }
         },
-        "/v1/validators/{id}/delegators": {
+        "/validators/{id}/delegators": {
             "get": {
                 "description": "Get validator's delegators",
                 "produces": [
@@ -4822,7 +4528,7 @@
                 }
             }
         },
-        "/v1/validators/{id}/jails": {
+        "/validators/{id}/jails": {
             "get": {
                 "description": "Get validator's jails",
                 "produces": [
@@ -4882,7 +4588,7 @@
                 }
             }
         },
-        "/v1/validators/{id}/uptime": {
+        "/validators/{id}/uptime": {
             "get": {
                 "description": "Get validator's uptime and history of signed block",
                 "produces": [
@@ -4934,7 +4640,7 @@
                 }
             }
         },
-        "/v1/vesting/{id}/periods": {
+        "/vesting/{id}/periods": {
             "get": {
                 "description": "Periods vesting periods by id. Returns not empty array only for periodic vestings.",
                 "produces": [
@@ -4989,7 +4695,7 @@
                 }
             }
         },
-        "/v1/ws": {
+        "/ws": {
             "get": {
                 "description": "## Documentation for websocket API\n\n### Notification\n\nThe structure of notification is following in all channels:\n\n```json\n{\n    \"channel\": \"channel_name\",\n    \"body\": \"\u003cobject or array\u003e\"  // depends on channel\n}\n```\n\n### Subscribe\n\nTo receive updates from websocket API send `subscribe` request to server.\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n        \"filters\": {\n            // pass channel filters\n        }\n    }\n}\n```\n\nNow 2 channels are supported:\n\n* `head` - receive information about indexer state. Channel does not have any filters. Subscribe message should looks like:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"head\"\n    }\n}\n```\n\nNotification body of `responses.State` type will be sent to the channel.\n\n* `blocks` - receive information about new blocks. Channel does not have any filters. Subscribe message should looks like:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"blocks\"\n    }\n}\n```\n\nNotification body of `responses.Block` type will be sent to the channel.\n\n\n### Unsubscribe\n\nTo unsubscribe send `unsubscribe` message containing one of channel name describing above.\n\n\n```json\n{\n    \"method\": \"unsubscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n    }\n}\n```\n",
                 "produces": [
@@ -5000,7 +4706,8 @@
                 ],
                 "summary": "Websocket API",
                 "operationId": "websocket",
-                "responses": {}
+                "responses": {},
+                "x-internal": true
             }
         }
     },

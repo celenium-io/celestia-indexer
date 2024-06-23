@@ -36,7 +36,7 @@ func NewStateHandler(state storage.IState, validator storage.IValidator, indexer
 //	@Success		204
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/head [get]
+//	@Router			/head [get]
 func (sh *StateHandler) Head(c echo.Context) error {
 	state, err := sh.state.ByName(c.Request().Context(), sh.indexerName)
 	if err != nil {

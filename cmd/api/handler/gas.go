@@ -55,7 +55,7 @@ type estimatePfbGas struct {
 //	@Success		200	{object}	uint64
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/gas/estimate_for_pfb [get]
+//	@Router			/gas/estimate_for_pfb [get]
 func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 	req, err := bindAndValidate[estimatePfbGas](c)
 	if err != nil {
@@ -94,7 +94,7 @@ func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 //	@ID				gas-price
 //	@Produce		json
 //	@Success		200	{object}	responses.GasPrice
-//	@Router			/v1/gas/price [get]
+//	@Router			/gas/price [get]
 func (handler GasHandler) EstimatePrice(c echo.Context) error {
 	data := handler.tracker.State()
 	return c.JSON(http.StatusOK, responses.GasPrice{

@@ -64,7 +64,7 @@ type validatorRequest struct {
 //	@Success		204
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/validators/{id} [get]
+//	@Router			/validators/{id} [get]
 func (handler *ValidatorHandler) Get(c echo.Context) error {
 	req, err := bindAndValidate[validatorRequest](c)
 	if err != nil {
@@ -105,7 +105,7 @@ func (req *validatorsPagination) SetDefault() {
 //	@Success		200	{array}		responses.Validator
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/validators [get]
+//	@Router			/validators [get]
 func (handler *ValidatorHandler) List(c echo.Context) error {
 	req, err := bindAndValidate[validatorsPagination](c)
 	if err != nil {
@@ -155,7 +155,7 @@ func (p *validatorPageableRequest) SetDefault() {
 //	@Success		200	{object}	responses.Block
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/validators/{id}/blocks [get]
+//	@Router			/validators/{id}/blocks [get]
 func (handler *ValidatorHandler) Blocks(c echo.Context) error {
 	req, err := bindAndValidate[validatorPageableRequest](c)
 	if err != nil {
@@ -200,7 +200,7 @@ func (r *validatorUptimeRequest) SetDefault() {
 //	@Success		204
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/validators/{id}/uptime [get]
+//	@Router			/validators/{id}/uptime [get]
 func (handler *ValidatorHandler) Uptime(c echo.Context) error {
 	req, err := bindAndValidate[validatorUptimeRequest](c)
 	if err != nil {
@@ -250,7 +250,7 @@ func (p *validatorDelegationsRequest) SetDefault() {
 //	@Success		200	{array}		responses.Delegation
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/validators/{id}/delegators [get]
+//	@Router			/validators/{id}/delegators [get]
 func (handler *ValidatorHandler) Delegators(c echo.Context) error {
 	req, err := bindAndValidate[validatorDelegationsRequest](c)
 	if err != nil {
@@ -290,7 +290,7 @@ func (handler *ValidatorHandler) Delegators(c echo.Context) error {
 //	@Success		200	{array}		responses.Jail
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/validators/{id}/jails [get]
+//	@Router			/validators/{id}/jails [get]
 func (handler *ValidatorHandler) Jails(c echo.Context) error {
 	req, err := bindAndValidate[validatorPageableRequest](c)
 	if err != nil {
@@ -325,7 +325,7 @@ func (handler *ValidatorHandler) Jails(c echo.Context) error {
 //	@Success		200	{object}	responses.ValidatorCount
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/validators/count [get]
+//	@Router			/validators/count [get]
 func (handler *ValidatorHandler) Count(c echo.Context) error {
 	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
 	if err != nil {

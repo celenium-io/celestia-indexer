@@ -44,7 +44,7 @@ func NewRollupHandler(
 //	@Success		200	{array}		responses.RollupWithStats
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/rollup [get]
+//	@Router			/rollup [get]
 func (handler RollupHandler) Leaderboard(c echo.Context) error {
 	req, err := bindAndValidate[rollupList](c)
 	if err != nil {
@@ -75,7 +75,7 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 //	@Success		204
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/rollup/{id} [get]
+//	@Router			/rollup/{id} [get]
 func (handler RollupHandler) Get(c echo.Context) error {
 	req, err := bindAndValidate[getById](c)
 	if err != nil {
@@ -122,7 +122,7 @@ func (req *getRollupPages) SetDefault() {
 //	@Success		200	{array}		responses.Namespace
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/rollup/{id}/namespaces [get]
+//	@Router			/rollup/{id}/namespaces [get]
 func (handler RollupHandler) GetNamespaces(c echo.Context) error {
 	req, err := bindAndValidate[getRollupPages](c)
 	if err != nil {
@@ -182,7 +182,7 @@ func (p *getRollupPagesWithSort) SetDefault() {
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/rollup/{id}/blobs [get]
+//	@Router			/rollup/{id}/blobs [get]
 func (handler RollupHandler) GetBlobs(c echo.Context) error {
 	req, err := bindAndValidate[getRollupPagesWithSort](c)
 	if err != nil {
@@ -237,7 +237,7 @@ type rollupStatsRequest struct {
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/rollup/{id}/stats/{name}/{timeframe} [get]
+//	@Router			/rollup/{id}/stats/{name}/{timeframe} [get]
 func (handler RollupHandler) Stats(c echo.Context) error {
 	req, err := bindAndValidate[rollupStatsRequest](c)
 	if err != nil {
@@ -271,7 +271,7 @@ func (handler RollupHandler) Stats(c echo.Context) error {
 //	@Produce		json
 //	@Success		200	{integer}	uint64
 //	@Failure		500	{object}	Error
-//	@Router			/v1/rollup/count [get]
+//	@Router			/rollup/count [get]
 func (handler RollupHandler) Count(c echo.Context) error {
 	count, err := handler.rollups.Count(c.Request().Context())
 	if err != nil {
@@ -296,7 +296,7 @@ type rollupBySlugRequest struct {
 //	@Success		204
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/rollup/slug/{slug} [get]
+//	@Router			/rollup/slug/{slug} [get]
 func (handler RollupHandler) BySlug(c echo.Context) error {
 	req, err := bindAndValidate[rollupBySlugRequest](c)
 	if err != nil {
@@ -337,7 +337,7 @@ type rollupDistributionRequest struct {
 //	@Success		200	{array}		responses.DistributionItem
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/rollup/{id}/distribution/{name}/{timeframe} [get]
+//	@Router			/rollup/{id}/distribution/{name}/{timeframe} [get]
 func (handler RollupHandler) Distribution(c echo.Context) error {
 	req, err := bindAndValidate[rollupDistributionRequest](c)
 	if err != nil {
@@ -379,7 +379,7 @@ type exportBlobsRequest struct {
 //	@Success		200
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/rollup/{id}/export [get]
+//	@Router			/rollup/{id}/export [get]
 func (handler RollupHandler) ExportBlobs(c echo.Context) error {
 	req, err := bindAndValidate[exportBlobsRequest](c)
 	if err != nil {

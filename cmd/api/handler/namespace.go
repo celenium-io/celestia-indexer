@@ -60,7 +60,7 @@ type getNamespaceRequest struct {
 //	@Success		200	{array}		responses.Namespace
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/namespace/{id} [get]
+//	@Router			/namespace/{id} [get]
 func (handler *NamespaceHandler) Get(c echo.Context) error {
 	req, err := bindAndValidate[getNamespaceRequest](c)
 	if err != nil {
@@ -101,7 +101,7 @@ type getNamespaceByHashRequest struct {
 //	@Success		204
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/namespace_by_hash/{hash} [get]
+//	@Router			/namespace_by_hash/{hash} [get]
 func (handler *NamespaceHandler) GetByHash(c echo.Context) error {
 	req, err := bindAndValidate[getNamespaceByHashRequest](c)
 	if err != nil {
@@ -141,7 +141,7 @@ type getNamespaceWithVersionRequest struct {
 //	@Success		204
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/namespace/{id}/{version} [get]
+//	@Router			/namespace/{id}/{version} [get]
 func (handler *NamespaceHandler) GetWithVersion(c echo.Context) error {
 	req, err := bindAndValidate[getNamespaceWithVersionRequest](c)
 	if err != nil {
@@ -175,7 +175,7 @@ func (handler *NamespaceHandler) GetWithVersion(c echo.Context) error {
 //	@Success		200	{array}		responses.Namespace
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/namespace [get]
+//	@Router			/namespace [get]
 func (handler *NamespaceHandler) List(c echo.Context) error {
 	req, err := bindAndValidate[namespaceList](c)
 	if err != nil {
@@ -210,7 +210,7 @@ type getBlobsRequest struct {
 //	@Produce		json
 //	@Success		200	{array}		responses.Blob
 //	@Failure		400	{object}	Error
-//	@Router			/v1/namespace_by_hash/{hash}/{height} [get]
+//	@Router			/namespace_by_hash/{hash}/{height} [get]
 func (handler *NamespaceHandler) GetBlobs(c echo.Context) error {
 	req, err := bindAndValidate[getBlobsRequest](c)
 	if err != nil {
@@ -253,7 +253,7 @@ func (req *listByNamespace) SetDefault() {
 //	@Success		204
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/namespace/{id}/{version}/messages [get]
+//	@Router			/namespace/{id}/{version}/messages [get]
 func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
 	req, err := bindAndValidate[listByNamespace](c)
 	if err != nil {
@@ -302,7 +302,7 @@ type getActiveRequest struct {
 //	@Produce		json
 //	@Success		200	{array}		responses.Namespace
 //	@Failure		500	{object}	Error
-//	@Router			/v1/namespace/active [get]
+//	@Router			/namespace/active [get]
 func (handler *NamespaceHandler) GetActive(c echo.Context) error {
 	req, err := bindAndValidate[getActiveRequest](c)
 	if err != nil {
@@ -334,7 +334,7 @@ func (handler *NamespaceHandler) GetActive(c echo.Context) error {
 //	@Produce		json
 //	@Success		200	{integer}	uint64
 //	@Failure		500	{object}	Error
-//	@Router			/v1/namespace/count [get]
+//	@Router			/namespace/count [get]
 func (handler *NamespaceHandler) Count(c echo.Context) error {
 	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
 	if err != nil {
@@ -362,7 +362,7 @@ type postBlobRequest struct {
 //	@Produce		json
 //	@Success		200	{object}	responses.Blob
 //	@Failure		400	{object}	Error
-//	@Router			/v1/blob [post]
+//	@Router			/blob [post]
 func (handler *NamespaceHandler) Blob(c echo.Context) error {
 	req, err := bindAndValidate[postBlobRequest](c)
 	if err != nil {
@@ -395,7 +395,7 @@ func (handler *NamespaceHandler) Blob(c echo.Context) error {
 //	@Produce		json
 //	@Success		200	{object}	responses.BlobLog
 //	@Failure		400	{object}	Error
-//	@Router			/v1/blob/metadata [post]
+//	@Router			/blob/metadata [post]
 func (handler *NamespaceHandler) BlobMetadata(c echo.Context) error {
 	req, err := bindAndValidate[postBlobRequest](c)
 	if err != nil {
@@ -471,7 +471,7 @@ func (req *getBlobLogsForNamespace) SetDefault() {
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/namespace/{id}/{version}/blobs [get]
+//	@Router			/namespace/{id}/{version}/blobs [get]
 func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 	req, err := bindAndValidate[getBlobLogsForNamespace](c)
 	if err != nil {
@@ -540,7 +540,7 @@ func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 //	@Success		200	{array}		responses.Rollup
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/namespace/{id}/{version}/rollups [get]
+//	@Router			/namespace/{id}/{version}/rollups [get]
 func (handler *NamespaceHandler) Rollups(c echo.Context) error {
 	req, err := bindAndValidate[listByNamespace](c)
 	if err != nil {

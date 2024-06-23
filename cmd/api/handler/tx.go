@@ -61,7 +61,7 @@ type getTxRequest struct {
 //	@Success		204
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/tx/{hash} [get]
+//	@Router			/tx/{hash} [get]
 func (handler *TxHandler) Get(c echo.Context) error {
 	req, err := bindAndValidate[getTxRequest](c)
 	if err != nil {
@@ -101,7 +101,7 @@ func (handler *TxHandler) Get(c echo.Context) error {
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/tx [get]
+//	@Router			/tx [get]
 func (handler *TxHandler) List(c echo.Context) error {
 	req, err := bindAndValidate[txListRequest](c)
 	if err != nil {
@@ -168,7 +168,7 @@ func (p *getTxRequestWithPagination) SetDefault() {
 //	@Success		200	{array}		responses.Event
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/tx/{hash}/events [get]
+//	@Router			/tx/{hash}/events [get]
 func (handler *TxHandler) GetEvents(c echo.Context) error {
 	req, err := bindAndValidate[getTxRequestWithPagination](c)
 	if err != nil {
@@ -216,7 +216,7 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 //	@Success		200	{array}		responses.Message
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/tx/{hash}/messages [get]
+//	@Router			/tx/{hash}/messages [get]
 func (handler *TxHandler) GetMessages(c echo.Context) error {
 	req, err := bindAndValidate[getTxRequestWithPagination](c)
 	if err != nil {
@@ -254,7 +254,7 @@ func (handler *TxHandler) GetMessages(c echo.Context) error {
 //	@Produce		json
 //	@Success		200	{integer}	uint64
 //	@Failure		500	{object}	Error
-//	@Router			/v1/tx/count [get]
+//	@Router			/tx/count [get]
 func (handler *TxHandler) Count(c echo.Context) error {
 	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
 	if err != nil {
@@ -276,7 +276,7 @@ func (handler *TxHandler) Count(c echo.Context) error {
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/tx/genesis [get]
+//	@Router			/tx/genesis [get]
 func (handler *TxHandler) Genesis(c echo.Context) error {
 	req, err := bindAndValidate[limitOffsetPagination](c)
 	if err != nil {
@@ -293,86 +293,6 @@ func (handler *TxHandler) Genesis(c echo.Context) error {
 		response[i] = responses.NewTx(txs[i])
 	}
 	return returnArray(c, response)
-}
-
-// Namespaces godoc
-//
-//	@Summary		List namespaces affected by transaction
-//	@Description	List namespaces affected by transaction
-//	@Tags			transactions
-//	@ID				list-namespaces-transactions
-//	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
-//	@Param			limit	query	integer	false	"Count of requested entities"		mininum(1)		maximum(100)
-//	@Param			offset	query	integer	false	"Offset"							mininum(1)
-//	@Produce		json
-//	@Success		200	{array}		responses.NamespaceMessage
-//	@Failure		400	{object}	Error
-//	@Failure		500	{object}	Error
-//	@Router			/v1/tx/{hash}/namespace [get]
-func (handler *TxHandler) Namespaces(c echo.Context) error {
-	req, err := bindAndValidate[listForTx](c)
-	if err != nil {
-		return badRequestError(c, err)
-	}
-	req.SetDefault()
-
-	hash, err := hex.DecodeString(req.Hash)
-	if err != nil {
-		return badRequestError(c, err)
-	}
-
-	txId, err := handler.tx.IdByHash(c.Request().Context(), hash)
-	if err != nil {
-		return handleError(c, err, handler.tx)
-	}
-
-	messages, err := handler.namespaces.MessagesByTxId(c.Request().Context(), txId, int(req.Limit), int(req.Offset))
-	if err != nil {
-		return handleError(c, err, handler.tx)
-	}
-	response := make([]responses.NamespaceMessage, len(messages))
-	for i := range messages {
-		response[i], err = responses.NewNamespaceMessage(messages[i])
-		if err != nil {
-			return handleError(c, err, handler.tx)
-		}
-	}
-	return returnArray(c, response)
-}
-
-// NamespacesCount godoc
-//
-//	@Summary		Count of namespaces affected by transaction
-//	@Description	Count of namespaces affected by transaction
-//	@Tags			transactions
-//	@ID				list-namespaces-count-transactions
-//	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
-//	@Produce		json
-//	@Success		200	{integer}	uint64
-//	@Failure		400	{object}	Error
-//	@Failure		500	{object}	Error
-//	@Router			/v1/tx/{hash}/namespace/count [get]
-func (handler *TxHandler) NamespacesCount(c echo.Context) error {
-	req, err := bindAndValidate[getTxRequest](c)
-	if err != nil {
-		return badRequestError(c, err)
-	}
-
-	hash, err := hex.DecodeString(req.Hash)
-	if err != nil {
-		return badRequestError(c, err)
-	}
-
-	txId, err := handler.tx.IdByHash(c.Request().Context(), hash)
-	if err != nil {
-		return handleError(c, err, handler.tx)
-	}
-
-	count, err := handler.namespaces.CountMessagesByTxId(c.Request().Context(), txId)
-	if err != nil {
-		return handleError(c, err, handler.tx)
-	}
-	return c.JSON(http.StatusOK, count)
 }
 
 type getBlobsForTx struct {
@@ -407,7 +327,7 @@ func (req *getBlobsForTx) SetDefault() {
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/tx/{hash}/blobs [get]
+//	@Router			/tx/{hash}/blobs [get]
 func (handler *TxHandler) Blobs(c echo.Context) error {
 	req, err := bindAndValidate[getBlobsForTx](c)
 	if err != nil {
@@ -457,7 +377,7 @@ func (handler *TxHandler) Blobs(c echo.Context) error {
 //	@Success		200	{integer}	uint64
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/v1/tx/{hash}/blobs/count [get]
+//	@Router			/tx/{hash}/blobs/count [get]
 func (handler *TxHandler) BlobsCount(c echo.Context) error {
 	req, err := bindAndValidate[getTxRequest](c)
 	if err != nil {

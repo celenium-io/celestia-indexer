@@ -156,8 +156,6 @@ const (
 type IStats interface {
 	Count(ctx context.Context, req CountRequest) (string, error)
 	Summary(ctx context.Context, req SummaryRequest) (string, error)
-	HistogramCount(ctx context.Context, req HistogramCountRequest) ([]HistogramItem, error)
-	Histogram(ctx context.Context, req HistogramRequest) ([]HistogramItem, error)
 	TPS(ctx context.Context) (TPS, error)
 	TxCountForLast24h(ctx context.Context) ([]TxCountForLast24hItem, error)
 	Series(ctx context.Context, timeframe Timeframe, name string, req SeriesRequest) ([]SeriesItem, error)

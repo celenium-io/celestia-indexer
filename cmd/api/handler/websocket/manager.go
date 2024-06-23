@@ -82,8 +82,9 @@ func (manager *Manager) listen(ctx context.Context) {
 //	@Description.markdown	websocket
 //	@Tags					websocket
 //	@ID						websocket
+//	@x-internal				true
 //	@Produce				json
-//	@Router					/v1/ws [get]
+//	@Router					/ws [get]
 func (manager *Manager) Handle(c echo.Context) error {
 	ws, err := manager.upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
