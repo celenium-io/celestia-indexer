@@ -23,6 +23,7 @@ var rootCmd = &cobra.Command{
 // @version					1.0
 // @description				This is docs of Celenium API.
 // @host					api.celenium.io
+// @schemes					https
 // @BasePath /v1
 //
 // @query.collection.format	multi

@@ -101,7 +101,6 @@ func (req *validatorsPagination) SetDefault() {
 //	@Param			offset	query	integer	false	"Offset"						mininum(1)
 //	@Param			jailed	query	boolean	false	"Return only jailed validators"
 //	@Produce		json
-//	@Produce		json
 //	@Success		200	{array}		responses.Validator
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
