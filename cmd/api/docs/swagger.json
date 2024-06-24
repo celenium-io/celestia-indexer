@@ -1,4 +1,7 @@
 {
+    "schemes": [
+        "https"
+    ],
     "swagger": "2.0",
     "info": {
         "description": "This is docs of Celenium API.",
@@ -4275,7 +4278,6 @@
             "get": {
                 "description": "List validators",
                 "produces": [
-                    "application/json",
                     "application/json"
                 ],
                 "tags": [
