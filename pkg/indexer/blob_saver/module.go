@@ -44,6 +44,7 @@ type Module struct {
 
 	kind    string
 	blocks  *sync.Map[pkgTypes.Level, *[]blob.Blob]
+	blobs   *sync.Map[string, struct{}]
 	storage blob.Storage
 	head    pkgTypes.Level
 }
@@ -57,6 +58,7 @@ func NewModule(
 	m := Module{
 		BaseModule: modules.New("blob_saver"),
 		blocks:     sync.NewMap[pkgTypes.Level, *[]blob.Blob](),
+		blobs:      sync.NewMap[string, struct{}](),
 		kind:       kind,
 	}
 
@@ -153,6 +155,7 @@ func (module *Module) processEndOfBlock(ctx context.Context, height pkgTypes.Lev
 
 	module.head = height
 	module.blocks.Delete(height)
+	module.blobs.Clear()
 	return nil
 }
 
@@ -167,20 +170,24 @@ func (module *Module) processBlob(msg *Msg) error {
 		return errors.Wrap(err, "can't create commitment")
 	}
 
+	blb := blob.Blob{
+		Commitment: commitment,
+		Blob:       msg.Blob,
+		Height:     uint64(msg.Height),
+	}
+	key := blb.String()
+
+	// skip blobs with the same commitments in the current block.
+	if _, ok := module.blobs.Get(key); ok {
+		return nil
+	}
+	module.blobs.Set(key, struct{}{})
+
 	if blobs, ok := module.blocks.Get(msg.Height); ok {
-		*blobs = append(*blobs, blob.Blob{
-			Commitment: commitment,
-			Blob:       msg.Blob,
-			Height:     uint64(msg.Height),
-		})
+		*blobs = append(*blobs, blb)
 	} else {
-		module.blocks.Set(msg.Height, &[]blob.Blob{
-			{
-				Commitment: commitment,
-				Blob:       msg.Blob,
-				Height:     uint64(msg.Height),
-			},
-		})
+
+		module.blocks.Set(msg.Height, &[]blob.Blob{blb})
 	}
 
 	return nil

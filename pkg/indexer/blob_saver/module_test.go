@@ -39,6 +39,12 @@ func TestBlobSaverModule(t *testing.T) {
 		ShareVersion:     0,
 		NamespaceVersion: 0,
 	}
+	b2Copy := &types.Blob{
+		NamespaceId:      []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x67, 0x6d},
+		Data:             []byte("0x676d"),
+		ShareVersion:     0,
+		NamespaceVersion: 0,
+	}
 	commitment, err := base64.StdEncoding.DecodeString("uwghsElFtoHNqQ3JrsDGj8uLW456izVbegVL/AunMOw=")
 	require.NoError(t, err, "decode commitment")
 
@@ -82,6 +88,10 @@ func TestBlobSaverModule(t *testing.T) {
 	input.Push(&Msg{
 		Height: 101,
 		Blob:   b2,
+	})
+	input.Push(&Msg{
+		Height: 101,
+		Blob:   b2Copy,
 	})
 	input.Push(&Msg{
 		Height:   101,
