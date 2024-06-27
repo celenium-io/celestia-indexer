@@ -229,6 +229,13 @@ func (sh StatsHandler) Series(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+type seriesCumulativeRequest struct {
+	Timeframe  string `example:"day"        param:"timeframe" swaggertype:"string"  validate:"required,oneof=day week month year"`
+	SeriesName string `example:"tps"        param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_size blobs_count fee tx_count gas_used gas_limit bytes_in_block"`
+	From       int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To         int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
 // SeriesCumulative godoc
 //
 //	@Summary		Get cumulative histogram with precomputed stats
@@ -245,7 +252,7 @@ func (sh StatsHandler) Series(c echo.Context) error {
 //	@Failure		500	{object}	Error
 //	@Router			/stats/series/{name}/{timeframe}/cumulative [get]
 func (sh StatsHandler) SeriesCumulative(c echo.Context) error {
-	req, err := bindAndValidate[seriesRequest](c)
+	req, err := bindAndValidate[seriesCumulativeRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
