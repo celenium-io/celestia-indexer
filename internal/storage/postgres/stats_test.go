@@ -270,7 +270,7 @@ func (s *StatsTestSuite) TestCumulativeSeriesWithFrom() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	items, err := s.storage.Stats.CumulativeSeries(ctx, storage.TimeframeHour, storage.SeriesBlobsSize, storage.SeriesRequest{
+	items, err := s.storage.Stats.CumulativeSeries(ctx, storage.TimeframeDay, storage.SeriesBlobsSize, storage.SeriesRequest{
 		From: time.Unix(1701192801, 0).UTC(),
 	})
 	s.Require().NoError(err)
