@@ -81,6 +81,45 @@ func (c *IStatsCountCall) DoAndReturn(f func(context.Context, storage.CountReque
 	return c
 }
 
+// CumulativeSeries mocks base method.
+func (m *MockIStats) CumulativeSeries(ctx context.Context, timeframe storage.Timeframe, name string, req storage.SeriesRequest) ([]storage.SeriesItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CumulativeSeries", ctx, timeframe, name, req)
+	ret0, _ := ret[0].([]storage.SeriesItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CumulativeSeries indicates an expected call of CumulativeSeries.
+func (mr *MockIStatsMockRecorder) CumulativeSeries(ctx, timeframe, name, req any) *IStatsCumulativeSeriesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CumulativeSeries", reflect.TypeOf((*MockIStats)(nil).CumulativeSeries), ctx, timeframe, name, req)
+	return &IStatsCumulativeSeriesCall{Call: call}
+}
+
+// IStatsCumulativeSeriesCall wrap *gomock.Call
+type IStatsCumulativeSeriesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IStatsCumulativeSeriesCall) Return(arg0 []storage.SeriesItem, arg1 error) *IStatsCumulativeSeriesCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IStatsCumulativeSeriesCall) Do(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsCumulativeSeriesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IStatsCumulativeSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsCumulativeSeriesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // NamespaceSeries mocks base method.
 func (m *MockIStats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe, name string, nsId uint64, req storage.SeriesRequest) ([]storage.SeriesItem, error) {
 	m.ctrl.T.Helper()

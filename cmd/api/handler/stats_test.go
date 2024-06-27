@@ -236,6 +236,7 @@ func (s *StatsTestSuite) TestBlockStatsHistogram() {
 		storage.SeriesGasPrice,
 		storage.SeriesGasUsed,
 		storage.SeriesBytesInBlock,
+		storage.SeriesBlobsCount,
 	} {
 
 		for _, tf := range []storage.Timeframe{
@@ -275,6 +276,53 @@ func (s *StatsTestSuite) TestBlockStatsHistogram() {
 			s.Require().Equal("11234", item.Value)
 			s.Require().Equal("782634", item.Max)
 			s.Require().Equal("69.6665479793", item.Min)
+		}
+	}
+}
+
+func (s *StatsTestSuite) TestBlockCumulativeStatsHistogram() {
+	for _, name := range []string{
+		storage.SeriesBlobsSize,
+		storage.SeriesFee,
+		storage.SeriesTxCount,
+		storage.SeriesGasLimit,
+		storage.SeriesGasUsed,
+		storage.SeriesBytesInBlock,
+		storage.SeriesBlobsCount,
+	} {
+
+		for _, tf := range []storage.Timeframe{
+			storage.TimeframeDay,
+			storage.TimeframeWeek,
+			storage.TimeframeMonth,
+			storage.TimeframeYear,
+		} {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/v1/stats/series/:name/:timeframe/cumulative")
+			c.SetParamNames("name", "timeframe")
+			c.SetParamValues(name, string(tf))
+
+			s.stats.EXPECT().
+				Series(gomock.Any(), tf, name, gomock.Any()).
+				Return([]storage.SeriesItem{
+					{
+						Time:  testTime,
+						Value: "11234",
+					},
+				}, nil)
+
+			s.Require().NoError(s.handler.Series(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
+
+			var response []responses.SeriesItem
+			err := json.NewDecoder(rec.Body).Decode(&response)
+			s.Require().NoError(err)
+			s.Require().Len(response, 1)
+
+			item := response[0]
+			s.Require().Equal("11234", item.Value)
 		}
 	}
 }
