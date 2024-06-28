@@ -3412,6 +3412,85 @@
                 }
             }
         },
+        "/stats/series/{name}/{timeframe}/cumulative": {
+            "get": {
+                "description": "Get cumulative histogram with precomputed stats by series name and timeframe",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get cumulative histogram with precomputed stats",
+                "operationId": "stats-series-cumulative",
+                "parameters": [
+                    {
+                        "enum": [
+                            "day",
+                            "week",
+                            "month",
+                            "year"
+                        ],
+                        "type": "string",
+                        "description": "Timeframe",
+                        "name": "timeframe",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "blobs_size",
+                            "blobs_count",
+                            "fee",
+                            "tx_count",
+                            "gas_used",
+                            "gas_limit",
+                            "bytes_in_block"
+                        ],
+                        "type": "string",
+                        "description": "Series name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.SeriesItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/staking/series/{id}/{name}/{timeframe}": {
             "get": {
                 "description": "Get histogram for staking with precomputed stats by series name and timeframe",

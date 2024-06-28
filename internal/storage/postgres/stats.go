@@ -210,6 +210,58 @@ func (s Stats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe,
 	return
 }
 
+func (s Stats) CumulativeSeries(ctx context.Context, timeframe storage.Timeframe, name string, req storage.SeriesRequest) (response []storage.SeriesItem, err error) {
+	query := s.db.DB().NewSelect()
+	switch timeframe {
+	case storage.TimeframeDay:
+		query.Table(storage.ViewBlockStatsByDay)
+	case storage.TimeframeWeek:
+		query.Table(storage.ViewBlockStatsByWeek)
+	case storage.TimeframeMonth:
+		query.Table(storage.ViewBlockStatsByMonth)
+	case storage.TimeframeYear:
+		query.Table(storage.ViewBlockStatsByYear)
+	default:
+		return nil, errors.Errorf("unexpected timeframe %s", timeframe)
+	}
+
+	switch name {
+	case storage.SeriesBlobsSize:
+		query.ColumnExpr("ts, sum(sum(blobs_size)) OVER(ORDER BY ts) as value")
+	case storage.SeriesFee:
+		query.ColumnExpr("ts, sum(sum(fee)) OVER(ORDER BY ts) as value")
+	case storage.SeriesTxCount:
+		query.ColumnExpr("ts, sum(sum(tx_count)) OVER(ORDER BY ts) as value")
+	case storage.SeriesGasLimit:
+		query.ColumnExpr("ts, sum(sum(gas_limit)) OVER(ORDER BY ts) as value")
+	case storage.SeriesGasUsed:
+		query.ColumnExpr("ts, sum(sum(gas_used)) OVER(ORDER BY ts) as value")
+	case storage.SeriesBytesInBlock:
+		query.ColumnExpr("ts, sum(sum(bytes_in_block)) OVER(ORDER BY ts) as value")
+	case storage.SeriesBlobsCount:
+		query.ColumnExpr("ts, sum(sum(blobs_count)) OVER(ORDER BY ts) as value")
+	default:
+		return nil, errors.Errorf("unexpected series name: %s", name)
+	}
+
+	withQuery := query.Group("ts")
+
+	q := s.db.DB().
+		NewSelect().
+		With("q", withQuery).
+		Table("q")
+
+	if !req.From.IsZero() {
+		q = q.Where("ts >= ?", req.From)
+	}
+	if !req.To.IsZero() {
+		q = q.Where("ts < ?", req.To)
+	}
+
+	err = q.Scan(ctx, &response)
+	return
+}
+
 func (s Stats) StakingSeries(ctx context.Context, timeframe storage.Timeframe, name string, validatorId uint64, req storage.SeriesRequest) (response []storage.SeriesItem, err error) {
 	var view string
 	switch timeframe {

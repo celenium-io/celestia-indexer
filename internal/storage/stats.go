@@ -159,6 +159,7 @@ type IStats interface {
 	TPS(ctx context.Context) (TPS, error)
 	TxCountForLast24h(ctx context.Context) ([]TxCountForLast24hItem, error)
 	Series(ctx context.Context, timeframe Timeframe, name string, req SeriesRequest) ([]SeriesItem, error)
+	CumulativeSeries(ctx context.Context, timeframe Timeframe, name string, req SeriesRequest) ([]SeriesItem, error)
 	NamespaceSeries(ctx context.Context, timeframe Timeframe, name string, nsId uint64, req SeriesRequest) (response []SeriesItem, err error)
 	StakingSeries(ctx context.Context, timeframe Timeframe, name string, validatorId uint64, req SeriesRequest) (response []SeriesItem, err error)
 }

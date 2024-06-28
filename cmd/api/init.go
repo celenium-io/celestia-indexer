@@ -401,6 +401,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		series := stats.Group("/series")
 		{
 			series.GET("/:name/:timeframe", statsHandler.Series)
+			series.GET("/:name/:timeframe/cumulative", statsHandler.SeriesCumulative)
 		}
 	}
 

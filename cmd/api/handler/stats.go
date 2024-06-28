@@ -229,6 +229,51 @@ func (sh StatsHandler) Series(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+type seriesCumulativeRequest struct {
+	Timeframe  string `example:"day"        param:"timeframe" swaggertype:"string"  validate:"required,oneof=day week month year"`
+	SeriesName string `example:"tps"        param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_size blobs_count fee tx_count gas_used gas_limit bytes_in_block"`
+	From       int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To         int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
+// SeriesCumulative godoc
+//
+//	@Summary		Get cumulative histogram with precomputed stats
+//	@Description	Get cumulative histogram with precomputed stats by series name and timeframe
+//	@Tags			stats
+//	@ID				stats-series-cumulative
+//	@Param			timeframe	path	string	true	"Timeframe"						Enums(day, week, month, year)
+//	@Param			name		path	string	true	"Series name"					Enums(blobs_size, blobs_count, fee, tx_count, gas_used, gas_limit, bytes_in_block)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.SeriesItem
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/stats/series/{name}/{timeframe}/cumulative [get]
+func (sh StatsHandler) SeriesCumulative(c echo.Context) error {
+	req, err := bindAndValidate[seriesCumulativeRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	histogram, err := sh.repo.CumulativeSeries(
+		c.Request().Context(),
+		storage.Timeframe(req.Timeframe),
+		req.SeriesName,
+		storage.NewSeriesRequest(req.From, req.To),
+	)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	response := make([]responses.SeriesItem, len(histogram))
+	for i := range histogram {
+		response[i] = responses.NewSeriesItem(histogram[i])
+	}
+	return returnArray(c, response)
+}
+
 type namespaceSeriesRequest struct {
 	Id         string `example:"0011223344" param:"id"        swaggertype:"string"  validate:"required,hexadecimal,len=56"`
 	Timeframe  string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day week month year"`
