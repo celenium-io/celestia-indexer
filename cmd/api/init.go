@@ -104,40 +104,53 @@ func initProflier(cfg *profiler.Config) (err error) {
 }
 
 func websocketSkipper(c echo.Context) bool {
-	return strings.Contains(c.Request().URL.Path, "ws")
+	return c.Path() == "/v1/ws"
+}
+
+func metricsSkipper(c echo.Context) bool {
+	return c.Path() == "/v1/metrics"
 }
 
 func postSkipper(c echo.Context) bool {
-	if strings.Contains(c.Request().URL.Path, "blob") {
+	if c.Path() == "/v1/blob" {
 		return true
 	}
-	if strings.Contains(c.Request().URL.Path, "auth/rollup") {
+	if c.Path() == "/v1/blob/metadata" {
+		return true
+	}
+	if c.Path() == "/v1/auth/rollup" {
 		return true
 	}
 	return false
 }
 
 func gzipSkipper(c echo.Context) bool {
-	if strings.Contains(c.Request().URL.Path, "swagger") {
+	if c.Path() == "/v1/swagger/doc.json" {
 		return true
 	}
-	if strings.Contains(c.Request().URL.Path, "metrics") {
+	if metricsSkipper(c) {
 		return true
 	}
 	return websocketSkipper(c)
 }
 
-func cacheSkipper(c echo.Context) bool {
+func observableCacheSkipper(c echo.Context) bool {
 	if c.Request().Method != http.MethodGet {
 		return true
 	}
 	if websocketSkipper(c) {
 		return true
 	}
-	if strings.Contains(c.Request().URL.Path, "metrics") {
+	if metricsSkipper(c) {
 		return true
 	}
-	if strings.Contains(c.Request().URL.Path, "head") {
+	if c.Path() == "/v1/head" {
+		return true
+	}
+	if strings.Contains(c.Path(), "/v1/block/:height") {
+		return true
+	}
+	if strings.Contains(c.Path(), "/v1/tx/:hash") {
 		return true
 	}
 	return false
@@ -271,6 +284,9 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	searchHandler := handler.NewSearchHandler(db.Search, db.Address, db.Blocks, db.Tx, db.Namespace, db.Validator, db.Rollup)
 	v1.GET("/search", searchHandler.Search)
 
+	ttlCache := cache.NewTTLCache(cache.Config{MaxEntitiesCount: 1000}, time.Minute*15)
+	ttlCacheMiddleware := cache.Middleware(ttlCache, nil)
+
 	addressHandlers := handler.NewAddressHandler(db.Address, db.Tx, db.BlobLogs, db.Message, db.Delegation, db.Undelegation, db.Redelegation, db.VestingAccounts, db.Grants, db.State, cfg.Indexer.Name)
 	addressesGroup := v1.Group("/address")
 	{
@@ -304,13 +320,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		blockGroup.GET("/count", blockHandlers.Count)
 		heightGroup := blockGroup.Group("/:height")
 		{
-			heightGroup.GET("", blockHandlers.Get)
-			heightGroup.GET("/events", blockHandlers.GetEvents)
-			heightGroup.GET("/messages", blockHandlers.GetMessages)
-			heightGroup.GET("/stats", blockHandlers.GetStats)
-			heightGroup.GET("/blobs", blockHandlers.Blobs)
-			heightGroup.GET("/blobs/count", blockHandlers.BlobsCount)
-			heightGroup.GET("/ods", blockHandlers.BlockODS)
+			heightGroup.GET("", blockHandlers.Get, ttlCacheMiddleware)
+			heightGroup.GET("/events", blockHandlers.GetEvents, ttlCacheMiddleware)
+			heightGroup.GET("/messages", blockHandlers.GetMessages, ttlCacheMiddleware)
+			heightGroup.GET("/stats", blockHandlers.GetStats, ttlCacheMiddleware)
+			heightGroup.GET("/blobs", blockHandlers.Blobs, ttlCacheMiddleware)
+			heightGroup.GET("/blobs/count", blockHandlers.BlobsCount, ttlCacheMiddleware)
+			heightGroup.GET("/ods", blockHandlers.BlockODS, ttlCacheMiddleware)
 		}
 	}
 
@@ -322,11 +338,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		txGroup.GET("/genesis", txHandlers.Genesis)
 		hashGroup := txGroup.Group("/:hash")
 		{
-			hashGroup.GET("", txHandlers.Get)
-			hashGroup.GET("/events", txHandlers.GetEvents)
-			hashGroup.GET("/messages", txHandlers.GetMessages)
-			hashGroup.GET("/blobs", txHandlers.Blobs)
-			hashGroup.GET("/blobs/count", txHandlers.BlobsCount)
+			hashGroup.GET("", txHandlers.Get, ttlCacheMiddleware)
+			hashGroup.GET("/events", txHandlers.GetEvents, ttlCacheMiddleware)
+			hashGroup.GET("/messages", txHandlers.GetMessages, ttlCacheMiddleware)
+			hashGroup.GET("/blobs", txHandlers.Blobs, ttlCacheMiddleware)
+			hashGroup.GET("/blobs/count", txHandlers.BlobsCount, ttlCacheMiddleware)
 		}
 	}
 
@@ -532,7 +548,7 @@ func initSentry(e *echo.Echo, db postgres.Storage, dsn, environment string) erro
 
 var (
 	wsManager     *websocket.Manager
-	endpointCache *cache.Cache
+	endpointCache *cache.ObservableCache
 )
 
 func initWebsocket(ctx context.Context, group *echo.Group) {
@@ -542,12 +558,12 @@ func initWebsocket(ctx context.Context, group *echo.Group) {
 	group.GET("/ws", wsManager.Handle)
 }
 
-func initCache(ctx context.Context, e *echo.Echo) {
+func initObservableCache(ctx context.Context, e *echo.Echo) {
 	observer := dispatcher.Observe(storage.ChannelHead)
-	endpointCache = cache.NewCache(cache.Config{
+	endpointCache = cache.NewObservableCache(cache.Config{
 		MaxEntitiesCount: 1000,
 	}, observer)
-	e.Use(cache.Middleware(endpointCache, cacheSkipper))
+	e.Use(cache.Middleware(endpointCache, observableCacheSkipper))
 	endpointCache.Start(ctx)
 }
 

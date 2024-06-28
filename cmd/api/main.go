@@ -48,7 +48,7 @@ func main() {
 	initDispatcher(ctx, db)
 	initGasTracker(ctx, db)
 	initHandlers(ctx, e, *cfg, db)
-	initCache(ctx, e)
+	initObservableCache(ctx, e)
 
 	go func() {
 		if err := e.Start(cfg.ApiConfig.Bind); err != nil && errors.Is(err, http.ErrServerClosed) {
