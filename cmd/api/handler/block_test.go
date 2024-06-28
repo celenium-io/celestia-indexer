@@ -568,3 +568,27 @@ func (s *BlockTestSuite) TestBlockODS() {
 	s.Require().EqualValues(4, ods.Width)
 	s.Require().Len(ods.Items, 4)
 }
+
+func (s *BlockTestSuite) TestEmptyBlockODS() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/block/:height/ods")
+	c.SetParamNames("height")
+	c.SetParamValues("100")
+
+	s.blockStats.EXPECT().
+		ByHeight(gomock.Any(), pkgTypes.Level(100)).
+		Return(storage.BlockStats{}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.BlockODS(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var ods responses.ODS
+	err := json.NewDecoder(rec.Body).Decode(&ods)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(1, ods.Width)
+	s.Require().Len(ods.Items, 1)
+}

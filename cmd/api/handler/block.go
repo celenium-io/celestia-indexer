@@ -427,8 +427,15 @@ func (handler *BlockHandler) BlockODS(c echo.Context) error {
 
 	if blockStats.TxCount == 0 {
 		return c.JSON(http.StatusOK, responses.ODS{
-			Width: 0,
-			Items: make([]responses.ODSItem, 0),
+			Width: 1,
+			Items: []responses.ODSItem{
+				{
+					From:      []uint{0, 0},
+					To:        []uint{0, 0},
+					Namespace: "//////////////////////////////////////4=",
+					Type:      responses.TailPaddingNamespace,
+				},
+			},
 		})
 	}
 
