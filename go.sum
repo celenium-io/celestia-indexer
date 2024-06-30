@@ -291,8 +291,8 @@ github.com/btcsuite/btcd/btcutil v1.1.3 h1:xfbtw8lwpp0G6NwSHb+UE67ryTFHJAiNuipus
 github.com/btcsuite/btcd/btcutil v1.1.3/go.mod h1:UR7dsSJzJUfMmFiiLlIrMq1lS9jh9EdCV7FStZSnpi0=
 github.com/btcsuite/btcd/chaincfg/chainhash v1.0.1 h1:q0rUy8C/TYNBQS1+CGKw68tLOFYSNEs0TFnxxnS9+4U=
 github.com/btcsuite/btcd/chaincfg/chainhash v1.0.1/go.mod h1:7SFka0XMvUgj3hfZtydOrQY2mwhPclbT2snogU7SQQc=
-github.com/celestiaorg/celestia-app v1.11.0 h1:NV2nWR4r75qWY0reawrzoMnVRRbUgVtrgtFT9+ytmGQ=
-github.com/celestiaorg/celestia-app v1.11.0/go.mod h1:aKJkApIZnGt/q5ZYtsf6UM21MJR+D62rwWn2mCHKBNE=
+github.com/celestiaorg/celestia-app v1.12.0 h1:7SMTI/sB8jxp7QPJQRi/liAREnToAD5nOyA7M+naPIc=
+github.com/celestiaorg/celestia-app v1.12.0/go.mod h1:O/idsViCLLFdcaE4cJ+iZctZLX0KWfRheKT2W18W2uM=
 github.com/celestiaorg/celestia-core v1.36.0-tm-v0.34.29 h1:qLsTxyS0CHMuMO4S0ug1Zntv+gFB6OVdDNmG3pz5mHI=
 github.com/celestiaorg/celestia-core v1.36.0-tm-v0.34.29/go.mod h1:AL7kotb6ucKF4bpKKhGIzGhGL7dwYj2nFstiFC6PGxM=
 github.com/celestiaorg/cosmos-sdk v1.23.0-sdk-v0.46.16 h1:N2uETI13szEKnGAdKhtTR0EsrpcW0AwRKYER74WLnuw=
