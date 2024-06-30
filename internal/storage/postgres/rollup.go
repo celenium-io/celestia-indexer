@@ -40,9 +40,11 @@ func (r *Rollup) Leaderboard(ctx context.Context, sortField string, sort sdk.Sor
 
 	query := r.DB().NewSelect().
 		Table(storage.ViewLeaderboard).
-		ColumnExpr("*")
+		ColumnExpr("*").
+		Offset(offset)
 
 	query = sortScope(query, sortField, sort)
+	query = limitScope(query, limit)
 	err = query.Scan(ctx, &rollups)
 	return
 }
