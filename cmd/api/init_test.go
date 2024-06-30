@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_cacheSkipper(t *testing.T) {
+func Test_observableCacheSkipper(t *testing.T) {
 	e := echo.New()
 
 	tests := []struct {
@@ -23,22 +23,32 @@ func Test_cacheSkipper(t *testing.T) {
 	}{
 		{
 			name:   "test 1",
-			path:   "/ws",
+			path:   "/v1/ws",
 			method: http.MethodGet,
 			want:   true,
 		}, {
 			name:   "test 2",
-			path:   "/metrics",
+			path:   "/v1/metrics",
 			method: http.MethodGet,
 			want:   true,
 		}, {
 			name:   "test 3",
-			path:   "/some_post",
-			method: http.MethodPost,
+			path:   "/v1/block/:height",
+			method: http.MethodGet,
 			want:   true,
 		}, {
 			name:   "test 4",
-			path:   "/valid",
+			path:   "/v1/tx/:hash",
+			method: http.MethodGet,
+			want:   true,
+		}, {
+			name:   "test 5",
+			path:   "/v1/some_post",
+			method: http.MethodPost,
+			want:   true,
+		}, {
+			name:   "test 6",
+			path:   "/v1/valid",
 			method: http.MethodGet,
 			want:   false,
 		},
@@ -48,7 +58,9 @@ func Test_cacheSkipper(t *testing.T) {
 			req := httptest.NewRequest(tt.method, tt.path, nil)
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			got := cacheSkipper(c)
+			c.SetPath(tt.path)
+
+			got := observableCacheSkipper(c)
 			require.Equal(t, tt.want, got)
 		})
 	}

@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCache_SetGet(t *testing.T) {
+func TestObservableCache_SetGet(t *testing.T) {
 	t.Run("set and get key from cache", func(t *testing.T) {
-		c := NewCache(Config{MaxEntitiesCount: 2}, nil)
+		c := NewObservableCache(Config{MaxEntitiesCount: 2}, nil)
 		c.Set("test", []byte{0, 1, 2, 3})
 
 		got, ok := c.Get("test")
@@ -25,7 +25,7 @@ func TestCache_SetGet(t *testing.T) {
 	})
 
 	t.Run("overflow set queue", func(t *testing.T) {
-		c := NewCache(Config{MaxEntitiesCount: 2}, nil)
+		c := NewObservableCache(Config{MaxEntitiesCount: 2}, nil)
 		for i := 0; i < 100; i++ {
 			c.Set(fmt.Sprintf("%d", i), []byte{byte(i)})
 		}
@@ -46,13 +46,13 @@ func TestCache_SetGet(t *testing.T) {
 	})
 
 	t.Run("overflow set queue multithread", func(t *testing.T) {
-		c := NewCache(Config{MaxEntitiesCount: 2}, nil)
+		c := NewObservableCache(Config{MaxEntitiesCount: 2}, nil)
 
 		var wg sync.WaitGroup
 
 		for i := 0; i < 10; i++ {
 			wg.Add(1)
-			go func(c *Cache, wg *sync.WaitGroup) {
+			go func(c *ObservableCache, wg *sync.WaitGroup) {
 				defer wg.Done()
 				for i := 0; i < 100; i++ {
 					c.Set(fmt.Sprintf("%d", i), []byte{byte(i)})
@@ -67,9 +67,9 @@ func TestCache_SetGet(t *testing.T) {
 	})
 }
 
-func TestCache_Clear(t *testing.T) {
-	t.Run("set and get key from cache", func(t *testing.T) {
-		c := NewCache(Config{MaxEntitiesCount: 100}, nil)
+func TestObservableCache_Clear(t *testing.T) {
+	t.Run("clear cache", func(t *testing.T) {
+		c := NewObservableCache(Config{MaxEntitiesCount: 100}, nil)
 		for i := 0; i < 100; i++ {
 			c.Set(fmt.Sprintf("%d", i), []byte{byte(i)})
 		}
