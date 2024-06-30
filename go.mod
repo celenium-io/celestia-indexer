@@ -1,6 +1,6 @@
 module github.com/celenium-io/celestia-indexer
 
-go 1.22.3
+go 1.22.4
 
 require (
 	cosmossdk.io/errors v1.0.0
@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.11
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.53.1
 	github.com/aws/smithy-go v1.20.2
-	github.com/celestiaorg/celestia-app v1.11.0
+	github.com/celestiaorg/celestia-app v1.12.0
 	github.com/celestiaorg/go-square v1.1.0
 	github.com/celestiaorg/go-square/merkle v0.0.0-20240429192549-dea967e1533b
 	github.com/celestiaorg/rsmt2d v0.13.1
