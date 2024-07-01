@@ -767,3 +767,8 @@ func (tx Transaction) Delegation(ctx context.Context, validatorId, addressId uin
 		Scan(ctx)
 	return
 }
+
+func (tx Transaction) RefreshLeaderboard(ctx context.Context) error {
+	_, err := tx.Tx().ExecContext(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
+	return err
+}
