@@ -12,11 +12,15 @@ import (
 )
 
 func (s *StorageTestSuite) TestRollupLeaderboard() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
+	s.Require().NoError(err)
+
 	for _, column := range []string{
 		sizeColumn, blobsCountColumn, timeColumn, feeColumn, "",
 	} {
-		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer ctxCancel()
 
 		rollups, err := s.storage.Rollup.Leaderboard(ctx, column, sdk.SortOrderDesc, 10, 0)
 		s.Require().NoError(err, column)

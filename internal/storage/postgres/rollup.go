@@ -38,32 +38,20 @@ func (r *Rollup) Leaderboard(ctx context.Context, sortField string, sort sdk.Sor
 		return nil, errors.Errorf("unknown sort field: %s", sortField)
 	}
 
-	timeAggQuery := r.DB().NewSelect().Table("rollup_stats_by_month").
-		ColumnExpr("sum(size) as size, sum(blobs_count) as blobs_count, max(last_time) as last_time, min(first_time) as first_time, sum(fee) as fee, namespace_id, signer_id").
-		Group("namespace_id", "signer_id")
-
-	leaderboardQuery := r.DB().NewSelect().TableExpr("(?) as agg", timeAggQuery).
-		ColumnExpr("sum(size) as size, sum(blobs_count) as blobs_count, max(last_time) as last_time, min(first_time) as first_time, sum(fee) as fee, rollup_id").
-		Join("inner join rollup_provider as rp on rp.address_id = agg.signer_id AND (rp.namespace_id = agg.namespace_id OR rp.namespace_id = 0)").
-		Group("rollup_id")
-
-	leaderboardQuery = sortScope(leaderboardQuery, sortField, sort)
-	if offset > 0 {
-		leaderboardQuery = leaderboardQuery.Offset(offset)
-	}
-	leaderboardQuery = limitScope(leaderboardQuery, limit)
-
-	query := r.DB().NewSelect().Table("leaderboard").With("leaderboard", leaderboardQuery).
-		ColumnExpr("size, blobs_count, last_time, first_time, fee, rollup.*").
-		Join("inner join rollup on rollup.id = leaderboard.rollup_id")
+	query := r.DB().NewSelect().
+		Table(storage.ViewLeaderboard).
+		ColumnExpr("*").
+		Offset(offset)
 
 	query = sortScope(query, sortField, sort)
+	query = limitScope(query, limit)
 	err = query.Scan(ctx, &rollups)
 	return
 }
 
 func (r *Rollup) Namespaces(ctx context.Context, rollupId uint64, limit, offset int) (namespaceIds []uint64, err error) {
-	query := r.DB().NewSelect().TableExpr("rollup_stats_by_hour as r").
+	query := r.DB().NewSelect().
+		TableExpr("rollup_stats_by_month as r").
 		ColumnExpr("distinct r.namespace_id").
 		Join("inner join rollup_provider as rp on rp.address_id = r.signer_id AND (rp.namespace_id = r.namespace_id OR rp.namespace_id = 0)").
 		Where("rollup_id = ?", rollupId)

@@ -1062,6 +1062,44 @@ func (c *TransactionNamespaceCall) DoAndReturn(f func(context.Context, uint64) (
 	return c
 }
 
+// RefreshLeaderboard mocks base method.
+func (m *MockTransaction) RefreshLeaderboard(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RefreshLeaderboard", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RefreshLeaderboard indicates an expected call of RefreshLeaderboard.
+func (mr *MockTransactionMockRecorder) RefreshLeaderboard(ctx any) *TransactionRefreshLeaderboardCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RefreshLeaderboard", reflect.TypeOf((*MockTransaction)(nil).RefreshLeaderboard), ctx)
+	return &TransactionRefreshLeaderboardCall{Call: call}
+}
+
+// TransactionRefreshLeaderboardCall wrap *gomock.Call
+type TransactionRefreshLeaderboardCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *TransactionRefreshLeaderboardCall) Return(arg0 error) *TransactionRefreshLeaderboardCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *TransactionRefreshLeaderboardCall) Do(f func(context.Context) error) *TransactionRefreshLeaderboardCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *TransactionRefreshLeaderboardCall) DoAndReturn(f func(context.Context) error) *TransactionRefreshLeaderboardCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // RetentionBlockSignatures mocks base method.
 func (m *MockTransaction) RetentionBlockSignatures(ctx context.Context, height types.Level) error {
 	m.ctrl.T.Helper()

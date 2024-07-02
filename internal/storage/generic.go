@@ -132,6 +132,7 @@ type Transaction interface {
 	GetProposerId(ctx context.Context, address string) (uint64, error)
 	Validator(ctx context.Context, id uint64) (val Validator, err error)
 	Delegation(ctx context.Context, validatorId, addressId uint64) (val Delegation, err error)
+	RefreshLeaderboard(ctx context.Context) error
 }
 
 const (
