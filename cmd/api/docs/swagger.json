@@ -980,7 +980,7 @@
                 }
             }
         },
-        "/address/{hash}/vesting": {
+        "/address/{hash}/vestings": {
             "get": {
                 "description": "Get vesting for address",
                 "produces": [

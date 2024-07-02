@@ -584,7 +584,7 @@ func (req *getAddressVestings) SetDefault() {
 //	@Success		200	{array}		responses.Vesting
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/address/{hash}/vesting [get]
+//	@Router			/address/{hash}/vestings [get]
 func (handler *AddressHandler) Vestings(c echo.Context) error {
 	req, err := bindAndValidate[getAddressVestings](c)
 	if err != nil {
