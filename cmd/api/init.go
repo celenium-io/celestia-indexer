@@ -112,13 +112,10 @@ func metricsSkipper(c echo.Context) bool {
 }
 
 func postSkipper(c echo.Context) bool {
-	if c.Path() == "/v1/blob" {
+	if strings.HasPrefix(c.Path(), "/v1/blob") {
 		return true
 	}
-	if c.Path() == "/v1/blob/metadata" {
-		return true
-	}
-	if c.Path() == "/v1/auth/rollup" {
+	if strings.HasPrefix(c.Path(), "/v1/auth") {
 		return true
 	}
 	return false

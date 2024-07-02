@@ -67,22 +67,27 @@ func (c *TTLCache) Get(key string) ([]byte, bool) {
 
 func (c *TTLCache) Set(key string, data []byte) {
 	c.mx.Lock()
-	queueIdx := len(c.m)
-	item := &ttlItem{
-		data:      data,
-		expiredAt: time.Now().Add(c.expiration),
-	}
+	{
+		queueIdx := len(c.m)
+		item := &ttlItem{
+			data:      data,
+			expiredAt: time.Now().Add(c.expiration),
+		}
 
-	if _, ok := c.m[key]; ok {
-		c.m[key] = item
-	} else {
-		c.m[key] = item
-		if queueIdx == c.maxEntitiesCount {
-			keyForRemove := c.queue[queueIdx-1]
-			c.queue = append([]string{key}, c.queue[:queueIdx-1]...)
-			delete(c.m, keyForRemove)
+		if _, ok := c.m[key]; ok {
+			c.m[key] = item
 		} else {
-			c.queue[c.maxEntitiesCount-queueIdx-1] = key
+			c.m[key] = item
+			if queueIdx == c.maxEntitiesCount {
+				keyForRemove := c.queue[0]
+				for i := 0; i < len(c.queue)-1; i++ {
+					c.queue[i] = c.queue[i+1]
+				}
+				c.queue[queueIdx-1] = key
+				delete(c.m, keyForRemove)
+			} else {
+				c.queue[c.maxEntitiesCount-queueIdx-1] = key
+			}
 		}
 	}
 	c.mx.Unlock()
