@@ -16,12 +16,14 @@ type Vesting struct {
 	Id        uint64            `example:"12"                                                               format:"integer"   json:"id"                   swaggertype:"integer"`
 	Height    pkgTypes.Level    `example:"100"                                                              format:"integer"   json:"height"               swaggertype:"integer"`
 	Time      time.Time         `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                 swaggertype:"string"`
-	StartTime time.Time         `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"start_time,omitempty" swaggertype:"string"`
-	EndTime   time.Time         `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"end_time,omitempty"   swaggertype:"string"`
+	StartTime *time.Time        `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"start_time,omitempty" swaggertype:"string"`
+	EndTime   *time.Time        `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"end_time,omitempty"   swaggertype:"string"`
 	Hash      string            `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"hash,omitempty"       swaggertype:"string"`
 	Type      types.VestingType `example:"delayed"                                                          format:"string"    json:"type"                 swaggertype:"string"`
 	Amount    string            `example:"123.13333"                                                        format:"string"    json:"amount"               swaggertype:"string"`
 }
+
+var startOfTime = time.Unix(0, 0).UTC()
 
 func NewVesting(v storage.VestingAccount) Vesting {
 	vesting := Vesting{
@@ -32,12 +34,39 @@ func NewVesting(v storage.VestingAccount) Vesting {
 		Amount: v.Amount.String(),
 	}
 
-	if v.StartTime != nil {
-		vesting.StartTime = *v.StartTime
-	}
+	switch v.Type {
+	case types.VestingTypeContinuous:
+		if v.StartTime != nil {
+			vesting.StartTime = v.StartTime
+		} else {
+			vesting.StartTime = &startOfTime
+		}
 
-	if v.EndTime != nil {
-		vesting.EndTime = *v.EndTime
+		if v.EndTime != nil {
+			vesting.EndTime = v.EndTime
+		} else {
+			vesting.EndTime = &startOfTime
+		}
+
+	case types.VestingTypePeriodic:
+		if v.StartTime != nil {
+			vesting.StartTime = v.StartTime
+		} else {
+			vesting.StartTime = &startOfTime
+		}
+
+		if v.EndTime != nil {
+			vesting.EndTime = v.EndTime
+		}
+
+	case types.VestingTypeDelayed:
+		if v.EndTime != nil {
+			vesting.EndTime = v.EndTime
+		} else {
+			vesting.EndTime = &startOfTime
+		}
+
+	case types.VestingTypePermanent:
 	}
 
 	if v.Tx != nil {
