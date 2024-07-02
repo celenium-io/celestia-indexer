@@ -106,16 +106,17 @@ func TestTTLCache_SetGet(t *testing.T) {
 		c.Set("test2", []byte{0})
 		c.Set("test", []byte{0})
 		c.Set("test3", []byte{0})
+		c.Set("test4", []byte{0})
 		c.m["test"].expiredAt = time.Now().Add(-time.Hour)
 
-		require.Len(t, c.m, 3)
+		require.Len(t, c.m, 4)
 		require.Len(t, c.queue, 4)
 
 		_, exists := c.Get("test")
 		require.False(t, exists)
 
 		require.Len(t, c.queue, 4)
-		require.Len(t, c.m, 2)
+		require.Len(t, c.m, 3)
 	})
 }
 
