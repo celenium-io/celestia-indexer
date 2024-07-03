@@ -585,7 +585,9 @@ func (s *AddressTestSuite) TestVestings() {
 	s.Require().Equal("100", v.Amount)
 	s.Require().EqualValues(1000, v.Height)
 	s.Require().Equal(testTime, v.Time)
-	s.Require().Equal(testTime, v.EndTime)
+	s.Require().NotNil(v.EndTime)
+	s.Require().Equal(testTime, *v.EndTime)
+	s.Require().Nil(v.StartTime)
 }
 
 func (s *AddressTestSuite) TestGrants() {
