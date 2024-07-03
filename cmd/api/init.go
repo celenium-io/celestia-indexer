@@ -202,11 +202,7 @@ func initEcho(cfg ApiConfig, db postgres.Storage, env string) *echo.Echo {
 	if cfg.RequestTimeout > 0 {
 		timeout = time.Duration(cfg.RequestTimeout) * time.Second
 	}
-	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
-		Skipper:      websocketSkipper,
-		Timeout:      timeout,
-		ErrorMessage: `{"message":"timeout"}`,
-	}))
+	e.Use(RequestTimeout(timeout))
 
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Skipper: gzipSkipper,
@@ -281,7 +277,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	searchHandler := handler.NewSearchHandler(db.Search, db.Address, db.Blocks, db.Tx, db.Namespace, db.Validator, db.Rollup)
 	v1.GET("/search", searchHandler.Search)
 
-	ttlCache := cache.NewTTLCache(cache.Config{MaxEntitiesCount: 1000}, time.Minute*15)
+	ttlCache := cache.NewTTLCache(cache.Config{MaxEntitiesCount: 1000}, time.Minute*30)
 	ttlCacheMiddleware := cache.Middleware(ttlCache, nil)
 
 	addressHandlers := handler.NewAddressHandler(db.Address, db.Tx, db.BlobLogs, db.Message, db.Delegation, db.Undelegation, db.Redelegation, db.VestingAccounts, db.Grants, db.State, cfg.Indexer.Name)

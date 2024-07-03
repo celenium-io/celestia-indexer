@@ -48,7 +48,12 @@ func handleError(c echo.Context, err error, noRows NoRows) error {
 	if err.Error() == errCancelRequest {
 		return nil
 	}
-	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+	if errors.Is(err, context.DeadlineExceeded) {
+		return c.JSON(http.StatusRequestTimeout, Error{
+			Message: "timeout",
+		})
+	}
+	if errors.Is(err, context.Canceled) {
 		return c.JSON(http.StatusBadGateway, Error{
 			Message: err.Error(),
 		})
