@@ -40,26 +40,26 @@ func (c *TTLCache) Get(key string) ([]byte, bool) {
 	}
 	if time.Now().After(item.expiredAt) {
 		c.mx.Lock()
-		{
-			copying := false
-			if len(c.queue) > len(c.m) {
-				for i := len(c.queue) - 1; i > 0; i-- {
-					if copying = copying || c.queue[i] == key; copying {
-						c.queue[i] = c.queue[i-1]
-					}
+		defer c.mx.Unlock()
+
+		copying := false
+		if len(c.queue) > len(c.m) {
+			for i := len(c.queue) - 1; i > 0; i-- {
+				if copying = copying || c.queue[i] == key; copying {
+					c.queue[i] = c.queue[i-1]
 				}
-				c.queue[0] = ""
-			} else {
-				for i := 0; i < len(c.queue)-1; i++ {
-					if copying = copying || c.queue[i] == key; copying {
-						c.queue[i] = c.queue[i+1]
-					}
-				}
-				c.queue[len(c.queue)-1] = ""
 			}
-			delete(c.m, key)
+			c.queue[0] = ""
+		} else {
+			for i := 0; i < len(c.queue)-1; i++ {
+				if copying = copying || c.queue[i] == key; copying {
+					c.queue[i] = c.queue[i+1]
+				}
+			}
+			c.queue[len(c.queue)-1] = ""
 		}
-		c.mx.Unlock()
+		delete(c.m, key)
+
 		return nil, false
 	}
 	return item.data, true
@@ -67,30 +67,29 @@ func (c *TTLCache) Get(key string) ([]byte, bool) {
 
 func (c *TTLCache) Set(key string, data []byte) {
 	c.mx.Lock()
-	{
-		queueIdx := len(c.m)
-		item := &ttlItem{
-			data:      data,
-			expiredAt: time.Now().Add(c.expiration),
-		}
+	defer c.mx.Unlock()
 
-		if _, ok := c.m[key]; ok {
-			c.m[key] = item
-		} else {
-			c.m[key] = item
-			if queueIdx == c.maxEntitiesCount {
-				keyForRemove := c.queue[0]
-				for i := 0; i < len(c.queue)-1; i++ {
-					c.queue[i] = c.queue[i+1]
-				}
-				c.queue[queueIdx-1] = key
-				delete(c.m, keyForRemove)
-			} else {
-				c.queue[c.maxEntitiesCount-queueIdx-1] = key
+	queueIdx := len(c.m)
+	item := &ttlItem{
+		data:      data,
+		expiredAt: time.Now().Add(c.expiration),
+	}
+
+	if _, ok := c.m[key]; ok {
+		c.m[key] = item
+	} else {
+		c.m[key] = item
+		if queueIdx == c.maxEntitiesCount {
+			keyForRemove := c.queue[0]
+			for i := 0; i < len(c.queue)-1; i++ {
+				c.queue[i] = c.queue[i+1]
 			}
+			c.queue[queueIdx-1] = key
+			delete(c.m, keyForRemove)
+		} else {
+			c.queue[c.maxEntitiesCount-queueIdx-1] = key
 		}
 	}
-	c.mx.Unlock()
 }
 
 func (c *TTLCache) Clear() {
