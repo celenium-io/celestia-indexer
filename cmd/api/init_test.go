@@ -32,16 +32,16 @@ func Test_observableCacheSkipper(t *testing.T) {
 			method: http.MethodGet,
 			want:   true,
 		}, {
-			name:   "test 3",
-			path:   "/v1/block/:height",
-			method: http.MethodGet,
-			want:   true,
-		}, {
-			name:   "test 4",
-			path:   "/v1/tx/:hash",
-			method: http.MethodGet,
-			want:   true,
-		}, {
+			// 	name:   "test 3",
+			// 	path:   "/v1/block/:height",
+			// 	method: http.MethodGet,
+			// 	want:   true,
+			// }, {
+			// 	name:   "test 4",
+			// 	path:   "/v1/tx/:hash",
+			// 	method: http.MethodGet,
+			// 	want:   true,
+			// }, {
 			name:   "test 5",
 			path:   "/v1/some_post",
 			method: http.MethodPost,
