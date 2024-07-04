@@ -87,7 +87,7 @@ func (c *TTLCache) Set(key string, data []byte) {
 			c.queue[queueIdx-1] = key
 			delete(c.m, keyForRemove)
 		} else {
-			c.queue[c.maxEntitiesCount-queueIdx-1] = key
+			c.queue[queueIdx] = key
 		}
 	}
 }
