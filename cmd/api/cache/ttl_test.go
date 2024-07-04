@@ -46,6 +46,8 @@ func TestTTLCache_SetGet(t *testing.T) {
 
 		_, exists := c.Get("0")
 		require.False(t, exists)
+
+		require.Equal(t, []string{"98", "99"}, c.queue)
 	})
 
 	t.Run("overflow set queue multithread", func(t *testing.T) {
