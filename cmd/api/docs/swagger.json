@@ -3491,6 +3491,56 @@
                 }
             }
         },
+        "/stats/square_size": {
+            "get": {
+                "description": "Get histogram for square size distribution",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get histogram for square size distribution",
+                "operationId": "stats-square-size",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.SquareSizeResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/staking/series/{id}/{name}/{timeframe}": {
             "get": {
                 "description": "Get histogram for staking with precomputed stats by series name and timeframe",
@@ -5956,6 +6006,15 @@
                 }
             }
         },
+        "responses.SquareSizeResponse": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/responses.TimeValueItem"
+                }
+            }
+        },
         "responses.State": {
             "type": "object",
             "properties": {
@@ -6058,6 +6117,21 @@
                     "type": "number",
                     "format": "float",
                     "example": 0.123
+                }
+            }
+        },
+        "responses.TimeValueItem": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "value": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.17632"
                 }
             }
         },

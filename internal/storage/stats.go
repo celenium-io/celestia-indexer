@@ -162,4 +162,5 @@ type IStats interface {
 	CumulativeSeries(ctx context.Context, timeframe Timeframe, name string, req SeriesRequest) ([]SeriesItem, error)
 	NamespaceSeries(ctx context.Context, timeframe Timeframe, name string, nsId uint64, req SeriesRequest) (response []SeriesItem, err error)
 	StakingSeries(ctx context.Context, timeframe Timeframe, name string, validatorId uint64, req SeriesRequest) (response []SeriesItem, err error)
+	SquareSize(ctx context.Context, from, to *time.Time) (map[int][]SeriesItem, error)
 }

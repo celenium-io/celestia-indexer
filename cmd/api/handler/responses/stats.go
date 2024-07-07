@@ -110,3 +110,22 @@ func NewDistributionItem(item storage.DistributionItem, tf string) (result Distr
 
 	return
 }
+
+type TimeValueItem struct {
+	Time  time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"  swaggertype:"string"`
+	Value string    `example:"0.17632"                   format:"string"    json:"value" swaggertype:"string"`
+}
+
+type SquareSizeResponse map[int][]TimeValueItem
+
+func NewSquareSizeResponse(m map[int][]storage.SeriesItem) SquareSizeResponse {
+	response := make(SquareSizeResponse)
+	for key, value := range m {
+		response[key] = make([]TimeValueItem, len(value))
+		for i := range value {
+			response[key][i].Time = value[i].Time
+			response[key][i].Value = value[i].Value
+		}
+	}
+	return response
+}
