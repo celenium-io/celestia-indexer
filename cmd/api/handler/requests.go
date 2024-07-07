@@ -47,7 +47,7 @@ type txListRequest struct {
 	Limit           int         `query:"limit"             validate:"omitempty,min=1,max=100"`
 	Offset          int         `query:"offset"            validate:"omitempty,min=0"`
 	Sort            string      `query:"sort"              validate:"omitempty,oneof=asc desc"`
-	Height          uint64      `query:"height"            validate:"omitempty,min=1"`
+	Height          *uint64     `query:"height"            validate:"omitempty,min=0"`
 	Status          StringArray `query:"status"            validate:"omitempty,dive,status"`
 	MsgType         StringArray `query:"msg_type"          validate:"omitempty,dive,msg_type"`
 	ExcludedMsgType StringArray `query:"excluded_msg_type" validate:"omitempty,dive,msg_type"`
@@ -92,7 +92,7 @@ type addressTxRequest struct {
 	Limit   uint64      `query:"limit"    validate:"omitempty,min=1,max=100"`
 	Offset  uint64      `query:"offset"   validate:"omitempty,min=0"`
 	Sort    string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
-	Height  uint64      `query:"height"   validate:"omitempty,min=1"`
+	Height  *uint64     `query:"height"   validate:"omitempty,min=0"`
 	Status  StringArray `query:"status"   validate:"omitempty,dive,status"`
 	MsgType StringArray `query:"msg_type" validate:"omitempty,dive,msg_type"`
 

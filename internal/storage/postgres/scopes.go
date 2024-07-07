@@ -53,8 +53,8 @@ func txFilter(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
 			return sq
 		})
 	}
-	if fltrs.Height > 0 {
-		query = query.Where("height = ?", fltrs.Height)
+	if fltrs.Height != nil {
+		query = query.Where("height = ?", *fltrs.Height)
 	}
 
 	if !fltrs.TimeFrom.IsZero() {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 )
 
@@ -94,7 +95,7 @@ func (s *StorageTestSuite) TestTxFilterExcludedMessageTypes() {
 		Limit:                10,
 		Offset:               0,
 		ExcludedMessageTypes: types.NewMsgTypeBitMask(types.MsgUnjail),
-		Height:               1000,
+		Height:               testsuite.Ptr(uint64(1000)),
 	})
 	s.Require().NoError(err)
 	s.Require().Len(txs, 1)
@@ -158,7 +159,7 @@ func (s *StorageTestSuite) TestTxFilterHeight() {
 		Limit:  10,
 		Offset: 0,
 		Status: []string{string(types.StatusSuccess)},
-		Height: 1000,
+		Height: testsuite.Ptr(uint64(1000)),
 	})
 	s.Require().NoError(err)
 	s.Require().Len(txs, 2)
