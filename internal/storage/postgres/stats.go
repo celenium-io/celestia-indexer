@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
@@ -296,5 +297,57 @@ func (s Stats) StakingSeries(ctx context.Context, timeframe storage.Timeframe, n
 	}
 
 	err = query.Limit(100).Scan(ctx, &response)
+	return
+}
+
+type squareSize struct {
+	SquareSize  int       `bun:"square_size"`
+	Time        time.Time `bun:"ts"`
+	CountBlocks string    `bun:"count_blocks"`
+}
+
+func (s Stats) SquareSize(ctx context.Context, from, to *time.Time) (result map[int][]storage.SeriesItem, err error) {
+	query := s.db.DB().NewSelect().
+		Table(storage.ViewSquareSize).
+		OrderExpr("ts desc, square_size desc")
+
+	switch {
+	case from == nil && to == nil:
+		query.
+			Where("ts >= ?", time.Now().AddDate(0, -1, 0).UTC())
+
+	case from != nil && to == nil:
+		query.
+			Where("ts >= ?", from.UTC()).
+			Where("ts < ?", from.AddDate(0, 1, 0).UTC())
+
+	case from == nil && to != nil:
+		query.
+			Where("ts >= ?", to.AddDate(0, -1, 0).UTC()).
+			Where("ts < ?", to.UTC())
+
+	case from != nil && to != nil:
+		query.
+			Where("ts >= ?", from.UTC()).
+			Where("ts < ?", to.UTC())
+	}
+
+	var response []squareSize
+	if err := query.Scan(ctx, &response); err != nil {
+		return result, err
+	}
+
+	result = make(map[int][]storage.SeriesItem)
+	for _, item := range response {
+		seriesItem := storage.SeriesItem{
+			Value: item.CountBlocks,
+			Time:  item.Time,
+		}
+		if _, ok := result[item.SquareSize]; !ok {
+			result[item.SquareSize] = make([]storage.SeriesItem, 0)
+		}
+		result[item.SquareSize] = append(result[item.SquareSize], seriesItem)
+	}
+
 	return
 }

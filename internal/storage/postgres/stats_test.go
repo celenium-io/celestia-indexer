@@ -286,6 +286,16 @@ func (s *StatsTestSuite) TestNamespaceSeries() {
 	s.Require().Len(items, 1)
 }
 
+func (s *StatsTestSuite) TestSquareSize() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	from := time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC)
+	items, err := s.storage.Stats.SquareSize(ctx, &from, nil)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+}
+
 func TestSuiteStats_Run(t *testing.T) {
 	suite.Run(t, new(StatsTestSuite))
 }

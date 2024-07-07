@@ -452,3 +452,49 @@ func (sh StatsHandler) StakingSeries(c echo.Context) error {
 	}
 	return returnArray(c, response)
 }
+
+type squareSizeRequest struct {
+	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1"`
+	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
+// SquareSize godoc
+//
+//	@Summary		Get histogram for square size distribution
+//	@Description	Get histogram for square size distribution
+//	@Tags			stats
+//	@ID				stats-square-size
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.SquareSizeResponse
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/stats/square_size [get]
+func (sh StatsHandler) SquareSize(c echo.Context) error {
+	req, err := bindAndValidate[squareSizeRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	var from, to *time.Time
+	if req.From > 0 {
+		t := time.Unix(req.From, 0).UTC()
+		from = &t
+	}
+	if req.To > 0 {
+		t := time.Unix(req.To, 0).UTC()
+		to = &t
+	}
+
+	histogram, err := sh.repo.SquareSize(
+		c.Request().Context(),
+		from,
+		to,
+	)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewSquareSizeResponse(histogram))
+}

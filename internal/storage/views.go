@@ -19,4 +19,5 @@ const (
 	ViewStakingByDay          = "staking_by_day"
 	ViewStakingByMonth        = "staking_by_month"
 	ViewLeaderboard           = "leaderboard"
+	ViewSquareSize            = "square_size"
 )

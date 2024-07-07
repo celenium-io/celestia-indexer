@@ -14,6 +14,7 @@ package mock
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
 	gomock "go.uber.org/mock/gomock"
@@ -194,6 +195,45 @@ func (c *IStatsSeriesCall) Do(f func(context.Context, storage.Timeframe, string,
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *IStatsSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsSeriesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SquareSize mocks base method.
+func (m *MockIStats) SquareSize(ctx context.Context, from, to *time.Time) (map[int][]storage.SeriesItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SquareSize", ctx, from, to)
+	ret0, _ := ret[0].(map[int][]storage.SeriesItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SquareSize indicates an expected call of SquareSize.
+func (mr *MockIStatsMockRecorder) SquareSize(ctx, from, to any) *IStatsSquareSizeCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SquareSize", reflect.TypeOf((*MockIStats)(nil).SquareSize), ctx, from, to)
+	return &IStatsSquareSizeCall{Call: call}
+}
+
+// IStatsSquareSizeCall wrap *gomock.Call
+type IStatsSquareSizeCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IStatsSquareSizeCall) Return(arg0 map[int][]storage.SeriesItem, arg1 error) *IStatsSquareSizeCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IStatsSquareSizeCall) Do(f func(context.Context, *time.Time, *time.Time) (map[int][]storage.SeriesItem, error)) *IStatsSquareSizeCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IStatsSquareSizeCall) DoAndReturn(f func(context.Context, *time.Time, *time.Time) (map[int][]storage.SeriesItem, error)) *IStatsSquareSizeCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

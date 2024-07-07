@@ -445,3 +445,31 @@ func (s *StatsTestSuite) TestPriceCurrent() {
 	s.Require().Equal("0.01", response.Low)
 	s.Require().Equal("0.15", response.Close)
 }
+
+func (s *StatsTestSuite) TestSquareSize() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/square_size")
+
+	s.stats.EXPECT().
+		SquareSize(gomock.Any(), nil, nil).
+		Return(map[int][]storage.SeriesItem{
+			2: {
+				{
+					Time:  testTime,
+					Value: "100",
+				},
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.SquareSize(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response responses.SquareSizeResponse
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 1)
+	s.Require().Contains(response, 2)
+	s.Require().Len(response[2], 1)
+}
