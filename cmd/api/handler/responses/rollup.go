@@ -23,11 +23,14 @@ type RollupWithStats struct {
 	BridgeContract string `example:"https://github.com/account"                format:"string"  json:"bridge,omitempty"      swaggertype:"string"`
 	Stack          string `example:"op_stack"                                  format:"string"  json:"stack,omitempty"       swaggertype:"string"`
 
-	BlobsCount  int64     `example:"2"                         format:"integer"   json:"blobs_count"        swaggertype:"integer"`
-	Size        int64     `example:"1000"                      format:"integer"   json:"size"               swaggertype:"integer"`
-	LastAction  time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"last_message_time"  swaggertype:"string"`
-	FirstAction time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"first_message_time" swaggertype:"string"`
-	Fee         string    `example:"123.456789"                format:"string"    json:"fee"                swaggertype:"string"`
+	BlobsCount    int64     `example:"2"                         format:"integer"   json:"blobs_count"        swaggertype:"integer"`
+	Size          int64     `example:"1000"                      format:"integer"   json:"size"               swaggertype:"integer"`
+	LastAction    time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"last_message_time"  swaggertype:"string"`
+	FirstAction   time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"first_message_time" swaggertype:"string"`
+	Fee           string    `example:"123.456789"                format:"string"    json:"fee"                swaggertype:"string"`
+	SizePct       float64   `example:"0.9876"                    format:"float"     json:"size_pct"           swaggertype:"number"`
+	FeePct        float64   `example:"0.9876"                    format:"float"     json:"fee_pct"            swaggertype:"number"`
+	BlobsCountPct float64   `example:"0.9876"                    format:"float"     json:"blobs_count_pct"    swaggertype:"number"`
 
 	Links []string `json:"links,omitempty"`
 }
@@ -49,6 +52,9 @@ func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 		Slug:           r.Slug,
 		BlobsCount:     r.BlobsCount,
 		Size:           r.Size,
+		SizePct:        r.SizePct,
+		BlobsCountPct:  r.BlobsCountPct,
+		FeePct:         r.FeePct,
 		LastAction:     r.LastActionTime,
 		FirstAction:    r.FirstActionTime,
 		Fee:            r.Fee.StringFixed(0),
