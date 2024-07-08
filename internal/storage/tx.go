@@ -48,7 +48,7 @@ type TxFilter struct {
 	Status               []string
 	MessageTypes         types.MsgTypeBits
 	ExcludedMessageTypes types.MsgTypeBits
-	Height               uint64
+	Height               *uint64
 	TimeFrom             time.Time
 	TimeTo               time.Time
 	WithMessages         bool
