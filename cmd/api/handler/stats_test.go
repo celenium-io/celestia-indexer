@@ -473,3 +473,51 @@ func (s *StatsTestSuite) TestSquareSize() {
 	s.Require().Contains(response, 2)
 	s.Require().Len(response[2], 1)
 }
+
+func (s *StatsTestSuite) TestCumulativeSeries() {
+	for _, name := range []string{
+		storage.SeriesBlobsSize,
+		storage.SeriesFee,
+		storage.SeriesSupplyChange,
+		storage.SeriesTxCount,
+		storage.SeriesGasLimit,
+		storage.SeriesGasUsed,
+		storage.SeriesBytesInBlock,
+		storage.SeriesBlobsCount,
+	} {
+
+		for _, tf := range []storage.Timeframe{
+			storage.TimeframeDay,
+			storage.TimeframeWeek,
+			storage.TimeframeMonth,
+			storage.TimeframeYear,
+		} {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/v1/stats/series/:name/:timeframe")
+			c.SetParamNames("name", "timeframe")
+			c.SetParamValues(name, string(tf))
+
+			s.stats.EXPECT().
+				CumulativeSeries(gomock.Any(), tf, name, storage.NewSeriesRequest(0, 0)).
+				Return([]storage.SeriesItem{
+					{
+						Value: "1000",
+						Time:  testTime,
+					},
+				}, nil)
+
+			s.Require().NoError(s.handler.SeriesCumulative(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
+
+			var response []responses.SeriesItem
+			err := json.NewDecoder(rec.Body).Decode(&response)
+			s.Require().NoError(err)
+			s.Require().Len(response, 1)
+
+			item := response[0]
+			s.Require().Equal("1000", item.Value)
+		}
+	}
+}
