@@ -39,6 +39,9 @@ var (
 			Size:            1000,
 			LastActionTime:  testTime,
 			FirstActionTime: testTime,
+			BlobsCountPct:   0.1,
+			FeePct:          0.2,
+			SizePct:         0.3,
 		},
 	}
 )
@@ -111,6 +114,9 @@ func (s *RollupTestSuite) TestLeaderboard() {
 		s.Require().EqualValues(1000, rollup.Size)
 		s.Require().EqualValues(testTime, rollup.LastAction)
 		s.Require().EqualValues(testTime, rollup.FirstAction)
+		s.Require().EqualValues(0.1, rollup.BlobsCountPct)
+		s.Require().EqualValues(0.2, rollup.FeePct)
+		s.Require().EqualValues(0.3, rollup.SizePct)
 	}
 }
 

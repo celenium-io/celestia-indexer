@@ -79,4 +79,7 @@ type RollupStats struct {
 	LastActionTime  time.Time       `bun:"last_time"`
 	FirstActionTime time.Time       `bun:"first_time"`
 	Fee             decimal.Decimal `bun:"fee"`
+	SizePct         float64         `bun:"size_pct"`
+	FeePct          float64         `bun:"fee_pct"`
+	BlobsCountPct   float64         `bun:"blobs_count_pct"`
 }

@@ -1,13 +1,6 @@
 CREATE MATERIALIZED VIEW IF NOT EXISTS leaderboard AS
-    select 
-        size, 
-        blobs_count, 
-        last_time, 
-        first_time, 
-        fee, 
-        rollup.*
-    from (
-        select 
+   with board as (
+	select 
             rollup_id,
             sum(size) as size, 
             sum(blobs_count) as blobs_count, 
@@ -28,8 +21,18 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS leaderboard AS
         ) as agg
         inner join rollup_provider as rp on rp.address_id = agg.signer_id AND (rp.namespace_id = agg.namespace_id OR rp.namespace_id = 0)
         group by 1
-    ) as leaderboard
-    inner join rollup on rollup.id = leaderboard.rollup_id
-    with no data;
+    ) 
+    select 
+        board.size, 
+        board.blobs_count, 
+        board.last_time, 
+        board.first_time, 
+        board.fee,
+        board.size / (select sum(size) from board) as size_pct,
+        board.fee / (select sum(fee) from board)as fee_pct,
+        board.blobs_count / (select sum(blobs_count) from board)as blobs_count_pct,
+        rollup.*
+    from board
+    inner join rollup on rollup.id = board.rollup_id;
 
 CALL add_job_refresh_materialized_view();

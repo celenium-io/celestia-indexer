@@ -34,6 +34,9 @@ func (s *StorageTestSuite) TestRollupLeaderboard() {
 		s.Require().False(rollup.LastActionTime.IsZero())
 		s.Require().False(rollup.FirstActionTime.IsZero())
 		s.Require().Equal("7000", rollup.Fee.String())
+		s.Require().EqualValues(0.6363636363636364, rollup.FeePct)
+		s.Require().EqualValues(0.42857142857142855, rollup.BlobsCountPct)
+		s.Require().EqualValues(0.3953488372093023, rollup.SizePct)
 	}
 }
 

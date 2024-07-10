@@ -5826,6 +5826,11 @@
                     "format": "integer",
                     "example": 2
                 },
+                "blobs_count_pct": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.9876
+                },
                 "bridge": {
                     "type": "string",
                     "format": "string",
@@ -5845,6 +5850,11 @@
                     "type": "string",
                     "format": "string",
                     "example": "123.456789"
+                },
+                "fee_pct": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.9876
                 },
                 "first_message_time": {
                     "type": "string",
@@ -5891,6 +5901,11 @@
                     "type": "integer",
                     "format": "integer",
                     "example": 1000
+                },
+                "size_pct": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.9876
                 },
                 "slug": {
                     "type": "string",
