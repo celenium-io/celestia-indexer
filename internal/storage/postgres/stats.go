@@ -241,6 +241,8 @@ func (s Stats) CumulativeSeries(ctx context.Context, timeframe storage.Timeframe
 		query.ColumnExpr("ts, sum(sum(bytes_in_block)) OVER(ORDER BY ts) as value")
 	case storage.SeriesBlobsCount:
 		query.ColumnExpr("ts, sum(sum(blobs_count)) OVER(ORDER BY ts) as value")
+	case storage.SeriesSupplyChange:
+		query.ColumnExpr("ts, sum(sum(supply_change)) OVER(ORDER BY ts) as value")
 	default:
 		return nil, errors.Errorf("unexpected series name: %s", name)
 	}

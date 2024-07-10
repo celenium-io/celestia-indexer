@@ -3445,7 +3445,8 @@
                             "tx_count",
                             "gas_used",
                             "gas_limit",
-                            "bytes_in_block"
+                            "bytes_in_block",
+                            "supply_change"
                         ],
                         "type": "string",
                         "description": "Series name",
