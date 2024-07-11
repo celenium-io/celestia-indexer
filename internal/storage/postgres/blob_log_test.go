@@ -42,6 +42,9 @@ func (s *StorageTestSuite) TestBlobLogsByNamespace() {
 
 	s.Require().NotNil(log.Tx)
 	s.Require().EqualValues(4, log.Tx.Id)
+
+	s.Require().NotNil(log.Rollup)
+	s.Require().Equal("Rollup 1", log.Rollup.Name)
 }
 
 func (s *StorageTestSuite) TestBlobLogsByNamespaceAndCommitment() {
