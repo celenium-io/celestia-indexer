@@ -95,12 +95,6 @@ type TPS struct {
 	ChangeLastHourPct float64
 }
 
-type TxCountForLast24hItem struct {
-	Time    time.Time `bun:"ts"`
-	TxCount int64     `bun:"tx_count"`
-	TPS     float64   `bun:"tps"`
-}
-
 type Change24hBlockStats struct {
 	TxCount      float64 `bun:"tx_count_24h"`
 	Fee          float64 `bun:"fee_24h"`
