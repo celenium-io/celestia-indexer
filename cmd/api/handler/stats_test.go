@@ -149,34 +149,32 @@ func (s *StatsTestSuite) TestTPS() {
 	s.Require().EqualValues(0.12, response.ChangeLastHourPct)
 }
 
-func (s *StatsTestSuite) TestTxCount24h() {
+func (s *StatsTestSuite) TestChanges24hBlockStats() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
-	c.SetPath("/v1/stats/tx_count_24h")
+	c.SetPath("/v1/stats/changes_24h")
 
 	s.stats.EXPECT().
-		TxCountForLast24h(gomock.Any()).
-		Return([]storage.TxCountForLast24hItem{
-			{
-				Time:    testTime,
-				TxCount: 100,
-				TPS:     0.01,
-			},
+		Change24hBlockStats(gomock.Any()).
+		Return(storage.Change24hBlockStats{
+			BytesInBlock: 0.123,
+			BlobsSize:    0.321,
+			Fee:          0.432,
+			TxCount:      0.345,
 		}, nil)
 
-	s.Require().NoError(s.handler.TxCountHourly24h(c))
+	s.Require().NoError(s.handler.Change24hBlockStats(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var response []responses.TxCountHistogramItem
-	err := json.NewDecoder(rec.Body).Decode(&response)
+	var item responses.Change24hBlockStats
+	err := json.NewDecoder(rec.Body).Decode(&item)
 	s.Require().NoError(err)
-	s.Require().Len(response, 1)
 
-	item := response[0]
-	s.Require().EqualValues(100, item.Count)
-	s.Require().EqualValues(0.01, item.TPS)
-	s.Require().True(testTime.Equal(item.Time))
+	s.Require().EqualValues(0.123, item.BytesInBlock)
+	s.Require().EqualValues(0.321, item.BlobsSize)
+	s.Require().EqualValues(0.432, item.Fee)
+	s.Require().EqualValues(0.345, item.TxCount)
 }
 
 func (s *StatsTestSuite) TestNamespaceUsage() {

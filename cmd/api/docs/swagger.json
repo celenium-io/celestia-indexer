@@ -3105,6 +3105,36 @@
                 }
             }
         },
+        "/stats/changes_24h": {
+            "get": {
+                "description": "Get changes for 24 hours",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get changes for 24 hours",
+                "operationId": "stats-24h-changes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Change24hBlockStats"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/namespace/series/{id}/{name}/{timeframe}": {
             "get": {
                 "description": "Get histogram for namespace with precomputed stats by series name and timeframe",
@@ -3723,37 +3753,6 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/responses.TPS"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                },
-                "x-internal": true
-            }
-        },
-        "/stats/tx_count_24h": {
-            "get": {
-                "description": "Get tx count histogram for last 24 hours by hour",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "stats"
-                ],
-                "summary": "Get tx count histogram for last 24 hours by hour",
-                "operationId": "stats-tx-count-24h",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/responses.TxCountHistogramItem"
-                            }
                         }
                     },
                     "500": {
@@ -5130,6 +5129,31 @@
                 }
             }
         },
+        "responses.Change24hBlockStats": {
+            "type": "object",
+            "properties": {
+                "blobs_size_24h": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.1234
+                },
+                "bytes_in_block_24h": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.1234
+                },
+                "fee_24h": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.1234
+                },
+                "tx_count_24h": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.1234
+                }
+            }
+        },
         "responses.Constants": {
             "type": "object",
             "properties": {
@@ -6253,26 +6277,6 @@
                     "type": "integer",
                     "format": "int64",
                     "example": 0
-                }
-            }
-        },
-        "responses.TxCountHistogramItem": {
-            "type": "object",
-            "properties": {
-                "count": {
-                    "type": "integer",
-                    "format": "integer",
-                    "example": 2223424
-                },
-                "time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "2023-07-04T03:10:57+00:00"
-                },
-                "tps": {
-                    "type": "number",
-                    "format": "float",
-                    "example": 0.13521
                 }
             }
         },

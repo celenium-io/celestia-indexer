@@ -228,15 +228,6 @@ func (s *StatsTestSuite) TestTPS() {
 	s.Require().EqualValues(0, tps.ChangeLastHourPct)
 }
 
-func (s *StatsTestSuite) TestTxCountForLast24h() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer ctxCancel()
-
-	items, err := s.storage.Stats.TxCountForLast24h(ctx)
-	s.Require().NoError(err)
-	s.Require().Len(items, 0)
-}
-
 func (s *StatsTestSuite) TestSeries() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

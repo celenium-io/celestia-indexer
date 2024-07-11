@@ -101,6 +101,13 @@ type TxCountForLast24hItem struct {
 	TPS     float64   `bun:"tps"`
 }
 
+type Change24hBlockStats struct {
+	TxCount      float64 `bun:"tx_count_24h"`
+	Fee          float64 `bun:"fee_24h"`
+	BlobsSize    float64 `bun:"blobs_size_24h"`
+	BytesInBlock float64 `bun:"bytes_in_block_24h"`
+}
+
 type SeriesRequest struct {
 	From time.Time
 	To   time.Time
@@ -157,10 +164,10 @@ type IStats interface {
 	Count(ctx context.Context, req CountRequest) (string, error)
 	Summary(ctx context.Context, req SummaryRequest) (string, error)
 	TPS(ctx context.Context) (TPS, error)
-	TxCountForLast24h(ctx context.Context) ([]TxCountForLast24hItem, error)
 	Series(ctx context.Context, timeframe Timeframe, name string, req SeriesRequest) ([]SeriesItem, error)
 	CumulativeSeries(ctx context.Context, timeframe Timeframe, name string, req SeriesRequest) ([]SeriesItem, error)
 	NamespaceSeries(ctx context.Context, timeframe Timeframe, name string, nsId uint64, req SeriesRequest) (response []SeriesItem, err error)
 	StakingSeries(ctx context.Context, timeframe Timeframe, name string, validatorId uint64, req SeriesRequest) (response []SeriesItem, err error)
 	SquareSize(ctx context.Context, from, to *time.Time) (map[int][]SeriesItem, error)
+	Change24hBlockStats(ctx context.Context) (response Change24hBlockStats, err error)
 }

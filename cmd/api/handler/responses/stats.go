@@ -27,17 +27,19 @@ func NewTPS(tps storage.TPS) TPS {
 	}
 }
 
-type TxCountHistogramItem struct {
-	Time  time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"  swaggertype:"string"`
-	Count int64     `example:"2223424"                   format:"integer"   json:"count" swaggertype:"integer"`
-	TPS   float64   `example:"0.13521"                   format:"float"     json:"tps"   swaggertype:"number"`
+type Change24hBlockStats struct {
+	TxCount      float64 `example:"0.1234" format:"float" json:"tx_count_24h"       swaggertype:"number"`
+	Fee          float64 `example:"0.1234" format:"float" json:"fee_24h"            swaggertype:"number"`
+	BytesInBlock float64 `example:"0.1234" format:"float" json:"bytes_in_block_24h" swaggertype:"number"`
+	BlobsSize    float64 `example:"0.1234" format:"float" json:"blobs_size_24h"     swaggertype:"number"`
 }
 
-func NewTxCountHistogramItem(item storage.TxCountForLast24hItem) TxCountHistogramItem {
-	return TxCountHistogramItem{
-		Time:  item.Time,
-		Count: item.TxCount,
-		TPS:   item.TPS,
+func NewChange24hBlockStats(response storage.Change24hBlockStats) Change24hBlockStats {
+	return Change24hBlockStats{
+		TxCount:      response.TxCount,
+		Fee:          response.Fee,
+		BytesInBlock: response.BytesInBlock,
+		BlobsSize:    response.BlobsSize,
 	}
 }
 
