@@ -300,7 +300,6 @@ func (s *NamespaceTestSuite) TestGetBlobs() {
 	s.Require().Equal(result[0].Namespace, blob.Namespace)
 	s.Require().Equal(result[0].Data, blob.Data)
 	s.Require().Equal(result[0].Commitment, blob.Commitment)
-
 }
 
 func (s *NamespaceTestSuite) TestGetMessages() {
@@ -511,6 +510,7 @@ func (s *NamespaceTestSuite) TestGetLogs() {
 				Size:       1000,
 				Height:     10000,
 				Time:       testTime,
+				Rollup:     &testRollup,
 			},
 		}, nil)
 
@@ -529,6 +529,7 @@ func (s *NamespaceTestSuite) TestGetLogs() {
 	s.Require().Equal("test_commitment", l.Commitment)
 	s.Require().EqualValues(1000, l.Size)
 	s.Require().Nil(l.Namespace)
+	s.Require().NotNil(l.Rollup)
 }
 
 func (s *NamespaceTestSuite) TestGetLogsWithCommitment() {
