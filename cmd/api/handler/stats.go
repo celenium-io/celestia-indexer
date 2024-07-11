@@ -498,3 +498,29 @@ func (sh StatsHandler) SquareSize(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, responses.NewSquareSizeResponse(histogram))
 }
+
+// RollupStats24h godoc
+//
+//	@Summary		Get rollups stats for last 24 hours
+//	@Description	Get rollups stats for last 24 hours
+//	@Tags			stats
+//	@ID				stats-rollup-24h
+//	@Produce		json
+//	@Success		200	{array}		responses.RollupStats24h
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/stats/rollup_stats_24h [get]
+func (sh StatsHandler) RollupStats24h(c echo.Context) error {
+	items, err := sh.repo.RollupStats24h(
+		c.Request().Context(),
+	)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	response := make([]responses.RollupStats24h, len(items))
+	for i := range items {
+		response[i] = responses.NewRollupStats24h(items[i])
+	}
+	return returnArray(c, response)
+}

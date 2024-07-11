@@ -353,3 +353,25 @@ func (s Stats) SquareSize(ctx context.Context, from, to *time.Time) (result map[
 
 	return
 }
+
+func (s Stats) RollupStats24h(ctx context.Context) (response []storage.RollupStats24h, err error) {
+	inner := s.db.DB().NewSelect().
+		Table(storage.ViewRollupStatsByHour).
+		Column("namespace_id", "signer_id", "size", "fee", "blobs_count").
+		Where("time > now() - '1 day'::interval")
+
+	joined := s.db.DB().NewSelect().
+		TableExpr("(?) as data", inner).
+		ColumnExpr("rollup_id, sum(data.size) as size, sum(data.fee) as fee, sum(data.blobs_count) as blobs_count").
+		Join("left join rollup_provider as rp on rp.address_id = data.signer_id AND (rp.namespace_id = data.namespace_id OR rp.namespace_id = 0)").
+		Group("rollup_id")
+
+	err = s.db.DB().NewSelect().
+		TableExpr("(?) as grouped", joined).
+		ColumnExpr("grouped.*, r.name, r.logo").
+		Join("left join rollup as r on r.id = grouped.rollup_id").
+		Order("blobs_count desc").
+		Scan(ctx, &response)
+
+	return
+}

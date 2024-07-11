@@ -122,6 +122,15 @@ func NewSeriesRequest(from, to int64) SeriesRequest {
 	return seriesRequest
 }
 
+type RollupStats24h struct {
+	RollupId   int64  `bun:"rollup_id"`
+	Name       string `bun:"name"`
+	Logo       string `bun:"logo"`
+	Size       int64  `bun:"size"`
+	Fee        int64  `bun:"fee"`
+	BlobsCount int64  `bun:"blobs_count"`
+}
+
 type SeriesItem struct {
 	Time  time.Time `bun:"ts"`
 	Value string    `bun:"value"`
@@ -162,5 +171,6 @@ type IStats interface {
 	CumulativeSeries(ctx context.Context, timeframe Timeframe, name string, req SeriesRequest) ([]SeriesItem, error)
 	NamespaceSeries(ctx context.Context, timeframe Timeframe, name string, nsId uint64, req SeriesRequest) (response []SeriesItem, err error)
 	StakingSeries(ctx context.Context, timeframe Timeframe, name string, validatorId uint64, req SeriesRequest) (response []SeriesItem, err error)
+	RollupStats24h(ctx context.Context) ([]RollupStats24h, error)
 	SquareSize(ctx context.Context, from, to *time.Time) (map[int][]SeriesItem, error)
 }
