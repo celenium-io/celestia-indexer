@@ -107,27 +107,22 @@ func (sh StatsHandler) TPS(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.NewTPS(tps))
 }
 
-// TxCountHourly24h godoc
+// Change24hBlockStats godoc
 //
-//	@Summary		Get tx count histogram for last 24 hours by hour
-//	@Description	Get tx count histogram for last 24 hours by hour
+//	@Summary		Get changes for 24 hours
+//	@Description	Get changes for 24 hours
 //	@Tags			stats
-//	@ID				stats-tx-count-24h
-//	@x-internal		true
+//	@ID				stats-24h-changes
 //	@Produce		json
-//	@Success		200	{array}		responses.TxCountHistogramItem
+//	@Success		200	{array}		responses.Change24hBlockStats
 //	@Failure		500	{object}	Error
-//	@Router			/stats/tx_count_24h [get]
-func (sh StatsHandler) TxCountHourly24h(c echo.Context) error {
-	histogram, err := sh.repo.TxCountForLast24h(c.Request().Context())
+//	@Router			/stats/changes_24h [get]
+func (sh StatsHandler) Change24hBlockStats(c echo.Context) error {
+	data, err := sh.repo.Change24hBlockStats(c.Request().Context())
 	if err != nil {
 		return handleError(c, err, sh.nsRepo)
 	}
-	response := make([]responses.TxCountHistogramItem, len(histogram))
-	for i := range histogram {
-		response[i] = responses.NewTxCountHistogramItem(histogram[i])
-	}
-	return returnArray(c, response)
+	return c.JSON(http.StatusOK, responses.NewChange24hBlockStats(data))
 }
 
 type namespaceUsageRequest struct {

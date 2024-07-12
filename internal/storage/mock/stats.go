@@ -43,6 +43,45 @@ func (m *MockIStats) EXPECT() *MockIStatsMockRecorder {
 	return m.recorder
 }
 
+// Change24hBlockStats mocks base method.
+func (m *MockIStats) Change24hBlockStats(ctx context.Context) (storage.Change24hBlockStats, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Change24hBlockStats", ctx)
+	ret0, _ := ret[0].(storage.Change24hBlockStats)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Change24hBlockStats indicates an expected call of Change24hBlockStats.
+func (mr *MockIStatsMockRecorder) Change24hBlockStats(ctx any) *IStatsChange24hBlockStatsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Change24hBlockStats", reflect.TypeOf((*MockIStats)(nil).Change24hBlockStats), ctx)
+	return &IStatsChange24hBlockStatsCall{Call: call}
+}
+
+// IStatsChange24hBlockStatsCall wrap *gomock.Call
+type IStatsChange24hBlockStatsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IStatsChange24hBlockStatsCall) Return(response storage.Change24hBlockStats, err error) *IStatsChange24hBlockStatsCall {
+	c.Call = c.Call.Return(response, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IStatsChange24hBlockStatsCall) Do(f func(context.Context) (storage.Change24hBlockStats, error)) *IStatsChange24hBlockStatsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IStatsChange24hBlockStatsCall) DoAndReturn(f func(context.Context) (storage.Change24hBlockStats, error)) *IStatsChange24hBlockStatsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Count mocks base method.
 func (m *MockIStats) Count(ctx context.Context, req storage.CountRequest) (string, error) {
 	m.ctrl.T.Helper()
@@ -351,45 +390,6 @@ func (c *IStatsTPSCall) Do(f func(context.Context) (storage.TPS, error)) *IStats
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *IStatsTPSCall) DoAndReturn(f func(context.Context) (storage.TPS, error)) *IStatsTPSCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// TxCountForLast24h mocks base method.
-func (m *MockIStats) TxCountForLast24h(ctx context.Context) ([]storage.TxCountForLast24hItem, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TxCountForLast24h", ctx)
-	ret0, _ := ret[0].([]storage.TxCountForLast24hItem)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// TxCountForLast24h indicates an expected call of TxCountForLast24h.
-func (mr *MockIStatsMockRecorder) TxCountForLast24h(ctx any) *IStatsTxCountForLast24hCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TxCountForLast24h", reflect.TypeOf((*MockIStats)(nil).TxCountForLast24h), ctx)
-	return &IStatsTxCountForLast24hCall{Call: call}
-}
-
-// IStatsTxCountForLast24hCall wrap *gomock.Call
-type IStatsTxCountForLast24hCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *IStatsTxCountForLast24hCall) Return(arg0 []storage.TxCountForLast24hItem, arg1 error) *IStatsTxCountForLast24hCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *IStatsTxCountForLast24hCall) Do(f func(context.Context) ([]storage.TxCountForLast24hItem, error)) *IStatsTxCountForLast24hCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsTxCountForLast24hCall) DoAndReturn(f func(context.Context) ([]storage.TxCountForLast24hItem, error)) *IStatsTxCountForLast24hCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
