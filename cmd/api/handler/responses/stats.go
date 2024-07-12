@@ -151,3 +151,15 @@ func NewRollupStats24h(stats storage.RollupStats24h) RollupStats24h {
 		BlobsCount: stats.BlobsCount,
 	}
 }
+
+type CountItem struct {
+	Name  string `example:"test"  format:"string" json:"name"  swaggertype:"string"`
+	Value int64  `example:"17632" format:"string" json:"value" swaggertype:"string"`
+}
+
+func NewCountItem(item storage.CountItem) CountItem {
+	return CountItem{
+		Name:  item.Name,
+		Value: item.Value,
+	}
+}
