@@ -97,10 +97,35 @@ func (s Stats) TPS(ctx context.Context) (response storage.TPS, err error) {
 	return
 }
 
-func (s Stats) TxCountForLast24h(ctx context.Context) (response []storage.TxCountForLast24hItem, err error) {
-	err = s.db.DB().NewSelect().Table(storage.ViewBlockStatsByHour).
-		Column("ts", "tps", "tx_count").
-		Where("ts = date_trunc('hour', now()) - '1 day'::interval").
+func (s Stats) Change24hBlockStats(ctx context.Context) (response storage.Change24hBlockStats, err error) {
+	first := s.db.DB().NewSelect().
+		Table(storage.ViewBlockStatsByHour).
+		ColumnExpr(`
+			sum(tx_count) as tx_count,
+			sum(bytes_in_block) as bytes_in_block,
+			sum(blobs_size) as blobs_size,
+			sum(fee) as fee`).
+		Where("ts > NOW() - '1 day':: interval")
+	second := s.db.DB().NewSelect().
+		Table(storage.ViewBlockStatsByHour).
+		ColumnExpr(`
+			sum(tx_count) as tx_count,
+			sum(bytes_in_block) as bytes_in_block,
+			sum(blobs_size) as blobs_size,
+			sum(fee) as fee`).
+		Where("ts <= NOW() - '1 day':: interval").
+		Where("ts > NOW() - '2 days':: interval")
+
+	err = s.db.DB().NewSelect().
+		With("f", first).
+		With("s", second).
+		TableExpr("f, s").
+		ColumnExpr(`
+			(f.tx_count - s.tx_count)/s.tx_count as tx_count_24h,
+			(f.bytes_in_block - s.bytes_in_block)/s.bytes_in_block as bytes_in_block_24h,
+			(f.blobs_size - s.blobs_size)/s.blobs_size as blobs_size_24h,
+			(f.fee - s.fee)/s.fee as fee_24h
+		`).
 		Scan(ctx, &response)
 	return
 }

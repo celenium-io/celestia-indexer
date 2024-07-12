@@ -390,7 +390,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	{
 		stats.GET("/summary/:table/:function", statsHandler.Summary)
 		stats.GET("/tps", statsHandler.TPS)
-		stats.GET("/tx_count_24h", statsHandler.TxCountHourly24h)
+		stats.GET("/changes_24h", statsHandler.Change24hBlockStats)
 		stats.GET("/rollup_stats_24h", statsHandler.RollupStats24h)
 		stats.GET("/square_size", statsHandler.SquareSize)
 
