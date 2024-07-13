@@ -124,12 +124,12 @@ func NewSeriesRequest(from, to int64) SeriesRequest {
 }
 
 type RollupStats24h struct {
-	RollupId   int64  `bun:"rollup_id"`
-	Name       string `bun:"name"`
-	Logo       string `bun:"logo"`
-	Size       int64  `bun:"size"`
-	Fee        int64  `bun:"fee"`
-	BlobsCount int64  `bun:"blobs_count"`
+	RollupId   int64   `bun:"rollup_id"`
+	Name       string  `bun:"name"`
+	Logo       string  `bun:"logo"`
+	Size       int64   `bun:"size"`
+	Fee        float64 `bun:"fee"`
+	BlobsCount int64   `bun:"blobs_count"`
 }
 
 type SeriesItem struct {
