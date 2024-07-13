@@ -287,6 +287,15 @@ func (s *StatsTestSuite) TestSquareSize() {
 	s.Require().Len(items, 1)
 }
 
+func (s *StatsTestSuite) TestRollupStats24h() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	stats, err := s.storage.Stats.RollupStats24h(ctx)
+	s.Require().NoError(err)
+	s.Require().Len(stats, 0)
+}
+
 func TestSuiteStats_Run(t *testing.T) {
 	suite.Run(t, new(StatsTestSuite))
 }

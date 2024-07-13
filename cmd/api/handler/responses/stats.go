@@ -131,3 +131,23 @@ func NewSquareSizeResponse(m map[int][]storage.SeriesItem) SquareSizeResponse {
 	}
 	return response
 }
+
+type RollupStats24h struct {
+	Id         int64  `example:"321"                             format:"integer" json:"id,omitempty"   swaggertype:"integer"`
+	Name       string `example:"Rollup name"                     format:"string"  json:"name,omitempty" swaggertype:"string"`
+	Logo       string `example:"https://some_link.com/image.png" format:"string"  json:"logo,omitempty" swaggertype:"string"`
+	Size       int64  `example:"123"                             format:"integer" json:"size"           swaggertype:"integer"`
+	Fee        int64  `example:"123"                             format:"integer" json:"fee"            swaggertype:"integer"`
+	BlobsCount int64  `example:"123"                             format:"integer" json:"blobs_count"    swaggertype:"integer"`
+}
+
+func NewRollupStats24h(stats storage.RollupStats24h) RollupStats24h {
+	return RollupStats24h{
+		Id:         stats.RollupId,
+		Name:       stats.Name,
+		Logo:       stats.Logo,
+		Size:       stats.Size,
+		Fee:        stats.Fee,
+		BlobsCount: stats.BlobsCount,
+	}
+}

@@ -519,3 +519,39 @@ func (s *StatsTestSuite) TestCumulativeSeries() {
 		}
 	}
 }
+
+func (s *StatsTestSuite) TestRollupStats24h() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/rollup_stats_24h")
+
+	s.stats.EXPECT().
+		RollupStats24h(gomock.Any()).
+		Return([]storage.RollupStats24h{
+			{
+				Name:       "name",
+				Logo:       "logo",
+				RollupId:   1,
+				Size:       12,
+				Fee:        43,
+				BlobsCount: 123,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.RollupStats24h(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response []responses.RollupStats24h
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 1)
+
+	item := response[0]
+	s.Require().EqualValues(1, item.Id)
+	s.Require().EqualValues(12, item.Size)
+	s.Require().EqualValues(43, item.Fee)
+	s.Require().EqualValues(123, item.BlobsCount)
+	s.Require().EqualValues("name", item.Name)
+	s.Require().EqualValues("logo", item.Logo)
+}
