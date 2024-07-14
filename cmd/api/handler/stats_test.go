@@ -534,7 +534,7 @@ func (s *StatsTestSuite) TestRollupStats24h() {
 				Logo:       "logo",
 				RollupId:   1,
 				Size:       12,
-				Fee:        43,
+				Fee:        43.01,
 				BlobsCount: 123,
 			},
 		}, nil)

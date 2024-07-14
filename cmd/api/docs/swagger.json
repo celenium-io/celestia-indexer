@@ -5888,7 +5888,7 @@
                 },
                 "fee": {
                     "type": "integer",
-                    "format": "integer",
+                    "format": "number",
                     "example": 123
                 },
                 "id": {
