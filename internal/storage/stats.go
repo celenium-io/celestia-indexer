@@ -112,6 +112,11 @@ type DistributionItem struct {
 	Value string `bun:"value"`
 }
 
+type CountItem struct {
+	Name  string `bun:"name"`
+	Value int64  `bun:"value"`
+}
+
 func NewSeriesRequest(from, to int64) SeriesRequest {
 	var seriesRequest SeriesRequest
 	if from > 0 {
@@ -174,4 +179,5 @@ type IStats interface {
 	RollupStats24h(ctx context.Context) ([]RollupStats24h, error)
 	SquareSize(ctx context.Context, from, to *time.Time) (map[int][]SeriesItem, error)
 	Change24hBlockStats(ctx context.Context) (response Change24hBlockStats, err error)
+	MessagesCount24h(ctx context.Context) ([]CountItem, error)
 }

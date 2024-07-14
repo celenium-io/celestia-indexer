@@ -3135,6 +3135,36 @@
                 }
             }
         },
+        "/stats/messages_count_24h": {
+            "get": {
+                "description": "Get messages distribution for the last 24 hours",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get messages distribution for the last 24 hours",
+                "operationId": "stats-messages-count-24h",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.CountItem"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/namespace/series/{id}/{name}/{timeframe}": {
             "get": {
                 "description": "Get histogram for namespace with precomputed stats by series name and timeframe",
@@ -5204,6 +5234,21 @@
                     "additionalProperties": {
                         "$ref": "#/definitions/responses.Params"
                     }
+                }
+            }
+        },
+        "responses.CountItem": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "test"
+                },
+                "value": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "17632"
                 }
             }
         },

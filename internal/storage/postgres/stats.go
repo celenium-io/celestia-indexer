@@ -397,6 +397,16 @@ func (s Stats) RollupStats24h(ctx context.Context) (response []storage.RollupSta
 		Join("left join rollup as r on r.id = grouped.rollup_id").
 		Order("blobs_count desc").
 		Scan(ctx, &response)
+	return
+}
 
+func (s Stats) MessagesCount24h(ctx context.Context) (response []storage.CountItem, err error) {
+	err = s.db.DB().NewSelect().
+		Model((*storage.Message)(nil)).
+		ColumnExpr("count(*) as value, type as name").
+		Where("time > now() - '1 day'::interval").
+		Group("type").
+		Order("value desc").
+		Scan(ctx, &response)
 	return
 }

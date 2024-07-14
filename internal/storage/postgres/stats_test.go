@@ -296,6 +296,15 @@ func (s *StatsTestSuite) TestRollupStats24h() {
 	s.Require().Len(stats, 0)
 }
 
+func (s *StatsTestSuite) TestMessagesCount24h() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	items, err := s.storage.Stats.MessagesCount24h(ctx)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
+}
+
 func TestSuiteStats_Run(t *testing.T) {
 	suite.Run(t, new(StatsTestSuite))
 }

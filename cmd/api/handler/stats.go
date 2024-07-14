@@ -519,3 +519,28 @@ func (sh StatsHandler) RollupStats24h(c echo.Context) error {
 	}
 	return returnArray(c, response)
 }
+
+// MessagesCount24h godoc
+//
+//	@Summary		Get messages distribution for the last 24 hours
+//	@Description	Get messages distribution for the last 24 hours
+//	@Tags			stats
+//	@ID				stats-messages-count-24h
+//	@Produce		json
+//	@Success		200	{array}		responses.CountItem
+//	@Failure		500	{object}	Error
+//	@Router			/stats/messages_count_24h [get]
+func (sh StatsHandler) MessagesCount24h(c echo.Context) error {
+	items, err := sh.repo.MessagesCount24h(
+		c.Request().Context(),
+	)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	response := make([]responses.CountItem, len(items))
+	for i := range items {
+		response[i] = responses.NewCountItem(items[i])
+	}
+	return returnArray(c, response)
+}

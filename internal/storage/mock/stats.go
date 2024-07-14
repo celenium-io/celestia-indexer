@@ -160,6 +160,45 @@ func (c *IStatsCumulativeSeriesCall) DoAndReturn(f func(context.Context, storage
 	return c
 }
 
+// MessagesCount24h mocks base method.
+func (m *MockIStats) MessagesCount24h(ctx context.Context) ([]storage.CountItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MessagesCount24h", ctx)
+	ret0, _ := ret[0].([]storage.CountItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MessagesCount24h indicates an expected call of MessagesCount24h.
+func (mr *MockIStatsMockRecorder) MessagesCount24h(ctx any) *IStatsMessagesCount24hCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagesCount24h", reflect.TypeOf((*MockIStats)(nil).MessagesCount24h), ctx)
+	return &IStatsMessagesCount24hCall{Call: call}
+}
+
+// IStatsMessagesCount24hCall wrap *gomock.Call
+type IStatsMessagesCount24hCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *IStatsMessagesCount24hCall) Return(arg0 []storage.CountItem, arg1 error) *IStatsMessagesCount24hCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *IStatsMessagesCount24hCall) Do(f func(context.Context) ([]storage.CountItem, error)) *IStatsMessagesCount24hCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *IStatsMessagesCount24hCall) DoAndReturn(f func(context.Context) ([]storage.CountItem, error)) *IStatsMessagesCount24hCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // NamespaceSeries mocks base method.
 func (m *MockIStats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe, name string, nsId uint64, req storage.SeriesRequest) ([]storage.SeriesItem, error) {
 	m.ctrl.T.Helper()

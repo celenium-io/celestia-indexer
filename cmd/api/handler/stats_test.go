@@ -555,3 +555,30 @@ func (s *StatsTestSuite) TestRollupStats24h() {
 	s.Require().EqualValues("name", item.Name)
 	s.Require().EqualValues("logo", item.Logo)
 }
+
+func (s *StatsTestSuite) TestMessgaesCount24h() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/messages_count_24h")
+
+	s.stats.EXPECT().
+		MessagesCount24h(gomock.Any()).
+		Return([]storage.CountItem{
+			{
+				Name:  "test",
+				Value: 100,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.MessagesCount24h(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response []responses.CountItem
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 1)
+
+	s.Require().EqualValues("test", response[0].Name)
+	s.Require().EqualValues(100, response[0].Value)
+}
