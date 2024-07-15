@@ -30,8 +30,8 @@ type BlockStats struct {
 	BlobsSize     int64           `bun:"blobs_size"               comment:"Summary blocks size from pay for blob"                             stats:"func:min max sum avg"`
 	BlobsCount    int             `bun:"blobs_count"              comment:"Summary blobs count in the block"                                  stats:"func:min max sum avg"`
 	BlockTime     uint64          `bun:"block_time"               comment:"Time in milliseconds between current and previous block"           stats:"func:min max sum avg"`
-	GasLimit      int64           `bun:"gas_limit"                comment:"Total gas limit in the block"`
-	GasUsed       int64           `bun:"gas_used"                 comment:"Total gas used in the block"`
+	GasLimit      int64           `bun:"gas_limit"                comment:"Total gas limit in the block"                                      stats:"func:min max sum avg"`
+	GasUsed       int64           `bun:"gas_used"                 comment:"Total gas used in the block"                                       stats:"func:min max sum avg"`
 	SupplyChange  decimal.Decimal `bun:",type:numeric"            comment:"Change of total supply in the block"                               stats:"func:min max sum avg"`
 	InflationRate decimal.Decimal `bun:",type:numeric"            comment:"Inflation rate"                                                    stats:"func:min max avg"`
 	Fee           decimal.Decimal `bun:"fee,type:numeric"         comment:"Summary block fee"                                                 stats:"func:min max sum avg"`
