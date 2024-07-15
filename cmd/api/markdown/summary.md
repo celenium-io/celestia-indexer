@@ -35,6 +35,8 @@ Returns string value by passed table and function.
 * `supply_chnge`   -- min max sum avg
 * `inflation_rate` -- min max avg
 * `fee`            -- min max sum avg
+* `gas_used`       -- min max sum avg
+* `gas_limit`      -- min max sum avg
 
 #### Tx
 * `height`         -- min max
