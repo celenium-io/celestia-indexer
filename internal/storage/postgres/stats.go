@@ -239,6 +239,8 @@ func (s Stats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe,
 func (s Stats) CumulativeSeries(ctx context.Context, timeframe storage.Timeframe, name string, req storage.SeriesRequest) (response []storage.SeriesItem, err error) {
 	query := s.db.DB().NewSelect()
 	switch timeframe {
+	case storage.TimeframeHour:
+		query.Table(storage.ViewBlockStatsByHour)
 	case storage.TimeframeDay:
 		query.Table(storage.ViewBlockStatsByDay)
 	case storage.TimeframeWeek:

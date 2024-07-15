@@ -485,6 +485,7 @@ func (s *StatsTestSuite) TestCumulativeSeries() {
 	} {
 
 		for _, tf := range []storage.Timeframe{
+			storage.TimeframeHour,
 			storage.TimeframeDay,
 			storage.TimeframeWeek,
 			storage.TimeframeMonth,
