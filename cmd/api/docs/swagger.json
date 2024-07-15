@@ -3522,6 +3522,7 @@
                 "parameters": [
                     {
                         "enum": [
+                            "hour",
                             "day",
                             "week",
                             "month",

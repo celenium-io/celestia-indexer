@@ -225,7 +225,7 @@ func (sh StatsHandler) Series(c echo.Context) error {
 }
 
 type seriesCumulativeRequest struct {
-	Timeframe  string `example:"day"        param:"timeframe" swaggertype:"string"  validate:"required,oneof=day week month year"`
+	Timeframe  string `example:"day"        param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day week month year"`
 	SeriesName string `example:"tps"        param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_size blobs_count fee tx_count gas_used gas_limit bytes_in_block supply_change"`
 	From       int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
 	To         int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
@@ -237,7 +237,7 @@ type seriesCumulativeRequest struct {
 //	@Description	Get cumulative histogram with precomputed stats by series name and timeframe
 //	@Tags			stats
 //	@ID				stats-series-cumulative
-//	@Param			timeframe	path	string	true	"Timeframe"						Enums(day, week, month, year)
+//	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, week, month, year)
 //	@Param			name		path	string	true	"Series name"					Enums(blobs_size, blobs_count, fee, tx_count, gas_used, gas_limit, bytes_in_block, supply_change)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
 //	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
