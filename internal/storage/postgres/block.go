@@ -111,8 +111,17 @@ func (b *Blocks) ByHash(ctx context.Context, hash []byte) (block storage.Block, 
 
 // ListWithStats -
 func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order sdk.SortOrder) (blocks []*storage.Block, err error) {
-	subQuery := b.DB().NewSelect().Model(&blocks)
-	subQuery = postgres.Pagination(subQuery, limit, offset, order)
+	subQuery := b.DB().NewSelect().
+		Model(&blocks)
+	subQuery = limitScope(subQuery, int(limit))
+	if offset > 0 {
+		subQuery = subQuery.Offset(int(offset))
+	}
+	if order == sdk.SortOrderAsc {
+		subQuery = subQuery.OrderExpr("time asc, id asc")
+	} else {
+		subQuery = subQuery.OrderExpr("time desc, id desc")
+	}
 
 	query := b.DB().NewSelect().
 		ColumnExpr("block.*").
