@@ -159,30 +159,9 @@ func (r *Rollup) Count(ctx context.Context) (int64, error) {
 }
 
 func (r *Rollup) Stats(ctx context.Context, rollupId uint64) (stats storage.RollupStats, err error) {
-	providers, err := r.Providers(ctx, rollupId)
-	if err != nil {
-		return
-	}
-
-	if len(providers) == 0 {
-		return
-	}
-
-	query := r.DB().NewSelect().Table("rollup_stats_by_month").
-		ColumnExpr("sum(blobs_count) as blobs_count, sum(size) as size, max(last_time) as last_time, min(first_time) as first_time, sum(fee) as fee")
-
-	for i := range providers {
-		query.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
-			if providers[i].NamespaceId > 0 {
-				return sq.
-					Where("namespace_id = ?", providers[i].NamespaceId).
-					Where("signer_id = ?", providers[i].AddressId)
-			}
-			return sq.Where("signer_id = ?", providers[i].AddressId)
-		})
-	}
-
-	err = query.Scan(ctx, &stats)
+	err = r.DB().NewSelect().Table(storage.ViewLeaderboard).
+		Column("blobs_count", "size", "last_time", "first_time", "fee", "size_pct", "fee_pct", "blobs_count_pct").
+		Where("id = ?", rollupId).Scan(ctx, &stats)
 	return
 }
 

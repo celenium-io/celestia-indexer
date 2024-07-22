@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/celenium-io/celestia-indexer/pkg/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -29,7 +28,7 @@ func NewBlocks(db *database.Bun) *Blocks {
 }
 
 // ByHeight -
-func (b *Blocks) ByHeight(ctx context.Context, height types.Level) (block storage.Block, err error) {
+func (b *Blocks) ByHeight(ctx context.Context, height pkgTypes.Level) (block storage.Block, err error) {
 	err = b.DB().NewSelect().Model(&block).
 		Where("block.height = ?", height).
 		Relation("Proposer", func(sq *bun.SelectQuery) *bun.SelectQuery {
@@ -41,7 +40,7 @@ func (b *Blocks) ByHeight(ctx context.Context, height types.Level) (block storag
 }
 
 // ByHeightWithStats -
-func (b *Blocks) ByHeightWithStats(ctx context.Context, height types.Level) (block storage.Block, err error) {
+func (b *Blocks) ByHeightWithStats(ctx context.Context, height pkgTypes.Level) (block storage.Block, err error) {
 	subQuery := b.DB().NewSelect().Model(&block).
 		Where("block.height = ?", height).
 		Limit(1)

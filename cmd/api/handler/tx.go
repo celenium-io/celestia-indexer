@@ -10,7 +10,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
 )
@@ -115,8 +114,8 @@ func (handler *TxHandler) List(c echo.Context) error {
 		Sort:                 pgSort(req.Sort),
 		Status:               req.Status,
 		Height:               req.Height,
-		MessageTypes:         types.NewMsgTypeBitMask(),
-		ExcludedMessageTypes: types.NewMsgTypeBitMask(),
+		MessageTypes:         storageTypes.NewMsgTypeBitMask(),
+		ExcludedMessageTypes: storageTypes.NewMsgTypeBitMask(),
 		WithMessages:         req.Messages,
 	}
 	if req.From > 0 {
