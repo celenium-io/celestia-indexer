@@ -134,12 +134,7 @@ func (s *RollupTestSuite) TestGet() {
 
 	s.rollups.EXPECT().
 		Stats(gomock.Any(), uint64(1)).
-		Return(storage.RollupStats{
-			Size:            10,
-			BlobsCount:      11,
-			LastActionTime:  testTime,
-			FirstActionTime: testTime,
-		}, nil)
+		Return(testRollupWithStats.RollupStats, nil)
 
 	s.Require().NoError(s.handler.Get(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
@@ -151,10 +146,13 @@ func (s *RollupTestSuite) TestGet() {
 	s.Require().EqualValues("test rollup", rollup.Name)
 	s.Require().EqualValues("image.png", rollup.Logo)
 	s.Require().EqualValues("test-rollup", rollup.Slug)
-	s.Require().EqualValues(10, rollup.Size)
-	s.Require().EqualValues(11, rollup.BlobsCount)
+	s.Require().EqualValues(100, rollup.BlobsCount)
+	s.Require().EqualValues(1000, rollup.Size)
 	s.Require().EqualValues(testTime, rollup.LastAction)
 	s.Require().EqualValues(testTime, rollup.FirstAction)
+	s.Require().EqualValues(0.1, rollup.BlobsCountPct)
+	s.Require().EqualValues(0.2, rollup.FeePct)
+	s.Require().EqualValues(0.3, rollup.SizePct)
 }
 
 func (s *RollupTestSuite) TestGetNamespaces() {

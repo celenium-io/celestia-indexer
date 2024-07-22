@@ -52,6 +52,9 @@ func (s *StorageTestSuite) TestRollupStats() {
 	s.Require().False(rollup.LastActionTime.IsZero())
 	s.Require().False(rollup.FirstActionTime.IsZero())
 	s.Require().Equal("2000", rollup.Fee.String())
+	s.Require().Greater(rollup.BlobsCountPct, 0.0)
+	s.Require().Greater(rollup.FeePct, 0.0)
+	s.Require().Greater(rollup.SizePct, 0.0)
 }
 
 func (s *StorageTestSuite) TestRollupNamespaces() {
