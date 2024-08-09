@@ -82,19 +82,12 @@ func (handler RollupHandler) Get(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	rollup, err := handler.rollups.GetByID(c.Request().Context(), req.Id)
+	rollup, err := handler.rollups.ById(c.Request().Context(), req.Id)
 	if err != nil {
 		return handleError(c, err, handler.rollups)
 	}
 
-	stats, err := handler.rollups.Stats(c.Request().Context(), rollup.Id)
-	if err != nil {
-		return handleError(c, err, handler.rollups)
-	}
-	return c.JSON(http.StatusOK, responses.NewRollupWithStats(storage.RollupWithStats{
-		Rollup:      *rollup,
-		RollupStats: stats,
-	}))
+	return c.JSON(http.StatusOK, responses.NewRollupWithStats(rollup))
 }
 
 type getRollupPages struct {
@@ -308,14 +301,7 @@ func (handler RollupHandler) BySlug(c echo.Context) error {
 		return handleError(c, err, handler.rollups)
 	}
 
-	stats, err := handler.rollups.Stats(c.Request().Context(), rollup.Id)
-	if err != nil {
-		return handleError(c, err, handler.rollups)
-	}
-	return c.JSON(http.StatusOK, responses.NewRollupWithStats(storage.RollupWithStats{
-		Rollup:      rollup,
-		RollupStats: stats,
-	}))
+	return c.JSON(http.StatusOK, responses.NewRollupWithStats(rollup))
 }
 
 type rollupDistributionRequest struct {

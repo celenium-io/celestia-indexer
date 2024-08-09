@@ -8,6 +8,7 @@
 //
 //	mockgen -source=vesting_period.go -destination=mock/vesting_period.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,6 +44,11 @@ func (m *MockIVestingPeriod) EXPECT() *MockIVestingPeriodMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIVestingPeriod) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // ByVesting mocks base method.
 func (m *MockIVestingPeriod) ByVesting(ctx context.Context, id uint64, limit, offset int) ([]storage.VestingPeriod, error) {
 	m.ctrl.T.Helper()
@@ -53,31 +59,31 @@ func (m *MockIVestingPeriod) ByVesting(ctx context.Context, id uint64, limit, of
 }
 
 // ByVesting indicates an expected call of ByVesting.
-func (mr *MockIVestingPeriodMockRecorder) ByVesting(ctx, id, limit, offset any) *IVestingPeriodByVestingCall {
+func (mr *MockIVestingPeriodMockRecorder) ByVesting(ctx, id, limit, offset any) *MockIVestingPeriodByVestingCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByVesting", reflect.TypeOf((*MockIVestingPeriod)(nil).ByVesting), ctx, id, limit, offset)
-	return &IVestingPeriodByVestingCall{Call: call}
+	return &MockIVestingPeriodByVestingCall{Call: call}
 }
 
-// IVestingPeriodByVestingCall wrap *gomock.Call
-type IVestingPeriodByVestingCall struct {
+// MockIVestingPeriodByVestingCall wrap *gomock.Call
+type MockIVestingPeriodByVestingCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingPeriodByVestingCall) Return(arg0 []storage.VestingPeriod, arg1 error) *IVestingPeriodByVestingCall {
+func (c *MockIVestingPeriodByVestingCall) Return(arg0 []storage.VestingPeriod, arg1 error) *MockIVestingPeriodByVestingCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingPeriodByVestingCall) Do(f func(context.Context, uint64, int, int) ([]storage.VestingPeriod, error)) *IVestingPeriodByVestingCall {
+func (c *MockIVestingPeriodByVestingCall) Do(f func(context.Context, uint64, int, int) ([]storage.VestingPeriod, error)) *MockIVestingPeriodByVestingCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingPeriodByVestingCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.VestingPeriod, error)) *IVestingPeriodByVestingCall {
+func (c *MockIVestingPeriodByVestingCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.VestingPeriod, error)) *MockIVestingPeriodByVestingCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +98,31 @@ func (m *MockIVestingPeriod) CursorList(ctx context.Context, id, limit uint64, o
 }
 
 // CursorList indicates an expected call of CursorList.
-func (mr *MockIVestingPeriodMockRecorder) CursorList(ctx, id, limit, order, cmp any) *IVestingPeriodCursorListCall {
+func (mr *MockIVestingPeriodMockRecorder) CursorList(ctx, id, limit, order, cmp any) *MockIVestingPeriodCursorListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CursorList", reflect.TypeOf((*MockIVestingPeriod)(nil).CursorList), ctx, id, limit, order, cmp)
-	return &IVestingPeriodCursorListCall{Call: call}
+	return &MockIVestingPeriodCursorListCall{Call: call}
 }
 
-// IVestingPeriodCursorListCall wrap *gomock.Call
-type IVestingPeriodCursorListCall struct {
+// MockIVestingPeriodCursorListCall wrap *gomock.Call
+type MockIVestingPeriodCursorListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingPeriodCursorListCall) Return(arg0 []*storage.VestingPeriod, arg1 error) *IVestingPeriodCursorListCall {
+func (c *MockIVestingPeriodCursorListCall) Return(arg0 []*storage.VestingPeriod, arg1 error) *MockIVestingPeriodCursorListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingPeriodCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingPeriod, error)) *IVestingPeriodCursorListCall {
+func (c *MockIVestingPeriodCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingPeriod, error)) *MockIVestingPeriodCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingPeriodCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingPeriod, error)) *IVestingPeriodCursorListCall {
+func (c *MockIVestingPeriodCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingPeriod, error)) *MockIVestingPeriodCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -131,31 +137,31 @@ func (m *MockIVestingPeriod) GetByID(ctx context.Context, id uint64) (*storage.V
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockIVestingPeriodMockRecorder) GetByID(ctx, id any) *IVestingPeriodGetByIDCall {
+func (mr *MockIVestingPeriodMockRecorder) GetByID(ctx, id any) *MockIVestingPeriodGetByIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockIVestingPeriod)(nil).GetByID), ctx, id)
-	return &IVestingPeriodGetByIDCall{Call: call}
+	return &MockIVestingPeriodGetByIDCall{Call: call}
 }
 
-// IVestingPeriodGetByIDCall wrap *gomock.Call
-type IVestingPeriodGetByIDCall struct {
+// MockIVestingPeriodGetByIDCall wrap *gomock.Call
+type MockIVestingPeriodGetByIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingPeriodGetByIDCall) Return(arg0 *storage.VestingPeriod, arg1 error) *IVestingPeriodGetByIDCall {
+func (c *MockIVestingPeriodGetByIDCall) Return(arg0 *storage.VestingPeriod, arg1 error) *MockIVestingPeriodGetByIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingPeriodGetByIDCall) Do(f func(context.Context, uint64) (*storage.VestingPeriod, error)) *IVestingPeriodGetByIDCall {
+func (c *MockIVestingPeriodGetByIDCall) Do(f func(context.Context, uint64) (*storage.VestingPeriod, error)) *MockIVestingPeriodGetByIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingPeriodGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.VestingPeriod, error)) *IVestingPeriodGetByIDCall {
+func (c *MockIVestingPeriodGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.VestingPeriod, error)) *MockIVestingPeriodGetByIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -169,31 +175,31 @@ func (m *MockIVestingPeriod) IsNoRows(err error) bool {
 }
 
 // IsNoRows indicates an expected call of IsNoRows.
-func (mr *MockIVestingPeriodMockRecorder) IsNoRows(err any) *IVestingPeriodIsNoRowsCall {
+func (mr *MockIVestingPeriodMockRecorder) IsNoRows(err any) *MockIVestingPeriodIsNoRowsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoRows", reflect.TypeOf((*MockIVestingPeriod)(nil).IsNoRows), err)
-	return &IVestingPeriodIsNoRowsCall{Call: call}
+	return &MockIVestingPeriodIsNoRowsCall{Call: call}
 }
 
-// IVestingPeriodIsNoRowsCall wrap *gomock.Call
-type IVestingPeriodIsNoRowsCall struct {
+// MockIVestingPeriodIsNoRowsCall wrap *gomock.Call
+type MockIVestingPeriodIsNoRowsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingPeriodIsNoRowsCall) Return(arg0 bool) *IVestingPeriodIsNoRowsCall {
+func (c *MockIVestingPeriodIsNoRowsCall) Return(arg0 bool) *MockIVestingPeriodIsNoRowsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingPeriodIsNoRowsCall) Do(f func(error) bool) *IVestingPeriodIsNoRowsCall {
+func (c *MockIVestingPeriodIsNoRowsCall) Do(f func(error) bool) *MockIVestingPeriodIsNoRowsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingPeriodIsNoRowsCall) DoAndReturn(f func(error) bool) *IVestingPeriodIsNoRowsCall {
+func (c *MockIVestingPeriodIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIVestingPeriodIsNoRowsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -208,31 +214,31 @@ func (m *MockIVestingPeriod) LastID(ctx context.Context) (uint64, error) {
 }
 
 // LastID indicates an expected call of LastID.
-func (mr *MockIVestingPeriodMockRecorder) LastID(ctx any) *IVestingPeriodLastIDCall {
+func (mr *MockIVestingPeriodMockRecorder) LastID(ctx any) *MockIVestingPeriodLastIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastID", reflect.TypeOf((*MockIVestingPeriod)(nil).LastID), ctx)
-	return &IVestingPeriodLastIDCall{Call: call}
+	return &MockIVestingPeriodLastIDCall{Call: call}
 }
 
-// IVestingPeriodLastIDCall wrap *gomock.Call
-type IVestingPeriodLastIDCall struct {
+// MockIVestingPeriodLastIDCall wrap *gomock.Call
+type MockIVestingPeriodLastIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingPeriodLastIDCall) Return(arg0 uint64, arg1 error) *IVestingPeriodLastIDCall {
+func (c *MockIVestingPeriodLastIDCall) Return(arg0 uint64, arg1 error) *MockIVestingPeriodLastIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingPeriodLastIDCall) Do(f func(context.Context) (uint64, error)) *IVestingPeriodLastIDCall {
+func (c *MockIVestingPeriodLastIDCall) Do(f func(context.Context) (uint64, error)) *MockIVestingPeriodLastIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingPeriodLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *IVestingPeriodLastIDCall {
+func (c *MockIVestingPeriodLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockIVestingPeriodLastIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -247,31 +253,31 @@ func (m *MockIVestingPeriod) List(ctx context.Context, limit, offset uint64, ord
 }
 
 // List indicates an expected call of List.
-func (mr *MockIVestingPeriodMockRecorder) List(ctx, limit, offset, order any) *IVestingPeriodListCall {
+func (mr *MockIVestingPeriodMockRecorder) List(ctx, limit, offset, order any) *MockIVestingPeriodListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIVestingPeriod)(nil).List), ctx, limit, offset, order)
-	return &IVestingPeriodListCall{Call: call}
+	return &MockIVestingPeriodListCall{Call: call}
 }
 
-// IVestingPeriodListCall wrap *gomock.Call
-type IVestingPeriodListCall struct {
+// MockIVestingPeriodListCall wrap *gomock.Call
+type MockIVestingPeriodListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingPeriodListCall) Return(arg0 []*storage.VestingPeriod, arg1 error) *IVestingPeriodListCall {
+func (c *MockIVestingPeriodListCall) Return(arg0 []*storage.VestingPeriod, arg1 error) *MockIVestingPeriodListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingPeriodListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.VestingPeriod, error)) *IVestingPeriodListCall {
+func (c *MockIVestingPeriodListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.VestingPeriod, error)) *MockIVestingPeriodListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingPeriodListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.VestingPeriod, error)) *IVestingPeriodListCall {
+func (c *MockIVestingPeriodListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.VestingPeriod, error)) *MockIVestingPeriodListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -285,31 +291,31 @@ func (m_2 *MockIVestingPeriod) Save(ctx context.Context, m *storage.VestingPerio
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockIVestingPeriodMockRecorder) Save(ctx, m any) *IVestingPeriodSaveCall {
+func (mr *MockIVestingPeriodMockRecorder) Save(ctx, m any) *MockIVestingPeriodSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIVestingPeriod)(nil).Save), ctx, m)
-	return &IVestingPeriodSaveCall{Call: call}
+	return &MockIVestingPeriodSaveCall{Call: call}
 }
 
-// IVestingPeriodSaveCall wrap *gomock.Call
-type IVestingPeriodSaveCall struct {
+// MockIVestingPeriodSaveCall wrap *gomock.Call
+type MockIVestingPeriodSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingPeriodSaveCall) Return(arg0 error) *IVestingPeriodSaveCall {
+func (c *MockIVestingPeriodSaveCall) Return(arg0 error) *MockIVestingPeriodSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingPeriodSaveCall) Do(f func(context.Context, *storage.VestingPeriod) error) *IVestingPeriodSaveCall {
+func (c *MockIVestingPeriodSaveCall) Do(f func(context.Context, *storage.VestingPeriod) error) *MockIVestingPeriodSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingPeriodSaveCall) DoAndReturn(f func(context.Context, *storage.VestingPeriod) error) *IVestingPeriodSaveCall {
+func (c *MockIVestingPeriodSaveCall) DoAndReturn(f func(context.Context, *storage.VestingPeriod) error) *MockIVestingPeriodSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -323,31 +329,31 @@ func (m_2 *MockIVestingPeriod) Update(ctx context.Context, m *storage.VestingPer
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIVestingPeriodMockRecorder) Update(ctx, m any) *IVestingPeriodUpdateCall {
+func (mr *MockIVestingPeriodMockRecorder) Update(ctx, m any) *MockIVestingPeriodUpdateCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIVestingPeriod)(nil).Update), ctx, m)
-	return &IVestingPeriodUpdateCall{Call: call}
+	return &MockIVestingPeriodUpdateCall{Call: call}
 }
 
-// IVestingPeriodUpdateCall wrap *gomock.Call
-type IVestingPeriodUpdateCall struct {
+// MockIVestingPeriodUpdateCall wrap *gomock.Call
+type MockIVestingPeriodUpdateCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingPeriodUpdateCall) Return(arg0 error) *IVestingPeriodUpdateCall {
+func (c *MockIVestingPeriodUpdateCall) Return(arg0 error) *MockIVestingPeriodUpdateCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingPeriodUpdateCall) Do(f func(context.Context, *storage.VestingPeriod) error) *IVestingPeriodUpdateCall {
+func (c *MockIVestingPeriodUpdateCall) Do(f func(context.Context, *storage.VestingPeriod) error) *MockIVestingPeriodUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingPeriodUpdateCall) DoAndReturn(f func(context.Context, *storage.VestingPeriod) error) *IVestingPeriodUpdateCall {
+func (c *MockIVestingPeriodUpdateCall) DoAndReturn(f func(context.Context, *storage.VestingPeriod) error) *MockIVestingPeriodUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -8,6 +8,7 @@
 //
 //	mockgen -source=staking_log.go -destination=mock/staking_log.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,6 +44,11 @@ func (m *MockIStakingLog) EXPECT() *MockIStakingLogMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIStakingLog) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // CursorList mocks base method.
 func (m *MockIStakingLog) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.StakingLog, error) {
 	m.ctrl.T.Helper()
@@ -53,31 +59,31 @@ func (m *MockIStakingLog) CursorList(ctx context.Context, id, limit uint64, orde
 }
 
 // CursorList indicates an expected call of CursorList.
-func (mr *MockIStakingLogMockRecorder) CursorList(ctx, id, limit, order, cmp any) *IStakingLogCursorListCall {
+func (mr *MockIStakingLogMockRecorder) CursorList(ctx, id, limit, order, cmp any) *MockIStakingLogCursorListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CursorList", reflect.TypeOf((*MockIStakingLog)(nil).CursorList), ctx, id, limit, order, cmp)
-	return &IStakingLogCursorListCall{Call: call}
+	return &MockIStakingLogCursorListCall{Call: call}
 }
 
-// IStakingLogCursorListCall wrap *gomock.Call
-type IStakingLogCursorListCall struct {
+// MockIStakingLogCursorListCall wrap *gomock.Call
+type MockIStakingLogCursorListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStakingLogCursorListCall) Return(arg0 []*storage.StakingLog, arg1 error) *IStakingLogCursorListCall {
+func (c *MockIStakingLogCursorListCall) Return(arg0 []*storage.StakingLog, arg1 error) *MockIStakingLogCursorListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStakingLogCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.StakingLog, error)) *IStakingLogCursorListCall {
+func (c *MockIStakingLogCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.StakingLog, error)) *MockIStakingLogCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStakingLogCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.StakingLog, error)) *IStakingLogCursorListCall {
+func (c *MockIStakingLogCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.StakingLog, error)) *MockIStakingLogCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +98,31 @@ func (m *MockIStakingLog) GetByID(ctx context.Context, id uint64) (*storage.Stak
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockIStakingLogMockRecorder) GetByID(ctx, id any) *IStakingLogGetByIDCall {
+func (mr *MockIStakingLogMockRecorder) GetByID(ctx, id any) *MockIStakingLogGetByIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockIStakingLog)(nil).GetByID), ctx, id)
-	return &IStakingLogGetByIDCall{Call: call}
+	return &MockIStakingLogGetByIDCall{Call: call}
 }
 
-// IStakingLogGetByIDCall wrap *gomock.Call
-type IStakingLogGetByIDCall struct {
+// MockIStakingLogGetByIDCall wrap *gomock.Call
+type MockIStakingLogGetByIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStakingLogGetByIDCall) Return(arg0 *storage.StakingLog, arg1 error) *IStakingLogGetByIDCall {
+func (c *MockIStakingLogGetByIDCall) Return(arg0 *storage.StakingLog, arg1 error) *MockIStakingLogGetByIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStakingLogGetByIDCall) Do(f func(context.Context, uint64) (*storage.StakingLog, error)) *IStakingLogGetByIDCall {
+func (c *MockIStakingLogGetByIDCall) Do(f func(context.Context, uint64) (*storage.StakingLog, error)) *MockIStakingLogGetByIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStakingLogGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.StakingLog, error)) *IStakingLogGetByIDCall {
+func (c *MockIStakingLogGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.StakingLog, error)) *MockIStakingLogGetByIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -130,31 +136,31 @@ func (m *MockIStakingLog) IsNoRows(err error) bool {
 }
 
 // IsNoRows indicates an expected call of IsNoRows.
-func (mr *MockIStakingLogMockRecorder) IsNoRows(err any) *IStakingLogIsNoRowsCall {
+func (mr *MockIStakingLogMockRecorder) IsNoRows(err any) *MockIStakingLogIsNoRowsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoRows", reflect.TypeOf((*MockIStakingLog)(nil).IsNoRows), err)
-	return &IStakingLogIsNoRowsCall{Call: call}
+	return &MockIStakingLogIsNoRowsCall{Call: call}
 }
 
-// IStakingLogIsNoRowsCall wrap *gomock.Call
-type IStakingLogIsNoRowsCall struct {
+// MockIStakingLogIsNoRowsCall wrap *gomock.Call
+type MockIStakingLogIsNoRowsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStakingLogIsNoRowsCall) Return(arg0 bool) *IStakingLogIsNoRowsCall {
+func (c *MockIStakingLogIsNoRowsCall) Return(arg0 bool) *MockIStakingLogIsNoRowsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStakingLogIsNoRowsCall) Do(f func(error) bool) *IStakingLogIsNoRowsCall {
+func (c *MockIStakingLogIsNoRowsCall) Do(f func(error) bool) *MockIStakingLogIsNoRowsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStakingLogIsNoRowsCall) DoAndReturn(f func(error) bool) *IStakingLogIsNoRowsCall {
+func (c *MockIStakingLogIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIStakingLogIsNoRowsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -169,31 +175,31 @@ func (m *MockIStakingLog) LastID(ctx context.Context) (uint64, error) {
 }
 
 // LastID indicates an expected call of LastID.
-func (mr *MockIStakingLogMockRecorder) LastID(ctx any) *IStakingLogLastIDCall {
+func (mr *MockIStakingLogMockRecorder) LastID(ctx any) *MockIStakingLogLastIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastID", reflect.TypeOf((*MockIStakingLog)(nil).LastID), ctx)
-	return &IStakingLogLastIDCall{Call: call}
+	return &MockIStakingLogLastIDCall{Call: call}
 }
 
-// IStakingLogLastIDCall wrap *gomock.Call
-type IStakingLogLastIDCall struct {
+// MockIStakingLogLastIDCall wrap *gomock.Call
+type MockIStakingLogLastIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStakingLogLastIDCall) Return(arg0 uint64, arg1 error) *IStakingLogLastIDCall {
+func (c *MockIStakingLogLastIDCall) Return(arg0 uint64, arg1 error) *MockIStakingLogLastIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStakingLogLastIDCall) Do(f func(context.Context) (uint64, error)) *IStakingLogLastIDCall {
+func (c *MockIStakingLogLastIDCall) Do(f func(context.Context) (uint64, error)) *MockIStakingLogLastIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStakingLogLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *IStakingLogLastIDCall {
+func (c *MockIStakingLogLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockIStakingLogLastIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -208,31 +214,31 @@ func (m *MockIStakingLog) List(ctx context.Context, limit, offset uint64, order 
 }
 
 // List indicates an expected call of List.
-func (mr *MockIStakingLogMockRecorder) List(ctx, limit, offset, order any) *IStakingLogListCall {
+func (mr *MockIStakingLogMockRecorder) List(ctx, limit, offset, order any) *MockIStakingLogListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIStakingLog)(nil).List), ctx, limit, offset, order)
-	return &IStakingLogListCall{Call: call}
+	return &MockIStakingLogListCall{Call: call}
 }
 
-// IStakingLogListCall wrap *gomock.Call
-type IStakingLogListCall struct {
+// MockIStakingLogListCall wrap *gomock.Call
+type MockIStakingLogListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStakingLogListCall) Return(arg0 []*storage.StakingLog, arg1 error) *IStakingLogListCall {
+func (c *MockIStakingLogListCall) Return(arg0 []*storage.StakingLog, arg1 error) *MockIStakingLogListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStakingLogListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.StakingLog, error)) *IStakingLogListCall {
+func (c *MockIStakingLogListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.StakingLog, error)) *MockIStakingLogListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStakingLogListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.StakingLog, error)) *IStakingLogListCall {
+func (c *MockIStakingLogListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.StakingLog, error)) *MockIStakingLogListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -246,31 +252,31 @@ func (m_2 *MockIStakingLog) Save(ctx context.Context, m *storage.StakingLog) err
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockIStakingLogMockRecorder) Save(ctx, m any) *IStakingLogSaveCall {
+func (mr *MockIStakingLogMockRecorder) Save(ctx, m any) *MockIStakingLogSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIStakingLog)(nil).Save), ctx, m)
-	return &IStakingLogSaveCall{Call: call}
+	return &MockIStakingLogSaveCall{Call: call}
 }
 
-// IStakingLogSaveCall wrap *gomock.Call
-type IStakingLogSaveCall struct {
+// MockIStakingLogSaveCall wrap *gomock.Call
+type MockIStakingLogSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStakingLogSaveCall) Return(arg0 error) *IStakingLogSaveCall {
+func (c *MockIStakingLogSaveCall) Return(arg0 error) *MockIStakingLogSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStakingLogSaveCall) Do(f func(context.Context, *storage.StakingLog) error) *IStakingLogSaveCall {
+func (c *MockIStakingLogSaveCall) Do(f func(context.Context, *storage.StakingLog) error) *MockIStakingLogSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStakingLogSaveCall) DoAndReturn(f func(context.Context, *storage.StakingLog) error) *IStakingLogSaveCall {
+func (c *MockIStakingLogSaveCall) DoAndReturn(f func(context.Context, *storage.StakingLog) error) *MockIStakingLogSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -284,31 +290,31 @@ func (m_2 *MockIStakingLog) Update(ctx context.Context, m *storage.StakingLog) e
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIStakingLogMockRecorder) Update(ctx, m any) *IStakingLogUpdateCall {
+func (mr *MockIStakingLogMockRecorder) Update(ctx, m any) *MockIStakingLogUpdateCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIStakingLog)(nil).Update), ctx, m)
-	return &IStakingLogUpdateCall{Call: call}
+	return &MockIStakingLogUpdateCall{Call: call}
 }
 
-// IStakingLogUpdateCall wrap *gomock.Call
-type IStakingLogUpdateCall struct {
+// MockIStakingLogUpdateCall wrap *gomock.Call
+type MockIStakingLogUpdateCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStakingLogUpdateCall) Return(arg0 error) *IStakingLogUpdateCall {
+func (c *MockIStakingLogUpdateCall) Return(arg0 error) *MockIStakingLogUpdateCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStakingLogUpdateCall) Do(f func(context.Context, *storage.StakingLog) error) *IStakingLogUpdateCall {
+func (c *MockIStakingLogUpdateCall) Do(f func(context.Context, *storage.StakingLog) error) *MockIStakingLogUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStakingLogUpdateCall) DoAndReturn(f func(context.Context, *storage.StakingLog) error) *IStakingLogUpdateCall {
+func (c *MockIStakingLogUpdateCall) DoAndReturn(f func(context.Context, *storage.StakingLog) error) *MockIStakingLogUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
 )
@@ -125,10 +126,10 @@ func (handler *TxHandler) List(c echo.Context) error {
 		fltrs.TimeTo = time.Unix(req.To, 0).UTC()
 	}
 	for i := range req.MsgType {
-		fltrs.MessageTypes.SetByMsgType(storageTypes.MsgType(req.MsgType[i]))
+		fltrs.MessageTypes.SetByMsgType(types.MsgType(req.MsgType[i]))
 	}
 	for i := range req.ExcludedMsgType {
-		fltrs.ExcludedMessageTypes.SetByMsgType(storageTypes.MsgType(req.ExcludedMsgType[i]))
+		fltrs.ExcludedMessageTypes.SetByMsgType(types.MsgType(req.ExcludedMsgType[i]))
 	}
 
 	txs, err := handler.tx.Filter(c.Request().Context(), fltrs)

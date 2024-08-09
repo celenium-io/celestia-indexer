@@ -8,6 +8,7 @@
 //
 //	mockgen -source=stats.go -destination=mock/stats.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,6 +44,11 @@ func (m *MockIStats) EXPECT() *MockIStatsMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIStats) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // Change24hBlockStats mocks base method.
 func (m *MockIStats) Change24hBlockStats(ctx context.Context) (storage.Change24hBlockStats, error) {
 	m.ctrl.T.Helper()
@@ -53,31 +59,31 @@ func (m *MockIStats) Change24hBlockStats(ctx context.Context) (storage.Change24h
 }
 
 // Change24hBlockStats indicates an expected call of Change24hBlockStats.
-func (mr *MockIStatsMockRecorder) Change24hBlockStats(ctx any) *IStatsChange24hBlockStatsCall {
+func (mr *MockIStatsMockRecorder) Change24hBlockStats(ctx any) *MockIStatsChange24hBlockStatsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Change24hBlockStats", reflect.TypeOf((*MockIStats)(nil).Change24hBlockStats), ctx)
-	return &IStatsChange24hBlockStatsCall{Call: call}
+	return &MockIStatsChange24hBlockStatsCall{Call: call}
 }
 
-// IStatsChange24hBlockStatsCall wrap *gomock.Call
-type IStatsChange24hBlockStatsCall struct {
+// MockIStatsChange24hBlockStatsCall wrap *gomock.Call
+type MockIStatsChange24hBlockStatsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStatsChange24hBlockStatsCall) Return(response storage.Change24hBlockStats, err error) *IStatsChange24hBlockStatsCall {
+func (c *MockIStatsChange24hBlockStatsCall) Return(response storage.Change24hBlockStats, err error) *MockIStatsChange24hBlockStatsCall {
 	c.Call = c.Call.Return(response, err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStatsChange24hBlockStatsCall) Do(f func(context.Context) (storage.Change24hBlockStats, error)) *IStatsChange24hBlockStatsCall {
+func (c *MockIStatsChange24hBlockStatsCall) Do(f func(context.Context) (storage.Change24hBlockStats, error)) *MockIStatsChange24hBlockStatsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsChange24hBlockStatsCall) DoAndReturn(f func(context.Context) (storage.Change24hBlockStats, error)) *IStatsChange24hBlockStatsCall {
+func (c *MockIStatsChange24hBlockStatsCall) DoAndReturn(f func(context.Context) (storage.Change24hBlockStats, error)) *MockIStatsChange24hBlockStatsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +98,31 @@ func (m *MockIStats) Count(ctx context.Context, req storage.CountRequest) (strin
 }
 
 // Count indicates an expected call of Count.
-func (mr *MockIStatsMockRecorder) Count(ctx, req any) *IStatsCountCall {
+func (mr *MockIStatsMockRecorder) Count(ctx, req any) *MockIStatsCountCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Count", reflect.TypeOf((*MockIStats)(nil).Count), ctx, req)
-	return &IStatsCountCall{Call: call}
+	return &MockIStatsCountCall{Call: call}
 }
 
-// IStatsCountCall wrap *gomock.Call
-type IStatsCountCall struct {
+// MockIStatsCountCall wrap *gomock.Call
+type MockIStatsCountCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStatsCountCall) Return(arg0 string, arg1 error) *IStatsCountCall {
+func (c *MockIStatsCountCall) Return(arg0 string, arg1 error) *MockIStatsCountCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStatsCountCall) Do(f func(context.Context, storage.CountRequest) (string, error)) *IStatsCountCall {
+func (c *MockIStatsCountCall) Do(f func(context.Context, storage.CountRequest) (string, error)) *MockIStatsCountCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsCountCall) DoAndReturn(f func(context.Context, storage.CountRequest) (string, error)) *IStatsCountCall {
+func (c *MockIStatsCountCall) DoAndReturn(f func(context.Context, storage.CountRequest) (string, error)) *MockIStatsCountCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -131,31 +137,31 @@ func (m *MockIStats) CumulativeSeries(ctx context.Context, timeframe storage.Tim
 }
 
 // CumulativeSeries indicates an expected call of CumulativeSeries.
-func (mr *MockIStatsMockRecorder) CumulativeSeries(ctx, timeframe, name, req any) *IStatsCumulativeSeriesCall {
+func (mr *MockIStatsMockRecorder) CumulativeSeries(ctx, timeframe, name, req any) *MockIStatsCumulativeSeriesCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CumulativeSeries", reflect.TypeOf((*MockIStats)(nil).CumulativeSeries), ctx, timeframe, name, req)
-	return &IStatsCumulativeSeriesCall{Call: call}
+	return &MockIStatsCumulativeSeriesCall{Call: call}
 }
 
-// IStatsCumulativeSeriesCall wrap *gomock.Call
-type IStatsCumulativeSeriesCall struct {
+// MockIStatsCumulativeSeriesCall wrap *gomock.Call
+type MockIStatsCumulativeSeriesCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStatsCumulativeSeriesCall) Return(arg0 []storage.SeriesItem, arg1 error) *IStatsCumulativeSeriesCall {
+func (c *MockIStatsCumulativeSeriesCall) Return(arg0 []storage.SeriesItem, arg1 error) *MockIStatsCumulativeSeriesCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStatsCumulativeSeriesCall) Do(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsCumulativeSeriesCall {
+func (c *MockIStatsCumulativeSeriesCall) Do(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *MockIStatsCumulativeSeriesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsCumulativeSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsCumulativeSeriesCall {
+func (c *MockIStatsCumulativeSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *MockIStatsCumulativeSeriesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -170,31 +176,31 @@ func (m *MockIStats) MessagesCount24h(ctx context.Context) ([]storage.CountItem,
 }
 
 // MessagesCount24h indicates an expected call of MessagesCount24h.
-func (mr *MockIStatsMockRecorder) MessagesCount24h(ctx any) *IStatsMessagesCount24hCall {
+func (mr *MockIStatsMockRecorder) MessagesCount24h(ctx any) *MockIStatsMessagesCount24hCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagesCount24h", reflect.TypeOf((*MockIStats)(nil).MessagesCount24h), ctx)
-	return &IStatsMessagesCount24hCall{Call: call}
+	return &MockIStatsMessagesCount24hCall{Call: call}
 }
 
-// IStatsMessagesCount24hCall wrap *gomock.Call
-type IStatsMessagesCount24hCall struct {
+// MockIStatsMessagesCount24hCall wrap *gomock.Call
+type MockIStatsMessagesCount24hCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStatsMessagesCount24hCall) Return(arg0 []storage.CountItem, arg1 error) *IStatsMessagesCount24hCall {
+func (c *MockIStatsMessagesCount24hCall) Return(arg0 []storage.CountItem, arg1 error) *MockIStatsMessagesCount24hCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStatsMessagesCount24hCall) Do(f func(context.Context) ([]storage.CountItem, error)) *IStatsMessagesCount24hCall {
+func (c *MockIStatsMessagesCount24hCall) Do(f func(context.Context) ([]storage.CountItem, error)) *MockIStatsMessagesCount24hCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsMessagesCount24hCall) DoAndReturn(f func(context.Context) ([]storage.CountItem, error)) *IStatsMessagesCount24hCall {
+func (c *MockIStatsMessagesCount24hCall) DoAndReturn(f func(context.Context) ([]storage.CountItem, error)) *MockIStatsMessagesCount24hCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -209,31 +215,31 @@ func (m *MockIStats) NamespaceSeries(ctx context.Context, timeframe storage.Time
 }
 
 // NamespaceSeries indicates an expected call of NamespaceSeries.
-func (mr *MockIStatsMockRecorder) NamespaceSeries(ctx, timeframe, name, nsId, req any) *IStatsNamespaceSeriesCall {
+func (mr *MockIStatsMockRecorder) NamespaceSeries(ctx, timeframe, name, nsId, req any) *MockIStatsNamespaceSeriesCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NamespaceSeries", reflect.TypeOf((*MockIStats)(nil).NamespaceSeries), ctx, timeframe, name, nsId, req)
-	return &IStatsNamespaceSeriesCall{Call: call}
+	return &MockIStatsNamespaceSeriesCall{Call: call}
 }
 
-// IStatsNamespaceSeriesCall wrap *gomock.Call
-type IStatsNamespaceSeriesCall struct {
+// MockIStatsNamespaceSeriesCall wrap *gomock.Call
+type MockIStatsNamespaceSeriesCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStatsNamespaceSeriesCall) Return(response []storage.SeriesItem, err error) *IStatsNamespaceSeriesCall {
+func (c *MockIStatsNamespaceSeriesCall) Return(response []storage.SeriesItem, err error) *MockIStatsNamespaceSeriesCall {
 	c.Call = c.Call.Return(response, err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStatsNamespaceSeriesCall) Do(f func(context.Context, storage.Timeframe, string, uint64, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsNamespaceSeriesCall {
+func (c *MockIStatsNamespaceSeriesCall) Do(f func(context.Context, storage.Timeframe, string, uint64, storage.SeriesRequest) ([]storage.SeriesItem, error)) *MockIStatsNamespaceSeriesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsNamespaceSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, uint64, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsNamespaceSeriesCall {
+func (c *MockIStatsNamespaceSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, uint64, storage.SeriesRequest) ([]storage.SeriesItem, error)) *MockIStatsNamespaceSeriesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -248,31 +254,31 @@ func (m *MockIStats) RollupStats24h(ctx context.Context) ([]storage.RollupStats2
 }
 
 // RollupStats24h indicates an expected call of RollupStats24h.
-func (mr *MockIStatsMockRecorder) RollupStats24h(ctx any) *IStatsRollupStats24hCall {
+func (mr *MockIStatsMockRecorder) RollupStats24h(ctx any) *MockIStatsRollupStats24hCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollupStats24h", reflect.TypeOf((*MockIStats)(nil).RollupStats24h), ctx)
-	return &IStatsRollupStats24hCall{Call: call}
+	return &MockIStatsRollupStats24hCall{Call: call}
 }
 
-// IStatsRollupStats24hCall wrap *gomock.Call
-type IStatsRollupStats24hCall struct {
+// MockIStatsRollupStats24hCall wrap *gomock.Call
+type MockIStatsRollupStats24hCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStatsRollupStats24hCall) Return(arg0 []storage.RollupStats24h, arg1 error) *IStatsRollupStats24hCall {
+func (c *MockIStatsRollupStats24hCall) Return(arg0 []storage.RollupStats24h, arg1 error) *MockIStatsRollupStats24hCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStatsRollupStats24hCall) Do(f func(context.Context) ([]storage.RollupStats24h, error)) *IStatsRollupStats24hCall {
+func (c *MockIStatsRollupStats24hCall) Do(f func(context.Context) ([]storage.RollupStats24h, error)) *MockIStatsRollupStats24hCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsRollupStats24hCall) DoAndReturn(f func(context.Context) ([]storage.RollupStats24h, error)) *IStatsRollupStats24hCall {
+func (c *MockIStatsRollupStats24hCall) DoAndReturn(f func(context.Context) ([]storage.RollupStats24h, error)) *MockIStatsRollupStats24hCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -287,31 +293,31 @@ func (m *MockIStats) Series(ctx context.Context, timeframe storage.Timeframe, na
 }
 
 // Series indicates an expected call of Series.
-func (mr *MockIStatsMockRecorder) Series(ctx, timeframe, name, req any) *IStatsSeriesCall {
+func (mr *MockIStatsMockRecorder) Series(ctx, timeframe, name, req any) *MockIStatsSeriesCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Series", reflect.TypeOf((*MockIStats)(nil).Series), ctx, timeframe, name, req)
-	return &IStatsSeriesCall{Call: call}
+	return &MockIStatsSeriesCall{Call: call}
 }
 
-// IStatsSeriesCall wrap *gomock.Call
-type IStatsSeriesCall struct {
+// MockIStatsSeriesCall wrap *gomock.Call
+type MockIStatsSeriesCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStatsSeriesCall) Return(arg0 []storage.SeriesItem, arg1 error) *IStatsSeriesCall {
+func (c *MockIStatsSeriesCall) Return(arg0 []storage.SeriesItem, arg1 error) *MockIStatsSeriesCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStatsSeriesCall) Do(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsSeriesCall {
+func (c *MockIStatsSeriesCall) Do(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *MockIStatsSeriesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsSeriesCall {
+func (c *MockIStatsSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, storage.SeriesRequest) ([]storage.SeriesItem, error)) *MockIStatsSeriesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -326,31 +332,31 @@ func (m *MockIStats) SquareSize(ctx context.Context, from, to *time.Time) (map[i
 }
 
 // SquareSize indicates an expected call of SquareSize.
-func (mr *MockIStatsMockRecorder) SquareSize(ctx, from, to any) *IStatsSquareSizeCall {
+func (mr *MockIStatsMockRecorder) SquareSize(ctx, from, to any) *MockIStatsSquareSizeCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SquareSize", reflect.TypeOf((*MockIStats)(nil).SquareSize), ctx, from, to)
-	return &IStatsSquareSizeCall{Call: call}
+	return &MockIStatsSquareSizeCall{Call: call}
 }
 
-// IStatsSquareSizeCall wrap *gomock.Call
-type IStatsSquareSizeCall struct {
+// MockIStatsSquareSizeCall wrap *gomock.Call
+type MockIStatsSquareSizeCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStatsSquareSizeCall) Return(arg0 map[int][]storage.SeriesItem, arg1 error) *IStatsSquareSizeCall {
+func (c *MockIStatsSquareSizeCall) Return(arg0 map[int][]storage.SeriesItem, arg1 error) *MockIStatsSquareSizeCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStatsSquareSizeCall) Do(f func(context.Context, *time.Time, *time.Time) (map[int][]storage.SeriesItem, error)) *IStatsSquareSizeCall {
+func (c *MockIStatsSquareSizeCall) Do(f func(context.Context, *time.Time, *time.Time) (map[int][]storage.SeriesItem, error)) *MockIStatsSquareSizeCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsSquareSizeCall) DoAndReturn(f func(context.Context, *time.Time, *time.Time) (map[int][]storage.SeriesItem, error)) *IStatsSquareSizeCall {
+func (c *MockIStatsSquareSizeCall) DoAndReturn(f func(context.Context, *time.Time, *time.Time) (map[int][]storage.SeriesItem, error)) *MockIStatsSquareSizeCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -365,31 +371,31 @@ func (m *MockIStats) StakingSeries(ctx context.Context, timeframe storage.Timefr
 }
 
 // StakingSeries indicates an expected call of StakingSeries.
-func (mr *MockIStatsMockRecorder) StakingSeries(ctx, timeframe, name, validatorId, req any) *IStatsStakingSeriesCall {
+func (mr *MockIStatsMockRecorder) StakingSeries(ctx, timeframe, name, validatorId, req any) *MockIStatsStakingSeriesCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StakingSeries", reflect.TypeOf((*MockIStats)(nil).StakingSeries), ctx, timeframe, name, validatorId, req)
-	return &IStatsStakingSeriesCall{Call: call}
+	return &MockIStatsStakingSeriesCall{Call: call}
 }
 
-// IStatsStakingSeriesCall wrap *gomock.Call
-type IStatsStakingSeriesCall struct {
+// MockIStatsStakingSeriesCall wrap *gomock.Call
+type MockIStatsStakingSeriesCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStatsStakingSeriesCall) Return(response []storage.SeriesItem, err error) *IStatsStakingSeriesCall {
+func (c *MockIStatsStakingSeriesCall) Return(response []storage.SeriesItem, err error) *MockIStatsStakingSeriesCall {
 	c.Call = c.Call.Return(response, err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStatsStakingSeriesCall) Do(f func(context.Context, storage.Timeframe, string, uint64, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsStakingSeriesCall {
+func (c *MockIStatsStakingSeriesCall) Do(f func(context.Context, storage.Timeframe, string, uint64, storage.SeriesRequest) ([]storage.SeriesItem, error)) *MockIStatsStakingSeriesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsStakingSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, uint64, storage.SeriesRequest) ([]storage.SeriesItem, error)) *IStatsStakingSeriesCall {
+func (c *MockIStatsStakingSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, string, uint64, storage.SeriesRequest) ([]storage.SeriesItem, error)) *MockIStatsStakingSeriesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -404,31 +410,31 @@ func (m *MockIStats) Summary(ctx context.Context, req storage.SummaryRequest) (s
 }
 
 // Summary indicates an expected call of Summary.
-func (mr *MockIStatsMockRecorder) Summary(ctx, req any) *IStatsSummaryCall {
+func (mr *MockIStatsMockRecorder) Summary(ctx, req any) *MockIStatsSummaryCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Summary", reflect.TypeOf((*MockIStats)(nil).Summary), ctx, req)
-	return &IStatsSummaryCall{Call: call}
+	return &MockIStatsSummaryCall{Call: call}
 }
 
-// IStatsSummaryCall wrap *gomock.Call
-type IStatsSummaryCall struct {
+// MockIStatsSummaryCall wrap *gomock.Call
+type MockIStatsSummaryCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStatsSummaryCall) Return(arg0 string, arg1 error) *IStatsSummaryCall {
+func (c *MockIStatsSummaryCall) Return(arg0 string, arg1 error) *MockIStatsSummaryCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStatsSummaryCall) Do(f func(context.Context, storage.SummaryRequest) (string, error)) *IStatsSummaryCall {
+func (c *MockIStatsSummaryCall) Do(f func(context.Context, storage.SummaryRequest) (string, error)) *MockIStatsSummaryCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsSummaryCall) DoAndReturn(f func(context.Context, storage.SummaryRequest) (string, error)) *IStatsSummaryCall {
+func (c *MockIStatsSummaryCall) DoAndReturn(f func(context.Context, storage.SummaryRequest) (string, error)) *MockIStatsSummaryCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -443,31 +449,31 @@ func (m *MockIStats) TPS(ctx context.Context) (storage.TPS, error) {
 }
 
 // TPS indicates an expected call of TPS.
-func (mr *MockIStatsMockRecorder) TPS(ctx any) *IStatsTPSCall {
+func (mr *MockIStatsMockRecorder) TPS(ctx any) *MockIStatsTPSCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TPS", reflect.TypeOf((*MockIStats)(nil).TPS), ctx)
-	return &IStatsTPSCall{Call: call}
+	return &MockIStatsTPSCall{Call: call}
 }
 
-// IStatsTPSCall wrap *gomock.Call
-type IStatsTPSCall struct {
+// MockIStatsTPSCall wrap *gomock.Call
+type MockIStatsTPSCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IStatsTPSCall) Return(arg0 storage.TPS, arg1 error) *IStatsTPSCall {
+func (c *MockIStatsTPSCall) Return(arg0 storage.TPS, arg1 error) *MockIStatsTPSCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IStatsTPSCall) Do(f func(context.Context) (storage.TPS, error)) *IStatsTPSCall {
+func (c *MockIStatsTPSCall) Do(f func(context.Context) (storage.TPS, error)) *MockIStatsTPSCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IStatsTPSCall) DoAndReturn(f func(context.Context) (storage.TPS, error)) *IStatsTPSCall {
+func (c *MockIStatsTPSCall) DoAndReturn(f func(context.Context) (storage.TPS, error)) *MockIStatsTPSCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
@@ -28,7 +28,7 @@ func NewBlocks(db *database.Bun) *Blocks {
 }
 
 // ByHeight -
-func (b *Blocks) ByHeight(ctx context.Context, height pkgTypes.Level) (block storage.Block, err error) {
+func (b *Blocks) ByHeight(ctx context.Context, height types.Level) (block storage.Block, err error) {
 	err = b.DB().NewSelect().Model(&block).
 		Where("block.height = ?", height).
 		Relation("Proposer", func(sq *bun.SelectQuery) *bun.SelectQuery {
@@ -40,7 +40,7 @@ func (b *Blocks) ByHeight(ctx context.Context, height pkgTypes.Level) (block sto
 }
 
 // ByHeightWithStats -
-func (b *Blocks) ByHeightWithStats(ctx context.Context, height pkgTypes.Level) (block storage.Block, err error) {
+func (b *Blocks) ByHeightWithStats(ctx context.Context, height types.Level) (block storage.Block, err error) {
 	subQuery := b.DB().NewSelect().Model(&block).
 		Where("block.height = ?", height).
 		Limit(1)
@@ -159,7 +159,7 @@ func (b *Blocks) ByProposer(ctx context.Context, proposerId uint64, limit, offse
 	return
 }
 
-func (b *Blocks) Time(ctx context.Context, height pkgTypes.Level) (response time.Time, err error) {
+func (b *Blocks) Time(ctx context.Context, height types.Level) (response time.Time, err error) {
 	err = b.DB().NewSelect().Model((*storage.Block)(nil)).
 		Column("time").
 		Where("height = ?", height).

@@ -40,23 +40,6 @@ func (s *StorageTestSuite) TestRollupLeaderboard() {
 	}
 }
 
-func (s *StorageTestSuite) TestRollupStats() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer ctxCancel()
-
-	rollup, err := s.storage.Rollup.Stats(ctx, 1)
-	s.Require().NoError(err)
-
-	s.Require().EqualValues(30, rollup.Size)
-	s.Require().EqualValues(2, rollup.BlobsCount)
-	s.Require().False(rollup.LastActionTime.IsZero())
-	s.Require().False(rollup.FirstActionTime.IsZero())
-	s.Require().Equal("2000", rollup.Fee.String())
-	s.Require().Greater(rollup.BlobsCountPct, 0.0)
-	s.Require().Greater(rollup.FeePct, 0.0)
-	s.Require().Greater(rollup.SizePct, 0.0)
-}
-
 func (s *StorageTestSuite) TestRollupNamespaces() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
@@ -99,11 +82,44 @@ func (s *StorageTestSuite) TestRollupBySlug() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	rollup, err := s.storage.Rollup.BySlug(ctx, "rollup_1")
+	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
 	s.Require().NoError(err)
 
-	s.Require().EqualValues(1, rollup.Id)
-	s.Require().EqualValues("Rollup 1", rollup.Name)
+	rollup, err := s.storage.Rollup.BySlug(ctx, "rollup_3")
+	s.Require().NoError(err)
+
+	s.Require().EqualValues("Rollup 3", rollup.Name)
+	s.Require().EqualValues("The third", rollup.Description)
+	s.Require().EqualValues(34, rollup.Size)
+	s.Require().EqualValues(3, rollup.BlobsCount)
+	s.Require().False(rollup.LastActionTime.IsZero())
+	s.Require().False(rollup.FirstActionTime.IsZero())
+	s.Require().Equal("7000", rollup.Fee.String())
+	s.Require().EqualValues(0.6363636363636364, rollup.FeePct)
+	s.Require().EqualValues(0.42857142857142855, rollup.BlobsCountPct)
+	s.Require().EqualValues(0.3953488372093023, rollup.SizePct)
+}
+
+func (s *StorageTestSuite) TestRollupById() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
+	s.Require().NoError(err)
+
+	rollup, err := s.storage.Rollup.ById(ctx, 3)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues("Rollup 3", rollup.Name)
+	s.Require().EqualValues("The third", rollup.Description)
+	s.Require().EqualValues(34, rollup.Size)
+	s.Require().EqualValues(3, rollup.BlobsCount)
+	s.Require().False(rollup.LastActionTime.IsZero())
+	s.Require().False(rollup.FirstActionTime.IsZero())
+	s.Require().Equal("7000", rollup.Fee.String())
+	s.Require().EqualValues(0.6363636363636364, rollup.FeePct)
+	s.Require().EqualValues(0.42857142857142855, rollup.BlobsCountPct)
+	s.Require().EqualValues(0.3953488372093023, rollup.SizePct)
 }
 
 func (s *StorageTestSuite) TestRollupsByNamespace() {
