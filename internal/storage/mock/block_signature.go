@@ -8,6 +8,7 @@
 //
 //	mockgen -source=block_signature.go -destination=mock/block_signature.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -44,6 +45,11 @@ func (m *MockIBlockSignature) EXPECT() *MockIBlockSignatureMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIBlockSignature) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // CursorList mocks base method.
 func (m *MockIBlockSignature) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.BlockSignature, error) {
 	m.ctrl.T.Helper()
@@ -54,31 +60,31 @@ func (m *MockIBlockSignature) CursorList(ctx context.Context, id, limit uint64, 
 }
 
 // CursorList indicates an expected call of CursorList.
-func (mr *MockIBlockSignatureMockRecorder) CursorList(ctx, id, limit, order, cmp any) *IBlockSignatureCursorListCall {
+func (mr *MockIBlockSignatureMockRecorder) CursorList(ctx, id, limit, order, cmp any) *MockIBlockSignatureCursorListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CursorList", reflect.TypeOf((*MockIBlockSignature)(nil).CursorList), ctx, id, limit, order, cmp)
-	return &IBlockSignatureCursorListCall{Call: call}
+	return &MockIBlockSignatureCursorListCall{Call: call}
 }
 
-// IBlockSignatureCursorListCall wrap *gomock.Call
-type IBlockSignatureCursorListCall struct {
+// MockIBlockSignatureCursorListCall wrap *gomock.Call
+type MockIBlockSignatureCursorListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlockSignatureCursorListCall) Return(arg0 []*storage.BlockSignature, arg1 error) *IBlockSignatureCursorListCall {
+func (c *MockIBlockSignatureCursorListCall) Return(arg0 []*storage.BlockSignature, arg1 error) *MockIBlockSignatureCursorListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlockSignatureCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlockSignature, error)) *IBlockSignatureCursorListCall {
+func (c *MockIBlockSignatureCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlockSignature, error)) *MockIBlockSignatureCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlockSignatureCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlockSignature, error)) *IBlockSignatureCursorListCall {
+func (c *MockIBlockSignatureCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlockSignature, error)) *MockIBlockSignatureCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -93,31 +99,31 @@ func (m *MockIBlockSignature) GetByID(ctx context.Context, id uint64) (*storage.
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockIBlockSignatureMockRecorder) GetByID(ctx, id any) *IBlockSignatureGetByIDCall {
+func (mr *MockIBlockSignatureMockRecorder) GetByID(ctx, id any) *MockIBlockSignatureGetByIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockIBlockSignature)(nil).GetByID), ctx, id)
-	return &IBlockSignatureGetByIDCall{Call: call}
+	return &MockIBlockSignatureGetByIDCall{Call: call}
 }
 
-// IBlockSignatureGetByIDCall wrap *gomock.Call
-type IBlockSignatureGetByIDCall struct {
+// MockIBlockSignatureGetByIDCall wrap *gomock.Call
+type MockIBlockSignatureGetByIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlockSignatureGetByIDCall) Return(arg0 *storage.BlockSignature, arg1 error) *IBlockSignatureGetByIDCall {
+func (c *MockIBlockSignatureGetByIDCall) Return(arg0 *storage.BlockSignature, arg1 error) *MockIBlockSignatureGetByIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlockSignatureGetByIDCall) Do(f func(context.Context, uint64) (*storage.BlockSignature, error)) *IBlockSignatureGetByIDCall {
+func (c *MockIBlockSignatureGetByIDCall) Do(f func(context.Context, uint64) (*storage.BlockSignature, error)) *MockIBlockSignatureGetByIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlockSignatureGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.BlockSignature, error)) *IBlockSignatureGetByIDCall {
+func (c *MockIBlockSignatureGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.BlockSignature, error)) *MockIBlockSignatureGetByIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -131,31 +137,31 @@ func (m *MockIBlockSignature) IsNoRows(err error) bool {
 }
 
 // IsNoRows indicates an expected call of IsNoRows.
-func (mr *MockIBlockSignatureMockRecorder) IsNoRows(err any) *IBlockSignatureIsNoRowsCall {
+func (mr *MockIBlockSignatureMockRecorder) IsNoRows(err any) *MockIBlockSignatureIsNoRowsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoRows", reflect.TypeOf((*MockIBlockSignature)(nil).IsNoRows), err)
-	return &IBlockSignatureIsNoRowsCall{Call: call}
+	return &MockIBlockSignatureIsNoRowsCall{Call: call}
 }
 
-// IBlockSignatureIsNoRowsCall wrap *gomock.Call
-type IBlockSignatureIsNoRowsCall struct {
+// MockIBlockSignatureIsNoRowsCall wrap *gomock.Call
+type MockIBlockSignatureIsNoRowsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlockSignatureIsNoRowsCall) Return(arg0 bool) *IBlockSignatureIsNoRowsCall {
+func (c *MockIBlockSignatureIsNoRowsCall) Return(arg0 bool) *MockIBlockSignatureIsNoRowsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlockSignatureIsNoRowsCall) Do(f func(error) bool) *IBlockSignatureIsNoRowsCall {
+func (c *MockIBlockSignatureIsNoRowsCall) Do(f func(error) bool) *MockIBlockSignatureIsNoRowsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlockSignatureIsNoRowsCall) DoAndReturn(f func(error) bool) *IBlockSignatureIsNoRowsCall {
+func (c *MockIBlockSignatureIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIBlockSignatureIsNoRowsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -170,31 +176,31 @@ func (m *MockIBlockSignature) LastID(ctx context.Context) (uint64, error) {
 }
 
 // LastID indicates an expected call of LastID.
-func (mr *MockIBlockSignatureMockRecorder) LastID(ctx any) *IBlockSignatureLastIDCall {
+func (mr *MockIBlockSignatureMockRecorder) LastID(ctx any) *MockIBlockSignatureLastIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastID", reflect.TypeOf((*MockIBlockSignature)(nil).LastID), ctx)
-	return &IBlockSignatureLastIDCall{Call: call}
+	return &MockIBlockSignatureLastIDCall{Call: call}
 }
 
-// IBlockSignatureLastIDCall wrap *gomock.Call
-type IBlockSignatureLastIDCall struct {
+// MockIBlockSignatureLastIDCall wrap *gomock.Call
+type MockIBlockSignatureLastIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlockSignatureLastIDCall) Return(arg0 uint64, arg1 error) *IBlockSignatureLastIDCall {
+func (c *MockIBlockSignatureLastIDCall) Return(arg0 uint64, arg1 error) *MockIBlockSignatureLastIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlockSignatureLastIDCall) Do(f func(context.Context) (uint64, error)) *IBlockSignatureLastIDCall {
+func (c *MockIBlockSignatureLastIDCall) Do(f func(context.Context) (uint64, error)) *MockIBlockSignatureLastIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlockSignatureLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *IBlockSignatureLastIDCall {
+func (c *MockIBlockSignatureLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockIBlockSignatureLastIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -209,31 +215,31 @@ func (m *MockIBlockSignature) LevelsByValidator(ctx context.Context, validatorId
 }
 
 // LevelsByValidator indicates an expected call of LevelsByValidator.
-func (mr *MockIBlockSignatureMockRecorder) LevelsByValidator(ctx, validatorId, startHeight any) *IBlockSignatureLevelsByValidatorCall {
+func (mr *MockIBlockSignatureMockRecorder) LevelsByValidator(ctx, validatorId, startHeight any) *MockIBlockSignatureLevelsByValidatorCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LevelsByValidator", reflect.TypeOf((*MockIBlockSignature)(nil).LevelsByValidator), ctx, validatorId, startHeight)
-	return &IBlockSignatureLevelsByValidatorCall{Call: call}
+	return &MockIBlockSignatureLevelsByValidatorCall{Call: call}
 }
 
-// IBlockSignatureLevelsByValidatorCall wrap *gomock.Call
-type IBlockSignatureLevelsByValidatorCall struct {
+// MockIBlockSignatureLevelsByValidatorCall wrap *gomock.Call
+type MockIBlockSignatureLevelsByValidatorCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlockSignatureLevelsByValidatorCall) Return(arg0 []types.Level, arg1 error) *IBlockSignatureLevelsByValidatorCall {
+func (c *MockIBlockSignatureLevelsByValidatorCall) Return(arg0 []types.Level, arg1 error) *MockIBlockSignatureLevelsByValidatorCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlockSignatureLevelsByValidatorCall) Do(f func(context.Context, uint64, types.Level) ([]types.Level, error)) *IBlockSignatureLevelsByValidatorCall {
+func (c *MockIBlockSignatureLevelsByValidatorCall) Do(f func(context.Context, uint64, types.Level) ([]types.Level, error)) *MockIBlockSignatureLevelsByValidatorCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlockSignatureLevelsByValidatorCall) DoAndReturn(f func(context.Context, uint64, types.Level) ([]types.Level, error)) *IBlockSignatureLevelsByValidatorCall {
+func (c *MockIBlockSignatureLevelsByValidatorCall) DoAndReturn(f func(context.Context, uint64, types.Level) ([]types.Level, error)) *MockIBlockSignatureLevelsByValidatorCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -248,31 +254,31 @@ func (m *MockIBlockSignature) List(ctx context.Context, limit, offset uint64, or
 }
 
 // List indicates an expected call of List.
-func (mr *MockIBlockSignatureMockRecorder) List(ctx, limit, offset, order any) *IBlockSignatureListCall {
+func (mr *MockIBlockSignatureMockRecorder) List(ctx, limit, offset, order any) *MockIBlockSignatureListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIBlockSignature)(nil).List), ctx, limit, offset, order)
-	return &IBlockSignatureListCall{Call: call}
+	return &MockIBlockSignatureListCall{Call: call}
 }
 
-// IBlockSignatureListCall wrap *gomock.Call
-type IBlockSignatureListCall struct {
+// MockIBlockSignatureListCall wrap *gomock.Call
+type MockIBlockSignatureListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlockSignatureListCall) Return(arg0 []*storage.BlockSignature, arg1 error) *IBlockSignatureListCall {
+func (c *MockIBlockSignatureListCall) Return(arg0 []*storage.BlockSignature, arg1 error) *MockIBlockSignatureListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlockSignatureListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.BlockSignature, error)) *IBlockSignatureListCall {
+func (c *MockIBlockSignatureListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.BlockSignature, error)) *MockIBlockSignatureListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlockSignatureListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.BlockSignature, error)) *IBlockSignatureListCall {
+func (c *MockIBlockSignatureListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.BlockSignature, error)) *MockIBlockSignatureListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -286,31 +292,31 @@ func (m_2 *MockIBlockSignature) Save(ctx context.Context, m *storage.BlockSignat
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockIBlockSignatureMockRecorder) Save(ctx, m any) *IBlockSignatureSaveCall {
+func (mr *MockIBlockSignatureMockRecorder) Save(ctx, m any) *MockIBlockSignatureSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIBlockSignature)(nil).Save), ctx, m)
-	return &IBlockSignatureSaveCall{Call: call}
+	return &MockIBlockSignatureSaveCall{Call: call}
 }
 
-// IBlockSignatureSaveCall wrap *gomock.Call
-type IBlockSignatureSaveCall struct {
+// MockIBlockSignatureSaveCall wrap *gomock.Call
+type MockIBlockSignatureSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlockSignatureSaveCall) Return(arg0 error) *IBlockSignatureSaveCall {
+func (c *MockIBlockSignatureSaveCall) Return(arg0 error) *MockIBlockSignatureSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlockSignatureSaveCall) Do(f func(context.Context, *storage.BlockSignature) error) *IBlockSignatureSaveCall {
+func (c *MockIBlockSignatureSaveCall) Do(f func(context.Context, *storage.BlockSignature) error) *MockIBlockSignatureSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlockSignatureSaveCall) DoAndReturn(f func(context.Context, *storage.BlockSignature) error) *IBlockSignatureSaveCall {
+func (c *MockIBlockSignatureSaveCall) DoAndReturn(f func(context.Context, *storage.BlockSignature) error) *MockIBlockSignatureSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -324,31 +330,31 @@ func (m_2 *MockIBlockSignature) Update(ctx context.Context, m *storage.BlockSign
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIBlockSignatureMockRecorder) Update(ctx, m any) *IBlockSignatureUpdateCall {
+func (mr *MockIBlockSignatureMockRecorder) Update(ctx, m any) *MockIBlockSignatureUpdateCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIBlockSignature)(nil).Update), ctx, m)
-	return &IBlockSignatureUpdateCall{Call: call}
+	return &MockIBlockSignatureUpdateCall{Call: call}
 }
 
-// IBlockSignatureUpdateCall wrap *gomock.Call
-type IBlockSignatureUpdateCall struct {
+// MockIBlockSignatureUpdateCall wrap *gomock.Call
+type MockIBlockSignatureUpdateCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlockSignatureUpdateCall) Return(arg0 error) *IBlockSignatureUpdateCall {
+func (c *MockIBlockSignatureUpdateCall) Return(arg0 error) *MockIBlockSignatureUpdateCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlockSignatureUpdateCall) Do(f func(context.Context, *storage.BlockSignature) error) *IBlockSignatureUpdateCall {
+func (c *MockIBlockSignatureUpdateCall) Do(f func(context.Context, *storage.BlockSignature) error) *MockIBlockSignatureUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlockSignatureUpdateCall) DoAndReturn(f func(context.Context, *storage.BlockSignature) error) *IBlockSignatureUpdateCall {
+func (c *MockIBlockSignatureUpdateCall) DoAndReturn(f func(context.Context, *storage.BlockSignature) error) *MockIBlockSignatureUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

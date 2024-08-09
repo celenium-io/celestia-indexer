@@ -8,6 +8,7 @@
 //
 //	mockgen -source=api.go -destination=mock/api.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,6 +44,11 @@ func (m *MockApi) EXPECT() *MockApiMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockApi) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // Block mocks base method.
 func (m *MockApi) Block(ctx context.Context, level types0.Level) (types0.ResultBlock, error) {
 	m.ctrl.T.Helper()
@@ -53,31 +59,31 @@ func (m *MockApi) Block(ctx context.Context, level types0.Level) (types0.ResultB
 }
 
 // Block indicates an expected call of Block.
-func (mr *MockApiMockRecorder) Block(ctx, level any) *ApiBlockCall {
+func (mr *MockApiMockRecorder) Block(ctx, level any) *MockApiBlockCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Block", reflect.TypeOf((*MockApi)(nil).Block), ctx, level)
-	return &ApiBlockCall{Call: call}
+	return &MockApiBlockCall{Call: call}
 }
 
-// ApiBlockCall wrap *gomock.Call
-type ApiBlockCall struct {
+// MockApiBlockCall wrap *gomock.Call
+type MockApiBlockCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *ApiBlockCall) Return(arg0 types0.ResultBlock, arg1 error) *ApiBlockCall {
+func (c *MockApiBlockCall) Return(arg0 types0.ResultBlock, arg1 error) *MockApiBlockCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *ApiBlockCall) Do(f func(context.Context, types0.Level) (types0.ResultBlock, error)) *ApiBlockCall {
+func (c *MockApiBlockCall) Do(f func(context.Context, types0.Level) (types0.ResultBlock, error)) *MockApiBlockCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *ApiBlockCall) DoAndReturn(f func(context.Context, types0.Level) (types0.ResultBlock, error)) *ApiBlockCall {
+func (c *MockApiBlockCall) DoAndReturn(f func(context.Context, types0.Level) (types0.ResultBlock, error)) *MockApiBlockCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +98,31 @@ func (m *MockApi) BlockData(ctx context.Context, level types0.Level) (types0.Blo
 }
 
 // BlockData indicates an expected call of BlockData.
-func (mr *MockApiMockRecorder) BlockData(ctx, level any) *ApiBlockDataCall {
+func (mr *MockApiMockRecorder) BlockData(ctx, level any) *MockApiBlockDataCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BlockData", reflect.TypeOf((*MockApi)(nil).BlockData), ctx, level)
-	return &ApiBlockDataCall{Call: call}
+	return &MockApiBlockDataCall{Call: call}
 }
 
-// ApiBlockDataCall wrap *gomock.Call
-type ApiBlockDataCall struct {
+// MockApiBlockDataCall wrap *gomock.Call
+type MockApiBlockDataCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *ApiBlockDataCall) Return(arg0 types0.BlockData, arg1 error) *ApiBlockDataCall {
+func (c *MockApiBlockDataCall) Return(arg0 types0.BlockData, arg1 error) *MockApiBlockDataCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *ApiBlockDataCall) Do(f func(context.Context, types0.Level) (types0.BlockData, error)) *ApiBlockDataCall {
+func (c *MockApiBlockDataCall) Do(f func(context.Context, types0.Level) (types0.BlockData, error)) *MockApiBlockDataCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *ApiBlockDataCall) DoAndReturn(f func(context.Context, types0.Level) (types0.BlockData, error)) *ApiBlockDataCall {
+func (c *MockApiBlockDataCall) DoAndReturn(f func(context.Context, types0.Level) (types0.BlockData, error)) *MockApiBlockDataCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -131,31 +137,31 @@ func (m *MockApi) BlockDataGet(ctx context.Context, level types0.Level) (types0.
 }
 
 // BlockDataGet indicates an expected call of BlockDataGet.
-func (mr *MockApiMockRecorder) BlockDataGet(ctx, level any) *ApiBlockDataGetCall {
+func (mr *MockApiMockRecorder) BlockDataGet(ctx, level any) *MockApiBlockDataGetCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BlockDataGet", reflect.TypeOf((*MockApi)(nil).BlockDataGet), ctx, level)
-	return &ApiBlockDataGetCall{Call: call}
+	return &MockApiBlockDataGetCall{Call: call}
 }
 
-// ApiBlockDataGetCall wrap *gomock.Call
-type ApiBlockDataGetCall struct {
+// MockApiBlockDataGetCall wrap *gomock.Call
+type MockApiBlockDataGetCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *ApiBlockDataGetCall) Return(arg0 types0.BlockData, arg1 error) *ApiBlockDataGetCall {
+func (c *MockApiBlockDataGetCall) Return(arg0 types0.BlockData, arg1 error) *MockApiBlockDataGetCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *ApiBlockDataGetCall) Do(f func(context.Context, types0.Level) (types0.BlockData, error)) *ApiBlockDataGetCall {
+func (c *MockApiBlockDataGetCall) Do(f func(context.Context, types0.Level) (types0.BlockData, error)) *MockApiBlockDataGetCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *ApiBlockDataGetCall) DoAndReturn(f func(context.Context, types0.Level) (types0.BlockData, error)) *ApiBlockDataGetCall {
+func (c *MockApiBlockDataGetCall) DoAndReturn(f func(context.Context, types0.Level) (types0.BlockData, error)) *MockApiBlockDataGetCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -170,31 +176,31 @@ func (m *MockApi) BlockResults(ctx context.Context, level types0.Level) (types0.
 }
 
 // BlockResults indicates an expected call of BlockResults.
-func (mr *MockApiMockRecorder) BlockResults(ctx, level any) *ApiBlockResultsCall {
+func (mr *MockApiMockRecorder) BlockResults(ctx, level any) *MockApiBlockResultsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BlockResults", reflect.TypeOf((*MockApi)(nil).BlockResults), ctx, level)
-	return &ApiBlockResultsCall{Call: call}
+	return &MockApiBlockResultsCall{Call: call}
 }
 
-// ApiBlockResultsCall wrap *gomock.Call
-type ApiBlockResultsCall struct {
+// MockApiBlockResultsCall wrap *gomock.Call
+type MockApiBlockResultsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *ApiBlockResultsCall) Return(arg0 types0.ResultBlockResults, arg1 error) *ApiBlockResultsCall {
+func (c *MockApiBlockResultsCall) Return(arg0 types0.ResultBlockResults, arg1 error) *MockApiBlockResultsCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *ApiBlockResultsCall) Do(f func(context.Context, types0.Level) (types0.ResultBlockResults, error)) *ApiBlockResultsCall {
+func (c *MockApiBlockResultsCall) Do(f func(context.Context, types0.Level) (types0.ResultBlockResults, error)) *MockApiBlockResultsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *ApiBlockResultsCall) DoAndReturn(f func(context.Context, types0.Level) (types0.ResultBlockResults, error)) *ApiBlockResultsCall {
+func (c *MockApiBlockResultsCall) DoAndReturn(f func(context.Context, types0.Level) (types0.ResultBlockResults, error)) *MockApiBlockResultsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -209,31 +215,31 @@ func (m *MockApi) Genesis(ctx context.Context) (types.Genesis, error) {
 }
 
 // Genesis indicates an expected call of Genesis.
-func (mr *MockApiMockRecorder) Genesis(ctx any) *ApiGenesisCall {
+func (mr *MockApiMockRecorder) Genesis(ctx any) *MockApiGenesisCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Genesis", reflect.TypeOf((*MockApi)(nil).Genesis), ctx)
-	return &ApiGenesisCall{Call: call}
+	return &MockApiGenesisCall{Call: call}
 }
 
-// ApiGenesisCall wrap *gomock.Call
-type ApiGenesisCall struct {
+// MockApiGenesisCall wrap *gomock.Call
+type MockApiGenesisCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *ApiGenesisCall) Return(arg0 types.Genesis, arg1 error) *ApiGenesisCall {
+func (c *MockApiGenesisCall) Return(arg0 types.Genesis, arg1 error) *MockApiGenesisCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *ApiGenesisCall) Do(f func(context.Context) (types.Genesis, error)) *ApiGenesisCall {
+func (c *MockApiGenesisCall) Do(f func(context.Context) (types.Genesis, error)) *MockApiGenesisCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *ApiGenesisCall) DoAndReturn(f func(context.Context) (types.Genesis, error)) *ApiGenesisCall {
+func (c *MockApiGenesisCall) DoAndReturn(f func(context.Context) (types.Genesis, error)) *MockApiGenesisCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -248,31 +254,31 @@ func (m *MockApi) Head(ctx context.Context) (types0.ResultBlock, error) {
 }
 
 // Head indicates an expected call of Head.
-func (mr *MockApiMockRecorder) Head(ctx any) *ApiHeadCall {
+func (mr *MockApiMockRecorder) Head(ctx any) *MockApiHeadCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Head", reflect.TypeOf((*MockApi)(nil).Head), ctx)
-	return &ApiHeadCall{Call: call}
+	return &MockApiHeadCall{Call: call}
 }
 
-// ApiHeadCall wrap *gomock.Call
-type ApiHeadCall struct {
+// MockApiHeadCall wrap *gomock.Call
+type MockApiHeadCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *ApiHeadCall) Return(arg0 types0.ResultBlock, arg1 error) *ApiHeadCall {
+func (c *MockApiHeadCall) Return(arg0 types0.ResultBlock, arg1 error) *MockApiHeadCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *ApiHeadCall) Do(f func(context.Context) (types0.ResultBlock, error)) *ApiHeadCall {
+func (c *MockApiHeadCall) Do(f func(context.Context) (types0.ResultBlock, error)) *MockApiHeadCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *ApiHeadCall) DoAndReturn(f func(context.Context) (types0.ResultBlock, error)) *ApiHeadCall {
+func (c *MockApiHeadCall) DoAndReturn(f func(context.Context) (types0.ResultBlock, error)) *MockApiHeadCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -287,31 +293,31 @@ func (m *MockApi) Status(ctx context.Context) (types.Status, error) {
 }
 
 // Status indicates an expected call of Status.
-func (mr *MockApiMockRecorder) Status(ctx any) *ApiStatusCall {
+func (mr *MockApiMockRecorder) Status(ctx any) *MockApiStatusCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Status", reflect.TypeOf((*MockApi)(nil).Status), ctx)
-	return &ApiStatusCall{Call: call}
+	return &MockApiStatusCall{Call: call}
 }
 
-// ApiStatusCall wrap *gomock.Call
-type ApiStatusCall struct {
+// MockApiStatusCall wrap *gomock.Call
+type MockApiStatusCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *ApiStatusCall) Return(arg0 types.Status, arg1 error) *ApiStatusCall {
+func (c *MockApiStatusCall) Return(arg0 types.Status, arg1 error) *MockApiStatusCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *ApiStatusCall) Do(f func(context.Context) (types.Status, error)) *ApiStatusCall {
+func (c *MockApiStatusCall) Do(f func(context.Context) (types.Status, error)) *MockApiStatusCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *ApiStatusCall) DoAndReturn(f func(context.Context) (types.Status, error)) *ApiStatusCall {
+func (c *MockApiStatusCall) DoAndReturn(f func(context.Context) (types.Status, error)) *MockApiStatusCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -339,6 +345,11 @@ func (m *MockDalApi) EXPECT() *MockDalApiMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockDalApi) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // Blob mocks base method.
 func (m *MockDalApi) Blob(ctx context.Context, height types0.Level, namespace, commitment string) (types.Blob, error) {
 	m.ctrl.T.Helper()
@@ -349,31 +360,31 @@ func (m *MockDalApi) Blob(ctx context.Context, height types0.Level, namespace, c
 }
 
 // Blob indicates an expected call of Blob.
-func (mr *MockDalApiMockRecorder) Blob(ctx, height, namespace, commitment any) *DalApiBlobCall {
+func (mr *MockDalApiMockRecorder) Blob(ctx, height, namespace, commitment any) *MockDalApiBlobCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Blob", reflect.TypeOf((*MockDalApi)(nil).Blob), ctx, height, namespace, commitment)
-	return &DalApiBlobCall{Call: call}
+	return &MockDalApiBlobCall{Call: call}
 }
 
-// DalApiBlobCall wrap *gomock.Call
-type DalApiBlobCall struct {
+// MockDalApiBlobCall wrap *gomock.Call
+type MockDalApiBlobCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *DalApiBlobCall) Return(arg0 types.Blob, arg1 error) *DalApiBlobCall {
+func (c *MockDalApiBlobCall) Return(arg0 types.Blob, arg1 error) *MockDalApiBlobCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *DalApiBlobCall) Do(f func(context.Context, types0.Level, string, string) (types.Blob, error)) *DalApiBlobCall {
+func (c *MockDalApiBlobCall) Do(f func(context.Context, types0.Level, string, string) (types.Blob, error)) *MockDalApiBlobCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *DalApiBlobCall) DoAndReturn(f func(context.Context, types0.Level, string, string) (types.Blob, error)) *DalApiBlobCall {
+func (c *MockDalApiBlobCall) DoAndReturn(f func(context.Context, types0.Level, string, string) (types.Blob, error)) *MockDalApiBlobCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -392,32 +403,32 @@ func (m *MockDalApi) Blobs(ctx context.Context, height types0.Level, hash ...str
 }
 
 // Blobs indicates an expected call of Blobs.
-func (mr *MockDalApiMockRecorder) Blobs(ctx, height any, hash ...any) *DalApiBlobsCall {
+func (mr *MockDalApiMockRecorder) Blobs(ctx, height any, hash ...any) *MockDalApiBlobsCall {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, height}, hash...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Blobs", reflect.TypeOf((*MockDalApi)(nil).Blobs), varargs...)
-	return &DalApiBlobsCall{Call: call}
+	return &MockDalApiBlobsCall{Call: call}
 }
 
-// DalApiBlobsCall wrap *gomock.Call
-type DalApiBlobsCall struct {
+// MockDalApiBlobsCall wrap *gomock.Call
+type MockDalApiBlobsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *DalApiBlobsCall) Return(arg0 []types.Blob, arg1 error) *DalApiBlobsCall {
+func (c *MockDalApiBlobsCall) Return(arg0 []types.Blob, arg1 error) *MockDalApiBlobsCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *DalApiBlobsCall) Do(f func(context.Context, types0.Level, ...string) ([]types.Blob, error)) *DalApiBlobsCall {
+func (c *MockDalApiBlobsCall) Do(f func(context.Context, types0.Level, ...string) ([]types.Blob, error)) *MockDalApiBlobsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *DalApiBlobsCall) DoAndReturn(f func(context.Context, types0.Level, ...string) ([]types.Blob, error)) *DalApiBlobsCall {
+func (c *MockDalApiBlobsCall) DoAndReturn(f func(context.Context, types0.Level, ...string) ([]types.Blob, error)) *MockDalApiBlobsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

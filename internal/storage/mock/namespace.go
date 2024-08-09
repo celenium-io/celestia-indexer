@@ -8,6 +8,7 @@
 //
 //	mockgen -source=namespace.go -destination=mock/namespace.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,6 +44,11 @@ func (m *MockINamespace) EXPECT() *MockINamespaceMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockINamespace) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // ByNamespaceId mocks base method.
 func (m *MockINamespace) ByNamespaceId(ctx context.Context, namespaceId []byte) ([]storage.Namespace, error) {
 	m.ctrl.T.Helper()
@@ -53,31 +59,31 @@ func (m *MockINamespace) ByNamespaceId(ctx context.Context, namespaceId []byte) 
 }
 
 // ByNamespaceId indicates an expected call of ByNamespaceId.
-func (mr *MockINamespaceMockRecorder) ByNamespaceId(ctx, namespaceId any) *INamespaceByNamespaceIdCall {
+func (mr *MockINamespaceMockRecorder) ByNamespaceId(ctx, namespaceId any) *MockINamespaceByNamespaceIdCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByNamespaceId", reflect.TypeOf((*MockINamespace)(nil).ByNamespaceId), ctx, namespaceId)
-	return &INamespaceByNamespaceIdCall{Call: call}
+	return &MockINamespaceByNamespaceIdCall{Call: call}
 }
 
-// INamespaceByNamespaceIdCall wrap *gomock.Call
-type INamespaceByNamespaceIdCall struct {
+// MockINamespaceByNamespaceIdCall wrap *gomock.Call
+type MockINamespaceByNamespaceIdCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceByNamespaceIdCall) Return(arg0 []storage.Namespace, arg1 error) *INamespaceByNamespaceIdCall {
+func (c *MockINamespaceByNamespaceIdCall) Return(arg0 []storage.Namespace, arg1 error) *MockINamespaceByNamespaceIdCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceByNamespaceIdCall) Do(f func(context.Context, []byte) ([]storage.Namespace, error)) *INamespaceByNamespaceIdCall {
+func (c *MockINamespaceByNamespaceIdCall) Do(f func(context.Context, []byte) ([]storage.Namespace, error)) *MockINamespaceByNamespaceIdCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceByNamespaceIdCall) DoAndReturn(f func(context.Context, []byte) ([]storage.Namespace, error)) *INamespaceByNamespaceIdCall {
+func (c *MockINamespaceByNamespaceIdCall) DoAndReturn(f func(context.Context, []byte) ([]storage.Namespace, error)) *MockINamespaceByNamespaceIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +98,31 @@ func (m *MockINamespace) ByNamespaceIdAndVersion(ctx context.Context, namespaceI
 }
 
 // ByNamespaceIdAndVersion indicates an expected call of ByNamespaceIdAndVersion.
-func (mr *MockINamespaceMockRecorder) ByNamespaceIdAndVersion(ctx, namespaceId, version any) *INamespaceByNamespaceIdAndVersionCall {
+func (mr *MockINamespaceMockRecorder) ByNamespaceIdAndVersion(ctx, namespaceId, version any) *MockINamespaceByNamespaceIdAndVersionCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByNamespaceIdAndVersion", reflect.TypeOf((*MockINamespace)(nil).ByNamespaceIdAndVersion), ctx, namespaceId, version)
-	return &INamespaceByNamespaceIdAndVersionCall{Call: call}
+	return &MockINamespaceByNamespaceIdAndVersionCall{Call: call}
 }
 
-// INamespaceByNamespaceIdAndVersionCall wrap *gomock.Call
-type INamespaceByNamespaceIdAndVersionCall struct {
+// MockINamespaceByNamespaceIdAndVersionCall wrap *gomock.Call
+type MockINamespaceByNamespaceIdAndVersionCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceByNamespaceIdAndVersionCall) Return(arg0 storage.Namespace, arg1 error) *INamespaceByNamespaceIdAndVersionCall {
+func (c *MockINamespaceByNamespaceIdAndVersionCall) Return(arg0 storage.Namespace, arg1 error) *MockINamespaceByNamespaceIdAndVersionCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceByNamespaceIdAndVersionCall) Do(f func(context.Context, []byte, byte) (storage.Namespace, error)) *INamespaceByNamespaceIdAndVersionCall {
+func (c *MockINamespaceByNamespaceIdAndVersionCall) Do(f func(context.Context, []byte, byte) (storage.Namespace, error)) *MockINamespaceByNamespaceIdAndVersionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceByNamespaceIdAndVersionCall) DoAndReturn(f func(context.Context, []byte, byte) (storage.Namespace, error)) *INamespaceByNamespaceIdAndVersionCall {
+func (c *MockINamespaceByNamespaceIdAndVersionCall) DoAndReturn(f func(context.Context, []byte, byte) (storage.Namespace, error)) *MockINamespaceByNamespaceIdAndVersionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -131,31 +137,31 @@ func (m *MockINamespace) CursorList(ctx context.Context, id, limit uint64, order
 }
 
 // CursorList indicates an expected call of CursorList.
-func (mr *MockINamespaceMockRecorder) CursorList(ctx, id, limit, order, cmp any) *INamespaceCursorListCall {
+func (mr *MockINamespaceMockRecorder) CursorList(ctx, id, limit, order, cmp any) *MockINamespaceCursorListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CursorList", reflect.TypeOf((*MockINamespace)(nil).CursorList), ctx, id, limit, order, cmp)
-	return &INamespaceCursorListCall{Call: call}
+	return &MockINamespaceCursorListCall{Call: call}
 }
 
-// INamespaceCursorListCall wrap *gomock.Call
-type INamespaceCursorListCall struct {
+// MockINamespaceCursorListCall wrap *gomock.Call
+type MockINamespaceCursorListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceCursorListCall) Return(arg0 []*storage.Namespace, arg1 error) *INamespaceCursorListCall {
+func (c *MockINamespaceCursorListCall) Return(arg0 []*storage.Namespace, arg1 error) *MockINamespaceCursorListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Namespace, error)) *INamespaceCursorListCall {
+func (c *MockINamespaceCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Namespace, error)) *MockINamespaceCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Namespace, error)) *INamespaceCursorListCall {
+func (c *MockINamespaceCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Namespace, error)) *MockINamespaceCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -170,31 +176,31 @@ func (m *MockINamespace) GetByID(ctx context.Context, id uint64) (*storage.Names
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockINamespaceMockRecorder) GetByID(ctx, id any) *INamespaceGetByIDCall {
+func (mr *MockINamespaceMockRecorder) GetByID(ctx, id any) *MockINamespaceGetByIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockINamespace)(nil).GetByID), ctx, id)
-	return &INamespaceGetByIDCall{Call: call}
+	return &MockINamespaceGetByIDCall{Call: call}
 }
 
-// INamespaceGetByIDCall wrap *gomock.Call
-type INamespaceGetByIDCall struct {
+// MockINamespaceGetByIDCall wrap *gomock.Call
+type MockINamespaceGetByIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceGetByIDCall) Return(arg0 *storage.Namespace, arg1 error) *INamespaceGetByIDCall {
+func (c *MockINamespaceGetByIDCall) Return(arg0 *storage.Namespace, arg1 error) *MockINamespaceGetByIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceGetByIDCall) Do(f func(context.Context, uint64) (*storage.Namespace, error)) *INamespaceGetByIDCall {
+func (c *MockINamespaceGetByIDCall) Do(f func(context.Context, uint64) (*storage.Namespace, error)) *MockINamespaceGetByIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Namespace, error)) *INamespaceGetByIDCall {
+func (c *MockINamespaceGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Namespace, error)) *MockINamespaceGetByIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -213,32 +219,32 @@ func (m *MockINamespace) GetByIds(ctx context.Context, ids ...uint64) ([]storage
 }
 
 // GetByIds indicates an expected call of GetByIds.
-func (mr *MockINamespaceMockRecorder) GetByIds(ctx any, ids ...any) *INamespaceGetByIdsCall {
+func (mr *MockINamespaceMockRecorder) GetByIds(ctx any, ids ...any) *MockINamespaceGetByIdsCall {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx}, ids...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByIds", reflect.TypeOf((*MockINamespace)(nil).GetByIds), varargs...)
-	return &INamespaceGetByIdsCall{Call: call}
+	return &MockINamespaceGetByIdsCall{Call: call}
 }
 
-// INamespaceGetByIdsCall wrap *gomock.Call
-type INamespaceGetByIdsCall struct {
+// MockINamespaceGetByIdsCall wrap *gomock.Call
+type MockINamespaceGetByIdsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceGetByIdsCall) Return(ns []storage.Namespace, err error) *INamespaceGetByIdsCall {
+func (c *MockINamespaceGetByIdsCall) Return(ns []storage.Namespace, err error) *MockINamespaceGetByIdsCall {
 	c.Call = c.Call.Return(ns, err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceGetByIdsCall) Do(f func(context.Context, ...uint64) ([]storage.Namespace, error)) *INamespaceGetByIdsCall {
+func (c *MockINamespaceGetByIdsCall) Do(f func(context.Context, ...uint64) ([]storage.Namespace, error)) *MockINamespaceGetByIdsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceGetByIdsCall) DoAndReturn(f func(context.Context, ...uint64) ([]storage.Namespace, error)) *INamespaceGetByIdsCall {
+func (c *MockINamespaceGetByIdsCall) DoAndReturn(f func(context.Context, ...uint64) ([]storage.Namespace, error)) *MockINamespaceGetByIdsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -252,31 +258,31 @@ func (m *MockINamespace) IsNoRows(err error) bool {
 }
 
 // IsNoRows indicates an expected call of IsNoRows.
-func (mr *MockINamespaceMockRecorder) IsNoRows(err any) *INamespaceIsNoRowsCall {
+func (mr *MockINamespaceMockRecorder) IsNoRows(err any) *MockINamespaceIsNoRowsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoRows", reflect.TypeOf((*MockINamespace)(nil).IsNoRows), err)
-	return &INamespaceIsNoRowsCall{Call: call}
+	return &MockINamespaceIsNoRowsCall{Call: call}
 }
 
-// INamespaceIsNoRowsCall wrap *gomock.Call
-type INamespaceIsNoRowsCall struct {
+// MockINamespaceIsNoRowsCall wrap *gomock.Call
+type MockINamespaceIsNoRowsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceIsNoRowsCall) Return(arg0 bool) *INamespaceIsNoRowsCall {
+func (c *MockINamespaceIsNoRowsCall) Return(arg0 bool) *MockINamespaceIsNoRowsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceIsNoRowsCall) Do(f func(error) bool) *INamespaceIsNoRowsCall {
+func (c *MockINamespaceIsNoRowsCall) Do(f func(error) bool) *MockINamespaceIsNoRowsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceIsNoRowsCall) DoAndReturn(f func(error) bool) *INamespaceIsNoRowsCall {
+func (c *MockINamespaceIsNoRowsCall) DoAndReturn(f func(error) bool) *MockINamespaceIsNoRowsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -291,31 +297,31 @@ func (m *MockINamespace) LastID(ctx context.Context) (uint64, error) {
 }
 
 // LastID indicates an expected call of LastID.
-func (mr *MockINamespaceMockRecorder) LastID(ctx any) *INamespaceLastIDCall {
+func (mr *MockINamespaceMockRecorder) LastID(ctx any) *MockINamespaceLastIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastID", reflect.TypeOf((*MockINamespace)(nil).LastID), ctx)
-	return &INamespaceLastIDCall{Call: call}
+	return &MockINamespaceLastIDCall{Call: call}
 }
 
-// INamespaceLastIDCall wrap *gomock.Call
-type INamespaceLastIDCall struct {
+// MockINamespaceLastIDCall wrap *gomock.Call
+type MockINamespaceLastIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceLastIDCall) Return(arg0 uint64, arg1 error) *INamespaceLastIDCall {
+func (c *MockINamespaceLastIDCall) Return(arg0 uint64, arg1 error) *MockINamespaceLastIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceLastIDCall) Do(f func(context.Context) (uint64, error)) *INamespaceLastIDCall {
+func (c *MockINamespaceLastIDCall) Do(f func(context.Context) (uint64, error)) *MockINamespaceLastIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *INamespaceLastIDCall {
+func (c *MockINamespaceLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockINamespaceLastIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -330,31 +336,31 @@ func (m *MockINamespace) List(ctx context.Context, limit, offset uint64, order s
 }
 
 // List indicates an expected call of List.
-func (mr *MockINamespaceMockRecorder) List(ctx, limit, offset, order any) *INamespaceListCall {
+func (mr *MockINamespaceMockRecorder) List(ctx, limit, offset, order any) *MockINamespaceListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockINamespace)(nil).List), ctx, limit, offset, order)
-	return &INamespaceListCall{Call: call}
+	return &MockINamespaceListCall{Call: call}
 }
 
-// INamespaceListCall wrap *gomock.Call
-type INamespaceListCall struct {
+// MockINamespaceListCall wrap *gomock.Call
+type MockINamespaceListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceListCall) Return(arg0 []*storage.Namespace, arg1 error) *INamespaceListCall {
+func (c *MockINamespaceListCall) Return(arg0 []*storage.Namespace, arg1 error) *MockINamespaceListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Namespace, error)) *INamespaceListCall {
+func (c *MockINamespaceListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Namespace, error)) *MockINamespaceListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Namespace, error)) *INamespaceListCall {
+func (c *MockINamespaceListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Namespace, error)) *MockINamespaceListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -369,31 +375,31 @@ func (m *MockINamespace) ListWithSort(ctx context.Context, sortField string, sor
 }
 
 // ListWithSort indicates an expected call of ListWithSort.
-func (mr *MockINamespaceMockRecorder) ListWithSort(ctx, sortField, sort, limit, offset any) *INamespaceListWithSortCall {
+func (mr *MockINamespaceMockRecorder) ListWithSort(ctx, sortField, sort, limit, offset any) *MockINamespaceListWithSortCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListWithSort", reflect.TypeOf((*MockINamespace)(nil).ListWithSort), ctx, sortField, sort, limit, offset)
-	return &INamespaceListWithSortCall{Call: call}
+	return &MockINamespaceListWithSortCall{Call: call}
 }
 
-// INamespaceListWithSortCall wrap *gomock.Call
-type INamespaceListWithSortCall struct {
+// MockINamespaceListWithSortCall wrap *gomock.Call
+type MockINamespaceListWithSortCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceListWithSortCall) Return(ns []storage.Namespace, err error) *INamespaceListWithSortCall {
+func (c *MockINamespaceListWithSortCall) Return(ns []storage.Namespace, err error) *MockINamespaceListWithSortCall {
 	c.Call = c.Call.Return(ns, err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceListWithSortCall) Do(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.Namespace, error)) *INamespaceListWithSortCall {
+func (c *MockINamespaceListWithSortCall) Do(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.Namespace, error)) *MockINamespaceListWithSortCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceListWithSortCall) DoAndReturn(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.Namespace, error)) *INamespaceListWithSortCall {
+func (c *MockINamespaceListWithSortCall) DoAndReturn(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.Namespace, error)) *MockINamespaceListWithSortCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -408,31 +414,31 @@ func (m *MockINamespace) Messages(ctx context.Context, id uint64, limit, offset 
 }
 
 // Messages indicates an expected call of Messages.
-func (mr *MockINamespaceMockRecorder) Messages(ctx, id, limit, offset any) *INamespaceMessagesCall {
+func (mr *MockINamespaceMockRecorder) Messages(ctx, id, limit, offset any) *MockINamespaceMessagesCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Messages", reflect.TypeOf((*MockINamespace)(nil).Messages), ctx, id, limit, offset)
-	return &INamespaceMessagesCall{Call: call}
+	return &MockINamespaceMessagesCall{Call: call}
 }
 
-// INamespaceMessagesCall wrap *gomock.Call
-type INamespaceMessagesCall struct {
+// MockINamespaceMessagesCall wrap *gomock.Call
+type MockINamespaceMessagesCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceMessagesCall) Return(arg0 []storage.NamespaceMessage, arg1 error) *INamespaceMessagesCall {
+func (c *MockINamespaceMessagesCall) Return(arg0 []storage.NamespaceMessage, arg1 error) *MockINamespaceMessagesCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceMessagesCall) Do(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesCall {
+func (c *MockINamespaceMessagesCall) Do(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *MockINamespaceMessagesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceMessagesCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *INamespaceMessagesCall {
+func (c *MockINamespaceMessagesCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *MockINamespaceMessagesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -446,31 +452,31 @@ func (m_2 *MockINamespace) Save(ctx context.Context, m *storage.Namespace) error
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockINamespaceMockRecorder) Save(ctx, m any) *INamespaceSaveCall {
+func (mr *MockINamespaceMockRecorder) Save(ctx, m any) *MockINamespaceSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockINamespace)(nil).Save), ctx, m)
-	return &INamespaceSaveCall{Call: call}
+	return &MockINamespaceSaveCall{Call: call}
 }
 
-// INamespaceSaveCall wrap *gomock.Call
-type INamespaceSaveCall struct {
+// MockINamespaceSaveCall wrap *gomock.Call
+type MockINamespaceSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceSaveCall) Return(arg0 error) *INamespaceSaveCall {
+func (c *MockINamespaceSaveCall) Return(arg0 error) *MockINamespaceSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceSaveCall) Do(f func(context.Context, *storage.Namespace) error) *INamespaceSaveCall {
+func (c *MockINamespaceSaveCall) Do(f func(context.Context, *storage.Namespace) error) *MockINamespaceSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceSaveCall) DoAndReturn(f func(context.Context, *storage.Namespace) error) *INamespaceSaveCall {
+func (c *MockINamespaceSaveCall) DoAndReturn(f func(context.Context, *storage.Namespace) error) *MockINamespaceSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -484,31 +490,31 @@ func (m_2 *MockINamespace) Update(ctx context.Context, m *storage.Namespace) err
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockINamespaceMockRecorder) Update(ctx, m any) *INamespaceUpdateCall {
+func (mr *MockINamespaceMockRecorder) Update(ctx, m any) *MockINamespaceUpdateCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockINamespace)(nil).Update), ctx, m)
-	return &INamespaceUpdateCall{Call: call}
+	return &MockINamespaceUpdateCall{Call: call}
 }
 
-// INamespaceUpdateCall wrap *gomock.Call
-type INamespaceUpdateCall struct {
+// MockINamespaceUpdateCall wrap *gomock.Call
+type MockINamespaceUpdateCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *INamespaceUpdateCall) Return(arg0 error) *INamespaceUpdateCall {
+func (c *MockINamespaceUpdateCall) Return(arg0 error) *MockINamespaceUpdateCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *INamespaceUpdateCall) Do(f func(context.Context, *storage.Namespace) error) *INamespaceUpdateCall {
+func (c *MockINamespaceUpdateCall) Do(f func(context.Context, *storage.Namespace) error) *MockINamespaceUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *INamespaceUpdateCall) DoAndReturn(f func(context.Context, *storage.Namespace) error) *INamespaceUpdateCall {
+func (c *MockINamespaceUpdateCall) DoAndReturn(f func(context.Context, *storage.Namespace) error) *MockINamespaceUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

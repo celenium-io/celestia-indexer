@@ -8,6 +8,7 @@
 //
 //	mockgen -source=storage.go -destination=mock.go -package=blob -typed
 //
+
 // Package blob is a generated GoMock package.
 package blob
 
@@ -41,6 +42,11 @@ func (m *MockStorage) EXPECT() *MockStorageMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockStorage) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // Head mocks base method.
 func (m *MockStorage) Head(ctx context.Context) (uint64, error) {
 	m.ctrl.T.Helper()
@@ -51,31 +57,31 @@ func (m *MockStorage) Head(ctx context.Context) (uint64, error) {
 }
 
 // Head indicates an expected call of Head.
-func (mr *MockStorageMockRecorder) Head(ctx any) *StorageHeadCall {
+func (mr *MockStorageMockRecorder) Head(ctx any) *MockStorageHeadCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Head", reflect.TypeOf((*MockStorage)(nil).Head), ctx)
-	return &StorageHeadCall{Call: call}
+	return &MockStorageHeadCall{Call: call}
 }
 
-// StorageHeadCall wrap *gomock.Call
-type StorageHeadCall struct {
+// MockStorageHeadCall wrap *gomock.Call
+type MockStorageHeadCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *StorageHeadCall) Return(arg0 uint64, arg1 error) *StorageHeadCall {
+func (c *MockStorageHeadCall) Return(arg0 uint64, arg1 error) *MockStorageHeadCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *StorageHeadCall) Do(f func(context.Context) (uint64, error)) *StorageHeadCall {
+func (c *MockStorageHeadCall) Do(f func(context.Context) (uint64, error)) *MockStorageHeadCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *StorageHeadCall) DoAndReturn(f func(context.Context) (uint64, error)) *StorageHeadCall {
+func (c *MockStorageHeadCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockStorageHeadCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -89,31 +95,31 @@ func (m *MockStorage) Save(ctx context.Context, blob Blob) error {
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockStorageMockRecorder) Save(ctx, blob any) *StorageSaveCall {
+func (mr *MockStorageMockRecorder) Save(ctx, blob any) *MockStorageSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockStorage)(nil).Save), ctx, blob)
-	return &StorageSaveCall{Call: call}
+	return &MockStorageSaveCall{Call: call}
 }
 
-// StorageSaveCall wrap *gomock.Call
-type StorageSaveCall struct {
+// MockStorageSaveCall wrap *gomock.Call
+type MockStorageSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *StorageSaveCall) Return(arg0 error) *StorageSaveCall {
+func (c *MockStorageSaveCall) Return(arg0 error) *MockStorageSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *StorageSaveCall) Do(f func(context.Context, Blob) error) *StorageSaveCall {
+func (c *MockStorageSaveCall) Do(f func(context.Context, Blob) error) *MockStorageSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *StorageSaveCall) DoAndReturn(f func(context.Context, Blob) error) *StorageSaveCall {
+func (c *MockStorageSaveCall) DoAndReturn(f func(context.Context, Blob) error) *MockStorageSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -127,31 +133,31 @@ func (m *MockStorage) SaveBulk(ctx context.Context, blobs []Blob) error {
 }
 
 // SaveBulk indicates an expected call of SaveBulk.
-func (mr *MockStorageMockRecorder) SaveBulk(ctx, blobs any) *StorageSaveBulkCall {
+func (mr *MockStorageMockRecorder) SaveBulk(ctx, blobs any) *MockStorageSaveBulkCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveBulk", reflect.TypeOf((*MockStorage)(nil).SaveBulk), ctx, blobs)
-	return &StorageSaveBulkCall{Call: call}
+	return &MockStorageSaveBulkCall{Call: call}
 }
 
-// StorageSaveBulkCall wrap *gomock.Call
-type StorageSaveBulkCall struct {
+// MockStorageSaveBulkCall wrap *gomock.Call
+type MockStorageSaveBulkCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *StorageSaveBulkCall) Return(arg0 error) *StorageSaveBulkCall {
+func (c *MockStorageSaveBulkCall) Return(arg0 error) *MockStorageSaveBulkCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *StorageSaveBulkCall) Do(f func(context.Context, []Blob) error) *StorageSaveBulkCall {
+func (c *MockStorageSaveBulkCall) Do(f func(context.Context, []Blob) error) *MockStorageSaveBulkCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *StorageSaveBulkCall) DoAndReturn(f func(context.Context, []Blob) error) *StorageSaveBulkCall {
+func (c *MockStorageSaveBulkCall) DoAndReturn(f func(context.Context, []Blob) error) *MockStorageSaveBulkCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -165,31 +171,31 @@ func (m *MockStorage) UpdateHead(ctx context.Context, head uint64) error {
 }
 
 // UpdateHead indicates an expected call of UpdateHead.
-func (mr *MockStorageMockRecorder) UpdateHead(ctx, head any) *StorageUpdateHeadCall {
+func (mr *MockStorageMockRecorder) UpdateHead(ctx, head any) *MockStorageUpdateHeadCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateHead", reflect.TypeOf((*MockStorage)(nil).UpdateHead), ctx, head)
-	return &StorageUpdateHeadCall{Call: call}
+	return &MockStorageUpdateHeadCall{Call: call}
 }
 
-// StorageUpdateHeadCall wrap *gomock.Call
-type StorageUpdateHeadCall struct {
+// MockStorageUpdateHeadCall wrap *gomock.Call
+type MockStorageUpdateHeadCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *StorageUpdateHeadCall) Return(arg0 error) *StorageUpdateHeadCall {
+func (c *MockStorageUpdateHeadCall) Return(arg0 error) *MockStorageUpdateHeadCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *StorageUpdateHeadCall) Do(f func(context.Context, uint64) error) *StorageUpdateHeadCall {
+func (c *MockStorageUpdateHeadCall) Do(f func(context.Context, uint64) error) *MockStorageUpdateHeadCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *StorageUpdateHeadCall) DoAndReturn(f func(context.Context, uint64) error) *StorageUpdateHeadCall {
+func (c *MockStorageUpdateHeadCall) DoAndReturn(f func(context.Context, uint64) error) *MockStorageUpdateHeadCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
