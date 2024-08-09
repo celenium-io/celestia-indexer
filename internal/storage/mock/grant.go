@@ -8,6 +8,7 @@
 //
 //	mockgen -source=grant.go -destination=mock/grant.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,6 +44,11 @@ func (m *MockIGrant) EXPECT() *MockIGrantMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIGrant) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // ByGrantee mocks base method.
 func (m *MockIGrant) ByGrantee(ctx context.Context, id uint64, limit, offset int) ([]storage.Grant, error) {
 	m.ctrl.T.Helper()
@@ -53,31 +59,31 @@ func (m *MockIGrant) ByGrantee(ctx context.Context, id uint64, limit, offset int
 }
 
 // ByGrantee indicates an expected call of ByGrantee.
-func (mr *MockIGrantMockRecorder) ByGrantee(ctx, id, limit, offset any) *IGrantByGranteeCall {
+func (mr *MockIGrantMockRecorder) ByGrantee(ctx, id, limit, offset any) *MockIGrantByGranteeCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByGrantee", reflect.TypeOf((*MockIGrant)(nil).ByGrantee), ctx, id, limit, offset)
-	return &IGrantByGranteeCall{Call: call}
+	return &MockIGrantByGranteeCall{Call: call}
 }
 
-// IGrantByGranteeCall wrap *gomock.Call
-type IGrantByGranteeCall struct {
+// MockIGrantByGranteeCall wrap *gomock.Call
+type MockIGrantByGranteeCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IGrantByGranteeCall) Return(arg0 []storage.Grant, arg1 error) *IGrantByGranteeCall {
+func (c *MockIGrantByGranteeCall) Return(arg0 []storage.Grant, arg1 error) *MockIGrantByGranteeCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IGrantByGranteeCall) Do(f func(context.Context, uint64, int, int) ([]storage.Grant, error)) *IGrantByGranteeCall {
+func (c *MockIGrantByGranteeCall) Do(f func(context.Context, uint64, int, int) ([]storage.Grant, error)) *MockIGrantByGranteeCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IGrantByGranteeCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Grant, error)) *IGrantByGranteeCall {
+func (c *MockIGrantByGranteeCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Grant, error)) *MockIGrantByGranteeCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +98,31 @@ func (m *MockIGrant) ByGranter(ctx context.Context, id uint64, limit, offset int
 }
 
 // ByGranter indicates an expected call of ByGranter.
-func (mr *MockIGrantMockRecorder) ByGranter(ctx, id, limit, offset any) *IGrantByGranterCall {
+func (mr *MockIGrantMockRecorder) ByGranter(ctx, id, limit, offset any) *MockIGrantByGranterCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByGranter", reflect.TypeOf((*MockIGrant)(nil).ByGranter), ctx, id, limit, offset)
-	return &IGrantByGranterCall{Call: call}
+	return &MockIGrantByGranterCall{Call: call}
 }
 
-// IGrantByGranterCall wrap *gomock.Call
-type IGrantByGranterCall struct {
+// MockIGrantByGranterCall wrap *gomock.Call
+type MockIGrantByGranterCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IGrantByGranterCall) Return(arg0 []storage.Grant, arg1 error) *IGrantByGranterCall {
+func (c *MockIGrantByGranterCall) Return(arg0 []storage.Grant, arg1 error) *MockIGrantByGranterCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IGrantByGranterCall) Do(f func(context.Context, uint64, int, int) ([]storage.Grant, error)) *IGrantByGranterCall {
+func (c *MockIGrantByGranterCall) Do(f func(context.Context, uint64, int, int) ([]storage.Grant, error)) *MockIGrantByGranterCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IGrantByGranterCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Grant, error)) *IGrantByGranterCall {
+func (c *MockIGrantByGranterCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Grant, error)) *MockIGrantByGranterCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -131,31 +137,31 @@ func (m *MockIGrant) CursorList(ctx context.Context, id, limit uint64, order sto
 }
 
 // CursorList indicates an expected call of CursorList.
-func (mr *MockIGrantMockRecorder) CursorList(ctx, id, limit, order, cmp any) *IGrantCursorListCall {
+func (mr *MockIGrantMockRecorder) CursorList(ctx, id, limit, order, cmp any) *MockIGrantCursorListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CursorList", reflect.TypeOf((*MockIGrant)(nil).CursorList), ctx, id, limit, order, cmp)
-	return &IGrantCursorListCall{Call: call}
+	return &MockIGrantCursorListCall{Call: call}
 }
 
-// IGrantCursorListCall wrap *gomock.Call
-type IGrantCursorListCall struct {
+// MockIGrantCursorListCall wrap *gomock.Call
+type MockIGrantCursorListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IGrantCursorListCall) Return(arg0 []*storage.Grant, arg1 error) *IGrantCursorListCall {
+func (c *MockIGrantCursorListCall) Return(arg0 []*storage.Grant, arg1 error) *MockIGrantCursorListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IGrantCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Grant, error)) *IGrantCursorListCall {
+func (c *MockIGrantCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Grant, error)) *MockIGrantCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IGrantCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Grant, error)) *IGrantCursorListCall {
+func (c *MockIGrantCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Grant, error)) *MockIGrantCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -170,31 +176,31 @@ func (m *MockIGrant) GetByID(ctx context.Context, id uint64) (*storage.Grant, er
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockIGrantMockRecorder) GetByID(ctx, id any) *IGrantGetByIDCall {
+func (mr *MockIGrantMockRecorder) GetByID(ctx, id any) *MockIGrantGetByIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockIGrant)(nil).GetByID), ctx, id)
-	return &IGrantGetByIDCall{Call: call}
+	return &MockIGrantGetByIDCall{Call: call}
 }
 
-// IGrantGetByIDCall wrap *gomock.Call
-type IGrantGetByIDCall struct {
+// MockIGrantGetByIDCall wrap *gomock.Call
+type MockIGrantGetByIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IGrantGetByIDCall) Return(arg0 *storage.Grant, arg1 error) *IGrantGetByIDCall {
+func (c *MockIGrantGetByIDCall) Return(arg0 *storage.Grant, arg1 error) *MockIGrantGetByIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IGrantGetByIDCall) Do(f func(context.Context, uint64) (*storage.Grant, error)) *IGrantGetByIDCall {
+func (c *MockIGrantGetByIDCall) Do(f func(context.Context, uint64) (*storage.Grant, error)) *MockIGrantGetByIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IGrantGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Grant, error)) *IGrantGetByIDCall {
+func (c *MockIGrantGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Grant, error)) *MockIGrantGetByIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -208,31 +214,31 @@ func (m *MockIGrant) IsNoRows(err error) bool {
 }
 
 // IsNoRows indicates an expected call of IsNoRows.
-func (mr *MockIGrantMockRecorder) IsNoRows(err any) *IGrantIsNoRowsCall {
+func (mr *MockIGrantMockRecorder) IsNoRows(err any) *MockIGrantIsNoRowsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoRows", reflect.TypeOf((*MockIGrant)(nil).IsNoRows), err)
-	return &IGrantIsNoRowsCall{Call: call}
+	return &MockIGrantIsNoRowsCall{Call: call}
 }
 
-// IGrantIsNoRowsCall wrap *gomock.Call
-type IGrantIsNoRowsCall struct {
+// MockIGrantIsNoRowsCall wrap *gomock.Call
+type MockIGrantIsNoRowsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IGrantIsNoRowsCall) Return(arg0 bool) *IGrantIsNoRowsCall {
+func (c *MockIGrantIsNoRowsCall) Return(arg0 bool) *MockIGrantIsNoRowsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IGrantIsNoRowsCall) Do(f func(error) bool) *IGrantIsNoRowsCall {
+func (c *MockIGrantIsNoRowsCall) Do(f func(error) bool) *MockIGrantIsNoRowsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IGrantIsNoRowsCall) DoAndReturn(f func(error) bool) *IGrantIsNoRowsCall {
+func (c *MockIGrantIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIGrantIsNoRowsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -247,31 +253,31 @@ func (m *MockIGrant) LastID(ctx context.Context) (uint64, error) {
 }
 
 // LastID indicates an expected call of LastID.
-func (mr *MockIGrantMockRecorder) LastID(ctx any) *IGrantLastIDCall {
+func (mr *MockIGrantMockRecorder) LastID(ctx any) *MockIGrantLastIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastID", reflect.TypeOf((*MockIGrant)(nil).LastID), ctx)
-	return &IGrantLastIDCall{Call: call}
+	return &MockIGrantLastIDCall{Call: call}
 }
 
-// IGrantLastIDCall wrap *gomock.Call
-type IGrantLastIDCall struct {
+// MockIGrantLastIDCall wrap *gomock.Call
+type MockIGrantLastIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IGrantLastIDCall) Return(arg0 uint64, arg1 error) *IGrantLastIDCall {
+func (c *MockIGrantLastIDCall) Return(arg0 uint64, arg1 error) *MockIGrantLastIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IGrantLastIDCall) Do(f func(context.Context) (uint64, error)) *IGrantLastIDCall {
+func (c *MockIGrantLastIDCall) Do(f func(context.Context) (uint64, error)) *MockIGrantLastIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IGrantLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *IGrantLastIDCall {
+func (c *MockIGrantLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockIGrantLastIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -286,31 +292,31 @@ func (m *MockIGrant) List(ctx context.Context, limit, offset uint64, order stora
 }
 
 // List indicates an expected call of List.
-func (mr *MockIGrantMockRecorder) List(ctx, limit, offset, order any) *IGrantListCall {
+func (mr *MockIGrantMockRecorder) List(ctx, limit, offset, order any) *MockIGrantListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIGrant)(nil).List), ctx, limit, offset, order)
-	return &IGrantListCall{Call: call}
+	return &MockIGrantListCall{Call: call}
 }
 
-// IGrantListCall wrap *gomock.Call
-type IGrantListCall struct {
+// MockIGrantListCall wrap *gomock.Call
+type MockIGrantListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IGrantListCall) Return(arg0 []*storage.Grant, arg1 error) *IGrantListCall {
+func (c *MockIGrantListCall) Return(arg0 []*storage.Grant, arg1 error) *MockIGrantListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IGrantListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Grant, error)) *IGrantListCall {
+func (c *MockIGrantListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Grant, error)) *MockIGrantListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IGrantListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Grant, error)) *IGrantListCall {
+func (c *MockIGrantListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Grant, error)) *MockIGrantListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -324,31 +330,31 @@ func (m_2 *MockIGrant) Save(ctx context.Context, m *storage.Grant) error {
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockIGrantMockRecorder) Save(ctx, m any) *IGrantSaveCall {
+func (mr *MockIGrantMockRecorder) Save(ctx, m any) *MockIGrantSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIGrant)(nil).Save), ctx, m)
-	return &IGrantSaveCall{Call: call}
+	return &MockIGrantSaveCall{Call: call}
 }
 
-// IGrantSaveCall wrap *gomock.Call
-type IGrantSaveCall struct {
+// MockIGrantSaveCall wrap *gomock.Call
+type MockIGrantSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IGrantSaveCall) Return(arg0 error) *IGrantSaveCall {
+func (c *MockIGrantSaveCall) Return(arg0 error) *MockIGrantSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IGrantSaveCall) Do(f func(context.Context, *storage.Grant) error) *IGrantSaveCall {
+func (c *MockIGrantSaveCall) Do(f func(context.Context, *storage.Grant) error) *MockIGrantSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IGrantSaveCall) DoAndReturn(f func(context.Context, *storage.Grant) error) *IGrantSaveCall {
+func (c *MockIGrantSaveCall) DoAndReturn(f func(context.Context, *storage.Grant) error) *MockIGrantSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -362,31 +368,31 @@ func (m_2 *MockIGrant) Update(ctx context.Context, m *storage.Grant) error {
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIGrantMockRecorder) Update(ctx, m any) *IGrantUpdateCall {
+func (mr *MockIGrantMockRecorder) Update(ctx, m any) *MockIGrantUpdateCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIGrant)(nil).Update), ctx, m)
-	return &IGrantUpdateCall{Call: call}
+	return &MockIGrantUpdateCall{Call: call}
 }
 
-// IGrantUpdateCall wrap *gomock.Call
-type IGrantUpdateCall struct {
+// MockIGrantUpdateCall wrap *gomock.Call
+type MockIGrantUpdateCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IGrantUpdateCall) Return(arg0 error) *IGrantUpdateCall {
+func (c *MockIGrantUpdateCall) Return(arg0 error) *MockIGrantUpdateCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IGrantUpdateCall) Do(f func(context.Context, *storage.Grant) error) *IGrantUpdateCall {
+func (c *MockIGrantUpdateCall) Do(f func(context.Context, *storage.Grant) error) *MockIGrantUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IGrantUpdateCall) DoAndReturn(f func(context.Context, *storage.Grant) error) *IGrantUpdateCall {
+func (c *MockIGrantUpdateCall) DoAndReturn(f func(context.Context, *storage.Grant) error) *MockIGrantUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

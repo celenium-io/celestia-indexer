@@ -8,6 +8,7 @@
 //
 //	mockgen -source=rollup.go -destination=mock/rollup.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,41 +44,85 @@ func (m *MockIRollup) EXPECT() *MockIRollupMockRecorder {
 	return m.recorder
 }
 
-// BySlug mocks base method.
-func (m *MockIRollup) BySlug(ctx context.Context, slug string) (storage.Rollup, error) {
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIRollup) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
+// ById mocks base method.
+func (m *MockIRollup) ById(ctx context.Context, rollupId uint64) (storage.RollupWithStats, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BySlug", ctx, slug)
-	ret0, _ := ret[0].(storage.Rollup)
+	ret := m.ctrl.Call(m, "ById", ctx, rollupId)
+	ret0, _ := ret[0].(storage.RollupWithStats)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// BySlug indicates an expected call of BySlug.
-func (mr *MockIRollupMockRecorder) BySlug(ctx, slug any) *IRollupBySlugCall {
+// ById indicates an expected call of ById.
+func (mr *MockIRollupMockRecorder) ById(ctx, rollupId any) *MockIRollupByIdCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BySlug", reflect.TypeOf((*MockIRollup)(nil).BySlug), ctx, slug)
-	return &IRollupBySlugCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ById", reflect.TypeOf((*MockIRollup)(nil).ById), ctx, rollupId)
+	return &MockIRollupByIdCall{Call: call}
 }
 
-// IRollupBySlugCall wrap *gomock.Call
-type IRollupBySlugCall struct {
+// MockIRollupByIdCall wrap *gomock.Call
+type MockIRollupByIdCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupBySlugCall) Return(arg0 storage.Rollup, arg1 error) *IRollupBySlugCall {
+func (c *MockIRollupByIdCall) Return(arg0 storage.RollupWithStats, arg1 error) *MockIRollupByIdCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupBySlugCall) Do(f func(context.Context, string) (storage.Rollup, error)) *IRollupBySlugCall {
+func (c *MockIRollupByIdCall) Do(f func(context.Context, uint64) (storage.RollupWithStats, error)) *MockIRollupByIdCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupBySlugCall) DoAndReturn(f func(context.Context, string) (storage.Rollup, error)) *IRollupBySlugCall {
+func (c *MockIRollupByIdCall) DoAndReturn(f func(context.Context, uint64) (storage.RollupWithStats, error)) *MockIRollupByIdCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// BySlug mocks base method.
+func (m *MockIRollup) BySlug(ctx context.Context, slug string) (storage.RollupWithStats, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BySlug", ctx, slug)
+	ret0, _ := ret[0].(storage.RollupWithStats)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BySlug indicates an expected call of BySlug.
+func (mr *MockIRollupMockRecorder) BySlug(ctx, slug any) *MockIRollupBySlugCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BySlug", reflect.TypeOf((*MockIRollup)(nil).BySlug), ctx, slug)
+	return &MockIRollupBySlugCall{Call: call}
+}
+
+// MockIRollupBySlugCall wrap *gomock.Call
+type MockIRollupBySlugCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIRollupBySlugCall) Return(arg0 storage.RollupWithStats, arg1 error) *MockIRollupBySlugCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIRollupBySlugCall) Do(f func(context.Context, string) (storage.RollupWithStats, error)) *MockIRollupBySlugCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIRollupBySlugCall) DoAndReturn(f func(context.Context, string) (storage.RollupWithStats, error)) *MockIRollupBySlugCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +137,31 @@ func (m *MockIRollup) Count(ctx context.Context) (int64, error) {
 }
 
 // Count indicates an expected call of Count.
-func (mr *MockIRollupMockRecorder) Count(ctx any) *IRollupCountCall {
+func (mr *MockIRollupMockRecorder) Count(ctx any) *MockIRollupCountCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Count", reflect.TypeOf((*MockIRollup)(nil).Count), ctx)
-	return &IRollupCountCall{Call: call}
+	return &MockIRollupCountCall{Call: call}
 }
 
-// IRollupCountCall wrap *gomock.Call
-type IRollupCountCall struct {
+// MockIRollupCountCall wrap *gomock.Call
+type MockIRollupCountCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupCountCall) Return(arg0 int64, arg1 error) *IRollupCountCall {
+func (c *MockIRollupCountCall) Return(arg0 int64, arg1 error) *MockIRollupCountCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupCountCall) Do(f func(context.Context) (int64, error)) *IRollupCountCall {
+func (c *MockIRollupCountCall) Do(f func(context.Context) (int64, error)) *MockIRollupCountCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupCountCall) DoAndReturn(f func(context.Context) (int64, error)) *IRollupCountCall {
+func (c *MockIRollupCountCall) DoAndReturn(f func(context.Context) (int64, error)) *MockIRollupCountCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -131,31 +176,31 @@ func (m *MockIRollup) CursorList(ctx context.Context, id, limit uint64, order st
 }
 
 // CursorList indicates an expected call of CursorList.
-func (mr *MockIRollupMockRecorder) CursorList(ctx, id, limit, order, cmp any) *IRollupCursorListCall {
+func (mr *MockIRollupMockRecorder) CursorList(ctx, id, limit, order, cmp any) *MockIRollupCursorListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CursorList", reflect.TypeOf((*MockIRollup)(nil).CursorList), ctx, id, limit, order, cmp)
-	return &IRollupCursorListCall{Call: call}
+	return &MockIRollupCursorListCall{Call: call}
 }
 
-// IRollupCursorListCall wrap *gomock.Call
-type IRollupCursorListCall struct {
+// MockIRollupCursorListCall wrap *gomock.Call
+type MockIRollupCursorListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupCursorListCall) Return(arg0 []*storage.Rollup, arg1 error) *IRollupCursorListCall {
+func (c *MockIRollupCursorListCall) Return(arg0 []*storage.Rollup, arg1 error) *MockIRollupCursorListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Rollup, error)) *IRollupCursorListCall {
+func (c *MockIRollupCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Rollup, error)) *MockIRollupCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Rollup, error)) *IRollupCursorListCall {
+func (c *MockIRollupCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Rollup, error)) *MockIRollupCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -170,31 +215,31 @@ func (m *MockIRollup) Distribution(ctx context.Context, rollupId uint64, series,
 }
 
 // Distribution indicates an expected call of Distribution.
-func (mr *MockIRollupMockRecorder) Distribution(ctx, rollupId, series, groupBy any) *IRollupDistributionCall {
+func (mr *MockIRollupMockRecorder) Distribution(ctx, rollupId, series, groupBy any) *MockIRollupDistributionCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Distribution", reflect.TypeOf((*MockIRollup)(nil).Distribution), ctx, rollupId, series, groupBy)
-	return &IRollupDistributionCall{Call: call}
+	return &MockIRollupDistributionCall{Call: call}
 }
 
-// IRollupDistributionCall wrap *gomock.Call
-type IRollupDistributionCall struct {
+// MockIRollupDistributionCall wrap *gomock.Call
+type MockIRollupDistributionCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupDistributionCall) Return(items []storage.DistributionItem, err error) *IRollupDistributionCall {
+func (c *MockIRollupDistributionCall) Return(items []storage.DistributionItem, err error) *MockIRollupDistributionCall {
 	c.Call = c.Call.Return(items, err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupDistributionCall) Do(f func(context.Context, uint64, string, string) ([]storage.DistributionItem, error)) *IRollupDistributionCall {
+func (c *MockIRollupDistributionCall) Do(f func(context.Context, uint64, string, string) ([]storage.DistributionItem, error)) *MockIRollupDistributionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupDistributionCall) DoAndReturn(f func(context.Context, uint64, string, string) ([]storage.DistributionItem, error)) *IRollupDistributionCall {
+func (c *MockIRollupDistributionCall) DoAndReturn(f func(context.Context, uint64, string, string) ([]storage.DistributionItem, error)) *MockIRollupDistributionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -209,31 +254,31 @@ func (m *MockIRollup) GetByID(ctx context.Context, id uint64) (*storage.Rollup, 
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockIRollupMockRecorder) GetByID(ctx, id any) *IRollupGetByIDCall {
+func (mr *MockIRollupMockRecorder) GetByID(ctx, id any) *MockIRollupGetByIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockIRollup)(nil).GetByID), ctx, id)
-	return &IRollupGetByIDCall{Call: call}
+	return &MockIRollupGetByIDCall{Call: call}
 }
 
-// IRollupGetByIDCall wrap *gomock.Call
-type IRollupGetByIDCall struct {
+// MockIRollupGetByIDCall wrap *gomock.Call
+type MockIRollupGetByIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupGetByIDCall) Return(arg0 *storage.Rollup, arg1 error) *IRollupGetByIDCall {
+func (c *MockIRollupGetByIDCall) Return(arg0 *storage.Rollup, arg1 error) *MockIRollupGetByIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupGetByIDCall) Do(f func(context.Context, uint64) (*storage.Rollup, error)) *IRollupGetByIDCall {
+func (c *MockIRollupGetByIDCall) Do(f func(context.Context, uint64) (*storage.Rollup, error)) *MockIRollupGetByIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Rollup, error)) *IRollupGetByIDCall {
+func (c *MockIRollupGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Rollup, error)) *MockIRollupGetByIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -247,31 +292,31 @@ func (m *MockIRollup) IsNoRows(err error) bool {
 }
 
 // IsNoRows indicates an expected call of IsNoRows.
-func (mr *MockIRollupMockRecorder) IsNoRows(err any) *IRollupIsNoRowsCall {
+func (mr *MockIRollupMockRecorder) IsNoRows(err any) *MockIRollupIsNoRowsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoRows", reflect.TypeOf((*MockIRollup)(nil).IsNoRows), err)
-	return &IRollupIsNoRowsCall{Call: call}
+	return &MockIRollupIsNoRowsCall{Call: call}
 }
 
-// IRollupIsNoRowsCall wrap *gomock.Call
-type IRollupIsNoRowsCall struct {
+// MockIRollupIsNoRowsCall wrap *gomock.Call
+type MockIRollupIsNoRowsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupIsNoRowsCall) Return(arg0 bool) *IRollupIsNoRowsCall {
+func (c *MockIRollupIsNoRowsCall) Return(arg0 bool) *MockIRollupIsNoRowsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupIsNoRowsCall) Do(f func(error) bool) *IRollupIsNoRowsCall {
+func (c *MockIRollupIsNoRowsCall) Do(f func(error) bool) *MockIRollupIsNoRowsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupIsNoRowsCall) DoAndReturn(f func(error) bool) *IRollupIsNoRowsCall {
+func (c *MockIRollupIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIRollupIsNoRowsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -286,31 +331,31 @@ func (m *MockIRollup) LastID(ctx context.Context) (uint64, error) {
 }
 
 // LastID indicates an expected call of LastID.
-func (mr *MockIRollupMockRecorder) LastID(ctx any) *IRollupLastIDCall {
+func (mr *MockIRollupMockRecorder) LastID(ctx any) *MockIRollupLastIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastID", reflect.TypeOf((*MockIRollup)(nil).LastID), ctx)
-	return &IRollupLastIDCall{Call: call}
+	return &MockIRollupLastIDCall{Call: call}
 }
 
-// IRollupLastIDCall wrap *gomock.Call
-type IRollupLastIDCall struct {
+// MockIRollupLastIDCall wrap *gomock.Call
+type MockIRollupLastIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupLastIDCall) Return(arg0 uint64, arg1 error) *IRollupLastIDCall {
+func (c *MockIRollupLastIDCall) Return(arg0 uint64, arg1 error) *MockIRollupLastIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupLastIDCall) Do(f func(context.Context) (uint64, error)) *IRollupLastIDCall {
+func (c *MockIRollupLastIDCall) Do(f func(context.Context) (uint64, error)) *MockIRollupLastIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *IRollupLastIDCall {
+func (c *MockIRollupLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockIRollupLastIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -325,31 +370,31 @@ func (m *MockIRollup) Leaderboard(ctx context.Context, sortField string, sort st
 }
 
 // Leaderboard indicates an expected call of Leaderboard.
-func (mr *MockIRollupMockRecorder) Leaderboard(ctx, sortField, sort, limit, offset any) *IRollupLeaderboardCall {
+func (mr *MockIRollupMockRecorder) Leaderboard(ctx, sortField, sort, limit, offset any) *MockIRollupLeaderboardCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Leaderboard", reflect.TypeOf((*MockIRollup)(nil).Leaderboard), ctx, sortField, sort, limit, offset)
-	return &IRollupLeaderboardCall{Call: call}
+	return &MockIRollupLeaderboardCall{Call: call}
 }
 
-// IRollupLeaderboardCall wrap *gomock.Call
-type IRollupLeaderboardCall struct {
+// MockIRollupLeaderboardCall wrap *gomock.Call
+type MockIRollupLeaderboardCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupLeaderboardCall) Return(arg0 []storage.RollupWithStats, arg1 error) *IRollupLeaderboardCall {
+func (c *MockIRollupLeaderboardCall) Return(arg0 []storage.RollupWithStats, arg1 error) *MockIRollupLeaderboardCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupLeaderboardCall) Do(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.RollupWithStats, error)) *IRollupLeaderboardCall {
+func (c *MockIRollupLeaderboardCall) Do(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.RollupWithStats, error)) *MockIRollupLeaderboardCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupLeaderboardCall) DoAndReturn(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.RollupWithStats, error)) *IRollupLeaderboardCall {
+func (c *MockIRollupLeaderboardCall) DoAndReturn(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.RollupWithStats, error)) *MockIRollupLeaderboardCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -364,31 +409,31 @@ func (m *MockIRollup) List(ctx context.Context, limit, offset uint64, order stor
 }
 
 // List indicates an expected call of List.
-func (mr *MockIRollupMockRecorder) List(ctx, limit, offset, order any) *IRollupListCall {
+func (mr *MockIRollupMockRecorder) List(ctx, limit, offset, order any) *MockIRollupListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIRollup)(nil).List), ctx, limit, offset, order)
-	return &IRollupListCall{Call: call}
+	return &MockIRollupListCall{Call: call}
 }
 
-// IRollupListCall wrap *gomock.Call
-type IRollupListCall struct {
+// MockIRollupListCall wrap *gomock.Call
+type MockIRollupListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupListCall) Return(arg0 []*storage.Rollup, arg1 error) *IRollupListCall {
+func (c *MockIRollupListCall) Return(arg0 []*storage.Rollup, arg1 error) *MockIRollupListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Rollup, error)) *IRollupListCall {
+func (c *MockIRollupListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Rollup, error)) *MockIRollupListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Rollup, error)) *IRollupListCall {
+func (c *MockIRollupListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Rollup, error)) *MockIRollupListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -403,31 +448,31 @@ func (m *MockIRollup) Namespaces(ctx context.Context, rollupId uint64, limit, of
 }
 
 // Namespaces indicates an expected call of Namespaces.
-func (mr *MockIRollupMockRecorder) Namespaces(ctx, rollupId, limit, offset any) *IRollupNamespacesCall {
+func (mr *MockIRollupMockRecorder) Namespaces(ctx, rollupId, limit, offset any) *MockIRollupNamespacesCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Namespaces", reflect.TypeOf((*MockIRollup)(nil).Namespaces), ctx, rollupId, limit, offset)
-	return &IRollupNamespacesCall{Call: call}
+	return &MockIRollupNamespacesCall{Call: call}
 }
 
-// IRollupNamespacesCall wrap *gomock.Call
-type IRollupNamespacesCall struct {
+// MockIRollupNamespacesCall wrap *gomock.Call
+type MockIRollupNamespacesCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupNamespacesCall) Return(namespaceIds []uint64, err error) *IRollupNamespacesCall {
+func (c *MockIRollupNamespacesCall) Return(namespaceIds []uint64, err error) *MockIRollupNamespacesCall {
 	c.Call = c.Call.Return(namespaceIds, err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupNamespacesCall) Do(f func(context.Context, uint64, int, int) ([]uint64, error)) *IRollupNamespacesCall {
+func (c *MockIRollupNamespacesCall) Do(f func(context.Context, uint64, int, int) ([]uint64, error)) *MockIRollupNamespacesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupNamespacesCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]uint64, error)) *IRollupNamespacesCall {
+func (c *MockIRollupNamespacesCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]uint64, error)) *MockIRollupNamespacesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -442,31 +487,31 @@ func (m *MockIRollup) Providers(ctx context.Context, rollupId uint64) ([]storage
 }
 
 // Providers indicates an expected call of Providers.
-func (mr *MockIRollupMockRecorder) Providers(ctx, rollupId any) *IRollupProvidersCall {
+func (mr *MockIRollupMockRecorder) Providers(ctx, rollupId any) *MockIRollupProvidersCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Providers", reflect.TypeOf((*MockIRollup)(nil).Providers), ctx, rollupId)
-	return &IRollupProvidersCall{Call: call}
+	return &MockIRollupProvidersCall{Call: call}
 }
 
-// IRollupProvidersCall wrap *gomock.Call
-type IRollupProvidersCall struct {
+// MockIRollupProvidersCall wrap *gomock.Call
+type MockIRollupProvidersCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupProvidersCall) Return(providers []storage.RollupProvider, err error) *IRollupProvidersCall {
+func (c *MockIRollupProvidersCall) Return(providers []storage.RollupProvider, err error) *MockIRollupProvidersCall {
 	c.Call = c.Call.Return(providers, err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupProvidersCall) Do(f func(context.Context, uint64) ([]storage.RollupProvider, error)) *IRollupProvidersCall {
+func (c *MockIRollupProvidersCall) Do(f func(context.Context, uint64) ([]storage.RollupProvider, error)) *MockIRollupProvidersCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupProvidersCall) DoAndReturn(f func(context.Context, uint64) ([]storage.RollupProvider, error)) *IRollupProvidersCall {
+func (c *MockIRollupProvidersCall) DoAndReturn(f func(context.Context, uint64) ([]storage.RollupProvider, error)) *MockIRollupProvidersCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -481,31 +526,31 @@ func (m *MockIRollup) RollupsByNamespace(ctx context.Context, namespaceId uint64
 }
 
 // RollupsByNamespace indicates an expected call of RollupsByNamespace.
-func (mr *MockIRollupMockRecorder) RollupsByNamespace(ctx, namespaceId, limit, offset any) *IRollupRollupsByNamespaceCall {
+func (mr *MockIRollupMockRecorder) RollupsByNamespace(ctx, namespaceId, limit, offset any) *MockIRollupRollupsByNamespaceCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollupsByNamespace", reflect.TypeOf((*MockIRollup)(nil).RollupsByNamespace), ctx, namespaceId, limit, offset)
-	return &IRollupRollupsByNamespaceCall{Call: call}
+	return &MockIRollupRollupsByNamespaceCall{Call: call}
 }
 
-// IRollupRollupsByNamespaceCall wrap *gomock.Call
-type IRollupRollupsByNamespaceCall struct {
+// MockIRollupRollupsByNamespaceCall wrap *gomock.Call
+type MockIRollupRollupsByNamespaceCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupRollupsByNamespaceCall) Return(rollups []storage.Rollup, err error) *IRollupRollupsByNamespaceCall {
+func (c *MockIRollupRollupsByNamespaceCall) Return(rollups []storage.Rollup, err error) *MockIRollupRollupsByNamespaceCall {
 	c.Call = c.Call.Return(rollups, err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupRollupsByNamespaceCall) Do(f func(context.Context, uint64, int, int) ([]storage.Rollup, error)) *IRollupRollupsByNamespaceCall {
+func (c *MockIRollupRollupsByNamespaceCall) Do(f func(context.Context, uint64, int, int) ([]storage.Rollup, error)) *MockIRollupRollupsByNamespaceCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupRollupsByNamespaceCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Rollup, error)) *IRollupRollupsByNamespaceCall {
+func (c *MockIRollupRollupsByNamespaceCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Rollup, error)) *MockIRollupRollupsByNamespaceCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -519,31 +564,31 @@ func (m_2 *MockIRollup) Save(ctx context.Context, m *storage.Rollup) error {
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockIRollupMockRecorder) Save(ctx, m any) *IRollupSaveCall {
+func (mr *MockIRollupMockRecorder) Save(ctx, m any) *MockIRollupSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIRollup)(nil).Save), ctx, m)
-	return &IRollupSaveCall{Call: call}
+	return &MockIRollupSaveCall{Call: call}
 }
 
-// IRollupSaveCall wrap *gomock.Call
-type IRollupSaveCall struct {
+// MockIRollupSaveCall wrap *gomock.Call
+type MockIRollupSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupSaveCall) Return(arg0 error) *IRollupSaveCall {
+func (c *MockIRollupSaveCall) Return(arg0 error) *MockIRollupSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupSaveCall) Do(f func(context.Context, *storage.Rollup) error) *IRollupSaveCall {
+func (c *MockIRollupSaveCall) Do(f func(context.Context, *storage.Rollup) error) *MockIRollupSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupSaveCall) DoAndReturn(f func(context.Context, *storage.Rollup) error) *IRollupSaveCall {
+func (c *MockIRollupSaveCall) DoAndReturn(f func(context.Context, *storage.Rollup) error) *MockIRollupSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -558,70 +603,31 @@ func (m *MockIRollup) Series(ctx context.Context, rollupId uint64, timeframe, co
 }
 
 // Series indicates an expected call of Series.
-func (mr *MockIRollupMockRecorder) Series(ctx, rollupId, timeframe, column, req any) *IRollupSeriesCall {
+func (mr *MockIRollupMockRecorder) Series(ctx, rollupId, timeframe, column, req any) *MockIRollupSeriesCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Series", reflect.TypeOf((*MockIRollup)(nil).Series), ctx, rollupId, timeframe, column, req)
-	return &IRollupSeriesCall{Call: call}
+	return &MockIRollupSeriesCall{Call: call}
 }
 
-// IRollupSeriesCall wrap *gomock.Call
-type IRollupSeriesCall struct {
+// MockIRollupSeriesCall wrap *gomock.Call
+type MockIRollupSeriesCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupSeriesCall) Return(items []storage.HistogramItem, err error) *IRollupSeriesCall {
+func (c *MockIRollupSeriesCall) Return(items []storage.HistogramItem, err error) *MockIRollupSeriesCall {
 	c.Call = c.Call.Return(items, err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupSeriesCall) Do(f func(context.Context, uint64, string, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *IRollupSeriesCall {
+func (c *MockIRollupSeriesCall) Do(f func(context.Context, uint64, string, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupSeriesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupSeriesCall) DoAndReturn(f func(context.Context, uint64, string, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *IRollupSeriesCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// Stats mocks base method.
-func (m *MockIRollup) Stats(ctx context.Context, rollupId uint64) (storage.RollupStats, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Stats", ctx, rollupId)
-	ret0, _ := ret[0].(storage.RollupStats)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Stats indicates an expected call of Stats.
-func (mr *MockIRollupMockRecorder) Stats(ctx, rollupId any) *IRollupStatsCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stats", reflect.TypeOf((*MockIRollup)(nil).Stats), ctx, rollupId)
-	return &IRollupStatsCall{Call: call}
-}
-
-// IRollupStatsCall wrap *gomock.Call
-type IRollupStatsCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *IRollupStatsCall) Return(arg0 storage.RollupStats, arg1 error) *IRollupStatsCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *IRollupStatsCall) Do(f func(context.Context, uint64) (storage.RollupStats, error)) *IRollupStatsCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupStatsCall) DoAndReturn(f func(context.Context, uint64) (storage.RollupStats, error)) *IRollupStatsCall {
+func (c *MockIRollupSeriesCall) DoAndReturn(f func(context.Context, uint64, string, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupSeriesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -635,31 +641,31 @@ func (m_2 *MockIRollup) Update(ctx context.Context, m *storage.Rollup) error {
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIRollupMockRecorder) Update(ctx, m any) *IRollupUpdateCall {
+func (mr *MockIRollupMockRecorder) Update(ctx, m any) *MockIRollupUpdateCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIRollup)(nil).Update), ctx, m)
-	return &IRollupUpdateCall{Call: call}
+	return &MockIRollupUpdateCall{Call: call}
 }
 
-// IRollupUpdateCall wrap *gomock.Call
-type IRollupUpdateCall struct {
+// MockIRollupUpdateCall wrap *gomock.Call
+type MockIRollupUpdateCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IRollupUpdateCall) Return(arg0 error) *IRollupUpdateCall {
+func (c *MockIRollupUpdateCall) Return(arg0 error) *MockIRollupUpdateCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IRollupUpdateCall) Do(f func(context.Context, *storage.Rollup) error) *IRollupUpdateCall {
+func (c *MockIRollupUpdateCall) Do(f func(context.Context, *storage.Rollup) error) *MockIRollupUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IRollupUpdateCall) DoAndReturn(f func(context.Context, *storage.Rollup) error) *IRollupUpdateCall {
+func (c *MockIRollupUpdateCall) DoAndReturn(f func(context.Context, *storage.Rollup) error) *MockIRollupUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

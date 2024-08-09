@@ -8,6 +8,7 @@
 //
 //	mockgen -source=price.go -destination=mock/price.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,6 +44,11 @@ func (m *MockIPrice) EXPECT() *MockIPriceMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIPrice) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // Get mocks base method.
 func (m *MockIPrice) Get(ctx context.Context, timeframe string, start, end time.Time, limit int) ([]storage.Price, error) {
 	m.ctrl.T.Helper()
@@ -53,31 +59,31 @@ func (m *MockIPrice) Get(ctx context.Context, timeframe string, start, end time.
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockIPriceMockRecorder) Get(ctx, timeframe, start, end, limit any) *IPriceGetCall {
+func (mr *MockIPriceMockRecorder) Get(ctx, timeframe, start, end, limit any) *MockIPriceGetCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockIPrice)(nil).Get), ctx, timeframe, start, end, limit)
-	return &IPriceGetCall{Call: call}
+	return &MockIPriceGetCall{Call: call}
 }
 
-// IPriceGetCall wrap *gomock.Call
-type IPriceGetCall struct {
+// MockIPriceGetCall wrap *gomock.Call
+type MockIPriceGetCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IPriceGetCall) Return(arg0 []storage.Price, arg1 error) *IPriceGetCall {
+func (c *MockIPriceGetCall) Return(arg0 []storage.Price, arg1 error) *MockIPriceGetCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IPriceGetCall) Do(f func(context.Context, string, time.Time, time.Time, int) ([]storage.Price, error)) *IPriceGetCall {
+func (c *MockIPriceGetCall) Do(f func(context.Context, string, time.Time, time.Time, int) ([]storage.Price, error)) *MockIPriceGetCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IPriceGetCall) DoAndReturn(f func(context.Context, string, time.Time, time.Time, int) ([]storage.Price, error)) *IPriceGetCall {
+func (c *MockIPriceGetCall) DoAndReturn(f func(context.Context, string, time.Time, time.Time, int) ([]storage.Price, error)) *MockIPriceGetCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +98,31 @@ func (m *MockIPrice) Last(ctx context.Context) (storage.Price, error) {
 }
 
 // Last indicates an expected call of Last.
-func (mr *MockIPriceMockRecorder) Last(ctx any) *IPriceLastCall {
+func (mr *MockIPriceMockRecorder) Last(ctx any) *MockIPriceLastCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Last", reflect.TypeOf((*MockIPrice)(nil).Last), ctx)
-	return &IPriceLastCall{Call: call}
+	return &MockIPriceLastCall{Call: call}
 }
 
-// IPriceLastCall wrap *gomock.Call
-type IPriceLastCall struct {
+// MockIPriceLastCall wrap *gomock.Call
+type MockIPriceLastCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IPriceLastCall) Return(arg0 storage.Price, arg1 error) *IPriceLastCall {
+func (c *MockIPriceLastCall) Return(arg0 storage.Price, arg1 error) *MockIPriceLastCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IPriceLastCall) Do(f func(context.Context) (storage.Price, error)) *IPriceLastCall {
+func (c *MockIPriceLastCall) Do(f func(context.Context) (storage.Price, error)) *MockIPriceLastCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IPriceLastCall) DoAndReturn(f func(context.Context) (storage.Price, error)) *IPriceLastCall {
+func (c *MockIPriceLastCall) DoAndReturn(f func(context.Context) (storage.Price, error)) *MockIPriceLastCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -130,31 +136,31 @@ func (m *MockIPrice) Save(ctx context.Context, price *storage.Price) error {
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockIPriceMockRecorder) Save(ctx, price any) *IPriceSaveCall {
+func (mr *MockIPriceMockRecorder) Save(ctx, price any) *MockIPriceSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIPrice)(nil).Save), ctx, price)
-	return &IPriceSaveCall{Call: call}
+	return &MockIPriceSaveCall{Call: call}
 }
 
-// IPriceSaveCall wrap *gomock.Call
-type IPriceSaveCall struct {
+// MockIPriceSaveCall wrap *gomock.Call
+type MockIPriceSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IPriceSaveCall) Return(arg0 error) *IPriceSaveCall {
+func (c *MockIPriceSaveCall) Return(arg0 error) *MockIPriceSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IPriceSaveCall) Do(f func(context.Context, *storage.Price) error) *IPriceSaveCall {
+func (c *MockIPriceSaveCall) Do(f func(context.Context, *storage.Price) error) *MockIPriceSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IPriceSaveCall) DoAndReturn(f func(context.Context, *storage.Price) error) *IPriceSaveCall {
+func (c *MockIPriceSaveCall) DoAndReturn(f func(context.Context, *storage.Price) error) *MockIPriceSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -8,6 +8,7 @@
 //
 //	mockgen -source=event.go -destination=mock/event.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -44,6 +45,11 @@ func (m *MockIEvent) EXPECT() *MockIEventMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIEvent) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // ByBlock mocks base method.
 func (m *MockIEvent) ByBlock(ctx context.Context, height types.Level, fltrs storage.EventFilter) ([]storage.Event, error) {
 	m.ctrl.T.Helper()
@@ -54,31 +60,31 @@ func (m *MockIEvent) ByBlock(ctx context.Context, height types.Level, fltrs stor
 }
 
 // ByBlock indicates an expected call of ByBlock.
-func (mr *MockIEventMockRecorder) ByBlock(ctx, height, fltrs any) *IEventByBlockCall {
+func (mr *MockIEventMockRecorder) ByBlock(ctx, height, fltrs any) *MockIEventByBlockCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByBlock", reflect.TypeOf((*MockIEvent)(nil).ByBlock), ctx, height, fltrs)
-	return &IEventByBlockCall{Call: call}
+	return &MockIEventByBlockCall{Call: call}
 }
 
-// IEventByBlockCall wrap *gomock.Call
-type IEventByBlockCall struct {
+// MockIEventByBlockCall wrap *gomock.Call
+type MockIEventByBlockCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IEventByBlockCall) Return(arg0 []storage.Event, arg1 error) *IEventByBlockCall {
+func (c *MockIEventByBlockCall) Return(arg0 []storage.Event, arg1 error) *MockIEventByBlockCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IEventByBlockCall) Do(f func(context.Context, types.Level, storage.EventFilter) ([]storage.Event, error)) *IEventByBlockCall {
+func (c *MockIEventByBlockCall) Do(f func(context.Context, types.Level, storage.EventFilter) ([]storage.Event, error)) *MockIEventByBlockCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IEventByBlockCall) DoAndReturn(f func(context.Context, types.Level, storage.EventFilter) ([]storage.Event, error)) *IEventByBlockCall {
+func (c *MockIEventByBlockCall) DoAndReturn(f func(context.Context, types.Level, storage.EventFilter) ([]storage.Event, error)) *MockIEventByBlockCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -93,31 +99,31 @@ func (m *MockIEvent) ByTxId(ctx context.Context, txId uint64, fltrs storage.Even
 }
 
 // ByTxId indicates an expected call of ByTxId.
-func (mr *MockIEventMockRecorder) ByTxId(ctx, txId, fltrs any) *IEventByTxIdCall {
+func (mr *MockIEventMockRecorder) ByTxId(ctx, txId, fltrs any) *MockIEventByTxIdCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByTxId", reflect.TypeOf((*MockIEvent)(nil).ByTxId), ctx, txId, fltrs)
-	return &IEventByTxIdCall{Call: call}
+	return &MockIEventByTxIdCall{Call: call}
 }
 
-// IEventByTxIdCall wrap *gomock.Call
-type IEventByTxIdCall struct {
+// MockIEventByTxIdCall wrap *gomock.Call
+type MockIEventByTxIdCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IEventByTxIdCall) Return(arg0 []storage.Event, arg1 error) *IEventByTxIdCall {
+func (c *MockIEventByTxIdCall) Return(arg0 []storage.Event, arg1 error) *MockIEventByTxIdCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IEventByTxIdCall) Do(f func(context.Context, uint64, storage.EventFilter) ([]storage.Event, error)) *IEventByTxIdCall {
+func (c *MockIEventByTxIdCall) Do(f func(context.Context, uint64, storage.EventFilter) ([]storage.Event, error)) *MockIEventByTxIdCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IEventByTxIdCall) DoAndReturn(f func(context.Context, uint64, storage.EventFilter) ([]storage.Event, error)) *IEventByTxIdCall {
+func (c *MockIEventByTxIdCall) DoAndReturn(f func(context.Context, uint64, storage.EventFilter) ([]storage.Event, error)) *MockIEventByTxIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -132,31 +138,31 @@ func (m *MockIEvent) CursorList(ctx context.Context, id, limit uint64, order sto
 }
 
 // CursorList indicates an expected call of CursorList.
-func (mr *MockIEventMockRecorder) CursorList(ctx, id, limit, order, cmp any) *IEventCursorListCall {
+func (mr *MockIEventMockRecorder) CursorList(ctx, id, limit, order, cmp any) *MockIEventCursorListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CursorList", reflect.TypeOf((*MockIEvent)(nil).CursorList), ctx, id, limit, order, cmp)
-	return &IEventCursorListCall{Call: call}
+	return &MockIEventCursorListCall{Call: call}
 }
 
-// IEventCursorListCall wrap *gomock.Call
-type IEventCursorListCall struct {
+// MockIEventCursorListCall wrap *gomock.Call
+type MockIEventCursorListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IEventCursorListCall) Return(arg0 []*storage.Event, arg1 error) *IEventCursorListCall {
+func (c *MockIEventCursorListCall) Return(arg0 []*storage.Event, arg1 error) *MockIEventCursorListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IEventCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Event, error)) *IEventCursorListCall {
+func (c *MockIEventCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Event, error)) *MockIEventCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IEventCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Event, error)) *IEventCursorListCall {
+func (c *MockIEventCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Event, error)) *MockIEventCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -171,31 +177,31 @@ func (m *MockIEvent) GetByID(ctx context.Context, id uint64) (*storage.Event, er
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockIEventMockRecorder) GetByID(ctx, id any) *IEventGetByIDCall {
+func (mr *MockIEventMockRecorder) GetByID(ctx, id any) *MockIEventGetByIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockIEvent)(nil).GetByID), ctx, id)
-	return &IEventGetByIDCall{Call: call}
+	return &MockIEventGetByIDCall{Call: call}
 }
 
-// IEventGetByIDCall wrap *gomock.Call
-type IEventGetByIDCall struct {
+// MockIEventGetByIDCall wrap *gomock.Call
+type MockIEventGetByIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IEventGetByIDCall) Return(arg0 *storage.Event, arg1 error) *IEventGetByIDCall {
+func (c *MockIEventGetByIDCall) Return(arg0 *storage.Event, arg1 error) *MockIEventGetByIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IEventGetByIDCall) Do(f func(context.Context, uint64) (*storage.Event, error)) *IEventGetByIDCall {
+func (c *MockIEventGetByIDCall) Do(f func(context.Context, uint64) (*storage.Event, error)) *MockIEventGetByIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IEventGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Event, error)) *IEventGetByIDCall {
+func (c *MockIEventGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Event, error)) *MockIEventGetByIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -209,31 +215,31 @@ func (m *MockIEvent) IsNoRows(err error) bool {
 }
 
 // IsNoRows indicates an expected call of IsNoRows.
-func (mr *MockIEventMockRecorder) IsNoRows(err any) *IEventIsNoRowsCall {
+func (mr *MockIEventMockRecorder) IsNoRows(err any) *MockIEventIsNoRowsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoRows", reflect.TypeOf((*MockIEvent)(nil).IsNoRows), err)
-	return &IEventIsNoRowsCall{Call: call}
+	return &MockIEventIsNoRowsCall{Call: call}
 }
 
-// IEventIsNoRowsCall wrap *gomock.Call
-type IEventIsNoRowsCall struct {
+// MockIEventIsNoRowsCall wrap *gomock.Call
+type MockIEventIsNoRowsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IEventIsNoRowsCall) Return(arg0 bool) *IEventIsNoRowsCall {
+func (c *MockIEventIsNoRowsCall) Return(arg0 bool) *MockIEventIsNoRowsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IEventIsNoRowsCall) Do(f func(error) bool) *IEventIsNoRowsCall {
+func (c *MockIEventIsNoRowsCall) Do(f func(error) bool) *MockIEventIsNoRowsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IEventIsNoRowsCall) DoAndReturn(f func(error) bool) *IEventIsNoRowsCall {
+func (c *MockIEventIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIEventIsNoRowsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -248,31 +254,31 @@ func (m *MockIEvent) LastID(ctx context.Context) (uint64, error) {
 }
 
 // LastID indicates an expected call of LastID.
-func (mr *MockIEventMockRecorder) LastID(ctx any) *IEventLastIDCall {
+func (mr *MockIEventMockRecorder) LastID(ctx any) *MockIEventLastIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastID", reflect.TypeOf((*MockIEvent)(nil).LastID), ctx)
-	return &IEventLastIDCall{Call: call}
+	return &MockIEventLastIDCall{Call: call}
 }
 
-// IEventLastIDCall wrap *gomock.Call
-type IEventLastIDCall struct {
+// MockIEventLastIDCall wrap *gomock.Call
+type MockIEventLastIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IEventLastIDCall) Return(arg0 uint64, arg1 error) *IEventLastIDCall {
+func (c *MockIEventLastIDCall) Return(arg0 uint64, arg1 error) *MockIEventLastIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IEventLastIDCall) Do(f func(context.Context) (uint64, error)) *IEventLastIDCall {
+func (c *MockIEventLastIDCall) Do(f func(context.Context) (uint64, error)) *MockIEventLastIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IEventLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *IEventLastIDCall {
+func (c *MockIEventLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockIEventLastIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -287,31 +293,31 @@ func (m *MockIEvent) List(ctx context.Context, limit, offset uint64, order stora
 }
 
 // List indicates an expected call of List.
-func (mr *MockIEventMockRecorder) List(ctx, limit, offset, order any) *IEventListCall {
+func (mr *MockIEventMockRecorder) List(ctx, limit, offset, order any) *MockIEventListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIEvent)(nil).List), ctx, limit, offset, order)
-	return &IEventListCall{Call: call}
+	return &MockIEventListCall{Call: call}
 }
 
-// IEventListCall wrap *gomock.Call
-type IEventListCall struct {
+// MockIEventListCall wrap *gomock.Call
+type MockIEventListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IEventListCall) Return(arg0 []*storage.Event, arg1 error) *IEventListCall {
+func (c *MockIEventListCall) Return(arg0 []*storage.Event, arg1 error) *MockIEventListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IEventListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Event, error)) *IEventListCall {
+func (c *MockIEventListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Event, error)) *MockIEventListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IEventListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Event, error)) *IEventListCall {
+func (c *MockIEventListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Event, error)) *MockIEventListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -325,31 +331,31 @@ func (m_2 *MockIEvent) Save(ctx context.Context, m *storage.Event) error {
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockIEventMockRecorder) Save(ctx, m any) *IEventSaveCall {
+func (mr *MockIEventMockRecorder) Save(ctx, m any) *MockIEventSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIEvent)(nil).Save), ctx, m)
-	return &IEventSaveCall{Call: call}
+	return &MockIEventSaveCall{Call: call}
 }
 
-// IEventSaveCall wrap *gomock.Call
-type IEventSaveCall struct {
+// MockIEventSaveCall wrap *gomock.Call
+type MockIEventSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IEventSaveCall) Return(arg0 error) *IEventSaveCall {
+func (c *MockIEventSaveCall) Return(arg0 error) *MockIEventSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IEventSaveCall) Do(f func(context.Context, *storage.Event) error) *IEventSaveCall {
+func (c *MockIEventSaveCall) Do(f func(context.Context, *storage.Event) error) *MockIEventSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IEventSaveCall) DoAndReturn(f func(context.Context, *storage.Event) error) *IEventSaveCall {
+func (c *MockIEventSaveCall) DoAndReturn(f func(context.Context, *storage.Event) error) *MockIEventSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -363,31 +369,31 @@ func (m_2 *MockIEvent) Update(ctx context.Context, m *storage.Event) error {
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIEventMockRecorder) Update(ctx, m any) *IEventUpdateCall {
+func (mr *MockIEventMockRecorder) Update(ctx, m any) *MockIEventUpdateCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIEvent)(nil).Update), ctx, m)
-	return &IEventUpdateCall{Call: call}
+	return &MockIEventUpdateCall{Call: call}
 }
 
-// IEventUpdateCall wrap *gomock.Call
-type IEventUpdateCall struct {
+// MockIEventUpdateCall wrap *gomock.Call
+type MockIEventUpdateCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IEventUpdateCall) Return(arg0 error) *IEventUpdateCall {
+func (c *MockIEventUpdateCall) Return(arg0 error) *MockIEventUpdateCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IEventUpdateCall) Do(f func(context.Context, *storage.Event) error) *IEventUpdateCall {
+func (c *MockIEventUpdateCall) Do(f func(context.Context, *storage.Event) error) *MockIEventUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IEventUpdateCall) DoAndReturn(f func(context.Context, *storage.Event) error) *IEventUpdateCall {
+func (c *MockIEventUpdateCall) DoAndReturn(f func(context.Context, *storage.Event) error) *MockIEventUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

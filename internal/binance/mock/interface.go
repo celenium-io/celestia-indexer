@@ -8,6 +8,7 @@
 //
 //	mockgen -source=interface.go -destination=mock/interface.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -42,6 +43,11 @@ func (m *MockIApi) EXPECT() *MockIApiMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIApi) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // OHLC mocks base method.
 func (m *MockIApi) OHLC(ctx context.Context, symbol, interval string, arguments *binance.OHLCArgs) ([]binance.OHLC, error) {
 	m.ctrl.T.Helper()
@@ -52,31 +58,31 @@ func (m *MockIApi) OHLC(ctx context.Context, symbol, interval string, arguments 
 }
 
 // OHLC indicates an expected call of OHLC.
-func (mr *MockIApiMockRecorder) OHLC(ctx, symbol, interval, arguments any) *IApiOHLCCall {
+func (mr *MockIApiMockRecorder) OHLC(ctx, symbol, interval, arguments any) *MockIApiOHLCCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OHLC", reflect.TypeOf((*MockIApi)(nil).OHLC), ctx, symbol, interval, arguments)
-	return &IApiOHLCCall{Call: call}
+	return &MockIApiOHLCCall{Call: call}
 }
 
-// IApiOHLCCall wrap *gomock.Call
-type IApiOHLCCall struct {
+// MockIApiOHLCCall wrap *gomock.Call
+type MockIApiOHLCCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IApiOHLCCall) Return(candles []binance.OHLC, err error) *IApiOHLCCall {
+func (c *MockIApiOHLCCall) Return(candles []binance.OHLC, err error) *MockIApiOHLCCall {
 	c.Call = c.Call.Return(candles, err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IApiOHLCCall) Do(f func(context.Context, string, string, *binance.OHLCArgs) ([]binance.OHLC, error)) *IApiOHLCCall {
+func (c *MockIApiOHLCCall) Do(f func(context.Context, string, string, *binance.OHLCArgs) ([]binance.OHLC, error)) *MockIApiOHLCCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IApiOHLCCall) DoAndReturn(f func(context.Context, string, string, *binance.OHLCArgs) ([]binance.OHLC, error)) *IApiOHLCCall {
+func (c *MockIApiOHLCCall) DoAndReturn(f func(context.Context, string, string, *binance.OHLCArgs) ([]binance.OHLC, error)) *MockIApiOHLCCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

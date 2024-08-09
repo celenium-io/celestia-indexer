@@ -165,8 +165,21 @@ func (r *Rollup) Stats(ctx context.Context, rollupId uint64) (stats storage.Roll
 	return
 }
 
-func (r *Rollup) BySlug(ctx context.Context, slug string) (rollup storage.Rollup, err error) {
-	err = r.DB().NewSelect().Model(&rollup).Where("slug = ?", slug).Limit(1).Scan(ctx)
+func (r *Rollup) BySlug(ctx context.Context, slug string) (rollup storage.RollupWithStats, err error) {
+	err = r.DB().NewSelect().
+		Table(storage.ViewLeaderboard).
+		Where("slug = ?", slug).
+		Limit(1).
+		Scan(ctx, &rollup)
+	return
+}
+
+func (r *Rollup) ById(ctx context.Context, rollupId uint64) (rollup storage.RollupWithStats, err error) {
+	err = r.DB().NewSelect().
+		Table(storage.ViewLeaderboard).
+		Where("id = ?", rollupId).
+		Limit(1).
+		Scan(ctx, &rollup)
 	return
 }
 

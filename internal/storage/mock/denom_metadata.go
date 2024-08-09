@@ -8,6 +8,7 @@
 //
 //	mockgen -source=denom_metadata.go -destination=mock/denom_metadata.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -42,6 +43,11 @@ func (m *MockIDenomMetadata) EXPECT() *MockIDenomMetadataMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIDenomMetadata) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // All mocks base method.
 func (m *MockIDenomMetadata) All(ctx context.Context) ([]storage.DenomMetadata, error) {
 	m.ctrl.T.Helper()
@@ -52,31 +58,31 @@ func (m *MockIDenomMetadata) All(ctx context.Context) ([]storage.DenomMetadata, 
 }
 
 // All indicates an expected call of All.
-func (mr *MockIDenomMetadataMockRecorder) All(ctx any) *IDenomMetadataAllCall {
+func (mr *MockIDenomMetadataMockRecorder) All(ctx any) *MockIDenomMetadataAllCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "All", reflect.TypeOf((*MockIDenomMetadata)(nil).All), ctx)
-	return &IDenomMetadataAllCall{Call: call}
+	return &MockIDenomMetadataAllCall{Call: call}
 }
 
-// IDenomMetadataAllCall wrap *gomock.Call
-type IDenomMetadataAllCall struct {
+// MockIDenomMetadataAllCall wrap *gomock.Call
+type MockIDenomMetadataAllCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IDenomMetadataAllCall) Return(arg0 []storage.DenomMetadata, arg1 error) *IDenomMetadataAllCall {
+func (c *MockIDenomMetadataAllCall) Return(arg0 []storage.DenomMetadata, arg1 error) *MockIDenomMetadataAllCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IDenomMetadataAllCall) Do(f func(context.Context) ([]storage.DenomMetadata, error)) *IDenomMetadataAllCall {
+func (c *MockIDenomMetadataAllCall) Do(f func(context.Context) ([]storage.DenomMetadata, error)) *MockIDenomMetadataAllCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IDenomMetadataAllCall) DoAndReturn(f func(context.Context) ([]storage.DenomMetadata, error)) *IDenomMetadataAllCall {
+func (c *MockIDenomMetadataAllCall) DoAndReturn(f func(context.Context) ([]storage.DenomMetadata, error)) *MockIDenomMetadataAllCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

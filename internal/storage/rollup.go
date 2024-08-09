@@ -21,11 +21,11 @@ type IRollup interface {
 	Namespaces(ctx context.Context, rollupId uint64, limit, offset int) (namespaceIds []uint64, err error)
 	Providers(ctx context.Context, rollupId uint64) (providers []RollupProvider, err error)
 	RollupsByNamespace(ctx context.Context, namespaceId uint64, limit, offset int) (rollups []Rollup, err error)
-	Stats(ctx context.Context, rollupId uint64) (RollupStats, error)
+	ById(ctx context.Context, rollupId uint64) (RollupWithStats, error)
 	Series(ctx context.Context, rollupId uint64, timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
 	Count(ctx context.Context) (int64, error)
 	Distribution(ctx context.Context, rollupId uint64, series, groupBy string) (items []DistributionItem, err error)
-	BySlug(ctx context.Context, slug string) (Rollup, error)
+	BySlug(ctx context.Context, slug string) (RollupWithStats, error)
 }
 
 // Rollup -

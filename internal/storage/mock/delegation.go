@@ -8,6 +8,7 @@
 //
 //	mockgen -source=delegation.go -destination=mock/delegation.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,6 +44,11 @@ func (m *MockIDelegation) EXPECT() *MockIDelegationMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIDelegation) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // ByAddress mocks base method.
 func (m *MockIDelegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int, showZero bool) ([]storage.Delegation, error) {
 	m.ctrl.T.Helper()
@@ -53,31 +59,31 @@ func (m *MockIDelegation) ByAddress(ctx context.Context, addressId uint64, limit
 }
 
 // ByAddress indicates an expected call of ByAddress.
-func (mr *MockIDelegationMockRecorder) ByAddress(ctx, addressId, limit, offset, showZero any) *IDelegationByAddressCall {
+func (mr *MockIDelegationMockRecorder) ByAddress(ctx, addressId, limit, offset, showZero any) *MockIDelegationByAddressCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByAddress", reflect.TypeOf((*MockIDelegation)(nil).ByAddress), ctx, addressId, limit, offset, showZero)
-	return &IDelegationByAddressCall{Call: call}
+	return &MockIDelegationByAddressCall{Call: call}
 }
 
-// IDelegationByAddressCall wrap *gomock.Call
-type IDelegationByAddressCall struct {
+// MockIDelegationByAddressCall wrap *gomock.Call
+type MockIDelegationByAddressCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IDelegationByAddressCall) Return(arg0 []storage.Delegation, arg1 error) *IDelegationByAddressCall {
+func (c *MockIDelegationByAddressCall) Return(arg0 []storage.Delegation, arg1 error) *MockIDelegationByAddressCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IDelegationByAddressCall) Do(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *IDelegationByAddressCall {
+func (c *MockIDelegationByAddressCall) Do(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *MockIDelegationByAddressCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IDelegationByAddressCall) DoAndReturn(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *IDelegationByAddressCall {
+func (c *MockIDelegationByAddressCall) DoAndReturn(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *MockIDelegationByAddressCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +98,31 @@ func (m *MockIDelegation) ByValidator(ctx context.Context, validatorId uint64, l
 }
 
 // ByValidator indicates an expected call of ByValidator.
-func (mr *MockIDelegationMockRecorder) ByValidator(ctx, validatorId, limit, offset, showZero any) *IDelegationByValidatorCall {
+func (mr *MockIDelegationMockRecorder) ByValidator(ctx, validatorId, limit, offset, showZero any) *MockIDelegationByValidatorCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByValidator", reflect.TypeOf((*MockIDelegation)(nil).ByValidator), ctx, validatorId, limit, offset, showZero)
-	return &IDelegationByValidatorCall{Call: call}
+	return &MockIDelegationByValidatorCall{Call: call}
 }
 
-// IDelegationByValidatorCall wrap *gomock.Call
-type IDelegationByValidatorCall struct {
+// MockIDelegationByValidatorCall wrap *gomock.Call
+type MockIDelegationByValidatorCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IDelegationByValidatorCall) Return(arg0 []storage.Delegation, arg1 error) *IDelegationByValidatorCall {
+func (c *MockIDelegationByValidatorCall) Return(arg0 []storage.Delegation, arg1 error) *MockIDelegationByValidatorCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IDelegationByValidatorCall) Do(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *IDelegationByValidatorCall {
+func (c *MockIDelegationByValidatorCall) Do(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *MockIDelegationByValidatorCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IDelegationByValidatorCall) DoAndReturn(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *IDelegationByValidatorCall {
+func (c *MockIDelegationByValidatorCall) DoAndReturn(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *MockIDelegationByValidatorCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -131,31 +137,31 @@ func (m *MockIDelegation) CursorList(ctx context.Context, id, limit uint64, orde
 }
 
 // CursorList indicates an expected call of CursorList.
-func (mr *MockIDelegationMockRecorder) CursorList(ctx, id, limit, order, cmp any) *IDelegationCursorListCall {
+func (mr *MockIDelegationMockRecorder) CursorList(ctx, id, limit, order, cmp any) *MockIDelegationCursorListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CursorList", reflect.TypeOf((*MockIDelegation)(nil).CursorList), ctx, id, limit, order, cmp)
-	return &IDelegationCursorListCall{Call: call}
+	return &MockIDelegationCursorListCall{Call: call}
 }
 
-// IDelegationCursorListCall wrap *gomock.Call
-type IDelegationCursorListCall struct {
+// MockIDelegationCursorListCall wrap *gomock.Call
+type MockIDelegationCursorListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IDelegationCursorListCall) Return(arg0 []*storage.Delegation, arg1 error) *IDelegationCursorListCall {
+func (c *MockIDelegationCursorListCall) Return(arg0 []*storage.Delegation, arg1 error) *MockIDelegationCursorListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IDelegationCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Delegation, error)) *IDelegationCursorListCall {
+func (c *MockIDelegationCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Delegation, error)) *MockIDelegationCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IDelegationCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Delegation, error)) *IDelegationCursorListCall {
+func (c *MockIDelegationCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Delegation, error)) *MockIDelegationCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -170,31 +176,31 @@ func (m *MockIDelegation) GetByID(ctx context.Context, id uint64) (*storage.Dele
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockIDelegationMockRecorder) GetByID(ctx, id any) *IDelegationGetByIDCall {
+func (mr *MockIDelegationMockRecorder) GetByID(ctx, id any) *MockIDelegationGetByIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockIDelegation)(nil).GetByID), ctx, id)
-	return &IDelegationGetByIDCall{Call: call}
+	return &MockIDelegationGetByIDCall{Call: call}
 }
 
-// IDelegationGetByIDCall wrap *gomock.Call
-type IDelegationGetByIDCall struct {
+// MockIDelegationGetByIDCall wrap *gomock.Call
+type MockIDelegationGetByIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IDelegationGetByIDCall) Return(arg0 *storage.Delegation, arg1 error) *IDelegationGetByIDCall {
+func (c *MockIDelegationGetByIDCall) Return(arg0 *storage.Delegation, arg1 error) *MockIDelegationGetByIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IDelegationGetByIDCall) Do(f func(context.Context, uint64) (*storage.Delegation, error)) *IDelegationGetByIDCall {
+func (c *MockIDelegationGetByIDCall) Do(f func(context.Context, uint64) (*storage.Delegation, error)) *MockIDelegationGetByIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IDelegationGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Delegation, error)) *IDelegationGetByIDCall {
+func (c *MockIDelegationGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Delegation, error)) *MockIDelegationGetByIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -208,31 +214,31 @@ func (m *MockIDelegation) IsNoRows(err error) bool {
 }
 
 // IsNoRows indicates an expected call of IsNoRows.
-func (mr *MockIDelegationMockRecorder) IsNoRows(err any) *IDelegationIsNoRowsCall {
+func (mr *MockIDelegationMockRecorder) IsNoRows(err any) *MockIDelegationIsNoRowsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoRows", reflect.TypeOf((*MockIDelegation)(nil).IsNoRows), err)
-	return &IDelegationIsNoRowsCall{Call: call}
+	return &MockIDelegationIsNoRowsCall{Call: call}
 }
 
-// IDelegationIsNoRowsCall wrap *gomock.Call
-type IDelegationIsNoRowsCall struct {
+// MockIDelegationIsNoRowsCall wrap *gomock.Call
+type MockIDelegationIsNoRowsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IDelegationIsNoRowsCall) Return(arg0 bool) *IDelegationIsNoRowsCall {
+func (c *MockIDelegationIsNoRowsCall) Return(arg0 bool) *MockIDelegationIsNoRowsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IDelegationIsNoRowsCall) Do(f func(error) bool) *IDelegationIsNoRowsCall {
+func (c *MockIDelegationIsNoRowsCall) Do(f func(error) bool) *MockIDelegationIsNoRowsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IDelegationIsNoRowsCall) DoAndReturn(f func(error) bool) *IDelegationIsNoRowsCall {
+func (c *MockIDelegationIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIDelegationIsNoRowsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -247,31 +253,31 @@ func (m *MockIDelegation) LastID(ctx context.Context) (uint64, error) {
 }
 
 // LastID indicates an expected call of LastID.
-func (mr *MockIDelegationMockRecorder) LastID(ctx any) *IDelegationLastIDCall {
+func (mr *MockIDelegationMockRecorder) LastID(ctx any) *MockIDelegationLastIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastID", reflect.TypeOf((*MockIDelegation)(nil).LastID), ctx)
-	return &IDelegationLastIDCall{Call: call}
+	return &MockIDelegationLastIDCall{Call: call}
 }
 
-// IDelegationLastIDCall wrap *gomock.Call
-type IDelegationLastIDCall struct {
+// MockIDelegationLastIDCall wrap *gomock.Call
+type MockIDelegationLastIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IDelegationLastIDCall) Return(arg0 uint64, arg1 error) *IDelegationLastIDCall {
+func (c *MockIDelegationLastIDCall) Return(arg0 uint64, arg1 error) *MockIDelegationLastIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IDelegationLastIDCall) Do(f func(context.Context) (uint64, error)) *IDelegationLastIDCall {
+func (c *MockIDelegationLastIDCall) Do(f func(context.Context) (uint64, error)) *MockIDelegationLastIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IDelegationLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *IDelegationLastIDCall {
+func (c *MockIDelegationLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockIDelegationLastIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -286,31 +292,31 @@ func (m *MockIDelegation) List(ctx context.Context, limit, offset uint64, order 
 }
 
 // List indicates an expected call of List.
-func (mr *MockIDelegationMockRecorder) List(ctx, limit, offset, order any) *IDelegationListCall {
+func (mr *MockIDelegationMockRecorder) List(ctx, limit, offset, order any) *MockIDelegationListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIDelegation)(nil).List), ctx, limit, offset, order)
-	return &IDelegationListCall{Call: call}
+	return &MockIDelegationListCall{Call: call}
 }
 
-// IDelegationListCall wrap *gomock.Call
-type IDelegationListCall struct {
+// MockIDelegationListCall wrap *gomock.Call
+type MockIDelegationListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IDelegationListCall) Return(arg0 []*storage.Delegation, arg1 error) *IDelegationListCall {
+func (c *MockIDelegationListCall) Return(arg0 []*storage.Delegation, arg1 error) *MockIDelegationListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IDelegationListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Delegation, error)) *IDelegationListCall {
+func (c *MockIDelegationListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Delegation, error)) *MockIDelegationListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IDelegationListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Delegation, error)) *IDelegationListCall {
+func (c *MockIDelegationListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Delegation, error)) *MockIDelegationListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -324,31 +330,31 @@ func (m_2 *MockIDelegation) Save(ctx context.Context, m *storage.Delegation) err
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockIDelegationMockRecorder) Save(ctx, m any) *IDelegationSaveCall {
+func (mr *MockIDelegationMockRecorder) Save(ctx, m any) *MockIDelegationSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIDelegation)(nil).Save), ctx, m)
-	return &IDelegationSaveCall{Call: call}
+	return &MockIDelegationSaveCall{Call: call}
 }
 
-// IDelegationSaveCall wrap *gomock.Call
-type IDelegationSaveCall struct {
+// MockIDelegationSaveCall wrap *gomock.Call
+type MockIDelegationSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IDelegationSaveCall) Return(arg0 error) *IDelegationSaveCall {
+func (c *MockIDelegationSaveCall) Return(arg0 error) *MockIDelegationSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IDelegationSaveCall) Do(f func(context.Context, *storage.Delegation) error) *IDelegationSaveCall {
+func (c *MockIDelegationSaveCall) Do(f func(context.Context, *storage.Delegation) error) *MockIDelegationSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IDelegationSaveCall) DoAndReturn(f func(context.Context, *storage.Delegation) error) *IDelegationSaveCall {
+func (c *MockIDelegationSaveCall) DoAndReturn(f func(context.Context, *storage.Delegation) error) *MockIDelegationSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -362,31 +368,31 @@ func (m_2 *MockIDelegation) Update(ctx context.Context, m *storage.Delegation) e
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIDelegationMockRecorder) Update(ctx, m any) *IDelegationUpdateCall {
+func (mr *MockIDelegationMockRecorder) Update(ctx, m any) *MockIDelegationUpdateCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIDelegation)(nil).Update), ctx, m)
-	return &IDelegationUpdateCall{Call: call}
+	return &MockIDelegationUpdateCall{Call: call}
 }
 
-// IDelegationUpdateCall wrap *gomock.Call
-type IDelegationUpdateCall struct {
+// MockIDelegationUpdateCall wrap *gomock.Call
+type MockIDelegationUpdateCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IDelegationUpdateCall) Return(arg0 error) *IDelegationUpdateCall {
+func (c *MockIDelegationUpdateCall) Return(arg0 error) *MockIDelegationUpdateCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IDelegationUpdateCall) Do(f func(context.Context, *storage.Delegation) error) *IDelegationUpdateCall {
+func (c *MockIDelegationUpdateCall) Do(f func(context.Context, *storage.Delegation) error) *MockIDelegationUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IDelegationUpdateCall) DoAndReturn(f func(context.Context, *storage.Delegation) error) *IDelegationUpdateCall {
+func (c *MockIDelegationUpdateCall) DoAndReturn(f func(context.Context, *storage.Delegation) error) *MockIDelegationUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

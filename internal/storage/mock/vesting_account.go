@@ -8,6 +8,7 @@
 //
 //	mockgen -source=vesting_account.go -destination=mock/vesting_account.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,6 +44,11 @@ func (m *MockIVestingAccount) EXPECT() *MockIVestingAccountMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIVestingAccount) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // ByAddress mocks base method.
 func (m *MockIVestingAccount) ByAddress(ctx context.Context, addressId uint64, limit, offset int, showEnded bool) ([]storage.VestingAccount, error) {
 	m.ctrl.T.Helper()
@@ -53,31 +59,31 @@ func (m *MockIVestingAccount) ByAddress(ctx context.Context, addressId uint64, l
 }
 
 // ByAddress indicates an expected call of ByAddress.
-func (mr *MockIVestingAccountMockRecorder) ByAddress(ctx, addressId, limit, offset, showEnded any) *IVestingAccountByAddressCall {
+func (mr *MockIVestingAccountMockRecorder) ByAddress(ctx, addressId, limit, offset, showEnded any) *MockIVestingAccountByAddressCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByAddress", reflect.TypeOf((*MockIVestingAccount)(nil).ByAddress), ctx, addressId, limit, offset, showEnded)
-	return &IVestingAccountByAddressCall{Call: call}
+	return &MockIVestingAccountByAddressCall{Call: call}
 }
 
-// IVestingAccountByAddressCall wrap *gomock.Call
-type IVestingAccountByAddressCall struct {
+// MockIVestingAccountByAddressCall wrap *gomock.Call
+type MockIVestingAccountByAddressCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingAccountByAddressCall) Return(arg0 []storage.VestingAccount, arg1 error) *IVestingAccountByAddressCall {
+func (c *MockIVestingAccountByAddressCall) Return(arg0 []storage.VestingAccount, arg1 error) *MockIVestingAccountByAddressCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingAccountByAddressCall) Do(f func(context.Context, uint64, int, int, bool) ([]storage.VestingAccount, error)) *IVestingAccountByAddressCall {
+func (c *MockIVestingAccountByAddressCall) Do(f func(context.Context, uint64, int, int, bool) ([]storage.VestingAccount, error)) *MockIVestingAccountByAddressCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingAccountByAddressCall) DoAndReturn(f func(context.Context, uint64, int, int, bool) ([]storage.VestingAccount, error)) *IVestingAccountByAddressCall {
+func (c *MockIVestingAccountByAddressCall) DoAndReturn(f func(context.Context, uint64, int, int, bool) ([]storage.VestingAccount, error)) *MockIVestingAccountByAddressCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +98,31 @@ func (m *MockIVestingAccount) CursorList(ctx context.Context, id, limit uint64, 
 }
 
 // CursorList indicates an expected call of CursorList.
-func (mr *MockIVestingAccountMockRecorder) CursorList(ctx, id, limit, order, cmp any) *IVestingAccountCursorListCall {
+func (mr *MockIVestingAccountMockRecorder) CursorList(ctx, id, limit, order, cmp any) *MockIVestingAccountCursorListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CursorList", reflect.TypeOf((*MockIVestingAccount)(nil).CursorList), ctx, id, limit, order, cmp)
-	return &IVestingAccountCursorListCall{Call: call}
+	return &MockIVestingAccountCursorListCall{Call: call}
 }
 
-// IVestingAccountCursorListCall wrap *gomock.Call
-type IVestingAccountCursorListCall struct {
+// MockIVestingAccountCursorListCall wrap *gomock.Call
+type MockIVestingAccountCursorListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingAccountCursorListCall) Return(arg0 []*storage.VestingAccount, arg1 error) *IVestingAccountCursorListCall {
+func (c *MockIVestingAccountCursorListCall) Return(arg0 []*storage.VestingAccount, arg1 error) *MockIVestingAccountCursorListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingAccountCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingAccount, error)) *IVestingAccountCursorListCall {
+func (c *MockIVestingAccountCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingAccount, error)) *MockIVestingAccountCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingAccountCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingAccount, error)) *IVestingAccountCursorListCall {
+func (c *MockIVestingAccountCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingAccount, error)) *MockIVestingAccountCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -131,31 +137,31 @@ func (m *MockIVestingAccount) GetByID(ctx context.Context, id uint64) (*storage.
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockIVestingAccountMockRecorder) GetByID(ctx, id any) *IVestingAccountGetByIDCall {
+func (mr *MockIVestingAccountMockRecorder) GetByID(ctx, id any) *MockIVestingAccountGetByIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockIVestingAccount)(nil).GetByID), ctx, id)
-	return &IVestingAccountGetByIDCall{Call: call}
+	return &MockIVestingAccountGetByIDCall{Call: call}
 }
 
-// IVestingAccountGetByIDCall wrap *gomock.Call
-type IVestingAccountGetByIDCall struct {
+// MockIVestingAccountGetByIDCall wrap *gomock.Call
+type MockIVestingAccountGetByIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingAccountGetByIDCall) Return(arg0 *storage.VestingAccount, arg1 error) *IVestingAccountGetByIDCall {
+func (c *MockIVestingAccountGetByIDCall) Return(arg0 *storage.VestingAccount, arg1 error) *MockIVestingAccountGetByIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingAccountGetByIDCall) Do(f func(context.Context, uint64) (*storage.VestingAccount, error)) *IVestingAccountGetByIDCall {
+func (c *MockIVestingAccountGetByIDCall) Do(f func(context.Context, uint64) (*storage.VestingAccount, error)) *MockIVestingAccountGetByIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingAccountGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.VestingAccount, error)) *IVestingAccountGetByIDCall {
+func (c *MockIVestingAccountGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.VestingAccount, error)) *MockIVestingAccountGetByIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -169,31 +175,31 @@ func (m *MockIVestingAccount) IsNoRows(err error) bool {
 }
 
 // IsNoRows indicates an expected call of IsNoRows.
-func (mr *MockIVestingAccountMockRecorder) IsNoRows(err any) *IVestingAccountIsNoRowsCall {
+func (mr *MockIVestingAccountMockRecorder) IsNoRows(err any) *MockIVestingAccountIsNoRowsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoRows", reflect.TypeOf((*MockIVestingAccount)(nil).IsNoRows), err)
-	return &IVestingAccountIsNoRowsCall{Call: call}
+	return &MockIVestingAccountIsNoRowsCall{Call: call}
 }
 
-// IVestingAccountIsNoRowsCall wrap *gomock.Call
-type IVestingAccountIsNoRowsCall struct {
+// MockIVestingAccountIsNoRowsCall wrap *gomock.Call
+type MockIVestingAccountIsNoRowsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingAccountIsNoRowsCall) Return(arg0 bool) *IVestingAccountIsNoRowsCall {
+func (c *MockIVestingAccountIsNoRowsCall) Return(arg0 bool) *MockIVestingAccountIsNoRowsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingAccountIsNoRowsCall) Do(f func(error) bool) *IVestingAccountIsNoRowsCall {
+func (c *MockIVestingAccountIsNoRowsCall) Do(f func(error) bool) *MockIVestingAccountIsNoRowsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingAccountIsNoRowsCall) DoAndReturn(f func(error) bool) *IVestingAccountIsNoRowsCall {
+func (c *MockIVestingAccountIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIVestingAccountIsNoRowsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -208,31 +214,31 @@ func (m *MockIVestingAccount) LastID(ctx context.Context) (uint64, error) {
 }
 
 // LastID indicates an expected call of LastID.
-func (mr *MockIVestingAccountMockRecorder) LastID(ctx any) *IVestingAccountLastIDCall {
+func (mr *MockIVestingAccountMockRecorder) LastID(ctx any) *MockIVestingAccountLastIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastID", reflect.TypeOf((*MockIVestingAccount)(nil).LastID), ctx)
-	return &IVestingAccountLastIDCall{Call: call}
+	return &MockIVestingAccountLastIDCall{Call: call}
 }
 
-// IVestingAccountLastIDCall wrap *gomock.Call
-type IVestingAccountLastIDCall struct {
+// MockIVestingAccountLastIDCall wrap *gomock.Call
+type MockIVestingAccountLastIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingAccountLastIDCall) Return(arg0 uint64, arg1 error) *IVestingAccountLastIDCall {
+func (c *MockIVestingAccountLastIDCall) Return(arg0 uint64, arg1 error) *MockIVestingAccountLastIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingAccountLastIDCall) Do(f func(context.Context) (uint64, error)) *IVestingAccountLastIDCall {
+func (c *MockIVestingAccountLastIDCall) Do(f func(context.Context) (uint64, error)) *MockIVestingAccountLastIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingAccountLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *IVestingAccountLastIDCall {
+func (c *MockIVestingAccountLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockIVestingAccountLastIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -247,31 +253,31 @@ func (m *MockIVestingAccount) List(ctx context.Context, limit, offset uint64, or
 }
 
 // List indicates an expected call of List.
-func (mr *MockIVestingAccountMockRecorder) List(ctx, limit, offset, order any) *IVestingAccountListCall {
+func (mr *MockIVestingAccountMockRecorder) List(ctx, limit, offset, order any) *MockIVestingAccountListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIVestingAccount)(nil).List), ctx, limit, offset, order)
-	return &IVestingAccountListCall{Call: call}
+	return &MockIVestingAccountListCall{Call: call}
 }
 
-// IVestingAccountListCall wrap *gomock.Call
-type IVestingAccountListCall struct {
+// MockIVestingAccountListCall wrap *gomock.Call
+type MockIVestingAccountListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingAccountListCall) Return(arg0 []*storage.VestingAccount, arg1 error) *IVestingAccountListCall {
+func (c *MockIVestingAccountListCall) Return(arg0 []*storage.VestingAccount, arg1 error) *MockIVestingAccountListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingAccountListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.VestingAccount, error)) *IVestingAccountListCall {
+func (c *MockIVestingAccountListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.VestingAccount, error)) *MockIVestingAccountListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingAccountListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.VestingAccount, error)) *IVestingAccountListCall {
+func (c *MockIVestingAccountListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.VestingAccount, error)) *MockIVestingAccountListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -285,31 +291,31 @@ func (m_2 *MockIVestingAccount) Save(ctx context.Context, m *storage.VestingAcco
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockIVestingAccountMockRecorder) Save(ctx, m any) *IVestingAccountSaveCall {
+func (mr *MockIVestingAccountMockRecorder) Save(ctx, m any) *MockIVestingAccountSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIVestingAccount)(nil).Save), ctx, m)
-	return &IVestingAccountSaveCall{Call: call}
+	return &MockIVestingAccountSaveCall{Call: call}
 }
 
-// IVestingAccountSaveCall wrap *gomock.Call
-type IVestingAccountSaveCall struct {
+// MockIVestingAccountSaveCall wrap *gomock.Call
+type MockIVestingAccountSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingAccountSaveCall) Return(arg0 error) *IVestingAccountSaveCall {
+func (c *MockIVestingAccountSaveCall) Return(arg0 error) *MockIVestingAccountSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingAccountSaveCall) Do(f func(context.Context, *storage.VestingAccount) error) *IVestingAccountSaveCall {
+func (c *MockIVestingAccountSaveCall) Do(f func(context.Context, *storage.VestingAccount) error) *MockIVestingAccountSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingAccountSaveCall) DoAndReturn(f func(context.Context, *storage.VestingAccount) error) *IVestingAccountSaveCall {
+func (c *MockIVestingAccountSaveCall) DoAndReturn(f func(context.Context, *storage.VestingAccount) error) *MockIVestingAccountSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -323,31 +329,31 @@ func (m_2 *MockIVestingAccount) Update(ctx context.Context, m *storage.VestingAc
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIVestingAccountMockRecorder) Update(ctx, m any) *IVestingAccountUpdateCall {
+func (mr *MockIVestingAccountMockRecorder) Update(ctx, m any) *MockIVestingAccountUpdateCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIVestingAccount)(nil).Update), ctx, m)
-	return &IVestingAccountUpdateCall{Call: call}
+	return &MockIVestingAccountUpdateCall{Call: call}
 }
 
-// IVestingAccountUpdateCall wrap *gomock.Call
-type IVestingAccountUpdateCall struct {
+// MockIVestingAccountUpdateCall wrap *gomock.Call
+type MockIVestingAccountUpdateCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IVestingAccountUpdateCall) Return(arg0 error) *IVestingAccountUpdateCall {
+func (c *MockIVestingAccountUpdateCall) Return(arg0 error) *MockIVestingAccountUpdateCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IVestingAccountUpdateCall) Do(f func(context.Context, *storage.VestingAccount) error) *IVestingAccountUpdateCall {
+func (c *MockIVestingAccountUpdateCall) Do(f func(context.Context, *storage.VestingAccount) error) *MockIVestingAccountUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IVestingAccountUpdateCall) DoAndReturn(f func(context.Context, *storage.VestingAccount) error) *IVestingAccountUpdateCall {
+func (c *MockIVestingAccountUpdateCall) DoAndReturn(f func(context.Context, *storage.VestingAccount) error) *MockIVestingAccountUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

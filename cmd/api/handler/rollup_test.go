@@ -95,7 +95,8 @@ func (s *RollupTestSuite) TestLeaderboard() {
 
 		s.rollups.EXPECT().
 			Leaderboard(gomock.Any(), sort, sdk.SortOrderDesc, 10, 0).
-			Return([]storage.RollupWithStats{testRollupWithStats}, nil)
+			Return([]storage.RollupWithStats{testRollupWithStats}, nil).
+			Times(1)
 
 		s.Require().NoError(s.handler.Leaderboard(c))
 		s.Require().Equal(http.StatusOK, rec.Code)
@@ -129,12 +130,9 @@ func (s *RollupTestSuite) TestGet() {
 	c.SetParamValues("1")
 
 	s.rollups.EXPECT().
-		GetByID(gomock.Any(), uint64(1)).
-		Return(&testRollup, nil)
-
-	s.rollups.EXPECT().
-		Stats(gomock.Any(), uint64(1)).
-		Return(testRollupWithStats.RollupStats, nil)
+		ById(gomock.Any(), uint64(1)).
+		Return(testRollupWithStats, nil).
+		Times(1)
 
 	s.Require().NoError(s.handler.Get(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
@@ -308,15 +306,8 @@ func (s *RollupTestSuite) TestBySlug() {
 
 	s.rollups.EXPECT().
 		BySlug(gomock.Any(), "test").
-		Return(testRollup, nil)
-
-	s.rollups.EXPECT().
-		Stats(gomock.Any(), uint64(1)).
-		Return(storage.RollupStats{
-			Size:           10,
-			BlobsCount:     11,
-			LastActionTime: testTime,
-		}, nil)
+		Return(testRollupWithStats, nil).
+		Times(1)
 
 	s.Require().NoError(s.handler.BySlug(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
@@ -328,8 +319,8 @@ func (s *RollupTestSuite) TestBySlug() {
 	s.Require().EqualValues("test rollup", rollup.Name)
 	s.Require().EqualValues("test-rollup", rollup.Slug)
 	s.Require().EqualValues("image.png", rollup.Logo)
-	s.Require().EqualValues(10, rollup.Size)
-	s.Require().EqualValues(11, rollup.BlobsCount)
+	s.Require().EqualValues(1000, rollup.Size)
+	s.Require().EqualValues(100, rollup.BlobsCount)
 	s.Require().EqualValues(testTime, rollup.LastAction)
 }
 

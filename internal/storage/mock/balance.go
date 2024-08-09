@@ -8,6 +8,7 @@
 //
 //	mockgen -source=balance.go -destination=mock/balance.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,6 +44,11 @@ func (m *MockIBalance) EXPECT() *MockIBalanceMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIBalance) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // CursorList mocks base method.
 func (m *MockIBalance) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Balance, error) {
 	m.ctrl.T.Helper()
@@ -53,31 +59,31 @@ func (m *MockIBalance) CursorList(ctx context.Context, id, limit uint64, order s
 }
 
 // CursorList indicates an expected call of CursorList.
-func (mr *MockIBalanceMockRecorder) CursorList(ctx, id, limit, order, cmp any) *IBalanceCursorListCall {
+func (mr *MockIBalanceMockRecorder) CursorList(ctx, id, limit, order, cmp any) *MockIBalanceCursorListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CursorList", reflect.TypeOf((*MockIBalance)(nil).CursorList), ctx, id, limit, order, cmp)
-	return &IBalanceCursorListCall{Call: call}
+	return &MockIBalanceCursorListCall{Call: call}
 }
 
-// IBalanceCursorListCall wrap *gomock.Call
-type IBalanceCursorListCall struct {
+// MockIBalanceCursorListCall wrap *gomock.Call
+type MockIBalanceCursorListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBalanceCursorListCall) Return(arg0 []*storage.Balance, arg1 error) *IBalanceCursorListCall {
+func (c *MockIBalanceCursorListCall) Return(arg0 []*storage.Balance, arg1 error) *MockIBalanceCursorListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBalanceCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Balance, error)) *IBalanceCursorListCall {
+func (c *MockIBalanceCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Balance, error)) *MockIBalanceCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBalanceCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Balance, error)) *IBalanceCursorListCall {
+func (c *MockIBalanceCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Balance, error)) *MockIBalanceCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +98,31 @@ func (m *MockIBalance) GetByID(ctx context.Context, id uint64) (*storage.Balance
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockIBalanceMockRecorder) GetByID(ctx, id any) *IBalanceGetByIDCall {
+func (mr *MockIBalanceMockRecorder) GetByID(ctx, id any) *MockIBalanceGetByIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockIBalance)(nil).GetByID), ctx, id)
-	return &IBalanceGetByIDCall{Call: call}
+	return &MockIBalanceGetByIDCall{Call: call}
 }
 
-// IBalanceGetByIDCall wrap *gomock.Call
-type IBalanceGetByIDCall struct {
+// MockIBalanceGetByIDCall wrap *gomock.Call
+type MockIBalanceGetByIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBalanceGetByIDCall) Return(arg0 *storage.Balance, arg1 error) *IBalanceGetByIDCall {
+func (c *MockIBalanceGetByIDCall) Return(arg0 *storage.Balance, arg1 error) *MockIBalanceGetByIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBalanceGetByIDCall) Do(f func(context.Context, uint64) (*storage.Balance, error)) *IBalanceGetByIDCall {
+func (c *MockIBalanceGetByIDCall) Do(f func(context.Context, uint64) (*storage.Balance, error)) *MockIBalanceGetByIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBalanceGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Balance, error)) *IBalanceGetByIDCall {
+func (c *MockIBalanceGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Balance, error)) *MockIBalanceGetByIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -130,31 +136,31 @@ func (m *MockIBalance) IsNoRows(err error) bool {
 }
 
 // IsNoRows indicates an expected call of IsNoRows.
-func (mr *MockIBalanceMockRecorder) IsNoRows(err any) *IBalanceIsNoRowsCall {
+func (mr *MockIBalanceMockRecorder) IsNoRows(err any) *MockIBalanceIsNoRowsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoRows", reflect.TypeOf((*MockIBalance)(nil).IsNoRows), err)
-	return &IBalanceIsNoRowsCall{Call: call}
+	return &MockIBalanceIsNoRowsCall{Call: call}
 }
 
-// IBalanceIsNoRowsCall wrap *gomock.Call
-type IBalanceIsNoRowsCall struct {
+// MockIBalanceIsNoRowsCall wrap *gomock.Call
+type MockIBalanceIsNoRowsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBalanceIsNoRowsCall) Return(arg0 bool) *IBalanceIsNoRowsCall {
+func (c *MockIBalanceIsNoRowsCall) Return(arg0 bool) *MockIBalanceIsNoRowsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBalanceIsNoRowsCall) Do(f func(error) bool) *IBalanceIsNoRowsCall {
+func (c *MockIBalanceIsNoRowsCall) Do(f func(error) bool) *MockIBalanceIsNoRowsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBalanceIsNoRowsCall) DoAndReturn(f func(error) bool) *IBalanceIsNoRowsCall {
+func (c *MockIBalanceIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIBalanceIsNoRowsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -169,31 +175,31 @@ func (m *MockIBalance) LastID(ctx context.Context) (uint64, error) {
 }
 
 // LastID indicates an expected call of LastID.
-func (mr *MockIBalanceMockRecorder) LastID(ctx any) *IBalanceLastIDCall {
+func (mr *MockIBalanceMockRecorder) LastID(ctx any) *MockIBalanceLastIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastID", reflect.TypeOf((*MockIBalance)(nil).LastID), ctx)
-	return &IBalanceLastIDCall{Call: call}
+	return &MockIBalanceLastIDCall{Call: call}
 }
 
-// IBalanceLastIDCall wrap *gomock.Call
-type IBalanceLastIDCall struct {
+// MockIBalanceLastIDCall wrap *gomock.Call
+type MockIBalanceLastIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBalanceLastIDCall) Return(arg0 uint64, arg1 error) *IBalanceLastIDCall {
+func (c *MockIBalanceLastIDCall) Return(arg0 uint64, arg1 error) *MockIBalanceLastIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBalanceLastIDCall) Do(f func(context.Context) (uint64, error)) *IBalanceLastIDCall {
+func (c *MockIBalanceLastIDCall) Do(f func(context.Context) (uint64, error)) *MockIBalanceLastIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBalanceLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *IBalanceLastIDCall {
+func (c *MockIBalanceLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockIBalanceLastIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -208,31 +214,31 @@ func (m *MockIBalance) List(ctx context.Context, limit, offset uint64, order sto
 }
 
 // List indicates an expected call of List.
-func (mr *MockIBalanceMockRecorder) List(ctx, limit, offset, order any) *IBalanceListCall {
+func (mr *MockIBalanceMockRecorder) List(ctx, limit, offset, order any) *MockIBalanceListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIBalance)(nil).List), ctx, limit, offset, order)
-	return &IBalanceListCall{Call: call}
+	return &MockIBalanceListCall{Call: call}
 }
 
-// IBalanceListCall wrap *gomock.Call
-type IBalanceListCall struct {
+// MockIBalanceListCall wrap *gomock.Call
+type MockIBalanceListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBalanceListCall) Return(arg0 []*storage.Balance, arg1 error) *IBalanceListCall {
+func (c *MockIBalanceListCall) Return(arg0 []*storage.Balance, arg1 error) *MockIBalanceListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBalanceListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Balance, error)) *IBalanceListCall {
+func (c *MockIBalanceListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Balance, error)) *MockIBalanceListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBalanceListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Balance, error)) *IBalanceListCall {
+func (c *MockIBalanceListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Balance, error)) *MockIBalanceListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -246,31 +252,31 @@ func (m_2 *MockIBalance) Save(ctx context.Context, m *storage.Balance) error {
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockIBalanceMockRecorder) Save(ctx, m any) *IBalanceSaveCall {
+func (mr *MockIBalanceMockRecorder) Save(ctx, m any) *MockIBalanceSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIBalance)(nil).Save), ctx, m)
-	return &IBalanceSaveCall{Call: call}
+	return &MockIBalanceSaveCall{Call: call}
 }
 
-// IBalanceSaveCall wrap *gomock.Call
-type IBalanceSaveCall struct {
+// MockIBalanceSaveCall wrap *gomock.Call
+type MockIBalanceSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBalanceSaveCall) Return(arg0 error) *IBalanceSaveCall {
+func (c *MockIBalanceSaveCall) Return(arg0 error) *MockIBalanceSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBalanceSaveCall) Do(f func(context.Context, *storage.Balance) error) *IBalanceSaveCall {
+func (c *MockIBalanceSaveCall) Do(f func(context.Context, *storage.Balance) error) *MockIBalanceSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBalanceSaveCall) DoAndReturn(f func(context.Context, *storage.Balance) error) *IBalanceSaveCall {
+func (c *MockIBalanceSaveCall) DoAndReturn(f func(context.Context, *storage.Balance) error) *MockIBalanceSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -284,31 +290,31 @@ func (m_2 *MockIBalance) Update(ctx context.Context, m *storage.Balance) error {
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIBalanceMockRecorder) Update(ctx, m any) *IBalanceUpdateCall {
+func (mr *MockIBalanceMockRecorder) Update(ctx, m any) *MockIBalanceUpdateCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIBalance)(nil).Update), ctx, m)
-	return &IBalanceUpdateCall{Call: call}
+	return &MockIBalanceUpdateCall{Call: call}
 }
 
-// IBalanceUpdateCall wrap *gomock.Call
-type IBalanceUpdateCall struct {
+// MockIBalanceUpdateCall wrap *gomock.Call
+type MockIBalanceUpdateCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBalanceUpdateCall) Return(arg0 error) *IBalanceUpdateCall {
+func (c *MockIBalanceUpdateCall) Return(arg0 error) *MockIBalanceUpdateCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBalanceUpdateCall) Do(f func(context.Context, *storage.Balance) error) *IBalanceUpdateCall {
+func (c *MockIBalanceUpdateCall) Do(f func(context.Context, *storage.Balance) error) *MockIBalanceUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBalanceUpdateCall) DoAndReturn(f func(context.Context, *storage.Balance) error) *IBalanceUpdateCall {
+func (c *MockIBalanceUpdateCall) DoAndReturn(f func(context.Context, *storage.Balance) error) *MockIBalanceUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

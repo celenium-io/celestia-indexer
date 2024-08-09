@@ -8,6 +8,7 @@
 //
 //	mockgen -source=jail.go -destination=mock/jail.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,6 +44,11 @@ func (m *MockIJail) EXPECT() *MockIJailMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIJail) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // ByValidator mocks base method.
 func (m *MockIJail) ByValidator(ctx context.Context, id uint64, limit, offset int) ([]storage.Jail, error) {
 	m.ctrl.T.Helper()
@@ -53,31 +59,31 @@ func (m *MockIJail) ByValidator(ctx context.Context, id uint64, limit, offset in
 }
 
 // ByValidator indicates an expected call of ByValidator.
-func (mr *MockIJailMockRecorder) ByValidator(ctx, id, limit, offset any) *IJailByValidatorCall {
+func (mr *MockIJailMockRecorder) ByValidator(ctx, id, limit, offset any) *MockIJailByValidatorCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByValidator", reflect.TypeOf((*MockIJail)(nil).ByValidator), ctx, id, limit, offset)
-	return &IJailByValidatorCall{Call: call}
+	return &MockIJailByValidatorCall{Call: call}
 }
 
-// IJailByValidatorCall wrap *gomock.Call
-type IJailByValidatorCall struct {
+// MockIJailByValidatorCall wrap *gomock.Call
+type MockIJailByValidatorCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IJailByValidatorCall) Return(arg0 []storage.Jail, arg1 error) *IJailByValidatorCall {
+func (c *MockIJailByValidatorCall) Return(arg0 []storage.Jail, arg1 error) *MockIJailByValidatorCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IJailByValidatorCall) Do(f func(context.Context, uint64, int, int) ([]storage.Jail, error)) *IJailByValidatorCall {
+func (c *MockIJailByValidatorCall) Do(f func(context.Context, uint64, int, int) ([]storage.Jail, error)) *MockIJailByValidatorCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IJailByValidatorCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Jail, error)) *IJailByValidatorCall {
+func (c *MockIJailByValidatorCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Jail, error)) *MockIJailByValidatorCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +98,31 @@ func (m *MockIJail) CursorList(ctx context.Context, id, limit uint64, order stor
 }
 
 // CursorList indicates an expected call of CursorList.
-func (mr *MockIJailMockRecorder) CursorList(ctx, id, limit, order, cmp any) *IJailCursorListCall {
+func (mr *MockIJailMockRecorder) CursorList(ctx, id, limit, order, cmp any) *MockIJailCursorListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CursorList", reflect.TypeOf((*MockIJail)(nil).CursorList), ctx, id, limit, order, cmp)
-	return &IJailCursorListCall{Call: call}
+	return &MockIJailCursorListCall{Call: call}
 }
 
-// IJailCursorListCall wrap *gomock.Call
-type IJailCursorListCall struct {
+// MockIJailCursorListCall wrap *gomock.Call
+type MockIJailCursorListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IJailCursorListCall) Return(arg0 []*storage.Jail, arg1 error) *IJailCursorListCall {
+func (c *MockIJailCursorListCall) Return(arg0 []*storage.Jail, arg1 error) *MockIJailCursorListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IJailCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Jail, error)) *IJailCursorListCall {
+func (c *MockIJailCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Jail, error)) *MockIJailCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IJailCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Jail, error)) *IJailCursorListCall {
+func (c *MockIJailCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Jail, error)) *MockIJailCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -131,31 +137,31 @@ func (m *MockIJail) GetByID(ctx context.Context, id uint64) (*storage.Jail, erro
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockIJailMockRecorder) GetByID(ctx, id any) *IJailGetByIDCall {
+func (mr *MockIJailMockRecorder) GetByID(ctx, id any) *MockIJailGetByIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockIJail)(nil).GetByID), ctx, id)
-	return &IJailGetByIDCall{Call: call}
+	return &MockIJailGetByIDCall{Call: call}
 }
 
-// IJailGetByIDCall wrap *gomock.Call
-type IJailGetByIDCall struct {
+// MockIJailGetByIDCall wrap *gomock.Call
+type MockIJailGetByIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IJailGetByIDCall) Return(arg0 *storage.Jail, arg1 error) *IJailGetByIDCall {
+func (c *MockIJailGetByIDCall) Return(arg0 *storage.Jail, arg1 error) *MockIJailGetByIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IJailGetByIDCall) Do(f func(context.Context, uint64) (*storage.Jail, error)) *IJailGetByIDCall {
+func (c *MockIJailGetByIDCall) Do(f func(context.Context, uint64) (*storage.Jail, error)) *MockIJailGetByIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IJailGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Jail, error)) *IJailGetByIDCall {
+func (c *MockIJailGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Jail, error)) *MockIJailGetByIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -169,31 +175,31 @@ func (m *MockIJail) IsNoRows(err error) bool {
 }
 
 // IsNoRows indicates an expected call of IsNoRows.
-func (mr *MockIJailMockRecorder) IsNoRows(err any) *IJailIsNoRowsCall {
+func (mr *MockIJailMockRecorder) IsNoRows(err any) *MockIJailIsNoRowsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoRows", reflect.TypeOf((*MockIJail)(nil).IsNoRows), err)
-	return &IJailIsNoRowsCall{Call: call}
+	return &MockIJailIsNoRowsCall{Call: call}
 }
 
-// IJailIsNoRowsCall wrap *gomock.Call
-type IJailIsNoRowsCall struct {
+// MockIJailIsNoRowsCall wrap *gomock.Call
+type MockIJailIsNoRowsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IJailIsNoRowsCall) Return(arg0 bool) *IJailIsNoRowsCall {
+func (c *MockIJailIsNoRowsCall) Return(arg0 bool) *MockIJailIsNoRowsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IJailIsNoRowsCall) Do(f func(error) bool) *IJailIsNoRowsCall {
+func (c *MockIJailIsNoRowsCall) Do(f func(error) bool) *MockIJailIsNoRowsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IJailIsNoRowsCall) DoAndReturn(f func(error) bool) *IJailIsNoRowsCall {
+func (c *MockIJailIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIJailIsNoRowsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -208,31 +214,31 @@ func (m *MockIJail) LastID(ctx context.Context) (uint64, error) {
 }
 
 // LastID indicates an expected call of LastID.
-func (mr *MockIJailMockRecorder) LastID(ctx any) *IJailLastIDCall {
+func (mr *MockIJailMockRecorder) LastID(ctx any) *MockIJailLastIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastID", reflect.TypeOf((*MockIJail)(nil).LastID), ctx)
-	return &IJailLastIDCall{Call: call}
+	return &MockIJailLastIDCall{Call: call}
 }
 
-// IJailLastIDCall wrap *gomock.Call
-type IJailLastIDCall struct {
+// MockIJailLastIDCall wrap *gomock.Call
+type MockIJailLastIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IJailLastIDCall) Return(arg0 uint64, arg1 error) *IJailLastIDCall {
+func (c *MockIJailLastIDCall) Return(arg0 uint64, arg1 error) *MockIJailLastIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IJailLastIDCall) Do(f func(context.Context) (uint64, error)) *IJailLastIDCall {
+func (c *MockIJailLastIDCall) Do(f func(context.Context) (uint64, error)) *MockIJailLastIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IJailLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *IJailLastIDCall {
+func (c *MockIJailLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockIJailLastIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -247,31 +253,31 @@ func (m *MockIJail) List(ctx context.Context, limit, offset uint64, order storag
 }
 
 // List indicates an expected call of List.
-func (mr *MockIJailMockRecorder) List(ctx, limit, offset, order any) *IJailListCall {
+func (mr *MockIJailMockRecorder) List(ctx, limit, offset, order any) *MockIJailListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIJail)(nil).List), ctx, limit, offset, order)
-	return &IJailListCall{Call: call}
+	return &MockIJailListCall{Call: call}
 }
 
-// IJailListCall wrap *gomock.Call
-type IJailListCall struct {
+// MockIJailListCall wrap *gomock.Call
+type MockIJailListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IJailListCall) Return(arg0 []*storage.Jail, arg1 error) *IJailListCall {
+func (c *MockIJailListCall) Return(arg0 []*storage.Jail, arg1 error) *MockIJailListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IJailListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Jail, error)) *IJailListCall {
+func (c *MockIJailListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Jail, error)) *MockIJailListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IJailListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Jail, error)) *IJailListCall {
+func (c *MockIJailListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Jail, error)) *MockIJailListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -285,31 +291,31 @@ func (m_2 *MockIJail) Save(ctx context.Context, m *storage.Jail) error {
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockIJailMockRecorder) Save(ctx, m any) *IJailSaveCall {
+func (mr *MockIJailMockRecorder) Save(ctx, m any) *MockIJailSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIJail)(nil).Save), ctx, m)
-	return &IJailSaveCall{Call: call}
+	return &MockIJailSaveCall{Call: call}
 }
 
-// IJailSaveCall wrap *gomock.Call
-type IJailSaveCall struct {
+// MockIJailSaveCall wrap *gomock.Call
+type MockIJailSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IJailSaveCall) Return(arg0 error) *IJailSaveCall {
+func (c *MockIJailSaveCall) Return(arg0 error) *MockIJailSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IJailSaveCall) Do(f func(context.Context, *storage.Jail) error) *IJailSaveCall {
+func (c *MockIJailSaveCall) Do(f func(context.Context, *storage.Jail) error) *MockIJailSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IJailSaveCall) DoAndReturn(f func(context.Context, *storage.Jail) error) *IJailSaveCall {
+func (c *MockIJailSaveCall) DoAndReturn(f func(context.Context, *storage.Jail) error) *MockIJailSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -323,31 +329,31 @@ func (m_2 *MockIJail) Update(ctx context.Context, m *storage.Jail) error {
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIJailMockRecorder) Update(ctx, m any) *IJailUpdateCall {
+func (mr *MockIJailMockRecorder) Update(ctx, m any) *MockIJailUpdateCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIJail)(nil).Update), ctx, m)
-	return &IJailUpdateCall{Call: call}
+	return &MockIJailUpdateCall{Call: call}
 }
 
-// IJailUpdateCall wrap *gomock.Call
-type IJailUpdateCall struct {
+// MockIJailUpdateCall wrap *gomock.Call
+type MockIJailUpdateCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IJailUpdateCall) Return(arg0 error) *IJailUpdateCall {
+func (c *MockIJailUpdateCall) Return(arg0 error) *MockIJailUpdateCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IJailUpdateCall) Do(f func(context.Context, *storage.Jail) error) *IJailUpdateCall {
+func (c *MockIJailUpdateCall) Do(f func(context.Context, *storage.Jail) error) *MockIJailUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IJailUpdateCall) DoAndReturn(f func(context.Context, *storage.Jail) error) *IJailUpdateCall {
+func (c *MockIJailUpdateCall) DoAndReturn(f func(context.Context, *storage.Jail) error) *MockIJailUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

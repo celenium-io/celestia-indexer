@@ -8,6 +8,7 @@
 //
 //	mockgen -source=constant.go -destination=mock/constant.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -43,6 +44,11 @@ func (m *MockIConstant) EXPECT() *MockIConstantMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIConstant) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // All mocks base method.
 func (m *MockIConstant) All(ctx context.Context) ([]storage.Constant, error) {
 	m.ctrl.T.Helper()
@@ -53,31 +59,31 @@ func (m *MockIConstant) All(ctx context.Context) ([]storage.Constant, error) {
 }
 
 // All indicates an expected call of All.
-func (mr *MockIConstantMockRecorder) All(ctx any) *IConstantAllCall {
+func (mr *MockIConstantMockRecorder) All(ctx any) *MockIConstantAllCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "All", reflect.TypeOf((*MockIConstant)(nil).All), ctx)
-	return &IConstantAllCall{Call: call}
+	return &MockIConstantAllCall{Call: call}
 }
 
-// IConstantAllCall wrap *gomock.Call
-type IConstantAllCall struct {
+// MockIConstantAllCall wrap *gomock.Call
+type MockIConstantAllCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IConstantAllCall) Return(arg0 []storage.Constant, arg1 error) *IConstantAllCall {
+func (c *MockIConstantAllCall) Return(arg0 []storage.Constant, arg1 error) *MockIConstantAllCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IConstantAllCall) Do(f func(context.Context) ([]storage.Constant, error)) *IConstantAllCall {
+func (c *MockIConstantAllCall) Do(f func(context.Context) ([]storage.Constant, error)) *MockIConstantAllCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IConstantAllCall) DoAndReturn(f func(context.Context) ([]storage.Constant, error)) *IConstantAllCall {
+func (c *MockIConstantAllCall) DoAndReturn(f func(context.Context) ([]storage.Constant, error)) *MockIConstantAllCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -92,31 +98,31 @@ func (m *MockIConstant) ByModule(ctx context.Context, module types.ModuleName) (
 }
 
 // ByModule indicates an expected call of ByModule.
-func (mr *MockIConstantMockRecorder) ByModule(ctx, module any) *IConstantByModuleCall {
+func (mr *MockIConstantMockRecorder) ByModule(ctx, module any) *MockIConstantByModuleCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByModule", reflect.TypeOf((*MockIConstant)(nil).ByModule), ctx, module)
-	return &IConstantByModuleCall{Call: call}
+	return &MockIConstantByModuleCall{Call: call}
 }
 
-// IConstantByModuleCall wrap *gomock.Call
-type IConstantByModuleCall struct {
+// MockIConstantByModuleCall wrap *gomock.Call
+type MockIConstantByModuleCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IConstantByModuleCall) Return(arg0 []storage.Constant, arg1 error) *IConstantByModuleCall {
+func (c *MockIConstantByModuleCall) Return(arg0 []storage.Constant, arg1 error) *MockIConstantByModuleCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IConstantByModuleCall) Do(f func(context.Context, types.ModuleName) ([]storage.Constant, error)) *IConstantByModuleCall {
+func (c *MockIConstantByModuleCall) Do(f func(context.Context, types.ModuleName) ([]storage.Constant, error)) *MockIConstantByModuleCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IConstantByModuleCall) DoAndReturn(f func(context.Context, types.ModuleName) ([]storage.Constant, error)) *IConstantByModuleCall {
+func (c *MockIConstantByModuleCall) DoAndReturn(f func(context.Context, types.ModuleName) ([]storage.Constant, error)) *MockIConstantByModuleCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -131,31 +137,31 @@ func (m *MockIConstant) Get(ctx context.Context, module types.ModuleName, name s
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockIConstantMockRecorder) Get(ctx, module, name any) *IConstantGetCall {
+func (mr *MockIConstantMockRecorder) Get(ctx, module, name any) *MockIConstantGetCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockIConstant)(nil).Get), ctx, module, name)
-	return &IConstantGetCall{Call: call}
+	return &MockIConstantGetCall{Call: call}
 }
 
-// IConstantGetCall wrap *gomock.Call
-type IConstantGetCall struct {
+// MockIConstantGetCall wrap *gomock.Call
+type MockIConstantGetCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IConstantGetCall) Return(arg0 storage.Constant, arg1 error) *IConstantGetCall {
+func (c *MockIConstantGetCall) Return(arg0 storage.Constant, arg1 error) *MockIConstantGetCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IConstantGetCall) Do(f func(context.Context, types.ModuleName, string) (storage.Constant, error)) *IConstantGetCall {
+func (c *MockIConstantGetCall) Do(f func(context.Context, types.ModuleName, string) (storage.Constant, error)) *MockIConstantGetCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IConstantGetCall) DoAndReturn(f func(context.Context, types.ModuleName, string) (storage.Constant, error)) *IConstantGetCall {
+func (c *MockIConstantGetCall) DoAndReturn(f func(context.Context, types.ModuleName, string) (storage.Constant, error)) *MockIConstantGetCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

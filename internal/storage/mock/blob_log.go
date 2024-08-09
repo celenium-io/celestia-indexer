@@ -8,6 +8,7 @@
 //
 //	mockgen -source=blob_log.go -destination=mock/blob_log.go -package=mock -typed
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -46,6 +47,11 @@ func (m *MockIBlobLog) EXPECT() *MockIBlobLogMockRecorder {
 	return m.recorder
 }
 
+// ISGOMOCK indicates that this struct is a gomock mock.
+func (m *MockIBlobLog) ISGOMOCK() struct{} {
+	return struct{}{}
+}
+
 // Blob mocks base method.
 func (m *MockIBlobLog) Blob(ctx context.Context, height types.Level, nsId uint64, commitment string) (storage.BlobLog, error) {
 	m.ctrl.T.Helper()
@@ -56,31 +62,31 @@ func (m *MockIBlobLog) Blob(ctx context.Context, height types.Level, nsId uint64
 }
 
 // Blob indicates an expected call of Blob.
-func (mr *MockIBlobLogMockRecorder) Blob(ctx, height, nsId, commitment any) *IBlobLogBlobCall {
+func (mr *MockIBlobLogMockRecorder) Blob(ctx, height, nsId, commitment any) *MockIBlobLogBlobCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Blob", reflect.TypeOf((*MockIBlobLog)(nil).Blob), ctx, height, nsId, commitment)
-	return &IBlobLogBlobCall{Call: call}
+	return &MockIBlobLogBlobCall{Call: call}
 }
 
-// IBlobLogBlobCall wrap *gomock.Call
-type IBlobLogBlobCall struct {
+// MockIBlobLogBlobCall wrap *gomock.Call
+type MockIBlobLogBlobCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogBlobCall) Return(arg0 storage.BlobLog, arg1 error) *IBlobLogBlobCall {
+func (c *MockIBlobLogBlobCall) Return(arg0 storage.BlobLog, arg1 error) *MockIBlobLogBlobCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogBlobCall) Do(f func(context.Context, types.Level, uint64, string) (storage.BlobLog, error)) *IBlobLogBlobCall {
+func (c *MockIBlobLogBlobCall) Do(f func(context.Context, types.Level, uint64, string) (storage.BlobLog, error)) *MockIBlobLogBlobCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogBlobCall) DoAndReturn(f func(context.Context, types.Level, uint64, string) (storage.BlobLog, error)) *IBlobLogBlobCall {
+func (c *MockIBlobLogBlobCall) DoAndReturn(f func(context.Context, types.Level, uint64, string) (storage.BlobLog, error)) *MockIBlobLogBlobCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -95,31 +101,31 @@ func (m *MockIBlobLog) ByHeight(ctx context.Context, height types.Level, fltrs s
 }
 
 // ByHeight indicates an expected call of ByHeight.
-func (mr *MockIBlobLogMockRecorder) ByHeight(ctx, height, fltrs any) *IBlobLogByHeightCall {
+func (mr *MockIBlobLogMockRecorder) ByHeight(ctx, height, fltrs any) *MockIBlobLogByHeightCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByHeight", reflect.TypeOf((*MockIBlobLog)(nil).ByHeight), ctx, height, fltrs)
-	return &IBlobLogByHeightCall{Call: call}
+	return &MockIBlobLogByHeightCall{Call: call}
 }
 
-// IBlobLogByHeightCall wrap *gomock.Call
-type IBlobLogByHeightCall struct {
+// MockIBlobLogByHeightCall wrap *gomock.Call
+type MockIBlobLogByHeightCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogByHeightCall) Return(arg0 []storage.BlobLog, arg1 error) *IBlobLogByHeightCall {
+func (c *MockIBlobLogByHeightCall) Return(arg0 []storage.BlobLog, arg1 error) *MockIBlobLogByHeightCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogByHeightCall) Do(f func(context.Context, types.Level, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogByHeightCall {
+func (c *MockIBlobLogByHeightCall) Do(f func(context.Context, types.Level, storage.BlobLogFilters) ([]storage.BlobLog, error)) *MockIBlobLogByHeightCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogByHeightCall) DoAndReturn(f func(context.Context, types.Level, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogByHeightCall {
+func (c *MockIBlobLogByHeightCall) DoAndReturn(f func(context.Context, types.Level, storage.BlobLogFilters) ([]storage.BlobLog, error)) *MockIBlobLogByHeightCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -134,31 +140,31 @@ func (m *MockIBlobLog) ByNamespace(ctx context.Context, nsId uint64, fltrs stora
 }
 
 // ByNamespace indicates an expected call of ByNamespace.
-func (mr *MockIBlobLogMockRecorder) ByNamespace(ctx, nsId, fltrs any) *IBlobLogByNamespaceCall {
+func (mr *MockIBlobLogMockRecorder) ByNamespace(ctx, nsId, fltrs any) *MockIBlobLogByNamespaceCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByNamespace", reflect.TypeOf((*MockIBlobLog)(nil).ByNamespace), ctx, nsId, fltrs)
-	return &IBlobLogByNamespaceCall{Call: call}
+	return &MockIBlobLogByNamespaceCall{Call: call}
 }
 
-// IBlobLogByNamespaceCall wrap *gomock.Call
-type IBlobLogByNamespaceCall struct {
+// MockIBlobLogByNamespaceCall wrap *gomock.Call
+type MockIBlobLogByNamespaceCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogByNamespaceCall) Return(arg0 []storage.BlobLog, arg1 error) *IBlobLogByNamespaceCall {
+func (c *MockIBlobLogByNamespaceCall) Return(arg0 []storage.BlobLog, arg1 error) *MockIBlobLogByNamespaceCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogByNamespaceCall) Do(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogByNamespaceCall {
+func (c *MockIBlobLogByNamespaceCall) Do(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *MockIBlobLogByNamespaceCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogByNamespaceCall) DoAndReturn(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogByNamespaceCall {
+func (c *MockIBlobLogByNamespaceCall) DoAndReturn(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *MockIBlobLogByNamespaceCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -173,31 +179,31 @@ func (m *MockIBlobLog) ByProviders(ctx context.Context, providers []storage.Roll
 }
 
 // ByProviders indicates an expected call of ByProviders.
-func (mr *MockIBlobLogMockRecorder) ByProviders(ctx, providers, fltrs any) *IBlobLogByProvidersCall {
+func (mr *MockIBlobLogMockRecorder) ByProviders(ctx, providers, fltrs any) *MockIBlobLogByProvidersCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByProviders", reflect.TypeOf((*MockIBlobLog)(nil).ByProviders), ctx, providers, fltrs)
-	return &IBlobLogByProvidersCall{Call: call}
+	return &MockIBlobLogByProvidersCall{Call: call}
 }
 
-// IBlobLogByProvidersCall wrap *gomock.Call
-type IBlobLogByProvidersCall struct {
+// MockIBlobLogByProvidersCall wrap *gomock.Call
+type MockIBlobLogByProvidersCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogByProvidersCall) Return(arg0 []storage.BlobLog, arg1 error) *IBlobLogByProvidersCall {
+func (c *MockIBlobLogByProvidersCall) Return(arg0 []storage.BlobLog, arg1 error) *MockIBlobLogByProvidersCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogByProvidersCall) Do(f func(context.Context, []storage.RollupProvider, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogByProvidersCall {
+func (c *MockIBlobLogByProvidersCall) Do(f func(context.Context, []storage.RollupProvider, storage.BlobLogFilters) ([]storage.BlobLog, error)) *MockIBlobLogByProvidersCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogByProvidersCall) DoAndReturn(f func(context.Context, []storage.RollupProvider, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogByProvidersCall {
+func (c *MockIBlobLogByProvidersCall) DoAndReturn(f func(context.Context, []storage.RollupProvider, storage.BlobLogFilters) ([]storage.BlobLog, error)) *MockIBlobLogByProvidersCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -212,31 +218,31 @@ func (m *MockIBlobLog) BySigner(ctx context.Context, signerId uint64, fltrs stor
 }
 
 // BySigner indicates an expected call of BySigner.
-func (mr *MockIBlobLogMockRecorder) BySigner(ctx, signerId, fltrs any) *IBlobLogBySignerCall {
+func (mr *MockIBlobLogMockRecorder) BySigner(ctx, signerId, fltrs any) *MockIBlobLogBySignerCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BySigner", reflect.TypeOf((*MockIBlobLog)(nil).BySigner), ctx, signerId, fltrs)
-	return &IBlobLogBySignerCall{Call: call}
+	return &MockIBlobLogBySignerCall{Call: call}
 }
 
-// IBlobLogBySignerCall wrap *gomock.Call
-type IBlobLogBySignerCall struct {
+// MockIBlobLogBySignerCall wrap *gomock.Call
+type MockIBlobLogBySignerCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogBySignerCall) Return(arg0 []storage.BlobLog, arg1 error) *IBlobLogBySignerCall {
+func (c *MockIBlobLogBySignerCall) Return(arg0 []storage.BlobLog, arg1 error) *MockIBlobLogBySignerCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogBySignerCall) Do(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogBySignerCall {
+func (c *MockIBlobLogBySignerCall) Do(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *MockIBlobLogBySignerCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogBySignerCall) DoAndReturn(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogBySignerCall {
+func (c *MockIBlobLogBySignerCall) DoAndReturn(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *MockIBlobLogBySignerCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -251,31 +257,31 @@ func (m *MockIBlobLog) ByTxId(ctx context.Context, txId uint64, fltrs storage.Bl
 }
 
 // ByTxId indicates an expected call of ByTxId.
-func (mr *MockIBlobLogMockRecorder) ByTxId(ctx, txId, fltrs any) *IBlobLogByTxIdCall {
+func (mr *MockIBlobLogMockRecorder) ByTxId(ctx, txId, fltrs any) *MockIBlobLogByTxIdCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByTxId", reflect.TypeOf((*MockIBlobLog)(nil).ByTxId), ctx, txId, fltrs)
-	return &IBlobLogByTxIdCall{Call: call}
+	return &MockIBlobLogByTxIdCall{Call: call}
 }
 
-// IBlobLogByTxIdCall wrap *gomock.Call
-type IBlobLogByTxIdCall struct {
+// MockIBlobLogByTxIdCall wrap *gomock.Call
+type MockIBlobLogByTxIdCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogByTxIdCall) Return(arg0 []storage.BlobLog, arg1 error) *IBlobLogByTxIdCall {
+func (c *MockIBlobLogByTxIdCall) Return(arg0 []storage.BlobLog, arg1 error) *MockIBlobLogByTxIdCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogByTxIdCall) Do(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogByTxIdCall {
+func (c *MockIBlobLogByTxIdCall) Do(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *MockIBlobLogByTxIdCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogByTxIdCall) DoAndReturn(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *IBlobLogByTxIdCall {
+func (c *MockIBlobLogByTxIdCall) DoAndReturn(f func(context.Context, uint64, storage.BlobLogFilters) ([]storage.BlobLog, error)) *MockIBlobLogByTxIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -290,31 +296,31 @@ func (m *MockIBlobLog) CountByHeight(ctx context.Context, height types.Level) (i
 }
 
 // CountByHeight indicates an expected call of CountByHeight.
-func (mr *MockIBlobLogMockRecorder) CountByHeight(ctx, height any) *IBlobLogCountByHeightCall {
+func (mr *MockIBlobLogMockRecorder) CountByHeight(ctx, height any) *MockIBlobLogCountByHeightCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountByHeight", reflect.TypeOf((*MockIBlobLog)(nil).CountByHeight), ctx, height)
-	return &IBlobLogCountByHeightCall{Call: call}
+	return &MockIBlobLogCountByHeightCall{Call: call}
 }
 
-// IBlobLogCountByHeightCall wrap *gomock.Call
-type IBlobLogCountByHeightCall struct {
+// MockIBlobLogCountByHeightCall wrap *gomock.Call
+type MockIBlobLogCountByHeightCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogCountByHeightCall) Return(arg0 int, arg1 error) *IBlobLogCountByHeightCall {
+func (c *MockIBlobLogCountByHeightCall) Return(arg0 int, arg1 error) *MockIBlobLogCountByHeightCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogCountByHeightCall) Do(f func(context.Context, types.Level) (int, error)) *IBlobLogCountByHeightCall {
+func (c *MockIBlobLogCountByHeightCall) Do(f func(context.Context, types.Level) (int, error)) *MockIBlobLogCountByHeightCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogCountByHeightCall) DoAndReturn(f func(context.Context, types.Level) (int, error)) *IBlobLogCountByHeightCall {
+func (c *MockIBlobLogCountByHeightCall) DoAndReturn(f func(context.Context, types.Level) (int, error)) *MockIBlobLogCountByHeightCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -329,31 +335,31 @@ func (m *MockIBlobLog) CountByTxId(ctx context.Context, txId uint64) (int, error
 }
 
 // CountByTxId indicates an expected call of CountByTxId.
-func (mr *MockIBlobLogMockRecorder) CountByTxId(ctx, txId any) *IBlobLogCountByTxIdCall {
+func (mr *MockIBlobLogMockRecorder) CountByTxId(ctx, txId any) *MockIBlobLogCountByTxIdCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountByTxId", reflect.TypeOf((*MockIBlobLog)(nil).CountByTxId), ctx, txId)
-	return &IBlobLogCountByTxIdCall{Call: call}
+	return &MockIBlobLogCountByTxIdCall{Call: call}
 }
 
-// IBlobLogCountByTxIdCall wrap *gomock.Call
-type IBlobLogCountByTxIdCall struct {
+// MockIBlobLogCountByTxIdCall wrap *gomock.Call
+type MockIBlobLogCountByTxIdCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogCountByTxIdCall) Return(arg0 int, arg1 error) *IBlobLogCountByTxIdCall {
+func (c *MockIBlobLogCountByTxIdCall) Return(arg0 int, arg1 error) *MockIBlobLogCountByTxIdCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogCountByTxIdCall) Do(f func(context.Context, uint64) (int, error)) *IBlobLogCountByTxIdCall {
+func (c *MockIBlobLogCountByTxIdCall) Do(f func(context.Context, uint64) (int, error)) *MockIBlobLogCountByTxIdCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogCountByTxIdCall) DoAndReturn(f func(context.Context, uint64) (int, error)) *IBlobLogCountByTxIdCall {
+func (c *MockIBlobLogCountByTxIdCall) DoAndReturn(f func(context.Context, uint64) (int, error)) *MockIBlobLogCountByTxIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -368,31 +374,31 @@ func (m *MockIBlobLog) CursorList(ctx context.Context, id, limit uint64, order s
 }
 
 // CursorList indicates an expected call of CursorList.
-func (mr *MockIBlobLogMockRecorder) CursorList(ctx, id, limit, order, cmp any) *IBlobLogCursorListCall {
+func (mr *MockIBlobLogMockRecorder) CursorList(ctx, id, limit, order, cmp any) *MockIBlobLogCursorListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CursorList", reflect.TypeOf((*MockIBlobLog)(nil).CursorList), ctx, id, limit, order, cmp)
-	return &IBlobLogCursorListCall{Call: call}
+	return &MockIBlobLogCursorListCall{Call: call}
 }
 
-// IBlobLogCursorListCall wrap *gomock.Call
-type IBlobLogCursorListCall struct {
+// MockIBlobLogCursorListCall wrap *gomock.Call
+type MockIBlobLogCursorListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogCursorListCall) Return(arg0 []*storage.BlobLog, arg1 error) *IBlobLogCursorListCall {
+func (c *MockIBlobLogCursorListCall) Return(arg0 []*storage.BlobLog, arg1 error) *MockIBlobLogCursorListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlobLog, error)) *IBlobLogCursorListCall {
+func (c *MockIBlobLogCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlobLog, error)) *MockIBlobLogCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlobLog, error)) *IBlobLogCursorListCall {
+func (c *MockIBlobLogCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlobLog, error)) *MockIBlobLogCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -406,31 +412,31 @@ func (m *MockIBlobLog) ExportByProviders(ctx context.Context, providers []storag
 }
 
 // ExportByProviders indicates an expected call of ExportByProviders.
-func (mr *MockIBlobLogMockRecorder) ExportByProviders(ctx, providers, from, to, stream any) *IBlobLogExportByProvidersCall {
+func (mr *MockIBlobLogMockRecorder) ExportByProviders(ctx, providers, from, to, stream any) *MockIBlobLogExportByProvidersCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExportByProviders", reflect.TypeOf((*MockIBlobLog)(nil).ExportByProviders), ctx, providers, from, to, stream)
-	return &IBlobLogExportByProvidersCall{Call: call}
+	return &MockIBlobLogExportByProvidersCall{Call: call}
 }
 
-// IBlobLogExportByProvidersCall wrap *gomock.Call
-type IBlobLogExportByProvidersCall struct {
+// MockIBlobLogExportByProvidersCall wrap *gomock.Call
+type MockIBlobLogExportByProvidersCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogExportByProvidersCall) Return(err error) *IBlobLogExportByProvidersCall {
+func (c *MockIBlobLogExportByProvidersCall) Return(err error) *MockIBlobLogExportByProvidersCall {
 	c.Call = c.Call.Return(err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogExportByProvidersCall) Do(f func(context.Context, []storage.RollupProvider, time.Time, time.Time, io.Writer) error) *IBlobLogExportByProvidersCall {
+func (c *MockIBlobLogExportByProvidersCall) Do(f func(context.Context, []storage.RollupProvider, time.Time, time.Time, io.Writer) error) *MockIBlobLogExportByProvidersCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogExportByProvidersCall) DoAndReturn(f func(context.Context, []storage.RollupProvider, time.Time, time.Time, io.Writer) error) *IBlobLogExportByProvidersCall {
+func (c *MockIBlobLogExportByProvidersCall) DoAndReturn(f func(context.Context, []storage.RollupProvider, time.Time, time.Time, io.Writer) error) *MockIBlobLogExportByProvidersCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -445,31 +451,31 @@ func (m *MockIBlobLog) GetByID(ctx context.Context, id uint64) (*storage.BlobLog
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockIBlobLogMockRecorder) GetByID(ctx, id any) *IBlobLogGetByIDCall {
+func (mr *MockIBlobLogMockRecorder) GetByID(ctx, id any) *MockIBlobLogGetByIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockIBlobLog)(nil).GetByID), ctx, id)
-	return &IBlobLogGetByIDCall{Call: call}
+	return &MockIBlobLogGetByIDCall{Call: call}
 }
 
-// IBlobLogGetByIDCall wrap *gomock.Call
-type IBlobLogGetByIDCall struct {
+// MockIBlobLogGetByIDCall wrap *gomock.Call
+type MockIBlobLogGetByIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogGetByIDCall) Return(arg0 *storage.BlobLog, arg1 error) *IBlobLogGetByIDCall {
+func (c *MockIBlobLogGetByIDCall) Return(arg0 *storage.BlobLog, arg1 error) *MockIBlobLogGetByIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogGetByIDCall) Do(f func(context.Context, uint64) (*storage.BlobLog, error)) *IBlobLogGetByIDCall {
+func (c *MockIBlobLogGetByIDCall) Do(f func(context.Context, uint64) (*storage.BlobLog, error)) *MockIBlobLogGetByIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.BlobLog, error)) *IBlobLogGetByIDCall {
+func (c *MockIBlobLogGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.BlobLog, error)) *MockIBlobLogGetByIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -483,31 +489,31 @@ func (m *MockIBlobLog) IsNoRows(err error) bool {
 }
 
 // IsNoRows indicates an expected call of IsNoRows.
-func (mr *MockIBlobLogMockRecorder) IsNoRows(err any) *IBlobLogIsNoRowsCall {
+func (mr *MockIBlobLogMockRecorder) IsNoRows(err any) *MockIBlobLogIsNoRowsCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoRows", reflect.TypeOf((*MockIBlobLog)(nil).IsNoRows), err)
-	return &IBlobLogIsNoRowsCall{Call: call}
+	return &MockIBlobLogIsNoRowsCall{Call: call}
 }
 
-// IBlobLogIsNoRowsCall wrap *gomock.Call
-type IBlobLogIsNoRowsCall struct {
+// MockIBlobLogIsNoRowsCall wrap *gomock.Call
+type MockIBlobLogIsNoRowsCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogIsNoRowsCall) Return(arg0 bool) *IBlobLogIsNoRowsCall {
+func (c *MockIBlobLogIsNoRowsCall) Return(arg0 bool) *MockIBlobLogIsNoRowsCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogIsNoRowsCall) Do(f func(error) bool) *IBlobLogIsNoRowsCall {
+func (c *MockIBlobLogIsNoRowsCall) Do(f func(error) bool) *MockIBlobLogIsNoRowsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogIsNoRowsCall) DoAndReturn(f func(error) bool) *IBlobLogIsNoRowsCall {
+func (c *MockIBlobLogIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIBlobLogIsNoRowsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -522,31 +528,31 @@ func (m *MockIBlobLog) LastID(ctx context.Context) (uint64, error) {
 }
 
 // LastID indicates an expected call of LastID.
-func (mr *MockIBlobLogMockRecorder) LastID(ctx any) *IBlobLogLastIDCall {
+func (mr *MockIBlobLogMockRecorder) LastID(ctx any) *MockIBlobLogLastIDCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastID", reflect.TypeOf((*MockIBlobLog)(nil).LastID), ctx)
-	return &IBlobLogLastIDCall{Call: call}
+	return &MockIBlobLogLastIDCall{Call: call}
 }
 
-// IBlobLogLastIDCall wrap *gomock.Call
-type IBlobLogLastIDCall struct {
+// MockIBlobLogLastIDCall wrap *gomock.Call
+type MockIBlobLogLastIDCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogLastIDCall) Return(arg0 uint64, arg1 error) *IBlobLogLastIDCall {
+func (c *MockIBlobLogLastIDCall) Return(arg0 uint64, arg1 error) *MockIBlobLogLastIDCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogLastIDCall) Do(f func(context.Context) (uint64, error)) *IBlobLogLastIDCall {
+func (c *MockIBlobLogLastIDCall) Do(f func(context.Context) (uint64, error)) *MockIBlobLogLastIDCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *IBlobLogLastIDCall {
+func (c *MockIBlobLogLastIDCall) DoAndReturn(f func(context.Context) (uint64, error)) *MockIBlobLogLastIDCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -561,31 +567,31 @@ func (m *MockIBlobLog) List(ctx context.Context, limit, offset uint64, order sto
 }
 
 // List indicates an expected call of List.
-func (mr *MockIBlobLogMockRecorder) List(ctx, limit, offset, order any) *IBlobLogListCall {
+func (mr *MockIBlobLogMockRecorder) List(ctx, limit, offset, order any) *MockIBlobLogListCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIBlobLog)(nil).List), ctx, limit, offset, order)
-	return &IBlobLogListCall{Call: call}
+	return &MockIBlobLogListCall{Call: call}
 }
 
-// IBlobLogListCall wrap *gomock.Call
-type IBlobLogListCall struct {
+// MockIBlobLogListCall wrap *gomock.Call
+type MockIBlobLogListCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogListCall) Return(arg0 []*storage.BlobLog, arg1 error) *IBlobLogListCall {
+func (c *MockIBlobLogListCall) Return(arg0 []*storage.BlobLog, arg1 error) *MockIBlobLogListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.BlobLog, error)) *IBlobLogListCall {
+func (c *MockIBlobLogListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.BlobLog, error)) *MockIBlobLogListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.BlobLog, error)) *IBlobLogListCall {
+func (c *MockIBlobLogListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.BlobLog, error)) *MockIBlobLogListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -599,31 +605,31 @@ func (m_2 *MockIBlobLog) Save(ctx context.Context, m *storage.BlobLog) error {
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockIBlobLogMockRecorder) Save(ctx, m any) *IBlobLogSaveCall {
+func (mr *MockIBlobLogMockRecorder) Save(ctx, m any) *MockIBlobLogSaveCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIBlobLog)(nil).Save), ctx, m)
-	return &IBlobLogSaveCall{Call: call}
+	return &MockIBlobLogSaveCall{Call: call}
 }
 
-// IBlobLogSaveCall wrap *gomock.Call
-type IBlobLogSaveCall struct {
+// MockIBlobLogSaveCall wrap *gomock.Call
+type MockIBlobLogSaveCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogSaveCall) Return(arg0 error) *IBlobLogSaveCall {
+func (c *MockIBlobLogSaveCall) Return(arg0 error) *MockIBlobLogSaveCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogSaveCall) Do(f func(context.Context, *storage.BlobLog) error) *IBlobLogSaveCall {
+func (c *MockIBlobLogSaveCall) Do(f func(context.Context, *storage.BlobLog) error) *MockIBlobLogSaveCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogSaveCall) DoAndReturn(f func(context.Context, *storage.BlobLog) error) *IBlobLogSaveCall {
+func (c *MockIBlobLogSaveCall) DoAndReturn(f func(context.Context, *storage.BlobLog) error) *MockIBlobLogSaveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -637,31 +643,31 @@ func (m_2 *MockIBlobLog) Update(ctx context.Context, m *storage.BlobLog) error {
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIBlobLogMockRecorder) Update(ctx, m any) *IBlobLogUpdateCall {
+func (mr *MockIBlobLogMockRecorder) Update(ctx, m any) *MockIBlobLogUpdateCall {
 	mr.mock.ctrl.T.Helper()
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIBlobLog)(nil).Update), ctx, m)
-	return &IBlobLogUpdateCall{Call: call}
+	return &MockIBlobLogUpdateCall{Call: call}
 }
 
-// IBlobLogUpdateCall wrap *gomock.Call
-type IBlobLogUpdateCall struct {
+// MockIBlobLogUpdateCall wrap *gomock.Call
+type MockIBlobLogUpdateCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *IBlobLogUpdateCall) Return(arg0 error) *IBlobLogUpdateCall {
+func (c *MockIBlobLogUpdateCall) Return(arg0 error) *MockIBlobLogUpdateCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *IBlobLogUpdateCall) Do(f func(context.Context, *storage.BlobLog) error) *IBlobLogUpdateCall {
+func (c *MockIBlobLogUpdateCall) Do(f func(context.Context, *storage.BlobLog) error) *MockIBlobLogUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *IBlobLogUpdateCall) DoAndReturn(f func(context.Context, *storage.BlobLog) error) *IBlobLogUpdateCall {
+func (c *MockIBlobLogUpdateCall) DoAndReturn(f func(context.Context, *storage.BlobLog) error) *MockIBlobLogUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
