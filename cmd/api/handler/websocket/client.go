@@ -222,7 +222,7 @@ func (c *Client) handleSubscribeMessage(msg Message) error {
 		return err
 	}
 
-	if c.unsubscribeHandler != nil {
+	if c.subscribeHandler != nil {
 		c.subscribeHandler(subscribeMsg.Channel, c)
 	}
 	return nil
