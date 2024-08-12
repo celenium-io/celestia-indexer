@@ -23,7 +23,7 @@ type client interface {
 	DetachFilters(msg Unsubscribe) error
 	Notify(msg any)
 	WriteMessages(ctx context.Context, ws *websocket.Conn, log echo.Logger)
-	ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Client, log echo.Logger)
+	ReadMessages(ctx context.Context, ws *websocket.Conn, log echo.Logger)
 	Filters() *Filters
 
 	io.Closer
@@ -38,25 +38,30 @@ const (
 	pingInterval = (pongWait * 9) / 10
 )
 
+type ClientHandler func(string, *Client)
+
 type Client struct {
 	id      uint64
-	manager *Manager
 	filters *Filters
 	ch      chan any
 	g       workerpool.Group
 
+	subscribeHandler   ClientHandler
+	unsubscribeHandler ClientHandler
+
 	closed *atomic.Bool
 }
 
-func newClient(id uint64, manager *Manager) *Client {
+func newClient(id uint64, subscribeHandler, unsubscribeHandler ClientHandler) *Client {
 	closed := new(atomic.Bool)
 	closed.Store(false)
 	return &Client{
-		id:      id,
-		manager: manager,
-		ch:      make(chan any, 1024),
-		g:       workerpool.NewGroup(),
-		closed:  closed,
+		id:                 id,
+		ch:                 make(chan any, 128),
+		g:                  workerpool.NewGroup(),
+		subscribeHandler:   subscribeHandler,
+		unsubscribeHandler: unsubscribeHandler,
+		closed:             closed,
 	}
 }
 
@@ -109,6 +114,8 @@ func (c *Client) Close() error {
 	c.g.Wait()
 	c.closed.Store(true)
 	close(c.ch)
+	c.subscribeHandler = nil
+	c.unsubscribeHandler = nil
 	return nil
 }
 
@@ -148,7 +155,7 @@ func (c *Client) WriteMessages(ctx context.Context, ws *websocket.Conn, log echo
 	})
 }
 
-func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Client, log echo.Logger) {
+func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, log echo.Logger) {
 	if err := ws.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
 		log.Error(err)
 		return
@@ -177,8 +184,10 @@ func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Clie
 					websocket.CloseAbnormalClosure,
 					websocket.CloseNoStatusReceived,
 					websocket.CloseGoingAway):
-					c.manager.RemoveClientFromChannel(ChannelHead, c)
-					c.manager.RemoveClientFromChannel(ChannelBlocks, c)
+					if c.unsubscribeHandler != nil {
+						c.unsubscribeHandler(ChannelHead, c)
+						c.unsubscribeHandler(ChannelBlocks, c)
+					}
 					return
 				}
 				log.Errorf("read websocket message: %s", err.Error())
@@ -213,7 +222,9 @@ func (c *Client) handleSubscribeMessage(msg Message) error {
 		return err
 	}
 
-	c.manager.AddClientToChannel(subscribeMsg.Channel, c)
+	if c.subscribeHandler != nil {
+		c.subscribeHandler(subscribeMsg.Channel, c)
+	}
 	return nil
 }
 
@@ -225,6 +236,8 @@ func (c *Client) handleUnsubscribeMessage(msg Message) error {
 	if err := c.DetachFilters(unsubscribeMsg); err != nil {
 		return err
 	}
-	c.manager.RemoveClientFromChannel(unsubscribeMsg.Channel, c)
+	if c.unsubscribeHandler != nil {
+		c.unsubscribeHandler(unsubscribeMsg.Channel, c)
+	}
 	return nil
 }

@@ -71,7 +71,7 @@ func (c *testHeadClient) WriteMessages(ctx context.Context, ws *websocket.Conn, 
 	}
 }
 
-func (c *testHeadClient) ReadMessages(ctx context.Context, ws *websocket.Conn, sub *Client, log echo.Logger) {
+func (c *testHeadClient) ReadMessages(ctx context.Context, ws *websocket.Conn, log echo.Logger) {
 }
 
 func (c *testHeadClient) Close() error {
