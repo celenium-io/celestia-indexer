@@ -46,12 +46,12 @@ func NewManager(observer *bus.Observer) *Manager {
 		g:        workerpool.NewGroup(),
 	}
 
-	manager.blocks = NewChannel[storage.Block, *responses.Block](
+	manager.blocks = NewChannel(
 		blockProcessor,
 		BlockFilter{},
 	)
 
-	manager.head = NewChannel[storage.State, *responses.State](
+	manager.head = NewChannel(
 		headProcessor,
 		HeadFilter{},
 	)
@@ -93,13 +93,13 @@ func (manager *Manager) Handle(c echo.Context) error {
 	ws.SetReadLimit(1024 * 10) // 10KB
 
 	sId := manager.clientId.Add(1)
-	sub := newClient(sId, manager)
+	sub := newClient(sId, manager.AddClientToChannel, manager.RemoveClientFromChannel)
 
 	manager.clients.Set(sId, sub)
 
 	ctx, cancel := context.WithCancel(c.Request().Context())
 	sub.WriteMessages(ctx, ws, c.Logger())
-	sub.ReadMessages(ctx, ws, sub, c.Logger())
+	sub.ReadMessages(ctx, ws, c.Logger())
 	manager.clients.Delete(sId)
 	cancel()
 
