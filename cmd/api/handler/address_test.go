@@ -695,7 +695,7 @@ func (s *AddressTestSuite) TestGrantee() {
 }
 
 func (s *AddressTestSuite) TestStats() {
-	for _, name := range []string{"count", "fee", "gas_used", "gas_wanted"} {
+	for _, name := range []string{"tx_count", "fee", "gas_used", "gas_wanted"} {
 		for _, tf := range []string{"hour", "day", "month"} {
 			req := httptest.NewRequest(http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()

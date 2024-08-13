@@ -75,7 +75,7 @@ func (a *Address) Series(ctx context.Context, addressId uint64, timeframe storag
 		query = query.ColumnExpr("gas_used as value, time as bucket")
 	case "gas_wanted":
 		query = query.ColumnExpr("gas_wanted as value, time as bucket")
-	case "count":
+	case "tx_count":
 		query = query.ColumnExpr("count as value, time as bucket")
 	case "fee":
 		query = query.ColumnExpr("fee as value, time as bucket")

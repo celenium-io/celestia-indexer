@@ -720,7 +720,7 @@ func (handler *AddressHandler) Grantee(c echo.Context) error {
 type addressStatsRequest struct {
 	Hash       string `example:"celestia1glfkehhpvl55amdew2fnm6wxt7egy560mxdrj7" param:"hash"      swaggertype:"string"  validate:"required,address"`
 	Timeframe  string `example:"hour"                                            param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day month"`
-	SeriesName string `example:"tps"                                             param:"name"      swaggertype:"string"  validate:"required,oneof=gas_used gas_wanted fee count"`
+	SeriesName string `example:"tps"                                             param:"name"      swaggertype:"string"  validate:"required,oneof=gas_used gas_wanted fee tx_count"`
 	From       int64  `example:"1692892095"                                      query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
 	To         int64  `example:"1692892095"                                      query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
 }
@@ -732,7 +732,7 @@ type addressStatsRequest struct {
 //	@Tags			address
 //	@ID				address-stats
 //	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(47)
-//	@Param			name		path	string	true	"Series name"					Enums(gas_used, gas_wanted, fee, count)
+//	@Param			name		path	string	true	"Series name"					Enums(gas_used, gas_wanted, fee, tx_count)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
 //	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
