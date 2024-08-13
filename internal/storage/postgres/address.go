@@ -39,17 +39,33 @@ func (a *Address) ByHash(ctx context.Context, hash []byte) (address storage.Addr
 }
 
 func (a *Address) ListWithBalance(ctx context.Context, filters storage.AddressListFilter) (result []storage.Address, err error) {
-	addressQuery := a.DB().NewSelect().
-		Model((*storage.Balance)(nil))
+	if filters.SortField == "last_height" || filters.SortField == "first_height" {
+		addressQuery := a.DB().NewSelect().
+			Model((*storage.Address)(nil))
 
-	addressQuery = addressListFilter(addressQuery, filters)
+		addressQuery = addressListFilter(addressQuery, filters)
 
-	err = a.DB().NewSelect().
-		TableExpr("(?) as balance", addressQuery).
-		ColumnExpr("address.*").
-		ColumnExpr("balance.currency as balance__currency, balance.spendable as balance__spendable, balance.delegated as balance__delegated, balance.unbonding as balance__unbonding").
-		Join("left join address on balance.id = address.id").
-		Scan(ctx, &result)
+		err = a.DB().NewSelect().
+			TableExpr("(?) as address", addressQuery).
+			ColumnExpr("address.*").
+			ColumnExpr("balance.currency as balance__currency, balance.spendable as balance__spendable, balance.delegated as balance__delegated, balance.unbonding as balance__unbonding").
+			Join("left join balance on balance.id = address.id").
+			Scan(ctx, &result)
+
+	} else {
+		addressQuery := a.DB().NewSelect().
+			Model((*storage.Balance)(nil))
+
+		addressQuery = addressListFilter(addressQuery, filters)
+
+		err = a.DB().NewSelect().
+			TableExpr("(?) as balance", addressQuery).
+			ColumnExpr("address.*").
+			ColumnExpr("balance.currency as balance__currency, balance.spendable as balance__spendable, balance.delegated as balance__delegated, balance.unbonding as balance__unbonding").
+			Join("left join address on balance.id = address.id").
+			Scan(ctx, &result)
+	}
+
 	return
 }
 
