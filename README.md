@@ -15,7 +15,7 @@ This is an indexing layer for Celestia DA written in Golang that operates on top
 
 - Git
 - [Docker](https://docs.docker.com/engine/install/)
-- [Go 1.22.4](https://go.dev/doc/install) (for development and testing)
+- [Go 1.22.5](https://go.dev/doc/install) (for development and testing)
 
 ### Local run ###
 
