@@ -677,7 +677,7 @@
                             "gas_used",
                             "gas_wanted",
                             "fee",
-                            "count"
+                            "tx_count"
                         ],
                         "type": "string",
                         "description": "Series name",

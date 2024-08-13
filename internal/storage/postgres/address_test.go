@@ -202,7 +202,7 @@ func (s *StorageTestSuite) TestAddressStats() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	for _, name := range []string{"count", "fee", "gas_wanted", "gas_used"} {
+	for _, name := range []string{"tx_count", "fee", "gas_wanted", "gas_used"} {
 		for _, tf := range []storage.Timeframe{storage.TimeframeHour, storage.TimeframeDay, storage.TimeframeMonth} {
 			series, err := s.storage.Address.Series(ctx, 1, tf, name, storage.NewSeriesRequest(0, 0))
 			s.Require().NoError(err)
