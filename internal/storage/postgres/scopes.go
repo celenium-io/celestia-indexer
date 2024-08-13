@@ -74,8 +74,10 @@ func addressListFilter(query *bun.SelectQuery, fltrs storage.AddressListFilter) 
 	query = query.Offset(fltrs.Offset)
 
 	switch fltrs.SortField {
-	case "id", "spendable", "unbonding", "delegated":
+	case "id", "spendable", "unbonding", "delegated", "last_height":
 		query = sortScope(query, fltrs.SortField, fltrs.Sort)
+	case "first_height":
+		query = sortScope(query, "height", fltrs.Sort)
 	default:
 		query = sortScope(query, "id", fltrs.Sort)
 	}

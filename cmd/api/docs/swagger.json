@@ -52,7 +52,9 @@
                             "id",
                             "delegated",
                             "spendable",
-                            "unbonding"
+                            "unbonding",
+                            "first_height",
+                            "last_height"
                         ],
                         "type": "string",
                         "description": "Sort field",

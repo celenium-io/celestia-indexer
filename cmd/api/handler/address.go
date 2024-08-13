@@ -96,7 +96,7 @@ type addressListRequest struct {
 	Limit  int    `query:"limit"   validate:"omitempty,min=1,max=100"`
 	Offset int    `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
-	SortBy string `query:"sort_by" validate:"omitempty,oneof=id spendable delegated unbonding"`
+	SortBy string `query:"sort_by" validate:"omitempty,oneof=id spendable delegated unbonding first_height last_height"`
 }
 
 func (p *addressListRequest) SetDefault() {
@@ -117,7 +117,7 @@ func (p *addressListRequest) SetDefault() {
 //	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						mininum(1)
 //	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field"					Enums(id, delegated, spendable, unbonding)
+//	@Param			sort_by	query	string	false	"Sort field"					Enums(id, delegated, spendable, unbonding, first_height, last_height)
 //	@Produce		json
 //	@Success		200	{array}		responses.Address
 //	@Failure		400	{object}	Error
