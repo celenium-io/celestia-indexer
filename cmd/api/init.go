@@ -519,7 +519,7 @@ func initSentry(e *echo.Echo, db postgres.Storage, dsn, environment string) erro
 		AttachStacktrace:   true,
 		Environment:        environment,
 		EnableTracing:      true,
-		TracesSampleRate:   1.0,
+		TracesSampleRate:   0.5,
 		ProfilesSampleRate: 0.25,
 		Release:            os.Getenv("TAG"),
 		IgnoreTransactions: []string{
