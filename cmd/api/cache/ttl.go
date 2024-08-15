@@ -4,99 +4,69 @@
 package cache
 
 import (
-	"sync"
 	"time"
+
+	"github.com/dgraph-io/badger/v4"
+	"github.com/rs/zerolog/log"
 )
 
-type ttlItem struct {
-	data      []byte
-	expiredAt time.Time
-}
-
 type TTLCache struct {
-	maxEntitiesCount int
-	m                map[string]*ttlItem
-	queue            []string
-	mx               *sync.RWMutex
-	expiration       time.Duration
+	db         *badger.DB
+	expiration time.Duration
 }
 
-func NewTTLCache(cfg Config, expiration time.Duration) *TTLCache {
+func NewTTLCache(expiration time.Duration) (*TTLCache, error) {
+	db, err := badger.Open(badger.DefaultOptions("").WithInMemory(true))
+	if err != nil {
+		return nil, err
+	}
+
 	return &TTLCache{
-		maxEntitiesCount: cfg.MaxEntitiesCount,
-		m:                make(map[string]*ttlItem),
-		queue:            make([]string, cfg.MaxEntitiesCount),
-		mx:               new(sync.RWMutex),
-		expiration:       expiration,
-	}
+		db:         db,
+		expiration: expiration,
+	}, nil
 }
 
-func (c *TTLCache) Get(key string) ([]byte, bool) {
-	c.mx.RLock()
-	item, ok := c.m[key]
-	c.mx.RUnlock()
-	if !ok {
-		return nil, false
-	}
-	if time.Now().After(item.expiredAt) {
-		c.mx.Lock()
-		defer c.mx.Unlock()
+func (c *TTLCache) Close() error {
+	return c.db.Close()
+}
 
-		copying := false
-		if len(c.queue) > len(c.m) {
-			for i := len(c.queue) - 1; i > 0; i-- {
-				if copying = copying || c.queue[i] == key; copying {
-					c.queue[i] = c.queue[i-1]
-				}
-			}
-			c.queue[0] = ""
-		} else {
-			for i := 0; i < len(c.queue)-1; i++ {
-				if copying = copying || c.queue[i] == key; copying {
-					c.queue[i] = c.queue[i+1]
-				}
-			}
-			c.queue[len(c.queue)-1] = ""
+func (c *TTLCache) Get(key string) (data []byte, found bool) {
+	if err := c.db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte(key))
+		if err != nil {
+			return err
 		}
-		delete(c.m, key)
 
+		if err := item.Value(func(val []byte) error {
+			data = make([]byte, len(val))
+			copy(data, val)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		return nil, false
 	}
-	return item.data, true
+	return data, true
 }
 
 func (c *TTLCache) Set(key string, data []byte) {
-	c.mx.Lock()
-	defer c.mx.Unlock()
-
-	queueIdx := len(c.m)
-	item := &ttlItem{
-		data:      data,
-		expiredAt: time.Now().Add(c.expiration),
-	}
-
-	if _, ok := c.m[key]; ok {
-		c.m[key] = item
-	} else {
-		c.m[key] = item
-		if queueIdx == c.maxEntitiesCount {
-			keyForRemove := c.queue[0]
-			for i := 0; i < len(c.queue)-1; i++ {
-				c.queue[i] = c.queue[i+1]
-			}
-			c.queue[queueIdx-1] = key
-			delete(c.m, keyForRemove)
-		} else {
-			c.queue[queueIdx] = key
-		}
+	keyBytes := []byte(key)
+	err := c.db.Update(func(txn *badger.Txn) error {
+		e := badger.
+			NewEntry(keyBytes, data).
+			WithTTL(c.expiration)
+		return txn.SetEntry(e)
+	})
+	if err != nil {
+		log.Err(err).Msgf("set %s to TTL cache", key)
 	}
 }
 
 func (c *TTLCache) Clear() {
-	c.mx.Lock()
-	for key := range c.m {
-		delete(c.m, key)
+	if err := c.db.DropAll(); err != nil {
+		log.Err(err).Msg("clear ttl cache")
 	}
-	c.queue = make([]string, c.maxEntitiesCount)
-	c.mx.Unlock()
 }

@@ -144,12 +144,12 @@ func observableCacheSkipper(c echo.Context) bool {
 	if c.Path() == "/v1/head" {
 		return true
 	}
-	// if strings.Contains(c.Path(), "/v1/block/:height") {
-	// 	return true
-	// }
-	// if strings.Contains(c.Path(), "/v1/tx/:hash") {
-	// 	return true
-	// }
+	if strings.Contains(c.Path(), "/v1/block/:height") {
+		return true
+	}
+	if strings.Contains(c.Path(), "/v1/tx/:hash") {
+		return true
+	}
 	return false
 }
 
@@ -266,6 +266,12 @@ func initDatabase(cfg config.Database, viewsDir string) postgres.Storage {
 }
 
 func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Storage) {
+	ttlCache, err := cache.NewTTLCache(time.Minute * 30)
+	if err != nil {
+		panic(err)
+	}
+	ttlCacheMiddleware := cache.Middleware(ttlCache, nil)
+
 	v1 := e.Group("v1")
 
 	stateHandlers := handler.NewStateHandler(db.State, db.Validator, cfg.Indexer.Name)
@@ -276,9 +282,6 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 
 	searchHandler := handler.NewSearchHandler(db.Search, db.Address, db.Blocks, db.Tx, db.Namespace, db.Validator, db.Rollup)
 	v1.GET("/search", searchHandler.Search)
-
-	// ttlCache := cache.NewTTLCache(cache.Config{MaxEntitiesCount: 1000}, time.Minute*30)
-	// ttlCacheMiddleware := cache.Middleware(ttlCache, nil)
 
 	addressHandlers := handler.NewAddressHandler(db.Address, db.Tx, db.BlobLogs, db.Message, db.Delegation, db.Undelegation, db.Redelegation, db.VestingAccounts, db.Grants, db.State, cfg.Indexer.Name)
 	addressesGroup := v1.Group("/address")
@@ -313,13 +316,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		blockGroup.GET("/count", blockHandlers.Count)
 		heightGroup := blockGroup.Group("/:height")
 		{
-			heightGroup.GET("", blockHandlers.Get)
-			heightGroup.GET("/events", blockHandlers.GetEvents)
-			heightGroup.GET("/messages", blockHandlers.GetMessages)
-			heightGroup.GET("/stats", blockHandlers.GetStats)
-			heightGroup.GET("/blobs", blockHandlers.Blobs)
-			heightGroup.GET("/blobs/count", blockHandlers.BlobsCount)
-			heightGroup.GET("/ods", blockHandlers.BlockODS)
+			heightGroup.GET("", blockHandlers.Get, ttlCacheMiddleware)
+			heightGroup.GET("/events", blockHandlers.GetEvents, ttlCacheMiddleware)
+			heightGroup.GET("/messages", blockHandlers.GetMessages, ttlCacheMiddleware)
+			heightGroup.GET("/stats", blockHandlers.GetStats, ttlCacheMiddleware)
+			heightGroup.GET("/blobs", blockHandlers.Blobs, ttlCacheMiddleware)
+			heightGroup.GET("/blobs/count", blockHandlers.BlobsCount, ttlCacheMiddleware)
+			heightGroup.GET("/ods", blockHandlers.BlockODS, ttlCacheMiddleware)
 		}
 	}
 
@@ -331,11 +334,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		txGroup.GET("/genesis", txHandlers.Genesis)
 		hashGroup := txGroup.Group("/:hash")
 		{
-			hashGroup.GET("", txHandlers.Get)
-			hashGroup.GET("/events", txHandlers.GetEvents)
-			hashGroup.GET("/messages", txHandlers.GetMessages)
-			hashGroup.GET("/blobs", txHandlers.Blobs)
-			hashGroup.GET("/blobs/count", txHandlers.BlobsCount)
+			hashGroup.GET("", txHandlers.Get, ttlCacheMiddleware)
+			hashGroup.GET("/events", txHandlers.GetEvents, ttlCacheMiddleware)
+			hashGroup.GET("/messages", txHandlers.GetMessages, ttlCacheMiddleware)
+			hashGroup.GET("/blobs", txHandlers.Blobs, ttlCacheMiddleware)
+			hashGroup.GET("/blobs/count", txHandlers.BlobsCount, ttlCacheMiddleware)
 		}
 	}
 
