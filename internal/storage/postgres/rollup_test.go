@@ -40,6 +40,23 @@ func (s *StorageTestSuite) TestRollupLeaderboard() {
 	}
 }
 
+func (s *StorageTestSuite) TestRollupLeaderboardDay() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard_day;")
+	s.Require().NoError(err)
+
+	for _, column := range []string{
+		"avg_size", "blobs_count", "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price", "",
+	} {
+
+		rollups, err := s.storage.Rollup.LeaderboardDay(ctx, column, sdk.SortOrderDesc, 10, 0)
+		s.Require().NoError(err, column)
+		s.Require().Len(rollups, 0, column)
+	}
+}
+
 func (s *StorageTestSuite) TestRollupNamespaces() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

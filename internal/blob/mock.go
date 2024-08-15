@@ -42,11 +42,6 @@ func (m *MockStorage) EXPECT() *MockStorageMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockStorage) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // Head mocks base method.
 func (m *MockStorage) Head(ctx context.Context) (uint64, error) {
 	m.ctrl.T.Helper()

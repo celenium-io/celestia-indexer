@@ -44,11 +44,6 @@ func (m *MockIVestingAccount) EXPECT() *MockIVestingAccountMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIVestingAccount) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // ByAddress mocks base method.
 func (m *MockIVestingAccount) ByAddress(ctx context.Context, addressId uint64, limit, offset int, showEnded bool) ([]storage.VestingAccount, error) {
 	m.ctrl.T.Helper()

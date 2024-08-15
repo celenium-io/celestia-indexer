@@ -46,11 +46,6 @@ func (m *MockITx) EXPECT() *MockITxMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockITx) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // ByAddress mocks base method.
 func (m *MockITx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxFilter) ([]storage.Tx, error) {
 	m.ctrl.T.Helper()

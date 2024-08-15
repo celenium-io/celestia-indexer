@@ -44,11 +44,6 @@ func (m *MockIBalance) EXPECT() *MockIBalanceMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIBalance) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // CursorList mocks base method.
 func (m *MockIBalance) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Balance, error) {
 	m.ctrl.T.Helper()

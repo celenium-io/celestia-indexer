@@ -44,11 +44,6 @@ func (m *MockINamespace) EXPECT() *MockINamespaceMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockINamespace) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // ByNamespaceId mocks base method.
 func (m *MockINamespace) ByNamespaceId(ctx context.Context, namespaceId []byte) ([]storage.Namespace, error) {
 	m.ctrl.T.Helper()

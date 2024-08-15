@@ -11,14 +11,13 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 
-	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type INamespace interface {
-	storage.Table[*Namespace]
+	sdk.Table[*Namespace]
 
 	ByNamespaceId(ctx context.Context, namespaceId []byte) ([]Namespace, error)
 	ByNamespaceIdAndVersion(ctx context.Context, namespaceId []byte, version byte) (Namespace, error)

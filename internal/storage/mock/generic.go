@@ -50,11 +50,6 @@ func (m *MockNotificator) EXPECT() *MockNotificatorMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockNotificator) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // Notify mocks base method.
 func (m *MockNotificator) Notify(ctx context.Context, channel, payload string) error {
 	m.ctrl.T.Helper()
@@ -114,11 +109,6 @@ func NewMockListener(ctrl *gomock.Controller) *MockListener {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockListener) EXPECT() *MockListenerMockRecorder {
 	return m.recorder
-}
-
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockListener) ISGOMOCK() struct{} {
-	return struct{}{}
 }
 
 // Close mocks base method.
@@ -263,11 +253,6 @@ func (m *MockListenerFactory) EXPECT() *MockListenerFactoryMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockListenerFactory) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // CreateListener mocks base method.
 func (m *MockListenerFactory) CreateListener() storage.Listener {
 	m.ctrl.T.Helper()
@@ -327,11 +312,6 @@ func NewMockTransaction(ctrl *gomock.Controller) *MockTransaction {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockTransaction) EXPECT() *MockTransactionMockRecorder {
 	return m.recorder
-}
-
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockTransaction) ISGOMOCK() struct{} {
-	return struct{}{}
 }
 
 // Add mocks base method.
@@ -3327,11 +3307,6 @@ func (m *MockISearch) EXPECT() *MockISearchMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockISearch) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // Search mocks base method.
 func (m *MockISearch) Search(ctx context.Context, query []byte) ([]storage.SearchResult, error) {
 	m.ctrl.T.Helper()
@@ -3431,11 +3406,6 @@ func NewMockExport(ctrl *gomock.Controller) *MockExport {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockExport) EXPECT() *MockExportMockRecorder {
 	return m.recorder
-}
-
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockExport) ISGOMOCK() struct{} {
-	return struct{}{}
 }
 
 // Close mocks base method.

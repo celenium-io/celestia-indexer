@@ -44,11 +44,6 @@ func (m *MockIGrant) EXPECT() *MockIGrantMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIGrant) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // ByGrantee mocks base method.
 func (m *MockIGrant) ByGrantee(ctx context.Context, id uint64, limit, offset int) ([]storage.Grant, error) {
 	m.ctrl.T.Helper()

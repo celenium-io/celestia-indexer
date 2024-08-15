@@ -44,11 +44,6 @@ func (m *MockApi) EXPECT() *MockApiMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockApi) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // Block mocks base method.
 func (m *MockApi) Block(ctx context.Context, level types0.Level) (types0.ResultBlock, error) {
 	m.ctrl.T.Helper()
@@ -343,11 +338,6 @@ func NewMockDalApi(ctrl *gomock.Controller) *MockDalApi {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockDalApi) EXPECT() *MockDalApiMockRecorder {
 	return m.recorder
-}
-
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockDalApi) ISGOMOCK() struct{} {
-	return struct{}{}
 }
 
 // Blob mocks base method.

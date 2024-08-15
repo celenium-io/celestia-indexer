@@ -43,11 +43,6 @@ func (m *MockIDenomMetadata) EXPECT() *MockIDenomMetadataMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIDenomMetadata) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // All mocks base method.
 func (m *MockIDenomMetadata) All(ctx context.Context) ([]storage.DenomMetadata, error) {
 	m.ctrl.T.Helper()

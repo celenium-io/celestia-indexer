@@ -45,11 +45,6 @@ func (m *MockIEvent) EXPECT() *MockIEventMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIEvent) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // ByBlock mocks base method.
 func (m *MockIEvent) ByBlock(ctx context.Context, height types.Level, fltrs storage.EventFilter) ([]storage.Event, error) {
 	m.ctrl.T.Helper()
