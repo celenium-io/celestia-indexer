@@ -288,6 +288,32 @@ func (handler RollupHandler) Stats(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+// AllSeries godoc
+//
+//	@Summary		Get series for all rollups
+//	@Description	Get series for all rollups
+//	@Tags			rollup
+//	@ID				get-rollup-all-series
+//	@Produce		json
+//	@Success		200	{array}		responses.RollupAllSeriesItem
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/rollup/stats/series [get]
+func (handler RollupHandler) AllSeries(c echo.Context) error {
+	histogram, err := handler.rollups.AllSeries(
+		c.Request().Context(),
+	)
+	if err != nil {
+		return handleError(c, err, handler.rollups)
+	}
+
+	response := make([]responses.RollupAllSeriesItem, len(histogram))
+	for i := range histogram {
+		response[i] = responses.NewRollupAllSeriesItem(histogram[i])
+	}
+	return returnArray(c, response)
+}
+
 // Count godoc
 //
 //	@Summary		Get count of rollups in network

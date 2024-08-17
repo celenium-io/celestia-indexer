@@ -44,6 +44,45 @@ func (m *MockIRollup) EXPECT() *MockIRollupMockRecorder {
 	return m.recorder
 }
 
+// AllSeries mocks base method.
+func (m *MockIRollup) AllSeries(ctx context.Context) ([]storage.RollupHistogramItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AllSeries", ctx)
+	ret0, _ := ret[0].([]storage.RollupHistogramItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AllSeries indicates an expected call of AllSeries.
+func (mr *MockIRollupMockRecorder) AllSeries(ctx any) *MockIRollupAllSeriesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AllSeries", reflect.TypeOf((*MockIRollup)(nil).AllSeries), ctx)
+	return &MockIRollupAllSeriesCall{Call: call}
+}
+
+// MockIRollupAllSeriesCall wrap *gomock.Call
+type MockIRollupAllSeriesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIRollupAllSeriesCall) Return(arg0 []storage.RollupHistogramItem, arg1 error) *MockIRollupAllSeriesCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIRollupAllSeriesCall) Do(f func(context.Context) ([]storage.RollupHistogramItem, error)) *MockIRollupAllSeriesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIRollupAllSeriesCall) DoAndReturn(f func(context.Context) ([]storage.RollupHistogramItem, error)) *MockIRollupAllSeriesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // ById mocks base method.
 func (m *MockIRollup) ById(ctx context.Context, rollupId uint64) (storage.RollupWithStats, error) {
 	m.ctrl.T.Helper()

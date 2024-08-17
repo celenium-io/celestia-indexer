@@ -267,3 +267,20 @@ func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series, grou
 		Scan(ctx, &items)
 	return
 }
+
+func (r *Rollup) AllSeries(ctx context.Context) (items []storage.RollupHistogramItem, err error) {
+	subQuery := r.DB().NewSelect().
+		Table(storage.ViewRollupStatsByMonth).
+		ColumnExpr("rp.rollup_id, sum(size) as size, sum(blobs_count) as blobs_count, sum(fee) as fee, time").
+		Join("inner join rollup_provider rp on (rp.namespace_id = 0 or rp.namespace_id = rollup_stats_by_month.namespace_id) and rp.address_id = signer_id").
+		Group("rollup_id", "time").
+		Order("time")
+
+	err = r.DB().NewSelect().
+		TableExpr("(?) as series", subQuery).
+		ColumnExpr("series.time as time, series.size as size, series.blobs_count as blobs_count, series.fee as fee, rollup.name as name, rollup.logo as logo").
+		Join("left join rollup on rollup.id = series.rollup_id").
+		Scan(ctx, &items)
+
+	return
+}
