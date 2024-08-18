@@ -44,11 +44,6 @@ func (m *MockIRollup) EXPECT() *MockIRollupMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIRollup) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // ById mocks base method.
 func (m *MockIRollup) ById(ctx context.Context, rollupId uint64) (storage.RollupWithStats, error) {
 	m.ctrl.T.Helper()
@@ -395,6 +390,45 @@ func (c *MockIRollupLeaderboardCall) Do(f func(context.Context, string, storage0
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIRollupLeaderboardCall) DoAndReturn(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.RollupWithStats, error)) *MockIRollupLeaderboardCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// LeaderboardDay mocks base method.
+func (m *MockIRollup) LeaderboardDay(ctx context.Context, sortField string, sort storage0.SortOrder, limit, offset int) ([]storage.RollupWithDayStats, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LeaderboardDay", ctx, sortField, sort, limit, offset)
+	ret0, _ := ret[0].([]storage.RollupWithDayStats)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LeaderboardDay indicates an expected call of LeaderboardDay.
+func (mr *MockIRollupMockRecorder) LeaderboardDay(ctx, sortField, sort, limit, offset any) *MockIRollupLeaderboardDayCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LeaderboardDay", reflect.TypeOf((*MockIRollup)(nil).LeaderboardDay), ctx, sortField, sort, limit, offset)
+	return &MockIRollupLeaderboardDayCall{Call: call}
+}
+
+// MockIRollupLeaderboardDayCall wrap *gomock.Call
+type MockIRollupLeaderboardDayCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIRollupLeaderboardDayCall) Return(arg0 []storage.RollupWithDayStats, arg1 error) *MockIRollupLeaderboardDayCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIRollupLeaderboardDayCall) Do(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.RollupWithDayStats, error)) *MockIRollupLeaderboardDayCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIRollupLeaderboardDayCall) DoAndReturn(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.RollupWithDayStats, error)) *MockIRollupLeaderboardDayCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

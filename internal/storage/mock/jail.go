@@ -44,11 +44,6 @@ func (m *MockIJail) EXPECT() *MockIJailMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIJail) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // ByValidator mocks base method.
 func (m *MockIJail) ByValidator(ctx context.Context, id uint64, limit, offset int) ([]storage.Jail, error) {
 	m.ctrl.T.Helper()

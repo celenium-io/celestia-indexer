@@ -44,11 +44,6 @@ func (m *MockIPrice) EXPECT() *MockIPriceMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIPrice) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // Get mocks base method.
 func (m *MockIPrice) Get(ctx context.Context, timeframe string, start, end time.Time, limit int) ([]storage.Price, error) {
 	m.ctrl.T.Helper()

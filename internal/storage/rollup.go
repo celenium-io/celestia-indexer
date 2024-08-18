@@ -7,7 +7,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
@@ -15,9 +14,10 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IRollup interface {
-	storage.Table[*Rollup]
+	sdk.Table[*Rollup]
 
 	Leaderboard(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) ([]RollupWithStats, error)
+	LeaderboardDay(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) ([]RollupWithDayStats, error)
 	Namespaces(ctx context.Context, rollupId uint64, limit, offset int) (namespaceIds []uint64, err error)
 	Providers(ctx context.Context, rollupId uint64) (providers []RollupProvider, err error)
 	RollupsByNamespace(ctx context.Context, namespaceId uint64, limit, offset int) (rollups []Rollup, err error)
@@ -82,4 +82,20 @@ type RollupStats struct {
 	SizePct         float64         `bun:"size_pct"`
 	FeePct          float64         `bun:"fee_pct"`
 	BlobsCountPct   float64         `bun:"blobs_count_pct"`
+}
+
+type RollupWithDayStats struct {
+	Rollup
+	RolluDayStats
+}
+
+type RolluDayStats struct {
+	AvgSize        int64           `bun:"avg_size"`
+	BlobsCount     int64           `bun:"blobs_count"`
+	TotalSize      int64           `bun:"total_size"`
+	Throghput      int64           `bun:"throughput"`
+	TotalFee       decimal.Decimal `bun:"total_fee"`
+	NamespaceCount int64           `bun:"namespace_count"`
+	PfbCount       int64           `bun:"pfb_count"`
+	MBPrice        decimal.Decimal `bun:"mb_price"`
 }

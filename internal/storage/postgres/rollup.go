@@ -49,6 +49,31 @@ func (r *Rollup) Leaderboard(ctx context.Context, sortField string, sort sdk.Sor
 	return
 }
 
+func (r *Rollup) LeaderboardDay(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) (rollups []storage.RollupWithDayStats, err error) {
+	switch sortField {
+	case "avg_size", blobsCountColumn, "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price":
+	case "":
+		sortField = "throughput"
+	default:
+		return nil, errors.Errorf("unknown sort field: %s", sortField)
+	}
+
+	query := r.DB().NewSelect().
+		Table(storage.ViewLeaderboardDay).
+		ColumnExpr("leaderboard_day.*").
+		ColumnExpr("rollup.id as rollup__id, rollup.name as rollup__name, rollup.description as rollup__description").
+		ColumnExpr("rollup.website as rollup__website, rollup.github as rollup__github, rollup.twitter as rollup__twitter").
+		ColumnExpr("rollup.logo as rollup__logo, rollup.slug as rollup__slug, rollup.bridge_contract as rollup__bridge_contract").
+		ColumnExpr("rollup.l2_beat as rollup__l2_beat, rollup.explorer as rollup__explorer, rollup.stack as rollup__stack").
+		Offset(offset).
+		Join("left join rollup on rollup.id = rollup_id")
+
+	query = sortScope(query, sortField, sort)
+	query = limitScope(query, limit)
+	err = query.Scan(ctx, &rollups)
+	return
+}
+
 func (r *Rollup) Namespaces(ctx context.Context, rollupId uint64, limit, offset int) (namespaceIds []uint64, err error) {
 	query := r.DB().NewSelect().
 		TableExpr("rollup_stats_by_month as r").

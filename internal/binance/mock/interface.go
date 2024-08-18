@@ -43,11 +43,6 @@ func (m *MockIApi) EXPECT() *MockIApiMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIApi) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // OHLC mocks base method.
 func (m *MockIApi) OHLC(ctx context.Context, symbol, interval string, arguments *binance.OHLCArgs) ([]binance.OHLC, error) {
 	m.ctrl.T.Helper()

@@ -46,11 +46,6 @@ func (m *MockIBlock) EXPECT() *MockIBlockMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIBlock) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // ByHash mocks base method.
 func (m *MockIBlock) ByHash(ctx context.Context, hash []byte) (storage.Block, error) {
 	m.ctrl.T.Helper()

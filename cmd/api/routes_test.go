@@ -47,6 +47,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/block GET":                                       {},
 		"/v1/tx/:hash/blobs/count GET":                        {},
 		"/v1/rollup GET":                                      {},
+		"/v1/rollup/day GET":                                  {},
 		"/v1/address/:hash/vestings GET":                      {},
 		"/v1/tx/:hash/events GET":                             {},
 		"/v1/stats/changes_24h GET":                           {},

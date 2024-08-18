@@ -44,11 +44,6 @@ func (m *MockIBlockStats) EXPECT() *MockIBlockStatsMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIBlockStats) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // ByHeight mocks base method.
 func (m *MockIBlockStats) ByHeight(ctx context.Context, height types.Level) (storage.BlockStats, error) {
 	m.ctrl.T.Helper()

@@ -45,11 +45,6 @@ func (m *MockIValidator) EXPECT() *MockIValidatorMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIValidator) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // ByAddress mocks base method.
 func (m *MockIValidator) ByAddress(ctx context.Context, address string) (storage.Validator, error) {
 	m.ctrl.T.Helper()

@@ -19,6 +19,7 @@ const (
 	ViewStakingByDay          = "staking_by_day"
 	ViewStakingByMonth        = "staking_by_month"
 	ViewLeaderboard           = "leaderboard"
+	ViewLeaderboardDay        = "leaderboard_day"
 	ViewSquareSize            = "square_size"
 	ViewRollupStatsByHour     = "rollup_stats_by_hour"
 	ViewRollupStatsByDay      = "rollup_stats_by_day"

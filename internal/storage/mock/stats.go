@@ -44,11 +44,6 @@ func (m *MockIStats) EXPECT() *MockIStatsMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIStats) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // Change24hBlockStats mocks base method.
 func (m *MockIStats) Change24hBlockStats(ctx context.Context) (storage.Change24hBlockStats, error) {
 	m.ctrl.T.Helper()

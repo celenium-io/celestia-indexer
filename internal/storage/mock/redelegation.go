@@ -44,11 +44,6 @@ func (m *MockIRedelegation) EXPECT() *MockIRedelegationMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIRedelegation) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // ByAddress mocks base method.
 func (m *MockIRedelegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int) ([]storage.Redelegation, error) {
 	m.ctrl.T.Helper()

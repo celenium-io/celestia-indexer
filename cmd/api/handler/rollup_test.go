@@ -121,6 +121,47 @@ func (s *RollupTestSuite) TestLeaderboard() {
 	}
 }
 
+func (s *RollupTestSuite) TestLeaderboardDay() {
+	for _, sort := range []string{
+		"avg_size", "blobs_count", "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price",
+	} {
+		q := make(url.Values)
+		q.Add("sort_by", sort)
+
+		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+		rec := httptest.NewRecorder()
+		c := s.echo.NewContext(req, rec)
+		c.SetPath("/rollup/day")
+
+		s.rollups.EXPECT().
+			LeaderboardDay(gomock.Any(), sort, sdk.SortOrderDesc, 10, 0).
+			Return([]storage.RollupWithDayStats{
+				{
+					Rollup: testRollup,
+					RolluDayStats: storage.RolluDayStats{
+						BlobsCount: 100,
+					},
+				},
+			}, nil).
+			Times(1)
+
+		s.Require().NoError(s.handler.LeaderboardDay(c))
+		s.Require().Equal(http.StatusOK, rec.Code)
+
+		var rollups []responses.RollupWithDayStats
+		err := json.NewDecoder(rec.Body).Decode(&rollups)
+		s.Require().NoError(err)
+		s.Require().Len(rollups, 1)
+
+		rollup := rollups[0]
+		s.Require().EqualValues(1, rollup.Id)
+		s.Require().EqualValues("test rollup", rollup.Name)
+		s.Require().EqualValues("image.png", rollup.Logo)
+		s.Require().EqualValues("test-rollup", rollup.Slug)
+		s.Require().EqualValues(100, rollup.BlobsCount)
+	}
+}
+
 func (s *RollupTestSuite) TestGet() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()

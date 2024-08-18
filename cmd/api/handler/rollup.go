@@ -39,7 +39,7 @@ func NewRollupHandler(
 //	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						mininum(1)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"		Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field. Default: size"		Enums(time, blobs_count, size, "fee")
+//	@Param			sort_by	query	string	false	"Sort field. Default: size"		Enums(time, blobs_count, size, fee)
 //	@Produce		json
 //	@Success		200	{array}		responses.RollupWithStats
 //	@Failure		400	{object}	Error
@@ -59,6 +59,39 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 	response := make([]responses.RollupWithStats, len(rollups))
 	for i := range rollups {
 		response[i] = responses.NewRollupWithStats(rollups[i])
+	}
+	return returnArray(c, response)
+}
+
+// LeaderboardDay godoc
+//
+//	@Summary		List rollups info with stats by previous 24 hours
+//	@Description	List rollups info with stats by previous 24 hours
+//	@Tags			rollup
+//	@ID				list-rollup-24h
+//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"		Enums(asc, desc)
+//	@Param			sort_by	query	string	false	"Sort field. Default: mb_price"	Enums(avg_size, blobs_count, total_size, total_fee, throughput, namespace_count, pfb_count, mb_price)
+//	@Produce		json
+//	@Success		200	{array}		responses.RollupWithDayStats
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/rollup/day [get]
+func (handler RollupHandler) LeaderboardDay(c echo.Context) error {
+	req, err := bindAndValidate[rollupDayList](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	rollups, err := handler.rollups.LeaderboardDay(c.Request().Context(), req.SortBy, pgSort(req.Sort), req.Limit, req.Offset)
+	if err != nil {
+		return handleError(c, err, handler.rollups)
+	}
+	response := make([]responses.RollupWithDayStats, len(rollups))
+	for i := range rollups {
+		response[i] = responses.NewRollupWithDayStats(rollups[i])
 	}
 	return returnArray(c, response)
 }

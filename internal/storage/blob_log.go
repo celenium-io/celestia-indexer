@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
@@ -27,7 +26,7 @@ type BlobLogFilters struct {
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IBlobLog interface {
-	storage.Table[*BlobLog]
+	sdk.Table[*BlobLog]
 
 	ByNamespace(ctx context.Context, nsId uint64, fltrs BlobLogFilters) ([]BlobLog, error)
 	ByProviders(ctx context.Context, providers []RollupProvider, fltrs BlobLogFilters) ([]BlobLog, error)

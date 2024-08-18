@@ -45,11 +45,6 @@ func (m *MockIBlockSignature) EXPECT() *MockIBlockSignatureMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIBlockSignature) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // CursorList mocks base method.
 func (m *MockIBlockSignature) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.BlockSignature, error) {
 	m.ctrl.T.Helper()

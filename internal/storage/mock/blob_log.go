@@ -47,11 +47,6 @@ func (m *MockIBlobLog) EXPECT() *MockIBlobLogMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIBlobLog) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // Blob mocks base method.
 func (m *MockIBlobLog) Blob(ctx context.Context, height types.Level, nsId uint64, commitment string) (storage.BlobLog, error) {
 	m.ctrl.T.Helper()

@@ -44,11 +44,6 @@ func (m *MockIVestingPeriod) EXPECT() *MockIVestingPeriodMockRecorder {
 	return m.recorder
 }
 
-// ISGOMOCK indicates that this struct is a gomock mock.
-func (m *MockIVestingPeriod) ISGOMOCK() struct{} {
-	return struct{}{}
-}
-
 // ByVesting mocks base method.
 func (m *MockIVestingPeriod) ByVesting(ctx context.Context, id uint64, limit, offset int) ([]storage.VestingPeriod, error) {
 	m.ctrl.T.Helper()
