@@ -157,7 +157,7 @@ func NewRollupWithDayStats(r storage.RollupWithDayStats) RollupWithDayStats {
 		Stack:          r.Stack,
 		Slug:           r.Slug,
 		BlobsCount:     r.BlobsCount,
-		AvgSize:        r.AvgSize,
+		AvgSize:        int64(r.AvgSize),
 		TotalSize:      r.TotalSize,
 		Throghput:      r.Throghput,
 		NamespaceCount: r.NamespaceCount,
