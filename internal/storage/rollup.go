@@ -90,7 +90,7 @@ type RollupWithDayStats struct {
 }
 
 type RolluDayStats struct {
-	AvgSize        int64           `bun:"avg_size"`
+	AvgSize        float64         `bun:"avg_size"`
 	BlobsCount     int64           `bun:"blobs_count"`
 	TotalSize      int64           `bun:"total_size"`
 	Throghput      int64           `bun:"throughput"`
