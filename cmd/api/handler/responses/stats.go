@@ -163,3 +163,23 @@ func NewCountItem(item storage.CountItem) CountItem {
 		Value: item.Value,
 	}
 }
+
+type RollupAllSeriesItem struct {
+	Time       time.Time `example:"2023-07-04T03:10:57+00:00"       format:"date-time" json:"time"           swaggertype:"string"`
+	Name       string    `example:"Rollup name"                     format:"string"    json:"name,omitempty" swaggertype:"string"`
+	Logo       string    `example:"https://some_link.com/image.png" format:"string"    json:"logo,omitempty" swaggertype:"string"`
+	Size       int64     `example:"123"                             format:"integer"   json:"size"           swaggertype:"integer"`
+	Fee        string    `example:"123"                             format:"string"    json:"fee"            swaggertype:"string"`
+	BlobsCount int64     `example:"123"                             format:"integer"   json:"blobs_count"    swaggertype:"integer"`
+}
+
+func NewRollupAllSeriesItem(stats storage.RollupHistogramItem) RollupAllSeriesItem {
+	return RollupAllSeriesItem{
+		Time:       stats.Time,
+		Name:       stats.Name,
+		Logo:       stats.Logo,
+		Size:       stats.Size,
+		Fee:        stats.Fee,
+		BlobsCount: stats.BlobsCount,
+	}
+}

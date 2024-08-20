@@ -402,3 +402,40 @@ func (s *RollupTestSuite) TestByExportBlobs() {
 	s.Require().NoError(s.handler.ExportBlobs(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 }
+
+func (s *RollupTestSuite) TestAllSeries() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/rollup/stats/series")
+
+	s.rollups.EXPECT().
+		AllSeries(gomock.Any()).
+		Return([]storage.RollupHistogramItem{
+			{
+				Name:       testRollup.Name,
+				Logo:       testRollup.Logo,
+				Time:       testTime,
+				BlobsCount: 1,
+				Size:       2,
+				Fee:        "3",
+			},
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.AllSeries(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var items []responses.RollupAllSeriesItem
+	err := json.NewDecoder(rec.Body).Decode(&items)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+
+	item := items[0]
+	s.Require().EqualValues("test rollup", item.Name)
+	s.Require().EqualValues("3", item.Fee)
+	s.Require().EqualValues("image.png", item.Logo)
+	s.Require().EqualValues(2, item.Size)
+	s.Require().EqualValues(1, item.BlobsCount)
+	s.Require().EqualValues(testTime, item.Time)
+}

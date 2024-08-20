@@ -2679,6 +2679,42 @@
                 }
             }
         },
+        "/rollup/stats/series": {
+            "get": {
+                "description": "Get series for all rollups",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rollup"
+                ],
+                "summary": "Get series for all rollups",
+                "operationId": "get-rollup-all-series",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.RollupAllSeriesItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/rollup/{id}": {
             "get": {
                 "description": "Get rollup info",
@@ -5923,6 +5959,41 @@
                     "type": "string",
                     "format": "string",
                     "example": "https://website.com"
+                }
+            }
+        },
+        "responses.RollupAllSeriesItem": {
+            "type": "object",
+            "properties": {
+                "blobs_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 123
+                },
+                "fee": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123"
+                },
+                "logo": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://some_link.com/image.png"
+                },
+                "name": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Rollup name"
+                },
+                "size": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 123
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
                 }
             }
         },

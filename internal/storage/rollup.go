@@ -23,6 +23,7 @@ type IRollup interface {
 	RollupsByNamespace(ctx context.Context, namespaceId uint64, limit, offset int) (rollups []Rollup, err error)
 	ById(ctx context.Context, rollupId uint64) (RollupWithStats, error)
 	Series(ctx context.Context, rollupId uint64, timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
+	AllSeries(ctx context.Context) ([]RollupHistogramItem, error)
 	Count(ctx context.Context) (int64, error)
 	Distribution(ctx context.Context, rollupId uint64, series, groupBy string) (items []DistributionItem, err error)
 	BySlug(ctx context.Context, slug string) (RollupWithStats, error)
@@ -98,4 +99,13 @@ type RolluDayStats struct {
 	NamespaceCount int64           `bun:"namespace_count"`
 	PfbCount       int64           `bun:"pfb_count"`
 	MBPrice        decimal.Decimal `bun:"mb_price"`
+}
+
+type RollupHistogramItem struct {
+	Fee        string    `bun:"fee"`
+	BlobsCount int64     `bun:"blobs_count"`
+	Size       int64     `bun:"size"`
+	Name       string    `bun:"name"`
+	Logo       string    `bun:"logo"`
+	Time       time.Time `bun:"time"`
 }
