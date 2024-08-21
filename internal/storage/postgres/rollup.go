@@ -61,10 +61,7 @@ func (r *Rollup) LeaderboardDay(ctx context.Context, sortField string, sort sdk.
 	query := r.DB().NewSelect().
 		Table(storage.ViewLeaderboardDay).
 		Column("avg_size", blobsCountColumn, "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price").
-		ColumnExpr("rollup.id as rollup__id, rollup.name as rollup__name, rollup.description as rollup__description").
-		ColumnExpr("rollup.website as rollup__website, rollup.github as rollup__github, rollup.twitter as rollup__twitter").
-		ColumnExpr("rollup.logo as rollup__logo, rollup.slug as rollup__slug, rollup.bridge_contract as rollup__bridge_contract").
-		ColumnExpr("rollup.l2_beat as rollup__l2_beat, rollup.explorer as rollup__explorer, rollup.stack as rollup__stack").
+		ColumnExpr("rollup.*").
 		Offset(offset).
 		Join("left join rollup on rollup.id = rollup_id")
 

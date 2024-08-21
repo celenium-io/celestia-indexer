@@ -48,7 +48,7 @@ func (s *StorageTestSuite) TestRollupLeaderboardDay() {
 	s.Require().NoError(err)
 
 	for _, column := range []string{
-		"avg_size", "blobs_count", "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price", "",
+		"avg_size", blobsCountColumn, "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price", "",
 	} {
 
 		rollups, err := s.storage.Rollup.LeaderboardDay(ctx, column, sdk.SortOrderDesc, 10, 0)
