@@ -29,6 +29,8 @@ var (
 	maxBlockSize = coreTypes.MaxDataBytesNoEvidence(1974272, 100)
 )
 
+type ComputeHandler func(ctx context.Context, gasState GasPrice) error
+
 type Tracker struct {
 	state    storage.IState
 	stats    storage.IBlockStats
@@ -39,6 +41,8 @@ type Tracker struct {
 	gasState GasPrice
 	q        *queue
 	g        workerpool.Group
+
+	computeHandler ComputeHandler
 }
 
 func NewTracker(
@@ -62,6 +66,10 @@ func NewTracker(
 		q:   newQueue(blockCount),
 		g:   workerpool.NewGroup(),
 	}
+}
+
+func (tracker *Tracker) SubscribeOnCompute(handler ComputeHandler) {
+	tracker.computeHandler = handler
 }
 
 func (tracker *Tracker) Start(ctx context.Context) {
@@ -89,6 +97,14 @@ func (tracker *Tracker) listen(ctx context.Context) {
 			}
 			if err := tracker.computeMetrics(); err != nil {
 				log.Err(err).Msg("compute metrics")
+			}
+
+			if tracker.computeHandler != nil {
+				tracker.g.GoCtx(ctx, func(ctx context.Context) {
+					if err := tracker.computeHandler(ctx, tracker.gasState); err != nil {
+						log.Err(err).Msg("error in compute handler of gas tracker")
+					}
+				})
 			}
 		}
 	}

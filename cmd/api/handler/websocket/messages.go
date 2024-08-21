@@ -16,8 +16,9 @@ const (
 
 // channels
 const (
-	ChannelHead   = "head"
-	ChannelBlocks = "blocks"
+	ChannelHead     = "head"
+	ChannelBlocks   = "blocks"
+	ChannelGasPrice = "gas_price"
 )
 
 type Message struct {
@@ -40,7 +41,7 @@ type TransactionFilters struct {
 }
 
 type INotification interface {
-	*responses.Block | *responses.State
+	*responses.Block | *responses.State | *responses.GasPrice
 }
 
 type Notification[T INotification] struct {
@@ -59,5 +60,12 @@ func NewStateNotification(state responses.State) Notification[*responses.State] 
 	return Notification[*responses.State]{
 		Channel: ChannelHead,
 		Body:    &state,
+	}
+}
+
+func NewGasPriceNotification(value responses.GasPrice) Notification[*responses.GasPrice] {
+	return Notification[*responses.GasPrice]{
+		Channel: ChannelGasPrice,
+		Body:    &value,
 	}
 }

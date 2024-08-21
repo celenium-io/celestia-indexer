@@ -555,6 +555,9 @@ var (
 func initWebsocket(ctx context.Context, group *echo.Group) {
 	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelBlock)
 	wsManager = websocket.NewManager(observer)
+	if gasTracker != nil {
+		gasTracker.SubscribeOnCompute(wsManager.GasTrackerHandler)
+	}
 	wsManager.Start(ctx)
 	group.GET("/ws", wsManager.Handle)
 }

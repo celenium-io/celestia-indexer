@@ -82,6 +82,8 @@ func (c *Client) ApplyFilters(msg Subscribe) error {
 		c.filters.head = true
 	case ChannelBlocks:
 		c.filters.blocks = true
+	case ChannelGasPrice:
+		c.filters.gasPrice = true
 	default:
 		return errors.Wrap(ErrUnknownChannel, msg.Channel)
 	}
@@ -97,6 +99,8 @@ func (c *Client) DetachFilters(msg Unsubscribe) error {
 		c.filters.head = false
 	case ChannelBlocks:
 		c.filters.blocks = false
+	case ChannelGasPrice:
+		c.filters.gasPrice = false
 	default:
 		return errors.Wrap(ErrUnknownChannel, msg.Channel)
 	}
