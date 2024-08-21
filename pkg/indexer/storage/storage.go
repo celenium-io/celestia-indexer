@@ -335,10 +335,10 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 }
 
 func (module *Module) notify(ctx context.Context, state storage.State, block storage.Block) error {
-	// if time.Since(block.Time) > time.Hour {
-	// 	// do not notify all about events if initial indexing is in progress
-	// 	return nil
-	// }
+	if time.Since(block.Time) > time.Hour {
+		// do not notify all about events if initial indexing is in progress
+		return nil
+	}
 
 	rawState, err := jsoniter.MarshalToString(state)
 	if err != nil {

@@ -2574,7 +2574,7 @@
                             "time",
                             "blobs_count",
                             "size",
-                            "\"fee\""
+                            "fee"
                         ],
                         "type": "string",
                         "description": "Sort field. Default: size",
@@ -2623,6 +2623,83 @@
                         "description": "OK",
                         "schema": {
                             "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/rollup/day": {
+            "get": {
+                "description": "List rollups info with stats by previous 24 hours",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rollup"
+                ],
+                "summary": "List rollups info with stats by previous 24 hours",
+                "operationId": "list-rollup-24h",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "avg_size",
+                            "blobs_count",
+                            "total_size",
+                            "total_fee",
+                            "throughput",
+                            "namespace_count",
+                            "pfb_count",
+                            "mb_price"
+                        ],
+                        "type": "string",
+                        "description": "Sort field. Default: mb_price",
+                        "name": "sort_by",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.RollupWithDayStats"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
                         }
                     },
                     "500": {
@@ -4933,7 +5010,7 @@
         },
         "/ws": {
             "get": {
-                "description": "## Documentation for websocket API\n\n### Notification\n\nThe structure of notification is following in all channels:\n\n```json\n{\n    \"channel\": \"channel_name\",\n    \"body\": \"\u003cobject or array\u003e\"  // depends on channel\n}\n```\n\n### Subscribe\n\nTo receive updates from websocket API send `subscribe` request to server.\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n        \"filters\": {\n            // pass channel filters\n        }\n    }\n}\n```\n\nNow 2 channels are supported:\n\n* `head` - receive information about indexer state. Channel does not have any filters. Subscribe message should looks like:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"head\"\n    }\n}\n```\n\nNotification body of `responses.State` type will be sent to the channel.\n\n* `blocks` - receive information about new blocks. Channel does not have any filters. Subscribe message should looks like:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"blocks\"\n    }\n}\n```\n\nNotification body of `responses.Block` type will be sent to the channel.\n\n\n### Unsubscribe\n\nTo unsubscribe send `unsubscribe` message containing one of channel name describing above.\n\n\n```json\n{\n    \"method\": \"unsubscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n    }\n}\n```\n",
+                "description": "## Documentation for websocket API\n\n### Notification\n\nThe structure of notification is following in all channels:\n\n```json\n{\n    \"channel\": \"channel_name\",\n    \"body\": \"\u003cobject or array\u003e\"  // depends on channel\n}\n```\n\n### Subscribe\n\nTo receive updates from websocket API send `subscribe` request to server.\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n        \"filters\": {\n            // pass channel filters\n        }\n    }\n}\n```\n\nNow 3 channels are supported:\n\n* `head` - receive information about indexer state. Channel does not have any filters. Subscribe message should looks like:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"head\"\n    }\n}\n```\n\nNotification body of `responses.State` type will be sent to the channel.\n\n* `blocks` - receive information about new blocks. Channel does not have any filters. Subscribe message should looks like:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"blocks\"\n    }\n}\n```\n\nNotification body of `responses.Block` type will be sent to the channel.\n\n* `gas_price` - receive information about current gas price. Channel does not have any filters. Subscribe message should looks like:\n\n```json\n{\n    \"method\": \"subscribe\",\n    \"body\": {\n        \"channel\": \"gas_price\"\n    }\n}\n```\n\nNotification body of `responses.GasPrice` type will be sent to the channel.\n\n\n### Unsubscribe\n\nTo unsubscribe send `unsubscribe` message containing one of channel name describing above.\n\n\n```json\n{\n    \"method\": \"unsubscribe\",\n    \"body\": {\n        \"channel\": \"\u003cCHANNEL_NAME\u003e\",\n    }\n}\n```\n",
                 "produces": [
                     "application/json"
                 ],
@@ -6029,6 +6106,121 @@
                     "type": "integer",
                     "format": "integer",
                     "example": 123
+                }
+            }
+        },
+        "responses.RollupWithDayStats": {
+            "type": "object",
+            "properties": {
+                "avg_size": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "blobs_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "blobs_per_pfb": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 100
+                },
+                "bridge": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://github.com/account"
+                },
+                "description": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Long rollup description"
+                },
+                "explorer": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://explorer.karak.network/"
+                },
+                "fee_per_pfb": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "100"
+                },
+                "github": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://github.com/account"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 321
+                },
+                "l2_beat": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://l2beat.com/scaling/projects/karak"
+                },
+                "logo": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://some_link.com/image.png"
+                },
+                "mb_price": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "100"
+                },
+                "name": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Rollup name"
+                },
+                "namespace_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "pfb_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "slug": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "rollup_slug"
+                },
+                "stack": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "op_stack"
+                },
+                "throughput": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "total_fee": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "100"
+                },
+                "total_size": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "twitter": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://x.com/account"
+                },
+                "website": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://website.com"
                 }
             }
         },
