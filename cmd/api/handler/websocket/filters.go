@@ -37,7 +37,21 @@ func (f HeadFilter) Filter(c client, msg Notification[*responses.State]) bool {
 	return fltrs.head
 }
 
+type GasPriceFilter struct{}
+
+func (f GasPriceFilter) Filter(c client, msg Notification[*responses.GasPrice]) bool {
+	if msg.Body == nil {
+		return false
+	}
+	fltrs := c.Filters()
+	if fltrs == nil {
+		return false
+	}
+	return fltrs.gasPrice
+}
+
 type Filters struct {
-	head   bool
-	blocks bool
+	head     bool
+	blocks   bool
+	gasPrice bool
 }

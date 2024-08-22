@@ -27,7 +27,7 @@ To receive updates from websocket API send `subscribe` request to server.
 }
 ```
 
-Now 2 channels are supported:
+Now 3 channels are supported:
 
 * `head` - receive information about indexer state. Channel does not have any filters. Subscribe message should looks like:
 
@@ -54,6 +54,19 @@ Notification body of `responses.State` type will be sent to the channel.
 ```
 
 Notification body of `responses.Block` type will be sent to the channel.
+
+* `gas_price` - receive information about current gas price. Channel does not have any filters. Subscribe message should looks like:
+
+```json
+{
+    "method": "subscribe",
+    "body": {
+        "channel": "gas_price"
+    }
+}
+```
+
+Notification body of `responses.GasPrice` type will be sent to the channel.
 
 
 ### Unsubscribe

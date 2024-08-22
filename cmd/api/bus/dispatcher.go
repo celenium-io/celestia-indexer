@@ -89,7 +89,7 @@ func (d *Dispatcher) listen(ctx context.Context) {
 				return
 			}
 			if notification == nil {
-				log.Warn().Str("channel", notification.Channel).Msg("nil notification")
+				log.Warn().Msg("nil notification")
 				continue
 			}
 			if err := d.handleNotification(ctx, notification); err != nil {

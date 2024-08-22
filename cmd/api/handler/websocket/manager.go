@@ -12,6 +12,7 @@ import (
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
+	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/gorilla/websocket"
@@ -25,8 +26,9 @@ type Manager struct {
 	clients  *sdkSync.Map[uint64, *Client]
 	observer *bus.Observer
 
-	blocks *Channel[storage.Block, *responses.Block]
-	head   *Channel[storage.State, *responses.State]
+	blocks   *Channel[storage.Block, *responses.Block]
+	head     *Channel[storage.State, *responses.State]
+	gasPrice *Channel[gas.GasPrice, *responses.GasPrice]
 
 	g workerpool.Group
 }
@@ -54,6 +56,11 @@ func NewManager(observer *bus.Observer) *Manager {
 	manager.head = NewChannel(
 		headProcessor,
 		HeadFilter{},
+	)
+
+	manager.gasPrice = NewChannel(
+		gasPriceProcessor,
+		GasPriceFilter{},
 	)
 
 	return manager
@@ -131,6 +138,8 @@ func (manager *Manager) AddClientToChannel(channel string, client *Client) {
 		manager.head.AddClient(client)
 	case ChannelBlocks:
 		manager.blocks.AddClient(client)
+	case ChannelGasPrice:
+		manager.gasPrice.AddClient(client)
 	default:
 		log.Error().Str("channel", channel).Msg("unknown channel name")
 	}
@@ -142,7 +151,13 @@ func (manager *Manager) RemoveClientFromChannel(channel string, client *Client) 
 		manager.head.RemoveClient(client.id)
 	case ChannelBlocks:
 		manager.blocks.RemoveClient(client.id)
+	case ChannelGasPrice:
+		manager.gasPrice.RemoveClient(client.id)
 	default:
 		log.Error().Str("channel", channel).Msg("unknown channel name")
 	}
+}
+
+func (manager *Manager) GasTrackerHandler(_ context.Context, state gas.GasPrice) error {
+	return manager.gasPrice.processMessage(state)
 }
