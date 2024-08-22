@@ -202,7 +202,7 @@ func initEcho(cfg ApiConfig, db postgres.Storage, env string) *echo.Echo {
 	if cfg.RequestTimeout > 0 {
 		timeout = time.Duration(cfg.RequestTimeout) * time.Second
 	}
-	e.Use(RequestTimeout(timeout))
+	e.Use(RequestTimeout(timeout, websocketSkipper))
 
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Skipper: gzipSkipper,
