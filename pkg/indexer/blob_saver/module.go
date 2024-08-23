@@ -6,6 +6,7 @@ package blobsaver
 import (
 	"context"
 	"os"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/blob"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
@@ -148,8 +149,21 @@ func (module *Module) processEndOfBlock(ctx context.Context, height pkgTypes.Lev
 			return errors.Wrap(err, "can't save blobs")
 		}
 
-		if err := module.storage.UpdateHead(ctx, uint64(height)); err != nil {
-			return errors.Wrap(err, "can't update head")
+		success := false
+		for !success {
+			timeoutCtx, cancel := context.WithTimeout(ctx, time.Second*15)
+			defer cancel()
+
+			if err := module.storage.UpdateHead(timeoutCtx, uint64(height)); err != nil {
+				if errors.Is(err, context.DeadlineExceeded) {
+					// try again
+					module.Log.Err(err).Msg("update head")
+					continue
+				}
+				return errors.Wrap(err, "can't update head")
+			}
+
+			success = true
 		}
 	}
 
@@ -186,7 +200,6 @@ func (module *Module) processBlob(msg *Msg) error {
 	if blobs, ok := module.blocks.Get(msg.Height); ok {
 		*blobs = append(*blobs, blb)
 	} else {
-
 		module.blocks.Set(msg.Height, &[]blob.Blob{blb})
 	}
 

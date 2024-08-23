@@ -72,7 +72,7 @@ func TestBlobSaverModule(t *testing.T) {
 		Times(1)
 
 	storage.EXPECT().
-		UpdateHead(ctx, uint64(101)).
+		UpdateHead(gomock.Any(), uint64(101)).
 		Return(nil).
 		Times(1)
 
