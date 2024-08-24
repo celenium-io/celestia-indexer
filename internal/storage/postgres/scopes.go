@@ -125,7 +125,7 @@ func blobLogSort(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.Sele
 	case sizeColumn, timeColumn:
 		query = sortScope(query, fmt.Sprintf("blob_log.%s", fltrs.SortBy), fltrs.Sort)
 	case "":
-		query = sortScope(query, "blob_log.id", fltrs.Sort)
+		query = sortScope(query, "blob_log.time", fltrs.Sort)
 	default:
 		return query
 	}
