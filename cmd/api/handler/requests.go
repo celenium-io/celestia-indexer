@@ -89,8 +89,8 @@ func bindAndValidate[T any](c echo.Context) (*T, error) {
 
 type addressTxRequest struct {
 	Hash    string      `param:"hash"     validate:"required,address"`
-	Limit   uint64      `query:"limit"    validate:"omitempty,min=1,max=100"`
-	Offset  uint64      `query:"offset"   validate:"omitempty,min=0"`
+	Limit   int         `query:"limit"    validate:"omitempty,min=1,max=100"`
+	Offset  int         `query:"offset"   validate:"omitempty,min=0"`
 	Sort    string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	Height  *uint64     `query:"height"   validate:"omitempty,min=0"`
 	Status  StringArray `query:"status"   validate:"omitempty,dive,status"`
@@ -111,8 +111,8 @@ func (p *addressTxRequest) SetDefault() {
 
 type listMessageByBlockRequest struct {
 	Height          pkgTypes.Level `param:"height"            validate:"required,min=1"`
-	Limit           uint64         `query:"limit"             validate:"omitempty,min=1,max=100"`
-	Offset          uint64         `query:"offset"            validate:"omitempty,min=0"`
+	Limit           int            `query:"limit"             validate:"omitempty,min=1,max=100"`
+	Offset          int            `query:"offset"            validate:"omitempty,min=0"`
 	MsgType         StringArray    `query:"msg_type"          validate:"omitempty,dive,msg_type"`
 	ExcludedMsgType StringArray    `query:"excluded_msg_type" validate:"omitempty,dive,msg_type"`
 }

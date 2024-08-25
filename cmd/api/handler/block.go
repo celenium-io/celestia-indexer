@@ -283,8 +283,8 @@ func (handler *BlockHandler) GetMessages(c echo.Context) error {
 	req.SetDefault()
 
 	fltrs := storage.MessageListWithTxFilters{
-		Limit:                int(req.Limit),
-		Offset:               int(req.Offset),
+		Limit:                req.Limit,
+		Offset:               req.Offset,
 		Height:               req.Height,
 		MessageTypes:         req.MsgType,
 		ExcludedMessageTypes: req.ExcludedMsgType,
@@ -305,8 +305,8 @@ func (handler *BlockHandler) GetMessages(c echo.Context) error {
 
 type getBlobsForBlock struct {
 	Height types.Level `param:"height"  validate:"min=0"`
-	Limit  uint64      `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset uint64      `query:"offset"  validate:"omitempty,min=0"`
+	Limit  int         `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset int         `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string      `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string      `query:"sort_by" validate:"omitempty,oneof=time size"`
 }
@@ -355,8 +355,8 @@ func (handler *BlockHandler) Blobs(c echo.Context) error {
 		c.Request().Context(),
 		req.Height,
 		storage.BlobLogFilters{
-			Limit:  int(req.Limit),
-			Offset: int(req.Offset),
+			Limit:  req.Limit,
+			Offset: req.Offset,
 			Sort:   pgSort(req.Sort),
 			SortBy: req.SortBy,
 			// using time filters to take certain partition

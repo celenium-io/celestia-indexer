@@ -112,8 +112,11 @@ func (b *Blocks) ByHash(ctx context.Context, hash []byte) (block storage.Block, 
 func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order sdk.SortOrder) (blocks []*storage.Block, err error) {
 	subQuery := b.DB().NewSelect().
 		Model(&blocks)
+
+	//nolint:gosec
 	subQuery = limitScope(subQuery, int(limit))
 	if offset > 0 {
+		//nolint:gosec
 		subQuery = subQuery.Offset(int(offset))
 	}
 	if order == sdk.SortOrderAsc {

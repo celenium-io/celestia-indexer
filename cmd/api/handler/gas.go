@@ -68,6 +68,7 @@ func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 		if err != nil {
 			return badRequestError(c, err)
 		}
+		//nolint:gosec
 		sizes[i] = uint32(size)
 	}
 

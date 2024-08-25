@@ -85,6 +85,8 @@ func getBalanceUpdates(
 			if err != nil {
 				return nil, err
 			}
+
+			//nolint:gosec
 			address.LastHeight = pkgTypes.Level(lastHeight)
 			updates[address.Address] = address
 		}

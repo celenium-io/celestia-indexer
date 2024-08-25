@@ -332,8 +332,8 @@ func (sh StatsHandler) NamespaceSeries(c echo.Context) error {
 
 type priceSeriesRequest struct {
 	Timeframe string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=1m 1h 1d"`
-	From      uint64 `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
-	To        uint64 `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
+	From      int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To        int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
 }
 
 // PriceSeries godoc
@@ -362,10 +362,10 @@ func (sh StatsHandler) PriceSeries(c echo.Context) error {
 	)
 
 	if req.From > 0 {
-		from = time.Unix(int64(req.From), 0).UTC()
+		from = time.Unix(req.From, 0).UTC()
 	}
 	if req.To > 0 {
-		to = time.Unix(int64(req.To), 0).UTC()
+		to = time.Unix(req.To, 0).UTC()
 	}
 
 	histogram, err := sh.price.Get(c.Request().Context(), req.Timeframe, from, to, 100)

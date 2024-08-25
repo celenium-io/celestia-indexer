@@ -30,6 +30,7 @@ func processBlob(blobs []*storage.BlobLog, d decode.DecodedTx, t *storage.Tx) {
 	)
 	for i := range blobs {
 		blobs[i].ContentType = http.DetectContentType(d.Blobs[i].Data)
+		//nolint:gosec
 		sharesUsed := appshares.SparseSharesNeeded(uint32(blobs[i].Size))
 		gas := decimal.NewFromInt(int64(sharesUsed)).Mul(gasPerBlobByte)
 		gasConsumedOnBlobs = gasConsumedOnBlobs.Add(gas)
