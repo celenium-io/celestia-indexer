@@ -188,8 +188,8 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 	}
 
 	fltrs := storage.TxFilter{
-		Limit:        int(req.Limit),
-		Offset:       int(req.Offset),
+		Limit:        req.Limit,
+		Offset:       req.Offset,
 		Sort:         pgSort(req.Sort),
 		Status:       req.Status,
 		Height:       req.Height,
@@ -218,8 +218,8 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 
 type getAddressMessages struct {
 	Hash    string      `param:"hash"     validate:"required,address"`
-	Limit   uint64      `query:"limit"    validate:"omitempty,min=1,max=100"`
-	Offset  uint64      `query:"offset"   validate:"omitempty,min=0"`
+	Limit   int         `query:"limit"    validate:"omitempty,min=1,max=100"`
+	Offset  int         `query:"offset"   validate:"omitempty,min=0"`
 	Sort    string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	MsgType StringArray `query:"msg_type" validate:"omitempty,dive,msg_type"`
 }
@@ -238,8 +238,8 @@ func (p *getAddressMessages) SetDefault() {
 
 func (p *getAddressMessages) ToFilters() storage.AddressMsgsFilter {
 	return storage.AddressMsgsFilter{
-		Limit:        int(p.Limit),
-		Offset:       int(p.Offset),
+		Limit:        p.Limit,
+		Offset:       p.Offset,
 		Sort:         pgSort(p.Sort),
 		MessageTypes: p.MsgType,
 	}
@@ -295,8 +295,8 @@ func (handler *AddressHandler) Messages(c echo.Context) error {
 
 type getBlobLogsForAddress struct {
 	Hash   string `param:"hash"    validate:"required,address"`
-	Limit  uint64 `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset uint64 `query:"offset"  validate:"omitempty,min=0"`
+	Limit  int    `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset int    `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string `query:"sort_by" validate:"omitempty,oneof=time size"`
 }
@@ -347,8 +347,8 @@ func (handler *AddressHandler) Blobs(c echo.Context) error {
 		c.Request().Context(),
 		addressId,
 		storage.BlobLogFilters{
-			Limit:  int(req.Limit),
-			Offset: int(req.Offset),
+			Limit:  req.Limit,
+			Offset: req.Offset,
 			Sort:   pgSort(req.Sort),
 			SortBy: req.SortBy,
 		},

@@ -101,6 +101,7 @@ func (module *Module) init(ctx context.Context) error {
 	if err != nil {
 		return errors.Wrap(err, "can't receive head")
 	}
+	//nolint:gosec
 	module.head = pkgTypes.Level(head)
 	return nil
 }
@@ -174,10 +175,12 @@ func (module *Module) processEndOfBlock(ctx context.Context, height pkgTypes.Lev
 }
 
 func (module *Module) processBlob(msg *Msg) error {
+	//nolint:gosec
 	ns, err := namespace.New(uint8(msg.Blob.NamespaceVersion), msg.Blob.NamespaceId)
 	if err != nil {
 		return errors.Wrapf(err, "can't parse namespace: version=%d id=%x", msg.Blob.NamespaceVersion, msg.Blob.NamespaceId)
 	}
+	//nolint:gosec
 	b := sqBlob.New(ns, msg.Blob.Data, uint8(msg.Blob.ShareVersion))
 	commitment, err := inclusion.CreateCommitment(b, merkle.HashFromByteSlices, appconsts.SubtreeRootThreshold(uint64(msg.Blob.ShareVersion)))
 	if err != nil {

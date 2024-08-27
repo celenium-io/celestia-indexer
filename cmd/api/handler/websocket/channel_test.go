@@ -98,6 +98,7 @@ func BenchmarkProcessingMessage(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			height := uint64(i)
 
+			//nolint:gosec
 			err := channel.processMessage(storage.Block{
 				Id:           height,
 				Height:       types.Level(height),

@@ -187,8 +187,8 @@ func (tracker *Tracker) compute(txs []storage.Gas, gasLimit int64, data *info) {
 	)
 
 	for i, p := range percentiles {
-		threshold := uint64(float64(gasLimit) * p)
-		for sumGas < int64(threshold) && txIndex < len(txs)-1 {
+		threshold := int64(float64(gasLimit) * p)
+		for sumGas < threshold && txIndex < len(txs)-1 {
 			txIndex++
 			sumGas += txs[txIndex].GasWanted
 		}

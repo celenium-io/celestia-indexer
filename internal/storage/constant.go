@@ -43,5 +43,6 @@ func (c Constant) MustUint32() uint32 {
 	if err != nil {
 		panic(err)
 	}
+	//nolint:gosec
 	return uint32(i)
 }

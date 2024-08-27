@@ -296,8 +296,8 @@ func (handler *TxHandler) Genesis(c echo.Context) error {
 
 type getBlobsForTx struct {
 	Hash   string `param:"hash"    validate:"required,hexadecimal,len=64"`
-	Limit  uint64 `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset uint64 `query:"offset"  validate:"omitempty,min=0"`
+	Limit  int    `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset int    `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string `query:"sort_by" validate:"omitempty,oneof=time size"`
 }
@@ -348,8 +348,8 @@ func (handler *TxHandler) Blobs(c echo.Context) error {
 		c.Request().Context(),
 		txId,
 		storage.BlobLogFilters{
-			Limit:  int(req.Limit),
-			Offset: int(req.Offset),
+			Limit:  req.Limit,
+			Offset: req.Offset,
 			Sort:   pgSort(req.Sort),
 			SortBy: req.SortBy,
 		},
