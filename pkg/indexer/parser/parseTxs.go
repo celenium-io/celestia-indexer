@@ -120,10 +120,6 @@ func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txR
 		}
 	}
 
-	if !txRes.IsFailed() {
-		p.notifyBlobs(b.Height, d.Blobs)
-	}
-
 	ctx.Block.Stats.Fee = ctx.Block.Stats.Fee.Add(t.Fee)
 	ctx.Block.MessageTypes.Set(t.MessageTypes.Bits)
 	ctx.Block.Stats.BlobsSize += t.BlobsSize

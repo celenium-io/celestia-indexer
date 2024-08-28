@@ -14,7 +14,6 @@ require (
 	github.com/aws/smithy-go v1.20.2
 	github.com/celestiaorg/celestia-app v1.14.0
 	github.com/celestiaorg/go-square v1.1.0
-	github.com/celestiaorg/go-square/merkle v0.0.0-20240429192549-dea967e1533b
 	github.com/celestiaorg/rsmt2d v0.13.1
 	github.com/cosmos/cosmos-sdk v0.46.16
 	github.com/cosmos/ibc-go/v6 v6.2.2

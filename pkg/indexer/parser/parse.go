@@ -94,8 +94,6 @@ func (p *Module) parse(b types.BlockData) error {
 	output := p.MustOutput(OutputName)
 	output.Push(decodeCtx)
 
-	p.notifyBlobsEndOfBlock(b.Height)
-
 	return nil
 }
 

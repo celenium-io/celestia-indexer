@@ -21,7 +21,6 @@ type Indexer struct {
 	StartLevel   int64  `validate:"omitempty"          yaml:"start_level"`
 	BlockPeriod  int64  `validate:"omitempty"          yaml:"block_period"`
 	ScriptsDir   string `validate:"omitempty,dir"      yaml:"scripts_dir"`
-	BlobSaver    string `validate:"omitempty,oneof=r2" yaml:"blob_saver"`
 }
 
 // Substitute -
