@@ -10,6 +10,7 @@ import (
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/pkg/errors"
+	"github.com/uptrace/bun"
 )
 
 // Address -
@@ -112,11 +113,11 @@ func (a *Address) Series(ctx context.Context, addressId uint64, timeframe storag
 }
 
 // IdByHash -
-func (a *Address) IdByHash(ctx context.Context, hash []byte) (id uint64, err error) {
+func (a *Address) IdByHash(ctx context.Context, hash ...[]byte) (id []uint64, err error) {
 	err = a.DB().NewSelect().
 		Model((*storage.Address)(nil)).
 		Column("id").
-		Where("hash = ?", hash).
+		Where("hash IN (?)", bun.In(hash)).
 		Scan(ctx, &id)
 	return
 }

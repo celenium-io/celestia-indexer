@@ -211,7 +211,7 @@ func (s *AddressTestSuite) TestTransactions() {
 
 	s.address.EXPECT().
 		IdByHash(gomock.Any(), testHashAddress).
-		Return(uint64(1), nil).
+		Return([]uint64{1}, nil).
 		Times(1)
 
 	s.txs.EXPECT().
@@ -260,7 +260,7 @@ func (s *AddressTestSuite) TestMessages() {
 
 	s.address.EXPECT().
 		IdByHash(gomock.Any(), testHashAddress).
-		Return(uint64(1), nil).
+		Return([]uint64{1}, nil).
 		Times(1)
 
 	s.messages.EXPECT().
@@ -320,13 +320,14 @@ func (s *AddressTestSuite) TestBlobs() {
 
 	s.address.EXPECT().
 		IdByHash(gomock.Any(), testHashAddress).
-		Return(uint64(1), nil).
+		Return([]uint64{1}, nil).
 		Times(1)
 
 	s.blobLogs.EXPECT().
 		BySigner(gomock.Any(), uint64(1), storage.BlobLogFilters{
 			Limit: 10,
 			Sort:  "desc",
+			Joins: true,
 		}).
 		Return([]storage.BlobLog{
 			{
@@ -395,7 +396,7 @@ func (s *AddressTestSuite) TestDelegations() {
 
 	s.address.EXPECT().
 		IdByHash(gomock.Any(), testHashAddress).
-		Return(uint64(1), nil).
+		Return([]uint64{1}, nil).
 		Times(1)
 
 	s.delegations.EXPECT().
@@ -442,7 +443,7 @@ func (s *AddressTestSuite) TestUndelegations() {
 
 	s.address.EXPECT().
 		IdByHash(gomock.Any(), testHashAddress).
-		Return(uint64(1), nil).
+		Return([]uint64{1}, nil).
 		Times(1)
 
 	s.undelegations.EXPECT().
@@ -495,7 +496,7 @@ func (s *AddressTestSuite) TestRedelegations() {
 
 	s.address.EXPECT().
 		IdByHash(gomock.Any(), testHashAddress).
-		Return(uint64(1), nil).
+		Return([]uint64{1}, nil).
 		Times(1)
 
 	s.redelegations.EXPECT().
@@ -552,7 +553,7 @@ func (s *AddressTestSuite) TestVestings() {
 
 	s.address.EXPECT().
 		IdByHash(gomock.Any(), testHashAddress).
-		Return(uint64(1), nil).
+		Return([]uint64{1}, nil).
 		Times(1)
 
 	s.vestings.EXPECT().
@@ -604,7 +605,7 @@ func (s *AddressTestSuite) TestGrants() {
 
 	s.address.EXPECT().
 		IdByHash(gomock.Any(), testHashAddress).
-		Return(uint64(1), nil).
+		Return([]uint64{1}, nil).
 		Times(1)
 
 	s.grants.EXPECT().
@@ -656,7 +657,7 @@ func (s *AddressTestSuite) TestGrantee() {
 
 	s.address.EXPECT().
 		IdByHash(gomock.Any(), testHashAddress).
-		Return(uint64(1), nil).
+		Return([]uint64{1}, nil).
 		Times(1)
 
 	s.grants.EXPECT().
@@ -706,7 +707,7 @@ func (s *AddressTestSuite) TestStats() {
 
 			s.address.EXPECT().
 				IdByHash(gomock.Any(), testHashAddress).
-				Return(uint64(1), nil).
+				Return([]uint64{1}, nil).
 				Times(1)
 
 			s.address.EXPECT().

@@ -36,18 +36,23 @@ func (bl *BlobLog) ByNamespace(ctx context.Context, nsId uint64, fltrs storage.B
 
 	blobsQuery = blobLogFilters(blobsQuery, fltrs)
 
-	query := bl.DB().NewSelect().
-		ColumnExpr("blob_log.*").
-		ColumnExpr("signer.address as signer__address").
-		ColumnExpr("tx.id as tx__id, tx.height as tx__height, tx.time as tx__time, tx.position as tx__position, tx.gas_wanted as tx__gas_wanted, tx.gas_used as tx__gas_used, tx.timeout_height as tx__timeout_height, tx.events_count as tx__events_count, tx.messages_count as tx__messages_count, tx.fee as tx__fee, tx.status as tx__status, tx.error as tx__error, tx.codespace as tx__codespace, tx.hash as tx__hash, tx.memo as tx__memo, tx.message_types as tx__message_types").
-		ColumnExpr("rollup.id as rollup__id, rollup.name as rollup__name, rollup.logo as rollup__logo, rollup.slug as rollup__slug").
-		TableExpr("(?) as blob_log", blobsQuery).
-		Join("left join address as signer on signer.id = blob_log.signer_id").
-		Join("left join tx on tx.id = blob_log.tx_id").
-		Join("left join rollup_provider as p on blob_log.signer_id = p.address_id and blob_log.namespace_id = p.namespace_id").
-		Join("left join rollup on rollup.id = p.rollup_id")
+	var query *bun.SelectQuery
+	if fltrs.Joins {
+		query = bl.DB().NewSelect().
+			ColumnExpr("blob_log.*").
+			ColumnExpr("signer.address as signer__address").
+			ColumnExpr("tx.id as tx__id, tx.height as tx__height, tx.time as tx__time, tx.position as tx__position, tx.gas_wanted as tx__gas_wanted, tx.gas_used as tx__gas_used, tx.timeout_height as tx__timeout_height, tx.events_count as tx__events_count, tx.messages_count as tx__messages_count, tx.fee as tx__fee, tx.status as tx__status, tx.error as tx__error, tx.codespace as tx__codespace, tx.hash as tx__hash, tx.memo as tx__memo, tx.message_types as tx__message_types").
+			ColumnExpr("rollup.id as rollup__id, rollup.name as rollup__name, rollup.logo as rollup__logo, rollup.slug as rollup__slug").
+			TableExpr("(?) as blob_log", blobsQuery).
+			Join("left join address as signer on signer.id = blob_log.signer_id").
+			Join("left join tx on tx.id = blob_log.tx_id").
+			Join("left join rollup_provider as p on blob_log.signer_id = p.address_id and blob_log.namespace_id = p.namespace_id").
+			Join("left join rollup on rollup.id = p.rollup_id")
+		query = blobLogSort(query, fltrs)
+	} else {
+		query = blobsQuery
+	}
 
-	query = blobLogSort(query, fltrs)
 	err = query.Scan(ctx, &logs)
 	return
 }
@@ -74,13 +79,17 @@ func (bl *BlobLog) ByProviders(ctx context.Context, providers []storage.RollupPr
 
 	query := bl.DB().NewSelect().
 		ColumnExpr("blob_log.*").
-		ColumnExpr("signer.address as signer__address").
 		ColumnExpr("ns.id as namespace__id, ns.size as namespace__size, ns.blobs_count as namespace__blobs_count, ns.version as namespace__version, ns.namespace_id as namespace__namespace_id, ns.reserved as namespace__reserved, ns.pfb_count as namespace__pfb_count, ns.last_height as namespace__last_height, ns.last_message_time as namespace__last_message_time").
-		ColumnExpr("tx.id as tx__id, tx.height as tx__height, tx.time as tx__time, tx.position as tx__position, tx.gas_wanted as tx__gas_wanted, tx.gas_used as tx__gas_used, tx.timeout_height as tx__timeout_height, tx.events_count as tx__events_count, tx.messages_count as tx__messages_count, tx.fee as tx__fee, tx.status as tx__status, tx.error as tx__error, tx.codespace as tx__codespace, tx.hash as tx__hash, tx.memo as tx__memo, tx.message_types as tx__message_types").
 		TableExpr("(?) as blob_log", blobQuery).
-		Join("left join address as signer on signer.id = blob_log.signer_id").
-		Join("left join namespace as ns on ns.id = blob_log.namespace_id").
-		Join("left join tx on tx.id = blob_log.tx_id")
+		Join("left join namespace as ns on ns.id = blob_log.namespace_id")
+
+	if fltrs.Joins {
+		query = query.
+			ColumnExpr("signer.address as signer__address").
+			ColumnExpr("tx.id as tx__id, tx.height as tx__height, tx.time as tx__time, tx.position as tx__position, tx.gas_wanted as tx__gas_wanted, tx.gas_used as tx__gas_used, tx.timeout_height as tx__timeout_height, tx.events_count as tx__events_count, tx.messages_count as tx__messages_count, tx.fee as tx__fee, tx.status as tx__status, tx.error as tx__error, tx.codespace as tx__codespace, tx.hash as tx__hash, tx.memo as tx__memo, tx.message_types as tx__message_types").
+			Join("left join address as signer on signer.id = blob_log.signer_id").
+			Join("left join tx on tx.id = blob_log.tx_id")
+	}
 
 	query = blobLogSort(query, fltrs)
 	err = query.Scan(ctx, &logs)
@@ -166,10 +175,15 @@ func (bl *BlobLog) BySigner(ctx context.Context, signerId uint64, fltrs storage.
 	query := bl.DB().NewSelect().
 		ColumnExpr("blob_log.*").
 		ColumnExpr("ns.id as namespace__id, ns.size as namespace__size, ns.blobs_count as namespace__blobs_count, ns.version as namespace__version, ns.namespace_id as namespace__namespace_id, ns.reserved as namespace__reserved, ns.pfb_count as namespace__pfb_count, ns.last_height as namespace__last_height, ns.last_message_time as namespace__last_message_time").
-		ColumnExpr("tx.id as tx__id, tx.height as tx__height, tx.time as tx__time, tx.position as tx__position, tx.gas_wanted as tx__gas_wanted, tx.gas_used as tx__gas_used, tx.timeout_height as tx__timeout_height, tx.events_count as tx__events_count, tx.messages_count as tx__messages_count, tx.fee as tx__fee, tx.status as tx__status, tx.error as tx__error, tx.codespace as tx__codespace, tx.hash as tx__hash, tx.memo as tx__memo, tx.message_types as tx__message_types").
 		TableExpr("(?) as blob_log", blobQuery).
-		Join("left join namespace as ns on ns.id = blob_log.namespace_id").
-		Join("left join tx on tx.id = blob_log.tx_id")
+		Join("left join namespace as ns on ns.id = blob_log.namespace_id")
+
+	if fltrs.Joins {
+		query = query.
+			ColumnExpr("tx.id as tx__id, tx.height as tx__height, tx.time as tx__time, tx.position as tx__position, tx.gas_wanted as tx__gas_wanted, tx.gas_used as tx__gas_used, tx.timeout_height as tx__timeout_height, tx.events_count as tx__events_count, tx.messages_count as tx__messages_count, tx.fee as tx__fee, tx.status as tx__status, tx.error as tx__error, tx.codespace as tx__codespace, tx.hash as tx__hash, tx.memo as tx__memo, tx.message_types as tx__message_types").
+			Join("left join tx on tx.id = blob_log.tx_id")
+
+	}
 
 	query = blobLogSort(query, fltrs)
 	err = query.Scan(ctx, &logs)

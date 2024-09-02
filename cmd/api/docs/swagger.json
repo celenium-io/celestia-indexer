@@ -216,6 +216,12 @@
                         "description": "Sort field. If it's empty internal id is used",
                         "name": "sort_by",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Flag indicating whether entities of transaction and namespace should be attached or not. Default: true",
+                        "name": "joins",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2278,6 +2284,24 @@
                         "description": "Time to in unix timestamp",
                         "name": "to",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Flag indicating whether entities of rollup, transaction and signer should be attached or not. Default: true",
+                        "name": "joins",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated celestia addresses",
+                        "name": "signers",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Last entity id which is used for cursor pagination",
+                        "name": "cursor",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2887,6 +2911,12 @@
                         "type": "string",
                         "description": "Sort field. If it's empty internal id is used",
                         "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Flag indicating whether entities of transaction and signer should be attached or not. Default: true",
+                        "name": "joins",
                         "in": "query"
                     }
                 ],
@@ -5138,6 +5168,11 @@
                     "type": "integer",
                     "format": "integer",
                     "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 200
                 },
                 "namespace": {
                     "$ref": "#/definitions/responses.Namespace"

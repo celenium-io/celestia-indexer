@@ -22,6 +22,9 @@ type BlobLogFilters struct {
 	From       time.Time
 	To         time.Time
 	Commitment string
+	Joins      bool
+	Signers    []uint64
+	Cursor     uint64
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed

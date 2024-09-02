@@ -14,6 +14,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/node"
 	"github.com/labstack/echo/v4"
 )
@@ -22,6 +23,7 @@ type NamespaceHandler struct {
 	namespace   storage.INamespace
 	blobLogs    storage.IBlobLog
 	rollups     storage.IRollup
+	address     storage.IAddress
 	blob        node.DalApi
 	state       storage.IState
 	indexerName string
@@ -31,6 +33,7 @@ func NewNamespaceHandler(
 	namespace storage.INamespace,
 	blobLogs storage.IBlobLog,
 	rollups storage.IRollup,
+	address storage.IAddress,
 	state storage.IState,
 	indexerName string,
 	blob node.DalApi,
@@ -39,6 +42,7 @@ func NewNamespaceHandler(
 		namespace:   namespace,
 		blobLogs:    blobLogs,
 		rollups:     rollups,
+		address:     address,
 		blob:        blob,
 		state:       state,
 		indexerName: indexerName,
@@ -420,13 +424,16 @@ func (handler *NamespaceHandler) BlobMetadata(c echo.Context) error {
 }
 
 type getBlobLogsForNamespace struct {
-	Id         string `param:"id"         validate:"required,hexadecimal,len=56"`
-	Version    byte   `param:"version"`
-	Limit      int    `query:"limit"      validate:"omitempty,min=1,max=100"`
-	Offset     int    `query:"offset"     validate:"omitempty,min=0"`
-	Sort       string `query:"sort"       validate:"omitempty,oneof=asc desc"`
-	SortBy     string `query:"sort_by"    validate:"omitempty,oneof=time size"`
-	Commitment string `query:"commitment" validate:"omitempty,base64url"`
+	Id         string      `param:"id"         validate:"required,hexadecimal,len=56"`
+	Version    byte        `param:"version"`
+	Limit      int         `query:"limit"      validate:"omitempty,min=1,max=100"`
+	Offset     int         `query:"offset"     validate:"omitempty,min=0"`
+	Sort       string      `query:"sort"       validate:"omitempty,oneof=asc desc"`
+	SortBy     string      `query:"sort_by"    validate:"omitempty,oneof=time size"`
+	Commitment string      `query:"commitment" validate:"omitempty,base64url"`
+	Joins      *bool       `query:"joins"      validate:"omitempty"`
+	Signers    StringArray `query:"signers"    validate:"omitempty,dive,address"`
+	Cursor     uint64      `query:"cursor"     validate:"omitempty,min=0"`
 
 	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1"`
 	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`
@@ -450,28 +457,34 @@ func (req *getBlobLogsForNamespace) SetDefault() {
 	if req.Sort == "" {
 		req.Sort = desc
 	}
+	if req.Joins == nil {
+		req.Joins = testsuite.Ptr(true)
+	}
 }
 
 // GetBlobLogs godoc
 //
-//	@Summary		Get blob changes for namespace
-//	@Description	Returns blob changes for namespace
-//	@Tags			namespace
-//	@ID				get-blob-logs
-//	@Param			id			path	string	true	"Namespace id in hexadecimal"					minlength(56)	maxlength(56)
-//	@Param			version		path	integer	true	"Version of namespace"
-//	@Param			limit		query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"										mininum(1)
-//	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			sort_by	    query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
-//	@Param			commitment	query	string	false	"Commitment value in URLbase64 format"
-//	@Param			from		query	integer	false	"Time from in unix timestamp"					mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"						mininum(1)
-//	@Produce		json
-//	@Success		200	{array}		responses.BlobLog
-//	@Failure		400	{object}	Error
-//	@Failure		500	{object}	Error
-//	@Router			/namespace/{id}/{version}/blobs [get]
+//		@Summary		Get blob changes for namespace
+//		@Description	Returns blob changes for namespace
+//		@Tags			namespace
+//		@ID				get-blob-logs
+//		@Param			id			path	string	true	"Namespace id in hexadecimal"					minlength(56)	maxlength(56)
+//		@Param			version		path	integer	true	"Version of namespace"
+//		@Param			limit		query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//		@Param			offset		query	integer	false	"Offset"										mininum(1)
+//		@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//		@Param			sort_by	    query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
+//		@Param			commitment	query	string	false	"Commitment value in URLbase64 format"
+//		@Param			from		query	integer	false	"Time from in unix timestamp"					mininum(1)
+//		@Param			to			query	integer	false	"Time to in unix timestamp"						mininum(1)
+//		@Param          joins       query   boolean false   "Flag indicating whether entities of rollup, transaction and signer should be attached or not. Default: true"
+//	    @Param          signers     query   string  false   "Comma-separated celestia addresses"
+//		@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	mininum(1)
+//		@Produce		json
+//		@Success		200	{array}		responses.BlobLog
+//		@Failure		400	{object}	Error
+//		@Failure		500	{object}	Error
+//		@Router			/namespace/{id}/{version}/blobs [get]
 func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 	req, err := bindAndValidate[getBlobLogsForNamespace](c)
 	if err != nil {
@@ -494,12 +507,31 @@ func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 		return handleError(c, err, handler.namespace)
 	}
 
+	var ids []uint64
+	if len(req.Signers) > 0 {
+		hash := make([][]byte, len(req.Signers))
+		for i := range req.Signers {
+			_, h, err := types.Address(req.Signers[i]).Decode()
+			if err != nil {
+				return badRequestError(c, err)
+			}
+			hash[i] = h
+		}
+		ids, err = handler.address.IdByHash(c.Request().Context(), hash...)
+		if err != nil {
+			return handleError(c, err, handler.namespace)
+		}
+	}
+
 	fltrs := storage.BlobLogFilters{
 		Limit:      req.Limit,
 		Offset:     req.Offset,
 		Sort:       pgSort(req.Sort),
 		SortBy:     req.SortBy,
 		Commitment: cm,
+		Joins:      *req.Joins,
+		Signers:    ids,
+		Cursor:     req.Cursor,
 	}
 
 	if req.From > 0 {

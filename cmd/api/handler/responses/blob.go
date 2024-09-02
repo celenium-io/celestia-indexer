@@ -38,6 +38,7 @@ func NewBlob(blob types.Blob) (Blob, error) {
 }
 
 type BlobLog struct {
+	Id          uint64         `example:"200"                                             format:"integer"   json:"id"               swaggertype:"integer"`
 	Commitment  string         `example:"vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg="    format:"base64"    json:"commitment"       swaggertype:"string"`
 	Size        int64          `example:"10"                                              format:"integer"   json:"size"             swaggertype:"integer"`
 	Height      pkgTypes.Level `example:"100"                                             format:"integer"   json:"height"           swaggertype:"integer"`
@@ -51,6 +52,7 @@ type BlobLog struct {
 
 func NewBlobLog(blob storage.BlobLog) BlobLog {
 	b := BlobLog{
+		Id:          blob.Id,
 		Commitment:  blob.Commitment,
 		Size:        blob.Size,
 		Height:      blob.Height,

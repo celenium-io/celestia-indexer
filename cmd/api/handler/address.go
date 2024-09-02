@@ -10,8 +10,10 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 type AddressHandler struct {
@@ -186,6 +188,9 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
+	if len(addressId) != 1 {
+		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
+	}
 
 	fltrs := storage.TxFilter{
 		Limit:        req.Limit,
@@ -205,7 +210,7 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 		fltrs.MessageTypes.SetByMsgType(storageTypes.MsgType(req.MsgType[i]))
 	}
 
-	txs, err := handler.txs.ByAddress(c.Request().Context(), addressId, fltrs)
+	txs, err := handler.txs.ByAddress(c.Request().Context(), addressId[0], fltrs)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
@@ -278,9 +283,12 @@ func (handler *AddressHandler) Messages(c echo.Context) error {
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
+	if len(addressId) != 1 {
+		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
+	}
 
 	filters := req.ToFilters()
-	msgs, err := handler.messages.ByAddress(c.Request().Context(), addressId, filters)
+	msgs, err := handler.messages.ByAddress(c.Request().Context(), addressId[0], filters)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
@@ -299,6 +307,7 @@ type getBlobLogsForAddress struct {
 	Offset int    `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string `query:"sort_by" validate:"omitempty,oneof=time size"`
+	Joins  *bool  `query:"joins"   validate:"omitempty"`
 }
 
 func (req *getBlobLogsForAddress) SetDefault() {
@@ -307,6 +316,9 @@ func (req *getBlobLogsForAddress) SetDefault() {
 	}
 	if req.Sort == "" {
 		req.Sort = desc
+	}
+	if req.Joins == nil {
+		req.Joins = testsuite.Ptr(true)
 	}
 }
 
@@ -321,6 +333,7 @@ func (req *getBlobLogsForAddress) SetDefault() {
 //	@Param			offset	query	integer	false	"Offset"										minimum(1)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
+//	@Param          joins   query   boolean false   "Flag indicating whether entities of transaction and namespace should be attached or not. Default: true"
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
@@ -342,15 +355,19 @@ func (handler *AddressHandler) Blobs(c echo.Context) error {
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
+	if len(addressId) != 1 {
+		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
+	}
 
 	logs, err := handler.blobLogs.BySigner(
 		c.Request().Context(),
-		addressId,
+		addressId[0],
 		storage.BlobLogFilters{
 			Limit:  req.Limit,
 			Offset: req.Offset,
 			Sort:   pgSort(req.Sort),
 			SortBy: req.SortBy,
+			Joins:  *req.Joins,
 		},
 	)
 	if err != nil {
@@ -427,10 +444,13 @@ func (handler *AddressHandler) Delegations(c echo.Context) error {
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
+	if len(addressId) != 1 {
+		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
+	}
 
 	delegations, err := handler.delegations.ByAddress(
 		c.Request().Context(),
-		addressId,
+		addressId[0],
 		req.Limit,
 		req.Offset,
 		req.ShowZero,
@@ -489,10 +509,13 @@ func (handler *AddressHandler) Undelegations(c echo.Context) error {
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
+	if len(addressId) != 1 {
+		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
+	}
 
 	undelegations, err := handler.undelegations.ByAddress(
 		c.Request().Context(),
-		addressId,
+		addressId[0],
 		req.Limit,
 		req.Offset,
 	)
@@ -538,10 +561,13 @@ func (handler *AddressHandler) Redelegations(c echo.Context) error {
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
+	if len(addressId) != 1 {
+		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
+	}
 
 	redelegations, err := handler.redelegations.ByAddress(
 		c.Request().Context(),
-		addressId,
+		addressId[0],
 		req.Limit,
 		req.Offset,
 	)
@@ -601,10 +627,13 @@ func (handler *AddressHandler) Vestings(c echo.Context) error {
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
+	if len(addressId) != 1 {
+		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
+	}
 
 	vestings, err := handler.vestings.ByAddress(
 		c.Request().Context(),
-		addressId,
+		addressId[0],
 		req.Limit,
 		req.Offset,
 		req.ShowEnded,
@@ -651,10 +680,13 @@ func (handler *AddressHandler) Grants(c echo.Context) error {
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
+	if len(addressId) != 1 {
+		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
+	}
 
 	grants, err := handler.grants.ByGranter(
 		c.Request().Context(),
-		addressId,
+		addressId[0],
 		req.Limit,
 		req.Offset,
 	)
@@ -699,10 +731,13 @@ func (handler *AddressHandler) Grantee(c echo.Context) error {
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
+	if len(addressId) != 1 {
+		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
+	}
 
 	grants, err := handler.grants.ByGrantee(
 		c.Request().Context(),
-		addressId,
+		addressId[0],
 		req.Limit,
 		req.Offset,
 	)
@@ -756,10 +791,13 @@ func (handler *AddressHandler) Stats(c echo.Context) error {
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
+	if len(addressId) != 1 {
+		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
+	}
 
 	series, err := handler.address.Series(
 		c.Request().Context(),
-		addressId,
+		addressId[0],
 		storage.Timeframe(req.Timeframe),
 		req.SeriesName,
 		storage.NewSeriesRequest(req.From, req.To),

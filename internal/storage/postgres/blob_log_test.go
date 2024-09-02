@@ -23,6 +23,7 @@ func (s *StorageTestSuite) TestBlobLogsByNamespace() {
 		Offset: 0,
 		Sort:   sdk.SortOrderAsc,
 		SortBy: "size",
+		Joins:  true,
 	})
 	s.Require().NoError(err)
 	s.Require().Len(logs, 2)
@@ -47,6 +48,35 @@ func (s *StorageTestSuite) TestBlobLogsByNamespace() {
 	s.Require().Equal("Rollup 1", log.Rollup.Name)
 }
 
+func (s *StorageTestSuite) TestBlobLogsByNamespaceWithoutJoins() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	logs, err := s.storage.BlobLogs.ByNamespace(ctx, 2, storage.BlobLogFilters{
+		Limit:  2,
+		Offset: 0,
+		Sort:   sdk.SortOrderAsc,
+		SortBy: "size",
+		Joins:  false,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(logs, 2)
+
+	log := logs[0]
+	s.Require().EqualValues(1, log.Id)
+	s.Require().EqualValues(0, log.Height)
+	s.Require().EqualValues("RWW7eaKKXasSGK/DS8PlpErARbl5iFs1vQIycYEAlk0=", log.Commitment)
+	s.Require().EqualValues(10, log.Size)
+	s.Require().EqualValues(2, log.NamespaceId)
+	s.Require().EqualValues(1, log.SignerId)
+	s.Require().EqualValues(1, log.MsgId)
+	s.Require().EqualValues(4, log.TxId)
+
+	s.Require().Nil(log.Signer)
+	s.Require().Nil(log.Tx)
+	s.Require().Nil(log.Rollup)
+}
+
 func (s *StorageTestSuite) TestBlobLogsByNamespaceAndCommitment() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
@@ -57,6 +87,7 @@ func (s *StorageTestSuite) TestBlobLogsByNamespaceAndCommitment() {
 		Sort:       sdk.SortOrderAsc,
 		SortBy:     "size",
 		Commitment: "0CsLX630cjij9DR6nqoWfQcCH2pCQSoSuq63dTkd4Bw=",
+		Joins:      true,
 	})
 	s.Require().NoError(err)
 	s.Require().Len(logs, 1)
@@ -87,6 +118,7 @@ func (s *StorageTestSuite) TestBlobLogsByNamespaceAndTime() {
 		Sort:   sdk.SortOrderAsc,
 		SortBy: "time",
 		From:   time.Date(2023, 7, 3, 11, 0, 0, 0, time.UTC),
+		Joins:  true,
 	})
 	s.Require().NoError(err)
 	s.Require().Len(logs, 1)
@@ -117,6 +149,7 @@ func (s *StorageTestSuite) TestBlobLogsByNamespaceAndToTime() {
 		Sort:   sdk.SortOrderDesc,
 		SortBy: "time",
 		To:     time.Date(2023, 7, 4, 13, 0, 0, 0, time.UTC),
+		Joins:  true,
 	})
 	s.Require().NoError(err)
 	s.Require().Len(logs, 1)
@@ -146,6 +179,7 @@ func (s *StorageTestSuite) TestBlobLogsSigner() {
 		Offset: 0,
 		Sort:   sdk.SortOrderAsc,
 		SortBy: "size",
+		Joins:  true,
 	})
 	s.Require().NoError(err)
 	s.Require().Len(logs, 2)
@@ -160,7 +194,34 @@ func (s *StorageTestSuite) TestBlobLogsSigner() {
 	s.Require().EqualValues(1, log.MsgId)
 	s.Require().EqualValues(4, log.TxId)
 	s.Require().NotNil(log.Namespace)
-	s.Require().NotNil(log.TxId)
+	s.Require().NotNil(log.Tx)
+}
+
+func (s *StorageTestSuite) TestBlobLogsSignerWithoutJoins() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	logs, err := s.storage.BlobLogs.BySigner(ctx, 1, storage.BlobLogFilters{
+		Limit:  2,
+		Offset: 0,
+		Sort:   sdk.SortOrderAsc,
+		SortBy: "size",
+		Joins:  false,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(logs, 2)
+
+	log := logs[0]
+	s.Require().EqualValues(1, log.Id)
+	s.Require().EqualValues(0, log.Height)
+	s.Require().EqualValues("RWW7eaKKXasSGK/DS8PlpErARbl5iFs1vQIycYEAlk0=", log.Commitment)
+	s.Require().EqualValues(10, log.Size)
+	s.Require().EqualValues(2, log.NamespaceId)
+	s.Require().EqualValues(1, log.SignerId)
+	s.Require().EqualValues(1, log.MsgId)
+	s.Require().EqualValues(4, log.TxId)
+	s.Require().NotNil(log.Namespace)
+	s.Require().Nil(log.Tx)
 }
 
 func (s *StorageTestSuite) TestBlobLogsTx() {
@@ -254,6 +315,7 @@ func (s *StorageTestSuite) TestBlobLogsByProviders() {
 		}, storage.BlobLogFilters{
 			Limit:  10,
 			SortBy: sortBy,
+			Joins:  true,
 		})
 		s.Require().NoError(err)
 		s.Require().Len(logs, 1)
@@ -262,6 +324,31 @@ func (s *StorageTestSuite) TestBlobLogsByProviders() {
 		s.Require().NotNil(log.Tx)
 		s.Require().NotNil(log.Namespace)
 		s.Require().NotNil(log.Signer)
+	}
+}
+
+func (s *StorageTestSuite) TestBlobLogsByProvidersWithoutJoins() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	for _, sortBy := range []string{"", "time", "size"} {
+		logs, err := s.storage.BlobLogs.ByProviders(ctx, []storage.RollupProvider{
+			{
+				AddressId:   1,
+				NamespaceId: 1,
+			},
+		}, storage.BlobLogFilters{
+			Limit:  10,
+			SortBy: sortBy,
+			Joins:  false,
+		})
+		s.Require().NoError(err)
+		s.Require().Len(logs, 1)
+
+		log := logs[0]
+		s.Require().Nil(log.Tx)
+		s.Require().NotNil(log.Namespace)
+		s.Require().Nil(log.Signer)
 	}
 }
 
