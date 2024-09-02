@@ -13,7 +13,6 @@ import (
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 
 	internalStorage "github.com/celenium-io/celestia-indexer/internal/storage"
-	blobsaver "github.com/celenium-io/celestia-indexer/pkg/indexer/blob_saver"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/genesis"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/parser"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/rollback"
@@ -30,18 +29,17 @@ import (
 )
 
 type Indexer struct {
-	cfg       config.Config
-	api       node.Api
-	receiver  *receiver.Module
-	parser    *parser.Module
-	storage   *storage.Module
-	rollback  *rollback.Module
-	genesis   *genesis.Module
-	blobSaver *blobsaver.Module
-	stopper   modules.Module
-	pg        postgres.Storage
-	wg        *sync.WaitGroup
-	log       zerolog.Logger
+	cfg      config.Config
+	api      node.Api
+	receiver *receiver.Module
+	parser   *parser.Module
+	storage  *storage.Module
+	rollback *rollback.Module
+	genesis  *genesis.Module
+	stopper  modules.Module
+	pg       postgres.Storage
+	wg       *sync.WaitGroup
+	log      zerolog.Logger
 }
 
 func New(ctx context.Context, cfg config.Config, stopperModule modules.Module) (Indexer, error) {
@@ -75,29 +73,23 @@ func New(ctx context.Context, cfg config.Config, stopperModule modules.Module) (
 		return Indexer{}, errors.Wrap(err, "while creating genesis module")
 	}
 
-	blobSaver, err := createBlobSaver(cfg, p)
-	if err != nil {
-		return Indexer{}, errors.Wrap(err, "while creating blob saver module")
-	}
-
-	err = attachStopper(stopperModule, r, p, s, rb, genesisModule, blobSaver)
+	err = attachStopper(stopperModule, r, p, s, rb, genesisModule)
 	if err != nil {
 		return Indexer{}, errors.Wrap(err, "while creating stopper module")
 	}
 
 	return Indexer{
-		cfg:       cfg,
-		api:       &api,
-		receiver:  r,
-		parser:    p,
-		storage:   s,
-		rollback:  rb,
-		genesis:   genesisModule,
-		blobSaver: blobSaver,
-		stopper:   stopperModule,
-		pg:        pg,
-		wg:        new(sync.WaitGroup),
-		log:       log.With().Str("module", "indexer").Logger(),
+		cfg:      cfg,
+		api:      &api,
+		receiver: r,
+		parser:   p,
+		storage:  s,
+		rollback: rb,
+		genesis:  genesisModule,
+		stopper:  stopperModule,
+		pg:       pg,
+		wg:       new(sync.WaitGroup),
+		log:      log.With().Str("module", "indexer").Logger(),
 	}, nil
 }
 
@@ -108,7 +100,6 @@ func (i *Indexer) Start(ctx context.Context) {
 	i.storage.Start(ctx)
 	i.parser.Start(ctx)
 	i.receiver.Start(ctx)
-	i.blobSaver.Start(ctx)
 }
 
 func (i *Indexer) Close() error {
@@ -129,9 +120,6 @@ func (i *Indexer) Close() error {
 	}
 	if err := i.rollback.Close(); err != nil {
 		log.Err(err).Msg("closing rollback")
-	}
-	if err := i.blobSaver.Close(); err != nil {
-		log.Err(err).Msg("closing blob saver")
 	}
 	if err := i.pg.Close(); err != nil {
 		log.Err(err).Msg("closing postgres connection")
@@ -211,19 +199,6 @@ func createGenesis(pg postgres.Storage, cfg config.Config, receiverModule module
 	return genesisModulePtr, nil
 }
 
-func createBlobSaver(cfg config.Config, parserModule modules.Module) (*blobsaver.Module, error) {
-	blobSaverModule, err := blobsaver.NewModule(cfg.Indexer.BlobSaver)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := blobSaverModule.AttachTo(parserModule, parser.OutputBlobsName, blobsaver.InputName); err != nil {
-		return nil, errors.Wrap(err, "while attaching blob saver to parser")
-	}
-
-	return blobSaverModule, nil
-}
-
 func attachStopper(
 	stopperModule modules.Module,
 	receiverModule modules.Module,
@@ -231,7 +206,6 @@ func attachStopper(
 	storageModule modules.Module,
 	rollbackModule modules.Module,
 	genesisModule modules.Module,
-	blobSaverModule modules.Module,
 ) error {
 	if err := stopperModule.AttachTo(receiverModule, receiver.StopOutput, stopper.InputName); err != nil {
 		return errors.Wrap(err, "while attaching stopper to receiver")
@@ -251,10 +225,6 @@ func attachStopper(
 
 	if err := stopperModule.AttachTo(genesisModule, genesis.StopOutput, stopper.InputName); err != nil {
 		return errors.Wrap(err, "while attaching stopper to genesis")
-	}
-
-	if err := stopperModule.AttachTo(blobSaverModule, blobsaver.StopOutput, stopper.InputName); err != nil {
-		return errors.Wrap(err, "while attaching stopper to blob saver")
 	}
 
 	return nil

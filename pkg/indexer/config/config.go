@@ -16,12 +16,11 @@ type Config struct {
 }
 
 type Indexer struct {
-	Name         string `validate:"omitempty"          yaml:"name"`
-	ThreadsCount uint32 `validate:"omitempty,min=1"    yaml:"threads_count"`
-	StartLevel   int64  `validate:"omitempty"          yaml:"start_level"`
-	BlockPeriod  int64  `validate:"omitempty"          yaml:"block_period"`
-	ScriptsDir   string `validate:"omitempty,dir"      yaml:"scripts_dir"`
-	BlobSaver    string `validate:"omitempty,oneof=r2" yaml:"blob_saver"`
+	Name         string `validate:"omitempty"       yaml:"name"`
+	ThreadsCount uint32 `validate:"omitempty,min=1" yaml:"threads_count"`
+	StartLevel   int64  `validate:"omitempty"       yaml:"start_level"`
+	BlockPeriod  int64  `validate:"omitempty"       yaml:"block_period"`
+	ScriptsDir   string `validate:"omitempty,dir"   yaml:"scripts_dir"`
 }
 
 // Substitute -
