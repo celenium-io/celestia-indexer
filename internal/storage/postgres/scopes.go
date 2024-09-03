@@ -115,6 +115,17 @@ func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.S
 	if fltrs.Commitment != "" {
 		query = query.Where("commitment = ?", fltrs.Commitment)
 	}
+	if len(fltrs.Signers) > 0 {
+		query = query.Where("signer_id IN (?)", bun.In(fltrs.Signers))
+	}
+	if fltrs.Cursor > 0 {
+		switch fltrs.Sort {
+		case sdk.SortOrderAsc:
+			query = query.Where("id > ?", fltrs.Cursor)
+		case sdk.SortOrderDesc:
+			query = query.Where("id < ?", fltrs.Cursor)
+		}
+	}
 
 	query = limitScope(query, fltrs.Limit)
 	return blobLogSort(query, fltrs)

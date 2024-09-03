@@ -162,18 +162,23 @@ func (c *MockIAddressGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*
 }
 
 // IdByHash mocks base method.
-func (m *MockIAddress) IdByHash(ctx context.Context, hash []byte) (uint64, error) {
+func (m *MockIAddress) IdByHash(ctx context.Context, hash ...[]byte) ([]uint64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IdByHash", ctx, hash)
-	ret0, _ := ret[0].(uint64)
+	varargs := []any{ctx}
+	for _, a := range hash {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "IdByHash", varargs...)
+	ret0, _ := ret[0].([]uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // IdByHash indicates an expected call of IdByHash.
-func (mr *MockIAddressMockRecorder) IdByHash(ctx, hash any) *MockIAddressIdByHashCall {
+func (mr *MockIAddressMockRecorder) IdByHash(ctx any, hash ...any) *MockIAddressIdByHashCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IdByHash", reflect.TypeOf((*MockIAddress)(nil).IdByHash), ctx, hash)
+	varargs := append([]any{ctx}, hash...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IdByHash", reflect.TypeOf((*MockIAddress)(nil).IdByHash), varargs...)
 	return &MockIAddressIdByHashCall{Call: call}
 }
 
@@ -183,19 +188,19 @@ type MockIAddressIdByHashCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIAddressIdByHashCall) Return(arg0 uint64, arg1 error) *MockIAddressIdByHashCall {
+func (c *MockIAddressIdByHashCall) Return(arg0 []uint64, arg1 error) *MockIAddressIdByHashCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIAddressIdByHashCall) Do(f func(context.Context, []byte) (uint64, error)) *MockIAddressIdByHashCall {
+func (c *MockIAddressIdByHashCall) Do(f func(context.Context, ...[]byte) ([]uint64, error)) *MockIAddressIdByHashCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIAddressIdByHashCall) DoAndReturn(f func(context.Context, []byte) (uint64, error)) *MockIAddressIdByHashCall {
+func (c *MockIAddressIdByHashCall) DoAndReturn(f func(context.Context, ...[]byte) ([]uint64, error)) *MockIAddressIdByHashCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

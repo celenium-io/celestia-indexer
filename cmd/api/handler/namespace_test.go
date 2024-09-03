@@ -48,6 +48,7 @@ type NamespaceTestSuite struct {
 	namespaces   *mock.MockINamespace
 	blobLogs     *mock.MockIBlobLog
 	rollups      *mock.MockIRollup
+	address      *mock.MockIAddress
 	state        *mock.MockIState
 	blobReceiver *nodeMock.MockDalApi
 	echo         *echo.Echo
@@ -62,10 +63,11 @@ func (s *NamespaceTestSuite) SetupSuite() {
 	s.ctrl = gomock.NewController(s.T())
 	s.namespaces = mock.NewMockINamespace(s.ctrl)
 	s.blobLogs = mock.NewMockIBlobLog(s.ctrl)
+	s.address = mock.NewMockIAddress(s.ctrl)
 	s.rollups = mock.NewMockIRollup(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
 	s.blobReceiver = nodeMock.NewMockDalApi(s.ctrl)
-	s.handler = NewNamespaceHandler(s.namespaces, s.blobLogs, s.rollups, s.state, testIndexerName, s.blobReceiver)
+	s.handler = NewNamespaceHandler(s.namespaces, s.blobLogs, s.rollups, s.address, s.state, testIndexerName, s.blobReceiver)
 }
 
 // TearDownSuite -
@@ -496,6 +498,7 @@ func (s *NamespaceTestSuite) TestGetLogs() {
 		ByNamespace(gomock.Any(), testNamespace.Id, storage.BlobLogFilters{
 			Limit: 10,
 			Sort:  "desc",
+			Joins: true,
 		}).
 		Return([]storage.BlobLog{
 			{
@@ -532,6 +535,73 @@ func (s *NamespaceTestSuite) TestGetLogs() {
 	s.Require().NotNil(l.Rollup)
 }
 
+func (s *NamespaceTestSuite) TestGetLogsBySigner() {
+	args := make(url.Values)
+	args.Set("signers", "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r,celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+args.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/namespace/:id/:version/logs")
+	c.SetParamNames("id", "version")
+	c.SetParamValues(testNamespaceId, "0")
+
+	s.namespaces.EXPECT().
+		ByNamespaceIdAndVersion(gomock.Any(), testNamespace.NamespaceID, byte(0)).
+		Return(testNamespace, nil)
+
+	_, h1, err := pkgTypes.Address("celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r").Decode()
+	s.Require().NoError(err)
+	_, h2, err := pkgTypes.Address("celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6").Decode()
+	s.Require().NoError(err)
+
+	s.address.EXPECT().
+		IdByHash(gomock.Any(), h1, h2).
+		Return([]uint64{1, 2}, nil).
+		Times(1)
+
+	s.blobLogs.EXPECT().
+		ByNamespace(gomock.Any(), testNamespace.Id, storage.BlobLogFilters{
+			Limit:   10,
+			Sort:    "desc",
+			Joins:   true,
+			Signers: []uint64{1, 2},
+		}).
+		Return([]storage.BlobLog{
+			{
+				NamespaceId: testNamespace.Id,
+				MsgId:       1,
+				TxId:        1,
+				SignerId:    1,
+				Signer: &storage.Address{
+					Address: testAddress,
+				},
+				Commitment: "test_commitment",
+				Size:       1000,
+				Height:     10000,
+				Time:       testTime,
+				Rollup:     &testRollup,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.GetBlobLogs(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var logs []responses.BlobLog
+	err = json.NewDecoder(rec.Body).Decode(&logs)
+	s.Require().NoError(err)
+	s.Require().Len(logs, 1)
+
+	l := logs[0]
+	s.Require().EqualValues(10000, l.Height)
+	s.Require().Equal(testTime, l.Time)
+	s.Require().Equal(testAddress, l.Signer)
+	s.Require().Equal("test_commitment", l.Commitment)
+	s.Require().EqualValues(1000, l.Size)
+	s.Require().Nil(l.Namespace)
+	s.Require().NotNil(l.Rollup)
+}
+
 func (s *NamespaceTestSuite) TestGetLogsWithCommitment() {
 	cm := "T1EPYi3jq6hC3ueLOZRtWB7LUsAC4DcnAX_oSwDopps="
 	args := make(url.Values)
@@ -553,6 +623,7 @@ func (s *NamespaceTestSuite) TestGetLogsWithCommitment() {
 			Limit:      10,
 			Sort:       "desc",
 			Commitment: "T1EPYi3jq6hC3ueLOZRtWB7LUsAC4DcnAX/oSwDopps=",
+			Joins:      true,
 		}).
 		Return([]storage.BlobLog{
 			{

@@ -347,7 +347,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		panic(err)
 	}
 
-	namespaceHandlers := handler.NewNamespaceHandler(db.Namespace, db.BlobLogs, db.Rollup, db.State, cfg.Indexer.Name, blobReceiver)
+	namespaceHandlers := handler.NewNamespaceHandler(db.Namespace, db.BlobLogs, db.Rollup, db.Address, db.State, cfg.Indexer.Name, blobReceiver)
 
 	blobGroup := v1.Group("/blob")
 	{

@@ -9,6 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/labstack/echo/v4"
 )
 
@@ -182,6 +183,7 @@ type getRollupPagesWithSort struct {
 	Offset int    `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string `query:"sort_by" validate:"omitempty,oneof=time size"`
+	Joins  *bool  `query:"joins"   validate:"omitempty"`
 }
 
 func (p *getRollupPagesWithSort) SetDefault() {
@@ -191,24 +193,28 @@ func (p *getRollupPagesWithSort) SetDefault() {
 	if p.Sort == "" {
 		p.Sort = desc
 	}
+	if p.Joins == nil {
+		p.Joins = testsuite.Ptr(true)
+	}
 }
 
 // GetBlobs godoc
 //
-//	@Summary		Get rollup blobs
-//	@Description	Get rollup blobs
-//	@Tags			rollup
-//	@ID				get-rollup-blobs
-//	@Param			id		path	integer	true	"Internal identity"								mininum(1)
-//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"										mininum(1)
-//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
-//	@Produce		json
-//	@Success		200	{array}		responses.BlobLog
-//	@Failure		400	{object}	Error
-//	@Failure		500	{object}	Error
-//	@Router			/rollup/{id}/blobs [get]
+//		@Summary		Get rollup blobs
+//		@Description	Get rollup blobs
+//		@Tags			rollup
+//		@ID				get-rollup-blobs
+//		@Param			id		path	integer	true	"Internal identity"								mininum(1)
+//		@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//		@Param			offset	query	integer	false	"Offset"										mininum(1)
+//		@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//		@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
+//	    @Param          joins   query   boolean false   "Flag indicating whether entities of transaction and signer should be attached or not. Default: true"
+//		@Produce		json
+//		@Success		200	{array}		responses.BlobLog
+//		@Failure		400	{object}	Error
+//		@Failure		500	{object}	Error
+//		@Router			/rollup/{id}/blobs [get]
 func (handler RollupHandler) GetBlobs(c echo.Context) error {
 	req, err := bindAndValidate[getRollupPagesWithSort](c)
 	if err != nil {
@@ -229,6 +235,7 @@ func (handler RollupHandler) GetBlobs(c echo.Context) error {
 		Offset: req.Offset,
 		Sort:   pgSort(req.Sort),
 		SortBy: req.SortBy,
+		Joins:  *req.Joins,
 	})
 	if err != nil {
 		return handleError(c, err, handler.rollups)
