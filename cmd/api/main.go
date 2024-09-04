@@ -22,7 +22,7 @@ var rootCmd = &cobra.Command{
 // @title					Celenium API
 // @version					1.0
 // @description				This is docs of Celenium API.
-// @host					api.celenium.io
+// @host					api-mainnet.celenium.io
 // @schemes					https
 // @BasePath /v1
 //
