@@ -26,6 +26,7 @@ var rootCmd = &cobra.Command{
 // @schemes					https
 // @BasePath /v1
 //
+// @x-servers [{"url": "api-mainnet.celenium.io", "description": "Celenium Mainnet API"},{"url": "api-mocha.celenium.io", "description": "Celenium Mocha API"},{"url": "api-arabica.celenium.io", "description": "Celenium Arabica API"}]
 // @query.collection.format	multi
 func main() {
 	cfg, err := initConfig()
