@@ -256,10 +256,10 @@ func (p *getAddressMessages) ToFilters() storage.AddressMsgsFilter {
 //	@Description	Get address messages
 //	@Tags			address
 //	@ID				address-messages
-//	@Param			hash		path	string					true	"Hash"									minlength(47)	maxlength(47)
-//	@Param			limit		query	integer					false	"Count of requested entities"			minimum(1)		maximum(100)
-//	@Param			offset		query	integer					false	"Offset"								minimum(1)
-//	@Param			sort		query	string					false	"Sort order"							Enums(asc, desc)
+//	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			limit		query	integer					false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset		query	integer					false	"Offset"						minimum(1)
+//	@Param			sort		query	string					false	"Sort order"					Enums(asc, desc)
 //	@Param			msg_type	query	storageTypes.MsgType	false	"Comma-separated message types list"
 //	@Produce		json
 //	@Success		200	{array}		responses.MessageForAddress
@@ -333,7 +333,7 @@ func (req *getBlobLogsForAddress) SetDefault() {
 //	@Param			offset	query	integer	false	"Offset"										minimum(1)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
-//	@Param          joins   query   boolean false   "Flag indicating whether entities of transaction and namespace should be attached or not. Default: true"
+//	@Param			joins	query	boolean	false	"Flag indicating whether entities of transaction and namespace should be attached or not. Default: true"
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error

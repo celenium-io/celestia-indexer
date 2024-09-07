@@ -351,6 +351,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 
 	blobGroup := v1.Group("/blob")
 	{
+		blobGroup.GET("", namespaceHandlers.Blobs)
 		blobGroup.POST("", namespaceHandlers.Blob)
 		blobGroup.POST("/metadata", namespaceHandlers.BlobMetadata)
 	}

@@ -414,7 +414,7 @@ type stakingSeriesRequest struct {
 //	@Description	Get histogram for staking with precomputed stats by series name and timeframe
 //	@Tags			stats
 //	@ID				stats-staking-series
-//	@Param			id			path	string	true	"Validator id"   				minlength(56)	maxlength(56)
+//	@Param			id			path	string	true	"Validator id"					minlength(56)	maxlength(56)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
 //	@Param			name		path	string	true	"Series name"					Enums(rewards, commissions, flow)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
@@ -459,8 +459,8 @@ type squareSizeRequest struct {
 //	@Description	Get histogram for square size distribution
 //	@Tags			stats
 //	@ID				stats-square-size
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from	query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to		query	integer	false	"Time to in unix timestamp"		mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.SquareSizeResponse
 //	@Failure		400	{object}	Error

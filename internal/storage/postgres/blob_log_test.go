@@ -400,3 +400,34 @@ func (s *StorageTestSuite) TestBlob() {
 	s.Require().NotNil(log.Tx)
 	s.Require().EqualValues(4, log.Tx.Id)
 }
+
+func (s *StorageTestSuite) TestListBlob() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	logs, err := s.storage.BlobLogs.ListBlobs(ctx, storage.ListBlobLogFilters{
+		Namespaces: []uint64{2},
+		Signers:    []uint64{1},
+		SortBy:     "time",
+		Sort:       sdk.SortOrderAsc,
+		Limit:      1,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(logs, 1)
+
+	log := logs[0]
+	s.Require().EqualValues(1, log.Id)
+	s.Require().EqualValues(0, log.Height)
+	s.Require().EqualValues("RWW7eaKKXasSGK/DS8PlpErARbl5iFs1vQIycYEAlk0=", log.Commitment)
+	s.Require().EqualValues(10, log.Size)
+	s.Require().EqualValues(2, log.NamespaceId)
+	s.Require().EqualValues(1, log.SignerId)
+	s.Require().EqualValues(1, log.MsgId)
+	s.Require().EqualValues(4, log.TxId)
+
+	s.Require().NotNil(log.Signer)
+	s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", log.Signer.Address)
+
+	s.Require().NotNil(log.Tx)
+	s.Require().NotNil(log.Namespace)
+}

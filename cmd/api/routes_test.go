@@ -73,6 +73,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/address/:hash/grants GET":                        {},
 		"/v1/address/:hash/granters GET":                      {},
 		"/v1/blob POST":                                       {},
+		"/v1/blob GET":                                        {},
 		"/v1/stats/price/current GET":                         {},
 		"/v1/swagger/doc.json GET":                            {},
 		"/v1/auth/rollup/:id DELETE":                          {},

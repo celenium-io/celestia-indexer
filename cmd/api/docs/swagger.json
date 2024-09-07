@@ -1057,6 +1057,108 @@
             }
         },
         "/blob": {
+            "get": {
+                "description": "Returns blobs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "namespace"
+                ],
+                "summary": "List all blobs with filters",
+                "operationId": "get-blobs",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "time",
+                            "size"
+                        ],
+                        "type": "string",
+                        "description": "Sort field. If it's empty internal id is used",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Commitment value in URLbase64 format",
+                        "name": "commitment",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated celestia addresses",
+                        "name": "signers",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated celestia namespaces",
+                        "name": "namespaces",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Last entity id which is used for cursor pagination",
+                        "name": "cursor",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.LightBlobLog"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Returns blob",
                 "consumes": [
@@ -5631,6 +5733,56 @@
                 },
                 "validator": {
                     "$ref": "#/definitions/responses.ShortValidator"
+                }
+            }
+        },
+        "responses.LightBlobLog": {
+            "type": "object",
+            "properties": {
+                "commitment": {
+                    "type": "string",
+                    "format": "base64",
+                    "example": "vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg="
+                },
+                "content_type": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "image/png"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 200
+                },
+                "namespace": {
+                    "type": "string",
+                    "format": "base64",
+                    "example": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="
+                },
+                "signer": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                },
+                "size": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 10
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
                 }
             }
         },

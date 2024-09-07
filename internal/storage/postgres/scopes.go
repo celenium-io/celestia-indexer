@@ -128,15 +128,48 @@ func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.S
 	}
 
 	query = limitScope(query, fltrs.Limit)
-	return blobLogSort(query, fltrs)
+	return blobLogSort(query, fltrs.SortBy, fltrs.Sort)
 }
 
-func blobLogSort(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.SelectQuery {
-	switch fltrs.SortBy {
+func listBlobLogFilters(query *bun.SelectQuery, fltrs storage.ListBlobLogFilters) *bun.SelectQuery {
+	if fltrs.Offset > 0 {
+		query = query.Offset(fltrs.Offset)
+	}
+
+	if !fltrs.From.IsZero() {
+		query = query.Where("time >= ?", fltrs.From)
+	}
+	if !fltrs.To.IsZero() {
+		query = query.Where("time < ?", fltrs.To)
+	}
+	if fltrs.Commitment != "" {
+		query = query.Where("commitment = ?", fltrs.Commitment)
+	}
+	if len(fltrs.Signers) > 0 {
+		query = query.Where("signer_id IN (?)", bun.In(fltrs.Signers))
+	}
+	if len(fltrs.Namespaces) > 0 {
+		query = query.Where("namespace_id IN (?)", bun.In(fltrs.Namespaces))
+	}
+	if fltrs.Cursor > 0 {
+		switch fltrs.Sort {
+		case sdk.SortOrderAsc:
+			query = query.Where("id > ?", fltrs.Cursor)
+		case sdk.SortOrderDesc:
+			query = query.Where("id < ?", fltrs.Cursor)
+		}
+	}
+
+	query = limitScope(query, fltrs.Limit)
+	return blobLogSort(query, fltrs.SortBy, fltrs.Sort)
+}
+
+func blobLogSort(query *bun.SelectQuery, sortBy string, sort sdk.SortOrder) *bun.SelectQuery {
+	switch sortBy {
 	case sizeColumn, timeColumn:
-		query = sortScope(query, fmt.Sprintf("blob_log.%s", fltrs.SortBy), fltrs.Sort)
+		query = sortScope(query, fmt.Sprintf("blob_log.%s", sortBy), sort)
 	case "":
-		query = sortScope(query, "blob_log.time", fltrs.Sort)
+		query = sortScope(query, "blob_log.time", sort)
 	default:
 		return query
 	}

@@ -746,3 +746,47 @@ func (s *NamespaceTestSuite) TestBlobMetadata() {
 	s.Require().NotNil(blob.Tx)
 	s.Require().NotNil(blob.Signer)
 }
+
+func (s *NamespaceTestSuite) TestBlobs() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/blobs")
+
+	s.blobLogs.EXPECT().
+		ListBlobs(gomock.Any(), gomock.Any()).
+		Return([]storage.BlobLog{
+			{
+				NamespaceId: testNamespace.Id,
+				MsgId:       1,
+				TxId:        1,
+				SignerId:    1,
+				Signer: &storage.Address{
+					Address: testAddress,
+				},
+				Commitment: "test_commitment",
+				Size:       1000,
+				Height:     1000,
+				Time:       testTime,
+				Tx:         &testTx,
+				Namespace:  &testNamespace,
+			},
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.Blobs(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var blobs []responses.LightBlobLog
+	err := json.NewDecoder(rec.Body).Decode(&blobs)
+	s.Require().NoError(err)
+	s.Require().Len(blobs, 1)
+
+	blob := blobs[0]
+	s.Require().EqualValues(1000, blob.Size)
+	s.Require().EqualValues(1000, blob.Height)
+	s.Require().EqualValues(testTime, blob.Time)
+	s.Require().EqualValues("test_commitment", blob.Commitment)
+	s.Require().EqualValues(testAddress, blob.Signer)
+	s.Require().EqualValues(testNamespace.Hash(), blob.Namespace)
+}

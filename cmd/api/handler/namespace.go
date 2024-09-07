@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/hex"
 	"net/http"
@@ -347,6 +348,125 @@ func (handler *NamespaceHandler) Count(c echo.Context) error {
 	return c.JSON(http.StatusOK, state.TotalNamespaces)
 }
 
+type listBlobsRequest struct {
+	Limit      int         `query:"limit"      validate:"omitempty,min=1,max=100"`
+	Offset     int         `query:"offset"     validate:"omitempty,min=0"`
+	Sort       string      `query:"sort"       validate:"omitempty,oneof=asc desc"`
+	SortBy     string      `query:"sort_by"    validate:"omitempty,oneof=time size"`
+	Commitment string      `query:"commitment" validate:"omitempty,base64url"`
+	Signers    StringArray `query:"signers"    validate:"omitempty,dive,address"`
+	Namespaces StringArray `query:"namespaces" validate:"omitempty,dive,namespace"`
+	Cursor     uint64      `query:"cursor"     validate:"omitempty,min=0"`
+
+	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1"`
+	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
+func (req *listBlobsRequest) SetDefault() {
+	if req.Limit == 0 {
+		req.Limit = 0
+	}
+	if req.Sort == "" {
+		req.Sort = desc
+	}
+}
+
+func (req listBlobsRequest) toDbRequest(ctx context.Context, ns storage.INamespace, addrs storage.IAddress) (storage.ListBlobLogFilters, error) {
+	fltrs := storage.ListBlobLogFilters{
+		Limit:      req.Limit,
+		Offset:     req.Offset,
+		Sort:       pgSort(req.Sort),
+		SortBy:     req.SortBy,
+		Commitment: req.Commitment,
+		Cursor:     req.Cursor,
+		Namespaces: make([]uint64, len(req.Namespaces)),
+	}
+	if req.From > 0 {
+		fltrs.From = time.Unix(req.From, 0).UTC()
+	}
+	if req.To > 0 {
+		fltrs.To = time.Unix(req.To, 0).UTC()
+	}
+
+	var err error
+
+	if len(req.Namespaces) > 0 {
+		for i := range req.Namespaces {
+			hash, err := base64.StdEncoding.DecodeString(req.Namespaces[i])
+			if err != nil {
+				return fltrs, err
+			}
+
+			n, err := ns.ByNamespaceIdAndVersion(ctx, hash[1:], hash[0])
+			if err != nil {
+				return fltrs, err
+			}
+			fltrs.Namespaces[i] = n.Id
+		}
+	}
+
+	if len(req.Signers) > 0 {
+		hash := make([][]byte, len(req.Signers))
+		for i := range req.Signers {
+			if _, hash[i], err = types.Address(req.Signers[i]).Decode(); err != nil {
+				return fltrs, err
+			}
+		}
+
+		if fltrs.Signers, err = addrs.IdByHash(ctx, hash...); err != nil {
+			return fltrs, err
+		}
+	}
+
+	return fltrs, nil
+}
+
+// Blobs godoc
+//
+//	@Summary		List all blobs with filters
+//	@Description	Returns blobs
+//	@Tags			namespace
+//	@ID				get-blobs
+//	@Param			limit		query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset		query	integer	false	"Offset"										mininum(1)
+//	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			sort_by		query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
+//	@Param			commitment	query	string	false	"Commitment value in URLbase64 format"
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			signers		query	string	false	"Comma-separated celestia addresses"
+//	@Param			namespaces  query	string	false	"Comma-separated celestia namespaces"
+//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	mininum(1)
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{array}		responses.LightBlobLog
+//	@Failure		400	{object}	Error
+//	@Router			/blob [get]
+func (handler *NamespaceHandler) Blobs(c echo.Context) error {
+	req, err := bindAndValidate[listBlobsRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	fltrs, err := req.toDbRequest(c.Request().Context(), handler.namespace, handler.address)
+	if err != nil {
+		return handleError(c, err, handler.blobLogs)
+	}
+
+	blob, err := handler.blobLogs.ListBlobs(c.Request().Context(), fltrs)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	response := make([]responses.LightBlobLog, len(blob))
+	for i := range blob {
+		response[i] = responses.NewLightBlobLog(blob[i])
+	}
+
+	return returnArray(c, response)
+}
+
 type postBlobRequest struct {
 	Hash       string      `json:"hash"       validate:"required,namespace"`
 	Height     types.Level `json:"height"     validate:"required,min=1"`
@@ -464,27 +584,27 @@ func (req *getBlobLogsForNamespace) SetDefault() {
 
 // GetBlobLogs godoc
 //
-//		@Summary		Get blob changes for namespace
-//		@Description	Returns blob changes for namespace
-//		@Tags			namespace
-//		@ID				get-blob-logs
-//		@Param			id			path	string	true	"Namespace id in hexadecimal"					minlength(56)	maxlength(56)
-//		@Param			version		path	integer	true	"Version of namespace"
-//		@Param			limit		query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//		@Param			offset		query	integer	false	"Offset"										mininum(1)
-//		@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//		@Param			sort_by	    query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
-//		@Param			commitment	query	string	false	"Commitment value in URLbase64 format"
-//		@Param			from		query	integer	false	"Time from in unix timestamp"					mininum(1)
-//		@Param			to			query	integer	false	"Time to in unix timestamp"						mininum(1)
-//		@Param          joins       query   boolean false   "Flag indicating whether entities of rollup, transaction and signer should be attached or not. Default: true"
-//	    @Param          signers     query   string  false   "Comma-separated celestia addresses"
-//		@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	mininum(1)
-//		@Produce		json
-//		@Success		200	{array}		responses.BlobLog
-//		@Failure		400	{object}	Error
-//		@Failure		500	{object}	Error
-//		@Router			/namespace/{id}/{version}/blobs [get]
+//	@Summary		Get blob changes for namespace
+//	@Description	Returns blob changes for namespace
+//	@Tags			namespace
+//	@ID				get-blob-logs
+//	@Param			id			path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
+//	@Param			version		path	integer	true	"Version of namespace"
+//	@Param			limit		query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset		query	integer	false	"Offset"										mininum(1)
+//	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			sort_by		query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
+//	@Param			commitment	query	string	false	"Commitment value in URLbase64 format"
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			joins		query	boolean	false	"Flag indicating whether entities of rollup, transaction and signer should be attached or not. Default: true"
+//	@Param			signers		query	string	false	"Comma-separated celestia addresses"
+//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.BlobLog
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/namespace/{id}/{version}/blobs [get]
 func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 	req, err := bindAndValidate[getBlobLogsForNamespace](c)
 	if err != nil {
@@ -566,8 +686,8 @@ func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 //	@ID				get-namespace-rollups
 //	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
 //	@Param			version	path	integer	true	"Version of namespace"
-//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"										mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Rollup
 //	@Failure		400	{object}	Error
