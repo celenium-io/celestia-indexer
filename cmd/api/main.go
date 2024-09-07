@@ -22,10 +22,11 @@ var rootCmd = &cobra.Command{
 // @title					Celenium API
 // @version					1.0
 // @description				This is docs of Celenium API.
-// @host					api.celenium.io
+// @host					api-mainnet.celenium.io
 // @schemes					https
 // @BasePath /v1
 //
+// @x-servers [{"url": "api-mainnet.celenium.io", "description": "Celenium Mainnet API"},{"url": "api-mocha.celenium.io", "description": "Celenium Mocha API"},{"url": "api-arabica.celenium.io", "description": "Celenium Arabica API"}]
 // @query.collection.format	multi
 func main() {
 	cfg, err := initConfig()
