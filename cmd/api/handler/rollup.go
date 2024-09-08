@@ -200,21 +200,21 @@ func (p *getRollupPagesWithSort) SetDefault() {
 
 // GetBlobs godoc
 //
-//		@Summary		Get rollup blobs
-//		@Description	Get rollup blobs
-//		@Tags			rollup
-//		@ID				get-rollup-blobs
-//		@Param			id		path	integer	true	"Internal identity"								mininum(1)
-//		@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//		@Param			offset	query	integer	false	"Offset"										mininum(1)
-//		@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//		@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
-//	    @Param          joins   query   boolean false   "Flag indicating whether entities of transaction and signer should be attached or not. Default: true"
-//		@Produce		json
-//		@Success		200	{array}		responses.BlobLog
-//		@Failure		400	{object}	Error
-//		@Failure		500	{object}	Error
-//		@Router			/rollup/{id}/blobs [get]
+//	@Summary		Get rollup blobs
+//	@Description	Get rollup blobs
+//	@Tags			rollup
+//	@ID				get-rollup-blobs
+//	@Param			id		path	integer	true	"Internal identity"								mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"										mininum(1)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
+//	@Param			joins	query	boolean	false	"Flag indicating whether entities of transaction and signer should be attached or not. Default: true"
+//	@Produce		json
+//	@Success		200	{array}		responses.BlobLog
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/rollup/{id}/blobs [get]
 func (handler RollupHandler) GetBlobs(c echo.Context) error {
 	req, err := bindAndValidate[getRollupPagesWithSort](c)
 	if err != nil {
@@ -382,9 +382,9 @@ type rollupDistributionRequest struct {
 //	@Description	Get rollup distribution
 //	@Tags			rollup
 //	@ID				get-rollup-distribution
-//	@Param			id			path	integer	true	"Internal identity"				mininum(1)
-//	@Param			name		path	string	true	"Series name"					Enums(blobs_count, size, size_per_blob, fee_per_blob)
-//	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day)
+//	@Param			id			path	integer	true	"Internal identity"	mininum(1)
+//	@Param			name		path	string	true	"Series name"		Enums(blobs_count, size, size_per_blob, fee_per_blob)
+//	@Param			timeframe	path	string	true	"Timeframe"			Enums(hour, day)
 //	@Produce		json
 //	@Success		200	{array}		responses.DistributionItem
 //	@Failure		400	{object}	Error
@@ -425,9 +425,9 @@ type exportBlobsRequest struct {
 //	@Description	Export rollup blobs
 //	@Tags			rollup
 //	@ID				rollup-export
-//	@Param			id			path	integer	true	"Internal identity"				mininum(1)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			id		path	integer	true	"Internal identity"				mininum(1)
+//	@Param			from	query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to		query	integer	false	"Time to in unix timestamp"		mininum(1)
 //	@Success		200
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error

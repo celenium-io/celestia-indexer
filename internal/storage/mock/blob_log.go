@@ -591,6 +591,45 @@ func (c *MockIBlobLogListCall) DoAndReturn(f func(context.Context, uint64, uint6
 	return c
 }
 
+// ListBlobs mocks base method.
+func (m *MockIBlobLog) ListBlobs(ctx context.Context, fltrs storage.ListBlobLogFilters) ([]storage.BlobLog, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListBlobs", ctx, fltrs)
+	ret0, _ := ret[0].([]storage.BlobLog)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListBlobs indicates an expected call of ListBlobs.
+func (mr *MockIBlobLogMockRecorder) ListBlobs(ctx, fltrs any) *MockIBlobLogListBlobsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListBlobs", reflect.TypeOf((*MockIBlobLog)(nil).ListBlobs), ctx, fltrs)
+	return &MockIBlobLogListBlobsCall{Call: call}
+}
+
+// MockIBlobLogListBlobsCall wrap *gomock.Call
+type MockIBlobLogListBlobsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIBlobLogListBlobsCall) Return(arg0 []storage.BlobLog, arg1 error) *MockIBlobLogListBlobsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIBlobLogListBlobsCall) Do(f func(context.Context, storage.ListBlobLogFilters) ([]storage.BlobLog, error)) *MockIBlobLogListBlobsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIBlobLogListBlobsCall) DoAndReturn(f func(context.Context, storage.ListBlobLogFilters) ([]storage.BlobLog, error)) *MockIBlobLogListBlobsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Save mocks base method.
 func (m_2 *MockIBlobLog) Save(ctx context.Context, m *storage.BlobLog) error {
 	m_2.ctrl.T.Helper()

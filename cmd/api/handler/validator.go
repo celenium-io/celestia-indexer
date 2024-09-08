@@ -242,7 +242,7 @@ func (p *validatorDelegationsRequest) SetDefault() {
 //	@Tags			validator
 //	@ID				validator-delegators
 //	@Param			id			path	integer	true	"Internal validator id"
-//	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
 //	@Param			offset		query	integer	false	"Offset"						minimum(1)
 //	@Param			show_zero	query	boolean	false	"Show zero delegations"
 //	@Produce		json
@@ -283,7 +283,7 @@ func (handler *ValidatorHandler) Delegators(c echo.Context) error {
 //	@Tags			validator
 //	@ID				validator-jails
 //	@Param			id		path	integer	true	"Internal validator id"
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Jail

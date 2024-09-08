@@ -5,6 +5,7 @@ package responses
 
 import (
 	"encoding/base64"
+	"encoding/hex"
 	"net/http"
 	"time"
 
@@ -71,6 +72,41 @@ func NewBlobLog(blob storage.BlobLog) BlobLog {
 	if blob.Tx != nil {
 		tx := NewTx(*blob.Tx)
 		b.Tx = &tx
+	}
+
+	return b
+}
+
+type LightBlobLog struct {
+	Id          uint64         `example:"200"                                                              format:"integer"   json:"id"           swaggertype:"integer"`
+	Commitment  string         `example:"vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg="                     format:"base64"    json:"commitment"   swaggertype:"string"`
+	Size        int64          `example:"10"                                                               format:"integer"   json:"size"         swaggertype:"integer"`
+	Height      pkgTypes.Level `example:"100"                                                              format:"integer"   json:"height"       swaggertype:"integer"`
+	Time        time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"         swaggertype:"string"`
+	Signer      string         `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"                  format:"string"    json:"signer"       swaggertype:"string"`
+	ContentType string         `example:"image/png"                                                        format:"string"    json:"content_type" swaggertype:"string"`
+	Namespace   string         `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="                         format:"base64"    json:"namespace"    swaggertype:"string"`
+	TxHash      string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"      swaggertype:"string"`
+}
+
+func NewLightBlobLog(blob storage.BlobLog) LightBlobLog {
+	b := LightBlobLog{
+		Id:          blob.Id,
+		Commitment:  blob.Commitment,
+		Size:        blob.Size,
+		Height:      blob.Height,
+		Time:        blob.Time,
+		ContentType: blob.ContentType,
+	}
+
+	if blob.Namespace != nil {
+		b.Namespace = blob.Namespace.Hash()
+	}
+	if blob.Signer != nil {
+		b.Signer = blob.Signer.Address
+	}
+	if blob.Tx != nil {
+		b.TxHash = hex.EncodeToString(blob.Tx.Hash)
 	}
 
 	return b

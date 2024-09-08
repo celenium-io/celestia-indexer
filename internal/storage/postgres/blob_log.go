@@ -48,7 +48,7 @@ func (bl *BlobLog) ByNamespace(ctx context.Context, nsId uint64, fltrs storage.B
 			Join("left join tx on tx.id = blob_log.tx_id").
 			Join("left join rollup_provider as p on blob_log.signer_id = p.address_id and blob_log.namespace_id = p.namespace_id").
 			Join("left join rollup on rollup.id = p.rollup_id")
-		query = blobLogSort(query, fltrs)
+		query = blobLogSort(query, fltrs.SortBy, fltrs.Sort)
 	} else {
 		query = blobsQuery
 	}
@@ -91,7 +91,7 @@ func (bl *BlobLog) ByProviders(ctx context.Context, providers []storage.RollupPr
 			Join("left join tx on tx.id = blob_log.tx_id")
 	}
 
-	query = blobLogSort(query, fltrs)
+	query = blobLogSort(query, fltrs.SortBy, fltrs.Sort)
 	err = query.Scan(ctx, &logs)
 	return
 }
@@ -185,7 +185,7 @@ func (bl *BlobLog) BySigner(ctx context.Context, signerId uint64, fltrs storage.
 
 	}
 
-	query = blobLogSort(query, fltrs)
+	query = blobLogSort(query, fltrs.SortBy, fltrs.Sort)
 	err = query.Scan(ctx, &logs)
 	return
 }
@@ -268,5 +268,24 @@ func (bl *BlobLog) Blob(ctx context.Context, height types.Level, nsId uint64, co
 		Join("left join rollup_provider as p on blob_log.signer_id = p.address_id and blob_log.namespace_id = p.namespace_id").
 		Join("left join rollup on rollup.id = p.rollup_id").
 		Scan(ctx, &l)
+	return
+}
+
+func (bl *BlobLog) ListBlobs(ctx context.Context, fltrs storage.ListBlobLogFilters) (logs []storage.BlobLog, err error) {
+	blobLogQuery := bl.DB().NewSelect().Model((*storage.BlobLog)(nil))
+	blobLogQuery = listBlobLogFilters(blobLogQuery, fltrs)
+
+	query := bl.DB().NewSelect().
+		ColumnExpr("blob_log.*").
+		ColumnExpr("signer.address as signer__address").
+		ColumnExpr("ns.version as namespace__version, ns.namespace_id as namespace__namespace_id").
+		ColumnExpr("tx.hash as tx__hash, tx.id as tx__id").
+		TableExpr("(?) as blob_log", blobLogQuery).
+		Join("left join address as signer on signer.id = blob_log.signer_id").
+		Join("left join namespace as ns on ns.id = blob_log.namespace_id").
+		Join("left join tx on tx.id = blob_log.tx_id")
+
+	query = blobLogSort(query, fltrs.SortBy, fltrs.Sort)
+	err = query.Scan(ctx, &logs)
 	return
 }

@@ -24,7 +24,7 @@ var rootCmd = &cobra.Command{
 // @description				This is docs of Celenium API.
 // @host					api-mainnet.celenium.io
 // @schemes					https
-// @BasePath /v1
+// @BasePath				/v1
 //
 // @x-servers [{"url": "api-mainnet.celenium.io", "description": "Celenium Mainnet API"},{"url": "api-mocha.celenium.io", "description": "Celenium Mocha API"},{"url": "api-arabica.celenium.io", "description": "Celenium Arabica API"}]
 // @query.collection.format	multi

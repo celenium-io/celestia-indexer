@@ -27,6 +27,19 @@ type BlobLogFilters struct {
 	Cursor     uint64
 }
 
+type ListBlobLogFilters struct {
+	Limit      int
+	Offset     int
+	Sort       sdk.SortOrder
+	SortBy     string
+	From       time.Time
+	To         time.Time
+	Commitment string
+	Signers    []uint64
+	Namespaces []uint64
+	Cursor     uint64
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IBlobLog interface {
 	sdk.Table[*BlobLog]
@@ -40,6 +53,7 @@ type IBlobLog interface {
 	CountByHeight(ctx context.Context, height types.Level) (int, error)
 	ExportByProviders(ctx context.Context, providers []RollupProvider, from, to time.Time, stream io.Writer) (err error)
 	Blob(ctx context.Context, height types.Level, nsId uint64, commitment string) (BlobLog, error)
+	ListBlobs(ctx context.Context, fltrs ListBlobLogFilters) ([]BlobLog, error)
 }
 
 type BlobLog struct {
