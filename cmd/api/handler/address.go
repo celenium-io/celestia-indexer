@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -184,12 +185,9 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
+	addressId, err := handler.getIdByHash(c.Request().Context(), hash, req.Hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
-	}
-	if len(addressId) != 1 {
-		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
 	}
 
 	fltrs := storage.TxFilter{
@@ -210,7 +208,7 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 		fltrs.MessageTypes.SetByMsgType(storageTypes.MsgType(req.MsgType[i]))
 	}
 
-	txs, err := handler.txs.ByAddress(c.Request().Context(), addressId[0], fltrs)
+	txs, err := handler.txs.ByAddress(c.Request().Context(), addressId, fltrs)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
@@ -279,16 +277,13 @@ func (handler *AddressHandler) Messages(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
+	addressId, err := handler.getIdByHash(c.Request().Context(), hash, req.Hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
-	if len(addressId) != 1 {
-		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
-	}
 
 	filters := req.ToFilters()
-	msgs, err := handler.messages.ByAddress(c.Request().Context(), addressId[0], filters)
+	msgs, err := handler.messages.ByAddress(c.Request().Context(), addressId, filters)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
@@ -351,17 +346,14 @@ func (handler *AddressHandler) Blobs(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
+	addressId, err := handler.getIdByHash(c.Request().Context(), hash, req.Hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
-	}
-	if len(addressId) != 1 {
-		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
 	}
 
 	logs, err := handler.blobLogs.BySigner(
 		c.Request().Context(),
-		addressId[0],
+		addressId,
 		storage.BlobLogFilters{
 			Limit:  req.Limit,
 			Offset: req.Offset,
@@ -440,17 +432,14 @@ func (handler *AddressHandler) Delegations(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
+	addressId, err := handler.getIdByHash(c.Request().Context(), hash, req.Hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
-	}
-	if len(addressId) != 1 {
-		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
 	}
 
 	delegations, err := handler.delegations.ByAddress(
 		c.Request().Context(),
-		addressId[0],
+		addressId,
 		req.Limit,
 		req.Offset,
 		req.ShowZero,
@@ -505,17 +494,14 @@ func (handler *AddressHandler) Undelegations(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
+	addressId, err := handler.getIdByHash(c.Request().Context(), hash, req.Hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
-	}
-	if len(addressId) != 1 {
-		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
 	}
 
 	undelegations, err := handler.undelegations.ByAddress(
 		c.Request().Context(),
-		addressId[0],
+		addressId,
 		req.Limit,
 		req.Offset,
 	)
@@ -557,17 +543,14 @@ func (handler *AddressHandler) Redelegations(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
+	addressId, err := handler.getIdByHash(c.Request().Context(), hash, req.Hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
-	}
-	if len(addressId) != 1 {
-		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
 	}
 
 	redelegations, err := handler.redelegations.ByAddress(
 		c.Request().Context(),
-		addressId[0],
+		addressId,
 		req.Limit,
 		req.Offset,
 	)
@@ -623,17 +606,13 @@ func (handler *AddressHandler) Vestings(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
+	addressId, err := handler.getIdByHash(c.Request().Context(), hash, req.Hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
-	if len(addressId) != 1 {
-		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
-	}
-
 	vestings, err := handler.vestings.ByAddress(
 		c.Request().Context(),
-		addressId[0],
+		addressId,
 		req.Limit,
 		req.Offset,
 		req.ShowEnded,
@@ -676,17 +655,14 @@ func (handler *AddressHandler) Grants(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
+	addressId, err := handler.getIdByHash(c.Request().Context(), hash, req.Hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
-	}
-	if len(addressId) != 1 {
-		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
 	}
 
 	grants, err := handler.grants.ByGranter(
 		c.Request().Context(),
-		addressId[0],
+		addressId,
 		req.Limit,
 		req.Offset,
 	)
@@ -727,17 +703,13 @@ func (handler *AddressHandler) Grantee(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
+	addressId, err := handler.getIdByHash(c.Request().Context(), hash, req.Hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
-	if len(addressId) != 1 {
-		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
-	}
-
 	grants, err := handler.grants.ByGrantee(
 		c.Request().Context(),
-		addressId[0],
+		addressId,
 		req.Limit,
 		req.Offset,
 	)
@@ -787,17 +759,14 @@ func (handler *AddressHandler) Stats(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	addressId, err := handler.address.IdByHash(c.Request().Context(), hash)
+	addressId, err := handler.getIdByHash(c.Request().Context(), hash, req.Hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
-	}
-	if len(addressId) != 1 {
-		return badRequestError(c, errors.Errorf("can't find address: %s", req.Hash))
 	}
 
 	series, err := handler.address.Series(
 		c.Request().Context(),
-		addressId[0],
+		addressId,
 		storage.Timeframe(req.Timeframe),
 		req.SeriesName,
 		storage.NewSeriesRequest(req.From, req.To),
@@ -811,4 +780,20 @@ func (handler *AddressHandler) Stats(c echo.Context) error {
 		response[i] = responses.NewHistogramItem(series[i])
 	}
 	return returnArray(c, response)
+}
+
+func (handler *AddressHandler) getIdByHash(ctx context.Context, hash []byte, address string) (uint64, error) {
+	addressId, err := handler.address.IdByHash(ctx, hash)
+	if err != nil {
+		return 0, err
+	}
+
+	switch len(addressId) {
+	case 0:
+		return 0, errors.Errorf("can't find address: %s", address)
+	case 1:
+		return addressId[0], nil
+	default:
+		return handler.address.IdByAddress(ctx, address, addressId...)
+	}
 }
