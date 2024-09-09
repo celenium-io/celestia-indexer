@@ -73,7 +73,12 @@ package types
 
 		cosmos.authz.v1beta1.EventRevoke,
 		cosmos.authz.v1.EventRevoke,
-		cancel_unbonding_delegation
+		cancel_unbonding_delegation,
+
+		active_proposal,
+		inactive_proposal,
+		ics27_packet,
+		channel_close_confirm
 	)
 */
 //go:generate go-enum --marshal --sql --values --names
