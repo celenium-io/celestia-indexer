@@ -127,6 +127,14 @@ const (
 	EventTypeCosmosauthzv1EventRevoke EventType = "cosmos.authz.v1.EventRevoke"
 	// EventTypeCancelUnbondingDelegation is a EventType of type cancel_unbonding_delegation.
 	EventTypeCancelUnbondingDelegation EventType = "cancel_unbonding_delegation"
+	// EventTypeActiveProposal is a EventType of type active_proposal.
+	EventTypeActiveProposal EventType = "active_proposal"
+	// EventTypeInactiveProposal is a EventType of type inactive_proposal.
+	EventTypeInactiveProposal EventType = "inactive_proposal"
+	// EventTypeIcs27Packet is a EventType of type ics27_packet.
+	EventTypeIcs27Packet EventType = "ics27_packet"
+	// EventTypeChannelCloseConfirm is a EventType of type channel_close_confirm.
+	EventTypeChannelCloseConfirm EventType = "channel_close_confirm"
 )
 
 var ErrInvalidEventType = fmt.Errorf("not a valid EventType, try [%s]", strings.Join(_EventTypeNames, ", "))
@@ -187,6 +195,10 @@ var _EventTypeNames = []string{
 	string(EventTypeCosmosauthzv1beta1EventRevoke),
 	string(EventTypeCosmosauthzv1EventRevoke),
 	string(EventTypeCancelUnbondingDelegation),
+	string(EventTypeActiveProposal),
+	string(EventTypeInactiveProposal),
+	string(EventTypeIcs27Packet),
+	string(EventTypeChannelCloseConfirm),
 }
 
 // EventTypeNames returns a list of possible string values of EventType.
@@ -254,6 +266,10 @@ func EventTypeValues() []EventType {
 		EventTypeCosmosauthzv1beta1EventRevoke,
 		EventTypeCosmosauthzv1EventRevoke,
 		EventTypeCancelUnbondingDelegation,
+		EventTypeActiveProposal,
+		EventTypeInactiveProposal,
+		EventTypeIcs27Packet,
+		EventTypeChannelCloseConfirm,
 	}
 }
 
@@ -325,6 +341,10 @@ var _EventTypeValue = map[string]EventType{
 	"cosmos.authz.v1beta1.EventRevoke":  EventTypeCosmosauthzv1beta1EventRevoke,
 	"cosmos.authz.v1.EventRevoke":       EventTypeCosmosauthzv1EventRevoke,
 	"cancel_unbonding_delegation":       EventTypeCancelUnbondingDelegation,
+	"active_proposal":                   EventTypeActiveProposal,
+	"inactive_proposal":                 EventTypeInactiveProposal,
+	"ics27_packet":                      EventTypeIcs27Packet,
+	"channel_close_confirm":             EventTypeChannelCloseConfirm,
 }
 
 // ParseEventType attempts to convert a string to a EventType.
