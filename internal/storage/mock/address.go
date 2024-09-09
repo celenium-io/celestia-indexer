@@ -161,6 +161,50 @@ func (c *MockIAddressGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*
 	return c
 }
 
+// IdByAddress mocks base method.
+func (m *MockIAddress) IdByAddress(ctx context.Context, address string, ids ...uint64) (uint64, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, address}
+	for _, a := range ids {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "IdByAddress", varargs...)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IdByAddress indicates an expected call of IdByAddress.
+func (mr *MockIAddressMockRecorder) IdByAddress(ctx, address any, ids ...any) *MockIAddressIdByAddressCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, address}, ids...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IdByAddress", reflect.TypeOf((*MockIAddress)(nil).IdByAddress), varargs...)
+	return &MockIAddressIdByAddressCall{Call: call}
+}
+
+// MockIAddressIdByAddressCall wrap *gomock.Call
+type MockIAddressIdByAddressCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIAddressIdByAddressCall) Return(arg0 uint64, arg1 error) *MockIAddressIdByAddressCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIAddressIdByAddressCall) Do(f func(context.Context, string, ...uint64) (uint64, error)) *MockIAddressIdByAddressCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIAddressIdByAddressCall) DoAndReturn(f func(context.Context, string, ...uint64) (uint64, error)) *MockIAddressIdByAddressCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // IdByHash mocks base method.
 func (m *MockIAddress) IdByHash(ctx context.Context, hash ...[]byte) ([]uint64, error) {
 	m.ctrl.T.Helper()

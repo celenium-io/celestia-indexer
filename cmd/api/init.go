@@ -112,6 +112,9 @@ func metricsSkipper(c echo.Context) bool {
 }
 
 func postSkipper(c echo.Context) bool {
+	if c.Request().Method != http.MethodPost {
+		return true
+	}
 	if strings.HasPrefix(c.Path(), "/v1/blob") {
 		return true
 	}

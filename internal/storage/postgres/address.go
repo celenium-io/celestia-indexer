@@ -121,3 +121,16 @@ func (a *Address) IdByHash(ctx context.Context, hash ...[]byte) (id []uint64, er
 		Scan(ctx, &id)
 	return
 }
+
+// IdByAddress -
+func (a *Address) IdByAddress(ctx context.Context, address string, ids ...uint64) (id uint64, err error) {
+	query := a.DB().NewSelect().
+		Model((*storage.Address)(nil)).
+		Column("id").
+		Where("address = ?", address)
+	if len(ids) > 0 {
+		query = query.Where("id IN (?)", bun.In(ids))
+	}
+	err = query.Scan(ctx, &id)
+	return
+}

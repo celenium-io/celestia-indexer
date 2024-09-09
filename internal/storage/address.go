@@ -27,6 +27,7 @@ type IAddress interface {
 	ListWithBalance(ctx context.Context, filters AddressListFilter) ([]Address, error)
 	Series(ctx context.Context, addressId uint64, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
 	IdByHash(ctx context.Context, hash ...[]byte) ([]uint64, error)
+	IdByAddress(ctx context.Context, address string, ids ...uint64) (uint64, error)
 }
 
 // Address -

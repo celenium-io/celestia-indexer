@@ -235,3 +235,12 @@ func (s *StorageTestSuite) TestAddressIdByHash() {
 	s.Require().Len(id, 1)
 	s.Require().EqualValues(1, id[0])
 }
+
+func (s *StorageTestSuite) TestAddressIdByAddress() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	id, err := s.storage.Address.IdByAddress(ctx, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", 2, 3, 4)
+	s.Require().NoError(err)
+	s.Require().EqualValues(2, id)
+}
