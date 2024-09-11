@@ -4,9 +4,13 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "This is docs of Celenium API.",
+        "description": "Celenium API is a powerful tool to access all blockchain data that is processed and indexed by our proprietary indexer. With Celenium API you can retrieve all historical data, off-chain data, blobs and statistics through our REST API. Celenium API indexer are open source, which allows you to not depend on third-party services. You can clone, build and run them independently, giving you full control over all components. If you have any questions or feature requests, please feel free to contact us. We appreciate your feedback!",
         "title": "Celenium API",
-        "contact": {},
+        "contact": {
+            "name": "Support",
+            "url": "https://discord.gg/3k83Przqk8",
+            "email": "celenium@pklabs.me"
+        },
         "version": "1.0"
     },
     "host": "api-mainnet.celenium.io",
@@ -7145,7 +7149,11 @@
                 "timeout_packet",
                 "cosmos.authz.v1beta1.EventRevoke",
                 "cosmos.authz.v1.EventRevoke",
-                "cancel_unbonding_delegation"
+                "cancel_unbonding_delegation",
+                "active_proposal",
+                "inactive_proposal",
+                "ics27_packet",
+                "channel_close_confirm"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -7202,7 +7210,11 @@
                 "EventTypeTimeoutPacket",
                 "EventTypeCosmosauthzv1beta1EventRevoke",
                 "EventTypeCosmosauthzv1EventRevoke",
-                "EventTypeCancelUnbondingDelegation"
+                "EventTypeCancelUnbondingDelegation",
+                "EventTypeActiveProposal",
+                "EventTypeInactiveProposal",
+                "EventTypeIcs27Packet",
+                "EventTypeChannelCloseConfirm"
             ]
         },
         "types.MsgAddressType": {
@@ -7421,6 +7433,18 @@
                 "MsgAcknowledgement"
             ]
         }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "description": "To authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.",
+            "type": "apiKey",
+            "name": "apikey",
+            "in": "header"
+        }
+    },
+    "externalDocs": {
+        "description": "Full documentation",
+        "url": "https://api-docs.celenium.io/"
     },
     "x-servers": [
         {
