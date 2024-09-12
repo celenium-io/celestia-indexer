@@ -26,20 +26,20 @@ var rootCmd = &cobra.Command{
 // @schemes					https
 // @BasePath				/v1
 //
-// @contact.name Support
-// @contact.url https://discord.gg/3k83Przqk8
-// @contact.email celenium@pklabs.me
+// @contact.name			Support
+// @contact.url				https://discord.gg/3k83Przqk8
+// @contact.email			celenium@pklabs.me
 //
-// @externalDocs.description Full documentation
-// @externalDocs.url https://api-docs.celenium.io/
+// @externalDocs.description	Full documentation
+// @externalDocs.url			https://api-docs.celenium.io/
 //
-// @x-servers [{"url": "api-mainnet.celenium.io", "description": "Celenium Mainnet API"},{"url": "api-mocha.celenium.io", "description": "Celenium Mocha API"},{"url": "api-arabica.celenium.io", "description": "Celenium Arabica API"}]
+// @x-servers					[{"url": "api-mainnet.celenium.io", "description": "Celenium Mainnet API"},{"url": "api-mocha.celenium.io", "description": "Celenium Mocha API"},{"url": "api-arabica.celenium.io", "description": "Celenium Arabica API"}]
 // @query.collection.format	multi
 //
-// @securityDefinitions.apikey ApiKeyAuth
-// @in header
-// @name apikey
-// @description To authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.
+// @securityDefinitions.apikey	ApiKeyAuth
+// @in							header
+// @name						apikey
+// @description					To authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.
 func main() {
 	cfg, err := initConfig()
 	if err != nil {
