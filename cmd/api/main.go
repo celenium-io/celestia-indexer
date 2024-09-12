@@ -19,27 +19,27 @@ var rootCmd = &cobra.Command{
 	Short: "DipDup Verticals | Celenium API",
 }
 
-// @title					Celenium API
-// @version					1.0
-// @description				Celenium API is a powerful tool to access all blockchain data that is processed and indexed by our proprietary indexer. With Celenium API you can retrieve all historical data, off-chain data, blobs and statistics through our REST API. Celenium API indexer are open source, which allows you to not depend on third-party services. You can clone, build and run them independently, giving you full control over all components. If you have any questions or feature requests, please feel free to contact us. We appreciate your feedback!
-// @host					api-mainnet.celenium.io
-// @schemes					https
-// @BasePath				/v1
+//	@title						Celenium API
+//	@version					1.0
+//	@description				Celenium API is a powerful tool to access all blockchain data that is processed and indexed by our proprietary indexer. With Celenium API you can retrieve all historical data, off-chain data, blobs and statistics through our REST API. Celenium API indexer are open source, which allows you to not depend on third-party services. You can clone, build and run them independently, giving you full control over all components. If you have any questions or feature requests, please feel free to contact us. We appreciate your feedback!
+//	@host						api-mainnet.celenium.io
+//	@schemes					https
+//	@BasePath					/v1
 //
-// @contact.name Support
-// @contact.url https://discord.gg/3k83Przqk8
-// @contact.email celenium@pklabs.me
+//	@contact.name				Support
+//	@contact.url				https://discord.gg/3k83Przqk8
+//	@contact.email				celenium@pklabs.me
 //
-// @externalDocs.description Full documentation
-// @externalDocs.url https://api-docs.celenium.io/
+//	@externalDocs.description	Full documentation
+//	@externalDocs.url			https://api-docs.celenium.io/
 //
-// @x-servers [{"url": "api-mainnet.celenium.io", "description": "Celenium Mainnet API"},{"url": "api-mocha.celenium.io", "description": "Celenium Mocha API"},{"url": "api-arabica.celenium.io", "description": "Celenium Arabica API"}]
-// @query.collection.format	multi
+//	@x-servers					[{"url": "api-mainnet.celenium.io", "description": "Celenium Mainnet API"},{"url": "api-mocha.celenium.io", "description": "Celenium Mocha API"},{"url": "api-arabica.celenium.io", "description": "Celenium Arabica API"}]
+//	@query.collection.format	multi
 //
-// @securityDefinitions.apikey ApiKeyAuth
-// @in header
-// @name apikey
-// @description To authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.
+//	@securityDefinitions.apikey	ApiKeyAuth
+//	@in							header
+//	@name						apikey
+//	@description				To authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.
 func main() {
 	cfg, err := initConfig()
 	if err != nil {

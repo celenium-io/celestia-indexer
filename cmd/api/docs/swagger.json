@@ -1164,7 +1164,7 @@
                 }
             },
             "post": {
-                "description": "Returns blob",
+                "description": "Returns blob\nTo authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.",
                 "consumes": [
                     "application/json"
                 ],

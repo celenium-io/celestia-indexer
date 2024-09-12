@@ -435,7 +435,7 @@ func (req listBlobsRequest) toDbRequest(ctx context.Context, ns storage.INamespa
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
 //	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
 //	@Param			signers		query	string	false	"Comma-separated celestia addresses"
-//	@Param			namespaces  query	string	false	"Comma-separated celestia namespaces"
+//	@Param			namespaces	query	string	false	"Comma-separated celestia namespaces"
 //	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	mininum(1)
 //	@Accept			json
 //	@Produce		json
@@ -475,18 +475,23 @@ type postBlobRequest struct {
 
 // Blob godoc
 //
-//	@Summary		Get namespace blob by commitment on height
-//	@Description	Returns blob
-//	@Tags			namespace
-//	@ID				get-blob
-//	@Param			hash		body	string	true	"Base64-encoded namespace id and version"
-//	@Param			height		body	integer	true	"Block heigth"	minimum(1)
-//	@Param			commitment	body	string	true	"Blob commitment"
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	responses.Blob
-//	@Failure		400	{object}	Error
-//	@Router			/blob [post]
+//	@Summary					Get namespace blob by commitment on height
+//	@Description				Returns blob
+//	@Tags						namespace
+//	@ID							get-blob
+//	@Param						hash		body	string	true	"Base64-encoded namespace id and version"
+//	@Param						height		body	integer	true	"Block heigth"	minimum(1)
+//	@Param						commitment	body	string	true	"Blob commitment"
+//	@Accept						json
+//	@Produce					json
+//	@Success					200	{object}	responses.Blob
+//	@Failure					400	{object}	Error
+//	@Router						/blob [post]
+//
+//	@securityDefinitions.apikey	ApiKeyAuth
+//	@in							header
+//	@name						apikey
+//	@description				To authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.
 func (handler *NamespaceHandler) Blob(c echo.Context) error {
 	req, err := bindAndValidate[postBlobRequest](c)
 	if err != nil {
