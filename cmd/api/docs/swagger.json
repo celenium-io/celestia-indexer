@@ -1164,7 +1164,7 @@
                 }
             },
             "post": {
-                "description": "Returns blob\nTo authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.",
+                "description": "Returns blob.\nTo authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1178,31 +1178,12 @@
                 "operationId": "get-blob",
                 "parameters": [
                     {
-                        "description": "Base64-encoded namespace id and version",
-                        "name": "hash",
+                        "description": "Request body containing height, commitment and namespace hash",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "minimum": 1,
-                        "description": "Block heigth",
-                        "name": "height",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "description": "Blob commitment",
-                        "name": "commitment",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/handler.postBlobRequest"
                         }
                     }
                 ],
@@ -1224,7 +1205,7 @@
         },
         "/blob/metadata": {
             "post": {
-                "description": "Returns blob metadata",
+                "description": "Returns blob metadata\nTo authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1238,31 +1219,12 @@
                 "operationId": "get-blob-metadata",
                 "parameters": [
                     {
-                        "description": "Base64-encoded namespace id and version",
-                        "name": "hash",
+                        "description": "Request body containing height, commitment and namespace hash",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "minimum": 1,
-                        "description": "Block heigth",
-                        "name": "height",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "description": "Blob commitment",
-                        "name": "commitment",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/handler.postBlobRequest"
                         }
                     }
                 ],
@@ -5177,6 +5139,29 @@
             "properties": {
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "handler.postBlobRequest": {
+            "type": "object",
+            "required": [
+                "commitment",
+                "hash",
+                "height"
+            ],
+            "properties": {
+                "commitment": {
+                    "type": "string",
+                    "example": "vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg="
+                },
+                "hash": {
+                    "type": "string",
+                    "example": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="
+                },
+                "height": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 123456
                 }
             }
         },

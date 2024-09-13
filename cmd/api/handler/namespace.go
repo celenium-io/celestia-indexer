@@ -468,20 +468,18 @@ func (handler *NamespaceHandler) Blobs(c echo.Context) error {
 }
 
 type postBlobRequest struct {
-	Hash       string      `json:"hash"       validate:"required,namespace"`
-	Height     types.Level `json:"height"     validate:"required,min=1"`
-	Commitment string      `json:"commitment" validate:"required,base64"`
+	Hash       string      `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="     json:"hash"       validate:"required,namespace"`
+	Height     types.Level `example:"123456"                                       json:"height"     validate:"required,min=1"`
+	Commitment string      `example:"vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg=" json:"commitment" validate:"required,base64"`
 }
 
 // Blob godoc
 //
 //	@Summary					Get namespace blob by commitment on height
-//	@Description				Returns blob
+//	@Description				Returns blob.
 //	@Tags						namespace
 //	@ID							get-blob
-//	@Param						hash		body	string	true	"Base64-encoded namespace id and version"
-//	@Param						height		body	integer	true	"Block heigth"	minimum(1)
-//	@Param						commitment	body	string	true	"Blob commitment"
+//	@Param						request	body postBlobRequest	true "Request body containing height, commitment and namespace hash"
 //	@Accept						json
 //	@Produce					json
 //	@Success					200	{object}	responses.Blob
@@ -517,14 +515,17 @@ func (handler *NamespaceHandler) Blob(c echo.Context) error {
 //	@Description	Returns blob metadata
 //	@Tags			namespace
 //	@ID				get-blob-metadata
-//	@Param			hash		body	string	true	"Base64-encoded namespace id and version"
-//	@Param			height		body	integer	true	"Block heigth"	minimum(1)
-//	@Param			commitment	body	string	true	"Blob commitment"
+//	@Param			request	body postBlobRequest	true "Request body containing height, commitment and namespace hash"
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{object}	responses.BlobLog
 //	@Failure		400	{object}	Error
 //	@Router			/blob/metadata [post]
+//
+//	@securityDefinitions.apikey	ApiKeyAuth
+//	@in							header
+//	@name						apikey
+//	@description				To authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.
 func (handler *NamespaceHandler) BlobMetadata(c echo.Context) error {
 	req, err := bindAndValidate[postBlobRequest](c)
 	if err != nil {
