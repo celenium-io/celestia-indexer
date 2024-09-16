@@ -659,6 +659,21 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 	if rollup.Links != nil {
 		query = query.Set("links = ?", pq.Array(rollup.Links))
 	}
+	if rollup.Type != "" {
+		query = query.Set("type = ?", rollup.Type)
+	}
+	if rollup.Category != "" {
+		query = query.Set("category = ?", rollup.Category)
+	}
+	if rollup.Provider != "" {
+		query = query.Set("provider = ?", rollup.Provider)
+	}
+	if rollup.Compression != "" {
+		query = query.Set("compression = ?", rollup.Compression)
+	}
+	if rollup.VM != "" {
+		query = query.Set("vm = ?", rollup.VM)
+	}
 
 	_, err := query.Exec(ctx)
 	return err

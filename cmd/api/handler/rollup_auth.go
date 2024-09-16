@@ -9,6 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
+	enums "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/gosimple/slug"
@@ -48,6 +49,11 @@ type createRollupRequest struct {
 	Explorer    string           `json:"explorer"    validate:"omitempty,url"`
 	Stack       string           `json:"stack"       validate:"omitempty"`
 	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
+	Category    string           `json:"category"    validate:"omitempty,oneof=nft gaming finance"`
+	Type        string           `json:"type"        validate:"omitempty,oneof=settled sovereign"`
+	Compression string           `json:"compression" validate:"omitempty"`
+	VM          string           `json:"vm"          validate:"omitempty"`
+	Provider    string           `json:"provider"    validate:"omitempty"`
 	Providers   []rollupProvider `json:"providers"   validate:"required,min=1"`
 }
 
@@ -87,6 +93,11 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRo
 		BridgeContract: req.Bridge,
 		Stack:          req.Stack,
 		Links:          req.Links,
+		Compression:    req.Compression,
+		Provider:       req.Provider,
+		VM:             req.VM,
+		Type:           enums.RollupType(req.Type),
+		Category:       enums.RollupCategory(req.Category),
 		Slug:           slug.Make(req.Name),
 	}
 
@@ -151,6 +162,11 @@ type updateRollupRequest struct {
 	Bridge      string           `json:"bridge"      validate:"omitempty,eth_addr"`
 	Explorer    string           `json:"explorer"    validate:"omitempty,url"`
 	Stack       string           `json:"stack"       validate:"omitempty"`
+	Category    string           `json:"category"    validate:"omitempty,oneof=nft gaming finance"`
+	Type        string           `json:"type"        validate:"omitempty,oneof=settled sovereign"`
+	Compression string           `json:"compression" validate:"omitempty"`
+	Provider    string           `json:"provider"    validate:"omitempty"`
+	VM          string           `json:"vm"          validate:"omitempty"`
 	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
 	Providers   []rollupProvider `json:"providers"   validate:"omitempty,min=1"`
 }
@@ -191,6 +207,11 @@ func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRo
 		Explorer:       req.Explorer,
 		BridgeContract: req.Bridge,
 		Stack:          req.Stack,
+		Compression:    req.Compression,
+		Provider:       req.Provider,
+		VM:             req.VM,
+		Type:           enums.RollupType(req.Type),
+		Category:       enums.RollupCategory(req.Category),
 		Links:          req.Links,
 	}
 

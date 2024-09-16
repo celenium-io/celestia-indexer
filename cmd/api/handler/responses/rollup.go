@@ -23,6 +23,11 @@ type RollupWithStats struct {
 	Explorer       string `example:"https://explorer.karak.network/"           format:"string"  json:"explorer,omitempty"    swaggertype:"string"`
 	BridgeContract string `example:"https://github.com/account"                format:"string"  json:"bridge,omitempty"      swaggertype:"string"`
 	Stack          string `example:"op_stack"                                  format:"string"  json:"stack,omitempty"       swaggertype:"string"`
+	Type           string `example:"settled"                                   format:"string"  json:"type,omitempty"        swaggertype:"string"`
+	Category       string `example:"nft"                                       format:"string"  json:"category,omitempty"    swaggertype:"string"`
+	VM             string `example:"evm"                                       format:"string"  json:"vm,omitempty"          swaggertype:"string"`
+	Provider       string `example:"name"                                      format:"string"  json:"provider,omitempty"    swaggertype:"string"`
+	Compression    string `example:"zip"                                       format:"string"  json:"compression,omitempty" swaggertype:"string"`
 
 	BlobsCount    int64     `example:"2"                         format:"integer"   json:"blobs_count"        swaggertype:"integer"`
 	Size          int64     `example:"1000"                      format:"integer"   json:"size"               swaggertype:"integer"`
@@ -58,6 +63,11 @@ func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 		FeePct:         r.FeePct,
 		LastAction:     r.LastActionTime,
 		FirstAction:    r.FirstActionTime,
+		Compression:    r.Compression,
+		Category:       r.Category.String(),
+		Type:           r.Type.String(),
+		Provider:       r.Provider,
+		VM:             r.VM,
 		Fee:            r.Fee.StringFixed(0),
 	}
 }
@@ -75,6 +85,11 @@ type Rollup struct {
 	Explorer       string `example:"https://explorer.karak.network/" format:"string"  json:"explorer,omitempty"    swaggertype:"string"`
 	BridgeContract string `example:"https://github.com/account"      format:"string"  json:"bridge,omitempty"      swaggertype:"string"`
 	Stack          string `example:"op_stack"                        format:"string"  json:"stack,omitempty"       swaggertype:"string"`
+	Type           string `example:"settled"                         format:"string"  json:"type,omitempty"        swaggertype:"string"`
+	Category       string `example:"nft"                             format:"string"  json:"category,omitempty"    swaggertype:"string"`
+	Provider       string `example:"name"                            format:"string"  json:"provider,omitempty"    swaggertype:"string"`
+	Compression    string `example:"zip"                             format:"string"  json:"compression,omitempty" swaggertype:"string"`
+	VM             string `example:"evm"                             format:"string"  json:"vm,omitempty"          swaggertype:"string"`
 
 	Links []string `json:"links,omitempty"`
 }
@@ -94,6 +109,11 @@ func NewRollup(r *storage.Rollup) Rollup {
 		Stack:          r.Stack,
 		Explorer:       r.Explorer,
 		Links:          r.Links,
+		Compression:    r.Compression,
+		Category:       r.Category.String(),
+		Type:           r.Type.String(),
+		Provider:       r.Provider,
+		VM:             r.VM,
 	}
 }
 
@@ -129,6 +149,11 @@ type RollupWithDayStats struct {
 	Explorer       string `example:"https://explorer.karak.network/"           format:"string"  json:"explorer,omitempty"    swaggertype:"string"`
 	BridgeContract string `example:"https://github.com/account"                format:"string"  json:"bridge,omitempty"      swaggertype:"string"`
 	Stack          string `example:"op_stack"                                  format:"string"  json:"stack,omitempty"       swaggertype:"string"`
+	Type           string `example:"settled"                                   format:"string"  json:"type,omitempty"        swaggertype:"string"`
+	Category       string `example:"nft"                                       format:"string"  json:"category,omitempty"    swaggertype:"string"`
+	Provider       string `example:"name"                                      format:"string"  json:"provider,omitempty"    swaggertype:"string"`
+	Compression    string `example:"zip"                                       format:"string"  json:"compression,omitempty" swaggertype:"string"`
+	VM             string `example:"evm"                                       format:"string"  json:"vm,omitempty"          swaggertype:"string"`
 
 	AvgSize        int64   `example:"100" format:"integer" json:"avg_size"        swaggertype:"integer"`
 	BlobsCount     int64   `example:"100" format:"integer" json:"blobs_count"     swaggertype:"integer"`
@@ -155,6 +180,11 @@ func NewRollupWithDayStats(r storage.RollupWithDayStats) RollupWithDayStats {
 		Explorer:       r.Explorer,
 		BridgeContract: r.BridgeContract,
 		Stack:          r.Stack,
+		Compression:    r.Compression,
+		Category:       r.Category.String(),
+		Type:           r.Type.String(),
+		Provider:       r.Provider,
+		VM:             r.VM,
 		Slug:           r.Slug,
 		BlobsCount:     r.BlobsCount,
 		AvgSize:        int64(r.AvgSize),

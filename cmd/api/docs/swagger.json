@@ -6152,6 +6152,16 @@
                     "format": "string",
                     "example": "https://github.com/account"
                 },
+                "category": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "nft"
+                },
+                "compression": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "zip"
+                },
                 "description": {
                     "type": "string",
                     "format": "string",
@@ -6193,6 +6203,11 @@
                     "format": "string",
                     "example": "Rollup name"
                 },
+                "provider": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "name"
+                },
                 "slug": {
                     "type": "string",
                     "format": "string",
@@ -6207,6 +6222,16 @@
                     "type": "string",
                     "format": "string",
                     "example": "https://x.com/account"
+                },
+                "type": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "settled"
+                },
+                "vm": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "evm"
                 },
                 "website": {
                     "type": "string",
@@ -6308,6 +6333,16 @@
                     "format": "string",
                     "example": "https://github.com/account"
                 },
+                "category": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "nft"
+                },
+                "compression": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "zip"
+                },
                 "description": {
                     "type": "string",
                     "format": "string",
@@ -6363,6 +6398,11 @@
                     "format": "integer",
                     "example": 100
                 },
+                "provider": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "name"
+                },
                 "slug": {
                     "type": "string",
                     "format": "string",
@@ -6393,6 +6433,16 @@
                     "format": "string",
                     "example": "https://x.com/account"
                 },
+                "type": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "settled"
+                },
+                "vm": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "evm"
+                },
                 "website": {
                     "type": "string",
                     "format": "string",
@@ -6417,6 +6467,16 @@
                     "type": "string",
                     "format": "string",
                     "example": "https://github.com/account"
+                },
+                "category": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "nft"
+                },
+                "compression": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "zip"
                 },
                 "description": {
                     "type": "string",
@@ -6479,6 +6539,11 @@
                     "format": "string",
                     "example": "Rollup name"
                 },
+                "provider": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "name"
+                },
                 "size": {
                     "type": "integer",
                     "format": "integer",
@@ -6503,6 +6568,16 @@
                     "type": "string",
                     "format": "string",
                     "example": "https://x.com/account"
+                },
+                "type": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "settled"
+                },
+                "vm": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "evm"
                 },
                 "website": {
                     "type": "string",
