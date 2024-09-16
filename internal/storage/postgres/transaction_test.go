@@ -748,6 +748,8 @@ func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 		BridgeContract: testLink,
 		Explorer:       testLink,
 		Stack:          "stack",
+		Type:           types.RollupTypeSettled,
+		Category:       types.RollupCategoryFinance,
 		Links:          []string{testLink},
 	}
 	err = tx.SaveRollup(ctx, rollup)
