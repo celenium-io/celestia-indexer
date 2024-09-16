@@ -7,7 +7,7 @@ package types
 /*
 	ENUM(
 		finance,
-		game,
+		gaming,
 		nft
 	)
 */

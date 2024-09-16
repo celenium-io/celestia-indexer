@@ -19,8 +19,8 @@ import (
 const (
 	// RollupCategoryFinance is a RollupCategory of type finance.
 	RollupCategoryFinance RollupCategory = "finance"
-	// RollupCategoryGame is a RollupCategory of type game.
-	RollupCategoryGame RollupCategory = "game"
+	// RollupCategoryGaming is a RollupCategory of type gaming.
+	RollupCategoryGaming RollupCategory = "gaming"
 	// RollupCategoryNft is a RollupCategory of type nft.
 	RollupCategoryNft RollupCategory = "nft"
 )
@@ -29,7 +29,7 @@ var ErrInvalidRollupCategory = fmt.Errorf("not a valid RollupCategory, try [%s]"
 
 var _RollupCategoryNames = []string{
 	string(RollupCategoryFinance),
-	string(RollupCategoryGame),
+	string(RollupCategoryGaming),
 	string(RollupCategoryNft),
 }
 
@@ -44,7 +44,7 @@ func RollupCategoryNames() []string {
 func RollupCategoryValues() []RollupCategory {
 	return []RollupCategory{
 		RollupCategoryFinance,
-		RollupCategoryGame,
+		RollupCategoryGaming,
 		RollupCategoryNft,
 	}
 }
@@ -63,7 +63,7 @@ func (x RollupCategory) IsValid() bool {
 
 var _RollupCategoryValue = map[string]RollupCategory{
 	"finance": RollupCategoryFinance,
-	"game":    RollupCategoryGame,
+	"gaming":  RollupCategoryGaming,
 	"nft":     RollupCategoryNft,
 }
 
