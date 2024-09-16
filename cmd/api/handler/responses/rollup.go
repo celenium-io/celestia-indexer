@@ -25,6 +25,7 @@ type RollupWithStats struct {
 	Stack          string `example:"op_stack"                                  format:"string"  json:"stack,omitempty"       swaggertype:"string"`
 	Type           string `example:"settled"                                   format:"string"  json:"type,omitempty"        swaggertype:"string"`
 	Category       string `example:"nft"                                       format:"string"  json:"category,omitempty"    swaggertype:"string"`
+	VM             string `example:"evm"                                       format:"string"  json:"vm,omitempty"          swaggertype:"string"`
 	Provider       string `example:"name"                                      format:"string"  json:"provider,omitempty"    swaggertype:"string"`
 	Compression    string `example:"zip"                                       format:"string"  json:"compression,omitempty" swaggertype:"string"`
 
@@ -66,6 +67,7 @@ func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 		Category:       r.Category.String(),
 		Type:           r.Type.String(),
 		Provider:       r.Provider,
+		VM:             r.VM,
 		Fee:            r.Fee.StringFixed(0),
 	}
 }
@@ -87,6 +89,7 @@ type Rollup struct {
 	Category       string `example:"nft"                             format:"string"  json:"category,omitempty"    swaggertype:"string"`
 	Provider       string `example:"name"                            format:"string"  json:"provider,omitempty"    swaggertype:"string"`
 	Compression    string `example:"zip"                             format:"string"  json:"compression,omitempty" swaggertype:"string"`
+	VM             string `example:"evm"                             format:"string"  json:"vm,omitempty"          swaggertype:"string"`
 
 	Links []string `json:"links,omitempty"`
 }
@@ -110,6 +113,7 @@ func NewRollup(r *storage.Rollup) Rollup {
 		Category:       r.Category.String(),
 		Type:           r.Type.String(),
 		Provider:       r.Provider,
+		VM:             r.VM,
 	}
 }
 
@@ -149,6 +153,7 @@ type RollupWithDayStats struct {
 	Category       string `example:"nft"                                       format:"string"  json:"category,omitempty"    swaggertype:"string"`
 	Provider       string `example:"name"                                      format:"string"  json:"provider,omitempty"    swaggertype:"string"`
 	Compression    string `example:"zip"                                       format:"string"  json:"compression,omitempty" swaggertype:"string"`
+	VM             string `example:"evm"                                       format:"string"  json:"vm,omitempty"          swaggertype:"string"`
 
 	AvgSize        int64   `example:"100" format:"integer" json:"avg_size"        swaggertype:"integer"`
 	BlobsCount     int64   `example:"100" format:"integer" json:"blobs_count"     swaggertype:"integer"`
@@ -179,6 +184,7 @@ func NewRollupWithDayStats(r storage.RollupWithDayStats) RollupWithDayStats {
 		Category:       r.Category.String(),
 		Type:           r.Type.String(),
 		Provider:       r.Provider,
+		VM:             r.VM,
 		Slug:           r.Slug,
 		BlobsCount:     r.BlobsCount,
 		AvgSize:        int64(r.AvgSize),

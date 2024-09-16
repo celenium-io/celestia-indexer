@@ -50,6 +50,7 @@ type Rollup struct {
 	Provider       string               `bun:"provider"                      comment:"RaaS provider"`
 	Type           types.RollupType     `bun:"type,type:rollup_type"         comment:"Type of rollup: settled or sovereign"`
 	Category       types.RollupCategory `bun:"category,type:rollup_category" comment:"Category of rollup"`
+	VM             string               `bun:"vm"                            comment:"Virtual machine"`
 	Links          []string             `bun:"links,array"                   comment:"Other links to rollup related sites"`
 
 	Providers []*RollupProvider `bun:"rel:has-many,join:id=rollup_id"`
@@ -75,7 +76,8 @@ func (r Rollup) IsEmpty() bool {
 		r.Category == "" &&
 		r.Compression == "" &&
 		r.Provider == "" &&
-		r.Type == ""
+		r.Type == "" &&
+		r.VM == ""
 }
 
 type RollupWithStats struct {

@@ -671,6 +671,9 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 	if rollup.Compression != "" {
 		query = query.Set("compression = ?", rollup.Compression)
 	}
+	if rollup.VM != "" {
+		query = query.Set("vm = ?", rollup.VM)
+	}
 
 	_, err := query.Exec(ctx)
 	return err

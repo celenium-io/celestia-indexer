@@ -52,6 +52,7 @@ type createRollupRequest struct {
 	Category    string           `json:"category"    validate:"omitempty,oneof=nft gaming finance"`
 	Type        string           `json:"type"        validate:"omitempty,oneof=settled sovereign"`
 	Compression string           `json:"compression" validate:"omitempty"`
+	VM          string           `json:"vm"          validate:"omitempty"`
 	Provider    string           `json:"provider"    validate:"omitempty"`
 	Providers   []rollupProvider `json:"providers"   validate:"required,min=1"`
 }
@@ -94,6 +95,7 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRo
 		Links:          req.Links,
 		Compression:    req.Compression,
 		Provider:       req.Provider,
+		VM:             req.VM,
 		Type:           enums.RollupType(req.Type),
 		Category:       enums.RollupCategory(req.Category),
 		Slug:           slug.Make(req.Name),
@@ -164,6 +166,7 @@ type updateRollupRequest struct {
 	Type        string           `json:"type"        validate:"omitempty,oneof=settled sovereign"`
 	Compression string           `json:"compression" validate:"omitempty"`
 	Provider    string           `json:"provider"    validate:"omitempty"`
+	VM          string           `json:"vm"          validate:"omitempty"`
 	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
 	Providers   []rollupProvider `json:"providers"   validate:"omitempty,min=1"`
 }
@@ -206,6 +209,7 @@ func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRo
 		Stack:          req.Stack,
 		Compression:    req.Compression,
 		Provider:       req.Provider,
+		VM:             req.VM,
 		Type:           enums.RollupType(req.Type),
 		Category:       enums.RollupCategory(req.Category),
 		Links:          req.Links,
