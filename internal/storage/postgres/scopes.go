@@ -169,7 +169,10 @@ func blobLogSort(query *bun.SelectQuery, sortBy string, sort sdk.SortOrder) *bun
 	case sizeColumn, timeColumn:
 		query = sortScope(query, fmt.Sprintf("blob_log.%s", sortBy), sort)
 	case "":
-		query = sortScope(query, "blob_log.time", sort)
+		if sort != sdk.SortOrderAsc && sort != sdk.SortOrderDesc {
+			sort = sdk.SortOrderAsc
+		}
+		query = query.OrderExpr("blob_log.time ?0, blob_log.id ?0", bun.Safe(sort))
 	default:
 		return query
 	}
