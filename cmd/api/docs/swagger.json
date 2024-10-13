@@ -2672,6 +2672,12 @@
                         "description": "Sort field. Default: size",
                         "name": "sort_by",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated rollup category list",
+                        "name": "category",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2775,6 +2781,12 @@
                         "type": "string",
                         "description": "Sort field. Default: mb_price",
                         "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated rollup category list",
+                        "name": "category",
                         "in": "query"
                     }
                 ],
@@ -5563,6 +5575,12 @@
         "responses.Enums": {
             "type": "object",
             "properties": {
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "event_type": {
                     "type": "array",
                     "items": {

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 )
 
@@ -22,7 +23,12 @@ func (s *StorageTestSuite) TestRollupLeaderboard() {
 		sizeColumn, blobsCountColumn, timeColumn, feeColumn, "",
 	} {
 
-		rollups, err := s.storage.Rollup.Leaderboard(ctx, column, sdk.SortOrderDesc, 10, 0)
+		rollups, err := s.storage.Rollup.Leaderboard(ctx, storage.LeaderboardFilters{
+			SortField: column,
+			Sort:      sdk.SortOrderDesc,
+			Limit:     10,
+			Offset:    0,
+		})
 		s.Require().NoError(err, column)
 		s.Require().Len(rollups, 3, column)
 
@@ -40,6 +46,42 @@ func (s *StorageTestSuite) TestRollupLeaderboard() {
 	}
 }
 
+func (s *StorageTestSuite) TestRollupLeaderboardWithCategory() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
+	s.Require().NoError(err)
+
+	for _, column := range []string{
+		sizeColumn, blobsCountColumn, timeColumn, feeColumn, "",
+	} {
+
+		rollups, err := s.storage.Rollup.Leaderboard(ctx, storage.LeaderboardFilters{
+			SortField: column,
+			Sort:      sdk.SortOrderDesc,
+			Limit:     10,
+			Offset:    0,
+			Category:  []types.RollupCategory{types.RollupCategoryNft},
+		})
+		s.Require().NoError(err, column)
+		s.Require().Len(rollups, 1, column)
+
+		rollup := rollups[0]
+		s.Require().EqualValues("Rollup 3", rollup.Name, column)
+		s.Require().EqualValues("The third", rollup.Description, column)
+		s.Require().EqualValues(34, rollup.Size, column)
+		s.Require().EqualValues(3, rollup.BlobsCount, column)
+		s.Require().False(rollup.LastActionTime.IsZero())
+		s.Require().False(rollup.FirstActionTime.IsZero())
+		s.Require().Equal("7000", rollup.Fee.String())
+		s.Require().EqualValues(0.6363636363636364, rollup.FeePct)
+		s.Require().EqualValues(0.42857142857142855, rollup.BlobsCountPct)
+		s.Require().EqualValues(0.3953488372093023, rollup.SizePct)
+		s.Require().EqualValues("nft", rollup.Category)
+	}
+}
+
 func (s *StorageTestSuite) TestRollupLeaderboardDay() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
@@ -51,7 +93,12 @@ func (s *StorageTestSuite) TestRollupLeaderboardDay() {
 		"avg_size", blobsCountColumn, "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price", "",
 	} {
 
-		rollups, err := s.storage.Rollup.LeaderboardDay(ctx, column, sdk.SortOrderDesc, 10, 0)
+		rollups, err := s.storage.Rollup.LeaderboardDay(ctx, storage.LeaderboardFilters{
+			SortField: column,
+			Sort:      sdk.SortOrderDesc,
+			Limit:     10,
+			Offset:    0,
+		})
 		s.Require().NoError(err, column)
 		s.Require().Len(rollups, 0, column)
 	}

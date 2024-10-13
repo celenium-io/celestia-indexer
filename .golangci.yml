@@ -22,3 +22,7 @@ linters:
     - prealloc
     - protogetter
     - makezero
+linters-settings:
+  gosec:
+    excludes:
+      - G115

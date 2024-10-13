@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
-	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
@@ -27,46 +26,54 @@ func NewRollup(db *database.Bun) *Rollup {
 	}
 }
 
-func (r *Rollup) Leaderboard(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) (rollups []storage.RollupWithStats, err error) {
-	switch sortField {
+func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilters) (rollups []storage.RollupWithStats, err error) {
+	switch fltrs.SortField {
 	case timeColumn:
-		sortField = "last_time"
+		fltrs.SortField = "last_time"
 	case sizeColumn, blobsCountColumn, feeColumn:
 	case "":
-		sortField = sizeColumn
+		fltrs.SortField = sizeColumn
 	default:
-		return nil, errors.Errorf("unknown sort field: %s", sortField)
+		return nil, errors.Errorf("unknown sort field: %s", fltrs.SortField)
 	}
 
 	query := r.DB().NewSelect().
 		Table(storage.ViewLeaderboard).
 		ColumnExpr("*").
-		Offset(offset)
+		Offset(fltrs.Offset)
 
-	query = sortScope(query, sortField, sort)
-	query = limitScope(query, limit)
+	if len(fltrs.Category) > 0 {
+		query = query.Where("category IN (?)", bun.In(fltrs.Category))
+	}
+
+	query = sortScope(query, fltrs.SortField, fltrs.Sort)
+	query = limitScope(query, fltrs.Limit)
 	err = query.Scan(ctx, &rollups)
 	return
 }
 
-func (r *Rollup) LeaderboardDay(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) (rollups []storage.RollupWithDayStats, err error) {
-	switch sortField {
+func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFilters) (rollups []storage.RollupWithDayStats, err error) {
+	switch fltrs.SortField {
 	case "avg_size", blobsCountColumn, "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price":
 	case "":
-		sortField = "throughput"
+		fltrs.SortField = "throughput"
 	default:
-		return nil, errors.Errorf("unknown sort field: %s", sortField)
+		return nil, errors.Errorf("unknown sort field: %s", fltrs.SortField)
 	}
 
 	query := r.DB().NewSelect().
 		Table(storage.ViewLeaderboardDay).
 		Column("avg_size", blobsCountColumn, "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price").
 		ColumnExpr("rollup.*").
-		Offset(offset).
+		Offset(fltrs.Offset).
 		Join("left join rollup on rollup.id = rollup_id")
 
-	query = sortScope(query, sortField, sort)
-	query = limitScope(query, limit)
+	if len(fltrs.Category) > 0 {
+		query = query.Where("category IN (?)", bun.In(fltrs.Category))
+	}
+
+	query = sortScope(query, fltrs.SortField, fltrs.Sort)
+	query = limitScope(query, fltrs.Limit)
 	err = query.Scan(ctx, &rollups)
 	return
 }
