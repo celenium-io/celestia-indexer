@@ -15,6 +15,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
@@ -31,6 +32,7 @@ var (
 		Twitter:     "https://x.com",
 		Logo:        "image.png",
 		Slug:        "test-rollup",
+		Category:    types.RollupCategoryNft,
 	}
 	testRollupWithStats = storage.RollupWithStats{
 		Rollup: testRollup,
@@ -87,6 +89,7 @@ func (s *RollupTestSuite) TestLeaderboard() {
 	} {
 		q := make(url.Values)
 		q.Add("sort_by", sort)
+		q.Add("category", "nft,gaming")
 
 		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 		rec := httptest.NewRecorder()
@@ -94,7 +97,16 @@ func (s *RollupTestSuite) TestLeaderboard() {
 		c.SetPath("/rollup")
 
 		s.rollups.EXPECT().
-			Leaderboard(gomock.Any(), sort, sdk.SortOrderDesc, 10, 0).
+			Leaderboard(gomock.Any(), storage.LeaderboardFilters{
+				SortField: sort,
+				Sort:      sdk.SortOrderDesc,
+				Limit:     10,
+				Offset:    0,
+				Category: []types.RollupCategory{
+					types.RollupCategoryNft,
+					types.RollupCategoryGaming,
+				},
+			}).
 			Return([]storage.RollupWithStats{testRollupWithStats}, nil).
 			Times(1)
 
@@ -127,6 +139,7 @@ func (s *RollupTestSuite) TestLeaderboardDay() {
 	} {
 		q := make(url.Values)
 		q.Add("sort_by", sort)
+		q.Add("category", "nft,gaming")
 
 		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 		rec := httptest.NewRecorder()
@@ -134,7 +147,16 @@ func (s *RollupTestSuite) TestLeaderboardDay() {
 		c.SetPath("/rollup/day")
 
 		s.rollups.EXPECT().
-			LeaderboardDay(gomock.Any(), sort, sdk.SortOrderDesc, 10, 0).
+			LeaderboardDay(gomock.Any(), storage.LeaderboardFilters{
+				SortField: sort,
+				Sort:      sdk.SortOrderDesc,
+				Limit:     10,
+				Offset:    0,
+				Category: []types.RollupCategory{
+					types.RollupCategoryNft,
+					types.RollupCategoryGaming,
+				},
+			}).
 			Return([]storage.RollupWithDayStats{
 				{
 					Rollup: testRollup,

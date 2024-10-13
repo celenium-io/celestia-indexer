@@ -52,13 +52,13 @@ func TestWebsocket(t *testing.T) {
 	dispatcher.Start(ctx)
 	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelBlock)
 
-	for i := 0; i < 10; i++ {
+	for i := uint64(0); i < 10; i++ {
 		hash := make([]byte, 32)
 		_, err := rand.Read(hash)
 		require.NoError(t, err)
 
-		blockMock.EXPECT().ByIdWithRelations(ctx, uint64(i)).Return(storage.Block{
-			Id:           uint64(i),
+		blockMock.EXPECT().ByIdWithRelations(ctx, i).Return(storage.Block{
+			Id:           i,
 			Height:       types.Level(i),
 			Time:         time.Now(),
 			Hash:         hash,

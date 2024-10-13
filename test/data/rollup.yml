@@ -6,6 +6,7 @@
   github: https://github.com/rollup1
   logo: https://rollup1.com/image.png
   slug: rollup_1
+  category: finance
 - id: 2
   name: Rollup 2
   description: The second
@@ -14,6 +15,7 @@
   github: https://github.com/rollup2
   logo: https://rollup2.com/image.png
   slug: rollup_2
+  category: gaming
 - id: 3
   name: Rollup 3
   description: The third
@@ -22,3 +24,4 @@
   github: https://github.com/rollup3
   logo: https://rollup3.com/image.png
   slug: rollup_3
+  category: nft

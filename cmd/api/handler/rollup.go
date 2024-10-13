@@ -9,6 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/labstack/echo/v4"
 )
@@ -31,21 +32,42 @@ func NewRollupHandler(
 	}
 }
 
+type rollupList struct {
+	Limit    int         `query:"limit"    validate:"omitempty,min=1,max=100"`
+	Offset   int         `query:"offset"   validate:"omitempty,min=0"`
+	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
+	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=time blobs_count size fee"`
+	Category StringArray `query:"category" validate:"omitempty,dive,category"`
+}
+
+func (p *rollupList) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+	if p.Sort == "" {
+		p.Sort = desc
+	}
+	if p.SortBy == "" {
+		p.SortBy = "size"
+	}
+}
+
 // Leaderboard godoc
 //
-//	@Summary		List rollups info
-//	@Description	List rollups info
-//	@Tags			rollup
-//	@ID				list-rollup
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
-//	@Param			sort	query	string	false	"Sort order. Default: desc"		Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field. Default: size"		Enums(time, blobs_count, size, fee)
-//	@Produce		json
-//	@Success		200	{array}		responses.RollupWithStats
-//	@Failure		400	{object}	Error
-//	@Failure		500	{object}	Error
-//	@Router			/rollup [get]
+//		@Summary		List rollups info
+//		@Description	List rollups info
+//		@Tags			rollup
+//		@ID				list-rollup
+//		@Param			limit	 query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//		@Param			offset	 query	integer	false	"Offset"						mininum(1)
+//		@Param			sort	 query	string	false	"Sort order. Default: desc"		Enums(asc, desc)
+//		@Param			sort_by	 query	string	false	"Sort field. Default: size"		Enums(time, blobs_count, size, fee)
+//	    @Param          category query  string  false   "Comma-separated rollup category list"
+//		@Produce		json
+//		@Success		200	{array}		responses.RollupWithStats
+//		@Failure		400	{object}	Error
+//		@Failure		500	{object}	Error
+//		@Router			/rollup [get]
 func (handler RollupHandler) Leaderboard(c echo.Context) error {
 	req, err := bindAndValidate[rollupList](c)
 	if err != nil {
@@ -53,7 +75,18 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	rollups, err := handler.rollups.Leaderboard(c.Request().Context(), req.SortBy, pgSort(req.Sort), req.Limit, req.Offset)
+	categories := make([]types.RollupCategory, len(req.Category))
+	for i := range categories {
+		categories[i] = types.RollupCategory(req.Category[i])
+	}
+
+	rollups, err := handler.rollups.Leaderboard(c.Request().Context(), storage.LeaderboardFilters{
+		SortField: req.SortBy,
+		Sort:      pgSort(req.Sort),
+		Limit:     req.Limit,
+		Offset:    req.Offset,
+		Category:  categories,
+	})
 	if err != nil {
 		return handleError(c, err, handler.rollups)
 	}
@@ -62,6 +95,26 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 		response[i] = responses.NewRollupWithStats(rollups[i])
 	}
 	return returnArray(c, response)
+}
+
+type rollupDayList struct {
+	Limit    int         `query:"limit"    validate:"omitempty,min=1,max=100"`
+	Offset   int         `query:"offset"   validate:"omitempty,min=0"`
+	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
+	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=avg_size blobs_count total_size total_fee throughput namespace_count pfb_count mb_price"`
+	Category StringArray `query:"category" validate:"omitempty,dive,category"`
+}
+
+func (p *rollupDayList) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+	if p.Sort == "" {
+		p.Sort = desc
+	}
+	if p.SortBy == "" {
+		p.SortBy = "throughput"
+	}
 }
 
 // LeaderboardDay godoc
@@ -74,6 +127,7 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 //	@Param			offset	query	integer	false	"Offset"						mininum(1)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"		Enums(asc, desc)
 //	@Param			sort_by	query	string	false	"Sort field. Default: mb_price"	Enums(avg_size, blobs_count, total_size, total_fee, throughput, namespace_count, pfb_count, mb_price)
+//	@Param          category query  string  false   "Comma-separated rollup category list"
 //	@Produce		json
 //	@Success		200	{array}		responses.RollupWithDayStats
 //	@Failure		400	{object}	Error
@@ -86,7 +140,18 @@ func (handler RollupHandler) LeaderboardDay(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	rollups, err := handler.rollups.LeaderboardDay(c.Request().Context(), req.SortBy, pgSort(req.Sort), req.Limit, req.Offset)
+	categories := make([]types.RollupCategory, len(req.Category))
+	for i := range categories {
+		categories[i] = types.RollupCategory(req.Category[i])
+	}
+
+	rollups, err := handler.rollups.LeaderboardDay(c.Request().Context(), storage.LeaderboardFilters{
+		SortField: req.SortBy,
+		Sort:      pgSort(req.Sort),
+		Limit:     req.Limit,
+		Offset:    req.Offset,
+		Category:  categories,
+	})
 	if err != nil {
 		return handleError(c, err, handler.rollups)
 	}

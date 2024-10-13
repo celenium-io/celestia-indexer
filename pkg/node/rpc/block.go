@@ -18,7 +18,7 @@ const pathBlock = "block"
 func (api *API) Block(ctx context.Context, level pkgTypes.Level) (pkgTypes.ResultBlock, error) {
 	args := make(map[string]string)
 	if level != 0 {
-		args["height"] = strconv.FormatUint(uint64(level), 10)
+		args["height"] = strconv.FormatInt(int64(level), 10)
 	}
 
 	var gbr types.Response[pkgTypes.ResultBlock]

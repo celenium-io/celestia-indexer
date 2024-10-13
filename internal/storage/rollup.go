@@ -13,12 +13,20 @@ import (
 	"github.com/uptrace/bun"
 )
 
+type LeaderboardFilters struct {
+	SortField string
+	Sort      sdk.SortOrder
+	Limit     int
+	Offset    int
+	Category  []types.RollupCategory
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IRollup interface {
 	sdk.Table[*Rollup]
 
-	Leaderboard(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) ([]RollupWithStats, error)
-	LeaderboardDay(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) ([]RollupWithDayStats, error)
+	Leaderboard(ctx context.Context, fltrs LeaderboardFilters) ([]RollupWithStats, error)
+	LeaderboardDay(ctx context.Context, fltrs LeaderboardFilters) ([]RollupWithDayStats, error)
 	Namespaces(ctx context.Context, rollupId uint64, limit, offset int) (namespaceIds []uint64, err error)
 	Providers(ctx context.Context, rollupId uint64) (providers []RollupProvider, err error)
 	RollupsByNamespace(ctx context.Context, namespaceId uint64, limit, offset int) (rollups []Rollup, err error)

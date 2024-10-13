@@ -227,9 +227,9 @@ func (s *TransactionTestSuite) TestSaveTxAddresses() {
 	s.Require().NoError(err)
 
 	addresses := make([]storage.Signer, 5)
-	for i := 0; i < 5; i++ {
-		addresses[i].AddressId = uint64(i + 1)
-		addresses[i].TxId = uint64(5 - i)
+	for i := uint64(0); i < 5; i++ {
+		addresses[i].AddressId = i + 1
+		addresses[i].TxId = 5 - i
 	}
 
 	err = tx.SaveSigners(ctx, addresses...)
