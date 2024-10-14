@@ -17,6 +17,8 @@ import (
 )
 
 const (
+	// RollupCategoryUncategorized is a RollupCategory of type uncategorized.
+	RollupCategoryUncategorized RollupCategory = "uncategorized"
 	// RollupCategoryFinance is a RollupCategory of type finance.
 	RollupCategoryFinance RollupCategory = "finance"
 	// RollupCategoryGaming is a RollupCategory of type gaming.
@@ -28,6 +30,7 @@ const (
 var ErrInvalidRollupCategory = fmt.Errorf("not a valid RollupCategory, try [%s]", strings.Join(_RollupCategoryNames, ", "))
 
 var _RollupCategoryNames = []string{
+	string(RollupCategoryUncategorized),
 	string(RollupCategoryFinance),
 	string(RollupCategoryGaming),
 	string(RollupCategoryNft),
@@ -43,6 +46,7 @@ func RollupCategoryNames() []string {
 // RollupCategoryValues returns a list of the values for RollupCategory
 func RollupCategoryValues() []RollupCategory {
 	return []RollupCategory{
+		RollupCategoryUncategorized,
 		RollupCategoryFinance,
 		RollupCategoryGaming,
 		RollupCategoryNft,
@@ -62,9 +66,10 @@ func (x RollupCategory) IsValid() bool {
 }
 
 var _RollupCategoryValue = map[string]RollupCategory{
-	"finance": RollupCategoryFinance,
-	"gaming":  RollupCategoryGaming,
-	"nft":     RollupCategoryNft,
+	"uncategorized": RollupCategoryUncategorized,
+	"finance":       RollupCategoryFinance,
+	"gaming":        RollupCategoryGaming,
+	"nft":           RollupCategoryNft,
 }
 
 // ParseRollupCategory attempts to convert a string to a RollupCategory.
