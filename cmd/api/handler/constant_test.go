@@ -63,5 +63,5 @@ func (s *ConstantTestSuite) TestEnums() {
 	s.Require().Len(enums.EventType, 59)
 	s.Require().Len(enums.MessageType, 74)
 	s.Require().Len(enums.Status, 2)
-	s.Require().Len(enums.Categories, 3)
+	s.Require().Len(enums.Categories, 4)
 }
