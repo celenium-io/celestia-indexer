@@ -49,7 +49,7 @@ type createRollupRequest struct {
 	Explorer    string           `json:"explorer"    validate:"omitempty,url"`
 	Stack       string           `json:"stack"       validate:"omitempty"`
 	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
-	Category    string           `json:"category"    validate:"omitempty,oneof=nft gaming finance"`
+	Category    string           `json:"category"    validate:"omitempty,oneof=nft gaming finance uncategorized"`
 	Type        string           `json:"type"        validate:"omitempty,oneof=settled sovereign"`
 	Compression string           `json:"compression" validate:"omitempty"`
 	VM          string           `json:"vm"          validate:"omitempty"`
@@ -162,7 +162,7 @@ type updateRollupRequest struct {
 	Bridge      string           `json:"bridge"      validate:"omitempty,eth_addr"`
 	Explorer    string           `json:"explorer"    validate:"omitempty,url"`
 	Stack       string           `json:"stack"       validate:"omitempty"`
-	Category    string           `json:"category"    validate:"omitempty,oneof=nft gaming finance"`
+	Category    string           `json:"category"    validate:"omitempty,oneof=nft gaming finance uncategorized"`
 	Type        string           `json:"type"        validate:"omitempty,oneof=settled sovereign"`
 	Compression string           `json:"compression" validate:"omitempty"`
 	Provider    string           `json:"provider"    validate:"omitempty"`
