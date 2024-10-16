@@ -284,10 +284,14 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 		}
 		query := tx.Tx().NewInsert().Model(&model).
 			Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate", "max_change_rate", "min_self_delegation", "stake", "jailed", "commissions", "rewards", "height").
-			On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
-			Set("rate = EXCLUDED.rate").
-			Set("min_self_delegation = EXCLUDED.min_self_delegation")
+			On("CONFLICT ON CONSTRAINT address_validator DO UPDATE")
 
+		if !validators[i].Rate.IsZero() {
+			query.Set("rate = EXCLUDED.rate")
+		}
+		if !validators[i].MinSelfDelegation.IsZero() {
+			query.Set("min_self_delegation = EXCLUDED.min_self_delegation")
+		}
 		if !validators[i].Stake.IsZero() {
 			query.Set("stake = added_validator.stake + EXCLUDED.stake")
 		}

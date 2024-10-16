@@ -8,12 +8,14 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/stats"
 	models "github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/postgres/migrations"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/migrate"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -143,7 +145,11 @@ func initDatabase(ctx context.Context, conn *database.Bun) error {
 		return errors.Wrap(err, "create hypertables")
 	}
 
-	return createIndices(ctx, conn)
+	if err := createIndices(ctx, conn); err != nil {
+		return err
+	}
+
+	return migrateDatabase(ctx, conn)
 }
 
 func (s Storage) CreateListener() models.Listener {
@@ -188,6 +194,26 @@ func createExtensions(ctx context.Context, conn *database.Bun) error {
 		_, err := tx.ExecContext(ctx, "CREATE EXTENSION IF NOT EXISTS pg_trgm;")
 		return err
 	})
+}
+
+func migrateDatabase(ctx context.Context, db *database.Bun) error {
+	migrator := migrate.NewMigrator(db.DB(), migrations.Migrations)
+	if err := migrator.Init(ctx); err != nil {
+		return err
+	}
+	if err := migrator.Lock(ctx); err != nil {
+		return err
+	}
+	defer migrator.Unlock(ctx) //nolint:errcheck
+
+	group, err := migrator.Migrate(ctx)
+	if err != nil {
+		return err
+	}
+	if group.IsZero() {
+		return nil
+	}
+	return nil
 }
 
 func (s Storage) Close() error {
