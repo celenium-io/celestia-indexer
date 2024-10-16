@@ -35,7 +35,7 @@ func (s *BlockStatsTestSuite) SetupSuite() {
 		Password: "password",
 		Database: "db_test",
 		Port:     5432,
-		Image:    "timescale/timescaledb-ha:pg15-latest",
+		Image:    "timescale/timescaledb-ha:pg15.8-ts2.17.0-all",
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
