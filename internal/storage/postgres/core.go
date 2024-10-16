@@ -206,14 +206,8 @@ func migrateDatabase(ctx context.Context, db *database.Bun) error {
 	}
 	defer migrator.Unlock(ctx) //nolint:errcheck
 
-	group, err := migrator.Migrate(ctx)
-	if err != nil {
-		return err
-	}
-	if group.IsZero() {
-		return nil
-	}
-	return nil
+	_, err := migrator.Migrate(ctx)
+	return err
 }
 
 func (s Storage) Close() error {
