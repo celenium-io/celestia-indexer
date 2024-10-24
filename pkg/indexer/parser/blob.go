@@ -8,12 +8,12 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
-	"github.com/celestiaorg/celestia-app/pkg/appconsts"
-	appshares "github.com/celestiaorg/celestia-app/pkg/shares"
+	"github.com/celestiaorg/celestia-app/v3/pkg/appconsts"
+	appshares "github.com/celestiaorg/go-square/v2/share"
 	"github.com/shopspring/decimal"
 )
 
-var gasPerBlobByte = decimal.NewFromInt(appconsts.DefaultGasPerBlobByte)
+var gasPerBlobByte = decimal.NewFromInt(int64(appconsts.DefaultGasPerBlobByte))
 
 func processBlob(blobs []*storage.BlobLog, d decode.DecodedTx, t *storage.Tx) {
 	if len(blobs) == 0 || len(d.Blobs) != len(blobs) {

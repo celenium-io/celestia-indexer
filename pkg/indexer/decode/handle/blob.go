@@ -9,8 +9,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/celestiaorg/celestia-app/pkg/namespace"
-	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v3/x/blob/types"
+	nsPackage "github.com/celestiaorg/go-square/v2/share"
 	"github.com/pkg/errors"
 )
 
@@ -30,13 +30,16 @@ func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, m *appBlob
 				"share commitment sizes length=%d is less then namespaces index=%d", len(m.ShareCommitments), nsI)
 		}
 
-		appNS := namespace.Namespace{Version: ns[0], ID: ns[1:]}
+		appNS, err := nsPackage.NewNamespaceFromBytes(ns)
+		if err != nil {
+			return storageTypes.MsgUnknown, nil, nil, nil, 0, errors.Wrap(err, "NewNamespaceFromBytes")
+		}
 		size := int64(m.BlobSizes[nsI])
 		blobsSize += size
 		namespace := storage.Namespace{
 			FirstHeight:     ctx.Block.Height,
-			Version:         appNS.Version,
-			NamespaceID:     appNS.ID,
+			Version:         appNS.Version(),
+			NamespaceID:     appNS.ID(),
 			PfbCount:        1,
 			Reserved:        appNS.IsReserved(),
 			LastHeight:      ctx.Block.Height,
