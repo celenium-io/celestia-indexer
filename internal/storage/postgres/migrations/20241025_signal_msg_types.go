@@ -14,10 +14,10 @@ func init() {
 }
 
 func upSignalMsgTypes(ctx context.Context, db *bun.DB) error {
-	if _, err := db.ExecContext(ctx, `ALTER TYPE msg_type ADD VALUE 'MsgSignalVersion' AFTER 'MsgAcknowledgement'`); err != nil {
+	if _, err := db.ExecContext(ctx, `ALTER TYPE msg_type ADD VALUE IF NOT EXISTS 'MsgSignalVersion' AFTER 'MsgAcknowledgement'`); err != nil {
 		return err
 	}
-	if _, err := db.ExecContext(ctx, `ALTER TYPE msg_type ADD VALUE 'MsgTryUpgrade' AFTER 'MsgSignalVersion'`); err != nil {
+	if _, err := db.ExecContext(ctx, `ALTER TYPE msg_type ADD VALUE IF NOT EXISTS 'MsgTryUpgrade' AFTER 'MsgSignalVersion'`); err != nil {
 		return err
 	}
 	return nil
