@@ -11,7 +11,7 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v3/x/blob/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
@@ -22,7 +22,7 @@ import (
 func createMsgPayForBlob() types.Msg {
 	msgPayForBlob := appBlobTypes.MsgPayForBlobs{
 		Signer:           "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
-		Namespaces:       [][]byte{{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22}},
+		Namespaces:       [][]byte{{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22}},
 		BlobSizes:        []uint32{1},
 		ShareCommitments: [][]byte{{176, 28, 134, 119, 32, 117, 87, 107, 231, 67, 121, 255, 209, 106, 52, 99, 88, 183, 85, 36, 67, 137, 98, 199, 144, 159, 13, 178, 111, 190, 121, 36}},
 		ShareVersions:    []uint32{0},
@@ -65,13 +65,13 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 		Type:     storageTypes.MsgPayForBlobs,
 		TxId:     0,
 		Data:     structs.Map(msgPayForBlob),
-		Size:     119,
+		Size:     120,
 		Namespace: []storage.Namespace{
 			{
 				Id:              0,
 				FirstHeight:     blob.Height,
 				Version:         0,
-				NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+				NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
 				Size:            1,
 				PfbCount:        1,
 				Reserved:        false,
@@ -91,7 +91,7 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 					Id:              0,
 					FirstHeight:     blob.Height,
 					Version:         0,
-					NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+					NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
 					Size:            1,
 					PfbCount:        1,
 					Reserved:        false,
@@ -116,9 +116,9 @@ func createMultipleMsgPayForBlob() types.Msg {
 	msgPayForBlob := appBlobTypes.MsgPayForBlobs{
 		Signer: "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
 		Namespaces: [][]byte{
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
 		},
 		BlobSizes: []uint32{1, 2, 3},
 		ShareCommitments: [][]byte{
@@ -166,13 +166,13 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 		Type:     storageTypes.MsgPayForBlobs,
 		TxId:     0,
 		Data:     structs.Map(msgPayForBlob),
-		Size:     251,
+		Size:     254,
 		Namespace: []storage.Namespace{
 			{
 				Id:              0,
 				FirstHeight:     blob.Height,
 				Version:         0,
-				NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+				NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
 				Size:            6,
 				PfbCount:        1,
 				Reserved:        false,
@@ -192,7 +192,7 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 					Id:              0,
 					FirstHeight:     blob.Height,
 					Version:         0,
-					NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+					NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
 					Size:            1,
 					PfbCount:        1,
 					Reserved:        false,
@@ -212,7 +212,7 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 					Id:              0,
 					FirstHeight:     blob.Height,
 					Version:         0,
-					NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+					NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
 					Size:            2,
 					PfbCount:        1,
 					Reserved:        false,
@@ -232,7 +232,7 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 					Id:              0,
 					FirstHeight:     blob.Height,
 					Version:         0,
-					NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+					NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
 					Size:            3,
 					PfbCount:        1,
 					Reserved:        false,
@@ -288,13 +288,13 @@ func TestDecodeMsg_FailedOnPayForBlob(t *testing.T) {
 		Type:     storageTypes.MsgPayForBlobs,
 		TxId:     0,
 		Data:     structs.Map(msgPayForBlob),
-		Size:     119,
+		Size:     120,
 		Namespace: []storage.Namespace{
 			{
 				Id:              0,
 				FirstHeight:     blob.Height,
 				Version:         0,
-				NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
+				NamespaceID:     []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22},
 				Size:            0,
 				PfbCount:        1,
 				Reserved:        false,

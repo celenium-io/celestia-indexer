@@ -116,6 +116,9 @@ const (
 	MsgTypeBitsTimeout
 	MsgTypeBitsTimeoutOnClose
 	MsgTypeBitsAcknowledgement
+
+	MsgTypeBitsSignalVersion
+	MsgTypeBitsTryUpgrade
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
@@ -289,6 +292,11 @@ func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 		mask.SetBit(MsgTypeBitsTimeoutOnClose)
 	case MsgAcknowledgement:
 		mask.SetBit(MsgTypeBitsAcknowledgement)
+
+	case MsgSignalVersion:
+		mask.SetBit(MsgTypeBitsSignalVersion)
+	case MsgTryUpgrade:
+		mask.SetBit(MsgTypeBitsTryUpgrade)
 	}
 }
 
@@ -566,6 +574,15 @@ func (mask MsgTypeBits) Names() []MsgType {
 	}
 	if mask.HasBit(MsgTypeBitsConnectionOpenConfirm) {
 		names[i] = MsgConnectionOpenConfirm
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsSignalVersion) {
+		names[i] = MsgSignalVersion
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsTryUpgrade) {
+		names[i] = MsgTryUpgrade
 		i++
 	}
 

@@ -24,8 +24,9 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	appBlobTypes "github.com/celestiaorg/celestia-app/x/blob/types"
-	qgbTypes "github.com/celestiaorg/celestia-app/x/qgb/types"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v3/x/blob/types"
+	qgbTypes "github.com/celestiaorg/celestia-app/v3/x/blobstream/types"
+	appSignalTypes "github.com/celestiaorg/celestia-app/v3/x/signal/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -287,6 +288,12 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgTimeoutOnClose(ctx, typedMsg)
 	case *coreChannel.MsgAcknowledgement:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgAcknowledgement(ctx, typedMsg)
+
+	// signal module
+	case *appSignalTypes.MsgSignalVersion:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSignalVersion(ctx, typedMsg.GetValidatorAddress())
+	case *appSignalTypes.MsgTryUpgrade:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgTryUpgrade(ctx, typedMsg.GetSigner())
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)

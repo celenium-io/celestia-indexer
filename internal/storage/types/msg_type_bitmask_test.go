@@ -312,6 +312,14 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			name:    "MsgMultiSend x2 and MsgSetWithdrawalAccess",
 			msgType: []int{MsgTypeBitsMultiSend, MsgTypeBitsMultiSend, MsgTypeBitsSetWithdrawAddress},
 			want:    []MsgType{MsgSetWithdrawAddress, MsgMultiSend},
+		}, {
+			name:    string(MsgTryUpgrade),
+			msgType: []int{MsgTypeBitsTryUpgrade},
+			want:    []MsgType{MsgTryUpgrade},
+		}, {
+			name:    string(MsgSignalVersion),
+			msgType: []int{MsgTypeBitsSignalVersion},
+			want:    []MsgType{MsgSignalVersion},
 		},
 	}
 	for _, tt := range tests {
@@ -635,6 +643,14 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			name:   "test 74",
 			values: []MsgType{MsgAcknowledgement},
 			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsAcknowledgement)},
+		}, {
+			name:   "test 75",
+			values: []MsgType{MsgTryUpgrade},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsTryUpgrade)},
+		}, {
+			name:   "test 76",
+			values: []MsgType{MsgSignalVersion},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSignalVersion)},
 		},
 
 		{

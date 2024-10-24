@@ -11,7 +11,7 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	qgbTypes "github.com/celestiaorg/celestia-app/x/qgb/types"
+	qgbTypes "github.com/celestiaorg/celestia-app/v3/x/blobstream/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
