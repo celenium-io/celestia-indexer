@@ -165,6 +165,10 @@ const (
 	MsgTimeoutOnClose MsgType = "MsgTimeoutOnClose"
 	// MsgAcknowledgement is a MsgType of type MsgAcknowledgement.
 	MsgAcknowledgement MsgType = "MsgAcknowledgement"
+	// MsgSignalVersion is a MsgType of type MsgSignalVersion.
+	MsgSignalVersion MsgType = "MsgSignalVersion"
+	// MsgTryUpgrade is a MsgType of type MsgTryUpgrade.
+	MsgTryUpgrade MsgType = "MsgTryUpgrade"
 )
 
 var ErrInvalidMsgType = fmt.Errorf("not a valid MsgType, try [%s]", strings.Join(_MsgTypeNames, ", "))
@@ -244,6 +248,8 @@ var _MsgTypeNames = []string{
 	string(MsgTimeout),
 	string(MsgTimeoutOnClose),
 	string(MsgAcknowledgement),
+	string(MsgSignalVersion),
+	string(MsgTryUpgrade),
 }
 
 // MsgTypeNames returns a list of possible string values of MsgType.
@@ -330,6 +336,8 @@ func MsgTypeValues() []MsgType {
 		MsgTimeout,
 		MsgTimeoutOnClose,
 		MsgAcknowledgement,
+		MsgSignalVersion,
+		MsgTryUpgrade,
 	}
 }
 
@@ -420,6 +428,8 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgTimeout":                         MsgTimeout,
 	"MsgTimeoutOnClose":                  MsgTimeoutOnClose,
 	"MsgAcknowledgement":                 MsgAcknowledgement,
+	"MsgSignalVersion":                   MsgSignalVersion,
+	"MsgTryUpgrade":                      MsgTryUpgrade,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.

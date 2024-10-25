@@ -7,7 +7,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	qgbTypes "github.com/celestiaorg/celestia-app/x/qgb/types"
+	qgbTypes "github.com/celestiaorg/celestia-app/v3/x/blobstream/types"
 )
 
 // MsgRegisterEVMAddress registers an evm address to a validator.

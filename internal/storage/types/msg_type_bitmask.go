@@ -116,6 +116,9 @@ const (
 	MsgTypeBitsTimeout
 	MsgTypeBitsTimeoutOnClose
 	MsgTypeBitsAcknowledgement
+
+	MsgTypeBitsSignalVersion
+	MsgTypeBitsTryUpgrade
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
@@ -289,6 +292,11 @@ func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 		mask.SetBit(MsgTypeBitsTimeoutOnClose)
 	case MsgAcknowledgement:
 		mask.SetBit(MsgTypeBitsAcknowledgement)
+
+	case MsgSignalVersion:
+		mask.SetBit(MsgTypeBitsSignalVersion)
+	case MsgTryUpgrade:
+		mask.SetBit(MsgTypeBitsTryUpgrade)
 	}
 }
 
@@ -569,6 +577,15 @@ func (mask MsgTypeBits) Names() []MsgType {
 		i++
 	}
 
+	if mask.HasBit(MsgTypeBitsSignalVersion) {
+		names[i] = MsgSignalVersion
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsTryUpgrade) {
+		names[i] = MsgTryUpgrade
+		i++
+	}
+
 	if mask.HasBit(MsgTypeBitsChannelOpenInit) {
 		names[i] = MsgChannelOpenInit
 		i++
@@ -638,7 +655,7 @@ var _ driver.Valuer = (*MsgTypeBits)(nil)
 
 func (mask MsgTypeBits) Value() (driver.Value, error) {
 	if mask.value == nil {
-		return fmt.Sprintf("%074b", 0), nil
+		return fmt.Sprintf("%076b", 0), nil
 	}
-	return fmt.Sprintf("%074b", mask.value), nil
+	return fmt.Sprintf("%076b", mask.value), nil
 }
