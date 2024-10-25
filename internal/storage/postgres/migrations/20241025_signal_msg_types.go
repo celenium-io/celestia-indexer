@@ -42,10 +42,10 @@ func upSignalMsgTypes(ctx context.Context, db *bun.DB) error {
 		return err
 	}
 
-	if _, err := db.ExecContext(ctx, `UPDATE block SET message_types_1 = (message_types::text || '00')::bit(76)`); err != nil {
+	if _, err := db.ExecContext(ctx, `UPDATE block SET message_types_1 = ('00' || message_types::text)::bit(76)`); err != nil {
 		return err
 	}
-	if _, err := db.ExecContext(ctx, `UPDATE tx SET message_types_1 = (message_types::text || '00')::bit(76)`); err != nil {
+	if _, err := db.ExecContext(ctx, `UPDATE tx SET message_types_1 = ('00' || message_types::text)::bit(76)`); err != nil {
 		return err
 	}
 
