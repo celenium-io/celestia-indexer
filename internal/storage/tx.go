@@ -74,7 +74,7 @@ type Tx struct {
 	Codespace    string            `bun:"codespace,type:text"        comment:"Codespace"                                    stats:"filterable"`
 	Hash         []byte            `bun:"hash"                       comment:"Transaction hash"`
 	Memo         string            `bun:"memo,type:text"             comment:"Note or comment to send with the transaction"`
-	MessageTypes types.MsgTypeBits `bun:"message_types,type:bit(74)" comment:"Bit mask with containing messages"            stats:"filterable"`
+	MessageTypes types.MsgTypeBits `bun:"message_types,type:bit(76)" comment:"Bit mask with containing messages"            stats:"filterable"`
 
 	Messages []Message `bun:"rel:has-many,join:id=tx_id"`
 	Events   []Event   `bun:"rel:has-many"`
