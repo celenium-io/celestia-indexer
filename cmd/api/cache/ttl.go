@@ -4,6 +4,8 @@
 package cache
 
 import (
+	"context"
+	"sync"
 	"time"
 
 	"github.com/dgraph-io/badger/v4"
@@ -11,23 +13,51 @@ import (
 )
 
 type TTLCache struct {
-	db         *badger.DB
-	expiration time.Duration
+	db              *badger.DB
+	expiration      time.Duration
+	gcCollectPeriod time.Duration
+	wg              *sync.WaitGroup
 }
 
 func NewTTLCache(expiration time.Duration) (*TTLCache, error) {
-	db, err := badger.Open(badger.DefaultOptions("").WithInMemory(true))
+	db, err := badger.Open(badger.DefaultOptions("/tmp/badger"))
 	if err != nil {
 		return nil, err
 	}
 
 	return &TTLCache{
-		db:         db,
-		expiration: expiration,
+		db:              db,
+		expiration:      expiration,
+		gcCollectPeriod: time.Minute * 5,
+		wg:              new(sync.WaitGroup),
 	}, nil
 }
 
+func (c *TTLCache) Start(ctx context.Context) {
+	c.wg.Add(1)
+	go c.gcCollect(ctx)
+}
+
+func (c *TTLCache) gcCollect(ctx context.Context) {
+	defer c.wg.Done()
+
+	ticker := time.NewTicker(c.gcCollectPeriod)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			if err := c.db.RunValueLogGC(0.5); err != nil {
+				log.Err(err).Msg("ttl cache garbage collection error")
+			}
+		}
+	}
+}
+
 func (c *TTLCache) Close() error {
+	c.wg.Wait()
 	return c.db.Close()
 }
 

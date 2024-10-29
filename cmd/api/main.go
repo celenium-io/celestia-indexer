@@ -72,6 +72,14 @@ func main() {
 	<-ctx.Done()
 	cancel()
 
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
+	}
+	if ttlCache != nil {
+		if err := ttlCache.Close(); err != nil {
+			e.Logger.Fatal(err)
+		}
+	}
 	if gasTracker != nil {
 		if err := gasTracker.Close(); err != nil {
 			e.Logger.Fatal(err)
@@ -93,11 +101,6 @@ func main() {
 			e.Logger.Fatal(err)
 		}
 	}
-
-	if err := e.Shutdown(ctx); err != nil {
-		e.Logger.Fatal(err)
-	}
-
 	if prscp != nil {
 		if err := prscp.Stop(); err != nil {
 			e.Logger.Fatal(err)

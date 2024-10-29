@@ -268,11 +268,15 @@ func initDatabase(cfg config.Database, viewsDir string) postgres.Storage {
 	return db
 }
 
+var ttlCache *cache.TTLCache
+
 func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Storage) {
-	ttlCache, err := cache.NewTTLCache(time.Minute * 30)
+	var err error
+	ttlCache, err = cache.NewTTLCache(time.Minute * 10)
 	if err != nil {
 		panic(err)
 	}
+	ttlCache.Start(ctx)
 	ttlCacheMiddleware := cache.Middleware(ttlCache, nil)
 
 	v1 := e.Group("v1")
