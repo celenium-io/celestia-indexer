@@ -19,8 +19,15 @@ type TTLCache struct {
 	wg              *sync.WaitGroup
 }
 
-func NewTTLCache(expiration time.Duration) (*TTLCache, error) {
-	db, err := badger.Open(badger.DefaultOptions("/tmp/badger"))
+const dir = "/tmp/badger"
+
+func NewTTLCache(expiration time.Duration, inMemory bool) (*TTLCache, error) {
+	path := ""
+	if !inMemory {
+		path = dir
+	}
+
+	db, err := badger.Open(badger.DefaultOptions(path).WithInMemory(inMemory))
 	if err != nil {
 		return nil, err
 	}

@@ -15,7 +15,7 @@ import (
 )
 
 func TestTTLCache_SetGet(t *testing.T) {
-	c, err := NewTTLCache(time.Second)
+	c, err := NewTTLCache(time.Second, true)
 	defer func() { _ = c.Close() }()
 	require.NoError(t, err)
 
@@ -103,7 +103,7 @@ func TestTTLCache_SetGet(t *testing.T) {
 }
 
 func TestTTLCache_Clear(t *testing.T) {
-	c, err := NewTTLCache(time.Second)
+	c, err := NewTTLCache(time.Second, true)
 	defer func() { _ = c.Close() }()
 	require.NoError(t, err)
 

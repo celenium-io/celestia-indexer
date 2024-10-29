@@ -272,7 +272,7 @@ var ttlCache *cache.TTLCache
 
 func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Storage) {
 	var err error
-	ttlCache, err = cache.NewTTLCache(time.Minute * 10)
+	ttlCache, err = cache.NewTTLCache(time.Minute*10, false)
 	if err != nil {
 		panic(err)
 	}
