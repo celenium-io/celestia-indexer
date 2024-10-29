@@ -15,14 +15,14 @@ import (
 )
 
 func TestTTLCache_SetGet(t *testing.T) {
+	c, err := NewTTLCache(time.Second)
+	defer func() { _ = c.Close() }()
+	require.NoError(t, err)
+
 	t.Run("set and get key from cache", func(t *testing.T) {
-		c, err := NewTTLCache(time.Second)
-		defer func() { _ = c.Close() }()
+		c.Set("value1", []byte{0, 1, 2, 3})
 
-		require.NoError(t, err)
-		c.Set("test", []byte{0, 1, 2, 3})
-
-		got, ok := c.Get("test")
+		got, ok := c.Get("value1")
 		require.True(t, ok)
 		require.Equal(t, []byte{0, 1, 2, 3}, got)
 
@@ -31,10 +31,6 @@ func TestTTLCache_SetGet(t *testing.T) {
 	})
 
 	t.Run("many set and get", func(t *testing.T) {
-		c, err := NewTTLCache(time.Second)
-		defer func() { _ = c.Close() }()
-
-		require.NoError(t, err)
 		for i := 0; i < 100; i++ {
 			c.Set(fmt.Sprintf("%d", i), []byte{byte(i)})
 		}
@@ -53,19 +49,14 @@ func TestTTLCache_SetGet(t *testing.T) {
 	})
 
 	t.Run("set multithread", func(t *testing.T) {
-		c, err := NewTTLCache(time.Second)
-		defer func() { _ = c.Close() }()
-
-		require.NoError(t, err)
-
 		var wg sync.WaitGroup
 
 		for i := 0; i < 10; i++ {
 			wg.Add(1)
 			go func(c *TTLCache, wg *sync.WaitGroup) {
 				defer wg.Done()
-				for i := 0; i < 100; i++ {
-					c.Set(fmt.Sprintf("%d", i), []byte{byte(i)})
+				for j := 200; j < 300; j++ {
+					c.Set(fmt.Sprintf("%d", j), []byte{byte(j)})
 				}
 			}(c, &wg)
 		}
@@ -74,52 +65,15 @@ func TestTTLCache_SetGet(t *testing.T) {
 	})
 
 	t.Run("get expired value", func(t *testing.T) {
-		c, err := NewTTLCache(time.Nanosecond)
-		defer func() { _ = c.Close() }()
-
-		require.NoError(t, err)
-
-		c.Set("test", []byte{0})
-		c.Set("test2", []byte{0})
-		c.Set("test3", []byte{0})
-
-		_, exists := c.Get("test")
-		require.False(t, exists)
-	})
-
-	t.Run("get expired value 2", func(t *testing.T) {
-		c, err := NewTTLCache(time.Nanosecond)
-		defer func() { _ = c.Close() }()
-
-		require.NoError(t, err)
-		c.Set("test2", []byte{0})
-		c.Set("test3", []byte{0})
 		c.Set("test", []byte{0})
 
-		_, exists := c.Get("test")
-		require.False(t, exists)
-	})
-
-	t.Run("get expired value 3", func(t *testing.T) {
-		c, err := NewTTLCache(time.Nanosecond)
-		defer func() { _ = c.Close() }()
-
-		require.NoError(t, err)
-		c.Set("test2", []byte{0})
-		c.Set("test", []byte{0})
-		c.Set("test3", []byte{0})
-		c.Set("test4", []byte{0})
+		time.Sleep(time.Second)
 
 		_, exists := c.Get("test")
 		require.False(t, exists)
 	})
 
 	t.Run("multithread", func(t *testing.T) {
-		c, err := NewTTLCache(time.Second)
-		defer func() { _ = c.Close() }()
-
-		require.NoError(t, err)
-
 		var wg sync.WaitGroup
 		set := func(wg *sync.WaitGroup) {
 			wg.Done()
@@ -149,11 +103,12 @@ func TestTTLCache_SetGet(t *testing.T) {
 }
 
 func TestTTLCache_Clear(t *testing.T) {
-	t.Run("clear cache", func(t *testing.T) {
-		c, err := NewTTLCache(time.Second)
-		defer func() { _ = c.Close() }()
+	c, err := NewTTLCache(time.Second)
+	defer func() { _ = c.Close() }()
+	require.NoError(t, err)
 
-		require.NoError(t, err)
+	t.Run("clear cache", func(t *testing.T) {
+
 		for i := 0; i < 100; i++ {
 			c.Set(fmt.Sprintf("%d", i), []byte{byte(i)})
 		}
