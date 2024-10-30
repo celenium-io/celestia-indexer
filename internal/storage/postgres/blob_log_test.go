@@ -293,15 +293,6 @@ func (s *StorageTestSuite) TestBlobLogsByHeight() {
 	s.Require().Equal("Rollup 1", log.Rollup.Name)
 }
 
-func (s *StorageTestSuite) TestCountBlobLogsByHeight() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer ctxCancel()
-
-	count, err := s.storage.BlobLogs.CountByHeight(ctx, 1000)
-	s.Require().NoError(err)
-	s.Require().EqualValues(count, 4)
-}
-
 func (s *StorageTestSuite) TestBlobLogsByProviders() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

@@ -393,12 +393,12 @@ func (handler *BlockHandler) BlobsCount(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	count, err := handler.blobLogs.CountByHeight(c.Request().Context(), req.Height)
+	stats, err := handler.blockStats.ByHeight(c.Request().Context(), req.Height)
 	if err != nil {
 		return handleError(c, err, handler.blobLogs)
 	}
 
-	return c.JSON(http.StatusOK, count)
+	return c.JSON(http.StatusOK, stats.BlobsCount)
 }
 
 // BlockODS godoc
