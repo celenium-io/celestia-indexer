@@ -1059,6 +1059,36 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 	s.Require().EqualValues("test-website", third.Website)
 	s.Require().NotNil(third.Jailed)
 	s.Require().True(*third.Jailed)
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	validatorJailed := []*storage.Validator{
+		{
+			Address:     "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
+			Delegator:   "celestia189ecvq5avj0wehrcfnagpd5sd8pup9aq7j2xd9",
+			Commissions: decimal.NewFromInt(100),
+			Rewards:     decimal.NewFromInt(200),
+			Identity:    storage.DoNotModify,
+			Website:     storage.DoNotModify,
+			Contacts:    storage.DoNotModify,
+			Moniker:     storage.DoNotModify,
+			Details:     storage.DoNotModify,
+			Stake:       decimal.Zero,
+		},
+	}
+
+	count2, err := tx2.SaveValidators(ctx, validatorJailed...)
+	s.Require().NoError(err)
+	s.Require().EqualValues(0, count2)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+
+	v, err := s.storage.Validator.ByAddress(ctx, "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr")
+	s.Require().NoError(err)
+	s.Require().NotNil(v.Jailed)
+	s.Require().True(*v.Jailed)
 }
 
 func TestSuiteTransaction_Run(t *testing.T) {
