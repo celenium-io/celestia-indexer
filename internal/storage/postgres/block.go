@@ -132,7 +132,7 @@ func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order 
 		ColumnExpr("stats.blobs_size AS stats__blobs_size, stats.block_time AS stats__block_time, stats.bytes_in_block AS stats__bytes_in_block, stats.rewards AS stats__rewards, stats.commissions AS stats__commissions").
 		ColumnExpr("stats.supply_change AS stats__supply_change, stats.inflation_rate AS stats__inflation_rate, stats.fee AS stats__fee, stats.gas_used AS stats__gas_used, stats.gas_limit AS stats__gas_limit, stats.square_size AS stats__square_size").
 		TableExpr("(?) as block", subQuery).
-		Join("LEFT JOIN block_stats as stats ON stats.height = block.height").
+		Join("LEFT JOIN block_stats as stats ON (stats.height = block.height) AND (stats.time = block.time)").
 		Join("LEFT JOIN validator as v ON v.id = block.proposer_id")
 	query = sortScope(query, "block.id", order)
 
@@ -156,7 +156,7 @@ func (b *Blocks) ByProposer(ctx context.Context, proposerId uint64, limit, offse
 		ColumnExpr("stats.blobs_size AS stats__blobs_size, stats.block_time AS stats__block_time, stats.bytes_in_block AS stats__bytes_in_block, stats.rewards AS stats__rewards, stats.commissions AS stats__commissions").
 		ColumnExpr("stats.supply_change AS stats__supply_change, stats.inflation_rate AS stats__inflation_rate, stats.fee AS stats__fee, stats.gas_used AS stats__gas_used, stats.gas_limit AS stats__gas_limit, stats.square_size AS stats__square_size").
 		TableExpr("(?) as block", blocksQuery).
-		Join("LEFT JOIN block_stats as stats ON stats.height = block.height").
+		Join("LEFT JOIN block_stats as stats ON (stats.height = block.height) AND (stats.time = block.time)").
 		Order("time desc").
 		Scan(ctx, &blocks)
 	return
