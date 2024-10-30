@@ -417,8 +417,8 @@ func (s *TxTestSuite) TestGetEvents() {
 	c.SetParamValues(testTxHash)
 
 	s.tx.EXPECT().
-		ByHash(gomock.Any(), testTxHashBytes).
-		Return(testTx, nil)
+		IdAndTimeByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx.Id, testTx.Time, nil)
 
 	s.events.EXPECT().
 		ByTxId(gomock.Any(), uint64(1), gomock.Any()).
@@ -464,8 +464,8 @@ func (s *TxTestSuite) TestGetMessage() {
 	c.SetParamValues(testTxHash)
 
 	s.tx.EXPECT().
-		IdByHash(gomock.Any(), testTxHashBytes).
-		Return(testTx.Id, nil)
+		IdAndTimeByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx.Id, testTx.Time, nil)
 
 	s.messages.EXPECT().
 		ByTxId(gomock.Any(), uint64(1), 2, 0).
@@ -560,8 +560,8 @@ func (s *TxTestSuite) TestBlobs() {
 	c.SetParamValues(testTxHash)
 
 	s.tx.EXPECT().
-		IdByHash(gomock.Any(), testTxHashBytes).
-		Return(testTx.Id, nil).
+		IdAndTimeByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx.Id, testTx.Time, nil).
 		Times(1)
 
 	s.blobLogs.EXPECT().
@@ -613,8 +613,8 @@ func (s *TxTestSuite) TestBlobsCount() {
 	c.SetParamValues(testTxHash)
 
 	s.tx.EXPECT().
-		IdByHash(gomock.Any(), testTxHashBytes).
-		Return(testTx.Id, nil).
+		IdAndTimeByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx.Id, testTx.Time, nil).
 		Times(1)
 
 	s.blobLogs.EXPECT().

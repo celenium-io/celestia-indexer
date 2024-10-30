@@ -41,16 +41,17 @@ func (s *StorageTestSuite) TestTxByHash() {
 	s.Require().Len(tx.Signers, 1)
 }
 
-func (s *StorageTestSuite) TestTxIdByHash() {
+func (s *StorageTestSuite) TestTxIdAndTimeByHash() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
 	txHash, err := hex.DecodeString("652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF")
 	s.Require().NoError(err)
 
-	id, err := s.storage.Tx.IdByHash(ctx, txHash)
+	id, t, err := s.storage.Tx.IdAndTimeByHash(ctx, txHash)
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, id)
+	s.Require().EqualValues("2023-07-04 03:10:57 +0000 UTC", t.String())
 }
 
 func (s *StorageTestSuite) TestTxFilterSuccessUnjailAsc() {

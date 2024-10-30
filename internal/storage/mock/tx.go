@@ -358,41 +358,42 @@ func (c *MockITxGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*stora
 	return c
 }
 
-// IdByHash mocks base method.
-func (m *MockITx) IdByHash(ctx context.Context, hash []byte) (uint64, error) {
+// IdAndTimeByHash mocks base method.
+func (m *MockITx) IdAndTimeByHash(ctx context.Context, hash []byte) (uint64, time.Time, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IdByHash", ctx, hash)
+	ret := m.ctrl.Call(m, "IdAndTimeByHash", ctx, hash)
 	ret0, _ := ret[0].(uint64)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(time.Time)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
-// IdByHash indicates an expected call of IdByHash.
-func (mr *MockITxMockRecorder) IdByHash(ctx, hash any) *MockITxIdByHashCall {
+// IdAndTimeByHash indicates an expected call of IdAndTimeByHash.
+func (mr *MockITxMockRecorder) IdAndTimeByHash(ctx, hash any) *MockITxIdAndTimeByHashCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IdByHash", reflect.TypeOf((*MockITx)(nil).IdByHash), ctx, hash)
-	return &MockITxIdByHashCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IdAndTimeByHash", reflect.TypeOf((*MockITx)(nil).IdAndTimeByHash), ctx, hash)
+	return &MockITxIdAndTimeByHashCall{Call: call}
 }
 
-// MockITxIdByHashCall wrap *gomock.Call
-type MockITxIdByHashCall struct {
+// MockITxIdAndTimeByHashCall wrap *gomock.Call
+type MockITxIdAndTimeByHashCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockITxIdByHashCall) Return(arg0 uint64, arg1 error) *MockITxIdByHashCall {
-	c.Call = c.Call.Return(arg0, arg1)
+func (c *MockITxIdAndTimeByHashCall) Return(arg0 uint64, arg1 time.Time, arg2 error) *MockITxIdAndTimeByHashCall {
+	c.Call = c.Call.Return(arg0, arg1, arg2)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockITxIdByHashCall) Do(f func(context.Context, []byte) (uint64, error)) *MockITxIdByHashCall {
+func (c *MockITxIdAndTimeByHashCall) Do(f func(context.Context, []byte) (uint64, time.Time, error)) *MockITxIdAndTimeByHashCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockITxIdByHashCall) DoAndReturn(f func(context.Context, []byte) (uint64, error)) *MockITxIdByHashCall {
+func (c *MockITxIdAndTimeByHashCall) DoAndReturn(f func(context.Context, []byte) (uint64, time.Time, error)) *MockITxIdAndTimeByHashCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

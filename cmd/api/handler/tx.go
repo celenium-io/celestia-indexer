@@ -180,7 +180,7 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	tx, err := handler.tx.ByHash(c.Request().Context(), hash)
+	txId, txTime, err := handler.tx.IdAndTimeByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
@@ -188,10 +188,10 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 	fltrs := storage.EventFilter{
 		Limit:  req.Limit,
 		Offset: req.Offset,
-		Time:   tx.Time.UTC(),
+		Time:   txTime.UTC(),
 	}
 
-	events, err := handler.events.ByTxId(c.Request().Context(), tx.Id, fltrs)
+	events, err := handler.events.ByTxId(c.Request().Context(), txId, fltrs)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
@@ -228,7 +228,7 @@ func (handler *TxHandler) GetMessages(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	txId, err := handler.tx.IdByHash(c.Request().Context(), hash)
+	txId, _, err := handler.tx.IdAndTimeByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
@@ -339,7 +339,7 @@ func (handler *TxHandler) Blobs(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	txId, err := handler.tx.IdByHash(c.Request().Context(), hash)
+	txId, _, err := handler.tx.IdAndTimeByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
@@ -388,7 +388,7 @@ func (handler *TxHandler) BlobsCount(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	txId, err := handler.tx.IdByHash(c.Request().Context(), hash)
+	txId, _, err := handler.tx.IdAndTimeByHash(c.Request().Context(), hash)
 	if err != nil {
 		return handleError(c, err, handler.tx)
 	}
