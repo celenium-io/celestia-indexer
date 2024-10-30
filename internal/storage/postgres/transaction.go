@@ -277,53 +277,34 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 		return 0, nil
 	}
 
-	var count int
+	arr := make([]addedValidator, len(validators))
 	for i := range validators {
-		model := addedValidator{
-			Validator: validators[i],
-		}
-		query := tx.Tx().NewInsert().Model(&model).
-			Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate", "max_change_rate", "min_self_delegation", "stake", "jailed", "commissions", "rewards", "height").
-			On("CONFLICT ON CONSTRAINT address_validator DO UPDATE")
+		arr[i].Validator = validators[i]
+	}
 
-		if !validators[i].Rate.IsZero() {
-			query.Set("rate = EXCLUDED.rate")
-		}
-		if !validators[i].MinSelfDelegation.IsZero() {
-			query.Set("min_self_delegation = EXCLUDED.min_self_delegation")
-		}
-		if !validators[i].Stake.IsZero() {
-			query.Set("stake = added_validator.stake + EXCLUDED.stake")
-		}
-		if validators[i].Jailed != nil {
-			query.Set("jailed = EXCLUDED.jailed")
-		}
-		if !validators[i].Commissions.IsZero() {
-			query.Set("commissions = added_validator.commissions + EXCLUDED.commissions")
-		}
-		if !validators[i].Rewards.IsZero() {
-			query.Set("rewards = added_validator.rewards + EXCLUDED.rewards")
-		}
-		if validators[i].Moniker != models.DoNotModify {
-			query.Set("moniker = EXCLUDED.moniker")
-		}
-		if validators[i].Website != models.DoNotModify {
-			query.Set("website = EXCLUDED.website")
-		}
-		if validators[i].Identity != models.DoNotModify {
-			query.Set("identity = EXCLUDED.identity")
-		}
-		if validators[i].Contacts != models.DoNotModify {
-			query.Set("contacts = EXCLUDED.contacts")
-		}
-		if validators[i].Details != models.DoNotModify {
-			query.Set("details = EXCLUDED.details")
-		}
-		if _, err := query.Returning("xmax, id").Exec(ctx); err != nil {
-			return 0, err
-		}
+	query := tx.Tx().NewInsert().Model(&arr).
+		Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate", "max_change_rate", "min_self_delegation", "stake", "jailed", "commissions", "rewards", "height").
+		On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
+		Set("rate = CASE WHEN EXCLUDED.rate > 0 THEN EXCLUDED.rate ELSE added_validator.rate END").
+		Set("min_self_delegation = CASE WHEN EXCLUDED.min_self_delegation > 0 THEN EXCLUDED.min_self_delegation ELSE added_validator.min_self_delegation END").
+		Set("stake = added_validator.stake + EXCLUDED.stake").
+		Set("commissions = added_validator.commissions + EXCLUDED.commissions").
+		Set("rewards = added_validator.rewards + EXCLUDED.rewards").
+		Set("moniker = CASE WHEN EXCLUDED.moniker != '[do-not-modify]' THEN EXCLUDED.moniker ELSE added_validator.moniker END").
+		Set("website = CASE WHEN EXCLUDED.website != '[do-not-modify]' THEN EXCLUDED.website ELSE added_validator.website END").
+		Set("identity = CASE WHEN EXCLUDED.identity != '[do-not-modify]' THEN EXCLUDED.identity ELSE added_validator.identity END").
+		Set("contacts = CASE WHEN EXCLUDED.contacts != '[do-not-modify]' THEN EXCLUDED.contacts ELSE added_validator.contacts END").
+		Set("details = CASE WHEN EXCLUDED.details != '[do-not-modify]' THEN EXCLUDED.details ELSE added_validator.details END").
+		Set("jailed = CASE WHEN EXCLUDED.jailed IS NOT NULL THEN EXCLUDED.jailed ELSE added_validator.jailed END").
+		Returning("xmax, id")
 
-		if model.Xmax == 0 {
+	if _, err := query.Exec(ctx); err != nil {
+		return 0, err
+	}
+
+	var count int
+	for i := range arr {
+		if arr[i].Xmax == 0 {
 			count++
 		}
 	}
