@@ -420,9 +420,12 @@ func (s *BlockTestSuite) TestGetBlobsCount() {
 	c.SetParamNames("height")
 	c.SetParamValues("100")
 
-	s.blobLogs.EXPECT().
-		CountByHeight(gomock.Any(), pkgTypes.Level(100)).
-		Return(12, nil)
+	s.blockStats.EXPECT().
+		ByHeight(gomock.Any(), pkgTypes.Level(100)).
+		Return(storage.BlockStats{
+			BlobsCount: 12,
+		}, nil).
+		Times(1)
 
 	s.Require().NoError(s.handler.BlobsCount(c))
 	s.Require().Equal(http.StatusOK, rec.Code)

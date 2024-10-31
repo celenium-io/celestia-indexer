@@ -242,12 +242,6 @@ func (bl *BlobLog) CountByTxId(ctx context.Context, txId uint64) (int, error) {
 		Count(ctx)
 }
 
-func (bl *BlobLog) CountByHeight(ctx context.Context, height types.Level) (int, error) {
-	return bl.DB().NewSelect().Model((*storage.BlobLog)(nil)).
-		Where("height = ?", height).
-		Count(ctx)
-}
-
 func (bl *BlobLog) Blob(ctx context.Context, height types.Level, nsId uint64, commitment string) (l storage.BlobLog, err error) {
 	blobLogQuery := bl.DB().NewSelect().
 		Model((*storage.BlobLog)(nil)).
