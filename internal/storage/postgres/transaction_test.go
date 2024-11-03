@@ -974,6 +974,123 @@ func (s *TransactionTestSuite) TestUpdateSlashedDelegations() {
 	s.Require().EqualValues(2, balances[1].Id)
 }
 
+func (s *TransactionTestSuite) TestSaveValidators() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	validators := []*storage.Validator{
+		{
+			Address:           "celestiavaloper1cj45qyagkujxgdgv8lgjur56zjxtrsy40g3pw3",
+			Delegator:         "celestia1cj45qyagkujxgdgv8lgjur56zjxtrsy42hncch",
+			ConsAddress:       "95764047BDFFB5CCADFA635DC63365EEB65F00C2",
+			Rate:              decimal.NewFromFloat32(0.2),
+			MaxRate:           decimal.NewFromFloat32(0.2),
+			MaxChangeRate:     decimal.Zero,
+			MinSelfDelegation: decimal.Zero,
+			Identity:          "0068ECE5E6EB5359",
+			Stake:             decimal.NewFromInt(100),
+			Moniker:           "Polychain",
+			Commissions:       decimal.Zero,
+			Rewards:           decimal.Zero,
+			Height:            1001,
+			Jailed:            testsuite.Ptr(false),
+		}, {
+			Address:     "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
+			Delegator:   "celestia189ecvq5avj0wehrcfnagpd5sd8pup9aq7j2xd9",
+			Rate:        decimal.NewFromFloat32(0.06),
+			Commissions: decimal.NewFromInt(100),
+			Rewards:     decimal.NewFromInt(200),
+			Website:     "test-website",
+			Identity:    storage.DoNotModify,
+			Contacts:    storage.DoNotModify,
+			Moniker:     storage.DoNotModify,
+			Details:     storage.DoNotModify,
+			Stake:       decimal.Zero,
+			Height:      1001,
+			Jailed:      testsuite.Ptr(true),
+		}, {
+			Address:     "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw",
+			Delegator:   "celestia17vmk8m246t648hpmde2q7kp4ft9uwrayps85dg",
+			Commissions: decimal.NewFromInt(100),
+			Rewards:     decimal.NewFromInt(200),
+			Stake:       decimal.Zero,
+			Website:     storage.DoNotModify,
+			Identity:    storage.DoNotModify,
+			Contacts:    storage.DoNotModify,
+			Moniker:     storage.DoNotModify,
+			Details:     storage.DoNotModify,
+			Height:      1001,
+		},
+	}
+
+	count, err := tx.SaveValidators(ctx, validators...)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1, count)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	entities, err := s.storage.Validator.ListByPower(ctx, storage.ValidatorFilters{
+		Limit: 10,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(entities, 3)
+
+	first := entities[0]
+	s.Require().EqualValues("101", first.Commissions.String())
+	s.Require().EqualValues("201", first.Rewards.String())
+	s.Require().NotNil(first.Jailed)
+	s.Require().False(*first.Jailed)
+
+	second := entities[1]
+	s.Require().EqualValues("100", second.Stake.String())
+	s.Require().EqualValues("0.2", second.Rate.String())
+	s.Require().EqualValues("Polychain", second.Moniker)
+	s.Require().NotNil(second.Jailed)
+	s.Require().False(*second.Jailed)
+
+	third := entities[2]
+	s.Require().EqualValues("101", third.Commissions.String())
+	s.Require().EqualValues("201", third.Rewards.String())
+	s.Require().EqualValues("0.06", third.Rate.String())
+	s.Require().EqualValues("test-website", third.Website)
+	s.Require().NotNil(third.Jailed)
+	s.Require().True(*third.Jailed)
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	validatorJailed := []*storage.Validator{
+		{
+			Address:     "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
+			Delegator:   "celestia189ecvq5avj0wehrcfnagpd5sd8pup9aq7j2xd9",
+			Commissions: decimal.NewFromInt(100),
+			Rewards:     decimal.NewFromInt(200),
+			Identity:    storage.DoNotModify,
+			Website:     storage.DoNotModify,
+			Contacts:    storage.DoNotModify,
+			Moniker:     storage.DoNotModify,
+			Details:     storage.DoNotModify,
+			Stake:       decimal.Zero,
+		},
+	}
+
+	count2, err := tx2.SaveValidators(ctx, validatorJailed...)
+	s.Require().NoError(err)
+	s.Require().EqualValues(0, count2)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+
+	v, err := s.storage.Validator.ByAddress(ctx, "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr")
+	s.Require().NoError(err)
+	s.Require().NotNil(v.Jailed)
+	s.Require().True(*v.Jailed)
+}
+
 func TestSuiteTransaction_Run(t *testing.T) {
 	suite.Run(t, new(TransactionTestSuite))
 }
