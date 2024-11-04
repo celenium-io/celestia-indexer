@@ -57,8 +57,12 @@ type Storage struct {
 }
 
 // Create -
-func Create(ctx context.Context, cfg config.Database, scriptsDir string) (Storage, error) {
-	strg, err := postgres.Create(ctx, cfg, initDatabase)
+func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMigrations bool) (Storage, error) {
+	init := initDatabase
+	if withMigrations {
+		init = initDatabaseWithMigrations
+	}
+	strg, err := postgres.Create(ctx, cfg, init)
 	if err != nil {
 		return Storage{}, err
 	}
@@ -145,10 +149,13 @@ func initDatabase(ctx context.Context, conn *database.Bun) error {
 		return errors.Wrap(err, "create hypertables")
 	}
 
-	if err := createIndices(ctx, conn); err != nil {
+	return createIndices(ctx, conn)
+}
+
+func initDatabaseWithMigrations(ctx context.Context, conn *database.Bun) error {
+	if err := initDatabase(ctx, conn); err != nil {
 		return err
 	}
-
 	return migrateDatabase(ctx, conn)
 }
 

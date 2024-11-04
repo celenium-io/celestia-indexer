@@ -41,7 +41,7 @@ func main() {
 		return
 	}
 
-	pg, err := postgres.Create(ctx, cfg.Database, cfg.Indexer.ScriptsDir)
+	pg, err := postgres.Create(ctx, cfg.Database, cfg.Indexer.ScriptsDir, false)
 	if err != nil {
 		log.Panic().Err(err).Msg("can't create database connection")
 		return
