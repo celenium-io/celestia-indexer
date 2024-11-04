@@ -25,6 +25,8 @@ const (
 	RollupCategoryGaming RollupCategory = "gaming"
 	// RollupCategoryNft is a RollupCategory of type nft.
 	RollupCategoryNft RollupCategory = "nft"
+	// RollupCategorySocial is a RollupCategory of type social.
+	RollupCategorySocial RollupCategory = "social"
 )
 
 var ErrInvalidRollupCategory = fmt.Errorf("not a valid RollupCategory, try [%s]", strings.Join(_RollupCategoryNames, ", "))
@@ -34,6 +36,7 @@ var _RollupCategoryNames = []string{
 	string(RollupCategoryFinance),
 	string(RollupCategoryGaming),
 	string(RollupCategoryNft),
+	string(RollupCategorySocial),
 }
 
 // RollupCategoryNames returns a list of possible string values of RollupCategory.
@@ -50,6 +53,7 @@ func RollupCategoryValues() []RollupCategory {
 		RollupCategoryFinance,
 		RollupCategoryGaming,
 		RollupCategoryNft,
+		RollupCategorySocial,
 	}
 }
 
@@ -70,6 +74,7 @@ var _RollupCategoryValue = map[string]RollupCategory{
 	"finance":       RollupCategoryFinance,
 	"gaming":        RollupCategoryGaming,
 	"nft":           RollupCategoryNft,
+	"social":        RollupCategorySocial,
 }
 
 // ParseRollupCategory attempts to convert a string to a RollupCategory.
