@@ -790,7 +790,7 @@ func (handler *AddressHandler) getIdByHash(ctx context.Context, hash []byte, add
 
 	switch len(addressId) {
 	case 0:
-		return 0, errors.Errorf("can't find address: %s", address)
+		return 0, errors.Wrap(errUnknownAddress, address)
 	case 1:
 		return addressId[0], nil
 	default:
