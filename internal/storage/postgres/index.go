@@ -236,6 +236,15 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Validator)(nil)).
+			Index("validator_jailed_idx").
+			ColumnExpr("(1)").
+			Where("NOT jailed").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Blob log
 		if _, err := tx.NewCreateIndex().
