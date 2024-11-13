@@ -288,3 +288,15 @@ func (r *Rollup) AllSeries(ctx context.Context) (items []storage.RollupHistogram
 
 	return
 }
+
+func (r *Rollup) RollupStatsGrouping(ctx context.Context, fltrs storage.RollupGroupStatsFilters) (results []storage.RollupGroupedStats, err error) {
+	err = r.DB().NewSelect().
+		Table(storage.ViewLeaderboard).
+		ColumnExpr(fltrs.Func+"(fee) as fee").
+		ColumnExpr(fltrs.Func+"(size) as size").
+		ColumnExpr(fltrs.Func+"(blobs_count) as blobs_count").
+		ColumnExpr(fltrs.Column+" as group").
+		Group(fltrs.Column).
+		Scan(ctx, &results)
+	return
+}

@@ -21,6 +21,11 @@ type LeaderboardFilters struct {
 	Category  []types.RollupCategory
 }
 
+type RollupGroupStatsFilters struct {
+	Func   string
+	Column string
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IRollup interface {
 	sdk.Table[*Rollup]
@@ -36,6 +41,7 @@ type IRollup interface {
 	Count(ctx context.Context) (int64, error)
 	Distribution(ctx context.Context, rollupId uint64, series, groupBy string) (items []DistributionItem, err error)
 	BySlug(ctx context.Context, slug string) (RollupWithStats, error)
+	RollupStatsGrouping(ctx context.Context, fltrs RollupGroupStatsFilters) ([]RollupGroupedStats, error)
 }
 
 // Rollup -
@@ -127,4 +133,11 @@ type RollupHistogramItem struct {
 	Name       string    `bun:"name"`
 	Logo       string    `bun:"logo"`
 	Time       time.Time `bun:"time"`
+}
+
+type RollupGroupedStats struct {
+	Fee        float64 `bun:"fee"`
+	Size       float64 `bun:"size"`
+	BlobsCount float64 `bun:"blobs_count"`
+	Group      string  `bun:"group"`
 }

@@ -537,3 +537,43 @@ func (handler RollupHandler) ExportBlobs(c echo.Context) error {
 	}
 	return nil
 }
+
+type rollupGroupStats struct {
+	Func   string `query:"func" validate:"oneof=sum avg"`
+	Column string `query:"column" validate:"oneof=stack type category vm provider"`
+}
+
+// RollupGroupedStats godoc
+//
+//	@Summary		Rollup Grouped Statistics
+//	@Description	Rollup Grouped Statistics
+//	@Tags			rollup
+//	@ID				rollup-grouped-statistics
+//	@Param			func	query	string	false	"Aggregate function"	Enums(sum, avg)
+//	@Param			column	query	string	false	"Group column"	Enums(stack, type, category, vm, provider)
+//	@Produce		json
+//	@Success		200	{array}		responses.RollupGroupedStats
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/rollup/group [get]
+func (handler RollupHandler) RollupGroupedStats(c echo.Context) error {
+	req, err := bindAndValidate[rollupGroupStats](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	rollups, err := handler.rollups.RollupStatsGrouping(c.Request().Context(), storage.RollupGroupStatsFilters{
+		Func:   req.Func,
+		Column: req.Column,
+	})
+	if err != nil {
+		return handleError(c, err, handler.rollups)
+	}
+
+	response := make([]responses.RollupGroupedStats, len(rollups))
+	for i := range rollups {
+		response[i] = responses.NewRollupGroupedStats(rollups[i])
+	}
+
+	return returnArray(c, response)
+}
