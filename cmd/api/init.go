@@ -108,7 +108,7 @@ func websocketSkipper(c echo.Context) bool {
 }
 
 func metricsSkipper(c echo.Context) bool {
-	return c.Path() == "/v1/metrics"
+	return c.Path() == "/metrics"
 }
 
 func postSkipper(c echo.Context) bool {
@@ -279,6 +279,10 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	ttlCache.Start(ctx)
 	ttlCacheMiddleware := cache.Middleware(ttlCache, nil)
 
+	if cfg.ApiConfig.Prometheus {
+		e.GET("/metrics", echoprometheus.NewHandler())
+	}
+
 	v1 := e.Group("v1")
 
 	stateHandlers := handler.NewStateHandler(db.State, db.Validator, cfg.Indexer.Name)
@@ -439,10 +443,6 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	vesting := v1.Group("/vesting")
 	{
 		vesting.GET("/:id/periods", vestingHandler.Periods)
-	}
-
-	if cfg.ApiConfig.Prometheus {
-		v1.GET("/metrics", echoprometheus.NewHandler())
 	}
 
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
