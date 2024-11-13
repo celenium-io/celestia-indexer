@@ -70,6 +70,7 @@ type Enums struct {
 	MessageType []string `json:"message_type"`
 	EventType   []string `json:"event_type"`
 	Categories  []string `json:"categories"`
+	RollupTypes []string `json:"rollup_type"`
 }
 
 func NewEnums() Enums {
@@ -78,5 +79,6 @@ func NewEnums() Enums {
 		MessageType: types.MsgTypeNames(),
 		EventType:   types.EventTypeNames(),
 		Categories:  types.RollupCategoryNames(),
+		RollupTypes: types.RollupTypeNames(),
 	}
 }

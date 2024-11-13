@@ -38,6 +38,7 @@ type rollupList struct {
 	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=time blobs_count size fee"`
 	Category StringArray `query:"category" validate:"omitempty,dive,category"`
+	Type     StringArray `query:"type" validate:"omitempty,dive,type"`
 }
 
 func (p *rollupList) SetDefault() {
@@ -80,12 +81,18 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 		categories[i] = types.RollupCategory(req.Category[i])
 	}
 
+	rollupTypes := make([]types.RollupType, len(req.Type))
+	for i := range rollupTypes {
+		rollupTypes[i] = types.RollupType(req.Type[i])
+	}
+
 	rollups, err := handler.rollups.Leaderboard(c.Request().Context(), storage.LeaderboardFilters{
 		SortField: req.SortBy,
 		Sort:      pgSort(req.Sort),
 		Limit:     req.Limit,
 		Offset:    req.Offset,
 		Category:  categories,
+		Type:      rollupTypes,
 	})
 	if err != nil {
 		return handleError(c, err, handler.rollups)
@@ -103,6 +110,7 @@ type rollupDayList struct {
 	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=avg_size blobs_count total_size total_fee throughput namespace_count pfb_count mb_price"`
 	Category StringArray `query:"category" validate:"omitempty,dive,category"`
+	Type     StringArray `query:"type" validate:"omitempty,dive,type"`
 }
 
 func (p *rollupDayList) SetDefault() {
@@ -145,12 +153,18 @@ func (handler RollupHandler) LeaderboardDay(c echo.Context) error {
 		categories[i] = types.RollupCategory(req.Category[i])
 	}
 
+	rollupTypes := make([]types.RollupType, len(req.Type))
+	for i := range rollupTypes {
+		rollupTypes[i] = types.RollupType(req.Type[i])
+	}
+
 	rollups, err := handler.rollups.LeaderboardDay(c.Request().Context(), storage.LeaderboardFilters{
 		SortField: req.SortBy,
 		Sort:      pgSort(req.Sort),
 		Limit:     req.Limit,
 		Offset:    req.Offset,
 		Category:  categories,
+		Type:      rollupTypes,
 	})
 	if err != nil {
 		return handleError(c, err, handler.rollups)

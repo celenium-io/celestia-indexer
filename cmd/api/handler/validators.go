@@ -35,6 +35,9 @@ func NewCelestiaApiValidator() *CelestiaApiValidator {
 	if err := v.RegisterValidation("category", categoryValidator()); err != nil {
 		panic(err)
 	}
+	if err := v.RegisterValidation("type", typeValidator()); err != nil {
+		panic(err)
+	}
 	return &CelestiaApiValidator{validator: v}
 }
 
@@ -106,6 +109,13 @@ func namespaceValidator() validator.Func {
 func categoryValidator() validator.Func {
 	return func(fl validator.FieldLevel) bool {
 		_, err := types.ParseRollupCategory(fl.Field().String())
+		return err == nil
+	}
+}
+
+func typeValidator() validator.Func {
+	return func(fl validator.FieldLevel) bool {
+		_, err := types.ParseRollupType(fl.Field().String())
 		return err == nil
 	}
 }
