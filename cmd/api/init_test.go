@@ -28,7 +28,7 @@ func Test_observableCacheSkipper(t *testing.T) {
 			want:   true,
 		}, {
 			name:   "test 2",
-			path:   "/v1/metrics",
+			path:   "/metrics",
 			method: http.MethodGet,
 			want:   true,
 		}, {
