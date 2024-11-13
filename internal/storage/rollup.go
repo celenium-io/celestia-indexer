@@ -138,6 +138,6 @@ type RollupHistogramItem struct {
 type RollupGroupedStats struct {
 	Fee        float64 `bun:"fee"`
 	Size       float64 `bun:"size"`
-	BlobsCount float64 `bun:"blobs_count"`
+	BlobsCount int64   `bun:"blobs_count"`
 	Group      string  `bun:"group"`
 }

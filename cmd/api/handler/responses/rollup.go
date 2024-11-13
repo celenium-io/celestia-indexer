@@ -208,7 +208,7 @@ func NewRollupWithDayStats(r storage.RollupWithDayStats) RollupWithDayStats {
 type RollupGroupedStats struct {
 	Fee        float64 `example:"123.456789" format:"string"  json:"fee"         swaggertype:"string"`
 	Size       float64 `example:"1000"       format:"integer" json:"size"        swaggertype:"integer"`
-	BlobsCount float64 `example:"2"          format:"integer" json:"blobs_count" swaggertype:"integer"`
+	BlobsCount int64   `example:"2"          format:"integer" json:"blobs_count" swaggertype:"integer"`
 	Group      string  `example:"group"      format:"string"  json:"group"       swaggertype:"string"`
 }
 
