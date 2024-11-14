@@ -505,12 +505,7 @@ func (s *RollupTestSuite) TestRollupStatsGrouping() {
 			s.Require().Len(stats, 1)
 
 			groupedStats := stats[0]
-			testRollupWithGroupedStats = storage.RollupGroupedStats{
-				Fee:        0.1,
-				Size:       0.2,
-				BlobsCount: 3,
-				Group:      "stack",
-			}
+
 			s.Require().EqualValues(0.1, groupedStats.Fee)
 			s.Require().EqualValues(0.2, groupedStats.Size)
 			s.Require().EqualValues(3, groupedStats.BlobsCount)
