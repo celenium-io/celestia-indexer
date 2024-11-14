@@ -25,6 +25,7 @@ import (
 type MockIRollup struct {
 	ctrl     *gomock.Controller
 	recorder *MockIRollupMockRecorder
+	isgomock struct{}
 }
 
 // MockIRollupMockRecorder is the mock recorder for MockIRollup.
@@ -585,6 +586,45 @@ func (c *MockIRollupProvidersCall) Do(f func(context.Context, uint64) ([]storage
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIRollupProvidersCall) DoAndReturn(f func(context.Context, uint64) ([]storage.RollupProvider, error)) *MockIRollupProvidersCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollupStatsGrouping mocks base method.
+func (m *MockIRollup) RollupStatsGrouping(ctx context.Context, fltrs storage.RollupGroupStatsFilters) ([]storage.RollupGroupedStats, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollupStatsGrouping", ctx, fltrs)
+	ret0, _ := ret[0].([]storage.RollupGroupedStats)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RollupStatsGrouping indicates an expected call of RollupStatsGrouping.
+func (mr *MockIRollupMockRecorder) RollupStatsGrouping(ctx, fltrs any) *MockIRollupRollupStatsGroupingCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollupStatsGrouping", reflect.TypeOf((*MockIRollup)(nil).RollupStatsGrouping), ctx, fltrs)
+	return &MockIRollupRollupStatsGroupingCall{Call: call}
+}
+
+// MockIRollupRollupStatsGroupingCall wrap *gomock.Call
+type MockIRollupRollupStatsGroupingCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIRollupRollupStatsGroupingCall) Return(arg0 []storage.RollupGroupedStats, arg1 error) *MockIRollupRollupStatsGroupingCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIRollupRollupStatsGroupingCall) Do(f func(context.Context, storage.RollupGroupStatsFilters) ([]storage.RollupGroupedStats, error)) *MockIRollupRollupStatsGroupingCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIRollupRollupStatsGroupingCall) DoAndReturn(f func(context.Context, storage.RollupGroupStatsFilters) ([]storage.RollupGroupedStats, error)) *MockIRollupRollupStatsGroupingCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

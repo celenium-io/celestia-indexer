@@ -539,7 +539,7 @@ func (handler RollupHandler) ExportBlobs(c echo.Context) error {
 }
 
 type rollupGroupStats struct {
-	Func   string `query:"func" validate:"oneof=sum avg"`
+	Func   string `query:"func"   validate:"oneof=sum avg"`
 	Column string `query:"column" validate:"oneof=stack type category vm provider"`
 }
 

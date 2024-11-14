@@ -46,6 +46,12 @@ var (
 			SizePct:         0.3,
 		},
 	}
+	testRollupWithGroupedStats = storage.RollupGroupedStats{
+		Fee:        0.1,
+		Size:       0.2,
+		BlobsCount: 3,
+		Group:      "stack",
+	}
 )
 
 // RollupTestSuite -
@@ -460,4 +466,55 @@ func (s *RollupTestSuite) TestAllSeries() {
 	s.Require().EqualValues(2, item.Size)
 	s.Require().EqualValues(1, item.BlobsCount)
 	s.Require().EqualValues(testTime, item.Time)
+}
+
+func (s *RollupTestSuite) TestRollupStatsGrouping() {
+	for _, funcName := range []string{
+		"sum",
+		"avg",
+	} {
+		for _, groupName := range []string{
+			"stack",
+			"type",
+			"category",
+			"vm",
+			"provider",
+		} {
+			q := make(url.Values)
+			q.Add("func", funcName)
+			q.Add("column", groupName)
+
+			req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/rollup/group")
+
+			s.rollups.EXPECT().
+				RollupStatsGrouping(gomock.Any(), storage.RollupGroupStatsFilters{
+					Func:   funcName,
+					Column: groupName,
+				}).
+				Return([]storage.RollupGroupedStats{testRollupWithGroupedStats}, nil).
+				Times(1)
+
+			s.Require().NoError(s.handler.RollupGroupedStats(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
+			var stats []responses.RollupGroupedStats
+			err := json.NewDecoder(rec.Body).Decode(&stats)
+			s.Require().NoError(err)
+			s.Require().Len(stats, 1)
+
+			groupedStats := stats[0]
+			testRollupWithGroupedStats = storage.RollupGroupedStats{
+				Fee:        0.1,
+				Size:       0.2,
+				BlobsCount: 3,
+				Group:      "stack",
+			}
+			s.Require().EqualValues(0.1, groupedStats.Fee)
+			s.Require().EqualValues(0.2, groupedStats.Size)
+			s.Require().EqualValues(3, groupedStats.BlobsCount)
+			s.Require().EqualValues("stack", groupedStats.Group)
+		}
+	}
 }
