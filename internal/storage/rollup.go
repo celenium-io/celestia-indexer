@@ -19,6 +19,7 @@ type LeaderboardFilters struct {
 	Limit     int
 	Offset    int
 	Category  []types.RollupCategory
+	Type      []types.RollupType
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
