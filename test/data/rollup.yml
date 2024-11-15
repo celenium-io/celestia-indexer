@@ -7,6 +7,7 @@
   logo: https://rollup1.com/image.png
   slug: rollup_1
   category: finance
+  type: settled
 - id: 2
   name: Rollup 2
   description: The second
@@ -16,6 +17,7 @@
   logo: https://rollup2.com/image.png
   slug: rollup_2
   category: gaming
+  type: settled
 - id: 3
   name: Rollup 3
   description: The third
@@ -25,3 +27,4 @@
   logo: https://rollup3.com/image.png
   slug: rollup_3
   category: nft
+  type: sovereign
