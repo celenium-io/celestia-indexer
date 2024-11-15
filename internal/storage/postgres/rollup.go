@@ -296,3 +296,32 @@ func (r *Rollup) AllSeries(ctx context.Context) (items []storage.RollupHistogram
 
 	return
 }
+
+func (r *Rollup) RollupStatsGrouping(ctx context.Context, fltrs storage.RollupGroupStatsFilters) (results []storage.RollupGroupedStats, err error) {
+	query := r.DB().NewSelect().Table(storage.ViewLeaderboard)
+
+	switch fltrs.Func {
+	case "sum":
+		query = query.
+			ColumnExpr("sum(fee) as fee").
+			ColumnExpr("sum(size) as size").
+			ColumnExpr("sum(blobs_count) as blobs_count")
+	case "avg":
+		query = query.
+			ColumnExpr("avg(fee) as fee").
+			ColumnExpr("avg(size) as size").
+			ColumnExpr("avg(blobs_count) as blobs_count")
+	default:
+		return nil, errors.Errorf("unknown func field: %s", fltrs.Column)
+	}
+
+	switch fltrs.Column {
+	case "stack", "type", "category", "vm", "provider":
+		query = query.ColumnExpr(fltrs.Column + " as group").Group(fltrs.Column)
+	default:
+		return nil, errors.Errorf("unknown column field: %s", fltrs.Column)
+	}
+
+	err = query.Scan(ctx, &results)
+	return
+}
