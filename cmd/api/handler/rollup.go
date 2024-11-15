@@ -38,7 +38,7 @@ type rollupList struct {
 	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=time blobs_count size fee"`
 	Category StringArray `query:"category" validate:"omitempty,dive,category"`
-	Type     StringArray `query:"type" validate:"omitempty,dive,type"`
+	Type     StringArray `query:"type"     validate:"omitempty,dive,type"`
 }
 
 func (p *rollupList) SetDefault() {
@@ -110,7 +110,7 @@ type rollupDayList struct {
 	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=avg_size blobs_count total_size total_fee throughput namespace_count pfb_count mb_price"`
 	Category StringArray `query:"category" validate:"omitempty,dive,category"`
-	Type     StringArray `query:"type" validate:"omitempty,dive,type"`
+	Type     StringArray `query:"type"     validate:"omitempty,dive,type"`
 }
 
 func (p *rollupDayList) SetDefault() {
