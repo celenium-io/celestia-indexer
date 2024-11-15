@@ -19,6 +19,7 @@ type LeaderboardFilters struct {
 	Limit     int
 	Offset    int
 	Category  []types.RollupCategory
+	Type      []types.RollupType
 }
 
 type RollupGroupStatsFilters struct {

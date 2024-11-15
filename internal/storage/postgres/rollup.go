@@ -46,6 +46,10 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 		query = query.Where("category IN (?)", bun.In(fltrs.Category))
 	}
 
+	if len(fltrs.Type) > 0 {
+		query = query.Where("type IN (?)", bun.In(fltrs.Type))
+	}
+
 	query = sortScope(query, fltrs.SortField, fltrs.Sort)
 	query = limitScope(query, fltrs.Limit)
 	err = query.Scan(ctx, &rollups)
@@ -70,6 +74,10 @@ func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFi
 
 	if len(fltrs.Category) > 0 {
 		query = query.Where("category IN (?)", bun.In(fltrs.Category))
+	}
+
+	if len(fltrs.Type) > 0 {
+		query = query.Where("type IN (?)", bun.In(fltrs.Type))
 	}
 
 	query = sortScope(query, fltrs.SortField, fltrs.Sort)

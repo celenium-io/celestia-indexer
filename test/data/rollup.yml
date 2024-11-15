@@ -8,6 +8,7 @@
   slug: rollup_1
   category: finance
   stack: OP Stack
+  type: settled
 - id: 2
   name: Rollup 2
   description: The second
@@ -18,6 +19,7 @@
   slug: rollup_2
   category: gaming
   stack: OP Stack
+  type: settled
 - id: 3
   name: Rollup 3
   description: The third
@@ -28,3 +30,4 @@
   slug: rollup_3
   category: nft
   stack: Custom Stack
+  type: sovereign
