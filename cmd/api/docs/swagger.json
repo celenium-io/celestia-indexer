@@ -2823,6 +2823,67 @@
                 }
             }
         },
+        "/rollup/group": {
+            "get": {
+                "description": "Rollup Grouped Statistics",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rollup"
+                ],
+                "summary": "Rollup Grouped Statistics",
+                "operationId": "rollup-grouped-statistics",
+                "parameters": [
+                    {
+                        "enum": [
+                            "sum",
+                            "avg"
+                        ],
+                        "type": "string",
+                        "description": "Aggregate function",
+                        "name": "func",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "stack",
+                            "type",
+                            "category",
+                            "vm",
+                            "provider"
+                        ],
+                        "type": "string",
+                        "description": "Group column",
+                        "name": "column",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.RollupGroupedStats"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/rollup/slug/{slug}": {
             "get": {
                 "description": "Get rollup by slug",
@@ -5605,6 +5666,12 @@
                         "type": "string"
                     }
                 },
+                "rollup_type": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "status": {
                     "type": "array",
                     "items": {
@@ -6302,6 +6369,31 @@
                     "type": "string",
                     "format": "date-time",
                     "example": "2023-07-04T03:10:57+00:00"
+                }
+            }
+        },
+        "responses.RollupGroupedStats": {
+            "type": "object",
+            "properties": {
+                "blobs_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 2
+                },
+                "fee": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123.456789"
+                },
+                "group": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "group"
+                },
+                "size": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 1000
                 }
             }
         },
