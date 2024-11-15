@@ -225,3 +225,25 @@ func (s *StorageTestSuite) TestRollupAllSeries() {
 	s.Require().NoError(err)
 	s.Require().Len(items, 5)
 }
+
+func (s *StorageTestSuite) TestRollupStatsGrouping() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
+	s.Require().NoError(err)
+
+	column := "stack"
+	rollups, err := s.storage.Rollup.RollupStatsGrouping(ctx, storage.RollupGroupStatsFilters{
+		Func:   "sum",
+		Column: column,
+	})
+	s.Require().NoError(err, column)
+	s.Require().Len(rollups, 2, column)
+
+	rollup := rollups[1]
+	s.Require().EqualValues(4000, rollup.Fee, column)
+	s.Require().EqualValues(52, rollup.Size, column)
+	s.Require().EqualValues(4, rollup.BlobsCount, column)
+	s.Require().EqualValues("OP Stack", rollup.Group, column)
+}

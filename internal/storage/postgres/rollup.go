@@ -290,7 +290,7 @@ func (r *Rollup) AllSeries(ctx context.Context) (items []storage.RollupHistogram
 }
 
 func (r *Rollup) RollupStatsGrouping(ctx context.Context, fltrs storage.RollupGroupStatsFilters) (results []storage.RollupGroupedStats, err error) {
-	query := r.DB().NewSelect().Table("leaderboard2")
+	query := r.DB().NewSelect().Table(storage.ViewLeaderboard)
 
 	switch fltrs.Func {
 	case "sum":
