@@ -15,8 +15,7 @@ import (
 )
 
 func TestTTLCache_SetGet(t *testing.T) {
-	c, err := NewTTLCache(time.Second, true)
-	defer func() { _ = c.Close() }()
+	c, err := NewTTLCache(time.Second)
 	require.NoError(t, err)
 
 	t.Run("set and get key from cache", func(t *testing.T) {
@@ -103,8 +102,7 @@ func TestTTLCache_SetGet(t *testing.T) {
 }
 
 func TestTTLCache_Clear(t *testing.T) {
-	c, err := NewTTLCache(time.Second, true)
-	defer func() { _ = c.Close() }()
+	c, err := NewTTLCache(time.Second)
 	require.NoError(t, err)
 
 	t.Run("clear cache", func(t *testing.T) {

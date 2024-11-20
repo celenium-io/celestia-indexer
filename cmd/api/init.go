@@ -268,15 +268,11 @@ func initDatabase(cfg config.Database, viewsDir string) postgres.Storage {
 	return db
 }
 
-var ttlCache *cache.TTLCache
-
 func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Storage) {
-	var err error
-	ttlCache, err = cache.NewTTLCache(time.Minute*10, false)
+	ttlCache, err := cache.NewTTLCache(time.Minute * 30)
 	if err != nil {
 		panic(err)
 	}
-	ttlCache.Start(ctx)
 	ttlCacheMiddleware := cache.Middleware(ttlCache, nil)
 
 	if cfg.ApiConfig.Prometheus {
