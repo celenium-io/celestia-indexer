@@ -7,6 +7,9 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/hex"
+	"github.com/celestiaorg/celestia-app/v3/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v3/pkg/da"
+	"github.com/celestiaorg/go-square/shares"
 	"net/http"
 	"time"
 
@@ -17,6 +20,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/node"
+	"github.com/celestiaorg/go-square/square"
 	"github.com/labstack/echo/v4"
 )
 
@@ -27,6 +31,7 @@ type NamespaceHandler struct {
 	address     storage.IAddress
 	blob        node.DalApi
 	state       storage.IState
+	node        node.Api
 	indexerName string
 }
 
@@ -38,6 +43,7 @@ func NewNamespaceHandler(
 	state storage.IState,
 	indexerName string,
 	blob node.DalApi,
+	node node.Api,
 ) *NamespaceHandler {
 	return &NamespaceHandler{
 		namespace:   namespace,
@@ -47,6 +53,7 @@ func NewNamespaceHandler(
 		blob:        blob,
 		state:       state,
 		indexerName: indexerName,
+		node:        node,
 	}
 }
 
@@ -732,4 +739,71 @@ func (handler *NamespaceHandler) Rollups(c echo.Context) error {
 	}
 
 	return returnArray(c, response)
+}
+
+// BlobProofs godoc
+//
+//	@Summary		Get blob inclusion proofs
+//	@Description	Returns blob inclusion proofs
+//	@Tags			namespace
+//	@ID				get-blob-proof
+//	@Param			request	body postBlobRequest	true "Request body containing height, commitment and namespace hash"
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	responses.BlobLog
+//	@Failure		400	{object}	Error
+//	@Router			/blob/proofs [get]
+func (handler *NamespaceHandler) BlobProofs(c echo.Context) error {
+	req, err := bindAndValidate[postBlobRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	block, err := handler.node.Block(c.Request().Context(), req.Height)
+	if err != nil {
+		return handleError(c, err, handler.namespace)
+	}
+
+	dataSquare, err := square.Construct(
+		block.Block.Data.Txs.ToSliceOfBytes(),
+		appconsts.SquareSizeUpperBound(0),
+		appconsts.SubtreeRootThreshold(0),
+	)
+
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	eds, err := da.ExtendShares(shares.ToBytes(dataSquare))
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	ods, err := responses.NewODS(eds)
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	namespaceOds, err := ods.FindODSByNamespace(req.Hash)
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	namespaceShares, err := responses.GetNamespaceShares(eds, namespaceOds.From, namespaceOds.To)
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	startBlobIdx, endBlobIdx, err := responses.GetBlobShareIdxs(
+		namespaceShares,
+		namespaceOds.From,
+		eds.Width()/2,
+		req.Commitment,
+	)
+
+	proofs, err := handler.node.BlobProofs(c.Request().Context(), req.Height, startBlobIdx, endBlobIdx)
+	if err != nil {
+		return handleError(c, err, handler.namespace)
+	}
+	return c.JSON(http.StatusOK, proofs)
 }

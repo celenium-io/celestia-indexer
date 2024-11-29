@@ -4,10 +4,17 @@
 package responses
 
 import (
+	"bytes"
 	"encoding/base64"
-
+	"github.com/celestiaorg/celestia-app/v3/pkg/appconsts"
 	"github.com/celestiaorg/go-square/namespace"
 	"github.com/celestiaorg/go-square/shares"
+	incl "github.com/celestiaorg/go-square/v2/inclusion"
+	"github.com/celestiaorg/go-square/v2/share"
+	"github.com/pkg/errors"
+	"github.com/tendermint/tendermint/crypto/merkle"
+
+	_ "github.com/celestiaorg/go-square/v2/share"
 	"github.com/celestiaorg/rsmt2d"
 )
 
@@ -22,6 +29,36 @@ type ODSItem struct {
 	To        []uint        `json:"to"`
 	Namespace string        `json:"namespace"`
 	Type      NamespaceKind `json:"type"`
+}
+
+type sequence struct {
+	ns              share.Namespace
+	shareVersion    uint8
+	startShareIndex int
+	data            []byte
+	sequenceLen     uint32
+	signer          []byte
+}
+
+const (
+	// ShareVersionZero is the first share version format.
+	ShareVersionZero = uint8(0)
+
+	// ShareVersionOne is the second share version format.
+	// It requires that a signer is included in the first share in the sequence.
+	ShareVersionOne = uint8(1)
+)
+
+// SupportedShareVersions is a list of supported share versions.
+var SupportedShareVersions = []uint8{ShareVersionZero, ShareVersionOne}
+
+func (ods *ODS) FindODSByNamespace(namespace string) (*ODSItem, error) {
+	for _, item := range ods.Items {
+		if item.Namespace == namespace {
+			return &item, nil
+		}
+	}
+	return nil, errors.New("item with specified namespace not found")
 }
 
 func NewODS(eds *rsmt2d.ExtendedDataSquare) (ODS, error) {
@@ -61,6 +98,40 @@ func NewODS(eds *rsmt2d.ExtendedDataSquare) (ODS, error) {
 	return ods, nil
 }
 
+func GetNamespaceShares(eds *rsmt2d.ExtendedDataSquare, from, to []uint) ([]share.Share, error) {
+	if len(from) != len(to) {
+		return nil, errors.New("length of 'from' and 'to' must match")
+	}
+
+	var resultShares []share.Share
+	startRow, startCol := from[0], from[1]
+	endRow, endCol := to[0], to[1]
+
+	if startRow > endRow || (startRow == endRow && startCol > endCol) {
+		return nil, errors.New("invalid from and to params")
+	}
+	currentRow, currentCol := startRow, startCol
+
+	for {
+		cell := eds.GetCell(currentRow, currentCol)
+		cellShare, err := share.NewShare(cell)
+		if err != nil {
+			return nil, err
+		}
+		resultShares = append(resultShares, *cellShare)
+		if currentRow == endRow && currentCol == endCol {
+			break
+		}
+		currentCol++
+		if currentCol == eds.Width()/2 {
+			currentCol = 0
+			currentRow++
+		}
+	}
+
+	return resultShares, nil
+}
+
 type NamespaceKind string
 
 const (
@@ -87,4 +158,69 @@ func getNamespaceType(ns namespace.Namespace) NamespaceKind {
 	default:
 		return DefaultNamespace
 	}
+}
+
+func GetBlobShareIdxs(
+	shares []share.Share,
+	nsStartFromIdx []uint,
+	edsWidth uint,
+	b64commitment string,
+) (blobStartIdx, blobEndIdx int, err error) {
+	if len(shares) == 0 {
+		return 0, 0, errors.New("invalid shares length")
+
+	}
+	sequences := make([]sequence, 0)
+	startRow, startCol := nsStartFromIdx[0], nsStartFromIdx[1]
+	nsStartIdx := int(startRow*edsWidth + startCol)
+
+	for shareIdx, s := range shares {
+		if !bytes.Contains(SupportedShareVersions, []byte{s.Version()}) {
+			return 0, 0, errors.New("unsupported share version")
+		}
+
+		if s.IsPadding() {
+			continue
+		}
+
+		if s.IsSequenceStart() {
+			sequences = append(sequences, sequence{
+				ns:              s.Namespace(),
+				shareVersion:    s.Version(),
+				startShareIndex: shareIdx,
+				data:            s.RawData(),
+				sequenceLen:     s.SequenceLen(),
+				signer:          share.GetSigner(s),
+			})
+		} else {
+			if len(sequences) == 0 {
+				return 0, 0, errors.New("continuation share without a sequence start share")
+			}
+			// FIXME: it doesn't look like we check whether all the shares belong to the same namespace.
+			prev := &sequences[len(sequences)-1]
+			prev.data = append(prev.data, s.RawData()...)
+		}
+	}
+	for i, seq := range sequences {
+		if int(seq.sequenceLen) < len(seq.data) {
+			seq.data = seq.data[:seq.sequenceLen]
+		}
+
+		blob, err := share.NewBlob(seq.ns, seq.data, seq.shareVersion, seq.signer)
+		if err != nil {
+			return 0, 0, err
+		}
+		commitment, err := incl.CreateCommitment(blob, merkle.HashFromByteSlices, appconsts.SubtreeRootThreshold(0))
+		if err != nil {
+			return 0, 0, err
+		}
+		if base64.StdEncoding.EncodeToString(commitment) == b64commitment {
+			if i == (len(sequences))-1 { // last sequence element
+				return seq.startShareIndex, seq.startShareIndex, err
+			}
+
+			return nsStartIdx + seq.startShareIndex, nsStartIdx + sequences[i+1].startShareIndex - 1, err
+		}
+	}
+	return 0, 0, err
 }
