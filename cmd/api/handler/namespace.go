@@ -800,6 +800,9 @@ func (handler *NamespaceHandler) BlobProofs(c echo.Context) error {
 		eds.Width()/2,
 		req.Commitment,
 	)
+	if err != nil {
+		return internalServerError(c, err)
+	}
 
 	proofs, err := handler.node.BlobProofs(c.Request().Context(), req.Height, startBlobIdx, endBlobIdx)
 	if err != nil {

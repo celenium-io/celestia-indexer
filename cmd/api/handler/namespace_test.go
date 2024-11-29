@@ -51,6 +51,7 @@ type NamespaceTestSuite struct {
 	address      *mock.MockIAddress
 	state        *mock.MockIState
 	blobReceiver *nodeMock.MockDalApi
+	node         *nodeMock.MockApi
 	echo         *echo.Echo
 	handler      *NamespaceHandler
 	ctrl         *gomock.Controller
@@ -67,7 +68,16 @@ func (s *NamespaceTestSuite) SetupSuite() {
 	s.rollups = mock.NewMockIRollup(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
 	s.blobReceiver = nodeMock.NewMockDalApi(s.ctrl)
-	s.handler = NewNamespaceHandler(s.namespaces, s.blobLogs, s.rollups, s.address, s.state, testIndexerName, s.blobReceiver)
+	s.handler = NewNamespaceHandler(
+		s.namespaces,
+		s.blobLogs,
+		s.rollups,
+		s.address,
+		s.state,
+		testIndexerName,
+		s.blobReceiver,
+		s.node,
+	)
 }
 
 // TearDownSuite -
