@@ -4,106 +4,42 @@
 package cache
 
 import (
-	"context"
-	"sync"
 	"time"
 
-	"github.com/dgraph-io/badger/v4"
-	"github.com/rs/zerolog/log"
+	"github.com/cespare/xxhash"
+	"github.com/elastic/go-freelru"
 )
 
 type TTLCache struct {
-	db              *badger.DB
-	expiration      time.Duration
-	gcCollectPeriod time.Duration
-	wg              *sync.WaitGroup
+	db         *freelru.LRU[string, []byte]
+	expiration time.Duration
 }
 
-const dir = "/tmp/badger"
+func hashStringXXHASH(s string) uint32 {
+	return uint32(xxhash.Sum64String(s))
+}
 
-func NewTTLCache(expiration time.Duration, inMemory bool) (*TTLCache, error) {
-	path := ""
-	if !inMemory {
-		path = dir
-	}
-
-	db, err := badger.Open(badger.DefaultOptions(path).WithInMemory(inMemory))
+func NewTTLCache(expiration time.Duration) (*TTLCache, error) {
+	lru, err := freelru.New[string, []byte](8192*32, hashStringXXHASH)
 	if err != nil {
 		return nil, err
 	}
+	lru.SetLifetime(expiration)
 
 	return &TTLCache{
-		db:              db,
-		expiration:      expiration,
-		gcCollectPeriod: time.Minute * 5,
-		wg:              new(sync.WaitGroup),
+		db:         lru,
+		expiration: expiration,
 	}, nil
 }
 
-func (c *TTLCache) Start(ctx context.Context) {
-	c.wg.Add(1)
-	go c.gcCollect(ctx)
-}
-
-func (c *TTLCache) gcCollect(ctx context.Context) {
-	defer c.wg.Done()
-
-	ticker := time.NewTicker(c.gcCollectPeriod)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			if err := c.db.RunValueLogGC(0.5); err != nil {
-				log.Err(err).Msg("ttl cache garbage collection error")
-			}
-		}
-	}
-}
-
-func (c *TTLCache) Close() error {
-	c.wg.Wait()
-	return c.db.Close()
-}
-
 func (c *TTLCache) Get(key string) (data []byte, found bool) {
-	if err := c.db.View(func(txn *badger.Txn) error {
-		item, err := txn.Get([]byte(key))
-		if err != nil {
-			return err
-		}
-
-		if err := item.Value(func(val []byte) error {
-			data = make([]byte, len(val))
-			copy(data, val)
-			return nil
-		}); err != nil {
-			return err
-		}
-		return nil
-	}); err != nil {
-		return nil, false
-	}
-	return data, true
+	return c.db.Get(key)
 }
 
 func (c *TTLCache) Set(key string, data []byte) {
-	keyBytes := []byte(key)
-	err := c.db.Update(func(txn *badger.Txn) error {
-		e := badger.
-			NewEntry(keyBytes, data).
-			WithTTL(c.expiration)
-		return txn.SetEntry(e)
-	})
-	if err != nil {
-		log.Err(err).Msgf("set %s to TTL cache", key)
-	}
+	c.db.Add(key, data)
 }
 
 func (c *TTLCache) Clear() {
-	if err := c.db.DropAll(); err != nil {
-		log.Err(err).Msg("clear ttl cache")
-	}
+	c.db.Purge()
 }

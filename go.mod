@@ -4,7 +4,7 @@ go 1.23.2
 
 require (
 	cosmossdk.io/errors v1.0.1
-	cosmossdk.io/math v1.3.0
+	cosmossdk.io/math v1.4.0
 	github.com/MarceloPetrucio/go-scalar-api-reference v0.0.0-20240521013641-ce5d2efe0e06
 	github.com/andybalholm/brotli v1.0.5
 	github.com/aws/aws-sdk-go-v2 v1.26.1
@@ -16,12 +16,13 @@ require (
 	github.com/celestiaorg/go-square v1.1.1
 	github.com/celestiaorg/go-square/v2 v2.1.0
 	github.com/celestiaorg/rsmt2d v0.14.0
+	github.com/cespare/xxhash v1.1.0
 	github.com/cosmos/cosmos-sdk v0.46.16
 	github.com/cosmos/ibc-go/v6 v6.2.2
-	github.com/dgraph-io/badger/v4 v4.3.0
 	github.com/dipdup-io/workerpool v0.0.4
 	github.com/dipdup-net/go-lib v0.4.0
 	github.com/dipdup-net/indexer-sdk v0.0.5
+	github.com/elastic/go-freelru v0.15.0
 	github.com/fatih/structs v1.1.0
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/getsentry/sentry-go v0.27.0
@@ -93,7 +94,6 @@ require (
 	github.com/celestiaorg/merkletree v0.0.0-20210714075610-a84dc3ddbbe4 // indirect
 	github.com/celestiaorg/nmt v0.22.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
-	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect
 	github.com/cockroachdb/apd/v2 v2.0.2 // indirect
@@ -150,7 +150,6 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.5-0.20220116011046-fa5810519dcb // indirect
 	github.com/google/btree v1.1.3 // indirect
-	github.com/google/flatbuffers v1.12.1 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/google/uuid v1.6.0 // indirect
