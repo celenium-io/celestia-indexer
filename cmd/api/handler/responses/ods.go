@@ -188,10 +188,7 @@ func GetBlobShareIdxs(
 		}
 	}
 	for i, seq := range sequences {
-		//if int(seq.sequenceLen) < len(seq.data) {
 		seq.data = seq.data[:seq.sequenceLen]
-		//}
-
 		blob, err := share.NewBlob(seq.ns, seq.data, seq.shareVersion, seq.signer)
 		if err != nil {
 			return 0, 0, err
