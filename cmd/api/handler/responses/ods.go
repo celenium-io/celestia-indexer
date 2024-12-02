@@ -4,7 +4,6 @@
 package responses
 
 import (
-	"bytes"
 	"encoding/base64"
 	"github.com/celestiaorg/celestia-app/v3/pkg/appconsts"
 	"github.com/celestiaorg/go-square/namespace"
@@ -39,18 +38,6 @@ type sequence struct {
 	sequenceLen     uint32
 	signer          []byte
 }
-
-const (
-	// ShareVersionZero is the first share version format.
-	ShareVersionZero = uint8(0)
-
-	// ShareVersionOne is the second share version format.
-	// It requires that a signer is included in the first share in the sequence.
-	ShareVersionOne = uint8(1)
-)
-
-// SupportedShareVersions is a list of supported share versions.
-var SupportedShareVersions = []uint8{ShareVersionZero, ShareVersionOne}
 
 func (ods *ODS) FindODSByNamespace(namespace string) (*ODSItem, error) {
 	for _, item := range ods.Items {
@@ -175,7 +162,7 @@ func GetBlobShareIdxs(
 	nsStartIdx := int(startRow*edsWidth + startCol)
 
 	for shareIdx, s := range shares {
-		if !bytes.Contains(SupportedShareVersions, []byte{s.Version()}) {
+		if !(s.Version() <= 1) {
 			return 0, 0, errors.New("unsupported share version")
 		}
 
@@ -188,7 +175,7 @@ func GetBlobShareIdxs(
 				ns:              s.Namespace(),
 				shareVersion:    s.Version(),
 				startShareIndex: shareIdx,
-				data:            s.RawData(),
+				data:            s.RawData(), // todo: remove all fields except this
 				sequenceLen:     s.SequenceLen(),
 				signer:          share.GetSigner(s),
 			})
@@ -196,15 +183,14 @@ func GetBlobShareIdxs(
 			if len(sequences) == 0 {
 				return 0, 0, errors.New("continuation share without a sequence start share")
 			}
-			// FIXME: it doesn't look like we check whether all the shares belong to the same namespace.
 			prev := &sequences[len(sequences)-1]
 			prev.data = append(prev.data, s.RawData()...)
 		}
 	}
 	for i, seq := range sequences {
-		if int(seq.sequenceLen) < len(seq.data) {
-			seq.data = seq.data[:seq.sequenceLen]
-		}
+		//if int(seq.sequenceLen) < len(seq.data) {
+		seq.data = seq.data[:seq.sequenceLen]
+		//}
 
 		blob, err := share.NewBlob(seq.ns, seq.data, seq.shareVersion, seq.signer)
 		if err != nil {

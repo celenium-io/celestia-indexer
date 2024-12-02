@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
+// SPDX-License-Identifier: MIT
+
 package rpc
 
 import (
@@ -8,18 +11,23 @@ import (
 	"strconv"
 )
 
-const pathBlockProofs = "prove_shares_v2"
+const pathBlobProofs = "prove_shares_v2"
 
 func (api *API) BlobProofs(ctx context.Context, level pkgTypes.Level, startShare, endShare int) (pkgTypes.BlobProof, error) {
-	args := make(map[string]string)
-	if level != 0 {
-		args["height"] = strconv.FormatInt(int64(level), 10)
-		args["startShare"] = strconv.FormatInt(int64(startShare), 10)
-		args["endShare"] = strconv.FormatInt(int64(endShare), 10)
+	if startShare < 0 || endShare < 0 {
+		return pkgTypes.BlobProof{}, errors.New("params 'startShare' and 'endShare' should not be lower than 0")
+	}
+	if level <= 0 {
+		return pkgTypes.BlobProof{}, errors.New("param 'level' should be greater than 0")
 	}
 
+	args := make(map[string]string)
+	args["height"] = strconv.FormatInt(int64(level), 10)
+	args["startShare"] = strconv.FormatInt(int64(startShare), 10)
+	args["endShare"] = strconv.FormatInt(int64(endShare), 10)
+
 	var proof types.Response[pkgTypes.BlobProof]
-	if err := api.get(ctx, pathBlockProofs, args, &proof); err != nil {
+	if err := api.get(ctx, pathBlobProofs, args, &proof); err != nil {
 		return pkgTypes.BlobProof{}, errors.Wrap(err, "api.get")
 	}
 
