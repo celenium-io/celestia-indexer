@@ -11,7 +11,6 @@ type BlobProof struct {
 // ShareProofData -
 type ShareProofData struct {
 	ShareProofs []ShareProof `json:"share_proofs"`
-	RowProof    RowProof     `json:"row_proof"`
 }
 
 // ShareProof -
