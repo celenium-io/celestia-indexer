@@ -31,12 +31,13 @@ type ODSItem struct {
 }
 
 type sequence struct {
-	ns              share.Namespace
-	shareVersion    uint8
-	startShareIndex int
-	data            []byte
-	sequenceLen     uint32
-	signer          []byte
+	ns            share.Namespace
+	shareVersion  uint8
+	startShareIdx int
+	endShareIdx   int
+	data          []byte
+	sequenceLen   uint32
+	signer        []byte
 }
 
 func (ods *ODS) FindODSByNamespace(namespace string) (*ODSItem, error) {
@@ -172,12 +173,13 @@ func GetBlobShareIdxs(
 
 		if s.IsSequenceStart() {
 			sequences = append(sequences, sequence{
-				ns:              s.Namespace(),
-				shareVersion:    s.Version(),
-				startShareIndex: shareIdx,
-				data:            s.RawData(), // todo: remove all fields except this
-				sequenceLen:     s.SequenceLen(),
-				signer:          share.GetSigner(s),
+				ns:            s.Namespace(),
+				shareVersion:  s.Version(),
+				startShareIdx: shareIdx,
+				endShareIdx:   shareIdx,
+				data:          s.RawData(),
+				sequenceLen:   s.SequenceLen(),
+				signer:        share.GetSigner(s),
 			})
 		} else {
 			if len(sequences) == 0 {
@@ -185,9 +187,10 @@ func GetBlobShareIdxs(
 			}
 			prev := &sequences[len(sequences)-1]
 			prev.data = append(prev.data, s.RawData()...)
+			prev.endShareIdx = shareIdx
 		}
 	}
-	for i, seq := range sequences {
+	for _, seq := range sequences {
 		seq.data = seq.data[:seq.sequenceLen]
 		blob, err := share.NewBlob(seq.ns, seq.data, seq.shareVersion, seq.signer)
 		if err != nil {
@@ -198,11 +201,7 @@ func GetBlobShareIdxs(
 			return 0, 0, err
 		}
 		if base64.StdEncoding.EncodeToString(commitment) == b64commitment {
-			if i == (len(sequences))-1 { // last sequence element
-				return seq.startShareIndex, seq.startShareIndex, err
-			}
-
-			return nsStartIdx + seq.startShareIndex, nsStartIdx + sequences[i+1].startShareIndex - 1, err
+			return nsStartIdx + seq.startShareIdx, nsStartIdx + seq.endShareIdx + 1, err
 		}
 	}
 	return 0, 0, err
