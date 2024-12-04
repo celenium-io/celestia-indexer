@@ -8,19 +8,17 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"github.com/celestiaorg/celestia-app/v3/pkg/appconsts"
-	"github.com/celestiaorg/celestia-app/v3/pkg/da"
-	"github.com/celestiaorg/go-square/shares"
 	"net/http"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/celestiaorg/go-square/v2"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/node"
-	"github.com/celestiaorg/go-square/square"
 	"github.com/labstack/echo/v4"
 )
 
@@ -774,37 +772,12 @@ func (handler *NamespaceHandler) BlobProofs(c echo.Context) error {
 		return internalServerError(c, err)
 	}
 
-	eds, err := da.ExtendShares(shares.ToBytes(dataSquare))
+	startBlobIndex, endBlobIndex, err := responses.GetBlobShareIndexes(dataSquare, req.Hash, req.Commitment)
 	if err != nil {
 		return internalServerError(c, err)
 	}
 
-	ods, err := responses.NewODS(eds)
-	if err != nil {
-		return internalServerError(c, err)
-	}
-
-	namespaceOds, err := ods.FindODSByNamespace(req.Hash)
-	if err != nil {
-		return internalServerError(c, err)
-	}
-
-	namespaceShares, err := responses.GetNamespaceShares(eds, namespaceOds.From, namespaceOds.To)
-	if err != nil {
-		return internalServerError(c, err)
-	}
-
-	startBlobIdx, endBlobIdx, err := responses.GetBlobShareIdxs(
-		namespaceShares,
-		namespaceOds.From,
-		eds.Width()/2,
-		req.Commitment,
-	)
-	if err != nil {
-		return internalServerError(c, err)
-	}
-
-	proofs, err := handler.node.BlobProofs(c.Request().Context(), req.Height, startBlobIdx, endBlobIdx)
+	proofs, err := handler.node.BlobProofs(c.Request().Context(), req.Height, startBlobIndex, endBlobIndex)
 	if err != nil {
 		return handleError(c, err, handler.namespace)
 	}
