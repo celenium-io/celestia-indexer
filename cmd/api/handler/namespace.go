@@ -8,6 +8,8 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"github.com/celestiaorg/celestia-app/v3/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v3/pkg/da"
+	"github.com/celestiaorg/go-square/v2/share"
 	"net/http"
 	"time"
 
@@ -19,6 +21,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/node"
+	"github.com/celestiaorg/celestia-app/v3/pkg/proof"
 	"github.com/labstack/echo/v4"
 )
 
@@ -776,10 +779,30 @@ func (handler *NamespaceHandler) BlobProofs(c echo.Context) error {
 	if err != nil {
 		return internalServerError(c, err)
 	}
+	blobSharesRange := share.Range{
+		Start: startBlobIndex,
+		End:   endBlobIndex,
+	}
 
-	proofs, err := handler.node.BlobProofs(c.Request().Context(), req.Height, startBlobIndex, endBlobIndex)
+	eds, err := da.ExtendShares(share.ToBytes(dataSquare))
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	namespaceBytes, err := base64.StdEncoding.DecodeString(req.Hash)
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	namespace, err := share.NewNamespaceFromBytes(namespaceBytes)
+	if err != nil {
+		return internalServerError(c, err)
+	}
+
+	proofs, err := proof.NewShareInclusionProofFromEDS(eds, namespace, blobSharesRange)
 	if err != nil {
 		return handleError(c, err, handler.namespace)
 	}
-	return c.JSON(http.StatusOK, proofs)
+
+	return c.JSON(http.StatusOK, proofs.ShareProofs)
 }
