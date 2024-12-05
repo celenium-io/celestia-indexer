@@ -354,13 +354,23 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		panic(err)
 	}
 
-	namespaceHandlers := handler.NewNamespaceHandler(db.Namespace, db.BlobLogs, db.Rollup, db.Address, db.State, cfg.Indexer.Name, blobReceiver)
+	namespaceHandlers := handler.NewNamespaceHandler(
+		db.Namespace,
+		db.BlobLogs,
+		db.Rollup,
+		db.Address,
+		db.State,
+		cfg.Indexer.Name,
+		blobReceiver,
+		&node,
+	)
 
 	blobGroup := v1.Group("/blob")
 	{
 		blobGroup.GET("", namespaceHandlers.Blobs)
 		blobGroup.POST("", namespaceHandlers.Blob)
 		blobGroup.POST("/metadata", namespaceHandlers.BlobMetadata)
+		blobGroup.POST("/proofs", namespaceHandlers.BlobProofs)
 	}
 
 	namespaceGroup := v1.Group("/namespace")

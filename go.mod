@@ -14,7 +14,7 @@ require (
 	github.com/aws/smithy-go v1.20.2
 	github.com/celestiaorg/celestia-app/v3 v3.0.0-mocha
 	github.com/celestiaorg/go-square v1.1.1
-	github.com/celestiaorg/go-square/v2 v2.0.0
+	github.com/celestiaorg/go-square/v2 v2.1.0
 	github.com/celestiaorg/rsmt2d v0.14.0
 	github.com/cespare/xxhash v1.1.0
 	github.com/cosmos/cosmos-sdk v0.46.16

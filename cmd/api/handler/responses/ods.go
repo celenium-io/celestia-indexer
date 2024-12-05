@@ -4,10 +4,17 @@
 package responses
 
 import (
+	"bytes"
 	"encoding/base64"
-
+	"github.com/celestiaorg/celestia-app/v3/pkg/appconsts"
 	"github.com/celestiaorg/go-square/namespace"
 	"github.com/celestiaorg/go-square/shares"
+	"github.com/celestiaorg/go-square/v2/inclusion"
+	"github.com/celestiaorg/go-square/v2/share"
+	"github.com/pkg/errors"
+	"github.com/tendermint/tendermint/crypto/merkle"
+
+	_ "github.com/celestiaorg/go-square/v2/share"
 	"github.com/celestiaorg/rsmt2d"
 )
 
@@ -87,4 +94,78 @@ func getNamespaceType(ns namespace.Namespace) NamespaceKind {
 	default:
 		return DefaultNamespace
 	}
+}
+
+type sequence struct {
+	ns            share.Namespace
+	shareVersion  uint8
+	startShareIdx int
+	endShareIdx   int
+	data          []byte
+	sequenceLen   uint32
+	signer        []byte
+}
+
+func GetBlobShareIndexes(
+	shares []share.Share,
+	base64namespace string,
+	base64commitment string,
+) (blobStartIndex, blobEndIndex int, err error) {
+	if len(shares) == 0 {
+		return 0, 0, errors.New("invalid shares length")
+
+	}
+	sequences := make([]sequence, 0)
+	namespaceBytes, err := base64.StdEncoding.DecodeString(base64namespace)
+	if err != nil {
+		return 0, 0, errors.Wrap(err, "decoding base64 namespace")
+	}
+
+	for shareIndex, s := range shares {
+		if !(s.Version() <= 1) {
+			return 0, 0, errors.New("unsupported share version")
+		}
+
+		if s.IsPadding() {
+			continue
+		}
+
+		if !bytes.Equal(s.Namespace().Bytes(), namespaceBytes) {
+			continue
+		}
+
+		if s.IsSequenceStart() {
+			sequences = append(sequences, sequence{
+				ns:            s.Namespace(),
+				shareVersion:  s.Version(),
+				startShareIdx: shareIndex,
+				endShareIdx:   shareIndex,
+				data:          s.RawData(),
+				sequenceLen:   s.SequenceLen(),
+				signer:        share.GetSigner(s),
+			})
+		} else {
+			if len(sequences) == 0 {
+				return 0, 0, errors.New("continuation share without a s start share")
+			}
+			prev := &sequences[len(sequences)-1]
+			prev.data = append(prev.data, s.RawData()...)
+			prev.endShareIdx = shareIndex
+		}
+	}
+	for _, s := range sequences {
+		s.data = s.data[:s.sequenceLen]
+		blob, err := share.NewBlob(s.ns, s.data, s.shareVersion, s.signer)
+		if err != nil {
+			return 0, 0, errors.Wrap(err, "creating blob")
+		}
+		commitment, err := inclusion.CreateCommitment(blob, merkle.HashFromByteSlices, appconsts.SubtreeRootThreshold(0))
+		if err != nil {
+			return 0, 0, errors.Wrap(err, "creating commitment")
+		}
+		if base64.StdEncoding.EncodeToString(commitment) == base64commitment {
+			return s.startShareIdx, s.endShareIdx + 1, err
+		}
+	}
+	return 0, 0, err
 }
