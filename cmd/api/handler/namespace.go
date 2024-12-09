@@ -804,5 +804,5 @@ func (handler *NamespaceHandler) BlobProofs(c echo.Context) error {
 		return handleError(c, err, handler.namespace)
 	}
 
-	return c.JSON(http.StatusOK, proofs.ShareProofs)
+	return c.JSON(http.StatusOK, responses.NewProofs(proofs.ShareProofs))
 }
