@@ -9,8 +9,8 @@ import (
 )
 
 type BlobProof struct {
-	Start int32    `example:"0" format:"integer" json:"start" swaggertype:"integer"`
-	End   int32    `example:"16" format:"integer" json:"end" swaggertype:"integer"`
+	Start int32    `example:"0"  format:"integer" json:"start" swaggertype:"integer"`
+	End   int32    `example:"16" format:"integer" json:"end"   swaggertype:"integer"`
 	Nodes []string `json:"nodes"`
 }
 
