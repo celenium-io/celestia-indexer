@@ -109,6 +109,10 @@ func (module *Module) parse(genesis types.Genesis) (parsedData, error) {
 		block.Txs = append(block.Txs, tx)
 	}
 
+	for _, addr := range decodeCtx.GetAddresses() {
+		data.addresses[addr.String()] = addr
+	}
+
 	module.parseDenomMetadata(genesis.AppState.Bank.DenomMetadata, &data)
 	module.parseConstants(genesis.AppState, genesis.ConsensusParams, &data)
 
@@ -187,13 +191,15 @@ func (module *Module) parseAccounts(accounts []types.Accounts, block storage.Blo
 			return errors.Errorf("unknown account type: %s", accounts[i].Type)
 		}
 
-		_, hash, err := pkgTypes.Address(readableAddress).Decode()
-		if err != nil {
-			return err
+		if _, ok := data.addresses[readableAddress]; !ok {
+			_, hash, err := pkgTypes.Address(readableAddress).Decode()
+			if err != nil {
+				return err
+			}
+			address.Hash = hash
+			address.Address = readableAddress
+			data.addresses[address.String()] = &address
 		}
-		address.Hash = hash
-		address.Address = readableAddress
-		data.addresses[address.String()] = &address
 	}
 	return nil
 }
