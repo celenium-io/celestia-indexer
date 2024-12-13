@@ -9,6 +9,7 @@
   category: finance
   stack: OP Stack
   type: settled
+  defi_lama: defi
 - id: 2
   name: Rollup 2
   description: The second
@@ -20,6 +21,7 @@
   category: gaming
   stack: OP Stack
   type: settled
+  defi_lama: lama
 - id: 3
   name: Rollup 3
   description: The third
@@ -31,3 +33,4 @@
   category: nft
   stack: Custom Stack
   type: sovereign
+  defi_lama: name
