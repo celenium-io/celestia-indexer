@@ -93,7 +93,8 @@ func (r Rollup) IsEmpty() bool {
 		r.Compression == "" &&
 		r.Provider == "" &&
 		r.Type == "" &&
-		r.VM == ""
+		r.VM == "" &&
+		r.DeFiLama == ""
 }
 
 type RollupWithStats struct {
