@@ -45,6 +45,7 @@ type createRollupRequest struct {
 	Twitter     string           `json:"twitter"     validate:"omitempty,url"`
 	Logo        string           `json:"logo"        validate:"omitempty,url"`
 	L2Beat      string           `json:"l2_beat"     validate:"omitempty,url"`
+	DeFiLama    string           `json:"defi_lama"   validate:"omitempty"`
 	Bridge      string           `json:"bridge"      validate:"omitempty,eth_addr"`
 	Explorer    string           `json:"explorer"    validate:"omitempty,url"`
 	Stack       string           `json:"stack"       validate:"omitempty"`
@@ -89,6 +90,7 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRo
 		Twitter:        req.Twitter,
 		Logo:           req.Logo,
 		L2Beat:         req.L2Beat,
+		DeFiLama:       req.DeFiLama,
 		Explorer:       req.Explorer,
 		BridgeContract: req.Bridge,
 		Stack:          req.Stack,
@@ -159,6 +161,7 @@ type updateRollupRequest struct {
 	Twitter     string           `json:"twitter"     validate:"omitempty,url"`
 	Logo        string           `json:"logo"        validate:"omitempty,url"`
 	L2Beat      string           `json:"l2_beat"     validate:"omitempty,url"`
+	DeFiLama    string           `json:"defi_lama"   validate:"omitempty"`
 	Bridge      string           `json:"bridge"      validate:"omitempty,eth_addr"`
 	Explorer    string           `json:"explorer"    validate:"omitempty,url"`
 	Stack       string           `json:"stack"       validate:"omitempty"`
@@ -204,6 +207,7 @@ func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRo
 		Twitter:        req.Twitter,
 		Logo:           req.Logo,
 		L2Beat:         req.L2Beat,
+		DeFiLama:       req.DeFiLama,
 		Explorer:       req.Explorer,
 		BridgeContract: req.Bridge,
 		Stack:          req.Stack,
