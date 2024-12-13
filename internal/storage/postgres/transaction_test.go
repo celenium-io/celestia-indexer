@@ -757,6 +757,7 @@ func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 	s.Require().Greater(rollup.Id, uint64(0))
 
 	rollup.GitHub = "https://github.com/rollup2"
+	rollup.DeFiLama = "test"
 	err = tx.UpdateRollup(ctx, rollup)
 	s.Require().NoError(err)
 
@@ -774,6 +775,7 @@ func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 	s.Require().EqualValues(testLink, newRollup.L2Beat)
 	s.Require().EqualValues(testLink, newRollup.Explorer)
 	s.Require().EqualValues(testLink, newRollup.BridgeContract)
+	s.Require().EqualValues("test", newRollup.DeFiLama)
 	s.Require().EqualValues("stack", newRollup.Stack)
 	s.Require().Len(newRollup.Links, 1)
 
