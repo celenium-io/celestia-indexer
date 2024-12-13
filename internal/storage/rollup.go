@@ -59,6 +59,7 @@ type Rollup struct {
 	Slug           string               `bun:"slug,unique:rollup_slug"       comment:"Rollup slug"`
 	BridgeContract string               `bun:"bridge_contract"               comment:"Link to bridge contract"`
 	L2Beat         string               `bun:"l2_beat"                       comment:"Link to L2 Beat"`
+	DeFiLama       string               `bun:"defi_lama"                     comment:"DeFi Lama chain name"`
 	Explorer       string               `bun:"explorer"                      comment:"Link to chain explorer"`
 	Stack          string               `bun:"stack"                         comment:"Underlaying stack"`
 	Compression    string               `bun:"compression"                   comment:"Compression"`
