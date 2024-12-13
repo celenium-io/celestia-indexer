@@ -350,6 +350,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 		if _, err := tx.NewCreateIndex().
 			IfNotExists().
 			Model((*storage.StakingLog)(nil)).
+			Index("staking_log_address_id_idx").
+			Column("address_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.StakingLog)(nil)).
 			Index("staking_log_height_idx").
 			Column("height").
 			Using("BRIN").
