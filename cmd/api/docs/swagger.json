@@ -1248,6 +1248,47 @@
                 }
             }
         },
+        "/blob/proofs": {
+            "get": {
+                "description": "Returns blob inclusion proofs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "namespace"
+                ],
+                "summary": "Get blob inclusion proofs",
+                "operationId": "get-blob-proof",
+                "parameters": [
+                    {
+                        "description": "Request body containing height, commitment and namespace hash",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.postBlobRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.BlobLog"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/block": {
             "get": {
                 "description": "List blocks info",
@@ -6259,6 +6300,11 @@
                     "format": "string",
                     "example": "zip"
                 },
+                "defi_lama": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Manta"
+                },
                 "description": {
                     "type": "string",
                     "format": "string",
@@ -6465,6 +6511,11 @@
                     "format": "string",
                     "example": "zip"
                 },
+                "defi_lama": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Manta"
+                },
                 "description": {
                     "type": "string",
                     "format": "string",
@@ -6599,6 +6650,11 @@
                     "type": "string",
                     "format": "string",
                     "example": "zip"
+                },
+                "defi_lama": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Manta"
                 },
                 "description": {
                     "type": "string",

@@ -20,6 +20,7 @@ type RollupWithStats struct {
 	Logo           string `example:"https://some_link.com/image.png"           format:"string"  json:"logo,omitempty"        swaggertype:"string"`
 	Slug           string `example:"rollup_slug"                               format:"string"  json:"slug"                  swaggertype:"string"`
 	L2Beat         string `example:"https://l2beat.com/scaling/projects/karak" format:"string"  json:"l2_beat,omitempty"     swaggertype:"string"`
+	DeFiLama       string `example:"Manta"                                     format:"string"  json:"defi_lama,omitempty"   swaggertype:"string"`
 	Explorer       string `example:"https://explorer.karak.network/"           format:"string"  json:"explorer,omitempty"    swaggertype:"string"`
 	BridgeContract string `example:"https://github.com/account"                format:"string"  json:"bridge,omitempty"      swaggertype:"string"`
 	Stack          string `example:"op_stack"                                  format:"string"  json:"stack,omitempty"       swaggertype:"string"`
@@ -51,6 +52,7 @@ func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 		Website:        r.Website,
 		Logo:           r.Logo,
 		L2Beat:         r.L2Beat,
+		DeFiLama:       r.DeFiLama,
 		Explorer:       r.Explorer,
 		BridgeContract: r.BridgeContract,
 		Links:          r.Links,
@@ -82,6 +84,7 @@ type Rollup struct {
 	Logo           string `example:"https://some_link.com/image.png" format:"string"  json:"logo,omitempty"        swaggertype:"string"`
 	Slug           string `example:"rollup_slug"                     format:"string"  json:"slug"                  swaggertype:"string"`
 	L2Beat         string `example:"https://github.com/account"      format:"string"  json:"l2_beat,omitempty"     swaggertype:"string"`
+	DeFiLama       string `example:"Manta"                           format:"string"  json:"defi_lama,omitempty"   swaggertype:"string"`
 	Explorer       string `example:"https://explorer.karak.network/" format:"string"  json:"explorer,omitempty"    swaggertype:"string"`
 	BridgeContract string `example:"https://github.com/account"      format:"string"  json:"bridge,omitempty"      swaggertype:"string"`
 	Stack          string `example:"op_stack"                        format:"string"  json:"stack,omitempty"       swaggertype:"string"`
@@ -105,6 +108,7 @@ func NewRollup(r *storage.Rollup) Rollup {
 		Logo:           r.Logo,
 		Slug:           r.Slug,
 		L2Beat:         r.L2Beat,
+		DeFiLama:       r.DeFiLama,
 		BridgeContract: r.BridgeContract,
 		Stack:          r.Stack,
 		Explorer:       r.Explorer,
@@ -146,6 +150,7 @@ type RollupWithDayStats struct {
 	Logo           string `example:"https://some_link.com/image.png"           format:"string"  json:"logo,omitempty"        swaggertype:"string"`
 	Slug           string `example:"rollup_slug"                               format:"string"  json:"slug"                  swaggertype:"string"`
 	L2Beat         string `example:"https://l2beat.com/scaling/projects/karak" format:"string"  json:"l2_beat,omitempty"     swaggertype:"string"`
+	DeFiLama       string `example:"Manta"                                     format:"string"  json:"defi_lama,omitempty"   swaggertype:"string"`
 	Explorer       string `example:"https://explorer.karak.network/"           format:"string"  json:"explorer,omitempty"    swaggertype:"string"`
 	BridgeContract string `example:"https://github.com/account"                format:"string"  json:"bridge,omitempty"      swaggertype:"string"`
 	Stack          string `example:"op_stack"                                  format:"string"  json:"stack,omitempty"       swaggertype:"string"`
@@ -177,6 +182,7 @@ func NewRollupWithDayStats(r storage.RollupWithDayStats) RollupWithDayStats {
 		Website:        r.Website,
 		Logo:           r.Logo,
 		L2Beat:         r.L2Beat,
+		DeFiLama:       r.DeFiLama,
 		Explorer:       r.Explorer,
 		BridgeContract: r.BridgeContract,
 		Stack:          r.Stack,
