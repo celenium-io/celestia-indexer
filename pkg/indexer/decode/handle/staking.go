@@ -74,6 +74,7 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 		if err := ctx.AddAddress(&address); err != nil {
 			return msgType, nil, err
 		}
+		addresses[0].Balance = address.Balance
 
 		ctx.AddDelegation(storage.Delegation{
 			Address:   &address,

@@ -243,6 +243,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 			},
 		},
 	}
+	addressesExpected[0].Balance.Delegated = decimal.RequireFromString("1")
 
 	expectedValidators := map[string]*storage.Validator{
 		"celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x": {
