@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
-	"github.com/celenium-io/celestia-indexer/cmd/api/cache"
 	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
@@ -557,8 +556,7 @@ func initSentry(e *echo.Echo, db postgres.Storage, dsn, environment string) erro
 }
 
 var (
-	wsManager     *websocket.Manager
-	endpointCache *cache.ObservableCache
+	wsManager *websocket.Manager
 )
 
 func initWebsocket(ctx context.Context, group *echo.Group) {
@@ -569,15 +567,6 @@ func initWebsocket(ctx context.Context, group *echo.Group) {
 	}
 	wsManager.Start(ctx)
 	group.GET("/ws", wsManager.Handle)
-}
-
-func initObservableCache(ctx context.Context, e *echo.Echo) {
-	observer := dispatcher.Observe(storage.ChannelHead)
-	endpointCache = cache.NewObservableCache(cache.Config{
-		MaxEntitiesCount: 1000,
-	}, observer)
-	e.Use(cache.Middleware(endpointCache, observableCacheSkipper))
-	endpointCache.Start(ctx)
 }
 
 var gasTracker *gas.Tracker
