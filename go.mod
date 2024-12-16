@@ -6,7 +6,7 @@ require (
 	cosmossdk.io/errors v1.0.1
 	cosmossdk.io/math v1.4.0
 	github.com/MarceloPetrucio/go-scalar-api-reference v0.0.0-20240521013641-ce5d2efe0e06
-	github.com/andybalholm/brotli v1.0.5
+	github.com/andybalholm/brotli v1.1.0
 	github.com/aws/aws-sdk-go-v2 v1.26.1
 	github.com/aws/aws-sdk-go-v2/config v1.27.11
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.11
@@ -25,7 +25,7 @@ require (
 	github.com/elastic/go-freelru v0.15.0
 	github.com/fatih/structs v1.1.0
 	github.com/gabriel-vasile/mimetype v1.4.3
-	github.com/getsentry/sentry-go v0.27.0
+	github.com/getsentry/sentry-go v0.30.0
 	github.com/getsentry/sentry-go/otel v0.27.0
 	github.com/go-playground/validator/v10 v10.18.0
 	github.com/go-testfixtures/testfixtures/v3 v3.9.0
@@ -189,7 +189,6 @@ require (
 	github.com/manifoldco/promptui v0.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20210601165009-122bf33a46e0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
