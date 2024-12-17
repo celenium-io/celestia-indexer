@@ -118,7 +118,7 @@ func TestRoutes(t *testing.T) {
 		BlobReceiver: "dal_node",
 	}
 
-	e := initEcho(apiCfg, db, "development")
+	e := initEcho(apiCfg, "development")
 	defer func() {
 		err := e.Close()
 		require.NoError(t, err)

@@ -26,7 +26,6 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/getsentry/sentry-go v0.30.0
-	github.com/getsentry/sentry-go/otel v0.27.0
 	github.com/go-playground/validator/v10 v10.18.0
 	github.com/go-testfixtures/testfixtures/v3 v3.9.0
 	github.com/goccy/go-json v0.10.3
@@ -48,7 +47,6 @@ require (
 	github.com/uptrace/bun/driver/pgdriver v1.1.17
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	go.opentelemetry.io/otel v1.30.0
-	go.opentelemetry.io/otel/sdk v1.30.0
 	go.opentelemetry.io/otel/trace v1.30.0
 	go.uber.org/mock v0.2.0
 	golang.org/x/exp v0.0.0-20240904232852-e7e105dedf7e
