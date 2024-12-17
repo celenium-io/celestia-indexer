@@ -25,7 +25,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/node/rpc"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/getsentry/sentry-go"
-	sentryotel "github.com/getsentry/sentry-go/otel"
 	"github.com/grafana/pyroscope-go"
 	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
@@ -33,8 +32,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"go.opentelemetry.io/otel"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"golang.org/x/time/rate"
 
 	"github.com/MarceloPetrucio/go-scalar-api-reference"
@@ -155,7 +152,7 @@ func observableCacheSkipper(c echo.Context) bool {
 	return false
 }
 
-func initEcho(cfg ApiConfig, db postgres.Storage, env string) *echo.Echo {
+func initEcho(cfg ApiConfig, env string) *echo.Echo {
 	e := echo.New()
 	e.Validator = handler.NewCelestiaApiValidator()
 
@@ -238,7 +235,7 @@ func initEcho(cfg ApiConfig, db postgres.Storage, env string) *echo.Echo {
 
 	}
 
-	if err := initSentry(e, db, cfg.SentryDsn, env); err != nil {
+	if err := initSentry(e, cfg.SentryDsn, env); err != nil {
 		log.Err(err).Msg("sentry")
 	}
 	e.Server.IdleTimeout = time.Second * 30
@@ -522,7 +519,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	}
 }
 
-func initSentry(e *echo.Echo, db postgres.Storage, dsn, environment string) error {
+func initSentry(e *echo.Echo, dsn, environment string) error {
 	if dsn == "" {
 		return nil
 	}
@@ -540,14 +537,6 @@ func initSentry(e *echo.Echo, db postgres.Storage, dsn, environment string) erro
 	}); err != nil {
 		return errors.Wrap(err, "initialization")
 	}
-
-	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithSpanProcessor(sentryotel.NewSentrySpanProcessor()),
-	)
-	otel.SetTracerProvider(tp)
-	otel.SetTextMapPropagator(sentryotel.NewSentryPropagator())
-
-	db.SetTracer(tp)
 
 	e.Use(SentryMiddleware())
 
