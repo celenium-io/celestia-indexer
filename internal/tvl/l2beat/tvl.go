@@ -1,11 +1,17 @@
+// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
+// SPDX-License-Identifier: MIT
+
 package l2beat
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 )
 
 type Data struct {
-	JSON [][]interface{} `json:"json"`
+	Json [][]interface{} `json:"json"`
 }
 
 type Result struct {
@@ -16,9 +22,8 @@ type TVLResponse []struct {
 	Result Result `json:"result"`
 }
 
-type TVLArgs struct {
-	Batch int64    `json:"batch"`
-	Input JsonData `json:"input"`
+type RequestData map[string]struct {
+	Json JsonData `json:"json"`
 }
 
 type JsonData struct {
@@ -32,9 +37,29 @@ type Filter struct {
 	ProjectIds []string `json:"projectIds"`
 }
 
-func (api API) TVL(ctx context.Context, arguments *TVLArgs) (result TVLResponse, err error) {
-	// TODO: cast args to query params
-	args := map[string]string{}
+func (api API) TVL(ctx context.Context, rollupName string, timeframe storage.TvlTimeframe) (result TVLResponse, err error) {
+	data := RequestData{
+		"0": {
+			JsonData{
+				Filter: Filter{
+					Type:       "projects",
+					ProjectIds: []string{rollupName},
+				},
+				Range:                   string(timeframe),
+				ExcludeAssociatedTokens: false,
+			},
+		},
+	}
+
+	var dataString, err1 = json.Marshal(data)
+	if err1 != nil {
+		return nil, fmt.Errorf("serialization error: %v", err)
+	}
+
+	args := make(map[string]string)
+	args["batch"] = "1"
+	args["input"] = string(dataString)
+
 	err = api.get(ctx, "trpc/tvl.chart", args, &result)
 	return
 }

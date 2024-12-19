@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
+// SPDX-License-Identifier: MIT
+
 package lama
 
 import (
@@ -10,12 +13,8 @@ type TVLResponse struct {
 	TVL  float64 `json:"tvl"`
 }
 
-type TVLArgs struct {
-	Chain string `json:"chain"`
-}
-
-func (api API) TVL(ctx context.Context, arguments *TVLArgs) (result []TVLResponse, err error) {
-	path, err := url.JoinPath("v2/historicalChainTvl", arguments.Chain)
+func (api API) TVL(ctx context.Context, rollupName string) (result []TVLResponse, err error) {
+	path, err := url.JoinPath("v2/historicalChainTvl", rollupName)
 	if err != nil {
 		return nil, err
 	}

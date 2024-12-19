@@ -5,9 +5,8 @@ package main
 
 import (
 	"context"
-	indexer "github.com/celenium-io/celestia-indexer/pkg/tvl"
-	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
-
+	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
+	"github.com/celenium-io/celestia-indexer/pkg/tvl"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"os"
@@ -35,18 +34,33 @@ func main() {
 	notifyCtx, notifyCancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	defer notifyCancel()
 
-	stopperModule := stopper.NewModule(cancel)
-	indexerModule, err := indexer.New(ctx, *cfg, &stopperModule)
-	if err != nil {
-		log.Panic().Err(err).Msg("error during indexer module creation")
+	l2beatDs, ok := cfg.DataSources["l2beat"]
+	if !ok {
+		log.Panic().Err(err).Msg("can't find l2beat data source")
 		return
 	}
 
-	stopperModule.Start(ctx)
-	indexerModule.Start(ctx)
+	lamaDs, ok := cfg.DataSources["lama"]
+	if !ok {
+		log.Panic().Err(err).Msg("can't find lama data source")
+		return
+	}
+
+	pg, err := postgres.Create(ctx, cfg.Database, cfg.Indexer.ScriptsDir, false)
+	if err != nil {
+		log.Panic().Err(err).Msg("can't create database connection")
+		return
+	}
+
+	module := tvl.New(l2beatDs, lamaDs, pg.Rollup, pg.Tvl)
+	module.Start(ctx)
 
 	<-notifyCtx.Done()
 	cancel()
+
+	if err := module.Close(); err != nil {
+		log.Panic().Err(err).Msg("stopping TVL scanner")
+	}
 
 	log.Info().Msg("stopped")
 }
