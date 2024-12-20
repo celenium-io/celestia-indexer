@@ -23,6 +23,7 @@ const (
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type ITvl interface {
 	Save(ctx context.Context, rollupTvl *Tvl) error
+	SaveBulk(ctx context.Context, tvls ...*Tvl) error
 }
 
 // Tvl -

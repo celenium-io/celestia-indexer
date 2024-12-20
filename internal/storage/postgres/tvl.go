@@ -21,10 +21,18 @@ func NewTvl(db *database.Bun) *Tvl {
 	}
 }
 
-func (p *Tvl) Save(ctx context.Context, tvl *storage.Tvl) error {
+func (t *Tvl) Save(ctx context.Context, tvl *storage.Tvl) error {
 	if tvl == nil {
 		return nil
 	}
-	_, err := p.db.DB().NewInsert().Model(tvl).Exec(ctx)
+	_, err := t.db.DB().NewInsert().Model(tvl).Exec(ctx)
+	return err
+}
+
+func (t *Tvl) SaveBulk(ctx context.Context, tvls ...*storage.Tvl) error {
+	if len(tvls) == 0 {
+		return nil
+	}
+	_, err := t.db.DB().NewInsert().Model(&tvls).Exec(ctx)
 	return err
 }

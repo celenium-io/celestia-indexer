@@ -68,22 +68,26 @@ func (m *Module) getTvl(ctx context.Context, timeframe storage.TvlTimeframe) {
 			}
 
 			rollupProject := url[lastIndex+1:]
-			tvl, err := m.rollupTvlFromL2Beat(ctx, rollupProject, storage.TvlTimeframeMax)
+			tvl, err := m.rollupTvlFromL2Beat(ctx, rollupProject, timeframe)
 			if err != nil {
 				m.Log.Err(err).Msg("receiving TVL from L2Beat")
 			}
 
-			for _, t := range tvl[0].Result.Data.Json {
+			tvlResponse := tvl[0].Result.Data.Json
+			tvlModels := make([]*storage.Tvl, 0, len(tvlResponse))
+			for _, t := range tvlResponse {
 				rollupTvl := t[1].(float64) + t[2].(float64) + t[3].(float64)
 				tsTvl := int64(t[0].(float64))
-				if err := m.tvl.Save(ctx, &storage.Tvl{
+				tvlModels = append(tvlModels, &storage.Tvl{
 					Value:    rollupTvl,
 					Time:     time.Unix(tsTvl, 0),
 					Rollup:   rollups[i],
 					RollupId: rollups[i].Id,
-				}); err != nil {
-					m.Log.Err(err).Msg("saving tvl")
-				}
+				})
+			}
+
+			if err := m.tvl.SaveBulk(ctx, tvlModels...); err != nil {
+				m.Log.Err(err).Msg("saving tvls")
 			}
 
 			continue
@@ -95,15 +99,18 @@ func (m *Module) getTvl(ctx context.Context, timeframe storage.TvlTimeframe) {
 				m.Log.Err(err).Msg("receiving TVL from DeFi Lama")
 			}
 
+			tvlModels := make([]*storage.Tvl, 0, len(tvl))
 			for _, t := range tvl {
-				if err := m.tvl.Save(ctx, &storage.Tvl{
+				tvlModels = append(tvlModels, &storage.Tvl{
 					Value:    t.TVL,
 					Time:     time.Unix(t.Date, 0),
 					Rollup:   rollups[i],
 					RollupId: rollups[i].Id,
-				}); err != nil {
-					m.Log.Err(err).Msg("saving tvl")
-				}
+				})
+			}
+
+			if err := m.tvl.SaveBulk(ctx, tvlModels...); err != nil {
+				m.Log.Err(err).Msg("saving tvls")
 			}
 
 			continue
