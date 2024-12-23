@@ -20,6 +20,10 @@ const (
 	rollupLimit = 100
 )
 
+var (
+	syncTimestamp = time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
+)
+
 type Module struct {
 	modules.BaseModule
 	l2beatApi l2beat.IApi
@@ -56,6 +60,7 @@ func (m *Module) getTvl(ctx context.Context, timeframe storage.TvlTimeframe) {
 	rollups, err := m.rollup.List(ctx, rollupLimit, 0, strg.SortOrderAsc)
 	if err != nil {
 		m.Log.Err(err).Msg("receiving rollups")
+		return
 	}
 
 	for i := range rollups {
@@ -64,63 +69,85 @@ func (m *Module) getTvl(ctx context.Context, timeframe storage.TvlTimeframe) {
 			lastIndex := strings.LastIndex(url, "/")
 
 			if lastIndex == -1 {
-				return
+				continue
 			}
 
 			rollupProject := url[lastIndex+1:]
 			tvl, err := m.rollupTvlFromL2Beat(ctx, rollupProject, timeframe)
 			if err != nil {
 				m.Log.Err(err).Msg("receiving TVL from L2Beat")
+				continue
 			}
 
 			tvlResponse := tvl[0].Result.Data.Json
-			tvlModels := make([]*storage.Tvl, 0, len(tvlResponse))
+			tvlModels := make([]*storage.Tvl, 0)
 			for _, t := range tvlResponse {
 				rollupTvl := t[1].(float64) + t[2].(float64) + t[3].(float64)
-				tsTvl := int64(t[0].(float64))
-				tvlModels = append(tvlModels, &storage.Tvl{
-					Value:    rollupTvl,
-					Time:     time.Unix(tsTvl, 0),
-					Rollup:   rollups[i],
-					RollupId: rollups[i].Id,
-				})
+				tvlTs := time.Unix(int64(t[0].(float64)), 0)
+				if tvlTs.After(syncTimestamp) {
+					tvlModels = append(tvlModels, &storage.Tvl{
+						Value:    rollupTvl,
+						Time:     tvlTs,
+						Rollup:   rollups[i],
+						RollupId: rollups[i].Id,
+					})
+				}
+			}
+
+			if len(tvlModels) == 0 {
+				continue
 			}
 
 			if err := m.tvl.SaveBulk(ctx, tvlModels...); err != nil {
 				m.Log.Err(err).Msg("saving tvls")
 			}
-
-			continue
 		}
 
 		if len(rollups[i].DeFiLama) > 0 {
 			tvl, err := m.rollupTvlFromLama(ctx, rollups[i].DeFiLama)
 			if err != nil {
 				m.Log.Err(err).Msg("receiving TVL from DeFi Lama")
+				continue
 			}
 
-			tvlModels := make([]*storage.Tvl, 0, len(tvl))
+			tvlModels := make([]*storage.Tvl, 0)
 			for _, t := range tvl {
-				tvlModels = append(tvlModels, &storage.Tvl{
-					Value:    t.TVL,
-					Time:     time.Unix(t.Date, 0),
-					Rollup:   rollups[i],
-					RollupId: rollups[i].Id,
-				})
+				tvlTs := time.Unix(t.Date, 0)
+				if tvlTs.After(syncTimestamp) {
+					tvlModels = append(tvlModels, &storage.Tvl{
+						Value:    t.TVL,
+						Time:     tvlTs,
+						Rollup:   rollups[i],
+						RollupId: rollups[i].Id,
+					})
+				}
+			}
+
+			if len(tvlModels) == 0 {
+				continue
 			}
 
 			if err := m.tvl.SaveBulk(ctx, tvlModels...); err != nil {
 				m.Log.Err(err).Msg("saving tvls")
 			}
-
-			continue
 		}
+	}
+	syncTimestamp, err = m.lastSyncTimeTvl(ctx)
+	if err != nil {
+		m.Log.Err(err).Msg("receiving last sync time for TVL")
 	}
 }
 
 func (m *Module) receive(ctx context.Context) {
+	syncTime, err := m.lastSyncTimeTvl(ctx)
+	if err != nil {
+		m.Log.Err(err).Msg("receiving last sync time for TVL")
+		return
+	}
+
+	syncTimestamp = syncTime
 	m.getTvl(ctx, storage.TvlTimeframeMax)
-	ticker := time.NewTicker(time.Second * 24)
+	ticker := time.NewTicker(time.Hour * 24)
 	defer ticker.Stop()
 
 	for {
@@ -128,7 +155,7 @@ func (m *Module) receive(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			m.getTvl(ctx, storage.TvlTimeframeMonth)
+			m.getTvl(ctx, storage.TvlTimeframe6Month)
 		}
 	}
 }
@@ -143,4 +170,10 @@ func (m *Module) rollupTvlFromL2Beat(ctx context.Context, rollupName string, tim
 	requestTimeout, cancel := context.WithTimeout(ctx, time.Second*10)
 	defer cancel()
 	return m.l2beatApi.TVL(requestTimeout, rollupName, timeframe)
+}
+
+func (m *Module) lastSyncTimeTvl(ctx context.Context) (time.Time, error) {
+	requestTimeout, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+	return m.tvl.LastSyncTime(requestTimeout)
 }

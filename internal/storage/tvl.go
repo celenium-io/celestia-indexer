@@ -22,6 +22,8 @@ const (
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type ITvl interface {
+	LastSyncTime(ctx context.Context) (time.Time, error)
+
 	Save(ctx context.Context, rollupTvl *Tvl) error
 	SaveBulk(ctx context.Context, tvls ...*Tvl) error
 }

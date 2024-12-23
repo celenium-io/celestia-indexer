@@ -7,6 +7,7 @@ import (
 	"context"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
+	"time"
 )
 
 // Tvl -
@@ -35,4 +36,11 @@ func (t *Tvl) SaveBulk(ctx context.Context, tvls ...*storage.Tvl) error {
 	}
 	_, err := t.db.DB().NewInsert().Model(&tvls).Exec(ctx)
 	return err
+}
+
+func (t *Tvl) LastSyncTime(ctx context.Context) (response time.Time, err error) {
+	err = t.db.DB().NewSelect().Model((*storage.Tvl)(nil)).
+		ColumnExpr("MAX(time) AS time").
+		Scan(ctx, &response)
+	return
 }
