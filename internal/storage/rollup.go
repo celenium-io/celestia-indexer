@@ -18,7 +18,7 @@ type LeaderboardFilters struct {
 	Sort      sdk.SortOrder
 	Limit     int
 	Offset    int
-	Category  []types.RollupCategory
+	Tags      []string
 	Type      []types.RollupType
 }
 
@@ -49,25 +49,25 @@ type IRollup interface {
 type Rollup struct {
 	bun.BaseModel `bun:"rollup" comment:"Table with rollups."`
 
-	Id             uint64               `bun:"id,pk,autoincrement"           comment:"Unique internal identity"`
-	Name           string               `bun:"name"                          comment:"Rollup's name"`
-	Description    string               `bun:"description"                   comment:"Rollup's description"`
-	Website        string               `bun:"website"                       comment:"Website"`
-	GitHub         string               `bun:"github"                        comment:"Github repository"`
-	Twitter        string               `bun:"twitter"                       comment:"Twitter account"`
-	Logo           string               `bun:"logo"                          comment:"Link to rollup logo"`
-	Slug           string               `bun:"slug,unique:rollup_slug"       comment:"Rollup slug"`
-	BridgeContract string               `bun:"bridge_contract"               comment:"Link to bridge contract"`
-	L2Beat         string               `bun:"l2_beat"                       comment:"Link to L2 Beat"`
-	DeFiLama       string               `bun:"defi_lama"                     comment:"DeFi Lama chain name"`
-	Explorer       string               `bun:"explorer"                      comment:"Link to chain explorer"`
-	Stack          string               `bun:"stack"                         comment:"Underlaying stack"`
-	Compression    string               `bun:"compression"                   comment:"Compression"`
-	Provider       string               `bun:"provider"                      comment:"RaaS provider"`
-	Type           types.RollupType     `bun:"type,type:rollup_type"         comment:"Type of rollup: settled or sovereign"`
-	Category       types.RollupCategory `bun:"category,type:rollup_category" comment:"Category of rollup"`
-	VM             string               `bun:"vm"                            comment:"Virtual machine"`
-	Links          []string             `bun:"links,array"                   comment:"Other links to rollup related sites"`
+	Id             uint64           `bun:"id,pk,autoincrement"     comment:"Unique internal identity"`
+	Name           string           `bun:"name"                    comment:"Rollup's name"`
+	Description    string           `bun:"description"             comment:"Rollup's description"`
+	Website        string           `bun:"website"                 comment:"Website"`
+	GitHub         string           `bun:"github"                  comment:"Github repository"`
+	Twitter        string           `bun:"twitter"                 comment:"Twitter account"`
+	Logo           string           `bun:"logo"                    comment:"Link to rollup logo"`
+	Slug           string           `bun:"slug,unique:rollup_slug" comment:"Rollup slug"`
+	BridgeContract string           `bun:"bridge_contract"         comment:"Link to bridge contract"`
+	L2Beat         string           `bun:"l2_beat"                 comment:"Link to L2 Beat"`
+	DeFiLama       string           `bun:"defi_lama"               comment:"DeFi Lama chain name"`
+	Explorer       string           `bun:"explorer"                comment:"Link to chain explorer"`
+	Stack          string           `bun:"stack"                   comment:"Underlaying stack"`
+	Compression    string           `bun:"compression"             comment:"Compression"`
+	Provider       string           `bun:"provider"                comment:"RaaS provider"`
+	Type           types.RollupType `bun:"type,type:rollup_type"   comment:"Type of rollup: settled or sovereign"`
+	Tags           []string         `bun:"tags,array"`
+	VM             string           `bun:"vm"                      comment:"Virtual machine"`
+	Links          []string         `bun:"links,array"             comment:"Other links to rollup related sites"`
 
 	Providers []*RollupProvider `bun:"rel:has-many,join:id=rollup_id"`
 }
@@ -89,7 +89,7 @@ func (r Rollup) IsEmpty() bool {
 		r.Explorer == "" &&
 		r.Stack == "" &&
 		r.Links == nil &&
-		r.Category == "" &&
+		r.Tags == nil &&
 		r.Compression == "" &&
 		r.Provider == "" &&
 		r.Type == "" &&

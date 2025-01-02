@@ -33,12 +33,12 @@ func NewRollupHandler(
 }
 
 type rollupList struct {
-	Limit    int         `query:"limit"    validate:"omitempty,min=1,max=100"`
-	Offset   int         `query:"offset"   validate:"omitempty,min=0"`
-	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
-	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=time blobs_count size fee"`
-	Category StringArray `query:"category" validate:"omitempty,dive,category"`
-	Type     StringArray `query:"type"     validate:"omitempty,dive,type"`
+	Limit  int         `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset int         `query:"offset"  validate:"omitempty,min=0"`
+	Sort   string      `query:"sort"    validate:"omitempty,oneof=asc desc"`
+	SortBy string      `query:"sort_by" validate:"omitempty,oneof=time blobs_count size fee"`
+	Tags   StringArray `query:"tags"    validate:"omitempty"`
+	Type   StringArray `query:"type"    validate:"omitempty,dive,type"`
 }
 
 func (p *rollupList) SetDefault() {
@@ -76,11 +76,6 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	categories := make([]types.RollupCategory, len(req.Category))
-	for i := range categories {
-		categories[i] = types.RollupCategory(req.Category[i])
-	}
-
 	rollupTypes := make([]types.RollupType, len(req.Type))
 	for i := range rollupTypes {
 		rollupTypes[i] = types.RollupType(req.Type[i])
@@ -91,7 +86,7 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 		Sort:      pgSort(req.Sort),
 		Limit:     req.Limit,
 		Offset:    req.Offset,
-		Category:  categories,
+		Tags:      req.Tags,
 		Type:      rollupTypes,
 	})
 	if err != nil {
@@ -105,12 +100,12 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 }
 
 type rollupDayList struct {
-	Limit    int         `query:"limit"    validate:"omitempty,min=1,max=100"`
-	Offset   int         `query:"offset"   validate:"omitempty,min=0"`
-	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
-	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=avg_size blobs_count total_size total_fee throughput namespace_count pfb_count mb_price"`
-	Category StringArray `query:"category" validate:"omitempty,dive,category"`
-	Type     StringArray `query:"type"     validate:"omitempty,dive,type"`
+	Limit  int         `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset int         `query:"offset"  validate:"omitempty,min=0"`
+	Sort   string      `query:"sort"    validate:"omitempty,oneof=asc desc"`
+	SortBy string      `query:"sort_by" validate:"omitempty,oneof=avg_size blobs_count total_size total_fee throughput namespace_count pfb_count mb_price"`
+	Tags   StringArray `query:"tags"    validate:"omitempty"`
+	Type   StringArray `query:"type"    validate:"omitempty,dive,type"`
 }
 
 func (p *rollupDayList) SetDefault() {
@@ -148,11 +143,6 @@ func (handler RollupHandler) LeaderboardDay(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	categories := make([]types.RollupCategory, len(req.Category))
-	for i := range categories {
-		categories[i] = types.RollupCategory(req.Category[i])
-	}
-
 	rollupTypes := make([]types.RollupType, len(req.Type))
 	for i := range rollupTypes {
 		rollupTypes[i] = types.RollupType(req.Type[i])
@@ -163,7 +153,7 @@ func (handler RollupHandler) LeaderboardDay(c echo.Context) error {
 		Sort:      pgSort(req.Sort),
 		Limit:     req.Limit,
 		Offset:    req.Offset,
-		Category:  categories,
+		Tags:      req.Tags,
 		Type:      rollupTypes,
 	})
 	if err != nil {

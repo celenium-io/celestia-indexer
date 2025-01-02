@@ -42,8 +42,15 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 		ColumnExpr("*").
 		Offset(fltrs.Offset)
 
-	if len(fltrs.Category) > 0 {
-		query = query.Where("category IN (?)", bun.In(fltrs.Category))
+	if len(fltrs.Tags) > 0 {
+		query = query.WhereGroup(" AND ", func(q *bun.SelectQuery) *bun.SelectQuery {
+			for i := range fltrs.Tags {
+				q.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
+					return sq.Where("? = ANY(tags)", fltrs.Tags[i])
+				})
+			}
+			return q
+		})
 	}
 
 	if len(fltrs.Type) > 0 {
@@ -72,8 +79,15 @@ func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFi
 		Offset(fltrs.Offset).
 		Join("left join rollup on rollup.id = rollup_id")
 
-	if len(fltrs.Category) > 0 {
-		query = query.Where("category IN (?)", bun.In(fltrs.Category))
+	if len(fltrs.Tags) > 0 {
+		query = query.WhereGroup(" AND ", func(q *bun.SelectQuery) *bun.SelectQuery {
+			for i := range fltrs.Tags {
+				q.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
+					return sq.Where("? = ANY(tags)", fltrs.Tags[i])
+				})
+			}
+			return q
+		})
 	}
 
 	if len(fltrs.Type) > 0 {

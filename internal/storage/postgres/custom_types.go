@@ -104,16 +104,6 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 		); err != nil {
 			return err
 		}
-
-		if _, err := tx.ExecContext(
-			ctx,
-			createTypeQuery,
-			"rollup_category",
-			bun.Safe("rollup_category"),
-			bun.In(types.RollupCategoryValues()),
-		); err != nil {
-			return err
-		}
 		return nil
 	})
 }

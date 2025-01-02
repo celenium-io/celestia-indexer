@@ -46,7 +46,7 @@ func (s *StorageTestSuite) TestRollupLeaderboard() {
 	}
 }
 
-func (s *StorageTestSuite) TestRollupLeaderboardWithCategory() {
+func (s *StorageTestSuite) TestRollupLeaderboardWithTags() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -62,7 +62,7 @@ func (s *StorageTestSuite) TestRollupLeaderboardWithCategory() {
 			Sort:      sdk.SortOrderDesc,
 			Limit:     10,
 			Offset:    0,
-			Category:  []types.RollupCategory{types.RollupCategoryNft},
+			Tags:      []string{"nft"},
 		})
 		s.Require().NoError(err, column)
 		s.Require().Len(rollups, 1, column)
@@ -78,7 +78,8 @@ func (s *StorageTestSuite) TestRollupLeaderboardWithCategory() {
 		s.Require().EqualValues(0.6363636363636364, rollup.FeePct)
 		s.Require().EqualValues(0.42857142857142855, rollup.BlobsCountPct)
 		s.Require().EqualValues(0.3953488372093023, rollup.SizePct)
-		s.Require().EqualValues("nft", rollup.Category)
+		s.Require().Len(rollup.Tags, 1)
+		s.Require().EqualValues("nft", rollup.Tags[0])
 	}
 }
 

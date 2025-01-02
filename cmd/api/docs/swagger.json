@@ -5689,12 +5689,6 @@
         "responses.Enums": {
             "type": "object",
             "properties": {
-                "categories": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "event_type": {
                     "type": "array",
                     "items": {
@@ -6290,11 +6284,6 @@
                     "format": "string",
                     "example": "https://github.com/account"
                 },
-                "category": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "nft"
-                },
                 "compression": {
                     "type": "string",
                     "format": "string",
@@ -6360,6 +6349,12 @@
                     "type": "string",
                     "format": "string",
                     "example": "op_stack"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "twitter": {
                     "type": "string",
@@ -6500,11 +6495,6 @@
                     "type": "string",
                     "format": "string",
                     "example": "https://github.com/account"
-                },
-                "category": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "nft"
                 },
                 "compression": {
                     "type": "string",
@@ -6741,6 +6731,12 @@
                     "type": "string",
                     "format": "string",
                     "example": "op_stack"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "twitter": {
                     "type": "string",

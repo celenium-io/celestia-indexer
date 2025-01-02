@@ -3,19 +3,6 @@
 
 package types
 
-// swagger:enum RollupCategory
-/*
-	ENUM(
-		uncategorized,
-		finance,
-		gaming,
-		nft,
-		social
-	)
-*/
-//go:generate go-enum --marshal --sql --values --names
-type RollupCategory string
-
 // swagger:enum RollupType
 /*
 	ENUM(

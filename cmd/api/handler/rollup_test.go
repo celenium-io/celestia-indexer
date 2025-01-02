@@ -32,7 +32,7 @@ var (
 		Twitter:     "https://x.com",
 		Logo:        "image.png",
 		Slug:        "test-rollup",
-		Category:    types.RollupCategoryNft,
+		Tags:        []string{"nft"},
 		Type:        types.RollupTypeSettled,
 	}
 	testRollupWithStats = storage.RollupWithStats{
@@ -96,7 +96,7 @@ func (s *RollupTestSuite) TestLeaderboard() {
 	} {
 		q := make(url.Values)
 		q.Add("sort_by", sort)
-		q.Add("category", "nft,gaming")
+		q.Add("tags", "nft,gaming")
 		q.Add("type", "sovereign")
 
 		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
@@ -110,9 +110,9 @@ func (s *RollupTestSuite) TestLeaderboard() {
 				Sort:      sdk.SortOrderDesc,
 				Limit:     10,
 				Offset:    0,
-				Category: []types.RollupCategory{
-					types.RollupCategoryNft,
-					types.RollupCategoryGaming,
+				Tags: []string{
+					"nft",
+					"gaming",
 				},
 				Type: []types.RollupType{
 					types.RollupTypeSovereign,
@@ -150,7 +150,7 @@ func (s *RollupTestSuite) TestLeaderboardDay() {
 	} {
 		q := make(url.Values)
 		q.Add("sort_by", sort)
-		q.Add("category", "nft,gaming")
+		q.Add("tags", "nft,gaming")
 		q.Add("type", "sovereign")
 
 		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
@@ -164,9 +164,9 @@ func (s *RollupTestSuite) TestLeaderboardDay() {
 				Sort:      sdk.SortOrderDesc,
 				Limit:     10,
 				Offset:    0,
-				Category: []types.RollupCategory{
-					types.RollupCategoryNft,
-					types.RollupCategoryGaming,
+				Tags: []string{
+					"nft",
+					"gaming",
 				},
 				Type: []types.RollupType{
 					types.RollupTypeSovereign,

@@ -32,9 +32,6 @@ func NewCelestiaApiValidator() *CelestiaApiValidator {
 	if err := v.RegisterValidation("namespace", namespaceValidator()); err != nil {
 		panic(err)
 	}
-	if err := v.RegisterValidation("category", categoryValidator()); err != nil {
-		panic(err)
-	}
 	if err := v.RegisterValidation("type", typeValidator()); err != nil {
 		panic(err)
 	}
@@ -103,13 +100,6 @@ func isNamespace(s string) bool {
 func namespaceValidator() validator.Func {
 	return func(fl validator.FieldLevel) bool {
 		return isNamespace(fl.Field().String())
-	}
-}
-
-func categoryValidator() validator.Func {
-	return func(fl validator.FieldLevel) bool {
-		_, err := types.ParseRollupCategory(fl.Field().String())
-		return err == nil
 	}
 }
 
