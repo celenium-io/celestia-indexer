@@ -42,6 +42,10 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 		ColumnExpr("*").
 		Offset(fltrs.Offset)
 
+	if len(fltrs.Category) > 0 {
+		query = query.Where("category IN (?)", bun.In(fltrs.Category))
+	}
+
 	if len(fltrs.Tags) > 0 {
 		query = query.WhereGroup(" AND ", func(q *bun.SelectQuery) *bun.SelectQuery {
 			for i := range fltrs.Tags {
@@ -78,6 +82,10 @@ func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFi
 		ColumnExpr("rollup.*").
 		Offset(fltrs.Offset).
 		Join("left join rollup on rollup.id = rollup_id")
+
+	if len(fltrs.Category) > 0 {
+		query = query.Where("category IN (?)", bun.In(fltrs.Category))
+	}
 
 	if len(fltrs.Tags) > 0 {
 		query = query.WhereGroup(" AND ", func(q *bun.SelectQuery) *bun.SelectQuery {
@@ -337,5 +345,14 @@ func (r *Rollup) RollupStatsGrouping(ctx context.Context, fltrs storage.RollupGr
 	}
 
 	err = query.Scan(ctx, &results)
+	return
+}
+
+func (r *Rollup) Tags(ctx context.Context) (arr []string, err error) {
+	err = r.DB().NewSelect().
+		Model((*storage.Rollup)(nil)).
+		Distinct().
+		ColumnExpr("unnest(tags)").
+		Scan(ctx, &arr)
 	return
 }

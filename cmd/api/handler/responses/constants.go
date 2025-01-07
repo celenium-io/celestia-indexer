@@ -69,14 +69,18 @@ type Enums struct {
 	Status      []string `json:"status"`
 	MessageType []string `json:"message_type"`
 	EventType   []string `json:"event_type"`
+	Categories  []string `json:"categories"`
 	RollupTypes []string `json:"rollup_type"`
+	Tags        []string `json:"tags"`
 }
 
-func NewEnums() Enums {
+func NewEnums(tags []string) Enums {
 	return Enums{
 		Status:      types.StatusNames(),
 		MessageType: types.MsgTypeNames(),
 		EventType:   types.EventTypeNames(),
+		Categories:  types.RollupCategoryNames(),
 		RollupTypes: types.RollupTypeNames(),
+		Tags:        tags,
 	}
 }

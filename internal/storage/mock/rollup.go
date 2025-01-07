@@ -744,6 +744,45 @@ func (c *MockIRollupSeriesCall) DoAndReturn(f func(context.Context, uint64, stri
 	return c
 }
 
+// Tags mocks base method.
+func (m *MockIRollup) Tags(ctx context.Context) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Tags", ctx)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Tags indicates an expected call of Tags.
+func (mr *MockIRollupMockRecorder) Tags(ctx any) *MockIRollupTagsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Tags", reflect.TypeOf((*MockIRollup)(nil).Tags), ctx)
+	return &MockIRollupTagsCall{Call: call}
+}
+
+// MockIRollupTagsCall wrap *gomock.Call
+type MockIRollupTagsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIRollupTagsCall) Return(arg0 []string, arg1 error) *MockIRollupTagsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIRollupTagsCall) Do(f func(context.Context) ([]string, error)) *MockIRollupTagsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIRollupTagsCall) DoAndReturn(f func(context.Context) ([]string, error)) *MockIRollupTagsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Update mocks base method.
 func (m_2 *MockIRollup) Update(ctx context.Context, m *storage.Rollup) error {
 	m_2.ctrl.T.Helper()

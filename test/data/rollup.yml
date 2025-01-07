@@ -6,11 +6,12 @@
   github: https://github.com/rollup1
   logo: https://rollup1.com/image.png
   slug: rollup_1
-  tags: RAW='{finance}'
+  tags: RAW='{zk}'
   stack: OP Stack
   type: settled
   defi_lama: defi
   links: RAW='{https://rollup1.com}'
+  category: finance
 - id: 2
   name: Rollup 2
   description: The second
@@ -19,10 +20,11 @@
   github: https://github.com/rollup2
   logo: https://rollup2.com/image.png
   slug: rollup_2
-  tags: RAW='{gaming}'
+  tags: RAW='{ai}'
   stack: OP Stack
   type: settled
   defi_lama: lama
+  category: gaming
 - id: 3
   name: Rollup 3
   description: The third
@@ -31,7 +33,8 @@
   github: https://github.com/rollup3
   logo: https://rollup3.com/image.png
   slug: rollup_3
-  tags: RAW='{nft}'
+  tags: RAW='{ai,zk}'
   stack: Custom Stack
   type: sovereign
   defi_lama: name
+  category: nft

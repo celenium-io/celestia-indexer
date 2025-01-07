@@ -2727,6 +2727,12 @@
                         "description": "Comma-separated rollup category list",
                         "name": "category",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated rollup tags list",
+                        "name": "tags",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2836,6 +2842,12 @@
                         "type": "string",
                         "description": "Comma-separated rollup category list",
                         "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated rollup tags list",
+                        "name": "tags",
                         "in": "query"
                     }
                 ],
@@ -5689,6 +5701,12 @@
         "responses.Enums": {
             "type": "object",
             "properties": {
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "event_type": {
                     "type": "array",
                     "items": {
@@ -5708,6 +5726,12 @@
                     }
                 },
                 "status": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tags": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -6284,6 +6308,11 @@
                     "format": "string",
                     "example": "https://github.com/account"
                 },
+                "category": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "nft"
+                },
                 "compression": {
                     "type": "string",
                     "format": "string",
@@ -6495,6 +6524,11 @@
                     "type": "string",
                     "format": "string",
                     "example": "https://github.com/account"
+                },
+                "category": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "nft"
                 },
                 "compression": {
                     "type": "string",
