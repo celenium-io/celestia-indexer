@@ -273,7 +273,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 
 	stateHandlers := handler.NewStateHandler(db.State, db.Validator, cfg.Indexer.Name)
 	v1.GET("/head", stateHandlers.Head)
-	constantsHandler := handler.NewConstantHandler(db.Constants, db.DenomMetadata, db.Address)
+	constantsHandler := handler.NewConstantHandler(db.Constants, db.DenomMetadata, db.Rollup)
 	v1.GET("/constants", constantsHandler.Get)
 	v1.GET("/enums", constantsHandler.Enums)
 

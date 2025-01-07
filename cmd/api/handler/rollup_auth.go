@@ -51,6 +51,7 @@ type createRollupRequest struct {
 	Stack       string           `json:"stack"       validate:"omitempty"`
 	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
 	Category    string           `json:"category"    validate:"omitempty,category"`
+	Tags        []string         `json:"tags"        validate:"omitempty"`
 	Type        string           `json:"type"        validate:"omitempty,oneof=settled sovereign"`
 	Compression string           `json:"compression" validate:"omitempty"`
 	VM          string           `json:"vm"          validate:"omitempty"`
@@ -101,6 +102,7 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRo
 		Type:           enums.RollupType(req.Type),
 		Category:       enums.RollupCategory(req.Category),
 		Slug:           slug.Make(req.Name),
+		Tags:           req.Tags,
 	}
 
 	if err := tx.SaveRollup(ctx, &rollup); err != nil {
@@ -172,6 +174,7 @@ type updateRollupRequest struct {
 	VM          string           `json:"vm"          validate:"omitempty"`
 	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
 	Providers   []rollupProvider `json:"providers"   validate:"omitempty,min=1"`
+	Tags        []string         `json:"tags"        validate:"omitempty"`
 }
 
 func (handler RollupAuthHandler) Update(c echo.Context) error {
@@ -217,6 +220,7 @@ func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRo
 		Type:           enums.RollupType(req.Type),
 		Category:       enums.RollupCategory(req.Category),
 		Links:          req.Links,
+		Tags:           req.Tags,
 	}
 
 	if err := tx.UpdateRollup(ctx, &rollup); err != nil {

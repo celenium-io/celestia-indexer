@@ -2727,6 +2727,12 @@
                         "description": "Comma-separated rollup category list",
                         "name": "category",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated rollup tags list",
+                        "name": "tags",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2836,6 +2842,12 @@
                         "type": "string",
                         "description": "Comma-separated rollup category list",
                         "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated rollup tags list",
+                        "name": "tags",
                         "in": "query"
                     }
                 ],
@@ -5718,6 +5730,12 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -6361,6 +6379,12 @@
                     "format": "string",
                     "example": "op_stack"
                 },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "twitter": {
                     "type": "string",
                     "format": "string",
@@ -6741,6 +6765,12 @@
                     "type": "string",
                     "format": "string",
                     "example": "op_stack"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "twitter": {
                     "type": "string",

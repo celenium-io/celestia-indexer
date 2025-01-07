@@ -650,6 +650,9 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 	if rollup.Category != "" {
 		query = query.Set("category = ?", rollup.Category)
 	}
+	if rollup.Tags != nil {
+		query = query.Set("tags = ?", pq.Array(rollup.Tags))
+	}
 	if rollup.Provider != "" {
 		query = query.Set("provider = ?", rollup.Provider)
 	}

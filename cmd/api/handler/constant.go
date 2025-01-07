@@ -14,18 +14,18 @@ import (
 type ConstantHandler struct {
 	constants     storage.IConstant
 	denomMetadata storage.IDenomMetadata
-	address       storage.IAddress
+	rollup        storage.IRollup
 }
 
 func NewConstantHandler(
 	constants storage.IConstant,
 	denomMetadata storage.IDenomMetadata,
-	address storage.IAddress,
+	rollup storage.IRollup,
 ) *ConstantHandler {
 	return &ConstantHandler{
 		constants:     constants,
 		denomMetadata: denomMetadata,
-		address:       address,
+		rollup:        rollup,
 	}
 }
 
@@ -43,11 +43,11 @@ func NewConstantHandler(
 func (handler *ConstantHandler) Get(c echo.Context) error {
 	consts, err := handler.constants.All(c.Request().Context())
 	if err != nil {
-		return handleError(c, err, handler.address)
+		return handleError(c, err, handler.rollup)
 	}
 	dm, err := handler.denomMetadata.All(c.Request().Context())
 	if err != nil {
-		return handleError(c, err, handler.address)
+		return handleError(c, err, handler.rollup)
 	}
 	return c.JSON(http.StatusOK, responses.NewConstants(consts, dm))
 }
@@ -62,5 +62,9 @@ func (handler *ConstantHandler) Get(c echo.Context) error {
 //	@Success		200	{object}	responses.Enums
 //	@Router			/enums [get]
 func (handler *ConstantHandler) Enums(c echo.Context) error {
-	return c.JSON(http.StatusOK, responses.NewEnums())
+	tags, err := handler.rollup.Tags(c.Request().Context())
+	if err != nil {
+		return handleError(c, err, handler.rollup)
+	}
+	return c.JSON(http.StatusOK, responses.NewEnums(tags))
 }

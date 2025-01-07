@@ -39,6 +39,7 @@ type RollupWithStats struct {
 	FeePct        float64   `example:"0.9876"                    format:"float"     json:"fee_pct"            swaggertype:"number"`
 	BlobsCountPct float64   `example:"0.9876"                    format:"float"     json:"blobs_count_pct"    swaggertype:"number"`
 
+	Tags  []string `json:"tags,omitempty"`
 	Links []string `json:"links,omitempty"`
 }
 
@@ -71,6 +72,7 @@ func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 		Provider:       r.Provider,
 		VM:             r.VM,
 		Fee:            r.Fee.StringFixed(0),
+		Tags:           r.Tags,
 	}
 }
 
@@ -94,6 +96,7 @@ type Rollup struct {
 	Compression    string `example:"zip"                             format:"string"  json:"compression,omitempty" swaggertype:"string"`
 	VM             string `example:"evm"                             format:"string"  json:"vm,omitempty"          swaggertype:"string"`
 
+	Tags  []string `json:"tags,omitempty"`
 	Links []string `json:"links,omitempty"`
 }
 
@@ -118,6 +121,7 @@ func NewRollup(r *storage.Rollup) Rollup {
 		Type:           r.Type.String(),
 		Provider:       r.Provider,
 		VM:             r.VM,
+		Tags:           r.Tags,
 	}
 }
 
