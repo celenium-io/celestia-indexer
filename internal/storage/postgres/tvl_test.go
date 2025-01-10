@@ -31,5 +31,6 @@ func (s *TransactionTestSuite) TestSaveBulk() {
 
 	tvl, err := s.storage.Tvl.LastSyncTime(ctx)
 	s.Require().NoError(err)
-	s.Require().True(saveTime.Equal(tvl.UTC()))
+	tvlTime := tvl.UTC()
+	s.Require().EqualValues(saveTime, tvlTime)
 }
