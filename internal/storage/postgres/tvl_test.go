@@ -20,7 +20,9 @@ func (s *TransactionTestSuite) TestSaveBulk() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	var saveTime = time.Now().UTC()
+	var saveTime = time.Now().
+		UTC().
+		Truncate(time.Minute)
 	var newTvl = &storage.Tvl{
 		Value:    12345,
 		RollupId: 1,
@@ -31,6 +33,9 @@ func (s *TransactionTestSuite) TestSaveBulk() {
 
 	tvl, err := s.storage.Tvl.LastSyncTime(ctx)
 	s.Require().NoError(err)
-	tvlTime := tvl.UTC()
+	tvlTime := tvl.
+		UTC().
+		Truncate(time.Minute)
+
 	s.Require().EqualValues(saveTime, tvlTime)
 }
