@@ -17,7 +17,6 @@ import (
 
 type Dispatcher struct {
 	listener   storage.Listener
-	blocks     storage.IBlock
 	validators storage.IValidator
 
 	mx        *sync.RWMutex
@@ -28,7 +27,6 @@ type Dispatcher struct {
 
 func NewDispatcher(
 	factory storage.ListenerFactory,
-	blocks storage.IBlock,
 	validators storage.IValidator,
 ) (*Dispatcher, error) {
 	if factory == nil {
@@ -37,7 +35,6 @@ func NewDispatcher(
 	listener := factory.CreateListener()
 	return &Dispatcher{
 		listener:   listener,
-		blocks:     blocks,
 		validators: validators,
 		observers:  make([]*Observer, 0),
 		mx:         new(sync.RWMutex),
