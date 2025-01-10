@@ -5,7 +5,6 @@ package storage
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
@@ -348,8 +347,11 @@ func (module *Module) notify(ctx context.Context, state storage.State, block sto
 		return err
 	}
 
-	blockId := strconv.FormatUint(block.Id, 10)
-	if err := module.notificator.Notify(ctx, storage.ChannelBlock, blockId); err != nil {
+	rawBlock, err := jsoniter.MarshalToString(block)
+	if err != nil {
+		return err
+	}
+	if err := module.notificator.Notify(ctx, storage.ChannelBlock, rawBlock); err != nil {
 		return err
 	}
 

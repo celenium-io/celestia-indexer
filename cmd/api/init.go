@@ -246,7 +246,7 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 var dispatcher *bus.Dispatcher
 
 func initDispatcher(ctx context.Context, db postgres.Storage) {
-	d, err := bus.NewDispatcher(db, db.Blocks, db.Validator)
+	d, err := bus.NewDispatcher(db, db.Validator)
 	if err != nil {
 		panic(err)
 	}
