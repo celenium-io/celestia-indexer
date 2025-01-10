@@ -729,3 +729,36 @@ func TestMsgTypeBits_HasOne(t *testing.T) {
 		})
 	}
 }
+
+func TestMarshall(t *testing.T) {
+	tests := []struct {
+		name string
+		mask MsgTypeBits
+	}{
+		{
+			name: "test 1",
+			mask: NewMsgTypeBitMask(MsgBeginRedelegate),
+		}, {
+			name: "test 2",
+			mask: NewMsgTypeBitMask(MsgBeginRedelegate, MsgDelegate, MsgSend),
+		}, {
+			name: "test 3",
+			mask: NewMsgTypeBitMask(MsgAcknowledgement, MsgCancelUpgrade),
+		}, {
+			name: "test 4",
+			mask: NewMsgTypeBitMask(MsgChannelOpenInit, MsgConnectionOpenConfirm),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data, err := json.Marshal(tt.mask)
+			require.NoError(t, err)
+
+			var newMask MsgTypeBits
+			err = json.Unmarshal(data, &newMask)
+			require.NoError(t, err)
+			require.Equal(t, tt.mask, newMask)
+		})
+	}
+}

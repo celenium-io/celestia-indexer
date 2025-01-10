@@ -5,7 +5,6 @@ package bus
 
 import (
 	"context"
-	"strconv"
 	"sync"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -111,18 +110,22 @@ func (d *Dispatcher) handleNotification(ctx context.Context, notification *pq.No
 }
 
 func (d *Dispatcher) handleBlock(ctx context.Context, payload string) error {
-	id, err := strconv.ParseUint(payload, 10, 64)
-	if err != nil {
-		return errors.Wrapf(err, "parse block id: %s", payload)
-	}
-
-	block, err := d.blocks.ByIdWithRelations(ctx, id)
-	if err != nil {
+	block := new(storage.Block)
+	if err := jsoniter.UnmarshalFromString(payload, block); err != nil {
 		return err
 	}
+
+	if block.ProposerId > 0 {
+		validator, err := d.validators.GetByID(ctx, block.ProposerId)
+		if err != nil {
+			return err
+		}
+		block.Proposer = *validator
+	}
+
 	d.mx.RLock()
 	for i := range d.observers {
-		d.observers[i].notifyBlocks(&block)
+		d.observers[i].notifyBlocks(block)
 	}
 	d.mx.RUnlock()
 	return nil

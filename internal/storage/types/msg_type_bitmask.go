@@ -659,3 +659,23 @@ func (mask MsgTypeBits) Value() (driver.Value, error) {
 	}
 	return fmt.Sprintf("%076b", mask.value), nil
 }
+
+func (mask MsgTypeBits) MarshalJSON() (data []byte, err error) {
+	if mask.value == nil {
+		data = []byte{'0'}
+		return
+	}
+	return json.Marshal(mask.value.String())
+}
+
+func (mask *MsgTypeBits) UnmarshalJSON(data []byte) error {
+	mask.Bits = NewEmptyBits()
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	if _, ok := mask.value.SetString(s, 10); !ok {
+		return errors.Errorf("invalid big.Int: %s", s)
+	}
+	return nil
+}
