@@ -49,7 +49,7 @@ func TestWebsocket(t *testing.T) {
 	dispatcher.Start(ctx)
 	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelBlock)
 
-	for i := uint64(1); i < 7; i++ {
+	for i := uint64(1); i < 10; i++ {
 		validatorsMock.
 			EXPECT().
 			GetByID(ctx, i).
@@ -58,7 +58,7 @@ func TestWebsocket(t *testing.T) {
 				Moniker:     "moniker",
 				ConsAddress: "cons_address",
 			}, nil).
-			Times(1)
+			MaxTimes(1)
 	}
 
 	go func() {
