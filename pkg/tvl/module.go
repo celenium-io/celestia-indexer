@@ -5,6 +5,7 @@ package tvl
 
 import (
 	"context"
+	"fmt"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/tvl/l2beat"
 	"github.com/celenium-io/celestia-indexer/internal/tvl/lama"
@@ -17,7 +18,7 @@ import (
 )
 
 const (
-	rollupLimit = 100
+	rollupLimit = uint64(100)
 )
 
 var (
@@ -64,85 +65,98 @@ func (m *Module) getTvl(ctx context.Context, timeframe storage.TvlTimeframe) {
 	}
 
 	for i := range rollups {
-		if len(rollups[i].L2Beat) > 0 {
-			url := rollups[i].L2Beat
-			lastIndex := strings.LastIndex(url, "/")
-
-			if lastIndex == -1 {
-				continue
-			}
-
-			rollupProject := url[lastIndex+1:]
-			tvl, err := m.rollupTvlFromL2Beat(ctx, rollupProject, timeframe)
-			if err != nil {
-				m.Log.Err(err).Msg("receiving TVL from L2Beat")
-				continue
-			}
-
-			tvlResponse := tvl[0].Result.Data.Json
-			tvlModels := make([]*storage.Tvl, 0)
-			for _, t := range tvlResponse {
-				rollupTvl := t[1].(float64) + t[2].(float64) + t[3].(float64)
-				tvlTs := time.Unix(int64(t[0].(float64)), 0)
-				if tvlTs.After(syncTimestamp) {
-					tvlModels = append(tvlModels, &storage.Tvl{
-						Value:    rollupTvl,
-						Time:     tvlTs,
-						Rollup:   rollups[i],
-						RollupId: rollups[i].Id,
-					})
-				}
-			}
-
-			if len(tvlModels) == 0 {
-				continue
-			}
-
-			if err := m.tvl.SaveBulk(ctx, tvlModels...); err != nil {
-				m.Log.Err(err).Msg("saving tvls")
-			}
-		}
-
-		if len(rollups[i].DeFiLama) > 0 {
-			tvl, err := m.rollupTvlFromLama(ctx, rollups[i].DeFiLama)
-			if err != nil {
-				m.Log.Err(err).Msg("receiving TVL from DeFi Lama")
-				continue
-			}
-
-			tvlModels := make([]*storage.Tvl, 0)
-			for _, t := range tvl {
-				tvlTs := time.Unix(t.Date, 0)
-				if tvlTs.After(syncTimestamp) {
-					tvlModels = append(tvlModels, &storage.Tvl{
-						Value:    t.TVL,
-						Time:     tvlTs,
-						Rollup:   rollups[i],
-						RollupId: rollups[i].Id,
-					})
-				}
-			}
-
-			if len(tvlModels) == 0 {
-				continue
-			}
-
-			if err := m.tvl.SaveBulk(ctx, tvlModels...); err != nil {
-				m.Log.Err(err).Msg("saving tvls")
-			}
+		if err = m.save(ctx, rollups[i], timeframe); err != nil {
+			m.Log.Err(err).Msg("saving tvls")
 		}
 	}
+
 	syncTimestamp, err = m.lastSyncTimeTvl(ctx)
 	if err != nil {
 		m.Log.Err(err).Msg("receiving last sync time for TVL")
 	}
 }
 
+func (m *Module) save(ctx context.Context, rollup *storage.Rollup, timeframe storage.TvlTimeframe) error {
+	if len(rollup.L2Beat) > 0 {
+		url := rollup.L2Beat
+		lastIndex := strings.LastIndex(url, "/")
+
+		if lastIndex == -1 {
+			return fmt.Errorf("incorrect L2Beat url")
+		}
+
+		rollupProject := url[lastIndex+1:]
+		tvl, err := m.rollupTvlFromL2Beat(ctx, rollupProject, timeframe)
+		if err != nil {
+			m.Log.Err(err).Msg("receiving TVL from L2Beat")
+			return err
+		}
+
+		tvlResponse := tvl[0].Result.Data.Json
+		tvlModels := make([]*storage.Tvl, 0)
+		for _, t := range tvlResponse {
+			for i := 1; i <= 3; i++ {
+				if _, ok := t[i].(float64); !ok {
+					return fmt.Errorf("incorrect value type of TVL")
+				}
+			}
+			rollupTvl := t[1].(float64) + t[2].(float64) + t[3].(float64)
+			tvlTs := time.Unix(int64(t[0].(float64)), 0)
+			if tvlTs.After(syncTimestamp) {
+				tvlModels = append(tvlModels, &storage.Tvl{
+					Value:    rollupTvl,
+					Time:     tvlTs,
+					Rollup:   rollup,
+					RollupId: rollup.Id,
+				})
+			}
+		}
+
+		if len(tvlModels) == 0 {
+			return nil
+		}
+
+		if err := m.tvl.SaveBulk(ctx, tvlModels...); err != nil {
+			m.Log.Err(err).Msg("saving tvls")
+		}
+	}
+
+	if len(rollup.DeFiLama) > 0 {
+		tvl, err := m.rollupTvlFromLama(ctx, rollup.DeFiLama)
+		if err != nil {
+			m.Log.Err(err).Msg("receiving TVL from DeFi Lama")
+			return err
+		}
+
+		tvlModels := make([]*storage.Tvl, 0)
+		for _, t := range tvl {
+			tvlTs := time.Unix(t.Date, 0)
+			if tvlTs.After(syncTimestamp) {
+				tvlModels = append(tvlModels, &storage.Tvl{
+					Value:    t.TVL,
+					Time:     tvlTs,
+					Rollup:   rollup,
+					RollupId: rollup.Id,
+				})
+			}
+		}
+
+		if len(tvlModels) == 0 {
+			return nil
+		}
+
+		if err := m.tvl.SaveBulk(ctx, tvlModels...); err != nil {
+			m.Log.Err(err).Msg("saving tvls")
+		}
+	}
+
+	return nil
+}
+
 func (m *Module) receive(ctx context.Context) {
 	syncTime, err := m.lastSyncTimeTvl(ctx)
 	if err != nil {
 		m.Log.Err(err).Msg("receiving last sync time for TVL")
-		return
 	}
 
 	syncTimestamp = syncTime
