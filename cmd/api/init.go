@@ -502,13 +502,14 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			KeyLookup: "header:Authorization",
 			Validator: keyValidator.Validate,
 		})
+		adminMiddleware := AdminMiddleware()
 
 		rollupAuthHandler := handler.NewRollupAuthHandler(db.Rollup, db.Address, db.Namespace, db.Transactable)
 		rollup := auth.Group("/rollup")
 		{
 			rollup.POST("/new", rollupAuthHandler.Create, keyMiddleware)
 			rollup.PATCH("/:id", rollupAuthHandler.Update, keyMiddleware)
-			rollup.DELETE("/:id", rollupAuthHandler.Delete, keyMiddleware)
+			rollup.DELETE("/:id", rollupAuthHandler.Delete, keyMiddleware, adminMiddleware)
 		}
 	}
 

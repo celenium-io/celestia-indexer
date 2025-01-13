@@ -130,7 +130,7 @@ func NewKeyValidator(apiKeys storage.IApiKey, errChecker NoRows) KeyValidator {
 	return KeyValidator{apiKeys: apiKeys, errChecker: errChecker}
 }
 
-const apiKeyName = "api_key"
+const ApiKeyName = "api_key"
 
 func (kv KeyValidator) Validate(key string, c echo.Context) (bool, error) {
 	apiKey, err := kv.apiKeys.Get(c.Request().Context(), key)
@@ -141,6 +141,6 @@ func (kv KeyValidator) Validate(key string, c echo.Context) (bool, error) {
 		return false, err
 	}
 	c.Logger().Infof("using apikey: %s", apiKey.Description)
-	c.Set(apiKeyName, apiKey)
+	c.Set(ApiKeyName, apiKey)
 	return true, nil
 }

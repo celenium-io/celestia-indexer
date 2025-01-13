@@ -66,7 +66,7 @@ type rollupProvider struct {
 }
 
 func (handler RollupAuthHandler) Create(c echo.Context) error {
-	val := c.Get(apiKeyName)
+	val := c.Get(ApiKeyName)
 	apiKey, ok := val.(storage.ApiKey)
 	if !ok {
 		return handleError(c, errInvalidApiKey, handler.address)
@@ -192,7 +192,7 @@ type updateRollupRequest struct {
 }
 
 func (handler RollupAuthHandler) Update(c echo.Context) error {
-	val := c.Get(apiKeyName)
+	val := c.Get(ApiKeyName)
 	apiKey, ok := val.(storage.ApiKey)
 	if !ok {
 		return handleError(c, errInvalidApiKey, handler.address)
@@ -275,15 +275,6 @@ type deleteRollupRequest struct {
 }
 
 func (handler RollupAuthHandler) Delete(c echo.Context) error {
-	val := c.Get(apiKeyName)
-	apiKey, ok := val.(storage.ApiKey)
-	if !ok {
-		return handleError(c, errInvalidApiKey, handler.address)
-	}
-	if !apiKey.Admin {
-		return handleError(c, errInvalidApiKey, handler.address)
-	}
-
 	req, err := bindAndValidate[deleteRollupRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
