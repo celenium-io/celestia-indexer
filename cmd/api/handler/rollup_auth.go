@@ -6,6 +6,7 @@ package handler
 import (
 	"context"
 	"encoding/base64"
+	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
@@ -43,7 +44,7 @@ type createRollupRequest struct {
 	Website     string           `json:"website"     validate:"omitempty,url"`
 	GitHub      string           `json:"github"      validate:"omitempty,url"`
 	Twitter     string           `json:"twitter"     validate:"omitempty,url"`
-	Logo        string           `json:"logo"        validate:"omitempty,url"`
+	Logo        string           `json:"logo"        validate:"required,url"`
 	L2Beat      string           `json:"l2_beat"     validate:"omitempty,url"`
 	DeFiLama    string           `json:"defi_lama"   validate:"omitempty"`
 	Bridge      string           `json:"bridge"      validate:"omitempty,eth_addr"`
@@ -65,22 +66,31 @@ type rollupProvider struct {
 }
 
 func (handler RollupAuthHandler) Create(c echo.Context) error {
+	val := c.Get(apiKeyName)
+	apiKey, ok := val.(storage.ApiKey)
+	if !ok {
+		return handleError(c, errInvalidApiKey, handler.address)
+	}
+
 	req, err := bindAndValidate[createRollupRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
 
-	if err := handler.createRollup(c.Request().Context(), req); err != nil {
+	rollupId, err := handler.createRollup(c.Request().Context(), req, apiKey.Admin)
+	if err != nil {
 		return handleError(c, err, handler.rollups)
 	}
 
-	return success(c)
+	return c.JSON(http.StatusOK, echo.Map{
+		"id": rollupId,
+	})
 }
 
-func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRollupRequest) error {
+func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRollupRequest, isAdmin bool) (uint64, error) {
 	tx, err := postgres.BeginTransaction(ctx, handler.tx)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	rollup := storage.Rollup{
@@ -103,26 +113,30 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRo
 		Category:       enums.RollupCategory(req.Category),
 		Slug:           slug.Make(req.Name),
 		Tags:           req.Tags,
+		Verified:       isAdmin,
 	}
 
 	if err := tx.SaveRollup(ctx, &rollup); err != nil {
-		return tx.HandleError(ctx, err)
+		return 0, tx.HandleError(ctx, err)
 	}
 
 	providers, err := handler.createProviders(ctx, rollup.Id, req.Providers...)
 	if err != nil {
-		return tx.HandleError(ctx, err)
+		return 0, tx.HandleError(ctx, err)
 	}
 
 	if err := tx.SaveProviders(ctx, providers...); err != nil {
-		return tx.HandleError(ctx, err)
+		return 0, tx.HandleError(ctx, err)
 	}
 
 	if err := tx.RefreshLeaderboard(ctx); err != nil {
-		return tx.HandleError(ctx, err)
+		return 0, tx.HandleError(ctx, err)
 	}
 
-	return tx.Flush(ctx)
+	if err := tx.Flush(ctx); err != nil {
+		return 0, err
+	}
+	return rollup.Id, nil
 }
 
 func (handler RollupAuthHandler) createProviders(ctx context.Context, rollupId uint64, data ...rollupProvider) ([]storage.RollupProvider, error) {
@@ -178,19 +192,25 @@ type updateRollupRequest struct {
 }
 
 func (handler RollupAuthHandler) Update(c echo.Context) error {
+	val := c.Get(apiKeyName)
+	apiKey, ok := val.(storage.ApiKey)
+	if !ok {
+		return handleError(c, errInvalidApiKey, handler.address)
+	}
+
 	req, err := bindAndValidate[updateRollupRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
 
-	if err := handler.updateRollup(c.Request().Context(), req); err != nil {
+	if err := handler.updateRollup(c.Request().Context(), req, apiKey.Admin); err != nil {
 		return handleError(c, err, handler.rollups)
 	}
 
 	return success(c)
 }
 
-func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRollupRequest) error {
+func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRollupRequest, isAdmin bool) error {
 	tx, err := postgres.BeginTransaction(ctx, handler.tx)
 	if err != nil {
 		return err
@@ -221,6 +241,7 @@ func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRo
 		Category:       enums.RollupCategory(req.Category),
 		Links:          req.Links,
 		Tags:           req.Tags,
+		Verified:       isAdmin,
 	}
 
 	if err := tx.UpdateRollup(ctx, &rollup); err != nil {
@@ -254,6 +275,15 @@ type deleteRollupRequest struct {
 }
 
 func (handler RollupAuthHandler) Delete(c echo.Context) error {
+	val := c.Get(apiKeyName)
+	apiKey, ok := val.(storage.ApiKey)
+	if !ok {
+		return handleError(c, errInvalidApiKey, handler.address)
+	}
+	if !apiKey.Admin {
+		return handleError(c, errInvalidApiKey, handler.address)
+	}
+
 	req, err := bindAndValidate[deleteRollupRequest](c)
 	if err != nil {
 		return badRequestError(c, err)

@@ -12,6 +12,7 @@
   defi_lama: defi
   links: RAW='{https://rollup1.com}'
   category: finance
+  verified: true
 - id: 2
   name: Rollup 2
   description: The second
@@ -25,6 +26,7 @@
   type: settled
   defi_lama: lama
   category: gaming
+  verified: true
 - id: 3
   name: Rollup 3
   description: The third
@@ -38,3 +40,18 @@
   type: sovereign
   defi_lama: name
   category: nft
+  verified: true
+- id: 4
+  name: Hidden Rollup 
+  description: The fourth
+  website: https://rollup4.com
+  twitter: https://x.com/rollup4
+  github: https://github.com/rollup4
+  logo: https://rollup4.com/image.png
+  slug: rollup_4
+  stack: Custom Stack
+  type: sovereign
+  defi_lama: name
+  category: nft
+  verified: false
+  tags: RAW='{hidden}'

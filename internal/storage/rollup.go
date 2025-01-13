@@ -71,6 +71,7 @@ type Rollup struct {
 	Tags           []string             `bun:"tags,array"`
 	VM             string               `bun:"vm"                            comment:"Virtual machine"`
 	Links          []string             `bun:"links,array"                   comment:"Other links to rollup related sites"`
+	Verified       bool                 `bun:"verified"`
 
 	Providers []*RollupProvider `bun:"rel:has-many,join:id=rollup_id"`
 }

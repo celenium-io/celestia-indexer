@@ -497,11 +497,10 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 
 	auth := v1.Group("/auth")
 	{
+		keyValidator := handler.NewKeyValidator(db.ApiKeys, db.BlobLogs)
 		keyMiddleware := middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
 			KeyLookup: "header:Authorization",
-			Validator: func(key string, c echo.Context) (bool, error) {
-				return key == os.Getenv("API_AUTH_KEY"), nil
-			},
+			Validator: keyValidator.Validate,
 		})
 
 		rollupAuthHandler := handler.NewRollupAuthHandler(db.Rollup, db.Address, db.Namespace, db.Transactable)

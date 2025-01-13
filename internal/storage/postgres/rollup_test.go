@@ -299,7 +299,7 @@ func (s *StorageTestSuite) TestRollupAllSeries() {
 
 	items, err := s.storage.Rollup.AllSeries(ctx)
 	s.Require().NoError(err)
-	s.Require().Len(items, 5)
+	s.Require().Len(items, 7)
 }
 
 func (s *StorageTestSuite) TestRollupStatsGrouping() {
@@ -333,4 +333,13 @@ func (s *StorageTestSuite) TestRollupTags() {
 	s.Require().Len(tags, 2)
 	s.Require().Contains(tags, "zk")
 	s.Require().Contains(tags, "ai")
+}
+
+func (s *StorageTestSuite) TestCount() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	count, err := s.storage.Rollup.Count(ctx)
+	s.Require().NoError(err)
+	s.Require().EqualValues(3, count)
 }
