@@ -50,6 +50,7 @@ type Storage struct {
 	Jails           models.IJail
 	Rollup          models.IRollup
 	Grants          models.IGrant
+	ApiKeys         models.IApiKey
 	Notificator     *Notificator
 
 	export models.Export
@@ -97,6 +98,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		Jails:           NewJail(strg.Connection()),
 		Rollup:          NewRollup(strg.Connection()),
 		Grants:          NewGrant(strg.Connection()),
+		ApiKeys:         NewApiKey(strg.Connection()),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
 
 		export: export,

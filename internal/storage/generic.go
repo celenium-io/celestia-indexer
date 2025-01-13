@@ -43,6 +43,7 @@ var Models = []any{
 	&Rollup{},
 	&RollupProvider{},
 	&Grant{},
+	&ApiKey{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
