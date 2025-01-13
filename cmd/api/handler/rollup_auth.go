@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"net/http"
 
+	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	enums "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -298,6 +299,54 @@ func (handler RollupAuthHandler) deleteRollup(ctx context.Context, id uint64) er
 	}
 
 	if err := tx.DeleteRollup(ctx, id); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
+	return tx.Flush(ctx)
+}
+
+func (handler RollupAuthHandler) Unverified(c echo.Context) error {
+	rollups, err := handler.rollups.Unverified(c.Request().Context())
+	if err != nil {
+		return handleError(c, err, handler.rollups)
+	}
+
+	response := make([]responses.Rollup, len(rollups))
+	for i := range rollups {
+		response[i] = responses.NewRollup(&rollups[i])
+	}
+
+	return returnArray(c, response)
+}
+
+type verifyRollupRequest struct {
+	Id uint64 `param:"id" validate:"required,min=1"`
+}
+
+func (handler RollupAuthHandler) Verify(c echo.Context) error {
+	req, err := bindAndValidate[verifyRollupRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	if err := handler.verify(c.Request().Context(), req.Id); err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	return success(c)
+}
+
+func (handler RollupAuthHandler) verify(ctx context.Context, id uint64) error {
+	tx, err := postgres.BeginTransaction(ctx, handler.tx)
+	if err != nil {
+		return err
+	}
+
+	err = tx.UpdateRollup(ctx, &storage.Rollup{
+		Id:       id,
+		Verified: true,
+	})
+	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
 

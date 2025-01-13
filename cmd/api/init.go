@@ -510,6 +510,8 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			rollup.POST("/new", rollupAuthHandler.Create, keyMiddleware)
 			rollup.PATCH("/:id", rollupAuthHandler.Update, keyMiddleware)
 			rollup.DELETE("/:id", rollupAuthHandler.Delete, keyMiddleware, adminMiddleware)
+			rollup.PATCH("/:id/verify", rollupAuthHandler.Verify, keyMiddleware, adminMiddleware)
+			rollup.GET("/unverified", rollupAuthHandler.Unverified, keyMiddleware, adminMiddleware)
 		}
 	}
 

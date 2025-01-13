@@ -357,3 +357,11 @@ func (r *Rollup) Tags(ctx context.Context) (arr []string, err error) {
 		Scan(ctx, &arr)
 	return
 }
+
+func (r *Rollup) Unverified(ctx context.Context) (rollups []storage.Rollup, err error) {
+	err = r.DB().NewSelect().
+		Model(&rollups).
+		Where("verified = false").
+		Scan(ctx)
+	return
+}

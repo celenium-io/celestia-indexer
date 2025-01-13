@@ -602,7 +602,7 @@ func (tx Transaction) SaveRollup(ctx context.Context, rollup *models.Rollup) err
 }
 
 func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) error {
-	if rollup == nil || rollup.IsEmpty() {
+	if rollup == nil || (rollup.IsEmpty() && !rollup.Verified) {
 		return nil
 	}
 

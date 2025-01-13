@@ -45,6 +45,7 @@ type IRollup interface {
 	BySlug(ctx context.Context, slug string) (RollupWithStats, error)
 	RollupStatsGrouping(ctx context.Context, fltrs RollupGroupStatsFilters) ([]RollupGroupedStats, error)
 	Tags(ctx context.Context) ([]string, error)
+	Unverified(ctx context.Context) (rollups []Rollup, err error)
 }
 
 // Rollup -

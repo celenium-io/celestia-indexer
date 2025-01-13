@@ -343,3 +343,12 @@ func (s *StorageTestSuite) TestCount() {
 	s.Require().NoError(err)
 	s.Require().EqualValues(3, count)
 }
+
+func (s *StorageTestSuite) TestUnverified() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	rollups, err := s.storage.Rollup.Unverified(ctx)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1, len(rollups))
+}
