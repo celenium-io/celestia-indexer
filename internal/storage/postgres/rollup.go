@@ -14,6 +14,12 @@ import (
 	"github.com/uptrace/bun"
 )
 
+const (
+	Hour  = string(storage.TimeframeHour)
+	Day   = string(storage.TimeframeDay)
+	Month = string(storage.TimeframeMonth)
+)
+
 // Rollup -
 type Rollup struct {
 	*postgres.Table[*storage.Rollup]
@@ -139,11 +145,11 @@ func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe, column 
 	query := r.DB().NewSelect().Order("time desc").Limit(100).Group("time")
 
 	switch timeframe {
-	case "hour":
+	case Hour:
 		query = query.Table("rollup_stats_by_hour")
-	case "day":
+	case Day:
 		query = query.Table("rollup_stats_by_day")
-	case "month":
+	case Month:
 		query = query.Table("rollup_stats_by_month")
 	default:
 		return nil, errors.Errorf("invalid timeframe: %s", timeframe)
@@ -228,11 +234,11 @@ func (r *Rollup) Tvl(ctx context.Context, rollupId uint64, timeframe string, req
 		Order("time desc")
 
 	switch timeframe {
-	case "hour":
+	case Hour:
 		return nil, errors.Errorf("unavailable data for this timeframe: %s", timeframe)
-	case "day":
+	case Day:
 		query = query.Table("tvl")
-	case "month":
+	case Month:
 		query = query.Table(storage.ViewRollupTvlByMonth)
 	default:
 		return nil, errors.Errorf("invalid timeframe: %s", timeframe)
@@ -274,11 +280,11 @@ func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series, grou
 	}
 
 	switch groupBy {
-	case "day":
+	case Day:
 		cte = cte.Table("rollup_stats_by_day").
 			ColumnExpr("extract(isodow from time) as name").
 			Where("time >= ?", time.Now().AddDate(0, -3, 0).UTC())
-	case "hour":
+	case Hour:
 		cte = cte.Table("rollup_stats_by_hour").
 			ColumnExpr("extract(hour from time) as name").
 			Where("time >= ?", time.Now().AddDate(0, -1, 0).UTC())
