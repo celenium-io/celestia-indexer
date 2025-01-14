@@ -544,3 +544,21 @@ func (sh StatsHandler) MessagesCount24h(c echo.Context) error {
 	}
 	return returnArray(c, response)
 }
+
+// Tvs godoc
+//
+//	@Summary		Get total TVS of the network
+//	@Description	Get total TVS of the network
+//	@Tags			stats
+//	@ID				stats-tvs
+//	@Produce		json
+//	@Success		200	{integer}	uint64
+//	@Failure		500	{object}	Error
+//	@Router			/stats/tvs [get]
+func (sh StatsHandler) Tvs(c echo.Context) error {
+	tvs, err := sh.repo.Tvs(c.Request().Context())
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+	return c.JSON(http.StatusOK, tvs)
+}

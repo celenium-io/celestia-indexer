@@ -583,3 +583,22 @@ func (s *StatsTestSuite) TestMessgaesCount24h() {
 	s.Require().EqualValues("test", response[0].Name)
 	s.Require().EqualValues(100, response[0].Value)
 }
+
+func (s *StatsTestSuite) TestTvs() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/tvs")
+
+	s.stats.EXPECT().
+		Tvs(gomock.Any()).
+		Return(12345678.90, nil)
+
+	s.Require().NoError(s.handler.Tvs(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response float64
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Equal(12345678.90, response)
+}

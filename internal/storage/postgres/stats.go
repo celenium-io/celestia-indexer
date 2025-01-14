@@ -412,3 +412,25 @@ func (s Stats) MessagesCount24h(ctx context.Context) (response []storage.CountIt
 		Scan(ctx, &response)
 	return
 }
+
+func (s Stats) Tvs(ctx context.Context) (tvs float64, err error) {
+	var lastTs time.Time
+	errTs := s.db.DB().
+		NewSelect().
+		Table(storage.ViewRollupTvlByMonth).
+		ColumnExpr("MAX(time) AS time").
+		Scan(ctx, &lastTs)
+
+	if errTs != nil {
+		return 0, errTs
+	}
+
+	err = s.db.DB().
+		NewSelect().
+		Table(storage.ViewRollupTvlByMonth).
+		ColumnExpr("sum(value) as value").
+		Where("time = ?", lastTs).
+		Scan(ctx, &tvs)
+
+	return
+}

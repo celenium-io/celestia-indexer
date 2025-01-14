@@ -180,4 +180,5 @@ type IStats interface {
 	SquareSize(ctx context.Context, from, to *time.Time) (map[int][]SeriesItem, error)
 	Change24hBlockStats(ctx context.Context) (response Change24hBlockStats, err error)
 	MessagesCount24h(ctx context.Context) ([]CountItem, error)
+	Tvs(ctx context.Context) (float64, error)
 }

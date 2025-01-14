@@ -25,6 +25,7 @@ import (
 type MockIStats struct {
 	ctrl     *gomock.Controller
 	recorder *MockIStatsMockRecorder
+	isgomock struct{}
 }
 
 // MockIStatsMockRecorder is the mock recorder for MockIStats.
@@ -469,6 +470,45 @@ func (c *MockIStatsTPSCall) Do(f func(context.Context) (storage.TPS, error)) *Mo
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIStatsTPSCall) DoAndReturn(f func(context.Context) (storage.TPS, error)) *MockIStatsTPSCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Tvs mocks base method.
+func (m *MockIStats) Tvs(ctx context.Context) (float64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Tvs", ctx)
+	ret0, _ := ret[0].(float64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Tvs indicates an expected call of Tvs.
+func (mr *MockIStatsMockRecorder) Tvs(ctx any) *MockIStatsTvsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Tvs", reflect.TypeOf((*MockIStats)(nil).Tvs), ctx)
+	return &MockIStatsTvsCall{Call: call}
+}
+
+// MockIStatsTvsCall wrap *gomock.Call
+type MockIStatsTvsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIStatsTvsCall) Return(arg0 float64, arg1 error) *MockIStatsTvsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIStatsTvsCall) Do(f func(context.Context) (float64, error)) *MockIStatsTvsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIStatsTvsCall) DoAndReturn(f func(context.Context) (float64, error)) *MockIStatsTvsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
