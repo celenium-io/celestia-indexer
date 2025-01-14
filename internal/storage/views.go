@@ -24,4 +24,5 @@ const (
 	ViewRollupStatsByHour     = "rollup_stats_by_hour"
 	ViewRollupStatsByDay      = "rollup_stats_by_day"
 	ViewRollupStatsByMonth    = "rollup_stats_by_month"
+	ViewRollupTvlByMonth      = "rollup_tvl_by_month"
 )

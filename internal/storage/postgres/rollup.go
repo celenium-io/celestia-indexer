@@ -220,6 +220,36 @@ func (r *Rollup) ById(ctx context.Context, rollupId uint64) (rollup storage.Roll
 	return
 }
 
+func (r *Rollup) Tvl(ctx context.Context, rollupId uint64, timeframe string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
+	query := r.DB().NewSelect().
+		ColumnExpr("value, time as bucket").
+		Where("rollup_id = ?", rollupId).
+		Limit(100).
+		Order("time desc")
+
+	switch timeframe {
+	case "hour":
+		return nil, errors.Errorf("unavailable data for this timeframe: %s", timeframe)
+	case "day":
+		query = query.Table("tvl")
+	case "month":
+		query = query.Table(storage.ViewRollupTvlByMonth)
+	default:
+		return nil, errors.Errorf("invalid timeframe: %s", timeframe)
+	}
+
+	if !req.From.IsZero() {
+		query = query.Where("time >= ?", req.From)
+	}
+	if !req.To.IsZero() {
+		query = query.Where("time < ?", req.To)
+	}
+
+	err = query.Scan(ctx, &items)
+
+	return
+}
+
 func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series, groupBy string) (items []storage.DistributionItem, err error) {
 	providers, err := r.Providers(ctx, rollupId)
 	if err != nil {
