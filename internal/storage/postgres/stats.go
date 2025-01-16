@@ -415,9 +415,10 @@ func (s Stats) MessagesCount24h(ctx context.Context) (response []storage.CountIt
 
 func (s Stats) Tvs(ctx context.Context) (tvs float64, err error) {
 	var lastTs time.Time
-	errTs := s.db.DB().
+	var query = s.db.DB().
 		NewSelect().
-		Table(storage.ViewRollupTvlByMonth).
+		Table(storage.ViewRollupTvlByMonth)
+	errTs := query.
 		ColumnExpr("MAX(time) AS time").
 		Scan(ctx, &lastTs)
 
@@ -425,12 +426,31 @@ func (s Stats) Tvs(ctx context.Context) (tvs float64, err error) {
 		return 0, errTs
 	}
 
-	err = s.db.DB().
-		NewSelect().
-		Table(storage.ViewRollupTvlByMonth).
+	err = query.
 		ColumnExpr("sum(value) as value").
 		Where("time = ?", lastTs).
 		Scan(ctx, &tvs)
+
+	return
+}
+
+func (s Stats) TvsSeries(ctx context.Context, timeframe storage.Timeframe) (response []storage.SeriesItem, err error) {
+	query := s.db.DB().NewSelect()
+
+	switch timeframe {
+	case storage.TimeframeDay:
+		query = query.Table(storage.ViewTvsByDay).
+			ColumnExpr("value, time as ts")
+	case storage.TimeframeMonth:
+		query = query.Table(storage.ViewTvsByMonth).
+			ColumnExpr("value, min_value as min, max_value as max, time as ts")
+	default:
+		return nil, errors.Errorf("unexpected timeframe %s", timeframe)
+	}
+
+	err = query.Order("time desc").
+		Limit(100).
+		Scan(ctx, &response)
 
 	return
 }

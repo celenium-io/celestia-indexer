@@ -14,12 +14,6 @@ import (
 	"github.com/uptrace/bun"
 )
 
-const (
-	Hour  = string(storage.TimeframeHour)
-	Day   = string(storage.TimeframeDay)
-	Month = string(storage.TimeframeMonth)
-)
-
 // Rollup -
 type Rollup struct {
 	*postgres.Table[*storage.Rollup]
@@ -132,7 +126,7 @@ func (r *Rollup) RollupsByNamespace(ctx context.Context, namespaceId uint64, lim
 	return
 }
 
-func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
+func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe storage.Timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
 	providers, err := r.Providers(ctx, rollupId)
 	if err != nil {
 		return nil, err
@@ -145,11 +139,11 @@ func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe, column 
 	query := r.DB().NewSelect().Order("time desc").Limit(100).Group("time")
 
 	switch timeframe {
-	case Hour:
+	case storage.TimeframeHour:
 		query = query.Table("rollup_stats_by_hour")
-	case Day:
+	case storage.TimeframeDay:
 		query = query.Table("rollup_stats_by_day")
-	case Month:
+	case storage.TimeframeMonth:
 		query = query.Table("rollup_stats_by_month")
 	default:
 		return nil, errors.Errorf("invalid timeframe: %s", timeframe)
@@ -226,7 +220,7 @@ func (r *Rollup) ById(ctx context.Context, rollupId uint64) (rollup storage.Roll
 	return
 }
 
-func (r *Rollup) Tvl(ctx context.Context, rollupId uint64, timeframe string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
+func (r *Rollup) Tvl(ctx context.Context, rollupId uint64, timeframe storage.Timeframe, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
 	query := r.DB().NewSelect().
 		ColumnExpr("value, time as bucket").
 		Where("rollup_id = ?", rollupId).
@@ -234,11 +228,11 @@ func (r *Rollup) Tvl(ctx context.Context, rollupId uint64, timeframe string, req
 		Order("time desc")
 
 	switch timeframe {
-	case Hour:
+	case storage.TimeframeHour:
 		return nil, errors.Errorf("unavailable data for this timeframe: %s", timeframe)
-	case Day:
+	case storage.TimeframeDay:
 		query = query.Table("tvl")
-	case Month:
+	case storage.TimeframeMonth:
 		query = query.Table(storage.ViewRollupTvlByMonth)
 	default:
 		return nil, errors.Errorf("invalid timeframe: %s", timeframe)
@@ -256,7 +250,7 @@ func (r *Rollup) Tvl(ctx context.Context, rollupId uint64, timeframe string, req
 	return
 }
 
-func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series, groupBy string) (items []storage.DistributionItem, err error) {
+func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series string, groupBy storage.Timeframe) (items []storage.DistributionItem, err error) {
 	providers, err := r.Providers(ctx, rollupId)
 	if err != nil {
 		return
@@ -280,11 +274,11 @@ func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series, grou
 	}
 
 	switch groupBy {
-	case Day:
+	case storage.TimeframeDay:
 		cte = cte.Table("rollup_stats_by_day").
 			ColumnExpr("extract(isodow from time) as name").
 			Where("time >= ?", time.Now().AddDate(0, -3, 0).UTC())
-	case Hour:
+	case storage.TimeframeHour:
 		cte = cte.Table("rollup_stats_by_hour").
 			ColumnExpr("extract(hour from time) as name").
 			Where("time >= ?", time.Now().AddDate(0, -1, 0).UTC())

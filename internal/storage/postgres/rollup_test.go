@@ -162,8 +162,8 @@ func (s *StorageTestSuite) TestRollupSeries() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	for _, tf := range []string{
-		"day", "hour", "month",
+	for _, tf := range []storage.Timeframe{
+		storage.TimeframeDay, storage.TimeframeHour, storage.TimeframeMonth,
 	} {
 		for _, column := range []string{
 			"size", "blobs_count", "size_per_blob", "fee",
@@ -239,8 +239,8 @@ func (s *StorageTestSuite) TestRollupDistribution() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	for _, groupBy := range []string{
-		"day", "hour",
+	for _, groupBy := range []storage.Timeframe{
+		storage.TimeframeDay, storage.TimeframeHour,
 	} {
 		for _, series := range []string{
 			"size", "blobs_count", "size_per_blob", "fee_per_blob",

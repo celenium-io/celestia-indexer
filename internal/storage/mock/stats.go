@@ -512,3 +512,42 @@ func (c *MockIStatsTvsCall) DoAndReturn(f func(context.Context) (float64, error)
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
+
+// TvsSeries mocks base method.
+func (m *MockIStats) TvsSeries(ctx context.Context, timeframe storage.Timeframe) ([]storage.SeriesItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TvsSeries", ctx, timeframe)
+	ret0, _ := ret[0].([]storage.SeriesItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TvsSeries indicates an expected call of TvsSeries.
+func (mr *MockIStatsMockRecorder) TvsSeries(ctx, timeframe any) *MockIStatsTvsSeriesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TvsSeries", reflect.TypeOf((*MockIStats)(nil).TvsSeries), ctx, timeframe)
+	return &MockIStatsTvsSeriesCall{Call: call}
+}
+
+// MockIStatsTvsSeriesCall wrap *gomock.Call
+type MockIStatsTvsSeriesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIStatsTvsSeriesCall) Return(arg0 []storage.SeriesItem, arg1 error) *MockIStatsTvsSeriesCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIStatsTvsSeriesCall) Do(f func(context.Context, storage.Timeframe) ([]storage.SeriesItem, error)) *MockIStatsTvsSeriesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIStatsTvsSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe) ([]storage.SeriesItem, error)) *MockIStatsTvsSeriesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}

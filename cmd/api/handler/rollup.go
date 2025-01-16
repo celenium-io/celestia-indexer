@@ -361,14 +361,14 @@ func (handler RollupHandler) Stats(c echo.Context) error {
 		histogram, err = handler.rollups.Tvl(
 			c.Request().Context(),
 			req.Id,
-			req.Timeframe,
+			storage.Timeframe(req.Timeframe),
 			storage.NewSeriesRequest(req.From, req.To),
 		)
 	} else {
 		histogram, err = handler.rollups.Series(
 			c.Request().Context(),
 			req.Id,
-			req.Timeframe,
+			storage.Timeframe(req.Timeframe),
 			req.SeriesName,
 			storage.NewSeriesRequest(req.From, req.To),
 		)
@@ -490,7 +490,7 @@ func (handler RollupHandler) Distribution(c echo.Context) error {
 		c.Request().Context(),
 		req.Id,
 		req.SeriesName,
-		req.Timeframe,
+		storage.Timeframe(req.Timeframe),
 	)
 	if err != nil {
 		return handleError(c, err, handler.rollups)

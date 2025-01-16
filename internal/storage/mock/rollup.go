@@ -241,7 +241,7 @@ func (c *MockIRollupCursorListCall) DoAndReturn(f func(context.Context, uint64, 
 }
 
 // Distribution mocks base method.
-func (m *MockIRollup) Distribution(ctx context.Context, rollupId uint64, series, groupBy string) ([]storage.DistributionItem, error) {
+func (m *MockIRollup) Distribution(ctx context.Context, rollupId uint64, series string, groupBy storage.Timeframe) ([]storage.DistributionItem, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Distribution", ctx, rollupId, series, groupBy)
 	ret0, _ := ret[0].([]storage.DistributionItem)
@@ -268,13 +268,13 @@ func (c *MockIRollupDistributionCall) Return(items []storage.DistributionItem, e
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIRollupDistributionCall) Do(f func(context.Context, uint64, string, string) ([]storage.DistributionItem, error)) *MockIRollupDistributionCall {
+func (c *MockIRollupDistributionCall) Do(f func(context.Context, uint64, string, storage.Timeframe) ([]storage.DistributionItem, error)) *MockIRollupDistributionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIRollupDistributionCall) DoAndReturn(f func(context.Context, uint64, string, string) ([]storage.DistributionItem, error)) *MockIRollupDistributionCall {
+func (c *MockIRollupDistributionCall) DoAndReturn(f func(context.Context, uint64, string, storage.Timeframe) ([]storage.DistributionItem, error)) *MockIRollupDistributionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -707,7 +707,7 @@ func (c *MockIRollupSaveCall) DoAndReturn(f func(context.Context, *storage.Rollu
 }
 
 // Series mocks base method.
-func (m *MockIRollup) Series(ctx context.Context, rollupId uint64, timeframe, column string, req storage.SeriesRequest) ([]storage.HistogramItem, error) {
+func (m *MockIRollup) Series(ctx context.Context, rollupId uint64, timeframe storage.Timeframe, column string, req storage.SeriesRequest) ([]storage.HistogramItem, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Series", ctx, rollupId, timeframe, column, req)
 	ret0, _ := ret[0].([]storage.HistogramItem)
@@ -734,19 +734,19 @@ func (c *MockIRollupSeriesCall) Return(items []storage.HistogramItem, err error)
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIRollupSeriesCall) Do(f func(context.Context, uint64, string, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupSeriesCall {
+func (c *MockIRollupSeriesCall) Do(f func(context.Context, uint64, storage.Timeframe, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupSeriesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIRollupSeriesCall) DoAndReturn(f func(context.Context, uint64, string, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupSeriesCall {
+func (c *MockIRollupSeriesCall) DoAndReturn(f func(context.Context, uint64, storage.Timeframe, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupSeriesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Tvl mocks base method.
-func (m *MockIRollup) Tvl(ctx context.Context, rollupId uint64, timeframe string, req storage.SeriesRequest) ([]storage.HistogramItem, error) {
+func (m *MockIRollup) Tvl(ctx context.Context, rollupId uint64, timeframe storage.Timeframe, req storage.SeriesRequest) ([]storage.HistogramItem, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Tvl", ctx, rollupId, timeframe, req)
 	ret0, _ := ret[0].([]storage.HistogramItem)
@@ -773,13 +773,13 @@ func (c *MockIRollupTvlCall) Return(items []storage.HistogramItem, err error) *M
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIRollupTvlCall) Do(f func(context.Context, uint64, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupTvlCall {
+func (c *MockIRollupTvlCall) Do(f func(context.Context, uint64, storage.Timeframe, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupTvlCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIRollupTvlCall) DoAndReturn(f func(context.Context, uint64, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupTvlCall {
+func (c *MockIRollupTvlCall) DoAndReturn(f func(context.Context, uint64, storage.Timeframe, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupTvlCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

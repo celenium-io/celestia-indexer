@@ -25,4 +25,6 @@ const (
 	ViewRollupStatsByDay      = "rollup_stats_by_day"
 	ViewRollupStatsByMonth    = "rollup_stats_by_month"
 	ViewRollupTvlByMonth      = "rollup_tvl_by_month"
+	ViewTvsByDay              = "tvs_by_day"
+	ViewTvsByMonth            = "tvs_by_month"
 )
