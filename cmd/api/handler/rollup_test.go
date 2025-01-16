@@ -317,13 +317,13 @@ func (s *RollupTestSuite) TestGetBlobs() {
 func (s *RollupTestSuite) TestStats() {
 	for _, name := range []string{"blobs_count", "size", "size_per_blob", "fee", "tvl"} {
 		if name != "tvl" {
-			for _, tf := range []string{"hour", "day", "month"} {
+			for _, tf := range []storage.Timeframe{storage.TimeframeHour, storage.TimeframeDay, storage.TimeframeMonth} {
 				req := httptest.NewRequest(http.MethodGet, "/", nil)
 				rec := httptest.NewRecorder()
 				c := s.echo.NewContext(req, rec)
 				c.SetPath("/rollup/:id/stats/:name/:timeframe")
 				c.SetParamNames("id", "name", "timeframe")
-				c.SetParamValues("1", name, tf)
+				c.SetParamValues("1", name, string(tf))
 
 				s.rollups.EXPECT().
 					Series(gomock.Any(), uint64(1), tf, name, storage.NewSeriesRequest(0, 0)).
@@ -343,13 +343,13 @@ func (s *RollupTestSuite) TestStats() {
 				s.Require().Len(histogram, 1)
 			}
 		} else {
-			for _, tf := range []string{"day", "month"} {
+			for _, tf := range []storage.Timeframe{storage.TimeframeDay, storage.TimeframeMonth} {
 				req := httptest.NewRequest(http.MethodGet, "/", nil)
 				rec := httptest.NewRecorder()
 				c := s.echo.NewContext(req, rec)
 				c.SetPath("/rollup/:id/stats/:name/:timeframe")
 				c.SetParamNames("id", "name", "timeframe")
-				c.SetParamValues("1", name, tf)
+				c.SetParamValues("1", name, string(tf))
 
 				s.rollups.EXPECT().
 					Tvl(gomock.Any(), uint64(1), tf, storage.NewSeriesRequest(0, 0)).
@@ -376,13 +376,13 @@ func (s *RollupTestSuite) TestStats() {
 
 func (s *RollupTestSuite) TestDistribution() {
 	for _, name := range []string{"blobs_count", "size", "size_per_blob", "fee_per_blob"} {
-		for _, tf := range []string{"hour", "day"} {
+		for _, tf := range []storage.Timeframe{storage.TimeframeHour, storage.TimeframeDay} {
 			req := httptest.NewRequest(http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/rollup/:id/distribution/:name/:timeframe")
 			c.SetParamNames("id", "name", "timeframe")
-			c.SetParamValues("1", name, tf)
+			c.SetParamValues("1", name, string(tf))
 
 			s.rollups.EXPECT().
 				Distribution(gomock.Any(), uint64(1), name, tf).
