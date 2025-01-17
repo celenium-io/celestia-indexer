@@ -544,3 +544,58 @@ func (sh StatsHandler) MessagesCount24h(c echo.Context) error {
 	}
 	return returnArray(c, response)
 }
+
+// Tvs godoc
+//
+//	@Summary		Get TVS of the network
+//	@Description	Get TVS of the network
+//	@Tags			stats
+//	@ID				stats-tvs
+//	@Produce		json
+//	@Success		200	{integer}	float64
+//	@Failure		500	{object}	Error
+//	@Router			/stats/tvs [get]
+func (sh StatsHandler) Tvs(c echo.Context) error {
+	tvs, err := sh.repo.Tvs(c.Request().Context())
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+	return c.JSON(http.StatusOK, tvs)
+}
+
+// TvsSeries godoc
+//
+//	@Summary		Get histogram for network TVS
+//	@Description	Get histogram for network TVS by timeframe
+//	@Tags			stats
+//	@ID				stats-tvs-series
+//	@Param			timeframe	path	string	true	"Timeframe"						Enums(day, month)
+//	@Produce		json
+//	@Success		200	{array}		responses.SeriesItem
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/stats/tvs/{timeframe} [get]
+func (sh StatsHandler) TvsSeries(c echo.Context) error {
+	req, err := bindAndValidate[tvsSeriesRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	tvs, err := sh.repo.TvsSeries(c.Request().Context(), storage.Timeframe(req.Timeframe))
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+	if len(tvs) == 0 {
+		return c.JSON(http.StatusOK, []any{})
+	}
+
+	response := make([]responses.SeriesItem, len(tvs))
+	for i := range tvs {
+		response[i] = responses.NewSeriesItem(tvs[i])
+	}
+	return returnArray(c, response)
+}
+
+type tvsSeriesRequest struct {
+	Timeframe string `example:"hour" param:"timeframe" swaggertype:"string" validate:"required,oneof=day month"`
+}

@@ -49,6 +49,7 @@ type Storage struct {
 	Undelegation    models.IUndelegation
 	Jails           models.IJail
 	Rollup          models.IRollup
+	Tvl             models.ITvl
 	Grants          models.IGrant
 	ApiKeys         models.IApiKey
 	Notificator     *Notificator
@@ -97,6 +98,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		Undelegation:    NewUndelegation(strg.Connection()),
 		Jails:           NewJail(strg.Connection()),
 		Rollup:          NewRollup(strg.Connection()),
+		Tvl:             NewTvl(strg.Connection()),
 		Grants:          NewGrant(strg.Connection()),
 		ApiKeys:         NewApiKey(strg.Connection()),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
@@ -177,6 +179,7 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 			&models.Jail{},
 			&models.StakingLog{},
 			&models.Price{},
+			&models.Tvl{},
 		} {
 			if _, err := tx.ExecContext(ctx,
 				`SELECT create_hypertable(?, 'time', chunk_time_interval => INTERVAL '1 month', if_not_exists => TRUE);`,

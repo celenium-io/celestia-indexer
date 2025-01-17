@@ -335,7 +335,7 @@ func (handler RollupHandler) GetBlobs(c echo.Context) error {
 type rollupStatsRequest struct {
 	Id         uint64 `example:"1"          param:"id"        swaggertype:"integer" validate:"required,min=1"`
 	Timeframe  string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day month"`
-	SeriesName string `example:"tps"        param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_count size size_per_blob fee"`
+	SeriesName string `example:"tps"        param:"name"      swaggertype:"string"  validate:"required,oneof=blobs_count size size_per_blob fee tvl"`
 	From       int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
 	To         int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
 }
@@ -347,7 +347,7 @@ type rollupStatsRequest struct {
 //	@Tags			rollup
 //	@ID				get-rollup-stats
 //	@Param			id			path	integer	true	"Internal identity"				mininum(1)
-//	@Param			name		path	string	true	"Series name"					Enums(blobs_count, size, size_per_blob, fee)
+//	@Param			name		path	string	true	"Series name"					Enums(blobs_count, size, size_per_blob, fee, tvl)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
 //	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
@@ -362,13 +362,24 @@ func (handler RollupHandler) Stats(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	histogram, err := handler.rollups.Series(
-		c.Request().Context(),
-		req.Id,
-		req.Timeframe,
-		req.SeriesName,
-		storage.NewSeriesRequest(req.From, req.To),
-	)
+	var histogram []storage.HistogramItem
+	if req.SeriesName == "tvl" {
+		histogram, err = handler.rollups.Tvl(
+			c.Request().Context(),
+			req.Id,
+			storage.Timeframe(req.Timeframe),
+			storage.NewSeriesRequest(req.From, req.To),
+		)
+	} else {
+		histogram, err = handler.rollups.Series(
+			c.Request().Context(),
+			req.Id,
+			storage.Timeframe(req.Timeframe),
+			req.SeriesName,
+			storage.NewSeriesRequest(req.From, req.To),
+		)
+	}
+
 	if err != nil {
 		return handleError(c, err, handler.rollups)
 	}
@@ -485,7 +496,7 @@ func (handler RollupHandler) Distribution(c echo.Context) error {
 		c.Request().Context(),
 		req.Id,
 		req.SeriesName,
-		req.Timeframe,
+		storage.Timeframe(req.Timeframe),
 	)
 	if err != nil {
 		return handleError(c, err, handler.rollups)

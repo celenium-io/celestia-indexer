@@ -107,6 +107,8 @@ func TestRoutes(t *testing.T) {
 		"/v1/rollup/stats/series GET":                         {},
 		"/v1/rollup/group GET":                                {},
 		"/v1/blob/proofs POST":                                {},
+		"/v1/stats/tvs GET":                                   {},
+		"/v1/stats/tvs/:timeframe GET":                        {},
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

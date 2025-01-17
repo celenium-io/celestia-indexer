@@ -35,6 +35,16 @@ datasources:
     url: ${BINANCE_API_URL:-https://api.binance.com/}
     rps: ${BINANCE_API_RPS:-5}
     timeout: ${BINANCE_API_TIMEOUT:-10}
+  l2beat:
+    kind: l2beat_api
+    url: ${L2BEAT_API_URL:-https://l2beat.com/api/}
+    rps: ${L2BEAT_API_RPS:-5}
+    timeout: ${L2BEAT_API_TIMEOUT:-10}
+  lama:
+    kind: lama_api
+    url: ${LAMA_API_URL:-https://api.llama.fi/}
+    rps: ${LAMA_API_RPS:-5}
+    timeout: ${LAMA_API_TIMEOUT:-10}
 
 api:
   bind: ${API_HOST:-0.0.0.0}:${API_PORT:-9876}
