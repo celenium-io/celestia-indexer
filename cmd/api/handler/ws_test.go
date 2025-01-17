@@ -5,15 +5,11 @@ package handler
 
 import (
 	"context"
-	"crypto/rand"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
@@ -21,12 +17,14 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
+
 	"go.uber.org/mock/gomock"
 )
 
@@ -45,26 +43,22 @@ func TestWebsocket(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	blockMock := mock.NewMockIBlock(ctrl)
 	validatorsMock := mock.NewMockIValidator(ctrl)
-	dispatcher, err := bus.NewDispatcher(listenerFactory, blockMock, validatorsMock)
+	dispatcher, err := bus.NewDispatcher(listenerFactory, validatorsMock)
 	require.NoError(t, err)
 	dispatcher.Start(ctx)
 	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelBlock)
 
-	for i := uint64(0); i < 10; i++ {
-		hash := make([]byte, 32)
-		_, err := rand.Read(hash)
-		require.NoError(t, err)
-
-		blockMock.EXPECT().ByIdWithRelations(ctx, i).Return(storage.Block{
-			Id:           i,
-			Height:       types.Level(i),
-			Time:         time.Now(),
-			Hash:         hash,
-			MessageTypes: storageTypes.NewMsgTypeBits(),
-			Stats:        testBlock.Stats,
-		}, nil).MaxTimes(1)
+	for i := uint64(1); i < 10; i++ {
+		validatorsMock.
+			EXPECT().
+			GetByID(ctx, i).
+			Return(&storage.Validator{
+				Id:          i,
+				Moniker:     "moniker",
+				ConsAddress: "cons_address",
+			}, nil).
+			MaxTimes(1)
 	}
 
 	go func() {
@@ -80,9 +74,21 @@ func TestWebsocket(t *testing.T) {
 			case <-ticker.C:
 				id++
 
+				block := storage.Block{
+					Id:           id,
+					ProposerId:   id,
+					Height:       types.Level(id),
+					Time:         time.Now(),
+					Hash:         testBlock.Hash,
+					Stats:        testBlock.Stats,
+					MessageTypes: storageTypes.NewMsgTypeBits(),
+				}
+				data, err := json.Marshal(block)
+				require.NoError(t, err)
+
 				headChannel <- &pq.Notification{
 					Channel: storage.ChannelBlock,
-					Extra:   strconv.FormatUint(id, 10),
+					Extra:   string(data),
 				}
 			}
 		}

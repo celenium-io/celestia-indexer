@@ -19,6 +19,7 @@ type LeaderboardFilters struct {
 	Limit     int
 	Offset    int
 	Category  []types.RollupCategory
+	Tags      []string
 	Type      []types.RollupType
 }
 
@@ -44,6 +45,8 @@ type IRollup interface {
 	Distribution(ctx context.Context, rollupId uint64, series string, groupBy Timeframe) (items []DistributionItem, err error)
 	BySlug(ctx context.Context, slug string) (RollupWithStats, error)
 	RollupStatsGrouping(ctx context.Context, fltrs RollupGroupStatsFilters) ([]RollupGroupedStats, error)
+	Tags(ctx context.Context) ([]string, error)
+	Unverified(ctx context.Context) (rollups []Rollup, err error)
 }
 
 // Rollup -
@@ -67,8 +70,10 @@ type Rollup struct {
 	Provider       string               `bun:"provider"                      comment:"RaaS provider"`
 	Type           types.RollupType     `bun:"type,type:rollup_type"         comment:"Type of rollup: settled or sovereign"`
 	Category       types.RollupCategory `bun:"category,type:rollup_category" comment:"Category of rollup"`
+	Tags           []string             `bun:"tags,array"`
 	VM             string               `bun:"vm"                            comment:"Virtual machine"`
 	Links          []string             `bun:"links,array"                   comment:"Other links to rollup related sites"`
+	Verified       bool                 `bun:"verified"`
 
 	Providers []*RollupProvider `bun:"rel:has-many,join:id=rollup_id"`
 }
@@ -91,6 +96,7 @@ func (r Rollup) IsEmpty() bool {
 		r.Stack == "" &&
 		r.Links == nil &&
 		r.Category == "" &&
+		r.Tags == nil &&
 		r.Compression == "" &&
 		r.Provider == "" &&
 		r.Type == "" &&

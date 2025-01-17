@@ -750,6 +750,7 @@ func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 		Stack:          "stack",
 		Type:           types.RollupTypeSettled,
 		Category:       types.RollupCategoryFinance,
+		Tags:           []string{"tag"},
 		Links:          []string{testLink},
 	}
 	err = tx.SaveRollup(ctx, rollup)
@@ -777,7 +778,9 @@ func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 	s.Require().EqualValues(testLink, newRollup.BridgeContract)
 	s.Require().EqualValues("test", newRollup.DeFiLama)
 	s.Require().EqualValues("stack", newRollup.Stack)
+	s.Require().EqualValues("finance", newRollup.Category)
 	s.Require().Len(newRollup.Links, 1)
+	s.Require().Len(newRollup.Tags, 1)
 
 	tx, err = BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)

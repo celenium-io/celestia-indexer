@@ -4,9 +4,17 @@
 package handler
 
 import (
+	"database/sql"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 func Test_isAddress(t *testing.T) {
@@ -71,4 +79,90 @@ func Test_isValoperAddress(t *testing.T) {
 			require.Equal(t, tt.want, got, tt.name)
 		})
 	}
+}
+
+func TestKeyValidator_Validate(t *testing.T) {
+	t.Run("valid key", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		e := echo.New()
+		ctx := e.NewContext(req, rec)
+
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		errChecker := mock.NewMockIDelegation(ctrl)
+		apiKeys := mock.NewMockIApiKey(ctrl)
+		kv := NewKeyValidator(apiKeys, errChecker)
+
+		apiKeys.EXPECT().
+			Get(gomock.Any(), "valid").
+			Return(storage.ApiKey{
+				Key:         "valid",
+				Description: "descr",
+			}, nil).
+			Times(1)
+
+		ok, err := kv.Validate("valid", ctx)
+		require.NoError(t, err)
+		require.True(t, ok)
+	})
+
+	t.Run("invalid key", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		e := echo.New()
+		ctx := e.NewContext(req, rec)
+
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		errChecker := mock.NewMockIDelegation(ctrl)
+		apiKeys := mock.NewMockIApiKey(ctrl)
+		kv := NewKeyValidator(apiKeys, errChecker)
+
+		apiKeys.EXPECT().
+			Get(gomock.Any(), "invalid").
+			Return(storage.ApiKey{}, sql.ErrNoRows).
+			Times(1)
+
+		errChecker.EXPECT().
+			IsNoRows(sql.ErrNoRows).
+			Return(true).
+			Times(1)
+
+		ok, err := kv.Validate("invalid", ctx)
+		require.NoError(t, err)
+		require.False(t, ok)
+	})
+
+	t.Run("unexpected error", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		e := echo.New()
+		ctx := e.NewContext(req, rec)
+
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		errChecker := mock.NewMockIDelegation(ctrl)
+		apiKeys := mock.NewMockIApiKey(ctrl)
+		kv := NewKeyValidator(apiKeys, errChecker)
+
+		unexpectedErr := errors.New("unexpected")
+
+		apiKeys.EXPECT().
+			Get(gomock.Any(), "invalid").
+			Return(storage.ApiKey{}, unexpectedErr).
+			Times(1)
+
+		errChecker.EXPECT().
+			IsNoRows(unexpectedErr).
+			Return(false).
+			Times(1)
+
+		ok, err := kv.Validate("invalid", ctx)
+		require.Error(t, err)
+		require.False(t, ok)
+	})
 }

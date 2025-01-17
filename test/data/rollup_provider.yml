@@ -10,3 +10,6 @@
 - rollup_id: 3
   namespace_id: 0
   address_id: 2
+- rollup_id: 4
+  namespace_id: 0
+  address_id: 2

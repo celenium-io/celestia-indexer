@@ -25,7 +25,6 @@ import (
 type MockIRollup struct {
 	ctrl     *gomock.Controller
 	recorder *MockIRollupMockRecorder
-	isgomock struct{}
 }
 
 // MockIRollupMockRecorder is the mock recorder for MockIRollup.
@@ -780,6 +779,84 @@ func (c *MockIRollupTvlCall) Do(f func(context.Context, uint64, storage.Timefram
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIRollupTvlCall) DoAndReturn(f func(context.Context, uint64, storage.Timeframe, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupTvlCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Tags mocks base method.
+func (m *MockIRollup) Tags(ctx context.Context) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Tags", ctx)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Tags indicates an expected call of Tags.
+func (mr *MockIRollupMockRecorder) Tags(ctx any) *MockIRollupTagsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Tags", reflect.TypeOf((*MockIRollup)(nil).Tags), ctx)
+	return &MockIRollupTagsCall{Call: call}
+}
+
+// MockIRollupTagsCall wrap *gomock.Call
+type MockIRollupTagsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIRollupTagsCall) Return(arg0 []string, arg1 error) *MockIRollupTagsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIRollupTagsCall) Do(f func(context.Context) ([]string, error)) *MockIRollupTagsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIRollupTagsCall) DoAndReturn(f func(context.Context) ([]string, error)) *MockIRollupTagsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Unverified mocks base method.
+func (m *MockIRollup) Unverified(ctx context.Context) ([]storage.Rollup, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Unverified", ctx)
+	ret0, _ := ret[0].([]storage.Rollup)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Unverified indicates an expected call of Unverified.
+func (mr *MockIRollupMockRecorder) Unverified(ctx any) *MockIRollupUnverifiedCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unverified", reflect.TypeOf((*MockIRollup)(nil).Unverified), ctx)
+	return &MockIRollupUnverifiedCall{Call: call}
+}
+
+// MockIRollupUnverifiedCall wrap *gomock.Call
+type MockIRollupUnverifiedCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIRollupUnverifiedCall) Return(rollups []storage.Rollup, err error) *MockIRollupUnverifiedCall {
+	c.Call = c.Call.Return(rollups, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIRollupUnverifiedCall) Do(f func(context.Context) ([]storage.Rollup, error)) *MockIRollupUnverifiedCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIRollupUnverifiedCall) DoAndReturn(f func(context.Context) ([]storage.Rollup, error)) *MockIRollupUnverifiedCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

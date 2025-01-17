@@ -16,6 +16,7 @@ var (
 	errInvalidHashLength = errors.New("invalid hash: should be 32 bytes length")
 	errInvalidAddress    = errors.New("invalid address")
 	errUnknownAddress    = errors.New("unknown address")
+	errInvalidApiKey     = errors.New("invalid api key")
 	errCancelRequest     = "pq: canceling statement due to user request"
 )
 

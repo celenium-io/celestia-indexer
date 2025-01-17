@@ -305,6 +305,18 @@ func (s *StatsTestSuite) TestMessagesCount24h() {
 	s.Require().Len(items, 0)
 }
 
+func (s *StatsTestSuite) TestChange24hBlockStats() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	stats, err := s.storage.Stats.Change24hBlockStats(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal(stats.BlobsSize, 0.0)
+	s.Require().Equal(stats.BytesInBlock, 0.0)
+	s.Require().Equal(stats.Fee, 0.0)
+	s.Require().Equal(stats.TxCount, 0.0)
+}
+
 func TestSuiteStats_Run(t *testing.T) {
 	suite.Run(t, new(StatsTestSuite))
 }

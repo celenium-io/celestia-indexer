@@ -602,7 +602,7 @@ func (tx Transaction) SaveRollup(ctx context.Context, rollup *models.Rollup) err
 }
 
 func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) error {
-	if rollup == nil || rollup.IsEmpty() {
+	if rollup == nil || (rollup.IsEmpty() && !rollup.Verified) {
 		return nil
 	}
 
@@ -650,6 +650,9 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 	if rollup.Category != "" {
 		query = query.Set("category = ?", rollup.Category)
 	}
+	if rollup.Tags != nil {
+		query = query.Set("tags = ?", pq.Array(rollup.Tags))
+	}
 	if rollup.Provider != "" {
 		query = query.Set("provider = ?", rollup.Provider)
 	}
@@ -662,6 +665,8 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 	if rollup.DeFiLama != "" {
 		query = query.Set("defi_lama = ?", rollup.DeFiLama)
 	}
+
+	query = query.Set("verified = ?", rollup.Verified)
 
 	_, err := query.Exec(ctx)
 	return err

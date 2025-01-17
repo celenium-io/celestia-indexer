@@ -121,10 +121,10 @@ func (s Stats) Change24hBlockStats(ctx context.Context) (response storage.Change
 		With("s", second).
 		TableExpr("f, s").
 		ColumnExpr(`
-			(f.tx_count - s.tx_count)/s.tx_count as tx_count_24h,
-			(f.bytes_in_block - s.bytes_in_block)/s.bytes_in_block as bytes_in_block_24h,
-			(f.blobs_size - s.blobs_size)/s.blobs_size as blobs_size_24h,
-			(f.fee - s.fee)/s.fee as fee_24h
+			case when s.tx_count > 0 then (f.tx_count - s.tx_count)/s.tx_count when f.tx_count > 0 then 1 else 0 end as tx_count_24h,
+			case when s.bytes_in_block > 0 then (f.bytes_in_block - s.bytes_in_block)/s.bytes_in_block when f.bytes_in_block > 0 then 1 else 0 end as bytes_in_block_24h,
+			case when s.blobs_size > 0 then (f.blobs_size - s.blobs_size)/s.blobs_size when f.blobs_size > 0 then 1 else 0 end as blobs_size_24h,
+			case when s.fee > 0 then (f.fee - s.fee)/s.fee when f.fee > 0 then 1 else 0 end as fee_24h
 		`).
 		Scan(ctx, &response)
 	return

@@ -16,7 +16,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/migrate"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // Storage -
@@ -52,6 +51,7 @@ type Storage struct {
 	Rollup          models.IRollup
 	Tvl             models.ITvl
 	Grants          models.IGrant
+	ApiKeys         models.IApiKey
 	Notificator     *Notificator
 
 	export models.Export
@@ -100,6 +100,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		Rollup:          NewRollup(strg.Connection()),
 		Tvl:             NewTvl(strg.Connection()),
 		Grants:          NewGrant(strg.Connection()),
+		ApiKeys:         NewApiKey(strg.Connection()),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
 
 		export: export,
@@ -228,14 +229,4 @@ func (s Storage) Close() error {
 		return err
 	}
 	return nil
-}
-
-func (s Storage) SetTracer(tp trace.TracerProvider) {
-	s.Connection().DB().AddQueryHook(
-		NewSentryHook(
-			s.cfg.Database,
-			tp.Tracer("db"),
-			true,
-		),
-	)
 }

@@ -52,14 +52,14 @@ type Block struct {
 	EvidenceHash       pkgTypes.Hex `bun:"evidence_hash"        comment:"Evidence hash"`
 	ProposerId         uint64       `bun:"proposer_id,nullzero" comment:"Proposer internal id"`
 
-	ChainId         string           `bun:"-"` // internal field for filling state
-	ProposerAddress string           `bun:"-"` // internal field for proposer
-	BlockSignatures []BlockSignature `bun:"-"` // internal field for block signature
+	ChainId         string           `bun:"-" json:"-"` // internal field for filling state
+	ProposerAddress string           `bun:"-" json:"-"` // internal field for proposer
+	BlockSignatures []BlockSignature `bun:"-" json:"-"` // internal field for block signature
 
-	Txs      []Tx       `bun:"rel:has-many"`
-	Events   []Event    `bun:"rel:has-many"`
+	Txs      []Tx       `bun:"rel:has-many"                   json:"-"`
+	Events   []Event    `bun:"rel:has-many"                   json:"-"`
 	Stats    BlockStats `bun:"rel:has-one,join:height=height"`
-	Proposer Validator  `bun:"rel:belongs-to"`
+	Proposer Validator  `bun:"rel:belongs-to"                 json:"-"`
 }
 
 // TableName -

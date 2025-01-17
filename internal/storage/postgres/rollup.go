@@ -46,6 +46,17 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 		query = query.Where("category IN (?)", bun.In(fltrs.Category))
 	}
 
+	if len(fltrs.Tags) > 0 {
+		query = query.WhereGroup(" AND ", func(q *bun.SelectQuery) *bun.SelectQuery {
+			for i := range fltrs.Tags {
+				q.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
+					return sq.Where("? = ANY(tags)", fltrs.Tags[i])
+				})
+			}
+			return q
+		})
+	}
+
 	if len(fltrs.Type) > 0 {
 		query = query.Where("type IN (?)", bun.In(fltrs.Type))
 	}
@@ -70,10 +81,21 @@ func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFi
 		Column("avg_size", blobsCountColumn, "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price").
 		ColumnExpr("rollup.*").
 		Offset(fltrs.Offset).
-		Join("left join rollup on rollup.id = rollup_id")
+		Join("left join rollup on rollup.id = rollup_id AND rollup.verified = true")
 
 	if len(fltrs.Category) > 0 {
 		query = query.Where("category IN (?)", bun.In(fltrs.Category))
+	}
+
+	if len(fltrs.Tags) > 0 {
+		query = query.WhereGroup(" AND ", func(q *bun.SelectQuery) *bun.SelectQuery {
+			for i := range fltrs.Tags {
+				q.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
+					return sq.Where("? = ANY(tags)", fltrs.Tags[i])
+				})
+			}
+			return q
+		})
 	}
 
 	if len(fltrs.Type) > 0 {
@@ -121,7 +143,7 @@ func (r *Rollup) RollupsByNamespace(ctx context.Context, namespaceId uint64, lim
 		With("rollups", subQuery).
 		Table("rollups").
 		ColumnExpr("rollup.*").
-		Join("left join rollup on rollup.id = rollups.rollup_id").
+		Join("left join rollup on rollup.id = rollups.rollup_id and rollup.verified = true").
 		Scan(ctx, &rollups)
 	return
 }
@@ -191,7 +213,7 @@ func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe storage.
 }
 
 func (r *Rollup) Count(ctx context.Context) (int64, error) {
-	count, err := r.DB().NewSelect().Model((*storage.Rollup)(nil)).Count(ctx)
+	count, err := r.DB().NewSelect().Model((*storage.Rollup)(nil)).Where("verified = TRUE").Count(ctx)
 	return int64(count), err
 }
 
@@ -321,7 +343,7 @@ func (r *Rollup) AllSeries(ctx context.Context) (items []storage.RollupHistogram
 	err = r.DB().NewSelect().
 		TableExpr("(?) as series", subQuery).
 		ColumnExpr("series.time as time, series.size as size, series.blobs_count as blobs_count, series.fee as fee, rollup.name as name, rollup.logo as logo").
-		Join("left join rollup on rollup.id = series.rollup_id").
+		Join("left join rollup on rollup.id = series.rollup_id and rollup.verified = true").
 		Scan(ctx, &items)
 
 	return
@@ -353,5 +375,23 @@ func (r *Rollup) RollupStatsGrouping(ctx context.Context, fltrs storage.RollupGr
 	}
 
 	err = query.Scan(ctx, &results)
+	return
+}
+
+func (r *Rollup) Tags(ctx context.Context) (arr []string, err error) {
+	err = r.DB().NewSelect().
+		Model((*storage.Rollup)(nil)).
+		Distinct().
+		ColumnExpr("unnest(tags)").
+		Where("verified = true").
+		Scan(ctx, &arr)
+	return
+}
+
+func (r *Rollup) Unverified(ctx context.Context) (rollups []storage.Rollup, err error) {
+	err = r.DB().NewSelect().
+		Model(&rollups).
+		Where("verified = false").
+		Scan(ctx)
 	return
 }

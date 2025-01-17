@@ -3,7 +3,6 @@
 
 package types
 
-// swagger:enum RollupCategory
 /*
 	ENUM(
 		uncategorized,

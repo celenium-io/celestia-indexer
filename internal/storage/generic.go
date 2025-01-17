@@ -43,6 +43,7 @@ var Models = []any{
 	&Rollup{},
 	&RollupProvider{},
 	&Grant{},
+	&ApiKey{},
 	&Tvl{},
 }
 

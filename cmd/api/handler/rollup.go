@@ -37,6 +37,7 @@ type rollupList struct {
 	Offset   int         `query:"offset"   validate:"omitempty,min=0"`
 	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=time blobs_count size fee"`
+	Tags     StringArray `query:"tags"     validate:"omitempty"`
 	Category StringArray `query:"category" validate:"omitempty,dive,category"`
 	Type     StringArray `query:"type"     validate:"omitempty,dive,type"`
 }
@@ -64,6 +65,7 @@ func (p *rollupList) SetDefault() {
 //		@Param			sort	 query	string	false	"Sort order. Default: desc"		Enums(asc, desc)
 //		@Param			sort_by	 query	string	false	"Sort field. Default: size"		Enums(time, blobs_count, size, fee)
 //	    @Param          category query  string  false   "Comma-separated rollup category list"
+//	    @Param          tags     query  string  false   "Comma-separated rollup tags list"
 //		@Produce		json
 //		@Success		200	{array}		responses.RollupWithStats
 //		@Failure		400	{object}	Error
@@ -76,14 +78,14 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	categories := make([]types.RollupCategory, len(req.Category))
-	for i := range categories {
-		categories[i] = types.RollupCategory(req.Category[i])
-	}
-
 	rollupTypes := make([]types.RollupType, len(req.Type))
 	for i := range rollupTypes {
 		rollupTypes[i] = types.RollupType(req.Type[i])
+	}
+
+	categories := make([]types.RollupCategory, len(req.Category))
+	for i := range categories {
+		categories[i] = types.RollupCategory(req.Category[i])
 	}
 
 	rollups, err := handler.rollups.Leaderboard(c.Request().Context(), storage.LeaderboardFilters{
@@ -92,6 +94,7 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 		Limit:     req.Limit,
 		Offset:    req.Offset,
 		Category:  categories,
+		Tags:      req.Tags,
 		Type:      rollupTypes,
 	})
 	if err != nil {
@@ -110,6 +113,7 @@ type rollupDayList struct {
 	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=avg_size blobs_count total_size total_fee throughput namespace_count pfb_count mb_price"`
 	Category StringArray `query:"category" validate:"omitempty,dive,category"`
+	Tags     StringArray `query:"tags"     validate:"omitempty"`
 	Type     StringArray `query:"type"     validate:"omitempty,dive,type"`
 }
 
@@ -136,6 +140,7 @@ func (p *rollupDayList) SetDefault() {
 //	@Param			sort	query	string	false	"Sort order. Default: desc"		Enums(asc, desc)
 //	@Param			sort_by	query	string	false	"Sort field. Default: mb_price"	Enums(avg_size, blobs_count, total_size, total_fee, throughput, namespace_count, pfb_count, mb_price)
 //	@Param          category query  string  false   "Comma-separated rollup category list"
+//	@Param          tags     query  string  false   "Comma-separated rollup tags list"
 //	@Produce		json
 //	@Success		200	{array}		responses.RollupWithDayStats
 //	@Failure		400	{object}	Error
@@ -148,14 +153,14 @@ func (handler RollupHandler) LeaderboardDay(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	categories := make([]types.RollupCategory, len(req.Category))
-	for i := range categories {
-		categories[i] = types.RollupCategory(req.Category[i])
-	}
-
 	rollupTypes := make([]types.RollupType, len(req.Type))
 	for i := range rollupTypes {
 		rollupTypes[i] = types.RollupType(req.Type[i])
+	}
+
+	categories := make([]types.RollupCategory, len(req.Category))
+	for i := range categories {
+		categories[i] = types.RollupCategory(req.Category[i])
 	}
 
 	rollups, err := handler.rollups.LeaderboardDay(c.Request().Context(), storage.LeaderboardFilters{
@@ -163,6 +168,7 @@ func (handler RollupHandler) LeaderboardDay(c echo.Context) error {
 		Sort:      pgSort(req.Sort),
 		Limit:     req.Limit,
 		Offset:    req.Offset,
+		Tags:      req.Tags,
 		Category:  categories,
 		Type:      rollupTypes,
 	})
