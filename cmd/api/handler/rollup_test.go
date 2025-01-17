@@ -314,62 +314,63 @@ func (s *RollupTestSuite) TestGetBlobs() {
 	s.Require().Len(logs, 1)
 }
 
+func (s *RollupTestSuite) TestTvl() {
+	name := "tvl"
+	for _, tf := range []storage.Timeframe{storage.TimeframeDay, storage.TimeframeMonth} {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		c := s.echo.NewContext(req, rec)
+		c.SetPath("/rollup/:id/stats/:name/:timeframe")
+		c.SetParamNames("id", "name", "timeframe")
+		c.SetParamValues("1", name, string(tf))
+
+		s.rollups.EXPECT().
+			Tvl(gomock.Any(), uint64(1), tf, storage.NewSeriesRequest(0, 0)).
+			Return([]storage.HistogramItem{
+				{
+					Value: "12345678",
+					Time:  testTime,
+				},
+			}, nil)
+
+		s.Require().NoError(s.handler.Stats(c))
+		s.Require().Equal(http.StatusOK, rec.Code)
+
+		var histogram []responses.HistogramItem
+		err := json.NewDecoder(rec.Body).Decode(&histogram)
+		s.Require().NoError(err)
+		s.Require().Len(histogram, 1)
+		s.Require().EqualValues("12345678", histogram[0].Value)
+		s.Require().EqualValues(testTime, histogram[0].Time)
+	}
+}
+
 func (s *RollupTestSuite) TestStats() {
-	for _, name := range []string{"blobs_count", "size", "size_per_blob", "fee", "tvl"} {
-		if name != "tvl" {
-			for _, tf := range []storage.Timeframe{storage.TimeframeHour, storage.TimeframeDay, storage.TimeframeMonth} {
-				req := httptest.NewRequest(http.MethodGet, "/", nil)
-				rec := httptest.NewRecorder()
-				c := s.echo.NewContext(req, rec)
-				c.SetPath("/rollup/:id/stats/:name/:timeframe")
-				c.SetParamNames("id", "name", "timeframe")
-				c.SetParamValues("1", name, string(tf))
+	for _, name := range []string{"blobs_count", "size", "size_per_blob", "fee"} {
+		for _, tf := range []storage.Timeframe{storage.TimeframeHour, storage.TimeframeDay, storage.TimeframeMonth} {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/rollup/:id/stats/:name/:timeframe")
+			c.SetParamNames("id", "name", "timeframe")
+			c.SetParamValues("1", name, string(tf))
 
-				s.rollups.EXPECT().
-					Series(gomock.Any(), uint64(1), tf, name, storage.NewSeriesRequest(0, 0)).
-					Return([]storage.HistogramItem{
-						{
-							Value: "0.1",
-							Time:  testTime,
-						},
-					}, nil)
+			s.rollups.EXPECT().
+				Series(gomock.Any(), uint64(1), tf, name, storage.NewSeriesRequest(0, 0)).
+				Return([]storage.HistogramItem{
+					{
+						Value: "0.1",
+						Time:  testTime,
+					},
+				}, nil)
 
-				s.Require().NoError(s.handler.Stats(c))
-				s.Require().Equal(http.StatusOK, rec.Code)
+			s.Require().NoError(s.handler.Stats(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
 
-				var histogram []responses.HistogramItem
-				err := json.NewDecoder(rec.Body).Decode(&histogram)
-				s.Require().NoError(err)
-				s.Require().Len(histogram, 1)
-			}
-		} else {
-			for _, tf := range []storage.Timeframe{storage.TimeframeDay, storage.TimeframeMonth} {
-				req := httptest.NewRequest(http.MethodGet, "/", nil)
-				rec := httptest.NewRecorder()
-				c := s.echo.NewContext(req, rec)
-				c.SetPath("/rollup/:id/stats/:name/:timeframe")
-				c.SetParamNames("id", "name", "timeframe")
-				c.SetParamValues("1", name, string(tf))
-
-				s.rollups.EXPECT().
-					Tvl(gomock.Any(), uint64(1), tf, storage.NewSeriesRequest(0, 0)).
-					Return([]storage.HistogramItem{
-						{
-							Value: "12345678",
-							Time:  testTime,
-						},
-					}, nil)
-
-				s.Require().NoError(s.handler.Stats(c))
-				s.Require().Equal(http.StatusOK, rec.Code)
-
-				var histogram []responses.HistogramItem
-				err := json.NewDecoder(rec.Body).Decode(&histogram)
-				s.Require().NoError(err)
-				s.Require().Len(histogram, 1)
-				s.Require().EqualValues("12345678", histogram[0].Value)
-				s.Require().EqualValues(testTime, histogram[0].Time)
-			}
+			var histogram []responses.HistogramItem
+			err := json.NewDecoder(rec.Body).Decode(&histogram)
+			s.Require().NoError(err)
+			s.Require().Len(histogram, 1)
 		}
 	}
 }

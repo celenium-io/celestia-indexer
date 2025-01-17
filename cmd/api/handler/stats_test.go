@@ -602,3 +602,46 @@ func (s *StatsTestSuite) TestTvs() {
 	s.Require().NoError(err)
 	s.Require().Equal(12345678.90, response)
 }
+
+func (s *StatsTestSuite) TestTvsSeries() {
+	for _, tf := range []storage.Timeframe{
+		storage.TimeframeDay,
+		storage.TimeframeMonth,
+	} {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		c := s.echo.NewContext(req, rec)
+		c.SetPath("/v1/stats/tvs/:timeframe")
+		c.SetParamNames("timeframe")
+		c.SetParamValues(string(tf))
+
+		s.stats.EXPECT().
+			TvsSeries(gomock.Any(), tf).
+			Return([]storage.SeriesItem{
+				{
+					Time:  testTime,
+					Value: "12345678",
+				},
+				{
+					Time:  testTime,
+					Value: "87654321",
+				},
+			}, nil)
+
+		s.Require().NoError(s.handler.TvsSeries(c))
+		s.Require().Equal(http.StatusOK, rec.Code)
+
+		var response []responses.SeriesItem
+		err := json.NewDecoder(rec.Body).Decode(&response)
+		s.Require().NoError(err)
+		s.Require().Len(response, 2)
+
+		item1 := response[0]
+		s.Require().Equal("12345678", item1.Value)
+		s.Require().Equal(testTime, item1.Time)
+
+		item2 := response[1]
+		s.Require().Equal("87654321", item2.Value)
+		s.Require().Equal(testTime, item2.Time)
+	}
+}
