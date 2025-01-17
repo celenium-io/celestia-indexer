@@ -95,11 +95,16 @@ func (m *Module) save(ctx context.Context, rollup *storage.Rollup, timeframe sto
 		tvlResponse := tvl[0].Result.Data.Json
 		tvlModels := make([]*storage.Tvl, 0)
 		for _, t := range tvlResponse {
+			if _, ok := t[0].(float64); !ok {
+				return fmt.Errorf("incorrect value type of TVL timestamp")
+			}
+
 			for i := 1; i <= 3; i++ {
 				if _, ok := t[i].(float64); !ok {
 					return fmt.Errorf("incorrect value type of TVL")
 				}
 			}
+
 			rollupTvl := t[1].(float64) + t[2].(float64) + t[3].(float64)
 			tvlTs := time.Unix(int64(t[0].(float64)), 0)
 			if tvlTs.After(syncTimestamp) {
@@ -118,7 +123,10 @@ func (m *Module) save(ctx context.Context, rollup *storage.Rollup, timeframe sto
 
 		if err := m.tvl.SaveBulk(ctx, tvlModels...); err != nil {
 			m.Log.Err(err).Msg("saving tvls")
+			return err
 		}
+
+		return nil
 	}
 
 	if len(rollup.DeFiLama) > 0 {
@@ -147,6 +155,7 @@ func (m *Module) save(ctx context.Context, rollup *storage.Rollup, timeframe sto
 
 		if err := m.tvl.SaveBulk(ctx, tvlModels...); err != nil {
 			m.Log.Err(err).Msg("saving tvls")
+			return err
 		}
 	}
 

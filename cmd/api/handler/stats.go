@@ -547,8 +547,8 @@ func (sh StatsHandler) MessagesCount24h(c echo.Context) error {
 
 // Tvs godoc
 //
-//	@Summary		Get total TVS of the network
-//	@Description	Get total TVS of the network
+//	@Summary		Get TVS of the network
+//	@Description	Get TVS of the network
 //	@Tags			stats
 //	@ID				stats-tvs
 //	@Produce		json
