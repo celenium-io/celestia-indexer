@@ -6,6 +6,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"github.com/shopspring/decimal"
 	"strings"
 	"testing"
 	"time"
@@ -315,6 +316,15 @@ func (s *StatsTestSuite) TestChange24hBlockStats() {
 	s.Require().Equal(stats.BytesInBlock, 0.0)
 	s.Require().Equal(stats.Fee, 0.0)
 	s.Require().Equal(stats.TxCount, 0.0)
+}
+
+func (s *StatsTestSuite) TestTvs() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tvs, err := s.storage.Stats.Tvs(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal(tvs, decimal.NewFromFloat(12345678))
 }
 
 func TestSuiteStats_Run(t *testing.T) {

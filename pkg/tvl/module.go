@@ -13,6 +13,7 @@ import (
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	strg "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/rs/zerolog"
+	"github.com/shopspring/decimal"
 	"strings"
 	"time"
 )
@@ -66,7 +67,7 @@ func (m *Module) getTvl(ctx context.Context, timeframe storage.TvlTimeframe) {
 
 	for i := range rollups {
 		if err = m.save(ctx, rollups[i], timeframe); err != nil {
-			m.Log.Err(err).Msg("saving tvls")
+			m.Log.Err(err).Msg("saving TVL")
 		}
 	}
 
@@ -74,6 +75,8 @@ func (m *Module) getTvl(ctx context.Context, timeframe storage.TvlTimeframe) {
 	if err != nil {
 		m.Log.Err(err).Msg("receiving last sync time for TVL")
 	}
+
+	m.Log.Info().Msg("Sync rollup TVL is completed")
 }
 
 func (m *Module) save(ctx context.Context, rollup *storage.Rollup, timeframe storage.TvlTimeframe) error {
@@ -87,11 +90,13 @@ func (m *Module) save(ctx context.Context, rollup *storage.Rollup, timeframe sto
 
 		rollupProject := url[lastIndex+1:]
 		tvl, err := m.rollupTvlFromL2Beat(ctx, rollupProject, timeframe)
+
 		if err != nil {
 			m.Log.Err(err).Msg("receiving TVL from L2Beat")
 			return err
 		}
 
+		m.Log.Info().Str("rollup", rollup.Name).Msg("receiving TVL from L2Beat")
 		tvlResponse := tvl[0].Result.Data.Json
 		tvlModels := make([]*storage.Tvl, 0)
 		for _, t := range tvlResponse {
@@ -105,11 +110,11 @@ func (m *Module) save(ctx context.Context, rollup *storage.Rollup, timeframe sto
 				}
 			}
 
-			rollupTvl := t[1].(float64) + t[2].(float64) + t[3].(float64)
+			rollupTvl := (t[1].(float64) + t[2].(float64) + t[3].(float64)) / 100
 			tvlTs := time.Unix(int64(t[0].(float64)), 0)
 			if tvlTs.After(syncTimestamp) {
 				tvlModels = append(tvlModels, &storage.Tvl{
-					Value:    rollupTvl,
+					Value:    decimal.NewFromFloat(rollupTvl),
 					Time:     tvlTs,
 					Rollup:   rollup,
 					RollupId: rollup.Id,
@@ -122,10 +127,11 @@ func (m *Module) save(ctx context.Context, rollup *storage.Rollup, timeframe sto
 		}
 
 		if err := m.tvl.SaveBulk(ctx, tvlModels...); err != nil {
-			m.Log.Err(err).Msg("saving tvls")
+			m.Log.Err(err).Msg("saving TVL")
 			return err
 		}
 
+		m.Log.Info().Str("rollup", rollup.Name).Msg("successfully saving TVL")
 		return nil
 	}
 
@@ -136,12 +142,13 @@ func (m *Module) save(ctx context.Context, rollup *storage.Rollup, timeframe sto
 			return err
 		}
 
+		m.Log.Info().Str("rollup", rollup.Name).Msg("receiving TVL from DeFi Lama")
 		tvlModels := make([]*storage.Tvl, 0)
 		for _, t := range tvl {
 			tvlTs := time.Unix(t.Date, 0)
 			if tvlTs.After(syncTimestamp) {
 				tvlModels = append(tvlModels, &storage.Tvl{
-					Value:    t.TVL,
+					Value:    decimal.NewFromFloat(t.TVL),
 					Time:     tvlTs,
 					Rollup:   rollup,
 					RollupId: rollup.Id,
@@ -154,9 +161,11 @@ func (m *Module) save(ctx context.Context, rollup *storage.Rollup, timeframe sto
 		}
 
 		if err := m.tvl.SaveBulk(ctx, tvlModels...); err != nil {
-			m.Log.Err(err).Msg("saving tvls")
+			m.Log.Err(err).Msg("saving TVL")
 			return err
 		}
+
+		m.Log.Info().Str("rollup", rollup.Name).Msg("successfully saving TVL")
 	}
 
 	return nil

@@ -5,6 +5,7 @@ package storage
 
 import (
 	"context"
+	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 	"time"
 )
@@ -32,10 +33,10 @@ type ITvl interface {
 type Tvl struct {
 	bun.BaseModel `bun:"tvl" comment:"Table with rollup TVL."`
 
-	Id       uint64    `bun:",pk,notnull,autoincrement" comment:"Unique internal identity"`
-	Value    float64   `bun:"value"                     comment:"Value of TVL"`
-	Time     time.Time `bun:"time,pk,notnull"           comment:"The time of TVL"`
-	RollupId uint64    `bun:"rollup_id"                 comment:"Rollup id"`
+	Id       uint64          `bun:",pk,notnull,autoincrement" comment:"Unique internal identity"`
+	Value    decimal.Decimal `bun:"value,type:numeric"        comment:"Value of TVL"`
+	Time     time.Time       `bun:"time,pk,notnull"           comment:"The time of TVL"`
+	RollupId uint64          `bun:"rollup_id"                 comment:"Rollup id"`
 
 	Rollup *Rollup `bun:"rel:belongs-to,join:rollup_id=id"`
 }

@@ -592,15 +592,15 @@ func (s *StatsTestSuite) TestTvs() {
 
 	s.stats.EXPECT().
 		Tvs(gomock.Any()).
-		Return(12345678.90, nil)
+		Return(decimal.NewFromFloat(12345678.90), nil)
 
 	s.Require().NoError(s.handler.Tvs(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var response float64
+	var response decimal.Decimal
 	err := json.NewDecoder(rec.Body).Decode(&response)
 	s.Require().NoError(err)
-	s.Require().Equal(12345678.90, response)
+	s.Require().Equal(decimal.NewFromFloat(12345678.90), response)
 }
 
 func (s *StatsTestSuite) TestTvsSeries() {

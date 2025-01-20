@@ -18,6 +18,7 @@ import (
 	time "time"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
+	decimal "github.com/shopspring/decimal"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -475,10 +476,10 @@ func (c *MockIStatsTPSCall) DoAndReturn(f func(context.Context) (storage.TPS, er
 }
 
 // Tvs mocks base method.
-func (m *MockIStats) Tvs(ctx context.Context) (float64, error) {
+func (m *MockIStats) Tvs(ctx context.Context) (decimal.Decimal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Tvs", ctx)
-	ret0, _ := ret[0].(float64)
+	ret0, _ := ret[0].(decimal.Decimal)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -496,19 +497,19 @@ type MockIStatsTvsCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIStatsTvsCall) Return(arg0 float64, arg1 error) *MockIStatsTvsCall {
+func (c *MockIStatsTvsCall) Return(arg0 decimal.Decimal, arg1 error) *MockIStatsTvsCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIStatsTvsCall) Do(f func(context.Context) (float64, error)) *MockIStatsTvsCall {
+func (c *MockIStatsTvsCall) Do(f func(context.Context) (decimal.Decimal, error)) *MockIStatsTvsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIStatsTvsCall) DoAndReturn(f func(context.Context) (float64, error)) *MockIStatsTvsCall {
+func (c *MockIStatsTvsCall) DoAndReturn(f func(context.Context) (decimal.Decimal, error)) *MockIStatsTvsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

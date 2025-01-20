@@ -6,6 +6,7 @@ package postgres
 import (
 	"context"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/shopspring/decimal"
 	"time"
 )
 
@@ -27,7 +28,7 @@ func (s *TransactionTestSuite) TestSaveBulk() {
 		UTC().
 		Truncate(time.Minute)
 	var newTvl = &storage.Tvl{
-		Value:    12345,
+		Value:    decimal.NewFromFloat(12345),
 		RollupId: 1,
 		Time:     saveTime}
 
