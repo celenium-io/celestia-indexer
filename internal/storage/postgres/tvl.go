@@ -30,11 +30,11 @@ func (t *Tvl) Save(ctx context.Context, tvl *storage.Tvl) error {
 	return err
 }
 
-func (t *Tvl) SaveBulk(ctx context.Context, tvls ...*storage.Tvl) error {
-	if len(tvls) == 0 {
+func (t *Tvl) SaveBulk(ctx context.Context, tvl ...*storage.Tvl) error {
+	if len(tvl) == 0 {
 		return nil
 	}
-	_, err := t.db.DB().NewInsert().Model(&tvls).Exec(ctx)
+	_, err := t.db.DB().NewInsert().Model(&tvl).Exec(ctx)
 	return err
 }
 

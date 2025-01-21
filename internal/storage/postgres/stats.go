@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/shopspring/decimal"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -413,8 +414,9 @@ func (s Stats) MessagesCount24h(ctx context.Context) (response []storage.CountIt
 	return
 }
 
-func (s Stats) Tvs(ctx context.Context) (tvs float64, err error) {
+func (s Stats) Tvs(ctx context.Context) (tvs decimal.Decimal, err error) {
 	var lastTs time.Time
+
 	var query = s.db.DB().
 		NewSelect().
 		Table(storage.ViewRollupTvlByMonth)
@@ -423,10 +425,12 @@ func (s Stats) Tvs(ctx context.Context) (tvs float64, err error) {
 		Scan(ctx, &lastTs)
 
 	if errTs != nil {
-		return 0, errTs
+		return decimal.Zero, errTs
 	}
 
-	err = query.
+	err = s.db.DB().
+		NewSelect().
+		Table(storage.ViewRollupTvlByMonth).
 		ColumnExpr("sum(value) as value").
 		Where("time = ?", lastTs).
 		Scan(ctx, &tvs)
