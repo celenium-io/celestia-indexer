@@ -515,18 +515,18 @@ func (c *MockIStatsTvsCall) DoAndReturn(f func(context.Context) (decimal.Decimal
 }
 
 // TvsSeries mocks base method.
-func (m *MockIStats) TvsSeries(ctx context.Context, timeframe storage.Timeframe) ([]storage.SeriesItem, error) {
+func (m *MockIStats) TvsSeries(ctx context.Context, timeframe storage.Timeframe, req storage.SeriesRequest) ([]storage.SeriesItem, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TvsSeries", ctx, timeframe)
+	ret := m.ctrl.Call(m, "TvsSeries", ctx, timeframe, req)
 	ret0, _ := ret[0].([]storage.SeriesItem)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // TvsSeries indicates an expected call of TvsSeries.
-func (mr *MockIStatsMockRecorder) TvsSeries(ctx, timeframe any) *MockIStatsTvsSeriesCall {
+func (mr *MockIStatsMockRecorder) TvsSeries(ctx, timeframe, req any) *MockIStatsTvsSeriesCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TvsSeries", reflect.TypeOf((*MockIStats)(nil).TvsSeries), ctx, timeframe)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TvsSeries", reflect.TypeOf((*MockIStats)(nil).TvsSeries), ctx, timeframe, req)
 	return &MockIStatsTvsSeriesCall{Call: call}
 }
 
@@ -542,13 +542,13 @@ func (c *MockIStatsTvsSeriesCall) Return(arg0 []storage.SeriesItem, arg1 error) 
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIStatsTvsSeriesCall) Do(f func(context.Context, storage.Timeframe) ([]storage.SeriesItem, error)) *MockIStatsTvsSeriesCall {
+func (c *MockIStatsTvsSeriesCall) Do(f func(context.Context, storage.Timeframe, storage.SeriesRequest) ([]storage.SeriesItem, error)) *MockIStatsTvsSeriesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIStatsTvsSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe) ([]storage.SeriesItem, error)) *MockIStatsTvsSeriesCall {
+func (c *MockIStatsTvsSeriesCall) DoAndReturn(f func(context.Context, storage.Timeframe, storage.SeriesRequest) ([]storage.SeriesItem, error)) *MockIStatsTvsSeriesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

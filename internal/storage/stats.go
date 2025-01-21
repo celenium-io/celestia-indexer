@@ -182,5 +182,5 @@ type IStats interface {
 	Change24hBlockStats(ctx context.Context) (response Change24hBlockStats, err error)
 	MessagesCount24h(ctx context.Context) ([]CountItem, error)
 	Tvs(ctx context.Context) (decimal.Decimal, error)
-	TvsSeries(ctx context.Context, timeframe Timeframe) ([]SeriesItem, error)
+	TvsSeries(ctx context.Context, timeframe Timeframe, req SeriesRequest) ([]SeriesItem, error)
 }
