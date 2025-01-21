@@ -616,7 +616,7 @@ func (s *StatsTestSuite) TestTvsSeries() {
 		c.SetParamValues(string(tf))
 
 		s.stats.EXPECT().
-			TvsSeries(gomock.Any(), tf).
+			TvsSeries(gomock.Any(), tf, gomock.Any()).
 			Return([]storage.SeriesItem{
 				{
 					Time:  testTime,

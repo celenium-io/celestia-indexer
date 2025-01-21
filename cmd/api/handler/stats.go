@@ -570,6 +570,8 @@ func (sh StatsHandler) Tvs(c echo.Context) error {
 //	@Tags			stats
 //	@ID				stats-tvs-series
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(day, month)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.SeriesItem
 //	@Failure		400	{object}	Error
@@ -581,7 +583,11 @@ func (sh StatsHandler) TvsSeries(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	tvs, err := sh.repo.TvsSeries(c.Request().Context(), storage.Timeframe(req.Timeframe))
+	tvs, err := sh.repo.TvsSeries(
+		c.Request().Context(),
+		storage.Timeframe(req.Timeframe),
+		storage.NewSeriesRequest(req.From, req.To))
+
 	if err != nil {
 		return handleError(c, err, sh.nsRepo)
 	}
@@ -597,5 +603,7 @@ func (sh StatsHandler) TvsSeries(c echo.Context) error {
 }
 
 type tvsSeriesRequest struct {
-	Timeframe string `example:"hour" param:"timeframe" swaggertype:"string" validate:"required,oneof=day month"`
+	Timeframe string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=day month"`
+	From      int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To        int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
 }

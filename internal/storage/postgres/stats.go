@@ -438,7 +438,7 @@ func (s Stats) Tvs(ctx context.Context) (tvs decimal.Decimal, err error) {
 	return
 }
 
-func (s Stats) TvsSeries(ctx context.Context, timeframe storage.Timeframe) (response []storage.SeriesItem, err error) {
+func (s Stats) TvsSeries(ctx context.Context, timeframe storage.Timeframe, req storage.SeriesRequest) (response []storage.SeriesItem, err error) {
 	query := s.db.DB().NewSelect()
 
 	switch timeframe {
@@ -450,6 +450,13 @@ func (s Stats) TvsSeries(ctx context.Context, timeframe storage.Timeframe) (resp
 			ColumnExpr("value, min_value as min, max_value as max, time as ts")
 	default:
 		return nil, errors.Errorf("unexpected timeframe %s", timeframe)
+	}
+
+	if !req.From.IsZero() {
+		query = query.Where("time >= ?", req.From)
+	}
+	if !req.To.IsZero() {
+		query = query.Where("time < ?", req.To)
 	}
 
 	err = query.Order("time desc").
