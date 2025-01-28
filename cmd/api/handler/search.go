@@ -14,6 +14,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -26,7 +27,7 @@ type SearchHandler struct {
 	namespace  storage.INamespace
 	validator  storage.IValidator
 	rollup     storage.IRollup
-	celestials storage.ICelestial
+	celestials celestials.ICelestial
 }
 
 func NewSearchHandler(
@@ -37,7 +38,7 @@ func NewSearchHandler(
 	namespace storage.INamespace,
 	validator storage.IValidator,
 	rollup storage.IRollup,
-	celestials storage.ICelestial,
+	celestials celestials.ICelestial,
 ) SearchHandler {
 	return SearchHandler{
 		search:     search,

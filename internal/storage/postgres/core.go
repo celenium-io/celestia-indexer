@@ -9,6 +9,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/stats"
 	models "github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres/migrations"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
+	celestialsPg "github.com/celenium-io/celestial-module/pkg/storage/postgres"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -52,8 +54,8 @@ type Storage struct {
 	Tvl             models.ITvl
 	Grants          models.IGrant
 	ApiKeys         models.IApiKey
-	Celestials      models.ICelestial
-	CelestialState  models.ICelestialState
+	Celestials      celestials.ICelestial
+	CelestialState  celestials.ICelestialState
 	Notificator     *Notificator
 
 	export models.Export
@@ -103,8 +105,8 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		Tvl:             NewTvl(strg.Connection()),
 		Grants:          NewGrant(strg.Connection()),
 		ApiKeys:         NewApiKey(strg.Connection()),
-		Celestials:      NewCelestials(strg.Connection()),
-		CelestialState:  NewCelestialState(strg.Connection()),
+		Celestials:      celestialsPg.NewCelestials(strg.Connection()),
+		CelestialState:  celestialsPg.NewCelestialState(strg.Connection()),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
 
 		export: export,

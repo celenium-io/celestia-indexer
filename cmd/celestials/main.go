@@ -10,8 +10,8 @@ import (
 	"syscall"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
-	"github.com/celenium-io/celestia-indexer/pkg/celestials"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	celestials "github.com/celenium-io/celestial-module/pkg/module"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )

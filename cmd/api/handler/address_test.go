@@ -18,6 +18,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
+	celestialMock "github.com/celenium-io/celestial-module/pkg/storage/mock"
 	"github.com/labstack/echo/v4"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
@@ -51,7 +53,7 @@ type AddressTestSuite struct {
 	redelegations *mock.MockIRedelegation
 	vestings      *mock.MockIVestingAccount
 	grants        *mock.MockIGrant
-	celestials    *mock.MockICelestial
+	celestials    *celestialMock.MockICelestial
 	state         *mock.MockIState
 	echo          *echo.Echo
 	handler       *AddressHandler
@@ -72,7 +74,7 @@ func (s *AddressTestSuite) SetupSuite() {
 	s.redelegations = mock.NewMockIRedelegation(s.ctrl)
 	s.vestings = mock.NewMockIVestingAccount(s.ctrl)
 	s.grants = mock.NewMockIGrant(s.ctrl)
-	s.celestials = mock.NewMockICelestial(s.ctrl)
+	s.celestials = celestialMock.NewMockICelestial(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
 	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.vestings, s.grants, s.celestials, s.state, testIndexerName)
 }
@@ -108,7 +110,7 @@ func (s *AddressTestSuite) TestGet() {
 
 	s.celestials.EXPECT().
 		ByAddressId(gomock.Any(), uint64(1), 1, 0).
-		Return([]storage.Celestial{
+		Return([]celestials.Celestial{
 			{
 				Id:       "name",
 				ImageUrl: "image",
@@ -195,7 +197,7 @@ func (s *AddressTestSuite) TestList() {
 
 	s.celestials.EXPECT().
 		ByAddressId(gomock.Any(), uint64(1), 1, 0).
-		Return([]storage.Celestial{
+		Return([]celestials.Celestial{
 			{
 				Id:       "name",
 				ImageUrl: "image",
@@ -782,9 +784,9 @@ func (s *AddressTestSuite) TestCelestials() {
 		Return([]uint64{1}, nil).
 		Times(1)
 
-	storageResponse := make([]storage.Celestial, 0)
+	storageResponse := make([]celestials.Celestial, 0)
 	for i := 0; i < 10; i++ {
-		storageResponse = append(storageResponse, storage.Celestial{
+		storageResponse = append(storageResponse, celestials.Celestial{
 			Id:       testsuite.RandomText(i + 10),
 			ImageUrl: testsuite.RandomText(2*i + 1),
 		})

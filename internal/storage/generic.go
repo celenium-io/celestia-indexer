@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/lib/pq"
 	"github.com/shopspring/decimal"
@@ -45,8 +46,8 @@ var Models = []any{
 	&Grant{},
 	&ApiKey{},
 	&Tvl{},
-	&Celestial{},
-	&CelestialState{},
+	&celestials.Celestial{},
+	&celestials.CelestialState{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -160,12 +161,4 @@ type ISearch interface {
 type Export interface {
 	ToCsv(ctx context.Context, writer io.Writer, query string) error
 	Close() error
-}
-
-//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
-type CelestialTransaction interface {
-	SaveCelestials(ctx context.Context, celestials ...Celestial) error
-	UpdateState(ctx context.Context, state *CelestialState) error
-
-	sdk.Transaction
 }

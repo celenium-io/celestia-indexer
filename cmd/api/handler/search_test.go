@@ -18,6 +18,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
+	celestialMock "github.com/celenium-io/celestial-module/pkg/storage/mock"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -34,7 +36,7 @@ type SearchTestSuite struct {
 	validator *mock.MockIValidator
 	search    *mock.MockISearch
 	rollup    *mock.MockIRollup
-	celestial *mock.MockICelestial
+	celestial *celestialMock.MockICelestial
 
 	echo    *echo.Echo
 	handler SearchHandler
@@ -53,7 +55,7 @@ func (s *SearchTestSuite) SetupSuite() {
 	s.search = mock.NewMockISearch(s.ctrl)
 	s.validator = mock.NewMockIValidator(s.ctrl)
 	s.rollup = mock.NewMockIRollup(s.ctrl)
-	s.celestial = mock.NewMockICelestial(s.ctrl)
+	s.celestial = celestialMock.NewMockICelestial(s.ctrl)
 	s.handler = NewSearchHandler(s.search, s.address, s.block, s.tx, s.namespace, s.validator, s.rollup, s.celestial)
 }
 
@@ -482,7 +484,7 @@ func (s *SearchTestSuite) TestSearchCelestial() {
 
 	s.celestial.EXPECT().
 		ById(gomock.Any(), "name 3").
-		Return(storage.Celestial{
+		Return(celestials.Celestial{
 			Id:       "name 3",
 			ImageUrl: "test",
 		}, nil).

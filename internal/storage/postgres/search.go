@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	"github.com/dipdup-net/go-lib/database"
 )
 
@@ -62,7 +63,7 @@ func (s *Search) SearchText(ctx context.Context, text string) (results []storage
 		ColumnExpr("id, encode(namespace_id, 'hex') as value, 'namespace' as type").
 		Where("encode(namespace_id, 'hex') ILIKE ?", text)
 	celestialsQuery := s.db.DB().NewSelect().
-		Model((*storage.Celestial)(nil)).
+		Model((*celestials.Celestial)(nil)).
 		ColumnExpr("address_id as id, id as value, 'celestial' as type").
 		Where("id ILIKE ?", text)
 

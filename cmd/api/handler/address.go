@@ -13,6 +13,7 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -27,7 +28,7 @@ type AddressHandler struct {
 	redelegations storage.IRedelegation
 	vestings      storage.IVestingAccount
 	grants        storage.IGrant
-	celestial     storage.ICelestial
+	celestial     celestials.ICelestial
 	state         storage.IState
 	indexerName   string
 }
@@ -42,7 +43,7 @@ func NewAddressHandler(
 	redelegations storage.IRedelegation,
 	vestings storage.IVestingAccount,
 	grants storage.IGrant,
-	celestial storage.ICelestial,
+	celestial celestials.ICelestial,
 	state storage.IState,
 	indexerName string,
 ) *AddressHandler {

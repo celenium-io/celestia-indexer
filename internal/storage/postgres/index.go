@@ -8,6 +8,7 @@ import (
 	"database/sql"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	celestialPg "github.com/celenium-io/celestial-module/pkg/storage/postgres"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/rs/zerolog/log"
 	"github.com/uptrace/bun"
@@ -527,20 +528,7 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 		}
 
 		// Celestial
-		if _, err := tx.NewCreateIndex().
-			IfNotExists().
-			Model((*storage.Celestial)(nil)).
-			Index("celestial_address_id_idx").
-			Column("address_id").
-			Exec(ctx); err != nil {
-			return err
-		}
-		if _, err := tx.NewCreateIndex().
-			IfNotExists().
-			Model((*storage.Celestial)(nil)).
-			Index("celestial_change_id_idx").
-			Column("change_id").
-			Exec(ctx); err != nil {
+		if err := celestialPg.CreateIndex(ctx, tx); err != nil {
 			return err
 		}
 

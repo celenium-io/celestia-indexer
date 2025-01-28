@@ -6,6 +6,7 @@ package responses
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 )
 
 // Address model info
@@ -39,7 +40,7 @@ func NewAddress(addr storage.Address) Address {
 	return address
 }
 
-func (address *Address) AddCelestails(celestials ...storage.Celestial) {
+func (address *Address) AddCelestails(celestials ...celestials.Celestial) {
 	for i := range celestials {
 		address.Celestials = append(address.Celestials, NewCelestial(celestials[i]))
 	}
@@ -63,7 +64,7 @@ type Celestial struct {
 	ImageUrl string `example:"https://ipfs.io/ipfs/QmUi269vE25fagqhyMCCTNSoiW6x4LHCwwQb3keSrEXAmC" json:"image_url" swaggertype:"string"`
 }
 
-func NewCelestial(c storage.Celestial) Celestial {
+func NewCelestial(c celestials.Celestial) Celestial {
 	return Celestial{
 		ImageUrl: c.ImageUrl,
 		Name:     c.Id,
