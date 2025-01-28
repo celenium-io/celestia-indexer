@@ -33,6 +33,5 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /go/bin/celestials /go/bin/celestials
 COPY ./configs/dipdup.yml ./
 COPY database database
-COPY cmd/celestials/docs docs
 
 ENTRYPOINT ["/go/bin/celestials", "-c", "dipdup.yml"]
