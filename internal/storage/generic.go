@@ -45,6 +45,8 @@ var Models = []any{
 	&Grant{},
 	&ApiKey{},
 	&Tvl{},
+	&Celestial{},
+	&CelestialState{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -158,4 +160,12 @@ type ISearch interface {
 type Export interface {
 	ToCsv(ctx context.Context, writer io.Writer, query string) error
 	Close() error
+}
+
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
+type CelestialTransaction interface {
+	SaveCelestials(ctx context.Context, celestials ...Celestial) error
+	UpdateState(ctx context.Context, state *CelestialState) error
+
+	sdk.Transaction
 }

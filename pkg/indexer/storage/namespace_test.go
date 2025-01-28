@@ -43,9 +43,8 @@ func Test_saveNamespaces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tx := mock.NewMockTransaction(ctrl)
 
-			tx.EXPECT().SaveNamespaces(gomock.Any(), gomock.Any()).
-				MaxTimes(1).
-				MinTimes(1).
+			tx.EXPECT().
+				SaveNamespaces(gomock.Any(), gomock.Any()).
 				DoAndReturn(func(_ context.Context, ns ...*storage.Namespace) (int64, error) {
 					require.Equal(t, len(tt.namespaces), len(ns))
 					return int64(len(ns)), nil

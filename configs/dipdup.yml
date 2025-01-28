@@ -45,6 +45,11 @@ datasources:
     url: ${LAMA_API_URL:-https://api.llama.fi/}
     rps: ${LAMA_API_RPS:-5}
     timeout: ${LAMA_API_TIMEOUT:-10}
+  celestials:
+    kind: celestials
+    url: ${CELESTIALS_API_URL:-https://api.stage.celestials.id}
+    rps: ${CELESTIALS_API_RPS:-5}
+    timeout: ${CELESTIALS_API_TIMEOUT:-10}
 
 api:
   bind: ${API_HOST:-0.0.0.0}:${API_PORT:-9876}

@@ -526,6 +526,24 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// Celestial
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Celestial)(nil)).
+			Index("celestial_address_id_idx").
+			Column("address_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Celestial)(nil)).
+			Index("celestial_change_id_idx").
+			Column("change_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

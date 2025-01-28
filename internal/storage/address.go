@@ -40,7 +40,8 @@ type Address struct {
 	Hash       []byte      `bun:"hash"                        comment:"Address hash."`
 	Address    string      `bun:"address,unique:address_idx"  comment:"Human-readable address."`
 
-	Balance Balance `bun:"rel:has-one,join:id=id"`
+	Balance    Balance     `bun:"rel:has-one,join:id=id"`
+	Celestials []Celestial `bun:"rel:has-many,join=id=address_id"`
 }
 
 // TableName -

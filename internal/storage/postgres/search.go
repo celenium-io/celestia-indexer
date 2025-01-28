@@ -61,8 +61,15 @@ func (s *Search) SearchText(ctx context.Context, text string) (results []storage
 		Model((*storage.Namespace)(nil)).
 		ColumnExpr("id, encode(namespace_id, 'hex') as value, 'namespace' as type").
 		Where("encode(namespace_id, 'hex') ILIKE ?", text)
+	celestialsQuery := s.db.DB().NewSelect().
+		Model((*storage.Celestial)(nil)).
+		ColumnExpr("address_id as id, id as value, 'celestial' as type").
+		Where("id ILIKE ?", text)
 
-	union := rollupQuery.UnionAll(namespaceQuery).UnionAll(validatorQuery)
+	union := rollupQuery.
+		UnionAll(namespaceQuery).
+		UnionAll(validatorQuery).
+		UnionAll(celestialsQuery)
 
 	err = s.db.DB().NewSelect().
 		TableExpr("(?) as search", union).

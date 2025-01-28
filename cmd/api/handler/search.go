@@ -19,13 +19,14 @@ import (
 )
 
 type SearchHandler struct {
-	search    storage.ISearch
-	address   storage.IAddress
-	block     storage.IBlock
-	tx        storage.ITx
-	namespace storage.INamespace
-	validator storage.IValidator
-	rollup    storage.IRollup
+	search     storage.ISearch
+	address    storage.IAddress
+	block      storage.IBlock
+	tx         storage.ITx
+	namespace  storage.INamespace
+	validator  storage.IValidator
+	rollup     storage.IRollup
+	celestials storage.ICelestial
 }
 
 func NewSearchHandler(
@@ -36,15 +37,17 @@ func NewSearchHandler(
 	namespace storage.INamespace,
 	validator storage.IValidator,
 	rollup storage.IRollup,
+	celestials storage.ICelestial,
 ) SearchHandler {
 	return SearchHandler{
-		search:    search,
-		address:   address,
-		block:     block,
-		tx:        tx,
-		namespace: namespace,
-		validator: validator,
-		rollup:    rollup,
+		search:     search,
+		address:    address,
+		block:      block,
+		tx:         tx,
+		namespace:  namespace,
+		validator:  validator,
+		rollup:     rollup,
+		celestials: celestials,
 	}
 }
 
@@ -254,6 +257,21 @@ func (handler SearchHandler) searchText(ctx context.Context, text string) ([]res
 				return nil, err
 			}
 			response[i].Result = responses.NewNamespace(*namespace)
+		case "celestial":
+			address, err := handler.address.GetByID(ctx, result[i].Id)
+			if err != nil {
+				return nil, err
+			}
+			addr := responses.NewAddress(*address)
+
+			celestial, err := handler.celestials.ById(ctx, result[i].Value)
+			if err != nil {
+				return nil, err
+			}
+			addr.AddCelestails(celestial)
+
+			response[i].Result = addr
+			response[i].Type = "address"
 		default:
 			return nil, errors.Errorf("unknown search text type: %s", response[i].Type)
 		}

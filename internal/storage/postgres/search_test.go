@@ -70,3 +70,17 @@ func (s *StorageTestSuite) TestSearchByDataHash() {
 	s.Require().EqualValues("block", result.Type)
 	s.Require().EqualValues("3d96b7d238e7e0456f6af8e7cdf0a67bd6cf9c2089ecb559c659dcaa1f880353", result.Value)
 }
+
+func (s *StorageTestSuite) TestSearchByTextByCelestials() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	results, err := s.storage.Search.SearchText(ctx, "me 1")
+	s.Require().NoError(err)
+	s.Require().Len(results, 1)
+
+	result := results[0]
+	s.Require().EqualValues(1, result.Id)
+	s.Require().EqualValues("celestial", result.Type)
+	s.Require().EqualValues("name 1", result.Value)
+}

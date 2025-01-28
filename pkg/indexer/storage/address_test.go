@@ -65,8 +65,7 @@ func TestModule_saveSigners(t *testing.T) {
 		tx := mock.NewMockTransaction(ctrl)
 		tx.EXPECT().
 			SaveSigners(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			MinTimes(1).
+			Times(1).
 			DoAndReturn(func(_ context.Context, addresses ...storage.Signer) error {
 				require.Equal(t, tt.want, addresses)
 				return nil
