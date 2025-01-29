@@ -25,7 +25,6 @@ import (
 type MockITvl struct {
 	ctrl     *gomock.Controller
 	recorder *MockITvlMockRecorder
-	isgomock struct{}
 }
 
 // MockITvlMockRecorder is the mock recorder for MockITvl.

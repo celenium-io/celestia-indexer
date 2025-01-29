@@ -7,59 +7,67 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"time"
+
+	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 )
 
-type Data struct {
-	Json [][]interface{} `json:"json"`
+type TVLResponse struct {
+	Data    Data   `json:"data"`
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
 }
 
 type Result struct {
 	Data Data `json:"data"`
 }
 
-type TVLResponse []struct {
-	Result Result `json:"result"`
+type Data struct {
+	Usd   float64 `json:"usdValue"`
+	Eth   float64 `json:"ethValue"`
+	Chart Chart   `json:"chart"`
 }
 
-type RequestData map[string]struct {
-	Json JsonData `json:"json"`
+type Chart struct {
+	Types []string `json:"types"`
+	Data  []Item   `json:"data"`
 }
 
-type JsonData struct {
-	Filter                  Filter `json:"filter"`
-	Range                   string `json:"range"`
-	ExcludeAssociatedTokens bool   `json:"excludeAssociatedTokens"`
+type Item struct {
+	Time      time.Time
+	Native    decimal.Decimal
+	Canonical decimal.Decimal
+	External  decimal.Decimal
+	EthPrice  decimal.Decimal
 }
 
-type Filter struct {
-	Type       string   `json:"type"`
-	ProjectIds []string `json:"projectIds"`
-}
-
-func (api API) TVL(ctx context.Context, rollupName string, timeframe storage.TvlTimeframe) (result TVLResponse, err error) {
-	data := RequestData{
-		"0": {
-			JsonData{
-				Filter: Filter{
-					Type:       "projects",
-					ProjectIds: []string{rollupName},
-				},
-				Range:                   string(timeframe),
-				ExcludeAssociatedTokens: false,
-			},
-		},
+func (item *Item) UnmarshalJSON(data []byte) error {
+	var items []float64
+	if err := json.Unmarshal(data, &items); err != nil {
+		return err
 	}
-
-	var dataString, err1 = json.Marshal(data)
-	if err1 != nil {
-		return nil, fmt.Errorf("serialization error: %v", err)
+	if len(items) != 5 {
+		return errors.Errorf("invalid chart item: %s", string(data))
 	}
+	item.Time = time.Unix(int64(items[0]), 0).UTC()
+	item.Native = decimal.NewFromFloat(items[1])
+	item.Canonical = decimal.NewFromFloat(items[2])
+	item.External = decimal.NewFromFloat(items[3])
+	item.EthPrice = decimal.NewFromFloat(items[4])
+	return nil
+}
 
+func (api API) TVL(ctx context.Context, rollupName string, timeframe TvlTimeframe) (result TVLResponse, err error) {
 	args := make(map[string]string)
-	args["batch"] = "1"
-	args["input"] = string(dataString)
+	args["range"] = timeframe.String()
 
-	err = api.get(ctx, "trpc/tvl.chart", args, &result)
+	if err = api.get(ctx, fmt.Sprintf("scaling/tvl/%s", rollupName), args, &result); err != nil {
+		return
+	}
+
+	if !result.Success {
+		err = errors.Errorf("l2 beat error: %s", result.Error)
+	}
 	return
 }

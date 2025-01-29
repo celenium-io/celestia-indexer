@@ -744,45 +744,6 @@ func (c *MockIRollupSeriesCall) DoAndReturn(f func(context.Context, uint64, stor
 	return c
 }
 
-// Tvl mocks base method.
-func (m *MockIRollup) Tvl(ctx context.Context, rollupId uint64, timeframe storage.Timeframe, req storage.SeriesRequest) ([]storage.HistogramItem, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Tvl", ctx, rollupId, timeframe, req)
-	ret0, _ := ret[0].([]storage.HistogramItem)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Tvl indicates an expected call of Tvl.
-func (mr *MockIRollupMockRecorder) Tvl(ctx, rollupId, timeframe, req any) *MockIRollupTvlCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Tvl", reflect.TypeOf((*MockIRollup)(nil).Tvl), ctx, rollupId, timeframe, req)
-	return &MockIRollupTvlCall{Call: call}
-}
-
-// MockIRollupTvlCall wrap *gomock.Call
-type MockIRollupTvlCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockIRollupTvlCall) Return(items []storage.HistogramItem, err error) *MockIRollupTvlCall {
-	c.Call = c.Call.Return(items, err)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockIRollupTvlCall) Do(f func(context.Context, uint64, storage.Timeframe, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupTvlCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIRollupTvlCall) DoAndReturn(f func(context.Context, uint64, storage.Timeframe, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupTvlCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // Tags mocks base method.
 func (m *MockIRollup) Tags(ctx context.Context) ([]string, error) {
 	m.ctrl.T.Helper()
@@ -818,6 +779,45 @@ func (c *MockIRollupTagsCall) Do(f func(context.Context) ([]string, error)) *Moc
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIRollupTagsCall) DoAndReturn(f func(context.Context) ([]string, error)) *MockIRollupTagsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Tvl mocks base method.
+func (m *MockIRollup) Tvl(ctx context.Context, rollupId uint64, timeframe storage.Timeframe, req storage.SeriesRequest) ([]storage.HistogramItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Tvl", ctx, rollupId, timeframe, req)
+	ret0, _ := ret[0].([]storage.HistogramItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Tvl indicates an expected call of Tvl.
+func (mr *MockIRollupMockRecorder) Tvl(ctx, rollupId, timeframe, req any) *MockIRollupTvlCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Tvl", reflect.TypeOf((*MockIRollup)(nil).Tvl), ctx, rollupId, timeframe, req)
+	return &MockIRollupTvlCall{Call: call}
+}
+
+// MockIRollupTvlCall wrap *gomock.Call
+type MockIRollupTvlCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIRollupTvlCall) Return(items []storage.HistogramItem, err error) *MockIRollupTvlCall {
+	c.Call = c.Call.Return(items, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIRollupTvlCall) Do(f func(context.Context, uint64, storage.Timeframe, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupTvlCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIRollupTvlCall) DoAndReturn(f func(context.Context, uint64, storage.Timeframe, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIRollupTvlCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

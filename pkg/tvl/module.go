@@ -5,17 +5,19 @@ package tvl
 
 import (
 	"context"
-	"fmt"
+	"net/url"
+	"strings"
+	"time"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/tvl/l2beat"
 	"github.com/celenium-io/celestia-indexer/internal/tvl/lama"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	strg "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/shopspring/decimal"
-	"strings"
-	"time"
 )
 
 const (
@@ -58,7 +60,7 @@ func (m *Module) Start(ctx context.Context) {
 	m.G.GoCtx(ctx, m.receive)
 }
 
-func (m *Module) getTvl(ctx context.Context, timeframe storage.TvlTimeframe) {
+func (m *Module) getTvl(ctx context.Context, timeframe l2beat.TvlTimeframe) {
 	rollups, err := m.rollup.List(ctx, rollupLimit, 0, strg.SortOrderAsc)
 	if err != nil {
 		m.Log.Err(err).Msg("receiving rollups")
@@ -79,43 +81,28 @@ func (m *Module) getTvl(ctx context.Context, timeframe storage.TvlTimeframe) {
 	m.Log.Info().Msg("Sync rollup TVL is completed")
 }
 
-func (m *Module) save(ctx context.Context, rollup *storage.Rollup, timeframe storage.TvlTimeframe) error {
+func (m *Module) save(ctx context.Context, rollup *storage.Rollup, timeframe l2beat.TvlTimeframe) error {
 	if len(rollup.L2Beat) > 0 {
-		url := rollup.L2Beat
-		lastIndex := strings.LastIndex(url, "/")
-
-		if lastIndex == -1 {
-			return fmt.Errorf("incorrect L2Beat url")
+		if _, err := url.Parse(rollup.L2Beat); err != nil {
+			return errors.Wrap(err, "invalid L2Beat url")
 		}
+		urlParts := strings.Split(rollup.L2Beat, "/")
+		rollupProject := urlParts[len(urlParts)-1]
 
-		rollupProject := url[lastIndex+1:]
 		tvl, err := m.rollupTvlFromL2Beat(ctx, rollupProject, timeframe)
-
 		if err != nil {
 			m.Log.Err(err).Msg("receiving TVL from L2Beat")
 			return err
 		}
 
 		m.Log.Info().Str("rollup", rollup.Name).Msg("receiving TVL from L2Beat")
-		tvlResponse := tvl[0].Result.Data.Json
+
 		tvlModels := make([]*storage.Tvl, 0)
-		for _, t := range tvlResponse {
-			if _, ok := t[0].(float64); !ok {
-				return fmt.Errorf("incorrect value type of TVL timestamp")
-			}
-
-			for i := 1; i <= 3; i++ {
-				if _, ok := t[i].(float64); !ok {
-					return fmt.Errorf("incorrect value type of TVL")
-				}
-			}
-
-			rollupTvl := (t[1].(float64) + t[2].(float64) + t[3].(float64)) / 100
-			tvlTs := time.Unix(int64(t[0].(float64)), 0)
-			if tvlTs.After(syncTimestamp) {
+		for _, t := range tvl.Data.Chart.Data {
+			if t.Time.After(syncTimestamp) {
 				tvlModels = append(tvlModels, &storage.Tvl{
-					Value:    decimal.NewFromFloat(rollupTvl),
-					Time:     tvlTs,
+					Value:    decimal.Sum(t.Canonical, t.External, t.Native),
+					Time:     t.Time,
 					Rollup:   rollup,
 					RollupId: rollup.Id,
 				})
@@ -178,7 +165,7 @@ func (m *Module) receive(ctx context.Context) {
 	}
 
 	syncTimestamp = syncTime
-	m.getTvl(ctx, storage.TvlTimeframeMax)
+	m.getTvl(ctx, l2beat.TvlTimeframeMax)
 	ticker := time.NewTicker(time.Hour * 24)
 	defer ticker.Stop()
 
@@ -187,7 +174,7 @@ func (m *Module) receive(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			m.getTvl(ctx, storage.TvlTimeframe6Month)
+			m.getTvl(ctx, l2beat.TvlTimeframe180D)
 		}
 	}
 }
@@ -198,7 +185,7 @@ func (m *Module) rollupTvlFromLama(ctx context.Context, rollupName string) ([]la
 	return m.lamaApi.TVL(requestTimeout, rollupName)
 }
 
-func (m *Module) rollupTvlFromL2Beat(ctx context.Context, rollupName string, timeframe storage.TvlTimeframe) (l2beat.TVLResponse, error) {
+func (m *Module) rollupTvlFromL2Beat(ctx context.Context, rollupName string, timeframe l2beat.TvlTimeframe) (l2beat.TVLResponse, error) {
 	requestTimeout, cancel := context.WithTimeout(ctx, time.Second*10)
 	defer cancel()
 	return m.l2beatApi.TVL(requestTimeout, rollupName, timeframe)

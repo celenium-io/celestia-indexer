@@ -26,6 +26,17 @@
                 "../../configs/dipdup.yml",
             ],
             "envFile": "${workspaceFolder}/.env"
+        },  {
+            "name": "Launch TVL",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/cmd/tvl",
+            "args": [
+                "-c",
+                "../../configs/dipdup.yml",
+            ],
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
