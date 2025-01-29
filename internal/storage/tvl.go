@@ -5,20 +5,10 @@ package storage
 
 import (
 	"context"
+	"time"
+
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
-	"time"
-)
-
-type TvlTimeframe string
-
-const (
-	TvlTimeframeWeek   TvlTimeframe = "7d"
-	TvlTimeframeMonth  TvlTimeframe = "30d"
-	TvlTimeframe3Month TvlTimeframe = "90d"
-	TvlTimeframe6Month TvlTimeframe = "180d"
-	TvlTimeframeYear   TvlTimeframe = "1y"
-	TvlTimeframeMax    TvlTimeframe = "max"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed

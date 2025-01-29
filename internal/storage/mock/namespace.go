@@ -25,7 +25,6 @@ import (
 type MockINamespace struct {
 	ctrl     *gomock.Controller
 	recorder *MockINamespaceMockRecorder
-	isgomock struct{}
 }
 
 // MockINamespaceMockRecorder is the mock recorder for MockINamespace.
