@@ -62,6 +62,12 @@ func (api API) TVL(ctx context.Context, rollupName string, timeframe TvlTimefram
 	args := make(map[string]string)
 	args["range"] = timeframe.String()
 
-	err = api.get(ctx, fmt.Sprintf("scaling/tvl/%s", rollupName), args, &result)
+	if err = api.get(ctx, fmt.Sprintf("scaling/tvl/%s", rollupName), args, &result); err != nil {
+		return
+	}
+
+	if !result.Success {
+		err = errors.Errorf("l2 beat error: %s", result.Error)
+	}
 	return
 }
