@@ -128,7 +128,7 @@ func (s *TxTestSuite) TestGet() {
 	s.Require().Equal("sdk", tx.Codespace)
 	s.Require().Equal(types.StatusSuccess, tx.Status)
 	s.Require().Len(tx.Signers, 1)
-	s.Require().Equal(testAddress, tx.Signers[0])
+	s.Require().Equal(testAddress, tx.Signers[0].Hash)
 }
 
 func (s *TxTestSuite) TestGetInvalidTx() {
@@ -191,7 +191,7 @@ func (s *TxTestSuite) TestList() {
 	s.Require().Equal("sdk", tx.Codespace)
 	s.Require().Equal(types.StatusSuccess, tx.Status)
 	s.Require().Len(tx.Signers, 1)
-	s.Require().Equal(testAddress, tx.Signers[0])
+	s.Require().Equal(testAddress, tx.Signers[0].Hash)
 }
 
 func (s *TxTestSuite) TestListValidationStatusError() {
@@ -283,7 +283,7 @@ func (s *TxTestSuite) TestListTime() {
 	s.Require().Equal("sdk", tx.Codespace)
 	s.Require().Equal(types.StatusSuccess, tx.Status)
 	s.Require().Len(tx.Signers, 1)
-	s.Require().Equal(testAddress, tx.Signers[0])
+	s.Require().Equal(testAddress, tx.Signers[0].Hash)
 }
 
 func (s *TxTestSuite) TestListHeight() {
@@ -342,7 +342,7 @@ func (s *TxTestSuite) TestListHeight() {
 
 	s.Require().Len(tx.Messages, 1)
 	s.Require().Len(tx.Signers, 1)
-	s.Require().Equal(testAddress, tx.Signers[0])
+	s.Require().Equal(testAddress, tx.Signers[0].Hash)
 }
 
 func (s *TxTestSuite) TestListExcludedMessages() {
@@ -401,7 +401,7 @@ func (s *TxTestSuite) TestListExcludedMessages() {
 
 	s.Require().Len(tx.Messages, 1)
 	s.Require().Len(tx.Signers, 1)
-	s.Require().Equal(testAddress, tx.Signers[0])
+	s.Require().Equal(testAddress, tx.Signers[0].Hash)
 }
 
 func (s *TxTestSuite) TestGetEvents() {

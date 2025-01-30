@@ -13,10 +13,8 @@ import (
 )
 
 type Validator struct {
-	Id          uint64 `example:"321"                                                    json:"id"           swaggertype:"integer"`
-	Delegator   string `example:"celestia1un77nfm6axkhkupe8fk4xl6fd4adz3y5qk7ph6"        json:"delegator"    swaggertype:"string"`
-	Address     string `example:"celestiavaloper1un77nfm6axkhkupe8fk4xl6fd4adz3y59fucpu" json:"address"      swaggertype:"string"`
-	ConsAddress string `example:"E641C7A2C964833E556AEF934FBF166B712874B6"               json:"cons_address" swaggertype:"string"`
+	Id          uint64 `example:"321"                                      json:"id"           swaggertype:"integer"`
+	ConsAddress string `example:"E641C7A2C964833E556AEF934FBF166B712874B6" json:"cons_address" swaggertype:"string"`
 
 	Moniker  string `example:"Easy 2 Stake"                   json:"moniker"  swaggertype:"string"`
 	Website  string `example:"https://www.easy2stake.com/"    json:"website"  swaggertype:"string"`
@@ -34,6 +32,9 @@ type Validator struct {
 	VotingPower       string `example:"1"    json:"voting_power"        swaggertype:"string"`
 
 	Jailed bool `example:"false" json:"jailed" swaggertype:"boolean"`
+
+	Address   *ShortAddress `json:"address"`
+	Delegator *ShortAddress `json:"delegator"`
 }
 
 func NewValidator(val storage.Validator) *Validator {
@@ -41,9 +42,13 @@ func NewValidator(val storage.Validator) *Validator {
 		return nil
 	}
 	return &Validator{
-		Id:                val.Id,
-		Delegator:         val.Delegator,
-		Address:           val.Address,
+		Id: val.Id,
+		Delegator: &ShortAddress{
+			Hash: val.Delegator,
+		},
+		Address: &ShortAddress{
+			Hash: val.Address,
+		},
 		ConsAddress:       val.ConsAddress,
 		Moniker:           val.Moniker,
 		Website:           val.Website,

@@ -5462,10 +5462,7 @@
                     "$ref": "#/definitions/responses.Balance"
                 },
                 "celestials": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/responses.Celestial"
-                    }
+                    "$ref": "#/definitions/responses.Celestial"
                 },
                 "first_height": {
                     "type": "integer",
@@ -5567,9 +5564,7 @@
                     "$ref": "#/definitions/responses.ShortRollup"
                 },
                 "signer": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "size": {
                     "type": "integer",
@@ -5743,6 +5738,10 @@
                 "name": {
                     "type": "string",
                     "example": "name"
+                },
+                "primary": {
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },
@@ -5811,8 +5810,7 @@
                     "example": "0.1"
                 },
                 "delegator": {
-                    "type": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "validator": {
                     "$ref": "#/definitions/responses.ShortValidator"
@@ -5984,12 +5982,10 @@
                     "example": "2023-07-04T03:10:57+00:00"
                 },
                 "grantee": {
-                    "type": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "granter": {
-                    "type": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "height": {
                     "type": "integer",
@@ -6081,9 +6077,7 @@
                     "example": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="
                 },
                 "signer": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "size": {
                     "type": "integer",
@@ -6452,8 +6446,7 @@
                     "example": "2023-07-04T03:10:57+00:00"
                 },
                 "delegator": {
-                    "type": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "destination": {
                     "$ref": "#/definitions/responses.ShortValidator"
@@ -7003,6 +6996,18 @@
                 }
             }
         },
+        "responses.ShortAddress": {
+            "type": "object",
+            "properties": {
+                "celestials": {
+                    "$ref": "#/definitions/responses.Celestial"
+                },
+                "hash": {
+                    "type": "string",
+                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                }
+            }
+        },
         "responses.ShortRollup": {
             "type": "object",
             "properties": {
@@ -7269,7 +7274,7 @@
                 "signers": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/responses.ShortAddress"
                     }
                 },
                 "status": {
@@ -7342,8 +7347,7 @@
                     "example": "2023-07-04T03:10:57+00:00"
                 },
                 "delegator": {
-                    "type": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "height": {
                     "type": "integer",
@@ -7362,8 +7366,7 @@
             "type": "object",
             "properties": {
                 "address": {
-                    "type": "string",
-                    "example": "celestiavaloper1un77nfm6axkhkupe8fk4xl6fd4adz3y59fucpu"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "commissions": {
                     "type": "string",
@@ -7378,8 +7381,7 @@
                     "example": "security@0xfury.com"
                 },
                 "delegator": {
-                    "type": "string",
-                    "example": "celestia1un77nfm6axkhkupe8fk4xl6fd4adz3y5qk7ph6"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "details": {
                     "type": "string",

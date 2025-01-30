@@ -269,7 +269,7 @@ func (handler SearchHandler) searchText(ctx context.Context, text string) ([]res
 			if err != nil {
 				return nil, err
 			}
-			addr.AddCelestails(celestial)
+			addr.AddCelestails(&celestial)
 
 			response[i].Result = addr
 			response[i].Type = "address"

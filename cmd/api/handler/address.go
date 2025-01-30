@@ -96,14 +96,7 @@ func (handler *AddressHandler) Get(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 
-	celestials, err := handler.celestial.ByAddressId(c.Request().Context(), address.Id, 1, 0)
-	if err != nil {
-		return handleError(c, err, handler.address)
-	}
-	response := responses.NewAddress(address)
-	response.AddCelestails(celestials...)
-
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, responses.NewAddress(address))
 }
 
 type addressListRequest struct {
@@ -159,11 +152,6 @@ func (handler *AddressHandler) List(c echo.Context) error {
 	response := make([]responses.Address, len(address))
 	for i := range address {
 		response[i] = responses.NewAddress(address[i])
-		celestials, err := handler.celestial.ByAddressId(c.Request().Context(), address[i].Id, 1, 0)
-		if err != nil {
-			return handleError(c, err, handler.address)
-		}
-		response[i].AddCelestails(celestials...)
 	}
 
 	return returnArray(c, response)
@@ -854,9 +842,9 @@ func (handler *AddressHandler) Celestials(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 
-	response := make([]responses.Celestial, len(celestials))
+	response := make([]*responses.Celestial, len(celestials))
 	for i := range celestials {
-		response[i] = responses.NewCelestial(celestials[i])
+		response[i] = responses.NewCelestial(&celestials[i])
 	}
 	return returnArray(c, response)
 }

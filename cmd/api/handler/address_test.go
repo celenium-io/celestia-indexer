@@ -105,13 +105,7 @@ func (s *AddressTestSuite) TestGet() {
 			Address:    testAddress,
 			Height:     100,
 			LastHeight: 100,
-		}, nil).
-		Times(1)
-
-	s.celestials.EXPECT().
-		ByAddressId(gomock.Any(), uint64(1), 1, 0).
-		Return([]celestials.Celestial{
-			{
+			Celestials: &celestials.Celestial{
 				Id:       "name",
 				ImageUrl: "image",
 			},
@@ -128,9 +122,9 @@ func (s *AddressTestSuite) TestGet() {
 	s.Require().EqualValues(100, address.Height)
 	s.Require().EqualValues(100, address.LastHeight)
 	s.Require().Equal(testAddress, address.Hash)
-	s.Require().Len(address.Celestials, 1)
-	s.Require().EqualValues("name", address.Celestials[0].Name)
-	s.Require().EqualValues("image", address.Celestials[0].ImageUrl)
+	s.Require().NotNil(address.Celestials)
+	s.Require().EqualValues("name", address.Celestials.Name)
+	s.Require().EqualValues("image", address.Celestials.ImageUrl)
 }
 
 func (s *AddressTestSuite) TestGetInvalidAddress() {
@@ -192,18 +186,12 @@ func (s *AddressTestSuite) TestList() {
 					Delegated: decimal.RequireFromString("1"),
 					Unbonding: decimal.RequireFromString("2"),
 				},
+				Celestials: &celestials.Celestial{
+					Id:       "name",
+					ImageUrl: "image",
+				},
 			},
 		}, nil)
-
-	s.celestials.EXPECT().
-		ByAddressId(gomock.Any(), uint64(1), 1, 0).
-		Return([]celestials.Celestial{
-			{
-				Id:       "name",
-				ImageUrl: "image",
-			},
-		}, nil).
-		Times(1)
 
 	s.Require().NoError(s.handler.List(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
@@ -220,9 +208,9 @@ func (s *AddressTestSuite) TestList() {
 	s.Require().Equal("utia", address[0].Balance.Currency)
 	s.Require().Equal("1", address[0].Balance.Delegated)
 	s.Require().Equal("2", address[0].Balance.Unbonding)
-	s.Require().Len(address[0].Celestials, 1)
-	s.Require().EqualValues("name", address[0].Celestials[0].Name)
-	s.Require().EqualValues("image", address[0].Celestials[0].ImageUrl)
+	s.Require().NotNil(address[0].Celestials)
+	s.Require().EqualValues("name", address[0].Celestials.Name)
+	s.Require().EqualValues("image", address[0].Celestials.ImageUrl)
 }
 
 func (s *AddressTestSuite) TestTransactions() {
@@ -388,7 +376,7 @@ func (s *AddressTestSuite) TestBlobs() {
 	l := logs[0]
 	s.Require().EqualValues(10000, l.Height)
 	s.Require().Equal(testTime, l.Time)
-	s.Require().Equal(testAddress, l.Signer)
+	s.Require().Equal(testAddress, l.Signer.Hash)
 	s.Require().Equal("test_commitment", l.Commitment)
 	s.Require().EqualValues(1000, l.Size)
 	s.Require().Nil(l.Namespace)
@@ -456,7 +444,7 @@ func (s *AddressTestSuite) TestDelegations() {
 
 	d := delegations[0]
 	s.Require().Equal("100", d.Amount)
-	s.Require().Equal(testAddress, d.Delegator)
+	s.Require().Equal(testAddress, d.Delegator.Hash)
 	s.Require().NotNil(d.Validator)
 	s.Require().Equal(testValidator.ConsAddress, d.Validator.ConsAddress)
 }
@@ -509,7 +497,7 @@ func (s *AddressTestSuite) TestUndelegations() {
 	s.Require().EqualValues(1000, d.Height)
 	s.Require().Equal(testTime, d.Time)
 	s.Require().Equal(testTime.Add(time.Hour), d.CompletionTime)
-	s.Require().Equal(testAddress, d.Delegator)
+	s.Require().Equal(testAddress, d.Delegator.Hash)
 	s.Require().NotNil(d.Validator)
 	s.Require().Equal(testValidator.ConsAddress, d.Validator.ConsAddress)
 }
@@ -564,7 +552,7 @@ func (s *AddressTestSuite) TestRedelegations() {
 	s.Require().EqualValues(1000, d.Height)
 	s.Require().Equal(testTime, d.Time)
 	s.Require().Equal(testTime.Add(time.Hour), d.CompletionTime)
-	s.Require().Equal(testAddress, d.Delegator)
+	s.Require().Equal(testAddress, d.Delegator.Hash)
 	s.Require().NotNil(d.Source)
 	s.Require().Equal(testValidator.ConsAddress, d.Source.ConsAddress)
 	s.Require().NotNil(d.Destination)
@@ -669,7 +657,7 @@ func (s *AddressTestSuite) TestGrants() {
 	g := grants[0]
 	s.Require().Equal(testTime, g.Time)
 	s.Require().EqualValues(1000, g.Height)
-	s.Require().Equal(testAddress, g.Grantee)
+	s.Require().Equal(testAddress, g.Grantee.Hash)
 	s.Require().Equal("test_msg", g.Authorization)
 	s.Require().NotNil(g.Params)
 	s.Require().False(g.Revoked)
@@ -721,7 +709,7 @@ func (s *AddressTestSuite) TestGrantee() {
 	g := grants[0]
 	s.Require().Equal(testTime, g.Time)
 	s.Require().EqualValues(1000, g.Height)
-	s.Require().Equal(testAddress, g.Granter)
+	s.Require().Equal(testAddress, g.Granter.Hash)
 	s.Require().Equal("test_msg", g.Authorization)
 	s.Require().NotNil(g.Params)
 	s.Require().False(g.Revoked)

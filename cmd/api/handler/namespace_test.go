@@ -9,11 +9,12 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"github.com/celestiaorg/celestia-app/v3/pkg/proof"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/celestiaorg/celestia-app/v3/pkg/proof"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -597,7 +598,7 @@ func (s *NamespaceTestSuite) TestGetLogs() {
 	l := logs[0]
 	s.Require().EqualValues(10000, l.Height)
 	s.Require().Equal(testTime, l.Time)
-	s.Require().Equal(testAddress, l.Signer)
+	s.Require().Equal(testAddress, l.Signer.Hash)
 	s.Require().Equal("test_commitment", l.Commitment)
 	s.Require().EqualValues(1000, l.Size)
 	s.Require().Nil(l.Namespace)
@@ -664,7 +665,7 @@ func (s *NamespaceTestSuite) TestGetLogsBySigner() {
 	l := logs[0]
 	s.Require().EqualValues(10000, l.Height)
 	s.Require().Equal(testTime, l.Time)
-	s.Require().Equal(testAddress, l.Signer)
+	s.Require().Equal(testAddress, l.Signer.Hash)
 	s.Require().Equal("test_commitment", l.Commitment)
 	s.Require().EqualValues(1000, l.Size)
 	s.Require().Nil(l.Namespace)
@@ -721,7 +722,7 @@ func (s *NamespaceTestSuite) TestGetLogsWithCommitment() {
 	l := logs[0]
 	s.Require().EqualValues(10000, l.Height)
 	s.Require().Equal(testTime, l.Time)
-	s.Require().Equal(testAddress, l.Signer)
+	s.Require().Equal(testAddress, l.Signer.Hash)
 	s.Require().Equal("T1EPYi3jq6hC3ueLOZRtWB7LUsAC4DcnAX/oSwDopps=", l.Commitment)
 	s.Require().EqualValues(1000, l.Size)
 	s.Require().Nil(l.Namespace)
@@ -856,7 +857,7 @@ func (s *NamespaceTestSuite) TestBlobs() {
 	s.Require().EqualValues(1000, blob.Height)
 	s.Require().EqualValues(testTime, blob.Time)
 	s.Require().EqualValues("test_commitment", blob.Commitment)
-	s.Require().EqualValues(testAddress, blob.Signer)
+	s.Require().EqualValues(testAddress, blob.Signer.Hash)
 	s.Require().EqualValues(testNamespace.Hash(), blob.Namespace)
 }
 

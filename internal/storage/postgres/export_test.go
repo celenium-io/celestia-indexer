@@ -21,5 +21,5 @@ func (s *StorageTestSuite) TestExportToCsv() {
 	reader := csv.NewReader(bytes.NewReader(buf.Bytes()))
 	rows, err := reader.ReadAll()
 	s.Require().NoError(err)
-	s.Require().Len(rows, 3)
+	s.Require().Len(rows, 4)
 }

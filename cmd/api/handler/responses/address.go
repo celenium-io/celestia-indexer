@@ -19,7 +19,7 @@ type Address struct {
 	Hash       string         `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"hash"         swaggertype:"string"`
 	Balance    Balance        `json:"balance"`
 
-	Celestials []Celestial `json:"celestials,omitempty"`
+	Celestials *Celestial `json:"celestials,omitempty"`
 }
 
 func NewAddress(addr storage.Address) Address {
@@ -34,15 +34,14 @@ func NewAddress(addr storage.Address) Address {
 			Delegated: addr.Balance.Delegated.String(),
 			Unbonding: addr.Balance.Unbonding.String(),
 		},
-		Celestials: make([]Celestial, 0),
 	}
-	address.AddCelestails(addr.Celestials...)
+	address.AddCelestails(addr.Celestials)
 	return address
 }
 
-func (address *Address) AddCelestails(celestials ...celestials.Celestial) {
-	for i := range celestials {
-		address.Celestials = append(address.Celestials, NewCelestial(celestials[i]))
+func (address *Address) AddCelestails(celestials *celestials.Celestial) {
+	if celestials != nil {
+		address.Celestials = NewCelestial(celestials)
 	}
 }
 
@@ -60,13 +59,33 @@ type Balance struct {
 //
 //	@Description	Linked celestial id
 type Celestial struct {
-	Name     string `example:"name"                                                                json:"name"      swaggertype:"string"`
-	ImageUrl string `example:"https://ipfs.io/ipfs/QmUi269vE25fagqhyMCCTNSoiW6x4LHCwwQb3keSrEXAmC" json:"image_url" swaggertype:"string"`
+	Name      string `example:"name"                                                                json:"name"              swaggertype:"string"`
+	ImageUrl  string `example:"https://ipfs.io/ipfs/QmUi269vE25fagqhyMCCTNSoiW6x4LHCwwQb3keSrEXAmC" json:"image_url"         swaggertype:"string"`
+	IsPrimary bool   `example:"true"                                                                json:"primary,omitempty" swaggertype:"boolean"`
 }
 
-func NewCelestial(c celestials.Celestial) Celestial {
-	return Celestial{
-		ImageUrl: c.ImageUrl,
-		Name:     c.Id,
+func NewCelestial(c *celestials.Celestial) *Celestial {
+	return &Celestial{
+		ImageUrl:  c.ImageUrl,
+		Name:      c.Id,
+		IsPrimary: c.IsPrimary,
 	}
+}
+
+type ShortAddress struct {
+	Hash       string     `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"hash" swaggertype:"string"`
+	Celestials *Celestial `json:"celestials,omitempty"`
+}
+
+func NewShortAddress(address *storage.Address) *ShortAddress {
+	if address == nil {
+		return nil
+	}
+
+	result := new(ShortAddress)
+	result.Hash = address.Address
+	if address.Celestials != nil {
+		result.Celestials = NewCelestial(address.Celestials)
+	}
+	return result
 }

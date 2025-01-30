@@ -48,13 +48,16 @@ func main() {
 		return
 	}
 
+	log.Info().Str("chain_id", cfg.Celestials.ChainId).Msg("running module")
+
 	module := celestials.New(
 		celestialsDatasource,
 		pg.Address,
+		pg.Celestials,
 		pg.CelestialState,
 		pg.Transactable,
 		cfg.Indexer.Name,
-		"celestia",
+		cfg.Celestials.ChainId,
 		celestials.WithAddressPrefix(types.AddressPrefixCelestia),
 	)
 	module.Start(ctx)
