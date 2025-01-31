@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.11
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.53.1
 	github.com/aws/smithy-go v1.20.2
-	github.com/celenium-io/celestial-module v0.0.2
+	github.com/celenium-io/celestial-module v0.0.3
 	github.com/celestiaorg/celestia-app/v3 v3.0.2
 	github.com/celestiaorg/go-square v1.1.1
 	github.com/celestiaorg/go-square/v2 v2.1.0
@@ -289,7 +289,6 @@ require (
 )
 
 replace (
-	github.com/celenium-io/celestial-module => /Users/artem/go/src/github.com/celenium-io/celestial-module
 	github.com/cosmos/cosmos-sdk => github.com/celestiaorg/cosmos-sdk v1.25.1-sdk-v0.46.16
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
