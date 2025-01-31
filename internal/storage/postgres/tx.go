@@ -37,7 +37,7 @@ func (tx *Tx) getSigners(ctx context.Context, txId ...uint64) (signers []storage
 		ColumnExpr("celestial.id as address__celestials__id, celestial.image_url as address__celestials__image_url").
 		ColumnExpr("signer.*").
 		Join("left join address on address.id = signer.address_id").
-		Join("left join celestial on celestial.address_id = signer.address_id and celestial.is_primary = true").
+		Join("left join celestial on celestial.address_id = signer.address_id and celestial.status = 'PRIMARY'").
 		Scan(ctx, &signers)
 	return
 }

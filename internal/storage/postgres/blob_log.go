@@ -46,7 +46,7 @@ func (bl *BlobLog) ByNamespace(ctx context.Context, nsId uint64, fltrs storage.B
 			ColumnExpr("rollup.id as rollup__id, rollup.name as rollup__name, rollup.logo as rollup__logo, rollup.slug as rollup__slug").
 			TableExpr("(?) as blob_log", blobsQuery).
 			Join("left join address as signer on signer.id = blob_log.signer_id").
-			Join("left join celestial on celestial.address_id = signer.id and celestial.is_primary = true").
+			Join("left join celestial on celestial.address_id = signer.id and celestial.status = 'PRIMARY'").
 			Join("left join tx on tx.id = blob_log.tx_id").
 			Join("left join rollup_provider as p on blob_log.signer_id = p.address_id and blob_log.namespace_id = p.namespace_id").
 			Join("left join rollup on rollup.id = p.rollup_id")
@@ -91,7 +91,7 @@ func (bl *BlobLog) ByProviders(ctx context.Context, providers []storage.RollupPr
 			ColumnExpr("celestial.id as signer__celestials__id, celestial.image_url as signer__celestials__image_url").
 			ColumnExpr("tx.id as tx__id, tx.height as tx__height, tx.time as tx__time, tx.position as tx__position, tx.gas_wanted as tx__gas_wanted, tx.gas_used as tx__gas_used, tx.timeout_height as tx__timeout_height, tx.events_count as tx__events_count, tx.messages_count as tx__messages_count, tx.fee as tx__fee, tx.status as tx__status, tx.error as tx__error, tx.codespace as tx__codespace, tx.hash as tx__hash, tx.memo as tx__memo, tx.message_types as tx__message_types").
 			Join("left join address as signer on signer.id = blob_log.signer_id").
-			Join("left join celestial on celestial.address_id = signer.id and celestial.is_primary = true").
+			Join("left join celestial on celestial.address_id = signer.id and celestial.status = 'PRIMARY'").
 			Join("left join tx on tx.id = blob_log.tx_id")
 	}
 
@@ -210,7 +210,7 @@ func (bl *BlobLog) ByTxId(ctx context.Context, txId uint64, fltrs storage.BlobLo
 		ColumnExpr("tx.id as tx__id, tx.height as tx__height, tx.time as tx__time, tx.position as tx__position, tx.gas_wanted as tx__gas_wanted, tx.gas_used as tx__gas_used, tx.timeout_height as tx__timeout_height, tx.events_count as tx__events_count, tx.messages_count as tx__messages_count, tx.fee as tx__fee, tx.status as tx__status, tx.error as tx__error, tx.codespace as tx__codespace, tx.hash as tx__hash, tx.memo as tx__memo, tx.message_types as tx__message_types").
 		TableExpr("(?) as blob_log", blobLogQuery).
 		Join("left join address as signer on signer.id = blob_log.signer_id").
-		Join("left join celestial on celestial.address_id = signer.id and celestial.is_primary = true").
+		Join("left join celestial on celestial.address_id = signer.id and celestial.status = 'PRIMARY'").
 		Join("left join namespace as ns on ns.id = blob_log.namespace_id").
 		Join("left join tx on tx.id = blob_log.tx_id").
 		Join("left join rollup_provider as p on blob_log.signer_id = p.address_id and blob_log.namespace_id = p.namespace_id").
@@ -235,7 +235,7 @@ func (bl *BlobLog) ByHeight(ctx context.Context, height types.Level, fltrs stora
 		ColumnExpr("tx.id as tx__id, tx.height as tx__height, tx.time as tx__time, tx.position as tx__position, tx.gas_wanted as tx__gas_wanted, tx.gas_used as tx__gas_used, tx.timeout_height as tx__timeout_height, tx.events_count as tx__events_count, tx.messages_count as tx__messages_count, tx.fee as tx__fee, tx.status as tx__status, tx.error as tx__error, tx.codespace as tx__codespace, tx.hash as tx__hash, tx.memo as tx__memo, tx.message_types as tx__message_types").
 		TableExpr("(?) as blob_log", blobLogQuery).
 		Join("left join address as signer on signer.id = blob_log.signer_id").
-		Join("left join celestial on celestial.address_id = signer.id and celestial.is_primary = true").
+		Join("left join celestial on celestial.address_id = signer.id and celestial.status = 'PRIMARY'").
 		Join("left join namespace as ns on ns.id = blob_log.namespace_id").
 		Join("left join tx on tx.id = blob_log.tx_id").
 		Join("left join rollup_provider as p on blob_log.signer_id = p.address_id and blob_log.namespace_id = p.namespace_id").

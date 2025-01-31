@@ -8,6 +8,7 @@ import (
 	"database/sql"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestial-module/pkg/storage/postgres"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/rs/zerolog/log"
 	"github.com/uptrace/bun"
@@ -23,6 +24,10 @@ const (
 )
 
 func createTypes(ctx context.Context, conn *database.Bun) error {
+	if err := postgres.CreateTypes(ctx, conn); err != nil {
+		return err
+	}
+
 	log.Info().Msg("creating custom types...")
 	return conn.DB().RunInTx(ctx, &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
 		if _, err := tx.ExecContext(

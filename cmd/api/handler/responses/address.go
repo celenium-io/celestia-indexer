@@ -68,7 +68,7 @@ func NewCelestial(c *celestials.Celestial) *Celestial {
 	return &Celestial{
 		ImageUrl:  c.ImageUrl,
 		Name:      c.Id,
-		IsPrimary: c.IsPrimary,
+		IsPrimary: c.Status == celestials.StatusPRIMARY,
 	}
 }
 

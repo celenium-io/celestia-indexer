@@ -36,7 +36,7 @@ func (a *Address) ByHash(ctx context.Context, hash []byte) (address storage.Addr
 		ColumnExpr("celestial.id as celestials__id, celestial.image_url as celestials__image_url").
 		ColumnExpr("balance.currency as balance__currency, balance.spendable as balance__spendable, balance.delegated as balance__delegated, balance.unbonding as balance__unbonding").
 		Join("left join balance on balance.id = address.id").
-		Join("left join celestial on celestial.address_id = address.id and celestial.is_primary = true").
+		Join("left join celestial on celestial.address_id = address.id and celestial.status = 'PRIMARY'").
 		Scan(ctx, &address)
 	return
 }
@@ -54,7 +54,7 @@ func (a *Address) ListWithBalance(ctx context.Context, filters storage.AddressLi
 			ColumnExpr("celestial.id as celestials__id, celestial.image_url as celestials__image_url").
 			ColumnExpr("balance.currency as balance__currency, balance.spendable as balance__spendable, balance.delegated as balance__delegated, balance.unbonding as balance__unbonding").
 			Join("left join balance on balance.id = address.id").
-			Join("left join celestial on celestial.address_id = address.id and celestial.is_primary = true").
+			Join("left join celestial on celestial.address_id = address.id and celestial.status = 'PRIMARY'").
 			Scan(ctx, &result)
 
 	} else {
@@ -69,7 +69,7 @@ func (a *Address) ListWithBalance(ctx context.Context, filters storage.AddressLi
 			ColumnExpr("celestial.id as celestials__id, celestial.image_url as celestials__image_url").
 			ColumnExpr("balance.currency as balance__currency, balance.spendable as balance__spendable, balance.delegated as balance__delegated, balance.unbonding as balance__unbonding").
 			Join("left join address on balance.id = address.id").
-			Join("left join celestial on celestial.address_id = address.id and celestial.is_primary = true").
+			Join("left join celestial on celestial.address_id = address.id and celestial.status = 'PRIMARY'").
 			Scan(ctx, &result)
 	}
 

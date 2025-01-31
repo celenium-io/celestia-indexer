@@ -2,14 +2,14 @@
   address_id: 1
   image_url:
   change_id: 1
-  is_primary: true
+  status: PRIMARY
 - id: name 2
   address_id: 1
   image_url:
   change_id: 2
-  is_primary: false
+  status: VERIFIED
 - id: name 3
   address_id: 2
   image_url:
   change_id: 3
-  is_primary: true
+  status: PRIMARY
