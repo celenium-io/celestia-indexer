@@ -24,6 +24,7 @@ func (s *StorageTestSuite) TestGrantByGrantee() {
 
 	s.Require().NotNil(grant.Granter)
 	s.Require().EqualValues("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", grant.Granter.Address)
+	s.Require().NotNil(grant.Granter.Celestials)
 }
 
 func (s *StorageTestSuite) TestGrantByGranter() {
@@ -42,4 +43,5 @@ func (s *StorageTestSuite) TestGrantByGranter() {
 
 	s.Require().NotNil(grant.Grantee)
 	s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", grant.Grantee.Address)
+	s.Require().NotNil(grant.Grantee.Celestials)
 }

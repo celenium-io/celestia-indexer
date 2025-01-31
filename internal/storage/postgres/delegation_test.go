@@ -41,4 +41,5 @@ func (s *StorageTestSuite) TestDelegationByValidator() {
 	s.Require().EqualValues("10000", d.Amount.String())
 	s.Require().Nil(d.Validator)
 	s.Require().NotNil(d.Address)
+	s.Require().NotNil(d.Address.Celestials)
 }

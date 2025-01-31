@@ -62,8 +62,10 @@ func (d *Delegation) ByValidator(ctx context.Context, validatorId uint64, limit,
 	err = d.DB().NewSelect().
 		TableExpr("(?) as delegation", subQuery).
 		ColumnExpr("delegation.*").
+		ColumnExpr("celestial.id as address__celestials__id, celestial.image_url as address__celestials__image_url").
 		ColumnExpr("address.id as address__id, address.address as address__address").
-		Join("left join address on address.id = address_id").
+		Join("left join address on address.id = delegation.address_id").
+		Join("left join celestial on celestial.address_id = delegation.address_id and celestial.status = 'PRIMARY'").
 		Scan(ctx, &delegations)
 
 	return
