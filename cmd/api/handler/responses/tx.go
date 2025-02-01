@@ -29,8 +29,8 @@ type Tx struct {
 	Memo          string         `example:"Transfer to private account"                                      format:"string"    json:"memo,omitempty"      swaggertype:"string"`
 	Time          time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                swaggertype:"string"`
 
-	Messages []Message `json:"messages,omitempty"`
-	Signers  []string  `json:"signers,omitempty"`
+	Messages []Message       `json:"messages,omitempty"`
+	Signers  []*ShortAddress `json:"signers,omitempty"`
 
 	MessageTypes []types.MsgType `example:"MsgSend,MsgUnjail" json:"message_types"`
 	Status       types.Status    `example:"success"           json:"status"`
@@ -58,14 +58,14 @@ func NewTx(tx storage.Tx) Tx {
 		MessageTypes:  tx.MessageTypes.Names(),
 		MsgTypeMask:   tx.MessageTypes,
 		Messages:      make([]Message, 0),
-		Signers:       make([]string, len(tx.Signers)),
+		Signers:       make([]*ShortAddress, len(tx.Signers)),
 	}
 
 	for i := range tx.Messages {
 		result.Messages = append(result.Messages, NewMessage(tx.Messages[i]))
 	}
 	for i := range tx.Signers {
-		result.Signers[i] = tx.Signers[i].Address
+		result.Signers[i] = NewShortAddress(&tx.Signers[i])
 	}
 
 	return result

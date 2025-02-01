@@ -13,6 +13,7 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -27,6 +28,7 @@ type AddressHandler struct {
 	redelegations storage.IRedelegation
 	vestings      storage.IVestingAccount
 	grants        storage.IGrant
+	celestial     celestials.ICelestial
 	state         storage.IState
 	indexerName   string
 }
@@ -41,6 +43,7 @@ func NewAddressHandler(
 	redelegations storage.IRedelegation,
 	vestings storage.IVestingAccount,
 	grants storage.IGrant,
+	celestial celestials.ICelestial,
 	state storage.IState,
 	indexerName string,
 ) *AddressHandler {
@@ -54,6 +57,7 @@ func NewAddressHandler(
 		redelegations: redelegations,
 		vestings:      vestings,
 		grants:        grants,
+		celestial:     celestial,
 		state:         state,
 		indexerName:   indexerName,
 	}
@@ -796,4 +800,51 @@ func (handler *AddressHandler) getIdByHash(ctx context.Context, hash []byte, add
 	default:
 		return handler.address.IdByAddress(ctx, address, addressId...)
 	}
+}
+
+// Celestials godoc
+//
+//	@Summary		Get list of celestial id for address
+//	@Description	Get list of celestial id for address
+//	@Tags			address
+//	@ID				address-celestials
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Celestial
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/address/{hash}/celestials [get]
+func (handler *AddressHandler) Celestials(c echo.Context) error {
+	req, err := bindAndValidate[getAddressPageable](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	_, hash, err := types.Address(req.Hash).Decode()
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	addressId, err := handler.getIdByHash(c.Request().Context(), hash, req.Hash)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	celestials, err := handler.celestial.ByAddressId(
+		c.Request().Context(),
+		addressId,
+		req.Limit,
+		req.Offset,
+	)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	response := make([]*responses.Celestial, len(celestials))
+	for i := range celestials {
+		response[i] = responses.NewCelestial(&celestials[i])
+	}
+	return returnArray(c, response)
 }

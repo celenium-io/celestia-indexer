@@ -38,7 +38,9 @@ func (g *Grant) ByGrantee(ctx context.Context, id uint64, limit, offset int) (gr
 		TableExpr("(?) as g", query).
 		ColumnExpr("g.*").
 		ColumnExpr("address.address as granter__address").
+		ColumnExpr("celestial.id as granter__celestials__id, celestial.image_url as granter__celestials__image_url").
 		Join("left join address on address.id = g.granter_id").
+		Join("left join celestial on celestial.address_id = g.granter_id and celestial.status = 'PRIMARY'").
 		Scan(ctx, &grants)
 	return
 }
@@ -58,7 +60,9 @@ func (g *Grant) ByGranter(ctx context.Context, id uint64, limit, offset int) (gr
 		TableExpr("(?) as g", query).
 		ColumnExpr("g.*").
 		ColumnExpr("address.address as grantee__address").
+		ColumnExpr("celestial.id as grantee__celestials__id, celestial.image_url as grantee__celestials__image_url").
 		Join("left join address on address.id = g.grantee_id").
+		Join("left join celestial on celestial.address_id = g.grantee_id and celestial.status = 'PRIMARY'").
 		Scan(ctx, &grants)
 	return
 }

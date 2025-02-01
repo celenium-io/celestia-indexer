@@ -9,6 +9,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/stats"
 	models "github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres/migrations"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
+	celestialsPg "github.com/celenium-io/celestial-module/pkg/storage/postgres"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -52,6 +54,8 @@ type Storage struct {
 	Tvl             models.ITvl
 	Grants          models.IGrant
 	ApiKeys         models.IApiKey
+	Celestials      celestials.ICelestial
+	CelestialState  celestials.ICelestialState
 	Notificator     *Notificator
 
 	export models.Export
@@ -101,6 +105,8 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		Tvl:             NewTvl(strg.Connection()),
 		Grants:          NewGrant(strg.Connection()),
 		ApiKeys:         NewApiKey(strg.Connection()),
+		Celestials:      celestialsPg.NewCelestials(strg.Connection()),
+		CelestialState:  celestialsPg.NewCelestialState(strg.Connection()),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
 
 		export: export,
@@ -156,10 +162,18 @@ func initDatabase(ctx context.Context, conn *database.Bun) error {
 }
 
 func initDatabaseWithMigrations(ctx context.Context, conn *database.Bun) error {
-	if err := initDatabase(ctx, conn); err != nil {
-		return err
+	exists, err := checkTablesExists(ctx, conn)
+	if err != nil {
+		return errors.Wrap(err, "check table exists")
 	}
-	return migrateDatabase(ctx, conn)
+
+	if exists {
+		if err := migrateDatabase(ctx, conn); err != nil {
+			return errors.Wrap(err, "migrate database")
+		}
+	}
+
+	return initDatabase(ctx, conn)
 }
 
 func (s Storage) CreateListener() models.Listener {
@@ -229,4 +243,14 @@ func (s Storage) Close() error {
 		return err
 	}
 	return nil
+}
+
+func checkTablesExists(ctx context.Context, db *database.Bun) (bool, error) {
+	var exists bool
+	err := db.DB().NewRaw(`SELECT EXISTS (
+		SELECT FROM information_schema.tables 
+		WHERE  table_schema = 'public'
+		AND    table_name   = 'state'
+	)`).Scan(ctx, &exists)
+	return exists, err
 }

@@ -18,6 +18,7 @@ import (
 func TestRoutes(t *testing.T) {
 	var expectedRoutes = map[string]struct{}{
 		"/v1/address/:hash/redelegations GET":                 {},
+		"/v1/address/:hash/celestials GET":                    {},
 		"/v1/namespace/count GET":                             {},
 		"/v1/validators/count GET":                            {},
 		"/v1/validators/:id/blocks GET":                       {},

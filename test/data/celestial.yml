@@ -1,0 +1,15 @@
+- id: name 1
+  address_id: 1
+  image_url:
+  change_id: 1
+  status: PRIMARY
+- id: name 2
+  address_id: 1
+  image_url:
+  change_id: 2
+  status: VERIFIED
+- id: name 3
+  address_id: 2
+  image_url:
+  change_id: 3
+  status: PRIMARY

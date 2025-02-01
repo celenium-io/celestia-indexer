@@ -11,19 +11,16 @@ import (
 )
 
 type Delegation struct {
-	Delegator string `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"delegator,omitempty" swaggertype:"string"`
-	Amount    string `example:"0.1"                                             json:"amount"              swaggertype:"string"`
+	Amount string `example:"0.1" json:"amount" swaggertype:"string"`
 
+	Delegator *ShortAddress   `json:"delegator,omitempty"`
 	Validator *ShortValidator `json:"validator,omitempty"`
 }
 
 func NewDelegation(d storage.Delegation) Delegation {
 	delegation := Delegation{
-		Amount: d.Amount.String(),
-	}
-
-	if d.Address != nil {
-		delegation.Delegator = d.Address.Address
+		Amount:    d.Amount.String(),
+		Delegator: NewShortAddress(d.Address),
 	}
 
 	if d.Validator != nil {
@@ -34,12 +31,12 @@ func NewDelegation(d storage.Delegation) Delegation {
 }
 
 type Undelegation struct {
-	Height         pkgTypes.Level `example:"100"                                             json:"height"              swaggertype:"integer"`
-	Time           time.Time      `example:"2023-07-04T03:10:57+00:00"                       json:"time"                swaggertype:"string"`
-	CompletionTime time.Time      `example:"2023-07-04T03:10:57+00:00"                       json:"completion_time"     swaggertype:"string"`
-	Delegator      string         `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"delegator,omitempty" swaggertype:"string"`
-	Amount         string         `example:"0.1"                                             json:"amount"              swaggertype:"string"`
+	Height         pkgTypes.Level `example:"100"                       json:"height"          swaggertype:"integer"`
+	Time           time.Time      `example:"2023-07-04T03:10:57+00:00" json:"time"            swaggertype:"string"`
+	CompletionTime time.Time      `example:"2023-07-04T03:10:57+00:00" json:"completion_time" swaggertype:"string"`
+	Amount         string         `example:"0.1"                       json:"amount"          swaggertype:"string"`
 
+	Delegator *ShortAddress   `json:"delegator,omitempty"`
 	Validator *ShortValidator `json:"validator,omitempty"`
 }
 
@@ -49,10 +46,7 @@ func NewUndelegation(d storage.Undelegation) Undelegation {
 		Time:           d.Time,
 		CompletionTime: d.CompletionTime,
 		Height:         d.Height,
-	}
-
-	if d.Address != nil {
-		undelegation.Delegator = d.Address.Address
+		Delegator:      NewShortAddress(d.Address),
 	}
 
 	if d.Validator != nil {
@@ -63,12 +57,12 @@ func NewUndelegation(d storage.Undelegation) Undelegation {
 }
 
 type Redelegation struct {
-	Height         pkgTypes.Level `example:"100"                                             json:"height"              swaggertype:"integer"`
-	Time           time.Time      `example:"2023-07-04T03:10:57+00:00"                       json:"time"                swaggertype:"string"`
-	CompletionTime time.Time      `example:"2023-07-04T03:10:57+00:00"                       json:"completion_time"     swaggertype:"string"`
-	Delegator      string         `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"delegator,omitempty" swaggertype:"string"`
-	Amount         string         `example:"0.1"                                             json:"amount"              swaggertype:"string"`
+	Height         pkgTypes.Level `example:"100"                       json:"height"          swaggertype:"integer"`
+	Time           time.Time      `example:"2023-07-04T03:10:57+00:00" json:"time"            swaggertype:"string"`
+	CompletionTime time.Time      `example:"2023-07-04T03:10:57+00:00" json:"completion_time" swaggertype:"string"`
+	Amount         string         `example:"0.1"                       json:"amount"          swaggertype:"string"`
 
+	Delegator   *ShortAddress   `json:"delegator,omitempty"`
 	Source      *ShortValidator `json:"source,omitempty"`
 	Destination *ShortValidator `json:"destination,omitempty"`
 }
@@ -79,10 +73,7 @@ func NewRedelegation(d storage.Redelegation) Redelegation {
 		Time:           d.Time,
 		CompletionTime: d.CompletionTime,
 		Height:         d.Height,
-	}
-
-	if d.Address != nil {
-		redelegation.Delegator = d.Address.Address
+		Delegator:      NewShortAddress(d.Address),
 	}
 
 	if d.Source != nil {

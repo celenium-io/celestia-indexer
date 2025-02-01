@@ -253,6 +253,68 @@
                 }
             }
         },
+        "/address/{hash}/celestials": {
+            "get": {
+                "description": "Get list of celestial id for address",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Get list of celestial id for address",
+                "operationId": "address-celestials",
+                "parameters": [
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Hash",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Celestial"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/address/{hash}/delegations": {
             "get": {
                 "description": "Get delegations made by address",
@@ -3346,7 +3408,8 @@
                             "blobs_count",
                             "size",
                             "size_per_blob",
-                            "fee"
+                            "fee",
+                            "tvl"
                         ],
                         "type": "string",
                         "description": "Series name",
@@ -4177,6 +4240,94 @@
                     }
                 },
                 "x-internal": true
+            }
+        },
+        "/stats/tvs": {
+            "get": {
+                "description": "Get TVS of the network",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get TVS of the network",
+                "operationId": "stats-tvs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/tvs/{timeframe}": {
+            "get": {
+                "description": "Get histogram for network TVS by timeframe",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get histogram for network TVS",
+                "operationId": "stats-tvs-series",
+                "parameters": [
+                    {
+                        "enum": [
+                            "day",
+                            "month"
+                        ],
+                        "type": "string",
+                        "description": "Timeframe",
+                        "name": "timeframe",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.SeriesItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
             }
         },
         "/tx": {
@@ -5310,6 +5461,9 @@
                 "balance": {
                     "$ref": "#/definitions/responses.Balance"
                 },
+                "celestials": {
+                    "$ref": "#/definitions/responses.Celestial"
+                },
                 "first_height": {
                     "type": "integer",
                     "example": 100
@@ -5410,9 +5564,7 @@
                     "$ref": "#/definitions/responses.ShortRollup"
                 },
                 "signer": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "size": {
                     "type": "integer",
@@ -5575,6 +5727,24 @@
                 }
             }
         },
+        "responses.Celestial": {
+            "description": "Linked celestial id",
+            "type": "object",
+            "properties": {
+                "image_url": {
+                    "type": "string",
+                    "example": "https://ipfs.io/ipfs/QmUi269vE25fagqhyMCCTNSoiW6x4LHCwwQb3keSrEXAmC"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "name"
+                },
+                "primary": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
         "responses.Change24hBlockStats": {
             "type": "object",
             "properties": {
@@ -5640,8 +5810,7 @@
                     "example": "0.1"
                 },
                 "delegator": {
-                    "type": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "validator": {
                     "$ref": "#/definitions/responses.ShortValidator"
@@ -5813,12 +5982,10 @@
                     "example": "2023-07-04T03:10:57+00:00"
                 },
                 "grantee": {
-                    "type": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "granter": {
-                    "type": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "height": {
                     "type": "integer",
@@ -5910,9 +6077,7 @@
                     "example": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="
                 },
                 "signer": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "size": {
                     "type": "integer",
@@ -6281,8 +6446,7 @@
                     "example": "2023-07-04T03:10:57+00:00"
                 },
                 "delegator": {
-                    "type": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "destination": {
                     "$ref": "#/definitions/responses.ShortValidator"
@@ -6832,6 +6996,18 @@
                 }
             }
         },
+        "responses.ShortAddress": {
+            "type": "object",
+            "properties": {
+                "celestials": {
+                    "$ref": "#/definitions/responses.Celestial"
+                },
+                "hash": {
+                    "type": "string",
+                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                }
+            }
+        },
         "responses.ShortRollup": {
             "type": "object",
             "properties": {
@@ -7098,7 +7274,7 @@
                 "signers": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/responses.ShortAddress"
                     }
                 },
                 "status": {
@@ -7171,8 +7347,7 @@
                     "example": "2023-07-04T03:10:57+00:00"
                 },
                 "delegator": {
-                    "type": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "height": {
                     "type": "integer",
@@ -7191,8 +7366,7 @@
             "type": "object",
             "properties": {
                 "address": {
-                    "type": "string",
-                    "example": "celestiavaloper1un77nfm6axkhkupe8fk4xl6fd4adz3y59fucpu"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "commissions": {
                     "type": "string",
@@ -7207,8 +7381,7 @@
                     "example": "security@0xfury.com"
                 },
                 "delegator": {
-                    "type": "string",
-                    "example": "celestia1un77nfm6axkhkupe8fk4xl6fd4adz3y5qk7ph6"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "details": {
                     "type": "string",

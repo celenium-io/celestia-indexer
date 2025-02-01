@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
@@ -40,7 +41,8 @@ type Address struct {
 	Hash       []byte      `bun:"hash"                        comment:"Address hash."`
 	Address    string      `bun:"address,unique:address_idx"  comment:"Human-readable address."`
 
-	Balance Balance `bun:"rel:has-one,join:id=id"`
+	Balance    Balance               `bun:"rel:has-one,join:id=id"`
+	Celestials *celestials.Celestial `bun:"rel:has-one,join:id=address_id"`
 }
 
 // TableName -

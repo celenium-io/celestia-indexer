@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/lib/pq"
 	"github.com/shopspring/decimal"
@@ -45,6 +46,8 @@ var Models = []any{
 	&Grant{},
 	&ApiKey{},
 	&Tvl{},
+	&celestials.Celestial{},
+	&celestials.CelestialState{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed

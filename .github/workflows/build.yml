@@ -106,3 +106,22 @@ jobs:
           cache-to: type=gha,mode=max
           tags: ${{ steps.meta-tvl.outputs.tags }}
           labels: ${{ steps.meta-tvl.outputs.labels }}
+
+      # Celestials
+
+      - name: Celestials image tags & labels
+        id: meta-celestials
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_BASE }}-celestials
+
+      - name: Celestials image build & push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: build/celestials/Dockerfile
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ steps.meta-celestials.outputs.tags }}
+          labels: ${{ steps.meta-celestials.outputs.labels }}

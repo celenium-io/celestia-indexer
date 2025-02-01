@@ -251,7 +251,7 @@ func (s *ValidatorTestSuite) TestDelegators() {
 
 	d := delegations[0]
 	s.Require().Equal("100", d.Amount)
-	s.Require().Equal(testAddress, d.Delegator)
+	s.Require().Equal(testAddress, d.Delegator.Hash)
 }
 
 func (s *ValidatorTestSuite) TestJails() {

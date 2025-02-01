@@ -411,7 +411,7 @@ func (s *TransactionTestSuite) TestRollbackAddress() {
 
 	items, err := s.storage.Address.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 1)
+	s.Require().Len(items, 2)
 }
 
 func (s *TransactionTestSuite) TestRollbackTxs() {

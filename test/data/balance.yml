@@ -8,3 +8,8 @@
   delegated: 0
   unbonding: 0
   currency: utia
+- id: 3
+  spendable: 555
+  delegated: 15
+  unbonding: 15
+  currency: utia

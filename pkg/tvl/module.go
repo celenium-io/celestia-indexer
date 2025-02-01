@@ -9,14 +9,13 @@ import (
 	"strings"
 	"time"
 
+	"cosmossdk.io/errors"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/tvl/l2beat"
 	"github.com/celenium-io/celestia-indexer/internal/tvl/lama"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	strg "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/pkg/errors"
-	"github.com/rs/zerolog"
 	"github.com/shopspring/decimal"
 )
 
@@ -34,7 +33,6 @@ type Module struct {
 	lamaApi   lama.IApi
 	rollup    storage.IRollup
 	tvl       storage.ITvl
-	log       zerolog.Logger
 }
 
 func New(l2beatCfg config.DataSource, lamaCfg config.DataSource, rollup storage.IRollup, tvl storage.ITvl) *Module {
@@ -56,7 +54,7 @@ func (m *Module) Close() error {
 }
 
 func (m *Module) Start(ctx context.Context) {
-	m.log.Info().Msg("starting TVL scanner...")
+	m.Log.Info().Msg("starting TVL scanner...")
 	m.G.GoCtx(ctx, m.receive)
 }
 
