@@ -406,8 +406,6 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		stats.GET("/rollup_stats_24h", statsHandler.RollupStats24h)
 		stats.GET("/square_size", statsHandler.SquareSize)
 		stats.GET("/messages_count_24h", statsHandler.MessagesCount24h)
-		stats.GET("/tvs", statsHandler.Tvs)
-		stats.GET("/tvs/:timeframe", statsHandler.TvsSeries)
 
 		price := stats.Group("/price")
 		{

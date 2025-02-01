@@ -45,7 +45,6 @@ var Models = []any{
 	&RollupProvider{},
 	&Grant{},
 	&ApiKey{},
-	&Tvl{},
 	&celestials.Celestial{},
 	&celestials.CelestialState{},
 }

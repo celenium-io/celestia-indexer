@@ -13,9 +13,6 @@ api:
 quotes:
 	cd cmd/quotes && go run . -c ../../configs/dipdup.yml
 
-tvl:
-	cd cmd/tvl && go run . -c ../../configs/dipdup.yml
-
 celestials:
 	cd cmd/celestials && go run . -c ../../configs/dipdup.yml
 
@@ -46,7 +43,7 @@ adr:
 	@cp adr/adr-template.md adr/adr-$(NUM)-$(TITLE).md
 
 generate:
-	go generate -v ./internal/blob ./internal/storage ./internal/storage/types ./pkg/node ./internal/binance ./internal/celestials ./internal/tvl/l2beat ./internal/tvl/lama
+	go generate -v ./internal/blob ./internal/storage ./internal/storage/types ./pkg/node ./internal/binance ./internal/celestials
 
 api-docs:
 	cd cmd/api && swag init --md markdown -parseDependency --parseInternal --parseDepth 1 --outputTypes json
@@ -84,4 +81,4 @@ cover:
 license-header:
 	update-license -path=./ -license=./HEADER
 
-.PHONY: init indexer api celestials quotes build clean compose lint test adr mock api-docs check-licenses cover license-header tvl
+.PHONY: init indexer api build clean compose lint test adr mock api-docs check-licenses cover license-header celestials
