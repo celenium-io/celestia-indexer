@@ -87,25 +87,6 @@ jobs:
           cache-to: type=gha,mode=max
           tags: ${{ steps.meta-quotes.outputs.tags }}
           labels: ${{ steps.meta-quotes.outputs.labels }}
-      
-      # Tvl
-
-      - name: Tvl image tags & labels
-        id: meta-tvl
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_BASE }}-tvl
-
-      - name: Tvl image build & push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: build/tvl/Dockerfile
-          push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: ${{ steps.meta-tvl.outputs.tags }}
-          labels: ${{ steps.meta-tvl.outputs.labels }}
 
       # Celestials
 

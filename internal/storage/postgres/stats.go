@@ -5,7 +5,6 @@ package postgres
 
 import (
 	"context"
-	"github.com/shopspring/decimal"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -411,57 +410,5 @@ func (s Stats) MessagesCount24h(ctx context.Context) (response []storage.CountIt
 		Group("type").
 		Order("value desc").
 		Scan(ctx, &response)
-	return
-}
-
-func (s Stats) Tvs(ctx context.Context) (tvs decimal.Decimal, err error) {
-	var lastTs time.Time
-
-	var query = s.db.DB().
-		NewSelect().
-		Table(storage.ViewRollupTvlByMonth)
-	errTs := query.
-		ColumnExpr("MAX(time) AS time").
-		Scan(ctx, &lastTs)
-
-	if errTs != nil {
-		return decimal.Zero, errTs
-	}
-
-	err = s.db.DB().
-		NewSelect().
-		Table(storage.ViewRollupTvlByMonth).
-		ColumnExpr("sum(value) as value").
-		Where("time = ?", lastTs).
-		Scan(ctx, &tvs)
-
-	return
-}
-
-func (s Stats) TvsSeries(ctx context.Context, timeframe storage.Timeframe, req storage.SeriesRequest) (response []storage.SeriesItem, err error) {
-	query := s.db.DB().NewSelect()
-
-	switch timeframe {
-	case storage.TimeframeDay:
-		query = query.Table(storage.ViewTvsByDay).
-			ColumnExpr("value, time as ts")
-	case storage.TimeframeMonth:
-		query = query.Table(storage.ViewTvsByMonth).
-			ColumnExpr("value, min_value as min, max_value as max, time as ts")
-	default:
-		return nil, errors.Errorf("unexpected timeframe %s", timeframe)
-	}
-
-	if !req.From.IsZero() {
-		query = query.Where("time >= ?", req.From)
-	}
-	if !req.To.IsZero() {
-		query = query.Where("time < ?", req.To)
-	}
-
-	err = query.Order("time desc").
-		Limit(100).
-		Scan(ctx, &response)
-
 	return
 }
