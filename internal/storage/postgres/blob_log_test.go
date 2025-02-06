@@ -388,6 +388,8 @@ func (s *StorageTestSuite) TestBlob() {
 
 	s.Require().NotNil(log.Signer)
 	s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", log.Signer.Address)
+	s.Require().NotNil(log.Signer.Celestials)
+	s.Require().EqualValues("name 1", log.Signer.Celestials.Id)
 
 	s.Require().NotNil(log.Tx)
 	s.Require().EqualValues(4, log.Tx.Id)
