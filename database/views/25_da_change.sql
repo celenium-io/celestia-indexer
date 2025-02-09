@@ -36,9 +36,9 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS da_change AS
     ) 
     select 
         case 
-            when board2.size > 0
-                then board1.size / board2.size - 1 
-            when board1.size > 0 and board2.size = 0
+            when coalesce(board2.size, 0) > 0
+                then coalesce(board1.size, 0) / coalesce(board2.size, 0) - 1 
+            when coalesce(board1.size > 0, 0) and coalesce(board2.size, 0) = 0
                 then 1
             else 0 
             end as da_pct,
