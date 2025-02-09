@@ -44,7 +44,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS da_change AS
             end as da_pct,
         rollup.id as rollup_id
     from rollup
-    inner join board1 on rollup.id = board1.rollup_id
-    inner join board2 on rollup.id = board2.rollup_id;
+    left join board1 on rollup.id = board1.rollup_id
+    left join board2 on rollup.id = board2.rollup_id;
 
 CALL add_job_refresh_materialized_view();

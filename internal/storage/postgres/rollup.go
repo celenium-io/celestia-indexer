@@ -328,7 +328,8 @@ func (r *Rollup) AllSeries(ctx context.Context, timeframe storage.Timeframe) (it
 	err = r.DB().NewSelect().
 		TableExpr("(?) as series", subQuery).
 		ColumnExpr("series.time as time, series.size as size, series.blobs_count as blobs_count, series.fee as fee, rollup.name as name, rollup.logo as logo").
-		Join("left join rollup on rollup.id = series.rollup_id and rollup.verified = true").
+		Join("left join rollup on rollup.id = series.rollup_id").
+		Where("rollup.verified = true").
 		OrderExpr("time desc").
 		Scan(ctx, &items)
 
