@@ -38,7 +38,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS da_change AS
         case 
             when coalesce(board2.size, 0) > 0
                 then coalesce(board1.size, 0) / coalesce(board2.size, 0) - 1 
-            when coalesce(board1.size > 0, 0) and coalesce(board2.size, 0) = 0
+            when coalesce(board1.size, 0) > 0 and coalesce(board2.size, 0) = 0
                 then 1
             else 0 
             end as da_pct,
