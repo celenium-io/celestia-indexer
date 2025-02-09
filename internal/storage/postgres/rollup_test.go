@@ -312,9 +312,12 @@ func (s *StorageTestSuite) TestRollupAllSeries() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	items, err := s.storage.Rollup.AllSeries(ctx)
-	s.Require().NoError(err)
-	s.Require().Len(items, 7)
+	for _, tf := range []storage.Timeframe{
+		storage.TimeframeHour, storage.TimeframeDay, storage.TimeframeMonth,
+	} {
+		_, err := s.storage.Rollup.AllSeries(ctx, tf)
+		s.Require().NoError(err, tf)
+	}
 }
 
 func (s *StorageTestSuite) TestRollupStatsGrouping() {

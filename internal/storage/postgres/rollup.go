@@ -310,18 +310,26 @@ func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series strin
 	return
 }
 
-func (r *Rollup) AllSeries(ctx context.Context) (items []storage.RollupHistogramItem, err error) {
+func (r *Rollup) AllSeries(ctx context.Context, timeframe storage.Timeframe) (items []storage.RollupHistogramItem, err error) {
 	subQuery := r.DB().NewSelect().
-		Table(storage.ViewRollupStatsByMonth).
 		ColumnExpr("rp.rollup_id, sum(size) as size, sum(blobs_count) as blobs_count, sum(fee) as fee, time").
-		Join("inner join rollup_provider rp on (rp.namespace_id = 0 or rp.namespace_id = rollup_stats_by_month.namespace_id) and rp.address_id = signer_id").
-		Group("rollup_id", "time").
-		Order("time")
+		Join("inner join rollup_provider rp on (rp.namespace_id = 0 or rp.namespace_id = stats.namespace_id) and rp.address_id = signer_id").
+		Group("rollup_id", "time")
+
+	switch timeframe {
+	case storage.TimeframeHour:
+		subQuery = subQuery.TableExpr("? as stats", bun.Safe(storage.ViewRollupStatsByHour)).Where("time > now() - '24 hours'::interval")
+	case storage.TimeframeDay:
+		subQuery = subQuery.TableExpr("? as stats", bun.Safe(storage.ViewRollupStatsByDay)).Where("time > now() - '30 days'::interval")
+	case storage.TimeframeMonth:
+		subQuery = subQuery.TableExpr("? as stats", bun.Safe(storage.ViewRollupStatsByMonth)).Where("time > now() - '1 year'::interval")
+	}
 
 	err = r.DB().NewSelect().
 		TableExpr("(?) as series", subQuery).
 		ColumnExpr("series.time as time, series.size as size, series.blobs_count as blobs_count, series.fee as fee, rollup.name as name, rollup.logo as logo").
 		Join("left join rollup on rollup.id = series.rollup_id and rollup.verified = true").
+		OrderExpr("time desc").
 		Scan(ctx, &items)
 
 	return

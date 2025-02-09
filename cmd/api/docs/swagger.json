@@ -3044,7 +3044,7 @@
                 }
             }
         },
-        "/rollup/stats/series": {
+        "/rollup/stats/series/{timeframe}": {
             "get": {
                 "description": "Get series for all rollups",
                 "produces": [
@@ -3055,13 +3055,33 @@
                 ],
                 "summary": "Get series for all rollups",
                 "operationId": "get-rollup-all-series",
+                "parameters": [
+                    {
+                        "enum": [
+                            "hour",
+                            "day",
+                            "month"
+                        ],
+                        "type": "string",
+                        "description": "Timeframe",
+                        "name": "timeframe",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/responses.RollupAllSeriesItem"
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/responses.RollupAllSeriesItem"
+                                    }
+                                }
                             }
                         }
                     },
@@ -3408,8 +3428,7 @@
                             "blobs_count",
                             "size",
                             "size_per_blob",
-                            "fee",
-                            "tvl"
+                            "fee"
                         ],
                         "type": "string",
                         "description": "Series name",
@@ -4240,94 +4259,6 @@
                     }
                 },
                 "x-internal": true
-            }
-        },
-        "/stats/tvs": {
-            "get": {
-                "description": "Get TVS of the network",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "stats"
-                ],
-                "summary": "Get TVS of the network",
-                "operationId": "stats-tvs",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/stats/tvs/{timeframe}": {
-            "get": {
-                "description": "Get histogram for network TVS by timeframe",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "stats"
-                ],
-                "summary": "Get histogram for network TVS",
-                "operationId": "stats-tvs-series",
-                "parameters": [
-                    {
-                        "enum": [
-                            "day",
-                            "month"
-                        ],
-                        "type": "string",
-                        "description": "Timeframe",
-                        "name": "timeframe",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Time from in unix timestamp",
-                        "name": "from",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Time to in unix timestamp",
-                        "name": "to",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/responses.SeriesItem"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                }
             }
         },
         "/tx": {
@@ -6598,11 +6529,6 @@
                     "type": "integer",
                     "format": "integer",
                     "example": 123
-                },
-                "time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "2023-07-04T03:10:57+00:00"
                 }
             }
         },
@@ -6838,6 +6764,11 @@
                     "type": "string",
                     "format": "string",
                     "example": "zip"
+                },
+                "da_pct": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.9876
                 },
                 "defi_lama": {
                     "type": "string",

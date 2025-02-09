@@ -381,30 +381,57 @@ func (handler RollupHandler) Stats(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+type rollupAllSeriesRequest struct {
+	Timeframe storage.Timeframe `example:"hour" param:"timeframe" swaggertype:"string" validate:"required,oneof=hour day month"`
+}
+
 // AllSeries godoc
 //
 //	@Summary		Get series for all rollups
 //	@Description	Get series for all rollups
 //	@Tags			rollup
 //	@ID				get-rollup-all-series
+//	@Param			timeframe	path	string	true	"Timeframe"		Enums(hour, day, month)
 //	@Produce		json
-//	@Success		200	{array}		responses.RollupAllSeriesItem
+//	@Success		200	{array}		RollupAllSeriesResponse
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/rollup/stats/series [get]
+//	@Router			/rollup/stats/series/{timeframe} [get]
 func (handler RollupHandler) AllSeries(c echo.Context) error {
+	req, err := bindAndValidate[rollupAllSeriesRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
 	histogram, err := handler.rollups.AllSeries(
 		c.Request().Context(),
+		req.Timeframe,
 	)
 	if err != nil {
 		return handleError(c, err, handler.rollups)
 	}
 
-	response := make([]responses.RollupAllSeriesItem, len(histogram))
+	response := make([]responses.RollupAllSeriesResponse, 0)
 	for i := range histogram {
-		response[i] = responses.NewRollupAllSeriesItem(histogram[i])
+		key := histogram[i].Time
+		value := responses.NewRollupAllSeriesItem(histogram[i])
+
+		var found bool
+		for j := range response {
+			if response[j].Time.Equal(key) {
+				response[j].Items = append(response[j].Items, value)
+				found = true
+			}
+		}
+
+		if !found {
+			response = append(response, responses.RollupAllSeriesResponse{
+				Time:  key,
+				Items: []responses.RollupAllSeriesItem{value},
+			})
+		}
 	}
-	return returnArray(c, response)
+	return c.JSON(http.StatusOK, response)
 }
 
 // Count godoc

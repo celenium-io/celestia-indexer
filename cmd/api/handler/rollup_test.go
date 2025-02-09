@@ -450,40 +450,50 @@ func (s *RollupTestSuite) TestByExportBlobs() {
 }
 
 func (s *RollupTestSuite) TestAllSeries() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	c := s.echo.NewContext(req, rec)
-	c.SetPath("/rollup/stats/series")
+	for _, tf := range []storage.Timeframe{
+		storage.TimeframeHour,
+		storage.TimeframeDay,
+		storage.TimeframeMonth,
+	} {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		c := s.echo.NewContext(req, rec)
+		c.SetPath("/rollup/stats/series/:timeframe")
+		c.SetParamNames("timeframe")
+		c.SetParamValues(string(tf))
 
-	s.rollups.EXPECT().
-		AllSeries(gomock.Any()).
-		Return([]storage.RollupHistogramItem{
-			{
-				Name:       testRollup.Name,
-				Logo:       testRollup.Logo,
-				Time:       testTime,
-				BlobsCount: 1,
-				Size:       2,
-				Fee:        "3",
-			},
-		}, nil).
-		Times(1)
+		s.rollups.EXPECT().
+			AllSeries(gomock.Any(), tf).
+			Return([]storage.RollupHistogramItem{
+				{
+					Name:       testRollup.Name,
+					Logo:       testRollup.Logo,
+					Time:       testTime,
+					BlobsCount: 1,
+					Size:       2,
+					Fee:        "3",
+				},
+			}, nil).
+			Times(1)
 
-	s.Require().NoError(s.handler.AllSeries(c))
-	s.Require().Equal(http.StatusOK, rec.Code)
+		s.Require().NoError(s.handler.AllSeries(c))
+		s.Require().Equal(http.StatusOK, rec.Code)
 
-	var items []responses.RollupAllSeriesItem
-	err := json.NewDecoder(rec.Body).Decode(&items)
-	s.Require().NoError(err)
-	s.Require().Len(items, 1)
+		var items []responses.RollupAllSeriesResponse
+		err := json.NewDecoder(rec.Body).Decode(&items)
+		s.Require().NoError(err)
+		s.Require().Len(items, 1)
 
-	item := items[0]
-	s.Require().EqualValues("test rollup", item.Name)
-	s.Require().EqualValues("3", item.Fee)
-	s.Require().EqualValues("image.png", item.Logo)
-	s.Require().EqualValues(2, item.Size)
-	s.Require().EqualValues(1, item.BlobsCount)
-	s.Require().EqualValues(testTime, item.Time)
+		for _, item := range items {
+			s.Require().Equal(testTime.String(), item.Time.String())
+			s.Require().Len(item.Items, 1)
+			s.Require().EqualValues("test rollup", item.Items[0].Name)
+			s.Require().EqualValues("3", item.Items[0].Fee)
+			s.Require().EqualValues("image.png", item.Items[0].Logo)
+			s.Require().EqualValues(2, item.Items[0].Size)
+			s.Require().EqualValues(1, item.Items[0].BlobsCount)
+		}
+	}
 }
 
 func (s *RollupTestSuite) TestRollupStatsGrouping() {
