@@ -103,7 +103,7 @@ func NewDistributionItem(item storage.DistributionItem, tf string) (result Distr
 
 	switch tf {
 	case "day":
-		result.Name = time.Weekday(item.Name).String()
+		result.Name = time.Weekday(item.Name % 7).String()
 	case "hour":
 		result.Name = strconv.FormatInt(int64(item.Name), 10)
 	default:

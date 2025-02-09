@@ -95,6 +95,17 @@ func TestNewDistributionItem(t *testing.T) {
 				Value: "10",
 			},
 		}, {
+			name: "Sunday",
+			item: storage.DistributionItem{
+				Name:  7,
+				Value: "10",
+			},
+			tf: "day",
+			wantResult: DistributionItem{
+				Name:  "Sunday",
+				Value: "10",
+			},
+		}, {
 			name: "10 hour",
 			item: storage.DistributionItem{
 				Name:  10,
