@@ -47,6 +47,9 @@ var (
 			FeePct:          0.2,
 			SizePct:         0.3,
 		},
+		DAChange: storage.DAChange{
+			DAPct: 0.1,
+		},
 	}
 	testRollupWithGroupedStats = storage.RollupGroupedStats{
 		Fee:        0.1,
@@ -144,6 +147,7 @@ func (s *RollupTestSuite) TestLeaderboard() {
 		s.Require().EqualValues(0.1, rollup.BlobsCountPct)
 		s.Require().EqualValues(0.2, rollup.FeePct)
 		s.Require().EqualValues(0.3, rollup.SizePct)
+		s.Require().EqualValues(0.1, rollup.DAPct)
 	}
 }
 

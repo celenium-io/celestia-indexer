@@ -18,6 +18,8 @@ func (s *StorageTestSuite) TestRollupLeaderboard() {
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
 	s.Require().NoError(err)
+	_, err = s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW da_change;")
+	s.Require().NoError(err)
 
 	for _, column := range []string{
 		sizeColumn, blobsCountColumn, timeColumn, feeColumn, "",
@@ -43,6 +45,7 @@ func (s *StorageTestSuite) TestRollupLeaderboard() {
 		s.Require().EqualValues(0.6363636363636364, rollup.FeePct)
 		s.Require().EqualValues(0.42857142857142855, rollup.BlobsCountPct)
 		s.Require().EqualValues(0.3953488372093023, rollup.SizePct)
+		s.Require().EqualValues(0, rollup.DAPct)
 	}
 }
 
@@ -51,6 +54,8 @@ func (s *StorageTestSuite) TestRollupLeaderboardWithCategory() {
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
+	s.Require().NoError(err)
+	_, err = s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW da_change;")
 	s.Require().NoError(err)
 
 	for _, column := range []string{
@@ -90,6 +95,8 @@ func (s *StorageTestSuite) TestRollupLeaderboardWithTags() {
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
 	s.Require().NoError(err)
+	_, err = s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW da_change;")
+	s.Require().NoError(err)
 
 	for _, column := range []string{
 		sizeColumn, blobsCountColumn, timeColumn, feeColumn, "",
@@ -127,6 +134,8 @@ func (s *StorageTestSuite) TestRollupLeaderboardWithType() {
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
+	s.Require().NoError(err)
+	_, err = s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW da_change;")
 	s.Require().NoError(err)
 
 	for _, column := range []string{
@@ -224,6 +233,8 @@ func (s *StorageTestSuite) TestRollupBySlug() {
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
 	s.Require().NoError(err)
+	_, err = s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW da_change;")
+	s.Require().NoError(err)
 
 	rollup, err := s.storage.Rollup.BySlug(ctx, "rollup_3")
 	s.Require().NoError(err)
@@ -238,6 +249,7 @@ func (s *StorageTestSuite) TestRollupBySlug() {
 	s.Require().EqualValues(0.6363636363636364, rollup.FeePct)
 	s.Require().EqualValues(0.42857142857142855, rollup.BlobsCountPct)
 	s.Require().EqualValues(0.3953488372093023, rollup.SizePct)
+	s.Require().EqualValues(0, rollup.DAPct)
 }
 
 func (s *StorageTestSuite) TestRollupById() {
@@ -245,6 +257,8 @@ func (s *StorageTestSuite) TestRollupById() {
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
+	s.Require().NoError(err)
+	_, err = s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW da_change;")
 	s.Require().NoError(err)
 
 	rollup, err := s.storage.Rollup.ById(ctx, 3)
@@ -260,6 +274,7 @@ func (s *StorageTestSuite) TestRollupById() {
 	s.Require().EqualValues(0.6363636363636364, rollup.FeePct)
 	s.Require().EqualValues(0.42857142857142855, rollup.BlobsCountPct)
 	s.Require().EqualValues(0.3953488372093023, rollup.SizePct)
+	s.Require().EqualValues(0, rollup.DAPct)
 }
 
 func (s *StorageTestSuite) TestRollupsByNamespace() {

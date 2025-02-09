@@ -39,8 +39,10 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 
 	query := r.DB().NewSelect().
 		Table(storage.ViewLeaderboard).
-		ColumnExpr("*").
-		Offset(fltrs.Offset)
+		ColumnExpr("leaderboard.*").
+		ColumnExpr("da_change.da_pct as da_pct").
+		Offset(fltrs.Offset).
+		Join("left join da_change on da_change.rollup_id = leaderboard.id")
 
 	if len(fltrs.Category) > 0 {
 		query = query.Where("category IN (?)", bun.In(fltrs.Category))
@@ -227,8 +229,11 @@ func (r *Rollup) Stats(ctx context.Context, rollupId uint64) (stats storage.Roll
 func (r *Rollup) BySlug(ctx context.Context, slug string) (rollup storage.RollupWithStats, err error) {
 	err = r.DB().NewSelect().
 		Table(storage.ViewLeaderboard).
+		ColumnExpr("leaderboard.*").
+		ColumnExpr("da_change.da_pct as da_pct").
 		Where("slug = ?", slug).
 		Limit(1).
+		Join("left join da_change on da_change.rollup_id = leaderboard.id").
 		Scan(ctx, &rollup)
 	return
 }
@@ -237,7 +242,10 @@ func (r *Rollup) ById(ctx context.Context, rollupId uint64) (rollup storage.Roll
 	err = r.DB().NewSelect().
 		Table(storage.ViewLeaderboard).
 		Where("id = ?", rollupId).
+		ColumnExpr("leaderboard.*").
+		ColumnExpr("da_change.da_pct as da_pct").
 		Limit(1).
+		Join("left join da_change on da_change.rollup_id = leaderboard.id").
 		Scan(ctx, &rollup)
 	return
 }
