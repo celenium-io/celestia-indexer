@@ -106,6 +106,11 @@ func (r Rollup) IsEmpty() bool {
 type RollupWithStats struct {
 	Rollup
 	RollupStats
+	DAChange
+}
+
+type DAChange struct {
+	DAPct float64 `bun:"da_pct"`
 }
 
 type RollupStats struct {

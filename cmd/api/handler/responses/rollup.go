@@ -38,6 +38,7 @@ type RollupWithStats struct {
 	SizePct       float64   `example:"0.9876"                    format:"float"     json:"size_pct"           swaggertype:"number"`
 	FeePct        float64   `example:"0.9876"                    format:"float"     json:"fee_pct"            swaggertype:"number"`
 	BlobsCountPct float64   `example:"0.9876"                    format:"float"     json:"blobs_count_pct"    swaggertype:"number"`
+	DAPct         float64   `example:"0.9876"                    format:"float"     json:"da_pct"             swaggertype:"number"`
 
 	Tags  []string `json:"tags,omitempty"`
 	Links []string `json:"links,omitempty"`
@@ -63,6 +64,7 @@ func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 		Size:           r.Size,
 		SizePct:        r.SizePct,
 		BlobsCountPct:  r.BlobsCountPct,
+		DAPct:          r.DAPct,
 		FeePct:         r.FeePct,
 		LastAction:     r.LastActionTime,
 		FirstAction:    r.FirstActionTime,
