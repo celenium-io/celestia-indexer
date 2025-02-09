@@ -181,3 +181,8 @@ func NewRollupAllSeriesItem(stats storage.RollupHistogramItem) RollupAllSeriesIt
 		BlobsCount: stats.BlobsCount,
 	}
 }
+
+type RollupAllSeriesResponse struct {
+	Time  time.Time             `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time" swaggertype:"string"`
+	Items []RollupAllSeriesItem `json:"items"`
+}

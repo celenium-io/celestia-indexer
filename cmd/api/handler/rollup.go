@@ -393,7 +393,7 @@ type rollupAllSeriesRequest struct {
 //	@ID				get-rollup-all-series
 //	@Param			timeframe	path	string	true	"Timeframe"		Enums(hour, day, month)
 //	@Produce		json
-//	@Success		200	{array}		map[string][]responses.RollupAllSeriesItem
+//	@Success		200	{array}		RollupAllSeriesResponse
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/rollup/stats/series/{timeframe} [get]
@@ -411,11 +411,25 @@ func (handler RollupHandler) AllSeries(c echo.Context) error {
 		return handleError(c, err, handler.rollups)
 	}
 
-	response := make(map[string][]responses.RollupAllSeriesItem, 0)
+	response := make([]responses.RollupAllSeriesResponse, 0)
 	for i := range histogram {
-		key := histogram[i].Time.Format(time.RFC3339)
+		key := histogram[i].Time
 		value := responses.NewRollupAllSeriesItem(histogram[i])
-		response[key] = append(response[key], value)
+
+		var found bool
+		for j := range response {
+			if response[j].Time.Equal(key) {
+				response[j].Items = append(response[j].Items, value)
+				found = true
+			}
+		}
+
+		if !found {
+			response = append(response, responses.RollupAllSeriesResponse{
+				Time:  key,
+				Items: []responses.RollupAllSeriesItem{value},
+			})
+		}
 	}
 	return c.JSON(http.StatusOK, response)
 }

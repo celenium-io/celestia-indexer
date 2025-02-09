@@ -479,18 +479,19 @@ func (s *RollupTestSuite) TestAllSeries() {
 		s.Require().NoError(s.handler.AllSeries(c))
 		s.Require().Equal(http.StatusOK, rec.Code)
 
-		var items map[string][]responses.RollupAllSeriesItem
+		var items []responses.RollupAllSeriesResponse
 		err := json.NewDecoder(rec.Body).Decode(&items)
 		s.Require().NoError(err)
 		s.Require().Len(items, 1)
 
 		for _, item := range items {
-			s.Require().Len(item, 1)
-			s.Require().EqualValues("test rollup", item[0].Name)
-			s.Require().EqualValues("3", item[0].Fee)
-			s.Require().EqualValues("image.png", item[0].Logo)
-			s.Require().EqualValues(2, item[0].Size)
-			s.Require().EqualValues(1, item[0].BlobsCount)
+			s.Require().Equal(testTime.String(), item.Time.String())
+			s.Require().Len(item.Items, 1)
+			s.Require().EqualValues("test rollup", item.Items[0].Name)
+			s.Require().EqualValues("3", item.Items[0].Fee)
+			s.Require().EqualValues("image.png", item.Items[0].Logo)
+			s.Require().EqualValues(2, item.Items[0].Size)
+			s.Require().EqualValues(1, item.Items[0].BlobsCount)
 		}
 	}
 }
