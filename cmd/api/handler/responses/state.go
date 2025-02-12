@@ -27,6 +27,7 @@ type State struct {
 	TotalSupply      string         `example:"312"                                                              format:"string"    json:"total_supply"       swaggertype:"string"`
 	TotalStake       string         `example:"312"                                                              format:"string"    json:"total_stake"        swaggertype:"string"`
 	TotalVotingPower string         `example:"312"                                                              format:"string"    json:"total_voting_power" swaggertype:"string"`
+	TotalNamespaces  int64          `example:"312"                                                              format:"string"    json:"total_namespaces"   swaggertype:"integer"`
 	Synced           bool           `example:"true"                                                             format:"boolean"   json:"synced"             swaggertype:"boolean"`
 }
 
@@ -43,6 +44,7 @@ func NewState(state storage.State) State {
 		TotalFee:         state.TotalFee.String(),
 		TotalBlobsSize:   state.TotalBlobsSize,
 		TotalValidators:  state.TotalValidators,
+		TotalNamespaces:  state.TotalNamespaces,
 		TotalSupply:      state.TotalSupply.String(),
 		TotalStake:       state.TotalStake.String(),
 		TotalVotingPower: state.TotalVotingPower.String(),
