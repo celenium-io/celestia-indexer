@@ -130,10 +130,6 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRo
 		return 0, tx.HandleError(ctx, err)
 	}
 
-	if err := tx.RefreshLeaderboard(ctx); err != nil {
-		return 0, tx.HandleError(ctx, err)
-	}
-
 	if err := tx.Flush(ctx); err != nil {
 		return 0, err
 	}
@@ -262,10 +258,6 @@ func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRo
 		if err := tx.SaveProviders(ctx, providers...); err != nil {
 			return tx.HandleError(ctx, err)
 		}
-	}
-
-	if err := tx.RefreshLeaderboard(ctx); err != nil {
-		return tx.HandleError(ctx, err)
 	}
 
 	return tx.Flush(ctx)
