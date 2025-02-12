@@ -79,8 +79,7 @@ func (a *Address) ListWithBalance(ctx context.Context, filters storage.AddressLi
 func (a *Address) Series(ctx context.Context, addressId uint64, timeframe storage.Timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
 	query := a.DB().NewSelect().
 		Where("address_id = ?", addressId).
-		Order("time desc").
-		Limit(100)
+		Order("time desc")
 
 	switch timeframe {
 	case storage.TimeframeHour:
