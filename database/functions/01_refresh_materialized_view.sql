@@ -2,7 +2,9 @@ CREATE OR REPLACE PROCEDURE refresh_materialized_view(job_id INT, config JSONB)
     LANGUAGE PLPGSQL AS
     $$
     BEGIN
+        SET enable_seqscan TO false;
         REFRESH MATERIALIZED VIEW leaderboard;
+        SET enable_seqscan TO true;
     END
     $$;
 
