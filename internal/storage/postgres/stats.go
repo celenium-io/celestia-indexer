@@ -193,7 +193,7 @@ func (s Stats) Series(ctx context.Context, timeframe storage.Timeframe, name str
 		query = query.Where("ts < ?", req.To)
 	}
 
-	err = query.Limit(200).Scan(ctx, &response)
+	err = query.Scan(ctx, &response)
 	return
 }
 
@@ -232,7 +232,7 @@ func (s Stats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe,
 		query = query.Where("ts < ?", req.To)
 	}
 
-	err = query.Limit(100).Scan(ctx, &response)
+	err = query.Scan(ctx, &response)
 	return
 }
 
@@ -325,7 +325,7 @@ func (s Stats) StakingSeries(ctx context.Context, timeframe storage.Timeframe, n
 		query = query.Where("time < ?", req.To)
 	}
 
-	err = query.Limit(100).Scan(ctx, &response)
+	err = query.Scan(ctx, &response)
 	return
 }
 

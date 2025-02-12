@@ -160,7 +160,7 @@ func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe storage.
 		return nil, nil
 	}
 
-	query := r.DB().NewSelect().Order("time desc").Limit(100).Group("time")
+	query := r.DB().NewSelect().Order("time desc").Group("time")
 
 	switch timeframe {
 	case storage.TimeframeHour:
