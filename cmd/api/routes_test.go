@@ -58,7 +58,6 @@ func TestRoutes(t *testing.T) {
 		"/v1/auth/rollup/unverified GET":                      {},
 		"/v1/address/:hash/undelegations GET":                 {},
 		"/v1/block/:height/messages GET":                      {},
-		"/v1/namespace/active GET":                            {},
 		"/v1/namespace_by_hash/:hash GET":                     {},
 		"/v1/vesting/:id/periods GET":                         {},
 		"/v1/constants GET":                                   {},
