@@ -7,15 +7,15 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/hex"
-	"github.com/celestiaorg/celestia-app/v3/pkg/appconsts"
-	"github.com/celestiaorg/celestia-app/v3/pkg/da"
-	"github.com/celestiaorg/go-square/v2/share"
 	"net/http"
 	"time"
 
+	"github.com/celestiaorg/celestia-app/v3/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v3/pkg/da"
+	"github.com/celestiaorg/go-square/v2/share"
+
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/celestiaorg/go-square/v2"
-	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -298,43 +298,6 @@ func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
 		response[i] = msg
 	}
 
-	return returnArray(c, response)
-}
-
-type getActiveRequest struct {
-	Sort string `query:"sort" validate:"omitempty,oneof=time pfb_count size"`
-}
-
-// GetActive godoc
-//
-//	@Summary		Get last used namespace
-//	@Description	Get last used namespace
-//	@Tags			namespace
-//	@ID				get-namespace-active
-//	@Param			sort	query	string	false	"Sort field. Default: time"	Enums(time,pfb_count,size)
-//	@Produce		json
-//	@Success		200	{array}		responses.Namespace
-//	@Failure		500	{object}	Error
-//	@Router			/namespace/active [get]
-func (handler *NamespaceHandler) GetActive(c echo.Context) error {
-	req, err := bindAndValidate[getActiveRequest](c)
-	if err != nil {
-		return badRequestError(c, err)
-	}
-
-	if req.Sort == "" {
-		req.Sort = "time"
-	}
-
-	active, err := handler.namespace.ListWithSort(c.Request().Context(), req.Sort, sdk.SortOrderDesc, 5, 0)
-	if err != nil {
-		return handleError(c, err, handler.namespace)
-	}
-
-	response := make([]responses.Namespace, len(active))
-	for i := range response {
-		response[i] = responses.NewNamespace(active[i])
-	}
 	return returnArray(c, response)
 }
 

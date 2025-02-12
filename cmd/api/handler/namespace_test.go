@@ -442,66 +442,6 @@ func (s *NamespaceTestSuite) TestCount() {
 	s.Require().EqualValues(123, count)
 }
 
-func (s *NamespaceTestSuite) TestGetActive() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	c := s.echo.NewContext(req, rec)
-	c.SetPath("/namespace/active")
-
-	s.namespaces.EXPECT().
-		ListWithSort(gomock.Any(), "time", sdk.SortOrderDesc, 5, 0).
-		Return([]storage.Namespace{
-			testNamespace,
-		}, nil)
-
-	s.Require().NoError(s.handler.GetActive(c))
-	s.Require().Equal(http.StatusOK, rec.Code)
-
-	var ns []responses.Namespace
-	err := json.NewDecoder(rec.Body).Decode(&ns)
-	s.Require().NoError(err)
-	s.Require().Len(ns, 1)
-
-	namespace := ns[0]
-	s.Require().Equal("0000000000000000000000000000000000000000fc7443b155920156", namespace.NamespaceID)
-	s.Require().EqualValues(100, namespace.LastHeight)
-	s.Require().EqualValues(100, namespace.Size)
-	s.Require().Equal(testTime, namespace.LastMessageTime)
-}
-
-func (s *NamespaceTestSuite) TestGetActiveWithSort() {
-	for _, field := range []string{"pfb_count", "time", "size"} {
-		q := make(url.Values)
-		q.Set("sort", field)
-
-		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
-		rec := httptest.NewRecorder()
-		c := s.echo.NewContext(req, rec)
-		c.SetPath("/namespace/active")
-
-		s.namespaces.EXPECT().
-			ListWithSort(gomock.Any(), field, sdk.SortOrderDesc, 5, 0).
-			Return([]storage.Namespace{
-				testNamespace,
-			}, nil)
-
-		s.Require().NoError(s.handler.GetActive(c))
-		s.Require().Equal(http.StatusOK, rec.Code)
-
-		var ns []responses.Namespace
-		err := json.NewDecoder(rec.Body).Decode(&ns)
-		s.Require().NoError(err)
-		s.Require().Len(ns, 1)
-
-		namespace := ns[0]
-		s.Require().Equal("0000000000000000000000000000000000000000fc7443b155920156", namespace.NamespaceID)
-		s.Require().EqualValues(100, namespace.LastHeight)
-		s.Require().EqualValues(100, namespace.Size)
-		s.Require().Equal(testTime, namespace.LastMessageTime)
-
-	}
-}
-
 func (s *NamespaceTestSuite) TestBlob() {
 	commitment := "ZeKGjIwsIkFsACD0wtEh/jbzzW+zIPP716VihNpm9T0="
 
