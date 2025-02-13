@@ -393,7 +393,7 @@ type rollupAllSeriesRequest struct {
 //	@ID				get-rollup-all-series
 //	@Param			timeframe	path	string	true	"Timeframe"		Enums(hour, day, month)
 //	@Produce		json
-//	@Success		200	{array}		RollupAllSeriesResponse
+//	@Success		200	{array}		responses.RollupAllSeriesResponse
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/rollup/stats/series/{timeframe} [get]

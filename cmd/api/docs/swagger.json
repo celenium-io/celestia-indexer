@@ -3075,13 +3075,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/definitions/responses.RollupAllSeriesItem"
-                                    }
-                                }
+                                "$ref": "#/definitions/responses.RollupAllSeriesResponse"
                             }
                         }
                     },
@@ -6532,6 +6526,22 @@
                 }
             }
         },
+        "responses.RollupAllSeriesResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responses.RollupAllSeriesItem"
+                    }
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                }
+            }
+        },
         "responses.RollupGroupedStats": {
             "type": "object",
             "properties": {
@@ -7055,6 +7065,11 @@
                     "type": "string",
                     "format": "string",
                     "example": "312"
+                },
+                "total_namespaces": {
+                    "type": "integer",
+                    "format": "string",
+                    "example": 312
                 },
                 "total_stake": {
                     "type": "string",
