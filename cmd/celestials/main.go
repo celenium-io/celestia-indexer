@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	celestials "github.com/celenium-io/celestial-module/pkg/module"
@@ -51,24 +52,13 @@ func main() {
 
 	log.Info().Str("chain_id", cfg.Celestials.ChainId).Msg("running module")
 
-	addressHandler := func(ctx context.Context, address string) (uint64, error) {
-		prefix, hash, err := types.Address(address).Decode()
-		if err != nil {
-			return 0, errors.Wrap(err, "decoding address")
-		}
-		if prefix != types.AddressPrefixCelestia {
-			return 0, errors.Errorf("invalid prefix: %s", prefix)
-		}
-		addressId, err := pg.Address.IdByHash(ctx, hash)
-		if err != nil || len(addressId) == 0 {
-			return 0, errors.Errorf("can't find address %s in database", address)
-		}
-		return addressId[0], nil
+	handler := func(ctx context.Context, address string) (uint64, error) {
+		return addressHandler(ctx, pg.Address, address)
 	}
 
 	module := celestials.New(
 		celestialsDatasource,
-		addressHandler,
+		handler,
 		pg.Celestials,
 		pg.CelestialState,
 		pg.Transactable,
@@ -85,4 +75,19 @@ func main() {
 	}
 
 	log.Info().Msg("stopped")
+}
+
+func addressHandler(ctx context.Context, repo storage.IAddress, address string) (uint64, error) {
+	prefix, hash, err := types.Address(address).Decode()
+	if err != nil {
+		return 0, errors.Wrap(err, "decoding address")
+	}
+	if prefix != types.AddressPrefixCelestia {
+		return 0, errors.Errorf("invalid prefix: %s", prefix)
+	}
+	addressId, err := repo.IdByHash(ctx, hash)
+	if err != nil || len(addressId) == 0 {
+		return 0, errors.Errorf("can't find address %s in database", address)
+	}
+	return addressId[0], nil
 }
