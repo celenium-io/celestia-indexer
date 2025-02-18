@@ -60,7 +60,7 @@ func main() {
 			return 0, errors.Errorf("invalid prefix: %s", prefix)
 		}
 		addressId, err := pg.Address.IdByHash(ctx, hash)
-		if err != nil || len(address) == 0 {
+		if err != nil || len(addressId) == 0 {
 			return 0, errors.Errorf("can't find address %s in database", address)
 		}
 		return addressId[0], nil
