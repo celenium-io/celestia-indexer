@@ -3,8 +3,17 @@
 
 package cache
 
+import (
+	"context"
+	"io"
+	"time"
+)
+
 type ICache interface {
-	Get(key string) ([]byte, bool)
-	Set(key string, data []byte)
-	Clear()
+	io.Closer
+
+	Get(ctx context.Context, key string) (string, bool)
+	Set(ctx context.Context, key string, data string, f ExpirationFunc) error
 }
+
+type ExpirationFunc func() time.Duration

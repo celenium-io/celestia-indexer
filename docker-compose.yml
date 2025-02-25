@@ -63,5 +63,18 @@ services:
       timeout: 5s
       retries: 5
     logging: *celestia-logging
+
+  cache:
+    image: valkey/valkey:8.0.2-alpine
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - VALKEY_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - cache:/bitnami/valkey/data
+    logging: *celestia-logging
+
 volumes:
   db:
+  cache:
