@@ -56,6 +56,7 @@ func main() {
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 
+	initCache(cfg.ApiConfig.Cache)
 	db := initDatabase(cfg.Database, cfg.Indexer.ScriptsDir)
 	e := initEcho(cfg.ApiConfig, cfg.Environment)
 	initDispatcher(ctx, db)
@@ -97,5 +98,10 @@ func main() {
 	}
 	if err := db.Close(); err != nil {
 		e.Logger.Fatal(err)
+	}
+	if ttlCache != nil {
+		if err := ttlCache.Close(); err != nil {
+			e.Logger.Fatal(err)
+		}
 	}
 }

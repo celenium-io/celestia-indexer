@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"net/http"
+	"strings"
 )
 
 type ResponseRecorder struct {
@@ -75,17 +76,17 @@ type CacheEntry struct {
 	Body       []byte
 }
 
-func (c *CacheEntry) Encode() ([]byte, error) {
+func (c *CacheEntry) Encode() (string, error) {
 	var buf bytes.Buffer
 	if err := gob.NewEncoder(&buf).Encode(c); err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return buf.Bytes(), nil
+	return buf.String(), nil
 }
 
-func (c *CacheEntry) Decode(b []byte) error {
-	dec := gob.NewDecoder(bytes.NewReader(b))
+func (c *CacheEntry) Decode(b string) error {
+	dec := gob.NewDecoder(strings.NewReader(b))
 	return dec.Decode(c)
 }
 

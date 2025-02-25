@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
+	"github.com/celenium-io/celestia-indexer/cmd/api/cache"
 	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
@@ -264,6 +265,18 @@ func initDatabase(cfg config.Database, viewsDir string) postgres.Storage {
 	return db
 }
 
+var ttlCache cache.ICache
+
+func initCache(url string) {
+	if url != "" {
+		c, err := cache.NewValKey(url, time.Hour)
+		if err != nil {
+			panic(err)
+		}
+		ttlCache = c
+	}
+}
+
 func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Storage) {
 	if cfg.ApiConfig.Prometheus {
 		e.GET("/metrics", echoprometheus.NewHandler())
@@ -273,9 +286,20 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 
 	stateHandlers := handler.NewStateHandler(db.State, db.Validator, cfg.Indexer.Name)
 	v1.GET("/head", stateHandlers.Head)
+
+	defaultMiddlewareCache := cache.Middleware(ttlCache, nil, nil)
+	statsMiddlewareCache := cache.Middleware(ttlCache, nil, func() time.Duration {
+		now := time.Now()
+		diff := now.Truncate(time.Hour).Add(time.Hour).Sub(now)
+		if diff > time.Minute*10 {
+			return time.Minute * 10
+		}
+		return diff
+	})
+
 	constantsHandler := handler.NewConstantHandler(db.Constants, db.DenomMetadata, db.Rollup)
-	v1.GET("/constants", constantsHandler.Get)
-	v1.GET("/enums", constantsHandler.Enums)
+	v1.GET("/constants", constantsHandler.Get, defaultMiddlewareCache)
+	v1.GET("/enums", constantsHandler.Enums, defaultMiddlewareCache)
 
 	searchHandler := handler.NewSearchHandler(db.Search, db.Address, db.Blocks, db.Tx, db.Namespace, db.Validator, db.Rollup, db.Celestials)
 	v1.GET("/search", searchHandler.Search)
@@ -298,7 +322,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			addressGroup.GET("/grants", addressHandlers.Grants)
 			addressGroup.GET("/granters", addressHandlers.Grantee)
 			addressGroup.GET("/celestials", addressHandlers.Celestials)
-			addressGroup.GET("/stats/:name/:timeframe", addressHandlers.Stats)
+			addressGroup.GET("/stats/:name/:timeframe", addressHandlers.Stats, statsMiddlewareCache)
 		}
 	}
 	ds, ok := cfg.DataSources["node_rpc"]
@@ -314,13 +338,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		blockGroup.GET("/count", blockHandlers.Count)
 		heightGroup := blockGroup.Group("/:height")
 		{
-			heightGroup.GET("", blockHandlers.Get)
-			heightGroup.GET("/events", blockHandlers.GetEvents)
-			heightGroup.GET("/messages", blockHandlers.GetMessages)
-			heightGroup.GET("/stats", blockHandlers.GetStats)
-			heightGroup.GET("/blobs", blockHandlers.Blobs)
-			heightGroup.GET("/blobs/count", blockHandlers.BlobsCount)
-			heightGroup.GET("/ods", blockHandlers.BlockODS)
+			heightGroup.GET("", blockHandlers.Get, defaultMiddlewareCache)
+			heightGroup.GET("/events", blockHandlers.GetEvents, defaultMiddlewareCache)
+			heightGroup.GET("/messages", blockHandlers.GetMessages, defaultMiddlewareCache)
+			heightGroup.GET("/stats", blockHandlers.GetStats, defaultMiddlewareCache)
+			heightGroup.GET("/blobs", blockHandlers.Blobs, defaultMiddlewareCache)
+			heightGroup.GET("/blobs/count", blockHandlers.BlobsCount, defaultMiddlewareCache)
+			heightGroup.GET("/ods", blockHandlers.BlockODS, defaultMiddlewareCache)
 		}
 	}
 
@@ -329,14 +353,14 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	{
 		txGroup.GET("", txHandlers.List)
 		txGroup.GET("/count", txHandlers.Count)
-		txGroup.GET("/genesis", txHandlers.Genesis)
+		txGroup.GET("/genesis", txHandlers.Genesis, defaultMiddlewareCache)
 		hashGroup := txGroup.Group("/:hash")
 		{
-			hashGroup.GET("", txHandlers.Get)
-			hashGroup.GET("/events", txHandlers.GetEvents)
-			hashGroup.GET("/messages", txHandlers.GetMessages)
-			hashGroup.GET("/blobs", txHandlers.Blobs)
-			hashGroup.GET("/blobs/count", txHandlers.BlobsCount)
+			hashGroup.GET("", txHandlers.Get, defaultMiddlewareCache)
+			hashGroup.GET("/events", txHandlers.GetEvents, defaultMiddlewareCache)
+			hashGroup.GET("/messages", txHandlers.GetMessages, defaultMiddlewareCache)
+			hashGroup.GET("/blobs", txHandlers.Blobs, defaultMiddlewareCache)
+			hashGroup.GET("/blobs/count", txHandlers.BlobsCount, defaultMiddlewareCache)
 		}
 	}
 
@@ -409,22 +433,22 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		price := stats.Group("/price")
 		{
 			price.GET("/current", statsHandler.PriceCurrent)
-			price.GET("/series/:timeframe", statsHandler.PriceSeries)
+			price.GET("/series/:timeframe", statsHandler.PriceSeries, statsMiddlewareCache)
 		}
 
 		namespace := stats.Group("/namespace")
 		{
 			namespace.GET("/usage", statsHandler.NamespaceUsage)
-			namespace.GET("/series/:id/:name/:timeframe", statsHandler.NamespaceSeries)
+			namespace.GET("/series/:id/:name/:timeframe", statsHandler.NamespaceSeries, statsMiddlewareCache)
 		}
 		staking := stats.Group("/staking")
 		{
-			staking.GET("/series/:id/:name/:timeframe", statsHandler.StakingSeries)
+			staking.GET("/series/:id/:name/:timeframe", statsHandler.StakingSeries, statsMiddlewareCache)
 		}
 		series := stats.Group("/series")
 		{
-			series.GET("/:name/:timeframe", statsHandler.Series)
-			series.GET("/:name/:timeframe/cumulative", statsHandler.SeriesCumulative)
+			series.GET("/:name/:timeframe", statsHandler.Series, statsMiddlewareCache)
+			series.GET("/:name/:timeframe/cumulative", statsHandler.SeriesCumulative, statsMiddlewareCache)
 		}
 	}
 
@@ -481,16 +505,16 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		rollups.GET("", rollupHandler.Leaderboard)
 		rollups.GET("/count", rollupHandler.Count)
 		rollups.GET("/day", rollupHandler.LeaderboardDay)
-		rollups.GET("/group", rollupHandler.RollupGroupedStats)
-		rollups.GET("/stats/series/:timeframe", rollupHandler.AllSeries)
+		rollups.GET("/group", rollupHandler.RollupGroupedStats, statsMiddlewareCache)
+		rollups.GET("/stats/series/:timeframe", rollupHandler.AllSeries, statsMiddlewareCache)
 		rollups.GET("/slug/:slug", rollupHandler.BySlug)
 		rollup := rollups.Group("/:id")
 		{
 			rollup.GET("", rollupHandler.Get)
 			rollup.GET("/namespaces", rollupHandler.GetNamespaces)
 			rollup.GET("/blobs", rollupHandler.GetBlobs)
-			rollup.GET("/stats/:name/:timeframe", rollupHandler.Stats)
-			rollup.GET("/distribution/:name/:timeframe", rollupHandler.Distribution)
+			rollup.GET("/stats/:name/:timeframe", rollupHandler.Stats, statsMiddlewareCache)
+			rollup.GET("/distribution/:name/:timeframe", rollupHandler.Distribution, statsMiddlewareCache)
 			rollup.GET("/export", rollupHandler.ExportBlobs)
 		}
 	}

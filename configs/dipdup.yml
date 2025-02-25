@@ -52,6 +52,7 @@ api:
   blob_receiver: ${BLOB_RECEIVER:-dal_api}
   sentry_dsn: ${SENTRY_DSN}
   websocket: ${API_WEBSOCKET_ENABLED:-true}
+  cache: ${CACHE_URL}
 
 environment: ${CELENIUM_ENV:-production}
 
