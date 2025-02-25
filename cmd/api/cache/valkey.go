@@ -46,7 +46,7 @@ func (c *ValKey) Set(ctx context.Context, key string, data string, expirationFun
 
 	return c.client.Do(
 		ctx,
-		c.client.B().Set().Key(key).Value(string(data)).ExSeconds(expiredAt).Build(),
+		c.client.B().Set().Key(key).Value(data).ExSeconds(expiredAt).Build(),
 	).Error()
 }
 

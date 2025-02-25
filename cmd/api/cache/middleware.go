@@ -69,8 +69,7 @@ func (m *CacheMiddleware) cacheResult(ctx context.Context, key string, r *Respon
 		return errors.Wrap(err, "unable to read recorded response")
 	}
 
-	m.cache.Set(ctx, key, data, m.expirationFunc)
-	return nil
+	return m.cache.Set(ctx, key, data, m.expirationFunc)
 }
 
 func (m *CacheMiddleware) isStatusCacheable(e *CacheEntry) bool {
