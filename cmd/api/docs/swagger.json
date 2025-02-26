@@ -2106,6 +2106,41 @@
                 }
             }
         },
+        "/gas/price/{priority}": {
+            "get": {
+                "description": "Get estimated gas price with priority filter based on historical data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gas"
+                ],
+                "summary": "Get estimated gas price with priority filter",
+                "operationId": "gas-price-priority",
+                "parameters": [
+                    {
+                        "enum": [
+                            "slow",
+                            "median",
+                            "fast"
+                        ],
+                        "type": "string",
+                        "description": "Priority",
+                        "name": "priority",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/head": {
             "get": {
                 "description": "Get current indexer head",
@@ -2203,49 +2238,6 @@
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handler.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/namespace/active": {
-            "get": {
-                "description": "Get last used namespace",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "namespace"
-                ],
-                "summary": "Get last used namespace",
-                "operationId": "get-namespace-active",
-                "parameters": [
-                    {
-                        "enum": [
-                            "time",
-                            "pfb_count",
-                            "size"
-                        ],
-                        "type": "string",
-                        "description": "Sort field. Default: time",
-                        "name": "sort",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/responses.Namespace"
-                            }
                         }
                     },
                     "500": {

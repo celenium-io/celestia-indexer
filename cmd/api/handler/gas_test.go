@@ -21,6 +21,12 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
+var testGasState = gas.GasPrice{
+	Slow:   "0.02",
+	Median: "0.03",
+	Fast:   "0.04",
+}
+
 // GasTestSuite -
 type GasTestSuite struct {
 	suite.Suite
@@ -30,7 +36,7 @@ type GasTestSuite struct {
 	constants  *mock.MockIConstant
 	blockStats *mock.MockIBlockStats
 	handler    GasHandler
-	tracker    *gas.Tracker
+	tracker    *gas.MockITracker
 	ctrl       *gomock.Controller
 }
 
@@ -43,16 +49,12 @@ func (s *GasTestSuite) SetupSuite() {
 	s.txs = mock.NewMockITx(s.ctrl)
 	s.constants = mock.NewMockIConstant(s.ctrl)
 	s.blockStats = mock.NewMockIBlockStats(s.ctrl)
-	s.tracker = gas.NewTracker(s.state, s.blockStats, s.txs, nil)
+	s.tracker = gas.NewMockITracker(s.ctrl)
 	s.handler = NewGasHandler(s.state, s.txs, s.constants, s.blockStats, s.tracker)
 }
 
 // TearDownSuite -
 func (s *GasTestSuite) TearDownSuite() {
-	if s.tracker != nil {
-		err := s.tracker.Close()
-		s.Require().NoError(err)
-	}
 	s.Require().NoError(s.echo.Shutdown(context.Background()))
 }
 
@@ -101,13 +103,50 @@ func (s *GasTestSuite) TestEstimatePrice() {
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/gas/price")
 
+	s.tracker.EXPECT().
+		State().
+		Return(testGasState).
+		Times(1)
+
 	s.Require().NoError(s.handler.EstimatePrice(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
 	var response responses.GasPrice
 	err := json.NewDecoder(rec.Body).Decode(&response)
 	s.Require().NoError(err)
-	s.Require().Equal("0", response.Fast)
-	s.Require().Equal("0", response.Slow)
-	s.Require().Equal("0", response.Median)
+	s.Require().Equal(testGasState.Slow, response.Slow)
+	s.Require().Equal(testGasState.Median, response.Median)
+	s.Require().Equal(testGasState.Fast, response.Fast)
+}
+
+func (s *GasTestSuite) TestEstimatePriceWithPriority() {
+	for _, priority := range []string{"slow", "median", "fast"} {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		c := s.echo.NewContext(req, rec)
+		c.SetPath("/gas/price/:priority")
+		c.SetParamNames("priority")
+		c.SetParamValues(priority)
+
+		s.tracker.EXPECT().
+			State().
+			Return(testGasState).
+			Times(1)
+
+		s.Require().NoError(s.handler.EstimatePricePriority(c))
+		s.Require().Equal(http.StatusOK, rec.Code, priority)
+
+		var response string
+		err := json.NewDecoder(rec.Body).Decode(&response)
+		s.Require().NoError(err, priority)
+
+		switch priority {
+		case "slow":
+			s.Require().Equal(testGasState.Slow, response, priority)
+		case "median":
+			s.Require().Equal(testGasState.Median, response, priority)
+		case "fast":
+			s.Require().Equal(testGasState.Fast, response, priority)
+		}
+	}
 }
