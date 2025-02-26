@@ -11,6 +11,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celestiaorg/celestia-app/v3/pkg/appconsts"
 	"github.com/dipdup-io/workerpool"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/rs/zerolog"
@@ -203,12 +204,17 @@ func (tracker *Tracker) State() GasPrice {
 	return tracker.gasState
 }
 
+var minGasPrice = decimal.NewFromFloat(appconsts.DefaultMinGasPrice)
+
 func (tracker *Tracker) computeMetrics() error {
 	slow := decimal.New(0, 1)
 	median := decimal.New(0, 1)
 	fast := decimal.New(0, 1)
 
 	err := tracker.q.Range(func(item info) (bool, error) {
+		if len(item.Percentiles) < 3 {
+			return false, nil
+		}
 		slow = slow.Add(item.Percentiles[0])
 		median = median.Add(item.Percentiles[1])
 		fast = fast.Add(item.Percentiles[2])
@@ -222,6 +228,16 @@ func (tracker *Tracker) computeMetrics() error {
 	slow = slow.Div(decimal.NewFromInt(count))
 	median = median.Div(decimal.NewFromInt(count))
 	fast = fast.Div(decimal.NewFromInt(count))
+
+	if slow.LessThan(minGasPrice) {
+		slow = minGasPrice.Copy()
+	}
+	if median.LessThan(minGasPrice) {
+		median = minGasPrice.Copy()
+	}
+	if fast.LessThan(minGasPrice) {
+		fast = minGasPrice.Copy()
+	}
 
 	tracker.mx.Lock()
 	{
