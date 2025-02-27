@@ -91,6 +91,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/tx/:hash/messages GET":                           {},
 		"/v1/stats/price/series/:timeframe GET":               {},
 		"/v1/gas/price GET":                                   {},
+		"/v1/gas/price/:priority GET":                         {},
 		"/v1/block/:height/ods GET":                           {},
 		"/v1/tx/:hash/blobs GET":                              {},
 		"/v1/namespace/:id/:version/messages GET":             {},

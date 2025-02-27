@@ -457,6 +457,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	{
 		gas.GET("/estimate_for_pfb", gasHandler.EstimateForPfb)
 		gas.GET("/price", gasHandler.EstimatePrice)
+		gas.GET("/price/:priority", gasHandler.EstimatePricePriority)
 	}
 
 	vestingHandler := handler.NewVestingHandler(db.VestingPeriods)

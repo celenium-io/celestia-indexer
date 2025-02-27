@@ -13,6 +13,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	blobtypes "github.com/celestiaorg/celestia-app/v3/x/blob/types"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 // GasHandler -
@@ -21,7 +22,7 @@ type GasHandler struct {
 	tx         storage.ITx
 	constant   storage.IConstant
 	blockStats storage.IBlockStats
-	tracker    *gas.Tracker
+	tracker    gas.ITracker
 }
 
 func NewGasHandler(
@@ -29,7 +30,7 @@ func NewGasHandler(
 	tx storage.ITx,
 	constant storage.IConstant,
 	blockStats storage.IBlockStats,
-	tracker *gas.Tracker,
+	tracker gas.ITracker,
 ) GasHandler {
 	return GasHandler{
 		state:      state,
@@ -103,4 +104,37 @@ func (handler GasHandler) EstimatePrice(c echo.Context) error {
 		Median: data.Median,
 		Fast:   data.Fast,
 	})
+}
+
+type estimatePricePriorityRequest struct {
+	Priority string `param:"priority" validate:"required,oneof=slow median fast"`
+}
+
+// EstimatePricePriority godoc
+//
+//	@Summary		Get estimated gas price with priority filter
+//	@Description	Get estimated gas price with priority filter based on historical data
+//	@Tags			gas
+//	@ID				gas-price-priority
+//	@Param			priority	path	string	true	"Priority"	Enums(slow, median, fast)
+//	@Produce		json
+//	@Success		200	{string} string
+//	@Router			/gas/price/{priority} [get]
+func (handler GasHandler) EstimatePricePriority(c echo.Context) error {
+	req, err := bindAndValidate[estimatePricePriorityRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	data := handler.tracker.State()
+	switch req.Priority {
+	case "slow":
+		return c.JSON(http.StatusOK, data.Slow)
+	case "median":
+		return c.JSON(http.StatusOK, data.Median)
+	case "fast":
+		return c.JSON(http.StatusOK, data.Fast)
+	default:
+		return badRequestError(c, errors.Errorf("invalid priority: %s", req.Priority))
+	}
 }
