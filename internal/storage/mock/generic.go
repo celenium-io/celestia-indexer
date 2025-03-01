@@ -1716,6 +1716,44 @@ func (c *MockTransactionRollbackNamespacesCall) DoAndReturn(f func(context.Conte
 	return c
 }
 
+// RollbackProposals mocks base method.
+func (m *MockTransaction) RollbackProposals(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackProposals", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackProposals indicates an expected call of RollbackProposals.
+func (mr *MockTransactionMockRecorder) RollbackProposals(ctx, height any) *MockTransactionRollbackProposalsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackProposals", reflect.TypeOf((*MockTransaction)(nil).RollbackProposals), ctx, height)
+	return &MockTransactionRollbackProposalsCall{Call: call}
+}
+
+// MockTransactionRollbackProposalsCall wrap *gomock.Call
+type MockTransactionRollbackProposalsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackProposalsCall) Return(arg0 error) *MockTransactionRollbackProposalsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackProposalsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackProposalsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackProposalsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackProposalsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // RollbackRedelegations mocks base method.
 func (m *MockTransaction) RollbackRedelegations(ctx context.Context, height types.Level) error {
 	m.ctrl.T.Helper()
@@ -2019,6 +2057,44 @@ func (c *MockTransactionRollbackVestingPeriodsCall) Do(f func(context.Context, t
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionRollbackVestingPeriodsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackVestingPeriodsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackVotes mocks base method.
+func (m *MockTransaction) RollbackVotes(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackVotes", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackVotes indicates an expected call of RollbackVotes.
+func (mr *MockTransactionMockRecorder) RollbackVotes(ctx, height any) *MockTransactionRollbackVotesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackVotes", reflect.TypeOf((*MockTransaction)(nil).RollbackVotes), ctx, height)
+	return &MockTransactionRollbackVotesCall{Call: call}
+}
+
+// MockTransactionRollbackVotesCall wrap *gomock.Call
+type MockTransactionRollbackVotesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackVotesCall) Return(arg0 error) *MockTransactionRollbackVotesCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackVotesCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackVotesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackVotesCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackVotesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -2584,6 +2660,49 @@ func (c *MockTransactionSaveNamespacesCall) DoAndReturn(f func(context.Context, 
 	return c
 }
 
+// SaveProposals mocks base method.
+func (m *MockTransaction) SaveProposals(ctx context.Context, proposals ...*storage.Proposal) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range proposals {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveProposals", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveProposals indicates an expected call of SaveProposals.
+func (mr *MockTransactionMockRecorder) SaveProposals(ctx any, proposals ...any) *MockTransactionSaveProposalsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, proposals...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveProposals", reflect.TypeOf((*MockTransaction)(nil).SaveProposals), varargs...)
+	return &MockTransactionSaveProposalsCall{Call: call}
+}
+
+// MockTransactionSaveProposalsCall wrap *gomock.Call
+type MockTransactionSaveProposalsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveProposalsCall) Return(arg0 error) *MockTransactionSaveProposalsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveProposalsCall) Do(f func(context.Context, ...*storage.Proposal) error) *MockTransactionSaveProposalsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveProposalsCall) DoAndReturn(f func(context.Context, ...*storage.Proposal) error) *MockTransactionSaveProposalsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // SaveProviders mocks base method.
 func (m *MockTransaction) SaveProviders(ctx context.Context, providers ...storage.RollupProvider) error {
 	m.ctrl.T.Helper()
@@ -3006,6 +3125,49 @@ func (c *MockTransactionSaveVestingPeriodsCall) Do(f func(context.Context, ...st
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionSaveVestingPeriodsCall) DoAndReturn(f func(context.Context, ...storage.VestingPeriod) error) *MockTransactionSaveVestingPeriodsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveVotes mocks base method.
+func (m *MockTransaction) SaveVotes(ctx context.Context, votes ...*storage.Vote) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range votes {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveVotes", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveVotes indicates an expected call of SaveVotes.
+func (mr *MockTransactionMockRecorder) SaveVotes(ctx any, votes ...any) *MockTransactionSaveVotesCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, votes...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveVotes", reflect.TypeOf((*MockTransaction)(nil).SaveVotes), varargs...)
+	return &MockTransactionSaveVotesCall{Call: call}
+}
+
+// MockTransactionSaveVotesCall wrap *gomock.Call
+type MockTransactionSaveVotesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveVotesCall) Return(arg0 error) *MockTransactionSaveVotesCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveVotesCall) Do(f func(context.Context, ...*storage.Vote) error) *MockTransactionSaveVotesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveVotesCall) DoAndReturn(f func(context.Context, ...*storage.Vote) error) *MockTransactionSaveVotesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

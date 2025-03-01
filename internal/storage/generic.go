@@ -46,6 +46,8 @@ var Models = []any{
 	&ApiKey{},
 	&celestials.Celestial{},
 	&celestials.CelestialState{},
+	&Proposal{},
+	&Vote{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -95,6 +97,8 @@ type Transaction interface {
 	SaveStakingLogs(ctx context.Context, logs ...StakingLog) error
 	SaveJails(ctx context.Context, jails ...Jail) error
 	SaveBlockSignatures(ctx context.Context, signs ...BlockSignature) error
+	SaveProposals(ctx context.Context, proposals ...*Proposal) error
+	SaveVotes(ctx context.Context, votes ...*Vote) error
 	RetentionBlockSignatures(ctx context.Context, height types.Level) error
 	CancelUnbondings(ctx context.Context, cancellations ...Undelegation) error
 	RetentionCompletedUnbondings(ctx context.Context, blockTime time.Time) error
@@ -121,6 +125,8 @@ type Transaction interface {
 	RollbackRedelegations(ctx context.Context, height types.Level) (err error)
 	RollbackStakingLogs(ctx context.Context, height types.Level) ([]StakingLog, error)
 	RollbackJails(ctx context.Context, height types.Level) ([]Jail, error)
+	RollbackProposals(ctx context.Context, height types.Level) error
+	RollbackVotes(ctx context.Context, height types.Level) error
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	DeleteProviders(ctx context.Context, rollupId uint64) error
 	DeleteRollup(ctx context.Context, rollupId uint64) error

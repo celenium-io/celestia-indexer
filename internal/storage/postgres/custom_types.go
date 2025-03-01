@@ -119,6 +119,36 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 		); err != nil {
 			return err
 		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"proposal_status",
+			bun.Safe("proposal_status"),
+			bun.In(types.ProposalStatusValues()),
+		); err != nil {
+			return err
+		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"proposal_type",
+			bun.Safe("proposal_type"),
+			bun.In(types.ProposalTypeValues()),
+		); err != nil {
+			return err
+		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"vote_option",
+			bun.Safe("vote_option"),
+			bun.In(types.VoteOptionValues()),
+		); err != nil {
+			return err
+		}
 		return nil
 	})
 }

@@ -1,0 +1,14 @@
+- id: 1
+  proposer_id: 1
+  height: 1000
+  status: inactive
+  title: Title
+  description: Description
+  type: text
+  created_at: '2023-06-04T03:10:57+00:00'
+  deposit_time: '2023-06-06T03:10:57+00:00'
+  deposit: 10000
+  yes: 10
+  no: 1
+  no_with_veto: 3
+  abstain: 2

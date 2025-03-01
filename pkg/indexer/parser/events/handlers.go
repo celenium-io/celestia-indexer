@@ -5,7 +5,6 @@ package events
 
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
@@ -22,6 +21,9 @@ var eventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgWithdrawValidatorCommission: handleWithdrawValidatorCommission,
 	storageTypes.MsgWithdrawDelegatorReward:     handleWithdrawDelegatorRewards,
 	storageTypes.MsgUnjail:                      handleUnjail,
+	storageTypes.MsgSubmitProposal:              handleSubmitProposal,
+	storageTypes.MsgDeposit:                     handleDeposit,
+	storageTypes.MsgVote:                        handleVote,
 }
 
 func Handle(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
@@ -34,7 +36,7 @@ func Handle(ctx *context.Context, events []storage.Event, msg *storage.Message, 
 
 	startIndex := *idx
 	for _, event := range events[startIndex:] {
-		if event.Type != types.EventTypeMessage {
+		if event.Type != storageTypes.EventTypeMessage {
 			*idx++
 			continue
 		}
