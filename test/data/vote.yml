@@ -1,0 +1,7 @@
+- id: 1
+  proposal_id: 1
+  voter_id: 1
+  option: yes
+  weight: 1.0
+  time: '2023-06-04T03:10:57+00:00'
+  height: 1000

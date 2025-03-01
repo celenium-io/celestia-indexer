@@ -52,6 +52,8 @@ type Storage struct {
 	Rollup          models.IRollup
 	Grants          models.IGrant
 	ApiKeys         models.IApiKey
+	Proposals       models.IProposal
+	Votes           models.IVote
 	Celestials      celestials.ICelestial
 	CelestialState  celestials.ICelestialState
 	Notificator     *Notificator
@@ -101,6 +103,8 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		Rollup:          NewRollup(strg.Connection()),
 		Grants:          NewGrant(strg.Connection()),
 		ApiKeys:         NewApiKey(strg.Connection()),
+		Proposals:       NewProposal(strg.Connection()),
+		Votes:           NewVote(strg.Connection()),
 		Celestials:      celestialsPg.NewCelestials(strg.Connection()),
 		CelestialState:  celestialsPg.NewCelestialState(strg.Connection()),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
@@ -188,6 +192,7 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 			&models.BlobLog{},
 			&models.Jail{},
 			&models.StakingLog{},
+			&models.Vote{},
 		} {
 			if _, err := tx.ExecContext(ctx,
 				`SELECT create_hypertable(?, 'time', chunk_time_interval => INTERVAL '1 month', if_not_exists => TRUE);`,

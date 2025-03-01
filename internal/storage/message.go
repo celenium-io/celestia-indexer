@@ -72,6 +72,7 @@ type Message struct {
 	Grants         []Grant           `bun:"-"`
 	InternalMsgs   []string          `bun:"-"` // field for parsing MsgExec internal messages
 	VestingAccount *VestingAccount   `bun:"-"` // internal field
+	Proposal       *Proposal         `bun:"-"` // internal field
 }
 
 // TableName -

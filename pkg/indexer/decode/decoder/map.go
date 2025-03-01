@@ -102,3 +102,15 @@ func AuthMsgIndexFromMap(m map[string]any) (*int64, error) {
 	i, err := strconv.ParseInt(str, 10, 64)
 	return &i, err
 }
+
+func Uint64FromMap(m map[string]any, key string) (uint64, error) {
+	val, ok := m[key]
+	if !ok {
+		return 0, errors.Errorf("can't find key: %s", key)
+	}
+	str, ok := val.(string)
+	if !ok {
+		return 0, errors.Errorf("key '%s' is not a string", key)
+	}
+	return strconv.ParseUint(str, 10, 64)
+}

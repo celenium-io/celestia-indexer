@@ -14,6 +14,7 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 
 	models "github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 )
 
@@ -373,6 +374,64 @@ func (tx Transaction) Jail(ctx context.Context, validators ...*models.Validator)
 	return err
 }
 
+func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Proposal) error {
+	if len(proposals) == 0 {
+		return nil
+	}
+
+	for i := range proposals {
+		if proposals[i].Type == "" {
+			proposals[i].Type = storageTypes.ProposalTypeText
+		}
+		if proposals[i].Status == "" {
+			proposals[i].Status = storageTypes.ProposalStatusInactive
+		}
+		query := tx.Tx().NewInsert().
+			Column("id", "proposer_id", "height", "created_at", "deposit_time", "activation_time", "status", "type", "title", "description", "deposit", "metadata", "changes", "yes", "no", "no_with_veto", "abstain").
+			Model(proposals[i]).
+			On("CONFLICT (id) DO UPDATE")
+
+		if !proposals[i].Deposit.IsZero() {
+			query.Set("deposit = proposal.deposit + EXCLUDED.deposit")
+		}
+
+		if proposals[i].EmptyStatus() {
+			query.Set("status = EXCLUDED.status")
+		}
+
+		if proposals[i].ActivationTime != nil {
+			query.Set("activation_time = EXCLUDED.activation_time")
+		}
+
+		if proposals[i].Yes > 0 {
+			query.Set("yes = proposal.yes + EXCLUDED.yes")
+		}
+		if proposals[i].No > 0 {
+			query.Set("no = proposal.no + EXCLUDED.no")
+		}
+		if proposals[i].NoWithVeto > 0 {
+			query.Set("no_with_veto = proposal.no_with_veto + EXCLUDED.no_with_veto")
+		}
+		if proposals[i].Abstain > 0 {
+			query.Set("abstain = proposal.abstain + EXCLUDED.abstain")
+		}
+
+		if _, err := query.Exec(ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) error {
+	if len(votes) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&votes).Exec(ctx)
+	return err
+}
+
 func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, fraction decimal.Decimal) (balances []models.Balance, err error) {
 	if validatorId == 0 || !fraction.IsPositive() {
 		return nil, nil
@@ -527,6 +586,20 @@ func (tx Transaction) RollbackStakingLogs(ctx context.Context, height types.Leve
 	_, err = tx.Tx().NewDelete().Model(&logs).
 		Where("height = ?", height).
 		Returning("*").
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackProposals(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.Proposal)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackVotes(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.Vote)(nil)).
+		Where("height = ?", height).
 		Exec(ctx)
 	return
 }
