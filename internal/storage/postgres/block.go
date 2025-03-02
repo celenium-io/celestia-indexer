@@ -119,11 +119,8 @@ func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order 
 		//nolint:gosec
 		subQuery = subQuery.Offset(int(offset))
 	}
-	if order == sdk.SortOrderAsc {
-		subQuery = subQuery.OrderExpr("time asc, id asc")
-	} else {
-		subQuery = subQuery.OrderExpr("time desc, id desc")
-	}
+
+	subQuery = sortScope(subQuery, "time", order)
 
 	query := b.DB().NewSelect().
 		ColumnExpr("block.*").
