@@ -301,24 +301,6 @@ func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
 	return returnArray(c, response)
 }
 
-// Count godoc
-//
-//	@Summary		Get count of namespaces in network
-//	@Description	Get count of namespaces in network
-//	@Tags			namespace
-//	@ID				get-namespace-count
-//	@Produce		json
-//	@Success		200	{integer}	uint64
-//	@Failure		500	{object}	Error
-//	@Router			/namespace/count [get]
-func (handler *NamespaceHandler) Count(c echo.Context) error {
-	state, err := handler.state.ByName(c.Request().Context(), handler.indexerName)
-	if err != nil {
-		return handleError(c, err, handler.namespace)
-	}
-	return c.JSON(http.StatusOK, state.TotalNamespaces)
-}
-
 type listBlobsRequest struct {
 	Limit      int         `query:"limit"      validate:"omitempty,min=1,max=100"`
 	Offset     int         `query:"offset"     validate:"omitempty,min=0"`

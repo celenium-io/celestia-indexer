@@ -391,7 +391,6 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	namespaceGroup := v1.Group("/namespace")
 	{
 		namespaceGroup.GET("", namespaceHandlers.List)
-		namespaceGroup.GET("/count", namespaceHandlers.Count)
 		namespaceGroup.GET("/:id", namespaceHandlers.Get)
 		namespaceGroup.GET("/:id/:version", namespaceHandlers.GetWithVersion)
 		namespaceGroup.GET("/:id/:version/messages", namespaceHandlers.GetMessages)
