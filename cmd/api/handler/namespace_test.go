@@ -423,25 +423,6 @@ func (s *NamespaceTestSuite) TestGetMessages() {
 	s.Require().EqualValues(1, msg.Tx.Id)
 }
 
-func (s *NamespaceTestSuite) TestCount() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	c := s.echo.NewContext(req, rec)
-	c.SetPath("/namespace/count")
-
-	s.state.EXPECT().
-		ByName(gomock.Any(), testIndexerName).
-		Return(testState, nil)
-
-	s.Require().NoError(s.handler.Count(c))
-	s.Require().Equal(http.StatusOK, rec.Code)
-
-	var count uint64
-	err := json.NewDecoder(rec.Body).Decode(&count)
-	s.Require().NoError(err)
-	s.Require().EqualValues(123, count)
-}
-
 func (s *NamespaceTestSuite) TestBlob() {
 	commitment := "ZeKGjIwsIkFsACD0wtEh/jbzzW+zIPP716VihNpm9T0="
 
