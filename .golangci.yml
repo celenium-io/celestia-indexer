@@ -10,7 +10,7 @@ linters:
     - errcheck
     - ineffassign
     - containedctx
-    - tenv
+    - usetesting
     - musttag
     - mirror
     - tagalign
