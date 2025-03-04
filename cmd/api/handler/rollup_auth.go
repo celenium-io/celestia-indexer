@@ -16,6 +16,7 @@ import (
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/gosimple/slug"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 type RollupAuthHandler struct {
@@ -146,6 +147,9 @@ func (handler RollupAuthHandler) createProviders(ctx context.Context, rollupId u
 		}
 		address, err := handler.address.ByHash(ctx, hashAddress)
 		if err != nil {
+			if handler.address.IsNoRows(err) {
+				return nil, errors.Wrap(errUnknownAddress, data[i].Address)
+			}
 			return nil, err
 		}
 		providers[i].AddressId = address.Id
@@ -157,6 +161,9 @@ func (handler RollupAuthHandler) createProviders(ctx context.Context, rollupId u
 			}
 			ns, err := handler.namespace.ByNamespaceIdAndVersion(ctx, hashNs[1:], hashNs[0])
 			if err != nil {
+				if handler.namespace.IsNoRows(err) {
+					return nil, errors.Wrap(errUnknownNamespace, data[i].Namespace)
+				}
 				return nil, err
 			}
 			providers[i].NamespaceId = ns.Id
