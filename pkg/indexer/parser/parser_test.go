@@ -134,24 +134,6 @@ func getBlock() types.BlockData {
 			TxsResults:       nil,
 			BeginBlockEvents: nil,
 			EndBlockEvents:   nil,
-			ValidatorUpdates: nil,
-			ConsensusParamUpdates: &types.ConsensusParams{
-				Block: &types.BlockParams{
-					MaxBytes: 0,
-					MaxGas:   0,
-				},
-				Evidence: &types.EvidenceParams{
-					MaxAgeNumBlocks: 0,
-					MaxAgeDuration:  0,
-					MaxBytes:        0,
-				},
-				Validator: &types.ValidatorParams{
-					PubKeyTypes: nil,
-				},
-				Version: &types.VersionParams{
-					AppVersion: 0,
-				},
-			},
 		},
 	}
 }
