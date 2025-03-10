@@ -40,7 +40,6 @@ var Models = []any{
 	&StakingLog{},
 	&Jail{},
 	&BlobLog{},
-	&Price{},
 	&Rollup{},
 	&RollupProvider{},
 	&Grant{},

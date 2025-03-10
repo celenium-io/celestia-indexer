@@ -68,25 +68,6 @@ jobs:
           cache-to: type=gha,mode=max
           tags: ${{ steps.meta-api.outputs.tags }}
           labels: ${{ steps.meta-api.outputs.labels }}
-      
-      # Quotes
-
-      - name: Quotes image tags & labels
-        id: meta-quotes
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_BASE }}-quotes
-
-      - name: Quotes image build & push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: build/quotes/Dockerfile
-          push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: ${{ steps.meta-quotes.outputs.tags }}
-          labels: ${{ steps.meta-quotes.outputs.labels }}
 
       # Celestials
 

@@ -83,16 +83,6 @@ type Price struct {
 	Close string    `example:"0.17632"                   format:"string"    json:"close" swaggertype:"string"`
 }
 
-func NewPrice(price storage.Price) Price {
-	return Price{
-		Time:  price.Time,
-		Open:  price.Open.String(),
-		High:  price.High.String(),
-		Low:   price.Low.String(),
-		Close: price.Close.String(),
-	}
-}
-
 type DistributionItem struct {
 	Name  string `example:"12"      format:"string" json:"name"  swaggertype:"string"`
 	Value string `example:"0.17632" format:"string" json:"value" swaggertype:"string"`

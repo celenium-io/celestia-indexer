@@ -10,9 +10,6 @@ indexer:
 api:
 	cd cmd/api && go run . -c ../../configs/dipdup.yml
 
-quotes:
-	cd cmd/quotes && go run . -c ../../configs/dipdup.yml
-
 celestials:
 	cd cmd/celestials && go run . -c ../../configs/dipdup.yml
 
@@ -43,7 +40,7 @@ adr:
 	@cp adr/adr-template.md adr/adr-$(NUM)-$(TITLE).md
 
 generate:
-	go generate -v ./internal/blob ./internal/storage ./internal/storage/types ./pkg/node ./internal/binance ./cmd/api/gas
+	go generate -v ./internal/blob ./internal/storage ./internal/storage/types ./pkg/node ./cmd/api/gas
 
 api-docs:
 	cd cmd/api && swag init --md markdown -parseDependency --parseInternal --parseDepth 1 --outputTypes json
