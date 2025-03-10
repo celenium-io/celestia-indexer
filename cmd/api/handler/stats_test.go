@@ -10,7 +10,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
-	
+
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
