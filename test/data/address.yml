@@ -13,3 +13,8 @@
   address: celestia1cr2t0y5zu9sya67t9sp0vt9cxum408yuphkhex
   hash: 0xC0D4B79282E1604EEBCB2C02F62CB83737579C9C
   last_height: 102
+- id: 4
+  height: 101
+  address: celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss
+  hash: 0x30a0d9ea9727e58de67f3125b6ed88bddaf7578b57ad149a9a90541d1737d407
+  last_height: 101
