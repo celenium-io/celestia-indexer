@@ -50,15 +50,26 @@ func (v *CelestiaApiValidator) Validate(i interface{}) error {
 }
 
 func isAddress(address string) bool {
-	return validateAddress(address, pkgTypes.AddressPrefixCelestia, 47)
+	return validateAddress(address, pkgTypes.AddressPrefixCelestia, 47, 128)
 }
 
 func isValoperAddress(address string) bool {
 	return validateAddress(address, pkgTypes.AddressPrefixValoper, 54)
 }
 
-func validateAddress(address string, wantPrefix string, length int) bool {
-	if len(address) != length {
+func validateAddress(address string, wantPrefix string, length ...int) bool {
+	addrLen := len(address)
+
+	switch len(length) {
+	case 1:
+		if addrLen != length[0] {
+			return false
+		}
+	case 2:
+		if addrLen < length[0] || addrLen > length[1] {
+			return false
+		}
+	default:
 		return false
 	}
 

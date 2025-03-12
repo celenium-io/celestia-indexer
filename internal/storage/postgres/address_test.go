@@ -26,6 +26,20 @@ func (s *StorageTestSuite) TestAddressByHash() {
 	s.Require().EqualValues("name 1", address.Celestials.Id)
 }
 
+func (s *StorageTestSuite) TestIcaAddressByHash() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	hash := []byte{48, 160, 217, 234, 151, 39, 229, 141, 230, 127, 49, 37, 182, 237, 136, 189, 218, 247, 87, 139, 87, 173, 20, 154, 154, 144, 84, 29, 23, 55, 212, 7}
+	address, err := s.storage.Address.ByHash(ctx, hash)
+	s.Require().NoError(err)
+	s.Require().EqualValues(4, address.Id)
+	s.Require().EqualValues(101, address.Height)
+	s.Require().Equal("celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss", address.Address)
+	s.Require().NotNil(address.Celestials)
+	s.Require().EqualValues("name 4", address.Celestials.Id)
+}
+
 func (s *StorageTestSuite) TestAddressByHashWithoutCelestials() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
@@ -49,7 +63,7 @@ func (s *StorageTestSuite) TestAddressList() {
 		Sort:   sdk.SortOrderAsc,
 	})
 	s.Require().NoError(err)
-	s.Require().Len(addresses, 3)
+	s.Require().Len(addresses, 4)
 
 	s.Require().EqualValues(1, addresses[0].Id)
 	s.Require().EqualValues(100, addresses[0].Height)
@@ -85,7 +99,7 @@ func (s *StorageTestSuite) TestAddressListWithSortAscHeight() {
 			SortField: field,
 		})
 		s.Require().NoError(err)
-		s.Require().Len(addresses, 3)
+		s.Require().Len(addresses, 4)
 
 		s.Require().EqualValues(1, addresses[0].Id)
 		s.Require().EqualValues(100, addresses[0].Height)
@@ -113,7 +127,7 @@ func (s *StorageTestSuite) TestAddressListWithSortDescHeight() {
 			SortField: field,
 		})
 		s.Require().NoError(err)
-		s.Require().Len(addresses, 3)
+		s.Require().Len(addresses, 4)
 
 		s.Require().EqualValues(3, addresses[0].Id, field)
 		s.Require().EqualValues(102, addresses[0].Height, field)
@@ -135,7 +149,7 @@ func (s *StorageTestSuite) TestAddressListWithSortDesc() {
 			SortField: field,
 		})
 		s.Require().NoError(err)
-		s.Require().Len(addresses, 3)
+		s.Require().Len(addresses, 4)
 
 		s.Require().EqualValues(3, addresses[0].Id)
 		s.Require().EqualValues(102, addresses[0].Height)
@@ -157,6 +171,13 @@ func (s *StorageTestSuite) TestAddressListWithSortDesc() {
 		s.Require().Equal("321", addresses[2].Balance.Spendable.String())
 		s.Require().Equal("utia", addresses[2].Balance.Currency)
 		s.Require().NotNil(addresses[2].Celestials)
+
+		s.Require().EqualValues(4, addresses[3].Id)
+		s.Require().EqualValues(101, addresses[3].Height)
+		s.Require().Equal("celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss", addresses[3].Address)
+		s.Require().Equal("210", addresses[3].Balance.Spendable.String())
+		s.Require().Equal("utia", addresses[3].Balance.Currency)
+		s.Require().NotNil(addresses[3].Celestials)
 	}
 }
 
@@ -172,18 +193,23 @@ func (s *StorageTestSuite) TestAddressListWithSortAsc() {
 			SortField: field,
 		})
 		s.Require().NoError(err)
-		s.Require().Len(addresses, 3)
+		s.Require().Len(addresses, 4)
 
-		s.Require().EqualValues(1, addresses[1].Id, field)
-		s.Require().EqualValues(100, addresses[1].Height)
-		s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", addresses[1].Address)
-		s.Require().Equal("432", addresses[1].Balance.Spendable.String())
+		s.Require().EqualValues(1, addresses[2].Id, field)
+		s.Require().EqualValues(100, addresses[2].Height)
+		s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", addresses[2].Address)
+		s.Require().Equal("432", addresses[2].Balance.Spendable.String())
+		s.Require().Equal("utia", addresses[2].Balance.Currency)
+
+		s.Require().EqualValues(2, addresses[1].Id)
+		s.Require().EqualValues(101, addresses[1].Height)
+		s.Require().Equal("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", addresses[1].Address)
+		s.Require().Equal("321", addresses[1].Balance.Spendable.String())
 		s.Require().Equal("utia", addresses[1].Balance.Currency)
 
-		s.Require().EqualValues(2, addresses[0].Id)
 		s.Require().EqualValues(101, addresses[0].Height)
-		s.Require().Equal("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", addresses[0].Address)
-		s.Require().Equal("321", addresses[0].Balance.Spendable.String())
+		s.Require().Equal("celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss", addresses[0].Address)
+		s.Require().Equal("210", addresses[0].Balance.Spendable.String())
 		s.Require().Equal("utia", addresses[0].Balance.Currency)
 	}
 }
