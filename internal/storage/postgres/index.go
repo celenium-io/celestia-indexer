@@ -338,6 +338,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.BlockSignature)(nil)).
+			Index("block_signature_validator_id_idx").
+			Column("validator_id").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// StakingLog
 		if _, err := tx.NewCreateIndex().
