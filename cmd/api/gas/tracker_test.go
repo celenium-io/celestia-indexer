@@ -97,7 +97,7 @@ func TestTracker_processBlock(t *testing.T) {
 			BytesInBlock: 0,
 		}
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second*3)
 		defer cancel()
 
 		err := tracker.processBlock(ctx, blockStats)
@@ -130,7 +130,7 @@ func TestTracker_processBlock(t *testing.T) {
 			BytesInBlock: maxBlockSize - 1000,
 		}
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second*3)
 		defer cancel()
 
 		err := tracker.processBlock(ctx, blockStats)
@@ -181,7 +181,7 @@ func TestTracker_processBlock(t *testing.T) {
 			BytesInBlock: maxBlockSize - 1000,
 		}
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second*3)
 		defer cancel()
 
 		err := tracker.processBlock(ctx, blockStats)
@@ -231,7 +231,7 @@ func TestTracker_processBlock(t *testing.T) {
 			BytesInBlock: 1000,
 		}
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second*3)
 		defer cancel()
 
 		err := tracker.processBlock(ctx, blockStats)

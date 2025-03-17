@@ -72,7 +72,7 @@ func TestModule_saveSigners(t *testing.T) {
 			})
 
 		t.Run(tt.name, func(t *testing.T) {
-			err := saveSigners(context.Background(), tx, tt.args.addrToId, tt.args.txs)
+			err := saveSigners(t.Context(), tx, tt.args.addrToId, tt.args.txs)
 			require.Equal(t, tt.wantErr, err != nil)
 		})
 	}
@@ -164,7 +164,7 @@ func Test_saveAddresses(t *testing.T) {
 			})
 
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, err := saveAddresses(context.Background(), tx, tt.addresses)
+			got, got1, err := saveAddresses(t.Context(), tx, tt.addresses)
 			require.Equal(t, tt.wantErr, err != nil)
 			require.Equal(t, tt.addr, got)
 			require.Equal(t, tt.total, got1)

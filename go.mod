@@ -1,6 +1,6 @@
 module github.com/celenium-io/celestia-indexer
 
-go 1.23.2
+go 1.24.1
 
 require (
 	cosmossdk.io/errors v1.0.1
