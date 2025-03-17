@@ -30,18 +30,6 @@ services:
       - "127.0.0.1:9876:9876"
     logging: *celestia-logging
 
-  quotes:
-    restart: always
-    image: ghcr.io/celenium-io/celestia-indexer-quotes:${TAG:-master}
-    build:
-      context: .
-      dockerfile: build/quotes/Dockerfile
-    env_file:
-      - .env
-    depends_on:
-      - db
-    logging: *celestia-logging
-
   db:
     command:
       - -cshared_preload_libraries=timescaledb,pg_stat_statements
