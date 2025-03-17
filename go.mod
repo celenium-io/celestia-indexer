@@ -2,6 +2,8 @@ module github.com/celenium-io/celestia-indexer
 
 go 1.23.2
 
+toolchain go1.24.1
+
 require (
 	cosmossdk.io/errors v1.0.1
 	cosmossdk.io/math v1.4.0
@@ -267,8 +269,8 @@ require (
 	go.opentelemetry.io/otel/metric v1.34.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.30.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.29.0 // indirect
-	golang.org/x/crypto v0.33.0 // indirect
-	golang.org/x/net v0.35.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
+	golang.org/x/net v0.36.0 // indirect
 	golang.org/x/oauth2 v0.23.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
