@@ -50,7 +50,7 @@ func Test_saveNamespaces(t *testing.T) {
 					return int64(len(ns)), nil
 				})
 
-			got, err := saveNamespaces(context.Background(), tx, tt.namespaces)
+			got, err := saveNamespaces(t.Context(), tx, tt.namespaces)
 			require.Equal(t, tt.wantErr, err != nil)
 			require.Equal(t, tt.want, got)
 		})

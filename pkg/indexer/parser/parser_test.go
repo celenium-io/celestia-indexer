@@ -148,7 +148,7 @@ func TestParserModule_Success(t *testing.T) {
 	err := readerModule.AttachTo(&parserModule, OutputName, readerInputName)
 	assert.NoError(t, err)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second*5)
 	defer cancel()
 
 	parserModule.Start(ctx)
@@ -183,7 +183,7 @@ func TestModule_OnClosedChannel(t *testing.T) {
 	err := stopperModule.AttachTo(&parserModule, StopOutput, stopInputName)
 	assert.NoError(t, err)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*1)
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second*1)
 	defer cancel()
 
 	parserModule.Start(ctx)
@@ -212,7 +212,7 @@ func TestModule_OnParseError(t *testing.T) {
 	err := stopperModule.AttachTo(&parserModule, StopOutput, stopInputName)
 	assert.NoError(t, err)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*1)
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second*1)
 	defer cancel()
 
 	parserModule.Start(ctx)
@@ -280,7 +280,7 @@ func getBlockByHeight(height uint64) (types.BlockData, error) {
 func TestModule_1768659(t *testing.T) {
 	writerModule, writerOutputName, parserModule := createModules(t)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*1)
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second*1)
 	defer cancel()
 
 	parserModule.Start(ctx)

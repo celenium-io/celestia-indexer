@@ -4,7 +4,6 @@
 package main
 
 import (
-	"context"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
@@ -54,7 +53,7 @@ func TestAddressHandler(t *testing.T) {
 					Times(1)
 			}
 
-			id, err := addressHandler(context.Background(), address, tt.address)
+			id, err := addressHandler(t.Context(), address, tt.address)
 			require.Equal(t, err != nil, tt.wantErr)
 			if err == nil {
 				require.Equal(t, uint64(1), id)

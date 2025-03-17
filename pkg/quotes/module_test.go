@@ -69,7 +69,7 @@ func TestReceiver_get(t *testing.T) {
 		MaxTimes(1).
 		MinTimes(1)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second*5)
 	defer cancel()
 
 	err := module.init(ctx)

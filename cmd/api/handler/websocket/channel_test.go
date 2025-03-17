@@ -86,7 +86,7 @@ func BenchmarkProcessingMessage(b *testing.B) {
 		BlockFilter{},
 	)
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(b.Context())
 
 	for id := uint64(0); id < clientsTestCount; id++ {
 		client := newTestHeadClient(id)

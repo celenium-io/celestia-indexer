@@ -14,7 +14,7 @@ import (
 )
 
 func TestCheckDatabaseExists(t *testing.T) {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
 	containerCfg := database.PostgreSQLContainerConfig{

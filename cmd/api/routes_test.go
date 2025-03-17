@@ -109,7 +109,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/blob/proofs POST":                                {},
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 
 	db := postgres.Storage{
