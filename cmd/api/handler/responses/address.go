@@ -61,6 +61,7 @@ type Balance struct {
 type Celestial struct {
 	Name      string `example:"name"                                                                json:"name"              swaggertype:"string"`
 	ImageUrl  string `example:"https://ipfs.io/ipfs/QmUi269vE25fagqhyMCCTNSoiW6x4LHCwwQb3keSrEXAmC" json:"image_url"         swaggertype:"string"`
+	Status    string `example:"VERIFIED"                                                            json:"status,omitempty"  swaggertype:"string"`
 	IsPrimary bool   `example:"true"                                                                json:"primary,omitempty" swaggertype:"boolean"`
 }
 
@@ -69,6 +70,7 @@ func NewCelestial(c *celestials.Celestial) *Celestial {
 		ImageUrl:  c.ImageUrl,
 		Name:      c.Id,
 		IsPrimary: c.Status == celestials.StatusPRIMARY,
+		Status:    c.Status.String(),
 	}
 }
 

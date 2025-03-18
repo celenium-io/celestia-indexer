@@ -777,6 +777,7 @@ func (s *AddressTestSuite) TestCelestials() {
 		storageResponse = append(storageResponse, celestials.Celestial{
 			Id:       testsuite.RandomText(i + 10),
 			ImageUrl: testsuite.RandomText(2*i + 1),
+			Status:   celestials.StatusVERIFIED,
 		})
 	}
 
@@ -795,5 +796,6 @@ func (s *AddressTestSuite) TestCelestials() {
 	for i := range celestials {
 		s.Require().EqualValues(storageResponse[i].Id, celestials[i].Name)
 		s.Require().EqualValues(storageResponse[i].ImageUrl, celestials[i].ImageUrl)
+		s.Require().EqualValues("VERIFIED", celestials[i].Status)
 	}
 }
