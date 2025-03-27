@@ -36,7 +36,6 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 	default:
 		return nil, errors.Errorf("unknown sort field: %s", fltrs.SortField)
 	}
-	
 	query := r.DB().NewSelect().
 		Table(storage.ViewLeaderboard).
 		ColumnExpr("leaderboard.*").
