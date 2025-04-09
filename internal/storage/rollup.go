@@ -21,6 +21,8 @@ type LeaderboardFilters struct {
 	Category  []types.RollupCategory
 	Tags      []string
 	Type      []types.RollupType
+	Stack     []string
+	Provider  []string
 }
 
 type RollupGroupStatsFilters struct {
