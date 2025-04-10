@@ -18,7 +18,7 @@ import (
 type IProposal interface {
 	sdk.Table[*Proposal]
 
-	ByProposer(ctx context.Context, id uint64, limit, offset int) ([]Proposal, error)
+	ListWithFilters(ctx context.Context, filters ListProposalFilters) (proposals []Proposal, err error)
 }
 
 type Proposal struct {
@@ -74,4 +74,13 @@ func (p Proposal) EmptyStatus() bool {
 
 func (p Proposal) Finished() bool {
 	return p.Status == types.ProposalStatusApplied || p.Status == types.ProposalStatusRejected
+}
+
+type ListProposalFilters struct {
+	Limit      int
+	Offset     int
+	ProposerId uint64
+	Sort       sdk.SortOrder
+	Status     []types.ProposalStatus
+	Type       []types.ProposalType
 }

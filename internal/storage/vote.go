@@ -13,6 +13,7 @@ import (
 	"github.com/uptrace/bun"
 )
 
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IVote interface {
 	sdk.Table[*Vote]
 }
