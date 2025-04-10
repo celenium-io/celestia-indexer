@@ -44,45 +44,6 @@ func (m *MockIProposal) EXPECT() *MockIProposalMockRecorder {
 	return m.recorder
 }
 
-// ByProposer mocks base method.
-func (m *MockIProposal) ByProposer(ctx context.Context, id uint64, limit, offset int) ([]storage.Proposal, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ByProposer", ctx, id, limit, offset)
-	ret0, _ := ret[0].([]storage.Proposal)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ByProposer indicates an expected call of ByProposer.
-func (mr *MockIProposalMockRecorder) ByProposer(ctx, id, limit, offset any) *MockIProposalByProposerCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByProposer", reflect.TypeOf((*MockIProposal)(nil).ByProposer), ctx, id, limit, offset)
-	return &MockIProposalByProposerCall{Call: call}
-}
-
-// MockIProposalByProposerCall wrap *gomock.Call
-type MockIProposalByProposerCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockIProposalByProposerCall) Return(arg0 []storage.Proposal, arg1 error) *MockIProposalByProposerCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockIProposalByProposerCall) Do(f func(context.Context, uint64, int, int) ([]storage.Proposal, error)) *MockIProposalByProposerCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIProposalByProposerCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Proposal, error)) *MockIProposalByProposerCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // CursorList mocks base method.
 func (m *MockIProposal) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Proposal, error) {
 	m.ctrl.T.Helper()
@@ -273,6 +234,45 @@ func (c *MockIProposalListCall) Do(f func(context.Context, uint64, uint64, stora
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIProposalListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Proposal, error)) *MockIProposalListCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// ListWithFilters mocks base method.
+func (m *MockIProposal) ListWithFilters(ctx context.Context, filters storage.ListProposalFilters) ([]storage.Proposal, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListWithFilters", ctx, filters)
+	ret0, _ := ret[0].([]storage.Proposal)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListWithFilters indicates an expected call of ListWithFilters.
+func (mr *MockIProposalMockRecorder) ListWithFilters(ctx, filters any) *MockIProposalListWithFiltersCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListWithFilters", reflect.TypeOf((*MockIProposal)(nil).ListWithFilters), ctx, filters)
+	return &MockIProposalListWithFiltersCall{Call: call}
+}
+
+// MockIProposalListWithFiltersCall wrap *gomock.Call
+type MockIProposalListWithFiltersCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIProposalListWithFiltersCall) Return(proposals []storage.Proposal, err error) *MockIProposalListWithFiltersCall {
+	c.Call = c.Call.Return(proposals, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIProposalListWithFiltersCall) Do(f func(context.Context, storage.ListProposalFilters) ([]storage.Proposal, error)) *MockIProposalListWithFiltersCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIProposalListWithFiltersCall) DoAndReturn(f func(context.Context, storage.ListProposalFilters) ([]storage.Proposal, error)) *MockIProposalListWithFiltersCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
