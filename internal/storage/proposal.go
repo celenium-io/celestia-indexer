@@ -38,10 +38,27 @@ type Proposal struct {
 	Metadata       string               `bun:"metadata"                    comment:"Metadata"`
 	Changes        []byte               `bun:"changes,type:bytea"          comment:"JSON object with proposal changes"`
 
+	VotesCount int64 `bun:"votes_count"  comment:"Total votes count"`
 	Yes        int64 `bun:"yes"          comment:"Count of yes votes"`
 	No         int64 `bun:"no"           comment:"Count of no votes"`
 	NoWithVeto int64 `bun:"no_with_veto" comment:"Count of no votes with veto"`
 	Abstain    int64 `bun:"abstain"      comment:"Count of abstain votes"`
+
+	YesValidators        int64 `bun:"yes_vals"          comment:"Count of yes votes by validators"`
+	NoValidators         int64 `bun:"no_vals"           comment:"Count of no votes by validators"`
+	NoWithVetoValidators int64 `bun:"no_with_veto_vals" comment:"Count of no votes with veto by validators"`
+	AbstainValidators    int64 `bun:"abstain_vals"      comment:"Count of abstain votes by validators"`
+
+	YesAddress        int64 `bun:"yes_addrs"          comment:"Count of yes votes by addresses"`
+	NoAddress         int64 `bun:"no_addrs"           comment:"Count of no votes by addresses"`
+	NoWithVetoAddress int64 `bun:"no_with_veto_addrs" comment:"Count of no votes with veto by addresses"`
+	AbstainAddress    int64 `bun:"abstain_addrs"      comment:"Count of abstain votes by addresses"`
+
+	VotingPower           decimal.Decimal `bun:"voting_power,type:numeric"              comment:"Total voting power"`
+	YesVotingPower        decimal.Decimal `bun:"yes_voting_power,type:numeric"          comment:"Yes voting power"`
+	NoVotingPower         decimal.Decimal `bun:"no_voting_power,type:numeric"           comment:"No voting power"`
+	NoWithVetoVotingPower decimal.Decimal `bun:"no_with_veto_voting_power,type:numeric" comment:"No with veto voting power"`
+	AbstainVotingPower    decimal.Decimal `bun:"abstain_voting_power,type:numeric"      comment:"Abstain voting power"`
 
 	Proposer *Address `bun:"rel:belongs-to,join:proposer_id=id"`
 }
@@ -53,4 +70,8 @@ func (Proposal) TableName() string {
 
 func (p Proposal) EmptyStatus() bool {
 	return p.Status == "" || p.Status == types.ProposalStatusInactive
+}
+
+func (p Proposal) Finished() bool {
+	return p.Status == types.ProposalStatusApplied || p.Status == types.ProposalStatusRejected
 }

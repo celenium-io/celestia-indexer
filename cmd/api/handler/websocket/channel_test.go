@@ -8,7 +8,6 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -81,7 +80,7 @@ func (c *testHeadClient) Close() error {
 }
 
 func BenchmarkProcessingMessage(b *testing.B) {
-	channel := NewChannel[storage.Block, *responses.Block](
+	channel := NewChannel(
 		blockProcessor,
 		BlockFilter{},
 	)

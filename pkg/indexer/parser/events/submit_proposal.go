@@ -15,8 +15,11 @@ func handleSubmitProposal(ctx *context.Context, events []storage.Event, msg *sto
 	if idx == nil {
 		return errors.New("nil event index")
 	}
-	if msg == nil || msg.Proposal == nil {
-		return errors.New("nil message or nil proposal in events handler")
+	if msg == nil {
+		return errors.New("nil message in events handler")
+	}
+	if msg.Proposal == nil {
+		return nil
 	}
 	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.gov.v1beta1.MsgSubmitProposal" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())

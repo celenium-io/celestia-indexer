@@ -20,16 +20,18 @@ type IVote interface {
 type Vote struct {
 	bun.BaseModel `bun:"vote" comment:"Table with proposal's votes"`
 
-	Id         uint64           `bun:"id,pk,autoincrement"     comment:"Unique internal identity"`
-	Height     pkgTypes.Level   `bun:"height,notnull"          comment:"The number (height) of this block"`
-	Time       time.Time        `bun:"time,pk,notnull"         comment:"The time of block"`
-	Option     types.VoteOption `bun:"option,type:vote_option" comment:"Selected vote option"`
-	Weight     decimal.Decimal  `bun:"weight,type:numeric"     comment:"Vote's weight"`
-	VoterId    uint64           `bun:"voter_id"                comment:"Voter internal identity"`
-	ProposalId uint64           `bun:"proposal_id"             comment:"Proposal id"`
+	Id          uint64           `bun:"id,pk,autoincrement"     comment:"Unique internal identity"`
+	Height      pkgTypes.Level   `bun:"height,notnull"          comment:"The number (height) of this block"`
+	Time        time.Time        `bun:"time,pk,notnull"         comment:"The time of block"`
+	Option      types.VoteOption `bun:"option,type:vote_option" comment:"Selected vote option"`
+	Weight      decimal.Decimal  `bun:"weight,type:numeric"     comment:"Vote's weight"`
+	VoterId     uint64           `bun:"voter_id"                comment:"Voter internal identity"`
+	ProposalId  uint64           `bun:"proposal_id"             comment:"Proposal id"`
+	ValidatorId uint64           `bun:"validator_id"            comment:"Validator id"`
 
-	Voter    *Address  `bun:"rel:belongs-to,join:voter_id=id"`
-	Proposal *Proposal `bun:"rel:belongs-to,join:proposal_id=id"`
+	Voter     *Address   `bun:"rel:belongs-to,join:voter_id=id"`
+	Proposal  *Proposal  `bun:"rel:belongs-to,join:proposal_id=id"`
+	Validator *Validator `bun:"rel:belongs-to,join:validator_id=id"`
 }
 
 // TableName -
