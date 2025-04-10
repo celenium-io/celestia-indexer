@@ -333,14 +333,16 @@ func (s *TransactionTestSuite) TestSaveProposals() {
 	s.Require().NoError(err)
 
 	err = tx.SaveProposals(ctx, &storage.Proposal{
-		Id:         2,
-		ProposerId: 2,
-		Status:     types.ProposalStatusInactive,
-		Type:       types.ProposalTypeText,
-		CreatedAt:  time.Now(),
+		Id:          2,
+		ProposerId:  2,
+		Status:      types.ProposalStatusInactive,
+		Type:        types.ProposalTypeText,
+		CreatedAt:   time.Now(),
+		VotingPower: decimal.Zero,
 	}, &storage.Proposal{
-		Id:     1,
-		Status: types.ProposalStatusActive,
+		Id:          1,
+		Status:      types.ProposalStatusActive,
+		VotingPower: decimal.Zero,
 	})
 	s.Require().NoError(err)
 
@@ -1186,6 +1188,99 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 	s.Require().NoError(err)
 	s.Require().NotNil(v.Jailed)
 	s.Require().True(*v.Jailed)
+}
+
+func (s *TransactionTestSuite) TestValidators() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	validators, err := tx.Validators(ctx)
+	s.Require().NoError(err)
+
+	s.Require().Len(validators, 2)
+
+	for i := range validators {
+		s.Require().NotEmpty(validators[i].Id)
+		s.Require().NotEmpty(validators[i].Stake.IntPart())
+		s.Require().Empty(validators[i].Address)
+	}
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestProposalVotes() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	votes, err := tx.ProposalVotes(ctx, 1, 1, 0)
+	s.Require().NoError(err)
+
+	s.Require().Len(votes, 1)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestAddressDelegations() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	delegations, err := tx.AddressDelegations(ctx, 1)
+	s.Require().NoError(err)
+
+	s.Require().Len(delegations, 1)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestUpdateConstants() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveConstants(ctx, storage.Constant{
+		Module: "auth",
+		Name:   "tx_size_cost_per_byte",
+		Value:  "20",
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	val, err := s.storage.Constants.Get(ctx, "auth", "tx_size_cost_per_byte")
+	s.Require().NoError(err)
+	s.Require().Equal("20", val.Value)
+}
+
+func (s *TransactionTestSuite) TestProposal() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	proposal, err := tx.Proposal(ctx, 1)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(1, proposal.Id)
+	s.Require().NotNil(proposal.Changes)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
 }
 
 func TestSuiteTransaction_Run(t *testing.T) {

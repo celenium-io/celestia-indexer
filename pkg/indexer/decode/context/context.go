@@ -192,6 +192,7 @@ func (ctx *Context) AddProposal(proposal *storage.Proposal) {
 		p.No += proposal.No
 		p.NoWithVeto += proposal.NoWithVeto
 		p.Abstain += proposal.Abstain
+		p.VotesCount += proposal.VotesCount
 	} else {
 		ctx.Proposals.Set(proposal.Id, proposal)
 	}

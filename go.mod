@@ -38,6 +38,7 @@ require (
 	github.com/rs/zerolog v1.34.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/cobra v1.9.1
+	github.com/stoewer/go-strcase v1.3.0
 	github.com/stretchr/testify v1.10.0
 	github.com/tendermint/tendermint v0.34.29
 	github.com/uptrace/bun v1.1.17
