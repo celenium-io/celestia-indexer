@@ -413,7 +413,7 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 			Model(proposals[i]).
 			On("CONFLICT (id) DO UPDATE")
 
-		if !proposals[i].Deposit.IsZero() {
+		if proposals[i].Deposit.IsPositive() {
 			query.Set("deposit = proposal.deposit + EXCLUDED.deposit")
 		}
 
