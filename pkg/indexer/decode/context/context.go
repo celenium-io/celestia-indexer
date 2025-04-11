@@ -185,7 +185,7 @@ func (ctx *Context) AddProposal(proposal *storage.Proposal) {
 		if proposal.ActivationTime != nil {
 			p.ActivationTime = proposal.ActivationTime
 		}
-		if !proposal.Deposit.IsZero() {
+		if proposal.Deposit.IsPositive() {
 			p.Deposit = p.Deposit.Add(proposal.Deposit)
 		}
 		p.Yes += proposal.Yes
