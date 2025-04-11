@@ -747,6 +747,8 @@ github.com/celestiaorg/cosmos-sdk v1.30.0-sdk-v0.46.16 h1:ZHr6hCpaeA6Qk/BqrDknZS
 github.com/celestiaorg/cosmos-sdk v1.30.0-sdk-v0.46.16/go.mod h1:8Wvxp2fu7ZMEz2sJVlfZiCqgdjLMNVosuE1O0X2yR5c=
 github.com/celestiaorg/celestia-app/v3 v3.0.2 h1:N9KOGcedhbQpK4XfDZ/OG5za/bV94N4QE72o4gSZ+EA=
 github.com/celestiaorg/celestia-app/v3 v3.0.2/go.mod h1:Ut3ytZG2+RcmeCxrYyJ5KOGaFoGnVcShIN+IufyDDSY=
+github.com/celestiaorg/celestia-app/v3 v3.7.0 h1:7Y3EnFTByoaHoijoF66MQlcfg4cxoqXHife3d13/XG0=
+github.com/celestiaorg/celestia-app/v3 v3.7.0/go.mod h1:n5ZGTu8BlZ2pfAOTpc9qvYrzLCaTaeCrWpm4lNeeDXQ=
 github.com/celestiaorg/celestia-core v1.49.0-tm-v0.34.35 h1:EqcEIFw5IKNRBSTM20zZ8+5G4MbyWlNw3YyZRFMNldw=
 github.com/celestiaorg/celestia-core v1.49.0-tm-v0.34.35/go.mod h1:FSd32MUffdVUYIXW+m/1v5pHptRQF2RJC88fwsgrKG8=
 github.com/celestiaorg/cosmos-sdk v1.25.0-sdk-v0.46.16 h1:f+fTe7GGk0/qgdzyqB8kk8EcDf9d6MC22khBTQiDXsU=
@@ -963,6 +965,8 @@ github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nos
 github.com/fsnotify/fsnotify v1.7.0/go.mod h1:40Bi/Hjc2AVfZrqy+aj+yEI+/bRxZnMJyTJwOpGvigM=
 github.com/gabriel-vasile/mimetype v1.4.9 h1:5k+WDwEsD9eTLL8Tz3L0VnmVh9QxGjRmjBvAG7U/oYY=
 github.com/gabriel-vasile/mimetype v1.4.9/go.mod h1:WnSQhFKJuBlRyLiKohA/2DtIlPFAbguNaG7QCHcyGok=
+github.com/gabriel-vasile/mimetype v1.4.3 h1:in2uUcidCuFcDKtdcBxlR0rJ1+fsokWf+uqxgUFjbI0=
+github.com/gabriel-vasile/mimetype v1.4.3/go.mod h1:d8uq/6HKRL6CGdk+aubisF/M5GcPfT7nKyLpA0lbSSk=
 github.com/getsentry/sentry-go v0.32.0 h1:YKs+//QmwE3DcYtfKRH8/KyOOF/I6Qnx7qYGNHCGmCY=
 github.com/getsentry/sentry-go v0.32.0/go.mod h1:CYNcMMz73YigoHljQRG+qPF+eMq8gG72XcGN/p71BAY=
 github.com/getsentry/sentry-go/echo v0.32.0 h1:Klqbny8ye5sbyDqTrfGryh10FhNz1BMX5TfP/q77tYg=
