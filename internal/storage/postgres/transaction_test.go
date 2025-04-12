@@ -1278,6 +1278,7 @@ func (s *TransactionTestSuite) TestProposal() {
 
 	s.Require().EqualValues(1, proposal.Id)
 	s.Require().NotNil(proposal.Changes)
+	s.Require().EqualValues(types.ProposalTypeText, proposal.Type)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))

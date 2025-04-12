@@ -966,7 +966,7 @@ func (tx Transaction) AddressDelegations(ctx context.Context, addressId uint64) 
 func (tx Transaction) Proposal(ctx context.Context, id uint64) (proposal models.Proposal, err error) {
 	err = tx.Tx().NewSelect().Model(&proposal).
 		Where("id = ?", id).
-		Column("id", "changes").
+		Column("id", "changes", "type").
 		Scan(ctx)
 	return
 }
