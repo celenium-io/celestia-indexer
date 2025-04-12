@@ -146,6 +146,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 			active[i].YesAddress = 0
 			active[i].YesValidators = 0
 			active[i].VotesCount = 0
+			active[i].Deposit = decimal.Zero
 
 			proposals[active[i].Id] = &active[i]
 		}
@@ -254,14 +255,14 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 }
 
 func (module *Module) updateConstants(ctx context.Context, tx storage.Transaction, proposal *storage.Proposal) error {
-	// save only constants from applied param change proposals
-	if proposal.Status != types.ProposalStatusApplied || proposal.Type != types.ProposalTypeParamChanged {
-		return nil
-	}
-
 	changes, err := tx.Proposal(ctx, proposal.Id)
 	if err != nil {
 		return errors.Wrap(err, "receive proposal changes")
+	}
+
+	// save only constants from applied param change proposals
+	if proposal.Status != types.ProposalStatusApplied || changes.Type != types.ProposalTypeParamChanged {
+		return nil
 	}
 
 	var parsed []paramsV1Beta.ParamChange
@@ -269,16 +270,91 @@ func (module *Module) updateConstants(ctx context.Context, tx storage.Transactio
 		return errors.Wrap(err, "parse proposal changes")
 	}
 
-	constants := make([]storage.Constant, len(parsed))
+	constants := make([]storage.Constant, 0)
 	for i := range parsed {
-		moduleName, err := types.ParseModuleName(parsed[i].GetSubspace())
+		handledConstants, err := constantsHandle(parsed[i])
 		if err != nil {
-			return errors.Wrapf(err, "parsing module name in proposal changes: %s", parsed[i].GetSubspace())
+			return errors.Wrap(err, "handle proposal changes")
 		}
-		constants[i].Module = moduleName
-		constants[i].Name = strcase.SnakeCase(parsed[i].GetKey())
-		constants[i].Value = parsed[i].GetValue()
+		constants = append(constants, handledConstants...)
+	}
+
+	if len(constants) == 0 {
+		return nil
 	}
 
 	return tx.SaveConstants(ctx, constants...)
+}
+
+func constantsHandle(change paramsV1Beta.ParamChange) ([]storage.Constant, error) {
+	moduleName, err := types.ParseModuleName(change.GetSubspace())
+	if err != nil {
+		return nil, errors.Wrapf(err, "parsing module name in proposal changes: %s", change.GetSubspace())
+	}
+	key := change.GetKey()
+	value := change.GetValue()
+
+	constants := make([]storage.Constant, 0)
+
+	switch moduleName {
+	case types.ModuleNameConsensus, types.ModuleNameBaseapp:
+
+		switch key {
+		case "BlockParams":
+			c, err := parseParamsToConstants(moduleName, "block_", value)
+			if err != nil {
+				return nil, errors.Wrap(err, "parse block params")
+			}
+			constants = append(constants, c...)
+		case "EvidenceParams":
+			c, err := parseParamsToConstants(moduleName, "evidence_", value)
+			if err != nil {
+				return nil, errors.Wrap(err, "parse evidence params")
+			}
+			constants = append(constants, c...)
+		case "ValidatorParams":
+			c, err := parseParamsToConstants(moduleName, "validator_", value)
+			if err != nil {
+				return nil, errors.Wrap(err, "parse validator params")
+			}
+			constants = append(constants, c...)
+		}
+
+	case types.ModuleNameGov:
+
+		if key == "votingparams" {
+			c, err := parseParamsToConstants(moduleName, "", value)
+			if err != nil {
+				return nil, errors.Wrap(err, "parse voting params")
+			}
+			constants = append(constants, c...)
+		}
+
+	default:
+
+		constants = append(constants, storage.Constant{
+			Module: moduleName,
+			Name:   strcase.SnakeCase(key),
+			Value:  value,
+		})
+
+	}
+
+	return constants, nil
+}
+
+func parseParamsToConstants(moduleName types.ModuleName, keyPrefix, value string) ([]storage.Constant, error) {
+	var params map[string]string
+	if err := json.Unmarshal([]byte(value), &params); err != nil {
+		return nil, errors.Wrap(err, "unmarshal params")
+	}
+	constants := make([]storage.Constant, 0)
+	for k, v := range params {
+		constants = append(constants, storage.Constant{
+			Module: moduleName,
+			Name:   keyPrefix + k,
+			Value:  v,
+		})
+	}
+	return constants, nil
 }
