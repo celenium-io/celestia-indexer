@@ -7269,6 +7269,11 @@
                     "format": "string",
                     "example": 312
                 },
+                "total_proposals": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 56789
+                },
                 "total_stake": {
                     "type": "string",
                     "format": "string",

@@ -396,11 +396,19 @@ func (tx Transaction) Jail(ctx context.Context, validators ...*models.Validator)
 	return err
 }
 
-func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Proposal) error {
+type addedProposal struct {
+	bun.BaseModel `bun:"proposal"`
+	*models.Proposal
+
+	Xmax uint64 `bun:"xmax"`
+}
+
+func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Proposal) (int64, error) {
 	if len(proposals) == 0 {
-		return nil
+		return 0, nil
 	}
 
+	var count int64
 	for i := range proposals {
 		if proposals[i].Type == "" {
 			proposals[i].Type = storageTypes.ProposalTypeText
@@ -408,9 +416,14 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 		if proposals[i].Status == "" {
 			proposals[i].Status = storageTypes.ProposalStatusInactive
 		}
+
+		add := addedProposal{
+			Proposal: proposals[i],
+		}
+
 		query := tx.Tx().NewInsert().
 			Column("id", "proposer_id", "height", "created_at", "deposit_time", "activation_time", "status", "type", "title", "description", "deposit", "metadata", "changes", "yes", "no", "no_with_veto", "abstain", "yes_vals", "no_vals", "no_with_veto_vals", "abstain_vals", "yes_addrs", "no_addrs", "no_with_veto_addrs", "abstain_addrs", "votes_count", "voting_power", "yes_voting_power", "no_voting_power", "no_with_veto_voting_power", "abstain_voting_power").
-			Model(proposals[i]).
+			Model(&add).
 			On("CONFLICT (id) DO UPDATE")
 
 		if proposals[i].Deposit.IsPositive() {
@@ -485,12 +498,16 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 			query.Set("abstain_voting_power = EXCLUDED.abstain_voting_power")
 		}
 
-		if _, err := query.Exec(ctx); err != nil {
-			return err
+		if _, err := query.Returning("xmax, id").Exec(ctx); err != nil {
+			return 0, err
+		}
+
+		if add.Xmax == 0 {
+			count++
 		}
 	}
 
-	return nil
+	return count, nil
 }
 
 func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) error {

@@ -24,13 +24,13 @@ func (module *Module) saveProposals(
 	proposals []*storage.Proposal,
 	votes []*storage.Vote,
 	addrToId map[string]uint64,
-) error {
+) (int64, error) {
 	if len(votes) > 0 {
 		for i := range votes {
 			if votes[i].Voter != nil {
 				voterId, ok := addrToId[votes[i].Voter.Address]
 				if !ok {
-					return errors.Errorf("unknown voter address: %s", votes[i].Voter.Address)
+					return 0, errors.Errorf("unknown voter address: %s", votes[i].Voter.Address)
 				}
 				votes[i].VoterId = voterId
 
@@ -70,20 +70,20 @@ func (module *Module) saveProposals(
 		}
 
 		if err := tx.SaveVotes(ctx, votes...); err != nil {
-			return errors.Wrap(err, "save votes")
+			return 0, errors.Wrap(err, "save votes")
 		}
 	}
 
 	filled, err := module.fillProposalsVotingPower(ctx, tx, height, proposals)
 	if err != nil {
-		return errors.Wrap(err, "compute proposal shares")
+		return 0, errors.Wrap(err, "compute proposal shares")
 	}
 
 	for i := range filled {
 		if filled[i].Proposer != nil {
 			proposerId, ok := addrToId[filled[i].Proposer.Address]
 			if !ok {
-				return errors.Errorf("unknown proposer address for proposal: %s", filled[i].Proposer.Address)
+				return 0, errors.Errorf("unknown proposer address for proposal: %s", filled[i].Proposer.Address)
 			}
 			filled[i].ProposerId = proposerId
 		}
@@ -91,17 +91,17 @@ func (module *Module) saveProposals(
 		if !filled[i].CreatedAt.IsZero() {
 			constant, err := module.constants.Get(ctx, types.ModuleNameGov, "max_deposit_period")
 			if err != nil {
-				return errors.Wrap(err, "can't find max_deposit_period constant")
+				return 0, errors.Wrap(err, "can't find max_deposit_period constant")
 			}
 			maxDepositPeriod, err := time.ParseDuration(constant.Value)
 			if err != nil {
-				return errors.Wrap(err, "can't parse max_deposit_period value")
+				return 0, errors.Wrap(err, "can't parse max_deposit_period value")
 			}
 			filled[i].DepositTime = filled[i].CreatedAt.Add(maxDepositPeriod)
 		}
 
 		if err := module.updateConstants(ctx, tx, filled[i]); err != nil {
-			return errors.Wrap(err, "update constants")
+			return 0, errors.Wrap(err, "update constants")
 		}
 	}
 

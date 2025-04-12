@@ -332,7 +332,7 @@ func (s *TransactionTestSuite) TestSaveProposals() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx.SaveProposals(ctx, &storage.Proposal{
+	count, err := tx.SaveProposals(ctx, &storage.Proposal{
 		Id:          2,
 		ProposerId:  2,
 		Status:      types.ProposalStatusInactive,
@@ -345,6 +345,7 @@ func (s *TransactionTestSuite) TestSaveProposals() {
 		VotingPower: decimal.Zero,
 	})
 	s.Require().NoError(err)
+	s.Require().EqualValues(1, count)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))

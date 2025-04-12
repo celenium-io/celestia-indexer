@@ -2817,15 +2817,16 @@ func (c *MockTransactionSaveNamespacesCall) DoAndReturn(f func(context.Context, 
 }
 
 // SaveProposals mocks base method.
-func (m *MockTransaction) SaveProposals(ctx context.Context, proposals ...*storage.Proposal) error {
+func (m *MockTransaction) SaveProposals(ctx context.Context, proposals ...*storage.Proposal) (int64, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
 	for _, a := range proposals {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SaveProposals", varargs...)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SaveProposals indicates an expected call of SaveProposals.
@@ -2842,19 +2843,19 @@ type MockTransactionSaveProposalsCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockTransactionSaveProposalsCall) Return(arg0 error) *MockTransactionSaveProposalsCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockTransactionSaveProposalsCall) Return(arg0 int64, arg1 error) *MockTransactionSaveProposalsCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionSaveProposalsCall) Do(f func(context.Context, ...*storage.Proposal) error) *MockTransactionSaveProposalsCall {
+func (c *MockTransactionSaveProposalsCall) Do(f func(context.Context, ...*storage.Proposal) (int64, error)) *MockTransactionSaveProposalsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionSaveProposalsCall) DoAndReturn(f func(context.Context, ...*storage.Proposal) error) *MockTransactionSaveProposalsCall {
+func (c *MockTransactionSaveProposalsCall) DoAndReturn(f func(context.Context, ...*storage.Proposal) (int64, error)) *MockTransactionSaveProposalsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
