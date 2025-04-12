@@ -97,7 +97,7 @@ type Transaction interface {
 	SaveStakingLogs(ctx context.Context, logs ...StakingLog) error
 	SaveJails(ctx context.Context, jails ...Jail) error
 	SaveBlockSignatures(ctx context.Context, signs ...BlockSignature) error
-	SaveProposals(ctx context.Context, proposals ...*Proposal) error
+	SaveProposals(ctx context.Context, proposals ...*Proposal) (int64, error)
 	SaveVotes(ctx context.Context, votes ...*Vote) error
 	RetentionBlockSignatures(ctx context.Context, height types.Level) error
 	CancelUnbondings(ctx context.Context, cancellations ...Undelegation) error
