@@ -6,6 +6,7 @@ package responses
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	"github.com/goccy/go-json"
 	"github.com/shopspring/decimal"
 )
@@ -66,21 +67,23 @@ func NewConstants(consts []storage.Constant, denomMetadata []storage.DenomMetada
 }
 
 type Enums struct {
-	Status      []string `json:"status"`
-	MessageType []string `json:"message_type"`
-	EventType   []string `json:"event_type"`
-	Categories  []string `json:"categories"`
-	RollupTypes []string `json:"rollup_type"`
-	Tags        []string `json:"tags"`
+	Status             []string `json:"status"`
+	MessageType        []string `json:"message_type"`
+	EventType          []string `json:"event_type"`
+	Categories         []string `json:"categories"`
+	RollupTypes        []string `json:"rollup_type"`
+	Tags               []string `json:"tags"`
+	CelestialsStatuses []string `json:"celestials_statuses"`
 }
 
 func NewEnums(tags []string) Enums {
 	return Enums{
-		Status:      types.StatusNames(),
-		MessageType: types.MsgTypeNames(),
-		EventType:   types.EventTypeNames(),
-		Categories:  types.RollupCategoryNames(),
-		RollupTypes: types.RollupTypeNames(),
-		Tags:        tags,
+		Status:             types.StatusNames(),
+		MessageType:        types.MsgTypeNames(),
+		EventType:          types.EventTypeNames(),
+		Categories:         types.RollupCategoryNames(),
+		RollupTypes:        types.RollupTypeNames(),
+		Tags:               tags,
+		CelestialsStatuses: celestials.StatusNames(),
 	}
 }

@@ -41,7 +41,7 @@ func TestWebsocket(t *testing.T) {
 	listener.EXPECT().Subscribe(gomock.Any(), storage.ChannelHead).Return(nil).Times(1)
 	listener.EXPECT().Close().Return(nil).MaxTimes(1)
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(t.Context())
 
 	validatorsMock := mock.NewMockIValidator(ctrl)
 	dispatcher, err := bus.NewDispatcher(listenerFactory, validatorsMock)

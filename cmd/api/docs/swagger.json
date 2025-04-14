@@ -2249,33 +2249,6 @@
                 }
             }
         },
-        "/namespace/count": {
-            "get": {
-                "description": "Get count of namespaces in network",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "namespace"
-                ],
-                "summary": "Get count of namespaces in network",
-                "operationId": "get-namespace-count",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/namespace/{id}": {
             "get": {
                 "description": "Returns array of namespace versions",
@@ -5659,6 +5632,10 @@
                 "primary": {
                     "type": "boolean",
                     "example": true
+                },
+                "status": {
+                    "type": "string",
+                    "example": "VERIFIED"
                 }
             }
         },
@@ -5788,6 +5765,12 @@
             "type": "object",
             "properties": {
                 "categories": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "celestials_statuses": {
                     "type": "array",
                     "items": {
                         "type": "string"

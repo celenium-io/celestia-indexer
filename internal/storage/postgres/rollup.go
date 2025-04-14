@@ -36,7 +36,6 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 	default:
 		return nil, errors.Errorf("unknown sort field: %s", fltrs.SortField)
 	}
-
 	query := r.DB().NewSelect().
 		Table(storage.ViewLeaderboard).
 		ColumnExpr("leaderboard.*").
@@ -57,6 +56,14 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 			}
 			return q
 		})
+	}
+
+	if len(fltrs.Stack) > 0 {
+		query = query.Where("stack IN (?)", bun.In(fltrs.Stack))
+	}
+
+	if len(fltrs.Provider) > 0 {
+		query = query.Where("provider IN (?)", bun.In(fltrs.Provider))
 	}
 
 	if len(fltrs.Type) > 0 {
@@ -98,6 +105,14 @@ func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFi
 			}
 			return q
 		})
+	}
+
+	if len(fltrs.Stack) > 0 {
+		query = query.Where("stack IN (?)", bun.In(fltrs.Stack))
+	}
+
+	if len(fltrs.Provider) > 0 {
+		query = query.Where("provider IN (?)", bun.In(fltrs.Provider))
 	}
 
 	if len(fltrs.Type) > 0 {

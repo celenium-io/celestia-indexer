@@ -404,7 +404,7 @@ func (s *TransactionTestSuite) TestRollbackAddress() {
 
 	deleted, err := tx.RollbackAddresses(ctx, 101)
 	s.Require().NoError(err)
-	s.Require().Len(deleted, 1)
+	s.Require().Len(deleted, 2)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))

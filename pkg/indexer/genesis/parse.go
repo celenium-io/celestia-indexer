@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
@@ -148,6 +149,11 @@ func (module *Module) parseTotalSupply(supply []types.Supply, block *storage.Blo
 }
 
 func (module *Module) parseAccounts(accounts []types.Accounts, block storage.Block, data *parsedData) error {
+	currencyBase := currency.DefaultCurrency
+	if len(data.denomMetadata) > 0 {
+		currencyBase = data.denomMetadata[0].Base
+	}
+
 	for i := range accounts {
 		address := storage.Address{
 			Height:     block.Height,
@@ -156,7 +162,7 @@ func (module *Module) parseAccounts(accounts []types.Accounts, block storage.Blo
 				Spendable: decimal.Zero,
 				Delegated: decimal.Zero,
 				Unbonding: decimal.Zero,
-				Currency:  data.denomMetadata[0].Base,
+				Currency:  currencyBase,
 			},
 		}
 

@@ -4,7 +4,6 @@
 package rollback
 
 import (
-	"context"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
@@ -231,7 +230,7 @@ func Test_getBalanceUpdates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getBalanceUpdates(context.Background(), tx, tt.args.deletedAddress, tt.args.deletedEvents)
+			got, err := getBalanceUpdates(t.Context(), tx, tt.args.deletedAddress, tt.args.deletedEvents)
 			require.Equal(t, tt.wantErr, err != nil)
 			if err == nil {
 				require.Equal(t, tt.want, got)

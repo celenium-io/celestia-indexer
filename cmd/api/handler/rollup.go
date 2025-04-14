@@ -38,6 +38,8 @@ type rollupList struct {
 	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=time blobs_count size fee"`
 	Tags     StringArray `query:"tags"     validate:"omitempty"`
+	Stack    StringArray `query:"stack"    validate:"omitempty"`
+	Provider StringArray `query:"provider" validate:"omitempty"`
 	Category StringArray `query:"category" validate:"omitempty,dive,category"`
 	Type     StringArray `query:"type"     validate:"omitempty,dive,type"`
 }
@@ -66,6 +68,8 @@ func (p *rollupList) SetDefault() {
 //		@Param			sort_by	 query	string	false	"Sort field. Default: size"		Enums(time, blobs_count, size, fee)
 //	    @Param          category query  string  false   "Comma-separated rollup category list"
 //	    @Param          tags     query  string  false   "Comma-separated rollup tags list"
+//	    @Param          stack    query  string  false   "Comma-separated rollup stack list"
+//	    @Param          provider query  string  false   "Comma-separated rollup provider list"
 //		@Produce		json
 //		@Success		200	{array}		responses.RollupWithStats
 //		@Failure		400	{object}	Error
@@ -96,6 +100,8 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 		Category:  categories,
 		Tags:      req.Tags,
 		Type:      rollupTypes,
+		Stack:     req.Stack,
+		Provider:  req.Provider,
 	})
 	if err != nil {
 		return handleError(c, err, handler.rollups)
@@ -112,6 +118,8 @@ type rollupDayList struct {
 	Offset   int         `query:"offset"   validate:"omitempty,min=0"`
 	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=avg_size blobs_count total_size total_fee throughput namespace_count pfb_count mb_price"`
+	Stack    StringArray `query:"stack"    validate:"omitempty"`
+	Provider StringArray `query:"provider" validate:"omitempty"`
 	Category StringArray `query:"category" validate:"omitempty,dive,category"`
 	Tags     StringArray `query:"tags"     validate:"omitempty"`
 	Type     StringArray `query:"type"     validate:"omitempty,dive,type"`
@@ -135,12 +143,14 @@ func (p *rollupDayList) SetDefault() {
 //	@Description	List rollups info with stats by previous 24 hours
 //	@Tags			rollup
 //	@ID				list-rollup-24h
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
-//	@Param			sort	query	string	false	"Sort order. Default: desc"		Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field. Default: mb_price"	Enums(avg_size, blobs_count, total_size, total_fee, throughput, namespace_count, pfb_count, mb_price)
+//	@Param			limit	 query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset	 query	integer	false	"Offset"						mininum(1)
+//	@Param			sort	 query	string	false	"Sort order. Default: desc"		Enums(asc, desc)
+//	@Param			sort_by	 query	string	false	"Sort field. Default: mb_price"	Enums(avg_size, blobs_count, total_size, total_fee, throughput, namespace_count, pfb_count, mb_price)
 //	@Param          category query  string  false   "Comma-separated rollup category list"
 //	@Param          tags     query  string  false   "Comma-separated rollup tags list"
+//	@Param          stack    query  string  false   "Comma-separated rollup stack list"
+//	@Param          provider query  string  false   "Comma-separated rollup provider list"
 //	@Produce		json
 //	@Success		200	{array}		responses.RollupWithDayStats
 //	@Failure		400	{object}	Error
@@ -171,6 +181,8 @@ func (handler RollupHandler) LeaderboardDay(c echo.Context) error {
 		Tags:      req.Tags,
 		Category:  categories,
 		Type:      rollupTypes,
+		Stack:     req.Stack,
+		Provider:  req.Provider,
 	})
 	if err != nil {
 		return handleError(c, err, handler.rollups)

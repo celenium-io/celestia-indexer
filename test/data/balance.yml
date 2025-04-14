@@ -5,11 +5,16 @@
   currency: utia
 - id: 2
   spendable: 321
-  delegated: 0
-  unbonding: 0
+  delegated: 5
+  unbonding: 5
   currency: utia
 - id: 3
   spendable: 555
   delegated: 15
   unbonding: 15
+  currency: utia
+- id: 4
+  spendable: 210
+  delegated: 0
+  unbonding: 0
   currency: utia

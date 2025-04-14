@@ -168,7 +168,7 @@ func (s *ModuleTestSuite) TestModule_SequencerOnEmptyState() {
 
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {
-			ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+			ctx, cancelCtx := context.WithTimeout(t.Context(), 5*time.Second)
 			defer cancelCtx()
 
 			receiverModule.setLevel(0, nil)
@@ -249,7 +249,7 @@ func (s *ModuleTestSuite) TestModule_SequencerOnNonEmptyState() {
 
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {
-			ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+			ctx, cancelCtx := context.WithTimeout(t.Context(), 5*time.Second)
 			defer cancelCtx()
 
 			receiverModule.setLevel(1000, hashOf1000Block)

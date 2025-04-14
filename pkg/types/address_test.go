@@ -166,6 +166,36 @@ func TestAddress_Decode(t *testing.T) {
 			want:    AddressPrefixCelestia,
 			want1:   []byte{0x64, 0xd3, 0xfc, 0x6a, 0x2a, 0x52, 0x4e, 0x2f, 0x60, 0x3f, 0x51, 0xc7, 0xee, 0x4e, 0x8d, 0x35, 0xf7, 0x23, 0x22, 0xf8},
 			wantErr: false,
+		}, {
+			name:    "celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss",
+			a:       Address("celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss"),
+			want:    AddressPrefixCelestia,
+			want1:   []byte{48, 160, 217, 234, 151, 39, 229, 141, 230, 127, 49, 37, 182, 237, 136, 189, 218, 247, 87, 139, 87, 173, 20, 154, 154, 144, 84, 29, 23, 55, 212, 7},
+			wantErr: false,
+		}, {
+			name:    "celestia1vdjkcetnw35kzvtxd3chzwrjdc6hw7tt0qmkkctnwea8g6rnwfehsdrwwpkk5epkdf6nvdmswdcsaw2mhz",
+			a:       Address("celestia1vdjkcetnw35kzvtxd3chzwrjdc6hw7tt0qmkkctnwea8g6rnwfehsdrwwpkk5epkdf6nvdmswdcsaw2mhz"),
+			want:    AddressPrefixCelestia,
+			want1:   []byte{99, 101, 108, 101, 115, 116, 105, 97, 49, 102, 108, 113, 113, 56, 114, 110, 53, 119, 121, 107, 120, 55, 107, 97, 115, 118, 122, 116, 104, 115, 114, 115, 120, 52, 110, 112, 109, 106, 100, 54, 106, 117, 54, 55, 112, 115, 113},
+			wantErr: false,
+		}, {
+			name:    "celestia13djgs6acn677nlygmsnc7m5qst2s0llaa8wdzmjj04zn3785elzqulvmvt",
+			a:       Address("celestia13djgs6acn677nlygmsnc7m5qst2s0llaa8wdzmjj04zn3785elzqulvmvt"),
+			want:    AddressPrefixCelestia,
+			want1:   []byte{139, 100, 136, 107, 184, 158, 189, 233, 252, 136, 220, 39, 143, 110, 128, 130, 213, 7, 255, 253, 233, 220, 209, 110, 82, 125, 69, 56, 248, 244, 207, 196},
+			wantErr: false,
+		}, {
+			name:    "celestia1lumaemzetgx7fa8gcw3waagevs6rqhejfwxdvszzxlneselshwxqm5rmxn",
+			a:       Address("celestia1lumaemzetgx7fa8gcw3waagevs6rqhejfwxdvszzxlneselshwxqm5rmxn"),
+			want:    AddressPrefixCelestia,
+			want1:   []byte{255, 55, 220, 236, 89, 90, 13, 228, 244, 232, 195, 162, 238, 245, 25, 100, 52, 48, 95, 50, 75, 140, 214, 64, 66, 55, 231, 152, 103, 240, 187, 140},
+			wantErr: false,
+		}, {
+			name:    "celestia1vdjkcetnw35kzvf50f3njuphwpshgu3nxfmxuum90fn85cenvehrjerww9shy6rvd4mxx7t4w3nqtn9hsr",
+			a:       Address("celestia1vdjkcetnw35kzvf50f3njuphwpshgu3nxfmxuum90fn85cenvehrjerww9shy6rvd4mxx7t4w3nqtn9hsr"),
+			want:    AddressPrefixCelestia,
+			want1:   []byte{99, 101, 108, 101, 115, 116, 105, 97, 49, 52, 122, 99, 57, 112, 55, 112, 97, 116, 114, 51, 50, 118, 110, 115, 101, 122, 102, 122, 99, 51, 102, 110, 57, 100, 110, 113, 97, 114, 104, 108, 109, 118, 99, 121, 117, 116, 102},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {

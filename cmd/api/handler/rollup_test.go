@@ -35,6 +35,8 @@ var (
 		Tags:        []string{"ai"},
 		Category:    types.RollupCategoryNft,
 		Type:        types.RollupTypeSettled,
+		Stack:       "stack 1, stack 2",
+		Provider:    "Provider 1",
 	}
 	testRollupWithStats = storage.RollupWithStats{
 		Rollup: testRollup,
@@ -103,6 +105,8 @@ func (s *RollupTestSuite) TestLeaderboard() {
 		q.Add("type", "sovereign")
 		q.Add("category", "nft,gaming")
 		q.Add("tags", "ai")
+		q.Add("stack", "stack 1,stack 2")
+		q.Add("provider", "provider 1")
 
 		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 		rec := httptest.NewRecorder()
@@ -122,7 +126,9 @@ func (s *RollupTestSuite) TestLeaderboard() {
 				Type: []types.RollupType{
 					types.RollupTypeSovereign,
 				},
-				Tags: []string{"ai"},
+				Tags:     []string{"ai"},
+				Stack:    []string{"stack 1", "stack 2"},
+				Provider: []string{"provider 1"},
 			}).
 			Return([]storage.RollupWithStats{testRollupWithStats}, nil).
 			Times(1)
@@ -160,6 +166,8 @@ func (s *RollupTestSuite) TestLeaderboardDay() {
 		q.Add("category", "nft,gaming")
 		q.Add("type", "sovereign")
 		q.Add("tags", "ai")
+		q.Add("stack", "stack 1,stack 2")
+		q.Add("provider", "provider 1")
 
 		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 		rec := httptest.NewRecorder()
@@ -179,7 +187,9 @@ func (s *RollupTestSuite) TestLeaderboardDay() {
 				Type: []types.RollupType{
 					types.RollupTypeSovereign,
 				},
-				Tags: []string{"ai"},
+				Tags:     []string{"ai"},
+				Stack:    []string{"stack 1", "stack 2"},
+				Provider: []string{"provider 1"},
 			}).
 			Return([]storage.RollupWithDayStats{
 				{
