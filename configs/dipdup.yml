@@ -33,11 +33,6 @@ datasources:
     url: ${CELESTIA_DAL_API_URL}
     rps: ${CELESTIA_DAL_API_RPS:-5}
     timeout: ${CELESTIA_DAL_API_TIMEOUT:-10}
-  binance:
-    kind: binance
-    url: ${BINANCE_API_URL:-https://api.binance.com/}
-    rps: ${BINANCE_API_RPS:-5}
-    timeout: ${BINANCE_API_TIMEOUT:-10}
   celestials:
     kind: celestials
     url: ${CELESTIALS_API_URL:-https://api.stage.celestials.id}

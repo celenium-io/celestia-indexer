@@ -419,7 +419,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.Price, db.State)
+	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.State)
 	stats := v1.Group("/stats")
 	{
 		stats.GET("/summary/:table/:function", statsHandler.Summary)
@@ -428,12 +428,6 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		stats.GET("/rollup_stats_24h", statsHandler.RollupStats24h)
 		stats.GET("/square_size", statsHandler.SquareSize)
 		stats.GET("/messages_count_24h", statsHandler.MessagesCount24h)
-
-		price := stats.Group("/price")
-		{
-			price.GET("/current", statsHandler.PriceCurrent)
-			price.GET("/series/:timeframe", statsHandler.PriceSeries, statsMiddlewareCache)
-		}
 
 		namespace := stats.Group("/namespace")
 		{

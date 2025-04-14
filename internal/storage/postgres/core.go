@@ -40,7 +40,6 @@ type Storage struct {
 	VestingAccounts models.IVestingAccount
 	VestingPeriods  models.IVestingPeriod
 	Namespace       models.INamespace
-	Price           models.IPrice
 	State           models.IState
 	Stats           models.IStats
 	Search          models.ISearch
@@ -88,7 +87,6 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		Address:         NewAddress(strg.Connection()),
 		VestingAccounts: NewVestingAccount(strg.Connection()),
 		VestingPeriods:  NewVestingPeriod(strg.Connection()),
-		Price:           NewPrice(strg.Connection()),
 		Tx:              NewTx(strg.Connection()),
 		State:           NewState(strg.Connection()),
 		Namespace:       NewNamespace(strg.Connection()),
@@ -190,7 +188,6 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 			&models.BlobLog{},
 			&models.Jail{},
 			&models.StakingLog{},
-			&models.Price{},
 		} {
 			if _, err := tx.ExecContext(ctx,
 				`SELECT create_hypertable(?, 'time', chunk_time_interval => INTERVAL '1 month', if_not_exists => TRUE);`,
