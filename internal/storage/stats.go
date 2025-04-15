@@ -167,6 +167,14 @@ const (
 	SeriesFlow          = "flow"
 )
 
+type SizeGroup struct {
+	Name    string `bun:"name"`
+	Count   int64  `bun:"count"`
+	Size    int64  `bun:"size"`
+	AvgSize int64  `bun:"avg_size"`
+	MinVal  int64  `bun:"min_val"`
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IStats interface {
 	Count(ctx context.Context, req CountRequest) (string, error)
@@ -180,4 +188,5 @@ type IStats interface {
 	SquareSize(ctx context.Context, from, to *time.Time) (map[int][]SeriesItem, error)
 	Change24hBlockStats(ctx context.Context) (response Change24hBlockStats, err error)
 	MessagesCount24h(ctx context.Context) ([]CountItem, error)
+	SizeGroups(ctx context.Context, timeFilter *time.Time) ([]SizeGroup, error)
 }

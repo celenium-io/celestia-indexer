@@ -509,3 +509,34 @@ func (s *StatsTestSuite) TestMessgaesCount24h() {
 	s.Require().EqualValues("test", response[0].Name)
 	s.Require().EqualValues(100, response[0].Value)
 }
+
+func (s *StatsTestSuite) TestSizeGroups() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/size_groups")
+
+	s.stats.EXPECT().
+		SizeGroups(gomock.Any(), nil).
+		Return([]storage.SizeGroup{
+			{
+				Name:    "test",
+				Size:    100,
+				AvgSize: 10,
+				Count:   10,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.SizeGroups(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response []responses.SizeGroup
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 1)
+
+	s.Require().EqualValues("test", response[0].Name)
+	s.Require().EqualValues(100, response[0].Size)
+	s.Require().EqualValues(10, response[0].AvgSize)
+	s.Require().EqualValues(10, response[0].Count)
+}

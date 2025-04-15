@@ -2760,6 +2760,18 @@
                         "description": "Comma-separated rollup tags list",
                         "name": "tags",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated rollup stack list",
+                        "name": "stack",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated rollup provider list",
+                        "name": "provider",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2875,6 +2887,18 @@
                         "type": "string",
                         "description": "Comma-separated rollup tags list",
                         "name": "tags",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated rollup stack list",
+                        "name": "stack",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated rollup provider list",
+                        "name": "provider",
                         "in": "query"
                     }
                 ],
@@ -3676,101 +3700,6 @@
                 }
             }
         },
-        "/stats/price/current": {
-            "get": {
-                "description": "Get current TIA price",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "stats"
-                ],
-                "summary": "Get current TIA price",
-                "operationId": "stats-price-current",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/responses.Price"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/stats/price/series/{timeframe}": {
-            "get": {
-                "description": "Get histogram with TIA price",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "stats"
-                ],
-                "summary": "Get histogram with TIA price",
-                "operationId": "stats-price-series",
-                "parameters": [
-                    {
-                        "enum": [
-                            "1m",
-                            "1h",
-                            "1d"
-                        ],
-                        "type": "string",
-                        "description": "Timeframe",
-                        "name": "timeframe",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Time from in unix timestamp",
-                        "name": "from",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Time to in unix timestamp",
-                        "name": "to",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/responses.Price"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/stats/rollup_stats_24h": {
             "get": {
                 "description": "Get rollups stats for last 24 hours",
@@ -3966,6 +3895,36 @@
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/size_groups": {
+            "get": {
+                "description": "Get blobs count grouped by size",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get blobs count grouped by size",
+                "operationId": "stats-size-groups",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.SizeGroup"
+                            }
                         }
                     },
                     "500": {
@@ -6304,36 +6263,6 @@
                 "type": "string"
             }
         },
-        "responses.Price": {
-            "type": "object",
-            "properties": {
-                "close": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "0.17632"
-                },
-                "high": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "0.17632"
-                },
-                "low": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "0.17632"
-                },
-                "open": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "0.17632"
-                },
-                "time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "2023-07-04T03:10:57+00:00"
-                }
-            }
-        },
         "responses.Redelegation": {
             "type": "object",
             "properties": {
@@ -6976,6 +6905,31 @@
                 "signed": {
                     "type": "boolean",
                     "example": true
+                }
+            }
+        },
+        "responses.SizeGroup": {
+            "type": "object",
+            "properties": {
+                "avg_size": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 123
+                },
+                "count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 123
+                },
+                "name": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Rollup name"
+                },
+                "size": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 123
                 }
             }
         },

@@ -412,3 +412,30 @@ func (s Stats) MessagesCount24h(ctx context.Context) (response []storage.CountIt
 		Scan(ctx, &response)
 	return
 }
+
+func (s Stats) SizeGroups(ctx context.Context, timeFilter *time.Time) (groups []storage.SizeGroup, err error) {
+	rangeQuery := s.db.DB().NewRaw(`SELECT *
+      FROM ( VALUES 
+		  (1, 1000, '<1Kb'),
+		  (1001, 10000, '1-10Kb'),
+		  (10001, 100000, '10-100Kb'),
+		  (100001, 1000000, '100Kb-1Mb'),
+		  (1000001, 100000000, '>1Mb') 
+	  ) AS t(min_val, max_val, name)`)
+
+	if timeFilter == nil {
+		tf := time.Now().UTC().AddDate(0, 0, -1)
+		timeFilter = &tf
+	}
+
+	err = s.db.DB().NewSelect().
+		With("ranges", rangeQuery).
+		Table("ranges").
+		ColumnExpr("ranges.name as name, min(ranges.min_val) as min_val, count(blob_log.*), coalesce(sum(blob_log.size), 0) as size, coalesce(ceil(avg(blob_log.size)), 0) as avg_size").
+		Join("left join blob_log on (blob_log.size between ranges.min_val and ranges.max_val) and time >= ?", timeFilter).
+		Group("name").
+		Order("min_val").
+		Scan(ctx, &groups)
+
+	return
+}

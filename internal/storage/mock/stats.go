@@ -317,6 +317,45 @@ func (c *MockIStatsSeriesCall) DoAndReturn(f func(context.Context, storage.Timef
 	return c
 }
 
+// SizeGroups mocks base method.
+func (m *MockIStats) SizeGroups(ctx context.Context, timeFilter *time.Time) ([]storage.SizeGroup, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SizeGroups", ctx, timeFilter)
+	ret0, _ := ret[0].([]storage.SizeGroup)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SizeGroups indicates an expected call of SizeGroups.
+func (mr *MockIStatsMockRecorder) SizeGroups(ctx, timeFilter any) *MockIStatsSizeGroupsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SizeGroups", reflect.TypeOf((*MockIStats)(nil).SizeGroups), ctx, timeFilter)
+	return &MockIStatsSizeGroupsCall{Call: call}
+}
+
+// MockIStatsSizeGroupsCall wrap *gomock.Call
+type MockIStatsSizeGroupsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIStatsSizeGroupsCall) Return(arg0 []storage.SizeGroup, arg1 error) *MockIStatsSizeGroupsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIStatsSizeGroupsCall) Do(f func(context.Context, *time.Time) ([]storage.SizeGroup, error)) *MockIStatsSizeGroupsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIStatsSizeGroupsCall) DoAndReturn(f func(context.Context, *time.Time) ([]storage.SizeGroup, error)) *MockIStatsSizeGroupsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // SquareSize mocks base method.
 func (m *MockIStats) SquareSize(ctx context.Context, from, to *time.Time) (map[int][]storage.SeriesItem, error) {
 	m.ctrl.T.Helper()
