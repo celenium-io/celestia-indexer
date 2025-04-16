@@ -174,6 +174,22 @@ func (handler *NamespaceHandler) GetWithVersion(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.NewNamespace(namespace))
 }
 
+type namespaceList struct {
+	Limit  int    `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset int    `query:"offset"  validate:"omitempty,min=0"`
+	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
+	SortBy string `query:"sort_by" validate:"omitempty,oneof=time pfb_count size"`
+}
+
+func (p *namespaceList) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+	if p.Sort == "" {
+		p.Sort = desc
+	}
+}
+
 // List godoc
 //
 //	@Summary		List namespace info

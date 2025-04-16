@@ -328,7 +328,12 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	updateState(block, totalAccounts, totalNamespaces, totalValidators, totalVotingPower, &state)
+	totalProposals, err := module.saveProposals(ctx, tx, dCtx.Block.Height, dCtx.GetProposals(), dCtx.Votes, addrToId)
+	if err != nil {
+		return state, err
+	}
+
+	updateState(block, totalAccounts, totalNamespaces, totalProposals, totalValidators, totalVotingPower, &state)
 	err = tx.Update(ctx, &state)
 	return state, err
 }

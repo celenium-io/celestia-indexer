@@ -14,7 +14,9 @@ package types
 		gov,
 		slashing,
 		staking,
-		consensus
+		consensus,
+		baseapp,
+		icahost
 	)
 */
 //go:generate go-enum --marshal --sql --values

@@ -34,6 +34,10 @@ const (
 	ModuleNameStaking ModuleName = "staking"
 	// ModuleNameConsensus is a ModuleName of type consensus.
 	ModuleNameConsensus ModuleName = "consensus"
+	// ModuleNameBaseapp is a ModuleName of type baseapp.
+	ModuleNameBaseapp ModuleName = "baseapp"
+	// ModuleNameIcahost is a ModuleName of type icahost.
+	ModuleNameIcahost ModuleName = "icahost"
 )
 
 var ErrInvalidModuleName = errors.New("not a valid ModuleName")
@@ -50,6 +54,8 @@ func ModuleNameValues() []ModuleName {
 		ModuleNameSlashing,
 		ModuleNameStaking,
 		ModuleNameConsensus,
+		ModuleNameBaseapp,
+		ModuleNameIcahost,
 	}
 }
 
@@ -75,6 +81,8 @@ var _ModuleNameValue = map[string]ModuleName{
 	"slashing":     ModuleNameSlashing,
 	"staking":      ModuleNameStaking,
 	"consensus":    ModuleNameConsensus,
+	"baseapp":      ModuleNameBaseapp,
+	"icahost":      ModuleNameIcahost,
 }
 
 // ParseModuleName attempts to convert a string to a ModuleName.

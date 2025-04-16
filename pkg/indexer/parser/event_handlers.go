@@ -13,6 +13,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
 
@@ -199,6 +200,33 @@ func parseSlash(ctx *context.Context, data map[string]any) error {
 				Jailed:      &jailed,
 			},
 		})
+	}
+
+	return nil
+}
+
+func parseProposal(ctx *context.Context, data map[string]any) error {
+	status, err := decode.NewProposalStatus(data)
+	if err != nil {
+		return err
+	}
+
+	if status.Id > 0 && status.Result != "" {
+		proposal := &storage.Proposal{
+			Id: status.Id,
+		}
+		switch status.Result {
+		case "proposal_rejected":
+			proposal.Status = types.ProposalStatusRejected
+		case "proposal_passed":
+			proposal.Status = types.ProposalStatusApplied
+		case "proposal_dropped":
+			proposal.Status = types.ProposalStatusRemoved
+		default:
+			return errors.Errorf("unknown proposal status: %s", status.Result)
+		}
+
+		ctx.AddProposal(proposal)
 	}
 
 	return nil

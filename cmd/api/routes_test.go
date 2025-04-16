@@ -105,6 +105,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/stats/messages_count_24h GET":                    {},
 		"/v1/rollup/stats/series/:timeframe GET":              {},
 		"/v1/rollup/group GET":                                {},
+		"/v1/proposal GET":                                    {},
 		"/v1/blob/proofs POST":                                {},
 	}
 

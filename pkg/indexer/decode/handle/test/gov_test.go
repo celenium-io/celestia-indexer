@@ -4,6 +4,7 @@
 package handle_test
 
 import (
+	"encoding/base64"
 	"testing"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 	codecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	"github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
@@ -65,8 +67,15 @@ func createExpectations(
 
 func createMsgSubmitProposalV1() types.Msg {
 	// Data from: ADDAF8EA30C75A7B3A069B1F9E24975CA6EA769CC42A850AD816432B4B0BE38F
+	value := "CmUKLi9jb3Ntb3MucGFyYW1zLnYxYmV0YTEuUGFyYW1ldGVyQ2hhbmdlUHJvcG9zYWwSMwoFdGl0bGUSC2Rlc2NyaXB0aW9uGh0KB3N0YWtpbmcSDU1heFZhbGlkYXRvcnMaAzEwMxISCgR1dGlhEgoxMDAwMDAwMDAwGi9jZWxlc3RpYTEwZDA3eTI2NWdtbXV2dDR6MHc5YXc4ODBqbnNyNzAwanRnejR2Nw=="
+	val, _ := base64.StdEncoding.DecodeString(value)
 	m := cosmosGovTypesV1.MsgSubmitProposal{
-		Messages:       make([]*codecTypes.Any, 0),
+		Messages: []*codecTypes.Any{
+			{
+				TypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal",
+				Value:   val,
+			},
+		},
 		InitialDeposit: make([]types.Coin, 0),
 		Proposer:       "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		Metadata:       "",
@@ -94,7 +103,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
 		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
 		storageTypes.MsgSubmitProposal,
-		49,
+		266,
 	)
 
 	assert.NoError(t, err)
@@ -106,9 +115,14 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
 // v1beta1.MsgSubmitProposal
 
 func createMsgSubmitProposalV1Beta1() types.Msg {
-	// Data from: ADDAF8EA30C75A7B3A069B1F9E24975CA6EA769CC42A850AD816432B4B0BE38F
+	// Data from: 8137be4397d31f265c3c61f11b9ed79601ea6c407b5517ddd5b259b989c135ef
+	value := "Chnwn5KOQ2VsZXN0aWEgQWlyZHJvcCDinIUgElhHZXQg8J+SjkNlbGVzdGlhIEFpcmRyb3Ag4pyFIHZpc2l0aW5nIHVybDogd3d3LlRlcnJhUHJvLmF0CgotIG1vcmUgaW5mbzogd3d3LlRlcnJhV2ViLmF0"
+	val, _ := base64.StdEncoding.DecodeString(value)
 	m := cosmosGovTypesV1Beta1.MsgSubmitProposal{
-		Content:        nil,
+		Content: &codecTypes.Any{
+			TypeUrl: "/cosmos.gov.v1beta1.TextProposal",
+			Value:   val,
+		},
 		InitialDeposit: make(types.Coins, 0),
 		Proposer:       "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 	}
@@ -135,8 +149,23 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1(t *testing.T) {
 		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
 		storageTypes.MsgSubmitProposal,
-		49,
+		205,
 	)
+	msgExpected.Data["Content"] = v1beta1.TextProposal{
+		Title:       "💎Celestia Airdrop ✅ ",
+		Description: "Get 💎Celestia Airdrop ✅ visiting url: www.TerraPro.at\n\n- more info: www.TerraWeb.at",
+	}
+	msgExpected.Proposal = &storage.Proposal{
+		Title:       "💎Celestia Airdrop ✅ ",
+		Description: "Get 💎Celestia Airdrop ✅ visiting url: www.TerraPro.at\n\n- more info: www.TerraWeb.at",
+		Height:      blob.Height,
+		CreatedAt:   blob.Block.Time,
+		Type:        storageTypes.ProposalTypeText,
+		Status:      storageTypes.ProposalStatusInactive,
+		Proposer: &storage.Address{
+			Address: "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		},
+	}
 
 	assert.NoError(t, err)
 	assert.Equal(t, int64(0), dm.BlobsSize)

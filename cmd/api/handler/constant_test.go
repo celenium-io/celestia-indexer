@@ -72,4 +72,6 @@ func (s *ConstantTestSuite) TestEnums() {
 	s.Require().Len(enums.Categories, 5)
 	s.Require().Len(enums.Tags, 2)
 	s.Require().Len(enums.CelestialsStatuses, 3)
+	s.Require().Len(enums.ProposalType, 4)
+	s.Require().Len(enums.ProposalStatus, 5)
 }

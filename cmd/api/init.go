@@ -460,6 +460,12 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		vesting.GET("/:id/periods", vestingHandler.Periods)
 	}
 
+	proposalHandler := handler.NewProposalsHandler(db.Proposals, db.Votes, db.Address)
+	proposal := v1.Group("/proposal")
+	{
+		proposal.GET("", proposalHandler.List)
+	}
+
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
 		SpecURL: "./docs/swagger.json",
 		CustomOptions: scalar.CustomOptions{

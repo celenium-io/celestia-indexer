@@ -75,6 +75,7 @@ func (s *StateTestSuite) TestHead() {
 			TotalValidators: 10,
 			TotalStake:      decimal.NewFromInt(100),
 			TotalNamespaces: 100,
+			TotalProposals:  10,
 		}, nil).
 		Times(1)
 
@@ -92,6 +93,7 @@ func (s *StateTestSuite) TestHead() {
 	s.Require().Equal("2", state.TotalFee)
 	s.Require().EqualValues(30, state.TotalBlobsSize)
 	s.Require().EqualValues(10, state.TotalValidators)
+	s.Require().EqualValues(10, state.TotalProposals)
 	s.Require().EqualValues(100, state.TotalNamespaces)
 	s.Require().Equal(testTime, state.LastTime)
 	s.Require().Equal("100", state.TotalVotingPower)
