@@ -472,3 +472,29 @@ func (sh StatsHandler) MessagesCount24h(c echo.Context) error {
 	}
 	return returnArray(c, response)
 }
+
+// SizeGroups godoc
+//
+//	@Summary		Get blobs count grouped by size
+//	@Description	Get blobs count grouped by size
+//	@Tags			stats
+//	@ID				stats-size-groups
+//	@Produce		json
+//	@Success		200	{array}		responses.SizeGroup
+//	@Failure		500	{object}	Error
+//	@Router			/stats/size_groups [get]
+func (sh StatsHandler) SizeGroups(c echo.Context) error {
+	items, err := sh.repo.SizeGroups(
+		c.Request().Context(),
+		nil,
+	)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	response := make([]responses.SizeGroup, len(items))
+	for i := range items {
+		response[i] = responses.NewSizeGroup(items[i])
+	}
+	return returnArray(c, response)
+}

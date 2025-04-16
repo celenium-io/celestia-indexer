@@ -317,6 +317,22 @@ func (s *StatsTestSuite) TestChange24hBlockStats() {
 	s.Require().Equal(stats.TxCount, 0.0)
 }
 
+func (s *StatsTestSuite) TestSizeGroups() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tf := time.Now().UTC().AddDate(-25, 0, 0)
+
+	groups, err := s.storage.Stats.SizeGroups(ctx, &tf)
+	s.Require().NoError(err)
+	s.Require().Len(groups, 5)
+	s.Require().EqualValues(5, groups[0].Count)
+	s.Require().EqualValues(0, groups[1].Count)
+	s.Require().EqualValues(0, groups[2].Count)
+	s.Require().EqualValues(0, groups[3].Count)
+	s.Require().EqualValues(0, groups[4].Count)
+}
+
 func TestSuiteStats_Run(t *testing.T) {
 	suite.Run(t, new(StatsTestSuite))
 }

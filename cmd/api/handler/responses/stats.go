@@ -176,3 +176,19 @@ type RollupAllSeriesResponse struct {
 	Time  time.Time             `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time" swaggertype:"string"`
 	Items []RollupAllSeriesItem `json:"items"`
 }
+
+type SizeGroup struct {
+	Name    string `example:"Rollup name" format:"string"  json:"name"     swaggertype:"string"`
+	Count   int64  `example:"123"         format:"integer" json:"count"    swaggertype:"integer"`
+	Size    int64  `example:"123"         format:"integer" json:"size"     swaggertype:"integer"`
+	AvgSize int64  `example:"123"         format:"integer" json:"avg_size" swaggertype:"integer"`
+}
+
+func NewSizeGroup(sg storage.SizeGroup) SizeGroup {
+	return SizeGroup{
+		Name:    sg.Name,
+		Count:   sg.Count,
+		Size:    sg.Size,
+		AvgSize: sg.AvgSize,
+	}
+}

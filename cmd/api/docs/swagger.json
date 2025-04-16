@@ -3906,6 +3906,36 @@
                 }
             }
         },
+        "/stats/size_groups": {
+            "get": {
+                "description": "Get blobs count grouped by size",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get blobs count grouped by size",
+                "operationId": "stats-size-groups",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.SizeGroup"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/square_size": {
             "get": {
                 "description": "Get histogram for square size distribution",
@@ -6875,6 +6905,31 @@
                 "signed": {
                     "type": "boolean",
                     "example": true
+                }
+            }
+        },
+        "responses.SizeGroup": {
+            "type": "object",
+            "properties": {
+                "avg_size": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 123
+                },
+                "count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 123
+                },
+                "name": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Rollup name"
+                },
+                "size": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 123
                 }
             }
         },
