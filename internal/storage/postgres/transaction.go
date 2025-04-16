@@ -665,6 +665,9 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 	if rollup.DeFiLama != "" {
 		query = query.Set("defi_lama = ?", rollup.DeFiLama)
 	}
+	if rollup.SettledOn != "" {
+		query = query.Set("settled_on = ?", rollup.SettledOn)
+	}
 
 	query = query.Set("verified = ?", rollup.Verified)
 

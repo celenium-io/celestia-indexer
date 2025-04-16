@@ -13,6 +13,7 @@
   links: RAW='{https://rollup1.com}'
   category: finance
   verified: true
+  settled_on: Arbitrum
 - id: 2
   name: Rollup 2
   description: The second
@@ -27,6 +28,7 @@
   defi_lama: lama
   category: gaming
   verified: true
+  settled_on: Arbitrum
 - id: 3
   name: Rollup 3
   description: The third
@@ -42,6 +44,7 @@
   category: nft
   verified: true
   provider: provider 1
+  settled_on: Arbitrum
 - id: 4
   name: Hidden Rollup 
   description: The fourth
@@ -57,3 +60,4 @@
   verified: false
   tags: RAW='{hidden}'
   provider: provider 2
+  settled_on: Arbitrum
