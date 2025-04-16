@@ -69,6 +69,7 @@ type Rollup struct {
 	Stack          string               `bun:"stack"                         comment:"Underlaying stack"`
 	Compression    string               `bun:"compression"                   comment:"Compression"`
 	Provider       string               `bun:"provider"                      comment:"RaaS provider"`
+	SettledOn      string               `bun:"settled_on"                    comment:"Settled on"`
 	Type           types.RollupType     `bun:"type,type:rollup_type"         comment:"Type of rollup: settled or sovereign"`
 	Category       types.RollupCategory `bun:"category,type:rollup_category" comment:"Category of rollup"`
 	Tags           []string             `bun:"tags,array"`
@@ -102,7 +103,8 @@ func (r Rollup) IsEmpty() bool {
 		r.Provider == "" &&
 		r.Type == "" &&
 		r.VM == "" &&
-		r.DeFiLama == ""
+		r.DeFiLama == "" &&
+		r.SettledOn == ""
 }
 
 type RollupWithStats struct {
