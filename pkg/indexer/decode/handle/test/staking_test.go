@@ -6,7 +6,6 @@ package handle_test
 import (
 	"testing"
 
-	"cosmossdk.io/math"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -291,13 +290,13 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 // MsgDelegate
 
 func createMsgDelegate() types.Msg {
-
+	amount, _ := types.NewIntFromString("1000")
 	msgDelegate := cosmosStakingTypes.MsgDelegate{
 		DelegatorAddress: "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
 		ValidatorAddress: "celestiavaloper12c6cwd0kqlg48sdhjnn9f0z82g0c82fmrl7j9y",
 		Amount: types.Coin{
 			Denom:  "utia",
-			Amount: math.NewInt(1000),
+			Amount: amount,
 		},
 	}
 
@@ -364,12 +363,13 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 // MsgUndelegate
 
 func createMsgUndelegate() types.Msg {
+	amount, _ := types.NewIntFromString("1001")
 	m := cosmosStakingTypes.MsgUndelegate{
 		DelegatorAddress: "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
 		ValidatorAddress: "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym",
 		Amount: types.Coin{
 			Denom:  "utia",
-			Amount: math.NewInt(1001),
+			Amount: amount,
 		},
 	}
 	return &m
@@ -435,12 +435,13 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 // MsgCancelUnbondingDelegation
 
 func createMsgCancelUnbondingDelegation() types.Msg {
+	amount, _ := types.NewIntFromString("1001")
 	m := cosmosStakingTypes.MsgCancelUnbondingDelegation{
 		DelegatorAddress: "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
 		ValidatorAddress: "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym",
 		Amount: types.Coin{
 			Denom:  "utia",
-			Amount: math.NewInt(1001),
+			Amount: amount,
 		},
 		CreationHeight: 100,
 	}

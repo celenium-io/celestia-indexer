@@ -4,11 +4,11 @@
 package context
 
 import (
-	"cosmossdk.io/errors"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
+	"github.com/pkg/errors"
 )
 
 type Context struct {
