@@ -4,6 +4,7 @@
 package storage
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -89,6 +90,35 @@ func TestUpdateConstants(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
+}
+
+func TestUpdateConstantsNewProposal(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	constants := mock.NewMockIConstant(ctrl)
+	validators := mock.NewMockIValidator(ctrl)
+
+	module := NewModule(nil, constants, validators, nil, config.Indexer{})
+
+	t.Run("new proposal", func(t *testing.T) {
+		tx := mock.NewMockTransaction(ctrl)
+
+		tx.EXPECT().
+			Proposal(gomock.Any(), uint64(1)).
+			Return(storage.Proposal{}, sql.ErrNoRows).
+			Times(1)
+
+		validators.EXPECT().
+			IsNoRows(sql.ErrNoRows).
+			Return(true).
+			Times(1)
+
+		err := module.updateConstants(t.Context(), tx, &storage.Proposal{
+			Id: 1,
+		})
+		require.NoError(t, err)
+	})
 }
 
 func TestFillProposalVotingPower(t *testing.T) {

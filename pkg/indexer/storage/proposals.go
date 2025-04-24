@@ -257,6 +257,9 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 func (module *Module) updateConstants(ctx context.Context, tx storage.Transaction, proposal *storage.Proposal) error {
 	changes, err := tx.Proposal(ctx, proposal.Id)
 	if err != nil {
+		if module.validators.IsNoRows(err) {
+			return nil
+		}
 		return errors.Wrap(err, "receive proposal changes")
 	}
 
