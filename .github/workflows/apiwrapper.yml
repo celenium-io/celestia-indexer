@@ -1,4 +1,7 @@
 name: Generate API
+permissions:
+  contents: read
+  pull-requests: read
 on:
   push:
     tags:
