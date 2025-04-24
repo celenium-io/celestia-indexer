@@ -1,6 +1,6 @@
 name: Pre-release
 permissions:
-  contents: read
+  contents: write
   pull-requests: read
 on:
   push:
