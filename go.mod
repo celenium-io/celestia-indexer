@@ -3,8 +3,6 @@ module github.com/celenium-io/celestia-indexer
 go 1.24.1
 
 require (
-	cosmossdk.io/errors v1.0.1
-	cosmossdk.io/math v1.4.0
 	github.com/MarceloPetrucio/go-scalar-api-reference v0.0.0-20240521013641-ce5d2efe0e06
 	github.com/andybalholm/brotli v1.1.1
 	github.com/aws/aws-sdk-go-v2 v1.26.1
@@ -13,43 +11,43 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.53.1
 	github.com/aws/smithy-go v1.20.2
 	github.com/celenium-io/celestial-module v0.0.7
-	github.com/celestiaorg/celestia-app/v3 v3.0.2
+	github.com/celestiaorg/celestia-app/v3 v3.8.1
 	github.com/celestiaorg/go-square v1.1.1
-	github.com/celestiaorg/go-square/v2 v2.1.0
+	github.com/celestiaorg/go-square/v2 v2.2.0
 	github.com/celestiaorg/rsmt2d v0.14.0
 	github.com/cosmos/cosmos-sdk v0.46.16
 	github.com/cosmos/ibc-go/v6 v6.2.2
 	github.com/dipdup-io/workerpool v0.0.4
 	github.com/dipdup-net/go-lib v0.4.7
-	github.com/dipdup-net/indexer-sdk v0.0.6
+	github.com/dipdup-net/indexer-sdk v0.0.7
 	github.com/fatih/structs v1.1.0
-	github.com/gabriel-vasile/mimetype v1.4.3
-	github.com/getsentry/sentry-go v0.30.0
-	github.com/go-playground/validator/v10 v10.18.0
+	github.com/gabriel-vasile/mimetype v1.4.9
+	github.com/getsentry/sentry-go v0.32.0
+	github.com/getsentry/sentry-go/echo v0.32.0
+	github.com/go-playground/validator/v10 v10.26.0
 	github.com/go-testfixtures/testfixtures/v3 v3.14.0
 	github.com/goccy/go-json v0.10.5
 	github.com/gorilla/websocket v1.5.3
-	github.com/gosimple/slug v1.13.1
-	github.com/grafana/pyroscope-go v1.1.2
+	github.com/gosimple/slug v1.15.0
+	github.com/grafana/pyroscope-go v1.2.2
 	github.com/json-iterator/go v1.1.12
 	github.com/labstack/echo-contrib v0.15.0
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/lib/pq v1.10.9
 	github.com/pkg/errors v0.9.1
-	github.com/rs/zerolog v1.33.0
+	github.com/rs/zerolog v1.34.0
 	github.com/shopspring/decimal v1.4.0
-	github.com/spf13/cobra v1.8.1
+	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/tendermint/tendermint v0.34.29
 	github.com/uptrace/bun v1.1.17
 	github.com/uptrace/bun/dialect/pgdialect v1.1.17
 	github.com/uptrace/bun/driver/pgdriver v1.1.17
-	github.com/valkey-io/valkey-go v1.0.55
+	github.com/valkey-io/valkey-go v1.0.57
 	github.com/vmihailenco/msgpack/v5 v5.4.1
-	go.opentelemetry.io/otel v1.34.0
 	go.opentelemetry.io/otel/trace v1.34.0
 	go.uber.org/mock v0.5.0
-	golang.org/x/exp v0.0.0-20240904232852-e7e105dedf7e
+	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
 	golang.org/x/time v0.9.0
 )
 
@@ -64,6 +62,8 @@ require (
 	cloud.google.com/go/monitoring v1.21.1 // indirect
 	cloud.google.com/go/spanner v1.73.0 // indirect
 	cloud.google.com/go/storage v1.43.0 // indirect
+	cosmossdk.io/errors v1.0.1 // indirect
+	cosmossdk.io/math v1.4.0 // indirect
 	dario.cat/mergo v1.0.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
@@ -97,7 +97,7 @@ require (
 	github.com/btcsuite/btcd/btcec/v2 v2.3.4 // indirect
 	github.com/celestiaorg/blobstream-contracts/v3 v3.1.0 // indirect
 	github.com/celestiaorg/merkletree v0.0.0-20210714075610-a84dc3ddbbe4 // indirect
-	github.com/celestiaorg/nmt v0.22.2 // indirect
+	github.com/celestiaorg/nmt v0.23.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
@@ -117,7 +117,7 @@ require (
 	github.com/cosmos/gorocksdb v1.2.0 // indirect
 	github.com/cosmos/iavl v0.19.6 // indirect
 	github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v6 v6.1.2 // indirect
-	github.com/cosmos/ledger-cosmos-go v0.13.2 // indirect
+	github.com/cosmos/ledger-cosmos-go v0.14.0 // indirect
 	github.com/cpuguy83/dockercfg v0.3.1 // indirect
 	github.com/crate-crypto/go-ipa v0.0.0-20240223125850-b1e8a79f509c // indirect
 	github.com/crate-crypto/go-kzg-4844 v1.0.0 // indirect
@@ -126,7 +126,7 @@ require (
 	github.com/deckarep/golang-set/v2 v2.6.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/dgraph-io/badger/v2 v2.2007.4 // indirect
-	github.com/dgraph-io/ristretto v0.1.2-0.20240116140435-c67e07994f91 // indirect
+	github.com/dgraph-io/ristretto v1.0.0 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/docker v27.3.0+incompatible // indirect
@@ -153,7 +153,7 @@ require (
 	github.com/gogo/gateway v1.1.0 // indirect
 	github.com/gogo/protobuf v1.3.3 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
-	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
+	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.5-0.20220116011046-fa5810519dcb // indirect
 	github.com/google/btree v1.1.3 // indirect
@@ -187,7 +187,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jmhodges/levigo v1.0.0 // indirect
-	github.com/klauspost/compress v1.17.9 // indirect
+	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/klauspost/reedsolomon v1.12.1 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
@@ -222,9 +222,9 @@ require (
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
-	github.com/prometheus/client_golang v1.20.3 // indirect
+	github.com/prometheus/client_golang v1.20.5 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.55.0 // indirect
+	github.com/prometheus/common v0.62.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/rakyll/statik v0.1.7 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
@@ -237,7 +237,7 @@ require (
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/spf13/viper v1.15.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/supranational/blst v0.3.13 // indirect
@@ -263,23 +263,24 @@ require (
 	go.opentelemetry.io/contrib/detectors/gcp v1.29.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.54.0 // indirect
+	go.opentelemetry.io/otel v1.34.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.19.0 // indirect
 	go.opentelemetry.io/otel/metric v1.34.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.30.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.29.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
-	golang.org/x/net v0.38.0 // indirect
-	golang.org/x/oauth2 v0.23.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/term v0.30.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
+	golang.org/x/oauth2 v0.24.0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/term v0.31.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	google.golang.org/api v0.203.0 // indirect
 	google.golang.org/genproto v0.0.0-20241015192408-796eee8c2d53 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241007155032-5fefd90f89a9 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241015192408-796eee8c2d53 // indirect
 	google.golang.org/grpc v1.68.0 // indirect
-	google.golang.org/protobuf v1.35.1 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -289,7 +290,7 @@ require (
 )
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/celestiaorg/cosmos-sdk v1.25.1-sdk-v0.46.16
+	github.com/cosmos/cosmos-sdk => github.com/celestiaorg/cosmos-sdk v1.30.0-sdk-v0.46.16
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 	github.com/tendermint/tendermint => github.com/celestiaorg/celestia-core v1.43.0-tm-v0.34.35

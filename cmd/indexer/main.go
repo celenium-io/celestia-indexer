@@ -41,7 +41,7 @@ func main() {
 	defer notifyCancel()
 
 	stopperModule := stopper.NewModule(cancel)
-	indexerModule, err := indexer.New(ctx, *cfg, &stopperModule)
+	indexerModule, err := indexer.New(ctx, *cfg, stopperModule)
 	if err != nil {
 		log.Panic().Err(err).Msg("error during indexer module creation")
 		return
