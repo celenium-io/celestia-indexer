@@ -333,7 +333,7 @@ func (s *TransactionTestSuite) TestSaveProposals() {
 	s.Require().NoError(err)
 
 	count, err := tx.SaveProposals(ctx, &storage.Proposal{
-		Id:          2,
+		Id:          3,
 		ProposerId:  2,
 		Status:      types.ProposalStatusInactive,
 		Type:        types.ProposalTypeText,
@@ -352,7 +352,7 @@ func (s *TransactionTestSuite) TestSaveProposals() {
 
 	items, err := s.storage.Proposals.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 2)
+	s.Require().Len(items, 3)
 }
 
 func (s *TransactionTestSuite) TestSaveVotes() {
@@ -675,7 +675,7 @@ func (s *TransactionTestSuite) TestRollbackProposals() {
 
 	items, err := s.storage.Proposals.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 0)
+	s.Require().Len(items, 1)
 }
 
 func (s *TransactionTestSuite) TestRollbackVotes() {
@@ -1280,6 +1280,25 @@ func (s *TransactionTestSuite) TestProposal() {
 	s.Require().EqualValues(1, proposal.Id)
 	s.Require().NotNil(proposal.Changes)
 	s.Require().EqualValues(types.ProposalTypeText, proposal.Type)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestActiveProposal() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	proposals, err := tx.ActiveProposals(ctx)
+	s.Require().NoError(err)
+	s.Require().Len(proposals, 1)
+
+	s.Require().EqualValues(2, proposals[0].Id)
+	s.Require().NotNil(proposals[0].Changes)
+	s.Require().EqualValues(types.ProposalTypeCommunityPoolSpend, proposals[0].Type)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
