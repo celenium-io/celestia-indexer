@@ -4,6 +4,7 @@
 package storage
 
 import (
+	"context"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -16,6 +17,10 @@ import (
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IVote interface {
 	sdk.Table[*Vote]
+
+	ByProposalId(ctx context.Context, proposalId uint64, fltrs VoteFilters) ([]Vote, error)
+	ByVoterId(ctx context.Context, voterId uint64, fltrs VoteFilters) ([]Vote, error)
+	ByValidatorId(ctx context.Context, validatorId uint64, fltrs VoteFilters) ([]Vote, error)
 }
 
 type Vote struct {
@@ -38,4 +43,10 @@ type Vote struct {
 // TableName -
 func (Vote) TableName() string {
 	return "vote"
+}
+
+type VoteFilters struct {
+	Limit  int
+	Offset int
+	Option types.VoteOption
 }

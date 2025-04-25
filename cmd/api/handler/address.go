@@ -29,6 +29,7 @@ type AddressHandler struct {
 	vestings      storage.IVestingAccount
 	grants        storage.IGrant
 	celestial     celestials.ICelestial
+	votes         storage.IVote
 	state         storage.IState
 	indexerName   string
 }
@@ -44,6 +45,7 @@ func NewAddressHandler(
 	vestings storage.IVestingAccount,
 	grants storage.IGrant,
 	celestial celestials.ICelestial,
+	votes storage.IVote,
 	state storage.IState,
 	indexerName string,
 ) *AddressHandler {
@@ -58,6 +60,7 @@ func NewAddressHandler(
 		vestings:      vestings,
 		grants:        grants,
 		celestial:     celestial,
+		votes:         votes,
 		state:         state,
 		indexerName:   indexerName,
 	}
@@ -845,6 +848,50 @@ func (handler *AddressHandler) Celestials(c echo.Context) error {
 	response := make([]*responses.Celestial, len(celestials))
 	for i := range celestials {
 		response[i] = responses.NewCelestial(&celestials[i])
+	}
+	return returnArray(c, response)
+}
+
+// Votes godoc
+//
+//	@Summary		Get list of votes for address
+//	@Description	Get list of votes for address
+//	@Tags			address
+//	@ID				address-votes
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Vote
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/address/{hash}/votes [get]
+func (handler *AddressHandler) Votes(c echo.Context) error {
+	req, err := bindAndValidate[getAddressPageable](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	addressId, err := handler.address.IdByAddress(c.Request().Context(), req.Hash)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	votes, err := handler.votes.ByVoterId(
+		c.Request().Context(),
+		addressId,
+		storage.VoteFilters{
+			Limit:  req.Limit,
+			Offset: req.Offset,
+		},
+	)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	response := make([]responses.Vote, len(votes))
+	for i := range votes {
+		response[i] = responses.NewVote(votes[i])
 	}
 	return returnArray(c, response)
 }

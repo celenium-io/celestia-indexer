@@ -304,7 +304,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	searchHandler := handler.NewSearchHandler(db.Search, db.Address, db.Blocks, db.Tx, db.Namespace, db.Validator, db.Rollup, db.Celestials)
 	v1.GET("/search", searchHandler.Search)
 
-	addressHandlers := handler.NewAddressHandler(db.Address, db.Tx, db.BlobLogs, db.Message, db.Delegation, db.Undelegation, db.Redelegation, db.VestingAccounts, db.Grants, db.Celestials, db.State, cfg.Indexer.Name)
+	addressHandlers := handler.NewAddressHandler(db.Address, db.Tx, db.BlobLogs, db.Message, db.Delegation, db.Undelegation, db.Redelegation, db.VestingAccounts, db.Grants, db.Celestials, db.Votes, db.State, cfg.Indexer.Name)
 	addressesGroup := v1.Group("/address")
 	{
 		addressesGroup.GET("", addressHandlers.List)
@@ -322,6 +322,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			addressGroup.GET("/grants", addressHandlers.Grants)
 			addressGroup.GET("/granters", addressHandlers.Grantee)
 			addressGroup.GET("/celestials", addressHandlers.Celestials)
+			addressGroup.GET("/votes", addressHandlers.Votes)
 			addressGroup.GET("/stats/:name/:timeframe", addressHandlers.Stats, statsMiddlewareCache)
 		}
 	}
@@ -404,7 +405,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		namespaceByHash.GET("/:hash/:height", namespaceHandlers.GetBlobs)
 	}
 
-	validatorsHandler := handler.NewValidatorHandler(db.Validator, db.Blocks, db.BlockSignatures, db.Delegation, db.Constants, db.Jails, db.State, cfg.Indexer.Name)
+	validatorsHandler := handler.NewValidatorHandler(db.Validator, db.Blocks, db.BlockSignatures, db.Delegation, db.Constants, db.Jails, db.Votes, db.State, cfg.Indexer.Name)
 	validators := v1.Group("/validators")
 	{
 		validators.GET("", validatorsHandler.List)
@@ -416,6 +417,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			validator.GET("/uptime", validatorsHandler.Uptime)
 			validator.GET("/delegators", validatorsHandler.Delegators)
 			validator.GET("/jails", validatorsHandler.Jails)
+			validator.GET("/votes", validatorsHandler.Votes)
 		}
 	}
 
@@ -464,6 +466,8 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	proposal := v1.Group("/proposal")
 	{
 		proposal.GET("", proposalHandler.List)
+		proposal.GET("/:id", proposalHandler.Get)
+		proposal.GET("/:id/votes", proposalHandler.Votes)
 	}
 
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{

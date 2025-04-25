@@ -5,6 +5,7 @@ package handler
 
 import (
 	"encoding/hex"
+	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -49,7 +50,7 @@ func (req *listProposalsRequest) SetDefault() {
 	}
 }
 
-func (req listProposalsRequest) toFilters(proposerId uint64) storage.ListProposalFilters {
+func (req *listProposalsRequest) toFilters(proposerId uint64) storage.ListProposalFilters {
 	filters := storage.ListProposalFilters{
 		Limit:      req.Limit,
 		Offset:     req.Offset,
@@ -117,6 +118,88 @@ func (handler *ProposalsHandler) List(c echo.Context) error {
 	response := make([]responses.Proposal, len(proposals))
 	for i := range proposals {
 		response[i] = responses.NewProposal(proposals[i])
+	}
+	return returnArray(c, response)
+}
+
+// Get godoc
+//
+//	@Summary		Get proposal info
+//	@Description	Get proposal info
+//	@Tags			proposal
+//	@ID				get-proposal
+//	@Param			id	path	integer	true	"Internal identity"	mininum(1)
+//	@Produce		json
+//	@Success		200	{object}	responses.Proposal
+//	@Success		204
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/proposal/{id} [get]
+func (handler *ProposalsHandler) Get(c echo.Context) error {
+	req, err := bindAndValidate[getById](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	proposal, err := handler.proposals.GetByID(c.Request().Context(), req.Id)
+	if err != nil {
+		return handleError(c, err, handler.proposals)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewProposal(*proposal))
+}
+
+type listVotesRequest struct {
+	Id     uint64           `param:"id" validate:"required,min=1"`
+	Limit  int              `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int              `query:"offset" validate:"omitempty,min=0"`
+	Option types.VoteOption `query:"option"  validate:"omitempty,dive,vote_option"`
+}
+
+func (p *listVotesRequest) SetDefault() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+}
+
+// Votes godoc
+//
+//	@Summary		Get proposal's votes
+//	@Description	Get proposal's votes
+//	@Tags			proposal
+//	@ID				proposal-votes
+//	@Param			limit	    query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset	    query	integer	false	"Offset"										mininum(1)
+//
+// @Param			option	    path	string	true	"Option"		Enums(yes, no, no_with_veto, abstain)
+//
+//	@Produce		json
+//	@Success		200	{array}		responses.Vote
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/proposal/[id]/votes [get]
+func (handler *ProposalsHandler) Votes(c echo.Context) error {
+	req, err := bindAndValidate[listVotesRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	votes, err := handler.votes.ByProposalId(
+		c.Request().Context(),
+		req.Id,
+		storage.VoteFilters{
+			Limit:  req.Limit,
+			Offset: req.Offset,
+			Option: req.Option,
+		})
+
+	if err != nil {
+		return handleError(c, err, handler.votes)
+	}
+	response := make([]responses.Vote, len(votes))
+	for i := range votes {
+		response[i] = responses.NewVote(votes[i])
 	}
 	return returnArray(c, response)
 }
