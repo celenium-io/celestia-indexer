@@ -18,11 +18,11 @@ func init() {
 }
 
 func upAddPriceFeed(ctx context.Context, db *bun.DB) error {
-	_, err := db.ExecContext(ctx, `ALTER TYPE module_name ADD VALUE ? AFTER ?`, types.ModuleNameBaseapp.String(), types.ModuleNameConsensus.String())
+	_, err := db.ExecContext(ctx, `ALTER TYPE module_name ADD VALUE IF NOT EXISTS ? AFTER ?`, types.ModuleNameBaseapp.String(), types.ModuleNameConsensus.String())
 	if err != nil {
 		return err
 	}
-	_, err = db.ExecContext(ctx, `ALTER TYPE module_name ADD VALUE ? AFTER ?`, types.ModuleNameIcahost.String(), types.ModuleNameBaseapp.String())
+	_, err = db.ExecContext(ctx, `ALTER TYPE module_name ADD VALUE IF NOT EXISTS ? AFTER ?`, types.ModuleNameIcahost.String(), types.ModuleNameBaseapp.String())
 	return err
 }
 func downPriceFeed(ctx context.Context, db *bun.DB) error {
