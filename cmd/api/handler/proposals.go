@@ -150,10 +150,11 @@ func (handler *ProposalsHandler) Get(c echo.Context) error {
 }
 
 type listVotesRequest struct {
-	Id     uint64           `param:"id" validate:"required,min=1"`
-	Limit  int              `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int              `query:"offset" validate:"omitempty,min=0"`
-	Option types.VoteOption `query:"option"  validate:"omitempty,dive,vote_option"`
+	Id        uint64 `param:"id"     validate:"required,min=1"`
+	Limit     int    `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset    int    `query:"offset" validate:"omitempty,min=0"`
+	Option    string `query:"option" validate:"omitempty,vote_option"`
+	VoterType string `query:"voter"  validate:"omitempty,voter_type"`
 }
 
 func (p *listVotesRequest) SetDefault() {
@@ -172,6 +173,7 @@ func (p *listVotesRequest) SetDefault() {
 //	@Param			offset	    query	integer	false	"Offset"										mininum(1)
 //
 // @Param			option	    path	string	true	"Option"		Enums(yes, no, no_with_veto, abstain)
+// @Param			voter	    path	string	true	"Voter type"		Enums(address, validator)
 //
 //	@Produce		json
 //	@Success		200	{array}		responses.Vote
@@ -179,6 +181,7 @@ func (p *listVotesRequest) SetDefault() {
 //	@Failure		500	{object}	Error
 //	@Router			/proposal/[id]/votes [get]
 func (handler *ProposalsHandler) Votes(c echo.Context) error {
+
 	req, err := bindAndValidate[listVotesRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
@@ -189,9 +192,10 @@ func (handler *ProposalsHandler) Votes(c echo.Context) error {
 		c.Request().Context(),
 		req.Id,
 		storage.VoteFilters{
-			Limit:  req.Limit,
-			Offset: req.Offset,
-			Option: req.Option,
+			Limit:     req.Limit,
+			Offset:    req.Offset,
+			Option:    types.VoteOption(req.Option),
+			VoterType: types.VoterType(req.VoterType),
 		})
 
 	if err != nil {

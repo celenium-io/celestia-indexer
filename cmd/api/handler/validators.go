@@ -49,6 +49,9 @@ func NewCelestiaApiValidator() *CelestiaApiValidator {
 	if err := v.RegisterValidation("vote_option", voteOptionValidator()); err != nil {
 		panic(err)
 	}
+	if err := v.RegisterValidation("voter_type", voterTypeValidator()); err != nil {
+		panic(err)
+	}
 	return &CelestiaApiValidator{validator: v}
 }
 
@@ -159,6 +162,13 @@ func proposalTypeValidator() validator.Func {
 func voteOptionValidator() validator.Func {
 	return func(fl validator.FieldLevel) bool {
 		_, err := types.ParseVoteOption(fl.Field().String())
+		return err == nil
+	}
+}
+
+func voterTypeValidator() validator.Func {
+	return func(fl validator.FieldLevel) bool {
+		_, err := types.ParseVoterType(fl.Field().String())
 		return err == nil
 	}
 }

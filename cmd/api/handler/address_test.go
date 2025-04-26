@@ -54,6 +54,7 @@ type AddressTestSuite struct {
 	vestings      *mock.MockIVestingAccount
 	grants        *mock.MockIGrant
 	celestials    *celestialMock.MockICelestial
+	votes         *mock.MockIVote
 	state         *mock.MockIState
 	echo          *echo.Echo
 	handler       *AddressHandler
@@ -75,8 +76,9 @@ func (s *AddressTestSuite) SetupSuite() {
 	s.vestings = mock.NewMockIVestingAccount(s.ctrl)
 	s.grants = mock.NewMockIGrant(s.ctrl)
 	s.celestials = celestialMock.NewMockICelestial(s.ctrl)
+	s.votes = mock.NewMockIVote(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.vestings, s.grants, s.celestials, s.state, testIndexerName)
+	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.vestings, s.grants, s.celestials, s.votes, s.state, testIndexerName)
 }
 
 // TearDownSuite -

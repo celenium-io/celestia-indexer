@@ -31,6 +31,7 @@ type ValidatorTestSuite struct {
 	delegations     *mock.MockIDelegation
 	jails           *mock.MockIJail
 	constants       *mock.MockIConstant
+	votes           *mock.MockIVote
 	state           *mock.MockIState
 	echo            *echo.Echo
 	handler         *ValidatorHandler
@@ -48,8 +49,9 @@ func (s *ValidatorTestSuite) SetupSuite() {
 	s.delegations = mock.NewMockIDelegation(s.ctrl)
 	s.constants = mock.NewMockIConstant(s.ctrl)
 	s.jails = mock.NewMockIJail(s.ctrl)
+	s.votes = mock.NewMockIVote(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewValidatorHandler(s.validators, s.blocks, s.blockSignatures, s.delegations, s.constants, s.jails, s.state, testIndexerName)
+	s.handler = NewValidatorHandler(s.validators, s.blocks, s.blockSignatures, s.delegations, s.constants, s.jails, s.votes, s.state, testIndexerName)
 }
 
 // TearDownSuite -

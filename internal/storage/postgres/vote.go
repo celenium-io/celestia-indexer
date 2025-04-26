@@ -6,6 +6,7 @@ package postgres
 import (
 	"context"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 )
@@ -28,8 +29,7 @@ func (v *Vote) ByProposalId(ctx context.Context, proposalId uint64, fltrs storag
 		Model(&votes).
 		Where("proposal_id = ?", proposalId).
 		Relation("Voter").
-		Relation("Validator").
-		Order("time desc")
+		Relation("Validator")
 
 	query = limitScope(query, fltrs.Limit)
 	if fltrs.Offset > 0 {
@@ -40,9 +40,15 @@ func (v *Vote) ByProposalId(ctx context.Context, proposalId uint64, fltrs storag
 		query = query.Where("option = ?", fltrs.Option)
 	}
 
-	query = query.Order("time desc")
+	if fltrs.VoterType == types.VoterTypeValidator {
+		query = query.Where("validator_id = ?", 0)
+	} else {
+		query = query.Where("validator_id != ?", 0)
+	}
 
+	query = query.Order("time desc")
 	err = query.Scan(ctx)
+
 	return
 }
 
@@ -52,15 +58,16 @@ func (v *Vote) ByVoterId(ctx context.Context, voterId uint64, fltrs storage.Vote
 		Model(&votes).
 		Where("voter_id = ?", voterId).
 		Relation("Voter").
-		Relation("Validator").
-		Order("time desc")
+		Relation("Validator")
 
 	query = limitScope(query, fltrs.Limit)
 	if fltrs.Offset > 0 {
 		query = query.Offset(fltrs.Offset)
 	}
 
+	query = query.Order("time desc")
 	err = query.Scan(ctx)
+
 	return
 }
 
@@ -70,14 +77,15 @@ func (v *Vote) ByValidatorId(ctx context.Context, validatorId uint64, fltrs stor
 		Model(&votes).
 		Where("validator_id = ?", validatorId).
 		Relation("Voter").
-		Relation("Validator").
-		Order("time desc")
+		Relation("Validator")
 
 	query = limitScope(query, fltrs.Limit)
 	if fltrs.Offset > 0 {
 		query = query.Offset(fltrs.Offset)
 	}
 
+	query = query.Order("time desc")
 	err = query.Scan(ctx)
+
 	return
 }

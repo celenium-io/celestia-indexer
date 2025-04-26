@@ -46,7 +46,8 @@ func (Vote) TableName() string {
 }
 
 type VoteFilters struct {
-	Limit  int
-	Offset int
-	Option types.VoteOption
+	Limit     int
+	Offset    int
+	Option    types.VoteOption
+	VoterType types.VoterType
 }

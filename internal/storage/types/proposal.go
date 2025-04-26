@@ -55,3 +55,13 @@ type ProposalType string
 */
 //go:generate go-enum --marshal --sql --values --names
 type VoteOption string
+
+// swagger:enum VoterType
+/*
+	ENUM(
+		address,
+		validator
+	)
+*/
+//go:generate go-enum --marshal --sql --values --names
+type VoterType string
