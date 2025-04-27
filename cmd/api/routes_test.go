@@ -106,6 +106,10 @@ func TestRoutes(t *testing.T) {
 		"/v1/rollup/stats/series/:timeframe GET":              {},
 		"/v1/rollup/group GET":                                {},
 		"/v1/proposal GET":                                    {},
+		"/v1/proposal/:id GET":                                {},
+		"/v1/proposal/:id/votes GET":                          {},
+		"/v1/address/:hash/votes GET":                         {},
+		"/v1/validators/:id/votes GET":                        {},
 		"/v1/blob/proofs POST":                                {},
 	}
 

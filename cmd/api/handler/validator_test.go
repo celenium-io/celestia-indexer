@@ -14,7 +14,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
-	st "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/labstack/echo/v4"
 	"github.com/shopspring/decimal"
@@ -314,7 +314,7 @@ func (s *ValidatorTestSuite) TestCount() {
 		Times(1)
 
 	s.constants.EXPECT().
-		Get(gomock.Any(), st.ModuleNameStaking, "max_validators").
+		Get(gomock.Any(), storageTypes.ModuleNameStaking, "max_validators").
 		Return(storage.Constant{
 			Value: "6",
 		}, nil).
@@ -331,4 +331,48 @@ func (s *ValidatorTestSuite) TestCount() {
 	s.Require().EqualValues(2, count.Jailed)
 	s.Require().EqualValues(6, count.Active)
 	s.Require().EqualValues(2, count.Inactive)
+}
+
+func (s *ValidatorTestSuite) TestVotes() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/validators/:id/votes")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	s.votes.EXPECT().
+		ByValidatorId(gomock.Any(), uint64(1), storage.VoteFilters{
+			Limit:  10,
+			Offset: 0,
+		}).
+		Return([]storage.Vote{
+			{
+				Id:          2,
+				Height:      1000,
+				Weight:      decimal.NewFromFloat(1),
+				Option:      storageTypes.VoteOptionNoWithVeto,
+				ValidatorId: 1,
+				Validator:   &testValidator,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Votes(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var votes []responses.Vote
+	err := json.NewDecoder(rec.Body).Decode(&votes)
+	s.Require().NoError(err)
+	s.Require().Len(votes, 1)
+	s.Require().EqualValues(2, votes[0].Id)
+	s.Require().EqualValues(1000, votes[0].Height)
+	s.Require().EqualValues(decimal.NewFromFloat(1), votes[0].Weight)
+	s.Require().EqualValues(storageTypes.VoteOptionNoWithVeto, votes[0].Option)
+	s.Require().EqualValues(1, votes[0].Validator.Id)
+	s.Require().EqualValues("moniker", votes[0].Validator.Moniker)
+	s.Require().EqualValues("012345", votes[0].Validator.ConsAddress)
 }
