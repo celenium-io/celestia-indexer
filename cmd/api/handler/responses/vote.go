@@ -35,10 +35,7 @@ func NewVote(vote storage.Vote) Vote {
 		Weight:     vote.Weight,
 		VoterId:    vote.VoterId,
 		ProposalId: vote.ProposalId,
-	}
-
-	if vote.Voter != nil {
-		result.Voter = NewShortAddress(vote.Voter)
+		Voter:      NewShortAddress(vote.Voter),
 	}
 
 	if vote.Validator != nil {

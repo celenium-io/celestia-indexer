@@ -609,6 +609,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Vote)(nil)).
+			Index("vote_option_idx").
+			Column("option").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		return nil
 	})
