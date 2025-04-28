@@ -21,6 +21,7 @@ type CelestiaApiValidator struct {
 
 func NewCelestiaApiValidator() *CelestiaApiValidator {
 	v := validator.New()
+	v.RegisterStructValidation(rollupProviderValidator, rollupProvider{})
 	if err := v.RegisterValidation("address", addressValidator()); err != nil {
 		panic(err)
 	}
@@ -154,4 +155,12 @@ func (kv KeyValidator) Validate(key string, c echo.Context) (bool, error) {
 	c.Logger().Infof("using apikey: %s", apiKey.Description)
 	c.Set(ApiKeyName, apiKey)
 	return true, nil
+}
+
+func rollupProviderValidator(sl validator.StructLevel) {
+	rp := sl.Current().Interface().(rollupProvider)
+	if rp.Address == "" && rp.Namespace == "" {
+		sl.ReportError(rp.Address, "address", "Address", "namespace_or_address", "")
+		sl.ReportError(rp.Namespace, "namespace", "Namespace", "namespace_or_address", "")
+	}
 }

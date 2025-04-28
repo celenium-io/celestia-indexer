@@ -5,7 +5,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS leaderboard_day AS
 	), 
 	rollup_data as (
 		select data.*, rp.rollup_id from data 
-		inner join rollup_provider rp on (rp.namespace_id = 0 or rp.namespace_id = data.namespace_id) and (rp.address_id = data.signer_id)
+		inner join rollup_provider rp on (rp.namespace_id = 0 or rp.namespace_id = data.namespace_id) and (rp.address_id = data.signer_id OR rp.address_id = 0)
     )
     select 
         avg(size) as avg_size, 
