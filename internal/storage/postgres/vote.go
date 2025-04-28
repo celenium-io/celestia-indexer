@@ -28,8 +28,16 @@ func (v *Vote) ByProposalId(ctx context.Context, proposalId uint64, fltrs storag
 	query := v.DB().NewSelect().
 		Model(&votes).
 		Where("proposal_id = ?", proposalId).
-		Relation("Voter").
-		Relation("Validator")
+		ColumnExpr("vote.*").
+		ColumnExpr("validator.id as validator__id").
+		ColumnExpr("validator.cons_address as validator__cons_address").
+		ColumnExpr("validator.moniker as validator__moniker").
+		ColumnExpr("address.address as voter__address").
+		ColumnExpr("celestial.id as voter__celestials__id").
+		ColumnExpr("celestial.image_url as voter__celestials__image_url").
+		Join("left join validator on validator.id = vote.validator_id").
+		Join("left join address on address.id = vote.voter_id").
+		Join("left join celestial on celestial.address_id = vote.voter_id and celestial.status = 'PRIMARY'")
 
 	query = limitScope(query, fltrs.Limit)
 	if fltrs.Offset > 0 {
@@ -42,7 +50,8 @@ func (v *Vote) ByProposalId(ctx context.Context, proposalId uint64, fltrs storag
 
 	if fltrs.VoterType == types.VoterTypeValidator {
 		query = query.Where("validator_id = ?", 0)
-	} else {
+	}
+	if fltrs.VoterType == types.VoterTypeAddress {
 		query = query.Where("validator_id != ?", 0)
 	}
 
@@ -57,8 +66,16 @@ func (v *Vote) ByVoterId(ctx context.Context, voterId uint64, fltrs storage.Vote
 	query := v.DB().NewSelect().
 		Model(&votes).
 		Where("voter_id = ?", voterId).
-		Relation("Voter").
-		Relation("Validator")
+		ColumnExpr("vote.*").
+		ColumnExpr("validator.id as validator__id").
+		ColumnExpr("validator.cons_address as validator__cons_address").
+		ColumnExpr("validator.moniker as validator__moniker").
+		ColumnExpr("address.address as voter__address").
+		ColumnExpr("celestial.id as voter__celestials__id").
+		ColumnExpr("celestial.image_url as voter__celestials__image_url").
+		Join("left join validator on validator.id = vote.validator_id").
+		Join("left join address on address.id = vote.voter_id").
+		Join("left join celestial on celestial.address_id = vote.voter_id and celestial.status = 'PRIMARY'")
 
 	query = limitScope(query, fltrs.Limit)
 	if fltrs.Offset > 0 {
@@ -76,8 +93,16 @@ func (v *Vote) ByValidatorId(ctx context.Context, validatorId uint64, fltrs stor
 	query := v.DB().NewSelect().
 		Model(&votes).
 		Where("validator_id = ?", validatorId).
-		Relation("Voter").
-		Relation("Validator")
+		ColumnExpr("vote.*").
+		ColumnExpr("validator.id as validator__id").
+		ColumnExpr("validator.cons_address as validator__cons_address").
+		ColumnExpr("validator.moniker as validator__moniker").
+		ColumnExpr("address.address as voter__address").
+		ColumnExpr("celestial.id as voter__celestials__id").
+		ColumnExpr("celestial.image_url as voter__celestials__image_url").
+		Join("left join validator on validator.id = vote.validator_id").
+		Join("left join address on address.id = vote.voter_id").
+		Join("left join celestial on celestial.address_id = vote.voter_id and celestial.status = 'PRIMARY'")
 
 	query = limitScope(query, fltrs.Limit)
 	if fltrs.Offset > 0 {

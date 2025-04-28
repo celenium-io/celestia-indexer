@@ -21,7 +21,7 @@ type Vote struct {
 	VoterId    uint64           `example:"1"                         format:"int64"     json:"voter_id"     swaggertype:"integer"`
 	ProposalId uint64           `example:"2"                         format:"int64"     json:"proposal_id"  swaggertype:"integer"`
 
-	Voter     *ShortAddress   `json:"proposer,omitempty"`
+	Voter     *ShortAddress   `json:"voter,omitempty"`
 	Validator *ShortValidator `json:"validator,omitempty"`
 	Proposal  Proposal        `json:"-"`
 }
