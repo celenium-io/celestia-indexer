@@ -166,3 +166,72 @@ func TestKeyValidator_Validate(t *testing.T) {
 		require.False(t, ok)
 	})
 }
+
+func TestValidateRollupProvider(t *testing.T) {
+	t.Run("all fields are filled", func(t *testing.T) {
+		req := createRollupRequest{
+			Name:        "name",
+			Description: "description",
+			Logo:        "https://celenium.io/",
+			Providers: []rollupProvider{
+				{
+					Namespace: "AAAAAAAAAAAAAAAAAAAAAAAAALt7GEYP9l+FgiU=",
+					Address:   "celestia1q58cnwjk6mftzh48hw76wdf27zs5vf5mys9ujz",
+				},
+			},
+		}
+
+		v := NewCelestiaApiValidator()
+		err := v.Validate(req)
+		require.NoError(t, err)
+	})
+
+	t.Run("only address is filled", func(t *testing.T) {
+		req := createRollupRequest{
+			Name:        "name",
+			Description: "description",
+			Logo:        "https://celenium.io/",
+			Providers: []rollupProvider{
+				{
+					Address: "celestia1q58cnwjk6mftzh48hw76wdf27zs5vf5mys9ujz",
+				},
+			},
+		}
+
+		v := NewCelestiaApiValidator()
+		err := v.Validate(req)
+		require.NoError(t, err)
+	})
+
+	t.Run("only namespace is filled", func(t *testing.T) {
+		req := createRollupRequest{
+			Name:        "name",
+			Description: "description",
+			Logo:        "https://celenium.io/",
+			Providers: []rollupProvider{
+				{
+					Namespace: "AAAAAAAAAAAAAAAAAAAAAAAAALt7GEYP9l+FgiU=",
+				},
+			},
+		}
+
+		v := NewCelestiaApiValidator()
+		err := v.Validate(req)
+		require.NoError(t, err)
+	})
+
+	t.Run("empty", func(t *testing.T) {
+		req := createRollupRequest{
+			Name:        "name",
+			Description: "description",
+			Logo:        "https://celenium.io/",
+			Providers: []rollupProvider{
+				{},
+			},
+		}
+
+		v := NewCelestiaApiValidator()
+		err := v.Validate(req)
+		require.Error(t, err)
+	})
+}

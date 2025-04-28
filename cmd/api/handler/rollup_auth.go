@@ -60,12 +60,12 @@ type createRollupRequest struct {
 	VM          string           `json:"vm"          validate:"omitempty"`
 	Provider    string           `json:"provider"    validate:"omitempty"`
 	SettledOn   string           `json:"settled_on"  validate:"omitempty"`
-	Providers   []rollupProvider `json:"providers"   validate:"required,min=1"`
+	Providers   []rollupProvider `json:"providers"   validate:"required,min=1,dive"`
 }
 
 type rollupProvider struct {
 	Namespace string `json:"namespace" validate:"omitempty,base64,namespace"`
-	Address   string `json:"address"   validate:"required,address"`
+	Address   string `json:"address"   validate:"omitempty,address"`
 }
 
 func (handler RollupAuthHandler) Create(c echo.Context) error {
@@ -143,18 +143,20 @@ func (handler RollupAuthHandler) createProviders(ctx context.Context, rollupId u
 	providers := make([]storage.RollupProvider, len(data))
 	for i := range data {
 		providers[i].RollupId = rollupId
-		_, hashAddress, err := types.Address(data[i].Address).Decode()
-		if err != nil {
-			return nil, err
-		}
-		address, err := handler.address.ByHash(ctx, hashAddress)
-		if err != nil {
-			if handler.address.IsNoRows(err) {
-				return nil, errors.Wrap(errUnknownAddress, data[i].Address)
+		if data[i].Address != "" {
+			_, hashAddress, err := types.Address(data[i].Address).Decode()
+			if err != nil {
+				return nil, err
 			}
-			return nil, err
+			address, err := handler.address.ByHash(ctx, hashAddress)
+			if err != nil {
+				if handler.address.IsNoRows(err) {
+					return nil, errors.Wrap(errUnknownAddress, data[i].Address)
+				}
+				return nil, err
+			}
+			providers[i].AddressId = address.Id
 		}
-		providers[i].AddressId = address.Id
 
 		if data[i].Namespace != "" {
 			hashNs, err := base64.StdEncoding.DecodeString(data[i].Namespace)
@@ -194,7 +196,7 @@ type updateRollupRequest struct {
 	VM          string           `json:"vm"          validate:"omitempty"`
 	SettledOn   string           `json:"settled_on"  validate:"omitempty"`
 	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
-	Providers   []rollupProvider `json:"providers"   validate:"omitempty,min=1"`
+	Providers   []rollupProvider `json:"providers"   validate:"omitempty,min=1,dive"`
 	Tags        []string         `json:"tags"        validate:"omitempty"`
 }
 

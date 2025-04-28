@@ -129,7 +129,7 @@ func (r *Rollup) Namespaces(ctx context.Context, rollupId uint64, limit, offset 
 	query := r.DB().NewSelect().
 		TableExpr("rollup_stats_by_month as r").
 		ColumnExpr("distinct r.namespace_id").
-		Join("inner join rollup_provider as rp on rp.address_id = r.signer_id AND (rp.namespace_id = r.namespace_id OR rp.namespace_id = 0)").
+		Join("inner join rollup_provider as rp on (rp.address_id = r.signer_id OR rp.address_id = 0) AND (rp.namespace_id = r.namespace_id OR rp.namespace_id = 0)").
 		Where("rollup_id = ?", rollupId)
 	if offset > 0 {
 		query = query.Offset(offset)
@@ -328,7 +328,7 @@ func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series strin
 func (r *Rollup) AllSeries(ctx context.Context, timeframe storage.Timeframe) (items []storage.RollupHistogramItem, err error) {
 	subQuery := r.DB().NewSelect().
 		ColumnExpr("rp.rollup_id, sum(size) as size, sum(blobs_count) as blobs_count, sum(fee) as fee, time").
-		Join("inner join rollup_provider rp on (rp.namespace_id = 0 or rp.namespace_id = stats.namespace_id) and rp.address_id = signer_id").
+		Join("inner join rollup_provider rp on (rp.namespace_id = 0 or rp.namespace_id = stats.namespace_id) and (rp.address_id = signer_id OR rp.address_id = 0)").
 		Group("rollup_id", "time")
 
 	switch timeframe {
