@@ -304,6 +304,17 @@ func (s *RollupTestSuite) TestGetBlobs() {
 			},
 		}, nil)
 
+	s.rollups.EXPECT().
+		ById(gomock.Any(), uint64(1)).
+		Return(storage.RollupWithStats{
+			Rollup: testRollup,
+			RollupStats: storage.RollupStats{
+				LastActionTime:  testTime,
+				FirstActionTime: testTime,
+			},
+		}, nil).
+		Times(1)
+
 	s.blobs.EXPECT().
 		ByProviders(gomock.Any(), gomock.Any(), gomock.Any()).
 		Return([]storage.BlobLog{

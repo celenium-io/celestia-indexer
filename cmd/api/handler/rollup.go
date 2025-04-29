@@ -327,12 +327,19 @@ func (handler RollupHandler) GetBlobs(c echo.Context) error {
 		return c.JSON(http.StatusOK, []any{})
 	}
 
+	rollup, err := handler.rollups.ById(c.Request().Context(), req.Id)
+	if err != nil {
+		return handleError(c, err, handler.rollups)
+	}
+
 	blobs, err := handler.blobs.ByProviders(c.Request().Context(), providers, storage.BlobLogFilters{
 		Limit:  req.Limit,
 		Offset: req.Offset,
 		Sort:   pgSort(req.Sort),
 		SortBy: req.SortBy,
 		Joins:  *req.Joins,
+		To:     rollup.LastActionTime,
+		From:   rollup.FirstActionTime,
 	})
 	if err != nil {
 		return handleError(c, err, handler.rollups)
