@@ -78,13 +78,8 @@ func (v *Vote) ByVoterId(ctx context.Context, voterId uint64, fltrs storage.Vote
 		ColumnExpr("validator.id as validator__id").
 		ColumnExpr("validator.cons_address as validator__cons_address").
 		ColumnExpr("validator.moniker as validator__moniker").
-		ColumnExpr("address.address as voter__address").
-		ColumnExpr("celestial.id as voter__celestials__id").
-		ColumnExpr("celestial.image_url as voter__celestials__image_url").
 		OrderExpr("votes.time desc").
-		Join("left join validator on validator.id = votes.validator_id").
-		Join("left join address on address.id = votes.voter_id").
-		Join("left join celestial on celestial.address_id = votes.voter_id and celestial.status = 'PRIMARY'")
+		Join("left join validator on validator.id = votes.validator_id")
 	err = query.Scan(ctx, &votes)
 
 	return
@@ -104,14 +99,10 @@ func (v *Vote) ByValidatorId(ctx context.Context, validatorId uint64, fltrs stor
 	query := v.DB().NewSelect().
 		TableExpr("(?) as votes", subQuery).
 		ColumnExpr("votes.*").
-		ColumnExpr("validator.id as validator__id").
-		ColumnExpr("validator.cons_address as validator__cons_address").
-		ColumnExpr("validator.moniker as validator__moniker").
 		ColumnExpr("address.address as voter__address").
 		ColumnExpr("celestial.id as voter__celestials__id").
 		ColumnExpr("celestial.image_url as voter__celestials__image_url").
 		OrderExpr("votes.time desc").
-		Join("left join validator on validator.id = votes.validator_id").
 		Join("left join address on address.id = votes.voter_id").
 		Join("left join celestial on celestial.address_id = votes.voter_id and celestial.status = 'PRIMARY'")
 	err = query.Scan(ctx, &votes)

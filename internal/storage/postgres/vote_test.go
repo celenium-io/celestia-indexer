@@ -81,7 +81,6 @@ func (s *StorageTestSuite) TestVoteByVoterId() {
 	s.Require().EqualValues(1000, vote.Height)
 	s.Require().EqualValues(types.VoteOptionNo, vote.Option)
 	s.Require().Nil(vote.Validator)
-	s.Require().EqualValues("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", vote.Voter.Address)
 }
 
 func (s *StorageTestSuite) TestVoteByValidatorId() {
@@ -99,9 +98,6 @@ func (s *StorageTestSuite) TestVoteByValidatorId() {
 	s.Require().EqualValues(3, vote.Id)
 	s.Require().EqualValues(1000, vote.Height)
 	s.Require().EqualValues(types.VoteOptionAbstain, vote.Option)
-	s.Require().NotNil(vote.Validator)
-	s.Require().EqualValues("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", vote.Validator.ConsAddress)
-	s.Require().EqualValues("Conqueror", vote.Validator.Moniker)
 }
 
 func (s *StorageTestSuite) TestVoteByValidatorIdNoResult() {
