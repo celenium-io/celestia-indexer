@@ -753,6 +753,7 @@ func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 		SettledOn:      "Ethereum",
 		Tags:           []string{"tag"},
 		Links:          []string{testLink},
+		Color:          "#333",
 	}
 	err = tx.SaveRollup(ctx, rollup)
 	s.Require().NoError(err)
@@ -781,6 +782,7 @@ func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 	s.Require().EqualValues("stack", newRollup.Stack)
 	s.Require().EqualValues("finance", newRollup.Category)
 	s.Require().EqualValues("Ethereum", newRollup.SettledOn)
+	s.Require().EqualValues("#333", newRollup.Color)
 	s.Require().Len(newRollup.Links, 1)
 	s.Require().Len(newRollup.Tags, 1)
 

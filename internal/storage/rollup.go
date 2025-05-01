@@ -74,6 +74,7 @@ type Rollup struct {
 	Category       types.RollupCategory `bun:"category,type:rollup_category" comment:"Category of rollup"`
 	Tags           []string             `bun:"tags,array"`
 	VM             string               `bun:"vm"                            comment:"Virtual machine"`
+	Color          string               `bun:"color"                         comment:"Roolup brand color"`
 	Links          []string             `bun:"links,array"                   comment:"Other links to rollup related sites"`
 	Verified       bool                 `bun:"verified"`
 
@@ -104,7 +105,8 @@ func (r Rollup) IsEmpty() bool {
 		r.Type == "" &&
 		r.VM == "" &&
 		r.DeFiLama == "" &&
-		r.SettledOn == ""
+		r.SettledOn == "" &&
+		r.Color == ""
 }
 
 type RollupWithStats struct {

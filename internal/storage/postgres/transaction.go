@@ -668,6 +668,9 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 	if rollup.SettledOn != "" {
 		query = query.Set("settled_on = ?", rollup.SettledOn)
 	}
+	if rollup.Color != "" {
+		query = query.Set("color = ?", rollup.Color)
+	}
 
 	query = query.Set("verified = ?", rollup.Verified)
 

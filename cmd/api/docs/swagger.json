@@ -6306,6 +6306,11 @@
                     "format": "string",
                     "example": "nft"
                 },
+                "color": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "#123456"
+                },
                 "compression": {
                     "type": "string",
                     "format": "string",
@@ -6361,6 +6366,11 @@
                     "type": "string",
                     "format": "string",
                     "example": "name"
+                },
+                "settled_on": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Ethereum"
                 },
                 "slug": {
                     "type": "string",
@@ -6534,6 +6544,11 @@
                     "format": "string",
                     "example": "nft"
                 },
+                "color": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "#123456"
+                },
                 "compression": {
                     "type": "string",
                     "format": "string",
@@ -6604,6 +6619,11 @@
                     "format": "string",
                     "example": "name"
                 },
+                "settled_on": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Ethereum"
+                },
                 "slug": {
                     "type": "string",
                     "format": "string",
@@ -6673,6 +6693,11 @@
                     "type": "string",
                     "format": "string",
                     "example": "nft"
+                },
+                "color": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "#123456"
                 },
                 "compression": {
                     "type": "string",
@@ -6754,6 +6779,11 @@
                     "type": "string",
                     "format": "string",
                     "example": "name"
+                },
+                "settled_on": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Ethereum"
                 },
                 "size": {
                     "type": "integer",

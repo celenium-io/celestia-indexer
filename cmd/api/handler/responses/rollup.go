@@ -29,6 +29,7 @@ type RollupWithStats struct {
 	VM             string `example:"evm"                                       format:"string"  json:"vm,omitempty"          swaggertype:"string"`
 	Provider       string `example:"name"                                      format:"string"  json:"provider,omitempty"    swaggertype:"string"`
 	SettledOn      string `example:"Ethereum"                                  format:"string"  json:"settled_on,omitempty"  swaggertype:"string"`
+	Color          string `example:"#123456"                                   format:"string"  json:"color,omitempty"       swaggertype:"string"`
 	Compression    string `example:"zip"                                       format:"string"  json:"compression,omitempty" swaggertype:"string"`
 
 	BlobsCount    int64     `example:"2"                         format:"integer"   json:"blobs_count"        swaggertype:"integer"`
@@ -100,6 +101,7 @@ type Rollup struct {
 	Compression    string `example:"zip"                             format:"string"  json:"compression,omitempty" swaggertype:"string"`
 	VM             string `example:"evm"                             format:"string"  json:"vm,omitempty"          swaggertype:"string"`
 	SettledOn      string `example:"Ethereum"                        format:"string"  json:"settled_on,omitempty"  swaggertype:"string"`
+	Color          string `example:"#123456"                         format:"string"  json:"color,omitempty"       swaggertype:"string"`
 
 	Tags  []string `json:"tags,omitempty"`
 	Links []string `json:"links,omitempty"`
@@ -170,6 +172,7 @@ type RollupWithDayStats struct {
 	Compression    string `example:"zip"                                       format:"string"  json:"compression,omitempty" swaggertype:"string"`
 	VM             string `example:"evm"                                       format:"string"  json:"vm,omitempty"          swaggertype:"string"`
 	SettledOn      string `example:"Ethereum"                                  format:"string"  json:"settled_on,omitempty"  swaggertype:"string"`
+	Color          string `example:"#123456"                                   format:"string"  json:"color,omitempty"       swaggertype:"string"`
 
 	AvgSize        int64   `example:"100" format:"integer" json:"avg_size"        swaggertype:"integer"`
 	BlobsCount     int64   `example:"100" format:"integer" json:"blobs_count"     swaggertype:"integer"`
