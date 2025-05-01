@@ -14,6 +14,7 @@
   category: finance
   verified: true
   settled_on: Arbitrum
+  color: "#888"
 - id: 2
   name: Rollup 2
   description: The second
@@ -29,6 +30,7 @@
   category: gaming
   verified: true
   settled_on: Arbitrum
+  color: "#123"
 - id: 3
   name: Rollup 3
   description: The third
@@ -45,6 +47,7 @@
   verified: true
   provider: provider 1
   settled_on: Arbitrum
+  color: "#222"
 - id: 4
   name: Hidden Rollup 
   description: The fourth
@@ -61,3 +64,4 @@
   tags: RAW='{hidden}'
   provider: provider 2
   settled_on: Arbitrum
+  color: "#111"

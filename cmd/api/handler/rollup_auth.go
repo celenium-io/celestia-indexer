@@ -60,6 +60,7 @@ type createRollupRequest struct {
 	VM          string           `json:"vm"          validate:"omitempty"`
 	Provider    string           `json:"provider"    validate:"omitempty"`
 	SettledOn   string           `json:"settled_on"  validate:"omitempty"`
+	Color       string           `json:"color"       validate:"omitempty,hexcolor"`
 	Providers   []rollupProvider `json:"providers"   validate:"required,min=1,dive"`
 }
 
@@ -112,6 +113,7 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRo
 		Compression:    req.Compression,
 		Provider:       req.Provider,
 		SettledOn:      req.SettledOn,
+		Color:          req.Color,
 		VM:             req.VM,
 		Type:           enums.RollupType(req.Type),
 		Category:       enums.RollupCategory(req.Category),
@@ -195,6 +197,7 @@ type updateRollupRequest struct {
 	Provider    string           `json:"provider"    validate:"omitempty"`
 	VM          string           `json:"vm"          validate:"omitempty"`
 	SettledOn   string           `json:"settled_on"  validate:"omitempty"`
+	Color       string           `json:"color"       validate:"omitempty,hexcolor"`
 	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
 	Providers   []rollupProvider `json:"providers"   validate:"omitempty,min=1,dive"`
 	Tags        []string         `json:"tags"        validate:"omitempty"`
@@ -246,6 +249,7 @@ func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRo
 		Compression:    req.Compression,
 		Provider:       req.Provider,
 		SettledOn:      req.SettledOn,
+		Color:          req.Color,
 		VM:             req.VM,
 		Type:           enums.RollupType(req.Type),
 		Category:       enums.RollupCategory(req.Category),
