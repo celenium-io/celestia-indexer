@@ -78,6 +78,7 @@ func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 		VM:             r.VM,
 		Fee:            r.Fee.StringFixed(0),
 		Tags:           r.Tags,
+		Color:          r.Color,
 	}
 }
 
@@ -130,6 +131,7 @@ func NewRollup(r *storage.Rollup) Rollup {
 		VM:             r.VM,
 		SettledOn:      r.SettledOn,
 		Tags:           r.Tags,
+		Color:          r.Color,
 	}
 }
 
@@ -216,6 +218,7 @@ func NewRollupWithDayStats(r storage.RollupWithDayStats) RollupWithDayStats {
 		TotalFee:       r.TotalFee.String(),
 		MBPrice:        r.MBPrice.String(),
 		FeePerPfb:      decimal.Zero.String(),
+		Color:          r.Color,
 	}
 
 	if r.PfbCount > 0 {

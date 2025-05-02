@@ -37,6 +37,7 @@ var (
 		Type:        types.RollupTypeSettled,
 		Stack:       "stack 1, stack 2",
 		Provider:    "Provider 1",
+		Color:       "#123456",
 	}
 	testRollupWithStats = storage.RollupWithStats{
 		Rollup: testRollup,
@@ -154,6 +155,7 @@ func (s *RollupTestSuite) TestLeaderboard() {
 		s.Require().EqualValues(0.2, rollup.FeePct)
 		s.Require().EqualValues(0.3, rollup.SizePct)
 		s.Require().EqualValues(0.1, rollup.DAPct)
+		s.Require().EqualValues("#123456", rollup.Color)
 	}
 }
 
@@ -215,6 +217,7 @@ func (s *RollupTestSuite) TestLeaderboardDay() {
 		s.Require().EqualValues("image.png", rollup.Logo)
 		s.Require().EqualValues("test-rollup", rollup.Slug)
 		s.Require().EqualValues(100, rollup.BlobsCount)
+		s.Require().EqualValues("#123456", rollup.Color)
 	}
 }
 
@@ -248,6 +251,7 @@ func (s *RollupTestSuite) TestGet() {
 	s.Require().EqualValues(0.1, rollup.BlobsCountPct)
 	s.Require().EqualValues(0.2, rollup.FeePct)
 	s.Require().EqualValues(0.3, rollup.SizePct)
+	s.Require().EqualValues("#123456", rollup.Color)
 }
 
 func (s *RollupTestSuite) TestGetNamespaces() {
