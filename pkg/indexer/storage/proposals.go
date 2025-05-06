@@ -6,6 +6,7 @@ package storage
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -333,6 +334,20 @@ func constantsHandle(change paramsV1Beta.ParamChange) ([]storage.Constant, error
 			constants = append(constants, c...)
 		}
 
+	case types.ModuleNameBlob:
+		val := value
+		if key == "GovMaxSquareSize" {
+			val, err = strconv.Unquote(value)
+			if err != nil {
+				return nil, errors.Wrap(err, value)
+			}
+		}
+
+		constants = append(constants, storage.Constant{
+			Module: moduleName,
+			Name:   strcase.SnakeCase(key),
+			Value:  val,
+		})
 	default:
 
 		constants = append(constants, storage.Constant{

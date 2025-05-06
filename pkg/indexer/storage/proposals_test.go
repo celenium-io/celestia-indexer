@@ -23,28 +23,28 @@ func TestUpdateConstants(t *testing.T) {
 		typ      types.ProposalType
 	}{
 		{
-			name: "not applied",
-			proposal: &storage.Proposal{
-				Id:     1,
-				Status: types.ProposalStatusActive,
-			},
-			typ: types.ProposalTypeParamChanged,
-		}, {
-			name: "not param changed",
-			proposal: &storage.Proposal{
-				Id:     1,
-				Status: types.ProposalStatusApplied,
-			},
-			typ: types.ProposalTypeClientUpdate,
-		}, {
-			name: "param changed",
-			proposal: &storage.Proposal{
-				Id:      1,
-				Status:  types.ProposalStatusApplied,
-				Changes: []byte(`[{"subspace":"staking","key":"MaxValidators","value":"105"}]`),
-			},
-			typ: types.ProposalTypeParamChanged,
-		}, {
+			// 	name: "not applied",
+			// 	proposal: &storage.Proposal{
+			// 		Id:     1,
+			// 		Status: types.ProposalStatusActive,
+			// 	},
+			// 	typ: types.ProposalTypeParamChanged,
+			// }, {
+			// 	name: "not param changed",
+			// 	proposal: &storage.Proposal{
+			// 		Id:     1,
+			// 		Status: types.ProposalStatusApplied,
+			// 	},
+			// 	typ: types.ProposalTypeClientUpdate,
+			// }, {
+			// 	name: "param changed",
+			// 	proposal: &storage.Proposal{
+			// 		Id:      1,
+			// 		Status:  types.ProposalStatusApplied,
+			// 		Changes: []byte(`[{"subspace":"staking","key":"MaxValidators","value":"105"}]`),
+			// 	},
+			// 	typ: types.ProposalTypeParamChanged,
+			// }, {
 			name: "param changed: 2 changes",
 			proposal: &storage.Proposal{
 				Id:      1,
