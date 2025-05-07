@@ -35,7 +35,11 @@ func sortScope(q *bun.SelectQuery, field string, sort sdk.SortOrder) *bun.Select
 
 func txFilter(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
 	query = limitScope(query, fltrs.Limit)
-	query = sortScope(query, "id", fltrs.Sort)
+
+	if fltrs.Sort != sdk.SortOrderAsc && fltrs.Sort != sdk.SortOrderDesc {
+		fltrs.Sort = sdk.SortOrderAsc
+	}
+	query = query.OrderExpr("time ?0, id ?0", bun.Safe(fltrs.Sort))
 
 	if !fltrs.MessageTypes.Empty() {
 		query = query.Where("bit_count(message_types & ?::bit(76)) > 0", fltrs.MessageTypes)
