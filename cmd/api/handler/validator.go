@@ -22,6 +22,7 @@ type ValidatorHandler struct {
 	delegations     storage.IDelegation
 	constants       storage.IConstant
 	jails           storage.IJail
+	votes           storage.IVote
 	state           storage.IState
 	indexerName     string
 }
@@ -33,6 +34,7 @@ func NewValidatorHandler(
 	delegations storage.IDelegation,
 	constants storage.IConstant,
 	jails storage.IJail,
+	votes storage.IVote,
 	state storage.IState,
 	indexerName string,
 ) *ValidatorHandler {
@@ -43,6 +45,7 @@ func NewValidatorHandler(
 		delegations:     delegations,
 		constants:       constants,
 		jails:           jails,
+		votes:           votes,
 		state:           state,
 		indexerName:     indexerName,
 	}
@@ -352,4 +355,44 @@ func (handler *ValidatorHandler) Count(c echo.Context) error {
 		Active:   active,
 		Inactive: state.TotalValidators - jailed - active,
 	})
+}
+
+// Votes godoc
+//
+//	@Summary		Get list of votes for validator
+//	@Description	Get list of votes for validator
+//	@Tags			validator
+//	@ID				validator-votes
+//	@Param			id		path	integer	true	"Internal validator id"
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Vote
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/validators/{id}/votes [get]
+func (handler *ValidatorHandler) Votes(c echo.Context) error {
+	req, err := bindAndValidate[validatorPageableRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	jails, err := handler.votes.ByValidatorId(
+		c.Request().Context(),
+		req.Id,
+		storage.VoteFilters{
+			Limit:  req.Limit,
+			Offset: req.Offset,
+		},
+	)
+	if err != nil {
+		return handleError(c, err, handler.delegations)
+	}
+
+	response := make([]responses.Vote, len(jails))
+	for i := range response {
+		response[i] = responses.NewVote(jails[i])
+	}
+	return returnArray(c, response)
 }

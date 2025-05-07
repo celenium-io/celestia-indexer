@@ -540,6 +540,84 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// Proposal
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Proposal)(nil)).
+			Index("proposal_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Proposal)(nil)).
+			Index("proposal_proposer_id_idx").
+			Column("proposer_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Proposal)(nil)).
+			Index("proposal_status_idx").
+			Column("status").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Proposal)(nil)).
+			Index("proposal_type_idx").
+			Column("type").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// Vote
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Vote)(nil)).
+			Index("vote_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Vote)(nil)).
+			Index("vote_proposal_id_idx").
+			Column("proposal_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Vote)(nil)).
+			Index("vote_voter_id_idx").
+			Column("voter_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Vote)(nil)).
+			Index("vote_validator_id_idx").
+			Column("validator_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Vote)(nil)).
+			Index("vote_option_idx").
+			Column("option").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

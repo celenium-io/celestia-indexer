@@ -2702,6 +2702,87 @@
                 }
             }
         },
+        "/proposal": {
+            "get": {
+                "description": "List proposal info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "proposal"
+                ],
+                "summary": "List proposal info",
+                "operationId": "list-proposal",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Proposer celestia address",
+                        "name": "proposer",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated proposal status list",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated proposal type list",
+                        "name": "type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Proposal"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/rollup": {
             "get": {
                 "description": "List rollups info",
@@ -5747,6 +5828,18 @@
                         "type": "string"
                     }
                 },
+                "proposal_status": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "proposal_type": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "rollup_type": {
                     "type": "array",
                     "items": {
@@ -6261,6 +6354,152 @@
             "type": "object",
             "additionalProperties": {
                 "type": "string"
+            }
+        },
+        "responses.Proposal": {
+            "type": "object",
+            "properties": {
+                "abstain": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "abstain_addrs": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "abstain_vals": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "abstain_voting_power": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "1000000000"
+                },
+                "activation_time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "changes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "deposit": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "1000000000"
+                },
+                "deposit_time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "description": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Some proposal description"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "metadata": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "metadata"
+                },
+                "no": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "no_addrs": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "no_vals": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "no_voting_power": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "1000000000"
+                },
+                "no_with_veto": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "no_with_veto_addrs": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "no_with_veto_vals": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "no_with_veto_voting_power": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "1000000000"
+                },
+                "proposer": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "status": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "active"
+                },
+                "title": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Proposal title"
+                },
+                "type": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "param_changed"
+                },
+                "votes_count": {
+                    "type": "integer",
+                    "example": 12354
+                },
+                "voting_power": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "1000000000"
+                },
+                "yes": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "yes_addrs": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "yes_vals": {
+                    "type": "integer",
+                    "example": 1234
+                },
+                "yes_voting_power": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "1000000000"
+                }
             }
         },
         "responses.Redelegation": {
@@ -7029,6 +7268,11 @@
                     "type": "integer",
                     "format": "string",
                     "example": 312
+                },
+                "total_proposals": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 56789
                 },
                 "total_stake": {
                     "type": "string",

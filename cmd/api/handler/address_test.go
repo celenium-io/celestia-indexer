@@ -54,6 +54,7 @@ type AddressTestSuite struct {
 	vestings      *mock.MockIVestingAccount
 	grants        *mock.MockIGrant
 	celestials    *celestialMock.MockICelestial
+	votes         *mock.MockIVote
 	state         *mock.MockIState
 	echo          *echo.Echo
 	handler       *AddressHandler
@@ -75,8 +76,9 @@ func (s *AddressTestSuite) SetupSuite() {
 	s.vestings = mock.NewMockIVestingAccount(s.ctrl)
 	s.grants = mock.NewMockIGrant(s.ctrl)
 	s.celestials = celestialMock.NewMockICelestial(s.ctrl)
+	s.votes = mock.NewMockIVote(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.vestings, s.grants, s.celestials, s.state, testIndexerName)
+	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.vestings, s.grants, s.celestials, s.votes, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -798,4 +800,70 @@ func (s *AddressTestSuite) TestCelestials() {
 		s.Require().EqualValues(storageResponse[i].ImageUrl, celestials[i].ImageUrl)
 		s.Require().EqualValues("VERIFIED", celestials[i].Status)
 	}
+}
+
+func (s *AddressTestSuite) TestVotes() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/address/:hash/votes")
+	c.SetParamNames("hash")
+	c.SetParamValues(testAddress)
+
+	s.address.EXPECT().
+		IdByAddress(gomock.Any(), testAddress).
+		Return(123, nil)
+
+	s.votes.EXPECT().
+		ByVoterId(gomock.Any(), uint64(123), storage.VoteFilters{
+			Limit:  10,
+			Offset: 0,
+		}).
+		Return([]storage.Vote{
+			{
+				Id:      1,
+				Height:  1000,
+				Weight:  decimal.NewFromFloat(1),
+				Option:  types.VoteOptionYes,
+				VoterId: 1,
+				Voter: &storage.Address{
+					Id:         111,
+					Hash:       testHashAddress,
+					Address:    testAddress,
+					Height:     333,
+					LastHeight: 333,
+					Balance: storage.Balance{
+						Currency:  "utia",
+						Spendable: decimal.RequireFromString("100"),
+						Delegated: decimal.RequireFromString("1"),
+						Unbonding: decimal.RequireFromString("2"),
+					},
+					Celestials: &celestials.Celestial{
+						Id:       "name",
+						ImageUrl: "image",
+					},
+				},
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Votes(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var votes []responses.Vote
+	err := json.NewDecoder(rec.Body).Decode(&votes)
+	s.Require().NoError(err)
+	s.Require().Len(votes, 1)
+	s.Require().EqualValues(1, votes[0].Id)
+	s.Require().EqualValues(1000, votes[0].Height)
+	s.Require().EqualValues(decimal.NewFromFloat(1), votes[0].Weight)
+	s.Require().EqualValues(types.VoteOptionYes, votes[0].Option)
+	s.Require().EqualValues(1, votes[0].VoterId)
+	s.Require().Nil(votes[0].Validator)
+	s.Require().NotNil(votes[0].Voter)
+	s.Require().NotNil(votes[0].Voter.Celestials)
+	s.Require().EqualValues("image", votes[0].Voter.Celestials.ImageUrl)
 }

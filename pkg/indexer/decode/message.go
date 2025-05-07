@@ -155,9 +155,23 @@ func Message(
 
 	// gov module
 	case *cosmosGovTypesV1.MsgSubmitProposal:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitProposal(ctx, typedMsg.Proposer)
+		var msgs []any
+		d.Msg.Type, d.Msg.Addresses, msgs, d.Msg.Proposal, err = handle.MsgSubmitProposalV1(ctx, cfg.Codec, status, typedMsg)
+		if err != nil {
+			return d, err
+		}
+		if len(msgs) > 0 {
+			d.Msg.Data["Messages"] = msgs
+		}
 	case *cosmosGovTypesV1Beta1.MsgSubmitProposal:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitProposal(ctx, typedMsg.Proposer)
+		var content any
+		d.Msg.Type, d.Msg.Addresses, content, d.Msg.Proposal, err = handle.MsgSubmitProposalV1Beta(ctx, cfg.Codec, status, typedMsg)
+		if err != nil {
+			return d, err
+		}
+		if content != nil {
+			d.Msg.Data["Content"] = content
+		}
 	case *cosmosGovTypesV1.MsgExecLegacyContent:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgExecLegacyContent(ctx, typedMsg)
 	case *cosmosGovTypesV1.MsgVote:

@@ -257,3 +257,14 @@ func NewSlash(m map[string]any) (body Slash, err error) {
 	body.Address = decoder.StringFromMap(m, "address")
 	return
 }
+
+type ProposalStatus struct {
+	Id     uint64
+	Result string
+}
+
+func NewProposalStatus(m map[string]any) (body ProposalStatus, err error) {
+	body.Result = decoder.StringFromMap(m, "proposal_result")
+	body.Id, err = decoder.Uint64FromMap(m, "proposal_id")
+	return
+}

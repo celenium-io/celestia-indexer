@@ -40,6 +40,18 @@ func NewCelestiaApiValidator() *CelestiaApiValidator {
 	if err := v.RegisterValidation("type", typeValidator()); err != nil {
 		panic(err)
 	}
+	if err := v.RegisterValidation("proposal_status", proposalStatusValidator()); err != nil {
+		panic(err)
+	}
+	if err := v.RegisterValidation("proposal_type", proposalTypeValidator()); err != nil {
+		panic(err)
+	}
+	if err := v.RegisterValidation("vote_option", voteOptionValidator()); err != nil {
+		panic(err)
+	}
+	if err := v.RegisterValidation("voter_type", voterTypeValidator()); err != nil {
+		panic(err)
+	}
 	return &CelestiaApiValidator{validator: v}
 }
 
@@ -129,6 +141,34 @@ func categoryValidator() validator.Func {
 func typeValidator() validator.Func {
 	return func(fl validator.FieldLevel) bool {
 		_, err := types.ParseRollupType(fl.Field().String())
+		return err == nil
+	}
+}
+
+func proposalStatusValidator() validator.Func {
+	return func(fl validator.FieldLevel) bool {
+		_, err := types.ParseProposalStatus(fl.Field().String())
+		return err == nil
+	}
+}
+
+func proposalTypeValidator() validator.Func {
+	return func(fl validator.FieldLevel) bool {
+		_, err := types.ParseProposalType(fl.Field().String())
+		return err == nil
+	}
+}
+
+func voteOptionValidator() validator.Func {
+	return func(fl validator.FieldLevel) bool {
+		_, err := types.ParseVoteOption(fl.Field().String())
+		return err == nil
+	}
+}
+
+func voterTypeValidator() validator.Func {
+	return func(fl validator.FieldLevel) bool {
+		_, err := types.ParseVoterType(fl.Field().String())
 		return err == nil
 	}
 }

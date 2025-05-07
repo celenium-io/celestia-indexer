@@ -14,6 +14,7 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 
 	models "github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 )
 
@@ -31,7 +32,29 @@ func (tx Transaction) SaveConstants(ctx context.Context, constants ...models.Con
 		return nil
 	}
 
-	_, err := tx.Tx().NewInsert().Model(&constants).Exec(ctx)
+	_, err := tx.Tx().NewInsert().Model(&constants).
+		Column("module", "name", "value").
+		On("CONFLICT (module, name) DO UPDATE").
+		Set("value = EXCLUDED.value").
+		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) UpdateConstants(ctx context.Context, constants ...models.Constant) error {
+	if len(constants) == 0 {
+		return nil
+	}
+
+	values := tx.Tx().NewValues(&constants)
+
+	_, err := tx.Tx().NewUpdate().
+		With("_data", values).
+		Model((*models.Constant)(nil)).
+		TableExpr("_data").
+		Set("value = _data.value").
+		Where("constant.module = _data.module").
+		Where("constant.name = _data.name").
+		Exec(ctx)
 	return err
 }
 
@@ -373,6 +396,128 @@ func (tx Transaction) Jail(ctx context.Context, validators ...*models.Validator)
 	return err
 }
 
+type addedProposal struct {
+	bun.BaseModel `bun:"proposal"`
+	*models.Proposal
+
+	Xmax uint64 `bun:"xmax"`
+}
+
+func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Proposal) (int64, error) {
+	if len(proposals) == 0 {
+		return 0, nil
+	}
+
+	var count int64
+	for i := range proposals {
+		if proposals[i].Type == "" {
+			proposals[i].Type = storageTypes.ProposalTypeText
+		}
+		if proposals[i].Status == "" {
+			proposals[i].Status = storageTypes.ProposalStatusInactive
+		}
+
+		add := addedProposal{
+			Proposal: proposals[i],
+		}
+
+		query := tx.Tx().NewInsert().
+			Column("id", "proposer_id", "height", "created_at", "deposit_time", "activation_time", "status", "type", "title", "description", "deposit", "metadata", "changes", "yes", "no", "no_with_veto", "abstain", "yes_vals", "no_vals", "no_with_veto_vals", "abstain_vals", "yes_addrs", "no_addrs", "no_with_veto_addrs", "abstain_addrs", "votes_count", "voting_power", "yes_voting_power", "no_voting_power", "no_with_veto_voting_power", "abstain_voting_power").
+			Model(&add).
+			On("CONFLICT (id) DO UPDATE")
+
+		if proposals[i].Deposit.IsPositive() {
+			query.Set("deposit = added_proposal.deposit + EXCLUDED.deposit")
+		}
+
+		if !proposals[i].EmptyStatus() {
+			query.Set("status = EXCLUDED.status")
+		}
+
+		if proposals[i].ActivationTime != nil {
+			query.Set("activation_time = EXCLUDED.activation_time")
+		}
+
+		if proposals[i].VotesCount > 0 {
+			query.Set("votes_count = added_proposal.votes_count + EXCLUDED.votes_count")
+		}
+
+		if proposals[i].VotingPower.IsPositive() {
+			query.Set("voting_power = EXCLUDED.voting_power")
+		}
+
+		if proposals[i].Yes > 0 {
+			query.Set("yes = added_proposal.yes + EXCLUDED.yes")
+		}
+		if proposals[i].No > 0 {
+			query.Set("no = added_proposal.no + EXCLUDED.no")
+		}
+		if proposals[i].NoWithVeto > 0 {
+			query.Set("no_with_veto = added_proposal.no_with_veto + EXCLUDED.no_with_veto")
+		}
+		if proposals[i].Abstain > 0 {
+			query.Set("abstain = added_proposal.abstain + EXCLUDED.abstain")
+		}
+
+		if proposals[i].YesValidators > 0 {
+			query.Set("yes_vals = added_proposal.yes_vals + EXCLUDED.yes_vals")
+		}
+		if proposals[i].NoValidators > 0 {
+			query.Set("no_vals = added_proposal.no_vals + EXCLUDED.no_vals")
+		}
+		if proposals[i].NoWithVetoValidators > 0 {
+			query.Set("no_with_veto_vals = added_proposal.no_with_veto_vals + EXCLUDED.no_with_veto_vals")
+		}
+		if proposals[i].AbstainValidators > 0 {
+			query.Set("abstain_vals = added_proposal.abstain_vals + EXCLUDED.abstain_vals")
+		}
+
+		if proposals[i].YesAddress > 0 {
+			query.Set("yes_addrs = added_proposal.yes_addrs + EXCLUDED.yes_addrs")
+		}
+		if proposals[i].NoAddress > 0 {
+			query.Set("no_addrs = added_proposal.no_addrs+ EXCLUDED.no_addrs")
+		}
+		if proposals[i].NoWithVetoAddress > 0 {
+			query.Set("no_with_veto_addrs = added_proposal.no_with_veto_addrs + EXCLUDED.no_with_veto_addrs")
+		}
+		if proposals[i].AbstainAddress > 0 {
+			query.Set("abstain_addrs = added_proposal.abstain_addrs + EXCLUDED.abstain_addrs")
+		}
+
+		if proposals[i].YesVotingPower.IsPositive() {
+			query.Set("yes_voting_power = EXCLUDED.yes_voting_power")
+		}
+		if proposals[i].NoVotingPower.IsPositive() {
+			query.Set("no_voting_power = EXCLUDED.no_voting_power")
+		}
+		if proposals[i].NoWithVetoVotingPower.IsPositive() {
+			query.Set("no_with_veto_voting_power = EXCLUDED.no_with_veto_voting_power")
+		}
+		if proposals[i].AbstainVotingPower.IsPositive() {
+			query.Set("abstain_voting_power = EXCLUDED.abstain_voting_power")
+		}
+
+		if _, err := query.Returning("xmax, id").Exec(ctx); err != nil {
+			return 0, err
+		}
+
+		if add.Xmax == 0 {
+			count++
+		}
+	}
+
+	return count, nil
+}
+
+func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) error {
+	if len(votes) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&votes).Exec(ctx)
+	return err
+}
+
 func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, fraction decimal.Decimal) (balances []models.Balance, err error) {
 	if validatorId == 0 || !fraction.IsPositive() {
 		return nil, nil
@@ -527,6 +672,20 @@ func (tx Transaction) RollbackStakingLogs(ctx context.Context, height types.Leve
 	_, err = tx.Tx().NewDelete().Model(&logs).
 		Where("height = ?", height).
 		Returning("*").
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackProposals(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.Proposal)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackVotes(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.Vote)(nil)).
+		Where("height = ?", height).
 		Exec(ctx)
 	return
 }
@@ -785,4 +944,46 @@ func (tx Transaction) Delegation(ctx context.Context, validatorId, addressId uin
 func (tx Transaction) RefreshLeaderboard(ctx context.Context) error {
 	_, err := tx.Tx().ExecContext(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
 	return err
+}
+
+func (tx Transaction) ActiveProposals(ctx context.Context) (proposals []models.Proposal, err error) {
+	err = tx.Tx().NewSelect().Model(&proposals).
+		Where("status = ?", storageTypes.ProposalStatusActive).
+		Scan(ctx)
+	return
+}
+
+func (tx Transaction) Validators(ctx context.Context) (validators []models.Validator, err error) {
+	err = tx.Tx().NewSelect().Model(&validators).
+		Column("id", "stake").
+		Scan(ctx)
+	return
+}
+
+func (tx Transaction) ProposalVotes(ctx context.Context, proposalId uint64, limit, offset int) (votes []models.Vote, err error) {
+	query := tx.Tx().NewSelect().Model(&votes).
+		Where("proposal_id = ?", proposalId)
+
+	query = limitScope(query, limit)
+	if offset > 0 {
+		query = query.Offset(offset)
+	}
+
+	err = query.Scan(ctx)
+	return
+}
+
+func (tx Transaction) AddressDelegations(ctx context.Context, addressId uint64) (val []models.Delegation, err error) {
+	err = tx.Tx().NewSelect().Model(&val).
+		Where("address_id = ?", addressId).
+		Scan(ctx)
+	return
+}
+
+func (tx Transaction) Proposal(ctx context.Context, id uint64) (proposal models.Proposal, err error) {
+	err = tx.Tx().NewSelect().Model(&proposal).
+		Where("id = ?", id).
+		Column("id", "changes", "type").
+		Scan(ctx)
+	return
 }

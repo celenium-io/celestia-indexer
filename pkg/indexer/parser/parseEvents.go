@@ -65,6 +65,10 @@ func processEvent(ctx *context.Context, event *storage.Event) error {
 		return parseRewards(ctx, event.Data)
 	case storageTypes.EventTypeSlash:
 		return parseSlash(ctx, event.Data)
+	case storageTypes.EventTypeActiveProposal:
+		return parseProposal(ctx, event.Data)
+	case storageTypes.EventTypeInactiveProposal:
+		return parseProposal(ctx, event.Data)
 	}
 
 	return nil

@@ -74,6 +74,10 @@ type Enums struct {
 	RollupTypes        []string `json:"rollup_type"`
 	Tags               []string `json:"tags"`
 	CelestialsStatuses []string `json:"celestials_statuses"`
+	ProposalStatus     []string `json:"proposal_status"`
+	ProposalType       []string `json:"proposal_type"`
+	VoteType           []string `json:"vote_type"`
+	VoteOption         []string `json:"vote_option"`
 }
 
 func NewEnums(tags []string) Enums {
@@ -85,5 +89,9 @@ func NewEnums(tags []string) Enums {
 		RollupTypes:        types.RollupTypeNames(),
 		Tags:               tags,
 		CelestialsStatuses: celestials.StatusNames(),
+		ProposalStatus:     types.ProposalStatusNames(),
+		ProposalType:       types.ProposalTypeNames(),
+		VoteType:           types.VoterTypeNames(),
+		VoteOption:         types.VoteOptionNames(),
 	}
 }
