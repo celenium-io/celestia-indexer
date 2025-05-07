@@ -73,5 +73,5 @@ func (m *CacheMiddleware) cacheResult(ctx context.Context, key string, r *Respon
 }
 
 func (m *CacheMiddleware) isStatusCacheable(e *CacheEntry) bool {
-	return e.StatusCode == http.StatusOK || e.StatusCode == http.StatusNoContent
+	return e.StatusCode == http.StatusOK
 }
