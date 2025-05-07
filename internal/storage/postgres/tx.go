@@ -118,25 +118,26 @@ func (tx *Tx) ByIdWithRelations(ctx context.Context, id uint64) (transaction sto
 	return
 }
 
-func (tx *Tx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxFilter) ([]storage.Tx, error) {
+func (tx *Tx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxFilter) (txs []storage.Tx, err error) {
 	var relations []storage.Signer
-	query := tx.DB().NewSelect().
+	signersQuery := tx.DB().NewSelect().
 		Model(&relations).
-		Where("address_id = ?", addressId).
-		Relation("Tx").
-		Offset(fltrs.Offset)
+		Where("address_id = ?", addressId)
+
+	query := tx.DB().NewSelect().
+		Table("txs").
+		With("txs", signersQuery).
+		ColumnExpr("tx.*").
+		Join("left join tx on tx.id = txs.tx_id")
 
 	query = txFilter(query, fltrs)
+	query.Offset(fltrs.Offset)
 
-	if err := query.Scan(ctx); err != nil {
+	if err := query.Scan(ctx, &txs); err != nil {
 		return nil, err
 	}
 
-	transactions := make([]storage.Tx, len(relations))
-	for i := range relations {
-		transactions[i] = *relations[i].Tx
-	}
-	return transactions, nil
+	return txs, nil
 }
 
 func (tx *Tx) Genesis(ctx context.Context, limit, offset int, sortOrder sdk.SortOrder) (txs []storage.Tx, err error) {

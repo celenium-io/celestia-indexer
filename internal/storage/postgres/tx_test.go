@@ -134,18 +134,18 @@ func (s *StorageTestSuite) TestTxFilterSuccessDesc() {
 
 	tx := txs[1]
 
-	s.Require().EqualValues(3, tx.Id)
+	s.Require().EqualValues(1, tx.Id)
 	s.Require().EqualValues(0, tx.Position)
-	s.Require().EqualValues(999, tx.Height)
+	s.Require().EqualValues(1000, tx.Height)
 	s.Require().EqualValues(0, tx.TimeoutHeight)
 	s.Require().EqualValues(80410, tx.GasWanted)
 	s.Require().EqualValues(77483, tx.GasUsed)
-	s.Require().EqualValues(0, tx.EventsCount)
-	s.Require().EqualValues(1, tx.MessagesCount)
-	s.Require().EqualValues("32", tx.MessageTypes.Bits.String())
+	s.Require().EqualValues(1, tx.EventsCount)
+	s.Require().EqualValues(2, tx.MessagesCount)
+	s.Require().EqualValues("68", tx.MessageTypes.Bits.String())
 	s.Require().Equal(types.StatusSuccess, tx.Status)
-	s.Require().Equal("", tx.Memo)
-	s.Require().Equal("", tx.Codespace)
+	s.Require().Equal("memo", tx.Memo)
+	s.Require().Equal("sdk", tx.Codespace)
 	s.Require().Equal("80410", tx.Fee.String())
 
 	s.Require().Len(tx.Signers, 1)
@@ -219,6 +219,8 @@ func (s *StorageTestSuite) TestTxFilterWithRelations() {
 	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
 		Limit:        1,
 		WithMessages: true,
+		Offset:       1,
+		Sort:         sdk.SortOrderDesc,
 	})
 	s.Require().NoError(err)
 	s.Require().Len(txs, 1)
