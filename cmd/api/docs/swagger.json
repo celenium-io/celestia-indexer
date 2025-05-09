@@ -1126,6 +1126,68 @@
                 }
             }
         },
+        "/address/{hash}/votes": {
+            "get": {
+                "description": "Get list of votes for address",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Get list of votes for address",
+                "operationId": "address-votes",
+                "parameters": [
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Hash",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Vote"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/blob": {
             "get": {
                 "description": "Returns blobs",
@@ -2783,6 +2845,126 @@
                 }
             }
         },
+        "/proposal/{id}": {
+            "get": {
+                "description": "Get proposal info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "proposal"
+                ],
+                "summary": "Get proposal info",
+                "operationId": "get-proposal",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal identity",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Proposal"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/proposal/{id}/votes": {
+            "get": {
+                "description": "Get proposal's votes",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "proposal"
+                ],
+                "summary": "Get proposal's votes",
+                "operationId": "proposal-votes",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "yes",
+                            "no",
+                            "no_with_veto",
+                            "abstain"
+                        ],
+                        "type": "string",
+                        "description": "Option",
+                        "name": "option",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "address",
+                            "validator"
+                        ],
+                        "type": "string",
+                        "description": "Voter type",
+                        "name": "voter",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Vote"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/rollup": {
             "get": {
                 "description": "List rollups info",
@@ -2852,6 +3034,12 @@
                         "type": "string",
                         "description": "Comma-separated rollup provider list",
                         "name": "provider",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "If true, shows rollups with activity over the last month",
+                        "name": "is_active",
                         "in": "query"
                     }
                 ],
@@ -5270,6 +5458,66 @@
                 }
             }
         },
+        "/validators/{id}/votes": {
+            "get": {
+                "description": "Get list of votes for validator",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "validator"
+                ],
+                "summary": "Get list of votes for validator",
+                "operationId": "validator-votes",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal validator id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Vote"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/vesting/{id}/periods": {
             "get": {
                 "description": "Periods vesting periods by id. Returns not empty array only for periodic vestings.",
@@ -5853,6 +6101,18 @@
                     }
                 },
                 "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "vote_option": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "vote_type": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -6988,6 +7248,11 @@
                     "format": "integer",
                     "example": 321
                 },
+                "is_active": {
+                    "type": "boolean",
+                    "format": "boolean",
+                    "example": true
+                },
                 "l2_beat": {
                     "type": "string",
                     "format": "string",
@@ -7679,6 +7944,52 @@
                     "type": "string",
                     "format": "date-time",
                     "example": "2023-07-04T03:10:57+00:00"
+                }
+            }
+        },
+        "responses.Vote": {
+            "type": "object",
+            "properties": {
+                "deposit_time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "proposal_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 2
+                },
+                "status": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "yes"
+                },
+                "validator": {
+                    "$ref": "#/definitions/responses.ShortValidator"
+                },
+                "voter": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "voter_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1
+                },
+                "weight": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 12345678
                 }
             }
         },
