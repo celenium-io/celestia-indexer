@@ -33,15 +33,16 @@ func NewRollupHandler(
 }
 
 type rollupList struct {
-	Limit    int         `query:"limit"    validate:"omitempty,min=1,max=100"`
-	Offset   int         `query:"offset"   validate:"omitempty,min=0"`
-	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
-	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=time blobs_count size fee"`
-	Tags     StringArray `query:"tags"     validate:"omitempty"`
-	Stack    StringArray `query:"stack"    validate:"omitempty"`
-	Provider StringArray `query:"provider" validate:"omitempty"`
-	Category StringArray `query:"category" validate:"omitempty,dive,category"`
-	Type     StringArray `query:"type"     validate:"omitempty,dive,type"`
+	Limit    int         `query:"limit"     validate:"omitempty,min=1,max=100"`
+	Offset   int         `query:"offset"    validate:"omitempty,min=0"`
+	Sort     string      `query:"sort"      validate:"omitempty,oneof=asc desc"`
+	SortBy   string      `query:"sort_by"   validate:"omitempty,oneof=time blobs_count size fee"`
+	Tags     StringArray `query:"tags"      validate:"omitempty"`
+	Stack    StringArray `query:"stack"     validate:"omitempty"`
+	Provider StringArray `query:"provider"  validate:"omitempty"`
+	Category StringArray `query:"category"  validate:"omitempty,dive,category"`
+	Type     StringArray `query:"type"      validate:"omitempty,dive,type"`
+	IsActive *bool       `query:"is_active" validate:"omitempty"`
 }
 
 func (p *rollupList) SetDefault() {
@@ -70,6 +71,7 @@ func (p *rollupList) SetDefault() {
 //	    @Param          tags     query  string  false   "Comma-separated rollup tags list"
 //	    @Param          stack    query  string  false   "Comma-separated rollup stack list"
 //	    @Param          provider query  string  false   "Comma-separated rollup provider list"
+//		@Param			is_active query	boolean	false	"If true, shows rollups with activity over the last month"
 //		@Produce		json
 //		@Success		200	{array}		responses.RollupWithStats
 //		@Failure		400	{object}	Error
@@ -102,6 +104,7 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 		Type:      rollupTypes,
 		Stack:     req.Stack,
 		Provider:  req.Provider,
+		IsActive:  req.IsActive,
 	})
 	if err != nil {
 		return handleError(c, err, handler.rollups)

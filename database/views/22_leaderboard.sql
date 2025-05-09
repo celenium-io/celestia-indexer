@@ -33,6 +33,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS leaderboard AS
         board.size / (select sum(size) from board) as size_pct,
         board.fee / (select sum(fee) from board)as fee_pct,
         board.blobs_count / (select sum(blobs_count) from board)as blobs_count_pct,
+        (now() - board.last_time < INTERVAL '1 month') as is_active,
         rollup.*
     from board
     inner join rollup on rollup.id = board.rollup_id;

@@ -70,6 +70,10 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 		query = query.Where("type IN (?)", bun.In(fltrs.Type))
 	}
 
+	if fltrs.IsActive != nil {
+		query = query.Where("is_active = ?", *fltrs.IsActive)
+	}
+
 	query = sortScope(query, fltrs.SortField, fltrs.Sort)
 	query = limitScope(query, fltrs.Limit)
 	err = query.Scan(ctx, &rollups)

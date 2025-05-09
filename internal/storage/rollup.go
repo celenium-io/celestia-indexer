@@ -23,6 +23,7 @@ type LeaderboardFilters struct {
 	Type      []types.RollupType
 	Stack     []string
 	Provider  []string
+	IsActive  *bool
 }
 
 type RollupGroupStatsFilters struct {
@@ -128,6 +129,7 @@ type RollupStats struct {
 	SizePct         float64         `bun:"size_pct"`
 	FeePct          float64         `bun:"fee_pct"`
 	BlobsCountPct   float64         `bun:"blobs_count_pct"`
+	IsActive        bool            `bun:"is_active"`
 }
 
 type RollupWithDayStats struct {
