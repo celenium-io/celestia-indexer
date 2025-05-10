@@ -173,13 +173,14 @@ func (p *listVotesRequest) SetDefault() {
 //	@Param			offset	    query	integer	false	"Offset"										mininum(1)
 //
 // @Param			option	    path	string	true	"Option"		Enums(yes, no, no_with_veto, abstain)
-// @Param			voter	    path	string	true	"Voter type"		Enums(address, validator)
+// @Param			voter	    path	string	true	"Voter type"	Enums(address, validator)
 //
 //	@Produce		json
 //	@Success		200	{array}		responses.Vote
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/proposal/[id]/votes [get]
+//
+// @Router /proposal/{id}/votes [get]
 func (handler *ProposalsHandler) Votes(c echo.Context) error {
 
 	req, err := bindAndValidate[listVotesRequest](c)
