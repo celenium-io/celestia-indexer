@@ -13,6 +13,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/celestiaorg/celestia-app/v3/pkg/proof"
 
@@ -490,7 +491,7 @@ func (s *NamespaceTestSuite) TestGetLogs() {
 			Limit: 10,
 			Sort:  "desc",
 			Joins: true,
-			To:    testNamespace.LastMessageTime,
+			To:    testNamespace.LastMessageTime.Add(time.Second),
 		}).
 		Return([]storage.BlobLog{
 			{
@@ -558,7 +559,7 @@ func (s *NamespaceTestSuite) TestGetLogsBySigner() {
 			Sort:    "desc",
 			Joins:   true,
 			Signers: []uint64{1, 2},
-			To:      testNamespace.LastMessageTime,
+			To:      testNamespace.LastMessageTime.Add(time.Second),
 		}).
 		Return([]storage.BlobLog{
 			{
@@ -617,7 +618,7 @@ func (s *NamespaceTestSuite) TestGetLogsWithCommitment() {
 			Sort:       "desc",
 			Commitment: "T1EPYi3jq6hC3ueLOZRtWB7LUsAC4DcnAX/oSwDopps=",
 			Joins:      true,
-			To:         testNamespace.LastMessageTime,
+			To:         testNamespace.LastMessageTime.Add(time.Second),
 		}).
 		Return([]storage.BlobLog{
 			{
