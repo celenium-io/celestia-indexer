@@ -341,7 +341,7 @@ func (handler RollupHandler) GetBlobs(c echo.Context) error {
 		Sort:   pgSort(req.Sort),
 		SortBy: req.SortBy,
 		Joins:  *req.Joins,
-		To:     rollup.LastActionTime,
+		To:     rollup.LastActionTime.Add(time.Hour),
 		From:   rollup.FirstActionTime,
 	})
 	if err != nil {
