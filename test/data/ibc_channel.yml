@@ -14,3 +14,6 @@
   ordering: true
   creator_id: 1
   status: opened
+  received: 100
+  sent: 100
+  transfers_count: 1

@@ -12,6 +12,7 @@ import (
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
@@ -1389,12 +1390,17 @@ func (s *TransactionTestSuite) TestIbcChannels() {
 		CounterpartyChannelId: "channel-100",
 		Ordering:              true,
 		Status:                types.IbcChannelStatusClosed,
+		Sent:                  decimal.RequireFromString("100"),
+		TransfersCount:        10,
 	}, &storage.IbcChannel{
 		Id:                 "channel-1",
 		ConfirmedAt:        time.Now().UTC(),
 		ConfirmationHeight: 10000,
 		ConfirmationTxId:   100,
 		Status:             types.IbcChannelStatusInitialization,
+		Sent:               decimal.RequireFromString("100"),
+		Received:           decimal.RequireFromString("100"),
+		TransfersCount:     12,
 	})
 	s.Require().NoError(err)
 
@@ -1405,6 +1411,40 @@ func (s *TransactionTestSuite) TestIbcChannels() {
 	s.Require().NoError(err)
 
 	err = tx2.RollbackIbcClients(ctx, 10000)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestIbcTransfers() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveIbcTransfers(ctx, &storage.IbcTransfer{
+		Id:              123,
+		ConnectionId:    "connection-1",
+		ChannelId:       "channel-1",
+		Height:          10000,
+		Time:            time.Now().UTC(),
+		Amount:          decimal.RequireFromString("12123123"),
+		Denom:           currency.Utia,
+		SenderId:        testsuite.Ptr(uint64(1)),
+		ReceiverAddress: testsuite.Ptr("osmo1m8wg4vxkefhs374qxmmqpyusgz289wmulex5qdwpfx7jnrxzer5s9cv83q"),
+		TxId:            3,
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackIbcTransfers(ctx, 10000)
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx2.Flush(ctx))

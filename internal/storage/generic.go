@@ -51,6 +51,7 @@ var Models = []any{
 	&IbcClient{},
 	&IbcConnection{},
 	&IbcChannel{},
+	&IbcTransfer{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -105,6 +106,7 @@ type Transaction interface {
 	SaveIbcClients(ctx context.Context, clients ...*IbcClient) (int64, error)
 	SaveIbcConnections(ctx context.Context, connections ...*IbcConnection) error
 	SaveIbcChannels(ctx context.Context, channels ...*IbcChannel) error
+	SaveIbcTransfers(ctx context.Context, transfers ...*IbcTransfer) error
 	RetentionBlockSignatures(ctx context.Context, height types.Level) error
 	CancelUnbondings(ctx context.Context, cancellations ...Undelegation) error
 	RetentionCompletedUnbondings(ctx context.Context, blockTime time.Time) error
@@ -136,6 +138,7 @@ type Transaction interface {
 	RollbackIbcClients(ctx context.Context, height types.Level) error
 	RollbackIbcConnections(ctx context.Context, height types.Level) error
 	RollbackIbcChannels(ctx context.Context, height types.Level) error
+	RollbackIbcTransfers(ctx context.Context, height types.Level) error
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	DeleteProviders(ctx context.Context, rollupId uint64) error
 	DeleteRollup(ctx context.Context, rollupId uint64) error

@@ -691,6 +691,44 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// IBC Transfer
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcTransfer)(nil)).
+			Index("ibc_transfer_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcTransfer)(nil)).
+			Index("ibc_transfer_receiver_id_idx").
+			Column("receiver_id").
+			Where("receiver_id is not null").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcTransfer)(nil)).
+			Index("ibc_transfer_sender_id_idx").
+			Column("sender_id").
+			Where("sender_id is not null").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcTransfer)(nil)).
+			Index("ibc_transfer_channel_id_idx").
+			Column("channel_id").
+			Where("channel_id is not null").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

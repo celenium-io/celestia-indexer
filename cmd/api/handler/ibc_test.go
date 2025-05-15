@@ -13,11 +13,14 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -89,13 +92,14 @@ var testIbcChannel = storage.IbcChannel{
 // IbcTestSuite -
 type IbcTestSuite struct {
 	suite.Suite
-	echo     *echo.Echo
-	txs      *mock.MockITx
-	clients  *mock.MockIIbcClient
-	conns    *mock.MockIIbcConnection
-	channels *mock.MockIIbcChannel
-	handler  *IbcHandler
-	ctrl     *gomock.Controller
+	echo      *echo.Echo
+	address   *mock.MockIAddress
+	clients   *mock.MockIIbcClient
+	conns     *mock.MockIIbcConnection
+	channels  *mock.MockIIbcChannel
+	transfers *mock.MockIIbcTransfer
+	handler   *IbcHandler
+	ctrl      *gomock.Controller
 }
 
 // SetupSuite -
@@ -106,8 +110,9 @@ func (s *IbcTestSuite) SetupSuite() {
 	s.clients = mock.NewMockIIbcClient(s.ctrl)
 	s.conns = mock.NewMockIIbcConnection(s.ctrl)
 	s.channels = mock.NewMockIIbcChannel(s.ctrl)
-	s.txs = mock.NewMockITx(s.ctrl)
-	s.handler = NewIbcHandler(s.clients, s.conns, s.channels, s.txs)
+	s.transfers = mock.NewMockIIbcTransfer(s.ctrl)
+	s.address = mock.NewMockIAddress(s.ctrl)
+	s.handler = NewIbcHandler(s.clients, s.conns, s.channels, s.transfers, s.address)
 }
 
 // TearDownSuite -
@@ -334,4 +339,64 @@ func (s *IbcTestSuite) TestListChannels() {
 	s.Require().NotNil(response.Creator)
 	s.Require().EqualValues(testAddress, response.Creator.Hash)
 	s.Require().True(response.Ordering)
+}
+
+func (s *IbcTestSuite) TestListTransfers() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/ibc/transfer")
+
+	s.transfers.EXPECT().
+		List(gomock.Any(), storage.ListIbcTransferFilters{
+			Limit: 10,
+			Sort:  sdk.SortOrderDesc,
+		}).
+		Return([]storage.IbcTransfer{
+			{
+				Id:              1,
+				Time:            testTime,
+				Height:          1000,
+				Timeout:         &testTime,
+				ChannelId:       "channel-1",
+				ConnectionId:    "connection-1",
+				Amount:          decimal.RequireFromString("101"),
+				Denom:           currency.Utia,
+				Memo:            "memo",
+				ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
+				Sender: &storage.Address{
+					Hash:    testHashAddress,
+					Address: testAddress,
+				},
+				Sequence: 123456,
+				Tx:       &testTx,
+			},
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.ListTransfers(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var transfers []responses.IbcTransfer
+	err := json.NewDecoder(rec.Body).Decode(&transfers)
+	s.Require().NoError(err)
+	s.Require().Len(transfers, 1)
+
+	transfer := transfers[0]
+	s.Require().EqualValues(1, transfer.Id)
+	s.Require().EqualValues(1000, transfer.Height)
+	s.Require().EqualValues(testTime, transfer.Time)
+	s.Require().NotNil(transfer.Timeout)
+	s.Require().EqualValues(testTime, *transfer.Timeout)
+	s.Require().EqualValues(0, transfer.TimeoutHeight)
+	s.Require().EqualValues("101", transfer.Amount)
+	s.Require().EqualValues("utia", transfer.Denom)
+	s.Require().EqualValues("channel-1", transfer.ChannelId)
+	s.Require().EqualValues("connection-1", transfer.ConnectionId)
+	s.Require().EqualValues("memo", transfer.Memo)
+	s.Require().EqualValues(strings.ToLower(testTxHash), transfer.TxHash)
+	s.Require().NotNil(transfer.Receiver)
+	s.Require().EqualValues("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2", transfer.Receiver.Hash)
+	s.Require().NotNil(transfer.Sender)
+	s.Require().EqualValues(testAddress, transfer.Sender.Hash)
 }

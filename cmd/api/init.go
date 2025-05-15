@@ -470,7 +470,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		proposal.GET("/:id/votes", proposalHandler.Votes)
 	}
 
-	ibcHandler := handler.NewIbcHandler(db.IbcClients, db.IbcConnections, db.IbcChannels, db.Tx)
+	ibcHandler := handler.NewIbcHandler(db.IbcClients, db.IbcConnections, db.IbcChannels, db.IbcTransfers, db.Address)
 	ibc := v1.Group("/ibc")
 	{
 		ibcClient := ibc.Group("/client")
@@ -487,6 +487,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		{
 			ibcChannel.GET("", ibcHandler.ListChannels)
 			ibcChannel.GET("/:id", ibcHandler.GetChannel)
+		}
+
+		ibcTransfer := ibc.Group("/transfer")
+		{
+			ibcTransfer.GET("", ibcHandler.ListTransfers)
 		}
 	}
 

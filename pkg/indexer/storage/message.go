@@ -31,7 +31,8 @@ func (module *Module) saveMessages(
 		vestingAccounts = make([]*storage.VestingAccount, 0)
 		ibcClients      = make(map[string]*storage.IbcClient)
 		ibcConnections  = make(map[string]*storage.IbcConnection)
-		ibcChannels     = make([]*storage.IbcChannel, 0)
+		ibcChannels     = make(map[string]*storage.IbcChannel)
+		ibcTransfers    = make([]*storage.IbcTransfer, 0)
 		grants          = make(map[string]storage.Grant)
 		namespaces      = make(map[string]uint64)
 		addedMsgId      = make(map[uint64]struct{})
@@ -159,7 +160,30 @@ func (module *Module) saveMessages(
 				}
 			}
 
-			ibcChannels = append(ibcChannels, messages[i].IbcChannel)
+			if conn, ok := ibcChannels[messages[i].IbcChannel.Id]; ok {
+				conn.Received = conn.Received.Add(messages[i].IbcChannel.Received)
+				conn.Sent = conn.Sent.Add(messages[i].IbcChannel.Sent)
+				conn.TransfersCount += messages[i].IbcChannel.TransfersCount
+			} else {
+				ibcChannels[messages[i].IbcChannel.Id] = messages[i].IbcChannel
+			}
+		}
+
+		if messages[i].IbcTransfer != nil {
+			messages[i].IbcTransfer.TxId = messages[i].TxId
+
+			if messages[i].IbcTransfer.Sender != nil {
+				if addrId, ok := addrToId[messages[i].IbcTransfer.Sender.Address]; ok {
+					messages[i].IbcTransfer.SenderId = &addrId
+				}
+			}
+			if messages[i].IbcTransfer.Receiver != nil {
+				if addrId, ok := addrToId[messages[i].IbcTransfer.Receiver.Address]; ok {
+					messages[i].IbcTransfer.ReceiverId = &addrId
+				}
+			}
+
+			ibcTransfers = append(ibcTransfers, messages[i].IbcTransfer)
 		}
 	}
 
@@ -208,8 +232,11 @@ func (module *Module) saveMessages(
 	if err := tx.SaveIbcConnections(ctx, slices.Collect(maps.Values(ibcConnections))...); err != nil {
 		return 0, errors.Wrap(err, "ibc connections saving")
 	}
-	if err := tx.SaveIbcChannels(ctx, ibcChannels...); err != nil {
+	if err := tx.SaveIbcChannels(ctx, slices.Collect(maps.Values(ibcChannels))...); err != nil {
 		return 0, errors.Wrap(err, "ibc channels saving")
+	}
+	if err := tx.SaveIbcTransfers(ctx, ibcTransfers...); err != nil {
+		return 0, errors.Wrap(err, "ibc transfers saving")
 	}
 
 	return ibcClientsCount, nil

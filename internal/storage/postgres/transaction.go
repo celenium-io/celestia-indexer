@@ -635,7 +635,7 @@ func (tx Transaction) SaveIbcChannels(ctx context.Context, channels ...*models.I
 	for i := range channels {
 		query := tx.Tx().NewInsert().
 			Model(&channels).
-			Column("id", "connection_id", "client_id", "port_id", "counterparty_port_id", "counterparty_channel_id", "version", "created_at", "confirmed_at", "height", "confirmation_height", "create_tx_id", "confirmation_tx_id", "ordering", "creator_id", "status").
+			Column("id", "connection_id", "client_id", "port_id", "counterparty_port_id", "counterparty_channel_id", "version", "created_at", "confirmed_at", "height", "confirmation_height", "create_tx_id", "confirmation_tx_id", "ordering", "creator_id", "status", "received", "sent", "transfers_count").
 			On("CONFLICT (id) DO UPDATE")
 
 		if !channels[i].ConfirmedAt.IsZero() {
@@ -653,6 +653,15 @@ func (tx Transaction) SaveIbcChannels(ctx context.Context, channels ...*models.I
 		if channels[i].Status == storageTypes.IbcChannelStatusClosed || channels[i].Status == storageTypes.IbcChannelStatusOpened {
 			query.Set("status = EXCLUDED.status")
 		}
+		if !channels[i].Received.IsZero() {
+			query.Set("received = ibc_channel.received + EXCLUDED.received")
+		}
+		if !channels[i].Sent.IsZero() {
+			query.Set("sent = ibc_channel.sent + EXCLUDED.sent")
+		}
+		if channels[i].TransfersCount > 0 {
+			query.Set("transfers_count = ibc_channel.transfers_count + EXCLUDED.transfers_count")
+		}
 
 		if _, err := query.Exec(ctx); err != nil {
 			return err
@@ -660,6 +669,14 @@ func (tx Transaction) SaveIbcChannels(ctx context.Context, channels ...*models.I
 	}
 
 	return nil
+}
+
+func (tx Transaction) SaveIbcTransfers(ctx context.Context, transfers ...*models.IbcTransfer) error {
+	if len(transfers) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&transfers).Exec(ctx)
+	return err
 }
 
 func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, fraction decimal.Decimal) (balances []models.Balance, err error) {
@@ -849,6 +866,13 @@ func (tx Transaction) RollbackIbcConnections(ctx context.Context, height types.L
 }
 
 func (tx Transaction) RollbackIbcChannels(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.IbcChannel)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackIbcTransfers(ctx context.Context, height types.Level) (err error) {
 	_, err = tx.Tx().NewDelete().Model((*models.IbcChannel)(nil)).
 		Where("height = ?", height).
 		Exec(ctx)

@@ -166,3 +166,59 @@ func NewIbcChannel(channel storage.IbcChannel) IbcChannel {
 
 	return response
 }
+
+type IbcTransfer struct {
+	Id            uint64         `example:"123456"                                                           format:"integer"   json:"id"                       swaggertype:"integer"`
+	Time          time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                     swaggertype:"string"`
+	Height        pkgTypes.Level `example:"100"                                                              format:"integer"   json:"height"                   swaggertype:"integer"`
+	ChannelId     string         `example:"channel-1"                                                        format:"string"    json:"channel_id"               swaggertype:"string"`
+	ConnectionId  string         `example:"connection-1"                                                     format:"string"    json:"connection_id"            swaggertype:"string"`
+	Port          string         `example:"transfer"                                                         format:"string"    json:"port"                     swaggertype:"string"`
+	Amount        string         `example:"123445"                                                           format:"string"    json:"amount"                   swaggertype:"string"`
+	Denom         string         `example:"utia"                                                             format:"string"    json:"denom"                    swaggertype:"string"`
+	Memo          string         `example:"memo"                                                             format:"string"    json:"memo,omitempty"           swaggertype:"string"`
+	Timeout       *time.Time     `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"timeout,omitempty"        swaggertype:"string"`
+	TimeoutHeight uint64         `example:"100"                                                              format:"integer"   json:"timeout_height,omitempty" swaggertype:"integer"`
+	TxHash        string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"                  swaggertype:"string"`
+	Sequence      uint64         `example:"123456"                                                           format:"integer"   json:"sequence"                 swaggertype:"integer"`
+
+	Sender   *ShortAddress `json:"sender,omitempty"`
+	Receiver *ShortAddress `json:"receiver,omitempty"`
+}
+
+func NewIbcTransfer(transfer storage.IbcTransfer) IbcTransfer {
+	response := IbcTransfer{
+		Id:            transfer.Id,
+		Time:          transfer.Time,
+		Height:        transfer.Height,
+		ChannelId:     transfer.ChannelId,
+		ConnectionId:  transfer.ConnectionId,
+		Port:          transfer.Port,
+		Amount:        transfer.Amount.String(),
+		Denom:         transfer.Denom,
+		Memo:          transfer.Memo,
+		Timeout:       transfer.Timeout,
+		TimeoutHeight: transfer.Tx.TimeoutHeight,
+		Sequence:      transfer.Sequence,
+		Sender:        NewShortAddress(transfer.Sender),
+		Receiver:      NewShortAddress(transfer.Receiver),
+	}
+
+	if transfer.ReceiverAddress != nil {
+		response.Receiver = &ShortAddress{
+			Hash: *transfer.ReceiverAddress,
+		}
+	}
+
+	if transfer.SenderAddress != nil {
+		response.Sender = &ShortAddress{
+			Hash: *transfer.SenderAddress,
+		}
+	}
+
+	if transfer.Tx != nil {
+		response.TxHash = hex.EncodeToString(transfer.Tx.Hash)
+	}
+
+	return response
+}

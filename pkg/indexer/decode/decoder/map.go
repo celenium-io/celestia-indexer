@@ -80,6 +80,17 @@ func TimeFromMap(m map[string]any, key string) (time.Time, error) {
 	return time.Parse(time.RFC3339, str)
 }
 
+func UnixNanoFromMap(m map[string]any, key string) (time.Time, error) {
+	u, err := Int64FromMap(m, key)
+	if err != nil {
+		return time.Time{}, errors.Wrap(err, "Int64FromMap")
+	}
+	if u == 0 {
+		return time.Time{}, nil
+	}
+	return time.Unix(0, u).UTC(), nil
+}
+
 func Int64FromMap(m map[string]any, key string) (int64, error) {
 	val, ok := m[key]
 	if !ok {
@@ -151,4 +162,23 @@ func ChannelOrderingFromMap(m map[string]any, key string) (bool, error) {
 		return false, errors.Errorf("key '%s' is not a Order", key)
 	}
 	return order == channelTypes.ORDERED, nil
+}
+
+func RevisionHeightFromMap(m map[string]any, key string) (uint64, uint64, error) {
+	ch := StringFromMap(m, key)
+	parts := strings.Split(ch, "-")
+	if len(parts) != 2 {
+		return 0, 0, errors.Errorf("invalid revision height: %s", ch)
+	}
+	revision, err := strconv.ParseUint(parts[0], 10, 64)
+	if err != nil {
+		return 0, 0, errors.Wrap(err, "revision")
+	}
+
+	height, err := strconv.ParseUint(parts[1], 10, 64)
+	if err != nil {
+		return 0, 0, errors.Wrap(err, "height")
+	}
+
+	return revision, height, nil
 }

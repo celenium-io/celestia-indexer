@@ -2595,6 +2595,93 @@
                 }
             }
         },
+        "/ibc/transfer": {
+            "get": {
+                "description": "Get ibc transfers info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ibc"
+                ],
+                "summary": "Get ibc transfers info",
+                "operationId": "get-ibc-transfers",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Client id",
+                        "name": "client_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Connection id",
+                        "name": "connection_id",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "initialization",
+                            "opened",
+                            "closed"
+                        ],
+                        "type": "string",
+                        "description": "Channel status",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.IbcTransfer"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/namespace": {
             "get": {
                 "description": "List namespace info",
@@ -6821,6 +6908,82 @@
                     "type": "string",
                     "format": "string",
                     "example": "connection-1"
+                }
+            }
+        },
+        "responses.IbcTransfer": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123445"
+                },
+                "channel_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "channel-1"
+                },
+                "connection_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "connection-1"
+                },
+                "denom": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "utia"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 123456
+                },
+                "memo": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "memo"
+                },
+                "port": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "transfer"
+                },
+                "receiver": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "sender": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "sequence": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 123456
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "timeout": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "timeout_height": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
                 }
             }
         },

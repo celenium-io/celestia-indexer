@@ -13,23 +13,26 @@ import (
 )
 
 type IbcHandler struct {
-	clients  storage.IIbcClient
-	conns    storage.IIbcConnection
-	channels storage.IIbcChannel
-	txs      storage.ITx
+	clients   storage.IIbcClient
+	conns     storage.IIbcConnection
+	channels  storage.IIbcChannel
+	transfers storage.IIbcTransfer
+	address   storage.IAddress
 }
 
 func NewIbcHandler(
 	clients storage.IIbcClient,
 	conns storage.IIbcConnection,
 	channels storage.IIbcChannel,
-	txs storage.ITx,
+	transfers storage.IIbcTransfer,
+	address storage.IAddress,
 ) *IbcHandler {
 	return &IbcHandler{
-		clients:  clients,
-		conns:    conns,
-		channels: channels,
-		txs:      txs,
+		clients:   clients,
+		conns:     conns,
+		channels:  channels,
+		transfers: transfers,
+		address:   address,
 	}
 }
 
@@ -58,7 +61,7 @@ func (handler *IbcHandler) Get(c echo.Context) error {
 
 	client, err := handler.clients.ById(c.Request().Context(), req.Id)
 	if err != nil {
-		return handleError(c, err, handler.txs)
+		return handleError(c, err, handler.address)
 	}
 
 	return c.JSON(http.StatusOK, responses.NewIbcClient(client))
@@ -103,7 +106,7 @@ func (handler *IbcHandler) List(c echo.Context) error {
 
 	clients, err := handler.clients.List(c.Request().Context(), req.Limit, req.Offset, pgSort(req.Sort))
 	if err != nil {
-		return handleError(c, err, handler.txs)
+		return handleError(c, err, handler.address)
 	}
 
 	response := make([]responses.IbcClient, len(clients))
@@ -138,7 +141,7 @@ func (handler *IbcHandler) GetConnection(c echo.Context) error {
 
 	conn, err := handler.conns.ById(c.Request().Context(), req.Id)
 	if err != nil {
-		return handleError(c, err, handler.txs)
+		return handleError(c, err, handler.address)
 	}
 
 	return c.JSON(http.StatusOK, responses.NewIbcConnection(conn))
@@ -190,7 +193,7 @@ func (handler *IbcHandler) ListConnections(c echo.Context) error {
 		ClientId: req.ClientId,
 	})
 	if err != nil {
-		return handleError(c, err, handler.txs)
+		return handleError(c, err, handler.address)
 	}
 
 	response := make([]responses.IbcConnection, len(conns))
@@ -225,7 +228,7 @@ func (handler *IbcHandler) GetChannel(c echo.Context) error {
 
 	channel, err := handler.channels.ById(c.Request().Context(), req.Id)
 	if err != nil {
-		return handleError(c, err, handler.txs)
+		return handleError(c, err, handler.address)
 	}
 
 	return c.JSON(http.StatusOK, responses.NewIbcChannel(channel))
@@ -255,12 +258,12 @@ func (req *getIbcChannelsRequest) SetDefault() {
 //	@Description	Get ibc channels info
 //	@Tags			ibc
 //	@ID				get-ibc-channels
-//	@Param			limit	    query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	    query	integer	false	"Offset"										mininum(1)
-//	@Param			sort	    query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			client_id	query	string	false	"Client id"
+//	@Param			limit	        query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset	        query	integer	false	"Offset"										mininum(1)
+//	@Param			sort	        query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			client_id	    query	string	false	"Client id"
 //	@Param			connection_id	query	string	false	"Connection id"
-//	@Param			status	    query	string	false	"Channel status"					        	Enums(initialization, opened, closed)
+//	@Param			status	        query	string	false	"Channel status"					        	Enums(initialization, opened, closed)
 //	@Produce		json
 //	@Success		200	{array}	responses.IbcChannel
 //	@Success		204
@@ -283,12 +286,96 @@ func (handler *IbcHandler) ListChannels(c echo.Context) error {
 		ConnectionId: req.ConnectionId,
 	})
 	if err != nil {
-		return handleError(c, err, handler.txs)
+		return handleError(c, err, handler.address)
 	}
 
 	response := make([]responses.IbcChannel, len(channels))
 	for i := range channels {
 		response[i] = responses.NewIbcChannel(channels[i])
+	}
+	return c.JSON(http.StatusOK, response)
+}
+
+type getIbcTransfersRequest struct {
+	Limit     int    `query:"limit"      validate:"omitempty,min=1,max=100"`
+	Offset    int    `query:"offset"     validate:"omitempty,min=0"`
+	Sort      string `query:"sort"       validate:"omitempty,oneof=asc desc"`
+	ChannelId string `query:"channel_id" validate:"omitempty"`
+	Receiver  string `query:"receiver"   validate:"omitempty,address"`
+	Sender    string `query:"sender"     validate:"omitempty,address"`
+	Address   string `query:"address"    validate:"omitempty,address"`
+}
+
+func (req *getIbcTransfersRequest) SetDefault() {
+	if req.Limit <= 0 {
+		req.Limit = 10
+	}
+	if req.Sort == "" {
+		req.Sort = desc
+	}
+}
+
+// ListTransfers godoc
+//
+//	@Summary		Get ibc transfers info
+//	@Description	Get ibc transfers info
+//	@Tags			ibc
+//	@ID				get-ibc-transfers
+//	@Param			limit	    query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset	    query	integer	false	"Offset"										mininum(1)
+//	@Param			sort	    query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			client_id	query	string	false	"Client id"
+//	@Param			connection_id	query	string	false	"Connection id"
+//	@Param			status	    query	string	false	"Channel status"					        	Enums(initialization, opened, closed)
+//	@Produce		json
+//	@Success		200	{array}	responses.IbcTransfer
+//	@Success		204
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/ibc/transfer [get]
+func (handler *IbcHandler) ListTransfers(c echo.Context) error {
+	req, err := bindAndValidate[getIbcTransfersRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	fltrs := storage.ListIbcTransferFilters{
+		Limit:     req.Limit,
+		Offset:    req.Offset,
+		Sort:      pgSort(req.Sort),
+		ChannelId: req.ChannelId,
+	}
+	if req.Address != "" {
+		id, err := handler.address.IdByAddress(c.Request().Context(), req.Address)
+		if err != nil {
+			return handleError(c, err, handler.address)
+		}
+		fltrs.AddressId = &id
+	}
+	if req.Sender != "" {
+		id, err := handler.address.IdByAddress(c.Request().Context(), req.Sender)
+		if err != nil {
+			return handleError(c, err, handler.address)
+		}
+		fltrs.SenderId = &id
+	}
+	if req.Receiver != "" {
+		id, err := handler.address.IdByAddress(c.Request().Context(), req.Receiver)
+		if err != nil {
+			return handleError(c, err, handler.address)
+		}
+		fltrs.ReceiverId = &id
+	}
+
+	transfers, err := handler.transfers.List(c.Request().Context(), fltrs)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	response := make([]responses.IbcTransfer, len(transfers))
+	for i := range transfers {
+		response[i] = responses.NewIbcTransfer(transfers[i])
 	}
 	return c.JSON(http.StatusOK, response)
 }

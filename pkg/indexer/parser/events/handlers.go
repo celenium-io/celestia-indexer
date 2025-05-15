@@ -36,6 +36,8 @@ var eventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgChannelOpenAck:              handleChannelOpenConfirm,
 	storageTypes.MsgChannelCloseInit:            handleChannelClose,
 	storageTypes.MsgChannelCloseConfirm:         handleChannelClose,
+	storageTypes.MsgAcknowledgement:             handleAcknowledgement,
+	storageTypes.MsgRecvPacket:                  handleRecvPacket,
 }
 
 func Handle(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {

@@ -422,6 +422,11 @@ func Test_saveMessages(t *testing.T) {
 			Times(1).
 			Return(nil)
 
+		tx.EXPECT().
+			SaveIbcTransfers(gomock.Any(), gomock.Any()).
+			Times(1).
+			Return(nil)
+
 		t.Run(tt.name, func(t *testing.T) {
 			ibcClientsCount, err := module.saveMessages(t.Context(), tx, tt.args.messages, tt.args.addrToId)
 			require.Equal(t, tt.wantErr, err != nil)

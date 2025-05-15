@@ -10,6 +10,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -29,7 +30,7 @@ type IIbcChannel interface {
 }
 
 type IbcChannel struct {
-	bun.BaseModel `bun:"ibc_channel" comment:"Table with IBC connections."`
+	bun.BaseModel `bun:"ibc_channel" comment:"Table with IBC channels."`
 
 	Id                    string                 `bun:"id,pk"                          comment:"Channel identity"`
 	ConnectionId          string                 `bun:"connection_id"                  comment:"Connection identity"`
@@ -47,6 +48,9 @@ type IbcChannel struct {
 	Ordering              bool                   `bun:"ordering"                       comment:"Ordered or unordered packets in the channel"`
 	CreatorId             uint64                 `bun:"creator_id"                     comment:"Internal creator identity"`
 	Status                types.IbcChannelStatus `bun:"status,type:ibc_channel_status" comment:"Channel status"`
+	Received              decimal.Decimal        `bun:"received,type:numeric"          comment:"Received value"`
+	Sent                  decimal.Decimal        `bun:"sent,type:numeric"              comment:"Sent value"`
+	TransfersCount        int64                  `bun:"transfers_count"                comment:"Count transfers"`
 
 	Connection     *IbcConnection `bun:"rel:belongs-to,join:connection_id=connection_id"`
 	Client         *IbcClient     `bun:"rel:belongs-to,join:client_id=id"`
