@@ -13,27 +13,60 @@ import (
 )
 
 // MsgCreateClient defines a message to create an IBC client
-func MsgCreateClient(ctx *context.Context, m *coreClient.MsgCreateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgCreateClient(ctx *context.Context, status types.Status, data types.PackedBytes, m *coreClient.MsgCreateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgCreateClient
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
-	return msgType, addresses, err
+	if err != nil || status == types.StatusFailed {
+		return msgType, addresses, err
+	}
+
+	if data == nil {
+		return msgType, addresses, nil
+	}
+
+	if m.ClientState != nil {
+		var clientState tmTypes.ClientState
+		if err := clientState.Unmarshal(m.ClientState.Value); err != nil {
+			return msgType, addresses, err
+		}
+		data["ClientState"] = clientState
+	}
+
+	if m.ConsensusState != nil {
+		var consensusState tmTypes.ConsensusState
+		if err := consensusState.Unmarshal(m.ConsensusState.Value); err != nil {
+			return msgType, addresses, err
+		}
+		data["ConsensusState"] = consensusState
+	}
+
+	return msgType, addresses, nil
 }
 
 // MsgUpdateClient defines a sdk.Msg to update an IBC client state using the given header
-func MsgUpdateClient(ctx *context.Context, status types.Status, m *coreClient.MsgUpdateClient) (storageTypes.MsgType, []storage.AddressWithType, *tmTypes.Header, error) {
+func MsgUpdateClient(ctx *context.Context, status types.Status, data types.PackedBytes, m *coreClient.MsgUpdateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgUpdateClient
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	if err != nil || status == types.StatusFailed {
-		return msgType, addresses, nil, err
+		return msgType, addresses, err
 	}
 
-	var header tmTypes.Header
-	err = header.Unmarshal(m.Header.Value)
-	return msgType, addresses, &header, err
+	if data == nil {
+		return msgType, addresses, nil
+	}
+
+	if m.Header != nil {
+		var header tmTypes.Header
+		if err := header.Unmarshal(m.Header.Value); err != nil {
+			return msgType, addresses, err
+		}
+		data["Header"] = header
+	}
+	return msgType, addresses, err
 }
 
 // MsgUpgradeClient defines a sdk.Msg to upgrade an IBC client to a new client state

@@ -470,6 +470,26 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		proposal.GET("/:id/votes", proposalHandler.Votes)
 	}
 
+	ibcHandler := handler.NewIbcHandler(db.IbcClients, db.IbcConnections, db.IbcChannels, db.Tx)
+	ibc := v1.Group("/ibc")
+	{
+		ibcClient := ibc.Group("/client")
+		{
+			ibcClient.GET("", ibcHandler.List)
+			ibcClient.GET("/:id", ibcHandler.Get)
+		}
+		ibcConnection := ibc.Group("/connection")
+		{
+			ibcConnection.GET("", ibcHandler.ListConnections)
+			ibcConnection.GET("/:id", ibcHandler.GetConnection)
+		}
+		ibcChannel := ibc.Group("/channel")
+		{
+			ibcChannel.GET("", ibcHandler.ListChannels)
+			ibcChannel.GET("/:id", ibcHandler.GetChannel)
+		}
+	}
+
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
 		SpecURL: "./docs/swagger.json",
 		CustomOptions: scalar.CustomOptions{

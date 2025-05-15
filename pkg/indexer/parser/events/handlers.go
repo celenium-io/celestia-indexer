@@ -24,6 +24,18 @@ var eventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgSubmitProposal:              handleSubmitProposal,
 	storageTypes.MsgDeposit:                     handleDeposit,
 	storageTypes.MsgVote:                        handleVote,
+	storageTypes.MsgCreateClient:                handleCreateClient,
+	storageTypes.MsgUpdateClient:                handleUpdateClient,
+	storageTypes.MsgConnectionOpenInit:          handleConnectionOpenInit,
+	storageTypes.MsgConnectionOpenTry:           handleConnectionOpenInit,
+	storageTypes.MsgConnectionOpenConfirm:       handleConnectionOpenConfirm,
+	storageTypes.MsgConnectionOpenAck:           handleConnectionOpenConfirm,
+	storageTypes.MsgChannelOpenInit:             handleChannelOpenInit,
+	storageTypes.MsgChannelOpenTry:              handleChannelOpenInit,
+	storageTypes.MsgChannelOpenConfirm:          handleChannelOpenConfirm,
+	storageTypes.MsgChannelOpenAck:              handleChannelOpenConfirm,
+	storageTypes.MsgChannelCloseInit:            handleChannelClose,
+	storageTypes.MsgChannelCloseConfirm:         handleChannelClose,
 }
 
 func Handle(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {

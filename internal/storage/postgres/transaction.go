@@ -518,6 +518,150 @@ func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) erro
 	return err
 }
 
+type addedIbcClient struct {
+	bun.BaseModel `bun:"ibc_client"`
+	*models.IbcClient
+
+	Xmax uint64 `bun:"xmax"`
+}
+
+func (tx Transaction) SaveIbcClients(ctx context.Context, clients ...*models.IbcClient) (int64, error) {
+	if len(clients) == 0 {
+		return 0, nil
+	}
+
+	count := int64(0)
+
+	for i := range clients {
+		add := addedIbcClient{
+			IbcClient: clients[i],
+		}
+
+		query := tx.Tx().NewInsert().
+			Column("id", "created_at", "updated_at", "height", "tx_id", "creator_id", "latest_revision_height", "latest_revision_number", "frozen_revision_height", "frozen_revision_number", "type").
+			Column("trusting_period", "unbonding_period", "max_clock_drift", "trust_level_denominator", "trust_level_numerator", "connection_count", "chain_id").
+			Model(&add).
+			On("CONFLICT (id) DO UPDATE")
+
+		if clients[i].ConnectionCount > 0 {
+			query.Set("connection_count = added_ibc_client.connection_count + EXCLUDED.connection_count")
+		}
+		if clients[i].TrustingPeriod > 0 {
+			query.Set("trusting_period = EXCLUDED.trusting_period")
+		}
+		if clients[i].UnbondingPeriod > 0 {
+			query.Set("unbonding_period = EXCLUDED.unbonding_period")
+		}
+		if clients[i].MaxClockDrift > 0 {
+			query.Set("max_clock_drift = EXCLUDED.max_clock_drift")
+		}
+		if clients[i].TrustLevelDenominator > 0 {
+			query.Set("trust_level_denominator = EXCLUDED.trust_level_denominator")
+		}
+		if clients[i].TrustLevelNumerator > 0 {
+			query.Set("trust_level_numerator = EXCLUDED.trust_level_numerator")
+		}
+		if clients[i].LatestRevisionHeight > 0 {
+			query.Set("latest_revision_height = EXCLUDED.latest_revision_height")
+		}
+		if clients[i].LatestRevisionNumber > 0 {
+			query.Set("latest_revision_number = EXCLUDED.latest_revision_number")
+		}
+		if clients[i].FrozenRevisionHeight > 0 {
+			query.Set("frozen_revision_height = EXCLUDED.frozen_revision_height")
+		}
+		if clients[i].FrozenRevisionNumber > 0 {
+			query.Set("frozen_revision_number = EXCLUDED.frozen_revision_number")
+		}
+		if clients[i].ChainId != "" {
+			query.Set("chain_id = EXCLUDED.chain_id")
+		}
+		if !clients[i].UpdatedAt.IsZero() {
+			query.Set("updated_at = EXCLUDED.updated_at")
+		}
+
+		if _, err := query.Returning("xmax, id").Exec(ctx); err != nil {
+			return 0, err
+		}
+
+		if add.Xmax == 0 {
+			count++
+		}
+	}
+
+	return count, nil
+}
+
+func (tx Transaction) SaveIbcConnections(ctx context.Context, conns ...*models.IbcConnection) error {
+	if len(conns) == 0 {
+		return nil
+	}
+
+	for i := range conns {
+		query := tx.Tx().NewInsert().
+			Model(&conns).
+			Column("connection_id", "client_id", "counterparty_connection_id", "counterparty_client_id", "created_at", "connected_at", "height", "connection_height", "create_tx_id", "connection_tx_id", "channels_count").
+			On("CONFLICT (connection_id) DO UPDATE")
+
+		if conns[i].ChannelsCount != 0 {
+			query.Set("channels_count = ibc_connection.channels_count + EXCLUDED.channels_count")
+		}
+		if !conns[i].ConnectedAt.IsZero() {
+			query.Set("connected_at = EXCLUDED.connected_at")
+		}
+		if conns[i].ConnectionTxId > 0 {
+			query.Set("connection_tx_id = EXCLUDED.connection_tx_id")
+		}
+		if conns[i].ConnectionHeight > 0 {
+			query.Set("connection_height = EXCLUDED.connection_height")
+		}
+		if conns[i].CounterpartyConnectionId != "" {
+			query.Set("counterparty_connection_id = EXCLUDED.counterparty_connection_id")
+		}
+
+		if _, err := query.Exec(ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (tx Transaction) SaveIbcChannels(ctx context.Context, channels ...*models.IbcChannel) error {
+	if len(channels) == 0 {
+		return nil
+	}
+
+	for i := range channels {
+		query := tx.Tx().NewInsert().
+			Model(&channels).
+			Column("id", "connection_id", "client_id", "port_id", "counterparty_port_id", "counterparty_channel_id", "version", "created_at", "confirmed_at", "height", "confirmation_height", "create_tx_id", "confirmation_tx_id", "ordering", "creator_id", "status").
+			On("CONFLICT (id) DO UPDATE")
+
+		if !channels[i].ConfirmedAt.IsZero() {
+			query.Set("confirmed_at = EXCLUDED.confirmed_at")
+		}
+		if channels[i].ConfirmationTxId > 0 {
+			query.Set("confirmation_tx_id = EXCLUDED.confirmation_tx_id")
+		}
+		if channels[i].ConfirmationHeight > 0 {
+			query.Set("confirmation_height = EXCLUDED.confirmation_height")
+		}
+		if channels[i].CounterpartyChannelId != "" {
+			query.Set("counterparty_channel_id = EXCLUDED.counterparty_channel_id")
+		}
+		if channels[i].Status == storageTypes.IbcChannelStatusClosed || channels[i].Status == storageTypes.IbcChannelStatusOpened {
+			query.Set("status = EXCLUDED.status")
+		}
+
+		if _, err := query.Exec(ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, fraction decimal.Decimal) (balances []models.Balance, err error) {
 	if validatorId == 0 || !fraction.IsPositive() {
 		return nil, nil
@@ -685,6 +829,27 @@ func (tx Transaction) RollbackProposals(ctx context.Context, height types.Level)
 
 func (tx Transaction) RollbackVotes(ctx context.Context, height types.Level) (err error) {
 	_, err = tx.Tx().NewDelete().Model((*models.Vote)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackIbcClients(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.IbcClient)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackIbcConnections(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.IbcConnection)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackIbcChannels(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.IbcChannel)(nil)).
 		Where("height = ?", height).
 		Exec(ctx)
 	return
@@ -984,6 +1149,14 @@ func (tx Transaction) Proposal(ctx context.Context, id uint64) (proposal models.
 	err = tx.Tx().NewSelect().Model(&proposal).
 		Where("id = ?", id).
 		Column("id", "changes", "type").
+		Scan(ctx)
+	return
+}
+
+func (tx Transaction) IbcConnection(ctx context.Context, id string) (conn models.IbcConnection, err error) {
+	err = tx.Tx().NewSelect().Model(&conn).
+		Where("connection_id = ?", id).
+		Column("client_id").
 		Scan(ctx)
 	return
 }

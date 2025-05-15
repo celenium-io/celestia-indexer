@@ -48,6 +48,9 @@ var Models = []any{
 	&celestials.CelestialState{},
 	&Proposal{},
 	&Vote{},
+	&IbcClient{},
+	&IbcConnection{},
+	&IbcChannel{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -99,6 +102,9 @@ type Transaction interface {
 	SaveBlockSignatures(ctx context.Context, signs ...BlockSignature) error
 	SaveProposals(ctx context.Context, proposals ...*Proposal) (int64, error)
 	SaveVotes(ctx context.Context, votes ...*Vote) error
+	SaveIbcClients(ctx context.Context, clients ...*IbcClient) (int64, error)
+	SaveIbcConnections(ctx context.Context, connections ...*IbcConnection) error
+	SaveIbcChannels(ctx context.Context, channels ...*IbcChannel) error
 	RetentionBlockSignatures(ctx context.Context, height types.Level) error
 	CancelUnbondings(ctx context.Context, cancellations ...Undelegation) error
 	RetentionCompletedUnbondings(ctx context.Context, blockTime time.Time) error
@@ -127,6 +133,9 @@ type Transaction interface {
 	RollbackJails(ctx context.Context, height types.Level) ([]Jail, error)
 	RollbackProposals(ctx context.Context, height types.Level) error
 	RollbackVotes(ctx context.Context, height types.Level) error
+	RollbackIbcClients(ctx context.Context, height types.Level) error
+	RollbackIbcConnections(ctx context.Context, height types.Level) error
+	RollbackIbcChannels(ctx context.Context, height types.Level) error
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	DeleteProviders(ctx context.Context, rollupId uint64) error
 	DeleteRollup(ctx context.Context, rollupId uint64) error
@@ -147,6 +156,7 @@ type Transaction interface {
 	ProposalVotes(ctx context.Context, proposalId uint64, limit, offset int) ([]Vote, error)
 	Proposal(ctx context.Context, id uint64) (Proposal, error)
 	RefreshLeaderboard(ctx context.Context) error
+	IbcConnection(ctx context.Context, id string) (IbcConnection, error)
 }
 
 const (

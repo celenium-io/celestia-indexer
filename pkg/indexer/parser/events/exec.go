@@ -15,7 +15,7 @@ func handleExec(ctx *context.Context, events []storage.Event, msg *storage.Messa
 		return errors.New("nil event index")
 	}
 	if msg == nil {
-		return errors.New("nil message in events hanler")
+		return errors.New("nil message in events handler")
 	}
 	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.authz.v1beta1.MsgExec" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())

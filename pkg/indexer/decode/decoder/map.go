@@ -10,6 +10,8 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/cosmos/cosmos-sdk/types"
+	channelTypes "github.com/cosmos/ibc-go/v6/modules/core/04-channel/types"
+	tmTypes "github.com/cosmos/ibc-go/v6/modules/light-clients/07-tendermint/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
@@ -113,4 +115,40 @@ func Uint64FromMap(m map[string]any, key string) (uint64, error) {
 		return 0, errors.Errorf("key '%s' is not a string", key)
 	}
 	return strconv.ParseUint(str, 10, 64)
+}
+
+func ClientStateFromMap(m map[string]any, key string) (*tmTypes.ClientState, error) {
+	val, ok := m[key]
+	if !ok {
+		return nil, errors.Errorf("can't find key: %s", key)
+	}
+	cs, ok := val.(tmTypes.ClientState)
+	if !ok {
+		return nil, errors.Errorf("key '%s' is not a client state", key)
+	}
+	return &cs, nil
+}
+
+func HeaderFromMap(m map[string]any, key string) (*tmTypes.Header, error) {
+	val, ok := m[key]
+	if !ok {
+		return nil, errors.Errorf("can't find key: %s", key)
+	}
+	header, ok := val.(tmTypes.Header)
+	if !ok {
+		return nil, errors.Errorf("key '%s' is not a header", key)
+	}
+	return &header, nil
+}
+
+func ChannelOrderingFromMap(m map[string]any, key string) (bool, error) {
+	val, ok := m[key]
+	if !ok {
+		return false, errors.Errorf("can't find key: %s", key)
+	}
+	order, ok := val.(channelTypes.Order)
+	if !ok {
+		return false, errors.Errorf("key '%s' is not a Order", key)
+	}
+	return order == channelTypes.ORDERED, nil
 }

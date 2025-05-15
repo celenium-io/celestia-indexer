@@ -618,6 +618,79 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// IBC Client
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcClient)(nil)).
+			Index("ibc_client_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcClient)(nil)).
+			Index("ibc_client_updated_at_idx").
+			Column("updated_at").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// IBC Connection
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcConnection)(nil)).
+			Index("ibc_connection_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcConnection)(nil)).
+			Index("ibc_connection_client_id_idx").
+			Column("client_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// IBC Channel
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcChannel)(nil)).
+			Index("ibc_channel_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcChannel)(nil)).
+			Index("ibc_channel_client_id_idx").
+			Column("client_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcChannel)(nil)).
+			Index("ibc_channel_connection_id_idx").
+			Column("connection_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcChannel)(nil)).
+			Index("ibc_channel_status_idx").
+			Column("status").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

@@ -2239,6 +2239,362 @@
                 }
             }
         },
+        "/ibc/channel": {
+            "get": {
+                "description": "Get ibc channels info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ibc"
+                ],
+                "summary": "Get ibc channels info",
+                "operationId": "get-ibc-channels",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Client id",
+                        "name": "client_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Connection id",
+                        "name": "connection_id",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "initialization",
+                            "opened",
+                            "closed"
+                        ],
+                        "type": "string",
+                        "description": "Channel status",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.IbcChannel"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/ibc/channel/{id}": {
+            "get": {
+                "description": "Get ibc channel info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ibc"
+                ],
+                "summary": "Get ibc channel info",
+                "operationId": "get-ibc-channel",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "IBC channel id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.IbcChannel"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/ibc/client": {
+            "get": {
+                "description": "Get ibc clients info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ibc"
+                ],
+                "summary": "Get ibc clients info",
+                "operationId": "get-ibc-clients",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.IbcClient"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/ibc/client/{id}": {
+            "get": {
+                "description": "Get ibc client info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ibc"
+                ],
+                "summary": "Get ibc client info",
+                "operationId": "get-ibc-client",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "IBC client id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.IbcClient"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/ibc/connection": {
+            "get": {
+                "description": "Get ibc connections info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ibc"
+                ],
+                "summary": "Get ibc connections info",
+                "operationId": "get-ibc-conns",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Client id",
+                        "name": "client_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.IbcConnection"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/ibc/connection/{id}": {
+            "get": {
+                "description": "Get ibc client info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ibc"
+                ],
+                "summary": "Get ibc connection info",
+                "operationId": "get-ibc-conn",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "IBC connection id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.IbcConnection"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/namespace": {
             "get": {
                 "description": "List namespace info",
@@ -6236,6 +6592,238 @@
                 }
             }
         },
+        "responses.IbcChannel": {
+            "type": "object",
+            "properties": {
+                "client": {
+                    "$ref": "#/definitions/responses.ShortIbcClient"
+                },
+                "confirmation_height": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "confirmation_tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "confirmed_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "connection_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "connection-1"
+                },
+                "counterparty_channel_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "channel-1"
+                },
+                "counterparty_port_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "transfer"
+                },
+                "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "created_tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "creator": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "channel-1"
+                },
+                "ordering": {
+                    "type": "boolean",
+                    "format": "boolean",
+                    "example": false
+                },
+                "port_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "transfer"
+                },
+                "status": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "opened"
+                },
+                "version": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "ics20-1"
+                }
+            }
+        },
+        "responses.IbcClient": {
+            "type": "object",
+            "properties": {
+                "chain_id": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "osmosis-1"
+                },
+                "connection_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "creator": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "frozen_revision_height": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "frozen_revision_number": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "client-1"
+                },
+                "latest_revision_height": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "latest_revision_number": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "max_clock_drift": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "trust_level_denominator": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "trust_level_numerator": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "trusting_period": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "type": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "client"
+                },
+                "unbonding_period": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "updated_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                }
+            }
+        },
+        "responses.IbcConnection": {
+            "type": "object",
+            "properties": {
+                "channels_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "client": {
+                    "$ref": "#/definitions/responses.ShortIbcClient"
+                },
+                "connected_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "connected_height": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "connected_tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "counterparty_client_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "client-1"
+                },
+                "counterparty_connection_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "connection-1"
+                },
+                "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "created_tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "connection-1"
+                }
+            }
+        },
         "responses.Jail": {
             "type": "object",
             "properties": {
@@ -7384,6 +7972,26 @@
                 "hash": {
                     "type": "string",
                     "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                }
+            }
+        },
+        "responses.ShortIbcClient": {
+            "type": "object",
+            "properties": {
+                "chain_id": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "osmosis-1"
+                },
+                "id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "client-1"
+                },
+                "type": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "client"
                 }
             }
         },

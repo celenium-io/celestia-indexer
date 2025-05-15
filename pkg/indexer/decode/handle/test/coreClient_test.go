@@ -110,7 +110,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateClient(t *testing.T) {
 	var header tmTypes.Header
 	err = header.Unmarshal(msg.Header.Value)
 	require.NoError(t, err)
-	data["Header"] = &header
+	data["Header"] = header
 
 	msgExpected := storage.Message{
 		Id:        0,

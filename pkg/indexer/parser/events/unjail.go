@@ -16,7 +16,7 @@ func handleUnjail(ctx *context.Context, events []storage.Event, msg *storage.Mes
 		return errors.New("nil event index")
 	}
 	if msg == nil {
-		return errors.New("nil message in events hanler")
+		return errors.New("nil message in events handler")
 	}
 	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.slashing.v1beta1.MsgUnjail" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())

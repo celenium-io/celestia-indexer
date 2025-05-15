@@ -257,15 +257,9 @@ func Message(
 
 	// coreClient module
 	case *coreClient.MsgCreateClient:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateClient(ctx, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateClient(ctx, status, d.Msg.Data, typedMsg)
 	case *coreClient.MsgUpdateClient:
-		typ, addrs, header, errParse := handle.MsgUpdateClient(ctx, status, typedMsg)
-		d.Msg.Addresses = addrs
-		d.Msg.Type = typ
-		err = errParse
-		if header != nil {
-			d.Msg.Data["Header"] = header
-		}
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateClient(ctx, status, d.Msg.Data, typedMsg)
 	case *coreClient.MsgUpgradeClient:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpgradeClient(ctx, typedMsg)
 	case *coreClient.MsgSubmitMisbehaviour:

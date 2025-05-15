@@ -54,6 +54,9 @@ type Storage struct {
 	ApiKeys         models.IApiKey
 	Proposals       models.IProposal
 	Votes           models.IVote
+	IbcClients      models.IIbcClient
+	IbcConnections  models.IIbcConnection
+	IbcChannels     models.IIbcChannel
 	Celestials      celestials.ICelestial
 	CelestialState  celestials.ICelestialState
 	Notificator     *Notificator
@@ -105,6 +108,9 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		ApiKeys:         NewApiKey(strg.Connection()),
 		Proposals:       NewProposal(strg.Connection()),
 		Votes:           NewVote(strg.Connection()),
+		IbcClients:      NewIbcClient(strg.Connection()),
+		IbcConnections:  NewIbcConnection(strg.Connection()),
+		IbcChannels:     NewIbcChannel(strg.Connection()),
 		Celestials:      celestialsPg.NewCelestials(strg.Connection()),
 		CelestialState:  celestialsPg.NewCelestialState(strg.Connection()),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),

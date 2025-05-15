@@ -4,6 +4,8 @@
 package decode
 
 import (
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
@@ -266,5 +268,65 @@ type ProposalStatus struct {
 func NewProposalStatus(m map[string]any) (body ProposalStatus, err error) {
 	body.Result = decoder.StringFromMap(m, "proposal_result")
 	body.Id, err = decoder.Uint64FromMap(m, "proposal_id")
+	return
+}
+
+type UpdateClient struct {
+	Id              string
+	Type            string
+	ConsensusHeight uint64
+	Revision        uint64
+}
+
+func NewUpdateClient(m map[string]any) (cc UpdateClient, err error) {
+	cc.Id = decoder.StringFromMap(m, "client_id")
+	cc.Type = decoder.StringFromMap(m, "client_type")
+	ch := decoder.StringFromMap(m, "consensus_height")
+	parts := strings.Split(ch, "-")
+	if len(parts) == 2 {
+		revision, err := strconv.ParseUint(parts[0], 10, 64)
+		if err != nil {
+			return cc, errors.Wrap(err, "revision")
+		}
+		cc.Revision = revision
+
+		height, err := strconv.ParseUint(parts[1], 10, 64)
+		if err != nil {
+			return cc, errors.Wrap(err, "consensus height")
+		}
+		cc.ConsensusHeight = height
+	}
+	return
+}
+
+type ConnectionChange struct {
+	ClientId                 string
+	ConnectionId             string
+	CounterpartyClientId     string
+	CounterpartyConnectionId string
+}
+
+func NewConnectionOpen(m map[string]any) (cc ConnectionChange) {
+	cc.ClientId = decoder.StringFromMap(m, "client_id")
+	cc.ConnectionId = decoder.StringFromMap(m, "connection_id")
+	cc.CounterpartyClientId = decoder.StringFromMap(m, "counterparty_client_id")
+	cc.CounterpartyConnectionId = decoder.StringFromMap(m, "counterparty_connection_id")
+	return
+}
+
+type ChannelChange struct {
+	ChannelId             string
+	ConnectionId          string
+	CounterpartyChannelId string
+	CounterpartyPortId    string
+	PortId                string
+}
+
+func NewChannelChange(m map[string]any) (cc ChannelChange) {
+	cc.ChannelId = decoder.StringFromMap(m, "channel_id")
+	cc.ConnectionId = decoder.StringFromMap(m, "connection_id")
+	cc.CounterpartyChannelId = decoder.StringFromMap(m, "counterparty_channel_id")
+	cc.CounterpartyPortId = decoder.StringFromMap(m, "counterparty_port_id")
+	cc.PortId = decoder.StringFromMap(m, "port_id")
 	return
 }

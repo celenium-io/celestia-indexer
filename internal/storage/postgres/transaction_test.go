@@ -1304,6 +1304,128 @@ func (s *TransactionTestSuite) TestActiveProposal() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
+func (s *TransactionTestSuite) TestIbcClients() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	count, err := tx.SaveIbcClients(ctx, &storage.IbcClient{
+		Id:              "client-100",
+		Height:          10000,
+		CreatedAt:       time.Now().UTC(),
+		TrustingPeriod:  time.Second,
+		ConnectionCount: 1,
+	}, &storage.IbcClient{
+		Id:              "client-1",
+		ConnectionCount: 10,
+	})
+	s.Require().NoError(err)
+	s.Require().EqualValues(1, count)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackIbcClients(ctx, 10000)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestIbcConnections() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveIbcConnections(ctx, &storage.IbcConnection{
+		ConnectionId:             "connection-100",
+		Height:                   10000,
+		CreatedAt:                time.Now().UTC(),
+		ClientId:                 "client-1",
+		CounterpartyConnectionId: "test-100",
+		CounterpartyClientId:     "test-client-100",
+		ChannelsCount:            1,
+	}, &storage.IbcConnection{
+		ConnectionId:  "connection-1",
+		ChannelsCount: 10,
+		ConnectedAt:   time.Now().UTC(),
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackIbcClients(ctx, 10000)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestIbcChannels() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveIbcChannels(ctx, &storage.IbcChannel{
+		Id:                    "channel-199",
+		ConnectionId:          "connection-1",
+		Height:                10000,
+		CreatedAt:             time.Now().UTC(),
+		ClientId:              "client-1",
+		CounterpartyPortId:    "transfer",
+		CounterpartyChannelId: "channel-100",
+		Ordering:              true,
+		Status:                types.IbcChannelStatusClosed,
+	}, &storage.IbcChannel{
+		Id:                 "channel-1",
+		ConfirmedAt:        time.Now().UTC(),
+		ConfirmationHeight: 10000,
+		ConfirmationTxId:   100,
+		Status:             types.IbcChannelStatusInitialization,
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackIbcClients(ctx, 10000)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestIbcConnection() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	conn, err := tx.IbcConnection(ctx, "connection-1")
+	s.Require().NoError(err)
+	s.Require().EqualValues("client-1", conn.ClientId)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
 func TestSuiteTransaction_Run(t *testing.T) {
 	suite.Run(t, new(TransactionTestSuite))
 }

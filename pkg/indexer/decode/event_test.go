@@ -343,3 +343,97 @@ func TestNewUnbond(t *testing.T) {
 		})
 	}
 }
+
+func TestNewUpdateClient(t *testing.T) {
+	tests := []struct {
+		name     string
+		m        map[string]any
+		wantBody UpdateClient
+		wantErr  bool
+	}{
+		{
+			name: "test 1",
+			m: map[string]any{
+				"client_id":        "07-tendermint-145",
+				"client_type":      "07-tendermint",
+				"consensus_height": "3-884",
+			},
+			wantBody: UpdateClient{
+				Id:              "07-tendermint-145",
+				Type:            "07-tendermint",
+				Revision:        3,
+				ConsensusHeight: 884,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotBody, err := NewUpdateClient(tt.m)
+			require.True(t, (err != nil) == tt.wantErr)
+			require.Equal(t, tt.wantBody, gotBody)
+		})
+	}
+}
+
+func TestNewConnectionChange(t *testing.T) {
+	tests := []struct {
+		name     string
+		m        map[string]any
+		wantBody ConnectionChange
+	}{
+		{
+			name: "test 1",
+			m: map[string]any{
+				"client_id":                  "07-tendermint-145",
+				"connection_id":              "connection-97",
+				"counterparty_client_id":     "07-tendermint-1",
+				"counterparty_connection_id": "connection-1",
+			},
+			wantBody: ConnectionChange{
+				ClientId:                 "07-tendermint-145",
+				ConnectionId:             "connection-97",
+				CounterpartyClientId:     "07-tendermint-1",
+				CounterpartyConnectionId: "connection-1",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotBody := NewConnectionOpen(tt.m)
+			require.Equal(t, tt.wantBody, gotBody)
+		})
+	}
+}
+
+func TestNewChannelChange(t *testing.T) {
+	tests := []struct {
+		name     string
+		m        map[string]any
+		wantBody ChannelChange
+	}{
+		{
+			name: "test 1",
+			m: map[string]any{
+				"channel_id":              "channel-112",
+				"connection_id":           "connection-97",
+				"counterparty_channel_id": "channel-1",
+				"counterparty_port_id":    "transfer",
+				"port_id":                 "transfer",
+			},
+			wantBody: ChannelChange{
+				ChannelId:             "channel-112",
+				ConnectionId:          "connection-97",
+				CounterpartyChannelId: "channel-1",
+				CounterpartyPortId:    "transfer",
+				PortId:                "transfer",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotBody := NewChannelChange(tt.m)
+			require.Equal(t, tt.wantBody, gotBody)
+		})
+	}
+}
