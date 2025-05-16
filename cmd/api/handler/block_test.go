@@ -17,7 +17,7 @@ import (
 
 	nodeMock "github.com/celenium-io/celestia-indexer/pkg/node/mock"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	tmTypes "github.com/tendermint/tendermint/types"
+	tmTypes "github.com/cometbft/cometbft/types"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"

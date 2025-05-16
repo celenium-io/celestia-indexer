@@ -8,9 +8,9 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
+	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
-	blobTypes "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
 func Test_processBlob(t *testing.T) {

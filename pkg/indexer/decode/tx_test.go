@@ -6,6 +6,7 @@ package decode
 import (
 	"testing"
 
+	"cosmossdk.io/math"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx"
@@ -80,7 +81,7 @@ func TestDecodeCosmosTx_DelegateMsg(t *testing.T) {
 			ValidatorAddress: "celestiavaloper19urg9awjzwq8d40vwjdvv0yw9kgehscf0zx3gs",
 			Amount: types.Coin{
 				Denom:  "utia",
-				Amount: types.NewInt(7000000),
+				Amount: math.NewInt(7000000),
 			},
 		},
 	}
@@ -105,7 +106,7 @@ func TestDecodeFee(t *testing.T) {
 			authInfo: tx.AuthInfo{
 				Fee: &tx.Fee{
 					Amount: types.Coins{
-						types.NewCoin("utia", types.NewInt(1000)),
+						types.NewCoin("utia", math.NewInt(1000)),
 					},
 				},
 			},
@@ -117,7 +118,7 @@ func TestDecodeFee(t *testing.T) {
 			authInfo: tx.AuthInfo{
 				Fee: &tx.Fee{
 					Amount: types.Coins{
-						types.NewCoin("tia", types.NewInt(5000000)),
+						types.NewCoin("tia", math.NewInt(5000000)),
 					},
 				},
 			},
@@ -129,8 +130,8 @@ func TestDecodeFee(t *testing.T) {
 			authInfo: tx.AuthInfo{
 				Fee: &tx.Fee{
 					Amount: types.Coins{
-						types.NewCoin("utia", types.NewInt(1000)),
-						types.NewCoin("tia", types.NewInt(5000000)),
+						types.NewCoin("utia", math.NewInt(1000)),
+						types.NewCoin("tia", math.NewInt(5000000)),
 					},
 				},
 			},
@@ -142,7 +143,7 @@ func TestDecodeFee(t *testing.T) {
 			authInfo: tx.AuthInfo{
 				Fee: &tx.Fee{
 					Amount: types.Coins{
-						types.NewCoin("unknown", types.NewInt(1000)),
+						types.NewCoin("unknown", math.NewInt(1000)),
 					},
 				},
 			},
@@ -177,7 +178,7 @@ func TestGetFeeInDenom(t *testing.T) {
 		{
 			desc: "Valid UTIA fee",
 			amount: types.Coins{
-				types.NewCoin("utia", types.NewInt(1000)),
+				types.NewCoin("utia", math.NewInt(1000)),
 			},
 			denom:       currency.Utia,
 			expectedFee: decimal.NewFromInt(1000),
@@ -186,7 +187,7 @@ func TestGetFeeInDenom(t *testing.T) {
 		{
 			desc: "Valid TIA fee",
 			amount: types.Coins{
-				types.NewCoin("tia", types.NewInt(5000000)),
+				types.NewCoin("tia", math.NewInt(5000000)),
 			},
 			denom:       currency.Tia,
 			expectedFee: decimal.NewFromInt(5000000).Shift(6),
@@ -195,7 +196,7 @@ func TestGetFeeInDenom(t *testing.T) {
 		{
 			desc: "Fee in unknown denom",
 			amount: types.Coins{
-				types.NewCoin("unknown", types.NewInt(1000)),
+				types.NewCoin("unknown", math.NewInt(1000)),
 			},
 			denom:       currency.Utia,
 			expectedFee: decimal.Zero,

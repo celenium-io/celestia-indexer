@@ -10,8 +10,8 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/cosmos/cosmos-sdk/types"
-	channelTypes "github.com/cosmos/ibc-go/v6/modules/core/04-channel/types"
-	tmTypes "github.com/cosmos/ibc-go/v6/modules/light-clients/07-tendermint/types"
+	channelTypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+	tmTypes "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )

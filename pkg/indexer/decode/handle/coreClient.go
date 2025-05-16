@@ -8,8 +8,9 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	coreClient "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
-	tmTypes "github.com/cosmos/ibc-go/v6/modules/light-clients/07-tendermint/types"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
+	coreClient "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
+	tmTypes "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 )
 
 // MsgCreateClient defines a message to create an IBC client
@@ -45,8 +46,8 @@ func MsgCreateClient(ctx *context.Context, status types.Status, data types.Packe
 	return msgType, addresses, nil
 }
 
-// MsgUpdateClient defines a sdk.Msg to update an IBC client state using the given header
-func MsgUpdateClient(ctx *context.Context, status types.Status, data types.PackedBytes, m *coreClient.MsgUpdateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
+// MsgUpdateClientV6 defines a sdk.Msg to update an IBC client state using the given header
+func MsgUpdateClientV6(ctx *context.Context, status types.Status, data types.PackedBytes, m *legacy.MsgUpdateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgUpdateClient
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
@@ -69,6 +70,22 @@ func MsgUpdateClient(ctx *context.Context, status types.Status, data types.Packe
 	return msgType, addresses, err
 }
 
+// MsgUpdateClient defines a sdk.Msg to update an IBC client state using the given header
+func MsgUpdateClient(ctx *context.Context, status types.Status, data types.PackedBytes, m *coreClient.MsgUpdateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgUpdateClient
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
+	}, ctx.Block.Height)
+	if err != nil || status == types.StatusFailed {
+		return msgType, addresses, err
+	}
+
+	if data == nil {
+		return msgType, addresses, nil
+	}
+	return msgType, addresses, err
+}
+
 // MsgUpgradeClient defines a sdk.Msg to upgrade an IBC client to a new client state
 func MsgUpgradeClient(ctx *context.Context, m *coreClient.MsgUpgradeClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgUpgradeClient
@@ -79,7 +96,7 @@ func MsgUpgradeClient(ctx *context.Context, m *coreClient.MsgUpgradeClient) (sto
 }
 
 // MsgSubmitMisbehaviour defines a sdk.Msg type that submits Evidence for light client misbehavior
-func MsgSubmitMisbehaviour(ctx *context.Context, m *coreClient.MsgSubmitMisbehaviour) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgSubmitMisbehaviour(ctx *context.Context, m *legacy.MsgSubmitMisbehaviour) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSubmitMisbehaviour
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},

@@ -4,10 +4,10 @@
 package handle
 
 import (
+	upgrade "cosmossdk.io/x/upgrade/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	upgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
 // MsgSoftwareUpgrade is the Msg/SoftwareUpgrade request type.

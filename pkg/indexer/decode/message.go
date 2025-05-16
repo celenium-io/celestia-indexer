@@ -4,34 +4,34 @@
 package decode
 
 import (
+	evidenceTypes "cosmossdk.io/x/evidence/types"
+	"cosmossdk.io/x/nft"
+	upgrade "cosmossdk.io/x/upgrade/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/handle"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	crisisTypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	evidenceTypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
-	"github.com/cosmos/cosmos-sdk/x/nft"
-	upgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	interchainAccounts "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/controller/types"
-	fee "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/types"
-	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
-	coreClient "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
-	coreConnection "github.com/cosmos/ibc-go/v6/modules/core/03-connection/types"
-	coreChannel "github.com/cosmos/ibc-go/v6/modules/core/04-channel/types"
+	interchainAccounts "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/types"
+	fee "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
+	ibcTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	coreClient "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
+	coreConnection "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
+	coreChannel "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 
 	"github.com/rs/zerolog/log"
 
+	cosmosFeegrant "cosmossdk.io/x/feegrant"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	appBlobTypes "github.com/celestiaorg/celestia-app/v3/x/blob/types"
-	qgbTypes "github.com/celestiaorg/celestia-app/v3/x/blobstream/types"
-	appSignalTypes "github.com/celestiaorg/celestia-app/v3/x/signal/types"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v4/x/blob/types"
+	appSignalTypes "github.com/celestiaorg/celestia-app/v4/x/signal/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	cosmosDistributionTypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	cosmosFeegrant "github.com/cosmos/cosmos-sdk/x/feegrant"
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	cosmosSlashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
@@ -125,7 +125,7 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, d.Msg.Grants, err = handle.MsgRevokeAllowance(ctx, status, typedMsg)
 
 	// qgb module
-	case *qgbTypes.MsgRegisterEVMAddress:
+	case *legacy.MsgRegisterEVMAddress:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRegisterEVMAddress(ctx, typedMsg)
 
 	// authz module
@@ -258,11 +258,13 @@ func Message(
 	// coreClient module
 	case *coreClient.MsgCreateClient:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateClient(ctx, status, d.Msg.Data, typedMsg)
+	case *legacy.MsgUpdateClient:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateClientV6(ctx, status, d.Msg.Data, typedMsg)
 	case *coreClient.MsgUpdateClient:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateClient(ctx, status, d.Msg.Data, typedMsg)
 	case *coreClient.MsgUpgradeClient:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpgradeClient(ctx, typedMsg)
-	case *coreClient.MsgSubmitMisbehaviour:
+	case *legacy.MsgSubmitMisbehaviour:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitMisbehaviour(ctx, typedMsg)
 
 	// coreConnection module

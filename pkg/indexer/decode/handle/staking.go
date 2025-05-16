@@ -18,7 +18,7 @@ import (
 func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cosmosStakingTypes.MsgCreateValidator) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgCreateValidator
 	addresses, err := createAddresses(ctx, addressesData{
-		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
+		{t: storageTypes.MsgAddressTypeDelegator, address: m.ValidatorAddress},
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 	}, ctx.Block.Height)
 	if err != nil {
@@ -41,7 +41,7 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 
 	jailed := false
 	validator := storage.Validator{
-		Delegator:         m.DelegatorAddress,
+		Delegator:         m.ValidatorAddress,
 		Address:           m.ValidatorAddress,
 		ConsAddress:       consAddress,
 		Moniker:           m.Description.Moniker,
@@ -63,7 +63,7 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 		validator.Stake = amount
 
 		address := storage.Address{
-			Address: m.DelegatorAddress,
+			Address: m.ValidatorAddress,
 			Balance: storage.Balance{
 				Currency:  currency.DefaultCurrency,
 				Spendable: decimal.Zero,

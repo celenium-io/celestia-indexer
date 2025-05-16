@@ -11,7 +11,7 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	fee "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/types"
+	fee "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
 )

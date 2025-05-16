@@ -11,11 +11,11 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/celenium-io/celestia-indexer/pkg/node"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/cometbft/cometbft/rpc/client/http"
 	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/rs/zerolog/log"
-	"github.com/tendermint/tendermint/rpc/client/http"
 )
 
 const (

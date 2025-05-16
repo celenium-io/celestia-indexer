@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"cosmossdk.io/math"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/shopspring/decimal"
@@ -28,7 +29,7 @@ func TestNewCoinSpent(t *testing.T) {
 			},
 			wantBody: CoinSpent{
 				Spender: "spender",
-				Amount:  testsuite.Ptr(types.NewCoin("utia", types.OneInt())),
+				Amount:  testsuite.Ptr(types.NewCoin("utia", math.OneInt())),
 			},
 		}, {
 			name: "test 2",
@@ -74,7 +75,7 @@ func TestNewCoinReceived(t *testing.T) {
 			},
 			wantBody: CoinReceived{
 				Receiver: "receiver",
-				Amount:   testsuite.Ptr(types.NewCoin("utia", types.NewInt(42))),
+				Amount:   testsuite.Ptr(types.NewCoin("utia", math.NewInt(42))),
 			},
 		}, {
 			name: "test 2",
@@ -121,7 +122,7 @@ func TestNewCompleteRedelegation(t *testing.T) {
 				"source_validator":      "celestiavaloper1wu24jxpn9j0580ehjz344d58cf3t7lzrrgqmnr",
 			},
 			wantBody: CompleteRedelegation{
-				Amount:        testsuite.Ptr(types.NewCoin("utia", types.NewInt(51000000))),
+				Amount:        testsuite.Ptr(types.NewCoin("utia", math.NewInt(51000000))),
 				Delegator:     "celestia1jxmxxa04k2tpkwk5u00pj37lmg668ksvh0ydax",
 				SrcValidator:  "celestiavaloper1wu24jxpn9j0580ehjz344d58cf3t7lzrrgqmnr",
 				DestValidator: "celestiavaloper1clf3nqp89h97umhl4fmcqr642jz6rszcxegjc6",
@@ -153,7 +154,7 @@ func TestNewCompleteUnbonding(t *testing.T) {
 				"validator": "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
 			wantBody: CompleteUnbonding{
-				Amount:    testsuite.Ptr(types.NewCoin("utia", types.NewInt(256000000))),
+				Amount:    testsuite.Ptr(types.NewCoin("utia", math.NewInt(256000000))),
 				Delegator: "celestia1g60teezwmfdj8xxpnd5kehvp25zfzt25pxxphv",
 				Validator: "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
@@ -264,7 +265,7 @@ func TestNewWithdrawReward(t *testing.T) {
 				"validator": "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
 			wantBody: WithdrawRewards{
-				Amount:    testsuite.Ptr(types.NewCoin("utia", types.NewInt(256000000))),
+				Amount:    testsuite.Ptr(types.NewCoin("utia", math.NewInt(256000000))),
 				Delegator: "celestia1g60teezwmfdj8xxpnd5kehvp25zfzt25pxxphv",
 				Validator: "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
@@ -296,7 +297,7 @@ func TestNewRedelegate(t *testing.T) {
 				"source_validator":      "celestiavaloper1rcm7tth05klgkqpucdhm5hexnk49dfda3l3hak",
 			},
 			wantBody: Redelegate{
-				Amount:         testsuite.Ptr(types.NewCoin("utia", types.NewInt(69989816))),
+				Amount:         testsuite.Ptr(types.NewCoin("utia", math.NewInt(69989816))),
 				SrcValidator:   "celestiavaloper1rcm7tth05klgkqpucdhm5hexnk49dfda3l3hak",
 				DestValidator:  "celestiavaloper1u825srldhev7t4wnd3hplhrphahjfk7ff3wfdr",
 				CompletionTime: time.Date(2024, 3, 10, 22, 58, 16, 0, time.UTC),
@@ -328,7 +329,7 @@ func TestNewUnbond(t *testing.T) {
 				"validator":       "celestiavaloper1ej2es5fjztqjcd4pwa0zyvaevtjd2y5wh8xeg4",
 			},
 			wantBody: Unbond{
-				Amount:         testsuite.Ptr(types.NewCoin("utia", types.NewInt(1000000))),
+				Amount:         testsuite.Ptr(types.NewCoin("utia", math.NewInt(1000000))),
 				Validator:      "celestiavaloper1ej2es5fjztqjcd4pwa0zyvaevtjd2y5wh8xeg4",
 				CompletionTime: time.Date(2024, 3, 10, 23, 8, 39, 0, time.UTC),
 			},

@@ -6,14 +6,15 @@ package decode
 import (
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/celestiaorg/celestia-app/v3/app"
-	"github.com/celestiaorg/celestia-app/v3/app/encoding"
+	"github.com/celestiaorg/celestia-app/v4/app"
+	"github.com/celestiaorg/celestia-app/v4/app/encoding"
+	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
+	tmTypes "github.com/cometbft/cometbft/types"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	blobTypes "github.com/tendermint/tendermint/proto/tendermint/types"
-	tmTypes "github.com/tendermint/tendermint/types"
 )
 
 type DecodedTx struct {
@@ -48,18 +49,16 @@ func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
 	}
 
 	d.Signers = make(map[types.Address][]byte)
-	for i := range d.Messages {
-		for _, signer := range d.Messages[i].GetSigners() {
-			if signer.Empty() {
-				continue
-			}
-			signerBytes := signer.Bytes()
-			address, err := types.NewAddressFromBytes(signerBytes)
-			if err != nil {
-				return d, err
-			}
-			d.Signers[address] = signerBytes
+	for _, signer := range d.AuthInfo.GetSignerInfos() {
+		var pk secp256k1.PubKey
+		if err := cfg.Codec.Unmarshal(signer.GetPublicKey().Value, &pk); err != nil {
+			return d, errors.Wrap(err, "signer decoding")
 		}
+		address, err := types.NewAddressFromBytes(pk.Bytes())
+		if err != nil {
+			return d, err
+		}
+		d.Signers[address] = pk.Key
 	}
 
 	return

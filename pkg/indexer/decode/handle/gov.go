@@ -12,7 +12,7 @@ import (
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	paramsV1Beta "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	ibcTypes "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
+	ibcTypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 )

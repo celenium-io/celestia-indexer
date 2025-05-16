@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/celestiaorg/celestia-app/v3/pkg/proof"
+	"github.com/celestiaorg/celestia-app/v4/pkg/proof"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -26,9 +26,9 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	nodeMock "github.com/celenium-io/celestia-indexer/pkg/node/mock"
 	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/node/types"
+	tendermintTypes "github.com/cometbft/cometbft/types"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
-	tendermintTypes "github.com/tendermint/tendermint/types"
 	"go.uber.org/mock/gomock"
 )
 

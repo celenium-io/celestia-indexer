@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"cosmossdk.io/x/feegrant"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
@@ -15,7 +16,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	codecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
 )
