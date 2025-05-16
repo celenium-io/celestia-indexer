@@ -320,6 +320,18 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			name:    string(MsgSignalVersion),
 			msgType: []int{MsgTypeBitsSignalVersion},
 			want:    []MsgType{MsgSignalVersion},
+		}, {
+			name:    string(MsgIBCSoftwareUpgrade),
+			msgType: []int{MsgTypeBitsIBCSoftwareUpgrade},
+			want:    []MsgType{MsgIBCSoftwareUpgrade},
+		}, {
+			name:    string(MsgRecoverClient),
+			msgType: []int{MsgTypeBitsRecoverClient},
+			want:    []MsgType{MsgRecoverClient},
+		}, {
+			name:    string(MsgUpdateParams),
+			msgType: []int{MsgTypeBitsUpdateParams},
+			want:    []MsgType{MsgUpdateParams},
 		},
 	}
 	for _, tt := range tests {
@@ -651,9 +663,19 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			name:   "test 76",
 			values: []MsgType{MsgSignalVersion},
 			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSignalVersion)},
-		},
-
-		{
+		}, {
+			name:   "test 77",
+			values: []MsgType{MsgIBCSoftwareUpgrade},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsIBCSoftwareUpgrade)},
+		}, {
+			name:   "test 78",
+			values: []MsgType{MsgUpdateParams},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateParams)},
+		}, {
+			name:   "test 79",
+			values: []MsgType{MsgRecoverClient},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsRecoverClient)},
+		}, {
 			name:   "test combo",
 			values: []MsgType{MsgWithdrawDelegatorReward, MsgBeginRedelegate},
 			want:   MsgTypeBits{NewBits(260)},

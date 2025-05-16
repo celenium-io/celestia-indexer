@@ -100,6 +100,9 @@ const (
 	MsgTypeBitsUpdateClient
 	MsgTypeBitsUpgradeClient
 	MsgTypeBitsSubmitMisbehaviour
+	MsgTypeBitsRecoverClient
+	MsgTypeBitsIBCSoftwareUpgrade
+	MsgTypeBitsUpdateParams
 
 	MsgTypeBitsConnectionOpenInit
 	MsgTypeBitsConnectionOpenTry
@@ -263,6 +266,13 @@ func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 		mask.SetBit(MsgTypeBitsUpgradeClient)
 	case MsgSubmitMisbehaviour:
 		mask.SetBit(MsgTypeBitsSubmitMisbehaviour)
+	case MsgIBCSoftwareUpgrade:
+		mask.SetBit(MsgTypeBitsIBCSoftwareUpgrade)
+	case MsgRecoverClient:
+		mask.SetBit(MsgTypeBitsRecoverClient)
+	case MsgUpdateParams:
+		mask.SetBit(MsgTypeBitsUpdateParams)
+
 	case MsgConnectionOpenInit:
 		mask.SetBit(MsgTypeBitsConnectionOpenInit)
 	case MsgConnectionOpenTry:
@@ -560,6 +570,18 @@ func (mask MsgTypeBits) Names() []MsgType {
 		names[i] = MsgSubmitMisbehaviour
 		i++
 	}
+	if mask.HasBit(MsgTypeBitsRecoverClient) {
+		names[i] = MsgRecoverClient
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsIBCSoftwareUpgrade) {
+		names[i] = MsgIBCSoftwareUpgrade
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsUpdateParams) {
+		names[i] = MsgUpdateParams
+		i++
+	}
 	if mask.HasBit(MsgTypeBitsConnectionOpenInit) {
 		names[i] = MsgConnectionOpenInit
 		i++
@@ -655,9 +677,9 @@ var _ driver.Valuer = (*MsgTypeBits)(nil)
 
 func (mask MsgTypeBits) Value() (driver.Value, error) {
 	if mask.value == nil {
-		return fmt.Sprintf("%076b", 0), nil
+		return fmt.Sprintf("%079b", 0), nil
 	}
-	return fmt.Sprintf("%076b", mask.value), nil
+	return fmt.Sprintf("%079b", mask.value), nil
 }
 
 func (mask MsgTypeBits) MarshalJSON() (data []byte, err error) {
