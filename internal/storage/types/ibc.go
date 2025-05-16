@@ -11,5 +11,5 @@ package types
 		closed
 	)
 */
-//go:generate go-enum --marshal --sql --values
+//go:generate go-enum --marshal --sql --values --names
 type IbcChannelStatus string

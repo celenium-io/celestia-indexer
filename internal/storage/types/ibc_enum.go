@@ -13,6 +13,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 const (
@@ -24,7 +25,20 @@ const (
 	IbcChannelStatusClosed IbcChannelStatus = "closed"
 )
 
-var ErrInvalidIbcChannelStatus = errors.New("not a valid IbcChannelStatus")
+var ErrInvalidIbcChannelStatus = fmt.Errorf("not a valid IbcChannelStatus, try [%s]", strings.Join(_IbcChannelStatusNames, ", "))
+
+var _IbcChannelStatusNames = []string{
+	string(IbcChannelStatusInitialization),
+	string(IbcChannelStatusOpened),
+	string(IbcChannelStatusClosed),
+}
+
+// IbcChannelStatusNames returns a list of possible string values of IbcChannelStatus.
+func IbcChannelStatusNames() []string {
+	tmp := make([]string, len(_IbcChannelStatusNames))
+	copy(tmp, _IbcChannelStatusNames)
+	return tmp
+}
 
 // IbcChannelStatusValues returns a list of the values for IbcChannelStatus
 func IbcChannelStatusValues() []IbcChannelStatus {

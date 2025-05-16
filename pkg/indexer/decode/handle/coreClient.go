@@ -103,3 +103,30 @@ func MsgSubmitMisbehaviour(ctx *context.Context, m *legacy.MsgSubmitMisbehaviour
 	}, ctx.Block.Height)
 	return msgType, addresses, err
 }
+
+// MsgRecoverClient defines the message used to recover a frozen or expired client.
+func MsgRecoverClient(ctx *context.Context, m *coreClient.MsgRecoverClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgRecoverClient
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgIBCSoftwareUpgrade defines the message used to schedule an upgrade of an IBC client using a v1 governance proposal
+func MsgIBCSoftwareUpgrade(ctx *context.Context, m *coreClient.MsgIBCSoftwareUpgrade) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgIBCSoftwareUpgrade
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgUpdateParams defines the sdk.Msg type to update the client parameters.
+func MsgUpdateParams(ctx *context.Context, m *coreClient.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgUpdateParams
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}

@@ -78,6 +78,7 @@ type Enums struct {
 	ProposalType       []string `json:"proposal_type"`
 	VoteType           []string `json:"vote_type"`
 	VoteOption         []string `json:"vote_option"`
+	IbcChannelStatus   []string `json:"ibc_channel_status"`
 }
 
 func NewEnums(tags []string) Enums {
@@ -93,5 +94,6 @@ func NewEnums(tags []string) Enums {
 		ProposalType:       types.ProposalTypeNames(),
 		VoteType:           types.VoterTypeNames(),
 		VoteOption:         types.VoteOptionNames(),
+		IbcChannelStatus:   types.IbcChannelStatusNames(),
 	}
 }

@@ -264,6 +264,12 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateClient(ctx, status, d.Msg.Data, typedMsg)
 	case *coreClient.MsgUpgradeClient:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpgradeClient(ctx, typedMsg)
+	case *coreClient.MsgRecoverClient:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRecoverClient(ctx, typedMsg)
+	case *coreClient.MsgIBCSoftwareUpgrade:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgIBCSoftwareUpgrade(ctx, typedMsg)
+	case *coreClient.MsgUpdateParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateParams(ctx, typedMsg)
 	case *legacy.MsgSubmitMisbehaviour:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitMisbehaviour(ctx, typedMsg)
 

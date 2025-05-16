@@ -55,16 +55,11 @@ func NewR2(cfg R2Config) R2 {
 }
 
 func (r2 *R2) Init(ctx context.Context) error {
-	r2Resolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
-		return aws.Endpoint{
-			URL: r2.cfg.R2Url(),
-		}, nil
-	})
 	cfg, err := awsConfig.LoadDefaultConfig(ctx,
-		awsConfig.WithEndpointResolverWithOptions(r2Resolver),
 		awsConfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(r2.cfg.AccessKeyId, r2.cfg.AccessKeySecret, "")),
 		awsConfig.WithRegion("auto"),
 		awsConfig.WithRetryMode(aws.RetryModeAdaptive),
+		awsConfig.WithBaseEndpoint(r2.cfg.R2Url()),
 	)
 	if err != nil {
 		return err

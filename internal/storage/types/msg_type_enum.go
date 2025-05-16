@@ -137,6 +137,12 @@ const (
 	MsgUpgradeClient MsgType = "MsgUpgradeClient"
 	// MsgSubmitMisbehaviour is a MsgType of type MsgSubmitMisbehaviour.
 	MsgSubmitMisbehaviour MsgType = "MsgSubmitMisbehaviour"
+	// MsgRecoverClient is a MsgType of type MsgRecoverClient.
+	MsgRecoverClient MsgType = "MsgRecoverClient"
+	// MsgIBCSoftwareUpgrade is a MsgType of type MsgIBCSoftwareUpgrade.
+	MsgIBCSoftwareUpgrade MsgType = "MsgIBCSoftwareUpgrade"
+	// MsgUpdateParams is a MsgType of type MsgUpdateParams.
+	MsgUpdateParams MsgType = "MsgUpdateParams"
 	// MsgConnectionOpenInit is a MsgType of type MsgConnectionOpenInit.
 	MsgConnectionOpenInit MsgType = "MsgConnectionOpenInit"
 	// MsgConnectionOpenTry is a MsgType of type MsgConnectionOpenTry.
@@ -234,6 +240,9 @@ var _MsgTypeNames = []string{
 	string(MsgUpdateClient),
 	string(MsgUpgradeClient),
 	string(MsgSubmitMisbehaviour),
+	string(MsgRecoverClient),
+	string(MsgIBCSoftwareUpgrade),
+	string(MsgUpdateParams),
 	string(MsgConnectionOpenInit),
 	string(MsgConnectionOpenTry),
 	string(MsgConnectionOpenAck),
@@ -322,6 +331,9 @@ func MsgTypeValues() []MsgType {
 		MsgUpdateClient,
 		MsgUpgradeClient,
 		MsgSubmitMisbehaviour,
+		MsgRecoverClient,
+		MsgIBCSoftwareUpgrade,
+		MsgUpdateParams,
 		MsgConnectionOpenInit,
 		MsgConnectionOpenTry,
 		MsgConnectionOpenAck,
@@ -414,6 +426,9 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgUpdateClient":                    MsgUpdateClient,
 	"MsgUpgradeClient":                   MsgUpgradeClient,
 	"MsgSubmitMisbehaviour":              MsgSubmitMisbehaviour,
+	"MsgRecoverClient":                   MsgRecoverClient,
+	"MsgIBCSoftwareUpgrade":              MsgIBCSoftwareUpgrade,
+	"MsgUpdateParams":                    MsgUpdateParams,
 	"MsgConnectionOpenInit":              MsgConnectionOpenInit,
 	"MsgConnectionOpenTry":               MsgConnectionOpenTry,
 	"MsgConnectionOpenAck":               MsgConnectionOpenAck,
