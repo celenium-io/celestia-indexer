@@ -31,12 +31,12 @@ func TestParseTxs_EmptyTxsResults(t *testing.T) {
 	assert.Empty(t, resultTxs)
 }
 
-func mustDecodeBase64(s string) []byte {
+func mustDecodeBase64(s string) string {
 	data, err := base64.StdEncoding.DecodeString(s)
 	if err != nil {
 		panic(err)
 	}
-	return data
+	return string(data)
 }
 
 func TestParseTxs_SuccessTx(t *testing.T) {
