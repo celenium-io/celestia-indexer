@@ -8324,6 +8324,11 @@
                     "format": "string",
                     "example": "312"
                 },
+                "total_ibc_clients": {
+                    "type": "integer",
+                    "format": "string",
+                    "example": 312
+                },
                 "total_namespaces": {
                     "type": "integer",
                     "format": "string",
