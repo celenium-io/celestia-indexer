@@ -7,8 +7,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
 	"github.com/cosmos/cosmos-sdk/codec"
+	cosmosDistrTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	paramsV1Beta "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
@@ -93,7 +93,7 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 		return msgType, addresses, proposal, prpsl, nil
 
 	case "/cosmos.distribution.v1beta1.CommunityPoolSpendProposal":
-		var proposal legacy.CommunityPoolSpendProposal
+		var proposal cosmosDistrTypesV1Beta1.CommunityPoolSpendProposal //nolint
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
 			return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling community pool spend proposal for submit proposal content")
 		}
