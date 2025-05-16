@@ -38,7 +38,7 @@ func parseEvent(ctx *context.Context, b types.BlockData, eN types.Event, index i
 	resultEvent.Data = make(map[string]any, len(eN.Attributes))
 
 	for i := range eN.Attributes {
-		resultEvent.Data[string(eN.Attributes[i].Key)] = string(eN.Attributes[i].Value)
+		resultEvent.Data[eN.Attributes[i].Key] = eN.Attributes[i].Value
 	}
 
 	return processEvent(ctx, resultEvent)

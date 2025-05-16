@@ -35,13 +35,13 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 		"type": "coin_spent",
 		"attributes": [
 			{
-				"key": "c3BlbmRlcg==",
-				"value": "Y2VsZXN0aWExcDMzMHN0YXB1c3lrZnNzNDdxcmhxbHVram5jdmd5emY2Z2R1ZnM=",
+				"key": "spender",
+				"value": "celestia1p330stapusykfss47qrhqlukjncvgyzf6gdufs",
 				"index": true
 			},
 			{
-				"key": "YW1vdW50",
-				"value": "NDA0OTR1dGlh",
+				"key": "amount",
+				"value": "40494utia",
 				"index": true
 			}
 		]
