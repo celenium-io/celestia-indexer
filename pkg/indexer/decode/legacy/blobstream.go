@@ -72,6 +72,10 @@ func (m *MsgRegisterEVMAddress) XXX_DiscardUnknown() {
 	xxx_messageInfo_MsgRegisterEVMAddress.DiscardUnknown(m)
 }
 
+func (m *MsgRegisterEVMAddress) XXX_MessageName() string {
+	return "celestia.qgb.v1.MsgRegisterEVMAddress"
+}
+
 var xxx_messageInfo_MsgRegisterEVMAddress proto.InternalMessageInfo
 
 func (m *MsgRegisterEVMAddress) GetValidatorAddress() string {
@@ -175,14 +179,6 @@ type MsgClient interface {
 	// There are no validity checks of the EVM addresses existence on the Ethereum
 	// state machine.
 	RegisterEVMAddress(ctx context.Context, in *MsgRegisterEVMAddress, opts ...grpc.CallOption) (*MsgRegisterEVMAddressResponse, error)
-	// CreateClient defines a rpc handler method for MsgCreateClient.
-	CreateClient(ctx context.Context, in *MsgCreateClient, opts ...grpc.CallOption) (*MsgCreateClientResponse, error)
-	// UpdateClient defines a rpc handler method for MsgUpdateClient.
-	UpdateClient(ctx context.Context, in *MsgUpdateClient, opts ...grpc.CallOption) (*MsgUpdateClientResponse, error)
-	// UpgradeClient defines a rpc handler method for MsgUpgradeClient.
-	UpgradeClient(ctx context.Context, in *MsgUpgradeClient, opts ...grpc.CallOption) (*MsgUpgradeClientResponse, error)
-	// SubmitMisbehaviour defines a rpc handler method for MsgSubmitMisbehaviour.
-	SubmitMisbehaviour(ctx context.Context, in *MsgSubmitMisbehaviour, opts ...grpc.CallOption) (*MsgSubmitMisbehaviourResponse, error)
 }
 
 type msgClient struct {
@@ -210,14 +206,6 @@ type MsgServer interface {
 	// There are no validity checks of the EVM addresses existence on the Ethereum
 	// state machine.
 	RegisterEVMAddress(context.Context, *MsgRegisterEVMAddress) (*MsgRegisterEVMAddressResponse, error)
-	// CreateClient defines a rpc handler method for MsgCreateClient.
-	CreateClient(context.Context, *MsgCreateClient) (*MsgCreateClientResponse, error)
-	// UpdateClient defines a rpc handler method for MsgUpdateClient.
-	UpdateClient(context.Context, *MsgUpdateClient) (*MsgUpdateClientResponse, error)
-	// UpgradeClient defines a rpc handler method for MsgUpgradeClient.
-	UpgradeClient(context.Context, *MsgUpgradeClient) (*MsgUpgradeClientResponse, error)
-	// SubmitMisbehaviour defines a rpc handler method for MsgSubmitMisbehaviour.
-	SubmitMisbehaviour(context.Context, *MsgSubmitMisbehaviour) (*MsgSubmitMisbehaviourResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.

@@ -26,6 +26,7 @@ type ListIbcTransferFilters struct {
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IIbcTransfer interface {
 	List(ctx context.Context, fltrs ListIbcTransferFilters) ([]IbcTransfer, error)
+	Series(ctx context.Context, channelId string, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
 }
 
 type IbcTransfer struct {

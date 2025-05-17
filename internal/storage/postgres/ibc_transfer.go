@@ -8,6 +8,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
+	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 )
 
@@ -60,5 +61,39 @@ func (c *IbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFil
 		Join("left join address as sender on sender.id = sender_id").
 		Join("left join celestial as cel_sender on cel_sender.address_id = sender_id and cel_sender.status = 'PRIMARY'").
 		Scan(ctx, &transfers)
+	return
+}
+
+func (c *IbcTransfer) Series(ctx context.Context, channelId string, timeframe storage.Timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
+	query := c.DB().NewSelect().Order("time desc")
+
+	switch timeframe {
+	case storage.TimeframeHour:
+		query = query.Table(storage.ViewIbcTransfersByHour)
+	case storage.TimeframeDay:
+		query = query.Table(storage.ViewIbcTransfersByDay)
+	case storage.TimeframeMonth:
+		query = query.Table(storage.ViewIbcTransfersByMonth)
+	default:
+		return nil, errors.Errorf("invalid timeframe: %s", timeframe)
+	}
+
+	switch column {
+	case "count":
+		query = query.ColumnExpr("count as value, time as bucket")
+	case "amount":
+		query = query.ColumnExpr("amount as value, time as bucket")
+	default:
+		return nil, errors.Errorf("invalid column: %s", column)
+	}
+
+	if !req.From.IsZero() {
+		query = query.Where("time >= ?", req.From)
+	}
+	if !req.To.IsZero() {
+		query = query.Where("time < ?", req.To)
+	}
+
+	err = query.Scan(ctx, &items)
 	return
 }

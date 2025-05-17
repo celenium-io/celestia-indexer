@@ -4271,6 +4271,86 @@
                 }
             }
         },
+        "/stats/ibc/series/{id}/{name}/{timeframe}": {
+            "get": {
+                "description": "Get histogram for ibc channels with precomputed stats by series name and timeframe",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get histogram for ibc channels with precomputed stats",
+                "operationId": "stats-ibc-series",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Channel id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "hour",
+                            "day",
+                            "month"
+                        ],
+                        "type": "string",
+                        "description": "Timeframe",
+                        "name": "timeframe",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "count",
+                            "amount"
+                        ],
+                        "type": "string",
+                        "description": "Series name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.HistogramItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/messages_count_24h": {
             "get": {
                 "description": "Get messages distribution for the last 24 hours",

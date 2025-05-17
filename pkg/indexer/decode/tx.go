@@ -5,6 +5,7 @@ package decode
 
 import (
 	"github.com/celenium-io/celestia-indexer/internal/currency"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/celestiaorg/celestia-app/v4/app"
 	"github.com/celestiaorg/celestia-app/v4/app/encoding"
@@ -160,6 +161,7 @@ func getFeeInDenom(amount cosmosTypes.Coins, denom string) (decimal.Decimal, boo
 
 func createDecoder() (encoding.Config, cosmosTypes.TxDecoder) {
 	cfg := encoding.MakeConfig(app.ModuleEncodingRegisters...)
+	cfg.InterfaceRegistry.RegisterImplementations((*cosmosTypes.Msg)(nil), &legacy.MsgRegisterEVMAddress{})
 	return cfg, cfg.TxConfig.TxDecoder()
 }
 

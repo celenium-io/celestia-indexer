@@ -63,3 +63,74 @@ func (s *StorageTestSuite) TestIbcTransferList() {
 		s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", transfer.Sender.Address)
 	}
 }
+
+func (s *StorageTestSuite) TestIbcTransferSeries() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	type args struct {
+		tf     storage.Timeframe
+		column string
+		req    storage.SeriesRequest
+
+		wantCount int
+	}
+
+	for _, fltrs := range []args{
+		{
+			tf:        storage.TimeframeHour,
+			column:    "count",
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeDay,
+			column:    "count",
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeMonth,
+			column:    "count",
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeDay,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeMonth,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(1715942016, 0),
+			wantCount: 0,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(1652783616, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(0, 1715942016),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(0, 1652783616),
+			wantCount: 0,
+		},
+	} {
+		series, err := s.storage.IbcTransfers.Series(ctx, "channel-1", fltrs.tf, fltrs.column, fltrs.req)
+		s.Require().NoError(err)
+		s.Require().Len(series, fltrs.wantCount)
+	}
+}

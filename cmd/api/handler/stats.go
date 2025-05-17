@@ -18,14 +18,16 @@ import (
 type StatsHandler struct {
 	repo   storage.IStats
 	nsRepo storage.INamespace
+	ibc    storage.IIbcTransfer
 	state  storage.IState
 }
 
-func NewStatsHandler(repo storage.IStats, nsRepo storage.INamespace, state storage.IState) StatsHandler {
+func NewStatsHandler(repo storage.IStats, nsRepo storage.INamespace, ibc storage.IIbcTransfer, state storage.IState) StatsHandler {
 	return StatsHandler{
 		repo:   repo,
 		nsRepo: nsRepo,
 		state:  state,
+		ibc:    ibc,
 	}
 }
 
@@ -372,6 +374,54 @@ func (sh StatsHandler) StakingSeries(c echo.Context) error {
 	response := make([]responses.SeriesItem, len(histogram))
 	for i := range histogram {
 		response[i] = responses.NewSeriesItem(histogram[i])
+	}
+	return returnArray(c, response)
+}
+
+type ibcSeriesRequest struct {
+	Id         string            `example:"channel-1"  param:"id"        swaggertype:"string"  validate:"required"`
+	Timeframe  storage.Timeframe `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day month"`
+	SeriesName string            `example:"size"       param:"name"      swaggertype:"string"  validate:"required,oneof=count amount"`
+	From       int64             `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To         int64             `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
+// IbcSeries godoc
+//
+//	@Summary		Get histogram for ibc channels with precomputed stats
+//	@Description	Get histogram for ibc channels with precomputed stats by series name and timeframe
+//	@Tags			stats
+//	@ID				stats-ibc-series
+//	@Param			id			path	string	true	"Channel id"
+//	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
+//	@Param			name		path	string	true	"Series name"					Enums(count, amount)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.HistogramItem
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/stats/ibc/series/{id}/{name}/{timeframe} [get]
+func (sh StatsHandler) IbcSeries(c echo.Context) error {
+	req, err := bindAndValidate[ibcSeriesRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	histogram, err := sh.ibc.Series(
+		c.Request().Context(),
+		req.Id,
+		req.Timeframe,
+		req.SeriesName,
+		storage.NewSeriesRequest(req.From, req.To),
+	)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	response := make([]responses.HistogramItem, len(histogram))
+	for i := range histogram {
+		response[i] = responses.NewHistogramItem(histogram[i])
 	}
 	return returnArray(c, response)
 }

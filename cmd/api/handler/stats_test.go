@@ -26,6 +26,7 @@ type StatsTestSuite struct {
 	stats   *mock.MockIStats
 	ns      *mock.MockINamespace
 	state   *mock.MockIState
+	ibc     *mock.MockIIbcTransfer
 	echo    *echo.Echo
 	handler StatsHandler
 	ctrl    *gomock.Controller
@@ -39,7 +40,8 @@ func (s *StatsTestSuite) SetupSuite() {
 	s.stats = mock.NewMockIStats(s.ctrl)
 	s.ns = mock.NewMockINamespace(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewStatsHandler(s.stats, s.ns, s.state)
+	s.ibc = mock.NewMockIIbcTransfer(s.ctrl)
+	s.handler = NewStatsHandler(s.stats, s.ns, s.ibc, s.state)
 }
 
 // TearDownSuite -
@@ -539,4 +541,45 @@ func (s *StatsTestSuite) TestSizeGroups() {
 	s.Require().EqualValues(100, response[0].Size)
 	s.Require().EqualValues(10, response[0].AvgSize)
 	s.Require().EqualValues(10, response[0].Count)
+}
+
+func (s *StatsTestSuite) TestIbcSeries() {
+	for _, name := range []string{
+		"count",
+		"amount",
+	} {
+
+		for _, tf := range []storage.Timeframe{
+			storage.TimeframeHour,
+			storage.TimeframeDay,
+			storage.TimeframeMonth,
+		} {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/v1/stats/ibc/series/:id/:name/:timeframe")
+			c.SetParamNames("id", "name", "timeframe")
+			c.SetParamValues("channel-1", name, string(tf))
+
+			s.ibc.EXPECT().
+				Series(gomock.Any(), "channel-1", tf, name, storage.NewSeriesRequest(0, 0)).
+				Return([]storage.HistogramItem{
+					{
+						Value: "1000",
+						Time:  testTime,
+					},
+				}, nil)
+
+			s.Require().NoError(s.handler.IbcSeries(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
+
+			var response []responses.HistogramItem
+			err := json.NewDecoder(rec.Body).Decode(&response)
+			s.Require().NoError(err)
+			s.Require().Len(response, 1)
+
+			item := response[0]
+			s.Require().Equal("1000", item.Value)
+		}
+	}
 }

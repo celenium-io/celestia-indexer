@@ -258,8 +258,6 @@ func Message(
 	// coreClient module
 	case *coreClient.MsgCreateClient:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateClient(ctx, status, d.Msg.Data, typedMsg)
-	case *legacy.MsgUpdateClient:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateClientV6(ctx, status, d.Msg.Data, typedMsg)
 	case *coreClient.MsgUpdateClient:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateClient(ctx, status, d.Msg.Data, typedMsg)
 	case *coreClient.MsgUpgradeClient:
@@ -270,7 +268,7 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgIBCSoftwareUpgrade(ctx, typedMsg)
 	case *coreClient.MsgUpdateParams:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateParams(ctx, typedMsg)
-	case *legacy.MsgSubmitMisbehaviour:
+	case *coreClient.MsgSubmitMisbehaviour: //nolint
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitMisbehaviour(ctx, typedMsg)
 
 	// coreConnection module

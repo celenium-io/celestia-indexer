@@ -421,7 +421,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.State)
+	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.IbcTransfers, db.State)
 	stats := v1.Group("/stats")
 	{
 		stats.GET("/summary/:table/:function", statsHandler.Summary)
@@ -440,6 +440,10 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		staking := stats.Group("/staking")
 		{
 			staking.GET("/series/:id/:name/:timeframe", statsHandler.StakingSeries, statsMiddlewareCache)
+		}
+		ibc := stats.Group("/ibc")
+		{
+			ibc.GET("/series/:id/:name/:timeframe", statsHandler.IbcSeries, statsMiddlewareCache)
 		}
 		series := stats.Group("/series")
 		{

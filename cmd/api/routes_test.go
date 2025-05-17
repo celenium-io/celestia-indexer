@@ -35,6 +35,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/stats/series/:name/:timeframe/cumulative GET":    {},
 		"/v1/search GET":                                      {},
 		"/v1/stats/staking/series/:id/:name/:timeframe GET":   {},
+		"/v1/stats/ibc/series/:id/:name/:timeframe GET":       {},
 		"/v1/rollup/:id GET":                                  {},
 		"/v1/auth/rollup/new POST":                            {},
 		"/v1/address/:hash GET":                               {},

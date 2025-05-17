@@ -81,3 +81,42 @@ func (c *MockIIbcTransferListCall) DoAndReturn(f func(context.Context, storage.L
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
+
+// Series mocks base method.
+func (m *MockIIbcTransfer) Series(ctx context.Context, channelId string, timeframe storage.Timeframe, column string, req storage.SeriesRequest) ([]storage.HistogramItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Series", ctx, channelId, timeframe, column, req)
+	ret0, _ := ret[0].([]storage.HistogramItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Series indicates an expected call of Series.
+func (mr *MockIIbcTransferMockRecorder) Series(ctx, channelId, timeframe, column, req any) *MockIIbcTransferSeriesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Series", reflect.TypeOf((*MockIIbcTransfer)(nil).Series), ctx, channelId, timeframe, column, req)
+	return &MockIIbcTransferSeriesCall{Call: call}
+}
+
+// MockIIbcTransferSeriesCall wrap *gomock.Call
+type MockIIbcTransferSeriesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIIbcTransferSeriesCall) Return(items []storage.HistogramItem, err error) *MockIIbcTransferSeriesCall {
+	c.Call = c.Call.Return(items, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIIbcTransferSeriesCall) Do(f func(context.Context, string, storage.Timeframe, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIIbcTransferSeriesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIIbcTransferSeriesCall) DoAndReturn(f func(context.Context, string, storage.Timeframe, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIIbcTransferSeriesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
