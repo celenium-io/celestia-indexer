@@ -8,6 +8,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/celestiaorg/celestia-app/v4/app"
 	"github.com/celestiaorg/celestia-app/v4/app/encoding"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v4/x/blob/types"
 	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmTypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -38,7 +39,7 @@ func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
 		d.Blobs = bTx.Blobs
 	}
 
-	d.AuthInfo, d.Fee, err = decodeAuthInfo(cfg, raw)
+	d.AuthInfo, d.Fee, err = decodeAuthInfo(raw)
 	if err != nil {
 		return
 	}
@@ -47,18 +48,33 @@ func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
 	if err != nil {
 		return
 	}
-
 	d.Signers = make(map[types.Address][]byte)
+
+	for i := range d.Messages {
+		if pfb, ok := d.Messages[i].(*appBlobTypes.MsgPayForBlobs); ok {
+			address := types.Address(pfb.Signer)
+			_, hash, err := address.Decode()
+			if err != nil {
+				return d, errors.Wrap(err, "decode PFB signer")
+			}
+			d.Signers[address] = hash
+		}
+	}
+
 	for _, signer := range d.AuthInfo.GetSignerInfos() {
+		publickKey := signer.GetPublicKey()
+		if publickKey == nil {
+			continue
+		}
 		var pk secp256k1.PubKey
-		if err := cfg.Codec.Unmarshal(signer.GetPublicKey().Value, &pk); err != nil {
+		if err := cfg.Codec.Unmarshal(publickKey.Value, &pk); err != nil {
 			return d, errors.Wrap(err, "signer decoding")
 		}
 		address, err := types.NewAddressFromBytes(pk.Bytes())
 		if err != nil {
 			return d, err
 		}
-		d.Signers[address] = pk.Key
+		d.Signers[address] = pk.Bytes()
 	}
 
 	return
@@ -82,7 +98,7 @@ func decodeCosmosTx(decoder cosmosTypes.TxDecoder, raw tmTypes.Tx) (timeoutHeigh
 	return
 }
 
-func decodeAuthInfo(cfg encoding.Config, raw tmTypes.Tx) (tx.AuthInfo, decimal.Decimal, error) {
+func decodeAuthInfo(raw tmTypes.Tx) (tx.AuthInfo, decimal.Decimal, error) {
 	var txRaw tx.TxRaw
 	if e := cfg.Codec.Unmarshal(raw, &txRaw); e != nil {
 		return tx.AuthInfo{}, decimal.Decimal{}, errors.Wrap(e, "unmarshalling tx error")
