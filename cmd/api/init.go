@@ -421,7 +421,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.IbcTransfers, db.State)
+	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.IbcTransfers, db.IbcChannels, db.State)
 	stats := v1.Group("/stats")
 	{
 		stats.GET("/summary/:table/:function", statsHandler.Summary)
@@ -444,6 +444,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		ibc := stats.Group("/ibc")
 		{
 			ibc.GET("/series/:id/:name/:timeframe", statsHandler.IbcSeries, statsMiddlewareCache)
+			ibc.GET("/chains", statsHandler.IbcSeries, statsMiddlewareCache)
 		}
 		series := stats.Group("/series")
 		{

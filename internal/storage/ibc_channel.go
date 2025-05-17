@@ -23,10 +23,18 @@ type ListChannelFilters struct {
 	Status       types.IbcChannelStatus
 }
 
+type ChainStats struct {
+	Chain    string          `bun:"chain_id"`
+	Received decimal.Decimal `bun:"received"`
+	Sent     decimal.Decimal `bun:"sent"`
+	Flow     decimal.Decimal `bun:"flow"`
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IIbcChannel interface {
 	ById(ctx context.Context, id string) (IbcChannel, error)
 	List(ctx context.Context, fltrs ListChannelFilters) ([]IbcChannel, error)
+	StatsByChain(ctx context.Context, limit, offset int) ([]ChainStats, error)
 }
 
 type IbcChannel struct {

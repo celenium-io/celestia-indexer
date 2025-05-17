@@ -16,6 +16,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -23,13 +24,14 @@ import (
 // StatsTestSuite -
 type StatsTestSuite struct {
 	suite.Suite
-	stats   *mock.MockIStats
-	ns      *mock.MockINamespace
-	state   *mock.MockIState
-	ibc     *mock.MockIIbcTransfer
-	echo    *echo.Echo
-	handler StatsHandler
-	ctrl    *gomock.Controller
+	stats    *mock.MockIStats
+	ns       *mock.MockINamespace
+	state    *mock.MockIState
+	ibc      *mock.MockIIbcTransfer
+	channels *mock.MockIIbcChannel
+	echo     *echo.Echo
+	handler  StatsHandler
+	ctrl     *gomock.Controller
 }
 
 // SetupSuite -
@@ -41,7 +43,8 @@ func (s *StatsTestSuite) SetupSuite() {
 	s.ns = mock.NewMockINamespace(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
 	s.ibc = mock.NewMockIIbcTransfer(s.ctrl)
-	s.handler = NewStatsHandler(s.stats, s.ns, s.ibc, s.state)
+	s.channels = mock.NewMockIIbcChannel(s.ctrl)
+	s.handler = NewStatsHandler(s.stats, s.ns, s.ibc, s.channels, s.state)
 }
 
 // TearDownSuite -
@@ -582,4 +585,35 @@ func (s *StatsTestSuite) TestIbcSeries() {
 			s.Require().Equal("1000", item.Value)
 		}
 	}
+}
+
+func (s *StatsTestSuite) TestIbcChainStats() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/ibc/chains")
+
+	s.channels.EXPECT().
+		StatsByChain(gomock.Any(), 10, 0).
+		Return([]storage.ChainStats{
+			{
+				Chain:    "test",
+				Received: decimal.RequireFromString("101"),
+				Sent:     decimal.RequireFromString("99"),
+				Flow:     decimal.RequireFromString("200"),
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.IbcByChains(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response []responses.IbcChainStats
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 1)
+
+	s.Require().EqualValues("test", response[0].Chain)
+	s.Require().EqualValues("101", response[0].Received)
+	s.Require().EqualValues("99", response[0].Sent)
+	s.Require().EqualValues("200", response[0].Flow)
 }

@@ -16,18 +16,20 @@ import (
 )
 
 type StatsHandler struct {
-	repo   storage.IStats
-	nsRepo storage.INamespace
-	ibc    storage.IIbcTransfer
-	state  storage.IState
+	repo        storage.IStats
+	nsRepo      storage.INamespace
+	ibc         storage.IIbcTransfer
+	ibcChannels storage.IIbcChannel
+	state       storage.IState
 }
 
-func NewStatsHandler(repo storage.IStats, nsRepo storage.INamespace, ibc storage.IIbcTransfer, state storage.IState) StatsHandler {
+func NewStatsHandler(repo storage.IStats, nsRepo storage.INamespace, ibc storage.IIbcTransfer, ibcChannels storage.IIbcChannel, state storage.IState) StatsHandler {
 	return StatsHandler{
-		repo:   repo,
-		nsRepo: nsRepo,
-		state:  state,
-		ibc:    ibc,
+		repo:        repo,
+		nsRepo:      nsRepo,
+		state:       state,
+		ibc:         ibc,
+		ibcChannels: ibcChannels,
 	}
 }
 
@@ -422,6 +424,53 @@ func (sh StatsHandler) IbcSeries(c echo.Context) error {
 	response := make([]responses.HistogramItem, len(histogram))
 	for i := range histogram {
 		response[i] = responses.NewHistogramItem(histogram[i])
+	}
+	return returnArray(c, response)
+}
+
+type ibcByChainsRequest struct {
+	Limit  int `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int `query:"offset" validate:"omitempty,min=0"`
+}
+
+func (req *ibcByChainsRequest) SetDefault() {
+	if req.Limit <= 0 {
+		req.Limit = 10
+	}
+}
+
+// IbcByChains godoc
+//
+//	@Summary		Get stats for ibc channels splitted by chains
+//	@Description	Get stats for ibc channels splitted by chains
+//	@Tags			stats
+//	@ID				stats-ibc-chains
+//	@Param			limit				query	integer			false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset				query	integer			false	"Offset"						mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.IbcChainStats
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/stats/ibc/chains [get]
+func (sh StatsHandler) IbcByChains(c echo.Context) error {
+	req, err := bindAndValidate[ibcByChainsRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	stats, err := sh.ibcChannels.StatsByChain(
+		c.Request().Context(),
+		req.Limit,
+		req.Offset,
+	)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	response := make([]responses.IbcChainStats, len(stats))
+	for i := range stats {
+		response[i] = responses.NewIbcChainStats(stats[i])
 	}
 	return returnArray(c, response)
 }

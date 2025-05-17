@@ -120,3 +120,16 @@ func (s *StorageTestSuite) TestIbcChannelList() {
 		s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", channel.Creator.Address)
 	}
 }
+
+func (s *StorageTestSuite) TestIbcChannelStatsByChainId() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	stats, err := s.storage.IbcChannels.StatsByChain(ctx, 10, 0)
+	s.Require().NoError(err)
+	s.Require().Len(stats, 1)
+
+	s.Require().Equal("osmosis-1", stats[0].Chain)
+	s.Require().Equal("100", stats[0].Sent.String())
+	s.Require().Equal("100", stats[0].Received.String())
+}

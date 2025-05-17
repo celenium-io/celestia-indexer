@@ -79,3 +79,25 @@ func (c *IbcChannel) List(ctx context.Context, fltrs storage.ListChannelFilters)
 		Scan(ctx, &channels)
 	return
 }
+
+func (c *IbcChannel) StatsByChain(ctx context.Context, limit, offset int) (stats []storage.ChainStats, err error) {
+	query := c.DB().NewSelect().
+		Model((*storage.IbcChannel)(nil)).
+		ColumnExpr("ibc_client.chain_id as chain_id").
+		ColumnExpr("sum(received) as received").
+		ColumnExpr("sum(sent) as sent").
+		ColumnExpr("sum(received) + sum(sent) as flow").
+		Join("left join ibc_client on ibc_client.id = ibc_channel.client_id").
+		Group("chain_id")
+
+	q := c.DB().NewSelect().
+		With("stats", query).
+		Table("stats").
+		OrderExpr("flow desc").
+		Offset(offset)
+
+	q = limitScope(q, limit)
+
+	err = q.Scan(ctx, &stats)
+	return
+}

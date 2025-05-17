@@ -222,3 +222,19 @@ func NewIbcTransfer(transfer storage.IbcTransfer) IbcTransfer {
 
 	return response
 }
+
+type IbcChainStats struct {
+	Chain    string `example:"123456" format:"string" json:"chain"    swaggertype:"string"`
+	Sent     string `example:"123445" format:"string" json:"sent"     swaggertype:"string"`
+	Received string `example:"123445" format:"string" json:"received" swaggertype:"string"`
+	Flow     string `example:"123445" format:"string" json:"flow"     swaggertype:"string"`
+}
+
+func NewIbcChainStats(stats storage.ChainStats) IbcChainStats {
+	return IbcChainStats{
+		Chain:    stats.Chain,
+		Received: stats.Received.String(),
+		Sent:     stats.Sent.String(),
+		Flow:     stats.Flow.String(),
+	}
+}

@@ -52,6 +52,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/address/:hash/vestings GET":                      {},
 		"/v1/tx/:hash/events GET":                             {},
 		"/v1/stats/changes_24h GET":                           {},
+		"/v1/stats/ibc/chains GET":                            {},
 		"/v1/rollup/count GET":                                {},
 		"/v1/auth/rollup/:id PATCH":                           {},
 		"/v1/auth/rollup/:id/verify PATCH":                    {},
