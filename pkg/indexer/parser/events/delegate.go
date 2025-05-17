@@ -19,7 +19,7 @@ func handleDelegate(ctx *context.Context, events []storage.Event, msg *storage.M
 		return errors.New("nil event index")
 	}
 	if msg == nil {
-		return errors.New("nil message in events hanler")
+		return errors.New("nil message in events handler")
 	}
 	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.staking.v1beta1.MsgDelegate" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())

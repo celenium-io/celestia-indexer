@@ -6,7 +6,7 @@ package types
 import (
 	"time"
 
-	"github.com/tendermint/tendermint/types"
+	"github.com/cometbft/cometbft/types"
 )
 
 // ResultBlock is a single block (with meta)

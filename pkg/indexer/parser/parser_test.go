@@ -17,11 +17,11 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	dCtx "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	tmTypes "github.com/cometbft/cometbft/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	tmTypes "github.com/tendermint/tendermint/types"
 )
 
 func createModules(t *testing.T) (modules.BaseModule, string, Module) {

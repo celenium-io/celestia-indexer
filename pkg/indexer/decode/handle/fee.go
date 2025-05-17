@@ -7,7 +7,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	fee "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/types"
+	fee "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
 )
 
 // MsgRegisterPayee defines the request type for the RegisterPayee rpc

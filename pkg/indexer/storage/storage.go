@@ -310,7 +310,8 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	if err := module.saveMessages(ctx, tx, messages, addrToId); err != nil {
+	ibcClientsCount, err := module.saveMessages(ctx, tx, messages, addrToId)
+	if err != nil {
 		return state, err
 	}
 
@@ -333,7 +334,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	updateState(block, totalAccounts, totalNamespaces, totalProposals, totalValidators, totalVotingPower, &state)
+	updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, totalVotingPower, &state)
 	err = tx.Update(ctx, &state)
 	return state, err
 }

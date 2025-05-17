@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	tmTypes "github.com/tendermint/tendermint/types"
+	tmTypes "github.com/cometbft/cometbft/types"
 )
 
 func EmptyBlock() (types.BlockData, time.Time) {

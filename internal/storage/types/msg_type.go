@@ -86,6 +86,9 @@ package types
 		MsgUpdateClient,
 		MsgUpgradeClient,
 		MsgSubmitMisbehaviour,
+		MsgRecoverClient,
+		MsgIBCSoftwareUpgrade,
+		MsgUpdateParams,
 
 		MsgConnectionOpenInit,
 		MsgConnectionOpenTry,

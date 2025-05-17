@@ -6,13 +6,14 @@ package responses
 import (
 	"bytes"
 	"encoding/base64"
-	"github.com/celestiaorg/celestia-app/v3/pkg/appconsts"
+
+	"github.com/celestiaorg/celestia-app/v4/pkg/appconsts"
 	"github.com/celestiaorg/go-square/namespace"
 	"github.com/celestiaorg/go-square/shares"
 	"github.com/celestiaorg/go-square/v2/inclusion"
 	"github.com/celestiaorg/go-square/v2/share"
+	"github.com/cometbft/cometbft/crypto/merkle"
 	"github.com/pkg/errors"
-	"github.com/tendermint/tendermint/crypto/merkle"
 
 	_ "github.com/celestiaorg/go-square/v2/share"
 	"github.com/celestiaorg/rsmt2d"
@@ -159,7 +160,7 @@ func GetBlobShareIndexes(
 		if err != nil {
 			return 0, 0, errors.Wrap(err, "creating blob")
 		}
-		commitment, err := inclusion.CreateCommitment(blob, merkle.HashFromByteSlices, appconsts.SubtreeRootThreshold(0))
+		commitment, err := inclusion.CreateCommitment(blob, merkle.HashFromByteSlices, appconsts.SubtreeRootThreshold)
 		if err != nil {
 			return 0, 0, errors.Wrap(err, "creating commitment")
 		}

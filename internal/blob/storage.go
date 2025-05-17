@@ -8,8 +8,8 @@ import (
 	"encoding/base64"
 	"fmt"
 
+	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/gabriel-vasile/mimetype"
-	blobTypes "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
 type Blob struct {

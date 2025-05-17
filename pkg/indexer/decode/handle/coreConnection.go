@@ -7,7 +7,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	coreConnection "github.com/cosmos/ibc-go/v6/modules/core/03-connection/types"
+	coreConnection "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
 )
 
 // MsgConnectionOpenInit defines the msg sent by an account on Chain A to initialize a connection with Chain B.

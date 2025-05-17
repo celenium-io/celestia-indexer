@@ -11,17 +11,15 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	signal "github.com/celestiaorg/celestia-app/v3/x/signal/types"
+	signal "github.com/celestiaorg/celestia-app/v4/x/signal/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestDecodeMsg_SuccessOnMsgSignalVersion(t *testing.T) {
-	valAddress, err := types.ValAddressFromBech32("celestiavaloper12zs7e3n8pjd8y8ex0cyv67ethv30mekg9rcrz9")
-	require.NoError(t, err)
 	m := signal.NewMsgSignalVersion(
-		valAddress, 10,
+		"celestiavaloper12zs7e3n8pjd8y8ex0cyv67ethv30mekg9rcrz9", 10,
 	)
 	blob, now := testsuite.EmptyBlock()
 	position := 7

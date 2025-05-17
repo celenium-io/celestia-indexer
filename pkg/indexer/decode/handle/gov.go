@@ -12,7 +12,7 @@ import (
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	paramsV1Beta "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	ibcTypes "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
+	ibcTypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 )
@@ -76,7 +76,7 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 
 		return msgType, addresses, proposal, prpsl, nil
 	case "/ibc.core.client.v1.ClientUpdateProposal":
-		var proposal ibcTypes.ClientUpdateProposal
+		var proposal ibcTypes.ClientUpdateProposal //nolint
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
 			return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling client update proposal for submit proposal content")
 		}
@@ -93,7 +93,7 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 		return msgType, addresses, proposal, prpsl, nil
 
 	case "/cosmos.distribution.v1beta1.CommunityPoolSpendProposal":
-		var proposal cosmosDistrTypesV1Beta1.CommunityPoolSpendProposal
+		var proposal cosmosDistrTypesV1Beta1.CommunityPoolSpendProposal //nolint
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
 			return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling community pool spend proposal for submit proposal content")
 		}

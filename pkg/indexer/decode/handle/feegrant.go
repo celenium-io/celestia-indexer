@@ -4,11 +4,11 @@
 package handle
 
 import (
+	"cosmossdk.io/x/feegrant"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	"github.com/fatih/structs"
 )
 

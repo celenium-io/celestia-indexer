@@ -6,13 +6,13 @@ package handle
 import (
 	"testing"
 
+	evidenceTypes "cosmossdk.io/x/evidence/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
-	evidenceTypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
 )

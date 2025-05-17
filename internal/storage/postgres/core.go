@@ -54,6 +54,10 @@ type Storage struct {
 	ApiKeys         models.IApiKey
 	Proposals       models.IProposal
 	Votes           models.IVote
+	IbcClients      models.IIbcClient
+	IbcConnections  models.IIbcConnection
+	IbcChannels     models.IIbcChannel
+	IbcTransfers    models.IIbcTransfer
 	Celestials      celestials.ICelestial
 	CelestialState  celestials.ICelestialState
 	Notificator     *Notificator
@@ -105,6 +109,10 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		ApiKeys:         NewApiKey(strg.Connection()),
 		Proposals:       NewProposal(strg.Connection()),
 		Votes:           NewVote(strg.Connection()),
+		IbcClients:      NewIbcClient(strg.Connection()),
+		IbcConnections:  NewIbcConnection(strg.Connection()),
+		IbcChannels:     NewIbcChannel(strg.Connection()),
+		IbcTransfers:    NewIbcTransfer(strg.Connection()),
 		Celestials:      celestialsPg.NewCelestials(strg.Connection()),
 		CelestialState:  celestialsPg.NewCelestialState(strg.Connection()),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
@@ -193,6 +201,7 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 			&models.Jail{},
 			&models.StakingLog{},
 			&models.Vote{},
+			&models.IbcTransfer{},
 		} {
 			if _, err := tx.ExecContext(ctx,
 				`SELECT create_hypertable(?, 'time', chunk_time_interval => INTERVAL '1 month', if_not_exists => TRUE);`,

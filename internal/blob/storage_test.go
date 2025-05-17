@@ -6,8 +6,8 @@ package blob
 import (
 	"testing"
 
+	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/require"
-	blobTypes "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
 func TestBlob_String(t *testing.T) {

@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	tendermint "github.com/cometbft/cometbft/types"
 	"github.com/pkg/errors"
-	tendermint "github.com/tendermint/tendermint/types"
 )
 
 func (r *Module) sync(ctx context.Context) {

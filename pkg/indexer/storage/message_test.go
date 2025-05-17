@@ -28,6 +28,7 @@ func Test_saveMessages(t *testing.T) {
 		args                      args
 		wantNamespaceMessageCount int
 		wantMsgAddress            int
+		wantIbcClientsCount       int64
 		wantErr                   bool
 	}{
 		{
@@ -309,6 +310,46 @@ func Test_saveMessages(t *testing.T) {
 			wantNamespaceMessageCount: 0,
 			wantMsgAddress:            1,
 			wantErr:                   false,
+		}, {
+			name: "test ibc clients saving",
+			args: args{
+				messages: []*storage.Message{
+					{
+						Height:   100,
+						Time:     now,
+						Position: 0,
+						Type:     types.MsgCreateClient,
+						TxId:     1,
+						Addresses: []storage.AddressWithType{
+							{
+								Type: types.MsgAddressTypeFromAddress,
+								Address: storage.Address{
+									Address:    "address1",
+									Height:     100,
+									LastHeight: 100,
+								},
+							},
+						},
+						IbcClient: &storage.IbcClient{
+							Id:        "client-1",
+							Height:    100,
+							CreatedAt: now,
+							Creator: &storage.Address{
+								Address:    "address1",
+								Height:     100,
+								LastHeight: 100,
+							},
+						},
+					},
+				},
+				addrToId: map[string]uint64{
+					"address1": 1,
+				},
+			},
+			wantNamespaceMessageCount: 0,
+			wantMsgAddress:            1,
+			wantIbcClientsCount:       1,
+			wantErr:                   false,
 		},
 	}
 
@@ -363,13 +404,35 @@ func Test_saveMessages(t *testing.T) {
 
 		tx.EXPECT().
 			SaveGrants(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			MinTimes(1).
+			Times(1).
+			Return(nil)
+
+		tx.EXPECT().
+			SaveIbcClients(gomock.Any(), gomock.Any()).
+			Times(1).
+			Return(tt.wantIbcClientsCount, nil)
+
+		tx.EXPECT().
+			SaveIbcConnections(gomock.Any(), gomock.Any()).
+			Times(1).
+			Return(nil)
+
+		tx.EXPECT().
+			SaveIbcChannels(gomock.Any(), gomock.Any()).
+			Times(1).
+			Return(nil)
+
+		tx.EXPECT().
+			SaveIbcTransfers(gomock.Any(), gomock.Any()).
+			Times(1).
 			Return(nil)
 
 		t.Run(tt.name, func(t *testing.T) {
-			err := module.saveMessages(t.Context(), tx, tt.args.messages, tt.args.addrToId)
+			ibcClientsCount, err := module.saveMessages(t.Context(), tx, tt.args.messages, tt.args.addrToId)
 			require.Equal(t, tt.wantErr, err != nil)
+			if !tt.wantErr {
+				require.EqualValues(t, tt.wantIbcClientsCount, ibcClientsCount)
+			}
 		})
 	}
 }

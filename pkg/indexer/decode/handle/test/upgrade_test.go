@@ -6,12 +6,12 @@ package handle
 import (
 	"testing"
 
+	upgrade "cosmossdk.io/x/upgrade/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	upgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
 )

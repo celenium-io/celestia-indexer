@@ -25,4 +25,7 @@ const (
 	ViewRollupStatsByDay      = "rollup_stats_by_day"
 	ViewRollupStatsByMonth    = "rollup_stats_by_month"
 	ViewDAChange              = "da_change"
+	ViewIbcTransfersByHour    = "ibc_transfers_by_hour"
+	ViewIbcTransfersByDay     = "ibc_transfers_by_day"
+	ViewIbcTransfersByMonth   = "ibc_transfers_by_month"
 )

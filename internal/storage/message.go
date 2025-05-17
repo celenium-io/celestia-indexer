@@ -73,6 +73,10 @@ type Message struct {
 	InternalMsgs   []string          `bun:"-"` // field for parsing MsgExec internal messages
 	VestingAccount *VestingAccount   `bun:"-"` // internal field
 	Proposal       *Proposal         `bun:"-"` // internal field
+	IbcClient      *IbcClient        `bun:"-"` // internal field
+	IbcConnection  *IbcConnection    `bun:"-"` // internal field
+	IbcChannel     *IbcChannel       `bun:"-"` // internal field
+	IbcTransfer    *IbcTransfer      `bun:"-"` // internal field
 }
 
 // TableName -
