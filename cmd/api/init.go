@@ -444,7 +444,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		ibc := stats.Group("/ibc")
 		{
 			ibc.GET("/series/:id/:name/:timeframe", statsHandler.IbcSeries, statsMiddlewareCache)
-			ibc.GET("/chains", statsHandler.IbcSeries, statsMiddlewareCache)
+			ibc.GET("/chains", statsHandler.IbcByChains, statsMiddlewareCache)
 		}
 		series := stats.Group("/series")
 		{
