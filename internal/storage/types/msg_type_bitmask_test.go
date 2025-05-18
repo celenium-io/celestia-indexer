@@ -332,6 +332,46 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			name:    string(MsgUpdateParams),
 			msgType: []int{MsgTypeBitsUpdateParams},
 			want:    []MsgType{MsgUpdateParams},
+		}, {
+			name:    string(MsgCreateMailbox),
+			msgType: []int{MsgTypeBitsCreateMailbox},
+			want:    []MsgType{MsgCreateMailbox},
+		}, {
+			name:    string(MsgProcessMessage),
+			msgType: []int{MsgTypeBitsProcessMessage},
+			want:    []MsgType{MsgProcessMessage},
+		}, {
+			name:    string(MsgSetMailbox),
+			msgType: []int{MsgTypeBitsSetMailbox},
+			want:    []MsgType{MsgSetMailbox},
+		}, {
+			name:    string(MsgCreateCollateralToken),
+			msgType: []int{MsgTypeBitsCreateCollateralToken},
+			want:    []MsgType{MsgCreateCollateralToken},
+		}, {
+			name:    string(MsgCreateSyntheticToken),
+			msgType: []int{MsgTypeBitsCreateSyntheticToken},
+			want:    []MsgType{MsgCreateSyntheticToken},
+		}, {
+			name:    string(MsgSetToken),
+			msgType: []int{MsgTypeBitsSetToken},
+			want:    []MsgType{MsgSetToken},
+		}, {
+			name:    string(MsgEnrollRemoteRouter),
+			msgType: []int{MsgTypeBitsEnrollRemoteRouter},
+			want:    []MsgType{MsgEnrollRemoteRouter},
+		}, {
+			name:    string(MsgUnrollRemoteRouter),
+			msgType: []int{MsgTypeBitsUnrollRemoteRouter},
+			want:    []MsgType{MsgUnrollRemoteRouter},
+		}, {
+			name:    string(MsgRemoteTransfer),
+			msgType: []int{MsgTypeBitsRemoteTransfer},
+			want:    []MsgType{MsgRemoteTransfer},
+		}, {
+			name:    string(MsgUpdateMinfeeParams),
+			msgType: []int{MsgTypeBitsUpdateMinfeeParams},
+			want:    []MsgType{MsgUpdateMinfeeParams},
 		},
 	}
 	for _, tt := range tests {
@@ -613,9 +653,7 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			name:   "test 64",
 			values: []MsgType{MsgConnectionOpenConfirm},
 			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsConnectionOpenConfirm)},
-		},
-
-		{
+		}, {
 			name:   "test 65",
 			values: []MsgType{MsgChannelOpenInit},
 			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsChannelOpenInit)},
@@ -675,6 +713,46 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			name:   "test 79",
 			values: []MsgType{MsgRecoverClient},
 			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsRecoverClient)},
+		}, {
+			name:   "test 80",
+			values: []MsgType{MsgCreateMailbox},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCreateMailbox)},
+		}, {
+			name:   "test 81",
+			values: []MsgType{MsgProcessMessage},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsProcessMessage)},
+		}, {
+			name:   "test 82",
+			values: []MsgType{MsgSetMailbox},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSetMailbox)},
+		}, {
+			name:   "test 83",
+			values: []MsgType{MsgCreateCollateralToken},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCreateCollateralToken)},
+		}, {
+			name:   "test 84",
+			values: []MsgType{MsgCreateSyntheticToken},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCreateSyntheticToken)},
+		}, {
+			name:   "test 85",
+			values: []MsgType{MsgSetToken},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSetToken)},
+		}, {
+			name:   "test 86",
+			values: []MsgType{MsgEnrollRemoteRouter},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsEnrollRemoteRouter)},
+		}, {
+			name:   "test 87",
+			values: []MsgType{MsgUnrollRemoteRouter},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUnrollRemoteRouter)},
+		}, {
+			name:   "test 88",
+			values: []MsgType{MsgRemoteTransfer},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsRemoteTransfer)},
+		}, {
+			name:   "test 89",
+			values: []MsgType{MsgUpdateMinfeeParams},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateMinfeeParams)},
 		}, {
 			name:   "test combo",
 			values: []MsgType{MsgWithdrawDelegatorReward, MsgBeginRedelegate},

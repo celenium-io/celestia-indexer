@@ -23,10 +23,13 @@ import (
 	"github.com/rs/zerolog/log"
 
 	cosmosFeegrant "cosmossdk.io/x/feegrant"
+	hyperlaneCore "github.com/bcp-innovations/hyperlane-cosmos/x/core/types"
+	hyperlaneWarp "github.com/bcp-innovations/hyperlane-cosmos/x/warp/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
 	appBlobTypes "github.com/celestiaorg/celestia-app/v4/x/blob/types"
+	minfeeTypes "github.com/celestiaorg/celestia-app/v4/x/minfee/types"
 	appSignalTypes "github.com/celestiaorg/celestia-app/v4/x/signal/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
@@ -308,6 +311,29 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSignalVersion(ctx, typedMsg.GetValidatorAddress())
 	case *appSignalTypes.MsgTryUpgrade:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgTryUpgrade(ctx, typedMsg.GetSigner())
+
+	// hyperlane
+	case *hyperlaneCore.MsgCreateMailbox:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateMailbox(ctx, typedMsg)
+	case *hyperlaneCore.MsgProcessMessage:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgProcessMessage(ctx, typedMsg)
+	case *hyperlaneCore.MsgSetMailbox:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSetMailbox(ctx, typedMsg)
+	case *hyperlaneWarp.MsgCreateCollateralToken:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateCollateralToken(ctx, typedMsg)
+	case *hyperlaneWarp.MsgCreateSyntheticToken:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateSyntheticToken(ctx, typedMsg)
+	case *hyperlaneWarp.MsgSetToken:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSetToken(ctx, typedMsg)
+	case *hyperlaneWarp.MsgEnrollRemoteRouter:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgEnrollRemoteRouter(ctx, typedMsg)
+	case *hyperlaneWarp.MsgUnrollRemoteRouter:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUnrollRemoteRouter(ctx, typedMsg)
+	case *hyperlaneWarp.MsgRemoteTransfer:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRemoteTransfer(ctx, typedMsg)
+
+	case *minfeeTypes.MsgUpdateMinfeeParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateMinfeeParams(ctx, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)

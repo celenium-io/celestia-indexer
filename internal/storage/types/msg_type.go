@@ -107,7 +107,19 @@ package types
 		MsgAcknowledgement,
 
 		MsgSignalVersion,
-		MsgTryUpgrade
+		MsgTryUpgrade,
+
+		MsgCreateMailbox,
+		MsgProcessMessage,
+		MsgSetMailbox,
+		MsgCreateCollateralToken,
+		MsgCreateSyntheticToken,
+		MsgSetToken,
+		MsgEnrollRemoteRouter,
+		MsgUnrollRemoteRouter,
+		MsgRemoteTransfer,
+
+		MsgUpdateMinfeeParams
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix --names

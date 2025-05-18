@@ -633,7 +633,17 @@
                             "MsgTimeoutOnClose",
                             "MsgAcknowledgement",
                             "MsgSignalVersion",
-                            "MsgTryUpgrade"
+                            "MsgTryUpgrade",
+                            "MsgCreateMailbox",
+                            "MsgProcessMessage",
+                            "MsgSetMailbox",
+                            "MsgCreateCollateralToken",
+                            "MsgCreateSyntheticToken",
+                            "MsgSetToken",
+                            "MsgEnrollRemoteRouter",
+                            "MsgUnrollRemoteRouter",
+                            "MsgRemoteTransfer",
+                            "MsgUpdateMinfeeParams"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -948,7 +958,17 @@
                             "MsgTimeoutOnClose",
                             "MsgAcknowledgement",
                             "MsgSignalVersion",
-                            "MsgTryUpgrade"
+                            "MsgTryUpgrade",
+                            "MsgCreateMailbox",
+                            "MsgProcessMessage",
+                            "MsgSetMailbox",
+                            "MsgCreateCollateralToken",
+                            "MsgCreateSyntheticToken",
+                            "MsgSetToken",
+                            "MsgEnrollRemoteRouter",
+                            "MsgUnrollRemoteRouter",
+                            "MsgRemoteTransfer",
+                            "MsgUpdateMinfeeParams"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1859,7 +1879,17 @@
                             "MsgTimeoutOnClose",
                             "MsgAcknowledgement",
                             "MsgSignalVersion",
-                            "MsgTryUpgrade"
+                            "MsgTryUpgrade",
+                            "MsgCreateMailbox",
+                            "MsgProcessMessage",
+                            "MsgSetMailbox",
+                            "MsgCreateCollateralToken",
+                            "MsgCreateSyntheticToken",
+                            "MsgSetToken",
+                            "MsgEnrollRemoteRouter",
+                            "MsgUnrollRemoteRouter",
+                            "MsgRemoteTransfer",
+                            "MsgUpdateMinfeeParams"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1946,7 +1976,17 @@
                             "MsgTimeoutOnClose",
                             "MsgAcknowledgement",
                             "MsgSignalVersion",
-                            "MsgTryUpgrade"
+                            "MsgTryUpgrade",
+                            "MsgCreateMailbox",
+                            "MsgProcessMessage",
+                            "MsgSetMailbox",
+                            "MsgCreateCollateralToken",
+                            "MsgCreateSyntheticToken",
+                            "MsgSetToken",
+                            "MsgEnrollRemoteRouter",
+                            "MsgUnrollRemoteRouter",
+                            "MsgRemoteTransfer",
+                            "MsgUpdateMinfeeParams"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types which should be excluded from list",
@@ -4271,6 +4311,57 @@
                 }
             }
         },
+        "/stats/ibc/chains": {
+            "get": {
+                "description": "Get stats for ibc channels splitted by chains",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get stats for ibc channels splitted by chains",
+                "operationId": "stats-ibc-chains",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.IbcChainStats"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/ibc/series/{id}/{name}/{timeframe}": {
             "get": {
                 "description": "Get histogram for ibc channels with precomputed stats by series name and timeframe",
@@ -5108,7 +5199,17 @@
                             "MsgTimeoutOnClose",
                             "MsgAcknowledgement",
                             "MsgSignalVersion",
-                            "MsgTryUpgrade"
+                            "MsgTryUpgrade",
+                            "MsgCreateMailbox",
+                            "MsgProcessMessage",
+                            "MsgSetMailbox",
+                            "MsgCreateCollateralToken",
+                            "MsgCreateSyntheticToken",
+                            "MsgSetToken",
+                            "MsgEnrollRemoteRouter",
+                            "MsgUnrollRemoteRouter",
+                            "MsgRemoteTransfer",
+                            "MsgUpdateMinfeeParams"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -5195,7 +5296,17 @@
                             "MsgTimeoutOnClose",
                             "MsgAcknowledgement",
                             "MsgSignalVersion",
-                            "MsgTryUpgrade"
+                            "MsgTryUpgrade",
+                            "MsgCreateMailbox",
+                            "MsgProcessMessage",
+                            "MsgSetMailbox",
+                            "MsgCreateCollateralToken",
+                            "MsgCreateSyntheticToken",
+                            "MsgSetToken",
+                            "MsgEnrollRemoteRouter",
+                            "MsgUnrollRemoteRouter",
+                            "MsgRemoteTransfer",
+                            "MsgUpdateMinfeeParams"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list which should be excluded",
@@ -6780,6 +6891,31 @@
                     "type": "string",
                     "format": "string",
                     "example": "2223424"
+                }
+            }
+        },
+        "responses.IbcChainStats": {
+            "type": "object",
+            "properties": {
+                "chain": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123456"
+                },
+                "flow": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123445"
+                },
+                "received": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123445"
+                },
+                "sent": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123445"
                 }
             }
         },
@@ -9140,7 +9276,17 @@
                 "MsgTimeoutOnClose",
                 "MsgAcknowledgement",
                 "MsgSignalVersion",
-                "MsgTryUpgrade"
+                "MsgTryUpgrade",
+                "MsgCreateMailbox",
+                "MsgProcessMessage",
+                "MsgSetMailbox",
+                "MsgCreateCollateralToken",
+                "MsgCreateSyntheticToken",
+                "MsgSetToken",
+                "MsgEnrollRemoteRouter",
+                "MsgUnrollRemoteRouter",
+                "MsgRemoteTransfer",
+                "MsgUpdateMinfeeParams"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -9221,7 +9367,17 @@
                 "MsgTimeoutOnClose",
                 "MsgAcknowledgement",
                 "MsgSignalVersion",
-                "MsgTryUpgrade"
+                "MsgTryUpgrade",
+                "MsgCreateMailbox",
+                "MsgProcessMessage",
+                "MsgSetMailbox",
+                "MsgCreateCollateralToken",
+                "MsgCreateSyntheticToken",
+                "MsgSetToken",
+                "MsgEnrollRemoteRouter",
+                "MsgUnrollRemoteRouter",
+                "MsgRemoteTransfer",
+                "MsgUpdateMinfeeParams"
             ]
         }
     },
