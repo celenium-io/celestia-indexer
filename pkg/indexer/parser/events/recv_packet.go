@@ -87,7 +87,7 @@ func processRecvPacket(events []storage.Event, msg *storage.Message, idx *int) e
 	*idx += 3
 	fundEvent := events[*idx]
 	if fundEvent.Type != storageTypes.EventTypeFungibleTokenPacket {
-		return errors.Errorf("invalid event type: %s", fundEvent.Type)
+		return nil
 	}
 
 	ftp := decode.NewFungibleTokenPacket(fundEvent.Data)
