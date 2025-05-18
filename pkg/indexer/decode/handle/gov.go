@@ -4,6 +4,9 @@
 package handle
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
@@ -26,7 +29,33 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 	if err != nil {
 		return msgType, addresses, nil, nil, err
 	}
-	return msgType, addresses, nil, nil, nil
+
+	if status != storageTypes.StatusSuccess {
+		return msgType, addresses, nil, nil, nil
+	}
+
+	prpsl := &storage.Proposal{
+		Height: ctx.Block.Height,
+		Proposer: &storage.Address{
+			Address: msg.Proposer,
+		},
+		CreatedAt: ctx.Block.Time,
+		Status:    storageTypes.ProposalStatusInactive,
+		Type:      storageTypes.ProposalTypeText,
+		Title:     "Proposal with messages",
+	}
+
+	var sb strings.Builder
+	if _, err := sb.WriteString("Proposal contains messages:\r\n"); err != nil {
+		return msgType, addresses, nil, nil, errors.Wrap(err, "building proposal description from messages")
+	}
+	for i := range msg.Messages {
+		if _, err := sb.WriteString(fmt.Sprintf("%d. %s\r\n", i+1, msg.Messages[i].TypeUrl)); err != nil {
+			return msgType, addresses, nil, nil, errors.Wrap(err, "building proposal description from messages")
+		}
+	}
+	prpsl.Description = sb.String()
+	return msgType, addresses, nil, prpsl, nil
 }
 
 // MsgSubmitProposalV1Beta
