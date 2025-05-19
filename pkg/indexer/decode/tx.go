@@ -62,20 +62,22 @@ func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
 		}
 	}
 
-	for _, signer := range d.AuthInfo.GetSignerInfos() {
-		publickKey := signer.GetPublicKey()
-		if publickKey == nil {
-			continue
+	if b.AppVersion > 3 {
+		for _, signer := range d.AuthInfo.GetSignerInfos() {
+			publickKey := signer.GetPublicKey()
+			if publickKey == nil {
+				continue
+			}
+			var pk secp256k1.PubKey
+			if err := cfg.Codec.Unmarshal(publickKey.Value, &pk); err != nil {
+				return d, errors.Wrap(err, "signer decoding")
+			}
+			address, err := types.NewAddressFromBytes(pk.Bytes())
+			if err != nil {
+				return d, err
+			}
+			d.Signers[address] = pk.Bytes()
 		}
-		var pk secp256k1.PubKey
-		if err := cfg.Codec.Unmarshal(publickKey.Value, &pk); err != nil {
-			return d, errors.Wrap(err, "signer decoding")
-		}
-		address, err := types.NewAddressFromBytes(pk.Bytes())
-		if err != nil {
-			return d, err
-		}
-		d.Signers[address] = pk.Bytes()
 	}
 
 	return

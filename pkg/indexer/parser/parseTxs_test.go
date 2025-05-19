@@ -260,7 +260,7 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 			},
 		},
 	}
-	block, now := testsuite.CreateTestBlock(txRes, 3)
+	block, now := testsuite.CreateTestBlockWithAppVersion(txRes, 3, 4)
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{

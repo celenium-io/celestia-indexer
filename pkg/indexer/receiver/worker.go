@@ -25,7 +25,7 @@ func (r *Module) worker(ctx context.Context, level types.Level) {
 		}
 
 		requestTimeout, cancel := context.WithTimeout(ctx, time.Minute)
-		block, err := r.api.BlockDataGet(requestTimeout, level)
+		block, err := r.api.BlockData(requestTimeout, level)
 		if err != nil {
 			cancel()
 
@@ -41,6 +41,7 @@ func (r *Module) worker(ctx context.Context, level types.Level) {
 			continue
 		}
 
+		block.AppVersion = r.appVersion.Load()
 		result = block
 		cancel()
 		break

@@ -84,13 +84,14 @@ func (r *Module) live(ctx context.Context) error {
 
 func (r *Module) readBlocks(ctx context.Context) error {
 	for {
-		headLevel, err := r.headLevel(ctx)
+		headLevel, appVersion, err := r.headLevel(ctx)
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				return nil
 			}
 			return err
 		}
+		r.appVersion.Store(appVersion)
 
 		if level, _ := r.Level(); level == headLevel {
 			time.Sleep(time.Second)
@@ -119,11 +120,10 @@ func (r *Module) passBlocks(ctx context.Context, head types.Level) {
 	}
 }
 
-func (r *Module) headLevel(ctx context.Context) (types.Level, error) {
+func (r *Module) headLevel(ctx context.Context) (types.Level, uint64, error) {
 	status, err := r.api.Status(ctx)
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
-
-	return status.SyncInfo.LatestBlockHeight, nil
+	return status.SyncInfo.LatestBlockHeight, status.NodeInfo.ProtocolVersion.App, nil
 }

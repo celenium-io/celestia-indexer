@@ -74,6 +74,11 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 		s.api.EXPECT().
 			Status(gomock.Any()).
 			Return(nodeTypes.Status{
+				NodeInfo: nodeTypes.NodeInfo{
+					ProtocolVersion: nodeTypes.ProtocolVersion{
+						App: 4,
+					},
+				},
 				SyncInfo: nodeTypes.SyncInfo{
 					LatestBlockHash:   nil,
 					LatestBlockHeight: 5,
@@ -83,8 +88,8 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 
 		for i := types.Level(1); i <= blockCount; i++ {
 			s.api.EXPECT().
-				// BlockData(gomock.Any(), i).
-				BlockDataGet(gomock.Any(), i).
+				BlockData(gomock.Any(), i).
+				// BlockDataGet(gomock.Any(), i).
 				Return(types.BlockData{
 					ResultBlock:        getResultBlock(i),
 					ResultBlockResults: getResultBlockResults(i),
@@ -100,7 +105,7 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 		BlockPeriod:  cfgDefault.BlockPeriod,
 	})
 
-	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancelCtx := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer cancelCtx()
 
 	workersCtx, cancelWorkers := context.WithCancel(ctx)

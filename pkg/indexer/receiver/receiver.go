@@ -6,6 +6,7 @@ package receiver
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
@@ -52,6 +53,7 @@ type Module struct {
 	rollbackSync     *sync.WaitGroup
 	cancelWorkers    context.CancelFunc
 	cancelReadBlocks context.CancelFunc
+	appVersion       *atomic.Uint64
 }
 
 var _ modules.Module = (*Module)(nil)
@@ -76,6 +78,7 @@ func NewModule(cfg config.Indexer, api node.Api, ws *http.HTTP, state *storage.S
 		taskQueue:    sdkSync.NewMap[types.Level, struct{}](),
 		mx:           new(sync.RWMutex),
 		rollbackSync: new(sync.WaitGroup),
+		appVersion:   new(atomic.Uint64),
 	}
 
 	receiver.CreateInput(RollbackInput)
