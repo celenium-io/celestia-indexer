@@ -128,6 +128,33 @@ func TestDecodeTx_Tx_PFB(t *testing.T) {
 	}
 }
 
+func TestDecodeTx_Tx_MsgRegisterEVMAddress(t *testing.T) {
+	deliverTx := nodeTypes.ResponseDeliverTx{
+		Code:      0,
+		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
+		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"celestia.blob.v1.EventPayForBlobs\",\"attributes\":[{\"key\":\"blob_sizes\",\"value\":\"[684]\"},{\"key\":\"namespaces\",\"value\":\"[\\\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ2Vyb0E=\\\"]\"},{\"key\":\"signer\",\"value\":\"\\\"celestia1rky9086t340m7rmkctuj4spxwv2gc62vlwx59v\\\"\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/celestia.blob.v1.MsgPayForBlobs\"}]}]}]`,
+		Info:      "",
+		GasWanted: 120000,
+		GasUsed:   91289,
+		Events:    []nodeTypes.Event{},
+		Codespace: "",
+	}
+
+	txData, err := base64.StdEncoding.DecodeString("CpEBCo4BCiYvY2VsZXN0aWEucWdiLnYxLk1zZ1JlZ2lzdGVyRVZNQWRkcmVzcxJkCjZjZWxlc3RpYXZhbG9wZXIxbmF3OXVxYzl2ems0MGduNnc1OHU5ODhqeTRocWM1bGEzbnZ1bTASKjB4Mjg4NTNENjRiM0QwYzJjY0Q2NzUzM0QzNUE3QzcyMEYyYzk1RTMwZRJnClAKRgofL2Nvc21vcy5jcnlwdG8uc2VjcDI1NmsxLlB1YktleRIjCiECOaLj7A4Ho38QaJLTKtYaMqHDLALGaP36kxuOUOd5aDcSBAoCCAEYAhITCg0KBHV0aWESBTMwMDAwENDoDBpAUWpMhxhq12Kpemsh5zcDqy5Z3V/E4Avt0Dypq6e27R5fVzpUpWsHJg0IJNzy+vUlImHw5mvUU3f3nMAZh7UE7A==")
+	require.NoError(t, err)
+	block, _ := testsuite.CreateBlockWithTxs(deliverTx, txData, 1)
+
+	dTx, err := Tx(block, 0)
+
+	require.NoError(t, err)
+
+	require.Len(t, dTx.Messages, 1)
+	require.Len(t, dTx.Signers, 1)
+	for addr, val := range dTx.Signers {
+		require.Equal(t, "celestia1naw9uqc9vzk40gn6w58u988jy4hqc5la5vw9df", addr.String())
+		require.Len(t, val, 20)
+	}
+}
 func TestDecodeCosmosTx_DelegateMsg(t *testing.T) {
 	rawTx := []byte{
 		10, 164, 1, 10, 161, 1, 10, 35, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 18, 122, 10, 47, 99, 101, 108, 101, 115, 116, 105, 97, 49, 52, 122, 102, 110, 99, 50, 107, 120, 100, 103, 100, 109, 97, 99, 110, 117, 117, 121, 116, 114, 101, 53, 112, 54, 102, 120, 57, 55, 116, 116, 102, 113, 57, 101, 103, 103, 120, 100, 18, 54, 99, 101, 108, 101, 115, 116, 105, 97, 118, 97, 108, 111, 112, 101, 114, 49, 57, 117, 114, 103, 57, 97, 119, 106, 122, 119, 113, 56, 100, 52, 48, 118, 119, 106, 100, 118, 118, 48, 121, 119, 57, 107, 103, 101, 104, 115, 99, 102, 48, 122, 120, 51, 103, 115, 26, 15, 10, 4, 117, 116, 105, 97, 18, 7, 55, 48, 48, 48, 48, 48, 48, 18, 88, 10, 80, 10, 70, 10, 31, 47, 99, 111, 115, 109, 111, 115, 46, 99, 114, 121, 112, 116, 111, 46, 115, 101, 99, 112, 50, 53, 54, 107, 49, 46, 80, 117, 98, 75, 101, 121, 18, 35, 10, 33, 2, 214, 196, 150, 138, 247, 194, 102, 99, 26, 107, 77, 58, 49, 185, 175, 141, 130, 161, 143, 190, 103, 32, 58, 186, 68, 20, 160, 25, 160, 135, 214, 93, 18, 4, 10, 2, 8, 1, 24, 16, 18, 4, 16, 208, 232, 12, 26, 64, 130, 232, 165, 58, 164, 111, 95, 148, 20, 60, 156, 116, 178, 169, 117, 153, 98, 157, 196, 77, 197, 213, 72, 128, 216, 230, 87, 132, 221, 235, 144, 244, 43, 210, 127, 94, 48, 55, 233, 145, 153, 238, 250, 34, 139, 7, 50, 77, 206, 206, 47, 38, 39, 163, 8, 34, 220, 47, 197, 168, 59, 78, 221, 207,

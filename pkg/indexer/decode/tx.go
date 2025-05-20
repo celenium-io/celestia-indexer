@@ -72,18 +72,30 @@ func decodeCosmosTx(decoder cosmosTypes.TxDecoder, raw tmTypes.Tx, d *DecodedTx)
 	if t, ok := txDecoded.(signing.Tx); ok {
 		signers, err := t.GetSigners()
 		if err != nil {
-			return errors.Wrap(err, "get signers")
-		}
-		for i := range signers {
-			address, err := types.NewAddressFromBytes(signers[i])
+			pubKeys, err := t.GetPubKeys()
 			if err != nil {
-				return errors.Wrap(err, "NewAddressFromBytes")
+				return errors.Wrap(err, "get pub keys")
 			}
-			d.Signers[address] = signers[i]
+			for _, pk := range pubKeys {
+				address, err := types.NewAddressFromBytes(pk.Address().Bytes())
+				if err != nil {
+					return errors.Wrap(err, "NewAddressFromBytes")
+				}
+				d.Signers[address] = pk.Address().Bytes()
+			}
+		} else {
+			for i := range signers {
+				address, err := types.NewAddressFromBytes(signers[i])
+				if err != nil {
+					return errors.Wrap(err, "NewAddressFromBytes")
+				}
+				d.Signers[address] = signers[i]
+			}
 		}
 	}
 
 	d.Messages = txDecoded.GetMsgs()
+
 	return nil
 }
 
