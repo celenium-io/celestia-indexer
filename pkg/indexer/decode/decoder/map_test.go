@@ -5,6 +5,7 @@ package decoder
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -64,6 +65,30 @@ func TestDecimalFromMap(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := DecimalFromMap(tt.m, tt.key)
 			require.Equal(t, tt.want, got.String())
+		})
+	}
+}
+
+func TestUnixNanoFromMap(t *testing.T) {
+	tests := []struct {
+		name string
+		m    map[string]any
+		key  string
+		want time.Time
+	}{
+		{
+			name: "test 1",
+			m: map[string]any{
+				"packet_timeout_timestamp": "9439823803807825920",
+			},
+			key:  "packet_timeout_timestamp",
+			want: time.Date(2269, 02, 19, 05, 16, 43, 807825920, time.UTC),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := UnixNanoFromMap(tt.m, tt.key)
+			require.Equal(t, tt.want, got)
 		})
 	}
 }

@@ -371,9 +371,6 @@ func NewRecvPacket(m map[string]any) (rp RecvPacket, err error) {
 		return rp, errors.Wrap(err, "packet_timeout_height")
 	}
 	rp.TimeoutHeight = height
-	rp.Timeout, err = decoder.UnixNanoFromMap(m, "packet_timeout_timestamp")
-	if err != nil {
-		return rp, errors.Wrap(err, "packet_timeout_timestamp")
-	}
+	rp.Timeout = decoder.UnixNanoFromMap(m, "packet_timeout_timestamp")
 	return
 }

@@ -80,15 +80,17 @@ func TimeFromMap(m map[string]any, key string) (time.Time, error) {
 	return time.Parse(time.RFC3339, str)
 }
 
-func UnixNanoFromMap(m map[string]any, key string) (time.Time, error) {
-	u, err := Int64FromMap(m, key)
-	if err != nil {
-		return time.Time{}, errors.Wrap(err, "Int64FromMap")
+var (
+	nsDivider = decimal.NewFromInt(10).Pow(decimal.NewFromInt(9))
+)
+
+func UnixNanoFromMap(m map[string]any, key string) time.Time {
+	value := DecimalFromMap(m, key)
+	if value.IsZero() {
+		return time.Time{}
 	}
-	if u == 0 {
-		return time.Time{}, nil
-	}
-	return time.Unix(0, u).UTC(), nil
+	x := value.Div(nsDivider)
+	return time.Unix(x.IntPart(), value.Mod(nsDivider).IntPart()).UTC()
 }
 
 func Int64FromMap(m map[string]any, key string) (int64, error) {
