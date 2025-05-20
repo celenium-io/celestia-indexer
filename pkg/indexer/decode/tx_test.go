@@ -4,6 +4,7 @@
 package decode
 
 import (
+	"encoding/base64"
 	"testing"
 
 	"cosmossdk.io/math"
@@ -11,10 +12,10 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/tx"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDecodeTx_TxWithMemo(t *testing.T) {
@@ -41,26 +42,90 @@ func TestDecodeTx_TxWithMemo(t *testing.T) {
 	assert.Equal(t, decimal.NewFromInt(72431), dTx.Fee)
 }
 
-func TestDecodeAuthInfo_WithNilAmount(t *testing.T) {
-	rawTx := []byte{
-		10, 164, 1, 10, 161, 1, 10, 35, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 18, 122, 10, 47, 99, 101, 108, 101, 115, 116, 105, 97, 49, 52, 122, 102, 110, 99, 50, 107, 120, 100, 103, 100, 109, 97, 99, 110, 117, 117, 121, 116, 114, 101, 53, 112, 54, 102, 120, 57, 55, 116, 116, 102, 113, 57, 101, 103, 103, 120, 100, 18, 54, 99, 101, 108, 101, 115, 116, 105, 97, 118, 97, 108, 111, 112, 101, 114, 49, 57, 117, 114, 103, 57, 97, 119, 106, 122, 119, 113, 56, 100, 52, 48, 118, 119, 106, 100, 118, 118, 48, 121, 119, 57, 107, 103, 101, 104, 115, 99, 102, 48, 122, 120, 51, 103, 115, 26, 15, 10, 4, 117, 116, 105, 97, 18, 7, 55, 48, 48, 48, 48, 48, 48, 18, 88, 10, 80, 10, 70, 10, 31, 47, 99, 111, 115, 109, 111, 115, 46, 99, 114, 121, 112, 116, 111, 46, 115, 101, 99, 112, 50, 53, 54, 107, 49, 46, 80, 117, 98, 75, 101, 121, 18, 35, 10, 33, 2, 214, 196, 150, 138, 247, 194, 102, 99, 26, 107, 77, 58, 49, 185, 175, 141, 130, 161, 143, 190, 103, 32, 58, 186, 68, 20, 160, 25, 160, 135, 214, 93, 18, 4, 10, 2, 8, 1, 24, 16, 18, 4, 16, 208, 232, 12, 26, 64, 130, 232, 165, 58, 164, 111, 95, 148, 20, 60, 156, 116, 178, 169, 117, 153, 98, 157, 196, 77, 197, 213, 72, 128, 216, 230, 87, 132, 221, 235, 144, 244, 43, 210, 127, 94, 48, 55, 233, 145, 153, 238, 250, 34, 139, 7, 50, 77, 206, 206, 47, 38, 39, 163, 8, 34, 220, 47, 197, 168, 59, 78, 221, 207,
+func TestDecodeTx_TxV050Signer(t *testing.T) {
+	deliverTx := nodeTypes.ResponseDeliverTx{
+		Code:      0,
+		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
+		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"receiver\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"spender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.bank.v1beta1.MsgSend\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]}]}]`,
+		Info:      "",
+		GasWanted: 120000,
+		GasUsed:   91289,
+		Events:    []nodeTypes.Event{},
+		Codespace: "",
 	}
 
-	authInfo, fee, err := decodeAuthInfo(rawTx)
-	assert.NoError(t, err)
-	assert.Equal(t, decimal.Zero, fee)
-	assert.Equal(t, uint64(210000), authInfo.Fee.GasLimit)
+	txData, err := base64.StdEncoding.DecodeString("CrsBCqIBCiMvY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dEZWxlZ2F0ZRJ7Ci9jZWxlc3RpYTFtZW1jZjZzcWQwMGg2eXpmMGU4ZThlNzA3dGptc3pwZDNsemM2ZRI2Y2VsZXN0aWF2YWxvcGVyMXQ0Z2hmOTg0ejJ5Mnl2bjR4YWp4Y201anoyZzVzZHpxZG05eGVwGhAKBHV0aWESCDI3MDAwMDAwEhRTZW50IHZpYSBDZWxlbml1bS5pbxJkCk4KRgofL2Nvc21vcy5jcnlwdG8uc2VjcDI1NmsxLlB1YktleRIjCiEDZihoRCE/LwSjSlI5YpX/zHSqUy/TiAt/V+HupnPyr18SBAoCCAESEgoMCgR1dGlhEgQ0MjgyEOu5ChpAhlo8GUvT+uSwJc880k916MeM+Yl2cBpG6Nv9lmsq2Bp5npoUdSVQ1t8o/evc1EAafhljZQbF/e5geBpapwqZdA==")
+	require.NoError(t, err)
+	block, _ := testsuite.CreateBlockWithTxs(deliverTx, txData, 1)
+
+	dTx, err := Tx(block, 0)
+
+	require.NoError(t, err)
+
+	require.Len(t, dTx.Messages, 1)
+	require.Len(t, dTx.Signers, 1)
+	require.Equal(t, "Sent via Celenium.io", dTx.Memo)
+	require.EqualValues(t, "4282", dTx.Fee.String())
+	for addr, val := range dTx.Signers {
+		require.Equal(t, "celestia1memcf6sqd00h6yzf0e8e8e707tjmszpd3lzc6e", addr.String())
+		require.Len(t, val, 20)
+	}
 }
 
-func TestDecodeAuthInfo_WithFee(t *testing.T) {
-	rawTx := []byte{
-		10, 171, 1, 10, 168, 1, 10, 35, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 18, 128, 1, 10, 47, 99, 101, 108, 101, 115, 116, 105, 97, 49, 55, 97, 100, 115, 106, 107, 117, 101, 99, 103, 106, 104, 101, 117, 103, 114, 100, 114, 119, 100, 113, 118, 57, 117, 104, 51, 113, 107, 114, 102, 109, 106, 57, 120, 122, 97, 119, 120, 18, 54, 99, 101, 108, 101, 115, 116, 105, 97, 118, 97, 108, 111, 112, 101, 114, 49, 55, 97, 100, 115, 106, 107, 117, 101, 99, 103, 106, 104, 101, 117, 103, 114, 100, 114, 119, 100, 113, 118, 57, 117, 104, 51, 113, 107, 114, 102, 109, 106, 113, 101, 113, 121, 99, 113, 26, 21, 10, 4, 117, 116, 105, 97, 18, 13, 53, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 18, 104, 10, 81, 10, 70, 10, 31, 47, 99, 111, 115, 109, 111, 115, 46, 99, 114, 121, 112, 116, 111, 46, 115, 101, 99, 112, 50, 53, 54, 107, 49, 46, 80, 117, 98, 75, 101, 121, 18, 35, 10, 33, 2, 5, 5, 146, 95, 90, 69, 253, 244, 240, 130, 93, 143, 158, 212, 70, 117, 227, 56, 38, 141, 84, 101, 29, 76, 145, 143, 105, 95, 140, 136, 230, 156, 18, 4, 10, 2, 8, 1, 24, 170, 1, 18, 19, 10, 13, 10, 4, 117, 116, 105, 97, 18, 5, 50, 49, 48, 48, 48, 16, 208, 232, 12, 26, 64, 93, 57, 117, 108, 143, 235, 212, 126, 28, 128, 252, 240, 168, 77, 60, 219, 10, 189, 241, 178, 117, 145, 177, 79, 112, 156, 36, 73, 6, 88, 0, 182, 72, 92, 192, 27, 7, 4, 51, 165, 1, 44, 21, 25, 78, 128, 31, 101, 86, 247, 159, 82, 136, 212, 79, 118, 139, 241, 135, 91, 205, 125, 100, 77,
+func TestDecodeTx_TxV050Signer2(t *testing.T) {
+	deliverTx := nodeTypes.ResponseDeliverTx{
+		Code:      0,
+		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
+		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"receiver\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"spender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.bank.v1beta1.MsgSend\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]}]}]`,
+		Info:      "",
+		GasWanted: 120000,
+		GasUsed:   91289,
+		Events:    []nodeTypes.Event{},
+		Codespace: "",
 	}
 
-	authInfo, fee, err := decodeAuthInfo(rawTx)
-	assert.NoError(t, err)
-	assert.Equal(t, decimal.NewFromInt(21000), fee)
-	assert.Equal(t, uint64(210000), authInfo.Fee.GasLimit)
+	txData, err := base64.StdEncoding.DecodeString("CpYBCpMBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEnMKL2NlbGVzdGlhMTZldG53anhnNmRzanVhdmpwcjl0azgyMmN6ZmV5bGZtOWY3eDVnEi9jZWxlc3RpYTFxMHhzdHlycWFtZTZ6bDVwdWVremE1OGpydjg2MjltNW1uZTBybhoPCgR1dGlhEgcxMDAwMDAwEh8KCBIECgIIARg1EhMKDQoEdXRpYRIFMTIwMDAQwKkHGkBGkZVTfgXdCxjUIw17iv4kvDMPT60O6r6HayzIs8XucwhgAjfdmuKwYZ20VTZuVF6SDa8UvXnrbMl8bhaImLwR")
+	require.NoError(t, err)
+	block, _ := testsuite.CreateBlockWithTxs(deliverTx, txData, 1)
+
+	dTx, err := Tx(block, 0)
+
+	require.NoError(t, err)
+
+	require.Len(t, dTx.Messages, 1)
+	require.Len(t, dTx.Signers, 1)
+	for addr, val := range dTx.Signers {
+		require.Equal(t, "celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g", addr.String())
+		require.Len(t, val, 20)
+	}
+}
+
+func TestDecodeTx_Tx_PFB(t *testing.T) {
+	deliverTx := nodeTypes.ResponseDeliverTx{
+		Code:      0,
+		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
+		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"celestia.blob.v1.EventPayForBlobs\",\"attributes\":[{\"key\":\"blob_sizes\",\"value\":\"[684]\"},{\"key\":\"namespaces\",\"value\":\"[\\\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ2Vyb0E=\\\"]\"},{\"key\":\"signer\",\"value\":\"\\\"celestia1rky9086t340m7rmkctuj4spxwv2gc62vlwx59v\\\"\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/celestia.blob.v1.MsgPayForBlobs\"}]}]}]`,
+		Info:      "",
+		GasWanted: 120000,
+		GasUsed:   91289,
+		Events:    []nodeTypes.Event{},
+		Codespace: "",
+	}
+
+	txData, err := base64.StdEncoding.DecodeString("CoUCCqABCp0BCiAvY2VsZXN0aWEuYmxvYi52MS5Nc2dQYXlGb3JCbG9icxJ5Ci9jZWxlc3RpYTFya3k5MDg2dDM0MG03cm1rY3R1ajRzcHh3djJnYzYydmx3eDU5dhIdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ2Vyb0EaAqwFIiA92mk96XJQMA82kZz4lDP5Fbj4U7ss8LisNXzMW00q0kIBABIeCgkSBAoCCAEYjQUSEQoLCgR1dGlhEgMxODUQ+dAFGkCYFhvYyED7gTt9JbqSSJSFsQfgBcFU/H6n35PgNgZvWUp9EDMknrBVwRNwdHX00Ald9brD/Ir34FDdJAfc8p/tEs0FChwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAENlcm9BEqwFeyJnbG9iYWxTZXF1ZW5jZU51bWJlciI6MTAzOSwiYmxvY2tSYW5nZUNvdmVyZWQiOnsiYmxvY2tTdGFydCI6MzczNjgwMCwiYmxvY2tFbmQiOjM3NDA0MDB9LCJ0aW1lc3RhbXAiOjE3NDcxMzkwNDAsInJvbGx1cFNlcXVlbmNlcyI6W3sicm9sbHVwSWQiOjEsImJhdGNoZXMiOlt7InRpbWVzdGFtcCI6MTc0NzEzOTA0MCwibnVtYmVyIjoxMDM5fV19LHsicm9sbHVwSWQiOjIsImJhdGNoZXMiOlt7InRpbWVzdGFtcCI6MTc0NzEzOTA0MCwidHJhbnNhY3Rpb25zIjpbeyJ0eElkIjoiMDM5YTRmYWIwNmQ0Nzg1OTRmYWUxMmQ5NGYxN2I1ZTlmNDUyMTdiZDUzNDc3YTc5Y2I1MWY2YTQzZDY0ZDQzMSIsInJhd1RyYW5zYWN0aW9uIjoie2Zyb206c29tZXRlc3RhZGRyZXNzLCB0bzogc29tZW9uZWVsc2UsIGFtb3VudDogMC4wMDUsIHRpbWU6MTc0NzEzNTQwNyB9IiwiYmxvY2tIZWlnaHQiOjM3Mzc5MDMsInJvbGx1cElkIjoyfV0sIm51bWJlciI6MTAzOX1dfSx7InJvbGx1cElkIjozLCJiYXRjaGVzIjpbeyJ0aW1lc3RhbXAiOjE3NDcxMzkwNDAsIm51bWJlciI6MTAzOX1dfSx7InJvbGx1cElkIjo0LCJiYXRjaGVzIjpbeyJ0aW1lc3RhbXAiOjE3NDcxMzkwNDAsIm51bWJlciI6MTAzOX1dfSx7InJvbGx1cElkIjo1LCJiYXRjaGVzIjpbeyJ0aW1lc3RhbXAiOjE3NDcxMzkwNDAsIm51bWJlciI6MTAzOX1dfV19GgRCTE9C")
+	require.NoError(t, err)
+	block, _ := testsuite.CreateBlockWithTxs(deliverTx, txData, 1)
+
+	dTx, err := Tx(block, 0)
+
+	require.NoError(t, err)
+
+	require.Len(t, dTx.Messages, 1)
+	require.Len(t, dTx.Signers, 1)
+	for addr, val := range dTx.Signers {
+		require.Equal(t, "celestia1rky9086t340m7rmkctuj4spxwv2gc62vlwx59v", addr.String())
+		require.Len(t, val, 20)
+	}
 }
 
 func TestDecodeCosmosTx_DelegateMsg(t *testing.T) {
@@ -68,10 +133,11 @@ func TestDecodeCosmosTx_DelegateMsg(t *testing.T) {
 		10, 164, 1, 10, 161, 1, 10, 35, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 18, 122, 10, 47, 99, 101, 108, 101, 115, 116, 105, 97, 49, 52, 122, 102, 110, 99, 50, 107, 120, 100, 103, 100, 109, 97, 99, 110, 117, 117, 121, 116, 114, 101, 53, 112, 54, 102, 120, 57, 55, 116, 116, 102, 113, 57, 101, 103, 103, 120, 100, 18, 54, 99, 101, 108, 101, 115, 116, 105, 97, 118, 97, 108, 111, 112, 101, 114, 49, 57, 117, 114, 103, 57, 97, 119, 106, 122, 119, 113, 56, 100, 52, 48, 118, 119, 106, 100, 118, 118, 48, 121, 119, 57, 107, 103, 101, 104, 115, 99, 102, 48, 122, 120, 51, 103, 115, 26, 15, 10, 4, 117, 116, 105, 97, 18, 7, 55, 48, 48, 48, 48, 48, 48, 18, 88, 10, 80, 10, 70, 10, 31, 47, 99, 111, 115, 109, 111, 115, 46, 99, 114, 121, 112, 116, 111, 46, 115, 101, 99, 112, 50, 53, 54, 107, 49, 46, 80, 117, 98, 75, 101, 121, 18, 35, 10, 33, 2, 214, 196, 150, 138, 247, 194, 102, 99, 26, 107, 77, 58, 49, 185, 175, 141, 130, 161, 143, 190, 103, 32, 58, 186, 68, 20, 160, 25, 160, 135, 214, 93, 18, 4, 10, 2, 8, 1, 24, 16, 18, 4, 16, 208, 232, 12, 26, 64, 130, 232, 165, 58, 164, 111, 95, 148, 20, 60, 156, 116, 178, 169, 117, 153, 98, 157, 196, 77, 197, 213, 72, 128, 216, 230, 87, 132, 221, 235, 144, 244, 43, 210, 127, 94, 48, 55, 233, 145, 153, 238, 250, 34, 139, 7, 50, 77, 206, 206, 47, 38, 39, 163, 8, 34, 220, 47, 197, 168, 59, 78, 221, 207,
 	}
 
-	timeoutHeight, memo, messages, err := decodeCosmosTx(txDecoder, rawTx)
+	var d = NewDecodedTx()
+	err := decodeCosmosTx(txDecoder, rawTx, &d)
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), timeoutHeight)
-	assert.Equal(t, "", memo)
+	assert.Equal(t, uint64(0), d.TimeoutHeight)
+	assert.Equal(t, "", d.Memo)
 
 	expectedMsgs := []types.Msg{
 		&cosmosStakingTypes.MsgDelegate{
@@ -83,67 +149,52 @@ func TestDecodeCosmosTx_DelegateMsg(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, expectedMsgs, messages)
+	assert.Equal(t, expectedMsgs, d.Messages)
+	assert.Equal(t, "0", d.Fee.String())
 }
 
 func TestDecodeFee(t *testing.T) {
 	testCases := []struct {
 		desc        string
-		authInfo    tx.AuthInfo
+		amount      types.Coins
 		expectedFee decimal.Decimal
 		expectedErr string
 	}{
 		{
 			desc:        "No fee",
-			authInfo:    tx.AuthInfo{},
+			amount:      nil,
 			expectedFee: decimal.Zero,
 			expectedErr: "",
 		},
 		{
 			desc: "Valid UTIA fee",
-			authInfo: tx.AuthInfo{
-				Fee: &tx.Fee{
-					Amount: types.Coins{
-						types.NewCoin("utia", math.NewInt(1000)),
-					},
-				},
+			amount: types.Coins{
+				types.NewCoin("utia", math.NewInt(1000)),
 			},
 			expectedFee: decimal.NewFromInt(1000),
 			expectedErr: "",
 		},
 		{
 			desc: "Valid TIA fee",
-			authInfo: tx.AuthInfo{
-				Fee: &tx.Fee{
-					Amount: types.Coins{
-						types.NewCoin("tia", math.NewInt(5000000)),
-					},
-				},
+			amount: types.Coins{
+				types.NewCoin("tia", math.NewInt(5000000)),
 			},
 			expectedFee: decimal.NewFromInt(5000000).Shift(6),
 			expectedErr: "",
 		},
 		{
 			desc: "Multiple fee currencies",
-			authInfo: tx.AuthInfo{
-				Fee: &tx.Fee{
-					Amount: types.Coins{
-						types.NewCoin("utia", math.NewInt(1000)),
-						types.NewCoin("tia", math.NewInt(5000000)),
-					},
-				},
+			amount: types.Coins{
+				types.NewCoin("utia", math.NewInt(1000)),
+				types.NewCoin("tia", math.NewInt(5000000)),
 			},
 			expectedFee: decimal.Zero,
 			expectedErr: "found fee in 2 currencies",
 		},
 		{
 			desc: "Fee in unknown denom",
-			authInfo: tx.AuthInfo{
-				Fee: &tx.Fee{
-					Amount: types.Coins{
-						types.NewCoin("unknown", math.NewInt(1000)),
-					},
-				},
+			amount: types.Coins{
+				types.NewCoin("unknown", math.NewInt(1000)),
 			},
 			expectedFee: decimal.Zero,
 			expectedErr: "couldn't find fee amount in utia or in tia denom",
@@ -152,7 +203,7 @@ func TestDecodeFee(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			fee, err := decodeFee(tc.authInfo)
+			fee, err := decodeFee(tc.amount)
 
 			assert.Equal(t, tc.expectedFee, fee)
 			if err != nil {
