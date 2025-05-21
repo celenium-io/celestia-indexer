@@ -197,7 +197,6 @@ func createMsgCreateValidator() types.Msg {
 		Description:       cosmosStakingTypes.Description{},
 		Commission:        cosmosStakingTypes.CommissionRates{},
 		MinSelfDelegation: math.NewInt(1),
-		DelegatorAddress:  "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 		ValidatorAddress:  "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 		Pubkey:            pkAny,
 		Value:             types.NewCoin("utia", math.OneInt()),
@@ -221,17 +220,6 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 
 	addressesExpected := []storage.AddressWithType{
 		{
-			Type: storageTypes.MsgAddressTypeDelegator,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
-				Hash:       []byte{0x4a, 0xb, 0xf8, 0x99, 0x89, 0xe7, 0xa, 0xe3, 0xf, 0x3b, 0x62, 0x94, 0xa2, 0x97, 0x5a, 0x17, 0x5c, 0x48, 0x22, 0xa3},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-		{
 			Type: storageTypes.MsgAddressTypeValidator,
 			Address: storage.Address{
 				Id:         0,
@@ -247,7 +235,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 
 	expectedValidators := map[string]*storage.Validator{
 		"celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x": {
-			Delegator:         "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
+			Delegator:         "celestia1fg9l3xvfuu9wxremv2229966zawysg4rss2hzq",
 			Address:           "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 			ConsAddress:       "A8BEA00847066E6C765E7B064DD79265406D402B",
 			Rate:              decimal.Zero,
