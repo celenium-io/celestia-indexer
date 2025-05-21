@@ -72,5 +72,7 @@ func processChannelOpenInit(_ *context.Context, events []storage.Event, msg *sto
 		ChannelsCount: 1,
 	}
 
+	*idx += 2
+
 	return nil
 }

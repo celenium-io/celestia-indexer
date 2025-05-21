@@ -45,6 +45,10 @@ func processConnectionOpenInit(_ *context.Context, events []storage.Event, msg *
 			CounterpartyConnectionId: cc.CounterpartyConnectionId,
 			ChannelsCount:            0,
 		}
+
+		break
 	}
+
+	*idx += 2
 	return nil
 }
