@@ -261,7 +261,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 		Type:      storageTypes.MsgCreateValidator,
 		TxId:      0,
 		Data:      data,
-		Size:      208,
+		Size:      152,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
