@@ -46,5 +46,6 @@ func processChannelOpenConfirm(_ *context.Context, events []storage.Event, msg *
 		Status:                storageTypes.IbcChannelStatusOpened,
 	}
 
+	*idx += 2
 	return nil
 }

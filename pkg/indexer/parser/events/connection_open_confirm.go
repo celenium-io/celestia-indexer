@@ -49,6 +49,9 @@ func processConnectionOpenConfirm(_ *context.Context, events []storage.Event, ms
 			Id:              cc.ClientId,
 			ConnectionCount: 1,
 		}
+		break
 	}
+
+	*idx += 2
 	return nil
 }
