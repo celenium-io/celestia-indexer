@@ -570,26 +570,6 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	auth := v1.Group("/auth")
-	{
-		keyValidator := handler.NewKeyValidator(db.ApiKeys, db.BlobLogs)
-		keyMiddleware := middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
-			KeyLookup: "header:Authorization",
-			Validator: keyValidator.Validate,
-		})
-		adminMiddleware := AdminMiddleware()
-
-		rollupAuthHandler := handler.NewRollupAuthHandler(db.Rollup, db.Address, db.Namespace, db.Transactable)
-		rollup := auth.Group("/rollup")
-		{
-			rollup.POST("/new", rollupAuthHandler.Create, keyMiddleware)
-			rollup.PATCH("/:id", rollupAuthHandler.Update, keyMiddleware)
-			rollup.DELETE("/:id", rollupAuthHandler.Delete, keyMiddleware, adminMiddleware)
-			rollup.PATCH("/:id/verify", rollupAuthHandler.Verify, keyMiddleware, adminMiddleware)
-			rollup.GET("/unverified", rollupAuthHandler.Unverified, keyMiddleware, adminMiddleware)
-		}
-	}
-
 	log.Info().Msg("API routes:")
 	for _, route := range e.Routes() {
 		log.Info().Msgf("[%s] %s -> %s", route.Method, route.Path, route.Name)

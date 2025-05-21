@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
+// SPDX-FileCopyrightText: 2025 PK Lab AG <contact@pklab.io>
 // SPDX-License-Identifier: MIT
 
 package handler
@@ -13,10 +13,11 @@ import (
 )
 
 var (
-	errInvalidHashLength = errors.New("invalid hash: should be 32 bytes length")
-	errInvalidAddress    = errors.New("invalid address")
-	errUnknownAddress    = errors.New("unknown address")
-	errCancelRequest     = "pq: canceling statement due to user request"
+	errInvalidAddress   = errors.New("invalid address")
+	errUnknownAddress   = errors.New("unknown address")
+	errUnknownNamespace = errors.New("unknown namespace")
+	errInvalidApiKey    = errors.New("invalid api key")
+	errCancelRequest    = "pq: canceling statement due to user request"
 )
 
 type NoRows interface {
@@ -25,21 +26,6 @@ type NoRows interface {
 
 type Error struct {
 	Message string `json:"message"`
-}
-
-func badRequestError(c echo.Context, err error) error {
-	return c.JSON(http.StatusBadRequest, Error{
-		Message: err.Error(),
-	})
-}
-
-func internalServerError(c echo.Context, err error) error {
-	if hub := sentryecho.GetHubFromContext(c); hub != nil {
-		hub.CaptureMessage(err.Error())
-	}
-	return c.JSON(http.StatusInternalServerError, Error{
-		Message: err.Error(),
-	})
 }
 
 func handleError(c echo.Context, err error, noRows NoRows) error {
@@ -66,4 +52,25 @@ func handleError(c echo.Context, err error, noRows NoRows) error {
 		return badRequestError(c, err)
 	}
 	return internalServerError(c, err)
+}
+
+func internalServerError(c echo.Context, err error) error {
+	if hub := sentryecho.GetHubFromContext(c); hub != nil {
+		hub.CaptureMessage(err.Error())
+	}
+	return c.JSON(http.StatusInternalServerError, Error{
+		Message: err.Error(),
+	})
+}
+
+func badRequestError(c echo.Context, err error) error {
+	return c.JSON(http.StatusBadRequest, Error{
+		Message: err.Error(),
+	})
+}
+
+func success(c echo.Context) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "success",
+	})
 }

@@ -1,0 +1,41 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Private API" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="celestia-indexer" />
+    <working_directory value="$PROJECT_DIR$/cmd/private_api" />
+    <parameters value="-c ../../configs/dipdup.yml" />
+    <envs>
+      <env name="API_PROMETHEUS_ENABLED" value="false" />
+      <env name="API_RATE_LIMIT" value="20" />
+      <env name="API_REQUEST_TIMEOUT" value="10" />
+      <env name="API_WEBSOCKET_ENABLED" value="true" />
+      <env name="BINANCE_API_RPS" value="5" />
+      <env name="BINANCE_API_TIMEOUT" value="10" />
+      <env name="BINANCE_API_URL" value="https://api.binance.com/" />
+      <env name="CELENIUM_ENV" value="production" />
+      <env name="CELESTIA_DAL_API_RPS" value="10" />
+      <env name="CELESTIA_DAL_API_TIMEOUT" value="30 # seconds" />
+      <env name="CELESTIA_DAL_API_URL" value="" />
+      <env name="CELESTIA_NODE_AUTH_TOKEN" value="" />
+      <env name="CELESTIA_NODE_RPS" value="5" />
+      <env name="CELESTIA_NODE_TIMEOUT" value="10 # seconds" />
+      <env name="CELESTIA_NODE_URL" value="https://node.celenium.io" />
+      <env name="CELESTIA_NODE_WS_URL" value="https://node.celenium.io:443" />
+      <env name="INDEXER_BLOCK_PERIOD" value="15 # seconds" />
+      <env name="INDEXER_NAME" value="celestia_indexer" />
+      <env name="INDEXER_SCRIPTS_DIR" value="./../../database" />
+      <env name="INDEXER_START_LEVEL" value="1" />
+      <env name="INDEXER_THREADS_COUNT" value="10" />
+      <env name="LOG_LEVEL" value="debug" />
+      <env name="POSTGRES_DB" value="celestia" />
+      <env name="POSTGRES_HOST" value="localhost" />
+      <env name="POSTGRES_PASSWORD" value="changeme" />
+      <env name="POSTGRES_PORT" value="5432" />
+      <env name="POSTGRES_USER" value="dipdup" />
+    </envs>
+    <kind value="DIRECTORY" />
+    <package value="github.com/celenium-io/celestia-indexer" />
+    <directory value="$PROJECT_DIR$/cmd/private_api" />
+    <filePath value="$PROJECT_DIR$" />
+    <method v="2" />
+  </configuration>
+</component>
