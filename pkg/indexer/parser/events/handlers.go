@@ -24,6 +24,7 @@ var eventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgSubmitProposal:              handleSubmitProposal,
 	storageTypes.MsgDeposit:                     handleDeposit,
 	storageTypes.MsgVote:                        handleVote,
+	storageTypes.MsgVoteWeighted:                handleVote,
 	storageTypes.MsgCreateClient:                handleCreateClient,
 	storageTypes.MsgUpdateClient:                handleUpdateClient,
 	storageTypes.MsgConnectionOpenInit:          handleConnectionOpenInit,
