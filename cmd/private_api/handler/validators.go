@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
+// SPDX-FileCopyrightText: 2025 PK Lab AG <contact@pklab.io>
 // SPDX-License-Identifier: MIT
 
 package handler
@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"net/http"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
@@ -20,6 +21,7 @@ type CelestiaApiValidator struct {
 
 func NewCelestiaApiValidator() *CelestiaApiValidator {
 	v := validator.New()
+	v.RegisterStructValidation(rollupProviderValidator, rollupProvider{})
 	if err := v.RegisterValidation("address", addressValidator()); err != nil {
 		panic(err)
 	}
@@ -168,5 +170,37 @@ func voterTypeValidator() validator.Func {
 	return func(fl validator.FieldLevel) bool {
 		_, err := types.ParseVoterType(fl.Field().String())
 		return err == nil
+	}
+}
+
+type KeyValidator struct {
+	apiKeys    storage.IApiKey
+	errChecker NoRows
+}
+
+func NewKeyValidator(apiKeys storage.IApiKey, errChecker NoRows) KeyValidator {
+	return KeyValidator{apiKeys: apiKeys, errChecker: errChecker}
+}
+
+const ApiKeyName = "api_key"
+
+func (kv KeyValidator) Validate(key string, c echo.Context) (bool, error) {
+	apiKey, err := kv.apiKeys.Get(c.Request().Context(), key)
+	if err != nil {
+		if kv.errChecker.IsNoRows(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	c.Logger().Infof("using apikey: %s", apiKey.Description)
+	c.Set(ApiKeyName, apiKey)
+	return true, nil
+}
+
+func rollupProviderValidator(sl validator.StructLevel) {
+	rp := sl.Current().Interface().(rollupProvider)
+	if rp.Address == "" && rp.Namespace == "" {
+		sl.ReportError(rp.Address, "address", "Address", "namespace_or_address", "")
+		sl.ReportError(rp.Namespace, "namespace", "Namespace", "namespace_or_address", "")
 	}
 }

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
+// SPDX-FileCopyrightText: 2025 PK Lab AG <contact@pklab.io>
 // SPDX-License-Identifier: MIT
 
 package main
@@ -6,7 +6,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
+	"github.com/celenium-io/celestia-indexer/cmd/private_api/handler"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/labstack/echo/v4"
 )
