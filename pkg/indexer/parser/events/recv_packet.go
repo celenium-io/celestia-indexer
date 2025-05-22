@@ -35,12 +35,29 @@ func processRecvPacket(events []storage.Event, msg *storage.Message, idx *int) e
 	if len(events)-1 < *idx || events[*idx].Type == storageTypes.EventTypeMessage {
 		return nil
 	}
+
+	var (
+		startIdx               = *idx
+		hasFungibleTokenPacket = events[*idx].Type == storageTypes.EventTypeFungibleTokenPacket
+		action                 = decoder.StringFromMap(events[*idx].Data, "action")
+	)
+
+	for action == "" && len(events)-1 > *idx {
+		*idx += 1
+		action = decoder.StringFromMap(events[*idx].Data, "action")
+		hasFungibleTokenPacket = (events[*idx].Type == storageTypes.EventTypeFungibleTokenPacket) || hasFungibleTokenPacket
+	}
+
+	if !hasFungibleTokenPacket {
+		return nil
+	}
+
 	msg.IbcTransfer = &storage.IbcTransfer{
 		Height: msg.Height,
 		Time:   msg.Time,
 	}
 
-	recvPacketEvent := events[*idx]
+	recvPacketEvent := events[startIdx]
 	if recvPacketEvent.Type != storageTypes.EventTypeRecvPacket {
 		return errors.Errorf("invalid event type: %s", recvPacketEvent.Type)
 	}
@@ -67,16 +84,15 @@ func processRecvPacket(events []storage.Event, msg *storage.Message, idx *int) e
 		msg.IbcTransfer.Timeout = &recvPacket.Timeout
 	}
 
-	*idx += 3
-	coinReceivedEvent := events[*idx]
+	startIdx += 3
+	coinReceivedEvent := events[startIdx]
 	if coinReceivedEvent.Type == storageTypes.EventTypeMessage {
-		*idx += 1
 		msg.IbcTransfer = nil
 		msg.IbcChannel = nil
 		return nil
 	}
 	if coinReceivedEvent.Type != storageTypes.EventTypeCoinReceived {
-		return errors.Errorf("invalid event type: %s", coinReceivedEvent.Type)
+		return errors.Errorf("invalid event type: %s | expect coin_received", coinReceivedEvent.Type)
 	}
 
 	received, err := decode.NewCoinReceived(coinReceivedEvent.Data)
@@ -84,10 +100,12 @@ func processRecvPacket(events []storage.Event, msg *storage.Message, idx *int) e
 		return errors.Wrap(err, "parse coinr received in recv packet")
 	}
 
-	*idx += 3
-	fundEvent := events[*idx]
+	startIdx += 3
+	fundEvent := events[startIdx]
 	if fundEvent.Type != storageTypes.EventTypeFungibleTokenPacket {
-		return nil
+		msg.IbcTransfer = nil
+		msg.IbcChannel = nil
+		return errors.Errorf("invalid event type: %s | expect fungible_token_packet", coinReceivedEvent.Type)
 	}
 
 	ftp := decode.NewFungibleTokenPacket(fundEvent.Data)
@@ -118,14 +136,5 @@ func processRecvPacket(events []storage.Event, msg *storage.Message, idx *int) e
 		msg.IbcTransfer.SenderAddress = &ftp.Sender
 	}
 
-	action := decoder.StringFromMap(events[*idx].Data, "action")
-	for action == "" && len(events)-1 > *idx {
-		*idx++
-		action = decoder.StringFromMap(events[*idx].Data, "action")
-	}
-
-	if action == "" {
-		*idx += 1
-	}
 	return nil
 }
