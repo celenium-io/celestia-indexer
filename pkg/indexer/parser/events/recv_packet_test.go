@@ -18,7 +18,7 @@ func Test_handleRecvPacket(t *testing.T) {
 		name   string
 		ctx    *context.Context
 		events []storage.Event
-		msg    *storage.Message
+		msg    []*storage.Message
 		idx    *int
 	}{
 		{
@@ -114,29 +114,31 @@ func Test_handleRecvPacket(t *testing.T) {
 					},
 				},
 			},
-			msg: &storage.Message{
-				Type:   types.MsgRecvPacket,
-				Height: 1866988,
-				Data: map[string]any{
-					"Packet": map[string]any{
-						"Data":               "eyJkYXRhIjoiQ3FJQkNod3ZZMjl6Ylc5ekxtSmhibXN1ZGpGaVpYUmhNUzVOYzJkVFpXNWtFb0VCQ2tOalpXeGxjM1JwWVRGNGVuTmtialkxYUhsc2FtTnRaVzVzZUhscWJXUnRkbWRvYUdRd2R6UjFkREkzYXpObWVEVTJhbkF5Y0RZNVpXZzJjM0p6T0hBemNuTnpFaTlqWld4bGMzUnBZVEZrYzIxdWVubzRjWFp1TXpRemJIaHhNbVYzTmpjek9YTmtNREpuYzNOd2VXVnpZVFJxZFJvSkNnUjFkR2xoRWdFeCIsIm1lbW8iOiJyb290dWxwIiwidHlwZSI6IlRZUEVfRVhFQ1VURV9UWCJ9",
-						"DestinationChannel": "channel-2",
-						"DestinationPort":    "icahost",
-						"Sequence":           3,
-						"SourceChannel":      "channel-4311",
-						"SourcePort":         "icacontroller-cosmos1epqzuh6myrwrp4zr8zjamcye4nvkkg9xd8ywak",
-						"TimeoutHeight": map[string]any{
-							"RevisionHeight": 0,
+			msg: []*storage.Message{
+				{
+					Type:   types.MsgRecvPacket,
+					Height: 1866988,
+					Data: map[string]any{
+						"Packet": map[string]any{
+							"Data":               "eyJkYXRhIjoiQ3FJQkNod3ZZMjl6Ylc5ekxtSmhibXN1ZGpGaVpYUmhNUzVOYzJkVFpXNWtFb0VCQ2tOalpXeGxjM1JwWVRGNGVuTmtialkxYUhsc2FtTnRaVzVzZUhscWJXUnRkbWRvYUdRd2R6UjFkREkzYXpObWVEVTJhbkF5Y0RZNVpXZzJjM0p6T0hBemNuTnpFaTlqWld4bGMzUnBZVEZrYzIxdWVubzRjWFp1TXpRemJIaHhNbVYzTmpjek9YTmtNREpuYzNOd2VXVnpZVFJxZFJvSkNnUjFkR2xoRWdFeCIsIm1lbW8iOiJyb290dWxwIiwidHlwZSI6IlRZUEVfRVhFQ1VURV9UWCJ9",
+							"DestinationChannel": "channel-2",
+							"DestinationPort":    "icahost",
+							"Sequence":           3,
+							"SourceChannel":      "channel-4311",
+							"SourcePort":         "icacontroller-cosmos1epqzuh6myrwrp4zr8zjamcye4nvkkg9xd8ywak",
+							"TimeoutHeight": map[string]any{
+								"RevisionHeight": 0,
+								"RevisionNumber": 0,
+							},
+							"TimeoutTimestamp": 1725383082324295700,
+						},
+						"ProofCommitment": "Cr8JCrwJCm9jb21taXRtZW50cy9wb3J0cy9pY2Fjb250cm9sbGVyLWNvc21vczFlcHF6dWg2bXlyd3JwNHpyOHpqYW1jeWU0bnZra2c5eGQ4eXdhay9jaGFubmVscy9jaGFubmVsLTQzMTEvc2VxdWVuY2VzLzMSIDOCpIscr0NGtsrg1HHkMhvGNI7gE5dlR5qpjuymB+A/Gg4IARgBIAEqBgAC6oeoFiIsCAESKAIE6oeoFiC2yEQJEJWHquHWhg/shpu6fOhyTtt2Jrf90zLAwr0UCyAiLAgBEigEBuqHqBYglv6DW7Udd8HWnGac8Tqmn2XL7BK/ab9FC8SERVGMq9AgIiwIARIoBg7qh6gWIK1Vn+IslEiRV+rjuwsUEytK3cQLJyOMaic6y/OeLjP1ICIsCAESKAgW6oeoFiAkf3L0kNPOb3iWG94x1Oo3F7tBbhTIyAFrzQi+pt6rTiAiLAgBEigKKOqHqBYgTaZg3a6jUz0ZxoCGVMv5Ms5Gi6NPmJMb9dAa2fn+Q6UgIi4IARIHDGjqh6gWIBohIJaGaKlZh0VVe2ssuilbDdCi3a0SiB30NGGpltGQmeA4Ii0IARIpDrYB6oeoFiBgbasOp9FmZSOJD++feygAcJYqoaRUFfkzq7ajJQ3LuCAiLQgBEikQpgLqh6gWIAl0SSkvpQjTDxRVrn1CfBfh87LLuW8xmBWLXpOQjt7NICItCAESKRL2BOqHqBYg4MgElmhPULuGOedxNZoAQp1FFnsbG/3yrTPYl4WZa0QgIi8IARIIFPYI6oeoFiAaISAuXh/nYY9vlfQKv/CgyUrPFzhycY1gk3Jw7bqTwF/rMiItCAESKRb4D+qHqBYg2+Rbd6aRYQmx64VbkpBNZ5tTm6ZFoJxSbXhNG1cv8dAgIi0IARIpGNYX6oeoFiCHjG3nSixO/bAilis8FCYwd/EWN9KK7ord/qD8o4JcqCAiLQgBEikatCvqh6gWIP1U5ibnw5lnxJXnEgEF+Sezp3ZOfOd5I46hwrtR2qPWICIvCAESCBy0QeqHqBYgGiEgxVJIDrh0mo4Jo2vnRhShF3Nijplat7z0LF7jnWjbYLMiLggBEioeppYB6oeoFiDyiezkU1qbVkDwyurADIjsoWY/eeML9hW52bHbOWAi+yAiMAgBEgkgrJcC6oeoFiAaISCVF4HnuKW911CS/1Z7RVtH9F3CxNCTe0UL/0JuGijzmSIuCAESKiLq3QPqh6gWIOoqmcYC8BjIhzdpVhEecmVjSEJMhkgBxPHPOYd12zckICIwCAESCSSQoQ/qh6gWIBohIP3AOOA+ESwqm09lXOQEKThWYKYEVChNqPZ5mrO77+HlIi4IARIqJoD3GuqHqBYghG3zHblcVrp+v9Axn2sLv42ZvZ45A7yqeAMLQGEl4F0gIi4IARIqKqzlP+qHqBYg1nEeJj/pEy3BJmJtfQaQT436/rjYi37b+hzYhpjY2r0gIjAIARIJLJDGaeqHqBYgGiEgZ9AeEXfcGGYWs8GFUhtqJjo0hrERT4aQ/kHfqdEEgeoiLwgBEiswvtL0AeqHqBYgGI0c4X+NGJy3R41b7tcFaGe13rFbrOzGuri1P3lp18ogCv4BCvsBCgNpYmMSIJjgI1oJUJC9HROp6RPN2KPTilScZ5Xt5JcAair7ud1YGgkIARgBIAEqAQAiJwgBEgEBGiAsZZMul3Pb18hNf7k3waWY0EPHQC4zEBRXGn11UjB3HCInCAESAQEaIJ6mHb7R8tnlGSTGyBulCjKkS1+sYn2nyOJzwUMa2l9LIiUIARIhAedBsHDxHKeqTnsAdphrBaZD+RqerkYmcU0ZNeAbwDnBIiUIARIhAQb01cMqsbVA5Evp7ZOqln0OG8rkQbPrIC2usl+UYjILIicIARIBARogcy34IRcmnnh/83TNtLTUER4Hm5ZFQJoPMOibHPR0Jlg=",
+						"ProofHeight": map[string]any{
+							"RevisionHeight": 23396854,
 							"RevisionNumber": 0,
 						},
-						"TimeoutTimestamp": 1725383082324295700,
+						"Signer": "celestia1dsmnzz8qvn343lxq2ew6739sd02gsspyesa4ju",
 					},
-					"ProofCommitment": "Cr8JCrwJCm9jb21taXRtZW50cy9wb3J0cy9pY2Fjb250cm9sbGVyLWNvc21vczFlcHF6dWg2bXlyd3JwNHpyOHpqYW1jeWU0bnZra2c5eGQ4eXdhay9jaGFubmVscy9jaGFubmVsLTQzMTEvc2VxdWVuY2VzLzMSIDOCpIscr0NGtsrg1HHkMhvGNI7gE5dlR5qpjuymB+A/Gg4IARgBIAEqBgAC6oeoFiIsCAESKAIE6oeoFiC2yEQJEJWHquHWhg/shpu6fOhyTtt2Jrf90zLAwr0UCyAiLAgBEigEBuqHqBYglv6DW7Udd8HWnGac8Tqmn2XL7BK/ab9FC8SERVGMq9AgIiwIARIoBg7qh6gWIK1Vn+IslEiRV+rjuwsUEytK3cQLJyOMaic6y/OeLjP1ICIsCAESKAgW6oeoFiAkf3L0kNPOb3iWG94x1Oo3F7tBbhTIyAFrzQi+pt6rTiAiLAgBEigKKOqHqBYgTaZg3a6jUz0ZxoCGVMv5Ms5Gi6NPmJMb9dAa2fn+Q6UgIi4IARIHDGjqh6gWIBohIJaGaKlZh0VVe2ssuilbDdCi3a0SiB30NGGpltGQmeA4Ii0IARIpDrYB6oeoFiBgbasOp9FmZSOJD++feygAcJYqoaRUFfkzq7ajJQ3LuCAiLQgBEikQpgLqh6gWIAl0SSkvpQjTDxRVrn1CfBfh87LLuW8xmBWLXpOQjt7NICItCAESKRL2BOqHqBYg4MgElmhPULuGOedxNZoAQp1FFnsbG/3yrTPYl4WZa0QgIi8IARIIFPYI6oeoFiAaISAuXh/nYY9vlfQKv/CgyUrPFzhycY1gk3Jw7bqTwF/rMiItCAESKRb4D+qHqBYg2+Rbd6aRYQmx64VbkpBNZ5tTm6ZFoJxSbXhNG1cv8dAgIi0IARIpGNYX6oeoFiCHjG3nSixO/bAilis8FCYwd/EWN9KK7ord/qD8o4JcqCAiLQgBEikatCvqh6gWIP1U5ibnw5lnxJXnEgEF+Sezp3ZOfOd5I46hwrtR2qPWICIvCAESCBy0QeqHqBYgGiEgxVJIDrh0mo4Jo2vnRhShF3Nijplat7z0LF7jnWjbYLMiLggBEioeppYB6oeoFiDyiezkU1qbVkDwyurADIjsoWY/eeML9hW52bHbOWAi+yAiMAgBEgkgrJcC6oeoFiAaISCVF4HnuKW911CS/1Z7RVtH9F3CxNCTe0UL/0JuGijzmSIuCAESKiLq3QPqh6gWIOoqmcYC8BjIhzdpVhEecmVjSEJMhkgBxPHPOYd12zckICIwCAESCSSQoQ/qh6gWIBohIP3AOOA+ESwqm09lXOQEKThWYKYEVChNqPZ5mrO77+HlIi4IARIqJoD3GuqHqBYghG3zHblcVrp+v9Axn2sLv42ZvZ45A7yqeAMLQGEl4F0gIi4IARIqKqzlP+qHqBYg1nEeJj/pEy3BJmJtfQaQT436/rjYi37b+hzYhpjY2r0gIjAIARIJLJDGaeqHqBYgGiEgZ9AeEXfcGGYWs8GFUhtqJjo0hrERT4aQ/kHfqdEEgeoiLwgBEiswvtL0AeqHqBYgGI0c4X+NGJy3R41b7tcFaGe13rFbrOzGuri1P3lp18ogCv4BCvsBCgNpYmMSIJjgI1oJUJC9HROp6RPN2KPTilScZ5Xt5JcAair7ud1YGgkIARgBIAEqAQAiJwgBEgEBGiAsZZMul3Pb18hNf7k3waWY0EPHQC4zEBRXGn11UjB3HCInCAESAQEaIJ6mHb7R8tnlGSTGyBulCjKkS1+sYn2nyOJzwUMa2l9LIiUIARIhAedBsHDxHKeqTnsAdphrBaZD+RqerkYmcU0ZNeAbwDnBIiUIARIhAQb01cMqsbVA5Evp7ZOqln0OG8rkQbPrIC2usl+UYjILIicIARIBARogcy34IRcmnnh/83TNtLTUER4Hm5ZFQJoPMOibHPR0Jlg=",
-					"ProofHeight": map[string]any{
-						"RevisionHeight": 23396854,
-						"RevisionNumber": 0,
-					},
-					"Signer": "celestia1dsmnzz8qvn343lxq2ew6739sd02gsspyesa4ju",
 				},
 			},
 			idx: testsuite.Ptr(0),
@@ -275,31 +277,148 @@ func Test_handleRecvPacket(t *testing.T) {
 					Data: map[string]any{
 						"module": "transfer",
 					},
+				}, {
+					Height: 1866988,
+					Type:   "message",
+					Data: map[string]any{
+						"action": "/ibc.core.channel.v1.MsgRecvPacket",
+					},
+				}, {
+					Height: 1866988,
+					Type:   "recv_packet",
+					Data: map[string]any{
+						"packet_channel_ordering":  "ORDER_UNORDERED",
+						"packet_connection":        "connection-7",
+						"packet_data":              "{\"amount\":\"100\",\"denom\":\"transfer/channel-35/utia\",\"receiver\":\"celestia1nsxcgald2c3622hfwflps608tqrj9l3wdcmq9s\",\"sender\":\"neutron1upjaknf6lmnu3p4llldp8jx0whzsxlgetu9zjt\"}",
+						"packet_data_hex":          "7b22616d6f756e74223a22313030222c2264656e6f6d223a227472616e736665722f6368616e6e656c2d33352f75746961222c227265636569766572223a2263656c6573746961316e73786367616c64326333363232686677666c70733630387471726a396c337764636d713973222c2273656e646572223a226e657574726f6e3175706a616b6e66366c6d6e753370346c6c6c6470386a783077687a73786c67657475397a6a74227d",
+						"packet_dst_channel":       "channel-8",
+						"packet_dst_port":          "transfer",
+						"packet_sequence":          "838309",
+						"packet_src_channel":       "channel-35",
+						"packet_src_port":          "transfer",
+						"packet_timeout_height":    "0-0",
+						"packet_timeout_timestamp": "1726674263466000000",
+					},
+				}, {
+					Height: 1866988,
+					Type:   "message",
+					Data: map[string]any{
+						"module": "ibc_channel",
+					},
+				}, {
+					Height: 1866988,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":  "100utia",
+						"spender": "celestia187dz9zlxc3zrltzx5756tu7zew6yu3v0smnfem",
+					},
+				}, {
+					Height: 1866988,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":   "100utia",
+						"receiver": "celestia1nsxcgald2c3622hfwflps608tqrj9l3wdcmq9s",
+					},
+				}, {
+					Height: 1866988,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "100utia",
+						"recipient": "celestia1nsxcgald2c3622hfwflps608tqrj9l3wdcmq9s",
+						"sender":    "celestia187dz9zlxc3zrltzx5756tu7zew6yu3v0smnfem",
+					},
+				}, {
+					Height: 1866988,
+					Type:   "message",
+					Data: map[string]any{
+						"sender": "celestia187dz9zlxc3zrltzx5756tu7zew6yu3v0smnfem",
+					},
+				}, {
+					Height: 1866988,
+					Type:   "fungible_token_packet",
+					Data: map[string]any{
+						"amount":   "100",
+						"denom":    "transfer/channel-35/utia",
+						"memo":     "",
+						"module":   "transfer",
+						"receiver": "celestia1nsxcgald2c3622hfwflps608tqrj9l3wdcmq9s",
+						"sender":   "neutron1upjaknf6lmnu3p4llldp8jx0whzsxlgetu9zjt",
+						"success":  "true",
+					},
+				}, {
+					Height: 1866988,
+					Type:   "write_acknowledgement",
+					Data: map[string]any{
+						"packet_ack":               "{\"result\":\"AQ==\"}",
+						"packet_ack_hex":           "7b22726573756c74223a2241513d3d227d",
+						"packet_connection":        "connection-7",
+						"packet_data":              "{\"amount\":\"100\",\"denom\":\"transfer/channel-35/utia\",\"receiver\":\"celestia1nsxcgald2c3622hfwflps608tqrj9l3wdcmq9s\",\"sender\":\"neutron1upjaknf6lmnu3p4llldp8jx0whzsxlgetu9zjt\"}",
+						"packet_data_hex":          "7b22616d6f756e74223a22313030222c2264656e6f6d223a227472616e736665722f6368616e6e656c2d33352f75746961222c227265636569766572223a2263656c6573746961316e73786367616c64326333363232686677666c70733630387471726a396c337764636d713973222c2273656e646572223a226e657574726f6e3175706a616b6e66366c6d6e753370346c6c6c6470386a783077687a73786c67657475397a6a74227d",
+						"packet_dst_channel":       "channel-8",
+						"packet_dst_port":          "transfer",
+						"packet_sequence":          "838309",
+						"packet_src_channel":       "channel-35",
+						"packet_src_port":          "transfer",
+						"packet_timeout_height":    "0-0",
+						"packet_timeout_timestamp": "1726674263466000000",
+					},
+				}, {
+					Height: 1866988,
+					Type:   "message",
+					Data: map[string]any{
+						"module": "ibc_channel",
+					},
 				},
 			},
-			msg: &storage.Message{
-				Type:   types.MsgRecvPacket,
-				Height: 1866988,
-				Data: map[string]any{
-					"Packet": map[string]any{
-						"Data":               "eyJhbW91bnQiOiI0MDAwMDAwIiwiZGVub20iOiJ0cmFuc2Zlci9jaGFubmVsLTM1L3V0aWEiLCJtZW1vIjoie1wiZm9yd2FyZFwiOntcInJlY2VpdmVyXCI6XCJvc21vMXZrZGFrcXFnNWh0cTVjM3d5MmtqMmdlcTUzNnE2NjV4ZGV4cnRqdXdxY2twYWRzMmMybnN2aGhjeXZcIixcInBvcnRcIjpcInRyYW5zZmVyXCIsXCJjaGFubmVsXCI6XCJjaGFubmVsLTJcIixcInRpbWVvdXRcIjowLFwicmV0cmllc1wiOjIsXCJuZXh0XCI6e1wid2FzbVwiOntcImNvbnRyYWN0XCI6XCJvc21vMXZrZGFrcXFnNWh0cTVjM3d5MmtqMmdlcTUzNnE2NjV4ZGV4cnRqdXdxY2twYWRzMmMybnN2aGhjeXZcIixcIm1zZ1wiOntcInN3YXBfYW5kX2FjdGlvblwiOntcInVzZXJfc3dhcFwiOntcInN3YXBfZXhhY3RfYXNzZXRfaW5cIjp7XCJzd2FwX3ZlbnVlX25hbWVcIjpcIm9zbW9zaXMtcG9vbG1hbmFnZXJcIixcIm9wZXJhdGlvbnNcIjpbe1wicG9vbFwiOlwiMTQ3NVwiLFwiZGVub21faW5cIjpcImliYy9ENzlFN0Q4M0FCMzk5QkZGRjkzNDMzRTU0RkFBNDgwQzE5MTI0OEZDNTU2OTI0QTJBODM1MUFFMjYzOEIzODc3XCIsXCJkZW5vbV9vdXRcIjpcImZhY3Rvcnkvb3NtbzFmNXZmY3BoMmR2ZmVxY3FraGV0d3Y3NWZkYTY5ejdlNWMyZGxkbTNrdmdqMjNjcmt2NndxY240N2EwL3VtaWxrVElBXCJ9LHtcInBvb2xcIjpcIjE2OTRcIixcImRlbm9tX2luXCI6XCJmYWN0b3J5L29zbW8xZjV2ZmNwaDJkdmZlcWNxa2hldHd2NzVmZGE2OXo3ZTVjMmRsZG0za3ZnajIzY3JrdjZ3cWNuNDdhMC91bWlsa1RJQVwiLFwiZGVub21fb3V0XCI6XCJpYmMvNjkxMTBGRjY3M0Q3MEIzOTkwNEZGMDU2Q0ZERkQ1OEE5MEJFQzMxOTQzMDNGNDVDMzJDQjkxQjhCMEE3MzhFQVwifSx7XCJwb29sXCI6XCIxNjk4XCIsXCJkZW5vbV9pblwiOlwiaWJjLzY5MTEwRkY2NzNENzBCMzk5MDRGRjA1NkNGREZENThBOTBCRUMzMTk0MzAzRjQ1QzMyQ0I5MUI4QjBBNzM4RUFcIixcImRlbm9tX291dFwiOlwiaWJjLzY0QkE2RTMxRkU4ODdENjZDNkY4RjMxQzdCMUE4MEM3Q0ExNzkyMzk2NzdCNDA4OEJCNTVGNUVBMDdEQkUyNzNcIn1dfX0sXCJtaW5fYXNzZXRcIjp7XCJuYXRpdmVcIjp7XCJkZW5vbVwiOlwiaWJjLzY0QkE2RTMxRkU4ODdENjZDNkY4RjMxQzdCMUE4MEM3Q0ExNzkyMzk2NzdCNDA4OEJCNTVGNUVBMDdEQkUyNzNcIixcImFtb3VudFwiOlwiMTA5NTExNjU5OTI0ODA2MzA5MlwifX0sXCJ0aW1lb3V0X3RpbWVzdGFtcFwiOjE3MjY2NzM5NjIyMzM0MzMwNjcsXCJwb3N0X3N3YXBfYWN0aW9uXCI6e1wiaWJjX3RyYW5zZmVyXCI6e1wiaWJjX2luZm9cIjp7XCJzb3VyY2VfY2hhbm5lbFwiOlwiY2hhbm5lbC0xMjJcIixcInJlY2VpdmVyXCI6XCJpbmoxc3lyZGgydjJyd2Y4Zmh2czVnc213cjRhaGNuczNtNHp2Y3Vrd2NcIixcIm1lbW9cIjpcIlwiLFwicmVjb3Zlcl9hZGRyZXNzXCI6XCJvc21vMW04NG5oNzVobDQ3NGs1ZDgzY3VucnFmeGdtcmw1MjN1NXEwOXh3XCJ9fX0sXCJhZmZpbGlhdGVzXCI6W3tcImJhc2lzX3BvaW50c19mZWVcIjpcIjYwXCIsXCJhZGRyZXNzXCI6XCJvc21vMW15NHRrNDIwZ2ptaGdncXd2dmhhNmV5OTM5MGdxd2ZyZWUycDR1XCJ9LHtcImJhc2lzX3BvaW50c19mZWVcIjpcIjE1XCIsXCJhZGRyZXNzXCI6XCJvc21vMW1zam5hbDJnbGZ6NnplOHg5a2R1aGc0NXhwcHg5c2RkYXdmeDQ2XCJ9XX19fX19fSIsInJlY2VpdmVyIjoiY2VsZXN0aWExbTg0bmg3NWhsNDc0azVkODNjdW5ycWZ4Z21ybDUyM3VkM2Q5MjMiLCJzZW5kZXIiOiJuZXV0cm9uMW04NG5oNzVobDQ3NGs1ZDgzY3VucnFmeGdtcmw1MjN1Y3k0aDJtIn0=",
-						"DestinationChannel": "channel-8",
-						"DestinationPort":    "transfer",
-						"Sequence":           838308,
-						"SourceChannel":      "channel-35",
-						"SourcePort":         "transfer",
-						"TimeoutHeight": map[string]any{
-							"RevisionHeight": 2372332,
-							"RevisionNumber": 0,
+			msg: []*storage.Message{
+				{
+					Type:   types.MsgRecvPacket,
+					Height: 1866988,
+					Data: map[string]any{
+						"Packet": map[string]any{
+							"Data":               "eyJhbW91bnQiOiI0MDAwMDAwIiwiZGVub20iOiJ0cmFuc2Zlci9jaGFubmVsLTM1L3V0aWEiLCJtZW1vIjoie1wiZm9yd2FyZFwiOntcInJlY2VpdmVyXCI6XCJvc21vMXZrZGFrcXFnNWh0cTVjM3d5MmtqMmdlcTUzNnE2NjV4ZGV4cnRqdXdxY2twYWRzMmMybnN2aGhjeXZcIixcInBvcnRcIjpcInRyYW5zZmVyXCIsXCJjaGFubmVsXCI6XCJjaGFubmVsLTJcIixcInRpbWVvdXRcIjowLFwicmV0cmllc1wiOjIsXCJuZXh0XCI6e1wid2FzbVwiOntcImNvbnRyYWN0XCI6XCJvc21vMXZrZGFrcXFnNWh0cTVjM3d5MmtqMmdlcTUzNnE2NjV4ZGV4cnRqdXdxY2twYWRzMmMybnN2aGhjeXZcIixcIm1zZ1wiOntcInN3YXBfYW5kX2FjdGlvblwiOntcInVzZXJfc3dhcFwiOntcInN3YXBfZXhhY3RfYXNzZXRfaW5cIjp7XCJzd2FwX3ZlbnVlX25hbWVcIjpcIm9zbW9zaXMtcG9vbG1hbmFnZXJcIixcIm9wZXJhdGlvbnNcIjpbe1wicG9vbFwiOlwiMTQ3NVwiLFwiZGVub21faW5cIjpcImliYy9ENzlFN0Q4M0FCMzk5QkZGRjkzNDMzRTU0RkFBNDgwQzE5MTI0OEZDNTU2OTI0QTJBODM1MUFFMjYzOEIzODc3XCIsXCJkZW5vbV9vdXRcIjpcImZhY3Rvcnkvb3NtbzFmNXZmY3BoMmR2ZmVxY3FraGV0d3Y3NWZkYTY5ejdlNWMyZGxkbTNrdmdqMjNjcmt2NndxY240N2EwL3VtaWxrVElBXCJ9LHtcInBvb2xcIjpcIjE2OTRcIixcImRlbm9tX2luXCI6XCJmYWN0b3J5L29zbW8xZjV2ZmNwaDJkdmZlcWNxa2hldHd2NzVmZGE2OXo3ZTVjMmRsZG0za3ZnajIzY3JrdjZ3cWNuNDdhMC91bWlsa1RJQVwiLFwiZGVub21fb3V0XCI6XCJpYmMvNjkxMTBGRjY3M0Q3MEIzOTkwNEZGMDU2Q0ZERkQ1OEE5MEJFQzMxOTQzMDNGNDVDMzJDQjkxQjhCMEE3MzhFQVwifSx7XCJwb29sXCI6XCIxNjk4XCIsXCJkZW5vbV9pblwiOlwiaWJjLzY5MTEwRkY2NzNENzBCMzk5MDRGRjA1NkNGREZENThBOTBCRUMzMTk0MzAzRjQ1QzMyQ0I5MUI4QjBBNzM4RUFcIixcImRlbm9tX291dFwiOlwiaWJjLzY0QkE2RTMxRkU4ODdENjZDNkY4RjMxQzdCMUE4MEM3Q0ExNzkyMzk2NzdCNDA4OEJCNTVGNUVBMDdEQkUyNzNcIn1dfX0sXCJtaW5fYXNzZXRcIjp7XCJuYXRpdmVcIjp7XCJkZW5vbVwiOlwiaWJjLzY0QkE2RTMxRkU4ODdENjZDNkY4RjMxQzdCMUE4MEM3Q0ExNzkyMzk2NzdCNDA4OEJCNTVGNUVBMDdEQkUyNzNcIixcImFtb3VudFwiOlwiMTA5NTExNjU5OTI0ODA2MzA5MlwifX0sXCJ0aW1lb3V0X3RpbWVzdGFtcFwiOjE3MjY2NzM5NjIyMzM0MzMwNjcsXCJwb3N0X3N3YXBfYWN0aW9uXCI6e1wiaWJjX3RyYW5zZmVyXCI6e1wiaWJjX2luZm9cIjp7XCJzb3VyY2VfY2hhbm5lbFwiOlwiY2hhbm5lbC0xMjJcIixcInJlY2VpdmVyXCI6XCJpbmoxc3lyZGgydjJyd2Y4Zmh2czVnc213cjRhaGNuczNtNHp2Y3Vrd2NcIixcIm1lbW9cIjpcIlwiLFwicmVjb3Zlcl9hZGRyZXNzXCI6XCJvc21vMW04NG5oNzVobDQ3NGs1ZDgzY3VucnFmeGdtcmw1MjN1NXEwOXh3XCJ9fX0sXCJhZmZpbGlhdGVzXCI6W3tcImJhc2lzX3BvaW50c19mZWVcIjpcIjYwXCIsXCJhZGRyZXNzXCI6XCJvc21vMW15NHRrNDIwZ2ptaGdncXd2dmhhNmV5OTM5MGdxd2ZyZWUycDR1XCJ9LHtcImJhc2lzX3BvaW50c19mZWVcIjpcIjE1XCIsXCJhZGRyZXNzXCI6XCJvc21vMW1zam5hbDJnbGZ6NnplOHg5a2R1aGc0NXhwcHg5c2RkYXdmeDQ2XCJ9XX19fX19fSIsInJlY2VpdmVyIjoiY2VsZXN0aWExbTg0bmg3NWhsNDc0azVkODNjdW5ycWZ4Z21ybDUyM3VkM2Q5MjMiLCJzZW5kZXIiOiJuZXV0cm9uMW04NG5oNzVobDQ3NGs1ZDgzY3VucnFmeGdtcmw1MjN1Y3k0aDJtIn0=",
+							"DestinationChannel": "channel-8",
+							"DestinationPort":    "transfer",
+							"Sequence":           838308,
+							"SourceChannel":      "channel-35",
+							"SourcePort":         "transfer",
+							"TimeoutHeight": map[string]any{
+								"RevisionHeight": 2372332,
+								"RevisionNumber": 0,
+							},
+							"TimeoutTimestamp": 0,
 						},
-						"TimeoutTimestamp": 0,
+						"ProofCommitment": "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",
+						"ProofHeight": map[string]any{
+							"RevisionHeight": 14715481,
+							"RevisionNumber": 1,
+						},
+						"Signer": "celestia1cdlz8scnf3mmxdnf4njmtp7vz4gps7fsm503qe",
 					},
-					"ProofCommitment": "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",
-					"ProofHeight": map[string]any{
-						"RevisionHeight": 14715481,
-						"RevisionNumber": 1,
+				}, {
+					Type:   types.MsgRecvPacket,
+					Height: 1866988,
+					Data: map[string]any{
+						"Packet": map[string]any{
+							"Data":               "eyJhbW91bnQiOiIxMDAiLCJkZW5vbSI6InRyYW5zZmVyL2NoYW5uZWwtMzUvdXRpYSIsInJlY2VpdmVyIjoiY2VsZXN0aWExbnN4Y2dhbGQyYzM2MjJoZndmbHBzNjA4dHFyajlsM3dkY21xOXMiLCJzZW5kZXIiOiJuZXV0cm9uMXVwamFrbmY2bG1udTNwNGxsbGRwOGp4MHdoenN4bGdldHU5emp0In0=",
+							"DestinationChannel": "channel-8",
+							"DestinationPort":    "transfer",
+							"Sequence":           838309,
+							"SourceChannel":      "channel-35",
+							"SourcePort":         "transfer",
+							"TimeoutHeight": map[string]any{
+								"RevisionHeight": 0,
+								"RevisionNumber": 0,
+							},
+							"TimeoutTimestamp": 1726674263466000000,
+						},
+						"ProofCommitment": "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",
+						"ProofHeight": map[string]any{
+							"RevisionHeight": 14715481,
+							"RevisionNumber": 1,
+						},
+						"Signer": "celestia1cdlz8scnf3mmxdnf4njmtp7vz4gps7fsm503qe",
 					},
-					"Signer": "celestia1cdlz8scnf3mmxdnf4njmtp7vz4gps7fsm503qe",
 				},
 			},
 			idx: testsuite.Ptr(0),
@@ -307,8 +426,10 @@ func Test_handleRecvPacket(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := handleRecvPacket(tt.ctx, tt.events, tt.msg, tt.idx)
-			require.NoError(t, err)
+			for i := range tt.msg {
+				err := handleRecvPacket(tt.ctx, tt.events, tt.msg[i], tt.idx)
+				require.NoError(t, err)
+			}
 		})
 	}
 }
