@@ -118,7 +118,9 @@ func processRecvPacket(events []storage.Event, msg *storage.Message, idx *int) e
 		msg.IbcTransfer.SenderAddress = &ftp.Sender
 	}
 
-	*idx += 3
+	for action := decoder.StringFromMap(events[*idx].Data, "action"); action == "" && len(events) > *idx; *idx++ {
+		action = decoder.StringFromMap(events[*idx].Data, "action")
+	}
 
 	return nil
 }

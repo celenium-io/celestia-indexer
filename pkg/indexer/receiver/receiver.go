@@ -79,7 +79,7 @@ func NewModule(cfg config.Indexer, api node.Api, ws *http.HTTP, state *storage.S
 		appVersion:   new(atomic.Uint64),
 	}
 
-	receiver.w = NewWorker(api, receiver.Log, receiver.blocks, 10)
+	receiver.w = NewWorker(api, receiver.Log, receiver.blocks, 30)
 
 	receiver.CreateInput(RollbackInput)
 	receiver.CreateInput(GenesisDoneInput)
