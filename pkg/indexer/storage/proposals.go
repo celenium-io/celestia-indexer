@@ -44,24 +44,24 @@ func (module *Module) saveProposals(
 						if votes[i].ValidatorId > 0 {
 							switch votes[i].Option {
 							case types.VoteOptionAbstain:
-								proposals[i].AbstainValidators += 1
+								proposals[j].AbstainValidators += 1
 							case types.VoteOptionNo:
-								proposals[i].NoValidators += 1
+								proposals[j].NoValidators += 1
 							case types.VoteOptionNoWithVeto:
-								proposals[i].NoWithVetoValidators += 1
+								proposals[j].NoWithVetoValidators += 1
 							case types.VoteOptionYes:
-								proposals[i].YesValidators += 1
+								proposals[j].YesValidators += 1
 							}
 						} else {
 							switch votes[i].Option {
 							case types.VoteOptionAbstain:
-								proposals[i].AbstainAddress += 1
+								proposals[j].AbstainAddress += 1
 							case types.VoteOptionNo:
-								proposals[i].NoAddress += 1
+								proposals[j].NoAddress += 1
 							case types.VoteOptionNoWithVeto:
-								proposals[i].NoWithVetoAddress += 1
+								proposals[j].NoWithVetoAddress += 1
 							case types.VoteOptionYes:
-								proposals[i].YesAddress += 1
+								proposals[j].YesAddress += 1
 							}
 						}
 						break
