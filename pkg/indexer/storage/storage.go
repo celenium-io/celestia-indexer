@@ -71,7 +71,7 @@ func NewModule(
 		indexerName:             cfg.Name,
 	}
 
-	m.CreateInputWithCapacity(InputName, 16)
+	m.CreateInputWithCapacity(InputName, 128)
 	m.CreateOutput(StopOutput)
 
 	return m

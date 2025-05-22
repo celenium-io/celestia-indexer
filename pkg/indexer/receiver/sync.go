@@ -93,6 +93,9 @@ func (r *Module) readBlocks(ctx context.Context) error {
 		}
 		r.appVersion.Store(appVersion)
 
+		isLiveMode := headLevel-r.level < types.Level(r.w.capacity)
+		r.w.SetLiveMode(isLiveMode)
+
 		if level, _ := r.Level(); level == headLevel {
 			time.Sleep(time.Second)
 			continue
@@ -112,10 +115,7 @@ func (r *Module) passBlocks(ctx context.Context, head types.Level) {
 		case <-ctx.Done():
 			return
 		default:
-			if _, ok := r.taskQueue.Get(level); !ok {
-				r.taskQueue.Set(level, struct{}{})
-				r.pool.AddTask(level)
-			}
+			r.w.Do(ctx, level, r.appVersion.Load())
 		}
 	}
 }

@@ -30,7 +30,7 @@ func NewModule(cfg config.Indexer) Module {
 		BaseModule: modules.New("parser"),
 		cfg:        cfg,
 	}
-	m.CreateInputWithCapacity(InputName, 32)
+	m.CreateInputWithCapacity(InputName, 128)
 	m.CreateOutput(OutputName)
 	m.CreateOutput(OutputBlobsName)
 	m.CreateOutput(StopOutput)

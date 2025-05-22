@@ -5,18 +5,67 @@ package receiver
 
 import (
 	"context"
+	"sync"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/pkg/node"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 )
 
-func (r *Module) worker(ctx context.Context, level types.Level) {
-	defer r.taskQueue.Delete(level)
+type Worker struct {
+	api      node.Api
+	blocks   chan types.BlockData
+	log      zerolog.Logger
+	queue    []types.Level
+	capacity int
+	liveMode bool
+	mx       *sync.RWMutex
+}
+
+func NewWorker(api node.Api, log zerolog.Logger, blocks chan types.BlockData, capacity int) *Worker {
+	if capacity == 0 {
+		capacity = 80
+	}
+	return &Worker{
+		api:      api,
+		blocks:   blocks,
+		log:      log,
+		queue:    make([]types.Level, 0),
+		capacity: capacity,
+		mx:       new(sync.RWMutex),
+	}
+}
+
+func (worker *Worker) SetLiveMode(liveMode bool) {
+	worker.mx.Lock()
+	{
+		worker.liveMode = liveMode
+	}
+	worker.mx.Unlock()
+}
+
+func (worker *Worker) Capacity() int {
+	return worker.capacity
+}
+
+func (worker *Worker) Do(ctx context.Context, level types.Level, appVersion uint64) {
+	worker.queue = append(worker.queue, level)
+	if len(worker.queue) < worker.capacity {
+		worker.mx.RLock()
+		{
+			if !worker.liveMode {
+				worker.mx.RUnlock()
+				return
+			}
+		}
+		worker.mx.RUnlock()
+	}
 
 	start := time.Now()
 
-	var result types.BlockData
+	var result []types.BlockData
 	for {
 		select {
 		case <-ctx.Done():
@@ -25,7 +74,7 @@ func (r *Module) worker(ctx context.Context, level types.Level) {
 		}
 
 		requestTimeout, cancel := context.WithTimeout(ctx, time.Minute)
-		block, err := r.api.BlockData(requestTimeout, level)
+		blocks, err := worker.api.BlockBulkData(requestTimeout, worker.queue...)
 		if err != nil {
 			cancel()
 
@@ -33,23 +82,26 @@ func (r *Module) worker(ctx context.Context, level types.Level) {
 				return
 			}
 
-			r.Log.Err(err).
+			worker.log.Err(err).
 				Uint64("height", uint64(level)).
 				Msg("while getting block data")
 
 			time.Sleep(time.Second)
 			continue
 		}
-
-		block.AppVersion = r.appVersion.Load()
-		result = block
+		result = blocks
 		cancel()
 		break
 	}
 
-	r.Log.Info().
-		Uint64("height", uint64(result.Height)).
-		Int64("ms", time.Since(start).Milliseconds()).
-		Msg("received block")
-	r.blocks <- result
+	for i := range result {
+		result[i].AppVersion = appVersion
+		worker.log.Info().
+			Uint64("height", uint64(result[i].Height)).
+			Int64("ms", time.Since(start).Milliseconds()).
+			Msg("received block")
+		worker.blocks <- result[i]
+	}
+
+	worker.queue = worker.queue[:0]
 }

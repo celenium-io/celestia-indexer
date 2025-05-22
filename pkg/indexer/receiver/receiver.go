@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/node"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/cometbft/cometbft/rpc/client/http"
-	"github.com/dipdup-io/workerpool"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/rs/zerolog/log"
@@ -43,7 +42,6 @@ type Module struct {
 	api              node.Api
 	ws               *http.HTTP
 	cfg              config.Indexer
-	pool             *workerpool.Pool[types.Level]
 	blocks           chan types.BlockData
 	level            types.Level
 	hash             []byte
@@ -51,9 +49,9 @@ type Module struct {
 	taskQueue        *sdkSync.Map[types.Level, struct{}]
 	mx               *sync.RWMutex
 	rollbackSync     *sync.WaitGroup
-	cancelWorkers    context.CancelFunc
 	cancelReadBlocks context.CancelFunc
 	appVersion       *atomic.Uint64
+	w                *Worker
 }
 
 var _ modules.Module = (*Module)(nil)
@@ -71,7 +69,7 @@ func NewModule(cfg config.Indexer, api node.Api, ws *http.HTTP, state *storage.S
 		api:          api,
 		ws:           ws,
 		cfg:          cfg,
-		blocks:       make(chan types.BlockData, cfg.ThreadsCount*10),
+		blocks:       make(chan types.BlockData, 128),
 		needGenesis:  state == nil,
 		level:        level,
 		hash:         lastHash,
@@ -81,6 +79,8 @@ func NewModule(cfg config.Indexer, api node.Api, ws *http.HTTP, state *storage.S
 		appVersion:   new(atomic.Uint64),
 	}
 
+	receiver.w = NewWorker(api, receiver.Log, receiver.blocks, 80)
+
 	receiver.CreateInput(RollbackInput)
 	receiver.CreateInput(GenesisDoneInput)
 
@@ -89,16 +89,11 @@ func NewModule(cfg config.Indexer, api node.Api, ws *http.HTTP, state *storage.S
 	receiver.CreateOutput(GenesisOutput)
 	receiver.CreateOutput(StopOutput)
 
-	receiver.pool = workerpool.NewPool(receiver.worker, int(cfg.ThreadsCount))
-
 	return receiver
 }
 
 func (r *Module) Start(ctx context.Context) {
 	r.Log.Info().Msg("starting receiver...")
-	workersCtx, cancelWorkers := context.WithCancel(ctx)
-	r.cancelWorkers = cancelWorkers
-	r.pool.Start(workersCtx)
 
 	if r.needGenesis {
 		if err := r.receiveGenesis(ctx); err != nil {
@@ -115,10 +110,6 @@ func (r *Module) Start(ctx context.Context) {
 func (r *Module) Close() error {
 	r.Log.Info().Msg("closing...")
 	r.G.Wait()
-
-	if err := r.pool.Close(); err != nil {
-		return err
-	}
 
 	close(r.blocks)
 

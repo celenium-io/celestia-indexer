@@ -33,7 +33,7 @@ func (r *Module) sequencer(ctx context.Context) {
 			for ok {
 				if prevBlockHash != nil {
 					if !bytes.Equal(b.Block.LastBlockID.Hash, prevBlockHash) {
-						prevBlockHash, currentBlock, orderedBlocks = r.startRollback(ctx, b, prevBlockHash)
+						prevBlockHash, currentBlock, orderedBlocks = r.startRollback(b, prevBlockHash)
 						break
 					}
 				}
@@ -55,7 +55,6 @@ func (r *Module) sequencer(ctx context.Context) {
 }
 
 func (r *Module) startRollback(
-	ctx context.Context,
 	b types.BlockData,
 	prevBlockHash []byte,
 ) ([]byte, int64, map[int64]types.BlockData) {
@@ -73,11 +72,6 @@ func (r *Module) startRollback(
 		r.cancelReadBlocks()
 	}
 
-	// Stop pool workers
-	if r.cancelWorkers != nil {
-		r.cancelWorkers()
-	}
-
 	clearChannel(r.blocks)
 
 	// Start rollback
@@ -91,11 +85,6 @@ func (r *Module) startRollback(
 	currentBlock := int64(level)
 	prevBlockHash = hash
 	orderedBlocks := map[int64]types.BlockData{}
-
-	// Restart workers pool that read blocks
-	workersCtx, cancelWorkers := context.WithCancel(ctx)
-	r.cancelWorkers = cancelWorkers
-	r.pool.Start(workersCtx)
 
 	return prevBlockHash, currentBlock, orderedBlocks
 }
