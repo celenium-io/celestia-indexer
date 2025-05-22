@@ -67,40 +67,44 @@ func processAcknowledgement(events []storage.Event, msg *storage.Message, idx *i
 		msg.IbcTransfer.Timeout = &recvPacket.Timeout
 	}
 
-	for events[*idx].Type != storageTypes.EventTypeFungibleTokenPacket {
-		*idx += 1
-	}
-	fundEvent := events[*idx]
-	if fundEvent.Type != storageTypes.EventTypeFungibleTokenPacket {
-		return errors.Errorf("invalid event type: %s", fundEvent.Type)
-	}
-
-	ftp := decode.NewFungibleTokenPacket(fundEvent.Data)
-
-	parts := strings.Split(ftp.Denom, "/")
-	msg.IbcTransfer.Denom = parts[len(parts)-1]
-
-	msg.IbcTransfer.Amount = ftp.Amount
-	msg.IbcTransfer.Memo = ftp.Memo
-
-	if strings.HasPrefix(ftp.Receiver, types.AddressPrefixCelestia) {
-		msg.IbcTransfer.Receiver = &storage.Address{
-			Address: ftp.Receiver,
-		}
-		msg.IbcChannel.Received = msg.IbcChannel.Received.Add(ftp.Amount)
-	} else {
-		msg.IbcTransfer.ReceiverAddress = &ftp.Receiver
-	}
-	if strings.HasPrefix(ftp.Sender, types.AddressPrefixCelestia) {
-		msg.IbcTransfer.Sender = &storage.Address{
-			Address: ftp.Sender,
-		}
-		msg.IbcChannel.Sent = msg.IbcChannel.Sent.Add(ftp.Amount)
-	} else {
-		msg.IbcTransfer.SenderAddress = &ftp.Sender
-	}
-
 	*idx += 2
 
-	return nil
+	fundEvent := events[*idx]
+
+	switch fundEvent.Type {
+	case storageTypes.EventTypeWriteAcknowledgement:
+		*idx += 2
+		msg.IbcTransfer = nil
+		return nil
+	case storageTypes.EventTypeFungibleTokenPacket:
+		ftp := decode.NewFungibleTokenPacket(fundEvent.Data)
+
+		parts := strings.Split(ftp.Denom, "/")
+		msg.IbcTransfer.Denom = parts[len(parts)-1]
+
+		msg.IbcTransfer.Amount = ftp.Amount
+		msg.IbcTransfer.Memo = ftp.Memo
+
+		if strings.HasPrefix(ftp.Receiver, types.AddressPrefixCelestia) {
+			msg.IbcTransfer.Receiver = &storage.Address{
+				Address: ftp.Receiver,
+			}
+			msg.IbcChannel.Received = msg.IbcChannel.Received.Add(ftp.Amount)
+		} else {
+			msg.IbcTransfer.ReceiverAddress = &ftp.Receiver
+		}
+		if strings.HasPrefix(ftp.Sender, types.AddressPrefixCelestia) {
+			msg.IbcTransfer.Sender = &storage.Address{
+				Address: ftp.Sender,
+			}
+			msg.IbcChannel.Sent = msg.IbcChannel.Sent.Add(ftp.Amount)
+		} else {
+			msg.IbcTransfer.SenderAddress = &ftp.Sender
+		}
+
+		*idx += 2
+		return nil
+	default:
+		return errors.Errorf("unexpected event for MsgAcknowledgement: %s", fundEvent.Type)
+	}
 }

@@ -1153,7 +1153,10 @@ func (tx Transaction) ProposalVotes(ctx context.Context, proposalId uint64, limi
 	query := tx.Tx().NewSelect().Model(&votes).
 		Where("proposal_id = ?", proposalId)
 
-	query = limitScope(query, limit)
+	if limit < 1 {
+		limit = 10
+	}
+	query = query.Limit(limit)
 	if offset > 0 {
 		query = query.Offset(offset)
 	}
