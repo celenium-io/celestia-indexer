@@ -599,7 +599,7 @@ func (tx Transaction) SaveIbcConnections(ctx context.Context, conns ...*models.I
 
 	for i := range conns {
 		query := tx.Tx().NewInsert().
-			Model(&conns).
+			Model(conns[i]).
 			Column("connection_id", "client_id", "counterparty_connection_id", "counterparty_client_id", "created_at", "connected_at", "height", "connection_height", "create_tx_id", "connection_tx_id", "channels_count").
 			On("CONFLICT (connection_id) DO UPDATE")
 
@@ -634,7 +634,7 @@ func (tx Transaction) SaveIbcChannels(ctx context.Context, channels ...*models.I
 
 	for i := range channels {
 		query := tx.Tx().NewInsert().
-			Model(&channels).
+			Model(channels[i]).
 			Column("id", "connection_id", "client_id", "port_id", "counterparty_port_id", "counterparty_channel_id", "version", "created_at", "confirmed_at", "height", "confirmation_height", "create_tx_id", "confirmation_tx_id", "ordering", "creator_id", "status", "received", "sent", "transfers_count").
 			On("CONFLICT (id) DO UPDATE")
 

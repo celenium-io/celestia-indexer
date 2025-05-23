@@ -26,7 +26,7 @@ type Worker struct {
 
 func NewWorker(api node.Api, log zerolog.Logger, blocks chan types.BlockData, capacity int) *Worker {
 	if capacity == 0 {
-		capacity = 80
+		capacity = 10
 	}
 	return &Worker{
 		api:      api,

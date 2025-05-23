@@ -103,8 +103,6 @@ func processRecvPacket(events []storage.Event, msg *storage.Message, idx *int) e
 	startIdx += 3
 	fundEvent := events[startIdx]
 	if fundEvent.Type != storageTypes.EventTypeFungibleTokenPacket {
-		msg.IbcTransfer = nil
-		msg.IbcChannel = nil
 		return errors.Errorf("invalid event type: %s | expect fungible_token_packet", coinReceivedEvent.Type)
 	}
 
