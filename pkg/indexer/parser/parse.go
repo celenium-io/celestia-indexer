@@ -52,7 +52,7 @@ func (p *Module) parse(b types.BlockData) error {
 			Height:        b.Height,
 			Time:          b.Block.Time,
 			TxCount:       int64(len(b.Block.Data.Txs)),
-			EventsCount:   int64(len(b.BeginBlockEvents) + len(b.EndBlockEvents)),
+			EventsCount:   int64(len(b.BeginBlockEvents) + len(b.FinBlockEvents(b.AppVersion))),
 			BlobsSize:     0,
 			Fee:           decimal.Zero,
 			SupplyChange:  decimal.Zero,
@@ -80,7 +80,7 @@ func (p *Module) parse(b types.BlockData) error {
 		return errors.Wrap(err, "parsing begin block events")
 	}
 
-	endEvents, err := parseEvents(decodeCtx, b, b.ResultBlockResults.EndBlockEvents)
+	endEvents, err := parseEvents(decodeCtx, b, b.ResultBlockResults.FinBlockEvents(b.AppVersion))
 	if err != nil {
 		return errors.Wrap(err, "parsing begin end events")
 	}

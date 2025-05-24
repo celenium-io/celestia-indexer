@@ -22,7 +22,9 @@ func handleVote(ctx *context.Context, events []storage.Event, msg *storage.Messa
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.gov.v1beta1.MsgVote" && action != "/cosmos.gov.v1.MsgVote" {
+	action := decoder.StringFromMap(events[*idx].Data, "action")
+	isValid := action == "/cosmos.gov.v1beta1.MsgVote" || action == "/cosmos.gov.v1.MsgVote" || action == "/cosmos.gov.v1.MsgVoteWeighted" || action == "/cosmos.gov.v1beta1.MsgVoteWeighted"
+	if !isValid {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
 	*idx += 1

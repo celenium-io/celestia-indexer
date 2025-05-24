@@ -4,34 +4,37 @@
 package decode
 
 import (
+	evidenceTypes "cosmossdk.io/x/evidence/types"
+	"cosmossdk.io/x/nft"
+	upgrade "cosmossdk.io/x/upgrade/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/handle"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	crisisTypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	evidenceTypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
-	"github.com/cosmos/cosmos-sdk/x/nft"
-	upgrade "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	interchainAccounts "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/controller/types"
-	fee "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/types"
-	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
-	coreClient "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
-	coreConnection "github.com/cosmos/ibc-go/v6/modules/core/03-connection/types"
-	coreChannel "github.com/cosmos/ibc-go/v6/modules/core/04-channel/types"
+	interchainAccounts "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/types"
+	fee "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
+	ibcTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	coreClient "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
+	coreConnection "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
+	coreChannel "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 
 	"github.com/rs/zerolog/log"
 
+	cosmosFeegrant "cosmossdk.io/x/feegrant"
+	hyperlaneCore "github.com/bcp-innovations/hyperlane-cosmos/x/core/types"
+	hyperlaneWarp "github.com/bcp-innovations/hyperlane-cosmos/x/warp/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	appBlobTypes "github.com/celestiaorg/celestia-app/v3/x/blob/types"
-	qgbTypes "github.com/celestiaorg/celestia-app/v3/x/blobstream/types"
-	appSignalTypes "github.com/celestiaorg/celestia-app/v3/x/signal/types"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v4/x/blob/types"
+	minfeeTypes "github.com/celestiaorg/celestia-app/v4/x/minfee/types"
+	appSignalTypes "github.com/celestiaorg/celestia-app/v4/x/signal/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	cosmosDistributionTypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	cosmosFeegrant "github.com/cosmos/cosmos-sdk/x/feegrant"
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	cosmosSlashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
@@ -125,7 +128,7 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, d.Msg.Grants, err = handle.MsgRevokeAllowance(ctx, status, typedMsg)
 
 	// qgb module
-	case *qgbTypes.MsgRegisterEVMAddress:
+	case *legacy.MsgRegisterEVMAddress:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRegisterEVMAddress(ctx, typedMsg)
 
 	// authz module
@@ -257,18 +260,18 @@ func Message(
 
 	// coreClient module
 	case *coreClient.MsgCreateClient:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateClient(ctx, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateClient(ctx, status, d.Msg.Data, typedMsg)
 	case *coreClient.MsgUpdateClient:
-		typ, addrs, header, errParse := handle.MsgUpdateClient(ctx, status, typedMsg)
-		d.Msg.Addresses = addrs
-		d.Msg.Type = typ
-		err = errParse
-		if header != nil {
-			d.Msg.Data["Header"] = header
-		}
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateClient(ctx, status, d.Msg.Data, typedMsg)
 	case *coreClient.MsgUpgradeClient:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpgradeClient(ctx, typedMsg)
-	case *coreClient.MsgSubmitMisbehaviour:
+	case *coreClient.MsgRecoverClient:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRecoverClient(ctx, typedMsg)
+	case *coreClient.MsgIBCSoftwareUpgrade:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgIBCSoftwareUpgrade(ctx, typedMsg)
+	case *coreClient.MsgUpdateParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateParams(ctx, typedMsg)
+	case *coreClient.MsgSubmitMisbehaviour: //nolint
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitMisbehaviour(ctx, typedMsg)
 
 	// coreConnection module
@@ -308,6 +311,29 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSignalVersion(ctx, typedMsg.GetValidatorAddress())
 	case *appSignalTypes.MsgTryUpgrade:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgTryUpgrade(ctx, typedMsg.GetSigner())
+
+	// hyperlane
+	case *hyperlaneCore.MsgCreateMailbox:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateMailbox(ctx, typedMsg)
+	case *hyperlaneCore.MsgProcessMessage:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgProcessMessage(ctx, typedMsg)
+	case *hyperlaneCore.MsgSetMailbox:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSetMailbox(ctx, typedMsg)
+	case *hyperlaneWarp.MsgCreateCollateralToken:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateCollateralToken(ctx, typedMsg)
+	case *hyperlaneWarp.MsgCreateSyntheticToken:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateSyntheticToken(ctx, typedMsg)
+	case *hyperlaneWarp.MsgSetToken:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSetToken(ctx, typedMsg)
+	case *hyperlaneWarp.MsgEnrollRemoteRouter:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgEnrollRemoteRouter(ctx, typedMsg)
+	case *hyperlaneWarp.MsgUnrollRemoteRouter:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUnrollRemoteRouter(ctx, typedMsg)
+	case *hyperlaneWarp.MsgRemoteTransfer:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRemoteTransfer(ctx, typedMsg)
+
+	case *minfeeTypes.MsgUpdateMinfeeParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateMinfeeParams(ctx, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)

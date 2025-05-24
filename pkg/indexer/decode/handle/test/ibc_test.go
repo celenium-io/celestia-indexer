@@ -12,8 +12,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
-	ibcTypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
-	ibcCoreClientTypes "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
+	ibcTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibcCoreClientTypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
 )

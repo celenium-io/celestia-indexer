@@ -1,0 +1,15 @@
+- id: 1
+  channel_id: channel-1
+  port: transfer
+  connection_id: connection-1
+  time: '2023-07-04T03:10:57+00:00'
+  height: 1000
+  amount: 123456
+  denom: utia
+  memo:
+  receiver_address: osmo1m8wg4vxkefhs374qxmmqpyusgz289wmulex5qdwpfx7jnrxzer5s9cv83q
+  sender_id: 1
+  tx_id: 1
+  timeout: null
+  height_timeout: null
+  sequence: 321654

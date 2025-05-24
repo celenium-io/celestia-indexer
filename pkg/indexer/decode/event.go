@@ -268,3 +268,109 @@ func NewProposalStatus(m map[string]any) (body ProposalStatus, err error) {
 	body.Id, err = decoder.Uint64FromMap(m, "proposal_id")
 	return
 }
+
+type UpdateClient struct {
+	Id              string
+	Type            string
+	ConsensusHeight uint64
+	Revision        uint64
+}
+
+func NewUpdateClient(m map[string]any) (cc UpdateClient, err error) {
+	cc.Id = decoder.StringFromMap(m, "client_id")
+	cc.Type = decoder.StringFromMap(m, "client_type")
+	revision, height, err := decoder.RevisionHeightFromMap(m, "consensus_height")
+	if err != nil {
+		return cc, errors.Wrap(err, "consensus_height")
+	}
+	cc.ConsensusHeight = height
+	cc.Revision = revision
+	return
+}
+
+type ConnectionChange struct {
+	ClientId                 string
+	ConnectionId             string
+	CounterpartyClientId     string
+	CounterpartyConnectionId string
+}
+
+func NewConnectionOpen(m map[string]any) (cc ConnectionChange) {
+	cc.ClientId = decoder.StringFromMap(m, "client_id")
+	cc.ConnectionId = decoder.StringFromMap(m, "connection_id")
+	cc.CounterpartyClientId = decoder.StringFromMap(m, "counterparty_client_id")
+	cc.CounterpartyConnectionId = decoder.StringFromMap(m, "counterparty_connection_id")
+	return
+}
+
+type ChannelChange struct {
+	ChannelId             string
+	ConnectionId          string
+	CounterpartyChannelId string
+	CounterpartyPortId    string
+	PortId                string
+}
+
+func NewChannelChange(m map[string]any) (cc ChannelChange) {
+	cc.ChannelId = decoder.StringFromMap(m, "channel_id")
+	cc.ConnectionId = decoder.StringFromMap(m, "connection_id")
+	cc.CounterpartyChannelId = decoder.StringFromMap(m, "counterparty_channel_id")
+	cc.CounterpartyPortId = decoder.StringFromMap(m, "counterparty_port_id")
+	cc.PortId = decoder.StringFromMap(m, "port_id")
+	return
+}
+
+type FungibleTokenPacket struct {
+	Amount   decimal.Decimal
+	Denom    string
+	Memo     string
+	Module   string
+	Receiver string
+	Sender   string
+	Success  string
+}
+
+func NewFungibleTokenPacket(m map[string]any) (ftp FungibleTokenPacket) {
+	ftp.Amount = decoder.DecimalFromMap(m, "amount")
+	ftp.Denom = decoder.StringFromMap(m, "denom")
+	ftp.Memo = decoder.StringFromMap(m, "memo")
+	ftp.Module = decoder.StringFromMap(m, "module")
+	ftp.Receiver = decoder.StringFromMap(m, "receiver")
+	ftp.Sender = decoder.StringFromMap(m, "sender")
+	ftp.Success = decoder.StringFromMap(m, "success")
+	return
+}
+
+type RecvPacket struct {
+	Ordering      string
+	Connection    string
+	Data          string
+	DstChannel    string
+	DstPort       string
+	SrcChannel    string
+	SrcPort       string
+	Sequence      uint64
+	Timeout       time.Time
+	TimeoutHeight uint64
+}
+
+func NewRecvPacket(m map[string]any) (rp RecvPacket, err error) {
+	rp.Ordering = decoder.StringFromMap(m, "packet_channel_ordering")
+	rp.Connection = decoder.StringFromMap(m, "packet_connection")
+	rp.Data = decoder.StringFromMap(m, "packet_data")
+	rp.DstChannel = decoder.StringFromMap(m, "packet_dst_channel")
+	rp.DstPort = decoder.StringFromMap(m, "packet_dst_port")
+	rp.Sequence, err = decoder.Uint64FromMap(m, "packet_sequence")
+	if err != nil {
+		return rp, errors.Wrap(err, "packet_sequence")
+	}
+	rp.SrcChannel = decoder.StringFromMap(m, "packet_src_channel")
+	rp.SrcPort = decoder.StringFromMap(m, "packet_src_port")
+	_, height, err := decoder.RevisionHeightFromMap(m, "packet_timeout_height")
+	if err != nil {
+		return rp, errors.Wrap(err, "packet_timeout_height")
+	}
+	rp.TimeoutHeight = height
+	rp.Timeout = decoder.UnixNanoFromMap(m, "packet_timeout_timestamp")
+	return
+}

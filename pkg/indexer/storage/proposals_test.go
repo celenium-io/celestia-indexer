@@ -164,6 +164,15 @@ func TestFillProposalVotingPower(t *testing.T) {
 	t.Run("active and no finished", func(t *testing.T) {
 		tx := mock.NewMockTransaction(ctrl)
 
+		constants.EXPECT().
+			Get(gomock.Any(), types.ModuleNameStaking, "max_validators").
+			Return(storage.Constant{
+				Name:   "max_validators",
+				Module: types.ModuleNameStaking,
+				Value:  "100",
+			}, nil).
+			Times(1)
+
 		tx.EXPECT().
 			ActiveProposals(t.Context()).
 			Return([]storage.Proposal{{
@@ -178,7 +187,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Times(1)
 
 		tx.EXPECT().
-			Validators(t.Context()).
+			BondedValidators(t.Context(), 100).
 			Return([]storage.Validator{{
 				Id:    1,
 				Stake: decimal.RequireFromString("100"),
@@ -192,7 +201,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 			ProposalVotes(t.Context(), uint64(1), 1000, 0).
 			Return([]storage.Vote{{
 				ValidatorId: 1,
-				VoterId:     2,
+				VoterId:     3,
 				Option:      types.VoteOptionAbstain,
 			}, {
 				VoterId: 1,
@@ -214,6 +223,15 @@ func TestFillProposalVotingPower(t *testing.T) {
 
 		tx.EXPECT().
 			AddressDelegations(t.Context(), uint64(2)).
+			Return([]storage.Delegation{{
+				ValidatorId: 1,
+				AddressId:   1,
+				Amount:      decimal.RequireFromString("10"),
+			}}, nil).
+			Times(1)
+
+		tx.EXPECT().
+			AddressDelegations(t.Context(), uint64(3)).
 			Return([]storage.Delegation{{
 				ValidatorId: 1,
 				AddressId:   1,

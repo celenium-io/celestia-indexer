@@ -11,7 +11,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	coreTypes "github.com/tendermint/tendermint/types"
+	coreTypes "github.com/cometbft/cometbft/types"
 )
 
 type Block struct {

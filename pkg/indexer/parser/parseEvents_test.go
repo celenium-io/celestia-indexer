@@ -60,7 +60,7 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 		Events:    events,
 		Codespace: "celestia-explorer",
 	}
-	block, now := testsuite.CreateTestBlock(txRes, 1)
+	block, now := testsuite.CreateTestBlockWithAppVersion(txRes, 1, 4)
 
 	ctx := context.NewContext()
 	resultEvents, err := parseEvents(ctx, block, events)
@@ -94,6 +94,7 @@ func BenchmarkParseEvent(b *testing.B) {
 		ResultBlockResults: types.ResultBlockResults{
 			Height: 100,
 		},
+		AppVersion: 3,
 	}
 	raw := `{
 		"type": "coin_spent",

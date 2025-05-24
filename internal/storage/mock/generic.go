@@ -430,6 +430,45 @@ func (c *MockTransactionAddressDelegationsCall) DoAndReturn(f func(context.Conte
 	return c
 }
 
+// BondedValidators mocks base method.
+func (m *MockTransaction) BondedValidators(ctx context.Context, limit int) ([]storage.Validator, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BondedValidators", ctx, limit)
+	ret0, _ := ret[0].([]storage.Validator)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BondedValidators indicates an expected call of BondedValidators.
+func (mr *MockTransactionMockRecorder) BondedValidators(ctx, limit any) *MockTransactionBondedValidatorsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BondedValidators", reflect.TypeOf((*MockTransaction)(nil).BondedValidators), ctx, limit)
+	return &MockTransactionBondedValidatorsCall{Call: call}
+}
+
+// MockTransactionBondedValidatorsCall wrap *gomock.Call
+type MockTransactionBondedValidatorsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionBondedValidatorsCall) Return(arg0 []storage.Validator, arg1 error) *MockTransactionBondedValidatorsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionBondedValidatorsCall) Do(f func(context.Context, int) ([]storage.Validator, error)) *MockTransactionBondedValidatorsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionBondedValidatorsCall) DoAndReturn(f func(context.Context, int) ([]storage.Validator, error)) *MockTransactionBondedValidatorsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // BulkSave mocks base method.
 func (m *MockTransaction) BulkSave(ctx context.Context, models []any) error {
 	m.ctrl.T.Helper()
@@ -938,6 +977,45 @@ func (c *MockTransactionHandleErrorCall) Do(f func(context.Context, error) error
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionHandleErrorCall) DoAndReturn(f func(context.Context, error) error) *MockTransactionHandleErrorCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// IbcConnection mocks base method.
+func (m *MockTransaction) IbcConnection(ctx context.Context, id string) (storage.IbcConnection, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IbcConnection", ctx, id)
+	ret0, _ := ret[0].(storage.IbcConnection)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IbcConnection indicates an expected call of IbcConnection.
+func (mr *MockTransactionMockRecorder) IbcConnection(ctx, id any) *MockTransactionIbcConnectionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IbcConnection", reflect.TypeOf((*MockTransaction)(nil).IbcConnection), ctx, id)
+	return &MockTransactionIbcConnectionCall{Call: call}
+}
+
+// MockTransactionIbcConnectionCall wrap *gomock.Call
+type MockTransactionIbcConnectionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionIbcConnectionCall) Return(arg0 storage.IbcConnection, arg1 error) *MockTransactionIbcConnectionCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionIbcConnectionCall) Do(f func(context.Context, string) (storage.IbcConnection, error)) *MockTransactionIbcConnectionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionIbcConnectionCall) DoAndReturn(f func(context.Context, string) (storage.IbcConnection, error)) *MockTransactionIbcConnectionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1674,6 +1752,158 @@ func (c *MockTransactionRollbackGrantsCall) Do(f func(context.Context, types.Lev
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionRollbackGrantsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackGrantsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackIbcChannels mocks base method.
+func (m *MockTransaction) RollbackIbcChannels(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackIbcChannels", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackIbcChannels indicates an expected call of RollbackIbcChannels.
+func (mr *MockTransactionMockRecorder) RollbackIbcChannels(ctx, height any) *MockTransactionRollbackIbcChannelsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackIbcChannels", reflect.TypeOf((*MockTransaction)(nil).RollbackIbcChannels), ctx, height)
+	return &MockTransactionRollbackIbcChannelsCall{Call: call}
+}
+
+// MockTransactionRollbackIbcChannelsCall wrap *gomock.Call
+type MockTransactionRollbackIbcChannelsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackIbcChannelsCall) Return(arg0 error) *MockTransactionRollbackIbcChannelsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackIbcChannelsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcChannelsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackIbcChannelsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcChannelsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackIbcClients mocks base method.
+func (m *MockTransaction) RollbackIbcClients(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackIbcClients", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackIbcClients indicates an expected call of RollbackIbcClients.
+func (mr *MockTransactionMockRecorder) RollbackIbcClients(ctx, height any) *MockTransactionRollbackIbcClientsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackIbcClients", reflect.TypeOf((*MockTransaction)(nil).RollbackIbcClients), ctx, height)
+	return &MockTransactionRollbackIbcClientsCall{Call: call}
+}
+
+// MockTransactionRollbackIbcClientsCall wrap *gomock.Call
+type MockTransactionRollbackIbcClientsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackIbcClientsCall) Return(arg0 error) *MockTransactionRollbackIbcClientsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackIbcClientsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcClientsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackIbcClientsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcClientsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackIbcConnections mocks base method.
+func (m *MockTransaction) RollbackIbcConnections(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackIbcConnections", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackIbcConnections indicates an expected call of RollbackIbcConnections.
+func (mr *MockTransactionMockRecorder) RollbackIbcConnections(ctx, height any) *MockTransactionRollbackIbcConnectionsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackIbcConnections", reflect.TypeOf((*MockTransaction)(nil).RollbackIbcConnections), ctx, height)
+	return &MockTransactionRollbackIbcConnectionsCall{Call: call}
+}
+
+// MockTransactionRollbackIbcConnectionsCall wrap *gomock.Call
+type MockTransactionRollbackIbcConnectionsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackIbcConnectionsCall) Return(arg0 error) *MockTransactionRollbackIbcConnectionsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackIbcConnectionsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcConnectionsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackIbcConnectionsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcConnectionsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackIbcTransfers mocks base method.
+func (m *MockTransaction) RollbackIbcTransfers(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackIbcTransfers", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackIbcTransfers indicates an expected call of RollbackIbcTransfers.
+func (mr *MockTransactionMockRecorder) RollbackIbcTransfers(ctx, height any) *MockTransactionRollbackIbcTransfersCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackIbcTransfers", reflect.TypeOf((*MockTransaction)(nil).RollbackIbcTransfers), ctx, height)
+	return &MockTransactionRollbackIbcTransfersCall{Call: call}
+}
+
+// MockTransactionRollbackIbcTransfersCall wrap *gomock.Call
+type MockTransactionRollbackIbcTransfersCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackIbcTransfersCall) Return(arg0 error) *MockTransactionRollbackIbcTransfersCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackIbcTransfersCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcTransfersCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackIbcTransfersCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcTransfersCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -2596,6 +2826,179 @@ func (c *MockTransactionSaveGrantsCall) Do(f func(context.Context, ...storage.Gr
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionSaveGrantsCall) DoAndReturn(f func(context.Context, ...storage.Grant) error) *MockTransactionSaveGrantsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveIbcChannels mocks base method.
+func (m *MockTransaction) SaveIbcChannels(ctx context.Context, channels ...*storage.IbcChannel) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range channels {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveIbcChannels", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveIbcChannels indicates an expected call of SaveIbcChannels.
+func (mr *MockTransactionMockRecorder) SaveIbcChannels(ctx any, channels ...any) *MockTransactionSaveIbcChannelsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, channels...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveIbcChannels", reflect.TypeOf((*MockTransaction)(nil).SaveIbcChannels), varargs...)
+	return &MockTransactionSaveIbcChannelsCall{Call: call}
+}
+
+// MockTransactionSaveIbcChannelsCall wrap *gomock.Call
+type MockTransactionSaveIbcChannelsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveIbcChannelsCall) Return(arg0 error) *MockTransactionSaveIbcChannelsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveIbcChannelsCall) Do(f func(context.Context, ...*storage.IbcChannel) error) *MockTransactionSaveIbcChannelsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveIbcChannelsCall) DoAndReturn(f func(context.Context, ...*storage.IbcChannel) error) *MockTransactionSaveIbcChannelsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveIbcClients mocks base method.
+func (m *MockTransaction) SaveIbcClients(ctx context.Context, clients ...*storage.IbcClient) (int64, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range clients {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveIbcClients", varargs...)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SaveIbcClients indicates an expected call of SaveIbcClients.
+func (mr *MockTransactionMockRecorder) SaveIbcClients(ctx any, clients ...any) *MockTransactionSaveIbcClientsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, clients...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveIbcClients", reflect.TypeOf((*MockTransaction)(nil).SaveIbcClients), varargs...)
+	return &MockTransactionSaveIbcClientsCall{Call: call}
+}
+
+// MockTransactionSaveIbcClientsCall wrap *gomock.Call
+type MockTransactionSaveIbcClientsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveIbcClientsCall) Return(arg0 int64, arg1 error) *MockTransactionSaveIbcClientsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveIbcClientsCall) Do(f func(context.Context, ...*storage.IbcClient) (int64, error)) *MockTransactionSaveIbcClientsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveIbcClientsCall) DoAndReturn(f func(context.Context, ...*storage.IbcClient) (int64, error)) *MockTransactionSaveIbcClientsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveIbcConnections mocks base method.
+func (m *MockTransaction) SaveIbcConnections(ctx context.Context, connections ...*storage.IbcConnection) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range connections {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveIbcConnections", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveIbcConnections indicates an expected call of SaveIbcConnections.
+func (mr *MockTransactionMockRecorder) SaveIbcConnections(ctx any, connections ...any) *MockTransactionSaveIbcConnectionsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, connections...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveIbcConnections", reflect.TypeOf((*MockTransaction)(nil).SaveIbcConnections), varargs...)
+	return &MockTransactionSaveIbcConnectionsCall{Call: call}
+}
+
+// MockTransactionSaveIbcConnectionsCall wrap *gomock.Call
+type MockTransactionSaveIbcConnectionsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveIbcConnectionsCall) Return(arg0 error) *MockTransactionSaveIbcConnectionsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveIbcConnectionsCall) Do(f func(context.Context, ...*storage.IbcConnection) error) *MockTransactionSaveIbcConnectionsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveIbcConnectionsCall) DoAndReturn(f func(context.Context, ...*storage.IbcConnection) error) *MockTransactionSaveIbcConnectionsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveIbcTransfers mocks base method.
+func (m *MockTransaction) SaveIbcTransfers(ctx context.Context, transfers ...*storage.IbcTransfer) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range transfers {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveIbcTransfers", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveIbcTransfers indicates an expected call of SaveIbcTransfers.
+func (mr *MockTransactionMockRecorder) SaveIbcTransfers(ctx any, transfers ...any) *MockTransactionSaveIbcTransfersCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, transfers...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveIbcTransfers", reflect.TypeOf((*MockTransaction)(nil).SaveIbcTransfers), varargs...)
+	return &MockTransactionSaveIbcTransfersCall{Call: call}
+}
+
+// MockTransactionSaveIbcTransfersCall wrap *gomock.Call
+type MockTransactionSaveIbcTransfersCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveIbcTransfersCall) Return(arg0 error) *MockTransactionSaveIbcTransfersCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveIbcTransfersCall) Do(f func(context.Context, ...*storage.IbcTransfer) error) *MockTransactionSaveIbcTransfersCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveIbcTransfersCall) DoAndReturn(f func(context.Context, ...*storage.IbcTransfer) error) *MockTransactionSaveIbcTransfersCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -3599,45 +4002,6 @@ func (c *MockTransactionValidatorCall) Do(f func(context.Context, uint64) (stora
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionValidatorCall) DoAndReturn(f func(context.Context, uint64) (storage.Validator, error)) *MockTransactionValidatorCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// Validators mocks base method.
-func (m *MockTransaction) Validators(ctx context.Context) ([]storage.Validator, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Validators", ctx)
-	ret0, _ := ret[0].([]storage.Validator)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Validators indicates an expected call of Validators.
-func (mr *MockTransactionMockRecorder) Validators(ctx any) *MockTransactionValidatorsCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validators", reflect.TypeOf((*MockTransaction)(nil).Validators), ctx)
-	return &MockTransactionValidatorsCall{Call: call}
-}
-
-// MockTransactionValidatorsCall wrap *gomock.Call
-type MockTransactionValidatorsCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockTransactionValidatorsCall) Return(arg0 []storage.Validator, arg1 error) *MockTransactionValidatorsCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockTransactionValidatorsCall) Do(f func(context.Context) ([]storage.Validator, error)) *MockTransactionValidatorsCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionValidatorsCall) DoAndReturn(f func(context.Context) ([]storage.Validator, error)) *MockTransactionValidatorsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

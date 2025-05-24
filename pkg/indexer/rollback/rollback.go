@@ -219,6 +219,18 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	if err := tx.RollbackProposals(ctx, height); err != nil {
 		return err
 	}
+	if err := tx.RollbackIbcTransfers(ctx, height); err != nil {
+		return err
+	}
+	if err := tx.RollbackIbcChannels(ctx, height); err != nil {
+		return err
+	}
+	if err := tx.RollbackIbcConnections(ctx, height); err != nil {
+		return err
+	}
+	if err := tx.RollbackIbcClients(ctx, height); err != nil {
+		return err
+	}
 
 	newBlock, err := tx.LastBlock(ctx)
 	if err != nil {

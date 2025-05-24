@@ -11,7 +11,7 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	qgbTypes "github.com/celestiaorg/celestia-app/v3/x/blobstream/types"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +20,7 @@ import (
 // MsgRegisterEvmAddress
 
 func createMsgRegisterEvmAddress() types.Msg {
-	m := qgbTypes.MsgRegisterEVMAddress{
+	m := legacy.MsgRegisterEVMAddress{
 		ValidatorAddress: "celestiavaloper1f5crra7r5m9kd6saw077u76x0n7dyjkkzk0qup",
 		EvmAddress:       "0xfDC46fBDd8AF50d9Bf7536Bf44ce8560E423352c",
 	}

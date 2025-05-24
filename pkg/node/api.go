@@ -20,6 +20,7 @@ type Api interface {
 	Genesis(ctx context.Context) (types.Genesis, error)
 	BlockData(ctx context.Context, level pkgTypes.Level) (pkgTypes.BlockData, error)
 	BlockDataGet(ctx context.Context, level pkgTypes.Level) (pkgTypes.BlockData, error)
+	BlockBulkData(ctx context.Context, levels ...pkgTypes.Level) ([]pkgTypes.BlockData, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed

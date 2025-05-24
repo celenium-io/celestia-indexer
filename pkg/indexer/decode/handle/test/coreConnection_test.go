@@ -11,7 +11,7 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	coreConnection "github.com/cosmos/ibc-go/v6/modules/core/03-connection/types"
+	coreConnection "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
 )

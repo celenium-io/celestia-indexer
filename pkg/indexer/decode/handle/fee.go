@@ -7,7 +7,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	fee "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/types"
+	minfeeTypes "github.com/celestiaorg/celestia-app/v4/x/minfee/types"
+	fee "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
 )
 
 // MsgRegisterPayee defines the request type for the RegisterPayee rpc
@@ -46,4 +47,13 @@ func MsgPayPacketFee(ctx *context.Context, m *fee.MsgPayPacketFee) (storageTypes
 func MsgPayPacketFeeAsync() (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgPayPacketFeeAsync
 	return msgType, []storage.AddressWithType{}, nil
+}
+
+// MsgUpdateMinfeeParams defines a message for updating the minimum fee parameters.
+func MsgUpdateMinfeeParams(ctx *context.Context, m *minfeeTypes.MsgUpdateMinfeeParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgUpdateMinfeeParams
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
 }

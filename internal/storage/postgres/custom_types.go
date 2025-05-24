@@ -149,6 +149,16 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 		); err != nil {
 			return err
 		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"ibc_channel_status",
+			bun.Safe("ibc_channel_status"),
+			bun.In(types.IbcChannelStatusValues()),
+		); err != nil {
+			return err
+		}
 		return nil
 	})
 }

@@ -36,10 +36,9 @@ func (s *ModuleTestSuite) InitApi(configureApi func()) {
 }
 
 var cfgDefault = ic.Indexer{
-	Name:         testIndexerName,
-	ThreadsCount: 1,
-	StartLevel:   0,
-	BlockPeriod:  10,
+	Name:        testIndexerName,
+	StartLevel:  0,
+	BlockPeriod: 10,
 }
 
 func (s *ModuleTestSuite) createModule() Module {
@@ -52,6 +51,7 @@ func (s *ModuleTestSuite) createModule() Module {
 		ChainId:    "explorer-test",
 	}
 	receiverModule := NewModule(cfgDefault, s.api, nil, &state)
+	receiverModule.w = NewWorker(s.api, receiverModule.Log, receiverModule.blocks, 5)
 
 	return receiverModule
 }
@@ -63,6 +63,7 @@ func (s *ModuleTestSuite) createModuleEmptyState(cfgOptional *ic.Indexer) Module
 	}
 
 	receiverModule := NewModule(cfg, s.api, nil, nil)
+	receiverModule.w = NewWorker(s.api, receiverModule.Log, receiverModule.blocks, 5)
 	return receiverModule
 }
 

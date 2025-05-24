@@ -67,6 +67,48 @@ func Test_handleVote(t *testing.T) {
 				Height: 3762606,
 				Time:   ts,
 			},
+		}, {
+			name: "vote test 2",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 871324,
+					Type:   "message",
+					Data: map[string]any{
+						"action": "/cosmos.gov.v1.MsgVoteWeighted",
+					},
+				}, {
+					Height: 871324,
+					Type:   "proposal_vote",
+					Data: map[string]any{
+						"option":      "option:VOTE_OPTION_YES weight:\"1.000000000000000000\"",
+						"proposal_id": "3",
+						"voter":       "celestia1davz40kat93t49ljrkmkl5uqhqq45e0tedgf8a",
+					},
+				}, {
+					Height: 871324,
+					Type:   "message",
+					Data: map[string]any{
+						"module": "governance",
+						"sender": "celestia1davz40kat93t49ljrkmkl5uqhqq45e0tedgf8a",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgVoteWeighted,
+				Height: 871324,
+			},
+			idx: testsuite.Ptr(0),
+			vote: storage.Vote{
+				ProposalId: 3,
+				Voter: &storage.Address{
+					Address: "celestia1davz40kat93t49ljrkmkl5uqhqq45e0tedgf8a",
+				},
+				Option: types.VoteOptionYes,
+				Weight: decimal.RequireFromString("1.000000000000000000"),
+				Height: 871324,
+				Time:   ts,
+			},
 		},
 	}
 	for _, tt := range tests {
