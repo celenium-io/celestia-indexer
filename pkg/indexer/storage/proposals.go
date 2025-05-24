@@ -159,7 +159,16 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 
 	// 2. Get all validators
 
-	validators, err := tx.Validators(ctx)
+	maxValsConsts, err := module.constants.Get(ctx, types.ModuleNameStaking, "max_validators")
+	if err != nil {
+		return nil, errors.Wrap(err, "get max validators value")
+	}
+	maxVals, err := strconv.Atoi(maxValsConsts.Value)
+	if err != nil {
+		return nil, errors.Wrap(err, "parse max validators value")
+	}
+
+	validators, err := tx.BondedValidators(ctx, maxVals)
 	if err != nil {
 		return nil, errors.Wrap(err, "get validators")
 	}
@@ -194,10 +203,6 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 			end = len(votes) < limit
 
 			for i := range votes {
-				if votes[i].ValidatorId > 0 {
-					votedValidators[votes[i].ValidatorId] = votes[i].Option
-					continue
-				}
 				delegations, err := tx.AddressDelegations(ctx, votes[i].VoterId)
 				if err != nil {
 					return nil, errors.Wrapf(err, "can't receive address delegations: %d", votes[i].VoterId)
@@ -222,6 +227,10 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 						proposal.YesVotingPower = proposal.YesVotingPower.Add(delegations[j].Amount)
 					}
 				}
+
+				if votes[i].ValidatorId > 0 {
+					votedValidators[votes[i].ValidatorId] = votes[i].Option
+				}
 			}
 		}
 
@@ -240,11 +249,8 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 				case types.VoteOptionYes:
 					proposal.YesVotingPower = proposal.YesVotingPower.Add(power).Sub(minus)
 				}
-			} else {
-				return nil, errors.Errorf("unknown validator id: %d", id)
 			}
 		}
-
 	}
 
 	result := make([]*storage.Proposal, 0)

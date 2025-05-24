@@ -1199,7 +1199,7 @@ func (s *TransactionTestSuite) TestValidators() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	validators, err := tx.Validators(ctx)
+	validators, err := tx.BondedValidators(ctx, 100)
 	s.Require().NoError(err)
 
 	s.Require().Len(validators, 2)

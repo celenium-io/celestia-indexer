@@ -1142,9 +1142,11 @@ func (tx Transaction) ActiveProposals(ctx context.Context) (proposals []models.P
 	return
 }
 
-func (tx Transaction) Validators(ctx context.Context) (validators []models.Validator, err error) {
+func (tx Transaction) BondedValidators(ctx context.Context, limit int) (validators []models.Validator, err error) {
 	err = tx.Tx().NewSelect().Model(&validators).
 		Column("id", "stake").
+		OrderExpr("stake desc").
+		Limit(limit).
 		Scan(ctx)
 	return
 }

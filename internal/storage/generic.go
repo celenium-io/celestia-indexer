@@ -152,7 +152,7 @@ type Transaction interface {
 	LastAddressAction(ctx context.Context, address []byte) (uint64, error)
 	GetProposerId(ctx context.Context, address string) (uint64, error)
 	Validator(ctx context.Context, id uint64) (val Validator, err error)
-	Validators(ctx context.Context) ([]Validator, error)
+	BondedValidators(ctx context.Context, limit int) ([]Validator, error)
 	Delegation(ctx context.Context, validatorId, addressId uint64) (val Delegation, err error)
 	AddressDelegations(ctx context.Context, addressId uint64) (val []Delegation, err error)
 	ActiveProposals(ctx context.Context) ([]Proposal, error)
