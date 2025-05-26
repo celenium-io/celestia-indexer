@@ -7,11 +7,11 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	qgbTypes "github.com/celestiaorg/celestia-app/v3/x/blobstream/types"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
 )
 
 // MsgRegisterEVMAddress registers an evm address to a validator.
-func MsgRegisterEVMAddress(ctx *context.Context, m *qgbTypes.MsgRegisterEVMAddress) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgRegisterEVMAddress(ctx *context.Context, m *legacy.MsgRegisterEVMAddress) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgRegisterEVMAddress
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},

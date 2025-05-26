@@ -14,6 +14,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParseTxs_EmptyTxsResults(t *testing.T) {
@@ -259,7 +260,7 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 			},
 		},
 	}
-	block, now := testsuite.CreateTestBlock(txRes, 3)
+	block, now := testsuite.CreateTestBlockWithAppVersion(txRes, 3, 4)
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
@@ -350,4 +351,58 @@ func TestParseTxs_FailedTxWithNonstandardErrorCode(t *testing.T) {
 	assert.Equal(t, int64(12000), f.GasWanted)
 	assert.Equal(t, int64(1000), f.GasUsed)
 	assert.Equal(t, "celestia-explorer", f.Codespace)
+}
+
+func TestParseTxs_PayForBlob(t *testing.T) {
+	txRes := types.ResponseDeliverTx{
+		Code:      0,
+		Data:      []byte{},
+		Log:       "[{\"msg_index\":0,\"events\":[{\"type\":\"celestia.blob.v1.EventPayForBlobs\",\"attributes\":[{\"key\":\"blob_sizes\",\"value\":\"[2]\"},{\"key\":\"namespaces\",\"value\":\"[\\\"AAAAAAAAAAAAAAAAAAAAAAAAAEJpDCBNOWAP3dM=\\\"]\"},{\"key\":\"signer\",\"value\":\"\\\"celestia1j52ntqu7l734fjpa9lvylmtekaq0xqzhc22l0w\\\"\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/celestia.blob.v1.MsgPayForBlobs\"}]}]}]",
+		Info:      "info",
+		GasWanted: 79796,
+		GasUsed:   65177,
+		Events: []types.Event{
+			{
+				Type: "coin_spent",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   "spender",
+						Value: "celestia1j52ntqu7l734fjpa9lvylmtekaq0xqzhc22l0w",
+						Index: true,
+					},
+					{
+						Key:   "amount",
+						Value: "7980utia",
+						Index: true,
+					},
+				},
+			},
+		},
+		Codespace: "celestia-explorer",
+	}
+	raw, err := base64.StdEncoding.DecodeString("CoQCCp8BCpwBCiAvY2VsZXN0aWEuYmxvYi52MS5Nc2dQYXlGb3JCbG9icxJ4Ci9jZWxlc3RpYTFqNTJudHF1N2w3MzRmanBhOWx2eWxtdGVrYXEweHF6aGMyMmwwdxIdAAAAAAAAAAAAAAAAAAAAAAAAAEJpDCBNOWAP3dMaAQIiICF4PtPB1eUbDxdy5XvDx/gdk1BrBlLAYrHn5cYesAeRQgEAEh4KCBIECgIIARgBEhIKDAoEdXRpYRIENzk4MBC07wQaQOjRPPhYMdn12jdebWXpDJaDIRwmBsJ85ke8a8nwb18CLMcXzovh7/dvZm/FH1Cxe4x8NDQjY4Ethm73qhPb/pQSIgocAAAAAAAAAAAAAAAAAAAAAAAAQmkMIE05YA/d0xICZ20aBEJMT0I=")
+	require.NoError(t, err)
+	block, now := testsuite.CreateBlockWithTxs(txRes, raw, 1)
+
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height:       1000,
+		Time:         now,
+		MessageTypes: storageTypes.NewMsgTypeBitMask(),
+	}
+
+	p := NewModule(config.Indexer{})
+	resultTxs, err := p.parseTxs(decodeCtx, block)
+
+	require.NoError(t, err)
+	require.Len(t, resultTxs, 1)
+
+	tx := resultTxs[0]
+	require.Equal(t, now, tx.Time)
+	require.Equal(t, storageTypes.StatusSuccess, tx.Status)
+	require.Equal(t, "", tx.Error)
+	require.EqualValues(t, 79796, tx.GasWanted)
+	require.EqualValues(t, 65177, tx.GasUsed)
+	require.Equal(t, "celestia-explorer", tx.Codespace)
+	require.Len(t, tx.Signers, 1)
 }

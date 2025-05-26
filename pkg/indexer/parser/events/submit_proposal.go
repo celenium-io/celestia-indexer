@@ -21,7 +21,9 @@ func handleSubmitProposal(ctx *context.Context, events []storage.Event, msg *sto
 	if msg.Proposal == nil {
 		return nil
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.gov.v1beta1.MsgSubmitProposal" {
+	action := decoder.StringFromMap(events[*idx].Data, "action")
+	isValid := action == "/cosmos.gov.v1beta1.MsgSubmitProposal" || action == "/cosmos.gov.v1.MsgSubmitProposal"
+	if !isValid {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
 	*idx += 1

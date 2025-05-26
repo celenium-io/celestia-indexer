@@ -106,6 +106,18 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
 		266,
 	)
 
+	msgExpected.Proposal = &storage.Proposal{
+		Height:    blob.Height,
+		CreatedAt: blob.Block.Time,
+		Proposer: &storage.Address{
+			Address: "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		},
+		Status:      storageTypes.ProposalStatusInactive,
+		Type:        storageTypes.ProposalTypeText,
+		Title:       "Proposal with messages",
+		Description: "Proposal contains messages:\r\n1. /cosmos.gov.v1beta1.MsgSubmitProposal\r\n",
+	}
+
 	assert.NoError(t, err)
 	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)

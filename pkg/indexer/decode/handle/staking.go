@@ -8,8 +8,10 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 )
@@ -18,7 +20,6 @@ import (
 func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cosmosStakingTypes.MsgCreateValidator) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgCreateValidator
 	addresses, err := createAddresses(ctx, addressesData{
-		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 	}, ctx.Block.Height)
 	if err != nil {
@@ -39,9 +40,19 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 		}
 	}
 
+	validatorAddress := types.Address(m.ValidatorAddress)
+	_, b, err := validatorAddress.Decode()
+	if err != nil {
+		return msgType, addresses, errors.Wrap(err, m.ValidatorAddress)
+	}
+	addr, err := types.NewAddressFromBytes(b)
+	if err != nil {
+		return msgType, addresses, errors.Wrap(err, m.ValidatorAddress)
+	}
+
 	jailed := false
 	validator := storage.Validator{
-		Delegator:         m.DelegatorAddress,
+		Delegator:         addr.String(),
 		Address:           m.ValidatorAddress,
 		ConsAddress:       consAddress,
 		Moniker:           m.Description.Moniker,
@@ -63,7 +74,7 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 		validator.Stake = amount
 
 		address := storage.Address{
-			Address: m.DelegatorAddress,
+			Address: m.ValidatorAddress,
 			Balance: storage.Balance{
 				Currency:  currency.DefaultCurrency,
 				Spendable: decimal.Zero,

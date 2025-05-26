@@ -6,6 +6,7 @@ package handle_test
 import (
 	"testing"
 
+	"cosmossdk.io/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
@@ -20,7 +21,7 @@ import (
 // MsgSend
 
 func createMsgSend() types.Msg {
-	amount, _ := types.NewIntFromString("1000")
+	amount, _ := math.NewIntFromString("1000")
 	m := cosmosBankTypes.MsgSend{
 		FromAddress: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 		ToAddress:   "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",

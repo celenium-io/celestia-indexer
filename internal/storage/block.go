@@ -38,7 +38,7 @@ type Block struct {
 	VersionBlock uint64         `bun:"version_block"             comment:"Block version"`
 	VersionApp   uint64         `bun:"version_app"               comment:"App version"`
 
-	MessageTypes types.MsgTypeBits `bun:"message_types,type:bit(76)" comment:"Bit mask with containing messages"`
+	MessageTypes types.MsgTypeBits `bun:"message_types,type:bit(89)" comment:"Bit mask with containing messages"`
 
 	Hash               pkgTypes.Hex `bun:"hash"                 comment:"Block hash"`
 	ParentHash         pkgTypes.Hex `bun:"parent_hash"          comment:"Hash of parent block"`

@@ -100,6 +100,9 @@ const (
 	MsgTypeBitsUpdateClient
 	MsgTypeBitsUpgradeClient
 	MsgTypeBitsSubmitMisbehaviour
+	MsgTypeBitsRecoverClient
+	MsgTypeBitsIBCSoftwareUpgrade
+	MsgTypeBitsUpdateParams
 
 	MsgTypeBitsConnectionOpenInit
 	MsgTypeBitsConnectionOpenTry
@@ -119,6 +122,18 @@ const (
 
 	MsgTypeBitsSignalVersion
 	MsgTypeBitsTryUpgrade
+
+	MsgTypeBitsCreateMailbox
+	MsgTypeBitsProcessMessage
+	MsgTypeBitsSetMailbox
+	MsgTypeBitsCreateCollateralToken
+	MsgTypeBitsCreateSyntheticToken
+	MsgTypeBitsSetToken
+	MsgTypeBitsEnrollRemoteRouter
+	MsgTypeBitsUnrollRemoteRouter
+	MsgTypeBitsRemoteTransfer
+
+	MsgTypeBitsUpdateMinfeeParams
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
@@ -263,6 +278,13 @@ func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 		mask.SetBit(MsgTypeBitsUpgradeClient)
 	case MsgSubmitMisbehaviour:
 		mask.SetBit(MsgTypeBitsSubmitMisbehaviour)
+	case MsgIBCSoftwareUpgrade:
+		mask.SetBit(MsgTypeBitsIBCSoftwareUpgrade)
+	case MsgRecoverClient:
+		mask.SetBit(MsgTypeBitsRecoverClient)
+	case MsgUpdateParams:
+		mask.SetBit(MsgTypeBitsUpdateParams)
+
 	case MsgConnectionOpenInit:
 		mask.SetBit(MsgTypeBitsConnectionOpenInit)
 	case MsgConnectionOpenTry:
@@ -297,6 +319,28 @@ func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 		mask.SetBit(MsgTypeBitsSignalVersion)
 	case MsgTryUpgrade:
 		mask.SetBit(MsgTypeBitsTryUpgrade)
+
+	case MsgCreateMailbox:
+		mask.SetBit(MsgTypeBitsCreateMailbox)
+	case MsgProcessMessage:
+		mask.SetBit(MsgTypeBitsProcessMessage)
+	case MsgSetMailbox:
+		mask.SetBit(MsgTypeBitsSetMailbox)
+	case MsgCreateCollateralToken:
+		mask.SetBit(MsgTypeBitsCreateCollateralToken)
+	case MsgCreateSyntheticToken:
+		mask.SetBit(MsgTypeBitsCreateSyntheticToken)
+	case MsgSetToken:
+		mask.SetBit(MsgTypeBitsSetToken)
+	case MsgEnrollRemoteRouter:
+		mask.SetBit(MsgTypeBitsEnrollRemoteRouter)
+	case MsgUnrollRemoteRouter:
+		mask.SetBit(MsgTypeBitsUnrollRemoteRouter)
+	case MsgRemoteTransfer:
+		mask.SetBit(MsgTypeBitsRemoteTransfer)
+
+	case MsgUpdateMinfeeParams:
+		mask.SetBit(MsgTypeBitsUpdateMinfeeParams)
 	}
 }
 
@@ -560,6 +604,18 @@ func (mask MsgTypeBits) Names() []MsgType {
 		names[i] = MsgSubmitMisbehaviour
 		i++
 	}
+	if mask.HasBit(MsgTypeBitsRecoverClient) {
+		names[i] = MsgRecoverClient
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsIBCSoftwareUpgrade) {
+		names[i] = MsgIBCSoftwareUpgrade
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsUpdateParams) {
+		names[i] = MsgUpdateParams
+		i++
+	}
 	if mask.HasBit(MsgTypeBitsConnectionOpenInit) {
 		names[i] = MsgConnectionOpenInit
 		i++
@@ -624,6 +680,48 @@ func (mask MsgTypeBits) Names() []MsgType {
 	}
 	if mask.HasBit(MsgTypeBitsAcknowledgement) {
 		names[i] = MsgAcknowledgement
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsCreateMailbox) {
+		names[i] = MsgCreateMailbox
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsProcessMessage) {
+		names[i] = MsgProcessMessage
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsSetMailbox) {
+		names[i] = MsgSetMailbox
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsCreateCollateralToken) {
+		names[i] = MsgCreateCollateralToken
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsCreateSyntheticToken) {
+		names[i] = MsgCreateSyntheticToken
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsSetToken) {
+		names[i] = MsgSetToken
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsEnrollRemoteRouter) {
+		names[i] = MsgEnrollRemoteRouter
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsUnrollRemoteRouter) {
+		names[i] = MsgUnrollRemoteRouter
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsRemoteTransfer) {
+		names[i] = MsgRemoteTransfer
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsUpdateMinfeeParams) {
+		names[i] = MsgUpdateMinfeeParams
 		// i++
 	}
 
@@ -655,9 +753,9 @@ var _ driver.Valuer = (*MsgTypeBits)(nil)
 
 func (mask MsgTypeBits) Value() (driver.Value, error) {
 	if mask.value == nil {
-		return fmt.Sprintf("%076b", 0), nil
+		return fmt.Sprintf("%089b", 0), nil
 	}
-	return fmt.Sprintf("%076b", mask.value), nil
+	return fmt.Sprintf("%089b", mask.value), nil
 }
 
 func (mask MsgTypeBits) MarshalJSON() (data []byte, err error) {

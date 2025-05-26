@@ -6,6 +6,7 @@ package handle_test
 import (
 	"testing"
 
+	"cosmossdk.io/math"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -112,7 +113,7 @@ func createMsgBeginRedelegate() types.Msg {
 		DelegatorAddress:    "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
 		ValidatorSrcAddress: "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 		ValidatorDstAddress: "celestiavaloper12c6cwd0kqlg48sdhjnn9f0z82g0c82fmrl7j9y",
-		Amount:              types.NewCoin(currency.Utia, types.OneInt()),
+		Amount:              types.NewCoin(currency.Utia, math.OneInt()),
 	}
 
 	return &m
@@ -195,11 +196,10 @@ func createMsgCreateValidator() types.Msg {
 	m := cosmosStakingTypes.MsgCreateValidator{
 		Description:       cosmosStakingTypes.Description{},
 		Commission:        cosmosStakingTypes.CommissionRates{},
-		MinSelfDelegation: types.NewInt(1),
-		DelegatorAddress:  "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
+		MinSelfDelegation: math.NewInt(1),
 		ValidatorAddress:  "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 		Pubkey:            pkAny,
-		Value:             types.NewCoin("utia", types.OneInt()),
+		Value:             types.NewCoin("utia", math.OneInt()),
 	}
 
 	return &m
@@ -220,17 +220,6 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 
 	addressesExpected := []storage.AddressWithType{
 		{
-			Type: storageTypes.MsgAddressTypeDelegator,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
-				Hash:       []byte{0x74, 0x2b, 0x74, 0xc3, 0xe7, 0xbf, 0xc9, 0xf5, 0xc4, 0xe1, 0x5d, 0xa9, 0x89, 0x97, 0x83, 0xea, 0x9f, 0xf, 0xf1, 0x49},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-		{
 			Type: storageTypes.MsgAddressTypeValidator,
 			Address: storage.Address{
 				Id:         0,
@@ -246,7 +235,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 
 	expectedValidators := map[string]*storage.Validator{
 		"celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x": {
-			Delegator:         "celestia1ws4hfsl8hlylt38ptk5cn9ura20slu2fnkre76",
+			Delegator:         "celestia1fg9l3xvfuu9wxremv2229966zawysg4rss2hzq",
 			Address:           "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 			ConsAddress:       "A8BEA00847066E6C765E7B064DD79265406D402B",
 			Rate:              decimal.Zero,
@@ -272,7 +261,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 		Type:      storageTypes.MsgCreateValidator,
 		TxId:      0,
 		Data:      data,
-		Size:      201,
+		Size:      152,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
@@ -290,7 +279,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 // MsgDelegate
 
 func createMsgDelegate() types.Msg {
-	amount, _ := types.NewIntFromString("1000")
+	amount, _ := math.NewIntFromString("1000")
 	msgDelegate := cosmosStakingTypes.MsgDelegate{
 		DelegatorAddress: "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
 		ValidatorAddress: "celestiavaloper12c6cwd0kqlg48sdhjnn9f0z82g0c82fmrl7j9y",
@@ -363,7 +352,7 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 // MsgUndelegate
 
 func createMsgUndelegate() types.Msg {
-	amount, _ := types.NewIntFromString("1001")
+	amount, _ := math.NewIntFromString("1001")
 	m := cosmosStakingTypes.MsgUndelegate{
 		DelegatorAddress: "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
 		ValidatorAddress: "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym",
@@ -435,7 +424,7 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 // MsgCancelUnbondingDelegation
 
 func createMsgCancelUnbondingDelegation() types.Msg {
-	amount, _ := types.NewIntFromString("1001")
+	amount, _ := math.NewIntFromString("1001")
 	m := cosmosStakingTypes.MsgCancelUnbondingDelegation{
 		DelegatorAddress: "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
 		ValidatorAddress: "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym",

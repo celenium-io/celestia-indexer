@@ -11,13 +11,13 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/celestiaorg/celestia-app/v3/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v4/pkg/appconsts"
+	coreTypes "github.com/cometbft/cometbft/types"
 	"github.com/dipdup-io/workerpool"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
-	coreTypes "github.com/tendermint/tendermint/types"
 )
 
 const (

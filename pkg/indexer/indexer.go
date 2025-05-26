@@ -7,8 +7,8 @@ import (
 	"context"
 	"sync"
 
+	"github.com/cometbft/cometbft/rpc/client/http"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
-	"github.com/tendermint/tendermint/rpc/client/http"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 

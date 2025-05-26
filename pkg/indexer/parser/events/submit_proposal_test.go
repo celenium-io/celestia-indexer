@@ -180,6 +180,80 @@ func Test_handleSubmitProposal(t *testing.T) {
 				Status:  types.ProposalStatusInactive,
 				Deposit: decimal.RequireFromString("10000000000"),
 			},
+		}, {
+			name: "submit_proposal test 3",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 58507,
+					Type:   "message",
+					Data: map[string]any{
+						"action": "/cosmos.gov.v1.MsgSubmitProposal",
+					},
+				}, {
+					Height: 58507,
+					Type:   "submit_proposal",
+					Data: map[string]any{
+						"proposal_id":       "2",
+						"proposal_messages": ",/cosmos.gov.v1beta1.MsgSubmitProposal",
+					},
+				}, {
+					Height: 58507,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":  "",
+						"spender": "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
+					},
+				}, {
+					Height: 58507,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":   "",
+						"receiver": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+					},
+				}, {
+					Height: 58507,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "",
+						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+						"sender":    "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
+					},
+				}, {
+					Height: 58507,
+					Type:   "message",
+					Data: map[string]any{
+						"sender": "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
+					},
+				}, {
+					Height: 58507,
+					Type:   "proposal_deposit",
+					Data: map[string]any{
+						"amount":      "",
+						"proposal_id": "2",
+					},
+				}, {
+					Height: 58507,
+					Type:   "message",
+					Data: map[string]any{
+						"module": "governance",
+						"sender": "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgSubmitProposal,
+				Height: 58507,
+				Proposal: &storage.Proposal{
+					Status: types.ProposalStatusInactive,
+				},
+			},
+			idx: testsuite.Ptr(0),
+			proposal: storage.Proposal{
+				Id:      2,
+				Status:  types.ProposalStatusInactive,
+				Deposit: decimal.Zero,
+			},
 		},
 	}
 	for _, tt := range tests {

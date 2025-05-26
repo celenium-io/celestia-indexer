@@ -36,6 +36,7 @@ type State struct {
 	TotalNamespaces int64           `bun:"total_namespaces"          comment:"Namespaces count in celestia"`
 	TotalBlobsSize  int64           `bun:"total_blobs_size"          comment:"Total blobs size"`
 	TotalProposals  int64           `bun:"total_proposals"           comment:"Total proposals count in celestia"`
+	TotalIbcClients int64           `bun:"total_ibc_clients"         comment:"Total count of IBC clients"`
 	TotalValidators int             `bun:"total_validators"          comment:"Total validator's count"`
 	TotalSupply     decimal.Decimal `bun:"total_supply,type:numeric" comment:"Total supply in celestia"`
 	TotalFee        decimal.Decimal `bun:"total_fee,type:numeric"    comment:"Total paid fee"`

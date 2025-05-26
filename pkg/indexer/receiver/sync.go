@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	tendermint "github.com/cometbft/cometbft/types"
 	"github.com/pkg/errors"
-	tendermint "github.com/tendermint/tendermint/types"
 )
 
 func (r *Module) sync(ctx context.Context) {
@@ -84,13 +84,17 @@ func (r *Module) live(ctx context.Context) error {
 
 func (r *Module) readBlocks(ctx context.Context) error {
 	for {
-		headLevel, err := r.headLevel(ctx)
+		headLevel, appVersion, err := r.headLevel(ctx)
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				return nil
 			}
 			return err
 		}
+		r.appVersion.Store(appVersion)
+
+		isLiveMode := headLevel-r.level < types.Level(r.w.capacity)
+		r.w.SetLiveMode(isLiveMode)
 
 		if level, _ := r.Level(); level == headLevel {
 			time.Sleep(time.Second)
@@ -111,19 +115,15 @@ func (r *Module) passBlocks(ctx context.Context, head types.Level) {
 		case <-ctx.Done():
 			return
 		default:
-			if _, ok := r.taskQueue.Get(level); !ok {
-				r.taskQueue.Set(level, struct{}{})
-				r.pool.AddTask(level)
-			}
+			r.w.Do(ctx, level, r.appVersion.Load())
 		}
 	}
 }
 
-func (r *Module) headLevel(ctx context.Context) (types.Level, error) {
+func (r *Module) headLevel(ctx context.Context) (types.Level, uint64, error) {
 	status, err := r.api.Status(ctx)
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
-
-	return status.SyncInfo.LatestBlockHeight, nil
+	return status.SyncInfo.LatestBlockHeight, status.NodeInfo.ProtocolVersion.App, nil
 }

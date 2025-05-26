@@ -10,6 +10,8 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/cosmos/cosmos-sdk/types"
+	channelTypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+	tmTypes "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
@@ -78,6 +80,19 @@ func TimeFromMap(m map[string]any, key string) (time.Time, error) {
 	return time.Parse(time.RFC3339, str)
 }
 
+var (
+	nsDivider = decimal.NewFromInt(10).Pow(decimal.NewFromInt(9))
+)
+
+func UnixNanoFromMap(m map[string]any, key string) time.Time {
+	value := DecimalFromMap(m, key)
+	if value.IsZero() {
+		return time.Time{}
+	}
+	x := value.Div(nsDivider)
+	return time.Unix(x.IntPart(), value.Mod(nsDivider).IntPart()).UTC()
+}
+
 func Int64FromMap(m map[string]any, key string) (int64, error) {
 	val, ok := m[key]
 	if !ok {
@@ -113,4 +128,59 @@ func Uint64FromMap(m map[string]any, key string) (uint64, error) {
 		return 0, errors.Errorf("key '%s' is not a string", key)
 	}
 	return strconv.ParseUint(str, 10, 64)
+}
+
+func ClientStateFromMap(m map[string]any, key string) (*tmTypes.ClientState, error) {
+	val, ok := m[key]
+	if !ok {
+		return nil, errors.Errorf("can't find key: %s", key)
+	}
+	cs, ok := val.(tmTypes.ClientState)
+	if !ok {
+		return nil, errors.Errorf("key '%s' is not a client state", key)
+	}
+	return &cs, nil
+}
+
+func HeaderFromMap(m map[string]any, key string) (*tmTypes.Header, error) {
+	val, ok := m[key]
+	if !ok {
+		return nil, errors.Errorf("can't find key: %s", key)
+	}
+	header, ok := val.(tmTypes.Header)
+	if !ok {
+		return nil, errors.Errorf("key '%s' is not a header", key)
+	}
+	return &header, nil
+}
+
+func ChannelOrderingFromMap(m map[string]any, key string) (bool, error) {
+	val, ok := m[key]
+	if !ok {
+		return false, errors.Errorf("can't find key: %s", key)
+	}
+	order, ok := val.(channelTypes.Order)
+	if !ok {
+		return false, errors.Errorf("key '%s' is not a Order", key)
+	}
+	return order == channelTypes.ORDERED, nil
+}
+
+func RevisionHeightFromMap(m map[string]any, key string) (uint64, uint64, error) {
+	ch := StringFromMap(m, key)
+	parts := strings.Split(ch, "-")
+	if len(parts) != 2 {
+		return 0, 0, errors.Errorf("invalid revision height: %s", ch)
+	}
+	revision, err := strconv.ParseUint(parts[0], 10, 64)
+	if err != nil {
+		return 0, 0, errors.Wrap(err, "revision")
+	}
+
+	height, err := strconv.ParseUint(parts[1], 10, 64)
+	if err != nil {
+		return 0, 0, errors.Wrap(err, "height")
+	}
+
+	return revision, height, nil
 }

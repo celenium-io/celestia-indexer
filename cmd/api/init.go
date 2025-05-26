@@ -421,7 +421,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.State)
+	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.IbcTransfers, db.IbcChannels, db.State)
 	stats := v1.Group("/stats")
 	{
 		stats.GET("/summary/:table/:function", statsHandler.Summary)
@@ -440,6 +440,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		staking := stats.Group("/staking")
 		{
 			staking.GET("/series/:id/:name/:timeframe", statsHandler.StakingSeries, statsMiddlewareCache)
+		}
+		ibc := stats.Group("/ibc")
+		{
+			ibc.GET("/series/:id/:name/:timeframe", statsHandler.IbcSeries, statsMiddlewareCache)
+			ibc.GET("/chains", statsHandler.IbcByChains, statsMiddlewareCache)
 		}
 		series := stats.Group("/series")
 		{
@@ -468,6 +473,31 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		proposal.GET("", proposalHandler.List)
 		proposal.GET("/:id", proposalHandler.Get)
 		proposal.GET("/:id/votes", proposalHandler.Votes)
+	}
+
+	ibcHandler := handler.NewIbcHandler(db.IbcClients, db.IbcConnections, db.IbcChannels, db.IbcTransfers, db.Address)
+	ibc := v1.Group("/ibc")
+	{
+		ibcClient := ibc.Group("/client")
+		{
+			ibcClient.GET("", ibcHandler.List)
+			ibcClient.GET("/:id", ibcHandler.Get)
+		}
+		ibcConnection := ibc.Group("/connection")
+		{
+			ibcConnection.GET("", ibcHandler.ListConnections)
+			ibcConnection.GET("/:id", ibcHandler.GetConnection)
+		}
+		ibcChannel := ibc.Group("/channel")
+		{
+			ibcChannel.GET("", ibcHandler.ListChannels)
+			ibcChannel.GET("/:id", ibcHandler.GetChannel)
+		}
+
+		ibcTransfer := ibc.Group("/transfer")
+		{
+			ibcTransfer.GET("", ibcHandler.ListTransfers)
+		}
 	}
 
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{

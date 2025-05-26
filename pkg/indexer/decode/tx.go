@@ -5,25 +5,31 @@ package decode
 
 import (
 	"github.com/celenium-io/celestia-indexer/internal/currency"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/celestiaorg/celestia-app/v3/app"
-	"github.com/celestiaorg/celestia-app/v3/app/encoding"
+	"github.com/celestiaorg/celestia-app/v4/app"
+	"github.com/celestiaorg/celestia-app/v4/app/encoding"
+	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
+	tmTypes "github.com/cometbft/cometbft/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/tx"
+	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	blobTypes "github.com/tendermint/tendermint/proto/tendermint/types"
-	tmTypes "github.com/tendermint/tendermint/types"
 )
 
 type DecodedTx struct {
-	AuthInfo      tx.AuthInfo
 	TimeoutHeight uint64
 	Memo          string
 	Messages      []cosmosTypes.Msg
 	Fee           decimal.Decimal
 	Signers       map[types.Address][]byte
 	Blobs         []*blobTypes.Blob
+}
+
+func NewDecodedTx() DecodedTx {
+	return DecodedTx{
+		Signers: make(map[types.Address][]byte),
+	}
 }
 
 var (
@@ -36,75 +42,64 @@ func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
 		raw = bTx.Tx
 		d.Blobs = bTx.Blobs
 	}
-
-	d.AuthInfo, d.Fee, err = decodeAuthInfo(cfg, raw)
-	if err != nil {
-		return
-	}
-
-	d.TimeoutHeight, d.Memo, d.Messages, err = decodeCosmosTx(txDecoder, raw)
-	if err != nil {
-		return
-	}
-
 	d.Signers = make(map[types.Address][]byte)
-	for i := range d.Messages {
-		for _, signer := range d.Messages[i].GetSigners() {
-			if signer.Empty() {
-				continue
-			}
-			signerBytes := signer.Bytes()
-			address, err := types.NewAddressFromBytes(signerBytes)
-			if err != nil {
-				return d, err
-			}
-			d.Signers[address] = signerBytes
-		}
+
+	if err = decodeCosmosTx(txDecoder, raw, &d); err != nil {
+		return
 	}
 
 	return
 }
 
-func decodeCosmosTx(decoder cosmosTypes.TxDecoder, raw tmTypes.Tx) (timeoutHeight uint64, memo string, messages []cosmosTypes.Msg, err error) {
+func decodeCosmosTx(decoder cosmosTypes.TxDecoder, raw tmTypes.Tx, d *DecodedTx) error {
 	txDecoded, err := decoder(raw)
 	if err != nil {
-		err = errors.Wrap(err, "decoding tx error")
-		return
+		return errors.Wrap(err, "decoding tx error")
 	}
 
 	if t, ok := txDecoded.(cosmosTypes.TxWithTimeoutHeight); ok {
-		timeoutHeight = t.GetTimeoutHeight()
+		d.TimeoutHeight = t.GetTimeoutHeight()
 	}
 	if t, ok := txDecoded.(cosmosTypes.TxWithMemo); ok {
-		memo = t.GetMemo()
+		d.Memo = t.GetMemo()
+	}
+	if t, ok := txDecoded.(cosmosTypes.FeeTx); ok {
+		d.Fee, err = decodeFee(t.GetFee())
+		if err != nil {
+			return errors.Wrap(err, "decode fee")
+		}
+	}
+	if t, ok := txDecoded.(signing.Tx); ok {
+		signers, err := t.GetSigners()
+		if err != nil {
+			pubKeys, err := t.GetPubKeys()
+			if err != nil {
+				return errors.Wrap(err, "get pub keys")
+			}
+			for _, pk := range pubKeys {
+				address, err := types.NewAddressFromBytes(pk.Address().Bytes())
+				if err != nil {
+					return errors.Wrap(err, "NewAddressFromBytes")
+				}
+				d.Signers[address] = pk.Address().Bytes()
+			}
+		} else {
+			for i := range signers {
+				address, err := types.NewAddressFromBytes(signers[i])
+				if err != nil {
+					return errors.Wrap(err, "NewAddressFromBytes")
+				}
+				d.Signers[address] = signers[i]
+			}
+		}
 	}
 
-	messages = txDecoded.GetMsgs()
-	return
+	d.Messages = txDecoded.GetMsgs()
+
+	return nil
 }
 
-func decodeAuthInfo(cfg encoding.Config, raw tmTypes.Tx) (tx.AuthInfo, decimal.Decimal, error) {
-	var txRaw tx.TxRaw
-	if e := cfg.Codec.Unmarshal(raw, &txRaw); e != nil {
-		return tx.AuthInfo{}, decimal.Decimal{}, errors.Wrap(e, "unmarshalling tx error")
-	}
-
-	var authInfo tx.AuthInfo
-	if e := cfg.Codec.Unmarshal(txRaw.AuthInfoBytes, &authInfo); e != nil {
-		return tx.AuthInfo{}, decimal.Decimal{}, errors.Wrap(e, "decoding tx auth_info error")
-	}
-
-	fee, err := decodeFee(authInfo)
-	if err != nil {
-		return authInfo, decimal.Zero, err
-	}
-
-	return authInfo, fee, nil
-}
-
-func decodeFee(authInfo tx.AuthInfo) (decimal.Decimal, error) {
-	amount := authInfo.GetFee().GetAmount()
-
+func decodeFee(amount cosmosTypes.Coins) (decimal.Decimal, error) {
 	if amount == nil {
 		return decimal.Zero, nil
 	}
@@ -145,6 +140,7 @@ func getFeeInDenom(amount cosmosTypes.Coins, denom string) (decimal.Decimal, boo
 
 func createDecoder() (encoding.Config, cosmosTypes.TxDecoder) {
 	cfg := encoding.MakeConfig(app.ModuleEncodingRegisters...)
+	cfg.InterfaceRegistry.RegisterImplementations((*cosmosTypes.Msg)(nil), &legacy.MsgRegisterEVMAddress{})
 	return cfg, cfg.TxConfig.TxDecoder()
 }
 

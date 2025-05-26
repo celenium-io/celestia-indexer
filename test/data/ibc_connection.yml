@@ -1,0 +1,11 @@
+- connection_id: connection-1
+  client_id: client-1
+  counterparty_connection_id: counterparty-1
+  counterparty_client_id: counterparty-client-1
+  created_at: '2023-07-04T03:10:57+00:00'
+  connected_at: '2023-07-04T03:11:57+00:00'
+  height: 1000
+  connection_height: 1001
+  create_tx_id: 1
+  connection_tx_id: 2
+  channels_count: 1

@@ -83,6 +83,50 @@ func (c *MockApiBlockCall) DoAndReturn(f func(context.Context, types0.Level) (ty
 	return c
 }
 
+// BlockBulkData mocks base method.
+func (m *MockApi) BlockBulkData(ctx context.Context, levels ...types0.Level) ([]types0.BlockData, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range levels {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BlockBulkData", varargs...)
+	ret0, _ := ret[0].([]types0.BlockData)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BlockBulkData indicates an expected call of BlockBulkData.
+func (mr *MockApiMockRecorder) BlockBulkData(ctx any, levels ...any) *MockApiBlockBulkDataCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, levels...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BlockBulkData", reflect.TypeOf((*MockApi)(nil).BlockBulkData), varargs...)
+	return &MockApiBlockBulkDataCall{Call: call}
+}
+
+// MockApiBlockBulkDataCall wrap *gomock.Call
+type MockApiBlockBulkDataCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockApiBlockBulkDataCall) Return(arg0 []types0.BlockData, arg1 error) *MockApiBlockBulkDataCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockApiBlockBulkDataCall) Do(f func(context.Context, ...types0.Level) ([]types0.BlockData, error)) *MockApiBlockBulkDataCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockApiBlockBulkDataCall) DoAndReturn(f func(context.Context, ...types0.Level) ([]types0.BlockData, error)) *MockApiBlockBulkDataCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // BlockData mocks base method.
 func (m *MockApi) BlockData(ctx context.Context, level types0.Level) (types0.BlockData, error) {
 	m.ctrl.T.Helper()
