@@ -196,6 +196,12 @@ func TestAddress_Decode(t *testing.T) {
 			want:    AddressPrefixCelestia,
 			want1:   []byte{99, 101, 108, 101, 115, 116, 105, 97, 49, 52, 122, 99, 57, 112, 55, 112, 97, 116, 114, 51, 50, 118, 110, 115, 101, 122, 102, 122, 99, 51, 102, 110, 57, 100, 110, 113, 97, 114, 104, 108, 109, 118, 99, 121, 117, 116, 102},
 			wantErr: false,
+		}, {
+			name:    "celestia15xvs73zpnfkrkdvm0k5wrdfz2kjfhd5vz9nnujyvagpq9sqjh3jqkp2tp3",
+			a:       Address("celestia15xvs73zpnfkrkdvm0k5wrdfz2kjfhd5vz9nnujyvagpq9sqjh3jqkp2tp3"),
+			want:    AddressPrefixCelestia,
+			want1:   []byte{0xa1, 0x99, 0xf, 0x44, 0x41, 0x9a, 0x6c, 0x3b, 0x35, 0x9b, 0x7d, 0xa8, 0xe1, 0xb5, 0x22, 0x55, 0xa4, 0x9b, 0xb6, 0x8c, 0x11, 0x67, 0x3e, 0x48, 0x8c, 0xea, 0x2, 0x2, 0xc0, 0x12, 0xbc, 0x64},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {

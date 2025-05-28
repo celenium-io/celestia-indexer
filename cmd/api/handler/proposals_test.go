@@ -110,8 +110,8 @@ func (s *ProposalTestSuite) TestGet() {
 	c.SetParamValues("1")
 
 	s.proposal.EXPECT().
-		GetByID(gomock.Any(), uint64(1)).
-		Return(&testProposal, nil)
+		ById(gomock.Any(), uint64(1)).
+		Return(testProposal, nil)
 
 	s.Require().NoError(s.handler.Get(c))
 	s.Require().Equal(http.StatusOK, rec.Code)

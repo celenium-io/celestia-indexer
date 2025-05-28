@@ -77,3 +77,18 @@ func (s *StorageTestSuite) TestProposalByType() {
 	s.Require().NotNil(proposal.Proposer)
 	s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", proposal.Proposer.String())
 }
+
+func (s *StorageTestSuite) TestProposalById() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	proposal, err := s.storage.Proposals.ById(ctx, 1)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(1, proposal.Id)
+	s.Require().EqualValues(1, proposal.ProposerId)
+	s.Require().EqualValues(1000, proposal.Height)
+	s.Require().EqualValues("Description", proposal.Description)
+	s.Require().NotNil(proposal.Proposer)
+	s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", proposal.Proposer.String())
+}

@@ -113,7 +113,7 @@ func (handler *ProposalsHandler) List(c echo.Context) error {
 
 	proposals, err := handler.proposals.ListWithFilters(c.Request().Context(), filters)
 	if err != nil {
-		return handleError(c, err, handler.proposals)
+		return handleError(c, err, handler.votes)
 	}
 	response := make([]responses.Proposal, len(proposals))
 	for i := range proposals {
@@ -141,12 +141,12 @@ func (handler *ProposalsHandler) Get(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	proposal, err := handler.proposals.GetByID(c.Request().Context(), req.Id)
+	proposal, err := handler.proposals.ById(c.Request().Context(), req.Id)
 	if err != nil {
-		return handleError(c, err, handler.proposals)
+		return handleError(c, err, handler.votes)
 	}
 
-	return c.JSON(http.StatusOK, responses.NewProposal(*proposal))
+	return c.JSON(http.StatusOK, responses.NewProposal(proposal))
 }
 
 type listVotesRequest struct {

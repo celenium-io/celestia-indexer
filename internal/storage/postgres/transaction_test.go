@@ -351,7 +351,10 @@ func (s *TransactionTestSuite) TestSaveProposals() {
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
 
-	items, err := s.storage.Proposals.List(ctx, 10, 0, sdk.SortOrderAsc)
+	items, err := s.storage.Proposals.ListWithFilters(ctx, storage.ListProposalFilters{
+		Limit: 10,
+		Sort:  sdk.SortOrderAsc,
+	})
 	s.Require().NoError(err)
 	s.Require().Len(items, 3)
 }
@@ -674,7 +677,10 @@ func (s *TransactionTestSuite) TestRollbackProposals() {
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
 
-	items, err := s.storage.Proposals.List(ctx, 10, 0, sdk.SortOrderAsc)
+	items, err := s.storage.Proposals.ListWithFilters(ctx, storage.ListProposalFilters{
+		Limit: 10,
+		Sort:  sdk.SortOrderAsc,
+	})
 	s.Require().NoError(err)
 	s.Require().Len(items, 1)
 }
