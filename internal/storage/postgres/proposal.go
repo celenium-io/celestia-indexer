@@ -53,3 +53,16 @@ func (p *Proposal) ListWithFilters(ctx context.Context, filters storage.ListProp
 
 	return
 }
+
+func (p *Proposal) ById(ctx context.Context, id uint64) (proposal storage.Proposal, err error) {
+	err = p.DB().NewSelect().
+		Model(&proposal).
+		ColumnExpr("proposal.*").
+		ColumnExpr("proposer.address as proposer__address").
+		ColumnExpr("celestial.id as proposer__celestials__id, celestial.image_url as proposer__celestials__image_url").
+		Where("proposal.id = ?", id).
+		Join("left join address as proposer ON proposal.proposer_id = proposer.id").
+		Join("left join celestial on celestial.address_id = proposal.proposer_id and celestial.status = 'PRIMARY'").
+		Scan(ctx)
+	return
+}
