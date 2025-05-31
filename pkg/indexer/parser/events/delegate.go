@@ -88,6 +88,6 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 
 	}
 
-	*idx = len(events) - 1
+	toTheNextAction(events, idx)
 	return nil
 }
