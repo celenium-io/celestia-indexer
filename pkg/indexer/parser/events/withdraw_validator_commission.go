@@ -63,6 +63,7 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 			validator.Commissions = amount.Neg()
 		}
 	}
-	*idx = len(events) - 1
+
+	toTheNextAction(events, idx)
 	return nil
 }

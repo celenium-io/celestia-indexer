@@ -22,6 +22,10 @@ func handleExec(ctx *context.Context, events []storage.Event, msg *storage.Messa
 	}
 	*idx += 1
 
+	return processExec(ctx, events, msg, idx)
+}
+
+func processExec(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	for i := range msg.InternalMsgs {
 		switch msg.InternalMsgs[i] {
 		case "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation":
@@ -63,7 +67,7 @@ func handleExec(ctx *context.Context, events []storage.Event, msg *storage.Messa
 				return err
 			}
 		case "/cosmos.slashing.v1beta1.MsgUnjail":
-			if err := processUnjail(ctx, events, idx); err != nil {
+			if err := processUnjail(ctx, events, msg, idx); err != nil {
 				return err
 			}
 		default:

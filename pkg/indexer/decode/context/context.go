@@ -43,6 +43,9 @@ func NewContext() *Context {
 }
 
 func (ctx *Context) AddAddress(address *storage.Address) error {
+	if address == nil {
+		return nil
+	}
 	if addr, ok := ctx.Addresses.Get(address.String()); ok {
 		addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
 		addr.Balance.Delegated = addr.Balance.Delegated.Add(address.Balance.Delegated)

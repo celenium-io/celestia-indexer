@@ -298,13 +298,13 @@ func Message(
 	case *coreChannel.MsgChannelCloseConfirm:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgChannelCloseConfirm(ctx, typedMsg)
 	case *coreChannel.MsgRecvPacket:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRecvPacket(ctx, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.IbcTransfer, d.Msg.IbcChannel, err = handle.MsgRecvPacket(ctx, cfg.Codec, d.Msg.Data, typedMsg)
 	case *coreChannel.MsgTimeout:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgTimeout(ctx, typedMsg)
 	case *coreChannel.MsgTimeoutOnClose:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgTimeoutOnClose(ctx, typedMsg)
 	case *coreChannel.MsgAcknowledgement:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgAcknowledgement(ctx, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.IbcTransfer, d.Msg.IbcChannel, err = handle.MsgAcknowledgement(ctx, cfg.Codec, d.Msg.Data, typedMsg)
 
 	// signal module
 	case *appSignalTypes.MsgSignalVersion:

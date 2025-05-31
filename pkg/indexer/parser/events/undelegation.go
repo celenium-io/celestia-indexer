@@ -102,6 +102,6 @@ func processUndelegate(ctx *context.Context, events []storage.Event, msg *storag
 		}
 	}
 
-	*idx = len(events) - 1
+	toTheNextAction(events, idx)
 	return nil
 }
