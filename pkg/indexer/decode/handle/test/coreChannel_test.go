@@ -4,6 +4,7 @@
 package handle
 
 import (
+	"encoding/base64"
 	"testing"
 
 	"cosmossdk.io/math"
@@ -313,10 +314,12 @@ func TestDecodeMsg_SuccessOnMsgChannelCloseConfirm(t *testing.T) {
 }
 
 func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost(t *testing.T) {
+	raw, err := base64.StdEncoding.DecodeString("eyJkYXRhIjoiQ3VjQkNpa3ZhV0pqTG1Gd2NHeHBZMkYwYVc5dWN5NTBjbUZ1YzJabGNpNTJNUzVOYzJkVWNtRnVjMlpsY2hLNUFRb0lkSEpoYm5ObVpYSVNDV05vWVc1dVpXd3RPQm9QQ2dSMWRHbGhFZ2N5TlRnek1USXdJa05qWld4bGMzUnBZVEV6Y1dVNVpuaGpaRFl6ZVcwMVozUTBabU15TXpWMVoyUjJPWHA2YW1WcWRYZHJlVGRuYkhGeE9IaDBaR00yTm5JNVp6WnpialIyWm5JMktrSnVaWFYwY205dU1YRTNjR04wT1RONGJUaHhkVzV0Ym1wNWRUSm1aV1Y2YW5wdWFIbGxaSE5tT1RZNGRUY3ljRFp0WVRKdFkyYzNOVFYwTUhOMWMyd3laM1k0L1BPcm1QVEZwcVFZIiwibWVtbyI6IiIsInR5cGUiOiJUWVBFX0VYRUNVVEVfVFgifQ==")
+	require.NoError(t, err)
 	msg := &coreChannel.MsgRecvPacket{
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 		Packet: coreChannel.Packet{
-			Data:            []byte(`eyJkYXRhIjoiQ3VjQkNpa3ZhV0pqTG1Gd2NHeHBZMkYwYVc5dWN5NTBjbUZ1YzJabGNpNTJNUzVOYzJkVWNtRnVjMlpsY2hLNUFRb0lkSEpoYm5ObVpYSVNDV05vWVc1dVpXd3RPQm9QQ2dSMWRHbGhFZ2N5TlRnek1USXdJa05qWld4bGMzUnBZVEV6Y1dVNVpuaGpaRFl6ZVcwMVozUTBabU15TXpWMVoyUjJPWHA2YW1WcWRYZHJlVGRuYkhGeE9IaDBaR00yTm5JNVp6WnpialIyWm5JMktrSnVaWFYwY205dU1YRTNjR04wT1RONGJUaHhkVzV0Ym1wNWRUSm1aV1Y2YW5wdWFIbGxaSE5tT1RZNGRUY3ljRFp0WVRKdFkyYzNOVFYwTUhOMWMyd3laM1k0L1BPcm1QVEZwcVFZIiwibWVtbyI6IiIsInR5cGUiOiJUWVBFX0VYRUNVVEVfVFgifQ==`),
+			Data:            raw,
 			DestinationPort: "icahost",
 		},
 	}
@@ -375,7 +378,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost(t *testing.T) {
 		Type:      storageTypes.MsgRecvPacket,
 		TxId:      0,
 		Data:      data,
-		Size:      548,
+		Size:      426,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}

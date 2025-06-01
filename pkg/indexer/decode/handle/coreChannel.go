@@ -4,7 +4,6 @@
 package handle
 
 import (
-	"encoding/base64"
 	"strings"
 
 	"github.com/celenium-io/celestia-indexer/internal/math"
@@ -101,13 +100,8 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data types.PackedByt
 
 	switch m.Packet.DestinationPort {
 	case "icahost":
-		raw := make([]byte, base64.StdEncoding.DecodedLen(len(m.Packet.Data)))
-		if _, err := base64.StdEncoding.Decode(raw, m.Packet.Data); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "icahost base64 decode raw")
-		}
-
 		var packet icaTypes.InterchainAccountPacketData
-		if err := json.Unmarshal(raw, &packet); err != nil {
+		if err := json.Unmarshal(m.Packet.Data, &packet); err != nil {
 			return msgType, addresses, nil, nil, errors.Wrap(err, "InterchainAccountPacketData")
 		}
 
@@ -242,13 +236,8 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data types.Pack
 
 	switch m.Packet.SourcePort {
 	case "icahost":
-		raw := make([]byte, base64.StdEncoding.DecodedLen(len(m.Packet.Data)))
-		if _, err := base64.StdEncoding.Decode(raw, m.Packet.Data); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "icahost base64 decode raw")
-		}
-
 		var packet icaTypes.InterchainAccountPacketData
-		if err := json.Unmarshal(raw, &packet); err != nil {
+		if err := json.Unmarshal(m.Packet.Data, &packet); err != nil {
 			return msgType, addresses, nil, nil, errors.Wrap(err, "InterchainAccountPacketData")
 		}
 
