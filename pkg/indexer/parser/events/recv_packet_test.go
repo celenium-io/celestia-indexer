@@ -13,13 +13,13 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
+	"github.com/shopspring/decimal"
 
 	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	icaTypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
-
 	transferTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	"github.com/shopspring/decimal"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -906,6 +906,181 @@ func Test_handleRecvPacket(t *testing.T) {
 							"RevisionNumber": 2,
 						},
 						"Signer": "celestia1cts5d9a32lxprwvaw9xt00qnkvndhadp93lwjp",
+					},
+				},
+			},
+			idx: testsuite.Ptr(0),
+		}, {
+			name: "recv packet test 5",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 2476842,
+					Type:   "message",
+					Data: map[string]any{
+						"action": "/ibc.core.channel.v1.MsgRecvPacket",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "recv_packet",
+					Data: map[string]any{
+						"packet_channel_ordering":  "ORDER_ORDERED",
+						"packet_connection":        "connection-57",
+						"packet_data":              "{\"data\":\"CrcBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEpYBCkNjZWxlc3RpYTFuNWp1OG5xNHQ0NHRrbWEyYW1lNnhkZnN4MnRjdG03eDR4dXd4MG1keXRjenJhNHJ0Z2hzbDVlczVkEkNjZWxlc3RpYTE2OXl1cDU2eWR4MmE0MHhrZDcydzJ5cHFqanpnbWw2MnIzMDJ4bWxlN3QwMjY0NGFyazZxN3kweGU1GgoKBHV0aWESAjEzCrgBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEpcBCkNjZWxlc3RpYTFuNWp1OG5xNHQ0NHRrbWEyYW1lNnhkZnN4MnRjdG03eDR4dXd4MG1keXRjenJhNHJ0Z2hzbDVlczVkEkNjZWxlc3RpYTEyN2RocGhuMHM5cXZxODZxM3dxOTVseXM3Zm1hanlod3RkbDNlcjB3MDk0aGpoc3NjNjJzOTQ3cXNrGgsKBHV0aWESAzExNw==\",\"memo\":\"\",\"type\":\"TYPE_EXECUTE_TX\"}",
+						"packet_data_hex":          "7b2264617461223a2243726342436877765932397a6257397a4c6d4a68626d7375646a46695a5852684d53354e633264545a57356b45705942436b4e6a5a57786c63335270595446754e5770314f4735784e4851304e485272625745795957316c4e6e686b5a6e4e344d6e526a6447303365445234645864344d47316b6558526a656e4a684e484a305a32687a6244566c637a566b456b4e6a5a57786c63335270595445324f586c3163445532655752344d6d45304d4868725a446379647a4a3563484671616e706e625777324d6e497a4d444a346257786c4e3351774d6a59304e474679617a5a784e336b776547553147676f4b4248563061574553416a457a43726742436877765932397a6257397a4c6d4a68626d7375646a46695a5852684d53354e633264545a57356b45706342436b4e6a5a57786c63335270595446754e5770314f4735784e4851304e485272625745795957316c4e6e686b5a6e4e344d6e526a6447303365445234645864344d47316b6558526a656e4a684e484a305a32687a6244566c637a566b456b4e6a5a57786c63335270595445794e32526f634768754d484d3563585a784f445a784d3364784f54567365584d335a6d3168616e6c6f6433526b62444e6c636a42334d446b306147706f63334e6a4e6a4a7a4f54513363584e724767734b4248563061574553417a45784e773d3d222c226d656d6f223a22222c2274797065223a22545950455f455845435554455f5458227d",
+						"packet_dst_channel":       "channel-46",
+						"packet_dst_port":          "icahost",
+						"packet_sequence":          "1",
+						"packet_src_channel":       "channel-27",
+						"packet_src_port":          "icacontroller-reward-utia",
+						"packet_timeout_height":    "0-0",
+						"packet_timeout_timestamp": "1727907245329855685",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "message",
+					Data: map[string]any{
+						"module": "ibc_channel",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":  "13utia",
+						"spender": "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":   "13utia",
+						"receiver": "celestia169yup56ydx2a40xkd72w2ypqjjzgml62r302xmle7t02644ark6q7y0xe5",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "13utia",
+						"recipient": "celestia169yup56ydx2a40xkd72w2ypqjjzgml62r302xmle7t02644ark6q7y0xe5",
+						"sender":    "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "message",
+					Data: map[string]any{
+						"sender": "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "message",
+					Data: map[string]any{
+						"module": "bank",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":  "117utia",
+						"spender": "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":   "117utia",
+						"receiver": "celestia127dhphn0s9qvq86q3wq95lys7fmajyhwtdl3er0w094hjhssc62s947qsk",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "117utia",
+						"recipient": "celestia127dhphn0s9qvq86q3wq95lys7fmajyhwtdl3er0w094hjhssc62s947qsk",
+						"sender":    "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "message",
+					Data: map[string]any{
+						"sender": "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "message",
+					Data: map[string]any{
+						"module": "bank",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "ics27_packet",
+					Data: map[string]any{
+						"host_channel_id": "channel-46",
+						"module":          "interchainaccounts",
+						"success":         "true",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "write_acknowledgement",
+					Data: map[string]any{
+						"packet_ack":               "{\"result\":\"EiYKJC9jb3Ntb3MuYmFuay52MWJldGExLk1zZ1NlbmRSZXNwb25zZRImCiQvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kUmVzcG9uc2U=\"}",
+						"packet_ack_hex":           "7b22726573756c74223a224569594b4a43396a62334e7462334d75596d4675617935324d574a6c644745784c6b317a5a314e6c626d52535a584e776232357a5a52496d436951765932397a6257397a4c6d4a68626d7375646a46695a5852684d53354e633264545a57356b556d567a634739756332553d227d",
+						"packet_connection":        "connection-57",
+						"packet_data":              "{\"data\":\"CrcBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEpYBCkNjZWxlc3RpYTFuNWp1OG5xNHQ0NHRrbWEyYW1lNnhkZnN4MnRjdG03eDR4dXd4MG1keXRjenJhNHJ0Z2hzbDVlczVkEkNjZWxlc3RpYTE2OXl1cDU2eWR4MmE0MHhrZDcydzJ5cHFqanpnbWw2MnIzMDJ4bWxlN3QwMjY0NGFyazZxN3kweGU1GgoKBHV0aWESAjEzCrgBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEpcBCkNjZWxlc3RpYTFuNWp1OG5xNHQ0NHRrbWEyYW1lNnhkZnN4MnRjdG03eDR4dXd4MG1keXRjenJhNHJ0Z2hzbDVlczVkEkNjZWxlc3RpYTEyN2RocGhuMHM5cXZxODZxM3dxOTVseXM3Zm1hanlod3RkbDNlcjB3MDk0aGpoc3NjNjJzOTQ3cXNrGgsKBHV0aWESAzExNw==\",\"memo\":\"\",\"type\":\"TYPE_EXECUTE_TX\"}",
+						"packet_data_hex":          "7b2264617461223a2243726342436877765932397a6257397a4c6d4a68626d7375646a46695a5852684d53354e633264545a57356b45705942436b4e6a5a57786c63335270595446754e5770314f4735784e4851304e485272625745795957316c4e6e686b5a6e4e344d6e526a6447303365445234645864344d47316b6558526a656e4a684e484a305a32687a6244566c637a566b456b4e6a5a57786c63335270595445324f586c3163445532655752344d6d45304d4868725a446379647a4a3563484671616e706e625777324d6e497a4d444a346257786c4e3351774d6a59304e474679617a5a784e336b776547553147676f4b4248563061574553416a457a43726742436877765932397a6257397a4c6d4a68626d7375646a46695a5852684d53354e633264545a57356b45706342436b4e6a5a57786c63335270595446754e5770314f4735784e4851304e485272625745795957316c4e6e686b5a6e4e344d6e526a6447303365445234645864344d47316b6558526a656e4a684e484a305a32687a6244566c637a566b456b4e6a5a57786c63335270595445794e32526f634768754d484d3563585a784f445a784d3364784f54567365584d335a6d3168616e6c6f6433526b62444e6c636a42334d446b306147706f63334e6a4e6a4a7a4f54513363584e724767734b4248563061574553417a45784e773d3d222c226d656d6f223a22222c2274797065223a22545950455f455845435554455f5458227d",
+						"packet_dst_channel":       "channel-46",
+						"packet_dst_port":          "icahost",
+						"packet_sequence":          "1",
+						"packet_src_channel":       "channel-27",
+						"packet_src_port":          "icacontroller-reward-utia",
+						"packet_timeout_height":    "0-0",
+						"packet_timeout_timestamp": "1727907245329855685",
+					},
+				}, {
+					Height: 2476842,
+					Type:   "message",
+					Data: map[string]any{
+						"module": "ibc_channel",
+					},
+				},
+			},
+			msg: []*storage.Message{
+				{
+					Type:   types.MsgRecvPacket,
+					Height: 2476842,
+					Data: map[string]any{
+						"Packet": map[string]any{
+							"Data": map[string]any{
+								"Memo": "",
+								"Type": icaTypes.EXECUTE_TX,
+								"Data": []cosmosTypes.Msg{
+									&cosmosBankTypes.MsgSend{
+										FromAddress: "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
+										ToAddress:   "celestia169yup56ydx2a40xkd72w2ypqjjzgml62r302xmle7t02644ark6q7y0xe5",
+										Amount:      cosmosTypes.NewCoins(cosmosTypes.NewCoin("utia", math.NewInt(113))),
+									},
+									&cosmosBankTypes.MsgSend{
+										FromAddress: "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
+										ToAddress:   "celestia127dhphn0s9qvq86q3wq95lys7fmajyhwtdl3er0w094hjhssc62s947qsk",
+										Amount:      cosmosTypes.NewCoins(cosmosTypes.NewCoin("utia", math.NewInt(117))),
+									},
+								},
+							},
+							"DestinationChannel": "channel-44",
+							"DestinationPort":    "icahost",
+							"Sequence":           14,
+							"SourceChannel":      "channel-210",
+							"SourcePort":         "icacontroller-celestia.performance",
+							"TimeoutHeight": map[string]any{
+								"RevisionHeight": 0,
+								"RevisionNumber": 0,
+							},
+							"TimeoutTimestamp": 1727402253142295600,
+						},
+						"ProofHeight": map[string]any{
+							"RevisionHeight": 2243980,
+							"RevisionNumber": 1,
+						},
+						"Signer": "celestia1cla57nqkvv9c76744lkyzrzael536gxf7uxnmy",
 					},
 				},
 			},

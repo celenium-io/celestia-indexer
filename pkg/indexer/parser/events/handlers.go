@@ -41,7 +41,7 @@ var eventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgRecvPacket:                  handleRecvPacket,
 }
 
-func handle(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int, eventHandlers map[storageTypes.MsgType]EventHandler) error {
+func handle(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int, eventHandlers map[storageTypes.MsgType]EventHandler, stopKey string) error {
 	if handler, ok := eventHandlers[msg.Type]; ok {
 		return handler(ctx, events, msg, idx)
 	}
@@ -55,7 +55,7 @@ func handle(ctx *context.Context, events []storage.Event, msg *storage.Message, 
 			*idx++
 			continue
 		}
-		if action := decoder.StringFromMap(event.Data, "action"); action == "" {
+		if action := decoder.StringFromMap(event.Data, stopKey); action == stopKey {
 			*idx++
 			continue
 		}
@@ -66,7 +66,7 @@ func handle(ctx *context.Context, events []storage.Event, msg *storage.Message, 
 }
 
 func Handle(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	return handle(ctx, events, msg, idx, eventHandlers)
+	return handle(ctx, events, msg, idx, eventHandlers, "action")
 }
 
 var ibcEventHandlers = map[storageTypes.MsgType]EventHandler{
