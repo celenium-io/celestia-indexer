@@ -34,6 +34,14 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 		msg.IbcChannel = nil
 		return nil
 	}
+	*idx += 2
+
+	if events[*idx].Type == storageTypes.EventTypeWriteAcknowledgement {
+		*idx += 2
+		msg.IbcTransfer = nil
+		msg.IbcChannel = nil
+		return nil
+	}
 
 	packet, err := decoder.Map(msg.Data, "Packet")
 	if err != nil {
