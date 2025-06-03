@@ -22,7 +22,7 @@ func handleRecvPacket(ctx *context.Context, events []storage.Event, msg *storage
 	action := decoder.StringFromMap(events[*idx].Data, "action")
 	isValidMsg := action == "/ibc.core.channel.v1.MsgRecvPacket"
 	if !isValidMsg {
-		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
+		return errors.Errorf("unexpected event action %s for message type %s (idx=%d, event=%s)", action, msg.Type.String(), *idx, events[*idx].Type)
 	}
 	*idx += 1
 	return processRecvPacket(ctx, events, msg, idx)
