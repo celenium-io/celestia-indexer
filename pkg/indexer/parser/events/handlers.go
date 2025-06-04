@@ -55,7 +55,7 @@ func handle(ctx *context.Context, events []storage.Event, msg *storage.Message, 
 			*idx++
 			continue
 		}
-		if action := decoder.StringFromMap(event.Data, stopKey); action == stopKey {
+		if action := decoder.StringFromMap(event.Data, stopKey); action == "" {
 			*idx++
 			continue
 		}
