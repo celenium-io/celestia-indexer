@@ -40,6 +40,7 @@ const (
 type Module struct {
 	modules.BaseModule
 	api              node.Api
+	cosmosApi        node.CosmosApi
 	ws               *http.HTTP
 	cfg              config.Indexer
 	blocks           chan types.BlockData
@@ -56,7 +57,7 @@ type Module struct {
 
 var _ modules.Module = (*Module)(nil)
 
-func NewModule(cfg config.Indexer, api node.Api, ws *http.HTTP, state *storage.State) Module {
+func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *http.HTTP, state *storage.State) Module {
 	level := types.Level(cfg.StartLevel)
 	var lastHash []byte
 	if state != nil {
@@ -67,6 +68,7 @@ func NewModule(cfg config.Indexer, api node.Api, ws *http.HTTP, state *storage.S
 	receiver := Module{
 		BaseModule:   modules.New("receiver"),
 		api:          api,
+		cosmosApi:    cosmosApi,
 		ws:           ws,
 		cfg:          cfg,
 		blocks:       make(chan types.BlockData, 128),

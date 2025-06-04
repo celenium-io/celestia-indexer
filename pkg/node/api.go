@@ -28,3 +28,8 @@ type DalApi interface {
 	Blobs(ctx context.Context, height pkgTypes.Level, hash ...string) ([]types.Blob, error)
 	Blob(ctx context.Context, height pkgTypes.Level, namespace, commitment string) (types.Blob, error)
 }
+
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
+type CosmosApi interface {
+	ModuleAccounts(ctx context.Context) ([]types.Account, error)
+}

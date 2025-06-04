@@ -13,10 +13,11 @@ import (
 //
 //	@Description	Celestia address information
 type Address struct {
-	Id         uint64         `example:"321"                                             json:"id"           swaggertype:"integer"`
-	Height     pkgTypes.Level `example:"100"                                             json:"first_height" swaggertype:"integer"`
-	LastHeight pkgTypes.Level `example:"100"                                             json:"last_height"  swaggertype:"integer"`
-	Hash       string         `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"hash"         swaggertype:"string"`
+	Id         uint64         `example:"321"                                             json:"id"             swaggertype:"integer"`
+	Height     pkgTypes.Level `example:"100"                                             json:"first_height"   swaggertype:"integer"`
+	LastHeight pkgTypes.Level `example:"100"                                             json:"last_height"    swaggertype:"integer"`
+	Hash       string         `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"hash"           swaggertype:"string"`
+	Name       string         `example:"bonded_tokens_pool"                              json:"name,omitempty" swaggertype:"string"`
 	Balance    Balance        `json:"balance"`
 
 	Celestials *Celestial `json:"celestials,omitempty"`
@@ -28,6 +29,7 @@ func NewAddress(addr storage.Address) Address {
 		Height:     addr.Height,
 		LastHeight: addr.LastHeight,
 		Hash:       addr.Address,
+		Name:       addr.Name,
 		Balance: Balance{
 			Currency:  addr.Balance.Currency,
 			Spendable: addr.Balance.Spendable.String(),
