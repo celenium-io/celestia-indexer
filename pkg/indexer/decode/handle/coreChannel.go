@@ -112,7 +112,9 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data types.PackedByt
 
 		var tx icaTypes.CosmosTx
 		if err := codec.Unmarshal(packet.Data, &tx); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "icaTypes.CosmosTx")
+			if err := codec.UnmarshalJSON(packet.Data, &tx); err != nil {
+				return msgType, addresses, nil, nil, errors.Wrap(err, "icaTypes.CosmosTx")
+			}
 		}
 
 		msgs := make([]cosmosTypes.Msg, len(tx.Messages))
@@ -248,7 +250,9 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data types.Pack
 
 		var tx icaTypes.CosmosTx
 		if err := codec.Unmarshal(packet.Data, &tx); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "icaTypes.CosmosTx")
+			if err := codec.UnmarshalJSON(packet.Data, &tx); err != nil {
+				return msgType, addresses, nil, nil, errors.Wrap(err, "icaTypes.CosmosTx")
+			}
 		}
 
 		msgs := make([]cosmosTypes.Msg, len(tx.Messages))
