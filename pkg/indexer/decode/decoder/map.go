@@ -10,6 +10,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/cosmos/cosmos-sdk/types"
+	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	channelTypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	tmTypes "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/pkg/errors"
@@ -33,6 +34,18 @@ func DecimalFromMap(m map[string]any, key string) decimal.Decimal {
 
 func Amount(m map[string]any) decimal.Decimal {
 	return DecimalFromMap(m, "amount")
+}
+
+func Map(m map[string]any, key string) (map[string]any, error) {
+	val, ok := m[key]
+	if !ok {
+		return nil, errors.Errorf("can't find key: %s", key)
+	}
+	result, ok := val.(map[string]any)
+	if !ok {
+		return nil, errors.Errorf("value of '%s' is not map: %##v", key, val)
+	}
+	return result, nil
 }
 
 func StringFromMap(m map[string]any, key string) string {
@@ -183,4 +196,16 @@ func RevisionHeightFromMap(m map[string]any, key string) (uint64, uint64, error)
 	}
 
 	return revision, height, nil
+}
+
+func MessagesFromMap(m map[string]any, key string) ([]cosmosTypes.Msg, error) {
+	val, ok := m[key]
+	if !ok {
+		return nil, errors.Errorf("can't find key: %s", key)
+	}
+	msgs, ok := val.([]cosmosTypes.Msg)
+	if !ok {
+		return nil, errors.Errorf("key '%s' is not a messages", key)
+	}
+	return msgs, nil
 }

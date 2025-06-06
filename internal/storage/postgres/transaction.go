@@ -132,7 +132,7 @@ func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...*models.Ad
 	}
 
 	_, err := tx.Tx().NewInsert().Model(&addr).
-		Column("address", "height", "last_height", "hash").
+		Column("address", "height", "last_height", "hash", "name").
 		On("CONFLICT ON CONSTRAINT address_idx DO UPDATE").
 		Set("last_height = EXCLUDED.last_height").
 		Returning("xmax, id").

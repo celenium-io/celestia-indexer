@@ -58,6 +58,7 @@ func TestParseAccounts(t *testing.T) {
 			LastHeight: 1,
 			Hash:       []byte{0x4f, 0xea, 0x76, 0x42, 0x7b, 0x83, 0x45, 0x86, 0x1e, 0x80, 0xa3, 0x54, 0xa, 0x8a, 0x9d, 0x93, 0x6f, 0xd3, 0x93, 0x91},
 			Balance:    storage.EmptyBalance(),
+			Name:       "bonded_tokens_pool",
 		},
 		"celestia10n95tmwqtc5ua47m9vu52p7xwcf6gcdtjj9rfh": {
 			Address:    "celestia10n95tmwqtc5ua47m9vu52p7xwcf6gcdtjj9rfh",

@@ -67,7 +67,7 @@ func (module *Module) listen(ctx context.Context) {
 				module.Log.Warn().Msg("can't read message from input")
 				return
 			}
-			genesis, ok := msg.(types.Genesis)
+			genesis, ok := msg.(types.GenesisOutput)
 			if !ok {
 				module.Log.Warn().Msgf("invalid message type: %T", msg)
 				return

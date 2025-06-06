@@ -23,12 +23,14 @@ const testIndexerName = "test_indexer"
 // ModuleTestSuite -
 type ModuleTestSuite struct {
 	suite.Suite
-	api *mock.MockApi
+	api       *mock.MockApi
+	cosmosApi *mock.MockCosmosApi
 }
 
 func (s *ModuleTestSuite) InitApi(configureApi func()) {
 	ctrl := gomock.NewController(s.T())
 	s.api = mock.NewMockApi(ctrl)
+	s.cosmosApi = mock.NewMockCosmosApi(ctrl)
 
 	if configureApi != nil {
 		configureApi()
@@ -50,7 +52,7 @@ func (s *ModuleTestSuite) createModule() Module {
 		LastTime:   time.Time{},
 		ChainId:    "explorer-test",
 	}
-	receiverModule := NewModule(cfgDefault, s.api, nil, &state)
+	receiverModule := NewModule(cfgDefault, s.api, s.cosmosApi, nil, &state)
 	receiverModule.w = NewWorker(s.api, receiverModule.Log, receiverModule.blocks, 5)
 
 	return receiverModule
@@ -62,7 +64,7 @@ func (s *ModuleTestSuite) createModuleEmptyState(cfgOptional *ic.Indexer) Module
 		cfg = *cfgOptional
 	}
 
-	receiverModule := NewModule(cfg, s.api, nil, nil)
+	receiverModule := NewModule(cfg, s.api, s.cosmosApi, nil, nil)
 	receiverModule.w = NewWorker(s.api, receiverModule.Log, receiverModule.blocks, 5)
 	return receiverModule
 }

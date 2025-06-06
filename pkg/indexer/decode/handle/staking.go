@@ -74,7 +74,7 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 		validator.Stake = amount
 
 		address := storage.Address{
-			Address: m.ValidatorAddress,
+			Address: addr.String(),
 			Balance: storage.Balance{
 				Currency:  currency.DefaultCurrency,
 				Spendable: decimal.Zero,

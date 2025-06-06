@@ -11,6 +11,12 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
+type GenesisOutput struct {
+	Genesis
+
+	ModuleAccs []Account
+}
+
 type Genesis struct {
 	GenesisTime     time.Time             `json:"genesis_time"`
 	ChainID         string                `json:"chain_id"`
@@ -43,7 +49,7 @@ type BaseVestingAccount struct {
 	EndTime          int64       `json:"end_time,string,omitempty"`
 }
 
-type Accounts struct {
+type Account struct {
 	Type               string             `json:"@type"`
 	Address            string             `json:"address,omitempty"`
 	PubKey             interface{}        `json:"pub_key,omitempty"`
@@ -64,7 +70,7 @@ type VestingPeriod struct {
 
 type Auth struct {
 	Params   AuthParams `json:"params"`
-	Accounts []Accounts `json:"accounts"`
+	Accounts []Account  `json:"accounts"`
 }
 
 type Authz struct {

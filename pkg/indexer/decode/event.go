@@ -328,6 +328,7 @@ type FungibleTokenPacket struct {
 	Receiver string
 	Sender   string
 	Success  string
+	Error    string
 }
 
 func NewFungibleTokenPacket(m map[string]any) (ftp FungibleTokenPacket) {
@@ -338,6 +339,7 @@ func NewFungibleTokenPacket(m map[string]any) (ftp FungibleTokenPacket) {
 	ftp.Receiver = decoder.StringFromMap(m, "receiver")
 	ftp.Sender = decoder.StringFromMap(m, "sender")
 	ftp.Success = decoder.StringFromMap(m, "success")
+	ftp.Error = decoder.StringFromMap(m, "error")
 	return
 }
 

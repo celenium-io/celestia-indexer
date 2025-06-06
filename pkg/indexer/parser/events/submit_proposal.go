@@ -52,9 +52,9 @@ func processSubmitProposal(ctx *context.Context, events []storage.Event, msg *st
 			msg.Proposal.Status = types.ProposalStatusActive
 			msg.Proposal.ActivationTime = &ctx.Block.Time
 		}
-		*idx += 1
 	}
 	ctx.AddProposal(msg.Proposal)
 
+	toTheNextAction(events, idx)
 	return nil
 }

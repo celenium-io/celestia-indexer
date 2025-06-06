@@ -90,9 +90,8 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 				Type:      storageTypes.StakingLogTypeUnbonding,
 			})
 		}
-
 	}
 
-	*idx = len(events) - 1
+	toTheNextAction(events, idx)
 	return nil
 }
