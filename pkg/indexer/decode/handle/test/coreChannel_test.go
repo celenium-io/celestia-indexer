@@ -15,6 +15,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
+	bankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	icaTypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
 	ibcTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	transferTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
@@ -379,6 +380,80 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost(t *testing.T) {
 		TxId:      0,
 		Data:      data,
 		Size:      426,
+		Namespace: nil,
+		Addresses: addressesExpected,
+	}
+
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.Equal(t, addressesExpected, dm.Addresses)
+}
+
+func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost2(t *testing.T) {
+	raw, err := base64.StdEncoding.DecodeString("eyJkYXRhIjoiZXlKdFpYTnpZV2RsY3lJNlczc2lRSFI1Y0dVaU9pSXZZMjl6Ylc5ekxtSmhibXN1ZGpGaVpYUmhNUzVOYzJkVFpXNWtJaXdpWm5KdmJWOWhaR1J5WlhOeklqb2lZMjl6Ylc5ek1UVmpZM05vYUcxd01HZHplREk1Y1hCeGNUWm5OSHB0YkhSdWJuWm5iWGwxT1hWbGRXRmthRGw1TW01ak5YcHFNSE42YkhNMVozUmtaSG9pTENKMGIxOWhaR1J5WlhOeklqb2lZMjl6Ylc5ek1UQm9PWE4wWXpWMk5tNTBaMlY1WjJZMWVHWTVORFZ1YW5GeE5XZ3pNbkkxTTNWeGRYWjNJaXdpWVcxdmRXNTBJanBiZXlKa1pXNXZiU0k2SW5OMFlXdGxJaXdpWVcxdmRXNTBJam9pTVRBd01DSjlYWDFkZlE9PSIsIm1lbW8iOiJtZW1vIiwidHlwZSI6IlRZUEVfRVhFQ1VURV9UWCJ9")
+	require.NoError(t, err)
+	msg := &coreChannel.MsgRecvPacket{
+		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		Packet: coreChannel.Packet{
+			Data:               raw,
+			DestinationPort:    "icahost",
+			DestinationChannel: "channel-1",
+			Sequence:           1,
+			SourceChannel:      "channel-4310",
+			SourcePort:         "icacontroller-cosmos1epqzuh6myrwrp4zr8zjamcye4nvkkg9xd8ywak",
+			TimeoutTimestamp:   1725050827576431600,
+		},
+	}
+	block, now := testsuite.EmptyBlock()
+	position := 0
+
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
+
+	addressesExpected := []storage.AddressWithType{
+		{
+			Type: storageTypes.MsgAddressTypeSigner,
+			Address: storage.Address{
+				Id:         0,
+				Height:     block.Height,
+				LastHeight: block.Height,
+				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
+				Balance:    storage.EmptyBalance(),
+			},
+		},
+	}
+
+	data := structs.Map(msg)
+	packet, ok := data["Packet"].(map[string]any)
+	require.True(t, ok)
+	packet["Data"] = map[string]any{
+		"Memo": "memo",
+		"Type": icaTypes.EXECUTE_TX,
+		"Data": []cosmosTypes.Msg{
+			&bankTypes.MsgSend{
+				FromAddress: "cosmos15ccshhmp0gsx29qpqq6g4zmltnnvgmyu9ueuadh9y2nc5zj0szls5gtddz",
+				ToAddress:   "cosmos10h9stc5v6ntgeygf5xf945njqq5h32r53uquvw",
+				Amount:      cosmosTypes.NewCoins(cosmosTypes.NewCoin("stake", math.NewInt(1000))),
+			},
+		},
+	}
+
+	msgExpected := storage.Message{
+		Id:        0,
+		Height:    block.Height,
+		Time:      now,
+		Position:  0,
+		Type:      storageTypes.MsgRecvPacket,
+		TxId:      0,
+		Data:      data,
+		Size:      544,
 		Namespace: nil,
 		Addresses: addressesExpected,
 	}
