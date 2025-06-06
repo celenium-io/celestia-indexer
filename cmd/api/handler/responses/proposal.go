@@ -46,7 +46,7 @@ type Proposal struct {
 	NoWithVetoVotingPower string `example:"1000000000" format:"string" json:"no_with_veto_voting_power" swaggertype:"string"`
 	AbstainVotingPower    string `example:"1000000000" format:"string" json:"abstain_voting_power"      swaggertype:"string"`
 
-	Changes  json.RawMessage `json:"changes,omitempty"`
+	Changes  json.RawMessage `json:"changes,omitempty"  swaggerignore:"true"`
 	Proposer *ShortAddress   `json:"proposer,omitempty"`
 }
 
