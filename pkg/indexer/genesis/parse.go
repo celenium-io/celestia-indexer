@@ -121,7 +121,9 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 	}
 
 	module.parseDenomMetadata(genesis.AppState.Bank.DenomMetadata, &data)
-	module.parseConstants(genesis.AppState, genesis.ConsensusParams, &data)
+	if err := module.parseConstants(genesis.AppState, genesis.ConsensusParams, &data); err != nil {
+		return data, errors.Wrap(err, "parse constants")
+	}
 
 	module.parseTotalSupply(genesis.AppState.Bank.Supply, &block)
 

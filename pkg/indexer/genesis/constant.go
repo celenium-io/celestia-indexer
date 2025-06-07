@@ -6,14 +6,16 @@ package genesis
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/pkg/errors"
 )
 
-func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes.ConsensusParams, data *parsedData) {
+func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes.ConsensusParams, data *parsedData) error {
 	// consensus
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameConsensus,
@@ -38,7 +40,7 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameConsensus,
 		Name:   "evidence_max_age_duration",
-		Value:  consensus.Evidence.MaxAgeDuration.String(),
+		Value:  strconv.FormatInt(consensus.Evidence.MaxAgeDuration.Nanoseconds(), 10),
 	})
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameConsensus,
@@ -122,15 +124,27 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 			Value:  appState.Gov.DepositParams.MinDeposit[0].String(),
 		})
 	}
+
+	maxDepositPeriod, err := time.ParseDuration(appState.Gov.DepositParams.MaxDepositPeriod)
+	if err != nil {
+		return errors.Wrap(err, "max deposit period")
+	}
+
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameGov,
 		Name:   "max_deposit_period",
-		Value:  appState.Gov.DepositParams.MaxDepositPeriod,
+		Value:  strconv.FormatInt(maxDepositPeriod.Nanoseconds(), 10),
 	})
+
+	votingPower, err := time.ParseDuration(appState.Gov.VotingParams.VotingPeriod)
+	if err != nil {
+		return errors.Wrap(err, "voting power")
+	}
+
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameGov,
 		Name:   "voting_period",
-		Value:  appState.Gov.VotingParams.VotingPeriod,
+		Value:  strconv.FormatInt(votingPower.Nanoseconds(), 10),
 	})
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameGov,
@@ -159,10 +173,14 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 		Name:   "min_signed_per_window",
 		Value:  appState.Slashing.Params.MinSignedPerWindow,
 	})
+	downtimeJailDuration, err := time.ParseDuration(appState.Slashing.Params.DowntimeJailDuration)
+	if err != nil {
+		return errors.Wrap(err, "DowntimeJailDuration")
+	}
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameSlashing,
 		Name:   "downtime_jail_duration",
-		Value:  appState.Slashing.Params.DowntimeJailDuration,
+		Value:  strconv.FormatInt(downtimeJailDuration.Nanoseconds(), 10),
 	})
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameSlashing,
@@ -176,10 +194,15 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 	})
 
 	// staking
+	unbondingTime, err := time.ParseDuration(appState.Staking.Params.UnbondingTime)
+	if err != nil {
+		return errors.Wrap(err, "unbonding time")
+	}
+
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameStaking,
 		Name:   "unbonding_time",
-		Value:  appState.Staking.Params.UnbondingTime,
+		Value:  strconv.FormatInt(unbondingTime.Nanoseconds(), 10),
 	})
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameStaking,
@@ -206,4 +229,6 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 		Name:   "min_commission_rate",
 		Value:  appState.Staking.Params.MinCommissionRate,
 	})
+
+	return nil
 }
