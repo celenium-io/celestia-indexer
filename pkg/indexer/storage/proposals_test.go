@@ -4,6 +4,7 @@
 package storage
 
 import (
+	"context"
 	"database/sql"
 	"testing"
 
@@ -23,28 +24,28 @@ func TestUpdateConstants(t *testing.T) {
 		typ      types.ProposalType
 	}{
 		{
-			// 	name: "not applied",
-			// 	proposal: &storage.Proposal{
-			// 		Id:     1,
-			// 		Status: types.ProposalStatusActive,
-			// 	},
-			// 	typ: types.ProposalTypeParamChanged,
-			// }, {
-			// 	name: "not param changed",
-			// 	proposal: &storage.Proposal{
-			// 		Id:     1,
-			// 		Status: types.ProposalStatusApplied,
-			// 	},
-			// 	typ: types.ProposalTypeClientUpdate,
-			// }, {
-			// 	name: "param changed",
-			// 	proposal: &storage.Proposal{
-			// 		Id:      1,
-			// 		Status:  types.ProposalStatusApplied,
-			// 		Changes: []byte(`[{"subspace":"staking","key":"MaxValidators","value":"105"}]`),
-			// 	},
-			// 	typ: types.ProposalTypeParamChanged,
-			// }, {
+			name: "not applied",
+			proposal: &storage.Proposal{
+				Id:     1,
+				Status: types.ProposalStatusActive,
+			},
+			typ: types.ProposalTypeParamChanged,
+		}, {
+			name: "not param changed",
+			proposal: &storage.Proposal{
+				Id:     1,
+				Status: types.ProposalStatusApplied,
+			},
+			typ: types.ProposalTypeClientUpdate,
+		}, {
+			name: "param changed",
+			proposal: &storage.Proposal{
+				Id:      1,
+				Status:  types.ProposalStatusApplied,
+				Changes: []byte(`[{"subspace":"staking","key":"MaxValidators","value":"105"}]`),
+			},
+			typ: types.ProposalTypeParamChanged,
+		}, {
 			name: "param changed: 2 changes",
 			proposal: &storage.Proposal{
 				Id:      1,
@@ -186,6 +187,11 @@ func TestFillProposalVotingPower(t *testing.T) {
 			}}, nil).
 			Times(1)
 
+		validators.EXPECT().
+			TotalVotingPower(gomock.Any()).
+			Return(decimal.RequireFromString("10000"), nil).
+			Times(1)
+
 		tx.EXPECT().
 			BondedValidators(t.Context(), 100).
 			Return([]storage.Validator{{
@@ -249,5 +255,32 @@ func TestFillProposalVotingPower(t *testing.T) {
 		require.Equal(t, "40", filled[0].AbstainVotingPower.String())
 		require.Equal(t, "50", filled[0].NoVotingPower.String())
 		require.Equal(t, "10", filled[0].YesVotingPower.String())
+	})
+}
+
+func TestModule_getConstantDuration(t *testing.T) {
+	t.Run("get constant", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		constants := mock.NewMockIConstant(ctrl)
+		validators := mock.NewMockIValidator(ctrl)
+
+		ctx, cancel := context.WithCancel(t.Context())
+		defer cancel()
+
+		constants.EXPECT().
+			Get(gomock.Any(), types.ModuleNameGov, "voting_period").
+			Return(storage.Constant{
+				Module: types.ModuleNameGov,
+				Name:   "voting_period",
+				Value:  "86400000000000",
+			}, nil).
+			Times(1)
+
+		module := NewModule(nil, constants, validators, nil, config.Indexer{})
+		got, err := module.getConstantDuration(ctx, types.ModuleNameGov, "voting_period")
+		require.NoError(t, err)
+		require.EqualValues(t, "24h0m0s", got.String())
 	})
 }

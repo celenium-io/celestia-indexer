@@ -22,11 +22,16 @@
   no_with_veto_addrs: 0
   abstain_addrs: 1
   changes: 0x0001
+  total_voting_power: 0
   voting_power: 0
   yes_voting_power: 0
   no_voting_power: 0
   no_with_veto_voting_power: 0
   abstain_voting_power: 0
+  quorum:
+  veto_quorum:
+  threshold:
+  min_deposit:
 - id: 2
   proposer_id: 2
   height: 1001
@@ -36,6 +41,8 @@
   type: community_pool_spend
   created_at: '2023-06-04T03:10:57+00:00'
   deposit_time: '2023-06-06T03:10:57+00:00'
+  activation_time: '2023-06-04T03:13:57+00:00'
+  end_time: '2023-06-06T03:13:57+00:00'
   deposit: 10000
   votes_count: 16
   yes: 10
@@ -51,8 +58,13 @@
   no_with_veto_addrs: 0
   abstain_addrs: 1
   changes: 0x0001
+  total_voting_power: 0
   voting_power: 0
   yes_voting_power: 0
   no_voting_power: 0
   no_with_veto_voting_power: 0
   abstain_voting_power: 0
+  quorum:
+  veto_quorum:
+  threshold:
+  min_deposit:

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 PK Lab AG <contact@pklab.io>
+// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
 // SPDX-License-Identifier: MIT
 
 package migrations
@@ -10,6 +10,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"github.com/uptrace/bun"
 )
 
@@ -37,7 +38,8 @@ func upConstantsFormat(ctx context.Context, db *bun.DB) error {
 	for i := range constants {
 		value, err := time.ParseDuration(constants[i].Value)
 		if err != nil {
-			return errors.Wrapf(err, "parsing constant: %s", constants[i].Name)
+			log.Err(err).Str("name", constants[i].Name).Msg("parsing constant")
+			continue
 		}
 
 		_, err = db.NewUpdate().
