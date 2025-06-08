@@ -370,6 +370,11 @@ func (s *IbcTestSuite) TestListTransfers() {
 				},
 				Sequence: 123456,
 				Tx:       &testTx,
+				Connection: &storage.IbcConnection{
+					Client: &storage.IbcClient{
+						ChainId: "chain-id",
+					},
+				},
 			},
 		}, nil).
 		Times(1)
@@ -399,4 +404,5 @@ func (s *IbcTestSuite) TestListTransfers() {
 	s.Require().EqualValues("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2", transfer.Receiver.Hash)
 	s.Require().NotNil(transfer.Sender)
 	s.Require().EqualValues(testAddress, transfer.Sender.Hash)
+	s.Require().Equal("chain-id", transfer.ChainId)
 }
