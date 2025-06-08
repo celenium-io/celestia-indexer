@@ -1096,6 +1096,9 @@ func Test_handleRecvPacket(t *testing.T) {
 			for i := range tt.msg {
 				err := handleRecvPacket(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
+				if tt.msg[i].IbcTransfer != nil {
+					require.NotEmpty(t, tt.msg[i].IbcTransfer.ConnectionId)
+				}
 			}
 		})
 	}

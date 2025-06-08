@@ -181,6 +181,7 @@ type IbcTransfer struct {
 	TimeoutHeight uint64         `example:"100"                                                              format:"integer"   json:"timeout_height,omitempty" swaggertype:"integer"`
 	TxHash        string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"                  swaggertype:"string"`
 	Sequence      uint64         `example:"123456"                                                           format:"integer"   json:"sequence"                 swaggertype:"integer"`
+	ChainId       string         `example:"osmosis-1"                                                        format:"binary"    json:"chain_id"                 swaggertype:"string"`
 
 	Sender   *ShortAddress `json:"sender,omitempty"`
 	Receiver *ShortAddress `json:"receiver,omitempty"`
@@ -218,6 +219,10 @@ func NewIbcTransfer(transfer storage.IbcTransfer) IbcTransfer {
 
 	if transfer.Tx != nil {
 		response.TxHash = hex.EncodeToString(transfer.Tx.Hash)
+	}
+
+	if transfer.Connection != nil && transfer.Connection.Client != nil {
+		response.ChainId = transfer.Connection.Client.ChainId
 	}
 
 	return response

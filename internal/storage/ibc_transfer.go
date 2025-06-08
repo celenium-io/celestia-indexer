@@ -50,9 +50,10 @@ type IbcTransfer struct {
 	Sequence        uint64          `bun:"sequence"                comment:"Sequence number of packet"`
 	TxId            uint64          `bun:"tx_id"                   comment:"Transaction id where transfer occurred"`
 
-	Tx       *Tx      `bun:"rel:belongs-to,join:tx_id=id"`
-	Receiver *Address `bun:"rel:belongs-to,join:receiver_id=id"`
-	Sender   *Address `bun:"rel:belongs-to,join:sender_id=id"`
+	Tx         *Tx            `bun:"rel:belongs-to,join:tx_id=id"`
+	Receiver   *Address       `bun:"rel:belongs-to,join:receiver_id=id"`
+	Sender     *Address       `bun:"rel:belongs-to,join:sender_id=id"`
+	Connection *IbcConnection `bun:"rel:belongs-to,join:connection_id=connection_id"`
 }
 
 func (IbcTransfer) TableName() string {

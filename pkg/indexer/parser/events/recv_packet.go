@@ -34,6 +34,14 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 		msg.IbcChannel = nil
 		return nil
 	}
+	if events[*idx].Type == storageTypes.EventTypeRecvPacket && msg.IbcTransfer != nil {
+		rp, err := decode.NewRecvPacket(events[*idx].Data)
+		if err != nil {
+			return err
+		}
+		msg.IbcTransfer.ConnectionId = rp.Connection
+	}
+
 	*idx += 2
 
 	if events[*idx].Type == storageTypes.EventTypeWriteAcknowledgement {

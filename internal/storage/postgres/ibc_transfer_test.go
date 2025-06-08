@@ -61,6 +61,10 @@ func (s *StorageTestSuite) TestIbcTransferList() {
 		s.Require().Equal(txHash, transfer.Tx.Hash)
 
 		s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", transfer.Sender.Address)
+
+		s.Require().NotNil(transfer.Connection)
+		s.Require().NotNil(transfer.Connection.Client)
+		s.Require().Equal("osmosis-1", transfer.Connection.Client.ChainId)
 	}
 }
 

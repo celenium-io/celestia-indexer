@@ -55,11 +55,14 @@ func (c *IbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFil
 		ColumnExpr("cel_receiver.id as receiver__celestials__id, cel_receiver.image_url as receiver__celestials__image_url").
 		ColumnExpr("sender.address as sender__address").
 		ColumnExpr("cel_sender.id as sender__celestials__id, cel_sender.image_url as sender__celestials__image_url").
+		ColumnExpr("ibc_client.chain_id as connection__client__chain_id").
 		Join("left join tx on tx_id = tx.id").
 		Join("left join address as receiver on receiver.id = receiver_id").
 		Join("left join celestial as cel_receiver on cel_receiver.address_id = receiver_id and cel_receiver.status = 'PRIMARY'").
 		Join("left join address as sender on sender.id = sender_id").
 		Join("left join celestial as cel_sender on cel_sender.address_id = sender_id and cel_sender.status = 'PRIMARY'").
+		Join("left join ibc_connection on ibc_connection.connection_id = ibc_transfer.connection_id").
+		Join("left join ibc_client on ibc_connection.client_id = ibc_client.id").
 		Scan(ctx, &transfers)
 	return
 }
