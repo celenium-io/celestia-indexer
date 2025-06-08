@@ -36,7 +36,7 @@ func (s *StorageTestSuite) TestVoteByProposalIdWithOption() {
 	votes, err := s.storage.Votes.ByProposalId(ctx, 1, storage.VoteFilters{
 		Limit:  10,
 		Offset: 0,
-		Option: types.VoteOptionNo,
+		Option: []types.VoteOption{types.VoteOptionNo},
 	})
 	s.Require().NoError(err)
 	s.Require().Len(votes, 1)

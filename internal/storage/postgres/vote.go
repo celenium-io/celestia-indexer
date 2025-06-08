@@ -5,10 +5,12 @@ package postgres
 
 import (
 	"context"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 )
 
 // Vote -
@@ -33,8 +35,8 @@ func (v *Vote) ByProposalId(ctx context.Context, proposalId uint64, fltrs storag
 	if fltrs.Offset > 0 {
 		subQuery = subQuery.Offset(fltrs.Offset)
 	}
-	if fltrs.Option != "" {
-		subQuery = subQuery.Where("option = ?", fltrs.Option)
+	if len(fltrs.Option) > 0 {
+		subQuery = subQuery.Where("option IN (?)", bun.In(fltrs.Option))
 	}
 	if fltrs.VoterType == types.VoterTypeValidator {
 		subQuery = subQuery.Where("validator_id != 0")
