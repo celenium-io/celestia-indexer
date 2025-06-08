@@ -150,11 +150,11 @@ func (handler *ProposalsHandler) Get(c echo.Context) error {
 }
 
 type listVotesRequest struct {
-	Id        uint64 `param:"id"     validate:"required,min=1"`
-	Limit     int    `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset    int    `query:"offset" validate:"omitempty,min=0"`
-	Option    string `query:"option" validate:"omitempty,vote_option"`
-	VoterType string `query:"voter"  validate:"omitempty,voter_type"`
+	Id        uint64      `param:"id"     validate:"required,min=1"`
+	Limit     int         `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset    int         `query:"offset" validate:"omitempty,min=0"`
+	Option    StringArray `query:"option" validate:"omitempty,dive,vote_option"`
+	VoterType string      `query:"voter"  validate:"omitempty,voter_type"`
 }
 
 func (p *listVotesRequest) SetDefault() {
@@ -189,13 +189,18 @@ func (handler *ProposalsHandler) Votes(c echo.Context) error {
 	}
 	req.SetDefault()
 
+	options := make([]types.VoteOption, len(req.Option))
+	for i := range req.Option {
+		options[i] = types.VoteOption(req.Option[i])
+	}
+
 	votes, err := handler.votes.ByProposalId(
 		c.Request().Context(),
 		req.Id,
 		storage.VoteFilters{
 			Limit:     req.Limit,
 			Offset:    req.Offset,
-			Option:    types.VoteOption(req.Option),
+			Option:    options,
 			VoterType: types.VoterType(req.VoterType),
 		})
 

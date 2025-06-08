@@ -147,6 +147,7 @@ func (s *ProposalTestSuite) TestVotes() {
 		ByProposalId(gomock.Any(), uint64(1), storage.VoteFilters{
 			Limit:  10,
 			Offset: 0,
+			Option: []types.VoteOption{},
 		}).
 		Return([]storage.Vote{
 			{
