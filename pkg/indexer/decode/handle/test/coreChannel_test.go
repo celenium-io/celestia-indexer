@@ -6,6 +6,7 @@ package handle
 import (
 	"encoding/base64"
 	"testing"
+	"time"
 
 	"cosmossdk.io/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -13,9 +14,10 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/cosmos/cosmos-sdk/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	bankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	distributionTypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	icaTypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
 	ibcTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	transferTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
@@ -359,7 +361,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost(t *testing.T) {
 			&ibcTypes.MsgTransfer{
 				SourcePort:    "transfer",
 				SourceChannel: "channel-8",
-				Token: types.Coin{
+				Token: cosmosTypes.Coin{
 					Denom:  "utia",
 					Amount: math.NewInt(2583120),
 				},
@@ -462,6 +464,92 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost2(t *testing.T) {
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
 	require.Equal(t, addressesExpected, dm.Addresses)
+}
+
+func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost3(t *testing.T) {
+	raw, err := base64.StdEncoding.DecodeString("eyJkYXRhIjoiQ293Q0NoNHZZMjl6Ylc5ekxtRjFkR2g2TG5ZeFltVjBZVEV1VFhOblIzSmhiblFTNlFFS1EyTmxiR1Z6ZEdsaE1YRnhkSEkwY0hwb09YSmphbmR3ZW5FMU0zYzFNRFIwZWpjeU4yMDFlV2g0ZEhSNU1ubG9lV1ZoYlhwNWR6aHhPR0V6WkhOeWEyaDFibXdTUTJObGJHVnpkR2xoTVdwbWRtb3dPR2h6YUROM2RtdDBiVFZtTW1kc2QzaHpZM1p5TTNKbFkyRXdOSEF3WkRabWJHNXhOVzQyT1d4a2JqSnJaM05oZHpOd2QzY2FYUXBUQ2lvdlkyOXpiVzl6TG1GMWRHaDZMbll4WW1WMFlURXVSMlZ1WlhKcFkwRjFkR2h2Y21sNllYUnBiMjRTSlFvakwyTnZjMjF2Y3k1emRHRnJhVzVuTG5ZeFltVjBZVEV1VFhOblJHVnNaV2RoZEdVU0JnamUxcmJFRkFyQkFRb3lMMk52YzIxdmN5NWthWE4wY21saWRYUnBiMjR1ZGpGaVpYUmhNUzVOYzJkVFpYUlhhWFJvWkhKaGQwRmtaSEpsYzNNU2lnRUtRMk5sYkdWemRHbGhNWEZ4ZEhJMGNIcG9PWEpqYW5kd2VuRTFNM2MxTURSMGVqY3lOMjAxZVdoNGRIUjVNbmxvZVdWaGJYcDVkemh4T0dFelpITnlhMmgxYm13U1EyTmxiR1Z6ZEdsaE1YcDNibTA1YzNCaGNYWjZObVp5TTJoeFpUQnplSFY2ZEhSNFpIUXlkbWRuY1dZMmNUQnliSG8wZG5wNk1qSTRaRGN5YW5Gd2F6TmpNbVU9IiwibWVtbyI6IiIsInR5cGUiOiJUWVBFX0VYRUNVVEVfVFgifQ==")
+	require.NoError(t, err)
+	msg := &coreChannel.MsgRecvPacket{
+		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		Packet: coreChannel.Packet{
+			Data:               raw,
+			DestinationPort:    "icahost",
+			DestinationChannel: "channel-1",
+			Sequence:           1,
+			SourceChannel:      "channel-4310",
+			SourcePort:         "icacontroller-cosmos1epqzuh6myrwrp4zr8zjamcye4nvkkg9xd8ywak",
+			TimeoutTimestamp:   1725050827576431600,
+		},
+	}
+	block, now := testsuite.EmptyBlock()
+	position := 0
+
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
+	require.NoError(t, err)
+
+	addressesExpected := []storage.AddressWithType{
+		{
+			Type: storageTypes.MsgAddressTypeSigner,
+			Address: storage.Address{
+				Id:         0,
+				Height:     block.Height,
+				LastHeight: block.Height,
+				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
+				Balance:    storage.EmptyBalance(),
+			},
+		},
+	}
+
+	data := structs.Map(msg)
+	packet, ok := data["Packet"].(map[string]any)
+	require.True(t, ok)
+
+	expirationDate := time.Date(2144, 9, 3, 17, 48, 14, 0, time.UTC)
+	packet["Data"] = map[string]any{
+		"Memo": "",
+		"Type": icaTypes.EXECUTE_TX,
+		"Data": []cosmosTypes.Msg{
+			&authz.MsgGrant{
+				Granter: "celestia1qqtr4pzh9rcjwpzq53w504tz727m5yhxtty2yhyeamzyw8q8a3dsrkhunl",
+				Grantee: "celestia1jfvj08hsh3wvktm5f2glwxscvr3reca04p0d6flnq5n69ldn2kgsaw3pww",
+				Grant: authz.Grant{
+					Expiration: &expirationDate,
+				},
+			},
+			&distributionTypes.MsgSetWithdrawAddress{
+				DelegatorAddress: "celestia1qqtr4pzh9rcjwpzq53w504tz727m5yhxtty2yhyeamzyw8q8a3dsrkhunl",
+				WithdrawAddress:  "celestia1zwnm9spaqvz6fr3hqe0sxuzttxdt2vggqf6q0rlz4vzz228d72jqpk3c2e",
+			},
+		},
+	}
+
+	msgExpected := storage.Message{
+		Id:        0,
+		Height:    block.Height,
+		Time:      now,
+		Position:  0,
+		Type:      storageTypes.MsgRecvPacket,
+		TxId:      0,
+		Data:      data,
+		Size:      836,
+		Namespace: nil,
+		Addresses: addressesExpected,
+	}
+
+	_, err = dm.Msg.Data.ToBytes()
+	require.NoError(t, err)
+
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.Equal(t, addressesExpected, dm.Addresses)
+
 }
 
 func TestDecodeMsg_SuccessOnMsgRecvPacket_Transfer(t *testing.T) {

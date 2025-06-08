@@ -14,6 +14,7 @@ import (
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	icaTypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
 	transferTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	coreChannel "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
@@ -122,6 +123,9 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data types.PackedByt
 			var msg cosmosTypes.Msg
 			if err := codec.UnpackAny(rawMsg, &msg); err != nil {
 				return msgType, addresses, nil, nil, errors.Wrap(err, "cosmosTypes.Msg")
+			}
+			if grant, ok := msg.(*authz.MsgGrant); ok {
+				grant.Grant.Authorization = nil // TODO: make more beautiful
 			}
 			msgs[i] = msg
 		}
