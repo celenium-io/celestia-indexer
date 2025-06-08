@@ -29,6 +29,7 @@ type Proposal struct {
 	CreatedAt      time.Time            `bun:"created_at,notnull"          comment:"Creation time"`
 	DepositTime    time.Time            `bun:"deposit_time"                comment:"Time to end of deposit period"`
 	ActivationTime *time.Time           `bun:"activation_time"             comment:"Voting start time"`
+	EndTime        *time.Time           `bun:"end_time"                    comment:"Voting end time"`
 	Status         types.ProposalStatus `bun:"status,type:proposal_status" comment:"Proposal status"`
 	Type           types.ProposalType   `bun:"type,type:proposal_type"     comment:"Proposal type"`
 	Title          string               `bun:"title"                       comment:"Title"`
@@ -53,11 +54,17 @@ type Proposal struct {
 	NoWithVetoAddress int64 `bun:"no_with_veto_addrs" comment:"Count of no votes with veto by addresses"`
 	AbstainAddress    int64 `bun:"abstain_addrs"      comment:"Count of abstain votes by addresses"`
 
-	VotingPower           decimal.Decimal `bun:"voting_power,type:numeric"              comment:"Total voting power"`
+	VotingPower           decimal.Decimal `bun:"voting_power,type:numeric"              comment:"Summary voting power of all votes"`
 	YesVotingPower        decimal.Decimal `bun:"yes_voting_power,type:numeric"          comment:"Yes voting power"`
 	NoVotingPower         decimal.Decimal `bun:"no_voting_power,type:numeric"           comment:"No voting power"`
 	NoWithVetoVotingPower decimal.Decimal `bun:"no_with_veto_voting_power,type:numeric" comment:"No with veto voting power"`
 	AbstainVotingPower    decimal.Decimal `bun:"abstain_voting_power,type:numeric"      comment:"Abstain voting power"`
+	TotalVotingPower      decimal.Decimal `bun:"total_voting_power,type:numeric"        comment:"Total voting power in the network"`
+
+	Quorum     string `bun:"quorum"      comment:"The minimum percentage of voting power that needs to be cast on a proposal for the result to be valid"`
+	VetoQuorum string `bun:"veto_quorum" comment:"Minimum value of Veto votes to Total votes ratio for proposal to be vetoed"`
+	Threshold  string `bun:"threshold"   comment:"Minimum proportion of Yes votes for proposal to pass"`
+	MinDeposit string `bun:"min_deposit" comment:"Minimum deposit for a proposal to enter voting period"`
 
 	Proposer *Address `bun:"rel:belongs-to,join:proposer_id=id"`
 }

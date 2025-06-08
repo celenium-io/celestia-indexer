@@ -7656,6 +7656,11 @@
                     "format": "string",
                     "example": "Some proposal description"
                 },
+                "end_time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
                 "height": {
                     "type": "integer",
                     "format": "int64",
@@ -7670,6 +7675,11 @@
                     "type": "string",
                     "format": "string",
                     "example": "metadata"
+                },
+                "min_deposit": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.33"
                 },
                 "no": {
                     "type": "integer",
@@ -7708,20 +7718,40 @@
                 "proposer": {
                     "$ref": "#/definitions/responses.ShortAddress"
                 },
+                "quorum": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.33"
+                },
                 "status": {
                     "type": "string",
                     "format": "string",
                     "example": "active"
+                },
+                "threshold": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.33"
                 },
                 "title": {
                     "type": "string",
                     "format": "string",
                     "example": "Proposal title"
                 },
+                "total_voting_power": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "1000000000"
+                },
                 "type": {
                     "type": "string",
                     "format": "string",
                     "example": "param_changed"
+                },
+                "veto_quorum": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.33"
                 },
                 "votes_count": {
                     "type": "integer",

@@ -90,15 +90,20 @@ func (module *Module) saveProposals(
 		}
 
 		if !filled[i].CreatedAt.IsZero() {
-			constant, err := module.constants.Get(ctx, types.ModuleNameGov, "max_deposit_period")
+			duration, err := module.getConstantDuration(ctx, types.ModuleNameGov, "max_deposit_period")
 			if err != nil {
-				return 0, errors.Wrap(err, "can't find max_deposit_period constant")
+				return 0, errors.Wrap(err, "getConstantDuration")
 			}
-			maxDepositPeriod, err := time.ParseDuration(constant.Value)
+			filled[i].DepositTime = filled[i].CreatedAt.Add(duration)
+		}
+
+		if filled[i].ActivationTime != nil && filled[i].EndTime == nil {
+			duration, err := module.getConstantDuration(ctx, types.ModuleNameGov, "voting_period")
 			if err != nil {
-				return 0, errors.Wrap(err, "can't parse max_deposit_period value")
+				return 0, errors.Wrap(err, "getConstantDuration")
 			}
-			filled[i].DepositTime = filled[i].CreatedAt.Add(maxDepositPeriod)
+			endTime := filled[i].ActivationTime.Add(duration)
+			filled[i].EndTime = &endTime
 		}
 
 		if err := module.updateConstants(ctx, tx, filled[i]); err != nil {
@@ -107,6 +112,18 @@ func (module *Module) saveProposals(
 	}
 
 	return tx.SaveProposals(ctx, filled...)
+}
+
+func (module *Module) getConstantDuration(ctx context.Context, moduleName types.ModuleName, name string) (time.Duration, error) {
+	constant, err := module.constants.Get(ctx, moduleName, name)
+	if err != nil {
+		return 0, errors.Wrapf(err, "can't find %s constant", name)
+	}
+	intValue, err := strconv.ParseInt(constant.Value, 10, 64)
+	if err != nil {
+		return 0, errors.Wrapf(err, "can't parse %s value", name)
+	}
+	return time.Duration(intValue), nil
 }
 
 func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.Transaction, height pkgTypes.Level, changedProposals []*storage.Proposal) ([]*storage.Proposal, error) {
@@ -181,15 +198,49 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 
 	const limit = 1000
 
+	totalVotingPower, err := module.validators.TotalVotingPower(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "get total voting power")
+	}
+
 	for _, proposal := range proposals {
 		proposal.VotingPower = decimal.Zero
 		proposal.AbstainVotingPower = decimal.Zero
 		proposal.NoVotingPower = decimal.Zero
 		proposal.NoWithVetoVotingPower = decimal.Zero
 		proposal.YesVotingPower = decimal.Zero
+		proposal.TotalVotingPower = decimal.Zero
 
 		validatorMinus := make(map[uint64]decimal.Decimal)
 		votedValidators := make(map[uint64]types.VoteOption)
+
+		if proposal.Finished() {
+			proposal.TotalVotingPower = totalVotingPower
+
+			quorum, err := module.constants.Get(ctx, types.ModuleNameGov, "quorum")
+			if err != nil {
+				return nil, errors.Wrapf(err, "can't find quorum constant")
+			}
+			proposal.Quorum = quorum.Value
+
+			minDeposit, err := module.constants.Get(ctx, types.ModuleNameGov, "min_deposit")
+			if err != nil {
+				return nil, errors.Wrapf(err, "can't find min_deposit constant")
+			}
+			proposal.MinDeposit = minDeposit.Value
+
+			threshold, err := module.constants.Get(ctx, types.ModuleNameGov, "threshold")
+			if err != nil {
+				return nil, errors.Wrapf(err, "can't find threshold constant")
+			}
+			proposal.Threshold = threshold.Value
+
+			veto, err := module.constants.Get(ctx, types.ModuleNameGov, "veto_threshold")
+			if err != nil {
+				return nil, errors.Wrapf(err, "can't find veto_threshold constant")
+			}
+			proposal.VetoQuorum = veto.Value
+		}
 
 		var offset int
 		var end bool
