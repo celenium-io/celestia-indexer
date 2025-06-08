@@ -119,11 +119,11 @@ func (module *Module) getConstantDuration(ctx context.Context, moduleName types.
 	if err != nil {
 		return 0, errors.Wrapf(err, "can't find %s constant", name)
 	}
-	uintValue, err := strconv.ParseUint(constant.Value, 10, 64)
+	intValue, err := strconv.ParseInt(constant.Value, 10, 64)
 	if err != nil {
 		return 0, errors.Wrapf(err, "can't parse %s value", name)
 	}
-	return time.Duration(uintValue), nil
+	return time.Duration(intValue), nil
 }
 
 func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.Transaction, height pkgTypes.Level, changedProposals []*storage.Proposal) ([]*storage.Proposal, error) {

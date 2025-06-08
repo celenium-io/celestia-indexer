@@ -160,7 +160,7 @@ func upInitProposalColumns(ctx context.Context, db *bun.DB) error {
 		return errors.Wrap(err, "receiving voting_period")
 	}
 
-	period, err := strconv.ParseUint(votingPeriod.Value, 10, 64)
+	period, err := strconv.ParseInt(votingPeriod.Value, 10, 64)
 	if err != nil {
 		return errors.Wrap(err, "parsing voting period")
 	}
