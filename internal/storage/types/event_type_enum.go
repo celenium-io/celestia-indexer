@@ -135,6 +135,8 @@ const (
 	EventTypeIcs27Packet EventType = "ics27_packet"
 	// EventTypeChannelCloseConfirm is a EventType of type channel_close_confirm.
 	EventTypeChannelCloseConfirm EventType = "channel_close_confirm"
+	// EventTypeUpdateClientProposal is a EventType of type update_client_proposal.
+	EventTypeUpdateClientProposal EventType = "update_client_proposal"
 )
 
 var ErrInvalidEventType = fmt.Errorf("not a valid EventType, try [%s]", strings.Join(_EventTypeNames, ", "))
@@ -199,6 +201,7 @@ var _EventTypeNames = []string{
 	string(EventTypeInactiveProposal),
 	string(EventTypeIcs27Packet),
 	string(EventTypeChannelCloseConfirm),
+	string(EventTypeUpdateClientProposal),
 }
 
 // EventTypeNames returns a list of possible string values of EventType.
@@ -270,6 +273,7 @@ func EventTypeValues() []EventType {
 		EventTypeInactiveProposal,
 		EventTypeIcs27Packet,
 		EventTypeChannelCloseConfirm,
+		EventTypeUpdateClientProposal,
 	}
 }
 
@@ -345,6 +349,7 @@ var _EventTypeValue = map[string]EventType{
 	"inactive_proposal":                 EventTypeInactiveProposal,
 	"ics27_packet":                      EventTypeIcs27Packet,
 	"channel_close_confirm":             EventTypeChannelCloseConfirm,
+	"update_client_proposal":            EventTypeUpdateClientProposal,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

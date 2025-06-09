@@ -9103,7 +9103,8 @@
                 "active_proposal",
                 "inactive_proposal",
                 "ics27_packet",
-                "channel_close_confirm"
+                "channel_close_confirm",
+                "update_client_proposal"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -9164,7 +9165,8 @@
                 "EventTypeActiveProposal",
                 "EventTypeInactiveProposal",
                 "EventTypeIcs27Packet",
-                "EventTypeChannelCloseConfirm"
+                "EventTypeChannelCloseConfirm",
+                "EventTypeUpdateClientProposal"
             ]
         },
         "types.MsgAddressType": {
