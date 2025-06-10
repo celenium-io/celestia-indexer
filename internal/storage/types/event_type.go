@@ -78,7 +78,9 @@ package types
 		active_proposal,
 		inactive_proposal,
 		ics27_packet,
-		channel_close_confirm
+		channel_close_confirm,
+
+		update_client_proposal
 	)
 */
 //go:generate go-enum --marshal --sql --values --names
