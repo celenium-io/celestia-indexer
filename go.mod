@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.76.1
 	github.com/aws/smithy-go v1.22.2
 	github.com/celenium-io/celestial-module v0.0.7
-	github.com/celestiaorg/celestia-app/v4 v4.0.0-arabica
+	github.com/celestiaorg/celestia-app/v4 v4.0.2-mocha
 	github.com/celestiaorg/go-square v1.1.1
 	github.com/celestiaorg/go-square/v2 v2.2.0
 	github.com/celestiaorg/rsmt2d v0.14.0
@@ -63,7 +63,7 @@ require (
 	github.com/cosmos/gogoproto v1.7.0
 	github.com/gogo/protobuf v1.3.3
 	google.golang.org/genproto/googleapis/api v0.0.0-20250324211829-b45e905df463
-	google.golang.org/grpc v1.72.0
+	google.golang.org/grpc v1.72.2
 )
 
 require (
@@ -83,7 +83,7 @@ require (
 	cosmossdk.io/core v0.11.3 // indirect
 	cosmossdk.io/depinject v1.2.0 // indirect
 	cosmossdk.io/errors v1.0.2 // indirect
-	cosmossdk.io/log v1.5.1 // indirect
+	cosmossdk.io/log v1.6.0 // indirect
 	cosmossdk.io/schema v1.1.0 // indirect
 	cosmossdk.io/store v1.1.2 // indirect
 	cosmossdk.io/x/circuit v0.1.1 // indirect
@@ -122,7 +122,7 @@ require (
 	github.com/bytedance/sonic v1.13.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/celestiaorg/merkletree v0.0.0-20210714075610-a84dc3ddbbe4 // indirect
-	github.com/celestiaorg/nmt v0.23.0 // indirect
+	github.com/celestiaorg/nmt v0.24.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect
