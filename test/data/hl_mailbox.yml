@@ -1,0 +1,12 @@
+- id: 1
+  height: 1000
+  time: '2023-07-04T03:10:57+00:00'
+  tx_id: 1
+  mailbox: mailbox
+  owner_id: 1
+  default_ism: 0x03020A
+  default_hook: 0x03020A
+  required_hook: 0x03020A
+  domain: 123
+  sent_messages: 12
+  received_messages: 21

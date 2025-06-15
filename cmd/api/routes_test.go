@@ -120,6 +120,11 @@ func TestRoutes(t *testing.T) {
 		"/v1/address/:hash/votes GET":                         {},
 		"/v1/validators/:id/votes GET":                        {},
 		"/v1/blob/proofs POST":                                {},
+		"/v1/hyperlane/mailbox GET":                           {},
+		"/v1/hyperlane/mailbox/:id GET":                       {},
+		"/v1/hyperlane/token GET":                             {},
+		"/v1/hyperlane/token/:id GET":                         {},
+		"/v1/hyperlane/transfer GET":                          {},
 	}
 
 	ctx, cancel := context.WithCancel(t.Context())

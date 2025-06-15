@@ -159,6 +159,26 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 		); err != nil {
 			return err
 		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"hyperlane_transfer_type",
+			bun.Safe("hyperlane_transfer_type"),
+			bun.In(types.HLTransferTypeValues()),
+		); err != nil {
+			return err
+		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"hyperlane_token_type",
+			bun.Safe("hyperlane_token_type"),
+			bun.In(types.HLTokenTypeValues()),
+		); err != nil {
+			return err
+		}
 		return nil
 	})
 }

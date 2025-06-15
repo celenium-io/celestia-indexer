@@ -113,7 +113,7 @@ func (handler *IbcHandler) List(c echo.Context) error {
 	for i := range clients {
 		response[i] = responses.NewIbcClient(clients[i])
 	}
-	return c.JSON(http.StatusOK, response)
+	return returnArray(c, response)
 }
 
 type getIbcConnectionRequest struct {
@@ -200,7 +200,7 @@ func (handler *IbcHandler) ListConnections(c echo.Context) error {
 	for i := range conns {
 		response[i] = responses.NewIbcConnection(conns[i])
 	}
-	return c.JSON(http.StatusOK, response)
+	return returnArray(c, response)
 }
 
 type getIbcChannelRequest struct {
@@ -293,7 +293,7 @@ func (handler *IbcHandler) ListChannels(c echo.Context) error {
 	for i := range channels {
 		response[i] = responses.NewIbcChannel(channels[i])
 	}
-	return c.JSON(http.StatusOK, response)
+	return returnArray(c, response)
 }
 
 type getIbcTransfersRequest struct {
@@ -377,5 +377,5 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 	for i := range transfers {
 		response[i] = responses.NewIbcTransfer(transfers[i])
 	}
-	return c.JSON(http.StatusOK, response)
+	return returnArray(c, response)
 }

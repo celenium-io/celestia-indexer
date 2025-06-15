@@ -500,6 +500,22 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
+	hyperlaneHandler := handler.NewHyperlaneHandler(db.HLMailbox, db.HLToken, db.HLTransfer, db.Address)
+	hyperlane := v1.Group("/hyperlane")
+	{
+		hlMailbox := hyperlane.Group("/mailbox")
+		{
+			hlMailbox.GET("", hyperlaneHandler.ListMailboxes)
+			hlMailbox.GET("/:id", hyperlaneHandler.GetMailbox)
+		}
+		hlToken := hyperlane.Group("/token")
+		{
+			hlToken.GET("", hyperlaneHandler.ListTokens)
+			hlToken.GET("/:id", hyperlaneHandler.GetToken)
+		}
+		hyperlane.GET("/transfer", hyperlaneHandler.ListTransfers)
+	}
+
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
 		SpecURL: "./docs/swagger.json",
 		CustomOptions: scalar.CustomOptions{

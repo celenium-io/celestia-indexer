@@ -3,7 +3,7 @@
 
 package types
 
-// swagger:enum ModuleName
+// swagger:enum IbcChannelStatus
 /*
 	ENUM(
 		initialization,

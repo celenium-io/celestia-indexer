@@ -24,7 +24,7 @@ func MsgCreateMailbox(ctx *context.Context, m *hyperlaneCore.MsgCreateMailbox) (
 func MsgProcessMessage(ctx *context.Context, m *hyperlaneCore.MsgProcessMessage) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgProcessMessage
 	addresses, err := createAddresses(ctx, addressesData{
-		// {t: storageTypes.MsgAddressTypeRelayer, address: m.GetRelayer()},
+		{t: storageTypes.MsgAddressTypeRelayer, address: m.GetRelayer()},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
 }

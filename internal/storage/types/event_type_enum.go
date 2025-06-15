@@ -137,6 +137,44 @@ const (
 	EventTypeChannelCloseConfirm EventType = "channel_close_confirm"
 	// EventTypeUpdateClientProposal is a EventType of type update_client_proposal.
 	EventTypeUpdateClientProposal EventType = "update_client_proposal"
+	// EventTypeHyperlanecorev1EventDispatch is a EventType of type hyperlane.core.v1.EventDispatch.
+	EventTypeHyperlanecorev1EventDispatch EventType = "hyperlane.core.v1.EventDispatch"
+	// EventTypeHyperlanecorev1EventProcess is a EventType of type hyperlane.core.v1.EventProcess.
+	EventTypeHyperlanecorev1EventProcess EventType = "hyperlane.core.v1.EventProcess"
+	// EventTypeHyperlanecorev1EventCreateMailbox is a EventType of type hyperlane.core.v1.EventCreateMailbox.
+	EventTypeHyperlanecorev1EventCreateMailbox EventType = "hyperlane.core.v1.EventCreateMailbox"
+	// EventTypeHyperlanecorev1EventSetMailbox is a EventType of type hyperlane.core.v1.EventSetMailbox.
+	EventTypeHyperlanecorev1EventSetMailbox EventType = "hyperlane.core.v1.EventSetMailbox"
+	// EventTypeHyperlanewarpv1EventCreateSyntheticToken is a EventType of type hyperlane.warp.v1.EventCreateSyntheticToken.
+	EventTypeHyperlanewarpv1EventCreateSyntheticToken EventType = "hyperlane.warp.v1.EventCreateSyntheticToken"
+	// EventTypeHyperlanewarpv1EventCreateCollateralToken is a EventType of type hyperlane.warp.v1.EventCreateCollateralToken.
+	EventTypeHyperlanewarpv1EventCreateCollateralToken EventType = "hyperlane.warp.v1.EventCreateCollateralToken"
+	// EventTypeHyperlanewarpv1EventSetToken is a EventType of type hyperlane.warp.v1.EventSetToken.
+	EventTypeHyperlanewarpv1EventSetToken EventType = "hyperlane.warp.v1.EventSetToken"
+	// EventTypeHyperlanewarpv1EventEnrollRemoteRouter is a EventType of type hyperlane.warp.v1.EventEnrollRemoteRouter.
+	EventTypeHyperlanewarpv1EventEnrollRemoteRouter EventType = "hyperlane.warp.v1.EventEnrollRemoteRouter"
+	// EventTypeHyperlanewarpv1EventUnrollRemoteRouter is a EventType of type hyperlane.warp.v1.EventUnrollRemoteRouter.
+	EventTypeHyperlanewarpv1EventUnrollRemoteRouter EventType = "hyperlane.warp.v1.EventUnrollRemoteRouter"
+	// EventTypeHyperlanewarpv1EventSendRemoteTransfer is a EventType of type hyperlane.warp.v1.EventSendRemoteTransfer.
+	EventTypeHyperlanewarpv1EventSendRemoteTransfer EventType = "hyperlane.warp.v1.EventSendRemoteTransfer"
+	// EventTypeHyperlanewarpv1EventReceiveRemoteTransfer is a EventType of type hyperlane.warp.v1.EventReceiveRemoteTransfer.
+	EventTypeHyperlanewarpv1EventReceiveRemoteTransfer EventType = "hyperlane.warp.v1.EventReceiveRemoteTransfer"
+	// EventTypeHyperlanecorepostDispatchv1EventCreateMerkleTreeHook is a EventType of type hyperlane.core.post_dispatch.v1.EventCreateMerkleTreeHook.
+	EventTypeHyperlanecorepostDispatchv1EventCreateMerkleTreeHook EventType = "hyperlane.core.post_dispatch.v1.EventCreateMerkleTreeHook"
+	// EventTypeHyperlanecorepostDispatchv1EventInsertedIntoTree is a EventType of type hyperlane.core.post_dispatch.v1.EventInsertedIntoTree.
+	EventTypeHyperlanecorepostDispatchv1EventInsertedIntoTree EventType = "hyperlane.core.post_dispatch.v1.EventInsertedIntoTree"
+	// EventTypeHyperlanecorepostDispatchv1EventGasPayment is a EventType of type hyperlane.core.post_dispatch.v1.EventGasPayment.
+	EventTypeHyperlanecorepostDispatchv1EventGasPayment EventType = "hyperlane.core.post_dispatch.v1.EventGasPayment"
+	// EventTypeHyperlanecorepostDispatchv1EventCreateNoopHook is a EventType of type hyperlane.core.post_dispatch.v1.EventCreateNoopHook.
+	EventTypeHyperlanecorepostDispatchv1EventCreateNoopHook EventType = "hyperlane.core.post_dispatch.v1.EventCreateNoopHook"
+	// EventTypeHyperlanecorepostDispatchv1EventCreateIgp is a EventType of type hyperlane.core.post_dispatch.v1.EventCreateIgp.
+	EventTypeHyperlanecorepostDispatchv1EventCreateIgp EventType = "hyperlane.core.post_dispatch.v1.EventCreateIgp"
+	// EventTypeHyperlanecorepostDispatchv1EventSetIgp is a EventType of type hyperlane.core.post_dispatch.v1.EventSetIgp.
+	EventTypeHyperlanecorepostDispatchv1EventSetIgp EventType = "hyperlane.core.post_dispatch.v1.EventSetIgp"
+	// EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig is a EventType of type hyperlane.core.post_dispatch.v1.EventSetDestinationGasConfig.
+	EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig EventType = "hyperlane.core.post_dispatch.v1.EventSetDestinationGasConfig"
+	// EventTypeHyperlanecorepostDispatchv1EventClaimIgp is a EventType of type hyperlane.core.post_dispatch.v1.EventClaimIgp.
+	EventTypeHyperlanecorepostDispatchv1EventClaimIgp EventType = "hyperlane.core.post_dispatch.v1.EventClaimIgp"
 )
 
 var ErrInvalidEventType = fmt.Errorf("not a valid EventType, try [%s]", strings.Join(_EventTypeNames, ", "))
@@ -202,6 +240,25 @@ var _EventTypeNames = []string{
 	string(EventTypeIcs27Packet),
 	string(EventTypeChannelCloseConfirm),
 	string(EventTypeUpdateClientProposal),
+	string(EventTypeHyperlanecorev1EventDispatch),
+	string(EventTypeHyperlanecorev1EventProcess),
+	string(EventTypeHyperlanecorev1EventCreateMailbox),
+	string(EventTypeHyperlanecorev1EventSetMailbox),
+	string(EventTypeHyperlanewarpv1EventCreateSyntheticToken),
+	string(EventTypeHyperlanewarpv1EventCreateCollateralToken),
+	string(EventTypeHyperlanewarpv1EventSetToken),
+	string(EventTypeHyperlanewarpv1EventEnrollRemoteRouter),
+	string(EventTypeHyperlanewarpv1EventUnrollRemoteRouter),
+	string(EventTypeHyperlanewarpv1EventSendRemoteTransfer),
+	string(EventTypeHyperlanewarpv1EventReceiveRemoteTransfer),
+	string(EventTypeHyperlanecorepostDispatchv1EventCreateMerkleTreeHook),
+	string(EventTypeHyperlanecorepostDispatchv1EventInsertedIntoTree),
+	string(EventTypeHyperlanecorepostDispatchv1EventGasPayment),
+	string(EventTypeHyperlanecorepostDispatchv1EventCreateNoopHook),
+	string(EventTypeHyperlanecorepostDispatchv1EventCreateIgp),
+	string(EventTypeHyperlanecorepostDispatchv1EventSetIgp),
+	string(EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig),
+	string(EventTypeHyperlanecorepostDispatchv1EventClaimIgp),
 }
 
 // EventTypeNames returns a list of possible string values of EventType.
@@ -274,6 +331,25 @@ func EventTypeValues() []EventType {
 		EventTypeIcs27Packet,
 		EventTypeChannelCloseConfirm,
 		EventTypeUpdateClientProposal,
+		EventTypeHyperlanecorev1EventDispatch,
+		EventTypeHyperlanecorev1EventProcess,
+		EventTypeHyperlanecorev1EventCreateMailbox,
+		EventTypeHyperlanecorev1EventSetMailbox,
+		EventTypeHyperlanewarpv1EventCreateSyntheticToken,
+		EventTypeHyperlanewarpv1EventCreateCollateralToken,
+		EventTypeHyperlanewarpv1EventSetToken,
+		EventTypeHyperlanewarpv1EventEnrollRemoteRouter,
+		EventTypeHyperlanewarpv1EventUnrollRemoteRouter,
+		EventTypeHyperlanewarpv1EventSendRemoteTransfer,
+		EventTypeHyperlanewarpv1EventReceiveRemoteTransfer,
+		EventTypeHyperlanecorepostDispatchv1EventCreateMerkleTreeHook,
+		EventTypeHyperlanecorepostDispatchv1EventInsertedIntoTree,
+		EventTypeHyperlanecorepostDispatchv1EventGasPayment,
+		EventTypeHyperlanecorepostDispatchv1EventCreateNoopHook,
+		EventTypeHyperlanecorepostDispatchv1EventCreateIgp,
+		EventTypeHyperlanecorepostDispatchv1EventSetIgp,
+		EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig,
+		EventTypeHyperlanecorepostDispatchv1EventClaimIgp,
 	}
 }
 
@@ -290,66 +366,85 @@ func (x EventType) IsValid() bool {
 }
 
 var _EventTypeValue = map[string]EventType{
-	"unknown":                           EventTypeUnknown,
-	"coin_received":                     EventTypeCoinReceived,
-	"coinbase":                          EventTypeCoinbase,
-	"coin_spent":                        EventTypeCoinSpent,
-	"burn":                              EventTypeBurn,
-	"mint":                              EventTypeMint,
-	"message":                           EventTypeMessage,
-	"proposer_reward":                   EventTypeProposerReward,
-	"rewards":                           EventTypeRewards,
-	"commission":                        EventTypeCommission,
-	"liveness":                          EventTypeLiveness,
-	"transfer":                          EventTypeTransfer,
-	"celestia.blob.v1.EventPayForBlobs": EventTypeCelestiablobv1EventPayForBlobs,
-	"redelegate":                        EventTypeRedelegate,
-	"AttestationRequest":                EventTypeAttestationRequest,
-	"withdraw_rewards":                  EventTypeWithdrawRewards,
-	"withdraw_commission":               EventTypeWithdrawCommission,
-	"set_withdraw_address":              EventTypeSetWithdrawAddress,
-	"create_validator":                  EventTypeCreateValidator,
-	"delegate":                          EventTypeDelegate,
-	"edit_validator":                    EventTypeEditValidator,
-	"unbond":                            EventTypeUnbond,
-	"tx":                                EventTypeTx,
-	"complete_redelegation":             EventTypeCompleteRedelegation,
-	"complete_unbonding":                EventTypeCompleteUnbonding,
-	"use_feegrant":                      EventTypeUseFeegrant,
-	"revoke_feegrant":                   EventTypeRevokeFeegrant,
-	"set_feegrant":                      EventTypeSetFeegrant,
-	"update_feegrant":                   EventTypeUpdateFeegrant,
-	"slash":                             EventTypeSlash,
-	"proposal_vote":                     EventTypeProposalVote,
-	"proposal_deposit":                  EventTypeProposalDeposit,
-	"submit_proposal":                   EventTypeSubmitProposal,
-	"cosmos.authz.v1beta1.EventGrant":   EventTypeCosmosauthzv1beta1EventGrant,
-	"send_packet":                       EventTypeSendPacket,
-	"ibc_transfer":                      EventTypeIbcTransfer,
-	"fungible_token_packet":             EventTypeFungibleTokenPacket,
-	"acknowledge_packet":                EventTypeAcknowledgePacket,
-	"create_client":                     EventTypeCreateClient,
-	"update_client":                     EventTypeUpdateClient,
-	"connection_open_try":               EventTypeConnectionOpenTry,
-	"connection_open_init":              EventTypeConnectionOpenInit,
-	"connection_open_confirm":           EventTypeConnectionOpenConfirm,
-	"connection_open_ack":               EventTypeConnectionOpenAck,
-	"channel_open_try":                  EventTypeChannelOpenTry,
-	"channel_open_init":                 EventTypeChannelOpenInit,
-	"channel_open_confirm":              EventTypeChannelOpenConfirm,
-	"channel_open_ack":                  EventTypeChannelOpenAck,
-	"recv_packet":                       EventTypeRecvPacket,
-	"write_acknowledgement":             EventTypeWriteAcknowledgement,
-	"timeout":                           EventTypeTimeout,
-	"timeout_packet":                    EventTypeTimeoutPacket,
-	"cosmos.authz.v1beta1.EventRevoke":  EventTypeCosmosauthzv1beta1EventRevoke,
-	"cosmos.authz.v1.EventRevoke":       EventTypeCosmosauthzv1EventRevoke,
-	"cancel_unbonding_delegation":       EventTypeCancelUnbondingDelegation,
-	"active_proposal":                   EventTypeActiveProposal,
-	"inactive_proposal":                 EventTypeInactiveProposal,
-	"ics27_packet":                      EventTypeIcs27Packet,
-	"channel_close_confirm":             EventTypeChannelCloseConfirm,
-	"update_client_proposal":            EventTypeUpdateClientProposal,
+	"unknown":                              EventTypeUnknown,
+	"coin_received":                        EventTypeCoinReceived,
+	"coinbase":                             EventTypeCoinbase,
+	"coin_spent":                           EventTypeCoinSpent,
+	"burn":                                 EventTypeBurn,
+	"mint":                                 EventTypeMint,
+	"message":                              EventTypeMessage,
+	"proposer_reward":                      EventTypeProposerReward,
+	"rewards":                              EventTypeRewards,
+	"commission":                           EventTypeCommission,
+	"liveness":                             EventTypeLiveness,
+	"transfer":                             EventTypeTransfer,
+	"celestia.blob.v1.EventPayForBlobs":    EventTypeCelestiablobv1EventPayForBlobs,
+	"redelegate":                           EventTypeRedelegate,
+	"AttestationRequest":                   EventTypeAttestationRequest,
+	"withdraw_rewards":                     EventTypeWithdrawRewards,
+	"withdraw_commission":                  EventTypeWithdrawCommission,
+	"set_withdraw_address":                 EventTypeSetWithdrawAddress,
+	"create_validator":                     EventTypeCreateValidator,
+	"delegate":                             EventTypeDelegate,
+	"edit_validator":                       EventTypeEditValidator,
+	"unbond":                               EventTypeUnbond,
+	"tx":                                   EventTypeTx,
+	"complete_redelegation":                EventTypeCompleteRedelegation,
+	"complete_unbonding":                   EventTypeCompleteUnbonding,
+	"use_feegrant":                         EventTypeUseFeegrant,
+	"revoke_feegrant":                      EventTypeRevokeFeegrant,
+	"set_feegrant":                         EventTypeSetFeegrant,
+	"update_feegrant":                      EventTypeUpdateFeegrant,
+	"slash":                                EventTypeSlash,
+	"proposal_vote":                        EventTypeProposalVote,
+	"proposal_deposit":                     EventTypeProposalDeposit,
+	"submit_proposal":                      EventTypeSubmitProposal,
+	"cosmos.authz.v1beta1.EventGrant":      EventTypeCosmosauthzv1beta1EventGrant,
+	"send_packet":                          EventTypeSendPacket,
+	"ibc_transfer":                         EventTypeIbcTransfer,
+	"fungible_token_packet":                EventTypeFungibleTokenPacket,
+	"acknowledge_packet":                   EventTypeAcknowledgePacket,
+	"create_client":                        EventTypeCreateClient,
+	"update_client":                        EventTypeUpdateClient,
+	"connection_open_try":                  EventTypeConnectionOpenTry,
+	"connection_open_init":                 EventTypeConnectionOpenInit,
+	"connection_open_confirm":              EventTypeConnectionOpenConfirm,
+	"connection_open_ack":                  EventTypeConnectionOpenAck,
+	"channel_open_try":                     EventTypeChannelOpenTry,
+	"channel_open_init":                    EventTypeChannelOpenInit,
+	"channel_open_confirm":                 EventTypeChannelOpenConfirm,
+	"channel_open_ack":                     EventTypeChannelOpenAck,
+	"recv_packet":                          EventTypeRecvPacket,
+	"write_acknowledgement":                EventTypeWriteAcknowledgement,
+	"timeout":                              EventTypeTimeout,
+	"timeout_packet":                       EventTypeTimeoutPacket,
+	"cosmos.authz.v1beta1.EventRevoke":     EventTypeCosmosauthzv1beta1EventRevoke,
+	"cosmos.authz.v1.EventRevoke":          EventTypeCosmosauthzv1EventRevoke,
+	"cancel_unbonding_delegation":          EventTypeCancelUnbondingDelegation,
+	"active_proposal":                      EventTypeActiveProposal,
+	"inactive_proposal":                    EventTypeInactiveProposal,
+	"ics27_packet":                         EventTypeIcs27Packet,
+	"channel_close_confirm":                EventTypeChannelCloseConfirm,
+	"update_client_proposal":               EventTypeUpdateClientProposal,
+	"hyperlane.core.v1.EventDispatch":      EventTypeHyperlanecorev1EventDispatch,
+	"hyperlane.core.v1.EventProcess":       EventTypeHyperlanecorev1EventProcess,
+	"hyperlane.core.v1.EventCreateMailbox": EventTypeHyperlanecorev1EventCreateMailbox,
+	"hyperlane.core.v1.EventSetMailbox":    EventTypeHyperlanecorev1EventSetMailbox,
+	"hyperlane.warp.v1.EventCreateSyntheticToken":                  EventTypeHyperlanewarpv1EventCreateSyntheticToken,
+	"hyperlane.warp.v1.EventCreateCollateralToken":                 EventTypeHyperlanewarpv1EventCreateCollateralToken,
+	"hyperlane.warp.v1.EventSetToken":                              EventTypeHyperlanewarpv1EventSetToken,
+	"hyperlane.warp.v1.EventEnrollRemoteRouter":                    EventTypeHyperlanewarpv1EventEnrollRemoteRouter,
+	"hyperlane.warp.v1.EventUnrollRemoteRouter":                    EventTypeHyperlanewarpv1EventUnrollRemoteRouter,
+	"hyperlane.warp.v1.EventSendRemoteTransfer":                    EventTypeHyperlanewarpv1EventSendRemoteTransfer,
+	"hyperlane.warp.v1.EventReceiveRemoteTransfer":                 EventTypeHyperlanewarpv1EventReceiveRemoteTransfer,
+	"hyperlane.core.post_dispatch.v1.EventCreateMerkleTreeHook":    EventTypeHyperlanecorepostDispatchv1EventCreateMerkleTreeHook,
+	"hyperlane.core.post_dispatch.v1.EventInsertedIntoTree":        EventTypeHyperlanecorepostDispatchv1EventInsertedIntoTree,
+	"hyperlane.core.post_dispatch.v1.EventGasPayment":              EventTypeHyperlanecorepostDispatchv1EventGasPayment,
+	"hyperlane.core.post_dispatch.v1.EventCreateNoopHook":          EventTypeHyperlanecorepostDispatchv1EventCreateNoopHook,
+	"hyperlane.core.post_dispatch.v1.EventCreateIgp":               EventTypeHyperlanecorepostDispatchv1EventCreateIgp,
+	"hyperlane.core.post_dispatch.v1.EventSetIgp":                  EventTypeHyperlanecorepostDispatchv1EventSetIgp,
+	"hyperlane.core.post_dispatch.v1.EventSetDestinationGasConfig": EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig,
+	"hyperlane.core.post_dispatch.v1.EventClaimIgp":                EventTypeHyperlanecorepostDispatchv1EventClaimIgp,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

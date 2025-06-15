@@ -6,6 +6,7 @@ package decode
 import (
 	"time"
 
+	"github.com/bcp-innovations/hyperlane-cosmos/util"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/pkg/errors"
@@ -374,5 +375,201 @@ func NewRecvPacket(m map[string]any) (rp RecvPacket, err error) {
 	}
 	rp.TimeoutHeight = height
 	rp.Timeout = decoder.UnixNanoFromMap(m, "packet_timeout_timestamp")
+	return
+}
+
+type CreateMailbox struct {
+	MailboxId    string
+	Owner        string
+	DefaultIsm   string
+	DefaultHook  string
+	RequiredHook string
+	LocalDomain  uint64
+}
+
+func NewCreateMailbox(m map[string]any) (cm CreateMailbox, err error) {
+	cm.MailboxId = decoder.StringFromMap(m, "mailbox_id")
+	cm.Owner = decoder.StringFromMap(m, "owner")
+	cm.DefaultIsm = decoder.StringFromMap(m, "default_ism")
+	cm.DefaultHook = decoder.StringFromMap(m, "default_hook")
+	cm.RequiredHook = decoder.StringFromMap(m, "required_hook")
+	cm.LocalDomain, err = decoder.Uint64FromMap(m, "local_domain")
+	if err != nil {
+		return cm, errors.Wrap(err, "local_domain")
+	}
+	return
+}
+
+type SetMailbox struct {
+	MailboxId         string
+	Owner             string
+	DefaultIsm        string
+	DefaultHook       string
+	NewOwner          string
+	RenounceOwnership bool
+}
+
+func NewSetMailbox(m map[string]any) (sm SetMailbox, err error) {
+	sm.MailboxId = decoder.StringFromMap(m, "mailbox_id")
+	sm.Owner = decoder.StringFromMap(m, "owner")
+	sm.DefaultIsm = decoder.StringFromMap(m, "default_ism")
+	sm.DefaultHook = decoder.StringFromMap(m, "default_hook")
+	sm.NewOwner = decoder.StringFromMap(m, "new_owner")
+	sm.RenounceOwnership, err = decoder.BoolFromMap(m, "renounce_ownership")
+	if err != nil {
+		return sm, errors.Wrap(err, "renounce_ownership")
+	}
+	return
+}
+
+type HyperlaneProcessEvent struct {
+	OriginMailboxId string
+	Sender          string
+	Recipient       string
+	MessageId       string
+	Origin          uint64
+	Message         *util.HyperlaneMessage
+}
+
+func NewHyperlaneProcessEvent(m map[string]any) (hpe HyperlaneProcessEvent, err error) {
+	hpe.OriginMailboxId = decoder.StringFromMap(m, "origin_mailbox_id")
+	hpe.Sender = decoder.StringFromMap(m, "sender")
+	hpe.Recipient = decoder.StringFromMap(m, "recipient")
+	hpe.MessageId = decoder.StringFromMap(m, "message_id")
+	hpe.Origin, err = decoder.Uint64FromMap(m, "origin")
+	if err != nil {
+		return hpe, errors.Wrap(err, "origin")
+	}
+	hpe.Message, err = decoder.HyperlaneMessageFromMap(m, "message")
+	if err != nil {
+		return hpe, errors.Wrap(err, "message")
+	}
+
+	return
+}
+
+type HyperlaneDispatchEvent struct {
+	OriginMailboxId string
+	Sender          string
+	Recipient       string
+	Destination     uint64
+	Message         *util.HyperlaneMessage
+}
+
+func NewHyperlaneDispatchEvent(m map[string]any) (hde HyperlaneDispatchEvent, err error) {
+	hde.OriginMailboxId = decoder.StringFromMap(m, "origin_mailbox_id")
+	hde.Sender = decoder.StringFromMap(m, "sender")
+	hde.Recipient = decoder.StringFromMap(m, "recipient")
+	hde.Destination, err = decoder.Uint64FromMap(m, "destination")
+	if err != nil {
+		return hde, errors.Wrap(err, "destination")
+	}
+	hde.Message, err = decoder.HyperlaneMessageFromMap(m, "message")
+	if err != nil {
+		return hde, errors.Wrap(err, "message")
+	}
+
+	return
+}
+
+type CreateCollateralToken struct {
+	MailboxId string
+	Owner     string
+	TokenId   string
+	Denom     string
+}
+
+func NewCreateCollateralToken(m map[string]any) (cct CreateCollateralToken, err error) {
+	cct.MailboxId = decoder.StringFromMap(m, "origin_mailbox")
+	cct.Owner = decoder.StringFromMap(m, "owner")
+	cct.TokenId = decoder.StringFromMap(m, "token_id")
+	cct.Denom = decoder.StringFromMap(m, "origin_denom")
+	return
+}
+
+type CreateSyntheticToken struct {
+	MailboxId string
+	Owner     string
+	TokenId   string
+	Denom     string
+}
+
+func NewCreateSyntheticToken(m map[string]any) (cst CreateSyntheticToken, err error) {
+	cst.MailboxId = decoder.StringFromMap(m, "origin_mailbox")
+	cst.Owner = decoder.StringFromMap(m, "owner")
+	cst.TokenId = decoder.StringFromMap(m, "token_id")
+	cst.Denom = decoder.StringFromMap(m, "origin_denom")
+	return
+}
+
+type HyperlaneReceiveTransferEvent struct {
+	Amount       decimal.Decimal
+	Denom        string
+	OriginDomain uint64
+	Recipient    string
+	Sender       string
+	TokenId      string
+}
+
+func NewHyperlaneReceiveTransferEvent(m map[string]any) (hrte HyperlaneReceiveTransferEvent, err error) {
+	hrte.Sender = decoder.StringFromMap(m, "sender")
+	hrte.Recipient = decoder.StringFromMap(m, "recipient")
+	hrte.TokenId = decoder.StringFromMap(m, "token_id")
+	hrte.OriginDomain, err = decoder.Uint64FromMap(m, "origin_domain")
+	if err != nil {
+		return hrte, errors.Wrap(err, "origin")
+	}
+	coin, err := decoder.CoinFromMap(m, "amount")
+	if err != nil {
+		return hrte, errors.Wrap(err, "amount")
+	}
+	hrte.Amount = decimal.RequireFromString(coin.Amount.String())
+	hrte.Denom = coin.GetDenom()
+	return
+}
+
+type HyperlaneSendTransferEvent struct {
+	Amount            decimal.Decimal
+	Denom             string
+	DestinationDomain uint64
+	Recipient         string
+	Sender            string
+	TokenId           string
+}
+
+func NewHyperlaneSendTransferEvent(m map[string]any) (hste HyperlaneSendTransferEvent, err error) {
+	hste.Sender = decoder.StringFromMap(m, "sender")
+	hste.Recipient = decoder.StringFromMap(m, "recipient")
+	hste.TokenId = decoder.StringFromMap(m, "token_id")
+	hste.DestinationDomain, err = decoder.Uint64FromMap(m, "destination_domain")
+	if err != nil {
+		return hste, errors.Wrap(err, "origin")
+	}
+	coin, err := decoder.CoinFromMap(m, "amount")
+	if err != nil {
+		return hste, errors.Wrap(err, "amount")
+	}
+	hste.Amount = decimal.RequireFromString(coin.Amount.String())
+	hste.Denom = coin.GetDenom()
+	return
+}
+
+type SetToken struct {
+	IsmId             string
+	TokenId           string
+	NewOwner          string
+	Owner             string
+	RenounceOwnership bool
+}
+
+func NewSetToken(m map[string]any) (st SetToken, err error) {
+	st.NewOwner = decoder.StringFromMap(m, "new_owner")
+	st.Owner = decoder.StringFromMap(m, "owner")
+	st.TokenId = decoder.StringFromMap(m, "token_id")
+	st.IsmId = decoder.StringFromMap(m, "ism_id")
+	st.RenounceOwnership, err = decoder.BoolFromMap(m, "renounce_ownership")
+	if err != nil {
+		return st, errors.Wrap(err, "renounce_ownership")
+	}
 	return
 }

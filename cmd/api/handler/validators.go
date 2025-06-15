@@ -55,6 +55,12 @@ func NewCelestiaApiValidator() *CelestiaApiValidator {
 	if err := v.RegisterValidation("ibc_channel_status", ibcChannelStatusValidator()); err != nil {
 		panic(err)
 	}
+	if err := v.RegisterValidation("hl_token_type", hyperlaneTokenTypeValidator()); err != nil {
+		panic(err)
+	}
+	if err := v.RegisterValidation("hl_transfer_type", hyperlaneTransferTypeValidator()); err != nil {
+		panic(err)
+	}
 	return &CelestiaApiValidator{validator: v}
 }
 
@@ -179,6 +185,20 @@ func voterTypeValidator() validator.Func {
 func ibcChannelStatusValidator() validator.Func {
 	return func(fl validator.FieldLevel) bool {
 		_, err := types.ParseIbcChannelStatus(fl.Field().String())
+		return err == nil
+	}
+}
+
+func hyperlaneTokenTypeValidator() validator.Func {
+	return func(fl validator.FieldLevel) bool {
+		_, err := types.ParseHLTokenType(fl.Field().String())
+		return err == nil
+	}
+}
+
+func hyperlaneTransferTypeValidator() validator.Func {
+	return func(fl validator.FieldLevel) bool {
+		_, err := types.ParseHLTransferType(fl.Field().String())
 		return err == nil
 	}
 }

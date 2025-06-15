@@ -50,3 +50,14 @@ func RandomText(n int) string {
 	}
 	return string(b)
 }
+
+// RandomBytes - generates random bytes with fixed size
+//
+//	data := RandomBytes(10)
+func RandomBytes(n int) []byte {
+	b := make([]byte, n)
+	if _, err := rand.Read(b); err != nil {
+		panic(err)
+	}
+	return b
+}

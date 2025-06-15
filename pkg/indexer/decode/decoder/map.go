@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bcp-innovations/hyperlane-cosmos/util"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
@@ -34,6 +35,14 @@ func DecimalFromMap(m map[string]any, key string) decimal.Decimal {
 
 func Amount(m map[string]any) decimal.Decimal {
 	return DecimalFromMap(m, "amount")
+}
+
+func CoinFromMap(m map[string]any, key string) (cosmosTypes.Coin, error) {
+	str := StringFromMap(m, key)
+	if str == "" {
+		return cosmosTypes.Coin{}, nil
+	}
+	return cosmosTypes.ParseCoinNormalized(str)
 }
 
 func Map(m map[string]any, key string) (map[string]any, error) {
@@ -143,6 +152,18 @@ func Uint64FromMap(m map[string]any, key string) (uint64, error) {
 	return strconv.ParseUint(str, 10, 64)
 }
 
+func BoolFromMap(m map[string]any, key string) (bool, error) {
+	val, ok := m[key]
+	if !ok {
+		return false, errors.Errorf("can't find key: %s", key)
+	}
+	b, ok := val.(string)
+	if !ok {
+		return false, errors.Errorf("key '%s' is not a string", key)
+	}
+	return strconv.ParseBool(b)
+}
+
 func ClientStateFromMap(m map[string]any, key string) (*tmTypes.ClientState, error) {
 	val, ok := m[key]
 	if !ok {
@@ -208,4 +229,26 @@ func MessagesFromMap(m map[string]any, key string) ([]cosmosTypes.Msg, error) {
 		return nil, errors.Errorf("key '%s' is not a messages", key)
 	}
 	return msgs, nil
+}
+
+func HyperlaneMessageFromMap(m map[string]any, key string) (*util.HyperlaneMessage, error) {
+	val, ok := m[key]
+	if !ok {
+		return nil, nil
+	}
+	str, ok := val.(string)
+	if !ok {
+		return nil, errors.Errorf("key '%s' is not a string", key)
+	}
+	if str == "" {
+		return nil, nil
+	}
+
+	messageBytes, err := util.DecodeEthHex(str)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to decode hyperlane message")
+	}
+
+	result, err := util.ParseHyperlaneMessage(messageBytes)
+	return &result, err
 }

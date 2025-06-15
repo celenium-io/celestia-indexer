@@ -1,0 +1,13 @@
+- id: 1
+  height: 1000
+  time: '2023-07-04T03:10:57'
+  owner_id: 1
+  mailbox_id: 1
+  tx_id: 1
+  type: collateral
+  denom: utia
+  token_id: token
+  sent_transfers: 12
+  received_transfers: 21
+  sent: 100000
+  received: 200000

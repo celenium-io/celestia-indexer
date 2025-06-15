@@ -231,6 +231,15 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	if err := tx.RollbackIbcClients(ctx, height); err != nil {
 		return err
 	}
+	if err := tx.RollbackHyperlaneTransfers(ctx, height); err != nil {
+		return err
+	}
+	if err := tx.RollbackHyperlaneTokens(ctx, height); err != nil {
+		return err
+	}
+	if err := tx.RollbackHyperlaneMailbox(ctx, height); err != nil {
+		return err
+	}
 
 	newBlock, err := tx.LastBlock(ctx)
 	if err != nil {

@@ -738,6 +738,145 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// Hyperlane Mailbox
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLMailbox)(nil)).
+			Index("hl_mailbox_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLMailbox)(nil)).
+			Index("hl_mailbox_owner_id_idx").
+			Column("owner_id").
+			Where("owner_id is not null").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLMailbox)(nil)).
+			Index("hl_mailbox_tx_id_idx").
+			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// Hyperlane Token
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLToken)(nil)).
+			Index("hl_token_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLToken)(nil)).
+			Index("hl_token_mailbox_id_idx").
+			Column("mailbox_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLToken)(nil)).
+			Index("hl_token_owner_id_idx").
+			Column("owner_id").
+			Where("owner_id is not null").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLToken)(nil)).
+			Index("hl_token_type_idx").
+			Column("type").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLToken)(nil)).
+			Index("hl_token_tx_id_idx").
+			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// Hyperlane Transfer
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLTransfer)(nil)).
+			Index("hl_transfer_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLTransfer)(nil)).
+			Index("hl_transfer_mailbox_id_idx").
+			Column("mailbox_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLTransfer)(nil)).
+			Index("hl_transfer_token_id_idx").
+			Column("token_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLTransfer)(nil)).
+			Index("hl_transfer_relayer_id_idx").
+			Column("relayer_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLTransfer)(nil)).
+			Index("hl_transfer_tx_id_idx").
+			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLTransfer)(nil)).
+			Index("hl_transfer_address_id_idx").
+			Column("address_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLTransfer)(nil)).
+			Index("hl_transfer_counterparty_idx").
+			Column("counterparty").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLTransfer)(nil)).
+			Index("hl_transfer_type_idx").
+			Column("type").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }
