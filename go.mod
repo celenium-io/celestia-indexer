@@ -58,7 +58,7 @@ require (
 	cosmossdk.io/x/feegrant v0.1.1
 	cosmossdk.io/x/nft v0.2.0
 	cosmossdk.io/x/upgrade v0.1.4
-	github.com/bcp-innovations/hyperlane-cosmos v1.0.0
+	github.com/bcp-innovations/hyperlane-cosmos v1.0.1
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/gogoproto v1.7.0
 	github.com/gogo/protobuf v1.3.3

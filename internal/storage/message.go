@@ -77,6 +77,9 @@ type Message struct {
 	IbcConnection  *IbcConnection    `bun:"-"` // internal field
 	IbcChannel     *IbcChannel       `bun:"-"` // internal field
 	IbcTransfer    *IbcTransfer      `bun:"-"` // internal field
+	HLMailbox      *HLMailbox        `bun:"-"` // internal field
+	HLTransfer     *HLTransfer       `bun:"-"` // internal field
+	HLToken        *HLToken          `bun:"-"` // internal field
 }
 
 // TableName -

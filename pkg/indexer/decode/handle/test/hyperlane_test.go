@@ -99,13 +99,25 @@ func TestDecodeMsg_SuccessOnMsgProcessMessage(t *testing.T) {
 		Size:      136,
 		Data:      structs.Map(msg),
 		Namespace: nil,
-		Addresses: []storage.AddressWithType{},
+		Addresses: []storage.AddressWithType{
+			{
+				Type: storageTypes.MsgAddressTypeRelayer,
+				Address: storage.Address{
+					Id:         0,
+					Height:     block.Height,
+					LastHeight: block.Height,
+					Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+					Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
+					Balance:    storage.EmptyBalance(),
+				},
+			},
+		},
 	}
 
 	require.NoError(t, err)
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
-	require.Nil(t, dm.Addresses)
+	require.Equal(t, msgExpected.Addresses, dm.Addresses)
 }
 
 func TestDecodeMsg_SuccessOnMsgSetMailbox(t *testing.T) {

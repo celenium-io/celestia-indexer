@@ -1,0 +1,17 @@
+- id: 1
+  height: 1000
+  time: '2023-07-04T03:10:57'
+  mailbox_id: 1
+  relayer_id: 2
+  token_id: 1
+  counterparty: 1234
+  address_id: 1
+  counterparty_address: '1234567890abcdef'
+  version: 1
+  nonce: 1
+  body: 0x01020301
+  metadata: 0x302010
+  type: send
+  amount: 1000
+  denom: utia
+  tx_id: 1

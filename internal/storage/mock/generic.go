@@ -981,6 +981,84 @@ func (c *MockTransactionHandleErrorCall) DoAndReturn(f func(context.Context, err
 	return c
 }
 
+// HyperlaneMailbox mocks base method.
+func (m *MockTransaction) HyperlaneMailbox(ctx context.Context, id []byte) (storage.HLMailbox, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HyperlaneMailbox", ctx, id)
+	ret0, _ := ret[0].(storage.HLMailbox)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HyperlaneMailbox indicates an expected call of HyperlaneMailbox.
+func (mr *MockTransactionMockRecorder) HyperlaneMailbox(ctx, id any) *MockTransactionHyperlaneMailboxCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HyperlaneMailbox", reflect.TypeOf((*MockTransaction)(nil).HyperlaneMailbox), ctx, id)
+	return &MockTransactionHyperlaneMailboxCall{Call: call}
+}
+
+// MockTransactionHyperlaneMailboxCall wrap *gomock.Call
+type MockTransactionHyperlaneMailboxCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionHyperlaneMailboxCall) Return(arg0 storage.HLMailbox, arg1 error) *MockTransactionHyperlaneMailboxCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionHyperlaneMailboxCall) Do(f func(context.Context, []byte) (storage.HLMailbox, error)) *MockTransactionHyperlaneMailboxCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionHyperlaneMailboxCall) DoAndReturn(f func(context.Context, []byte) (storage.HLMailbox, error)) *MockTransactionHyperlaneMailboxCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// HyperlaneToken mocks base method.
+func (m *MockTransaction) HyperlaneToken(ctx context.Context, id []byte) (storage.HLToken, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HyperlaneToken", ctx, id)
+	ret0, _ := ret[0].(storage.HLToken)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HyperlaneToken indicates an expected call of HyperlaneToken.
+func (mr *MockTransactionMockRecorder) HyperlaneToken(ctx, id any) *MockTransactionHyperlaneTokenCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HyperlaneToken", reflect.TypeOf((*MockTransaction)(nil).HyperlaneToken), ctx, id)
+	return &MockTransactionHyperlaneTokenCall{Call: call}
+}
+
+// MockTransactionHyperlaneTokenCall wrap *gomock.Call
+type MockTransactionHyperlaneTokenCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionHyperlaneTokenCall) Return(arg0 storage.HLToken, arg1 error) *MockTransactionHyperlaneTokenCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionHyperlaneTokenCall) Do(f func(context.Context, []byte) (storage.HLToken, error)) *MockTransactionHyperlaneTokenCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionHyperlaneTokenCall) DoAndReturn(f func(context.Context, []byte) (storage.HLToken, error)) *MockTransactionHyperlaneTokenCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // IbcConnection mocks base method.
 func (m *MockTransaction) IbcConnection(ctx context.Context, id string) (storage.IbcConnection, error) {
 	m.ctrl.T.Helper()
@@ -1752,6 +1830,120 @@ func (c *MockTransactionRollbackGrantsCall) Do(f func(context.Context, types.Lev
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionRollbackGrantsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackGrantsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackHyperlaneMailbox mocks base method.
+func (m *MockTransaction) RollbackHyperlaneMailbox(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackHyperlaneMailbox", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackHyperlaneMailbox indicates an expected call of RollbackHyperlaneMailbox.
+func (mr *MockTransactionMockRecorder) RollbackHyperlaneMailbox(ctx, height any) *MockTransactionRollbackHyperlaneMailboxCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackHyperlaneMailbox", reflect.TypeOf((*MockTransaction)(nil).RollbackHyperlaneMailbox), ctx, height)
+	return &MockTransactionRollbackHyperlaneMailboxCall{Call: call}
+}
+
+// MockTransactionRollbackHyperlaneMailboxCall wrap *gomock.Call
+type MockTransactionRollbackHyperlaneMailboxCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackHyperlaneMailboxCall) Return(arg0 error) *MockTransactionRollbackHyperlaneMailboxCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackHyperlaneMailboxCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneMailboxCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackHyperlaneMailboxCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneMailboxCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackHyperlaneTokens mocks base method.
+func (m *MockTransaction) RollbackHyperlaneTokens(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackHyperlaneTokens", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackHyperlaneTokens indicates an expected call of RollbackHyperlaneTokens.
+func (mr *MockTransactionMockRecorder) RollbackHyperlaneTokens(ctx, height any) *MockTransactionRollbackHyperlaneTokensCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackHyperlaneTokens", reflect.TypeOf((*MockTransaction)(nil).RollbackHyperlaneTokens), ctx, height)
+	return &MockTransactionRollbackHyperlaneTokensCall{Call: call}
+}
+
+// MockTransactionRollbackHyperlaneTokensCall wrap *gomock.Call
+type MockTransactionRollbackHyperlaneTokensCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackHyperlaneTokensCall) Return(arg0 error) *MockTransactionRollbackHyperlaneTokensCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackHyperlaneTokensCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneTokensCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackHyperlaneTokensCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneTokensCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackHyperlaneTransfers mocks base method.
+func (m *MockTransaction) RollbackHyperlaneTransfers(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackHyperlaneTransfers", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackHyperlaneTransfers indicates an expected call of RollbackHyperlaneTransfers.
+func (mr *MockTransactionMockRecorder) RollbackHyperlaneTransfers(ctx, height any) *MockTransactionRollbackHyperlaneTransfersCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackHyperlaneTransfers", reflect.TypeOf((*MockTransaction)(nil).RollbackHyperlaneTransfers), ctx, height)
+	return &MockTransactionRollbackHyperlaneTransfersCall{Call: call}
+}
+
+// MockTransactionRollbackHyperlaneTransfersCall wrap *gomock.Call
+type MockTransactionRollbackHyperlaneTransfersCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackHyperlaneTransfersCall) Return(arg0 error) *MockTransactionRollbackHyperlaneTransfersCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackHyperlaneTransfersCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneTransfersCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackHyperlaneTransfersCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneTransfersCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -2826,6 +3018,135 @@ func (c *MockTransactionSaveGrantsCall) Do(f func(context.Context, ...storage.Gr
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionSaveGrantsCall) DoAndReturn(f func(context.Context, ...storage.Grant) error) *MockTransactionSaveGrantsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveHyperlaneMailbox mocks base method.
+func (m *MockTransaction) SaveHyperlaneMailbox(ctx context.Context, mailbox ...*storage.HLMailbox) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range mailbox {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveHyperlaneMailbox", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveHyperlaneMailbox indicates an expected call of SaveHyperlaneMailbox.
+func (mr *MockTransactionMockRecorder) SaveHyperlaneMailbox(ctx any, mailbox ...any) *MockTransactionSaveHyperlaneMailboxCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, mailbox...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveHyperlaneMailbox", reflect.TypeOf((*MockTransaction)(nil).SaveHyperlaneMailbox), varargs...)
+	return &MockTransactionSaveHyperlaneMailboxCall{Call: call}
+}
+
+// MockTransactionSaveHyperlaneMailboxCall wrap *gomock.Call
+type MockTransactionSaveHyperlaneMailboxCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveHyperlaneMailboxCall) Return(arg0 error) *MockTransactionSaveHyperlaneMailboxCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveHyperlaneMailboxCall) Do(f func(context.Context, ...*storage.HLMailbox) error) *MockTransactionSaveHyperlaneMailboxCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveHyperlaneMailboxCall) DoAndReturn(f func(context.Context, ...*storage.HLMailbox) error) *MockTransactionSaveHyperlaneMailboxCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveHyperlaneTokens mocks base method.
+func (m *MockTransaction) SaveHyperlaneTokens(ctx context.Context, tokens ...*storage.HLToken) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range tokens {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveHyperlaneTokens", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveHyperlaneTokens indicates an expected call of SaveHyperlaneTokens.
+func (mr *MockTransactionMockRecorder) SaveHyperlaneTokens(ctx any, tokens ...any) *MockTransactionSaveHyperlaneTokensCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, tokens...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveHyperlaneTokens", reflect.TypeOf((*MockTransaction)(nil).SaveHyperlaneTokens), varargs...)
+	return &MockTransactionSaveHyperlaneTokensCall{Call: call}
+}
+
+// MockTransactionSaveHyperlaneTokensCall wrap *gomock.Call
+type MockTransactionSaveHyperlaneTokensCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveHyperlaneTokensCall) Return(arg0 error) *MockTransactionSaveHyperlaneTokensCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveHyperlaneTokensCall) Do(f func(context.Context, ...*storage.HLToken) error) *MockTransactionSaveHyperlaneTokensCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveHyperlaneTokensCall) DoAndReturn(f func(context.Context, ...*storage.HLToken) error) *MockTransactionSaveHyperlaneTokensCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveHyperlaneTransfers mocks base method.
+func (m *MockTransaction) SaveHyperlaneTransfers(ctx context.Context, transfers ...*storage.HLTransfer) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range transfers {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveHyperlaneTransfers", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveHyperlaneTransfers indicates an expected call of SaveHyperlaneTransfers.
+func (mr *MockTransactionMockRecorder) SaveHyperlaneTransfers(ctx any, transfers ...any) *MockTransactionSaveHyperlaneTransfersCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, transfers...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveHyperlaneTransfers", reflect.TypeOf((*MockTransaction)(nil).SaveHyperlaneTransfers), varargs...)
+	return &MockTransactionSaveHyperlaneTransfersCall{Call: call}
+}
+
+// MockTransactionSaveHyperlaneTransfersCall wrap *gomock.Call
+type MockTransactionSaveHyperlaneTransfersCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveHyperlaneTransfersCall) Return(arg0 error) *MockTransactionSaveHyperlaneTransfersCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveHyperlaneTransfersCall) Do(f func(context.Context, ...*storage.HLTransfer) error) *MockTransactionSaveHyperlaneTransfersCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveHyperlaneTransfersCall) DoAndReturn(f func(context.Context, ...*storage.HLTransfer) error) *MockTransactionSaveHyperlaneTransfersCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

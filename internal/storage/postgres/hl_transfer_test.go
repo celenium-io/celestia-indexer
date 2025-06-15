@@ -1,0 +1,69 @@
+// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
+// SPDX-License-Identifier: MIT
+
+package postgres
+
+import (
+	"context"
+	"encoding/hex"
+	"time"
+
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
+)
+
+func (s *StorageTestSuite) TestHyperlaneTransferList() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	transfers, err := s.storage.HLTransfer.List(ctx, storage.ListHyperlaneTransfers{
+		Limit:     1,
+		Offset:    0,
+		Sort:      sdk.SortOrderAsc,
+		AddressId: 1,
+		RelayerId: 2,
+		MailboxId: 1,
+		TokenId:   1,
+		Type:      types.HLTransferTypeValues(),
+		Domain:    1234,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(transfers, 1)
+
+	transfer := transfers[0]
+	s.Require().EqualValues(1, transfer.Id)
+	s.Require().EqualValues(1000, transfer.Height)
+	s.Require().EqualValues(1234, transfer.Counterparty)
+	s.Require().EqualValues("utia", transfer.Denom)
+	s.Require().EqualValues(1, transfer.TokenId)
+	s.Require().EqualValues(1, transfer.MailboxId)
+	s.Require().EqualValues(1, transfer.AddressId)
+	s.Require().EqualValues(2, transfer.RelayerId)
+	s.Require().EqualValues(1, transfer.Version)
+	s.Require().EqualValues(1, transfer.Nonce)
+	s.Require().EqualValues("1000", transfer.Amount.String())
+	s.Require().EqualValues("1234567890abcdef", transfer.CounterpartyAddress)
+	s.Require().EqualValues(types.HLTransferTypeSend, transfer.Type)
+	s.Require().NotNil(transfer.Body)
+	s.Require().NotNil(transfer.Metadata)
+
+	s.Require().NotNil(transfer.Tx)
+	txHash, err := hex.DecodeString("652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF")
+	s.Require().NoError(err)
+	s.Require().Equal(txHash, transfer.Tx.Hash)
+
+	s.Require().NotNil(transfer.Address)
+	s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", transfer.Address.Address)
+	s.Require().NotNil(transfer.Address.Celestials)
+
+	s.Require().NotNil(transfer.Relayer)
+	s.Require().EqualValues("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", transfer.Relayer.Address)
+	s.Require().NotNil(transfer.Relayer.Celestials)
+
+	s.Require().NotNil(transfer.Mailbox)
+	s.Require().Equal([]byte("mailbox"), transfer.Mailbox.Mailbox)
+
+	s.Require().NotNil(transfer.Token)
+	s.Require().Equal([]byte("token"), transfer.Token.TokenId)
+}

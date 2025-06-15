@@ -39,6 +39,13 @@ var eventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgChannelCloseConfirm:         handleChannelClose,
 	storageTypes.MsgAcknowledgement:             handleAcknowledgement,
 	storageTypes.MsgRecvPacket:                  handleRecvPacket,
+	storageTypes.MsgCreateMailbox:               handleCreateMailbox,
+	storageTypes.MsgSetMailbox:                  handleSetMailbox,
+	storageTypes.MsgProcessMessage:              handleHyperlaneProcessMessage,
+	storageTypes.MsgRemoteTransfer:              handleHyperlaneRemoteTransfer,
+	storageTypes.MsgCreateCollateralToken:       handleCreateCollateralToken,
+	storageTypes.MsgCreateSyntheticToken:        handleCreateSyntheticToken,
+	storageTypes.MsgSetToken:                    handleSetToken,
 }
 
 func handle(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int, eventHandlers map[storageTypes.MsgType]EventHandler, stopKey string) error {
@@ -94,6 +101,13 @@ var ibcEventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgChannelOpenAck:              processChannelOpenConfirm,
 	storageTypes.MsgChannelCloseInit:            processChannelClose,
 	storageTypes.MsgChannelCloseConfirm:         processChannelClose,
+	storageTypes.MsgCreateMailbox:               processCreateMailbox,
+	storageTypes.MsgSetMailbox:                  processSetMailbox,
+	storageTypes.MsgProcessMessage:              processHyperlaneProcessMessage,
+	storageTypes.MsgRemoteTransfer:              processHyperlaneRemoteTransfer,
+	storageTypes.MsgCreateCollateralToken:       processCreateCollateralToken,
+	storageTypes.MsgCreateSyntheticToken:        processCreateSyntheticToken,
+	storageTypes.MsgSetToken:                    processSetToken,
 }
 
 func toTheNextAction(events []storage.Event, idx *int) {

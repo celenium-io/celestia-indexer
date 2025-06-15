@@ -80,7 +80,27 @@ package types
 		ics27_packet,
 		channel_close_confirm,
 
-		update_client_proposal
+		update_client_proposal,
+
+		hyperlane.core.v1.EventDispatch,
+		hyperlane.core.v1.EventProcess,
+		hyperlane.core.v1.EventCreateMailbox,
+		hyperlane.core.v1.EventSetMailbox,
+		hyperlane.warp.v1.EventCreateSyntheticToken,
+		hyperlane.warp.v1.EventCreateCollateralToken,
+		hyperlane.warp.v1.EventSetToken,
+		hyperlane.warp.v1.EventEnrollRemoteRouter,
+		hyperlane.warp.v1.EventUnrollRemoteRouter,
+		hyperlane.warp.v1.EventSendRemoteTransfer,
+		hyperlane.warp.v1.EventReceiveRemoteTransfer,
+		hyperlane.core.post_dispatch.v1.EventCreateMerkleTreeHook,
+		hyperlane.core.post_dispatch.v1.EventInsertedIntoTree,
+		hyperlane.core.post_dispatch.v1.EventGasPayment,
+		hyperlane.core.post_dispatch.v1.EventCreateNoopHook,
+		hyperlane.core.post_dispatch.v1.EventCreateIgp,
+		hyperlane.core.post_dispatch.v1.EventSetIgp,
+		hyperlane.core.post_dispatch.v1.EventSetDestinationGasConfig,
+		hyperlane.core.post_dispatch.v1.EventClaimIgp,
 	)
 */
 //go:generate go-enum --marshal --sql --values --names

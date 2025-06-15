@@ -701,6 +701,78 @@ func (tx Transaction) SaveIbcTransfers(ctx context.Context, transfers ...*models
 	return err
 }
 
+func (tx Transaction) SaveHyperlaneMailbox(ctx context.Context, mailbox ...*models.HLMailbox) error {
+	if len(mailbox) == 0 {
+		return nil
+	}
+
+	for i := range mailbox {
+		query := tx.Tx().NewInsert().
+			Model(mailbox[i]).
+			Column("height", "time", "tx_id", "mailbox", "owner_id", "default_ism", "default_hook", "required_hook", "domain", "sent_messages", "received_messages").
+			On("CONFLICT (mailbox) DO UPDATE")
+
+		if mailbox[i].Owner != nil {
+			query.Set("owner_id = EXCLUDED.owner_id")
+		}
+		if mailbox[i].SentMessages > 0 {
+			query.Set("sent_messages = hl_mailbox.sent_messages + EXCLUDED.sent_messages")
+		}
+		if mailbox[i].ReceivedMessages > 0 {
+			query.Set("received_messages = hl_mailbox.received_messages + EXCLUDED.received_messages")
+		}
+
+		if _, err := query.Exec(ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (tx Transaction) SaveHyperlaneTokens(ctx context.Context, tokens ...*models.HLToken) error {
+	if len(tokens) == 0 {
+		return nil
+	}
+
+	for i := range tokens {
+		query := tx.Tx().NewInsert().
+			Model(tokens[i]).
+			Column("height", "time", "tx_id", "mailbox_id", "owner_id", "type", "denom", "token_id", "sent_transfers", "received_transfers", "sent", "received").
+			On("CONFLICT (token_id) DO UPDATE")
+
+		if tokens[i].Owner != nil {
+			query.Set("owner_id = EXCLUDED.owner_id")
+		}
+		if tokens[i].SentTransfers > 0 {
+			query.Set("sent_transfers = hl_token.sent_transfers + EXCLUDED.sent_transfers")
+		}
+		if tokens[i].ReceiveTransfers > 0 {
+			query.Set("received_transfers = hl_token.received_transfers + EXCLUDED.received_transfers")
+		}
+		if !tokens[i].Sent.IsZero() {
+			query.Set("sent = hl_token.sent + EXCLUDED.sent")
+		}
+		if !tokens[i].Received.IsZero() {
+			query.Set("received = hl_token.received + EXCLUDED.received")
+		}
+
+		if _, err := query.Exec(ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (tx Transaction) SaveHyperlaneTransfers(ctx context.Context, transfers ...*models.HLTransfer) error {
+	if len(transfers) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&transfers).Exec(ctx)
+	return err
+}
+
 func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, fraction decimal.Decimal) (balances []models.Balance, err error) {
 	if validatorId == 0 || !fraction.IsPositive() {
 		return nil, nil
@@ -896,6 +968,27 @@ func (tx Transaction) RollbackIbcChannels(ctx context.Context, height types.Leve
 
 func (tx Transaction) RollbackIbcTransfers(ctx context.Context, height types.Level) (err error) {
 	_, err = tx.Tx().NewDelete().Model((*models.IbcChannel)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackHyperlaneMailbox(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.HLMailbox)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackHyperlaneTokens(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.HLToken)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackHyperlaneTransfers(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.HLTransfer)(nil)).
 		Where("height = ?", height).
 		Exec(ctx)
 	return
@@ -1208,6 +1301,22 @@ func (tx Transaction) IbcConnection(ctx context.Context, id string) (conn models
 	err = tx.Tx().NewSelect().Model(&conn).
 		Where("connection_id = ?", id).
 		Column("client_id").
+		Scan(ctx)
+	return
+}
+
+func (tx Transaction) HyperlaneMailbox(ctx context.Context, id []byte) (mailbox models.HLMailbox, err error) {
+	err = tx.Tx().NewSelect().Model(&mailbox).
+		Where("mailbox = ?", id).
+		Column("id").
+		Scan(ctx)
+	return
+}
+
+func (tx Transaction) HyperlaneToken(ctx context.Context, id []byte) (token models.HLToken, err error) {
+	err = tx.Tx().NewSelect().Model(&token).
+		Where("token_id = ?", id).
+		Column("id").
 		Scan(ctx)
 	return
 }

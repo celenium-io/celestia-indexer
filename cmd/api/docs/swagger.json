@@ -2291,6 +2291,346 @@
                 }
             }
         },
+        "/hyperlane/mailbox": {
+            "get": {
+                "description": "List hyperlane mailboxes info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "List hyperlane mailboxes info",
+                "operationId": "list-hyperlane-mailbox",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.HyperlaneMailbox"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/hyperlane/mailbox/{id}": {
+            "get": {
+                "description": "Get hyperlane mailbox info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "Get hyperlane mailbox info",
+                "operationId": "get-hyperlane-mailbox",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Hyperlane mailbox id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.HyperlaneMailbox"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/hyperlane/token": {
+            "get": {
+                "description": "List hyperlane tokens info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "List hyperlane tokens info",
+                "operationId": "list-hyperlane-tokens",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Owner celestia address",
+                        "name": "owner",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Mailbox hexademical identity",
+                        "name": "mailbox",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "synthetic",
+                            "collateral"
+                        ],
+                        "type": "string",
+                        "description": "Comma-separated string of tokens type",
+                        "name": "type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.HyperlaneToken"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/hyperlane/token/{id}": {
+            "get": {
+                "description": "Get hyperlane token info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "Get hyperlane token info",
+                "operationId": "get-hyperlane-token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Hyperlane token id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.HyperlaneToken"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/hyperlane/transfer": {
+            "get": {
+                "description": "List hyperlane transfers info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "List hyperlane transfers info",
+                "operationId": "list-hyperlane-transfers",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Celestia address",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Celestia address of relayer",
+                        "name": "relayer",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Mailbox hexademical identity",
+                        "name": "mailbox",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token hexademical identity",
+                        "name": "token",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "send",
+                            "receive"
+                        ],
+                        "type": "string",
+                        "description": "Comma-separated string of transfer type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Domain of counterparty chain",
+                        "name": "domain",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.HyperlaneTransfer"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/ibc/channel": {
             "get": {
                 "description": "Get ibc channels info",
@@ -6726,6 +7066,18 @@
                         "type": "string"
                     }
                 },
+                "hyperlane_token_type": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "hyperlane_transfer_type": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "ibc_channel_status": {
                     "type": "array",
                     "items": {
@@ -6895,6 +7247,230 @@
                     "type": "string",
                     "format": "string",
                     "example": "2223424"
+                }
+            }
+        },
+        "responses.HyperlaneCounterparty": {
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "hash": {
+                    "type": "string",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                }
+            }
+        },
+        "responses.HyperlaneMailbox": {
+            "type": "object",
+            "properties": {
+                "default_hook": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "default_ism": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "domain": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "mailbox": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "owner": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "received_messages": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "required_hook": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "sent_messages": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                }
+            }
+        },
+        "responses.HyperlaneToken": {
+            "type": "object",
+            "properties": {
+                "denom": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "utia"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "mailbox": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "owner": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "received": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123445"
+                },
+                "received_transfers": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "sent": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123445"
+                },
+                "sent_transfers": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "token_id": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "type": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "collateral"
+                }
+            }
+        },
+        "responses.HyperlaneTransfer": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "body": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="
+                },
+                "counterparty": {
+                    "$ref": "#/definitions/responses.HyperlaneCounterparty"
+                },
+                "denom": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "utia"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "mailbox": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "metadata": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="
+                },
+                "nonce": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 10
+                },
+                "received": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123445"
+                },
+                "relayer": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "token_id": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "type": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "collateral"
+                },
+                "version": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1
                 }
             }
         },
@@ -9104,7 +9680,26 @@
                 "inactive_proposal",
                 "ics27_packet",
                 "channel_close_confirm",
-                "update_client_proposal"
+                "update_client_proposal",
+                "hyperlane.core.v1.EventDispatch",
+                "hyperlane.core.v1.EventProcess",
+                "hyperlane.core.v1.EventCreateMailbox",
+                "hyperlane.core.v1.EventSetMailbox",
+                "hyperlane.warp.v1.EventCreateSyntheticToken",
+                "hyperlane.warp.v1.EventCreateCollateralToken",
+                "hyperlane.warp.v1.EventSetToken",
+                "hyperlane.warp.v1.EventEnrollRemoteRouter",
+                "hyperlane.warp.v1.EventUnrollRemoteRouter",
+                "hyperlane.warp.v1.EventSendRemoteTransfer",
+                "hyperlane.warp.v1.EventReceiveRemoteTransfer",
+                "hyperlane.core.post_dispatch.v1.EventCreateMerkleTreeHook",
+                "hyperlane.core.post_dispatch.v1.EventInsertedIntoTree",
+                "hyperlane.core.post_dispatch.v1.EventGasPayment",
+                "hyperlane.core.post_dispatch.v1.EventCreateNoopHook",
+                "hyperlane.core.post_dispatch.v1.EventCreateIgp",
+                "hyperlane.core.post_dispatch.v1.EventSetIgp",
+                "hyperlane.core.post_dispatch.v1.EventSetDestinationGasConfig",
+                "hyperlane.core.post_dispatch.v1.EventClaimIgp"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -9166,7 +9761,26 @@
                 "EventTypeInactiveProposal",
                 "EventTypeIcs27Packet",
                 "EventTypeChannelCloseConfirm",
-                "EventTypeUpdateClientProposal"
+                "EventTypeUpdateClientProposal",
+                "EventTypeHyperlanecorev1EventDispatch",
+                "EventTypeHyperlanecorev1EventProcess",
+                "EventTypeHyperlanecorev1EventCreateMailbox",
+                "EventTypeHyperlanecorev1EventSetMailbox",
+                "EventTypeHyperlanewarpv1EventCreateSyntheticToken",
+                "EventTypeHyperlanewarpv1EventCreateCollateralToken",
+                "EventTypeHyperlanewarpv1EventSetToken",
+                "EventTypeHyperlanewarpv1EventEnrollRemoteRouter",
+                "EventTypeHyperlanewarpv1EventUnrollRemoteRouter",
+                "EventTypeHyperlanewarpv1EventSendRemoteTransfer",
+                "EventTypeHyperlanewarpv1EventReceiveRemoteTransfer",
+                "EventTypeHyperlanecorepostDispatchv1EventCreateMerkleTreeHook",
+                "EventTypeHyperlanecorepostDispatchv1EventInsertedIntoTree",
+                "EventTypeHyperlanecorepostDispatchv1EventGasPayment",
+                "EventTypeHyperlanecorepostDispatchv1EventCreateNoopHook",
+                "EventTypeHyperlanecorepostDispatchv1EventCreateIgp",
+                "EventTypeHyperlanecorepostDispatchv1EventSetIgp",
+                "EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig",
+                "EventTypeHyperlanecorepostDispatchv1EventClaimIgp"
             ]
         },
         "types.MsgAddressType": {

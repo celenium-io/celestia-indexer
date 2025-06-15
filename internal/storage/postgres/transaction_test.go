@@ -1472,6 +1472,147 @@ func (s *TransactionTestSuite) TestIbcConnection() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
+func (s *TransactionTestSuite) TestHyperlaneTransfers() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveHyperlaneTransfers(ctx, &storage.HLTransfer{
+		Id:                  123,
+		Height:              10000,
+		Time:                time.Now().UTC(),
+		Amount:              decimal.RequireFromString("12123123"),
+		Denom:               currency.Utia,
+		TxId:                2,
+		MailboxId:           1,
+		TokenId:             1,
+		AddressId:           1,
+		Counterparty:        1,
+		CounterpartyAddress: "1234567890",
+		Version:             2,
+		Nonce:               2,
+		Type:                types.HLTransferTypeReceive,
+		RelayerId:           2,
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackHyperlaneTransfers(ctx, 10000)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestHyperlaneTokens() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveHyperlaneTokens(ctx, &storage.HLToken{
+		Id:               123,
+		Height:           10000,
+		Time:             time.Now().UTC(),
+		Denom:            currency.Utia,
+		TxId:             2,
+		MailboxId:        1,
+		TokenId:          []byte{0, 1, 2, 3, 4, 5, 6},
+		Type:             types.HLTokenTypeCollateral,
+		SentTransfers:    1,
+		ReceiveTransfers: 1,
+		Sent:             decimal.RequireFromString("123"),
+		Received:         decimal.Zero,
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackHyperlaneTokens(ctx, 10000)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestHyperlaneMailbox() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveHyperlaneMailbox(ctx, &storage.HLMailbox{
+		Id:               123,
+		Height:           10000,
+		Time:             time.Now().UTC(),
+		TxId:             2,
+		Mailbox:          []byte{1, 2, 3, 4, 5, 6},
+		OwnerId:          1,
+		Domain:           2,
+		SentMessages:     3,
+		RequiredHook:     []byte("hook"),
+		ReceivedMessages: 44,
+		DefaultIsm:       []byte("ism"),
+		DefaultHook:      []byte("default_hook"),
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackHyperlaneMailbox(ctx, 10000)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestGetHyperlaneMailbox() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	mailbox, err := tx.HyperlaneMailbox(ctx, []byte("mailbox"))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+	s.Require().EqualValues(1, mailbox.Id)
+}
+
+func (s *TransactionTestSuite) TestGetHyperlaneToken() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	token, err := tx.HyperlaneToken(ctx, []byte("token"))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+	s.Require().EqualValues(1, token.Id)
+}
+
 func TestSuiteTransaction_Run(t *testing.T) {
 	suite.Run(t, new(TransactionTestSuite))
 }

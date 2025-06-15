@@ -25,18 +25,21 @@ func (module *Module) saveMessages(
 	}
 
 	var (
-		namespaceMsgs   []storage.NamespaceMessage
-		msgAddress      []storage.MsgAddress
-		blobLogs        = make([]storage.BlobLog, 0)
-		vestingAccounts = make([]*storage.VestingAccount, 0)
-		ibcClients      = make(map[string]*storage.IbcClient)
-		ibcConnections  = make(map[string]*storage.IbcConnection)
-		ibcChannels     = make(map[string]*storage.IbcChannel)
-		ibcTransfers    = make([]*storage.IbcTransfer, 0)
-		grants          = make(map[string]storage.Grant)
-		namespaces      = make(map[string]uint64)
-		addedMsgId      = make(map[uint64]struct{})
-		msgAddrMap      = make(map[string]struct{})
+		namespaceMsgs      []storage.NamespaceMessage
+		msgAddress         []storage.MsgAddress
+		blobLogs           = make([]storage.BlobLog, 0)
+		vestingAccounts    = make([]*storage.VestingAccount, 0)
+		ibcClients         = make(map[string]*storage.IbcClient)
+		ibcConnections     = make(map[string]*storage.IbcConnection)
+		ibcChannels        = make(map[string]*storage.IbcChannel)
+		ibcTransfers       = make([]*storage.IbcTransfer, 0)
+		hyperlaneMailbox   = make(map[string]*storage.HLMailbox, 0)
+		hyperlaneTokens    = make(map[string]*storage.HLToken, 0)
+		hyperlaneTransfers = make([]*storage.HLTransfer, 0)
+		grants             = make(map[string]storage.Grant)
+		namespaces         = make(map[string]uint64)
+		addedMsgId         = make(map[uint64]struct{})
+		msgAddrMap         = make(map[string]struct{})
 	)
 	for i := range messages {
 		for j := range messages[i].Namespace {
@@ -185,6 +188,87 @@ func (module *Module) saveMessages(
 
 			ibcTransfers = append(ibcTransfers, messages[i].IbcTransfer)
 		}
+
+		if messages[i].HLMailbox != nil {
+			messages[i].HLMailbox.TxId = messages[i].TxId
+
+			if messages[i].HLMailbox.Owner != nil {
+				if addrId, ok := addrToId[messages[i].HLMailbox.Owner.Address]; ok {
+					messages[i].HLMailbox.OwnerId = addrId
+				}
+			}
+
+			hyperlaneMailbox[messages[i].HLMailbox.String()] = messages[i].HLMailbox
+		}
+
+		if messages[i].HLToken != nil {
+			messages[i].HLToken.TxId = messages[i].TxId
+
+			if messages[i].HLToken.Owner != nil {
+				if addrId, ok := addrToId[messages[i].HLToken.Owner.Address]; ok {
+					messages[i].HLToken.OwnerId = addrId
+				}
+			}
+
+			if messages[i].HLToken.Mailbox != nil {
+				mailbox, err := tx.HyperlaneMailbox(ctx, messages[i].HLToken.Mailbox.Mailbox)
+				if err != nil {
+					return 0, errors.Wrapf(err, "can't find mailbox for token: %x", messages[i].HLToken.Mailbox)
+				}
+				messages[i].HLToken.MailboxId = mailbox.Id
+			}
+
+			hyperlaneTokens[messages[i].HLToken.String()] = messages[i].HLToken
+		}
+
+		if messages[i].HLTransfer != nil {
+			messages[i].HLTransfer.TxId = messages[i].TxId
+
+			if messages[i].HLTransfer.Relayer != nil {
+				if addrId, ok := addrToId[messages[i].HLTransfer.Relayer.Address]; ok {
+					messages[i].HLTransfer.RelayerId = addrId
+				}
+			}
+			if messages[i].HLTransfer.Address != nil {
+				if addrId, ok := addrToId[messages[i].HLTransfer.Address.Address]; ok {
+					messages[i].HLTransfer.AddressId = addrId
+				}
+			}
+			if messages[i].HLTransfer.Mailbox != nil {
+				mailbox, err := tx.HyperlaneMailbox(ctx, messages[i].HLTransfer.Mailbox.Mailbox)
+				if err != nil {
+					return 0, errors.Wrapf(err, "can't find mailbox for transfer: %x", messages[i].HLTransfer.Mailbox)
+				}
+				messages[i].HLTransfer.MailboxId = mailbox.Id
+				messages[i].HLTransfer.Mailbox.Id = mailbox.Id
+
+				if hlm, ok := hyperlaneMailbox[messages[i].HLTransfer.Mailbox.String()]; ok {
+					if messages[i].HLTransfer.Token != nil {
+						hlm.ReceivedMessages += messages[i].HLTransfer.Token.ReceiveTransfers
+						hlm.SentMessages += messages[i].HLTransfer.Token.SentTransfers
+					}
+				} else {
+					hyperlaneMailbox[messages[i].HLTransfer.Mailbox.String()] = messages[i].HLTransfer.Mailbox
+				}
+			}
+			if messages[i].HLTransfer.Token != nil {
+				token, err := tx.HyperlaneToken(ctx, messages[i].HLTransfer.Token.TokenId)
+				if err != nil {
+					return 0, errors.Wrapf(err, "can't find token for transfer: %x", messages[i].HLTransfer.Token.TokenId)
+				}
+				messages[i].HLTransfer.TokenId = token.Id
+				messages[i].HLTransfer.Token.Id = token.Id
+
+				if hlt, ok := hyperlaneTokens[messages[i].HLTransfer.Token.String()]; ok {
+					hlt.ReceiveTransfers += messages[i].HLTransfer.Token.ReceiveTransfers
+					hlt.SentTransfers += messages[i].HLTransfer.Token.SentTransfers
+					hlt.Received = hlt.Received.Add(messages[i].HLTransfer.Token.Received)
+					hlt.Sent = hlt.Sent.Add(messages[i].HLTransfer.Token.Sent)
+				} else {
+					hyperlaneTokens[messages[i].HLToken.String()] = messages[i].HLTransfer.Token
+				}
+			}
+		}
 	}
 
 	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
@@ -237,6 +321,15 @@ func (module *Module) saveMessages(
 	}
 	if err := tx.SaveIbcTransfers(ctx, ibcTransfers...); err != nil {
 		return 0, errors.Wrap(err, "ibc transfers saving")
+	}
+	if err := tx.SaveHyperlaneMailbox(ctx, slices.Collect(maps.Values(hyperlaneMailbox))...); err != nil {
+		return 0, errors.Wrap(err, "hyperlane mailbox saving")
+	}
+	if err := tx.SaveHyperlaneTokens(ctx, slices.Collect(maps.Values(hyperlaneTokens))...); err != nil {
+		return 0, errors.Wrap(err, "hyperlane tokens saving")
+	}
+	if err := tx.SaveHyperlaneTransfers(ctx, hyperlaneTransfers...); err != nil {
+		return 0, errors.Wrap(err, "hyperlane transfers saving")
 	}
 
 	return ibcClientsCount, nil

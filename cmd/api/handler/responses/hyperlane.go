@@ -1,0 +1,157 @@
+// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
+// SPDX-License-Identifier: MIT
+
+package responses
+
+import (
+	"encoding/hex"
+	"time"
+
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+)
+
+type HyperlaneMailbox struct {
+	Id               uint64         `example:"321"                                                              format:"int64"     json:"id"                      swaggertype:"integer"`
+	Height           pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"                  swaggertype:"integer"`
+	Time             time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                    swaggertype:"string"`
+	TxHash           string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"       swaggertype:"string"`
+	Mailbox          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"mailbox"                 swaggertype:"string"`
+	DefaultIsm       string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"default_ism,omitempty"   swaggertype:"string"`
+	DefaultHook      string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"default_hook,omitempty"  swaggertype:"string"`
+	RequiredHook     string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"required_hook,omitempty" swaggertype:"string"`
+	Domain           uint64         `example:"100"                                                              format:"int64"     json:"domain,omitempty"        swaggertype:"integer"`
+	SentMessages     uint64         `example:"100"                                                              format:"int64"     json:"sent_messages"           swaggertype:"integer"`
+	ReceivedMessages uint64         `example:"100"                                                              format:"int64"     json:"received_messages"       swaggertype:"integer"`
+
+	Owner *ShortAddress `json:"owner,omitempty"`
+}
+
+func NewHyperlaneMailbox(mailbox storage.HLMailbox) HyperlaneMailbox {
+	result := HyperlaneMailbox{
+		Id:               mailbox.Id,
+		Height:           mailbox.Height,
+		Time:             mailbox.Time,
+		Mailbox:          hex.EncodeToString(mailbox.Mailbox),
+		Domain:           mailbox.Domain,
+		SentMessages:     mailbox.SentMessages,
+		ReceivedMessages: mailbox.ReceivedMessages,
+		Owner:            NewShortAddress(mailbox.Owner),
+	}
+
+	if len(mailbox.DefaultHook) > 0 {
+		result.DefaultHook = hex.EncodeToString(mailbox.DefaultHook)
+	}
+	if len(mailbox.RequiredHook) > 0 {
+		result.RequiredHook = hex.EncodeToString(mailbox.RequiredHook)
+	}
+	if len(mailbox.DefaultIsm) > 0 {
+		result.DefaultIsm = hex.EncodeToString(mailbox.DefaultIsm)
+	}
+
+	if mailbox.Tx != nil {
+		result.TxHash = hex.EncodeToString(mailbox.Tx.Hash)
+	}
+
+	return result
+}
+
+type HyperlaneToken struct {
+	Id               uint64         `example:"321"                                                              format:"int64"     json:"id"                 swaggertype:"integer"`
+	Height           pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"             swaggertype:"integer"`
+	Time             time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"               swaggertype:"string"`
+	Mailbox          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"mailbox"            swaggertype:"string"`
+	TxHash           string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"  swaggertype:"string"`
+	Type             string         `example:"collateral"                                                       format:"string"    json:"type"               swaggertype:"string"`
+	Denom            string         `example:"utia"                                                             format:"string"    json:"denom"              swaggertype:"string"`
+	TokenId          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"token_id"           swaggertype:"string"`
+	SentTransfers    uint64         `example:"100"                                                              format:"int64"     json:"sent_transfers"     swaggertype:"integer"`
+	ReceiveTransfers uint64         `example:"100"                                                              format:"int64"     json:"received_transfers" swaggertype:"integer"`
+	Sent             string         `example:"123445"                                                           format:"string"    json:"sent"               swaggertype:"string"`
+	Received         string         `example:"123445"                                                           format:"string"    json:"received"           swaggertype:"string"`
+
+	Owner *ShortAddress `json:"owner,omitempty"`
+}
+
+func NewHyperlaneToken(token storage.HLToken) HyperlaneToken {
+	result := HyperlaneToken{
+		Id:               token.Id,
+		Height:           token.Height,
+		Time:             token.Time,
+		Type:             token.Type.String(),
+		Denom:            token.Denom,
+		TokenId:          hex.EncodeToString(token.TokenId),
+		SentTransfers:    token.SentTransfers,
+		ReceiveTransfers: token.ReceiveTransfers,
+		Sent:             token.Sent.String(),
+		Received:         token.Received.String(),
+		Owner:            NewShortAddress(token.Owner),
+	}
+
+	if token.Mailbox != nil {
+		result.Mailbox = hex.EncodeToString(token.Mailbox.Mailbox)
+	}
+	if token.Tx != nil {
+		result.TxHash = hex.EncodeToString(token.Tx.Hash)
+	}
+
+	return result
+}
+
+type HyperlaneTransfer struct {
+	Id       uint64         `example:"321"                                                              format:"int64"     json:"id"                 swaggertype:"integer"`
+	Height   pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"             swaggertype:"integer"`
+	Time     time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"               swaggertype:"string"`
+	TxHash   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"  swaggertype:"string"`
+	Mailbox  string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"mailbox"            swaggertype:"string"`
+	TokenId  string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"token_id"           swaggertype:"string"`
+	Type     string         `example:"collateral"                                                       format:"string"    json:"type"               swaggertype:"string"`
+	Version  byte           `example:"1"                                                                format:"int64"     json:"version"            swaggertype:"integer"`
+	Nonce    uint32         `example:"10"                                                               format:"int64"     json:"nonce"              swaggertype:"integer"`
+	Body     []byte         `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="                         format:"string"    json:"body,omitempty"     swaggertype:"string"`
+	Metadata []byte         `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="                         format:"string"    json:"metadata,omitempty" swaggertype:"string"`
+	Amount   string         `example:"123445"                                                           format:"string"    json:"received"           swaggertype:"string"`
+	Denom    string         `example:"utia"                                                             format:"string"    json:"denom"              swaggertype:"string"`
+
+	Address      *ShortAddress         `json:"address,omitempty"`
+	Relayer      *ShortAddress         `json:"relayer,omitempty"`
+	Counterparty HyperlaneCounterparty `json:"counterparty"`
+}
+
+func NewHyperlaneTransfer(transfer storage.HLTransfer) HyperlaneTransfer {
+	result := HyperlaneTransfer{
+		Id:       transfer.Id,
+		Height:   transfer.Height,
+		Time:     transfer.Time,
+		Type:     transfer.Type.String(),
+		Version:  transfer.Version,
+		Nonce:    transfer.Nonce,
+		Body:     transfer.Body,
+		Metadata: transfer.Metadata,
+		Denom:    transfer.Denom,
+		Amount:   transfer.Amount.String(),
+		Address:  NewShortAddress(transfer.Address),
+		Relayer:  NewShortAddress(transfer.Relayer),
+		Counterparty: HyperlaneCounterparty{
+			Hash:   transfer.CounterpartyAddress,
+			Domain: transfer.Counterparty,
+		},
+	}
+
+	if transfer.Token != nil {
+		result.TokenId = hex.EncodeToString(transfer.Token.TokenId)
+	}
+	if transfer.Mailbox != nil {
+		result.Mailbox = hex.EncodeToString(transfer.Mailbox.Mailbox)
+	}
+	if transfer.Tx != nil {
+		result.TxHash = hex.EncodeToString(transfer.Tx.Hash)
+	}
+
+	return result
+}
+
+type HyperlaneCounterparty struct {
+	Hash   string `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"hash"    swaggertype:"string"`
+	Domain uint64 `example:"100"                                                              format:"int64" json:"domain,omitempty" swaggertype:"integer"`
+}

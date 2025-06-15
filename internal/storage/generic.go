@@ -52,6 +52,9 @@ var Models = []any{
 	&IbcConnection{},
 	&IbcChannel{},
 	&IbcTransfer{},
+	&HLMailbox{},
+	&HLToken{},
+	&HLTransfer{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -107,6 +110,9 @@ type Transaction interface {
 	SaveIbcConnections(ctx context.Context, connections ...*IbcConnection) error
 	SaveIbcChannels(ctx context.Context, channels ...*IbcChannel) error
 	SaveIbcTransfers(ctx context.Context, transfers ...*IbcTransfer) error
+	SaveHyperlaneMailbox(ctx context.Context, mailbox ...*HLMailbox) error
+	SaveHyperlaneTokens(ctx context.Context, tokens ...*HLToken) error
+	SaveHyperlaneTransfers(ctx context.Context, transfers ...*HLTransfer) error
 	RetentionBlockSignatures(ctx context.Context, height types.Level) error
 	CancelUnbondings(ctx context.Context, cancellations ...Undelegation) error
 	RetentionCompletedUnbondings(ctx context.Context, blockTime time.Time) error
@@ -139,6 +145,9 @@ type Transaction interface {
 	RollbackIbcConnections(ctx context.Context, height types.Level) error
 	RollbackIbcChannels(ctx context.Context, height types.Level) error
 	RollbackIbcTransfers(ctx context.Context, height types.Level) error
+	RollbackHyperlaneMailbox(ctx context.Context, height types.Level) error
+	RollbackHyperlaneTokens(ctx context.Context, height types.Level) error
+	RollbackHyperlaneTransfers(ctx context.Context, height types.Level) error
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	DeleteProviders(ctx context.Context, rollupId uint64) error
 	DeleteRollup(ctx context.Context, rollupId uint64) error
@@ -160,6 +169,8 @@ type Transaction interface {
 	Proposal(ctx context.Context, id uint64) (Proposal, error)
 	RefreshLeaderboard(ctx context.Context) error
 	IbcConnection(ctx context.Context, id string) (IbcConnection, error)
+	HyperlaneMailbox(ctx context.Context, id []byte) (HLMailbox, error)
+	HyperlaneToken(ctx context.Context, id []byte) (HLToken, error)
 }
 
 const (
