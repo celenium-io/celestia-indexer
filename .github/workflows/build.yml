@@ -79,7 +79,7 @@ jobs:
         id: meta-private-api
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_BASE }}-api
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_BASE }}-private-api
 
       - name: Private API image build & push
         uses: docker/build-push-action@v5
