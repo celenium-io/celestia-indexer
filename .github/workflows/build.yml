@@ -73,6 +73,25 @@ jobs:
           tags: ${{ steps.meta-api.outputs.tags }}
           labels: ${{ steps.meta-api.outputs.labels }}
 
+      # Private API
+
+      - name: Private API image tags & labels
+        id: meta-private-api
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_BASE }}-api
+
+      - name: Private API image build & push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: build/private_api/Dockerfile
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ steps.meta-private-api.outputs.tags }}
+          labels: ${{ steps.meta-private-api.outputs.labels }}
+
       # Celestials
 
       - name: Celestials image tags & labels
