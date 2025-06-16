@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------
 #  The first stage container, for building the application
 # ---------------------------------------------------------------------
-FROM golang:1.24.1-alpine AS builder
+FROM golang:1.24.4-alpine AS builder
 
 ENV CGO_ENABLED=0
 ENV GO111MODULE=on
@@ -16,6 +16,7 @@ WORKDIR $GOPATH/src/github.com/celenium-io/celestia-indexer
 RUN go mod download
 
 COPY cmd/private_api cmd/private_api
+COPY cmd/api cmd/api
 COPY internal internal
 COPY pkg pkg
 
