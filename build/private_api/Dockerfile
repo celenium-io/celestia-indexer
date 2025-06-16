@@ -15,23 +15,24 @@ COPY ./go.* $GOPATH/src/github.com/celenium-io/celestia-indexer/
 WORKDIR $GOPATH/src/github.com/celenium-io/celestia-indexer
 RUN go mod download
 
-COPY cmd/celestials cmd/celestials
+COPY cmd/private_api cmd/private_api
+COPY cmd/api cmd/api
 COPY internal internal
 COPY pkg pkg
 
-WORKDIR $GOPATH/src/github.com/celenium-io/celestia-indexer/cmd/celestials/
-RUN go build -a -installsuffix cgo -o /go/bin/celestials .
+WORKDIR $GOPATH/src/github.com/celenium-io/celestia-indexer/cmd/private_api/
+RUN go build -a -installsuffix cgo -o /go/bin/private_api .
 
 # ---------------------------------------------------------------------
 #  The second stage container, for running the application
 # ---------------------------------------------------------------------
 FROM scratch
 
-WORKDIR /app/celestials
+WORKDIR /app/private_api
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /go/bin/celestials /go/bin/celestials
+COPY --from=builder /go/bin/private_api /go/bin/private_api
 COPY ./configs/dipdup.yml ./
 COPY database database
 
-ENTRYPOINT ["/go/bin/celestials", "-c", "dipdup.yml"]
+ENTRYPOINT ["/go/bin/private_api", "-c", "dipdup.yml"]

@@ -10,12 +10,17 @@ indexer:
 api:
 	cd cmd/api && go run . -c ../../configs/dipdup.yml
 
+private_api:
+	cd cmd/private_api && go run . -c ../../configs/dipdup.yml
+
 celestials:
 	cd cmd/celestials && go run . -c ../../configs/dipdup.yml
 
 build:
 	cd cmd/indexer && go build -a -o ../../bin/indexer .
 	cd cmd/api && go build -a -o ../../bin/api .
+	cd cmd/private_api && go build -a -o ../../bin/private_api .
+	cd cmd/celestials && go build -a -o ../../bin/celestials .
 
 clean:
 	rm -rf bin
