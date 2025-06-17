@@ -124,10 +124,10 @@ func (s *AuthTestSuite) TestBulk() {
 		}, nil).
 		Times(2)
 
-	txBegginer := func(_ context.Context, _ sdk.Transactable) (storage.Transaction, error) {
+	txBeginner := func(_ context.Context, _ sdk.Transactable) (storage.Transaction, error) {
 		return tx, nil
 	}
-	handler := NewRollupAuthHandler(s.rollups, s.address, s.namespace, nil, txBegginer)
+	handler := NewRollupAuthHandler(s.rollups, s.address, s.namespace, nil, txBeginner)
 
 	s.Require().NoError(handler.Bulk(c))
 	s.Require().Equal(http.StatusOK, rec.Code)

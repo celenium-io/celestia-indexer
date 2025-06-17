@@ -24,7 +24,7 @@ type RollupAuthHandler struct {
 	namespace  storage.INamespace
 	rollups    storage.IRollup
 	tx         sdk.Transactable
-	txBegginer func(ctx context.Context, tx sdk.Transactable) (storage.Transaction, error)
+	txBeginner func(ctx context.Context, tx sdk.Transactable) (storage.Transaction, error)
 }
 
 func NewRollupAuthHandler(
@@ -32,22 +32,22 @@ func NewRollupAuthHandler(
 	address storage.IAddress,
 	namespace storage.INamespace,
 	tx sdk.Transactable,
-	txBegginer func(ctx context.Context, tx sdk.Transactable) (storage.Transaction, error),
+	txBeginner func(ctx context.Context, tx sdk.Transactable) (storage.Transaction, error),
 ) RollupAuthHandler {
 	return RollupAuthHandler{
 		rollups:    rollups,
 		address:    address,
 		namespace:  namespace,
 		tx:         tx,
-		txBegginer: txBegginer,
+		txBeginner: txBeginner,
 	}
 }
 
 func (handler RollupAuthHandler) runTx(ctx context.Context, f func(ctx context.Context, tx storage.Transaction) error) error {
-	if handler.txBegginer == nil {
-		return errors.New("tx begginer is nil")
+	if handler.txBeginner == nil {
+		return errors.New("tx beginner is nil")
 	}
-	tx, err := handler.txBegginer(ctx, handler.tx)
+	tx, err := handler.txBeginner(ctx, handler.tx)
 	if err != nil {
 		return err
 	}

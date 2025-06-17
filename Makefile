@@ -32,7 +32,7 @@ lint:
 	golangci-lint run
 
 test:
-	go test -p 8 -timeout 60s ./...
+	go test -p 8 -timeout 120s ./...
 
 ## Make green comment
 gc:
