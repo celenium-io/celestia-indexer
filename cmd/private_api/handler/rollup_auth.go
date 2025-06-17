@@ -20,10 +20,11 @@ import (
 )
 
 type RollupAuthHandler struct {
-	address   storage.IAddress
-	namespace storage.INamespace
-	rollups   storage.IRollup
-	tx        sdk.Transactable
+	address    storage.IAddress
+	namespace  storage.INamespace
+	rollups    storage.IRollup
+	tx         sdk.Transactable
+	txBeginner func(ctx context.Context, tx sdk.Transactable) (storage.Transaction, error)
 }
 
 func NewRollupAuthHandler(
@@ -31,13 +32,81 @@ func NewRollupAuthHandler(
 	address storage.IAddress,
 	namespace storage.INamespace,
 	tx sdk.Transactable,
+	txBeginner func(ctx context.Context, tx sdk.Transactable) (storage.Transaction, error),
 ) RollupAuthHandler {
 	return RollupAuthHandler{
-		rollups:   rollups,
-		address:   address,
-		namespace: namespace,
-		tx:        tx,
+		rollups:    rollups,
+		address:    address,
+		namespace:  namespace,
+		tx:         tx,
+		txBeginner: txBeginner,
 	}
+}
+
+func (handler RollupAuthHandler) runTx(ctx context.Context, f func(ctx context.Context, tx storage.Transaction) error) error {
+	if handler.txBeginner == nil {
+		return errors.New("tx beginner is nil")
+	}
+	tx, err := handler.txBeginner(ctx, handler.tx)
+	if err != nil {
+		return err
+	}
+
+	if f != nil {
+		if err := f(ctx, tx); err != nil {
+			return tx.HandleError(ctx, err)
+		}
+	}
+
+	return tx.Flush(ctx)
+}
+
+type bulkRequest struct {
+	Rollups []*updateRollupRequest `json:"rollups" validate:"required,max=10"`
+}
+
+func (handler RollupAuthHandler) Bulk(c echo.Context) error {
+	val := c.Get(ApiKeyName)
+	apiKey, ok := val.(storage.ApiKey)
+	if !ok {
+		return handleError(c, errInvalidApiKey, handler.address)
+	}
+
+	req, err := bindAndValidate[bulkRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	var ids []uint64
+	err = handler.runTx(c.Request().Context(), func(ctx context.Context, tx storage.Transaction) error {
+		ids, err = handler.bulk(ctx, tx, req.Rollups, apiKey.Admin)
+		return err
+	})
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"ids": ids,
+	})
+}
+
+func (handler RollupAuthHandler) bulk(ctx context.Context, tx storage.Transaction, rollups []*updateRollupRequest, isAdmin bool) ([]uint64, error) {
+	ids := make([]uint64, 0)
+
+	for _, item := range rollups {
+		if item.Id == 0 {
+			rollupId, err := handler.createRollup(ctx, tx, item.toCreate(), isAdmin)
+			if err != nil {
+				return nil, err
+			}
+			ids = append(ids, rollupId)
+		} else {
+			if err := handler.updateRollup(ctx, tx, item, isAdmin); err != nil {
+				return nil, err
+			}
+			ids = append(ids, item.Id)
+		}
+	}
+
+	return ids, nil
 }
 
 type createRollupRequest struct {
@@ -81,7 +150,11 @@ func (handler RollupAuthHandler) Create(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	rollupId, err := handler.createRollup(c.Request().Context(), req, apiKey.Admin)
+	var rollupId uint64
+	err = handler.runTx(c.Request().Context(), func(ctx context.Context, tx storage.Transaction) error {
+		rollupId, err = handler.createRollup(ctx, tx, req, apiKey.Admin)
+		return err
+	})
 	if err != nil {
 		return handleError(c, err, handler.rollups)
 	}
@@ -91,12 +164,7 @@ func (handler RollupAuthHandler) Create(c echo.Context) error {
 	})
 }
 
-func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRollupRequest, isAdmin bool) (uint64, error) {
-	tx, err := postgres.BeginTransaction(ctx, handler.tx)
-	if err != nil {
-		return 0, err
-	}
-
+func (handler RollupAuthHandler) createRollup(ctx context.Context, tx storage.Transaction, req *createRollupRequest, isAdmin bool) (uint64, error) {
 	rollup := storage.Rollup{
 		Name:           req.Name,
 		Description:    req.Description,
@@ -123,21 +191,18 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, req *createRo
 	}
 
 	if err := tx.SaveRollup(ctx, &rollup); err != nil {
-		return 0, tx.HandleError(ctx, err)
+		return 0, err
 	}
 
 	providers, err := handler.createProviders(ctx, rollup.Id, req.Providers...)
 	if err != nil {
-		return 0, tx.HandleError(ctx, err)
+		return 0, err
 	}
 
 	if err := tx.SaveProviders(ctx, providers...); err != nil {
-		return 0, tx.HandleError(ctx, err)
-	}
-
-	if err := tx.Flush(ctx); err != nil {
 		return 0, err
 	}
+
 	return rollup.Id, nil
 }
 
@@ -203,6 +268,32 @@ type updateRollupRequest struct {
 	Tags        []string         `json:"tags"        validate:"omitempty"`
 }
 
+func (req *updateRollupRequest) toCreate() *createRollupRequest {
+	return &createRollupRequest{
+		Name:        req.Name,
+		Description: req.Description,
+		Website:     req.Website,
+		GitHub:      req.GitHub,
+		Twitter:     req.Twitter,
+		Logo:        req.Logo,
+		L2Beat:      req.L2Beat,
+		DeFiLama:    req.DeFiLama,
+		Bridge:      req.Bridge,
+		Explorer:    req.Explorer,
+		Stack:       req.Stack,
+		Links:       req.Links,
+		Category:    req.Category,
+		Tags:        req.Tags,
+		Type:        req.Type,
+		Compression: req.Compression,
+		VM:          req.VM,
+		Provider:    req.Provider,
+		SettledOn:   req.SettledOn,
+		Color:       req.Color,
+		Providers:   req.Providers,
+	}
+}
+
 func (handler RollupAuthHandler) Update(c echo.Context) error {
 	val := c.Get(ApiKeyName)
 	apiKey, ok := val.(storage.ApiKey)
@@ -215,19 +306,16 @@ func (handler RollupAuthHandler) Update(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	if err := handler.updateRollup(c.Request().Context(), req, apiKey.Admin); err != nil {
+	if err := handler.runTx(c.Request().Context(), func(ctx context.Context, tx storage.Transaction) error {
+		return handler.updateRollup(c.Request().Context(), tx, req, apiKey.Admin)
+	}); err != nil {
 		return handleError(c, err, handler.rollups)
 	}
 
 	return success(c)
 }
 
-func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRollupRequest, isAdmin bool) error {
-	tx, err := postgres.BeginTransaction(ctx, handler.tx)
-	if err != nil {
-		return err
-	}
-
+func (handler RollupAuthHandler) updateRollup(ctx context.Context, tx storage.Transaction, req *updateRollupRequest, isAdmin bool) error {
 	if _, err := handler.rollups.GetByID(ctx, req.Id); err != nil {
 		return err
 	}
@@ -259,25 +347,25 @@ func (handler RollupAuthHandler) updateRollup(ctx context.Context, req *updateRo
 	}
 
 	if err := tx.UpdateRollup(ctx, &rollup); err != nil {
-		return tx.HandleError(ctx, err)
+		return err
 	}
 
 	if len(req.Providers) > 0 {
 		if err := tx.DeleteProviders(ctx, req.Id); err != nil {
-			return tx.HandleError(ctx, err)
+			return err
 		}
 
 		providers, err := handler.createProviders(ctx, rollup.Id, req.Providers...)
 		if err != nil {
-			return tx.HandleError(ctx, err)
+			return err
 		}
 
 		if err := tx.SaveProviders(ctx, providers...); err != nil {
-			return tx.HandleError(ctx, err)
+			return err
 		}
 	}
 
-	return tx.Flush(ctx)
+	return nil
 }
 
 type deleteRollupRequest struct {

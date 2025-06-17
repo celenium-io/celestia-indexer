@@ -20,6 +20,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/auth/rollup/:id/verify PATCH": {},
 		"/v1/auth/rollup/unverified GET":   {},
 		"/v1/auth/rollup/:id DELETE":       {},
+		"/v1/auth/bulk POST":               {},
 	}
 
 	db := postgres.Storage{
