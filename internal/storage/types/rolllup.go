@@ -9,7 +9,8 @@ package types
 		finance,
 		gaming,
 		nft,
-		social
+		social,
+		other
 	)
 */
 //go:generate go-enum --marshal --sql --values --names
@@ -19,7 +20,8 @@ type RollupCategory string
 /*
 	ENUM(
 		sovereign,
-		settled
+		settled,
+		other
 	)
 */
 //go:generate go-enum --marshal --sql --values --names

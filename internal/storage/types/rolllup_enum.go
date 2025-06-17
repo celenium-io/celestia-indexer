@@ -27,6 +27,8 @@ const (
 	RollupCategoryNft RollupCategory = "nft"
 	// RollupCategorySocial is a RollupCategory of type social.
 	RollupCategorySocial RollupCategory = "social"
+	// RollupCategoryOther is a RollupCategory of type other.
+	RollupCategoryOther RollupCategory = "other"
 )
 
 var ErrInvalidRollupCategory = fmt.Errorf("not a valid RollupCategory, try [%s]", strings.Join(_RollupCategoryNames, ", "))
@@ -37,6 +39,7 @@ var _RollupCategoryNames = []string{
 	string(RollupCategoryGaming),
 	string(RollupCategoryNft),
 	string(RollupCategorySocial),
+	string(RollupCategoryOther),
 }
 
 // RollupCategoryNames returns a list of possible string values of RollupCategory.
@@ -54,6 +57,7 @@ func RollupCategoryValues() []RollupCategory {
 		RollupCategoryGaming,
 		RollupCategoryNft,
 		RollupCategorySocial,
+		RollupCategoryOther,
 	}
 }
 
@@ -75,6 +79,7 @@ var _RollupCategoryValue = map[string]RollupCategory{
 	"gaming":        RollupCategoryGaming,
 	"nft":           RollupCategoryNft,
 	"social":        RollupCategorySocial,
+	"other":         RollupCategoryOther,
 }
 
 // ParseRollupCategory attempts to convert a string to a RollupCategory.
@@ -145,6 +150,8 @@ const (
 	RollupTypeSovereign RollupType = "sovereign"
 	// RollupTypeSettled is a RollupType of type settled.
 	RollupTypeSettled RollupType = "settled"
+	// RollupTypeOther is a RollupType of type other.
+	RollupTypeOther RollupType = "other"
 )
 
 var ErrInvalidRollupType = fmt.Errorf("not a valid RollupType, try [%s]", strings.Join(_RollupTypeNames, ", "))
@@ -152,6 +159,7 @@ var ErrInvalidRollupType = fmt.Errorf("not a valid RollupType, try [%s]", string
 var _RollupTypeNames = []string{
 	string(RollupTypeSovereign),
 	string(RollupTypeSettled),
+	string(RollupTypeOther),
 }
 
 // RollupTypeNames returns a list of possible string values of RollupType.
@@ -166,6 +174,7 @@ func RollupTypeValues() []RollupType {
 	return []RollupType{
 		RollupTypeSovereign,
 		RollupTypeSettled,
+		RollupTypeOther,
 	}
 }
 
@@ -184,6 +193,7 @@ func (x RollupType) IsValid() bool {
 var _RollupTypeValue = map[string]RollupType{
 	"sovereign": RollupTypeSovereign,
 	"settled":   RollupTypeSettled,
+	"other":     RollupTypeOther,
 }
 
 // ParseRollupType attempts to convert a string to a RollupType.

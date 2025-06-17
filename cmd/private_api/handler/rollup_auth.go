@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
+// SPDX-License-Identifier: MIT
+
 // SPDX-FileCopyrightText: 2025 PK Lab AG <contact@pklab.io>
 // SPDX-License-Identifier: MIT
 
@@ -54,7 +57,10 @@ func (handler RollupAuthHandler) runTx(ctx context.Context, f func(ctx context.C
 
 	if f != nil {
 		if err := f(ctx, tx); err != nil {
-			return tx.HandleError(ctx, err)
+			if handleErr := tx.HandleError(ctx, err); handleErr != nil {
+				return errors.Wrap(err, handleErr.Error())
+			}
+			return err
 		}
 	}
 
@@ -82,6 +88,9 @@ func (handler RollupAuthHandler) Bulk(c echo.Context) error {
 		ids, err = handler.bulk(ctx, tx, req.Rollups, apiKey.Admin)
 		return err
 	})
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
 
 	return c.JSON(http.StatusOK, echo.Map{
 		"ids": ids,
@@ -124,7 +133,7 @@ type createRollupRequest struct {
 	Links       []string         `json:"links"       validate:"omitempty,dive,url"`
 	Category    string           `json:"category"    validate:"omitempty,category"`
 	Tags        []string         `json:"tags"        validate:"omitempty"`
-	Type        string           `json:"type"        validate:"omitempty,oneof=settled sovereign"`
+	Type        string           `json:"type"        validate:"omitempty,oneof=settled sovereign other"`
 	Compression string           `json:"compression" validate:"omitempty"`
 	VM          string           `json:"vm"          validate:"omitempty"`
 	Provider    string           `json:"provider"    validate:"omitempty"`
@@ -188,6 +197,13 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, tx storage.Tr
 		Slug:           slug.Make(req.Name),
 		Tags:           req.Tags,
 		Verified:       isAdmin,
+	}
+
+	if rollup.Type == "" {
+		rollup.Type = enums.RollupTypeOther
+	}
+	if rollup.Category == "" {
+		rollup.Category = enums.RollupCategoryOther
 	}
 
 	if err := tx.SaveRollup(ctx, &rollup); err != nil {
@@ -257,7 +273,7 @@ type updateRollupRequest struct {
 	Explorer    string           `json:"explorer"    validate:"omitempty,url"`
 	Stack       string           `json:"stack"       validate:"omitempty"`
 	Category    string           `json:"category"    validate:"omitempty,category"`
-	Type        string           `json:"type"        validate:"omitempty,oneof=settled sovereign"`
+	Type        string           `json:"type"        validate:"omitempty,oneof=settled sovereign other"`
 	Compression string           `json:"compression" validate:"omitempty"`
 	Provider    string           `json:"provider"    validate:"omitempty"`
 	VM          string           `json:"vm"          validate:"omitempty"`
