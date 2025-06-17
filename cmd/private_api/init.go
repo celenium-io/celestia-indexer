@@ -5,11 +5,12 @@ package main
 
 import (
 	"context"
-	"golang.org/x/time/rate"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"golang.org/x/time/rate"
 
 	"github.com/celenium-io/celestia-indexer/cmd/private_api/handler"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
@@ -165,7 +166,7 @@ func initHandlers(e *echo.Echo, db postgres.Storage) {
 		})
 		adminMiddleware := AdminMiddleware()
 
-		rollupAuthHandler := handler.NewRollupAuthHandler(db.Rollup, db.Address, db.Namespace, db.Transactable)
+		rollupAuthHandler := handler.NewRollupAuthHandler(db.Rollup, db.Address, db.Namespace, db.Transactable, postgres.BeginTransaction)
 		rollup := auth.Group("/rollup")
 		{
 			rollup.POST("/new", rollupAuthHandler.Create, keyMiddleware)
@@ -174,5 +175,7 @@ func initHandlers(e *echo.Echo, db postgres.Storage) {
 			rollup.PATCH("/:id/verify", rollupAuthHandler.Verify, keyMiddleware, adminMiddleware)
 			rollup.GET("/unverified", rollupAuthHandler.Unverified, keyMiddleware, adminMiddleware)
 		}
+
+		auth.POST("/bulk", rollupAuthHandler.Bulk, keyMiddleware)
 	}
 }
