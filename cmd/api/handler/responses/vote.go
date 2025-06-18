@@ -1,15 +1,13 @@
 // SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
 // SPDX-License-Identifier: MIT
 
-// SPDX-FileCopyrightText: 2025 PK Lab AG <contact@pklab.io>
-// SPDX-License-Identifier: MIT
-
 package responses
 
 import (
+	"time"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/shopspring/decimal"
-	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"

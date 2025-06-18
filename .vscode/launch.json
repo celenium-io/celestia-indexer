@@ -37,6 +37,17 @@
                 "../../configs/dipdup.yml",
             ],
             "envFile": "${workspaceFolder}/.env"
-        }
+        },  {
+            "name": "Launch Private API",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/cmd/private_api",
+            "args": [
+                "-c",
+                "../../configs/dipdup.yml",
+            ],
+            "envFile": "${workspaceFolder}/.env"
+        },
     ]
 }

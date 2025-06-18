@@ -1,15 +1,16 @@
-// SPDX-FileCopyrightText: 2025 PK Lab AG <contact@pklab.io>
+// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
 // SPDX-License-Identifier: MIT
 
 package main
 
 import (
 	"context"
-	"github.com/pkg/errors"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/pkg/errors"
 
 	"github.com/spf13/cobra"
 )

@@ -1,14 +1,15 @@
-// SPDX-FileCopyrightText: 2025 PK Lab AG <contact@pklab.io>
+// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
 // SPDX-License-Identifier: MIT
 
 package handler
 
 import (
 	"database/sql"
-	"go.uber.org/mock/gomock"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"go.uber.org/mock/gomock"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"

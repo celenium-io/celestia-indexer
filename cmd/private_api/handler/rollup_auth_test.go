@@ -1,8 +1,12 @@
+// SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
+// SPDX-License-Identifier: MIT
+
 package handler
 
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -140,4 +144,74 @@ func (s *AuthTestSuite) TestBulk() {
 	s.Require().Len(ids.Values, 2)
 	s.Require().EqualValues(1, ids.Values[0])
 	s.Require().EqualValues(2, ids.Values[1])
+}
+
+func (s *AuthTestSuite) TestBulkError() {
+	body := `
+	{
+		"rollups": [
+			{
+				"name": "Test",
+				"providers": [{
+					"address": "celestia1kywuhlvslyt0qy8yr4p5lgkzz74qryujkjgprx"
+				}],
+				"vm": "svm"
+			}
+		]
+	}`
+
+	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(body))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.Set(ApiKeyName, storage.ApiKey{
+		Admin:       true,
+		Description: "test",
+		Key:         "test",
+	})
+	c.SetPath("/v1/bulk")
+
+	tx := mock.NewMockTransaction(s.ctrl)
+
+	tx.EXPECT().
+		SaveRollup(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(ctx context.Context, r *storage.Rollup) error {
+			r.Id = 2
+			return nil
+		}).
+		Times(1)
+
+	tx.EXPECT().
+		HandleError(gomock.Any(), gomock.Any()).
+		Return(nil).
+		Times(1)
+
+	s.address.EXPECT().
+		ByHash(gomock.Any(), []byte{177, 29, 203, 253, 144, 249, 22, 240, 16, 228, 29, 67, 79, 162, 194, 23, 170, 1, 147, 146}).
+		Return(storage.Address{}, errors.New("no rows")).
+		Times(1)
+
+	s.address.EXPECT().
+		IsNoRows(gomock.Any()).
+		Return(true).
+		Times(1)
+
+	s.address.EXPECT().
+		IsNoRows(gomock.Any()).
+		Return(false).
+		Times(1)
+
+	txBeginner := func(_ context.Context, _ sdk.Transactable) (storage.Transaction, error) {
+		return tx, nil
+	}
+	handler := NewRollupAuthHandler(s.rollups, s.address, s.namespace, nil, txBeginner)
+
+	s.Require().NoError(handler.Bulk(c))
+	s.Require().Equal(http.StatusBadRequest, rec.Code)
+
+	var result Error
+	err := json.NewDecoder(rec.Body).Decode(&result)
+	s.Require().NoError(err)
+	s.Require().NotEmpty(result.Message)
 }
