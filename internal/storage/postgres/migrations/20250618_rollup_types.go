@@ -19,9 +19,6 @@ func upAddRollupOtherTypeAndCategory(ctx context.Context, db *bun.DB) error {
 	if _, err := db.ExecContext(ctx, `ALTER TYPE rollup_type ADD VALUE IF NOT EXISTS ? AFTER ?`, types.RollupTypeOther.String(), types.RollupTypeSettled.String()); err != nil {
 		return errors.Wrap(err, "add other rollup type")
 	}
-	if _, err := db.ExecContext(ctx, `ALTER TYPE rollup_category ADD VALUE IF NOT EXISTS ? AFTER ?`, types.RollupCategoryOther.String(), types.RollupCategorySocial.String()); err != nil {
-		return errors.Wrap(err, "add other rollup category")
-	}
 	return nil
 }
 func downAddRollupOtherTypeAndCategory(ctx context.Context, db *bun.DB) error {
