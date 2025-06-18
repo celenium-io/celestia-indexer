@@ -63,6 +63,13 @@ jobs:
 
       # API
 
+      - name: API validate build configuration
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          call: check
+          file: build/api/Dockerfile
+
       - name: API image tags & labels
         id: meta-api
         uses: docker/metadata-action@v5
@@ -82,6 +89,13 @@ jobs:
 
       # Private API
 
+      - name: Private API validate build configuration
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          call: check
+          file: build/private_api/Dockerfile
+
       - name: Private API image tags & labels
         id: meta-private-api
         uses: docker/metadata-action@v5
@@ -100,6 +114,13 @@ jobs:
           labels: ${{ steps.meta-private-api.outputs.labels }}
 
       # Celestials
+
+      - name: Celestials validate build configuration
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          call: check
+          file: build/celestials/Dockerfile
 
       - name: Celestials image tags & labels
         id: meta-celestials
