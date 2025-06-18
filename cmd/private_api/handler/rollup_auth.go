@@ -200,7 +200,7 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, tx storage.Tr
 		rollup.Type = enums.RollupTypeOther
 	}
 	if rollup.Category == "" {
-		rollup.Category = enums.RollupCategoryOther
+		rollup.Category = enums.RollupCategoryUncategorized
 	}
 
 	if err := tx.SaveRollup(ctx, &rollup); err != nil {

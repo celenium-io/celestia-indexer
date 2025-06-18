@@ -9,8 +9,7 @@ package types
 		finance,
 		gaming,
 		nft,
-		social,
-		other
+		social
 	)
 */
 //go:generate go-enum --marshal --sql --values --names
