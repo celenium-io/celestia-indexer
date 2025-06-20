@@ -10,7 +10,6 @@ import (
 
 	"github.com/bcp-innovations/hyperlane-cosmos/util"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
-	"github.com/cosmos/cosmos-sdk/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	channelTypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	tmTypes "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
@@ -69,12 +68,12 @@ func StringFromMap(m map[string]any, key string) string {
 	return str
 }
 
-func BalanceFromMap(m map[string]any, key string) (*types.Coin, error) {
+func BalanceFromMap(m map[string]any, key string) (*cosmosTypes.Coin, error) {
 	str := StringFromMap(m, key)
 	if str == "" {
 		return nil, nil
 	}
-	coin, err := types.ParseCoinNormalized(str)
+	coin, err := cosmosTypes.ParseCoinNormalized(str)
 	if err != nil {
 		return nil, err
 	}

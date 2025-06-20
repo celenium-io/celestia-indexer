@@ -445,7 +445,7 @@ func (handler *BlockHandler) BlockODS(c echo.Context) error {
 	}
 
 	dataSquare, err := square.Construct(
-		block.Block.Data.Txs.ToSliceOfBytes(),
+		block.Block.Txs.ToSliceOfBytes(),
 		appconsts.SquareSizeUpperBound,
 		appconsts.SubtreeRootThreshold,
 	)

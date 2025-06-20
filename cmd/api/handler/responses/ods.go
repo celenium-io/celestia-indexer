@@ -15,7 +15,6 @@ import (
 	"github.com/cometbft/cometbft/crypto/merkle"
 	"github.com/pkg/errors"
 
-	_ "github.com/celestiaorg/go-square/v2/share"
 	"github.com/celestiaorg/rsmt2d"
 )
 
@@ -123,7 +122,7 @@ func GetBlobShareIndexes(
 	}
 
 	for shareIndex, s := range shares {
-		if !(s.Version() <= 1) {
+		if s.Version() > 1 {
 			return 0, 0, errors.New("unsupported share version")
 		}
 

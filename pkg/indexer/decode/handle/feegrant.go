@@ -6,7 +6,6 @@ package handle
 import (
 	"cosmossdk.io/x/feegrant"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/fatih/structs"
@@ -14,13 +13,13 @@ import (
 
 // MsgGrantAllowance adds permission for Grantee to spend up to Allowance
 // of fees from the account of Granter.
-func MsgGrantAllowance(ctx *context.Context, status types.Status, m *feegrant.MsgGrantAllowance) (storageTypes.MsgType, []storage.AddressWithType, []storage.Grant, error) {
+func MsgGrantAllowance(ctx *context.Context, status storageTypes.Status, m *feegrant.MsgGrantAllowance) (storageTypes.MsgType, []storage.AddressWithType, []storage.Grant, error) {
 	msgType := storageTypes.MsgGrantAllowance
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeGranter, address: m.Granter},
 		{t: storageTypes.MsgAddressTypeGrantee, address: m.Grantee},
 	}, ctx.Block.Height)
-	if err != nil || status == types.StatusFailed {
+	if err != nil || status == storageTypes.StatusFailed {
 		return msgType, addresses, nil, err
 	}
 
@@ -41,13 +40,13 @@ func MsgGrantAllowance(ctx *context.Context, status types.Status, m *feegrant.Ms
 }
 
 // MsgRevokeAllowance removes any existing Allowance from Granter to Grantee.
-func MsgRevokeAllowance(ctx *context.Context, status types.Status, m *feegrant.MsgRevokeAllowance) (storageTypes.MsgType, []storage.AddressWithType, []storage.Grant, error) {
+func MsgRevokeAllowance(ctx *context.Context, status storageTypes.Status, m *feegrant.MsgRevokeAllowance) (storageTypes.MsgType, []storage.AddressWithType, []storage.Grant, error) {
 	msgType := storageTypes.MsgRevokeAllowance
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeGranter, address: m.Granter},
 		{t: storageTypes.MsgAddressTypeGrantee, address: m.Grantee},
 	}, ctx.Block.Height)
-	if err != nil || status == types.StatusFailed {
+	if err != nil || status == storageTypes.StatusFailed {
 		return msgType, addresses, nil, err
 	}
 

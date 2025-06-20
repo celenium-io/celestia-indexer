@@ -5,7 +5,6 @@ package handle
 
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	coreClient "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
@@ -13,12 +12,12 @@ import (
 )
 
 // MsgCreateClient defines a message to create an IBC client
-func MsgCreateClient(ctx *context.Context, status types.Status, data types.PackedBytes, m *coreClient.MsgCreateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgCreateClient(ctx *context.Context, status storageTypes.Status, data storageTypes.PackedBytes, m *coreClient.MsgCreateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgCreateClient
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
-	if err != nil || status == types.StatusFailed {
+	if err != nil || status == storageTypes.StatusFailed {
 		return msgType, addresses, err
 	}
 
@@ -46,12 +45,12 @@ func MsgCreateClient(ctx *context.Context, status types.Status, data types.Packe
 }
 
 // MsgUpdateClient defines a sdk.Msg to update an IBC client state using the given header
-func MsgUpdateClient(ctx *context.Context, status types.Status, data types.PackedBytes, m *coreClient.MsgUpdateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateClient(ctx *context.Context, status storageTypes.Status, data storageTypes.PackedBytes, m *coreClient.MsgUpdateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgUpdateClient
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
-	if err != nil || status == types.StatusFailed {
+	if err != nil || status == storageTypes.StatusFailed {
 		return msgType, addresses, err
 	}
 

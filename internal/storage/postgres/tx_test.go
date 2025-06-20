@@ -78,7 +78,7 @@ func (s *StorageTestSuite) TestTxFilterSuccessUnjailAsc() {
 	s.Require().EqualValues(77483, tx.GasUsed)
 	s.Require().EqualValues(1, tx.EventsCount)
 	s.Require().EqualValues(1, tx.MessagesCount)
-	s.Require().EqualValues("2048", tx.MessageTypes.Bits.String())
+	s.Require().EqualValues("2048", tx.MessageTypes.String())
 	s.Require().Equal(types.StatusSuccess, tx.Status)
 	s.Require().Equal("memo2", tx.Memo)
 	s.Require().Equal("", tx.Codespace)
@@ -142,7 +142,7 @@ func (s *StorageTestSuite) TestTxFilterSuccessDesc() {
 	s.Require().EqualValues(77483, tx.GasUsed)
 	s.Require().EqualValues(1, tx.EventsCount)
 	s.Require().EqualValues(2, tx.MessagesCount)
-	s.Require().EqualValues("68", tx.MessageTypes.Bits.String())
+	s.Require().EqualValues("68", tx.MessageTypes.String())
 	s.Require().Equal(types.StatusSuccess, tx.Status)
 	s.Require().Equal("memo", tx.Memo)
 	s.Require().Equal("sdk", tx.Codespace)
@@ -175,7 +175,7 @@ func (s *StorageTestSuite) TestTxFilterHeight() {
 	s.Require().EqualValues(77483, tx.GasUsed)
 	s.Require().EqualValues(1, tx.EventsCount)
 	s.Require().EqualValues(1, tx.MessagesCount)
-	s.Require().EqualValues("2048", tx.MessageTypes.Bits.String())
+	s.Require().EqualValues("2048", tx.MessageTypes.String())
 	s.Require().Equal(types.StatusSuccess, tx.Status)
 	s.Require().Equal("memo2", tx.Memo)
 	s.Require().Equal("", tx.Codespace)
@@ -250,7 +250,7 @@ func (s *StorageTestSuite) TestTxByIdWithRelations() {
 	s.Require().Equal("memo2", tx.Memo)
 	s.Require().Equal("", tx.Codespace)
 	s.Require().Equal("80410", tx.Fee.String())
-	s.Require().EqualValues("2048", tx.MessageTypes.Bits.String())
+	s.Require().EqualValues("2048", tx.MessageTypes.String())
 
 	s.Require().Len(tx.Messages, 2)
 	s.Require().Len(tx.Signers, 2)
@@ -277,7 +277,7 @@ func (s *StorageTestSuite) TestTxGenesis() {
 	s.Require().Equal("34499b1ac473fbb03894c883178ecc83f0d6eaf6@64.227.18.169:26656", tx.Memo)
 	s.Require().Equal("", tx.Codespace)
 	s.Require().Equal("0", tx.Fee.String())
-	s.Require().EqualValues("32", tx.MessageTypes.Bits.String())
+	s.Require().EqualValues("32", tx.MessageTypes.String())
 }
 
 func (s *StorageTestSuite) TestTxByAddressAndTime() {

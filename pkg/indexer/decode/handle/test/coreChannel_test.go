@@ -19,7 +19,6 @@ import (
 	bankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distributionTypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	icaTypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
-	ibcTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	transferTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	coreChannel "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	"github.com/fatih/structs"
@@ -358,7 +357,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost(t *testing.T) {
 		"Memo": "",
 		"Type": icaTypes.EXECUTE_TX,
 		"Data": []cosmosTypes.Msg{
-			&ibcTypes.MsgTransfer{
+			&transferTypes.MsgTransfer{
 				SourcePort:    "transfer",
 				SourceChannel: "channel-8",
 				Token: cosmosTypes.Coin{

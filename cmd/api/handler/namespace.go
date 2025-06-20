@@ -327,8 +327,8 @@ type listBlobsRequest struct {
 	Namespaces StringArray `query:"namespaces" validate:"omitempty,dive,namespace"`
 	Cursor     uint64      `query:"cursor"     validate:"omitempty,min=0"`
 
-	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1"`
-	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`
+	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
+	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
 }
 
 func (req *listBlobsRequest) SetDefault() {
@@ -530,8 +530,8 @@ type getBlobLogsForNamespace struct {
 	Signers    StringArray `query:"signers"    validate:"omitempty,dive,address"`
 	Cursor     uint64      `query:"cursor"     validate:"omitempty,min=0"`
 
-	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1"`
-	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`
+	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
+	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
 }
 
 func (req getBlobLogsForNamespace) getCommitment() (string, error) {
@@ -728,7 +728,7 @@ func (handler *NamespaceHandler) BlobProofs(c echo.Context) error {
 	}
 
 	dataSquare, err := square.Construct(
-		block.Block.Data.Txs.ToSliceOfBytes(),
+		block.Block.Txs.ToSliceOfBytes(),
 		appconsts.SquareSizeUpperBound,
 		appconsts.SubtreeRootThreshold,
 	)

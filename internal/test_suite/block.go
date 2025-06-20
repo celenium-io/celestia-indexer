@@ -30,7 +30,7 @@ func CreateTestBlock(tx types.ResponseDeliverTx, count int) (types.BlockData, ti
 	var txResults = make([]*types.ResponseDeliverTx, count)
 	for i := 0; i < count; i++ {
 		txResults[i] = &tx
-		headerBlock.Data.Txs[i] = txMsgBeginRedelegate
+		headerBlock.Txs[i] = txMsgBeginRedelegate
 	}
 
 	block := types.BlockData{
@@ -60,7 +60,7 @@ func CreateBlockWithTxs(tx types.ResponseDeliverTx, txData []byte, count int) (t
 	var txResults = make([]*types.ResponseDeliverTx, count)
 	for i := 0; i < count; i++ {
 		txResults[i] = &tx
-		headerBlock.Data.Txs[i] = txData
+		headerBlock.Txs[i] = txData
 	}
 
 	block := types.BlockData{
@@ -90,7 +90,7 @@ func CreateTestBlockWithAppVersion(tx types.ResponseDeliverTx, count int, appVer
 	var txResults = make([]*types.ResponseDeliverTx, count)
 	for i := 0; i < count; i++ {
 		txResults[i] = &tx
-		headerBlock.Data.Txs[i] = txMsgBeginRedelegate
+		headerBlock.Txs[i] = txMsgBeginRedelegate
 	}
 
 	block := types.BlockData{

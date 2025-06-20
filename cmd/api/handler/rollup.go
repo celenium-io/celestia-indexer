@@ -550,8 +550,8 @@ func (handler RollupHandler) Distribution(c echo.Context) error {
 
 type exportBlobsRequest struct {
 	Id   uint64 `example:"10"         param:"id"   swaggertype:"integer" validate:"required,min=1"`
-	From int64  `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1"`
-	To   int64  `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`
+	From int64  `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
+	To   int64  `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
 }
 
 // ExportBlobs godoc
