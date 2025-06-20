@@ -42,7 +42,7 @@ func (r *ResponseRecorder) copyHeaders() {
 	}
 
 	r.headerCopied = true
-	copyHeaders(r.ResponseWriter.Header(), r.headers)
+	copyHeaders(r.Header(), r.headers)
 }
 
 func (w *ResponseRecorder) WriteHeader(statusCode int) {

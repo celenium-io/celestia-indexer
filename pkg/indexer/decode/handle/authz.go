@@ -8,7 +8,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
@@ -19,11 +18,11 @@ import (
 
 // MsgGrant is a request type for Grant method. It declares authorization to the grantee
 // on behalf of the granter with the provided expiration time.
-func MsgGrant(ctx *context.Context, status types.Status, m *authz.MsgGrant) (storageTypes.MsgType, []storage.AddressWithType, []storage.Grant, error) {
-	msgType := storageTypes.MsgGrant
+func MsgGrant(ctx *context.Context, status types.Status, m *authz.MsgGrant) (types.MsgType, []storage.AddressWithType, []storage.Grant, error) {
+	msgType := types.MsgGrant
 	addresses, err := createAddresses(ctx, addressesData{
-		{t: storageTypes.MsgAddressTypeGranter, address: m.Granter},
-		{t: storageTypes.MsgAddressTypeGrantee, address: m.Grantee},
+		{t: types.MsgAddressTypeGranter, address: m.Granter},
+		{t: types.MsgAddressTypeGrantee, address: m.Grantee},
 	}, ctx.Block.Height)
 	if err != nil || status == types.StatusFailed {
 		return msgType, addresses, nil, err
@@ -35,10 +34,10 @@ func MsgGrant(ctx *context.Context, status types.Status, m *authz.MsgGrant) (sto
 // MsgExec attempts to execute the provided messages using
 // authorizations granted to the grantee. Each message should have only
 // one signer corresponding to the granter of the authorization.
-func MsgExec(ctx *context.Context, status types.Status, m *authz.MsgExec) (storageTypes.MsgType, []storage.AddressWithType, []string, error) {
-	msgType := storageTypes.MsgExec
+func MsgExec(ctx *context.Context, status types.Status, m *authz.MsgExec) (types.MsgType, []storage.AddressWithType, []string, error) {
+	msgType := types.MsgExec
 	addresses, err := createAddresses(ctx, addressesData{
-		{t: storageTypes.MsgAddressTypeGrantee, address: m.Grantee},
+		{t: types.MsgAddressTypeGrantee, address: m.Grantee},
 	}, ctx.Block.Height)
 
 	// MsgExecute also has Msgs field, where also can be addresses.
@@ -64,11 +63,11 @@ func MsgExec(ctx *context.Context, status types.Status, m *authz.MsgExec) (stora
 
 // MsgRevoke revokes any authorization with the provided sdk.Msg type on the
 // granter's account with that has been granted to the grantee.
-func MsgRevoke(ctx *context.Context, status types.Status, m *authz.MsgRevoke) (storageTypes.MsgType, []storage.AddressWithType, []storage.Grant, error) {
-	msgType := storageTypes.MsgRevoke
+func MsgRevoke(ctx *context.Context, status types.Status, m *authz.MsgRevoke) (types.MsgType, []storage.AddressWithType, []storage.Grant, error) {
+	msgType := types.MsgRevoke
 	addresses, err := createAddresses(ctx, addressesData{
-		{t: storageTypes.MsgAddressTypeGranter, address: m.Granter},
-		{t: storageTypes.MsgAddressTypeGrantee, address: m.Grantee},
+		{t: types.MsgAddressTypeGranter, address: m.Granter},
+		{t: types.MsgAddressTypeGrantee, address: m.Grantee},
 	}, ctx.Block.Height)
 	if err != nil || status == types.StatusFailed {
 		return msgType, addresses, nil, err

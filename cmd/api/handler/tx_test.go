@@ -194,6 +194,27 @@ func (s *TxTestSuite) TestList() {
 	s.Require().Equal(testAddress, tx.Signers[0].Hash)
 }
 
+func (s *TxTestSuite) TestListWithHighTimestamp() {
+	q := make(url.Values)
+	q.Set("limit", "2")
+	q.Set("offset", "0")
+	q.Set("sort", "desc")
+	q.Set("to", "16725214801")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx")
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusBadRequest, rec.Code)
+
+	var response Error
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().NotEmpty(response.Message)
+}
+
 func (s *TxTestSuite) TestListValidationStatusError() {
 	q := make(url.Values)
 	q.Set("limit", "2")

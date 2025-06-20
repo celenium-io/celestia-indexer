@@ -476,8 +476,8 @@ func (sh StatsHandler) IbcByChains(c echo.Context) error {
 }
 
 type squareSizeRequest struct {
-	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1"`
-	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`
+	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
+	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
 }
 
 // SquareSize godoc

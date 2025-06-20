@@ -17,7 +17,6 @@ import (
 	codecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	"github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
@@ -163,7 +162,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1(t *testing.T) {
 		storageTypes.MsgSubmitProposal,
 		205,
 	)
-	msgExpected.Data["Content"] = v1beta1.TextProposal{
+	msgExpected.Data["Content"] = cosmosGovTypesV1Beta1.TextProposal{
 		Title:       "💎Celestia Airdrop ✅ ",
 		Description: "Get 💎Celestia Airdrop ✅ visiting url: www.TerraPro.at\n\n- more info: www.TerraWeb.at",
 	}

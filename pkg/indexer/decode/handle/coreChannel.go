@@ -8,7 +8,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
@@ -85,7 +84,7 @@ func MsgChannelCloseConfirm(ctx *context.Context, m *coreChannel.MsgChannelClose
 }
 
 // MsgRecvPacket receives an incoming IBC packet
-func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data types.PackedBytes, m *coreChannel.MsgRecvPacket) (storageTypes.MsgType, []storage.AddressWithType, *storage.IbcTransfer, *storage.IbcChannel, error) {
+func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.PackedBytes, m *coreChannel.MsgRecvPacket) (storageTypes.MsgType, []storage.AddressWithType, *storage.IbcTransfer, *storage.IbcChannel, error) {
 	msgType := storageTypes.MsgRecvPacket
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
@@ -229,7 +228,7 @@ func MsgTimeoutOnClose(ctx *context.Context, m *coreChannel.MsgTimeoutOnClose) (
 }
 
 // MsgAcknowledgement receives incoming IBC acknowledgement
-func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data types.PackedBytes, m *coreChannel.MsgAcknowledgement) (storageTypes.MsgType, []storage.AddressWithType, *storage.IbcTransfer, *storage.IbcChannel, error) {
+func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTypes.PackedBytes, m *coreChannel.MsgAcknowledgement) (storageTypes.MsgType, []storage.AddressWithType, *storage.IbcTransfer, *storage.IbcChannel, error) {
 	msgType := storageTypes.MsgAcknowledgement
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
