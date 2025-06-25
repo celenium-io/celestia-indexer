@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2025 PK Lab AG <celenium@baking-bad.org>
+// SPDX-License-Identifier: MIT
+
 // SPDX-FileCopyrightText: 2024 PK Lab AG <contact@pklab.io>
 // SPDX-License-Identifier: MIT
 
