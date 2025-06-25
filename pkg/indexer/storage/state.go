@@ -5,12 +5,13 @@ package storage
 
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
 
-func updateState(block *storage.Block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount int64, totalValidators int, totalVotingPower decimal.Decimal, state *storage.State) {
+func updateState(block *storage.Block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount int64, totalValidators int, totalVotingPower decimal.Decimal, state *storage.State) error {
 	if block.Height <= state.LastHeight {
-		return
+		return errors.Errorf("block has already indexed: height=%d  state=%d", block.Height, state.LastHeight)
 	}
 
 	state.LastHeight = block.Height
@@ -27,4 +28,5 @@ func updateState(block *storage.Block, totalAccounts, totalNamespaces, totalProp
 	state.TotalStake = state.TotalStake.Add(totalVotingPower)
 	state.TotalIbcClients += ibcClientsCount
 	state.ChainId = block.ChainId
+	return nil
 }

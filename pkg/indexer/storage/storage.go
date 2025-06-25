@@ -334,7 +334,10 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, totalVotingPower, &state)
+	if err := updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, totalVotingPower, &state); err != nil {
+		return state, err
+	}
+
 	err = tx.Update(ctx, &state)
 	return state, err
 }
