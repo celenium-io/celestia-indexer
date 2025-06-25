@@ -8,8 +8,6 @@ import (
 	"encoding/base64"
 
 	"github.com/celestiaorg/celestia-app/v4/pkg/appconsts"
-	"github.com/celestiaorg/go-square/namespace"
-	"github.com/celestiaorg/go-square/shares"
 	"github.com/celestiaorg/go-square/v2/inclusion"
 	"github.com/celestiaorg/go-square/v2/share"
 	"github.com/cometbft/cometbft/crypto/merkle"
@@ -41,14 +39,11 @@ func NewODS(eds *rsmt2d.ExtendedDataSquare) (ODS, error) {
 	for i := uint(0); i < ods.Width; i++ {
 		for j := uint(0); j < ods.Width; j++ {
 			cell := eds.GetCell(i, j)
-			share, err := shares.NewShare(cell)
+			share, err := share.NewShare(cell)
 			if err != nil {
 				return ods, err
 			}
-			namespace, err := share.Namespace()
-			if err != nil {
-				return ods, err
-			}
+			namespace := share.Namespace()
 			base64Namespace := base64.StdEncoding.EncodeToString(namespace.Bytes())
 			if base64Namespace != current.Namespace {
 				if current.Namespace != "" {
@@ -79,7 +74,7 @@ const (
 	DefaultNamespace         NamespaceKind = "namespace"
 )
 
-func getNamespaceType(ns namespace.Namespace) NamespaceKind {
+func getNamespaceType(ns share.Namespace) NamespaceKind {
 	switch {
 	case ns.IsPayForBlob():
 		return PayForBlobNamespace

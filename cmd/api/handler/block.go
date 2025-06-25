@@ -11,8 +11,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/celestiaorg/celestia-app/v4/pkg/appconsts"
 	"github.com/celestiaorg/celestia-app/v4/pkg/da"
-	"github.com/celestiaorg/go-square/shares"
-	"github.com/celestiaorg/go-square/square"
+	square "github.com/celestiaorg/go-square/v2"
+	"github.com/celestiaorg/go-square/v2/share"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -453,7 +453,7 @@ func (handler *BlockHandler) BlockODS(c echo.Context) error {
 		return internalServerError(c, err)
 	}
 
-	eds, err := da.ExtendShares(shares.ToBytes(dataSquare))
+	eds, err := da.ExtendShares(share.ToBytes(dataSquare))
 	if err != nil {
 		return internalServerError(c, err)
 	}

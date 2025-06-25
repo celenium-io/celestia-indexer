@@ -233,6 +233,7 @@ func (s *StorageTestSuite) TestAddressMessages() {
 	s.Require().EqualValues(types.MsgAddressTypeFromAddress, messages[0].Type)
 	s.Require().Equal(types.MsgWithdrawDelegatorReward, msg.Type)
 	s.Require().NotNil(messages[0].Tx)
+	s.Require().NotNil(messages[0].Tx.Hash)
 }
 
 func (s *StorageTestSuite) TestAddressMessagesWithType() {
