@@ -41,7 +41,7 @@ type AddressMessageWithTx struct {
 
 	MsgAddress
 	Msg *Message `bun:"rel:belongs-to,join:msg_id=id"`
-	Tx  *Tx      `bun:"rel:belongs-to,join:msg__tx_id=id"`
+	Tx  *Tx
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
