@@ -9,7 +9,7 @@ import (
 )
 
 func updateState(block *storage.Block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount int64, totalValidators int, totalVotingPower decimal.Decimal, state *storage.State) {
-	if block.Id <= uint64(state.LastHeight) {
+	if block.Height <= state.LastHeight {
 		return
 	}
 
