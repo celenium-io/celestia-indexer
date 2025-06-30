@@ -21,7 +21,6 @@ func handleUnjail(ctx *context.Context, events []storage.Event, msg *storage.Mes
 	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.slashing.v1beta1.MsgUnjail" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
 	return processUnjail(ctx, events, msg, idx)
 }
 
@@ -31,6 +30,10 @@ func processUnjail(ctx *context.Context, events []storage.Event, _ *storage.Mess
 	}
 
 	module := decoder.StringFromMap(events[*idx].Data, "module")
+	if module == "" {
+		*idx += 1
+		module = decoder.StringFromMap(events[*idx].Data, "module")
+	}
 	if module != types.ModuleNameSlashing.String() {
 		return errors.Errorf("slashing unexpected module name: %s", module)
 	}

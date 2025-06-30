@@ -45,6 +45,25 @@ func Test_handleUnjail(t *testing.T) {
 				Height: 844287,
 			},
 			idx: testsuite.Ptr(0),
+		}, {
+			name: "test 2",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 6758141,
+					Type:   "message",
+					Data: map[string]any{
+						"action": "/cosmos.slashing.v1beta1.MsgUnjail",
+						"module": "slashing",
+						"sender": "celestiavaloper1qe8uuf5x69c526h4nzxwv4ltftr73v7q5qhs58",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgUnjail,
+				Height: 6758141,
+			},
+			idx: testsuite.Ptr(0),
 		},
 	}
 	for _, tt := range tests {
