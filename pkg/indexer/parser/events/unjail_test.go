@@ -53,9 +53,10 @@ func Test_handleUnjail(t *testing.T) {
 					Height: 6758141,
 					Type:   "message",
 					Data: map[string]any{
-						"action": "/cosmos.slashing.v1beta1.MsgUnjail",
-						"module": "slashing",
-						"sender": "celestiavaloper1qe8uuf5x69c526h4nzxwv4ltftr73v7q5qhs58",
+						"action":    "/cosmos.slashing.v1beta1.MsgUnjail",
+						"module":    "slashing",
+						"msg_index": "0",
+						"sender":    "celestia1t4ghf984z2y2yvn4xajxcm5jz2g5sdzqgy8l08",
 					},
 				},
 			},
