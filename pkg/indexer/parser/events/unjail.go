@@ -8,6 +8,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 )
 
@@ -43,9 +44,24 @@ func processUnjail(ctx *context.Context, events []storage.Event, _ *storage.Mess
 		return errors.Errorf("slashing unexpected sender value: %s", sender)
 	}
 
+	prefix, hash, err := pkgTypes.Address(sender).Decode()
+	if err != nil {
+		return errors.Wrap(err, "parsing validator address")
+	}
+
 	jailed := false
 	v := storage.EmptyValidator()
-	v.Address = sender
+
+	if prefix == pkgTypes.AddressPrefixValoper {
+		v.Address = sender
+	} else {
+		addr, err := pkgTypes.NewValoperAddressFromBytes(hash)
+		if err != nil {
+			return errors.Wrap(err, "encoding validator address")
+		}
+		v.Address = addr.String()
+	}
+
 	v.Jailed = &jailed
 	ctx.AddValidator(v)
 
