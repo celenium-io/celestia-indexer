@@ -49,7 +49,19 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 
 			amount := decimal.RequireFromString(cancel.Amount.Amount.String())
 			validator := storage.EmptyValidator()
-			validator.Address = cancel.Validator
+			prefix, hash, err := types.Address(cancel.Validator)
+			if err != nil {
+				return errors.Wrap(err, "decode validator address")
+			}
+			if prefix == types.AddressPrefixCelestia {
+				validator.Address = cancel.Validator
+			} else {
+				addr, err := types.NewAddressFromBytes(hash)
+				if err != nil {
+					return errors.Wrap(err, "encode validator address")
+				}
+				validator.Address = addr.String()
+			}
 			validator.Stake = amount.Copy()
 			ctx.AddValidator(validator)
 
