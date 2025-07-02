@@ -4,6 +4,7 @@
 package handle
 
 import (
+	hyperlaneICS "github.com/bcp-innovations/hyperlane-cosmos/x/core/01_interchain_security/types"
 	hyperlanePostDispatch "github.com/bcp-innovations/hyperlane-cosmos/x/core/02_post_dispatch/types"
 	hyperlaneCore "github.com/bcp-innovations/hyperlane-cosmos/x/core/types"
 	hyperlaneWarp "github.com/bcp-innovations/hyperlane-cosmos/x/warp/types"
@@ -160,6 +161,51 @@ func MsgCreateNoopHook(ctx *context.Context, m *hyperlanePostDispatch.MsgCreateN
 	msgType := storageTypes.MsgCreateNoopHook
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgAnnounceValidator
+func MsgAnnounceValidator(ctx *context.Context, m *hyperlaneICS.MsgAnnounceValidator) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgAnnounceValidator
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeSender, address: m.GetCreator()},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgCreateMessageIdMultisigIsm
+func MsgCreateMessageIdMultisigIsm(ctx *context.Context, m *hyperlaneICS.MsgCreateMessageIdMultisigIsm) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgCreateMessageIdMultisigIsm
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeSender, address: m.GetCreator()},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgCreateMerkleRootMultisigIsm
+func MsgCreateMerkleRootMultisigIsm(ctx *context.Context, m *hyperlaneICS.MsgCreateMerkleRootMultisigIsm) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgCreateMerkleRootMultisigIsm
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeSender, address: m.GetCreator()},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgCreateNoopIsm
+func MsgCreateNoopIsm(ctx *context.Context, m *hyperlaneICS.MsgCreateNoopIsm) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgCreateNoopIsm
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeSender, address: m.GetCreator()},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgCreateRoutingIsm
+func MsgCreateRoutingIsm(ctx *context.Context, m *hyperlaneICS.MsgCreateRoutingIsm) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgCreateRoutingIsm
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeSender, address: m.GetCreator()},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
 }

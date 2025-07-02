@@ -127,7 +127,13 @@ package types
 		MsgPayForGas,
 		MsgClaim,
 		MsgCreateMerkleTreeHook,
-		MsgCreateNoopHook
+		MsgCreateNoopHook,
+
+		MsgCreateMessageIdMultisigIsm,
+		MsgCreateMerkleRootMultisigIsm,
+		MsgCreateNoopIsm,
+		MsgAnnounceValidator,
+		MsgCreateRoutingIsm
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix --names

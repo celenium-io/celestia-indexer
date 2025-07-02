@@ -23,6 +23,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	cosmosFeegrant "cosmossdk.io/x/feegrant"
+	hyperlaneICS "github.com/bcp-innovations/hyperlane-cosmos/x/core/01_interchain_security/types"
 	hyperlanePostDispatch "github.com/bcp-innovations/hyperlane-cosmos/x/core/02_post_dispatch/types"
 	hyperlaneCore "github.com/bcp-innovations/hyperlane-cosmos/x/core/types"
 	hyperlaneWarp "github.com/bcp-innovations/hyperlane-cosmos/x/warp/types"
@@ -346,6 +347,16 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateMerkleTreeHook(ctx, typedMsg)
 	case *hyperlanePostDispatch.MsgCreateNoopHook:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateNoopHook(ctx, typedMsg)
+	case *hyperlaneICS.MsgAnnounceValidator:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgAnnounceValidator(ctx, typedMsg)
+	case *hyperlaneICS.MsgCreateMerkleRootMultisigIsm:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateMerkleRootMultisigIsm(ctx, typedMsg)
+	case *hyperlaneICS.MsgCreateMessageIdMultisigIsm:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateMessageIdMultisigIsm(ctx, typedMsg)
+	case *hyperlaneICS.MsgCreateNoopIsm:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateNoopIsm(ctx, typedMsg)
+	case *hyperlaneICS.MsgCreateRoutingIsm:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateRoutingIsm(ctx, typedMsg)
 
 	case *minfeeTypes.MsgUpdateMinfeeParams:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateMinfeeParams(ctx, typedMsg)

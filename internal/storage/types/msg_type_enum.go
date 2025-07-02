@@ -209,6 +209,16 @@ const (
 	MsgCreateMerkleTreeHook MsgType = "MsgCreateMerkleTreeHook"
 	// MsgCreateNoopHook is a MsgType of type MsgCreateNoopHook.
 	MsgCreateNoopHook MsgType = "MsgCreateNoopHook"
+	// MsgCreateMessageIdMultisigIsm is a MsgType of type MsgCreateMessageIdMultisigIsm.
+	MsgCreateMessageIdMultisigIsm MsgType = "MsgCreateMessageIdMultisigIsm"
+	// MsgCreateMerkleRootMultisigIsm is a MsgType of type MsgCreateMerkleRootMultisigIsm.
+	MsgCreateMerkleRootMultisigIsm MsgType = "MsgCreateMerkleRootMultisigIsm"
+	// MsgCreateNoopIsm is a MsgType of type MsgCreateNoopIsm.
+	MsgCreateNoopIsm MsgType = "MsgCreateNoopIsm"
+	// MsgAnnounceValidator is a MsgType of type MsgAnnounceValidator.
+	MsgAnnounceValidator MsgType = "MsgAnnounceValidator"
+	// MsgCreateRoutingIsm is a MsgType of type MsgCreateRoutingIsm.
+	MsgCreateRoutingIsm MsgType = "MsgCreateRoutingIsm"
 )
 
 var ErrInvalidMsgType = fmt.Errorf("not a valid MsgType, try [%s]", strings.Join(_MsgTypeNames, ", "))
@@ -310,6 +320,11 @@ var _MsgTypeNames = []string{
 	string(MsgClaim),
 	string(MsgCreateMerkleTreeHook),
 	string(MsgCreateNoopHook),
+	string(MsgCreateMessageIdMultisigIsm),
+	string(MsgCreateMerkleRootMultisigIsm),
+	string(MsgCreateNoopIsm),
+	string(MsgAnnounceValidator),
+	string(MsgCreateRoutingIsm),
 }
 
 // MsgTypeNames returns a list of possible string values of MsgType.
@@ -418,6 +433,11 @@ func MsgTypeValues() []MsgType {
 		MsgClaim,
 		MsgCreateMerkleTreeHook,
 		MsgCreateNoopHook,
+		MsgCreateMessageIdMultisigIsm,
+		MsgCreateMerkleRootMultisigIsm,
+		MsgCreateNoopIsm,
+		MsgAnnounceValidator,
+		MsgCreateRoutingIsm,
 	}
 }
 
@@ -530,6 +550,11 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgClaim":                           MsgClaim,
 	"MsgCreateMerkleTreeHook":            MsgCreateMerkleTreeHook,
 	"MsgCreateNoopHook":                  MsgCreateNoopHook,
+	"MsgCreateMessageIdMultisigIsm":      MsgCreateMessageIdMultisigIsm,
+	"MsgCreateMerkleRootMultisigIsm":     MsgCreateMerkleRootMultisigIsm,
+	"MsgCreateNoopIsm":                   MsgCreateNoopIsm,
+	"MsgAnnounceValidator":               MsgAnnounceValidator,
+	"MsgCreateRoutingIsm":                MsgCreateRoutingIsm,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.
