@@ -12,6 +12,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
@@ -96,7 +97,7 @@ func processUndelegate(ctx *context.Context, events []storage.Event, msg *storag
 
 			completionTime = unbond.CompletionTime
 			amount = decimal.RequireFromString(unbond.Amount.Amount.String())
-			prefix, hash, err := types.Address(unbond.Validator)
+			prefix, hash, err := types.Address(unbond.Validator).Decode()
 			if err != nil {
 				return errors.Wrap(err, "decode validator address")
 			}
