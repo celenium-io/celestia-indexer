@@ -102,13 +102,13 @@ func processUndelegate(ctx *context.Context, events []storage.Event, msg *storag
 				return errors.Wrap(err, "decode validator address")
 			}
 			if prefix == types.AddressPrefixCelestia {
-				validator.Address = unbond.Validator
-			} else {
-				addr, err := types.NewAddressFromBytes(hash)
+				addr, err := types.NewValoperAddressFromBytes(hash)
 				if err != nil {
 					return errors.Wrap(err, "encode validator address")
 				}
 				validator.Address = addr.String()
+			} else {
+				validator.Address = unbond.Validator
 			}
 			validator.Stake = amount.Copy().Neg()
 			ctx.AddValidator(validator)

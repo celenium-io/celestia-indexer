@@ -54,13 +54,13 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 				return errors.Wrap(err, "decode validator address")
 			}
 			if prefix == types.AddressPrefixCelestia {
-				source.Address = redelegate.SrcValidator
-			} else {
-				addr, err := types.NewAddressFromBytes(hash)
+				addr, err := types.NewValoperAddressFromBytes(hash)
 				if err != nil {
 					return errors.Wrap(err, "encode validator address")
 				}
 				source.Address = addr.String()
+			} else {
+				source.Address = redelegate.SrcValidator
 			}
 			source.Stake = amount.Copy().Neg()
 			ctx.AddValidator(source)
@@ -71,13 +71,13 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 				return errors.Wrap(err, "decode validator address")
 			}
 			if prefix == types.AddressPrefixCelestia {
-				dest.Address = redelegate.DestValidator
-			} else {
-				addr, err := types.NewAddressFromBytes(hash)
+				addr, err := types.NewValoperAddressFromBytes(hash)
 				if err != nil {
 					return errors.Wrap(err, "encode validator address")
 				}
 				dest.Address = addr.String()
+			} else {
+				dest.Address = redelegate.DestValidator
 			}
 			dest.Stake = amount
 			ctx.AddValidator(dest)

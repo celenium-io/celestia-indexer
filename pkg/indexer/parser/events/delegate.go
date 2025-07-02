@@ -87,13 +87,13 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 				return errors.Wrap(err, "decode validator address")
 			}
 			if prefix == types.AddressPrefixCelestia {
-				validator.Address = delegate.Validator
-			} else {
-				addr, err := types.NewAddressFromBytes(hash)
+				addr, err := types.NewValoperAddressFromBytes(hash)
 				if err != nil {
 					return errors.Wrap(err, "encode validator address")
 				}
-				validator.Address = addr.String()
+				delegation.Validator.Address = addr.String()
+			} else {
+				delegation.Validator.Address = delegate.Validator
 			}
 			delegation.Validator.Stake = delegation.Amount
 			ctx.AddValidator(*delegation.Validator)
