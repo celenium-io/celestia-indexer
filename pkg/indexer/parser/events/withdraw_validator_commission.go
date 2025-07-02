@@ -13,6 +13,8 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+const msgWithdrawValidatorCommission = "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission"
+
 func handleWithdrawValidatorCommission(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	if idx == nil {
 		return errors.New("nil event index")
@@ -20,7 +22,7 @@ func handleWithdrawValidatorCommission(ctx *context.Context, events []storage.Ev
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission" {
+	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != msgWithdrawValidatorCommission {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
 	return processWithdrawValidatorCommission(ctx, events, msg, idx)
@@ -30,7 +32,7 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 	var validator = storage.EmptyValidator()
 
 	var newFormat bool
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action == "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission" {
+	if action := decoder.StringFromMap(events[*idx].Data, "action"); action == msgWithdrawValidatorCommission {
 		validator.Address = decoder.StringFromMap(events[*idx].Data, "sender")
 		*idx += 1
 		newFormat = true
