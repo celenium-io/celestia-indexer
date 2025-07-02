@@ -477,7 +477,10 @@ func NewHyperlaneProcessEvent(m map[string]any) (hpe HyperlaneProcessEvent, err 
 	if err != nil {
 		return hpe, errors.Wrap(err, "recipient")
 	}
-	hpe.MessageId = decoder.StringFromMap(m, "message_id")
+	hpe.MessageId, err = parseUnquoteOptional(decoder.StringFromMap(m, "message_id"))
+	if err != nil {
+		return hpe, errors.Wrap(err, "message_id")
+	}
 	hpe.Origin, err = decoder.Uint64FromMap(m, "origin")
 	if err != nil {
 		return hpe, errors.Wrap(err, "origin")
@@ -535,9 +538,18 @@ func NewCreateCollateralToken(m map[string]any) (cct CreateCollateralToken, err 
 	if err != nil {
 		return cct, errors.Wrap(err, "origin_mailbox_id")
 	}
-	cct.Owner = decoder.StringFromMap(m, "owner")
-	cct.TokenId = decoder.StringFromMap(m, "token_id")
-	cct.Denom = decoder.StringFromMap(m, "origin_denom")
+	cct.Owner, err = parseUnquoteOptional(decoder.StringFromMap(m, "owner"))
+	if err != nil {
+		return cct, errors.Wrap(err, "owner")
+	}
+	cct.TokenId, err = parseUnquoteOptional(decoder.StringFromMap(m, "token_id"))
+	if err != nil {
+		return cct, errors.Wrap(err, "token_id")
+	}
+	cct.Denom, err = parseUnquoteOptional(decoder.StringFromMap(m, "origin_denom"))
+	if err != nil {
+		return cct, errors.Wrap(err, "origin_denom")
+	}
 	return
 }
 
@@ -553,9 +565,18 @@ func NewCreateSyntheticToken(m map[string]any) (cst CreateSyntheticToken, err er
 	if err != nil {
 		return cst, errors.Wrap(err, "origin_mailbox_id")
 	}
-	cst.Owner = decoder.StringFromMap(m, "owner")
-	cst.TokenId = decoder.StringFromMap(m, "token_id")
-	cst.Denom = decoder.StringFromMap(m, "origin_denom")
+	cst.Owner, err = parseUnquoteOptional(decoder.StringFromMap(m, "owner"))
+	if err != nil {
+		return cst, errors.Wrap(err, "owner")
+	}
+	cst.TokenId, err = parseUnquoteOptional(decoder.StringFromMap(m, "token_id"))
+	if err != nil {
+		return cst, errors.Wrap(err, "token_id")
+	}
+	cst.Denom, err = parseUnquoteOptional(decoder.StringFromMap(m, "origin_denom"))
+	if err != nil {
+		return cst, errors.Wrap(err, "origin_denom")
+	}
 	return
 }
 
@@ -577,7 +598,10 @@ func NewHyperlaneReceiveTransferEvent(m map[string]any) (hrte HyperlaneReceiveTr
 	if err != nil {
 		return hrte, errors.Wrap(err, "recipient")
 	}
-	hrte.TokenId = decoder.StringFromMap(m, "token_id")
+	hrte.TokenId, err = parseUnquoteOptional(decoder.StringFromMap(m, "token_id"))
+	if err != nil {
+		return hrte, errors.Wrap(err, "token_id")
+	}
 	hrte.OriginDomain, err = decoder.Uint64FromMap(m, "origin_domain")
 	if err != nil {
 		return hrte, errors.Wrap(err, "origin")
@@ -609,7 +633,10 @@ func NewHyperlaneSendTransferEvent(m map[string]any) (hste HyperlaneSendTransfer
 	if err != nil {
 		return hste, errors.Wrap(err, "recipient")
 	}
-	hste.TokenId = decoder.StringFromMap(m, "token_id")
+	hste.TokenId, err = parseUnquoteOptional(decoder.StringFromMap(m, "token_id"))
+	if err != nil {
+		return hste, errors.Wrap(err, "token_id")
+	}
 	hste.DestinationDomain, err = decoder.Uint64FromMap(m, "destination_domain")
 	if err != nil {
 		return hste, errors.Wrap(err, "origin")
@@ -632,10 +659,22 @@ type SetToken struct {
 }
 
 func NewSetToken(m map[string]any) (st SetToken, err error) {
-	st.NewOwner = decoder.StringFromMap(m, "new_owner")
-	st.Owner = decoder.StringFromMap(m, "owner")
-	st.TokenId = decoder.StringFromMap(m, "token_id")
-	st.IsmId = decoder.StringFromMap(m, "ism_id")
+	st.NewOwner, err = parseUnquoteOptional(decoder.StringFromMap(m, "new_owner"))
+	if err != nil {
+		return st, errors.Wrap(err, "new_owner")
+	}
+	st.Owner, err = parseUnquoteOptional(decoder.StringFromMap(m, "owner"))
+	if err != nil {
+		return st, errors.Wrap(err, "owner")
+	}
+	st.TokenId, err = parseUnquoteOptional(decoder.StringFromMap(m, "token_id"))
+	if err != nil {
+		return st, errors.Wrap(err, "token_id")
+	}
+	st.IsmId, err = parseUnquoteOptional(decoder.StringFromMap(m, "ism_id"))
+	if err != nil {
+		return st, errors.Wrap(err, "ism_id")
+	}
 	st.RenounceOwnership, err = decoder.BoolFromMap(m, "renounce_ownership")
 	if err != nil {
 		return st, errors.Wrap(err, "renounce_ownership")
