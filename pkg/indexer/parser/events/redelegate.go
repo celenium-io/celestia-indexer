@@ -10,6 +10,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
@@ -48,12 +49,36 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 			amount := decimal.RequireFromString(redelegate.Amount.Amount.String())
 
 			source := storage.EmptyValidator()
-			source.Address = redelegate.SrcValidator
+			prefix, hash, err := types.Address(redelegate.SrcValidator).Decode()
+			if err != nil {
+				return errors.Wrap(err, "decode validator address")
+			}
+			if prefix == types.AddressPrefixCelestia {
+				addr, err := types.NewValoperAddressFromBytes(hash)
+				if err != nil {
+					return errors.Wrap(err, "encode validator address")
+				}
+				source.Address = addr.String()
+			} else {
+				source.Address = redelegate.SrcValidator
+			}
 			source.Stake = amount.Copy().Neg()
 			ctx.AddValidator(source)
 
 			dest := storage.EmptyValidator()
-			dest.Address = redelegate.DestValidator
+			prefix, hash, err = types.Address(redelegate.DestValidator).Decode()
+			if err != nil {
+				return errors.Wrap(err, "decode validator address")
+			}
+			if prefix == types.AddressPrefixCelestia {
+				addr, err := types.NewValoperAddressFromBytes(hash)
+				if err != nil {
+					return errors.Wrap(err, "encode validator address")
+				}
+				dest.Address = addr.String()
+			} else {
+				dest.Address = redelegate.DestValidator
+			}
 			dest.Stake = amount
 			ctx.AddValidator(dest)
 

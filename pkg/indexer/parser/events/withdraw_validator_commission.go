@@ -34,8 +34,10 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 	var newFormat bool
 	if action := decoder.StringFromMap(events[*idx].Data, "action"); action == msgWithdrawValidatorCommission {
 		validator.Address = decoder.StringFromMap(events[*idx].Data, "sender")
-		*idx += 1
-		newFormat = true
+		if validator.Address != "" {
+			*idx += 1
+			newFormat = true
+		}
 	}
 
 	for i := *idx; i < len(events); i++ {

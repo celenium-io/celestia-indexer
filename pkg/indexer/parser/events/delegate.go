@@ -10,6 +10,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
@@ -81,7 +82,19 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 				return err
 			}
 			delegation.Amount = decimal.RequireFromString(delegate.Amount.Amount.String())
-			delegation.Validator.Address = delegate.Validator
+			prefix, hash, err := types.Address(delegate.Validator).Decode()
+			if err != nil {
+				return errors.Wrap(err, "decode validator address")
+			}
+			if prefix == types.AddressPrefixCelestia {
+				addr, err := types.NewValoperAddressFromBytes(hash)
+				if err != nil {
+					return errors.Wrap(err, "encode validator address")
+				}
+				delegation.Validator.Address = addr.String()
+			} else {
+				delegation.Validator.Address = delegate.Validator
+			}
 			delegation.Validator.Stake = delegation.Amount
 			ctx.AddValidator(*delegation.Validator)
 		}
