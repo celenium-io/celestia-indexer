@@ -13,6 +13,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const null = "null"
+
 func handleCreateMailbox(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	if idx == nil {
 		return errors.New("nil event index")
@@ -55,7 +57,7 @@ func processCreateMailbox(ctx *context.Context, events []storage.Event, msg *sto
 				Domain:     createMailbox.LocalDomain,
 			}
 
-			if len(createMailbox.DefaultHook) > 0 {
+			if len(createMailbox.DefaultHook) > 0 && createMailbox.DefaultHook != null {
 				defaultHook, err := util.DecodeHexAddress(createMailbox.DefaultHook)
 				if err != nil {
 					return errors.Wrap(err, "decode default hook")
@@ -63,7 +65,7 @@ func processCreateMailbox(ctx *context.Context, events []storage.Event, msg *sto
 				mailbox.DefaultHook = defaultHook.Bytes()
 			}
 
-			if len(createMailbox.RequiredHook) > 0 {
+			if len(createMailbox.RequiredHook) > 0 && createMailbox.RequiredHook != null {
 				requiredHook, err := util.DecodeHexAddress(createMailbox.RequiredHook)
 				if err != nil {
 					return errors.Wrap(err, "decode required hook")

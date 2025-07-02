@@ -4,6 +4,8 @@
 package decode
 
 import (
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/bcp-innovations/hyperlane-cosmos/util"
@@ -378,6 +380,13 @@ func NewRecvPacket(m map[string]any) (rp RecvPacket, err error) {
 	return
 }
 
+func parseUnquoteOptional(s string) (string, error) {
+	if strings.HasPrefix(s, "\"") && strings.HasSuffix(s, "\"") {
+		return strconv.Unquote(s)
+	}
+	return s, nil
+}
+
 type CreateMailbox struct {
 	MailboxId    string
 	Owner        string
@@ -388,9 +397,18 @@ type CreateMailbox struct {
 }
 
 func NewCreateMailbox(m map[string]any) (cm CreateMailbox, err error) {
-	cm.MailboxId = decoder.StringFromMap(m, "mailbox_id")
-	cm.Owner = decoder.StringFromMap(m, "owner")
-	cm.DefaultIsm = decoder.StringFromMap(m, "default_ism")
+	cm.MailboxId, err = parseUnquoteOptional(decoder.StringFromMap(m, "mailbox_id"))
+	if err != nil {
+		return cm, errors.Wrap(err, "mailbox_id")
+	}
+	cm.Owner, err = parseUnquoteOptional(decoder.StringFromMap(m, "owner"))
+	if err != nil {
+		return cm, errors.Wrap(err, "mailbox_id")
+	}
+	cm.DefaultIsm, err = parseUnquoteOptional(decoder.StringFromMap(m, "default_ism"))
+	if err != nil {
+		return cm, errors.Wrap(err, "default_ism")
+	}
 	cm.DefaultHook = decoder.StringFromMap(m, "default_hook")
 	cm.RequiredHook = decoder.StringFromMap(m, "required_hook")
 	cm.LocalDomain, err = decoder.Uint64FromMap(m, "local_domain")
@@ -410,9 +428,18 @@ type SetMailbox struct {
 }
 
 func NewSetMailbox(m map[string]any) (sm SetMailbox, err error) {
-	sm.MailboxId = decoder.StringFromMap(m, "mailbox_id")
-	sm.Owner = decoder.StringFromMap(m, "owner")
-	sm.DefaultIsm = decoder.StringFromMap(m, "default_ism")
+	sm.MailboxId, err = parseUnquoteOptional(decoder.StringFromMap(m, "mailbox_id"))
+	if err != nil {
+		return sm, errors.Wrap(err, "mailbox_id")
+	}
+	sm.Owner, err = parseUnquoteOptional(decoder.StringFromMap(m, "owner"))
+	if err != nil {
+		return sm, errors.Wrap(err, "mailbox_id")
+	}
+	sm.DefaultIsm, err = parseUnquoteOptional(decoder.StringFromMap(m, "default_ism"))
+	if err != nil {
+		return sm, errors.Wrap(err, "default_ism")
+	}
 	sm.DefaultHook = decoder.StringFromMap(m, "default_hook")
 	sm.NewOwner = decoder.StringFromMap(m, "new_owner")
 	sm.RenounceOwnership, err = decoder.BoolFromMap(m, "renounce_ownership")
@@ -432,9 +459,18 @@ type HyperlaneProcessEvent struct {
 }
 
 func NewHyperlaneProcessEvent(m map[string]any) (hpe HyperlaneProcessEvent, err error) {
-	hpe.OriginMailboxId = decoder.StringFromMap(m, "origin_mailbox_id")
-	hpe.Sender = decoder.StringFromMap(m, "sender")
-	hpe.Recipient = decoder.StringFromMap(m, "recipient")
+	hpe.OriginMailboxId, err = parseUnquoteOptional(decoder.StringFromMap(m, "origin_mailbox_id"))
+	if err != nil {
+		return hpe, errors.Wrap(err, "origin_mailbox_id")
+	}
+	hpe.Sender, err = parseUnquoteOptional(decoder.StringFromMap(m, "sender"))
+	if err != nil {
+		return hpe, errors.Wrap(err, "sender")
+	}
+	hpe.Recipient, err = parseUnquoteOptional(decoder.StringFromMap(m, "recipient"))
+	if err != nil {
+		return hpe, errors.Wrap(err, "recipient")
+	}
 	hpe.MessageId = decoder.StringFromMap(m, "message_id")
 	hpe.Origin, err = decoder.Uint64FromMap(m, "origin")
 	if err != nil {
@@ -457,9 +493,18 @@ type HyperlaneDispatchEvent struct {
 }
 
 func NewHyperlaneDispatchEvent(m map[string]any) (hde HyperlaneDispatchEvent, err error) {
-	hde.OriginMailboxId = decoder.StringFromMap(m, "origin_mailbox_id")
-	hde.Sender = decoder.StringFromMap(m, "sender")
-	hde.Recipient = decoder.StringFromMap(m, "recipient")
+	hde.OriginMailboxId, err = parseUnquoteOptional(decoder.StringFromMap(m, "origin_mailbox_id"))
+	if err != nil {
+		return hde, errors.Wrap(err, "origin_mailbox_id")
+	}
+	hde.Sender, err = parseUnquoteOptional(decoder.StringFromMap(m, "sender"))
+	if err != nil {
+		return hde, errors.Wrap(err, "sender")
+	}
+	hde.Recipient, err = parseUnquoteOptional(decoder.StringFromMap(m, "recipient"))
+	if err != nil {
+		return hde, errors.Wrap(err, "recipient")
+	}
 	hde.Destination, err = decoder.Uint64FromMap(m, "destination")
 	if err != nil {
 		return hde, errors.Wrap(err, "destination")
@@ -480,7 +525,10 @@ type CreateCollateralToken struct {
 }
 
 func NewCreateCollateralToken(m map[string]any) (cct CreateCollateralToken, err error) {
-	cct.MailboxId = decoder.StringFromMap(m, "origin_mailbox")
+	cct.MailboxId, err = parseUnquoteOptional(decoder.StringFromMap(m, "origin_mailbox"))
+	if err != nil {
+		return cct, errors.Wrap(err, "origin_mailbox_id")
+	}
 	cct.Owner = decoder.StringFromMap(m, "owner")
 	cct.TokenId = decoder.StringFromMap(m, "token_id")
 	cct.Denom = decoder.StringFromMap(m, "origin_denom")
@@ -495,7 +543,10 @@ type CreateSyntheticToken struct {
 }
 
 func NewCreateSyntheticToken(m map[string]any) (cst CreateSyntheticToken, err error) {
-	cst.MailboxId = decoder.StringFromMap(m, "origin_mailbox")
+	cst.MailboxId, err = parseUnquoteOptional(decoder.StringFromMap(m, "origin_mailbox"))
+	if err != nil {
+		return cst, errors.Wrap(err, "origin_mailbox_id")
+	}
 	cst.Owner = decoder.StringFromMap(m, "owner")
 	cst.TokenId = decoder.StringFromMap(m, "token_id")
 	cst.Denom = decoder.StringFromMap(m, "origin_denom")
@@ -512,8 +563,14 @@ type HyperlaneReceiveTransferEvent struct {
 }
 
 func NewHyperlaneReceiveTransferEvent(m map[string]any) (hrte HyperlaneReceiveTransferEvent, err error) {
-	hrte.Sender = decoder.StringFromMap(m, "sender")
-	hrte.Recipient = decoder.StringFromMap(m, "recipient")
+	hrte.Sender, err = parseUnquoteOptional(decoder.StringFromMap(m, "sender"))
+	if err != nil {
+		return hrte, errors.Wrap(err, "sender")
+	}
+	hrte.Recipient, err = parseUnquoteOptional(decoder.StringFromMap(m, "recipient"))
+	if err != nil {
+		return hrte, errors.Wrap(err, "recipient")
+	}
 	hrte.TokenId = decoder.StringFromMap(m, "token_id")
 	hrte.OriginDomain, err = decoder.Uint64FromMap(m, "origin_domain")
 	if err != nil {
@@ -538,8 +595,14 @@ type HyperlaneSendTransferEvent struct {
 }
 
 func NewHyperlaneSendTransferEvent(m map[string]any) (hste HyperlaneSendTransferEvent, err error) {
-	hste.Sender = decoder.StringFromMap(m, "sender")
-	hste.Recipient = decoder.StringFromMap(m, "recipient")
+	hste.Sender, err = parseUnquoteOptional(decoder.StringFromMap(m, "sender"))
+	if err != nil {
+		return hste, errors.Wrap(err, "sender")
+	}
+	hste.Recipient, err = parseUnquoteOptional(decoder.StringFromMap(m, "recipient"))
+	if err != nil {
+		return hste, errors.Wrap(err, "recipient")
+	}
 	hste.TokenId = decoder.StringFromMap(m, "token_id")
 	hste.DestinationDomain, err = decoder.Uint64FromMap(m, "destination_domain")
 	if err != nil {
