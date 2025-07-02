@@ -57,16 +57,18 @@ func handleWithdrawDelegatorRewards(ctx *context.Context, events []storage.Event
 	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
 	return processWithdrawDelegatorRewards(ctx, events, msg, idx)
 }
 
 func processWithdrawDelegatorRewards(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+	msgIdx := decoder.StringFromMap(events[*idx].Data, "msg_index")
+	newFormat := msgIdx != ""
+
 	for i := *idx; i < len(events); i++ {
 		switch events[i].Type {
 		case storageTypes.EventTypeMessage:
-			if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "" {
-				return nil
+			if newFormat {
+				continue
 			}
 			if module := decoder.StringFromMap(events[i].Data, "module"); module == storageTypes.ModuleNameDistribution.String() {
 				*idx = i + 1
@@ -75,6 +77,10 @@ func processWithdrawDelegatorRewards(ctx *context.Context, events []storage.Even
 		case storageTypes.EventTypeWithdrawRewards:
 			if err := parseWithdrawRewards(ctx, msg, events[i].Data); err != nil {
 				return err
+			}
+			if newFormat {
+				*idx = i + 1
+				return nil
 			}
 		}
 	}

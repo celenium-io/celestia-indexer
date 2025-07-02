@@ -18,7 +18,7 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 		name   string
 		ctx    *context.Context
 		events []storage.Event
-		msg    *storage.Message
+		msgs   []*storage.Message
 		idx    *int
 	}{
 		{
@@ -74,9 +74,11 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 					},
 				},
 			},
-			msg: &storage.Message{
-				Type:   types.MsgDelegate,
-				Height: 848613,
+			msgs: []*storage.Message{
+				{
+					Type:   types.MsgWithdrawValidatorCommission,
+					Height: 848613,
+				},
 			},
 			idx: testsuite.Ptr(0),
 		}, {
@@ -90,7 +92,7 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 						"action":    "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
 						"sender":    "celestiavaloper1s0lankh33kprer2l22nank5rvsuh9ksa2xcd2y",
 						"module":    "distribution",
-						"msg_index": 1,
+						"msg_index": "1",
 					},
 				}, {
 					Height: 848613,
@@ -128,17 +130,21 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 					},
 				},
 			},
-			msg: &storage.Message{
-				Type:   types.MsgDelegate,
-				Height: 848613,
+			msgs: []*storage.Message{
+				{
+					Type:   types.MsgWithdrawValidatorCommission,
+					Height: 848613,
+				},
 			},
 			idx: testsuite.Ptr(0),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := handleWithdrawValidatorCommission(tt.ctx, tt.events, tt.msg, tt.idx)
-			require.NoError(t, err)
+			for i := range tt.msgs {
+				err := handleWithdrawValidatorCommission(tt.ctx, tt.events, tt.msgs[i], tt.idx)
+				require.NoError(t, err)
+			}
 		})
 	}
 }
