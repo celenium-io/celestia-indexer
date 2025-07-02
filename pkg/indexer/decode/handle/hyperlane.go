@@ -4,6 +4,7 @@
 package handle
 
 import (
+	hyperlanePostDispatch "github.com/bcp-innovations/hyperlane-cosmos/x/core/02_post_dispatch/types"
 	hyperlaneCore "github.com/bcp-innovations/hyperlane-cosmos/x/core/types"
 	hyperlaneWarp "github.com/bcp-innovations/hyperlane-cosmos/x/warp/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -32,10 +33,16 @@ func MsgProcessMessage(ctx *context.Context, m *hyperlaneCore.MsgProcessMessage)
 // MsgSetMailbox
 func MsgSetMailbox(ctx *context.Context, m *hyperlaneCore.MsgSetMailbox) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSetMailbox
-	addresses, err := createAddresses(ctx, addressesData{
+
+	items := addressesData{
 		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
-		{t: storageTypes.MsgAddressTypeOwner, address: m.GetNewOwner()},
-	}, ctx.Block.Height)
+	}
+	if m.GetNewOwner() != "" {
+		items = append(items,
+			addressData{t: storageTypes.MsgAddressTypeOwner, address: m.GetNewOwner()},
+		)
+	}
+	addresses, err := createAddresses(ctx, items, ctx.Block.Height)
 	return msgType, addresses, err
 }
 
@@ -90,6 +97,69 @@ func MsgRemoteTransfer(ctx *context.Context, m *hyperlaneWarp.MsgRemoteTransfer)
 	msgType := storageTypes.MsgRemoteTransfer
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSender, address: m.GetSender()},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgClaim
+func MsgClaim(ctx *context.Context, m *hyperlanePostDispatch.MsgClaim) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgClaim
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeSender, address: m.GetSender()},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgCreateIgp
+func MsgCreateIgp(ctx *context.Context, m *hyperlanePostDispatch.MsgCreateIgp) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgCreateIgp
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgSetIgpOwner
+func MsgSetIgpOwner(ctx *context.Context, m *hyperlanePostDispatch.MsgSetIgpOwner) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgSetIgpOwner
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgPayForGas
+func MsgPayForGas(ctx *context.Context, m *hyperlanePostDispatch.MsgPayForGas) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgPayForGas
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeSender, address: m.GetSender()},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgSetDestinationGasConfig
+func MsgSetDestinationGasConfig(ctx *context.Context, m *hyperlanePostDispatch.MsgSetDestinationGasConfig) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgSetDestinationGasConfig
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgCreateMerkleTreeHook
+func MsgCreateMerkleTreeHook(ctx *context.Context, m *hyperlanePostDispatch.MsgCreateMerkleTreeHook) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgCreateMerkleTreeHook
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+// MsgCreateNoopHook
+func MsgCreateNoopHook(ctx *context.Context, m *hyperlanePostDispatch.MsgCreateNoopHook) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgCreateNoopHook
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
 }

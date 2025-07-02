@@ -119,7 +119,15 @@ package types
 		MsgUnrollRemoteRouter,
 		MsgRemoteTransfer,
 
-		MsgUpdateMinfeeParams
+		MsgUpdateMinfeeParams,
+
+		MsgCreateIgp,
+		MsgSetIgpOwner,
+		MsgSetDestinationGasConfig,
+		MsgPayForGas,
+		MsgClaim,
+		MsgCreateMerkleTreeHook,
+		MsgCreateNoopHook
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix --names

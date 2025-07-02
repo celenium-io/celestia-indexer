@@ -50,7 +50,7 @@ func processSetMailbox(ctx *context.Context, events []storage.Event, msg *storag
 				},
 			}
 
-			if len(setMailbox.DefaultIsm) > 0 && setMailbox.DefaultIsm != "null" {
+			if len(setMailbox.DefaultIsm) > 0 && setMailbox.DefaultIsm != null {
 				defaultIsm, err := util.DecodeHexAddress(setMailbox.DefaultIsm)
 				if err != nil {
 					return errors.Wrap(err, "decode default ISM")
@@ -58,7 +58,7 @@ func processSetMailbox(ctx *context.Context, events []storage.Event, msg *storag
 				mailbox.DefaultIsm = defaultIsm.Bytes()
 			}
 
-			if len(setMailbox.DefaultHook) > 0 && setMailbox.DefaultHook != "null" {
+			if len(setMailbox.DefaultHook) > 0 && setMailbox.DefaultHook != null {
 				defaultHook, err := util.DecodeHexAddress(setMailbox.DefaultHook)
 				if err != nil {
 					return errors.Wrap(err, "decode default hook")
