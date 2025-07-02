@@ -48,12 +48,36 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 			amount := decimal.RequireFromString(redelegate.Amount.Amount.String())
 
 			source := storage.EmptyValidator()
-			source.Address = redelegate.SrcValidator
+			prefix, hash, err := types.Address(redelegate.SrcValidator)
+			if err != nil {
+				return errors.Wrap(err, "decode validator address")
+			}
+			if prefix == types.AddressPrefixCelestia {
+				validator.Address = redelegate.SrcValidator
+			} else {
+				addr, err := types.NewAddressFromBytes(hash)
+				if err != nil {
+					return errors.Wrap(err, "encode validator address")
+				}
+				validator.Address = addr.String()
+			}
 			source.Stake = amount.Copy().Neg()
 			ctx.AddValidator(source)
 
 			dest := storage.EmptyValidator()
-			dest.Address = redelegate.DestValidator
+			prefix, hash, err := types.Address(redelegate.DestValidator)
+			if err != nil {
+				return errors.Wrap(err, "decode validator address")
+			}
+			if prefix == types.AddressPrefixCelestia {
+				validator.Address = redelegate.DestValidator
+			} else {
+				addr, err := types.NewAddressFromBytes(hash)
+				if err != nil {
+					return errors.Wrap(err, "encode validator address")
+				}
+				validator.Address = addr.String()
+			}
 			dest.Stake = amount
 			ctx.AddValidator(dest)
 

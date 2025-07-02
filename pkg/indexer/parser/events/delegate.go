@@ -81,7 +81,19 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 				return err
 			}
 			delegation.Amount = decimal.RequireFromString(delegate.Amount.Amount.String())
-			delegation.Validator.Address = delegate.Validator
+			prefix, hash, err := types.Address(delegate.Validator)
+			if err != nil {
+				return errors.Wrap(err, "decode validator address")
+			}
+			if prefix == types.AddressPrefixCelestia {
+				validator.Address = delegate.Validator
+			} else {
+				addr, err := types.NewAddressFromBytes(hash)
+				if err != nil {
+					return errors.Wrap(err, "encode validator address")
+				}
+				validator.Address = addr.String()
+			}
 			delegation.Validator.Stake = delegation.Amount
 			ctx.AddValidator(*delegation.Validator)
 		}

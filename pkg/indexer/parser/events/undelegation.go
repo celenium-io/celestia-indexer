@@ -96,7 +96,19 @@ func processUndelegate(ctx *context.Context, events []storage.Event, msg *storag
 
 			completionTime = unbond.CompletionTime
 			amount = decimal.RequireFromString(unbond.Amount.Amount.String())
-			validator.Address = unbond.Validator
+			prefix, hash, err := types.Address(unbond.Validator)
+			if err != nil {
+				return errors.Wrap(err, "decode validator address")
+			}
+			if prefix == types.AddressPrefixCelestia {
+				validator.Address = unbond.Validator
+			} else {
+				addr, err := types.NewAddressFromBytes(hash)
+				if err != nil {
+					return errors.Wrap(err, "encode validator address")
+				}
+				validator.Address = addr.String()
+			}
 			validator.Stake = amount.Copy().Neg()
 			ctx.AddValidator(validator)
 		}
