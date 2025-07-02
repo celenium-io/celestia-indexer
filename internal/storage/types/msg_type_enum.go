@@ -195,6 +195,20 @@ const (
 	MsgRemoteTransfer MsgType = "MsgRemoteTransfer"
 	// MsgUpdateMinfeeParams is a MsgType of type MsgUpdateMinfeeParams.
 	MsgUpdateMinfeeParams MsgType = "MsgUpdateMinfeeParams"
+	// MsgCreateIgp is a MsgType of type MsgCreateIgp.
+	MsgCreateIgp MsgType = "MsgCreateIgp"
+	// MsgSetIgpOwner is a MsgType of type MsgSetIgpOwner.
+	MsgSetIgpOwner MsgType = "MsgSetIgpOwner"
+	// MsgSetDestinationGasConfig is a MsgType of type MsgSetDestinationGasConfig.
+	MsgSetDestinationGasConfig MsgType = "MsgSetDestinationGasConfig"
+	// MsgPayForGas is a MsgType of type MsgPayForGas.
+	MsgPayForGas MsgType = "MsgPayForGas"
+	// MsgClaim is a MsgType of type MsgClaim.
+	MsgClaim MsgType = "MsgClaim"
+	// MsgCreateMerkleTreeHook is a MsgType of type MsgCreateMerkleTreeHook.
+	MsgCreateMerkleTreeHook MsgType = "MsgCreateMerkleTreeHook"
+	// MsgCreateNoopHook is a MsgType of type MsgCreateNoopHook.
+	MsgCreateNoopHook MsgType = "MsgCreateNoopHook"
 )
 
 var ErrInvalidMsgType = fmt.Errorf("not a valid MsgType, try [%s]", strings.Join(_MsgTypeNames, ", "))
@@ -289,6 +303,13 @@ var _MsgTypeNames = []string{
 	string(MsgUnrollRemoteRouter),
 	string(MsgRemoteTransfer),
 	string(MsgUpdateMinfeeParams),
+	string(MsgCreateIgp),
+	string(MsgSetIgpOwner),
+	string(MsgSetDestinationGasConfig),
+	string(MsgPayForGas),
+	string(MsgClaim),
+	string(MsgCreateMerkleTreeHook),
+	string(MsgCreateNoopHook),
 }
 
 // MsgTypeNames returns a list of possible string values of MsgType.
@@ -390,6 +411,13 @@ func MsgTypeValues() []MsgType {
 		MsgUnrollRemoteRouter,
 		MsgRemoteTransfer,
 		MsgUpdateMinfeeParams,
+		MsgCreateIgp,
+		MsgSetIgpOwner,
+		MsgSetDestinationGasConfig,
+		MsgPayForGas,
+		MsgClaim,
+		MsgCreateMerkleTreeHook,
+		MsgCreateNoopHook,
 	}
 }
 
@@ -495,6 +523,13 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgUnrollRemoteRouter":              MsgUnrollRemoteRouter,
 	"MsgRemoteTransfer":                  MsgRemoteTransfer,
 	"MsgUpdateMinfeeParams":              MsgUpdateMinfeeParams,
+	"MsgCreateIgp":                       MsgCreateIgp,
+	"MsgSetIgpOwner":                     MsgSetIgpOwner,
+	"MsgSetDestinationGasConfig":         MsgSetDestinationGasConfig,
+	"MsgPayForGas":                       MsgPayForGas,
+	"MsgClaim":                           MsgClaim,
+	"MsgCreateMerkleTreeHook":            MsgCreateMerkleTreeHook,
+	"MsgCreateNoopHook":                  MsgCreateNoopHook,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.

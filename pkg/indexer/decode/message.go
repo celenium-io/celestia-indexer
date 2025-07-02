@@ -23,6 +23,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	cosmosFeegrant "cosmossdk.io/x/feegrant"
+	hyperlanePostDispatch "github.com/bcp-innovations/hyperlane-cosmos/x/core/02_post_dispatch/types"
 	hyperlaneCore "github.com/bcp-innovations/hyperlane-cosmos/x/core/types"
 	hyperlaneWarp "github.com/bcp-innovations/hyperlane-cosmos/x/warp/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -331,6 +332,20 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUnrollRemoteRouter(ctx, typedMsg)
 	case *hyperlaneWarp.MsgRemoteTransfer:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRemoteTransfer(ctx, typedMsg)
+	case *hyperlanePostDispatch.MsgClaim:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgClaim(ctx, typedMsg)
+	case *hyperlanePostDispatch.MsgCreateIgp:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateIgp(ctx, typedMsg)
+	case *hyperlanePostDispatch.MsgSetIgpOwner:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSetIgpOwner(ctx, typedMsg)
+	case *hyperlanePostDispatch.MsgPayForGas:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgPayForGas(ctx, typedMsg)
+	case *hyperlanePostDispatch.MsgSetDestinationGasConfig:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSetDestinationGasConfig(ctx, typedMsg)
+	case *hyperlanePostDispatch.MsgCreateMerkleTreeHook:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateMerkleTreeHook(ctx, typedMsg)
+	case *hyperlanePostDispatch.MsgCreateNoopHook:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateNoopHook(ctx, typedMsg)
 
 	case *minfeeTypes.MsgUpdateMinfeeParams:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateMinfeeParams(ctx, typedMsg)

@@ -440,8 +440,14 @@ func NewSetMailbox(m map[string]any) (sm SetMailbox, err error) {
 	if err != nil {
 		return sm, errors.Wrap(err, "default_ism")
 	}
-	sm.DefaultHook = decoder.StringFromMap(m, "default_hook")
-	sm.NewOwner = decoder.StringFromMap(m, "new_owner")
+	sm.DefaultHook, err = parseUnquoteOptional(decoder.StringFromMap(m, "default_hook"))
+	if err != nil {
+		return sm, errors.Wrap(err, "default_hook")
+	}
+	sm.NewOwner, err = parseUnquoteOptional(decoder.StringFromMap(m, "new_owner"))
+	if err != nil {
+		return sm, errors.Wrap(err, "new_owner")
+	}
 	sm.RenounceOwnership, err = decoder.BoolFromMap(m, "renounce_ownership")
 	if err != nil {
 		return sm, errors.Wrap(err, "renounce_ownership")
