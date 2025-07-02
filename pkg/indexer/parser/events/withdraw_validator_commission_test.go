@@ -79,6 +79,60 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				Height: 848613,
 			},
 			idx: testsuite.Ptr(0),
+		}, {
+			name: "test 2",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 848613,
+					Type:   "message",
+					Data: map[string]any{
+						"action":    "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
+						"sender":    "celestiavaloper1s0lankh33kprer2l22nank5rvsuh9ksa2xcd2y",
+						"module":    "distribution",
+						"msg_index": 1,
+					},
+				}, {
+					Height: 848613,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":  "3003622utia",
+						"spender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 848613,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":   "3003622utia",
+						"receiver": "celestia1s0lankh33kprer2l22nank5rvsuh9ksa0e65uz",
+					},
+				}, {
+					Height: 848613,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "3003622utia",
+						"recipient": "celestia1s0lankh33kprer2l22nank5rvsuh9ksa0e65uz",
+						"sender":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 848613,
+					Type:   "message",
+					Data: map[string]any{
+						"sender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 848613,
+					Type:   "withdraw_commission",
+					Data: map[string]any{
+						"amount": "3003622utia",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgDelegate,
+				Height: 848613,
+			},
+			idx: testsuite.Ptr(0),
 		},
 	}
 	for _, tt := range tests {

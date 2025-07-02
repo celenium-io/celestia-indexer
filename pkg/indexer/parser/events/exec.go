@@ -58,7 +58,7 @@ func processExec(ctx *context.Context, events []storage.Event, msg *storage.Mess
 			if err := processUndelegate(ctx, events, msg, idx); err != nil {
 				return err
 			}
-		case "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission":
+		case msgWithdrawValidatorCommission:
 			if err := processWithdrawValidatorCommission(ctx, events, msg, idx); err != nil {
 				return err
 			}
