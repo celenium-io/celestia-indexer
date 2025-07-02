@@ -32,10 +32,16 @@ func MsgProcessMessage(ctx *context.Context, m *hyperlaneCore.MsgProcessMessage)
 // MsgSetMailbox
 func MsgSetMailbox(ctx *context.Context, m *hyperlaneCore.MsgSetMailbox) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSetMailbox
-	addresses, err := createAddresses(ctx, addressesData{
+
+	items := addressesData{
 		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
-		{t: storageTypes.MsgAddressTypeOwner, address: m.GetNewOwner()},
-	}, ctx.Block.Height)
+	}
+	if m.GetNewOwner() != "" {
+		items = append(items,
+			addressData{t: storageTypes.MsgAddressTypeOwner, address: m.GetNewOwner()},
+		)
+	}
+	addresses, err := createAddresses(ctx, items, ctx.Block.Height)
 	return msgType, addresses, err
 }
 
