@@ -65,6 +65,9 @@ func processWithdrawDelegatorRewards(ctx *context.Context, events []storage.Even
 	for i := *idx; i < len(events); i++ {
 		switch events[i].Type {
 		case storageTypes.EventTypeMessage:
+			if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "" {
+				return nil
+			}
 			if module := decoder.StringFromMap(events[i].Data, "module"); module == storageTypes.ModuleNameDistribution.String() {
 				*idx = i + 1
 				return nil
