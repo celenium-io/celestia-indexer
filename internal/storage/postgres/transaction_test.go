@@ -366,14 +366,16 @@ func (s *TransactionTestSuite) TestSaveVotes() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx.SaveVotes(ctx, &storage.Vote{
+	var vote = &storage.Vote{
 		Option:     types.VoteOptionAbstain,
 		ProposalId: 1,
 		VoterId:    1,
 		Height:     1001,
 		Time:       time.Now(),
 		Weight:     decimal.RequireFromString("1.0"),
-	})
+	}
+
+	err = tx.SaveVotes(ctx, vote)
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))
@@ -381,7 +383,13 @@ func (s *TransactionTestSuite) TestSaveVotes() {
 
 	items, err := s.storage.Votes.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 5)
+	s.Require().Len(items, 4)
+
+	for i := range items {
+		if items[i].VoterId == vote.VoterId && items[i].ProposalId == vote.ProposalId {
+			s.Require().Equal(vote.Option, items[i].Option)
+		}
+	}
 }
 
 func (s *TransactionTestSuite) TestSaveBlockSignatures() {

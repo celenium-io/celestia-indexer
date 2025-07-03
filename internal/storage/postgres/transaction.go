@@ -5,10 +5,12 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/lib/pq"
+	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 	"github.com/vmihailenco/msgpack/v5"
@@ -532,10 +534,41 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 	return count, nil
 }
 
+var one = decimal.NewFromInt(1)
+
 func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) error {
 	if len(votes) == 0 {
 		return nil
 	}
+
+	for i := range votes {
+		var existsVotes []models.Vote
+		query := tx.Tx().NewSelect().
+			Model(&existsVotes).
+			Where("proposal_id = ?", votes[i].ProposalId)
+
+		if votes[i].VoterId > 0 {
+			query.Where("voter_id = ?", votes[i].VoterId)
+		}
+		if votes[i].ValidatorId > 0 {
+			query.Where("voter_id = ?", votes[i].ValidatorId)
+		}
+		if err := query.Scan(ctx); err != nil && !errors.Is(err, sql.ErrNoRows) {
+			return errors.Wrap(err, "receive existing votes")
+		}
+		ids := make([]uint64, len(existsVotes))
+		total := votes[i].Weight.Copy()
+		for j, vote := range existsVotes {
+			total = total.Add(vote.Weight)
+			ids[j] = vote.Id
+		}
+		if total.GreaterThan(one) {
+			if _, err := tx.Tx().NewDelete().Model((*models.Vote)(nil)).Where("id IN (?)", bun.In(ids)).Exec(ctx); err != nil {
+				return errors.Wrap(err, "remove existing votes")
+			}
+		}
+	}
+
 	_, err := tx.Tx().NewInsert().Model(&votes).Exec(ctx)
 	return err
 }
