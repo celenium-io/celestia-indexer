@@ -134,6 +134,20 @@ const (
 	MsgTypeBitsRemoteTransfer
 
 	MsgTypeBitsUpdateMinfeeParams
+
+	MsgTypeBitsCreateIgp
+	MsgTypeBitsSetIgpOwner
+	MsgTypeBitsSetDestinationGasConfig
+	MsgTypeBitsPayForGas
+	MsgTypeBitsClaim
+	MsgTypeBitsCreateMerkleTreeHook
+	MsgTypeBitsCreateNoopHook
+
+	MsgTypeBitsCreateMessageIdMultisigIsm
+	MsgTypeBitsCreateMerkleRootMultisigIsm
+	MsgTypeBitsCreateNoopIsm
+	MsgTypeBitsAnnounceValidator
+	MsgTypeBitsCreateRoutingIsm
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
@@ -341,6 +355,31 @@ func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 
 	case MsgUpdateMinfeeParams:
 		mask.SetBit(MsgTypeBitsUpdateMinfeeParams)
+
+	case MsgCreateIgp:
+		mask.SetBit(MsgTypeBitsCreateIgp)
+	case MsgSetIgpOwner:
+		mask.SetBit(MsgTypeBitsSetIgpOwner)
+	case MsgSetDestinationGasConfig:
+		mask.SetBit(MsgTypeBitsSetDestinationGasConfig)
+	case MsgPayForGas:
+		mask.SetBit(MsgTypeBitsPayForGas)
+	case MsgClaim:
+		mask.SetBit(MsgTypeBitsClaim)
+	case MsgCreateMerkleTreeHook:
+		mask.SetBit(MsgTypeBitsCreateMerkleTreeHook)
+	case MsgCreateNoopHook:
+		mask.SetBit(MsgTypeBitsCreateNoopHook)
+	case MsgCreateMessageIdMultisigIsm:
+		mask.SetBit(MsgTypeBitsCreateMessageIdMultisigIsm)
+	case MsgCreateMerkleRootMultisigIsm:
+		mask.SetBit(MsgTypeBitsCreateMerkleRootMultisigIsm)
+	case MsgCreateNoopIsm:
+		mask.SetBit(MsgTypeBitsCreateNoopIsm)
+	case MsgAnnounceValidator:
+		mask.SetBit(MsgTypeBitsAnnounceValidator)
+	case MsgCreateRoutingIsm:
+		mask.SetBit(MsgTypeBitsCreateRoutingIsm)
 	}
 }
 
@@ -722,6 +761,66 @@ func (mask MsgTypeBits) Names() []MsgType {
 
 	if mask.HasBit(MsgTypeBitsUpdateMinfeeParams) {
 		names[i] = MsgUpdateMinfeeParams
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsCreateIgp) {
+		names[i] = MsgCreateIgp
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsSetIgpOwner) {
+		names[i] = MsgSetIgpOwner
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsPayForGas) {
+		names[i] = MsgPayForGas
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsSetDestinationGasConfig) {
+		names[i] = MsgSetDestinationGasConfig
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsClaim) {
+		names[i] = MsgClaim
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsCreateMerkleTreeHook) {
+		names[i] = MsgCreateMerkleTreeHook
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsCreateNoopHook) {
+		names[i] = MsgCreateNoopHook
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsCreateMessageIdMultisigIsm) {
+		names[i] = MsgCreateMessageIdMultisigIsm
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsCreateMerkleRootMultisigIsm) {
+		names[i] = MsgCreateMerkleRootMultisigIsm
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsCreateNoopIsm) {
+		names[i] = MsgCreateNoopIsm
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsAnnounceValidator) {
+		names[i] = MsgAnnounceValidator
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsCreateRoutingIsm) {
+		names[i] = MsgCreateRoutingIsm
 		// i++
 	}
 
@@ -753,9 +852,9 @@ var _ driver.Valuer = (*MsgTypeBits)(nil)
 
 func (mask MsgTypeBits) Value() (driver.Value, error) {
 	if mask.value == nil {
-		return fmt.Sprintf("%089b", 0), nil
+		return fmt.Sprintf("%0101b", 0), nil
 	}
-	return fmt.Sprintf("%089b", mask.value), nil
+	return fmt.Sprintf("%0101b", mask.value), nil
 }
 
 func (mask MsgTypeBits) MarshalJSON() (data []byte, err error) {
