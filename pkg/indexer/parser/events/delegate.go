@@ -35,40 +35,48 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 		delegation = storage.Delegation{
 			Validator: &validator,
 		}
+		msgIdx    = decoder.StringFromMap(events[*idx].Data, "msg_index")
+		newFormat = msgIdx != ""
+
+		endDelegation = func(event storage.Event, key string) error {
+			delegator := decoder.StringFromMap(event.Data, key)
+
+			address := &storage.Address{
+				Address:    delegator,
+				Height:     msg.Height,
+				LastHeight: msg.Height,
+				Balance: storage.Balance{
+					Currency:  currency.DefaultCurrency,
+					Delegated: delegation.Amount,
+				},
+			}
+
+			if err := ctx.AddAddress(address); err != nil {
+				return err
+			}
+			delegation.Address = address
+
+			ctx.AddDelegation(delegation)
+
+			ctx.AddStakingLog(storage.StakingLog{
+				Height:    msg.Height,
+				Time:      msg.Time,
+				Address:   address,
+				Validator: delegation.Validator,
+				Change:    delegation.Amount,
+				Type:      storageTypes.StakingLogTypeDelegation,
+			})
+			return nil
+		}
 	)
 
 	for i := *idx; i < len(events); i++ {
 		switch events[i].Type {
 		case storageTypes.EventTypeMessage:
 			if module := decoder.StringFromMap(events[i].Data, "module"); module == storageTypes.ModuleNameStaking.String() {
-				delegator := decoder.StringFromMap(events[i].Data, "sender")
-
-				address := &storage.Address{
-					Address:    delegator,
-					Height:     msg.Height,
-					LastHeight: msg.Height,
-					Balance: storage.Balance{
-						Currency:  currency.DefaultCurrency,
-						Delegated: delegation.Amount,
-					},
+				if err := endDelegation(events[i], "sender"); err != nil {
+					return errors.Wrap(err, "end delegation")
 				}
-
-				if err := ctx.AddAddress(address); err != nil {
-					return err
-				}
-				delegation.Address = address
-
-				ctx.AddDelegation(delegation)
-
-				ctx.AddStakingLog(storage.StakingLog{
-					Height:    msg.Height,
-					Time:      msg.Time,
-					Address:   address,
-					Validator: delegation.Validator,
-					Change:    delegation.Amount,
-					Type:      storageTypes.StakingLogTypeDelegation,
-				})
-
 				*idx = i + 1
 				return nil
 			}
@@ -97,6 +105,14 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 			}
 			delegation.Validator.Stake = delegation.Amount
 			ctx.AddValidator(*delegation.Validator)
+
+			if newFormat {
+				if err := endDelegation(events[i], "delegator"); err != nil {
+					return errors.Wrap(err, "end delegation")
+				}
+				*idx = i + 1
+				return nil
+			}
 		}
 
 	}

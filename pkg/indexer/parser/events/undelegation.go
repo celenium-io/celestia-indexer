@@ -36,51 +36,62 @@ func processUndelegate(ctx *context.Context, events []storage.Event, msg *storag
 		amount         = decimal.Zero
 		validator      = storage.EmptyValidator()
 		completionTime = time.Now()
+		msgIdx         = decoder.StringFromMap(events[*idx].Data, "msg_index")
+		newFormat      = msgIdx != ""
+
+		undelegationEnd = func(event storage.Event, key string) error {
+			delegator := decoder.StringFromMap(event.Data, key)
+
+			address := &storage.Address{
+				Address:    delegator,
+				Height:     msg.Height,
+				LastHeight: msg.Height,
+				Balance: storage.Balance{
+					Currency:  currency.DefaultCurrency,
+					Delegated: amount.Copy().Neg(),
+					Unbonding: amount,
+					Spendable: decimal.Zero,
+				},
+			}
+			if err := ctx.AddAddress(address); err != nil {
+				return err
+			}
+
+			ctx.AddDelegation(storage.Delegation{
+				Address:   address,
+				Validator: &validator,
+				Amount:    amount.Copy().Neg(),
+			})
+
+			ctx.AddUndelegation(storage.Undelegation{
+				Validator:      &validator,
+				Address:        address,
+				Amount:         amount,
+				Time:           msg.Time,
+				Height:         msg.Height,
+				CompletionTime: completionTime,
+			})
+
+			ctx.AddStakingLog(storage.StakingLog{
+				Height:    msg.Height,
+				Time:      msg.Time,
+				Address:   address,
+				Validator: &validator,
+				Change:    amount.Copy().Neg(),
+				Type:      storageTypes.StakingLogTypeUnbonding,
+			})
+
+			return nil
+		}
 	)
 
 	for i := *idx; i < len(events); i++ {
 		switch events[i].Type {
 		case storageTypes.EventTypeMessage:
 			if module := decoder.StringFromMap(events[i].Data, "module"); module == storageTypes.ModuleNameStaking.String() {
-				delegator := decoder.StringFromMap(events[i].Data, "sender")
-
-				address := &storage.Address{
-					Address:    delegator,
-					Height:     msg.Height,
-					LastHeight: msg.Height,
-					Balance: storage.Balance{
-						Currency:  currency.DefaultCurrency,
-						Delegated: amount.Copy().Neg(),
-						Unbonding: amount,
-					},
+				if err := undelegationEnd(events[i], "sender"); err != nil {
+					return errors.Wrap(err, "undelegation end")
 				}
-				if err := ctx.AddAddress(address); err != nil {
-					return err
-				}
-
-				ctx.AddDelegation(storage.Delegation{
-					Address:   address,
-					Validator: &validator,
-					Amount:    amount.Copy().Neg(),
-				})
-
-				ctx.AddUndelegation(storage.Undelegation{
-					Validator:      &validator,
-					Address:        address,
-					Amount:         amount,
-					Time:           msg.Time,
-					Height:         msg.Height,
-					CompletionTime: completionTime,
-				})
-
-				ctx.AddStakingLog(storage.StakingLog{
-					Height:    msg.Height,
-					Time:      msg.Time,
-					Address:   address,
-					Validator: &validator,
-					Change:    amount.Copy().Neg(),
-					Type:      storageTypes.StakingLogTypeUnbonding,
-				})
 
 				*idx = i + 1
 				return nil
@@ -112,6 +123,14 @@ func processUndelegate(ctx *context.Context, events []storage.Event, msg *storag
 			}
 			validator.Stake = amount.Copy().Neg()
 			ctx.AddValidator(validator)
+
+			if newFormat {
+				if err := undelegationEnd(events[i], "delegator"); err != nil {
+					return errors.Wrap(err, "undelegation end")
+				}
+				*idx = i + 1
+				return nil
+			}
 		}
 	}
 

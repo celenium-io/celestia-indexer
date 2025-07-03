@@ -11,6 +11,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 )
 
 func handleCreateSyntheticToken(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
@@ -53,8 +54,12 @@ func processCreateSyntheticToken(ctx *context.Context, events []storage.Event, m
 				Type:   types.HLTokenTypeSynthetic,
 				Mailbox: &storage.HLMailbox{
 					Mailbox: originMailboxId.Bytes(),
+					Height:  ctx.Block.Height,
+					Time:    ctx.Block.Time,
 				},
-				TokenId: tokenId.Bytes(),
+				TokenId:  tokenId.Bytes(),
+				Sent:     decimal.Zero,
+				Received: decimal.Zero,
 			}
 
 			if createToken.Owner != "" {
