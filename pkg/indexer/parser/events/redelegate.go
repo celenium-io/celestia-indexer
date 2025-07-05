@@ -30,6 +30,11 @@ func handleRedelegate(ctx *context.Context, events []storage.Event, msg *storage
 }
 
 func processRedelegate(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+	var (
+		msgIdx    = decoder.StringFromMap(events[*idx].Data, "msg_index")
+		newFormat = msgIdx != ""
+	)
+
 	for i := *idx; i < len(events); i++ {
 		switch events[i].Type {
 		case storageTypes.EventTypeMessage:
@@ -132,6 +137,11 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 				Change:    amount.Copy(),
 				Type:      storageTypes.StakingLogTypeDelegation,
 			})
+
+			if newFormat {
+				*idx = i + 1
+				return nil
+			}
 		}
 	}
 

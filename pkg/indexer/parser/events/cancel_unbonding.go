@@ -30,6 +30,11 @@ func handleCancelUnbonding(ctx *context.Context, events []storage.Event, msg *st
 }
 
 func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+	var (
+		msgIdx    = decoder.StringFromMap(events[*idx].Data, "msg_index")
+		newFormat = msgIdx != ""
+	)
+
 	for i := *idx; i < len(events); i++ {
 		switch events[i].Type {
 		case storageTypes.EventTypeMessage:
@@ -88,7 +93,7 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 			ctx.AddCancelUndelegation(storage.Undelegation{
 				Validator: &validator,
 				Address:   address,
-				Height:    types.Level(cancel.CreationHeight),
+				Height:    msg.Height,
 				Time:      msg.Time,
 				Amount:    amount,
 			})
@@ -101,6 +106,11 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 				Change:    amount.Copy(),
 				Type:      storageTypes.StakingLogTypeUnbonding,
 			})
+
+			if newFormat {
+				*idx = i + 1
+				return nil
+			}
 		}
 	}
 
