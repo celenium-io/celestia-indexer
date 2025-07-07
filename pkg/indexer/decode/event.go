@@ -606,9 +606,13 @@ func NewHyperlaneReceiveTransferEvent(m map[string]any) (hrte HyperlaneReceiveTr
 	if err != nil {
 		return hrte, errors.Wrap(err, "origin")
 	}
-	coin, err := decoder.CoinFromMap(m, "amount")
+	amount, err := parseUnquoteOptional(decoder.StringFromMap(m, "amount"))
 	if err != nil {
 		return hrte, errors.Wrap(err, "amount")
+	}
+	coin, err := types.ParseCoinNormalized(amount)
+	if err != nil {
+		return hrte, errors.Wrap(err, amount)
 	}
 	hrte.Amount = decimal.RequireFromString(coin.Amount.String())
 	hrte.Denom = coin.GetDenom()
@@ -641,9 +645,13 @@ func NewHyperlaneSendTransferEvent(m map[string]any) (hste HyperlaneSendTransfer
 	if err != nil {
 		return hste, errors.Wrap(err, "origin")
 	}
-	coin, err := decoder.CoinFromMap(m, "amount")
+	amount, err := parseUnquoteOptional(decoder.StringFromMap(m, "amount"))
 	if err != nil {
 		return hste, errors.Wrap(err, "amount")
+	}
+	coin, err := types.ParseCoinNormalized(amount)
+	if err != nil {
+		return hste, errors.Wrap(err, amount)
 	}
 	hste.Amount = decimal.RequireFromString(coin.Amount.String())
 	hste.Denom = coin.GetDenom()
