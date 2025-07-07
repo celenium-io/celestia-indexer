@@ -982,18 +982,18 @@ func (c *MockTransactionHandleErrorCall) DoAndReturn(f func(context.Context, err
 }
 
 // HyperlaneMailbox mocks base method.
-func (m *MockTransaction) HyperlaneMailbox(ctx context.Context, id []byte) (storage.HLMailbox, error) {
+func (m *MockTransaction) HyperlaneMailbox(ctx context.Context, internalId uint64) (storage.HLMailbox, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HyperlaneMailbox", ctx, id)
+	ret := m.ctrl.Call(m, "HyperlaneMailbox", ctx, internalId)
 	ret0, _ := ret[0].(storage.HLMailbox)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // HyperlaneMailbox indicates an expected call of HyperlaneMailbox.
-func (mr *MockTransactionMockRecorder) HyperlaneMailbox(ctx, id any) *MockTransactionHyperlaneMailboxCall {
+func (mr *MockTransactionMockRecorder) HyperlaneMailbox(ctx, internalId any) *MockTransactionHyperlaneMailboxCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HyperlaneMailbox", reflect.TypeOf((*MockTransaction)(nil).HyperlaneMailbox), ctx, id)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HyperlaneMailbox", reflect.TypeOf((*MockTransaction)(nil).HyperlaneMailbox), ctx, internalId)
 	return &MockTransactionHyperlaneMailboxCall{Call: call}
 }
 
@@ -1009,13 +1009,13 @@ func (c *MockTransactionHyperlaneMailboxCall) Return(arg0 storage.HLMailbox, arg
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionHyperlaneMailboxCall) Do(f func(context.Context, []byte) (storage.HLMailbox, error)) *MockTransactionHyperlaneMailboxCall {
+func (c *MockTransactionHyperlaneMailboxCall) Do(f func(context.Context, uint64) (storage.HLMailbox, error)) *MockTransactionHyperlaneMailboxCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionHyperlaneMailboxCall) DoAndReturn(f func(context.Context, []byte) (storage.HLMailbox, error)) *MockTransactionHyperlaneMailboxCall {
+func (c *MockTransactionHyperlaneMailboxCall) DoAndReturn(f func(context.Context, uint64) (storage.HLMailbox, error)) *MockTransactionHyperlaneMailboxCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

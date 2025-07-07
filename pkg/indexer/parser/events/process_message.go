@@ -53,6 +53,7 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 
 			transfer.Mailbox = &storage.HLMailbox{
 				Mailbox:          originMailboxId.Bytes(),
+				InternalId:       originMailboxId.GetInternalId(),
 				ReceivedMessages: 1,
 			}
 

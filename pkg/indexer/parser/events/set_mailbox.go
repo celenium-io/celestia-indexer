@@ -42,9 +42,10 @@ func processSetMailbox(ctx *context.Context, events []storage.Event, msg *storag
 			}
 
 			mailbox := &storage.HLMailbox{
-				Height:  ctx.Block.Height,
-				Time:    ctx.Block.Time,
-				Mailbox: mailboxId.Bytes(),
+				Height:     ctx.Block.Height,
+				Time:       ctx.Block.Time,
+				Mailbox:    mailboxId.Bytes(),
+				InternalId: mailboxId.GetInternalId(),
 				Owner: &storage.Address{
 					Address: setMailbox.Owner,
 				},
