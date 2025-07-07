@@ -265,7 +265,7 @@ func (module *Module) saveMessages(
 					hlt.Received = hlt.Received.Add(messages[i].HLTransfer.Token.Received)
 					hlt.Sent = hlt.Sent.Add(messages[i].HLTransfer.Token.Sent)
 				} else {
-					hyperlaneTokens[messages[i].HLToken.String()] = messages[i].HLTransfer.Token
+					hyperlaneTokens[messages[i].HLTransfer.Token.String()] = messages[i].HLTransfer.Token
 				}
 			}
 		}
