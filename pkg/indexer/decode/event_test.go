@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"cosmossdk.io/math"
+	"github.com/bcp-innovations/hyperlane-cosmos/util"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/shopspring/decimal"
@@ -578,6 +579,56 @@ func TestNewHyperlaneSendTransferEvent(t *testing.T) {
 			gotBody, err := NewHyperlaneSendTransferEvent(tt.m)
 			require.NoError(t, err)
 			require.Equal(t, tt.wantBody, gotBody)
+		})
+	}
+}
+
+func mustHexAddress(str string) util.HexAddress {
+	addr, err := util.DecodeHexAddress(str)
+	if err != nil {
+		panic(err)
+	}
+	return addr
+}
+
+func TestNewHyperlaneDispatchEvent(t *testing.T) {
+	tests := []struct {
+		name    string
+		m       map[string]any
+		wantHde HyperlaneDispatchEvent
+	}{
+		{
+			name: "test 1",
+			m: map[string]any{
+				"destination":       "84532",
+				"message":           "\"0x03000000004d4f4348726f757465725f6170700000000000000000000000000001000000000000000000014a34000000000000000000000000c2455315f69696295b357428fe13970bb5b4effa0000000000000000000000009b8ae55dccca7a842182cc023bd63d24d2692e0a000000000000000000000000000000000000000000000000000000000000000a\"",
+				"origin_mailbox_id": "\"0x68797065726c616e650000000000000000000000000000000000000000000000\"",
+				"recipient":         "\"0x000000000000000000000000c2455315f69696295b357428fe13970bb5b4effa\"",
+				"sender":            "\"0x726f757465725f61707000000000000000000000000000010000000000000000\"",
+				"msg_index":         "0",
+			},
+			wantHde: HyperlaneDispatchEvent{
+				Destination:     84532,
+				OriginMailboxId: "0x68797065726c616e650000000000000000000000000000000000000000000000",
+				Recipient:       "0x000000000000000000000000c2455315f69696295b357428fe13970bb5b4effa",
+				Sender:          "0x726f757465725f61707000000000000000000000000000010000000000000000",
+				Message: &util.HyperlaneMessage{
+					Version:     3,
+					Origin:      1297040200,
+					Nonce:       0,
+					Destination: 84532,
+					Sender:      mustHexAddress("0x726f757465725f61707000000000000000000000000000010000000000000000"),
+					Recipient:   mustHexAddress("0x000000000000000000000000c2455315f69696295b357428fe13970bb5b4effa"),
+					Body:        []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 155, 138, 229, 93, 204, 202, 122, 132, 33, 130, 204, 2, 59, 214, 61, 36, 210, 105, 46, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotBody, err := NewHyperlaneDispatchEvent(tt.m)
+			require.NoError(t, err)
+			require.Equal(t, tt.wantHde, gotBody)
 		})
 	}
 }

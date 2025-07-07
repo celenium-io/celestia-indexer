@@ -243,11 +243,23 @@ func HyperlaneMessageFromMap(m map[string]any, key string) (*util.HyperlaneMessa
 		return nil, nil
 	}
 
-	messageBytes, err := util.DecodeEthHex(str)
+	unquoted, err := parseUnquoteOptional(str)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unquote hyperlane message")
+	}
+
+	messageBytes, err := util.DecodeEthHex(unquoted)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode hyperlane message")
 	}
 
 	result, err := util.ParseHyperlaneMessage(messageBytes)
 	return &result, err
+}
+
+func parseUnquoteOptional(s string) (string, error) {
+	if strings.HasPrefix(s, "\"") && strings.HasSuffix(s, "\"") {
+		return strconv.Unquote(s)
+	}
+	return s, nil
 }
