@@ -33,7 +33,7 @@ func (module *Module) saveMessages(
 		ibcConnections     = make(map[string]*storage.IbcConnection)
 		ibcChannels        = make(map[string]*storage.IbcChannel)
 		ibcTransfers       = make([]*storage.IbcTransfer, 0)
-		hyperlaneMailbox   = make(map[string]*storage.HLMailbox, 0)
+		hyperlaneMailbox   = make(map[uint64]*storage.HLMailbox, 0)
 		hyperlaneTokens    = make(map[string]*storage.HLToken, 0)
 		hyperlaneTransfers = make([]*storage.HLTransfer, 0)
 		grants             = make(map[string]storage.Grant)
@@ -198,7 +198,7 @@ func (module *Module) saveMessages(
 				}
 			}
 
-			hyperlaneMailbox[messages[i].HLMailbox.String()] = messages[i].HLMailbox
+			hyperlaneMailbox[messages[i].HLMailbox.InternalId] = messages[i].HLMailbox
 		}
 
 		if messages[i].HLToken != nil {
@@ -211,7 +211,7 @@ func (module *Module) saveMessages(
 			}
 
 			if messages[i].HLToken.Mailbox != nil {
-				mailbox, err := tx.HyperlaneMailbox(ctx, messages[i].HLToken.Mailbox.Mailbox)
+				mailbox, err := tx.HyperlaneMailbox(ctx, messages[i].HLToken.Mailbox.InternalId)
 				if err != nil {
 					return 0, errors.Wrapf(err, "can't find mailbox for token: %x", messages[i].HLToken.Mailbox)
 				}
@@ -235,20 +235,20 @@ func (module *Module) saveMessages(
 				}
 			}
 			if messages[i].HLTransfer.Mailbox != nil {
-				mailbox, err := tx.HyperlaneMailbox(ctx, messages[i].HLTransfer.Mailbox.Mailbox)
+				mailbox, err := tx.HyperlaneMailbox(ctx, messages[i].HLTransfer.Mailbox.InternalId)
 				if err != nil {
 					return 0, errors.Wrapf(err, "can't find mailbox for transfer: %x", messages[i].HLTransfer.Mailbox)
 				}
 				messages[i].HLTransfer.MailboxId = mailbox.Id
 				messages[i].HLTransfer.Mailbox.Id = mailbox.Id
 
-				if hlm, ok := hyperlaneMailbox[messages[i].HLTransfer.Mailbox.String()]; ok {
+				if hlm, ok := hyperlaneMailbox[messages[i].HLTransfer.Mailbox.InternalId]; ok {
 					if messages[i].HLTransfer.Token != nil {
 						hlm.ReceivedMessages += messages[i].HLTransfer.Token.ReceiveTransfers
 						hlm.SentMessages += messages[i].HLTransfer.Token.SentTransfers
 					}
 				} else {
-					hyperlaneMailbox[messages[i].HLTransfer.Mailbox.String()] = messages[i].HLTransfer.Mailbox
+					hyperlaneMailbox[messages[i].HLTransfer.Mailbox.InternalId] = messages[i].HLTransfer.Mailbox
 				}
 			}
 			if messages[i].HLTransfer.Token != nil {

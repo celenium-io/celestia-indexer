@@ -742,8 +742,8 @@ func (tx Transaction) SaveHyperlaneMailbox(ctx context.Context, mailbox ...*mode
 	for i := range mailbox {
 		query := tx.Tx().NewInsert().
 			Model(mailbox[i]).
-			Column("height", "time", "tx_id", "mailbox", "owner_id", "default_ism", "default_hook", "required_hook", "domain", "sent_messages", "received_messages").
-			On("CONFLICT (mailbox) DO UPDATE")
+			Column("height", "time", "tx_id", "mailbox", "internal_id", "owner_id", "default_ism", "default_hook", "required_hook", "domain", "sent_messages", "received_messages").
+			On("CONFLICT (internal_id) DO UPDATE")
 
 		if mailbox[i].Owner != nil {
 			query.Set("owner_id = EXCLUDED.owner_id")
@@ -1338,9 +1338,9 @@ func (tx Transaction) IbcConnection(ctx context.Context, id string) (conn models
 	return
 }
 
-func (tx Transaction) HyperlaneMailbox(ctx context.Context, id []byte) (mailbox models.HLMailbox, err error) {
+func (tx Transaction) HyperlaneMailbox(ctx context.Context, internalId uint64) (mailbox models.HLMailbox, err error) {
 	err = tx.Tx().NewSelect().Model(&mailbox).
-		Where("mailbox = ?", id).
+		Where("internal_id = ?", internalId).
 		Column("id").
 		Scan(ctx)
 	return

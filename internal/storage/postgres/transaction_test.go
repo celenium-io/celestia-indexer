@@ -1598,7 +1598,7 @@ func (s *TransactionTestSuite) TestGetHyperlaneMailbox() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	mailbox, err := tx.HyperlaneMailbox(ctx, []byte("mailbox"))
+	mailbox, err := tx.HyperlaneMailbox(ctx, 1)
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))

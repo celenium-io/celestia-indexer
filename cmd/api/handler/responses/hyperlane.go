@@ -13,6 +13,7 @@ import (
 
 type HyperlaneMailbox struct {
 	Id               uint64         `example:"321"                                                              format:"int64"     json:"id"                      swaggertype:"integer"`
+	InternalId       uint64         `example:"321"                                                              format:"int64"     json:"hyperlane_id"            swaggertype:"integer"`
 	Height           pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"                  swaggertype:"integer"`
 	Time             time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                    swaggertype:"string"`
 	TxHash           string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"       swaggertype:"string"`
@@ -33,6 +34,7 @@ func NewHyperlaneMailbox(mailbox storage.HLMailbox) HyperlaneMailbox {
 		Height:           mailbox.Height,
 		Time:             mailbox.Time,
 		Mailbox:          hex.EncodeToString(mailbox.Mailbox),
+		InternalId:       mailbox.InternalId,
 		Domain:           mailbox.Domain,
 		SentMessages:     mailbox.SentMessages,
 		ReceivedMessages: mailbox.ReceivedMessages,

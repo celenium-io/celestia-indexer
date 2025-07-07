@@ -3,6 +3,7 @@
   time: '2023-07-04T03:10:57+00:00'
   tx_id: 1
   mailbox: mailbox
+  internal_id: 1
   owner_id: 1
   default_ism: 0x03020A
   default_hook: 0x03020A

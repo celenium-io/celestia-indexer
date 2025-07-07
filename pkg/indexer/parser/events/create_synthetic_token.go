@@ -53,9 +53,10 @@ func processCreateSyntheticToken(ctx *context.Context, events []storage.Event, m
 				Denom:  createToken.Denom,
 				Type:   types.HLTokenTypeSynthetic,
 				Mailbox: &storage.HLMailbox{
-					Mailbox: originMailboxId.Bytes(),
-					Height:  ctx.Block.Height,
-					Time:    ctx.Block.Time,
+					Height:     ctx.Block.Height,
+					Time:       ctx.Block.Time,
+					Mailbox:    originMailboxId.Bytes(),
+					InternalId: originMailboxId.GetInternalId(),
 				},
 				TokenId:  tokenId.Bytes(),
 				Sent:     decimal.Zero,

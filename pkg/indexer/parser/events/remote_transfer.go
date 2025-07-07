@@ -57,6 +57,7 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event
 
 			transfer.Mailbox = &storage.HLMailbox{
 				Mailbox:      originMailboxId.Bytes(),
+				InternalId:   originMailboxId.GetInternalId(),
 				SentMessages: 1,
 			}
 

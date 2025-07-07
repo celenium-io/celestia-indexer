@@ -169,7 +169,7 @@ type Transaction interface {
 	Proposal(ctx context.Context, id uint64) (Proposal, error)
 	RefreshLeaderboard(ctx context.Context) error
 	IbcConnection(ctx context.Context, id string) (IbcConnection, error)
-	HyperlaneMailbox(ctx context.Context, id []byte) (HLMailbox, error)
+	HyperlaneMailbox(ctx context.Context, internalId uint64) (HLMailbox, error)
 	HyperlaneToken(ctx context.Context, id []byte) (HLToken, error)
 }
 

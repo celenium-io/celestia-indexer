@@ -26,6 +26,7 @@ type HLMailbox struct {
 	Time             time.Time      `bun:"time,pk,notnull"     comment:"The time of block"`
 	TxId             uint64         `bun:"tx_id"               comment:"Internal creation transaction id"`
 	Mailbox          []byte         `bun:"mailbox,unique"      comment:"Mailbox address"`
+	InternalId       uint64         `bun:"internal_id,unique"  comment:"Internal mailbox id"`
 	OwnerId          uint64         `bun:"owner_id"            comment:"Owner identity"`
 	DefaultIsm       []byte         `bun:"default_ism"         comment:"Default ISM"`
 	DefaultHook      []byte         `bun:"default_hook"        comment:"Default hook"`
