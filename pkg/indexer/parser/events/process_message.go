@@ -97,6 +97,7 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 				TokenId:          tokenId.Bytes(),
 				ReceiveTransfers: 1,
 				Received:         event.Amount,
+				Type:             types.HLTokenTypeCollateral,
 			}
 		}
 

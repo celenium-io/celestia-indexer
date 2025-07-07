@@ -82,6 +82,7 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event
 				TokenId:       tokenId.Bytes(),
 				SentTransfers: 1,
 				Sent:          event.Amount,
+				Type:          types.HLTokenTypeCollateral,
 			}
 		}
 
