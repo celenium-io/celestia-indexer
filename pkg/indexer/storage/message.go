@@ -268,6 +268,8 @@ func (module *Module) saveMessages(
 					hyperlaneTokens[messages[i].HLTransfer.Token.String()] = messages[i].HLTransfer.Token
 				}
 			}
+
+			hyperlaneTransfers = append(hyperlaneTransfers, messages[i].HLTransfer)
 		}
 	}
 
