@@ -130,6 +130,9 @@ func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.S
 			query = query.Where("id < ?", fltrs.Cursor)
 		}
 	}
+	if fltrs.Height > 0 {
+		query = query.Where("height = ?", fltrs.Height)
+	}
 
 	query = limitScope(query, fltrs.Limit)
 	return blobLogSort(query, fltrs.SortBy, fltrs.Sort)
@@ -162,6 +165,9 @@ func listBlobLogFilters(query *bun.SelectQuery, fltrs storage.ListBlobLogFilters
 		case sdk.SortOrderDesc:
 			query = query.Where("id < ?", fltrs.Cursor)
 		}
+	}
+	if fltrs.Height > 0 {
+		query = query.Where("height = ?", fltrs.Height)
 	}
 
 	query = limitScope(query, fltrs.Limit)
