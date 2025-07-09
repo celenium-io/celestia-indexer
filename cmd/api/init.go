@@ -210,7 +210,7 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 	e.Use(middleware.DecompressWithConfig(middleware.DecompressConfig{
 		Skipper: websocketSkipper,
 	}))
-	e.Use(middleware.BodyLimit("2M"))
+	e.Use(middleware.BodyLimit("9M"))
 	e.Use(middleware.CSRFWithConfig(
 		middleware.CSRFConfig{
 			Skipper: func(c echo.Context) bool {

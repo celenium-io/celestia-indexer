@@ -25,6 +25,7 @@ type BlobLogFilters struct {
 	Joins      bool
 	Signers    []uint64
 	Cursor     uint64
+	Height     types.Level
 }
 
 type ListBlobLogFilters struct {
@@ -38,6 +39,7 @@ type ListBlobLogFilters struct {
 	Signers    []uint64
 	Namespaces []uint64
 	Cursor     uint64
+	Height     types.Level
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed

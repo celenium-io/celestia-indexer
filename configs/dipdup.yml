@@ -44,6 +44,14 @@ datasources:
     rps: ${CELESTIALS_API_RPS:-5}
     timeout: ${CELESTIALS_API_TIMEOUT:-10}
 
+jsonrpc:
+  bind: ${JSONRPC_HOST:-0.0.0.0}:${JSONRPC_PORT:-9878}
+  rate_limit: ${JSONRPC_RATE_LIMIT:-0}
+  prometheus: ${JSONRPC_PROMETHEUS_ENABLED:-true}
+  request_timeout: ${JSONRPC_REQUEST_TIMEOUT:-30}
+  blob_receiver: ${BLOB_RECEIVER:-dal_api}
+  sentry_dsn: ${SENTRY_DSN}
+
 api:
   bind: ${API_HOST:-0.0.0.0}:${API_PORT:-9876}
   rate_limit: ${API_RATE_LIMIT:-0}
