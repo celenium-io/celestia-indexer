@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
 	"github.com/celenium-io/celestia-indexer/internal/blob"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	"github.com/celenium-io/celestia-indexer/pkg/node"
@@ -100,7 +99,6 @@ func initDatabase(cfg config.Database, viewsDir string) postgres.Storage {
 
 func initEcho(cfg JsonRpcConfig, env string) *echo.Echo {
 	e := echo.New()
-	e.Validator = handler.NewCelestiaApiValidator()
 
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogURI:       true,
