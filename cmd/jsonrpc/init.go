@@ -190,6 +190,13 @@ func initBlobReceiver(ctx context.Context, cfg Config) (node.DalApi, error) {
 		})
 		err := r2.Init(ctx)
 		return r2, err
+	case "celenium_blobs":
+		datasource, ok := cfg.DataSources[cfg.JsonRpcConfig.BlobReceiver]
+		if !ok {
+			return nil, errors.Errorf("unknown data source pointed in blob_receiver: %s", cfg.JsonRpcConfig.BlobReceiver)
+		}
+		celeniumBlobReceiver := blob.NewCelenium(datasource)
+		return celeniumBlobReceiver, nil
 	default:
 		datasource, ok := cfg.DataSources[cfg.JsonRpcConfig.BlobReceiver]
 		if !ok {
