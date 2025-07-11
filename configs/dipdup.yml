@@ -43,6 +43,11 @@ datasources:
     url: ${CELESTIALS_API_URL:-https://api.stage.celestials.id}
     rps: ${CELESTIALS_API_RPS:-5}
     timeout: ${CELESTIALS_API_TIMEOUT:-10}
+  celenium_blobs:
+    kind: celenium
+    url: ${CELENIUM_BLOBS_API_URL}
+    rps: ${CELENIUM_BLOBS_API_RPS:-5}
+    timeout: ${CELENIUM_BLOBS_API_TIMEOUT:-10}
 
 jsonrpc:
   bind: ${JSONRPC_HOST:-0.0.0.0}:${JSONRPC_PORT:-9878}

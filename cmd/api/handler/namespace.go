@@ -467,7 +467,7 @@ func (handler *NamespaceHandler) Blob(c echo.Context) error {
 
 	blob, err := handler.blob.Blob(c.Request().Context(), req.Height, req.Hash, req.Commitment)
 	if err != nil {
-		return badRequestError(c, err)
+		return internalServerError(c, err)
 	}
 
 	response, err := responses.NewBlob(blob)
