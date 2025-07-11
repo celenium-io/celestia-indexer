@@ -152,6 +152,11 @@ func initEcho(cfg JsonRpcConfig, env string) *echo.Echo {
 	e.Use(middleware.BodyLimit("9M"))
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
+	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		Skipper: func(c echo.Context) bool {
+			return true
+		},
+	}))
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	if cfg.Prometheus {
@@ -209,9 +214,6 @@ func initSentry(e *echo.Echo, dsn, environment string) error {
 		EnableTracing:    true,
 		TracesSampleRate: 0.1,
 		Release:          os.Getenv("TAG"),
-		IgnoreTransactions: []string{
-			"GET /v1/ws",
-		},
 	}); err != nil {
 		return errors.Wrap(err, "initialization")
 	}
