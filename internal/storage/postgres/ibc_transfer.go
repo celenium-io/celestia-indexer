@@ -68,7 +68,9 @@ func (c *IbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFil
 }
 
 func (c *IbcTransfer) Series(ctx context.Context, channelId string, timeframe storage.Timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
-	query := c.DB().NewSelect().Order("time desc")
+	query := c.DB().NewSelect().
+		Order("time desc").
+		Where("channel_id = ?", channelId)
 
 	switch timeframe {
 	case storage.TimeframeHour:
