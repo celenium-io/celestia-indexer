@@ -17,6 +17,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
+	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
 	"github.com/celenium-io/celestia-indexer/internal/blob"
 	"github.com/celenium-io/celestia-indexer/internal/profiler"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -646,4 +647,9 @@ func initBlobReceiver(ctx context.Context, cfg Config) (node.DalApi, error) {
 			WithAuthToken(os.Getenv("CELESTIA_NODE_AUTH_TOKEN")).
 			WithRateLimit(datasource.RequestsPerSecond), nil
 	}
+}
+
+func initChainStore(ctx context.Context, cfg Config) {
+	cs := hyperlane.NewChainStore(cfg.ApiConfig.HyperlaneNodeUrl)
+	cs.Start(ctx)
 }

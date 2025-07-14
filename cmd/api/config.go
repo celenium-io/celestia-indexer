@@ -19,12 +19,13 @@ type Config struct {
 }
 
 type ApiConfig struct {
-	Bind           string  `validate:"required,hostname_port" yaml:"bind"`
-	RateLimit      float64 `validate:"omitempty,min=0"        yaml:"rate_limit"`
-	Prometheus     bool    `validate:"omitempty"              yaml:"prometheus"`
-	RequestTimeout int     `validate:"omitempty,min=1"        yaml:"request_timeout"`
-	BlobReceiver   string  `validate:"required"               yaml:"blob_receiver"`
-	SentryDsn      string  `validate:"omitempty"              yaml:"sentry_dsn"`
-	Websocket      bool    `validate:"omitempty"              yaml:"websocket"`
-	Cache          string  `validate:"omitempty,url"          yaml:"cache"`
+	Bind             string  `validate:"required,hostname_port" yaml:"bind"`
+	RateLimit        float64 `validate:"omitempty,min=0"        yaml:"rate_limit"`
+	Prometheus       bool    `validate:"omitempty"              yaml:"prometheus"`
+	RequestTimeout   int     `validate:"omitempty,min=1"        yaml:"request_timeout"`
+	BlobReceiver     string  `validate:"required"               yaml:"blob_receiver"`
+	SentryDsn        string  `validate:"omitempty"              yaml:"sentry_dsn"`
+	Websocket        bool    `validate:"omitempty"              yaml:"websocket"`
+	Cache            string  `validate:"omitempty,url"          yaml:"cache"`
+	HyperlaneNodeUrl string  `validate:"required"               yaml:"hyperlane_node"`
 }

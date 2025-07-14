@@ -101,7 +101,7 @@ func (s *HyperlaneTestSuite) TearDownSuite() {
 	s.Require().NoError(s.echo.Shutdown(context.Background()))
 }
 
-func HyperlaneTestSuite_Run(t *testing.T) {
+func TestSuiteHyperlane_Run(t *testing.T) {
 	suite.Run(t, new(HyperlaneTestSuite))
 }
 

@@ -61,6 +61,7 @@ api:
   sentry_dsn: ${SENTRY_DSN}
   websocket: ${API_WEBSOCKET_ENABLED:-true}
   cache: ${CACHE_URL}
+  hyperlane_node: ${HYPERLANE_NODE_URL}
   
 private_api:
   bind: ${PRIVATE_API_HOST:-0.0.0.0}:${PRIVATE_API_PORT:-9877}
