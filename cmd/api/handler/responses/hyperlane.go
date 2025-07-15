@@ -199,7 +199,7 @@ func NewChainMetadata(domenId uint64) *ChainMetadata {
 				Symbol:   metadata.NativeToken.Symbol,
 			},
 		}
-	} else {
-		return nil
 	}
+
+	return nil
 }

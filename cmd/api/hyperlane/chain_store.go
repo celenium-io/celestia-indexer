@@ -70,17 +70,23 @@ func (cs *ChainStore) sync(ctx context.Context) {
 
 	ticker := time.NewTicker(24 * time.Hour)
 	defer ticker.Stop()
-	for range ticker.C {
-		metadata, err = cs.api.ChainMetadata(ctx)
-		if err != nil {
-			cs.log.Error().Err(err).Msg("sync hyperlane chain metadata failed")
-			continue
+
+	for {
+		select {
+		case <-ctx.Done():
+			cs.log.Info().Msg("context canceled, stopping metadata sync")
+			return
+		case <-ticker.C:
+			metadata, err = cs.api.ChainMetadata(ctx)
+			if err != nil {
+				cs.log.Error().Err(err).Msg("sync hyperlane chain metadata failed")
+				continue
+			}
+
+			cs.Set(metadata)
+			cs.log.Info().Int("chain metadata count", len(metadata)).Msg("sync hyperlane chain metadata")
 		}
-
-		cs.Set(metadata)
-		cs.log.Info().Int("chain metadata count", len(metadata)).Msg("sync hyperlane chain metadata")
 	}
-
 }
 
 func (cs *ChainStore) Close() error {
