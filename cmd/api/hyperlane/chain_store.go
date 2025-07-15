@@ -28,7 +28,7 @@ func NewChainStore(url string) *ChainStore {
 	api := hyperlane.NewApi(
 		url,
 		hyperlane.WithRateLimit(1),
-		hyperlane.WithTimeout(time.Second*time.Duration(1)))
+		hyperlane.WithTimeout(time.Second*time.Duration(30)))
 
 	cs := &ChainStore{
 		data: make(map[uint64]hyperlane.ChainMetadata),
@@ -69,16 +69,18 @@ func (cs *ChainStore) sync(ctx context.Context) {
 	cs.Set(metadata)
 
 	ticker := time.NewTicker(24 * time.Hour)
-	for {
-		select {
-		case <-ticker.C:
-			if metadata, err = cs.api.ChainMetadata(ctx); err != nil {
-				cs.log.Error().Err(err).Msg("sync hyperlane chain metadata failed")
-			}
-
-			cs.Set(metadata)
+	defer ticker.Stop()
+	for range ticker.C {
+		metadata, err = cs.api.ChainMetadata(ctx)
+		if err != nil {
+			cs.log.Error().Err(err).Msg("sync hyperlane chain metadata failed")
+			continue
 		}
+
+		cs.Set(metadata)
+		cs.log.Info().Int("chain metadata count", len(metadata)).Msg("sync hyperlane chain metadata")
 	}
+
 }
 
 func (cs *ChainStore) Close() error {
