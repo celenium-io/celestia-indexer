@@ -13,11 +13,13 @@ import (
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	hl "github.com/celenium-io/celestia-indexer/pkg/node/hyperlane"
 	"github.com/labstack/echo/v4"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
@@ -70,18 +72,41 @@ var (
 		Sent:             decimal.RequireFromString("1000"),
 		Received:         decimal.RequireFromString("1000"),
 	}
+
+	testChainMetadata = hl.ChainMetadata{
+		DomainId:    123,
+		DisplayName: "test chain",
+		BlockExplorers: []hl.BlockExplorer{
+			{
+				Name:   "test explorer",
+				ApiUrl: "https://api.test.url.io",
+				Family: "testscan",
+				Url:    "https://test.url.io",
+			},
+		},
+		NativeToken: hl.NativeToken{
+			Decimals: 18,
+			Name:     "Test coin",
+			Symbol:   "TEST",
+		},
+	}
+
+	testChainStore = map[uint64]hl.ChainMetadata{
+		testChainMetadata.DomainId: testChainMetadata,
+	}
 )
 
 // HyperlaneTestSuite -
 type HyperlaneTestSuite struct {
 	suite.Suite
-	echo     *echo.Echo
-	address  *mock.MockIAddress
-	mailbox  *mock.MockIHLMailbox
-	token    *mock.MockIHLToken
-	transfer *mock.MockIHLTransfer
-	handler  *HyperlaneHandler
-	ctrl     *gomock.Controller
+	echo       *echo.Echo
+	address    *mock.MockIAddress
+	mailbox    *mock.MockIHLMailbox
+	token      *mock.MockIHLToken
+	transfer   *mock.MockIHLTransfer
+	handler    *HyperlaneHandler
+	chainStore *hyperlane.MockIChainStore
+	ctrl       *gomock.Controller
 }
 
 // SetupSuite -
@@ -94,6 +119,7 @@ func (s *HyperlaneTestSuite) SetupSuite() {
 	s.transfer = mock.NewMockIHLTransfer(s.ctrl)
 	s.address = mock.NewMockIAddress(s.ctrl)
 	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.address)
+	s.chainStore = hyperlane.NewMockIChainStore(s.ctrl)
 }
 
 // TearDownSuite -
@@ -281,6 +307,10 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 		Denom:               currency.Utia,
 		Type:                types.HLTransferTypeReceive,
 	}
+
+	hyperlane.NewChainStore("")
+	hyperlane.Store.Set(testChainStore)
+
 	s.transfer.EXPECT().
 		List(gomock.Any(), gomock.Any()).
 		Return([]storage.HLTransfer{
@@ -316,4 +346,13 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 	s.Require().Equal(testAddress, response.Relayer.Hash)
 	s.Require().NotNil(response.Body)
 	s.Require().NotNil(response.Metadata)
+	s.Require().EqualValues(testChainMetadata.DisplayName, response.Counterparty.ChainMetadata.Name)
+	s.Require().EqualValues(testChainMetadata.DomainId, response.Counterparty.Domain)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, response.Counterparty.ChainMetadata.NativeToken.Decimals)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Name, response.Counterparty.ChainMetadata.NativeToken.Name)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Symbol, response.Counterparty.ChainMetadata.NativeToken.Symbol)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Name, response.Counterparty.ChainMetadata.BlockExplorers[0].Name)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].ApiUrl, response.Counterparty.ChainMetadata.BlockExplorers[0].ApiUrl)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Url, response.Counterparty.ChainMetadata.BlockExplorers[0].Url)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Family, response.Counterparty.ChainMetadata.BlockExplorers[0].Family)
 }

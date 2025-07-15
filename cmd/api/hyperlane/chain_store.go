@@ -46,14 +46,14 @@ func (cs *ChainStore) Start(ctx context.Context) {
 	cs.g.GoCtx(ctx, cs.sync)
 }
 
-func (cs *ChainStore) Get(domainID uint64) (hyperlane.ChainMetadata, bool) {
+func (cs *ChainStore) Get(domainId uint64) (hyperlane.ChainMetadata, bool) {
 	cs.mx.RLock()
 	defer cs.mx.RUnlock()
-	val, ok := cs.data[domainID]
+	val, ok := cs.data[domainId]
 	return val, ok
 }
 
-func (cs *ChainStore) set(metadata map[uint64]hyperlane.ChainMetadata) {
+func (cs *ChainStore) Set(metadata map[uint64]hyperlane.ChainMetadata) {
 	cs.mx.Lock()
 	cs.data = metadata
 	cs.mx.Unlock()
@@ -66,7 +66,7 @@ func (cs *ChainStore) sync(ctx context.Context) {
 	}
 
 	cs.log.Info().Int("chain metadata count", len(metadata)).Msg("sync hyperlane chain metadata")
-	cs.set(metadata)
+	cs.Set(metadata)
 
 	ticker := time.NewTicker(24 * time.Hour)
 	for {
@@ -76,7 +76,13 @@ func (cs *ChainStore) sync(ctx context.Context) {
 				cs.log.Error().Err(err).Msg("sync hyperlane chain metadata failed")
 			}
 
-			cs.set(metadata)
+			cs.Set(metadata)
 		}
 	}
+}
+
+func (cs *ChainStore) Close() error {
+	cs.g.Wait()
+
+	return nil
 }

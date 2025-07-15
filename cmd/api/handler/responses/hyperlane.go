@@ -162,22 +162,22 @@ type HyperlaneCounterparty struct {
 }
 
 type ChainMetadata struct {
-	Name           string          `example:"name"                      json:"name"              swaggertype:"string"`
+	Name           string          `example:"name"                   json:"name" swaggertype:"string"`
 	BlockExplorers []BlockExplorer `json:"block_explorers,omitempty"`
 	NativeToken    NativeToken     `json:"native_token,omitempty"`
 }
 
 type BlockExplorer struct {
 	ApiUrl string `example:"https://api.scan.url.io" format:"string" json:"api_url" swaggertype:"string"`
-	Family string `example:"etherscan" format:"string" json:"family" swaggertype:"string"`
-	Name   string `example:"Block explorer" format:"string" json:"name" swaggertype:"string"`
-	Url    string `example:"https://scan.url.io" format:"string" json:"url" swaggertype:"string"`
+	Family string `example:"etherscan"               format:"string" json:"family"  swaggertype:"string"`
+	Name   string `example:"Block explorer"          format:"string" json:"name"    swaggertype:"string"`
+	Url    string `example:"https://scan.url.io"     format:"string" json:"url"     swaggertype:"string"`
 }
 
 type NativeToken struct {
-	Decimals uint64 `example:"18" format:"int64" json:"decimals,omitempty" swaggertype:"integer"`
-	Name     string `example:"Ether" json:"name" format:"string" swaggertype:"string"`
-	Symbol   string `example:"ETH" json:"symbol" format:"string" swaggertype:"string"`
+	Decimals uint64 `example:"18"    format:"int64"  json:"decimals" swaggertype:"integer"`
+	Name     string `example:"Ether" format:"string" json:"name"     swaggertype:"string"`
+	Symbol   string `example:"ETH"   format:"string" json:"symbol"   swaggertype:"string"`
 }
 
 func NewChainMetadata(domenId uint64) *ChainMetadata {

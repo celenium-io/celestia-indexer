@@ -649,7 +649,9 @@ func initBlobReceiver(ctx context.Context, cfg Config) (node.DalApi, error) {
 	}
 }
 
+var chainStore *hyperlane.ChainStore
+
 func initChainStore(ctx context.Context, cfg Config) {
-	cs := hyperlane.NewChainStore(cfg.ApiConfig.HyperlaneNodeUrl)
-	cs.Start(ctx)
+	chainStore = hyperlane.NewChainStore(cfg.ApiConfig.HyperlaneNodeUrl)
+	chainStore.Start(ctx)
 }

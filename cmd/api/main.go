@@ -105,4 +105,9 @@ func main() {
 			e.Logger.Fatal(err)
 		}
 	}
+	if chainStore != nil {
+		if err := chainStore.Close(); err != nil {
+			e.Logger.Fatal(err)
+		}
+	}
 }
