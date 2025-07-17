@@ -45,11 +45,20 @@ func upChangeMsgTypes(ctx context.Context, db *bun.DB) error {
 		return err
 	}
 
-	var msgs []storage.Message
+	type msg struct {
+		bun.BaseModel `bun:"message"`
+
+		Height uint64        `bun:",notnull"`
+		Type   types.MsgType `bun:",type:msg_type"`
+		TxId   uint64        `bun:"tx_id"`
+	}
+
+	var msgs []msg
 	if err := db.NewSelect().
-		Column("tx_id", "height").
+		Column("tx_id", "height", "type").
 		Table("message").
 		Where("type IN (?)", bun.In(addedTypes)).
+		Where("time > '2023-04-01T00:00:00Z'").
 		Scan(ctx, &msgs); err != nil {
 		return errors.Wrap(err, "get messages")
 	}
