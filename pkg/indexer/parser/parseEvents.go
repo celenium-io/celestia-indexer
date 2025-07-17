@@ -4,9 +4,6 @@
 package parser
 
 import (
-	"encoding/base64"
-
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
