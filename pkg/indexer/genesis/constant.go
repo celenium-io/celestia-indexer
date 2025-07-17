@@ -19,11 +19,6 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 	// consensus
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameConsensus,
-		Name:   "block_max_bytes",
-		Value:  strconv.FormatInt(consensus.Block.MaxBytes, 10),
-	})
-	data.constants = append(data.constants, storage.Constant{
-		Module: storageTypes.ModuleNameConsensus,
 		Name:   "block_max_gas",
 		Value:  strconv.FormatInt(consensus.Block.MaxGas, 10),
 	})
