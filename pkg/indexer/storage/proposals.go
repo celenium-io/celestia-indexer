@@ -362,19 +362,19 @@ func constantsHandle(change paramsV1Beta.ParamChange) ([]storage.Constant, error
 
 		switch key {
 		case "BlockParams":
-			c, err := parseParamsToConstants(moduleName, "block_", value)
+			c, err := parseParamsToConstants(types.ModuleNameConsensus, "block_", value)
 			if err != nil {
 				return nil, errors.Wrap(err, "parse block params")
 			}
 			constants = append(constants, c...)
 		case "EvidenceParams":
-			c, err := parseParamsToConstants(moduleName, "evidence_", value)
+			c, err := parseParamsToConstants(types.ModuleNameConsensus, "evidence_", value)
 			if err != nil {
 				return nil, errors.Wrap(err, "parse evidence params")
 			}
 			constants = append(constants, c...)
 		case "ValidatorParams":
-			c, err := parseParamsToConstants(moduleName, "validator_", value)
+			c, err := parseParamsToConstants(types.ModuleNameConsensus, "validator_", value)
 			if err != nil {
 				return nil, errors.Wrap(err, "parse validator params")
 			}
