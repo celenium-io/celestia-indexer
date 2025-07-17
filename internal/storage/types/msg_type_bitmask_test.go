@@ -372,6 +372,54 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			name:    string(MsgUpdateMinfeeParams),
 			msgType: []int{MsgTypeBitsUpdateMinfeeParams},
 			want:    []MsgType{MsgUpdateMinfeeParams},
+		}, {
+			name:    string(MsgCreateIgp),
+			msgType: []int{MsgTypeBitsCreateIgp},
+			want:    []MsgType{MsgCreateIgp},
+		}, {
+			name:    string(MsgSetIgpOwner),
+			msgType: []int{MsgTypeBitsSetIgpOwner},
+			want:    []MsgType{MsgSetIgpOwner},
+		}, {
+			name:    string(MsgSetDestinationGasConfig),
+			msgType: []int{MsgTypeBitsSetDestinationGasConfig},
+			want:    []MsgType{MsgSetDestinationGasConfig},
+		}, {
+			name:    string(MsgPayForGas),
+			msgType: []int{MsgTypeBitsPayForGas},
+			want:    []MsgType{MsgPayForGas},
+		}, {
+			name:    string(MsgClaim),
+			msgType: []int{MsgTypeBitsClaim},
+			want:    []MsgType{MsgClaim},
+		}, {
+			name:    string(MsgCreateMerkleTreeHook),
+			msgType: []int{MsgTypeBitsCreateMerkleTreeHook},
+			want:    []MsgType{MsgCreateMerkleTreeHook},
+		}, {
+			name:    string(MsgCreateNoopHook),
+			msgType: []int{MsgTypeBitsCreateNoopHook},
+			want:    []MsgType{MsgCreateNoopHook},
+		}, {
+			name:    string(MsgCreateMessageIdMultisigIsm),
+			msgType: []int{MsgTypeBitsCreateMessageIdMultisigIsm},
+			want:    []MsgType{MsgCreateMessageIdMultisigIsm},
+		}, {
+			name:    string(MsgCreateMerkleRootMultisigIsm),
+			msgType: []int{MsgTypeBitsCreateMerkleRootMultisigIsm},
+			want:    []MsgType{MsgCreateMerkleRootMultisigIsm},
+		}, {
+			name:    string(MsgCreateNoopIsm),
+			msgType: []int{MsgTypeBitsCreateNoopIsm},
+			want:    []MsgType{MsgCreateNoopIsm},
+		}, {
+			name:    string(MsgAnnounceValidator),
+			msgType: []int{MsgTypeBitsAnnounceValidator},
+			want:    []MsgType{MsgAnnounceValidator},
+		}, {
+			name:    string(MsgCreateRoutingIsm),
+			msgType: []int{MsgTypeBitsCreateRoutingIsm},
+			want:    []MsgType{MsgCreateRoutingIsm},
 		},
 	}
 	for _, tt := range tests {
