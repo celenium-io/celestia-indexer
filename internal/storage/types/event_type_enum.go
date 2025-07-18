@@ -175,6 +175,14 @@ const (
 	EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig EventType = "hyperlane.core.post_dispatch.v1.EventSetDestinationGasConfig"
 	// EventTypeHyperlanecorepostDispatchv1EventClaimIgp is a EventType of type hyperlane.core.post_dispatch.v1.EventClaimIgp.
 	EventTypeHyperlanecorepostDispatchv1EventClaimIgp EventType = "hyperlane.core.post_dispatch.v1.EventClaimIgp"
+	// EventTypeHyperlanecoreinterchainSecurityv1EventCreateNoopIsm is a EventType of type hyperlane.core.interchain_security.v1.EventCreateNoopIsm.
+	EventTypeHyperlanecoreinterchainSecurityv1EventCreateNoopIsm EventType = "hyperlane.core.interchain_security.v1.EventCreateNoopIsm"
+	// EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain is a EventType of type hyperlane.core.interchain_security.v1.EventSetRoutingIsmDomain.
+	EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain EventType = "hyperlane.core.interchain_security.v1.EventSetRoutingIsmDomain"
+	// EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm is a EventType of type hyperlane.core.interchain_security.v1.EventSetRoutingIsm.
+	EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm EventType = "hyperlane.core.interchain_security.v1.EventSetRoutingIsm"
+	// EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm is a EventType of type hyperlane.core.interchain_security.v1.EventCreateRoutingIsm.
+	EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm EventType = "hyperlane.core.interchain_security.v1.EventCreateRoutingIsm"
 )
 
 var ErrInvalidEventType = fmt.Errorf("not a valid EventType, try [%s]", strings.Join(_EventTypeNames, ", "))
@@ -259,6 +267,10 @@ var _EventTypeNames = []string{
 	string(EventTypeHyperlanecorepostDispatchv1EventSetIgp),
 	string(EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig),
 	string(EventTypeHyperlanecorepostDispatchv1EventClaimIgp),
+	string(EventTypeHyperlanecoreinterchainSecurityv1EventCreateNoopIsm),
+	string(EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain),
+	string(EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm),
+	string(EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm),
 }
 
 // EventTypeNames returns a list of possible string values of EventType.
@@ -350,6 +362,10 @@ func EventTypeValues() []EventType {
 		EventTypeHyperlanecorepostDispatchv1EventSetIgp,
 		EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig,
 		EventTypeHyperlanecorepostDispatchv1EventClaimIgp,
+		EventTypeHyperlanecoreinterchainSecurityv1EventCreateNoopIsm,
+		EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain,
+		EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm,
+		EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm,
 	}
 }
 
@@ -430,21 +446,25 @@ var _EventTypeValue = map[string]EventType{
 	"hyperlane.core.v1.EventProcess":       EventTypeHyperlanecorev1EventProcess,
 	"hyperlane.core.v1.EventCreateMailbox": EventTypeHyperlanecorev1EventCreateMailbox,
 	"hyperlane.core.v1.EventSetMailbox":    EventTypeHyperlanecorev1EventSetMailbox,
-	"hyperlane.warp.v1.EventCreateSyntheticToken":                  EventTypeHyperlanewarpv1EventCreateSyntheticToken,
-	"hyperlane.warp.v1.EventCreateCollateralToken":                 EventTypeHyperlanewarpv1EventCreateCollateralToken,
-	"hyperlane.warp.v1.EventSetToken":                              EventTypeHyperlanewarpv1EventSetToken,
-	"hyperlane.warp.v1.EventEnrollRemoteRouter":                    EventTypeHyperlanewarpv1EventEnrollRemoteRouter,
-	"hyperlane.warp.v1.EventUnrollRemoteRouter":                    EventTypeHyperlanewarpv1EventUnrollRemoteRouter,
-	"hyperlane.warp.v1.EventSendRemoteTransfer":                    EventTypeHyperlanewarpv1EventSendRemoteTransfer,
-	"hyperlane.warp.v1.EventReceiveRemoteTransfer":                 EventTypeHyperlanewarpv1EventReceiveRemoteTransfer,
-	"hyperlane.core.post_dispatch.v1.EventCreateMerkleTreeHook":    EventTypeHyperlanecorepostDispatchv1EventCreateMerkleTreeHook,
-	"hyperlane.core.post_dispatch.v1.EventInsertedIntoTree":        EventTypeHyperlanecorepostDispatchv1EventInsertedIntoTree,
-	"hyperlane.core.post_dispatch.v1.EventGasPayment":              EventTypeHyperlanecorepostDispatchv1EventGasPayment,
-	"hyperlane.core.post_dispatch.v1.EventCreateNoopHook":          EventTypeHyperlanecorepostDispatchv1EventCreateNoopHook,
-	"hyperlane.core.post_dispatch.v1.EventCreateIgp":               EventTypeHyperlanecorepostDispatchv1EventCreateIgp,
-	"hyperlane.core.post_dispatch.v1.EventSetIgp":                  EventTypeHyperlanecorepostDispatchv1EventSetIgp,
-	"hyperlane.core.post_dispatch.v1.EventSetDestinationGasConfig": EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig,
-	"hyperlane.core.post_dispatch.v1.EventClaimIgp":                EventTypeHyperlanecorepostDispatchv1EventClaimIgp,
+	"hyperlane.warp.v1.EventCreateSyntheticToken":                    EventTypeHyperlanewarpv1EventCreateSyntheticToken,
+	"hyperlane.warp.v1.EventCreateCollateralToken":                   EventTypeHyperlanewarpv1EventCreateCollateralToken,
+	"hyperlane.warp.v1.EventSetToken":                                EventTypeHyperlanewarpv1EventSetToken,
+	"hyperlane.warp.v1.EventEnrollRemoteRouter":                      EventTypeHyperlanewarpv1EventEnrollRemoteRouter,
+	"hyperlane.warp.v1.EventUnrollRemoteRouter":                      EventTypeHyperlanewarpv1EventUnrollRemoteRouter,
+	"hyperlane.warp.v1.EventSendRemoteTransfer":                      EventTypeHyperlanewarpv1EventSendRemoteTransfer,
+	"hyperlane.warp.v1.EventReceiveRemoteTransfer":                   EventTypeHyperlanewarpv1EventReceiveRemoteTransfer,
+	"hyperlane.core.post_dispatch.v1.EventCreateMerkleTreeHook":      EventTypeHyperlanecorepostDispatchv1EventCreateMerkleTreeHook,
+	"hyperlane.core.post_dispatch.v1.EventInsertedIntoTree":          EventTypeHyperlanecorepostDispatchv1EventInsertedIntoTree,
+	"hyperlane.core.post_dispatch.v1.EventGasPayment":                EventTypeHyperlanecorepostDispatchv1EventGasPayment,
+	"hyperlane.core.post_dispatch.v1.EventCreateNoopHook":            EventTypeHyperlanecorepostDispatchv1EventCreateNoopHook,
+	"hyperlane.core.post_dispatch.v1.EventCreateIgp":                 EventTypeHyperlanecorepostDispatchv1EventCreateIgp,
+	"hyperlane.core.post_dispatch.v1.EventSetIgp":                    EventTypeHyperlanecorepostDispatchv1EventSetIgp,
+	"hyperlane.core.post_dispatch.v1.EventSetDestinationGasConfig":   EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig,
+	"hyperlane.core.post_dispatch.v1.EventClaimIgp":                  EventTypeHyperlanecorepostDispatchv1EventClaimIgp,
+	"hyperlane.core.interchain_security.v1.EventCreateNoopIsm":       EventTypeHyperlanecoreinterchainSecurityv1EventCreateNoopIsm,
+	"hyperlane.core.interchain_security.v1.EventSetRoutingIsmDomain": EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain,
+	"hyperlane.core.interchain_security.v1.EventSetRoutingIsm":       EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm,
+	"hyperlane.core.interchain_security.v1.EventCreateRoutingIsm":    EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

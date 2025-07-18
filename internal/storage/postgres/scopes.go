@@ -42,11 +42,11 @@ func txFilter(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
 	query = query.OrderExpr("time ?0, id ?0", bun.Safe(fltrs.Sort))
 
 	if !fltrs.MessageTypes.Empty() {
-		query = query.Where("bit_count(message_types & ?::bit(101)) > 0", fltrs.MessageTypes)
+		query = query.Where("bit_count(message_types & ?::bit(104)) > 0", fltrs.MessageTypes)
 	}
 
 	if !fltrs.ExcludedMessageTypes.Empty() {
-		query = query.Where("bit_count(message_types & ~(?::bit(101))) > 0", fltrs.ExcludedMessageTypes)
+		query = query.Where("bit_count(message_types & ~(?::bit(104))) > 0", fltrs.ExcludedMessageTypes)
 	}
 
 	if len(fltrs.Status) > 0 {

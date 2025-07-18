@@ -148,6 +148,9 @@ const (
 	MsgTypeBitsCreateNoopIsm
 	MsgTypeBitsAnnounceValidator
 	MsgTypeBitsCreateRoutingIsm
+	MsgTypeBitsSetRoutingIsmDomain
+	MsgTypeBitsRemoveRoutingIsmDomain
+	MsgTypeBitsUpdateRoutingIsmOwner
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
@@ -380,6 +383,12 @@ func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 		mask.SetBit(MsgTypeBitsAnnounceValidator)
 	case MsgCreateRoutingIsm:
 		mask.SetBit(MsgTypeBitsCreateRoutingIsm)
+	case MsgSetRoutingIsmDomain:
+		mask.SetBit(MsgTypeBitsSetRoutingIsmDomain)
+	case MsgRemoveRoutingIsmDomain:
+		mask.SetBit(MsgTypeBitsRemoveRoutingIsmDomain)
+	case MsgUpdateRoutingIsmOwner:
+		mask.SetBit(MsgTypeBitsUpdateRoutingIsmOwner)
 	}
 }
 
@@ -821,6 +830,21 @@ func (mask MsgTypeBits) Names() []MsgType {
 
 	if mask.HasBit(MsgTypeBitsCreateRoutingIsm) {
 		names[i] = MsgCreateRoutingIsm
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsSetRoutingIsmDomain) {
+		names[i] = MsgSetRoutingIsmDomain
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsRemoveRoutingIsmDomain) {
+		names[i] = MsgRemoveRoutingIsmDomain
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsUpdateRoutingIsmOwner) {
+		names[i] = MsgUpdateRoutingIsmOwner
 		// i++
 	}
 
@@ -852,9 +876,9 @@ var _ driver.Valuer = (*MsgTypeBits)(nil)
 
 func (mask MsgTypeBits) Value() (driver.Value, error) {
 	if mask.value == nil {
-		return fmt.Sprintf("%0101b", 0), nil
+		return fmt.Sprintf("%0104b", 0), nil
 	}
-	return fmt.Sprintf("%0101b", mask.value), nil
+	return fmt.Sprintf("%0104b", mask.value), nil
 }
 
 func (mask MsgTypeBits) MarshalJSON() (data []byte, err error) {

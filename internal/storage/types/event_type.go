@@ -100,7 +100,11 @@ package types
 		hyperlane.core.post_dispatch.v1.EventCreateIgp,
 		hyperlane.core.post_dispatch.v1.EventSetIgp,
 		hyperlane.core.post_dispatch.v1.EventSetDestinationGasConfig,
-		hyperlane.core.post_dispatch.v1.EventClaimIgp
+		hyperlane.core.post_dispatch.v1.EventClaimIgp,
+		hyperlane.core.interchain_security.v1.EventCreateNoopIsm,
+		hyperlane.core.interchain_security.v1.EventSetRoutingIsmDomain,
+		hyperlane.core.interchain_security.v1.EventSetRoutingIsm,
+		hyperlane.core.interchain_security.v1.EventCreateRoutingIsm
 	)
 */
 //go:generate go-enum --marshal --sql --values --names
