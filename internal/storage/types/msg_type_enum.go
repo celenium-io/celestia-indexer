@@ -219,6 +219,12 @@ const (
 	MsgAnnounceValidator MsgType = "MsgAnnounceValidator"
 	// MsgCreateRoutingIsm is a MsgType of type MsgCreateRoutingIsm.
 	MsgCreateRoutingIsm MsgType = "MsgCreateRoutingIsm"
+	// MsgSetRoutingIsmDomain is a MsgType of type MsgSetRoutingIsmDomain.
+	MsgSetRoutingIsmDomain MsgType = "MsgSetRoutingIsmDomain"
+	// MsgRemoveRoutingIsmDomain is a MsgType of type MsgRemoveRoutingIsmDomain.
+	MsgRemoveRoutingIsmDomain MsgType = "MsgRemoveRoutingIsmDomain"
+	// MsgUpdateRoutingIsmOwner is a MsgType of type MsgUpdateRoutingIsmOwner.
+	MsgUpdateRoutingIsmOwner MsgType = "MsgUpdateRoutingIsmOwner"
 )
 
 var ErrInvalidMsgType = fmt.Errorf("not a valid MsgType, try [%s]", strings.Join(_MsgTypeNames, ", "))
@@ -325,6 +331,9 @@ var _MsgTypeNames = []string{
 	string(MsgCreateNoopIsm),
 	string(MsgAnnounceValidator),
 	string(MsgCreateRoutingIsm),
+	string(MsgSetRoutingIsmDomain),
+	string(MsgRemoveRoutingIsmDomain),
+	string(MsgUpdateRoutingIsmOwner),
 }
 
 // MsgTypeNames returns a list of possible string values of MsgType.
@@ -438,6 +447,9 @@ func MsgTypeValues() []MsgType {
 		MsgCreateNoopIsm,
 		MsgAnnounceValidator,
 		MsgCreateRoutingIsm,
+		MsgSetRoutingIsmDomain,
+		MsgRemoveRoutingIsmDomain,
+		MsgUpdateRoutingIsmOwner,
 	}
 }
 
@@ -555,6 +567,9 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgCreateNoopIsm":                   MsgCreateNoopIsm,
 	"MsgAnnounceValidator":               MsgAnnounceValidator,
 	"MsgCreateRoutingIsm":                MsgCreateRoutingIsm,
+	"MsgSetRoutingIsmDomain":             MsgSetRoutingIsmDomain,
+	"MsgRemoveRoutingIsmDomain":          MsgRemoveRoutingIsmDomain,
+	"MsgUpdateRoutingIsmOwner":           MsgUpdateRoutingIsmOwner,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.

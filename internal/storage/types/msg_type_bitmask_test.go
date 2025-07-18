@@ -420,6 +420,18 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			name:    string(MsgCreateRoutingIsm),
 			msgType: []int{MsgTypeBitsCreateRoutingIsm},
 			want:    []MsgType{MsgCreateRoutingIsm},
+		}, {
+			name:    string(MsgSetRoutingIsmDomain),
+			msgType: []int{MsgTypeBitsSetRoutingIsmDomain},
+			want:    []MsgType{MsgSetRoutingIsmDomain},
+		}, {
+			name:    string(MsgRemoveRoutingIsmDomain),
+			msgType: []int{MsgTypeBitsRemoveRoutingIsmDomain},
+			want:    []MsgType{MsgRemoveRoutingIsmDomain},
+		}, {
+			name:    string(MsgUpdateRoutingIsmOwner),
+			msgType: []int{MsgTypeBitsUpdateRoutingIsmOwner},
+			want:    []MsgType{MsgUpdateRoutingIsmOwner},
 		},
 	}
 	for _, tt := range tests {
@@ -801,6 +813,18 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			name:   "test 89",
 			values: []MsgType{MsgUpdateMinfeeParams},
 			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateMinfeeParams)},
+		}, {
+			name:   "test 90",
+			values: []MsgType{MsgSetRoutingIsmDomain},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSetRoutingIsmDomain)},
+		}, {
+			name:   "test 91",
+			values: []MsgType{MsgRemoveRoutingIsmDomain},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsRemoveRoutingIsmDomain)},
+		}, {
+			name:   "test 92",
+			values: []MsgType{MsgUpdateRoutingIsmOwner},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateRoutingIsmOwner)},
 		}, {
 			name:   "test combo",
 			values: []MsgType{MsgWithdrawDelegatorReward, MsgBeginRedelegate},

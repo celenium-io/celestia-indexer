@@ -133,7 +133,10 @@ package types
 		MsgCreateMerkleRootMultisigIsm,
 		MsgCreateNoopIsm,
 		MsgAnnounceValidator,
-		MsgCreateRoutingIsm
+		MsgCreateRoutingIsm,
+		MsgSetRoutingIsmDomain,
+		MsgRemoveRoutingIsmDomain,
+		MsgUpdateRoutingIsmOwner
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix --names
