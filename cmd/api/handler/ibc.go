@@ -399,6 +399,9 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 		if err != nil {
 			return handleError(c, err, handler.address)
 		}
+		if len(clients) == 0 {
+			return returnArray(c, []any{})
+		}
 		conns, err := handler.conns.IdsByClients(c.Request().Context(), clients...)
 		if err != nil {
 			return handleError(c, err, handler.address)
