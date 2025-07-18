@@ -44,6 +44,16 @@ func (s *StorageTestSuite) TestIbcConnectionById() {
 	s.Require().EqualValues(1, conn.Client.ConnectionCount)
 }
 
+func (s *StorageTestSuite) TestIbcConnectionIdsByClients() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	conn, err := s.storage.IbcConnections.IdsByClients(ctx, "client-1")
+	s.Require().NoError(err)
+	s.Require().Len(conn, 1)
+	s.Require().EqualValues("connection-1", conn[0])
+}
+
 func (s *StorageTestSuite) TestIbcConnectionList() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

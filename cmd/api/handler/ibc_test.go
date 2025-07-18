@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -167,7 +168,10 @@ func (s *IbcTestSuite) TestList() {
 	c.SetPath("/ibc/client")
 
 	s.clients.EXPECT().
-		List(gomock.Any(), 10, 0, sdk.SortOrderDesc).
+		List(gomock.Any(), storage.ListIbcClientsFilters{
+			Limit: 10,
+			Sort:  sdk.SortOrderDesc,
+		}).
 		Return([]storage.IbcClient{testIbcClient}, nil).
 		Times(1)
 
@@ -351,6 +355,86 @@ func (s *IbcTestSuite) TestListTransfers() {
 		List(gomock.Any(), storage.ListIbcTransferFilters{
 			Limit: 10,
 			Sort:  sdk.SortOrderDesc,
+		}).
+		Return([]storage.IbcTransfer{
+			{
+				Id:              1,
+				Time:            testTime,
+				Height:          1000,
+				Timeout:         &testTime,
+				ChannelId:       "channel-1",
+				ConnectionId:    "connection-1",
+				Amount:          decimal.RequireFromString("101"),
+				Denom:           currency.Utia,
+				Memo:            "memo",
+				ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
+				Sender: &storage.Address{
+					Hash:    testHashAddress,
+					Address: testAddress,
+				},
+				Sequence: 123456,
+				Tx:       &testTx,
+				Connection: &storage.IbcConnection{
+					Client: &storage.IbcClient{
+						ChainId: "chain-id",
+					},
+				},
+			},
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.ListTransfers(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var transfers []responses.IbcTransfer
+	err := json.NewDecoder(rec.Body).Decode(&transfers)
+	s.Require().NoError(err)
+	s.Require().Len(transfers, 1)
+
+	transfer := transfers[0]
+	s.Require().EqualValues(1, transfer.Id)
+	s.Require().EqualValues(1000, transfer.Height)
+	s.Require().EqualValues(testTime, transfer.Time)
+	s.Require().NotNil(transfer.Timeout)
+	s.Require().EqualValues(testTime, *transfer.Timeout)
+	s.Require().EqualValues(0, transfer.TimeoutHeight)
+	s.Require().EqualValues("101", transfer.Amount)
+	s.Require().EqualValues("utia", transfer.Denom)
+	s.Require().EqualValues("channel-1", transfer.ChannelId)
+	s.Require().EqualValues("connection-1", transfer.ConnectionId)
+	s.Require().EqualValues("memo", transfer.Memo)
+	s.Require().EqualValues(strings.ToLower(testTxHash), transfer.TxHash)
+	s.Require().NotNil(transfer.Receiver)
+	s.Require().EqualValues("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2", transfer.Receiver.Hash)
+	s.Require().NotNil(transfer.Sender)
+	s.Require().EqualValues(testAddress, transfer.Sender.Hash)
+	s.Require().Equal("chain-id", transfer.ChainId)
+}
+
+func (s *IbcTestSuite) TestListTransfersByChainId() {
+	q := make(url.Values)
+	q.Set("chain_id", "test")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/ibc/transfer")
+
+	s.clients.EXPECT().
+		ByChainId(gomock.Any(), "test").
+		Return([]string{"client"}, nil).
+		Times(1)
+
+	s.conns.EXPECT().
+		IdsByClients(gomock.Any(), "client").
+		Return([]string{"connection-1"}, nil).
+		Times(1)
+
+	s.transfers.EXPECT().
+		List(gomock.Any(), storage.ListIbcTransferFilters{
+			Limit:         10,
+			Sort:          sdk.SortOrderDesc,
+			ConnectionIds: []string{"connection-1"},
 		}).
 		Return([]storage.IbcTransfer{
 			{

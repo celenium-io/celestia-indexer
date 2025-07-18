@@ -12,10 +12,19 @@ import (
 	"github.com/uptrace/bun"
 )
 
+type ListIbcClientsFilters struct {
+	Limit     int
+	Offset    int
+	Sort      sdk.SortOrder
+	ChainId   string
+	CreatorId *uint64
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IIbcClient interface {
 	ById(ctx context.Context, id string) (IbcClient, error)
-	List(ctx context.Context, limit, offset int, sort sdk.SortOrder) ([]IbcClient, error)
+	ByChainId(ctx context.Context, chainId string) ([]string, error)
+	List(ctx context.Context, flts ListIbcClientsFilters) ([]IbcClient, error)
 }
 
 type IbcClient struct {

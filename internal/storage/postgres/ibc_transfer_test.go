@@ -37,6 +37,11 @@ func (s *StorageTestSuite) TestIbcTransferList() {
 			Offset:    0,
 			Sort:      sdk.SortOrderDesc,
 			AddressId: testsuite.Ptr(uint64(1)),
+		}, {
+			Limit:         1,
+			Offset:        0,
+			Sort:          sdk.SortOrderDesc,
+			ConnectionIds: []string{"connection-1"},
 		},
 	} {
 

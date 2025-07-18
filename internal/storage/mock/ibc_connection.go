@@ -82,6 +82,50 @@ func (c *MockIIbcConnectionByIdCall) DoAndReturn(f func(context.Context, string)
 	return c
 }
 
+// IdsByClients mocks base method.
+func (m *MockIIbcConnection) IdsByClients(ctx context.Context, clientIds ...string) ([]string, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range clientIds {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "IdsByClients", varargs...)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IdsByClients indicates an expected call of IdsByClients.
+func (mr *MockIIbcConnectionMockRecorder) IdsByClients(ctx any, clientIds ...any) *MockIIbcConnectionIdsByClientsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, clientIds...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IdsByClients", reflect.TypeOf((*MockIIbcConnection)(nil).IdsByClients), varargs...)
+	return &MockIIbcConnectionIdsByClientsCall{Call: call}
+}
+
+// MockIIbcConnectionIdsByClientsCall wrap *gomock.Call
+type MockIIbcConnectionIdsByClientsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIIbcConnectionIdsByClientsCall) Return(arg0 []string, arg1 error) *MockIIbcConnectionIdsByClientsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIIbcConnectionIdsByClientsCall) Do(f func(context.Context, ...string) ([]string, error)) *MockIIbcConnectionIdsByClientsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIIbcConnectionIdsByClientsCall) DoAndReturn(f func(context.Context, ...string) ([]string, error)) *MockIIbcConnectionIdsByClientsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // List mocks base method.
 func (m *MockIIbcConnection) List(ctx context.Context, fltrs storage.ListConnectionFilters) ([]storage.IbcConnection, error) {
 	m.ctrl.T.Helper()

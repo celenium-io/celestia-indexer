@@ -2845,6 +2845,20 @@
                         "description": "Sort order. Default: desc",
                         "name": "sort",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Chain id",
+                        "name": "chain_id",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Creator address",
+                        "name": "creator",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3072,25 +3086,38 @@
                     },
                     {
                         "type": "string",
-                        "description": "Client id",
-                        "name": "client_id",
+                        "description": "Channel id",
+                        "name": "channel_id",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Connection id",
-                        "name": "connection_id",
+                        "description": "Chain id",
+                        "name": "chain_id",
                         "in": "query"
                     },
                     {
-                        "enum": [
-                            "initialization",
-                            "opened",
-                            "closed"
-                        ],
+                        "maxLength": 47,
+                        "minLength": 47,
                         "type": "string",
-                        "description": "Channel status",
-                        "name": "status",
+                        "description": "Receiver address",
+                        "name": "receiver",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Sender address",
+                        "name": "sender",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Address: receiver or sender",
+                        "name": "address",
                         "in": "query"
                     }
                 ],

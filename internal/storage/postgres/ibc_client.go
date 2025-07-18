@@ -8,7 +8,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
-	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 )
 
 type IbcClient struct {
@@ -38,16 +37,24 @@ func (c *IbcClient) ById(ctx context.Context, id string) (client storage.IbcClie
 	return
 }
 
-func (c *IbcClient) List(ctx context.Context, limit, offset int, sort sdk.SortOrder) (clients []storage.IbcClient, err error) {
+func (c *IbcClient) List(ctx context.Context, filters storage.ListIbcClientsFilters) (clients []storage.IbcClient, err error) {
 	query := c.DB().NewSelect().
 		Model(&clients)
 
-	if offset > 0 {
-		query.Offset(offset)
+	if filters.Offset > 0 {
+		query.Offset(filters.Offset)
 	}
 
-	query = limitScope(query, limit)
-	query = sortScope(query, "height", sort)
+	query = limitScope(query, filters.Limit)
+	query = sortScope(query, "height", filters.Sort)
+
+	if filters.CreatorId != nil {
+		query = query.Where("creator_id = ?", *filters.CreatorId)
+	}
+
+	if filters.ChainId != "" {
+		query = query.Where("chain_id = ?", filters.ChainId)
+	}
 
 	err = c.DB().NewSelect().
 		TableExpr("(?) as ibc_client", query).
@@ -59,5 +66,14 @@ func (c *IbcClient) List(ctx context.Context, limit, offset int, sort sdk.SortOr
 		Join("left join address on address.id = creator_id").
 		Join("left join celestial on celestial.address_id = creator_id and celestial.status = 'PRIMARY'").
 		Scan(ctx, &clients)
+	return
+}
+
+func (c *IbcClient) ByChainId(ctx context.Context, chainId string) (res []string, err error) {
+	err = c.DB().NewSelect().
+		Column("id").
+		Model((*storage.IbcClient)(nil)).
+		Where("chain_id = ?", chainId).
+		Scan(ctx, &res)
 	return
 }

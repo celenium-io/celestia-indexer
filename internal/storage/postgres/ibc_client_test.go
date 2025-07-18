@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 )
 
@@ -36,7 +37,12 @@ func (s *StorageTestSuite) TestIbcClientList() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	clients, err := s.storage.IbcClients.List(ctx, 1, 0, sdk.SortOrderDesc)
+	clients, err := s.storage.IbcClients.List(ctx, storage.ListIbcClientsFilters{
+		Limit:   1,
+		Offset:  0,
+		Sort:    sdk.SortOrderDesc,
+		ChainId: "osmosis-1",
+	})
 	s.Require().NoError(err)
 	s.Require().Len(clients, 1)
 
@@ -53,4 +59,14 @@ func (s *StorageTestSuite) TestIbcClientList() {
 	s.Require().Equal(txHash, client.Tx.Hash)
 
 	s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", client.Creator.Address)
+}
+
+func (s *StorageTestSuite) TestIbcClientByChainId() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	clients, err := s.storage.IbcClients.ByChainId(ctx, "osmosis-1")
+	s.Require().NoError(err)
+	s.Require().Len(clients, 1)
+	s.Require().EqualValues("client-1", clients[0])
 }
