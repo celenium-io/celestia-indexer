@@ -490,3 +490,26 @@ func (s *IbcTestSuite) TestListTransfersByChainId() {
 	s.Require().EqualValues(testAddress, transfer.Sender.Hash)
 	s.Require().Equal("chain-id", transfer.ChainId)
 }
+
+func (s *IbcTestSuite) TestListTransfersByChainIdUnknownChain() {
+	q := make(url.Values)
+	q.Set("chain_id", "test")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/ibc/transfer")
+
+	s.clients.EXPECT().
+		ByChainId(gomock.Any(), "test").
+		Return([]string{}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.ListTransfers(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var transfers []responses.IbcTransfer
+	err := json.NewDecoder(rec.Body).Decode(&transfers)
+	s.Require().NoError(err)
+	s.Require().Len(transfers, 0)
+}
