@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
@@ -68,18 +69,36 @@ func (handler *IbcHandler) Get(c echo.Context) error {
 }
 
 type getIbcClientsRequest struct {
-	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset" validate:"omitempty,min=0"`
-	Sort   string `query:"sort"   validate:"omitempty,oneof=asc desc"`
+	Limit   int    `query:"limit"    validate:"omitempty,min=1,max=100"`
+	Offset  int    `query:"offset"   validate:"omitempty,min=0"`
+	Sort    string `query:"sort"     validate:"omitempty,oneof=asc desc"`
+	ChainId string `query:"chain_id" validate:"omitempty"`
+	Creator string `query:"creator"  validate:"omitempty,address"`
 }
 
-func (req *getIbcClientsRequest) SetDefault() {
-	if req.Limit <= 0 {
-		req.Limit = 10
+func (req *getIbcClientsRequest) ToFilters(ctx context.Context, address storage.IAddress) (storage.ListIbcClientsFilters, error) {
+	var filters = storage.ListIbcClientsFilters{
+		Limit:   10,
+		Sort:    desc,
+		Offset:  req.Offset,
+		ChainId: req.ChainId,
 	}
-	if req.Sort == "" {
-		req.Sort = desc
+
+	if req.Limit > 0 {
+		filters.Limit = req.Limit
 	}
+	if req.Sort != "" {
+		filters.Sort = pgSort(req.Sort)
+	}
+	if req.Creator != "" {
+		addrId, err := address.IdByAddress(ctx, req.Creator)
+		if err != nil {
+			return filters, err
+		}
+		filters.CreatorId = &addrId
+	}
+
+	return filters, nil
 }
 
 // List godoc
@@ -88,9 +107,11 @@ func (req *getIbcClientsRequest) SetDefault() {
 //	@Description	Get ibc clients info
 //	@Tags			ibc
 //	@ID				get-ibc-clients
-//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"										mininum(1)
-//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			limit		query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset		query	integer	false	"Offset"										mininum(1)
+//	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			chain_id	query	string	false	"Chain id"
+//	@Param			creator		query	string	false	"Creator address"						    	minlength(47)	maxlength(47)
 //	@Produce		json
 //	@Success		200	{array}	responses.IbcClient
 //	@Success		204
@@ -102,9 +123,12 @@ func (handler *IbcHandler) List(c echo.Context) error {
 	if err != nil {
 		return badRequestError(c, err)
 	}
-	req.SetDefault()
+	filters, err := req.ToFilters(c.Request().Context(), handler.address)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
 
-	clients, err := handler.clients.List(c.Request().Context(), req.Limit, req.Offset, pgSort(req.Sort))
+	clients, err := handler.clients.List(c.Request().Context(), filters)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
@@ -301,6 +325,7 @@ type getIbcTransfersRequest struct {
 	Offset    int    `query:"offset"     validate:"omitempty,min=0"`
 	Sort      string `query:"sort"       validate:"omitempty,oneof=asc desc"`
 	ChannelId string `query:"channel_id" validate:"omitempty"`
+	ChainId   string `query:"chain_id"   validate:"omitempty"`
 	Receiver  string `query:"receiver"   validate:"omitempty,address"`
 	Sender    string `query:"sender"     validate:"omitempty,address"`
 	Address   string `query:"address"    validate:"omitempty,address"`
@@ -321,12 +346,14 @@ func (req *getIbcTransfersRequest) SetDefault() {
 //	@Description	Get ibc transfers info
 //	@Tags			ibc
 //	@ID				get-ibc-transfers
-//	@Param			limit	    query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	    query	integer	false	"Offset"										mininum(1)
-//	@Param			sort	    query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			client_id	query	string	false	"Client id"
-//	@Param			connection_id	query	string	false	"Connection id"
-//	@Param			status	    query	string	false	"Channel status"					        	Enums(initialization, opened, closed)
+//	@Param			limit	    	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
+//	@Param			offset	    	query	integer	false	"Offset"										mininum(1)
+//	@Param			sort	   		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
+//	@Param			channel_id		query	string	false	"Channel id"
+//	@Param			chain_id		query	string	false	"Chain id"
+//	@Param			receiver		query	string	false	"Receiver address"								minlength(47)	maxlength(47)
+//	@Param			sender			query	string	false	"Sender address"								minlength(47)	maxlength(47)
+//	@Param			address			query	string	false	"Address: receiver or sender"					minlength(47)	maxlength(47)
 //	@Produce		json
 //	@Success		200	{array}	responses.IbcTransfer
 //	@Success		204
@@ -366,6 +393,17 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 			return handleError(c, err, handler.address)
 		}
 		fltrs.ReceiverId = &id
+	}
+	if req.ChainId != "" {
+		clients, err := handler.clients.ByChainId(c.Request().Context(), req.ChainId)
+		if err != nil {
+			return handleError(c, err, handler.address)
+		}
+		conns, err := handler.conns.IdsByClients(c.Request().Context(), clients...)
+		if err != nil {
+			return handleError(c, err, handler.address)
+		}
+		fltrs.ConnectionIds = conns
 	}
 
 	transfers, err := handler.transfers.List(c.Request().Context(), fltrs)

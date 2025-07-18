@@ -8,6 +8,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
+	"github.com/uptrace/bun"
 )
 
 type IbcConnection struct {
@@ -62,5 +63,18 @@ func (c *IbcConnection) List(ctx context.Context, fltrs storage.ListConnectionFi
 		Join("left join tx as connect_tx on connection_tx_id = connect_tx.id").
 		Join("left join ibc_client on client_id = ibc_client.id").
 		Scan(ctx, &conns)
+	return
+}
+
+func (c *IbcConnection) IdsByClients(ctx context.Context, clientIds ...string) (res []string, err error) {
+	if len(clientIds) == 0 {
+		return res, nil
+	}
+
+	err = c.DB().NewSelect().
+		Column("connection_id").
+		Model((*storage.IbcConnection)(nil)).
+		Where("client_id IN (?)", bun.In(clientIds)).
+		Scan(ctx, &res)
 	return
 }

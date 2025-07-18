@@ -17,7 +17,6 @@ import (
 	reflect "reflect"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
-	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,6 +41,45 @@ func NewMockIIbcClient(ctrl *gomock.Controller) *MockIIbcClient {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockIIbcClient) EXPECT() *MockIIbcClientMockRecorder {
 	return m.recorder
+}
+
+// ByChainId mocks base method.
+func (m *MockIIbcClient) ByChainId(ctx context.Context, chainId string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ByChainId", ctx, chainId)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ByChainId indicates an expected call of ByChainId.
+func (mr *MockIIbcClientMockRecorder) ByChainId(ctx, chainId any) *MockIIbcClientByChainIdCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByChainId", reflect.TypeOf((*MockIIbcClient)(nil).ByChainId), ctx, chainId)
+	return &MockIIbcClientByChainIdCall{Call: call}
+}
+
+// MockIIbcClientByChainIdCall wrap *gomock.Call
+type MockIIbcClientByChainIdCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIIbcClientByChainIdCall) Return(arg0 []string, arg1 error) *MockIIbcClientByChainIdCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIIbcClientByChainIdCall) Do(f func(context.Context, string) ([]string, error)) *MockIIbcClientByChainIdCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIIbcClientByChainIdCall) DoAndReturn(f func(context.Context, string) ([]string, error)) *MockIIbcClientByChainIdCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // ById mocks base method.
@@ -84,18 +122,18 @@ func (c *MockIIbcClientByIdCall) DoAndReturn(f func(context.Context, string) (st
 }
 
 // List mocks base method.
-func (m *MockIIbcClient) List(ctx context.Context, limit, offset int, sort storage0.SortOrder) ([]storage.IbcClient, error) {
+func (m *MockIIbcClient) List(ctx context.Context, flts storage.ListIbcClientsFilters) ([]storage.IbcClient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", ctx, limit, offset, sort)
+	ret := m.ctrl.Call(m, "List", ctx, flts)
 	ret0, _ := ret[0].([]storage.IbcClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // List indicates an expected call of List.
-func (mr *MockIIbcClientMockRecorder) List(ctx, limit, offset, sort any) *MockIIbcClientListCall {
+func (mr *MockIIbcClientMockRecorder) List(ctx, flts any) *MockIIbcClientListCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIIbcClient)(nil).List), ctx, limit, offset, sort)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIIbcClient)(nil).List), ctx, flts)
 	return &MockIIbcClientListCall{Call: call}
 }
 
@@ -111,13 +149,13 @@ func (c *MockIIbcClientListCall) Return(arg0 []storage.IbcClient, arg1 error) *M
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIIbcClientListCall) Do(f func(context.Context, int, int, storage0.SortOrder) ([]storage.IbcClient, error)) *MockIIbcClientListCall {
+func (c *MockIIbcClientListCall) Do(f func(context.Context, storage.ListIbcClientsFilters) ([]storage.IbcClient, error)) *MockIIbcClientListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIIbcClientListCall) DoAndReturn(f func(context.Context, int, int, storage0.SortOrder) ([]storage.IbcClient, error)) *MockIIbcClientListCall {
+func (c *MockIIbcClientListCall) DoAndReturn(f func(context.Context, storage.ListIbcClientsFilters) ([]storage.IbcClient, error)) *MockIIbcClientListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

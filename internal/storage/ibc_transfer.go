@@ -14,13 +14,14 @@ import (
 )
 
 type ListIbcTransferFilters struct {
-	Limit      int
-	Offset     int
-	Sort       sdk.SortOrder
-	ReceiverId *uint64
-	SenderId   *uint64
-	AddressId  *uint64
-	ChannelId  string
+	Limit         int
+	Offset        int
+	Sort          sdk.SortOrder
+	ReceiverId    *uint64
+	SenderId      *uint64
+	AddressId     *uint64
+	ChannelId     string
+	ConnectionIds []string
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed

@@ -636,6 +636,15 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcClient)(nil)).
+			Index("ibc_client_chain_id_idx").
+			Column("chain_id").
+			Where("chain_id is not null").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// IBC Connection
 		if _, err := tx.NewCreateIndex().
