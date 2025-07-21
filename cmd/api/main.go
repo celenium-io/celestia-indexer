@@ -61,8 +61,8 @@ func main() {
 	e := initEcho(cfg.ApiConfig, cfg.Environment)
 	initDispatcher(ctx, db)
 	initGasTracker(ctx, db)
-	initHandlers(ctx, e, *cfg, db)
 	initChainStore(ctx, *cfg)
+	initHandlers(ctx, e, *cfg, db)
 
 	go func() {
 		if err := e.Start(cfg.ApiConfig.Bind); err != nil && errors.Is(err, http.ErrServerClosed) {
