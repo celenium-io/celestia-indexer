@@ -1,10 +1,11 @@
 package hyperlane
 
 import (
-	"bufio"
 	"bytes"
 	"context"
+	"fmt"
 	"gopkg.in/yaml.v3"
+	"io"
 	"time"
 
 	fastshot "github.com/opus-domini/fast-shot"
@@ -57,23 +58,24 @@ func (api Api) ChainMetadata(ctx context.Context) (map[uint64]ChainMetadata, err
 		return nil, errors.Errorf("invalid status: %d", resp.Status().Code())
 	}
 
-	scanner := bufio.NewScanner(resp.Raw().Body)
-	var buf bytes.Buffer
-	skipped := false
-	for scanner.Scan() {
-		if !skipped {
-			skipped = true
-			continue
-		}
-		buf.Write(scanner.Bytes())
-		buf.WriteByte('\n')
-	}
-	if err := scanner.Err(); err != nil {
+	body, err := io.ReadAll(resp.Raw().Body)
+	closeErr := resp.Raw().Body.Close()
+
+	if err != nil {
 		return nil, err
 	}
 
+	if closeErr != nil {
+		return nil, closeErr
+	}
+
+	lines := bytes.SplitN(body, []byte("\n"), 2)
+	if len(lines) < 2 {
+		return nil, fmt.Errorf("unexpected file format: not enough lines")
+	}
+
 	var raw map[string]ChainMetadata
-	if err := yaml.Unmarshal(buf.Bytes(), &raw); err != nil {
+	if err := yaml.Unmarshal(lines[1], &raw); err != nil {
 		return nil, err
 	}
 
