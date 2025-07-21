@@ -501,7 +501,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	hyperlaneHandler := handler.NewHyperlaneHandler(db.HLMailbox, db.HLToken, db.HLTransfer, db.Address)
+	hyperlaneHandler := handler.NewHyperlaneHandler(db.HLMailbox, db.HLToken, db.HLTransfer, db.Address, chainStore)
 	hyperlane := v1.Group("/hyperlane")
 	{
 		hlMailbox := hyperlane.Group("/mailbox")

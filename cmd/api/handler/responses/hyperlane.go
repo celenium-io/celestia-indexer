@@ -121,7 +121,7 @@ type HyperlaneTransfer struct {
 	Counterparty HyperlaneCounterparty `json:"counterparty"`
 }
 
-func NewHyperlaneTransfer(transfer storage.HLTransfer) HyperlaneTransfer {
+func NewHyperlaneTransfer(transfer storage.HLTransfer, store hyperlane.IChainStore) HyperlaneTransfer {
 	result := HyperlaneTransfer{
 		Id:       transfer.Id,
 		Height:   transfer.Height,
@@ -138,7 +138,7 @@ func NewHyperlaneTransfer(transfer storage.HLTransfer) HyperlaneTransfer {
 		Counterparty: HyperlaneCounterparty{
 			Hash:          transfer.CounterpartyAddress,
 			Domain:        transfer.Counterparty,
-			ChainMetadata: NewChainMetadata(transfer.Counterparty),
+			ChainMetadata: NewChainMetadata(transfer.Counterparty, store),
 		},
 	}
 
@@ -180,12 +180,8 @@ type NativeToken struct {
 	Symbol   string `example:"ETH"   format:"string" json:"symbol"   swaggertype:"string"`
 }
 
-func NewChainMetadata(domenId uint64) *ChainMetadata {
-	if hyperlane.Store == nil {
-		return nil
-	}
-
-	if metadata, ok := hyperlane.Store.Get(domenId); ok {
+func NewChainMetadata(domenId uint64, store hyperlane.IChainStore) *ChainMetadata {
+	if metadata, ok := store.Get(domenId); ok {
 		explorers := make([]BlockExplorer, len(metadata.BlockExplorers))
 		for i := range explorers {
 			explorers[i] = BlockExplorer(metadata.BlockExplorers[i])

@@ -118,8 +118,8 @@ func (s *HyperlaneTestSuite) SetupSuite() {
 	s.token = mock.NewMockIHLToken(s.ctrl)
 	s.transfer = mock.NewMockIHLTransfer(s.ctrl)
 	s.address = mock.NewMockIAddress(s.ctrl)
-	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.address)
 	s.chainStore = hyperlane.NewMockIChainStore(s.ctrl)
+	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.address, s.chainStore)
 }
 
 // TearDownSuite -
@@ -308,8 +308,13 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 		Type:                types.HLTransferTypeReceive,
 	}
 
-	hyperlane.NewChainStore("")
-	hyperlane.Store.Set(testChainStore)
+	s.chainStore.EXPECT().
+		Set(testChainStore).
+		Times(1)
+
+	s.chainStore.EXPECT().
+		Get(uint64(123)).
+		Return(testChainMetadata, true)
 
 	s.transfer.EXPECT().
 		List(gomock.Any(), gomock.Any()).
@@ -317,6 +322,9 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 			transfer,
 		}, nil).
 		Times(1)
+
+	hyperlane.NewChainStore("")
+	s.chainStore.Set(testChainStore)
 
 	s.Require().NoError(s.handler.ListTransfers(c))
 	s.Require().Equal(http.StatusOK, rec.Code)

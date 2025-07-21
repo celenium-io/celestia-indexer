@@ -14,8 +14,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var Store *ChainStore
-
 type ChainStore struct {
 	data map[uint64]hyperlane.ChainMetadata
 	api  hyperlane.IApi
@@ -38,7 +36,6 @@ func NewChainStore(url string) *ChainStore {
 		log:  log.With().Str("module", "chain_store").Logger(),
 	}
 
-	Store = cs
 	return cs
 }
 
