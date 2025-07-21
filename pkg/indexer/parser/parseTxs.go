@@ -107,6 +107,13 @@ func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txR
 		if txRes.IsFailed() {
 			dm.Msg.Namespace = nil
 			dm.BlobsSize = 0
+			dm.Msg.IbcTransfer = nil
+			dm.Msg.IbcChannel = nil
+			dm.Msg.IbcClient = nil
+			dm.Msg.IbcConnection = nil
+			dm.Msg.HLMailbox = nil
+			dm.Msg.HLToken = nil
+			dm.Msg.HLTransfer = nil
 		}
 
 		t.Messages[i] = dm.Msg
