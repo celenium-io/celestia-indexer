@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -17,10 +18,11 @@ import (
 )
 
 type HyperlaneHandler struct {
-	mailbox   storage.IHLMailbox
-	tokens    storage.IHLToken
-	transfers storage.IHLTransfer
-	address   storage.IAddress
+	mailbox    storage.IHLMailbox
+	tokens     storage.IHLToken
+	transfers  storage.IHLTransfer
+	address    storage.IAddress
+	chainStore hyperlane.IChainStore
 }
 
 func NewHyperlaneHandler(
@@ -28,12 +30,14 @@ func NewHyperlaneHandler(
 	tokens storage.IHLToken,
 	transfers storage.IHLTransfer,
 	address storage.IAddress,
+	chainStore hyperlane.IChainStore,
 ) *HyperlaneHandler {
 	return &HyperlaneHandler{
-		mailbox:   mailbox,
-		tokens:    tokens,
-		transfers: transfers,
-		address:   address,
+		mailbox:    mailbox,
+		tokens:     tokens,
+		transfers:  transfers,
+		address:    address,
+		chainStore: chainStore,
 	}
 }
 
@@ -365,7 +369,7 @@ func (handler *HyperlaneHandler) ListTransfers(c echo.Context) error {
 
 	response := make([]responses.HyperlaneTransfer, len(transfers))
 	for i := range transfers {
-		response[i] = responses.NewHyperlaneTransfer(transfers[i])
+		response[i] = responses.NewHyperlaneTransfer(transfers[i], handler.chainStore)
 	}
 	return returnArray(c, response)
 }

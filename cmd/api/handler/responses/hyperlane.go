@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 )
@@ -120,7 +121,7 @@ type HyperlaneTransfer struct {
 	Counterparty HyperlaneCounterparty `json:"counterparty"`
 }
 
-func NewHyperlaneTransfer(transfer storage.HLTransfer) HyperlaneTransfer {
+func NewHyperlaneTransfer(transfer storage.HLTransfer, store hyperlane.IChainStore) HyperlaneTransfer {
 	result := HyperlaneTransfer{
 		Id:       transfer.Id,
 		Height:   transfer.Height,
@@ -135,8 +136,9 @@ func NewHyperlaneTransfer(transfer storage.HLTransfer) HyperlaneTransfer {
 		Address:  NewShortAddress(transfer.Address),
 		Relayer:  NewShortAddress(transfer.Relayer),
 		Counterparty: HyperlaneCounterparty{
-			Hash:   transfer.CounterpartyAddress,
-			Domain: transfer.Counterparty,
+			Hash:          transfer.CounterpartyAddress,
+			Domain:        transfer.Counterparty,
+			ChainMetadata: NewChainMetadata(transfer.Counterparty, store),
 		},
 	}
 
@@ -154,6 +156,46 @@ func NewHyperlaneTransfer(transfer storage.HLTransfer) HyperlaneTransfer {
 }
 
 type HyperlaneCounterparty struct {
-	Hash   string `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"hash"    swaggertype:"string"`
-	Domain uint64 `example:"100"                                                              format:"int64" json:"domain,omitempty" swaggertype:"integer"`
+	Hash          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"hash"    swaggertype:"string"`
+	Domain        uint64         `example:"100"                                                              format:"int64" json:"domain,omitempty" swaggertype:"integer"`
+	ChainMetadata *ChainMetadata `json:"chain_metadata,omitempty"`
+}
+
+type ChainMetadata struct {
+	Name           string          `example:"name"                   json:"name" swaggertype:"string"`
+	BlockExplorers []BlockExplorer `json:"block_explorers,omitempty"`
+	NativeToken    NativeToken     `json:"native_token,omitempty"`
+}
+
+type BlockExplorer struct {
+	ApiUrl string `example:"https://api.scan.url.io" format:"string" json:"api_url" swaggertype:"string"`
+	Family string `example:"etherscan"               format:"string" json:"family"  swaggertype:"string"`
+	Name   string `example:"Block explorer"          format:"string" json:"name"    swaggertype:"string"`
+	Url    string `example:"https://scan.url.io"     format:"string" json:"url"     swaggertype:"string"`
+}
+
+type NativeToken struct {
+	Decimals uint64 `example:"18"    format:"int64"  json:"decimals" swaggertype:"integer"`
+	Name     string `example:"Ether" format:"string" json:"name"     swaggertype:"string"`
+	Symbol   string `example:"ETH"   format:"string" json:"symbol"   swaggertype:"string"`
+}
+
+func NewChainMetadata(domenId uint64, store hyperlane.IChainStore) *ChainMetadata {
+	if metadata, ok := store.Get(domenId); ok {
+		explorers := make([]BlockExplorer, len(metadata.BlockExplorers))
+		for i := range explorers {
+			explorers[i] = BlockExplorer(metadata.BlockExplorers[i])
+		}
+		return &ChainMetadata{
+			Name:           metadata.DisplayName,
+			BlockExplorers: explorers,
+			NativeToken: NativeToken{
+				Decimals: metadata.NativeToken.Decimals,
+				Name:     metadata.NativeToken.Name,
+				Symbol:   metadata.NativeToken.Symbol,
+			},
+		}
+	}
+
+	return nil
 }

@@ -62,6 +62,7 @@ func main() {
 	initDispatcher(ctx, db)
 	initGasTracker(ctx, db)
 	initHandlers(ctx, e, *cfg, db)
+	initChainStore(ctx, *cfg)
 
 	go func() {
 		if err := e.Start(cfg.ApiConfig.Bind); err != nil && errors.Is(err, http.ErrServerClosed) {
@@ -101,6 +102,11 @@ func main() {
 	}
 	if ttlCache != nil {
 		if err := ttlCache.Close(); err != nil {
+			e.Logger.Fatal(err)
+		}
+	}
+	if chainStore != nil {
+		if err := chainStore.Close(); err != nil {
 			e.Logger.Fatal(err)
 		}
 	}
