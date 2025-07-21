@@ -746,6 +746,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.IbcTransfer)(nil)).
+			Index("ibc_transfer_tx_id_idx").
+			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Hyperlane Mailbox
 		if _, err := tx.NewCreateIndex().
