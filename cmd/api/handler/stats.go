@@ -475,6 +475,30 @@ func (sh StatsHandler) IbcByChains(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+// IbcSummary godoc
+//
+//	@Summary		Get stats for ibc the largest transfer and busiest channel per day
+//	@Description	Get stats for ibc the largest transfer and busiest channel per day
+//	@Tags			stats
+//	@ID				stats-ibc-summary
+//	@Produce		json
+//	@Success		200	{array}		responses.IbcSummaryStats
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/stats/ibc/summary [get]
+func (sh StatsHandler) IbcSummary(c echo.Context) error {
+	transfer, err := sh.ibc.LargestTransfer24h(c.Request().Context())
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+	channel, err := sh.ibcChannels.BusiestChannel1m(c.Request().Context())
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewIbcSummaryStats(transfer, channel))
+}
+
 type squareSizeRequest struct {
 	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
 	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`

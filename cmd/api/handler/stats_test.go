@@ -12,8 +12,10 @@ import (
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
 	"github.com/shopspring/decimal"
@@ -616,4 +618,59 @@ func (s *StatsTestSuite) TestIbcChainStats() {
 	s.Require().EqualValues("101", response[0].Received)
 	s.Require().EqualValues("99", response[0].Sent)
 	s.Require().EqualValues("200", response[0].Flow)
+}
+
+func (s *StatsTestSuite) TestIbcSummaryStats() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/ibc/summary")
+
+	s.ibc.EXPECT().
+		LargestTransfer24h(gomock.Any()).Return(
+		storage.IbcTransfer{
+			Id:              1,
+			Time:            testTime,
+			Height:          1000,
+			Timeout:         &testTime,
+			ChannelId:       "channel-1",
+			ConnectionId:    "connection-1",
+			Amount:          decimal.RequireFromString("101"),
+			Denom:           currency.Utia,
+			Memo:            "memo",
+			ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
+			Sender: &storage.Address{
+				Hash:    testHashAddress,
+				Address: testAddress,
+			},
+			Sequence: 123456,
+			Tx:       &testTx,
+			Connection: &storage.IbcConnection{
+				Client: &storage.IbcClient{
+					ChainId: "chain-id",
+				},
+			},
+		}, nil)
+
+	s.channels.EXPECT().
+		BusiestChannel1m(gomock.Any()).
+		Return(storage.BusiestChannel{
+			ChannelId:      "channel-111",
+			TransfersCount: 1000,
+		}, nil)
+
+	s.Require().NoError(s.handler.IbcSummary(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response responses.IbcSummaryStats
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(1, response.LargestTransfer.Id)
+	s.Require().EqualValues("channel-1", response.LargestTransfer.ChannelId)
+	s.Require().EqualValues("101", response.LargestTransfer.Amount)
+	s.Require().EqualValues(currency.Utia, response.LargestTransfer.Denom)
+
+	s.Require().EqualValues("channel-111", response.BusiestChannel.ChannelId)
+	s.Require().EqualValues(1000, response.BusiestChannel.TransfersCount)
 }

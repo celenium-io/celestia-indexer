@@ -243,3 +243,23 @@ func NewIbcChainStats(stats storage.ChainStats) IbcChainStats {
 		Flow:     stats.Flow.String(),
 	}
 }
+
+type BusiestChannel struct {
+	ChannelId      string `example:"channel-1" format:"string"  json:"channel_id"      swaggertype:"string"`
+	TransfersCount int64  `example:"100"       format:"integer" json:"transfers_count" swaggertype:"integer"`
+}
+
+type IbcSummaryStats struct {
+	LargestTransfer IbcTransfer    `json:"largest_transfer,omitempty"`
+	BusiestChannel  BusiestChannel `json:"busiest_channel,omitempty"`
+}
+
+func NewIbcSummaryStats(transfer storage.IbcTransfer, channel storage.BusiestChannel) IbcSummaryStats {
+	return IbcSummaryStats{
+		LargestTransfer: NewIbcTransfer(transfer),
+		BusiestChannel: BusiestChannel{
+			ChannelId:      channel.ChannelId,
+			TransfersCount: channel.TransfersCount,
+		},
+	}
+}

@@ -101,3 +101,13 @@ func (c *IbcChannel) StatsByChain(ctx context.Context, limit, offset int) (stats
 	err = q.Scan(ctx, &stats)
 	return
 }
+
+func (c *IbcChannel) BusiestChannel1m(ctx context.Context) (channel storage.BusiestChannel, err error) {
+	err = c.DB().NewSelect().
+		Table(storage.ViewIbcTransfersByHour).
+		ColumnExpr("channel_id, max(count) as count").
+		Where("time >= NOW() - INTERVAL '1 month'").
+		Group("channel_id").
+		Scan(ctx, &channel)
+	return
+}

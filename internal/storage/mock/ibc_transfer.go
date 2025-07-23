@@ -24,6 +24,7 @@ import (
 type MockIIbcTransfer struct {
 	ctrl     *gomock.Controller
 	recorder *MockIIbcTransferMockRecorder
+	isgomock struct{}
 }
 
 // MockIIbcTransferMockRecorder is the mock recorder for MockIIbcTransfer.
@@ -41,6 +42,45 @@ func NewMockIIbcTransfer(ctrl *gomock.Controller) *MockIIbcTransfer {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockIIbcTransfer) EXPECT() *MockIIbcTransferMockRecorder {
 	return m.recorder
+}
+
+// LargestTransfer24h mocks base method.
+func (m *MockIIbcTransfer) LargestTransfer24h(ctx context.Context) (storage.IbcTransfer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LargestTransfer24h", ctx)
+	ret0, _ := ret[0].(storage.IbcTransfer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LargestTransfer24h indicates an expected call of LargestTransfer24h.
+func (mr *MockIIbcTransferMockRecorder) LargestTransfer24h(ctx any) *MockIIbcTransferLargestTransfer24hCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LargestTransfer24h", reflect.TypeOf((*MockIIbcTransfer)(nil).LargestTransfer24h), ctx)
+	return &MockIIbcTransferLargestTransfer24hCall{Call: call}
+}
+
+// MockIIbcTransferLargestTransfer24hCall wrap *gomock.Call
+type MockIIbcTransferLargestTransfer24hCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIIbcTransferLargestTransfer24hCall) Return(arg0 storage.IbcTransfer, arg1 error) *MockIIbcTransferLargestTransfer24hCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIIbcTransferLargestTransfer24hCall) Do(f func(context.Context) (storage.IbcTransfer, error)) *MockIIbcTransferLargestTransfer24hCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIIbcTransferLargestTransfer24hCall) DoAndReturn(f func(context.Context) (storage.IbcTransfer, error)) *MockIIbcTransferLargestTransfer24hCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // List mocks base method.
