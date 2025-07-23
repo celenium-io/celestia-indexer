@@ -323,7 +323,6 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 		}, nil).
 		Times(1)
 
-	hyperlane.NewChainStore("")
 	s.chainStore.Set(testChainStore)
 
 	s.Require().NoError(s.handler.ListTransfers(c))
@@ -363,4 +362,80 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].ApiUrl, response.Counterparty.ChainMetadata.BlockExplorers[0].ApiUrl)
 	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Url, response.Counterparty.ChainMetadata.BlockExplorers[0].Url)
 	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Family, response.Counterparty.ChainMetadata.BlockExplorers[0].Family)
+}
+
+func (s *HyperlaneTestSuite) TestListTransferWithoutChainStore() {
+	s.chainStore = nil
+	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.address, nil)
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/hyperlane/transfer")
+
+	transfer := storage.HLTransfer{
+		Id:        1,
+		Height:    1000,
+		Time:      testTime,
+		MailboxId: 1,
+		Mailbox:   &testMailbox,
+		AddressId: 1,
+		Address: &storage.Address{
+			Address: testAddress,
+		},
+		RelayerId: 1,
+		Relayer: &storage.Address{
+			Address: testAddress,
+		},
+		TokenId:             1,
+		Token:               &testHyperlaneToken,
+		TxId:                1,
+		Tx:                  &testTx,
+		Counterparty:        123,
+		CounterpartyAddress: testsuite.RandomText(20),
+		Nonce:               12,
+		Version:             1,
+		Body:                testsuite.RandomBytes(32),
+		Metadata:            testsuite.RandomBytes(32),
+		Amount:              decimal.RequireFromString("125678"),
+		Denom:               currency.Utia,
+		Type:                types.HLTransferTypeReceive,
+	}
+
+	s.transfer.EXPECT().
+		List(gomock.Any(), gomock.Any()).
+		Return([]storage.HLTransfer{
+			transfer,
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.ListTransfers(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var items []responses.HyperlaneTransfer
+	err := json.NewDecoder(rec.Body).Decode(&items)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+
+	response := items[0]
+	s.Require().EqualValues(transfer.Id, response.Id)
+	s.Require().EqualValues(transfer.Height, response.Height)
+	s.Require().EqualValues(transfer.Time, response.Time)
+	s.Require().EqualValues(hex.EncodeToString(transfer.Mailbox.Mailbox), response.Mailbox)
+	s.Require().EqualValues(transfer.Type.String(), response.Type)
+	s.Require().EqualValues(transfer.Denom, response.Denom)
+	s.Require().EqualValues(transfer.Counterparty, response.Counterparty.Domain)
+	s.Require().EqualValues(transfer.CounterpartyAddress, response.Counterparty.Hash)
+	s.Require().EqualValues(transfer.Version, response.Version)
+	s.Require().EqualValues(transfer.Nonce, response.Nonce)
+	s.Require().EqualValues(transfer.Amount.String(), response.Amount)
+	s.Require().EqualValues(hex.EncodeToString(transfer.Token.TokenId), response.TokenId)
+	s.Require().EqualValues(strings.ToLower(testTxHash), response.TxHash)
+	s.Require().NotNil(response.Address)
+	s.Require().Equal(testAddress, response.Address.Hash)
+	s.Require().NotNil(response.Relayer)
+	s.Require().Equal(testAddress, response.Relayer.Hash)
+	s.Require().NotNil(response.Body)
+	s.Require().NotNil(response.Metadata)
+	s.Require().Nil(response.Counterparty.ChainMetadata)
 }
