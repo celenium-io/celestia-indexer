@@ -27,5 +27,5 @@ type ApiConfig struct {
 	SentryDsn        string  `validate:"omitempty"              yaml:"sentry_dsn"`
 	Websocket        bool    `validate:"omitempty"              yaml:"websocket"`
 	Cache            string  `validate:"omitempty,url"          yaml:"cache"`
-	HyperlaneNodeUrl string  `validate:"required"               yaml:"hyperlane_node"`
+	HyperlaneNodeUrl string  `validate:"omitempty,url"          yaml:"hyperlane_node"`
 }

@@ -61,7 +61,7 @@ func main() {
 	e := initEcho(cfg.ApiConfig, cfg.Environment)
 	initDispatcher(ctx, db)
 	initGasTracker(ctx, db)
-	initChainStore(ctx, *cfg)
+	initChainStore(ctx, cfg.ApiConfig.HyperlaneNodeUrl)
 	initHandlers(ctx, e, *cfg, db)
 
 	go func() {

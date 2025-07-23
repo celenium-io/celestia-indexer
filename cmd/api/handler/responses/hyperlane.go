@@ -122,24 +122,29 @@ type HyperlaneTransfer struct {
 }
 
 func NewHyperlaneTransfer(transfer storage.HLTransfer, store hyperlane.IChainStore) HyperlaneTransfer {
+	counterparty := HyperlaneCounterparty{
+		Hash:   transfer.CounterpartyAddress,
+		Domain: transfer.Counterparty,
+	}
+
+	if store != nil {
+		counterparty.ChainMetadata = NewChainMetadata(transfer.Counterparty, store)
+	}
+
 	result := HyperlaneTransfer{
-		Id:       transfer.Id,
-		Height:   transfer.Height,
-		Time:     transfer.Time,
-		Type:     transfer.Type.String(),
-		Version:  transfer.Version,
-		Nonce:    transfer.Nonce,
-		Body:     transfer.Body,
-		Metadata: transfer.Metadata,
-		Denom:    transfer.Denom,
-		Amount:   transfer.Amount.String(),
-		Address:  NewShortAddress(transfer.Address),
-		Relayer:  NewShortAddress(transfer.Relayer),
-		Counterparty: HyperlaneCounterparty{
-			Hash:          transfer.CounterpartyAddress,
-			Domain:        transfer.Counterparty,
-			ChainMetadata: NewChainMetadata(transfer.Counterparty, store),
-		},
+		Id:           transfer.Id,
+		Height:       transfer.Height,
+		Time:         transfer.Time,
+		Type:         transfer.Type.String(),
+		Version:      transfer.Version,
+		Nonce:        transfer.Nonce,
+		Body:         transfer.Body,
+		Metadata:     transfer.Metadata,
+		Denom:        transfer.Denom,
+		Amount:       transfer.Amount.String(),
+		Address:      NewShortAddress(transfer.Address),
+		Relayer:      NewShortAddress(transfer.Relayer),
+		Counterparty: counterparty,
 	}
 
 	if transfer.Token != nil {
