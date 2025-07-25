@@ -28,6 +28,7 @@ type ListIbcTransferFilters struct {
 type IIbcTransfer interface {
 	List(ctx context.Context, fltrs ListIbcTransferFilters) ([]IbcTransfer, error)
 	Series(ctx context.Context, channelId string, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
+	LargestTransfer24h(ctx context.Context) (IbcTransfer, error)
 }
 
 type IbcTransfer struct {

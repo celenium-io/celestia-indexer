@@ -13,3 +13,33 @@
   timeout: null
   height_timeout: null
   sequence: 321654
+- id: 2
+  channel_id: channel-2
+  port: transfer
+  connection_id: connection-2
+  time: now()
+  height: 1001
+  amount: 1234567
+  denom: utia
+  memo:
+  receiver_address: osmo2m8wg4vxkefhs374qxmmqpyusgz289wmulex5qdwpfx7jnrxzer5s9cv83w
+  sender_id: 2
+  tx_id: 2
+  timeout: null
+  height_timeout: null
+  sequence: 321655
+- id: 3
+  channel_id: channel-2
+  port: transfer
+  connection_id: connection-2
+  time: now()
+  height: 1002
+  amount: 12345678
+  denom: utia
+  memo:
+  receiver_address: osmo3m8wg4vxkefhs374qxmmqpyusgz289wmulex5qdwpfx7jnrxzer5s9cv83e
+  sender_id: 3
+  tx_id: 3
+  timeout: null
+  height_timeout: null
+  sequence: 321656

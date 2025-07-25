@@ -30,11 +30,17 @@ type ChainStats struct {
 	Flow     decimal.Decimal `bun:"flow"`
 }
 
+type BusiestChannel struct {
+	ChannelId      string `bun:"channel_id"`
+	TransfersCount int64  `bun:"count"`
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IIbcChannel interface {
 	ById(ctx context.Context, id string) (IbcChannel, error)
 	List(ctx context.Context, fltrs ListChannelFilters) ([]IbcChannel, error)
 	StatsByChain(ctx context.Context, limit, offset int) ([]ChainStats, error)
+	BusiestChannel1m(ctx context.Context) (BusiestChannel, error)
 }
 
 type IbcChannel struct {

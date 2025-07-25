@@ -133,3 +133,14 @@ func (s *StorageTestSuite) TestIbcChannelStatsByChainId() {
 	s.Require().Equal("100", stats[0].Sent.String())
 	s.Require().Equal("100", stats[0].Received.String())
 }
+
+func (s *StorageTestSuite) TestIbcBusiestChannel1m() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	channel, err := s.storage.IbcChannels.BusiestChannel1m(ctx)
+	s.Require().NoError(err)
+
+	s.Require().Equal("channel-2", channel.ChannelId)
+	s.Require().Equal(int64(2), channel.TransfersCount)
+}

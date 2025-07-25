@@ -19,9 +19,9 @@ func (s *StorageTestSuite) TestIbcTransferList() {
 
 	for _, fltrs := range []storage.ListIbcTransferFilters{
 		{
-			Limit:  10,
+			Limit:  1,
 			Offset: 0,
-			Sort:   sdk.SortOrderDesc,
+			Sort:   sdk.SortOrderAsc,
 		}, {
 			Limit:     1,
 			Offset:    0,
@@ -142,4 +142,23 @@ func (s *StorageTestSuite) TestIbcTransferSeries() {
 		s.Require().NoError(err)
 		s.Require().Len(series, fltrs.wantCount)
 	}
+}
+
+func (s *StorageTestSuite) TestLargestTransfer24h() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	transfer, err := s.storage.IbcTransfers.LargestTransfer24h(ctx)
+	s.Require().NoError(err)
+	s.Require().NotNil(transfer)
+	s.Require().EqualValues("connection-2", transfer.ConnectionId)
+	s.Require().EqualValues("channel-2", transfer.ChannelId)
+	s.Require().EqualValues(1002, transfer.Height)
+	s.Require().EqualValues("12345678", transfer.Amount.String())
+	s.Require().EqualValues("utia", transfer.Denom)
+	s.Require().Zero(transfer.HeightTimeout)
+	s.Require().Nil(transfer.Timeout)
+	s.Require().EqualValues(321656, transfer.Sequence)
+	s.Require().NotNil(transfer.Tx)
+	s.Require().NotNil(transfer.Sender)
 }
