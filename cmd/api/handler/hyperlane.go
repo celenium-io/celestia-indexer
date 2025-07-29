@@ -21,6 +21,7 @@ type HyperlaneHandler struct {
 	mailbox    storage.IHLMailbox
 	tokens     storage.IHLToken
 	transfers  storage.IHLTransfer
+	txs        storage.ITx
 	address    storage.IAddress
 	chainStore hyperlane.IChainStore
 }
@@ -29,6 +30,7 @@ func NewHyperlaneHandler(
 	mailbox storage.IHLMailbox,
 	tokens storage.IHLToken,
 	transfers storage.IHLTransfer,
+	txs storage.ITx,
 	address storage.IAddress,
 	chainStore hyperlane.IChainStore,
 ) *HyperlaneHandler {
@@ -36,6 +38,7 @@ func NewHyperlaneHandler(
 		mailbox:    mailbox,
 		tokens:     tokens,
 		transfers:  transfers,
+		txs:        txs,
 		address:    address,
 		chainStore: chainStore,
 	}
@@ -261,16 +264,17 @@ type listHyperlaneTransferRequest struct {
 	Token   string      `query:"token"   validate:"omitempty,hexadecimal"`
 	Type    StringArray `query:"type"    validate:"omitempty,dive,hl_transfer_type"`
 	Domain  uint64      `query:"domain"  validate:"omitempty,min=1"`
+	Hash    string      `query:"hash"    validate:"omitempty,hexadecimal,len=64"`
 }
 
-func (req *listHyperlaneTransferRequest) ToFilters(ctx context.Context, address storage.IAddress, mailbox storage.IHLMailbox, tokens storage.IHLToken) (storage.ListHyperlaneTransfers, error) {
+func (req *listHyperlaneTransferRequest) ToFilters(ctx context.Context, address storage.IAddress, mailbox storage.IHLMailbox, tokens storage.IHLToken, tx storage.ITx) (storage.ListHyperlaneTransferFilters, error) {
 	if req.Limit <= 0 {
 		req.Limit = 10
 	}
 	if req.Sort == "" {
 		req.Sort = desc
 	}
-	filters := storage.ListHyperlaneTransfers{
+	filters := storage.ListHyperlaneTransferFilters{
 		Limit:  req.Limit,
 		Offset: req.Offset,
 		Sort:   pgSort(req.Sort),
@@ -287,6 +291,17 @@ func (req *listHyperlaneTransferRequest) ToFilters(ctx context.Context, address 
 			return filters, errors.Wrapf(err, "receiving mailbox by id: %x", id)
 		}
 		filters.MailboxId = mbx.Id
+	}
+	if req.Hash != "" {
+		hash, err := hex.DecodeString(req.Hash)
+		if err != nil {
+			return filters, errors.Wrapf(err, "decoding tx hash: %s", req.Hash)
+		}
+		transaction, err := tx.ByHash(ctx, hash)
+		if err != nil {
+			return filters, errors.Wrapf(err, "receiving tx by hash: %x", hash)
+		}
+		filters.TxId = transaction.Id
 	}
 	if req.Token != "" {
 		id, err := hex.DecodeString(req.Token)
@@ -357,7 +372,7 @@ func (handler *HyperlaneHandler) ListTransfers(c echo.Context) error {
 	if err != nil {
 		return badRequestError(c, err)
 	}
-	filters, err := req.ToFilters(c.Request().Context(), handler.address, handler.mailbox, handler.tokens)
+	filters, err := req.ToFilters(c.Request().Context(), handler.address, handler.mailbox, handler.tokens, handler.txs)
 	if err != nil {
 		return badRequestError(c, err)
 	}
@@ -372,4 +387,31 @@ func (handler *HyperlaneHandler) ListTransfers(c echo.Context) error {
 		response[i] = responses.NewHyperlaneTransfer(transfers[i], handler.chainStore)
 	}
 	return returnArray(c, response)
+}
+
+// GetTransfer godoc
+//
+//	@Summary		Get transfer by id
+//	@Description	Get transfer by id
+//	@Tags			hyperlane
+//	@ID				get-hyperlane-transfer
+//	@Param			id	path	integer	true	"Internal identity"	mininum(1)
+//	@Produce		json
+//	@Success		200	{object}	responses.HyperlaneTransfer
+//	@Success		204
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/hyperlane/transfer/{id} [get]
+func (handler *HyperlaneHandler) GetTransfer(c echo.Context) error {
+	req, err := bindAndValidate[getById](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	transfer, err := handler.transfers.ById(c.Request().Context(), req.Id)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewHyperlaneTransfer(transfer, handler.chainStore))
 }

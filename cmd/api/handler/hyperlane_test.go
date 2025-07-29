@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -74,7 +75,7 @@ var (
 	}
 
 	testChainMetadata = hl.ChainMetadata{
-		DomainId:    123,
+		DomainId:    1,
 		DisplayName: "test chain",
 		BlockExplorers: []hl.BlockExplorer{
 			{
@@ -94,6 +95,66 @@ var (
 	testChainStore = map[uint64]hl.ChainMetadata{
 		testChainMetadata.DomainId: testChainMetadata,
 	}
+
+	testTransfer = storage.HLTransfer{
+		Id:        1,
+		Height:    1000,
+		Time:      testTime,
+		MailboxId: 1,
+		Mailbox:   &testMailbox,
+		AddressId: 1,
+		Address: &storage.Address{
+			Address: testAddress,
+		},
+		RelayerId: 1,
+		Relayer: &storage.Address{
+			Address: testAddress,
+		},
+		TokenId:             1,
+		Token:               &testHyperlaneToken,
+		TxId:                1,
+		Tx:                  &testTx,
+		Counterparty:        1,
+		CounterpartyAddress: testsuite.RandomText(20),
+		Nonce:               12,
+		Version:             1,
+		Body:                testsuite.RandomBytes(32),
+		Metadata:            testsuite.RandomBytes(32),
+		Amount:              decimal.RequireFromString("125678"),
+		Denom:               currency.Utia,
+		Type:                types.HLTransferTypeReceive,
+	}
+
+	testTransactionHash         = "123452A670018D678CC116E510BA88C1CABE061336661B1F3D206D248BD558GH"
+	testTransactionHashBytes, _ = hex.DecodeString(testTransactionHash)
+	testTransaction             = storage.Tx{
+		Id:            2,
+		Hash:          testTransactionHashBytes,
+		Height:        200,
+		Time:          testTime,
+		Position:      3,
+		GasWanted:     80410,
+		GasUsed:       77483,
+		TimeoutHeight: 0,
+		EventsCount:   11,
+		MessagesCount: 3,
+		Fee:           decimal.RequireFromString("80410"),
+		Status:        types.StatusSuccess,
+		Codespace:     "sdk",
+		Memo:          "memo",
+		MessageTypes:  types.NewMsgTypeBitMask(types.MsgSend),
+		Messages: []storage.Message{
+			{
+				Id:   1,
+				Type: types.MsgSend,
+			},
+		},
+		Signers: []storage.Address{
+			{
+				Address: testAddress,
+			},
+		},
+	}
 )
 
 // HyperlaneTestSuite -
@@ -104,6 +165,7 @@ type HyperlaneTestSuite struct {
 	mailbox    *mock.MockIHLMailbox
 	token      *mock.MockIHLToken
 	transfer   *mock.MockIHLTransfer
+	txs        *mock.MockITx
 	handler    *HyperlaneHandler
 	chainStore *hyperlane.MockIChainStore
 	ctrl       *gomock.Controller
@@ -117,9 +179,10 @@ func (s *HyperlaneTestSuite) SetupSuite() {
 	s.mailbox = mock.NewMockIHLMailbox(s.ctrl)
 	s.token = mock.NewMockIHLToken(s.ctrl)
 	s.transfer = mock.NewMockIHLTransfer(s.ctrl)
+	s.txs = mock.NewMockITx(s.ctrl)
 	s.address = mock.NewMockIAddress(s.ctrl)
 	s.chainStore = hyperlane.NewMockIChainStore(s.ctrl)
-	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.address, s.chainStore)
+	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.txs, s.address, s.chainStore)
 }
 
 // TearDownSuite -
@@ -273,58 +336,96 @@ func (s *HyperlaneTestSuite) TestListToken() {
 	s.Require().Equal(testAddress, response.Owner.Hash)
 }
 
-func (s *HyperlaneTestSuite) TestListTransfer() {
+func (s *HyperlaneTestSuite) TestGetTransfer() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
-	c.SetPath("/hyperlane/transfer")
-
-	transfer := storage.HLTransfer{
-		Id:        1,
-		Height:    1000,
-		Time:      testTime,
-		MailboxId: 1,
-		Mailbox:   &testMailbox,
-		AddressId: 1,
-		Address: &storage.Address{
-			Address: testAddress,
-		},
-		RelayerId: 1,
-		Relayer: &storage.Address{
-			Address: testAddress,
-		},
-		TokenId:             1,
-		Token:               &testHyperlaneToken,
-		TxId:                1,
-		Tx:                  &testTx,
-		Counterparty:        123,
-		CounterpartyAddress: testsuite.RandomText(20),
-		Nonce:               12,
-		Version:             1,
-		Body:                testsuite.RandomBytes(32),
-		Metadata:            testsuite.RandomBytes(32),
-		Amount:              decimal.RequireFromString("125678"),
-		Denom:               currency.Utia,
-		Type:                types.HLTransferTypeReceive,
-	}
+	c.SetPath("/hyperlane/transfer/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
 
 	s.chainStore.EXPECT().
 		Set(testChainStore).
 		Times(1)
 
 	s.chainStore.EXPECT().
-		Get(uint64(123)).
+		Get(uint64(1)).
 		Return(testChainMetadata, true)
 
 	s.transfer.EXPECT().
-		List(gomock.Any(), gomock.Any()).
-		Return([]storage.HLTransfer{
-			transfer,
-		}, nil).
+		ById(gomock.Any(), uint64(1)).
+		Return(testTransfer, nil).
 		Times(1)
 
 	s.chainStore.Set(testChainStore)
 
+	s.Require().NoError(s.handler.GetTransfer(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response responses.HyperlaneTransfer
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(testTransfer.Id, response.Id)
+	s.Require().EqualValues(testTransfer.Height, response.Height)
+	s.Require().EqualValues(testTransfer.Time, response.Time)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.Mailbox.Mailbox), response.Mailbox)
+	s.Require().EqualValues(testTransfer.Type.String(), response.Type)
+	s.Require().EqualValues(testTransfer.Denom, response.Denom)
+	s.Require().EqualValues(testTransfer.Counterparty, response.Counterparty.Domain)
+	s.Require().EqualValues(testTransfer.CounterpartyAddress, response.Counterparty.Hash)
+	s.Require().EqualValues(testTransfer.Version, response.Version)
+	s.Require().EqualValues(testTransfer.Nonce, response.Nonce)
+	s.Require().EqualValues(testTransfer.Amount.String(), response.Amount)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.Token.TokenId), response.TokenId)
+	s.Require().EqualValues(strings.ToLower(testTxHash), response.TxHash)
+	s.Require().NotNil(response.Address)
+	s.Require().Equal(testAddress, response.Address.Hash)
+	s.Require().NotNil(response.Relayer)
+	s.Require().Equal(testAddress, response.Relayer.Hash)
+	s.Require().NotNil(response.Body)
+	s.Require().NotNil(response.Metadata)
+	s.Require().EqualValues(testChainMetadata.DisplayName, response.Counterparty.ChainMetadata.Name)
+	s.Require().EqualValues(testChainMetadata.DomainId, response.Counterparty.Domain)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, response.Counterparty.ChainMetadata.NativeToken.Decimals)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Name, response.Counterparty.ChainMetadata.NativeToken.Name)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Symbol, response.Counterparty.ChainMetadata.NativeToken.Symbol)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Name, response.Counterparty.ChainMetadata.BlockExplorers[0].Name)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].ApiUrl, response.Counterparty.ChainMetadata.BlockExplorers[0].ApiUrl)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Url, response.Counterparty.ChainMetadata.BlockExplorers[0].Url)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Family, response.Counterparty.ChainMetadata.BlockExplorers[0].Family)
+}
+
+func (s *HyperlaneTestSuite) TestListTransferWithHash() {
+	q := make(url.Values)
+	q.Add("hash", testTxHash)
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/hyperlane/transfer")
+
+	s.chainStore.EXPECT().
+		Set(testChainStore).
+		Times(1)
+
+	s.chainStore.EXPECT().
+		Get(gomock.Any()).
+		Return(testChainMetadata, true).
+		Times(1)
+
+	s.txs.EXPECT().
+		ByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx, nil)
+
+	s.transfer.EXPECT().
+		List(gomock.Any(), gomock.Any()).
+		Return([]storage.HLTransfer{
+			testTransfer,
+		}, nil).
+		Times(1)
+
+	s.chainStore.Set(testChainStore)
 	s.Require().NoError(s.handler.ListTransfers(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
@@ -334,18 +435,110 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 	s.Require().Len(items, 1)
 
 	response := items[0]
-	s.Require().EqualValues(transfer.Id, response.Id)
-	s.Require().EqualValues(transfer.Height, response.Height)
-	s.Require().EqualValues(transfer.Time, response.Time)
-	s.Require().EqualValues(hex.EncodeToString(transfer.Mailbox.Mailbox), response.Mailbox)
-	s.Require().EqualValues(transfer.Type.String(), response.Type)
-	s.Require().EqualValues(transfer.Denom, response.Denom)
-	s.Require().EqualValues(transfer.Counterparty, response.Counterparty.Domain)
-	s.Require().EqualValues(transfer.CounterpartyAddress, response.Counterparty.Hash)
-	s.Require().EqualValues(transfer.Version, response.Version)
-	s.Require().EqualValues(transfer.Nonce, response.Nonce)
-	s.Require().EqualValues(transfer.Amount.String(), response.Amount)
-	s.Require().EqualValues(hex.EncodeToString(transfer.Token.TokenId), response.TokenId)
+	s.Require().EqualValues(testTransfer.Id, response.Id)
+	s.Require().EqualValues(testTransfer.Height, response.Height)
+	s.Require().EqualValues(testTransfer.Time, response.Time)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.Mailbox.Mailbox), response.Mailbox)
+	s.Require().EqualValues(testTransfer.Type.String(), response.Type)
+	s.Require().EqualValues(testTransfer.Denom, response.Denom)
+	s.Require().EqualValues(testTransfer.Counterparty, response.Counterparty.Domain)
+	s.Require().EqualValues(testTransfer.CounterpartyAddress, response.Counterparty.Hash)
+	s.Require().EqualValues(testTransfer.Version, response.Version)
+	s.Require().EqualValues(testTransfer.Nonce, response.Nonce)
+	s.Require().EqualValues(testTransfer.Amount.String(), response.Amount)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.Token.TokenId), response.TokenId)
+	s.Require().EqualValues(strings.ToLower(testTxHash), response.TxHash)
+	s.Require().NotNil(response.Address)
+	s.Require().Equal(testAddress, response.Address.Hash)
+	s.Require().NotNil(response.Relayer)
+	s.Require().Equal(testAddress, response.Relayer.Hash)
+	s.Require().NotNil(response.Body)
+	s.Require().NotNil(response.Metadata)
+	s.Require().EqualValues(testChainMetadata.DisplayName, response.Counterparty.ChainMetadata.Name)
+	s.Require().EqualValues(testChainMetadata.DomainId, response.Counterparty.Domain)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, response.Counterparty.ChainMetadata.NativeToken.Decimals)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Name, response.Counterparty.ChainMetadata.NativeToken.Name)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Symbol, response.Counterparty.ChainMetadata.NativeToken.Symbol)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Name, response.Counterparty.ChainMetadata.BlockExplorers[0].Name)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].ApiUrl, response.Counterparty.ChainMetadata.BlockExplorers[0].ApiUrl)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Url, response.Counterparty.ChainMetadata.BlockExplorers[0].Url)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Family, response.Counterparty.ChainMetadata.BlockExplorers[0].Family)
+}
+
+func (s *HyperlaneTestSuite) TestListTransfer() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/hyperlane/transfer")
+
+	transfers := []storage.HLTransfer{
+		testTransfer,
+		{
+			Id:        2,
+			Height:    1001,
+			Time:      testTime,
+			MailboxId: 1,
+			Mailbox:   &testMailbox,
+			AddressId: 1,
+			Address: &storage.Address{
+				Address: testAddress,
+			},
+			RelayerId: 1,
+			Relayer: &storage.Address{
+				Address: testAddress,
+			},
+			TokenId:             1,
+			Token:               &testHyperlaneToken,
+			TxId:                1,
+			Tx:                  &testTransaction,
+			Counterparty:        1,
+			CounterpartyAddress: testsuite.RandomText(20),
+			Nonce:               12,
+			Version:             1,
+			Body:                testsuite.RandomBytes(32),
+			Metadata:            testsuite.RandomBytes(32),
+			Amount:              decimal.RequireFromString("102030"),
+			Denom:               currency.Utia,
+			Type:                types.HLTransferTypeReceive,
+		},
+	}
+
+	s.chainStore.EXPECT().
+		Set(testChainStore).
+		Times(1)
+
+	s.chainStore.EXPECT().
+		Get(gomock.Any()).
+		Return(testChainMetadata, true).
+		Times(len(transfers))
+
+	s.transfer.EXPECT().
+		List(gomock.Any(), gomock.Any()).
+		Return(transfers, nil).
+		Times(1)
+
+	s.chainStore.Set(testChainStore)
+	s.Require().NoError(s.handler.ListTransfers(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var items []responses.HyperlaneTransfer
+	err := json.NewDecoder(rec.Body).Decode(&items)
+	s.Require().NoError(err)
+	s.Require().Len(items, 2)
+
+	response := items[0]
+	s.Require().EqualValues(testTransfer.Id, response.Id)
+	s.Require().EqualValues(testTransfer.Height, response.Height)
+	s.Require().EqualValues(testTransfer.Time, response.Time)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.Mailbox.Mailbox), response.Mailbox)
+	s.Require().EqualValues(testTransfer.Type.String(), response.Type)
+	s.Require().EqualValues(testTransfer.Denom, response.Denom)
+	s.Require().EqualValues(testTransfer.Counterparty, response.Counterparty.Domain)
+	s.Require().EqualValues(testTransfer.CounterpartyAddress, response.Counterparty.Hash)
+	s.Require().EqualValues(testTransfer.Version, response.Version)
+	s.Require().EqualValues(testTransfer.Nonce, response.Nonce)
+	s.Require().EqualValues(testTransfer.Amount.String(), response.Amount)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.Token.TokenId), response.TokenId)
 	s.Require().EqualValues(strings.ToLower(testTxHash), response.TxHash)
 	s.Require().NotNil(response.Address)
 	s.Require().Equal(testAddress, response.Address.Hash)
@@ -366,46 +559,17 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 
 func (s *HyperlaneTestSuite) TestListTransferWithoutChainStore() {
 	s.chainStore = nil
-	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.address, nil)
+	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.txs, s.address, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/transfer")
 
-	transfer := storage.HLTransfer{
-		Id:        1,
-		Height:    1000,
-		Time:      testTime,
-		MailboxId: 1,
-		Mailbox:   &testMailbox,
-		AddressId: 1,
-		Address: &storage.Address{
-			Address: testAddress,
-		},
-		RelayerId: 1,
-		Relayer: &storage.Address{
-			Address: testAddress,
-		},
-		TokenId:             1,
-		Token:               &testHyperlaneToken,
-		TxId:                1,
-		Tx:                  &testTx,
-		Counterparty:        123,
-		CounterpartyAddress: testsuite.RandomText(20),
-		Nonce:               12,
-		Version:             1,
-		Body:                testsuite.RandomBytes(32),
-		Metadata:            testsuite.RandomBytes(32),
-		Amount:              decimal.RequireFromString("125678"),
-		Denom:               currency.Utia,
-		Type:                types.HLTransferTypeReceive,
-	}
-
 	s.transfer.EXPECT().
 		List(gomock.Any(), gomock.Any()).
 		Return([]storage.HLTransfer{
-			transfer,
+			testTransfer,
 		}, nil).
 		Times(1)
 
@@ -418,18 +582,18 @@ func (s *HyperlaneTestSuite) TestListTransferWithoutChainStore() {
 	s.Require().Len(items, 1)
 
 	response := items[0]
-	s.Require().EqualValues(transfer.Id, response.Id)
-	s.Require().EqualValues(transfer.Height, response.Height)
-	s.Require().EqualValues(transfer.Time, response.Time)
-	s.Require().EqualValues(hex.EncodeToString(transfer.Mailbox.Mailbox), response.Mailbox)
-	s.Require().EqualValues(transfer.Type.String(), response.Type)
-	s.Require().EqualValues(transfer.Denom, response.Denom)
-	s.Require().EqualValues(transfer.Counterparty, response.Counterparty.Domain)
-	s.Require().EqualValues(transfer.CounterpartyAddress, response.Counterparty.Hash)
-	s.Require().EqualValues(transfer.Version, response.Version)
-	s.Require().EqualValues(transfer.Nonce, response.Nonce)
-	s.Require().EqualValues(transfer.Amount.String(), response.Amount)
-	s.Require().EqualValues(hex.EncodeToString(transfer.Token.TokenId), response.TokenId)
+	s.Require().EqualValues(testTransfer.Id, response.Id)
+	s.Require().EqualValues(testTransfer.Height, response.Height)
+	s.Require().EqualValues(testTransfer.Time, response.Time)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.Mailbox.Mailbox), response.Mailbox)
+	s.Require().EqualValues(testTransfer.Type.String(), response.Type)
+	s.Require().EqualValues(testTransfer.Denom, response.Denom)
+	s.Require().EqualValues(testTransfer.Counterparty, response.Counterparty.Domain)
+	s.Require().EqualValues(testTransfer.CounterpartyAddress, response.Counterparty.Hash)
+	s.Require().EqualValues(testTransfer.Version, response.Version)
+	s.Require().EqualValues(testTransfer.Nonce, response.Nonce)
+	s.Require().EqualValues(testTransfer.Amount.String(), response.Amount)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.Token.TokenId), response.TokenId)
 	s.Require().EqualValues(strings.ToLower(testTxHash), response.TxHash)
 	s.Require().NotNil(response.Address)
 	s.Require().Equal(testAddress, response.Address.Hash)

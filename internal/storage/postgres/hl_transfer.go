@@ -5,7 +5,6 @@ package postgres
 
 import (
 	"context"
-
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/uptrace/bun"
@@ -23,7 +22,7 @@ func NewHLTransfer(db *database.Bun) *HLTransfer {
 	}
 }
 
-func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTransfers) (transfers []storage.HLTransfer, err error) {
+func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTransferFilters) (transfers []storage.HLTransfer, err error) {
 	query := t.DB().NewSelect().
 		Model((*storage.HLTransfer)(nil))
 
@@ -45,6 +44,9 @@ func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTran
 	}
 	if filters.TokenId > 0 {
 		query = query.Where("token_id = ?", filters.TokenId)
+	}
+	if filters.TxId > 0 {
+		query = query.Where("tx_id = ?", filters.TxId)
 	}
 	if filters.Domain > 0 {
 		query = query.Where("counterparty = ?", filters.Domain)
@@ -71,5 +73,31 @@ func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTran
 		Join("left join address as relayer on relayer.id = transfer.relayer_id").
 		Join("left join celestial as relayer_celestials on relayer_celestials.address_id = transfer.relayer_id and relayer_celestials.status = 'PRIMARY'").
 		Scan(ctx, &transfers)
+	return
+}
+
+func (t *HLTransfer) ById(ctx context.Context, id uint64) (transfer storage.HLTransfer, err error) {
+	query := t.DB().NewSelect().
+		Model((*storage.HLTransfer)(nil)).
+		Where("id = ?", id)
+
+	err = t.DB().NewSelect().
+		TableExpr("(?) as transfer", query).
+		ColumnExpr("transfer.*").
+		ColumnExpr("hl_mailbox.mailbox as mailbox__mailbox").
+		ColumnExpr("hl_token.token_id as token__token_id").
+		ColumnExpr("tx.hash as tx__hash").
+		ColumnExpr("address.address as address__address").
+		ColumnExpr("celestial.id as address__celestials__id, celestial.image_url as address__celestials__image_url").
+		ColumnExpr("relayer.address as relayer__address").
+		ColumnExpr("relayer_celestials.id as relayer__celestials__id, relayer_celestials.image_url as relayer__celestials__image_url").
+		Join("left join hl_mailbox on mailbox_id = hl_mailbox.id").
+		Join("left join hl_token on transfer.token_id = hl_token.id").
+		Join("left join tx on transfer.tx_id = tx.id").
+		Join("left join address on address.id = transfer.address_id").
+		Join("left join celestial on celestial.address_id = transfer.address_id and celestial.status = 'PRIMARY'").
+		Join("left join address as relayer on relayer.id = transfer.relayer_id").
+		Join("left join celestial as relayer_celestials on relayer_celestials.address_id = transfer.relayer_id and relayer_celestials.status = 'PRIMARY'").
+		Scan(ctx, &transfer)
 	return
 }

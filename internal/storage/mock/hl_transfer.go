@@ -24,6 +24,7 @@ import (
 type MockIHLTransfer struct {
 	ctrl     *gomock.Controller
 	recorder *MockIHLTransferMockRecorder
+	isgomock struct{}
 }
 
 // MockIHLTransferMockRecorder is the mock recorder for MockIHLTransfer.
@@ -43,8 +44,47 @@ func (m *MockIHLTransfer) EXPECT() *MockIHLTransferMockRecorder {
 	return m.recorder
 }
 
+// ById mocks base method.
+func (m *MockIHLTransfer) ById(ctx context.Context, id uint64) (storage.HLTransfer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ById", ctx, id)
+	ret0, _ := ret[0].(storage.HLTransfer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ById indicates an expected call of ById.
+func (mr *MockIHLTransferMockRecorder) ById(ctx, id any) *MockIHLTransferByIdCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ById", reflect.TypeOf((*MockIHLTransfer)(nil).ById), ctx, id)
+	return &MockIHLTransferByIdCall{Call: call}
+}
+
+// MockIHLTransferByIdCall wrap *gomock.Call
+type MockIHLTransferByIdCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIHLTransferByIdCall) Return(arg0 storage.HLTransfer, arg1 error) *MockIHLTransferByIdCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIHLTransferByIdCall) Do(f func(context.Context, uint64) (storage.HLTransfer, error)) *MockIHLTransferByIdCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIHLTransferByIdCall) DoAndReturn(f func(context.Context, uint64) (storage.HLTransfer, error)) *MockIHLTransferByIdCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // List mocks base method.
-func (m *MockIHLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTransfers) ([]storage.HLTransfer, error) {
+func (m *MockIHLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTransferFilters) ([]storage.HLTransfer, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, filters)
 	ret0, _ := ret[0].([]storage.HLTransfer)
@@ -71,13 +111,13 @@ func (c *MockIHLTransferListCall) Return(arg0 []storage.HLTransfer, arg1 error) 
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIHLTransferListCall) Do(f func(context.Context, storage.ListHyperlaneTransfers) ([]storage.HLTransfer, error)) *MockIHLTransferListCall {
+func (c *MockIHLTransferListCall) Do(f func(context.Context, storage.ListHyperlaneTransferFilters) ([]storage.HLTransfer, error)) *MockIHLTransferListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIHLTransferListCall) DoAndReturn(f func(context.Context, storage.ListHyperlaneTransfers) ([]storage.HLTransfer, error)) *MockIHLTransferListCall {
+func (c *MockIHLTransferListCall) DoAndReturn(f func(context.Context, storage.ListHyperlaneTransferFilters) ([]storage.HLTransfer, error)) *MockIHLTransferListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
