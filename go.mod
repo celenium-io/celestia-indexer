@@ -65,6 +65,7 @@ require (
 	github.com/opus-domini/fast-shot v1.1.4
 	google.golang.org/genproto/googleapis/api v0.0.0-20250414145226-207652e42e2e
 	google.golang.org/grpc v1.73.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -320,7 +321,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250422160041-2d3770c4ea7f // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/v3 v3.5.2 // indirect
 	mellium.im/sasl v0.3.2 // indirect
 	nhooyr.io/websocket v1.8.17 // indirect

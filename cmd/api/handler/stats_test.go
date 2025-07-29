@@ -657,6 +657,7 @@ func (s *StatsTestSuite) TestIbcSummaryStats() {
 		Return(storage.BusiestChannel{
 			ChannelId:      "channel-111",
 			TransfersCount: 1000,
+			ChainId:        "chain-1",
 		}, nil)
 
 	s.Require().NoError(s.handler.IbcSummary(c))
@@ -672,5 +673,6 @@ func (s *StatsTestSuite) TestIbcSummaryStats() {
 	s.Require().EqualValues(currency.Utia, response.LargestTransfer.Denom)
 
 	s.Require().EqualValues("channel-111", response.BusiestChannel.ChannelId)
+	s.Require().EqualValues("chain-1", response.BusiestChannel.ChainId)
 	s.Require().EqualValues(1000, response.BusiestChannel.TransfersCount)
 }
