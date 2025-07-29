@@ -33,6 +33,7 @@ type ChainStats struct {
 type BusiestChannel struct {
 	ChannelId      string `bun:"channel_id"`
 	TransfersCount int64  `bun:"count"`
+	ChainId        string `bun:"chain_id"`
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed

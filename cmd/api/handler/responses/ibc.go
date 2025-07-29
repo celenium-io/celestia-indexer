@@ -17,7 +17,7 @@ type IbcClient struct {
 	CreatedAt             time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"created_at"              swaggertype:"string"`
 	UpdatedAt             time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"updated_at"              swaggertype:"string"`
 	Height                pkgTypes.Level `example:"100"                                                              format:"integer"   json:"height"                  swaggertype:"integer"`
-	ChainId               string         `example:"osmosis-1"                                                        format:"binary"    json:"chain_id"                swaggertype:"string"`
+	ChainId               string         `example:"osmosis-1"                                                        format:"string"    json:"chain_id"                swaggertype:"string"`
 	TxHash                string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"                 swaggertype:"string"`
 	LatestRevisionHeight  uint64         `example:"100"                                                              format:"integer"   json:"latest_revision_height"  swaggertype:"integer"`
 	LatestRevisionNumber  uint64         `example:"100"                                                              format:"integer"   json:"latest_revision_number"  swaggertype:"integer"`
@@ -247,6 +247,7 @@ func NewIbcChainStats(stats storage.ChainStats) IbcChainStats {
 type BusiestChannel struct {
 	ChannelId      string `example:"channel-1" format:"string"  json:"channel_id"      swaggertype:"string"`
 	TransfersCount int64  `example:"100"       format:"integer" json:"transfers_count" swaggertype:"integer"`
+	ChainId        string `example:"osmosis-1" format:"string"  json:"chain_id"        swaggertype:"string"`
 }
 
 type IbcSummaryStats struct {
@@ -260,6 +261,7 @@ func NewIbcSummaryStats(transfer storage.IbcTransfer, channel storage.BusiestCha
 		BusiestChannel: BusiestChannel{
 			ChannelId:      channel.ChannelId,
 			TransfersCount: channel.TransfersCount,
+			ChainId:        channel.ChainId,
 		},
 	}
 }

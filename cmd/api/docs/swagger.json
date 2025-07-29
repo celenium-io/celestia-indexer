@@ -655,7 +655,10 @@
                             "MsgCreateMerkleRootMultisigIsm",
                             "MsgCreateNoopIsm",
                             "MsgAnnounceValidator",
-                            "MsgCreateRoutingIsm"
+                            "MsgCreateRoutingIsm",
+                            "MsgSetRoutingIsmDomain",
+                            "MsgRemoveRoutingIsmDomain",
+                            "MsgUpdateRoutingIsmOwner"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -992,7 +995,10 @@
                             "MsgCreateMerkleRootMultisigIsm",
                             "MsgCreateNoopIsm",
                             "MsgAnnounceValidator",
-                            "MsgCreateRoutingIsm"
+                            "MsgCreateRoutingIsm",
+                            "MsgSetRoutingIsmDomain",
+                            "MsgRemoveRoutingIsmDomain",
+                            "MsgUpdateRoutingIsmOwner"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1925,7 +1931,10 @@
                             "MsgCreateMerkleRootMultisigIsm",
                             "MsgCreateNoopIsm",
                             "MsgAnnounceValidator",
-                            "MsgCreateRoutingIsm"
+                            "MsgCreateRoutingIsm",
+                            "MsgSetRoutingIsmDomain",
+                            "MsgRemoveRoutingIsmDomain",
+                            "MsgUpdateRoutingIsmOwner"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -2034,7 +2043,10 @@
                             "MsgCreateMerkleRootMultisigIsm",
                             "MsgCreateNoopIsm",
                             "MsgAnnounceValidator",
-                            "MsgCreateRoutingIsm"
+                            "MsgCreateRoutingIsm",
+                            "MsgSetRoutingIsmDomain",
+                            "MsgRemoveRoutingIsmDomain",
+                            "MsgUpdateRoutingIsmOwner"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types which should be excluded from list",
@@ -4857,6 +4869,42 @@
                 }
             }
         },
+        "/stats/ibc/summary": {
+            "get": {
+                "description": "Get stats for ibc the largest transfer and busiest channel per day",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get stats for ibc the largest transfer and busiest channel per day",
+                "operationId": "stats-ibc-summary",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.IbcSummaryStats"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/messages_count_24h": {
             "get": {
                 "description": "Get messages distribution for the last 24 hours",
@@ -5636,7 +5684,10 @@
                             "MsgCreateMerkleRootMultisigIsm",
                             "MsgCreateNoopIsm",
                             "MsgAnnounceValidator",
-                            "MsgCreateRoutingIsm"
+                            "MsgCreateRoutingIsm",
+                            "MsgSetRoutingIsmDomain",
+                            "MsgRemoveRoutingIsmDomain",
+                            "MsgUpdateRoutingIsmOwner"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -5745,7 +5796,10 @@
                             "MsgCreateMerkleRootMultisigIsm",
                             "MsgCreateNoopIsm",
                             "MsgAnnounceValidator",
-                            "MsgCreateRoutingIsm"
+                            "MsgCreateRoutingIsm",
+                            "MsgSetRoutingIsmDomain",
+                            "MsgRemoveRoutingIsmDomain",
+                            "MsgUpdateRoutingIsmOwner"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list which should be excluded",
@@ -6935,6 +6989,31 @@
                 }
             }
         },
+        "responses.BlockExplorer": {
+            "type": "object",
+            "properties": {
+                "api_url": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://api.scan.url.io"
+                },
+                "family": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "etherscan"
+                },
+                "name": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Block explorer"
+                },
+                "url": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://scan.url.io"
+                }
+            }
+        },
         "responses.BlockStats": {
             "type": "object",
             "properties": {
@@ -7000,6 +7079,26 @@
                 }
             }
         },
+        "responses.BusiestChannel": {
+            "type": "object",
+            "properties": {
+                "chain_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "osmosis-1"
+                },
+                "channel_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "channel-1"
+                },
+                "transfers_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                }
+            }
+        },
         "responses.Celestial": {
             "description": "Linked celestial id",
             "type": "object",
@@ -7019,6 +7118,24 @@
                 "status": {
                     "type": "string",
                     "example": "VERIFIED"
+                }
+            }
+        },
+        "responses.ChainMetadata": {
+            "type": "object",
+            "properties": {
+                "block_explorers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responses.BlockExplorer"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "example": "name"
+                },
+                "native_token": {
+                    "$ref": "#/definitions/responses.NativeToken"
                 }
             }
         },
@@ -7352,6 +7469,9 @@
         "responses.HyperlaneCounterparty": {
             "type": "object",
             "properties": {
+                "chain_metadata": {
+                    "$ref": "#/definitions/responses.ChainMetadata"
+                },
                 "domain": {
                     "type": "integer",
                     "format": "int64",
@@ -7689,7 +7809,7 @@
             "properties": {
                 "chain_id": {
                     "type": "string",
-                    "format": "binary",
+                    "format": "string",
                     "example": "osmosis-1"
                 },
                 "connection_count": {
@@ -7832,6 +7952,17 @@
                     "type": "string",
                     "format": "string",
                     "example": "connection-1"
+                }
+            }
+        },
+        "responses.IbcSummaryStats": {
+            "type": "object",
+            "properties": {
+                "busiest_channel": {
+                    "$ref": "#/definitions/responses.BusiestChannel"
+                },
+                "largest_transfer": {
+                    "$ref": "#/definitions/responses.IbcTransfer"
                 }
             }
         },
@@ -8249,6 +8380,26 @@
                 "version": {
                     "type": "integer",
                     "format": "byte"
+                }
+            }
+        },
+        "responses.NativeToken": {
+            "type": "object",
+            "properties": {
+                "decimals": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 18
+                },
+                "name": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Ether"
+                },
+                "symbol": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "ETH"
                 }
             }
         },
@@ -9803,7 +9954,11 @@
                 "hyperlane.core.post_dispatch.v1.EventCreateIgp",
                 "hyperlane.core.post_dispatch.v1.EventSetIgp",
                 "hyperlane.core.post_dispatch.v1.EventSetDestinationGasConfig",
-                "hyperlane.core.post_dispatch.v1.EventClaimIgp"
+                "hyperlane.core.post_dispatch.v1.EventClaimIgp",
+                "hyperlane.core.interchain_security.v1.EventCreateNoopIsm",
+                "hyperlane.core.interchain_security.v1.EventSetRoutingIsmDomain",
+                "hyperlane.core.interchain_security.v1.EventSetRoutingIsm",
+                "hyperlane.core.interchain_security.v1.EventCreateRoutingIsm"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -9884,7 +10039,11 @@
                 "EventTypeHyperlanecorepostDispatchv1EventCreateIgp",
                 "EventTypeHyperlanecorepostDispatchv1EventSetIgp",
                 "EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig",
-                "EventTypeHyperlanecorepostDispatchv1EventClaimIgp"
+                "EventTypeHyperlanecorepostDispatchv1EventClaimIgp",
+                "EventTypeHyperlanecoreinterchainSecurityv1EventCreateNoopIsm",
+                "EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain",
+                "EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm",
+                "EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm"
             ]
         },
         "types.MsgAddressType": {
@@ -10051,7 +10210,10 @@
                 "MsgCreateMerkleRootMultisigIsm",
                 "MsgCreateNoopIsm",
                 "MsgAnnounceValidator",
-                "MsgCreateRoutingIsm"
+                "MsgCreateRoutingIsm",
+                "MsgSetRoutingIsmDomain",
+                "MsgRemoveRoutingIsmDomain",
+                "MsgUpdateRoutingIsmOwner"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -10154,7 +10316,10 @@
                 "MsgCreateMerkleRootMultisigIsm",
                 "MsgCreateNoopIsm",
                 "MsgAnnounceValidator",
-                "MsgCreateRoutingIsm"
+                "MsgCreateRoutingIsm",
+                "MsgSetRoutingIsmDomain",
+                "MsgRemoveRoutingIsmDomain",
+                "MsgUpdateRoutingIsmOwner"
             ]
         }
     },

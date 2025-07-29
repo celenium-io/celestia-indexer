@@ -57,7 +57,7 @@ func (s *StorageTestSuite) TestIbcChannelList() {
 
 	for _, fltrs := range []storage.ListChannelFilters{
 		{
-			Limit:  10,
+			Limit:  1,
 			Offset: 0,
 			Sort:   sdk.SortOrderDesc,
 		}, {
@@ -130,8 +130,8 @@ func (s *StorageTestSuite) TestIbcChannelStatsByChainId() {
 	s.Require().Len(stats, 1)
 
 	s.Require().Equal("osmosis-1", stats[0].Chain)
-	s.Require().Equal("100", stats[0].Sent.String())
-	s.Require().Equal("100", stats[0].Received.String())
+	s.Require().Equal("200", stats[0].Sent.String())
+	s.Require().Equal("200", stats[0].Received.String())
 }
 
 func (s *StorageTestSuite) TestIbcBusiestChannel1m() {
@@ -142,5 +142,6 @@ func (s *StorageTestSuite) TestIbcBusiestChannel1m() {
 	s.Require().NoError(err)
 
 	s.Require().Equal("channel-2", channel.ChannelId)
+	s.Require().Equal("osmosis-1", channel.ChainId)
 	s.Require().Equal(int64(2), channel.TransfersCount)
 }
