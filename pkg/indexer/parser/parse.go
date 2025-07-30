@@ -52,7 +52,7 @@ func (p *Module) parse(b types.BlockData) error {
 			Height:        b.Height,
 			Time:          b.Block.Time,
 			TxCount:       int64(len(b.Block.Txs)),
-			EventsCount:   int64(len(b.BeginBlockEvents) + len(b.FinBlockEvents(b.AppVersion))),
+			EventsCount:   int64(len(b.FinalizeBlockEvents)),
 			BlobsSize:     0,
 			Fee:           decimal.Zero,
 			SupplyChange:  decimal.Zero,
@@ -75,16 +75,10 @@ func (p *Module) parse(b types.BlockData) error {
 
 	decodeCtx.Block.BlockSignatures = p.parseBlockSignatures(b.Block.LastCommit)
 
-	decodeCtx.Block.Events, err = parseEvents(decodeCtx, b, b.BeginBlockEvents)
-	if err != nil {
-		return errors.Wrap(err, "parsing begin block events")
-	}
-
-	endEvents, err := parseEvents(decodeCtx, b, b.FinBlockEvents(b.AppVersion))
+	decodeCtx.Block.Events, err = parseEvents(decodeCtx, b, b.FinalizeBlockEvents)
 	if err != nil {
 		return errors.Wrap(err, "parsing begin end events")
 	}
-	decodeCtx.Block.Events = append(decodeCtx.Block.Events, endEvents...)
 
 	p.Log.Info().
 		Uint64("height", uint64(decodeCtx.Block.Height)).

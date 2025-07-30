@@ -130,10 +130,9 @@ func getBlock() types.BlockData {
 			},
 		},
 		ResultBlockResults: types.ResultBlockResults{
-			Height:           100,
-			TxsResults:       nil,
-			BeginBlockEvents: nil,
-			EndBlockEvents:   nil,
+			Height:              100,
+			TxsResults:          nil,
+			FinalizeBlockEvents: nil,
 		},
 	}
 }
