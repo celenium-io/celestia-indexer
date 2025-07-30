@@ -361,6 +361,7 @@ func (req *listHyperlaneTransferRequest) ToFilters(ctx context.Context, address 
 //	@Param			token	query	string	false	"Token hexademical identity"
 //	@Param			type    query	string	false	"Comma-separated string of transfer type"	Enums(send, receive)
 //	@Param			domain	query	integer	false	"Domain of counterparty chain"				mininum(1)
+//	@Param			hash	query	string	false	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
 //	@Produce		json
 //	@Success		200	{array}	responses.HyperlaneTransfer
 //	@Success		204
@@ -374,6 +375,9 @@ func (handler *HyperlaneHandler) ListTransfers(c echo.Context) error {
 	}
 	filters, err := req.ToFilters(c.Request().Context(), handler.address, handler.mailbox, handler.tokens, handler.txs)
 	if err != nil {
+		if handler.txs.IsNoRows(err) {
+			return returnArray(c, []any{})
+		}
 		return badRequestError(c, err)
 	}
 
