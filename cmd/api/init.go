@@ -477,7 +477,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		proposal.GET("/:id/votes", proposalHandler.Votes)
 	}
 
-	ibcHandler := handler.NewIbcHandler(db.IbcClients, db.IbcConnections, db.IbcChannels, db.IbcTransfers, db.Address)
+	ibcHandler := handler.NewIbcHandler(db.IbcClients, db.IbcConnections, db.IbcChannels, db.IbcTransfers, db.Address, db.Tx)
 	ibc := v1.Group("/ibc")
 	{
 		ibcClient := ibc.Group("/client")
@@ -499,10 +499,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		ibcTransfer := ibc.Group("/transfer")
 		{
 			ibcTransfer.GET("", ibcHandler.ListTransfers)
+			ibcTransfer.GET("/:id", ibcHandler.GetIbcTransfer)
 		}
 	}
 
-	hyperlaneHandler := handler.NewHyperlaneHandler(db.HLMailbox, db.HLToken, db.HLTransfer, db.Address, chainStore)
+	hyperlaneHandler := handler.NewHyperlaneHandler(db.HLMailbox, db.HLToken, db.HLTransfer, db.Tx, db.Address, chainStore)
 	hyperlane := v1.Group("/hyperlane")
 	{
 		hlMailbox := hyperlane.Group("/mailbox")
@@ -515,7 +516,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			hlToken.GET("", hyperlaneHandler.ListTokens)
 			hlToken.GET("/:id", hyperlaneHandler.GetToken)
 		}
-		hyperlane.GET("/transfer", hyperlaneHandler.ListTransfers)
+		hyperlaneTransfer := hyperlane.Group("/transfer")
+		{
+			hyperlaneTransfer.GET("", hyperlaneHandler.ListTransfers)
+			hyperlaneTransfer.GET("/:id", hyperlaneHandler.GetTransfer)
+		}
 	}
 
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{

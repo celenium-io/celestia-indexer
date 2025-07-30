@@ -14,13 +14,14 @@ import (
 	"github.com/uptrace/bun"
 )
 
-type ListHyperlaneTransfers struct {
+type ListHyperlaneTransferFilters struct {
 	Limit     int
 	Offset    int
 	Sort      sdk.SortOrder
 	MailboxId uint64
 	AddressId uint64
 	TokenId   uint64
+	TxId      uint64
 	RelayerId uint64
 	Type      []types.HLTransferType
 	Domain    uint64
@@ -28,7 +29,8 @@ type ListHyperlaneTransfers struct {
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IHLTransfer interface {
-	List(ctx context.Context, filters ListHyperlaneTransfers) ([]HLTransfer, error)
+	ById(ctx context.Context, id uint64) (HLTransfer, error)
+	List(ctx context.Context, filters ListHyperlaneTransferFilters) ([]HLTransfer, error)
 }
 
 type HLTransfer struct {

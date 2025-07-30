@@ -5,6 +5,7 @@ package handler
 
 import (
 	"context"
+	"encoding/hex"
 	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
@@ -19,6 +20,7 @@ type IbcHandler struct {
 	channels  storage.IIbcChannel
 	transfers storage.IIbcTransfer
 	address   storage.IAddress
+	txs       storage.ITx
 }
 
 func NewIbcHandler(
@@ -27,6 +29,7 @@ func NewIbcHandler(
 	channels storage.IIbcChannel,
 	transfers storage.IIbcTransfer,
 	address storage.IAddress,
+	txs storage.ITx,
 ) *IbcHandler {
 	return &IbcHandler{
 		clients:   clients,
@@ -34,6 +37,7 @@ func NewIbcHandler(
 		channels:  channels,
 		transfers: transfers,
 		address:   address,
+		txs:       txs,
 	}
 }
 
@@ -329,6 +333,7 @@ type getIbcTransfersRequest struct {
 	Receiver  string `query:"receiver"   validate:"omitempty,address"`
 	Sender    string `query:"sender"     validate:"omitempty,address"`
 	Address   string `query:"address"    validate:"omitempty,address"`
+	Hash      string `query:"hash"       validate:"omitempty,hexadecimal,len=64"`
 }
 
 func (req *getIbcTransfersRequest) SetDefault() {
@@ -408,6 +413,17 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 		}
 		fltrs.ConnectionIds = conns
 	}
+	if req.Hash != "" {
+		hash, err := hex.DecodeString(req.Hash)
+		if err != nil {
+			return handleError(c, err, handler.address)
+		}
+		transaction, err := handler.txs.ByHash(c.Request().Context(), hash)
+		if err != nil {
+			return handleError(c, err, handler.address)
+		}
+		fltrs.TxId = &transaction.Id
+	}
 
 	transfers, err := handler.transfers.List(c.Request().Context(), fltrs)
 	if err != nil {
@@ -419,4 +435,31 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 		response[i] = responses.NewIbcTransfer(transfers[i])
 	}
 	return returnArray(c, response)
+}
+
+// GetIbcTransfer godoc
+//
+//	@Summary		Get transfer by id
+//	@Description	Get transfer by id
+//	@Tags			ibc
+//	@ID				get-ibc-transfer
+//	@Param			id	path	integer	true	"Internal identity"	mininum(1)
+//	@Produce		json
+//	@Success		200	{object}	responses.IbcTransfer
+//	@Success		204
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/ibc/transfer/{id} [get]
+func (handler *IbcHandler) GetIbcTransfer(c echo.Context) error {
+	req, err := bindAndValidate[getById](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	transfer, err := handler.transfers.ById(c.Request().Context(), req.Id)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewIbcTransfer(transfer))
 }

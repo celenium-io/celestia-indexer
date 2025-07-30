@@ -99,6 +99,7 @@ type IbcTestSuite struct {
 	conns     *mock.MockIIbcConnection
 	channels  *mock.MockIIbcChannel
 	transfers *mock.MockIIbcTransfer
+	txs       *mock.MockITx
 	handler   *IbcHandler
 	ctrl      *gomock.Controller
 }
@@ -112,8 +113,9 @@ func (s *IbcTestSuite) SetupSuite() {
 	s.conns = mock.NewMockIIbcConnection(s.ctrl)
 	s.channels = mock.NewMockIIbcChannel(s.ctrl)
 	s.transfers = mock.NewMockIIbcTransfer(s.ctrl)
+	s.txs = mock.NewMockITx(s.ctrl)
 	s.address = mock.NewMockIAddress(s.ctrl)
-	s.handler = NewIbcHandler(s.clients, s.conns, s.channels, s.transfers, s.address)
+	s.handler = NewIbcHandler(s.clients, s.conns, s.channels, s.transfers, s.address, s.txs)
 }
 
 // TearDownSuite -
@@ -512,4 +514,135 @@ func (s *IbcTestSuite) TestListTransfersByChainIdUnknownChain() {
 	err := json.NewDecoder(rec.Body).Decode(&transfers)
 	s.Require().NoError(err)
 	s.Require().Len(transfers, 0)
+}
+
+func (s *IbcTestSuite) TestGetTransfer() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/ibc/transfer/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	s.transfers.EXPECT().
+		ById(gomock.Any(), uint64(1)).
+		Return(storage.IbcTransfer{
+			Id:              1,
+			Time:            testTime,
+			Height:          1000,
+			Timeout:         &testTime,
+			ChannelId:       "channel-1",
+			ConnectionId:    "connection-1",
+			Amount:          decimal.RequireFromString("101"),
+			Denom:           currency.Utia,
+			Memo:            "memo",
+			ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
+			Sender: &storage.Address{
+				Hash:    testHashAddress,
+				Address: testAddress,
+			},
+			Sequence: 123456,
+			Tx:       &testTx,
+			Connection: &storage.IbcConnection{
+				Client: &storage.IbcClient{
+					ChainId: "chain-id",
+				},
+			},
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.GetIbcTransfer(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response responses.IbcTransfer
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(1, response.Id)
+	s.Require().EqualValues(1000, response.Height)
+	s.Require().EqualValues(testTime, response.Time)
+	s.Require().NotNil(response.Timeout)
+	s.Require().EqualValues(testTime, *response.Timeout)
+	s.Require().EqualValues(0, response.TimeoutHeight)
+	s.Require().EqualValues("101", response.Amount)
+	s.Require().EqualValues("utia", response.Denom)
+	s.Require().EqualValues("channel-1", response.ChannelId)
+	s.Require().EqualValues("connection-1", response.ConnectionId)
+	s.Require().EqualValues("memo", response.Memo)
+	s.Require().EqualValues(strings.ToLower(testTxHash), response.TxHash)
+	s.Require().NotNil(response.Receiver)
+	s.Require().EqualValues("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2", response.Receiver.Hash)
+	s.Require().NotNil(response.Sender)
+	s.Require().EqualValues(testAddress, response.Sender.Hash)
+	s.Require().Equal("chain-id", response.ChainId)
+}
+
+func (s *IbcTestSuite) TestListTransferWithHash() {
+	q := make(url.Values)
+	q.Add("hash", testTxHash)
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/ibc/transfer")
+
+	s.txs.EXPECT().
+		ByHash(gomock.Any(), testTxHashBytes).
+		Return(testTx, nil)
+
+	s.transfers.EXPECT().
+		List(gomock.Any(), gomock.Any()).
+		Return([]storage.IbcTransfer{
+			{
+				Id:              1,
+				Time:            testTime,
+				Height:          1000,
+				Timeout:         &testTime,
+				ChannelId:       "channel-1",
+				ConnectionId:    "connection-1",
+				Amount:          decimal.RequireFromString("101"),
+				Denom:           currency.Utia,
+				Memo:            "memo",
+				ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
+				Sender: &storage.Address{
+					Hash:    testHashAddress,
+					Address: testAddress,
+				},
+				Sequence: 123456,
+				Tx:       &testTx,
+				Connection: &storage.IbcConnection{
+					Client: &storage.IbcClient{
+						ChainId: "chain-id",
+					},
+				},
+			},
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.ListTransfers(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var transfers []responses.IbcTransfer
+	err := json.NewDecoder(rec.Body).Decode(&transfers)
+	s.Require().NoError(err)
+	s.Require().Len(transfers, 1)
+
+	transfer := transfers[0]
+	s.Require().EqualValues(1, transfer.Id)
+	s.Require().EqualValues(1000, transfer.Height)
+	s.Require().EqualValues(testTime, transfer.Time)
+	s.Require().NotNil(transfer.Timeout)
+	s.Require().EqualValues(testTime, *transfer.Timeout)
+	s.Require().EqualValues(0, transfer.TimeoutHeight)
+	s.Require().EqualValues("101", transfer.Amount)
+	s.Require().EqualValues("utia", transfer.Denom)
+	s.Require().EqualValues("channel-1", transfer.ChannelId)
+	s.Require().EqualValues("connection-1", transfer.ConnectionId)
+	s.Require().EqualValues("memo", transfer.Memo)
+	s.Require().EqualValues(strings.ToLower(testTxHash), transfer.TxHash)
+	s.Require().NotNil(transfer.Receiver)
+	s.Require().EqualValues("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2", transfer.Receiver.Hash)
+	s.Require().NotNil(transfer.Sender)
+	s.Require().EqualValues(testAddress, transfer.Sender.Hash)
+	s.Require().Equal("chain-id", transfer.ChainId)
 }

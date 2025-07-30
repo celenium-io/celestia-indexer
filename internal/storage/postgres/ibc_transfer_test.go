@@ -43,6 +43,12 @@ func (s *StorageTestSuite) TestIbcTransferList() {
 			Sort:          sdk.SortOrderDesc,
 			ConnectionIds: []string{"connection-1"},
 		},
+		{
+			Limit:  1,
+			Offset: 0,
+			Sort:   sdk.SortOrderDesc,
+			TxId:   testsuite.Ptr(uint64(1)),
+		},
 	} {
 
 		transfers, err := s.storage.IbcTransfers.List(ctx, fltrs)
@@ -144,7 +150,7 @@ func (s *StorageTestSuite) TestIbcTransferSeries() {
 	}
 }
 
-func (s *StorageTestSuite) TestLargestTransfer24h() {
+func (s *StorageTestSuite) TestIbcLargestTransfer24h() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
@@ -161,4 +167,31 @@ func (s *StorageTestSuite) TestLargestTransfer24h() {
 	s.Require().EqualValues(321656, transfer.Sequence)
 	s.Require().NotNil(transfer.Tx)
 	s.Require().NotNil(transfer.Sender)
+}
+
+func (s *StorageTestSuite) TestIbcTransferById() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	transfer, err := s.storage.IbcTransfers.ById(ctx, 3)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(3, transfer.Id)
+	s.Require().EqualValues("channel-2", transfer.ChannelId)
+	s.Require().EqualValues("connection-2", transfer.ConnectionId)
+	s.Require().EqualValues("utia", transfer.Denom)
+	s.Require().EqualValues(1002, transfer.Height)
+	s.Require().EqualValues("12345678", transfer.Amount.String())
+	s.Require().EqualValues(321656, transfer.Sequence)
+
+	s.Require().NotNil(transfer.Tx)
+	s.Require().NotNil(transfer.Sender)
+}
+
+func (s *StorageTestSuite) TestIbcTransferByIdNotFound() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	_, err := s.storage.IbcTransfers.ById(ctx, 100000)
+	s.Require().Error(err)
 }

@@ -44,6 +44,45 @@ func (m *MockIIbcTransfer) EXPECT() *MockIIbcTransferMockRecorder {
 	return m.recorder
 }
 
+// ById mocks base method.
+func (m *MockIIbcTransfer) ById(ctx context.Context, id uint64) (storage.IbcTransfer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ById", ctx, id)
+	ret0, _ := ret[0].(storage.IbcTransfer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ById indicates an expected call of ById.
+func (mr *MockIIbcTransferMockRecorder) ById(ctx, id any) *MockIIbcTransferByIdCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ById", reflect.TypeOf((*MockIIbcTransfer)(nil).ById), ctx, id)
+	return &MockIIbcTransferByIdCall{Call: call}
+}
+
+// MockIIbcTransferByIdCall wrap *gomock.Call
+type MockIIbcTransferByIdCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIIbcTransferByIdCall) Return(arg0 storage.IbcTransfer, arg1 error) *MockIIbcTransferByIdCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIIbcTransferByIdCall) Do(f func(context.Context, uint64) (storage.IbcTransfer, error)) *MockIIbcTransferByIdCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIIbcTransferByIdCall) DoAndReturn(f func(context.Context, uint64) (storage.IbcTransfer, error)) *MockIIbcTransferByIdCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // LargestTransfer24h mocks base method.
 func (m *MockIIbcTransfer) LargestTransfer24h(ctx context.Context) (storage.IbcTransfer, error) {
 	m.ctrl.T.Helper()

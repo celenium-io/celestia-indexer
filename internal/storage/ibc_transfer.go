@@ -19,6 +19,7 @@ type ListIbcTransferFilters struct {
 	Sort          sdk.SortOrder
 	ReceiverId    *uint64
 	SenderId      *uint64
+	TxId          *uint64
 	AddressId     *uint64
 	ChannelId     string
 	ConnectionIds []string
@@ -26,6 +27,7 @@ type ListIbcTransferFilters struct {
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IIbcTransfer interface {
+	ById(ctx context.Context, id uint64) (IbcTransfer, error)
 	List(ctx context.Context, fltrs ListIbcTransferFilters) ([]IbcTransfer, error)
 	Series(ctx context.Context, channelId string, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
 	LargestTransfer24h(ctx context.Context) (IbcTransfer, error)
