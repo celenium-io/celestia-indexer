@@ -359,6 +359,7 @@ func (req *getIbcTransfersRequest) SetDefault() {
 //	@Param			receiver		query	string	false	"Receiver address"								minlength(47)	maxlength(47)
 //	@Param			sender			query	string	false	"Sender address"								minlength(47)	maxlength(47)
 //	@Param			address			query	string	false	"Address: receiver or sender"					minlength(47)	maxlength(47)
+//	@Param			hash	        query	string	false	"Transaction hash in hexadecimal"	            minlength(64)	maxlength(64)
 //	@Produce		json
 //	@Success		200	{array}	responses.IbcTransfer
 //	@Success		204
@@ -420,6 +421,9 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 		}
 		transaction, err := handler.txs.ByHash(c.Request().Context(), hash)
 		if err != nil {
+			if handler.txs.IsNoRows(err) {
+				return returnArray(c, []any{})
+			}
 			return handleError(c, err, handler.address)
 		}
 		fltrs.TxId = &transaction.Id
