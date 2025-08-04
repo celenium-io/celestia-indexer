@@ -435,8 +435,8 @@ func (handler *HyperlaneHandler) GetTransfer(c echo.Context) error {
 func (handler *HyperlaneHandler) ListDomains(c echo.Context) error {
 	data := handler.chainStore.All()
 	response := make([]*responses.ChainMetadata, 0, len(data))
-	for k, _ := range data {
-		response = append(response, responses.NewChainMetadata(data[k].DomainId, handler.chainStore))
+	for i := range data {
+		response = append(response, responses.NewChainMetadata(data[i].DomainId, handler.chainStore))
 	}
 	return returnArray(c, response)
 }
