@@ -20,16 +20,18 @@ type StatsHandler struct {
 	nsRepo      storage.INamespace
 	ibc         storage.IIbcTransfer
 	ibcChannels storage.IIbcChannel
+	hyperlane   storage.IHLTransfer
 	state       storage.IState
 }
 
-func NewStatsHandler(repo storage.IStats, nsRepo storage.INamespace, ibc storage.IIbcTransfer, ibcChannels storage.IIbcChannel, state storage.IState) StatsHandler {
+func NewStatsHandler(repo storage.IStats, nsRepo storage.INamespace, ibc storage.IIbcTransfer, ibcChannels storage.IIbcChannel, hyperlane storage.IHLTransfer, state storage.IState) StatsHandler {
 	return StatsHandler{
 		repo:        repo,
 		nsRepo:      nsRepo,
 		state:       state,
 		ibc:         ibc,
 		ibcChannels: ibcChannels,
+		hyperlane:   hyperlane,
 	}
 }
 
@@ -428,12 +430,12 @@ func (sh StatsHandler) IbcSeries(c echo.Context) error {
 	return returnArray(c, response)
 }
 
-type ibcByChainsRequest struct {
+type limitOffsetRequest struct {
 	Limit  int `query:"limit"  validate:"omitempty,min=1,max=100"`
 	Offset int `query:"offset" validate:"omitempty,min=0"`
 }
 
-func (req *ibcByChainsRequest) SetDefault() {
+func (req *limitOffsetRequest) SetDefault() {
 	if req.Limit <= 0 {
 		req.Limit = 10
 	}
@@ -453,7 +455,7 @@ func (req *ibcByChainsRequest) SetDefault() {
 //	@Failure		500	{object}	Error
 //	@Router			/stats/ibc/chains [get]
 func (sh StatsHandler) IbcByChains(c echo.Context) error {
-	req, err := bindAndValidate[ibcByChainsRequest](c)
+	req, err := bindAndValidate[limitOffsetRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
 	}
@@ -618,6 +620,90 @@ func (sh StatsHandler) SizeGroups(c echo.Context) error {
 	response := make([]responses.SizeGroup, len(items))
 	for i := range items {
 		response[i] = responses.NewSizeGroup(items[i])
+	}
+	return returnArray(c, response)
+}
+
+type hlSeriesRequest struct {
+	Id         uint64            `example:"1488"       param:"id"        swaggertype:"integer" validate:"required"`
+	Timeframe  storage.Timeframe `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day month"`
+	SeriesName string            `example:"size"       param:"name"      swaggertype:"string"  validate:"required,oneof=count amount"`
+	From       int64             `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To         int64             `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
+// HlSeries godoc
+//
+//	@Summary		Get histogram for hyperlane domains with precomputed stats
+//	@Description	Get histogram for hyperlane domains with precomputed stats by series name and timeframe
+//	@Tags			stats
+//	@ID				stats-hl-series
+//	@Param			id			path	integer	true	"Domain id"
+//	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
+//	@Param			name		path	string	true	"Series name"					Enums(count, amount)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.HistogramItem
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/stats/hyperlane/series/{id}/{name}/{timeframe} [get]
+func (sh StatsHandler) HlSeries(c echo.Context) error {
+	req, err := bindAndValidate[hlSeriesRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	histogram, err := sh.hyperlane.Series(
+		c.Request().Context(),
+		req.Id,
+		req.Timeframe,
+		req.SeriesName,
+		storage.NewSeriesRequest(req.From, req.To),
+	)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	response := make([]responses.HistogramItem, len(histogram))
+	for i := range histogram {
+		response[i] = responses.NewHistogramItem(histogram[i])
+	}
+	return returnArray(c, response)
+}
+
+// HlByDomain godoc
+//
+//	@Summary		Get stats for hyperlane transfers splitted by domain
+//	@Description	Get stats for hyperlane transfers splitted by domain
+//	@Tags			stats
+//	@ID				stats-hl-domains
+//	@Param			limit				query	integer			false	"Count of requested entities"	mininum(1)	maximum(100)
+//	@Param			offset				query	integer			false	"Offset"						mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.IbcChainStats
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/stats/ibc/chains [get]
+func (sh StatsHandler) HlByDomain(c echo.Context) error {
+	req, err := bindAndValidate[limitOffsetRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	stats, err := sh.hyperlane.StatsByDomain(
+		c.Request().Context(),
+		req.Limit,
+		req.Offset,
+	)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	response := make([]responses.HlDomainStats, len(stats))
+	for i := range stats {
+		response[i] = responses.NewHlDomainStats(stats[i])
 	}
 	return returnArray(c, response)
 }

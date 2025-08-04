@@ -121,3 +121,81 @@ func (c *MockIHLTransferListCall) DoAndReturn(f func(context.Context, storage.Li
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
+
+// Series mocks base method.
+func (m *MockIHLTransfer) Series(ctx context.Context, domainId uint64, timeframe storage.Timeframe, column string, req storage.SeriesRequest) ([]storage.HistogramItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Series", ctx, domainId, timeframe, column, req)
+	ret0, _ := ret[0].([]storage.HistogramItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Series indicates an expected call of Series.
+func (mr *MockIHLTransferMockRecorder) Series(ctx, domainId, timeframe, column, req any) *MockIHLTransferSeriesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Series", reflect.TypeOf((*MockIHLTransfer)(nil).Series), ctx, domainId, timeframe, column, req)
+	return &MockIHLTransferSeriesCall{Call: call}
+}
+
+// MockIHLTransferSeriesCall wrap *gomock.Call
+type MockIHLTransferSeriesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIHLTransferSeriesCall) Return(items []storage.HistogramItem, err error) *MockIHLTransferSeriesCall {
+	c.Call = c.Call.Return(items, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIHLTransferSeriesCall) Do(f func(context.Context, uint64, storage.Timeframe, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIHLTransferSeriesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIHLTransferSeriesCall) DoAndReturn(f func(context.Context, uint64, storage.Timeframe, string, storage.SeriesRequest) ([]storage.HistogramItem, error)) *MockIHLTransferSeriesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// StatsByDomain mocks base method.
+func (m *MockIHLTransfer) StatsByDomain(ctx context.Context, limit, offset int) ([]storage.DomainStats, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StatsByDomain", ctx, limit, offset)
+	ret0, _ := ret[0].([]storage.DomainStats)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StatsByDomain indicates an expected call of StatsByDomain.
+func (mr *MockIHLTransferMockRecorder) StatsByDomain(ctx, limit, offset any) *MockIHLTransferStatsByDomainCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StatsByDomain", reflect.TypeOf((*MockIHLTransfer)(nil).StatsByDomain), ctx, limit, offset)
+	return &MockIHLTransferStatsByDomainCall{Call: call}
+}
+
+// MockIHLTransferStatsByDomainCall wrap *gomock.Call
+type MockIHLTransferStatsByDomainCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIHLTransferStatsByDomainCall) Return(arg0 []storage.DomainStats, arg1 error) *MockIHLTransferStatsByDomainCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIHLTransferStatsByDomainCall) Do(f func(context.Context, int, int) ([]storage.DomainStats, error)) *MockIHLTransferStatsByDomainCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIHLTransferStatsByDomainCall) DoAndReturn(f func(context.Context, int, int) ([]storage.DomainStats, error)) *MockIHLTransferStatsByDomainCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}

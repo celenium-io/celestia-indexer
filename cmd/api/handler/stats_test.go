@@ -26,14 +26,15 @@ import (
 // StatsTestSuite -
 type StatsTestSuite struct {
 	suite.Suite
-	stats    *mock.MockIStats
-	ns       *mock.MockINamespace
-	state    *mock.MockIState
-	ibc      *mock.MockIIbcTransfer
-	channels *mock.MockIIbcChannel
-	echo     *echo.Echo
-	handler  StatsHandler
-	ctrl     *gomock.Controller
+	stats     *mock.MockIStats
+	ns        *mock.MockINamespace
+	state     *mock.MockIState
+	ibc       *mock.MockIIbcTransfer
+	hyperlane *mock.MockIHLTransfer
+	channels  *mock.MockIIbcChannel
+	echo      *echo.Echo
+	handler   StatsHandler
+	ctrl      *gomock.Controller
 }
 
 // SetupSuite -
@@ -45,8 +46,9 @@ func (s *StatsTestSuite) SetupSuite() {
 	s.ns = mock.NewMockINamespace(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
 	s.ibc = mock.NewMockIIbcTransfer(s.ctrl)
+	s.hyperlane = mock.NewMockIHLTransfer(s.ctrl)
 	s.channels = mock.NewMockIIbcChannel(s.ctrl)
-	s.handler = NewStatsHandler(s.stats, s.ns, s.ibc, s.channels, s.state)
+	s.handler = NewStatsHandler(s.stats, s.ns, s.ibc, s.channels, s.hyperlane, s.state)
 }
 
 // TearDownSuite -
@@ -675,4 +677,74 @@ func (s *StatsTestSuite) TestIbcSummaryStats() {
 	s.Require().EqualValues("channel-111", response.BusiestChannel.ChannelId)
 	s.Require().EqualValues("chain-1", response.BusiestChannel.ChainId)
 	s.Require().EqualValues(1000, response.BusiestChannel.TransfersCount)
+}
+
+func (s *StatsTestSuite) TestHlDomainStats() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/hyperlane/domains")
+
+	s.hyperlane.EXPECT().
+		StatsByDomain(gomock.Any(), 10, 0).
+		Return([]storage.DomainStats{
+			{
+				Domain:  123,
+				Amount:  decimal.RequireFromString("1010.101"),
+				TxCount: 1488,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.HlByDomain(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response []responses.HlDomainStats
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 1)
+
+	s.Require().EqualValues(123, response[0].Domain)
+	s.Require().EqualValues("1010.101", response[0].Amount)
+	s.Require().EqualValues(1488, response[0].TransfersCount)
+}
+
+func (s *StatsTestSuite) TestHlSeries() {
+	for _, name := range []string{
+		"count",
+		"amount",
+	} {
+
+		for _, tf := range []storage.Timeframe{
+			storage.TimeframeHour,
+			storage.TimeframeDay,
+			storage.TimeframeMonth,
+		} {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/v1/stats/hyperlane/series/:id/:name/:timeframe")
+			c.SetParamNames("id", "name", "timeframe")
+			c.SetParamValues("123", name, string(tf))
+
+			s.hyperlane.EXPECT().
+				Series(gomock.Any(), uint64(123), tf, name, storage.NewSeriesRequest(0, 0)).
+				Return([]storage.HistogramItem{
+					{
+						Value: "1111",
+						Time:  testTime,
+					},
+				}, nil)
+
+			s.Require().NoError(s.handler.HlSeries(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
+
+			var response []responses.HistogramItem
+			err := json.NewDecoder(rec.Body).Decode(&response)
+			s.Require().NoError(err)
+			s.Require().Len(response, 1)
+
+			item := response[0]
+			s.Require().Equal("1111", item.Value)
+		}
+	}
 }

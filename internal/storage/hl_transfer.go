@@ -27,10 +27,18 @@ type ListHyperlaneTransferFilters struct {
 	Domain    uint64
 }
 
+type DomainStats struct {
+	Domain  uint64          `bun:"domain_id"`
+	Amount  decimal.Decimal `bun:"amount"`
+	TxCount uint64          `bun:"tx_count"`
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IHLTransfer interface {
 	ById(ctx context.Context, id uint64) (HLTransfer, error)
 	List(ctx context.Context, filters ListHyperlaneTransferFilters) ([]HLTransfer, error)
+	Series(ctx context.Context, domainId uint64, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
+	StatsByDomain(ctx context.Context, limit, offset int) ([]DomainStats, error)
 }
 
 type HLTransfer struct {
