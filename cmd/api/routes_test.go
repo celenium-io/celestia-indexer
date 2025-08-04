@@ -123,6 +123,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/hyperlane/token/:id GET":                         {},
 		"/v1/hyperlane/transfer GET":                          {},
 		"/v1/hyperlane/transfer/:id GET":                      {},
+		"/v1/hyperlane/domains GET":                           {},
 	}
 
 	ctx, cancel := context.WithCancel(t.Context())

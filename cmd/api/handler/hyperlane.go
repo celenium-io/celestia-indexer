@@ -419,3 +419,24 @@ func (handler *HyperlaneHandler) GetTransfer(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, responses.NewHyperlaneTransfer(transfer, handler.chainStore))
 }
+
+// ListDomains godoc
+//
+//	@Summary		List hyperlane domains info
+//	@Description	List hyperlane domains info
+//	@Tags			hyperlane
+//	@ID				list-hyperlane-domains
+//	@Produce		json
+//	@Success		200	{array}	responses.ChainMetadata
+//	@Success		204
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/hyperlane/domains [get]
+func (handler *HyperlaneHandler) ListDomains(c echo.Context) error {
+	data := handler.chainStore.All()
+	response := make([]*responses.ChainMetadata, 0, len(data))
+	for k, _ := range data {
+		response = append(response, responses.NewChainMetadata(data[k].DomainId, handler.chainStore))
+	}
+	return returnArray(c, response)
+}

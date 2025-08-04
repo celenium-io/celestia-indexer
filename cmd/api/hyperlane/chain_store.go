@@ -56,6 +56,17 @@ func (cs *ChainStore) Set(metadata map[uint64]hyperlane.ChainMetadata) {
 	cs.mx.Unlock()
 }
 
+func (cs *ChainStore) All() map[uint64]hyperlane.ChainMetadata {
+	cs.mx.RLock()
+	defer cs.mx.RUnlock()
+
+	s := make(map[uint64]hyperlane.ChainMetadata, len(cs.data))
+	for k, v := range cs.data {
+		s[k] = v
+	}
+	return s
+}
+
 func (cs *ChainStore) sync(ctx context.Context) {
 	metadata, err := cs.api.ChainMetadata(ctx)
 	if err != nil {

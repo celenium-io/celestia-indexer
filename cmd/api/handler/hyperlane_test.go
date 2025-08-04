@@ -603,3 +603,46 @@ func (s *HyperlaneTestSuite) TestListTransferWithoutChainStore() {
 	s.Require().NotNil(response.Metadata)
 	s.Require().Nil(response.Counterparty.ChainMetadata)
 }
+
+func (s *HyperlaneTestSuite) TestListDomains() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/hyperlane/domains")
+
+	s.chainStore.EXPECT().
+		Set(testChainStore).
+		Times(1)
+
+	s.chainStore.EXPECT().
+		All().
+		Return(testChainStore).
+		Times(1)
+
+	s.chainStore.EXPECT().
+		Get(gomock.Any()).
+		Return(testChainMetadata, true).
+		Times(len(testChainStore))
+
+	s.chainStore.Set(testChainStore)
+	s.Require().NoError(s.handler.ListDomains(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var items []responses.ChainMetadata
+	err := json.NewDecoder(rec.Body).Decode(&items)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+
+	response := items[0]
+	s.Require().EqualValues(testChainMetadata.DisplayName, response.Name)
+	s.Require().NotNil(response.BlockExplorers)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Name, response.BlockExplorers[0].Name)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].ApiUrl, response.BlockExplorers[0].ApiUrl)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Family, response.BlockExplorers[0].Family)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Url, response.BlockExplorers[0].Url)
+	s.Require().NotNil(response.NativeToken)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Name, response.NativeToken.Name)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, response.NativeToken.Decimals)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Symbol, response.NativeToken.Symbol)
+
+}
