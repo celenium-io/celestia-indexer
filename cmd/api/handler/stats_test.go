@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
@@ -26,15 +27,16 @@ import (
 // StatsTestSuite -
 type StatsTestSuite struct {
 	suite.Suite
-	stats     *mock.MockIStats
-	ns        *mock.MockINamespace
-	state     *mock.MockIState
-	ibc       *mock.MockIIbcTransfer
-	hyperlane *mock.MockIHLTransfer
-	channels  *mock.MockIIbcChannel
-	echo      *echo.Echo
-	handler   StatsHandler
-	ctrl      *gomock.Controller
+	stats      *mock.MockIStats
+	ns         *mock.MockINamespace
+	state      *mock.MockIState
+	ibc        *mock.MockIIbcTransfer
+	hyperlane  *mock.MockIHLTransfer
+	channels   *mock.MockIIbcChannel
+	chainStore *hyperlane.MockIChainStore
+	echo       *echo.Echo
+	handler    StatsHandler
+	ctrl       *gomock.Controller
 }
 
 // SetupSuite -
@@ -48,7 +50,8 @@ func (s *StatsTestSuite) SetupSuite() {
 	s.ibc = mock.NewMockIIbcTransfer(s.ctrl)
 	s.hyperlane = mock.NewMockIHLTransfer(s.ctrl)
 	s.channels = mock.NewMockIIbcChannel(s.ctrl)
-	s.handler = NewStatsHandler(s.stats, s.ns, s.ibc, s.channels, s.hyperlane, s.state)
+	s.chainStore = hyperlane.NewMockIChainStore(s.ctrl)
+	s.handler = NewStatsHandler(s.stats, s.ns, s.ibc, s.channels, s.hyperlane, s.chainStore, s.state)
 }
 
 // TearDownSuite -
@@ -683,18 +686,34 @@ func (s *StatsTestSuite) TestHlDomainStats() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
-	c.SetPath("/v1/stats/hyperlane/domains")
+	c.SetPath("/v1/stats/hyperlane/chains")
+
+	s.chainStore.EXPECT().
+		Set(testChainStore).
+		Times(1)
+
+	s.chainStore.EXPECT().
+		All().
+		Return(testChainStore).
+		Times(1)
+
+	s.chainStore.EXPECT().
+		Get(gomock.Any()).
+		Return(testChainMetadata, true).
+		Times(len(testChainStore))
 
 	s.hyperlane.EXPECT().
 		StatsByDomain(gomock.Any(), 10, 0).
 		Return([]storage.DomainStats{
 			{
-				Domain:  123,
+				Domain:  1,
 				Amount:  decimal.RequireFromString("1010.101"),
 				TxCount: 1488,
 			},
 		}, nil)
 
+	s.chainStore.Set(testChainStore)
+	s.chainStore.All()
 	s.Require().NoError(s.handler.HlByDomain(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
@@ -703,9 +722,19 @@ func (s *StatsTestSuite) TestHlDomainStats() {
 	s.Require().NoError(err)
 	s.Require().Len(response, 1)
 
-	s.Require().EqualValues(123, response[0].Domain)
-	s.Require().EqualValues("1010.101", response[0].Amount)
-	s.Require().EqualValues(1488, response[0].TransfersCount)
+	result := response[0]
+	s.Require().EqualValues(1, result.Domain)
+	s.Require().EqualValues("1010.101", result.Amount)
+	s.Require().EqualValues(1488, result.TransfersCount)
+	s.Require().NotNil(result.ChainMetadata)
+	s.Require().EqualValues(testChainMetadata.DisplayName, result.ChainMetadata.Name)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, result.ChainMetadata.NativeToken.Decimals)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Name, result.ChainMetadata.NativeToken.Name)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Symbol, result.ChainMetadata.NativeToken.Symbol)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Name, result.ChainMetadata.BlockExplorers[0].Name)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].ApiUrl, result.ChainMetadata.BlockExplorers[0].ApiUrl)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Url, result.ChainMetadata.BlockExplorers[0].Url)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Family, result.ChainMetadata.BlockExplorers[0].Family)
 }
 
 func (s *StatsTestSuite) TestHlSeries() {
@@ -747,4 +776,38 @@ func (s *StatsTestSuite) TestHlSeries() {
 			s.Require().Equal("1111", item.Value)
 		}
 	}
+}
+
+func (s *StatsTestSuite) TestHlDomainStatsWithoutChainStore() {
+	s.chainStore = nil
+	s.handler = NewStatsHandler(s.stats, s.ns, s.ibc, s.channels, s.hyperlane, nil, s.state)
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/hyperlane/chains")
+
+	s.hyperlane.EXPECT().
+		StatsByDomain(gomock.Any(), 10, 0).
+		Return([]storage.DomainStats{
+			{
+				Domain:  1,
+				Amount:  decimal.RequireFromString("1010.101"),
+				TxCount: 1488,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.HlByDomain(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response []responses.HlDomainStats
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 1)
+
+	result := response[0]
+	s.Require().EqualValues(1, result.Domain)
+	s.Require().EqualValues("1010.101", result.Amount)
+	s.Require().EqualValues(1488, result.TransfersCount)
+	s.Require().Nil(result.ChainMetadata)
 }

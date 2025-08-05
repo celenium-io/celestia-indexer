@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
@@ -21,10 +22,19 @@ type StatsHandler struct {
 	ibc         storage.IIbcTransfer
 	ibcChannels storage.IIbcChannel
 	hyperlane   storage.IHLTransfer
+	chainStore  hyperlane.IChainStore
 	state       storage.IState
 }
 
-func NewStatsHandler(repo storage.IStats, nsRepo storage.INamespace, ibc storage.IIbcTransfer, ibcChannels storage.IIbcChannel, hyperlane storage.IHLTransfer, state storage.IState) StatsHandler {
+func NewStatsHandler(
+	repo storage.IStats,
+	nsRepo storage.INamespace,
+	ibc storage.IIbcTransfer,
+	ibcChannels storage.IIbcChannel,
+	hyperlane storage.IHLTransfer,
+	chainStore hyperlane.IChainStore,
+	state storage.IState,
+) StatsHandler {
 	return StatsHandler{
 		repo:        repo,
 		nsRepo:      nsRepo,
@@ -32,6 +42,7 @@ func NewStatsHandler(repo storage.IStats, nsRepo storage.INamespace, ibc storage
 		ibc:         ibc,
 		ibcChannels: ibcChannels,
 		hyperlane:   hyperlane,
+		chainStore:  chainStore,
 	}
 }
 
@@ -681,10 +692,10 @@ func (sh StatsHandler) HlSeries(c echo.Context) error {
 //	@Param			limit				query	integer			false	"Count of requested entities"	mininum(1)	maximum(100)
 //	@Param			offset				query	integer			false	"Offset"						mininum(1)
 //	@Produce		json
-//	@Success		200	{array}		responses.IbcChainStats
+//	@Success		200	{array}		responses.HlDomainStats
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
-//	@Router			/stats/ibc/chains [get]
+//	@Router			/stats/hyperlane/chains [get]
 func (sh StatsHandler) HlByDomain(c echo.Context) error {
 	req, err := bindAndValidate[limitOffsetRequest](c)
 	if err != nil {
@@ -703,7 +714,7 @@ func (sh StatsHandler) HlByDomain(c echo.Context) error {
 
 	response := make([]responses.HlDomainStats, len(stats))
 	for i := range stats {
-		response[i] = responses.NewHlDomainStats(stats[i])
+		response[i] = responses.NewHlDomainStats(stats[i], sh.chainStore)
 	}
 	return returnArray(c, response)
 }

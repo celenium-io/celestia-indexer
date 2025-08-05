@@ -244,20 +244,6 @@ func NewIbcChainStats(stats storage.ChainStats) IbcChainStats {
 	}
 }
 
-type HlDomainStats struct {
-	Domain         uint64 `example:"123456"    format:"integer" json:"domain_id"       swaggertype:"integer"`
-	Amount         string `example:"1234.5678" format:"string"  json:"amount"          swaggertype:"integer"`
-	TransfersCount uint64 `example:"123445"    format:"integer" json:"transfers_count" swaggertype:"integer"`
-}
-
-func NewHlDomainStats(stats storage.DomainStats) HlDomainStats {
-	return HlDomainStats{
-		Domain:         stats.Domain,
-		Amount:         stats.Amount.String(),
-		TransfersCount: stats.TxCount,
-	}
-}
-
 type BusiestChannel struct {
 	ChannelId      string `example:"channel-1" format:"string"  json:"channel_id"      swaggertype:"string"`
 	TransfersCount int64  `example:"100"       format:"integer" json:"transfers_count" swaggertype:"integer"`

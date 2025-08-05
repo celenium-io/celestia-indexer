@@ -422,7 +422,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.IbcTransfers, db.IbcChannels, db.HLTransfer, db.State)
+	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.IbcTransfers, db.IbcChannels, db.HLTransfer, chainStore, db.State)
 	stats := v1.Group("/stats")
 	{
 		stats.GET("/summary/:table/:function", statsHandler.Summary)
@@ -451,7 +451,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		hl := stats.Group("/hyperlane")
 		{
 			hl.GET("/series/:id/:name/:timeframe", statsHandler.HlSeries, statsMiddlewareCache)
-			hl.GET("/domains", statsHandler.HlByDomain, statsMiddlewareCache)
+			hl.GET("/chains", statsHandler.HlByDomain, statsMiddlewareCache)
 		}
 		series := stats.Group("/series")
 		{

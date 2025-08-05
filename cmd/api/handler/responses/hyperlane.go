@@ -204,3 +204,23 @@ func NewChainMetadata(domenId uint64, store hyperlane.IChainStore) *ChainMetadat
 
 	return nil
 }
+
+type HlDomainStats struct {
+	Domain         uint64         `example:"123456"                format:"integer" json:"domain_id"       swaggertype:"integer"`
+	Amount         string         `example:"1234.5678"             format:"string"  json:"amount"          swaggertype:"integer"`
+	TransfersCount uint64         `example:"123445"                format:"integer" json:"transfers_count" swaggertype:"integer"`
+	ChainMetadata  *ChainMetadata `json:"chain_metadata,omitempty"`
+}
+
+func NewHlDomainStats(stats storage.DomainStats, store hyperlane.IChainStore) HlDomainStats {
+	result := HlDomainStats{
+		Domain:         stats.Domain,
+		Amount:         stats.Amount.String(),
+		TransfersCount: stats.TxCount,
+	}
+	if store != nil {
+		result.ChainMetadata = NewChainMetadata(stats.Domain, store)
+	}
+
+	return result
+}

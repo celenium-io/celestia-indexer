@@ -37,7 +37,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/stats/staking/series/:id/:name/:timeframe GET":   {},
 		"/v1/stats/ibc/series/:id/:name/:timeframe GET":       {},
 		"/v1/stats/hyperlane/series/:id/:name/:timeframe GET": {},
-		"/v1/stats/hyperlane/domains GET":                     {},
+		"/v1/stats/hyperlane/chains GET":                      {},
 		"/v1/rollup/:id GET":                                  {},
 		"/v1/address/:hash GET":                               {},
 		"/v1/address/:hash/txs GET":                           {},
