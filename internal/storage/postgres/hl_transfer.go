@@ -5,8 +5,10 @@ package postgres
 
 import (
 	"context"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
+	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 )
 
@@ -99,5 +101,55 @@ func (t *HLTransfer) ById(ctx context.Context, id uint64) (transfer storage.HLTr
 		Join("left join address as relayer on relayer.id = transfer.relayer_id").
 		Join("left join celestial as relayer_celestials on relayer_celestials.address_id = transfer.relayer_id and relayer_celestials.status = 'PRIMARY'").
 		Scan(ctx, &transfer)
+	return
+}
+
+func (t *HLTransfer) Series(ctx context.Context, domainId uint64, timeframe storage.Timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
+	query := t.DB().NewSelect().
+		Order("time desc").
+		Where("counterparty = ?", domainId)
+
+	switch timeframe {
+	case storage.TimeframeHour:
+		query = query.Table(storage.ViewHlTransfersByHour)
+	case storage.TimeframeDay:
+		query = query.Table(storage.ViewHlTransfersByDay)
+	case storage.TimeframeMonth:
+		query = query.Table(storage.ViewHlTransfersByMonth)
+	default:
+		return nil, errors.Errorf("invalid timeframe: %s", timeframe)
+	}
+
+	switch column {
+	case "count":
+		query = query.ColumnExpr("count as value, time as bucket")
+	case "amount":
+		query = query.ColumnExpr("amount as value, time as bucket")
+	default:
+		return nil, errors.Errorf("invalid column: %s", column)
+	}
+
+	if !req.From.IsZero() {
+		query = query.Where("time >= ?", req.From)
+	}
+	if !req.To.IsZero() {
+		query = query.Where("time < ?", req.To)
+	}
+
+	err = query.Scan(ctx, &items)
+	return
+}
+
+func (t *HLTransfer) StatsByDomain(ctx context.Context, limit, offset int) (stats []storage.DomainStats, err error) {
+	query := t.DB().NewSelect().
+		Table(storage.ViewHlTransfersByMonth).
+		ColumnExpr("counterparty as domain_id, sum(count) as tx_count, sum(amount) as amount").
+		Group("domain_id").
+		Order("amount DESC").
+		Offset(offset)
+
+	query = limitScope(query, limit)
+
+	err = query.Scan(ctx, &stats)
 	return
 }

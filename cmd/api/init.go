@@ -422,7 +422,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.IbcTransfers, db.IbcChannels, db.State)
+	statsHandler := handler.NewStatsHandler(db.Stats, db.Namespace, db.IbcTransfers, db.IbcChannels, db.HLTransfer, chainStore, db.State)
 	stats := v1.Group("/stats")
 	{
 		stats.GET("/summary/:table/:function", statsHandler.Summary)
@@ -447,6 +447,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			ibc.GET("/series/:id/:name/:timeframe", statsHandler.IbcSeries, statsMiddlewareCache)
 			ibc.GET("/chains", statsHandler.IbcByChains, statsMiddlewareCache)
 			ibc.GET("/summary", statsHandler.IbcSummary, statsMiddlewareCache)
+		}
+		hl := stats.Group("/hyperlane")
+		{
+			hl.GET("/series/:id/:name/:timeframe", statsHandler.HlSeries, statsMiddlewareCache)
+			hl.GET("/chains", statsHandler.HlByDomain, statsMiddlewareCache)
 		}
 		series := stats.Group("/series")
 		{
@@ -521,6 +526,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			hyperlaneTransfer.GET("", hyperlaneHandler.ListTransfers)
 			hyperlaneTransfer.GET("/:id", hyperlaneHandler.GetTransfer)
 		}
+		hyperlane.GET("/domains", hyperlaneHandler.ListDomains)
 	}
 
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{

@@ -28,4 +28,7 @@ const (
 	ViewIbcTransfersByHour    = "ibc_transfers_by_hour"
 	ViewIbcTransfersByDay     = "ibc_transfers_by_day"
 	ViewIbcTransfersByMonth   = "ibc_transfers_by_month"
+	ViewHlTransfersByHour     = "hl_transfers_by_hour"
+	ViewHlTransfersByDay      = "hl_transfers_by_day"
+	ViewHlTransfersByMonth    = "hl_transfers_by_month"
 )

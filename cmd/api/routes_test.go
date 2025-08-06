@@ -36,6 +36,8 @@ func TestRoutes(t *testing.T) {
 		"/v1/search GET":                                      {},
 		"/v1/stats/staking/series/:id/:name/:timeframe GET":   {},
 		"/v1/stats/ibc/series/:id/:name/:timeframe GET":       {},
+		"/v1/stats/hyperlane/series/:id/:name/:timeframe GET": {},
+		"/v1/stats/hyperlane/chains GET":                      {},
 		"/v1/rollup/:id GET":                                  {},
 		"/v1/address/:hash GET":                               {},
 		"/v1/address/:hash/txs GET":                           {},
@@ -123,6 +125,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/hyperlane/token/:id GET":                         {},
 		"/v1/hyperlane/transfer GET":                          {},
 		"/v1/hyperlane/transfer/:id GET":                      {},
+		"/v1/hyperlane/domains GET":                           {},
 	}
 
 	ctx, cancel := context.WithCancel(t.Context())

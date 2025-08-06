@@ -17,4 +17,5 @@ type IChainStore interface {
 	Start(ctx context.Context)
 	Get(domainId uint64) (hyperlane.ChainMetadata, bool)
 	Set(metadata map[uint64]hyperlane.ChainMetadata)
+	All() map[uint64]hyperlane.ChainMetadata
 }

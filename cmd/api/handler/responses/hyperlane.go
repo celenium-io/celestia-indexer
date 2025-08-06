@@ -185,8 +185,8 @@ type NativeToken struct {
 	Symbol   string `example:"ETH"   format:"string" json:"symbol"   swaggertype:"string"`
 }
 
-func NewChainMetadata(domenId uint64, store hyperlane.IChainStore) *ChainMetadata {
-	if metadata, ok := store.Get(domenId); ok {
+func NewChainMetadata(domainId uint64, store hyperlane.IChainStore) *ChainMetadata {
+	if metadata, ok := store.Get(domainId); ok {
 		explorers := make([]BlockExplorer, len(metadata.BlockExplorers))
 		for i := range explorers {
 			explorers[i] = BlockExplorer(metadata.BlockExplorers[i])
@@ -203,4 +203,52 @@ func NewChainMetadata(domenId uint64, store hyperlane.IChainStore) *ChainMetadat
 	}
 
 	return nil
+}
+
+type DomainMetadata struct {
+	Domain         uint64          `example:"1488"                   json:"domain,omitempty" swaggertype:"int64"`
+	Name           string          `example:"name"                   json:"name,omitempty"   swaggertype:"string"`
+	BlockExplorers []BlockExplorer `json:"block_explorers,omitempty"`
+	NativeToken    NativeToken     `json:"native_token,omitempty"`
+}
+
+func NewDomainMetadata(domainId uint64, store hyperlane.IChainStore) *DomainMetadata {
+	if metadata, ok := store.Get(domainId); ok {
+		explorers := make([]BlockExplorer, len(metadata.BlockExplorers))
+		for i := range explorers {
+			explorers[i] = BlockExplorer(metadata.BlockExplorers[i])
+		}
+		return &DomainMetadata{
+			Domain:         domainId,
+			Name:           metadata.DisplayName,
+			BlockExplorers: explorers,
+			NativeToken: NativeToken{
+				Decimals: metadata.NativeToken.Decimals,
+				Name:     metadata.NativeToken.Name,
+				Symbol:   metadata.NativeToken.Symbol,
+			},
+		}
+	}
+
+	return nil
+}
+
+type HlDomainStats struct {
+	Domain         uint64         `example:"123456"                format:"integer" json:"domain_id"       swaggertype:"integer"`
+	Amount         string         `example:"1234.5678"             format:"string"  json:"amount"          swaggertype:"integer"`
+	TransfersCount uint64         `example:"123445"                format:"integer" json:"transfers_count" swaggertype:"integer"`
+	ChainMetadata  *ChainMetadata `json:"chain_metadata,omitempty"`
+}
+
+func NewHlDomainStats(stats storage.DomainStats, store hyperlane.IChainStore) HlDomainStats {
+	result := HlDomainStats{
+		Domain:         stats.Domain,
+		Amount:         stats.Amount.String(),
+		TransfersCount: stats.TxCount,
+	}
+	if store != nil {
+		result.ChainMetadata = NewChainMetadata(stats.Domain, store)
+	}
+
+	return result
 }

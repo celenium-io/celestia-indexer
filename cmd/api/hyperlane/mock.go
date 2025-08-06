@@ -44,6 +44,44 @@ func (m *MockIChainStore) EXPECT() *MockIChainStoreMockRecorder {
 	return m.recorder
 }
 
+// All mocks base method.
+func (m *MockIChainStore) All() map[uint64]hyperlane.ChainMetadata {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "All")
+	ret0, _ := ret[0].(map[uint64]hyperlane.ChainMetadata)
+	return ret0
+}
+
+// All indicates an expected call of All.
+func (mr *MockIChainStoreMockRecorder) All() *MockIChainStoreAllCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "All", reflect.TypeOf((*MockIChainStore)(nil).All))
+	return &MockIChainStoreAllCall{Call: call}
+}
+
+// MockIChainStoreAllCall wrap *gomock.Call
+type MockIChainStoreAllCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIChainStoreAllCall) Return(arg0 map[uint64]hyperlane.ChainMetadata) *MockIChainStoreAllCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIChainStoreAllCall) Do(f func() map[uint64]hyperlane.ChainMetadata) *MockIChainStoreAllCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIChainStoreAllCall) DoAndReturn(f func() map[uint64]hyperlane.ChainMetadata) *MockIChainStoreAllCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Close mocks base method.
 func (m *MockIChainStore) Close() error {
 	m.ctrl.T.Helper()

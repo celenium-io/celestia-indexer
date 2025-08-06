@@ -121,3 +121,87 @@ func (s *StorageTestSuite) TestHyperlaneTransferByIdNotFound() {
 	_, err := s.storage.HLTransfer.ById(ctx, 100000)
 	s.Require().Error(err)
 }
+
+func (s *StorageTestSuite) TestHlTransferSeries() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	type args struct {
+		tf     storage.Timeframe
+		column string
+		req    storage.SeriesRequest
+
+		wantCount int
+	}
+
+	for _, fltrs := range []args{
+		{
+			tf:        storage.TimeframeHour,
+			column:    "count",
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeDay,
+			column:    "count",
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeMonth,
+			column:    "count",
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeDay,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeMonth,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(1715942016, 0),
+			wantCount: 0,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(1652783616, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(0, 1715942016),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    "amount",
+			req:       storage.NewSeriesRequest(0, 1652783616),
+			wantCount: 0,
+		},
+	} {
+		series, err := s.storage.HLTransfer.Series(ctx, 1234, fltrs.tf, fltrs.column, fltrs.req)
+		s.Require().NoError(err)
+		s.Require().Len(series, fltrs.wantCount)
+	}
+}
+
+func (s *StorageTestSuite) TestStatsByDomain() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	stats, err := s.storage.HLTransfer.StatsByDomain(ctx, 10, 0)
+	s.Require().NoError(err)
+	s.Require().Len(stats, 1)
+
+	s.Require().Equal(uint64(1234), stats[0].Domain)
+	s.Require().Equal("1000", stats[0].Amount.String())
+	s.Require().Equal(uint64(1), stats[0].TxCount)
+}
