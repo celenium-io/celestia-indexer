@@ -628,12 +628,17 @@ func (s *HyperlaneTestSuite) TestListDomains() {
 	s.Require().NoError(s.handler.ListDomains(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var items []responses.ChainMetadata
+	var items map[uint64]responses.DomainMetadata
 	err := json.NewDecoder(rec.Body).Decode(&items)
 	s.Require().NoError(err)
 	s.Require().Len(items, 1)
 
-	response := items[0]
+	var response responses.DomainMetadata
+	for _, v := range items {
+		response = v
+		break
+	}
+	s.Require().EqualValues(testChainMetadata.DomainId, response.Domain)
 	s.Require().EqualValues(testChainMetadata.DisplayName, response.Name)
 	s.Require().NotNil(response.BlockExplorers)
 	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Name, response.BlockExplorers[0].Name)

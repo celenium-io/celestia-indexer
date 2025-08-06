@@ -142,7 +142,7 @@ func (t *HLTransfer) Series(ctx context.Context, domainId uint64, timeframe stor
 
 func (t *HLTransfer) StatsByDomain(ctx context.Context, limit, offset int) (stats []storage.DomainStats, err error) {
 	query := t.DB().NewSelect().
-		Table(storage.ViewHlTransfersByDay).
+		Table(storage.ViewHlTransfersByMonth).
 		ColumnExpr("counterparty as domain_id, sum(count) as tx_count, sum(amount) as amount").
 		Group("domain_id").
 		Order("amount DESC").

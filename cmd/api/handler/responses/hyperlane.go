@@ -185,13 +185,41 @@ type NativeToken struct {
 	Symbol   string `example:"ETH"   format:"string" json:"symbol"   swaggertype:"string"`
 }
 
-func NewChainMetadata(domenId uint64, store hyperlane.IChainStore) *ChainMetadata {
-	if metadata, ok := store.Get(domenId); ok {
+func NewChainMetadata(domainId uint64, store hyperlane.IChainStore) *ChainMetadata {
+	if metadata, ok := store.Get(domainId); ok {
 		explorers := make([]BlockExplorer, len(metadata.BlockExplorers))
 		for i := range explorers {
 			explorers[i] = BlockExplorer(metadata.BlockExplorers[i])
 		}
 		return &ChainMetadata{
+			Name:           metadata.DisplayName,
+			BlockExplorers: explorers,
+			NativeToken: NativeToken{
+				Decimals: metadata.NativeToken.Decimals,
+				Name:     metadata.NativeToken.Name,
+				Symbol:   metadata.NativeToken.Symbol,
+			},
+		}
+	}
+
+	return nil
+}
+
+type DomainMetadata struct {
+	Domain         uint64          `example:"1488"                   json:"domain,omitempty" swaggertype:"int64"`
+	Name           string          `example:"name"                   json:"name,omitempty"   swaggertype:"string"`
+	BlockExplorers []BlockExplorer `json:"block_explorers,omitempty"`
+	NativeToken    NativeToken     `json:"native_token,omitempty"`
+}
+
+func NewDomainMetadata(domainId uint64, store hyperlane.IChainStore) *DomainMetadata {
+	if metadata, ok := store.Get(domainId); ok {
+		explorers := make([]BlockExplorer, len(metadata.BlockExplorers))
+		for i := range explorers {
+			explorers[i] = BlockExplorer(metadata.BlockExplorers[i])
+		}
+		return &DomainMetadata{
+			Domain:         domainId,
 			Name:           metadata.DisplayName,
 			BlockExplorers: explorers,
 			NativeToken: NativeToken{
