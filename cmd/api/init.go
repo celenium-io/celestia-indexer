@@ -526,7 +526,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			hyperlaneTransfer.GET("", hyperlaneHandler.ListTransfers)
 			hyperlaneTransfer.GET("/:id", hyperlaneHandler.GetTransfer)
 		}
-		hyperlane.GET("/domains", hyperlaneHandler.ListDomains)
+		hyperlane.GET("/domains", hyperlaneHandler.ListDomains, defaultMiddlewareCache)
 	}
 
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
