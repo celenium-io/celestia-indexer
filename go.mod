@@ -10,7 +10,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.59
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.76.1
 	github.com/aws/smithy-go v1.22.2
-	github.com/celenium-io/celestial-module v0.0.7
+	github.com/celenium-io/celestial-module v0.0.8
 	github.com/celestiaorg/celestia-app/v4 v4.0.2-mocha
 	github.com/celestiaorg/go-square/v2 v2.3.0
 	github.com/celestiaorg/rsmt2d v0.14.0
