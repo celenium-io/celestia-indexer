@@ -683,6 +683,51 @@ func (sh StatsHandler) HlSeries(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+type hlTotalSeriesRequest struct {
+	Timeframe  storage.Timeframe `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day month"`
+	SeriesName string            `example:"size"       param:"name"      swaggertype:"string"  validate:"required,oneof=count amount"`
+	From       int64             `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
+	To         int64             `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
+// HlTotalSeries godoc
+//
+//	@Summary		Get histogram for aggregated hyperlane domains with precomputed stats
+//	@Description	Get histogram for aggregated hyperlane domains with precomputed stats by series name and timeframe
+//	@Tags			stats
+//	@ID				stats-hl-total-series
+//	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
+//	@Param			name		path	string	true	"Series name"					Enums(count, amount)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.HistogramItem
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/stats/hyperlane/chains/{name}/{timeframe} [get]
+func (sh StatsHandler) HlTotalSeries(c echo.Context) error {
+	req, err := bindAndValidate[hlTotalSeriesRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	histogram, err := sh.hyperlane.TotalSeries(
+		c.Request().Context(),
+		req.Timeframe,
+		req.SeriesName,
+		storage.NewSeriesRequest(req.From, req.To),
+	)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	response := make([]responses.HistogramItem, len(histogram))
+	for i := range histogram {
+		response[i] = responses.NewHistogramItem(histogram[i])
+	}
+	return returnArray(c, response)
+}
+
 // HlByDomain godoc
 //
 //	@Summary		Get stats for hyperlane transfers splitted by domain

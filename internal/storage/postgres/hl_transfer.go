@@ -140,6 +140,42 @@ func (t *HLTransfer) Series(ctx context.Context, domainId uint64, timeframe stor
 	return
 }
 
+func (t *HLTransfer) TotalSeries(ctx context.Context, timeframe storage.Timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
+	query := t.DB().NewSelect().
+		Group("time").
+		Order("time desc")
+
+	switch timeframe {
+	case storage.TimeframeHour:
+		query = query.Table(storage.ViewHlTransfersByHour)
+	case storage.TimeframeDay:
+		query = query.Table(storage.ViewHlTransfersByDay)
+	case storage.TimeframeMonth:
+		query = query.Table(storage.ViewHlTransfersByMonth)
+	default:
+		return nil, errors.Errorf("invalid timeframe: %s", timeframe)
+	}
+
+	switch column {
+	case "count":
+		query = query.ColumnExpr("sum(count) as value, time as bucket")
+	case "amount":
+		query = query.ColumnExpr("sum(amount) as value, time as bucket")
+	default:
+		return nil, errors.Errorf("invalid column: %s", column)
+	}
+
+	if !req.From.IsZero() {
+		query = query.Where("time >= ?", req.From)
+	}
+	if !req.To.IsZero() {
+		query = query.Where("time < ?", req.To)
+	}
+
+	err = query.Scan(ctx, &items)
+	return
+}
+
 func (t *HLTransfer) StatsByDomain(ctx context.Context, limit, offset int) (stats []storage.DomainStats, err error) {
 	query := t.DB().NewSelect().
 		Table(storage.ViewHlTransfersByMonth).

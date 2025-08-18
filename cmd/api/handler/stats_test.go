@@ -811,3 +811,44 @@ func (s *StatsTestSuite) TestHlDomainStatsWithoutChainStore() {
 	s.Require().EqualValues(1488, result.TransfersCount)
 	s.Require().Nil(result.ChainMetadata)
 }
+
+func (s *StatsTestSuite) TestHlTotalSeries() {
+	for _, name := range []string{
+		"count",
+		"amount",
+	} {
+
+		for _, tf := range []storage.Timeframe{
+			storage.TimeframeHour,
+			storage.TimeframeDay,
+			storage.TimeframeMonth,
+		} {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/v1/stats/hyperlane/chains/:name/:timeframe")
+			c.SetParamNames("name", "timeframe")
+			c.SetParamValues(name, string(tf))
+
+			s.hyperlane.EXPECT().
+				TotalSeries(gomock.Any(), tf, name, storage.NewSeriesRequest(0, 0)).
+				Return([]storage.HistogramItem{
+					{
+						Value: "1234",
+						Time:  testTime,
+					},
+				}, nil)
+
+			s.Require().NoError(s.handler.HlTotalSeries(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
+
+			var response []responses.HistogramItem
+			err := json.NewDecoder(rec.Body).Decode(&response)
+			s.Require().NoError(err)
+			s.Require().Len(response, 1)
+
+			item := response[0]
+			s.Require().Equal("1234", item.Value)
+		}
+	}
+}
