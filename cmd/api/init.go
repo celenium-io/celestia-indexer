@@ -451,6 +451,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		hl := stats.Group("/hyperlane")
 		{
 			hl.GET("/series/:id/:name/:timeframe", statsHandler.HlSeries, statsMiddlewareCache)
+			hl.GET("/chains/:name/:timeframe", statsHandler.HlTotalSeries, statsMiddlewareCache)
 			hl.GET("/chains", statsHandler.HlByDomain, statsMiddlewareCache)
 		}
 		series := stats.Group("/series")
