@@ -165,6 +165,8 @@ const (
 	SeriesRewards       = "rewards"
 	SeriesCommissions   = "commissions"
 	SeriesFlow          = "flow"
+	SeriesCount         = "count"
+	SeriesAmount        = "amount"
 )
 
 type SizeGroup struct {

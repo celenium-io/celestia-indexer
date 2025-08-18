@@ -121,9 +121,9 @@ func (t *HLTransfer) Series(ctx context.Context, domainId uint64, timeframe stor
 	}
 
 	switch column {
-	case "count":
+	case storage.SeriesCount:
 		query = query.ColumnExpr("count as value, time as bucket")
-	case "amount":
+	case storage.SeriesAmount:
 		query = query.ColumnExpr("amount as value, time as bucket")
 	default:
 		return nil, errors.Errorf("invalid column: %s", column)
@@ -157,9 +157,9 @@ func (t *HLTransfer) TotalSeries(ctx context.Context, timeframe storage.Timefram
 	}
 
 	switch column {
-	case "count":
+	case storage.SeriesCount:
 		query = query.ColumnExpr("sum(count) as value, time as bucket")
-	case "amount":
+	case storage.SeriesAmount:
 		query = query.ColumnExpr("sum(amount) as value, time as bucket")
 	default:
 		return nil, errors.Errorf("invalid column: %s", column)
