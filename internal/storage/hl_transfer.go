@@ -38,6 +38,7 @@ type IHLTransfer interface {
 	ById(ctx context.Context, id uint64) (HLTransfer, error)
 	List(ctx context.Context, filters ListHyperlaneTransferFilters) ([]HLTransfer, error)
 	Series(ctx context.Context, domainId uint64, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
+	TotalSeries(ctx context.Context, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
 	StatsByDomain(ctx context.Context, limit, offset int) ([]DomainStats, error)
 }
 

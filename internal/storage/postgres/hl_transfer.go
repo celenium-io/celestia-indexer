@@ -121,10 +121,46 @@ func (t *HLTransfer) Series(ctx context.Context, domainId uint64, timeframe stor
 	}
 
 	switch column {
-	case "count":
+	case storage.SeriesCount:
 		query = query.ColumnExpr("count as value, time as bucket")
-	case "amount":
+	case storage.SeriesAmount:
 		query = query.ColumnExpr("amount as value, time as bucket")
+	default:
+		return nil, errors.Errorf("invalid column: %s", column)
+	}
+
+	if !req.From.IsZero() {
+		query = query.Where("time >= ?", req.From)
+	}
+	if !req.To.IsZero() {
+		query = query.Where("time < ?", req.To)
+	}
+
+	err = query.Scan(ctx, &items)
+	return
+}
+
+func (t *HLTransfer) TotalSeries(ctx context.Context, timeframe storage.Timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
+	query := t.DB().NewSelect().
+		Group("time").
+		Order("time desc")
+
+	switch timeframe {
+	case storage.TimeframeHour:
+		query = query.Table(storage.ViewHlTransfersByHour)
+	case storage.TimeframeDay:
+		query = query.Table(storage.ViewHlTransfersByDay)
+	case storage.TimeframeMonth:
+		query = query.Table(storage.ViewHlTransfersByMonth)
+	default:
+		return nil, errors.Errorf("invalid timeframe: %s", timeframe)
+	}
+
+	switch column {
+	case storage.SeriesCount:
+		query = query.ColumnExpr("sum(count) as value, time as bucket")
+	case storage.SeriesAmount:
+		query = query.ColumnExpr("sum(amount) as value, time as bucket")
 	default:
 		return nil, errors.Errorf("invalid column: %s", column)
 	}

@@ -46,7 +46,7 @@ func (s *StorageTestSuite) TestHyperlaneTransferList() {
 		{
 			Limit:  1,
 			Offset: 0,
-			Sort:   sdk.SortOrderDesc,
+			Sort:   sdk.SortOrderAsc,
 			Type:   types.HLTransferTypeValues(),
 		},
 		{
@@ -137,52 +137,52 @@ func (s *StorageTestSuite) TestHlTransferSeries() {
 	for _, fltrs := range []args{
 		{
 			tf:        storage.TimeframeHour,
-			column:    "count",
+			column:    storage.SeriesCount,
 			req:       storage.NewSeriesRequest(0, 0),
 			wantCount: 1,
 		}, {
 			tf:        storage.TimeframeDay,
-			column:    "count",
+			column:    storage.SeriesCount,
 			req:       storage.NewSeriesRequest(0, 0),
 			wantCount: 1,
 		}, {
 			tf:        storage.TimeframeMonth,
-			column:    "count",
+			column:    storage.SeriesCount,
 			req:       storage.NewSeriesRequest(0, 0),
 			wantCount: 1,
 		}, {
 			tf:        storage.TimeframeHour,
-			column:    "amount",
+			column:    storage.SeriesAmount,
 			req:       storage.NewSeriesRequest(0, 0),
 			wantCount: 1,
 		}, {
 			tf:        storage.TimeframeDay,
-			column:    "amount",
+			column:    storage.SeriesAmount,
 			req:       storage.NewSeriesRequest(0, 0),
 			wantCount: 1,
 		}, {
 			tf:        storage.TimeframeMonth,
-			column:    "amount",
+			column:    storage.SeriesAmount,
 			req:       storage.NewSeriesRequest(0, 0),
 			wantCount: 1,
 		}, {
 			tf:        storage.TimeframeHour,
-			column:    "amount",
+			column:    storage.SeriesAmount,
 			req:       storage.NewSeriesRequest(1715942016, 0),
 			wantCount: 0,
 		}, {
 			tf:        storage.TimeframeHour,
-			column:    "amount",
+			column:    storage.SeriesAmount,
 			req:       storage.NewSeriesRequest(1652783616, 0),
 			wantCount: 1,
 		}, {
 			tf:        storage.TimeframeHour,
-			column:    "amount",
+			column:    storage.SeriesAmount,
 			req:       storage.NewSeriesRequest(0, 1715942016),
 			wantCount: 1,
 		}, {
 			tf:        storage.TimeframeHour,
-			column:    "amount",
+			column:    storage.SeriesAmount,
 			req:       storage.NewSeriesRequest(0, 1652783616),
 			wantCount: 0,
 		},
@@ -199,9 +199,80 @@ func (s *StorageTestSuite) TestStatsByDomain() {
 
 	stats, err := s.storage.HLTransfer.StatsByDomain(ctx, 10, 0)
 	s.Require().NoError(err)
-	s.Require().Len(stats, 1)
+	s.Require().Len(stats, 2)
 
-	s.Require().Equal(uint64(1234), stats[0].Domain)
-	s.Require().Equal("1000", stats[0].Amount.String())
+	s.Require().Equal(uint64(12345), stats[0].Domain)
+	s.Require().Equal("2000", stats[0].Amount.String())
 	s.Require().Equal(uint64(1), stats[0].TxCount)
+}
+
+func (s *StorageTestSuite) TestHlTotalSeries() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	type args struct {
+		tf     storage.Timeframe
+		column string
+		req    storage.SeriesRequest
+
+		wantCount int
+	}
+
+	for _, fltrs := range []args{
+		{
+			tf:        storage.TimeframeHour,
+			column:    storage.SeriesCount,
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 2,
+		}, {
+			tf:        storage.TimeframeDay,
+			column:    storage.SeriesCount,
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeMonth,
+			column:    storage.SeriesCount,
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    storage.SeriesAmount,
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 2,
+		}, {
+			tf:        storage.TimeframeDay,
+			column:    storage.SeriesAmount,
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeMonth,
+			column:    storage.SeriesAmount,
+			req:       storage.NewSeriesRequest(0, 0),
+			wantCount: 1,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    storage.SeriesAmount,
+			req:       storage.NewSeriesRequest(1715942016, 0),
+			wantCount: 0,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    storage.SeriesAmount,
+			req:       storage.NewSeriesRequest(1652783616, 0),
+			wantCount: 2,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    storage.SeriesAmount,
+			req:       storage.NewSeriesRequest(0, 1715942016),
+			wantCount: 2,
+		}, {
+			tf:        storage.TimeframeHour,
+			column:    storage.SeriesAmount,
+			req:       storage.NewSeriesRequest(0, 1652783616),
+			wantCount: 0,
+		},
+	} {
+		series, err := s.storage.HLTransfer.TotalSeries(ctx, fltrs.tf, fltrs.column, fltrs.req)
+		s.Require().NoError(err)
+		s.Require().Len(series, fltrs.wantCount)
+	}
 }
