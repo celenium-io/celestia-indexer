@@ -4,6 +4,8 @@
 package parser
 
 import (
+	"encoding/hex"
+
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -13,6 +15,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/parser/events"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 )
 
@@ -99,7 +102,11 @@ func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txR
 	for i := range d.Messages {
 		dm, err := decode.Message(ctx, d.Messages[i], i, t.Status)
 		if err != nil {
-			return errors.Wrapf(err, "while parsing tx=%v on index=%d", t.Hash, t.Position)
+			if !txRes.IsFailed() {
+				return errors.Wrapf(err, "while parsing tx=%v on index=%d", hex.EncodeToString(t.Hash), t.Position)
+			} else {
+				log.Warn().Str("hash", hex.EncodeToString(t.Hash)).Int64("position", t.Position).Err(err).Msg("parsing tx")
+			}
 		}
 
 		processBlob(dm.Msg.BlobLogs, d, t)
