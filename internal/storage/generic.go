@@ -55,6 +55,8 @@ var Models = []any{
 	&HLMailbox{},
 	&HLToken{},
 	&HLTransfer{},
+	&SignalVersion{},
+	&Upgrade{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -118,6 +120,8 @@ type Transaction interface {
 	RetentionCompletedUnbondings(ctx context.Context, blockTime time.Time) error
 	RetentionCompletedRedelegations(ctx context.Context, blockTime time.Time) error
 	Jail(ctx context.Context, validators ...*Validator) error
+	SaveSignals(ctx context.Context, signals ...*SignalVersion) error
+	SaveUpgrades(ctx context.Context, signals ...*Upgrade) error
 
 	RollbackBlock(ctx context.Context, height types.Level) error
 	RollbackBlockStats(ctx context.Context, height types.Level) (stats BlockStats, err error)
@@ -171,12 +175,24 @@ type Transaction interface {
 	IbcConnection(ctx context.Context, id string) (IbcConnection, error)
 	HyperlaneMailbox(ctx context.Context, internalId uint64) (HLMailbox, error)
 	HyperlaneToken(ctx context.Context, id []byte) (HLToken, error)
+	SignalVersions(ctx context.Context) ([]Signal, error)
 }
 
 const (
 	ChannelHead  = "head"
 	ChannelBlock = "block"
 )
+
+type Signal struct {
+	Id          uint64          `bun:"id"`
+	Height      int64           `bun:"height"`
+	ValidatorId uint64          `bun:"validator_id"`
+	Time        time.Time       `bun:"time"`
+	VotingPower decimal.Decimal `bun:"voting_power"`
+	Version     uint64          `bun:"version"`
+	MsgId       uint64          `bun:"msg_id"`
+	TxId        uint64          `bun:"tx_id"`
+}
 
 type SearchResult struct {
 	Id    uint64 `bun:"id"`
