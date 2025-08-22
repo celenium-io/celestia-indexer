@@ -80,6 +80,8 @@ type Message struct {
 	HLMailbox      *HLMailbox        `bun:"-"` // internal field
 	HLTransfer     *HLTransfer       `bun:"-"` // internal field
 	HLToken        *HLToken          `bun:"-"` // internal field
+	SignalVersion  *SignalVersion    `bun:"-"` // internal field
+	Upgrade        *Upgrade          `bun:"-"` // internal field
 }
 
 // TableName -
