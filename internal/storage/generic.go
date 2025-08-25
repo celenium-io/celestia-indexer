@@ -185,13 +185,8 @@ const (
 
 type Signal struct {
 	Id          uint64          `bun:"id"`
-	Height      int64           `bun:"height"`
-	ValidatorId uint64          `bun:"validator_id"`
-	Time        time.Time       `bun:"time"`
 	VotingPower decimal.Decimal `bun:"voting_power"`
 	Version     uint64          `bun:"version"`
-	MsgId       uint64          `bun:"msg_id"`
-	TxId        uint64          `bun:"tx_id"`
 }
 
 type SearchResult struct {

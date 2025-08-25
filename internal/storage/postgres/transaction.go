@@ -1373,8 +1373,8 @@ func (tx Transaction) HyperlaneToken(ctx context.Context, id []byte) (token mode
 }
 
 func (tx Transaction) SignalVersions(ctx context.Context) (signals []models.Signal, err error) {
-	err = tx.Tx().NewSelect().Model(&signals).
-		ColumnExpr("height as height, validator_id as validator_id, time as time, sum(voting_power) as voting_power, msg_id as msg_id, tx_id as tx_id").
+	err = tx.Tx().NewSelect().Model((*models.SignalVersion)(nil)).
+		ColumnExpr("version as version, sum(voting_power) as voting_power").
 		Group("version").
 		Order("version desc").
 		Scan(ctx)
