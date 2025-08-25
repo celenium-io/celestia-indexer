@@ -280,11 +280,16 @@ func (module *Module) saveMessages(
 		if messages[i].SignalVersion != nil {
 			messages[i].SignalVersion.TxId = messages[i].TxId
 			messages[i].SignalVersion.MsgId = messages[i].Id
-			validatorId := module.validatorsByAddress[messages[i].SignalVersion.Validator.Address]
+			validatorId, ok := module.validatorsByAddress[messages[i].SignalVersion.Validator.Address]
+			if !ok {
+				return 0, errors.New("address:" + messages[i].SignalVersion.Validator.Address + " not found in validator map")
+			}
+
 			validator, err := tx.Validator(ctx, validatorId)
 			if err != nil {
 				return 0, errors.Wrapf(err, "can't find validator for address: %s", messages[i].SignalVersion.Validator.Address)
 			}
+
 			messages[i].SignalVersion.VotingPower = validator.Stake
 			messages[i].SignalVersion.ValidatorId = validatorId
 			messages[i].SignalVersion.Validator = &validator
@@ -295,9 +300,12 @@ func (module *Module) saveMessages(
 		if messages[i].Upgrade != nil {
 			messages[i].Upgrade.TxId = messages[i].TxId
 			messages[i].Upgrade.MsgId = messages[i].Id
-			signerId := module.validatorsByAddress[messages[i].Upgrade.Signer.Address]
-			messages[i].Upgrade.SignerId = signerId
+			signerId, ok := addrToId[messages[i].Upgrade.Signer.Address]
+			if !ok {
+				return 0, errors.New("address:" + messages[i].Upgrade.Signer.Address + " not found in addrToId map")
+			}
 
+			messages[i].Upgrade.SignerId = signerId
 			sgs, err := tx.SignalVersions(ctx)
 			if err != nil {
 				return 0, errors.Wrapf(err, "receiving signal versions")
@@ -308,15 +316,15 @@ func (module *Module) saveMessages(
 				return 0, errors.Wrapf(err, "receiving total voting power")
 			}
 
-			version := decimal.Zero
+			version := uint64(0)
 			for _, signal := range sgs {
 				if signal.VotingPower.GreaterThan(vp.Div(decimal.NewFromInt(2))) {
-					version = signal.VotingPower
+					version = signal.Version
 					break
 				}
 			}
 
-			messages[i].Upgrade.Version = version.BigInt().Uint64()
+			messages[i].Upgrade.Version = version
 			upgrades = append(upgrades, messages[i].Upgrade)
 		}
 	}

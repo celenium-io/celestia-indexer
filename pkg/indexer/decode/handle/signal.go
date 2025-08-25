@@ -12,10 +12,10 @@ import (
 )
 
 // MsgSignalVersion -
-func MsgSignalVersion(ctx *context.Context, validatorAddress string, status storageTypes.Status, m *signalTypes.MsgSignalVersion) (storageTypes.MsgType, []storage.AddressWithType, *storage.SignalVersion, error) {
+func MsgSignalVersion(ctx *context.Context, status storageTypes.Status, m *signalTypes.MsgSignalVersion) (storageTypes.MsgType, []storage.AddressWithType, *storage.SignalVersion, error) {
 	msgType := storageTypes.MsgSignalVersion
 	addresses, err := createAddresses(ctx, addressesData{
-		{t: storageTypes.MsgAddressTypeValidator, address: validatorAddress},
+		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 	}, ctx.Block.Height)
 	if err != nil {
 		return msgType, addresses, nil, err
@@ -37,10 +37,10 @@ func MsgSignalVersion(ctx *context.Context, validatorAddress string, status stor
 }
 
 // MsgTryUpgrade -
-func MsgTryUpgrade(ctx *context.Context, signer string, status storageTypes.Status, m *signalTypes.MsgTryUpgrade) (storageTypes.MsgType, []storage.AddressWithType, *storage.Upgrade, error) {
+func MsgTryUpgrade(ctx *context.Context, status storageTypes.Status, m *signalTypes.MsgTryUpgrade) (storageTypes.MsgType, []storage.AddressWithType, *storage.Upgrade, error) {
 	msgType := storageTypes.MsgTryUpgrade
 	addresses, err := createAddresses(ctx, addressesData{
-		{t: storageTypes.MsgAddressTypeSigner, address: signer},
+		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 	}, ctx.Block.Height)
 	if err != nil {
 		return msgType, addresses, nil, err
