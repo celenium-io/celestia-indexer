@@ -1377,6 +1377,6 @@ func (tx Transaction) SignalVersions(ctx context.Context) (signals []models.Sign
 		ColumnExpr("version as version, sum(voting_power) as voting_power").
 		Group("version").
 		Order("version desc").
-		Scan(ctx)
+		Scan(ctx, &signals)
 	return
 }

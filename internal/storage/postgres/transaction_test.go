@@ -1621,6 +1621,126 @@ func (s *TransactionTestSuite) TestGetHyperlaneToken() {
 	s.Require().EqualValues(1, token.Id)
 }
 
+func (s *TransactionTestSuite) TestSaveSignals() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	validator := storage.Validator{
+		Address:           "celestiavaloper1cj45qyagkujxgdgv8lgjur56zjxtrsy40g3pw3",
+		Delegator:         "celestia1cj45qyagkujxgdgv8lgjur56zjxtrsy42hncch",
+		ConsAddress:       "95764047BDFFB5CCADFA635DC63365EEB65F00C2",
+		Rate:              decimal.NewFromFloat32(0.2),
+		MaxRate:           decimal.NewFromFloat32(0.2),
+		MaxChangeRate:     decimal.Zero,
+		MinSelfDelegation: decimal.Zero,
+		Identity:          "0068ECE5E6EB5359",
+		Stake:             decimal.NewFromInt(100),
+		Moniker:           "Polychain",
+		Commissions:       decimal.Zero,
+		Rewards:           decimal.Zero,
+		Height:            1001,
+		Jailed:            testsuite.Ptr(false),
+	}
+
+	err = tx.SaveSignals(ctx,
+		&storage.SignalVersion{
+			Id:          1,
+			Height:      1111,
+			VotingPower: decimal.RequireFromString("1000"),
+			MsgId:       1,
+			TxId:        1,
+			Time:        time.Now().UTC(),
+			Version:     1,
+			ValidatorId: 1,
+			Validator:   &validator,
+		}, &storage.SignalVersion{
+			Id:          2,
+			Height:      2222,
+			VotingPower: decimal.RequireFromString("2000"),
+			MsgId:       2,
+			TxId:        2,
+			Time:        time.Now().UTC(),
+			Version:     2,
+			ValidatorId: 2,
+			Validator:   &validator})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestSaveUpgrades() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	addresses := make([]*storage.Address, 0, 2)
+	for i := 0; i < 2; i++ {
+		hash := make([]byte, 20)
+		for j := 0; j < 19; j++ {
+			hash[j] = byte(j)
+		}
+		hash[19] = byte(i)
+		s.NoError(err)
+
+		addr, err := bech32.ConvertAndEncode(pkgTypes.AddressPrefixCelestia, hash)
+		s.NoError(err)
+
+		addresses = append(addresses, &storage.Address{
+			Height:     pkgTypes.Level(10000 + i),
+			LastHeight: pkgTypes.Level(10000 + i),
+			Hash:       hash,
+			Address:    addr,
+			Id:         uint64(i),
+		})
+	}
+
+	err = tx.SaveUpgrades(ctx,
+		&storage.Upgrade{
+			Id:       1,
+			Height:   1111,
+			Time:     time.Now().UTC(),
+			MsgId:    1,
+			TxId:     1,
+			Version:  1,
+			SignerId: 1,
+			Signer:   addresses[0],
+		}, &storage.Upgrade{
+			Id:       2,
+			Height:   2222,
+			Time:     time.Now().UTC(),
+			MsgId:    2,
+			TxId:     2,
+			Version:  2,
+			SignerId: 2,
+			Signer:   addresses[1],
+		})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestSignalVersions() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	signals, err := tx.SignalVersions(ctx)
+	s.Require().NoError(err)
+	s.Require().Len(signals, 2)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
 func TestSuiteTransaction_Run(t *testing.T) {
 	suite.Run(t, new(TransactionTestSuite))
 }
