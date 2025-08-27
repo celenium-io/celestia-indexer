@@ -49,7 +49,9 @@ func (t *Upgrade) List(ctx context.Context, filters storage.ListUpgradesFilter) 
 		TableExpr("(?) as upgrade", query).
 		ColumnExpr("upgrade.*").
 		ColumnExpr("signer.address as signer__address").
+		ColumnExpr("tx.hash as tx__hash").
 		Join("left join address as signer on signer.id = signer_id").
+		Join("left join tx on tx_id = tx.id").
 		Scan(ctx, &upgrades)
 
 	return

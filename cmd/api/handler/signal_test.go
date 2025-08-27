@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -14,6 +15,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
 	"github.com/shopspring/decimal"
@@ -30,6 +32,8 @@ var testSignal = storage.SignalVersion{
 	Version:     1,
 	MsgId:       1,
 	TxId:        1,
+	Tx:          &testTx,
+	Validator:   &testValidator,
 }
 
 var testUpgrade = storage.Upgrade{
@@ -40,6 +44,24 @@ var testUpgrade = storage.Upgrade{
 	Version:  1,
 	MsgId:    1,
 	TxId:     1,
+	Tx:       &testTx,
+	Signer: &storage.Address{
+		Id:         2,
+		Hash:       testHashAddress,
+		Address:    testAddress,
+		Height:     200,
+		LastHeight: 200,
+		Balance: storage.Balance{
+			Currency:  "utia",
+			Spendable: decimal.RequireFromString("200"),
+			Delegated: decimal.RequireFromString("0"),
+			Unbonding: decimal.RequireFromString("0"),
+		},
+		Celestials: &celestials.Celestial{
+			Id:       "name_id",
+			ImageUrl: "url",
+		},
+	},
 }
 
 // SignalTestSuite -
@@ -107,7 +129,18 @@ func (s *SignalTestSuite) TestList() {
 	err := json.NewDecoder(rec.Body).Decode(&signals)
 	s.Require().NoError(err)
 	s.Require().Len(signals, 1)
-	s.Require().EqualValues(1, signals[0].Id)
+	s.Require().EqualValues(testSignal.Id, signals[0].Id)
+	s.Require().EqualValues(testSignal.Height, signals[0].Height)
+	s.Require().EqualValues(testSignal.Version, signals[0].Version)
+
+	txHash, err := hex.DecodeString(signals[0].TxHash)
+	s.Require().NoError(err)
+	s.Require().EqualValues(testSignal.Tx.Hash, txHash)
+
+	s.Require().NotNil(signals[0].Validator)
+	s.Require().EqualValues(testSignal.Validator.Id, signals[0].Validator.Id)
+	s.Require().EqualValues(testSignal.Validator.ConsAddress, signals[0].Validator.ConsAddress)
+	s.Require().EqualValues(testSignal.Validator.Moniker, signals[0].Validator.Moniker)
 }
 
 func (s *SignalTestSuite) TestUpgrades() {
@@ -140,4 +173,14 @@ func (s *SignalTestSuite) TestUpgrades() {
 	s.Require().NoError(err)
 	s.Require().Len(upgrades, 1)
 	s.Require().EqualValues(2, upgrades[0].Id)
+	s.Require().EqualValues(testUpgrade.Version, upgrades[0].Version)
+
+	txHash, err := hex.DecodeString(upgrades[0].TxHash)
+	s.Require().NoError(err)
+	s.Require().EqualValues(testUpgrade.Tx.Hash, txHash)
+
+	s.Require().NotNil(upgrades[0].Signer)
+	s.Require().NotNil(upgrades[0].Signer.Celestials)
+	s.Require().EqualValues(testUpgrade.Signer.Celestials.Id, upgrades[0].Signer.Celestials.Name)
+	s.Require().EqualValues(testUpgrade.Signer.Celestials.ImageUrl, upgrades[0].Signer.Celestials.ImageUrl)
 }

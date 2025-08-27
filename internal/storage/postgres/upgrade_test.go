@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+	"encoding/hex"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -48,5 +49,10 @@ func (s *StorageTestSuite) TestUpgradeList() {
 		s.Require().EqualValues(1, upgrade.TxId)
 		s.Require().NotNil(upgrade.Signer)
 		s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", upgrade.Signer.Address)
+
+		txHash, err := hex.DecodeString("652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF")
+		s.Require().NoError(err)
+		s.Require().NotNil(upgrade.Tx)
+		s.Require().EqualValues(txHash, upgrade.Tx.Hash)
 	}
 }

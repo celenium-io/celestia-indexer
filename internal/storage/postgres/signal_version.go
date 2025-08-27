@@ -54,7 +54,9 @@ func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFil
 		TableExpr("(?) as signal_version", query).
 		ColumnExpr("signal_version.*").
 		ColumnExpr("validator.address as validator__address").
+		ColumnExpr("tx.hash as tx__hash").
 		Join("left join validator as validator on validator.id = validator_id").
+		Join("left join tx on tx_id = tx.id").
 		Scan(ctx, &signals)
 
 	return

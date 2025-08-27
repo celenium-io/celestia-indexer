@@ -5,12 +5,13 @@ package postgres
 
 import (
 	"context"
-	"github.com/shopspring/decimal"
+	"encoding/hex"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"github.com/shopspring/decimal"
 )
 
 func (s *StorageTestSuite) TestSignalVersionList() {
@@ -51,5 +52,10 @@ func (s *StorageTestSuite) TestSignalVersionList() {
 		s.Require().EqualValues(1, signal.TxId)
 		s.Require().NotNil(signal.Validator)
 		s.Require().EqualValues("celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw", signal.Validator.Address)
+
+		txHash, err := hex.DecodeString("652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF")
+		s.Require().NoError(err)
+		s.Require().NotNil(signal.Tx)
+		s.Require().EqualValues(txHash, signal.Tx.Hash)
 	}
 }

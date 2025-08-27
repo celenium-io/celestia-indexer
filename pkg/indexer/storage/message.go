@@ -302,7 +302,7 @@ func (module *Module) saveMessages(
 			messages[i].Upgrade.MsgId = messages[i].Id
 			signerId, ok := addrToId[messages[i].Upgrade.Signer.Address]
 			if !ok {
-				return 0, errors.New("address:" + messages[i].Upgrade.Signer.Address + " not found in addrToId map")
+				return 0, errors.Errorf("address %s not found in addrToId map", messages[i].Upgrade.Signer.Address)
 			}
 
 			messages[i].Upgrade.SignerId = signerId
