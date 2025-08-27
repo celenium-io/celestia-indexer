@@ -9,6 +9,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
+	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
@@ -33,8 +34,25 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 
 	var newFormat bool
 	if action := decoder.StringFromMap(events[*idx].Data, "action"); action == msgWithdrawValidatorCommission {
-		validator.Address = decoder.StringFromMap(events[*idx].Data, "sender")
-		if validator.Address != "" {
+		if sender := decoder.StringFromMap(events[*idx].Data, "sender"); sender != "" {
+			prefix, hash, err := types.Address(sender).Decode()
+			if err != nil {
+				return errors.Wrap(err, "decoding sender in WithdrawValidatorCommission")
+			}
+
+			switch prefix {
+			case types.AddressPrefixCelestia:
+				address, err := types.NewValoperAddressFromBytes(hash)
+				if err != nil {
+					return errors.Wrap(err, "creating valoper address in WithdrawValidatorCommission")
+				}
+				validator.Address = address.String()
+			case types.AddressPrefixValoper:
+				validator.Address = sender
+			default:
+				return errors.Errorf("unexpected sender address prefix in WithdrawValidatorCommission: %s", prefix)
+			}
+
 			*idx += 1
 			newFormat = true
 		}
