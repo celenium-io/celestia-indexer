@@ -137,6 +137,67 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				},
 			},
 			idx: testsuite.Ptr(0),
+		}, {
+			name: "test 3",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 848613,
+					Type:   "message",
+					Data: map[string]any{
+						"action":    "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
+						"sender":    "celestia1emku8jrvf9dzu80n3sx7wx50chpgjhrw46yru6",
+						"module":    "distribution",
+						"msg_index": "1",
+					},
+				}, {
+					Height: 848613,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":    "8124483956utia",
+						"msg_index": "1",
+						"spender":   "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 848613,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":    "8124483956utia",
+						"msg_index": "1",
+						"receiver":  "celestia1aq57jhhq332emqwdv8a4pgeaukw84sg9nwje2h",
+					},
+				}, {
+					Height: 848613,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "8124483956utia",
+						"msg_index": "1",
+						"recipient": "celestia1aq57jhhq332emqwdv8a4pgeaukw84sg9nwje2h",
+						"sender":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 848613,
+					Type:   "message",
+					Data: map[string]any{
+						"msg_index": "1",
+						"sender":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 848613,
+					Type:   "withdraw_commission",
+					Data: map[string]any{
+						"amount":    "8124483956utia",
+						"msg_index": "1",
+					},
+				},
+			},
+			msgs: []*storage.Message{
+				{
+					Type:   types.MsgWithdrawValidatorCommission,
+					Height: 848613,
+				},
+			},
+			idx: testsuite.Ptr(0),
 		},
 	}
 	for _, tt := range tests {

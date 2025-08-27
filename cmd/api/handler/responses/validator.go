@@ -41,6 +41,10 @@ func NewValidator(val storage.Validator) *Validator {
 	if val.Id == 0 { // for genesis block
 		return nil
 	}
+	jailed := false
+	if val.Jailed != nil {
+		jailed = *val.Jailed
+	}
 	return &Validator{
 		Id: val.Id,
 		Delegator: &ShortAddress{
@@ -62,7 +66,7 @@ func NewValidator(val storage.Validator) *Validator {
 		Stake:             val.Stake.String(),
 		Rewards:           val.Rewards.Floor().String(),
 		Commissions:       val.Commissions.Floor().String(),
-		Jailed:            *val.Jailed,
+		Jailed:            jailed,
 		VotingPower:       val.Stake.Div(decimal.NewFromInt(1_000_000)).Floor().String(),
 	}
 }
