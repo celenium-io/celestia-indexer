@@ -6,7 +6,10 @@ package responses
 import (
 	"testing"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -55,5 +58,58 @@ func TestNewValidatorUptime(t *testing.T) {
 		require.True(t, uptime.Blocks[1].Signed)
 		require.True(t, uptime.Blocks[2].Signed)
 		require.False(t, uptime.Blocks[3].Signed)
+	})
+}
+
+func TestNewValidator(t *testing.T) {
+	t.Run("validator with nil jailed field", func(t *testing.T) {
+		dec := decimal.NewFromInt(100)
+		validator := storage.Validator{
+			Jailed:            nil,
+			Id:                1,
+			Rate:              dec,
+			MaxRate:           dec,
+			MaxChangeRate:     dec,
+			MinSelfDelegation: dec,
+			Stake:             dec,
+			Rewards:           dec,
+			Commissions:       dec,
+		}
+		val := NewValidator(validator)
+		require.False(t, val.Jailed)
+	})
+
+	t.Run("validator with false jailed field", func(t *testing.T) {
+		dec := decimal.NewFromInt(100)
+		validator := storage.Validator{
+			Jailed:            testsuite.Ptr(false),
+			Id:                1,
+			Rate:              dec,
+			MaxRate:           dec,
+			MaxChangeRate:     dec,
+			MinSelfDelegation: dec,
+			Stake:             dec,
+			Rewards:           dec,
+			Commissions:       dec,
+		}
+		val := NewValidator(validator)
+		require.False(t, val.Jailed)
+	})
+
+	t.Run("validator with true jailed field", func(t *testing.T) {
+		dec := decimal.NewFromInt(100)
+		validator := storage.Validator{
+			Jailed:            testsuite.Ptr(true),
+			Id:                1,
+			Rate:              dec,
+			MaxRate:           dec,
+			MaxChangeRate:     dec,
+			MinSelfDelegation: dec,
+			Stake:             dec,
+			Rewards:           dec,
+			Commissions:       dec,
+		}
+		val := NewValidator(validator)
+		require.True(t, val.Jailed)
 	})
 }
