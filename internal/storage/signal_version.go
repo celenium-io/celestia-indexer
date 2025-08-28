@@ -41,7 +41,6 @@ type SignalVersion struct {
 	Version     uint64          `bun:"version"                   comment:"Version"`
 	MsgId       uint64          `bun:"msg_id,notnull"            comment:"Message internal identity"`
 	TxId        uint64          `bun:"tx_id,notnull"             comment:"Transaction internal identity"`
-	TxHash      []byte          `bun:"tx_hash"                   comment:"Transaction hash"`
 
 	Validator *Validator `bun:"rel:belongs-to,join:validator_id=id"`
 	Tx        *Tx        `bun:"rel:belongs-to,join:tx_id=id"`
