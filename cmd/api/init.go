@@ -530,6 +530,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		hyperlane.GET("/domains", hyperlaneHandler.ListDomains, defaultMiddlewareCache)
 	}
 
+	signalHandler := handler.NewSignalHandler(db.SignalVersion, db.Upgrade, db.Validator, db.Tx, db.Address)
+	signalGroup := v1.Group("/signal")
+	{
+		signalGroup.GET("", signalHandler.List)
+		signalGroup.GET("/upgrade", signalHandler.Upgrades)
+	}
+
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
 		SpecURL: "./docs/swagger.json",
 		CustomOptions: scalar.CustomOptions{

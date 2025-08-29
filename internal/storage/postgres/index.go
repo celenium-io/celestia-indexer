@@ -894,6 +894,68 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// Signal Version
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLTransfer)(nil)).
+			Index("signal_version_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.SignalVersion)(nil)).
+			Index("signal_version_validator_id_idx").
+			Column("validator_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.SignalVersion)(nil)).
+			Index("signal_version_tx_id_idx").
+			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.SignalVersion)(nil)).
+			Index("signal_version_version_idx").
+			Column("version").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// Upgrade
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLTransfer)(nil)).
+			Index("upgrade_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Upgrade)(nil)).
+			Index("upgrade_signer_id_idx").
+			Column("signer_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Upgrade)(nil)).
+			Index("upgrade_tx_id_idx").
+			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

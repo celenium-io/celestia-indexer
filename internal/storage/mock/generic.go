@@ -31,6 +31,7 @@ import (
 type MockNotificator struct {
 	ctrl     *gomock.Controller
 	recorder *MockNotificatorMockRecorder
+	isgomock struct{}
 }
 
 // MockNotificatorMockRecorder is the mock recorder for MockNotificator.
@@ -92,6 +93,7 @@ func (c *MockNotificatorNotifyCall) DoAndReturn(f func(context.Context, string, 
 type MockListener struct {
 	ctrl     *gomock.Controller
 	recorder *MockListenerMockRecorder
+	isgomock struct{}
 }
 
 // MockListenerMockRecorder is the mock recorder for MockListener.
@@ -234,6 +236,7 @@ func (c *MockListenerSubscribeCall) DoAndReturn(f func(context.Context, ...strin
 type MockListenerFactory struct {
 	ctrl     *gomock.Controller
 	recorder *MockListenerFactoryMockRecorder
+	isgomock struct{}
 }
 
 // MockListenerFactoryMockRecorder is the mock recorder for MockListenerFactory.
@@ -295,6 +298,7 @@ func (c *MockListenerFactoryCreateListenerCall) DoAndReturn(f func() storage.Lis
 type MockTransaction struct {
 	ctrl     *gomock.Controller
 	recorder *MockTransactionMockRecorder
+	isgomock struct{}
 }
 
 // MockTransactionMockRecorder is the mock recorder for MockTransaction.
@@ -3708,6 +3712,49 @@ func (c *MockTransactionSaveRollupCall) DoAndReturn(f func(context.Context, *sto
 	return c
 }
 
+// SaveSignals mocks base method.
+func (m *MockTransaction) SaveSignals(ctx context.Context, signals ...*storage.SignalVersion) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range signals {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveSignals", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveSignals indicates an expected call of SaveSignals.
+func (mr *MockTransactionMockRecorder) SaveSignals(ctx any, signals ...any) *MockTransactionSaveSignalsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, signals...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveSignals", reflect.TypeOf((*MockTransaction)(nil).SaveSignals), varargs...)
+	return &MockTransactionSaveSignalsCall{Call: call}
+}
+
+// MockTransactionSaveSignalsCall wrap *gomock.Call
+type MockTransactionSaveSignalsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveSignalsCall) Return(arg0 error) *MockTransactionSaveSignalsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveSignalsCall) Do(f func(context.Context, ...*storage.SignalVersion) error) *MockTransactionSaveSignalsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveSignalsCall) DoAndReturn(f func(context.Context, ...*storage.SignalVersion) error) *MockTransactionSaveSignalsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // SaveSigners mocks base method.
 func (m *MockTransaction) SaveSigners(ctx context.Context, addresses ...storage.Signer) error {
 	m.ctrl.T.Helper()
@@ -3876,6 +3923,49 @@ func (c *MockTransactionSaveUndelegationsCall) Do(f func(context.Context, ...sto
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionSaveUndelegationsCall) DoAndReturn(f func(context.Context, ...storage.Undelegation) error) *MockTransactionSaveUndelegationsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveUpgrades mocks base method.
+func (m *MockTransaction) SaveUpgrades(ctx context.Context, signals ...*storage.Upgrade) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range signals {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveUpgrades", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveUpgrades indicates an expected call of SaveUpgrades.
+func (mr *MockTransactionMockRecorder) SaveUpgrades(ctx any, signals ...any) *MockTransactionSaveUpgradesCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, signals...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveUpgrades", reflect.TypeOf((*MockTransaction)(nil).SaveUpgrades), varargs...)
+	return &MockTransactionSaveUpgradesCall{Call: call}
+}
+
+// MockTransactionSaveUpgradesCall wrap *gomock.Call
+type MockTransactionSaveUpgradesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveUpgradesCall) Return(arg0 error) *MockTransactionSaveUpgradesCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveUpgradesCall) Do(f func(context.Context, ...*storage.Upgrade) error) *MockTransactionSaveUpgradesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveUpgradesCall) DoAndReturn(f func(context.Context, ...*storage.Upgrade) error) *MockTransactionSaveUpgradesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -4049,6 +4139,45 @@ func (c *MockTransactionSaveVotesCall) Do(f func(context.Context, ...*storage.Vo
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionSaveVotesCall) DoAndReturn(f func(context.Context, ...*storage.Vote) error) *MockTransactionSaveVotesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SignalVersions mocks base method.
+func (m *MockTransaction) SignalVersions(ctx context.Context) ([]storage.Signal, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SignalVersions", ctx)
+	ret0, _ := ret[0].([]storage.Signal)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SignalVersions indicates an expected call of SignalVersions.
+func (mr *MockTransactionMockRecorder) SignalVersions(ctx any) *MockTransactionSignalVersionsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignalVersions", reflect.TypeOf((*MockTransaction)(nil).SignalVersions), ctx)
+	return &MockTransactionSignalVersionsCall{Call: call}
+}
+
+// MockTransactionSignalVersionsCall wrap *gomock.Call
+type MockTransactionSignalVersionsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSignalVersionsCall) Return(arg0 []storage.Signal, arg1 error) *MockTransactionSignalVersionsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSignalVersionsCall) Do(f func(context.Context) ([]storage.Signal, error)) *MockTransactionSignalVersionsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSignalVersionsCall) DoAndReturn(f func(context.Context) ([]storage.Signal, error)) *MockTransactionSignalVersionsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -4331,6 +4460,7 @@ func (c *MockTransactionValidatorCall) DoAndReturn(f func(context.Context, uint6
 type MockISearch struct {
 	ctrl     *gomock.Controller
 	recorder *MockISearchMockRecorder
+	isgomock struct{}
 }
 
 // MockISearchMockRecorder is the mock recorder for MockISearch.
@@ -4432,6 +4562,7 @@ func (c *MockISearchSearchTextCall) DoAndReturn(f func(context.Context, string) 
 type MockExport struct {
 	ctrl     *gomock.Controller
 	recorder *MockExportMockRecorder
+	isgomock struct{}
 }
 
 // MockExportMockRecorder is the mock recorder for MockExport.

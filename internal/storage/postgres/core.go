@@ -61,6 +61,8 @@ type Storage struct {
 	HLMailbox       models.IHLMailbox
 	HLTransfer      models.IHLTransfer
 	HLToken         models.IHLToken
+	SignalVersion   models.ISignalVersion
+	Upgrade         models.IUpgrade
 	Celestials      celestials.ICelestial
 	CelestialState  celestials.ICelestialState
 	Notificator     *Notificator
@@ -119,6 +121,8 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		HLMailbox:       NewHLMailbox(strg.Connection()),
 		HLTransfer:      NewHLTransfer(strg.Connection()),
 		HLToken:         NewHLToken(strg.Connection()),
+		SignalVersion:   NewSignalVersion(strg.Connection()),
+		Upgrade:         NewUpgrade(strg.Connection()),
 		Celestials:      celestialsPg.NewCelestials(strg.Connection()),
 		CelestialState:  celestialsPg.NewCelestialState(strg.Connection()),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
@@ -209,6 +213,8 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 			&models.Vote{},
 			&models.IbcTransfer{},
 			&models.HLTransfer{},
+			&models.SignalVersion{},
+			&models.Upgrade{},
 		} {
 			if _, err := tx.ExecContext(ctx,
 				`SELECT create_hypertable(?, 'time', chunk_time_interval => INTERVAL '1 month', if_not_exists => TRUE);`,

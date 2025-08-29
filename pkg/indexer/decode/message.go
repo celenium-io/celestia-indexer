@@ -310,9 +310,9 @@ func Message(
 
 	// signal module
 	case *appSignalTypes.MsgSignalVersion:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSignalVersion(ctx, typedMsg.GetValidatorAddress())
+		d.Msg.Type, d.Msg.Addresses, d.Msg.SignalVersion, err = handle.MsgSignalVersion(ctx, status, typedMsg)
 	case *appSignalTypes.MsgTryUpgrade:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgTryUpgrade(ctx, typedMsg.GetSigner())
+		d.Msg.Type, d.Msg.Addresses, d.Msg.Upgrade, err = handle.MsgTryUpgrade(ctx, status, typedMsg)
 
 	// hyperlane
 	case *hyperlaneCore.MsgCreateMailbox:
