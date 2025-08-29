@@ -50,6 +50,7 @@ func processSetToken(ctx *context.Context, events []storage.Event, msg *storage.
 				Owner: &storage.Address{
 					Address: setToken.NewOwner,
 				},
+				Type: types.HLTokenTypeCollateral,
 			}
 			end = true
 		}
