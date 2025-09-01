@@ -318,7 +318,7 @@ func (module *Module) saveMessages(
 
 			version := uint64(0)
 			for _, signal := range sgs {
-				if signal.VotingPower.GreaterThan(vp.Div(decimal.NewFromInt(2))) {
+				if signal.VotingPower.GreaterThan(vp.Mul(decimal.NewFromInt(5)).Div(decimal.NewFromInt(6))) {
 					version = signal.Version
 					break
 				}
