@@ -17,10 +17,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDecodeMsg_SuccessOnMsgSignalVersion(t *testing.T) {
+func createMsgSignalVersion() signal.MsgSignalVersion {
 	m := signal.NewMsgSignalVersion(
-		"celestiavaloper12zs7e3n8pjd8y8ex0cyv67ethv30mekg9rcrz9", 10,
+		"celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x", 10,
 	)
+
+	return *m
+}
+
+func TestDecodeMsg_SuccessOnMsgSignalVersion(t *testing.T) {
+	m := createMsgSignalVersion()
 	blob, now := testsuite.EmptyBlock()
 	position := 7
 
@@ -30,21 +36,30 @@ func TestDecodeMsg_SuccessOnMsgSignalVersion(t *testing.T) {
 		Time:   blob.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, &m, position, storageTypes.StatusSuccess)
 
 	addressesExpected, msgExpected := createExpectations(
-		blob, now, m, position,
+		blob, now, &m, position,
 		storageTypes.MsgAddressTypeValidator,
-		"celestiavaloper12zs7e3n8pjd8y8ex0cyv67ethv30mekg9rcrz9",
-		[]byte{0x50, 0xa1, 0xec, 0xc6, 0x67, 0x0c, 0x9a, 0x72, 0x1f, 0x26, 0x7e, 0x08, 0xcd, 0x7b, 0x2b, 0xbb, 0x22, 0xfd, 0xe6, 0xc8},
+		"celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
+		[]byte{0x4a, 0xb, 0xf8, 0x99, 0x89, 0xe7, 0xa, 0xe3, 0xf, 0x3b, 0x62, 0x94, 0xa2, 0x97, 0x5a, 0x17, 0x5c, 0x48, 0x22, 0xa3},
 		storageTypes.MsgSignalVersion,
 		58,
 	)
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	msgExpected.SignalVersion = &storage.SignalVersion{
+		Height: blob.Height,
+		Validator: &storage.Validator{
+			Address: m.ValidatorAddress,
+		},
+		Time:    blob.Block.Time,
+		Version: m.Version,
+	}
+
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, addressesExpected, dm.Addresses)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgTryUpgrade(t *testing.T) {
@@ -72,6 +87,14 @@ func TestDecodeMsg_SuccessOnMsgTryUpgrade(t *testing.T) {
 		storageTypes.MsgTryUpgrade,
 		49,
 	)
+
+	msgExpected.Upgrade = &storage.Upgrade{
+		Height: blob.Height,
+		Signer: &storage.Address{
+			Address: m.Signer,
+		},
+		Time: blob.Block.Time,
+	}
 
 	assert.NoError(t, err)
 	assert.Equal(t, int64(0), dm.BlobsSize)

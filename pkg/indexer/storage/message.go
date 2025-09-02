@@ -7,9 +7,12 @@ import (
 	"context"
 	"maps"
 	"slices"
+	"strconv"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 )
 
 var errCantFindAddress = errors.New("can't find address")
@@ -37,6 +40,8 @@ func (module *Module) saveMessages(
 		hyperlaneTokens    = make(map[string]*storage.HLToken, 0)
 		hyperlaneTransfers = make([]*storage.HLTransfer, 0)
 		grants             = make(map[string]storage.Grant)
+		signals            = make([]*storage.SignalVersion, 0)
+		upgrades           = make([]*storage.Upgrade, 0)
 		namespaces         = make(map[string]uint64)
 		addedMsgId         = make(map[uint64]struct{})
 		msgAddrMap         = make(map[string]struct{})
@@ -271,6 +276,57 @@ func (module *Module) saveMessages(
 
 			hyperlaneTransfers = append(hyperlaneTransfers, messages[i].HLTransfer)
 		}
+
+		if messages[i].SignalVersion != nil {
+			messages[i].SignalVersion.TxId = messages[i].TxId
+			messages[i].SignalVersion.MsgId = messages[i].Id
+			validatorId, ok := module.validatorsByAddress[messages[i].SignalVersion.Validator.Address]
+			if !ok {
+				return 0, errors.New("address:" + messages[i].SignalVersion.Validator.Address + " not found in validator map")
+			}
+
+			validator, err := tx.Validator(ctx, validatorId)
+			if err != nil {
+				return 0, errors.Wrapf(err, "can't find validator for address: %s", messages[i].SignalVersion.Validator.Address)
+			}
+
+			messages[i].SignalVersion.VotingPower = validator.Stake
+			messages[i].SignalVersion.ValidatorId = validatorId
+			messages[i].SignalVersion.Validator = &validator
+
+			signals = append(signals, messages[i].SignalVersion)
+		}
+
+		if messages[i].Upgrade != nil {
+			messages[i].Upgrade.TxId = messages[i].TxId
+			messages[i].Upgrade.MsgId = messages[i].Id
+			signerId, ok := addrToId[messages[i].Upgrade.Signer.Address]
+			if !ok {
+				return 0, errors.Errorf("address %s not found in addrToId map", messages[i].Upgrade.Signer.Address)
+			}
+
+			messages[i].Upgrade.SignerId = signerId
+			sgs, err := tx.SignalVersions(ctx)
+			if err != nil {
+				return 0, errors.Wrapf(err, "receiving signal versions")
+			}
+
+			vp, err := module.totalVotingPower(ctx, tx)
+			if err != nil {
+				return 0, errors.Wrapf(err, "receiving total voting power")
+			}
+
+			version := uint64(0)
+			for _, signal := range sgs {
+				if signal.VotingPower.GreaterThan(vp.Mul(decimal.NewFromInt(5)).Div(decimal.NewFromInt(6))) {
+					version = signal.Version
+					break
+				}
+			}
+
+			messages[i].Upgrade.Version = version
+			upgrades = append(upgrades, messages[i].Upgrade)
+		}
 	}
 
 	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
@@ -333,6 +389,12 @@ func (module *Module) saveMessages(
 	if err := tx.SaveHyperlaneTransfers(ctx, hyperlaneTransfers...); err != nil {
 		return 0, errors.Wrap(err, "hyperlane transfers saving")
 	}
+	if err := tx.SaveSignals(ctx, signals...); err != nil {
+		return 0, errors.Wrap(err, "signals saving")
+	}
+	if err := tx.SaveUpgrades(ctx, upgrades...); err != nil {
+		return 0, errors.Wrap(err, "upgrades saving")
+	}
 
 	return ibcClientsCount, nil
 }
@@ -371,4 +433,26 @@ func processGrants(addrToId map[string]uint64, grant *storage.Grant) error {
 	}
 	grant.GranterId = granterId
 	return nil
+}
+
+func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transaction) (decimal.Decimal, error) {
+	maxValsConsts, err := module.constants.Get(ctx, types.ModuleNameStaking, "max_validators")
+	if err != nil {
+		return decimal.Zero, errors.Wrap(err, "get max validators value")
+	}
+	maxVals, err := strconv.Atoi(maxValsConsts.Value)
+	if err != nil {
+		return decimal.Zero, errors.Wrap(err, "parse max validators value")
+	}
+
+	validators, err := tx.BondedValidators(ctx, maxVals)
+	if err != nil {
+		return decimal.Zero, errors.Wrap(err, "get validators")
+	}
+
+	power := decimal.Zero
+	for i := range validators {
+		power.Add(validators[i].Stake)
+	}
+	return power, nil
 }

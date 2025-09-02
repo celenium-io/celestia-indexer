@@ -290,6 +290,24 @@ func (tx Transaction) SaveGrants(ctx context.Context, grants ...models.Grant) er
 	return err
 }
 
+func (tx Transaction) SaveSignals(ctx context.Context, signals ...*models.SignalVersion) error {
+	if len(signals) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&signals).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgrade) error {
+	if len(upgrades) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&upgrades).Exec(ctx)
+	return err
+}
+
 type addedValidator struct {
 	bun.BaseModel `bun:"validator"`
 	*models.Validator
@@ -1351,5 +1369,14 @@ func (tx Transaction) HyperlaneToken(ctx context.Context, id []byte) (token mode
 		Where("token_id = ?", id).
 		Column("id").
 		Scan(ctx)
+	return
+}
+
+func (tx Transaction) SignalVersions(ctx context.Context) (signals []models.Signal, err error) {
+	err = tx.Tx().NewSelect().Model((*models.SignalVersion)(nil)).
+		ColumnExpr("version as version, sum(voting_power) as voting_power").
+		Group("version").
+		Order("version desc").
+		Scan(ctx, &signals)
 	return
 }
