@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -483,7 +484,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		proposal.GET("/:id/votes", proposalHandler.Votes)
 	}
 
-	ibcHandler := handler.NewIbcHandler(db.IbcClients, db.IbcConnections, db.IbcChannels, db.IbcTransfers, db.Address, db.Tx)
+	relayers, err := readRelayersFile("../../assets/relayers_celestia.json")
+	if err != nil {
+		panic(err)
+	}
+	ibcHandler := handler.NewIbcHandler(db.IbcClients, db.IbcConnections, db.IbcChannels, db.IbcTransfers, db.Address, db.Tx, relayers)
 	ibc := v1.Group("/ibc")
 	{
 		ibcClient := ibc.Group("/client")
@@ -507,6 +512,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			ibcTransfer.GET("", ibcHandler.ListTransfers)
 			ibcTransfer.GET("/:id", ibcHandler.GetIbcTransfer)
 		}
+		ibc.GET("/relayers", ibcHandler.IbcRelayers, defaultMiddlewareCache)
 	}
 
 	hyperlaneHandler := handler.NewHyperlaneHandler(db.HLMailbox, db.HLToken, db.HLTransfer, db.Tx, db.Address, chainStore)
@@ -683,4 +689,15 @@ func initChainStore(ctx context.Context, url string) {
 		chainStore = hyperlane.NewChainStore(url)
 		chainStore.Start(ctx)
 	}
+}
+
+func readRelayersFile(path string) ([]byte, error) {
+	wd, _ := os.Getwd()
+	p := filepath.Join(wd, path)
+	data, err := os.ReadFile(p)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }

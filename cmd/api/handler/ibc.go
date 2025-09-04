@@ -6,6 +6,7 @@ package handler
 import (
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
@@ -21,6 +22,7 @@ type IbcHandler struct {
 	transfers storage.IIbcTransfer
 	address   storage.IAddress
 	txs       storage.ITx
+	relayers  []byte
 }
 
 func NewIbcHandler(
@@ -30,6 +32,7 @@ func NewIbcHandler(
 	transfers storage.IIbcTransfer,
 	address storage.IAddress,
 	txs storage.ITx,
+	relayers []byte,
 ) *IbcHandler {
 	return &IbcHandler{
 		clients:   clients,
@@ -38,6 +41,7 @@ func NewIbcHandler(
 		transfers: transfers,
 		address:   address,
 		txs:       txs,
+		relayers:  relayers,
 	}
 }
 
@@ -466,4 +470,24 @@ func (handler *IbcHandler) GetIbcTransfer(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.NewIbcTransfer(transfer))
+}
+
+// IbcRelayers godoc
+//
+//	@Summary		List ibc relayers
+//	@Description	List ibc relayers
+//	@Tags			ibc
+//	@ID				get-ibc-relayers
+//	@Produce		json
+//	@Success		200	{array}		responses.Relayer
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/ibc/relayers [get]
+func (handler *IbcHandler) IbcRelayers(c echo.Context) error {
+	var relayers []responses.Relayer
+	if err := json.Unmarshal(handler.relayers, &relayers); err != nil {
+		return internalServerError(c, err)
+	}
+
+	return returnArray(c, relayers)
 }

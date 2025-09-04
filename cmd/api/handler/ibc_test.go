@@ -90,6 +90,17 @@ var testIbcChannel = storage.IbcChannel{
 	},
 }
 
+var testRelayers = `[{
+		"name": "Test name",
+		"logo": "https://example.com/logo.png",
+		"contact": {
+			"website": "https://test.io",
+			"github": "https://github.com/testrepo",
+			"twitter": "https://twitter.com/test"
+		},
+		"addresses": ["celestia1xyz123"]
+	}]`
+
 // IbcTestSuite -
 type IbcTestSuite struct {
 	suite.Suite
@@ -100,6 +111,7 @@ type IbcTestSuite struct {
 	channels  *mock.MockIIbcChannel
 	transfers *mock.MockIIbcTransfer
 	txs       *mock.MockITx
+	relayers  []byte
 	handler   *IbcHandler
 	ctrl      *gomock.Controller
 }
@@ -115,7 +127,9 @@ func (s *IbcTestSuite) SetupSuite() {
 	s.transfers = mock.NewMockIIbcTransfer(s.ctrl)
 	s.txs = mock.NewMockITx(s.ctrl)
 	s.address = mock.NewMockIAddress(s.ctrl)
-	s.handler = NewIbcHandler(s.clients, s.conns, s.channels, s.transfers, s.address, s.txs)
+	s.relayers = []byte(testRelayers)
+
+	s.handler = NewIbcHandler(s.clients, s.conns, s.channels, s.transfers, s.address, s.txs, s.relayers)
 }
 
 // TearDownSuite -
@@ -645,4 +659,27 @@ func (s *IbcTestSuite) TestListTransferWithHash() {
 	s.Require().NotNil(transfer.Sender)
 	s.Require().EqualValues(testAddress, transfer.Sender.Hash)
 	s.Require().Equal("chain-id", transfer.ChainId)
+}
+
+func (s *IbcTestSuite) TestRelayerList() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/ibc/relayers")
+
+	s.Require().NoError(s.handler.IbcRelayers(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response []responses.Relayer
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 1)
+	s.Require().EqualValues("Test name", response[0].Name)
+	s.Require().EqualValues("https://example.com/logo.png", response[0].Logo)
+	s.Require().Len(response[0].Addresses, 1)
+	s.Require().EqualValues(response[0].Addresses[0], "celestia1xyz123")
+	s.Require().NotNil(response[0].Contact)
+	s.Require().EqualValues(response[0].Contact.Website, "https://test.io")
+	s.Require().EqualValues(response[0].Contact.Github, "https://github.com/testrepo")
+	s.Require().EqualValues(response[0].Contact.Twitter, "https://twitter.com/test")
 }
