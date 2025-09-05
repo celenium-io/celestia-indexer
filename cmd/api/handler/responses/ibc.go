@@ -226,7 +226,7 @@ func NewIbcTransfer(transfer storage.IbcTransfer, relayers map[uint64]Relayer) I
 		response.ChainId = transfer.Connection.Client.ChainId
 	}
 
-	if relayers != nil {
+	if len(relayers) > 0 {
 		if relayer, ok := relayers[transfer.Connection.Client.CreatorId]; ok {
 			response.Relayer = &relayer
 		}
