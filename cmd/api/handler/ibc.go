@@ -6,6 +6,7 @@ package handler
 import (
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
@@ -15,12 +16,14 @@ import (
 )
 
 type IbcHandler struct {
-	clients   storage.IIbcClient
-	conns     storage.IIbcConnection
-	channels  storage.IIbcChannel
-	transfers storage.IIbcTransfer
-	address   storage.IAddress
-	txs       storage.ITx
+	clients      storage.IIbcClient
+	conns        storage.IIbcConnection
+	channels     storage.IIbcChannel
+	transfers    storage.IIbcTransfer
+	address      storage.IAddress
+	txs          storage.ITx
+	relayersFile []byte
+	relayers     map[uint64]responses.Relayer
 }
 
 func NewIbcHandler(
@@ -30,14 +33,18 @@ func NewIbcHandler(
 	transfers storage.IIbcTransfer,
 	address storage.IAddress,
 	txs storage.ITx,
+	file []byte,
+	relayers map[uint64]responses.Relayer,
 ) *IbcHandler {
 	return &IbcHandler{
-		clients:   clients,
-		conns:     conns,
-		channels:  channels,
-		transfers: transfers,
-		address:   address,
-		txs:       txs,
+		clients:      clients,
+		conns:        conns,
+		channels:     channels,
+		transfers:    transfers,
+		address:      address,
+		txs:          txs,
+		relayersFile: file,
+		relayers:     relayers,
 	}
 }
 
@@ -436,7 +443,7 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 
 	response := make([]responses.IbcTransfer, len(transfers))
 	for i := range transfers {
-		response[i] = responses.NewIbcTransfer(transfers[i])
+		response[i] = responses.NewIbcTransfer(transfers[i], handler.relayers)
 	}
 	return returnArray(c, response)
 }
@@ -465,5 +472,25 @@ func (handler *IbcHandler) GetIbcTransfer(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 
-	return c.JSON(http.StatusOK, responses.NewIbcTransfer(transfer))
+	return c.JSON(http.StatusOK, responses.NewIbcTransfer(transfer, handler.relayers))
+}
+
+// IbcRelayers godoc
+//
+//	@Summary		List ibc relayers
+//	@Description	List ibc relayers
+//	@Tags			ibc
+//	@ID				get-ibc-relayers
+//	@Produce		json
+//	@Success		200	{array}		responses.Relayer
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/ibc/relayers [get]
+func (handler *IbcHandler) IbcRelayers(c echo.Context) error {
+	var relayers []responses.Relayer
+	if err := json.Unmarshal(handler.relayersFile, &relayers); err != nil {
+		return internalServerError(c, err)
+	}
+
+	return returnArray(c, relayers)
 }

@@ -116,6 +116,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/ibc/channel/:id GET":                             {},
 		"/v1/ibc/transfer GET":                                {},
 		"/v1/ibc/transfer/:id GET":                            {},
+		"/v1/ibc/relayers GET":                                {},
 		"/v1/proposal/:id/votes GET":                          {},
 		"/v1/address/:hash/votes GET":                         {},
 		"/v1/validators/:id/votes GET":                        {},

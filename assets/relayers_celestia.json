@@ -1,0 +1,154 @@
+[
+  {
+    "name": "CryptoCrew Validators",
+    "logo": "",
+    "contact": {
+      "github": "https://github.com/cryptocrew-validators",
+      "telegram": "https://t.me/cryptocrew_validators",
+      "twitter": "https://x.com/crypto_crew",
+      "website": "https://ccvalidators.com"
+    },
+    "introduction": [
+      "We power the interchain | ccvalidators.com"
+    ],
+    "addresses": [
+      "celestia1yghndrffay859ma2ue4pa2cltw640vta4nja9s",
+      "celestia1f269n4mrg0s8tqveny9huulyamvdv97n70yajk",
+      "celestia16m48j88mlw2smhc8nyurznt4jl9nqgyqegz3da",
+      "celestia1qp2jfwdez8f69h470ex9rtcd6truqqg9cmtzac",
+      "celestia18hx3fcqrvynx9vvpvyv5qym82xz4suw5pvzz9d"
+    ]
+  },
+  {
+    "name": "Inter Blockchain Services",
+    "logo": "https://github.com/irisnet/iob-registry/raw/main/relayers/Inter%20Blockchain%20Services/images/IBS-logo-seul-noir-24.png",
+    "contact": {
+      "discord": "https://discord.gg/Tyn2xTj2c9",
+      "github": "https://github.com/Inter-Blockchain-Service",
+      "medium": "https://medium.com/@ibs.team",
+      "telegram": "https://t.me/+3gWaJBip3FhiYjI0",
+      "twitter": "https://twitter.com/IBSvalidator",
+      "website": "https://ibs.team/"
+    },
+    "introduction": [
+      "IBS provides trusted validator services, relayer infrastructure, synching services, peering , public RPC and API for cosmos ecosystem"
+    ],
+    "addresses": [
+      "celestia14uyfxlv00lj0qhcwt7vms2rsf7kxuld792fzq3"
+    ]
+  },
+  {
+    "name": "Qubelabs",
+    "logo": "https://raw.githubusercontent.com/qubelabsio/iob-registry/main/relayers/Qubelabs/images/qubelabs%20(2).png",
+    "contact": {
+      "github": "https://github.com/qubelabsio",
+      "twitter": "https://twitter.com/qubelabs",
+      "website": "https://qubelabs.io"
+    },
+    "introduction": [
+      "Independent organization of validators, builders, network contributors and community builders."
+    ],
+    "addresses": [
+      "celestia1eyfy0hde8t62pmkzwxpl4xjr72rs3s8t0g3gkj"
+    ]
+  },
+  {
+    "name": "Stakely.io",
+    "logo": "",
+    "contact": {
+      "discord": "discord.com/users/311985361658183691",
+      "github": "https://github.com/stakely",
+      "telegram": "https://t.me/Stakely",
+      "twitter": "https://twitter.com/Stakely_io",
+      "website": "https://stakely.io/"
+    },
+    "introduction": [
+      "🔥 Professional validator highly experienced in PoS 🔥 Slashing protection \u0026 Eligible for airdrops | Learn with our staking guides, video tutorials and FAQs | Part of the commission of our nodes will go to our Multicoin Faucet funds and other tools 🌱 Carbon Neutral 🌱"
+    ],
+    "addresses": [
+      "celestia1kz6qywrj9jyer9r5hkx5qe7mrm96xudqp6kg4c"
+    ]
+  },
+  {
+    "name": "Stakin",
+    "logo": "",
+    "contact": {
+      "github": "https://github.com/StakinOfficial",
+      "medium": "https://medium.com/stakin",
+      "telegram": "https://t.me/stakinofficial",
+      "twitter": "https://twitter.com/StakinOfficial",
+      "website": "https://stakin.com"
+    },
+    "introduction": [
+      "Experienced enterprise validator running Proof-of-Stake nodes for the Cosmos ecosystem and beyond. Visit our website for more information: https://stakin.com"
+    ],
+    "addresses": [
+      "celestia1q6cc9u0x5r3fkjcex0rgxee5qlu86w8rxq438l"
+    ]
+  },
+  {
+    "name": "[NODERS]TEAM",
+    "logo": "https://raw.githubusercontent.com/aleksandrnoders/iob-registry/main/relayers/%5BNODERS%5DTEAM/images/logo.png",
+    "contact": {
+      "github": "https://github.com/nodersteam",
+      "twitter": "https://twitter.com/NODERS_TEAM",
+      "website": "https://noders.team"
+    },
+    "introduction": [
+      "Trusted blockchain validator and web3 developer team"
+    ],
+    "addresses": [
+      "celestia14n8p425hz5l6xxcrq4ml00djkmwezm0mta38sc"
+    ]
+  },
+  {
+    "name": "cosmosrescue",
+    "logo": "https://raw.githubusercontent.com/irisnet/iob-registry/main/relayers/cosmosrescue/logo.png",
+    "contact": {
+      "discord": "https://discord.cosmosrescue.com",
+      "telegram": "https://t.me/cosmosrescue",
+      "twitter": "https://x.com/cosmosrescue",
+      "website": "https://cosmosrescue.com"
+    },
+    "introduction": [
+      "Bare metal validator and relayer committed to user safety and preventing scams. We provide tools for users and validators, help prevent scams with our Telegram bot Cosmobot, and relay many chains in the ecosystem. Those who have fallen victim to scams can also rely on us to help save their unstaking assets."
+    ],
+    "addresses": [
+      "celestia1p4557mdpc2qk8vcemeqgrcg55gs2uyzn4uxaad"
+    ]
+  },
+  {
+    "name": "CroutonDigital",
+    "logo": "https://github.com/irisnet/iob-registry/raw/main/relayers/CroutonDigital/images/CroutonDigital_Logo.png",
+    "contact": {
+      "website": "https://crouton.digital",
+      "github": "https://github.com/CroutonDigital",
+      "telegram": "https://t.me/CroutonDigital",
+      "twitter": "https://x.com/CroutonDigital",
+      "medium": "https://medium.com/@CroutonDigital",
+      "discord": ""
+    },
+    "introduction": [
+      "Crouton Digital is a non-custodial staking provider and has been on the crypto market since 2017 as a service provider with an EU license. We have survived multiple waves of bull and bear markets, maintaining our reputation as a reliable partner. We host our infrastructure at unique geolocations. Security and reliability are our top priorities, which is why we use in-house developed monitoring tools and robust security measures."
+    ],
+    "addresses": [
+      "celestia1fq6ddllcan5fkmjyu93gwd7fyz06mu7xt95e9w"
+    ]
+  },
+  {
+    "name": "kjnodes",
+    "logo": "",
+    "contact": {
+      "website": "https://kjnodes.com",
+      "twitter": "https://x.com/kjnodes",
+      "telegram": "https://t.me/kjnodes",
+      "github": "https://github.com/kjnodes"
+    },
+    "introduction": [
+      "Trusted Proof of Stake validator across Cosmos universe. Active ecosystem contributor, IBC relayer and chain service provider since 2021."
+    ],
+    "addresses": [
+      "celestia1twmgaeug7ymjq8c53ttstpl7rny43q8z5zsua2"
+    ]
+  }
+]

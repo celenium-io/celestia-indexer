@@ -18,6 +18,7 @@ RUN go mod download
 COPY cmd/indexer cmd/indexer
 COPY internal internal
 COPY pkg pkg
+COPY assets/relayers_celestia.json assets/relayers_celestia.json
 
 WORKDIR $GOPATH/src/github.com/celenium-io/celestia-indexer/cmd/indexer/
 RUN go build -a -o /go/bin/indexer .

@@ -18,6 +18,7 @@ RUN go mod download
 COPY cmd/api cmd/api
 COPY internal internal
 COPY pkg pkg
+COPY assets/relayers_celestia.json assets/relayers_celestia.json
 
 WORKDIR $GOPATH/src/github.com/celenium-io/celestia-indexer/cmd/api/
 RUN go build -a -installsuffix cgo -o /go/bin/api .

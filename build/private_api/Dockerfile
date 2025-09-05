@@ -19,6 +19,7 @@ COPY cmd/private_api cmd/private_api
 COPY cmd/api cmd/api
 COPY internal internal
 COPY pkg pkg
+COPY assets/relayers_celestia.json assets/relayers_celestia.json
 
 WORKDIR $GOPATH/src/github.com/celenium-io/celestia-indexer/cmd/private_api/
 RUN go build -a -installsuffix cgo -o /go/bin/private_api .
