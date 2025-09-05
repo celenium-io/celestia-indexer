@@ -26,7 +26,6 @@ type State struct {
 	TotalProposals   int64          `example:"56789"                                                            format:"int64"     json:"total_proposals"    swaggertype:"integer"`
 	TotalValidators  int            `example:"100"                                                              format:"int64"     json:"total_validators"   swaggertype:"integer"`
 	TotalSupply      string         `example:"312"                                                              format:"string"    json:"total_supply"       swaggertype:"string"`
-	TotalStake       string         `example:"312"                                                              format:"string"    json:"total_stake"        swaggertype:"string"`
 	TotalVotingPower string         `example:"312"                                                              format:"string"    json:"total_voting_power" swaggertype:"string"`
 	TotalNamespaces  int64          `example:"312"                                                              format:"string"    json:"total_namespaces"   swaggertype:"integer"`
 	TotalIbcClients  int64          `example:"312"                                                              format:"string"    json:"total_ibc_clients"  swaggertype:"integer"`
@@ -49,7 +48,6 @@ func NewState(state storage.State) State {
 		TotalNamespaces:  state.TotalNamespaces,
 		TotalProposals:   state.TotalProposals,
 		TotalSupply:      state.TotalSupply.String(),
-		TotalStake:       state.TotalStake.String(),
 		TotalVotingPower: state.TotalVotingPower.String(),
 		TotalIbcClients:  state.TotalIbcClients,
 		Synced:           !state.LastTime.UTC().Add(2 * time.Minute).Before(time.Now().UTC()),
