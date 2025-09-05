@@ -206,8 +206,8 @@ func NewChainMetadata(domainId uint64, store hyperlane.IChainStore) *ChainMetada
 }
 
 type DomainMetadata struct {
-	Domain         uint64          `example:"1488"                   json:"domain,omitempty" swaggertype:"integer"`
-	Name           string          `example:"name"                   json:"name,omitempty"   swaggertype:"string"`
+	Domain         uint64          `example:"1488"         json:"domain,omitempty" swaggertype:"integer"`
+	Name           string          `example:"name"         json:"name,omitempty"   swaggertype:"string"`
 	BlockExplorers []BlockExplorer `json:"block_explorers"`
 	NativeToken    NativeToken     `json:"native_token"`
 }
