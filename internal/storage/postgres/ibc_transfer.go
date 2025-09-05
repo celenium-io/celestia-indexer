@@ -29,7 +29,6 @@ func (c *IbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFil
 	}
 
 	query = limitScope(query, fltrs.Limit)
-	query = query.OrderExpr("time ?0, id ?0", bun.Safe(fltrs.Sort))
 
 	if fltrs.ChannelId != "" {
 		query = query.Where("channel_id = ?", fltrs.ChannelId)
@@ -69,6 +68,7 @@ func (c *IbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFil
 		Join("left join celestial as cel_sender on cel_sender.address_id = sender_id and cel_sender.status = 'PRIMARY'").
 		Join("left join ibc_connection on ibc_connection.connection_id = ibc_transfer.connection_id").
 		Join("left join ibc_client on ibc_connection.client_id = ibc_client.id").
+		OrderExpr("time ?0, id ?0", bun.Safe(fltrs.Sort)).
 		Scan(ctx, &transfers)
 	return
 }
