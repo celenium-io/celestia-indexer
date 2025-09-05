@@ -16,13 +16,14 @@ import (
 )
 
 type IbcHandler struct {
-	clients   storage.IIbcClient
-	conns     storage.IIbcConnection
-	channels  storage.IIbcChannel
-	transfers storage.IIbcTransfer
-	address   storage.IAddress
-	txs       storage.ITx
-	relayers  []byte
+	clients      storage.IIbcClient
+	conns        storage.IIbcConnection
+	channels     storage.IIbcChannel
+	transfers    storage.IIbcTransfer
+	address      storage.IAddress
+	txs          storage.ITx
+	relayersFile []byte
+	relayers     map[uint64]responses.Relayer
 }
 
 func NewIbcHandler(
@@ -32,16 +33,18 @@ func NewIbcHandler(
 	transfers storage.IIbcTransfer,
 	address storage.IAddress,
 	txs storage.ITx,
-	relayers []byte,
+	file []byte,
+	relayers map[uint64]responses.Relayer,
 ) *IbcHandler {
 	return &IbcHandler{
-		clients:   clients,
-		conns:     conns,
-		channels:  channels,
-		transfers: transfers,
-		address:   address,
-		txs:       txs,
-		relayers:  relayers,
+		clients:      clients,
+		conns:        conns,
+		channels:     channels,
+		transfers:    transfers,
+		address:      address,
+		txs:          txs,
+		relayersFile: file,
+		relayers:     relayers,
 	}
 }
 
@@ -440,7 +443,7 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 
 	response := make([]responses.IbcTransfer, len(transfers))
 	for i := range transfers {
-		response[i] = responses.NewIbcTransfer(transfers[i])
+		response[i] = responses.NewIbcTransfer(transfers[i], handler.relayers)
 	}
 	return returnArray(c, response)
 }
@@ -469,7 +472,7 @@ func (handler *IbcHandler) GetIbcTransfer(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 
-	return c.JSON(http.StatusOK, responses.NewIbcTransfer(transfer))
+	return c.JSON(http.StatusOK, responses.NewIbcTransfer(transfer, handler.relayers))
 }
 
 // IbcRelayers godoc
@@ -485,7 +488,7 @@ func (handler *IbcHandler) GetIbcTransfer(c echo.Context) error {
 //	@Router			/ibc/relayers [get]
 func (handler *IbcHandler) IbcRelayers(c echo.Context) error {
 	var relayers []responses.Relayer
-	if err := json.Unmarshal(handler.relayers, &relayers); err != nil {
+	if err := json.Unmarshal(handler.relayersFile, &relayers); err != nil {
 		return internalServerError(c, err)
 	}
 

@@ -39,6 +39,7 @@ var testIbcClient = storage.IbcClient{
 	UnbondingPeriod:      time.Microsecond,
 	MaxClockDrift:        time.Minute,
 	ConnectionCount:      10,
+	CreatorId:            1,
 	ChainId:              "osmosis-1",
 	Tx: &storage.Tx{
 		Hash: testTxHashBytes,
@@ -90,30 +91,54 @@ var testIbcChannel = storage.IbcChannel{
 	},
 }
 
-var testRelayers = `[{
-		"name": "Test name",
-		"logo": "https://example.com/logo.png",
+var testRelayersFile = `[{
+		"name": "Test name 1",
+		"logo": "https://example.com/logo1.png",
 		"contact": {
-			"website": "https://test.io",
-			"github": "https://github.com/testrepo",
-			"twitter": "https://twitter.com/test"
+			"website": "https://test1.io",
+			"github": "https://github.com/testrepo1",
+			"twitter": "https://twitter.com/test1"
 		},
-		"addresses": ["celestia1xyz123"]
+		"addresses": ["celestia1xyz1488"]
 	}]`
+
+var relayersMap = map[uint64]responses.Relayer{
+	1: {
+		Name: "Test name 1",
+		Logo: "https://example.com/logo1.png",
+		Contact: &responses.Contact{
+			Website: "https://test1.io",
+			Github:  "https://github.com/testrepo1",
+			Twitter: "https://twitter.com/test1",
+		},
+		Addresses: []string{"celestia1xyz1488"},
+	},
+	2: {
+		Name: "Test name 2",
+		Logo: "https://example.com/logo2.png",
+		Contact: &responses.Contact{
+			Website: "https://test2.io",
+			Github:  "https://github.com/testrepo2",
+			Twitter: "https://twitter.com/test2",
+		},
+		Addresses: []string{"celestia1xyz2222"},
+	},
+}
 
 // IbcTestSuite -
 type IbcTestSuite struct {
 	suite.Suite
-	echo      *echo.Echo
-	address   *mock.MockIAddress
-	clients   *mock.MockIIbcClient
-	conns     *mock.MockIIbcConnection
-	channels  *mock.MockIIbcChannel
-	transfers *mock.MockIIbcTransfer
-	txs       *mock.MockITx
-	relayers  []byte
-	handler   *IbcHandler
-	ctrl      *gomock.Controller
+	echo         *echo.Echo
+	address      *mock.MockIAddress
+	clients      *mock.MockIIbcClient
+	conns        *mock.MockIIbcConnection
+	channels     *mock.MockIIbcChannel
+	transfers    *mock.MockIIbcTransfer
+	txs          *mock.MockITx
+	relayersFile []byte
+	relayersMap  map[uint64]responses.Relayer
+	handler      *IbcHandler
+	ctrl         *gomock.Controller
 }
 
 // SetupSuite -
@@ -127,9 +152,10 @@ func (s *IbcTestSuite) SetupSuite() {
 	s.transfers = mock.NewMockIIbcTransfer(s.ctrl)
 	s.txs = mock.NewMockITx(s.ctrl)
 	s.address = mock.NewMockIAddress(s.ctrl)
-	s.relayers = []byte(testRelayers)
+	s.relayersFile = []byte(testRelayersFile)
+	s.relayersMap = relayersMap
 
-	s.handler = NewIbcHandler(s.clients, s.conns, s.channels, s.transfers, s.address, s.txs, s.relayers)
+	s.handler = NewIbcHandler(s.clients, s.conns, s.channels, s.transfers, s.address, s.txs, s.relayersFile, s.relayersMap)
 }
 
 // TearDownSuite -
@@ -559,7 +585,8 @@ func (s *IbcTestSuite) TestGetTransfer() {
 			Tx:       &testTx,
 			Connection: &storage.IbcConnection{
 				Client: &storage.IbcClient{
-					ChainId: "chain-id",
+					ChainId:   "chain-id",
+					CreatorId: 1,
 				},
 			},
 		}, nil).
@@ -589,6 +616,15 @@ func (s *IbcTestSuite) TestGetTransfer() {
 	s.Require().NotNil(response.Sender)
 	s.Require().EqualValues(testAddress, response.Sender.Hash)
 	s.Require().Equal("chain-id", response.ChainId)
+	s.Require().NotNil(response.Relayer)
+	s.Require().EqualValues("Test name 1", response.Relayer.Name)
+	s.Require().EqualValues("https://example.com/logo1.png", response.Relayer.Logo)
+	s.Require().NotNil(response.Relayer.Contact)
+	s.Require().EqualValues("https://test1.io", response.Relayer.Contact.Website)
+	s.Require().EqualValues("https://github.com/testrepo1", response.Relayer.Contact.Github)
+	s.Require().EqualValues("https://twitter.com/test1", response.Relayer.Contact.Twitter)
+	s.Require().Len(response.Relayer.Addresses, 1)
+	s.Require().EqualValues("celestia1xyz1488", response.Relayer.Addresses[0])
 }
 
 func (s *IbcTestSuite) TestListTransferWithHash() {
@@ -626,7 +662,8 @@ func (s *IbcTestSuite) TestListTransferWithHash() {
 				Tx:       &testTx,
 				Connection: &storage.IbcConnection{
 					Client: &storage.IbcClient{
-						ChainId: "chain-id",
+						ChainId:   "chain-id",
+						CreatorId: 1,
 					},
 				},
 			},
@@ -659,6 +696,15 @@ func (s *IbcTestSuite) TestListTransferWithHash() {
 	s.Require().NotNil(transfer.Sender)
 	s.Require().EqualValues(testAddress, transfer.Sender.Hash)
 	s.Require().Equal("chain-id", transfer.ChainId)
+	s.Require().NotNil(transfer.Relayer)
+	s.Require().EqualValues("Test name 1", transfer.Relayer.Name)
+	s.Require().EqualValues("https://example.com/logo1.png", transfer.Relayer.Logo)
+	s.Require().NotNil(transfer.Relayer.Contact)
+	s.Require().EqualValues("https://test1.io", transfer.Relayer.Contact.Website)
+	s.Require().EqualValues("https://github.com/testrepo1", transfer.Relayer.Contact.Github)
+	s.Require().EqualValues("https://twitter.com/test1", transfer.Relayer.Contact.Twitter)
+	s.Require().Len(transfer.Relayer.Addresses, 1)
+	s.Require().EqualValues("celestia1xyz1488", transfer.Relayer.Addresses[0])
 }
 
 func (s *IbcTestSuite) TestRelayerList() {
@@ -674,12 +720,12 @@ func (s *IbcTestSuite) TestRelayerList() {
 	err := json.NewDecoder(rec.Body).Decode(&response)
 	s.Require().NoError(err)
 	s.Require().Len(response, 1)
-	s.Require().EqualValues("Test name", response[0].Name)
-	s.Require().EqualValues("https://example.com/logo.png", response[0].Logo)
+	s.Require().EqualValues("Test name 1", response[0].Name)
+	s.Require().EqualValues("https://example.com/logo1.png", response[0].Logo)
 	s.Require().Len(response[0].Addresses, 1)
-	s.Require().EqualValues(response[0].Addresses[0], "celestia1xyz123")
+	s.Require().EqualValues(response[0].Addresses[0], "celestia1xyz1488")
 	s.Require().NotNil(response[0].Contact)
-	s.Require().EqualValues(response[0].Contact.Website, "https://test.io")
-	s.Require().EqualValues(response[0].Contact.Github, "https://github.com/testrepo")
-	s.Require().EqualValues(response[0].Contact.Twitter, "https://twitter.com/test")
+	s.Require().EqualValues(response[0].Contact.Website, "https://test1.io")
+	s.Require().EqualValues(response[0].Contact.Github, "https://github.com/testrepo1")
+	s.Require().EqualValues(response[0].Contact.Twitter, "https://twitter.com/test1")
 }
