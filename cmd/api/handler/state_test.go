@@ -73,7 +73,6 @@ func (s *StateTestSuite) TestHead() {
 			TotalFee:        decimal.RequireFromString("2"),
 			TotalBlobsSize:  30,
 			TotalValidators: 10,
-			TotalStake:      decimal.NewFromInt(100),
 			TotalNamespaces: 100,
 			TotalProposals:  10,
 		}, nil).
@@ -97,7 +96,6 @@ func (s *StateTestSuite) TestHead() {
 	s.Require().EqualValues(100, state.TotalNamespaces)
 	s.Require().Equal(testTime, state.LastTime)
 	s.Require().Equal("100", state.TotalVotingPower)
-	s.Require().Equal("100", state.TotalStake)
 }
 
 func (s *StateTestSuite) TestNoHead() {

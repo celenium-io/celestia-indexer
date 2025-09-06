@@ -2351,6 +2351,45 @@
                 }
             }
         },
+        "/hyperlane/domains": {
+            "get": {
+                "description": "List hyperlane domains info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "List hyperlane domains info",
+                "operationId": "list-hyperlane-domains",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.DomainMetadata"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/hyperlane/mailbox": {
             "get": {
                 "description": "List hyperlane mailboxes info",
@@ -2661,6 +2700,14 @@
                         "description": "Domain of counterparty chain",
                         "name": "domain",
                         "in": "query"
+                    },
+                    {
+                        "maxLength": 64,
+                        "minLength": 64,
+                        "type": "string",
+                        "description": "Transaction hash in hexadecimal",
+                        "name": "hash",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2671,6 +2718,51 @@
                             "items": {
                                 "$ref": "#/definitions/responses.HyperlaneTransfer"
                             }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/hyperlane/transfer/{id}": {
+            "get": {
+                "description": "Get transfer by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "Get transfer by id",
+                "operationId": "get-hyperlane-transfer",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal identity",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.HyperlaneTransfer"
                         }
                     },
                     "204": {
@@ -3131,6 +3223,14 @@
                         "description": "Address: receiver or sender",
                         "name": "address",
                         "in": "query"
+                    },
+                    {
+                        "maxLength": 64,
+                        "minLength": 64,
+                        "type": "string",
+                        "description": "Transaction hash in hexadecimal",
+                        "name": "hash",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3141,6 +3241,51 @@
                             "items": {
                                 "$ref": "#/definitions/responses.IbcTransfer"
                             }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/ibc/transfer/{id}": {
+            "get": {
+                "description": "Get transfer by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ibc"
+                ],
+                "summary": "Get transfer by id",
+                "operationId": "get-ibc-transfer",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal identity",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.IbcTransfer"
                         }
                     },
                     "204": {
@@ -4708,6 +4853,176 @@
                 }
             }
         },
+        "/signal": {
+            "get": {
+                "description": "List signals",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "signal"
+                ],
+                "summary": "List signals",
+                "operationId": "list-signal",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Version",
+                        "name": "version",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Validator internal id",
+                        "name": "validator_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Transaction hash",
+                        "name": "tx_hash",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.SignalVersion"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/signal/upgrade": {
+            "get": {
+                "description": "List upgrades",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "signal"
+                ],
+                "summary": "List upgrades",
+                "operationId": "list-upgrades",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Number of block",
+                        "name": "height",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Transaction hash",
+                        "name": "tx_hash",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Signer address",
+                        "name": "signer",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Upgrade"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/changes_24h": {
             "get": {
                 "description": "Get changes for 24 hours",
@@ -4727,6 +5042,210 @@
                             "items": {
                                 "$ref": "#/definitions/responses.Change24hBlockStats"
                             }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/hyperlane/chains": {
+            "get": {
+                "description": "Get stats for hyperlane transfers splitted by domain",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get stats for hyperlane transfers splitted by domain",
+                "operationId": "stats-hl-domains",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.HlDomainStats"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/hyperlane/chains/{name}/{timeframe}": {
+            "get": {
+                "description": "Get histogram for aggregated hyperlane domains with precomputed stats by series name and timeframe",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get histogram for aggregated hyperlane domains with precomputed stats",
+                "operationId": "stats-hl-total-series",
+                "parameters": [
+                    {
+                        "enum": [
+                            "hour",
+                            "day",
+                            "month"
+                        ],
+                        "type": "string",
+                        "description": "Timeframe",
+                        "name": "timeframe",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "count",
+                            "amount"
+                        ],
+                        "type": "string",
+                        "description": "Series name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.HistogramItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/hyperlane/series/{id}/{name}/{timeframe}": {
+            "get": {
+                "description": "Get histogram for hyperlane domains with precomputed stats by series name and timeframe",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get histogram for hyperlane domains with precomputed stats",
+                "operationId": "stats-hl-series",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Domain id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "hour",
+                            "day",
+                            "month"
+                        ],
+                        "type": "string",
+                        "description": "Timeframe",
+                        "name": "timeframe",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "count",
+                            "amount"
+                        ],
+                        "type": "string",
+                        "description": "Series name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.HistogramItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
                         }
                     },
                     "500": {
@@ -7261,6 +7780,28 @@
                 }
             }
         },
+        "responses.DomainMetadata": {
+            "type": "object",
+            "properties": {
+                "block_explorers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responses.BlockExplorer"
+                    }
+                },
+                "domain": {
+                    "type": "integer",
+                    "example": 1488
+                },
+                "name": {
+                    "type": "string",
+                    "example": "name"
+                },
+                "native_token": {
+                    "$ref": "#/definitions/responses.NativeToken"
+                }
+            }
+        },
         "responses.Enums": {
             "type": "object",
             "properties": {
@@ -7463,6 +8004,29 @@
                     "type": "string",
                     "format": "string",
                     "example": "2223424"
+                }
+            }
+        },
+        "responses.HlDomainStats": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "1234.5678"
+                },
+                "chain_metadata": {
+                    "$ref": "#/definitions/responses.ChainMetadata"
+                },
+                "domain_id": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 123456
+                },
+                "transfers_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 123445
                 }
             }
         },
@@ -9304,6 +9868,44 @@
                 }
             }
         },
+        "responses.SignalVersion": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2025-07-04T03:10:57+00:00"
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "validator": {
+                    "$ref": "#/definitions/responses.ShortValidator"
+                },
+                "version": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1
+                },
+                "voting_power": {
+                    "type": "string",
+                    "format": "int64",
+                    "example": "9348"
+                }
+            }
+        },
         "responses.SignedBlocks": {
             "type": "object",
             "properties": {
@@ -9418,11 +10020,6 @@
                     "type": "integer",
                     "format": "int64",
                     "example": 56789
-                },
-                "total_stake": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "312"
                 },
                 "total_supply": {
                     "type": "string",
@@ -9653,6 +10250,44 @@
                 },
                 "validator": {
                     "$ref": "#/definitions/responses.ShortValidator"
+                }
+            }
+        },
+        "responses.Upgrade": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "msg_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 2
+                },
+                "signer": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2025-07-04T03:10:57+00:00"
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "version": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1
                 }
             }
         },

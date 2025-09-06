@@ -40,7 +40,6 @@ type State struct {
 	TotalValidators int             `bun:"total_validators"          comment:"Total validator's count"`
 	TotalSupply     decimal.Decimal `bun:"total_supply,type:numeric" comment:"Total supply in celestia"`
 	TotalFee        decimal.Decimal `bun:"total_fee,type:numeric"    comment:"Total paid fee"`
-	TotalStake      decimal.Decimal `bun:"total_stake,type:numeric"  comment:"Total stake"`
 
 	TotalVotingPower decimal.Decimal `bun:"-"`
 }
