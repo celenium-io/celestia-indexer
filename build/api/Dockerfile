@@ -18,7 +18,6 @@ RUN go mod download
 COPY cmd/api cmd/api
 COPY internal internal
 COPY pkg pkg
-COPY assets/relayers_celestia.json assets/relayers_celestia.json
 
 WORKDIR $GOPATH/src/github.com/celenium-io/celestia-indexer/cmd/api/
 RUN go build -a -installsuffix cgo -o /go/bin/api .
@@ -35,5 +34,6 @@ COPY --from=builder /go/bin/api /go/bin/api
 COPY ./configs/dipdup.yml ./
 COPY database database
 COPY cmd/api/docs docs
+COPY assets/relayers_celestia.json assets/relayers_celestia.json
 
 ENTRYPOINT ["/go/bin/api", "-c", "dipdup.yml"]

@@ -5,11 +5,9 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"io"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -18,9 +16,9 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/cache"
 	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
-	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
 	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
+	"github.com/celenium-io/celestia-indexer/cmd/api/ibc_relayer"
 	"github.com/celenium-io/celestia-indexer/internal/blob"
 	"github.com/celenium-io/celestia-indexer/internal/profiler"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -486,11 +484,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		proposal.GET("/:id/votes", proposalHandler.Votes)
 	}
 
-	rFile, rMap, err := initIbcRelayers(ctx, db.Address)
+	relayers, err := ibc_relayer.NewRelayerStore(ctx, "../../assets/relayers_celestia.json", db.Address)
 	if err != nil {
 		log.Warn().Err(err).Msg("init IBC relayers")
 	}
-	ibcHandler := handler.NewIbcHandler(db.IbcClients, db.IbcConnections, db.IbcChannels, db.IbcTransfers, db.Address, db.Tx, rFile, rMap)
+	ibcHandler := handler.NewIbcHandler(db.IbcClients, db.IbcConnections, db.IbcChannels, db.IbcTransfers, db.Address, db.Tx, relayers)
 	ibc := v1.Group("/ibc")
 	{
 		ibcClient := ibc.Group("/client")
@@ -691,44 +689,4 @@ func initChainStore(ctx context.Context, url string) {
 		chainStore = hyperlane.NewChainStore(url)
 		chainStore.Start(ctx)
 	}
-}
-
-func initIbcRelayers(ctx context.Context, address storage.IAddress) ([]byte, map[uint64]responses.Relayer, error) {
-	file, err := readRelayersFile("../../assets/relayers_celestia.json")
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var metadata []responses.Relayer
-	if err = json.Unmarshal(file, &metadata); err != nil {
-		return nil, nil, err
-	}
-
-	if address == nil {
-		return nil, nil, errors.New("received 'nil' instead of storage.IAddress")
-	}
-
-	relayers := make(map[uint64]responses.Relayer)
-	for _, relayer := range metadata {
-		for _, addr := range relayer.Addresses {
-			id, err := address.IdByAddress(ctx, addr)
-			if err != nil {
-				continue
-			}
-			relayers[id] = relayer
-		}
-	}
-
-	return file, relayers, nil
-}
-
-func readRelayersFile(path string) ([]byte, error) {
-	wd, _ := os.Getwd()
-	p := filepath.Join(wd, path)
-	data, err := os.ReadFile(p)
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
 }

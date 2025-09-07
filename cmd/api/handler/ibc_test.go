@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	mockIbc "github.com/celenium-io/celestia-indexer/cmd/api/ibc_relayer"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
@@ -91,17 +92,6 @@ var testIbcChannel = storage.IbcChannel{
 	},
 }
 
-var testRelayersFile = `[{
-		"name": "Test name 1",
-		"logo": "https://example.com/logo1.png",
-		"contact": {
-			"website": "https://test1.io",
-			"github": "https://github.com/testrepo1",
-			"twitter": "https://twitter.com/test1"
-		},
-		"addresses": ["celestia1xyz1488"]
-	}]`
-
 var relayersMap = map[uint64]responses.Relayer{
 	1: {
 		Name: "Test name 1",
@@ -128,17 +118,16 @@ var relayersMap = map[uint64]responses.Relayer{
 // IbcTestSuite -
 type IbcTestSuite struct {
 	suite.Suite
-	echo         *echo.Echo
-	address      *mock.MockIAddress
-	clients      *mock.MockIIbcClient
-	conns        *mock.MockIIbcConnection
-	channels     *mock.MockIIbcChannel
-	transfers    *mock.MockIIbcTransfer
-	txs          *mock.MockITx
-	relayersFile []byte
-	relayersMap  map[uint64]responses.Relayer
-	handler      *IbcHandler
-	ctrl         *gomock.Controller
+	echo      *echo.Echo
+	address   *mock.MockIAddress
+	clients   *mock.MockIIbcClient
+	conns     *mock.MockIIbcConnection
+	channels  *mock.MockIIbcChannel
+	transfers *mock.MockIIbcTransfer
+	txs       *mock.MockITx
+	relayers  *mockIbc.MockIRelayerStore
+	handler   *IbcHandler
+	ctrl      *gomock.Controller
 }
 
 // SetupSuite -
@@ -152,10 +141,9 @@ func (s *IbcTestSuite) SetupSuite() {
 	s.transfers = mock.NewMockIIbcTransfer(s.ctrl)
 	s.txs = mock.NewMockITx(s.ctrl)
 	s.address = mock.NewMockIAddress(s.ctrl)
-	s.relayersFile = []byte(testRelayersFile)
-	s.relayersMap = relayersMap
+	s.relayers = mockIbc.NewMockIRelayerStore(s.ctrl)
 
-	s.handler = NewIbcHandler(s.clients, s.conns, s.channels, s.transfers, s.address, s.txs, s.relayersFile, s.relayersMap)
+	s.handler = NewIbcHandler(s.clients, s.conns, s.channels, s.transfers, s.address, s.txs, s.relayers)
 }
 
 // TearDownSuite -
@@ -393,6 +381,11 @@ func (s *IbcTestSuite) TestListTransfers() {
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/transfer")
 
+	s.relayers.EXPECT().
+		List().
+		Return(relayersMap).
+		Times(1)
+
 	s.transfers.EXPECT().
 		List(gomock.Any(), storage.ListIbcTransferFilters{
 			Limit: 10,
@@ -470,6 +463,11 @@ func (s *IbcTestSuite) TestListTransfersByChainId() {
 	s.conns.EXPECT().
 		IdsByClients(gomock.Any(), "client").
 		Return([]string{"connection-1"}, nil).
+		Times(1)
+
+	s.relayers.EXPECT().
+		List().
+		Return(relayersMap).
 		Times(1)
 
 	s.transfers.EXPECT().
@@ -592,6 +590,11 @@ func (s *IbcTestSuite) TestGetTransfer() {
 		}, nil).
 		Times(1)
 
+	s.relayers.EXPECT().
+		List().
+		Return(relayersMap).
+		Times(1)
+
 	s.Require().NoError(s.handler.GetIbcTransfer(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
@@ -639,6 +642,11 @@ func (s *IbcTestSuite) TestListTransferWithHash() {
 	s.txs.EXPECT().
 		ByHash(gomock.Any(), testTxHashBytes).
 		Return(testTx, nil)
+
+	s.relayers.EXPECT().
+		List().
+		Return(relayersMap).
+		Times(1)
 
 	s.transfers.EXPECT().
 		List(gomock.Any(), gomock.Any()).
@@ -707,11 +715,21 @@ func (s *IbcTestSuite) TestListTransferWithHash() {
 	s.Require().EqualValues("celestia1xyz1488", transfer.Relayer.Addresses[0])
 }
 
-func (s *IbcTestSuite) TestRelayerList() {
+func (s *IbcTestSuite) TestAllRelayers() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/relayers")
+
+	values := make([]responses.Relayer, 0, len(relayersMap))
+	for _, v := range relayersMap {
+		values = append(values, v)
+	}
+
+	s.relayers.EXPECT().
+		All().
+		Return(values).
+		Times(1)
 
 	s.Require().NoError(s.handler.IbcRelayers(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
@@ -719,13 +737,13 @@ func (s *IbcTestSuite) TestRelayerList() {
 	var response []responses.Relayer
 	err := json.NewDecoder(rec.Body).Decode(&response)
 	s.Require().NoError(err)
-	s.Require().Len(response, 1)
-	s.Require().EqualValues("Test name 1", response[0].Name)
-	s.Require().EqualValues("https://example.com/logo1.png", response[0].Logo)
-	s.Require().Len(response[0].Addresses, 1)
-	s.Require().EqualValues(response[0].Addresses[0], "celestia1xyz1488")
-	s.Require().NotNil(response[0].Contact)
-	s.Require().EqualValues(response[0].Contact.Website, "https://test1.io")
-	s.Require().EqualValues(response[0].Contact.Github, "https://github.com/testrepo1")
-	s.Require().EqualValues(response[0].Contact.Twitter, "https://twitter.com/test1")
+	s.Require().Len(response, 2)
+	s.Require().EqualValues("Test name 1", response[1].Name)
+	s.Require().EqualValues("https://example.com/logo1.png", response[1].Logo)
+	s.Require().Len(response[1].Addresses, 1)
+	s.Require().EqualValues(response[1].Addresses[0], "celestia1xyz1488")
+	s.Require().NotNil(response[1].Contact)
+	s.Require().EqualValues(response[1].Contact.Website, "https://test1.io")
+	s.Require().EqualValues(response[1].Contact.Github, "https://github.com/testrepo1")
+	s.Require().EqualValues(response[1].Contact.Twitter, "https://twitter.com/test1")
 }

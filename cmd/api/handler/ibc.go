@@ -6,24 +6,23 @@ package handler
 import (
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/cmd/api/ibc_relayer"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
 )
 
 type IbcHandler struct {
-	clients      storage.IIbcClient
-	conns        storage.IIbcConnection
-	channels     storage.IIbcChannel
-	transfers    storage.IIbcTransfer
-	address      storage.IAddress
-	txs          storage.ITx
-	relayersFile []byte
-	relayers     map[uint64]responses.Relayer
+	clients   storage.IIbcClient
+	conns     storage.IIbcConnection
+	channels  storage.IIbcChannel
+	transfers storage.IIbcTransfer
+	address   storage.IAddress
+	txs       storage.ITx
+	store     ibc_relayer.IRelayerStore
 }
 
 func NewIbcHandler(
@@ -33,18 +32,16 @@ func NewIbcHandler(
 	transfers storage.IIbcTransfer,
 	address storage.IAddress,
 	txs storage.ITx,
-	file []byte,
-	relayers map[uint64]responses.Relayer,
+	store ibc_relayer.IRelayerStore,
 ) *IbcHandler {
 	return &IbcHandler{
-		clients:      clients,
-		conns:        conns,
-		channels:     channels,
-		transfers:    transfers,
-		address:      address,
-		txs:          txs,
-		relayersFile: file,
-		relayers:     relayers,
+		clients:   clients,
+		conns:     conns,
+		channels:  channels,
+		transfers: transfers,
+		address:   address,
+		txs:       txs,
+		store:     store,
 	}
 }
 
@@ -441,9 +438,10 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 
+	metadata := handler.store.List()
 	response := make([]responses.IbcTransfer, len(transfers))
 	for i := range transfers {
-		response[i] = responses.NewIbcTransfer(transfers[i], handler.relayers)
+		response[i] = responses.NewIbcTransfer(transfers[i], metadata)
 	}
 	return returnArray(c, response)
 }
@@ -472,7 +470,7 @@ func (handler *IbcHandler) GetIbcTransfer(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 
-	return c.JSON(http.StatusOK, responses.NewIbcTransfer(transfer, handler.relayers))
+	return c.JSON(http.StatusOK, responses.NewIbcTransfer(transfer, handler.store.List()))
 }
 
 // IbcRelayers godoc
@@ -487,10 +485,5 @@ func (handler *IbcHandler) GetIbcTransfer(c echo.Context) error {
 //	@Failure		500	{object}	Error
 //	@Router			/ibc/relayers [get]
 func (handler *IbcHandler) IbcRelayers(c echo.Context) error {
-	var relayers []responses.Relayer
-	if err := json.Unmarshal(handler.relayersFile, &relayers); err != nil {
-		return internalServerError(c, err)
-	}
-
-	return returnArray(c, relayers)
+	return returnArray(c, handler.store.All())
 }
