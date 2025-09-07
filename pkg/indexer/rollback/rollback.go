@@ -260,7 +260,6 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	state.TotalValidators -= vals.count
 	state.TotalFee = state.TotalFee.Sub(blockStats.Fee)
 	state.TotalSupply = state.TotalSupply.Sub(blockStats.SupplyChange)
-	state.TotalStake = state.TotalStake.Sub(vals.stake)
 
 	if err := tx.Update(ctx, &state); err != nil {
 		return tx.HandleError(ctx, err)

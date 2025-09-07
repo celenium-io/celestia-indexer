@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
-	"github.com/shopspring/decimal"
 )
 
 func (module *Module) save(ctx context.Context, data parsedData) error {
@@ -125,11 +124,6 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		return tx.HandleError(ctx, err)
 	}
 
-	totalStake := decimal.NewFromInt(0)
-	for i := range data.validators {
-		totalStake = totalStake.Add(data.validators[i].Stake)
-	}
-
 	for i := range data.stakingLogs {
 		if address, ok := data.addresses[data.stakingLogs[i].Address.Address]; ok {
 			data.stakingLogs[i].AddressId = &address.Id
@@ -237,7 +231,6 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		TotalAccounts:   totalAccounts,
 		TotalNamespaces: totalNamespaces,
 		TotalValidators: totalValidators,
-		TotalStake:      totalStake,
 	}); err != nil {
 		return tx.HandleError(ctx, err)
 	}

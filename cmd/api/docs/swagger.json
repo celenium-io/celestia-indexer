@@ -8076,9 +8076,9 @@
             "type": "object",
             "properties": {
                 "amount": {
-                    "type": "integer",
+                    "type": "string",
                     "format": "string",
-                    "example": 123456789
+                    "example": "1234.5678"
                 },
                 "chain_metadata": {
                     "$ref": "#/definitions/responses.ChainMetadata"
@@ -10115,11 +10115,6 @@
                     "type": "integer",
                     "format": "int64",
                     "example": 56789
-                },
-                "total_stake": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "312"
                 },
                 "total_supply": {
                     "type": "string",

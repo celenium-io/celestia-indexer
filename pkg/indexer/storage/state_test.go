@@ -87,7 +87,7 @@ func Test_updateState(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := updateState(tt.args.block, tt.args.totalAccounts, tt.args.totalNamespaces, tt.args.totalProposals, tt.args.ibcClientsCount, tt.args.totalValidators, decimal.Zero, tt.args.state)
+			err := updateState(tt.args.block, tt.args.totalAccounts, tt.args.totalNamespaces, tt.args.totalProposals, tt.args.ibcClientsCount, tt.args.totalValidators, tt.args.state)
 			require.NoError(t, err)
 		})
 	}
