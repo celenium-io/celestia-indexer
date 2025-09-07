@@ -29,6 +29,7 @@ func (c *IbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFil
 	}
 
 	query = limitScope(query, fltrs.Limit)
+	query = query.OrderExpr("time ?0, id ?0", bun.Safe(fltrs.Sort))
 
 	if fltrs.ChannelId != "" {
 		query = query.Where("channel_id = ?", fltrs.ChannelId)
