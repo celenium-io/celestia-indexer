@@ -20,18 +20,19 @@ type RelayerStore struct {
 }
 
 func NewRelayerStore(ctx context.Context, pathToFile string, address storage.IAddress) (*RelayerStore, error) {
+	rs := &RelayerStore{}
 	file, err := readFile(pathToFile)
 	if err != nil {
-		return nil, err
+		return rs, err
 	}
 
 	var relayers []responses.Relayer
 	if err = json.Unmarshal(file, &relayers); err != nil {
-		return nil, err
+		return rs, err
 	}
 
 	if address == nil {
-		return nil, errors.New("received 'nil' instead of storage.IAddress")
+		return rs, errors.New("received 'nil' instead of storage.IAddress")
 	}
 
 	data := make(map[uint64]responses.Relayer)
@@ -44,27 +45,18 @@ func NewRelayerStore(ctx context.Context, pathToFile string, address storage.IAd
 			data[id] = relayer
 		}
 	}
-
-	rs := &RelayerStore{
-		metadata: data,
-		relayers: relayers,
-	}
+	rs.metadata = data
+	rs.relayers = relayers
 
 	return rs, nil
 }
 
 func (s *RelayerStore) List() map[uint64]responses.Relayer {
-	if s != nil {
-		return s.metadata
-	}
-	return map[uint64]responses.Relayer{}
+	return s.metadata
 }
 
 func (s *RelayerStore) All() []responses.Relayer {
-	if s != nil {
-		return s.relayers
-	}
-	return []responses.Relayer{}
+	return s.relayers
 }
 
 func readFile(path string) ([]byte, error) {
