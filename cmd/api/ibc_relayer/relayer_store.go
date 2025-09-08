@@ -54,11 +54,17 @@ func NewRelayerStore(ctx context.Context, pathToFile string, address storage.IAd
 }
 
 func (s *RelayerStore) List() map[uint64]responses.Relayer {
-	return s.metadata
+	if s != nil {
+		return s.metadata
+	}
+	return map[uint64]responses.Relayer{}
 }
 
 func (s *RelayerStore) All() []responses.Relayer {
-	return s.relayers
+	if s != nil {
+		return s.relayers
+	}
+	return []responses.Relayer{}
 }
 
 func readFile(path string) ([]byte, error) {

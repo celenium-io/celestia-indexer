@@ -34,6 +34,6 @@ COPY --from=builder /go/bin/api /go/bin/api
 COPY ./configs/dipdup.yml ./
 COPY database database
 COPY cmd/api/docs docs
-COPY assets/relayers_celestia.json assets/relayers_celestia.json
+COPY assets assets
 
 ENTRYPOINT ["/go/bin/api", "-c", "dipdup.yml"]
