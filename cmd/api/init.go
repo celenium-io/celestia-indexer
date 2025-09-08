@@ -18,6 +18,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
 	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
+	"github.com/celenium-io/celestia-indexer/cmd/api/ibc_relayer"
 	"github.com/celenium-io/celestia-indexer/internal/blob"
 	"github.com/celenium-io/celestia-indexer/internal/profiler"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -483,7 +484,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		proposal.GET("/:id/votes", proposalHandler.Votes)
 	}
 
-	ibcHandler := handler.NewIbcHandler(db.IbcClients, db.IbcConnections, db.IbcChannels, db.IbcTransfers, db.Address, db.Tx)
+	relayers, err := ibc_relayer.NewRelayerStore(ctx, "../../assets/relayers_celestia.json", db.Address)
+	if err != nil {
+		log.Warn().Err(err).Msg("init IBC relayers")
+	}
+	ibcHandler := handler.NewIbcHandler(db.IbcClients, db.IbcConnections, db.IbcChannels, db.IbcTransfers, db.Address, db.Tx, relayers)
 	ibc := v1.Group("/ibc")
 	{
 		ibcClient := ibc.Group("/client")
@@ -507,6 +512,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			ibcTransfer.GET("", ibcHandler.ListTransfers)
 			ibcTransfer.GET("/:id", ibcHandler.GetIbcTransfer)
 		}
+		ibc.GET("/relayers", ibcHandler.IbcRelayers, defaultMiddlewareCache)
 	}
 
 	hyperlaneHandler := handler.NewHyperlaneHandler(db.HLMailbox, db.HLToken, db.HLTransfer, db.Tx, db.Address, chainStore)

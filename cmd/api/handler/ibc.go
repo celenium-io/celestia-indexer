@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/cmd/api/ibc_relayer"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
@@ -21,6 +22,7 @@ type IbcHandler struct {
 	transfers storage.IIbcTransfer
 	address   storage.IAddress
 	txs       storage.ITx
+	store     ibc_relayer.IRelayerStore
 }
 
 func NewIbcHandler(
@@ -30,6 +32,7 @@ func NewIbcHandler(
 	transfers storage.IIbcTransfer,
 	address storage.IAddress,
 	txs storage.ITx,
+	store ibc_relayer.IRelayerStore,
 ) *IbcHandler {
 	return &IbcHandler{
 		clients:   clients,
@@ -38,6 +41,7 @@ func NewIbcHandler(
 		transfers: transfers,
 		address:   address,
 		txs:       txs,
+		store:     store,
 	}
 }
 
@@ -434,9 +438,10 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 
+	metadata := handler.store.List()
 	response := make([]responses.IbcTransfer, len(transfers))
 	for i := range transfers {
-		response[i] = responses.NewIbcTransfer(transfers[i])
+		response[i] = responses.NewIbcTransfer(transfers[i], metadata)
 	}
 	return returnArray(c, response)
 }
@@ -465,5 +470,20 @@ func (handler *IbcHandler) GetIbcTransfer(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 
-	return c.JSON(http.StatusOK, responses.NewIbcTransfer(transfer))
+	return c.JSON(http.StatusOK, responses.NewIbcTransfer(transfer, handler.store.List()))
+}
+
+// IbcRelayers godoc
+//
+//	@Summary		List ibc relayers
+//	@Description	List ibc relayers
+//	@Tags			ibc
+//	@ID				get-ibc-relayers
+//	@Produce		json
+//	@Success		200	{array}		responses.Relayer
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/ibc/relayers [get]
+func (handler *IbcHandler) IbcRelayers(c echo.Context) error {
+	return returnArray(c, handler.store.All())
 }

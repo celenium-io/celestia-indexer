@@ -3153,6 +3153,42 @@
                 }
             }
         },
+        "/ibc/relayers": {
+            "get": {
+                "description": "List ibc relayers",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ibc"
+                ],
+                "summary": "List ibc relayers",
+                "operationId": "get-ibc-relayers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Relayer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/ibc/transfer": {
             "get": {
                 "description": "Get ibc transfers info",
@@ -7700,6 +7736,35 @@
                 }
             }
         },
+        "responses.Contact": {
+            "type": "object",
+            "properties": {
+                "discord": {
+                    "type": "string",
+                    "example": "https://discord.cosmosrescue.com"
+                },
+                "github": {
+                    "type": "string",
+                    "example": "https://github.com/cosmosrescue"
+                },
+                "medium": {
+                    "type": "string",
+                    "example": "https://medium.com/cosmosrescue"
+                },
+                "telegram": {
+                    "type": "string",
+                    "example": "https://t.me/cosmosrescue"
+                },
+                "twitter": {
+                    "type": "string",
+                    "example": "https://x.com/cosmosrescue"
+                },
+                "website": {
+                    "type": "string",
+                    "example": "https://cosmosrescue.com"
+                }
+            }
+        },
         "responses.CountItem": {
             "type": "object",
             "properties": {
@@ -8581,6 +8646,9 @@
                 "receiver": {
                     "$ref": "#/definitions/responses.ShortAddress"
                 },
+                "relayer": {
+                    "$ref": "#/definitions/responses.Relayer"
+                },
                 "sender": {
                     "$ref": "#/definitions/responses.ShortAddress"
                 },
@@ -9208,6 +9276,33 @@
                 "time": {
                     "type": "string",
                     "example": "2023-07-04T03:10:57+00:00"
+                }
+            }
+        },
+        "responses.Relayer": {
+            "type": "object",
+            "properties": {
+                "addresses": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    ]
+                },
+                "contact": {
+                    "$ref": "#/definitions/responses.Contact"
+                },
+                "logo": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "https://raw.githubusercontent.com/irisnet/iob-registry/main/relayers/cosmosrescue/logo.png"
+                },
+                "name": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "cosmosrescue"
                 }
             }
         },
