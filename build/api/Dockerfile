@@ -34,6 +34,6 @@ COPY --from=builder /go/bin/api /go/bin/api
 COPY ./configs/dipdup.yml ./
 COPY database database
 COPY cmd/api/docs docs
-COPY assets assets
+COPY cmd/api/assets assets
 
 ENTRYPOINT ["/go/bin/api", "-c", "dipdup.yml"]
