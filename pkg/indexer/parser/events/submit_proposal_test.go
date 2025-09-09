@@ -188,7 +188,8 @@ func Test_handleSubmitProposal(t *testing.T) {
 					Height: 58507,
 					Type:   "message",
 					Data: map[string]any{
-						"action": "/cosmos.gov.v1.MsgSubmitProposal",
+						"action":    "/cosmos.gov.v1.MsgSubmitProposal",
+						"msg_index": "0",
 					},
 				}, {
 					Height: 58507,
@@ -196,20 +197,23 @@ func Test_handleSubmitProposal(t *testing.T) {
 					Data: map[string]any{
 						"proposal_id":       "2",
 						"proposal_messages": ",/cosmos.gov.v1beta1.MsgSubmitProposal",
+						"msg_index":         "0",
 					},
 				}, {
 					Height: 58507,
 					Type:   "coin_spent",
 					Data: map[string]any{
-						"amount":  "",
-						"spender": "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
+						"amount":    "",
+						"spender":   "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
+						"msg_index": "0",
 					},
 				}, {
 					Height: 58507,
 					Type:   "coin_received",
 					Data: map[string]any{
-						"amount":   "",
-						"receiver": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+						"amount":    "",
+						"receiver":  "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+						"msg_index": "0",
 					},
 				}, {
 					Height: 58507,
@@ -218,12 +222,14 @@ func Test_handleSubmitProposal(t *testing.T) {
 						"amount":    "",
 						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 						"sender":    "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
+						"msg_index": "0",
 					},
 				}, {
 					Height: 58507,
 					Type:   "message",
 					Data: map[string]any{
-						"sender": "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
+						"sender":    "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
+						"msg_index": "0",
 					},
 				}, {
 					Height: 58507,
@@ -231,13 +237,15 @@ func Test_handleSubmitProposal(t *testing.T) {
 					Data: map[string]any{
 						"amount":      "",
 						"proposal_id": "2",
+						"msg_index":   "0",
 					},
 				}, {
 					Height: 58507,
 					Type:   "message",
 					Data: map[string]any{
-						"module": "governance",
-						"sender": "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
+						"module":    "governance",
+						"sender":    "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
+						"msg_index": "0",
 					},
 				},
 			},
@@ -253,6 +261,93 @@ func Test_handleSubmitProposal(t *testing.T) {
 				Id:      2,
 				Status:  types.ProposalStatusInactive,
 				Deposit: decimal.Zero,
+			},
+		}, {
+			name: "submit_proposal test 4",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 8113801,
+					Type:   "message",
+					Data: map[string]any{
+						"action":    "/cosmos.gov.v1.MsgSubmitProposal",
+						"module":    "gov",
+						"msg_index": "0",
+						"sender":    "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+					},
+				}, {
+					Height: 8113801,
+					Type:   "submit_proposal",
+					Data: map[string]any{
+						"msg_index":         "0",
+						"proposal_id":       "4",
+						"proposal_messages": ",/celestia.blob.v1.MsgUpdateBlobParams,/cosmos.consensus.v1.MsgUpdateParams",
+						"proposal_proposer": "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+					},
+				}, {
+					Height: 8113801,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":    "10000000000utia",
+						"msg_index": "0",
+						"spender":   "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+					},
+				}, {
+					Height: 8113801,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":    "10000000000utia",
+						"msg_index": "0",
+						"receiver":  "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+					},
+				}, {
+					Height: 8113801,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "10000000000utia",
+						"msg_index": "0",
+						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+						"sender":    "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+					},
+				}, {
+					Height: 8113801,
+					Type:   "message",
+					Data: map[string]any{
+						"msg_index": "0",
+						"sender":    "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+					},
+				}, {
+					Height: 8113801,
+					Type:   "proposal_deposit",
+					Data: map[string]any{
+						"amount":      "10000000000utia",
+						"depositor":   "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+						"msg_index":   "0",
+						"proposal_id": "4",
+					},
+				}, {
+					Height: 8113801,
+					Type:   "submit_proposal",
+					Data: map[string]any{
+						"msg_index":           "0",
+						"voting_period_start": "4",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgSubmitProposal,
+				Height: 8113801,
+				Proposal: &storage.Proposal{
+					Status: types.ProposalStatusActive,
+				},
+				Time: ts,
+			},
+			idx: testsuite.Ptr(0),
+			proposal: storage.Proposal{
+				Id:             4,
+				Status:         types.ProposalStatusActive,
+				Deposit:        decimal.RequireFromString("10000000000"),
+				ActivationTime: &ts,
 			},
 		},
 	}
