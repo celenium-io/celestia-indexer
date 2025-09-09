@@ -224,11 +224,10 @@ func NewIbcTransfer(transfer storage.IbcTransfer, relayers map[uint64]Relayer) I
 
 	if transfer.Connection != nil && transfer.Connection.Client != nil {
 		response.ChainId = transfer.Connection.Client.ChainId
-	}
-
-	if len(relayers) > 0 {
-		if relayer, ok := relayers[transfer.Connection.Client.CreatorId]; ok {
-			response.Relayer = &relayer
+		if len(relayers) > 0 {
+			if relayer, ok := relayers[transfer.Connection.Client.CreatorId]; ok {
+				response.Relayer = &relayer
+			}
 		}
 	}
 
