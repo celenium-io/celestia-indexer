@@ -109,6 +109,44 @@ func Test_handleVote(t *testing.T) {
 				Height: 871324,
 				Time:   ts,
 			},
+		}, {
+			name: "vote test 3",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 871324,
+					Type:   "message",
+					Data: map[string]any{
+						"action":    "/cosmos.gov.v1.MsgVote",
+						"sender":    "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+						"module":    "gov",
+						"msg_index": "0",
+					},
+				}, {
+					Height: 871324,
+					Type:   "proposal_vote",
+					Data: map[string]any{
+						"option":      "[{\"option\":1,\"weight\":\"1.000000000000000000\"}]",
+						"proposal_id": "4",
+						"voter":       "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgVote,
+				Height: 871324,
+			},
+			idx: testsuite.Ptr(0),
+			vote: storage.Vote{
+				ProposalId: 4,
+				Voter: &storage.Address{
+					Address: "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+				},
+				Option: types.VoteOptionYes,
+				Weight: decimal.RequireFromString("1.000000000000000000"),
+				Height: 871324,
+				Time:   ts,
+			},
 		},
 	}
 	for _, tt := range tests {

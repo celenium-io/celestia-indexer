@@ -12,6 +12,7 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/cosmos/cosmos-sdk/types"
+	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
@@ -178,6 +179,27 @@ func TestDecodeCosmosTx_DelegateMsg(t *testing.T) {
 	}
 	assert.Equal(t, expectedMsgs, d.Messages)
 	assert.Equal(t, "0", d.Fee.String())
+}
+
+func TestDecodeCosmosTx_VoteMsg(t *testing.T) {
+	rawTx, err := base64.StdEncoding.DecodeString("ClEKTwoWL2Nvc21vcy5nb3YudjEuTXNnVm90ZRI1CAQSL2NlbGVzdGlhMTJ6czdlM244cGpkOHk4ZXgwY3l2NjdldGh2MzBtZWtncXU2NjVyGAESaApQCkYKHy9jb3Ntb3MuY3J5cHRvLnNlY3AyNTZrMS5QdWJLZXkSIwohAyJq13zdVvBc4sHiqsxdwmZuhu/+7jp5qybynJAUP4VeEgQKAggBGEQSFAoOCgR1dGlhEgY1MDAwMDAQ85EFGkB0CjjkpeDX/bfNeifAKWUWMSf5l7l8DqsDosnuQK3XMjiTlXN4AthomxLpSDqS/i7fsV7cLnaKV2trwJR5FvTc")
+	require.NoError(t, err)
+
+	var d = NewDecodedTx()
+	err = decodeCosmosTx(txDecoder, rawTx, &d)
+	assert.NoError(t, err)
+	assert.Equal(t, uint64(0), d.TimeoutHeight)
+	assert.Equal(t, "", d.Memo)
+
+	expectedMsgs := []types.Msg{
+		&cosmosGovTypesV1.MsgVote{
+			ProposalId: 4,
+			Voter:      "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+			Option:     cosmosGovTypesV1.OptionYes,
+		},
+	}
+	assert.Equal(t, expectedMsgs, d.Messages)
+	assert.Equal(t, "500000", d.Fee.String())
 }
 
 func TestDecodeFee(t *testing.T) {

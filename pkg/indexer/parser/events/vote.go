@@ -4,6 +4,7 @@
 package events
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
+	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
@@ -51,11 +53,49 @@ func processVote(ctx *context.Context, events []storage.Event, _ *storage.Messag
 			Address: voter,
 		},
 	}
-	proposal := &storage.Proposal{
+	proposal := storage.Proposal{
 		Id:         proposalId,
 		VotesCount: 1,
 	}
 
+	if err := parseOption(option, &vote, &proposal, idx); err != nil {
+		return errors.Wrap(err, "parse option")
+	}
+
+	ctx.AddVote(&vote)
+	ctx.AddProposal(&proposal)
+	return nil
+}
+
+type optionType struct {
+	Option int             `json:"option"`
+	Weight decimal.Decimal `json:"weight"`
+}
+
+func parseOption(option string, vote *storage.Vote, proposal *storage.Proposal, idx *int) error {
+	var opts []optionType
+	if err := json.Unmarshal([]byte(option), &opts); err == nil {
+		if len(opts) == 0 {
+			return errors.New("empty vote options array")
+		}
+		switch opts[0].Option {
+		case int(cosmosGovTypesV1.OptionAbstain):
+			vote.Option = types.VoteOptionAbstain
+			proposal.Abstain += 1
+		case int(cosmosGovTypesV1.OptionNo):
+			vote.Option = types.VoteOptionNo
+			proposal.No += 1
+		case int(cosmosGovTypesV1.OptionNoWithVeto):
+			vote.Option = types.VoteOptionNoWithVeto
+			proposal.NoWithVeto += 1
+		case int(cosmosGovTypesV1.OptionYes):
+			vote.Option = types.VoteOptionYes
+			proposal.Yes += 1
+		}
+		vote.Weight = opts[0].Weight
+		*idx += 1
+		return nil
+	}
 	optionParts := strings.Split(option, " ")
 	for i := range optionParts {
 		values := strings.Split(optionParts[i], ":")
@@ -86,9 +126,6 @@ func processVote(ctx *context.Context, events []storage.Event, _ *storage.Messag
 			vote.Weight = decimal.RequireFromString(value)
 		}
 	}
-	ctx.AddVote(&vote)
-	ctx.AddProposal(proposal)
-
 	*idx += 2
 	return nil
 }
