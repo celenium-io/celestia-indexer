@@ -80,10 +80,16 @@ func processAcknowledgement(ctx *context.Context, events []storage.Event, msg *s
 
 		hasFtp := false
 		for action == "" && len(events)-1 > *idx {
-			*idx += 1
 			action = decoder.StringFromMap(events[*idx].Data, "action")
 
-			if events[*idx].Type == storageTypes.EventTypeFungibleTokenPacket {
+			switch events[*idx].Type {
+			case storageTypes.EventTypeAcknowledgePacket:
+				ack, err := decode.NewAcknowledgementPacket(events[*idx].Data)
+				if err != nil {
+					return errors.Wrap(err, "ack packet")
+				}
+				msg.IbcTransfer.ConnectionId = ack.PacketConnection
+			case storageTypes.EventTypeFungibleTokenPacket:
 				hasFtp = true
 				ftp := decode.NewFungibleTokenPacket(events[*idx].Data)
 				if ftp.Error != "" {
@@ -91,6 +97,7 @@ func processAcknowledgement(ctx *context.Context, events []storage.Event, msg *s
 					msg.IbcChannel = nil
 				}
 			}
+			*idx += 1
 		}
 
 		if !hasFtp {

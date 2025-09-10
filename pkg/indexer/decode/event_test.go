@@ -632,3 +632,48 @@ func TestNewHyperlaneDispatchEvent(t *testing.T) {
 		})
 	}
 }
+
+func TestNewAcknoledgementPacket(t *testing.T) {
+	tests := []struct {
+		name string
+		m    map[string]any
+		want AcknowledgementPacket
+	}{
+		{
+			name: "test 1",
+			m: map[string]any{
+				"connection_id":            "connection-2",
+				"msg_index":                "1",
+				"packet_channel_ordering":  "ORDER_UNORDERED",
+				"packet_connection":        "connection-2",
+				"packet_dst_channel":       "channel-6994",
+				"packet_dst_port":          "transfer",
+				"packet_sequence":          "1290050",
+				"packet_src_channel":       "channel-2",
+				"packet_src_port":          "transfer",
+				"packet_timeout_height":    "0-0",
+				"packet_timeout_timestamp": "1757503869097000000",
+			},
+			want: AcknowledgementPacket{
+				ConnectionID:          "connection-2",
+				MsgIndex:              "1",
+				PacketChannelOrdering: "ORDER_UNORDERED",
+				PacketConnection:      "connection-2",
+				PacketDstChannel:      "channel-6994",
+				PacketDstPort:         "transfer",
+				PacketSequence:        1290050,
+				PacketSrcChannel:      "channel-2",
+				PacketSrcPort:         "transfer",
+				TimeoutHeight:         0,
+				Timeout:               time.Date(2025, 9, 10, 11, 31, 9, 97000000, time.UTC),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotBody, err := NewAcknowledgementPacket(tt.m)
+			require.NoError(t, err)
+			require.Equal(t, tt.want, gotBody)
+		})
+	}
+}

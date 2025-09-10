@@ -346,6 +346,42 @@ func NewFungibleTokenPacket(m map[string]any) (ftp FungibleTokenPacket) {
 	return
 }
 
+type AcknowledgementPacket struct {
+	ConnectionID          string
+	MsgIndex              string
+	PacketChannelOrdering string
+	PacketConnection      string
+	PacketDstChannel      string
+	PacketDstPort         string
+	PacketSequence        uint64
+	PacketSrcChannel      string
+	PacketSrcPort         string
+	Timeout               time.Time
+	TimeoutHeight         uint64
+}
+
+func NewAcknowledgementPacket(m map[string]any) (ap AcknowledgementPacket, err error) {
+	ap.ConnectionID = decoder.StringFromMap(m, "connection_id")
+	ap.MsgIndex = decoder.StringFromMap(m, "msg_index")
+	ap.PacketChannelOrdering = decoder.StringFromMap(m, "packet_channel_ordering")
+	ap.PacketConnection = decoder.StringFromMap(m, "packet_connection")
+	ap.PacketDstChannel = decoder.StringFromMap(m, "packet_dst_channel")
+	ap.PacketDstPort = decoder.StringFromMap(m, "packet_dst_port")
+	ap.PacketSequence, err = decoder.Uint64FromMap(m, "packet_sequence")
+	if err != nil {
+		return ap, errors.Wrap(err, "packet_sequence")
+	}
+	ap.PacketSrcChannel = decoder.StringFromMap(m, "packet_src_channel")
+	ap.PacketSrcPort = decoder.StringFromMap(m, "packet_src_port")
+	_, height, err := decoder.RevisionHeightFromMap(m, "packet_timeout_height")
+	if err != nil {
+		return ap, errors.Wrap(err, "packet_timeout_height")
+	}
+	ap.TimeoutHeight = height
+	ap.Timeout = decoder.UnixNanoFromMap(m, "packet_timeout_timestamp")
+	return
+}
+
 type RecvPacket struct {
 	Ordering      string
 	Connection    string
