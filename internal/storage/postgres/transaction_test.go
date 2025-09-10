@@ -392,6 +392,42 @@ func (s *TransactionTestSuite) TestSaveVotes() {
 	}
 }
 
+func (s *TransactionTestSuite) TestSaveVotesValidatorIdDuplicate() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	var vote = &storage.Vote{
+		Option:      types.VoteOptionYes,
+		ProposalId:  2,
+		ValidatorId: 1,
+		Height:      1001,
+		Time:        time.Now(),
+		Weight:      decimal.RequireFromString("1.0"),
+	}
+
+	err = tx.SaveVotes(ctx, vote)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.Votes.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 4)
+
+	var count int
+	for i := range items {
+		if items[i].ValidatorId == vote.ValidatorId && items[i].ProposalId == vote.ProposalId {
+			s.Require().Equal(vote.Option, items[i].Option)
+			count++
+		}
+	}
+	s.Require().EqualValues(1, count)
+}
+
 func (s *TransactionTestSuite) TestSaveBlockSignatures() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
