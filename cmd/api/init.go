@@ -476,7 +476,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		vesting.GET("/:id/periods", vestingHandler.Periods)
 	}
 
-	proposalHandler := handler.NewProposalsHandler(db.Proposals, db.Votes, db.Address)
+	proposalHandler := handler.NewProposalsHandler(db.Proposals, db.Votes, db.Address, db.Validator)
 	proposal := v1.Group("/proposal")
 	{
 		proposal.GET("", proposalHandler.List)

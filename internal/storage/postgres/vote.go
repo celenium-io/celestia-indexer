@@ -44,6 +44,12 @@ func (v *Vote) ByProposalId(ctx context.Context, proposalId uint64, fltrs storag
 	if fltrs.VoterType == types.VoterTypeAddress {
 		subQuery = subQuery.Where("validator_id = 0")
 	}
+	if fltrs.AddressId != nil {
+		subQuery.Where("voter_id = ?", fltrs.AddressId)
+	}
+	if fltrs.ValidatorId != nil {
+		subQuery.Where("validator_id = ?", fltrs.ValidatorId)
+	}
 
 	query := v.DB().NewSelect().
 		TableExpr("(?) as votes", subQuery).

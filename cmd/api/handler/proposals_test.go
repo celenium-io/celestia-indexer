@@ -14,6 +14,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
@@ -39,12 +40,13 @@ var testProposal = storage.Proposal{
 // ProposalTestSuite -
 type ProposalTestSuite struct {
 	suite.Suite
-	proposal *mock.MockIProposal
-	votes    *mock.MockIVote
-	address  *mock.MockIAddress
-	echo     *echo.Echo
-	handler  ProposalsHandler
-	ctrl     *gomock.Controller
+	proposal   *mock.MockIProposal
+	votes      *mock.MockIVote
+	address    *mock.MockIAddress
+	validators *mock.MockIValidator
+	echo       *echo.Echo
+	handler    ProposalsHandler
+	ctrl       *gomock.Controller
 }
 
 // SetupSuite -
@@ -55,10 +57,12 @@ func (s *ProposalTestSuite) SetupSuite() {
 	s.proposal = mock.NewMockIProposal(s.ctrl)
 	s.votes = mock.NewMockIVote(s.ctrl)
 	s.address = mock.NewMockIAddress(s.ctrl)
+	s.validators = mock.NewMockIValidator(s.ctrl)
 	s.handler = NewProposalsHandler(
 		s.proposal,
 		s.votes,
 		s.address,
+		s.validators,
 	)
 }
 
@@ -204,4 +208,123 @@ func (s *ProposalTestSuite) TestVotes() {
 	s.Require().NotNil(votes[1].Voter)
 	s.Require().NotNil(votes[1].Voter.Celestials)
 	s.Require().EqualValues("image", votes[1].Voter.Celestials.ImageUrl)
+}
+
+func (s *ProposalTestSuite) TestVotesByProposalIdWithVoter() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+	q.Set("address", testAddress)
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/proposal/:id/votes")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	s.address.EXPECT().
+		IdByAddress(gomock.Any(), testAddress).
+		Return(2, nil)
+
+	s.votes.EXPECT().
+		ByProposalId(gomock.Any(), uint64(1), storage.VoteFilters{
+			Limit:     10,
+			Offset:    0,
+			Option:    []types.VoteOption{},
+			AddressId: testsuite.Ptr(uint64(2)),
+		}).
+		Return([]storage.Vote{
+			{
+				Id:          2,
+				Height:      121212,
+				Weight:      decimal.NewFromFloat(123),
+				Option:      types.VoteOptionNo,
+				ValidatorId: 0,
+				Voter: &storage.Address{
+					Id:         1,
+					Hash:       testHashAddress,
+					Address:    testAddress,
+					Height:     321,
+					LastHeight: 123,
+					Balance: storage.Balance{
+						Currency:  "utia",
+						Spendable: decimal.RequireFromString("100"),
+						Delegated: decimal.RequireFromString("1"),
+						Unbonding: decimal.RequireFromString("2"),
+					},
+					Celestials: &celestials.Celestial{
+						Id:       "test name",
+						ImageUrl: "test image",
+					},
+				},
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Votes(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var votes []responses.Vote
+	err := json.NewDecoder(rec.Body).Decode(&votes)
+	s.Require().NoError(err)
+	s.Require().Len(votes, 1)
+	s.Require().EqualValues(2, votes[0].Id)
+	s.Require().EqualValues(types.VoteOptionNo, votes[0].Option)
+	s.Require().EqualValues(121212, votes[0].Height)
+	s.Require().Nil(votes[0].Validator)
+	s.Require().NotNil(votes[0].Voter)
+	s.Require().EqualValues("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", votes[0].Voter.Hash)
+	s.Require().NotNil(votes[0].Voter.Celestials)
+	s.Require().EqualValues("test name", votes[0].Voter.Celestials.Name)
+	s.Require().EqualValues("test image", votes[0].Voter.Celestials.ImageUrl)
+}
+
+func (s *ProposalTestSuite) TestVotesByProposalIdWithValidator() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+	q.Set("validator", "celestiavaloper1qycj0ymu9fqvwgyw4xz93p3n4a83jjk7sm2wzh")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/proposal/:id/votes")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	s.validators.EXPECT().
+		ByAddress(gomock.Any(), "celestiavaloper1qycj0ymu9fqvwgyw4xz93p3n4a83jjk7sm2wzh").
+		Return(testValidator, nil)
+
+	s.votes.EXPECT().
+		ByProposalId(gomock.Any(), uint64(1), storage.VoteFilters{
+			Limit:       10,
+			Offset:      0,
+			Option:      []types.VoteOption{},
+			ValidatorId: testsuite.Ptr(uint64(1)),
+		}).
+		Return([]storage.Vote{
+			{
+				Id:          3,
+				Height:      131313,
+				Weight:      decimal.NewFromFloat(1234),
+				Option:      types.VoteOptionYes,
+				ValidatorId: 1,
+				Validator:   &testValidator,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Votes(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var votes []responses.Vote
+	err := json.NewDecoder(rec.Body).Decode(&votes)
+	s.Require().NoError(err)
+	s.Require().Len(votes, 1)
+	s.Require().EqualValues(3, votes[0].Id)
+	s.Require().EqualValues(types.VoteOptionYes, votes[0].Option)
+	s.Require().NotNil(votes[0].Validator)
+	s.Require().Nil(votes[0].Voter)
+	s.Require().EqualValues("moniker", votes[0].Validator.Moniker)
+	s.Require().EqualValues(1, votes[0].Validator.Id)
 }

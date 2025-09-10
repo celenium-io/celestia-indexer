@@ -15,20 +15,23 @@ import (
 
 // ProposalsHandler -
 type ProposalsHandler struct {
-	proposals storage.IProposal
-	votes     storage.IVote
-	address   storage.IAddress
+	proposals  storage.IProposal
+	votes      storage.IVote
+	address    storage.IAddress
+	validators storage.IValidator
 }
 
 func NewProposalsHandler(
 	proposals storage.IProposal,
 	votes storage.IVote,
 	address storage.IAddress,
+	validators storage.IValidator,
 ) ProposalsHandler {
 	return ProposalsHandler{
-		proposals: proposals,
-		votes:     votes,
-		address:   address,
+		proposals:  proposals,
+		votes:      votes,
+		address:    address,
+		validators: validators,
 	}
 }
 
@@ -150,11 +153,13 @@ func (handler *ProposalsHandler) Get(c echo.Context) error {
 }
 
 type listVotesRequest struct {
-	Id        uint64      `param:"id"     validate:"required,min=1"`
-	Limit     int         `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset    int         `query:"offset" validate:"omitempty,min=0"`
-	Option    StringArray `query:"option" validate:"omitempty,dive,vote_option"`
-	VoterType string      `query:"voter"  validate:"omitempty,voter_type"`
+	Id        uint64      `param:"id"        validate:"required,min=1"`
+	Limit     int         `query:"limit"     validate:"omitempty,min=1,max=100"`
+	Offset    int         `query:"offset"    validate:"omitempty,min=0"`
+	Option    StringArray `query:"option"    validate:"omitempty,dive,vote_option"`
+	Voter     string      `query:"voter"     validate:"omitempty,voter_type"`
+	Address   string      `query:"address"   validate:"omitempty,address"`
+	Validator string      `query:"validator" validate:"omitempty,address"`
 }
 
 func (p *listVotesRequest) SetDefault() {
@@ -169,11 +174,14 @@ func (p *listVotesRequest) SetDefault() {
 //	@Description	Get proposal's votes
 //	@Tags			proposal
 //	@ID				proposal-votes
-//	@Param			limit	    query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	    query	integer	false	"Offset"										mininum(1)
+//	@Param			id	path	integer	true	"Internal identity"	mininum(1)
+//	@Param			limit	    query	integer	false	"Count of requested entities"		mininum(1)	maximum(100)
+//	@Param			offset	    query	integer	false	"Offset"							mininum(1)
 //
-// @Param			option	    path	string	true	"Option"		Enums(yes, no, no_with_veto, abstain)
-// @Param			voter	    path	string	true	"Voter type"	Enums(address, validator)
+// @Param			option	    query	string	true	"Option"		Enums(yes, no, no_with_veto, abstain)
+// @Param			voter	    query	string	true	"Voter type"	Enums(address, validator)
+// @Param			address		query	string	false	"Voter address"		minlength(47)	maxlength(47)
+// @Param			validator	query	string	false	"Voter address"	    minlength(54)	maxlength(54)
 //
 //	@Produce		json
 //	@Success		200	{array}		responses.Vote
@@ -182,7 +190,6 @@ func (p *listVotesRequest) SetDefault() {
 //
 // @Router /proposal/{id}/votes [get]
 func (handler *ProposalsHandler) Votes(c echo.Context) error {
-
 	req, err := bindAndValidate[listVotesRequest](c)
 	if err != nil {
 		return badRequestError(c, err)
@@ -194,15 +201,32 @@ func (handler *ProposalsHandler) Votes(c echo.Context) error {
 		options[i] = types.VoteOption(req.Option[i])
 	}
 
+	filter := storage.VoteFilters{
+		Limit:     req.Limit,
+		Offset:    req.Offset,
+		Option:    options,
+		VoterType: types.VoterType(req.Voter),
+	}
+
+	if req.Address != "" {
+		addressId, err := handler.address.IdByAddress(c.Request().Context(), req.Address)
+		if err != nil {
+			return handleError(c, err, handler.address)
+		}
+		filter.AddressId = &addressId
+	}
+	if req.Validator != "" {
+		validator, err := handler.validators.ByAddress(c.Request().Context(), req.Validator)
+		if err != nil {
+			return handleError(c, err, handler.validators)
+		}
+		filter.ValidatorId = &validator.Id
+	}
+
 	votes, err := handler.votes.ByProposalId(
 		c.Request().Context(),
 		req.Id,
-		storage.VoteFilters{
-			Limit:     req.Limit,
-			Offset:    req.Offset,
-			Option:    options,
-			VoterType: types.VoterType(req.VoterType),
-		})
+		filter)
 
 	if err != nil {
 		return handleError(c, err, handler.votes)

@@ -9,6 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 )
 
 func (s *StorageTestSuite) TestVoteByProposalId() {
@@ -66,6 +67,47 @@ func (s *StorageTestSuite) TestVoteByProposalIdWithVoterType() {
 	s.Require().EqualValues(types.VoteOptionAbstain, vote.Option)
 	s.Require().EqualValues("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", vote.Validator.ConsAddress)
 	s.Require().EqualValues("Conqueror", vote.Validator.Moniker)
+}
+
+func (s *StorageTestSuite) TestVoteByProposalIdWithVoter() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	votes, err := s.storage.Votes.ByProposalId(ctx, 1, storage.VoteFilters{
+		Limit:     10,
+		Offset:    0,
+		AddressId: testsuite.Ptr(uint64(2)),
+	})
+	s.Require().NoError(err)
+	s.Require().Len(votes, 1)
+
+	vote := votes[0]
+	s.Require().EqualValues(2, vote.Id)
+	s.Require().EqualValues(1000, vote.Height)
+	s.Require().EqualValues(2, vote.VoterId)
+	s.Require().NotNil(vote.Voter)
+	s.Require().EqualValues("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", vote.Voter.Address)
+}
+
+func (s *StorageTestSuite) TestVoteByProposalIdWithValidator() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	votes, err := s.storage.Votes.ByProposalId(ctx, 2, storage.VoteFilters{
+		Limit:       10,
+		Offset:      0,
+		ValidatorId: testsuite.Ptr(uint64(1)),
+	})
+	s.Require().NoError(err)
+	s.Require().Len(votes, 1)
+
+	vote := votes[0]
+	s.Require().EqualValues(3, vote.Id)
+	s.Require().EqualValues(1000, vote.Height)
+	s.Require().EqualValues(1, vote.ValidatorId)
+	s.Require().NotNil(vote.Validator)
+	s.Require().EqualValues("Conqueror", vote.Validator.Moniker)
+	s.Require().EqualValues("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", vote.Validator.ConsAddress)
 }
 
 func (s *StorageTestSuite) TestVoteByVoterId() {
