@@ -238,6 +238,7 @@ func Test_handleAcknowledgement(t *testing.T) {
 					require.Nil(t, tt.msg[i].IbcTransfer)
 				} else {
 					require.NotNil(t, tt.msg[i].IbcTransfer)
+					require.NotEmpty(t, tt.msg[i].IbcTransfer.ConnectionId)
 				}
 			}
 		})
