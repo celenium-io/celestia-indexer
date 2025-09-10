@@ -80,8 +80,6 @@ func processAcknowledgement(ctx *context.Context, events []storage.Event, msg *s
 
 		hasFtp := false
 		for action == "" && len(events)-1 > *idx {
-			action = decoder.StringFromMap(events[*idx].Data, "action")
-
 			switch events[*idx].Type {
 			case storageTypes.EventTypeAcknowledgePacket:
 				ack, err := decode.NewAcknowledgementPacket(events[*idx].Data)
@@ -98,6 +96,7 @@ func processAcknowledgement(ctx *context.Context, events []storage.Event, msg *s
 				}
 			}
 			*idx += 1
+			action = decoder.StringFromMap(events[*idx].Data, "action")
 		}
 
 		if !hasFtp {
