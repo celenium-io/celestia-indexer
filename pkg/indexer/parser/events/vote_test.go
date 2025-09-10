@@ -23,7 +23,7 @@ func Test_handleVote(t *testing.T) {
 		events []storage.Event
 		msg    *storage.Message
 		idx    *int
-		vote   storage.Vote
+		votes  []*storage.Vote
 	}{
 		{
 			name: "vote test 1",
@@ -57,15 +57,17 @@ func Test_handleVote(t *testing.T) {
 				Height: 3762606,
 			},
 			idx: testsuite.Ptr(0),
-			vote: storage.Vote{
-				ProposalId: 5,
-				Voter: &storage.Address{
-					Address: "celestia1lha3l9w5sca8gv98t27n5rezex3vafp8qa7h69",
+			votes: []*storage.Vote{
+				{
+					ProposalId: 5,
+					Voter: &storage.Address{
+						Address: "celestia1lha3l9w5sca8gv98t27n5rezex3vafp8qa7h69",
+					},
+					Option: types.VoteOptionYes,
+					Weight: decimal.RequireFromString("1.000000000000000000"),
+					Height: 3762606,
+					Time:   ts,
 				},
-				Option: types.VoteOptionYes,
-				Weight: decimal.RequireFromString("1.000000000000000000"),
-				Height: 3762606,
-				Time:   ts,
 			},
 		}, {
 			name: "vote test 2",
@@ -99,15 +101,17 @@ func Test_handleVote(t *testing.T) {
 				Height: 871324,
 			},
 			idx: testsuite.Ptr(0),
-			vote: storage.Vote{
-				ProposalId: 3,
-				Voter: &storage.Address{
-					Address: "celestia1davz40kat93t49ljrkmkl5uqhqq45e0tedgf8a",
+			votes: []*storage.Vote{
+				{
+					ProposalId: 3,
+					Voter: &storage.Address{
+						Address: "celestia1davz40kat93t49ljrkmkl5uqhqq45e0tedgf8a",
+					},
+					Option: types.VoteOptionYes,
+					Weight: decimal.RequireFromString("1.000000000000000000"),
+					Height: 871324,
+					Time:   ts,
 				},
-				Option: types.VoteOptionYes,
-				Weight: decimal.RequireFromString("1.000000000000000000"),
-				Height: 871324,
-				Time:   ts,
 			},
 		}, {
 			name: "vote test 3",
@@ -137,15 +141,66 @@ func Test_handleVote(t *testing.T) {
 				Height: 871324,
 			},
 			idx: testsuite.Ptr(0),
-			vote: storage.Vote{
-				ProposalId: 4,
-				Voter: &storage.Address{
-					Address: "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+			votes: []*storage.Vote{
+				{
+					ProposalId: 4,
+					Voter: &storage.Address{
+						Address: "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+					},
+					Option: types.VoteOptionYes,
+					Weight: decimal.RequireFromString("1.000000000000000000"),
+					Height: 871324,
+					Time:   ts,
 				},
-				Option: types.VoteOptionYes,
-				Weight: decimal.RequireFromString("1.000000000000000000"),
+			},
+		}, {
+			name: "vote test 4",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 871324,
+					Type:   "message",
+					Data: map[string]any{
+						"action":    "/cosmos.gov.v1.MsgVote",
+						"sender":    "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+						"module":    "gov",
+						"msg_index": "0",
+					},
+				}, {
+					Height: 871324,
+					Type:   "proposal_vote",
+					Data: map[string]any{
+						"option":      "[{\"option\":1,\"weight\":\"0.500000000000000000\"},{\"option\":2,\"weight\":\"0.500000000000000000\"}]",
+						"proposal_id": "4",
+						"voter":       "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgVote,
 				Height: 871324,
-				Time:   ts,
+			},
+			idx: testsuite.Ptr(0),
+			votes: []*storage.Vote{
+				{
+					ProposalId: 4,
+					Voter: &storage.Address{
+						Address: "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+					},
+					Option: types.VoteOptionYes,
+					Weight: decimal.RequireFromString("0.500000000000000000"),
+					Height: 871324,
+					Time:   ts,
+				}, {
+					ProposalId: 4,
+					Voter: &storage.Address{
+						Address: "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+					},
+					Option: types.VoteOptionAbstain,
+					Weight: decimal.RequireFromString("0.500000000000000000"),
+					Height: 871324,
+					Time:   ts,
+				},
 			},
 		},
 	}
@@ -157,8 +212,8 @@ func Test_handleVote(t *testing.T) {
 			}
 			err := handleVote(tt.ctx, tt.events, tt.msg, tt.idx)
 			require.NoError(t, err)
-			require.Len(t, tt.ctx.Votes, 1)
-			require.Equal(t, tt.vote, *tt.ctx.Votes[0])
+			require.Len(t, tt.ctx.Votes, len(tt.votes))
+			require.Equal(t, tt.votes, tt.ctx.Votes)
 		})
 	}
 }
