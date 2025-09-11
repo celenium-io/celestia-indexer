@@ -190,20 +190,19 @@ type IbcTransfer struct {
 
 func NewIbcTransfer(transfer storage.IbcTransfer, relayers map[uint64]Relayer) IbcTransfer {
 	response := IbcTransfer{
-		Id:            transfer.Id,
-		Time:          transfer.Time,
-		Height:        transfer.Height,
-		ChannelId:     transfer.ChannelId,
-		ConnectionId:  transfer.ConnectionId,
-		Port:          transfer.Port,
-		Amount:        transfer.Amount.String(),
-		Denom:         transfer.Denom,
-		Memo:          transfer.Memo,
-		Timeout:       transfer.Timeout,
-		TimeoutHeight: transfer.Tx.TimeoutHeight,
-		Sequence:      transfer.Sequence,
-		Sender:        NewShortAddress(transfer.Sender),
-		Receiver:      NewShortAddress(transfer.Receiver),
+		Id:           transfer.Id,
+		Time:         transfer.Time,
+		Height:       transfer.Height,
+		ChannelId:    transfer.ChannelId,
+		ConnectionId: transfer.ConnectionId,
+		Port:         transfer.Port,
+		Amount:       transfer.Amount.String(),
+		Denom:        transfer.Denom,
+		Memo:         transfer.Memo,
+		Timeout:      transfer.Timeout,
+		Sequence:     transfer.Sequence,
+		Sender:       NewShortAddress(transfer.Sender),
+		Receiver:     NewShortAddress(transfer.Receiver),
 	}
 
 	if transfer.ReceiverAddress != nil {
@@ -219,15 +218,17 @@ func NewIbcTransfer(transfer storage.IbcTransfer, relayers map[uint64]Relayer) I
 	}
 
 	if transfer.Tx != nil {
+		response.TimeoutHeight = transfer.Tx.TimeoutHeight
 		response.TxHash = hex.EncodeToString(transfer.Tx.Hash)
 	}
 
 	if transfer.Connection != nil && transfer.Connection.Client != nil {
 		response.ChainId = transfer.Connection.Client.ChainId
-		if len(relayers) > 0 {
-			if relayer, ok := relayers[transfer.Connection.Client.CreatorId]; ok {
-				response.Relayer = &relayer
-			}
+	}
+
+	if transfer.SignerId != nil && len(relayers) > 0 {
+		if relayer, ok := relayers[*transfer.SignerId]; ok {
+			response.Relayer = &relayer
 		}
 	}
 
