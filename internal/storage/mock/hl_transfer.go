@@ -24,7 +24,6 @@ import (
 type MockIHLTransfer struct {
 	ctrl     *gomock.Controller
 	recorder *MockIHLTransferMockRecorder
-	isgomock struct{}
 }
 
 // MockIHLTransferMockRecorder is the mock recorder for MockIHLTransfer.

@@ -10,7 +10,8 @@ package types
 		active,
 		removed,
 		applied,
-		rejected
+		rejected,
+		failed
 	)
 */
 //go:generate go-enum --marshal --sql --values --names
@@ -20,6 +21,8 @@ func (p ProposalStatus) GreaterThan(status ProposalStatus) bool {
 	switch status {
 	case ProposalStatusInactive:
 		return false
+	case ProposalStatusFailed:
+		return true
 	case ProposalStatusRemoved:
 		return true
 	case ProposalStatusRejected:

@@ -79,7 +79,7 @@ func (p Proposal) EmptyStatus() bool {
 }
 
 func (p Proposal) Finished() bool {
-	return p.Status == types.ProposalStatusApplied || p.Status == types.ProposalStatusRejected
+	return p.Status == types.ProposalStatusApplied || p.Status == types.ProposalStatusRejected || p.Status == types.ProposalStatusFailed
 }
 
 type ListProposalFilters struct {

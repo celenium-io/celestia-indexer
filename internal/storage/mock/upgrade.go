@@ -24,7 +24,6 @@ import (
 type MockIUpgrade struct {
 	ctrl     *gomock.Controller
 	recorder *MockIUpgradeMockRecorder
-	isgomock struct{}
 }
 
 // MockIUpgradeMockRecorder is the mock recorder for MockIUpgrade.
