@@ -24,7 +24,6 @@ import (
 type MockIIbcChannel struct {
 	ctrl     *gomock.Controller
 	recorder *MockIIbcChannelMockRecorder
-	isgomock struct{}
 }
 
 // MockIIbcChannelMockRecorder is the mock recorder for MockIIbcChannel.
