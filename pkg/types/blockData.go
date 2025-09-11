@@ -6,6 +6,4 @@ package types
 type BlockData struct {
 	ResultBlock
 	ResultBlockResults
-
-	AppVersion uint64
 }

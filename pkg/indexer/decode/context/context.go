@@ -4,7 +4,10 @@
 package context
 
 import (
+	"fmt"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
@@ -17,6 +20,7 @@ type Context struct {
 	Delegations *sync.Map[string, *storage.Delegation]
 	Jails       *sync.Map[string, *storage.Jail]
 	Proposals   *sync.Map[uint64, *storage.Proposal]
+	Constants   *sync.Map[string, *storage.Constant]
 
 	Redelegations   []storage.Redelegation
 	Undelegations   []storage.Undelegation
@@ -34,6 +38,7 @@ func NewContext() *Context {
 		Delegations:     sync.NewMap[string, *storage.Delegation](),
 		Jails:           sync.NewMap[string, *storage.Jail](),
 		Proposals:       sync.NewMap[uint64, *storage.Proposal](),
+		Constants:       sync.NewMap[string, *storage.Constant](),
 		Redelegations:   make([]storage.Redelegation, 0),
 		Undelegations:   make([]storage.Undelegation, 0),
 		CancelUnbonding: make([]storage.Undelegation, 0),
@@ -212,4 +217,13 @@ func (ctx *Context) GetProposals() []*storage.Proposal {
 
 func (ctx *Context) AddVote(vote *storage.Vote) {
 	ctx.Votes = append(ctx.Votes, vote)
+}
+
+func (ctx *Context) AddConstant(module types.ModuleName, name, value string) {
+	key := fmt.Sprintf("%s_%s", module, name)
+	ctx.Constants.Set(key, &storage.Constant{
+		Module: module,
+		Name:   name,
+		Value:  value,
+	})
 }

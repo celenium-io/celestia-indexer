@@ -95,7 +95,6 @@ func (worker *Worker) Do(ctx context.Context, level types.Level, appVersion uint
 	}
 
 	for i := range result {
-		result[i].AppVersion = appVersion
 		worker.log.Info().
 			Uint64("height", uint64(result[i].Height)).
 			Int64("ms", time.Since(start).Milliseconds()).

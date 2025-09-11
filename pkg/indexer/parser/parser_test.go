@@ -133,6 +133,12 @@ func getBlock() types.BlockData {
 			Height:              100,
 			TxsResults:          nil,
 			FinalizeBlockEvents: nil,
+			ConsensusParamUpdates: &types.ConsensusParams{
+				Evidence: &types.EvidenceParams{
+					MaxAgeNumBlocks: 100,
+					MaxAgeDuration:  time.Hour,
+				},
+			},
 		},
 	}
 }

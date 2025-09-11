@@ -5,6 +5,7 @@ package parser
 
 import (
 	"encoding/hex"
+	"fmt"
 	"strings"
 	"time"
 
@@ -74,6 +75,7 @@ func (p *Module) parse(b types.BlockData) error {
 	}
 
 	decodeCtx.Block.BlockSignatures = p.parseBlockSignatures(b.Block.LastCommit)
+	p.parseConsensusParamUpdates(decodeCtx, b.ConsensusParamUpdates)
 
 	decodeCtx.Block.Events, err = parseEvents(decodeCtx, b, b.FinalizeBlockEvents)
 	if err != nil {
@@ -106,4 +108,9 @@ func (p *Module) parseBlockSignatures(commit *types.Commit) []storage.BlockSigna
 		})
 	}
 	return signs
+}
+
+func (p *Module) parseConsensusParamUpdates(ctx *dCtx.Context, params *types.ConsensusParams) {
+	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_num_blocks", params.Evidence.MaxAgeDuration.String())
+	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_duration", fmt.Sprintf("%d", params.Evidence.MaxAgeNumBlocks))
 }

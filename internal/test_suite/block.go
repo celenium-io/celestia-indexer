@@ -40,7 +40,6 @@ func CreateTestBlock(tx types.ResponseDeliverTx, count int) (types.BlockData, ti
 		ResultBlockResults: types.ResultBlockResults{
 			TxsResults: txResults,
 		},
-		AppVersion: 3,
 	}
 
 	return block, now
@@ -70,7 +69,6 @@ func CreateBlockWithTxs(tx types.ResponseDeliverTx, txData []byte, count int) (t
 		ResultBlockResults: types.ResultBlockResults{
 			TxsResults: txResults,
 		},
-		AppVersion: 4,
 	}
 
 	return block, now
@@ -100,7 +98,6 @@ func CreateTestBlockWithAppVersion(tx types.ResponseDeliverTx, count int, appVer
 		ResultBlockResults: types.ResultBlockResults{
 			TxsResults: txResults,
 		},
-		AppVersion: appVerion,
 	}
 
 	return block, now
