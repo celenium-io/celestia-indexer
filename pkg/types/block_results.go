@@ -10,11 +10,11 @@ import (
 
 // ResultBlockResults is an ABCI results from a block
 type ResultBlockResults struct {
-	Height              Level                `json:"height,string"`
-	TxsResults          []*ResponseDeliverTx `json:"txs_results"`
-	FinalizeBlockEvents []Event              `json:"finalize_block_events"`
+	Height                Level                `json:"height,string"`
+	TxsResults            []*ResponseDeliverTx `json:"txs_results"`
+	FinalizeBlockEvents   []Event              `json:"finalize_block_events"`
+	ConsensusParamUpdates *ConsensusParams     `json:"consensus_param_updates"`
 	// ValidatorUpdates      []ValidatorUpdate    `json:"validator_updates"`
-	// ConsensusParamUpdates *ConsensusParams     `json:"consensus_param_updates"`
 }
 
 type ResponseDeliverTx struct {

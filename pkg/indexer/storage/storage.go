@@ -44,6 +44,8 @@ type Module struct {
 
 	slashingForDowntime   decimal.Decimal
 	slashingForDoubleSign decimal.Decimal
+	maxAgeNumBlocks       string
+	maxAgeDuration        string
 	indexerName           string
 }
 
@@ -68,6 +70,8 @@ func NewModule(
 		validatorsByDelegator:   make(map[string]uint64),
 		slashingForDowntime:     decimal.Zero,
 		slashingForDoubleSign:   decimal.Zero,
+		maxAgeNumBlocks:         "",
+		maxAgeDuration:          "",
 		indexerName:             cfg.Name,
 	}
 
@@ -137,6 +141,24 @@ func (module *Module) initConstants(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
+	maxAgeNumBlocks, err := module.constants.Get(ctx, types.ModuleNameConsensus, "evidence_max_age_num_blocks")
+	if err != nil {
+		if module.validators.IsNoRows(err) {
+			return nil
+		}
+		return err
+	}
+	module.maxAgeNumBlocks = maxAgeNumBlocks.Value
+
+	maxAgeDuration, err := module.constants.Get(ctx, types.ModuleNameConsensus, "evidence_max_age_duration")
+	if err != nil {
+		if module.validators.IsNoRows(err) {
+			return nil
+		}
+		return err
+	}
+	module.maxAgeDuration = maxAgeDuration.Value
 	return nil
 }
 
@@ -247,6 +269,10 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 			return state, errors.Wrap(err, "can't find block proposer")
 		}
 		block.ProposerId = proposerId
+	}
+
+	if err := module.saveConstantUpdates(ctx, tx, dCtx.Constants); err != nil {
+		return state, errors.Wrap(err, "can't save constant updates")
 	}
 
 	if err := tx.Add(ctx, block); err != nil {
