@@ -111,6 +111,6 @@ func (p *Module) parseBlockSignatures(commit *types.Commit) []storage.BlockSigna
 }
 
 func (p *Module) parseConsensusParamUpdates(ctx *dCtx.Context, params *types.ConsensusParams) {
-	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_num_blocks", params.Evidence.MaxAgeDuration.String())
-	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_duration", fmt.Sprintf("%d", params.Evidence.MaxAgeNumBlocks))
+	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_num_blocks", fmt.Sprintf("%d", params.Evidence.MaxAgeNumBlocks))
+	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_duration", params.Evidence.MaxAgeDuration.String())
 }

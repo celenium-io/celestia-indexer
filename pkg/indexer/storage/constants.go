@@ -21,10 +21,12 @@ func (module *Module) saveConstantUpdates(
 		case "evidence_max_age_num_blocks":
 			if value.Value != module.maxAgeNumBlocks {
 				newConstants = append(newConstants, *value)
+				module.maxAgeNumBlocks = value.Value
 			}
 		case "evidence_max_age_duration":
 			if value.Value != module.maxAgeDuration {
 				newConstants = append(newConstants, *value)
+				module.maxAgeDuration = value.Value
 			}
 		}
 		return nil, false
