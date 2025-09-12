@@ -264,10 +264,12 @@ func NewSlash(m map[string]any) (body Slash, err error) {
 type ProposalStatus struct {
 	Id     uint64
 	Result string
+	Log    string
 }
 
 func NewProposalStatus(m map[string]any) (body ProposalStatus, err error) {
 	body.Result = decoder.StringFromMap(m, "proposal_result")
+	body.Log = decoder.StringFromMap(m, "proposal_log")
 	body.Id, err = decoder.Uint64FromMap(m, "proposal_id")
 	return
 }

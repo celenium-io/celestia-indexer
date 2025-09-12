@@ -444,7 +444,7 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 		query := tx.Tx().NewInsert().
 			Column("id", "proposer_id", "height", "created_at", "deposit_time", "activation_time", "status", "type", "title", "description", "deposit", "metadata", "changes", "yes", "no", "no_with_veto", "abstain").
 			Column("yes_vals", "no_vals", "no_with_veto_vals", "abstain_vals", "yes_addrs", "no_addrs", "no_with_veto_addrs", "abstain_addrs", "votes_count", "voting_power", "yes_voting_power", "no_voting_power", "no_with_veto_voting_power", "abstain_voting_power").
-			Column("total_voting_power", "quorum", "veto_quorum", "threshold", "min_deposit", "end_time").
+			Column("total_voting_power", "quorum", "veto_quorum", "threshold", "min_deposit", "end_time", "error").
 			Model(&add).
 			On("CONFLICT (id) DO UPDATE")
 
@@ -486,6 +486,9 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 		}
 		if proposals[i].MinDeposit != "" {
 			query.Set("min_deposit = EXCLUDED.min_deposit")
+		}
+		if proposals[i].Error != "" {
+			query.Set("error = EXCLUDED.error")
 		}
 
 		if proposals[i].Yes > 0 {

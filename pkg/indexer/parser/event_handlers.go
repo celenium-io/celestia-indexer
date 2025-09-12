@@ -224,6 +224,7 @@ func parseProposal(ctx *context.Context, data map[string]any) error {
 			proposal.Status = types.ProposalStatusRemoved
 		case "proposal_failed":
 			proposal.Status = types.ProposalStatusFailed
+			proposal.Error = status.Log
 		default:
 			return errors.Errorf("unknown proposal status: %s", status.Result)
 		}
