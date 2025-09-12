@@ -46,6 +46,7 @@ type IbcTransfer struct {
 	ReceiverId      *uint64         `bun:"receiver_id"             comment:"Receiver id. It's not null if it's celestia address."`
 	SenderAddress   *string         `bun:"sender_address"          comment:"Sender string. It's not null if it's not celestia address."`
 	SenderId        *uint64         `bun:"sender_id"               comment:"Sender id. It's not null if it's celestia address."`
+	SignerId        *uint64         `bun:"signer_id"               comment:"Signer id. It's not null if it's celestia address."`
 	ConnectionId    string          `bun:"connection_id"           comment:"Connection identity"`
 	ChannelId       string          `bun:"channel_id"              comment:"Channel identity"`
 	Port            string          `bun:"port"                    comment:"Port"`

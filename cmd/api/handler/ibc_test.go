@@ -579,6 +579,7 @@ func (s *IbcTestSuite) TestGetTransfer() {
 				Hash:    testHashAddress,
 				Address: testAddress,
 			},
+			SignerId: testsuite.Ptr(uint64(1)),
 			Sequence: 123456,
 			Tx:       &testTx,
 			Connection: &storage.IbcConnection{
@@ -666,6 +667,7 @@ func (s *IbcTestSuite) TestListTransferWithHash() {
 					Hash:    testHashAddress,
 					Address: testAddress,
 				},
+				SignerId: testsuite.Ptr(uint64(1)),
 				Sequence: 123456,
 				Tx:       &testTx,
 				Connection: &storage.IbcConnection{
