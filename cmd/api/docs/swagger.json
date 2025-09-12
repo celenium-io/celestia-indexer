@@ -4006,6 +4006,13 @@
                 "operationId": "proposal-votes",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "Internal identity",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "maximum": 100,
                         "type": "integer",
                         "description": "Count of requested entities",
@@ -4028,7 +4035,7 @@
                         "type": "string",
                         "description": "Option",
                         "name": "option",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -4039,8 +4046,24 @@
                         "type": "string",
                         "description": "Voter type",
                         "name": "voter",
-                        "in": "path",
+                        "in": "query",
                         "required": true
+                    },
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Voter address",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 54,
+                        "minLength": 54,
+                        "type": "string",
+                        "description": "Voter address",
+                        "name": "validator",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -9128,6 +9151,11 @@
                     "type": "string",
                     "format": "date-time",
                     "example": "2023-07-04T03:10:57+00:00"
+                },
+                "error": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Some error text"
                 },
                 "height": {
                     "type": "integer",

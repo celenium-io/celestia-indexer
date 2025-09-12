@@ -53,6 +53,8 @@ type Proposal struct {
 	Threshold  string `example:"0.33" format:"string" json:"threshold,omitempty"   swaggertype:"string"`
 	MinDeposit string `example:"0.33" format:"string" json:"min_deposit,omitempty" swaggertype:"string"`
 
+	Error string `example:"Some error text" format:"string" json:"error,omitempty" swaggertype:"string"`
+
 	Changes  json.RawMessage `json:"changes,omitempty"  swaggerignore:"true"`
 	Proposer *ShortAddress   `json:"proposer,omitempty"`
 }
@@ -96,5 +98,6 @@ func NewProposal(proposal storage.Proposal) Proposal {
 		Threshold:             proposal.Threshold,
 		MinDeposit:            proposal.MinDeposit,
 		TotalVotingPower:      proposal.TotalVotingPower.String(),
+		Error:                 proposal.Error,
 	}
 }

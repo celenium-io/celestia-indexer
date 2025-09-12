@@ -65,6 +65,7 @@ type Proposal struct {
 	VetoQuorum string `bun:"veto_quorum" comment:"Minimum value of Veto votes to Total votes ratio for proposal to be vetoed"`
 	Threshold  string `bun:"threshold"   comment:"Minimum proportion of Yes votes for proposal to pass"`
 	MinDeposit string `bun:"min_deposit" comment:"Minimum deposit for a proposal to enter voting period"`
+	Error      string `bun:"error"       comment:"Proposal error"`
 
 	Proposer *Address `bun:"rel:belongs-to,join:proposer_id=id"`
 }
