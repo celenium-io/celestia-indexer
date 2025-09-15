@@ -45,10 +45,10 @@ func (m *MockIIbcTransfer) EXPECT() *MockIIbcTransferMockRecorder {
 }
 
 // ById mocks base method.
-func (m *MockIIbcTransfer) ById(ctx context.Context, id uint64) (storage.IbcTransfer, error) {
+func (m *MockIIbcTransfer) ById(ctx context.Context, id uint64) (storage.IbcTransferWithSigner, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ById", ctx, id)
-	ret0, _ := ret[0].(storage.IbcTransfer)
+	ret0, _ := ret[0].(storage.IbcTransferWithSigner)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -66,19 +66,19 @@ type MockIIbcTransferByIdCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIIbcTransferByIdCall) Return(arg0 storage.IbcTransfer, arg1 error) *MockIIbcTransferByIdCall {
+func (c *MockIIbcTransferByIdCall) Return(arg0 storage.IbcTransferWithSigner, arg1 error) *MockIIbcTransferByIdCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIIbcTransferByIdCall) Do(f func(context.Context, uint64) (storage.IbcTransfer, error)) *MockIIbcTransferByIdCall {
+func (c *MockIIbcTransferByIdCall) Do(f func(context.Context, uint64) (storage.IbcTransferWithSigner, error)) *MockIIbcTransferByIdCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIIbcTransferByIdCall) DoAndReturn(f func(context.Context, uint64) (storage.IbcTransfer, error)) *MockIIbcTransferByIdCall {
+func (c *MockIIbcTransferByIdCall) DoAndReturn(f func(context.Context, uint64) (storage.IbcTransferWithSigner, error)) *MockIIbcTransferByIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -123,10 +123,10 @@ func (c *MockIIbcTransferLargestTransfer24hCall) DoAndReturn(f func(context.Cont
 }
 
 // List mocks base method.
-func (m *MockIIbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFilters) ([]storage.IbcTransfer, error) {
+func (m *MockIIbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFilters) ([]storage.IbcTransferWithSigner, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, fltrs)
-	ret0, _ := ret[0].([]storage.IbcTransfer)
+	ret0, _ := ret[0].([]storage.IbcTransferWithSigner)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -144,19 +144,19 @@ type MockIIbcTransferListCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIIbcTransferListCall) Return(arg0 []storage.IbcTransfer, arg1 error) *MockIIbcTransferListCall {
+func (c *MockIIbcTransferListCall) Return(arg0 []storage.IbcTransferWithSigner, arg1 error) *MockIIbcTransferListCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIIbcTransferListCall) Do(f func(context.Context, storage.ListIbcTransferFilters) ([]storage.IbcTransfer, error)) *MockIIbcTransferListCall {
+func (c *MockIIbcTransferListCall) Do(f func(context.Context, storage.ListIbcTransferFilters) ([]storage.IbcTransferWithSigner, error)) *MockIIbcTransferListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIIbcTransferListCall) DoAndReturn(f func(context.Context, storage.ListIbcTransferFilters) ([]storage.IbcTransfer, error)) *MockIIbcTransferListCall {
+func (c *MockIIbcTransferListCall) DoAndReturn(f func(context.Context, storage.ListIbcTransferFilters) ([]storage.IbcTransferWithSigner, error)) *MockIIbcTransferListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -20,7 +20,7 @@ func NewIbcTransfer(conn *database.Bun) *IbcTransfer {
 	return &IbcTransfer{conn}
 }
 
-func (c *IbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFilters) (transfers []storage.IbcTransfer, err error) {
+func (c *IbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFilters) (transfers []storage.IbcTransferWithSigner, err error) {
 	query := c.DB().NewSelect().
 		Model((*storage.IbcTransfer)(nil))
 
@@ -140,7 +140,7 @@ func (c *IbcTransfer) LargestTransfer24h(ctx context.Context) (transfer storage.
 	return
 }
 
-func (c *IbcTransfer) ById(ctx context.Context, id uint64) (transfer storage.IbcTransfer, err error) {
+func (c *IbcTransfer) ById(ctx context.Context, id uint64) (transfer storage.IbcTransferWithSigner, err error) {
 	query := c.DB().NewSelect().
 		Model((*storage.IbcTransfer)(nil)).
 		Where("id = ?", id)

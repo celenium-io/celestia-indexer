@@ -183,6 +183,7 @@ func (s *StorageTestSuite) TestIbcTransferById() {
 	s.Require().EqualValues(1002, transfer.Height)
 	s.Require().EqualValues("12345678", transfer.Amount.String())
 	s.Require().EqualValues(321656, transfer.Sequence)
+	s.Require().EqualValues(testsuite.Ptr(uint64(1)), transfer.SignerId)
 
 	s.Require().NotNil(transfer.Tx)
 	s.Require().NotNil(transfer.Sender)
