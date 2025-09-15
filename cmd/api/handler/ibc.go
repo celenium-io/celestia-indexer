@@ -441,7 +441,7 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 	metadata := handler.store.List()
 	response := make([]responses.IbcTransfer, len(transfers))
 	for i := range transfers {
-		response[i] = responses.NewIbcTransfer(transfers[i], metadata)
+		response[i] = responses.NewIbcTransferWithRelayer(transfers[i], metadata)
 	}
 	return returnArray(c, response)
 }
@@ -470,7 +470,7 @@ func (handler *IbcHandler) GetIbcTransfer(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 
-	return c.JSON(http.StatusOK, responses.NewIbcTransfer(transfer, handler.store.List()))
+	return c.JSON(http.StatusOK, responses.NewIbcTransferWithRelayer(transfer, handler.store.List()))
 }
 
 // IbcRelayers godoc

@@ -13,6 +13,13 @@ import (
 	"github.com/uptrace/bun"
 )
 
+type IbcTransferWithSigner struct {
+	bun.BaseModel `bun:"ibc_transfer,alias:ibc_transfer"`
+
+	IbcTransfer
+	SignerId *uint64 `bun:"signer_id"`
+}
+
 type ListIbcTransferFilters struct {
 	Limit         int
 	Offset        int
@@ -27,8 +34,8 @@ type ListIbcTransferFilters struct {
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IIbcTransfer interface {
-	ById(ctx context.Context, id uint64) (IbcTransfer, error)
-	List(ctx context.Context, fltrs ListIbcTransferFilters) ([]IbcTransfer, error)
+	ById(ctx context.Context, id uint64) (IbcTransferWithSigner, error)
+	List(ctx context.Context, fltrs ListIbcTransferFilters) ([]IbcTransferWithSigner, error)
 	Series(ctx context.Context, channelId string, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
 	LargestTransfer24h(ctx context.Context) (IbcTransfer, error)
 }

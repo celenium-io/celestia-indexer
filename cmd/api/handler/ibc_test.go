@@ -391,29 +391,32 @@ func (s *IbcTestSuite) TestListTransfers() {
 			Limit: 10,
 			Sort:  sdk.SortOrderDesc,
 		}).
-		Return([]storage.IbcTransfer{
+		Return([]storage.IbcTransferWithSigner{
 			{
-				Id:              1,
-				Time:            testTime,
-				Height:          1000,
-				Timeout:         &testTime,
-				ChannelId:       "channel-1",
-				ConnectionId:    "connection-1",
-				Amount:          decimal.RequireFromString("101"),
-				Denom:           currency.Utia,
-				Memo:            "memo",
-				ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
-				Sender: &storage.Address{
-					Hash:    testHashAddress,
-					Address: testAddress,
-				},
-				Sequence: 123456,
-				Tx:       &testTx,
-				Connection: &storage.IbcConnection{
-					Client: &storage.IbcClient{
-						ChainId: "chain-id",
+				IbcTransfer: storage.IbcTransfer{
+					Id:              1,
+					Time:            testTime,
+					Height:          1000,
+					Timeout:         &testTime,
+					ChannelId:       "channel-1",
+					ConnectionId:    "connection-1",
+					Amount:          decimal.RequireFromString("101"),
+					Denom:           currency.Utia,
+					Memo:            "memo",
+					ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
+					Sender: &storage.Address{
+						Hash:    testHashAddress,
+						Address: testAddress,
+					},
+					Sequence: 123456,
+					Tx:       &testTx,
+					Connection: &storage.IbcConnection{
+						Client: &storage.IbcClient{
+							ChainId: "chain-id",
+						},
 					},
 				},
+				SignerId: testsuite.Ptr(uint64(1)),
 			},
 		}, nil).
 		Times(1)
@@ -444,6 +447,15 @@ func (s *IbcTestSuite) TestListTransfers() {
 	s.Require().NotNil(transfer.Sender)
 	s.Require().EqualValues(testAddress, transfer.Sender.Hash)
 	s.Require().Equal("chain-id", transfer.ChainId)
+	s.Require().NotNil(transfer.Relayer)
+	s.Require().EqualValues("Test name 1", transfer.Relayer.Name)
+	s.Require().EqualValues("https://example.com/logo1.png", transfer.Relayer.Logo)
+	s.Require().NotNil(transfer.Relayer.Contact)
+	s.Require().EqualValues("https://test1.io", transfer.Relayer.Contact.Website)
+	s.Require().EqualValues("https://github.com/testrepo1", transfer.Relayer.Contact.Github)
+	s.Require().EqualValues("https://twitter.com/test1", transfer.Relayer.Contact.Twitter)
+	s.Require().Len(transfer.Relayer.Addresses, 1)
+	s.Require().EqualValues("celestia1xyz1488", transfer.Relayer.Addresses[0])
 }
 
 func (s *IbcTestSuite) TestListTransfersByChainId() {
@@ -476,29 +488,32 @@ func (s *IbcTestSuite) TestListTransfersByChainId() {
 			Sort:          sdk.SortOrderDesc,
 			ConnectionIds: []string{"connection-1"},
 		}).
-		Return([]storage.IbcTransfer{
+		Return([]storage.IbcTransferWithSigner{
 			{
-				Id:              1,
-				Time:            testTime,
-				Height:          1000,
-				Timeout:         &testTime,
-				ChannelId:       "channel-1",
-				ConnectionId:    "connection-1",
-				Amount:          decimal.RequireFromString("101"),
-				Denom:           currency.Utia,
-				Memo:            "memo",
-				ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
-				Sender: &storage.Address{
-					Hash:    testHashAddress,
-					Address: testAddress,
-				},
-				Sequence: 123456,
-				Tx:       &testTx,
-				Connection: &storage.IbcConnection{
-					Client: &storage.IbcClient{
-						ChainId: "chain-id",
+				IbcTransfer: storage.IbcTransfer{
+					Id:              1,
+					Time:            testTime,
+					Height:          1000,
+					Timeout:         &testTime,
+					ChannelId:       "channel-1",
+					ConnectionId:    "connection-1",
+					Amount:          decimal.RequireFromString("101"),
+					Denom:           currency.Utia,
+					Memo:            "memo",
+					ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
+					Sender: &storage.Address{
+						Hash:    testHashAddress,
+						Address: testAddress,
+					},
+					Sequence: 123456,
+					Tx:       &testTx,
+					Connection: &storage.IbcConnection{
+						Client: &storage.IbcClient{
+							ChainId: "chain-id",
+						},
 					},
 				},
+				SignerId: testsuite.Ptr(uint64(1)),
 			},
 		}, nil).
 		Times(1)
@@ -529,6 +544,15 @@ func (s *IbcTestSuite) TestListTransfersByChainId() {
 	s.Require().NotNil(transfer.Sender)
 	s.Require().EqualValues(testAddress, transfer.Sender.Hash)
 	s.Require().Equal("chain-id", transfer.ChainId)
+	s.Require().NotNil(transfer.Relayer)
+	s.Require().EqualValues("Test name 1", transfer.Relayer.Name)
+	s.Require().EqualValues("https://example.com/logo1.png", transfer.Relayer.Logo)
+	s.Require().NotNil(transfer.Relayer.Contact)
+	s.Require().EqualValues("https://test1.io", transfer.Relayer.Contact.Website)
+	s.Require().EqualValues("https://github.com/testrepo1", transfer.Relayer.Contact.Github)
+	s.Require().EqualValues("https://twitter.com/test1", transfer.Relayer.Contact.Twitter)
+	s.Require().Len(transfer.Relayer.Addresses, 1)
+	s.Require().EqualValues("celestia1xyz1488", transfer.Relayer.Addresses[0])
 }
 
 func (s *IbcTestSuite) TestListTransfersByChainIdUnknownChain() {
@@ -564,29 +588,32 @@ func (s *IbcTestSuite) TestGetTransfer() {
 
 	s.transfers.EXPECT().
 		ById(gomock.Any(), uint64(1)).
-		Return(storage.IbcTransfer{
-			Id:              1,
-			Time:            testTime,
-			Height:          1000,
-			Timeout:         &testTime,
-			ChannelId:       "channel-1",
-			ConnectionId:    "connection-1",
-			Amount:          decimal.RequireFromString("101"),
-			Denom:           currency.Utia,
-			Memo:            "memo",
-			ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
-			Sender: &storage.Address{
-				Hash:    testHashAddress,
-				Address: testAddress,
-			},
-			Sequence: 123456,
-			Tx:       &testTx,
-			Connection: &storage.IbcConnection{
-				Client: &storage.IbcClient{
-					ChainId:   "chain-id",
-					CreatorId: 1,
+		Return(storage.IbcTransferWithSigner{
+			IbcTransfer: storage.IbcTransfer{
+				Id:              1,
+				Time:            testTime,
+				Height:          1000,
+				Timeout:         &testTime,
+				ChannelId:       "channel-1",
+				ConnectionId:    "connection-1",
+				Amount:          decimal.RequireFromString("101"),
+				Denom:           currency.Utia,
+				Memo:            "memo",
+				ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
+				Sender: &storage.Address{
+					Hash:    testHashAddress,
+					Address: testAddress,
+				},
+				Sequence: 123456,
+				Tx:       &testTx,
+				Connection: &storage.IbcConnection{
+					Client: &storage.IbcClient{
+						ChainId:   "chain-id",
+						CreatorId: 1,
+					},
 				},
 			},
+			SignerId: testsuite.Ptr(uint64(1)),
 		}, nil).
 		Times(1)
 
@@ -650,30 +677,33 @@ func (s *IbcTestSuite) TestListTransferWithHash() {
 
 	s.transfers.EXPECT().
 		List(gomock.Any(), gomock.Any()).
-		Return([]storage.IbcTransfer{
+		Return([]storage.IbcTransferWithSigner{
 			{
-				Id:              1,
-				Time:            testTime,
-				Height:          1000,
-				Timeout:         &testTime,
-				ChannelId:       "channel-1",
-				ConnectionId:    "connection-1",
-				Amount:          decimal.RequireFromString("101"),
-				Denom:           currency.Utia,
-				Memo:            "memo",
-				ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
-				Sender: &storage.Address{
-					Hash:    testHashAddress,
-					Address: testAddress,
-				},
-				Sequence: 123456,
-				Tx:       &testTx,
-				Connection: &storage.IbcConnection{
-					Client: &storage.IbcClient{
-						ChainId:   "chain-id",
-						CreatorId: 1,
+				IbcTransfer: storage.IbcTransfer{
+					Id:              1,
+					Time:            testTime,
+					Height:          1000,
+					Timeout:         &testTime,
+					ChannelId:       "channel-1",
+					ConnectionId:    "connection-1",
+					Amount:          decimal.RequireFromString("101"),
+					Denom:           currency.Utia,
+					Memo:            "memo",
+					ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
+					Sender: &storage.Address{
+						Hash:    testHashAddress,
+						Address: testAddress,
+					},
+					Sequence: 123456,
+					Tx:       &testTx,
+					Connection: &storage.IbcConnection{
+						Client: &storage.IbcClient{
+							ChainId:   "chain-id",
+							CreatorId: 1,
+						},
 					},
 				},
+				SignerId: testsuite.Ptr(uint64(1)),
 			},
 		}, nil).
 		Times(1)

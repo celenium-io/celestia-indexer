@@ -188,7 +188,7 @@ type IbcTransfer struct {
 	Relayer  *Relayer      `json:"relayer,omitempty"`
 }
 
-func NewIbcTransfer(transfer storage.IbcTransfer, relayers map[uint64]Relayer) IbcTransfer {
+func NewIbcTransfer(transfer storage.IbcTransfer) IbcTransfer {
 	response := IbcTransfer{
 		Id:            transfer.Id,
 		Time:          transfer.Time,
@@ -200,7 +200,7 @@ func NewIbcTransfer(transfer storage.IbcTransfer, relayers map[uint64]Relayer) I
 		Denom:         transfer.Denom,
 		Memo:          transfer.Memo,
 		Timeout:       transfer.Timeout,
-		TimeoutHeight: transfer.Tx.TimeoutHeight,
+		TimeoutHeight: transfer.HeightTimeout,
 		Sequence:      transfer.Sequence,
 		Sender:        NewShortAddress(transfer.Sender),
 		Receiver:      NewShortAddress(transfer.Receiver),
@@ -224,10 +224,17 @@ func NewIbcTransfer(transfer storage.IbcTransfer, relayers map[uint64]Relayer) I
 
 	if transfer.Connection != nil && transfer.Connection.Client != nil {
 		response.ChainId = transfer.Connection.Client.ChainId
-		if len(relayers) > 0 {
-			if relayer, ok := relayers[transfer.Connection.Client.CreatorId]; ok {
-				response.Relayer = &relayer
-			}
+	}
+
+	return response
+}
+
+func NewIbcTransferWithRelayer(transfer storage.IbcTransferWithSigner, relayers map[uint64]Relayer) IbcTransfer {
+	response := NewIbcTransfer(transfer.IbcTransfer)
+
+	if transfer.SignerId != nil && len(relayers) > 0 {
+		if relayer, ok := relayers[*transfer.SignerId]; ok {
+			response.Relayer = &relayer
 		}
 	}
 
@@ -263,7 +270,7 @@ type IbcSummaryStats struct {
 
 func NewIbcSummaryStats(transfer storage.IbcTransfer, channel storage.BusiestChannel) IbcSummaryStats {
 	return IbcSummaryStats{
-		LargestTransfer: NewIbcTransfer(transfer, nil),
+		LargestTransfer: NewIbcTransfer(transfer),
 		BusiestChannel: BusiestChannel{
 			ChannelId:      channel.ChannelId,
 			TransfersCount: channel.TransfersCount,
