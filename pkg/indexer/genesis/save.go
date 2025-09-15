@@ -115,12 +115,33 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		}
 	}
 
+	totalValidators, err := tx.SaveValidators(ctx, data.validators...)
+	if err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
 	if err := tx.SaveMessages(ctx, messages...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
-	totalValidators, err := tx.SaveValidators(ctx, data.validators...)
-	if err != nil {
+	var msgVals []storage.MsgValidator
+	for i := range messages {
+		for _, val := range messages[i].Validators {
+			for j := range data.validators {
+				if data.validators[j].Address == val {
+					msgVals = append(msgVals, storage.MsgValidator{
+						Height:      0,
+						Time:        data.block.Time,
+						MsgId:       messages[i].Id,
+						ValidatorId: data.validators[j].Id,
+					})
+					break
+				}
+			}
+		}
+	}
+
+	if err := tx.SaveMsgValidator(ctx, msgVals...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 

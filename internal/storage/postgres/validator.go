@@ -74,3 +74,30 @@ func (v *Validator) JailedCount(ctx context.Context) (int, error) {
 		Where("jailed = true").
 		Count(ctx)
 }
+
+func (v *Validator) Messages(ctx context.Context, id uint64, fltrs storage.ValidatorMessagesFilters) ([]storage.MsgValidator, error) {
+	subQuery := v.DB().NewSelect().
+		Model((*storage.MsgValidator)(nil)).
+		Offset(fltrs.Offset).
+		Where("validator_id = ?", id)
+
+	subQuery = limitScope(subQuery, fltrs.Limit)
+	subQuery = sortScope(subQuery, "time", fltrs.Sort)
+
+	if fltrs.To != nil {
+		subQuery = subQuery.Where("time < ?", *fltrs.To)
+	}
+	if fltrs.From != nil {
+		subQuery = subQuery.Where("time >= ?", *fltrs.From)
+	}
+
+	var response []storage.MsgValidator
+	err := v.DB().NewSelect().
+		TableExpr("(?) as msgs", subQuery).
+		ColumnExpr("msgs.*").
+		ColumnExpr("message.position as msg__position, message.type as msg__type, message.size as msg__size, message.data as msg__data").
+		Join("left join message on message.id = msg_id").
+		Scan(ctx, &response)
+
+	return response, err
+}

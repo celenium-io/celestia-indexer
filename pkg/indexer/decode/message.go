@@ -80,7 +80,7 @@ func Message(
 
 	// staking module
 	case *cosmosStakingTypes.MsgCreateValidator:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateValidator(ctx, status, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.Validators, err = handle.MsgCreateValidator(ctx, status, typedMsg)
 		if err != nil {
 			return d, err
 		}
@@ -91,7 +91,7 @@ func Message(
 			}
 		}
 	case *cosmosStakingTypes.MsgEditValidator:
-		d.Msg.Type, d.Msg.Addresses, err = handle.MsgEditValidator(ctx, status, typedMsg)
+		d.Msg.Type, d.Msg.Addresses, d.Msg.Validators, err = handle.MsgEditValidator(ctx, status, typedMsg)
 	case *cosmosStakingTypes.MsgDelegate:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgDelegate(ctx, typedMsg)
 	case *cosmosStakingTypes.MsgBeginRedelegate:

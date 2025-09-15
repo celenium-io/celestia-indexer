@@ -240,6 +240,15 @@ func (tx Transaction) SaveMsgAddresses(ctx context.Context, addresses ...models.
 	return err
 }
 
+func (tx Transaction) SaveMsgValidator(ctx context.Context, valMsgs ...models.MsgValidator) error {
+	if len(valMsgs) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&valMsgs).Exec(ctx)
+	return err
+}
+
 func (tx Transaction) SaveNamespaceMessage(ctx context.Context, nsMsgs ...models.NamespaceMessage) error {
 	if len(nsMsgs) == 0 {
 		return nil
@@ -964,6 +973,12 @@ func (tx Transaction) RollbackMessageAddresses(ctx context.Context, msgIds []uin
 	return
 }
 
+func (tx Transaction) RollbackMessageValidators(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.MsgValidator)(nil)).
+		Where("height = ?", height).Exec(ctx)
+	return
+}
+
 func (tx Transaction) RollbackBlockSignatures(ctx context.Context, height types.Level) (err error) {
 	_, err = tx.Tx().NewDelete().Model((*models.BlockSignature)(nil)).
 		Where("height = ?", height).Exec(ctx)
@@ -1044,6 +1059,20 @@ func (tx Transaction) RollbackHyperlaneTokens(ctx context.Context, height types.
 
 func (tx Transaction) RollbackHyperlaneTransfers(ctx context.Context, height types.Level) (err error) {
 	_, err = tx.Tx().NewDelete().Model((*models.HLTransfer)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackSignals(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.SignalVersion)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackUpgrades(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.Upgrade)(nil)).
 		Where("height = ?", height).
 		Exec(ctx)
 	return

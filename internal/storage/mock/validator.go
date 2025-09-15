@@ -356,6 +356,45 @@ func (c *MockIValidatorListByPowerCall) DoAndReturn(f func(context.Context, stor
 	return c
 }
 
+// Messages mocks base method.
+func (m *MockIValidator) Messages(ctx context.Context, id uint64, fltrs storage.ValidatorMessagesFilters) ([]storage.MsgValidator, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Messages", ctx, id, fltrs)
+	ret0, _ := ret[0].([]storage.MsgValidator)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Messages indicates an expected call of Messages.
+func (mr *MockIValidatorMockRecorder) Messages(ctx, id, fltrs any) *MockIValidatorMessagesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Messages", reflect.TypeOf((*MockIValidator)(nil).Messages), ctx, id, fltrs)
+	return &MockIValidatorMessagesCall{Call: call}
+}
+
+// MockIValidatorMessagesCall wrap *gomock.Call
+type MockIValidatorMessagesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIValidatorMessagesCall) Return(arg0 []storage.MsgValidator, arg1 error) *MockIValidatorMessagesCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIValidatorMessagesCall) Do(f func(context.Context, uint64, storage.ValidatorMessagesFilters) ([]storage.MsgValidator, error)) *MockIValidatorMessagesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIValidatorMessagesCall) DoAndReturn(f func(context.Context, uint64, storage.ValidatorMessagesFilters) ([]storage.MsgValidator, error)) *MockIValidatorMessagesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Save mocks base method.
 func (m_2 *MockIValidator) Save(ctx context.Context, m *storage.Validator) error {
 	m_2.ctrl.T.Helper()

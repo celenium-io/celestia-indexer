@@ -420,6 +420,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			validator.GET("/delegators", validatorsHandler.Delegators)
 			validator.GET("/jails", validatorsHandler.Jails)
 			validator.GET("/votes", validatorsHandler.Votes)
+			validator.GET("/messages", validatorsHandler.Messages)
 		}
 	}
 

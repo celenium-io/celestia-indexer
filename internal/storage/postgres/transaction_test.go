@@ -1785,6 +1785,74 @@ func (s *TransactionTestSuite) TestUpdateSignalsAfterUpgrade() {
 	s.Require().EqualValues("1000100", signals[0].VotingPower.String())
 }
 
+func (s *TransactionTestSuite) TestRollbackUpgrade() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackUpgrades(ctx, 1011)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	data, err := s.storage.Upgrade.List(ctx, storage.ListUpgradesFilter{
+		Limit: 10,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(data, 1)
+}
+
+func (s *TransactionTestSuite) TestRollbackSignalVersions() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackSignals(ctx, 102)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	data, err := s.storage.SignalVersion.List(ctx, storage.ListSignalsFilter{
+		Limit: 10,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(data, 1)
+}
+
+func (s *TransactionTestSuite) TestMsgValidator() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveMsgValidator(ctx, storage.MsgValidator{
+		ValidatorId: 1,
+		MsgId:       100,
+		Time:        time.Now(),
+		Height:      123456,
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackMessageValidators(ctx, 123456)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+}
+
 func TestSuiteTransaction_Run(t *testing.T) {
 	suite.Run(t, new(TransactionTestSuite))
 }

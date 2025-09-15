@@ -32,6 +32,7 @@ func (module *Module) saveMessages(
 	var (
 		namespaceMsgs      []storage.NamespaceMessage
 		msgAddress         []storage.MsgAddress
+		valMsgs            []storage.MsgValidator
 		blobLogs           = make([]storage.BlobLog, 0)
 		vestingAccounts    = make([]*storage.VestingAccount, 0)
 		ibcClients         = make(map[string]*storage.IbcClient)
@@ -334,6 +335,22 @@ func (module *Module) saveMessages(
 
 			upgrades = append(upgrades, messages[i].Upgrade)
 		}
+
+		if len(messages[i].Validators) > 0 {
+			for _, val := range messages[i].Validators {
+				id, ok := module.validatorsByAddress[val]
+				if !ok {
+					return 0, errors.Errorf("validator %s not found", val)
+				}
+
+				valMsgs = append(valMsgs, storage.MsgValidator{
+					Height:      messages[i].Height,
+					Time:        messages[i].Time,
+					MsgId:       messages[i].Id,
+					ValidatorId: id,
+				})
+			}
+		}
 	}
 
 	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
@@ -341,6 +358,9 @@ func (module *Module) saveMessages(
 	}
 	if err := tx.SaveMsgAddresses(ctx, msgAddress...); err != nil {
 		return 0, state.Version, err
+	}
+	if err := tx.SaveMsgValidator(ctx, valMsgs...); err != nil {
+		return 0, err
 	}
 	if err := tx.SaveBlobLogs(ctx, blobLogs...); err != nil {
 		return 0, state.Version, err

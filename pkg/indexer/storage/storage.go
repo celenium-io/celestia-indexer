@@ -336,12 +336,12 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	ibcClientsCount, version, err := module.saveMessages(ctx, tx, messages, addrToId, state)
+	totalValidators, err := module.saveValidators(ctx, tx, dCtx.GetValidators(), dCtx.Jails)
 	if err != nil {
 		return state, err
 	}
 
-	totalValidators, err := module.saveValidators(ctx, tx, dCtx.GetValidators(), dCtx.Jails)
+	ibcClientsCount, version, err := module.saveMessages(ctx, tx, messages, addrToId, state)
 	if err != nil {
 		return state, err
 	}
