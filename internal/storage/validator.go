@@ -51,6 +51,8 @@ type Validator struct {
 	Version     uint64          `bun:"version,default:0"        comment:"Signal version"                    json:"-"`
 
 	Jailed *bool `bun:"jailed" comment:"True if validator was punished" json:"-"`
+
+	MessagesCount uint64 `bun:"messages_count" comment:"Count of validator messages" json:"-"`
 }
 
 func (Validator) TableName() string {

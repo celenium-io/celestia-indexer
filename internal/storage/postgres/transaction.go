@@ -335,13 +335,14 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 	}
 
 	query := tx.Tx().NewInsert().Model(&arr).
-		Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate", "max_change_rate", "min_self_delegation", "stake", "jailed", "commissions", "rewards", "height", "version").
+		Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate", "max_change_rate", "min_self_delegation", "stake", "jailed", "commissions", "rewards", "height", "version", "messages_count").
 		On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
 		Set("rate = CASE WHEN EXCLUDED.rate > 0 THEN EXCLUDED.rate ELSE added_validator.rate END").
 		Set("min_self_delegation = CASE WHEN EXCLUDED.min_self_delegation > 0 THEN EXCLUDED.min_self_delegation ELSE added_validator.min_self_delegation END").
 		Set("stake = added_validator.stake + EXCLUDED.stake").
 		Set("commissions = added_validator.commissions + EXCLUDED.commissions").
 		Set("rewards = added_validator.rewards + EXCLUDED.rewards").
+		Set("messages_count = added_validator.messages_count + EXCLUDED.messages_count").
 		Set("moniker = CASE WHEN EXCLUDED.moniker != '[do-not-modify]' THEN EXCLUDED.moniker ELSE added_validator.moniker END").
 		Set("website = CASE WHEN EXCLUDED.website != '[do-not-modify]' THEN EXCLUDED.website ELSE added_validator.website END").
 		Set("identity = CASE WHEN EXCLUDED.identity != '[do-not-modify]' THEN EXCLUDED.identity ELSE added_validator.identity END").

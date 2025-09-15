@@ -68,6 +68,7 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 		MinSelfDelegation: decimal.Zero,
 		Stake:             decimal.Zero,
 		Jailed:            &jailed,
+		MessagesCount:     1,
 	}
 
 	if !m.Value.IsNil() {
@@ -151,6 +152,7 @@ func MsgEditValidator(ctx *context.Context, status storageTypes.Status, m *cosmo
 		Rate:              decimal.Zero,
 		MinSelfDelegation: decimal.Zero,
 		Stake:             decimal.Zero,
+		MessagesCount:     1,
 	}
 
 	if m.CommissionRate != nil && !m.CommissionRate.IsNil() {

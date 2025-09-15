@@ -79,6 +79,7 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 			Rate:              decimal.Zero,
 			MinSelfDelegation: decimal.Zero,
 			Stake:             decimal.Zero,
+			MessagesCount:     1,
 		},
 	}
 
@@ -247,6 +248,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 			MinSelfDelegation: decimal.RequireFromString("1"),
 			Height:            blob.Height,
 			Jailed:            testsuite.Ptr(false),
+			MessagesCount:     1,
 		},
 	}
 

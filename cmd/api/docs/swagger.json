@@ -10546,6 +10546,10 @@
                     "type": "string",
                     "example": "0.1"
                 },
+                "messages_count": {
+                    "type": "integer",
+                    "example": 1
+                },
                 "min_self_delegation": {
                     "type": "string",
                     "example": "1"
