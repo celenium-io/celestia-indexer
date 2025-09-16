@@ -37,17 +37,9 @@ func processExec(ctx *context.Context, events []storage.Event, msg *storage.Mess
 				return err
 			}
 		case "/cosmos.staking.v1beta1.MsgBeginRedelegate":
-			msgsAny, ok := msg.Data["Msgs"]
-			if !ok {
-				return errors.Errorf("can't find Msgs key in MsgExec: %##v", msg.Data)
-			}
-			msgsArr, ok := msgsAny.([]any)
-			if !ok {
-				return errors.Errorf("Msgs is not an array in MsgExec: %T", msgsAny)
-			}
-			msgs, ok := msgsArr[i].(map[string]any)
-			if !ok {
-				return errors.Errorf("Msgs invalid type in MsgExec: %T", msgsArr[i])
+			msgs, err := getInternalDataForExec(msg.Data, i)
+			if err != nil {
+				return err
 			}
 			if err := processRedelegate(ctx, events, &storage.Message{
 				Data: msgs,
@@ -68,6 +60,14 @@ func processExec(ctx *context.Context, events []storage.Event, msg *storage.Mess
 			}
 		case "/cosmos.slashing.v1beta1.MsgUnjail":
 			if err := processUnjail(ctx, events, msg, idx); err != nil {
+				return err
+			}
+		case "/celestia.signal.v1.Msg/SignalVersion":
+			data, err := getInternalDataForExec(msg.Data, i)
+			if err != nil {
+				return err
+			}
+			if err := processSignalVersion(ctx, events, msg, data, idx); err != nil {
 				return err
 			}
 		default:
@@ -91,4 +91,20 @@ func processExec(ctx *context.Context, events []storage.Event, msg *storage.Mess
 	}
 
 	return nil
+}
+
+func getInternalDataForExec(data map[string]any, idx int) (map[string]any, error) {
+	msgsAny, ok := data["Msgs"]
+	if !ok {
+		return nil, errors.Errorf("can't find Msgs key in MsgExec: %##v", data)
+	}
+	msgsArr, ok := msgsAny.([]any)
+	if !ok {
+		return nil, errors.Errorf("Msgs is not an array in MsgExec: %T", msgsAny)
+	}
+	msgs, ok := msgsArr[idx].(map[string]any)
+	if !ok {
+		return nil, errors.Errorf("Msgs invalid type in MsgExec: %T", msgsArr[idx])
+	}
+	return msgs, nil
 }

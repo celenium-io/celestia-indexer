@@ -16,6 +16,7 @@ import (
 )
 
 var errCantFindAddress = errors.New("can't find address")
+var signalsThreshold = decimal.NewFromFloat(0.833333333) // 5/6
 
 func (module *Module) saveMessages(
 	ctx context.Context,
@@ -306,7 +307,13 @@ func (module *Module) saveMessages(
 			}
 
 			messages[i].Upgrade.SignerId = signerId
-			sgs, err := tx.SignalVersions(ctx)
+
+			maxValidatorsCount, err := getMaxValidatorsCount(ctx, module.constants)
+			if err != nil {
+				return 0, errors.Wrapf(err, "receiving max validators count")
+			}
+
+			versions, err := tx.SignalVersions(ctx, maxValidatorsCount)
 			if err != nil {
 				return 0, errors.Wrapf(err, "receiving signal versions")
 			}
@@ -317,9 +324,14 @@ func (module *Module) saveMessages(
 			}
 
 			version := uint64(0)
-			for _, signal := range sgs {
-				if signal.VotingPower.GreaterThan(vp.Mul(decimal.NewFromInt(5)).Div(decimal.NewFromInt(6))) {
-					version = signal.Version
+			for _, v := range versions {
+				if v.VotingPower.GreaterThan(vp.Mul(signalsThreshold)) {
+					version = v.Version
+
+					if err := tx.UpdateSignalsAfterUpgrade(ctx, version); err != nil {
+						return 0, errors.Wrap(err, "updating signals after upgrade")
+					}
+
 					break
 				}
 			}

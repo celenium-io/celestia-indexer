@@ -176,13 +176,9 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 
 	// 2. Get all validators
 
-	maxValsConsts, err := module.constants.Get(ctx, types.ModuleNameStaking, "max_validators")
+	maxVals, err := getMaxValidatorsCount(ctx, module.constants)
 	if err != nil {
-		return nil, errors.Wrap(err, "get max validators value")
-	}
-	maxVals, err := strconv.Atoi(maxValsConsts.Value)
-	if err != nil {
-		return nil, errors.Wrap(err, "parse max validators value")
+		return nil, errors.Wrapf(err, "receiving max validators count")
 	}
 
 	validators, err := tx.BondedValidators(ctx, maxVals)

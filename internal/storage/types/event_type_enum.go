@@ -183,6 +183,8 @@ const (
 	EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm EventType = "hyperlane.core.interchain_security.v1.EventSetRoutingIsm"
 	// EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm is a EventType of type hyperlane.core.interchain_security.v1.EventCreateRoutingIsm.
 	EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm EventType = "hyperlane.core.interchain_security.v1.EventCreateRoutingIsm"
+	// EventTypeSignalVersion is a EventType of type signal_version.
+	EventTypeSignalVersion EventType = "signal_version"
 )
 
 var ErrInvalidEventType = fmt.Errorf("not a valid EventType, try [%s]", strings.Join(_EventTypeNames, ", "))
@@ -271,6 +273,7 @@ var _EventTypeNames = []string{
 	string(EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain),
 	string(EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm),
 	string(EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm),
+	string(EventTypeSignalVersion),
 }
 
 // EventTypeNames returns a list of possible string values of EventType.
@@ -366,6 +369,7 @@ func EventTypeValues() []EventType {
 		EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain,
 		EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm,
 		EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm,
+		EventTypeSignalVersion,
 	}
 }
 
@@ -465,6 +469,7 @@ var _EventTypeValue = map[string]EventType{
 	"hyperlane.core.interchain_security.v1.EventSetRoutingIsmDomain": EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain,
 	"hyperlane.core.interchain_security.v1.EventSetRoutingIsm":       EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm,
 	"hyperlane.core.interchain_security.v1.EventCreateRoutingIsm":    EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm,
+	"signal_version": EventTypeSignalVersion,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

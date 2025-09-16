@@ -1375,11 +1375,34 @@ func (tx Transaction) HyperlaneToken(ctx context.Context, id []byte) (token mode
 	return
 }
 
-func (tx Transaction) SignalVersions(ctx context.Context) (signals []models.Signal, err error) {
-	err = tx.Tx().NewSelect().Model((*models.SignalVersion)(nil)).
-		ColumnExpr("version as version, sum(voting_power) as voting_power").
+func (tx Transaction) SignalVersions(ctx context.Context, maxValidatorsCount int) (signals []models.Signal, err error) {
+	versionsQuery := tx.Tx().NewSelect().Model((*models.SignalVersion)(nil)).
+		ColumnExpr("max(version) as version, validator_id").
+		Group("validator_id")
+
+	bondedQuery := tx.Tx().NewSelect().Model((*models.Validator)(nil)).
+		ColumnExpr("*").
+		Where("jailed is not true").
+		Order("stake desc").
+		Limit(maxValidatorsCount)
+
+	err = tx.Tx().NewSelect().
+		With("versions", versionsQuery).
+		With("bonded", bondedQuery).
+		Table("versions").
+		ColumnExpr("version as version, sum(stake) as voting_power").
+		Join("inner join bonded on validator_id = bonded.id").
 		Group("version").
 		Order("version desc").
 		Scan(ctx, &signals)
 	return
+}
+
+func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) error {
+	_, err := tx.Tx().NewUpdate().Table("signal_version", "validator").
+		SetColumn("voting_power", "validator.stake").
+		Where("version = ?", version).
+		Where("validator.id = validator_id").
+		Exec(ctx)
+	return err
 }

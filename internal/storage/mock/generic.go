@@ -4140,18 +4140,18 @@ func (c *MockTransactionSaveVotesCall) DoAndReturn(f func(context.Context, ...*s
 }
 
 // SignalVersions mocks base method.
-func (m *MockTransaction) SignalVersions(ctx context.Context) ([]storage.Signal, error) {
+func (m *MockTransaction) SignalVersions(ctx context.Context, bondedValidatorsCount int) ([]storage.Signal, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SignalVersions", ctx)
+	ret := m.ctrl.Call(m, "SignalVersions", ctx, bondedValidatorsCount)
 	ret0, _ := ret[0].([]storage.Signal)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SignalVersions indicates an expected call of SignalVersions.
-func (mr *MockTransactionMockRecorder) SignalVersions(ctx any) *MockTransactionSignalVersionsCall {
+func (mr *MockTransactionMockRecorder) SignalVersions(ctx, bondedValidatorsCount any) *MockTransactionSignalVersionsCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignalVersions", reflect.TypeOf((*MockTransaction)(nil).SignalVersions), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignalVersions", reflect.TypeOf((*MockTransaction)(nil).SignalVersions), ctx, bondedValidatorsCount)
 	return &MockTransactionSignalVersionsCall{Call: call}
 }
 
@@ -4167,13 +4167,13 @@ func (c *MockTransactionSignalVersionsCall) Return(arg0 []storage.Signal, arg1 e
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionSignalVersionsCall) Do(f func(context.Context) ([]storage.Signal, error)) *MockTransactionSignalVersionsCall {
+func (c *MockTransactionSignalVersionsCall) Do(f func(context.Context, int) ([]storage.Signal, error)) *MockTransactionSignalVersionsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionSignalVersionsCall) DoAndReturn(f func(context.Context) ([]storage.Signal, error)) *MockTransactionSignalVersionsCall {
+func (c *MockTransactionSignalVersionsCall) DoAndReturn(f func(context.Context, int) ([]storage.Signal, error)) *MockTransactionSignalVersionsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -4327,6 +4327,44 @@ func (c *MockTransactionUpdateRollupCall) Do(f func(context.Context, *storage.Ro
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionUpdateRollupCall) DoAndReturn(f func(context.Context, *storage.Rollup) error) *MockTransactionUpdateRollupCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// UpdateSignalsAfterUpgrade mocks base method.
+func (m *MockTransaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSignalsAfterUpgrade", ctx, version)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSignalsAfterUpgrade indicates an expected call of UpdateSignalsAfterUpgrade.
+func (mr *MockTransactionMockRecorder) UpdateSignalsAfterUpgrade(ctx, version any) *MockTransactionUpdateSignalsAfterUpgradeCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSignalsAfterUpgrade", reflect.TypeOf((*MockTransaction)(nil).UpdateSignalsAfterUpgrade), ctx, version)
+	return &MockTransactionUpdateSignalsAfterUpgradeCall{Call: call}
+}
+
+// MockTransactionUpdateSignalsAfterUpgradeCall wrap *gomock.Call
+type MockTransactionUpdateSignalsAfterUpgradeCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Return(arg0 error) *MockTransactionUpdateSignalsAfterUpgradeCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Do(f func(context.Context, uint64) error) *MockTransactionUpdateSignalsAfterUpgradeCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionUpdateSignalsAfterUpgradeCall) DoAndReturn(f func(context.Context, uint64) error) *MockTransactionUpdateSignalsAfterUpgradeCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

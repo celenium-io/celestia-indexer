@@ -1769,12 +1769,40 @@ func (s *TransactionTestSuite) TestSignalVersions() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	signals, err := tx.SignalVersions(ctx)
+	signals, err := tx.SignalVersions(ctx, 10)
 	s.Require().NoError(err)
 	s.Require().Len(signals, 2)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
+
+	s.Require().EqualValues(1488, signals[0].Version)
+	s.Require().EqualValues("1000100", signals[0].VotingPower.String())
+	s.Require().EqualValues(1477, signals[1].Version)
+	s.Require().EqualValues("1000100", signals[1].VotingPower.String())
+}
+
+func (s *TransactionTestSuite) TestUpdateSignalsAfterUpgrade() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.UpdateSignalsAfterUpgrade(ctx, 1488)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	signals, err := s.storage.SignalVersion.List(ctx, storage.ListSignalsFilter{
+		Limit: 1,
+		Sort:  sdk.SortOrderAsc,
+	})
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(1488, signals[0].Version)
+	s.Require().EqualValues("1000100", signals[0].VotingPower.String())
 }
 
 func TestSuiteTransaction_Run(t *testing.T) {
