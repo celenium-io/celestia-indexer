@@ -340,7 +340,7 @@ func (module *Module) saveMessages(
 			for _, val := range messages[i].Validators {
 				id, ok := module.validatorsByAddress[val]
 				if !ok {
-					return 0, errors.Errorf("validator %s not found", val)
+					return 0, state.Version, errors.Errorf("validator %s not found", val)
 				}
 
 				valMsgs = append(valMsgs, storage.MsgValidator{
@@ -360,7 +360,7 @@ func (module *Module) saveMessages(
 		return 0, state.Version, err
 	}
 	if err := tx.SaveMsgValidator(ctx, valMsgs...); err != nil {
-		return 0, err
+		return 0, state.Version, err
 	}
 	if err := tx.SaveBlobLogs(ctx, blobLogs...); err != nil {
 		return 0, state.Version, err
