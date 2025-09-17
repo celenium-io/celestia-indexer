@@ -10163,6 +10163,11 @@
                     "type": "string",
                     "format": "string",
                     "example": "312"
+                },
+                "version": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 5
                 }
             }
         },
@@ -10479,6 +10484,10 @@
                     "type": "string",
                     "example": "1"
                 },
+                "version": {
+                    "type": "integer",
+                    "example": 5
+                },
                 "voting_power": {
                     "type": "string",
                     "example": "1"
@@ -10716,7 +10725,8 @@
                 "hyperlane.core.interchain_security.v1.EventCreateNoopIsm",
                 "hyperlane.core.interchain_security.v1.EventSetRoutingIsmDomain",
                 "hyperlane.core.interchain_security.v1.EventSetRoutingIsm",
-                "hyperlane.core.interchain_security.v1.EventCreateRoutingIsm"
+                "hyperlane.core.interchain_security.v1.EventCreateRoutingIsm",
+                "signal_version"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -10801,7 +10811,8 @@
                 "EventTypeHyperlanecoreinterchainSecurityv1EventCreateNoopIsm",
                 "EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain",
                 "EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm",
-                "EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm"
+                "EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm",
+                "EventTypeSignalVersion"
             ]
         },
         "types.MsgAddressType": {

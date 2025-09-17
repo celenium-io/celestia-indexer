@@ -122,6 +122,7 @@ type Transaction interface {
 	Jail(ctx context.Context, validators ...*Validator) error
 	SaveSignals(ctx context.Context, signals ...*SignalVersion) error
 	SaveUpgrades(ctx context.Context, signals ...*Upgrade) error
+	UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) error
 
 	RollbackBlock(ctx context.Context, height types.Level) error
 	RollbackBlockStats(ctx context.Context, height types.Level) (stats BlockStats, err error)
@@ -175,7 +176,6 @@ type Transaction interface {
 	IbcConnection(ctx context.Context, id string) (IbcConnection, error)
 	HyperlaneMailbox(ctx context.Context, internalId uint64) (HLMailbox, error)
 	HyperlaneToken(ctx context.Context, id []byte) (HLToken, error)
-	SignalVersions(ctx context.Context) ([]Signal, error)
 }
 
 const (
@@ -184,7 +184,6 @@ const (
 )
 
 type Signal struct {
-	Id          uint64          `bun:"id"`
 	VotingPower decimal.Decimal `bun:"voting_power"`
 	Version     uint64          `bun:"version"`
 }

@@ -46,6 +46,7 @@ type Validator struct {
 	Rewards     decimal.Decimal `bun:"rewards,type:numeric"     comment:"Validator's rewards"               json:"-"`
 	Commissions decimal.Decimal `bun:"commissions,type:numeric" comment:"Commissions"                       json:"-"`
 	Height      pkgTypes.Level  `bun:"height"                   comment:"Height when validator was created" json:"-"`
+	Version     uint64          `bun:"version,default:0"        comment:"Signal version"                    json:"-"`
 
 	Jailed *bool `bun:"jailed" comment:"True if validator was punished" json:"-"`
 }

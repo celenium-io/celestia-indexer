@@ -151,6 +151,18 @@ func Uint64FromMap(m map[string]any, key string) (uint64, error) {
 	return strconv.ParseUint(str, 10, 64)
 }
 
+func Uint64(m map[string]any, key string) (uint64, error) {
+	val, ok := m[key]
+	if !ok {
+		return 0, errors.Errorf("can't find key: %s", key)
+	}
+	u, ok := val.(int)
+	if !ok {
+		return 0, errors.Errorf("key '%s' is not a uint64", key)
+	}
+	return uint64(u), nil
+}
+
 func BoolFromMap(m map[string]any, key string) (bool, error) {
 	val, ok := m[key]
 	if !ok {

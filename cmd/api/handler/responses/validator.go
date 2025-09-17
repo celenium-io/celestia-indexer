@@ -14,6 +14,7 @@ import (
 
 type Validator struct {
 	Id          uint64 `example:"321"                                      json:"id"           swaggertype:"integer"`
+	Version     uint64 `example:"5"                                        json:"version"      swaggertype:"integer"`
 	ConsAddress string `example:"E641C7A2C964833E556AEF934FBF166B712874B6" json:"cons_address" swaggertype:"string"`
 
 	Moniker  string `example:"Easy 2 Stake"                   json:"moniker"  swaggertype:"string"`
@@ -46,7 +47,8 @@ func NewValidator(val storage.Validator) *Validator {
 		jailed = *val.Jailed
 	}
 	return &Validator{
-		Id: val.Id,
+		Id:      val.Id,
+		Version: val.Version,
 		Delegator: &ShortAddress{
 			Hash: val.Delegator,
 		},

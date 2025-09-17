@@ -29,10 +29,12 @@ func MsgSignalVersion(ctx *context.Context, status storageTypes.Status, m *signa
 		Height: ctx.Block.Height,
 		Validator: &storage.Validator{
 			Address: m.ValidatorAddress,
+			Version: m.Version,
 		},
 		Time:    ctx.Block.Time,
 		Version: m.Version,
 	}
+	ctx.AddValidator(*signal.Validator)
 	return msgType, addresses, signal, err
 }
 

@@ -758,6 +758,94 @@ func Test_handleExec(t *testing.T) {
 				},
 			},
 			idx: testsuite.Ptr(9),
+		}, {
+			name: "signal version",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 45631,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":  "210000utia",
+						"spender": "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
+					},
+				}, {
+					Height: 45631,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":   "210000utia",
+						"receiver": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
+					},
+				}, {
+					Height: 45631,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "210000utia",
+						"recipient": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
+						"sender":    "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
+					},
+				}, {
+					Height: 45631,
+					Type:   "message",
+					Data: map[string]any{
+						"sender": "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
+					},
+				}, {
+					Height: 45631,
+					Type:   "tx",
+					Data: map[string]any{
+						"fee":       "210000utia",
+						"fee_payer": "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
+					},
+				}, {
+					Height: 45631,
+					Type:   "tx",
+					Data: map[string]any{
+						"acc_seq": "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw/0",
+					},
+				}, {
+					Height: 45631,
+					Type:   "tx",
+					Data: map[string]any{
+						"signature": "pRnJae6JayIR/V4E1fwTpMC8myY3jldBM6YNWtgcuRIqLib2O6Tu06Ki3Yx3QEyjKiZSA1hH0jPRa3G/+/1Lcw==",
+					},
+				}, {
+					Height: 45631,
+					Type:   "message",
+					Data: map[string]any{
+						"action":    "/cosmos.authz.v1beta1.MsgExec",
+						"module":    "authz",
+						"msg_index": "0",
+						"sender":    "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
+					},
+				}, {
+					Height: 45631,
+					Type:   "signal_version",
+					Data: map[string]any{
+						"action":            "/celestia.signal.v1.Msg/SignalVersion",
+						"authz_msg_index":   "0",
+						"msg_index":         "0",
+						"validator_address": "celestiavaloper15urq2dtp9qce4fyc85m6upwm9xul3049gwdz0x",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgExec,
+				Height: 45631,
+				Data: map[string]any{
+					"Grantee": "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
+					"Msgs": []any{
+						map[string]any{
+							"ValidatorAddress": "celestiavaloper15urq2dtp9qce4fyc85m6upwm9xul3049gwdz0x",
+							"Version":          5,
+						},
+					},
+				},
+				InternalMsgs: []string{
+					"/celestia.signal.v1.Msg/SignalVersion",
+				},
+			},
+			idx: testsuite.Ptr(7),
 		},
 	}
 	for _, tt := range tests {

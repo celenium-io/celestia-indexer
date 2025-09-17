@@ -14,6 +14,7 @@ import (
 
 type State struct {
 	Id               uint64         `example:"321"                                                              format:"int64"     json:"id"                 swaggertype:"integer"`
+	Version          uint64         `example:"5"                                                                format:"int64"     json:"version"            swaggertype:"integer"`
 	Name             string         `example:"indexer"                                                          format:"string"    json:"name"               swaggertype:"string"`
 	ChainId          string         `example:"mocha-4"                                                          format:"string"    json:"chain_id"           swaggertype:"string"`
 	LastHeight       pkgTypes.Level `example:"100"                                                              format:"int64"     json:"last_height"        swaggertype:"integer"`
@@ -35,6 +36,7 @@ type State struct {
 func NewState(state storage.State) State {
 	return State{
 		Id:               state.Id,
+		Version:          state.Version,
 		Name:             state.Name,
 		ChainId:          state.ChainId,
 		LastHeight:       state.LastHeight,

@@ -326,7 +326,7 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 	}
 
 	query := tx.Tx().NewInsert().Model(&arr).
-		Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate", "max_change_rate", "min_self_delegation", "stake", "jailed", "commissions", "rewards", "height").
+		Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate", "max_change_rate", "min_self_delegation", "stake", "jailed", "commissions", "rewards", "height", "version").
 		On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
 		Set("rate = CASE WHEN EXCLUDED.rate > 0 THEN EXCLUDED.rate ELSE added_validator.rate END").
 		Set("min_self_delegation = CASE WHEN EXCLUDED.min_self_delegation > 0 THEN EXCLUDED.min_self_delegation ELSE added_validator.min_self_delegation END").
@@ -339,6 +339,7 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 		Set("contacts = CASE WHEN EXCLUDED.contacts != '[do-not-modify]' THEN EXCLUDED.contacts ELSE added_validator.contacts END").
 		Set("details = CASE WHEN EXCLUDED.details != '[do-not-modify]' THEN EXCLUDED.details ELSE added_validator.details END").
 		Set("jailed = CASE WHEN EXCLUDED.jailed IS NOT NULL THEN EXCLUDED.jailed ELSE added_validator.jailed END").
+		Set("version = CASE WHEN EXCLUDED.version > 0 THEN EXCLUDED.version ELSE added_validator.version END").
 		Returning("xmax, id")
 
 	if _, err := query.Exec(ctx); err != nil {
@@ -1313,7 +1314,7 @@ func (tx Transaction) ActiveProposals(ctx context.Context) (proposals []models.P
 
 func (tx Transaction) BondedValidators(ctx context.Context, limit int) (validators []models.Validator, err error) {
 	err = tx.Tx().NewSelect().Model(&validators).
-		Column("id", "stake").
+		Column("id", "stake", "version").
 		OrderExpr("stake desc").
 		Limit(limit).
 		Scan(ctx)
@@ -1375,11 +1376,11 @@ func (tx Transaction) HyperlaneToken(ctx context.Context, id []byte) (token mode
 	return
 }
 
-func (tx Transaction) SignalVersions(ctx context.Context) (signals []models.Signal, err error) {
-	err = tx.Tx().NewSelect().Model((*models.SignalVersion)(nil)).
-		ColumnExpr("version as version, sum(voting_power) as voting_power").
-		Group("version").
-		Order("version desc").
-		Scan(ctx, &signals)
-	return
+func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) error {
+	_, err := tx.Tx().NewUpdate().Table("signal_version", "validator").
+		SetColumn("voting_power", "validator.stake").
+		Where("signal_version.version = ?", version).
+		Where("validator.id = validator_id").
+		Exec(ctx)
+	return err
 }

@@ -16,15 +16,17 @@ import (
 )
 
 var errCantFindAddress = errors.New("can't find address")
+var signalsThreshold = decimal.NewFromFloat(0.833333333) // 5/6
 
 func (module *Module) saveMessages(
 	ctx context.Context,
 	tx storage.Transaction,
 	messages []*storage.Message,
 	addrToId map[string]uint64,
-) (int64, error) {
+	state storage.State,
+) (int64, uint64, error) {
 	if err := tx.SaveMessages(ctx, messages...); err != nil {
-		return 0, err
+		return 0, state.Version, err
 	}
 
 	var (
@@ -94,7 +96,7 @@ func (module *Module) saveMessages(
 
 		for j := range messages[i].BlobLogs {
 			if err := processPayForBlob(addrToId, namespaces, messages[i], messages[i].BlobLogs[j]); err != nil {
-				return 0, err
+				return 0, state.Version, err
 			}
 
 			blobLogs = append(blobLogs, *messages[i].BlobLogs[j])
@@ -112,7 +114,7 @@ func (module *Module) saveMessages(
 
 		for j := range messages[i].Grants {
 			if err := processGrants(addrToId, &messages[i].Grants[j]); err != nil {
-				return 0, err
+				return 0, state.Version, err
 			}
 			grants[messages[i].Grants[j].String()] = messages[i].Grants[j]
 		}
@@ -157,7 +159,7 @@ func (module *Module) saveMessages(
 			if messages[i].IbcChannel.ConnectionId != "" {
 				conn, err := tx.IbcConnection(ctx, messages[i].IbcChannel.ConnectionId)
 				if err != nil {
-					return 0, errors.Wrap(err, "receiving connection for channel")
+					return 0, state.Version, errors.Wrap(err, "receiving connection for channel")
 				}
 				messages[i].IbcChannel.ClientId = conn.ClientId
 			}
@@ -218,7 +220,7 @@ func (module *Module) saveMessages(
 			if messages[i].HLToken.Mailbox != nil {
 				mailbox, err := tx.HyperlaneMailbox(ctx, messages[i].HLToken.Mailbox.InternalId)
 				if err != nil {
-					return 0, errors.Wrapf(err, "can't find mailbox for token: %x", messages[i].HLToken.Mailbox)
+					return 0, state.Version, errors.Wrapf(err, "can't find mailbox for token: %x", messages[i].HLToken.Mailbox)
 				}
 				messages[i].HLToken.MailboxId = mailbox.Id
 			}
@@ -242,7 +244,7 @@ func (module *Module) saveMessages(
 			if messages[i].HLTransfer.Mailbox != nil {
 				mailbox, err := tx.HyperlaneMailbox(ctx, messages[i].HLTransfer.Mailbox.InternalId)
 				if err != nil {
-					return 0, errors.Wrapf(err, "can't find mailbox for transfer: %x", messages[i].HLTransfer.Mailbox)
+					return 0, state.Version, errors.Wrapf(err, "can't find mailbox for transfer: %x", messages[i].HLTransfer.Mailbox)
 				}
 				messages[i].HLTransfer.MailboxId = mailbox.Id
 				messages[i].HLTransfer.Mailbox.Id = mailbox.Id
@@ -259,7 +261,7 @@ func (module *Module) saveMessages(
 			if messages[i].HLTransfer.Token != nil {
 				token, err := tx.HyperlaneToken(ctx, messages[i].HLTransfer.Token.TokenId)
 				if err != nil {
-					return 0, errors.Wrapf(err, "can't find token for transfer: %x", messages[i].HLTransfer.Token.TokenId)
+					return 0, state.Version, errors.Wrapf(err, "can't find token for transfer: %x", messages[i].HLTransfer.Token.TokenId)
 				}
 				messages[i].HLTransfer.TokenId = token.Id
 				messages[i].HLTransfer.Token.Id = token.Id
@@ -282,12 +284,12 @@ func (module *Module) saveMessages(
 			messages[i].SignalVersion.MsgId = messages[i].Id
 			validatorId, ok := module.validatorsByAddress[messages[i].SignalVersion.Validator.Address]
 			if !ok {
-				return 0, errors.New("address:" + messages[i].SignalVersion.Validator.Address + " not found in validator map")
+				return 0, state.Version, errors.New("address:" + messages[i].SignalVersion.Validator.Address + " not found in validator map")
 			}
 
 			validator, err := tx.Validator(ctx, validatorId)
 			if err != nil {
-				return 0, errors.Wrapf(err, "can't find validator for address: %s", messages[i].SignalVersion.Validator.Address)
+				return 0, state.Version, errors.Wrapf(err, "can't find validator for address: %s", messages[i].SignalVersion.Validator.Address)
 			}
 
 			messages[i].SignalVersion.VotingPower = validator.Stake
@@ -302,41 +304,46 @@ func (module *Module) saveMessages(
 			messages[i].Upgrade.MsgId = messages[i].Id
 			signerId, ok := addrToId[messages[i].Upgrade.Signer.Address]
 			if !ok {
-				return 0, errors.Errorf("address %s not found in addrToId map", messages[i].Upgrade.Signer.Address)
+				return 0, state.Version, errors.Errorf("address %s not found in addrToId map", messages[i].Upgrade.Signer.Address)
 			}
 
 			messages[i].Upgrade.SignerId = signerId
-			sgs, err := tx.SignalVersions(ctx)
+
+			vp, validators, err := module.totalVotingPower(ctx, tx)
 			if err != nil {
-				return 0, errors.Wrapf(err, "receiving signal versions")
+				return 0, state.Version, errors.Wrapf(err, "receiving total voting power")
 			}
 
-			vp, err := module.totalVotingPower(ctx, tx)
-			if err != nil {
-				return 0, errors.Wrapf(err, "receiving total voting power")
-			}
+			voted := decimal.Zero
+			for _, v := range validators {
+				if v.Version <= state.Version {
+					continue
+				}
+				voted = voted.Add(v.Stake)
+				if voted.GreaterThan(vp.Mul(signalsThreshold)) {
+					messages[i].Upgrade.Version = v.Version
+					state.Version = v.Version
 
-			version := uint64(0)
-			for _, signal := range sgs {
-				if signal.VotingPower.GreaterThan(vp.Mul(decimal.NewFromInt(5)).Div(decimal.NewFromInt(6))) {
-					version = signal.Version
+					if err := tx.UpdateSignalsAfterUpgrade(ctx, v.Version); err != nil {
+						return 0, state.Version, errors.Wrap(err, "updating signals after upgrade")
+					}
+
 					break
 				}
 			}
 
-			messages[i].Upgrade.Version = version
 			upgrades = append(upgrades, messages[i].Upgrade)
 		}
 	}
 
 	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
-		return 0, err
+		return 0, state.Version, err
 	}
 	if err := tx.SaveMsgAddresses(ctx, msgAddress...); err != nil {
-		return 0, err
+		return 0, state.Version, err
 	}
 	if err := tx.SaveBlobLogs(ctx, blobLogs...); err != nil {
-		return 0, err
+		return 0, state.Version, err
 	}
 
 	grantsArr := make([]storage.Grant, 0)
@@ -345,12 +352,12 @@ func (module *Module) saveMessages(
 	}
 
 	if err := tx.SaveGrants(ctx, grantsArr...); err != nil {
-		return 0, err
+		return 0, state.Version, err
 	}
 
 	if len(vestingAccounts) > 0 {
 		if err := tx.SaveVestingAccounts(ctx, vestingAccounts...); err != nil {
-			return 0, err
+			return 0, state.Version, err
 		}
 
 		vestingPeriods := make([]storage.VestingPeriod, 0)
@@ -362,41 +369,41 @@ func (module *Module) saveMessages(
 		}
 
 		if err := tx.SaveVestingPeriods(ctx, vestingPeriods...); err != nil {
-			return 0, err
+			return 0, state.Version, err
 		}
 	}
 
 	ibcClientsCount, err := tx.SaveIbcClients(ctx, slices.Collect(maps.Values(ibcClients))...)
 	if err != nil {
-		return 0, errors.Wrap(err, "ibc clients saving")
+		return 0, state.Version, errors.Wrap(err, "ibc clients saving")
 	}
 
 	if err := tx.SaveIbcConnections(ctx, slices.Collect(maps.Values(ibcConnections))...); err != nil {
-		return 0, errors.Wrap(err, "ibc connections saving")
+		return 0, state.Version, errors.Wrap(err, "ibc connections saving")
 	}
 	if err := tx.SaveIbcChannels(ctx, slices.Collect(maps.Values(ibcChannels))...); err != nil {
-		return 0, errors.Wrap(err, "ibc channels saving")
+		return 0, state.Version, errors.Wrap(err, "ibc channels saving")
 	}
 	if err := tx.SaveIbcTransfers(ctx, ibcTransfers...); err != nil {
-		return 0, errors.Wrap(err, "ibc transfers saving")
+		return 0, state.Version, errors.Wrap(err, "ibc transfers saving")
 	}
 	if err := tx.SaveHyperlaneMailbox(ctx, slices.Collect(maps.Values(hyperlaneMailbox))...); err != nil {
-		return 0, errors.Wrap(err, "hyperlane mailbox saving")
+		return 0, state.Version, errors.Wrap(err, "hyperlane mailbox saving")
 	}
 	if err := tx.SaveHyperlaneTokens(ctx, slices.Collect(maps.Values(hyperlaneTokens))...); err != nil {
-		return 0, errors.Wrap(err, "hyperlane tokens saving")
+		return 0, state.Version, errors.Wrap(err, "hyperlane tokens saving")
 	}
 	if err := tx.SaveHyperlaneTransfers(ctx, hyperlaneTransfers...); err != nil {
-		return 0, errors.Wrap(err, "hyperlane transfers saving")
+		return 0, state.Version, errors.Wrap(err, "hyperlane transfers saving")
 	}
 	if err := tx.SaveSignals(ctx, signals...); err != nil {
-		return 0, errors.Wrap(err, "signals saving")
+		return 0, state.Version, errors.Wrap(err, "signals saving")
 	}
 	if err := tx.SaveUpgrades(ctx, upgrades...); err != nil {
-		return 0, errors.Wrap(err, "upgrades saving")
+		return 0, state.Version, errors.Wrap(err, "upgrades saving")
 	}
 
-	return ibcClientsCount, nil
+	return ibcClientsCount, state.Version, nil
 }
 
 func processPayForBlob(addrToId map[string]uint64, namespaces map[string]uint64, msg *storage.Message, blob *storage.BlobLog) error {
@@ -435,24 +442,24 @@ func processGrants(addrToId map[string]uint64, grant *storage.Grant) error {
 	return nil
 }
 
-func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transaction) (decimal.Decimal, error) {
+func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transaction) (decimal.Decimal, []storage.Validator, error) {
 	maxValsConsts, err := module.constants.Get(ctx, types.ModuleNameStaking, "max_validators")
 	if err != nil {
-		return decimal.Zero, errors.Wrap(err, "get max validators value")
+		return decimal.Zero, nil, errors.Wrap(err, "get max validators value")
 	}
 	maxVals, err := strconv.Atoi(maxValsConsts.Value)
 	if err != nil {
-		return decimal.Zero, errors.Wrap(err, "parse max validators value")
+		return decimal.Zero, nil, errors.Wrap(err, "parse max validators value")
 	}
 
 	validators, err := tx.BondedValidators(ctx, maxVals)
 	if err != nil {
-		return decimal.Zero, errors.Wrap(err, "get validators")
+		return decimal.Zero, nil, errors.Wrap(err, "get validators")
 	}
 
 	power := decimal.Zero
 	for i := range validators {
 		power.Add(validators[i].Stake)
 	}
-	return power, nil
+	return power, validators, nil
 }

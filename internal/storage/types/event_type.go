@@ -104,7 +104,9 @@ package types
 		hyperlane.core.interchain_security.v1.EventCreateNoopIsm,
 		hyperlane.core.interchain_security.v1.EventSetRoutingIsmDomain,
 		hyperlane.core.interchain_security.v1.EventSetRoutingIsm,
-		hyperlane.core.interchain_security.v1.EventCreateRoutingIsm
+		hyperlane.core.interchain_security.v1.EventCreateRoutingIsm,
+
+		signal_version
 	)
 */
 //go:generate go-enum --marshal --sql --values --names
