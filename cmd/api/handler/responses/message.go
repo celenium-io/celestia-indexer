@@ -59,6 +59,22 @@ func NewMessageWithTx(msg storage.MessageWithTx) Message {
 	return message
 }
 
+func NewValidatorMessage(msg storage.MsgValidator) Message {
+	response := Message{
+		Id:     msg.MsgId,
+		Height: msg.Height,
+		Time:   msg.Time,
+	}
+	if msg.Msg != nil {
+		response.Data = msg.Msg.Data
+		response.Position = msg.Msg.Position
+		response.Size = msg.Msg.Size
+		response.Type = msg.Msg.Type
+	}
+
+	return response
+}
+
 type MessageForAddress struct {
 	Id       uint64         `example:"321"                       format:"int64"     json:"id"              swaggertype:"integer"`
 	Height   pkgTypes.Level `example:"100"                       format:"int64"     json:"height"          swaggertype:"integer"`

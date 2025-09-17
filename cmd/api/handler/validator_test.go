@@ -376,3 +376,53 @@ func (s *ValidatorTestSuite) TestVotes() {
 	s.Require().EqualValues("moniker", votes[0].Validator.Moniker)
 	s.Require().EqualValues("012345", votes[0].Validator.ConsAddress)
 }
+
+func (s *ValidatorTestSuite) TestMessages() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/validators/:id/messages")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	s.validators.EXPECT().
+		Messages(gomock.Any(), uint64(1), storage.ValidatorMessagesFilters{
+			Limit:  10,
+			Offset: 0,
+			Sort:   pgSort("asc"),
+		}).
+		Return([]storage.MsgValidator{
+			{
+				MsgId:       2,
+				ValidatorId: 1,
+				Height:      1000,
+				Time:        testTime,
+				Msg: &storage.Message{
+					Id:       2,
+					Type:     storageTypes.MsgCreateValidator,
+					Size:     12,
+					Position: 2,
+				},
+				Validator: &testValidator,
+			},
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.Messages(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var messages []responses.Message
+	err := json.NewDecoder(rec.Body).Decode(&messages)
+	s.Require().NoError(err)
+	s.Require().Len(messages, 1)
+
+	s.Require().EqualValues(2, messages[0].Id)
+	s.Require().EqualValues(1000, messages[0].Height)
+	s.Require().Equal(testTime.String(), messages[0].Time.String())
+	s.Require().EqualValues(12, messages[0].Size)
+	s.Require().EqualValues(2, messages[0].Position)
+}

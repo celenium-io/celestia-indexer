@@ -152,6 +152,7 @@ func initDatabase(ctx context.Context, conn *database.Bun) error {
 	conn.DB().RegisterModel(
 		(*models.NamespaceMessage)(nil),
 		(*models.MsgAddress)(nil),
+		(*models.MsgValidator)(nil),
 		(*models.RollupProvider)(nil),
 	)
 

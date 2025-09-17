@@ -5,6 +5,7 @@ package storage
 
 import (
 	"context"
+	"time"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
@@ -21,6 +22,7 @@ type IValidator interface {
 	TotalVotingPower(ctx context.Context) (decimal.Decimal, error)
 	ListByPower(ctx context.Context, fltrs ValidatorFilters) ([]Validator, error)
 	JailedCount(ctx context.Context) (int, error)
+	Messages(ctx context.Context, id uint64, fltrs ValidatorMessagesFilters) ([]MsgValidator, error)
 }
 
 type Validator struct {
@@ -49,6 +51,8 @@ type Validator struct {
 	Version     uint64          `bun:"version,default:0"        comment:"Signal version"                    json:"-"`
 
 	Jailed *bool `bun:"jailed" comment:"True if validator was punished" json:"-"`
+
+	MessagesCount uint64 `bun:"messages_count" comment:"Count of validator messages" json:"-"`
 }
 
 func (Validator) TableName() string {
@@ -78,4 +82,12 @@ type ValidatorFilters struct {
 	Limit  int
 	Offset int
 	Jailed *bool
+}
+
+type ValidatorMessagesFilters struct {
+	Limit  int
+	Offset int
+	Sort   storage.SortOrder
+	From   *time.Time
+	To     *time.Time
 }

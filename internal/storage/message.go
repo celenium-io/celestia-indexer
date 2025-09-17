@@ -82,6 +82,7 @@ type Message struct {
 	HLToken        *HLToken          `bun:"-"` // internal field
 	SignalVersion  *SignalVersion    `bun:"-"` // internal field
 	Upgrade        *Upgrade          `bun:"-"` // internal field
+	Validators     []string          `bun:"-"` // internal field
 }
 
 // TableName -

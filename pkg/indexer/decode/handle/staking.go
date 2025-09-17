@@ -17,17 +17,18 @@ import (
 )
 
 // MsgCreateValidator defines an SDK message for creating a new validator.
-func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cosmosStakingTypes.MsgCreateValidator) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cosmosStakingTypes.MsgCreateValidator) (storageTypes.MsgType, []storage.AddressWithType, []string, error) {
 	msgType := storageTypes.MsgCreateValidator
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 	}, ctx.Block.Height)
 	if err != nil {
-		return msgType, addresses, err
+		return msgType, addresses, nil, err
 	}
 
+	validators := []string{m.ValidatorAddress}
 	if status == storageTypes.StatusFailed {
-		return msgType, addresses, nil
+		return msgType, addresses, nil, nil
 	}
 
 	var consAddress string
@@ -43,11 +44,11 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 	validatorAddress := types.Address(m.ValidatorAddress)
 	_, b, err := validatorAddress.Decode()
 	if err != nil {
-		return msgType, addresses, errors.Wrap(err, m.ValidatorAddress)
+		return msgType, addresses, nil, errors.Wrap(err, m.ValidatorAddress)
 	}
 	addr, err := types.NewAddressFromBytes(b)
 	if err != nil {
-		return msgType, addresses, errors.Wrap(err, m.ValidatorAddress)
+		return msgType, addresses, nil, errors.Wrap(err, m.ValidatorAddress)
 	}
 
 	jailed := false
@@ -67,6 +68,7 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 		MinSelfDelegation: decimal.Zero,
 		Stake:             decimal.Zero,
 		Jailed:            &jailed,
+		MessagesCount:     1,
 	}
 
 	if !m.Value.IsNil() {
@@ -83,7 +85,7 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 			},
 		}
 		if err := ctx.AddAddress(&address); err != nil {
-			return msgType, nil, err
+			return msgType, nil, validators, err
 		}
 		addresses[0].Balance = address.Balance
 
@@ -121,21 +123,22 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 
 	ctx.AddValidator(validator)
 
-	return msgType, addresses, err
+	return msgType, addresses, validators, err
 }
 
 // MsgEditValidator defines a SDK message for editing an existing validator.
-func MsgEditValidator(ctx *context.Context, status storageTypes.Status, m *cosmosStakingTypes.MsgEditValidator) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgEditValidator(ctx *context.Context, status storageTypes.Status, m *cosmosStakingTypes.MsgEditValidator) (storageTypes.MsgType, []storage.AddressWithType, []string, error) {
 	msgType := storageTypes.MsgEditValidator
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 	}, ctx.Block.Height)
 	if err != nil {
-		return msgType, addresses, err
+		return msgType, addresses, nil, err
 	}
 
+	validators := []string{m.ValidatorAddress}
 	if status == storageTypes.StatusFailed {
-		return msgType, addresses, nil
+		return msgType, addresses, nil, nil
 	}
 
 	validator := storage.Validator{
@@ -149,6 +152,7 @@ func MsgEditValidator(ctx *context.Context, status storageTypes.Status, m *cosmo
 		Rate:              decimal.Zero,
 		MinSelfDelegation: decimal.Zero,
 		Stake:             decimal.Zero,
+		MessagesCount:     1,
 	}
 
 	if m.CommissionRate != nil && !m.CommissionRate.IsNil() {
@@ -158,7 +162,7 @@ func MsgEditValidator(ctx *context.Context, status storageTypes.Status, m *cosmo
 		validator.MinSelfDelegation = decimal.RequireFromString(m.MinSelfDelegation.String())
 	}
 	ctx.AddValidator(validator)
-	return msgType, addresses, err
+	return msgType, addresses, validators, err
 }
 
 // MsgDelegate defines a SDK message for performing a delegation of coins

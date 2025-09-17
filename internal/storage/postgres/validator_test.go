@@ -47,11 +47,21 @@ func (s *StorageTestSuite) TestListByPower() {
 	s.Require().Len(validators, 2)
 }
 
-func (s *StorageTestSuite) TestJailedCOunt() {
+func (s *StorageTestSuite) TestJailedCount() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
 	count, err := s.storage.Validator.JailedCount(ctx)
 	s.Require().NoError(err)
 	s.Require().EqualValues(0, count)
+}
+
+func (s *StorageTestSuite) TestMessages() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	msgs, err := s.storage.Validator.Messages(ctx, 1, storage.ValidatorMessagesFilters{})
+	s.Require().NoError(err)
+	s.Require().Len(msgs, 1)
+	s.Require().NotNil(msgs[0].Msg)
 }

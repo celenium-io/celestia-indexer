@@ -79,26 +79,29 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 			Rate:              decimal.Zero,
 			MinSelfDelegation: decimal.Zero,
 			Stake:             decimal.Zero,
+			MessagesCount:     1,
 		},
 	}
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
-		Time:      now,
-		Position:  0,
-		Type:      storageTypes.MsgEditValidator,
-		TxId:      0,
-		Data:      structs.Map(m),
-		Size:      128,
-		Namespace: nil,
-		Addresses: addressesExpected,
+		Id:         0,
+		Height:     blob.Height,
+		Time:       now,
+		Position:   0,
+		Type:       storageTypes.MsgEditValidator,
+		TxId:       0,
+		Data:       structs.Map(m),
+		Size:       128,
+		Namespace:  nil,
+		Addresses:  addressesExpected,
+		Validators: []string{"celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x"},
 	}
 
 	require.NoError(t, err)
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
 	require.Equal(t, addressesExpected, dm.Addresses)
+	require.Len(t, dm.Msg.Validators, 1)
 	for key, value := range expectedValidators {
 		val, ok := decodeCtx.Validators.Get(key)
 		require.True(t, ok)
@@ -245,6 +248,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 			MinSelfDelegation: decimal.RequireFromString("1"),
 			Height:            blob.Height,
 			Jailed:            testsuite.Ptr(false),
+			MessagesCount:     1,
 		},
 	}
 
@@ -254,21 +258,23 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 		"type": "ed25519",
 	}
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
-		Time:      now,
-		Position:  0,
-		Type:      storageTypes.MsgCreateValidator,
-		TxId:      0,
-		Data:      data,
-		Size:      152,
-		Namespace: nil,
-		Addresses: addressesExpected,
+		Id:         0,
+		Height:     blob.Height,
+		Time:       now,
+		Position:   0,
+		Type:       storageTypes.MsgCreateValidator,
+		TxId:       0,
+		Data:       data,
+		Size:       152,
+		Namespace:  nil,
+		Addresses:  addressesExpected,
+		Validators: []string{"celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x"},
 	}
 	require.NoError(t, err)
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
 	require.Equal(t, addressesExpected, dm.Addresses)
+	require.Len(t, dm.Msg.Validators, 1)
 	for key, value := range expectedValidators {
 		val, ok := decodeCtx.Validators.Get(key)
 		require.True(t, ok)

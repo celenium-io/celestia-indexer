@@ -34,6 +34,8 @@ type Validator struct {
 
 	Jailed bool `example:"false" json:"jailed" swaggertype:"boolean"`
 
+	MessagesCount uint64 `example:"1" json:"messages_count" swaggertype:"integer"`
+
 	Address   *ShortAddress `json:"address"`
 	Delegator *ShortAddress `json:"delegator"`
 }
@@ -70,6 +72,7 @@ func NewValidator(val storage.Validator) *Validator {
 		Commissions:       val.Commissions.Floor().String(),
 		Jailed:            jailed,
 		VotingPower:       val.Stake.Div(decimal.NewFromInt(1_000_000)).Floor().String(),
+		MessagesCount:     val.MessagesCount,
 	}
 }
 

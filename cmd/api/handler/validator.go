@@ -6,6 +6,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/math"
@@ -394,5 +395,74 @@ func (handler *ValidatorHandler) Votes(c echo.Context) error {
 	for i := range response {
 		response[i] = responses.NewVote(jails[i])
 	}
+	return returnArray(c, response)
+}
+
+type getValidatorMessages struct {
+	Id     uint64 `param:"id"     validate:"required,min=1"`
+	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int    `query:"offset" validate:"omitempty,min=0"`
+	Sort   string `query:"sort"   validate:"omitempty,oneof=asc desc"`
+	From   int64  `query:"from"   validate:"omitempty,min=1"`
+	To     int64  `query:"to"     validate:"omitempty,min=1"`
+}
+
+func (req getValidatorMessages) ToFilters() storage.ValidatorMessagesFilters {
+	if req.Limit < 1 {
+		req.Limit = 10
+	}
+	if req.Offset < 0 {
+		req.Offset = 0
+	}
+	filters := storage.ValidatorMessagesFilters{
+		Limit:  req.Limit,
+		Offset: req.Offset,
+		Sort:   pgSort(req.Sort),
+	}
+	if req.From > 0 {
+		from := time.Unix(req.From, 0).UTC()
+		filters.From = &from
+	}
+	if req.To > 0 {
+		to := time.Unix(req.To, 0).UTC()
+		filters.To = &to
+	}
+	return filters
+}
+
+// Messages godoc
+//
+//	@Summary		Get validator messages
+//	@Description	Get validator messages
+//	@Tags			validator
+//	@ID				validator-messages
+//	@Param			id			path	integer		true	"Internal validator id"
+//	@Param			limit		query	integer		false	"Count of requested entities"	minimum(1)		maximum(100)
+//	@Param			offset		query	integer		false	"Offset"						minimum(1)
+//	@Param			sort		query	string		false	"Sort order"					Enums(asc, desc)
+//	@Param			from		query	integer		false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer		false	"Time to in unix timestamp"		mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.Message
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/validators/{id}/messages [get]
+func (handler *ValidatorHandler) Messages(c echo.Context) error {
+	req, err := bindAndValidate[getValidatorMessages](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	filters := req.ToFilters()
+	msgs, err := handler.validators.Messages(c.Request().Context(), req.Id, filters)
+	if err != nil {
+		return handleError(c, err, handler.validators)
+	}
+
+	response := make([]responses.Message, len(msgs))
+	for i := range msgs {
+		response[i] = responses.NewValidatorMessage(msgs[i])
+	}
+
 	return returnArray(c, response)
 }

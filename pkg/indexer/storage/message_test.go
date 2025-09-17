@@ -393,6 +393,11 @@ func Test_saveMessages(t *testing.T) {
 			Return(nil)
 
 		tx.EXPECT().
+			SaveMsgValidator(gomock.Any(), gomock.Any()).
+			Times(1).
+			Return(nil)
+
+		tx.EXPECT().
 			SaveVestingAccounts(gomock.Any(), gomock.Any()).
 			MaxTimes(1).
 			Return(nil)

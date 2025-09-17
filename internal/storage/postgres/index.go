@@ -956,6 +956,17 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// MsgValidator
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.MsgValidator)(nil)).
+			Index("msg_validator_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

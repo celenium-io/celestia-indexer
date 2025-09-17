@@ -112,6 +112,9 @@ func (ctx *Context) AddValidator(validator storage.Validator) {
 		if validator.Version > 0 {
 			val.Version = validator.Version
 		}
+		if validator.MessagesCount > 0 {
+			val.MessagesCount += validator.MessagesCount
+		}
 	} else {
 		ctx.Validators.Set(validator.Address, &validator)
 	}

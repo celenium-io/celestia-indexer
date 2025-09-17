@@ -33,6 +33,7 @@ var Models = []any{
 	&NamespaceMessage{},
 	&Signer{},
 	&MsgAddress{},
+	&MsgValidator{},
 	&Validator{},
 	&Delegation{},
 	&Redelegation{},
@@ -91,6 +92,7 @@ type Transaction interface {
 	SaveMessages(ctx context.Context, msgs ...*Message) error
 	SaveSigners(ctx context.Context, addresses ...Signer) error
 	SaveMsgAddresses(ctx context.Context, addresses ...MsgAddress) error
+	SaveMsgValidator(ctx context.Context, validatorMsgs ...MsgValidator) error
 	SaveNamespaceMessage(ctx context.Context, nsMsgs ...NamespaceMessage) error
 	SaveBlobLogs(ctx context.Context, logs ...BlobLog) error
 	SaveValidators(ctx context.Context, validators ...*Validator) (int, error)
@@ -140,6 +142,7 @@ type Transaction interface {
 	RollbackBlockSignatures(ctx context.Context, height types.Level) (err error)
 	RollbackSigners(ctx context.Context, txIds []uint64) (err error)
 	RollbackMessageAddresses(ctx context.Context, msgIds []uint64) (err error)
+	RollbackMessageValidators(ctx context.Context, height types.Level) (err error)
 	RollbackUndelegations(ctx context.Context, height types.Level) (err error)
 	RollbackRedelegations(ctx context.Context, height types.Level) (err error)
 	RollbackStakingLogs(ctx context.Context, height types.Level) ([]StakingLog, error)
@@ -153,6 +156,8 @@ type Transaction interface {
 	RollbackHyperlaneMailbox(ctx context.Context, height types.Level) error
 	RollbackHyperlaneTokens(ctx context.Context, height types.Level) error
 	RollbackHyperlaneTransfers(ctx context.Context, height types.Level) error
+	RollbackSignals(ctx context.Context, height types.Level) error
+	RollbackUpgrades(ctx context.Context, height types.Level) error
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	DeleteProviders(ctx context.Context, rollupId uint64) error
 	DeleteRollup(ctx context.Context, rollupId uint64) error
