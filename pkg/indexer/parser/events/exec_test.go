@@ -760,6 +760,7 @@ func Test_handleExec(t *testing.T) {
 			idx: testsuite.Ptr(9),
 		}, {
 			name: "signal version",
+			ctx:  context.NewContext(),
 			events: []storage.Event{
 				{
 					Height: 45631,

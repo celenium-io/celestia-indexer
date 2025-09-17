@@ -20,6 +20,7 @@ func Test_updateState(t *testing.T) {
 		totalProposals  int64
 		ibcClientsCount int64
 		totalValidators int
+		version         uint64
 		state           *storage.State
 	}
 
@@ -51,6 +52,7 @@ func Test_updateState(t *testing.T) {
 				totalProposals:  8,
 				totalValidators: 3,
 				ibcClientsCount: 4,
+				version:         18,
 				state: &storage.State{
 					Id:              1,
 					Name:            "test",
@@ -82,12 +84,13 @@ func Test_updateState(t *testing.T) {
 				TotalValidators: 4,
 				TotalProposals:  8,
 				TotalIbcClients: 7,
+				Version:         18,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := updateState(tt.args.block, tt.args.totalAccounts, tt.args.totalNamespaces, tt.args.totalProposals, tt.args.ibcClientsCount, tt.args.totalValidators, tt.args.state)
+			err := updateState(tt.args.block, tt.args.totalAccounts, tt.args.totalNamespaces, tt.args.totalProposals, tt.args.ibcClientsCount, tt.args.totalValidators, tt.args.version, tt.args.state)
 			require.NoError(t, err)
 		})
 	}

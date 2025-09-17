@@ -176,7 +176,6 @@ type Transaction interface {
 	IbcConnection(ctx context.Context, id string) (IbcConnection, error)
 	HyperlaneMailbox(ctx context.Context, internalId uint64) (HLMailbox, error)
 	HyperlaneToken(ctx context.Context, id []byte) (HLToken, error)
-	SignalVersions(ctx context.Context, bondedValidatorsCount int) ([]Signal, error)
 }
 
 const (

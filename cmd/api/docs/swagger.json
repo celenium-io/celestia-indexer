@@ -10163,6 +10163,11 @@
                     "type": "string",
                     "format": "string",
                     "example": "312"
+                },
+                "version": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 5
                 }
             }
         },
@@ -10478,6 +10483,10 @@
                 "stake": {
                     "type": "string",
                     "example": "1"
+                },
+                "version": {
+                    "type": "integer",
+                    "example": 5
                 },
                 "voting_power": {
                     "type": "string",

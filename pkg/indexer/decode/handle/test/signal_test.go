@@ -51,6 +51,7 @@ func TestDecodeMsg_SuccessOnMsgSignalVersion(t *testing.T) {
 		Height: blob.Height,
 		Validator: &storage.Validator{
 			Address: m.ValidatorAddress,
+			Version: 10,
 		},
 		Time:    blob.Block.Time,
 		Version: m.Version,

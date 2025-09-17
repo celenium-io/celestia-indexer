@@ -109,6 +109,9 @@ func (ctx *Context) AddValidator(validator storage.Validator) {
 		if validator.Website != storage.DoNotModify {
 			val.Website = validator.Website
 		}
+		if validator.Version > 0 {
+			val.Version = validator.Version
+		}
 	} else {
 		ctx.Validators.Set(validator.Address, &validator)
 	}

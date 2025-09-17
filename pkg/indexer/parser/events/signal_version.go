@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func processSignalVersion(_ *context.Context, events []storage.Event, msg *storage.Message, data map[string]any, idx *int) error {
+func processSignalVersion(ctx *context.Context, events []storage.Event, msg *storage.Message, data map[string]any, idx *int) error {
 	version, err := decoder.Uint64(data, "Version")
 	if err != nil {
 		return errors.Wrap(err, "get signal version in exec")
@@ -22,8 +22,10 @@ func processSignalVersion(_ *context.Context, events []storage.Event, msg *stora
 		Version: version,
 		Validator: &storage.Validator{
 			Address: validator,
+			Version: version,
 		},
 	}
+	ctx.AddValidator(*msg.SignalVersion.Validator)
 	toTheNextAction(events, idx)
 	return nil
 }

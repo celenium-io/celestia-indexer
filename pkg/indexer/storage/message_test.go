@@ -453,7 +453,7 @@ func Test_saveMessages(t *testing.T) {
 			Return(nil)
 
 		t.Run(tt.name, func(t *testing.T) {
-			ibcClientsCount, err := module.saveMessages(t.Context(), tx, tt.args.messages, tt.args.addrToId)
+			ibcClientsCount, _, err := module.saveMessages(t.Context(), tx, tt.args.messages, tt.args.addrToId, storage.State{Version: 10})
 			require.Equal(t, tt.wantErr, err != nil)
 			if !tt.wantErr {
 				require.EqualValues(t, tt.wantIbcClientsCount, ibcClientsCount)

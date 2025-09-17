@@ -16,6 +16,7 @@
   rewards: 1
   height: 999
   jailed: false
+  version: 2
 - id: 2
   address: celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr
   delegator: celestia189ecvq5avj0wehrcfnagpd5sd8pup9aq7j2xd9
@@ -34,3 +35,4 @@
   rewards: 1
   height: 1000
   jailed: false
+  version: 3
