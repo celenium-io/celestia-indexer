@@ -9,8 +9,8 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/pkg/node"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/celestiaorg/celestia-app/v4/pkg/appconsts"
-	"github.com/celestiaorg/celestia-app/v4/pkg/da"
+	"github.com/celestiaorg/celestia-app/v5/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v5/pkg/da"
 	square "github.com/celestiaorg/go-square/v2"
 	"github.com/celestiaorg/go-square/v2/share"
 

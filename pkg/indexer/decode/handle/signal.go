@@ -8,7 +8,7 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 
-	signalTypes "github.com/celestiaorg/celestia-app/v4/x/signal/types"
+	signalTypes "github.com/celestiaorg/celestia-app/v5/x/signal/types"
 )
 
 // MsgSignalVersion -

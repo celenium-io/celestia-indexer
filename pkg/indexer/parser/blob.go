@@ -8,7 +8,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
-	"github.com/celestiaorg/celestia-app/v4/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v5/pkg/appconsts"
 	appshares "github.com/celestiaorg/go-square/v2/share"
 	"github.com/shopspring/decimal"
 )
