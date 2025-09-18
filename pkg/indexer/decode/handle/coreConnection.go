@@ -47,3 +47,11 @@ func MsgConnectionOpenConfirm(ctx *context.Context, m *coreConnection.MsgConnect
 	}, ctx.Block.Height)
 	return msgType, addresses, err
 }
+
+func MsgUpdateParamsConnection(ctx *context.Context, m *coreConnection.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgUpdateParams
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}

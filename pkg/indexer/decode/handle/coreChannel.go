@@ -346,3 +346,11 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTyp
 		return msgType, addresses, nil, nil, errors.Errorf("unknown source port: %s", m.Packet.SourcePort)
 	}
 }
+
+func MsgUpdateParamsChannel(ctx *context.Context, m *coreChannel.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgUpdateParams
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}

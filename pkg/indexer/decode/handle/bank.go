@@ -38,3 +38,19 @@ func MsgMultiSend(ctx *context.Context, m *cosmosBankTypes.MsgMultiSend) (storag
 	addresses, err := createAddresses(ctx, aData, ctx.Block.Height)
 	return msgType, addresses, err
 }
+
+func MsgSetSendEnabled(ctx *context.Context, m *cosmosBankTypes.MsgSetSendEnabled) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgSetSendEnabled
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
+func MsgUpdateParamsBank(ctx *context.Context, m *cosmosBankTypes.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgUpdateParams
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}

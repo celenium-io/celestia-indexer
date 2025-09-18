@@ -18,3 +18,11 @@ func MsgUnjail(ctx *context.Context, m *cosmosSlashingTypes.MsgUnjail) (storageT
 	}, ctx.Block.Height)
 	return msgType, addresses, err
 }
+
+func MsgUpdateParamsSlashing(ctx *context.Context, m *cosmosSlashingTypes.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgUpdateParams
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}

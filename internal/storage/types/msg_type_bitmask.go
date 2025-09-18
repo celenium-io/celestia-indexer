@@ -151,6 +151,14 @@ const (
 	MsgTypeBitsSetRoutingIsmDomain
 	MsgTypeBitsRemoveRoutingIsmDomain
 	MsgTypeBitsUpdateRoutingIsmOwner
+
+	MsgTypeBitsUpdateBlobParams
+	MsgTypeBitsPruneExpiredGrants
+	MsgTypeBitsSetSendEnabled
+	MsgTypeBitsAuthorizeCircuitBreaker
+	MsgTypeBitsResetCircuitBreaker
+	MsgTypeBitsTripCircuitBreaker
+	MsgTypeBitsModuleQuerySafe
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
@@ -205,6 +213,8 @@ func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 
 	case MsgPayForBlobs:
 		mask.SetBit(MsgTypeBitsPayForBlobs)
+	case MsgUpdateBlobParams:
+		mask.SetBit(MsgTypeBitsUpdateBlobParams)
 
 	case MsgGrant:
 		mask.SetBit(MsgTypeBitsGrant)
@@ -389,6 +399,19 @@ func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 		mask.SetBit(MsgTypeBitsRemoveRoutingIsmDomain)
 	case MsgUpdateRoutingIsmOwner:
 		mask.SetBit(MsgTypeBitsUpdateRoutingIsmOwner)
+
+	case MsgPruneExpiredGrants:
+		mask.SetBit(MsgTypeBitsPruneExpiredGrants)
+	case MsgSetSendEnabled:
+		mask.SetBit(MsgTypeBitsSetSendEnabled)
+	case MsgAuthorizeCircuitBreaker:
+		mask.SetBit(MsgTypeBitsAuthorizeCircuitBreaker)
+	case MsgResetCircuitBreaker:
+		mask.SetBit(MsgTypeBitsResetCircuitBreaker)
+	case MsgTripCircuitBreaker:
+		mask.SetBit(MsgTypeBitsTripCircuitBreaker)
+	case MsgModuleQuerySafe:
+		mask.SetBit(MsgTypeBitsModuleQuerySafe)
 	}
 }
 
@@ -843,6 +866,35 @@ func (mask MsgTypeBits) Names() []MsgType {
 		i++
 	}
 
+	if mask.HasBit(MsgTypeBitsUpdateBlobParams) {
+		names[i] = MsgUpdateBlobParams
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsPruneExpiredGrants) {
+		names[i] = MsgPruneExpiredGrants
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsSetSendEnabled) {
+		names[i] = MsgSetSendEnabled
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsAuthorizeCircuitBreaker) {
+		names[i] = MsgAuthorizeCircuitBreaker
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsResetCircuitBreaker) {
+		names[i] = MsgResetCircuitBreaker
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsTripCircuitBreaker) {
+		names[i] = MsgTripCircuitBreaker
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsModuleQuerySafe) {
+		names[i] = MsgModuleQuerySafe
+		i++
+	}
+
 	if mask.HasBit(MsgTypeBitsUpdateRoutingIsmOwner) {
 		names[i] = MsgUpdateRoutingIsmOwner
 		// i++
@@ -876,9 +928,9 @@ var _ driver.Valuer = (*MsgTypeBits)(nil)
 
 func (mask MsgTypeBits) Value() (driver.Value, error) {
 	if mask.value == nil {
-		return fmt.Sprintf("%0104b", 0), nil
+		return fmt.Sprintf("%0111b", 0), nil
 	}
-	return fmt.Sprintf("%0104b", mask.value), nil
+	return fmt.Sprintf("%0111b", mask.value), nil
 }
 
 func (mask MsgTypeBits) MarshalJSON() (data []byte, err error) {

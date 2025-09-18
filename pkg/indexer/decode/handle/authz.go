@@ -16,6 +16,14 @@ import (
 	"github.com/fatih/structs"
 )
 
+func MsgPruneExpiredGrants(ctx *context.Context, m *authz.MsgPruneExpiredGrants) (types.MsgType, []storage.AddressWithType, error) {
+	msgType := types.MsgPruneExpiredGrants
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: types.MsgAddressTypeExecutor, address: m.Pruner},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
+
 // MsgGrant is a request type for Grant method. It declares authorization to the grantee
 // on behalf of the granter with the provided expiration time.
 func MsgGrant(ctx *context.Context, status types.Status, m *authz.MsgGrant) (types.MsgType, []storage.AddressWithType, []storage.Grant, error) {

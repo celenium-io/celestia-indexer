@@ -136,7 +136,15 @@ package types
 		MsgCreateRoutingIsm,
 		MsgSetRoutingIsmDomain,
 		MsgRemoveRoutingIsmDomain,
-		MsgUpdateRoutingIsmOwner
+		MsgUpdateRoutingIsmOwner,
+
+		MsgUpdateBlobParams,
+		MsgPruneExpiredGrants,
+		MsgSetSendEnabled,
+		MsgAuthorizeCircuitBreaker,
+		MsgResetCircuitBreaker,
+		MsgTripCircuitBreaker,
+		MsgModuleQuerySafe
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix --names

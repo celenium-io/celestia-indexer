@@ -82,3 +82,12 @@ func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, m *appBlob
 
 	return storageTypes.MsgPayForBlobs, addresses, namespaces, blobLogs, blobsSize, err
 }
+
+// MsgUpdateBlobParams defines the sdk.Msg type to update the client parameters.
+func MsgUpdateBlobParams(ctx *context.Context, status storageTypes.Status, m *appBlobTypes.MsgUpdateBlobParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgUpdateBlobParams
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
