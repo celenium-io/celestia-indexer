@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/celestiaorg/celestia-app/v4/pkg/appconsts"
-	"github.com/celestiaorg/celestia-app/v4/pkg/da"
+	"github.com/celestiaorg/celestia-app/v5/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v5/pkg/da"
 	"github.com/celestiaorg/go-square/v2/share"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -21,7 +21,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/node"
-	"github.com/celestiaorg/celestia-app/v4/pkg/proof"
+	"github.com/celestiaorg/celestia-app/v5/pkg/proof"
 	"github.com/labstack/echo/v4"
 )
 
