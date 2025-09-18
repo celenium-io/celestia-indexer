@@ -658,7 +658,14 @@
                             "MsgCreateRoutingIsm",
                             "MsgSetRoutingIsmDomain",
                             "MsgRemoveRoutingIsmDomain",
-                            "MsgUpdateRoutingIsmOwner"
+                            "MsgUpdateRoutingIsmOwner",
+                            "MsgUpdateBlobParams",
+                            "MsgPruneExpiredGrants",
+                            "MsgSetSendEnabled",
+                            "MsgAuthorizeCircuitBreaker",
+                            "MsgResetCircuitBreaker",
+                            "MsgTripCircuitBreaker",
+                            "MsgModuleQuerySafe"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -998,7 +1005,14 @@
                             "MsgCreateRoutingIsm",
                             "MsgSetRoutingIsmDomain",
                             "MsgRemoveRoutingIsmDomain",
-                            "MsgUpdateRoutingIsmOwner"
+                            "MsgUpdateRoutingIsmOwner",
+                            "MsgUpdateBlobParams",
+                            "MsgPruneExpiredGrants",
+                            "MsgSetSendEnabled",
+                            "MsgAuthorizeCircuitBreaker",
+                            "MsgResetCircuitBreaker",
+                            "MsgTripCircuitBreaker",
+                            "MsgModuleQuerySafe"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1934,7 +1948,14 @@
                             "MsgCreateRoutingIsm",
                             "MsgSetRoutingIsmDomain",
                             "MsgRemoveRoutingIsmDomain",
-                            "MsgUpdateRoutingIsmOwner"
+                            "MsgUpdateRoutingIsmOwner",
+                            "MsgUpdateBlobParams",
+                            "MsgPruneExpiredGrants",
+                            "MsgSetSendEnabled",
+                            "MsgAuthorizeCircuitBreaker",
+                            "MsgResetCircuitBreaker",
+                            "MsgTripCircuitBreaker",
+                            "MsgModuleQuerySafe"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -2046,7 +2067,14 @@
                             "MsgCreateRoutingIsm",
                             "MsgSetRoutingIsmDomain",
                             "MsgRemoveRoutingIsmDomain",
-                            "MsgUpdateRoutingIsmOwner"
+                            "MsgUpdateRoutingIsmOwner",
+                            "MsgUpdateBlobParams",
+                            "MsgPruneExpiredGrants",
+                            "MsgSetSendEnabled",
+                            "MsgAuthorizeCircuitBreaker",
+                            "MsgResetCircuitBreaker",
+                            "MsgTripCircuitBreaker",
+                            "MsgModuleQuerySafe"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types which should be excluded from list",
@@ -6265,7 +6293,14 @@
                             "MsgCreateRoutingIsm",
                             "MsgSetRoutingIsmDomain",
                             "MsgRemoveRoutingIsmDomain",
-                            "MsgUpdateRoutingIsmOwner"
+                            "MsgUpdateRoutingIsmOwner",
+                            "MsgUpdateBlobParams",
+                            "MsgPruneExpiredGrants",
+                            "MsgSetSendEnabled",
+                            "MsgAuthorizeCircuitBreaker",
+                            "MsgResetCircuitBreaker",
+                            "MsgTripCircuitBreaker",
+                            "MsgModuleQuerySafe"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -6377,7 +6412,14 @@
                             "MsgCreateRoutingIsm",
                             "MsgSetRoutingIsmDomain",
                             "MsgRemoveRoutingIsmDomain",
-                            "MsgUpdateRoutingIsmOwner"
+                            "MsgUpdateRoutingIsmOwner",
+                            "MsgUpdateBlobParams",
+                            "MsgPruneExpiredGrants",
+                            "MsgSetSendEnabled",
+                            "MsgAuthorizeCircuitBreaker",
+                            "MsgResetCircuitBreaker",
+                            "MsgTripCircuitBreaker",
+                            "MsgModuleQuerySafe"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list which should be excluded",
@@ -11068,7 +11110,14 @@
                 "MsgCreateRoutingIsm",
                 "MsgSetRoutingIsmDomain",
                 "MsgRemoveRoutingIsmDomain",
-                "MsgUpdateRoutingIsmOwner"
+                "MsgUpdateRoutingIsmOwner",
+                "MsgUpdateBlobParams",
+                "MsgPruneExpiredGrants",
+                "MsgSetSendEnabled",
+                "MsgAuthorizeCircuitBreaker",
+                "MsgResetCircuitBreaker",
+                "MsgTripCircuitBreaker",
+                "MsgModuleQuerySafe"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -11174,7 +11223,14 @@
                 "MsgCreateRoutingIsm",
                 "MsgSetRoutingIsmDomain",
                 "MsgRemoveRoutingIsmDomain",
-                "MsgUpdateRoutingIsmOwner"
+                "MsgUpdateRoutingIsmOwner",
+                "MsgUpdateBlobParams",
+                "MsgPruneExpiredGrants",
+                "MsgSetSendEnabled",
+                "MsgAuthorizeCircuitBreaker",
+                "MsgResetCircuitBreaker",
+                "MsgTripCircuitBreaker",
+                "MsgModuleQuerySafe"
             ]
         }
     },
