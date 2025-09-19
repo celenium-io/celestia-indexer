@@ -373,6 +373,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.StakingLog)(nil)).
+			Index("staking_log_type_idx").
+			Column("type").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Delegation
 		if _, err := tx.NewCreateIndex().
