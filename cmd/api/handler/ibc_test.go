@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -102,8 +103,7 @@ var relayersMap = map[uint64]responses.Relayer{
 			Twitter: "https://twitter.com/test1",
 		},
 		Addresses: []string{"celestia1xyz1488"},
-	},
-	2: {
+	}, 2: {
 		Name: "Test name 2",
 		Logo: "https://example.com/logo2.png",
 		Contact: &responses.Contact{
@@ -755,6 +755,10 @@ func (s *IbcTestSuite) TestAllRelayers() {
 	for _, v := range relayersMap {
 		values = append(values, v)
 	}
+
+	slices.SortFunc(values, func(a, b responses.Relayer) int {
+		return strings.Compare(a.Name, b.Name)
+	})
 
 	s.relayers.EXPECT().
 		All().
