@@ -5959,7 +5959,12 @@
                         "enum": [
                             "rewards",
                             "commissions",
-                            "flow"
+                            "flow",
+                            "delegations",
+                            "unbondings",
+                            "delegations_count",
+                            "unbondings_count",
+                            "cumulative_flow"
                         ],
                         "type": "string",
                         "description": "Series name",

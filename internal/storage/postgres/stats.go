@@ -309,20 +309,37 @@ func (s Stats) StakingSeries(ctx context.Context, timeframe storage.Timeframe, n
 
 	switch name {
 	case storage.SeriesRewards:
-		query.ColumnExpr("time as ts, rewards as value")
+		query.ColumnExpr("ts, rewards as value")
 	case storage.SeriesCommissions:
-		query.ColumnExpr("time as ts, commissions as value")
+		query.ColumnExpr("ts, commissions as value")
 	case storage.SeriesFlow:
-		query.ColumnExpr("time as ts, flow as value")
+		query.ColumnExpr("ts, flow as value")
+	case storage.SeriesDelegations:
+		query.ColumnExpr("ts, delegations as value")
+	case storage.SeriesDelegationsCount:
+		query.ColumnExpr("ts, delegations_count as value")
+	case storage.SeriesUnbondings:
+		query.ColumnExpr("ts, unbondings as value")
+	case storage.SeriesUnbondingsCount:
+		query.ColumnExpr("ts, unbondings_count as value")
+	case storage.SeriesCumulativeFlow:
+		subQuery := s.db.DB().NewSelect().
+			Table(view).
+			Where("validator_id = ?", validatorId).
+			ColumnExpr("ts, sum(sum(flow)) OVER(ORDER BY ts) as value").
+			Group("ts")
+
+		query = s.db.DB().NewSelect().With("q", subQuery).Table("q").Column("ts", "value")
+
 	default:
 		return nil, errors.Errorf("unexpected series name: %s", name)
 	}
 
 	if !req.From.IsZero() {
-		query = query.Where("time >= ?", req.From)
+		query = query.Where("ts >= ?", req.From)
 	}
 	if !req.To.IsZero() {
-		query = query.Where("time < ?", req.To)
+		query = query.Where("ts < ?", req.To)
 	}
 
 	err = query.Scan(ctx, &response)

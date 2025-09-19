@@ -1,11 +1,15 @@
 CREATE MATERIALIZED VIEW IF NOT EXISTS staking_by_day
 WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
     select 
-        time_bucket('1 day'::interval, time) AS time, 
+        time_bucket('1 day'::interval, ts) AS ts, 
         logs.validator_id,
         sum(flow) as flow,
+        sum(delegations) as delegations,
+        sum(unbondings) as unbondings,
         sum(rewards) as rewards,
-        sum(commissions) as commissions
+        sum(commissions) as commissions,
+        sum(delegations_count) as delegations_count,
+        sum(unbondings_count) as unbondings_count
     from staking_by_hour as logs
     group by 1, 2
 	with no data;
