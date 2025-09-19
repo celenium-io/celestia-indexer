@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"strings"
 
+	"github.com/bcp-innovations/hyperlane-cosmos/util"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -231,6 +232,64 @@ func parseProposal(ctx *context.Context, data map[string]any) error {
 
 		ctx.AddProposal(proposal)
 	}
+
+	return nil
+}
+
+func parseCreateIgp(ctx *context.Context, data map[string]any) error {
+	igp, err := decode.NewHyperlaneCreateIgpEvent(data)
+	if err != nil {
+		return err
+	}
+
+	if igp.IgpId == "" {
+		return nil
+	}
+
+	igpId, err := util.DecodeHexAddress(igp.IgpId)
+	if err != nil {
+		return errors.Wrap(err, "decode igp id")
+	}
+
+	newIgp := storage.HLIGP{
+		Height: ctx.Block.Height,
+		Time:   ctx.Block.Time,
+		Denom:  igp.Denom,
+		IgpId:  igpId.Bytes(),
+		Owner: &storage.Address{
+			Address: igp.Owner,
+		},
+	}
+	ctx.AddIgp(newIgp)
+
+	return nil
+}
+
+func parseSetDestinationGasConfig(ctx *context.Context, data map[string]any) error {
+	igp, err := decode.NewHyperlaneSetDestinationGasConfig(data)
+	if err != nil {
+		return err
+	}
+
+	if igp.IgpId == "" {
+		return nil
+	}
+
+	igpId, err := util.DecodeHexAddress(igp.IgpId)
+	if err != nil {
+		return errors.Wrap(err, "decode igp id")
+	}
+
+	newIgpConfig := storage.HLIGPConfig{
+		Height:            ctx.Block.Height,
+		Time:              ctx.Block.Time,
+		IgpId:             igpId.Bytes(),
+		GasPrice:          igp.GasPrice,
+		GasOverhead:       igp.GasOverhead,
+		RemoteDomain:      igp.RemoteDomain,
+		TokenExchangeRate: igp.TokenExchangeRate,
+	}
+	ctx.AddIgpConfig(newIgpConfig)
 
 	return nil
 }

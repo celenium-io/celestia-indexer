@@ -731,3 +731,96 @@ func NewSetToken(m map[string]any) (st SetToken, err error) {
 	}
 	return
 }
+
+type HyperlaneCreateIgpEvent struct {
+	IgpId string
+	Owner string
+	Denom string
+}
+
+func NewHyperlaneCreateIgpEvent(m map[string]any) (hcie HyperlaneCreateIgpEvent, err error) {
+	hcie.IgpId, err = parseUnquoteOptional(decoder.StringFromMap(m, "igp_id"))
+	if err != nil {
+		return hcie, errors.Wrap(err, "igp_id")
+	}
+	hcie.Owner, err = parseUnquoteOptional(decoder.StringFromMap(m, "owner"))
+	if err != nil {
+		return hcie, errors.Wrap(err, "owner")
+	}
+	hcie.Denom, err = parseUnquoteOptional(decoder.StringFromMap(m, "denom"))
+	if err != nil {
+		return hcie, errors.Wrap(err, "denom")
+	}
+	return
+}
+
+type HyperlaneSetDestinationGasConfig struct {
+	GasOverhead       decimal.Decimal
+	GasPrice          decimal.Decimal
+	IgpId             string
+	Owner             string
+	RemoteDomain      uint64
+	TokenExchangeRate string
+}
+
+func NewHyperlaneSetDestinationGasConfig(m map[string]any) (hsdgc HyperlaneSetDestinationGasConfig, err error) {
+	price, err := parseUnquoteOptional(decoder.StringFromMap(m, "gas_price"))
+	if err != nil {
+		return hsdgc, errors.Wrap(err, "gas_price")
+	}
+	hsdgc.GasPrice = decimal.RequireFromString(price)
+	overhead, err := parseUnquoteOptional(decoder.StringFromMap(m, "gas_overhead"))
+	if err != nil {
+		return hsdgc, errors.Wrap(err, "gas_overhead")
+	}
+	hsdgc.GasOverhead = decimal.RequireFromString(overhead)
+	hsdgc.IgpId, err = parseUnquoteOptional(decoder.StringFromMap(m, "igp_id"))
+	if err != nil {
+		return hsdgc, errors.Wrap(err, "igp_id")
+	}
+	hsdgc.Owner, err = parseUnquoteOptional(decoder.StringFromMap(m, "owner"))
+	if err != nil {
+		return hsdgc, errors.Wrap(err, "owner")
+	}
+	hsdgc.RemoteDomain, err = decoder.Uint64FromMap(m, "remote_domain")
+	if err != nil {
+		return hsdgc, errors.Wrap(err, "remote_domain")
+	}
+	hsdgc.TokenExchangeRate, err = parseUnquoteOptional(decoder.StringFromMap(m, "token_exchange_rate"))
+	if err != nil {
+		return hsdgc, errors.Wrap(err, "token_exchange_rate")
+	}
+
+	return
+}
+
+type HyperlaneGasPaymentEvent struct {
+	Amount    decimal.Decimal
+	GasAmount decimal.Decimal
+	IgpId     string
+}
+
+func NewHyperlaneGasPaymentEvent(m map[string]any) (hgpe HyperlaneGasPaymentEvent, err error) {
+	gasAmount, err := parseUnquoteOptional(decoder.StringFromMap(m, "gas_amount"))
+	if err != nil {
+		return hgpe, errors.Wrap(err, "gas_amount")
+	}
+	hgpe.GasAmount = decimal.RequireFromString(gasAmount)
+
+	payment, err := parseUnquoteOptional(decoder.StringFromMap(m, "payment"))
+	if err != nil {
+		return hgpe, errors.Wrap(err, "payment")
+	}
+	coin, err := types.ParseCoinNormalized(payment)
+	if err != nil {
+		return hgpe, errors.Wrap(err, payment)
+	}
+	hgpe.Amount = decimal.RequireFromString(coin.Amount.String())
+
+	hgpe.IgpId, err = parseUnquoteOptional(decoder.StringFromMap(m, "igp_id"))
+	if err != nil {
+		return hgpe, errors.Wrap(err, "igp_id")
+	}
+
+	return
+}

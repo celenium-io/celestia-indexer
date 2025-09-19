@@ -1853,6 +1853,127 @@ func (s *TransactionTestSuite) TestMsgValidator() {
 	s.Require().NoError(tx2.Close(ctx))
 }
 
+func (s *TransactionTestSuite) TestSaveIgp() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveIgps(ctx,
+		storage.HLIGP{
+			Id:      1,
+			Height:  1488,
+			Time:    time.Now().UTC(),
+			OwnerId: 1,
+			IgpId:   []uint8{0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x5f, 0x70, 0x6f, 0x73, 0x74, 0x5f, 0x64, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x0, 0x0, 0x0, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1},
+			Denom:   "utia",
+		}, storage.HLIGP{
+			Id:      2,
+			Height:  1489,
+			Time:    time.Now().UTC(),
+			OwnerId: 2,
+			IgpId:   []uint8{0x71, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x5f, 0x70, 0x6f, 0x73, 0x74, 0x5f, 0x64, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x0, 0x0, 0x0, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1},
+			Denom:   "utia",
+		})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestHyperlaneIgp() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	igp, err := tx.HyperlaneIgp(ctx, []byte("igp_1"))
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(1488, igp.Height)
+	s.Require().EqualValues([]byte("igp_1"), igp.IgpId)
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestSaveIgpConfig() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveIgpConfigs(ctx,
+		storage.HLIGPConfig{
+			Id:                1,
+			Height:            1111,
+			Time:              time.Now().UTC(),
+			GasOverhead:       decimal.RequireFromString("100000"),
+			GasPrice:          decimal.RequireFromString("1"),
+			IgpId:             []uint8{0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x5f, 0x70, 0x6f, 0x73, 0x74, 0x5f, 0x64, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x0, 0x0, 0x0, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1},
+			RemoteDomain:      1488,
+			TokenExchangeRate: "1234567",
+		}, storage.HLIGPConfig{
+			Id:                1,
+			Height:            1112,
+			Time:              time.Now().UTC(),
+			GasOverhead:       decimal.RequireFromString("200000"),
+			GasPrice:          decimal.RequireFromString("2"),
+			IgpId:             []uint8{0x71, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x5f, 0x70, 0x6f, 0x73, 0x74, 0x5f, 0x64, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x0, 0x0, 0x0, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1},
+			RemoteDomain:      1488,
+			TokenExchangeRate: "87654321",
+		})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestHyperlaneIgpConfig() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	igp, err := tx.HyperlaneIgpConfig(ctx, []byte("igp_1"))
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(1488, igp.Height)
+	s.Require().EqualValues([]byte("igp_1"), igp.IgpId)
+	s.Require().EqualValues(decimal.RequireFromString("1"), igp.GasPrice)
+	s.Require().EqualValues(decimal.RequireFromString("100000"), igp.GasOverhead)
+	s.Require().EqualValues(1234, igp.RemoteDomain)
+	s.Require().EqualValues("4321", igp.TokenExchangeRate)
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestSaveHyperlaneGasPayments() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveHyperlaneGasPayments(ctx,
+		&storage.HLGasPayment{
+			Id:         1,
+			Height:     1111,
+			Time:       time.Now().UTC(),
+			GasAmount:  decimal.RequireFromString("1"),
+			Amount:     decimal.RequireFromString("1234"),
+			IgpId:      1,
+			TransferId: 1,
+		})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
 func TestSuiteTransaction_Run(t *testing.T) {
 	suite.Run(t, new(TransactionTestSuite))
 }

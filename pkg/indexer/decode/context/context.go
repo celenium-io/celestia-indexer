@@ -27,6 +27,8 @@ type Context struct {
 	CancelUnbonding []storage.Undelegation
 	StakingLogs     []storage.StakingLog
 	Votes           []*storage.Vote
+	Igps            []storage.HLIGP
+	IgpConfigs      []storage.HLIGPConfig
 
 	Block *storage.Block
 }
@@ -44,6 +46,8 @@ func NewContext() *Context {
 		CancelUnbonding: make([]storage.Undelegation, 0),
 		StakingLogs:     make([]storage.StakingLog, 0),
 		Votes:           make([]*storage.Vote, 0),
+		Igps:            make([]storage.HLIGP, 0),
+		IgpConfigs:      make([]storage.HLIGPConfig, 0),
 	}
 }
 
@@ -231,5 +235,28 @@ func (ctx *Context) AddConstant(module types.ModuleName, name, value string) {
 		Module: module,
 		Name:   name,
 		Value:  value,
+	})
+}
+
+func (ctx *Context) AddIgp(igp storage.HLIGP) {
+	ctx.Igps = append(ctx.Igps, storage.HLIGP{
+		Time:    igp.Time,
+		Height:  igp.Height,
+		IgpId:   igp.IgpId,
+		OwnerId: igp.OwnerId,
+		Denom:   igp.Denom,
+		Owner:   igp.Owner,
+	})
+}
+
+func (ctx *Context) AddIgpConfig(igp storage.HLIGPConfig) {
+	ctx.IgpConfigs = append(ctx.IgpConfigs, storage.HLIGPConfig{
+		Time:              igp.Time,
+		Height:            igp.Height,
+		IgpId:             igp.IgpId,
+		GasOverhead:       igp.GasOverhead,
+		GasPrice:          igp.GasPrice,
+		RemoteDomain:      igp.RemoteDomain,
+		TokenExchangeRate: igp.TokenExchangeRate,
 	})
 }
