@@ -127,7 +127,7 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 				Address:   address,
 				Validator: &source,
 				Change:    amount.Copy().Neg(),
-				Type:      storageTypes.StakingLogTypeDelegation,
+				Type:      storageTypes.StakingLogTypeUnbonding,
 			})
 			ctx.AddStakingLog(storage.StakingLog{
 				Height:    msg.Height,
