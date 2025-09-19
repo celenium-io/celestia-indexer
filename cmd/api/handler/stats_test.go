@@ -875,7 +875,7 @@ func (s *StatsTestSuite) TestStakingSeries() {
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/v1/stats/staking/series/:id/:name/:timeframe")
 			c.SetParamNames("id", "name", "timeframe")
-			c.SetParamValues("1", string(name), string(tf))
+			c.SetParamValues("1", name, string(tf))
 
 			s.stats.EXPECT().
 				StakingSeries(gomock.Any(), tf, name, uint64(1), storage.NewSeriesRequest(0, 0)).
