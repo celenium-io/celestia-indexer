@@ -308,6 +308,33 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 	return err
 }
 
+func (tx Transaction) SaveIgps(ctx context.Context, igps ...models.HLIGP) error {
+	if len(igps) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&igps).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveIgpConfigs(ctx context.Context, configs ...models.HLIGPConfig) error {
+	if len(configs) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&configs).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveHyperlaneGasPayments(ctx context.Context, payments ...*models.HLGasPayment) error {
+	if len(payments) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&payments).Exec(ctx)
+	return err
+}
+
 type addedValidator struct {
 	bun.BaseModel `bun:"validator"`
 	*models.Validator
@@ -1381,5 +1408,19 @@ func (tx Transaction) SignalVersions(ctx context.Context) (signals []models.Sign
 		Group("version").
 		Order("version desc").
 		Scan(ctx, &signals)
+	return
+}
+
+func (tx Transaction) HyperlaneIgp(ctx context.Context, id []byte) (igp models.HLIGP, err error) {
+	err = tx.Tx().NewSelect().Model(&igp).
+		Where("igp_id = ?", id).
+		Scan(ctx)
+	return
+}
+
+func (tx Transaction) HyperlaneIgpConfig(ctx context.Context, id []byte) (config models.HLIGPConfig, err error) {
+	err = tx.Tx().NewSelect().Model(&config).
+		Where("igp_id = ?", id).
+		Scan(ctx)
 	return
 }

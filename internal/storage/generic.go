@@ -57,6 +57,9 @@ var Models = []any{
 	&HLTransfer{},
 	&SignalVersion{},
 	&Upgrade{},
+	&HLIGP{},
+	&HLIGPConfig{},
+	&HLGasPayment{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -122,6 +125,9 @@ type Transaction interface {
 	Jail(ctx context.Context, validators ...*Validator) error
 	SaveSignals(ctx context.Context, signals ...*SignalVersion) error
 	SaveUpgrades(ctx context.Context, signals ...*Upgrade) error
+	SaveIgps(ctx context.Context, igps ...HLIGP) error
+	SaveIgpConfigs(ctx context.Context, configs ...HLIGPConfig) error
+	SaveHyperlaneGasPayments(ctx context.Context, payments ...*HLGasPayment) error
 
 	RollbackBlock(ctx context.Context, height types.Level) error
 	RollbackBlockStats(ctx context.Context, height types.Level) (stats BlockStats, err error)
@@ -176,6 +182,8 @@ type Transaction interface {
 	HyperlaneMailbox(ctx context.Context, internalId uint64) (HLMailbox, error)
 	HyperlaneToken(ctx context.Context, id []byte) (HLToken, error)
 	SignalVersions(ctx context.Context) ([]Signal, error)
+	HyperlaneIgp(ctx context.Context, id []byte) (HLIGP, error)
+	HyperlaneIgpConfig(ctx context.Context, id []byte) (HLIGPConfig, error)
 }
 
 const (

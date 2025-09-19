@@ -73,6 +73,16 @@ func Test_handleHyperlaneProcessMessage(t *testing.T) {
 					},
 				}, {
 					Height: 1036866,
+					Type:   "hyperlane.core.post_dispatch.v1.EventGasPayment",
+					Data: map[string]any{
+						"gas_amount": "350000",
+						"igp_id":     "0x726f757465725f706f73745f6469737061746368000000040000000000000001",
+						"message_id": "0x11b96db63570faa6deb0444ce3f07b0c12130fdf7704bca24d87bd8668016293",
+						"msg_index":  "0",
+						"payment":    "6011utia",
+					},
+				}, {
+					Height: 1036866,
 					Type:   "hyperlane.core.v1.EventProcess",
 					Data: map[string]any{
 						"origin":            "56",
