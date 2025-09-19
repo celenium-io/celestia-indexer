@@ -333,6 +333,32 @@ func (s *StatsTestSuite) TestSizeGroups() {
 	s.Require().EqualValues(0, groups[4].Count)
 }
 
+func (s *StatsTestSuite) TestStakingSeries() {
+	for _, tf := range []storage.Timeframe{
+		storage.TimeframeHour,
+		storage.TimeframeDay,
+		storage.TimeframeMonth,
+	} {
+		for _, series := range []string{
+			storage.SeriesDelegations,
+			storage.SeriesDelegationsCount,
+			storage.SeriesUnbondings,
+			storage.SeriesUnbondingsCount,
+			storage.SeriesCommissions,
+			storage.SeriesRewards,
+			storage.SeriesFlow,
+			storage.SeriesCumulativeFlow,
+		} {
+			ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer ctxCancel()
+
+			items, err := s.storage.Stats.StakingSeries(ctx, tf, series, 1, storage.NewSeriesRequest(0, 0))
+			s.Require().NoError(err, string(tf), series)
+			s.Require().Len(items, 1, string(tf), series)
+		}
+	}
+}
+
 func TestSuiteStats_Run(t *testing.T) {
 	suite.Run(t, new(StatsTestSuite))
 }

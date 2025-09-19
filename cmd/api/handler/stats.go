@@ -348,7 +348,7 @@ func (sh StatsHandler) NamespaceSeries(c echo.Context) error {
 type stakingSeriesRequest struct {
 	Id         uint64 `example:"123"        param:"id"        swaggertype:"integer" validate:"required,min=1"`
 	Timeframe  string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day month"`
-	SeriesName string `example:"size"       param:"name"      swaggertype:"string"  validate:"required,oneof=rewards commissions flow"`
+	SeriesName string `example:"flow"       param:"name"      swaggertype:"string"  validate:"required,oneof=rewards commissions flow delegations unbondings delegations_count unbondings_count cumulative_flow"`
 	From       int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
 	To         int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
 }
@@ -361,7 +361,7 @@ type stakingSeriesRequest struct {
 //	@ID				stats-staking-series
 //	@Param			id			path	string	true	"Validator id"					minlength(56)	maxlength(56)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
-//	@Param			name		path	string	true	"Series name"					Enums(rewards, commissions, flow)
+//	@Param			name		path	string	true	"Series name"					Enums(rewards, commissions, flow, delegations, unbondings, delegations_count, unbondings_count, cumulative_flow)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
 //	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
 //	@Produce		json

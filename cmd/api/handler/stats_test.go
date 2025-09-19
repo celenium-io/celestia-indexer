@@ -852,3 +852,50 @@ func (s *StatsTestSuite) TestHlTotalSeries() {
 		}
 	}
 }
+
+func (s *StatsTestSuite) TestStakingSeries() {
+	for _, name := range []string{
+		storage.SeriesDelegations,
+		storage.SeriesDelegationsCount,
+		storage.SeriesUnbondings,
+		storage.SeriesUnbondingsCount,
+		storage.SeriesCommissions,
+		storage.SeriesRewards,
+		storage.SeriesFlow,
+		storage.SeriesCumulativeFlow,
+	} {
+
+		for _, tf := range []storage.Timeframe{
+			storage.TimeframeHour,
+			storage.TimeframeDay,
+			storage.TimeframeMonth,
+		} {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/v1/stats/staking/series/:id/:name/:timeframe")
+			c.SetParamNames("id", "name", "timeframe")
+			c.SetParamValues("1", name, string(tf))
+
+			s.stats.EXPECT().
+				StakingSeries(gomock.Any(), tf, name, uint64(1), storage.NewSeriesRequest(0, 0)).
+				Return([]storage.SeriesItem{
+					{
+						Value: "1111",
+						Time:  testTime,
+					},
+				}, nil)
+
+			s.Require().NoError(s.handler.StakingSeries(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
+
+			var response []responses.SeriesItem
+			err := json.NewDecoder(rec.Body).Decode(&response)
+			s.Require().NoError(err)
+			s.Require().Len(response, 1)
+
+			item := response[0]
+			s.Require().Equal("1111", item.Value)
+		}
+	}
+}
