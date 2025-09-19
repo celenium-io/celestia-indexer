@@ -246,3 +246,52 @@ func TestDecodeMsg_SuccessOnMsgRevoke(t *testing.T) {
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
 }
+
+// MsgPruneExpiredGrants
+
+func TestDecodeMsg_SuccessOnMsgPruneExpiredGrants(t *testing.T) {
+	m := &authz.MsgPruneExpiredGrants{
+		Pruner: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
+	}
+	block, now := testsuite.EmptyBlock()
+	position := 4
+
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+
+	addressesExpected := []storage.AddressWithType{
+		{
+			Type: storageTypes.MsgAddressTypeExecutor,
+			Address: storage.Address{
+				Id:         0,
+				Height:     block.Height,
+				LastHeight: block.Height,
+				Address:    "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
+				Hash:       []byte{0x64, 0xd3, 0xfc, 0x6a, 0x2a, 0x52, 0x4e, 0x2f, 0x60, 0x3f, 0x51, 0xc7, 0xee, 0x4e, 0x8d, 0x35, 0xf7, 0x23, 0x22, 0xf8},
+				Balance:    storage.EmptyBalance(),
+			},
+		},
+	}
+
+	msgExpected := storage.Message{
+		Id:        0,
+		Height:    block.Height,
+		Time:      now,
+		Position:  4,
+		Type:      storageTypes.MsgPruneExpiredGrants,
+		TxId:      0,
+		Data:      structs.Map(m),
+		Size:      49,
+		Namespace: nil,
+		Addresses: addressesExpected,
+	}
+
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), dm.BlobsSize)
+	assert.Equal(t, msgExpected, dm.Msg)
+}

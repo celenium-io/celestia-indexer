@@ -432,6 +432,34 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			name:    string(MsgUpdateRoutingIsmOwner),
 			msgType: []int{MsgTypeBitsUpdateRoutingIsmOwner},
 			want:    []MsgType{MsgUpdateRoutingIsmOwner},
+		}, {
+			name:    string(MsgUpdateBlobParams),
+			msgType: []int{MsgTypeBitsUpdateBlobParams},
+			want:    []MsgType{MsgUpdateBlobParams},
+		}, {
+			name:    string(MsgPruneExpiredGrants),
+			msgType: []int{MsgTypeBitsPruneExpiredGrants},
+			want:    []MsgType{MsgPruneExpiredGrants},
+		}, {
+			name:    string(MsgSetSendEnabled),
+			msgType: []int{MsgTypeBitsSetSendEnabled},
+			want:    []MsgType{MsgSetSendEnabled},
+		}, {
+			name:    string(MsgAuthorizeCircuitBreaker),
+			msgType: []int{MsgTypeBitsAuthorizeCircuitBreaker},
+			want:    []MsgType{MsgAuthorizeCircuitBreaker},
+		}, {
+			name:    string(MsgModuleQuerySafe),
+			msgType: []int{MsgTypeBitsModuleQuerySafe},
+			want:    []MsgType{MsgModuleQuerySafe},
+		}, {
+			name:    string(MsgResetCircuitBreaker),
+			msgType: []int{MsgTypeBitsResetCircuitBreaker},
+			want:    []MsgType{MsgResetCircuitBreaker},
+		}, {
+			name:    string(MsgTripCircuitBreaker),
+			msgType: []int{MsgTypeBitsTripCircuitBreaker},
+			want:    []MsgType{MsgTripCircuitBreaker},
 		},
 	}
 	for _, tt := range tests {
@@ -825,6 +853,34 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			name:   "test 92",
 			values: []MsgType{MsgUpdateRoutingIsmOwner},
 			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateRoutingIsmOwner)},
+		}, {
+			name:   "test 93",
+			values: []MsgType{MsgUpdateBlobParams},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateBlobParams)},
+		}, {
+			name:   "test 94",
+			values: []MsgType{MsgPruneExpiredGrants},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsPruneExpiredGrants)},
+		}, {
+			name:   "test 95",
+			values: []MsgType{MsgSetSendEnabled},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSetSendEnabled)},
+		}, {
+			name:   "test 96",
+			values: []MsgType{MsgAuthorizeCircuitBreaker},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsAuthorizeCircuitBreaker)},
+		}, {
+			name:   "test 97",
+			values: []MsgType{MsgResetCircuitBreaker},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsResetCircuitBreaker)},
+		}, {
+			name:   "test 98",
+			values: []MsgType{MsgTripCircuitBreaker},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsTripCircuitBreaker)},
+		}, {
+			name:   "test 99",
+			values: []MsgType{MsgModuleQuerySafe},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsModuleQuerySafe)},
 		}, {
 			name:   "test combo",
 			values: []MsgType{MsgWithdrawDelegatorReward, MsgBeginRedelegate},

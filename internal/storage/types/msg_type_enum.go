@@ -225,6 +225,20 @@ const (
 	MsgRemoveRoutingIsmDomain MsgType = "MsgRemoveRoutingIsmDomain"
 	// MsgUpdateRoutingIsmOwner is a MsgType of type MsgUpdateRoutingIsmOwner.
 	MsgUpdateRoutingIsmOwner MsgType = "MsgUpdateRoutingIsmOwner"
+	// MsgUpdateBlobParams is a MsgType of type MsgUpdateBlobParams.
+	MsgUpdateBlobParams MsgType = "MsgUpdateBlobParams"
+	// MsgPruneExpiredGrants is a MsgType of type MsgPruneExpiredGrants.
+	MsgPruneExpiredGrants MsgType = "MsgPruneExpiredGrants"
+	// MsgSetSendEnabled is a MsgType of type MsgSetSendEnabled.
+	MsgSetSendEnabled MsgType = "MsgSetSendEnabled"
+	// MsgAuthorizeCircuitBreaker is a MsgType of type MsgAuthorizeCircuitBreaker.
+	MsgAuthorizeCircuitBreaker MsgType = "MsgAuthorizeCircuitBreaker"
+	// MsgResetCircuitBreaker is a MsgType of type MsgResetCircuitBreaker.
+	MsgResetCircuitBreaker MsgType = "MsgResetCircuitBreaker"
+	// MsgTripCircuitBreaker is a MsgType of type MsgTripCircuitBreaker.
+	MsgTripCircuitBreaker MsgType = "MsgTripCircuitBreaker"
+	// MsgModuleQuerySafe is a MsgType of type MsgModuleQuerySafe.
+	MsgModuleQuerySafe MsgType = "MsgModuleQuerySafe"
 )
 
 var ErrInvalidMsgType = fmt.Errorf("not a valid MsgType, try [%s]", strings.Join(_MsgTypeNames, ", "))
@@ -334,6 +348,13 @@ var _MsgTypeNames = []string{
 	string(MsgSetRoutingIsmDomain),
 	string(MsgRemoveRoutingIsmDomain),
 	string(MsgUpdateRoutingIsmOwner),
+	string(MsgUpdateBlobParams),
+	string(MsgPruneExpiredGrants),
+	string(MsgSetSendEnabled),
+	string(MsgAuthorizeCircuitBreaker),
+	string(MsgResetCircuitBreaker),
+	string(MsgTripCircuitBreaker),
+	string(MsgModuleQuerySafe),
 }
 
 // MsgTypeNames returns a list of possible string values of MsgType.
@@ -450,6 +471,13 @@ func MsgTypeValues() []MsgType {
 		MsgSetRoutingIsmDomain,
 		MsgRemoveRoutingIsmDomain,
 		MsgUpdateRoutingIsmOwner,
+		MsgUpdateBlobParams,
+		MsgPruneExpiredGrants,
+		MsgSetSendEnabled,
+		MsgAuthorizeCircuitBreaker,
+		MsgResetCircuitBreaker,
+		MsgTripCircuitBreaker,
+		MsgModuleQuerySafe,
 	}
 }
 
@@ -570,6 +598,13 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgSetRoutingIsmDomain":             MsgSetRoutingIsmDomain,
 	"MsgRemoveRoutingIsmDomain":          MsgRemoveRoutingIsmDomain,
 	"MsgUpdateRoutingIsmOwner":           MsgUpdateRoutingIsmOwner,
+	"MsgUpdateBlobParams":                MsgUpdateBlobParams,
+	"MsgPruneExpiredGrants":              MsgPruneExpiredGrants,
+	"MsgSetSendEnabled":                  MsgSetSendEnabled,
+	"MsgAuthorizeCircuitBreaker":         MsgAuthorizeCircuitBreaker,
+	"MsgResetCircuitBreaker":             MsgResetCircuitBreaker,
+	"MsgTripCircuitBreaker":              MsgTripCircuitBreaker,
+	"MsgModuleQuerySafe":                 MsgModuleQuerySafe,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.

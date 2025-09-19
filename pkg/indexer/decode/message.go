@@ -4,6 +4,7 @@
 package decode
 
 import (
+	circuitTypes "cosmossdk.io/x/circuit/types"
 	evidenceTypes "cosmossdk.io/x/evidence/types"
 	"cosmossdk.io/x/nft"
 	upgrade "cosmossdk.io/x/upgrade/types"
@@ -14,6 +15,7 @@ import (
 	crisisTypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
 	interchainAccounts "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/types"
+	interchainAccountsHost "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
 	fee "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
 	ibcTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	coreClient "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
@@ -77,6 +79,8 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgWithdrawValidatorCommission(ctx, typedMsg)
 	case *cosmosDistributionTypes.MsgFundCommunityPool:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgFundCommunityPool(ctx, typedMsg)
+	case *cosmosDistributionTypes.MsgUpdateParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateParamsDistr(ctx, typedMsg)
 
 	// staking module
 	case *cosmosStakingTypes.MsgCreateValidator:
@@ -100,16 +104,24 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUndelegate(ctx, typedMsg)
 	case *cosmosStakingTypes.MsgCancelUnbondingDelegation:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCancelUnbondingDelegation(ctx, typedMsg)
+	case *cosmosStakingTypes.MsgUpdateParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateParamsStaking(ctx, typedMsg)
 
 	// slashing module
 	case *cosmosSlashingTypes.MsgUnjail:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUnjail(ctx, typedMsg)
+	case *cosmosSlashingTypes.MsgUpdateParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateParamsSlashing(ctx, typedMsg)
 
 	// bank module
 	case *cosmosBankTypes.MsgSend:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSend(ctx, typedMsg)
 	case *cosmosBankTypes.MsgMultiSend:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgMultiSend(ctx, typedMsg)
+	case *cosmosBankTypes.MsgSetSendEnabled:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSetSendEnabled(ctx, typedMsg)
+	case *cosmosBankTypes.MsgUpdateParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateParamsBank(ctx, typedMsg)
 
 	// vesting module
 	case *cosmosVestingTypes.MsgCreateVestingAccount:
@@ -122,6 +134,8 @@ func Message(
 	// blob module
 	case *appBlobTypes.MsgPayForBlobs:
 		d.Msg.Type, d.Msg.Addresses, d.Msg.Namespace, d.Msg.BlobLogs, d.BlobsSize, err = handle.MsgPayForBlobs(ctx, status, typedMsg)
+	case *appBlobTypes.MsgUpdateBlobParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateBlobParams(ctx, status, typedMsg)
 
 	// feegrant module
 	case *cosmosFeegrant.MsgGrantAllowance:
@@ -134,6 +148,8 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRegisterEVMAddress(ctx, typedMsg)
 
 	// authz module
+	case *authz.MsgPruneExpiredGrants:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgPruneExpiredGrants(ctx, typedMsg)
 	case *authz.MsgGrant:
 		d.Msg.Type, d.Msg.Addresses, d.Msg.Grants, err = handle.MsgGrant(ctx, status, typedMsg)
 	case *authz.MsgExec:
@@ -191,6 +207,8 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgDeposit(ctx, typedMsg.Depositor)
 	case *cosmosGovTypesV1Beta1.MsgDeposit:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgDeposit(ctx, typedMsg.Depositor)
+	case *cosmosGovTypesV1.MsgUpdateParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateParamsGov(ctx, typedMsg)
 
 	// ibc module
 	case *ibcTypes.MsgTransfer:
@@ -249,6 +267,12 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgRegisterInterchainAccount(ctx, typedMsg)
 	case *interchainAccounts.MsgSendTx:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSendTx(ctx, typedMsg)
+	case *interchainAccounts.MsgUpdateParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateParamsIcaController(ctx, typedMsg)
+	case *interchainAccountsHost.MsgModuleQuerySafe:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgModuleQuerySafe(ctx, typedMsg)
+	case *interchainAccountsHost.MsgUpdateParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateParamsIcaHost(ctx, typedMsg)
 
 	// fee module
 	case *fee.MsgRegisterPayee:
@@ -285,6 +309,8 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgConnectionOpenAck(ctx, typedMsg)
 	case *coreConnection.MsgConnectionOpenConfirm:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgConnectionOpenConfirm(ctx, typedMsg)
+	case *coreConnection.MsgUpdateParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateParamsConnection(ctx, typedMsg)
 
 	// coreChannel module
 	case *coreChannel.MsgChannelOpenInit:
@@ -307,6 +333,8 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgTimeoutOnClose(ctx, typedMsg)
 	case *coreChannel.MsgAcknowledgement:
 		d.Msg.Type, d.Msg.Addresses, d.Msg.IbcTransfer, d.Msg.IbcChannel, err = handle.MsgAcknowledgement(ctx, cfg.Codec, d.Msg.Data, typedMsg)
+	case *coreChannel.MsgUpdateParams:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateParamsChannel(ctx, typedMsg)
 
 	// signal module
 	case *appSignalTypes.MsgSignalVersion:
@@ -360,6 +388,14 @@ func Message(
 
 	case *minfeeTypes.MsgUpdateMinfeeParams:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateMinfeeParams(ctx, typedMsg)
+
+	// circuit
+	case *circuitTypes.MsgAuthorizeCircuitBreaker:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgAuthorizeCircuitBreaker(ctx, typedMsg)
+	case *circuitTypes.MsgResetCircuitBreaker:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgResetCircuitBreaker(ctx, typedMsg)
+	case *circuitTypes.MsgTripCircuitBreaker:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgTripCircuitBreaker(ctx, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)

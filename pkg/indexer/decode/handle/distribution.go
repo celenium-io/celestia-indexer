@@ -52,3 +52,11 @@ func MsgFundCommunityPool(ctx *context.Context, m *cosmosDistributionTypes.MsgFu
 	}, ctx.Block.Height)
 	return msgType, addresses, err
 }
+
+func MsgUpdateParamsDistr(ctx *context.Context, m *cosmosDistributionTypes.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgUpdateParams
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}

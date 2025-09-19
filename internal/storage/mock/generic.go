@@ -4296,45 +4296,6 @@ func (c *MockTransactionSaveVotesCall) DoAndReturn(f func(context.Context, ...*s
 	return c
 }
 
-// SignalVersions mocks base method.
-func (m *MockTransaction) SignalVersions(ctx context.Context, bondedValidatorsCount int) ([]storage.Signal, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SignalVersions", ctx, bondedValidatorsCount)
-	ret0, _ := ret[0].([]storage.Signal)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SignalVersions indicates an expected call of SignalVersions.
-func (mr *MockTransactionMockRecorder) SignalVersions(ctx, bondedValidatorsCount any) *MockTransactionSignalVersionsCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignalVersions", reflect.TypeOf((*MockTransaction)(nil).SignalVersions), ctx, bondedValidatorsCount)
-	return &MockTransactionSignalVersionsCall{Call: call}
-}
-
-// MockTransactionSignalVersionsCall wrap *gomock.Call
-type MockTransactionSignalVersionsCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockTransactionSignalVersionsCall) Return(arg0 []storage.Signal, arg1 error) *MockTransactionSignalVersionsCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockTransactionSignalVersionsCall) Do(f func(context.Context, int) ([]storage.Signal, error)) *MockTransactionSignalVersionsCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionSignalVersionsCall) DoAndReturn(f func(context.Context, int) ([]storage.Signal, error)) *MockTransactionSignalVersionsCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // State mocks base method.
 func (m *MockTransaction) State(ctx context.Context, name string) (storage.State, error) {
 	m.ctrl.T.Helper()

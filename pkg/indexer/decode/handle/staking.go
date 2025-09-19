@@ -211,3 +211,11 @@ func MsgCancelUnbondingDelegation(ctx *context.Context, m *cosmosStakingTypes.Ms
 	}, ctx.Block.Height)
 	return msgType, addresses, err
 }
+
+func MsgUpdateParamsStaking(ctx *context.Context, m *cosmosStakingTypes.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+	msgType := storageTypes.MsgUpdateParams
+	addresses, err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
+	}, ctx.Block.Height)
+	return msgType, addresses, err
+}
