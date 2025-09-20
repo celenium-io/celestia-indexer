@@ -677,3 +677,38 @@ func TestNewAcknoledgementPacket(t *testing.T) {
 		})
 	}
 }
+
+func TestNewHyperlaneReceiveTransferEvent(t *testing.T) {
+	tests := []struct {
+		name string
+		m    map[string]any
+		want HyperlaneReceiveTransferEvent
+	}{
+		{
+			name: "test 1",
+			m: map[string]any{
+				"amount":        "\"\"",
+				"origin_domain": "8453",
+				"recipient":     "\"celestia1z7ut79ds6h550925ehkxpwvkgcfq63y2vfk2e0\"",
+				"sender":        "\"0x0000000000000000000000005d27225a5d8a756e5655617b22cc03616c3b26c3\"",
+				"token_id":      "\"0x726f757465725f61707000000000000000000000000000010000000000000001\"",
+				"msg_index":     "0",
+			},
+			want: HyperlaneReceiveTransferEvent{
+				Amount:       decimal.Zero,
+				OriginDomain: 8453,
+				Recipient:    "celestia1z7ut79ds6h550925ehkxpwvkgcfq63y2vfk2e0",
+				Sender:       "0x0000000000000000000000005d27225a5d8a756e5655617b22cc03616c3b26c3",
+				TokenId:      "0x726f757465725f61707000000000000000000000000000010000000000000001",
+				Denom:        "utia",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotBody, err := NewHyperlaneReceiveTransferEvent(tt.m)
+			require.NoError(t, err)
+			require.Equal(t, tt.want, gotBody)
+		})
+	}
+}

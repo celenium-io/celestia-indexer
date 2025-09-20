@@ -42,7 +42,9 @@ func processExec(ctx *context.Context, events []storage.Event, msg *storage.Mess
 				return err
 			}
 			if err := processRedelegate(ctx, events, &storage.Message{
-				Data: msgs,
+				Height: msg.Height,
+				Time:   msg.Time,
+				Data:   msgs,
 			}, idx); err != nil {
 				return err
 			}

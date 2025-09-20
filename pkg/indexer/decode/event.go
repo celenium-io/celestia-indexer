@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/bcp-innovations/hyperlane-cosmos/util"
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/pkg/errors"
@@ -650,11 +651,14 @@ func NewHyperlaneReceiveTransferEvent(m map[string]any) (hrte HyperlaneReceiveTr
 	}
 	coin, err := types.ParseCoinNormalized(amount)
 	if err != nil {
-		return hrte, errors.Wrap(err, amount)
+		hrte.Amount = decimal.Zero
+		hrte.Denom = currency.Utia
+	} else {
+		hrte.Amount = decimal.RequireFromString(coin.Amount.String())
+		hrte.Denom = coin.GetDenom()
 	}
-	hrte.Amount = decimal.RequireFromString(coin.Amount.String())
-	hrte.Denom = coin.GetDenom()
-	return
+
+	return hrte, nil
 }
 
 type HyperlaneSendTransferEvent struct {
