@@ -7,9 +7,9 @@ import (
 	"bytes"
 	"encoding/base64"
 
-	"github.com/celestiaorg/celestia-app/v5/pkg/appconsts"
-	"github.com/celestiaorg/go-square/v2/inclusion"
-	"github.com/celestiaorg/go-square/v2/share"
+	"github.com/celestiaorg/celestia-app/v6/pkg/appconsts"
+	"github.com/celestiaorg/go-square/v3/inclusion"
+	"github.com/celestiaorg/go-square/v3/share"
 	"github.com/cometbft/cometbft/crypto/merkle"
 	"github.com/pkg/errors"
 

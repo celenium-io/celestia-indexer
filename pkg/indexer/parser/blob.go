@@ -8,8 +8,8 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
-	"github.com/celestiaorg/celestia-app/v5/pkg/appconsts"
-	appshares "github.com/celestiaorg/go-square/v2/share"
+	"github.com/celestiaorg/celestia-app/v6/pkg/appconsts"
+	"github.com/celestiaorg/go-square/v3/share"
 	"github.com/shopspring/decimal"
 )
 
@@ -28,7 +28,8 @@ func processBlob(blobs []*storage.BlobLog, d decode.DecodedTx, t *storage.Tx) {
 	for i := range blobs {
 		blobs[i].ContentType = http.DetectContentType(d.Blobs[i].Data)
 		//nolint:gosec
-		sharesUsed := appshares.SparseSharesNeeded(uint32(blobs[i].Size))
+
+		sharesUsed := share.SparseSharesNeeded(uint32(blobs[i].Size), blobs[i].ShareVersion == int(share.ShareVersionOne))
 		gas := decimal.NewFromInt(int64(sharesUsed)).Mul(gasPerBlobByte)
 		gasConsumedOnBlobs = gasConsumedOnBlobs.Add(gas)
 		gasConsumedPerBlob[i] = gas

@@ -72,9 +72,9 @@ func TestTracker_computeMetrics(t *testing.T) {
 		err := tracker.computeMetrics()
 		require.NoError(t, err)
 		state := tracker.State()
-		require.Equal(t, "0.002000", state.Slow)
-		require.Equal(t, "0.002000", state.Median)
-		require.Equal(t, "0.002000", state.Fast)
+		require.Equal(t, "0.004000", state.Slow)
+		require.Equal(t, "0.004000", state.Median)
+		require.Equal(t, "0.004000", state.Fast)
 	})
 }
 

@@ -11,7 +11,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/celestiaorg/celestia-app/v5/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v6/pkg/appconsts"
 	coreTypes "github.com/cometbft/cometbft/types"
 	"github.com/dipdup-io/workerpool"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"

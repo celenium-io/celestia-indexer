@@ -9,8 +9,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	appBlobTypes "github.com/celestiaorg/celestia-app/v5/x/blob/types"
-	nsPackage "github.com/celestiaorg/go-square/v2/share"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v6/x/blob/types"
+	nsPackage "github.com/celestiaorg/go-square/v3/share"
 	"github.com/pkg/errors"
 )
 
@@ -20,21 +20,25 @@ func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, m *appBlob
 	uniqueNs := make(map[string]*storage.Namespace)
 	blobLogs := make([]*storage.BlobLog, 0)
 
-	for nsI, ns := range m.Namespaces {
-		if len(m.BlobSizes) < nsI {
+	for idx, ns := range m.Namespaces {
+		if len(m.BlobSizes) < idx {
 			return storageTypes.MsgUnknown, nil, nil, nil, 0, errors.Errorf(
-				"blob sizes length=%d is less then namespaces index=%d", len(m.BlobSizes), nsI)
+				"blob sizes length=%d is less then namespaces index=%d", len(m.BlobSizes), idx)
 		}
-		if len(m.ShareCommitments) < nsI {
+		if len(m.ShareCommitments) < idx {
 			return storageTypes.MsgUnknown, nil, nil, nil, 0, errors.Errorf(
-				"share commitment sizes length=%d is less then namespaces index=%d", len(m.ShareCommitments), nsI)
+				"share commitment length=%d is less then namespaces index=%d", len(m.ShareCommitments), idx)
+		}
+		if len(m.ShareVersions) < idx {
+			return storageTypes.MsgUnknown, nil, nil, nil, 0, errors.Errorf(
+				"share versions length=%d is less then namespaces index=%d", len(m.ShareVersions), idx)
 		}
 
 		appNS, err := nsPackage.NewNamespaceFromBytes(ns)
 		if err != nil {
 			return storageTypes.MsgUnknown, nil, nil, nil, 0, errors.Wrap(err, "NewNamespaceFromBytes")
 		}
-		size := int64(m.BlobSizes[nsI])
+		size := int64(m.BlobSizes[idx])
 		blobsSize += size
 		namespace := storage.Namespace{
 			FirstHeight:     ctx.Block.Height,
@@ -51,7 +55,7 @@ func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, m *appBlob
 			namespace.Size = size
 
 			blobLog := &storage.BlobLog{
-				Commitment: base64.StdEncoding.EncodeToString(m.ShareCommitments[nsI]),
+				Commitment: base64.StdEncoding.EncodeToString(m.ShareCommitments[idx]),
 				Size:       size,
 				Namespace:  &namespace,
 				Height:     ctx.Block.Height,
@@ -59,6 +63,7 @@ func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, m *appBlob
 				Signer: &storage.Address{
 					Address: m.Signer,
 				},
+				ShareVersion: int(m.ShareVersions[idx]),
 			}
 			blobLogs = append(blobLogs, blobLog)
 		}
