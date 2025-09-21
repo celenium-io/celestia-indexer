@@ -456,3 +456,27 @@ func (s Stats) SizeGroups(ctx context.Context, timeFilter *time.Time) (groups []
 
 	return
 }
+
+func (s Stats) StakingDistribution(ctx context.Context, req storage.SeriesRequest) (response []storage.StakingDistributionItem, err error) {
+	dataQuery := s.db.DB().NewSelect().
+		ColumnExpr("ts, validator_id, sum(sum(flow)) OVER(PARTITION BY validator_id ORDER BY ts) as value").
+		Table(storage.ViewStakingByMonth).
+		GroupExpr("validator_id, ts")
+
+	query := s.db.DB().NewSelect().
+		With("data", dataQuery).
+		Table("data").
+		ColumnExpr("data.ts, data.value, validator.moniker").
+		Join("left join validator on validator_id = validator.id").
+		OrderExpr("ts asc, value desc")
+
+	if !req.From.IsZero() {
+		query = query.Where("ts >= ?", req.From)
+	}
+	if !req.To.IsZero() {
+		query = query.Where("ts < ?", req.To)
+	}
+
+	err = query.Scan(ctx, &response)
+	return
+}

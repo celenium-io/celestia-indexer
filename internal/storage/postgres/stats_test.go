@@ -359,6 +359,15 @@ func (s *StatsTestSuite) TestStakingSeries() {
 	}
 }
 
+func (s *StatsTestSuite) TestStakingDistribution() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	items, err := s.storage.Stats.StakingDistribution(ctx, storage.NewSeriesRequest(0, 0))
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+}
+
 func TestSuiteStats_Run(t *testing.T) {
 	suite.Run(t, new(StatsTestSuite))
 }
