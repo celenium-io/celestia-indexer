@@ -21,6 +21,7 @@ type Worker struct {
 	queue    []types.Level
 	capacity int
 	liveMode bool
+	m        map[types.Level]struct{}
 	mx       *sync.RWMutex
 }
 
@@ -33,6 +34,7 @@ func NewWorker(api node.Api, log zerolog.Logger, blocks chan types.BlockData, ca
 		blocks:   blocks,
 		log:      log,
 		queue:    make([]types.Level, 0),
+		m:        make(map[types.Level]struct{}),
 		capacity: capacity,
 		mx:       new(sync.RWMutex),
 	}
@@ -50,8 +52,13 @@ func (worker *Worker) Capacity() int {
 	return worker.capacity
 }
 
-func (worker *Worker) Do(ctx context.Context, level types.Level, appVersion uint64) {
+func (worker *Worker) Do(ctx context.Context, level types.Level) {
+	if _, ok := worker.m[level]; ok {
+		return
+	}
 	worker.queue = append(worker.queue, level)
+	worker.m[level] = struct{}{}
+
 	if len(worker.queue) < worker.capacity {
 		worker.mx.RLock()
 		{
@@ -103,4 +110,5 @@ func (worker *Worker) Do(ctx context.Context, level types.Level, appVersion uint
 	}
 
 	worker.queue = worker.queue[:0]
+	clear(worker.m)
 }
