@@ -186,6 +186,7 @@ type SizeGroup struct {
 type StakingDistributionItem struct {
 	Moniker string          `bun:"moniker"`
 	Value   decimal.Decimal `bun:"value"`
+	Percent decimal.Decimal `bun:"percent"`
 	Time    time.Time       `bun:"ts"`
 }
 

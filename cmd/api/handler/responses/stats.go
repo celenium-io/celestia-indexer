@@ -192,3 +192,28 @@ func NewSizeGroup(sg storage.SizeGroup) SizeGroup {
 		AvgSize: sg.AvgSize,
 	}
 }
+
+type StakingDistributionItem struct {
+	Time    time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"    swaggertype:"string"`
+	Value   string    `example:"0.17632"                   format:"string"    json:"value"   swaggertype:"string"`
+	Percent string    `example:"0.17632"                   format:"string"    json:"percent" swaggertype:"string"`
+}
+
+func NewStakingDistributionItem(item storage.StakingDistributionItem) StakingDistributionItem {
+	return StakingDistributionItem{
+		Time:    item.Time,
+		Value:   item.Value.String(),
+		Percent: item.Percent.String(),
+	}
+}
+
+type StakingDistribution map[string][]StakingDistributionItem
+
+func NewStakingDistribution(items []storage.StakingDistributionItem) StakingDistribution {
+	result := make(StakingDistribution)
+	for i := range items {
+		item := NewStakingDistributionItem(items[i])
+		result[items[i].Moniker] = append(result[items[i].Moniker], item)
+	}
+	return result
+}

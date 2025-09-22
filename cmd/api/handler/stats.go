@@ -407,7 +407,7 @@ type stakingDistributionRequest struct {
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
 //	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
 //	@Produce		json
-//	@Success		200	{array}		responses.SeriesItem
+//	@Success		200	{object}	StakingDistribution
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/stats/staking/distribution [get]
@@ -425,11 +425,7 @@ func (sh StatsHandler) StakingDistribution(c echo.Context) error {
 		return handleError(c, err, sh.nsRepo)
 	}
 
-	response := make([]responses.SeriesItem, len(items))
-	for i := range items {
-		response[i] = responses.NewSeriesItem(items[i])
-	}
-	return returnArray(c, response)
+	return c.JSON(http.StatusOK, responses.NewStakingDistribution(items))
 }
 
 type ibcSeriesRequest struct {

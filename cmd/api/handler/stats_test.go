@@ -899,3 +899,44 @@ func (s *StatsTestSuite) TestStakingSeries() {
 		}
 	}
 }
+
+func (s *StatsTestSuite) TestSStakingDistribution() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/v1/stats/staking/distribution")
+
+	s.stats.EXPECT().
+		StakingDistribution(gomock.Any(), storage.NewSeriesRequest(0, 0)).
+		Return([]storage.StakingDistributionItem{
+			{
+				Moniker: "Test 1",
+				Value:   decimal.RequireFromString("100"),
+				Percent: decimal.RequireFromString("0.5"),
+				Time:    testTime,
+			}, {
+				Moniker: "Test 2",
+				Value:   decimal.RequireFromString("100"),
+				Percent: decimal.RequireFromString("0.5"),
+				Time:    testTime,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.StakingDistribution(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response responses.StakingDistribution
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 2)
+
+	test1 := response["Test 1"]
+	s.Require().Len(test1, 1)
+	s.Require().EqualValues("100", test1[0].Value)
+	s.Require().EqualValues("0.5", test1[0].Percent)
+
+	test2 := response["Test 2"]
+	s.Require().Len(test2, 1)
+	s.Require().EqualValues("100", test2[0].Value)
+	s.Require().EqualValues("0.5", test2[0].Percent)
+}

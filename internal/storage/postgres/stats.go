@@ -459,15 +459,27 @@ func (s Stats) SizeGroups(ctx context.Context, timeFilter *time.Time) (groups []
 
 func (s Stats) StakingDistribution(ctx context.Context, req storage.SeriesRequest) (response []storage.StakingDistributionItem, err error) {
 	dataQuery := s.db.DB().NewSelect().
-		ColumnExpr("ts, validator_id, sum(sum(flow)) OVER(PARTITION BY validator_id ORDER BY ts) as value").
+		ColumnExpr("time_bucket_gapfill('1 month', ts) as month, validator_id, sum(sum(flow)) OVER(PARTITION BY validator_id ORDER BY 1) as value").
 		Table(storage.ViewStakingByMonth).
-		GroupExpr("validator_id, ts")
+		Where("ts >= '2023-10-01T00:00:00Z'").
+		Where("ts <= NOW()").
+		GroupExpr("1, 2")
+
+	summaryQuery := s.db.DB().NewSelect().
+		ColumnExpr("time_bucket_gapfill('1 month', ts) as ts, sum(sum(flow)) OVER(ORDER BY 1) as value").
+		Table(storage.ViewStakingByMonth).
+		Where("ts >= '2023-10-01T00:00:00Z'").
+		Where("ts <= NOW()").
+		GroupExpr("1")
 
 	query := s.db.DB().NewSelect().
 		With("data", dataQuery).
+		With("summary", summaryQuery).
 		Table("data").
-		ColumnExpr("data.ts, data.value, validator.moniker").
-		Join("left join validator on validator_id = validator.id").
+		ColumnExpr("data.month as ts, data.value, validator.moniker").
+		ColumnExpr("(case when summary.value > 0 then data.value / summary.value else 0 end) as percent").
+		Join("left join validator on data.validator_id = validator.id").
+		Join("left join summary on summary.ts = data.month").
 		OrderExpr("ts asc, value desc")
 
 	if !req.From.IsZero() {
