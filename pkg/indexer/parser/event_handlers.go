@@ -260,7 +260,7 @@ func parseCreateIgp(ctx *context.Context, data map[string]any) error {
 			Address: igp.Owner,
 		},
 	}
-	ctx.AddIgp(newIgp)
+	ctx.AddIgp(igp.IgpId, &newIgp)
 
 	return nil
 }
@@ -290,6 +290,34 @@ func parseSetDestinationGasConfig(ctx *context.Context, data map[string]any) err
 		TokenExchangeRate: igp.TokenExchangeRate,
 	}
 	ctx.AddIgpConfig(newIgpConfig)
+
+	return nil
+}
+
+func parseSetIgp(ctx *context.Context, data map[string]any) error {
+	igp, err := decode.NewHyperlaneSetIgpEvent(data)
+	if err != nil {
+		return err
+	}
+
+	if igp.IgpId == "" {
+		return nil
+	}
+
+	igpId, err := util.DecodeHexAddress(igp.IgpId)
+	if err != nil {
+		return errors.Wrap(err, "decode igp id")
+	}
+
+	newIgp := storage.HLIGP{
+		Height: ctx.Block.Height,
+		Time:   ctx.Block.Time,
+		IgpId:  igpId.Bytes(),
+		Owner: &storage.Address{
+			Address: igp.NewOwner,
+		},
+	}
+	ctx.AddIgp(igp.IgpId, &newIgp)
 
 	return nil
 }

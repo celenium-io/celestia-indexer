@@ -5,7 +5,6 @@ package context
 
 import (
 	"fmt"
-
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
@@ -21,13 +20,13 @@ type Context struct {
 	Jails       *sync.Map[string, *storage.Jail]
 	Proposals   *sync.Map[uint64, *storage.Proposal]
 	Constants   *sync.Map[string, *storage.Constant]
+	Igps        *sync.Map[string, *storage.HLIGP]
 
 	Redelegations   []storage.Redelegation
 	Undelegations   []storage.Undelegation
 	CancelUnbonding []storage.Undelegation
 	StakingLogs     []storage.StakingLog
 	Votes           []*storage.Vote
-	Igps            []storage.HLIGP
 	IgpConfigs      []storage.HLIGPConfig
 
 	Block *storage.Block
@@ -41,12 +40,12 @@ func NewContext() *Context {
 		Jails:           sync.NewMap[string, *storage.Jail](),
 		Proposals:       sync.NewMap[uint64, *storage.Proposal](),
 		Constants:       sync.NewMap[string, *storage.Constant](),
+		Igps:            sync.NewMap[string, *storage.HLIGP](),
 		Redelegations:   make([]storage.Redelegation, 0),
 		Undelegations:   make([]storage.Undelegation, 0),
 		CancelUnbonding: make([]storage.Undelegation, 0),
 		StakingLogs:     make([]storage.StakingLog, 0),
 		Votes:           make([]*storage.Vote, 0),
-		Igps:            make([]storage.HLIGP, 0),
 		IgpConfigs:      make([]storage.HLIGPConfig, 0),
 	}
 }
@@ -238,15 +237,21 @@ func (ctx *Context) AddConstant(module types.ModuleName, name, value string) {
 	})
 }
 
-func (ctx *Context) AddIgp(igp storage.HLIGP) {
-	ctx.Igps = append(ctx.Igps, storage.HLIGP{
-		Time:    igp.Time,
-		Height:  igp.Height,
-		IgpId:   igp.IgpId,
-		OwnerId: igp.OwnerId,
-		Denom:   igp.Denom,
-		Owner:   igp.Owner,
+func (ctx *Context) GetIgps() []*storage.HLIGP {
+	igps := make([]*storage.HLIGP, 0)
+	_ = ctx.Igps.Range(func(_ string, value *storage.HLIGP) (error, bool) {
+		igps = append(igps, value)
+		return nil, false
 	})
+	return igps
+}
+
+func (ctx *Context) AddIgp(igpId string, igp *storage.HLIGP) {
+	if val, ok := ctx.Igps.Get(igpId); ok {
+		val.Owner = igp.Owner
+	} else {
+		ctx.Igps.Set(igpId, igp)
+	}
 }
 
 func (ctx *Context) AddIgpConfig(igp storage.HLIGPConfig) {

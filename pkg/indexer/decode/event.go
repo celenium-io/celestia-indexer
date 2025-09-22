@@ -824,3 +824,30 @@ func NewHyperlaneGasPaymentEvent(m map[string]any) (hgpe HyperlaneGasPaymentEven
 
 	return
 }
+
+type HyperlaneSetIgpEvent struct {
+	IgpId             string
+	Owner             string
+	NewOwner          string
+	RenounceOwnership bool
+}
+
+func NewHyperlaneSetIgpEvent(m map[string]any) (hsie HyperlaneSetIgpEvent, err error) {
+	hsie.IgpId, err = parseUnquoteOptional(decoder.StringFromMap(m, "igp_id"))
+	if err != nil {
+		return hsie, errors.Wrap(err, "igp_id")
+	}
+	hsie.Owner, err = parseUnquoteOptional(decoder.StringFromMap(m, "owner"))
+	if err != nil {
+		return hsie, errors.Wrap(err, "owner")
+	}
+	hsie.NewOwner, err = parseUnquoteOptional(decoder.StringFromMap(m, "new_owner"))
+	if err != nil {
+		return hsie, errors.Wrap(err, "new_owner")
+	}
+	hsie.RenounceOwnership, err = decoder.BoolFromMap(m, "renounce_ownership")
+	if err != nil {
+		return hsie, errors.Wrap(err, "renounce_ownership")
+	}
+	return
+}

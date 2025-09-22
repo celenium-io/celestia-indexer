@@ -7,25 +7,24 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/pkg/errors"
 )
 
-func (module *Module) saveIgp(
+func (module *Module) saveIgps(
 	ctx context.Context,
 	tx storage.Transaction,
-	dCtx *decodeContext.Context,
+	igps []*storage.HLIGP,
 	addrToId map[string]uint64,
 ) error {
-	for i := range dCtx.Igps {
-		addressId, ok := addrToId[dCtx.Igps[i].Owner.Address]
+	for i := range igps {
+		addressId, ok := addrToId[igps[i].Owner.Address]
 		if !ok {
-			return errors.Wrapf(errCantFindAddress, "owner address %s", dCtx.Igps[i].Owner.Address)
+			return errors.Wrapf(errCantFindAddress, "owner address %s", igps[i].Owner.Address)
 		}
-		dCtx.Igps[i].OwnerId = addressId
+		igps[i].OwnerId = addressId
 	}
 
-	if err := tx.SaveIgps(ctx, dCtx.Igps...); err != nil {
+	if err := tx.SaveIgps(ctx, igps...); err != nil {
 		return err
 	}
 

@@ -359,7 +359,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	if err := module.saveIgp(ctx, tx, dCtx, addrToId); err != nil {
+	if err := module.saveIgps(ctx, tx, dCtx.GetIgps(), addrToId); err != nil {
 		return state, err
 	}
 

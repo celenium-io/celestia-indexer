@@ -89,7 +89,7 @@ func Test_parseCreateIgp(t *testing.T) {
 	tests := []struct {
 		name    string
 		data    map[string]any
-		want    storage.HLIGP
+		want    *storage.HLIGP
 		wantErr bool
 	}{
 		{
@@ -99,7 +99,7 @@ func Test_parseCreateIgp(t *testing.T) {
 				"igp_id": "\"0x726f757465725f706f73745f6469737061746368000000040000000000000001\"",
 				"owner":  testAddress,
 			},
-			want: storage.HLIGP{
+			want: &storage.HLIGP{
 				Height: pkgTypes.Level(1488),
 				Time:   testBlock.Time,
 				Owner: &storage.Address{
@@ -114,10 +114,11 @@ func Test_parseCreateIgp(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := parseCreateIgp(ctx, tt.data)
 			require.True(t, (err == nil) != tt.wantErr)
-			require.EqualValues(t, 1, len(ctx.Igps))
-			for _, v := range ctx.Igps {
-				require.Equal(t, tt.want, v)
-			}
+			require.EqualValues(t, 1, ctx.Igps.Len())
+			_ = ctx.Igps.Range(func(_ string, value *storage.HLIGP) (error, bool) {
+				require.Equal(t, tt.want, value)
+				return nil, false
+			})
 		})
 	}
 }
@@ -161,6 +162,47 @@ func Test_parseSetDestinationGasConfig(t *testing.T) {
 			for _, v := range ctx.IgpConfigs {
 				require.Equal(t, tt.want, v)
 			}
+		})
+	}
+}
+
+func Test_parseSetIgp(t *testing.T) {
+	ctx := context.NewContext()
+	ctx.Block = &testBlock
+
+	tests := []struct {
+		name    string
+		data    map[string]any
+		want    *storage.HLIGP
+		wantErr bool
+	}{
+		{
+			name: "test 1",
+			data: map[string]any{
+				"igp_id":             "\"0x726f757465725f706f73745f6469737061746368000000040000000000000001\"",
+				"owner":              testAddress,
+				"new_owner":          "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w61",
+				"renounce_ownership": "false",
+			},
+			want: &storage.HLIGP{
+				Height: pkgTypes.Level(1488),
+				Time:   testBlock.Time,
+				Owner: &storage.Address{
+					Address: "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w61",
+				},
+				IgpId: testIgpId,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := parseSetIgp(ctx, tt.data)
+			require.True(t, (err == nil) != tt.wantErr)
+			require.EqualValues(t, 1, ctx.Igps.Len())
+			_ = ctx.Igps.Range(func(_ string, value *storage.HLIGP) (error, bool) {
+				require.Equal(t, tt.want, value)
+				return nil, false
+			})
 		})
 	}
 }

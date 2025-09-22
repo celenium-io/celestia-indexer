@@ -317,12 +317,18 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 	return err
 }
 
-func (tx Transaction) SaveIgps(ctx context.Context, igps ...models.HLIGP) error {
+func (tx Transaction) SaveIgps(ctx context.Context, igps ...*models.HLIGP) error {
 	if len(igps) == 0 {
 		return nil
 	}
 
-	_, err := tx.Tx().NewInsert().Model(&igps).Exec(ctx)
+	_, err := tx.Tx().NewInsert().Model(&igps).
+		Column("id", "height", "time", "igp_id", "owner_id", "denom").
+		On("CONFLICT (igp_id) DO UPDATE").
+		Set("height = EXCLUDED.height").
+		Set("time = EXCLUDED.time").
+		Set("owner_id = EXCLUDED.owner_id").
+		Exec(ctx)
 	return err
 }
 

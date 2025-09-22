@@ -18,12 +18,12 @@ type IHLIGP interface {
 type HLIGP struct {
 	bun.BaseModel `bun:"hl_igp" comment:"Table with hyperlane interchain gas paymaster (IGP)"`
 
-	Id      uint64         `bun:"id,pk,autoincrement" comment:"Internal identity"`
-	Height  pkgTypes.Level `bun:"height,notnull"      comment:"The number (height) of this block"`
-	Time    time.Time      `bun:"time,pk,notnull"     comment:"The time of block"`
-	IgpId   []byte         `bun:"igp_id"              comment:"IGP id"`
-	OwnerId uint64         `bun:"owner_id"            comment:"Owner identity"`
-	Denom   string         `bun:"denom"               comment:"Denom"`
+	Id      uint64         `bun:"id,pk,autoincrement"      comment:"Internal identity"`
+	Height  pkgTypes.Level `bun:"height,notnull"           comment:"The number (height) of this block"`
+	Time    time.Time      `bun:"time,pk,notnull"          comment:"The time of block"`
+	IgpId   []byte         `bun:"igp_id,type:bytea,unique" comment:"IGP id"`
+	OwnerId uint64         `bun:"owner_id"                 comment:"Owner identity"`
+	Denom   string         `bun:"denom"                    comment:"Denom"`
 
 	Owner *Address `bun:"rel:belongs-to,join:owner_id=id"`
 }
