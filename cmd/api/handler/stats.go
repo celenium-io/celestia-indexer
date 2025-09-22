@@ -407,7 +407,7 @@ type stakingDistributionRequest struct {
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
 //	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
 //	@Produce		json
-//	@Success		200	{object}	StakingDistribution
+//	@Success		200	{object}	responses.StakingDistribution
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/stats/staking/distribution [get]
