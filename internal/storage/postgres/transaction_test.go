@@ -402,7 +402,7 @@ func (s *TransactionTestSuite) TestSaveVotesValidatorIdDuplicate() {
 	var vote = &storage.Vote{
 		Option:      types.VoteOptionYes,
 		ProposalId:  2,
-		ValidatorId: 1,
+		ValidatorId: testsuite.Ptr(uint64(1)),
 		Height:      1001,
 		Time:        time.Now(),
 		Weight:      decimal.RequireFromString("1.0"),
@@ -420,9 +420,11 @@ func (s *TransactionTestSuite) TestSaveVotesValidatorIdDuplicate() {
 
 	var count int
 	for i := range items {
-		if items[i].ValidatorId == vote.ValidatorId && items[i].ProposalId == vote.ProposalId {
-			s.Require().Equal(vote.Option, items[i].Option)
-			count++
+		if items[i].ProposalId == vote.ProposalId {
+			if items[i].ValidatorId != nil && vote.ValidatorId != nil && *items[i].ValidatorId == *vote.ValidatorId {
+				s.Require().Equal(vote.Option, items[i].Option)
+				count++
+			}
 		}
 	}
 	s.Require().EqualValues(1, count)

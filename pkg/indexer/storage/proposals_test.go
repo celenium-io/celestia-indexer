@@ -11,6 +11,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
@@ -206,7 +207,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 		tx.EXPECT().
 			ProposalVotes(t.Context(), uint64(1), 1000, 0).
 			Return([]storage.Vote{{
-				ValidatorId: 1,
+				ValidatorId: testsuite.Ptr(uint64(1)),
 				VoterId:     3,
 				Option:      types.VoteOptionAbstain,
 			}, {

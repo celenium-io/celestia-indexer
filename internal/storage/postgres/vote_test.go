@@ -104,7 +104,8 @@ func (s *StorageTestSuite) TestVoteByProposalIdWithValidator() {
 	vote := votes[0]
 	s.Require().EqualValues(3, vote.Id)
 	s.Require().EqualValues(1000, vote.Height)
-	s.Require().EqualValues(1, vote.ValidatorId)
+	s.Require().NotNil(vote.ValidatorId)
+	s.Require().EqualValues(1, *vote.ValidatorId)
 	s.Require().NotNil(vote.Validator)
 	s.Require().EqualValues("Conqueror", vote.Validator.Moniker)
 	s.Require().EqualValues("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", vote.Validator.ConsAddress)

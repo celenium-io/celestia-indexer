@@ -159,7 +159,7 @@ func (s *ProposalTestSuite) TestVotes() {
 				Height:      66666,
 				Weight:      decimal.NewFromFloat(1),
 				Option:      types.VoteOptionYes,
-				ValidatorId: 1,
+				ValidatorId: testsuite.Ptr(uint64(1)),
 				Validator:   &testValidator,
 			},
 			{
@@ -167,7 +167,7 @@ func (s *ProposalTestSuite) TestVotes() {
 				Height:      66666,
 				Weight:      decimal.NewFromFloat(1),
 				Option:      types.VoteOptionYes,
-				ValidatorId: 0,
+				ValidatorId: nil,
 				Voter: &storage.Address{
 					Id:         111,
 					Hash:       testHashAddress,
@@ -240,7 +240,7 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithVoter() {
 				Height:      121212,
 				Weight:      decimal.NewFromFloat(123),
 				Option:      types.VoteOptionNo,
-				ValidatorId: 0,
+				ValidatorId: nil,
 				Voter: &storage.Address{
 					Id:         1,
 					Hash:       testHashAddress,
@@ -309,7 +309,7 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithValidator() {
 				Height:      131313,
 				Weight:      decimal.NewFromFloat(1234),
 				Option:      types.VoteOptionYes,
-				ValidatorId: 1,
+				ValidatorId: testsuite.Ptr(uint64(1)),
 				Validator:   &testValidator,
 			},
 		}, nil)
