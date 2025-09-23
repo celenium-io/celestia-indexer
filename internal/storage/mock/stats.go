@@ -395,6 +395,45 @@ func (c *MockIStatsSquareSizeCall) DoAndReturn(f func(context.Context, *time.Tim
 	return c
 }
 
+// StakingDistribution mocks base method.
+func (m *MockIStats) StakingDistribution(ctx context.Context, req storage.SeriesRequest) ([]storage.StakingDistributionItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StakingDistribution", ctx, req)
+	ret0, _ := ret[0].([]storage.StakingDistributionItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StakingDistribution indicates an expected call of StakingDistribution.
+func (mr *MockIStatsMockRecorder) StakingDistribution(ctx, req any) *MockIStatsStakingDistributionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StakingDistribution", reflect.TypeOf((*MockIStats)(nil).StakingDistribution), ctx, req)
+	return &MockIStatsStakingDistributionCall{Call: call}
+}
+
+// MockIStatsStakingDistributionCall wrap *gomock.Call
+type MockIStatsStakingDistributionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIStatsStakingDistributionCall) Return(arg0 []storage.StakingDistributionItem, arg1 error) *MockIStatsStakingDistributionCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIStatsStakingDistributionCall) Do(f func(context.Context, storage.SeriesRequest) ([]storage.StakingDistributionItem, error)) *MockIStatsStakingDistributionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIStatsStakingDistributionCall) DoAndReturn(f func(context.Context, storage.SeriesRequest) ([]storage.StakingDistributionItem, error)) *MockIStatsStakingDistributionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // StakingSeries mocks base method.
 func (m *MockIStats) StakingSeries(ctx context.Context, timeframe storage.Timeframe, name string, validatorId uint64, req storage.SeriesRequest) ([]storage.SeriesItem, error) {
 	m.ctrl.T.Helper()

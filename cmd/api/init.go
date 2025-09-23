@@ -443,6 +443,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		staking := stats.Group("/staking")
 		{
 			staking.GET("/series/:id/:name/:timeframe", statsHandler.StakingSeries, statsMiddlewareCache)
+			staking.GET("/distribution", statsHandler.StakingDistribution, statsMiddlewareCache)
 		}
 		ibc := stats.Group("/ibc")
 		{

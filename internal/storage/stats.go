@@ -9,6 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/stats"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 )
 
 type CountRequest struct {
@@ -182,6 +183,13 @@ type SizeGroup struct {
 	MinVal  int64  `bun:"min_val"`
 }
 
+type StakingDistributionItem struct {
+	Moniker string          `bun:"moniker"`
+	Value   decimal.Decimal `bun:"value"`
+	Percent decimal.Decimal `bun:"percent"`
+	Time    time.Time       `bun:"ts"`
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IStats interface {
 	Count(ctx context.Context, req CountRequest) (string, error)
@@ -191,6 +199,7 @@ type IStats interface {
 	CumulativeSeries(ctx context.Context, timeframe Timeframe, name string, req SeriesRequest) ([]SeriesItem, error)
 	NamespaceSeries(ctx context.Context, timeframe Timeframe, name string, nsId uint64, req SeriesRequest) (response []SeriesItem, err error)
 	StakingSeries(ctx context.Context, timeframe Timeframe, name string, validatorId uint64, req SeriesRequest) (response []SeriesItem, err error)
+	StakingDistribution(ctx context.Context, req SeriesRequest) ([]StakingDistributionItem, error)
 	RollupStats24h(ctx context.Context) ([]RollupStats24h, error)
 	SquareSize(ctx context.Context, from, to *time.Time) (map[int][]SeriesItem, error)
 	Change24hBlockStats(ctx context.Context) (response Change24hBlockStats, err error)

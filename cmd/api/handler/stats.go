@@ -393,6 +393,41 @@ func (sh StatsHandler) StakingSeries(c echo.Context) error {
 	return returnArray(c, response)
 }
 
+type stakingDistributionRequest struct {
+	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1"`
+	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`
+}
+
+// StakingSeries godoc
+//
+//	@Summary		Get histogram for staking
+//	@Description	Get histogram for staking
+//	@Tags			stats
+//	@ID				stats-staking-distribution
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Produce		json
+//	@Success		200	{object}	responses.StakingDistribution
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/stats/staking/distribution [get]
+func (sh StatsHandler) StakingDistribution(c echo.Context) error {
+	req, err := bindAndValidate[stakingDistributionRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	items, err := sh.repo.StakingDistribution(
+		c.Request().Context(),
+		storage.NewSeriesRequest(req.From, req.To),
+	)
+	if err != nil {
+		return handleError(c, err, sh.nsRepo)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewStakingDistribution(items))
+}
+
 type ibcSeriesRequest struct {
 	Id         string            `example:"channel-1"  param:"id"        swaggertype:"string"  validate:"required"`
 	Timeframe  storage.Timeframe `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day month"`

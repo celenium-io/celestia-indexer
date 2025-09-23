@@ -5956,6 +5956,53 @@
                 }
             }
         },
+        "/stats/staking/distribution": {
+            "get": {
+                "description": "Get histogram for staking",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "Get histogram for staking",
+                "operationId": "stats-staking-distribution",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Time from in unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Time to in unix timestamp",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StakingDistribution"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/staking/series/{id}/{name}/{timeframe}": {
             "get": {
                 "description": "Get histogram for staking with precomputed stats by series name and timeframe",
@@ -10218,6 +10265,35 @@
                 "type": "array",
                 "items": {
                     "$ref": "#/definitions/responses.TimeValueItem"
+                }
+            }
+        },
+        "responses.StakingDistribution": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/responses.StakingDistributionItem"
+                }
+            }
+        },
+        "responses.StakingDistributionItem": {
+            "type": "object",
+            "properties": {
+                "percent": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.17632"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "value": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0.17632"
                 }
             }
         },
