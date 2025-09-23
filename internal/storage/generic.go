@@ -164,6 +164,8 @@ type Transaction interface {
 	RollbackHyperlaneTransfers(ctx context.Context, height types.Level) error
 	RollbackSignals(ctx context.Context, height types.Level) error
 	RollbackUpgrades(ctx context.Context, height types.Level) error
+	RollbackHyperlaneIgps(ctx context.Context, height types.Level) error
+	RollbackHyperlaneIgpConfigs(ctx context.Context, height types.Level) error
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	DeleteProviders(ctx context.Context, rollupId uint64) error
 	DeleteRollup(ctx context.Context, rollupId uint64) error

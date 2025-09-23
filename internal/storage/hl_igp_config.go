@@ -4,6 +4,7 @@
 package storage
 
 import (
+	"context"
 	"encoding/hex"
 	"time"
 
@@ -13,7 +14,9 @@ import (
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
-type IHLIGPConfig interface{}
+type IHLIGPConfig interface {
+	List(ctx context.Context, limit, offset int) ([]HLIGPConfig, error)
+}
 
 type HLIGPConfig struct {
 	bun.BaseModel `bun:"hl_igp_config" comment:"Table with hyperlane interchain gas paymaster (IGP) config"`

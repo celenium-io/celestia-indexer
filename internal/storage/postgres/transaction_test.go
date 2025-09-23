@@ -747,6 +747,42 @@ func (s *TransactionTestSuite) TestRollbackVotes() {
 	s.Require().Len(items, 0)
 }
 
+func (s *TransactionTestSuite) TestRollbackHyperlaneIgps() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackHyperlaneIgps(ctx, 1489)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.HLIGP.List(ctx, 10, 0)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+}
+
+func (s *TransactionTestSuite) TestRollbackHyperlaneIgpConfigs() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackHyperlaneIgpConfigs(ctx, 1488)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.HLIGPConfig.List(ctx, 10, 0)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
+}
+
 func (s *TransactionTestSuite) TestDeleteBalances() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

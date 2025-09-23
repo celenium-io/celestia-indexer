@@ -1916,6 +1916,82 @@ func (c *MockTransactionRollbackGrantsCall) DoAndReturn(f func(context.Context, 
 	return c
 }
 
+// RollbackHyperlaneIgpConfigs mocks base method.
+func (m *MockTransaction) RollbackHyperlaneIgpConfigs(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackHyperlaneIgpConfigs", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackHyperlaneIgpConfigs indicates an expected call of RollbackHyperlaneIgpConfigs.
+func (mr *MockTransactionMockRecorder) RollbackHyperlaneIgpConfigs(ctx, height any) *MockTransactionRollbackHyperlaneIgpConfigsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackHyperlaneIgpConfigs", reflect.TypeOf((*MockTransaction)(nil).RollbackHyperlaneIgpConfigs), ctx, height)
+	return &MockTransactionRollbackHyperlaneIgpConfigsCall{Call: call}
+}
+
+// MockTransactionRollbackHyperlaneIgpConfigsCall wrap *gomock.Call
+type MockTransactionRollbackHyperlaneIgpConfigsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackHyperlaneIgpConfigsCall) Return(arg0 error) *MockTransactionRollbackHyperlaneIgpConfigsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackHyperlaneIgpConfigsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneIgpConfigsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackHyperlaneIgpConfigsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneIgpConfigsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackHyperlaneIgps mocks base method.
+func (m *MockTransaction) RollbackHyperlaneIgps(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackHyperlaneIgps", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackHyperlaneIgps indicates an expected call of RollbackHyperlaneIgps.
+func (mr *MockTransactionMockRecorder) RollbackHyperlaneIgps(ctx, height any) *MockTransactionRollbackHyperlaneIgpsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackHyperlaneIgps", reflect.TypeOf((*MockTransaction)(nil).RollbackHyperlaneIgps), ctx, height)
+	return &MockTransactionRollbackHyperlaneIgpsCall{Call: call}
+}
+
+// MockTransactionRollbackHyperlaneIgpsCall wrap *gomock.Call
+type MockTransactionRollbackHyperlaneIgpsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackHyperlaneIgpsCall) Return(arg0 error) *MockTransactionRollbackHyperlaneIgpsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackHyperlaneIgpsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneIgpsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackHyperlaneIgpsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneIgpsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // RollbackHyperlaneMailbox mocks base method.
 func (m *MockTransaction) RollbackHyperlaneMailbox(ctx context.Context, height types.Level) error {
 	m.ctrl.T.Helper()

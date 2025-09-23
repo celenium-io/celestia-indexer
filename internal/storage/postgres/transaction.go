@@ -1112,6 +1112,20 @@ func (tx Transaction) RollbackUpgrades(ctx context.Context, height types.Level) 
 	return
 }
 
+func (tx Transaction) RollbackHyperlaneIgps(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.HLIGP)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackHyperlaneIgpConfigs(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.HLIGPConfig)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
 func (tx Transaction) DeleteBalances(ctx context.Context, ids []uint64) error {
 	if len(ids) == 0 {
 		return nil
