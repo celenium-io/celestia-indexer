@@ -1204,7 +1204,7 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 	s.Require().EqualValues("Polychain", second.Moniker)
 	s.Require().NotNil(second.Jailed)
 	s.Require().False(*second.Jailed)
-	s.Require().EqualValues(ct.String(), second.CreationTime.String())
+	s.Require().EqualValues(ct.Format(time.RFC3339), second.CreationTime.Format(time.RFC3339))
 
 	third := entities[2]
 	s.Require().EqualValues("101", third.Commissions.String())
