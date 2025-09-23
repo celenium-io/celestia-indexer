@@ -2263,6 +2263,12 @@
                         "name": "sizes",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated array of share versions. Default is 0",
+                        "name": "versions",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -7597,6 +7603,11 @@
                 "rollup": {
                     "$ref": "#/definitions/responses.ShortRollup"
                 },
+                "share_version": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 0
+                },
                 "signer": {
                     "$ref": "#/definitions/responses.ShortAddress"
                 },
@@ -8882,6 +8893,11 @@
                     "type": "string",
                     "format": "base64",
                     "example": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="
+                },
+                "share_version": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 0
                 },
                 "signer": {
                     "$ref": "#/definitions/responses.ShortAddress"

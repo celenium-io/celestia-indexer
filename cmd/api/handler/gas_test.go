@@ -97,6 +97,68 @@ func (s *GasTestSuite) TestEstimateForPfb() {
 	s.Require().Greater(response, uint64(0))
 }
 
+func (s *GasTestSuite) TestEstimateForPfbWithVersions() {
+	q := make(url.Values)
+	q.Set("sizes", "12,34")
+	q.Set("versions", "0,1")
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/gas/estimate_for_pfb")
+
+	s.constants.EXPECT().
+		Get(gomock.Any(), types.ModuleNameAuth, "tx_size_cost_per_byte").
+		Return(storage.Constant{
+			Module: types.ModuleNameAuth,
+			Name:   "tx_size_cost_per_byte",
+			Value:  "10",
+		}, nil).
+		Times(1)
+
+	s.constants.EXPECT().
+		Get(gomock.Any(), types.ModuleNameBlob, "gas_per_blob_byte").
+		Return(storage.Constant{
+			Module: types.ModuleNameBlob,
+			Name:   "gas_per_blob_byte",
+			Value:  "8",
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.EstimateForPfb(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response uint64
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Greater(response, uint64(0))
+}
+
+func (s *GasTestSuite) TestEstimateForPfbWithInvalidVersion() {
+	q := make(url.Values)
+	q.Set("sizes", "12,34")
+	q.Set("versions", "0,132")
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/gas/estimate_for_pfb")
+
+	s.Require().NoError(s.handler.EstimateForPfb(c))
+	s.Require().Equal(http.StatusBadRequest, rec.Code)
+}
+
+func (s *GasTestSuite) TestEstimateForPfbWithInvalidVersionLen() {
+	q := make(url.Values)
+	q.Set("sizes", "12,34")
+	q.Set("versions", "0")
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/gas/estimate_for_pfb")
+
+	s.Require().NoError(s.handler.EstimateForPfb(c))
+	s.Require().Equal(http.StatusBadRequest, rec.Code)
+}
+
 func (s *GasTestSuite) TestEstimatePrice() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()

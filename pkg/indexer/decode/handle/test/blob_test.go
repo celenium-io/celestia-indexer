@@ -11,7 +11,7 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	appBlobTypes "github.com/celestiaorg/celestia-app/v5/x/blob/types"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v6/x/blob/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"

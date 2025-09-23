@@ -11,7 +11,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	blobtypes "github.com/celestiaorg/celestia-app/v5/x/blob/types"
+	blobtypes "github.com/celestiaorg/celestia-app/v6/x/blob/types"
+	"github.com/celestiaorg/go-square/v3/share"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -42,7 +43,8 @@ func NewGasHandler(
 }
 
 type estimatePfbGas struct {
-	Sizes StringArray `query:"sizes" validate:"required"`
+	Sizes    StringArray `query:"sizes"    validate:"required"`
+	Versions StringArray `query:"versions" validate:"omitempty"`
 }
 
 // EstimateForPfb godoc
@@ -51,7 +53,8 @@ type estimatePfbGas struct {
 //	@Description	Get estimated gas for pay for blob message with certain values of blob sizes
 //	@Tags			gas
 //	@ID				gas-estimate-for-pfb
-//	@Param			sizes	query	string	true	"Comma-separated array of blob sizes"
+//	@Param			sizes	  query	string	true	"Comma-separated array of blob sizes"
+//	 @Param         versions  query string  false   "Comma-separated array of share versions. Default is 0"
 //	@Produce		json
 //	@Success		200	{object}	uint64
 //	@Failure		400	{object}	Error
@@ -73,6 +76,27 @@ func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 		sizes[i] = uint32(size)
 	}
 
+	var versions []uint32
+	if len(req.Versions) > 0 {
+		if len(req.Versions) != len(req.Sizes) {
+			return badRequestError(c, errors.Errorf("len of sizes is not equal to len of versions: %d != %d", len(req.Sizes), len(req.Versions)))
+		}
+		versions = make([]uint32, len(req.Versions))
+		for i := range req.Sizes {
+			v, err := strconv.ParseUint(req.Versions[i], 10, 32)
+			if err != nil {
+				return badRequestError(c, err)
+			}
+			if v > uint64(share.ShareVersionOne) {
+				return badRequestError(c, errors.Errorf("invalid share version: %d", v))
+			}
+			//nolint:gosec
+			versions[i] = uint32(v)
+		}
+	} else {
+		versions = make([]uint32, len(req.Sizes))
+	}
+
 	gasPerBlobByteConst, err := handler.constant.Get(c.Request().Context(), types.ModuleNameBlob, "gas_per_blob_byte")
 	if err != nil {
 		return handleError(c, err, handler.tx)
@@ -85,7 +109,10 @@ func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 	}
 	txSizeCost := txSizeCostConst.MustUint64()
 
-	return c.JSON(http.StatusOK, blobtypes.EstimateGas(sizes, gasPerBlobByte, txSizeCost))
+	return c.JSON(http.StatusOK, blobtypes.EstimateGas(&blobtypes.MsgPayForBlobs{
+		BlobSizes:     sizes,
+		ShareVersions: versions,
+	}, gasPerBlobByte, txSizeCost))
 }
 
 // EstimatePrice godoc
