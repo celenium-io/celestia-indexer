@@ -53,6 +53,8 @@ type Validator struct {
 	Jailed *bool `bun:"jailed" comment:"True if validator was punished" json:"-"`
 
 	MessagesCount uint64 `bun:"messages_count" comment:"Count of validator messages" json:"-"`
+
+	CreationTime time.Time `bun:"creation_time" comment:"Creation time"`
 }
 
 func (Validator) TableName() string {

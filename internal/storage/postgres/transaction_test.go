@@ -1132,6 +1132,7 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
+	ct := time.Now().UTC()
 	validators := []*storage.Validator{
 		{
 			Address:           "celestiavaloper1cj45qyagkujxgdgv8lgjur56zjxtrsy40g3pw3",
@@ -1148,6 +1149,7 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 			Rewards:           decimal.Zero,
 			Height:            1001,
 			Jailed:            testsuite.Ptr(false),
+			CreationTime:      ct,
 		}, {
 			Address:     "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
 			Delegator:   "celestia189ecvq5avj0wehrcfnagpd5sd8pup9aq7j2xd9",
@@ -1202,6 +1204,7 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 	s.Require().EqualValues("Polychain", second.Moniker)
 	s.Require().NotNil(second.Jailed)
 	s.Require().False(*second.Jailed)
+	s.Require().EqualValues(ct.String(), second.CreationTime.String())
 
 	third := entities[2]
 	s.Require().EqualValues("101", third.Commissions.String())

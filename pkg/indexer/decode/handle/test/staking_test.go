@@ -210,13 +210,13 @@ func createMsgCreateValidator() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 	m := createMsgCreateValidator()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
@@ -226,8 +226,8 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 			Type: storageTypes.MsgAddressTypeValidator,
 			Address: storage.Address{
 				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
+				Height:     block.Height,
+				LastHeight: block.Height,
 				Address:    "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 				Hash:       []byte{0x4a, 0xb, 0xf8, 0x99, 0x89, 0xe7, 0xa, 0xe3, 0xf, 0x3b, 0x62, 0x94, 0xa2, 0x97, 0x5a, 0x17, 0x5c, 0x48, 0x22, 0xa3},
 				Balance:    storage.EmptyBalance(),
@@ -246,9 +246,10 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 			MaxChangeRate:     decimal.Zero,
 			Stake:             decimal.RequireFromString("1"),
 			MinSelfDelegation: decimal.RequireFromString("1"),
-			Height:            blob.Height,
+			Height:            block.Height,
 			Jailed:            testsuite.Ptr(false),
 			MessagesCount:     1,
+			CreationTime:      block.Block.Time,
 		},
 	}
 
@@ -259,7 +260,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 	}
 	msgExpected := storage.Message{
 		Id:         0,
-		Height:     blob.Height,
+		Height:     block.Height,
 		Time:       now,
 		Position:   0,
 		Type:       storageTypes.MsgCreateValidator,
