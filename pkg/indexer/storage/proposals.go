@@ -36,12 +36,12 @@ func (module *Module) saveProposals(
 				votes[i].VoterId = voterId
 
 				if validatorId, ok := module.validatorsByDelegator[votes[i].Voter.Address]; ok {
-					votes[i].ValidatorId = validatorId
+					votes[i].ValidatorId = &validatorId
 				}
 
 				for j := range proposals {
 					if proposals[j].Id == votes[i].ProposalId {
-						if votes[i].ValidatorId > 0 {
+						if votes[i].ValidatorId != nil {
 							switch votes[i].Option {
 							case types.VoteOptionAbstain:
 								proposals[j].AbstainValidators += 1
@@ -275,8 +275,8 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 					}
 				}
 
-				if votes[i].ValidatorId > 0 {
-					votedValidators[votes[i].ValidatorId] = votes[i].Option
+				if votes[i].ValidatorId != nil {
+					votedValidators[*votes[i].ValidatorId] = votes[i].Option
 				}
 			}
 		}

@@ -15,6 +15,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/labstack/echo/v4"
 	"github.com/shopspring/decimal"
@@ -356,7 +357,7 @@ func (s *ValidatorTestSuite) TestVotes() {
 				Height:      1000,
 				Weight:      decimal.NewFromFloat(1),
 				Option:      storageTypes.VoteOptionNoWithVeto,
-				ValidatorId: 1,
+				ValidatorId: testsuite.Ptr(uint64(1)),
 				Validator:   &testValidator,
 			},
 		}, nil)

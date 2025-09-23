@@ -33,7 +33,7 @@ type Vote struct {
 	Weight      decimal.Decimal  `bun:"weight,type:numeric"     comment:"Vote's weight"`
 	VoterId     uint64           `bun:"voter_id"                comment:"Voter internal identity"`
 	ProposalId  uint64           `bun:"proposal_id"             comment:"Proposal id"`
-	ValidatorId uint64           `bun:"validator_id"            comment:"Validator id"`
+	ValidatorId *uint64          `bun:"validator_id"            comment:"Validator id"`
 
 	Voter     *Address   `bun:"rel:belongs-to,join:voter_id=id"`
 	Proposal  *Proposal  `bun:"rel:belongs-to,join:proposal_id=id"`

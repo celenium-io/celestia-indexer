@@ -582,8 +582,8 @@ func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) erro
 		if votes[i].VoterId > 0 {
 			query.Where("voter_id = ?", votes[i].VoterId)
 		}
-		if votes[i].ValidatorId > 0 {
-			query.Where("validator_id = ?", votes[i].ValidatorId)
+		if votes[i].ValidatorId != nil {
+			query.Where("validator_id = ?", *votes[i].ValidatorId)
 		}
 		if err := query.Scan(ctx); err != nil && !errors.Is(err, sql.ErrNoRows) {
 			return errors.Wrap(err, "receive existing votes")
