@@ -36,6 +36,8 @@ type Validator struct {
 
 	MessagesCount uint64 `example:"1" json:"messages_count" swaggertype:"integer"`
 
+	CreationTime time.Time `example:"2025-07-04T03:10:57+00:00" format:"date-time" json:"creation_time" swaggertype:"string"`
+
 	Address   *ShortAddress `json:"address"`
 	Delegator *ShortAddress `json:"delegator"`
 }
@@ -73,6 +75,7 @@ func NewValidator(val storage.Validator) *Validator {
 		Jailed:            jailed,
 		VotingPower:       val.Stake.Div(decimal.NewFromInt(1_000_000)).Floor().String(),
 		MessagesCount:     val.MessagesCount,
+		CreationTime:      val.CreationTime,
 	}
 }
 

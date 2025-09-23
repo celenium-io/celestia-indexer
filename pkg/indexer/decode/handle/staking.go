@@ -69,6 +69,7 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 		Stake:             decimal.Zero,
 		Jailed:            &jailed,
 		MessagesCount:     1,
+		CreationTime:      ctx.Block.Time,
 	}
 
 	if !m.Value.IsNil() {
