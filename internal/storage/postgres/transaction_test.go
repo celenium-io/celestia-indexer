@@ -1853,14 +1853,14 @@ func (s *TransactionTestSuite) TestMsgValidator() {
 	s.Require().NoError(tx2.Close(ctx))
 }
 
-func (s *TransactionTestSuite) TestSaveIgp() {
+func (s *TransactionTestSuite) TestSaveHyperlaneIgps() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx.SaveIgps(ctx,
+	err = tx.SaveHyperlaneIgps(ctx,
 		&storage.HLIGP{
 			Id:      1,
 			Height:  1488,
@@ -1905,7 +1905,7 @@ func (s *TransactionTestSuite) TestSaveIgpConfig() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx.SaveIgpConfigs(ctx,
+	err = tx.SaveHyperlaneIgpConfigs(ctx,
 		storage.HLIGPConfig{
 			Id:                1,
 			Height:            1111,

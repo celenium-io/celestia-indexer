@@ -317,7 +317,7 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 	return err
 }
 
-func (tx Transaction) SaveIgps(ctx context.Context, igps ...*models.HLIGP) error {
+func (tx Transaction) SaveHyperlaneIgps(ctx context.Context, igps ...*models.HLIGP) error {
 	if len(igps) == 0 {
 		return nil
 	}
@@ -332,7 +332,7 @@ func (tx Transaction) SaveIgps(ctx context.Context, igps ...*models.HLIGP) error
 	return err
 }
 
-func (tx Transaction) SaveIgpConfigs(ctx context.Context, configs ...models.HLIGPConfig) error {
+func (tx Transaction) SaveHyperlaneIgpConfigs(ctx context.Context, configs ...models.HLIGPConfig) error {
 	if len(configs) == 0 {
 		return nil
 	}

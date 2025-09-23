@@ -24,7 +24,7 @@ func (module *Module) saveIgps(
 		igps[i].OwnerId = addressId
 	}
 
-	if err := tx.SaveIgps(ctx, igps...); err != nil {
+	if err := tx.SaveHyperlaneIgps(ctx, igps...); err != nil {
 		return err
 	}
 

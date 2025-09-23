@@ -363,7 +363,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	if err := tx.SaveIgpConfigs(ctx, dCtx.IgpConfigs...); err != nil {
+	if err := tx.SaveHyperlaneIgpConfigs(ctx, dCtx.IgpConfigs...); err != nil {
 		return state, err
 	}
 	

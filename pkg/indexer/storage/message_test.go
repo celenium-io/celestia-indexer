@@ -444,7 +444,17 @@ func Test_saveMessages(t *testing.T) {
 
 		tx.EXPECT().
 			SaveHyperlaneTransfers(gomock.Any(), gomock.Any()).
-			Times(1).
+			MaxTimes(1).
+			Return(nil)
+
+		tx.EXPECT().
+			SaveHyperlaneIgps(gomock.Any(), gomock.Any()).
+			MaxTimes(1).
+			Return(nil)
+
+		tx.EXPECT().
+			SaveHyperlaneIgpConfigs(gomock.Any(), gomock.Any()).
+			MaxTimes(1).
 			Return(nil)
 
 		tx.EXPECT().

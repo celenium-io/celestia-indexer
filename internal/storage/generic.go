@@ -128,8 +128,8 @@ type Transaction interface {
 	SaveSignals(ctx context.Context, signals ...*SignalVersion) error
 	SaveUpgrades(ctx context.Context, signals ...*Upgrade) error
 	UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) error
-	SaveIgps(ctx context.Context, igps ...*HLIGP) error
-	SaveIgpConfigs(ctx context.Context, configs ...HLIGPConfig) error
+	SaveHyperlaneIgps(ctx context.Context, igps ...*HLIGP) error
+	SaveHyperlaneIgpConfigs(ctx context.Context, configs ...HLIGPConfig) error
 	SaveHyperlaneGasPayments(ctx context.Context, payments ...*HLGasPayment) error
 
 	RollbackBlock(ctx context.Context, height types.Level) error
