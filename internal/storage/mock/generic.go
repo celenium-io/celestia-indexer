@@ -3607,7 +3607,7 @@ func (c *MockTransactionSaveIgpConfigsCall) DoAndReturn(f func(context.Context, 
 }
 
 // SaveIgps mocks base method.
-func (m *MockTransaction) SaveIgps(ctx context.Context, igps ...storage.HLIGP) error {
+func (m *MockTransaction) SaveIgps(ctx context.Context, igps ...*storage.HLIGP) error {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
 	for _, a := range igps {
@@ -3638,13 +3638,13 @@ func (c *MockTransactionSaveIgpsCall) Return(arg0 error) *MockTransactionSaveIgp
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionSaveIgpsCall) Do(f func(context.Context, ...storage.HLIGP) error) *MockTransactionSaveIgpsCall {
+func (c *MockTransactionSaveIgpsCall) Do(f func(context.Context, ...*storage.HLIGP) error) *MockTransactionSaveIgpsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionSaveIgpsCall) DoAndReturn(f func(context.Context, ...storage.HLIGP) error) *MockTransactionSaveIgpsCall {
+func (c *MockTransactionSaveIgpsCall) DoAndReturn(f func(context.Context, ...*storage.HLIGP) error) *MockTransactionSaveIgpsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -516,7 +516,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		ibc.GET("/relayers", ibcHandler.IbcRelayers)
 	}
 
-	hyperlaneHandler := handler.NewHyperlaneHandler(db.HLMailbox, db.HLToken, db.HLTransfer, db.Tx, db.Address, chainStore)
+	hyperlaneHandler := handler.NewHyperlaneHandler(db.HLMailbox, db.HLToken, db.HLTransfer, db.Tx, db.Address, db.HLIGP, chainStore)
 	hyperlane := v1.Group("/hyperlane")
 	{
 		hlMailbox := hyperlane.Group("/mailbox")
@@ -533,6 +533,11 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		{
 			hyperlaneTransfer.GET("", hyperlaneHandler.ListTransfers)
 			hyperlaneTransfer.GET("/:id", hyperlaneHandler.GetTransfer)
+		}
+		hlIgp := hyperlane.Group("/igp")
+		{
+			hlIgp.GET("", hyperlaneHandler.ListIgps)
+			hlIgp.GET("/:id", hyperlaneHandler.GetIgp)
 		}
 		hyperlane.GET("/domains", hyperlaneHandler.ListDomains, defaultMiddlewareCache)
 	}

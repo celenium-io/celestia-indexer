@@ -252,3 +252,57 @@ func NewHlDomainStats(stats storage.DomainStats, store hyperlane.IChainStore) Hl
 
 	return result
 }
+
+type HyperlaneIgp struct {
+	Id     uint64         `example:"321"                                                              format:"int64"     json:"id"                 swaggertype:"integer"`
+	Height pkgTypes.Level `example:"1488"                                                              format:"int64"     json:"height"             swaggertype:"integer"`
+	Time   time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"               swaggertype:"string"`
+	Denom  string         `example:"utia"                                                             format:"string"    json:"denom"              swaggertype:"string"`
+	IgpId  string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"igp_id"           swaggertype:"string"`
+
+	Owner  *ShortAddress       `json:"owner,omitempty"`
+	Config *HyperlaneIgpConfig `json:"config,omitempty"`
+}
+
+func NewHyperlaneIgp(igp storage.HLIGP) HyperlaneIgp {
+	result := HyperlaneIgp{
+		Id:     igp.Id,
+		Height: igp.Height,
+		Time:   igp.Time,
+		Denom:  igp.Denom,
+		IgpId:  hex.EncodeToString(igp.IgpId),
+		Owner:  NewShortAddress(igp.Owner),
+	}
+
+	if igp.Config != nil {
+		result.Config = NewHyperlaneIgpConfig(igp.Config)
+	}
+
+	return result
+}
+
+type HyperlaneIgpConfig struct {
+	Id                uint64         `example:"321"                                                              format:"int64"     json:"id"                 swaggertype:"integer"`
+	Height            pkgTypes.Level `example:"1488"                                                              format:"int64"     json:"height"             swaggertype:"integer"`
+	Time              time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"               swaggertype:"string"`
+	IgpId             string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"igp_id"           swaggertype:"string"`
+	GasOverhead       string         `example:"100000"                                                             format:"int64"     json:"gas_overhead"                 swaggertype:"string"`
+	GasPrice          string         `example:"1"                                                             format:"int64"     json:"gas_price"                 swaggertype:"string"`
+	RemoteDomain      uint64         `example:"100"                                                              format:"int64"     json:"remote_domain"        swaggertype:"integer"`
+	TokenExchangeRate string         `example:"12345678"                                                              format:"int64"     json:"token_exchange_rate"        swaggertype:"string"`
+}
+
+func NewHyperlaneIgpConfig(igp *storage.HLIGPConfig) *HyperlaneIgpConfig {
+	result := &HyperlaneIgpConfig{
+		Id:                igp.Id,
+		Height:            igp.Height,
+		Time:              igp.Time,
+		IgpId:             hex.EncodeToString(igp.IgpId),
+		GasOverhead:       igp.GasOverhead.String(),
+		GasPrice:          igp.GasPrice.String(),
+		RemoteDomain:      igp.RemoteDomain,
+		TokenExchangeRate: igp.TokenExchangeRate,
+	}
+
+	return result
+}

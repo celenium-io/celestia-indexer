@@ -4,6 +4,7 @@
 package storage
 
 import (
+	"context"
 	"encoding/hex"
 	"time"
 
@@ -13,6 +14,8 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IHLIGP interface {
+	List(ctx context.Context, limit, offset int) ([]HLIGP, error)
+	ByHash(ctx context.Context, hash []byte) (HLIGP, error)
 }
 
 type HLIGP struct {
@@ -25,7 +28,8 @@ type HLIGP struct {
 	OwnerId uint64         `bun:"owner_id"                 comment:"Owner identity"`
 	Denom   string         `bun:"denom"                    comment:"Denom"`
 
-	Owner *Address `bun:"rel:belongs-to,join:owner_id=id"`
+	Owner  *Address     `bun:"rel:belongs-to,join:owner_id=id"`
+	Config *HLIGPConfig `bun:"rel:belongs-to"`
 }
 
 func (t *HLIGP) TableName() string {

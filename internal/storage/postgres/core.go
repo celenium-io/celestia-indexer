@@ -61,6 +61,8 @@ type Storage struct {
 	HLMailbox       models.IHLMailbox
 	HLTransfer      models.IHLTransfer
 	HLToken         models.IHLToken
+	HLIGP           models.IHLIGP
+	HLIGPConfig     models.IHLIGPConfig
 	SignalVersion   models.ISignalVersion
 	Upgrade         models.IUpgrade
 	Celestials      celestials.ICelestial
@@ -121,6 +123,8 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		HLMailbox:       NewHLMailbox(strg.Connection()),
 		HLTransfer:      NewHLTransfer(strg.Connection()),
 		HLToken:         NewHLToken(strg.Connection()),
+		HLIGP:           NewHLIGP(strg.Connection()),
+		HLIGPConfig:     NewHLIGPConfig(strg.Connection()),
 		SignalVersion:   NewSignalVersion(strg.Connection()),
 		Upgrade:         NewUpgrade(strg.Connection()),
 		Celestials:      celestialsPg.NewCelestials(strg.Connection()),
