@@ -783,6 +783,26 @@ func (s *TransactionTestSuite) TestRollbackHyperlaneIgpConfigs() {
 	s.Require().Len(items, 0)
 }
 
+func (s *TransactionTestSuite) TestRollbackHyperlaneGasPayment() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackSignals(ctx, 102)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	data, err := s.storage.SignalVersion.List(ctx, storage.ListSignalsFilter{
+		Limit: 10,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(data, 1)
+}
+
 func (s *TransactionTestSuite) TestDeleteBalances() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

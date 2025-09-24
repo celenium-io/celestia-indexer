@@ -68,7 +68,7 @@ type HLTransfer struct {
 	Address    *Address      `bun:"rel:belongs-to,join:address_id=id"`
 	Token      *HLToken      `bun:"rel:belongs-to,join:token_id=id"`
 	Tx         *Tx           `bun:"rel:belongs-to,join:tx_id=id"`
-	GasPayment *HLGasPayment `bun:"rel:belongs-to"`
+	GasPayment *HLGasPayment `bun:"rel:belongs-to,join:id=transfer_id"`
 }
 
 func (m *HLTransfer) TableName() string {

@@ -96,6 +96,13 @@ func (s *StorageTestSuite) TestHyperlaneTransferList() {
 
 		s.Require().NotNil(transfer.Token)
 		s.Require().Equal([]byte("token"), transfer.Token.TokenId)
+
+		s.Require().NotNil(transfer.GasPayment)
+		s.Require().EqualValues("111", transfer.GasPayment.Amount.String())
+		s.Require().EqualValues("11", transfer.GasPayment.GasAmount.String())
+		s.Require().EqualValues(1, transfer.GasPayment.IgpId)
+		s.Require().NotNil(transfer.GasPayment.Igp)
+		s.Require().Equal([]byte("igp_1"), transfer.GasPayment.Igp.IgpId)
 	}
 }
 
@@ -112,6 +119,12 @@ func (s *StorageTestSuite) TestHyperlaneTransferById() {
 	s.Require().EqualValues(1234, transfer.Counterparty)
 
 	s.Require().NotNil(transfer.Tx)
+	s.Require().NotNil(transfer.GasPayment)
+	s.Require().EqualValues("111", transfer.GasPayment.Amount.String())
+	s.Require().EqualValues("11", transfer.GasPayment.GasAmount.String())
+	s.Require().EqualValues(1, transfer.GasPayment.IgpId)
+	s.Require().NotNil(transfer.GasPayment.Igp)
+	s.Require().Equal([]byte("igp_1"), transfer.GasPayment.Igp.IgpId)
 }
 
 func (s *StorageTestSuite) TestHyperlaneTransferByIdNotFound() {

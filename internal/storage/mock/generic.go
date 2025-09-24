@@ -1916,6 +1916,44 @@ func (c *MockTransactionRollbackGrantsCall) DoAndReturn(f func(context.Context, 
 	return c
 }
 
+// RollbackHyperlaneGasPayment mocks base method.
+func (m *MockTransaction) RollbackHyperlaneGasPayment(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackHyperlaneGasPayment", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackHyperlaneGasPayment indicates an expected call of RollbackHyperlaneGasPayment.
+func (mr *MockTransactionMockRecorder) RollbackHyperlaneGasPayment(ctx, height any) *MockTransactionRollbackHyperlaneGasPaymentCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackHyperlaneGasPayment", reflect.TypeOf((*MockTransaction)(nil).RollbackHyperlaneGasPayment), ctx, height)
+	return &MockTransactionRollbackHyperlaneGasPaymentCall{Call: call}
+}
+
+// MockTransactionRollbackHyperlaneGasPaymentCall wrap *gomock.Call
+type MockTransactionRollbackHyperlaneGasPaymentCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackHyperlaneGasPaymentCall) Return(arg0 error) *MockTransactionRollbackHyperlaneGasPaymentCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackHyperlaneGasPaymentCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneGasPaymentCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackHyperlaneGasPaymentCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneGasPaymentCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // RollbackHyperlaneIgpConfigs mocks base method.
 func (m *MockTransaction) RollbackHyperlaneIgpConfigs(ctx context.Context, height types.Level) error {
 	m.ctrl.T.Helper()

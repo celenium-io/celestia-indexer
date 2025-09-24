@@ -123,6 +123,12 @@ var (
 		Amount:              decimal.RequireFromString("125678"),
 		Denom:               currency.Utia,
 		Type:                types.HLTransferTypeReceive,
+		GasPayment: &storage.HLGasPayment{
+			Amount:    decimal.RequireFromString("111"),
+			GasAmount: decimal.RequireFromString("11"),
+			IgpId:     1,
+			Igp:       &storage.HLIGP{IgpId: []byte{1, 2, 3}},
+		},
 	}
 
 	testTransactionHash         = "123452A670018D678CC116E510BA88C1CABE061336661B1F3D206D248BD558GH"
@@ -408,6 +414,10 @@ func (s *HyperlaneTestSuite) TestGetTransfer() {
 	s.Require().Equal(testAddress, response.Relayer.Hash)
 	s.Require().NotNil(response.Body)
 	s.Require().NotNil(response.Metadata)
+	s.Require().NotNil(response.GasPayment)
+	s.Require().EqualValues(testTransfer.GasPayment.Amount.String(), response.GasPayment.Amount)
+	s.Require().EqualValues(testTransfer.GasPayment.GasAmount.String(), response.GasPayment.GasAmount)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.GasPayment.Igp.IgpId), response.GasPayment.IgpId)
 	s.Require().EqualValues(testChainMetadata.DisplayName, response.Counterparty.ChainMetadata.Name)
 	s.Require().EqualValues(testChainMetadata.DomainId, response.Counterparty.Domain)
 	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, response.Counterparty.ChainMetadata.NativeToken.Decimals)
@@ -477,6 +487,10 @@ func (s *HyperlaneTestSuite) TestListTransferWithHash() {
 	s.Require().Equal(testAddress, response.Relayer.Hash)
 	s.Require().NotNil(response.Body)
 	s.Require().NotNil(response.Metadata)
+	s.Require().NotNil(response.GasPayment)
+	s.Require().EqualValues(testTransfer.GasPayment.Amount.String(), response.GasPayment.Amount)
+	s.Require().EqualValues(testTransfer.GasPayment.GasAmount.String(), response.GasPayment.GasAmount)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.GasPayment.Igp.IgpId), response.GasPayment.IgpId)
 	s.Require().EqualValues(testChainMetadata.DisplayName, response.Counterparty.ChainMetadata.Name)
 	s.Require().EqualValues(testChainMetadata.DomainId, response.Counterparty.Domain)
 	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, response.Counterparty.ChainMetadata.NativeToken.Decimals)
@@ -569,6 +583,10 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 	s.Require().Equal(testAddress, response.Relayer.Hash)
 	s.Require().NotNil(response.Body)
 	s.Require().NotNil(response.Metadata)
+	s.Require().NotNil(response.GasPayment)
+	s.Require().EqualValues(testTransfer.GasPayment.Amount.String(), response.GasPayment.Amount)
+	s.Require().EqualValues(testTransfer.GasPayment.GasAmount.String(), response.GasPayment.GasAmount)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.GasPayment.Igp.IgpId), response.GasPayment.IgpId)
 	s.Require().EqualValues(testChainMetadata.DisplayName, response.Counterparty.ChainMetadata.Name)
 	s.Require().EqualValues(testChainMetadata.DomainId, response.Counterparty.Domain)
 	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, response.Counterparty.ChainMetadata.NativeToken.Decimals)
@@ -624,6 +642,10 @@ func (s *HyperlaneTestSuite) TestListTransferWithoutChainStore() {
 	s.Require().Equal(testAddress, response.Relayer.Hash)
 	s.Require().NotNil(response.Body)
 	s.Require().NotNil(response.Metadata)
+	s.Require().NotNil(response.GasPayment)
+	s.Require().EqualValues(testTransfer.GasPayment.Amount.String(), response.GasPayment.Amount)
+	s.Require().EqualValues(testTransfer.GasPayment.GasAmount.String(), response.GasPayment.GasAmount)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.GasPayment.Igp.IgpId), response.GasPayment.IgpId)
 	s.Require().Nil(response.Counterparty.ChainMetadata)
 }
 

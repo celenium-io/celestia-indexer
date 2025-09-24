@@ -118,6 +118,7 @@ type HyperlaneTransfer struct {
 
 	Address      *ShortAddress         `json:"address,omitempty"`
 	Relayer      *ShortAddress         `json:"relayer,omitempty"`
+	GasPayment   *GasPayment           `json:"gas_payment,omitempty"`
 	Counterparty HyperlaneCounterparty `json:"counterparty"`
 }
 
@@ -157,7 +158,24 @@ func NewHyperlaneTransfer(transfer storage.HLTransfer, store hyperlane.IChainSto
 		result.TxHash = hex.EncodeToString(transfer.Tx.Hash)
 	}
 
+	if transfer.GasPayment != nil {
+		result.GasPayment = &GasPayment{
+			Amount:    transfer.GasPayment.Amount.String(),
+			GasAmount: transfer.GasPayment.GasAmount.String(),
+		}
+
+		if transfer.GasPayment.Igp != nil {
+			result.GasPayment.IgpId = hex.EncodeToString(transfer.GasPayment.Igp.IgpId)
+		}
+	}
+
 	return result
+}
+
+type GasPayment struct {
+	Amount    string `example:"12345"                                                            format:"string" json:"amount"     swaggertype:"string"`
+	GasAmount string `example:"123"                                                              format:"string" json:"gas_amount" swaggertype:"string"`
+	IgpId     string `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary" json:"igp_id"     swaggertype:"string"`
 }
 
 type HyperlaneCounterparty struct {
@@ -282,22 +300,14 @@ func NewHyperlaneIgp(igp storage.HLIGP) HyperlaneIgp {
 }
 
 type HyperlaneIgpConfig struct {
-	Id                uint64         `example:"321"                                                              format:"int64"     json:"id"                  swaggertype:"integer"`
-	Height            pkgTypes.Level `example:"1488"                                                             format:"int64"     json:"height"              swaggertype:"integer"`
-	Time              time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                swaggertype:"string"`
-	IgpId             string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"igp_id"              swaggertype:"string"`
-	GasOverhead       string         `example:"100000"                                                           format:"int64"     json:"gas_overhead"        swaggertype:"string"`
-	GasPrice          string         `example:"1"                                                                format:"int64"     json:"gas_price"           swaggertype:"string"`
-	RemoteDomain      uint64         `example:"100"                                                              format:"int64"     json:"remote_domain"       swaggertype:"integer"`
-	TokenExchangeRate string         `example:"12345678"                                                         format:"int64"     json:"token_exchange_rate" swaggertype:"string"`
+	GasOverhead       string `example:"100000"   format:"int64" json:"gas_overhead"        swaggertype:"string"`
+	GasPrice          string `example:"1"        format:"int64" json:"gas_price"           swaggertype:"string"`
+	RemoteDomain      uint64 `example:"100"      format:"int64" json:"remote_domain"       swaggertype:"integer"`
+	TokenExchangeRate string `example:"12345678" format:"int64" json:"token_exchange_rate" swaggertype:"string"`
 }
 
 func NewHyperlaneIgpConfig(igp *storage.HLIGPConfig) *HyperlaneIgpConfig {
 	result := &HyperlaneIgpConfig{
-		Id:                igp.Id,
-		Height:            igp.Height,
-		Time:              igp.Time,
-		IgpId:             hex.EncodeToString(igp.IgpId),
 		GasOverhead:       igp.GasOverhead.String(),
 		GasPrice:          igp.GasPrice.String(),
 		RemoteDomain:      igp.RemoteDomain,
