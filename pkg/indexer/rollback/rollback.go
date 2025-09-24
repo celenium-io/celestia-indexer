@@ -249,6 +249,15 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	if err := tx.RollbackMessageValidators(ctx, height); err != nil {
 		return err
 	}
+	if err := tx.RollbackHyperlaneIgps(ctx, height); err != nil {
+		return err
+	}
+	if err := tx.RollbackHyperlaneIgpConfigs(ctx, height); err != nil {
+		return err
+	}
+	if err := tx.RollbackHyperlaneGasPayment(ctx, height); err != nil {
+		return err
+	}
 
 	newBlock, err := tx.LastBlock(ctx)
 	if err != nil {

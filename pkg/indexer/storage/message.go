@@ -277,6 +277,15 @@ func (module *Module) saveMessages(
 				}
 			}
 
+			if messages[i].HLTransfer.GasPayment != nil {
+				igp, err := tx.HyperlaneIgp(ctx, messages[i].HLTransfer.GasPayment.Igp.IgpId)
+				if err != nil {
+					return 0, state.Version, errors.Wrapf(err, "can't find igp for transfer: %x", messages[i].HLTransfer.GasPayment.Igp.IgpId)
+				}
+
+				messages[i].HLTransfer.GasPayment.IgpId = igp.Id
+			}
+
 			hyperlaneTransfers = append(hyperlaneTransfers, messages[i].HLTransfer)
 		}
 
@@ -415,6 +424,23 @@ func (module *Module) saveMessages(
 	}
 	if err := tx.SaveHyperlaneTransfers(ctx, hyperlaneTransfers...); err != nil {
 		return 0, state.Version, errors.Wrap(err, "hyperlane transfers saving")
+	}
+	if len(hyperlaneTransfers) > 0 {
+		if err := tx.SaveHyperlaneTransfers(ctx, hyperlaneTransfers...); err != nil {
+			return 0, state.Version, errors.Wrap(err, "hyperlane transfers saving")
+		}
+
+		gasPayments := make([]*storage.HLGasPayment, 0)
+		for i := range hyperlaneTransfers {
+			if hyperlaneTransfers[i].GasPayment != nil {
+				hyperlaneTransfers[i].GasPayment.TransferId = hyperlaneTransfers[i].Id
+				gasPayments = append(gasPayments, hyperlaneTransfers[i].GasPayment)
+			}
+		}
+
+		if err := tx.SaveHyperlaneGasPayments(ctx, gasPayments...); err != nil {
+			return 0, state.Version, errors.Wrap(err, "hyperlane gas payments saving")
+		}
 	}
 	if err := tx.SaveSignals(ctx, signals...); err != nil {
 		return 0, state.Version, errors.Wrap(err, "signals saving")

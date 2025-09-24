@@ -123,6 +123,12 @@ var (
 		Amount:              decimal.RequireFromString("125678"),
 		Denom:               currency.Utia,
 		Type:                types.HLTransferTypeReceive,
+		GasPayment: &storage.HLGasPayment{
+			Amount:    decimal.RequireFromString("111"),
+			GasAmount: decimal.RequireFromString("11"),
+			IgpId:     1,
+			Igp:       &storage.HLIGP{IgpId: []byte{1, 2, 3}},
+		},
 	}
 
 	testTransactionHash         = "123452A670018D678CC116E510BA88C1CABE061336661B1F3D206D248BD558GH"
@@ -155,6 +161,27 @@ var (
 			},
 		},
 	}
+
+	testIgp = storage.HLIGP{
+		Id:      1,
+		Height:  1488,
+		Time:    testTime,
+		OwnerId: 1,
+		Denom:   currency.Utia,
+		IgpId:   testsuite.RandomBytes(32),
+		Owner: &storage.Address{
+			Address:    testAddress,
+			Hash:       testHashAddress,
+			Height:     1488,
+			LastHeight: 1488,
+		},
+		Config: &storage.HLIGPConfig{
+			GasPrice:          decimal.RequireFromString("1"),
+			GasOverhead:       decimal.RequireFromString("100000"),
+			TokenExchangeRate: "1234",
+			RemoteDomain:      4321,
+		},
+	}
 )
 
 // HyperlaneTestSuite -
@@ -166,6 +193,7 @@ type HyperlaneTestSuite struct {
 	token      *mock.MockIHLToken
 	transfer   *mock.MockIHLTransfer
 	txs        *mock.MockITx
+	igp        *mock.MockIHLIGP
 	handler    *HyperlaneHandler
 	chainStore *hyperlane.MockIChainStore
 	ctrl       *gomock.Controller
@@ -181,8 +209,9 @@ func (s *HyperlaneTestSuite) SetupSuite() {
 	s.transfer = mock.NewMockIHLTransfer(s.ctrl)
 	s.txs = mock.NewMockITx(s.ctrl)
 	s.address = mock.NewMockIAddress(s.ctrl)
+	s.igp = mock.NewMockIHLIGP(s.ctrl)
 	s.chainStore = hyperlane.NewMockIChainStore(s.ctrl)
-	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.txs, s.address, s.chainStore)
+	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.txs, s.address, s.igp, s.chainStore)
 }
 
 // TearDownSuite -
@@ -385,6 +414,10 @@ func (s *HyperlaneTestSuite) TestGetTransfer() {
 	s.Require().Equal(testAddress, response.Relayer.Hash)
 	s.Require().NotNil(response.Body)
 	s.Require().NotNil(response.Metadata)
+	s.Require().NotNil(response.GasPayment)
+	s.Require().EqualValues(testTransfer.GasPayment.Amount.String(), response.GasPayment.Amount)
+	s.Require().EqualValues(testTransfer.GasPayment.GasAmount.String(), response.GasPayment.GasAmount)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.GasPayment.Igp.IgpId), response.GasPayment.IgpId)
 	s.Require().EqualValues(testChainMetadata.DisplayName, response.Counterparty.ChainMetadata.Name)
 	s.Require().EqualValues(testChainMetadata.DomainId, response.Counterparty.Domain)
 	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, response.Counterparty.ChainMetadata.NativeToken.Decimals)
@@ -454,6 +487,10 @@ func (s *HyperlaneTestSuite) TestListTransferWithHash() {
 	s.Require().Equal(testAddress, response.Relayer.Hash)
 	s.Require().NotNil(response.Body)
 	s.Require().NotNil(response.Metadata)
+	s.Require().NotNil(response.GasPayment)
+	s.Require().EqualValues(testTransfer.GasPayment.Amount.String(), response.GasPayment.Amount)
+	s.Require().EqualValues(testTransfer.GasPayment.GasAmount.String(), response.GasPayment.GasAmount)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.GasPayment.Igp.IgpId), response.GasPayment.IgpId)
 	s.Require().EqualValues(testChainMetadata.DisplayName, response.Counterparty.ChainMetadata.Name)
 	s.Require().EqualValues(testChainMetadata.DomainId, response.Counterparty.Domain)
 	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, response.Counterparty.ChainMetadata.NativeToken.Decimals)
@@ -546,6 +583,10 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 	s.Require().Equal(testAddress, response.Relayer.Hash)
 	s.Require().NotNil(response.Body)
 	s.Require().NotNil(response.Metadata)
+	s.Require().NotNil(response.GasPayment)
+	s.Require().EqualValues(testTransfer.GasPayment.Amount.String(), response.GasPayment.Amount)
+	s.Require().EqualValues(testTransfer.GasPayment.GasAmount.String(), response.GasPayment.GasAmount)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.GasPayment.Igp.IgpId), response.GasPayment.IgpId)
 	s.Require().EqualValues(testChainMetadata.DisplayName, response.Counterparty.ChainMetadata.Name)
 	s.Require().EqualValues(testChainMetadata.DomainId, response.Counterparty.Domain)
 	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, response.Counterparty.ChainMetadata.NativeToken.Decimals)
@@ -559,7 +600,7 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 
 func (s *HyperlaneTestSuite) TestListTransferWithoutChainStore() {
 	s.chainStore = nil
-	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.txs, s.address, nil)
+	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.txs, s.address, s.igp, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
@@ -601,6 +642,10 @@ func (s *HyperlaneTestSuite) TestListTransferWithoutChainStore() {
 	s.Require().Equal(testAddress, response.Relayer.Hash)
 	s.Require().NotNil(response.Body)
 	s.Require().NotNil(response.Metadata)
+	s.Require().NotNil(response.GasPayment)
+	s.Require().EqualValues(testTransfer.GasPayment.Amount.String(), response.GasPayment.Amount)
+	s.Require().EqualValues(testTransfer.GasPayment.GasAmount.String(), response.GasPayment.GasAmount)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.GasPayment.Igp.IgpId), response.GasPayment.IgpId)
 	s.Require().Nil(response.Counterparty.ChainMetadata)
 }
 
@@ -649,5 +694,72 @@ func (s *HyperlaneTestSuite) TestListDomains() {
 	s.Require().EqualValues(testChainMetadata.NativeToken.Name, response.NativeToken.Name)
 	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, response.NativeToken.Decimals)
 	s.Require().EqualValues(testChainMetadata.NativeToken.Symbol, response.NativeToken.Symbol)
+}
 
+func (s *HyperlaneTestSuite) TestGetIgp() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/hyperlane/igp/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("010203")
+
+	s.igp.EXPECT().
+		ByHash(gomock.Any(), []byte{1, 2, 3}).
+		Return(testIgp, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.GetIgp(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response responses.HyperlaneIgp
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(testIgp.Id, response.Id)
+	s.Require().EqualValues(testIgp.Height, response.Height)
+	s.Require().EqualValues(testIgp.Time, response.Time)
+	s.Require().EqualValues(testIgp.Denom, response.Denom)
+	s.Require().EqualValues(hex.EncodeToString(testIgp.IgpId), response.IgpId)
+	s.Require().NotNil(response.Owner)
+	s.Require().Equal(testAddress, response.Owner.Hash)
+	s.Require().NotNil(response.Config)
+	s.Require().EqualValues(testIgp.Config.RemoteDomain, response.Config.RemoteDomain)
+	s.Require().EqualValues(testIgp.Config.GasPrice.String(), response.Config.GasPrice)
+	s.Require().EqualValues(testIgp.Config.GasOverhead.String(), response.Config.GasOverhead)
+	s.Require().EqualValues(testIgp.Config.TokenExchangeRate, response.Config.TokenExchangeRate)
+}
+
+func (s *HyperlaneTestSuite) TestListIgps() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/hyperlane/igp")
+
+	s.igp.EXPECT().
+		List(gomock.Any(), 10, 0).
+		Return([]storage.HLIGP{testIgp}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.ListIgps(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var response []responses.HyperlaneIgp
+	err := json.NewDecoder(rec.Body).Decode(&response)
+	s.Require().NoError(err)
+	s.Require().Len(response, 1)
+
+	igp := response[0]
+	s.Require().EqualValues(testIgp.Id, igp.Id)
+	s.Require().EqualValues(testIgp.Height, igp.Height)
+	s.Require().EqualValues(testIgp.Time, igp.Time)
+	s.Require().EqualValues(testIgp.Denom, igp.Denom)
+	s.Require().EqualValues(hex.EncodeToString(testIgp.IgpId), igp.IgpId)
+	s.Require().NotNil(igp.Owner)
+	s.Require().Equal(testAddress, igp.Owner.Hash)
+	s.Require().NotNil(igp.Config)
+	s.Require().EqualValues(testIgp.Config.RemoteDomain, igp.Config.RemoteDomain)
+	s.Require().EqualValues(testIgp.Config.GasPrice.String(), igp.Config.GasPrice)
+	s.Require().EqualValues(testIgp.Config.GasOverhead.String(), igp.Config.GasOverhead)
+	s.Require().EqualValues(testIgp.Config.TokenExchangeRate, igp.Config.TokenExchangeRate)
 }

@@ -69,6 +69,12 @@ func processEvent(ctx *context.Context, event *storage.Event) error {
 		return parseProposal(ctx, event.Data)
 	case storageTypes.EventTypeInactiveProposal:
 		return parseProposal(ctx, event.Data)
+	case storageTypes.EventTypeHyperlanecorepostDispatchv1EventCreateIgp:
+		return parseCreateIgp(ctx, event.Data)
+	case storageTypes.EventTypeHyperlanecorepostDispatchv1EventSetIgp:
+		return parseSetIgp(ctx, event.Data)
+	case storageTypes.EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig:
+		return parseSetDestinationGasConfig(ctx, event.Data)
 	}
 
 	return nil

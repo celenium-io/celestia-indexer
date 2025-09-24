@@ -130,6 +130,8 @@ func TestRoutes(t *testing.T) {
 		"/v1/hyperlane/transfer GET":                          {},
 		"/v1/hyperlane/transfer/:id GET":                      {},
 		"/v1/hyperlane/domains GET":                           {},
+		"/v1/hyperlane/igp GET":                               {},
+		"/v1/hyperlane/igp/:id GET":                           {},
 		"/v1/signal GET":                                      {},
 		"/v1/signal/upgrade GET":                              {},
 	}

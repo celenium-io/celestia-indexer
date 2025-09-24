@@ -62,6 +62,8 @@ func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTran
 		ColumnExpr("transfer.*").
 		ColumnExpr("hl_mailbox.mailbox as mailbox__mailbox").
 		ColumnExpr("hl_token.token_id as token__token_id").
+		ColumnExpr("hl_gas_payment.amount as gas_payment__amount, hl_gas_payment.gas_amount as gas_payment__gas_amount, hl_gas_payment.igp_id as gas_payment__igp_id").
+		ColumnExpr("hl_igp.igp_id as gas_payment__igp__igp_id").
 		ColumnExpr("tx.hash as tx__hash").
 		ColumnExpr("address.address as address__address").
 		ColumnExpr("celestial.id as address__celestials__id, celestial.image_url as address__celestials__image_url").
@@ -69,6 +71,8 @@ func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTran
 		ColumnExpr("relayer_celestials.id as relayer__celestials__id, relayer_celestials.image_url as relayer__celestials__image_url").
 		Join("left join hl_mailbox on mailbox_id = hl_mailbox.id").
 		Join("left join hl_token on transfer.token_id = hl_token.id").
+		Join("left join hl_gas_payment on transfer.id = hl_gas_payment.transfer_id").
+		Join("left join hl_igp on hl_igp.id = hl_gas_payment.igp_id").
 		Join("left join tx on transfer.tx_id = tx.id").
 		Join("left join address on address.id = transfer.address_id").
 		Join("left join celestial on celestial.address_id = transfer.address_id and celestial.status = 'PRIMARY'").
@@ -88,6 +92,8 @@ func (t *HLTransfer) ById(ctx context.Context, id uint64) (transfer storage.HLTr
 		ColumnExpr("transfer.*").
 		ColumnExpr("hl_mailbox.mailbox as mailbox__mailbox").
 		ColumnExpr("hl_token.token_id as token__token_id").
+		ColumnExpr("hl_gas_payment.amount as gas_payment__amount, hl_gas_payment.gas_amount as gas_payment__gas_amount, hl_gas_payment.igp_id as gas_payment__igp_id").
+		ColumnExpr("hl_igp.igp_id as gas_payment__igp__igp_id").
 		ColumnExpr("tx.hash as tx__hash").
 		ColumnExpr("address.address as address__address").
 		ColumnExpr("celestial.id as address__celestials__id, celestial.image_url as address__celestials__image_url").
@@ -95,6 +101,8 @@ func (t *HLTransfer) ById(ctx context.Context, id uint64) (transfer storage.HLTr
 		ColumnExpr("relayer_celestials.id as relayer__celestials__id, relayer_celestials.image_url as relayer__celestials__image_url").
 		Join("left join hl_mailbox on mailbox_id = hl_mailbox.id").
 		Join("left join hl_token on transfer.token_id = hl_token.id").
+		Join("left join hl_gas_payment on transfer.id = hl_gas_payment.transfer_id").
+		Join("left join hl_igp on hl_igp.id = hl_gas_payment.igp_id").
 		Join("left join tx on transfer.tx_id = tx.id").
 		Join("left join address on address.id = transfer.address_id").
 		Join("left join celestial on celestial.address_id = transfer.address_id and celestial.status = 'PRIMARY'").

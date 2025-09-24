@@ -31,6 +31,7 @@ import (
 type MockNotificator struct {
 	ctrl     *gomock.Controller
 	recorder *MockNotificatorMockRecorder
+	isgomock struct{}
 }
 
 // MockNotificatorMockRecorder is the mock recorder for MockNotificator.
@@ -92,6 +93,7 @@ func (c *MockNotificatorNotifyCall) DoAndReturn(f func(context.Context, string, 
 type MockListener struct {
 	ctrl     *gomock.Controller
 	recorder *MockListenerMockRecorder
+	isgomock struct{}
 }
 
 // MockListenerMockRecorder is the mock recorder for MockListener.
@@ -234,6 +236,7 @@ func (c *MockListenerSubscribeCall) DoAndReturn(f func(context.Context, ...strin
 type MockListenerFactory struct {
 	ctrl     *gomock.Controller
 	recorder *MockListenerFactoryMockRecorder
+	isgomock struct{}
 }
 
 // MockListenerFactoryMockRecorder is the mock recorder for MockListenerFactory.
@@ -295,6 +298,7 @@ func (c *MockListenerFactoryCreateListenerCall) DoAndReturn(f func() storage.Lis
 type MockTransaction struct {
 	ctrl     *gomock.Controller
 	recorder *MockTransactionMockRecorder
+	isgomock struct{}
 }
 
 // MockTransactionMockRecorder is the mock recorder for MockTransaction.
@@ -977,6 +981,84 @@ func (c *MockTransactionHandleErrorCall) Do(f func(context.Context, error) error
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionHandleErrorCall) DoAndReturn(f func(context.Context, error) error) *MockTransactionHandleErrorCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// HyperlaneIgp mocks base method.
+func (m *MockTransaction) HyperlaneIgp(ctx context.Context, id []byte) (storage.HLIGP, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HyperlaneIgp", ctx, id)
+	ret0, _ := ret[0].(storage.HLIGP)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HyperlaneIgp indicates an expected call of HyperlaneIgp.
+func (mr *MockTransactionMockRecorder) HyperlaneIgp(ctx, id any) *MockTransactionHyperlaneIgpCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HyperlaneIgp", reflect.TypeOf((*MockTransaction)(nil).HyperlaneIgp), ctx, id)
+	return &MockTransactionHyperlaneIgpCall{Call: call}
+}
+
+// MockTransactionHyperlaneIgpCall wrap *gomock.Call
+type MockTransactionHyperlaneIgpCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionHyperlaneIgpCall) Return(arg0 storage.HLIGP, arg1 error) *MockTransactionHyperlaneIgpCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionHyperlaneIgpCall) Do(f func(context.Context, []byte) (storage.HLIGP, error)) *MockTransactionHyperlaneIgpCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionHyperlaneIgpCall) DoAndReturn(f func(context.Context, []byte) (storage.HLIGP, error)) *MockTransactionHyperlaneIgpCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// HyperlaneIgpConfig mocks base method.
+func (m *MockTransaction) HyperlaneIgpConfig(ctx context.Context, id []byte) (storage.HLIGPConfig, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HyperlaneIgpConfig", ctx, id)
+	ret0, _ := ret[0].(storage.HLIGPConfig)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HyperlaneIgpConfig indicates an expected call of HyperlaneIgpConfig.
+func (mr *MockTransactionMockRecorder) HyperlaneIgpConfig(ctx, id any) *MockTransactionHyperlaneIgpConfigCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HyperlaneIgpConfig", reflect.TypeOf((*MockTransaction)(nil).HyperlaneIgpConfig), ctx, id)
+	return &MockTransactionHyperlaneIgpConfigCall{Call: call}
+}
+
+// MockTransactionHyperlaneIgpConfigCall wrap *gomock.Call
+type MockTransactionHyperlaneIgpConfigCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionHyperlaneIgpConfigCall) Return(arg0 storage.HLIGPConfig, arg1 error) *MockTransactionHyperlaneIgpConfigCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionHyperlaneIgpConfigCall) Do(f func(context.Context, []byte) (storage.HLIGPConfig, error)) *MockTransactionHyperlaneIgpConfigCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionHyperlaneIgpConfigCall) DoAndReturn(f func(context.Context, []byte) (storage.HLIGPConfig, error)) *MockTransactionHyperlaneIgpConfigCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1830,6 +1912,120 @@ func (c *MockTransactionRollbackGrantsCall) Do(f func(context.Context, types.Lev
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionRollbackGrantsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackGrantsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackHyperlaneGasPayment mocks base method.
+func (m *MockTransaction) RollbackHyperlaneGasPayment(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackHyperlaneGasPayment", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackHyperlaneGasPayment indicates an expected call of RollbackHyperlaneGasPayment.
+func (mr *MockTransactionMockRecorder) RollbackHyperlaneGasPayment(ctx, height any) *MockTransactionRollbackHyperlaneGasPaymentCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackHyperlaneGasPayment", reflect.TypeOf((*MockTransaction)(nil).RollbackHyperlaneGasPayment), ctx, height)
+	return &MockTransactionRollbackHyperlaneGasPaymentCall{Call: call}
+}
+
+// MockTransactionRollbackHyperlaneGasPaymentCall wrap *gomock.Call
+type MockTransactionRollbackHyperlaneGasPaymentCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackHyperlaneGasPaymentCall) Return(arg0 error) *MockTransactionRollbackHyperlaneGasPaymentCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackHyperlaneGasPaymentCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneGasPaymentCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackHyperlaneGasPaymentCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneGasPaymentCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackHyperlaneIgpConfigs mocks base method.
+func (m *MockTransaction) RollbackHyperlaneIgpConfigs(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackHyperlaneIgpConfigs", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackHyperlaneIgpConfigs indicates an expected call of RollbackHyperlaneIgpConfigs.
+func (mr *MockTransactionMockRecorder) RollbackHyperlaneIgpConfigs(ctx, height any) *MockTransactionRollbackHyperlaneIgpConfigsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackHyperlaneIgpConfigs", reflect.TypeOf((*MockTransaction)(nil).RollbackHyperlaneIgpConfigs), ctx, height)
+	return &MockTransactionRollbackHyperlaneIgpConfigsCall{Call: call}
+}
+
+// MockTransactionRollbackHyperlaneIgpConfigsCall wrap *gomock.Call
+type MockTransactionRollbackHyperlaneIgpConfigsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackHyperlaneIgpConfigsCall) Return(arg0 error) *MockTransactionRollbackHyperlaneIgpConfigsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackHyperlaneIgpConfigsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneIgpConfigsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackHyperlaneIgpConfigsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneIgpConfigsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackHyperlaneIgps mocks base method.
+func (m *MockTransaction) RollbackHyperlaneIgps(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackHyperlaneIgps", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackHyperlaneIgps indicates an expected call of RollbackHyperlaneIgps.
+func (mr *MockTransactionMockRecorder) RollbackHyperlaneIgps(ctx, height any) *MockTransactionRollbackHyperlaneIgpsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackHyperlaneIgps", reflect.TypeOf((*MockTransaction)(nil).RollbackHyperlaneIgps), ctx, height)
+	return &MockTransactionRollbackHyperlaneIgpsCall{Call: call}
+}
+
+// MockTransactionRollbackHyperlaneIgpsCall wrap *gomock.Call
+type MockTransactionRollbackHyperlaneIgpsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackHyperlaneIgpsCall) Return(arg0 error) *MockTransactionRollbackHyperlaneIgpsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackHyperlaneIgpsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneIgpsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackHyperlaneIgpsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneIgpsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -3132,6 +3328,135 @@ func (c *MockTransactionSaveGrantsCall) Do(f func(context.Context, ...storage.Gr
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionSaveGrantsCall) DoAndReturn(f func(context.Context, ...storage.Grant) error) *MockTransactionSaveGrantsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveHyperlaneGasPayments mocks base method.
+func (m *MockTransaction) SaveHyperlaneGasPayments(ctx context.Context, payments ...*storage.HLGasPayment) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range payments {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveHyperlaneGasPayments", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveHyperlaneGasPayments indicates an expected call of SaveHyperlaneGasPayments.
+func (mr *MockTransactionMockRecorder) SaveHyperlaneGasPayments(ctx any, payments ...any) *MockTransactionSaveHyperlaneGasPaymentsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, payments...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveHyperlaneGasPayments", reflect.TypeOf((*MockTransaction)(nil).SaveHyperlaneGasPayments), varargs...)
+	return &MockTransactionSaveHyperlaneGasPaymentsCall{Call: call}
+}
+
+// MockTransactionSaveHyperlaneGasPaymentsCall wrap *gomock.Call
+type MockTransactionSaveHyperlaneGasPaymentsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveHyperlaneGasPaymentsCall) Return(arg0 error) *MockTransactionSaveHyperlaneGasPaymentsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveHyperlaneGasPaymentsCall) Do(f func(context.Context, ...*storage.HLGasPayment) error) *MockTransactionSaveHyperlaneGasPaymentsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveHyperlaneGasPaymentsCall) DoAndReturn(f func(context.Context, ...*storage.HLGasPayment) error) *MockTransactionSaveHyperlaneGasPaymentsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveHyperlaneIgpConfigs mocks base method.
+func (m *MockTransaction) SaveHyperlaneIgpConfigs(ctx context.Context, configs ...storage.HLIGPConfig) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range configs {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveHyperlaneIgpConfigs", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveHyperlaneIgpConfigs indicates an expected call of SaveHyperlaneIgpConfigs.
+func (mr *MockTransactionMockRecorder) SaveHyperlaneIgpConfigs(ctx any, configs ...any) *MockTransactionSaveHyperlaneIgpConfigsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, configs...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveHyperlaneIgpConfigs", reflect.TypeOf((*MockTransaction)(nil).SaveHyperlaneIgpConfigs), varargs...)
+	return &MockTransactionSaveHyperlaneIgpConfigsCall{Call: call}
+}
+
+// MockTransactionSaveHyperlaneIgpConfigsCall wrap *gomock.Call
+type MockTransactionSaveHyperlaneIgpConfigsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveHyperlaneIgpConfigsCall) Return(arg0 error) *MockTransactionSaveHyperlaneIgpConfigsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveHyperlaneIgpConfigsCall) Do(f func(context.Context, ...storage.HLIGPConfig) error) *MockTransactionSaveHyperlaneIgpConfigsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveHyperlaneIgpConfigsCall) DoAndReturn(f func(context.Context, ...storage.HLIGPConfig) error) *MockTransactionSaveHyperlaneIgpConfigsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveHyperlaneIgps mocks base method.
+func (m *MockTransaction) SaveHyperlaneIgps(ctx context.Context, igps ...*storage.HLIGP) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range igps {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveHyperlaneIgps", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveHyperlaneIgps indicates an expected call of SaveHyperlaneIgps.
+func (mr *MockTransactionMockRecorder) SaveHyperlaneIgps(ctx any, igps ...any) *MockTransactionSaveHyperlaneIgpsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, igps...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveHyperlaneIgps", reflect.TypeOf((*MockTransaction)(nil).SaveHyperlaneIgps), varargs...)
+	return &MockTransactionSaveHyperlaneIgpsCall{Call: call}
+}
+
+// MockTransactionSaveHyperlaneIgpsCall wrap *gomock.Call
+type MockTransactionSaveHyperlaneIgpsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveHyperlaneIgpsCall) Return(arg0 error) *MockTransactionSaveHyperlaneIgpsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveHyperlaneIgpsCall) Do(f func(context.Context, ...*storage.HLIGP) error) *MockTransactionSaveHyperlaneIgpsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveHyperlaneIgpsCall) DoAndReturn(f func(context.Context, ...*storage.HLIGP) error) *MockTransactionSaveHyperlaneIgpsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -4612,6 +4937,7 @@ func (c *MockTransactionValidatorCall) DoAndReturn(f func(context.Context, uint6
 type MockISearch struct {
 	ctrl     *gomock.Controller
 	recorder *MockISearchMockRecorder
+	isgomock struct{}
 }
 
 // MockISearchMockRecorder is the mock recorder for MockISearch.
@@ -4713,6 +5039,7 @@ func (c *MockISearchSearchTextCall) DoAndReturn(f func(context.Context, string) 
 type MockExport struct {
 	ctrl     *gomock.Controller
 	recorder *MockExportMockRecorder
+	isgomock struct{}
 }
 
 // MockExportMockRecorder is the mock recorder for MockExport.

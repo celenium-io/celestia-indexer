@@ -317,6 +317,39 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 	return err
 }
 
+func (tx Transaction) SaveHyperlaneIgps(ctx context.Context, igps ...*models.HLIGP) error {
+	if len(igps) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&igps).
+		Column("id", "height", "time", "igp_id", "owner_id", "denom").
+		On("CONFLICT (igp_id) DO UPDATE").
+		Set("height = EXCLUDED.height").
+		Set("time = EXCLUDED.time").
+		Set("owner_id = EXCLUDED.owner_id").
+		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveHyperlaneIgpConfigs(ctx context.Context, configs ...models.HLIGPConfig) error {
+	if len(configs) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&configs).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveHyperlaneGasPayments(ctx context.Context, payments ...*models.HLGasPayment) error {
+	if len(payments) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&payments).Exec(ctx)
+	return err
+}
+
 type addedValidator struct {
 	bun.BaseModel `bun:"validator"`
 	*models.Validator
@@ -1079,6 +1112,27 @@ func (tx Transaction) RollbackUpgrades(ctx context.Context, height types.Level) 
 	return
 }
 
+func (tx Transaction) RollbackHyperlaneIgps(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.HLIGP)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackHyperlaneIgpConfigs(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.HLIGPConfig)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackHyperlaneGasPayment(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.HLGasPayment)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
 func (tx Transaction) DeleteBalances(ctx context.Context, ids []uint64) error {
 	if len(ids) == 0 {
 		return nil
@@ -1413,4 +1467,18 @@ func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uin
 		Where("validator.id = validator_id").
 		Exec(ctx)
 	return err
+}
+
+func (tx Transaction) HyperlaneIgp(ctx context.Context, id []byte) (igp models.HLIGP, err error) {
+	err = tx.Tx().NewSelect().Model(&igp).
+		Where("igp_id = ?", id).
+		Scan(ctx)
+	return
+}
+
+func (tx Transaction) HyperlaneIgpConfig(ctx context.Context, id []byte) (config models.HLIGPConfig, err error) {
+	err = tx.Tx().NewSelect().Model(&config).
+		Where("igp_id = ?", id).
+		Scan(ctx)
+	return
 }

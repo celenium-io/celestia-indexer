@@ -359,6 +359,13 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
+	if err := module.saveIgps(ctx, tx, dCtx.GetIgps(), addrToId); err != nil {
+		return state, err
+	}
+
+	if err := tx.SaveHyperlaneIgpConfigs(ctx, dCtx.IgpConfigs...); err != nil {
+		return state, err
+	}
 	if err := updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, version, &state); err != nil {
 		return state, err
 	}

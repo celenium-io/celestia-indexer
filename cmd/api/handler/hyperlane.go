@@ -23,6 +23,7 @@ type HyperlaneHandler struct {
 	transfers  storage.IHLTransfer
 	txs        storage.ITx
 	address    storage.IAddress
+	igp        storage.IHLIGP
 	chainStore hyperlane.IChainStore
 }
 
@@ -32,6 +33,7 @@ func NewHyperlaneHandler(
 	transfers storage.IHLTransfer,
 	txs storage.ITx,
 	address storage.IAddress,
+	igp storage.IHLIGP,
 	chainStore hyperlane.IChainStore,
 ) *HyperlaneHandler {
 	return &HyperlaneHandler{
@@ -40,6 +42,7 @@ func NewHyperlaneHandler(
 		transfers:  transfers,
 		txs:        txs,
 		address:    address,
+		igp:        igp,
 		chainStore: chainStore,
 	}
 }
@@ -441,4 +444,74 @@ func (handler *HyperlaneHandler) ListDomains(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+// ListIgps godoc
+//
+//	@Summary		List hyperlane Interchain Gas Paymaster (IGP)
+//	@Description	List hyperlane Interchain Gas Paymaster (IGP)
+//	@Tags			hyperlane
+//	@ID				list-hyperlane-igps
+//	@Param			limit	query	integer	false	"Count of requested entities"				mininum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"									mininum(1)
+//	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)
+//	@Produce		json
+//	@Success		200	{array}	responses.HyperlaneIgp
+//	@Success		204
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/hyperlane/igp [get]
+func (handler *HyperlaneHandler) ListIgps(c echo.Context) error {
+	req, err := bindAndValidate[limitOffsetPagination](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	igps, err := handler.igp.List(c.Request().Context(), req.Limit, req.Offset)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	response := make([]responses.HyperlaneIgp, len(igps))
+	for i := range igps {
+		response[i] = responses.NewHyperlaneIgp(igps[i])
+	}
+	return returnArray(c, response)
+}
+
+type getHyperlaneIgpRequest struct {
+	Id string `param:"id" validate:"required,hexadecimal"`
+}
+
+// GetIgp godoc
+//
+//	@Summary		Get IGP by id
+//	@Description	Get IGP by id
+//	@Tags			hyperlane
+//	@ID				get-hyperlane-igp
+//	@Param			id	path	integer	true	"Internal identity"	mininum(1)
+//	@Produce		json
+//	@Success		200	{object}	responses.HyperlaneIgp
+//	@Success		204
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/hyperlane/igp/{id} [get]
+func (handler *HyperlaneHandler) GetIgp(c echo.Context) error {
+	req, err := bindAndValidate[getHyperlaneIgpRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	id, err := hex.DecodeString(req.Id)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	igp, err := handler.igp.ByHash(c.Request().Context(), id)
+	if err != nil {
+		return handleError(c, err, handler.address)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewHyperlaneIgp(igp))
 }

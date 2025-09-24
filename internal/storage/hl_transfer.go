@@ -63,11 +63,12 @@ type HLTransfer struct {
 	Amount              decimal.Decimal      `bun:"amount,type:numeric"           comment:"Amount"`
 	Denom               string               `bun:"denom"                         comment:"Denom"`
 
-	Mailbox *HLMailbox `bun:"rel:belongs-to,join:mailbox_id=id"`
-	Relayer *Address   `bun:"rel:belongs-to,join:relayer_id=id"`
-	Address *Address   `bun:"rel:belongs-to,join:address_id=id"`
-	Token   *HLToken   `bun:"rel:belongs-to,join:token_id=id"`
-	Tx      *Tx        `bun:"rel:belongs-to,join:tx_id=id"`
+	Mailbox    *HLMailbox    `bun:"rel:belongs-to,join:mailbox_id=id"`
+	Relayer    *Address      `bun:"rel:belongs-to,join:relayer_id=id"`
+	Address    *Address      `bun:"rel:belongs-to,join:address_id=id"`
+	Token      *HLToken      `bun:"rel:belongs-to,join:token_id=id"`
+	Tx         *Tx           `bun:"rel:belongs-to,join:tx_id=id"`
+	GasPayment *HLGasPayment `bun:"rel:belongs-to,join:id=transfer_id"`
 }
 
 func (m *HLTransfer) TableName() string {
