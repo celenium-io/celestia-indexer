@@ -86,8 +86,10 @@ func (v *Vote) ByVoterId(ctx context.Context, voterId uint64, fltrs storage.Vote
 		ColumnExpr("validator.id as validator__id").
 		ColumnExpr("validator.cons_address as validator__cons_address").
 		ColumnExpr("validator.moniker as validator__moniker").
+		ColumnExpr("proposal.id as proposal__id, proposal.status as proposal__status, proposal.title as proposal__title, proposal.description as proposal__description").
 		OrderExpr("votes.time desc").
-		Join("left join validator on validator.id = votes.validator_id")
+		Join("left join validator on validator.id = votes.validator_id").
+		Join("left join proposal on proposal.id = votes.proposal_id")
 	err = query.Scan(ctx, &votes)
 
 	return

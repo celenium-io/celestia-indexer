@@ -258,6 +258,12 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithVoter() {
 						ImageUrl: "test image",
 					},
 				},
+				Proposal: &storage.Proposal{
+					Id:          1,
+					Title:       "test title",
+					Description: "test description",
+					Status:      types.ProposalStatusApplied,
+				},
 			},
 		}, nil)
 
@@ -277,6 +283,11 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithVoter() {
 	s.Require().NotNil(votes[0].Voter.Celestials)
 	s.Require().EqualValues("test name", votes[0].Voter.Celestials.Name)
 	s.Require().EqualValues("test image", votes[0].Voter.Celestials.ImageUrl)
+	s.Require().NotNil(votes[0].Proposal)
+	s.Require().EqualValues(1, votes[0].Proposal.Id)
+	s.Require().EqualValues(types.ProposalStatusApplied, votes[0].Proposal.Status)
+	s.Require().EqualValues("test title", votes[0].Proposal.Title)
+	s.Require().EqualValues("test description", votes[0].Proposal.Description)
 }
 
 func (s *ProposalTestSuite) TestVotesByProposalIdWithValidator() {
@@ -311,6 +322,12 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithValidator() {
 				Option:      types.VoteOptionYes,
 				ValidatorId: testsuite.Ptr(uint64(1)),
 				Validator:   &testValidator,
+				Proposal: &storage.Proposal{
+					Id:          1,
+					Title:       "test title",
+					Description: "test description",
+					Status:      types.ProposalStatusApplied,
+				},
 			},
 		}, nil)
 
@@ -327,4 +344,9 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithValidator() {
 	s.Require().Nil(votes[0].Voter)
 	s.Require().EqualValues("moniker", votes[0].Validator.Moniker)
 	s.Require().EqualValues(1, votes[0].Validator.Id)
+	s.Require().NotNil(votes[0].Proposal)
+	s.Require().EqualValues(1, votes[0].Proposal.Id)
+	s.Require().EqualValues(types.ProposalStatusApplied, votes[0].Proposal.Status)
+	s.Require().EqualValues("test title", votes[0].Proposal.Title)
+	s.Require().EqualValues("test description", votes[0].Proposal.Description)
 }
