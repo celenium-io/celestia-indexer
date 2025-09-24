@@ -4,6 +4,7 @@
 package storage
 
 import (
+	"context"
 	"time"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
@@ -13,6 +14,7 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IHLGasPayment interface {
+	List(ctx context.Context, limit, offset int) ([]HLGasPayment, error)
 }
 
 type HLGasPayment struct {

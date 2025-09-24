@@ -790,17 +790,15 @@ func (s *TransactionTestSuite) TestRollbackHyperlaneGasPayment() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx.RollbackSignals(ctx, 102)
+	err = tx.RollbackHyperlaneGasPayment(ctx, 1488)
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
 
-	data, err := s.storage.SignalVersion.List(ctx, storage.ListSignalsFilter{
-		Limit: 10,
-	})
+	data, err := s.storage.HLGasPayment.List(ctx, 10, 0)
 	s.Require().NoError(err)
-	s.Require().Len(data, 1)
+	s.Require().Len(data, 0)
 }
 
 func (s *TransactionTestSuite) TestDeleteBalances() {

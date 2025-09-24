@@ -13,6 +13,10 @@
 package mock
 
 import (
+	context "context"
+	reflect "reflect"
+
+	storage "github.com/celenium-io/celestia-indexer/internal/storage"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -38,4 +42,43 @@ func NewMockIHLGasPayment(ctrl *gomock.Controller) *MockIHLGasPayment {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockIHLGasPayment) EXPECT() *MockIHLGasPaymentMockRecorder {
 	return m.recorder
+}
+
+// List mocks base method.
+func (m *MockIHLGasPayment) List(ctx context.Context, limit, offset int) ([]storage.HLGasPayment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "List", ctx, limit, offset)
+	ret0, _ := ret[0].([]storage.HLGasPayment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// List indicates an expected call of List.
+func (mr *MockIHLGasPaymentMockRecorder) List(ctx, limit, offset any) *MockIHLGasPaymentListCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIHLGasPayment)(nil).List), ctx, limit, offset)
+	return &MockIHLGasPaymentListCall{Call: call}
+}
+
+// MockIHLGasPaymentListCall wrap *gomock.Call
+type MockIHLGasPaymentListCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIHLGasPaymentListCall) Return(arg0 []storage.HLGasPayment, arg1 error) *MockIHLGasPaymentListCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIHLGasPaymentListCall) Do(f func(context.Context, int, int) ([]storage.HLGasPayment, error)) *MockIHLGasPaymentListCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIHLGasPaymentListCall) DoAndReturn(f func(context.Context, int, int) ([]storage.HLGasPayment, error)) *MockIHLGasPaymentListCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
