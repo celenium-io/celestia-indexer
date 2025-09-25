@@ -24,7 +24,7 @@ type Vote struct {
 
 	Voter     *ShortAddress   `json:"voter,omitempty"`
 	Validator *ShortValidator `json:"validator,omitempty"`
-	Proposal  Proposal        `json:"-"`
+	Proposal  *ShortProposal  `json:"proposal,omitempty"`
 }
 
 func NewVote(vote storage.Vote) Vote {
@@ -41,6 +41,10 @@ func NewVote(vote storage.Vote) Vote {
 
 	if vote.Validator != nil {
 		result.Validator = NewShortValidator(*vote.Validator)
+	}
+
+	if vote.Proposal != nil {
+		result.Proposal = NewShortProposal(*vote.Proposal)
 	}
 
 	return result

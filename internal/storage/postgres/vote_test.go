@@ -127,6 +127,11 @@ func (s *StorageTestSuite) TestVoteByVoterId() {
 	s.Require().EqualValues(1000, vote.Height)
 	s.Require().EqualValues(types.VoteOptionNo, vote.Option)
 	s.Require().Nil(vote.Validator)
+	s.Require().NotNil(vote.Proposal)
+	s.Require().EqualValues(1, vote.Proposal.Id)
+	s.Require().EqualValues("Title", vote.Proposal.Title)
+	s.Require().EqualValues("Description", vote.Proposal.Description)
+	s.Require().EqualValues(types.ProposalStatusInactive, vote.Proposal.Status)
 }
 
 func (s *StorageTestSuite) TestVoteByValidatorId() {

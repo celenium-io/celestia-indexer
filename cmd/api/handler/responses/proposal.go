@@ -101,3 +101,24 @@ func NewProposal(proposal storage.Proposal) Proposal {
 		Error:                 proposal.Error,
 	}
 }
+
+type ShortProposal struct {
+	Id          uint64 `example:"321"                       format:"int64"  json:"id"          swaggertype:"integer"`
+	Status      string `example:"active"                    format:"string" json:"status"      swaggertype:"string"`
+	Title       string `example:"Proposal title"            format:"string" json:"title"       swaggertype:"string"`
+	Description string `example:"Some proposal description" format:"string" json:"description" swaggertype:"string"`
+}
+
+func NewShortProposal(proposal storage.Proposal) *ShortProposal {
+	if proposal.Id == 0 {
+		return nil
+	}
+
+	result := new(ShortProposal)
+	result.Id = proposal.Id
+	result.Status = proposal.Status.String()
+	result.Title = proposal.Title
+	result.Description = proposal.Description
+
+	return result
+}
