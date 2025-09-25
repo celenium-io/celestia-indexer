@@ -201,7 +201,7 @@ func (bl *BlobLog) ByTxId(ctx context.Context, txId uint64, fltrs storage.BlobLo
 
 	blobLogQuery = blobLogFilters(blobLogQuery, fltrs)
 
-	err = bl.DB().NewSelect().
+	query := bl.DB().NewSelect().
 		ColumnExpr("blob_log.*").
 		ColumnExpr("rollup.id as rollup__id, rollup.name as rollup__name, rollup.logo as rollup__logo, rollup.slug as rollup__slug").
 		ColumnExpr("signer.address as signer__address").
@@ -214,8 +214,10 @@ func (bl *BlobLog) ByTxId(ctx context.Context, txId uint64, fltrs storage.BlobLo
 		Join("left join namespace as ns on ns.id = blob_log.namespace_id").
 		Join("left join tx on tx.id = blob_log.tx_id").
 		Join("left join rollup_provider as p on blob_log.signer_id = p.address_id and blob_log.namespace_id = p.namespace_id").
-		Join("left join rollup on rollup.id = p.rollup_id").
-		Scan(ctx, &logs)
+		Join("left join rollup on rollup.id = p.rollup_id")
+
+	query = blobLogSort(query, fltrs.SortBy, fltrs.Sort)
+	err = query.Scan(ctx, &logs)
 	return
 }
 
@@ -226,7 +228,7 @@ func (bl *BlobLog) ByHeight(ctx context.Context, height types.Level, fltrs stora
 
 	blobLogQuery = blobLogFilters(blobLogQuery, fltrs)
 
-	err = bl.DB().NewSelect().
+	query := bl.DB().NewSelect().
 		ColumnExpr("blob_log.*").
 		ColumnExpr("rollup.id as rollup__id, rollup.name as rollup__name, rollup.logo as rollup__logo, rollup.slug as rollup__slug").
 		ColumnExpr("signer.address as signer__address").
@@ -239,8 +241,10 @@ func (bl *BlobLog) ByHeight(ctx context.Context, height types.Level, fltrs stora
 		Join("left join namespace as ns on ns.id = blob_log.namespace_id").
 		Join("left join tx on tx.id = blob_log.tx_id").
 		Join("left join rollup_provider as p on blob_log.signer_id = p.address_id and blob_log.namespace_id = p.namespace_id").
-		Join("left join rollup on rollup.id = p.rollup_id").
-		Scan(ctx, &logs)
+		Join("left join rollup on rollup.id = p.rollup_id")
+
+	query = blobLogSort(query, fltrs.SortBy, fltrs.Sort)
+	err = query.Scan(ctx, &logs)
 	return
 }
 
