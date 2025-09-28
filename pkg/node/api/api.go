@@ -11,14 +11,12 @@ import (
 	"time"
 
 	"github.com/dipdup-net/go-lib/config"
-	jsoniter "github.com/json-iterator/go"
+	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
 )
-
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 const (
 	celeniumUserAgent = "Celenium Indexer"
