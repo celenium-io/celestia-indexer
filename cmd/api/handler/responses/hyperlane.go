@@ -282,7 +282,7 @@ type HyperlaneIgp struct {
 	Config *HyperlaneIgpConfig `json:"config,omitempty"`
 }
 
-func NewHyperlaneIgp(igp storage.HLIGP) HyperlaneIgp {
+func NewHyperlaneIgp(igp storage.HLIGP, store hyperlane.IChainStore) HyperlaneIgp {
 	result := HyperlaneIgp{
 		Id:     igp.Id,
 		Height: igp.Height,
@@ -293,7 +293,7 @@ func NewHyperlaneIgp(igp storage.HLIGP) HyperlaneIgp {
 	}
 
 	if igp.Config != nil {
-		result.Config = NewHyperlaneIgpConfig(igp.Config)
+		result.Config = NewHyperlaneIgpConfig(igp.Config, store)
 	}
 
 	return result
@@ -302,17 +302,31 @@ func NewHyperlaneIgp(igp storage.HLIGP) HyperlaneIgp {
 type HyperlaneIgpConfig struct {
 	GasOverhead       string `example:"100000"   format:"int64" json:"gas_overhead"        swaggertype:"string"`
 	GasPrice          string `example:"1"        format:"int64" json:"gas_price"           swaggertype:"string"`
-	RemoteDomain      uint64 `example:"100"      format:"int64" json:"remote_domain"       swaggertype:"integer"`
 	TokenExchangeRate string `example:"12345678" format:"int64" json:"token_exchange_rate" swaggertype:"string"`
+
+	Counterparty HyperlaneRemoteDomain `json:"counterparty"`
 }
 
-func NewHyperlaneIgpConfig(igp *storage.HLIGPConfig) *HyperlaneIgpConfig {
+func NewHyperlaneIgpConfig(igp *storage.HLIGPConfig, store hyperlane.IChainStore) *HyperlaneIgpConfig {
+	counterparty := HyperlaneRemoteDomain{
+		RemoteDomain: igp.RemoteDomain,
+	}
+
+	if store != nil {
+		counterparty.ChainMetadata = NewChainMetadata(igp.RemoteDomain, store)
+	}
+
 	result := &HyperlaneIgpConfig{
 		GasOverhead:       igp.GasOverhead.String(),
 		GasPrice:          igp.GasPrice.String(),
-		RemoteDomain:      igp.RemoteDomain,
 		TokenExchangeRate: igp.TokenExchangeRate,
+		Counterparty:      counterparty,
 	}
 
 	return result
+}
+
+type HyperlaneRemoteDomain struct {
+	RemoteDomain  uint64         `example:"100"                   format:"int64" json:"remote_domain" swaggertype:"integer"`
+	ChainMetadata *ChainMetadata `json:"chain_metadata,omitempty"`
 }

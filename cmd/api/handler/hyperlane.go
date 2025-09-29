@@ -475,7 +475,7 @@ func (handler *HyperlaneHandler) ListIgps(c echo.Context) error {
 
 	response := make([]responses.HyperlaneIgp, len(igps))
 	for i := range igps {
-		response[i] = responses.NewHyperlaneIgp(igps[i])
+		response[i] = responses.NewHyperlaneIgp(igps[i], handler.chainStore)
 	}
 	return returnArray(c, response)
 }
@@ -513,5 +513,5 @@ func (handler *HyperlaneHandler) GetIgp(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 
-	return c.JSON(http.StatusOK, responses.NewHyperlaneIgp(igp))
+	return c.JSON(http.StatusOK, responses.NewHyperlaneIgp(igp, handler.chainStore))
 }

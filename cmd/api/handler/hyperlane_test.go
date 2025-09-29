@@ -179,7 +179,7 @@ var (
 			GasPrice:          decimal.RequireFromString("1"),
 			GasOverhead:       decimal.RequireFromString("100000"),
 			TokenExchangeRate: "1234",
-			RemoteDomain:      4321,
+			RemoteDomain:      1,
 		},
 	}
 )
@@ -704,10 +704,20 @@ func (s *HyperlaneTestSuite) TestGetIgp() {
 	c.SetParamNames("id")
 	c.SetParamValues("010203")
 
+	s.chainStore.EXPECT().
+		Set(testChainStore).
+		Times(1)
+
+	s.chainStore.EXPECT().
+		Get(uint64(1)).
+		Return(testChainMetadata, true)
+
 	s.igp.EXPECT().
 		ByHash(gomock.Any(), []byte{1, 2, 3}).
 		Return(testIgp, nil).
 		Times(1)
+
+	s.chainStore.Set(testChainStore)
 
 	s.Require().NoError(s.handler.GetIgp(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
@@ -724,10 +734,22 @@ func (s *HyperlaneTestSuite) TestGetIgp() {
 	s.Require().NotNil(response.Owner)
 	s.Require().Equal(testAddress, response.Owner.Hash)
 	s.Require().NotNil(response.Config)
-	s.Require().EqualValues(testIgp.Config.RemoteDomain, response.Config.RemoteDomain)
 	s.Require().EqualValues(testIgp.Config.GasPrice.String(), response.Config.GasPrice)
 	s.Require().EqualValues(testIgp.Config.GasOverhead.String(), response.Config.GasOverhead)
 	s.Require().EqualValues(testIgp.Config.TokenExchangeRate, response.Config.TokenExchangeRate)
+	s.Require().NotNil(response.Config.Counterparty)
+	s.Require().NotNil(response.Config.Counterparty.ChainMetadata)
+	s.Require().EqualValues(testChainMetadata.DisplayName, response.Config.Counterparty.ChainMetadata.Name)
+	s.Require().EqualValues(testChainMetadata.DomainId, response.Config.Counterparty.RemoteDomain)
+	s.Require().NotNil(response.Config.Counterparty.ChainMetadata.NativeToken)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, response.Config.Counterparty.ChainMetadata.NativeToken.Decimals)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Name, response.Config.Counterparty.ChainMetadata.NativeToken.Name)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Symbol, response.Config.Counterparty.ChainMetadata.NativeToken.Symbol)
+	s.Require().NotNil(response.Config.Counterparty.ChainMetadata.BlockExplorers)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Name, response.Config.Counterparty.ChainMetadata.BlockExplorers[0].Name)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].ApiUrl, response.Config.Counterparty.ChainMetadata.BlockExplorers[0].ApiUrl)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Url, response.Config.Counterparty.ChainMetadata.BlockExplorers[0].Url)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Family, response.Config.Counterparty.ChainMetadata.BlockExplorers[0].Family)
 }
 
 func (s *HyperlaneTestSuite) TestListIgps() {
@@ -736,10 +758,21 @@ func (s *HyperlaneTestSuite) TestListIgps() {
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/igp")
 
+	s.chainStore.EXPECT().
+		Set(testChainStore).
+		Times(1)
+
+	s.chainStore.EXPECT().
+		Get(gomock.Any()).
+		Return(testChainMetadata, true).
+		Times(1)
+
 	s.igp.EXPECT().
 		List(gomock.Any(), 10, 0).
 		Return([]storage.HLIGP{testIgp}, nil).
 		Times(1)
+
+	s.chainStore.Set(testChainStore)
 
 	s.Require().NoError(s.handler.ListIgps(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
@@ -758,8 +791,21 @@ func (s *HyperlaneTestSuite) TestListIgps() {
 	s.Require().NotNil(igp.Owner)
 	s.Require().Equal(testAddress, igp.Owner.Hash)
 	s.Require().NotNil(igp.Config)
-	s.Require().EqualValues(testIgp.Config.RemoteDomain, igp.Config.RemoteDomain)
 	s.Require().EqualValues(testIgp.Config.GasPrice.String(), igp.Config.GasPrice)
 	s.Require().EqualValues(testIgp.Config.GasOverhead.String(), igp.Config.GasOverhead)
 	s.Require().EqualValues(testIgp.Config.TokenExchangeRate, igp.Config.TokenExchangeRate)
+
+	s.Require().NotNil(igp.Config.Counterparty)
+	s.Require().NotNil(igp.Config.Counterparty.ChainMetadata)
+	s.Require().EqualValues(testChainMetadata.DisplayName, igp.Config.Counterparty.ChainMetadata.Name)
+	s.Require().EqualValues(testChainMetadata.DomainId, igp.Config.Counterparty.RemoteDomain)
+	s.Require().NotNil(igp.Config.Counterparty.ChainMetadata.NativeToken)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Decimals, igp.Config.Counterparty.ChainMetadata.NativeToken.Decimals)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Name, igp.Config.Counterparty.ChainMetadata.NativeToken.Name)
+	s.Require().EqualValues(testChainMetadata.NativeToken.Symbol, igp.Config.Counterparty.ChainMetadata.NativeToken.Symbol)
+	s.Require().NotNil(igp.Config.Counterparty.ChainMetadata.BlockExplorers)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Name, igp.Config.Counterparty.ChainMetadata.BlockExplorers[0].Name)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].ApiUrl, igp.Config.Counterparty.ChainMetadata.BlockExplorers[0].ApiUrl)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Url, igp.Config.Counterparty.ChainMetadata.BlockExplorers[0].Url)
+	s.Require().EqualValues(testChainMetadata.BlockExplorers[0].Family, igp.Config.Counterparty.ChainMetadata.BlockExplorers[0].Family)
 }
