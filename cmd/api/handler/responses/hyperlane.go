@@ -278,8 +278,8 @@ type HyperlaneIgp struct {
 	Denom  string         `example:"utia"                                                             format:"string"    json:"denom"  swaggertype:"string"`
 	IgpId  string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"igp_id" swaggertype:"string"`
 
-	Owner  *ShortAddress       `json:"owner,omitempty"`
-	Config *HyperlaneIgpConfig `json:"config,omitempty"`
+	Owner   *ShortAddress         `json:"owner,omitempty"`
+	Configs []*HyperlaneIgpConfig `json:"configs,omitempty"`
 }
 
 func NewHyperlaneIgp(igp storage.HLIGP, store hyperlane.IChainStore) HyperlaneIgp {
@@ -293,7 +293,7 @@ func NewHyperlaneIgp(igp storage.HLIGP, store hyperlane.IChainStore) HyperlaneIg
 	}
 
 	if igp.Config != nil {
-		result.Config = NewHyperlaneIgpConfig(igp.Config, store)
+		result.Configs = append(result.Configs, NewHyperlaneIgpConfig(igp.Config, store))
 	}
 
 	return result

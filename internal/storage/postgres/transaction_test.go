@@ -1979,7 +1979,7 @@ func (s *TransactionTestSuite) TestSaveIgpConfig() {
 			Time:              time.Now().UTC(),
 			GasOverhead:       decimal.RequireFromString("200000"),
 			GasPrice:          decimal.RequireFromString("2"),
-			RemoteDomain:      1488,
+			RemoteDomain:      1489,
 			TokenExchangeRate: "87654321",
 		})
 	s.Require().NoError(err)
