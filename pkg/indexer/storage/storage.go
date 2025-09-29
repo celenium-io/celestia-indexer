@@ -9,7 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	jsoniter "github.com/json-iterator/go"
+	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 
@@ -380,19 +380,19 @@ func (module *Module) notify(ctx context.Context, state storage.State, block sto
 		return nil
 	}
 
-	rawState, err := jsoniter.MarshalToString(state)
+	rawState, err := json.Marshal(state)
 	if err != nil {
 		return err
 	}
-	if err := module.notificator.Notify(ctx, storage.ChannelHead, rawState); err != nil {
+	if err := module.notificator.Notify(ctx, storage.ChannelHead, string(rawState)); err != nil {
 		return err
 	}
 
-	rawBlock, err := jsoniter.MarshalToString(block)
+	rawBlock, err := json.Marshal(block)
 	if err != nil {
 		return err
 	}
-	if err := module.notificator.Notify(ctx, storage.ChannelBlock, rawBlock); err != nil {
+	if err := module.notificator.Notify(ctx, storage.ChannelBlock, string(rawBlock)); err != nil {
 		return err
 	}
 

@@ -13,8 +13,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
-
 type PackedBytes map[string]any
 
 var _ sql.Scanner = (*PackedBytes)(nil)
@@ -29,7 +27,7 @@ func (pb *PackedBytes) Scan(src interface{}) error {
 	}
 
 	result := bytes.NewBuffer(b)
-	return json.NewDecoder(brotli.NewReader(result)).Decode(pb)
+	return jsoniter.NewDecoder(brotli.NewReader(result)).Decode(pb)
 }
 
 var _ driver.Valuer = (*PackedBytes)(nil)
@@ -39,7 +37,7 @@ func (pb PackedBytes) Value() (driver.Value, error) {
 }
 
 func (pb PackedBytes) ToBytes() ([]byte, error) {
-	b, err := json.Marshal(pb)
+	b, err := jsoniter.Marshal(pb)
 	if err != nil {
 		return nil, err
 	}

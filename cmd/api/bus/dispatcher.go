@@ -9,7 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-io/workerpool"
-	jsoniter "github.com/json-iterator/go"
+	"github.com/goccy/go-json"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -108,7 +108,7 @@ func (d *Dispatcher) handleNotification(ctx context.Context, notification *pq.No
 
 func (d *Dispatcher) handleBlock(ctx context.Context, payload string) error {
 	block := new(storage.Block)
-	if err := jsoniter.UnmarshalFromString(payload, block); err != nil {
+	if err := json.Unmarshal([]byte(payload), block); err != nil {
 		return err
 	}
 
@@ -130,7 +130,7 @@ func (d *Dispatcher) handleBlock(ctx context.Context, payload string) error {
 
 func (d *Dispatcher) handleState(ctx context.Context, payload string) error {
 	var state storage.State
-	if err := jsoniter.UnmarshalFromString(payload, &state); err != nil {
+	if err := json.Unmarshal([]byte(payload), &state); err != nil {
 		return err
 	}
 
