@@ -5,7 +5,6 @@ package storage
 
 import (
 	"context"
-	"encoding/hex"
 	"time"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
@@ -21,20 +20,15 @@ type IHLIGPConfig interface {
 type HLIGPConfig struct {
 	bun.BaseModel `bun:"hl_igp_config" comment:"Table with hyperlane interchain gas paymaster (IGP) config"`
 
-	Id                uint64          `bun:"id,pk,autoincrement"      comment:"Internal identity"`
-	Height            pkgTypes.Level  `bun:"height,notnull"           comment:"The number (height) of this block"`
-	Time              time.Time       `bun:"time,pk,notnull"          comment:"The time of block"`
-	IgpId             []byte          `bun:"igp_id,type:bytea,unique" comment:"IGP identity"`
-	GasOverhead       decimal.Decimal `bun:"gas_overhead"             comment:"Gas overhead"`
-	GasPrice          decimal.Decimal `bun:"gas_price"                comment:"Gas price"`
-	RemoteDomain      uint64          `bun:"remote_domain"            comment:"Remote domain"`
-	TokenExchangeRate string          `bun:"token_exchange_rate"      comment:"Token exchange rate"`
+	Id                uint64          `bun:"id,pk"               comment:"Internal identity"`
+	Height            pkgTypes.Level  `bun:"height,notnull"      comment:"The number (height) of this block"`
+	Time              time.Time       `bun:"time,pk,notnull"     comment:"The time of block"`
+	GasOverhead       decimal.Decimal `bun:"gas_overhead"        comment:"Gas overhead"`
+	GasPrice          decimal.Decimal `bun:"gas_price"           comment:"Gas price"`
+	RemoteDomain      uint64          `bun:"remote_domain"       comment:"Remote domain"`
+	TokenExchangeRate string          `bun:"token_exchange_rate" comment:"Token exchange rate"`
 }
 
 func (t *HLIGPConfig) TableName() string {
 	return "hl_igp_config"
-}
-
-func (t *HLIGPConfig) String() string {
-	return hex.EncodeToString(t.IgpId)
 }

@@ -1971,7 +1971,6 @@ func (s *TransactionTestSuite) TestSaveIgpConfig() {
 			Time:              time.Now().UTC(),
 			GasOverhead:       decimal.RequireFromString("100000"),
 			GasPrice:          decimal.RequireFromString("1"),
-			IgpId:             []uint8{0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x5f, 0x70, 0x6f, 0x73, 0x74, 0x5f, 0x64, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x0, 0x0, 0x0, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1},
 			RemoteDomain:      1488,
 			TokenExchangeRate: "1234567",
 		}, storage.HLIGPConfig{
@@ -1980,7 +1979,6 @@ func (s *TransactionTestSuite) TestSaveIgpConfig() {
 			Time:              time.Now().UTC(),
 			GasOverhead:       decimal.RequireFromString("200000"),
 			GasPrice:          decimal.RequireFromString("2"),
-			IgpId:             []uint8{0x71, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x5f, 0x70, 0x6f, 0x73, 0x74, 0x5f, 0x64, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x0, 0x0, 0x0, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1},
 			RemoteDomain:      1488,
 			TokenExchangeRate: "87654321",
 		})
@@ -1997,11 +1995,10 @@ func (s *TransactionTestSuite) TestHyperlaneIgpConfig() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	igp, err := tx.HyperlaneIgpConfig(ctx, []byte("igp_1"))
+	igp, err := tx.HyperlaneIgpConfig(ctx, 1)
 	s.Require().NoError(err)
 
 	s.Require().EqualValues(1488, igp.Height)
-	s.Require().EqualValues([]byte("igp_1"), igp.IgpId)
 	s.Require().EqualValues(decimal.RequireFromString("1"), igp.GasPrice)
 	s.Require().EqualValues(decimal.RequireFromString("100000"), igp.GasOverhead)
 	s.Require().EqualValues(1234, igp.RemoteDomain)

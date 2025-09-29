@@ -191,7 +191,7 @@ type Transaction interface {
 	HyperlaneMailbox(ctx context.Context, internalId uint64) (HLMailbox, error)
 	HyperlaneToken(ctx context.Context, id []byte) (HLToken, error)
 	HyperlaneIgp(ctx context.Context, id []byte) (HLIGP, error)
-	HyperlaneIgpConfig(ctx context.Context, id []byte) (HLIGPConfig, error)
+	HyperlaneIgpConfig(ctx context.Context, id uint64) (HLIGPConfig, error)
 }
 
 const (

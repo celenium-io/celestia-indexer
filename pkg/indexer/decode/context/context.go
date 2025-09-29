@@ -21,13 +21,13 @@ type Context struct {
 	Proposals   *sync.Map[uint64, *storage.Proposal]
 	Constants   *sync.Map[string, *storage.Constant]
 	Igps        *sync.Map[string, *storage.HLIGP]
+	IgpConfigs  *sync.Map[string, *storage.HLIGPConfig]
 
 	Redelegations   []storage.Redelegation
 	Undelegations   []storage.Undelegation
 	CancelUnbonding []storage.Undelegation
 	StakingLogs     []storage.StakingLog
 	Votes           []*storage.Vote
-	IgpConfigs      []storage.HLIGPConfig
 
 	Block *storage.Block
 }
@@ -41,12 +41,12 @@ func NewContext() *Context {
 		Proposals:       sync.NewMap[uint64, *storage.Proposal](),
 		Constants:       sync.NewMap[string, *storage.Constant](),
 		Igps:            sync.NewMap[string, *storage.HLIGP](),
+		IgpConfigs:      sync.NewMap[string, *storage.HLIGPConfig](),
 		Redelegations:   make([]storage.Redelegation, 0),
 		Undelegations:   make([]storage.Undelegation, 0),
 		CancelUnbonding: make([]storage.Undelegation, 0),
 		StakingLogs:     make([]storage.StakingLog, 0),
 		Votes:           make([]*storage.Vote, 0),
-		IgpConfigs:      make([]storage.HLIGPConfig, 0),
 	}
 }
 
@@ -254,14 +254,10 @@ func (ctx *Context) AddIgp(igpId string, igp *storage.HLIGP) {
 	}
 }
 
-func (ctx *Context) AddIgpConfig(igp storage.HLIGPConfig) {
-	ctx.IgpConfigs = append(ctx.IgpConfigs, storage.HLIGPConfig{
-		Time:              igp.Time,
-		Height:            igp.Height,
-		IgpId:             igp.IgpId,
-		GasOverhead:       igp.GasOverhead,
-		GasPrice:          igp.GasPrice,
-		RemoteDomain:      igp.RemoteDomain,
-		TokenExchangeRate: igp.TokenExchangeRate,
-	})
+func (ctx *Context) AddIgpConfig(igpId string, config *storage.HLIGPConfig) {
+	if val, ok := ctx.Igps.Get(igpId); ok {
+		val.Config = config
+	} else {
+		ctx.IgpConfigs.Set(igpId, config)
+	}
 }

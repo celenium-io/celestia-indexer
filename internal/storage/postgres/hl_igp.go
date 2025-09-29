@@ -27,8 +27,8 @@ func (hl *HLIGP) List(ctx context.Context, limit, offset int) (igp []storage.HLI
 	err = hl.DB().NewSelect().
 		TableExpr("(?) as igp", query).
 		ColumnExpr("igp.*").
-		ColumnExpr("hl_igp_config.gas_overhead as config__gas_overhead, hl_igp_config.gas_price as config__gas_price, hl_igp_config.remote_domain as config__remote_domain, hl_igp_config.token_exchange_rate as config__token_exchange_rate, hl_igp_config.igp_id as config__igp_id").
-		Join("left join hl_igp_config on hl_igp_config.igp_id = igp.igp_id").
+		ColumnExpr("hl_igp_config.gas_overhead as config__gas_overhead, hl_igp_config.gas_price as config__gas_price, hl_igp_config.remote_domain as config__remote_domain, hl_igp_config.token_exchange_rate as config__token_exchange_rate").
+		Join("left join hl_igp_config on hl_igp_config.id = igp.id").
 		Scan(ctx, &igp)
 	return
 }
@@ -42,8 +42,8 @@ func (hl *HLIGP) ByHash(ctx context.Context, hash []byte) (igp storage.HLIGP, er
 	err = hl.DB().NewSelect().
 		TableExpr("(?) as igp", query).
 		ColumnExpr("igp.*").
-		ColumnExpr("hl_igp_config.gas_overhead as config__gas_overhead, hl_igp_config.gas_price as config__gas_price, hl_igp_config.remote_domain as config__remote_domain, hl_igp_config.token_exchange_rate as config__token_exchange_rate, hl_igp_config.igp_id as config__igp_id").
-		Join("left join hl_igp_config on hl_igp_config.igp_id = igp.igp_id").
+		ColumnExpr("hl_igp_config.gas_overhead as config__gas_overhead, hl_igp_config.gas_price as config__gas_price, hl_igp_config.remote_domain as config__remote_domain, hl_igp_config.token_exchange_rate as config__token_exchange_rate").
+		Join("left join hl_igp_config on hl_igp_config.id = igp.id").
 		Scan(ctx, &igp)
 	return
 }

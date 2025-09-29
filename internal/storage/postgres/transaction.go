@@ -1476,9 +1476,9 @@ func (tx Transaction) HyperlaneIgp(ctx context.Context, id []byte) (igp models.H
 	return
 }
 
-func (tx Transaction) HyperlaneIgpConfig(ctx context.Context, id []byte) (config models.HLIGPConfig, err error) {
+func (tx Transaction) HyperlaneIgpConfig(ctx context.Context, id uint64) (config models.HLIGPConfig, err error) {
 	err = tx.Tx().NewSelect().Model(&config).
-		Where("igp_id = ?", id).
+		Where("id = ?", id).
 		Scan(ctx)
 	return
 }

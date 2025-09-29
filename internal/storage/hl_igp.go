@@ -29,7 +29,7 @@ type HLIGP struct {
 	Denom   string         `bun:"denom"                    comment:"Denom"`
 
 	Owner  *Address     `bun:"rel:belongs-to,join:owner_id=id"`
-	Config *HLIGPConfig `bun:"rel:belongs-to"`
+	Config *HLIGPConfig `bun:"rel:belongs-to,join:id=id"`
 }
 
 func (t *HLIGP) TableName() string {

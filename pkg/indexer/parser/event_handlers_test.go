@@ -130,7 +130,7 @@ func Test_parseSetDestinationGasConfig(t *testing.T) {
 	tests := []struct {
 		name    string
 		data    map[string]any
-		want    storage.HLIGPConfig
+		want    *storage.HLIGPConfig
 		wantErr bool
 	}{
 		{
@@ -143,10 +143,9 @@ func Test_parseSetDestinationGasConfig(t *testing.T) {
 				"remote_domain":       "84532",
 				"token_exchange_rate": "\"10000000000\"",
 			},
-			want: storage.HLIGPConfig{
+			want: &storage.HLIGPConfig{
 				Height:            pkgTypes.Level(1488),
 				Time:              testBlock.Time,
-				IgpId:             testIgpId,
 				GasPrice:          decimal.RequireFromString("1"),
 				GasOverhead:       decimal.RequireFromString("200000"),
 				RemoteDomain:      84532,
@@ -158,10 +157,11 @@ func Test_parseSetDestinationGasConfig(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := parseSetDestinationGasConfig(ctx, tt.data)
 			require.True(t, (err == nil) != tt.wantErr)
-			require.EqualValues(t, 1, len(ctx.IgpConfigs))
-			for _, v := range ctx.IgpConfigs {
-				require.Equal(t, tt.want, v)
-			}
+			require.EqualValues(t, 1, ctx.IgpConfigs.Len())
+			_ = ctx.IgpConfigs.Range(func(_ string, value *storage.HLIGPConfig) (error, bool) {
+				require.Equal(t, tt.want, value)
+				return nil, false
+			})
 		})
 	}
 }
