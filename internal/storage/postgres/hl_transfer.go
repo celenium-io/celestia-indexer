@@ -28,12 +28,12 @@ func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTran
 	query := t.DB().NewSelect().
 		Model((*storage.HLTransfer)(nil))
 
-	query = limitScope(query, filters.Limit)
-	query = sortScope(query, "id", filters.Sort)
-
 	if filters.Offset > 0 {
 		query = query.Offset(filters.Offset)
 	}
+
+	query = limitScope(query, filters.Limit)
+	query = query.OrderExpr("time ?0, id ?0", bun.Safe(filters.Sort))
 
 	if filters.MailboxId > 0 {
 		query = query.Where("mailbox_id = ?", filters.MailboxId)
