@@ -77,7 +77,6 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 				}
 			}
 			msg.HLTransfer = transfer
-			end = true
 		case types.EventTypeHyperlanewarpv1EventReceiveRemoteTransfer:
 			event, err := decode.NewHyperlaneReceiveTransferEvent(events[*idx].Data)
 			if err != nil {
