@@ -78,6 +78,7 @@ func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTran
 		Join("left join celestial on celestial.address_id = transfer.address_id and celestial.status = 'PRIMARY'").
 		Join("left join address as relayer on relayer.id = transfer.relayer_id").
 		Join("left join celestial as relayer_celestials on relayer_celestials.address_id = transfer.relayer_id and relayer_celestials.status = 'PRIMARY'").
+		OrderExpr("time ?0, id ?0", bun.Safe(filters.Sort)).
 		Scan(ctx, &transfers)
 	return
 }
