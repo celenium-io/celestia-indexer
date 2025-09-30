@@ -292,8 +292,8 @@ func NewHyperlaneIgp(igp storage.HLIGP, store hyperlane.IChainStore) HyperlaneIg
 		Owner:  NewShortAddress(igp.Owner),
 	}
 
-	if igp.Config != nil {
-		result.Configs = append(result.Configs, NewHyperlaneIgpConfig(igp.Config, store))
+	for i := range igp.Configs {
+		result.Configs = append(result.Configs, NewHyperlaneIgpConfig(igp.Configs[i], store))
 	}
 
 	return result

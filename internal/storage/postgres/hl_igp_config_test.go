@@ -14,7 +14,7 @@ func (s *StorageTestSuite) TestHyperlaneIgpConfigList() {
 
 	items, err := s.storage.HLIGPConfig.List(ctx, 10, 0)
 	s.Require().NoError(err)
-	s.Require().Len(items, 1)
+	s.Require().Len(items, 2)
 
 	config := items[0]
 	s.Require().EqualValues(1, config.Id)

@@ -782,7 +782,7 @@ func (s *TransactionTestSuite) TestRollbackHyperlaneIgpConfigs() {
 
 	items, err := s.storage.HLIGPConfig.List(ctx, 10, 0)
 	s.Require().NoError(err)
-	s.Require().Len(items, 0)
+	s.Require().Len(items, 1)
 }
 
 func (s *TransactionTestSuite) TestRollbackHyperlaneGasPayment() {

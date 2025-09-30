@@ -175,11 +175,13 @@ var (
 			Height:     1488,
 			LastHeight: 1488,
 		},
-		Config: &storage.HLIGPConfig{
-			GasPrice:          decimal.RequireFromString("1"),
-			GasOverhead:       decimal.RequireFromString("100000"),
-			TokenExchangeRate: "1234",
-			RemoteDomain:      1,
+		Configs: []*storage.HLIGPConfig{
+			{
+				GasPrice:          decimal.RequireFromString("1"),
+				GasOverhead:       decimal.RequireFromString("100000"),
+				TokenExchangeRate: "1234",
+				RemoteDomain:      1,
+			},
 		},
 	}
 )
@@ -733,10 +735,10 @@ func (s *HyperlaneTestSuite) TestGetIgp() {
 	s.Require().EqualValues(hex.EncodeToString(testIgp.IgpId), response.IgpId)
 	s.Require().NotNil(response.Owner)
 	s.Require().Equal(testAddress, response.Owner.Hash)
-	s.Require().NotNil(response.Configs)
-	s.Require().EqualValues(testIgp.Config.GasPrice.String(), response.Configs[0].GasPrice)
-	s.Require().EqualValues(testIgp.Config.GasOverhead.String(), response.Configs[0].GasOverhead)
-	s.Require().EqualValues(testIgp.Config.TokenExchangeRate, response.Configs[0].TokenExchangeRate)
+	s.Require().Len(response.Configs, 1)
+	s.Require().EqualValues(testIgp.Configs[0].GasPrice.String(), response.Configs[0].GasPrice)
+	s.Require().EqualValues(testIgp.Configs[0].GasOverhead.String(), response.Configs[0].GasOverhead)
+	s.Require().EqualValues(testIgp.Configs[0].TokenExchangeRate, response.Configs[0].TokenExchangeRate)
 	s.Require().NotNil(response.Configs[0].Counterparty)
 	s.Require().NotNil(response.Configs[0].Counterparty.ChainMetadata)
 	s.Require().EqualValues(testChainMetadata.DisplayName, response.Configs[0].Counterparty.ChainMetadata.Name)
@@ -790,10 +792,10 @@ func (s *HyperlaneTestSuite) TestListIgps() {
 	s.Require().EqualValues(hex.EncodeToString(testIgp.IgpId), igp.IgpId)
 	s.Require().NotNil(igp.Owner)
 	s.Require().Equal(testAddress, igp.Owner.Hash)
-	s.Require().NotNil(igp.Configs)
-	s.Require().EqualValues(testIgp.Config.GasPrice.String(), igp.Configs[0].GasPrice)
-	s.Require().EqualValues(testIgp.Config.GasOverhead.String(), igp.Configs[0].GasOverhead)
-	s.Require().EqualValues(testIgp.Config.TokenExchangeRate, igp.Configs[0].TokenExchangeRate)
+	s.Require().Len(igp.Configs, 1)
+	s.Require().EqualValues(testIgp.Configs[0].GasPrice.String(), igp.Configs[0].GasPrice)
+	s.Require().EqualValues(testIgp.Configs[0].GasOverhead.String(), igp.Configs[0].GasOverhead)
+	s.Require().EqualValues(testIgp.Configs[0].TokenExchangeRate, igp.Configs[0].TokenExchangeRate)
 
 	s.Require().NotNil(igp.Configs[0].Counterparty)
 	s.Require().NotNil(igp.Configs[0].Counterparty.ChainMetadata)

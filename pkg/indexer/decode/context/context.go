@@ -256,7 +256,7 @@ func (ctx *Context) AddIgp(igpId string, igp *storage.HLIGP) {
 
 func (ctx *Context) AddIgpConfig(igpId string, config *storage.HLIGPConfig) {
 	if val, ok := ctx.Igps.Get(igpId); ok {
-		val.Config = config
+		val.Configs = append(val.Configs, config)
 	} else {
 		ctx.IgpConfigs.Set(igpId, config)
 	}
