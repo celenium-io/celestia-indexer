@@ -337,7 +337,15 @@ func (tx Transaction) SaveHyperlaneIgpConfigs(ctx context.Context, configs ...mo
 		return nil
 	}
 
-	_, err := tx.Tx().NewInsert().Model(&configs).Exec(ctx)
+	_, err := tx.Tx().NewInsert().Model(&configs).
+		Column("id", "height", "time", "gas_overhead", "gas_price", "remote_domain", "token_exchange_rate").
+		On("CONFLICT (id, remote_domain) DO UPDATE").
+		Set("height = EXCLUDED.height").
+		Set("time = EXCLUDED.time").
+		Set("gas_overhead = EXCLUDED.gas_overhead").
+		Set("gas_price = EXCLUDED.gas_price").
+		Set("token_exchange_rate = EXCLUDED.token_exchange_rate").
+		Exec(ctx)
 	return err
 }
 
