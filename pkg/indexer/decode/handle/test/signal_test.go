@@ -47,14 +47,14 @@ func TestDecodeMsg_SuccessOnMsgSignalVersion(t *testing.T) {
 		58,
 	)
 
+	validator := storage.EmptyValidator()
+	validator.Address = m.ValidatorAddress
+	validator.Version = 10
 	msgExpected.SignalVersion = &storage.SignalVersion{
-		Height: blob.Height,
-		Validator: &storage.Validator{
-			Address: m.ValidatorAddress,
-			Version: 10,
-		},
-		Time:    blob.Block.Time,
-		Version: m.Version,
+		Height:    blob.Height,
+		Validator: &validator,
+		Time:      blob.Block.Time,
+		Version:   m.Version,
 	}
 
 	require.NoError(t, err)
