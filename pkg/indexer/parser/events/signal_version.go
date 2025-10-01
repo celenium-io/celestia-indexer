@@ -15,15 +15,16 @@ func processSignalVersion(ctx *context.Context, events []storage.Event, msg *sto
 	if err != nil {
 		return errors.Wrap(err, "get signal version in exec")
 	}
-	validator := decoder.StringFromMap(data, "ValidatorAddress")
+
+	val := storage.EmptyValidator()
+	val.Address = decoder.StringFromMap(data, "ValidatorAddress")
+	val.Version = version
+
 	msg.SignalVersion = &storage.SignalVersion{
-		Height:  msg.Height,
-		Time:    msg.Time,
-		Version: version,
-		Validator: &storage.Validator{
-			Address: validator,
-			Version: version,
-		},
+		Height:    msg.Height,
+		Time:      msg.Time,
+		Version:   version,
+		Validator: &val,
 	}
 	ctx.AddValidator(*msg.SignalVersion.Validator)
 	toTheNextAction(events, idx)
