@@ -25,14 +25,15 @@ func MsgSignalVersion(ctx *context.Context, status storageTypes.Status, m *signa
 		return msgType, addresses, nil, nil
 	}
 
+	validator := storage.EmptyValidator()
+	validator.Address = m.ValidatorAddress
+	validator.Version = m.Version
+
 	signal := &storage.SignalVersion{
-		Height: ctx.Block.Height,
-		Validator: &storage.Validator{
-			Address: m.ValidatorAddress,
-			Version: m.Version,
-		},
-		Time:    ctx.Block.Time,
-		Version: m.Version,
+		Height:    ctx.Block.Height,
+		Validator: &validator,
+		Time:      ctx.Block.Time,
+		Version:   m.Version,
 	}
 	ctx.AddValidator(*signal.Validator)
 	return msgType, addresses, signal, err
