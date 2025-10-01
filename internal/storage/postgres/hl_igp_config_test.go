@@ -14,12 +14,11 @@ func (s *StorageTestSuite) TestHyperlaneIgpConfigList() {
 
 	items, err := s.storage.HLIGPConfig.List(ctx, 10, 0)
 	s.Require().NoError(err)
-	s.Require().Len(items, 1)
+	s.Require().Len(items, 2)
 
 	config := items[0]
 	s.Require().EqualValues(1, config.Id)
 	s.Require().EqualValues(1488, config.Height)
-	s.Require().EqualValues([]byte("igp_1"), config.IgpId)
 	s.Require().EqualValues("100000", config.GasOverhead.String())
 	s.Require().EqualValues("1", config.GasPrice.String())
 	s.Require().EqualValues(1234, config.RemoteDomain)

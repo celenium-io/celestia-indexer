@@ -28,8 +28,8 @@ type HLIGP struct {
 	OwnerId uint64         `bun:"owner_id"                 comment:"Owner identity"`
 	Denom   string         `bun:"denom"                    comment:"Denom"`
 
-	Owner  *Address     `bun:"rel:belongs-to,join:owner_id=id"`
-	Config *HLIGPConfig `bun:"rel:belongs-to"`
+	Owner   *Address       `bun:"rel:belongs-to,join:owner_id=id"`
+	Configs []*HLIGPConfig `bun:"rel:has-many,join:id=id"`
 }
 
 func (t *HLIGP) TableName() string {

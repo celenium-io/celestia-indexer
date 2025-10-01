@@ -19,11 +19,12 @@ func (s *StorageTestSuite) TestHyperlaneIgpByHash() {
 	s.Require().EqualValues(1488, igp.Height)
 	s.Require().EqualValues([]byte("igp_1"), igp.IgpId)
 
-	s.Require().NotNil(igp.Config)
-	s.Require().EqualValues(1234, igp.Config.RemoteDomain)
-	s.Require().EqualValues("4321", igp.Config.TokenExchangeRate)
-	s.Require().EqualValues("100000", igp.Config.GasOverhead.String())
-	s.Require().EqualValues("1", igp.Config.GasPrice.String())
+	s.Require().Len(igp.Configs, 2)
+	config := igp.Configs[0]
+	s.Require().EqualValues(1234, config.RemoteDomain)
+	s.Require().EqualValues("4321", config.TokenExchangeRate)
+	s.Require().EqualValues("100000", config.GasOverhead.String())
+	s.Require().EqualValues("1", config.GasPrice.String())
 }
 
 func (s *StorageTestSuite) TestHyperlaneIgpList() {
@@ -39,5 +40,5 @@ func (s *StorageTestSuite) TestHyperlaneIgpList() {
 	s.Require().EqualValues(1489, igp.Height)
 	s.Require().EqualValues([]byte("igp_2"), igp.IgpId)
 
-	s.Require().Nil(igp.Config)
+	s.Require().Len(igp.Configs, 0)
 }

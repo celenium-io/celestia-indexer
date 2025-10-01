@@ -275,21 +275,15 @@ func parseSetDestinationGasConfig(ctx *context.Context, data map[string]any) err
 		return nil
 	}
 
-	igpId, err := util.DecodeHexAddress(igp.IgpId)
-	if err != nil {
-		return errors.Wrap(err, "decode igp id")
-	}
-
-	newIgpConfig := storage.HLIGPConfig{
+	config := storage.HLIGPConfig{
 		Height:            ctx.Block.Height,
 		Time:              ctx.Block.Time,
-		IgpId:             igpId.Bytes(),
 		GasPrice:          igp.GasPrice,
 		GasOverhead:       igp.GasOverhead,
 		RemoteDomain:      igp.RemoteDomain,
 		TokenExchangeRate: igp.TokenExchangeRate,
 	}
-	ctx.AddIgpConfig(newIgpConfig)
+	ctx.AddIgpConfig(igp.IgpId, &config)
 
 	return nil
 }

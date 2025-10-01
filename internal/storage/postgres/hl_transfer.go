@@ -28,12 +28,12 @@ func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTran
 	query := t.DB().NewSelect().
 		Model((*storage.HLTransfer)(nil))
 
-	query = limitScope(query, filters.Limit)
-	query = sortScope(query, "id", filters.Sort)
-
 	if filters.Offset > 0 {
 		query = query.Offset(filters.Offset)
 	}
+
+	query = limitScope(query, filters.Limit)
+	query = query.OrderExpr("time ?0, id ?0", bun.Safe(filters.Sort))
 
 	if filters.MailboxId > 0 {
 		query = query.Where("mailbox_id = ?", filters.MailboxId)
@@ -78,6 +78,7 @@ func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTran
 		Join("left join celestial on celestial.address_id = transfer.address_id and celestial.status = 'PRIMARY'").
 		Join("left join address as relayer on relayer.id = transfer.relayer_id").
 		Join("left join celestial as relayer_celestials on relayer_celestials.address_id = transfer.relayer_id and relayer_celestials.status = 'PRIMARY'").
+		OrderExpr("time ?0, id ?0", bun.Safe(filters.Sort)).
 		Scan(ctx, &transfers)
 	return
 }

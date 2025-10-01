@@ -1025,7 +1025,7 @@ func (c *MockTransactionHyperlaneIgpCall) DoAndReturn(f func(context.Context, []
 }
 
 // HyperlaneIgpConfig mocks base method.
-func (m *MockTransaction) HyperlaneIgpConfig(ctx context.Context, id []byte) (storage.HLIGPConfig, error) {
+func (m *MockTransaction) HyperlaneIgpConfig(ctx context.Context, id uint64) (storage.HLIGPConfig, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "HyperlaneIgpConfig", ctx, id)
 	ret0, _ := ret[0].(storage.HLIGPConfig)
@@ -1052,13 +1052,13 @@ func (c *MockTransactionHyperlaneIgpConfigCall) Return(arg0 storage.HLIGPConfig,
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionHyperlaneIgpConfigCall) Do(f func(context.Context, []byte) (storage.HLIGPConfig, error)) *MockTransactionHyperlaneIgpConfigCall {
+func (c *MockTransactionHyperlaneIgpConfigCall) Do(f func(context.Context, uint64) (storage.HLIGPConfig, error)) *MockTransactionHyperlaneIgpConfigCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionHyperlaneIgpConfigCall) DoAndReturn(f func(context.Context, []byte) (storage.HLIGPConfig, error)) *MockTransactionHyperlaneIgpConfigCall {
+func (c *MockTransactionHyperlaneIgpConfigCall) DoAndReturn(f func(context.Context, uint64) (storage.HLIGPConfig, error)) *MockTransactionHyperlaneIgpConfigCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

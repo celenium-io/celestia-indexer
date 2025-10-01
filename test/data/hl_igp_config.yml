@@ -3,6 +3,12 @@
   time: '2025-07-07T07:07:07'
   gas_overhead: 100000
   gas_price: 1
-  igp_id: igp_1
   remote_domain: 1234
   token_exchange_rate: 4321
+- id: 1
+  height: 1490
+  time: '2025-09-09T09:09:09'
+  gas_overhead: 000000
+  gas_price: 9
+  remote_domain: 99
+  token_exchange_rate: 999

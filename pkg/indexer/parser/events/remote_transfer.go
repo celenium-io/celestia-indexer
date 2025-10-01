@@ -62,7 +62,6 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event
 			}
 
 			msg.HLTransfer = transfer
-			end = true
 		case types.EventTypeHyperlanewarpv1EventSendRemoteTransfer:
 			event, err := decode.NewHyperlaneSendTransferEvent(events[*idx].Data)
 			if err != nil {
@@ -83,6 +82,25 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event
 				SentTransfers: 1,
 				Sent:          event.Amount,
 				Type:          types.HLTokenTypeCollateral,
+			}
+		case types.EventTypeHyperlanecorepostDispatchv1EventGasPayment:
+			event, err := decode.NewHyperlaneGasPaymentEvent(events[*idx].Data)
+			if err != nil {
+				return errors.Wrap(err, "parse hyperlane gas payment event")
+			}
+
+			igpId, err := util.DecodeHexAddress(event.IgpId)
+			if err != nil {
+				return errors.Wrap(err, "decode igp id")
+			}
+			transfer.GasPayment = &storage.HLGasPayment{
+				Height:    ctx.Block.Height,
+				Time:      ctx.Block.Time,
+				Amount:    event.Amount,
+				GasAmount: event.GasAmount,
+				Igp: &storage.HLIGP{
+					IgpId: igpId.Bytes(),
+				},
 			}
 		}
 

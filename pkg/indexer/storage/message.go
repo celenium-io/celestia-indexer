@@ -422,9 +422,6 @@ func (module *Module) saveMessages(
 	if err := tx.SaveHyperlaneTokens(ctx, slices.Collect(maps.Values(hyperlaneTokens))...); err != nil {
 		return 0, state.Version, errors.Wrap(err, "hyperlane tokens saving")
 	}
-	if err := tx.SaveHyperlaneTransfers(ctx, hyperlaneTransfers...); err != nil {
-		return 0, state.Version, errors.Wrap(err, "hyperlane transfers saving")
-	}
 	if len(hyperlaneTransfers) > 0 {
 		if err := tx.SaveHyperlaneTransfers(ctx, hyperlaneTransfers...); err != nil {
 			return 0, state.Version, errors.Wrap(err, "hyperlane transfers saving")
