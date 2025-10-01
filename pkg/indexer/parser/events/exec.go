@@ -64,7 +64,7 @@ func processExec(ctx *context.Context, events []storage.Event, msg *storage.Mess
 			if err := processUnjail(ctx, events, msg, idx); err != nil {
 				return err
 			}
-		case "/celestia.signal.v1.Msg/SignalVersion":
+		case "/celestia.signal.v1.MsgSignalVersion":
 			data, err := getInternalDataForExec(msg.Data, i)
 			if err != nil {
 				return err

@@ -822,7 +822,7 @@ func Test_handleExec(t *testing.T) {
 					Height: 45631,
 					Type:   "signal_version",
 					Data: map[string]any{
-						"action":            "/celestia.signal.v1.Msg/SignalVersion",
+						"action":            "/celestia.signal.v1.MsgSignalVersion",
 						"authz_msg_index":   "0",
 						"msg_index":         "0",
 						"validator_address": "celestiavaloper15urq2dtp9qce4fyc85m6upwm9xul3049gwdz0x",
