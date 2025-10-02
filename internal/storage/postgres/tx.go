@@ -122,11 +122,9 @@ func (tx *Tx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxF
 	var relations []storage.Signer
 	signersQuery := tx.DB().NewSelect().
 		Model(&relations).
-		Where("address_id = ?", addressId).
-		Offset(fltrs.Offset)
+		Where("address_id = ?", addressId)
 
 	signersQuery = sortScope(signersQuery, "tx_id", fltrs.Sort)
-	signersQuery = limitScope(signersQuery, fltrs.Limit)
 
 	query := tx.DB().NewSelect().
 		Table("txs").
@@ -135,6 +133,7 @@ func (tx *Tx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxF
 		Join("left join tx on tx.id = txs.tx_id")
 
 	query = txFilter(query, fltrs)
+	query = query.Offset(fltrs.Offset)
 
 	if err := query.Scan(ctx, &txs); err != nil {
 		return nil, err
