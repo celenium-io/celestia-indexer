@@ -466,3 +466,66 @@ func (handler *ValidatorHandler) Messages(c echo.Context) error {
 
 	return returnArray(c, response)
 }
+
+// Metrics godoc
+//
+//	@Summary		Get validator's metrics
+//	@Description	Get validator's metrics
+//	@Tags			validator
+//	@ID				validator-metrics
+//	@Param			id			path	integer	true	"Internal validator id"
+//	@Produce		json
+//	@Success		200	{object}	responses.Metrics
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/validators/{id}/metrics [get]
+func (handler *ValidatorHandler) Metrics(c echo.Context) error {
+	req, err := bindAndValidate[validatorRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	metrics, err := handler.validators.Metrics(c.Request().Context(), req.Id)
+	if err != nil {
+		return handleError(c, err, handler.delegations)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewMetrics(metrics))
+}
+
+type getTopNValidatorMetrics struct {
+	Count int `query:"count" validate:"omitempty,min=1"`
+}
+
+func (req *getTopNValidatorMetrics) SetDefault() {
+	if req.Count < 1 {
+		req.Count = 25
+	}
+}
+
+// TopNMetrics godoc
+//
+//	@Summary		Get validators metrics
+//	@Description	Get validators metrics
+//	@Tags			validator
+//	@ID				validators-metrics
+//	@Param			count		query	integer	false	"Count of aggregated entities"
+//	@Produce		json
+//	@Success		200	{object}	responses.TopNMetrics
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/validators/metrics [get]
+func (handler *ValidatorHandler) TopNMetrics(c echo.Context) error {
+	req, err := bindAndValidate[getTopNValidatorMetrics](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+	req.SetDefault()
+
+	metrics, err := handler.validators.TopNMetrics(c.Request().Context(), req.Count)
+	if err != nil {
+		return handleError(c, err, handler.delegations)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewTopNMetrics(metrics))
+}

@@ -26,3 +26,12 @@ CREATE OR REPLACE PROCEDURE refresh_da_change_materialized_view(job_id INT, conf
     END
     $$;
 
+
+CREATE OR REPLACE PROCEDURE refresh_validator_metrics_materialized_view(job_id INT, config JSONB)
+    LANGUAGE PLPGSQL AS
+    $$
+    BEGIN
+        REFRESH MATERIALIZED VIEW validator_metrics;
+    END
+    $$;
+

@@ -16,5 +16,10 @@ CREATE OR REPLACE PROCEDURE add_job_refresh_materialized_view()
         then
             PERFORM add_job('refresh_da_change_materialized_view', '15m', config => NULL);
         end if;
+
+        if not exists (select from timescaledb_information.jobs where proc_name = 'refresh_validator_metrics_materialized_view')
+        then
+            PERFORM add_job('refresh_validator_metrics_materialized_view', '5m', config => NULL);
+        end if;
     END
     $$;

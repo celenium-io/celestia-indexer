@@ -65,3 +65,36 @@ func (s *StorageTestSuite) TestMessages() {
 	s.Require().Len(msgs, 1)
 	s.Require().NotNil(msgs[0].Msg)
 }
+
+func (s *StorageTestSuite) TestMetrics() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW validator_metrics;")
+	s.Require().NoError(err)
+
+	metrics, err := s.storage.Validator.Metrics(ctx, 1)
+	s.Require().NoError(err)
+	s.Require().NotEmpty(metrics.Id)
+	s.Require().NotEmpty(metrics.BlockMissedMetric.String())
+	s.Require().NotEmpty(metrics.VotesMetric.String())
+	s.Require().NotEmpty(metrics.OperationTimeMetric.String())
+	s.Require().NotEmpty(metrics.CommissionMetric.String())
+	s.Require().NotEmpty(metrics.SelfDelegationMetric.String())
+}
+
+func (s *StorageTestSuite) TestTopNMetrics() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW validator_metrics;")
+	s.Require().NoError(err)
+
+	metrics, err := s.storage.Validator.TopNMetrics(ctx, 10)
+	s.Require().NoError(err)
+	s.Require().NotEmpty(metrics.BlockMissedMetric.String())
+	s.Require().NotEmpty(metrics.VotesMetric.String())
+	s.Require().NotEmpty(metrics.OperationTimeMetric.String())
+	s.Require().NotEmpty(metrics.CommissionMetric.String())
+	s.Require().NotEmpty(metrics.SelfDelegationMetric.String())
+}

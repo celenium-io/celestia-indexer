@@ -101,3 +101,29 @@ func (v *Validator) Messages(ctx context.Context, id uint64, fltrs storage.Valid
 
 	return response, err
 }
+
+func (v *Validator) Metrics(ctx context.Context, id uint64) (metrics storage.ValidatorMetrics, err error) {
+	err = v.DB().NewSelect().
+		Table(storage.ViewValidatorMetrics).
+		Where("id = ?", id).
+		Scan(ctx, &metrics)
+	return
+}
+
+func (v *Validator) TopNMetrics(ctx context.Context, n int) (metrics storage.ValidatorMetrics, err error) {
+	subQuery := v.DB().NewSelect().
+		Table(storage.ViewValidatorMetrics).
+		Order("stake desc").
+		Limit(n)
+
+	err = v.DB().NewSelect().
+		With("metrics", subQuery).
+		Table("metrics").
+		ColumnExpr("avg(commission_metric) as commission_metric").
+		ColumnExpr("avg(votes_metric) as votes_metric").
+		ColumnExpr("avg(operation_time_metric) as operation_time_metric").
+		ColumnExpr("avg(self_delegation_metric) as self_delegation_metric").
+		ColumnExpr("avg(block_missed_metric) as block_missed_metric").
+		Scan(ctx, &metrics)
+	return
+}

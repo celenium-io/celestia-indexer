@@ -31,4 +31,5 @@ const (
 	ViewHlTransfersByHour     = "hl_transfers_by_hour"
 	ViewHlTransfersByDay      = "hl_transfers_by_day"
 	ViewHlTransfersByMonth    = "hl_transfers_by_month"
+	ViewValidatorMetrics      = "validator_metrics"
 )
