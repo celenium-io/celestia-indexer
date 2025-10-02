@@ -412,6 +412,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	{
 		validators.GET("", validatorsHandler.List)
 		validators.GET("/count", validatorsHandler.Count)
+		validators.GET("/metrics", validatorsHandler.TopNMetrics)
 		validator := validators.Group("/:id")
 		{
 			validator.GET("", validatorsHandler.Get)
@@ -421,6 +422,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			validator.GET("/jails", validatorsHandler.Jails)
 			validator.GET("/votes", validatorsHandler.Votes)
 			validator.GET("/messages", validatorsHandler.Messages)
+			validator.GET("/metrics", validatorsHandler.Metrics)
 		}
 	}
 

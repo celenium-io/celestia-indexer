@@ -166,3 +166,59 @@ type ValidatorCount struct {
 	Active   int `example:"100" json:"active"   swaggertype:"integer"`
 	Inactive int `example:"100" json:"inactive" swaggertype:"integer"`
 }
+
+type Metrics struct {
+	Id                    uint64    `example:"321"                       json:"id"                      swaggertype:"integer"`
+	Moniker               string    `example:"Easy 2 Stake"              json:"moniker"                 swaggertype:"string"`
+	MaxRate               string    `example:"0.1"                       json:"max_rate"                swaggertype:"string"`
+	MaxChangeRate         string    `example:"0.01"                      json:"max_change_rate"         swaggertype:"string"`
+	Stake                 string    `example:"1"                         json:"stake"                   swaggertype:"string"`
+	CreationTime          time.Time `example:"2025-07-04T03:10:57+00:00" format:"date-time"             json:"creation_time"  swaggertype:"string"`
+	SelfDelegationAmount  string    `example:"1"                         json:"self_delegation_amount"  swaggertype:"string"`
+	AppliedProposalsCount uint64    `example:"321"                       json:"applied_proposals_count" swaggertype:"integer"`
+	VotesCount            uint64    `example:"321"                       json:"votes_count"             swaggertype:"integer"`
+	BlockMissedCount      uint64    `example:"321"                       json:"block_missed_count"      swaggertype:"integer"`
+	VotesMetric           string    `example:"1"                         json:"votes_metric"            swaggertype:"string"`
+	CommissionMetric      string    `example:"1"                         json:"commission_metric"       swaggertype:"string"`
+	OperationTimeMetric   string    `example:"1"                         json:"operation_time_metric"   swaggertype:"string"`
+	SelfDelegationMetric  string    `example:"1"                         json:"self_delegation_metric"  swaggertype:"string"`
+	BlockMissedMetric     string    `example:"1"                         json:"block_missed_metric"     swaggertype:"string"`
+}
+
+func NewMetrics(value storage.ValidatorMetrics) Metrics {
+	return Metrics{
+		Id:                    value.Id,
+		Moniker:               value.Moniker,
+		MaxRate:               value.MaxRate.String(),
+		MaxChangeRate:         value.MaxChangeRate.String(),
+		Stake:                 value.Stake.String(),
+		CreationTime:          value.CreationTime,
+		SelfDelegationAmount:  value.SelfDelegationAmount.String(),
+		AppliedProposalsCount: value.AppliedProposalsCount,
+		VotesCount:            value.VotesCount,
+		BlockMissedCount:      value.BlockMissedCount,
+		VotesMetric:           value.VotesMetric.String(),
+		CommissionMetric:      value.CommissionMetric.String(),
+		OperationTimeMetric:   value.OperationTimeMetric.String(),
+		SelfDelegationMetric:  value.SelfDelegationMetric.String(),
+		BlockMissedMetric:     value.BlockMissedMetric.String(),
+	}
+}
+
+type TopNMetrics struct {
+	VotesMetric          string `example:"1" json:"votes_metric"           swaggertype:"string"`
+	CommissionMetric     string `example:"1" json:"commission_metric"      swaggertype:"string"`
+	OperationTimeMetric  string `example:"1" json:"operation_time_metric"  swaggertype:"string"`
+	SelfDelegationMetric string `example:"1" json:"self_delegation_metric" swaggertype:"string"`
+	BlockMissedMetric    string `example:"1" json:"block_missed_metric"    swaggertype:"string"`
+}
+
+func NewTopNMetrics(value storage.ValidatorMetrics) TopNMetrics {
+	return TopNMetrics{
+		VotesMetric:          value.VotesMetric.String(),
+		CommissionMetric:     value.CommissionMetric.String(),
+		OperationTimeMetric:  value.OperationTimeMetric.String(),
+		SelfDelegationMetric: value.SelfDelegationMetric.String(),
+		BlockMissedMetric:    value.BlockMissedMetric.String(),
+	}
+}

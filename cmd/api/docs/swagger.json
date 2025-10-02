@@ -2424,6 +2424,115 @@
                 }
             }
         },
+        "/hyperlane/igp": {
+            "get": {
+                "description": "List hyperlane Interchain Gas Paymaster (IGP)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "List hyperlane Interchain Gas Paymaster (IGP)",
+                "operationId": "list-hyperlane-igps",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.HyperlaneIgp"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/hyperlane/igp/{id}": {
+            "get": {
+                "description": "Get IGP by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "Get IGP by id",
+                "operationId": "get-hyperlane-igp",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal identity",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.HyperlaneIgp"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/hyperlane/mailbox": {
             "get": {
                 "description": "List hyperlane mailboxes info",
@@ -7003,6 +7112,47 @@
                 }
             }
         },
+        "/validators/metrics": {
+            "get": {
+                "description": "Get validators metrics",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "validator"
+                ],
+                "summary": "Get validators metrics",
+                "operationId": "validators-metrics",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Count of aggregated entities",
+                        "name": "count",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.TopNMetrics"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/validators/{id}": {
             "get": {
                 "description": "Get validator info",
@@ -7294,6 +7444,48 @@
                             "items": {
                                 "$ref": "#/definitions/responses.Message"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/validators/{id}/metrics": {
+            "get": {
+                "description": "Get validator's metrics",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "validator"
+                ],
+                "summary": "Get validator's metrics",
+                "operationId": "validator-metrics",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal validator id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Metrics"
                         }
                     },
                     "400": {
@@ -8208,6 +8400,26 @@
                 }
             }
         },
+        "responses.GasPayment": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "12345"
+                },
+                "gas_amount": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123"
+                },
+                "igp_id": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                }
+            }
+        },
         "responses.GasPrice": {
             "type": "object",
             "properties": {
@@ -8322,6 +8534,68 @@
                 }
             }
         },
+        "responses.HyperlaneIgp": {
+            "type": "object",
+            "properties": {
+                "configs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responses.HyperlaneIgpConfig"
+                    }
+                },
+                "denom": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "utia"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1488
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "igp_id": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "owner": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                }
+            }
+        },
+        "responses.HyperlaneIgpConfig": {
+            "type": "object",
+            "properties": {
+                "counterparty": {
+                    "$ref": "#/definitions/responses.HyperlaneRemoteDomain"
+                },
+                "gas_overhead": {
+                    "type": "string",
+                    "format": "int64",
+                    "example": "100000"
+                },
+                "gas_price": {
+                    "type": "string",
+                    "format": "int64",
+                    "example": "1"
+                },
+                "token_exchange_rate": {
+                    "type": "string",
+                    "format": "int64",
+                    "example": "12345678"
+                }
+            }
+        },
         "responses.HyperlaneMailbox": {
             "type": "object",
             "properties": {
@@ -8387,6 +8661,19 @@
                     "type": "string",
                     "format": "binary",
                     "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                }
+            }
+        },
+        "responses.HyperlaneRemoteDomain": {
+            "type": "object",
+            "properties": {
+                "chain_metadata": {
+                    "$ref": "#/definitions/responses.ChainMetadata"
+                },
+                "remote_domain": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
                 }
             }
         },
@@ -8476,6 +8763,9 @@
                     "type": "string",
                     "format": "string",
                     "example": "utia"
+                },
+                "gas_payment": {
+                    "$ref": "#/definitions/responses.GasPayment"
                 },
                 "height": {
                     "type": "integer",
@@ -9071,6 +9361,72 @@
                         }
                     ],
                     "example": "MsgCreatePeriodicVestingAccount"
+                }
+            }
+        },
+        "responses.Metrics": {
+            "type": "object",
+            "properties": {
+                "applied_proposals_count": {
+                    "type": "integer",
+                    "example": 321
+                },
+                "block_missed_count": {
+                    "type": "integer",
+                    "example": 321
+                },
+                "block_missed_metric": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "commission_metric": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "creation_time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2025-07-04T03:10:57+00:00"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 321
+                },
+                "max_change_rate": {
+                    "type": "string",
+                    "example": "0.01"
+                },
+                "max_rate": {
+                    "type": "string",
+                    "example": "0.1"
+                },
+                "moniker": {
+                    "type": "string",
+                    "example": "Easy 2 Stake"
+                },
+                "operation_time_metric": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "self_delegation_amount": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "self_delegation_metric": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "stake": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "votes_count": {
+                    "type": "integer",
+                    "example": 321
+                },
+                "votes_metric": {
+                    "type": "string",
+                    "example": "1"
                 }
             }
         },
@@ -10141,6 +10497,31 @@
                 }
             }
         },
+        "responses.ShortProposal": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Some proposal description"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "status": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "active"
+                },
+                "title": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "Proposal title"
+                }
+            }
+        },
         "responses.ShortRollup": {
             "type": "object",
             "properties": {
@@ -10429,6 +10810,31 @@
                     "type": "string",
                     "format": "string",
                     "example": "0.17632"
+                }
+            }
+        },
+        "responses.TopNMetrics": {
+            "type": "object",
+            "properties": {
+                "block_missed_metric": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "commission_metric": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "operation_time_metric": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "self_delegation_metric": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "votes_metric": {
+                    "type": "string",
+                    "example": "1"
                 }
             }
         },
@@ -10841,6 +11247,9 @@
                     "type": "integer",
                     "format": "int64",
                     "example": 321
+                },
+                "proposal": {
+                    "$ref": "#/definitions/responses.ShortProposal"
                 },
                 "proposal_id": {
                     "type": "integer",

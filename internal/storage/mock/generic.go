@@ -31,7 +31,6 @@ import (
 type MockNotificator struct {
 	ctrl     *gomock.Controller
 	recorder *MockNotificatorMockRecorder
-	isgomock struct{}
 }
 
 // MockNotificatorMockRecorder is the mock recorder for MockNotificator.
@@ -93,7 +92,6 @@ func (c *MockNotificatorNotifyCall) DoAndReturn(f func(context.Context, string, 
 type MockListener struct {
 	ctrl     *gomock.Controller
 	recorder *MockListenerMockRecorder
-	isgomock struct{}
 }
 
 // MockListenerMockRecorder is the mock recorder for MockListener.
@@ -236,7 +234,6 @@ func (c *MockListenerSubscribeCall) DoAndReturn(f func(context.Context, ...strin
 type MockListenerFactory struct {
 	ctrl     *gomock.Controller
 	recorder *MockListenerFactoryMockRecorder
-	isgomock struct{}
 }
 
 // MockListenerFactoryMockRecorder is the mock recorder for MockListenerFactory.
@@ -298,7 +295,6 @@ func (c *MockListenerFactoryCreateListenerCall) DoAndReturn(f func() storage.Lis
 type MockTransaction struct {
 	ctrl     *gomock.Controller
 	recorder *MockTransactionMockRecorder
-	isgomock struct{}
 }
 
 // MockTransactionMockRecorder is the mock recorder for MockTransaction.
@@ -4937,7 +4933,6 @@ func (c *MockTransactionValidatorCall) DoAndReturn(f func(context.Context, uint6
 type MockISearch struct {
 	ctrl     *gomock.Controller
 	recorder *MockISearchMockRecorder
-	isgomock struct{}
 }
 
 // MockISearchMockRecorder is the mock recorder for MockISearch.
@@ -5039,7 +5034,6 @@ func (c *MockISearchSearchTextCall) DoAndReturn(f func(context.Context, string) 
 type MockExport struct {
 	ctrl     *gomock.Controller
 	recorder *MockExportMockRecorder
-	isgomock struct{}
 }
 
 // MockExportMockRecorder is the mock recorder for MockExport.

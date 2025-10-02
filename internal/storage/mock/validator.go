@@ -395,6 +395,45 @@ func (c *MockIValidatorMessagesCall) DoAndReturn(f func(context.Context, uint64,
 	return c
 }
 
+// Metrics mocks base method.
+func (m *MockIValidator) Metrics(ctx context.Context, id uint64) (storage.ValidatorMetrics, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Metrics", ctx, id)
+	ret0, _ := ret[0].(storage.ValidatorMetrics)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Metrics indicates an expected call of Metrics.
+func (mr *MockIValidatorMockRecorder) Metrics(ctx, id any) *MockIValidatorMetricsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Metrics", reflect.TypeOf((*MockIValidator)(nil).Metrics), ctx, id)
+	return &MockIValidatorMetricsCall{Call: call}
+}
+
+// MockIValidatorMetricsCall wrap *gomock.Call
+type MockIValidatorMetricsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIValidatorMetricsCall) Return(arg0 storage.ValidatorMetrics, arg1 error) *MockIValidatorMetricsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIValidatorMetricsCall) Do(f func(context.Context, uint64) (storage.ValidatorMetrics, error)) *MockIValidatorMetricsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIValidatorMetricsCall) DoAndReturn(f func(context.Context, uint64) (storage.ValidatorMetrics, error)) *MockIValidatorMetricsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Save mocks base method.
 func (m_2 *MockIValidator) Save(ctx context.Context, m *storage.Validator) error {
 	m_2.ctrl.T.Helper()
@@ -429,6 +468,45 @@ func (c *MockIValidatorSaveCall) Do(f func(context.Context, *storage.Validator) 
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIValidatorSaveCall) DoAndReturn(f func(context.Context, *storage.Validator) error) *MockIValidatorSaveCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// TopNMetrics mocks base method.
+func (m *MockIValidator) TopNMetrics(ctx context.Context, n int) (storage.ValidatorMetrics, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TopNMetrics", ctx, n)
+	ret0, _ := ret[0].(storage.ValidatorMetrics)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TopNMetrics indicates an expected call of TopNMetrics.
+func (mr *MockIValidatorMockRecorder) TopNMetrics(ctx, n any) *MockIValidatorTopNMetricsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TopNMetrics", reflect.TypeOf((*MockIValidator)(nil).TopNMetrics), ctx, n)
+	return &MockIValidatorTopNMetricsCall{Call: call}
+}
+
+// MockIValidatorTopNMetricsCall wrap *gomock.Call
+type MockIValidatorTopNMetricsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIValidatorTopNMetricsCall) Return(arg0 storage.ValidatorMetrics, arg1 error) *MockIValidatorTopNMetricsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIValidatorTopNMetricsCall) Do(f func(context.Context, int) (storage.ValidatorMetrics, error)) *MockIValidatorTopNMetricsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIValidatorTopNMetricsCall) DoAndReturn(f func(context.Context, int) (storage.ValidatorMetrics, error)) *MockIValidatorTopNMetricsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

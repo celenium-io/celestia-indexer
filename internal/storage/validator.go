@@ -14,6 +14,25 @@ import (
 	"github.com/uptrace/bun"
 )
 
+type ValidatorMetrics struct {
+	Id                    uint64          `bun:"id"`
+	Moniker               string          `bun:"moniker"`
+	MaxRate               decimal.Decimal `bun:"max_rate"`
+	MaxChangeRate         decimal.Decimal `bun:"max_change_rate"`
+	Stake                 decimal.Decimal `bun:"stake"`
+	CreationTime          time.Time       `bun:"creation_time"`
+	SelfDelegationAmount  decimal.Decimal `bun:"self_delegation_amount"`
+	AppliedProposalsCount uint64          `bun:"applied_proposals_count"`
+	VotesCount            uint64          `bun:"votes_count"`
+	BlockMissedCount      uint64          `bun:"block_missed_count"`
+
+	VotesMetric          decimal.Decimal `bun:"votes_metric"`
+	CommissionMetric     decimal.Decimal `bun:"commission_metric"`
+	OperationTimeMetric  decimal.Decimal `bun:"operation_time_metric"`
+	SelfDelegationMetric decimal.Decimal `bun:"self_delegation_metric"`
+	BlockMissedMetric    decimal.Decimal `bun:"block_missed_metric"`
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IValidator interface {
 	storage.Table[*Validator]
@@ -23,6 +42,8 @@ type IValidator interface {
 	ListByPower(ctx context.Context, fltrs ValidatorFilters) ([]Validator, error)
 	JailedCount(ctx context.Context) (int, error)
 	Messages(ctx context.Context, id uint64, fltrs ValidatorMessagesFilters) ([]MsgValidator, error)
+	Metrics(ctx context.Context, id uint64) (ValidatorMetrics, error)
+	TopNMetrics(ctx context.Context, n int) (ValidatorMetrics, error)
 }
 
 type Validator struct {

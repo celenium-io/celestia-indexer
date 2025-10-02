@@ -427,3 +427,87 @@ func (s *ValidatorTestSuite) TestMessages() {
 	s.Require().EqualValues(12, messages[0].Size)
 	s.Require().EqualValues(2, messages[0].Position)
 }
+
+func (s *ValidatorTestSuite) TestMetrics() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/validators/:id/metrics")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	s.validators.EXPECT().
+		Metrics(gomock.Any(), uint64(1)).
+		Return(storage.ValidatorMetrics{
+			Id:                    1,
+			Moniker:               "moniker",
+			MaxRate:               decimal.RequireFromString("0.1"),
+			MaxChangeRate:         decimal.RequireFromString("0.01"),
+			Stake:                 decimal.RequireFromString("100"),
+			CreationTime:          testTime,
+			SelfDelegationAmount:  decimal.RequireFromString("10"),
+			AppliedProposalsCount: 5,
+			VotesCount:            5,
+			BlockMissedCount:      2,
+			VotesMetric:           decimal.RequireFromString("1.0"),
+			CommissionMetric:      decimal.RequireFromString("0.9"),
+			OperationTimeMetric:   decimal.RequireFromString("0.85"),
+			SelfDelegationMetric:  decimal.RequireFromString("0.8"),
+			BlockMissedMetric:     decimal.RequireFromString("0.75"),
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.Metrics(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var metrics responses.Metrics
+	err := json.NewDecoder(rec.Body).Decode(&metrics)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(1, metrics.Id)
+	s.Require().EqualValues("moniker", metrics.Moniker)
+	s.Require().EqualValues("0.1", metrics.MaxRate)
+	s.Require().EqualValues("0.01", metrics.MaxChangeRate)
+	s.Require().EqualValues("100", metrics.Stake)
+	s.Require().EqualValues(testTime.String(), metrics.CreationTime.String())
+	s.Require().EqualValues("10", metrics.SelfDelegationAmount)
+	s.Require().EqualValues(5, metrics.AppliedProposalsCount)
+	s.Require().EqualValues(5, metrics.VotesCount)
+	s.Require().EqualValues(2, metrics.BlockMissedCount)
+	s.Require().EqualValues("1", metrics.VotesMetric)
+	s.Require().EqualValues("0.9", metrics.CommissionMetric)
+	s.Require().EqualValues("0.85", metrics.OperationTimeMetric)
+	s.Require().EqualValues("0.8", metrics.SelfDelegationMetric)
+	s.Require().EqualValues("0.75", metrics.BlockMissedMetric)
+}
+
+func (s *ValidatorTestSuite) TestTopNMetrics() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/validators/metrics")
+
+	s.validators.EXPECT().
+		TopNMetrics(gomock.Any(), 25).
+		Return(storage.ValidatorMetrics{
+			VotesMetric:          decimal.RequireFromString("1.0"),
+			CommissionMetric:     decimal.RequireFromString("0.9"),
+			OperationTimeMetric:  decimal.RequireFromString("0.85"),
+			SelfDelegationMetric: decimal.RequireFromString("0.8"),
+			BlockMissedMetric:    decimal.RequireFromString("0.75"),
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.TopNMetrics(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var metrics responses.TopNMetrics
+	err := json.NewDecoder(rec.Body).Decode(&metrics)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues("1", metrics.VotesMetric)
+	s.Require().EqualValues("0.9", metrics.CommissionMetric)
+	s.Require().EqualValues("0.85", metrics.OperationTimeMetric)
+	s.Require().EqualValues("0.8", metrics.SelfDelegationMetric)
+	s.Require().EqualValues("0.75", metrics.BlockMissedMetric)
+}
