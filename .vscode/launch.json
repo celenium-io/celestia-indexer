@@ -48,17 +48,6 @@
                 "../../configs/dipdup.yml",
             ],
             "envFile": "${workspaceFolder}/.env"
-        }, {
-            "name": "Launch JSON RPC",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceFolder}/cmd/jsonrpc",
-            "args": [
-                "-c",
-                "../../configs/dipdup.yml",
-            ],
-            "envFile": "${workspaceFolder}/.env"
-        },
+        }, 
     ]
 }

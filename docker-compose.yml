@@ -45,20 +45,6 @@ services:
       - "127.0.0.1:9877:9877"
     logging: *celestia-logging
 
-  jsonrpc:
-    restart: always
-    image: ghcr.io/celenium-io/celestia-indexer-jsonrpc:${TAG:-master}
-    build:
-      context: .
-      dockerfile: build/jsonrpc/Dockerfile
-    env_file:
-      - .env
-    depends_on:
-      - db
-    ports:
-      - "127.0.0.1:9878:9878"
-    logging: *celestia-logging
-
   db:
     command:
       - -cshared_preload_libraries=timescaledb,pg_stat_statements

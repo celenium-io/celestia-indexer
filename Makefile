@@ -13,9 +13,6 @@ api:
 private_api:
 	cd cmd/private_api && go run . -c ../../configs/dipdup.yml
 
-jsonrpc:
-	cd cmd/jsonrpc && go run . -c ../../configs/dipdup.yml
-
 celestials:
 	cd cmd/celestials && go run . -c ../../configs/dipdup.yml
 
