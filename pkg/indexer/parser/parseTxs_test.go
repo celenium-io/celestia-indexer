@@ -406,3 +406,138 @@ func TestParseTxs_PayForBlob(t *testing.T) {
 	require.Equal(t, "celestia-explorer", tx.Codespace)
 	require.Len(t, tx.Signers, 1)
 }
+
+func TestParseTxs_ExecSignal(t *testing.T) {
+	txRes := types.ResponseDeliverTx{
+		Code:      0,
+		Data:      []byte{},
+		Log:       "[{\"msg_index\":0,\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.authz.v1beta1.MsgExec\"}]}]}]",
+		Info:      "info",
+		GasWanted: 79796,
+		GasUsed:   65177,
+		Events: []types.Event{
+			{
+				Type: "coin_spent",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   "spender",
+						Value: "celestia1k2q8jtfyj2hrnndzshx6vdxqsazl7ll8xnctdx",
+						Index: true,
+					},
+					{
+						Key:   "amount",
+						Value: "21000utia",
+						Index: true,
+					},
+				},
+			}, {
+				Type: "coin_received",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   "receiver",
+						Value: "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
+						Index: true,
+					},
+					{
+						Key:   "amount",
+						Value: "21000utia",
+						Index: true,
+					},
+				},
+			}, {
+				Type: "transfer",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   "recipient",
+						Value: "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
+						Index: true,
+					}, {
+						Key:   "sender",
+						Value: "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
+						Index: true,
+					},
+					{
+						Key:   "amount",
+						Value: "21000utia",
+						Index: true,
+					},
+				},
+			}, {
+				Type: "message",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   "sender",
+						Value: "celestia1k2q8jtfyj2hrnndzshx6vdxqsazl7ll8xnctdx",
+						Index: true,
+					},
+				},
+			}, {
+				Type: "tx",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   "fee",
+						Value: "21000utia",
+						Index: true,
+					}, {
+						Key:   "fee_payer",
+						Value: "celestia1k2q8jtfyj2hrnndzshx6vdxqsazl7ll8xnctdx",
+						Index: true,
+					},
+				},
+			}, {
+				Type: "tx",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   "acc_seq",
+						Value: "celestia1k2q8jtfyj2hrnndzshx6vdxqsazl7ll8xnctdx/1",
+						Index: true,
+					},
+				},
+			}, {
+				Type: "tx",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   "signature",
+						Value: "OMevpi/bn2QUh2a3Eh7bA1yJWYMm8tFphaD92mKWXzoPqoNDDTHZ2njn9EDNjDfxHyTPG0oN+8rZ2t8jgGUVuA==",
+						Index: true,
+					},
+				},
+			}, {
+				Type: "message",
+				Attributes: []types.EventAttribute{
+					{
+						Key:   "action",
+						Value: "/cosmos.authz.v1beta1.MsgExec",
+						Index: true,
+					},
+				},
+			},
+		},
+		Codespace: "celestia-explorer",
+	}
+	raw, err := base64.StdEncoding.DecodeString("CroBCrcBCh0vY29zbW9zLmF1dGh6LnYxYmV0YTEuTXNnRXhlYxKVAQovY2VsZXN0aWExazJxOGp0ZnlqMmhybm5kenNoeDZ2ZHhxc2F6bDdsbDh4bmN0ZHgSYgokL2NlbGVzdGlhLnNpZ25hbC52MS5Nc2dTaWduYWxWZXJzaW9uEjoKNmNlbGVzdGlhdmFsb3BlcjFxM3Y1Y3VnYzhjZHB1ZDg3dTR6d3kwYTc0dXhrazZ1NHE0Z3g0cBADEmcKUApGCh8vY29zbW9zLmNyeXB0by5zZWNwMjU2azEuUHViS2V5EiMKIQIknqJ+ODItM0iT8QcFFYcYbIvmEpnFqvSWekVF9uHYlRIECgIIARgBEhMKDQoEdXRpYRIFMjEwMDAQ0OgMGkA4x6+mL9ufZBSHZrcSHtsDXIlZgyby0WmFoP3aYpZfOg+qg0MNMdnaeOf0QM2MN/EfJM8bSg37ytna3yOAZRW4")
+	require.NoError(t, err)
+	block, now := testsuite.CreateBlockWithTxs(txRes, raw, 1)
+
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height:       1000,
+		Time:         now,
+		MessageTypes: storageTypes.NewMsgTypeBitMask(),
+	}
+
+	p := NewModule(config.Indexer{})
+	resultTxs, err := p.parseTxs(decodeCtx, block)
+
+	require.NoError(t, err)
+	require.Len(t, resultTxs, 1)
+
+	tx := resultTxs[0]
+	require.Equal(t, now, tx.Time)
+	require.Equal(t, storageTypes.StatusSuccess, tx.Status)
+	require.Equal(t, "", tx.Error)
+	require.EqualValues(t, 79796, tx.GasWanted)
+	require.EqualValues(t, 65177, tx.GasUsed)
+	require.Equal(t, "celestia-explorer", tx.Codespace)
+	require.Len(t, tx.Signers, 1)
+}

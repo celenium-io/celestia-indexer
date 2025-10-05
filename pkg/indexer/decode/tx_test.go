@@ -129,6 +129,29 @@ func TestDecodeTx_Tx_PFB(t *testing.T) {
 	}
 }
 
+func TestDecodeTx_Exec_signal(t *testing.T) {
+	deliverTx := nodeTypes.ResponseDeliverTx{
+		Code:      0,
+		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
+		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.authz.v1beta1.MsgExec\"}]}]}]`,
+		Info:      "",
+		GasWanted: 210000,
+		GasUsed:   68808,
+		Events:    []nodeTypes.Event{},
+		Codespace: "",
+	}
+
+	txData, err := base64.StdEncoding.DecodeString("CroBCrcBCh0vY29zbW9zLmF1dGh6LnYxYmV0YTEuTXNnRXhlYxKVAQovY2VsZXN0aWExazJxOGp0ZnlqMmhybm5kenNoeDZ2ZHhxc2F6bDdsbDh4bmN0ZHgSYgokL2NlbGVzdGlhLnNpZ25hbC52MS5Nc2dTaWduYWxWZXJzaW9uEjoKNmNlbGVzdGlhdmFsb3BlcjFxM3Y1Y3VnYzhjZHB1ZDg3dTR6d3kwYTc0dXhrazZ1NHE0Z3g0cBADEmcKUApGCh8vY29zbW9zLmNyeXB0by5zZWNwMjU2azEuUHViS2V5EiMKIQIknqJ+ODItM0iT8QcFFYcYbIvmEpnFqvSWekVF9uHYlRIECgIIARgBEhMKDQoEdXRpYRIFMjEwMDAQ0OgMGkA4x6+mL9ufZBSHZrcSHtsDXIlZgyby0WmFoP3aYpZfOg+qg0MNMdnaeOf0QM2MN/EfJM8bSg37ytna3yOAZRW4")
+	require.NoError(t, err)
+	block, _ := testsuite.CreateBlockWithTxs(deliverTx, txData, 1)
+
+	dTx, err := Tx(block, 0)
+
+	require.NoError(t, err)
+
+	require.Len(t, dTx.Messages, 1)
+}
+
 func TestDecodeTx_Tx_MsgRegisterEVMAddress(t *testing.T) {
 	deliverTx := nodeTypes.ResponseDeliverTx{
 		Code:      0,
