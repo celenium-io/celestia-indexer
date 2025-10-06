@@ -77,6 +77,10 @@ func (p *Module) parse(b types.BlockData) error {
 	decodeCtx.Block.BlockSignatures = p.parseBlockSignatures(b.Block.LastCommit)
 	p.parseConsensusParamUpdates(decodeCtx, b.ConsensusParamUpdates)
 
+	if isEventDuplicated(b.ResultBlockResults) {
+		b.FinalizeBlockEvents = b.FinalizeBlockEvents[:len(b.FinalizeBlockEvents)-decodeCtx.TxEventsCount]
+	}
+
 	decodeCtx.Block.Events, err = parseEvents(decodeCtx, b, b.FinalizeBlockEvents)
 	if err != nil {
 		return errors.Wrap(err, "parsing begin end events")
@@ -113,4 +117,12 @@ func (p *Module) parseBlockSignatures(commit *types.Commit) []storage.BlockSigna
 func (p *Module) parseConsensusParamUpdates(ctx *dCtx.Context, params *types.ConsensusParams) {
 	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_num_blocks", fmt.Sprintf("%d", params.Evidence.MaxAgeNumBlocks))
 	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_duration", params.Evidence.MaxAgeDuration.String())
+}
+
+func isEventDuplicated(results types.ResultBlockResults) bool {
+	if len(results.TxsResults) == 0 || len(results.FinalizeBlockEvents) == 0 {
+		return false
+	}
+	lastEvents := results.TxsResults[len(results.TxsResults)-1].Events
+	return lastEvents[len(lastEvents)-1].Compare(results.FinalizeBlockEvents[len(results.FinalizeBlockEvents)-1])
 }

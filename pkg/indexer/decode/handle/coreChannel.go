@@ -168,14 +168,17 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.Pa
 			TransfersCount: 1,
 			Status:         storageTypes.IbcChannelStatusInitialization,
 		}
-		prefix, _, err := pkgTypes.Address(packet.Receiver).Decode()
+		prefix, hash, err := pkgTypes.Address(packet.Receiver).Decode()
 		if err != nil {
 			return msgType, addresses, nil, nil, nil
 		}
 		if prefix == pkgTypes.AddressPrefixCelestia {
 			transfer.Receiver = &storage.Address{
-				Address: packet.Receiver,
-				Balance: storage.EmptyBalance(),
+				Address:    packet.Receiver,
+				Balance:    storage.EmptyBalance(),
+				Height:     ctx.Block.Height,
+				LastHeight: ctx.Block.Height,
+				Hash:       hash,
 			}
 			addresses = append(addresses, storage.AddressWithType{
 				Address: *transfer.Receiver,
@@ -185,14 +188,17 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.Pa
 		} else {
 			transfer.ReceiverAddress = &packet.Receiver
 		}
-		prefix, _, err = pkgTypes.Address(packet.Sender).Decode()
+		prefix, hash, err = pkgTypes.Address(packet.Sender).Decode()
 		if err != nil {
 			return msgType, addresses, nil, nil, nil
 		}
 		if prefix == pkgTypes.AddressPrefixCelestia {
 			transfer.Sender = &storage.Address{
-				Address: packet.Sender,
-				Balance: storage.EmptyBalance(),
+				Address:    packet.Sender,
+				Balance:    storage.EmptyBalance(),
+				Height:     ctx.Block.Height,
+				LastHeight: ctx.Block.Height,
+				Hash:       hash,
 			}
 			addresses = append(addresses, storage.AddressWithType{
 				Address: *transfer.Sender,
@@ -306,14 +312,17 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTyp
 			TransfersCount: 1,
 			Status:         storageTypes.IbcChannelStatusInitialization,
 		}
-		prefix, _, err := pkgTypes.Address(packet.Receiver).Decode()
+		prefix, hash, err := pkgTypes.Address(packet.Receiver).Decode()
 		if err != nil {
 			return msgType, addresses, nil, nil, nil
 		}
 		if prefix == pkgTypes.AddressPrefixCelestia {
 			transfer.Receiver = &storage.Address{
-				Address: packet.Receiver,
-				Balance: storage.EmptyBalance(),
+				Address:    packet.Receiver,
+				Balance:    storage.EmptyBalance(),
+				Height:     ctx.Block.Height,
+				LastHeight: ctx.Block.Height,
+				Hash:       hash,
 			}
 			addresses = append(addresses, storage.AddressWithType{
 				Address: *transfer.Receiver,
@@ -323,14 +332,17 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTyp
 		} else {
 			transfer.ReceiverAddress = &packet.Receiver
 		}
-		prefix, _, err = pkgTypes.Address(packet.Sender).Decode()
+		prefix, hash, err = pkgTypes.Address(packet.Sender).Decode()
 		if err != nil {
 			return msgType, addresses, nil, nil, nil
 		}
 		if prefix == pkgTypes.AddressPrefixCelestia {
 			transfer.Sender = &storage.Address{
-				Address: packet.Sender,
-				Balance: storage.EmptyBalance(),
+				Address:    packet.Sender,
+				Balance:    storage.EmptyBalance(),
+				Height:     ctx.Block.Height,
+				LastHeight: ctx.Block.Height,
+				Hash:       hash,
 			}
 			addresses = append(addresses, storage.AddressWithType{
 				Address: *transfer.Sender,

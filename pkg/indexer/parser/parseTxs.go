@@ -86,6 +86,8 @@ func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txR
 		return errors.Wrap(err, "parsing events")
 	}
 
+	ctx.TxEventsCount += int(t.EventsCount)
+
 	var eventsIdx int
 
 	// find first action

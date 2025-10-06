@@ -40,6 +40,21 @@ type Event struct {
 	Attributes []EventAttribute `json:"attributes,omitempty" protobuf:"bytes,2,rep,name=attributes,proto3"`
 }
 
+func (e Event) Compare(a Event) bool {
+	if e.Type != a.Type {
+		return false
+	}
+	if len(e.Attributes) != len(a.Attributes) {
+		return false
+	}
+	for i := range e.Attributes {
+		if e.Attributes[i].Key != a.Attributes[i].Key || e.Attributes[i].Value != a.Attributes[i].Value {
+			return false
+		}
+	}
+	return true
+}
+
 // EventAttribute is a single key-value pair, associated with an event.
 type EventAttribute struct {
 	Key   string `json:"key,omitempty"   protobuf:"bytes,1,opt,name=key,proto3"`
