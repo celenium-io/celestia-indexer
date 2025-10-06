@@ -48,6 +48,13 @@ func (module *Module) saveValidators(
 			if err != nil {
 				return err, false
 			}
+			burned := decimal.Zero
+			for i := range balanceUpdates {
+				burned = burned.Sub(balanceUpdates[i].Delegated) // delegated is a negative value. That's why sub
+			}
+			if !j.Burned.Equal(burned) {
+				return errors.Errorf("jailing: burned from event is not equal burned from database: %s != %s", j.Burned.String(), burned.String()), false
+			}
 			if err := tx.SaveBalances(ctx, balanceUpdates...); err != nil {
 				return err, false
 			}

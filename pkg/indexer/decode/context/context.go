@@ -5,6 +5,7 @@ package context
 
 import (
 	"fmt"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
@@ -29,7 +30,8 @@ type Context struct {
 	StakingLogs     []storage.StakingLog
 	Votes           []*storage.Vote
 
-	Block *storage.Block
+	Block         *storage.Block
+	TxEventsCount int
 }
 
 func NewContext() *Context {

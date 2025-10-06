@@ -589,6 +589,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_Transfer(t *testing.T) {
 				Height:     block.Height,
 				LastHeight: block.Height,
 				Address:    "celestia19863f6vse7qc8jegpmg8wzagdy7n0h6fwkzw3k",
+				Hash:       []byte{0x29, 0xf5, 0x14, 0xe9, 0x90, 0xcf, 0x81, 0x83, 0xcb, 0x28, 0x0e, 0xd0, 0x77, 0x0b, 0xa8, 0x69, 0x3d, 0x37, 0xdf, 0x49},
 				Balance:    storage.EmptyBalance(),
 			},
 		},
@@ -621,6 +622,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_Transfer(t *testing.T) {
 			Receiver: &storage.Address{
 				Address: "celestia19863f6vse7qc8jegpmg8wzagdy7n0h6fwkzw3k",
 				Balance: storage.EmptyBalance(),
+				Hash:    []byte{0x29, 0xf5, 0x14, 0xe9, 0x90, 0xcf, 0x81, 0x83, 0xcb, 0x28, 0x0e, 0xd0, 0x77, 0x0b, 0xa8, 0x69, 0x3d, 0x37, 0xdf, 0x49},
 			},
 			SenderAddress: testsuite.Ptr("osmo19863f6vse7qc8jegpmg8wzagdy7n0h6fh8qwaf"),
 			Amount:        decimal.RequireFromString("2000000"),
@@ -776,6 +778,7 @@ func TestDecodeMsg_SuccessOnMsgAcknowledgement(t *testing.T) {
 				Height:     blob.Height,
 				LastHeight: blob.Height,
 				Address:    "celestia1gutppfxgmwcrm4ws796ma467reu4cj8q37txyv",
+				Hash:       []byte{0x47, 0x16, 0x10, 0xa4, 0xc8, 0xdb, 0xb0, 0x3d, 0xd5, 0xd0, 0xf1, 0x75, 0xbe, 0xd7, 0x5e, 0x1e, 0x79, 0x5c, 0x48, 0xe0},
 				Balance:    storage.EmptyBalance(),
 			},
 		},
@@ -817,6 +820,7 @@ func TestDecodeMsg_SuccessOnMsgAcknowledgement(t *testing.T) {
 			Sender: &storage.Address{
 				Address: "celestia1gutppfxgmwcrm4ws796ma467reu4cj8q37txyv",
 				Balance: storage.EmptyBalance(),
+				Hash:    []byte{0x47, 0x16, 0x10, 0xa4, 0xc8, 0xdb, 0xb0, 0x3d, 0xd5, 0xd0, 0xf1, 0x75, 0xbe, 0xd7, 0x5e, 0x1e, 0x79, 0x5c, 0x48, 0xe0},
 			},
 			Amount: decimal.RequireFromString("1000000"),
 			Denom:  "utia",
