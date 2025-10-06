@@ -31,6 +31,10 @@ func (module *Module) saveValidators(
 				return errors.Errorf("unknown jailed validator: %s", address), false
 			}
 
+			if j.Burned.IsZero() {
+				return nil, false
+			}
+
 			jailsArr = append(jailsArr, *j)
 
 			fraction := decimal.Zero
