@@ -8,6 +8,7 @@ import (
 
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 )
@@ -23,15 +24,30 @@ func (module *Module) saveConstantUpdates(
 		switch value.Name {
 		case "evidence_max_age_num_blocks":
 			if value.Value != module.maxAgeNumBlocks {
-				newConstants = append(newConstants, *value)
 				module.maxAgeNumBlocks = value.Value
 			}
 		case "evidence_max_age_duration":
 			if value.Value != module.maxAgeDuration {
-				newConstants = append(newConstants, *value)
 				module.maxAgeDuration = value.Value
 			}
+		case "slash_fraction_double_sign":
+			if value.Value != module.slashingForDoubleSign.String() {
+				val, err := decimal.NewFromString(value.Value)
+				if err != nil {
+					return errors.Wrap(err, "slash_fraction_double_sign"), true
+				}
+				module.slashingForDoubleSign = val
+			}
+		case "slash_fraction_downtime":
+			if value.Value != module.slashingForDowntime.String() {
+				val, err := decimal.NewFromString(value.Value)
+				if err != nil {
+					return errors.Wrap(err, "slash_fraction_downtime"), true
+				}
+				module.slashingForDowntime = val
+			}
 		}
+		newConstants = append(newConstants, *value)
 		return nil, false
 	})
 

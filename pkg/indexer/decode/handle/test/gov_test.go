@@ -20,6 +20,7 @@ import (
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/fatih/structs"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func createExpectations(
@@ -462,4 +463,137 @@ func TestDecodeMsg_SuccessOnMsgDeposit_V1Beta1(t *testing.T) {
 	assert.Equal(t, int64(0), dm.BlobsSize)
 	assert.Equal(t, msgExpected, dm.Msg)
 	assert.Equal(t, addressesExpected, dm.Addresses)
+}
+
+// v1.MsgSubmitProposal
+
+func createMsgSubmitProposalV1WithSlashingUpdates() types.Msg {
+	// Data from: a76d1e70be952270f8fac76b734d547b972f73fe3b57e10ae7778843bfc84290
+	value := "Ci9jZWxlc3RpYTEwZDA3eTI2NWdtbXV2dDR6MHc5YXc4ODBqbnNyNzAwanRnejR2NxIwCJBOEhExMDAwMDAwMDAwMDAwMDAwMBoCCDwiETIwMDAwMDAwMDAwMDAwMDAwKgEw"
+	val, _ := base64.StdEncoding.DecodeString(value)
+	m := cosmosGovTypesV1.MsgSubmitProposal{
+		Messages: []*codecTypes.Any{
+			{
+				TypeUrl: "/cosmos.slashing.v1beta.MsgUpdateParams",
+				Value:   val,
+			},
+		},
+		InitialDeposit: make([]types.Coin, 0),
+		Proposer:       "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		Metadata:       "",
+	}
+
+	return &m
+}
+
+func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithSlashingUpdates(t *testing.T) {
+	m := createMsgSubmitProposalV1WithSlashingUpdates()
+	blob, now := testsuite.EmptyBlock()
+	position := 7
+
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+
+	addressesExpected, msgExpected := createExpectations(
+		blob, now, m, position,
+		storageTypes.MsgAddressTypeProposer,
+		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
+		storageTypes.MsgSubmitProposal,
+		266,
+	)
+
+	msgExpected.Proposal = &storage.Proposal{
+		Height:    blob.Height,
+		CreatedAt: blob.Block.Time,
+		Proposer: &storage.Address{
+			Address: "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		},
+		Status:      storageTypes.ProposalStatusInactive,
+		Type:        storageTypes.ProposalTypeText,
+		Title:       "Proposal with messages",
+		Description: "Proposal contains messages:\r\n1. /cosmos.slashing.v1beta.MsgUpdateParams\r\n",
+	}
+
+	require.NoError(t, err)
+	require.Equal(t, addressesExpected, dm.Addresses)
+	require.Equal(t, msgExpected.Proposal.Title, dm.Msg.Proposal.Title)
+	require.Equal(t, msgExpected.Proposal.Status, dm.Msg.Proposal.Status)
+	require.Equal(t, msgExpected.Proposal.Height, dm.Msg.Proposal.Height)
+	require.Equal(t, msgExpected.Proposal.Description, dm.Msg.Proposal.Description)
+	require.Equal(t, msgExpected.Proposal.Proposer.Address, dm.Msg.Proposal.Proposer.Address)
+	require.NotNil(t, dm.Msg.Proposal.Changes)
+	require.EqualValues(t, 5, decodeCtx.Constants.Len())
+}
+
+func createMsgSubmitProposalV1WithConsensusAndBlobUpdates() types.Msg {
+	// Data from: 0x5c64b9867425b04961b4d650563fb997676b54ab4bfa297268f2283ec06cd1c8
+	val1, _ := base64.StdEncoding.DecodeString("Ci9jZWxlc3RpYTEwZDA3eTI2NWdtbXV2dDR6MHc5YXc4ODBqbnNyNzAwanRnejR2NxIFCAgQgAI=")
+	val2, _ := base64.StdEncoding.DecodeString("Ci9jZWxlc3RpYTEwZDA3eTI2NWdtbXV2dDR6MHc5YXc4ODBqbnNyNzAwanRnejR2NxIQCICAgBAQ////////////ARoOCNDnDhIECJCGShiAgEAiCQoHZWQyNTUxOQ==")
+	m := cosmosGovTypesV1.MsgSubmitProposal{
+		Messages: []*codecTypes.Any{
+			{
+				TypeUrl: "/celestia.blob.v1.MsgUpdateBlobParams",
+				Value:   val1,
+			}, {
+				TypeUrl: "/cosmos.consensus.v1.MsgUpdateParams",
+				Value:   val2,
+			},
+		},
+		InitialDeposit: make([]types.Coin, 0),
+		Proposer:       "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		Metadata:       "",
+	}
+
+	return &m
+}
+
+func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithConsensusAndBlobsUpdates(t *testing.T) {
+	m := createMsgSubmitProposalV1WithConsensusAndBlobUpdates()
+	blob, now := testsuite.EmptyBlock()
+	position := 7
+
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: blob.Height,
+		Time:   blob.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+
+	addressesExpected, msgExpected := createExpectations(
+		blob, now, m, position,
+		storageTypes.MsgAddressTypeProposer,
+		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
+		storageTypes.MsgSubmitProposal,
+		266,
+	)
+
+	msgExpected.Proposal = &storage.Proposal{
+		Height:    blob.Height,
+		CreatedAt: blob.Block.Time,
+		Proposer: &storage.Address{
+			Address: "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		},
+		Status:      storageTypes.ProposalStatusInactive,
+		Type:        storageTypes.ProposalTypeText,
+		Title:       "Proposal with messages",
+		Description: "Proposal contains messages:\r\n1. /celestia.blob.v1.MsgUpdateBlobParams\r\n2. /cosmos.consensus.v1.MsgUpdateParams\r\n",
+	}
+
+	require.NoError(t, err)
+	require.Equal(t, addressesExpected, dm.Addresses)
+	require.Equal(t, msgExpected.Proposal.Title, dm.Msg.Proposal.Title)
+	require.Equal(t, msgExpected.Proposal.Status, dm.Msg.Proposal.Status)
+	require.Equal(t, msgExpected.Proposal.Height, dm.Msg.Proposal.Height)
+	require.Equal(t, msgExpected.Proposal.Description, dm.Msg.Proposal.Description)
+	require.Equal(t, msgExpected.Proposal.Proposer.Address, dm.Msg.Proposal.Proposer.Address)
+	require.NotNil(t, dm.Msg.Proposal.Changes)
+	require.EqualValues(t, 7, decodeCtx.Constants.Len())
 }
