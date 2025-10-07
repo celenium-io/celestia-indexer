@@ -75,7 +75,11 @@ func (r *Module) live(ctx context.Context) error {
 			if block.Data == nil {
 				continue
 			}
-			blockHeader := block.Data.(tendermint.EventDataNewBlockHeader)
+			blockHeader, ok := block.Data.(tendermint.EventDataNewBlockHeader)
+			if !ok {
+				r.Log.Error().Msgf("unexpected block type: %T", block.Data)
+				continue
+			}
 			r.Log.Info().Int64("height", blockHeader.Header.Height).Msg("new block received")
 			r.passBlocks(ctx, types.Level(blockHeader.Header.Height))
 		}
