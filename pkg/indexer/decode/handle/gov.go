@@ -207,7 +207,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 			if evidence := params.GetEvidence(); evidence != nil {
 				maxAgeNumBlocks := strconv.FormatInt(evidence.GetMaxAgeNumBlocks(), 10)
 				ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_num_blocks", maxAgeNumBlocks)
-				paramChanges["block_max_bytes"] = maxAgeNumBlocks
+				paramChanges["evidence_max_age_num_blocks"] = maxAgeNumBlocks
 
 				maxBytes := strconv.FormatInt(evidence.GetMaxBytes(), 10)
 				ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_bytes", maxBytes)
