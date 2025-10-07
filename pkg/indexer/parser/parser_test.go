@@ -137,6 +137,11 @@ func getBlock() types.BlockData {
 				Evidence: &types.EvidenceParams{
 					MaxAgeNumBlocks: 100,
 					MaxAgeDuration:  time.Hour,
+					MaxBytes:        123,
+				},
+				Block: &types.BlockParams{
+					MaxBytes: 78,
+					MaxGas:   789,
 				},
 			},
 		},
