@@ -5,7 +5,7 @@ package parser
 
 import (
 	"encoding/hex"
-	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -115,8 +115,11 @@ func (p *Module) parseBlockSignatures(commit *types.Commit) []storage.BlockSigna
 }
 
 func (p *Module) parseConsensusParamUpdates(ctx *dCtx.Context, params *types.ConsensusParams) {
-	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_num_blocks", fmt.Sprintf("%d", params.Evidence.MaxAgeNumBlocks))
-	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_duration", params.Evidence.MaxAgeDuration.String())
+	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_num_blocks", strconv.FormatInt(params.Evidence.MaxAgeNumBlocks, 10))
+	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_duration", strconv.FormatInt(params.Evidence.MaxAgeDuration.Nanoseconds(), 10))
+	ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_bytes", strconv.FormatInt(params.Evidence.MaxBytes, 10))
+	ctx.AddConstant(storageTypes.ModuleNameConsensus, "block_max_bytes", strconv.FormatInt(params.Block.MaxBytes, 10))
+	ctx.AddConstant(storageTypes.ModuleNameConsensus, "block_max_gas", strconv.FormatInt(params.Block.MaxGas, 10))
 }
 
 func isEventDuplicated(results types.ResultBlockResults) bool {
