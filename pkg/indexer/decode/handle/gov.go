@@ -23,6 +23,7 @@ import (
 	ibcTypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
+	"github.com/stoewer/go-strcase"
 )
 
 // MsgSubmitProposalV1
@@ -270,6 +271,55 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 			return msgType, addresses, nil, nil, errors.Wrap(err, "marshalling changes proposal for submit proposal content")
 		}
 
+		for i := range proposal.Changes {
+			moduleName, err := storageTypes.ParseModuleName(proposal.Changes[i].GetSubspace())
+			if err != nil {
+				return msgType, addresses, nil, nil, errors.Wrapf(err, "parsing module name in proposal changes: %s", proposal.Changes[i].GetSubspace())
+			}
+			key := proposal.Changes[i].GetKey()
+			value := proposal.Changes[i].GetValue()
+
+			switch moduleName {
+			case storageTypes.ModuleNameConsensus, storageTypes.ModuleNameBaseapp:
+
+				switch key {
+				case "BlockParams":
+					if err := parseParamsToConstants(ctx, storageTypes.ModuleNameConsensus, "block_", value); err != nil {
+						return msgType, addresses, nil, nil, errors.Wrap(err, "parse block params")
+					}
+				case "EvidenceParams":
+					if err := parseParamsToConstants(ctx, storageTypes.ModuleNameConsensus, "evidence_", value); err != nil {
+						return msgType, addresses, nil, nil, errors.Wrap(err, "parse evidence params")
+					}
+				case "ValidatorParams":
+					if err := parseParamsToConstants(ctx, storageTypes.ModuleNameConsensus, "validator_", value); err != nil {
+						return msgType, addresses, nil, nil, errors.Wrap(err, "parse validator params")
+					}
+				}
+
+			case storageTypes.ModuleNameGov:
+				if key == "votingparams" {
+					if err := parseParamsToConstants(ctx, moduleName, "", value); err != nil {
+						return msgType, addresses, nil, nil, errors.Wrap(err, "parse voting params")
+					}
+				}
+
+			case storageTypes.ModuleNameBlob:
+				val := value
+				if key == "GovMaxSquareSize" {
+					val, err = strconv.Unquote(value)
+					if err != nil {
+						return msgType, addresses, nil, nil, errors.Wrap(err, value)
+					}
+				}
+				ctx.AddConstant(moduleName, strcase.SnakeCase(key), val)
+
+			default:
+				ctx.AddConstant(moduleName, strcase.SnakeCase(key), value)
+
+			}
+		}
+
 		return msgType, addresses, proposal, prpsl, nil
 	case "/ibc.core.client.v1.ClientUpdateProposal":
 		var proposal ibcTypes.ClientUpdateProposal //nolint
@@ -355,4 +405,15 @@ func MsgUpdateParamsGov(ctx *context.Context, m *v1.MsgUpdateParams) (storageTyp
 		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
+}
+
+func parseParamsToConstants(ctx *context.Context, moduleName storageTypes.ModuleName, keyPrefix, value string) error {
+	var params map[string]string
+	if err := json.Unmarshal([]byte(value), &params); err != nil {
+		return errors.Wrap(err, "unmarshal params")
+	}
+	for k, v := range params {
+		ctx.AddConstant(moduleName, keyPrefix+k, v)
+	}
+	return nil
 }

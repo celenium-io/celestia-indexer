@@ -5,17 +5,14 @@ package storage
 
 import (
 	"context"
-	"encoding/json"
 	"strconv"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	paramsV1Beta "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	"github.com/stoewer/go-strcase"
 )
 
 func (module *Module) saveProposals(
@@ -104,10 +101,6 @@ func (module *Module) saveProposals(
 			}
 			endTime := filled[i].ActivationTime.Add(duration)
 			filled[i].EndTime = &endTime
-		}
-
-		if err := module.updateConstants(ctx, tx, filled[i]); err != nil {
-			return 0, errors.Wrap(err, "update constants")
 		}
 	}
 
@@ -306,126 +299,4 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 	}
 
 	return result, nil
-}
-
-func (module *Module) updateConstants(ctx context.Context, tx storage.Transaction, proposal *storage.Proposal) error {
-	changes, err := tx.Proposal(ctx, proposal.Id)
-	if err != nil {
-		if module.validators.IsNoRows(err) {
-			return nil
-		}
-		return errors.Wrap(err, "receive proposal changes")
-	}
-
-	// save only constants from applied param change proposals
-	if proposal.Status != types.ProposalStatusApplied || changes.Type != types.ProposalTypeParamChanged {
-		return nil
-	}
-
-	var parsed []paramsV1Beta.ParamChange
-	if err := json.Unmarshal(changes.Changes, &parsed); err != nil {
-		return errors.Wrap(err, "parse proposal changes")
-	}
-
-	constants := make([]storage.Constant, 0)
-	for i := range parsed {
-		handledConstants, err := constantsHandle(parsed[i])
-		if err != nil {
-			return errors.Wrap(err, "handle proposal changes")
-		}
-		constants = append(constants, handledConstants...)
-	}
-
-	if len(constants) == 0 {
-		return nil
-	}
-
-	return tx.SaveConstants(ctx, constants...)
-}
-
-func constantsHandle(change paramsV1Beta.ParamChange) ([]storage.Constant, error) {
-	moduleName, err := types.ParseModuleName(change.GetSubspace())
-	if err != nil {
-		return nil, errors.Wrapf(err, "parsing module name in proposal changes: %s", change.GetSubspace())
-	}
-	key := change.GetKey()
-	value := change.GetValue()
-
-	constants := make([]storage.Constant, 0)
-
-	switch moduleName {
-	case types.ModuleNameConsensus, types.ModuleNameBaseapp:
-
-		switch key {
-		case "BlockParams":
-			c, err := parseParamsToConstants(types.ModuleNameConsensus, "block_", value)
-			if err != nil {
-				return nil, errors.Wrap(err, "parse block params")
-			}
-			constants = append(constants, c...)
-		case "EvidenceParams":
-			c, err := parseParamsToConstants(types.ModuleNameConsensus, "evidence_", value)
-			if err != nil {
-				return nil, errors.Wrap(err, "parse evidence params")
-			}
-			constants = append(constants, c...)
-		case "ValidatorParams":
-			c, err := parseParamsToConstants(types.ModuleNameConsensus, "validator_", value)
-			if err != nil {
-				return nil, errors.Wrap(err, "parse validator params")
-			}
-			constants = append(constants, c...)
-		}
-
-	case types.ModuleNameGov:
-
-		if key == "votingparams" {
-			c, err := parseParamsToConstants(moduleName, "", value)
-			if err != nil {
-				return nil, errors.Wrap(err, "parse voting params")
-			}
-			constants = append(constants, c...)
-		}
-
-	case types.ModuleNameBlob:
-		val := value
-		if key == "GovMaxSquareSize" {
-			val, err = strconv.Unquote(value)
-			if err != nil {
-				return nil, errors.Wrap(err, value)
-			}
-		}
-
-		constants = append(constants, storage.Constant{
-			Module: moduleName,
-			Name:   strcase.SnakeCase(key),
-			Value:  val,
-		})
-	default:
-
-		constants = append(constants, storage.Constant{
-			Module: moduleName,
-			Name:   strcase.SnakeCase(key),
-			Value:  value,
-		})
-
-	}
-
-	return constants, nil
-}
-
-func parseParamsToConstants(moduleName types.ModuleName, keyPrefix, value string) ([]storage.Constant, error) {
-	var params map[string]string
-	if err := json.Unmarshal([]byte(value), &params); err != nil {
-		return nil, errors.Wrap(err, "unmarshal params")
-	}
-	constants := make([]storage.Constant, 0)
-	for k, v := range params {
-		constants = append(constants, storage.Constant{
-			Module: moduleName,
-			Name:   keyPrefix + k,
-			Value:  v,
-		})
-	}
-	return constants, nil
 }

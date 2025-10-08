@@ -532,12 +532,12 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithSlashingUpdates(t *testing.T
 	require.NotNil(t, dm.Msg.Proposal.Changes)
 
 	var changes []paramsv1beta1.ParamChange
-	err = json.Unmarshal([]byte(dm.Msg.Proposal.Changes), &changes)
+	err = json.Unmarshal(dm.Msg.Proposal.Changes, &changes)
 	require.NoError(t, err)
 	require.Len(t, changes, 5)
-	require.Equal(t, "slashing", changes[0].Subspace)
-	require.Equal(t, "slash_fraction_double_sign", changes[0].Key)
-	require.Equal(t, "0.020000000000000000", changes[0].Value)
+	require.Equal(t, "slashing", changes[0].GetSubspace())
+	require.Equal(t, "slash_fraction_double_sign", changes[0].GetKey())
+	require.Equal(t, "0.020000000000000000", changes[0].GetValue())
 
 	require.EqualValues(t, 5, decodeCtx.Constants.Len())
 }
