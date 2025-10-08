@@ -5,9 +5,11 @@ package handle_test
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"testing"
 	"time"
 
+	paramsv1beta1 "cosmossdk.io/api/cosmos/params/v1beta1"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
@@ -528,6 +530,15 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithSlashingUpdates(t *testing.T
 	require.Equal(t, msgExpected.Proposal.Description, dm.Msg.Proposal.Description)
 	require.Equal(t, msgExpected.Proposal.Proposer.Address, dm.Msg.Proposal.Proposer.Address)
 	require.NotNil(t, dm.Msg.Proposal.Changes)
+
+	var changes []paramsv1beta1.ParamChange
+	err = json.Unmarshal(dm.Msg.Proposal.Changes, &changes)
+	require.NoError(t, err)
+	require.Len(t, changes, 5)
+	require.Equal(t, "slashing", changes[0].GetSubspace())
+	require.Equal(t, "slash_fraction_double_sign", changes[0].GetKey())
+	require.Equal(t, "0.020000000000000000", changes[0].GetValue())
+
 	require.EqualValues(t, 5, decodeCtx.Constants.Len())
 }
 

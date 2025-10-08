@@ -5,7 +5,6 @@ package storage
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -17,111 +16,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
-
-func TestUpdateConstants(t *testing.T) {
-	tests := []struct {
-		name     string
-		proposal *storage.Proposal
-		typ      types.ProposalType
-	}{
-		{
-			name: "not applied",
-			proposal: &storage.Proposal{
-				Id:     1,
-				Status: types.ProposalStatusActive,
-			},
-			typ: types.ProposalTypeParamChanged,
-		}, {
-			name: "not param changed",
-			proposal: &storage.Proposal{
-				Id:     1,
-				Status: types.ProposalStatusApplied,
-			},
-			typ: types.ProposalTypeClientUpdate,
-		}, {
-			name: "param changed",
-			proposal: &storage.Proposal{
-				Id:      1,
-				Status:  types.ProposalStatusApplied,
-				Changes: []byte(`[{"subspace":"staking","key":"MaxValidators","value":"105"}]`),
-			},
-			typ: types.ProposalTypeParamChanged,
-		}, {
-			name: "param changed: 2 changes",
-			proposal: &storage.Proposal{
-				Id:      1,
-				Status:  types.ProposalStatusApplied,
-				Changes: []byte(`[{"subspace":"baseapp","key":"BlockParams","value":"{\"max_bytes\":\"8388608\",\"max_gas\":\"-1\"}"},{"subspace":"blob","key":"GovMaxSquareSize","value":"\"128\""}]`),
-			},
-			typ: types.ProposalTypeParamChanged,
-		},
-	}
-
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	constants := mock.NewMockIConstant(ctrl)
-	validators := mock.NewMockIValidator(ctrl)
-
-	module := NewModule(nil, constants, validators, nil, config.Indexer{})
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tx := mock.NewMockTransaction(ctrl)
-
-			retProp := storage.Proposal{
-				Id:      1,
-				Status:  tt.proposal.Status,
-				Type:    tt.typ,
-				Changes: tt.proposal.Changes,
-			}
-
-			tx.EXPECT().
-				Proposal(gomock.Any(), uint64(1)).
-				Return(retProp, nil).
-				Times(1)
-
-			if tt.proposal.Changes != nil {
-				tx.EXPECT().
-					SaveConstants(gomock.Any(), gomock.Any()).
-					Return(nil).
-					Times(1)
-			}
-
-			err := module.updateConstants(t.Context(), tx, tt.proposal)
-			require.NoError(t, err)
-		})
-	}
-}
-
-func TestUpdateConstantsNewProposal(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	constants := mock.NewMockIConstant(ctrl)
-	validators := mock.NewMockIValidator(ctrl)
-
-	module := NewModule(nil, constants, validators, nil, config.Indexer{})
-
-	t.Run("new proposal", func(t *testing.T) {
-		tx := mock.NewMockTransaction(ctrl)
-
-		tx.EXPECT().
-			Proposal(gomock.Any(), uint64(1)).
-			Return(storage.Proposal{}, sql.ErrNoRows).
-			Times(1)
-
-		validators.EXPECT().
-			IsNoRows(sql.ErrNoRows).
-			Return(true).
-			Times(1)
-
-		err := module.updateConstants(t.Context(), tx, &storage.Proposal{
-			Id: 1,
-		})
-		require.NoError(t, err)
-	})
-}
 
 func TestFillProposalVotingPower(t *testing.T) {
 	ctrl := gomock.NewController(t)
