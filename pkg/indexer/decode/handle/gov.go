@@ -63,7 +63,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 	}
 	for i := range msg.Messages {
 		switch msg.Messages[i].TypeUrl {
-		case "/cosmos.slashing.v1beta.MsgUpdateParams":
+		case "/cosmos.slashing.v1beta1.MsgUpdateParams":
 			var params slashingv1beta1.MsgUpdateParams
 			if err := codec.Unmarshal(msg.Messages[i].Value, &params); err != nil {
 				return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling proposal with slashing.v1beta1.MsgUpdateParams")

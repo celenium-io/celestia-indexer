@@ -474,7 +474,7 @@ func createMsgSubmitProposalV1WithSlashingUpdates() types.Msg {
 	m := cosmosGovTypesV1.MsgSubmitProposal{
 		Messages: []*codecTypes.Any{
 			{
-				TypeUrl: "/cosmos.slashing.v1beta.MsgUpdateParams",
+				TypeUrl: "/cosmos.slashing.v1beta1.MsgUpdateParams",
 				Value:   val,
 			},
 		},
@@ -517,7 +517,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithSlashingUpdates(t *testing.T
 		Status:      storageTypes.ProposalStatusInactive,
 		Type:        storageTypes.ProposalTypeText,
 		Title:       "Proposal with messages",
-		Description: "Proposal contains messages:\r\n1. /cosmos.slashing.v1beta.MsgUpdateParams\r\n",
+		Description: "Proposal contains messages:\r\n1. /cosmos.slashing.v1beta1.MsgUpdateParams\r\n",
 	}
 
 	require.NoError(t, err)
