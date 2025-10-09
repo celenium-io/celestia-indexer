@@ -80,7 +80,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "slash_fraction_double_sign", slashFractionDoubleSign.String()))
 
 				var slashFractionDowntime math.LegacyDec
-				if err := slashFractionDoubleSign.Unmarshal(p.GetSlashFractionDowntime()); err != nil {
+				if err := slashFractionDowntime.Unmarshal(p.GetSlashFractionDowntime()); err != nil {
 					return msgType, addresses, nil, nil, errors.Wrap(err, "slash_fraction_downtime")
 				}
 				ctx.AddConstant(storageTypes.ModuleNameSlashing, "slash_fraction_downtime", slashFractionDowntime.String())
@@ -90,9 +90,12 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 				ctx.AddConstant(storageTypes.ModuleNameSlashing, "downtime_jail_duration", downtimeJailDuration)
 				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "downtime_jail_duration", downtimeJailDuration))
 
-				minSignedPerWindow := string(p.GetMinSignedPerWindow())
-				ctx.AddConstant(storageTypes.ModuleNameSlashing, "min_signed_per_window", minSignedPerWindow)
-				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "min_signed_per_window", minSignedPerWindow))
+				var minSignedPerWindow math.LegacyDec
+				if err := minSignedPerWindow.Unmarshal(p.GetMinSignedPerWindow()); err != nil {
+					return msgType, addresses, nil, nil, errors.Wrap(err, "min_signed_per_window")
+				}
+				ctx.AddConstant(storageTypes.ModuleNameSlashing, "min_signed_per_window", minSignedPerWindow.String())
+				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "min_signed_per_window", minSignedPerWindow.String()))
 
 				signedBlocksWindow := strconv.FormatInt(p.GetSignedBlocksWindow(), 10)
 				ctx.AddConstant(storageTypes.ModuleNameSlashing, "signed_blocks_window", signedBlocksWindow)

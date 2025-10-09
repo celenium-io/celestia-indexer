@@ -539,6 +539,14 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithSlashingUpdates(t *testing.T
 	require.Equal(t, "slash_fraction_double_sign", changes[0].GetKey())
 	require.Equal(t, "0.020000000000000000", changes[0].GetValue())
 
+	require.Equal(t, "slashing", changes[1].GetSubspace())
+	require.Equal(t, "slash_fraction_downtime", changes[1].GetKey())
+	require.Equal(t, "0.000000000000000000", changes[1].GetValue())
+
+	require.Equal(t, "slashing", changes[3].GetSubspace())
+	require.Equal(t, "min_signed_per_window", changes[3].GetKey())
+	require.Equal(t, "0.010000000000000000", changes[3].GetValue())
+
 	require.EqualValues(t, 5, decodeCtx.Constants.Len())
 }
 
