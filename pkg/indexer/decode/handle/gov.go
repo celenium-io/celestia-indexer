@@ -80,7 +80,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "slash_fraction_double_sign", slashFractionDoubleSign.String()))
 
 				var slashFractionDowntime math.LegacyDec
-				if err := slashFractionDoubleSign.Unmarshal(p.GetSlashFractionDowntime()); err != nil {
+				if err := slashFractionDowntime.Unmarshal(p.GetSlashFractionDowntime()); err != nil {
 					return msgType, addresses, nil, nil, errors.Wrap(err, "slash_fraction_downtime")
 				}
 				ctx.AddConstant(storageTypes.ModuleNameSlashing, "slash_fraction_downtime", slashFractionDowntime.String())
