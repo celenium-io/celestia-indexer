@@ -126,6 +126,14 @@ func isEventDuplicated(results types.ResultBlockResults) bool {
 	if len(results.TxsResults) == 0 || len(results.FinalizeBlockEvents) == 0 {
 		return false
 	}
-	lastEvents := results.TxsResults[len(results.TxsResults)-1].Events
-	return lastEvents[len(lastEvents)-1].Compare(results.FinalizeBlockEvents[len(results.FinalizeBlockEvents)-1])
+
+	for i := len(results.TxsResults) - 1; i >= 0; i-- {
+		if len(results.TxsResults[i].Events) > 0 {
+			lastEventTx := results.TxsResults[i].Events[len(results.TxsResults[i].Events)-1]
+			lastBlockEvent := results.FinalizeBlockEvents[len(results.FinalizeBlockEvents)-1]
+			return lastEventTx.Compare(lastBlockEvent)
+		}
+	}
+
+	return false
 }
