@@ -80,11 +80,8 @@ func (worker *Worker) Do(ctx context.Context, level types.Level) {
 		default:
 		}
 
-		requestTimeout, cancel := context.WithTimeout(ctx, time.Minute)
-		blocks, err := worker.api.BlockBulkData(requestTimeout, worker.queue...)
+		blocks, err := worker.api.BlockBulkData(ctx, worker.queue...)
 		if err != nil {
-			cancel()
-
 			if errors.Is(err, context.Canceled) {
 				return
 			}
@@ -97,7 +94,6 @@ func (worker *Worker) Do(ctx context.Context, level types.Level) {
 			continue
 		}
 		result = blocks
-		cancel()
 		break
 	}
 

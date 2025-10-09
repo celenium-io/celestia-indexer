@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
-	"github.com/goccy/go-json"
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -21,6 +21,8 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 const (
 	celeniumUserAgent = "Celenium Indexer"
@@ -39,6 +41,10 @@ func NewAPI(cfg config.DataSource) API {
 	if cfg.RequestsPerSecond < 1 || cfg.RequestsPerSecond > 100 {
 		rps = 10
 	}
+	timeout := cfg.Timeout
+	if timeout <= 0 {
+		timeout = 10
+	}
 
 	t := http.DefaultTransport.(*http.Transport).Clone()
 	t.MaxIdleConns = rps
@@ -48,6 +54,7 @@ func NewAPI(cfg config.DataSource) API {
 	return API{
 		client: &http.Client{
 			Transport: t,
+			Timeout:   time.Second * time.Duration(timeout),
 		},
 		cfg:       cfg,
 		rps:       rps,
