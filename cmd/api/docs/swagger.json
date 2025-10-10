@@ -4925,6 +4925,51 @@
                 }
             }
         },
+        "/rollup/{id}/providers": {
+            "get": {
+                "description": "Get rollup providers info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rollup"
+                ],
+                "summary": "Get rollup providers info",
+                "operationId": "get-rollup-providers",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal identity",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.RollupProvider"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/rollup/{id}/stats/{name}/{timeframe}": {
             "get": {
                 "description": "Get rollup stats",
@@ -10067,6 +10112,21 @@
                     "type": "integer",
                     "format": "integer",
                     "example": 1000
+                }
+            }
+        },
+        "responses.RollupProvider": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0x1234567890abcdef1234567890abcdef12345678"
+                },
+                "namespace": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "U3dhZ2dlciByb2Nrcw=="
                 }
             }
         },

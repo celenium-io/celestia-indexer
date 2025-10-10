@@ -4,13 +4,14 @@
 package storage
 
 import (
-	"github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"context"
+
 	"github.com/uptrace/bun"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IRollupProvider interface {
-	storage.Table[*RollupProvider]
+	ByRollupId(ctx context.Context, rollupId uint64) ([]RollupProvider, error)
 }
 
 // RollupProvider -
@@ -20,6 +21,9 @@ type RollupProvider struct {
 	RollupId    uint64 `bun:"rollup_id,pk"    comment:"Unique internal rollup identity"`
 	NamespaceId uint64 `bun:"namespace_id,pk" comment:"Namespace identity. May be NULL"`
 	AddressId   uint64 `bun:"address_id,pk"   comment:"Celestia address of data provider"`
+
+	Namespace *Namespace `bun:"rel:belongs-to,join:namespace_id=id"`
+	Address   *Address   `bun:"rel:belongs-to,join:address_id=id"`
 }
 
 // TableName -

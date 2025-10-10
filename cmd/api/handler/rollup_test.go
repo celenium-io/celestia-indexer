@@ -68,6 +68,7 @@ type RollupTestSuite struct {
 	suite.Suite
 	namespace *mock.MockINamespace
 	rollups   *mock.MockIRollup
+	providers *mock.MockIRollupProvider
 	blobs     *mock.MockIBlobLog
 	echo      *echo.Echo
 	handler   RollupHandler
@@ -81,8 +82,9 @@ func (s *RollupTestSuite) SetupSuite() {
 	s.ctrl = gomock.NewController(s.T())
 	s.namespace = mock.NewMockINamespace(s.ctrl)
 	s.rollups = mock.NewMockIRollup(s.ctrl)
+	s.providers = mock.NewMockIRollupProvider(s.ctrl)
 	s.blobs = mock.NewMockIBlobLog(s.ctrl)
-	s.handler = NewRollupHandler(s.rollups, s.namespace, s.blobs)
+	s.handler = NewRollupHandler(s.rollups, s.providers, s.namespace, s.blobs)
 }
 
 // TearDownSuite -
@@ -288,6 +290,59 @@ func (s *RollupTestSuite) TestGetNamespaces() {
 	s.Require().EqualValues(12, namespace.PfbCount)
 	s.Require().Equal(testNamespaceId, namespace.NamespaceID)
 	s.Require().Equal(testNamespaceBase64, namespace.Hash)
+}
+
+func (s *RollupTestSuite) TestGetProviders() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/rollup/:id/providers")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	s.providers.EXPECT().
+		ByRollupId(gomock.Any(), uint64(1)).
+		Return([]storage.RollupProvider{
+			{
+				AddressId: 1,
+				RollupId:  1,
+				Address: &storage.Address{
+					Address: testAddress,
+				},
+			}, {
+				NamespaceId: 1,
+				AddressId:   2,
+				RollupId:    1,
+				Address: &storage.Address{
+					Address: testAddress,
+				},
+				Namespace: &testNamespace,
+			}, {
+				NamespaceId: 1,
+				RollupId:    1,
+				Namespace:   &testNamespace,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.GetProviders(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var providers []responses.RollupProvider
+	err := json.NewDecoder(rec.Body).Decode(&providers)
+	s.Require().NoError(err)
+	s.Require().Len(providers, 3)
+
+	provider1 := providers[0]
+	s.Require().EqualValues(testAddress, provider1.Address)
+	s.Require().Empty(provider1.Namespace)
+
+	provider2 := providers[1]
+	s.Require().EqualValues(testAddress, provider2.Address)
+	s.Require().EqualValues(testNamespaceBase64, provider2.Namespace)
+
+	provider3 := providers[2]
+	s.Require().Empty(provider3.Address)
+	s.Require().EqualValues(testNamespaceBase64, provider3.Namespace)
 }
 
 func (s *RollupTestSuite) TestGetBlobs() {

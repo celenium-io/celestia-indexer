@@ -586,7 +586,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		initWebsocket(ctx, v1)
 	}
 
-	rollupHandler := handler.NewRollupHandler(db.Rollup, db.Namespace, db.BlobLogs)
+	rollupHandler := handler.NewRollupHandler(db.Rollup, db.RollupProvider, db.Namespace, db.BlobLogs)
 	rollups := v1.Group("/rollup")
 	{
 		rollups.GET("", rollupHandler.Leaderboard)
@@ -599,6 +599,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		{
 			rollup.GET("", rollupHandler.Get)
 			rollup.GET("/namespaces", rollupHandler.GetNamespaces)
+			rollup.GET("/providers", rollupHandler.GetProviders)
 			rollup.GET("/blobs", rollupHandler.GetBlobs)
 			rollup.GET("/stats/:name/:timeframe", rollupHandler.Stats, statsMiddlewareCache)
 			rollup.GET("/distribution/:name/:timeframe", rollupHandler.Distribution, statsMiddlewareCache)
