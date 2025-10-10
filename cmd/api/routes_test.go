@@ -51,6 +51,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/tx GET":                                          {},
 		"/v1/namespace/:id/:version/blobs GET":                {},
 		"/v1/rollup/:id/namespaces GET":                       {},
+		"/v1/rollup/:id/providers GET":                        {},
 		"/v1/block GET":                                       {},
 		"/v1/tx/:hash/blobs/count GET":                        {},
 		"/v1/rollup GET":                                      {},

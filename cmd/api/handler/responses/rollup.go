@@ -248,3 +248,18 @@ func NewRollupGroupedStats(r storage.RollupGroupedStats) RollupGroupedStats {
 
 	return response
 }
+
+type RollupProvider struct {
+	Address   string `example:"0x1234567890abcdef1234567890abcdef12345678" format:"string" json:"address,omitempty"   swaggertype:"string"`
+	Namespace string `example:"U3dhZ2dlciByb2Nrcw=="                       format:"string" json:"namespace,omitempty" swaggertype:"string"`
+}
+
+func NewRollupProvider(r storage.RollupProvider) (provider RollupProvider) {
+	if r.Address != nil {
+		provider.Address = r.Address.String()
+	}
+	if r.Namespace != nil {
+		provider.Namespace = r.Namespace.Hash()
+	}
+	return provider
+}

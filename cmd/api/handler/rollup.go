@@ -16,17 +16,20 @@ import (
 
 type RollupHandler struct {
 	rollups   storage.IRollup
+	providers storage.IRollupProvider
 	namespace storage.INamespace
 	blobs     storage.IBlobLog
 }
 
 func NewRollupHandler(
 	rollups storage.IRollup,
+	providers storage.IRollupProvider,
 	namespace storage.INamespace,
 	blobs storage.IBlobLog,
 ) RollupHandler {
 	return RollupHandler{
 		rollups:   rollups,
+		providers: providers,
 		namespace: namespace,
 		blobs:     blobs,
 	}
@@ -274,6 +277,38 @@ func (handler RollupHandler) GetNamespaces(c echo.Context) error {
 		response[i] = responses.NewNamespace(namespaces[i])
 	}
 
+	return returnArray(c, response)
+}
+
+// GetProviders godoc
+//
+//	@Summary		Get rollup providers info
+//	@Description	Get rollup providers info
+//	@Tags			rollup
+//	@ID				get-rollup-providers
+//	@Param			id		path	integer	true	"Internal identity"				mininum(1)
+//	@Produce		json
+//	@Success		200	{array}		responses.RollupProvider
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/rollup/{id}/providers [get]
+func (handler RollupHandler) GetProviders(c echo.Context) error {
+	req, err := bindAndValidate[getById](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	providers, err := handler.providers.ByRollupId(c.Request().Context(), req.Id)
+	if err != nil {
+		return handleError(c, err, handler.rollups)
+	}
+	if len(providers) == 0 {
+		return c.JSON(http.StatusOK, []any{})
+	}
+	response := make([]responses.RollupProvider, len(providers))
+	for i := range providers {
+		response[i] = responses.NewRollupProvider(providers[i])
+	}
 	return returnArray(c, response)
 }
 

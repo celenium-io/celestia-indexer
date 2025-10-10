@@ -50,6 +50,7 @@ type Storage struct {
 	Undelegation    models.IUndelegation
 	Jails           models.IJail
 	Rollup          models.IRollup
+	RollupProvider  models.IRollupProvider
 	Grants          models.IGrant
 	ApiKeys         models.IApiKey
 	Proposals       models.IProposal
@@ -113,6 +114,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		Undelegation:    NewUndelegation(strg.Connection()),
 		Jails:           NewJail(strg.Connection()),
 		Rollup:          NewRollup(strg.Connection()),
+		RollupProvider:  NewRollupProvider(strg.Connection()),
 		Grants:          NewGrant(strg.Connection()),
 		ApiKeys:         NewApiKey(strg.Connection()),
 		Proposals:       NewProposal(strg.Connection()),
