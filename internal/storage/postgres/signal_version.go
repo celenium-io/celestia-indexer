@@ -24,7 +24,9 @@ func NewSignalVersion(db *database.Bun) *SignalVersion {
 
 func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFilter) (signals []storage.SignalVersion, err error) {
 	query := t.DB().NewSelect().
-		Model((*storage.SignalVersion)(nil))
+		Model((*storage.SignalVersion)(nil)).
+		ColumnExpr("version, validator_id, max(id) as id, max(height) as height,  max(time) as time, max(msg_id) as msg_id, max(tx_id) as tx_id, last(voting_power, time) as voting_power").
+		GroupExpr("version, validator_id")
 
 	if filters.Offset > 0 {
 		query = query.Offset(filters.Offset)
@@ -53,7 +55,7 @@ func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFil
 	err = t.DB().NewSelect().
 		TableExpr("(?) as signal_version", query).
 		ColumnExpr("signal_version.*").
-		ColumnExpr("validator.address as validator__address").
+		ColumnExpr("validator.cons_address as validator__cons_address, validator.moniker as validator__moniker, validator.id as validator__id").
 		ColumnExpr("tx.hash as tx__hash").
 		Join("left join validator as validator on validator.id = validator_id").
 		Join("left join tx on tx_id = tx.id").

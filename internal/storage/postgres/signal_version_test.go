@@ -22,7 +22,7 @@ func (s *StorageTestSuite) TestSignalVersionList() {
 		{
 			Offset: 0,
 			Sort:   sdk.SortOrderDesc,
-			TxId:   testsuite.Ptr(uint64(1)),
+			TxId:   testsuite.Ptr(uint64(3)),
 		}, {
 			Offset:  0,
 			Sort:    sdk.SortOrderDesc,
@@ -30,12 +30,15 @@ func (s *StorageTestSuite) TestSignalVersionList() {
 		}, {
 			Offset: 0,
 			Sort:   sdk.SortOrderDesc,
-			From:   time.Date(2025, 8, 7, 0, 0, 0, 0, time.UTC),
-			To:     time.Date(2025, 8, 8, 0, 0, 0, 0, time.UTC),
+			From:   time.Date(2025, 8, 9, 3, 11, 0, 0, time.UTC),
+			To:     time.Date(2025, 8, 10, 0, 0, 0, 0, time.UTC),
 		}, {
 			Limit:  1,
-			Offset: 0,
+			Offset: 1,
 			Sort:   sdk.SortOrderAsc,
+		}, {
+			Sort:        sdk.SortOrderDesc,
+			ValidatorId: 1,
 		},
 	} {
 
@@ -44,16 +47,18 @@ func (s *StorageTestSuite) TestSignalVersionList() {
 		s.Require().Len(signals, 1)
 
 		signal := signals[0]
-		s.Require().EqualValues(1, signal.Id)
-		s.Require().EqualValues(101, signal.Height)
+		s.Require().EqualValues(3, signal.Id)
+		s.Require().EqualValues(103, signal.Height)
 		s.Require().EqualValues(1488, signal.Version)
-		s.Require().EqualValues(decimal.RequireFromString("123"), signal.VotingPower)
-		s.Require().EqualValues(1, signal.MsgId)
-		s.Require().EqualValues(1, signal.TxId)
+		s.Require().EqualValues(decimal.RequireFromString("8"), signal.VotingPower)
+		s.Require().EqualValues(3, signal.MsgId)
+		s.Require().EqualValues(3, signal.TxId)
 		s.Require().NotNil(signal.Validator)
-		s.Require().EqualValues("celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw", signal.Validator.Address)
+		s.Require().EqualValues("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", signal.Validator.ConsAddress)
+		s.Require().EqualValues(1, signal.Validator.Id)
+		s.Require().EqualValues("Conqueror", signal.Validator.Moniker)
 
-		txHash, err := hex.DecodeString("652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF")
+		txHash, err := hex.DecodeString("BA37478C3E9A804697271ACC474D484E9160899C86E551D737EEA819FCC75003")
 		s.Require().NoError(err)
 		s.Require().NotNil(signal.Tx)
 		s.Require().EqualValues(txHash, signal.Tx.Hash)

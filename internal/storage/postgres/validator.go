@@ -63,6 +63,9 @@ func (v *Validator) ListByPower(ctx context.Context, fltrs storage.ValidatorFilt
 			query = query.Where("jailed = false")
 		}
 	}
+	if fltrs.Version != nil {
+		query = query.Where("version = ?", *fltrs.Version)
+	}
 
 	err = query.Scan(ctx)
 	return

@@ -114,6 +114,37 @@ func (s *ValidatorTestSuite) TestList() {
 	s.Require().EqualValues("012345", validators[0].ConsAddress)
 }
 
+func (s *ValidatorTestSuite) TestListWithVersion() {
+	q := make(url.Values)
+	q.Add("version", "4")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/validator")
+
+	s.validators.EXPECT().
+		ListByPower(gomock.Any(), storage.ValidatorFilters{
+			Limit:   10,
+			Version: testsuite.Ptr(4),
+		}).
+		Return([]storage.Validator{
+			testValidator,
+		}, nil)
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var validators []responses.Validator
+	err := json.NewDecoder(rec.Body).Decode(&validators)
+	s.Require().NoError(err)
+	s.Require().Len(validators, 1)
+	s.Require().EqualValues(1, validators[0].Id)
+	s.Require().EqualValues("moniker", validators[0].Moniker)
+	s.Require().EqualValues("012345", validators[0].ConsAddress)
+	s.Require().EqualValues(4, validators[0].Version)
+}
+
 func (s *ValidatorTestSuite) TestByProposer() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()

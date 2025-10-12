@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 )
 
 func (s *StorageTestSuite) TestValidatorByAddress() {
@@ -45,6 +46,20 @@ func (s *StorageTestSuite) TestListByPower() {
 	})
 	s.Require().NoError(err)
 	s.Require().Len(validators, 2)
+}
+
+func (s *StorageTestSuite) TestListByPowerWithVersion() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	validators, err := s.storage.Validator.ListByPower(ctx, storage.ValidatorFilters{
+		Limit:   10,
+		Version: testsuite.Ptr(2),
+	})
+	s.Require().NoError(err)
+	s.Require().Len(validators, 1)
+
+	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", validators[0].ConsAddress)
 }
 
 func (s *StorageTestSuite) TestJailedCount() {

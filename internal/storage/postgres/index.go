@@ -246,6 +246,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Validator)(nil)).
+			Index("validator_version_idx").
+			Column("version").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Blob log
 		if _, err := tx.NewCreateIndex().
