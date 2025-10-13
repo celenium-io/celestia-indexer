@@ -1774,49 +1774,54 @@ func (s *TransactionTestSuite) TestSaveUpgrades() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	addresses := make([]*storage.Address, 0, 2)
+	addresses := make([]*storage.Address, 2)
 	for i := 0; i < 2; i++ {
-		hash := make([]byte, 20)
-		for j := 0; j < 19; j++ {
-			hash[j] = byte(j)
-		}
-		hash[19] = byte(i)
-		s.NoError(err)
-
+		hash := testsuite.RandomBytes(20)
 		addr, err := bech32.ConvertAndEncode(pkgTypes.AddressPrefixCelestia, hash)
 		s.NoError(err)
 
-		addresses = append(addresses, &storage.Address{
+		addresses[i] = &storage.Address{
 			Height:     pkgTypes.Level(10000 + i),
 			LastHeight: pkgTypes.Level(10000 + i),
 			Hash:       hash,
 			Address:    addr,
 			Id:         uint64(i),
-		})
+		}
 	}
 
 	err = tx.SaveUpgrades(ctx,
 		&storage.Upgrade{
-			Height:   1111,
-			Time:     time.Now().UTC(),
-			MsgId:    1,
-			TxId:     1,
-			Version:  1,
-			SignerId: 1,
-			Signer:   addresses[0],
+			Height:       1111,
+			Time:         time.Now().UTC(),
+			MsgId:        1,
+			TxId:         1,
+			Version:      1,
+			SignerId:     1,
+			Signer:       addresses[0],
+			SignalsCount: 1,
 		}, &storage.Upgrade{
-			Height:   2222,
-			Time:     time.Now().UTC(),
-			MsgId:    2,
-			TxId:     2,
-			Version:  2,
-			SignerId: 2,
-			Signer:   addresses[1],
+			Height:       2222,
+			Time:         time.Now().UTC(),
+			MsgId:        2,
+			TxId:         2,
+			Version:      1500,
+			SignerId:     2,
+			Signer:       addresses[1],
+			SignalsCount: 3,
 		})
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
+
+	upgrades, err := s.storage.Upgrade.List(ctx, storage.ListUpgradesFilter{
+		Limit: 1,
+		Sort:  sdk.SortOrderDesc,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(upgrades, 1)
+	s.Require().EqualValues(1500, upgrades[0].Version)
+	s.Require().EqualValues(4, upgrades[0].SignalsCount)
 }
 
 func (s *TransactionTestSuite) TestUpdateSignalsAfterUpgrade() {

@@ -314,7 +314,7 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 	}
 
 	for i := range upgrades {
-		query := tx.Tx().NewInsert().Model(&upgrades).
+		query := tx.Tx().NewInsert().Model(upgrades[i]).
 			Column("version", "height", "time", "end_height", "end_time", "signer_id", "msg_id", "tx_id", "voting_power", "voted_power", "signals_count").
 			On("CONFLICT (version) DO UPDATE")
 

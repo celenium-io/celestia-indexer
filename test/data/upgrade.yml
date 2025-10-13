@@ -8,6 +8,7 @@
   tx_id: 1
   voting_power: 123456
   voted_power: 12345
+  signals_count: 5
 - height: 1011
   end_height: 1012
   signer_id: 2
@@ -18,3 +19,4 @@
   tx_id: 2
   voting_power: 123456
   voted_power: 12345
+  signals_count: 1
