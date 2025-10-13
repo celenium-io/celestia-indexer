@@ -51,6 +51,7 @@ var (
 		Moniker:     "moniker",
 		ConsAddress: "012345",
 		Jailed:      testsuite.Ptr(false),
+		Version:     4,
 	}
 	testBlockWithStats = storage.Block{
 		Id:           1,

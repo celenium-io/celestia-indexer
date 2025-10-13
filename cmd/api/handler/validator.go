@@ -84,9 +84,10 @@ func (handler *ValidatorHandler) Get(c echo.Context) error {
 }
 
 type validatorsPagination struct {
-	Limit  int   `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int   `query:"offset" validate:"omitempty,min=0"`
-	Jailed *bool `query:"jailed" validate:"omitempty"`
+	Limit   int   `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset  int   `query:"offset"  validate:"omitempty,min=0"`
+	Jailed  *bool `query:"jailed"  validate:"omitempty"`
+	Version *int  `query:"version" validate:"omitempty,min=0"`
 }
 
 func (req *validatorsPagination) SetDefault() {
@@ -102,8 +103,9 @@ func (req *validatorsPagination) SetDefault() {
 //	@Tags			validator
 //	@ID				list-validator
 //	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			offset	query	integer	false	"Offset"						mininum(0)
 //	@Param			jailed	query	boolean	false	"Return only jailed validators"
+//	@Param			version	query	integer	false	"Current validator app version"	mininum(0)
 //	@Produce		json
 //	@Success		200	{array}		responses.Validator
 //	@Failure		400	{object}	Error
@@ -117,9 +119,10 @@ func (handler *ValidatorHandler) List(c echo.Context) error {
 	req.SetDefault()
 
 	validators, err := handler.validators.ListByPower(c.Request().Context(), storage.ValidatorFilters{
-		Limit:  req.Limit,
-		Offset: req.Offset,
-		Jailed: req.Jailed,
+		Limit:   req.Limit,
+		Offset:  req.Offset,
+		Jailed:  req.Jailed,
+		Version: req.Version,
 	})
 	if err != nil {
 		return handleError(c, err, handler.validators)

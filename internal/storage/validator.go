@@ -102,9 +102,10 @@ func EmptyValidator() Validator {
 }
 
 type ValidatorFilters struct {
-	Limit  int
-	Offset int
-	Jailed *bool
+	Limit   int
+	Offset  int
+	Jailed  *bool
+	Version *int
 }
 
 type ValidatorMessagesFilters struct {
