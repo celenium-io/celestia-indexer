@@ -1797,7 +1797,6 @@ func (s *TransactionTestSuite) TestSaveUpgrades() {
 
 	err = tx.SaveUpgrades(ctx,
 		&storage.Upgrade{
-			Id:       1,
 			Height:   1111,
 			Time:     time.Now().UTC(),
 			MsgId:    1,
@@ -1806,7 +1805,6 @@ func (s *TransactionTestSuite) TestSaveUpgrades() {
 			SignerId: 1,
 			Signer:   addresses[0],
 		}, &storage.Upgrade{
-			Id:       2,
 			Height:   2222,
 			Time:     time.Now().UTC(),
 			MsgId:    2,

@@ -11077,17 +11077,27 @@
         "responses.Upgrade": {
             "type": "object",
             "properties": {
+                "end_height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "end_time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2025-07-04T03:10:57+00:00"
+                },
                 "height": {
                     "type": "integer",
                     "format": "int64",
                     "example": 100
                 },
-                "id": {
+                "msg_id": {
                     "type": "integer",
                     "format": "int64",
-                    "example": 321
+                    "example": 2
                 },
-                "msg_id": {
+                "signals_count": {
                     "type": "integer",
                     "format": "int64",
                     "example": 2

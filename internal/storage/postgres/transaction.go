@@ -313,8 +313,41 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 		return nil
 	}
 
-	_, err := tx.Tx().NewInsert().Model(&upgrades).Exec(ctx)
-	return err
+	for i := range upgrades {
+		query := tx.Tx().NewInsert().Model(&upgrades).
+			Column("version", "height", "time", "end_height", "end_time", "signer_id", "msg_id", "tx_id", "voting_power", "voted_power", "signals_count").
+			On("CONFLICT (version) DO UPDATE")
+
+		if upgrades[i].EndHeight > 0 {
+			query = query.Set("end_height = EXCLUDED.end_height")
+		}
+		if !upgrades[i].EndTime.IsZero() {
+			query = query.Set("end_time = EXCLUDED.end_time")
+		}
+		if upgrades[i].SignerId > 0 {
+			query = query.Set("signer_id = EXCLUDED.signer_id")
+		}
+		if upgrades[i].MsgId > 0 {
+			query = query.Set("msg_id = EXCLUDED.msg_id")
+		}
+		if upgrades[i].TxId > 0 {
+			query = query.Set("tx_id = EXCLUDED.tx_id")
+		}
+		if !upgrades[i].VotingPower.IsZero() {
+			query = query.Set("voting_power = EXCLUDED.voting_power")
+		}
+		if !upgrades[i].VotedPower.IsZero() {
+			query = query.Set("voted_power = EXCLUDED.voted_power")
+		}
+		if upgrades[i].SignalsCount > 0 {
+			query = query.Set("signals_count = EXCLUDED.signals_count + upgrade.signals_count")
+		}
+		if _, err := query.Exec(ctx); err != nil {
+			return errors.Wrapf(err, "save upgrade %d", upgrades[i].Version)
+		}
+	}
+
+	return nil
 }
 
 func (tx Transaction) SaveHyperlaneIgps(ctx context.Context, igps ...*models.HLIGP) error {

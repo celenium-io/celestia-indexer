@@ -322,7 +322,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		}
 	}
 
-	addrToId, totalAccounts, err := saveAddresses(ctx, tx, dCtx.GetAddresses())
+	addrToId, totalAccounts, err := saveAddresses(ctx, tx, dCtx.Addresses.Values())
 	if err != nil {
 		return state, err
 	}
@@ -336,12 +336,12 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	totalValidators, err := module.saveValidators(ctx, tx, dCtx.GetValidators(), dCtx.Jails)
+	totalValidators, err := module.saveValidators(ctx, tx, dCtx.Validators.Values(), dCtx.Jails)
 	if err != nil {
 		return state, err
 	}
 
-	ibcClientsCount, version, err := module.saveMessages(ctx, tx, messages, addrToId, state)
+	ibcClientsCount, version, err := module.saveMessages(ctx, tx, messages, addrToId, dCtx.Upgrades, state)
 	if err != nil {
 		return state, err
 	}
@@ -354,7 +354,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	totalProposals, err := module.saveProposals(ctx, tx, dCtx.Block.Height, dCtx.GetProposals(), dCtx.Votes, addrToId)
+	totalProposals, err := module.saveProposals(ctx, tx, dCtx.Block.Height, dCtx.Proposals.Values(), dCtx.Votes, addrToId)
 	if err != nil {
 		return state, err
 	}
