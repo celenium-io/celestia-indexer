@@ -7097,6 +7097,12 @@
                         "description": "Return only jailed validators",
                         "name": "jailed",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Current validator app version",
+                        "name": "version",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -11103,6 +11109,16 @@
                     "type": "integer",
                     "format": "int64",
                     "example": 1
+                },
+                "voted_power": {
+                    "type": "string",
+                    "format": "int64",
+                    "example": "9348"
+                },
+                "voting_power": {
+                    "type": "string",
+                    "format": "int64",
+                    "example": "9348"
                 }
             }
         },

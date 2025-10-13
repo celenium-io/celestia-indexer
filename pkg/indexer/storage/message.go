@@ -8,6 +8,7 @@ import (
 	"maps"
 	"slices"
 	"strconv"
+	"sync"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -324,6 +325,7 @@ func (module *Module) saveMessages(
 				return 0, state.Version, errors.Wrapf(err, "receiving total voting power")
 			}
 
+			var saveOnce sync.Once
 			voted := decimal.Zero
 			for _, v := range validators {
 				if v.Version <= state.Version {
@@ -331,17 +333,20 @@ func (module *Module) saveMessages(
 				}
 				voted = voted.Add(v.Stake)
 				if voted.GreaterThan(vp.Mul(signalsThreshold)) {
-					messages[i].Upgrade.Version = v.Version
-					state.Version = v.Version
-
-					if err := tx.UpdateSignalsAfterUpgrade(ctx, v.Version); err != nil {
+					var err error
+					saveOnce.Do(func() {
+						messages[i].Upgrade.Version = v.Version
+						state.Version = v.Version
+						err = tx.UpdateSignalsAfterUpgrade(ctx, v.Version)
+					})
+					if err != nil {
 						return 0, state.Version, errors.Wrap(err, "updating signals after upgrade")
 					}
-
-					break
 				}
 			}
 
+			messages[i].Upgrade.VotingPower = vp
+			messages[i].Upgrade.VotedPower = voted
 			upgrades = append(upgrades, messages[i].Upgrade)
 		}
 

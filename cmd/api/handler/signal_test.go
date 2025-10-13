@@ -37,14 +37,16 @@ var testSignal = storage.SignalVersion{
 }
 
 var testUpgrade = storage.Upgrade{
-	Id:       2,
-	Height:   101,
-	SignerId: 2,
-	Time:     time.Now().UTC(),
-	Version:  1,
-	MsgId:    1,
-	TxId:     1,
-	Tx:       &testTx,
+	Id:          2,
+	Height:      101,
+	SignerId:    2,
+	Time:        time.Now().UTC(),
+	Version:     1,
+	MsgId:       1,
+	TxId:        1,
+	Tx:          &testTx,
+	VotingPower: decimal.RequireFromString("1000"),
+	VotedPower:  decimal.RequireFromString("900"),
 	Signer: &storage.Address{
 		Id:         2,
 		Hash:       testHashAddress,
@@ -174,6 +176,8 @@ func (s *SignalTestSuite) TestUpgrades() {
 	s.Require().Len(upgrades, 1)
 	s.Require().EqualValues(2, upgrades[0].Id)
 	s.Require().EqualValues(testUpgrade.Version, upgrades[0].Version)
+	s.Require().EqualValues(testUpgrade.VotedPower.String(), upgrades[0].VotedPower)
+	s.Require().EqualValues(testUpgrade.VotingPower.String(), upgrades[0].VotingPower)
 
 	txHash, err := hex.DecodeString(upgrades[0].TxHash)
 	s.Require().NoError(err)
