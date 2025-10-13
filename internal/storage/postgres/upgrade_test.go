@@ -47,6 +47,8 @@ func (s *StorageTestSuite) TestUpgradeList() {
 		s.Require().EqualValues(1499, upgrade.Version)
 		s.Require().EqualValues(1, upgrade.MsgId)
 		s.Require().EqualValues(1, upgrade.TxId)
+		s.Require().EqualValues("12345", upgrade.VotedPower.String())
+		s.Require().EqualValues("123456", upgrade.VotingPower.String())
 		s.Require().NotNil(upgrade.Signer)
 		s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", upgrade.Signer.Address)
 
