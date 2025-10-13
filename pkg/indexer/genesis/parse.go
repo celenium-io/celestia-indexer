@@ -116,7 +116,7 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 		block.Txs = append(block.Txs, tx)
 	}
 
-	for _, addr := range decodeCtx.GetAddresses() {
+	for _, addr := range decodeCtx.Addresses.Values() {
 		data.addresses[addr.String()] = addr
 	}
 
@@ -134,7 +134,7 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 		return data, errors.Wrap(err, "parse genesis account balances")
 	}
 
-	data.validators = decodeCtx.GetValidators()
+	data.validators = decodeCtx.Validators.Values()
 	data.stakingLogs = decodeCtx.StakingLogs
 
 	_ = decodeCtx.Delegations.Range(func(_ string, value *storage.Delegation) (error, bool) {

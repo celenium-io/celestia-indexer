@@ -36,6 +36,10 @@ func MsgSignalVersion(ctx *context.Context, status storageTypes.Status, m *signa
 		Version:   m.Version,
 	}
 	ctx.AddValidator(*signal.Validator)
+	ctx.AddUpgrade(storage.Upgrade{
+		Version:      m.Version,
+		SignalsCount: 1,
+	})
 	return msgType, addresses, signal, err
 }
 

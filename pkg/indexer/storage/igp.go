@@ -18,7 +18,7 @@ func (module *Module) saveIgps(
 	dCtx *decodeContext.Context,
 	addrToId map[string]uint64,
 ) error {
-	igps := dCtx.GetIgps()
+	igps := dCtx.Igps.Values()
 	for i := range igps {
 		addressId, ok := addrToId[igps[i].Owner.Address]
 		if !ok {

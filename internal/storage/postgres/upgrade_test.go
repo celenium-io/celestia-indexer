@@ -42,7 +42,6 @@ func (s *StorageTestSuite) TestUpgradeList() {
 		s.Require().Len(upgrades, 1)
 
 		upgrade := upgrades[0]
-		s.Require().EqualValues(1, upgrade.Id)
 		s.Require().EqualValues(1010, upgrade.Height)
 		s.Require().EqualValues(1499, upgrade.Version)
 		s.Require().EqualValues(1, upgrade.MsgId)

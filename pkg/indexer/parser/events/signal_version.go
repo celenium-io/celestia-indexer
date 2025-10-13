@@ -27,6 +27,10 @@ func processSignalVersion(ctx *context.Context, events []storage.Event, msg *sto
 		Validator: &val,
 	}
 	ctx.AddValidator(*msg.SignalVersion.Validator)
+	ctx.AddUpgrade(storage.Upgrade{
+		Version:      version,
+		SignalsCount: 1,
+	})
 	toTheNextAction(events, idx)
 	return nil
 }

@@ -23,6 +23,7 @@ type Context struct {
 	Constants   *sync.Map[string, *storage.Constant]
 	Igps        *sync.Map[string, *storage.HLIGP]
 	IgpConfigs  *sync.Map[string, *storage.HLIGPConfig]
+	Upgrades    *sync.Map[uint64, *storage.Upgrade]
 
 	Redelegations   []storage.Redelegation
 	Undelegations   []storage.Undelegation
@@ -44,6 +45,7 @@ func NewContext() *Context {
 		Constants:       sync.NewMap[string, *storage.Constant](),
 		Igps:            sync.NewMap[string, *storage.HLIGP](),
 		IgpConfigs:      sync.NewMap[string, *storage.HLIGPConfig](),
+		Upgrades:        sync.NewMap[uint64, *storage.Upgrade](),
 		Redelegations:   make([]storage.Redelegation, 0),
 		Undelegations:   make([]storage.Undelegation, 0),
 		CancelUnbonding: make([]storage.Undelegation, 0),
@@ -137,24 +139,6 @@ func (ctx *Context) SetInflation(data map[string]any) {
 	ctx.Block.Stats.InflationRate = decoder.DecimalFromMap(data, "inflation_rate")
 }
 
-func (ctx *Context) GetValidators() []*storage.Validator {
-	validators := make([]*storage.Validator, 0)
-	_ = ctx.Validators.Range(func(_ string, value *storage.Validator) (error, bool) {
-		validators = append(validators, value)
-		return nil, false
-	})
-	return validators
-}
-
-func (ctx *Context) GetAddresses() []*storage.Address {
-	addresses := make([]*storage.Address, 0)
-	_ = ctx.Addresses.Range(func(_ string, value *storage.Address) (error, bool) {
-		addresses = append(addresses, value)
-		return nil, false
-	})
-	return addresses
-}
-
 func (ctx *Context) AddDelegation(d storage.Delegation) {
 	if val, ok := ctx.Delegations.Get(d.String()); ok {
 		val.Amount = val.Amount.Add(d.Amount)
@@ -217,15 +201,6 @@ func (ctx *Context) AddProposal(proposal *storage.Proposal) {
 	}
 }
 
-func (ctx *Context) GetProposals() []*storage.Proposal {
-	proposals := make([]*storage.Proposal, 0)
-	_ = ctx.Proposals.Range(func(_ uint64, value *storage.Proposal) (error, bool) {
-		proposals = append(proposals, value)
-		return nil, false
-	})
-	return proposals
-}
-
 func (ctx *Context) AddVote(vote *storage.Vote) {
 	ctx.Votes = append(ctx.Votes, vote)
 }
@@ -237,15 +212,6 @@ func (ctx *Context) AddConstant(module types.ModuleName, name, value string) {
 		Name:   name,
 		Value:  value,
 	})
-}
-
-func (ctx *Context) GetIgps() []*storage.HLIGP {
-	igps := make([]*storage.HLIGP, 0)
-	_ = ctx.Igps.Range(func(_ string, value *storage.HLIGP) (error, bool) {
-		igps = append(igps, value)
-		return nil, false
-	})
-	return igps
 }
 
 func (ctx *Context) AddIgp(igpId string, igp *storage.HLIGP) {
@@ -261,5 +227,13 @@ func (ctx *Context) AddIgpConfig(igpId string, config *storage.HLIGPConfig) {
 		val.Configs = append(val.Configs, config)
 	} else {
 		ctx.IgpConfigs.Set(igpId, config)
+	}
+}
+
+func (ctx *Context) AddUpgrade(upgrade storage.Upgrade) {
+	if val, ok := ctx.Upgrades.Get(upgrade.Version); ok {
+		val.SignalsCount += upgrade.SignalsCount
+	} else {
+		ctx.Upgrades.Set(upgrade.Version, &upgrade)
 	}
 }

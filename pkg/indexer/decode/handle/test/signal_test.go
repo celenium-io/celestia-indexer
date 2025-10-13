@@ -61,6 +61,11 @@ func TestDecodeMsg_SuccessOnMsgSignalVersion(t *testing.T) {
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, addressesExpected, dm.Addresses)
 	require.Equal(t, msgExpected, dm.Msg)
+
+	require.EqualValues(t, 1, decodeCtx.Upgrades.Len())
+	upgrade, ok := decodeCtx.Upgrades.Get(10)
+	require.True(t, ok)
+	require.EqualValues(t, 1, upgrade.SignalsCount)
 }
 
 func TestDecodeMsg_SuccessOnMsgTryUpgrade(t *testing.T) {

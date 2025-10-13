@@ -1,18 +1,22 @@
-- id: 1
-  height: 1010
+- height: 1010
+  end_height: 1012
   signer_id: 1
   time: '2025-08-10T03:10:57+00:00'
+  end_time: '2025-08-11T03:12:57+00:00'
   version: 1499
   msg_id: 1
   tx_id: 1
   voting_power: 123456
   voted_power: 12345
-- id: 2
-  height: 1011
+  signals_count: 5
+- height: 1011
+  end_height: 1012
   signer_id: 2
   time: '2025-08-11T03:10:57+00:00'
+  end_time: '2025-08-11T03:12:57+00:00'
   version: 1500
   msg_id: 2
   tx_id: 2
   voting_power: 123456
   voted_power: 12345
+  signals_count: 1

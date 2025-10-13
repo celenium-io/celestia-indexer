@@ -8,22 +8,25 @@ import (
 	"maps"
 	"slices"
 	"strconv"
-	"sync"
+	ssync "sync"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
 
 var errCantFindAddress = errors.New("can't find address")
 var signalsThreshold = decimal.NewFromFloat(0.833333333) // 5/6
+var powerDivider = decimal.RequireFromString("1000000")
 
 func (module *Module) saveMessages(
 	ctx context.Context,
 	tx storage.Transaction,
 	messages []*storage.Message,
 	addrToId map[string]uint64,
+	upgrades *sync.Map[uint64, *storage.Upgrade],
 	state storage.State,
 ) (int64, uint64, error) {
 	if err := tx.SaveMessages(ctx, messages...); err != nil {
@@ -45,7 +48,6 @@ func (module *Module) saveMessages(
 		hyperlaneTransfers = make([]*storage.HLTransfer, 0)
 		grants             = make(map[string]storage.Grant)
 		signals            = make([]*storage.SignalVersion, 0)
-		upgrades           = make([]*storage.Upgrade, 0)
 		namespaces         = make(map[string]uint64)
 		addedMsgId         = make(map[uint64]struct{})
 		msgAddrMap         = make(map[string]struct{})
@@ -317,7 +319,6 @@ func (module *Module) saveMessages(
 			if !ok {
 				return 0, state.Version, errors.Errorf("address %s not found in addrToId map", messages[i].Upgrade.Signer.Address)
 			}
-
 			messages[i].Upgrade.SignerId = signerId
 
 			vp, validators, err := module.totalVotingPower(ctx, tx)
@@ -325,7 +326,7 @@ func (module *Module) saveMessages(
 				return 0, state.Version, errors.Wrapf(err, "receiving total voting power")
 			}
 
-			var saveOnce sync.Once
+			var saveOnce ssync.Once
 			voted := decimal.Zero
 			for _, v := range validators {
 				if v.Version <= state.Version {
@@ -345,9 +346,15 @@ func (module *Module) saveMessages(
 				}
 			}
 
-			messages[i].Upgrade.VotingPower = vp
-			messages[i].Upgrade.VotedPower = voted
-			upgrades = append(upgrades, messages[i].Upgrade)
+			if messages[i].Upgrade.Version > 0 {
+				messages[i].Upgrade.VotingPower = vp.Div(powerDivider).Floor()
+				messages[i].Upgrade.VotedPower = voted.Div(powerDivider).Floor()
+
+				if val, ok := upgrades.Get(messages[i].Upgrade.Version); ok {
+					messages[i].Upgrade.SignalsCount = val.SignalsCount
+				}
+				upgrades.Set(messages[i].Upgrade.Version, messages[i].Upgrade)
+			}
 		}
 
 		if len(messages[i].Validators) > 0 {
@@ -447,7 +454,12 @@ func (module *Module) saveMessages(
 	if err := tx.SaveSignals(ctx, signals...); err != nil {
 		return 0, state.Version, errors.Wrap(err, "signals saving")
 	}
-	if err := tx.SaveUpgrades(ctx, upgrades...); err != nil {
+
+	if err := module.postProcessingSignal(ctx, tx, signals, upgrades, state); err != nil {
+		return 0, state.Version, errors.Wrap(err, "signals post processing")
+	}
+
+	if err := tx.SaveUpgrades(ctx, upgrades.Values()...); err != nil {
 		return 0, state.Version, errors.Wrap(err, "upgrades saving")
 	}
 
@@ -510,4 +522,43 @@ func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transacti
 		power.Add(validators[i].Stake)
 	}
 	return power, validators, nil
+}
+
+func (module *Module) postProcessingSignal(ctx context.Context, tx storage.Transaction, signals []*storage.SignalVersion, upgrades *sync.Map[uint64, *storage.Upgrade], state storage.State) error {
+	if len(signals) == 0 {
+		return nil
+	}
+
+	versions := map[uint64]struct{}{}
+	for i := range signals {
+		versions[signals[i].Version] = struct{}{}
+	}
+
+	for version := range versions {
+		vp, validators, err := module.totalVotingPower(ctx, tx)
+		if err != nil {
+			return errors.Wrapf(err, "receiving total voting power for upgrade version %d", version)
+		}
+
+		var voted decimal.Decimal
+		for i := range validators {
+			if validators[i].Version <= state.Version {
+				continue
+			}
+			voted = voted.Add(validators[i].Stake)
+		}
+
+		if val, ok := upgrades.Get(version); ok {
+			val.VotingPower = voted.Div(powerDivider).Floor()
+			val.VotingPower = vp.Div(powerDivider).Floor()
+		} else {
+			return errors.Errorf("found signal without upgrade version %d", version)
+		}
+
+		if err := tx.UpdateSignalsAfterUpgrade(ctx, version); err != nil {
+			return errors.Wrapf(err, "update signals for version %d", version)
+		}
+	}
+
+	return nil
 }

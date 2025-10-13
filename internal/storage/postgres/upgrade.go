@@ -31,7 +31,7 @@ func (t *Upgrade) List(ctx context.Context, filters storage.ListUpgradesFilter) 
 	}
 
 	query = limitScope(query, filters.Limit)
-	query = sortScope(query, "height", filters.Sort)
+	query = sortScope(query, "version", filters.Sort)
 
 	if filters.SignerId != nil {
 		query = query.Where("signer_id = ?", *filters.SignerId)
@@ -45,14 +45,15 @@ func (t *Upgrade) List(ctx context.Context, filters storage.ListUpgradesFilter) 
 		query = query.Where("height = ?", filters.Height)
 	}
 
-	err = t.DB().NewSelect().
+	q := t.DB().NewSelect().
 		TableExpr("(?) as upgrade", query).
 		ColumnExpr("upgrade.*").
 		ColumnExpr("signer.address as signer__address").
 		ColumnExpr("tx.hash as tx__hash").
 		Join("left join address as signer on signer.id = signer_id").
-		Join("left join tx on tx_id = tx.id").
-		Scan(ctx, &upgrades)
+		Join("left join tx on tx_id = tx.id")
 
+	q = sortScope(q, "version", filters.Sort)
+	err = q.Scan(ctx, &upgrades)
 	return
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -468,7 +469,7 @@ func Test_saveMessages(t *testing.T) {
 			Return(nil)
 
 		t.Run(tt.name, func(t *testing.T) {
-			ibcClientsCount, _, err := module.saveMessages(t.Context(), tx, tt.args.messages, tt.args.addrToId, storage.State{Version: 10})
+			ibcClientsCount, _, err := module.saveMessages(t.Context(), tx, tt.args.messages, tt.args.addrToId, sync.NewMap[uint64, *storage.Upgrade](), storage.State{Version: 10})
 			require.Equal(t, tt.wantErr, err != nil)
 			if !tt.wantErr {
 				require.EqualValues(t, tt.wantIbcClientsCount, ibcClientsCount)

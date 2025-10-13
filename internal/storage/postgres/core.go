@@ -223,7 +223,6 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 			&models.IbcTransfer{},
 			&models.HLTransfer{},
 			&models.SignalVersion{},
-			&models.Upgrade{},
 		} {
 			if _, err := tx.ExecContext(ctx,
 				`SELECT create_hypertable(?, 'time', chunk_time_interval => INTERVAL '1 month', if_not_exists => TRUE);`,

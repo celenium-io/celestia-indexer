@@ -37,7 +37,6 @@ var testSignal = storage.SignalVersion{
 }
 
 var testUpgrade = storage.Upgrade{
-	Id:          2,
 	Height:      101,
 	SignerId:    2,
 	Time:        time.Now().UTC(),
@@ -174,7 +173,6 @@ func (s *SignalTestSuite) TestUpgrades() {
 	err := json.NewDecoder(rec.Body).Decode(&upgrades)
 	s.Require().NoError(err)
 	s.Require().Len(upgrades, 1)
-	s.Require().EqualValues(2, upgrades[0].Id)
 	s.Require().EqualValues(testUpgrade.Version, upgrades[0].Version)
 	s.Require().EqualValues(testUpgrade.VotedPower.String(), upgrades[0].VotedPower)
 	s.Require().EqualValues(testUpgrade.VotingPower.String(), upgrades[0].VotingPower)
