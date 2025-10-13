@@ -43,16 +43,16 @@ func NewSignalVersion(signal storage.SignalVersion) SignalVersion {
 }
 
 type Upgrade struct {
-	Height       pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"        swaggertype:"integer"`
-	EndHeight    pkgTypes.Level `example:"100"                                                              format:"int64"     json:"end_height"    swaggertype:"integer"`
-	Time         time.Time      `example:"2025-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"          swaggertype:"string"`
-	EndTime      time.Time      `example:"2025-07-04T03:10:57+00:00"                                        format:"date-time" json:"end_time"      swaggertype:"string"`
-	Version      uint64         `example:"1"                                                                format:"int64"     json:"version"       swaggertype:"integer"`
-	MsgId        uint64         `example:"2"                                                                format:"int64"     json:"msg_id"        swaggertype:"integer"`
-	TxHash       string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"       swaggertype:"string"`
-	VotingPower  string         `example:"9348"                                                             format:"int64"     json:"voting_power"  swaggertype:"string"`
-	VotedPower   string         `example:"9348"                                                             format:"int64"     json:"voted_power"   swaggertype:"string"`
-	SignalsCount int            `example:"2"                                                                format:"int64"     json:"signals_count" swaggertype:"integer"`
+	Height       pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"               swaggertype:"integer"`
+	EndHeight    pkgTypes.Level `example:"100"                                                              format:"int64"     json:"end_height,omitempty" swaggertype:"integer"`
+	Time         time.Time      `example:"2025-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                 swaggertype:"string"`
+	EndTime      *time.Time     `example:"2025-07-04T03:10:57+00:00"                                        format:"date-time" json:"end_time,omitempty"   swaggertype:"string"`
+	Version      uint64         `example:"1"                                                                format:"int64"     json:"version"              swaggertype:"integer"`
+	MsgId        uint64         `example:"2"                                                                format:"int64"     json:"msg_id,omitempty"     swaggertype:"integer"`
+	TxHash       string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"    swaggertype:"string"`
+	VotingPower  string         `example:"9348"                                                             format:"int64"     json:"voting_power"         swaggertype:"string"`
+	VotedPower   string         `example:"9348"                                                             format:"int64"     json:"voted_power"          swaggertype:"string"`
+	SignalsCount int            `example:"2"                                                                format:"int64"     json:"signals_count"        swaggertype:"integer"`
 
 	Signer *ShortAddress `json:"signer,omitempty"`
 }
@@ -61,13 +61,16 @@ func NewUpgrade(upgrade storage.Upgrade) Upgrade {
 	result := Upgrade{
 		Height:       upgrade.Height,
 		EndHeight:    upgrade.EndHeight,
-		EndTime:      upgrade.EndTime,
 		Time:         upgrade.Time,
 		Version:      upgrade.Version,
 		MsgId:        upgrade.MsgId,
 		VotingPower:  upgrade.VotingPower.String(),
 		VotedPower:   upgrade.VotedPower.String(),
 		SignalsCount: upgrade.SignalsCount,
+	}
+
+	if !upgrade.EndTime.IsZero() {
+		result.EndTime = &upgrade.EndTime
 	}
 
 	if upgrade.Tx != nil {
