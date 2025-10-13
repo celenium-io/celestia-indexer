@@ -345,9 +345,11 @@ func (module *Module) saveMessages(
 				}
 			}
 
-			messages[i].Upgrade.VotingPower = vp
-			messages[i].Upgrade.VotedPower = voted
-			upgrades = append(upgrades, messages[i].Upgrade)
+			if messages[i].Upgrade.Version > 0 {
+				messages[i].Upgrade.VotingPower = vp
+				messages[i].Upgrade.VotedPower = voted
+				upgrades = append(upgrades, messages[i].Upgrade)
+			}
 		}
 
 		if len(messages[i].Validators) > 0 {
