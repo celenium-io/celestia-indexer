@@ -1835,8 +1835,9 @@ func (s *TransactionTestSuite) TestUpdateSignalsAfterUpgrade() {
 	s.Require().NoError(tx.Close(ctx))
 
 	signals, err := s.storage.SignalVersion.List(ctx, storage.ListSignalsFilter{
-		Limit: 1,
-		Sort:  sdk.SortOrderAsc,
+		Limit:   1,
+		Sort:    sdk.SortOrderAsc,
+		Version: 1488,
 	})
 	s.Require().NoError(err)
 

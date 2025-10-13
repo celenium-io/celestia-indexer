@@ -40,7 +40,7 @@ func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFil
 	}
 
 	query = limitScope(query, filters.Limit)
-	query = sortScope(query, "height", filters.Sort)
+	query = sortScope(query, "time", filters.Sort)
 
 	if filters.TxId != nil {
 		query = query.Where("tx_id = ?", *filters.TxId)
@@ -52,14 +52,16 @@ func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFil
 		query = query.Where("version = ?", filters.Version)
 	}
 
-	err = t.DB().NewSelect().
+	q := t.DB().NewSelect().
 		TableExpr("(?) as signal_version", query).
 		ColumnExpr("signal_version.*").
 		ColumnExpr("validator.cons_address as validator__cons_address, validator.moniker as validator__moniker, validator.id as validator__id").
 		ColumnExpr("tx.hash as tx__hash").
 		Join("left join validator as validator on validator.id = validator_id").
-		Join("left join tx on tx_id = tx.id").
-		Scan(ctx, &signals)
+		Join("left join tx on tx_id = tx.id")
+
+	q = sortScope(q, "time", filters.Sort)
+	err = q.Scan(ctx, &signals)
 
 	return
 }
