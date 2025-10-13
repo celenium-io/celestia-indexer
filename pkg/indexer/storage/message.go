@@ -19,6 +19,7 @@ import (
 
 var errCantFindAddress = errors.New("can't find address")
 var signalsThreshold = decimal.NewFromFloat(0.833333333) // 5/6
+var powerDivider = decimal.RequireFromString("1000000")
 
 func (module *Module) saveMessages(
 	ctx context.Context,
@@ -346,8 +347,8 @@ func (module *Module) saveMessages(
 			}
 
 			if messages[i].Upgrade.Version > 0 {
-				messages[i].Upgrade.VotingPower = vp
-				messages[i].Upgrade.VotedPower = voted
+				messages[i].Upgrade.VotingPower = vp.Div(powerDivider).Floor()
+				messages[i].Upgrade.VotedPower = voted.Div(powerDivider).Floor()
 
 				if val, ok := upgrades.Get(messages[i].Upgrade.Version); ok {
 					messages[i].Upgrade.SignalsCount = val.SignalsCount
@@ -548,8 +549,8 @@ func (module *Module) postProcessingSignal(ctx context.Context, tx storage.Trans
 		}
 
 		if val, ok := upgrades.Get(version); ok {
-			val.VotingPower = voted
-			val.VotingPower = vp
+			val.VotingPower = voted.Div(powerDivider).Floor()
+			val.VotingPower = vp.Div(powerDivider).Floor()
 		} else {
 			return errors.Errorf("found signal without upgrade version %d", version)
 		}

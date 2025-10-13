@@ -16,6 +16,8 @@ func init() {
 	Migrations.MustRegister(upUpgrades, downUpgrades)
 }
 
+var powerDivider = decimal.RequireFromString("1000000")
+
 func upUpgrades(ctx context.Context, db *bun.DB) error {
 	if _, err := db.Exec(`CREATE TABLE public.upgrade_new (
 		height int8 NULL,
@@ -110,7 +112,7 @@ func upUpgrades(ctx context.Context, db *bun.DB) error {
 		Height:       signals[0].Height,
 		Time:         signals[0].Time,
 		SignalsCount: len(signals),
-		VotedPower:   votedPower,
+		VotedPower:   votedPower.Div(powerDivider).Floor(),
 	}
 
 	if _, err := db.NewInsert().Model(&upgrade).Exec(ctx); err != nil {
@@ -119,6 +121,7 @@ func upUpgrades(ctx context.Context, db *bun.DB) error {
 
 	return nil
 }
+
 func downUpgrades(ctx context.Context, db *bun.DB) error {
 	return nil
 }
