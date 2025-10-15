@@ -76,7 +76,7 @@ type getAddressRequest struct {
 //	@Description	Get address info
 //	@Tags			address
 //	@ID				get-address
-//	@Param			hash	path	string	true	"Hash"	minlength(47)	maxlength(47)
+//	@Param			hash	path	string	true	"Hash"	minlength(47)	maxlength(128)
 //	@Produce		json
 //	@Success		200	{object}	responses.Address
 //	@Success		204
@@ -166,7 +166,7 @@ func (handler *AddressHandler) List(c echo.Context) error {
 //	@Description	Get address transactions
 //	@Tags			address
 //	@ID				address-transactions
-//	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(128)
 //	@Param			limit		query	integer					false	"Count of requested entities"	minimum(1)		maximum(100)
 //	@Param			offset		query	integer					false	"Offset"						minimum(1)
 //	@Param			sort		query	string					false	"Sort order"					Enums(asc, desc)
@@ -261,7 +261,7 @@ func (p *getAddressMessages) ToFilters() storage.AddressMsgsFilter {
 //	@Description	Get address messages
 //	@Tags			address
 //	@ID				address-messages
-//	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(128)
 //	@Param			limit		query	integer					false	"Count of requested entities"	minimum(1)		maximum(100)
 //	@Param			offset		query	integer					false	"Offset"						minimum(1)
 //	@Param			sort		query	string					false	"Sort order"					Enums(asc, desc)
@@ -330,7 +330,7 @@ func (req *getBlobLogsForAddress) SetDefault() {
 //	@Description	Get blobs pushed by address
 //	@Tags			address
 //	@ID				address-blobs
-//	@Param			hash	path	string	true	"Hash"											minlength(47)	maxlength(47)
+//	@Param			hash	path	string	true	"Hash"											minlength(47)	maxlength(128)
 //	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)		maximum(100)
 //	@Param			offset	query	integer	false	"Offset"										minimum(1)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
@@ -418,7 +418,7 @@ func (req *getAddressDelegations) SetDefault() {
 //	@Description	Get delegations made by address
 //	@Tags			address
 //	@ID				address-delegations
-//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)
 //	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
 //	@Param			offset		query	integer	false	"Offset"						minimum(1)
 //	@Param			show_zero	query	boolean	false	"Show zero delegations"
@@ -481,7 +481,7 @@ func (req *getAddressPageable) SetDefault() {
 //	@Description	Get undelegations made by address
 //	@Tags			address
 //	@ID				address-undelegations
-//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Produce		json
@@ -530,7 +530,7 @@ func (handler *AddressHandler) Undelegations(c echo.Context) error {
 //	@Description	Get redelegations made by address
 //	@Tags			address
 //	@ID				address-redelegations
-//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Produce		json
@@ -592,7 +592,7 @@ func (req *getAddressVestings) SetDefault() {
 //	@Description	Get vesting for address
 //	@Tags			address
 //	@ID				address-vesting
-//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)
 //	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
 //	@Param			offset		query	integer	false	"Offset"						minimum(1)
 //	@Param			show_ended	query	boolean	false	"Show finished vestings delegations"
@@ -642,7 +642,7 @@ func (handler *AddressHandler) Vestings(c echo.Context) error {
 //	@Description	Get grants made by address
 //	@Tags			address
 //	@ID				address-grants
-//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Produce		json
@@ -690,7 +690,7 @@ func (handler *AddressHandler) Grants(c echo.Context) error {
 //	@Description	Get grants where address is grantee
 //	@Tags			address
 //	@ID				address-grantee
-//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Produce		json
@@ -745,7 +745,7 @@ type addressStatsRequest struct {
 //	@Description	Get address stats
 //	@Tags			address
 //	@ID				address-stats
-//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)
 //	@Param			name		path	string	true	"Series name"					Enums(gas_used, gas_wanted, fee, tx_count)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
@@ -811,7 +811,7 @@ func (handler *AddressHandler) getIdByHash(ctx context.Context, hash []byte, add
 //	@Description	Get list of celestial id for address
 //	@Tags			address
 //	@ID				address-celestials
-//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Produce		json
@@ -858,7 +858,7 @@ func (handler *AddressHandler) Celestials(c echo.Context) error {
 //	@Description	Get list of votes for address
 //	@Tags			address
 //	@ID				address-votes
-//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(47)
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
 //	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Produce		json
