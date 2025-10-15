@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/shopspring/decimal"
 )
 
 type Validator struct {
@@ -73,7 +72,7 @@ func NewValidator(val storage.Validator) *Validator {
 		Rewards:           val.Rewards.Floor().String(),
 		Commissions:       val.Commissions.Floor().String(),
 		Jailed:            jailed,
-		VotingPower:       val.Stake.Div(decimal.NewFromInt(1_000_000)).Floor().String(),
+		VotingPower:       val.VotingPower().String(),
 		MessagesCount:     val.MessagesCount,
 		CreationTime:      val.CreationTime,
 	}
