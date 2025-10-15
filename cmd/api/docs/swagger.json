@@ -131,7 +131,7 @@
                 "operationId": "get-address",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
@@ -178,7 +178,7 @@
                 "operationId": "address-blobs",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
@@ -266,7 +266,7 @@
                 "operationId": "address-celestials",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
@@ -328,7 +328,7 @@
                 "operationId": "address-delegations",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
@@ -396,7 +396,7 @@
                 "operationId": "address-grantee",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
@@ -458,7 +458,7 @@
                 "operationId": "address-grants",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
@@ -520,7 +520,7 @@
                 "operationId": "address-messages",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
@@ -711,7 +711,7 @@
                 "operationId": "address-redelegations",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
@@ -773,7 +773,7 @@
                 "operationId": "address-stats",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
@@ -857,7 +857,7 @@
                 "operationId": "address-transactions",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
@@ -1079,7 +1079,7 @@
                 "operationId": "address-undelegations",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
@@ -1141,7 +1141,7 @@
                 "operationId": "address-vesting",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
@@ -1209,7 +1209,7 @@
                 "operationId": "address-votes",
                 "parameters": [
                     {
-                        "maxLength": 47,
+                        "maxLength": 128,
                         "minLength": 47,
                         "type": "string",
                         "description": "Hash",
