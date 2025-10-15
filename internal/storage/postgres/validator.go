@@ -31,13 +31,13 @@ func (v *Validator) ByAddress(ctx context.Context, address string) (validator st
 	return
 }
 
-func (v *Validator) TotalVotingPower(ctx context.Context) (decimal.Decimal, error) {
+func (v *Validator) TotalVotingPower(ctx context.Context, maxVals int) (decimal.Decimal, error) {
 	q := v.DB().NewSelect().
 		Model((*storage.Validator)(nil)).
 		Column("stake").
 		Where("jailed = false").
 		Order("stake desc").
-		Limit(100)
+		Limit(maxVals)
 
 	var power decimal.Decimal
 	err := v.DB().NewSelect().

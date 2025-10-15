@@ -44,7 +44,18 @@ func TestWebsocket(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 
 	validatorsMock := mock.NewMockIValidator(ctrl)
-	dispatcher, err := bus.NewDispatcher(listenerFactory, validatorsMock)
+	constantsMock := mock.NewMockIConstant(ctrl)
+	dispatcher, err := bus.NewDispatcher(listenerFactory, validatorsMock, constantsMock)
+
+	constantsMock.EXPECT().
+		Get(gomock.Any(), storageTypes.ModuleNameStaking, "max_validators").
+		Return(storage.Constant{
+			Module: storageTypes.ModuleNameStaking,
+			Name:   "max_validators",
+			Value:  "100",
+		}, nil).
+		Times(1)
+
 	require.NoError(t, err)
 	dispatcher.Start(ctx)
 	observer := dispatcher.Observe(storage.ChannelHead, storage.ChannelBlock)

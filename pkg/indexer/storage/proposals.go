@@ -190,7 +190,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 
 	const limit = 1000
 
-	totalVotingPower, err := module.validators.TotalVotingPower(ctx)
+	totalVotingPower, err := module.validators.TotalVotingPower(ctx, maxVals)
 	if err != nil {
 		return nil, errors.Wrap(err, "get total voting power")
 	}
