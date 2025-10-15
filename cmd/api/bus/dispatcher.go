@@ -5,9 +5,11 @@ package bus
 
 import (
 	"context"
+	"strconv"
 	"sync"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-io/workerpool"
 	"github.com/goccy/go-json"
 	"github.com/lib/pq"
@@ -18,27 +20,33 @@ import (
 type Dispatcher struct {
 	listener   storage.Listener
 	validators storage.IValidator
+	constants  storage.IConstant
 
 	mx        *sync.RWMutex
 	observers []*Observer
 
 	g workerpool.Group
+
+	maxValidators int
 }
 
 func NewDispatcher(
 	factory storage.ListenerFactory,
 	validators storage.IValidator,
+	constants storage.IConstant,
 ) (*Dispatcher, error) {
 	if factory == nil {
 		return nil, errors.New("nil listener factory")
 	}
 	listener := factory.CreateListener()
 	return &Dispatcher{
-		listener:   listener,
-		validators: validators,
-		observers:  make([]*Observer, 0),
-		mx:         new(sync.RWMutex),
-		g:          workerpool.NewGroup(),
+		listener:      listener,
+		validators:    validators,
+		constants:     constants,
+		maxValidators: 100,
+		observers:     make([]*Observer, 0),
+		mx:            new(sync.RWMutex),
+		g:             workerpool.NewGroup(),
 	}, nil
 }
 
@@ -54,6 +62,12 @@ func (d *Dispatcher) Observe(channels ...string) *Observer {
 }
 
 func (d *Dispatcher) Start(ctx context.Context) {
+	if value, err := d.constants.Get(ctx, types.ModuleNameStaking, "max_validators"); err == nil {
+		if maxVals, err := strconv.Atoi(value.Value); err == nil {
+			d.maxValidators = maxVals
+		}
+	}
+
 	if err := d.listener.Subscribe(ctx, storage.ChannelHead, storage.ChannelBlock); err != nil {
 		log.Err(err).Msg("subscribe on postgres notifications")
 		return
@@ -134,7 +148,7 @@ func (d *Dispatcher) handleState(ctx context.Context, payload string) error {
 		return err
 	}
 
-	power, err := d.validators.TotalVotingPower(ctx)
+	power, err := d.validators.TotalVotingPower(ctx, d.maxValidators)
 	if err != nil {
 		return err
 	}
