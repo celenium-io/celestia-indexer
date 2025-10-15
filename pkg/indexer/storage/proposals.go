@@ -252,7 +252,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 				}
 
 				for j := range delegations {
-					shares := math.VotingPower(delegations[j].Amount)
+					shares := math.Shares(delegations[j].Amount)
 					if amount, ok := validatorMinus[delegations[j].ValidatorId]; ok {
 						validatorMinus[delegations[j].ValidatorId] = amount.Add(shares)
 					} else {

@@ -84,7 +84,7 @@ func (Validator) TableName() string {
 }
 
 func (v Validator) VotingPower() decimal.Decimal {
-	return math.VotingPower(v.Stake)
+	return math.Shares(v.Stake)
 }
 
 const DoNotModify = "[do-not-modify]"
