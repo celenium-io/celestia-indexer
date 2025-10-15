@@ -7,6 +7,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/math"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -80,6 +81,10 @@ type Validator struct {
 
 func (Validator) TableName() string {
 	return "validator"
+}
+
+func (v Validator) VotingPower() decimal.Decimal {
+	return math.VotingPower(v.Stake)
 }
 
 const DoNotModify = "[do-not-modify]"

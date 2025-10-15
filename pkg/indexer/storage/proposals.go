@@ -5,9 +5,12 @@ package storage
 
 import (
 	"context"
+	"maps"
+	"slices"
 	"strconv"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
@@ -180,7 +183,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 	}
 	validatorsPower := make(map[uint64]decimal.Decimal)
 	for i := range validators {
-		validatorsPower[validators[i].Id] = validators[i].Stake
+		validatorsPower[validators[i].Id] = validators[i].VotingPower()
 	}
 
 	// 3. Compute voting results
@@ -249,22 +252,23 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 				}
 
 				for j := range delegations {
+					shares := math.VotingPower(delegations[j].Amount)
 					if amount, ok := validatorMinus[delegations[j].ValidatorId]; ok {
-						validatorMinus[delegations[j].ValidatorId] = amount.Add(delegations[j].Amount)
+						validatorMinus[delegations[j].ValidatorId] = amount.Add(shares)
 					} else {
-						validatorMinus[delegations[j].ValidatorId] = delegations[j].Amount
+						validatorMinus[delegations[j].ValidatorId] = shares
 					}
-					proposal.VotingPower = proposal.VotingPower.Add(delegations[j].Amount)
+					proposal.VotingPower = proposal.VotingPower.Add(shares)
 
 					switch votes[i].Option {
 					case types.VoteOptionAbstain:
-						proposal.AbstainVotingPower = proposal.AbstainVotingPower.Add(delegations[j].Amount)
+						proposal.AbstainVotingPower = proposal.AbstainVotingPower.Add(shares)
 					case types.VoteOptionNo:
-						proposal.NoVotingPower = proposal.NoVotingPower.Add(delegations[j].Amount)
+						proposal.NoVotingPower = proposal.NoVotingPower.Add(shares)
 					case types.VoteOptionNoWithVeto:
-						proposal.NoWithVetoVotingPower = proposal.NoWithVetoVotingPower.Add(delegations[j].Amount)
+						proposal.NoWithVetoVotingPower = proposal.NoWithVetoVotingPower.Add(shares)
 					case types.VoteOptionYes:
-						proposal.YesVotingPower = proposal.YesVotingPower.Add(delegations[j].Amount)
+						proposal.YesVotingPower = proposal.YesVotingPower.Add(shares)
 					}
 				}
 
@@ -293,10 +297,5 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 		}
 	}
 
-	result := make([]*storage.Proposal, 0)
-	for _, proposal := range proposals {
-		result = append(result, proposal)
-	}
-
-	return result, nil
+	return slices.Collect(maps.Values(proposals)), nil
 }
