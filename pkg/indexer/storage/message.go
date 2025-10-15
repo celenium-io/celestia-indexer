@@ -347,8 +347,8 @@ func (module *Module) saveMessages(
 			}
 
 			if messages[i].Upgrade.Version > 0 {
-				messages[i].Upgrade.VotingPower = math.VotingPower(vp)
-				messages[i].Upgrade.VotedPower = math.VotingPower(voted)
+				messages[i].Upgrade.VotingPower = math.Shares(vp)
+				messages[i].Upgrade.VotedPower = math.Shares(voted)
 
 				if val, ok := upgrades.Get(messages[i].Upgrade.Version); ok {
 					messages[i].Upgrade.SignalsCount = val.SignalsCount
@@ -549,8 +549,8 @@ func (module *Module) postProcessingSignal(ctx context.Context, tx storage.Trans
 		}
 
 		if val, ok := upgrades.Get(version); ok {
-			val.VotingPower = math.VotingPower(voted)
-			val.VotingPower = math.VotingPower(vp)
+			val.VotingPower = math.Shares(voted)
+			val.VotingPower = math.Shares(vp)
 		} else {
 			return errors.Errorf("found signal without upgrade version %d", version)
 		}
