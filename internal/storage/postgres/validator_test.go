@@ -32,7 +32,7 @@ func (s *StorageTestSuite) TestTotalPower() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
 
-	power, err := s.storage.Validator.TotalVotingPower(ctx)
+	power, err := s.storage.Validator.TotalVotingPower(ctx, 100)
 	s.Require().NoError(err)
 	s.Require().Equal("2", power.String())
 }
