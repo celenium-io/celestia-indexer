@@ -7,6 +7,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/math"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -38,7 +39,7 @@ type IValidator interface {
 	storage.Table[*Validator]
 
 	ByAddress(ctx context.Context, address string) (Validator, error)
-	TotalVotingPower(ctx context.Context) (decimal.Decimal, error)
+	TotalVotingPower(ctx context.Context, maxVals int) (decimal.Decimal, error)
 	ListByPower(ctx context.Context, fltrs ValidatorFilters) ([]Validator, error)
 	JailedCount(ctx context.Context) (int, error)
 	Messages(ctx context.Context, id uint64, fltrs ValidatorMessagesFilters) ([]MsgValidator, error)
@@ -80,6 +81,10 @@ type Validator struct {
 
 func (Validator) TableName() string {
 	return "validator"
+}
+
+func (v Validator) VotingPower() decimal.Decimal {
+	return math.Shares(v.Stake)
 }
 
 const DoNotModify = "[do-not-modify]"

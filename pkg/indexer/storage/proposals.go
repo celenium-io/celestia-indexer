@@ -5,6 +5,8 @@ package storage
 
 import (
 	"context"
+	"maps"
+	"slices"
 	"strconv"
 	"time"
 
@@ -35,40 +37,33 @@ func (module *Module) saveProposals(
 				if validatorId, ok := module.validatorsByDelegator[votes[i].Voter.Address]; ok {
 					votes[i].ValidatorId = &validatorId
 				}
-
-				for j := range proposals {
-					if proposals[j].Id == votes[i].ProposalId {
-						if votes[i].ValidatorId != nil {
-							switch votes[i].Option {
-							case types.VoteOptionAbstain:
-								proposals[j].AbstainValidators += 1
-							case types.VoteOptionNo:
-								proposals[j].NoValidators += 1
-							case types.VoteOptionNoWithVeto:
-								proposals[j].NoWithVetoValidators += 1
-							case types.VoteOptionYes:
-								proposals[j].YesValidators += 1
-							}
-						} else {
-							switch votes[i].Option {
-							case types.VoteOptionAbstain:
-								proposals[j].AbstainAddress += 1
-							case types.VoteOptionNo:
-								proposals[j].NoAddress += 1
-							case types.VoteOptionNoWithVeto:
-								proposals[j].NoWithVetoAddress += 1
-							case types.VoteOptionYes:
-								proposals[j].YesAddress += 1
-							}
-						}
-						break
-					}
-				}
 			}
 		}
 
-		if err := tx.SaveVotes(ctx, votes...); err != nil {
+		votesCount, err := tx.SaveVotes(ctx, votes...)
+		if err != nil {
 			return 0, errors.Wrap(err, "save votes")
+		}
+
+		for i := range proposals {
+			if vc, ok := votesCount[proposals[i].Id]; ok {
+				proposals[i].VotesCount += vc.VotesCount
+
+				proposals[i].Abstain += vc.Abstain
+				proposals[i].No += vc.No
+				proposals[i].NoWithVeto += vc.NoWithVeto
+				proposals[i].Yes += vc.Yes
+
+				proposals[i].AbstainAddress += vc.AbstainAddress
+				proposals[i].NoAddress += vc.NoAddress
+				proposals[i].NoWithVetoAddress += vc.NoWithVetoAddress
+				proposals[i].YesAddress += vc.YesAddress
+
+				proposals[i].AbstainValidators += vc.AbstainValidators
+				proposals[i].NoValidators += vc.NoValidators
+				proposals[i].NoWithVetoValidators += vc.NoWithVetoValidators
+				proposals[i].YesValidators += vc.YesValidators
+			}
 		}
 	}
 
@@ -187,7 +182,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 
 	const limit = 1000
 
-	totalVotingPower, err := module.validators.TotalVotingPower(ctx)
+	totalVotingPower, err := module.validators.TotalVotingPower(ctx, maxVals)
 	if err != nil {
 		return nil, errors.Wrap(err, "get total voting power")
 	}
@@ -249,22 +244,28 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 				}
 
 				for j := range delegations {
-					if amount, ok := validatorMinus[delegations[j].ValidatorId]; ok {
-						validatorMinus[delegations[j].ValidatorId] = amount.Add(delegations[j].Amount)
-					} else {
-						validatorMinus[delegations[j].ValidatorId] = delegations[j].Amount
+					if votes[i].ValidatorId != nil && delegations[j].ValidatorId == *votes[i].ValidatorId && delegations[j].AddressId == votes[i].VoterId {
+						// skip self delegation
+						continue
 					}
-					proposal.VotingPower = proposal.VotingPower.Add(delegations[j].Amount)
+
+					shares := delegations[j].Amount
+					if amount, ok := validatorMinus[delegations[j].ValidatorId]; ok {
+						validatorMinus[delegations[j].ValidatorId] = amount.Add(shares)
+					} else {
+						validatorMinus[delegations[j].ValidatorId] = shares
+					}
+					proposal.VotingPower = proposal.VotingPower.Add(shares)
 
 					switch votes[i].Option {
 					case types.VoteOptionAbstain:
-						proposal.AbstainVotingPower = proposal.AbstainVotingPower.Add(delegations[j].Amount)
+						proposal.AbstainVotingPower = proposal.AbstainVotingPower.Add(shares)
 					case types.VoteOptionNo:
-						proposal.NoVotingPower = proposal.NoVotingPower.Add(delegations[j].Amount)
+						proposal.NoVotingPower = proposal.NoVotingPower.Add(shares)
 					case types.VoteOptionNoWithVeto:
-						proposal.NoWithVetoVotingPower = proposal.NoWithVetoVotingPower.Add(delegations[j].Amount)
+						proposal.NoWithVetoVotingPower = proposal.NoWithVetoVotingPower.Add(shares)
 					case types.VoteOptionYes:
-						proposal.YesVotingPower = proposal.YesVotingPower.Add(delegations[j].Amount)
+						proposal.YesVotingPower = proposal.YesVotingPower.Add(shares)
 					}
 				}
 
@@ -293,10 +294,5 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 		}
 	}
 
-	result := make([]*storage.Proposal, 0)
-	for _, proposal := range proposals {
-		result = append(result, proposal)
-	}
-
-	return result, nil
+	return slices.Collect(maps.Values(proposals)), nil
 }

@@ -33,7 +33,7 @@ type TransactionTestSuite struct {
 
 // SetupSuite -
 func (s *TransactionTestSuite) SetupSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 90*time.Second)
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 180*time.Second)
 	defer ctxCancel()
 
 	psqlContainer, err := database.NewPostgreSQLContainer(ctx, database.PostgreSQLContainerConfig{
@@ -369,21 +369,28 @@ func (s *TransactionTestSuite) TestSaveVotes() {
 	var vote = &storage.Vote{
 		Option:     types.VoteOptionAbstain,
 		ProposalId: 1,
-		VoterId:    1,
+		VoterId:    3,
 		Height:     1001,
 		Time:       time.Now(),
 		Weight:     decimal.RequireFromString("1.0"),
 	}
 
-	err = tx.SaveVotes(ctx, vote)
+	count, err := tx.SaveVotes(ctx, vote)
 	s.Require().NoError(err)
+	s.Require().EqualValues(map[uint64]*storage.VotesCount{
+		1: {
+			VotesCount:     1,
+			Abstain:        1,
+			AbstainAddress: 1,
+		},
+	}, count)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
 
 	items, err := s.storage.Votes.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 4)
+	s.Require().Len(items, 5)
 
 	for i := range items {
 		if items[i].VoterId == vote.VoterId && items[i].ProposalId == vote.ProposalId {
@@ -408,8 +415,16 @@ func (s *TransactionTestSuite) TestSaveVotesValidatorIdDuplicate() {
 		Weight:      decimal.RequireFromString("1.0"),
 	}
 
-	err = tx.SaveVotes(ctx, vote)
+	newCount, err := tx.SaveVotes(ctx, vote)
 	s.Require().NoError(err)
+	s.Require().EqualValues(map[uint64]*storage.VotesCount{
+		2: {
+			Yes:               1,
+			YesValidators:     1,
+			Abstain:           -1,
+			AbstainValidators: -1,
+		},
+	}, newCount)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
@@ -1330,10 +1345,10 @@ func (s *TransactionTestSuite) TestProposalVotes() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	votes, err := tx.ProposalVotes(ctx, 1, 1, 0)
+	votes, err := tx.ProposalVotes(ctx, 1, 10, 0)
 	s.Require().NoError(err)
 
-	s.Require().Len(votes, 1)
+	s.Require().Len(votes, 2)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))

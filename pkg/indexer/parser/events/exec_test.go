@@ -5,6 +5,7 @@ package events
 
 import (
 	"testing"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -506,6 +507,7 @@ func Test_handleExec(t *testing.T) {
 			idx: testsuite.Ptr(0),
 		}, {
 			name: "MsgWithdrawDelegatorReward",
+			ctx:  context.NewContext(),
 			events: []storage.Event{
 				{
 					Height: 977944,
@@ -671,6 +673,7 @@ func Test_handleExec(t *testing.T) {
 			idx: testsuite.Ptr(7),
 		}, {
 			name: "unknown message",
+			ctx:  context.NewContext(),
 			events: []storage.Event{
 				{
 					Height: 45631,
@@ -846,9 +849,107 @@ func Test_handleExec(t *testing.T) {
 				},
 			},
 			idx: testsuite.Ptr(7),
+		}, {
+			name: "vote",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 45631,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":  "2259utia",
+						"spender": "celestia1cnkaqutgx24kyrge8mpp5qq0pw6mll93572anj",
+					},
+				}, {
+					Height: 45631,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":   "2259utia",
+						"receiver": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
+					},
+				}, {
+					Height: 45631,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "2259utia",
+						"recipient": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
+						"sender":    "celestia1cnkaqutgx24kyrge8mpp5qq0pw6mll93572anj",
+					},
+				}, {
+					Height: 45631,
+					Type:   "message",
+					Data: map[string]any{
+						"sender": "celestia1cnkaqutgx24kyrge8mpp5qq0pw6mll93572anj",
+					},
+				}, {
+					Height: 45631,
+					Type:   "tx",
+					Data: map[string]any{
+						"fee":       "2259utia",
+						"fee_payer": "celestia1cnkaqutgx24kyrge8mpp5qq0pw6mll93572anj",
+					},
+				}, {
+					Height: 45631,
+					Type:   "tx",
+					Data: map[string]any{
+						"acc_seq": "celestia1cnkaqutgx24kyrge8mpp5qq0pw6mll93572anj/0",
+					},
+				}, {
+					Height: 45631,
+					Type:   "tx",
+					Data: map[string]any{
+						"signature": "/FrbyKniUo9iKrZnIrb3czbur2Lewro/7l2aeDEHTMlG3QGdesQKHi2ILs54MOUWNTDsAdFMvD/xWMOQ4VNTPg==",
+					},
+				}, {
+					Height: 45631,
+					Type:   "message",
+					Data: map[string]any{
+						"action": "/cosmos.authz.v1beta1.MsgExec",
+					},
+				}, {
+					Height: 45631,
+					Type:   "proposal_vote",
+					Data: map[string]any{
+						"authz_msg_index": "0",
+						"option":          "option:VOTE_OPTION_ABSTAIN weight:\"1.000000000000000000\"",
+						"proposal_id":     "2",
+						"voter":           "celestia138jl42zlxue4wpvnugcdqhxjmyd2vpt69gjdfk",
+					},
+				}, {
+					Height: 45631,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "0",
+						"module":          "governance",
+						"sender":          "celestia138jl42zlxue4wpvnugcdqhxjmyd2vpt69gjdfk",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgExec,
+				Height: 45631,
+				Data: map[string]any{
+					"Grantee": "celestia1cnkaqutgx24kyrge8mpp5qq0pw6mll93572anj",
+					"Msgs": []any{
+						map[string]any{
+							"Option":     2,
+							"ProposalId": 2,
+							"Voter":      "celestia138jl42zlxue4wpvnugcdqhxjmyd2vpt69gjdfk",
+						},
+					},
+				},
+				InternalMsgs: []string{
+					"/cosmos.gov.v1.MsgVoteWeighted",
+				},
+			},
+			idx: testsuite.Ptr(7),
 		},
 	}
 	for _, tt := range tests {
+		tt.ctx.Block = &storage.Block{
+			Time:   time.Now(),
+			Height: tt.msg.Height,
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			err := handleExec(tt.ctx, tt.events, tt.msg, tt.idx)
 			require.NoError(t, err)

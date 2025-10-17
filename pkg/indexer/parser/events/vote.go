@@ -46,8 +46,7 @@ func processVote(ctx *context.Context, events []storage.Event, _ *storage.Messag
 	option := decoder.StringFromMap(events[*idx].Data, "option")
 
 	proposal := storage.Proposal{
-		Id:         proposalId,
-		VotesCount: 1,
+		Id: proposalId,
 	}
 
 	if err := parseOption(ctx, proposalId, voter, option, &proposal, idx); err != nil {
@@ -76,22 +75,25 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 				Time:       ctx.Block.Time,
 				Height:     ctx.Block.Height,
 				Voter: &storage.Address{
-					Address: voter,
+					Height:     ctx.Block.Height,
+					LastHeight: ctx.Block.Height,
+					Address:    voter,
+					Balance:    storage.EmptyBalance(),
 				},
 			}
+			if err := ctx.AddAddress(vote.Voter); err != nil {
+				return err
+			}
+
 			switch opts[i].Option {
 			case int(cosmosGovTypesV1.OptionAbstain):
 				vote.Option = types.VoteOptionAbstain
-				proposal.Abstain += 1
 			case int(cosmosGovTypesV1.OptionNo):
 				vote.Option = types.VoteOptionNo
-				proposal.No += 1
 			case int(cosmosGovTypesV1.OptionNoWithVeto):
 				vote.Option = types.VoteOptionNoWithVeto
-				proposal.NoWithVeto += 1
 			case int(cosmosGovTypesV1.OptionYes):
 				vote.Option = types.VoteOptionYes
-				proposal.Yes += 1
 			}
 			vote.Weight = opts[i].Weight
 
@@ -106,8 +108,15 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 		Time:       ctx.Block.Time,
 		Height:     ctx.Block.Height,
 		Voter: &storage.Address{
-			Address: voter,
+			Height:     ctx.Block.Height,
+			LastHeight: ctx.Block.Height,
+			Address:    voter,
+			Balance:    storage.EmptyBalance(),
 		},
+	}
+
+	if err := ctx.AddAddress(vote.Voter); err != nil {
+		return err
 	}
 
 	optionParts := strings.Split(option, " ")
@@ -121,16 +130,12 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 			switch values[1] {
 			case "VOTE_OPTION_YES":
 				vote.Option = types.VoteOptionYes
-				proposal.Yes += 1
 			case "VOTE_OPTION_NO":
 				vote.Option = types.VoteOptionNo
-				proposal.No += 1
 			case "VOTE_OPTION_NO_WITH_VETO":
 				vote.Option = types.VoteOptionNoWithVeto
-				proposal.NoWithVeto += 1
 			case "VOTE_OPTION_ABSTAIN":
 				vote.Option = types.VoteOptionAbstain
-				proposal.Abstain += 1
 			}
 		case "weight":
 			value, err := strconv.Unquote(values[1])
