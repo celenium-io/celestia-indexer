@@ -47,6 +47,8 @@ func (module *Module) saveProposals(
 
 		for i := range proposals {
 			if vc, ok := votesCount[proposals[i].Id]; ok {
+				proposals[i].VotesCount += vc.VotesCount
+
 				proposals[i].Abstain += vc.Abstain
 				proposals[i].No += vc.No
 				proposals[i].NoWithVeto += vc.NoWithVeto
