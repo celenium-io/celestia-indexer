@@ -37,40 +37,31 @@ func (module *Module) saveProposals(
 				if validatorId, ok := module.validatorsByDelegator[votes[i].Voter.Address]; ok {
 					votes[i].ValidatorId = &validatorId
 				}
-
-				for j := range proposals {
-					if proposals[j].Id == votes[i].ProposalId {
-						if votes[i].ValidatorId != nil {
-							switch votes[i].Option {
-							case types.VoteOptionAbstain:
-								proposals[j].AbstainValidators += 1
-							case types.VoteOptionNo:
-								proposals[j].NoValidators += 1
-							case types.VoteOptionNoWithVeto:
-								proposals[j].NoWithVetoValidators += 1
-							case types.VoteOptionYes:
-								proposals[j].YesValidators += 1
-							}
-						} else {
-							switch votes[i].Option {
-							case types.VoteOptionAbstain:
-								proposals[j].AbstainAddress += 1
-							case types.VoteOptionNo:
-								proposals[j].NoAddress += 1
-							case types.VoteOptionNoWithVeto:
-								proposals[j].NoWithVetoAddress += 1
-							case types.VoteOptionYes:
-								proposals[j].YesAddress += 1
-							}
-						}
-						break
-					}
-				}
 			}
 		}
 
-		if err := tx.SaveVotes(ctx, votes...); err != nil {
+		votesCount, err := tx.SaveVotes(ctx, votes...)
+		if err != nil {
 			return 0, errors.Wrap(err, "save votes")
+		}
+
+		for i := range proposals {
+			if vc, ok := votesCount[proposals[i].Id]; ok {
+				proposals[i].Abstain += vc.Abstain
+				proposals[i].No += vc.No
+				proposals[i].NoWithVeto += vc.NoWithVeto
+				proposals[i].Yes += vc.Yes
+
+				proposals[i].AbstainAddress += vc.AbstainAddress
+				proposals[i].NoAddress += vc.NoAddress
+				proposals[i].NoWithVetoAddress += vc.NoWithVetoAddress
+				proposals[i].YesAddress += vc.YesAddress
+
+				proposals[i].AbstainValidators += vc.AbstainValidators
+				proposals[i].NoValidators += vc.NoValidators
+				proposals[i].NoWithVetoValidators += vc.NoWithVetoValidators
+				proposals[i].YesValidators += vc.YesValidators
+			}
 		}
 	}
 

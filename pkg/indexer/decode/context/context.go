@@ -191,11 +191,6 @@ func (ctx *Context) AddProposal(proposal *storage.Proposal) {
 		if proposal.Deposit.IsPositive() {
 			p.Deposit = p.Deposit.Add(proposal.Deposit)
 		}
-		p.Yes += proposal.Yes
-		p.No += proposal.No
-		p.NoWithVeto += proposal.NoWithVeto
-		p.Abstain += proposal.Abstain
-		p.VotesCount += proposal.VotesCount
 	} else {
 		ctx.Proposals.Set(proposal.Id, proposal)
 	}

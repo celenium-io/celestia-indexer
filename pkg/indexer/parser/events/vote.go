@@ -46,8 +46,7 @@ func processVote(ctx *context.Context, events []storage.Event, _ *storage.Messag
 	option := decoder.StringFromMap(events[*idx].Data, "option")
 
 	proposal := storage.Proposal{
-		Id:         proposalId,
-		VotesCount: 1,
+		Id: proposalId,
 	}
 
 	if err := parseOption(ctx, proposalId, voter, option, &proposal, idx); err != nil {
