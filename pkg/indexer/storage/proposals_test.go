@@ -146,10 +146,10 @@ func TestFillProposalVotingPower(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, filled, 1)
 
-		require.Equal(t, "100", filled[0].VotingPower.String())
-		require.Equal(t, "40", filled[0].AbstainVotingPower.String())
-		require.Equal(t, "50", filled[0].NoVotingPower.String())
-		require.Equal(t, "10", filled[0].YesVotingPower.String())
+		require.Equal(t, "100000000", filled[0].VotingPower.String())
+		require.Equal(t, "40000000", filled[0].AbstainVotingPower.String())
+		require.Equal(t, "50000000", filled[0].NoVotingPower.String())
+		require.Equal(t, "10000000", filled[0].YesVotingPower.String())
 	})
 }
 

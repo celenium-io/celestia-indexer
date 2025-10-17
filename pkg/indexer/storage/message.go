@@ -10,7 +10,6 @@ import (
 	"strconv"
 	ssync "sync"
 
-	"github.com/celenium-io/celestia-indexer/internal/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
@@ -347,8 +346,8 @@ func (module *Module) saveMessages(
 			}
 
 			if messages[i].Upgrade.Version > 0 {
-				messages[i].Upgrade.VotingPower = math.Shares(vp)
-				messages[i].Upgrade.VotedPower = math.Shares(voted)
+				messages[i].Upgrade.VotingPower = vp
+				messages[i].Upgrade.VotedPower = voted
 
 				if val, ok := upgrades.Get(messages[i].Upgrade.Version); ok {
 					messages[i].Upgrade.SignalsCount = val.SignalsCount
@@ -549,8 +548,8 @@ func (module *Module) postProcessingSignal(ctx context.Context, tx storage.Trans
 		}
 
 		if val, ok := upgrades.Get(version); ok {
-			val.VotingPower = math.Shares(voted)
-			val.VotingPower = math.Shares(vp)
+			val.VotingPower = voted
+			val.VotingPower = vp
 		} else {
 			return errors.Errorf("found signal without upgrade version %d", version)
 		}

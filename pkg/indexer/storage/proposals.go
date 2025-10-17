@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/celenium-io/celestia-indexer/internal/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
@@ -183,7 +182,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 	}
 	validatorsPower := make(map[uint64]decimal.Decimal)
 	for i := range validators {
-		validatorsPower[validators[i].Id] = validators[i].VotingPower()
+		validatorsPower[validators[i].Id] = validators[i].Stake
 	}
 
 	// 3. Compute voting results
@@ -252,7 +251,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 				}
 
 				for j := range delegations {
-					shares := math.Shares(delegations[j].Amount)
+					shares := delegations[j].Amount
 					if amount, ok := validatorMinus[delegations[j].ValidatorId]; ok {
 						validatorMinus[delegations[j].ValidatorId] = amount.Add(shares)
 					} else {
