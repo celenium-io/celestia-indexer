@@ -369,21 +369,28 @@ func (s *TransactionTestSuite) TestSaveVotes() {
 	var vote = &storage.Vote{
 		Option:     types.VoteOptionAbstain,
 		ProposalId: 1,
-		VoterId:    1,
+		VoterId:    3,
 		Height:     1001,
 		Time:       time.Now(),
 		Weight:     decimal.RequireFromString("1.0"),
 	}
 
-	err = tx.SaveVotes(ctx, vote)
+	count, err := tx.SaveVotes(ctx, vote)
 	s.Require().NoError(err)
+	s.Require().EqualValues(map[uint64]*storage.VotesCount{
+		1: {
+			VotesCount:     1,
+			Abstain:        1,
+			AbstainAddress: 1,
+		},
+	}, count)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
 
 	items, err := s.storage.Votes.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 4)
+	s.Require().Len(items, 5)
 
 	for i := range items {
 		if items[i].VoterId == vote.VoterId && items[i].ProposalId == vote.ProposalId {
@@ -408,8 +415,9 @@ func (s *TransactionTestSuite) TestSaveVotesValidatorIdDuplicate() {
 		Weight:      decimal.RequireFromString("1.0"),
 	}
 
-	err = tx.SaveVotes(ctx, vote)
+	newCount, err := tx.SaveVotes(ctx, vote)
 	s.Require().NoError(err)
+	s.Require().EqualValues(map[uint64]*storage.VotesCount{}, newCount)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
