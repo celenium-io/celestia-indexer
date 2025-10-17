@@ -649,8 +649,6 @@ func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) (map
 
 	var votesCount = make(map[uint64]*models.VotesCount)
 	for i := range votes {
-		var count = int64(1)
-
 		var existsVotes []models.Vote
 		query := tx.Tx().NewSelect().
 			Model(&existsVotes).
@@ -675,17 +673,24 @@ func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) (map
 			if _, err := tx.Tx().NewDelete().Model((*models.Vote)(nil)).Where("id IN (?)", bun.In(ids)).Exec(ctx); err != nil {
 				return nil, errors.Wrap(err, "remove existing votes")
 			}
-			count--
+
+			for _, vote := range existsVotes {
+				if vc, ok := votesCount[vote.ProposalId]; ok {
+					vc.Update(-1, vote)
+				} else {
+					var vc models.VotesCount
+					vc.Update(-1, vote)
+					votesCount[vote.ProposalId] = &vc
+				}
+			}
 		}
 
-		if count > 0 {
-			if vc, ok := votesCount[votes[i].ProposalId]; ok {
-				vc.Update(count, *votes[i])
-			} else {
-				var vc models.VotesCount
-				vc.Update(count, *votes[i])
-				votesCount[votes[i].ProposalId] = &vc
-			}
+		if vc, ok := votesCount[votes[i].ProposalId]; ok {
+			vc.Update(1, *votes[i])
+		} else {
+			var vc models.VotesCount
+			vc.Update(1, *votes[i])
+			votesCount[votes[i].ProposalId] = &vc
 		}
 	}
 

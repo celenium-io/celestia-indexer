@@ -417,7 +417,14 @@ func (s *TransactionTestSuite) TestSaveVotesValidatorIdDuplicate() {
 
 	newCount, err := tx.SaveVotes(ctx, vote)
 	s.Require().NoError(err)
-	s.Require().EqualValues(map[uint64]*storage.VotesCount{}, newCount)
+	s.Require().EqualValues(map[uint64]*storage.VotesCount{
+		2: {
+			Yes:               1,
+			YesValidators:     1,
+			Abstain:           -1,
+			AbstainValidators: -1,
+		},
+	}, newCount)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
