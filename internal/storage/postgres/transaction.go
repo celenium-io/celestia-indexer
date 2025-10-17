@@ -642,12 +642,15 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 
 var one = decimal.NewFromInt(1)
 
-func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) error {
+func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) (map[uint64]*models.VotesCount, error) {
 	if len(votes) == 0 {
-		return nil
+		return nil, nil
 	}
 
+	var votesCount = make(map[uint64]*models.VotesCount)
 	for i := range votes {
+		var count = int64(1)
+
 		var existsVotes []models.Vote
 		query := tx.Tx().NewSelect().
 			Model(&existsVotes).
@@ -660,7 +663,7 @@ func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) erro
 			query.Where("validator_id = ?", *votes[i].ValidatorId)
 		}
 		if err := query.Scan(ctx); err != nil && !errors.Is(err, sql.ErrNoRows) {
-			return errors.Wrap(err, "receive existing votes")
+			return nil, errors.Wrap(err, "receive existing votes")
 		}
 		ids := make([]uint64, len(existsVotes))
 		total := votes[i].Weight.Copy()
@@ -670,13 +673,24 @@ func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) erro
 		}
 		if total.GreaterThan(one) {
 			if _, err := tx.Tx().NewDelete().Model((*models.Vote)(nil)).Where("id IN (?)", bun.In(ids)).Exec(ctx); err != nil {
-				return errors.Wrap(err, "remove existing votes")
+				return nil, errors.Wrap(err, "remove existing votes")
+			}
+			count--
+		}
+
+		if count > 0 {
+			if vc, ok := votesCount[votes[i].ProposalId]; ok {
+				vc.Update(count, *votes[i])
+			} else {
+				var vc models.VotesCount
+				vc.Update(count, *votes[i])
+				votesCount[votes[i].ProposalId] = &vc
 			}
 		}
 	}
 
 	_, err := tx.Tx().NewInsert().Model(&votes).Exec(ctx)
-	return err
+	return votesCount, err
 }
 
 type addedIbcClient struct {

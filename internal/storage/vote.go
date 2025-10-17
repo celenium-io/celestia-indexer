@@ -53,3 +53,58 @@ type VoteFilters struct {
 	AddressId   *uint64
 	ValidatorId *uint64
 }
+type VotesCount struct {
+	VotesCount int64
+	Yes        int64
+	No         int64
+	NoWithVeto int64
+	Abstain    int64
+
+	YesValidators        int64
+	NoValidators         int64
+	NoWithVetoValidators int64
+	AbstainValidators    int64
+
+	YesAddress        int64
+	NoAddress         int64
+	NoWithVetoAddress int64
+	AbstainAddress    int64
+}
+
+func (vc *VotesCount) Update(count int64, vote Vote) {
+	vc.VotesCount += count
+
+	switch vote.Option {
+	case types.VoteOptionAbstain:
+		vc.Abstain += count
+		if vote.ValidatorId != nil {
+			vc.AbstainValidators += count
+		} else {
+			vc.AbstainAddress += count
+		}
+
+	case types.VoteOptionNo:
+		vc.No += count
+		if vote.ValidatorId != nil {
+			vc.NoValidators += count
+		} else {
+			vc.NoAddress += count
+		}
+
+	case types.VoteOptionNoWithVeto:
+		vc.NoWithVeto += count
+		if vote.ValidatorId != nil {
+			vc.NoWithVetoValidators += count
+		} else {
+			vc.NoWithVetoAddress += count
+		}
+
+	case types.VoteOptionYes:
+		vc.Yes += count
+		if vote.ValidatorId != nil {
+			vc.YesValidators += count
+		} else {
+			vc.YesAddress += count
+		}
+	}
+}
