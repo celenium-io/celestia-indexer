@@ -1481,7 +1481,8 @@ func (tx Transaction) BondedValidators(ctx context.Context, limit int) (validato
 
 func (tx Transaction) ProposalVotes(ctx context.Context, proposalId uint64, limit, offset int) (votes []models.Vote, err error) {
 	query := tx.Tx().NewSelect().Model(&votes).
-		Where("proposal_id = ?", proposalId)
+		Where("proposal_id = ?", proposalId).
+		OrderExpr("id asc")
 
 	if limit < 1 {
 		limit = 10
