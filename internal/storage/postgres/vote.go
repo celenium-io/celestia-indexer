@@ -35,18 +35,22 @@ func (v *Vote) ByProposalId(ctx context.Context, proposalId uint64, fltrs storag
 	if fltrs.Offset > 0 {
 		subQuery = subQuery.Offset(fltrs.Offset)
 	}
+
 	if len(fltrs.Option) > 0 {
 		subQuery = subQuery.Where("option IN (?)", bun.In(fltrs.Option))
 	}
-	if fltrs.VoterType == types.VoterTypeValidator {
-		subQuery = subQuery.Where("validator_id != 0")
+
+	switch fltrs.VoterType {
+	case types.VoterTypeValidator:
+		subQuery = subQuery.Where("validator_id is not null")
+	case types.VoterTypeAddress:
+		subQuery = subQuery.Where("validator_id is null")
 	}
-	if fltrs.VoterType == types.VoterTypeAddress {
-		subQuery = subQuery.Where("validator_id = 0")
-	}
+
 	if fltrs.AddressId != nil {
 		subQuery.Where("voter_id = ?", fltrs.AddressId)
 	}
+
 	if fltrs.ValidatorId != nil {
 		subQuery.Where("validator_id = ?", fltrs.ValidatorId)
 	}
