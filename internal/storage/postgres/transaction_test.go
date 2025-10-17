@@ -33,7 +33,7 @@ type TransactionTestSuite struct {
 
 // SetupSuite -
 func (s *TransactionTestSuite) SetupSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 90*time.Second)
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 180*time.Second)
 	defer ctxCancel()
 
 	psqlContainer, err := database.NewPostgreSQLContainer(ctx, database.PostgreSQLContainerConfig{
