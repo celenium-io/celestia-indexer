@@ -75,9 +75,16 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 				Time:       ctx.Block.Time,
 				Height:     ctx.Block.Height,
 				Voter: &storage.Address{
-					Address: voter,
+					Height:     ctx.Block.Height,
+					LastHeight: ctx.Block.Height,
+					Address:    voter,
+					Balance:    storage.EmptyBalance(),
 				},
 			}
+			if err := ctx.AddAddress(vote.Voter); err != nil {
+				return err
+			}
+
 			switch opts[i].Option {
 			case int(cosmosGovTypesV1.OptionAbstain):
 				vote.Option = types.VoteOptionAbstain
@@ -105,8 +112,15 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 		Time:       ctx.Block.Time,
 		Height:     ctx.Block.Height,
 		Voter: &storage.Address{
-			Address: voter,
+			Height:     ctx.Block.Height,
+			LastHeight: ctx.Block.Height,
+			Address:    voter,
+			Balance:    storage.EmptyBalance(),
 		},
+	}
+
+	if err := ctx.AddAddress(vote.Voter); err != nil {
+		return err
 	}
 
 	optionParts := strings.Split(option, " ")
