@@ -1345,10 +1345,10 @@ func (s *TransactionTestSuite) TestProposalVotes() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	votes, err := tx.ProposalVotes(ctx, 1, 1, 0)
+	votes, err := tx.ProposalVotes(ctx, 1, 10, 0)
 	s.Require().NoError(err)
 
-	s.Require().Len(votes, 1)
+	s.Require().Len(votes, 2)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
