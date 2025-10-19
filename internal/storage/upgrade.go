@@ -27,6 +27,7 @@ type ListUpgradesFilter struct {
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IUpgrade interface {
 	List(ctx context.Context, flts ListUpgradesFilter) ([]Upgrade, error)
+	ByVersion(ctx context.Context, version uint64) (Upgrade, error)
 }
 
 type Upgrade struct {

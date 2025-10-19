@@ -1885,7 +1885,7 @@ func (s *TransactionTestSuite) TestRollbackSignalVersions() {
 		Limit: 10,
 	})
 	s.Require().NoError(err)
-	s.Require().Len(data, 1)
+	s.Require().Len(data, 2)
 }
 
 func (s *TransactionTestSuite) TestMsgValidator() {

@@ -27,6 +27,7 @@ func (s *StorageTestSuite) TestSignalVersionList() {
 			Offset:  0,
 			Sort:    sdk.SortOrderDesc,
 			Version: 1488,
+			Limit:   1,
 		}, {
 			Offset: 0,
 			Sort:   sdk.SortOrderDesc,
@@ -34,11 +35,12 @@ func (s *StorageTestSuite) TestSignalVersionList() {
 			To:     time.Date(2025, 8, 10, 0, 0, 0, 0, time.UTC),
 		}, {
 			Limit:  1,
-			Offset: 1,
+			Offset: 2,
 			Sort:   sdk.SortOrderAsc,
 		}, {
 			Sort:        sdk.SortOrderDesc,
 			ValidatorId: 1,
+			Limit:       1,
 		},
 	} {
 

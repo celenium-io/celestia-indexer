@@ -186,3 +186,36 @@ func (s *SignalTestSuite) TestUpgrades() {
 	s.Require().EqualValues(testUpgrade.Signer.Celestials.Id, upgrades[0].Signer.Celestials.Name)
 	s.Require().EqualValues(testUpgrade.Signer.Celestials.ImageUrl, upgrades[0].Signer.Celestials.ImageUrl)
 }
+
+func (s *SignalTestSuite) TestUpgrade() {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/signal/upgrade/:version")
+	c.SetParamNames("version")
+	c.SetParamValues("1")
+
+	s.upgrades.EXPECT().
+		ByVersion(gomock.Any(), uint64(1)).
+		Return(testUpgrade, nil)
+
+	s.Require().NoError(s.handler.Upgrade(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var upgrade responses.Upgrade
+	err := json.NewDecoder(rec.Body).Decode(&upgrade)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(testUpgrade.Version, upgrade.Version)
+	s.Require().EqualValues(testUpgrade.VotedPower.String(), upgrade.VotedPower)
+	s.Require().EqualValues(testUpgrade.VotingPower.String(), upgrade.VotingPower)
+
+	txHash, err := hex.DecodeString(upgrade.TxHash)
+	s.Require().NoError(err)
+	s.Require().EqualValues(testUpgrade.Tx.Hash, txHash)
+
+	s.Require().NotNil(upgrade.Signer)
+	s.Require().NotNil(upgrade.Signer.Celestials)
+	s.Require().EqualValues(testUpgrade.Signer.Celestials.Id, upgrade.Signer.Celestials.Name)
+	s.Require().EqualValues(testUpgrade.Signer.Celestials.ImageUrl, upgrade.Signer.Celestials.ImageUrl)
+}

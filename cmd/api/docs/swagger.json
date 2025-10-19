@@ -5270,6 +5270,48 @@
                 }
             }
         },
+        "/signal/upgrade/{version}": {
+            "get": {
+                "description": "Get upgrade by version",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "signal"
+                ],
+                "summary": "Get upgrade by version",
+                "operationId": "get-upgrade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Upgrade version",
+                        "name": "version",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Upgrade"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/stats/changes_24h": {
             "get": {
                 "description": "Get changes for 24 hours",

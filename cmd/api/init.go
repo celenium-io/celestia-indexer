@@ -550,6 +550,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	{
 		signalGroup.GET("", signalHandler.List)
 		signalGroup.GET("/upgrade", signalHandler.Upgrades)
+		signalGroup.GET("/upgrade/:version", signalHandler.Upgrade)
 	}
 
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{

@@ -57,3 +57,25 @@ func (s *StorageTestSuite) TestUpgradeList() {
 		s.Require().EqualValues(txHash, upgrade.Tx.Hash)
 	}
 }
+
+func (s *StorageTestSuite) TestUpgradeByVersion() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	upgrade, err := s.storage.Upgrade.ByVersion(ctx, 1499)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(1010, upgrade.Height)
+	s.Require().EqualValues(1499, upgrade.Version)
+	s.Require().EqualValues(1, upgrade.MsgId)
+	s.Require().EqualValues(1, upgrade.TxId)
+	s.Require().EqualValues("12345", upgrade.VotedPower.String())
+	s.Require().EqualValues("123456", upgrade.VotingPower.String())
+	s.Require().NotNil(upgrade.Signer)
+	s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", upgrade.Signer.Address)
+
+	txHash, err := hex.DecodeString("652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF")
+	s.Require().NoError(err)
+	s.Require().NotNil(upgrade.Tx)
+	s.Require().EqualValues(txHash, upgrade.Tx.Hash)
+}

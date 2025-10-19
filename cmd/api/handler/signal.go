@@ -6,6 +6,8 @@ package handler
 import (
 	"context"
 	"encoding/hex"
+	"net/http"
+
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/labstack/echo/v4"
@@ -215,4 +217,34 @@ func (handler *SignalHandler) Upgrades(c echo.Context) error {
 	}
 
 	return returnArray(c, response)
+}
+
+type upgradeRequest struct {
+	Version uint64 `example:"12345678" param:"version" swaggertype:"integer" validate:"required,min=1"`
+}
+
+// Upgrade godoc
+//
+//	@Summary		Get upgrade by version
+//	@Description	Get upgrade by version
+//	@Tags			signal
+//	@ID				get-upgrade
+//	@Param			version	path	integer	true	"Upgrade version"
+//	@Produce		json
+//	@Success		200	{object}		responses.Upgrade
+//	@Failure		400	{object}	Error
+//	@Failure		500	{object}	Error
+//	@Router			/signal/upgrade/{version} [get]
+func (handler *SignalHandler) Upgrade(c echo.Context) error {
+	req, err := bindAndValidate[upgradeRequest](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	upgrade, err := handler.upgrades.ByVersion(c.Request().Context(), req.Version)
+	if err != nil {
+		return handleError(c, err, handler.tx)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewUpgrade(upgrade))
 }
