@@ -359,6 +359,28 @@ func (s *TransactionTestSuite) TestSaveProposals() {
 	s.Require().Len(items, 3)
 }
 
+func (s *TransactionTestSuite) TestSaveEmptyProposalDuplicate() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	count, err := tx.SaveProposals(ctx, &storage.Proposal{
+		Id: 1,
+	})
+	s.Require().NoError(err)
+	s.Require().EqualValues(0, count)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	proposal, err := s.storage.Proposals.ById(ctx, 1)
+	s.Require().NoError(err)
+	s.Require().EqualValues("Description", proposal.Description)
+	s.Require().EqualValues("10000", proposal.Deposit.String())
+}
+
 func (s *TransactionTestSuite) TestSaveVotes() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

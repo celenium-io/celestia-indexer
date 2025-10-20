@@ -531,7 +531,20 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 			Column("yes_vals", "no_vals", "no_with_veto_vals", "abstain_vals", "yes_addrs", "no_addrs", "no_with_veto_addrs", "abstain_addrs", "votes_count", "voting_power", "yes_voting_power", "no_voting_power", "no_with_veto_voting_power", "abstain_voting_power").
 			Column("total_voting_power", "quorum", "veto_quorum", "threshold", "min_deposit", "end_time", "error").
 			Model(&add).
-			On("CONFLICT (id) DO UPDATE")
+			On("CONFLICT (id) DO UPDATE").
+			Set("votes_count = added_proposal.votes_count + EXCLUDED.votes_count").
+			Set("yes = added_proposal.yes + EXCLUDED.yes").
+			Set("no = added_proposal.no + EXCLUDED.no").
+			Set("no_with_veto = added_proposal.no_with_veto + EXCLUDED.no_with_veto").
+			Set("abstain = added_proposal.abstain + EXCLUDED.abstain").
+			Set("yes_vals = added_proposal.yes_vals + EXCLUDED.yes_vals").
+			Set("no_vals = added_proposal.no_vals + EXCLUDED.no_vals").
+			Set("no_with_veto_vals = added_proposal.no_with_veto_vals + EXCLUDED.no_with_veto_vals").
+			Set("abstain_vals = added_proposal.abstain_vals + EXCLUDED.abstain_vals").
+			Set("yes_addrs = added_proposal.yes_addrs + EXCLUDED.yes_addrs").
+			Set("no_addrs = added_proposal.no_addrs+ EXCLUDED.no_addrs").
+			Set("no_with_veto_addrs = added_proposal.no_with_veto_addrs + EXCLUDED.no_with_veto_addrs").
+			Set("abstain_addrs = added_proposal.abstain_addrs + EXCLUDED.abstain_addrs")
 
 		if proposals[i].Deposit.IsPositive() {
 			query.Set("deposit = added_proposal.deposit + EXCLUDED.deposit")
@@ -547,10 +560,6 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 
 		if proposals[i].EndTime != nil {
 			query.Set("end_time = EXCLUDED.end_time")
-		}
-
-		if proposals[i].VotesCount != 0 {
-			query.Set("votes_count = added_proposal.votes_count + EXCLUDED.votes_count")
 		}
 
 		if proposals[i].VotingPower.IsPositive() {
@@ -574,45 +583,6 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 		}
 		if proposals[i].Error != "" {
 			query.Set("error = EXCLUDED.error")
-		}
-
-		if proposals[i].Yes != 0 {
-			query.Set("yes = added_proposal.yes + EXCLUDED.yes")
-		}
-		if proposals[i].No != 0 {
-			query.Set("no = added_proposal.no + EXCLUDED.no")
-		}
-		if proposals[i].NoWithVeto != 0 {
-			query.Set("no_with_veto = added_proposal.no_with_veto + EXCLUDED.no_with_veto")
-		}
-		if proposals[i].Abstain != 0 {
-			query.Set("abstain = added_proposal.abstain + EXCLUDED.abstain")
-		}
-
-		if proposals[i].YesValidators != 0 {
-			query.Set("yes_vals = added_proposal.yes_vals + EXCLUDED.yes_vals")
-		}
-		if proposals[i].NoValidators != 0 {
-			query.Set("no_vals = added_proposal.no_vals + EXCLUDED.no_vals")
-		}
-		if proposals[i].NoWithVetoValidators != 0 {
-			query.Set("no_with_veto_vals = added_proposal.no_with_veto_vals + EXCLUDED.no_with_veto_vals")
-		}
-		if proposals[i].AbstainValidators != 0 {
-			query.Set("abstain_vals = added_proposal.abstain_vals + EXCLUDED.abstain_vals")
-		}
-
-		if proposals[i].YesAddress != 0 {
-			query.Set("yes_addrs = added_proposal.yes_addrs + EXCLUDED.yes_addrs")
-		}
-		if proposals[i].NoAddress != 0 {
-			query.Set("no_addrs = added_proposal.no_addrs+ EXCLUDED.no_addrs")
-		}
-		if proposals[i].NoWithVetoAddress != 0 {
-			query.Set("no_with_veto_addrs = added_proposal.no_with_veto_addrs + EXCLUDED.no_with_veto_addrs")
-		}
-		if proposals[i].AbstainAddress != 0 {
-			query.Set("abstain_addrs = added_proposal.abstain_addrs + EXCLUDED.abstain_addrs")
 		}
 
 		if proposals[i].YesVotingPower.IsPositive() {
