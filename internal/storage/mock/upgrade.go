@@ -43,6 +43,45 @@ func (m *MockIUpgrade) EXPECT() *MockIUpgradeMockRecorder {
 	return m.recorder
 }
 
+// ByVersion mocks base method.
+func (m *MockIUpgrade) ByVersion(ctx context.Context, version uint64) (storage.Upgrade, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ByVersion", ctx, version)
+	ret0, _ := ret[0].(storage.Upgrade)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ByVersion indicates an expected call of ByVersion.
+func (mr *MockIUpgradeMockRecorder) ByVersion(ctx, version any) *MockIUpgradeByVersionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByVersion", reflect.TypeOf((*MockIUpgrade)(nil).ByVersion), ctx, version)
+	return &MockIUpgradeByVersionCall{Call: call}
+}
+
+// MockIUpgradeByVersionCall wrap *gomock.Call
+type MockIUpgradeByVersionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIUpgradeByVersionCall) Return(arg0 storage.Upgrade, arg1 error) *MockIUpgradeByVersionCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIUpgradeByVersionCall) Do(f func(context.Context, uint64) (storage.Upgrade, error)) *MockIUpgradeByVersionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIUpgradeByVersionCall) DoAndReturn(f func(context.Context, uint64) (storage.Upgrade, error)) *MockIUpgradeByVersionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // List mocks base method.
 func (m *MockIUpgrade) List(ctx context.Context, flts storage.ListUpgradesFilter) ([]storage.Upgrade, error) {
 	m.ctrl.T.Helper()

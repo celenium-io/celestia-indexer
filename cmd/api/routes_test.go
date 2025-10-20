@@ -137,6 +137,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/hyperlane/igp/:id GET":                           {},
 		"/v1/signal GET":                                      {},
 		"/v1/signal/upgrade GET":                              {},
+		"/v1/signal/upgrade/:version GET":                     {},
 	}
 
 	ctx, cancel := context.WithCancel(t.Context())

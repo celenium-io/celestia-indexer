@@ -24,9 +24,7 @@ func NewSignalVersion(db *database.Bun) *SignalVersion {
 
 func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFilter) (signals []storage.SignalVersion, err error) {
 	query := t.DB().NewSelect().
-		Model((*storage.SignalVersion)(nil)).
-		ColumnExpr("version, validator_id, max(id) as id, max(height) as height,  max(time) as time, max(msg_id) as msg_id, max(tx_id) as tx_id, last(voting_power, time) as voting_power").
-		GroupExpr("version, validator_id")
+		Model((*storage.SignalVersion)(nil))
 
 	if filters.Offset > 0 {
 		query = query.Offset(filters.Offset)

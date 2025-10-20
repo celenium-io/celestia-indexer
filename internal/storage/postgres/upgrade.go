@@ -57,3 +57,20 @@ func (t *Upgrade) List(ctx context.Context, filters storage.ListUpgradesFilter) 
 	err = q.Scan(ctx, &upgrades)
 	return
 }
+
+func (t *Upgrade) ByVersion(ctx context.Context, version uint64) (upgrade storage.Upgrade, err error) {
+	query := t.DB().NewSelect().
+		Model((*storage.Upgrade)(nil)).
+		Where("version = ?", version).
+		Limit(1)
+
+	err = t.DB().NewSelect().
+		TableExpr("(?) as upgrade", query).
+		ColumnExpr("upgrade.*").
+		ColumnExpr("signer.address as signer__address").
+		ColumnExpr("tx.hash as tx__hash").
+		Join("left join address as signer on signer.id = signer_id").
+		Join("left join tx on tx_id = tx.id").
+		Scan(ctx, &upgrade)
+	return
+}
