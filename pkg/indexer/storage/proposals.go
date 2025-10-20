@@ -13,6 +13,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
@@ -21,7 +22,7 @@ func (module *Module) saveProposals(
 	ctx context.Context,
 	tx storage.Transaction,
 	height pkgTypes.Level,
-	proposals []*storage.Proposal,
+	proposals *sync.Map[uint64, *storage.Proposal],
 	votes []*storage.Vote,
 	addrToId map[string]uint64,
 ) (int64, error) {
@@ -45,25 +46,28 @@ func (module *Module) saveProposals(
 			return 0, errors.Wrap(err, "save votes")
 		}
 
-		for i := range proposals {
-			if vc, ok := votesCount[proposals[i].Id]; ok {
-				proposals[i].VotesCount += vc.VotesCount
-
-				proposals[i].Abstain += vc.Abstain
-				proposals[i].No += vc.No
-				proposals[i].NoWithVeto += vc.NoWithVeto
-				proposals[i].Yes += vc.Yes
-
-				proposals[i].AbstainAddress += vc.AbstainAddress
-				proposals[i].NoAddress += vc.NoAddress
-				proposals[i].NoWithVetoAddress += vc.NoWithVetoAddress
-				proposals[i].YesAddress += vc.YesAddress
-
-				proposals[i].AbstainValidators += vc.AbstainValidators
-				proposals[i].NoValidators += vc.NoValidators
-				proposals[i].NoWithVetoValidators += vc.NoWithVetoValidators
-				proposals[i].YesValidators += vc.YesValidators
+		for id, vc := range votesCount {
+			proposal, ok := proposals.Get(id)
+			if !ok {
+				return 0, errors.Errorf("unknown proposal id during votes count computing: %d", id)
 			}
+
+			proposal.VotesCount += vc.VotesCount
+
+			proposal.Abstain += vc.Abstain
+			proposal.No += vc.No
+			proposal.NoWithVeto += vc.NoWithVeto
+			proposal.Yes += vc.Yes
+
+			proposal.AbstainAddress += vc.AbstainAddress
+			proposal.NoAddress += vc.NoAddress
+			proposal.NoWithVetoAddress += vc.NoWithVetoAddress
+			proposal.YesAddress += vc.YesAddress
+
+			proposal.AbstainValidators += vc.AbstainValidators
+			proposal.NoValidators += vc.NoValidators
+			proposal.NoWithVetoValidators += vc.NoWithVetoValidators
+			proposal.YesValidators += vc.YesValidators
 		}
 	}
 
@@ -114,21 +118,23 @@ func (module *Module) getConstantDuration(ctx context.Context, moduleName types.
 	return time.Duration(intValue), nil
 }
 
-func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.Transaction, height pkgTypes.Level, changedProposals []*storage.Proposal) ([]*storage.Proposal, error) {
+func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.Transaction, height pkgTypes.Level, proposals *sync.Map[uint64, *storage.Proposal]) ([]*storage.Proposal, error) {
 	// 1. Receive all active or just completed proposals
 
 	// 1.1 Return if we don't have proposal updates and it's not certain block height (one block in hour)
 
-	proposals := make(map[uint64]*storage.Proposal)
-	for i := range changedProposals {
-		if !changedProposals[i].Finished() {
-			continue
+	finished := make(map[uint64]*storage.Proposal)
+	if err := proposals.Range(func(key uint64, value *storage.Proposal) (error, bool) {
+		if value.Finished() {
+			finished[value.Id] = value
 		}
-		proposals[changedProposals[i].Id] = changedProposals[i]
+		return nil, false
+	}); err != nil {
+		return nil, errors.Wrap(err, "proposals range")
 	}
 
-	if len(proposals) == 0 && height%600 > 0 {
-		return changedProposals, nil
+	if len(finished) == 0 && height%600 > 0 {
+		return proposals.Values(), nil
 	}
 
 	active, err := tx.ActiveProposals(ctx)
@@ -137,7 +143,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 	}
 
 	for i := range active {
-		if _, ok := proposals[active[i].Id]; !ok {
+		if _, ok := finished[active[i].Id]; !ok {
 			// reset counters to avoid repeat of counting
 			active[i].Abstain = 0
 			active[i].AbstainAddress = 0
@@ -154,12 +160,12 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 			active[i].VotesCount = 0
 			active[i].Deposit = decimal.Zero
 
-			proposals[active[i].Id] = &active[i]
+			finished[active[i].Id] = &active[i]
 		}
 	}
 
-	if len(active) == 0 && len(proposals) == 0 {
-		return changedProposals, nil
+	if len(finished) == 0 {
+		return proposals.Values(), nil
 	}
 
 	// 2. Get all validators
@@ -187,7 +193,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 		return nil, errors.Wrap(err, "get total voting power")
 	}
 
-	for _, proposal := range proposals {
+	for _, proposal := range finished {
 		proposal.VotingPower = decimal.Zero
 		proposal.AbstainVotingPower = decimal.Zero
 		proposal.NoVotingPower = decimal.Zero
@@ -294,5 +300,5 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 		}
 	}
 
-	return slices.Collect(maps.Values(proposals)), nil
+	return slices.Collect(maps.Values(finished)), nil
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
+	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -29,9 +30,13 @@ func TestFillProposalVotingPower(t *testing.T) {
 	t.Run("not fill", func(t *testing.T) {
 		tx := mock.NewMockTransaction(ctrl)
 
-		filled, err := module.fillProposalsVotingPower(t.Context(), tx, 1, []*storage.Proposal{{
+		proposals := sync.NewMap[uint64, *storage.Proposal]()
+		proposals.Set(1, &storage.Proposal{
+			Id:     1,
 			Status: types.ProposalStatusActive,
-		}})
+		})
+
+		filled, err := module.fillProposalsVotingPower(t.Context(), tx, 1, proposals)
 		require.NoError(t, err)
 		require.Len(t, filled, 1)
 	})
@@ -44,7 +49,8 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Return([]storage.Proposal{}, nil).
 			Times(1)
 
-		filled, err := module.fillProposalsVotingPower(t.Context(), tx, 600, []*storage.Proposal{{
+		proposals := sync.NewMap[uint64, *storage.Proposal]()
+		proposals.Set(1, &storage.Proposal{
 			Id:         1,
 			Status:     types.ProposalStatusActive,
 			Type:       types.ProposalTypeParamChanged,
@@ -52,7 +58,9 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Yes:        100,
 			No:         1,
 			NoWithVeto: 1,
-		}})
+		})
+
+		filled, err := module.fillProposalsVotingPower(t.Context(), tx, 600, proposals)
 		require.NoError(t, err)
 		require.Len(t, filled, 1)
 	})
@@ -81,7 +89,6 @@ func TestFillProposalVotingPower(t *testing.T) {
 				NoWithVeto: 1,
 			}}, nil).
 			Times(1)
-
 		validators.EXPECT().
 			TotalVotingPower(gomock.Any(), 100).
 			Return(decimal.RequireFromString("10000"), nil).
@@ -140,9 +147,18 @@ func TestFillProposalVotingPower(t *testing.T) {
 			}}, nil).
 			Times(1)
 
-		filled, err := module.fillProposalsVotingPower(t.Context(), tx, 600, []*storage.Proposal{{
-			Status: types.ProposalStatusActive,
-		}})
+		proposals := sync.NewMap[uint64, *storage.Proposal]()
+		proposals.Set(1, &storage.Proposal{
+			Id:         1,
+			Status:     types.ProposalStatusActive,
+			Type:       types.ProposalTypeParamChanged,
+			Abstain:    10,
+			Yes:        100,
+			No:         1,
+			NoWithVeto: 1,
+		})
+
+		filled, err := module.fillProposalsVotingPower(t.Context(), tx, 600, proposals)
 		require.NoError(t, err)
 		require.Len(t, filled, 1)
 

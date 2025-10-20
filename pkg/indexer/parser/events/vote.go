@@ -45,15 +45,13 @@ func processVote(ctx *context.Context, events []storage.Event, _ *storage.Messag
 	voter := decoder.StringFromMap(events[*idx].Data, "voter")
 	option := decoder.StringFromMap(events[*idx].Data, "option")
 
-	proposal := storage.Proposal{
-		Id: proposalId,
-	}
-
-	if err := parseOption(ctx, proposalId, voter, option, &proposal, idx); err != nil {
+	if err := parseOption(ctx, proposalId, voter, option, idx); err != nil {
 		return errors.Wrap(err, "parse option")
 	}
 
-	ctx.AddProposal(&proposal)
+	ctx.AddProposal(&storage.Proposal{
+		Id: proposalId,
+	})
 	return nil
 }
 
@@ -62,7 +60,7 @@ type optionType struct {
 	Weight decimal.Decimal `json:"weight"`
 }
 
-func parseOption(ctx *context.Context, proposalId uint64, voter, option string, proposal *storage.Proposal, idx *int) error {
+func parseOption(ctx *context.Context, proposalId uint64, voter, option string, idx *int) error {
 	var opts []optionType
 	if err := json.Unmarshal([]byte(option), &opts); err == nil {
 		if len(opts) == 0 {

@@ -14,7 +14,7 @@ func init() {
 }
 
 func upAddProposalLog(ctx context.Context, db *bun.DB) error {
-	if _, err := db.ExecContext(ctx, `ALTER TABLE public.proposal ADD error varchar NULL`); err != nil {
+	if _, err := db.ExecContext(ctx, `ALTER TABLE public.proposal ADD COLUMN IF NOT EXISTS error varchar NULL`); err != nil {
 		return err
 	}
 	if _, err := db.ExecContext(ctx, `ALTER TABLE public.proposal ALTER COLUMN error SET STORAGE EXTENDED`); err != nil {

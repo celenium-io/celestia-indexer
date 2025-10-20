@@ -549,7 +549,7 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 			query.Set("end_time = EXCLUDED.end_time")
 		}
 
-		if proposals[i].VotesCount > 0 {
+		if proposals[i].VotesCount != 0 {
 			query.Set("votes_count = added_proposal.votes_count + EXCLUDED.votes_count")
 		}
 
@@ -576,42 +576,42 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 			query.Set("error = EXCLUDED.error")
 		}
 
-		if proposals[i].Yes > 0 {
+		if proposals[i].Yes != 0 {
 			query.Set("yes = added_proposal.yes + EXCLUDED.yes")
 		}
-		if proposals[i].No > 0 {
+		if proposals[i].No != 0 {
 			query.Set("no = added_proposal.no + EXCLUDED.no")
 		}
-		if proposals[i].NoWithVeto > 0 {
+		if proposals[i].NoWithVeto != 0 {
 			query.Set("no_with_veto = added_proposal.no_with_veto + EXCLUDED.no_with_veto")
 		}
-		if proposals[i].Abstain > 0 {
+		if proposals[i].Abstain != 0 {
 			query.Set("abstain = added_proposal.abstain + EXCLUDED.abstain")
 		}
 
-		if proposals[i].YesValidators > 0 {
+		if proposals[i].YesValidators != 0 {
 			query.Set("yes_vals = added_proposal.yes_vals + EXCLUDED.yes_vals")
 		}
-		if proposals[i].NoValidators > 0 {
+		if proposals[i].NoValidators != 0 {
 			query.Set("no_vals = added_proposal.no_vals + EXCLUDED.no_vals")
 		}
-		if proposals[i].NoWithVetoValidators > 0 {
+		if proposals[i].NoWithVetoValidators != 0 {
 			query.Set("no_with_veto_vals = added_proposal.no_with_veto_vals + EXCLUDED.no_with_veto_vals")
 		}
-		if proposals[i].AbstainValidators > 0 {
+		if proposals[i].AbstainValidators != 0 {
 			query.Set("abstain_vals = added_proposal.abstain_vals + EXCLUDED.abstain_vals")
 		}
 
-		if proposals[i].YesAddress > 0 {
+		if proposals[i].YesAddress != 0 {
 			query.Set("yes_addrs = added_proposal.yes_addrs + EXCLUDED.yes_addrs")
 		}
-		if proposals[i].NoAddress > 0 {
+		if proposals[i].NoAddress != 0 {
 			query.Set("no_addrs = added_proposal.no_addrs+ EXCLUDED.no_addrs")
 		}
-		if proposals[i].NoWithVetoAddress > 0 {
+		if proposals[i].NoWithVetoAddress != 0 {
 			query.Set("no_with_veto_addrs = added_proposal.no_with_veto_addrs + EXCLUDED.no_with_veto_addrs")
 		}
-		if proposals[i].AbstainAddress > 0 {
+		if proposals[i].AbstainAddress != 0 {
 			query.Set("abstain_addrs = added_proposal.abstain_addrs + EXCLUDED.abstain_addrs")
 		}
 

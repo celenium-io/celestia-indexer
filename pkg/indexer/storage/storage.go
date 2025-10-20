@@ -354,7 +354,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	totalProposals, err := module.saveProposals(ctx, tx, dCtx.Block.Height, dCtx.Proposals.Values(), dCtx.Votes, addrToId)
+	totalProposals, err := module.saveProposals(ctx, tx, dCtx.Block.Height, dCtx.Proposals, dCtx.Votes, addrToId)
 	if err != nil {
 		return state, err
 	}
