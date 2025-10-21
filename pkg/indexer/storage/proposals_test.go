@@ -80,13 +80,9 @@ func TestFillProposalVotingPower(t *testing.T) {
 		tx.EXPECT().
 			ActiveProposals(t.Context()).
 			Return([]storage.Proposal{{
-				Id:         1,
-				Status:     types.ProposalStatusActive,
-				Type:       types.ProposalTypeParamChanged,
-				Abstain:    10,
-				Yes:        100,
-				No:         1,
-				NoWithVeto: 1,
+				Id:     1,
+				Status: types.ProposalStatusActive,
+				Type:   types.ProposalTypeParamChanged,
 			}}, nil).
 			Times(1)
 		validators.EXPECT().
