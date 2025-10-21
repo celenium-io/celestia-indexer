@@ -52,6 +52,40 @@ func Test_handleCreateMailbox(t *testing.T) {
 				},
 			},
 			idx: testsuite.Ptr(0),
+		}, {
+			name: "test 2",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 1036866,
+					Type:   "message",
+					Data: map[string]any{
+						"action":    "/hyperlane.core.v1.MsgCreateMailbox",
+						"sender":    "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j",
+						"module":    "core",
+						"msg_index": "0",
+					},
+				}, {
+					Height: 1036866,
+					Type:   "hyperlane.core.v1.EventCreateMailbox",
+					Data: map[string]any{
+						"owner":         "\"celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j\"",
+						"mailbox_id":    "\"0x68797065726c616e650000000000000000000000000000000000000000000003\"",
+						"default_ism":   "\"0x726f757465725f69736d00000000000000000000000000000000000000000004\"",
+						"default_hook":  "\"0x726f757465725f706f73745f6469737061746368000000000000000000000004\"",
+						"local_domain":  "1297040200",
+						"required_hook": "\"0x726f757465725f706f73745f6469737061746368000000000000000000000004\"",
+						"msg_index":     "0",
+					},
+				},
+			},
+			msg: []*storage.Message{
+				{
+					Type:   types.MsgCreateMailbox,
+					Height: 1036866,
+				},
+			},
+			idx: testsuite.Ptr(0),
 		},
 	}
 	for _, tt := range tests {
