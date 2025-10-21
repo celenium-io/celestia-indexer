@@ -144,22 +144,6 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 
 	for i := range active {
 		if _, ok := finished[active[i].Id]; !ok {
-			// reset counters to avoid repeat of counting
-			active[i].Abstain = 0
-			active[i].AbstainAddress = 0
-			active[i].AbstainValidators = 0
-			active[i].No = 0
-			active[i].NoAddress = 0
-			active[i].NoValidators = 0
-			active[i].NoWithVeto = 0
-			active[i].NoWithVetoAddress = 0
-			active[i].NoWithVetoValidators = 0
-			active[i].Yes = 0
-			active[i].YesAddress = 0
-			active[i].YesValidators = 0
-			active[i].VotesCount = 0
-			active[i].Deposit = decimal.Zero
-
 			finished[active[i].Id] = &active[i]
 		}
 	}
@@ -194,13 +178,6 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 	}
 
 	for _, proposal := range finished {
-		proposal.VotingPower = decimal.Zero
-		proposal.AbstainVotingPower = decimal.Zero
-		proposal.NoVotingPower = decimal.Zero
-		proposal.NoWithVetoVotingPower = decimal.Zero
-		proposal.YesVotingPower = decimal.Zero
-		proposal.TotalVotingPower = decimal.Zero
-
 		validatorMinus := make(map[uint64]decimal.Decimal)
 		votedValidators := make(map[uint64]types.VoteOption)
 
@@ -244,6 +221,10 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 			end = len(votes) < limit
 
 			for i := range votes {
+				if votes[i].ValidatorId != nil {
+					votedValidators[*votes[i].ValidatorId] = votes[i].Option
+				}
+
 				delegations, err := tx.AddressDelegations(ctx, votes[i].VoterId)
 				if err != nil {
 					return nil, errors.Wrapf(err, "can't receive address delegations: %d", votes[i].VoterId)
@@ -274,16 +255,15 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 						proposal.YesVotingPower = proposal.YesVotingPower.Add(shares)
 					}
 				}
-
-				if votes[i].ValidatorId != nil {
-					votedValidators[*votes[i].ValidatorId] = votes[i].Option
-				}
 			}
 		}
 
 		for id, option := range votedValidators {
+			minus, ok := validatorMinus[id]
+			if !ok {
+				minus = decimal.Zero
+			}
 			if power, ok := validatorsPower[id]; ok {
-				minus := validatorMinus[id]
 				proposal.VotingPower = proposal.VotingPower.Add(power).Sub(minus)
 
 				switch option {

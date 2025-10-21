@@ -5,7 +5,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -630,27 +629,30 @@ func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) (map
 		if votes[i].ValidatorId != nil {
 			query.Where("validator_id = ?", *votes[i].ValidatorId)
 		}
-		if err := query.Scan(ctx); err != nil && !errors.Is(err, sql.ErrNoRows) {
+		if err := query.Scan(ctx); err != nil {
 			return nil, errors.Wrap(err, "receive existing votes")
 		}
-		ids := make([]uint64, len(existsVotes))
-		total := votes[i].Weight.Copy()
-		for j, vote := range existsVotes {
-			total = total.Add(vote.Weight)
-			ids[j] = vote.Id
-		}
-		if total.GreaterThan(one) {
-			if _, err := tx.Tx().NewDelete().Model((*models.Vote)(nil)).Where("id IN (?)", bun.In(ids)).Exec(ctx); err != nil {
-				return nil, errors.Wrap(err, "remove existing votes")
-			}
 
-			for _, vote := range existsVotes {
-				if vc, ok := votesCount[vote.ProposalId]; ok {
-					vc.Update(-1, vote)
-				} else {
-					var vc models.VotesCount
-					vc.Update(-1, vote)
-					votesCount[vote.ProposalId] = &vc
+		if len(existsVotes) > 0 {
+			ids := make([]uint64, len(existsVotes))
+			totalWeight := votes[i].Weight.Copy()
+			for j := range existsVotes {
+				totalWeight = totalWeight.Add(existsVotes[j].Weight)
+				ids[j] = existsVotes[j].Id
+			}
+			if totalWeight.GreaterThan(one) {
+				if _, err := tx.Tx().NewDelete().Model((*models.Vote)(nil)).Where("id IN (?)", bun.In(ids)).Exec(ctx); err != nil {
+					return nil, errors.Wrap(err, "remove existing votes")
+				}
+
+				for _, vote := range existsVotes {
+					if vc, ok := votesCount[vote.ProposalId]; ok {
+						vc.Update(-1, vote)
+					} else {
+						var vc models.VotesCount
+						vc.Update(-1, vote)
+						votesCount[vote.ProposalId] = &vc
+					}
 				}
 			}
 		}
@@ -1435,6 +1437,8 @@ func (tx Transaction) RefreshLeaderboard(ctx context.Context) error {
 
 func (tx Transaction) ActiveProposals(ctx context.Context) (proposals []models.Proposal, err error) {
 	err = tx.Tx().NewSelect().Model(&proposals).
+		Column("id", "proposer_id", "height", "created_at", "deposit_time", "activation_time", "status", "type", "title", "description", "metadata", "changes").
+		Column("quorum", "veto_quorum", "threshold", "min_deposit", "end_time", "error").
 		Where("status = ?", storageTypes.ProposalStatusActive).
 		Scan(ctx)
 	return
@@ -1469,6 +1473,7 @@ func (tx Transaction) ProposalVotes(ctx context.Context, proposalId uint64, limi
 func (tx Transaction) AddressDelegations(ctx context.Context, addressId uint64) (val []models.Delegation, err error) {
 	err = tx.Tx().NewSelect().Model(&val).
 		Where("address_id = ?", addressId).
+		Where("amount > 0").
 		Scan(ctx)
 	return
 }
