@@ -448,8 +448,14 @@ func NewCreateMailbox(m map[string]any) (cm CreateMailbox, err error) {
 	if err != nil {
 		return cm, errors.Wrap(err, "default_ism")
 	}
-	cm.DefaultHook = decoder.StringFromMap(m, "default_hook")
-	cm.RequiredHook = decoder.StringFromMap(m, "required_hook")
+	cm.DefaultHook, err = parseUnquoteOptional(decoder.StringFromMap(m, "default_hook"))
+	if err != nil {
+		return cm, errors.Wrap(err, "default_hook")
+	}
+	cm.RequiredHook, err = parseUnquoteOptional(decoder.StringFromMap(m, "required_hook"))
+	if err != nil {
+		return cm, errors.Wrap(err, "required_hook")
+	}
 	cm.LocalDomain, err = decoder.Uint64FromMap(m, "local_domain")
 	if err != nil {
 		return cm, errors.Wrap(err, "local_domain")

@@ -39,11 +39,11 @@ func processCreateMailbox(ctx *context.Context, events []storage.Event, msg *sto
 			}
 			mailboxId, err := util.DecodeHexAddress(createMailbox.MailboxId)
 			if err != nil {
-				return errors.Wrap(err, "decode mailbox id")
+				return errors.Wrapf(err, "decode mailbox id: %s", createMailbox.MailboxId)
 			}
 			defaultIsm, err := util.DecodeHexAddress(createMailbox.DefaultIsm)
 			if err != nil {
-				return errors.Wrap(err, "decode default ISM")
+				return errors.Wrapf(err, "decode default ISM: %s", createMailbox.DefaultIsm)
 			}
 
 			mailbox := &storage.HLMailbox{
@@ -61,7 +61,7 @@ func processCreateMailbox(ctx *context.Context, events []storage.Event, msg *sto
 			if len(createMailbox.DefaultHook) > 0 && createMailbox.DefaultHook != null {
 				defaultHook, err := util.DecodeHexAddress(createMailbox.DefaultHook)
 				if err != nil {
-					return errors.Wrap(err, "decode default hook")
+					return errors.Wrapf(err, "decode default hook: %s", createMailbox.DefaultHook)
 				}
 				mailbox.DefaultHook = defaultHook.Bytes()
 			}
@@ -69,7 +69,7 @@ func processCreateMailbox(ctx *context.Context, events []storage.Event, msg *sto
 			if len(createMailbox.RequiredHook) > 0 && createMailbox.RequiredHook != null {
 				requiredHook, err := util.DecodeHexAddress(createMailbox.RequiredHook)
 				if err != nil {
-					return errors.Wrap(err, "decode required hook")
+					return errors.Wrapf(err, "decode required hook: %s", createMailbox.RequiredHook)
 				}
 				mailbox.DefaultHook = requiredHook.Bytes()
 			}
