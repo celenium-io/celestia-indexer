@@ -541,7 +541,7 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 			Set("no_with_veto_vals = added_proposal.no_with_veto_vals + EXCLUDED.no_with_veto_vals").
 			Set("abstain_vals = added_proposal.abstain_vals + EXCLUDED.abstain_vals").
 			Set("yes_addrs = added_proposal.yes_addrs + EXCLUDED.yes_addrs").
-			Set("no_addrs = added_proposal.no_addrs+ EXCLUDED.no_addrs").
+			Set("no_addrs = added_proposal.no_addrs + EXCLUDED.no_addrs").
 			Set("no_with_veto_addrs = added_proposal.no_with_veto_addrs + EXCLUDED.no_with_veto_addrs").
 			Set("abstain_addrs = added_proposal.abstain_addrs + EXCLUDED.abstain_addrs")
 
