@@ -9,7 +9,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func (module *Module) saveValidators(
@@ -37,27 +36,9 @@ func (module *Module) saveValidators(
 
 			jailsArr = append(jailsArr, *j)
 
-			fraction := decimal.Zero
-			switch j.Reason {
-			case "double_sign":
-				fraction = module.slashingForDoubleSign.Copy()
-			case "missing_signature":
-				fraction = module.slashingForDowntime.Copy()
-			}
-			if !fraction.IsPositive() {
-				return nil, false
-			}
-
-			balanceUpdates, err := tx.UpdateSlashedDelegations(ctx, j.ValidatorId, fraction)
+			balanceUpdates, err := tx.UpdateSlashedDelegations(ctx, j.ValidatorId, j.Burned)
 			if err != nil {
 				return err, false
-			}
-			burned := decimal.Zero
-			for i := range balanceUpdates {
-				burned = burned.Sub(balanceUpdates[i].Delegated) // delegated is a negative value. That's why sub
-			}
-			if !j.Burned.Equal(burned) {
-				return errors.Errorf("jailing: burned from event is not equal burned from database: %s != %s", j.Burned.String(), burned.String()), false
 			}
 			if err := tx.SaveBalances(ctx, balanceUpdates...); err != nil {
 				return err, false

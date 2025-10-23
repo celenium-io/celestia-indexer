@@ -912,17 +912,31 @@ func (tx Transaction) SaveHyperlaneTransfers(ctx context.Context, transfers ...*
 	return err
 }
 
-func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, fraction decimal.Decimal) (balances []models.Balance, err error) {
-	if validatorId == 0 || !fraction.IsPositive() {
+func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned decimal.Decimal) (balances []models.Balance, err error) {
+	if validatorId == 0 || !burned.IsPositive() {
 		return nil, nil
 	}
 
-	fr, _ := fraction.Float64()
-	_, err = tx.Tx().NewUpdate().
+	totalQuery := tx.Tx().NewSelect().
 		Model((*models.Delegation)(nil)).
-		Set("amount = amount * (1 - ?)", fr).
+		ColumnExpr("sum(amount) as amount").
+		Where("validator_id = ?", validatorId)
+
+	burnedParts := tx.Tx().NewSelect().
+		Table("total", "delegation").
+		ColumnExpr("(delegation.amount * ? / total.amount) as amount", burned.String()).
+		ColumnExpr("delegation.address_id as address_id").
+		Where("validator_id = ?", validatorId)
+
+	_, err = tx.Tx().NewUpdate().
+		With("total", totalQuery).
+		With("burned", burnedParts).
+		Model((*models.Delegation)(nil)).
+		TableExpr("burned").
+		Set("amount = delegation.amount * burned.amount").
 		Where("validator_id = ?", validatorId).
-		Returning("address_id as id, 'utia' as currency, -(amount / (1 - ?) - amount) as delegated", fr).
+		Where("burned.address_id = delegation.address_id").
+		Returning("delegation.address_id as id, 'utia' as currency, -burned.amount as delegated").
 		Exec(ctx, &balances)
 	return
 }

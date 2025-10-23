@@ -1165,7 +1165,7 @@ func (s *TransactionTestSuite) TestUpdateSlashedDelegations() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	balances, err := tx.UpdateSlashedDelegations(ctx, 1, decimal.NewFromFloat(0.01))
+	balances, err := tx.UpdateSlashedDelegations(ctx, 1, decimal.NewFromFloat(200))
 	s.Require().NoError(err)
 	s.Require().Len(balances, 2)
 

@@ -107,7 +107,7 @@ type Transaction interface {
 	SaveUndelegations(ctx context.Context, undelegations ...Undelegation) error
 	SaveRedelegations(ctx context.Context, redelegations ...Redelegation) error
 	SaveDelegations(ctx context.Context, delegations ...Delegation) error
-	UpdateSlashedDelegations(ctx context.Context, validatorId uint64, fraction decimal.Decimal) ([]Balance, error)
+	UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned decimal.Decimal) ([]Balance, error)
 	SaveStakingLogs(ctx context.Context, logs ...StakingLog) error
 	SaveJails(ctx context.Context, jails ...Jail) error
 	SaveBlockSignatures(ctx context.Context, signs ...BlockSignature) error

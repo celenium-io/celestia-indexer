@@ -36,13 +36,24 @@ func parseWithdrawRewards(ctx *context.Context, msg *storage.Message, data map[s
 
 	ctx.AddValidator(validator)
 
+	rewardReceiver := &storage.Address{
+		Address:    rewards.Delegator,
+		Height:     ctx.Block.Height,
+		LastHeight: ctx.Block.Height,
+		Balance:    storage.EmptyBalance(),
+	}
 	ctx.AddStakingLog(storage.StakingLog{
 		Height:    msg.Height,
 		Time:      msg.Time,
 		Validator: &validator,
+		Address:   rewardReceiver,
 		Change:    validator.Rewards.Copy(),
 		Type:      storageTypes.StakingLogTypeRewards,
 	})
+
+	if err := ctx.AddAddress(rewardReceiver); err != nil {
+		return err
+	}
 
 	return nil
 }
