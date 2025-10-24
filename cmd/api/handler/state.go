@@ -4,23 +4,29 @@
 package handler
 
 import (
+	"context"
 	"net/http"
+	"strconv"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 type StateHandler struct {
 	state       storage.IState
 	validator   storage.IValidator
+	constants   storage.IConstant
 	indexerName string
 }
 
-func NewStateHandler(state storage.IState, validator storage.IValidator, indexerName string) *StateHandler {
+func NewStateHandler(state storage.IState, validator storage.IValidator, constants storage.IConstant, indexerName string) *StateHandler {
 	return &StateHandler{
 		state:       state,
 		validator:   validator,
+		constants:   constants,
 		indexerName: indexerName,
 	}
 }
@@ -43,11 +49,24 @@ func (sh *StateHandler) Head(c echo.Context) error {
 		return handleError(c, err, sh.state)
 	}
 
-	votingPower, err := sh.validator.TotalVotingPower(c.Request().Context())
+	maxValidators, err := getMaxValidatorsCount(c.Request().Context(), sh.constants)
+	if err != nil {
+		return handleError(c, err, sh.state)
+	}
+
+	votingPower, err := sh.validator.TotalVotingPower(c.Request().Context(), maxValidators)
 	if err != nil {
 		return handleError(c, err, sh.state)
 	}
 	state.TotalVotingPower = votingPower
 
 	return c.JSON(http.StatusOK, responses.NewState(state))
+}
+
+func getMaxValidatorsCount(ctx context.Context, constants storage.IConstant) (int, error) {
+	maxValsConsts, err := constants.Get(ctx, types.ModuleNameStaking, "max_validators")
+	if err != nil {
+		return 0, errors.Wrap(err, "get max validators value")
+	}
+	return strconv.Atoi(maxValsConsts.Value)
 }

@@ -72,6 +72,10 @@ func processExec(ctx *context.Context, events []storage.Event, msg *storage.Mess
 			if err := processSignalVersion(ctx, events, msg, data, idx); err != nil {
 				return err
 			}
+		case "/cosmos.gov.v1beta1.MsgVote", "/cosmos.gov.v1.MsgVote", "/cosmos.gov.v1.MsgVoteWeighted", "/cosmos.gov.v1beta1.MsgVoteWeighted":
+			if err := processVote(ctx, events, msg, idx); err != nil {
+				return err
+			}
 		default:
 			for j := *idx; j < len(events); j++ {
 				authMsgIdxPtr, err := decoder.AuthMsgIndexFromMap(events[*idx].Data)

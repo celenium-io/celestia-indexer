@@ -14,7 +14,7 @@ func init() {
 }
 
 func upAddMessagesCount(ctx context.Context, db *bun.DB) error {
-	if _, err := db.ExecContext(ctx, `ALTER TABLE public."validator" ADD "messages_count" int8 NULL`); err != nil {
+	if _, err := db.ExecContext(ctx, `ALTER TABLE public."validator" ADD COLUMN IF NOT EXISTS "messages_count" int8 NULL`); err != nil {
 		return err
 	}
 	if _, err := db.ExecContext(ctx, `ALTER TABLE public."validator" ALTER COLUMN "messages_count" SET STORAGE PLAIN`); err != nil {

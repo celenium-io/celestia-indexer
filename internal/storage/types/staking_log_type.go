@@ -9,7 +9,9 @@ package types
 		delegation,
 		unbonding,
 		rewards,
-		commissions
+		commissions,
+		unbonded,
+		slashing
 	)
 */
 //go:generate go-enum --marshal --sql --values --names

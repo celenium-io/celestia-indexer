@@ -512,18 +512,18 @@ func (c *MockIValidatorTopNMetricsCall) DoAndReturn(f func(context.Context, int)
 }
 
 // TotalVotingPower mocks base method.
-func (m *MockIValidator) TotalVotingPower(ctx context.Context) (decimal.Decimal, error) {
+func (m *MockIValidator) TotalVotingPower(ctx context.Context, maxVals int) (decimal.Decimal, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TotalVotingPower", ctx)
+	ret := m.ctrl.Call(m, "TotalVotingPower", ctx, maxVals)
 	ret0, _ := ret[0].(decimal.Decimal)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // TotalVotingPower indicates an expected call of TotalVotingPower.
-func (mr *MockIValidatorMockRecorder) TotalVotingPower(ctx any) *MockIValidatorTotalVotingPowerCall {
+func (mr *MockIValidatorMockRecorder) TotalVotingPower(ctx, maxVals any) *MockIValidatorTotalVotingPowerCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TotalVotingPower", reflect.TypeOf((*MockIValidator)(nil).TotalVotingPower), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TotalVotingPower", reflect.TypeOf((*MockIValidator)(nil).TotalVotingPower), ctx, maxVals)
 	return &MockIValidatorTotalVotingPowerCall{Call: call}
 }
 
@@ -539,13 +539,13 @@ func (c *MockIValidatorTotalVotingPowerCall) Return(arg0 decimal.Decimal, arg1 e
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIValidatorTotalVotingPowerCall) Do(f func(context.Context) (decimal.Decimal, error)) *MockIValidatorTotalVotingPowerCall {
+func (c *MockIValidatorTotalVotingPowerCall) Do(f func(context.Context, int) (decimal.Decimal, error)) *MockIValidatorTotalVotingPowerCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIValidatorTotalVotingPowerCall) DoAndReturn(f func(context.Context) (decimal.Decimal, error)) *MockIValidatorTotalVotingPowerCall {
+func (c *MockIValidatorTotalVotingPowerCall) DoAndReturn(f func(context.Context, int) (decimal.Decimal, error)) *MockIValidatorTotalVotingPowerCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

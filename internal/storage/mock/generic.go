@@ -4575,15 +4575,16 @@ func (c *MockTransactionSaveVestingPeriodsCall) DoAndReturn(f func(context.Conte
 }
 
 // SaveVotes mocks base method.
-func (m *MockTransaction) SaveVotes(ctx context.Context, votes ...*storage.Vote) error {
+func (m *MockTransaction) SaveVotes(ctx context.Context, votes ...*storage.Vote) (map[uint64]*storage.VotesCount, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
 	for _, a := range votes {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SaveVotes", varargs...)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(map[uint64]*storage.VotesCount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SaveVotes indicates an expected call of SaveVotes.
@@ -4600,19 +4601,19 @@ type MockTransactionSaveVotesCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockTransactionSaveVotesCall) Return(arg0 error) *MockTransactionSaveVotesCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockTransactionSaveVotesCall) Return(arg0 map[uint64]*storage.VotesCount, arg1 error) *MockTransactionSaveVotesCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionSaveVotesCall) Do(f func(context.Context, ...*storage.Vote) error) *MockTransactionSaveVotesCall {
+func (c *MockTransactionSaveVotesCall) Do(f func(context.Context, ...*storage.Vote) (map[uint64]*storage.VotesCount, error)) *MockTransactionSaveVotesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionSaveVotesCall) DoAndReturn(f func(context.Context, ...*storage.Vote) error) *MockTransactionSaveVotesCall {
+func (c *MockTransactionSaveVotesCall) DoAndReturn(f func(context.Context, ...*storage.Vote) (map[uint64]*storage.VotesCount, error)) *MockTransactionSaveVotesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -4809,18 +4810,18 @@ func (c *MockTransactionUpdateSignalsAfterUpgradeCall) DoAndReturn(f func(contex
 }
 
 // UpdateSlashedDelegations mocks base method.
-func (m *MockTransaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, fraction decimal.Decimal) ([]storage.Balance, error) {
+func (m *MockTransaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned decimal.Decimal) ([]storage.Balance, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateSlashedDelegations", ctx, validatorId, fraction)
+	ret := m.ctrl.Call(m, "UpdateSlashedDelegations", ctx, validatorId, burned)
 	ret0, _ := ret[0].([]storage.Balance)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // UpdateSlashedDelegations indicates an expected call of UpdateSlashedDelegations.
-func (mr *MockTransactionMockRecorder) UpdateSlashedDelegations(ctx, validatorId, fraction any) *MockTransactionUpdateSlashedDelegationsCall {
+func (mr *MockTransactionMockRecorder) UpdateSlashedDelegations(ctx, validatorId, burned any) *MockTransactionUpdateSlashedDelegationsCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSlashedDelegations", reflect.TypeOf((*MockTransaction)(nil).UpdateSlashedDelegations), ctx, validatorId, fraction)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSlashedDelegations", reflect.TypeOf((*MockTransaction)(nil).UpdateSlashedDelegations), ctx, validatorId, burned)
 	return &MockTransactionUpdateSlashedDelegationsCall{Call: call}
 }
 

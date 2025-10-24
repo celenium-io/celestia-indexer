@@ -49,7 +49,7 @@ func (s *StorageTestSuite) TestVoteByProposalIdWithOption() {
 	s.Require().EqualValues("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", vote.Voter.Address)
 }
 
-func (s *StorageTestSuite) TestVoteByProposalIdWithVoterType() {
+func (s *StorageTestSuite) TestVoteByProposalIdWithVoterTypeValidator() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
@@ -65,8 +65,31 @@ func (s *StorageTestSuite) TestVoteByProposalIdWithVoterType() {
 	s.Require().EqualValues(3, vote.Id)
 	s.Require().EqualValues(1000, vote.Height)
 	s.Require().EqualValues(types.VoteOptionAbstain, vote.Option)
+	s.Require().Nil(vote.Voter)
+	s.Require().NotNil(vote.Validator)
 	s.Require().EqualValues("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", vote.Validator.ConsAddress)
 	s.Require().EqualValues("Conqueror", vote.Validator.Moniker)
+}
+
+func (s *StorageTestSuite) TestVoteByProposalIdWithVoterTypeAddress() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	votes, err := s.storage.Votes.ByProposalId(ctx, 2, storage.VoteFilters{
+		Limit:     10,
+		Offset:    0,
+		VoterType: types.VoterTypeAddress,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(votes, 1)
+
+	vote := votes[0]
+	s.Require().EqualValues(4, vote.Id)
+	s.Require().EqualValues(1000, vote.Height)
+	s.Require().EqualValues(types.VoteOptionYes, vote.Option)
+	s.Require().NotNil(vote.Voter)
+	s.Require().Nil(vote.Validator)
+	s.Require().Equal("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", vote.Voter.Address)
 }
 
 func (s *StorageTestSuite) TestVoteByProposalIdWithVoter() {
