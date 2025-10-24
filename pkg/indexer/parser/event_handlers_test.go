@@ -9,6 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/shopspring/decimal"
@@ -20,7 +21,7 @@ var (
 	testHashAddress = []byte{0x96, 0xa, 0xa0, 0x36, 0x6b, 0x25, 0x4e, 0x1e, 0xa7, 0x9b, 0xda, 0x46, 0x7e, 0xb3, 0xaa, 0x5c, 0x97, 0xcb, 0xa5, 0xae}
 	testIgpId       = []uint8{0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x5f, 0x70, 0x6f, 0x73, 0x74, 0x5f, 0x64, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x0, 0x0, 0x0, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1}
 	testBlock       = storage.Block{
-		Height: pkgTypes.Level(1488),
+		Height: pkgTypes.Level(123456),
 		Time:   time.Now(),
 	}
 )
@@ -100,7 +101,7 @@ func Test_parseCreateIgp(t *testing.T) {
 				"owner":  testAddress,
 			},
 			want: &storage.HLIGP{
-				Height: pkgTypes.Level(1488),
+				Height: pkgTypes.Level(123456),
 				Time:   testBlock.Time,
 				Owner: &storage.Address{
 					Address: testAddress,
@@ -144,7 +145,7 @@ func Test_parseSetDestinationGasConfig(t *testing.T) {
 				"token_exchange_rate": "\"10000000000\"",
 			},
 			want: &storage.HLIGPConfig{
-				Height:            pkgTypes.Level(1488),
+				Height:            pkgTypes.Level(123456),
 				Time:              testBlock.Time,
 				GasPrice:          decimal.RequireFromString("1"),
 				GasOverhead:       decimal.RequireFromString("200000"),
@@ -185,7 +186,7 @@ func Test_parseSetIgp(t *testing.T) {
 				"renounce_ownership": "false",
 			},
 			want: &storage.HLIGP{
-				Height: pkgTypes.Level(1488),
+				Height: pkgTypes.Level(123456),
 				Time:   testBlock.Time,
 				Owner: &storage.Address{
 					Address: "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w61",
@@ -203,6 +204,120 @@ func Test_parseSetIgp(t *testing.T) {
 				require.Equal(t, tt.want, value)
 				return nil, false
 			})
+		})
+	}
+}
+
+func Test_parseCompleteUnbonding(t *testing.T) {
+	ctx := context.NewContext()
+	ctx.Block = &testBlock
+
+	tests := []struct {
+		name    string
+		data    map[string]any
+		want    storage.StakingLog
+		wantErr bool
+	}{
+		{
+			name: "test 1",
+			data: map[string]any{
+				"amount":    "35570000utia",
+				"delegator": "celestia1nwm73xdjhdwfpw6uxc3pkcspw0kr5m06z067t3",
+				"mode":      "EndBlock",
+				"validator": "celestiavaloper140l6y2gp3gxvay6qtn70re7z2s0gn57zcvqd22",
+			},
+			want: storage.StakingLog{
+				Height: pkgTypes.Level(123456),
+				Time:   testBlock.Time,
+				Address: &storage.Address{
+					Address:    "celestia1nwm73xdjhdwfpw6uxc3pkcspw0kr5m06z067t3",
+					Height:     pkgTypes.Level(123456),
+					LastHeight: pkgTypes.Level(123456),
+					Hash:       []byte{0x9b, 0xb7, 0xe8, 0x99, 0xb2, 0xbb, 0x5c, 0x90, 0xbb, 0x5c, 0x36, 0x22, 0x1b, 0x62, 0x01, 0x73, 0xec, 0x3a, 0x6d, 0xfa},
+					Balance: storage.Balance{
+						Currency:  currency.Utia,
+						Unbonding: decimal.RequireFromString("-35570000"),
+						Spendable: decimal.Zero,
+						Delegated: decimal.Zero,
+					},
+				},
+				Validator: &storage.Validator{
+					Address: "celestiavaloper140l6y2gp3gxvay6qtn70re7z2s0gn57zcvqd22",
+				},
+				Change: decimal.RequireFromString("-35570000"),
+				Type:   types.StakingLogTypeUnbonded,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := parseCompleteUnbonding(ctx, tt.data)
+			require.True(t, (err == nil) != tt.wantErr)
+			require.Len(t, ctx.StakingLogs, 1)
+			require.Equal(t, tt.want, ctx.StakingLogs[0])
+			require.EqualValues(t, ctx.Addresses.Len(), 1)
+			addr, ok := ctx.Addresses.Get("celestia1nwm73xdjhdwfpw6uxc3pkcspw0kr5m06z067t3")
+			require.True(t, ok)
+			require.Equal(t, tt.want.Address, addr)
+			require.EqualValues(t, ctx.Validators.Len(), 1)
+			val, ok := ctx.Validators.Get("celestiavaloper140l6y2gp3gxvay6qtn70re7z2s0gn57zcvqd22")
+			require.True(t, ok)
+			require.Equal(t, tt.want.Validator, val)
+		})
+	}
+}
+
+func Test_parseCompleteRedelegation(t *testing.T) {
+	ctx := context.NewContext()
+	ctx.Block = &testBlock
+
+	tests := []struct {
+		name    string
+		data    map[string]any
+		want    storage.StakingLog
+		wantErr bool
+	}{
+		{
+			name: "test 1",
+			data: map[string]any{
+				"amount":                "265636688utia",
+				"delegator":             "celestia1nwm73xdjhdwfpw6uxc3pkcspw0kr5m06z067t3",
+				"destination_validator": "celestiavaloper1snun9qqk9eussvyhkqm03lz6f265ekhnnlw043",
+				"mode":                  "EndBlock",
+				"source_validator":      "celestiavaloper140l6y2gp3gxvay6qtn70re7z2s0gn57zcvqd22",
+			},
+			want: storage.StakingLog{
+				Height: pkgTypes.Level(123456),
+				Time:   testBlock.Time,
+				Address: &storage.Address{
+					Address:    "celestia1nwm73xdjhdwfpw6uxc3pkcspw0kr5m06z067t3",
+					Height:     pkgTypes.Level(123456),
+					LastHeight: pkgTypes.Level(123456),
+					Hash:       []byte{0x9b, 0xb7, 0xe8, 0x99, 0xb2, 0xbb, 0x5c, 0x90, 0xbb, 0x5c, 0x36, 0x22, 0x1b, 0x62, 0x01, 0x73, 0xec, 0x3a, 0x6d, 0xfa},
+					Balance:    storage.EmptyBalance(),
+				},
+				Validator: &storage.Validator{
+					Address: "celestiavaloper140l6y2gp3gxvay6qtn70re7z2s0gn57zcvqd22",
+				},
+				Change: decimal.RequireFromString("-265636688"),
+				Type:   types.StakingLogTypeUnbonded,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := parseCompleteRedelegation(ctx, tt.data)
+			require.True(t, (err == nil) != tt.wantErr)
+			require.Len(t, ctx.StakingLogs, 1)
+			require.Equal(t, tt.want, ctx.StakingLogs[0])
+			require.EqualValues(t, ctx.Addresses.Len(), 1)
+			addr, ok := ctx.Addresses.Get("celestia1nwm73xdjhdwfpw6uxc3pkcspw0kr5m06z067t3")
+			require.True(t, ok)
+			require.Equal(t, tt.want.Address, addr)
+			require.EqualValues(t, ctx.Validators.Len(), 1)
+			val, ok := ctx.Validators.Get("celestiavaloper140l6y2gp3gxvay6qtn70re7z2s0gn57zcvqd22")
+			require.True(t, ok)
+			require.Equal(t, tt.want.Validator, val)
 		})
 	}
 }
