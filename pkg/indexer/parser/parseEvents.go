@@ -82,7 +82,9 @@ func processEvent(ctx *context.Context, event *storage.Event) error {
 	case storageTypes.EventTypeCoinSpent:
 		return parseCoinSpent(ctx, event.Data, event.Height)
 	case storageTypes.EventTypeCompleteUnbonding:
-		return parseCompleteUnbonding(ctx, event.Data, event.Height)
+		return parseCompleteUnbonding(ctx, event.Data)
+	case storageTypes.EventTypeCompleteRedelegation:
+		return parseCompleteRedelegation(ctx, event.Data)
 	case storageTypes.EventTypeCommission:
 		return parseCommission(ctx, event.Data)
 	case storageTypes.EventTypeRewards:
