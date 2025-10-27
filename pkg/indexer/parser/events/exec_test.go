@@ -333,6 +333,12 @@ func Test_handleExec(t *testing.T) {
 			msg: &storage.Message{
 				Type:   types.MsgExec,
 				Height: 844359,
+				Data: map[string]any{
+					"Grantee": "celestia1zq2atge5df93w0l6xhm87r8uspjva632aqz4fe",
+					"Msgs": []any{
+						map[string]any{}, map[string]any{}, map[string]any{}, map[string]any{},
+					},
+				},
 				InternalMsgs: []string{
 					"/cosmos.staking.v1beta1.MsgDelegate",
 					"/cosmos.staking.v1beta1.MsgDelegate",
@@ -498,6 +504,12 @@ func Test_handleExec(t *testing.T) {
 			msg: &storage.Message{
 				Type:   types.MsgExec,
 				Height: 595997,
+				Data: map[string]any{
+					"Grantee": "celestia1zq2atge5df93w0l6xhm87r8uspjva632aqz4fe",
+					"Msgs": []any{
+						map[string]any{}, map[string]any{}, map[string]any{},
+					},
+				},
 				InternalMsgs: []string{
 					"/cosmos.staking.v1beta1.MsgUndelegate",
 					"/cosmos.staking.v1beta1.MsgUndelegate",
@@ -665,6 +677,12 @@ func Test_handleExec(t *testing.T) {
 			msg: &storage.Message{
 				Type:   types.MsgExec,
 				Height: 977944,
+				Data: map[string]any{
+					"Grantee": "celestia1zq2atge5df93w0l6xhm87r8uspjva632aqz4fe",
+					"Msgs": []any{
+						map[string]any{}, map[string]any{},
+					},
+				},
 				InternalMsgs: []string{
 					"/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
 					"/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
@@ -756,6 +774,12 @@ func Test_handleExec(t *testing.T) {
 			msg: &storage.Message{
 				Type:   types.MsgGrant,
 				Height: 45631,
+				Data: map[string]any{
+					"Grantee": "celestia10eykchznjdn8jdlwaj5v9wvlmdsp6kxx8ddhq6",
+					"Msgs": []any{
+						map[string]any{},
+					},
+				},
 				InternalMsgs: []string{
 					"/cosmos.authz.v1beta1.MsgGrant",
 				},
@@ -940,6 +964,179 @@ func Test_handleExec(t *testing.T) {
 				},
 				InternalMsgs: []string{
 					"/cosmos.gov.v1.MsgVoteWeighted",
+				},
+			},
+			idx: testsuite.Ptr(7),
+		}, {
+			name: "multiple withdraw commissions and delegator rewards",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 45631,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":  "2000utia",
+						"spender": "celestia1eqj8gju6sldleq76auawrl58nwqcl6dyh9xdry",
+					},
+				}, {
+					Height: 45631,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":   "2000utia",
+						"receiver": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
+					},
+				}, {
+					Height: 45631,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "2000utia",
+						"recipient": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
+						"sender":    "celestia1eqj8gju6sldleq76auawrl58nwqcl6dyh9xdry",
+					},
+				}, {
+					Height: 45631,
+					Type:   "message",
+					Data: map[string]any{
+						"sender": "celestia1eqj8gju6sldleq76auawrl58nwqcl6dyh9xdry",
+					},
+				}, {
+					Height: 45631,
+					Type:   "tx",
+					Data: map[string]any{
+						"fee":       "2000utia",
+						"fee_payer": "celestia1eqj8gju6sldleq76auawrl58nwqcl6dyh9xdry",
+					},
+				}, {
+					Height: 45631,
+					Type:   "tx",
+					Data: map[string]any{
+						"acc_seq": "celestia1eqj8gju6sldleq76auawrl58nwqcl6dyh9xdry/8",
+					},
+				}, {
+					Height: 45631,
+					Type:   "tx",
+					Data: map[string]any{
+						"signature": "I5CqepCwRdt5drYYFZGBaXJF4Idgr/CbRURa8zSOZD9WIfI61AlmHpfP1oiZQqwBVJQTUi1TT3NSbADUpZnqrA==",
+					},
+				}, {
+					Height: 45631,
+					Type:   "message",
+					Data: map[string]any{
+						"action":    "/cosmos.authz.v1beta1.MsgExec",
+						"module":    "authz",
+						"msg_index": "0",
+						"sender":    "celestia1eqj8gju6sldleq76auawrl58nwqcl6dyh9xdry",
+					},
+				}, {
+					Height: 45631,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":          "41419902utia",
+						"authz_msg_index": "0",
+						"msg_index":       "0",
+						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 45631,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":          "41419902utia",
+						"authz_msg_index": "0",
+						"msg_index":       "0",
+						"receiver":        "celestia1fwyzhlyngfguxg0pkm34mqd0ycw8ua5ftnkqcm",
+					},
+				}, {
+					Height: 45631,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":          "41419902utia",
+						"authz_msg_index": "0",
+						"msg_index":       "0",
+						"recipient":       "celestia1fwyzhlyngfguxg0pkm34mqd0ycw8ua5ftnkqcm",
+						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 45631,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "0",
+						"msg_index":       "0",
+						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 45631,
+					Type:   "withdraw_rewards",
+					Data: map[string]any{
+						"amount":          "41419902utia",
+						"authz_msg_index": "0",
+						"delegator":       "celestia1gl0rg3g0pkcpr8umj2hvlhha06ecjd65p58r5j",
+						"msg_index":       "0",
+						"validator":       "celestiavaloper1gl0rg3g0pkcpr8umj2hvlhha06ecjd65yt96z5",
+					},
+				}, {
+					Height: 45631,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":          "8323576892utia",
+						"authz_msg_index": "1",
+						"msg_index":       "0",
+						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 45631,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":          "8323576892utia",
+						"authz_msg_index": "1",
+						"msg_index":       "0",
+						"receiver":        "celestia1fwyzhlyngfguxg0pkm34mqd0ycw8ua5ftnkqcm",
+					},
+				}, {
+					Height: 45631,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":          "8323576892utia",
+						"authz_msg_index": "1",
+						"msg_index":       "0",
+						"recipient":       "celestia1fwyzhlyngfguxg0pkm34mqd0ycw8ua5ftnkqcm",
+						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 45631,
+					Type:   "message",
+					Data: map[string]any{
+						"authz_msg_index": "1",
+						"msg_index":       "0",
+						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+					},
+				}, {
+					Height: 45631,
+					Type:   "withdraw_commission",
+					Data: map[string]any{
+						"amount":          "8323576892utia",
+						"authz_msg_index": "1",
+						"msg_index":       "0",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgExec,
+				Height: 45631,
+				Data: map[string]any{
+					"Grantee": "celestia1eqj8gju6sldleq76auawrl58nwqcl6dyh9xdry",
+					"Msgs": []any{
+						map[string]any{
+							"DelegatorAddress": "celestia1gl0rg3g0pkcpr8umj2hvlhha06ecjd65p58r5j",
+							"ValidatorAddress": "celestiavaloper1gl0rg3g0pkcpr8umj2hvlhha06ecjd65yt96z5",
+						},
+						map[string]any{
+							"ValidatorAddress": "celestiavaloper1gl0rg3g0pkcpr8umj2hvlhha06ecjd65yt96z5",
+						},
+					},
+				},
+				InternalMsgs: []string{
+					"/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
+					"/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
 				},
 			},
 			idx: testsuite.Ptr(7),

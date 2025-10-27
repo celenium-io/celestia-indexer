@@ -78,6 +78,9 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				{
 					Type:   types.MsgWithdrawValidatorCommission,
 					Height: 848613,
+					Data: map[string]any{
+						"ValidatorAddress": "celestiavaloper1s0lankh33kprer2l22nank5rvsuh9ksa2xcd2y",
+					},
 				},
 			},
 			idx: testsuite.Ptr(0),
@@ -134,6 +137,9 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				{
 					Type:   types.MsgWithdrawValidatorCommission,
 					Height: 848613,
+					Data: map[string]any{
+						"ValidatorAddress": "celestiavaloper1s0lankh33kprer2l22nank5rvsuh9ksa2xcd2y",
+					},
 				},
 			},
 			idx: testsuite.Ptr(0),
@@ -195,6 +201,9 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				{
 					Type:   types.MsgWithdrawValidatorCommission,
 					Height: 848613,
+					Data: map[string]any{
+						"ValidatorAddress": "celestia1emku8jrvf9dzu80n3sx7wx50chpgjhrw46yru6",
+					},
 				},
 			},
 			idx: testsuite.Ptr(0),
