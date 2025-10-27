@@ -78,7 +78,7 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 				Height:    msg.Height,
 				Time:      msg.Time,
 				Validator: &validator,
-				Change:    validator.Commissions.Neg().Copy(),
+				Change:    amount.Neg().Copy(),
 				Type:      storageTypes.StakingLogTypeCommissions,
 			})
 
@@ -89,6 +89,5 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 		}
 	}
 
-	toTheNextAction(events, idx)
 	return nil
 }
