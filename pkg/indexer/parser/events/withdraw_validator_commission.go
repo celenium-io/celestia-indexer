@@ -30,9 +30,6 @@ func handleWithdrawValidatorCommission(ctx *context.Context, events []storage.Ev
 }
 
 func processWithdrawValidatorCommission(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	msgIdx := decoder.StringFromMap(events[*idx].Data, "msg_index")
-	newFormat := msgIdx != ""
-
 	var validator = storage.EmptyValidator()
 
 	if validatorAddress := decoder.StringFromMap(msg.Data, "ValidatorAddress"); validatorAddress != "" {
@@ -59,9 +56,9 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 		return errors.Errorf("empty validator address in WithdrawValidatorCommission: %##v", msg.Data)
 	}
 
-	for i := *idx; i < len(events); i++ {
-		if events[i].Type == storageTypes.EventTypeWithdrawCommission {
-			commission, err := decode.NewWithdrawCommission(events[i].Data)
+	for ; *idx < len(events); *idx++ {
+		if events[*idx].Type == storageTypes.EventTypeWithdrawCommission {
+			commission, err := decode.NewWithdrawCommission(events[*idx].Data)
 			if err != nil {
 				return err
 			}
@@ -72,19 +69,16 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 			amount := decimal.RequireFromString(commission.Amount.Amount.String())
 			validator.Commissions = amount.Neg()
 
-			if newFormat {
-				ctx.AddValidator(validator)
+			ctx.AddValidator(validator)
 
-				ctx.AddStakingLog(storage.StakingLog{
-					Height:    msg.Height,
-					Time:      msg.Time,
-					Validator: &validator,
-					Change:    validator.Commissions.Neg().Copy(),
-					Type:      storageTypes.StakingLogTypeCommissions,
-				})
-				*idx = i + 1
-				return nil
-			}
+			ctx.AddStakingLog(storage.StakingLog{
+				Height:    msg.Height,
+				Time:      msg.Time,
+				Validator: &validator,
+				Change:    validator.Commissions.Neg().Copy(),
+				Type:      storageTypes.StakingLogTypeCommissions,
+			})
+			break
 		}
 	}
 

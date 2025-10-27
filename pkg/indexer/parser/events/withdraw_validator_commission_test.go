@@ -214,6 +214,7 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 			for i := range tt.msgs {
 				err := handleWithdrawValidatorCommission(tt.ctx, tt.events, tt.msgs[i], tt.idx)
 				require.NoError(t, err)
+				require.Equal(t, len(tt.events)-1, *tt.idx)
 			}
 		})
 	}
