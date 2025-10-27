@@ -116,15 +116,15 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]any) error {
 		address.Balance.Unbonding = amount.Copy().Neg()
 		address.Balance.Currency = unbonding.Amount.GetDenom()
 
-		validator := &storage.Validator{
-			Address: unbonding.Validator,
-		}
-		ctx.AddValidator(*validator)
+		validator := storage.EmptyValidator()
+		validator.Address = unbonding.Validator
+		ctx.AddValidator(validator)
+
 		ctx.AddStakingLog(storage.StakingLog{
 			Time:      ctx.Block.Time,
 			Height:    ctx.Block.Height,
 			Address:   address,
-			Validator: validator,
+			Validator: &validator,
 			Change:    amount.Copy().Neg(),
 			Type:      types.StakingLogTypeUnbonded,
 		})
@@ -155,15 +155,15 @@ func parseCompleteRedelegation(ctx *context.Context, data map[string]any) error 
 			return err
 		}
 
-		validator := &storage.Validator{
-			Address: redelegation.SrcValidator,
-		}
-		ctx.AddValidator(*validator)
+		validator := storage.EmptyValidator()
+		validator.Address = redelegation.SrcValidator
+		ctx.AddValidator(validator)
+
 		ctx.AddStakingLog(storage.StakingLog{
 			Time:      ctx.Block.Time,
 			Height:    ctx.Block.Height,
 			Address:   address,
-			Validator: validator,
+			Validator: &validator,
 			Change:    amount.Copy().Neg(),
 			Type:      types.StakingLogTypeUnbonded,
 		})
