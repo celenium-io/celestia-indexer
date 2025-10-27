@@ -33,14 +33,14 @@ func (module *Module) saveDelegations(
 			if dCtx.StakingLogs[i].Address != nil {
 				addressId, ok := addrToId[dCtx.StakingLogs[i].Address.Address]
 				if !ok {
-					return errors.Wrapf(errCantFindAddress, "delegation address %s", dCtx.StakingLogs[i].Address.Address)
+					return errors.Wrapf(errCantFindAddress, "staking log address %s", dCtx.StakingLogs[i].Address.Address)
 				}
 				dCtx.StakingLogs[i].AddressId = &addressId
 			}
 
 			validatorId, ok := module.validatorsByAddress[dCtx.StakingLogs[i].Validator.Address]
 			if !ok {
-				return errors.Wrapf(errCantFindAddress, "delegation validator address %s", dCtx.StakingLogs[i].Validator.Address)
+				return errors.Wrapf(errCantFindAddress, "staking log validator address %s", dCtx.StakingLogs[i].Validator.Address)
 			}
 			dCtx.StakingLogs[i].ValidatorId = validatorId
 		}
