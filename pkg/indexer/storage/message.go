@@ -7,7 +7,6 @@ import (
 	"context"
 	"maps"
 	"slices"
-	"strconv"
 	ssync "sync"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -454,7 +453,7 @@ func (module *Module) saveMessages(
 		return 0, state.Version, errors.Wrap(err, "signals saving")
 	}
 
-	if err := module.postProcessingSignal(ctx, tx, signals, upgrades, state); err != nil {
+	if err := module.postProcessingSignal(ctx, tx, signals, upgrades); err != nil {
 		return 0, state.Version, errors.Wrap(err, "signals post processing")
 	}
 
@@ -502,28 +501,23 @@ func processGrants(addrToId map[string]uint64, grant *storage.Grant) error {
 }
 
 func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transaction) (decimal.Decimal, []storage.Validator, error) {
-	maxValsConsts, err := module.constants.Get(ctx, types.ModuleNameStaking, "max_validators")
+	maxVals, err := module.constants.Get(ctx, types.ModuleNameStaking, "max_validators")
 	if err != nil {
 		return decimal.Zero, nil, errors.Wrap(err, "get max validators value")
 	}
-	maxVals, err := strconv.Atoi(maxValsConsts.Value)
-	if err != nil {
-		return decimal.Zero, nil, errors.Wrap(err, "parse max validators value")
-	}
-
-	validators, err := tx.BondedValidators(ctx, maxVals)
+	validators, err := tx.BondedValidators(ctx, maxVals.MustInt())
 	if err != nil {
 		return decimal.Zero, nil, errors.Wrap(err, "get validators")
 	}
 
 	power := decimal.Zero
 	for i := range validators {
-		power.Add(validators[i].Stake)
+		power = power.Add(validators[i].Stake)
 	}
 	return power, validators, nil
 }
 
-func (module *Module) postProcessingSignal(ctx context.Context, tx storage.Transaction, signals []*storage.SignalVersion, upgrades *sync.Map[uint64, *storage.Upgrade], state storage.State) error {
+func (module *Module) postProcessingSignal(ctx context.Context, tx storage.Transaction, signals []*storage.SignalVersion, upgrades *sync.Map[uint64, *storage.Upgrade]) error {
 	if len(signals) == 0 {
 		return nil
 	}
@@ -541,14 +535,14 @@ func (module *Module) postProcessingSignal(ctx context.Context, tx storage.Trans
 
 		var voted decimal.Decimal
 		for i := range validators {
-			if validators[i].Version <= state.Version {
+			if validators[i].Version != version {
 				continue
 			}
 			voted = voted.Add(validators[i].Stake)
 		}
 
 		if val, ok := upgrades.Get(version); ok {
-			val.VotingPower = voted
+			val.VotedPower = voted
 			val.VotingPower = vp
 		} else {
 			return errors.Errorf("found signal without upgrade version %d", version)
