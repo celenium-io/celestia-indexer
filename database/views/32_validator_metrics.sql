@@ -3,9 +3,10 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS validator_metrics AS
         select * from state limit 1
     ),
     votes as (
-        select count(*) as value, validator_id
+        select count(distinct proposal_id) as value, validator_id
         from vote
-        where validator_id is not null
+        left join proposal on proposal.id = proposal_id
+        where validator_id is not null and proposal.status = 'applied'
         group by validator_id
     ),
     applied_proposals as (
