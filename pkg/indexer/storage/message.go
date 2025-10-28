@@ -7,8 +7,8 @@ import (
 	"context"
 	"maps"
 	"slices"
-	ssync "sync"
 
+	"github.com/celenium-io/celestia-indexer/internal/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
@@ -17,7 +17,7 @@ import (
 )
 
 var errCantFindAddress = errors.New("can't find address")
-var signalsThreshold = decimal.NewFromFloat(0.833333333) // 5/6
+var signalsThreshold = decimal.NewFromFloat(5.0 / 6.0)
 
 func (module *Module) saveMessages(
 	ctx context.Context,
@@ -318,36 +318,33 @@ func (module *Module) saveMessages(
 				return 0, state.Version, errors.Errorf("address %s not found in addrToId map", messages[i].Upgrade.Signer.Address)
 			}
 			messages[i].Upgrade.SignerId = signerId
-
 			vp, validators, err := module.totalVotingPower(ctx, tx)
 			if err != nil {
 				return 0, state.Version, errors.Wrapf(err, "receiving total voting power")
 			}
+			vp = math.Shares(vp)
+			threshold := vp.Mul(signalsThreshold)
 
-			var saveOnce ssync.Once
+			var version uint64
 			voted := decimal.Zero
 			for _, v := range validators {
-				if v.Version <= state.Version {
+				if state.Version > 0 && v.Version <= state.Version {
 					continue
 				}
-				voted = voted.Add(v.Stake)
-				if voted.GreaterThan(vp.Mul(signalsThreshold)) {
-					var err error
-					saveOnce.Do(func() {
-						messages[i].Upgrade.Version = v.Version
-						state.Version = v.Version
-						err = tx.UpdateSignalsAfterUpgrade(ctx, v.Version)
-					})
-					if err != nil {
-						return 0, state.Version, errors.Wrap(err, "updating signals after upgrade")
-					}
+				voted = voted.Add(math.Shares(v.Stake))
+				if voted.GreaterThan(threshold) && (version == 0 || v.Version < version) {
+					version = v.Version
 				}
 			}
 
-			if messages[i].Upgrade.Version > 0 {
+			if version > 0 {
+				messages[i].Upgrade.Version = version
+				state.Version = version
+				if err := tx.UpdateSignalsAfterUpgrade(ctx, version); err != nil {
+					return 0, state.Version, errors.Wrap(err, "updating signals after upgrade")
+				}
 				messages[i].Upgrade.VotingPower = vp
 				messages[i].Upgrade.VotedPower = voted
-
 				if val, ok := upgrades.Get(messages[i].Upgrade.Version); ok {
 					messages[i].Upgrade.SignalsCount = val.SignalsCount
 				}
@@ -527,18 +524,19 @@ func (module *Module) postProcessingSignal(ctx context.Context, tx storage.Trans
 		versions[signals[i].Version] = struct{}{}
 	}
 
-	for version := range versions {
-		vp, validators, err := module.totalVotingPower(ctx, tx)
-		if err != nil {
-			return errors.Wrapf(err, "receiving total voting power for upgrade version %d", version)
-		}
+	vp, validators, err := module.totalVotingPower(ctx, tx)
+	if err != nil {
+		return errors.Wrapf(err, "receiving total voting power for upgrade version")
+	}
+	vp = math.Shares(vp)
 
+	for version := range versions {
 		var voted decimal.Decimal
 		for i := range validators {
 			if validators[i].Version != version {
 				continue
 			}
-			voted = voted.Add(validators[i].Stake)
+			voted = voted.Add(math.Shares(validators[i].Stake))
 		}
 
 		if val, ok := upgrades.Get(version); ok {
