@@ -1448,6 +1448,7 @@ func (tx Transaction) BondedValidators(ctx context.Context, limit int) (validato
 	err = tx.Tx().NewSelect().Model(&validators).
 		Column("id", "stake", "version").
 		OrderExpr("stake desc").
+		Where("jailed = false").
 		Limit(limit).
 		Scan(ctx)
 	return
