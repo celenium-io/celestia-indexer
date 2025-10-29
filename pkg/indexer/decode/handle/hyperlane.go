@@ -68,10 +68,13 @@ func MsgCreateSyntheticToken(ctx *context.Context, m *hyperlaneWarp.MsgCreateSyn
 // MsgSetToken
 func MsgSetToken(ctx *context.Context, m *hyperlaneWarp.MsgSetToken) (storageTypes.MsgType, []storage.AddressWithType, error) {
 	msgType := storageTypes.MsgSetToken
-	addresses, err := createAddresses(ctx, addressesData{
+	data := addressesData{
 		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
-		{t: storageTypes.MsgAddressTypeOwner, address: m.GetNewOwner()},
-	}, ctx.Block.Height)
+	}
+	if m.GetNewOwner() != "" {
+		data = append(data, addressData{t: storageTypes.MsgAddressTypeOwner, address: m.GetNewOwner()})
+	}
+	addresses, err := createAddresses(ctx, data, ctx.Block.Height)
 	return msgType, addresses, err
 }
 
