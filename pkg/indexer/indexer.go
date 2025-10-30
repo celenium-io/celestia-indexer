@@ -104,6 +104,7 @@ func (i *Indexer) Start(ctx context.Context) {
 	i.storage.Start(ctx)
 	i.parser.Start(ctx)
 	i.receiver.Start(ctx)
+	i.rollback.Start(ctx)
 }
 
 func (i *Indexer) Close() error {
