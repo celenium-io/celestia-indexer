@@ -36,23 +36,21 @@ func processSetToken(ctx *context.Context, events []storage.Event, msg *storage.
 				return err
 			}
 
-			if setToken.NewOwner == "" {
-				return nil
-			}
+			if setToken.NewOwner != "" {
+				tokenId, err := util.DecodeHexAddress(setToken.TokenId)
+				if err != nil {
+					return errors.Wrap(err, "decode token id")
+				}
 
-			tokenId, err := util.DecodeHexAddress(setToken.TokenId)
-			if err != nil {
-				return errors.Wrap(err, "decode token id")
+				msg.HLToken = &storage.HLToken{
+					TokenId: tokenId.Bytes(),
+					Owner: &storage.Address{
+						Address: setToken.NewOwner,
+					},
+					Type: types.HLTokenTypeCollateral,
+				}
+				end = true
 			}
-
-			msg.HLToken = &storage.HLToken{
-				TokenId: tokenId.Bytes(),
-				Owner: &storage.Address{
-					Address: setToken.NewOwner,
-				},
-				Type: types.HLTokenTypeCollateral,
-			}
-			end = true
 		}
 
 		action := decoder.StringFromMap(events[*idx].Data, "action")

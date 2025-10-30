@@ -16,11 +16,12 @@ import (
 
 func Test_handleSetToken(t *testing.T) {
 	tests := []struct {
-		name   string
-		ctx    *context.Context
-		events []storage.Event
-		msg    []*storage.Message
-		idx    *int
+		name      string
+		ctx       *context.Context
+		events    []storage.Event
+		msg       []*storage.Message
+		wantEmpty bool
+		idx       *int
 	}{
 		{
 			name: "test 1",
@@ -51,7 +52,39 @@ func Test_handleSetToken(t *testing.T) {
 					Height: 1036866,
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx:       testsuite.Ptr(0),
+			wantEmpty: false,
+		}, {
+			name: "test 2: empty new owner",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 1036866,
+					Type:   "message",
+					Data: map[string]any{
+						"action": "/hyperlane.warp.v1.MsgSetToken",
+					},
+				}, {
+					Height: 1036866,
+					Type:   "hyperlane.warp.v1.EventSetToken",
+					Data: map[string]any{
+						"owner":              "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j",
+						"ism_id":             "0x726f757465725f69736d00000000000000000000000000000000000000000001",
+						"token_id":           "0x726f757465725f61707000000000000000000000000000020000000000000001",
+						"msg_index":          "0",
+						"new_owner":          "",
+						"renounce_ownership": "false",
+					},
+				},
+			},
+			msg: []*storage.Message{
+				{
+					Type:   types.MsgSetToken,
+					Height: 1036866,
+				},
+			},
+			idx:       testsuite.Ptr(0),
+			wantEmpty: true,
 		},
 	}
 	for _, tt := range tests {
@@ -63,7 +96,11 @@ func Test_handleSetToken(t *testing.T) {
 			for i := range tt.msg {
 				err := handleSetToken(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
-				require.NotNil(t, tt.msg[i].HLToken)
+				if !tt.wantEmpty {
+					require.NotNil(t, tt.msg[i].HLToken)
+				} else {
+					require.Nil(t, tt.msg[i].HLToken)
+				}
 			}
 		})
 	}

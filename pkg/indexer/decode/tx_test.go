@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"cosmossdk.io/math"
+	"github.com/bcp-innovations/hyperlane-cosmos/util"
+	hyperlaneWarp "github.com/bcp-innovations/hyperlane-cosmos/x/warp/types"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/types"
@@ -223,6 +225,35 @@ func TestDecodeCosmosTx_VoteMsg(t *testing.T) {
 	}
 	assert.Equal(t, expectedMsgs, d.Messages)
 	assert.Equal(t, "500000", d.Fee.String())
+}
+
+func TestDecodeCosmosTx_MsgSetToken(t *testing.T) {
+	rawTx, err := base64.StdEncoding.DecodeString("Ct8BCtwBCh4vaHlwZXJsYW5lLndhcnAudjEuTXNnU2V0VG9rZW4SuQEKL2NlbGVzdGlhMWxnMGU5bjRwdDI5bHBxMms0cHR1ZTRja3cwOWR4MGF1amxwZTRqEkIweDcyNmY3NTc0NjU3MjVmNjE3MDcwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMjAwMDAwMDAwMDAwMDAwMDEiQjB4NzI2Zjc1NzQ2NTcyNWY2OTczNmQwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMRJmClAKRgofL2Nvc21vcy5jcnlwdG8uc2VjcDI1NmsxLlB1YktleRIjCiEDWNM912meXMULRdagfSqXn5vi7myaXeqmuhR3K6DMYlASBAoCCAEYFhISCgwKBHV0aWESBDc3NzUQtt8EGkCEcA6E3QIjVOQI+3ufuuxCj408FXKeRhx/WrvcD2qcqjeebz+DUCKLygNkvCK+otS7gPYDycS5nZw8kBtyuTn1")
+	require.NoError(t, err)
+
+	var d = NewDecodedTx()
+	err = decodeCosmosTx(txDecoder, rawTx, &d)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), d.TimeoutHeight)
+	require.Equal(t, "", d.Memo)
+
+	tokenId, err := util.DecodeHexAddress("0x726f757465725f61707000000000000000000000000000020000000000000001")
+	require.NoError(t, err)
+
+	ismId, err := util.DecodeHexAddress("0x726f757465725f69736d00000000000000000000000000000000000000000001")
+	require.NoError(t, err)
+
+	expectedMsgs := []types.Msg{
+		&hyperlaneWarp.MsgSetToken{
+			Owner:             "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j",
+			RenounceOwnership: false,
+			NewOwner:          "",
+			TokenId:           tokenId,
+			IsmId:             &ismId,
+		},
+	}
+	require.Equal(t, expectedMsgs, d.Messages)
+	require.Equal(t, "7775", d.Fee.String())
 }
 
 func TestDecodeFee(t *testing.T) {
