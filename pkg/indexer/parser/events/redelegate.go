@@ -145,6 +145,5 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 		}
 	}
 
-	toTheNextAction(events, idx)
 	return nil
 }

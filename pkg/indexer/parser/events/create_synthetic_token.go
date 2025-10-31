@@ -77,7 +77,5 @@ func processCreateSyntheticToken(ctx *context.Context, events []storage.Event, m
 		end = len(events)-1 == *idx || action != "" || end
 		*idx += 1
 	}
-
-	toTheNextAction(events, idx)
 	return nil
 }

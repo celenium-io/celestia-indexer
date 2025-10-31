@@ -68,7 +68,6 @@ func processAcknowledgement(ctx *context.Context, events []storage.Event, msg *s
 		var action = decoder.StringFromMap(events[*idx].Data, "action")
 
 		if msg.IbcTransfer == nil {
-			toTheNextAction(events, idx)
 			return nil
 		}
 		if err := ctx.AddAddress(msg.IbcTransfer.Sender); err != nil {

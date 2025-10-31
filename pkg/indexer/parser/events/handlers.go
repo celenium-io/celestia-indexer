@@ -50,7 +50,11 @@ var eventHandlers = map[storageTypes.MsgType]EventHandler{
 
 func handle(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int, eventHandlers map[storageTypes.MsgType]EventHandler, stopKey string) error {
 	if handler, ok := eventHandlers[msg.Type]; ok {
-		return handler(ctx, events, msg, idx)
+		if err := handler(ctx, events, msg, idx); err != nil {
+			return err
+		}
+		toTheNextAction(events, idx)
+		return nil
 	}
 
 	// if event handler is not found list events to another action

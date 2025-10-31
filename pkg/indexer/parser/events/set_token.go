@@ -58,6 +58,5 @@ func processSetToken(ctx *context.Context, events []storage.Event, msg *storage.
 		*idx += 1
 	}
 
-	toTheNextAction(events, idx)
 	return nil
 }

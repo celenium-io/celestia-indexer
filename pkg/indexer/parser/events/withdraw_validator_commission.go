@@ -30,9 +30,6 @@ func handleWithdrawValidatorCommission(ctx *context.Context, events []storage.Ev
 }
 
 func processWithdrawValidatorCommission(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	msgIdx := decoder.StringFromMap(events[*idx].Data, "msg_index")
-	newFormat := msgIdx != ""
-
 	var validator = storage.EmptyValidator()
 
 	if validatorAddress := decoder.StringFromMap(msg.Data, "ValidatorAddress"); validatorAddress != "" {
@@ -81,13 +78,8 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 				Change:    amount.Neg().Copy(),
 				Type:      storageTypes.StakingLogTypeCommissions,
 			})
-
-			if !newFormat {
-				*idx++
-			}
 			break
 		}
 	}
-
 	return nil
 }

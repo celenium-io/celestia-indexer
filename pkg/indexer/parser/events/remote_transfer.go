@@ -109,6 +109,5 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event
 		*idx += 1
 	}
 
-	toTheNextAction(events, idx)
 	return nil
 }
