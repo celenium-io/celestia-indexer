@@ -1351,6 +1351,11 @@ func (s *TransactionTestSuite) TestUpdateSlashedDelegations() {
 	s.Require().Equal("-100", balances[1].Delegated.String())
 	s.Require().Equal("utia", balances[1].Currency)
 	s.Require().EqualValues(2, balances[1].Id)
+
+	delegations, err := s.storage.Delegation.ByValidator(ctx, 1, 1, 0, false)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues("9900", delegations[0].Amount.String())
 }
 
 func (s *TransactionTestSuite) TestSaveValidators() {
