@@ -924,7 +924,7 @@ func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId 
 		With("burned", burnedParts).
 		Model((*models.Delegation)(nil)).
 		TableExpr("burned").
-		Set("amount = delegation.amount * burned.amount").
+		Set("amount = delegation.amount - burned.amount").
 		Where("validator_id = ?", validatorId).
 		Where("burned.address_id = delegation.address_id").
 		Returning("delegation.address_id as id, 'utia' as currency, -burned.amount as delegated").
