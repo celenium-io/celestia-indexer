@@ -9,18 +9,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
-
-const (
-	withdrawStakeReason = "not enough self delegation"
-)
-
-type jailed struct {
-	storage.Jail
-
-	addressId uint64
-}
 
 func (module *Module) saveDelegations(
 	ctx context.Context,
@@ -76,8 +65,6 @@ func (module *Module) saveDelegations(
 		}
 	}
 
-	withdrawStake := make(map[uint64]jailed)
-
 	if len(dCtx.Redelegations) > 0 {
 		for i := range dCtx.Redelegations {
 			addressId, ok := addrToId[dCtx.Redelegations[i].Address.Address]
@@ -97,19 +84,6 @@ func (module *Module) saveDelegations(
 				return errors.Wrapf(errCantFindAddress, "dest validator address %s", dCtx.Redelegations[i].Destination.Address)
 			}
 			dCtx.Redelegations[i].DestId = destId
-
-			if id, ok := module.validatorsByDelegator[dCtx.Redelegations[i].Address.Address]; ok && id == srcId {
-				withdrawStake[id] = jailed{
-					Jail: storage.Jail{
-						Height:      dCtx.Block.Height,
-						Time:        dCtx.Block.Time,
-						ValidatorId: srcId,
-						Reason:      withdrawStakeReason,
-						Burned:      decimal.Zero,
-					},
-					addressId: addressId,
-				}
-			}
 		}
 
 		if err := tx.SaveRedelegations(ctx, dCtx.Redelegations...); err != nil {
@@ -130,19 +104,6 @@ func (module *Module) saveDelegations(
 				return errors.Wrapf(errCantFindAddress, "validator address %s", dCtx.Undelegations[i].Validator.Address)
 			}
 			dCtx.Undelegations[i].ValidatorId = validatorId
-
-			if id, ok := module.validatorsByDelegator[dCtx.Undelegations[i].Address.Address]; ok && id == validatorId {
-				withdrawStake[id] = jailed{
-					Jail: storage.Jail{
-						Height:      dCtx.Block.Height,
-						Time:        dCtx.Block.Time,
-						ValidatorId: validatorId,
-						Reason:      withdrawStakeReason,
-						Burned:      decimal.Zero,
-					},
-					addressId: addressId,
-				}
-			}
 		}
 
 		if err := tx.SaveUndelegations(ctx, dCtx.Undelegations...); err != nil {
@@ -175,32 +136,6 @@ func (module *Module) saveDelegations(
 	}
 	if err := tx.RetentionCompletedUnbondings(ctx, dCtx.Block.Time); err != nil {
 		return errors.Wrap(err, "retention completed unbondings")
-	}
-
-	for validatorId, jail := range withdrawStake {
-		validator, err := tx.Validator(ctx, validatorId)
-		if err != nil {
-			return errors.Wrap(err, "can't find validator")
-		}
-		delegation, err := tx.Delegation(ctx, validatorId, jail.addressId)
-		if err != nil {
-			return errors.Wrap(err, "can't find delegation")
-		}
-		if delegation.Amount.IsPositive() && delegation.Amount.GreaterThanOrEqual(validator.MinSelfDelegation) {
-			continue
-		}
-
-		j := true
-		validator.Jailed = &j
-		validator.Stake = decimal.Zero
-
-		if err := tx.Jail(ctx, &validator); err != nil {
-			return errors.Wrap(err, "jail on withdraw stake")
-		}
-
-		if err := tx.SaveJails(ctx, jail.Jail); err != nil {
-			return errors.Wrap(err, "save jail on withdraw stake")
-		}
 	}
 
 	return nil
