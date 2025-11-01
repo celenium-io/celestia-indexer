@@ -86,7 +86,7 @@ func parseCoinReceived(ctx *context.Context, data map[string]any, height pkgType
 	return ctx.AddAddress(address)
 }
 
-func parseCompleteUnbonding(ctx *context.Context, data map[string]any, height pkgTypes.Level) error {
+func parseCompleteUnbonding(ctx *context.Context, data map[string]any) error {
 	unbonding, err := decode.NewCompleteUnbonding(data)
 	if err != nil {
 		return err
@@ -98,8 +98,8 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]any, height pk
 
 	address := &storage.Address{
 		Address:    unbonding.Delegator,
-		Height:     height,
-		LastHeight: height,
+		Height:     ctx.Block.Height,
+		LastHeight: ctx.Block.Height,
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
 			Spendable: decimal.Zero,
@@ -115,6 +115,58 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]any, height pk
 		}
 		address.Balance.Unbonding = amount.Copy().Neg()
 		address.Balance.Currency = unbonding.Amount.GetDenom()
+
+		validator := storage.EmptyValidator()
+		validator.Address = unbonding.Validator
+		ctx.AddValidator(validator)
+
+		ctx.AddStakingLog(storage.StakingLog{
+			Time:      ctx.Block.Time,
+			Height:    ctx.Block.Height,
+			Address:   address,
+			Validator: &validator,
+			Change:    amount.Copy().Neg(),
+			Type:      types.StakingLogTypeUnbonded,
+		})
+	}
+	return ctx.AddAddress(address)
+}
+
+func parseCompleteRedelegation(ctx *context.Context, data map[string]any) error {
+	redelegation, err := decode.NewCompleteRedelegation(data)
+	if err != nil {
+		return err
+	}
+
+	if redelegation.SrcValidator == "" || redelegation.DestValidator == "" || redelegation.Delegator == "" {
+		return nil
+	}
+
+	address := &storage.Address{
+		Address:    redelegation.Delegator,
+		Height:     ctx.Block.Height,
+		LastHeight: ctx.Block.Height,
+		Balance:    storage.EmptyBalance(),
+	}
+
+	if redelegation.Amount != nil {
+		amount, err := decimal.NewFromString(redelegation.Amount.Amount.String())
+		if err != nil {
+			return err
+		}
+
+		validator := storage.EmptyValidator()
+		validator.Address = redelegation.SrcValidator
+		ctx.AddValidator(validator)
+
+		ctx.AddStakingLog(storage.StakingLog{
+			Time:      ctx.Block.Time,
+			Height:    ctx.Block.Height,
+			Address:   address,
+			Validator: &validator,
+			Change:    amount.Copy().Neg(),
+			Type:      types.StakingLogTypeUnbonded,
+		})
 	}
 	return ctx.AddAddress(address)
 }

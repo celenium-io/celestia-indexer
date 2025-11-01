@@ -39,6 +39,8 @@ func MsgSignalVersion(ctx *context.Context, status storageTypes.Status, m *signa
 	ctx.AddUpgrade(storage.Upgrade{
 		Version:      m.Version,
 		SignalsCount: 1,
+		Height:       ctx.Block.Height,
+		Time:         ctx.Block.Time,
 	})
 	return msgType, addresses, signal, err
 }
@@ -58,11 +60,13 @@ func MsgTryUpgrade(ctx *context.Context, status storageTypes.Status, m *signalTy
 	}
 
 	upgrade := &storage.Upgrade{
-		Height: ctx.Block.Height,
+		Height:    ctx.Block.Height,
+		Time:      ctx.Block.Time,
+		EndTime:   ctx.Block.Time,
+		EndHeight: ctx.Block.Height,
 		Signer: &storage.Address{
 			Address: m.Signer,
 		},
-		Time: ctx.Block.Time,
 	}
 	return msgType, addresses, upgrade, err
 }

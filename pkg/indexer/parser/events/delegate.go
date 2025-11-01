@@ -117,6 +117,5 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 
 	}
 
-	toTheNextAction(events, idx)
 	return nil
 }

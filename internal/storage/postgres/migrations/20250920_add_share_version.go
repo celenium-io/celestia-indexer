@@ -14,7 +14,7 @@ func init() {
 }
 
 func upAddShareVersionColumns(ctx context.Context, db *bun.DB) error {
-	if _, err := db.ExecContext(ctx, `ALTER TABLE public."blob_log" ADD "share_version" int4 DEFAULT 0`); err != nil {
+	if _, err := db.ExecContext(ctx, `ALTER TABLE public."blob_log" ADD COLUMN IF NOT EXISTS "share_version" int4 DEFAULT 0`); err != nil {
 		return err
 	}
 	if _, err := db.ExecContext(ctx, `ALTER TABLE public."blob_log" ALTER COLUMN "share_version" SET STORAGE PLAIN`); err != nil {

@@ -95,7 +95,5 @@ func processWithdrawDelegatorRewards(ctx *context.Context, events []storage.Even
 			}
 		}
 	}
-
-	toTheNextAction(events, idx)
 	return nil
 }

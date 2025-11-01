@@ -71,7 +71,5 @@ func processChannelOpenInit(_ *context.Context, events []storage.Event, msg *sto
 		ConnectionId:  cc.ConnectionId,
 		ChannelsCount: 1,
 	}
-
-	toTheNextAction(events, idx)
 	return nil
 }

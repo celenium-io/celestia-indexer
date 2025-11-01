@@ -77,7 +77,5 @@ func processCreateCollateralToken(ctx *context.Context, events []storage.Event, 
 		end = len(events)-1 == *idx || action != "" || end
 		*idx += 1
 	}
-
-	toTheNextAction(events, idx)
 	return nil
 }

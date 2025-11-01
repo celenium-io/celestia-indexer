@@ -25,7 +25,7 @@ type msg struct {
 }
 
 func upAddCreationTimeValidator(ctx context.Context, db *bun.DB) error {
-	if _, err := db.NewRaw("ALTER TABLE public.validator ADD IF NOT EXISTS creation_time timestamptz NULL").Exec(ctx); err != nil {
+	if _, err := db.NewRaw("ALTER TABLE public.validator ADD COLUMN IF NOT EXISTS creation_time timestamptz NULL").Exec(ctx); err != nil {
 		return err
 	}
 	if _, err := db.NewRaw("ALTER TABLE public.validator ALTER COLUMN creation_time SET STORAGE PLAIN").Exec(ctx); err != nil {

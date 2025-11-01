@@ -46,3 +46,11 @@ func (c Constant) MustUint32() uint32 {
 	//nolint:gosec
 	return uint32(i)
 }
+
+func (c Constant) MustInt() int {
+	i, err := strconv.Atoi(c.Value)
+	if err != nil {
+		panic(err)
+	}
+	return i
+}

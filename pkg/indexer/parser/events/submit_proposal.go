@@ -59,7 +59,5 @@ func processSubmitProposal(ctx *context.Context, events []storage.Event, msg *st
 		}
 	}
 	ctx.AddProposal(msg.Proposal)
-
-	toTheNextAction(events, idx)
 	return nil
 }

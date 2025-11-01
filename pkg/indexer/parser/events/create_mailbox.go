@@ -82,7 +82,5 @@ func processCreateMailbox(ctx *context.Context, events []storage.Event, msg *sto
 		end = len(events)-1 == *idx || action != "" || end
 		*idx += 1
 	}
-
-	toTheNextAction(events, idx)
 	return nil
 }

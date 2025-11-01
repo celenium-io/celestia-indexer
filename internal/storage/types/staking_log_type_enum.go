@@ -25,6 +25,10 @@ const (
 	StakingLogTypeRewards StakingLogType = "rewards"
 	// StakingLogTypeCommissions is a StakingLogType of type commissions.
 	StakingLogTypeCommissions StakingLogType = "commissions"
+	// StakingLogTypeUnbonded is a StakingLogType of type unbonded.
+	StakingLogTypeUnbonded StakingLogType = "unbonded"
+	// StakingLogTypeSlashing is a StakingLogType of type slashing.
+	StakingLogTypeSlashing StakingLogType = "slashing"
 )
 
 var ErrInvalidStakingLogType = fmt.Errorf("not a valid StakingLogType, try [%s]", strings.Join(_StakingLogTypeNames, ", "))
@@ -34,6 +38,8 @@ var _StakingLogTypeNames = []string{
 	string(StakingLogTypeUnbonding),
 	string(StakingLogTypeRewards),
 	string(StakingLogTypeCommissions),
+	string(StakingLogTypeUnbonded),
+	string(StakingLogTypeSlashing),
 }
 
 // StakingLogTypeNames returns a list of possible string values of StakingLogType.
@@ -50,6 +56,8 @@ func StakingLogTypeValues() []StakingLogType {
 		StakingLogTypeUnbonding,
 		StakingLogTypeRewards,
 		StakingLogTypeCommissions,
+		StakingLogTypeUnbonded,
+		StakingLogTypeSlashing,
 	}
 }
 
@@ -70,6 +78,8 @@ var _StakingLogTypeValue = map[string]StakingLogType{
 	"unbonding":   StakingLogTypeUnbonding,
 	"rewards":     StakingLogTypeRewards,
 	"commissions": StakingLogTypeCommissions,
+	"unbonded":    StakingLogTypeUnbonded,
+	"slashing":    StakingLogTypeSlashing,
 }
 
 // ParseStakingLogType attempts to convert a string to a StakingLogType.

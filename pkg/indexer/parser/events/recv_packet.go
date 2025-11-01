@@ -80,13 +80,11 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 			}
 			msg.Addresses = append(msg.Addresses, decodedMsg.Addresses...)
 		}
-		toTheNextAction(events, idx)
 
 	case "transfer":
 		var action = decoder.StringFromMap(events[*idx].Data, "action")
 
 		if msg.IbcTransfer == nil {
-			toTheNextAction(events, idx)
 			return nil
 		}
 
