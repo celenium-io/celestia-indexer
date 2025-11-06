@@ -43,7 +43,7 @@ func processDeposit(ctx *context.Context, events []storage.Event, msg *storage.M
 	}
 
 	*idx += 1
-	for len(events) > *idx {
+	for ; len(events) > *idx; *idx += 1 {
 		if events[*idx].Type == types.EventTypeProposalDeposit {
 			votingPeriodStart, err := decoder.Uint64FromMap(events[*idx].Data, "voting_period_start")
 			if err != nil {
@@ -55,7 +55,10 @@ func processDeposit(ctx *context.Context, events []storage.Event, msg *storage.M
 			}
 			break
 		}
-		*idx += 1
+
+		if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "" {
+			break
+		}
 	}
 	ctx.AddProposal(msg.Proposal)
 
