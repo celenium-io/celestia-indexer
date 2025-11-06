@@ -114,6 +114,5 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 		}
 	}
 
-	toTheNextAction(events, idx)
 	return nil
 }

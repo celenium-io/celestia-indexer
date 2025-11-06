@@ -5,7 +5,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -531,7 +530,20 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 			Column("yes_vals", "no_vals", "no_with_veto_vals", "abstain_vals", "yes_addrs", "no_addrs", "no_with_veto_addrs", "abstain_addrs", "votes_count", "voting_power", "yes_voting_power", "no_voting_power", "no_with_veto_voting_power", "abstain_voting_power").
 			Column("total_voting_power", "quorum", "veto_quorum", "threshold", "min_deposit", "end_time", "error").
 			Model(&add).
-			On("CONFLICT (id) DO UPDATE")
+			On("CONFLICT (id) DO UPDATE").
+			Set("votes_count = added_proposal.votes_count + EXCLUDED.votes_count").
+			Set("yes = added_proposal.yes + EXCLUDED.yes").
+			Set("no = added_proposal.no + EXCLUDED.no").
+			Set("no_with_veto = added_proposal.no_with_veto + EXCLUDED.no_with_veto").
+			Set("abstain = added_proposal.abstain + EXCLUDED.abstain").
+			Set("yes_vals = added_proposal.yes_vals + EXCLUDED.yes_vals").
+			Set("no_vals = added_proposal.no_vals + EXCLUDED.no_vals").
+			Set("no_with_veto_vals = added_proposal.no_with_veto_vals + EXCLUDED.no_with_veto_vals").
+			Set("abstain_vals = added_proposal.abstain_vals + EXCLUDED.abstain_vals").
+			Set("yes_addrs = added_proposal.yes_addrs + EXCLUDED.yes_addrs").
+			Set("no_addrs = added_proposal.no_addrs + EXCLUDED.no_addrs").
+			Set("no_with_veto_addrs = added_proposal.no_with_veto_addrs + EXCLUDED.no_with_veto_addrs").
+			Set("abstain_addrs = added_proposal.abstain_addrs + EXCLUDED.abstain_addrs")
 
 		if proposals[i].Deposit.IsPositive() {
 			query.Set("deposit = added_proposal.deposit + EXCLUDED.deposit")
@@ -547,10 +559,6 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 
 		if proposals[i].EndTime != nil {
 			query.Set("end_time = EXCLUDED.end_time")
-		}
-
-		if proposals[i].VotesCount > 0 {
-			query.Set("votes_count = added_proposal.votes_count + EXCLUDED.votes_count")
 		}
 
 		if proposals[i].VotingPower.IsPositive() {
@@ -574,45 +582,6 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 		}
 		if proposals[i].Error != "" {
 			query.Set("error = EXCLUDED.error")
-		}
-
-		if proposals[i].Yes > 0 {
-			query.Set("yes = added_proposal.yes + EXCLUDED.yes")
-		}
-		if proposals[i].No > 0 {
-			query.Set("no = added_proposal.no + EXCLUDED.no")
-		}
-		if proposals[i].NoWithVeto > 0 {
-			query.Set("no_with_veto = added_proposal.no_with_veto + EXCLUDED.no_with_veto")
-		}
-		if proposals[i].Abstain > 0 {
-			query.Set("abstain = added_proposal.abstain + EXCLUDED.abstain")
-		}
-
-		if proposals[i].YesValidators > 0 {
-			query.Set("yes_vals = added_proposal.yes_vals + EXCLUDED.yes_vals")
-		}
-		if proposals[i].NoValidators > 0 {
-			query.Set("no_vals = added_proposal.no_vals + EXCLUDED.no_vals")
-		}
-		if proposals[i].NoWithVetoValidators > 0 {
-			query.Set("no_with_veto_vals = added_proposal.no_with_veto_vals + EXCLUDED.no_with_veto_vals")
-		}
-		if proposals[i].AbstainValidators > 0 {
-			query.Set("abstain_vals = added_proposal.abstain_vals + EXCLUDED.abstain_vals")
-		}
-
-		if proposals[i].YesAddress > 0 {
-			query.Set("yes_addrs = added_proposal.yes_addrs + EXCLUDED.yes_addrs")
-		}
-		if proposals[i].NoAddress > 0 {
-			query.Set("no_addrs = added_proposal.no_addrs+ EXCLUDED.no_addrs")
-		}
-		if proposals[i].NoWithVetoAddress > 0 {
-			query.Set("no_with_veto_addrs = added_proposal.no_with_veto_addrs + EXCLUDED.no_with_veto_addrs")
-		}
-		if proposals[i].AbstainAddress > 0 {
-			query.Set("abstain_addrs = added_proposal.abstain_addrs + EXCLUDED.abstain_addrs")
 		}
 
 		if proposals[i].YesVotingPower.IsPositive() {
@@ -642,11 +611,12 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 
 var one = decimal.NewFromInt(1)
 
-func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) error {
+func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) (map[uint64]*models.VotesCount, error) {
 	if len(votes) == 0 {
-		return nil
+		return nil, nil
 	}
 
+	var votesCount = make(map[uint64]*models.VotesCount)
 	for i := range votes {
 		var existsVotes []models.Vote
 		query := tx.Tx().NewSelect().
@@ -659,24 +629,45 @@ func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) erro
 		if votes[i].ValidatorId != nil {
 			query.Where("validator_id = ?", *votes[i].ValidatorId)
 		}
-		if err := query.Scan(ctx); err != nil && !errors.Is(err, sql.ErrNoRows) {
-			return errors.Wrap(err, "receive existing votes")
+		if err := query.Scan(ctx); err != nil {
+			return nil, errors.Wrap(err, "receive existing votes")
 		}
-		ids := make([]uint64, len(existsVotes))
-		total := votes[i].Weight.Copy()
-		for j, vote := range existsVotes {
-			total = total.Add(vote.Weight)
-			ids[j] = vote.Id
-		}
-		if total.GreaterThan(one) {
-			if _, err := tx.Tx().NewDelete().Model((*models.Vote)(nil)).Where("id IN (?)", bun.In(ids)).Exec(ctx); err != nil {
-				return errors.Wrap(err, "remove existing votes")
+
+		if len(existsVotes) > 0 {
+			ids := make([]uint64, len(existsVotes))
+			totalWeight := votes[i].Weight.Copy()
+			for j := range existsVotes {
+				totalWeight = totalWeight.Add(existsVotes[j].Weight)
+				ids[j] = existsVotes[j].Id
 			}
+			if totalWeight.GreaterThan(one) {
+				if _, err := tx.Tx().NewDelete().Model((*models.Vote)(nil)).Where("id IN (?)", bun.In(ids)).Exec(ctx); err != nil {
+					return nil, errors.Wrap(err, "remove existing votes")
+				}
+
+				for _, vote := range existsVotes {
+					if vc, ok := votesCount[vote.ProposalId]; ok {
+						vc.Update(-1, vote)
+					} else {
+						var vc models.VotesCount
+						vc.Update(-1, vote)
+						votesCount[vote.ProposalId] = &vc
+					}
+				}
+			}
+		}
+
+		if vc, ok := votesCount[votes[i].ProposalId]; ok {
+			vc.Update(1, *votes[i])
+		} else {
+			var vc models.VotesCount
+			vc.Update(1, *votes[i])
+			votesCount[votes[i].ProposalId] = &vc
 		}
 	}
 
 	_, err := tx.Tx().NewInsert().Model(&votes).Exec(ctx)
-	return err
+	return votesCount, err
 }
 
 type addedIbcClient struct {
@@ -933,7 +924,7 @@ func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId 
 		With("burned", burnedParts).
 		Model((*models.Delegation)(nil)).
 		TableExpr("burned").
-		Set("amount = delegation.amount * burned.amount").
+		Set("amount = delegation.amount - burned.amount").
 		Where("validator_id = ?", validatorId).
 		Where("burned.address_id = delegation.address_id").
 		Returning("delegation.address_id as id, 'utia' as currency, -burned.amount as delegated").
@@ -1446,6 +1437,8 @@ func (tx Transaction) RefreshLeaderboard(ctx context.Context) error {
 
 func (tx Transaction) ActiveProposals(ctx context.Context) (proposals []models.Proposal, err error) {
 	err = tx.Tx().NewSelect().Model(&proposals).
+		Column("id", "proposer_id", "height", "created_at", "deposit_time", "activation_time", "status", "type", "title", "description", "metadata", "changes").
+		Column("quorum", "veto_quorum", "threshold", "min_deposit", "end_time", "error").
 		Where("status = ?", storageTypes.ProposalStatusActive).
 		Scan(ctx)
 	return
@@ -1455,6 +1448,7 @@ func (tx Transaction) BondedValidators(ctx context.Context, limit int) (validato
 	err = tx.Tx().NewSelect().Model(&validators).
 		Column("id", "stake", "version").
 		OrderExpr("stake desc").
+		Where("jailed = false").
 		Limit(limit).
 		Scan(ctx)
 	return
@@ -1462,7 +1456,8 @@ func (tx Transaction) BondedValidators(ctx context.Context, limit int) (validato
 
 func (tx Transaction) ProposalVotes(ctx context.Context, proposalId uint64, limit, offset int) (votes []models.Vote, err error) {
 	query := tx.Tx().NewSelect().Model(&votes).
-		Where("proposal_id = ?", proposalId)
+		Where("proposal_id = ?", proposalId).
+		OrderExpr("id asc")
 
 	if limit < 1 {
 		limit = 10
@@ -1479,6 +1474,7 @@ func (tx Transaction) ProposalVotes(ctx context.Context, proposalId uint64, limi
 func (tx Transaction) AddressDelegations(ctx context.Context, addressId uint64) (val []models.Delegation, err error) {
 	err = tx.Tx().NewSelect().Model(&val).
 		Where("address_id = ?", addressId).
+		Where("amount > 0").
 		Scan(ctx)
 	return
 }

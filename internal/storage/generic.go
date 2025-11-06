@@ -112,7 +112,7 @@ type Transaction interface {
 	SaveJails(ctx context.Context, jails ...Jail) error
 	SaveBlockSignatures(ctx context.Context, signs ...BlockSignature) error
 	SaveProposals(ctx context.Context, proposals ...*Proposal) (int64, error)
-	SaveVotes(ctx context.Context, votes ...*Vote) error
+	SaveVotes(ctx context.Context, votes ...*Vote) (map[uint64]*VotesCount, error)
 	SaveIbcClients(ctx context.Context, clients ...*IbcClient) (int64, error)
 	SaveIbcConnections(ctx context.Context, connections ...*IbcConnection) error
 	SaveIbcChannels(ctx context.Context, channels ...*IbcChannel) error

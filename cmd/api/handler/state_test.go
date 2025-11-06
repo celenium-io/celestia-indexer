@@ -14,6 +14,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
@@ -25,6 +26,7 @@ type StateTestSuite struct {
 	suite.Suite
 	state      *mock.MockIState
 	validators *mock.MockIValidator
+	constants  *mock.MockIConstant
 	echo       *echo.Echo
 	handler    *StateHandler
 	ctrl       *gomock.Controller
@@ -37,7 +39,8 @@ func (s *StateTestSuite) SetupSuite() {
 	s.ctrl = gomock.NewController(s.T())
 	s.state = mock.NewMockIState(s.ctrl)
 	s.validators = mock.NewMockIValidator(s.ctrl)
-	s.handler = NewStateHandler(s.state, s.validators, testIndexerName)
+	s.constants = mock.NewMockIConstant(s.ctrl)
+	s.handler = NewStateHandler(s.state, s.validators, s.constants, testIndexerName)
 }
 
 // TearDownSuite -
@@ -57,8 +60,17 @@ func (s *StateTestSuite) TestHead() {
 	c.SetPath("/head")
 
 	s.validators.EXPECT().
-		TotalVotingPower(gomock.Any()).
+		TotalVotingPower(gomock.Any(), 100).
 		Return(decimal.RequireFromString("100"), nil).
+		Times(1)
+
+	s.constants.EXPECT().
+		Get(gomock.Any(), types.ModuleNameStaking, "max_validators").
+		Return(storage.Constant{
+			Module: types.ModuleNameStaking,
+			Name:   "max_validators",
+			Value:  "100",
+		}, nil).
 		Times(1)
 
 	s.state.EXPECT().

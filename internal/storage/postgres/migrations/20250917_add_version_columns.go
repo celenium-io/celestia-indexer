@@ -16,7 +16,7 @@ func init() {
 
 func upAddVersionColumns(ctx context.Context, db *bun.DB) error {
 	// Create validator's version column
-	if _, err := db.ExecContext(ctx, `ALTER TABLE public."validator" ADD "version" int8 NULL`); err != nil {
+	if _, err := db.ExecContext(ctx, `ALTER TABLE public."validator" ADD COLUMN IF NOT EXISTS "version" int8 NULL`); err != nil {
 		return err
 	}
 	if _, err := db.ExecContext(ctx, `ALTER TABLE public."validator" ALTER COLUMN "version" SET STORAGE PLAIN`); err != nil {
@@ -41,7 +41,7 @@ func upAddVersionColumns(ctx context.Context, db *bun.DB) error {
 	}
 
 	// Create version column at the state
-	if _, err := db.ExecContext(ctx, `ALTER TABLE public.state ADD "version" int8 NULL`); err != nil {
+	if _, err := db.ExecContext(ctx, `ALTER TABLE public.state ADD COLUMN IF NOT EXISTS "version" int8 NULL`); err != nil {
 		return err
 	}
 	if _, err := db.ExecContext(ctx, `ALTER TABLE public.state ALTER COLUMN "version" SET STORAGE PLAIN`); err != nil {

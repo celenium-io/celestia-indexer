@@ -32,54 +32,33 @@ func handleWithdrawValidatorCommission(ctx *context.Context, events []storage.Ev
 func processWithdrawValidatorCommission(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	var validator = storage.EmptyValidator()
 
-	var newFormat bool
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action == msgWithdrawValidatorCommission {
-		if sender := decoder.StringFromMap(events[*idx].Data, "sender"); sender != "" {
-			prefix, hash, err := types.Address(sender).Decode()
+	if validatorAddress := decoder.StringFromMap(msg.Data, "ValidatorAddress"); validatorAddress != "" {
+		prefix, hash, err := types.Address(validatorAddress).Decode()
+		if err != nil {
+			return errors.Wrap(err, "decoding sender in WithdrawValidatorCommission")
+		}
+
+		switch prefix {
+		case types.AddressPrefixCelestia:
+			address, err := types.NewValoperAddressFromBytes(hash)
 			if err != nil {
-				return errors.Wrap(err, "decoding sender in WithdrawValidatorCommission")
+				return errors.Wrap(err, "creating valoper address in WithdrawValidatorCommission")
 			}
-
-			switch prefix {
-			case types.AddressPrefixCelestia:
-				address, err := types.NewValoperAddressFromBytes(hash)
-				if err != nil {
-					return errors.Wrap(err, "creating valoper address in WithdrawValidatorCommission")
-				}
-				validator.Address = address.String()
-			case types.AddressPrefixValoper:
-				validator.Address = sender
-			default:
-				return errors.Errorf("unexpected sender address prefix in WithdrawValidatorCommission: %s", prefix)
-			}
-
-			*idx += 1
-			newFormat = true
+			validator.Address = address.String()
+		case types.AddressPrefixValoper:
+			validator.Address = validatorAddress
+		default:
+			return errors.Errorf("unexpected sender address prefix in WithdrawValidatorCommission: %s", prefix)
 		}
 	}
 
-	for i := *idx; i < len(events); i++ {
-		switch events[i].Type {
-		case storageTypes.EventTypeMessage:
-			if module := decoder.StringFromMap(events[i].Data, "module"); module == storageTypes.ModuleNameDistribution.String() {
-				if !validator.Commissions.IsZero() {
-					validator.Address = decoder.StringFromMap(events[i].Data, "sender")
-					ctx.AddValidator(validator)
+	if validator.Address == "" {
+		return errors.Errorf("empty validator address in WithdrawValidatorCommission: %##v", msg.Data)
+	}
 
-					ctx.AddStakingLog(storage.StakingLog{
-						Height:    msg.Height,
-						Time:      msg.Time,
-						Validator: &validator,
-						Change:    validator.Commissions.Copy(),
-						Type:      storageTypes.StakingLogTypeCommissions,
-					})
-				}
-
-				*idx = i + 1
-				return nil
-			}
-		case storageTypes.EventTypeWithdrawCommission:
-			commission, err := decode.NewWithdrawCommission(events[i].Data)
+	for ; *idx < len(events); *idx++ {
+		if events[*idx].Type == storageTypes.EventTypeWithdrawCommission {
+			commission, err := decode.NewWithdrawCommission(events[*idx].Data)
 			if err != nil {
 				return err
 			}
@@ -90,22 +69,17 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 			amount := decimal.RequireFromString(commission.Amount.Amount.String())
 			validator.Commissions = amount.Neg()
 
-			if newFormat {
-				ctx.AddValidator(validator)
+			ctx.AddValidator(validator)
 
-				ctx.AddStakingLog(storage.StakingLog{
-					Height:    msg.Height,
-					Time:      msg.Time,
-					Validator: &validator,
-					Change:    validator.Commissions.Copy(),
-					Type:      storageTypes.StakingLogTypeCommissions,
-				})
-				*idx = i + 1
-				return nil
-			}
+			ctx.AddStakingLog(storage.StakingLog{
+				Height:    msg.Height,
+				Time:      msg.Time,
+				Validator: &validator,
+				Change:    amount.Neg().Copy(),
+				Type:      storageTypes.StakingLogTypeCommissions,
+			})
+			break
 		}
 	}
-
-	toTheNextAction(events, idx)
 	return nil
 }

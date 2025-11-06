@@ -249,7 +249,7 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 var dispatcher *bus.Dispatcher
 
 func initDispatcher(ctx context.Context, db postgres.Storage) {
-	d, err := bus.NewDispatcher(db, db.Validator)
+	d, err := bus.NewDispatcher(db, db.Validator, db.Constants)
 	if err != nil {
 		panic(err)
 	}
@@ -286,7 +286,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 
 	v1 := e.Group("v1")
 
-	stateHandlers := handler.NewStateHandler(db.State, db.Validator, cfg.Indexer.Name)
+	stateHandlers := handler.NewStateHandler(db.State, db.Validator, db.Constants, cfg.Indexer.Name)
 	v1.GET("/head", stateHandlers.Head)
 
 	defaultMiddlewareCache := cache.Middleware(ttlCache, nil, nil)

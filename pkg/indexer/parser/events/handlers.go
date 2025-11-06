@@ -73,7 +73,11 @@ func handle(ctx *context.Context, events []storage.Event, msg *storage.Message, 
 }
 
 func Handle(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	return handle(ctx, events, msg, idx, eventHandlers, "action")
+	if err := handle(ctx, events, msg, idx, eventHandlers, "action"); err != nil {
+		return err
+	}
+	toTheNextAction(events, idx)
+	return nil
 }
 
 var ibcEventHandlers = map[storageTypes.MsgType]EventHandler{

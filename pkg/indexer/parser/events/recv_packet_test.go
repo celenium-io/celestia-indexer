@@ -748,9 +748,7 @@ func Test_handleRecvPacket(t *testing.T) {
 					Data: map[string]any{
 						"module": "ibc_channel",
 					},
-				},
-
-				{
+				}, {
 					Height: 2432340,
 					Type:   "message",
 					Data: map[string]any{
@@ -1099,6 +1097,7 @@ func Test_handleRecvPacket(t *testing.T) {
 				if tt.msg[i].IbcTransfer != nil {
 					require.NotEmpty(t, tt.msg[i].IbcTransfer.ConnectionId)
 				}
+				toTheNextAction(tt.events, tt.idx)
 			}
 		})
 	}

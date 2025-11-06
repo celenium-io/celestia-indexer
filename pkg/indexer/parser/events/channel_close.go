@@ -40,6 +40,5 @@ func processChannelClose(_ *context.Context, events []storage.Event, msg *storag
 		Status: storageTypes.IbcChannelStatusClosed,
 	}
 
-	toTheNextAction(events, idx)
 	return nil
 }
