@@ -42,11 +42,18 @@ func processDeposit(ctx *context.Context, events []storage.Event, msg *storage.M
 		Status:  types.ProposalStatusInactive,
 	}
 
-	*idx += 2
-	if len(events) > *idx {
+	*idx += 1
+	for len(events) > *idx {
 		if events[*idx].Type == types.EventTypeProposalDeposit {
-			msg.Proposal.Status = types.ProposalStatusActive
-			msg.Proposal.ActivationTime = &ctx.Block.Time
+			votingPeriodStart, err := decoder.Uint64FromMap(events[*idx].Data, "voting_period_start")
+			if err != nil {
+				return errors.Errorf("submit proposal can't receive voting_period_start: %##v", events[*idx].Data)
+			}
+			if votingPeriodStart == proposalId {
+				msg.Proposal.Status = types.ProposalStatusActive
+				msg.Proposal.ActivationTime = &ctx.Block.Time
+			}
+			break
 		}
 		*idx += 1
 	}

@@ -160,6 +160,140 @@ func Test_handleDeposit(t *testing.T) {
 				Status:  types.ProposalStatusInactive,
 				Deposit: decimal.RequireFromString("9990000000"),
 			},
+		}, {
+			name: "deposit test 3",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 1745041,
+					Type:   "message",
+					Data: map[string]any{
+						"action": "/cosmos.gov.v1.MsgDeposit",
+					},
+				}, {
+					Height: 1745041,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":    "9000000000utia",
+						"msg_index": "0",
+						"spender":   "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
+					},
+				}, {
+					Height: 1745041,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":    "9000000000utia",
+						"msg_index": "0",
+						"receiver":  "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+					},
+				}, {
+					Height: 1745041,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "9000000000utia",
+						"msg_index": "0",
+						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+						"sender":    "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
+					},
+				}, {
+					Height: 1745041,
+					Type:   "message",
+					Data: map[string]any{
+						"msg_index": "0",
+						"sender":    "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
+					},
+				}, {
+					Height: 1745041,
+					Type:   "proposal_deposit",
+					Data: map[string]any{
+						"amount":      "9000000000utia",
+						"depositor":   "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
+						"msg_index":   "0",
+						"proposal_id": "7",
+					},
+				}, {
+					Height: 1745041,
+					Type:   "proposal_deposit",
+					Data: map[string]any{
+						"msg_index":           "0",
+						"voting_period_start": "7",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgDeposit,
+				Height: 1745041,
+			},
+			idx: testsuite.Ptr(0),
+			proposal: storage.Proposal{
+				Id:             7,
+				ActivationTime: &ts,
+				Status:         types.ProposalStatusActive,
+				Deposit:        decimal.RequireFromString("9000000000"),
+			},
+		}, {
+			name: "deposit test 4",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 1745041,
+					Type:   "message",
+					Data: map[string]any{
+						"action": "/cosmos.gov.v1.MsgDeposit",
+					},
+				}, {
+					Height: 1745041,
+					Type:   "coin_spent",
+					Data: map[string]any{
+						"amount":    "100000000utia",
+						"msg_index": "0",
+						"spender":   "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
+					},
+				}, {
+					Height: 1745041,
+					Type:   "coin_received",
+					Data: map[string]any{
+						"amount":    "100000000utia",
+						"msg_index": "0",
+						"receiver":  "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+					},
+				}, {
+					Height: 1745041,
+					Type:   "transfer",
+					Data: map[string]any{
+						"amount":    "100000000utia",
+						"msg_index": "0",
+						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+						"sender":    "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
+					},
+				}, {
+					Height: 1745041,
+					Type:   "message",
+					Data: map[string]any{
+						"msg_index": "0",
+						"sender":    "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
+					},
+				}, {
+					Height: 1745041,
+					Type:   "proposal_deposit",
+					Data: map[string]any{
+						"amount":      "100000000utia",
+						"depositor":   "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
+						"msg_index":   "0",
+						"proposal_id": "7",
+					},
+				},
+			},
+			msg: &storage.Message{
+				Type:   types.MsgDeposit,
+				Height: 1745041,
+			},
+			idx: testsuite.Ptr(0),
+			proposal: storage.Proposal{
+				Id:      7,
+				Status:  types.ProposalStatusInactive,
+				Deposit: decimal.RequireFromString("100000000"),
+			},
 		},
 	}
 	for _, tt := range tests {
