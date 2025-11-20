@@ -41,7 +41,7 @@ func upAddUpgradeStatusColumns(ctx context.Context, db *bun.DB) error {
 		return err
 	}
 
-	if _, err := db.ExecContext(ctx, `ALTER TABLE public."upgrade" ADD COLUMN IF NOT EXISTS "applied_at" timestamptz NOT NULL`); err != nil {
+	if _, err := db.ExecContext(ctx, `ALTER TABLE public."upgrade" ADD COLUMN IF NOT EXISTS "applied_at" timestamptz NOT NULL DEFAULT '0001-01-01 00:00:00+00'`); err != nil {
 		return err
 	}
 	if _, err := db.ExecContext(ctx, `ALTER TABLE public."upgrade" ALTER COLUMN "applied_at" SET STORAGE PLAIN`); err != nil {
