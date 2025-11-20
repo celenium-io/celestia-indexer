@@ -41,7 +41,7 @@ func upAddUpgradeStatusColumns(ctx context.Context, db *bun.DB) error {
 		return err
 	}
 
-	if _, err := db.ExecContext(ctx, `ALTER TABLE public."upgrade" ADD COLUMN IF NOT EXISTS "applied_at" timestamptz`); err != nil {
+	if _, err := db.ExecContext(ctx, `ALTER TABLE public."upgrade" ADD COLUMN IF NOT EXISTS "applied_at" timestamptz NOT NULL`); err != nil {
 		return err
 	}
 	if _, err := db.ExecContext(ctx, `ALTER TABLE public."upgrade" ALTER COLUMN "applied_at" SET STORAGE PLAIN`); err != nil {
@@ -51,7 +51,7 @@ func upAddUpgradeStatusColumns(ctx context.Context, db *bun.DB) error {
 		return err
 	}
 
-	if _, err := db.ExecContext(ctx, `ALTER TABLE public."upgrade" ADD COLUMN IF NOT EXISTS "applied_at_level" int8 DEFAULT 0`); err != nil {
+	if _, err := db.ExecContext(ctx, `ALTER TABLE public."upgrade" ADD COLUMN IF NOT EXISTS "applied_at_level" int8 NULL`); err != nil {
 		return err
 	}
 	if _, err := db.ExecContext(ctx, `ALTER TABLE public."upgrade" ALTER COLUMN "applied_at_level" SET STORAGE PLAIN`); err != nil {
