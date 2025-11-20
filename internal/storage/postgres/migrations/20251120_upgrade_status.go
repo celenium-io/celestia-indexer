@@ -72,8 +72,9 @@ func upAddUpgradeStatusColumns(ctx context.Context, db *bun.DB) error {
 
 	_, err = db.NewUpdate().
 		Model((*storage.Upgrade)(nil)).
-		Set("status = ?", types.UpgradeStatusApplied).
-		Where("version <= ?", state.Version).
+		Set("status = ?", types.UpgradeStatusWaitingUpgrade).
+		Where("version > ?", state.Version).
+		Where("end_height > 0").
 		Exec(ctx)
 	if err != nil {
 		return err
@@ -81,9 +82,8 @@ func upAddUpgradeStatusColumns(ctx context.Context, db *bun.DB) error {
 
 	_, err = db.NewUpdate().
 		Model((*storage.Upgrade)(nil)).
-		Set("status = ?", types.UpgradeStatusWaitingUpgrade).
-		Where("version > ?", state.Version).
-		Where("end_height is not null").
+		Set("status = ?", types.UpgradeStatusApplied).
+		Where("version <= ?", state.Version).
 		Exec(ctx)
 	if err != nil {
 		return err
