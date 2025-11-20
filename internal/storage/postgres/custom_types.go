@@ -179,6 +179,16 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 		); err != nil {
 			return err
 		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"upgrade_status",
+			bun.Safe("upgrade_status"),
+			bun.In(types.UpgradeStatusValues()),
+		); err != nil {
+			return err
+		}
 		return nil
 	})
 }
