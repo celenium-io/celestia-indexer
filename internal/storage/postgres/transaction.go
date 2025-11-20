@@ -318,7 +318,7 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 		}
 
 		query := tx.Tx().NewInsert().Model(upgrades[i]).
-			Column("version", "height", "time", "end_height", "end_time", "signer_id", "msg_id", "tx_id", "voting_power", "voted_power", "signals_count", "status").
+			Column("version", "height", "time", "end_height", "end_time", "applied_at_level", "applied_at", "signer_id", "msg_id", "tx_id", "voting_power", "voted_power", "signals_count", "status").
 			On("CONFLICT (version) DO UPDATE")
 
 		if upgrades[i].EndHeight > 0 {
@@ -326,6 +326,12 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 		}
 		if !upgrades[i].EndTime.IsZero() {
 			query = query.Set("end_time = EXCLUDED.end_time")
+		}
+		if upgrades[i].AppliedAtLevel > 0 {
+			query = query.Set("applied_at_level = EXCLUDED.applied_at_level")
+		}
+		if !upgrades[i].AppliedAt.IsZero() {
+			query = query.Set("applied_at = EXCLUDED.applied_at")
 		}
 		if upgrades[i].SignerId > 0 {
 			query = query.Set("signer_id = EXCLUDED.signer_id")

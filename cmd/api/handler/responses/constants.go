@@ -81,6 +81,7 @@ type Enums struct {
 	IbcChannelStatus   []string `json:"ibc_channel_status"`
 	HLTokenType        []string `json:"hyperlane_token_type"`
 	HLTransferType     []string `json:"hyperlane_transfer_type"`
+	UpgradeStatus      []string `json:"upgrade_status"`
 }
 
 func NewEnums(tags []string) Enums {
@@ -99,5 +100,6 @@ func NewEnums(tags []string) Enums {
 		IbcChannelStatus:   types.IbcChannelStatusNames(),
 		HLTokenType:        types.HLTokenTypeNames(),
 		HLTransferType:     types.HLTransferTypeNames(),
+		UpgradeStatus:      types.UpgradeStatusNames(),
 	}
 }

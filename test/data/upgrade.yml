@@ -10,6 +10,8 @@
   voted_power: 12345
   signals_count: 5
   status: applied
+  applied_at: '2025-08-11T03:14:57+00:00'
+  applied_at_level: 1014
 - height: 1011
   end_height: 1012
   signer_id: 2
@@ -22,3 +24,5 @@
   voted_power: 12345
   signals_count: 1
   status: applied
+  applied_at: '2025-08-11T03:14:57+00:00'
+  applied_at_level: 1014

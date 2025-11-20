@@ -126,7 +126,7 @@ type Transaction interface {
 	RetentionCompletedRedelegations(ctx context.Context, blockTime time.Time) error
 	Jail(ctx context.Context, validators ...*Validator) error
 	SaveSignals(ctx context.Context, signals ...*SignalVersion) error
-	SaveUpgrades(ctx context.Context, signals ...*Upgrade) error
+	SaveUpgrades(ctx context.Context, upgrades ...*Upgrade) error
 	UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) error
 	SaveHyperlaneIgps(ctx context.Context, igps ...*HLIGP) error
 	SaveHyperlaneIgpConfigs(ctx context.Context, configs ...HLIGPConfig) error

@@ -8437,6 +8437,12 @@
                         "type": "string"
                     }
                 },
+                "upgrade_status": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "vote_option": {
                     "type": "array",
                     "items": {
@@ -11119,6 +11125,16 @@
         "responses.Upgrade": {
             "type": "object",
             "properties": {
+                "applied_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2025-07-04T03:10:57+00:00"
+                },
+                "applied_at_level": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
                 "end_height": {
                     "type": "integer",
                     "format": "int64",

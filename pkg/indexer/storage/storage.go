@@ -363,6 +363,10 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
+	if err := module.setUpgradeApplied(ctx, tx, state.Version, dCtx.Block); err != nil {
+		return state, errors.Wrap(err, "set upgrade applied")
+	}
+
 	if err := updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, dCtx.Block.VersionApp, &state); err != nil {
 		return state, err
 	}
@@ -394,4 +398,19 @@ func (module *Module) notify(ctx context.Context, state storage.State, block sto
 	}
 
 	return nil
+}
+
+func (module *Module) setUpgradeApplied(ctx context.Context, tx storage.Transaction, currentVersion uint64, block *storage.Block) error {
+	if currentVersion >= block.VersionApp {
+		return nil
+	}
+
+	upgrade := storage.Upgrade{
+		Version:        block.VersionApp,
+		Status:         types.UpgradeStatusApplied,
+		AppliedAt:      block.Time,
+		AppliedAtLevel: block.Height,
+	}
+
+	return tx.SaveUpgrades(ctx, &upgrade)
 }
