@@ -313,8 +313,12 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 	}
 
 	for i := range upgrades {
+		if upgrades[i].Status == "" {
+			upgrades[i].Status = storageTypes.UpgradeStatusProcessing
+		}
+
 		query := tx.Tx().NewInsert().Model(upgrades[i]).
-			Column("version", "height", "time", "end_height", "end_time", "signer_id", "msg_id", "tx_id", "voting_power", "voted_power", "signals_count").
+			Column("version", "height", "time", "end_height", "end_time", "signer_id", "msg_id", "tx_id", "voting_power", "voted_power", "signals_count", "status").
 			On("CONFLICT (version) DO UPDATE")
 
 		if upgrades[i].EndHeight > 0 {
@@ -341,6 +345,10 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 		if upgrades[i].SignalsCount > 0 {
 			query = query.Set("signals_count = EXCLUDED.signals_count + upgrade.signals_count")
 		}
+		if upgrades[i].Status != storageTypes.UpgradeStatusProcessing {
+			query = query.Set("status = EXCLUDED.status")
+		}
+
 		if _, err := query.Exec(ctx); err != nil {
 			return errors.Wrapf(err, "save upgrade %d", upgrades[i].Version)
 		}

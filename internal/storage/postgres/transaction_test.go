@@ -1985,6 +1985,7 @@ func (s *TransactionTestSuite) TestSaveUpgrades() {
 			SignerId:     2,
 			Signer:       addresses[1],
 			SignalsCount: 3,
+			Status:       types.UpgradeStatusWaitingUpgrade,
 		})
 	s.Require().NoError(err)
 
@@ -1999,6 +2000,7 @@ func (s *TransactionTestSuite) TestSaveUpgrades() {
 	s.Require().Len(upgrades, 1)
 	s.Require().EqualValues(1500, upgrades[0].Version)
 	s.Require().EqualValues(4, upgrades[0].SignalsCount)
+	s.Require().EqualValues(types.UpgradeStatusWaitingUpgrade, upgrades[0].Status)
 }
 
 func (s *TransactionTestSuite) TestUpdateSignalsAfterUpgrade() {

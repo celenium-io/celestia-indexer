@@ -11147,6 +11147,11 @@
                 "signer": {
                     "$ref": "#/definitions/responses.ShortAddress"
                 },
+                "status": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "applied"
+                },
                 "time": {
                     "type": "string",
                     "format": "date-time",

@@ -53,6 +53,7 @@ type Upgrade struct {
 	VotingPower  string         `example:"9348"                                                             format:"int64"     json:"voting_power"         swaggertype:"string"`
 	VotedPower   string         `example:"9348"                                                             format:"int64"     json:"voted_power"          swaggertype:"string"`
 	SignalsCount int            `example:"2"                                                                format:"int64"     json:"signals_count"        swaggertype:"integer"`
+	Status       string         `example:"applied"                                                          format:"string"    json:"status"               swaggertype:"string"`
 
 	Signer *ShortAddress `json:"signer,omitempty"`
 }
@@ -67,6 +68,7 @@ func NewUpgrade(upgrade storage.Upgrade) Upgrade {
 		VotingPower:  upgrade.VotingPower.String(),
 		VotedPower:   upgrade.VotedPower.String(),
 		SignalsCount: upgrade.SignalsCount,
+		Status:       upgrade.Status.String(),
 	}
 
 	if !upgrade.EndTime.IsZero() {

@@ -341,7 +341,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	ibcClientsCount, version, err := module.saveMessages(ctx, tx, messages, addrToId, dCtx.Upgrades, state)
+	ibcClientsCount, err := module.saveMessages(ctx, tx, messages, addrToId, dCtx.Upgrades, state)
 	if err != nil {
 		return state, err
 	}
@@ -363,7 +363,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	if err := updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, version, &state); err != nil {
+	if err := updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, dCtx.Block.VersionApp, &state); err != nil {
 		return state, err
 	}
 
