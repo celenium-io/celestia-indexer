@@ -18,9 +18,6 @@ func Upgrade(ctx *decodeContext.Context, currentVersion, targetVersion uint64) e
 		// CIP-037 Reduce the validator unbonding period from 21 days to 14 days and 1 hour to improve capital efficiency while maintaining network security (https://cips.celestia.org/cip-037.html)
 		ctx.AddConstant(types.ModuleNameStaking, "unbonding_time", "1213200000000000")
 
-		// CIP-038: Increases the maximum block size to 128MB, square size to 512, and transaction size to 8MB, enabled by a new high-throughput recovery mechanism (https://cips.celestia.org/cip-038.html)
-		ctx.AddConstant(types.ModuleNameBlob, "gov_max_square_size", "512")
-
 		// CIP-041:Reduce inflation to 2.5% and increase minimum validator commission to 10% to improve TIA’s suitability for financial applications (https://cips.celestia.org/cip-041.html)
 		ctx.AddConstant(types.ModuleNameStaking, "min_commission_rate", "0.100000000000000000")
 
