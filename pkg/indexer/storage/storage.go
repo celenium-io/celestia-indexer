@@ -271,6 +271,10 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		block.ProposerId = proposerId
 	}
 
+	if err := Upgrade(dCtx, state.Version, block.VersionApp); err != nil {
+		return state, errors.Wrap(err, "upgrade failed")
+	}
+
 	if err := module.saveConstantUpdates(ctx, tx, dCtx.Constants); err != nil {
 		return state, errors.Wrap(err, "can't save constant updates")
 	}

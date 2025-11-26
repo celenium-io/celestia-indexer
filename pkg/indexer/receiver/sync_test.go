@@ -84,11 +84,11 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 
 		levels := make([]types.Level, blockCount)
 		bulkResult := make([]types.BlockData, blockCount)
-		for i := types.Level(1); i <= blockCount; i++ {
-			levels[i-1] = i
-			bulkResult[i-1] = types.BlockData{
-				ResultBlock:        getResultBlock(i),
-				ResultBlockResults: getResultBlockResults(i),
+		for i := 0; i < blockCount; i++ {
+			levels[i] = types.Level(i + 1)
+			bulkResult[i] = types.BlockData{
+				ResultBlock:        getResultBlock(levels[i]),
+				ResultBlockResults: getResultBlockResults(levels[i]),
 			}
 		}
 
