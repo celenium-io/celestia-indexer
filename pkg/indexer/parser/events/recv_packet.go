@@ -76,11 +76,7 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 				return errors.Wrap(err, "decode message in RecvPacket")
 			}
 
-			stopKey := "module"
-			if decodedMsg.Msg.Type == storageTypes.MsgSend {
-				stopKey = "sender"
-			}
-			if err := handle(ctx, events, &decodedMsg.Msg, idx, ibcEventHandlers, stopKey); err != nil {
+			if err := handle(ctx, events, &decodedMsg.Msg, idx, ibcEventHandlers, "module"); err != nil {
 				return errors.Wrap(err, "handle IBC msg event")
 			}
 			msg.Addresses = append(msg.Addresses, decodedMsg.Addresses...)

@@ -46,6 +46,7 @@ var eventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgCreateCollateralToken:       handleCreateCollateralToken,
 	storageTypes.MsgCreateSyntheticToken:        handleCreateSyntheticToken,
 	storageTypes.MsgSetToken:                    handleSetToken,
+	storageTypes.MsgSend:                        handleSend,
 }
 
 func handle(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int, eventHandlers map[storageTypes.MsgType]EventHandler, stopKey string) error {
@@ -112,6 +113,7 @@ var ibcEventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgCreateCollateralToken:       processCreateCollateralToken,
 	storageTypes.MsgCreateSyntheticToken:        processCreateSyntheticToken,
 	storageTypes.MsgSetToken:                    processSetToken,
+	storageTypes.MsgSend:                        processSend,
 }
 
 func toTheNextAction(events []storage.Event, idx *int) {
