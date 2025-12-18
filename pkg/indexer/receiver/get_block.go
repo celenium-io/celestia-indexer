@@ -43,7 +43,9 @@ func (r *Module) getBlocks(ctx context.Context) {
 				Int64("ms", time.Since(start).Milliseconds()).
 				Msg("received block")
 			r.blocks <- blocks[i]
-			r.receivedLevel = blocks[i].Height
+			if blocks[i].Height > r.receivedLevel {
+				r.receivedLevel = blocks[i].Height
+			}
 		}
 
 		r.taskQueue.Clear()
