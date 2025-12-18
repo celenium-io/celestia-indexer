@@ -99,8 +99,9 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 	})
 
 	receiverModule := s.createModuleEmptyState(&ic.Indexer{
-		Name:        cfgDefault.Name,
-		BlockPeriod: cfgDefault.BlockPeriod,
+		Name:            cfgDefault.Name,
+		BlockPeriod:     cfgDefault.BlockPeriod,
+		RequestBulkSize: 5,
 	})
 
 	ctx, cancelCtx := context.WithTimeout(s.T().Context(), 5*time.Second)

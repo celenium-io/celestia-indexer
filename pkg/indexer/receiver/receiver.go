@@ -44,13 +44,13 @@ type Module struct {
 	cfg              config.Indexer
 	blocks           chan types.BlockData
 	level            types.Level
+	receivedLevel    types.Level
 	hash             []byte
 	needGenesis      bool
 	taskQueue        *sdkSync.Map[types.Level, struct{}]
 	mx               *sync.RWMutex
 	rollbackSync     *sync.WaitGroup
 	cancelReadBlocks context.CancelFunc
-	w                *Worker
 }
 
 var _ modules.Module = (*Module)(nil)
@@ -64,21 +64,20 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 	}
 
 	receiver := Module{
-		BaseModule:   modules.New("receiver"),
-		api:          api,
-		cosmosApi:    cosmosApi,
-		ws:           ws,
-		cfg:          cfg,
-		blocks:       make(chan types.BlockData, 128),
-		needGenesis:  state == nil,
-		level:        level,
-		hash:         lastHash,
-		taskQueue:    sdkSync.NewMap[types.Level, struct{}](),
-		mx:           new(sync.RWMutex),
-		rollbackSync: new(sync.WaitGroup),
+		BaseModule:    modules.New("receiver"),
+		api:           api,
+		cosmosApi:     cosmosApi,
+		ws:            ws,
+		cfg:           cfg,
+		blocks:        make(chan types.BlockData, 128),
+		needGenesis:   state == nil,
+		level:         level,
+		receivedLevel: level,
+		hash:          lastHash,
+		taskQueue:     sdkSync.NewMap[types.Level, struct{}](),
+		mx:            new(sync.RWMutex),
+		rollbackSync:  new(sync.WaitGroup),
 	}
-
-	receiver.w = NewWorker(api, receiver.Log, receiver.blocks, cfg.RequestBulkSize)
 
 	receiver.CreateInput(RollbackInput)
 	receiver.CreateInput(GenesisDoneInput)
