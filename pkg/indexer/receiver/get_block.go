@@ -7,7 +7,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 )
 
@@ -18,7 +17,6 @@ func (r *Module) getBlocks(ctx context.Context) {
 
 	start := time.Now()
 
-	var result []types.BlockData
 	for {
 		select {
 		case <-ctx.Done():
@@ -38,18 +36,18 @@ func (r *Module) getBlocks(ctx context.Context) {
 			time.Sleep(time.Second)
 			continue
 		}
-		result = blocks
-		break
+
+		for i := range blocks {
+			r.Log.Info().
+				Uint64("height", uint64(blocks[i].Height)).
+				Int64("ms", time.Since(start).Milliseconds()).
+				Msg("received block")
+			r.blocks <- blocks[i]
+			r.receivedLevel = blocks[i].Height
+		}
+
+		r.taskQueue.Clear()
+		return
 	}
 
-	for i := range result {
-		r.Log.Info().
-			Uint64("height", uint64(result[i].Height)).
-			Int64("ms", time.Since(start).Milliseconds()).
-			Msg("received block")
-		r.blocks <- result[i]
-		r.receivedLevel = result[i].Height
-	}
-
-	r.taskQueue.Clear()
 }
