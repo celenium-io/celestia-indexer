@@ -47,7 +47,7 @@ func (p *Module) parse(b types.BlockData) error {
 
 		ChainId: b.Block.ChainID,
 
-		Events: nil,
+		Events: make([]storage.Event, 0, len(b.FinalizeBlockEvents)),
 
 		Stats: storage.BlockStats{
 			Height:        b.Height,
@@ -94,7 +94,7 @@ func (p *Module) parse(b types.BlockData) error {
 }
 
 func (p *Module) parseBlockSignatures(commit *types.Commit) []storage.BlockSignature {
-	signs := make([]storage.BlockSignature, 0)
+	signs := make([]storage.BlockSignature, 0, len(commit.Signatures))
 	for i := range commit.Signatures {
 		if commit.Signatures[i].BlockIDFlag != 2 {
 			continue

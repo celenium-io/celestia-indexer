@@ -6,6 +6,7 @@ package receiver
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
@@ -15,6 +16,7 @@ import (
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/rs/zerolog/log"
+	"github.com/sony/gobreaker/v2"
 )
 
 const (
@@ -51,6 +53,8 @@ type Module struct {
 	mx               *sync.RWMutex
 	rollbackSync     *sync.WaitGroup
 	cancelReadBlocks context.CancelFunc
+
+	circuitBreaker *gobreaker.CircuitBreaker[[]types.BlockData]
 }
 
 var _ modules.Module = (*Module)(nil)
@@ -77,6 +81,16 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 		taskQueue:     sdkSync.NewMap[types.Level, struct{}](),
 		mx:            new(sync.RWMutex),
 		rollbackSync:  new(sync.WaitGroup),
+		circuitBreaker: gobreaker.NewCircuitBreaker[[]types.BlockData](gobreaker.Settings{
+			Name:        "BlockDataAPI",
+			MaxRequests: 2,
+			Interval:    time.Minute,
+			Timeout:     30 * time.Second,
+			ReadyToTrip: func(counts gobreaker.Counts) bool {
+				failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
+				return counts.Requests >= 10 && failureRatio >= 0.6
+			},
+		}),
 	}
 
 	receiver.CreateInput(RollbackInput)

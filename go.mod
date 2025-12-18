@@ -64,6 +64,7 @@ require (
 	github.com/cosmos/gogoproto v1.7.2
 	github.com/gogo/protobuf v1.3.3
 	github.com/opus-domini/fast-shot v1.1.4
+	github.com/sony/gobreaker/v2 v2.3.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c
 	google.golang.org/grpc v1.76.0
 	gopkg.in/yaml.v3 v3.0.1
