@@ -83,7 +83,7 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 		rollbackSync:  new(sync.WaitGroup),
 		circuitBreaker: gobreaker.NewCircuitBreaker[[]types.BlockData](gobreaker.Settings{
 			Name:        "BlockDataAPI",
-			MaxRequests: 10,
+			MaxRequests: 2,
 			Interval:    time.Minute,
 			Timeout:     30 * time.Second,
 			ReadyToTrip: func(counts gobreaker.Counts) bool {
