@@ -4,6 +4,8 @@
 package websocket
 
 import (
+	"time"
+
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 
 	"github.com/pkg/errors"
@@ -38,7 +40,10 @@ func (channel *Channel[I, M]) processMessage(msg I) error {
 		return nil
 	}
 
+	startTime := time.Now()
 	data := channel.processor(msg)
+
+	channelName := data.Channel
 
 	if err := channel.clients.Range(func(_ uint64, value client) (error, bool) {
 		if channel.filters.Filter(value, data) {
@@ -49,5 +54,6 @@ func (channel *Channel[I, M]) processMessage(msg I) error {
 		return errors.Wrap(err, "write message to client")
 	}
 
+	wsMessageLatency.WithLabelValues(channelName).Observe(time.Since(startTime).Seconds())
 	return nil
 }
