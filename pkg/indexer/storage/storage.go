@@ -317,7 +317,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 			if err := tx.SaveEvents(ctx, events...); err != nil {
 				return state, err
 			}
-			events = make([]storage.Event, 0, 10000)
+			events = events[:0]
 		}
 	}
 	if len(events) > 0 {
