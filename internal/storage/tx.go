@@ -54,6 +54,15 @@ type TxFilter struct {
 	WithMessages         bool
 }
 
+func (filter *TxFilter) IsEmpty() bool {
+	return len(filter.Status) == 0 &&
+		filter.MessageTypes.Empty() &&
+		filter.ExcludedMessageTypes.Empty() &&
+		filter.Height == nil &&
+		filter.TimeFrom.IsZero() &&
+		filter.TimeTo.IsZero()
+}
+
 // Tx -
 type Tx struct {
 	bun.BaseModel `bun:"tx" comment:"Table with celestia transactions."`

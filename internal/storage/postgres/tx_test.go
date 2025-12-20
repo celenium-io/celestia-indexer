@@ -320,6 +320,17 @@ func (s *StorageTestSuite) TestTxByAddressAndTime() {
 	s.Require().Len(txs, 2)
 }
 
+func (s *StorageTestSuite) TestTxByAddress() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	txs, err := s.storage.Tx.ByAddress(ctx, 1, storage.TxFilter{
+		Limit: 10,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 3)
+}
+
 func (s *StorageTestSuite) TestTxGas() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

@@ -137,6 +137,11 @@ func (tx *Tx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxF
 		Model(&relations).
 		Where("address_id = ?", addressId)
 
+	if fltrs.IsEmpty() {
+		signersQuery = limitScope(signersQuery, fltrs.Limit)
+		signersQuery = signersQuery.Offset(fltrs.Offset)
+	}
+
 	signersQuery = sortScope(signersQuery, "tx_id", fltrs.Sort)
 
 	query := tx.DB().NewSelect().
