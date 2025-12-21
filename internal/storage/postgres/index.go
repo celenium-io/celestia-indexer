@@ -941,7 +941,7 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 		// Signal Version
 		if _, err := tx.NewCreateIndex().
 			IfNotExists().
-			Model((*storage.HLTransfer)(nil)).
+			Model((*storage.SignalVersion)(nil)).
 			Index("signal_version_height_idx").
 			Column("height").
 			Using("BRIN").
@@ -976,7 +976,7 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 		// Upgrade
 		if _, err := tx.NewCreateIndex().
 			IfNotExists().
-			Model((*storage.HLTransfer)(nil)).
+			Model((*storage.Upgrade)(nil)).
 			Index("upgrade_height_idx").
 			Column("height").
 			Using("BRIN").
@@ -985,7 +985,7 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 		}
 		if _, err := tx.NewCreateIndex().
 			IfNotExists().
-			Model((*storage.Upgrade)(nil)).
+			Model((*storage.)(nil)).
 			Index("upgrade_signer_id_idx").
 			Column("signer_id").
 			Exec(ctx); err != nil {
