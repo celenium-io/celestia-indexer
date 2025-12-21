@@ -10,8 +10,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	json "github.com/bytedance/sonic"
 	"github.com/dipdup-io/workerpool"
-	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"

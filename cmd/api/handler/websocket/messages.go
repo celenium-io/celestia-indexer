@@ -4,8 +4,9 @@
 package websocket
 
 import (
+	"encoding/json"
+
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
-	"github.com/goccy/go-json"
 )
 
 // methods
