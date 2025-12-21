@@ -53,15 +53,28 @@ func (tx *Tx) setSigners(ctx context.Context, txs []storage.Tx) error {
 		return err
 	}
 
+	matchSignersWithTx(txs, signers)
+	return nil
+}
+
+func matchSignersWithTx(txs []storage.Tx, signers []storage.Signer) {
+	signerMap := make(map[uint64][]storage.Address, len(txs))
+
 	for i := range signers {
-		for j := range txs {
-			if txs[j].Id == signers[i].TxId && signers[i].Address != nil {
-				txs[j].Signers = append(txs[j].Signers, *signers[i].Address)
-				break
-			}
+		if signers[i].Address == nil {
+			continue
+		}
+		signerMap[signers[i].TxId] = append(
+			signerMap[signers[i].TxId],
+			*signers[i].Address,
+		)
+	}
+
+	for i := range txs {
+		if addrs, ok := signerMap[txs[i].Id]; ok {
+			txs[i].Signers = addrs
 		}
 	}
-	return nil
 }
 
 func (tx *Tx) ByHash(ctx context.Context, hash []byte) (transaction storage.Tx, err error) {
@@ -123,6 +136,11 @@ func (tx *Tx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxF
 	signersQuery := tx.DB().NewSelect().
 		Model(&relations).
 		Where("address_id = ?", addressId)
+
+	if fltrs.IsEmpty() {
+		signersQuery = limitScope(signersQuery, fltrs.Limit)
+		signersQuery = signersQuery.Offset(fltrs.Offset)
+	}
 
 	signersQuery = sortScope(signersQuery, "tx_id", fltrs.Sort)
 

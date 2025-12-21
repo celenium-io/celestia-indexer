@@ -6,6 +6,8 @@ package postgres
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
+	"testing"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -318,6 +320,17 @@ func (s *StorageTestSuite) TestTxByAddressAndTime() {
 	s.Require().Len(txs, 2)
 }
 
+func (s *StorageTestSuite) TestTxByAddress() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	txs, err := s.storage.Tx.ByAddress(ctx, 1, storage.TxFilter{
+		Limit: 10,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 3)
+}
+
 func (s *StorageTestSuite) TestTxGas() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
@@ -340,4 +353,24 @@ func (s *StorageTestSuite) TestTxGas() {
 	s.Require().EqualValues(77483, tx1.GasUsed)
 	s.Require().EqualValues("80410", tx1.Fee.String())
 	s.Require().EqualValues("1", tx1.GasPrice.String())
+}
+
+func BenchmarkSetSigners(b *testing.B) {
+	txs := make([]storage.Tx, 100)
+	signers := make([]storage.Signer, 1000)
+
+	for i := 0; i < 100; i++ {
+		txs[i].Id = uint64(i)
+		for j := 0; j < 10; j++ {
+			idx := i*10 + j
+			signers[idx].TxId = uint64(i)
+			addr := storage.Address{Address: fmt.Sprintf("addr_%d", idx)}
+			signers[idx].Address = &addr
+		}
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		matchSignersWithTx(txs, signers)
+	}
 }

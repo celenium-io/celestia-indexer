@@ -771,6 +771,34 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// Hyperlane Gas Payment
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLGasPayment)(nil)).
+			Index("hl_gas_payment_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLGasPayment)(nil)).
+			Index("hl_gas_payment_transfer_id_idx").
+			Column("transfer_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.HLGasPayment)(nil)).
+			Index("hl_gas_payment_igp_id_idx").
+			Column("igp_id").
+			Where("igp_id is not null").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		// Hyperlane Mailbox
 		if _, err := tx.NewCreateIndex().
 			IfNotExists().
