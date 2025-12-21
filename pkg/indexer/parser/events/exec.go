@@ -111,6 +111,9 @@ func getInternalDataForExec(data map[string]any, idx int) (map[string]any, error
 	if !ok {
 		return nil, errors.Errorf("Msgs is not an array in MsgExec: %T", msgsAny)
 	}
+	if idx < 0 || idx >= len(msgsArr) {
+		return nil, errors.Errorf("Msgs index out of range in MsgExec: %d >= %d", idx, len(msgsArr))
+	}
 	msgs, ok := msgsArr[idx].(map[string]any)
 	if !ok {
 		return nil, errors.Errorf("Msgs invalid type in MsgExec: %T", msgsArr[idx])

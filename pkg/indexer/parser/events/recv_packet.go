@@ -44,6 +44,10 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 
 	*idx += 2
 
+	if len(events)-1 < *idx {
+		return nil
+	}
+
 	if events[*idx].Type == storageTypes.EventTypeWriteAcknowledgement {
 		*idx += 2
 		msg.IbcTransfer = nil
