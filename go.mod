@@ -25,11 +25,11 @@ require (
 	github.com/getsentry/sentry-go/echo v0.32.0
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/go-testfixtures/testfixtures/v3 v3.16.0
-	github.com/goccy/go-json v0.10.5
+	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/gorilla/websocket v1.5.3
 	github.com/gosimple/slug v1.15.0
 	github.com/grafana/pyroscope-go v1.2.7
-	github.com/json-iterator/go v1.1.12
+	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/labstack/echo-contrib v0.15.0
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/lib/pq v1.10.9
@@ -59,6 +59,7 @@ require (
 	cosmossdk.io/x/nft v0.2.0-rc.2
 	cosmossdk.io/x/upgrade v0.1.4
 	github.com/bcp-innovations/hyperlane-cosmos v1.0.1
+	github.com/bytedance/sonic v1.14.1
 	github.com/celestiaorg/celestia-app/v6 v6.2.5
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/gogoproto v1.7.2
@@ -119,7 +120,6 @@ require (
 	github.com/bgentry/speakeasy v0.2.0 // indirect
 	github.com/bits-and-blooms/bitset v1.17.0 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
-	github.com/bytedance/sonic v1.14.1 // indirect
 	github.com/bytedance/sonic/loader v0.3.0 // indirect
 	github.com/celestiaorg/go-square/v2 v2.3.3 // indirect
 	github.com/celestiaorg/merkletree v0.0.0-20210714075610-a84dc3ddbbe4 // indirect
