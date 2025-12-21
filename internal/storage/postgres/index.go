@@ -985,7 +985,7 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 		}
 		if _, err := tx.NewCreateIndex().
 			IfNotExists().
-			Model((*storage.)(nil)).
+			Model((*storage.Upgrade)(nil)).
 			Index("upgrade_signer_id_idx").
 			Column("signer_id").
 			Exec(ctx); err != nil {
