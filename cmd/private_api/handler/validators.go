@@ -198,7 +198,10 @@ func (kv KeyValidator) Validate(key string, c echo.Context) (bool, error) {
 }
 
 func rollupProviderValidator(sl validator.StructLevel) {
-	rp := sl.Current().Interface().(rollupProvider)
+	rp, ok := sl.Current().Interface().(rollupProvider)
+	if !ok {
+		return
+	}
 	if rp.Address == "" && rp.Namespace == "" {
 		sl.ReportError(rp.Address, "address", "Address", "namespace_or_address", "")
 		sl.ReportError(rp.Namespace, "namespace", "Namespace", "namespace_or_address", "")
