@@ -49,6 +49,10 @@ type Notification[T INotification] struct {
 	Body    T      `json:"body"`
 }
 
+func (n Notification[T]) GetChannel() string {
+	return n.Channel
+}
+
 func NewBlockNotification(block responses.Block) Notification[*responses.Block] {
 	return Notification[*responses.Block]{
 		Channel: ChannelBlocks,

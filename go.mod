@@ -64,6 +64,7 @@ require (
 	github.com/cosmos/gogoproto v1.7.2
 	github.com/gogo/protobuf v1.3.3
 	github.com/opus-domini/fast-shot v1.1.4
+	github.com/prometheus/client_golang v1.23.2
 	github.com/sony/gobreaker/v2 v2.3.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c
 	google.golang.org/grpc v1.76.0
@@ -259,7 +260,6 @@ require (
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
-	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.67.1 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect

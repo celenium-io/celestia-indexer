@@ -59,6 +59,7 @@ api:
   websocket: ${API_WEBSOCKET_ENABLED:-true}
   cache: ${CACHE_URL}
   hyperlane_node: ${HYPERLANE_NODE_URL}
+  websocket_clients_per_ip: ${API_WEBSOCKET_CLIENTS_PER_IP:-10}
   
 private_api:
   bind: ${PRIVATE_API_HOST:-0.0.0.0}:${PRIVATE_API_PORT:-9877}

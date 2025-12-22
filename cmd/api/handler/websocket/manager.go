@@ -7,9 +7,10 @@ import (
 	"context"
 	"net/http"
 	"sync/atomic"
+	"time"
 
 	"github.com/dipdup-io/workerpool"
-	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
+	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
@@ -23,8 +24,11 @@ import (
 type Manager struct {
 	upgrader websocket.Upgrader
 	clientId *atomic.Uint64
-	clients  *sdkSync.Map[uint64, *Client]
+	clients  *sync.Map[uint64, *Client]
 	observer *bus.Observer
+
+	ips                   *sync.Map[string, int]
+	websocketClientsPerIp int
 
 	blocks   *Channel[storage.Block, *responses.Block]
 	head     *Channel[storage.State, *responses.State]
@@ -33,7 +37,7 @@ type Manager struct {
 	g workerpool.Group
 }
 
-func NewManager(observer *bus.Observer) *Manager {
+func NewManager(observer *bus.Observer, opts ...ManagerOption) *Manager {
 	manager := &Manager{
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
@@ -42,10 +46,12 @@ func NewManager(observer *bus.Observer) *Manager {
 				return true
 			},
 		},
-		observer: observer,
-		clientId: new(atomic.Uint64),
-		clients:  sdkSync.NewMap[uint64, *Client](),
-		g:        workerpool.NewGroup(),
+		observer:              observer,
+		clientId:              new(atomic.Uint64),
+		clients:               sync.NewMap[uint64, *Client](),
+		g:                     workerpool.NewGroup(),
+		ips:                   sync.NewMap[string, int](),
+		websocketClientsPerIp: 10,
 	}
 
 	manager.blocks = NewChannel(
@@ -63,10 +69,14 @@ func NewManager(observer *bus.Observer) *Manager {
 		GasPriceFilter{},
 	)
 
+	for _, opt := range opts {
+		opt(manager)
+	}
+
 	return manager
 }
 
-func (manager *Manager) listen(ctx context.Context) {
+func (manager *Manager) listenBlocks(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -75,12 +85,33 @@ func (manager *Manager) listen(ctx context.Context) {
 			if err := manager.blocks.processMessage(*block); err != nil {
 				log.Err(err).Msg("handle block")
 			}
+		}
+	}
+}
+
+func (manager *Manager) listenHead(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
 		case state := <-manager.observer.Head():
 			if err := manager.head.processMessage(*state); err != nil {
 				log.Err(err).Msg("handle state")
 			}
 		}
 	}
+}
+
+func (manager *Manager) countClientsByIp(ip string, value int) error {
+	if count, ok := manager.ips.Get(ip); ok {
+		if count >= manager.websocketClientsPerIp {
+			return ErrTooManyClients
+		}
+		manager.ips.Set(ip, count+value)
+	} else {
+		manager.ips.Set(ip, value)
+	}
+	return nil
 }
 
 // Handle godoc
@@ -95,9 +126,29 @@ func (manager *Manager) listen(ctx context.Context) {
 func (manager *Manager) Handle(c echo.Context) error {
 	ws, err := manager.upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
+		wsErrors.WithLabelValues("upgrade").Inc()
 		return err
 	}
 	ws.SetReadLimit(1024 * 10) // 10KB
+
+	if err := manager.countClientsByIp(c.RealIP(), 1); err != nil {
+		wsConnectionsTotal.WithLabelValues("rejected").Inc()
+		return err
+	}
+	defer func() {
+		if err := manager.countClientsByIp(c.RealIP(), -1); err != nil {
+			log.Err(err).Msg("decrease client count by ip")
+		}
+	}()
+
+	wsConnectionsTotal.WithLabelValues("accepted").Inc()
+	wsActiveConnections.Inc()
+
+	startTime := time.Now()
+	defer func() {
+		wsActiveConnections.Dec()
+		wsConnectionDuration.Observe(time.Since(startTime).Seconds())
+	}()
 
 	sId := manager.clientId.Add(1)
 	sub := newClient(sId, manager.AddClientToChannel, manager.RemoveClientFromChannel)
@@ -118,7 +169,8 @@ func (manager *Manager) Handle(c echo.Context) error {
 }
 
 func (manager *Manager) Start(ctx context.Context) {
-	manager.g.GoCtx(ctx, manager.listen)
+	manager.g.GoCtx(ctx, manager.listenHead)
+	manager.g.GoCtx(ctx, manager.listenBlocks)
 }
 
 func (manager *Manager) Close() error {
@@ -136,12 +188,16 @@ func (manager *Manager) AddClientToChannel(channel string, client *Client) {
 	switch channel {
 	case ChannelHead:
 		manager.head.AddClient(client)
+		wsSubscriptions.WithLabelValues(channel).Inc()
 	case ChannelBlocks:
 		manager.blocks.AddClient(client)
+		wsSubscriptions.WithLabelValues(channel).Inc()
 	case ChannelGasPrice:
 		manager.gasPrice.AddClient(client)
+		wsSubscriptions.WithLabelValues(channel).Inc()
 	default:
 		log.Error().Str("channel", channel).Msg("unknown channel name")
+		wsErrors.WithLabelValues("unknown_channel").Inc()
 	}
 }
 
@@ -149,10 +205,13 @@ func (manager *Manager) RemoveClientFromChannel(channel string, client *Client) 
 	switch channel {
 	case ChannelHead:
 		manager.head.RemoveClient(client.id)
+		wsSubscriptions.WithLabelValues(channel).Dec()
 	case ChannelBlocks:
 		manager.blocks.RemoveClient(client.id)
+		wsSubscriptions.WithLabelValues(channel).Dec()
 	case ChannelGasPrice:
 		manager.gasPrice.RemoveClient(client.id)
+		wsSubscriptions.WithLabelValues(channel).Dec()
 	default:
 		log.Error().Str("channel", channel).Msg("unknown channel name")
 	}

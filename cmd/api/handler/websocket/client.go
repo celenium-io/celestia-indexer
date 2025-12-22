@@ -57,7 +57,7 @@ func newClient(id uint64, subscribeHandler, unsubscribeHandler ClientHandler) *C
 	closed.Store(false)
 	return &Client{
 		id:                 id,
-		ch:                 make(chan any, 128),
+		ch:                 make(chan any, 1024),
 		g:                  workerpool.NewGroup(),
 		subscribeHandler:   subscribeHandler,
 		unsubscribeHandler: unsubscribeHandler,
@@ -111,7 +111,16 @@ func (c *Client) Notify(msg any) {
 	if c.closed.Load() {
 		return
 	}
-	c.ch <- msg
+	select {
+	case c.ch <- msg:
+	default:
+		// Channel full or closed, drop message
+		if notification, ok := msg.(interface{ GetChannel() string }); ok {
+			wsMessagesDropped.WithLabelValues(notification.GetChannel()).Inc()
+		} else {
+			wsMessagesDropped.WithLabelValues("unknown").Inc()
+		}
+	}
 }
 
 func (c *Client) Close() error {
@@ -147,7 +156,15 @@ func (c *Client) writeThread(ctx context.Context, ws *websocket.Conn, log echo.L
 			}
 
 			if err := ws.WriteJSON(msg); err != nil {
+				wsErrors.WithLabelValues("write").Inc()
 				log.Errorf("send client message: %s", err)
+			} else {
+				// Track message sent
+				if notification, ok := msg.(interface{ GetChannel() string }); ok {
+					wsMessagesSent.WithLabelValues(notification.GetChannel()).Inc()
+				} else {
+					wsMessagesSent.WithLabelValues("unknown").Inc()
+				}
 			}
 		}
 	}
@@ -191,6 +208,7 @@ func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, log echo.
 					if c.unsubscribeHandler != nil {
 						c.unsubscribeHandler(ChannelHead, c)
 						c.unsubscribeHandler(ChannelBlocks, c)
+						c.unsubscribeHandler(ChannelGasPrice, c)
 					}
 					return
 				}
@@ -203,6 +221,7 @@ func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, log echo.
 func (c *Client) read(ws *websocket.Conn) error {
 	var msg Message
 	if err := ws.ReadJSON(&msg); err != nil {
+		wsErrors.WithLabelValues("read").Inc()
 		return err
 	}
 
@@ -212,6 +231,7 @@ func (c *Client) read(ws *websocket.Conn) error {
 	case MethodUnsubscribe:
 		return c.handleUnsubscribeMessage(msg)
 	default:
+		wsErrors.WithLabelValues("unknown_method").Inc()
 		return errors.Wrap(ErrUnknownMethod, msg.Method)
 	}
 }
@@ -219,16 +239,19 @@ func (c *Client) read(ws *websocket.Conn) error {
 func (c *Client) handleSubscribeMessage(msg Message) error {
 	var subscribeMsg Subscribe
 	if err := json.Unmarshal(msg.Body, &subscribeMsg); err != nil {
+		wsSubscribeRequests.WithLabelValues(subscribeMsg.Channel, "error").Inc()
 		return err
 	}
 
 	if err := c.ApplyFilters(subscribeMsg); err != nil {
+		wsSubscribeRequests.WithLabelValues(subscribeMsg.Channel, "error").Inc()
 		return err
 	}
 
 	if c.subscribeHandler != nil {
 		c.subscribeHandler(subscribeMsg.Channel, c)
 	}
+	wsSubscribeRequests.WithLabelValues(subscribeMsg.Channel, "success").Inc()
 	return nil
 }
 
@@ -243,5 +266,6 @@ func (c *Client) handleUnsubscribeMessage(msg Message) error {
 	if c.unsubscribeHandler != nil {
 		c.unsubscribeHandler(unsubscribeMsg.Channel, c)
 	}
+	wsUnsubscribeRequests.WithLabelValues(unsubscribeMsg.Channel).Inc()
 	return nil
 }
