@@ -663,17 +663,8 @@ func initGasTracker(ctx context.Context, db postgres.Storage) {
 	gasTracker.Start(ctx)
 }
 
-func initBlobReceiver(ctx context.Context, cfg Config) (node.DalApi, error) {
+func initBlobReceiver(_ context.Context, cfg Config) (node.DalApi, error) {
 	switch cfg.ApiConfig.BlobReceiver {
-	case "r2":
-		r2 := blob.NewR2(blob.R2Config{
-			BucketName:      os.Getenv("R2_BUCKET"),
-			AccountId:       os.Getenv("R2_ACCOUNT_ID"),
-			AccessKeyId:     os.Getenv("R2_ACCESS_KEY_ID"),
-			AccessKeySecret: os.Getenv("R2_ACCESS_KEY_SECRET"),
-		})
-		err := r2.Init(ctx)
-		return r2, err
 	case "celenium_blobs":
 		datasource, ok := cfg.DataSources[cfg.ApiConfig.BlobReceiver]
 		if !ok {
