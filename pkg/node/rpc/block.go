@@ -7,10 +7,20 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/celenium-io/celestia-indexer/internal/pool"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/pkg/errors"
+)
+
+var (
+	requestsPool = pool.New(func() []types.Request {
+		return make([]types.Request, 0, 20)
+	})
+	responsesPool = pool.New(func() []any {
+		return make([]any, 0, 20)
+	})
 )
 
 const pathBlock = "block"
@@ -84,8 +94,37 @@ func (api *API) BlockBulkData(ctx context.Context, levels ...pkgTypes.Level) ([]
 	if len(levels) == 0 {
 		return nil, nil
 	}
-	responses := make([]any, len(levels)*2)
-	requests := make([]types.Request, len(levels)*2)
+
+	// Get slices from pools
+	responses := responsesPool.Get()
+	requests := requestsPool.Get()
+
+	// Ensure proper capacity
+	neededSize := len(levels) * 2
+	if cap(responses) < neededSize {
+		responses = make([]any, 0, neededSize)
+	}
+	if cap(requests) < neededSize {
+		requests = make([]types.Request, 0, neededSize)
+	}
+
+	// Reset and resize to needed length
+	responses = responses[:neededSize]
+	requests = requests[:neededSize]
+
+	// Defer cleanup and return to pool
+	defer func() {
+		// Clear references to prevent memory leaks
+		for i := range responses {
+			responses[i] = nil
+		}
+		responses = responses[:0]
+		responsesPool.Put(responses)
+
+		// Clear request data
+		requests = requests[:0]
+		requestsPool.Put(requests)
+	}()
 
 	for i := range levels {
 		responses[i*2] = &types.Response[pkgTypes.ResultBlock]{}

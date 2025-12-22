@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	json "github.com/bytedance/sonic"
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	ws "github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
@@ -18,7 +19,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/lib/pq"

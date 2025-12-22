@@ -11,8 +11,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/bytedance/sonic"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
-	jsoniter "github.com/json-iterator/go"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -22,7 +22,7 @@ import (
 	"golang.org/x/time/rate"
 )
 
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
+var json = sonic.ConfigFastest
 
 const (
 	celeniumUserAgent = "Celenium Indexer"

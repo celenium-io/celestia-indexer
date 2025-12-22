@@ -11,6 +11,7 @@ import (
 	consensusv1 "cosmossdk.io/api/cosmos/consensus/v1"
 	slashingv1beta1 "cosmossdk.io/api/cosmos/slashing/v1beta1"
 	"cosmossdk.io/math"
+	json "github.com/bytedance/sonic"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
@@ -21,7 +22,6 @@ import (
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	paramsV1Beta "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	ibcTypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
-	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 	"github.com/stoewer/go-strcase"
 )

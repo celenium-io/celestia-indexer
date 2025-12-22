@@ -53,7 +53,7 @@ func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txR
 	t.MessageTypes = storageTypes.NewMsgTypeBitMask()
 	t.Messages = make([]storage.Message, len(d.Messages))
 	t.Events = nil
-	t.Signers = make([]storage.Address, 0)
+	t.Signers = make([]storage.Address, 0, len(d.Signers))
 	t.BlobsSize = 0
 	t.BytesSize = int64(len(txRes.Data))
 

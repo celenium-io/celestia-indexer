@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
+	json "github.com/bytedance/sonic"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
-	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,7 +22,7 @@ func TestParseAccounts(t *testing.T) {
 	defer f.Close()
 
 	var g types.Genesis
-	err = json.NewDecoder(f).Decode(&g)
+	err = json.ConfigFastest.NewDecoder(f).Decode(&g)
 	require.NoError(t, err)
 
 	data := newParsedData()

@@ -6,7 +6,7 @@ package types
 import (
 	"testing"
 
-	"github.com/goccy/go-json"
+	json "github.com/bytedance/sonic"
 	"github.com/stretchr/testify/require"
 )
 

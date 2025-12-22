@@ -10,8 +10,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/bytedance/sonic"
 	"github.com/dipdup-net/go-lib/config"
-	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -20,6 +20,10 @@ import (
 
 const (
 	celeniumUserAgent = "Celenium Indexer"
+)
+
+var (
+	json = sonic.ConfigFastest
 )
 
 type API struct {

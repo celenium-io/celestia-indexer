@@ -9,9 +9,11 @@ import (
 	"database/sql/driver"
 
 	"github.com/andybalholm/brotli"
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	"github.com/pkg/errors"
 )
+
+var json = sonic.ConfigFastest
 
 type PackedBytes map[string]any
 
@@ -27,7 +29,7 @@ func (pb *PackedBytes) Scan(src interface{}) error {
 	}
 
 	result := bytes.NewBuffer(b)
-	return jsoniter.NewDecoder(brotli.NewReader(result)).Decode(pb)
+	return json.NewDecoder(brotli.NewReader(result)).Decode(pb)
 }
 
 var _ driver.Valuer = (*PackedBytes)(nil)
@@ -37,7 +39,7 @@ func (pb PackedBytes) Value() (driver.Value, error) {
 }
 
 func (pb PackedBytes) ToBytes() ([]byte, error) {
-	b, err := jsoniter.Marshal(pb)
+	b, err := json.Marshal(pb)
 	if err != nil {
 		return nil, err
 	}

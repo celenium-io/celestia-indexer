@@ -4,10 +4,11 @@
 package responses
 
 import (
+	"encoding/json"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
-	"github.com/goccy/go-json"
 	"github.com/shopspring/decimal"
 )
 

@@ -8,10 +8,11 @@ import (
 	"strconv"
 	"sync"
 
+	json "github.com/bytedance/sonic"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-io/workerpool"
-	"github.com/goccy/go-json"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"

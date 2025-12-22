@@ -7,9 +7,9 @@ import (
 	"context"
 	"time"
 
+	json "github.com/bytedance/sonic"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 
@@ -385,19 +385,19 @@ func (module *Module) notify(ctx context.Context, state storage.State, block sto
 		return nil
 	}
 
-	rawState, err := json.Marshal(state)
+	rawState, err := json.MarshalString(state)
 	if err != nil {
 		return err
 	}
-	if err := module.notificator.Notify(ctx, storage.ChannelHead, string(rawState)); err != nil {
+	if err := module.notificator.Notify(ctx, storage.ChannelHead, rawState); err != nil {
 		return err
 	}
 
-	rawBlock, err := json.Marshal(block)
+	rawBlock, err := json.MarshalString(block)
 	if err != nil {
 		return err
 	}
-	if err := module.notificator.Notify(ctx, storage.ChannelBlock, string(rawBlock)); err != nil {
+	if err := module.notificator.Notify(ctx, storage.ChannelBlock, rawBlock); err != nil {
 		return err
 	}
 
