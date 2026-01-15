@@ -35,42 +35,7 @@ func sortScope(q *bun.SelectQuery, field string, sort sdk.SortOrder) *bun.Select
 
 func txFilter(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
 	query = limitScope(query, fltrs.Limit)
-
-	if fltrs.Sort != sdk.SortOrderAsc && fltrs.Sort != sdk.SortOrderDesc {
-		fltrs.Sort = sdk.SortOrderAsc
-	}
-	query = query.OrderExpr("time ?0, id ?0", bun.Safe(fltrs.Sort))
-
-	if !fltrs.MessageTypes.Empty() {
-		query = query.Where("bit_count(message_types & ?::bit(111)) > 0", fltrs.MessageTypes)
-	}
-
-	if !fltrs.ExcludedMessageTypes.Empty() {
-		query = query.Where("bit_count(message_types & ~(?::bit(111))) > 0", fltrs.ExcludedMessageTypes)
-	}
-
-	if len(fltrs.Status) > 0 {
-		query = query.WhereGroup(" AND ", func(sq *bun.SelectQuery) *bun.SelectQuery {
-			for i := range fltrs.Status {
-				sq = sq.WhereOr("status = ?", fltrs.Status[i])
-			}
-			return sq
-		})
-	}
-	if fltrs.Height != nil {
-		query = query.Where("height = ?", *fltrs.Height)
-	}
-
-	if !fltrs.TimeFrom.IsZero() {
-		query = query.Where("time >= ?", fltrs.TimeFrom)
-	}
-	if !fltrs.TimeTo.IsZero() {
-		query = query.Where("time < ?", fltrs.TimeTo)
-	}
-	if fltrs.WithMessages {
-		query = query.Relation("Messages")
-	}
-	return query
+	return txFilterWithoutLimit(query, fltrs)
 }
 
 func txFilterWithoutLimit(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
