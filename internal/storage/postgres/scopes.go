@@ -35,7 +35,10 @@ func sortScope(q *bun.SelectQuery, field string, sort sdk.SortOrder) *bun.Select
 
 func txFilter(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
 	query = limitScope(query, fltrs.Limit)
+	return txFilterWithoutLimit(query, fltrs)
+}
 
+func txFilterWithoutLimit(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
 	if fltrs.Sort != sdk.SortOrderAsc && fltrs.Sort != sdk.SortOrderDesc {
 		fltrs.Sort = sdk.SortOrderAsc
 	}
