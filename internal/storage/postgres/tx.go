@@ -150,9 +150,7 @@ func (tx *Tx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxF
 		ColumnExpr("tx.*").
 		Join("left join tx on tx.id = txs.tx_id")
 
-	query = txFilter(query, fltrs)
-	query = query.Offset(fltrs.Offset)
-
+	query = txFilterWithoutLimit(query, fltrs)
 	if err := query.Scan(ctx, &txs); err != nil {
 		return nil, err
 	}
