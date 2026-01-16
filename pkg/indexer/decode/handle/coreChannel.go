@@ -6,6 +6,7 @@ package handle
 import (
 	"strings"
 
+	json "github.com/bytedance/sonic"
 	"github.com/celenium-io/celestia-indexer/internal/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -17,7 +18,6 @@ import (
 	icaTypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
 	transferTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	coreChannel "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
