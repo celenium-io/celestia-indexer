@@ -25,7 +25,7 @@ require (
 	github.com/getsentry/sentry-go/echo v0.32.0
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/go-testfixtures/testfixtures/v3 v3.16.0
-	github.com/goccy/go-json v0.10.5 // indirect
+	github.com/goccy/go-json v0.10.5
 	github.com/gorilla/websocket v1.5.3
 	github.com/gosimple/slug v1.15.0
 	github.com/grafana/pyroscope-go v1.2.7
