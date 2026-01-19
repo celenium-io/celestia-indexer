@@ -12,16 +12,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
+	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
-)
-
-var (
-	json = sonic.ConfigFastest
 )
 
 type Node struct {
