@@ -24,6 +24,7 @@ import (
 type MockIHLMailbox struct {
 	ctrl     *gomock.Controller
 	recorder *MockIHLMailboxMockRecorder
+	isgomock struct{}
 }
 
 // MockIHLMailboxMockRecorder is the mock recorder for MockIHLMailbox.

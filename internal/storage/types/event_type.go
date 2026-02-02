@@ -107,6 +107,7 @@ package types
 		hyperlane.core.interchain_security.v1.EventCreateRoutingIsm,
 
 		signal_version
+		ibccallbackerror-ics27_packet
 	)
 */
 //go:generate go-enum --marshal --sql --values --names

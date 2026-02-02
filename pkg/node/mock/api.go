@@ -25,6 +25,7 @@ import (
 type MockApi struct {
 	ctrl     *gomock.Controller
 	recorder *MockApiMockRecorder
+	isgomock struct{}
 }
 
 // MockApiMockRecorder is the mock recorder for MockApi.
@@ -365,6 +366,7 @@ func (c *MockApiStatusCall) DoAndReturn(f func(context.Context) (types.Status, e
 type MockDalApi struct {
 	ctrl     *gomock.Controller
 	recorder *MockDalApiMockRecorder
+	isgomock struct{}
 }
 
 // MockDalApiMockRecorder is the mock recorder for MockDalApi.
@@ -471,6 +473,7 @@ func (c *MockDalApiBlobsCall) DoAndReturn(f func(context.Context, types0.Level, 
 type MockCosmosApi struct {
 	ctrl     *gomock.Controller
 	recorder *MockCosmosApiMockRecorder
+	isgomock struct{}
 }
 
 // MockCosmosApiMockRecorder is the mock recorder for MockCosmosApi.

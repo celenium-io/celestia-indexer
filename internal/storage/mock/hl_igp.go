@@ -24,6 +24,7 @@ import (
 type MockIHLIGP struct {
 	ctrl     *gomock.Controller
 	recorder *MockIHLIGPMockRecorder
+	isgomock struct{}
 }
 
 // MockIHLIGPMockRecorder is the mock recorder for MockIHLIGP.

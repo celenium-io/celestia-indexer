@@ -25,6 +25,7 @@ import (
 type MockIVestingPeriod struct {
 	ctrl     *gomock.Controller
 	recorder *MockIVestingPeriodMockRecorder
+	isgomock struct{}
 }
 
 // MockIVestingPeriodMockRecorder is the mock recorder for MockIVestingPeriod.

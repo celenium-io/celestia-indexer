@@ -24,6 +24,7 @@ import (
 type MockIIbcTransfer struct {
 	ctrl     *gomock.Controller
 	recorder *MockIIbcTransferMockRecorder
+	isgomock struct{}
 }
 
 // MockIIbcTransferMockRecorder is the mock recorder for MockIIbcTransfer.

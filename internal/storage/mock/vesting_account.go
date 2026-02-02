@@ -25,6 +25,7 @@ import (
 type MockIVestingAccount struct {
 	ctrl     *gomock.Controller
 	recorder *MockIVestingAccountMockRecorder
+	isgomock struct{}
 }
 
 // MockIVestingAccountMockRecorder is the mock recorder for MockIVestingAccount.
