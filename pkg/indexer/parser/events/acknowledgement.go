@@ -50,7 +50,7 @@ func processAcknowledgement(ctx *context.Context, events []storage.Event, msg *s
 
 		msgs, err := decoder.MessagesFromMap(mapData, "Data")
 		if err != nil {
-			return errors.Wrap(err, "get messages from data map")
+			return nil
 		}
 
 		for i := range msgs {

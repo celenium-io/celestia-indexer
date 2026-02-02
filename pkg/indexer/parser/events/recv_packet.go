@@ -71,7 +71,7 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 
 		msgs, err := decoder.MessagesFromMap(mapData, "Data")
 		if err != nil {
-			return errors.Wrap(err, "get messages from data map")
+			return nil
 		}
 
 		for i := range msgs {
