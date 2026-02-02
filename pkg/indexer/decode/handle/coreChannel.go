@@ -113,7 +113,7 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.Pa
 		var tx icaTypes.CosmosTx
 		if err := codec.Unmarshal(packet.Data, &tx); err != nil {
 			if err := codec.UnmarshalJSON(packet.Data, &tx); err != nil {
-				return msgType, addresses, nil, nil, errors.Wrap(err, "icaTypes.CosmosTx")
+				return msgType, addresses, nil, nil, nil
 			}
 		}
 
