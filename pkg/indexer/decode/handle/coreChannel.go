@@ -113,11 +113,7 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.Pa
 		var tx icaTypes.CosmosTx
 		if err := codec.Unmarshal(packet.Data, &tx); err != nil {
 			if err := codec.UnmarshalJSON(packet.Data, &tx); err != nil {
-				var m map[string]any
-				if err := json.Unmarshal(packet.Data, &m); err != nil {
-					return msgType, addresses, nil, nil, errors.Wrap(err, "icaTypes.CosmosTx unmarshal")
-				}
-				packetMapData["Data"] = m
+				packetMapData["Data"] = []cosmosTypes.Msg{}
 				packetMap["Data"] = packetMapData
 				return msgType, addresses, nil, nil, nil
 			}
@@ -266,11 +262,7 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTyp
 		var tx icaTypes.CosmosTx
 		if err := codec.Unmarshal(packet.Data, &tx); err != nil {
 			if err := codec.UnmarshalJSON(packet.Data, &tx); err != nil {
-				var m map[string]any
-				if err := json.Unmarshal(packet.Data, &m); err != nil {
-					return msgType, addresses, nil, nil, errors.Wrap(err, "icaTypes.CosmosTx unmarshal")
-				}
-				packetMapData["Data"] = m
+				packetMapData["Data"] = []cosmosTypes.Msg{}
 				packetMap["Data"] = packetMapData
 				return msgType, addresses, nil, nil, nil
 			}

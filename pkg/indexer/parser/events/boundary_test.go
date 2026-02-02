@@ -203,7 +203,7 @@ func Test_acknowledgement_boundaryChecks(t *testing.T) {
 				},
 			},
 			idx:         testsuite.Ptr(0),
-			expectError: false,
+			expectError: true,
 		},
 	}
 
