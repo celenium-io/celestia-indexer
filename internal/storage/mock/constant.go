@@ -25,6 +25,7 @@ import (
 type MockIConstant struct {
 	ctrl     *gomock.Controller
 	recorder *MockIConstantMockRecorder
+	isgomock struct{}
 }
 
 // MockIConstantMockRecorder is the mock recorder for MockIConstant.

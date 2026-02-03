@@ -31,6 +31,7 @@ import (
 type MockNotificator struct {
 	ctrl     *gomock.Controller
 	recorder *MockNotificatorMockRecorder
+	isgomock struct{}
 }
 
 // MockNotificatorMockRecorder is the mock recorder for MockNotificator.
@@ -92,6 +93,7 @@ func (c *MockNotificatorNotifyCall) DoAndReturn(f func(context.Context, string, 
 type MockListener struct {
 	ctrl     *gomock.Controller
 	recorder *MockListenerMockRecorder
+	isgomock struct{}
 }
 
 // MockListenerMockRecorder is the mock recorder for MockListener.
@@ -234,6 +236,7 @@ func (c *MockListenerSubscribeCall) DoAndReturn(f func(context.Context, ...strin
 type MockListenerFactory struct {
 	ctrl     *gomock.Controller
 	recorder *MockListenerFactoryMockRecorder
+	isgomock struct{}
 }
 
 // MockListenerFactoryMockRecorder is the mock recorder for MockListenerFactory.
@@ -295,6 +298,7 @@ func (c *MockListenerFactoryCreateListenerCall) DoAndReturn(f func() storage.Lis
 type MockTransaction struct {
 	ctrl     *gomock.Controller
 	recorder *MockTransactionMockRecorder
+	isgomock struct{}
 }
 
 // MockTransactionMockRecorder is the mock recorder for MockTransaction.
@@ -4402,10 +4406,10 @@ func (c *MockTransactionSaveUndelegationsCall) DoAndReturn(f func(context.Contex
 }
 
 // SaveUpgrades mocks base method.
-func (m *MockTransaction) SaveUpgrades(ctx context.Context, signals ...*storage.Upgrade) error {
+func (m *MockTransaction) SaveUpgrades(ctx context.Context, upgrades ...*storage.Upgrade) error {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
-	for _, a := range signals {
+	for _, a := range upgrades {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SaveUpgrades", varargs...)
@@ -4414,9 +4418,9 @@ func (m *MockTransaction) SaveUpgrades(ctx context.Context, signals ...*storage.
 }
 
 // SaveUpgrades indicates an expected call of SaveUpgrades.
-func (mr *MockTransactionMockRecorder) SaveUpgrades(ctx any, signals ...any) *MockTransactionSaveUpgradesCall {
+func (mr *MockTransactionMockRecorder) SaveUpgrades(ctx any, upgrades ...any) *MockTransactionSaveUpgradesCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx}, signals...)
+	varargs := append([]any{ctx}, upgrades...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveUpgrades", reflect.TypeOf((*MockTransaction)(nil).SaveUpgrades), varargs...)
 	return &MockTransactionSaveUpgradesCall{Call: call}
 }
@@ -4934,6 +4938,7 @@ func (c *MockTransactionValidatorCall) DoAndReturn(f func(context.Context, uint6
 type MockISearch struct {
 	ctrl     *gomock.Controller
 	recorder *MockISearchMockRecorder
+	isgomock struct{}
 }
 
 // MockISearchMockRecorder is the mock recorder for MockISearch.
@@ -5035,6 +5040,7 @@ func (c *MockISearchSearchTextCall) DoAndReturn(f func(context.Context, string) 
 type MockExport struct {
 	ctrl     *gomock.Controller
 	recorder *MockExportMockRecorder
+	isgomock struct{}
 }
 
 // MockExportMockRecorder is the mock recorder for MockExport.

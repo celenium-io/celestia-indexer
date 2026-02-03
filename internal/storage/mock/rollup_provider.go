@@ -24,6 +24,7 @@ import (
 type MockIRollupProvider struct {
 	ctrl     *gomock.Controller
 	recorder *MockIRollupProviderMockRecorder
+	isgomock struct{}
 }
 
 // MockIRollupProviderMockRecorder is the mock recorder for MockIRollupProvider.

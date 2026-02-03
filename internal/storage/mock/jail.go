@@ -25,6 +25,7 @@ import (
 type MockIJail struct {
 	ctrl     *gomock.Controller
 	recorder *MockIJailMockRecorder
+	isgomock struct{}
 }
 
 // MockIJailMockRecorder is the mock recorder for MockIJail.

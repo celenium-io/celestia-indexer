@@ -25,6 +25,7 @@ import (
 type MockIVote struct {
 	ctrl     *gomock.Controller
 	recorder *MockIVoteMockRecorder
+	isgomock struct{}
 }
 
 // MockIVoteMockRecorder is the mock recorder for MockIVote.

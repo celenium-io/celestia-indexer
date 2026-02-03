@@ -24,6 +24,7 @@ import (
 type MockIApiKey struct {
 	ctrl     *gomock.Controller
 	recorder *MockIApiKeyMockRecorder
+	isgomock struct{}
 }
 
 // MockIApiKeyMockRecorder is the mock recorder for MockIApiKey.

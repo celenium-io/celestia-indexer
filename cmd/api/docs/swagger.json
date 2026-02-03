@@ -11514,7 +11514,8 @@
                 "hyperlane.core.interchain_security.v1.EventSetRoutingIsmDomain",
                 "hyperlane.core.interchain_security.v1.EventSetRoutingIsm",
                 "hyperlane.core.interchain_security.v1.EventCreateRoutingIsm",
-                "signal_version"
+                "signal_version",
+                "ibccallbackerror-ics27_packet"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -11600,7 +11601,8 @@
                 "EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain",
                 "EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm",
                 "EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm",
-                "EventTypeSignalVersion"
+                "EventTypeSignalVersion",
+                "EventTypeIbccallbackerrorIcs27Packet"
             ]
         },
         "types.MsgAddressType": {

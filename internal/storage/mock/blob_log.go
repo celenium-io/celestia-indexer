@@ -28,6 +28,7 @@ import (
 type MockIBlobLog struct {
 	ctrl     *gomock.Controller
 	recorder *MockIBlobLogMockRecorder
+	isgomock struct{}
 }
 
 // MockIBlobLogMockRecorder is the mock recorder for MockIBlobLog.

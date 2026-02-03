@@ -25,6 +25,7 @@ import (
 type MockIUndelegation struct {
 	ctrl     *gomock.Controller
 	recorder *MockIUndelegationMockRecorder
+	isgomock struct{}
 }
 
 // MockIUndelegationMockRecorder is the mock recorder for MockIUndelegation.
