@@ -56,7 +56,7 @@ func main() {
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 
-	initCache(cfg.ApiConfig.Cache)
+	initCache(cfg.ApiConfig.Cache, cfg.ApiConfig.DefaultCacheTTL)
 	db := initDatabase(cfg.Database, cfg.Indexer.ScriptsDir)
 	e := initEcho(cfg.ApiConfig, cfg.Environment)
 	initDispatcher(ctx, db)

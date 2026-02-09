@@ -269,9 +269,12 @@ func initDatabase(cfg config.Database, viewsDir string) postgres.Storage {
 
 var ttlCache cache.ICache
 
-func initCache(url string) {
+func initCache(url string, ttl int) {
 	if url != "" {
-		c, err := cache.NewValKey(url, time.Hour)
+		if ttl == 0 {
+			ttl = 5
+		}
+		c, err := cache.NewValKey(url, time.Duration(ttl)*time.Minute)
 		if err != nil {
 			panic(err)
 		}

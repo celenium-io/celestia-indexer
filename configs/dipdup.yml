@@ -58,6 +58,7 @@ api:
   sentry_dsn: ${SENTRY_DSN}
   websocket: ${API_WEBSOCKET_ENABLED:-true}
   cache: ${CACHE_URL}
+  default_cache_ttl: ${CACHE_DEFAULT_TTL:-5}
   hyperlane_node: ${HYPERLANE_NODE_URL}
   websocket_clients_per_ip: ${API_WEBSOCKET_CLIENTS_PER_IP:-10}
   
