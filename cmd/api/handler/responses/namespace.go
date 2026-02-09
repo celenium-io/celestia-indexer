@@ -46,7 +46,7 @@ func NewNamespace(ns storage.Namespace) Namespace {
 func decodeName(nsId []byte) string {
 	var (
 		trimmed     = bytes.TrimLeft(nsId, "\x00")
-		data        = make([]byte, 0)
+		data        = make([]byte, 0, len(trimmed))
 		isDecodable = true
 	)
 	for i := range trimmed {
