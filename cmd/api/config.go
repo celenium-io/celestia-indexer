@@ -27,6 +27,7 @@ type ApiConfig struct {
 	SentryDsn             string  `validate:"omitempty"              yaml:"sentry_dsn"`
 	Websocket             bool    `validate:"omitempty"              yaml:"websocket"`
 	Cache                 string  `validate:"omitempty,url"          yaml:"cache"`
+	DefaultCacheTTL       int     `validate:"omitempty,min=1"        yaml:"default_cache_ttl"`
 	HyperlaneNodeUrl      string  `validate:"omitempty,url"          yaml:"hyperlane_node"`
 	WebscoketClientsPerIp int     `validate:"omitempty,min=1"        yaml:"websocket_clients_per_ip"`
 }
