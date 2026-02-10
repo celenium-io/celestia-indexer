@@ -85,12 +85,6 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		return Storage{}, err
 	}
 
-	sqldb := strg.Connection().DB().DB
-	sqldb.SetMaxOpenConns(100)
-	sqldb.SetMaxIdleConns(100)
-	sqldb.SetConnMaxLifetime(0)
-	sqldb.SetConnMaxIdleTime(0)
-
 	export := NewExport(cfg)
 
 	s := Storage{

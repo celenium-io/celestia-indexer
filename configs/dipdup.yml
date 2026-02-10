@@ -18,6 +18,9 @@ database:
   user: ${POSTGRES_USER}
   password: ${POSTGRES_PASSWORD}
   database: ${POSTGRES_DB:-celestia}
+  max_open_connections: ${POSTGRES_MAX_OPEN_CONNECTIONS:-100}
+  max_idle_connections: ${POSTGRES_MAX_IDLE_CONNECTIONS:-100}
+  max_lifetime_connections: ${POSTGRES_MAX_LIFETIME_CONNECTIONS:-0}
 
 datasources:
   node_rpc:
