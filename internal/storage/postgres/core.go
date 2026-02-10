@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/stats"
 	models "github.com/celenium-io/celestia-indexer/internal/storage"
@@ -86,9 +87,18 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 	}
 
 	sqldb := strg.Connection().DB().DB
-	sqldb.SetMaxOpenConns(100)
-	sqldb.SetMaxIdleConns(100)
-	sqldb.SetConnMaxLifetime(0)
+	if cfg.MaxOpenConnections <= 0 {
+		cfg.MaxOpenConnections = 100
+	}
+	if cfg.MaxIdleConnections <= 0 {
+		cfg.MaxIdleConnections = 100
+	}
+	if cfg.MaxLifetimeConnections < 0 {
+		cfg.MaxLifetimeConnections = 0
+	}
+	sqldb.SetMaxOpenConns(cfg.MaxOpenConnections)
+	sqldb.SetMaxIdleConns(cfg.MaxIdleConnections)
+	sqldb.SetConnMaxLifetime(time.Duration(cfg.MaxLifetimeConnections) * time.Second)
 	sqldb.SetConnMaxIdleTime(0)
 
 	export := NewExport(cfg)
