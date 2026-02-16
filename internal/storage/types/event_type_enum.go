@@ -186,6 +186,16 @@ const (
 	EventTypeSignalVersion EventType = "signal_version"
 	// EventTypeIbccallbackerrorIcs27Packet is a EventType of type ibccallbackerror-ics27_packet.
 	EventTypeIbccallbackerrorIcs27Packet EventType = "ibccallbackerror-ics27_packet"
+	// EventTypeCelestiaforwardingv1EventTokenForwarded is a EventType of type celestia.forwarding.v1.EventTokenForwarded.
+	EventTypeCelestiaforwardingv1EventTokenForwarded EventType = "celestia.forwarding.v1.EventTokenForwarded"
+	// EventTypeCelestiaforwardingv1EventForwardingComplete is a EventType of type celestia.forwarding.v1.EventForwardingComplete.
+	EventTypeCelestiaforwardingv1EventForwardingComplete EventType = "celestia.forwarding.v1.EventForwardingComplete"
+	// EventTypeCelestiazkismv1EventCreateInterchainSecurityModule is a EventType of type celestia.zkism.v1.EventCreateInterchainSecurityModule.
+	EventTypeCelestiazkismv1EventCreateInterchainSecurityModule EventType = "celestia.zkism.v1.EventCreateInterchainSecurityModule"
+	// EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule is a EventType of type celestia.zkism.v1.EventUpdateInterchainSecurityModule.
+	EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule EventType = "celestia.zkism.v1.EventUpdateInterchainSecurityModule"
+	// EventTypeCelestiazkismv1EventSubmitMessages is a EventType of type celestia.zkism.v1.EventSubmitMessages.
+	EventTypeCelestiazkismv1EventSubmitMessages EventType = "celestia.zkism.v1.EventSubmitMessages"
 )
 
 var ErrInvalidEventType = fmt.Errorf("not a valid EventType, try [%s]", strings.Join(_EventTypeNames, ", "))
@@ -276,6 +286,11 @@ var _EventTypeNames = []string{
 	string(EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm),
 	string(EventTypeSignalVersion),
 	string(EventTypeIbccallbackerrorIcs27Packet),
+	string(EventTypeCelestiaforwardingv1EventTokenForwarded),
+	string(EventTypeCelestiaforwardingv1EventForwardingComplete),
+	string(EventTypeCelestiazkismv1EventCreateInterchainSecurityModule),
+	string(EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule),
+	string(EventTypeCelestiazkismv1EventSubmitMessages),
 }
 
 // EventTypeNames returns a list of possible string values of EventType.
@@ -373,6 +388,11 @@ func EventTypeValues() []EventType {
 		EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm,
 		EventTypeSignalVersion,
 		EventTypeIbccallbackerrorIcs27Packet,
+		EventTypeCelestiaforwardingv1EventTokenForwarded,
+		EventTypeCelestiaforwardingv1EventForwardingComplete,
+		EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,
+		EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
+		EventTypeCelestiazkismv1EventSubmitMessages,
 	}
 }
 
@@ -472,8 +492,13 @@ var _EventTypeValue = map[string]EventType{
 	"hyperlane.core.interchain_security.v1.EventSetRoutingIsmDomain": EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain,
 	"hyperlane.core.interchain_security.v1.EventSetRoutingIsm":       EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm,
 	"hyperlane.core.interchain_security.v1.EventCreateRoutingIsm":    EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm,
-	"signal_version":                EventTypeSignalVersion,
-	"ibccallbackerror-ics27_packet": EventTypeIbccallbackerrorIcs27Packet,
+	"signal_version":                                        EventTypeSignalVersion,
+	"ibccallbackerror-ics27_packet":                         EventTypeIbccallbackerrorIcs27Packet,
+	"celestia.forwarding.v1.EventTokenForwarded":            EventTypeCelestiaforwardingv1EventTokenForwarded,
+	"celestia.forwarding.v1.EventForwardingComplete":        EventTypeCelestiaforwardingv1EventForwardingComplete,
+	"celestia.zkism.v1.EventCreateInterchainSecurityModule": EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,
+	"celestia.zkism.v1.EventUpdateInterchainSecurityModule": EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
+	"celestia.zkism.v1.EventSubmitMessages":                 EventTypeCelestiazkismv1EventSubmitMessages,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

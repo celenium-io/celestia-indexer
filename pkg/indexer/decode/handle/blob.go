@@ -9,7 +9,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	appBlobTypes "github.com/celestiaorg/celestia-app/v6/x/blob/types"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v7/x/blob/types"
 	nsPackage "github.com/celestiaorg/go-square/v3/share"
 	"github.com/pkg/errors"
 )

@@ -238,6 +238,14 @@ const (
 	MsgTripCircuitBreaker MsgType = "MsgTripCircuitBreaker"
 	// MsgModuleQuerySafe is a MsgType of type MsgModuleQuerySafe.
 	MsgModuleQuerySafe MsgType = "MsgModuleQuerySafe"
+	// MsgForward is a MsgType of type MsgForward.
+	MsgForward MsgType = "MsgForward"
+	// MsgCreateInterchainSecurityModule is a MsgType of type MsgCreateInterchainSecurityModule.
+	MsgCreateInterchainSecurityModule MsgType = "MsgCreateInterchainSecurityModule"
+	// MsgUpdateInterchainSecurityModule is a MsgType of type MsgUpdateInterchainSecurityModule.
+	MsgUpdateInterchainSecurityModule MsgType = "MsgUpdateInterchainSecurityModule"
+	// MsgSubmitMessages is a MsgType of type MsgSubmitMessages.
+	MsgSubmitMessages MsgType = "MsgSubmitMessages"
 )
 
 var ErrInvalidMsgType = fmt.Errorf("not a valid MsgType, try [%s]", strings.Join(_MsgTypeNames, ", "))
@@ -354,6 +362,10 @@ var _MsgTypeNames = []string{
 	string(MsgResetCircuitBreaker),
 	string(MsgTripCircuitBreaker),
 	string(MsgModuleQuerySafe),
+	string(MsgForward),
+	string(MsgCreateInterchainSecurityModule),
+	string(MsgUpdateInterchainSecurityModule),
+	string(MsgSubmitMessages),
 }
 
 // MsgTypeNames returns a list of possible string values of MsgType.
@@ -477,6 +489,10 @@ func MsgTypeValues() []MsgType {
 		MsgResetCircuitBreaker,
 		MsgTripCircuitBreaker,
 		MsgModuleQuerySafe,
+		MsgForward,
+		MsgCreateInterchainSecurityModule,
+		MsgUpdateInterchainSecurityModule,
+		MsgSubmitMessages,
 	}
 }
 
@@ -604,6 +620,10 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgResetCircuitBreaker":             MsgResetCircuitBreaker,
 	"MsgTripCircuitBreaker":              MsgTripCircuitBreaker,
 	"MsgModuleQuerySafe":                 MsgModuleQuerySafe,
+	"MsgForward":                         MsgForward,
+	"MsgCreateInterchainSecurityModule":  MsgCreateInterchainSecurityModule,
+	"MsgUpdateInterchainSecurityModule":  MsgUpdateInterchainSecurityModule,
+	"MsgSubmitMessages":                  MsgSubmitMessages,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.

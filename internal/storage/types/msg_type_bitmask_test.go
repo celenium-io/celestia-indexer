@@ -460,6 +460,22 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			name:    string(MsgTripCircuitBreaker),
 			msgType: []int{MsgTypeBitsTripCircuitBreaker},
 			want:    []MsgType{MsgTripCircuitBreaker},
+		}, {
+			name:    string(MsgForward),
+			msgType: []int{MsgTypeBitsForward},
+			want:    []MsgType{MsgForward},
+		}, {
+			name:    string(MsgCreateInterchainSecurityModule),
+			msgType: []int{MsgTypeBitsCreateInterchainSecurityModule},
+			want:    []MsgType{MsgCreateInterchainSecurityModule},
+		}, {
+			name:    string(MsgUpdateInterchainSecurityModule),
+			msgType: []int{MsgTypeBitsUpdateInterchainSecurityModule},
+			want:    []MsgType{MsgUpdateInterchainSecurityModule},
+		}, {
+			name:    string(MsgSubmitMessages),
+			msgType: []int{MsgTypeBitsSubmitMessages},
+			want:    []MsgType{MsgSubmitMessages},
 		},
 	}
 	for _, tt := range tests {
@@ -881,6 +897,22 @@ func TestNewMsgTypeBitMask(t *testing.T) {
 			name:   "test 99",
 			values: []MsgType{MsgModuleQuerySafe},
 			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsModuleQuerySafe)},
+		}, {
+			name:   "test 100",
+			values: []MsgType{MsgForward},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsForward)},
+		}, {
+			name:   "test 101",
+			values: []MsgType{MsgCreateInterchainSecurityModule},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsCreateInterchainSecurityModule)},
+		}, {
+			name:   "test 102",
+			values: []MsgType{MsgUpdateInterchainSecurityModule},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsUpdateInterchainSecurityModule)},
+		}, {
+			name:   "test 103",
+			values: []MsgType{MsgSubmitMessages},
+			want:   MsgTypeBits{NewBitsWithPosition(MsgTypeBitsSubmitMessages)},
 		}, {
 			name:   "test combo",
 			values: []MsgType{MsgWithdrawDelegatorReward, MsgBeginRedelegate},
