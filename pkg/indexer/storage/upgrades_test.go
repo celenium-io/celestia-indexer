@@ -47,13 +47,14 @@ func TestUpgradeV7(t *testing.T) {
 	minCommissionRate := decimal.RequireFromString("0.200000000000000000")
 	maxCommissionRate := decimal.RequireFromString("0.600000000000000000")
 
-	dCtx.Validators.Range(func(key string, value *storage.Validator) (error, bool) {
+	err = dCtx.Validators.Range(func(key string, value *storage.Validator) (error, bool) {
 		require.True(t, value.Rate.GreaterThanOrEqual(minCommissionRate))
 		require.True(t, value.MaxRate.LessThanOrEqual(maxCommissionRate))
 		return nil, true
 	})
+	require.NoError(t, err)
 
-	dCtx.Constants.Range(func(_ string, value *storage.Constant) (error, bool) {
+	err = dCtx.Constants.Range(func(_ string, value *storage.Constant) (error, bool) {
 		if value.Name == "min_commission_rate" {
 			require.Equal(t, "0.200000000000000000", value.Value)
 		}
@@ -62,4 +63,5 @@ func TestUpgradeV7(t *testing.T) {
 		}
 		return nil, true
 	})
+	require.NoError(t, err)
 }

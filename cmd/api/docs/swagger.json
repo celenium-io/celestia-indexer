@@ -665,7 +665,11 @@
                             "MsgAuthorizeCircuitBreaker",
                             "MsgResetCircuitBreaker",
                             "MsgTripCircuitBreaker",
-                            "MsgModuleQuerySafe"
+                            "MsgModuleQuerySafe",
+                            "MsgForward",
+                            "MsgCreateInterchainSecurityModule",
+                            "MsgUpdateInterchainSecurityModule",
+                            "MsgSubmitMessages"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1012,7 +1016,11 @@
                             "MsgAuthorizeCircuitBreaker",
                             "MsgResetCircuitBreaker",
                             "MsgTripCircuitBreaker",
-                            "MsgModuleQuerySafe"
+                            "MsgModuleQuerySafe",
+                            "MsgForward",
+                            "MsgCreateInterchainSecurityModule",
+                            "MsgUpdateInterchainSecurityModule",
+                            "MsgSubmitMessages"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -1955,7 +1963,11 @@
                             "MsgAuthorizeCircuitBreaker",
                             "MsgResetCircuitBreaker",
                             "MsgTripCircuitBreaker",
-                            "MsgModuleQuerySafe"
+                            "MsgModuleQuerySafe",
+                            "MsgForward",
+                            "MsgCreateInterchainSecurityModule",
+                            "MsgUpdateInterchainSecurityModule",
+                            "MsgSubmitMessages"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -2074,7 +2086,11 @@
                             "MsgAuthorizeCircuitBreaker",
                             "MsgResetCircuitBreaker",
                             "MsgTripCircuitBreaker",
-                            "MsgModuleQuerySafe"
+                            "MsgModuleQuerySafe",
+                            "MsgForward",
+                            "MsgCreateInterchainSecurityModule",
+                            "MsgUpdateInterchainSecurityModule",
+                            "MsgSubmitMessages"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types which should be excluded from list",
@@ -6554,7 +6570,11 @@
                             "MsgAuthorizeCircuitBreaker",
                             "MsgResetCircuitBreaker",
                             "MsgTripCircuitBreaker",
-                            "MsgModuleQuerySafe"
+                            "MsgModuleQuerySafe",
+                            "MsgForward",
+                            "MsgCreateInterchainSecurityModule",
+                            "MsgUpdateInterchainSecurityModule",
+                            "MsgSubmitMessages"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list",
@@ -6673,7 +6693,11 @@
                             "MsgAuthorizeCircuitBreaker",
                             "MsgResetCircuitBreaker",
                             "MsgTripCircuitBreaker",
-                            "MsgModuleQuerySafe"
+                            "MsgModuleQuerySafe",
+                            "MsgForward",
+                            "MsgCreateInterchainSecurityModule",
+                            "MsgUpdateInterchainSecurityModule",
+                            "MsgSubmitMessages"
                         ],
                         "type": "string",
                         "description": "Comma-separated message types list which should be excluded",
@@ -11515,7 +11539,12 @@
                 "hyperlane.core.interchain_security.v1.EventSetRoutingIsm",
                 "hyperlane.core.interchain_security.v1.EventCreateRoutingIsm",
                 "signal_version",
-                "ibccallbackerror-ics27_packet"
+                "ibccallbackerror-ics27_packet",
+                "celestia.forwarding.v1.EventTokenForwarded",
+                "celestia.forwarding.v1.EventForwardingComplete",
+                "celestia.zkism.v1.EventCreateInterchainSecurityModule",
+                "celestia.zkism.v1.EventUpdateInterchainSecurityModule",
+                "celestia.zkism.v1.EventSubmitMessages"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -11602,7 +11631,12 @@
                 "EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm",
                 "EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm",
                 "EventTypeSignalVersion",
-                "EventTypeIbccallbackerrorIcs27Packet"
+                "EventTypeIbccallbackerrorIcs27Packet",
+                "EventTypeCelestiaforwardingv1EventTokenForwarded",
+                "EventTypeCelestiaforwardingv1EventForwardingComplete",
+                "EventTypeCelestiazkismv1EventCreateInterchainSecurityModule",
+                "EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule",
+                "EventTypeCelestiazkismv1EventSubmitMessages"
             ]
         },
         "types.MsgAddressType": {
@@ -11779,7 +11813,11 @@
                 "MsgAuthorizeCircuitBreaker",
                 "MsgResetCircuitBreaker",
                 "MsgTripCircuitBreaker",
-                "MsgModuleQuerySafe"
+                "MsgModuleQuerySafe",
+                "MsgForward",
+                "MsgCreateInterchainSecurityModule",
+                "MsgUpdateInterchainSecurityModule",
+                "MsgSubmitMessages"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -11892,7 +11930,11 @@
                 "MsgAuthorizeCircuitBreaker",
                 "MsgResetCircuitBreaker",
                 "MsgTripCircuitBreaker",
-                "MsgModuleQuerySafe"
+                "MsgModuleQuerySafe",
+                "MsgForward",
+                "MsgCreateInterchainSecurityModule",
+                "MsgUpdateInterchainSecurityModule",
+                "MsgSubmitMessages"
             ]
         }
     },
