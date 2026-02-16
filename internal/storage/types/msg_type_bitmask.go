@@ -159,6 +159,12 @@ const (
 	MsgTypeBitsResetCircuitBreaker
 	MsgTypeBitsTripCircuitBreaker
 	MsgTypeBitsModuleQuerySafe
+
+	MsgTypeBitsForward
+
+	MsgTypeBitsCreateInterchainSecurityModule
+	MsgTypeBitsUpdateInterchainSecurityModule
+	MsgTypeBitsSubmitMessages
 )
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
@@ -412,6 +418,16 @@ func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 		mask.SetBit(MsgTypeBitsTripCircuitBreaker)
 	case MsgModuleQuerySafe:
 		mask.SetBit(MsgTypeBitsModuleQuerySafe)
+
+	case MsgForward:
+		mask.SetBit(MsgTypeBitsForward)
+
+	case MsgCreateInterchainSecurityModule:
+		mask.SetBit(MsgTypeBitsCreateInterchainSecurityModule)
+	case MsgUpdateInterchainSecurityModule:
+		mask.SetBit(MsgTypeBitsUpdateInterchainSecurityModule)
+	case MsgSubmitMessages:
+		mask.SetBit(MsgTypeBitsSubmitMessages)
 	}
 }
 
@@ -897,6 +913,24 @@ func (mask MsgTypeBits) Names() []MsgType {
 
 	if mask.HasBit(MsgTypeBitsUpdateRoutingIsmOwner) {
 		names[i] = MsgUpdateRoutingIsmOwner
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsForward) {
+		names[i] = MsgForward
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsCreateInterchainSecurityModule) {
+		names[i] = MsgCreateInterchainSecurityModule
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsUpdateInterchainSecurityModule) {
+		names[i] = MsgUpdateInterchainSecurityModule
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsSubmitMessages) {
+		names[i] = MsgSubmitMessages
 		// i++
 	}
 
@@ -928,9 +962,9 @@ var _ driver.Valuer = (*MsgTypeBits)(nil)
 
 func (mask MsgTypeBits) Value() (driver.Value, error) {
 	if mask.value == nil {
-		return fmt.Sprintf("%0111b", 0), nil
+		return fmt.Sprintf("%0115b", 0), nil
 	}
-	return fmt.Sprintf("%0111b", mask.value), nil
+	return fmt.Sprintf("%0115b", mask.value), nil
 }
 
 func (mask MsgTypeBits) MarshalJSON() (data []byte, err error) {

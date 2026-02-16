@@ -11,7 +11,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	blobtypes "github.com/celestiaorg/celestia-app/v6/x/blob/types"
+	blobtypes "github.com/celestiaorg/celestia-app/v7/x/blob/types"
 	"github.com/celestiaorg/go-square/v3/share"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"

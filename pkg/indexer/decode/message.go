@@ -32,9 +32,11 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
-	appBlobTypes "github.com/celestiaorg/celestia-app/v6/x/blob/types"
-	minfeeTypes "github.com/celestiaorg/celestia-app/v6/x/minfee/types"
-	appSignalTypes "github.com/celestiaorg/celestia-app/v6/x/signal/types"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v7/x/blob/types"
+	fwdTypes "github.com/celestiaorg/celestia-app/v7/x/forwarding/types"
+	minfeeTypes "github.com/celestiaorg/celestia-app/v7/x/minfee/types"
+	appSignalTypes "github.com/celestiaorg/celestia-app/v7/x/signal/types"
+	zkismTypes "github.com/celestiaorg/celestia-app/v7/x/zkism/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -396,6 +398,18 @@ func Message(
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgResetCircuitBreaker(ctx, typedMsg)
 	case *circuitTypes.MsgTripCircuitBreaker:
 		d.Msg.Type, d.Msg.Addresses, err = handle.MsgTripCircuitBreaker(ctx, typedMsg)
+
+	// forwarding
+	case *fwdTypes.MsgForward:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgForward(ctx, typedMsg)
+
+	// zkism
+	case *zkismTypes.MsgCreateInterchainSecurityModule:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgCreateInterchainSecurityModule(ctx, typedMsg)
+	case *zkismTypes.MsgUpdateInterchainSecurityModule:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgUpdateInterchainSecurityModule(ctx, typedMsg)
+	case *zkismTypes.MsgSubmitMessages:
+		d.Msg.Type, d.Msg.Addresses, err = handle.MsgSubmitMessages(ctx, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)

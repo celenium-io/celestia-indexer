@@ -106,8 +106,15 @@ package types
 		hyperlane.core.interchain_security.v1.EventSetRoutingIsm,
 		hyperlane.core.interchain_security.v1.EventCreateRoutingIsm,
 
-		signal_version
-		ibccallbackerror-ics27_packet
+		signal_version,
+		ibccallbackerror-ics27_packet,
+
+		celestia.forwarding.v1.EventTokenForwarded,
+		celestia.forwarding.v1.EventForwardingComplete,
+
+		celestia.zkism.v1.EventCreateInterchainSecurityModule,
+		celestia.zkism.v1.EventUpdateInterchainSecurityModule,
+		celestia.zkism.v1.EventSubmitMessages
 	)
 */
 //go:generate go-enum --marshal --sql --values --names

@@ -144,7 +144,13 @@ package types
 		MsgAuthorizeCircuitBreaker,
 		MsgResetCircuitBreaker,
 		MsgTripCircuitBreaker,
-		MsgModuleQuerySafe
+		MsgModuleQuerySafe,
+
+		MsgForward,
+
+		MsgCreateInterchainSecurityModule,
+		MsgUpdateInterchainSecurityModule,
+		MsgSubmitMessages
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix --names
