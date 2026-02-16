@@ -24,6 +24,11 @@ func Upgrade(ctx *decodeContext.Context, currentVersion, targetVersion uint64) e
 		// CIP-041:Reduce inflation to 2.5% and increase minimum validator commission to 10% to improve TIA’s suitability for financial applications (https://cips.celestia.org/cip-041.html)
 		ctx.AddConstant(types.ModuleNameStaking, "min_commission_rate", "0.100000000000000000")
 
+	case 7:
+		// CIP-043: Increase maximum validator commission to 60% and minimum commission to 20% (https://cips.celestia.org/cip-044.html)
+		ctx.AddConstant(types.ModuleNameStaking, "min_commission_rate", "0.200000000000000000")
+		ctx.AddConstant(types.ModuleNameStaking, "max_commission_rate", "0.600000000000000000")
+
 	default:
 		return errors.Errorf("unsupported upgrade version: %d", targetVersion)
 	}
