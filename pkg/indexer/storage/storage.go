@@ -271,7 +271,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		block.ProposerId = proposerId
 	}
 
-	if err := Upgrade(dCtx, state.Version, block.VersionApp); err != nil {
+	if err := module.upgrade(ctx, dCtx, state.Version, block.VersionApp); err != nil {
 		return state, errors.Wrap(err, "upgrade failed")
 	}
 
