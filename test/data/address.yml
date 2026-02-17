@@ -3,18 +3,28 @@
   address: celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8
   hash: 0xdece425b75d67115bda877e1e7a1f262f6fa51d6
   last_height: 100
+  is_forwarding: false
 - id: 2
   height: 101
   address: celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60
   hash: 0x960aa0366b254e1ea79bda467eb3aa5c97cba5ae
   last_height: 101
+  is_forwarding: false
 - id: 3
   height: 102
   address: celestia1cr2t0y5zu9sya67t9sp0vt9cxum408yuphkhex
   hash: 0xC0D4B79282E1604EEBCB2C02F62CB83737579C9C
   last_height: 102
+  is_forwarding: false
 - id: 4
   height: 101
   address: celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss
   hash: 0x30a0d9ea9727e58de67f3125b6ed88bddaf7578b57ad149a9a90541d1737d407
   last_height: 101
+  is_forwarding: false
+- id: 5
+  height: 1000
+  address: celestia1ccqy2wlzf2zndn4vspmuksw5frqq0ufsgw4gmt
+  hash: 0xC600453BE24A8536CEAC8077CB41D448C007F130
+  last_height: 1000
+  is_forwarding: true

@@ -138,6 +138,8 @@ func TestRoutes(t *testing.T) {
 		"/v1/signal GET":                                      {},
 		"/v1/signal/upgrade GET":                              {},
 		"/v1/signal/upgrade/:version GET":                     {},
+		"/v1/forwarding GET":                                  {},
+		"/v1/forwarding/:id GET":                              {},
 	}
 
 	ctx, cancel := context.WithCancel(t.Context())

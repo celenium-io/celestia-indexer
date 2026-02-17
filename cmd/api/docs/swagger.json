@@ -2261,6 +2261,148 @@
                 }
             }
         },
+        "/forwarding": {
+            "get": {
+                "description": "Returns a paginated list of forwarding events. Forwarding events represent cross-domain token transfers\nwhere tokens are forwarded from a Celestia address to a destination address on another domain.\nResults can be filtered by transaction hash, address, or block height.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "forwarding"
+                ],
+                "summary": "List forwarding events",
+                "operationId": "list-forwarding",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset for pagination",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 64,
+                        "minLength": 64,
+                        "type": "string",
+                        "description": "Filter by transaction hash (hex)",
+                        "name": "tx_hash",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Filter by Celestia address",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by block height",
+                        "name": "height",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Filter by start time (Unix timestamp)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Filter by end time (Unix timestamp)",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Forwarding"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/forwarding/{id}": {
+            "get": {
+                "description": "Returns a single forwarding event by its internal ID. The response includes details about\nthe cross-domain token transfer such as destination domain, destination address,\nforwarding address, success/failed counts, and the list of individual transfers.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "forwarding"
+                ],
+                "summary": "Get forwarding event by ID",
+                "operationId": "get-forwarding",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal forwarding event ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Forwarding"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/gas/estimate_for_pfb": {
             "get": {
                 "description": "Get estimated gas for pay for blob message with certain values of blob sizes",
@@ -8520,6 +8662,62 @@
                         }
                     ],
                     "example": "commission"
+                }
+            }
+        },
+        "responses.Forwarding": {
+            "type": "object",
+            "properties": {
+                "dest_address": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "0x000000000000000000000000123456789abcdef123456789abcdef12345609"
+                },
+                "dest_domain": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 123456789
+                },
+                "failed_count": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 10
+                },
+                "forward_address": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "success_count": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "transfers": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
                 }
             }
         },

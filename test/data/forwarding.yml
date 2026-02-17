@@ -1,0 +1,16 @@
+- id: 1
+  height: 10000
+  time: '2024-07-04T03:00:00+00:00'
+  address_id: 5
+  tx_id: 5
+  dest_domain: 123
+  dest_recipient: 0x0123456789
+  success_count: 1
+  failed_count: 1
+  transfers:
+    - amount: 10
+      denom: eth
+      error:
+    - amount: 10
+      denom: usdt
+      error: failed due to some reason

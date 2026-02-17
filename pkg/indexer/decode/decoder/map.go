@@ -4,6 +4,7 @@
 package decoder
 
 import (
+	"encoding/hex"
 	"strconv"
 	"strings"
 	"time"
@@ -274,4 +275,20 @@ func parseUnquoteOptional(s string) (string, error) {
 		return strconv.Unquote(s)
 	}
 	return s, nil
+}
+
+func BytesFromMap(m map[string]any, key string) ([]byte, error) {
+	val, ok := m[key]
+	if !ok {
+		return nil, errors.Errorf("can't find key: %s", key)
+	}
+	str, ok := val.(string)
+	if !ok {
+		return nil, errors.Errorf("key '%s' is not a string", key)
+	}
+	str, err := parseUnquoteOptional(str)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unquote string")
+	}
+	return hex.DecodeString(strings.TrimPrefix(str, "0x"))
 }

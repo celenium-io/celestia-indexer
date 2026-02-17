@@ -10,6 +10,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"github.com/shopspring/decimal"
 )
 
 func (s *StorageTestSuite) TestAddressByHash() {
@@ -63,7 +64,7 @@ func (s *StorageTestSuite) TestAddressList() {
 		Sort:   sdk.SortOrderAsc,
 	})
 	s.Require().NoError(err)
-	s.Require().Len(addresses, 4)
+	s.Require().Len(addresses, 5)
 
 	s.Require().EqualValues(1, addresses[0].Id)
 	s.Require().EqualValues(100, addresses[0].Height)
@@ -99,7 +100,7 @@ func (s *StorageTestSuite) TestAddressListWithSortAscHeight() {
 			SortField: field,
 		})
 		s.Require().NoError(err)
-		s.Require().Len(addresses, 4)
+		s.Require().Len(addresses, 5)
 
 		s.Require().EqualValues(1, addresses[0].Id)
 		s.Require().EqualValues(100, addresses[0].Height)
@@ -122,7 +123,7 @@ func (s *StorageTestSuite) TestAddressListWithSortDescHeight() {
 	for _, field := range []string{"first_height", "last_height"} {
 		addresses, err := s.storage.Address.ListWithBalance(ctx, storage.AddressListFilter{
 			Limit:     10,
-			Offset:    0,
+			Offset:    1,
 			Sort:      sdk.SortOrderDesc,
 			SortField: field,
 		})
@@ -149,7 +150,7 @@ func (s *StorageTestSuite) TestAddressListWithSortDesc() {
 			SortField: field,
 		})
 		s.Require().NoError(err)
-		s.Require().Len(addresses, 4)
+		s.Require().Len(addresses, 5)
 
 		s.Require().EqualValues(3, addresses[0].Id)
 		s.Require().EqualValues(102, addresses[0].Height)
@@ -193,24 +194,25 @@ func (s *StorageTestSuite) TestAddressListWithSortAsc() {
 			SortField: field,
 		})
 		s.Require().NoError(err)
-		s.Require().Len(addresses, 4)
+		s.Require().Len(addresses, 5)
 
-		s.Require().EqualValues(1, addresses[2].Id, field)
-		s.Require().EqualValues(100, addresses[2].Height)
-		s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", addresses[2].Address)
-		s.Require().Equal("432", addresses[2].Balance.Spendable.String())
-		s.Require().Equal("utia", addresses[2].Balance.Currency)
+		var balance decimal.Decimal
+		for i := range addresses {
+			var current decimal.Decimal
+			switch field {
+			case "delegated":
+				current = addresses[i].Balance.Delegated.Copy()
+			case "spendable":
+				current = addresses[i].Balance.Spendable.Copy()
+			case "unbonding":
+				current = addresses[i].Balance.Unbonding.Copy()
+			}
 
-		s.Require().EqualValues(2, addresses[1].Id)
-		s.Require().EqualValues(101, addresses[1].Height)
-		s.Require().Equal("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", addresses[1].Address)
-		s.Require().Equal("321", addresses[1].Balance.Spendable.String())
-		s.Require().Equal("utia", addresses[1].Balance.Currency)
-
-		s.Require().EqualValues(101, addresses[0].Height)
-		s.Require().Equal("celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss", addresses[0].Address)
-		s.Require().Equal("210", addresses[0].Balance.Spendable.String())
-		s.Require().Equal("utia", addresses[0].Balance.Currency)
+			if i != 0 {
+				s.Require().True(current.GreaterThanOrEqual(balance), "balance should be sorted in ascending order")
+			}
+			balance = current
+		}
 	}
 }
 

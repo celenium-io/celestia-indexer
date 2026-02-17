@@ -128,7 +128,7 @@ func (s *StorageTestSuite) TestTxFilterSuccessDesc() {
 	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
 		Sort:   sdk.SortOrderDesc,
 		Limit:  10,
-		Offset: 0,
+		Offset: 1,
 		Status: []string{string(types.StatusSuccess)},
 	})
 	s.Require().NoError(err)
@@ -195,7 +195,7 @@ func (s *StorageTestSuite) TestTxFilterTime() {
 		TimeFrom: time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
 	})
 	s.Require().NoError(err)
-	s.Require().Len(txs, 4)
+	s.Require().Len(txs, 5)
 
 	txs, err = s.storage.Tx.Filter(ctx, storage.TxFilter{
 		Limit:  10,
@@ -221,7 +221,7 @@ func (s *StorageTestSuite) TestTxFilterWithRelations() {
 	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
 		Limit:        1,
 		WithMessages: true,
-		Offset:       1,
+		Offset:       2,
 		Sort:         sdk.SortOrderDesc,
 	})
 	s.Require().NoError(err)

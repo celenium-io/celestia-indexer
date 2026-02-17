@@ -15,6 +15,7 @@ func MsgForward(ctx *context.Context, m *fwdTypes.MsgForward) (storageTypes.MsgT
 	msgType := storageTypes.MsgForward
 	addresses, err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
+		{t: storageTypes.MsgAddressTypeReceiver, address: m.ForwardAddr},
 	}, ctx.Block.Height)
 	return msgType, addresses, err
 }

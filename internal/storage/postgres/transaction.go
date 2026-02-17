@@ -133,7 +133,7 @@ func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...*models.Ad
 	}
 
 	_, err := tx.Tx().NewInsert().Model(&addr).
-		Column("address", "height", "last_height", "hash", "name").
+		Column("address", "height", "last_height", "hash", "name", "is_forwarding").
 		On("CONFLICT ON CONSTRAINT address_idx DO UPDATE").
 		Set("last_height = EXCLUDED.last_height").
 		Returning("xmax, id").
@@ -401,6 +401,15 @@ func (tx Transaction) SaveHyperlaneGasPayments(ctx context.Context, payments ...
 	}
 
 	_, err := tx.Tx().NewInsert().Model(&payments).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveForwardings(ctx context.Context, forwardings ...*models.Forwarding) error {
+	if len(forwardings) == 0 {
+		return nil
+	}
+
+	_, err := tx.Tx().NewInsert().Model(&forwardings).Exec(ctx)
 	return err
 }
 
@@ -1188,6 +1197,13 @@ func (tx Transaction) RollbackHyperlaneIgpConfigs(ctx context.Context, height ty
 
 func (tx Transaction) RollbackHyperlaneGasPayment(ctx context.Context, height types.Level) (err error) {
 	_, err = tx.Tx().NewDelete().Model((*models.HLGasPayment)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackForwardings(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.Forwarding)(nil)).
 		Where("height = ?", height).
 		Exec(ctx)
 	return

@@ -556,6 +556,13 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		signalGroup.GET("/upgrade/:version", signalHandler.Upgrade)
 	}
 
+	fwdHandler := handler.NewForwardingsHandler(db.Forwardings, db.Address, db.Tx)
+	forwarding := v1.Group("/forwarding")
+	{
+		forwarding.GET("", fwdHandler.List)
+		forwarding.GET("/:id", fwdHandler.Get)
+	}
+
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
 		SpecURL: "./docs/swagger.json",
 		CustomOptions: scalar.CustomOptions{

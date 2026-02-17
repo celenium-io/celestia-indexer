@@ -44,6 +44,7 @@ func (module *Module) saveMessages(
 		hyperlaneMailbox   = make(map[uint64]*storage.HLMailbox, 0)
 		hyperlaneTokens    = make(map[string]*storage.HLToken, 0)
 		hyperlaneTransfers = make([]*storage.HLTransfer, 0)
+		forwardings        = make([]*storage.Forwarding, 0)
 		grants             = make(map[string]storage.Grant)
 		signals            = make([]*storage.SignalVersion, 0)
 		namespaces         = make(map[string]uint64)
@@ -196,6 +197,16 @@ func (module *Module) saveMessages(
 			}
 
 			ibcTransfers = append(ibcTransfers, messages[i].IbcTransfer)
+		}
+
+		if messages[i].Forwarding != nil {
+			messages[i].Forwarding.TxId = messages[i].TxId
+			if messages[i].Forwarding.Address != nil {
+				if addrId, ok := addrToId[messages[i].Forwarding.Address.Address]; ok {
+					messages[i].Forwarding.AddressId = addrId
+				}
+			}
+			forwardings = append(forwardings, messages[i].Forwarding)
 		}
 
 		if messages[i].HLMailbox != nil {
@@ -447,6 +458,10 @@ func (module *Module) saveMessages(
 			return 0, errors.Wrap(err, "hyperlane gas payments saving")
 		}
 	}
+	if err := tx.SaveForwardings(ctx, forwardings...); err != nil {
+		return 0, errors.Wrap(err, "forwardings saving")
+	}
+
 	if err := tx.SaveSignals(ctx, signals...); err != nil {
 		return 0, errors.Wrap(err, "signals saving")
 	}
