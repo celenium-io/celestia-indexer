@@ -623,6 +623,34 @@ func (s *TransactionTestSuite) TestSaveBlockSignatures() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
+func (s *TransactionTestSuite) TestSaveForwardings() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveForwardings(ctx, &storage.Forwarding{
+		Height:        10000,
+		Time:          time.Now(),
+		DestDomain:    123,
+		DestRecipient: testsuite.RandomBytes(32),
+		AddressId:     1,
+		TxId:          1,
+		SuccessCount:  0,
+		FailedCount:   1,
+		Transfers:     []byte(`[{"amount":"1000","denom":"utia","error":"some error"}]`),
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.Forwardings.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 3)
+}
+
 func (s *TransactionTestSuite) TestRollbackBlockSignatures() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
@@ -688,7 +716,7 @@ func (s *TransactionTestSuite) TestRollbackAddress() {
 
 	items, err := s.storage.Address.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 2)
+	s.Require().Len(items, 3)
 }
 
 func (s *TransactionTestSuite) TestRollbackTxs() {
@@ -709,7 +737,7 @@ func (s *TransactionTestSuite) TestRollbackTxs() {
 
 	items, err := s.storage.Tx.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 2)
+	s.Require().Len(items, 3)
 }
 
 func (s *TransactionTestSuite) TestRollbackEvents() {
@@ -973,6 +1001,24 @@ func (s *TransactionTestSuite) TestRollbackHyperlaneGasPayment() {
 	data, err := s.storage.HLGasPayment.List(ctx, 10, 0)
 	s.Require().NoError(err)
 	s.Require().Len(data, 0)
+}
+
+func (s *TransactionTestSuite) TestRollbackForwardings() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackForwardings(ctx, 10000)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.Forwardings.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
 }
 
 func (s *TransactionTestSuite) TestDeleteBalances() {

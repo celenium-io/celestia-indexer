@@ -35,12 +35,13 @@ type IAddress interface {
 type Address struct {
 	bun.BaseModel `bun:"address" comment:"Table with celestia addresses."`
 
-	Id         uint64      `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
-	Height     types.Level `bun:"height"                      comment:"Block number of the first address occurrence."`
-	LastHeight types.Level `bun:"last_height"                 comment:"Block number of the last address occurrence."`
-	Hash       []byte      `bun:"hash"                        comment:"Address hash."`
-	Address    string      `bun:"address,unique:address_idx"  comment:"Human-readable address."`
-	Name       string      `bun:"name,nullzero"               comment:"Cosmos address name"`
+	Id           uint64      `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
+	Height       types.Level `bun:"height"                      comment:"Block number of the first address occurrence."`
+	LastHeight   types.Level `bun:"last_height"                 comment:"Block number of the last address occurrence."`
+	Hash         []byte      `bun:"hash"                        comment:"Address hash."`
+	Address      string      `bun:"address,unique:address_idx"  comment:"Human-readable address."`
+	Name         string      `bun:"name,nullzero"               comment:"Cosmos address name"`
+	IsForwarding bool        `bun:"is_forwarding,default:false" comment:"Is the address used for forwarding."`
 
 	Balance    Balance               `bun:"rel:has-one,join:id=id"`
 	Celestials *celestials.Celestial `bun:"rel:has-one,join:id=address_id"`

@@ -1011,6 +1011,41 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// Forwarding
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Forwarding)(nil)).
+			Index("forwarding_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Forwarding)(nil)).
+			Index("forwarding_address_id_idx").
+			Column("address_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Forwarding)(nil)).
+			Index("forwarding_tx_id_idx").
+			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Forwarding)(nil)).
+			Index("forwarding_domain_idx").
+			Column("dest_domain").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

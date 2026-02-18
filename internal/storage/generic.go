@@ -61,6 +61,7 @@ var Models = []any{
 	&HLIGP{},
 	&HLIGPConfig{},
 	&HLGasPayment{},
+	&Forwarding{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -131,6 +132,7 @@ type Transaction interface {
 	SaveHyperlaneIgps(ctx context.Context, igps ...*HLIGP) error
 	SaveHyperlaneIgpConfigs(ctx context.Context, configs ...HLIGPConfig) error
 	SaveHyperlaneGasPayments(ctx context.Context, payments ...*HLGasPayment) error
+	SaveForwardings(ctx context.Context, forwardings ...*Forwarding) error
 
 	RollbackBlock(ctx context.Context, height types.Level) error
 	RollbackBlockStats(ctx context.Context, height types.Level) (stats BlockStats, err error)
@@ -167,6 +169,7 @@ type Transaction interface {
 	RollbackHyperlaneIgps(ctx context.Context, height types.Level) error
 	RollbackHyperlaneIgpConfigs(ctx context.Context, height types.Level) error
 	RollbackHyperlaneGasPayment(ctx context.Context, height types.Level) error
+	RollbackForwardings(ctx context.Context, height types.Level) error
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	DeleteProviders(ctx context.Context, rollupId uint64) error
 	DeleteRollup(ctx context.Context, rollupId uint64) error

@@ -79,6 +79,10 @@ func processExec(ctx *context.Context, events []storage.Event, msg *storage.Mess
 			if err := processVote(ctx, events, internalMessage, idx); err != nil {
 				return err
 			}
+		case "/celestia.forwarding.v1.MsgForward":
+			if err := processForward(ctx, events, internalMessage, idx); err != nil {
+				return err
+			}
 		default:
 			for j := *idx; j < len(events); j++ {
 				authMsgIdxPtr, err := decoder.AuthMsgIndexFromMap(events[*idx].Data)

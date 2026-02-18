@@ -62,7 +62,7 @@ func (s *StorageTestSuite) TestHyperlaneTransferList() {
 		s.Require().Len(transfers, 1)
 
 		transfer := transfers[0]
-		s.Require().EqualValues(1, transfer.Id)
+		s.Require().EqualValues(1, transfer.Id, fltrs)
 		s.Require().EqualValues(1000, transfer.Height)
 		s.Require().EqualValues(1234, transfer.Counterparty)
 		s.Require().EqualValues("utia", transfer.Denom)
@@ -212,7 +212,7 @@ func (s *StorageTestSuite) TestStatsByDomain() {
 
 	stats, err := s.storage.HLTransfer.StatsByDomain(ctx, 10, 0)
 	s.Require().NoError(err)
-	s.Require().Len(stats, 2)
+	s.Require().Len(stats, 3)
 
 	s.Require().Equal(uint64(12345), stats[0].Domain)
 	s.Require().Equal("2000", stats[0].Amount.String())

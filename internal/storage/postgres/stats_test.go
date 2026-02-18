@@ -85,7 +85,7 @@ func (s *StatsTestSuite) TestCount() {
 			want:  "2",
 		}, {
 			table: "tx",
-			want:  "4",
+			want:  "5",
 		}, {
 			table: "event",
 			want:  "3",
@@ -131,7 +131,7 @@ func (s *StatsTestSuite) TestCountNoData() {
 
 		count, err := s.storage.Stats.Count(ctx, storage.CountRequest{
 			Table: tests[i].table,
-			From:  1693324139,
+			From:  1893324139,
 		})
 		s.Require().NoError(err)
 		s.Require().EqualValues("0", count)
@@ -181,7 +181,7 @@ func (s *StatsTestSuite) TestSummaryBlock() {
 			table:    "tx",
 			column:   "fee",
 			function: "avg",
-			want:     "60307",
+			want:     "48246",
 		}, {
 			table:    "tx",
 			column:   "fee",

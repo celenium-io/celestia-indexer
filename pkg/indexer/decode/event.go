@@ -857,3 +857,54 @@ func NewHyperlaneSetIgpEvent(m map[string]any) (hsie HyperlaneSetIgpEvent, err e
 	}
 	return
 }
+
+type EventForwardingComplete struct {
+	ForwardAddress       string
+	DestinationDomain    uint64
+	DestinationRecipient []byte
+	SuccessfulCount      uint64
+	FailedCount          uint64
+}
+
+func NewEventForwardingComplete(m map[string]any) (efc EventForwardingComplete, err error) {
+	efc.ForwardAddress = decoder.StringFromMap(m, "forward_address")
+	efc.DestinationDomain, err = decoder.Uint64FromMap(m, "destination_domain")
+	if err != nil {
+		return efc, errors.Wrap(err, "destination_domain")
+	}
+	efc.DestinationRecipient, err = decoder.BytesFromMap(m, "destination_recipient")
+	if err != nil {
+		return efc, errors.Wrap(err, "destination_recipient")
+	}
+	efc.SuccessfulCount, err = decoder.Uint64FromMap(m, "successful_count")
+	if err != nil {
+		return efc, errors.Wrap(err, "successful_count")
+	}
+	efc.FailedCount, err = decoder.Uint64FromMap(m, "failed_count")
+	if err != nil {
+		return efc, errors.Wrap(err, "failed_count")
+	}
+	return
+}
+
+type EventTokenForwarded struct {
+	ForwardAddress string
+	Denom          string
+	Amount         string
+	MessageId      string
+	Success        bool
+	Error          string
+}
+
+func NewEventTokenForwarded(m map[string]any) (etf EventTokenForwarded, err error) {
+	etf.ForwardAddress = decoder.StringFromMap(m, "forward_address")
+	etf.Denom = decoder.StringFromMap(m, "denom")
+	etf.Amount = decoder.StringFromMap(m, "amount")
+	etf.MessageId = decoder.StringFromMap(m, "message_id")
+	etf.Success, err = decoder.BoolFromMap(m, "success")
+	if err != nil {
+		return etf, errors.Wrap(err, "success")
+	}
+	etf.Error = decoder.StringFromMap(m, "error")
+	return
+}

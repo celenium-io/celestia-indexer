@@ -1878,6 +1878,44 @@ func (c *MockTransactionRollbackEventsCall) DoAndReturn(f func(context.Context, 
 	return c
 }
 
+// RollbackForwardings mocks base method.
+func (m *MockTransaction) RollbackForwardings(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackForwardings", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackForwardings indicates an expected call of RollbackForwardings.
+func (mr *MockTransactionMockRecorder) RollbackForwardings(ctx, height any) *MockTransactionRollbackForwardingsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackForwardings", reflect.TypeOf((*MockTransaction)(nil).RollbackForwardings), ctx, height)
+	return &MockTransactionRollbackForwardingsCall{Call: call}
+}
+
+// MockTransactionRollbackForwardingsCall wrap *gomock.Call
+type MockTransactionRollbackForwardingsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackForwardingsCall) Return(arg0 error) *MockTransactionRollbackForwardingsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackForwardingsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackForwardingsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackForwardingsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackForwardingsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // RollbackGrants mocks base method.
 func (m *MockTransaction) RollbackGrants(ctx context.Context, height types.Level) error {
 	m.ctrl.T.Helper()
@@ -3285,6 +3323,49 @@ func (c *MockTransactionSaveEventsCall) Do(f func(context.Context, ...storage.Ev
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionSaveEventsCall) DoAndReturn(f func(context.Context, ...storage.Event) error) *MockTransactionSaveEventsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveForwardings mocks base method.
+func (m *MockTransaction) SaveForwardings(ctx context.Context, forwardings ...*storage.Forwarding) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range forwardings {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveForwardings", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveForwardings indicates an expected call of SaveForwardings.
+func (mr *MockTransactionMockRecorder) SaveForwardings(ctx any, forwardings ...any) *MockTransactionSaveForwardingsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, forwardings...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveForwardings", reflect.TypeOf((*MockTransaction)(nil).SaveForwardings), varargs...)
+	return &MockTransactionSaveForwardingsCall{Call: call}
+}
+
+// MockTransactionSaveForwardingsCall wrap *gomock.Call
+type MockTransactionSaveForwardingsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveForwardingsCall) Return(arg0 error) *MockTransactionSaveForwardingsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveForwardingsCall) Do(f func(context.Context, ...*storage.Forwarding) error) *MockTransactionSaveForwardingsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveForwardingsCall) DoAndReturn(f func(context.Context, ...*storage.Forwarding) error) *MockTransactionSaveForwardingsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

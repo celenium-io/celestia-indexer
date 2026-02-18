@@ -712,3 +712,36 @@ func TestNewHyperlaneReceiveTransferEvent(t *testing.T) {
 		})
 	}
 }
+
+func TestEventForwardingComplete(t *testing.T) {
+	tests := []struct {
+		name string
+		m    map[string]any
+		want EventForwardingComplete
+	}{
+		{
+			name: "test 1",
+			m: map[string]any{
+				"destination_domain":    "84532",
+				"forward_address":       "celestia1z7ut79ds6h550925ehkxpwvkgcfq63y2vfk2e0",
+				"destination_recipient": "0x000000000000000000000000c2455315f69696295b357428fe13970bb5b4effa",
+				"successful_count":      "2",
+				"failed_count":          "1",
+			},
+			want: EventForwardingComplete{
+				DestinationDomain:    84532,
+				ForwardAddress:       "celestia1z7ut79ds6h550925ehkxpwvkgcfq63y2vfk2e0",
+				DestinationRecipient: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc2, 0x45, 0x53, 0x15, 0xf6, 0x96, 0x96, 0x29, 0x5b, 0x35, 0x74, 0x28, 0xfe, 0x13, 0x97, 0xb, 0xb5, 0xb4, 0xef, 0xfa},
+				SuccessfulCount:      2,
+				FailedCount:          1,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotBody, err := NewEventForwardingComplete(tt.m)
+			require.NoError(t, err)
+			require.Equal(t, tt.want, gotBody)
+		})
+	}
+}

@@ -18,3 +18,8 @@
   delegated: 0
   unbonding: 0
   currency: utia
+- id: 5
+  spendable: 0
+  delegated: 0
+  unbonding: 0
+  currency: utia

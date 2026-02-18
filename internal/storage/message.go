@@ -83,6 +83,7 @@ type Message struct {
 	SignalVersion  *SignalVersion    `bun:"-"` // internal field
 	Upgrade        *Upgrade          `bun:"-"` // internal field
 	Validators     []string          `bun:"-"` // internal field
+	Forwarding     *Forwarding       `bun:"-"` // internal field
 }
 
 // TableName -
