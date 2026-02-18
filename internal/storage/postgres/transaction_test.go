@@ -648,7 +648,7 @@ func (s *TransactionTestSuite) TestSaveForwardings() {
 
 	items, err := s.storage.Forwardings.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 2)
+	s.Require().Len(items, 3)
 }
 
 func (s *TransactionTestSuite) TestRollbackBlockSignatures() {

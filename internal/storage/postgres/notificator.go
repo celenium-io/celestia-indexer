@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	connectionName       = "celestia_notifications"
 	minReconnectInterval = 10 * time.Second
 	maxReconnectInterval = time.Minute
 )

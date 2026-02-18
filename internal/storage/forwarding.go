@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
@@ -29,7 +30,8 @@ type IForwarding interface {
 	storage.Table[*Forwarding]
 
 	Filter(ctx context.Context, filters ForwardingFilter) ([]Forwarding, error)
-	ById(ctx context.Context, id uint64) (Forwarding, error)
+	ById(ctx context.Context, id uint64) (Forwarding, time.Time, error)
+	Inputs(ctx context.Context, addressId uint64, from, to time.Time) ([]ForwardingInput, error)
 }
 
 type Forwarding struct {
@@ -52,4 +54,15 @@ type Forwarding struct {
 
 func (Forwarding) TableName() string {
 	return "forwarding"
+}
+
+type ForwardingInput struct {
+	Height       pkgTypes.Level    `bun:"height"`
+	Time         time.Time         `bun:"time"`
+	TxHash       []byte            `bun:"hash"`
+	From         string            `bun:"src"`
+	Amount       string            `bun:"amount"`
+	Denom        string            `bun:"denom"`
+	Counterparty uint64            `bun:"counterparty"`
+	Data         types.PackedBytes `bun:"data"`
 }

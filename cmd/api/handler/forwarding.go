@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/labstack/echo/v4"
 )
@@ -18,17 +19,20 @@ type ForwardingsHandler struct {
 	forwardings storage.IForwarding
 	address     storage.IAddress
 	txs         storage.ITx
+	chainStore  hyperlane.IChainStore
 }
 
 func NewForwardingsHandler(
 	forwardings storage.IForwarding,
 	address storage.IAddress,
 	txs storage.ITx,
+	chainStore hyperlane.IChainStore,
 ) ForwardingsHandler {
 	return ForwardingsHandler{
 		forwardings: forwardings,
 		address:     address,
 		txs:         txs,
+		chainStore:  chainStore,
 	}
 }
 
@@ -125,7 +129,7 @@ func (handler *ForwardingsHandler) List(c echo.Context) error {
 	}
 	response := make([]responses.Forwarding, len(forwardings))
 	for i := range forwardings {
-		response[i] = responses.NewForwarding(forwardings[i])
+		response[i] = responses.NewForwarding(forwardings[i], handler.chainStore)
 	}
 	return returnArray(c, response)
 }
@@ -151,10 +155,21 @@ func (handler *ForwardingsHandler) Get(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	forwarding, err := handler.forwardings.ById(c.Request().Context(), req.Id)
+	forwarding, prevTime, err := handler.forwardings.ById(c.Request().Context(), req.Id)
 	if err != nil {
 		return handleError(c, err, handler.forwardings)
 	}
 
-	return c.JSON(http.StatusOK, responses.NewForwarding(forwarding))
+	inputs, err := handler.forwardings.Inputs(c.Request().Context(), forwarding.AddressId, prevTime, forwarding.Time)
+	if err != nil {
+		return handleError(c, err, handler.forwardings)
+	}
+
+	response := responses.NewForwarding(forwarding, handler.chainStore)
+
+	response.Inputs = make([]responses.ForwardingInput, len(inputs))
+	for i, input := range inputs {
+		response.Inputs[i] = responses.NewForwardingInputFromHyperlaneTransfer(input, handler.chainStore)
+	}
+	return c.JSON(http.StatusOK, response)
 }

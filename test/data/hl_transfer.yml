@@ -32,3 +32,20 @@
   amount: 2000
   denom: utia
   tx_id: 2
+- id: 3
+  height: 1001
+  time: '2023-07-04T04:11:57'
+  mailbox_id: 2
+  relayer_id: 3
+  token_id: 2
+  counterparty: 123450
+  address_id: 5
+  counterparty_address: '1234567890abcdef'
+  version: 1
+  nonce: 1
+  body: 0x01020301
+  metadata: 0x302010
+  type: receive
+  amount: 1000
+  denom: utia
+  tx_id: 2

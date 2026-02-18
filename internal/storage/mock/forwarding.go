@@ -15,6 +15,7 @@ package mock
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
 	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -46,12 +47,13 @@ func (m *MockIForwarding) EXPECT() *MockIForwardingMockRecorder {
 }
 
 // ById mocks base method.
-func (m *MockIForwarding) ById(ctx context.Context, id uint64) (storage.Forwarding, error) {
+func (m *MockIForwarding) ById(ctx context.Context, id uint64) (storage.Forwarding, time.Time, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ById", ctx, id)
 	ret0, _ := ret[0].(storage.Forwarding)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(time.Time)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // ById indicates an expected call of ById.
@@ -67,19 +69,19 @@ type MockIForwardingByIdCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIForwardingByIdCall) Return(arg0 storage.Forwarding, arg1 error) *MockIForwardingByIdCall {
-	c.Call = c.Call.Return(arg0, arg1)
+func (c *MockIForwardingByIdCall) Return(arg0 storage.Forwarding, arg1 time.Time, arg2 error) *MockIForwardingByIdCall {
+	c.Call = c.Call.Return(arg0, arg1, arg2)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIForwardingByIdCall) Do(f func(context.Context, uint64) (storage.Forwarding, error)) *MockIForwardingByIdCall {
+func (c *MockIForwardingByIdCall) Do(f func(context.Context, uint64) (storage.Forwarding, time.Time, error)) *MockIForwardingByIdCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIForwardingByIdCall) DoAndReturn(f func(context.Context, uint64) (storage.Forwarding, error)) *MockIForwardingByIdCall {
+func (c *MockIForwardingByIdCall) DoAndReturn(f func(context.Context, uint64) (storage.Forwarding, time.Time, error)) *MockIForwardingByIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -197,6 +199,45 @@ func (c *MockIForwardingGetByIDCall) Do(f func(context.Context, uint64) (*storag
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIForwardingGetByIDCall) DoAndReturn(f func(context.Context, uint64) (*storage.Forwarding, error)) *MockIForwardingGetByIDCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Inputs mocks base method.
+func (m *MockIForwarding) Inputs(ctx context.Context, addressId uint64, from, to time.Time) ([]storage.ForwardingInput, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Inputs", ctx, addressId, from, to)
+	ret0, _ := ret[0].([]storage.ForwardingInput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Inputs indicates an expected call of Inputs.
+func (mr *MockIForwardingMockRecorder) Inputs(ctx, addressId, from, to any) *MockIForwardingInputsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Inputs", reflect.TypeOf((*MockIForwarding)(nil).Inputs), ctx, addressId, from, to)
+	return &MockIForwardingInputsCall{Call: call}
+}
+
+// MockIForwardingInputsCall wrap *gomock.Call
+type MockIForwardingInputsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIForwardingInputsCall) Return(arg0 []storage.ForwardingInput, arg1 error) *MockIForwardingInputsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIForwardingInputsCall) Do(f func(context.Context, uint64, time.Time, time.Time) ([]storage.ForwardingInput, error)) *MockIForwardingInputsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIForwardingInputsCall) DoAndReturn(f func(context.Context, uint64, time.Time, time.Time) ([]storage.ForwardingInput, error)) *MockIForwardingInputsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

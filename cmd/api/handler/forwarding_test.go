@@ -11,8 +11,10 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
+	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/labstack/echo/v4"
@@ -46,6 +48,7 @@ type ForwardingTestSuite struct {
 	forwardings *mock.MockIForwarding
 	address     *mock.MockIAddress
 	txs         *mock.MockITx
+	chainStore  *hyperlane.MockIChainStore
 	handler     ForwardingsHandler
 	ctrl        *gomock.Controller
 }
@@ -58,7 +61,8 @@ func (s *ForwardingTestSuite) SetupSuite() {
 	s.forwardings = mock.NewMockIForwarding(s.ctrl)
 	s.address = mock.NewMockIAddress(s.ctrl)
 	s.txs = mock.NewMockITx(s.ctrl)
-	s.handler = NewForwardingsHandler(s.forwardings, s.address, s.txs)
+	s.chainStore = hyperlane.NewMockIChainStore(s.ctrl)
+	s.handler = NewForwardingsHandler(s.forwardings, s.address, s.txs, s.chainStore)
 }
 
 // TearDownSuite -
@@ -90,6 +94,11 @@ func (s *ForwardingTestSuite) TestList() {
 		Return([]storage.Forwarding{testForwarding}, nil).
 		Times(1)
 
+	s.chainStore.EXPECT().
+		Get(gomock.Any()).
+		Return(testChainMetadata, true).
+		Times(1)
+
 	s.Require().NoError(s.handler.List(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
@@ -104,7 +113,10 @@ func (s *ForwardingTestSuite) TestList() {
 	s.Require().Equal(testTime, fwd.Time)
 	s.Require().EqualValues(strings.ToLower(testTxHash), fwd.TxHash)
 	s.Require().EqualValues(123456789, fwd.DestDomain)
-	s.Require().Equal(testAddress, fwd.ForwardAddress)
+	s.Require().NotNil(fwd.ForwardAddress)
+	s.Require().Equal(testAddress, fwd.ForwardAddress.Hash)
+	s.Require().NotNil(fwd.Chain)
+	s.Require().Equal(testChainMetadata.DisplayName, fwd.Chain.Name)
 	s.Require().EqualValues(10, fwd.SuccessCount)
 	s.Require().EqualValues(2, fwd.FailedCount)
 }
@@ -150,6 +162,11 @@ func (s *ForwardingTestSuite) TestListWithTxHash() {
 		Return(txId, testTime, nil).
 		Times(1)
 
+	s.chainStore.EXPECT().
+		Get(gomock.Any()).
+		Return(testChainMetadata, true).
+		Times(1)
+
 	s.forwardings.EXPECT().
 		Filter(gomock.Any(), storage.ForwardingFilter{
 			Limit:  10,
@@ -181,6 +198,11 @@ func (s *ForwardingTestSuite) TestListWithAddress() {
 	c.SetPath("/forwarding")
 
 	addressId := uint64(1)
+
+	s.chainStore.EXPECT().
+		Get(gomock.Any()).
+		Return(testChainMetadata, true).
+		Times(1)
 
 	s.address.EXPECT().
 		IdByAddress(gomock.Any(), testAddress).
@@ -217,6 +239,11 @@ func (s *ForwardingTestSuite) TestListWithHeight() {
 	c.SetPath("/forwarding")
 
 	height := uint64(100)
+
+	s.chainStore.EXPECT().
+		Get(gomock.Any()).
+		Return(testChainMetadata, true).
+		Times(1)
 
 	s.forwardings.EXPECT().
 		Filter(gomock.Any(), storage.ForwardingFilter{
@@ -260,7 +287,34 @@ func (s *ForwardingTestSuite) TestGet() {
 
 	s.forwardings.EXPECT().
 		ById(gomock.Any(), uint64(1)).
-		Return(testForwarding, nil).
+		Return(testForwarding, testTime, nil).
+		Times(1)
+
+	s.chainStore.EXPECT().
+		Get(gomock.Any()).
+		Return(testChainMetadata, true).
+		Times(2)
+
+	s.forwardings.EXPECT().
+		Inputs(gomock.Any(), uint64(1), gomock.Any(), gomock.Any()).
+		Return([]storage.ForwardingInput{
+			{
+				Height:       100,
+				Time:         testTime,
+				TxHash:       testTx.Hash,
+				From:         testAddress,
+				Amount:       "12345",
+				Denom:        "utia",
+				Counterparty: 123456789,
+			}, {
+				Height: 101,
+				Time:   testTime.Add(time.Minute),
+				TxHash: testTx.Hash,
+				From:   testAddress,
+				Amount: "54321",
+				Denom:  "utia",
+			},
+		}, nil).
 		Times(1)
 
 	s.Require().NoError(s.handler.Get(c))
@@ -274,9 +328,32 @@ func (s *ForwardingTestSuite) TestGet() {
 	s.Require().Equal(testTime, response.Time)
 	s.Require().EqualValues(strings.ToLower(testTxHash), response.TxHash)
 	s.Require().EqualValues(123456789, response.DestDomain)
-	s.Require().Equal(testAddress, response.ForwardAddress)
+	s.Require().NotNil(response.ForwardAddress)
+	s.Require().Equal(testAddress, response.ForwardAddress.Hash)
+	s.Require().NotNil(response.Chain)
+	s.Require().Equal(testChainMetadata.DisplayName, response.Chain.Name)
 	s.Require().EqualValues(10, response.SuccessCount)
 	s.Require().EqualValues(2, response.FailedCount)
+	s.Require().Len(response.Inputs, 2)
+
+	input1 := response.Inputs[0]
+	s.Require().EqualValues(100, input1.Height)
+	s.Require().Equal(testTime, input1.Time)
+	s.Require().EqualValues(strings.ToLower(testTxHash), input1.TxHash)
+	s.Require().Equal(testAddress, input1.From)
+	s.Require().Equal("12345", input1.Amount)
+	s.Require().Equal("utia", input1.Denom)
+	s.Require().NotNil(input1.Chain)
+	s.Require().Equal(testChainMetadata.DisplayName, input1.Chain.Name)
+
+	input2 := response.Inputs[1]
+	s.Require().EqualValues(101, input2.Height)
+	s.Require().Equal(testTime.Add(time.Minute), input2.Time)
+	s.Require().EqualValues(strings.ToLower(testTxHash), input2.TxHash)
+	s.Require().Equal(testAddress, input2.From)
+	s.Require().Equal("54321", input2.Amount)
+	s.Require().Equal("utia", input2.Denom)
+	s.Require().Nil(input2.Chain)
 }
 
 func (s *ForwardingTestSuite) TestGetValidationError() {

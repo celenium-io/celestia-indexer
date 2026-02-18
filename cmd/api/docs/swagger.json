@@ -8668,6 +8668,9 @@
         "responses.Forwarding": {
             "type": "object",
             "properties": {
+                "chain": {
+                    "$ref": "#/definitions/responses.ChainMetadata"
+                },
                 "dest_address": {
                     "type": "string",
                     "format": "binary",
@@ -8684,9 +8687,7 @@
                     "example": 10
                 },
                 "forward_address": {
-                    "type": "string",
-                    "format": "string",
-                    "example": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+                    "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "height": {
                     "type": "integer",
@@ -8697,6 +8698,12 @@
                     "type": "integer",
                     "format": "int64",
                     "example": 321
+                },
+                "inputs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responses.ForwardingInput"
+                    }
                 },
                 "success_count": {
                     "type": "integer",
@@ -8713,6 +8720,44 @@
                     "items": {
                         "type": "integer"
                     }
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                }
+            }
+        },
+        "responses.ForwardingInput": {
+            "type": "object",
+            "properties": {
+                "chain": {
+                    "$ref": "#/definitions/responses.ChainMetadata"
+                },
+                "denom": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "utia"
+                },
+                "from": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0x000000000000000000000000123456789abcdef123456789abcdef12345609"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "received": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "123445"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
                 },
                 "tx_hash": {
                     "type": "string",

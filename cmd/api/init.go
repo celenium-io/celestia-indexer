@@ -556,7 +556,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		signalGroup.GET("/upgrade/:version", signalHandler.Upgrade)
 	}
 
-	fwdHandler := handler.NewForwardingsHandler(db.Forwardings, db.Address, db.Tx)
+	fwdHandler := handler.NewForwardingsHandler(db.Forwardings, db.Address, db.Tx, chainStore)
 	forwarding := v1.Group("/forwarding")
 	{
 		forwarding.GET("", fwdHandler.List)
