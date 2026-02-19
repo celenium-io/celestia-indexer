@@ -31,9 +31,8 @@ func NewForwarding(db *database.Bun) *Forwarding {
 func (f *Forwarding) ById(ctx context.Context, id uint64) (forwarding storage.Forwarding, prevTime time.Time, err error) {
 	subQuery := f.DB().NewSelect().
 		Model(&forwarding).
-		Where("id = ?", id).
-		WhereOr("id = ?", id-1).
-		Order("id desc").
+		Where("id <= ?", id).
+		Order("id desc", "time desc").
 		Limit(2)
 
 	var fwds []storage.Forwarding
