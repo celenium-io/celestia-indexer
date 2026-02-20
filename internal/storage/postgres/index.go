@@ -1046,6 +1046,106 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			return err
 		}
 
+		// ZK ISM
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ZkISM)(nil)).
+			Index("zk_ism_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ZkISM)(nil)).
+			Index("zk_ism_creator_id_idx").
+			Column("creator_id").
+			Where("creator_id is not null").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ZkISM)(nil)).
+			Index("zk_ism_tx_id_idx").
+			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// ZK ISM Update
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ZkISMUpdate)(nil)).
+			Index("zk_ism_update_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ZkISMUpdate)(nil)).
+			Index("zk_ism_update_zk_ism_id_idx").
+			Column("zk_ism_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ZkISMUpdate)(nil)).
+			Index("zk_ism_update_signer_id_idx").
+			Column("signer_id").
+			Where("signer_id is not null").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ZkISMUpdate)(nil)).
+			Index("zk_ism_update_tx_id_idx").
+			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// ZK ISM Message
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ZkISMMessage)(nil)).
+			Index("zk_ism_message_height_idx").
+			Column("height").
+			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ZkISMMessage)(nil)).
+			Index("zk_ism_message_zk_ism_id_idx").
+			Column("zk_ism_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ZkISMMessage)(nil)).
+			Index("zk_ism_message_signer_id_idx").
+			Column("signer_id").
+			Where("signer_id is not null").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ZkISMMessage)(nil)).
+			Index("zk_ism_message_tx_id_idx").
+			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

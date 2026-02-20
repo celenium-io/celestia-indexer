@@ -45,6 +45,9 @@ func (module *Module) saveMessages(
 		hyperlaneTokens    = make(map[string]*storage.HLToken, 0)
 		hyperlaneTransfers = make([]*storage.HLTransfer, 0)
 		forwardings        = make([]*storage.Forwarding, 0)
+		zkisms             = make(map[string]*storage.ZkISM, 0)
+		zkismUpdates       = make([]*storage.ZkISMUpdate, 0)
+		zkismMessages      = make([]*storage.ZkISMMessage, 0)
 		grants             = make(map[string]storage.Grant)
 		signals            = make([]*storage.SignalVersion, 0)
 		namespaces         = make(map[string]uint64)
@@ -207,6 +210,54 @@ func (module *Module) saveMessages(
 				}
 			}
 			forwardings = append(forwardings, messages[i].Forwarding)
+		}
+
+		if messages[i].ZkISM != nil {
+			messages[i].ZkISM.TxId = messages[i].TxId
+			if messages[i].ZkISM.Creator != nil {
+				if addrId, ok := addrToId[messages[i].ZkISM.Creator.Address]; ok {
+					messages[i].ZkISM.CreatorId = addrId
+				}
+			}
+			zkisms[messages[i].ZkISM.ExternalIdString()] = messages[i].ZkISM
+		}
+
+		if messages[i].ZkISMUpdate != nil {
+			messages[i].ZkISMUpdate.TxId = messages[i].TxId
+			if messages[i].ZkISMUpdate.Signer != nil {
+				if addrId, ok := addrToId[messages[i].ZkISMUpdate.Signer.Address]; ok {
+					messages[i].ZkISMUpdate.SignerId = addrId
+				}
+			}
+			if _, ok := zkisms[messages[i].ZkISMUpdate.ExternalId()]; !ok {
+				// ISM from a previous block: resolve its DB id now.
+				dbIsm, err := tx.ZkISMById(ctx, messages[i].ZkISMUpdate.ZkISMExternalId)
+				if err != nil {
+					return 0, errors.Wrapf(err, "can't find zk ism for update: external_id=%s", messages[i].ZkISMUpdate.ExternalId())
+				}
+				messages[i].ZkISMUpdate.ZkISMId = dbIsm.Id
+			}
+			zkismUpdates = append(zkismUpdates, messages[i].ZkISMUpdate)
+		}
+
+		if len(messages[i].ZkISMMessages) > 0 {
+			for _, m := range messages[i].ZkISMMessages {
+				m.TxId = messages[i].TxId
+				if m.Signer != nil {
+					if addrId, ok := addrToId[m.Signer.Address]; ok {
+						m.SignerId = addrId
+					}
+				}
+				if _, ok := zkisms[m.ExternalId()]; !ok {
+					// ISM from a previous block: resolve its DB id now.
+					dbIsm, err := tx.ZkISMById(ctx, m.ZkISMExternalId)
+					if err != nil {
+						return 0, errors.Wrapf(err, "can't find zk ism for message: external_id=%s", m.ExternalId())
+					}
+					m.ZkISMId = dbIsm.Id
+				}
+				zkismMessages = append(zkismMessages, m)
+			}
 		}
 
 		if messages[i].HLMailbox != nil {
@@ -460,6 +511,34 @@ func (module *Module) saveMessages(
 	}
 	if err := tx.SaveForwardings(ctx, forwardings...); err != nil {
 		return 0, errors.Wrap(err, "forwardings saving")
+	}
+
+	if err := tx.SaveZkISMs(ctx, slices.Collect(maps.Values(zkisms))...); err != nil {
+		return 0, errors.Wrap(err, "zk isms saving")
+	}
+
+	// Resolve ZkISMId for updates and messages that reference ISMs created in the same block.
+	// SaveZkISMs populates the Id field on each ZkISM struct via the Bun RETURNING mechanism.
+	for i := range zkismUpdates {
+		if zkismUpdates[i].ZkISMId == 0 {
+			if ism, ok := zkisms[zkismUpdates[i].ExternalId()]; ok {
+				zkismUpdates[i].ZkISMId = ism.Id
+			}
+		}
+	}
+	for i := range zkismMessages {
+		if zkismMessages[i].ZkISMId == 0 {
+			if ism, ok := zkisms[zkismMessages[i].ExternalId()]; ok {
+				zkismMessages[i].ZkISMId = ism.Id
+			}
+		}
+	}
+
+	if err := tx.SaveZkISMUpdates(ctx, zkismUpdates...); err != nil {
+		return 0, errors.Wrap(err, "zk ism updates saving")
+	}
+	if err := tx.SaveZkISMMessages(ctx, zkismMessages...); err != nil {
+		return 0, errors.Wrap(err, "zk ism messages saving")
 	}
 
 	if err := tx.SaveSignals(ctx, signals...); err != nil {
