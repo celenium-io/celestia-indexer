@@ -1614,7 +1614,7 @@ func (tx Transaction) RollbackZkISMMessages(ctx context.Context, height types.Le
 	return
 }
 
-func (tx Transaction) ZkISMById(ctx context.Context, externalId uint64) (item models.ZkISM, err error) {
+func (tx Transaction) ZkISMById(ctx context.Context, externalId []byte) (item models.ZkISM, err error) {
 	err = tx.Tx().NewSelect().Model(&item).
 		Where("external_id = ?", externalId).
 		Column("id").

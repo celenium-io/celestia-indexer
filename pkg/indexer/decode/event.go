@@ -911,7 +911,7 @@ func NewEventTokenForwarded(m map[string]any) (etf EventTokenForwarded, err erro
 }
 
 type ZkISMCreateEvent struct {
-	Id                  uint64
+	Id                  []byte
 	Creator             string
 	State               []byte
 	StateRoot           []byte
@@ -922,7 +922,7 @@ type ZkISMCreateEvent struct {
 }
 
 func NewZkISMCreateEvent(m map[string]any) (e ZkISMCreateEvent, err error) {
-	e.Id, err = decoder.Uint64FromMap(m, "id")
+	e.Id, err = decoder.BytesFromMap(m, "id")
 	if err != nil {
 		return e, errors.Wrap(err, "id")
 	}
@@ -955,14 +955,14 @@ func NewZkISMCreateEvent(m map[string]any) (e ZkISMCreateEvent, err error) {
 }
 
 type ZkISMUpdateEvent struct {
-	Id           uint64
+	Id           []byte
 	Signer       string
 	NewState     []byte
 	NewStateRoot []byte
 }
 
 func NewZkISMUpdateEvent(m map[string]any) (e ZkISMUpdateEvent, err error) {
-	e.Id, err = decoder.Uint64FromMap(m, "id")
+	e.Id, err = decoder.BytesFromMap(m, "id")
 	if err != nil {
 		return e, errors.Wrap(err, "id")
 	}
@@ -979,14 +979,14 @@ func NewZkISMUpdateEvent(m map[string]any) (e ZkISMUpdateEvent, err error) {
 }
 
 type ZkISMSubmitMessagesEvent struct {
-	Id         uint64
+	Id         []byte
 	Signer     string
 	StateRoot  []byte
 	MessageIds [][]byte
 }
 
 func NewZkISMSubmitMessagesEvent(m map[string]any) (e ZkISMSubmitMessagesEvent, err error) {
-	e.Id, err = decoder.Uint64FromMap(m, "id")
+	e.Id, err = decoder.BytesFromMap(m, "id")
 	if err != nil {
 		return e, errors.Wrap(err, "id")
 	}

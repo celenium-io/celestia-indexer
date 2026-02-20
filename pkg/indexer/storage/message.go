@@ -45,7 +45,7 @@ func (module *Module) saveMessages(
 		hyperlaneTokens    = make(map[string]*storage.HLToken, 0)
 		hyperlaneTransfers = make([]*storage.HLTransfer, 0)
 		forwardings        = make([]*storage.Forwarding, 0)
-		zkisms             = make(map[uint64]*storage.ZkISM, 0)
+		zkisms             = make(map[string]*storage.ZkISM, 0)
 		zkismUpdates       = make([]*storage.ZkISMUpdate, 0)
 		zkismMessages      = make([]*storage.ZkISMMessage, 0)
 		grants             = make(map[string]storage.Grant)
@@ -219,7 +219,7 @@ func (module *Module) saveMessages(
 					messages[i].ZkISM.CreatorId = addrId
 				}
 			}
-			zkisms[messages[i].ZkISM.ExternalId] = messages[i].ZkISM
+			zkisms[messages[i].ZkISM.ExternalIdString()] = messages[i].ZkISM
 		}
 
 		if messages[i].ZkISMUpdate != nil {
@@ -229,11 +229,11 @@ func (module *Module) saveMessages(
 					messages[i].ZkISMUpdate.SignerId = addrId
 				}
 			}
-			if _, ok := zkisms[messages[i].ZkISMUpdate.ZkISMExternalId]; !ok {
+			if _, ok := zkisms[messages[i].ZkISMUpdate.ExternalId()]; !ok {
 				// ISM from a previous block: resolve its DB id now.
 				dbIsm, err := tx.ZkISMById(ctx, messages[i].ZkISMUpdate.ZkISMExternalId)
 				if err != nil {
-					return 0, errors.Wrapf(err, "can't find zk ism for update: external_id=%d", messages[i].ZkISMUpdate.ZkISMExternalId)
+					return 0, errors.Wrapf(err, "can't find zk ism for update: external_id=%s", messages[i].ZkISMUpdate.ExternalId())
 				}
 				messages[i].ZkISMUpdate.ZkISMId = dbIsm.Id
 			}
@@ -248,11 +248,11 @@ func (module *Module) saveMessages(
 						m.SignerId = addrId
 					}
 				}
-				if _, ok := zkisms[m.ZkISMExternalId]; !ok {
+				if _, ok := zkisms[m.ExternalId()]; !ok {
 					// ISM from a previous block: resolve its DB id now.
 					dbIsm, err := tx.ZkISMById(ctx, m.ZkISMExternalId)
 					if err != nil {
-						return 0, errors.Wrapf(err, "can't find zk ism for message: external_id=%d", m.ZkISMExternalId)
+						return 0, errors.Wrapf(err, "can't find zk ism for message: external_id=%s", m.ExternalId())
 					}
 					m.ZkISMId = dbIsm.Id
 				}
@@ -521,14 +521,14 @@ func (module *Module) saveMessages(
 	// SaveZkISMs populates the Id field on each ZkISM struct via the Bun RETURNING mechanism.
 	for i := range zkismUpdates {
 		if zkismUpdates[i].ZkISMId == 0 {
-			if ism, ok := zkisms[zkismUpdates[i].ZkISMExternalId]; ok {
+			if ism, ok := zkisms[zkismUpdates[i].ExternalId()]; ok {
 				zkismUpdates[i].ZkISMId = ism.Id
 			}
 		}
 	}
 	for i := range zkismMessages {
 		if zkismMessages[i].ZkISMId == 0 {
-			if ism, ok := zkisms[zkismMessages[i].ZkISMExternalId]; ok {
+			if ism, ok := zkisms[zkismMessages[i].ExternalId()]; ok {
 				zkismMessages[i].ZkISMId = ism.Id
 			}
 		}

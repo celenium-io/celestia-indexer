@@ -768,7 +768,7 @@ func TestNewZkISMCreateEvent(t *testing.T) {
 		{
 			name: "valid event",
 			m: map[string]any{
-				"id":                    "42",
+				"id":                    "deadbeaf",
 				"creator":               "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state":                 toHex(stateBytes),
 				"state_root":            toHex(stateRootBytes),
@@ -778,7 +778,7 @@ func TestNewZkISMCreateEvent(t *testing.T) {
 				"state_membership_vkey": toHex(stateMembershipVKeyBytes),
 			},
 			want: ZkISMCreateEvent{
-				Id:                  42,
+				Id:                  testsuite.MustHexDecode("deadbeaf"),
 				Creator:             "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				State:               stateBytes,
 				StateRoot:           stateRootBytes,
@@ -846,13 +846,13 @@ func TestNewZkISMUpdateEvent(t *testing.T) {
 		{
 			name: "valid event",
 			m: map[string]any{
-				"id":             "7",
+				"id":             "\"0xdeadbeaf\"",
 				"signer":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 				"new_state":      toHex(newStateBytes),
 				"new_state_root": toHex(newStateRootBytes),
 			},
 			want: ZkISMUpdateEvent{
-				Id:           7,
+				Id:           testsuite.MustHexDecode("deadbeaf"),
 				Signer:       "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 				NewState:     newStateBytes,
 				NewStateRoot: newStateRootBytes,
@@ -909,13 +909,13 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 		{
 			name: "single message id",
 			m: map[string]any{
-				"id":          "3",
+				"id":          "dcdb3f985ecd20c313c58c0f6b2a0d7e",
 				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state_root":  toHex(stateRootBytes),
 				"message_ids": toHex(msgId1),
 			},
 			want: ZkISMSubmitMessagesEvent{
-				Id:         3,
+				Id:         testsuite.MustHexDecode("dcdb3f985ecd20c313c58c0f6b2a0d7e"),
 				Signer:     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				StateRoot:  stateRootBytes,
 				MessageIds: [][]byte{msgId1},
@@ -924,13 +924,13 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 		{
 			name: "multiple message ids comma-separated",
 			m: map[string]any{
-				"id":          "5",
+				"id":          "0123",
 				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state_root":  toHex(stateRootBytes),
 				"message_ids": toHex(msgId1) + "," + toHex(msgId2),
 			},
 			want: ZkISMSubmitMessagesEvent{
-				Id:         5,
+				Id:         testsuite.MustHexDecode("0123"),
 				Signer:     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				StateRoot:  stateRootBytes,
 				MessageIds: [][]byte{msgId1, msgId2},
@@ -939,13 +939,13 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 		{
 			name: "empty message_ids",
 			m: map[string]any{
-				"id":          "1",
+				"id":          "00",
 				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state_root":  toHex(stateRootBytes),
 				"message_ids": "",
 			},
 			want: ZkISMSubmitMessagesEvent{
-				Id:         1,
+				Id:         testsuite.MustHexDecode("00"),
 				Signer:     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				StateRoot:  stateRootBytes,
 				MessageIds: nil,

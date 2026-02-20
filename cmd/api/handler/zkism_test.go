@@ -34,7 +34,7 @@ var (
 
 	testZkISM = storage.ZkISM{
 		Id:                  1,
-		ExternalId:          42,
+		ExternalId:          []byte{0x42},
 		Height:              1000,
 		Time:                testTime,
 		TxId:                1,
@@ -141,7 +141,7 @@ func (s *ZkISMTestSuite) TestList() {
 
 	ism := response[0]
 	s.Require().EqualValues(testZkISM.Id, ism.Id)
-	s.Require().EqualValues(testZkISM.ExternalId, ism.ExternalId)
+	s.Require().EqualValues(hex.EncodeToString(testZkISM.ExternalId), ism.ExternalId)
 	s.Require().EqualValues(testZkISM.Height, ism.Height)
 	s.Require().Equal(testZkISM.Time, ism.Time)
 	s.Require().Equal(hex.EncodeToString(testZkISMStateRoot), ism.StateRoot)
@@ -306,7 +306,7 @@ func (s *ZkISMTestSuite) TestGet() {
 	s.Require().NoError(json.NewDecoder(rec.Body).Decode(&response))
 
 	s.Require().EqualValues(testZkISM.Id, response.Id)
-	s.Require().EqualValues(testZkISM.ExternalId, response.ExternalId)
+	s.Require().EqualValues(hex.EncodeToString(testZkISM.ExternalId), response.ExternalId)
 	s.Require().EqualValues(testZkISM.Height, response.Height)
 	s.Require().Equal(testZkISM.Time, response.Time)
 	s.Require().Equal(hex.EncodeToString(testZkISMStateRoot), response.StateRoot)

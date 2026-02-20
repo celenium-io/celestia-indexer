@@ -50,7 +50,7 @@ type ZkISM struct {
 	Time                time.Time      `bun:"time,notnull"                     comment:"Block time of creation"`
 	TxId                uint64         `bun:"tx_id"                            comment:"Creation transaction id"`
 	CreatorId           uint64         `bun:"creator_id"                       comment:"Creator address identity"`
-	ExternalId          uint64         `bun:"external_id,unique"               comment:"Chain-assigned ISM id"`
+	ExternalId          []byte         `bun:"external_id,unique,type:bytea"    comment:"Chain-assigned ISM id"`
 	State               []byte         `bun:"state,type:bytea"                 comment:"Current trusted state"`
 	StateRoot           []byte         `bun:"state_root,type:bytea"            comment:"Current state root (first 32 bytes of state)"`
 	MerkleTreeAddress   []byte         `bun:"merkle_tree_address,type:bytea"   comment:"External chain merkle tree address (32 bytes)"`
@@ -70,6 +70,10 @@ func (z *ZkISM) String() string {
 	return hex.EncodeToString(z.StateRoot)
 }
 
+func (z *ZkISM) ExternalIdString() string {
+	return hex.EncodeToString(z.ExternalId)
+}
+
 // ZkISMUpdate represents a state transition recorded via MsgUpdateInterchainSecurityModule.
 type ZkISMUpdate struct {
 	bun.BaseModel `bun:"zk_ism_update" comment:"Table with ZK ISM state updates"`
@@ -84,7 +88,7 @@ type ZkISMUpdate struct {
 	NewState     []byte         `bun:"new_state,type:bytea"      comment:"New full state after update"`
 
 	// Temporary field used during parsing to hold the chain-level ISM id before DB resolution.
-	ZkISMExternalId uint64 `bun:"-"`
+	ZkISMExternalId []byte `bun:"-"`
 
 	ZkISM  *ZkISM   `bun:"rel:belongs-to,join:zk_ism_id=id"`
 	Signer *Address `bun:"rel:belongs-to,join:signer_id=id"`
@@ -93,6 +97,10 @@ type ZkISMUpdate struct {
 
 func (z *ZkISMUpdate) TableName() string {
 	return "zk_ism_update"
+}
+
+func (z *ZkISMUpdate) ExternalId() string {
+	return hex.EncodeToString(z.ZkISMExternalId)
 }
 
 // ZkISMMessage represents an authorized message submitted via MsgSubmitMessages.
@@ -109,7 +117,7 @@ type ZkISMMessage struct {
 	MessageId []byte         `bun:"message_id,type:bytea" comment:"Authorized Hyperlane message id"`
 
 	// Temporary field used during parsing to hold the chain-level ISM id before DB resolution.
-	ZkISMExternalId uint64 `bun:"-"`
+	ZkISMExternalId []byte `bun:"-"`
 
 	ZkISM  *ZkISM   `bun:"rel:belongs-to,join:zk_ism_id=id"`
 	Signer *Address `bun:"rel:belongs-to,join:signer_id=id"`
@@ -118,4 +126,8 @@ type ZkISMMessage struct {
 
 func (z *ZkISMMessage) TableName() string {
 	return "zk_ism_message"
+}
+
+func (z *ZkISMMessage) ExternalId() string {
+	return hex.EncodeToString(z.ZkISMExternalId)
 }

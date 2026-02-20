@@ -5259,7 +5259,7 @@ func (c *MockTransactionValidatorCall) DoAndReturn(f func(context.Context, uint6
 }
 
 // ZkISMById mocks base method.
-func (m *MockTransaction) ZkISMById(ctx context.Context, id uint64) (storage.ZkISM, error) {
+func (m *MockTransaction) ZkISMById(ctx context.Context, id []byte) (storage.ZkISM, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ZkISMById", ctx, id)
 	ret0, _ := ret[0].(storage.ZkISM)
@@ -5286,13 +5286,13 @@ func (c *MockTransactionZkISMByIdCall) Return(arg0 storage.ZkISM, arg1 error) *M
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionZkISMByIdCall) Do(f func(context.Context, uint64) (storage.ZkISM, error)) *MockTransactionZkISMByIdCall {
+func (c *MockTransactionZkISMByIdCall) Do(f func(context.Context, []byte) (storage.ZkISM, error)) *MockTransactionZkISMByIdCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionZkISMByIdCall) DoAndReturn(f func(context.Context, uint64) (storage.ZkISM, error)) *MockTransactionZkISMByIdCall {
+func (c *MockTransactionZkISMByIdCall) DoAndReturn(f func(context.Context, []byte) (storage.ZkISM, error)) *MockTransactionZkISMByIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

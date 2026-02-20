@@ -179,7 +179,7 @@ type Transaction interface {
 	RollbackZkISMs(ctx context.Context, height types.Level) error
 	RollbackZkISMUpdates(ctx context.Context, height types.Level) error
 	RollbackZkISMMessages(ctx context.Context, height types.Level) error
-	ZkISMById(ctx context.Context, id uint64) (ZkISM, error)
+	ZkISMById(ctx context.Context, id []byte) (ZkISM, error)
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	DeleteProviders(ctx context.Context, rollupId uint64) error
 	DeleteRollup(ctx context.Context, rollupId uint64) error

@@ -30,7 +30,7 @@ func (s *StorageTestSuite) TestZkISMList() {
 	ism := items[0]
 	s.Require().EqualValues(2, ism.Id)
 	s.Require().EqualValues(1000, ism.Height)
-	s.Require().EqualValues(200, ism.ExternalId)
+	s.Require().EqualValues([]byte{0x32, 0x30, 0x30}, ism.ExternalId)
 	s.Require().NotEmpty(ism.State)
 	s.Require().NotEmpty(ism.StateRoot)
 	s.Require().NotEmpty(ism.MerkleTreeAddress)
@@ -61,7 +61,7 @@ func (s *StorageTestSuite) TestZkISMListByCreator() {
 
 	ism := items[0]
 	s.Require().EqualValues(1, ism.Id)
-	s.Require().EqualValues(100, ism.ExternalId)
+	s.Require().EqualValues([]byte{0x31, 0x30, 0x30}, ism.ExternalId)
 
 	s.Require().NotNil(ism.Creator)
 	s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", ism.Creator.Address)
@@ -81,7 +81,7 @@ func (s *StorageTestSuite) TestZkISMListByTx() {
 
 	ism := items[0]
 	s.Require().EqualValues(2, ism.Id)
-	s.Require().EqualValues(200, ism.ExternalId)
+	s.Require().EqualValues([]byte{0x32, 0x30, 0x30}, ism.ExternalId)
 
 	s.Require().NotNil(ism.Tx)
 	txHash, err := hex.DecodeString("652452A670011D629CC116E510BA88C1CABE061336661B1F3D206D248BD55811")
@@ -133,7 +133,7 @@ func (s *StorageTestSuite) TestZkISMById() {
 
 	s.Require().EqualValues(1, ism.Id)
 	s.Require().EqualValues(1000, ism.Height)
-	s.Require().EqualValues(100, ism.ExternalId)
+	s.Require().EqualValues([]byte{0x31, 0x30, 0x30}, ism.ExternalId)
 	s.Require().NotEmpty(ism.State)
 	s.Require().NotEmpty(ism.StateRoot)
 	s.Require().NotEmpty(ism.MerkleTreeAddress)

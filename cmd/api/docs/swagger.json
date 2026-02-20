@@ -12029,9 +12029,9 @@
                     "$ref": "#/definitions/responses.ShortAddress"
                 },
                 "external_id": {
-                    "type": "integer",
-                    "format": "int64",
-                    "example": 1
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
                 },
                 "groth16_vkey": {
                     "type": "string",

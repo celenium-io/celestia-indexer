@@ -104,7 +104,7 @@ func Test_handleCreateZkISM_Success(t *testing.T) {
 	require.NotNil(t, msg.ZkISM)
 
 	ism := msg.ZkISM
-	require.EqualValues(t, 42, ism.ExternalId)
+	require.EqualValues(t, []byte{0x42}, ism.ExternalId)
 	require.Equal(t, ctx.Block.Height, ism.Height)
 	require.Equal(t, ctx.Block.Time, ism.Time)
 	require.Equal(t, stateRoot, ism.StateRoot)
@@ -116,7 +116,7 @@ func Test_handleCreateZkISM_Success(t *testing.T) {
 	require.Equal(t, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", ism.Creator.Address)
 
 	// The ISM must be stored in the context keyed by external id
-	stored, ok := ctx.ZkISMs.Get(42)
+	stored, ok := ctx.ZkISMs.Get("42")
 	require.True(t, ok)
 	require.Equal(t, ism, stored)
 }
@@ -141,7 +141,7 @@ func Test_handleCreateZkISM_StopsAtNextAction(t *testing.T) {
 		{
 			Type: types.EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,
 			Data: map[string]any{
-				"id":                    "1",
+				"id":                    "01",
 				"creator":               "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state":                 toHex(state),
 				"state_root":            toHex(stateRoot),
@@ -216,7 +216,7 @@ func Test_handleUpdateZkISM_Success(t *testing.T) {
 		{
 			Type: types.EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
 			Data: map[string]any{
-				"id":             "7",
+				"id":             "0x07",
 				"signer":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 				"new_state":      toHex(newState),
 				"new_state_root": toHex(newStateRoot),
@@ -229,7 +229,7 @@ func Test_handleUpdateZkISM_Success(t *testing.T) {
 	require.NotNil(t, msg.ZkISMUpdate)
 
 	upd := msg.ZkISMUpdate
-	require.EqualValues(t, 7, upd.ZkISMExternalId)
+	require.EqualValues(t, testsuite.MustHexDecode("07"), upd.ZkISMExternalId)
 	require.Equal(t, ctx.Block.Height, upd.Height)
 	require.Equal(t, ctx.Block.Time, upd.Time)
 	require.Equal(t, newState, upd.NewState)
@@ -248,7 +248,7 @@ func Test_handleUpdateZkISM_UpdatesContextState(t *testing.T) {
 
 	ctx := makeZkISMContext()
 	// Simulate ISM created earlier in this block
-	ctx.ZkISMs.Set(7, &storage.ZkISM{ExternalId: 7, State: oldState, StateRoot: oldRoot})
+	ctx.ZkISMs.Set("0x07", &storage.ZkISM{ExternalId: testsuite.MustHexDecode("07"), State: oldState, StateRoot: oldRoot})
 
 	idx := 0
 	msg := &storage.Message{Type: types.MsgUpdateInterchainSecurityModule}
@@ -260,7 +260,7 @@ func Test_handleUpdateZkISM_UpdatesContextState(t *testing.T) {
 		{
 			Type: types.EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
 			Data: map[string]any{
-				"id":             "7",
+				"id":             "0x07",
 				"signer":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 				"new_state":      toHex(newState),
 				"new_state_root": toHex(newRoot),
@@ -271,7 +271,7 @@ func Test_handleUpdateZkISM_UpdatesContextState(t *testing.T) {
 	err := handleUpdateZkISM(ctx, events, msg, &idx)
 	require.NoError(t, err)
 
-	stored, ok := ctx.ZkISMs.Get(7)
+	stored, ok := ctx.ZkISMs.Get("07")
 	require.True(t, ok)
 	require.Equal(t, newState, stored.State)
 	require.Equal(t, newRoot, stored.StateRoot)
@@ -328,7 +328,7 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
 			Data: map[string]any{
-				"id":          "3",
+				"id":          "0x03",
 				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state_root":  toHex(stateRoot),
 				"message_ids": toHex(msgId),
@@ -341,7 +341,7 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 	require.Len(t, msg.ZkISMMessages, 1)
 
 	m := msg.ZkISMMessages[0]
-	require.EqualValues(t, 3, m.ZkISMExternalId)
+	require.EqualValues(t, []byte{0x03}, m.ZkISMExternalId)
 	require.Equal(t, ctx.Block.Height, m.Height)
 	require.Equal(t, ctx.Block.Time, m.Time)
 	require.Equal(t, stateRoot, m.StateRoot)
@@ -368,7 +368,7 @@ func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
 			Data: map[string]any{
-				"id":          "5",
+				"id":          "0x05",
 				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state_root":  toHex(stateRoot),
 				"message_ids": toHex(msgId1) + "," + toHex(msgId2) + "," + toHex(msgId3),
@@ -381,7 +381,7 @@ func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 	require.Len(t, msg.ZkISMMessages, 3)
 
 	for _, m := range msg.ZkISMMessages {
-		require.EqualValues(t, 5, m.ZkISMExternalId)
+		require.EqualValues(t, []byte{0x05}, m.ZkISMExternalId)
 		require.Equal(t, stateRoot, m.StateRoot)
 		require.NotNil(t, m.Signer)
 	}
@@ -407,7 +407,7 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
 			Data: map[string]any{
-				"id":          "1",
+				"id":          "0x01",
 				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state_root":  toHex(stateRoot1),
 				"message_ids": toHex(msgId1),
@@ -420,7 +420,7 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
 			Data: map[string]any{
-				"id":          "2",
+				"id":          "0x02",
 				"signer":      "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 				"state_root":  toHex(stateRoot2),
 				"message_ids": toHex(msgId2),
@@ -439,12 +439,12 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 	}
 
 	require.Len(t, msgs[0].ZkISMMessages, 1)
-	require.EqualValues(t, 1, msgs[0].ZkISMMessages[0].ZkISMExternalId)
+	require.EqualValues(t, []byte{0x01}, msgs[0].ZkISMMessages[0].ZkISMExternalId)
 	require.Equal(t, msgId1, msgs[0].ZkISMMessages[0].MessageId)
 	require.Equal(t, stateRoot1, msgs[0].ZkISMMessages[0].StateRoot)
 
 	require.Len(t, msgs[1].ZkISMMessages, 1)
-	require.EqualValues(t, 2, msgs[1].ZkISMMessages[0].ZkISMExternalId)
+	require.EqualValues(t, []byte{0x02}, msgs[1].ZkISMMessages[0].ZkISMExternalId)
 	require.Equal(t, msgId2, msgs[1].ZkISMMessages[0].MessageId)
 	require.Equal(t, stateRoot2, msgs[1].ZkISMMessages[0].StateRoot)
 }
