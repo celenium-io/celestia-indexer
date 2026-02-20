@@ -24,6 +24,7 @@ type Context struct {
 	Igps        *sync.Map[string, *storage.HLIGP]
 	IgpConfigs  *sync.Map[string, *storage.HLIGPConfig]
 	Upgrades    *sync.Map[uint64, *storage.Upgrade]
+	ZkISMs      *sync.Map[uint64, *storage.ZkISM]
 
 	Redelegations   []storage.Redelegation
 	Undelegations   []storage.Undelegation
@@ -46,6 +47,7 @@ func NewContext() *Context {
 		Igps:            sync.NewMap[string, *storage.HLIGP](),
 		IgpConfigs:      sync.NewMap[string, *storage.HLIGPConfig](),
 		Upgrades:        sync.NewMap[uint64, *storage.Upgrade](),
+		ZkISMs:          sync.NewMap[uint64, *storage.ZkISM](),
 		Redelegations:   make([]storage.Redelegation, 0),
 		Undelegations:   make([]storage.Undelegation, 0),
 		CancelUnbonding: make([]storage.Undelegation, 0),
@@ -230,5 +232,14 @@ func (ctx *Context) AddUpgrade(upgrade storage.Upgrade) {
 		val.SignalsCount += upgrade.SignalsCount
 	} else {
 		ctx.Upgrades.Set(upgrade.Version, &upgrade)
+	}
+}
+
+func (ctx *Context) AddZkISM(ism *storage.ZkISM) {
+	if value, ok := ctx.ZkISMs.Get(ism.ExternalId); ok {
+		value.State = ism.State
+		value.StateRoot = ism.StateRoot
+	} else {
+		ctx.ZkISMs.Set(ism.ExternalId, ism)
 	}
 }

@@ -3084,6 +3084,333 @@
                 }
             }
         },
+        "/hyperlane/zkism": {
+            "get": {
+                "description": "Returns a paginated list of ZK Interchain Security Modules (ZK ISMs). ZK ISMs use\nGroth16 zero-knowledge proofs to trustlessly verify cross-chain messages from external\nchains. Results can be filtered by transaction hash or creator address.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "List ZK Interchain Security Modules",
+                "operationId": "list-zkism",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset for pagination",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 64,
+                        "minLength": 64,
+                        "type": "string",
+                        "description": "Filter by transaction hash (hex)",
+                        "name": "tx_hash",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Filter by creator Celestia address",
+                        "name": "address",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.ZkISM"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/hyperlane/zkism/{id}": {
+            "get": {
+                "description": "Returns a single ZK Interchain Security Module by its internal id. The response includes\nthe current trusted state, state root, merkle tree address, and verifier key commitments\nused for ZK proof verification.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "Get ZK ISM by id",
+                "operationId": "get-zkism",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal ZK ISM identity",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ZkISM"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/hyperlane/zkism/{id}/messages": {
+            "get": {
+                "description": "Returns the list of Hyperlane messages that were authorized via a given ZK ISM through\nMsgSubmitMessages transactions. Each entry contains the message id, state root used for\nthe membership proof, and the signer who submitted the authorization. Results can be\nfiltered by signer address, transaction hash, or time range.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "Get ZK ISM authorized messages",
+                "operationId": "get-zkism-messages",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal ZK ISM identity",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset for pagination",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 64,
+                        "minLength": 64,
+                        "type": "string",
+                        "description": "Filter by transaction hash (hex)",
+                        "name": "tx_hash",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Filter by signer Celestia address",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Filter by start time (Unix timestamp)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Filter by end time (Unix timestamp)",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.ZkISMMessage"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/hyperlane/zkism/{id}/updates": {
+            "get": {
+                "description": "Returns the history of state updates for a given ZK ISM. Each update corresponds to a\nMsgUpdateInterchainSecurityModule transaction that advanced the trusted state of the ISM\nvia a Groth16 state-transition ZK proof. Results can be filtered by signer address,\ntransaction hash, or time range.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hyperlane"
+                ],
+                "summary": "Get ZK ISM state update history",
+                "operationId": "get-zkism-updates",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Internal ZK ISM identity",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "type": "integer",
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset for pagination",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort order. Default: desc",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 64,
+                        "minLength": 64,
+                        "type": "string",
+                        "description": "Filter by transaction hash (hex)",
+                        "name": "tx_hash",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 47,
+                        "minLength": 47,
+                        "type": "string",
+                        "description": "Filter by signer Celestia address",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Filter by start time (Unix timestamp)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Filter by end time (Unix timestamp)",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.ZkISMUpdate"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/ibc/channel": {
             "get": {
                 "description": "Get ibc channels info",
@@ -11692,6 +12019,145 @@
                     "type": "integer",
                     "format": "int64",
                     "example": 12345678
+                }
+            }
+        },
+        "responses.ZkISM": {
+            "type": "object",
+            "properties": {
+                "creator": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "external_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1
+                },
+                "groth16_vkey": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "merkle_tree_address": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "state": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "state_membership_vkey": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "state_root": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "state_transition_vkey": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                }
+            }
+        },
+        "responses.ZkISMMessage": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "message_id": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "signer": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "state_root": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                }
+            }
+        },
+        "responses.ZkISMUpdate": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 321
+                },
+                "new_state": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "new_state_root": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "signer": {
+                    "$ref": "#/definitions/responses.ShortAddress"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
+                },
+                "tx_hash": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
                 }
             }
         },

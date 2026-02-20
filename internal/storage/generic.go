@@ -62,6 +62,9 @@ var Models = []any{
 	&HLIGPConfig{},
 	&HLGasPayment{},
 	&Forwarding{},
+	&ZkISM{},
+	&ZkISMUpdate{},
+	&ZkISMMessage{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -133,6 +136,9 @@ type Transaction interface {
 	SaveHyperlaneIgpConfigs(ctx context.Context, configs ...HLIGPConfig) error
 	SaveHyperlaneGasPayments(ctx context.Context, payments ...*HLGasPayment) error
 	SaveForwardings(ctx context.Context, forwardings ...*Forwarding) error
+	SaveZkISMs(ctx context.Context, items ...*ZkISM) error
+	SaveZkISMUpdates(ctx context.Context, items ...*ZkISMUpdate) error
+	SaveZkISMMessages(ctx context.Context, items ...*ZkISMMessage) error
 
 	RollbackBlock(ctx context.Context, height types.Level) error
 	RollbackBlockStats(ctx context.Context, height types.Level) (stats BlockStats, err error)
@@ -170,6 +176,10 @@ type Transaction interface {
 	RollbackHyperlaneIgpConfigs(ctx context.Context, height types.Level) error
 	RollbackHyperlaneGasPayment(ctx context.Context, height types.Level) error
 	RollbackForwardings(ctx context.Context, height types.Level) error
+	RollbackZkISMs(ctx context.Context, height types.Level) error
+	RollbackZkISMUpdates(ctx context.Context, height types.Level) error
+	RollbackZkISMMessages(ctx context.Context, height types.Level) error
+	ZkISMById(ctx context.Context, id uint64) (ZkISM, error)
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	DeleteProviders(ctx context.Context, rollupId uint64) error
 	DeleteRollup(ctx context.Context, rollupId uint64) error

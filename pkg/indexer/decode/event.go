@@ -4,6 +4,7 @@
 package decode
 
 import (
+	"encoding/hex"
 	"strconv"
 	"strings"
 	"time"
@@ -906,5 +907,108 @@ func NewEventTokenForwarded(m map[string]any) (etf EventTokenForwarded, err erro
 		return etf, errors.Wrap(err, "success")
 	}
 	etf.Error = decoder.StringFromMap(m, "error")
+	return
+}
+
+type ZkISMCreateEvent struct {
+	Id                  uint64
+	Creator             string
+	State               []byte
+	StateRoot           []byte
+	MerkleTreeAddress   []byte
+	Groth16VKey         []byte
+	StateTransitionVKey []byte
+	StateMembershipVKey []byte
+}
+
+func NewZkISMCreateEvent(m map[string]any) (e ZkISMCreateEvent, err error) {
+	e.Id, err = decoder.Uint64FromMap(m, "id")
+	if err != nil {
+		return e, errors.Wrap(err, "id")
+	}
+	e.Creator = decoder.StringFromMap(m, "creator")
+	e.State, err = decoder.BytesFromMap(m, "state")
+	if err != nil {
+		return e, errors.Wrap(err, "state")
+	}
+	e.StateRoot, err = decoder.BytesFromMap(m, "state_root")
+	if err != nil {
+		return e, errors.Wrap(err, "state_root")
+	}
+	e.MerkleTreeAddress, err = decoder.BytesFromMap(m, "merkle_tree_address")
+	if err != nil {
+		return e, errors.Wrap(err, "merkle_tree_address")
+	}
+	e.Groth16VKey, err = decoder.BytesFromMap(m, "groth16_vkey")
+	if err != nil {
+		return e, errors.Wrap(err, "groth16_vkey")
+	}
+	e.StateTransitionVKey, err = decoder.BytesFromMap(m, "state_transition_vkey")
+	if err != nil {
+		return e, errors.Wrap(err, "state_transition_vkey")
+	}
+	e.StateMembershipVKey, err = decoder.BytesFromMap(m, "state_membership_vkey")
+	if err != nil {
+		return e, errors.Wrap(err, "state_membership_vkey")
+	}
+	return
+}
+
+type ZkISMUpdateEvent struct {
+	Id           uint64
+	Signer       string
+	NewState     []byte
+	NewStateRoot []byte
+}
+
+func NewZkISMUpdateEvent(m map[string]any) (e ZkISMUpdateEvent, err error) {
+	e.Id, err = decoder.Uint64FromMap(m, "id")
+	if err != nil {
+		return e, errors.Wrap(err, "id")
+	}
+	e.Signer = decoder.StringFromMap(m, "signer")
+	e.NewState, err = decoder.BytesFromMap(m, "new_state")
+	if err != nil {
+		return e, errors.Wrap(err, "new_state")
+	}
+	e.NewStateRoot, err = decoder.BytesFromMap(m, "new_state_root")
+	if err != nil {
+		return e, errors.Wrap(err, "new_state_root")
+	}
+	return
+}
+
+type ZkISMSubmitMessagesEvent struct {
+	Id         uint64
+	Signer     string
+	StateRoot  []byte
+	MessageIds [][]byte
+}
+
+func NewZkISMSubmitMessagesEvent(m map[string]any) (e ZkISMSubmitMessagesEvent, err error) {
+	e.Id, err = decoder.Uint64FromMap(m, "id")
+	if err != nil {
+		return e, errors.Wrap(err, "id")
+	}
+	e.Signer = decoder.StringFromMap(m, "signer")
+	e.StateRoot, err = decoder.BytesFromMap(m, "state_root")
+	if err != nil {
+		return e, errors.Wrap(err, "state_root")
+	}
+	messageIds := decoder.StringFromMap(m, "message_ids")
+	if messageIds != "" {
+		for _, id := range strings.Split(messageIds, ",") {
+			id = strings.TrimSpace(strings.Trim(id, "[]\""))
+			if id == "" {
+				continue
+			}
+			id = strings.TrimPrefix(id, "0x")
+			idBytes, hexErr := hex.DecodeString(id)
+			if hexErr != nil {
+				return e, errors.Wrapf(hexErr, "message_id: %s", id)
+			}
+			e.MessageIds = append(e.MessageIds, idBytes)
+		}
+	}
 	return
 }

@@ -475,6 +475,21 @@ func Test_saveMessages(t *testing.T) {
 			Times(1).
 			Return(nil)
 
+		tx.EXPECT().
+			SaveZkISMs(gomock.Any(), gomock.Any()).
+			MaxTimes(1).
+			Return(nil)
+
+		tx.EXPECT().
+			SaveZkISMUpdates(gomock.Any(), gomock.Any()).
+			MaxTimes(1).
+			Return(nil)
+
+		tx.EXPECT().
+			SaveZkISMMessages(gomock.Any(), gomock.Any()).
+			MaxTimes(1).
+			Return(nil)
+
 		t.Run(tt.name, func(t *testing.T) {
 			ibcClientsCount, err := module.saveMessages(t.Context(), tx, tt.args.messages, tt.args.addrToId, sync.NewMap[uint64, *storage.Upgrade](), storage.State{Version: 10})
 			require.Equal(t, tt.wantErr, err != nil)

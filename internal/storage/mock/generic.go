@@ -3025,6 +3025,120 @@ func (c *MockTransactionRollbackVotesCall) DoAndReturn(f func(context.Context, t
 	return c
 }
 
+// RollbackZkISMMessages mocks base method.
+func (m *MockTransaction) RollbackZkISMMessages(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackZkISMMessages", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackZkISMMessages indicates an expected call of RollbackZkISMMessages.
+func (mr *MockTransactionMockRecorder) RollbackZkISMMessages(ctx, height any) *MockTransactionRollbackZkISMMessagesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackZkISMMessages", reflect.TypeOf((*MockTransaction)(nil).RollbackZkISMMessages), ctx, height)
+	return &MockTransactionRollbackZkISMMessagesCall{Call: call}
+}
+
+// MockTransactionRollbackZkISMMessagesCall wrap *gomock.Call
+type MockTransactionRollbackZkISMMessagesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackZkISMMessagesCall) Return(arg0 error) *MockTransactionRollbackZkISMMessagesCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackZkISMMessagesCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackZkISMMessagesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackZkISMMessagesCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackZkISMMessagesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackZkISMUpdates mocks base method.
+func (m *MockTransaction) RollbackZkISMUpdates(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackZkISMUpdates", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackZkISMUpdates indicates an expected call of RollbackZkISMUpdates.
+func (mr *MockTransactionMockRecorder) RollbackZkISMUpdates(ctx, height any) *MockTransactionRollbackZkISMUpdatesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackZkISMUpdates", reflect.TypeOf((*MockTransaction)(nil).RollbackZkISMUpdates), ctx, height)
+	return &MockTransactionRollbackZkISMUpdatesCall{Call: call}
+}
+
+// MockTransactionRollbackZkISMUpdatesCall wrap *gomock.Call
+type MockTransactionRollbackZkISMUpdatesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackZkISMUpdatesCall) Return(arg0 error) *MockTransactionRollbackZkISMUpdatesCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackZkISMUpdatesCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackZkISMUpdatesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackZkISMUpdatesCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackZkISMUpdatesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// RollbackZkISMs mocks base method.
+func (m *MockTransaction) RollbackZkISMs(ctx context.Context, height types.Level) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RollbackZkISMs", ctx, height)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RollbackZkISMs indicates an expected call of RollbackZkISMs.
+func (mr *MockTransactionMockRecorder) RollbackZkISMs(ctx, height any) *MockTransactionRollbackZkISMsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RollbackZkISMs", reflect.TypeOf((*MockTransaction)(nil).RollbackZkISMs), ctx, height)
+	return &MockTransactionRollbackZkISMsCall{Call: call}
+}
+
+// MockTransactionRollbackZkISMsCall wrap *gomock.Call
+type MockTransactionRollbackZkISMsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionRollbackZkISMsCall) Return(arg0 error) *MockTransactionRollbackZkISMsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionRollbackZkISMsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackZkISMsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionRollbackZkISMsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackZkISMsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // SaveAddresses mocks base method.
 func (m *MockTransaction) SaveAddresses(ctx context.Context, addresses ...*storage.Address) (int64, error) {
 	m.ctrl.T.Helper()
@@ -4703,6 +4817,135 @@ func (c *MockTransactionSaveVotesCall) DoAndReturn(f func(context.Context, ...*s
 	return c
 }
 
+// SaveZkISMMessages mocks base method.
+func (m *MockTransaction) SaveZkISMMessages(ctx context.Context, items ...*storage.ZkISMMessage) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range items {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveZkISMMessages", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveZkISMMessages indicates an expected call of SaveZkISMMessages.
+func (mr *MockTransactionMockRecorder) SaveZkISMMessages(ctx any, items ...any) *MockTransactionSaveZkISMMessagesCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, items...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveZkISMMessages", reflect.TypeOf((*MockTransaction)(nil).SaveZkISMMessages), varargs...)
+	return &MockTransactionSaveZkISMMessagesCall{Call: call}
+}
+
+// MockTransactionSaveZkISMMessagesCall wrap *gomock.Call
+type MockTransactionSaveZkISMMessagesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveZkISMMessagesCall) Return(arg0 error) *MockTransactionSaveZkISMMessagesCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveZkISMMessagesCall) Do(f func(context.Context, ...*storage.ZkISMMessage) error) *MockTransactionSaveZkISMMessagesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveZkISMMessagesCall) DoAndReturn(f func(context.Context, ...*storage.ZkISMMessage) error) *MockTransactionSaveZkISMMessagesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveZkISMUpdates mocks base method.
+func (m *MockTransaction) SaveZkISMUpdates(ctx context.Context, items ...*storage.ZkISMUpdate) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range items {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveZkISMUpdates", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveZkISMUpdates indicates an expected call of SaveZkISMUpdates.
+func (mr *MockTransactionMockRecorder) SaveZkISMUpdates(ctx any, items ...any) *MockTransactionSaveZkISMUpdatesCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, items...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveZkISMUpdates", reflect.TypeOf((*MockTransaction)(nil).SaveZkISMUpdates), varargs...)
+	return &MockTransactionSaveZkISMUpdatesCall{Call: call}
+}
+
+// MockTransactionSaveZkISMUpdatesCall wrap *gomock.Call
+type MockTransactionSaveZkISMUpdatesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveZkISMUpdatesCall) Return(arg0 error) *MockTransactionSaveZkISMUpdatesCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveZkISMUpdatesCall) Do(f func(context.Context, ...*storage.ZkISMUpdate) error) *MockTransactionSaveZkISMUpdatesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveZkISMUpdatesCall) DoAndReturn(f func(context.Context, ...*storage.ZkISMUpdate) error) *MockTransactionSaveZkISMUpdatesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SaveZkISMs mocks base method.
+func (m *MockTransaction) SaveZkISMs(ctx context.Context, items ...*storage.ZkISM) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range items {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SaveZkISMs", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveZkISMs indicates an expected call of SaveZkISMs.
+func (mr *MockTransactionMockRecorder) SaveZkISMs(ctx any, items ...any) *MockTransactionSaveZkISMsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, items...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveZkISMs", reflect.TypeOf((*MockTransaction)(nil).SaveZkISMs), varargs...)
+	return &MockTransactionSaveZkISMsCall{Call: call}
+}
+
+// MockTransactionSaveZkISMsCall wrap *gomock.Call
+type MockTransactionSaveZkISMsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSaveZkISMsCall) Return(arg0 error) *MockTransactionSaveZkISMsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSaveZkISMsCall) Do(f func(context.Context, ...*storage.ZkISM) error) *MockTransactionSaveZkISMsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSaveZkISMsCall) DoAndReturn(f func(context.Context, ...*storage.ZkISM) error) *MockTransactionSaveZkISMsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // State mocks base method.
 func (m *MockTransaction) State(ctx context.Context, name string) (storage.State, error) {
 	m.ctrl.T.Helper()
@@ -5011,6 +5254,45 @@ func (c *MockTransactionValidatorCall) Do(f func(context.Context, uint64) (stora
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionValidatorCall) DoAndReturn(f func(context.Context, uint64) (storage.Validator, error)) *MockTransactionValidatorCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// ZkISMById mocks base method.
+func (m *MockTransaction) ZkISMById(ctx context.Context, id uint64) (storage.ZkISM, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ZkISMById", ctx, id)
+	ret0, _ := ret[0].(storage.ZkISM)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ZkISMById indicates an expected call of ZkISMById.
+func (mr *MockTransactionMockRecorder) ZkISMById(ctx, id any) *MockTransactionZkISMByIdCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ZkISMById", reflect.TypeOf((*MockTransaction)(nil).ZkISMById), ctx, id)
+	return &MockTransactionZkISMByIdCall{Call: call}
+}
+
+// MockTransactionZkISMByIdCall wrap *gomock.Call
+type MockTransactionZkISMByIdCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionZkISMByIdCall) Return(arg0 storage.ZkISM, arg1 error) *MockTransactionZkISMByIdCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionZkISMByIdCall) Do(f func(context.Context, uint64) (storage.ZkISM, error)) *MockTransactionZkISMByIdCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionZkISMByIdCall) DoAndReturn(f func(context.Context, uint64) (storage.ZkISM, error)) *MockTransactionZkISMByIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
