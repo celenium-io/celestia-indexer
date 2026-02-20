@@ -10,13 +10,15 @@ import (
 	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 var (
-	errInvalidHashLength = errors.New("invalid hash: should be 32 bytes length")
-	errInvalidAddress    = errors.New("invalid address")
-	errUnknownAddress    = errors.New("unknown address")
-	errCancelRequest     = "pq: canceling statement due to user request"
+	errInvalidHashLength   = errors.New("invalid hash: should be 32 bytes length")
+	errInvalidAddress      = errors.New("invalid address")
+	errUnknownAddress      = errors.New("unknown address")
+	errCancelRequest       = "pq: canceling statement due to user request"
+	errInternalServerError = "Internal Server Error"
 )
 
 type NoRows interface {
@@ -37,8 +39,9 @@ func internalServerError(c echo.Context, err error) error {
 	if hub := sentryecho.GetHubFromContext(c); hub != nil {
 		hub.CaptureMessage(err.Error())
 	}
+	log.Err(err).Msg(c.Path())
 	return c.JSON(http.StatusInternalServerError, Error{
-		Message: err.Error(),
+		Message: errInternalServerError,
 	})
 }
 
