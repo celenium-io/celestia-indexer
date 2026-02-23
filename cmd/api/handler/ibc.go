@@ -52,7 +52,7 @@ type getIbcClientRequest struct {
 // Get godoc
 //
 //	@Summary		Get ibc client info
-//	@Description	Get ibc client info
+//	@Description	Returns information about an IBC light client identified by its client ID, including the counterparty chain ID, client state type, and trusting period.
 //	@Tags			ibc
 //	@ID				get-ibc-client
 //	@Param			id	path	string	true	"IBC client id"
@@ -112,11 +112,11 @@ func (req *getIbcClientsRequest) ToFilters(ctx context.Context, address storage.
 // List godoc
 //
 //	@Summary		Get ibc clients info
-//	@Description	Get ibc clients info
+//	@Description	Returns a paginated list of IBC light clients. Supports filtering by chain ID and creator address.
 //	@Tags			ibc
 //	@ID				get-ibc-clients
-//	@Param			limit		query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"										mininum(1)
+//	@Param			limit		query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
+//	@Param			offset		query	integer	false	"Offset"										minimum(1)
 //	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	@Param			chain_id	query	string	false	"Chain id"
 //	@Param			creator		query	string	false	"Creator address"						    	minlength(47)	maxlength(47)
@@ -155,7 +155,7 @@ type getIbcConnectionRequest struct {
 // GetConnection godoc
 //
 //	@Summary		Get ibc connection info
-//	@Description	Get ibc client info
+//	@Description	Returns information about an IBC connection identified by its connection ID, including linked client ID and counterparty connection details.
 //	@Tags			ibc
 //	@ID				get-ibc-conn
 //	@Param			id	path	string	true	"IBC connection id"
@@ -198,11 +198,11 @@ func (req *getIbcConnsRequest) SetDefault() {
 // ListConnections godoc
 //
 //	@Summary		Get ibc connections info
-//	@Description	Get ibc connections info
+//	@Description	Returns a paginated list of IBC connections. Supports filtering by client ID.
 //	@Tags			ibc
 //	@ID				get-ibc-conns
-//	@Param			limit	    query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	    query	integer	false	"Offset"										mininum(1)
+//	@Param			limit	    query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
+//	@Param			offset	    query	integer	false	"Offset"										minimum(1)
 //	@Param			sort	    query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	@Param			client_id	query	string	false	"Client id"
 //	@Produce		json
@@ -242,7 +242,7 @@ type getIbcChannelRequest struct {
 // GetChannel godoc
 //
 //	@Summary		Get ibc channel info
-//	@Description	Get ibc channel info
+//	@Description	Returns information about an IBC channel by its channel ID, including ordering, state, connection, and counterparty port/channel.
 //	@Tags			ibc
 //	@ID				get-ibc-channel
 //	@Param			id	path	string	true	"IBC channel id"
@@ -287,11 +287,11 @@ func (req *getIbcChannelsRequest) SetDefault() {
 // ListChannels godoc
 //
 //	@Summary		Get ibc channels info
-//	@Description	Get ibc channels info
+//	@Description	Returns a paginated list of IBC channels. Supports filtering by client ID, connection ID, and channel status (initialization, opened, closed).
 //	@Tags			ibc
 //	@ID				get-ibc-channels
-//	@Param			limit	        query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	        query	integer	false	"Offset"										mininum(1)
+//	@Param			limit	        query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
+//	@Param			offset	        query	integer	false	"Offset"										minimum(1)
 //	@Param			sort	        query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	@Param			client_id	    query	string	false	"Client id"
 //	@Param			connection_id	query	string	false	"Connection id"
@@ -352,11 +352,11 @@ func (req *getIbcTransfersRequest) SetDefault() {
 // ListTransfers godoc
 //
 //	@Summary		Get ibc transfers info
-//	@Description	Get ibc transfers info
+//	@Description	Returns a paginated list of IBC token transfers. Supports filtering by channel, chain ID, sender, receiver, either-party address, and transaction hash.
 //	@Tags			ibc
 //	@ID				get-ibc-transfers
-//	@Param			limit	    	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	    	query	integer	false	"Offset"										mininum(1)
+//	@Param			limit	    	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
+//	@Param			offset	    	query	integer	false	"Offset"										minimum(1)
 //	@Param			sort	   		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	@Param			channel_id		query	string	false	"Channel id"
 //	@Param			chain_id		query	string	false	"Chain id"
@@ -449,10 +449,10 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 // GetIbcTransfer godoc
 //
 //	@Summary		Get transfer by id
-//	@Description	Get transfer by id
+//	@Description	Returns a single IBC token transfer by its internal id, including sender, receiver, amount, denom, and transaction reference.
 //	@Tags			ibc
 //	@ID				get-ibc-transfer
-//	@Param			id	path	integer	true	"Internal identity"	mininum(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.IbcTransfer
 //	@Success		204
@@ -476,7 +476,7 @@ func (handler *IbcHandler) GetIbcTransfer(c echo.Context) error {
 // IbcRelayers godoc
 //
 //	@Summary		List ibc relayers
-//	@Description	List ibc relayers
+//	@Description	Returns the list of known IBC relayers with their Celestia address and associated chain metadata, sourced from the static relayer registry.
 //	@Tags			ibc
 //	@ID				get-ibc-relayers
 //	@Produce		json

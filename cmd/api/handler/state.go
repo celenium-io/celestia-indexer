@@ -34,7 +34,7 @@ func NewStateHandler(state storage.IState, validator storage.IValidator, constan
 // Head godoc
 //
 //	@Summary		Get current indexer head
-//	@Description	Get current indexer head
+//	@Description	Returns the current indexer state: the last indexed block height, total accounts, total blobs size, total voting power, and other network-wide counters.
 //	@Tags			general
 //	@ID				head
 //	@Produce		json

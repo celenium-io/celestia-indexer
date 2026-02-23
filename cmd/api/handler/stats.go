@@ -63,8 +63,8 @@ type summaryRequest struct {
 //	@Param					table		path	string	true	"Table name"	Enums(block, block_stats, tx, event, message, validator)
 //	@Param					function	path	string	true	"Function name"	Enums(min, max, avg, sum, count)
 //	@Param					column		query	string	false	"Column name which will be used for computation. Optional for count."
-//	@Param					from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param					to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param					from		query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param					to			query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Produce				json
 //	@Success				200	{object}	string
 //	@Failure				400	{object}	Error
@@ -125,7 +125,7 @@ func (sh StatsHandler) TPS(c echo.Context) error {
 // Change24hBlockStats godoc
 //
 //	@Summary		Get changes for 24 hours
-//	@Description	Get changes for 24 hours
+//	@Description	Returns comparative statistics showing how key block metrics (blob size, tx count, fee, block time) changed over the last 24 hours versus the prior 24 hours.
 //	@Tags			stats
 //	@ID				stats-24h-changes
 //	@Produce		json
@@ -147,10 +147,10 @@ type namespaceUsageRequest struct {
 // NamespaceUsage godoc
 //
 //	@Summary		Get namespaces with sorting by size.
-//	@Description	Get namespaces with sorting by size. Returns top 100 namespaces. Namespaces which is not included to top 100 grouped into 'others' item
+//	@Description	Returns the top N namespaces sorted by total blob size in descending order. Namespaces outside the top N are aggregated into a single 'others' entry showing the remaining total size.
 //	@Tags			stats
 //	@ID				stats-namespace-usage
-//	@Param			top	query	integer	false	"Count of entities"	mininum(1)	maximum(100)
+//	@Param			top	query	integer	false	"Count of entities"	minimum(1)	maximum(100)
 //	@Produce		json
 //	@Success		200	{array}		responses.NamespaceUsage
 //	@Failure		500	{object}	Error
@@ -204,13 +204,13 @@ type seriesRequest struct {
 // Series godoc
 //
 //	@Summary		Get histogram with precomputed stats
-//	@Description	Get histogram with precomputed stats by series name and timeframe
+//	@Description	Returns a time-series histogram of precomputed network statistics for the selected metric and timeframe. Supports filtering by time range.
 //	@Tags			stats
 //	@ID				stats-series
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, week, month, year)
 //	@Param			name		path	string	true	"Series name"					Enums(blobs_size, blobs_count, tps, bps, fee, supply_change, block_time, tx_count, events_count, gas_price, gas_efficiency, gas_used, gas_limit, bytes_in_block, rewards, commissions)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.SeriesItem
 //	@Failure		400	{object}	Error
@@ -249,13 +249,13 @@ type seriesCumulativeRequest struct {
 // SeriesCumulative godoc
 //
 //	@Summary		Get cumulative histogram with precomputed stats
-//	@Description	Get cumulative histogram with precomputed stats by series name and timeframe
+//	@Description	Returns a running total (cumulative sum) time-series of the selected network metric for the given timeframe. Useful for tracking all-time growth trends.
 //	@Tags			stats
 //	@ID				stats-series-cumulative
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, week, month, year)
 //	@Param			name		path	string	true	"Series name"					Enums(blobs_size, blobs_count, fee, tx_count, gas_used, gas_limit, bytes_in_block, supply_change)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.SeriesItem
 //	@Failure		400	{object}	Error
@@ -295,14 +295,14 @@ type namespaceSeriesRequest struct {
 // NamespaceSeries godoc
 //
 //	@Summary		Get histogram for namespace with precomputed stats
-//	@Description	Get histogram for namespace with precomputed stats by series name and timeframe
+//	@Description	Returns a time-series histogram of precomputed blob statistics (pfb_count or size) for the specified namespace, filtered by timeframe and optional time range.
 //	@Tags			stats
 //	@ID				stats-ns-series
 //	@Param			id			path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, week, month, year)
 //	@Param			name		path	string	true	"Series name"					Enums(pfb_count, size)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.SeriesItem
 //	@Failure		400	{object}	Error
@@ -356,14 +356,14 @@ type stakingSeriesRequest struct {
 // StakingSeries godoc
 //
 //	@Summary		Get histogram for staking with precomputed stats
-//	@Description	Get histogram for staking with precomputed stats by series name and timeframe
+//	@Description	Returns a time-series histogram of staking metrics (rewards, commissions, delegation flows, etc.) for the specified validator and timeframe.
 //	@Tags			stats
 //	@ID				stats-staking-series
 //	@Param			id			path	string	true	"Validator id"					minlength(56)	maxlength(56)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
 //	@Param			name		path	string	true	"Series name"					Enums(rewards, commissions, flow, delegations, unbondings, delegations_count, unbondings_count, cumulative_flow)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.SeriesItem
 //	@Failure		400	{object}	Error
@@ -398,14 +398,14 @@ type stakingDistributionRequest struct {
 	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`
 }
 
-// StakingSeries godoc
+// StakingDistribution godoc
 //
 //	@Summary		Get histogram for staking
-//	@Description	Get histogram for staking
+//	@Description	Returns the distribution of delegated stake across validators grouped by delegation size buckets, useful for understanding stake concentration over the selected time range.
 //	@Tags			stats
 //	@ID				stats-staking-distribution
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.StakingDistribution
 //	@Failure		400	{object}	Error
@@ -439,14 +439,14 @@ type ibcSeriesRequest struct {
 // IbcSeries godoc
 //
 //	@Summary		Get histogram for ibc channels with precomputed stats
-//	@Description	Get histogram for ibc channels with precomputed stats by series name and timeframe
+//	@Description	Returns a time-series histogram of IBC transfer statistics (count or amount) for the specified channel, filtered by timeframe and optional time range.
 //	@Tags			stats
 //	@ID				stats-ibc-series
 //	@Param			id			path	string	true	"Channel id"
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
 //	@Param			name		path	string	true	"Series name"					Enums(count, amount)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
@@ -490,11 +490,11 @@ func (req *limitOffsetRequest) SetDefault() {
 // IbcByChains godoc
 //
 //	@Summary		Get stats for ibc channels splitted by chains
-//	@Description	Get stats for ibc channels splitted by chains
+//	@Description	Returns a paginated list of IBC transfer statistics grouped by counterparty chain, including total transfer count, volume, and active channels.
 //	@Tags			stats
 //	@ID				stats-ibc-chains
-//	@Param			limit				query	integer			false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset				query	integer			false	"Offset"						mininum(1)
+//	@Param			limit				query	integer			false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset				query	integer			false	"Offset"						minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.IbcChainStats
 //	@Failure		400	{object}	Error
@@ -526,7 +526,7 @@ func (sh StatsHandler) IbcByChains(c echo.Context) error {
 // IbcSummary godoc
 //
 //	@Summary		Get stats for ibc the largest transfer and busiest channel per day
-//	@Description	Get stats for ibc the largest transfer and busiest channel per day
+//	@Description	Returns a summary of IBC activity over the last 24 hours: the single largest token transfer and the most active (busiest) IBC channel by transfer count.
 //	@Tags			stats
 //	@ID				stats-ibc-summary
 //	@Produce		json
@@ -555,11 +555,11 @@ type squareSizeRequest struct {
 // SquareSize godoc
 //
 //	@Summary		Get histogram for square size distribution
-//	@Description	Get histogram for square size distribution
+//	@Description	Returns the frequency distribution of data availability square sizes (number of rows/columns) used across blocks in the selected time range.
 //	@Tags			stats
 //	@ID				stats-square-size
-//	@Param			from	query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to		query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from	query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to		query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.SquareSizeResponse
 //	@Failure		400	{object}	Error
@@ -596,7 +596,7 @@ func (sh StatsHandler) SquareSize(c echo.Context) error {
 // RollupStats24h godoc
 //
 //	@Summary		Get rollups stats for last 24 hours
-//	@Description	Get rollups stats for last 24 hours
+//	@Description	Returns aggregated rollup statistics for the previous 24 hours: total blobs, total size, total fee, and throughput across all indexed rollups.
 //	@Tags			stats
 //	@ID				stats-rollup-24h
 //	@Produce		json
@@ -622,7 +622,7 @@ func (sh StatsHandler) RollupStats24h(c echo.Context) error {
 // MessagesCount24h godoc
 //
 //	@Summary		Get messages distribution for the last 24 hours
-//	@Description	Get messages distribution for the last 24 hours
+//	@Description	Returns the count of each Cosmos SDK message type observed in the last 24 hours, useful for understanding network activity composition.
 //	@Tags			stats
 //	@ID				stats-messages-count-24h
 //	@Produce		json
@@ -647,7 +647,7 @@ func (sh StatsHandler) MessagesCount24h(c echo.Context) error {
 // SizeGroups godoc
 //
 //	@Summary		Get blobs count grouped by size
-//	@Description	Get blobs count grouped by size
+//	@Description	Returns the distribution of blobs across predefined size buckets (e.g. <1KB, 1-16KB, 16-256KB, etc.), showing how many blobs fall into each size group.
 //	@Tags			stats
 //	@ID				stats-size-groups
 //	@Produce		json
@@ -681,14 +681,14 @@ type hlSeriesRequest struct {
 // HlSeries godoc
 //
 //	@Summary		Get histogram for hyperlane domains with precomputed stats
-//	@Description	Get histogram for hyperlane domains with precomputed stats by series name and timeframe
+//	@Description	Returns a time-series histogram of Hyperlane transfer statistics (count or amount) for the specified domain, filtered by timeframe and optional time range.
 //	@Tags			stats
 //	@ID				stats-hl-series
 //	@Param			id			path	integer	true	"Domain id"
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
 //	@Param			name		path	string	true	"Series name"					Enums(count, amount)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
@@ -728,13 +728,13 @@ type hlTotalSeriesRequest struct {
 // HlTotalSeries godoc
 //
 //	@Summary		Get histogram for aggregated hyperlane domains with precomputed stats
-//	@Description	Get histogram for aggregated hyperlane domains with precomputed stats by series name and timeframe
+//	@Description	Returns a time-series histogram of aggregated Hyperlane transfer statistics (count or amount) across all domains, filtered by timeframe and optional time range.
 //	@Tags			stats
 //	@ID				stats-hl-total-series
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
 //	@Param			name		path	string	true	"Series name"					Enums(count, amount)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
@@ -766,11 +766,11 @@ func (sh StatsHandler) HlTotalSeries(c echo.Context) error {
 // HlByDomain godoc
 //
 //	@Summary		Get stats for hyperlane transfers splitted by domain
-//	@Description	Get stats for hyperlane transfers splitted by domain
+//	@Description	Returns a paginated list of Hyperlane transfer statistics grouped by counterparty domain (chain), including transfer count and total volume.
 //	@Tags			stats
 //	@ID				stats-hl-domains
-//	@Param			limit				query	integer			false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset				query	integer			false	"Offset"						mininum(1)
+//	@Param			limit				query	integer			false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset				query	integer			false	"Offset"						minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.HlDomainStats
 //	@Failure		400	{object}	Error

@@ -50,7 +50,7 @@ type estimatePfbGas struct {
 // EstimateForPfb godoc
 //
 //	@Summary		Get estimated gas for pay for blob
-//	@Description	Get estimated gas for pay for blob message with certain values of blob sizes
+//	@Description	Returns the estimated gas required to submit a MsgPayForBlobs transaction for the given blob sizes and share versions, using current on-chain gas parameters.
 //	@Tags			gas
 //	@ID				gas-estimate-for-pfb
 //	@Param			sizes	  query	string	true	"Comma-separated array of blob sizes"
@@ -118,7 +118,7 @@ func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 // EstimatePrice godoc
 //
 //	@Summary		Get estimated gas price
-//	@Description	Get estimated gas price based on historical data
+//	@Description	Returns estimated gas prices (slow, median, fast) derived from recent transaction history. Useful for setting the gas price when submitting new transactions.
 //	@Tags			gas
 //	@ID				gas-price
 //	@Produce		json
@@ -140,7 +140,7 @@ type estimatePricePriorityRequest struct {
 // EstimatePricePriority godoc
 //
 //	@Summary		Get estimated gas price with priority filter
-//	@Description	Get estimated gas price with priority filter based on historical data
+//	@Description	Returns a single estimated gas price string for the selected priority level (slow, median, or fast) based on recent transaction history.
 //	@Tags			gas
 //	@ID				gas-price-priority
 //	@Param			priority	path	string	true	"Priority"	Enums(slow, median, fast)

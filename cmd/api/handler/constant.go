@@ -32,7 +32,7 @@ func NewConstantHandler(
 // Get godoc
 //
 //	@Summary		Get network constants
-//	@Description	Get network constants
+//	@Description	Returns all on-chain governance and module parameters for the Celestia network, including staking, slashing, blob, and other module constants, along with denomination metadata.
 //	@Tags			general
 //	@ID				get-constants
 //	@Produce		json
@@ -55,7 +55,7 @@ func (handler *ConstantHandler) Get(c echo.Context) error {
 // Enums godoc
 //
 //	@Summary		Get celenium enumerators
-//	@Description	Get celenium enumerators
+//	@Description	Returns all enumeration values used across the API, including rollup tags, categories, stacks, providers, message types, and other typed string constants.
 //	@Tags			general
 //	@ID				get-enums
 //	@Produce		json

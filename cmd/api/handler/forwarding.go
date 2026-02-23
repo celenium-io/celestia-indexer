@@ -97,15 +97,14 @@ func (req *listForwardingsRequest) toFilters(ctx context.Context, address storag
 //	@Description	Results can be filtered by transaction hash, address, or block height.
 //	@Tags			forwarding
 //	@ID				list-forwarding
-//	@Param			limit	query	integer	false	"Count of requested entities"			mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset for pagination"					mininum(0)
+//	@Param			limit	query	integer	false	"Count of requested entities"			minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset for pagination"					minimum(0)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"				Enums(asc, desc)
 //	@Param			tx_hash	query	string	false	"Filter by transaction hash (hex)"		minlength(64)	maxlength(64)
 //	@Param			address	query	string	false	"Filter by Celestia address"			minlength(47)	maxlength(47)
-//	@Param			height	query	integer	false	"Filter by block height"				mininum(1)
+//	@Param			height	query	integer	false	"Filter by block height"				minimum(1)
 //	@Param			from	query	integer	false	"Filter by start time (Unix timestamp)"	minimum(1)
 //	@Param			to		query	integer	false	"Filter by end time (Unix timestamp)"	minimum(1)
-//	@Success		200	{array}		responses.Forwarding
 //	@Produce		json
 //	@Success		200	{array}		responses.Forwarding
 //	@Failure		400	{object}	Error
@@ -142,7 +141,7 @@ func (handler *ForwardingsHandler) List(c echo.Context) error {
 //	@Description	forwarding address, success/failed counts, and the list of individual transfers.
 //	@Tags			forwarding
 //	@ID				get-forwarding
-//	@Param			id	path	integer	true	"Internal forwarding event ID"	mininum(1)
+//	@Param			id	path	integer	true	"Internal forwarding event ID"	minimum(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.Forwarding
 //	@Success		204

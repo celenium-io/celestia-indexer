@@ -27,13 +27,13 @@ type getVestingPeriodsRequest struct {
 
 // Periods godoc
 //
-//	@Summary		Periods vesting periods by id
-//	@Description	Periods vesting periods by id. Returns not empty array only for periodic vestings.
+//	@Summary		Get vesting periods by id
+//	@Description	Returns vesting periods by vesting id. Returns a non-empty array only for periodic vestings.
 //	@Tags			vesting
 //	@ID				get-vesting-periods
 //	@Param			id		path	integer	true	"Internal identity"
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.VestingPeriod
 //	@Failure		400	{object}	Error
