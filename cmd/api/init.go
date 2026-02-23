@@ -546,6 +546,15 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			hlIgp.GET("/:id", hyperlaneHandler.GetIgp)
 		}
 		hyperlane.GET("/domains", hyperlaneHandler.ListDomains, defaultMiddlewareCache)
+
+		zkismHandler := handler.NewZkISMHandler(db.ZkISM, db.Address, db.Tx)
+		hlZkism := hyperlane.Group("/zkism")
+		{
+			hlZkism.GET("", zkismHandler.List)
+			hlZkism.GET("/:id", zkismHandler.Get)
+			hlZkism.GET("/:id/updates", zkismHandler.GetUpdates)
+			hlZkism.GET("/:id/messages", zkismHandler.GetMessages)
+		}
 	}
 
 	signalHandler := handler.NewSignalHandler(db.SignalVersion, db.Upgrade, db.Validator, db.Tx, db.Address)

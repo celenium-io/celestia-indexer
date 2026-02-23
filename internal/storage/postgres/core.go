@@ -68,6 +68,7 @@ type Storage struct {
 	SignalVersion   models.ISignalVersion
 	Upgrade         models.IUpgrade
 	Forwardings     models.IForwarding
+	ZkISM           models.IZkISM
 	Celestials      celestials.ICelestial
 	CelestialState  celestials.ICelestialState
 	Notificator     *Notificator
@@ -133,6 +134,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		SignalVersion:   NewSignalVersion(strg.Connection()),
 		Upgrade:         NewUpgrade(strg.Connection()),
 		Forwardings:     NewForwarding(strg.Connection()),
+		ZkISM:           NewZkISM(strg.Connection()),
 		Celestials:      celestialsPg.NewCelestials(strg.Connection()),
 		CelestialState:  celestialsPg.NewCelestialState(strg.Connection()),
 		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
@@ -226,6 +228,8 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 			&models.HLTransfer{},
 			&models.SignalVersion{},
 			&models.Forwarding{},
+			&models.ZkISMUpdate{},
+			&models.ZkISMMessage{},
 		} {
 			if _, err := tx.ExecContext(ctx,
 				`SELECT create_hypertable(?, 'time', chunk_time_interval => INTERVAL '1 month', if_not_exists => TRUE);`,

@@ -84,6 +84,9 @@ type Message struct {
 	Upgrade        *Upgrade          `bun:"-"` // internal field
 	Validators     []string          `bun:"-"` // internal field
 	Forwarding     *Forwarding       `bun:"-"` // internal field
+	ZkISM          *ZkISM            `bun:"-"` // internal field
+	ZkISMUpdate    *ZkISMUpdate      `bun:"-"` // internal field
+	ZkISMMessages  []*ZkISMMessage   `bun:"-"` // internal field
 }
 
 // TableName -

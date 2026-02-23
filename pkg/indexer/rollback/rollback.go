@@ -261,6 +261,15 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	if err := tx.RollbackForwardings(ctx, height); err != nil {
 		return err
 	}
+	if err := tx.RollbackZkISMMessages(ctx, height); err != nil {
+		return err
+	}
+	if err := tx.RollbackZkISMUpdates(ctx, height); err != nil {
+		return err
+	}
+	if err := tx.RollbackZkISMs(ctx, height); err != nil {
+		return err
+	}
 
 	newBlock, err := tx.LastBlock(ctx)
 	if err != nil {

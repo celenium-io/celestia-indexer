@@ -1,0 +1,25 @@
+- id: 1
+  height: 1000
+  time: '2023-07-04T03:10:57+00:00'
+  tx_id: 1
+  creator_id: 1
+  external_id: 100
+  state: 0x0102030405
+  state_root: 0x0A0B0C0D0E
+  merkle_tree_address: 0x1A1B1C1D1E
+  groth16_vkey: 0x2A2B2C2D2E
+  state_transition_vkey: 0x3A3B3C3D3E
+  state_membership_vkey: 0x4A4B4C4D4E
+
+- id: 2
+  height: 1000
+  time: '2023-07-04T03:10:58+00:00'
+  tx_id: 2
+  creator_id: 2
+  external_id: 200
+  state: 0x0506070809
+  state_root: 0x0E0D0C0B0A
+  merkle_tree_address: 0x1E1D1C1B1A
+  groth16_vkey: 0x2E2D2C2B2A
+  state_transition_vkey: 0x3E3D3C3B3A
+  state_membership_vkey: 0x4E4D4C4B4A

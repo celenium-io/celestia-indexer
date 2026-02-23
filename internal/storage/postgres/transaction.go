@@ -1563,3 +1563,61 @@ func (tx Transaction) HyperlaneIgpConfig(ctx context.Context, id uint64) (config
 		Scan(ctx)
 	return
 }
+
+func (tx Transaction) SaveZkISMs(ctx context.Context, items ...*models.ZkISM) error {
+	if len(items) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&items).
+		On("CONFLICT (external_id) DO UPDATE").
+		Set("state = EXCLUDED.state").
+		Set("state_root = EXCLUDED.state_root").
+		Returning("id").
+		Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveZkISMUpdates(ctx context.Context, items ...*models.ZkISMUpdate) error {
+	if len(items) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&items).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) SaveZkISMMessages(ctx context.Context, items ...*models.ZkISMMessage) error {
+	if len(items) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&items).Exec(ctx)
+	return err
+}
+
+func (tx Transaction) RollbackZkISMs(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.ZkISM)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackZkISMUpdates(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.ZkISMUpdate)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) RollbackZkISMMessages(ctx context.Context, height types.Level) (err error) {
+	_, err = tx.Tx().NewDelete().Model((*models.ZkISMMessage)(nil)).
+		Where("height = ?", height).
+		Exec(ctx)
+	return
+}
+
+func (tx Transaction) ZkISMById(ctx context.Context, externalId []byte) (item models.ZkISM, err error) {
+	err = tx.Tx().NewSelect().Model(&item).
+		Where("external_id = ?", externalId).
+		Column("id").
+		Scan(ctx)
+	return
+}
