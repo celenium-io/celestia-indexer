@@ -1003,6 +1003,7 @@ func NewZkISMSubmitMessagesEvent(m map[string]any) (e ZkISMSubmitMessagesEvent, 
 		return e, errors.Wrap(err, "state_root")
 	}
 	messageIds := decoder.StringFromMap(m, "messages")
+	messageIds = strings.Trim(messageIds, "[]")
 	if messageIds != "" {
 		for _, id := range strings.Split(messageIds, ",") {
 			str, err := parseUnquoteOptional(id)

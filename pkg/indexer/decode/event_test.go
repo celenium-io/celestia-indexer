@@ -876,7 +876,7 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 	msgId2 := []byte{0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89}
 
 	toHex := func(b []byte) string {
-		return "0x" + hex.EncodeToString(b)
+		return "\"0x" + hex.EncodeToString(b) + "\""
 	}
 
 	tests := []struct {
@@ -890,7 +890,7 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 			m: map[string]any{
 				"id":         "dcdb3f985ecd20c313c58c0f6b2a0d7e",
 				"state_root": toHex(stateRootBytes),
-				"messages":   toHex(msgId1),
+				"messages":   `[` + toHex(msgId1) + `]`,
 			},
 			want: ZkISMSubmitMessagesEvent{
 				Id:         testsuite.MustHexDecode("dcdb3f985ecd20c313c58c0f6b2a0d7e"),
@@ -903,7 +903,7 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 			m: map[string]any{
 				"id":         "0123",
 				"state_root": toHex(stateRootBytes),
-				"messages":   toHex(msgId1) + "," + toHex(msgId2),
+				"messages":   `[` + toHex(msgId1) + `,` + toHex(msgId2) + `]`,
 			},
 			want: ZkISMSubmitMessagesEvent{
 				Id:         testsuite.MustHexDecode("0123"),
@@ -916,7 +916,7 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 			m: map[string]any{
 				"id":         "00",
 				"state_root": toHex(stateRootBytes),
-				"messages":   "",
+				"messages":   "[]",
 			},
 			want: ZkISMSubmitMessagesEvent{
 				Id:         testsuite.MustHexDecode("00"),
@@ -929,7 +929,7 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 			m: map[string]any{
 				"signer":     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state_root": toHex(stateRootBytes),
-				"messages":   toHex(msgId1),
+				"messages":   `[` + toHex(msgId1) + `]`,
 			},
 			wantErr: true,
 		},
@@ -939,7 +939,7 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 				"id":         "1",
 				"signer":     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state_root": toHex(stateRootBytes),
-				"messages":   "0xZZZZinvalid",
+				"messages":   `[0xZZZZinvalid]`,
 			},
 			wantErr: true,
 		},

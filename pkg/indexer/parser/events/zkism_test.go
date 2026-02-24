@@ -314,7 +314,7 @@ func Test_handleSubmitZkISMMessages_WrongAction(t *testing.T) {
 func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 	stateRoot := testsuite.RandomBytes(32)
 	msgId := testsuite.RandomBytes(32)
-	toHex := func(b []byte) string { return "0x" + hex.EncodeToString(b) }
+	toHex := func(b []byte) string { return "\"0x" + hex.EncodeToString(b) + "\"" }
 
 	ctx := makeZkISMContext()
 	idx := 0
@@ -332,7 +332,7 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 			Data: map[string]any{
 				"id":         "0x03",
 				"state_root": toHex(stateRoot),
-				"messages":   toHex(msgId),
+				"messages":   `[` + toHex(msgId) + `]`,
 			},
 		},
 	}
@@ -356,7 +356,7 @@ func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 	msgId1 := testsuite.RandomBytes(32)
 	msgId2 := testsuite.RandomBytes(32)
 	msgId3 := testsuite.RandomBytes(32)
-	toHex := func(b []byte) string { return "0x" + hex.EncodeToString(b) }
+	toHex := func(b []byte) string { return "\"0x" + hex.EncodeToString(b) + "\"" }
 
 	ctx := makeZkISMContext()
 	idx := 0
@@ -374,7 +374,7 @@ func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 			Data: map[string]any{
 				"id":         "0x05",
 				"state_root": toHex(stateRoot),
-				"messages":   toHex(msgId1) + "," + toHex(msgId2) + "," + toHex(msgId3),
+				"messages":   `[` + toHex(msgId1) + `,` + toHex(msgId2) + `,` + toHex(msgId3) + `]`,
 			},
 		},
 	}
@@ -398,7 +398,7 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 	stateRoot2 := testsuite.RandomBytes(32)
 	msgId1 := testsuite.RandomBytes(32)
 	msgId2 := testsuite.RandomBytes(32)
-	toHex := func(b []byte) string { return "0x" + hex.EncodeToString(b) }
+	toHex := func(b []byte) string { return "\"0x" + hex.EncodeToString(b) + "\"" }
 
 	ctx := makeZkISMContext()
 	idx := testsuite.Ptr(0)
@@ -415,7 +415,7 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 			Data: map[string]any{
 				"id":         "0x01",
 				"state_root": toHex(stateRoot1),
-				"messages":   toHex(msgId1),
+				"messages":   `[` + toHex(msgId1) + `]`,
 			},
 		},
 		{
@@ -430,7 +430,7 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 			Data: map[string]any{
 				"id":         "0x02",
 				"state_root": toHex(stateRoot2),
-				"messages":   toHex(msgId2),
+				"messages":   `[` + toHex(msgId2) + `]`,
 			},
 		},
 	}
