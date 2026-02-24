@@ -351,6 +351,45 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 	require.Equal(t, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", m.Signer.Address)
 }
 
+func Test_handleSubmitZkISMMessages_Real(t *testing.T) {
+	ctx := makeZkISMContext()
+	idx := 0
+	msg := &storage.Message{Type: types.MsgSubmitMessages}
+	events := []storage.Event{
+		{
+			Type: "message",
+			Data: map[string]any{
+				"action":    "/celestia.zkism.v1.MsgSubmitMessages",
+				"sender":    "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j",
+				"msg_index": "0",
+				"module":    "zkism",
+			},
+		},
+		{
+			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
+			Data: map[string]any{
+				"id":         "\"0x726f757465725f69736d000000000000000000000000002a000000000000000f\"",
+				"state_root": "\"0xb1d302256aee21b0d2dc21d88612061d1c7bb5bd5a222d98bd29482e6ea33d33\"",
+				"messages":   "[\"0x8066fb378e24512ba445ac2f36b1a5b1d74b664d09df64b58226923a680990a6\"]",
+				"msg_index":  "0",
+			},
+		},
+	}
+
+	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
+	require.NoError(t, err)
+	require.Len(t, msg.ZkISMMessages, 1)
+
+	m := msg.ZkISMMessages[0]
+	require.NotEmpty(t, m.ZkISMExternalId)
+	require.Equal(t, ctx.Block.Height, m.Height)
+	require.Equal(t, ctx.Block.Time, m.Time)
+	require.NotEmpty(t, m.StateRoot)
+	require.NotEmpty(t, m.MessageId)
+	require.NotNil(t, m.Signer)
+	require.Equal(t, "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j", m.Signer.Address)
+}
+
 func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 	stateRoot := testsuite.RandomBytes(32)
 	msgId1 := testsuite.RandomBytes(32)
