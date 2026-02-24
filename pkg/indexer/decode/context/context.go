@@ -65,6 +65,10 @@ func (ctx *Context) AddAddress(address *storage.Address) error {
 		addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
 		addr.Balance.Delegated = addr.Balance.Delegated.Add(address.Balance.Delegated)
 		addr.Balance.Unbonding = addr.Balance.Unbonding.Add(address.Balance.Unbonding)
+
+		if address.IsForwarding {
+			addr.IsForwarding = true
+		}
 	} else {
 		if len(address.Hash) == 0 {
 			_, hash, err := pkgTypes.Address(address.Address).Decode()

@@ -26,11 +26,12 @@ type Address struct {
 
 func NewAddress(addr storage.Address) Address {
 	address := Address{
-		Id:         addr.Id,
-		Height:     addr.Height,
-		LastHeight: addr.LastHeight,
-		Hash:       addr.Address,
-		Name:       addr.Name,
+		Id:           addr.Id,
+		Height:       addr.Height,
+		LastHeight:   addr.LastHeight,
+		Hash:         addr.Address,
+		Name:         addr.Name,
+		IsForwarding: addr.IsForwarding,
 		Balance: Balance{
 			Currency:  addr.Balance.Currency,
 			Spendable: addr.Balance.Spendable.String(),
