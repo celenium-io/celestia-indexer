@@ -19,7 +19,7 @@ type Forwarding struct {
 	Time         time.Time       `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"          swaggertype:"string"`
 	TxHash       string          `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"       swaggertype:"string"`
 	DestDomain   uint64          `example:"123456789"                                                        format:"int64"     json:"dest_domain"   swaggertype:"integer"`
-	DestAddress  []byte          `example:"0x000000000000000000000000123456789abcdef123456789abcdef12345609" format:"binary"    json:"dest_address"  swaggertype:"string"`
+	DestAddress  string          `example:"0x000000000000000000000000123456789abcdef123456789abcdef12345609" format:"binary"    json:"dest_address"  swaggertype:"string"`
 	SuccessCount uint64          `example:"100"                                                              format:"int64"     json:"success_count" swaggertype:"integer"`
 	FailedCount  uint64          `example:"10"                                                               format:"int64"     json:"failed_count"  swaggertype:"integer"`
 	Transfers    json.RawMessage `json:"transfers,omitempty"`
@@ -35,7 +35,6 @@ func NewForwarding(forwarding storage.Forwarding, store hyperlane.IChainStore) F
 		Time:         forwarding.Time,
 		Height:       forwarding.Height,
 		DestDomain:   forwarding.DestDomain,
-		DestAddress:  forwarding.DestRecipient,
 		SuccessCount: forwarding.SuccessCount,
 		FailedCount:  forwarding.FailedCount,
 		Transfers:    forwarding.Transfers,
@@ -47,6 +46,10 @@ func NewForwarding(forwarding storage.Forwarding, store hyperlane.IChainStore) F
 
 	if forwarding.Address != nil {
 		response.ForwardAddress = NewShortAddress(forwarding.Address)
+	}
+
+	if len(forwarding.DestRecipient) > 0 {
+		response.DestAddress = hex.EncodeToString(forwarding.DestRecipient)
 	}
 
 	if store != nil {
