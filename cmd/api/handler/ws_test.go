@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -72,7 +73,10 @@ func TestWebsocket(t *testing.T) {
 			MaxTimes(1)
 	}
 
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		ticker := time.NewTicker(time.Second)
 		defer ticker.Stop()
 
@@ -156,6 +160,7 @@ func TestWebsocket(t *testing.T) {
 			time.Sleep(time.Second)
 			cancel()
 
+			wg.Wait()
 			err = manager.Close()
 			require.NoError(t, err, "closing manager")
 
