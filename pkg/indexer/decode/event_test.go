@@ -749,7 +749,6 @@ func TestEventForwardingComplete(t *testing.T) {
 
 func TestNewZkISMCreateEvent(t *testing.T) {
 	stateBytes := []byte{0xde, 0xad, 0xbe, 0xef, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c}
-	stateRootBytes := []byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20}
 	merkleTreeBytes := []byte{0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99}
 	groth16VKeyBytes := []byte{0x10, 0x20, 0x30, 0x40}
 	stateTransitionVKeyBytes := []byte{0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10}
@@ -769,9 +768,8 @@ func TestNewZkISMCreateEvent(t *testing.T) {
 			name: "valid event",
 			m: map[string]any{
 				"id":                    "deadbeaf",
-				"creator":               "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+				"owner":                 "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state":                 toHex(stateBytes),
-				"state_root":            toHex(stateRootBytes),
 				"merkle_tree_address":   toHex(merkleTreeBytes),
 				"groth16_vkey":          toHex(groth16VKeyBytes),
 				"state_transition_vkey": toHex(stateTransitionVKeyBytes),
@@ -781,7 +779,6 @@ func TestNewZkISMCreateEvent(t *testing.T) {
 				Id:                  testsuite.MustHexDecode("deadbeaf"),
 				Creator:             "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				State:               stateBytes,
-				StateRoot:           stateRootBytes,
 				MerkleTreeAddress:   merkleTreeBytes,
 				Groth16VKey:         groth16VKeyBytes,
 				StateTransitionVKey: stateTransitionVKeyBytes,
@@ -791,9 +788,8 @@ func TestNewZkISMCreateEvent(t *testing.T) {
 		{
 			name: "missing id",
 			m: map[string]any{
-				"creator":               "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+				"owner":                 "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state":                 toHex(stateBytes),
-				"state_root":            toHex(stateRootBytes),
 				"merkle_tree_address":   toHex(merkleTreeBytes),
 				"groth16_vkey":          toHex(groth16VKeyBytes),
 				"state_transition_vkey": toHex(stateTransitionVKeyBytes),
@@ -805,9 +801,8 @@ func TestNewZkISMCreateEvent(t *testing.T) {
 			name: "invalid state hex",
 			m: map[string]any{
 				"id":                    "1",
-				"creator":               "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+				"owner":                 "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state":                 "not-hex",
-				"state_root":            toHex(stateRootBytes),
 				"merkle_tree_address":   toHex(merkleTreeBytes),
 				"groth16_vkey":          toHex(groth16VKeyBytes),
 				"state_transition_vkey": toHex(stateTransitionVKeyBytes),
@@ -831,7 +826,6 @@ func TestNewZkISMCreateEvent(t *testing.T) {
 
 func TestNewZkISMUpdateEvent(t *testing.T) {
 	newStateBytes := []byte{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10}
-	newStateRootBytes := []byte{0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f, 0x40}
 
 	toHex := func(b []byte) string {
 		return "0x" + hex.EncodeToString(b)
@@ -846,34 +840,19 @@ func TestNewZkISMUpdateEvent(t *testing.T) {
 		{
 			name: "valid event",
 			m: map[string]any{
-				"id":             "\"0xdeadbeaf\"",
-				"signer":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
-				"new_state":      toHex(newStateBytes),
-				"new_state_root": toHex(newStateRootBytes),
+				"id":    "\"0xdeadbeaf\"",
+				"state": toHex(newStateBytes),
 			},
 			want: ZkISMUpdateEvent{
-				Id:           testsuite.MustHexDecode("deadbeaf"),
-				Signer:       "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
-				NewState:     newStateBytes,
-				NewStateRoot: newStateRootBytes,
+				Id:       testsuite.MustHexDecode("deadbeaf"),
+				NewState: newStateBytes,
 			},
 		},
 		{
 			name: "missing id",
 			m: map[string]any{
-				"signer":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
-				"new_state":      toHex(newStateBytes),
-				"new_state_root": toHex(newStateRootBytes),
-			},
-			wantErr: true,
-		},
-		{
-			name: "invalid new_state_root hex",
-			m: map[string]any{
-				"id":             "1",
-				"signer":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
-				"new_state":      toHex(newStateBytes),
-				"new_state_root": "ZZZZ",
+				"signer": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+				"state":  toHex(newStateBytes),
 			},
 			wantErr: true,
 		},
@@ -897,7 +876,7 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 	msgId2 := []byte{0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89}
 
 	toHex := func(b []byte) string {
-		return "0x" + hex.EncodeToString(b)
+		return "\"0x" + hex.EncodeToString(b) + "\""
 	}
 
 	tests := []struct {
@@ -909,14 +888,12 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 		{
 			name: "single message id",
 			m: map[string]any{
-				"id":          "dcdb3f985ecd20c313c58c0f6b2a0d7e",
-				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
-				"state_root":  toHex(stateRootBytes),
-				"message_ids": toHex(msgId1),
+				"id":         "dcdb3f985ecd20c313c58c0f6b2a0d7e",
+				"state_root": toHex(stateRootBytes),
+				"messages":   `[` + toHex(msgId1) + `]`,
 			},
 			want: ZkISMSubmitMessagesEvent{
 				Id:         testsuite.MustHexDecode("dcdb3f985ecd20c313c58c0f6b2a0d7e"),
-				Signer:     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				StateRoot:  stateRootBytes,
 				MessageIds: [][]byte{msgId1},
 			},
@@ -924,14 +901,12 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 		{
 			name: "multiple message ids comma-separated",
 			m: map[string]any{
-				"id":          "0123",
-				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
-				"state_root":  toHex(stateRootBytes),
-				"message_ids": toHex(msgId1) + "," + toHex(msgId2),
+				"id":         "0123",
+				"state_root": toHex(stateRootBytes),
+				"messages":   `[` + toHex(msgId1) + `,` + toHex(msgId2) + `]`,
 			},
 			want: ZkISMSubmitMessagesEvent{
 				Id:         testsuite.MustHexDecode("0123"),
-				Signer:     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				StateRoot:  stateRootBytes,
 				MessageIds: [][]byte{msgId1, msgId2},
 			},
@@ -939,14 +914,12 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 		{
 			name: "empty message_ids",
 			m: map[string]any{
-				"id":          "00",
-				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
-				"state_root":  toHex(stateRootBytes),
-				"message_ids": "",
+				"id":         "00",
+				"state_root": toHex(stateRootBytes),
+				"messages":   "[]",
 			},
 			want: ZkISMSubmitMessagesEvent{
 				Id:         testsuite.MustHexDecode("00"),
-				Signer:     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				StateRoot:  stateRootBytes,
 				MessageIds: nil,
 			},
@@ -954,19 +927,19 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 		{
 			name: "missing id",
 			m: map[string]any{
-				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
-				"state_root":  toHex(stateRootBytes),
-				"message_ids": toHex(msgId1),
+				"signer":     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+				"state_root": toHex(stateRootBytes),
+				"messages":   `[` + toHex(msgId1) + `]`,
 			},
 			wantErr: true,
 		},
 		{
 			name: "invalid message id hex",
 			m: map[string]any{
-				"id":          "1",
-				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
-				"state_root":  toHex(stateRootBytes),
-				"message_ids": "0xZZZZinvalid",
+				"id":         "1",
+				"signer":     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+				"state_root": toHex(stateRootBytes),
+				"messages":   `[0xZZZZinvalid]`,
 			},
 			wantErr: true,
 		},

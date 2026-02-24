@@ -13,12 +13,13 @@ import (
 //
 //	@Description	Celestia address information
 type Address struct {
-	Id         uint64         `example:"321"                                             json:"id"             swaggertype:"integer"`
-	Height     pkgTypes.Level `example:"100"                                             json:"first_height"   swaggertype:"integer"`
-	LastHeight pkgTypes.Level `example:"100"                                             json:"last_height"    swaggertype:"integer"`
-	Hash       string         `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"hash"           swaggertype:"string"`
-	Name       string         `example:"bonded_tokens_pool"                              json:"name,omitempty" swaggertype:"string"`
-	Balance    Balance        `json:"balance"`
+	Id           uint64         `example:"321"                                             json:"id"             swaggertype:"integer"`
+	Height       pkgTypes.Level `example:"100"                                             json:"first_height"   swaggertype:"integer"`
+	LastHeight   pkgTypes.Level `example:"100"                                             json:"last_height"    swaggertype:"integer"`
+	Hash         string         `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"hash"           swaggertype:"string"`
+	Name         string         `example:"bonded_tokens_pool"                              json:"name,omitempty" swaggertype:"string"`
+	IsForwarding bool           `example:"true"                                            json:"is_forwarding"  swaggertype:"boolean"`
+	Balance      Balance        `json:"balance"`
 
 	Celestials *Celestial `json:"celestials,omitempty"`
 }

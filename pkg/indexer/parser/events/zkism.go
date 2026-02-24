@@ -40,7 +40,6 @@ func processCreateZkISM(ctx *context.Context, events []storage.Event, msg *stora
 				Time:                ctx.Block.Time,
 				ExternalId:          e.Id,
 				State:               e.State,
-				StateRoot:           e.StateRoot,
 				MerkleTreeAddress:   e.MerkleTreeAddress,
 				Groth16VKey:         e.Groth16VKey,
 				StateTransitionVKey: e.StateTransitionVKey,
@@ -72,8 +71,23 @@ func handleUpdateZkISM(ctx *context.Context, events []storage.Event, msg *storag
 	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/celestia.zkism.v1.MsgUpdateInterchainSecurityModule" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
+	sender := decoder.StringFromMap(events[*idx].Data, "sender")
+	if sender == "" {
+		return errors.New("missing sender in submit zkism messages event")
+	}
 	*idx += 1
-	return processUpdateZkISM(ctx, events, msg, idx)
+	if err := processUpdateZkISM(ctx, events, msg, idx); err != nil {
+		return err
+	}
+	if msg.ZkISMUpdate != nil {
+		msg.ZkISMUpdate.Signer = &storage.Address{
+			Address:    sender,
+			Height:     msg.Height,
+			LastHeight: msg.Height,
+			Balance:    storage.EmptyBalance(),
+		}
+	}
+	return nil
 }
 
 func processUpdateZkISM(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
@@ -86,19 +100,14 @@ func processUpdateZkISM(ctx *context.Context, events []storage.Event, msg *stora
 			}
 
 			update := &storage.ZkISMUpdate{
-				Height:       ctx.Block.Height,
-				Time:         ctx.Block.Time,
-				NewState:     e.NewState,
-				NewStateRoot: e.NewStateRoot,
-			}
-			if e.Signer != "" {
-				update.Signer = &storage.Address{Address: e.Signer}
+				Height:   ctx.Block.Height,
+				Time:     ctx.Block.Time,
+				NewState: e.NewState,
 			}
 
 			ctx.AddZkISM(&storage.ZkISM{
 				ExternalId: e.Id,
 				State:      e.NewState,
-				StateRoot:  e.NewStateRoot,
 			})
 			msg.ZkISMUpdate = update
 			msg.ZkISMUpdate.ZkISMExternalId = e.Id
@@ -122,8 +131,23 @@ func handleSubmitZkISMMessages(ctx *context.Context, events []storage.Event, msg
 	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/celestia.zkism.v1.MsgSubmitMessages" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
+	sender := decoder.StringFromMap(events[*idx].Data, "sender")
+	if sender == "" {
+		return errors.New("missing sender in submit zkism messages event")
+	}
 	*idx += 1
-	return processSubmitZkISMMessages(ctx, events, msg, idx)
+	if err := processSubmitZkISMMessages(ctx, events, msg, idx); err != nil {
+		return err
+	}
+	for i := range msg.ZkISMMessages {
+		msg.ZkISMMessages[i].Signer = &storage.Address{
+			Address:    sender,
+			Height:     msg.Height,
+			LastHeight: msg.Height,
+			Balance:    storage.EmptyBalance(),
+		}
+	}
+	return nil
 }
 
 func processSubmitZkISMMessages(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
@@ -142,9 +166,6 @@ func processSubmitZkISMMessages(ctx *context.Context, events []storage.Event, ms
 					Time:      ctx.Block.Time,
 					StateRoot: e.StateRoot,
 					MessageId: msgId,
-				}
-				if e.Signer != "" {
-					m.Signer = &storage.Address{Address: e.Signer}
 				}
 				m.ZkISMExternalId = e.Id
 				msgs[i] = m

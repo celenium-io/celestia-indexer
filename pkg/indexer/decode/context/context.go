@@ -240,7 +240,6 @@ func (ctx *Context) AddZkISM(ism *storage.ZkISM) {
 	key := hex.EncodeToString(ism.ExternalId)
 	if value, ok := ctx.ZkISMs.Get(key); ok {
 		value.State = ism.State
-		value.StateRoot = ism.StateRoot
 	} else {
 		ctx.ZkISMs.Set(key, ism)
 	}

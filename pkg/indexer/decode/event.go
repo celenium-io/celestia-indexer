@@ -932,7 +932,6 @@ type ZkISMCreateEvent struct {
 	Id                  []byte
 	Creator             string
 	State               []byte
-	StateRoot           []byte
 	MerkleTreeAddress   []byte
 	Groth16VKey         []byte
 	StateTransitionVKey []byte
@@ -944,14 +943,13 @@ func NewZkISMCreateEvent(m map[string]any) (e ZkISMCreateEvent, err error) {
 	if err != nil {
 		return e, errors.Wrap(err, "id")
 	}
-	e.Creator = decoder.StringFromMap(m, "creator")
+	e.Creator, err = parseUnquoteOptional(decoder.StringFromMap(m, "owner"))
+	if err != nil {
+		return e, errors.Wrap(err, "creator")
+	}
 	e.State, err = decoder.BytesFromMap(m, "state")
 	if err != nil {
 		return e, errors.Wrap(err, "state")
-	}
-	e.StateRoot, err = decoder.BytesFromMap(m, "state_root")
-	if err != nil {
-		return e, errors.Wrap(err, "state_root")
 	}
 	e.MerkleTreeAddress, err = decoder.BytesFromMap(m, "merkle_tree_address")
 	if err != nil {
@@ -973,10 +971,8 @@ func NewZkISMCreateEvent(m map[string]any) (e ZkISMCreateEvent, err error) {
 }
 
 type ZkISMUpdateEvent struct {
-	Id           []byte
-	Signer       string
-	NewState     []byte
-	NewStateRoot []byte
+	Id       []byte
+	NewState []byte
 }
 
 func NewZkISMUpdateEvent(m map[string]any) (e ZkISMUpdateEvent, err error) {
@@ -984,21 +980,15 @@ func NewZkISMUpdateEvent(m map[string]any) (e ZkISMUpdateEvent, err error) {
 	if err != nil {
 		return e, errors.Wrap(err, "id")
 	}
-	e.Signer = decoder.StringFromMap(m, "signer")
-	e.NewState, err = decoder.BytesFromMap(m, "new_state")
+	e.NewState, err = decoder.BytesFromMap(m, "state")
 	if err != nil {
-		return e, errors.Wrap(err, "new_state")
-	}
-	e.NewStateRoot, err = decoder.BytesFromMap(m, "new_state_root")
-	if err != nil {
-		return e, errors.Wrap(err, "new_state_root")
+		return e, errors.Wrap(err, "state")
 	}
 	return
 }
 
 type ZkISMSubmitMessagesEvent struct {
 	Id         []byte
-	Signer     string
 	StateRoot  []byte
 	MessageIds [][]byte
 }
@@ -1008,22 +998,21 @@ func NewZkISMSubmitMessagesEvent(m map[string]any) (e ZkISMSubmitMessagesEvent, 
 	if err != nil {
 		return e, errors.Wrap(err, "id")
 	}
-	e.Signer = decoder.StringFromMap(m, "signer")
 	e.StateRoot, err = decoder.BytesFromMap(m, "state_root")
 	if err != nil {
 		return e, errors.Wrap(err, "state_root")
 	}
-	messageIds := decoder.StringFromMap(m, "message_ids")
+	messageIds := decoder.StringFromMap(m, "messages")
+	messageIds = strings.Trim(messageIds, "[]")
 	if messageIds != "" {
 		for _, id := range strings.Split(messageIds, ",") {
-			id = strings.TrimSpace(strings.Trim(id, "[]\""))
-			if id == "" {
-				continue
+			str, err := parseUnquoteOptional(id)
+			if err != nil {
+				return e, errors.Wrap(err, "failed to unquote string")
 			}
-			id = strings.TrimPrefix(id, "0x")
-			idBytes, hexErr := hex.DecodeString(id)
-			if hexErr != nil {
-				return e, errors.Wrapf(hexErr, "message_id: %s", id)
+			idBytes, err := hex.DecodeString(strings.TrimPrefix(str, "0x"))
+			if err != nil {
+				return e, errors.Wrap(err, "failed to decode hex string")
 			}
 			e.MessageIds = append(e.MessageIds, idBytes)
 		}

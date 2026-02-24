@@ -241,22 +241,22 @@ func (module *Module) saveMessages(
 		}
 
 		if len(messages[i].ZkISMMessages) > 0 {
-			for _, m := range messages[i].ZkISMMessages {
-				m.TxId = messages[i].TxId
-				if m.Signer != nil {
-					if addrId, ok := addrToId[m.Signer.Address]; ok {
-						m.SignerId = addrId
+			for j := range messages[i].ZkISMMessages {
+				messages[i].ZkISMMessages[j].TxId = messages[i].TxId
+				if messages[i].ZkISMMessages[j].Signer != nil {
+					if addrId, ok := addrToId[messages[i].ZkISMMessages[j].Signer.Address]; ok {
+						messages[i].ZkISMMessages[j].SignerId = addrId
 					}
 				}
-				if _, ok := zkisms[m.ExternalId()]; !ok {
+				if _, ok := zkisms[messages[i].ZkISMMessages[j].ExternalId()]; !ok {
 					// ISM from a previous block: resolve its DB id now.
-					dbIsm, err := tx.ZkISMById(ctx, m.ZkISMExternalId)
+					dbIsm, err := tx.ZkISMById(ctx, messages[i].ZkISMMessages[j].ZkISMExternalId)
 					if err != nil {
-						return 0, errors.Wrapf(err, "can't find zk ism for message: external_id=%s", m.ExternalId())
+						return 0, errors.Wrapf(err, "can't find zk ism for message: external_id=%s", messages[i].ZkISMMessages[j].ExternalId())
 					}
-					m.ZkISMId = dbIsm.Id
+					messages[i].ZkISMMessages[j].ZkISMId = dbIsm.Id
 				}
-				zkismMessages = append(zkismMessages, m)
+				zkismMessages = append(zkismMessages, messages[i].ZkISMMessages[j])
 			}
 		}
 

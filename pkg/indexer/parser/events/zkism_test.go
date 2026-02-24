@@ -63,7 +63,6 @@ func Test_handleCreateZkISM_WrongAction(t *testing.T) {
 }
 
 func Test_handleCreateZkISM_Success(t *testing.T) {
-	stateRoot := testsuite.RandomBytes(32)
 	merkleTree := testsuite.RandomBytes(32)
 	groth16VKey := testsuite.RandomBytes(64)
 	stateTransitionVKey := testsuite.RandomBytes(32)
@@ -81,6 +80,7 @@ func Test_handleCreateZkISM_Success(t *testing.T) {
 			Type:   "message",
 			Data: map[string]any{
 				"action": "/celestia.zkism.v1.MsgCreateInterchainSecurityModule",
+				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 			},
 		},
 		{
@@ -88,9 +88,8 @@ func Test_handleCreateZkISM_Success(t *testing.T) {
 			Type:   types.EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,
 			Data: map[string]any{
 				"id":                    "42",
-				"creator":               "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+				"owner":                 "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state":                 toHex(state),
-				"state_root":            toHex(stateRoot),
 				"merkle_tree_address":   toHex(merkleTree),
 				"groth16_vkey":          toHex(groth16VKey),
 				"state_transition_vkey": toHex(stateTransitionVKey),
@@ -107,7 +106,6 @@ func Test_handleCreateZkISM_Success(t *testing.T) {
 	require.EqualValues(t, []byte{0x42}, ism.ExternalId)
 	require.Equal(t, ctx.Block.Height, ism.Height)
 	require.Equal(t, ctx.Block.Time, ism.Time)
-	require.Equal(t, stateRoot, ism.StateRoot)
 	require.Equal(t, merkleTree, ism.MerkleTreeAddress)
 	require.Equal(t, groth16VKey, ism.Groth16VKey)
 	require.Equal(t, stateTransitionVKey, ism.StateTransitionVKey)
@@ -123,7 +121,6 @@ func Test_handleCreateZkISM_Success(t *testing.T) {
 
 func Test_handleCreateZkISM_StopsAtNextAction(t *testing.T) {
 	state := testsuite.RandomBytes(32)
-	stateRoot := testsuite.RandomBytes(32)
 	merkleTree := testsuite.RandomBytes(32)
 	groth16VKey := testsuite.RandomBytes(32)
 	stateTransVKey := testsuite.RandomBytes(32)
@@ -136,15 +133,17 @@ func Test_handleCreateZkISM_StopsAtNextAction(t *testing.T) {
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{"action": "/celestia.zkism.v1.MsgCreateInterchainSecurityModule"},
+			Data: map[string]any{
+				"action": "/celestia.zkism.v1.MsgCreateInterchainSecurityModule",
+				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,
 			Data: map[string]any{
 				"id":                    "01",
-				"creator":               "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+				"owner":                 "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state":                 toHex(state),
-				"state_root":            toHex(stateRoot),
 				"merkle_tree_address":   toHex(merkleTree),
 				"groth16_vkey":          toHex(groth16VKey),
 				"state_transition_vkey": toHex(stateTransVKey),
@@ -154,7 +153,10 @@ func Test_handleCreateZkISM_StopsAtNextAction(t *testing.T) {
 		{
 			// second message — should NOT be consumed
 			Type: "message",
-			Data: map[string]any{"action": "/celestia.zkism.v1.MsgUpdateInterchainSecurityModule"},
+			Data: map[string]any{
+				"action": "/celestia.zkism.v1.MsgUpdateInterchainSecurityModule",
+				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+			},
 		},
 	}
 
@@ -202,7 +204,6 @@ func Test_handleUpdateZkISM_WrongAction(t *testing.T) {
 
 func Test_handleUpdateZkISM_Success(t *testing.T) {
 	newState := testsuite.RandomBytes(64)
-	newStateRoot := testsuite.RandomBytes(32)
 	toHex := func(b []byte) string { return "0x" + hex.EncodeToString(b) }
 
 	ctx := makeZkISMContext()
@@ -211,15 +212,16 @@ func Test_handleUpdateZkISM_Success(t *testing.T) {
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{"action": "/celestia.zkism.v1.MsgUpdateInterchainSecurityModule"},
+			Data: map[string]any{
+				"action": "/celestia.zkism.v1.MsgUpdateInterchainSecurityModule",
+				"sender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
 			Data: map[string]any{
-				"id":             "0x07",
-				"signer":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
-				"new_state":      toHex(newState),
-				"new_state_root": toHex(newStateRoot),
+				"id":    "0x07",
+				"state": toHex(newState),
 			},
 		},
 	}
@@ -233,7 +235,6 @@ func Test_handleUpdateZkISM_Success(t *testing.T) {
 	require.Equal(t, ctx.Block.Height, upd.Height)
 	require.Equal(t, ctx.Block.Time, upd.Time)
 	require.Equal(t, newState, upd.NewState)
-	require.Equal(t, newStateRoot, upd.NewStateRoot)
 	require.NotNil(t, upd.Signer)
 	require.Equal(t, "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj", upd.Signer.Address)
 }
@@ -241,29 +242,28 @@ func Test_handleUpdateZkISM_Success(t *testing.T) {
 func Test_handleUpdateZkISM_UpdatesContextState(t *testing.T) {
 	// If the ISM was created in the same block it must be updated in the context.
 	oldState := testsuite.RandomBytes(64)
-	oldRoot := testsuite.RandomBytes(32)
 	newState := testsuite.RandomBytes(64)
-	newRoot := testsuite.RandomBytes(32)
 	toHex := func(b []byte) string { return "0x" + hex.EncodeToString(b) }
 
 	ctx := makeZkISMContext()
 	// Simulate ISM created earlier in this block
-	ctx.ZkISMs.Set("0x07", &storage.ZkISM{ExternalId: testsuite.MustHexDecode("07"), State: oldState, StateRoot: oldRoot})
+	ctx.ZkISMs.Set("0x07", &storage.ZkISM{ExternalId: testsuite.MustHexDecode("07"), State: oldState})
 
 	idx := 0
 	msg := &storage.Message{Type: types.MsgUpdateInterchainSecurityModule}
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{"action": "/celestia.zkism.v1.MsgUpdateInterchainSecurityModule"},
+			Data: map[string]any{
+				"action": "/celestia.zkism.v1.MsgUpdateInterchainSecurityModule",
+				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
 			Data: map[string]any{
-				"id":             "0x07",
-				"signer":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
-				"new_state":      toHex(newState),
-				"new_state_root": toHex(newRoot),
+				"id":    "0x07",
+				"state": toHex(newState),
 			},
 		},
 	}
@@ -274,7 +274,6 @@ func Test_handleUpdateZkISM_UpdatesContextState(t *testing.T) {
 	stored, ok := ctx.ZkISMs.Get("07")
 	require.True(t, ok)
 	require.Equal(t, newState, stored.State)
-	require.Equal(t, newRoot, stored.StateRoot)
 }
 
 // ──────────────────────────────────────────────────────────
@@ -315,7 +314,7 @@ func Test_handleSubmitZkISMMessages_WrongAction(t *testing.T) {
 func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 	stateRoot := testsuite.RandomBytes(32)
 	msgId := testsuite.RandomBytes(32)
-	toHex := func(b []byte) string { return "0x" + hex.EncodeToString(b) }
+	toHex := func(b []byte) string { return "\"0x" + hex.EncodeToString(b) + "\"" }
 
 	ctx := makeZkISMContext()
 	idx := 0
@@ -323,15 +322,17 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{"action": "/celestia.zkism.v1.MsgSubmitMessages"},
+			Data: map[string]any{
+				"action": "/celestia.zkism.v1.MsgSubmitMessages",
+				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
 			Data: map[string]any{
-				"id":          "0x03",
-				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
-				"state_root":  toHex(stateRoot),
-				"message_ids": toHex(msgId),
+				"id":         "0x03",
+				"state_root": toHex(stateRoot),
+				"messages":   `[` + toHex(msgId) + `]`,
 			},
 		},
 	}
@@ -350,12 +351,51 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 	require.Equal(t, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", m.Signer.Address)
 }
 
+func Test_handleSubmitZkISMMessages_Real(t *testing.T) {
+	ctx := makeZkISMContext()
+	idx := 0
+	msg := &storage.Message{Type: types.MsgSubmitMessages}
+	events := []storage.Event{
+		{
+			Type: "message",
+			Data: map[string]any{
+				"action":    "/celestia.zkism.v1.MsgSubmitMessages",
+				"sender":    "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j",
+				"msg_index": "0",
+				"module":    "zkism",
+			},
+		},
+		{
+			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
+			Data: map[string]any{
+				"id":         "\"0x726f757465725f69736d000000000000000000000000002a000000000000000f\"",
+				"state_root": "\"0xb1d302256aee21b0d2dc21d88612061d1c7bb5bd5a222d98bd29482e6ea33d33\"",
+				"messages":   "[\"0x8066fb378e24512ba445ac2f36b1a5b1d74b664d09df64b58226923a680990a6\"]",
+				"msg_index":  "0",
+			},
+		},
+	}
+
+	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
+	require.NoError(t, err)
+	require.Len(t, msg.ZkISMMessages, 1)
+
+	m := msg.ZkISMMessages[0]
+	require.NotEmpty(t, m.ZkISMExternalId)
+	require.Equal(t, ctx.Block.Height, m.Height)
+	require.Equal(t, ctx.Block.Time, m.Time)
+	require.NotEmpty(t, m.StateRoot)
+	require.NotEmpty(t, m.MessageId)
+	require.NotNil(t, m.Signer)
+	require.Equal(t, "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j", m.Signer.Address)
+}
+
 func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 	stateRoot := testsuite.RandomBytes(32)
 	msgId1 := testsuite.RandomBytes(32)
 	msgId2 := testsuite.RandomBytes(32)
 	msgId3 := testsuite.RandomBytes(32)
-	toHex := func(b []byte) string { return "0x" + hex.EncodeToString(b) }
+	toHex := func(b []byte) string { return "\"0x" + hex.EncodeToString(b) + "\"" }
 
 	ctx := makeZkISMContext()
 	idx := 0
@@ -363,15 +403,17 @@ func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{"action": "/celestia.zkism.v1.MsgSubmitMessages"},
+			Data: map[string]any{
+				"action": "/celestia.zkism.v1.MsgSubmitMessages",
+				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
 			Data: map[string]any{
-				"id":          "0x05",
-				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
-				"state_root":  toHex(stateRoot),
-				"message_ids": toHex(msgId1) + "," + toHex(msgId2) + "," + toHex(msgId3),
+				"id":         "0x05",
+				"state_root": toHex(stateRoot),
+				"messages":   `[` + toHex(msgId1) + `,` + toHex(msgId2) + `,` + toHex(msgId3) + `]`,
 			},
 		},
 	}
@@ -395,35 +437,39 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 	stateRoot2 := testsuite.RandomBytes(32)
 	msgId1 := testsuite.RandomBytes(32)
 	msgId2 := testsuite.RandomBytes(32)
-	toHex := func(b []byte) string { return "0x" + hex.EncodeToString(b) }
+	toHex := func(b []byte) string { return "\"0x" + hex.EncodeToString(b) + "\"" }
 
 	ctx := makeZkISMContext()
 	idx := testsuite.Ptr(0)
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{"action": "/celestia.zkism.v1.MsgSubmitMessages"},
+			Data: map[string]any{
+				"action": "/celestia.zkism.v1.MsgSubmitMessages",
+				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
 			Data: map[string]any{
-				"id":          "0x01",
-				"signer":      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
-				"state_root":  toHex(stateRoot1),
-				"message_ids": toHex(msgId1),
+				"id":         "0x01",
+				"state_root": toHex(stateRoot1),
+				"messages":   `[` + toHex(msgId1) + `]`,
 			},
 		},
 		{
 			Type: "message",
-			Data: map[string]any{"action": "/celestia.zkism.v1.MsgSubmitMessages"},
+			Data: map[string]any{
+				"action": "/celestia.zkism.v1.MsgSubmitMessages",
+				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
 			Data: map[string]any{
-				"id":          "0x02",
-				"signer":      "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
-				"state_root":  toHex(stateRoot2),
-				"message_ids": toHex(msgId2),
+				"id":         "0x02",
+				"state_root": toHex(stateRoot2),
+				"messages":   `[` + toHex(msgId2) + `]`,
 			},
 		},
 	}

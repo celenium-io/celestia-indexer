@@ -52,7 +52,6 @@ type ZkISM struct {
 	CreatorId           uint64         `bun:"creator_id"                       comment:"Creator address identity"`
 	ExternalId          []byte         `bun:"external_id,unique,type:bytea"    comment:"Chain-assigned ISM id"`
 	State               []byte         `bun:"state,type:bytea"                 comment:"Current trusted state"`
-	StateRoot           []byte         `bun:"state_root,type:bytea"            comment:"Current state root (first 32 bytes of state)"`
 	MerkleTreeAddress   []byte         `bun:"merkle_tree_address,type:bytea"   comment:"External chain merkle tree address (32 bytes)"`
 	Groth16VKey         []byte         `bun:"groth16_vkey,type:bytea"          comment:"On-chain Groth16 verifier key"`
 	StateTransitionVKey []byte         `bun:"state_transition_vkey,type:bytea" comment:"State transition verifier key commitment (32 bytes)"`
@@ -66,10 +65,6 @@ func (z *ZkISM) TableName() string {
 	return "zk_ism"
 }
 
-func (z *ZkISM) String() string {
-	return hex.EncodeToString(z.StateRoot)
-}
-
 func (z *ZkISM) ExternalIdString() string {
 	return hex.EncodeToString(z.ExternalId)
 }
@@ -78,14 +73,13 @@ func (z *ZkISM) ExternalIdString() string {
 type ZkISMUpdate struct {
 	bun.BaseModel `bun:"zk_ism_update" comment:"Table with ZK ISM state updates"`
 
-	Id           uint64         `bun:"id,pk,autoincrement"       comment:"Internal identity"`
-	Height       pkgTypes.Level `bun:"height,notnull"            comment:"Block height"`
-	Time         time.Time      `bun:"time,pk,notnull"           comment:"Block time"`
-	TxId         uint64         `bun:"tx_id"                     comment:"Transaction id"`
-	ZkISMId      uint64         `bun:"zk_ism_id,notnull"         comment:"ZK ISM internal id"`
-	SignerId     uint64         `bun:"signer_id"                 comment:"Signer address identity"`
-	NewStateRoot []byte         `bun:"new_state_root,type:bytea" comment:"New state root after update"`
-	NewState     []byte         `bun:"new_state,type:bytea"      comment:"New full state after update"`
+	Id       uint64         `bun:"id,pk,autoincrement"  comment:"Internal identity"`
+	Height   pkgTypes.Level `bun:"height,notnull"       comment:"Block height"`
+	Time     time.Time      `bun:"time,pk,notnull"      comment:"Block time"`
+	TxId     uint64         `bun:"tx_id"                comment:"Transaction id"`
+	ZkISMId  uint64         `bun:"zk_ism_id,notnull"    comment:"ZK ISM internal id"`
+	SignerId uint64         `bun:"signer_id"            comment:"Signer address identity"`
+	NewState []byte         `bun:"new_state,type:bytea" comment:"New full state after update"`
 
 	// Temporary field used during parsing to hold the chain-level ISM id before DB resolution.
 	ZkISMExternalId []byte `bun:"-"`
