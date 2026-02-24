@@ -65,10 +65,6 @@ func (z *ZkISM) TableName() string {
 	return "zk_ism"
 }
 
-func (z *ZkISM) String() string {
-	return hex.EncodeToString(z.State)
-}
-
 func (z *ZkISM) ExternalIdString() string {
 	return hex.EncodeToString(z.ExternalId)
 }
