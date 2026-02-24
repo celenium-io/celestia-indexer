@@ -76,11 +76,11 @@ func (req *listProposalsRequest) toFilters(proposerId uint64) storage.ListPropos
 // List godoc
 //
 //		@Summary		List proposal info
-//		@Description	List proposal info
+//		@Description	Returns a paginated list of governance proposals. Supports filtering by proposer address, status, and type.
 //		@Tags			proposal
 //		@ID				list-proposal
-//		@Param			limit	    query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//		@Param			offset	    query	integer	false	"Offset"										mininum(1)
+//		@Param			limit	    query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
+//		@Param			offset	    query	integer	false	"Offset"										minimum(1)
 //		@Param			sort	    query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	    @Param			proposer	query	string	false	"Proposer celestia address"	                    minlength(47)	maxlength(47)
 //		@Param          status      query   string  false   "Comma-separated proposal status list"
@@ -128,10 +128,10 @@ func (handler *ProposalsHandler) List(c echo.Context) error {
 // Get godoc
 //
 //	@Summary		Get proposal info
-//	@Description	Get proposal info
+//	@Description	Returns detailed information about a single governance proposal by its internal ID, including proposer, status, votes summary, and deposit information.
 //	@Tags			proposal
 //	@ID				get-proposal
-//	@Param			id	path	integer	true	"Internal identity"	mininum(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.Proposal
 //	@Success		204
@@ -171,15 +171,15 @@ func (p *listVotesRequest) SetDefault() {
 // Votes godoc
 //
 //	@Summary		Get proposal's votes
-//	@Description	Get proposal's votes
+//	@Description	Returns a paginated list of governance votes for the given proposal. Can be filtered by vote option (yes/no/no_with_veto/abstain), voter type (address or validator), and specific voter address.
 //	@Tags			proposal
 //	@ID				proposal-votes
-//	@Param			id	path	integer	true	"Internal identity"	mininum(1)
-//	@Param			limit	    query	integer	false	"Count of requested entities"		mininum(1)	maximum(100)
-//	@Param			offset	    query	integer	false	"Offset"							mininum(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)
+//	@Param			limit	    query	integer	false	"Count of requested entities"		minimum(1)	maximum(100)
+//	@Param			offset	    query	integer	false	"Offset"							minimum(1)
 //
-// @Param			option	    query	string	true	"Option"		Enums(yes, no, no_with_veto, abstain)
-// @Param			voter	    query	string	true	"Voter type"	Enums(address, validator)
+// @Param			option	    query	string	false	"Option"		Enums(yes, no, no_with_veto, abstain)
+// @Param			voter	    query	string	false	"Voter type"	Enums(address, validator)
 // @Param			address		query	string	false	"Voter address"		minlength(47)	maxlength(47)
 // @Param			validator	query	string	false	"Voter address"	    minlength(54)	maxlength(54)
 //

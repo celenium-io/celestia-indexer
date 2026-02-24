@@ -54,7 +54,7 @@ type getHyperlaneMailboxRequest struct {
 // GetMailbox godoc
 //
 //	@Summary		Get hyperlane mailbox info
-//	@Description	Get hyperlane mailbox info
+//	@Description	Returns detailed information about a Hyperlane mailbox identified by its hexadecimal identity, including its domain, owner, and linked token/ISM counts.
 //	@Tags			hyperlane
 //	@ID				get-hyperlane-mailbox
 //	@Param			id	path	string	true	"Hyperlane mailbox id"
@@ -97,11 +97,11 @@ func (req *listHyperlaneMailboxRequest) SetDefault() {
 // ListMailboxes godoc
 //
 //	@Summary		List hyperlane mailboxes info
-//	@Description	List hyperlane mailboxes info
+//	@Description	Returns a paginated list of all Hyperlane mailboxes indexed on Celestia, each identified by a hexadecimal identity.
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-mailbox
-//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"										mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"										minimum(1)
 //	@Produce		json
 //	@Success		200	{array}	responses.HyperlaneMailbox
 //	@Success		204
@@ -134,7 +134,7 @@ type getHyperlaneTokenRequest struct {
 // GetToken godoc
 //
 //	@Summary		Get hyperlane token info
-//	@Description	Get hyperlane token info
+//	@Description	Returns detailed information about a Hyperlane token (synthetic or collateral) identified by its hexadecimal identity, including owner, mailbox, and token type.
 //	@Tags			hyperlane
 //	@ID				get-hyperlane-token
 //	@Param			id	path	string	true	"Hyperlane token id"
@@ -220,11 +220,11 @@ func (req *listHyperlaneTokenRequest) ToFilters(ctx context.Context, address sto
 // ListTokens godoc
 //
 //	@Summary		List hyperlane tokens info
-//	@Description	List hyperlane tokens info
+//	@Description	Returns a paginated list of Hyperlane tokens indexed on Celestia. Supports filtering by owner address, mailbox identity, and token type (synthetic or collateral).
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-tokens
-//	@Param			limit	query	integer	false	"Count of requested entities"				mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"									mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"									minimum(1)
 //	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)
 //	@Param			owner	query	string	false	"Owner celestia address"					minlength(47)	maxlength(47)
 //	@Param			mailbox	query	string	false	"Mailbox hexademical identity"
@@ -352,18 +352,18 @@ func (req *listHyperlaneTransferRequest) ToFilters(ctx context.Context, address 
 // ListTransfers godoc
 //
 //	@Summary		List hyperlane transfers info
-//	@Description	List hyperlane transfers info
+//	@Description	Returns a paginated list of Hyperlane cross-chain token transfers. Supports filtering by sender/receiver address, relayer, mailbox, token, transfer type (send/receive), domain, and transaction hash.
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-transfers
-//	@Param			limit	query	integer	false	"Count of requested entities"				mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"									mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"									minimum(1)
 //	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)
 //	@Param			address	query	string	false	"Celestia address"				         	minlength(47)	maxlength(47)
 //	@Param			relayer	query	string	false	"Celestia address of relayer"				minlength(47)	maxlength(47)
 //	@Param			mailbox	query	string	false	"Mailbox hexademical identity"
 //	@Param			token	query	string	false	"Token hexademical identity"
 //	@Param			type    query	string	false	"Comma-separated string of transfer type"	Enums(send, receive)
-//	@Param			domain	query	integer	false	"Domain of counterparty chain"				mininum(1)
+//	@Param			domain	query	integer	false	"Domain of counterparty chain"				minimum(1)
 //	@Param			hash	query	string	false	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
 //	@Produce		json
 //	@Success		200	{array}	responses.HyperlaneTransfer
@@ -399,10 +399,10 @@ func (handler *HyperlaneHandler) ListTransfers(c echo.Context) error {
 // GetTransfer godoc
 //
 //	@Summary		Get transfer by id
-//	@Description	Get transfer by id
+//	@Description	Returns a single Hyperlane cross-chain token transfer by its internal id, including source/destination domain, amount, and associated transaction.
 //	@Tags			hyperlane
 //	@ID				get-hyperlane-transfer
-//	@Param			id	path	integer	true	"Internal identity"	mininum(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.HyperlaneTransfer
 //	@Success		204
@@ -426,7 +426,7 @@ func (handler *HyperlaneHandler) GetTransfer(c echo.Context) error {
 // ListDomains godoc
 //
 //	@Summary		List hyperlane domains info
-//	@Description	List hyperlane domains info
+//	@Description	Returns metadata for all known Hyperlane domains (counterparty chains), keyed by domain ID. Each entry contains the chain name, logo, and domain identifier.
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-domains
 //	@Produce		json
@@ -449,11 +449,11 @@ func (handler *HyperlaneHandler) ListDomains(c echo.Context) error {
 // ListIgps godoc
 //
 //	@Summary		List hyperlane Interchain Gas Paymaster (IGP)
-//	@Description	List hyperlane Interchain Gas Paymaster (IGP)
+//	@Description	Returns a paginated list of Hyperlane Interchain Gas Paymasters (IGPs) indexed on Celestia. IGPs allow message senders to pay for destination chain gas fees from the origin chain.
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-igps
-//	@Param			limit	query	integer	false	"Count of requested entities"				mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"									mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"									minimum(1)
 //	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)
 //	@Produce		json
 //	@Success		200	{array}	responses.HyperlaneIgp
@@ -487,10 +487,10 @@ type getHyperlaneIgpRequest struct {
 // GetIgp godoc
 //
 //	@Summary		Get IGP by id
-//	@Description	Get IGP by id
+//	@Description	Returns a single Hyperlane Interchain Gas Paymaster (IGP) by its hexadecimal identity, including its owner and destination gas configs.
 //	@Tags			hyperlane
 //	@ID				get-hyperlane-igp
-//	@Param			id	path	integer	true	"Internal identity"	mininum(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.HyperlaneIgp
 //	@Success		204

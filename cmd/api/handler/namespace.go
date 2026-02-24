@@ -65,7 +65,7 @@ type getNamespaceRequest struct {
 // Get godoc
 //
 //	@Summary		Get namespace info
-//	@Description	Returns array of namespace versions
+//	@Description	Returns all versions of the namespace identified by the given 28-byte hex namespace id. Each namespace version is returned as a separate entry.
 //	@Tags			namespace
 //	@ID				get-namespace
 //	@Param			id	path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
@@ -105,7 +105,7 @@ type getNamespaceByHashRequest struct {
 // GetByHash godoc
 //
 //	@Summary		Get namespace info by base64
-//	@Description	Returns namespace by base64 encoded identity
+//	@Description	Returns namespace details for the given base64-encoded namespace identity (version byte + namespace id). Returns 204 if the namespace is not found.
 //	@Tags			namespace
 //	@ID				get-namespace-base64
 //	@Param			hash	path	string	true	"Base64-encoded namespace id and version"
@@ -144,7 +144,7 @@ type getNamespaceWithVersionRequest struct {
 // GetWithVersion godoc
 //
 //	@Summary		Get namespace info by id and version
-//	@Description	Returns namespace by version byte and namespace id
+//	@Description	Returns namespace details for the specific combination of namespace id (28 hex bytes) and version byte. Returns 204 if the namespace is not found.
 //	@Tags			namespace
 //	@ID				get-namespace-by-version-and-id
 //	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
@@ -193,11 +193,11 @@ func (p *namespaceList) SetDefault() {
 // List godoc
 //
 //	@Summary		List namespace info
-//	@Description	List namespace info
+//	@Description	Returns a paginated list of namespaces. Supports sorting by creation time, PayForBlobs count, or total blob size.
 //	@Tags			namespace
 //	@ID				list-namespace
-//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"										mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"										minimum(1)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, pfb_count, size)
 //	@Produce		json
@@ -231,11 +231,11 @@ type getBlobsRequest struct {
 // GetBlobs godoc
 //
 //	@Summary		Get namespace blobs on height
-//	@Description	Returns blobs
+//	@Description	Returns all blobs submitted to the given namespace (identified by base64-encoded hash) at the specified block height, fetched directly from the DA node.
 //	@Tags			namespace
 //	@ID				get-namespace-blobs
 //	@Param			hash	path	string	true	"Base64-encoded namespace id and version"
-//	@Param			height	path	integer	true	"Block heigth"	minimum(1)
+//	@Param			height	path	integer	true	"Block height"	minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Blob
 //	@Failure		400	{object}	Error
@@ -270,13 +270,13 @@ func (req *listByNamespace) SetDefault() {
 // GetMessages godoc
 //
 //	@Summary		Get namespace messages by id and version
-//	@Description	Returns namespace messages by version byte and namespace id
+//	@Description	Returns a paginated list of Cosmos SDK messages (e.g. MsgPayForBlobs) that referenced this namespace, identified by version byte and namespace id.
 //	@Tags			namespace
 //	@ID				get-namespace-messages
 //	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
 //	@Param			version	path	integer	true	"Version of namespace"
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Produce		json
 //	@Success		200	{array}	responses.NamespaceMessage
 //	@Success		204
@@ -393,19 +393,19 @@ func (req listBlobsRequest) toDbRequest(ctx context.Context, ns storage.INamespa
 // Blobs godoc
 //
 //	@Summary		List all blobs with filters
-//	@Description	Returns blobs
+//	@Description	Returns a paginated list of blob log entries across all namespaces. Supports filtering by commitment, time range, signer addresses, and namespace identifiers. Cursor-based pagination is available via the cursor parameter.
 //	@Tags			namespace
 //	@ID				get-blobs
-//	@Param			limit		query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"										mininum(1)
+//	@Param			limit		query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
+//	@Param			offset		query	integer	false	"Offset"										minimum(1)
 //	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	@Param			sort_by		query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
 //	@Param			commitment	query	string	false	"Commitment value in URLbase64 format"
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Param			signers		query	string	false	"Comma-separated celestia addresses"
 //	@Param			namespaces	query	string	false	"Comma-separated celestia namespaces"
-//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	mininum(1)
+//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	minimum(1)
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{array}		responses.LightBlobLog
@@ -445,7 +445,7 @@ type postBlobRequest struct {
 // Blob godoc
 //
 //	@Summary					Get namespace blob by commitment on height
-//	@Description				Returns blob.
+//	@Description				Returns the raw blob data from the Celestia DA layer for the given block height, namespace hash, and commitment. Requires API key authorization.
 //	@Tags						namespace
 //	@ID							get-blob
 //	@Param						request	body postBlobRequest	true "Request body containing height, commitment and namespace hash"
@@ -481,7 +481,7 @@ func (handler *NamespaceHandler) Blob(c echo.Context) error {
 // BlobMetadata godoc
 //
 //	@Summary		Get blob metadata by commitment on height
-//	@Description	Returns blob metadata
+//	@Description	Returns indexed metadata for a blob (namespace, size, signer, share version, etc.) identified by block height, namespace hash, and commitment. Does not return raw blob data.
 //	@Tags			namespace
 //	@ID				get-blob-metadata
 //	@Param			request	body postBlobRequest	true "Request body containing height, commitment and namespace hash"
@@ -560,21 +560,21 @@ func (req *getBlobLogsForNamespace) SetDefault() {
 // GetBlobLogs godoc
 //
 //	@Summary		Get blob changes for namespace
-//	@Description	Returns blob changes for namespace
+//	@Description	Returns a paginated list of blob log entries for the specified namespace version. Supports filtering by commitment, time range, signer addresses, and cursor-based pagination.
 //	@Tags			namespace
 //	@ID				get-blob-logs
 //	@Param			id			path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
 //	@Param			version		path	integer	true	"Version of namespace"
-//	@Param			limit		query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"										mininum(1)
+//	@Param			limit		query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
+//	@Param			offset		query	integer	false	"Offset"										minimum(1)
 //	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	@Param			sort_by		query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
 //	@Param			commitment	query	string	false	"Commitment value in URLbase64 format"
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Param			joins		query	boolean	false	"Flag indicating whether entities of rollup, transaction and signer should be attached or not. Default: true"
 //	@Param			signers		query	string	false	"Comma-separated celestia addresses"
-//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	mininum(1)
+//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
@@ -657,13 +657,13 @@ func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 // Rollups godoc
 //
 //	@Summary		List rollups using the namespace
-//	@Description	List rollups using the namespace
+//	@Description	Returns a paginated list of rollups that have submitted blobs to the given namespace (identified by hex id and version).
 //	@Tags			namespace
 //	@ID				get-namespace-rollups
 //	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
 //	@Param			version	path	integer	true	"Version of namespace"
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Rollup
 //	@Failure		400	{object}	Error
@@ -707,7 +707,7 @@ func (handler *NamespaceHandler) Rollups(c echo.Context) error {
 // BlobProofs godoc
 //
 //	@Summary		Get blob inclusion proofs
-//	@Description	Returns blob inclusion proofs
+//	@Description	Returns NMT inclusion proofs for a blob identified by block height, namespace hash, and commitment. Proofs can be used to verify that the blob is included in the block's data square.
 //	@Tags			namespace
 //	@ID				get-blob-proof
 //	@Param			request	body postBlobRequest	true "Request body containing height, commitment and namespace hash"
@@ -715,7 +715,7 @@ func (handler *NamespaceHandler) Rollups(c echo.Context) error {
 //	@Produce		json
 //	@Success		200	{object}	responses.BlobLog
 //	@Failure		400	{object}	Error
-//	@Router			/blob/proofs [get]
+//	@Router			/blob/proofs [post]
 func (handler *NamespaceHandler) BlobProofs(c echo.Context) error {
 	req, err := bindAndValidate[postBlobRequest](c)
 	if err != nil {

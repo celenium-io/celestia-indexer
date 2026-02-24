@@ -68,7 +68,7 @@ type getBlockRequest struct {
 // Get godoc
 //
 //	@Summary		Get block info
-//	@Description	Get block info
+//	@Description	Returns detailed information about the block at the given height, including proposer, hash, time, and transaction count. Pass stats=true to also include aggregated block statistics.
 //	@Tags			block
 //	@ID				get-block
 //	@Param			height	path	integer	true	"Block height"	minimum(1)
@@ -118,11 +118,11 @@ func (p *blockListRequest) SetDefault() {
 // List godoc
 //
 //	@Summary		List blocks info
-//	@Description	List blocks info
+//	@Description	Returns a paginated list of blocks. Supports ascending or descending sort by height. Pass stats=true to include aggregated statistics for each block.
 //	@Tags			block
 //	@ID				list-block
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
 //	@Param			stats	query	boolean	false	"Need join stats for block"
 //	@Produce		json
@@ -171,12 +171,12 @@ func (p *getBlockEvents) SetDefault() {
 // GetEvents godoc
 //
 //	@Summary		Get events from begin and end of block
-//	@Description	Get events from begin and end of block
+//	@Description	Returns begin-block and end-block ABCI events for the block at the given height. These events are emitted by the Cosmos SDK before and after transaction execution.
 //	@Tags			block
 //	@ID				get-block-events
 //	@Param			height	path	integer	true	"Block height"					minimum(1)
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Event
 //	@Failure		400	{object}	Error
@@ -219,7 +219,7 @@ func (handler *BlockHandler) GetEvents(c echo.Context) error {
 // GetStats godoc
 //
 //	@Summary		Get block stats by height
-//	@Description	Get block stats by height
+//	@Description	Returns aggregated statistics for the block at the given height: blob count, total blob size, total fee, gas used/limit, transactions count, and more.
 //	@Tags			block
 //	@ID				get-block-stats
 //	@Param			height	path	integer	true	"Block height"	minimum(1)
@@ -244,7 +244,7 @@ func (handler *BlockHandler) GetStats(c echo.Context) error {
 // Count godoc
 //
 //	@Summary		Get count of blocks in network
-//	@Description	Get count of blocks in network
+//	@Description	Returns the total number of blocks indexed, including the genesis block.
 //	@Tags			block
 //	@ID				get-block-count
 //	@Produce		json
@@ -262,12 +262,12 @@ func (handler *BlockHandler) Count(c echo.Context) error {
 // GetMessages godoc
 //
 //	@Summary		Get messages contained in the block
-//	@Description	Get messages contained in the block
+//	@Description	Returns a paginated list of Cosmos SDK messages included in transactions within the given block. Supports filtering by message type and exclusion list.
 //	@Tags			block
 //	@ID				get-block-messages
 //	@Param			height				path	integer			true	"Block height"					minimum(1)
-//	@Param			limit				query	integer			false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset				query	integer			false	"Offset"						mininum(1)
+//	@Param			limit				query	integer			false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset				query	integer			false	"Offset"						minimum(1)
 //	@Param			msg_type			query	types.MsgType	false	"Comma-separated message types list"
 //	@Param			excluded_msg_type	query	types.MsgType	false	"Comma-separated message types which should be excluded from list"
 //	@Produce		json
@@ -323,12 +323,12 @@ func (req *getBlobsForBlock) SetDefault() {
 // Blobs godoc
 //
 //	@Summary		List blobs which was pushed in the block
-//	@Description	List blobs which was pushed in the block
+//	@Description	Returns a paginated list of blobs submitted via PayForBlobs transactions included in the block at the given height. Supports sorting by time or size.
 //	@Tags			block
 //	@ID				get-block-blobs
 //	@Param			height	path	integer	true	"Block height"									minimum(1)
-//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"										mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"										minimum(1)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
 //	@Produce		json
@@ -377,8 +377,8 @@ func (handler *BlockHandler) Blobs(c echo.Context) error {
 
 // BlobsCount godoc
 //
-//	@Summary		Count of blobs which was pushed by transaction
-//	@Description	Count of blobs which was pushed by transaction
+//	@Summary		Count of blobs which was pushed in the block
+//	@Description	Returns the total number of blobs included in the block at the given height
 //	@Tags			block
 //	@ID				block-blobs-count
 //	@Param			height	path	integer	true	"Block height"	minimum(1)
@@ -404,7 +404,7 @@ func (handler *BlockHandler) BlobsCount(c echo.Context) error {
 // BlockODS godoc
 //
 //	@Summary		ODS for block
-//	@Description	ODS for block
+//	@Description	Returns the Original Data Square (ODS) structure for the block at the given height, representing the raw data availability square layout used for blob verification.
 //	@Tags			block
 //	@ID				block-ods
 //	@Param			height	path	integer	true	"Block height"	minimum(1)

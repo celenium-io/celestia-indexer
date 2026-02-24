@@ -87,16 +87,16 @@ func (req *signalsRequest) ToFilters(
 // List godoc
 //
 //		@Summary		List signals
-//		@Description	List signals
+//		@Description	Returns a paginated list of validator upgrade signals (MsgSignalVersion messages) indicating readiness to upgrade to a new software version. Supports filtering by version, validator, transaction hash, and time range.
 //		@Tags			signal
 //		@ID				list-signal
 //	    @Param			version	query	integer	false	"Version"
 //	    @Param			validator_id	query	integer	false	"Validator internal id"
 //	    @Param			tx_hash	query	string	false	"Transaction hash"
-//		@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//		@Param			offset	query	integer	false	"Offset"						mininum(1)
-//		@Param			from	query	integer	false	"Time from in unix timestamp"	mininum(1)
-//		@Param			to		query	integer	false	"Time to in unix timestamp"		mininum(1)
+//		@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
+//		@Param			offset	query	integer	false	"Offset"						minimum(1)
+//		@Param			from	query	integer	false	"Time from in unix timestamp"	minimum(1)
+//		@Param			to		query	integer	false	"Time to in unix timestamp"		minimum(1)
 //		@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //		@Produce		json
 //		@Success		200	{array}		responses.SignalVersion
@@ -182,14 +182,14 @@ func (req *upgradesRequest) ToFilters(
 // Upgrades godoc
 //
 //	@Summary		List upgrades
-//	@Description	List upgrades
+//	@Description	Returns a paginated list of on-chain network upgrades that were activated. Supports filtering by block height, transaction hash, and signer address.
 //	@Tags			signal
 //	@ID				list-upgrades
 //	@Param			height	query	integer	false	"Number of block"
 //	@Param			tx_hash	query	string	false	"Transaction hash"
 //	@Param			signer	query	string	false	"Signer address"
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	@Produce		json
 //	@Success		200	{array}		responses.Upgrade
@@ -226,7 +226,7 @@ type upgradeRequest struct {
 // Upgrade godoc
 //
 //	@Summary		Get upgrade by version
-//	@Description	Get upgrade by version
+//	@Description	Returns details of the on-chain network upgrade for the given software version number, including the activation block height and quorum of signals received.
 //	@Tags			signal
 //	@ID				get-upgrade
 //	@Param			version	path	integer	true	"Upgrade version"

@@ -59,7 +59,7 @@ type validatorRequest struct {
 // Get godoc
 //
 //	@Summary		Get validator info
-//	@Description	Get validator info
+//	@Description	Returns detailed information about a validator by internal id, including moniker, consensus address, voting power, commission rates, and current status.
 //	@Tags			validator
 //	@ID				get-validator
 //	@Param			id	path	integer	true	"Internal validator id"
@@ -99,13 +99,13 @@ func (req *validatorsPagination) SetDefault() {
 // List godoc
 //
 //	@Summary		List validators
-//	@Description	List validators
+//	@Description	Returns a paginated list of validators ordered by voting power. Supports filtering by jailed status and app version.
 //	@Tags			validator
 //	@ID				list-validator
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(0)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)
 //	@Param			jailed	query	boolean	false	"Return only jailed validators"
-//	@Param			version	query	integer	false	"Current validator app version"	mininum(0)
+//	@Param			version	query	integer	false	"Current validator app version"	minimum(0)
 //	@Produce		json
 //	@Success		200	{array}		responses.Validator
 //	@Failure		400	{object}	Error
@@ -151,14 +151,14 @@ func (p *validatorPageableRequest) SetDefault() {
 // Blocks godoc
 //
 //	@Summary		Get blocks which was proposed by validator
-//	@Description	Get blocks which was proposed by validator
+//	@Description	Returns a paginated list of blocks proposed by the given validator.
 //	@Tags			validator
 //	@ID				get-validator-blocks
 //	@Param			id		path	integer	true	"Internal validator id"
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Produce		json
-//	@Success		200	{object}	responses.Block
+//	@Success		200	{array}		responses.Block
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/validators/{id}/blocks [get]
@@ -196,11 +196,11 @@ func (r *validatorUptimeRequest) SetDefault() {
 // Uptime godoc
 //
 //	@Summary		Get validator's uptime and history of signed block
-//	@Description	Get validator's uptime and history of signed block
+//	@Description	Returns the validator's uptime percentage and a history of the last N blocks indicating whether each was signed.
 //	@Tags			validator
 //	@ID				get-validator-uptime
 //	@Param			id		path	integer	true	"Internal validator id"
-//	@Param			limit	query	integer	false	"Count of requested blocks"	mininum(1)	maximum(100)
+//	@Param			limit	query	integer	false	"Count of requested blocks"	minimum(1)	maximum(100)
 //	@Produce		json
 //	@Success		200	{object}	responses.ValidatorUptime
 //	@Success		204
@@ -245,7 +245,7 @@ func (p *validatorDelegationsRequest) SetDefault() {
 // Delegators godoc
 //
 //	@Summary		Get validator's delegators
-//	@Description	Get validator's delegators
+//	@Description	Returns a paginated list of delegators staking with this validator, including their delegated amounts. Pass show_zero=true to include delegators with zero balance.
 //	@Tags			validator
 //	@ID				validator-delegators
 //	@Param			id			path	integer	true	"Internal validator id"
@@ -286,7 +286,7 @@ func (handler *ValidatorHandler) Delegators(c echo.Context) error {
 // Jails godoc
 //
 //	@Summary		Get validator's jails
-//	@Description	Get validator's jails
+//	@Description	Returns a paginated list of jail events for this validator, including the jail reason and block height at which each jail occurred.
 //	@Tags			validator
 //	@ID				validator-jails
 //	@Param			id		path	integer	true	"Internal validator id"
@@ -324,7 +324,7 @@ func (handler *ValidatorHandler) Jails(c echo.Context) error {
 // Count godoc
 //
 //	@Summary		Get validator's count by status
-//	@Description	Get validator's count by status
+//	@Description	Returns the total validator count broken down by status: total, active, jailed, and inactive.
 //	@Tags			validator
 //	@ID				validator-count
 //	@Produce		json
@@ -364,7 +364,7 @@ func (handler *ValidatorHandler) Count(c echo.Context) error {
 // Votes godoc
 //
 //	@Summary		Get list of votes for validator
-//	@Description	Get list of votes for validator
+//	@Description	Returns a paginated list of governance votes cast by this validator on on-chain proposals.
 //	@Tags			validator
 //	@ID				validator-votes
 //	@Param			id		path	integer	true	"Internal validator id"
@@ -436,15 +436,15 @@ func (req getValidatorMessages) ToFilters() storage.ValidatorMessagesFilters {
 // Messages godoc
 //
 //	@Summary		Get validator messages
-//	@Description	Get validator messages
+//	@Description	Returns a paginated list of messages submitted by the validator's operator address, filterable by time range.
 //	@Tags			validator
 //	@ID				validator-messages
 //	@Param			id			path	integer		true	"Internal validator id"
 //	@Param			limit		query	integer		false	"Count of requested entities"	minimum(1)		maximum(100)
 //	@Param			offset		query	integer		false	"Offset"						minimum(1)
 //	@Param			sort		query	string		false	"Sort order"					Enums(asc, desc)
-//	@Param			from		query	integer		false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer		false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from		query	integer		false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer		false	"Time to in unix timestamp"		minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Message
 //	@Failure		400	{object}	Error
@@ -473,7 +473,7 @@ func (handler *ValidatorHandler) Messages(c echo.Context) error {
 // Metrics godoc
 //
 //	@Summary		Get validator's metrics
-//	@Description	Get validator's metrics
+//	@Description	Returns performance metrics for a single validator including uptime, missed blocks, and block signing efficiency.
 //	@Tags			validator
 //	@ID				validator-metrics
 //	@Param			id			path	integer	true	"Internal validator id"
@@ -509,7 +509,7 @@ func (req *getTopNValidatorMetrics) SetDefault() {
 // TopNMetrics godoc
 //
 //	@Summary		Get validators metrics
-//	@Description	Get validators metrics
+//	@Description	Returns aggregated performance metrics for the top N validators by voting power, useful for comparing signing efficiency across the active set.
 //	@Tags			validator
 //	@ID				validators-metrics
 //	@Param			count		query	integer	false	"Count of aggregated entities"

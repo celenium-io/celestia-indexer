@@ -51,7 +51,7 @@ type getTxRequest struct {
 // Get godoc
 //
 //	@Summary		Get transaction by hash
-//	@Description	Get transaction by hash
+//	@Description	Returns detailed information about a transaction identified by its hexadecimal hash, including status, gas, fees, and signer. Returns 204 if the transaction is not found.
 //	@Tags			transactions
 //	@ID				get-transaction
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
@@ -83,19 +83,19 @@ func (handler *TxHandler) Get(c echo.Context) error {
 // List godoc
 //
 //	@Summary		List transactions info
-//	@Description	List transactions info
+//	@Description	Returns a paginated list of transactions. Supports filtering by status, message type, time range, and block height. Pass messages=true to include message details in each result.
 //	@Tags			transactions
 //	@ID				list-transactions
-//	@Param			limit				query	integer			false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset				query	integer			false	"Offset"						mininum(1)
+//	@Param			limit				query	integer			false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset				query	integer			false	"Offset"						minimum(1)
 //	@Param			sort				query	string			false	"Sort order"					Enums(asc, desc)
 //	@Param			status				query	types.Status	false	"Comma-separated status list"
 //	@Param			msg_type			query	types.MsgType	false	"Comma-separated message types list"
 //	@Param			excluded_msg_type	query	types.MsgType	false	"Comma-separated message types list which should be excluded"
-//	@Param			from				query	integer			false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to					query	integer			false	"Time to in unix timestamp"		mininum(1)
-//	@Param			height				query	integer			false	"Block number"					mininum(1)
-//	@Param			messages			query	boolean			false	"If true join messages"			mininum(1)
+//	@Param			from				query	integer			false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to					query	integer			false	"Time to in unix timestamp"		minimum(1)
+//	@Param			height				query	integer			false	"Block number"					minimum(1)
+//	@Param			messages			query	boolean			false	"If true join messages"
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
@@ -157,12 +157,12 @@ func (p *getTxRequestWithPagination) SetDefault() {
 // GetEvents godoc
 //
 //	@Summary		Get transaction events
-//	@Description	Get transaction events
+//	@Description	Returns a paginated list of ABCI events emitted during transaction execution for the given transaction hash.
 //	@Tags			transactions
 //	@ID				get-transaction-events
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
-//	@Param			limit	query	integer	false	"Count of requested entities"		mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"							mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"		minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"							minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Event
 //	@Failure		400	{object}	Error
@@ -205,12 +205,12 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 // GetMessages godoc
 //
 //	@Summary		Get transaction messages
-//	@Description	Get transaction messages
+//	@Description	Returns a paginated list of Cosmos SDK messages contained in the transaction identified by the given hash.
 //	@Tags			transactions
 //	@ID				get-transaction-messages
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
-//	@Param			limit	query	integer	false	"Count of requested entities"		mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"							mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"		minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"							minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Message
 //	@Failure		400	{object}	Error
@@ -247,7 +247,7 @@ func (handler *TxHandler) GetMessages(c echo.Context) error {
 // Count godoc
 //
 //	@Summary		Get count of transactions in network
-//	@Description	Get count of transactions in network
+//	@Description	Returns the total number of transactions indexed, sourced from the current indexer state.
 //	@Tags			transactions
 //	@ID				get-transactions-count
 //	@Produce		json
@@ -265,11 +265,11 @@ func (handler *TxHandler) Count(c echo.Context) error {
 // Genesis godoc
 //
 //	@Summary		List genesis transactions info
-//	@Description	List genesis transactions info
+//	@Description	Returns a paginated list of transactions included in the genesis block (block 0). These are the initial state transactions that bootstrapped the chain.
 //	@Tags			transactions
 //	@ID				list-genesis-transactions
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
@@ -314,12 +314,12 @@ func (req *getBlobsForTx) SetDefault() {
 // Blobs godoc
 //
 //	@Summary		List blobs which was pushed by transaction
-//	@Description	List blobs which was pushed by transaction
+//	@Description	Returns a paginated list of blobs submitted via the PayForBlobs message in the given transaction. Supports sorting by time or blob size.
 //	@Tags			transactions
 //	@ID				list-transaction-blobs
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"				minlength(64)	maxlength(64)
-//	@Param			limit	query	integer	false	"Count of requested entities"					mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"										mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"										minimum(1)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
 //	@Produce		json
@@ -368,7 +368,7 @@ func (handler *TxHandler) Blobs(c echo.Context) error {
 // BlobsCount godoc
 //
 //	@Summary		Count of blobs which was pushed by transaction
-//	@Description	Count of blobs which was pushed by transaction
+//	@Description	Returns the total number of blobs submitted via the PayForBlobs message in the given transaction.
 //	@Tags			transactions
 //	@ID				transaction-blobs-count
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"				minlength(64)	maxlength(64)

@@ -18,24 +18,26 @@
     "paths": {
         "/address": {
             "get": {
-                "description": "List address info",
+                "description": "Returns a paginated list of Celestia addresses with their balances. Supports sorting by balance fields, delegation amounts, and block activity.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "address"
                 ],
-                "summary": "List address info",
+                "summary": "List addresses",
                 "operationId": "list-address",
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -93,7 +95,7 @@
         },
         "/address/count": {
             "get": {
-                "description": "Get count of addresses in network",
+                "description": "Returns the total number of unique addresses that have ever appeared on the Celestia network, sourced from the indexer state.",
                 "produces": [
                     "application/json"
                 ],
@@ -120,7 +122,7 @@
         },
         "/address/{hash}": {
             "get": {
-                "description": "Get address info",
+                "description": "Returns detailed information about a Celestia address including balances, delegation amounts, and linked Celestial identity. Returns 204 if the address is not found.",
                 "produces": [
                     "application/json"
                 ],
@@ -167,7 +169,7 @@
         },
         "/address/{hash}/blobs": {
             "get": {
-                "description": "Get blobs pushed by address",
+                "description": "Returns a paginated list of blobs submitted via PayForBlobs transactions from the given address. Supports sorting by time or size, and optional join of transaction and namespace entities.",
                 "produces": [
                     "application/json"
                 ],
@@ -255,7 +257,7 @@
         },
         "/address/{hash}/celestials": {
             "get": {
-                "description": "Get list of celestial id for address",
+                "description": "Returns a paginated list of Celestials NFT identities linked to the given address, including image URLs and associated metadata.",
                 "produces": [
                     "application/json"
                 ],
@@ -317,7 +319,7 @@
         },
         "/address/{hash}/delegations": {
             "get": {
-                "description": "Get delegations made by address",
+                "description": "Returns a paginated list of active staking delegations from the given address to validators. Use show_zero=true to include delegations with zero amount.",
                 "produces": [
                     "application/json"
                 ],
@@ -385,7 +387,7 @@
         },
         "/address/{hash}/granters": {
             "get": {
-                "description": "Get grants where address is grantee",
+                "description": "Returns a paginated list of authz grants where the given address is the grantee — i.e., grants that other accounts have authorized to this address.",
                 "produces": [
                     "application/json"
                 ],
@@ -447,7 +449,7 @@
         },
         "/address/{hash}/grants": {
             "get": {
-                "description": "Get grants made by address",
+                "description": "Returns a paginated list of authz grants where the given address is the granter — i.e., grants that this address has authorized to other accounts.",
                 "produces": [
                     "application/json"
                 ],
@@ -509,7 +511,7 @@
         },
         "/address/{hash}/messages": {
             "get": {
-                "description": "Get address messages",
+                "description": "Returns a paginated list of Cosmos SDK messages associated with the given address. Supports filtering by message type.",
                 "produces": [
                     "application/json"
                 ],
@@ -704,7 +706,7 @@
         },
         "/address/{hash}/redelegations": {
             "get": {
-                "description": "Get redelegations made by address",
+                "description": "Returns a paginated list of redelegation records where the given address moved stake from one validator to another.",
                 "produces": [
                     "application/json"
                 ],
@@ -766,7 +768,7 @@
         },
         "/address/{hash}/stats/{name}/{timeframe}": {
             "get": {
-                "description": "Get address stats",
+                "description": "Returns a time-series histogram of per-address statistics for the selected metric (gas_used, gas_wanted, fee, or tx_count) aggregated by the given timeframe.",
                 "produces": [
                     "application/json"
                 ],
@@ -811,12 +813,14 @@
                         "required": true
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -850,7 +854,7 @@
         },
         "/address/{hash}/txs": {
             "get": {
-                "description": "Get address transactions",
+                "description": "Returns a paginated list of transactions sent or signed by the given address. Supports filtering by status, message type, time range, and block height.",
                 "produces": [
                     "application/json"
                 ],
@@ -1076,7 +1080,7 @@
         },
         "/address/{hash}/undelegations": {
             "get": {
-                "description": "Get undelegations made by address",
+                "description": "Returns a paginated list of pending unbonding (undelegation) records for the given address. Tokens are locked during the unbonding period before they become available.",
                 "produces": [
                     "application/json"
                 ],
@@ -1138,7 +1142,7 @@
         },
         "/address/{hash}/vestings": {
             "get": {
-                "description": "Get vesting for address",
+                "description": "Returns a paginated list of vesting accounts associated with the given address. Use show_ended=true to also include vestings whose end time has already passed.",
                 "produces": [
                     "application/json"
                 ],
@@ -1206,7 +1210,7 @@
         },
         "/address/{hash}/votes": {
             "get": {
-                "description": "Get list of votes for address",
+                "description": "Returns a paginated list of governance votes cast by the given address on on-chain proposals.",
                 "produces": [
                     "application/json"
                 ],
@@ -1268,7 +1272,7 @@
         },
         "/blob": {
             "get": {
-                "description": "Returns blobs",
+                "description": "Returns a paginated list of blob log entries across all namespaces. Supports filtering by commitment, time range, signer addresses, and namespace identifiers. Cursor-based pagination is available via the cursor parameter.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1283,12 +1287,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -1321,12 +1327,14 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -1345,6 +1353,7 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Last entity id which is used for cursor pagination",
                         "name": "cursor",
@@ -1370,7 +1379,7 @@
                 }
             },
             "post": {
-                "description": "Returns blob.\nTo authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.",
+                "description": "Returns the raw blob data from the Celestia DA layer for the given block height, namespace hash, and commitment. Requires API key authorization.\nTo authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1411,7 +1420,7 @@
         },
         "/blob/metadata": {
             "post": {
-                "description": "Returns blob metadata\nTo authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.",
+                "description": "Returns indexed metadata for a blob (namespace, size, signer, share version, etc.) identified by block height, namespace hash, and commitment. Does not return raw blob data.\nTo authorize your requests you have to select the required tariff on our site. Then you receive api key to authorize. Api key should be passed via request header `apikey`.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1451,8 +1460,8 @@
             }
         },
         "/blob/proofs": {
-            "get": {
-                "description": "Returns blob inclusion proofs",
+            "post": {
+                "description": "Returns NMT inclusion proofs for a blob identified by block height, namespace hash, and commitment. Proofs can be used to verify that the blob is included in the block's data square.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1493,7 +1502,7 @@
         },
         "/block": {
             "get": {
-                "description": "List blocks info",
+                "description": "Returns a paginated list of blocks. Supports ascending or descending sort by height. Pass stats=true to include aggregated statistics for each block.",
                 "produces": [
                     "application/json"
                 ],
@@ -1505,12 +1514,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -1560,7 +1571,7 @@
         },
         "/block/count": {
             "get": {
-                "description": "Get count of blocks in network",
+                "description": "Returns the total number of blocks indexed, including the genesis block.",
                 "produces": [
                     "application/json"
                 ],
@@ -1587,7 +1598,7 @@
         },
         "/block/{height}": {
             "get": {
-                "description": "Get block info",
+                "description": "Returns detailed information about the block at the given height, including proposer, hash, time, and transaction count. Pass stats=true to also include aggregated block statistics.",
                 "produces": [
                     "application/json"
                 ],
@@ -1639,7 +1650,7 @@
         },
         "/block/{height}/blobs": {
             "get": {
-                "description": "List blobs which was pushed in the block",
+                "description": "Returns a paginated list of blobs submitted via PayForBlobs transactions included in the block at the given height. Supports sorting by time or size.",
                 "produces": [
                     "application/json"
                 ],
@@ -1659,12 +1670,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -1718,14 +1731,14 @@
         },
         "/block/{height}/blobs/count": {
             "get": {
-                "description": "Count of blobs which was pushed by transaction",
+                "description": "Returns the total number of blobs included in the block at the given height",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "block"
                 ],
-                "summary": "Count of blobs which was pushed by transaction",
+                "summary": "Count of blobs which was pushed in the block",
                 "operationId": "block-blobs-count",
                 "parameters": [
                     {
@@ -1761,7 +1774,7 @@
         },
         "/block/{height}/events": {
             "get": {
-                "description": "Get events from begin and end of block",
+                "description": "Returns begin-block and end-block ABCI events for the block at the given height. These events are emitted by the Cosmos SDK before and after transaction execution.",
                 "produces": [
                     "application/json"
                 ],
@@ -1781,12 +1794,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -1820,7 +1835,7 @@
         },
         "/block/{height}/messages": {
             "get": {
-                "description": "Get messages contained in the block",
+                "description": "Returns a paginated list of Cosmos SDK messages included in transactions within the given block. Supports filtering by message type and exclusion list.",
                 "produces": [
                     "application/json"
                 ],
@@ -1840,12 +1855,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -2125,7 +2142,7 @@
         },
         "/block/{height}/ods": {
             "get": {
-                "description": "ODS for block",
+                "description": "Returns the Original Data Square (ODS) structure for the block at the given height, representing the raw data availability square layout used for blob verification.",
                 "produces": [
                     "application/json"
                 ],
@@ -2169,7 +2186,7 @@
         },
         "/block/{height}/stats": {
             "get": {
-                "description": "Get block stats by height",
+                "description": "Returns aggregated statistics for the block at the given height: blob count, total blob size, total fee, gas used/limit, transactions count, and more.",
                 "produces": [
                     "application/json"
                 ],
@@ -2212,7 +2229,7 @@
         },
         "/constants": {
             "get": {
-                "description": "Get network constants",
+                "description": "Returns all on-chain governance and module parameters for the Celestia network, including staking, slashing, blob, and other module constants, along with denomination metadata.",
                 "produces": [
                     "application/json"
                 ],
@@ -2242,7 +2259,7 @@
         },
         "/enums": {
             "get": {
-                "description": "Get celenium enumerators",
+                "description": "Returns all enumeration values used across the API, including rollup tags, categories, stacks, providers, message types, and other typed string constants.",
                 "produces": [
                     "application/json"
                 ],
@@ -2275,12 +2292,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 0,
                         "type": "integer",
                         "description": "Offset for pagination",
                         "name": "offset",
@@ -2313,6 +2332,7 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Filter by block height",
                         "name": "height",
@@ -2371,6 +2391,7 @@
                 "operationId": "get-forwarding",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal forwarding event ID",
                         "name": "id",
@@ -2405,7 +2426,7 @@
         },
         "/gas/estimate_for_pfb": {
             "get": {
-                "description": "Get estimated gas for pay for blob message with certain values of blob sizes",
+                "description": "Returns the estimated gas required to submit a MsgPayForBlobs transaction for the given blob sizes and share versions, using current on-chain gas parameters.",
                 "produces": [
                     "application/json"
                 ],
@@ -2453,7 +2474,7 @@
         },
         "/gas/price": {
             "get": {
-                "description": "Get estimated gas price based on historical data",
+                "description": "Returns estimated gas prices (slow, median, fast) derived from recent transaction history. Useful for setting the gas price when submitting new transactions.",
                 "produces": [
                     "application/json"
                 ],
@@ -2474,7 +2495,7 @@
         },
         "/gas/price/{priority}": {
             "get": {
-                "description": "Get estimated gas price with priority filter based on historical data",
+                "description": "Returns a single estimated gas price string for the selected priority level (slow, median, or fast) based on recent transaction history.",
                 "produces": [
                     "application/json"
                 ],
@@ -2509,7 +2530,7 @@
         },
         "/head": {
             "get": {
-                "description": "Get current indexer head",
+                "description": "Returns the current indexer state: the last indexed block height, total accounts, total blobs size, total voting power, and other network-wide counters.",
                 "produces": [
                     "application/json"
                 ],
@@ -2545,7 +2566,7 @@
         },
         "/hyperlane/domains": {
             "get": {
-                "description": "List hyperlane domains info",
+                "description": "Returns metadata for all known Hyperlane domains (counterparty chains), keyed by domain ID. Each entry contains the chain name, logo, and domain identifier.",
                 "produces": [
                     "application/json"
                 ],
@@ -2584,7 +2605,7 @@
         },
         "/hyperlane/igp": {
             "get": {
-                "description": "List hyperlane Interchain Gas Paymaster (IGP)",
+                "description": "Returns a paginated list of Hyperlane Interchain Gas Paymasters (IGPs) indexed on Celestia. IGPs allow message senders to pay for destination chain gas fees from the origin chain.",
                 "produces": [
                     "application/json"
                 ],
@@ -2596,12 +2617,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -2648,7 +2671,7 @@
         },
         "/hyperlane/igp/{id}": {
             "get": {
-                "description": "Get IGP by id",
+                "description": "Returns a single Hyperlane Interchain Gas Paymaster (IGP) by its hexadecimal identity, including its owner and destination gas configs.",
                 "produces": [
                     "application/json"
                 ],
@@ -2659,6 +2682,7 @@
                 "operationId": "get-hyperlane-igp",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal identity",
                         "name": "id",
@@ -2693,7 +2717,7 @@
         },
         "/hyperlane/mailbox": {
             "get": {
-                "description": "List hyperlane mailboxes info",
+                "description": "Returns a paginated list of all Hyperlane mailboxes indexed on Celestia, each identified by a hexadecimal identity.",
                 "produces": [
                     "application/json"
                 ],
@@ -2705,12 +2729,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -2747,7 +2773,7 @@
         },
         "/hyperlane/mailbox/{id}": {
             "get": {
-                "description": "Get hyperlane mailbox info",
+                "description": "Returns detailed information about a Hyperlane mailbox identified by its hexadecimal identity, including its domain, owner, and linked token/ISM counts.",
                 "produces": [
                     "application/json"
                 ],
@@ -2792,7 +2818,7 @@
         },
         "/hyperlane/token": {
             "get": {
-                "description": "List hyperlane tokens info",
+                "description": "Returns a paginated list of Hyperlane tokens indexed on Celestia. Supports filtering by owner address, mailbox identity, and token type (synthetic or collateral).",
                 "produces": [
                     "application/json"
                 ],
@@ -2804,12 +2830,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -2880,7 +2908,7 @@
         },
         "/hyperlane/token/{id}": {
             "get": {
-                "description": "Get hyperlane token info",
+                "description": "Returns detailed information about a Hyperlane token (synthetic or collateral) identified by its hexadecimal identity, including owner, mailbox, and token type.",
                 "produces": [
                     "application/json"
                 ],
@@ -2925,7 +2953,7 @@
         },
         "/hyperlane/transfer": {
             "get": {
-                "description": "List hyperlane transfers info",
+                "description": "Returns a paginated list of Hyperlane cross-chain token transfers. Supports filtering by sender/receiver address, relayer, mailbox, token, transfer type (send/receive), domain, and transaction hash.",
                 "produces": [
                     "application/json"
                 ],
@@ -2937,12 +2965,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -2997,6 +3027,7 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Domain of counterparty chain",
                         "name": "domain",
@@ -3041,7 +3072,7 @@
         },
         "/hyperlane/transfer/{id}": {
             "get": {
-                "description": "Get transfer by id",
+                "description": "Returns a single Hyperlane cross-chain token transfer by its internal id, including source/destination domain, amount, and associated transaction.",
                 "produces": [
                     "application/json"
                 ],
@@ -3052,6 +3083,7 @@
                 "operationId": "get-hyperlane-transfer",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal identity",
                         "name": "id",
@@ -3098,12 +3130,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 0,
                         "type": "integer",
                         "description": "Offset for pagination",
                         "name": "offset",
@@ -3177,6 +3211,7 @@
                 "operationId": "get-zkism",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal ZK ISM identity",
                         "name": "id",
@@ -3222,6 +3257,7 @@
                 "operationId": "get-zkism-messages",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal ZK ISM identity",
                         "name": "id",
@@ -3230,12 +3266,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 0,
                         "type": "integer",
                         "description": "Offset for pagination",
                         "name": "offset",
@@ -3323,6 +3361,7 @@
                 "operationId": "get-zkism-updates",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal ZK ISM identity",
                         "name": "id",
@@ -3331,12 +3370,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 0,
                         "type": "integer",
                         "description": "Offset for pagination",
                         "name": "offset",
@@ -3413,7 +3454,7 @@
         },
         "/ibc/channel": {
             "get": {
-                "description": "Get ibc channels info",
+                "description": "Returns a paginated list of IBC channels. Supports filtering by client ID, connection ID, and channel status (initialization, opened, closed).",
                 "produces": [
                     "application/json"
                 ],
@@ -3425,12 +3466,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -3500,7 +3543,7 @@
         },
         "/ibc/channel/{id}": {
             "get": {
-                "description": "Get ibc channel info",
+                "description": "Returns information about an IBC channel by its channel ID, including ordering, state, connection, and counterparty port/channel.",
                 "produces": [
                     "application/json"
                 ],
@@ -3545,7 +3588,7 @@
         },
         "/ibc/client": {
             "get": {
-                "description": "Get ibc clients info",
+                "description": "Returns a paginated list of IBC light clients. Supports filtering by chain ID and creator address.",
                 "produces": [
                     "application/json"
                 ],
@@ -3557,12 +3600,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -3623,7 +3668,7 @@
         },
         "/ibc/client/{id}": {
             "get": {
-                "description": "Get ibc client info",
+                "description": "Returns information about an IBC light client identified by its client ID, including the counterparty chain ID, client state type, and trusting period.",
                 "produces": [
                     "application/json"
                 ],
@@ -3668,7 +3713,7 @@
         },
         "/ibc/connection": {
             "get": {
-                "description": "Get ibc connections info",
+                "description": "Returns a paginated list of IBC connections. Supports filtering by client ID.",
                 "produces": [
                     "application/json"
                 ],
@@ -3680,12 +3725,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -3738,7 +3785,7 @@
         },
         "/ibc/connection/{id}": {
             "get": {
-                "description": "Get ibc client info",
+                "description": "Returns information about an IBC connection identified by its connection ID, including linked client ID and counterparty connection details.",
                 "produces": [
                     "application/json"
                 ],
@@ -3783,7 +3830,7 @@
         },
         "/ibc/relayers": {
             "get": {
-                "description": "List ibc relayers",
+                "description": "Returns the list of known IBC relayers with their Celestia address and associated chain metadata, sourced from the static relayer registry.",
                 "produces": [
                     "application/json"
                 ],
@@ -3819,7 +3866,7 @@
         },
         "/ibc/transfer": {
             "get": {
-                "description": "Get ibc transfers info",
+                "description": "Returns a paginated list of IBC token transfers. Supports filtering by channel, chain ID, sender, receiver, either-party address, and transaction hash.",
                 "produces": [
                     "application/json"
                 ],
@@ -3831,12 +3878,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -3927,7 +3976,7 @@
         },
         "/ibc/transfer/{id}": {
             "get": {
-                "description": "Get transfer by id",
+                "description": "Returns a single IBC token transfer by its internal id, including sender, receiver, amount, denom, and transaction reference.",
                 "produces": [
                     "application/json"
                 ],
@@ -3938,6 +3987,7 @@
                 "operationId": "get-ibc-transfer",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal identity",
                         "name": "id",
@@ -3972,7 +4022,7 @@
         },
         "/namespace": {
             "get": {
-                "description": "List namespace info",
+                "description": "Returns a paginated list of namespaces. Supports sorting by creation time, PayForBlobs count, or total blob size.",
                 "produces": [
                     "application/json"
                 ],
@@ -3984,12 +4034,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -4044,7 +4096,7 @@
         },
         "/namespace/{id}": {
             "get": {
-                "description": "Returns array of namespace versions",
+                "description": "Returns all versions of the namespace identified by the given 28-byte hex namespace id. Each namespace version is returned as a separate entry.",
                 "produces": [
                     "application/json"
                 ],
@@ -4091,7 +4143,7 @@
         },
         "/namespace/{id}/{version}": {
             "get": {
-                "description": "Returns namespace by version byte and namespace id",
+                "description": "Returns namespace details for the specific combination of namespace id (28 hex bytes) and version byte. Returns 204 if the namespace is not found.",
                 "produces": [
                     "application/json"
                 ],
@@ -4145,7 +4197,7 @@
         },
         "/namespace/{id}/{version}/blobs": {
             "get": {
-                "description": "Returns blob changes for namespace",
+                "description": "Returns a paginated list of blob log entries for the specified namespace version. Supports filtering by commitment, time range, signer addresses, and cursor-based pagination.",
                 "produces": [
                     "application/json"
                 ],
@@ -4173,12 +4225,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -4211,12 +4265,14 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -4235,6 +4291,7 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Last entity id which is used for cursor pagination",
                         "name": "cursor",
@@ -4268,7 +4325,7 @@
         },
         "/namespace/{id}/{version}/messages": {
             "get": {
-                "description": "Returns namespace messages by version byte and namespace id",
+                "description": "Returns a paginated list of Cosmos SDK messages (e.g. MsgPayForBlobs) that referenced this namespace, identified by version byte and namespace id.",
                 "produces": [
                     "application/json"
                 ],
@@ -4296,12 +4353,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -4338,7 +4397,7 @@
         },
         "/namespace/{id}/{version}/rollups": {
             "get": {
-                "description": "List rollups using the namespace",
+                "description": "Returns a paginated list of rollups that have submitted blobs to the given namespace (identified by hex id and version).",
                 "produces": [
                     "application/json"
                 ],
@@ -4366,12 +4425,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -4405,7 +4466,7 @@
         },
         "/namespace_by_hash/{hash}": {
             "get": {
-                "description": "Returns namespace by base64 encoded identity",
+                "description": "Returns namespace details for the given base64-encoded namespace identity (version byte + namespace id). Returns 204 if the namespace is not found.",
                 "produces": [
                     "application/json"
                 ],
@@ -4450,7 +4511,7 @@
         },
         "/namespace_by_hash/{hash}/{height}": {
             "get": {
-                "description": "Returns blobs",
+                "description": "Returns all blobs submitted to the given namespace (identified by base64-encoded hash) at the specified block height, fetched directly from the DA node.",
                 "produces": [
                     "application/json"
                 ],
@@ -4470,7 +4531,7 @@
                     {
                         "minimum": 1,
                         "type": "integer",
-                        "description": "Block heigth",
+                        "description": "Block height",
                         "name": "height",
                         "in": "path",
                         "required": true
@@ -4497,7 +4558,7 @@
         },
         "/proposal": {
             "get": {
-                "description": "List proposal info",
+                "description": "Returns a paginated list of governance proposals. Supports filtering by proposer address, status, and type.",
                 "produces": [
                     "application/json"
                 ],
@@ -4509,12 +4570,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -4578,7 +4641,7 @@
         },
         "/proposal/{id}": {
             "get": {
-                "description": "Get proposal info",
+                "description": "Returns detailed information about a single governance proposal by its internal ID, including proposer, status, votes summary, and deposit information.",
                 "produces": [
                     "application/json"
                 ],
@@ -4589,6 +4652,7 @@
                 "operationId": "get-proposal",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal identity",
                         "name": "id",
@@ -4623,7 +4687,7 @@
         },
         "/proposal/{id}/votes": {
             "get": {
-                "description": "Get proposal's votes",
+                "description": "Returns a paginated list of governance votes for the given proposal. Can be filtered by vote option (yes/no/no_with_veto/abstain), voter type (address or validator), and specific voter address.",
                 "produces": [
                     "application/json"
                 ],
@@ -4634,6 +4698,7 @@
                 "operationId": "proposal-votes",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal identity",
                         "name": "id",
@@ -4642,12 +4707,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -4663,8 +4730,7 @@
                         "type": "string",
                         "description": "Option",
                         "name": "option",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     },
                     {
                         "enum": [
@@ -4674,8 +4740,7 @@
                         "type": "string",
                         "description": "Voter type",
                         "name": "voter",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     },
                     {
                         "maxLength": 47,
@@ -4721,7 +4786,7 @@
         },
         "/rollup": {
             "get": {
-                "description": "List rollups info",
+                "description": "Returns a paginated leaderboard of rollups with their cumulative statistics. Supports filtering by category, tags, stack, and provider. Sorting by blob count, total size, or fee.",
                 "produces": [
                     "application/json"
                 ],
@@ -4733,12 +4798,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -4824,7 +4891,7 @@
         },
         "/rollup/count": {
             "get": {
-                "description": "Get count of rollups in network",
+                "description": "Returns the total number of rollups indexed in the Celenium database.",
                 "produces": [
                     "application/json"
                 ],
@@ -4851,7 +4918,7 @@
         },
         "/rollup/day": {
             "get": {
-                "description": "List rollups info with stats by previous 24 hours",
+                "description": "Returns a paginated leaderboard of rollups with statistics aggregated over the previous 24 hours. Useful for ranking rollups by recent activity such as throughput, blob count, or fee.",
                 "produces": [
                     "application/json"
                 ],
@@ -4863,12 +4930,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -4952,7 +5021,7 @@
         },
         "/rollup/group": {
             "get": {
-                "description": "Rollup Grouped Statistics",
+                "description": "Returns rollup statistics aggregated by the selected column (stack, type, category, vm, or provider), using the chosen aggregate function (sum or avg).",
                 "produces": [
                     "application/json"
                 ],
@@ -5013,7 +5082,7 @@
         },
         "/rollup/slug/{slug}": {
             "get": {
-                "description": "Get rollup by slug",
+                "description": "Returns rollup information by its human-readable slug identifier (e.g. \"eclipse\"). Returns 204 if no rollup with the given slug is found.",
                 "produces": [
                     "application/json"
                 ],
@@ -5058,7 +5127,7 @@
         },
         "/rollup/stats/series/{timeframe}": {
             "get": {
-                "description": "Get series for all rollups",
+                "description": "Returns time-series data for all rollups combined, grouped by the selected timeframe. Useful for rendering aggregate charts showing total DA usage across all indexed rollups.",
                 "produces": [
                     "application/json"
                 ],
@@ -5108,7 +5177,7 @@
         },
         "/rollup/{id}": {
             "get": {
-                "description": "Get rollup info",
+                "description": "Returns detailed information and cumulative statistics for the rollup identified by its internal id, including name, description, social links, namespaces, and providers.",
                 "produces": [
                     "application/json"
                 ],
@@ -5119,6 +5188,7 @@
                 "operationId": "get-rollup",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal identity",
                         "name": "id",
@@ -5153,7 +5223,7 @@
         },
         "/rollup/{id}/blobs": {
             "get": {
-                "description": "Get rollup blobs",
+                "description": "Returns a paginated list of blobs submitted by the rollup. Supports sorting by time or size and optionally joining transaction and signer entities.",
                 "produces": [
                     "application/json"
                 ],
@@ -5164,6 +5234,7 @@
                 "operationId": "get-rollup-blobs",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal identity",
                         "name": "id",
@@ -5172,12 +5243,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -5237,7 +5310,7 @@
         },
         "/rollup/{id}/distribution/{name}/{timeframe}": {
             "get": {
-                "description": "Get rollup distribution",
+                "description": "Returns the intra-timeframe distribution (e.g. by hour-of-day) for the selected rollup metric, useful for identifying activity patterns.",
                 "produces": [
                     "application/json"
                 ],
@@ -5248,6 +5321,7 @@
                 "operationId": "get-rollup-distribution",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal identity",
                         "name": "id",
@@ -5306,7 +5380,7 @@
         },
         "/rollup/{id}/export": {
             "get": {
-                "description": "Export rollup blobs",
+                "description": "Streams a plain-text export of blob metadata submitted by the rollup, optionally filtered by a time range. The response is streamed line by line.",
                 "tags": [
                     "rollup"
                 ],
@@ -5314,6 +5388,7 @@
                 "operationId": "rollup-export",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal identity",
                         "name": "id",
@@ -5321,12 +5396,14 @@
                         "required": true
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -5354,7 +5431,7 @@
         },
         "/rollup/{id}/namespaces": {
             "get": {
-                "description": "Get rollup namespaces info",
+                "description": "Returns a paginated list of namespaces that the rollup has submitted blobs to.",
                 "produces": [
                     "application/json"
                 ],
@@ -5365,6 +5442,7 @@
                 "operationId": "get-rollup-namespaces",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal identity",
                         "name": "id",
@@ -5373,12 +5451,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -5412,7 +5492,7 @@
         },
         "/rollup/{id}/providers": {
             "get": {
-                "description": "Get rollup providers info",
+                "description": "Returns a list of data availability providers associated with the rollup (e.g. Celestia addresses used for blob submission).",
                 "produces": [
                     "application/json"
                 ],
@@ -5423,6 +5503,7 @@
                 "operationId": "get-rollup-providers",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal identity",
                         "name": "id",
@@ -5457,7 +5538,7 @@
         },
         "/rollup/{id}/stats/{name}/{timeframe}": {
             "get": {
-                "description": "Get rollup stats",
+                "description": "Returns a time-series histogram for the rollup with the selected metric (blobs_count, size, size_per_blob, or fee) aggregated by the given timeframe.",
                 "produces": [
                     "application/json"
                 ],
@@ -5468,6 +5549,7 @@
                 "operationId": "get-rollup-stats",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Internal identity",
                         "name": "id",
@@ -5500,12 +5582,14 @@
                         "required": true
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -5587,7 +5671,7 @@
         },
         "/signal": {
             "get": {
-                "description": "List signals",
+                "description": "Returns a paginated list of validator upgrade signals (MsgSignalVersion messages) indicating readiness to upgrade to a new software version. Supports filtering by version, validator, transaction hash, and time range.",
                 "produces": [
                     "application/json"
                 ],
@@ -5617,24 +5701,28 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -5678,7 +5766,7 @@
         },
         "/signal/upgrade": {
             "get": {
-                "description": "List upgrades",
+                "description": "Returns a paginated list of on-chain network upgrades that were activated. Supports filtering by block height, transaction hash, and signer address.",
                 "produces": [
                     "application/json"
                 ],
@@ -5708,12 +5796,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -5757,7 +5847,7 @@
         },
         "/signal/upgrade/{version}": {
             "get": {
-                "description": "Get upgrade by version",
+                "description": "Returns details of the on-chain network upgrade for the given software version number, including the activation block height and quorum of signals received.",
                 "produces": [
                     "application/json"
                 ],
@@ -5799,7 +5889,7 @@
         },
         "/stats/changes_24h": {
             "get": {
-                "description": "Get changes for 24 hours",
+                "description": "Returns comparative statistics showing how key block metrics (blob size, tx count, fee, block time) changed over the last 24 hours versus the prior 24 hours.",
                 "produces": [
                     "application/json"
                 ],
@@ -5829,7 +5919,7 @@
         },
         "/stats/hyperlane/chains": {
             "get": {
-                "description": "Get stats for hyperlane transfers splitted by domain",
+                "description": "Returns a paginated list of Hyperlane transfer statistics grouped by counterparty domain (chain), including transfer count and total volume.",
                 "produces": [
                     "application/json"
                 ],
@@ -5841,12 +5931,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -5880,7 +5972,7 @@
         },
         "/stats/hyperlane/chains/{name}/{timeframe}": {
             "get": {
-                "description": "Get histogram for aggregated hyperlane domains with precomputed stats by series name and timeframe",
+                "description": "Returns a time-series histogram of aggregated Hyperlane transfer statistics (count or amount) across all domains, filtered by timeframe and optional time range.",
                 "produces": [
                     "application/json"
                 ],
@@ -5914,12 +6006,14 @@
                         "required": true
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -5953,7 +6047,7 @@
         },
         "/stats/hyperlane/series/{id}/{name}/{timeframe}": {
             "get": {
-                "description": "Get histogram for hyperlane domains with precomputed stats by series name and timeframe",
+                "description": "Returns a time-series histogram of Hyperlane transfer statistics (count or amount) for the specified domain, filtered by timeframe and optional time range.",
                 "produces": [
                     "application/json"
                 ],
@@ -5994,12 +6088,14 @@
                         "required": true
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -6033,7 +6129,7 @@
         },
         "/stats/ibc/chains": {
             "get": {
-                "description": "Get stats for ibc channels splitted by chains",
+                "description": "Returns a paginated list of IBC transfer statistics grouped by counterparty chain, including total transfer count, volume, and active channels.",
                 "produces": [
                     "application/json"
                 ],
@@ -6045,12 +6141,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -6084,7 +6182,7 @@
         },
         "/stats/ibc/series/{id}/{name}/{timeframe}": {
             "get": {
-                "description": "Get histogram for ibc channels with precomputed stats by series name and timeframe",
+                "description": "Returns a time-series histogram of IBC transfer statistics (count or amount) for the specified channel, filtered by timeframe and optional time range.",
                 "produces": [
                     "application/json"
                 ],
@@ -6125,12 +6223,14 @@
                         "required": true
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -6164,7 +6264,7 @@
         },
         "/stats/ibc/summary": {
             "get": {
-                "description": "Get stats for ibc the largest transfer and busiest channel per day",
+                "description": "Returns a summary of IBC activity over the last 24 hours: the single largest token transfer and the most active (busiest) IBC channel by transfer count.",
                 "produces": [
                     "application/json"
                 ],
@@ -6200,7 +6300,7 @@
         },
         "/stats/messages_count_24h": {
             "get": {
-                "description": "Get messages distribution for the last 24 hours",
+                "description": "Returns the count of each Cosmos SDK message type observed in the last 24 hours, useful for understanding network activity composition.",
                 "produces": [
                     "application/json"
                 ],
@@ -6230,7 +6330,7 @@
         },
         "/stats/namespace/series/{id}/{name}/{timeframe}": {
             "get": {
-                "description": "Get histogram for namespace with precomputed stats by series name and timeframe",
+                "description": "Returns a time-series histogram of precomputed blob statistics (pfb_count or size) for the specified namespace, filtered by timeframe and optional time range.",
                 "produces": [
                     "application/json"
                 ],
@@ -6275,12 +6375,14 @@
                         "required": true
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -6314,7 +6416,7 @@
         },
         "/stats/namespace/usage": {
             "get": {
-                "description": "Get namespaces with sorting by size. Returns top 100 namespaces. Namespaces which is not included to top 100 grouped into 'others' item",
+                "description": "Returns the top N namespaces sorted by total blob size in descending order. Namespaces outside the top N are aggregated into a single 'others' entry showing the remaining total size.",
                 "produces": [
                     "application/json"
                 ],
@@ -6326,6 +6428,7 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of entities",
                         "name": "top",
@@ -6353,7 +6456,7 @@
         },
         "/stats/rollup_stats_24h": {
             "get": {
-                "description": "Get rollups stats for last 24 hours",
+                "description": "Returns aggregated rollup statistics for the previous 24 hours: total blobs, total size, total fee, and throughput across all indexed rollups.",
                 "produces": [
                     "application/json"
                 ],
@@ -6389,7 +6492,7 @@
         },
         "/stats/series/{name}/{timeframe}": {
             "get": {
-                "description": "Get histogram with precomputed stats by series name and timeframe",
+                "description": "Returns a time-series histogram of precomputed network statistics for the selected metric and timeframe. Supports filtering by time range.",
                 "produces": [
                     "application/json"
                 ],
@@ -6439,12 +6542,14 @@
                         "required": true
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -6478,7 +6583,7 @@
         },
         "/stats/series/{name}/{timeframe}/cumulative": {
             "get": {
-                "description": "Get cumulative histogram with precomputed stats by series name and timeframe",
+                "description": "Returns a running total (cumulative sum) time-series of the selected network metric for the given timeframe. Useful for tracking all-time growth trends.",
                 "produces": [
                     "application/json"
                 ],
@@ -6520,12 +6625,14 @@
                         "required": true
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -6559,7 +6666,7 @@
         },
         "/stats/size_groups": {
             "get": {
-                "description": "Get blobs count grouped by size",
+                "description": "Returns the distribution of blobs across predefined size buckets (e.g. \u003c1KB, 1-16KB, 16-256KB, etc.), showing how many blobs fall into each size group.",
                 "produces": [
                     "application/json"
                 ],
@@ -6589,7 +6696,7 @@
         },
         "/stats/square_size": {
             "get": {
-                "description": "Get histogram for square size distribution",
+                "description": "Returns the frequency distribution of data availability square sizes (number of rows/columns) used across blocks in the selected time range.",
                 "produces": [
                     "application/json"
                 ],
@@ -6600,12 +6707,14 @@
                 "operationId": "stats-square-size",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -6639,7 +6748,7 @@
         },
         "/stats/staking/distribution": {
             "get": {
-                "description": "Get histogram for staking",
+                "description": "Returns the distribution of delegated stake across validators grouped by delegation size buckets, useful for understanding stake concentration over the selected time range.",
                 "produces": [
                     "application/json"
                 ],
@@ -6650,12 +6759,14 @@
                 "operationId": "stats-staking-distribution",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -6686,7 +6797,7 @@
         },
         "/stats/staking/series/{id}/{name}/{timeframe}": {
             "get": {
-                "description": "Get histogram for staking with precomputed stats by series name and timeframe",
+                "description": "Returns a time-series histogram of staking metrics (rewards, commissions, delegation flows, etc.) for the specified validator and timeframe.",
                 "produces": [
                     "application/json"
                 ],
@@ -6735,12 +6846,14 @@
                         "required": true
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -6820,12 +6933,14 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -6884,7 +6999,7 @@
         },
         "/tx": {
             "get": {
-                "description": "List transactions info",
+                "description": "Returns a paginated list of transactions. Supports filtering by status, message type, time range, and block height. Pass messages=true to include message details in each result.",
                 "produces": [
                     "application/json"
                 ],
@@ -6896,12 +7011,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -7174,18 +7291,21 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Block number",
                         "name": "height",
@@ -7225,7 +7345,7 @@
         },
         "/tx/count": {
             "get": {
-                "description": "Get count of transactions in network",
+                "description": "Returns the total number of transactions indexed, sourced from the current indexer state.",
                 "produces": [
                     "application/json"
                 ],
@@ -7252,7 +7372,7 @@
         },
         "/tx/genesis": {
             "get": {
-                "description": "List genesis transactions info",
+                "description": "Returns a paginated list of transactions included in the genesis block (block 0). These are the initial state transactions that bootstrapped the chain.",
                 "produces": [
                     "application/json"
                 ],
@@ -7264,12 +7384,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -7313,7 +7435,7 @@
         },
         "/tx/{hash}": {
             "get": {
-                "description": "Get transaction by hash",
+                "description": "Returns detailed information about a transaction identified by its hexadecimal hash, including status, gas, fees, and signer. Returns 204 if the transaction is not found.",
                 "produces": [
                     "application/json"
                 ],
@@ -7360,7 +7482,7 @@
         },
         "/tx/{hash}/blobs": {
             "get": {
-                "description": "List blobs which was pushed by transaction",
+                "description": "Returns a paginated list of blobs submitted via the PayForBlobs message in the given transaction. Supports sorting by time or blob size.",
                 "produces": [
                     "application/json"
                 ],
@@ -7381,12 +7503,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -7440,7 +7564,7 @@
         },
         "/tx/{hash}/blobs/count": {
             "get": {
-                "description": "Count of blobs which was pushed by transaction",
+                "description": "Returns the total number of blobs submitted via the PayForBlobs message in the given transaction.",
                 "produces": [
                     "application/json"
                 ],
@@ -7484,7 +7608,7 @@
         },
         "/tx/{hash}/events": {
             "get": {
-                "description": "Get transaction events",
+                "description": "Returns a paginated list of ABCI events emitted during transaction execution for the given transaction hash.",
                 "produces": [
                     "application/json"
                 ],
@@ -7505,12 +7629,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -7544,7 +7670,7 @@
         },
         "/tx/{hash}/messages": {
             "get": {
-                "description": "Get transaction messages",
+                "description": "Returns a paginated list of Cosmos SDK messages contained in the transaction identified by the given hash.",
                 "produces": [
                     "application/json"
                 ],
@@ -7565,12 +7691,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -7604,7 +7732,7 @@
         },
         "/validators": {
             "get": {
-                "description": "List validators",
+                "description": "Returns a paginated list of validators ordered by voting power. Supports filtering by jailed status and app version.",
                 "produces": [
                     "application/json"
                 ],
@@ -7616,12 +7744,14 @@
                 "parameters": [
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 0,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -7634,6 +7764,7 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 0,
                         "type": "integer",
                         "description": "Current validator app version",
                         "name": "version",
@@ -7667,7 +7798,7 @@
         },
         "/validators/count": {
             "get": {
-                "description": "Get validator's count by status",
+                "description": "Returns the total validator count broken down by status: total, active, jailed, and inactive.",
                 "produces": [
                     "application/json"
                 ],
@@ -7700,7 +7831,7 @@
         },
         "/validators/metrics": {
             "get": {
-                "description": "Get validators metrics",
+                "description": "Returns aggregated performance metrics for the top N validators by voting power, useful for comparing signing efficiency across the active set.",
                 "produces": [
                     "application/json"
                 ],
@@ -7741,7 +7872,7 @@
         },
         "/validators/{id}": {
             "get": {
-                "description": "Get validator info",
+                "description": "Returns detailed information about a validator by internal id, including moniker, consensus address, voting power, commission rates, and current status.",
                 "produces": [
                     "application/json"
                 ],
@@ -7786,7 +7917,7 @@
         },
         "/validators/{id}/blocks": {
             "get": {
-                "description": "Get blocks which was proposed by validator",
+                "description": "Returns a paginated list of blocks proposed by the given validator.",
                 "produces": [
                     "application/json"
                 ],
@@ -7805,12 +7936,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
@@ -7821,7 +7954,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.Block"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.Block"
+                            }
                         }
                     },
                     "400": {
@@ -7841,7 +7977,7 @@
         },
         "/validators/{id}/delegators": {
             "get": {
-                "description": "Get validator's delegators",
+                "description": "Returns a paginated list of delegators staking with this validator, including their delegated amounts. Pass show_zero=true to include delegators with zero balance.",
                 "produces": [
                     "application/json"
                 ],
@@ -7907,7 +8043,7 @@
         },
         "/validators/{id}/jails": {
             "get": {
-                "description": "Get validator's jails",
+                "description": "Returns a paginated list of jail events for this validator, including the jail reason and block height at which each jail occurred.",
                 "produces": [
                     "application/json"
                 ],
@@ -7967,7 +8103,7 @@
         },
         "/validators/{id}/messages": {
             "get": {
-                "description": "Get validator messages",
+                "description": "Returns a paginated list of messages submitted by the validator's operator address, filterable by time range.",
                 "produces": [
                     "application/json"
                 ],
@@ -8010,12 +8146,14 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time from in unix timestamp",
                         "name": "from",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Time to in unix timestamp",
                         "name": "to",
@@ -8049,7 +8187,7 @@
         },
         "/validators/{id}/metrics": {
             "get": {
-                "description": "Get validator's metrics",
+                "description": "Returns performance metrics for a single validator including uptime, missed blocks, and block signing efficiency.",
                 "produces": [
                     "application/json"
                 ],
@@ -8091,7 +8229,7 @@
         },
         "/validators/{id}/uptime": {
             "get": {
-                "description": "Get validator's uptime and history of signed block",
+                "description": "Returns the validator's uptime percentage and a history of the last N blocks indicating whether each was signed.",
                 "produces": [
                     "application/json"
                 ],
@@ -8110,6 +8248,7 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested blocks",
                         "name": "limit",
@@ -8143,7 +8282,7 @@
         },
         "/validators/{id}/votes": {
             "get": {
-                "description": "Get list of votes for validator",
+                "description": "Returns a paginated list of governance votes cast by this validator on on-chain proposals.",
                 "produces": [
                     "application/json"
                 ],
@@ -8203,14 +8342,14 @@
         },
         "/vesting/{id}/periods": {
             "get": {
-                "description": "Periods vesting periods by id. Returns not empty array only for periodic vestings.",
+                "description": "Returns vesting periods by vesting id. Returns a non-empty array only for periodic vestings.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "vesting"
                 ],
-                "summary": "Periods vesting periods by id",
+                "summary": "Get vesting periods by id",
                 "operationId": "get-vesting-periods",
                 "parameters": [
                     {
@@ -8222,12 +8361,14 @@
                     },
                     {
                         "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Count of requested entities",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",

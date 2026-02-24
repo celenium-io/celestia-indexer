@@ -73,7 +73,7 @@ type getAddressRequest struct {
 // Get godoc
 //
 //	@Summary		Get address info
-//	@Description	Get address info
+//	@Description	Returns detailed information about a Celestia address including balances, delegation amounts, and linked Celestial identity. Returns 204 if the address is not found.
 //	@Tags			address
 //	@ID				get-address
 //	@Param			hash	path	string	true	"Hash"	minlength(47)	maxlength(128)
@@ -120,12 +120,12 @@ func (p *addressListRequest) SetDefault() {
 
 // List godoc
 //
-//	@Summary		List address info
-//	@Description	List address info
+//	@Summary		List addresses
+//	@Description	Returns a paginated list of Celestia addresses with their balances. Supports sorting by balance fields, delegation amounts, and block activity.
 //	@Tags			address
 //	@ID				list-address
-//	@Param			limit	query	integer	false	"Count of requested entities"	mininum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						mininum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)
 //	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
 //	@Param			sort_by	query	string	false	"Sort field"					Enums(id, delegated, spendable, unbonding, first_height, last_height)
 //	@Produce		json
@@ -163,7 +163,7 @@ func (handler *AddressHandler) List(c echo.Context) error {
 // Transactions godoc
 //
 //	@Summary		Get address transactions
-//	@Description	Get address transactions
+//	@Description	Returns a paginated list of transactions sent or signed by the given address. Supports filtering by status, message type, time range, and block height.
 //	@Tags			address
 //	@ID				address-transactions
 //	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(128)
@@ -258,7 +258,7 @@ func (p *getAddressMessages) ToFilters() storage.AddressMsgsFilter {
 // Messages godoc
 //
 //	@Summary		Get address messages
-//	@Description	Get address messages
+//	@Description	Returns a paginated list of Cosmos SDK messages associated with the given address. Supports filtering by message type.
 //	@Tags			address
 //	@ID				address-messages
 //	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(128)
@@ -327,7 +327,7 @@ func (req *getBlobLogsForAddress) SetDefault() {
 // Blobs godoc
 //
 //	@Summary		Get blobs pushed by address
-//	@Description	Get blobs pushed by address
+//	@Description	Returns a paginated list of blobs submitted via PayForBlobs transactions from the given address. Supports sorting by time or size, and optional join of transaction and namespace entities.
 //	@Tags			address
 //	@ID				address-blobs
 //	@Param			hash	path	string	true	"Hash"											minlength(47)	maxlength(128)
@@ -384,7 +384,7 @@ func (handler *AddressHandler) Blobs(c echo.Context) error {
 // Count godoc
 //
 //	@Summary		Get count of addresses in network
-//	@Description	Get count of addresses in network
+//	@Description	Returns the total number of unique addresses that have ever appeared on the Celestia network, sourced from the indexer state.
 //	@Tags			address
 //	@ID				get-address-count
 //	@Produce		json
@@ -415,7 +415,7 @@ func (req *getAddressDelegations) SetDefault() {
 // Delegations godoc
 //
 //	@Summary		Get delegations made by address
-//	@Description	Get delegations made by address
+//	@Description	Returns a paginated list of active staking delegations from the given address to validators. Use show_zero=true to include delegations with zero amount.
 //	@Tags			address
 //	@ID				address-delegations
 //	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)
@@ -478,7 +478,7 @@ func (req *getAddressPageable) SetDefault() {
 // Undelegations godoc
 //
 //	@Summary		Get undelegations made by address
-//	@Description	Get undelegations made by address
+//	@Description	Returns a paginated list of pending unbonding (undelegation) records for the given address. Tokens are locked during the unbonding period before they become available.
 //	@Tags			address
 //	@ID				address-undelegations
 //	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
@@ -527,7 +527,7 @@ func (handler *AddressHandler) Undelegations(c echo.Context) error {
 // Redelegations godoc
 //
 //	@Summary		Get redelegations made by address
-//	@Description	Get redelegations made by address
+//	@Description	Returns a paginated list of redelegation records where the given address moved stake from one validator to another.
 //	@Tags			address
 //	@ID				address-redelegations
 //	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
@@ -589,7 +589,7 @@ func (req *getAddressVestings) SetDefault() {
 // Vestings godoc
 //
 //	@Summary		Get vesting for address
-//	@Description	Get vesting for address
+//	@Description	Returns a paginated list of vesting accounts associated with the given address. Use show_ended=true to also include vestings whose end time has already passed.
 //	@Tags			address
 //	@ID				address-vesting
 //	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)
@@ -639,7 +639,7 @@ func (handler *AddressHandler) Vestings(c echo.Context) error {
 // Grants godoc
 //
 //	@Summary		Get grants made by address
-//	@Description	Get grants made by address
+//	@Description	Returns a paginated list of authz grants where the given address is the granter — i.e., grants that this address has authorized to other accounts.
 //	@Tags			address
 //	@ID				address-grants
 //	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
@@ -687,7 +687,7 @@ func (handler *AddressHandler) Grants(c echo.Context) error {
 // Grantee godoc
 //
 //	@Summary		Get grants where address is grantee
-//	@Description	Get grants where address is grantee
+//	@Description	Returns a paginated list of authz grants where the given address is the grantee — i.e., grants that other accounts have authorized to this address.
 //	@Tags			address
 //	@ID				address-grantee
 //	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
@@ -742,14 +742,14 @@ type addressStatsRequest struct {
 // Stats godoc
 //
 //	@Summary		Get address stats
-//	@Description	Get address stats
+//	@Description	Returns a time-series histogram of per-address statistics for the selected metric (gas_used, gas_wanted, fee, or tx_count) aggregated by the given timeframe.
 //	@Tags			address
 //	@ID				address-stats
 //	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)
 //	@Param			name		path	string	true	"Series name"					Enums(gas_used, gas_wanted, fee, tx_count)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	mininum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		mininum(1)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
@@ -808,7 +808,7 @@ func (handler *AddressHandler) getIdByHash(ctx context.Context, hash []byte, add
 // Celestials godoc
 //
 //	@Summary		Get list of celestial id for address
-//	@Description	Get list of celestial id for address
+//	@Description	Returns a paginated list of Celestials NFT identities linked to the given address, including image URLs and associated metadata.
 //	@Tags			address
 //	@ID				address-celestials
 //	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
@@ -855,7 +855,7 @@ func (handler *AddressHandler) Celestials(c echo.Context) error {
 // Votes godoc
 //
 //	@Summary		Get list of votes for address
-//	@Description	Get list of votes for address
+//	@Description	Returns a paginated list of governance votes cast by the given address on on-chain proposals.
 //	@Tags			address
 //	@ID				address-votes
 //	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
