@@ -125,6 +125,10 @@ func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txR
 			dm.Msg.HLTransfer = nil
 			dm.Msg.SignalVersion = nil
 			dm.Msg.Upgrade = nil
+			dm.Msg.Forwarding = nil
+			dm.Msg.ZkISM = nil
+			dm.Msg.ZkISMUpdate = nil
+			dm.Msg.ZkISMMessages = nil
 		}
 
 		t.Messages[i] = dm.Msg

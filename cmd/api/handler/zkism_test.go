@@ -27,7 +27,6 @@ import (
 // ──────────────────────────────────────────────────────────
 
 var (
-	testZkISMStateRoot           = testsuite.RandomBytes(32)
 	testZkISMMerkleTreeAddress   = testsuite.RandomBytes(32)
 	testZkISMStateTransitionVKey = testsuite.RandomBytes(32)
 	testZkISMStateMembershipVKey = testsuite.RandomBytes(32)
@@ -39,7 +38,6 @@ var (
 		Time:                testTime,
 		TxId:                1,
 		CreatorId:           1,
-		StateRoot:           testZkISMStateRoot,
 		MerkleTreeAddress:   testZkISMMerkleTreeAddress,
 		StateTransitionVKey: testZkISMStateTransitionVKey,
 		StateMembershipVKey: testZkISMStateMembershipVKey,
@@ -50,13 +48,11 @@ var (
 		Tx: &testTx,
 	}
 
-	testZkISMUpdateNewStateRoot = testsuite.RandomBytes(32)
-	testZkISMUpdate             = storage.ZkISMUpdate{
-		Id:           10,
-		Height:       1001,
-		Time:         testTime,
-		ZkISMId:      1,
-		NewStateRoot: testZkISMUpdateNewStateRoot,
+	testZkISMUpdate = storage.ZkISMUpdate{
+		Id:      10,
+		Height:  1001,
+		Time:    testTime,
+		ZkISMId: 1,
 		Signer: &storage.Address{
 			Address: testAddress,
 			Hash:    testHashAddress,
@@ -144,7 +140,6 @@ func (s *ZkISMTestSuite) TestList() {
 	s.Require().EqualValues(hex.EncodeToString(testZkISM.ExternalId), ism.ExternalId)
 	s.Require().EqualValues(testZkISM.Height, ism.Height)
 	s.Require().Equal(testZkISM.Time, ism.Time)
-	s.Require().Equal(hex.EncodeToString(testZkISMStateRoot), ism.StateRoot)
 	s.Require().Equal(hex.EncodeToString(testZkISMMerkleTreeAddress), ism.MerkleTreeAddress)
 	s.Require().Equal(hex.EncodeToString(testZkISMStateTransitionVKey), ism.StateTransitionVKey)
 	s.Require().Equal(hex.EncodeToString(testZkISMStateMembershipVKey), ism.StateMembershipVKey)
@@ -309,7 +304,6 @@ func (s *ZkISMTestSuite) TestGet() {
 	s.Require().EqualValues(hex.EncodeToString(testZkISM.ExternalId), response.ExternalId)
 	s.Require().EqualValues(testZkISM.Height, response.Height)
 	s.Require().Equal(testZkISM.Time, response.Time)
-	s.Require().Equal(hex.EncodeToString(testZkISMStateRoot), response.StateRoot)
 	s.Require().Equal(hex.EncodeToString(testZkISMMerkleTreeAddress), response.MerkleTreeAddress)
 	s.Require().Equal(hex.EncodeToString(testZkISMStateTransitionVKey), response.StateTransitionVKey)
 	s.Require().Equal(hex.EncodeToString(testZkISMStateMembershipVKey), response.StateMembershipVKey)
@@ -362,7 +356,6 @@ func (s *ZkISMTestSuite) TestGetUpdates() {
 	s.Require().EqualValues(testZkISMUpdate.Id, upd.Id)
 	s.Require().EqualValues(testZkISMUpdate.Height, upd.Height)
 	s.Require().Equal(testZkISMUpdate.Time, upd.Time)
-	s.Require().Equal(hex.EncodeToString(testZkISMUpdateNewStateRoot), upd.NewStateRoot)
 	s.Require().Equal(strings.ToLower(testTxHash), upd.TxHash)
 	s.Require().NotNil(upd.Signer)
 	s.Require().Equal(testAddress, upd.Signer.Hash)

@@ -32,7 +32,6 @@ func (s *StorageTestSuite) TestZkISMList() {
 	s.Require().EqualValues(1000, ism.Height)
 	s.Require().EqualValues([]byte{0x32, 0x30, 0x30}, ism.ExternalId)
 	s.Require().NotEmpty(ism.State)
-	s.Require().NotEmpty(ism.StateRoot)
 	s.Require().NotEmpty(ism.MerkleTreeAddress)
 	s.Require().NotEmpty(ism.Groth16VKey)
 	s.Require().NotEmpty(ism.StateTransitionVKey)
@@ -135,7 +134,6 @@ func (s *StorageTestSuite) TestZkISMById() {
 	s.Require().EqualValues(1000, ism.Height)
 	s.Require().EqualValues([]byte{0x31, 0x30, 0x30}, ism.ExternalId)
 	s.Require().NotEmpty(ism.State)
-	s.Require().NotEmpty(ism.StateRoot)
 	s.Require().NotEmpty(ism.MerkleTreeAddress)
 	s.Require().NotEmpty(ism.Groth16VKey)
 	s.Require().NotEmpty(ism.StateTransitionVKey)
@@ -178,7 +176,6 @@ func (s *StorageTestSuite) TestZkISMUpdates() {
 	s.Require().EqualValues(1, u.ZkISMId)
 	s.Require().EqualValues(1002, u.Height)
 	s.Require().NotEmpty(u.NewState)
-	s.Require().NotEmpty(u.NewStateRoot)
 
 	s.Require().NotNil(u.Tx)
 	txHash, err := hex.DecodeString("652452A670011D629CC116E510BA88C1CABE061336661B1F3D206D248BD55811")

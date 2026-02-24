@@ -12204,11 +12204,6 @@
                     "format": "binary",
                     "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
                 },
-                "state_root": {
-                    "type": "string",
-                    "format": "binary",
-                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
-                },
                 "state_transition_vkey": {
                     "type": "string",
                     "format": "binary",
@@ -12278,11 +12273,6 @@
                     "example": 321
                 },
                 "new_state": {
-                    "type": "string",
-                    "format": "binary",
-                    "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
-                },
-                "new_state_root": {
                     "type": "string",
                     "format": "binary",
                     "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"

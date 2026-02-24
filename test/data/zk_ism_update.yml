@@ -4,7 +4,6 @@
   tx_id: 1
   zk_ism_id: 1
   signer_id: 1
-  new_state_root: 0xA1B1C1D1E1
   new_state: 0xF1F2F3F4F5
 
 - id: 2
@@ -13,5 +12,4 @@
   tx_id: 2
   zk_ism_id: 1
   signer_id: 2
-  new_state_root: 0xA2B2C2D2E2
   new_state: 0xF6F7F8F9FA

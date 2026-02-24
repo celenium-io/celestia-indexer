@@ -1571,7 +1571,6 @@ func (tx Transaction) SaveZkISMs(ctx context.Context, items ...*models.ZkISM) er
 	_, err := tx.Tx().NewInsert().Model(&items).
 		On("CONFLICT (external_id) DO UPDATE").
 		Set("state = EXCLUDED.state").
-		Set("state_root = EXCLUDED.state_root").
 		Returning("id").
 		Exec(ctx)
 	return err

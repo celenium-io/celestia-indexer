@@ -18,7 +18,6 @@ type ZkISM struct {
 	Time                time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                            swaggertype:"string"`
 	TxHash              string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"               swaggertype:"string"`
 	State               string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"state,omitempty"                 swaggertype:"string"`
-	StateRoot           string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"state_root,omitempty"            swaggertype:"string"`
 	MerkleTreeAddress   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"merkle_tree_address,omitempty"   swaggertype:"string"`
 	StateTransitionVKey string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"state_transition_vkey,omitempty" swaggertype:"string"`
 	StateMembershipVKey string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"state_membership_vkey,omitempty" swaggertype:"string"`
@@ -41,9 +40,6 @@ func NewZkISM(ism storage.ZkISM) ZkISM {
 	if len(ism.State) > 0 {
 		result.State = hex.EncodeToString(ism.State)
 	}
-	if len(ism.StateRoot) > 0 {
-		result.StateRoot = hex.EncodeToString(ism.StateRoot)
-	}
 	if len(ism.MerkleTreeAddress) > 0 {
 		result.MerkleTreeAddress = hex.EncodeToString(ism.MerkleTreeAddress)
 	}
@@ -64,12 +60,11 @@ func NewZkISM(ism storage.ZkISM) ZkISM {
 }
 
 type ZkISMUpdate struct {
-	Id           uint64         `example:"321"                                                              format:"int64"     json:"id"                       swaggertype:"integer"`
-	Height       pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"                   swaggertype:"integer"`
-	Time         time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                     swaggertype:"string"`
-	TxHash       string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"        swaggertype:"string"`
-	NewStateRoot string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"new_state_root,omitempty" swaggertype:"string"`
-	NewState     string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"new_state,omitempty"      swaggertype:"string"`
+	Id       uint64         `example:"321"                                                              format:"int64"     json:"id"                  swaggertype:"integer"`
+	Height   pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"              swaggertype:"integer"`
+	Time     time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                swaggertype:"string"`
+	TxHash   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"   swaggertype:"string"`
+	NewState string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"new_state,omitempty" swaggertype:"string"`
 
 	Signer *ShortAddress `json:"signer,omitempty"`
 }
@@ -84,9 +79,6 @@ func NewZkISMUpdate(update storage.ZkISMUpdate) ZkISMUpdate {
 
 	if len(update.NewState) > 0 {
 		result.NewState = hex.EncodeToString(update.NewState)
-	}
-	if len(update.NewStateRoot) > 0 {
-		result.NewStateRoot = hex.EncodeToString(update.NewStateRoot)
 	}
 	if update.Tx != nil {
 		result.TxHash = hex.EncodeToString(update.Tx.Hash)
