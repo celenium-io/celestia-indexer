@@ -840,8 +840,8 @@ func TestNewZkISMUpdateEvent(t *testing.T) {
 		{
 			name: "valid event",
 			m: map[string]any{
-				"id":        "\"0xdeadbeaf\"",
-				"new_state": toHex(newStateBytes),
+				"id":    "\"0xdeadbeaf\"",
+				"state": toHex(newStateBytes),
 			},
 			want: ZkISMUpdateEvent{
 				Id:       testsuite.MustHexDecode("deadbeaf"),
@@ -851,8 +851,8 @@ func TestNewZkISMUpdateEvent(t *testing.T) {
 		{
 			name: "missing id",
 			m: map[string]any{
-				"signer":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
-				"new_state": toHex(newStateBytes),
+				"signer": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+				"state":  toHex(newStateBytes),
 			},
 			wantErr: true,
 		},

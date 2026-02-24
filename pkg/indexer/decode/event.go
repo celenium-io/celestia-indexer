@@ -980,9 +980,9 @@ func NewZkISMUpdateEvent(m map[string]any) (e ZkISMUpdateEvent, err error) {
 	if err != nil {
 		return e, errors.Wrap(err, "id")
 	}
-	e.NewState, err = decoder.BytesFromMap(m, "new_state")
+	e.NewState, err = decoder.BytesFromMap(m, "state")
 	if err != nil {
-		return e, errors.Wrap(err, "new_state")
+		return e, errors.Wrap(err, "state")
 	}
 	return
 }

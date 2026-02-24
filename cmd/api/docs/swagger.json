@@ -8478,6 +8478,10 @@
                     "type": "integer",
                     "example": 321
                 },
+                "is_forwarding": {
+                    "type": "boolean",
+                    "example": true
+                },
                 "last_height": {
                     "type": "integer",
                     "example": 100

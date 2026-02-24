@@ -220,8 +220,8 @@ func Test_handleUpdateZkISM_Success(t *testing.T) {
 		{
 			Type: types.EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
 			Data: map[string]any{
-				"id":        "0x07",
-				"new_state": toHex(newState),
+				"id":    "0x07",
+				"state": toHex(newState),
 			},
 		},
 	}
@@ -262,8 +262,8 @@ func Test_handleUpdateZkISM_UpdatesContextState(t *testing.T) {
 		{
 			Type: types.EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
 			Data: map[string]any{
-				"id":        "0x07",
-				"new_state": toHex(newState),
+				"id":    "0x07",
+				"state": toHex(newState),
 			},
 		},
 	}
