@@ -723,11 +723,11 @@ func TestEventForwardingComplete(t *testing.T) {
 		{
 			name: "test 1",
 			m: map[string]any{
-				"destination_domain":    "84532",
-				"forward_address":       "celestia1z7ut79ds6h550925ehkxpwvkgcfq63y2vfk2e0",
-				"destination_recipient": "0x000000000000000000000000c2455315f69696295b357428fe13970bb5b4effa",
-				"successful_count":      "2",
-				"failed_count":          "1",
+				"dest_domain":      "84532",
+				"forward_addr":     "\"celestia1z7ut79ds6h550925ehkxpwvkgcfq63y2vfk2e0\"",
+				"dest_recipient":   "\"0x000000000000000000000000c2455315f69696295b357428fe13970bb5b4effa\"",
+				"tokens_forwarded": "2",
+				"tokens_failed":    "1",
 			},
 			want: EventForwardingComplete{
 				DestinationDomain:    84532,
