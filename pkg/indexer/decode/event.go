@@ -905,14 +905,26 @@ func NewEventTokenForwarded(m map[string]any) (etf EventTokenForwarded, err erro
 	if err != nil {
 		return etf, errors.Wrap(err, "forward_addr")
 	}
-	etf.Denom = decoder.StringFromMap(m, "denom")
-	etf.Amount = decoder.StringFromMap(m, "amount")
-	etf.MessageId = decoder.StringFromMap(m, "message_id")
+	etf.Denom, err = parseUnquoteOptional(decoder.StringFromMap(m, "denom"))
+	if err != nil {
+		return etf, errors.Wrap(err, "denom")
+	}
+	etf.Amount, err = parseUnquoteOptional(decoder.StringFromMap(m, "amount"))
+	if err != nil {
+		return etf, errors.Wrap(err, "amount")
+	}
+	etf.MessageId, err = parseUnquoteOptional(decoder.StringFromMap(m, "message_id"))
+	if err != nil {
+		return etf, errors.Wrap(err, "message_id")
+	}
 	etf.Success, err = decoder.BoolFromMap(m, "success")
 	if err != nil {
 		return etf, errors.Wrap(err, "success")
 	}
-	etf.Error = decoder.StringFromMap(m, "error")
+	etf.Error, err = parseUnquoteOptional(decoder.StringFromMap(m, "error"))
+	if err != nil {
+		return etf, errors.Wrap(err, "error")
+	}
 	return
 }
 
