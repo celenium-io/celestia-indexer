@@ -868,22 +868,25 @@ type EventForwardingComplete struct {
 }
 
 func NewEventForwardingComplete(m map[string]any) (efc EventForwardingComplete, err error) {
-	efc.ForwardAddress = decoder.StringFromMap(m, "forward_address")
-	efc.DestinationDomain, err = decoder.Uint64FromMap(m, "destination_domain")
+	efc.ForwardAddress, err = parseUnquoteOptional(decoder.StringFromMap(m, "forward_addr"))
 	if err != nil {
-		return efc, errors.Wrap(err, "destination_domain")
+		return efc, errors.Wrap(err, "forward_addr")
 	}
-	efc.DestinationRecipient, err = decoder.BytesFromMap(m, "destination_recipient")
+	efc.DestinationDomain, err = decoder.Uint64FromMap(m, "dest_domain")
 	if err != nil {
-		return efc, errors.Wrap(err, "destination_recipient")
+		return efc, errors.Wrap(err, "dest_domain")
 	}
-	efc.SuccessfulCount, err = decoder.Uint64FromMap(m, "successful_count")
+	efc.DestinationRecipient, err = decoder.BytesFromMap(m, "dest_recipient")
 	if err != nil {
-		return efc, errors.Wrap(err, "successful_count")
+		return efc, errors.Wrap(err, "dest_recipient")
 	}
-	efc.FailedCount, err = decoder.Uint64FromMap(m, "failed_count")
+	efc.SuccessfulCount, err = decoder.Uint64FromMap(m, "tokens_forwarded")
 	if err != nil {
-		return efc, errors.Wrap(err, "failed_count")
+		return efc, errors.Wrap(err, "tokens_forwarded")
+	}
+	efc.FailedCount, err = decoder.Uint64FromMap(m, "tokens_failed")
+	if err != nil {
+		return efc, errors.Wrap(err, "tokens_failed")
 	}
 	return
 }
@@ -898,7 +901,10 @@ type EventTokenForwarded struct {
 }
 
 func NewEventTokenForwarded(m map[string]any) (etf EventTokenForwarded, err error) {
-	etf.ForwardAddress = decoder.StringFromMap(m, "forward_address")
+	etf.ForwardAddress, err = parseUnquoteOptional(decoder.StringFromMap(m, "forward_addr"))
+	if err != nil {
+		return etf, errors.Wrap(err, "forward_addr")
+	}
 	etf.Denom = decoder.StringFromMap(m, "denom")
 	etf.Amount = decoder.StringFromMap(m, "amount")
 	etf.MessageId = decoder.StringFromMap(m, "message_id")
