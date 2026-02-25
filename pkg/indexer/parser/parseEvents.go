@@ -73,10 +73,10 @@ func parseEvent(ctx *context.Context, b types.BlockData, eN types.Event, index i
 func processEvent(ctx *context.Context, event *storage.Event) error {
 	switch event.Type {
 	case storageTypes.EventTypeBurn:
-		return ctx.SubSupply(event.Data)
+		ctx.SubSupply(event.Data)
 	case storageTypes.EventTypeMint:
 		ctx.SetInflation(event.Data)
-		return ctx.AddSupply(event.Data)
+		ctx.AddSupply(event.Data)
 	case storageTypes.EventTypeCoinReceived:
 		return parseCoinReceived(ctx, event.Data, event.Height)
 	case storageTypes.EventTypeCoinSpent:

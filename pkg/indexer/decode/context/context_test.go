@@ -17,7 +17,6 @@ func Test_AddSupply(t *testing.T) {
 		name    string
 		data    map[string]any
 		want    decimal.Decimal
-		wantErr bool
 	}{
 		{
 			name: "valid amount",
@@ -25,14 +24,12 @@ func Test_AddSupply(t *testing.T) {
 				"amount": "1000000000000000000utia",
 			},
 			want:    decimal.NewFromInt(1000000000000000000),
-			wantErr: false,
 		}, {
 			name: "valid amount but no utia",
 			data: map[string]any{
 				"amount": "1000000000000000000test",
 			},
 			want:    decimal.NewFromInt(0),
-			wantErr: false,
 		},
 		{
 			name: "invalid amount",
@@ -40,7 +37,13 @@ func Test_AddSupply(t *testing.T) {
 				"amount": "invalid_amount",
 			},
 			want:    decimal.Zero,
-			wantErr: true,
+		},
+		{
+			name: "amount without currency",
+			data: map[string]any{
+				"amount": "123456",
+			},
+			want: decimal.RequireFromString("123456"),
 		},
 	}
 
@@ -53,46 +56,44 @@ func Test_AddSupply(t *testing.T) {
 				},
 			}
 
-			err := ctx.AddSupply(tt.data)
-			if tt.wantErr {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				require.Equal(t, tt.want.String(), ctx.Block.Stats.SupplyChange.String())
-			}
+			ctx.AddSupply(tt.data)
+			require.Equal(t, tt.want.String(), ctx.Block.Stats.SupplyChange.String())
 		})
 	}
 }
 
 func Test_SubSupply(t *testing.T) {
 	tests := []struct {
-		name    string
-		data    map[string]any
-		want    decimal.Decimal
-		wantErr bool
+		name string
+		data map[string]any
+		want decimal.Decimal
 	}{
 		{
 			name: "valid amount",
 			data: map[string]any{
 				"amount": "1000000000000000000utia",
 			},
-			want:    decimal.NewFromInt(-1000000000000000000),
-			wantErr: false,
+			want: decimal.NewFromInt(-1000000000000000000),
 		}, {
 			name: "valid amount but no utia",
 			data: map[string]any{
 				"amount": "1000000000000000000test",
 			},
-			want:    decimal.NewFromInt(0),
-			wantErr: false,
+			want: decimal.NewFromInt(0),
 		},
 		{
 			name: "invalid amount",
 			data: map[string]any{
 				"amount": "invalid_amount",
 			},
-			want:    decimal.Zero,
-			wantErr: true,
+			want: decimal.Zero,
+		},
+		{
+			name: "amount without currency",
+			data: map[string]any{
+				"amount": "123456",
+			},
+			want: decimal.RequireFromString("-123456"),
 		},
 	}
 
@@ -105,13 +106,8 @@ func Test_SubSupply(t *testing.T) {
 				},
 			}
 
-			err := ctx.SubSupply(tt.data)
-			if tt.wantErr {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				require.Equal(t, tt.want.String(), ctx.Block.Stats.SupplyChange.String())
-			}
+			ctx.SubSupply(tt.data)
+			require.Equal(t, tt.want.String(), ctx.Block.Stats.SupplyChange.String())
 		})
 	}
 }

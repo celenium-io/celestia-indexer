@@ -138,28 +138,30 @@ func (ctx *Context) AddValidator(validator storage.Validator) {
 	}
 }
 
-func (ctx *Context) AddSupply(data map[string]any) error {
+func (ctx *Context) AddSupply(data map[string]any) {
 	coin, err := decoder.CoinFromMap(data, "amount")
-	if err != nil {
-		return errors.Wrap(err, "parse supply event amount")
-	}
-	if coin.GetDenom() == currency.DefaultCurrency {
-		amount := decimal.NewFromBigInt(coin.Amount.BigInt(), 0)
+	if err == nil {
+		if coin.GetDenom() == currency.DefaultCurrency {
+			amount := decimal.NewFromBigInt(coin.Amount.BigInt(), 0)
+			ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Add(amount)
+		}
+	} else {
+		amount := decoder.DecimalFromMap(data, "amount")
 		ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Add(amount)
 	}
-	return nil
 }
 
-func (ctx *Context) SubSupply(data map[string]any) error {
+func (ctx *Context) SubSupply(data map[string]any) {
 	coin, err := decoder.CoinFromMap(data, "amount")
-	if err != nil {
-		return errors.Wrap(err, "parse burn event amount")
-	}
-	if coin.GetDenom() == currency.DefaultCurrency {
-		amount := decimal.NewFromBigInt(coin.Amount.BigInt(), 0)
+	if err == nil {
+		if coin.GetDenom() == currency.DefaultCurrency {
+			amount := decimal.NewFromBigInt(coin.Amount.BigInt(), 0)
+			ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Sub(amount)
+		}
+	} else {
+		amount := decoder.DecimalFromMap(data, "amount")
 		ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Sub(amount)
 	}
-	return nil
 }
 
 func (ctx *Context) SetInflation(data map[string]any) {
