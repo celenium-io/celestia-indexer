@@ -14,29 +14,29 @@ import (
 
 func Test_AddSupply(t *testing.T) {
 	tests := []struct {
-		name    string
-		data    map[string]any
-		want    decimal.Decimal
+		name string
+		data map[string]any
+		want decimal.Decimal
 	}{
 		{
 			name: "valid amount",
 			data: map[string]any{
 				"amount": "1000000000000000000utia",
 			},
-			want:    decimal.NewFromInt(1000000000000000000),
+			want: decimal.NewFromInt(1000000000000000000),
 		}, {
 			name: "valid amount but no utia",
 			data: map[string]any{
 				"amount": "1000000000000000000test",
 			},
-			want:    decimal.NewFromInt(0),
+			want: decimal.NewFromInt(0),
 		},
 		{
 			name: "invalid amount",
 			data: map[string]any{
 				"amount": "invalid_amount",
 			},
-			want:    decimal.Zero,
+			want: decimal.Zero,
 		},
 		{
 			name: "amount without currency",
