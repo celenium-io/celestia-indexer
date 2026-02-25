@@ -64,25 +64,29 @@ func (bl *BlobLog) ByProviders(ctx context.Context, providers []storage.RollupPr
 		return nil, nil
 	}
 
-	blobQuery := bl.DB().NewSelect().
-		Model((*storage.BlobLog)(nil))
-
+	var combined *bun.SelectQuery
 	for i := range providers {
-		blobQuery = blobQuery.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
-			sq.Where("blob_log.signer_id = ?", providers[i].AddressId)
-			if providers[i].NamespaceId > 0 {
-				sq.Where("blob_log.namespace_id = ?", providers[i].NamespaceId)
-			}
-			return sq
-		})
-	}
+		blobQuery := bl.DB().NewSelect().
+			Model((*storage.BlobLog)(nil)).
+			Where("blob_log.signer_id = ?", providers[i].AddressId)
 
-	blobQuery = blobLogFilters(blobQuery, fltrs)
+		if providers[i].NamespaceId > 0 {
+			blobQuery = blobQuery.Where("blob_log.namespace_id = ?", providers[i].NamespaceId)
+		}
+
+		blobQuery = blobByProviderFilters(blobQuery, fltrs)
+
+		if combined == nil {
+			combined = blobQuery
+		} else {
+			combined = combined.Union(blobQuery)
+		}
+	}
 
 	query := bl.DB().NewSelect().
 		ColumnExpr("blob_log.*").
 		ColumnExpr("ns.id as namespace__id, ns.size as namespace__size, ns.blobs_count as namespace__blobs_count, ns.version as namespace__version, ns.namespace_id as namespace__namespace_id, ns.reserved as namespace__reserved, ns.pfb_count as namespace__pfb_count, ns.last_height as namespace__last_height, ns.last_message_time as namespace__last_message_time").
-		TableExpr("(?) as blob_log", blobQuery).
+		TableExpr("(?) as blob_log", combined).
 		Join("left join namespace as ns on ns.id = blob_log.namespace_id")
 
 	if fltrs.Joins {
@@ -96,6 +100,10 @@ func (bl *BlobLog) ByProviders(ctx context.Context, providers []storage.RollupPr
 	}
 
 	query = blobLogSort(query, fltrs.SortBy, fltrs.Sort)
+	query = limitScope(query, fltrs.Limit)
+	if fltrs.Offset > 0 {
+		query = query.Offset(fltrs.Offset)
+	}
 	err = query.Scan(ctx, &logs)
 	return
 }
@@ -109,56 +117,55 @@ func (bl *BlobLog) ExportByProviders(ctx context.Context, providers []storage.Ro
 		return nil
 	}
 
-	blobQuery := bl.DB().NewSelect().
-		Model((*storage.BlobLog)(nil))
+	var combined *bun.SelectQuery
+	for i := range providers {
+		blobQuery := bl.DB().NewSelect().
+			Model((*storage.BlobLog)(nil)).
+			Where("blob_log.signer_id = ?", providers[i].AddressId)
 
-	switch {
-	case from.IsZero() && to.IsZero():
-		blobQuery = blobQuery.
-			Where("time >= ?", time.Now().AddDate(0, -maxExportPeriodInMonth, 0).UTC())
+		if providers[i].NamespaceId > 0 {
+			blobQuery = blobQuery.Where("blob_log.namespace_id = ?", providers[i].NamespaceId)
+		}
+		switch {
+		case from.IsZero() && to.IsZero():
+			blobQuery = blobQuery.
+				Where("time >= ?", time.Now().AddDate(0, -maxExportPeriodInMonth, 0).UTC())
 
-	case !from.IsZero() && to.IsZero():
-		blobQuery = blobQuery.
-			Where("time >= ?", from).
-			Where("time < ?", from.AddDate(0, maxExportPeriodInMonth, 0).UTC())
-
-	case from.IsZero() && !to.IsZero():
-		blobQuery = blobQuery.
-			Where("time < ?", to).
-			Where("time >= ?", to.AddDate(0, -maxExportPeriodInMonth, 0).UTC())
-
-	case !from.IsZero() && !to.IsZero():
-		if to.Sub(from) > time.Hour*24*30 {
+		case !from.IsZero() && to.IsZero():
 			blobQuery = blobQuery.
 				Where("time >= ?", from).
 				Where("time < ?", from.AddDate(0, maxExportPeriodInMonth, 0).UTC())
-		} else {
+
+		case from.IsZero() && !to.IsZero():
 			blobQuery = blobQuery.
-				Where("time >= ?", from).
-				Where("time < ?", to)
+				Where("time < ?", to).
+				Where("time >= ?", to.AddDate(0, -maxExportPeriodInMonth, 0).UTC())
+
+		case !from.IsZero() && !to.IsZero():
+			if to.Sub(from) > time.Hour*24*30 {
+				blobQuery = blobQuery.
+					Where("time >= ?", from).
+					Where("time < ?", from.AddDate(0, maxExportPeriodInMonth, 0).UTC())
+			} else {
+				blobQuery = blobQuery.
+					Where("time >= ?", from).
+					Where("time < ?", to)
+			}
 		}
 
+		if combined == nil {
+			combined = blobQuery
+		} else {
+			combined = combined.Union(blobQuery)
+		}
 	}
-
-	blobQuery = blobQuery.WhereGroup(" AND ", func(q *bun.SelectQuery) *bun.SelectQuery {
-		for i := range providers {
-			q = q.WhereGroup(" OR ", func(sq *bun.SelectQuery) *bun.SelectQuery {
-				sq.Where("blob_log.signer_id = ?", providers[i].AddressId)
-				if providers[i].NamespaceId > 0 {
-					sq.Where("blob_log.namespace_id = ?", providers[i].NamespaceId)
-				}
-				return sq
-			})
-		}
-		return q
-	})
 
 	query := bl.DB().NewSelect().
 		ColumnExpr("blob_log.time, blob_log.height, blob_log.size, blob_log.commitment, blob_log.content_type").
 		ColumnExpr("signer.address as signer").
 		ColumnExpr("ns.version as namespace_version, ns.namespace_id as namespace_namespace_id").
 		ColumnExpr("tx.hash as tx_hash").
-		TableExpr("(?) as blob_log", blobQuery).
+		TableExpr("(?) as blob_log", combined).
 		Join("left join address as signer on signer.id = blob_log.signer_id").
 		Join("left join namespace as ns on ns.id = blob_log.namespace_id").
 		Join("left join tx on tx.id = blob_log.tx_id").

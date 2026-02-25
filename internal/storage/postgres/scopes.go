@@ -114,6 +114,39 @@ func messagesFilter(query *bun.SelectQuery, fltrs storage.MessageListWithTxFilte
 	return query
 }
 
+func blobByProviderFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.SelectQuery {
+	if !fltrs.From.IsZero() {
+		query = query.Where("time >= ?", fltrs.From)
+	}
+	if !fltrs.To.IsZero() {
+		query = query.Where("time < ?", fltrs.To)
+	}
+	if fltrs.Commitment != "" {
+		query = query.Where("commitment = ?", fltrs.Commitment)
+	}
+	if len(fltrs.Signers) > 0 {
+		query = query.Where("signer_id IN (?)", bun.In(fltrs.Signers))
+	}
+	if fltrs.Cursor > 0 {
+		switch fltrs.Sort {
+		case sdk.SortOrderAsc:
+			query = query.Where("id > ?", fltrs.Cursor)
+		case sdk.SortOrderDesc:
+			query = query.Where("id < ?", fltrs.Cursor)
+		}
+	}
+	if fltrs.Height > 0 {
+		query = query.Where("height = ?", fltrs.Height)
+	}
+
+	if fltrs.Limit+fltrs.Offset > 0 {
+		query = query.Limit(fltrs.Limit + fltrs.Offset)
+	} else {
+		query = query.Limit(10)
+	}
+	return blobLogSort(query, fltrs.SortBy, fltrs.Sort)
+}
+
 func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.SelectQuery {
 	if fltrs.Offset > 0 {
 		query = query.Offset(fltrs.Offset)
@@ -184,13 +217,14 @@ func listBlobLogFilters(query *bun.SelectQuery, fltrs storage.ListBlobLogFilters
 }
 
 func blobLogSort(query *bun.SelectQuery, sortBy string, sort sdk.SortOrder) *bun.SelectQuery {
+	if sort != sdk.SortOrderAsc && sort != sdk.SortOrderDesc {
+		sort = sdk.SortOrderAsc
+	}
+
 	switch sortBy {
-	case sizeColumn, timeColumn:
+	case sizeColumn:
 		query = sortScope(query, fmt.Sprintf("blob_log.%s", sortBy), sort)
-	case "":
-		if sort != sdk.SortOrderAsc && sort != sdk.SortOrderDesc {
-			sort = sdk.SortOrderAsc
-		}
+	case "", timeColumn:
 		query = query.OrderExpr("blob_log.time ?0, blob_log.id ?0", bun.Safe(sort))
 	default:
 		return query
