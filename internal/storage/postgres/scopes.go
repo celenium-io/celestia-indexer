@@ -76,19 +76,25 @@ func txFilterWithoutLimit(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.S
 	return query
 }
 
+func addressSortScope(q *bun.SelectQuery, field string, sort sdk.SortOrder) *bun.SelectQuery {
+	if sort != sdk.SortOrderAsc && sort != sdk.SortOrderDesc {
+		sort = sdk.SortOrderAsc
+	}
+	switch field {
+	case "id", "spendable", "unbonding", "delegated", "last_height":
+		q = sortScope(q, field, sort)
+	case "first_height":
+		q = sortScope(q, "height", sort)
+	default:
+		q = sortScope(q, "id", sort)
+	}
+	return q
+}
+
 func addressListFilter(query *bun.SelectQuery, fltrs storage.AddressListFilter) *bun.SelectQuery {
 	query = limitScope(query, fltrs.Limit)
 	query = query.Offset(fltrs.Offset)
-
-	switch fltrs.SortField {
-	case "id", "spendable", "unbonding", "delegated", "last_height":
-		query = sortScope(query, fltrs.SortField, fltrs.Sort)
-	case "first_height":
-		query = sortScope(query, "height", fltrs.Sort)
-	default:
-		query = sortScope(query, "id", fltrs.Sort)
-	}
-
+	query = addressSortScope(query, fltrs.SortField, fltrs.Sort)
 	return query
 }
 
