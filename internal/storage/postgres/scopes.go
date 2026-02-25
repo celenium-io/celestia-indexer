@@ -4,8 +4,6 @@
 package postgres
 
 import (
-	"fmt"
-
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
@@ -221,13 +219,10 @@ func blobLogSort(query *bun.SelectQuery, sortBy string, sort sdk.SortOrder) *bun
 		sort = sdk.SortOrderAsc
 	}
 
-	switch sortBy {
-	case sizeColumn:
-		query = sortScope(query, fmt.Sprintf("blob_log.%s", sortBy), sort)
-	case "", timeColumn:
+	if sortBy == sizeColumn {
+		query = sortScope(query, "blob_log.size", sort)
+	} else {
 		query = query.OrderExpr("blob_log.time ?0, blob_log.id ?0", bun.Safe(sort))
-	default:
-		return query
 	}
 	return query
 }
