@@ -7,12 +7,14 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 )
 
 type Context struct {
@@ -62,9 +64,11 @@ func (ctx *Context) AddAddress(address *storage.Address) error {
 		return nil
 	}
 	if addr, ok := ctx.Addresses.Get(address.String()); ok {
-		addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
-		addr.Balance.Delegated = addr.Balance.Delegated.Add(address.Balance.Delegated)
-		addr.Balance.Unbonding = addr.Balance.Unbonding.Add(address.Balance.Unbonding)
+		if address.Balance.Currency == currency.DefaultCurrency { // hotfix for balance updates with non-default currency
+			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
+			addr.Balance.Delegated = addr.Balance.Delegated.Add(address.Balance.Delegated)
+			addr.Balance.Unbonding = addr.Balance.Unbonding.Add(address.Balance.Unbonding)
+		}
 
 		if address.IsForwarding {
 			addr.IsForwarding = true
@@ -135,11 +139,29 @@ func (ctx *Context) AddValidator(validator storage.Validator) {
 }
 
 func (ctx *Context) AddSupply(data map[string]any) {
-	ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Add(decoder.Amount(data))
+	coin, err := decoder.CoinFromMap(data, "amount")
+	if err == nil {
+		if coin.GetDenom() == currency.DefaultCurrency {
+			amount := decimal.NewFromBigInt(coin.Amount.BigInt(), 0)
+			ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Add(amount)
+		}
+	} else {
+		amount := decoder.DecimalFromMap(data, "amount")
+		ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Add(amount)
+	}
 }
 
 func (ctx *Context) SubSupply(data map[string]any) {
-	ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Sub(decoder.Amount(data))
+	coin, err := decoder.CoinFromMap(data, "amount")
+	if err == nil {
+		if coin.GetDenom() == currency.DefaultCurrency {
+			amount := decimal.NewFromBigInt(coin.Amount.BigInt(), 0)
+			ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Sub(amount)
+		}
+	} else {
+		amount := decoder.DecimalFromMap(data, "amount")
+		ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Sub(amount)
+	}
 }
 
 func (ctx *Context) SetInflation(data map[string]any) {

@@ -6,6 +6,7 @@ package postgres
 import (
 	"context"
 
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/dipdup-net/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
@@ -35,7 +36,7 @@ func (a *Address) ByHash(ctx context.Context, hash []byte) (address storage.Addr
 		ColumnExpr("address.*").
 		ColumnExpr("celestial.id as celestials__id, celestial.image_url as celestials__image_url").
 		ColumnExpr("balance.currency as balance__currency, balance.spendable as balance__spendable, balance.delegated as balance__delegated, balance.unbonding as balance__unbonding").
-		Join("left join balance on balance.id = address.id").
+		Join("left join balance on balance.id = address.id and balance.currency = ?", currency.DefaultCurrency).
 		Join("left join celestial on celestial.address_id = address.id and celestial.status = 'PRIMARY'").
 		Scan(ctx, &address)
 	return
@@ -48,14 +49,15 @@ func (a *Address) ListWithBalance(ctx context.Context, filters storage.AddressLi
 
 		addressQuery = addressListFilter(addressQuery, filters)
 
-		err = a.DB().NewSelect().
+		query := a.DB().NewSelect().
 			TableExpr("(?) as address", addressQuery).
 			ColumnExpr("address.*").
 			ColumnExpr("celestial.id as celestials__id, celestial.image_url as celestials__image_url").
 			ColumnExpr("balance.currency as balance__currency, balance.spendable as balance__spendable, balance.delegated as balance__delegated, balance.unbonding as balance__unbonding").
-			Join("left join balance on balance.id = address.id").
-			Join("left join celestial on celestial.address_id = address.id and celestial.status = 'PRIMARY'").
-			Scan(ctx, &result)
+			Join("left join balance on balance.id = address.id and balance.currency = ?", currency.DefaultCurrency).
+			Join("left join celestial on celestial.address_id = address.id and celestial.status = 'PRIMARY'")
+		query = addressSortScope(query, filters.SortField, filters.Sort)
+		err = query.Scan(ctx, &result)
 
 	} else {
 		addressQuery := a.DB().NewSelect().
@@ -63,14 +65,15 @@ func (a *Address) ListWithBalance(ctx context.Context, filters storage.AddressLi
 
 		addressQuery = addressListFilter(addressQuery, filters)
 
-		err = a.DB().NewSelect().
+		query := a.DB().NewSelect().
 			TableExpr("(?) as balance", addressQuery).
 			ColumnExpr("address.*").
 			ColumnExpr("celestial.id as celestials__id, celestial.image_url as celestials__image_url").
 			ColumnExpr("balance.currency as balance__currency, balance.spendable as balance__spendable, balance.delegated as balance__delegated, balance.unbonding as balance__unbonding").
-			Join("left join address on balance.id = address.id").
-			Join("left join celestial on celestial.address_id = address.id and celestial.status = 'PRIMARY'").
-			Scan(ctx, &result)
+			Join("left join address on balance.id = address.id and balance.currency = ?", currency.DefaultCurrency).
+			Join("left join celestial on celestial.address_id = address.id and celestial.status = 'PRIMARY'")
+		query = addressSortScope(query, filters.SortField, filters.Sort)
+		err = query.Scan(ctx, &result)
 	}
 
 	return
