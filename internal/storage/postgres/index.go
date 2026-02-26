@@ -72,6 +72,15 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Block)(nil)).
+			Index("block_height_covering_idx").
+			Column("height").
+			Include("time").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// BlockStats
 		if _, err := tx.NewCreateIndex().
@@ -145,6 +154,15 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Index("event_tx_id_idx").
 			Column("tx_id").
 			Where("tx_id IS NOT NULL").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Event)(nil)).
+			Index("event_block_idx").
+			Column("height", "id").
+			Where("tx_id IS NULL").
 			Exec(ctx); err != nil {
 			return err
 		}
@@ -330,6 +348,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.BlobLog)(nil)).
+			Index("blob_log_ns_time_idx").
+			ColumnExpr("namespace_id, time DESC").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Rollup
 		if _, err := tx.NewCreateIndex().
@@ -471,6 +497,22 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Index("redelegation_height_idx").
 			Column("height").
 			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Redelegation)(nil)).
+			Index("redelegation_src_validator_id_idx").
+			Column("src_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Redelegation)(nil)).
+			Index("redelegation_dst_validator_id_idx").
+			Column("dest_id").
 			Exec(ctx); err != nil {
 			return err
 		}

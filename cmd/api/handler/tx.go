@@ -11,11 +11,13 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/labstack/echo/v4"
 )
 
 type TxHandler struct {
 	tx          storage.ITx
+	blocks      storage.IBlock
 	events      storage.IEvent
 	messages    storage.IMessage
 	namespaces  storage.INamespace
@@ -26,6 +28,7 @@ type TxHandler struct {
 
 func NewTxHandler(
 	tx storage.ITx,
+	blocks storage.IBlock,
 	events storage.IEvent,
 	messages storage.IMessage,
 	namespaces storage.INamespace,
@@ -35,6 +38,7 @@ func NewTxHandler(
 ) *TxHandler {
 	return &TxHandler{
 		tx:          tx,
+		blocks:      blocks,
 		events:      events,
 		messages:    messages,
 		namespaces:  namespaces,
@@ -78,6 +82,26 @@ func (handler *TxHandler) Get(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.NewTx(tx))
+}
+
+func minTime(a, b time.Time) time.Time {
+	if a.IsZero() {
+		return b
+	}
+	if b.IsZero() {
+		return a
+	}
+	if a.Before(b) {
+		return a
+	}
+	return b
+}
+
+func maxTime(a, b time.Time) time.Time {
+	if a.Before(b) {
+		return b
+	}
+	return a
 }
 
 // List godoc
@@ -129,6 +153,18 @@ func (handler *TxHandler) List(c echo.Context) error {
 	}
 	for i := range req.ExcludedMsgType {
 		fltrs.ExcludedMessageTypes.SetByMsgType(types.MsgType(req.ExcludedMsgType[i]))
+	}
+
+	if req.Height != nil {
+		blockTime, err := handler.blocks.Time(c.Request().Context(), pkgTypes.Level(*req.Height))
+		if err != nil {
+			if handler.blocks.IsNoRows(err) {
+				return returnArray(c, []any{})
+			}
+			return handleError(c, err, handler.blocks)
+		}
+		fltrs.TimeFrom = maxTime(fltrs.TimeFrom, blockTime)
+		fltrs.TimeTo = minTime(fltrs.TimeTo, blockTime.Add(time.Minute))
 	}
 
 	txs, err := handler.tx.Filter(c.Request().Context(), fltrs)

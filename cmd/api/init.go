@@ -354,7 +354,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		}
 	}
 
-	txHandlers := handler.NewTxHandler(db.Tx, db.Event, db.Message, db.Namespace, db.BlobLogs, db.State, cfg.Indexer.Name)
+	txHandlers := handler.NewTxHandler(db.Tx, db.Blocks, db.Event, db.Message, db.Namespace, db.BlobLogs, db.State, cfg.Indexer.Name)
 	txGroup := v1.Group("/tx")
 	{
 		txGroup.GET("", txHandlers.List)
