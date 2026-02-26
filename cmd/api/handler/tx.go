@@ -158,6 +158,9 @@ func (handler *TxHandler) List(c echo.Context) error {
 	if req.Height != nil {
 		blockTime, err := handler.blocks.Time(c.Request().Context(), pkgTypes.Level(*req.Height))
 		if err != nil {
+			if handler.blocks.IsNoRows(err) {
+				return returnArray(c, []any{})
+			}
 			return handleError(c, err, handler.blocks)
 		}
 		fltrs.TimeFrom = maxTime(fltrs.TimeFrom, blockTime)

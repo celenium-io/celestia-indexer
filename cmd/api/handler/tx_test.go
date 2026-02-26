@@ -5,6 +5,7 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	"encoding/hex"
 	"encoding/json"
 	"net/http"
@@ -196,6 +197,92 @@ func (s *TxTestSuite) TestList() {
 	s.Require().Equal(types.StatusSuccess, tx.Status)
 	s.Require().Len(tx.Signers, 1)
 	s.Require().Equal(testAddress, tx.Signers[0].Hash)
+}
+
+func (s *TxTestSuite) TestListWithHeight() {
+	q := make(url.Values)
+	q.Set("limit", "2")
+	q.Set("height", "100")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx")
+
+	s.blocks.EXPECT().
+		Time(gomock.Any(), pkgTypes.Level(100)).
+		Return(testTime, nil).
+		Times(1)
+
+	s.tx.EXPECT().
+		Filter(gomock.Any(), gomock.Any()).
+		Return([]storage.Tx{testTx}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var txs []responses.Tx
+	err := json.NewDecoder(rec.Body).Decode(&txs)
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+	s.Require().EqualValues(100, txs[0].Height)
+}
+
+func (s *TxTestSuite) TestListWithHeightAndFrom() {
+	q := make(url.Values)
+	q.Set("height", "100")
+	q.Set("from", "1690851660") // unix for testTime
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx")
+
+	s.blocks.EXPECT().
+		Time(gomock.Any(), pkgTypes.Level(100)).
+		Return(testTime, nil).
+		Times(1)
+
+	s.tx.EXPECT().
+		Filter(gomock.Any(), gomock.Any()).
+		Return([]storage.Tx{testTx}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var txs []responses.Tx
+	err := json.NewDecoder(rec.Body).Decode(&txs)
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+	s.Require().EqualValues(100, txs[0].Height)
+}
+
+func (s *TxTestSuite) TestListWithHeightNotFound() {
+	q := make(url.Values)
+	q.Set("height", "999999999")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx")
+
+	s.blocks.EXPECT().
+		Time(gomock.Any(), pkgTypes.Level(999999999)).
+		Return(time.Time{}, sql.ErrNoRows)
+
+	s.blocks.EXPECT().
+		IsNoRows(sql.ErrNoRows).
+		Return(true)
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var txs []responses.Tx
+	err := json.NewDecoder(rec.Body).Decode(&txs)
+	s.Require().NoError(err)
+	s.Require().Empty(txs)
 }
 
 func (s *TxTestSuite) TestListValidationStatusError() {
