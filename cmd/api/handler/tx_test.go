@@ -12,12 +12,14 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/labstack/echo/v4"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
@@ -61,6 +63,7 @@ var (
 type TxTestSuite struct {
 	suite.Suite
 	tx        *mock.MockITx
+	blocks    *mock.MockIBlock
 	events    *mock.MockIEvent
 	messages  *mock.MockIMessage
 	namespace *mock.MockINamespace
@@ -77,12 +80,13 @@ func (s *TxTestSuite) SetupSuite() {
 	s.echo.Validator = NewCelestiaApiValidator()
 	s.ctrl = gomock.NewController(s.T())
 	s.tx = mock.NewMockITx(s.ctrl)
+	s.blocks = mock.NewMockIBlock(s.ctrl)
 	s.events = mock.NewMockIEvent(s.ctrl)
 	s.namespace = mock.NewMockINamespace(s.ctrl)
 	s.blobLogs = mock.NewMockIBlobLog(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
 	s.messages = mock.NewMockIMessage(s.ctrl)
-	s.handler = NewTxHandler(s.tx, s.events, s.messages, s.namespace, s.blobLogs, s.state, testIndexerName)
+	s.handler = NewTxHandler(s.tx, s.blocks, s.events, s.messages, s.namespace, s.blobLogs, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -301,6 +305,12 @@ func (s *TxTestSuite) TestListHeight() {
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
 
+	blockTime := time.Now()
+	s.blocks.EXPECT().
+		Time(gomock.Any(), pkgTypes.Level(1000)).
+		Return(blockTime, nil).
+		Times(1)
+
 	s.tx.EXPECT().
 		Filter(gomock.Any(), storage.TxFilter{
 			Limit:                2,
@@ -311,6 +321,8 @@ func (s *TxTestSuite) TestListHeight() {
 			MessageTypes:         types.NewMsgTypeBitMask(types.MsgSend),
 			ExcludedMessageTypes: types.NewMsgTypeBitMask(),
 			WithMessages:         true,
+			TimeFrom:             blockTime,
+			TimeTo:               blockTime.Add(time.Minute),
 		}).
 		Return([]storage.Tx{
 			testTx,
@@ -355,6 +367,12 @@ func (s *TxTestSuite) TestListExcludedMessages() {
 	q.Set("height", "1000")
 	q.Set("messages", "true")
 
+	blockTime := time.Now()
+	s.blocks.EXPECT().
+		Time(gomock.Any(), pkgTypes.Level(1000)).
+		Return(blockTime, nil).
+		Times(1)
+
 	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
@@ -370,6 +388,8 @@ func (s *TxTestSuite) TestListExcludedMessages() {
 			ExcludedMessageTypes: types.NewMsgTypeBitMask(types.MsgSend),
 			MessageTypes:         types.NewMsgTypeBitMask(),
 			WithMessages:         true,
+			TimeFrom:             blockTime,
+			TimeTo:               blockTime.Add(time.Minute),
 		}).
 		Return([]storage.Tx{
 			testTx,
