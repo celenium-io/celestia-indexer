@@ -61,7 +61,8 @@ func (a *Address) ListWithBalance(ctx context.Context, filters storage.AddressLi
 
 	} else {
 		addressQuery := a.DB().NewSelect().
-			Model((*storage.Balance)(nil))
+			Model((*storage.Balance)(nil)).
+			Where("currency = ?", currency.DefaultCurrency)
 
 		addressQuery = addressListFilter(addressQuery, filters)
 
