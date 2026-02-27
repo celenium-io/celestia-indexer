@@ -12,7 +12,7 @@ import (
 	"github.com/dipdup-net/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
-	"github.com/uptrace/bun"
+	"github.com/lib/pq"
 )
 
 // Tx -
@@ -30,7 +30,7 @@ func NewTx(db *database.Bun) *Tx {
 func (tx *Tx) getSigners(ctx context.Context, txId ...uint64) (signers []storage.Signer, err error) {
 	subQuery := tx.DB().NewSelect().
 		Model((*storage.Signer)(nil)).
-		Where("tx_id IN (?)", bun.In(txId))
+		Where("tx_id = ANY(?)", pq.Array(txId))
 
 	err = tx.DB().NewSelect().TableExpr("(?) as signer", subQuery).
 		ColumnExpr("address.address as address__address").

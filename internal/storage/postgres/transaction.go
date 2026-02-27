@@ -1063,7 +1063,7 @@ func (tx Transaction) RollbackVestingPeriods(ctx context.Context, height types.L
 func (tx Transaction) RollbackSigners(ctx context.Context, txIds []uint64) (err error) {
 	_, err = tx.Tx().NewDelete().
 		Model((*models.Signer)(nil)).
-		Where("tx_id IN (?)", bun.In(txIds)).
+		Where("tx_id = ANY(?)", pq.Array(txIds)).
 		Exec(ctx)
 	return
 }
