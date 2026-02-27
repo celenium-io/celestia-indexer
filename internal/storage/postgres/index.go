@@ -108,6 +108,7 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Model((*storage.Tx)(nil)).
 			Index("tx_hash_idx").
 			Column("hash").
+			Using("HASH").
 			Exec(ctx); err != nil {
 			return err
 		}
@@ -134,6 +135,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Model((*storage.Signer)(nil)).
 			Index("signer_tx_id_idx").
 			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Signer)(nil)).
+			Index("signer_address_id_idx").
+			ColumnExpr("address_id, tx_id DESC").
 			Exec(ctx); err != nil {
 			return err
 		}
@@ -356,6 +365,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.BlobLog)(nil)).
+			Index("blob_log_time_idx").
+			ColumnExpr("time DESC").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Rollup
 		if _, err := tx.NewCreateIndex().
@@ -390,6 +407,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Model((*storage.RollupProvider)(nil)).
 			Index("rollup_provider_address_id_idx").
 			Column("address_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.RollupProvider)(nil)).
+			Index("rollup_provider_ns_addr_idx").
+			Column("namespace_id", "address_id").
 			Exec(ctx); err != nil {
 			return err
 		}
