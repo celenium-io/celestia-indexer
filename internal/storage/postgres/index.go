@@ -128,6 +128,15 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Tx)(nil)).
+			Index("tx_time_id_covering_idx").
+			ColumnExpr("time DESC, id DESC").
+			Include("message_types", "status").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Signer
 		if _, err := tx.NewCreateIndex().
@@ -171,6 +180,15 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Model((*storage.Event)(nil)).
 			Index("event_block_idx").
 			Column("height", "id").
+			Where("tx_id IS NULL").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Event)(nil)).
+			Index("event_block_time_idx").
+			Column("height", "time", "id").
 			Where("tx_id IS NULL").
 			Exec(ctx); err != nil {
 			return err
