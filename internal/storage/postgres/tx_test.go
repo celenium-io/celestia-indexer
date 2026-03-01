@@ -343,6 +343,92 @@ func (s *StorageTestSuite) TestTxByAddressLimitOffset() {
 	s.Require().Len(txs, 1)
 }
 
+func (s *StorageTestSuite) TestTxFilterCursorAsc() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	// cursor=3, sort=ASC → WHERE id > 3 ORDER BY time ASC, id ASC
+	// from fixture: id=4 (time=2023-07-04T03:00:00), id=5 (time=2024-07-04T03:00:00)
+	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Sort:   sdk.SortOrderAsc,
+		Limit:  10,
+		Cursor: 3,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 2)
+
+	s.Require().EqualValues(4, txs[0].Id)
+	s.Require().EqualValues(5, txs[1].Id)
+}
+
+func (s *StorageTestSuite) TestTxFilterCursorDesc() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	// cursor=3, sort=DESC → WHERE id < 3 ORDER BY time DESC, id DESC
+	// from fixture: id=2 (time=2023-07-04T03:10:57), id=1 (same time, lower id)
+	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Sort:   sdk.SortOrderDesc,
+		Limit:  10,
+		Cursor: 3,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 2)
+
+	s.Require().EqualValues(2, txs[0].Id)
+	s.Require().EqualValues(1, txs[1].Id)
+}
+
+func (s *StorageTestSuite) TestTxFilterCursorWithLimit() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	// cursor=3, sort=ASC, limit=1 → returns only the first record after cursor
+	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Sort:   sdk.SortOrderAsc,
+		Limit:  1,
+		Cursor: 3,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+
+	s.Require().EqualValues(4, txs[0].Id)
+}
+
+func (s *StorageTestSuite) TestTxFilterCursorZeroMeansNoCursor() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	// cursor=0 → condition not applied, all records returned
+	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Sort:   sdk.SortOrderAsc,
+		Limit:  10,
+		Cursor: 0,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 5)
+}
+
+func (s *StorageTestSuite) TestTxFilterCursorWithStatus() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	// cursor=1, sort=ASC, status=success → WHERE id > 1 AND status = 'success'
+	// from fixture all are success, so: id=2 (03:10:57), id=3 (03:10:56), id=4 (03:00:00), id=5 (2024)
+	// ORDER BY time ASC, id ASC: id=4, id=3, id=2, id=5 → 4 records
+	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
+		Sort:   sdk.SortOrderAsc,
+		Limit:  10,
+		Cursor: 1,
+		Status: []string{string(types.StatusSuccess)},
+	})
+	s.Require().NoError(err)
+	s.Require().Len(txs, 4)
+
+	// first record should have id=4 (earliest time among id>1)
+	s.Require().EqualValues(4, txs[0].Id)
+}
+
 func (s *StorageTestSuite) TestTxGas() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

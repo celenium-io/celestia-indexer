@@ -711,6 +711,100 @@ func (s *TxTestSuite) TestBlobs() {
 	s.Require().Len(logs, 2)
 }
 
+func (s *TxTestSuite) TestListWithCursorAsc() {
+	q := make(url.Values)
+	q.Set("cursor", "5")
+	q.Set("sort", "asc")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx")
+
+	s.tx.EXPECT().
+		Filter(gomock.Any(), storage.TxFilter{
+			Limit:                10,
+			Offset:               0,
+			Cursor:               5,
+			Sort:                 pgSort("asc"),
+			MessageTypes:         types.NewMsgTypeBitMask(),
+			ExcludedMessageTypes: types.NewMsgTypeBitMask(),
+		}).
+		Return([]storage.Tx{testTx}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var txs []responses.Tx
+	err := json.NewDecoder(rec.Body).Decode(&txs)
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+}
+
+func (s *TxTestSuite) TestListWithCursorDesc() {
+	q := make(url.Values)
+	q.Set("cursor", "3")
+	q.Set("sort", "desc")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx")
+
+	s.tx.EXPECT().
+		Filter(gomock.Any(), storage.TxFilter{
+			Limit:                10,
+			Offset:               0,
+			Cursor:               3,
+			Sort:                 pgSort("desc"),
+			MessageTypes:         types.NewMsgTypeBitMask(),
+			ExcludedMessageTypes: types.NewMsgTypeBitMask(),
+		}).
+		Return([]storage.Tx{testTx}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var txs []responses.Tx
+	err := json.NewDecoder(rec.Body).Decode(&txs)
+	s.Require().NoError(err)
+	s.Require().Len(txs, 1)
+}
+
+func (s *TxTestSuite) TestListWithCursorAndMsgType() {
+	q := make(url.Values)
+	q.Set("cursor", "3")
+	q.Set("msg_type", "MsgSend")
+	q.Set("sort", "asc")
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/tx")
+
+	s.tx.EXPECT().
+		Filter(gomock.Any(), storage.TxFilter{
+			Limit:                10,
+			Offset:               0,
+			Cursor:               3,
+			Sort:                 pgSort("asc"),
+			MessageTypes:         types.NewMsgTypeBitMask(types.MsgSend),
+			ExcludedMessageTypes: types.NewMsgTypeBitMask(),
+		}).
+		Return([]storage.Tx{}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var txs []responses.Tx
+	err := json.NewDecoder(rec.Body).Decode(&txs)
+	s.Require().NoError(err)
+	s.Require().Empty(txs)
+}
+
 func (s *TxTestSuite) TestBlobsCount() {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
