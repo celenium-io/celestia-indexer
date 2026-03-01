@@ -141,6 +141,7 @@ func (handler *TxHandler) List(c echo.Context) error {
 		MessageTypes:         types.NewMsgTypeBitMask(),
 		ExcludedMessageTypes: types.NewMsgTypeBitMask(),
 		WithMessages:         req.Messages,
+		Cursor:               req.Cursor,
 	}
 	if req.From > 0 {
 		fltrs.TimeFrom = time.Unix(req.From, 0).UTC()

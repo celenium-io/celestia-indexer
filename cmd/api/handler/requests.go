@@ -52,6 +52,7 @@ type txListRequest struct {
 	MsgType         StringArray `query:"msg_type"          validate:"omitempty,dive,msg_type"`
 	ExcludedMsgType StringArray `query:"excluded_msg_type" validate:"omitempty,dive,msg_type"`
 	Messages        bool        `query:"messages"          validate:"omitempty"`
+	Cursor          uint64      `query:"cursor"            validate:"omitempty,min=1"`
 
 	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1"`
 	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1"`

@@ -71,6 +71,15 @@ func txFilterWithoutLimit(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.S
 	if fltrs.WithMessages {
 		query = query.Relation("Messages")
 	}
+	if fltrs.Cursor > 0 {
+		fltrs.Offset = 0
+		switch fltrs.Sort {
+		case sdk.SortOrderAsc:
+			query = query.Where("id > ?", fltrs.Cursor)
+		case sdk.SortOrderDesc:
+			query = query.Where("id < ?", fltrs.Cursor)
+		}
+	}
 	return query
 }
 
@@ -126,6 +135,7 @@ func blobByProviderFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters)
 		query = query.Where("signer_id IN (?)", bun.In(fltrs.Signers))
 	}
 	if fltrs.Cursor > 0 {
+		fltrs.Offset = 0
 		switch fltrs.Sort {
 		case sdk.SortOrderAsc:
 			query = query.Where("id > ?", fltrs.Cursor)
@@ -146,10 +156,6 @@ func blobByProviderFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters)
 }
 
 func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.SelectQuery {
-	if fltrs.Offset > 0 {
-		query = query.Offset(fltrs.Offset)
-	}
-
 	if !fltrs.From.IsZero() {
 		query = query.Where("time >= ?", fltrs.From)
 	}
@@ -163,6 +169,7 @@ func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.S
 		query = query.Where("signer_id IN (?)", bun.In(fltrs.Signers))
 	}
 	if fltrs.Cursor > 0 {
+		fltrs.Offset = 0
 		switch fltrs.Sort {
 		case sdk.SortOrderAsc:
 			query = query.Where("id > ?", fltrs.Cursor)
@@ -173,16 +180,15 @@ func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.S
 	if fltrs.Height > 0 {
 		query = query.Where("height = ?", fltrs.Height)
 	}
+	if fltrs.Offset > 0 {
+		query = query.Offset(fltrs.Offset)
+	}
 
 	query = limitScope(query, fltrs.Limit)
 	return blobLogSort(query, fltrs.SortBy, fltrs.Sort)
 }
 
 func listBlobLogFilters(query *bun.SelectQuery, fltrs storage.ListBlobLogFilters) *bun.SelectQuery {
-	if fltrs.Offset > 0 {
-		query = query.Offset(fltrs.Offset)
-	}
-
 	if !fltrs.From.IsZero() {
 		query = query.Where("time >= ?", fltrs.From)
 	}
@@ -199,12 +205,16 @@ func listBlobLogFilters(query *bun.SelectQuery, fltrs storage.ListBlobLogFilters
 		query = query.Where("namespace_id IN (?)", bun.In(fltrs.Namespaces))
 	}
 	if fltrs.Cursor > 0 {
+		fltrs.Offset = 0
 		switch fltrs.Sort {
 		case sdk.SortOrderAsc:
 			query = query.Where("id > ?", fltrs.Cursor)
 		case sdk.SortOrderDesc:
 			query = query.Where("id < ?", fltrs.Cursor)
 		}
+	}
+	if fltrs.Offset > 0 {
+		query = query.Offset(fltrs.Offset)
 	}
 	if fltrs.Height > 0 {
 		query = query.Where("height = ?", fltrs.Height)
