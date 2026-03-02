@@ -11,7 +11,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/shopspring/decimal"
 )
 
@@ -77,7 +77,7 @@ type Listener interface {
 	io.Closer
 
 	Subscribe(ctx context.Context, channels ...string) error
-	Listen() chan *pq.Notification
+	Listen() <-chan pgconn.Notification
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -232,5 +232,4 @@ type ISearch interface {
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type Export interface {
 	ToCsv(ctx context.Context, writer io.Writer, query string) error
-	Close() error
 }

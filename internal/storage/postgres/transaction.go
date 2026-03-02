@@ -7,17 +7,18 @@ import (
 	"context"
 	"time"
 
+	models "github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/lib/pq"
+	"github.com/dipdup-net/indexer-sdk/pkg/storage"
+	pg "github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
-	"github.com/vmihailenco/msgpack/v5"
-
-	models "github.com/celenium-io/celestia-indexer/internal/storage"
-	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"github.com/uptrace/bun/dialect/pgdialect"
 )
+
+const copyThreashold = 20
 
 type Transaction struct {
 	storage.Transaction
@@ -60,18 +61,12 @@ func (tx Transaction) UpdateConstants(ctx context.Context, constants ...models.C
 }
 
 func (tx Transaction) SaveTransactions(ctx context.Context, txs ...models.Tx) error {
-	switch len(txs) {
-	case 0:
+	if len(txs) == 0 {
 		return nil
-	case 1:
-		return tx.Add(ctx, &txs[0])
-	default:
-		arr := make([]any, len(txs))
-		for i := range txs {
-			arr[i] = &txs[i]
-		}
-		return tx.BulkSave(ctx, arr)
 	}
+
+	_, err := tx.Tx().NewInsert().Model(&txs).Returning("id").Exec(ctx)
+	return err
 }
 
 type addedNamespace struct {
@@ -168,39 +163,7 @@ func (tx Transaction) SaveBalances(ctx context.Context, balances ...models.Balan
 }
 
 func (tx Transaction) SaveEvents(ctx context.Context, events ...models.Event) error {
-	switch {
-	case len(events) == 0:
-		return nil
-	case len(events) < 20:
-		_, err := tx.Tx().NewInsert().Model(&events).Exec(ctx)
-		return err
-	default:
-		stmt, err := tx.Tx().PrepareContext(ctx,
-			pq.CopyIn("event", "height", "time", "position", "type", "tx_id", "data"),
-		)
-		if err != nil {
-			return err
-		}
-
-		for i := range events {
-			var s []byte
-			if len(events[i].Data) > 0 {
-				if raw, err := msgpack.Marshal(events[i].Data); err == nil {
-					s = raw
-				}
-			}
-
-			if _, err := stmt.ExecContext(ctx, events[i].Height, events[i].Time, events[i].Position, events[i].Type, events[i].TxId, s); err != nil {
-				return err
-			}
-		}
-
-		if _, err := stmt.ExecContext(ctx); err != nil {
-			return err
-		}
-
-		return stmt.Close()
-	}
+	return pg.SaveBulkWithCopy(ctx, tx, events, copyThreashold)
 }
 
 func (tx Transaction) SaveMessages(ctx context.Context, msgs ...*models.Message) error {
@@ -222,12 +185,7 @@ func (tx Transaction) SaveSigners(ctx context.Context, addresses ...models.Signe
 }
 
 func (tx Transaction) SaveBlobLogs(ctx context.Context, logs ...models.BlobLog) error {
-	if len(logs) == 0 {
-		return nil
-	}
-
-	_, err := tx.Tx().NewInsert().Model(&logs).Exec(ctx)
-	return err
+	return pg.SaveBulkWithCopy(ctx, tx, logs, copyThreashold)
 }
 
 func (tx Transaction) SaveMsgAddresses(ctx context.Context, addresses ...models.MsgAddress) error {
@@ -664,7 +622,7 @@ func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) (map
 				ids[j] = existsVotes[j].Id
 			}
 			if totalWeight.GreaterThan(one) {
-				if _, err := tx.Tx().NewDelete().Model((*models.Vote)(nil)).Where("id IN (?)", bun.In(ids)).Exec(ctx); err != nil {
+				if _, err := tx.Tx().NewDelete().Model((*models.Vote)(nil)).Where("id IN ?", bun.Tuple(ids)).Exec(ctx); err != nil {
 					return nil, errors.Wrap(err, "remove existing votes")
 				}
 
@@ -1063,7 +1021,7 @@ func (tx Transaction) RollbackVestingPeriods(ctx context.Context, height types.L
 func (tx Transaction) RollbackSigners(ctx context.Context, txIds []uint64) (err error) {
 	_, err = tx.Tx().NewDelete().
 		Model((*models.Signer)(nil)).
-		Where("tx_id = ANY(?)", pq.Array(txIds)).
+		Where("tx_id = ANY(?)", pgdialect.Array(txIds)).
 		Exec(ctx)
 	return
 }
@@ -1071,7 +1029,7 @@ func (tx Transaction) RollbackSigners(ctx context.Context, txIds []uint64) (err 
 func (tx Transaction) RollbackMessageAddresses(ctx context.Context, msgIds []uint64) (err error) {
 	_, err = tx.Tx().NewDelete().
 		Model((*models.MsgAddress)(nil)).
-		Where("msg_id IN (?)", bun.In(msgIds)).
+		Where("msg_id IN ?", bun.Tuple(msgIds)).
 		Exec(ctx)
 	return
 }
@@ -1216,7 +1174,7 @@ func (tx Transaction) DeleteBalances(ctx context.Context, ids []uint64) error {
 
 	_, err := tx.Tx().NewDelete().
 		Model((*models.Balance)(nil)).
-		Where("id IN (?)", bun.In(ids)).
+		Where("id IN ?", bun.Tuple(ids)).
 		Exec(ctx)
 	return err
 }
@@ -1228,7 +1186,7 @@ func (tx Transaction) DeleteDelegationsByValidator(ctx context.Context, ids ...u
 
 	_, err := tx.Tx().NewDelete().
 		Model((*models.Delegation)(nil)).
-		Where("validator_id IN (?)", bun.In(ids)).
+		Where("validator_id IN ?", bun.Tuple(ids)).
 		Exec(ctx)
 	return err
 }
@@ -1320,7 +1278,7 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 		query = query.Set("stack = ?", rollup.Stack)
 	}
 	if rollup.Links != nil {
-		query = query.Set("links = ?", pq.Array(rollup.Links))
+		query = query.Set("links = ?", pgdialect.Array(rollup.Links))
 	}
 	if rollup.Type != "" {
 		query = query.Set("type = ?", rollup.Type)
@@ -1329,7 +1287,7 @@ func (tx Transaction) UpdateRollup(ctx context.Context, rollup *models.Rollup) e
 		query = query.Set("category = ?", rollup.Category)
 	}
 	if rollup.Tags != nil {
-		query = query.Set("tags = ?", pq.Array(rollup.Tags))
+		query = query.Set("tags = ?", pgdialect.Array(rollup.Tags))
 	}
 	if rollup.Provider != "" {
 		query = query.Set("provider = ?", rollup.Provider)

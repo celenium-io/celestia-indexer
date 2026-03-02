@@ -55,7 +55,7 @@ func (s *StorageTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.storage = strg
 
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
+	db, err := sql.Open("pgx", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
 	fixtures, err := testfixtures.New(
@@ -316,9 +316,9 @@ func (s *StorageTestSuite) TestNotify() {
 		case <-ctx.Done():
 			return
 		case msg := <-s.storage.Notificator.Listen():
-			log.Info().Str("msg", msg.Extra).Str("channel", msg.Channel).Msg("new message")
+			log.Info().Str("msg", msg.Payload).Str("channel", msg.Channel).Msg("new message")
 			s.Require().Equal("test", msg.Channel)
-			s.Require().Equal("message", msg.Extra)
+			s.Require().Equal("message", msg.Payload)
 			if ticks == 2 {
 				return
 			}

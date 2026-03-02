@@ -100,10 +100,10 @@ func messagesFilter(query *bun.SelectQuery, fltrs storage.MessageListWithTxFilte
 	query = limitScope(query, fltrs.Limit)
 
 	if len(fltrs.MessageTypes) > 0 {
-		query = query.Where("type IN (?)", bun.In(fltrs.MessageTypes))
+		query = query.Where("type IN ?", bun.Tuple(fltrs.MessageTypes))
 	}
 	if len(fltrs.ExcludedMessageTypes) > 0 {
-		query = query.Where("type NOT IN (?)", bun.In(fltrs.ExcludedMessageTypes))
+		query = query.Where("type NOT IN ?", bun.Tuple(fltrs.ExcludedMessageTypes))
 	}
 	if fltrs.Height > 0 {
 		query = query.Where("message.height = ?", fltrs.Height)
@@ -123,7 +123,7 @@ func blobByProviderFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters)
 		query = query.Where("commitment = ?", fltrs.Commitment)
 	}
 	if len(fltrs.Signers) > 0 {
-		query = query.Where("signer_id IN (?)", bun.In(fltrs.Signers))
+		query = query.Where("signer_id IN ?", bun.Tuple(fltrs.Signers))
 	}
 	if fltrs.Cursor > 0 {
 		switch fltrs.Sort {
@@ -160,7 +160,7 @@ func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.S
 		query = query.Where("commitment = ?", fltrs.Commitment)
 	}
 	if len(fltrs.Signers) > 0 {
-		query = query.Where("signer_id IN (?)", bun.In(fltrs.Signers))
+		query = query.Where("signer_id IN ?", bun.Tuple(fltrs.Signers))
 	}
 	if fltrs.Cursor > 0 {
 		switch fltrs.Sort {
@@ -193,10 +193,10 @@ func listBlobLogFilters(query *bun.SelectQuery, fltrs storage.ListBlobLogFilters
 		query = query.Where("commitment = ?", fltrs.Commitment)
 	}
 	if len(fltrs.Signers) > 0 {
-		query = query.Where("signer_id IN (?)", bun.In(fltrs.Signers))
+		query = query.Where("signer_id IN ?", bun.Tuple(fltrs.Signers))
 	}
 	if len(fltrs.Namespaces) > 0 {
-		query = query.Where("namespace_id IN (?)", bun.In(fltrs.Namespaces))
+		query = query.Where("namespace_id IN ?", bun.Tuple(fltrs.Namespaces))
 	}
 	if fltrs.Cursor > 0 {
 		switch fltrs.Sort {

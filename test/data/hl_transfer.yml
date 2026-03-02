@@ -9,8 +9,8 @@
   counterparty_address: '1234567890abcdef'
   version: 1
   nonce: 1
-  body: 0x01020301
-  metadata: 0x302010
+  body: '0x01020301'
+  metadata: '0x302010'
   type: send
   amount: 1000
   denom: utia
@@ -26,8 +26,8 @@
   counterparty_address: '1234567890abcdef'
   version: 1
   nonce: 1
-  body: 0x01020301
-  metadata: 0x302010
+  body: '0x01020301'
+  metadata: '0x302010'
   type: send
   amount: 2000
   denom: utia
@@ -43,8 +43,8 @@
   counterparty_address: '1234567890abcdef'
   version: 1
   nonce: 1
-  body: 0x01020301
-  metadata: 0x302010
+  body: '0x01020301'
+  metadata: '0x302010'
   type: receive
   amount: 1000
   denom: utia

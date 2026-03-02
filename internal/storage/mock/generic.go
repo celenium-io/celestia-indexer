@@ -20,8 +20,8 @@ import (
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
 	types "github.com/celenium-io/celestia-indexer/pkg/types"
-	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	pq "github.com/lib/pq"
+	pgx "github.com/jackc/pgx/v5"
+	pgconn "github.com/jackc/pgx/v5/pgconn"
 	decimal "github.com/shopspring/decimal"
 	bun "github.com/uptrace/bun"
 	gomock "go.uber.org/mock/gomock"
@@ -152,10 +152,10 @@ func (c *MockListenerCloseCall) DoAndReturn(f func() error) *MockListenerCloseCa
 }
 
 // Listen mocks base method.
-func (m *MockListener) Listen() chan *pq.Notification {
+func (m *MockListener) Listen() <-chan pgconn.Notification {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Listen")
-	ret0, _ := ret[0].(chan *pq.Notification)
+	ret0, _ := ret[0].(<-chan pgconn.Notification)
 	return ret0
 }
 
@@ -172,19 +172,19 @@ type MockListenerListenCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockListenerListenCall) Return(arg0 chan *pq.Notification) *MockListenerListenCall {
+func (c *MockListenerListenCall) Return(arg0 <-chan pgconn.Notification) *MockListenerListenCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockListenerListenCall) Do(f func() chan *pq.Notification) *MockListenerListenCall {
+func (c *MockListenerListenCall) Do(f func() <-chan pgconn.Notification) *MockListenerListenCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockListenerListenCall) DoAndReturn(f func() chan *pq.Notification) *MockListenerListenCall {
+func (c *MockListenerListenCall) DoAndReturn(f func() <-chan pgconn.Notification) *MockListenerListenCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -588,44 +588,6 @@ func (c *MockTransactionCloseCall) Do(f func(context.Context) error) *MockTransa
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionCloseCall) DoAndReturn(f func(context.Context) error) *MockTransactionCloseCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// CopyFrom mocks base method.
-func (m *MockTransaction) CopyFrom(ctx context.Context, tableName string, data []storage0.Copiable) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CopyFrom", ctx, tableName, data)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CopyFrom indicates an expected call of CopyFrom.
-func (mr *MockTransactionMockRecorder) CopyFrom(ctx, tableName, data any) *MockTransactionCopyFromCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyFrom", reflect.TypeOf((*MockTransaction)(nil).CopyFrom), ctx, tableName, data)
-	return &MockTransactionCopyFromCall{Call: call}
-}
-
-// MockTransactionCopyFromCall wrap *gomock.Call
-type MockTransactionCopyFromCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockTransactionCopyFromCall) Return(arg0 error) *MockTransactionCopyFromCall {
-	c.Call = c.Call.Return(arg0)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockTransactionCopyFromCall) Do(f func(context.Context, string, []storage0.Copiable) error) *MockTransactionCopyFromCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionCopyFromCall) DoAndReturn(f func(context.Context, string, []storage0.Copiable) error) *MockTransactionCopyFromCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1375,6 +1337,44 @@ func (c *MockTransactionNamespaceCall) Do(f func(context.Context, uint64) (stora
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionNamespaceCall) DoAndReturn(f func(context.Context, uint64) (storage.Namespace, error)) *MockTransactionNamespaceCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Pool mocks base method.
+func (m *MockTransaction) Pool() *pgx.Conn {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Pool")
+	ret0, _ := ret[0].(*pgx.Conn)
+	return ret0
+}
+
+// Pool indicates an expected call of Pool.
+func (mr *MockTransactionMockRecorder) Pool() *MockTransactionPoolCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Pool", reflect.TypeOf((*MockTransaction)(nil).Pool))
+	return &MockTransactionPoolCall{Call: call}
+}
+
+// MockTransactionPoolCall wrap *gomock.Call
+type MockTransactionPoolCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionPoolCall) Return(arg0 *pgx.Conn) *MockTransactionPoolCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionPoolCall) Do(f func() *pgx.Conn) *MockTransactionPoolCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionPoolCall) DoAndReturn(f func() *pgx.Conn) *MockTransactionPoolCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -5421,44 +5421,6 @@ func NewMockExport(ctrl *gomock.Controller) *MockExport {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockExport) EXPECT() *MockExportMockRecorder {
 	return m.recorder
-}
-
-// Close mocks base method.
-func (m *MockExport) Close() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Close")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Close indicates an expected call of Close.
-func (mr *MockExportMockRecorder) Close() *MockExportCloseCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockExport)(nil).Close))
-	return &MockExportCloseCall{Call: call}
-}
-
-// MockExportCloseCall wrap *gomock.Call
-type MockExportCloseCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockExportCloseCall) Return(arg0 error) *MockExportCloseCall {
-	c.Call = c.Call.Return(arg0)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockExportCloseCall) Do(f func() error) *MockExportCloseCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockExportCloseCall) DoAndReturn(f func() error) *MockExportCloseCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
 }
 
 // ToCsv mocks base method.

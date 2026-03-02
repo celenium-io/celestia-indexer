@@ -9,11 +9,11 @@ import (
 	"sync"
 
 	json "github.com/bytedance/sonic"
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-io/workerpool"
-	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -99,10 +99,6 @@ func (d *Dispatcher) listen(ctx context.Context) {
 			if !ok {
 				return
 			}
-			if notification == nil {
-				log.Warn().Msg("nil notification")
-				continue
-			}
 			if err := d.handleNotification(ctx, notification); err != nil {
 				log.Err(err).Str("channel", notification.Channel).Msg("handle notification")
 			}
@@ -110,12 +106,12 @@ func (d *Dispatcher) listen(ctx context.Context) {
 	}
 }
 
-func (d *Dispatcher) handleNotification(ctx context.Context, notification *pq.Notification) error {
+func (d *Dispatcher) handleNotification(ctx context.Context, notification pgconn.Notification) error {
 	switch notification.Channel {
 	case storage.ChannelHead:
-		return d.handleState(ctx, notification.Extra)
+		return d.handleState(ctx, notification.Payload)
 	case storage.ChannelBlock:
-		return d.handleBlock(ctx, notification.Extra)
+		return d.handleBlock(ctx, notification.Payload)
 	default:
 		return errors.Errorf("unknown channel name: %s", notification.Channel)
 	}

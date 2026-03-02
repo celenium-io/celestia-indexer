@@ -51,7 +51,7 @@ func (s *BlockStatsTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.storage = strg
 
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
+	db, err := sql.Open("pgx", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
 	fixtures, err := testfixtures.New(

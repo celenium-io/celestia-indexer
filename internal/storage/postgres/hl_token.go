@@ -62,7 +62,7 @@ func (t *HLToken) List(ctx context.Context, filters storage.ListHyperlaneTokens)
 		query = query.Where("owner_id = ?", filters.OwnerId)
 	}
 	if len(filters.Type) > 0 {
-		query = query.Where("type IN (?)", bun.In(filters.Type))
+		query = query.Where("type IN ?", bun.Tuple(filters.Type))
 	}
 
 	err = t.DB().NewSelect().

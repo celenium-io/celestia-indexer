@@ -61,7 +61,7 @@ func (m *Message) ByAddress(ctx context.Context, addressId uint64, filters stora
 		Join("left join message as msg on msg_address.msg_id = msg.id").
 		Join("left join tx on tx.id = msg.tx_id and tx.time = msg.time")
 	if len(filters.MessageTypes) > 0 {
-		wrapQuery = wrapQuery.Where("msg.type IN (?)", bun.In(filters.MessageTypes))
+		wrapQuery = wrapQuery.Where("msg.type IN ?", bun.Tuple(filters.MessageTypes))
 	}
 	wrapQuery = sortScope(wrapQuery, "msg_id", filters.Sort)
 	err = wrapQuery.Scan(ctx, &msgs)

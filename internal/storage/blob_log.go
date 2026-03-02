@@ -57,6 +57,8 @@ type IBlobLog interface {
 	ListBlobs(ctx context.Context, fltrs ListBlobLogFilters) ([]BlobLog, error)
 }
 
+var _ sdk.Copiable = (*BlobLog)(nil)
+
 type BlobLog struct {
 	bun.BaseModel `bun:"blob_log" comment:"Table with flatted blob entities."`
 
@@ -83,4 +85,27 @@ type BlobLog struct {
 
 func (BlobLog) TableName() string {
 	return "blob_log"
+}
+
+func (BlobLog) Columns() []string {
+	return []string{
+		"time", "height", "size", "share_version", "commitment", "content_type",
+		"fee", "signer_id", "namespace_id", "msg_id", "tx_id",
+	}
+}
+
+func (b BlobLog) Flat() ([]any, error) {
+	return []any{
+		b.Time,
+		int64(b.Height),
+		b.Size,
+		b.ShareVersion,
+		b.Commitment,
+		b.ContentType,
+		b.Fee.String(),
+		b.SignerId,
+		b.NamespaceId,
+		b.MsgId,
+		b.TxId,
+	}, nil
 }

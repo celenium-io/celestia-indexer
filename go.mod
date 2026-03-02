@@ -10,15 +10,15 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.7 // indirect
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.96.0 // indirect
 	github.com/aws/smithy-go v1.24.0 // indirect
-	github.com/celenium-io/celestial-module v0.0.8
+	github.com/celenium-io/celestial-module v0.0.9
 	github.com/celestiaorg/go-square/v3 v3.0.2
 	github.com/celestiaorg/rsmt2d v0.15.1
 	github.com/cometbft/cometbft v0.38.17
 	github.com/cosmos/cosmos-sdk v0.53.0
 	github.com/cosmos/ibc-go/v8 v8.7.0
 	github.com/dipdup-io/workerpool v0.0.4
-	github.com/dipdup-net/go-lib v0.4.10
-	github.com/dipdup-net/indexer-sdk v0.0.8
+	github.com/dipdup-net/go-lib v0.5.0
+	github.com/dipdup-net/indexer-sdk v0.0.9
 	github.com/fatih/structs v1.1.0
 	github.com/gabriel-vasile/mimetype v1.4.9
 	github.com/getsentry/sentry-go v0.42.0
@@ -32,16 +32,16 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/labstack/echo-contrib v0.15.0
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/lib/pq v1.11.2
+	github.com/lib/pq v1.11.2 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.34.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/cobra v1.10.2
 	github.com/stoewer/go-strcase v1.3.0
 	github.com/stretchr/testify v1.11.1
-	github.com/uptrace/bun v1.2.15
-	github.com/uptrace/bun/dialect/pgdialect v1.2.15
-	github.com/uptrace/bun/driver/pgdriver v1.2.15
+	github.com/uptrace/bun v1.2.18
+	github.com/uptrace/bun/dialect/pgdialect v1.2.18
+	github.com/uptrace/bun/driver/pgdriver v1.2.18
 	github.com/valkey-io/valkey-go v1.0.57
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	go.opentelemetry.io/otel/trace v1.40.0
@@ -64,6 +64,8 @@ require (
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/gogoproto v1.7.2
 	github.com/gogo/protobuf v1.3.3
+	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
+	github.com/jackc/pgx/v5 v5.8.0
 	github.com/opus-domini/fast-shot v1.1.4
 	github.com/prometheus/client_golang v1.23.2
 	github.com/sony/gobreaker/v2 v2.3.0
@@ -229,6 +231,9 @@ require (
 	github.com/improbable-eng/grpc-web v0.15.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/ingonyama-zk/icicle-gnark/v3 v3.2.2 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jmhodges/levigo v1.0.0 // indirect

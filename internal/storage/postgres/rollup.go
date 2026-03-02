@@ -44,7 +44,7 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 		Join("left join da_change on da_change.rollup_id = leaderboard.id")
 
 	if len(fltrs.Category) > 0 {
-		query = query.Where("category IN (?)", bun.In(fltrs.Category))
+		query = query.Where("category IN ?", bun.Tuple(fltrs.Category))
 	}
 
 	if len(fltrs.Tags) > 0 {
@@ -59,15 +59,15 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 	}
 
 	if len(fltrs.Stack) > 0 {
-		query = query.Where("stack IN (?)", bun.In(fltrs.Stack))
+		query = query.Where("stack IN ?", bun.Tuple(fltrs.Stack))
 	}
 
 	if len(fltrs.Provider) > 0 {
-		query = query.Where("provider IN (?)", bun.In(fltrs.Provider))
+		query = query.Where("provider IN ?", bun.Tuple(fltrs.Provider))
 	}
 
 	if len(fltrs.Type) > 0 {
-		query = query.Where("type IN (?)", bun.In(fltrs.Type))
+		query = query.Where("type IN ?", bun.Tuple(fltrs.Type))
 	}
 
 	if fltrs.IsActive != nil {
@@ -97,7 +97,7 @@ func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFi
 		Join("left join rollup on rollup.id = rollup_id AND rollup.verified = true")
 
 	if len(fltrs.Category) > 0 {
-		query = query.Where("category IN (?)", bun.In(fltrs.Category))
+		query = query.Where("category IN ?", bun.Tuple(fltrs.Category))
 	}
 
 	if len(fltrs.Tags) > 0 {
@@ -112,15 +112,15 @@ func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFi
 	}
 
 	if len(fltrs.Stack) > 0 {
-		query = query.Where("stack IN (?)", bun.In(fltrs.Stack))
+		query = query.Where("stack IN ?", bun.Tuple(fltrs.Stack))
 	}
 
 	if len(fltrs.Provider) > 0 {
-		query = query.Where("provider IN (?)", bun.In(fltrs.Provider))
+		query = query.Where("provider IN ?", bun.Tuple(fltrs.Provider))
 	}
 
 	if len(fltrs.Type) > 0 {
-		query = query.Where("type IN (?)", bun.In(fltrs.Type))
+		query = query.Where("type IN ?", bun.Tuple(fltrs.Type))
 	}
 
 	query = sortScope(query, fltrs.SortField, fltrs.Sort)

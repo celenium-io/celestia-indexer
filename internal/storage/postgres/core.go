@@ -87,7 +87,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		return Storage{}, err
 	}
 
-	export := NewExport(cfg)
+	export := NewExport(strg.Connection())
 
 	s := Storage{
 		cfg:             cfg,
@@ -137,7 +137,7 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		ZkISM:           NewZkISM(strg.Connection()),
 		Celestials:      celestialsPg.NewCelestials(strg.Connection()),
 		CelestialState:  celestialsPg.NewCelestialState(strg.Connection()),
-		Notificator:     NewNotificator(cfg, strg.Connection().DB()),
+		Notificator:     NewNotificator(strg.Connection().Pool()),
 
 		export: export,
 	}
@@ -149,6 +149,8 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 		return s, errors.Wrap(err, "creating views")
 	}
 
+	// reset all connections for registering custom types
+	strg.Connection().Pool().Reset()
 	return s, nil
 }
 
@@ -208,7 +210,7 @@ func initDatabaseWithMigrations(ctx context.Context, conn *database.Bun) error {
 }
 
 func (s Storage) CreateListener() models.Listener {
-	return NewNotificator(s.cfg, s.Notificator.db)
+	return NewNotificator(s.Notificator.pool)
 }
 
 func createHypertables(ctx context.Context, conn *database.Bun) error {
@@ -272,9 +274,6 @@ func migrateDatabase(ctx context.Context, db *database.Bun) error {
 }
 
 func (s Storage) Close() error {
-	if err := s.export.Close(); err != nil {
-		return err
-	}
 	if err := s.Storage.Close(); err != nil {
 		return err
 	}

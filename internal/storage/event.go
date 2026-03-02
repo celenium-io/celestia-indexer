@@ -8,9 +8,11 @@ import (
 	"time"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/pkg/errors"
+	"github.com/vmihailenco/msgpack/v5"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-net/indexer-sdk/pkg/storage"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
 
@@ -22,11 +24,13 @@ type EventFilter struct {
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IEvent interface {
-	storage.Table[*Event]
+	sdk.Table[*Event]
 
 	ByTxId(ctx context.Context, txId uint64, fltrs EventFilter) ([]Event, error)
 	ByBlock(ctx context.Context, height pkgTypes.Level, fltrs EventFilter) ([]Event, error)
 }
+
+var _ sdk.Copiable = (*Event)(nil)
 
 // Event -
 type Event struct {
@@ -44,4 +48,33 @@ type Event struct {
 // TableName -
 func (Event) TableName() string {
 	return "event"
+}
+func (e Event) Flat() ([]any, error) {
+	var data []byte
+	if len(e.Data) > 0 {
+		var encErr error
+		data, encErr = msgpack.Marshal(e.Data)
+		if encErr != nil {
+			return nil, errors.Wrap(encErr, "msgpack marshal event's data")
+		}
+	}
+
+	var txID any
+	if e.TxId != nil {
+		txID = int64(*e.TxId)
+	}
+	return []any{
+		int64(e.Height),
+		e.Time,
+		e.Position,
+		string(e.Type),
+		txID,
+		data,
+	}, nil
+}
+
+func (e Event) Columns() []string {
+	return []string{
+		"height", "time", "position", "type", "tx_id", "data",
+	}
 }

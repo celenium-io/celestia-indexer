@@ -18,7 +18,7 @@ const (
 	createTypeQuery = `DO $$
 	BEGIN
 		IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ?) THEN
-			CREATE TYPE ? AS ENUM (?);
+			CREATE TYPE ? AS ENUM ?;
 		END IF;
 	END$$;`
 )
@@ -35,7 +35,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"event_type",
 			bun.Safe("event_type"),
-			bun.In(types.EventTypeValues()),
+			bun.Tuple(types.EventTypeValues()),
 		); err != nil {
 			return err
 		}
@@ -45,7 +45,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"msg_type",
 			bun.Safe("msg_type"),
-			bun.In(types.MsgTypeValues()),
+			bun.Tuple(types.MsgTypeValues()),
 		); err != nil {
 			return err
 		}
@@ -55,7 +55,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"status",
 			bun.Safe("status"),
-			bun.In(types.StatusValues()),
+			bun.Tuple(types.StatusValues()),
 		); err != nil {
 			return err
 		}
@@ -65,7 +65,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"msg_address_type",
 			bun.Safe("msg_address_type"),
-			bun.In(types.MsgAddressTypeValues()),
+			bun.Tuple(types.MsgAddressTypeValues()),
 		); err != nil {
 			return err
 		}
@@ -75,7 +75,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"module_name",
 			bun.Safe("module_name"),
-			bun.In(types.ModuleNameValues()),
+			bun.Tuple(types.ModuleNameValues()),
 		); err != nil {
 			return err
 		}
@@ -85,7 +85,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"staking_log_type",
 			bun.Safe("staking_log_type"),
-			bun.In(types.StakingLogTypeValues()),
+			bun.Tuple(types.StakingLogTypeValues()),
 		); err != nil {
 			return err
 		}
@@ -95,7 +95,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"vesting_type",
 			bun.Safe("vesting_type"),
-			bun.In(types.VestingTypeValues()),
+			bun.Tuple(types.VestingTypeValues()),
 		); err != nil {
 			return err
 		}
@@ -105,7 +105,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"rollup_type",
 			bun.Safe("rollup_type"),
-			bun.In(types.RollupTypeValues()),
+			bun.Tuple(types.RollupTypeValues()),
 		); err != nil {
 			return err
 		}
@@ -115,7 +115,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"rollup_category",
 			bun.Safe("rollup_category"),
-			bun.In(types.RollupCategoryValues()),
+			bun.Tuple(types.RollupCategoryValues()),
 		); err != nil {
 			return err
 		}
@@ -125,7 +125,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"proposal_status",
 			bun.Safe("proposal_status"),
-			bun.In(types.ProposalStatusValues()),
+			bun.Tuple(types.ProposalStatusValues()),
 		); err != nil {
 			return err
 		}
@@ -135,7 +135,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"proposal_type",
 			bun.Safe("proposal_type"),
-			bun.In(types.ProposalTypeValues()),
+			bun.Tuple(types.ProposalTypeValues()),
 		); err != nil {
 			return err
 		}
@@ -145,7 +145,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"vote_option",
 			bun.Safe("vote_option"),
-			bun.In(types.VoteOptionValues()),
+			bun.Tuple(types.VoteOptionValues()),
 		); err != nil {
 			return err
 		}
@@ -155,7 +155,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"ibc_channel_status",
 			bun.Safe("ibc_channel_status"),
-			bun.In(types.IbcChannelStatusValues()),
+			bun.Tuple(types.IbcChannelStatusValues()),
 		); err != nil {
 			return err
 		}
@@ -165,7 +165,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"hyperlane_transfer_type",
 			bun.Safe("hyperlane_transfer_type"),
-			bun.In(types.HLTransferTypeValues()),
+			bun.Tuple(types.HLTransferTypeValues()),
 		); err != nil {
 			return err
 		}
@@ -175,7 +175,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"hyperlane_token_type",
 			bun.Safe("hyperlane_token_type"),
-			bun.In(types.HLTokenTypeValues()),
+			bun.Tuple(types.HLTokenTypeValues()),
 		); err != nil {
 			return err
 		}
@@ -185,7 +185,7 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"upgrade_status",
 			bun.Safe("upgrade_status"),
-			bun.In(types.UpgradeStatusValues()),
+			bun.Tuple(types.UpgradeStatusValues()),
 		); err != nil {
 			return err
 		}

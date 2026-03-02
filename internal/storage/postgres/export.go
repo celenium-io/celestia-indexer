@@ -5,49 +5,34 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"io"
 
-	"github.com/dipdup-net/go-lib/config"
+	"github.com/dipdup-net/go-lib/database"
+	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
 )
 
 type Export struct {
-	*bun.DB
+	*database.Bun
 }
 
-func NewExport(cfg config.Database) *Export {
-	dsn := fmt.Sprintf(
-		"postgres://%s:%s@%s:%d/%s?sslmode=disable&application_name=export",
-		cfg.User,
-		cfg.Password,
-		cfg.Host,
-		cfg.Port,
-		cfg.Database,
-	)
-	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
-	db := bun.NewDB(sqldb, pgdialect.New())
+func NewExport(db *database.Bun) *Export {
 	return &Export{db}
 }
 
 func (e *Export) ToCsv(ctx context.Context, writer io.Writer, query string) error {
-	conn, err := e.Conn(ctx)
-	if err != nil {
-		return err
+	pool := e.Pool()
+	if pool == nil {
+		return errors.New("pool is nil")
 	}
-	defer conn.Close()
+	conn, err := pool.Acquire(ctx)
+	if err != nil {
+		return errors.Wrap(err, "acquire connection pool")
+	}
+	defer conn.Release()
 
 	rawQuery := fmt.Sprintf("COPY (%s) TO STDOUT WITH CSV HEADER", bun.Safe(query))
-	_, err = pgdriver.CopyTo(ctx, conn, writer, rawQuery)
+	_, err = conn.Conn().PgConn().CopyTo(ctx, writer, rawQuery)
 	return err
-}
-
-func (e *Export) Close() error {
-	if err := e.DB.Close(); err != nil {
-		return err
-	}
-	return nil
 }

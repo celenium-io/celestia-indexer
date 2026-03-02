@@ -68,7 +68,7 @@ func (s *TransactionTestSuite) TearDownSuite() {
 }
 
 func (s *TransactionTestSuite) BeforeTest(suiteName, testName string) {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
+	db, err := sql.Open("pgx", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
 	fixtures, err := testfixtures.New(
@@ -324,6 +324,40 @@ func (s *TransactionTestSuite) TestSaveBlobLogs() {
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestSaveBlobLogsWithCopy() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	blobLogs := make([]storage.BlobLog, 1000)
+	for i := 0; i < 1000; i++ {
+		blobLogs[i].MsgId = uint64(i + 1)
+		blobLogs[i].NamespaceId = uint64(10000 - i)
+		blobLogs[i].TxId = uint64((i + 1) * 2)
+		blobLogs[i].Time = time.Now()
+		blobLogs[i].Height = 1000
+		blobLogs[i].Commitment = testsuite.RandomText(16)
+		blobLogs[i].ContentType = "application/json"
+		blobLogs[i].Fee = decimal.NewFromInt(17263)
+		blobLogs[i].ShareVersion = 1
+		blobLogs[i].SignerId = uint64(i * 3)
+		blobLogs[i].Size = 123
+	}
+
+	err = tx.SaveBlobLogs(ctx, blobLogs...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	var count int
+	err = s.storage.Connection().DB().QueryRow("select count(*) from blob_log").Scan(&count)
+	s.Require().NoError(err)
+	s.Require().GreaterOrEqual(count, 1000)
 }
 
 func (s *TransactionTestSuite) TestSaveProposals() {

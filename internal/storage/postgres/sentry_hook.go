@@ -100,7 +100,7 @@ func (h *SentryHook) eventQuery(event *bun.QueryEvent) string {
 
 func unformattedQuery(event *bun.QueryEvent) string {
 	if event.IQuery != nil {
-		if b, err := event.IQuery.AppendQuery(schema.NewNopFormatter(), nil); err == nil {
+		if b, err := event.IQuery.AppendQuery(schema.NewNopQueryGen(), nil); err == nil {
 			return string(b)
 		}
 	}

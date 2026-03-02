@@ -126,7 +126,7 @@ func (a *Address) IdByHash(ctx context.Context, hash ...[]byte) (id []uint64, er
 	err = a.DB().NewSelect().
 		Model((*storage.Address)(nil)).
 		Column("id").
-		Where("hash IN (?)", bun.In(hash)).
+		Where("hash IN ?", bun.Tuple(hash)).
 		Scan(ctx, &id)
 	return
 }
@@ -138,7 +138,7 @@ func (a *Address) IdByAddress(ctx context.Context, address string, ids ...uint64
 		Column("id").
 		Where("address = ?", address)
 	if len(ids) > 0 {
-		query = query.Where("id IN (?)", bun.In(ids))
+		query = query.Where("id IN ?", bun.Tuple(ids))
 	}
 	err = query.Scan(ctx, &id)
 	return
