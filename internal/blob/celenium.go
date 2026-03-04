@@ -11,7 +11,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/dipdup-net/go-lib/config"
+	"github.com/dipdup-io/go-lib/config"
 	fastshot "github.com/opus-domini/fast-shot"
 	"github.com/opus-domini/fast-shot/constant/mime"
 	"github.com/pkg/errors"

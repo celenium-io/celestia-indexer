@@ -26,7 +26,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/node"
 	nodeApi "github.com/celenium-io/celestia-indexer/pkg/node/dal"
 	"github.com/celenium-io/celestia-indexer/pkg/node/rpc"
-	"github.com/dipdup-net/go-lib/config"
+	"github.com/dipdup-io/go-lib/config"
 	"github.com/getsentry/sentry-go"
 	"github.com/grafana/pyroscope-go"
 	"github.com/labstack/echo-contrib/echoprometheus"

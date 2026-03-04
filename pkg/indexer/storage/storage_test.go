@@ -14,8 +14,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	indexerCfg "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/dipdup-net/go-lib/config"
-	"github.com/dipdup-net/go-lib/database"
+	"github.com/dipdup-io/go-lib/config"
+	"github.com/dipdup-io/go-lib/database"
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/stretchr/testify/suite"
 )

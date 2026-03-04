@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dipdup-net/go-lib/config"
-	"github.com/dipdup-net/go-lib/database"
+	"github.com/dipdup-io/go-lib/config"
+	"github.com/dipdup-io/go-lib/database"
 	"github.com/stretchr/testify/require"
 )
 

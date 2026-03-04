@@ -36,7 +36,7 @@ func Test_handleSetToken(t *testing.T) {
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.warp.v1.EventSetToken",
-					Data: map[string]any{
+					Data: map[string]any{ //nolint:gosec
 						"owner":              "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 						"ism_id":             "",
 						"token_id":           "0x726f757465725f61707000000000000000000000000000010000000000000000",
@@ -67,7 +67,7 @@ func Test_handleSetToken(t *testing.T) {
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.warp.v1.EventSetToken",
-					Data: map[string]any{
+					Data: map[string]any{ //nolint:gosec
 						"owner":              "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j",
 						"ism_id":             "0x726f757465725f69736d00000000000000000000000000000000000000000001",
 						"token_id":           "0x726f757465725f61707000000000000000000000000000020000000000000001",

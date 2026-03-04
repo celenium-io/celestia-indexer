@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Celestia Indexer — CLAUDE.md
 
 ## Project Overview
@@ -72,19 +76,27 @@ configs/
 ## Commands
 
 ```bash
+make init         # chmod + run init.dev.sh (first-time dev setup)
 make indexer      # go run ./cmd/indexer -c ./configs/dipdup.yml
 make api          # go run ./cmd/api -c ./configs/dipdup.yml
 make private_api  # go run ./cmd/private_api -c ./configs/dipdup.yml
 make celestials   # go run ./cmd/celestials -c ./configs/dipdup.yml
 make build        # build all binaries to /bin
 make test         # go test -p 8 -timeout 120s ./...
-make generate     # go generate ./... (regenerate mocks + enums)
+make generate     # go generate (mocks + enums for storage, blob, node, gas packages)
 make api-docs     # swag init (regenerate Swagger)
 make ga           # generate + api-docs
 make lint         # golangci-lint
 make gc           # lint → test → commit
 make compose      # docker compose up --build
 make cover        # generate coverage report
+make license-header  # add/update SPDX headers across all files
+```
+
+**Run a single test or package:**
+```bash
+go test ./internal/storage/postgres/... -run TestBlockByHeight -v
+go test ./cmd/api/handler/... -timeout 30s
 ```
 
 ## Configuration
@@ -272,7 +284,7 @@ stopperModule.AttachTo(r, receiver.StopOutput, stopper.InputName)
 - Message types use bitmask (bit vectors of size 115) for efficient multi-type filtering
 - Enum types are code-generated via `make generate` — never edit `*_enum.go` files manually
 - Active linters to watch: `zerologlint`, `musttag`, `gosec`, `containedctx`
-- SPDX license headers required on all new files: `// SPDX-FileCopyrightText: 2025 Bb Strategy Pte. Ltd.` + `// SPDX-License-Identifier: MIT`
+- SPDX license headers required on all new files: `// SPDX-FileCopyrightText: 2025 Bb Strategy Pte. Ltd. <celenium@baking-bad.org>` + `// SPDX-License-Identifier: MIT` (run `make license-header` to apply automatically)
 - JSON marshaling uses `github.com/bytedance/sonic` (faster than `encoding/json`)
 
 ## Entity Types Overview
@@ -295,6 +307,7 @@ Key entities indexed (57 total storage types):
 ## Testing
 
 - Mocks are auto-generated in `mock/` subdirectories — never edit manually
+- DB integration tests spin up a real TimescaleDB Docker container via testcontainers — **Docker must be running**
 - `testfixtures` for DB integration tests (`test/` directory)
 - Newman collection for API tests: `make test-api`
 - Run `make test` before committing

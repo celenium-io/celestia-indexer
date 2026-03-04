@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/bytedance/sonic"
-	"github.com/dipdup-net/go-lib/config"
+	"github.com/dipdup-io/go-lib/config"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -91,7 +91,7 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 	}
 	req.Header.Set("User-Agent", celeniumUserAgent)
 
-	response, err := api.client.Do(req)
+	response, err := api.client.Do(req) //nolint:gosec
 	if err != nil {
 		return err
 	}

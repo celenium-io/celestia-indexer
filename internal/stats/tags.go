@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/dipdup-net/go-lib/hasura"
+	"github.com/ettle/strcase"
 	"github.com/pkg/errors"
 )
 
@@ -76,7 +76,7 @@ func InitModel(model any) error {
 		case "BaseModel":
 			tableName = strings.TrimPrefix(bunTagValues[0], "table:")
 			if tableName == "" {
-				tableName = hasura.ToSnakeCase(typ.Name())
+				tableName = strcase.ToSnake(typ.Name())
 			}
 		default:
 			statsTag := field.Tag.Get(statsTagName)
@@ -108,7 +108,7 @@ func InitModel(model any) error {
 			}
 			columnName := bunTagValues[0]
 			if columnName == "" {
-				columnName = hasura.ToSnakeCase(field.Name)
+				columnName = strcase.ToSnake(field.Name)
 			}
 			table.Columns[columnName] = column
 		}

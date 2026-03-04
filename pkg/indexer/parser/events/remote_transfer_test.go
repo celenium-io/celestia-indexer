@@ -63,7 +63,7 @@ func Test_handleHyperlaneRemoteTransfer(t *testing.T) {
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.warp.v1.EventSendRemoteTransfer",
-					Data: map[string]any{
+					Data: map[string]any{ //nolint:gosec
 						"amount":             "6745utia",
 						"sender":             "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 						"token_id":           "0x726f757465725f61707000000000000000000000000000010000000000000000",

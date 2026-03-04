@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-net/go-lib/config"
-	"github.com/dipdup-net/go-lib/database"
+	"github.com/dipdup-io/go-lib/config"
+	"github.com/dipdup-io/go-lib/database"
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/stretchr/testify/suite"
 )

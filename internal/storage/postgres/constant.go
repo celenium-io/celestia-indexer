@@ -8,7 +8,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-net/go-lib/database"
+	"github.com/dipdup-io/go-lib/database"
 )
 
 // Constant -

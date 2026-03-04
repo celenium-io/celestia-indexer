@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
-	"github.com/dipdup-net/go-lib/config"
+	"github.com/dipdup-io/go-lib/config"
 	pg "github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/stretchr/testify/require"
 )
