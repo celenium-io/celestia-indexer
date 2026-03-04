@@ -28,7 +28,6 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/gosimple/slug v1.15.0
 	github.com/grafana/pyroscope-go v1.2.7
-	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/labstack/echo-contrib v0.15.0
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/lib/pq v1.11.2 // indirect
@@ -63,8 +62,8 @@ require (
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/gogoproto v1.7.2
 	github.com/dipdup-io/go-lib/config v1.0.0
-	github.com/dipdup-io/go-lib/database v1.0.0
-	github.com/dipdup-io/go-lib/hasura v1.0.0
+	github.com/dipdup-io/go-lib/database v1.0.1
+	github.com/ettle/strcase v0.2.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
 	github.com/jackc/pgx/v5 v5.8.0
@@ -263,8 +262,6 @@ require (
 	github.com/moby/sys/user v0.4.0 // indirect
 	github.com/moby/sys/userns v0.1.0 // indirect
 	github.com/moby/term v0.5.0 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
