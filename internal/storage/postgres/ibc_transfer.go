@@ -50,7 +50,7 @@ func (c *IbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFil
 		query = query.Where("sender_id = ?", *fltrs.SenderId)
 	}
 	if len(fltrs.ConnectionIds) > 0 {
-		query = query.Where("connection_id IN (?)", bun.In(fltrs.ConnectionIds))
+		query = query.Where("connection_id IN ?", bun.Tuple(fltrs.ConnectionIds))
 	}
 
 	err = c.DB().NewSelect().

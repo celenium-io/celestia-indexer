@@ -950,6 +950,11 @@ func (mask *MsgTypeBits) Scan(src interface{}) (err error) {
 		if err != nil {
 			return err
 		}
+	case string:
+		mask.Bits, err = NewBitsFromString(val)
+		if err != nil {
+			return err
+		}
 	case nil:
 		mask.Bits = NewEmptyBits()
 	default:

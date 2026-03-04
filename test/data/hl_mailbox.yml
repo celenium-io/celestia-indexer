@@ -5,9 +5,9 @@
   mailbox: mailbox
   internal_id: 1
   owner_id: 1
-  default_ism: 0x03020A
-  default_hook: 0x03020A
-  required_hook: 0x03020A
+  default_ism: '0x03020A'
+  default_hook: '0x03020A'
+  required_hook: '0x03020A'
   domain: 123
   sent_messages: 12
   received_messages: 21

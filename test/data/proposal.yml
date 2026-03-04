@@ -21,7 +21,7 @@
   no_addrs: 1
   no_with_veto_addrs: 0
   abstain_addrs: 1
-  changes: 0x0001
+  changes: '0x0001'
   total_voting_power: 0
   voting_power: 0
   yes_voting_power: 0
@@ -57,7 +57,7 @@
   no_addrs: 1
   no_with_veto_addrs: 0
   abstain_addrs: 1
-  changes: 0x0001
+  changes: '0x0001'
   total_voting_power: 0
   voting_power: 0
   yes_voting_power: 0

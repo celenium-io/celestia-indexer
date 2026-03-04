@@ -21,8 +21,8 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/gorilla/websocket"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/labstack/echo/v4"
-	"github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 
@@ -37,7 +37,7 @@ func TestWebsocket(t *testing.T) {
 
 	listenerFactory.EXPECT().CreateListener().Return(listener).Times(1)
 
-	headChannel := make(chan *pq.Notification, 10)
+	headChannel := make(chan pgconn.Notification, 10)
 	listener.EXPECT().Listen().Return(headChannel).AnyTimes()
 	listener.EXPECT().Subscribe(gomock.Any(), storage.ChannelHead).Return(nil).Times(1)
 	listener.EXPECT().Close().Return(nil).MaxTimes(1)
@@ -101,9 +101,9 @@ func TestWebsocket(t *testing.T) {
 				data, err := json.Marshal(block)
 				require.NoError(t, err)
 
-				headChannel <- &pq.Notification{
+				headChannel <- pgconn.Notification{
 					Channel: storage.ChannelBlock,
-					Extra:   string(data),
+					Payload: string(data),
 				}
 			}
 		}

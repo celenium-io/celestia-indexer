@@ -98,6 +98,6 @@ func (n *Namespace) GetByIds(ctx context.Context, ids ...uint64) (ns []storage.N
 		return nil, nil
 	}
 
-	err = n.DB().NewSelect().Model(&ns).Where("id IN (?)", bun.In(ids)).Scan(ctx)
+	err = n.DB().NewSelect().Model(&ns).Where("id IN ?", bun.Tuple(ids)).Scan(ctx)
 	return
 }

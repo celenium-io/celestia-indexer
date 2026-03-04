@@ -54,7 +54,7 @@ func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTran
 		query = query.Where("counterparty = ?", filters.Domain)
 	}
 	if len(filters.Type) > 0 {
-		query = query.Where("type IN (?)", bun.In(filters.Type))
+		query = query.Where("type IN ?", bun.Tuple(filters.Type))
 	}
 
 	err = t.DB().NewSelect().

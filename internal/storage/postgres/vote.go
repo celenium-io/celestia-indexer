@@ -37,7 +37,7 @@ func (v *Vote) ByProposalId(ctx context.Context, proposalId uint64, fltrs storag
 	}
 
 	if len(fltrs.Option) > 0 {
-		subQuery = subQuery.Where("option IN (?)", bun.In(fltrs.Option))
+		subQuery = subQuery.Where("option IN ?", bun.Tuple(fltrs.Option))
 	}
 
 	switch fltrs.VoterType {

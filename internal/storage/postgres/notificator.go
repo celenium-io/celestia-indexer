@@ -5,62 +5,75 @@ package postgres
 
 import (
 	"context"
-	"fmt"
-	"time"
+	"sync"
 
-	"github.com/dipdup-net/go-lib/config"
-	"github.com/lib/pq"
-	"github.com/uptrace/bun"
-)
-
-const (
-	minReconnectInterval = 10 * time.Second
-	maxReconnectInterval = time.Minute
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/pkg/errors"
 )
 
 type Notificator struct {
-	db *bun.DB
-	l  *pq.Listener
+	pool *pgxpool.Pool
+	ch   chan pgconn.Notification
+	once sync.Once
+	done chan struct{}
+	wg   sync.WaitGroup
 }
 
-func NewNotificator(cfg config.Database, db *bun.DB) *Notificator {
-	connStr := fmt.Sprintf(
-		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		cfg.User,
-		cfg.Password,
-		cfg.Host,
-		cfg.Port,
-		cfg.Database,
-	)
+func NewNotificator(pool *pgxpool.Pool) *Notificator {
 	return &Notificator{
-		l: pq.NewListener(
-			connStr,
-			minReconnectInterval,
-			maxReconnectInterval,
-			nil,
-		),
-		db: db,
+		pool: pool,
+		ch:   make(chan pgconn.Notification, 16),
+		done: make(chan struct{}),
 	}
 }
 
 func (n *Notificator) Notify(ctx context.Context, channel string, payload string) error {
-	_, err := n.db.ExecContext(ctx, "NOTIFY ?, ?", bun.Ident(channel), payload)
+	conn, err := n.pool.Acquire(ctx)
+	if err != nil {
+		return errors.Wrap(err, "acquire connection for notify")
+	}
+	defer conn.Release()
+	_, err = conn.Exec(ctx, "SELECT pg_notify($1, $2)", channel, payload)
 	return err
 }
 
-func (n *Notificator) Listen() chan *pq.Notification {
-	return n.l.Notify
-}
-
 func (n *Notificator) Subscribe(ctx context.Context, channels ...string) error {
-	for i := range channels {
-		if err := n.l.Listen(channels[i]); err != nil {
-			return err
+	conn, err := n.pool.Acquire(ctx)
+	if err != nil {
+		return errors.Wrap(err, "acquire connection for listen")
+	}
+	for _, ch := range channels {
+		if _, err := conn.Exec(ctx, "LISTEN "+ch); err != nil {
+			conn.Release()
+			return errors.Wrapf(err, "listen %s", ch)
 		}
 	}
+	n.wg.Add(1)
+	go func() {
+		defer n.wg.Done()
+		defer conn.Release()
+		for {
+			notification, err := conn.Conn().WaitForNotification(ctx)
+			if err != nil {
+				return
+			}
+			select {
+			case n.ch <- *notification:
+			case <-n.done:
+				return
+			}
+		}
+	}()
 	return nil
 }
 
+func (n *Notificator) Listen() <-chan pgconn.Notification {
+	return n.ch
+}
+
 func (n *Notificator) Close() error {
-	return n.l.Close()
+	n.once.Do(func() { close(n.done) })
+	n.wg.Wait()
+	return nil
 }

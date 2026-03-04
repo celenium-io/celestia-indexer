@@ -8,8 +8,10 @@ import (
 	"net/http"
 
 	sentryecho "github.com/getsentry/sentry-go/echo"
+	"github.com/jackc/pgerrcode"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
+	"github.com/uptrace/bun/driver/pgdriver"
 )
 
 var (
@@ -17,7 +19,6 @@ var (
 	errUnknownAddress   = errors.New("unknown address")
 	errUnknownNamespace = errors.New("unknown namespace")
 	errInvalidApiKey    = errors.New("invalid api key")
-	errCancelRequest    = "pq: canceling statement due to user request"
 )
 
 type NoRows interface {
@@ -32,7 +33,7 @@ func handleError(c echo.Context, err error, noRows NoRows) error {
 	if err == nil {
 		return nil
 	}
-	if err.Error() == errCancelRequest {
+	if errPg, ok := err.(pgdriver.Error); ok && errPg.Field('C') == pgerrcode.QueryCanceled {
 		return nil
 	}
 	if errors.Is(err, context.DeadlineExceeded) {

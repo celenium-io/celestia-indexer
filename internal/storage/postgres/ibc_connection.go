@@ -74,7 +74,7 @@ func (c *IbcConnection) IdsByClients(ctx context.Context, clientIds ...string) (
 	err = c.DB().NewSelect().
 		Column("connection_id").
 		Model((*storage.IbcConnection)(nil)).
-		Where("client_id IN (?)", bun.In(clientIds)).
+		Where("client_id IN ?", bun.Tuple(clientIds)).
 		Scan(ctx, &res)
 	return
 }

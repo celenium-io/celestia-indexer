@@ -5,7 +5,6 @@ package storage
 
 import (
 	"context"
-	"database/sql"
 	"encoding/hex"
 	"testing"
 	"time"
@@ -55,6 +54,15 @@ func (s *ModuleTestSuite) SetupSuite() {
 	}, "../../../database", false)
 	s.Require().NoError(err)
 	s.storage = strg
+
+	fixtures, err := testfixtures.New(
+		testfixtures.Database(strg.Connection().DB().DB),
+		testfixtures.Dialect("timescaledb"),
+		testfixtures.Directory("../../../test/data"),
+		testfixtures.UseAlterConstraint(),
+	)
+	s.Require().NoError(err)
+	s.Require().NoError(fixtures.Load())
 }
 
 // TearDownSuite -
@@ -67,19 +75,6 @@ func (s *ModuleTestSuite) TearDownSuite() {
 }
 
 func (s *ModuleTestSuite) TestBlockLast() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
-	s.Require().NoError(err)
-
-	fixtures, err := testfixtures.New(
-		testfixtures.Database(db),
-		testfixtures.Dialect("timescaledb"),
-		testfixtures.Directory("../../../test/data"),
-		testfixtures.UseAlterConstraint(),
-	)
-	s.Require().NoError(err)
-	s.Require().NoError(fixtures.Load())
-	s.Require().NoError(db.Close())
-
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer ctxCancel()
 

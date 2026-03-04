@@ -26,7 +26,7 @@ func upAddUpgradeStatusColumns(ctx context.Context, db *bun.DB) error {
 		END$$`,
 		"upgrade_status",
 		bun.Safe("upgrade_status"),
-		bun.In(types.UpgradeStatusValues()),
+		bun.Tuple(types.UpgradeStatusValues()),
 	); err != nil {
 		return err
 	}

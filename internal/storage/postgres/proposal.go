@@ -36,10 +36,10 @@ func (p *Proposal) ListWithFilters(ctx context.Context, filters storage.ListProp
 	}
 
 	if len(filters.Status) > 0 {
-		query = query.Where("status IN (?)", bun.In(filters.Status))
+		query = query.Where("status IN ?", bun.Tuple(filters.Status))
 	}
 	if len(filters.Type) > 0 {
-		query = query.Where("type IN (?)", bun.In(filters.Type))
+		query = query.Where("type IN ?", bun.Tuple(filters.Type))
 	}
 
 	err = p.DB().NewSelect().
