@@ -99,12 +99,11 @@ func (tx *Tx) ByHash(ctx context.Context, hash []byte) (transaction storage.Tx, 
 }
 
 func (tx *Tx) Filter(ctx context.Context, fltrs storage.TxFilter) (txs []storage.Tx, err error) {
-	query := tx.DB().NewSelect().Model(&txs).Offset(fltrs.Offset)
+	query := tx.DB().NewSelect().Model(&txs)
 	query = txFilter(query, fltrs)
 	if err = query.Scan(ctx); err != nil {
 		return
 	}
-
 	err = tx.setSigners(ctx, txs)
 	return
 }
