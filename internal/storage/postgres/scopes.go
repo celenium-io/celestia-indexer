@@ -33,7 +33,20 @@ func sortScope(q *bun.SelectQuery, field string, sort sdk.SortOrder) *bun.Select
 
 func txFilter(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
 	query = limitScope(query, fltrs.Limit)
-	return txFilterWithoutLimit(query, fltrs)
+	query = txFilterWithoutLimit(query, fltrs)
+
+	if fltrs.Cursor > 0 {
+		switch fltrs.Sort {
+		case sdk.SortOrderAsc:
+			query = query.Where("id > ?", fltrs.Cursor)
+		case sdk.SortOrderDesc:
+			query = query.Where("id < ?", fltrs.Cursor)
+		}
+	} else if fltrs.Offset > 0 {
+		query = query.Offset(fltrs.Offset)
+	}
+
+	return query
 }
 
 func txFilterWithoutLimit(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.SelectQuery {
@@ -70,15 +83,6 @@ func txFilterWithoutLimit(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.S
 	}
 	if fltrs.WithMessages {
 		query = query.Relation("Messages")
-	}
-	if fltrs.Cursor > 0 {
-		fltrs.Offset = 0
-		switch fltrs.Sort {
-		case sdk.SortOrderAsc:
-			query = query.Where("id > ?", fltrs.Cursor)
-		case sdk.SortOrderDesc:
-			query = query.Where("id < ?", fltrs.Cursor)
-		}
 	}
 	return query
 }
@@ -134,19 +138,9 @@ func blobByProviderFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters)
 	if len(fltrs.Signers) > 0 {
 		query = query.Where("signer_id IN ?", bun.Tuple(fltrs.Signers))
 	}
-	if fltrs.Cursor > 0 {
-		fltrs.Offset = 0
-		switch fltrs.Sort {
-		case sdk.SortOrderAsc:
-			query = query.Where("id > ?", fltrs.Cursor)
-		case sdk.SortOrderDesc:
-			query = query.Where("id < ?", fltrs.Cursor)
-		}
-	}
 	if fltrs.Height > 0 {
 		query = query.Where("height = ?", fltrs.Height)
 	}
-
 	if fltrs.Limit+fltrs.Offset > 0 {
 		query = query.Limit(fltrs.Limit + fltrs.Offset)
 	} else {
@@ -168,22 +162,20 @@ func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.S
 	if len(fltrs.Signers) > 0 {
 		query = query.Where("signer_id IN ?", bun.Tuple(fltrs.Signers))
 	}
+	if fltrs.Height > 0 {
+		query = query.Where("height = ?", fltrs.Height)
+	}
+
 	if fltrs.Cursor > 0 {
-		fltrs.Offset = 0
 		switch fltrs.Sort {
 		case sdk.SortOrderAsc:
 			query = query.Where("id > ?", fltrs.Cursor)
 		case sdk.SortOrderDesc:
 			query = query.Where("id < ?", fltrs.Cursor)
 		}
-	}
-	if fltrs.Height > 0 {
-		query = query.Where("height = ?", fltrs.Height)
-	}
-	if fltrs.Offset > 0 {
+	} else if fltrs.Offset > 0 {
 		query = query.Offset(fltrs.Offset)
 	}
-
 	query = limitScope(query, fltrs.Limit)
 	return blobLogSort(query, fltrs.SortBy, fltrs.Sort)
 }
@@ -204,22 +196,20 @@ func listBlobLogFilters(query *bun.SelectQuery, fltrs storage.ListBlobLogFilters
 	if len(fltrs.Namespaces) > 0 {
 		query = query.Where("namespace_id IN ?", bun.Tuple(fltrs.Namespaces))
 	}
+	if fltrs.Height > 0 {
+		query = query.Where("height = ?", fltrs.Height)
+	}
+
 	if fltrs.Cursor > 0 {
-		fltrs.Offset = 0
 		switch fltrs.Sort {
 		case sdk.SortOrderAsc:
 			query = query.Where("id > ?", fltrs.Cursor)
 		case sdk.SortOrderDesc:
 			query = query.Where("id < ?", fltrs.Cursor)
 		}
-	}
-	if fltrs.Offset > 0 {
+	} else if fltrs.Offset > 0 {
 		query = query.Offset(fltrs.Offset)
 	}
-	if fltrs.Height > 0 {
-		query = query.Where("height = ?", fltrs.Height)
-	}
-
 	query = limitScope(query, fltrs.Limit)
 	return blobLogSort(query, fltrs.SortBy, fltrs.Sort)
 }
