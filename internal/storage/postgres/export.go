@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/dipdup-net/go-lib/database"
+	"github.com/dipdup-io/go-lib/database"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 )

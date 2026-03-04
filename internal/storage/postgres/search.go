@@ -10,7 +10,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
-	"github.com/dipdup-net/go-lib/database"
+	"github.com/dipdup-io/go-lib/database"
 )
 
 // Search -

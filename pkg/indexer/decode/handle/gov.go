@@ -213,7 +213,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 			}
 		}
 
-		if _, err := sb.WriteString(fmt.Sprintf("%d. %s\r\n", i+1, msg.Messages[i].TypeUrl)); err != nil {
+		if _, err := fmt.Fprintf(&sb, "%d. %s\r\n", i+1, msg.Messages[i].TypeUrl); err != nil {
 			return msgType, addresses, nil, nil, errors.Wrap(err, "building proposal description from messages")
 		}
 	}

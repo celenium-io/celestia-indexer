@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	goLibConfig "github.com/dipdup-net/go-lib/config"
+	goLibConfig "github.com/dipdup-io/go-lib/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )

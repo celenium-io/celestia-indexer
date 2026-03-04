@@ -11,8 +11,8 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/dipdup-net/go-lib/config"
-	"github.com/dipdup-net/go-lib/database"
+	"github.com/dipdup-io/go-lib/config"
+	"github.com/dipdup-io/go-lib/database"
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"

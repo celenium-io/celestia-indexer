@@ -63,7 +63,7 @@ func Test_handleHyperlaneProcessMessage(t *testing.T) {
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.warp.v1.EventReceiveRemoteTransfer",
-					Data: map[string]any{
+					Data: map[string]any{ //nolint:gosec
 						"amount":        "6745utia",
 						"sender":        "0x0000000000000000000000007b4bf9feccff207ef2cb7101ceb15b8516021acd",
 						"token_id":      "0x726f757465725f61707000000000000000000000000000010000000000000000",

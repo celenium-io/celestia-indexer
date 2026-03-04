@@ -41,7 +41,7 @@ func Test_handleCreateSyntheticToken(t *testing.T) {
 					Height: 1036866,
 					Type:   "hyperlane.warp.v1.EventCreateSyntheticToken",
 					Time:   ts,
-					Data: map[string]any{
+					Data: map[string]any{ //nolint:gosec
 						"msg_index":      "0",
 						"origin_denom":   "\"utia\"",
 						"origin_mailbox": "\"0x68797065726c616e650000000000000000000000000000000000000000000000\"",

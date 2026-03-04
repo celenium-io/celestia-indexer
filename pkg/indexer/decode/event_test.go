@@ -557,7 +557,7 @@ func TestNewHyperlaneSendTransferEvent(t *testing.T) {
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]any{ //nolint:gosec
 				"amount":             "\"10utia\"",
 				"destination_domain": "812",
 				"recipient":          "\"0x0000000000000000000000009b8ae55dccca7a842182cc023bd63d24d2692e0a\"",
@@ -565,7 +565,7 @@ func TestNewHyperlaneSendTransferEvent(t *testing.T) {
 				"token_id":           "\"0x726f757465725f61707000000000000000000000000000010000000000000000\"",
 				"msg_index":          "0",
 			},
-			wantBody: HyperlaneSendTransferEvent{
+			wantBody: HyperlaneSendTransferEvent{ //nolint:gosec
 				Amount:            decimal.RequireFromString("10"),
 				Denom:             "utia",
 				DestinationDomain: 812,
@@ -687,7 +687,7 @@ func TestNewHyperlaneReceiveTransferEvent(t *testing.T) {
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]any{ //nolint:gosec
 				"amount":        "\"\"",
 				"origin_domain": "8453",
 				"recipient":     "\"celestia1z7ut79ds6h550925ehkxpwvkgcfq63y2vfk2e0\"",
@@ -695,7 +695,7 @@ func TestNewHyperlaneReceiveTransferEvent(t *testing.T) {
 				"token_id":      "\"0x726f757465725f61707000000000000000000000000000010000000000000001\"",
 				"msg_index":     "0",
 			},
-			want: HyperlaneReceiveTransferEvent{
+			want: HyperlaneReceiveTransferEvent{ //nolint:gosec
 				Amount:       decimal.Zero,
 				OriginDomain: 8453,
 				Recipient:    "celestia1z7ut79ds6h550925ehkxpwvkgcfq63y2vfk2e0",

@@ -14,7 +14,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/cmd/private_api/handler"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
-	"github.com/dipdup-net/go-lib/config"
+	"github.com/dipdup-io/go-lib/config"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog"

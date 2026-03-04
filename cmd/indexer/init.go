@@ -9,7 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/profiler"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
-	goLibConfig "github.com/dipdup-net/go-lib/config"
+	goLibConfig "github.com/dipdup-io/go-lib/config"
 	"github.com/grafana/pyroscope-go"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"

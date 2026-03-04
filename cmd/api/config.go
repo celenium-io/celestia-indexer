@@ -6,7 +6,7 @@ package main
 import (
 	"github.com/celenium-io/celestia-indexer/internal/profiler"
 	indexerConfig "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
-	"github.com/dipdup-net/go-lib/config"
+	"github.com/dipdup-io/go-lib/config"
 )
 
 type Config struct {

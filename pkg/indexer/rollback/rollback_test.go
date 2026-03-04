@@ -20,8 +20,8 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
-	"github.com/dipdup-net/go-lib/config"
-	"github.com/dipdup-net/go-lib/database"
+	"github.com/dipdup-io/go-lib/config"
+	"github.com/dipdup-io/go-lib/database"
 	"github.com/stretchr/testify/suite"
 )
 
