@@ -18,7 +18,7 @@ require (
 	github.com/cosmos/ibc-go/v8 v8.7.0
 	github.com/dipdup-io/workerpool v0.0.4
 	github.com/dipdup-net/go-lib v0.5.0
-	github.com/dipdup-net/indexer-sdk v0.0.9
+	github.com/dipdup-net/indexer-sdk v0.0.10
 	github.com/fatih/structs v1.1.0
 	github.com/gabriel-vasile/mimetype v1.4.9
 	github.com/getsentry/sentry-go v0.42.0

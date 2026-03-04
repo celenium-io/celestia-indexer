@@ -148,9 +148,6 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 	if err := s.createScripts(ctx, "views", true); err != nil {
 		return s, errors.Wrap(err, "creating views")
 	}
-
-	// reset all connections for registering custom types
-	strg.Connection().Pool().Reset()
 	return s, nil
 }
 
