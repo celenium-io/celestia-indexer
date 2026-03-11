@@ -13,7 +13,6 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
-	"github.com/shopspring/decimal"
 
 	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -421,21 +420,6 @@ func Test_handleRecvPacket(t *testing.T) {
 						},
 						"Signer": "celestia1cdlz8scnf3mmxdnf4njmtp7vz4gps7fsm503qe",
 					},
-					IbcTransfer: &storage.IbcTransfer{
-						Height:        1866988,
-						SenderAddress: testsuite.Ptr("neutron1m84nh75hl474k5d83cunrqfxgmrl523ucy4h2m"),
-						Receiver: &storage.Address{
-							Address: "celestia1m84nh75hl474k5d83cunrqfxgmrl523ud3d923",
-						},
-						Memo:   "{\\\"forward\\\":{\\\"receiver\\\":\\\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\\\",\\\"port\\\":\\\"transfer\\\",\\\"channel\\\":\\\"channel-2\\\",\\\"timeout\\\":0,\\\"retries\\\":2,\\\"next\\\":{\\\"wasm\\\":{\\\"contract\\\":\\\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\\\",\\\"msg\\\":{\\\"swap_and_action\\\":{\\\"user_swap\\\":{\\\"swap_exact_asset_in\\\":{\\\"swap_venue_name\\\":\\\"osmosis-poolmanager\\\",\\\"operations\\\":[{\\\"pool\\\":\\\"1475\\\",\\\"denom_in\\\":\\\"ibc/D79E7D83AB399BFFF93433E54FAA480C191248FC556924A2A8351AE2638B3877\\\",\\\"denom_out\\\":\\\"factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA\\\"},{\\\"pool\\\":\\\"1694\\\",\\\"denom_in\\\":\\\"factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA\\\",\\\"denom_out\\\":\\\"ibc/69110FF673D70B39904FF056CFDFD58A90BEC3194303F45C32CB91B8B0A738EA\\\"},{\\\"pool\\\":\\\"1698\\\",\\\"denom_in\\\":\\\"ibc/69110FF673D70B39904FF056CFDFD58A90BEC3194303F45C32CB91B8B0A738EA\\\",\\\"denom_out\\\":\\\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\\\"}]}},\\\"min_asset\\\":{\\\"native\\\":{\\\"denom\\\":\\\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\\\",\\\"amount\\\":\\\"1095116599248063092\\\"}},\\\"timeout_timestamp\\\":1726673962233433067,\\\"post_swap_action\\\":{\\\"ibc_transfer\\\":{\\\"ibc_info\\\":{\\\"source_channel\\\":\\\"channel-122\\\",\\\"receiver\\\":\\\"inj1syrdh2v2rwf8fhvs5gsmwr4ahcns3m4zvcukwc\\\",\\\"memo\\\":\\\"\\\",\\\"recover_address\\\":\\\"osmo1m84nh75hl474k5d83cunrqfxgmrl523u5q09xw\\\"}}},\\\"affiliates\\\":[{\\\"basis_points_fee\\\":\\\"60\\\",\\\"address\\\":\\\"osmo1my4tk420gjmhggqwvvha6ey9390gqwfree2p4u\\\"},{\\\"basis_points_fee\\\":\\\"15\\\",\\\"address\\\":\\\"osmo1msjnal2glfz6ze8x9kduhg45xppx9sddawfx46\\\"}]}}}}}}",
-						Amount: decimal.RequireFromString("4000000"),
-						Denom:  "utia",
-					},
-					IbcChannel: &storage.IbcChannel{
-						Id:       "channel-8",
-						PortId:   "transfer",
-						Received: decimal.RequireFromString("4000000"),
-					},
 				}, {
 					Type:   types.MsgRecvPacket,
 					Height: 1866988,
@@ -464,20 +448,6 @@ func Test_handleRecvPacket(t *testing.T) {
 							"RevisionNumber": 1,
 						},
 						"Signer": "celestia1cdlz8scnf3mmxdnf4njmtp7vz4gps7fsm503qe",
-					},
-					IbcTransfer: &storage.IbcTransfer{
-						Height:        1866988,
-						SenderAddress: testsuite.Ptr("neutron1upjaknf6lmnu3p4llldp8jx0whzsxlgetu9zjt"),
-						Receiver: &storage.Address{
-							Address: "celestia1nsxcgald2c3622hfwflps608tqrj9l3wdcmq9s",
-						},
-						Amount: decimal.RequireFromString("100"),
-						Denom:  "utia",
-					},
-					IbcChannel: &storage.IbcChannel{
-						Id:       "channel-8",
-						PortId:   "transfer",
-						Received: decimal.RequireFromString("100"),
 					},
 				},
 			},
@@ -1094,10 +1064,21 @@ func Test_handleRecvPacket(t *testing.T) {
 			for i := range tt.msg {
 				err := handleRecvPacket(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
-				if tt.msg[i].IbcTransfer != nil {
-					require.NotEmpty(t, tt.msg[i].IbcTransfer.ConnectionId)
+				if len(tt.ctx.IbcTransfers) > 0 {
+					require.NotEmpty(t, tt.ctx.IbcTransfers[0].ConnectionId)
 				}
+
+				channelsCount := tt.ctx.IbcChannels.Len()
+				if channelsCount > 0 {
+					_ = tt.ctx.IbcChannels.Range(func(_ string, value *storage.IbcChannel) (error, bool) {
+						require.NotEmpty(t, value.TransfersCount)
+						require.NotEmpty(t, value.Id)
+						return nil, false
+					})
+				}
+
 				toTheNextAction(tt.events, tt.idx)
+
 			}
 		})
 	}

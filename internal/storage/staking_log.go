@@ -13,6 +13,8 @@ import (
 	"github.com/uptrace/bun"
 )
 
+var _ storage.Copiable = (*StakingLog)(nil)
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IStakingLog interface {
 	storage.Table[*StakingLog]
@@ -37,4 +39,25 @@ type StakingLog struct {
 // TableName -
 func (StakingLog) TableName() string {
 	return "staking_log"
+}
+
+func (m StakingLog) Flat() ([]any, error) {
+	var addressId any
+	if m.AddressId != nil {
+		addressId = int64(*m.AddressId)
+	}
+	return []any{
+		m.Time,
+		int64(m.Height),
+		addressId,
+		int64(m.ValidatorId),
+		m.Change.String(),
+		string(m.Type),
+	}, nil
+}
+
+func (StakingLog) Columns() []string {
+	return []string{
+		"time", "height", "address_id", "validator_id", "change", "type",
+	}
 }

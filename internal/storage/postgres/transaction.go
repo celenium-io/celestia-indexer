@@ -61,12 +61,7 @@ func (tx Transaction) UpdateConstants(ctx context.Context, constants ...models.C
 }
 
 func (tx Transaction) SaveTransactions(ctx context.Context, txs ...models.Tx) error {
-	if len(txs) == 0 {
-		return nil
-	}
-
-	_, err := tx.Tx().NewInsert().Model(&txs).Returning("id").Exec(ctx)
-	return err
+	return pg.SaveBulkWithCopy(ctx, tx, txs, copyThreashold)
 }
 
 type addedNamespace struct {
@@ -167,12 +162,7 @@ func (tx Transaction) SaveEvents(ctx context.Context, events ...models.Event) er
 }
 
 func (tx Transaction) SaveMessages(ctx context.Context, msgs ...*models.Message) error {
-	if len(msgs) == 0 {
-		return nil
-	}
-
-	_, err := tx.Tx().NewInsert().Model(&msgs).Returning("id").Exec(ctx)
-	return err
+	return pg.SaveBulkWithCopy(ctx, tx, msgs, copyThreashold)
 }
 
 func (tx Transaction) SaveSigners(ctx context.Context, addresses ...models.Signer) error {
@@ -184,17 +174,12 @@ func (tx Transaction) SaveSigners(ctx context.Context, addresses ...models.Signe
 	return err
 }
 
-func (tx Transaction) SaveBlobLogs(ctx context.Context, logs ...models.BlobLog) error {
+func (tx Transaction) SaveBlobLogs(ctx context.Context, logs ...*models.BlobLog) error {
 	return pg.SaveBulkWithCopy(ctx, tx, logs, copyThreashold)
 }
 
-func (tx Transaction) SaveMsgAddresses(ctx context.Context, addresses ...models.MsgAddress) error {
-	if len(addresses) == 0 {
-		return nil
-	}
-
-	_, err := tx.Tx().NewInsert().Model(&addresses).Exec(ctx)
-	return err
+func (tx Transaction) SaveMsgAddresses(ctx context.Context, addresses ...*models.MsgAddress) error {
+	return pg.SaveBulkWithCopy(ctx, tx, addresses, copyThreashold)
 }
 
 func (tx Transaction) SaveMsgValidator(ctx context.Context, valMsgs ...models.MsgValidator) error {
@@ -206,7 +191,7 @@ func (tx Transaction) SaveMsgValidator(ctx context.Context, valMsgs ...models.Ms
 	return err
 }
 
-func (tx Transaction) SaveNamespaceMessage(ctx context.Context, nsMsgs ...models.NamespaceMessage) error {
+func (tx Transaction) SaveNamespaceMessage(ctx context.Context, nsMsgs ...*models.NamespaceMessage) error {
 	if len(nsMsgs) == 0 {
 		return nil
 	}
@@ -241,7 +226,7 @@ func (tx Transaction) SaveVestingPeriods(ctx context.Context, periods ...models.
 	return err
 }
 
-func (tx Transaction) SaveGrants(ctx context.Context, grants ...models.Grant) error {
+func (tx Transaction) SaveGrants(ctx context.Context, grants ...*models.Grant) error {
 	if len(grants) == 0 {
 		return nil
 	}
@@ -437,11 +422,7 @@ func (tx Transaction) SaveRedelegations(ctx context.Context, redelegations ...mo
 }
 
 func (tx Transaction) SaveStakingLogs(ctx context.Context, logs ...models.StakingLog) error {
-	if len(logs) == 0 {
-		return nil
-	}
-	_, err := tx.Tx().NewInsert().Model(&logs).Exec(ctx)
-	return err
+	return pg.SaveBulkWithCopy(ctx, tx, logs, copyThreashold)
 }
 
 func (tx Transaction) SaveDelegations(ctx context.Context, delegations ...models.Delegation) error {

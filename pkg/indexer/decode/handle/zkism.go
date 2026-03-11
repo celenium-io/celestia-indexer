@@ -4,35 +4,34 @@
 package handle
 
 import (
-	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	zkismTypes "github.com/celestiaorg/celestia-app/v7/x/zkism/types"
 )
 
 // MsgCreateInterchainSecurityModule
-func MsgCreateInterchainSecurityModule(ctx *context.Context, m *zkismTypes.MsgCreateInterchainSecurityModule) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgCreateInterchainSecurityModule(ctx *context.Context, msgId uint64, m *zkismTypes.MsgCreateInterchainSecurityModule) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgCreateInterchainSecurityModule
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSender, address: m.Creator},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgUpdateInterchainSecurityModule
-func MsgUpdateInterchainSecurityModule(ctx *context.Context, m *zkismTypes.MsgUpdateInterchainSecurityModule) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateInterchainSecurityModule(ctx *context.Context, msgId uint64, m *zkismTypes.MsgUpdateInterchainSecurityModule) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateInterchainSecurityModule
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgSubmitMessages
-func MsgSubmitMessages(ctx *context.Context, m *zkismTypes.MsgSubmitMessages) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgSubmitMessages(ctx *context.Context, msgId uint64, m *zkismTypes.MsgSubmitMessages) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgSubmitMessages
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }

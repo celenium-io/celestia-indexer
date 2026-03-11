@@ -97,9 +97,9 @@ func Test_handleSetToken(t *testing.T) {
 				err := handleSetToken(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
 				if !tt.wantEmpty {
-					require.NotNil(t, tt.msg[i].HLToken)
+					require.NotEmpty(t, tt.ctx.HlTokens.Len())
 				} else {
-					require.Nil(t, tt.msg[i].HLToken)
+					require.Empty(t, tt.ctx.HlTokens.Len())
 				}
 			}
 		})

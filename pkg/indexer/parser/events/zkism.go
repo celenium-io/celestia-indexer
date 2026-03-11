@@ -44,13 +44,13 @@ func processCreateZkISM(ctx *context.Context, events []storage.Event, msg *stora
 				Groth16VKey:         e.Groth16VKey,
 				StateTransitionVKey: e.StateTransitionVKey,
 				StateMembershipVKey: e.StateMembershipVKey,
+				TxId:                msg.TxId,
 			}
 			if e.Creator != "" {
 				ism.Creator = &storage.Address{Address: e.Creator}
 			}
 
 			ctx.AddZkISM(ism)
-			msg.ZkISM = ism
 			end = true
 		}
 
@@ -71,21 +71,9 @@ func handleUpdateZkISM(ctx *context.Context, events []storage.Event, msg *storag
 	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/celestia.zkism.v1.MsgUpdateInterchainSecurityModule" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	sender := decoder.StringFromMap(events[*idx].Data, "sender")
-	if sender == "" {
-		return errors.New("missing sender in submit zkism messages event")
-	}
 	*idx += 1
 	if err := processUpdateZkISM(ctx, events, msg, idx); err != nil {
 		return err
-	}
-	if msg.ZkISMUpdate != nil {
-		msg.ZkISMUpdate.Signer = &storage.Address{
-			Address:    sender,
-			Height:     msg.Height,
-			LastHeight: msg.Height,
-			Balance:    storage.EmptyBalance(),
-		}
 	}
 	return nil
 }
@@ -99,18 +87,28 @@ func processUpdateZkISM(ctx *context.Context, events []storage.Event, msg *stora
 				return errors.Wrap(err, "parsing update zkism event")
 			}
 
-			update := &storage.ZkISMUpdate{
-				Height:   ctx.Block.Height,
-				Time:     ctx.Block.Time,
-				NewState: e.NewState,
+			var addr *storage.Address
+			if signer := decoder.StringFromMap(msg.Data, "Signer"); signer != "" {
+				addr = &storage.Address{
+					Address:    signer,
+					Height:     msg.Height,
+					LastHeight: msg.Height,
+					Balance:    storage.EmptyBalance(),
+				}
 			}
 
 			ctx.AddZkISM(&storage.ZkISM{
 				ExternalId: e.Id,
 				State:      e.NewState,
 			})
-			msg.ZkISMUpdate = update
-			msg.ZkISMUpdate.ZkISMExternalId = e.Id
+			ctx.AddZkIsmUpdate(&storage.ZkISMUpdate{
+				Height:          ctx.Block.Height,
+				Time:            ctx.Block.Time,
+				NewState:        e.NewState,
+				TxId:            msg.TxId,
+				ZkISMExternalId: e.Id,
+				Signer:          addr,
+			})
 			end = true
 		}
 
@@ -131,21 +129,9 @@ func handleSubmitZkISMMessages(ctx *context.Context, events []storage.Event, msg
 	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/celestia.zkism.v1.MsgSubmitMessages" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	sender := decoder.StringFromMap(events[*idx].Data, "sender")
-	if sender == "" {
-		return errors.New("missing sender in submit zkism messages event")
-	}
 	*idx += 1
 	if err := processSubmitZkISMMessages(ctx, events, msg, idx); err != nil {
 		return err
-	}
-	for i := range msg.ZkISMMessages {
-		msg.ZkISMMessages[i].Signer = &storage.Address{
-			Address:    sender,
-			Height:     msg.Height,
-			LastHeight: msg.Height,
-			Balance:    storage.EmptyBalance(),
-		}
 	}
 	return nil
 }
@@ -159,19 +145,28 @@ func processSubmitZkISMMessages(ctx *context.Context, events []storage.Event, ms
 				return errors.Wrap(err, "parsing submit zkism messages event")
 			}
 
-			msgs := make([]*storage.ZkISMMessage, len(e.MessageIds))
-			for i, msgId := range e.MessageIds {
-				m := &storage.ZkISMMessage{
-					Height:    ctx.Block.Height,
-					Time:      ctx.Block.Time,
-					StateRoot: e.StateRoot,
-					MessageId: msgId,
+			var addr *storage.Address
+			if signer := decoder.StringFromMap(msg.Data, "Signer"); signer != "" {
+				addr = &storage.Address{
+					Address:    signer,
+					Height:     msg.Height,
+					LastHeight: msg.Height,
+					Balance:    storage.EmptyBalance(),
 				}
-				m.ZkISMExternalId = e.Id
-				msgs[i] = m
 			}
 
-			msg.ZkISMMessages = msgs
+			for i := range e.MessageIds {
+				ctx.AddZkIsmMessage(&storage.ZkISMMessage{
+					Height:          ctx.Block.Height,
+					Time:            ctx.Block.Time,
+					StateRoot:       e.StateRoot,
+					MessageId:       e.MessageIds[i],
+					TxId:            msg.TxId,
+					Signer:          addr,
+					ZkISMExternalId: e.Id,
+				})
+			}
+
 			end = true
 		}
 

@@ -5,17 +5,16 @@ package handle
 
 import (
 	evidenceTypes "cosmossdk.io/x/evidence/types"
-	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 )
 
 // MsgSubmitEvidence represents a message that supports submitting arbitrary
 // Evidence of misbehavior such as equivocation or counterfactual signing.
-func MsgSubmitEvidence(ctx *context.Context, m *evidenceTypes.MsgSubmitEvidence) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgSubmitEvidence(ctx *context.Context, msgId uint64, m *evidenceTypes.MsgSubmitEvidence) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgSubmitEvidence
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSubmitter, address: m.Submitter},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }

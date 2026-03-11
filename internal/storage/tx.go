@@ -68,17 +68,17 @@ func (filter *TxFilter) IsEmpty() bool {
 type Tx struct {
 	bun.BaseModel `bun:"tx" comment:"Table with celestia transactions."`
 
-	Id            uint64          `bun:"id,autoincrement,pk,notnull" comment:"Unique internal id"`
-	Height        pkgTypes.Level  `bun:",notnull"                    comment:"The number (height) of this block"                 stats:"func:min max,filterable"`
-	Time          time.Time       `bun:"time,pk,notnull"             comment:"The time of block"                                 stats:"func:min max,filterable"`
-	Position      int64           `bun:"position"                    comment:"Position in block"`
-	GasWanted     int64           `bun:"gas_wanted"                  comment:"Gas wanted"                                        stats:"func:min max sum avg"`
-	GasUsed       int64           `bun:"gas_used"                    comment:"Gas used"                                          stats:"func:min max sum avg"`
-	TimeoutHeight uint64          `bun:"timeout_height"              comment:"Block height until which the transaction is valid" stats:"func:min max avg"`
-	EventsCount   int64           `bun:"events_count"                comment:"Events count in transaction"                       stats:"func:min max sum avg"`
-	MessagesCount int64           `bun:"messages_count"              comment:"Messages count in transaction"                     stats:"func:min max sum avg"`
-	Fee           decimal.Decimal `bun:"fee,type:numeric"            comment:"Paid fee"                                          stats:"func:min max sum avg"`
-	Status        types.Status    `bun:"status,type:status"          comment:"Transaction status"                                stats:"filterable"`
+	Id            uint64          `bun:"id,pk,notnull"      comment:"Unique internal id"`
+	Height        pkgTypes.Level  `bun:",notnull"           comment:"The number (height) of this block"                 stats:"func:min max,filterable"`
+	Time          time.Time       `bun:"time,pk,notnull"    comment:"The time of block"                                 stats:"func:min max,filterable"`
+	Position      int64           `bun:"position"           comment:"Position in block"`
+	GasWanted     int64           `bun:"gas_wanted"         comment:"Gas wanted"                                        stats:"func:min max sum avg"`
+	GasUsed       int64           `bun:"gas_used"           comment:"Gas used"                                          stats:"func:min max sum avg"`
+	TimeoutHeight uint64          `bun:"timeout_height"     comment:"Block height until which the transaction is valid" stats:"func:min max avg"`
+	EventsCount   int64           `bun:"events_count"       comment:"Events count in transaction"                       stats:"func:min max sum avg"`
+	MessagesCount int64           `bun:"messages_count"     comment:"Messages count in transaction"                     stats:"func:min max sum avg"`
+	Fee           decimal.Decimal `bun:"fee,type:numeric"   comment:"Paid fee"                                          stats:"func:min max sum avg"`
+	Status        types.Status    `bun:"status,type:status" comment:"Transaction status"                                stats:"filterable"`
 
 	Error        string            `bun:"error,type:text"             comment:"Error string if failed"`
 	Codespace    string            `bun:"codespace,type:text"         comment:"Codespace"                                    stats:"filterable"`
@@ -98,4 +98,42 @@ type Tx struct {
 // TableName -
 func (Tx) TableName() string {
 	return "tx"
+}
+
+func (tx *Tx) SetId() error {
+	id, err := idFromHeightAndPosition(tx.Height, tx.Position)
+	if err != nil {
+		return err
+	}
+	tx.Id = id
+	return nil
+}
+
+func (e Tx) Flat() ([]any, error) {
+	return []any{
+		e.Id,
+		int64(e.Height),
+		e.Time,
+		e.Position,
+		e.GasWanted,
+		e.GasUsed,
+		e.TimeoutHeight,
+		e.EventsCount,
+		e.MessagesCount,
+		e.Fee.String(),
+		e.Status.String(),
+		e.Error,
+		e.Codespace,
+		e.Hash,
+		e.Memo,
+		e.MessageTypes.String(),
+	}, nil
+}
+
+func (e Tx) Columns() []string {
+	return []string{
+		"id", "height", "time", "position", "gas_wanted", "gas_used", "timeout_height",
+		"events_count", "messages_count", "fee", "status", "error", "codespace",
+		"hash", "memo", "message_types",
+	}
 }

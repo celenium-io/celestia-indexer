@@ -16,7 +16,6 @@ import (
 	coreClient "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	tmTypes "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/fatih/structs"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,34 +23,20 @@ func TestDecodeMsg_SuccessOnMsgCreateClient(t *testing.T) {
 	msg := &coreClient.MsgCreateClient{
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgCreateClient,
@@ -59,13 +44,11 @@ func TestDecodeMsg_SuccessOnMsgCreateClient(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgUpdateClientV6(t *testing.T) {
@@ -80,31 +63,17 @@ func TestDecodeMsg_SuccessOnMsgUpdateClientV6(t *testing.T) {
 			Value:   value,
 		},
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 	require.NoError(t, err)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
 
 	data := structs.Map(msg)
 	var header tmTypes.Header
@@ -114,56 +83,40 @@ func TestDecodeMsg_SuccessOnMsgUpdateClientV6(t *testing.T) {
 	delete(data, "ClientMessage")
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgUpdateClient,
 		TxId:      0,
 		Data:      data,
 		Namespace: nil,
-		Addresses: addressesExpected,
 		Size:      30637,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgUpgradeClient(t *testing.T) {
 	msg := &coreClient.MsgUpgradeClient{
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgUpgradeClient,
@@ -171,13 +124,11 @@ func TestDecodeMsg_SuccessOnMsgUpgradeClient(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgUpdateClient(t *testing.T) {
@@ -186,34 +137,20 @@ func TestDecodeMsg_SuccessOnMsgUpdateClient(t *testing.T) {
 		ClientId:      "client-1",
 		ClientMessage: &types.Any{},
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:       0,
-		Height:   blob.Height,
+		Id:       1,
+		Height:   block.Height,
 		Time:     now,
 		Position: 0,
 		Type:     storageTypes.MsgUpdateClient,
@@ -225,47 +162,31 @@ func TestDecodeMsg_SuccessOnMsgUpdateClient(t *testing.T) {
 		},
 		Size:      61,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgSubmitMisbehaviour(t *testing.T) {
 	msg := &coreClient.MsgSubmitMisbehaviour{ //nolint
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgSubmitMisbehaviour,
@@ -273,13 +194,11 @@ func TestDecodeMsg_SuccessOnMsgSubmitMisbehaviour(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgRecoverClient(t *testing.T) {
@@ -297,24 +216,10 @@ func TestDecodeMsg_SuccessOnMsgRecoverClient(t *testing.T) {
 		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     block.Height,
-				LastHeight: block.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
+		Id:        1,
 		Height:    block.Height,
 		Time:      now,
 		Position:  0,
@@ -323,13 +228,11 @@ func TestDecodeMsg_SuccessOnMsgRecoverClient(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      69,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgIBCSoftwareUpgrade(t *testing.T) {
@@ -345,24 +248,10 @@ func TestDecodeMsg_SuccessOnMsgIBCSoftwareUpgrade(t *testing.T) {
 		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     block.Height,
-				LastHeight: block.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
+		Id:        1,
 		Height:    block.Height,
 		Time:      now,
 		Position:  0,
@@ -371,13 +260,11 @@ func TestDecodeMsg_SuccessOnMsgIBCSoftwareUpgrade(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      64,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgUpdateParams(t *testing.T) {
@@ -394,24 +281,10 @@ func TestDecodeMsg_SuccessOnMsgUpdateParams(t *testing.T) {
 		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     block.Height,
-				LastHeight: block.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
+		Id:        1,
 		Height:    block.Height,
 		Time:      now,
 		Position:  0,
@@ -420,11 +293,9 @@ func TestDecodeMsg_SuccessOnMsgUpdateParams(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      54,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }

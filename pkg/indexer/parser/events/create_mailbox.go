@@ -56,6 +56,7 @@ func processCreateMailbox(ctx *context.Context, events []storage.Event, msg *sto
 				},
 				DefaultIsm: defaultIsm.Bytes(),
 				Domain:     createMailbox.LocalDomain,
+				TxId:       msg.TxId,
 			}
 
 			if len(createMailbox.DefaultHook) > 0 && createMailbox.DefaultHook != null {
@@ -74,7 +75,7 @@ func processCreateMailbox(ctx *context.Context, events []storage.Event, msg *sto
 				mailbox.DefaultHook = requiredHook.Bytes()
 			}
 
-			msg.HLMailbox = mailbox
+			ctx.AddHlMailbox(mailbox)
 			end = true
 		}
 

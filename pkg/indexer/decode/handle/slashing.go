@@ -4,25 +4,24 @@
 package handle
 
 import (
-	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	cosmosSlashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 )
 
 // MsgUnjail defines the Msg/Unjail request type
-func MsgUnjail(ctx *context.Context, m *cosmosSlashingTypes.MsgUnjail) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUnjail(ctx *context.Context, msgId uint64, m *cosmosSlashingTypes.MsgUnjail) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUnjail
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddr},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
-func MsgUpdateParamsSlashing(ctx *context.Context, m *cosmosSlashingTypes.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateParamsSlashing(ctx *context.Context, msgId uint64, m *cosmosSlashingTypes.MsgUpdateParams) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateParams
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }

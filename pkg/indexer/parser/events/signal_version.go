@@ -20,13 +20,16 @@ func processSignalVersion(ctx *context.Context, _ []storage.Event, msg *storage.
 	val.Address = decoder.StringFromMap(data, "ValidatorAddress")
 	val.Version = version
 
-	msg.SignalVersion = &storage.SignalVersion{
+	signalVersion := &storage.SignalVersion{
 		Height:    msg.Height,
 		Time:      msg.Time,
 		Version:   version,
 		Validator: &val,
+		TxId:      msg.TxId,
+		MsgId:     msg.Id,
 	}
-	ctx.AddValidator(*msg.SignalVersion.Validator)
+	ctx.AddSignal(signalVersion)
+	ctx.AddValidator(*signalVersion.Validator)
 	ctx.AddUpgrade(storage.Upgrade{
 		Version:      version,
 		SignalsCount: 1,

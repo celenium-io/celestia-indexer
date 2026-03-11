@@ -20,7 +20,6 @@ import (
 	tmTypes "github.com/cometbft/cometbft/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,7 +30,7 @@ func createModules(t *testing.T) (modules.BaseModule, string, Module) {
 	parserModule := NewModule(config.Indexer{})
 
 	err := parserModule.AttachTo(&writerModule, outputName, InputName)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	return writerModule, outputName, parserModule
 }
@@ -57,7 +56,7 @@ func getExpectedBlock() storage.Block {
 		ProposerAddress:    types.Hex{0x0, 0x0, 0x1, 0x9}.String(),
 		ChainId:            "celestia-explorer-test",
 		Txs:                make([]storage.Tx, 0),
-		Events:             make([]storage.Event, 0),
+		Events:             nil,
 		BlockSignatures: []storage.BlockSignature{
 			{
 				Height: 999,
@@ -156,7 +155,7 @@ func TestParserModule_Success(t *testing.T) {
 	readerModule.CreateInput(readerInputName)
 
 	err := readerModule.AttachTo(&parserModule, OutputName, readerInputName)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(t.Context(), time.Second*5)
 	defer cancel()
@@ -171,13 +170,13 @@ func TestParserModule_Success(t *testing.T) {
 		case <-ctx.Done():
 			t.Error("stop by cancelled context")
 		case msg, ok := <-readerModule.MustInput(readerInputName).Listen():
-			assert.True(t, ok, "received value should be delivered by successful send operation")
+			require.True(t, ok, "received value should be delivered by successful send operation")
 
 			received, ok := msg.(*dCtx.Context)
-			assert.Truef(t, ok, "invalid message type: %T", msg)
+			require.Truef(t, ok, "invalid message type: %T", msg)
 
 			expectedBlock := getExpectedBlock()
-			assert.Equal(t, expectedBlock, *received.Block)
+			require.Equal(t, expectedBlock, *received.Block)
 			return
 		}
 	}
@@ -191,7 +190,7 @@ func TestModule_OnClosedChannel(t *testing.T) {
 	stopperModule.CreateInput(stopInputName)
 
 	err := stopperModule.AttachTo(&parserModule, StopOutput, stopInputName)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(t.Context(), time.Second*1)
 	defer cancel()
@@ -199,14 +198,14 @@ func TestModule_OnClosedChannel(t *testing.T) {
 	parserModule.Start(ctx)
 
 	err = parserModule.MustInput(InputName).Close()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	for {
 		select {
 		case <-ctx.Done():
 			t.Error("stop by cancelled context")
 		case msg := <-stopperModule.MustInput(stopInputName).Listen():
-			assert.Equal(t, struct{}{}, msg)
+			require.Equal(t, struct{}{}, msg)
 			return
 		}
 	}
@@ -220,7 +219,7 @@ func TestModule_OnParseError(t *testing.T) {
 	stopperModule.CreateInput(stopInputName)
 
 	err := stopperModule.AttachTo(&parserModule, StopOutput, stopInputName)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(t.Context(), time.Second*1)
 	defer cancel()
@@ -252,7 +251,7 @@ func TestModule_OnParseError(t *testing.T) {
 		case <-ctx.Done():
 			t.Error("stop by cancelled context")
 		case msg := <-stopperModule.MustInput(stopInputName).Listen():
-			assert.Equal(t, struct{}{}, msg)
+			require.Equal(t, struct{}{}, msg)
 			return
 		}
 	}

@@ -14,39 +14,44 @@ import (
 	bankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/fatih/structs"
+	"github.com/pkg/errors"
 )
 
-func MsgPruneExpiredGrants(ctx *context.Context, m *authz.MsgPruneExpiredGrants) (types.MsgType, []storage.AddressWithType, error) {
+func MsgPruneExpiredGrants(ctx *context.Context, msgId uint64, m *authz.MsgPruneExpiredGrants) (types.MsgType, error) {
 	msgType := types.MsgPruneExpiredGrants
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: types.MsgAddressTypeExecutor, address: m.Pruner},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgGrant is a request type for Grant method. It declares authorization to the grantee
 // on behalf of the granter with the provided expiration time.
-func MsgGrant(ctx *context.Context, status types.Status, m *authz.MsgGrant) (types.MsgType, []storage.AddressWithType, []storage.Grant, error) {
+func MsgGrant(ctx *context.Context, status types.Status, msgId uint64, m *authz.MsgGrant) (types.MsgType, error) {
 	msgType := types.MsgGrant
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: types.MsgAddressTypeGranter, address: m.Granter},
 		{t: types.MsgAddressTypeGrantee, address: m.Grantee},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil || status == types.StatusFailed {
-		return msgType, addresses, nil, err
+		return msgType, err
 	}
 	grants, err := parseGrants(m, ctx.Block.Time, ctx.Block.Height)
-	return msgType, addresses, grants, err
+	if err != nil {
+		return msgType, errors.Wrap(err, "parse grants")
+	}
+	ctx.AddGrants(grants...)
+	return msgType, nil
 }
 
 // MsgExec attempts to execute the provided messages using
 // authorizations granted to the grantee. Each message should have only
 // one signer corresponding to the granter of the authorization.
-func MsgExec(ctx *context.Context, status types.Status, m *authz.MsgExec) (types.MsgType, []storage.AddressWithType, []string, error) {
+func MsgExec(ctx *context.Context, status types.Status, msgId uint64, m *authz.MsgExec) (types.MsgType, []string, error) {
 	msgType := types.MsgExec
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: types.MsgAddressTypeGrantee, address: m.Grantee},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 
 	// MsgExecute also has Msgs field, where also can be addresses.
 	// Authorization Msg requests to execute. Each msg must implement Authorization interface
@@ -54,11 +59,11 @@ func MsgExec(ctx *context.Context, status types.Status, m *authz.MsgExec) (types
 	// triple and validate it.
 
 	if err != nil {
-		return msgType, addresses, nil, err
+		return msgType, nil, err
 	}
 
 	if status == types.StatusFailed {
-		return msgType, addresses, nil, nil
+		return msgType, nil, nil
 	}
 
 	msgs := make([]string, len(m.Msgs))
@@ -66,19 +71,19 @@ func MsgExec(ctx *context.Context, status types.Status, m *authz.MsgExec) (types
 		msgs[i] = m.Msgs[i].TypeUrl
 	}
 
-	return msgType, addresses, msgs, nil
+	return msgType, msgs, nil
 }
 
 // MsgRevoke revokes any authorization with the provided sdk.Msg type on the
 // granter's account with that has been granted to the grantee.
-func MsgRevoke(ctx *context.Context, status types.Status, m *authz.MsgRevoke) (types.MsgType, []storage.AddressWithType, []storage.Grant, error) {
+func MsgRevoke(ctx *context.Context, status types.Status, msgId uint64, m *authz.MsgRevoke) (types.MsgType, error) {
 	msgType := types.MsgRevoke
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: types.MsgAddressTypeGranter, address: m.Granter},
 		{t: types.MsgAddressTypeGrantee, address: m.Grantee},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil || status == types.StatusFailed {
-		return msgType, addresses, nil, err
+		return msgType, err
 	}
 
 	grant := storage.Grant{
@@ -93,10 +98,11 @@ func MsgRevoke(ctx *context.Context, status types.Status, m *authz.MsgRevoke) (t
 		RevokeHeight:  &ctx.Block.Height,
 	}
 
-	return msgType, addresses, []storage.Grant{grant}, nil
+	ctx.AddGrants(&grant)
+	return msgType, nil
 }
 
-func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]storage.Grant, error) {
+func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]*storage.Grant, error) {
 	if msg == nil {
 		return nil, nil
 	}
@@ -107,7 +113,7 @@ func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]sto
 		if err := typ.Unmarshal(msg.Grant.Authorization.Value); err != nil {
 			return nil, err
 		}
-		return []storage.Grant{
+		return []*storage.Grant{
 			{
 				Params:        structs.Map(typ),
 				Authorization: typ.MsgTypeURL(),
@@ -127,7 +133,7 @@ func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]sto
 		if err := typ.Unmarshal(msg.Grant.Authorization.Value); err != nil {
 			return nil, err
 		}
-		return []storage.Grant{
+		return []*storage.Grant{
 			{
 				Params:        structs.Map(typ),
 				Authorization: "/cosmos.bank.v1beta1.MsgSend",
@@ -149,7 +155,7 @@ func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]sto
 		}
 		switch typ.AuthorizationType {
 		case stakingTypes.AuthorizationType_AUTHORIZATION_TYPE_DELEGATE:
-			return []storage.Grant{
+			return []*storage.Grant{
 				{
 					Params:        structs.Map(typ),
 					Authorization: "/cosmos.staking.v1beta1.MsgDelegate",
@@ -165,7 +171,7 @@ func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]sto
 				},
 			}, nil
 		case stakingTypes.AuthorizationType_AUTHORIZATION_TYPE_REDELEGATE:
-			return []storage.Grant{
+			return []*storage.Grant{
 				{
 					Params:        structs.Map(typ),
 					Authorization: "/cosmos.staking.v1beta1.MsgRedelegate",
@@ -181,7 +187,7 @@ func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]sto
 				},
 			}, nil
 		case stakingTypes.AuthorizationType_AUTHORIZATION_TYPE_UNDELEGATE:
-			return []storage.Grant{
+			return []*storage.Grant{
 				{
 					Params:        structs.Map(typ),
 					Authorization: "/cosmos.staking.v1beta1.MsgUndelegate",
@@ -197,7 +203,7 @@ func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]sto
 				},
 			}, nil
 		case stakingTypes.AuthorizationType_AUTHORIZATION_TYPE_UNSPECIFIED:
-			return []storage.Grant{
+			return []*storage.Grant{
 				{
 					Params:        structs.Map(typ),
 					Authorization: "/cosmos.staking.v1beta1.MsgDelegate",

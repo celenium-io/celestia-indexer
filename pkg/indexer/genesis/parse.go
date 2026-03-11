@@ -51,7 +51,7 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 		Height:  pkgTypes.Level(genesis.InitialHeight - 1),
 		AppHash: []byte(genesis.AppHash),
 		ChainId: genesis.ChainID,
-		Txs:     make([]storage.Tx, 0),
+		Txs:     make([]storage.Tx, len(genesis.AppState.Genutil.GenTxs)),
 		Stats: storage.BlockStats{
 			Time:          genesis.GenesisTime,
 			Height:        pkgTypes.Level(genesis.InitialHeight - 1),
@@ -100,9 +100,12 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 			Messages: make([]storage.Message, len(txDecoded.GetMsgs())),
 			Events:   nil,
 		}
+		if err := tx.SetId(); err != nil {
+			return data, err
+		}
 
 		for msgIndex, msg := range txDecoded.GetMsgs() {
-			decoded, err := decode.Message(decodeCtx, msg, msgIndex, storageTypes.StatusSuccess)
+			decoded, err := decode.Message(decodeCtx, msg, msgIndex, storageTypes.StatusSuccess, tx.Id)
 			if err != nil {
 				return data, errors.Wrap(err, "decode genesis message")
 			}

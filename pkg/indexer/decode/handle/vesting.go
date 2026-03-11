@@ -16,14 +16,14 @@ import (
 
 // MsgCreateVestingAccount defines a message that enables creating a vesting
 // account.
-func MsgCreateVestingAccount(ctx *context.Context, status storageTypes.Status, m *cosmosVestingTypes.MsgCreateVestingAccount) (storageTypes.MsgType, []storage.AddressWithType, *storage.VestingAccount, error) {
+func MsgCreateVestingAccount(ctx *context.Context, status storageTypes.Status, txId, msgId uint64, m *cosmosVestingTypes.MsgCreateVestingAccount) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgCreateVestingAccount
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeFromAddress, address: m.FromAddress},
 		{t: storageTypes.MsgAddressTypeToAddress, address: m.ToAddress},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil || status == storageTypes.StatusFailed {
-		return msgType, addresses, nil, err
+		return msgType, err
 	}
 
 	v := &storage.VestingAccount{
@@ -32,6 +32,7 @@ func MsgCreateVestingAccount(ctx *context.Context, status storageTypes.Status, m
 		Address: &storage.Address{
 			Address: m.ToAddress,
 		},
+		TxId: &txId,
 	}
 
 	amount := decimal.NewFromBigInt(m.Amount.AmountOf(currency.Utia).BigInt(), 0)
@@ -52,21 +53,22 @@ func MsgCreateVestingAccount(ctx *context.Context, status storageTypes.Status, m
 		v.Type = storageTypes.VestingTypeContinuous
 	}
 
-	return msgType, addresses, v, err
+	ctx.AddVestingAccount(v)
+	return msgType, err
 }
 
 // MsgCreatePermanentLockedAccount defines a message that enables creating a permanent
 // locked account.
 //
 // Since: cosmos-sdk 0.46
-func MsgCreatePermanentLockedAccount(ctx *context.Context, status storageTypes.Status, m *cosmosVestingTypes.MsgCreatePermanentLockedAccount) (storageTypes.MsgType, []storage.AddressWithType, *storage.VestingAccount, error) {
+func MsgCreatePermanentLockedAccount(ctx *context.Context, status storageTypes.Status, txId, msgId uint64, m *cosmosVestingTypes.MsgCreatePermanentLockedAccount) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgCreatePermanentLockedAccount
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeFromAddress, address: m.FromAddress},
 		{t: storageTypes.MsgAddressTypeToAddress, address: m.ToAddress},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil || status == storageTypes.StatusFailed {
-		return msgType, addresses, nil, err
+		return msgType, err
 	}
 
 	v := &storage.VestingAccount{
@@ -76,26 +78,28 @@ func MsgCreatePermanentLockedAccount(ctx *context.Context, status storageTypes.S
 			Address: m.ToAddress,
 		},
 		Type: storageTypes.VestingTypePermanent,
+		TxId: &txId,
 	}
 
 	amount := decimal.NewFromBigInt(m.Amount.AmountOf(currency.Utia).BigInt(), 0)
 	v.Amount = v.Amount.Add(amount)
 
-	return msgType, addresses, v, err
+	ctx.AddVestingAccount(v)
+	return msgType, err
 }
 
 // MsgCreateVestingAccount defines a message that enables creating a vesting
 // account.
 //
 // Since: cosmos-sdk 0.46
-func MsgCreatePeriodicVestingAccount(ctx *context.Context, status storageTypes.Status, m *cosmosVestingTypes.MsgCreatePeriodicVestingAccount) (storageTypes.MsgType, []storage.AddressWithType, *storage.VestingAccount, error) {
+func MsgCreatePeriodicVestingAccount(ctx *context.Context, status storageTypes.Status, txId, msgId uint64, m *cosmosVestingTypes.MsgCreatePeriodicVestingAccount) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgCreatePeriodicVestingAccount
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeFromAddress, address: m.FromAddress},
 		{t: storageTypes.MsgAddressTypeToAddress, address: m.ToAddress},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil || status == storageTypes.StatusFailed {
-		return msgType, addresses, nil, err
+		return msgType, err
 	}
 
 	v := &storage.VestingAccount{
@@ -106,6 +110,7 @@ func MsgCreatePeriodicVestingAccount(ctx *context.Context, status storageTypes.S
 		},
 		Type:   storageTypes.VestingTypePeriodic,
 		Amount: decimal.Zero,
+		TxId:   &txId,
 	}
 
 	periodTime := v.Time
@@ -126,5 +131,6 @@ func MsgCreatePeriodicVestingAccount(ctx *context.Context, status storageTypes.S
 		v.VestingPeriods = append(v.VestingPeriods, period)
 	}
 
-	return msgType, addresses, v, err
+	ctx.AddVestingAccount(v)
+	return msgType, err
 }

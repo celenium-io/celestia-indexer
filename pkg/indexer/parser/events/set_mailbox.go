@@ -47,8 +47,14 @@ func processSetMailbox(ctx *context.Context, events []storage.Event, msg *storag
 				Mailbox:    mailboxId.Bytes(),
 				InternalId: mailboxId.GetInternalId(),
 				Owner: &storage.Address{
-					Address: setMailbox.Owner,
+					Address:    setMailbox.Owner,
+					Height:     msg.Height,
+					LastHeight: msg.Height,
+					Balance:    storage.EmptyBalance(),
 				},
+			}
+			if err := ctx.AddAddress(mailbox.Owner); err != nil {
+				return errors.Wrap(err, "add address")
 			}
 
 			if len(setMailbox.DefaultIsm) > 0 && setMailbox.DefaultIsm != null {
@@ -67,11 +73,20 @@ func processSetMailbox(ctx *context.Context, events []storage.Event, msg *storag
 				mailbox.DefaultHook = defaultHook.Bytes()
 			}
 
-			if len(setMailbox.NewOwner) > 0 {
-				mailbox.DefaultHook = []byte(setMailbox.NewOwner)
+			if len(setMailbox.NewOwner) > 0 && setMailbox.NewOwner != setMailbox.Owner {
+				newOwner := &storage.Address{
+					Address:    setMailbox.NewOwner,
+					Balance:    storage.EmptyBalance(),
+					Height:     msg.Height,
+					LastHeight: msg.Height,
+				}
+				if err := ctx.AddAddress(newOwner); err != nil {
+					return errors.Wrap(err, "add address")
+				}
+				mailbox.Owner = newOwner
 			}
 
-			msg.HLMailbox = mailbox
+			ctx.AddHlMailbox(mailbox)
 			end = true
 		}
 

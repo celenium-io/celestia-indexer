@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (module *Module) saveIgps(
+func saveIgps(
 	ctx context.Context,
 	tx storage.Transaction,
 	dCtx *decodeContext.Context,
@@ -32,7 +32,7 @@ func (module *Module) saveIgps(
 	}
 
 	if dCtx.IgpConfigs.Len() > 0 {
-		configs := make([]storage.HLIGPConfig, 0)
+		configs := make([]storage.HLIGPConfig, 0, dCtx.IgpConfigs.Len())
 		if err := dCtx.IgpConfigs.Range(func(igpAddress string, value *storage.HLIGPConfig) (error, bool) {
 			hexAddress, err := util.DecodeHexAddress(igpAddress)
 			if err != nil {

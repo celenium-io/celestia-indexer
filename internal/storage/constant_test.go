@@ -6,10 +6,10 @@ package storage
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestConstant_TableName(t *testing.T) {
 	constant := Constant{}
-	assert.Equal(t, "constant", constant.TableName())
+	require.Equal(t, "constant", constant.TableName())
 }

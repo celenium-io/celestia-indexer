@@ -54,18 +54,3 @@ func (ns Namespace) String() string {
 func (ns Namespace) Hash() string {
 	return base64.StdEncoding.EncodeToString(append([]byte{ns.Version}, ns.NamespaceID...))
 }
-
-func (ns Namespace) Copy() *Namespace {
-	return &Namespace{
-		Id:              ns.Id,
-		FirstHeight:     ns.FirstHeight,
-		LastHeight:      ns.LastHeight,
-		Version:         ns.Version,
-		NamespaceID:     ns.NamespaceID,
-		Size:            ns.Size,
-		PfbCount:        ns.PfbCount,
-		BlobsCount:      ns.BlobsCount,
-		Reserved:        ns.Reserved,
-		LastMessageTime: ns.LastMessageTime,
-	}
-}

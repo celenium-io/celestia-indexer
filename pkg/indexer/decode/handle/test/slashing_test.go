@@ -14,7 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosSlashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/fatih/structs"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // MsgUnjail
@@ -28,34 +28,20 @@ func createMsgUnjail() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 	m := createMsgUnjail()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeValidator,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym",
-				Hash:       []byte{0xf3, 0xc0, 0x5, 0x68, 0x19, 0x9b, 0xaa, 0xa7, 0xf1, 0x2d, 0xa0, 0x48, 0xf1, 0xd0, 0xb6, 0xa, 0x22, 0xb9, 0x2b, 0x7e},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgUnjail,
@@ -63,10 +49,8 @@ func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 		Data:      structs.Map(m),
 		Size:      56,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }

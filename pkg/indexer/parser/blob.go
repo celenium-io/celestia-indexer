@@ -19,7 +19,6 @@ func processBlob(blobs []*storage.BlobLog, d decode.DecodedTx, t *storage.Tx) {
 	if len(blobs) == 0 || len(d.Blobs) != len(blobs) {
 		return
 	}
-	t.BlobsCount += len(blobs)
 
 	var (
 		gasConsumedOnBlobs = decimal.Zero.Copy()
@@ -33,7 +32,6 @@ func processBlob(blobs []*storage.BlobLog, d decode.DecodedTx, t *storage.Tx) {
 		gas := decimal.NewFromInt(int64(sharesUsed)).Mul(gasPerBlobByte)
 		gasConsumedOnBlobs = gasConsumedOnBlobs.Add(gas)
 		gasConsumedPerBlob[i] = gas
-
 	}
 
 	gasUsed := decimal.NewFromInt(t.GasUsed)

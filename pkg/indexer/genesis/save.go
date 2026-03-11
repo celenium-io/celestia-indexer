@@ -43,7 +43,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 	}
 
 	var (
-		messages   = make([]*storage.Message, 0)
+		messages   = make([]*storage.Message, 0, 1000)
 		events     = make([]any, len(data.block.Events))
 		namespaces = make(map[string]*storage.Namespace, 0)
 	)
@@ -54,7 +54,6 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 
 	for i := range data.block.Txs {
 		for j := range data.block.Txs[i].Messages {
-			data.block.Txs[i].Messages[j].TxId = data.block.Txs[i].Id
 			messages = append(messages, &data.block.Txs[i].Messages[j])
 
 			for k := range data.block.Txs[i].Messages[j].Namespace {
@@ -205,13 +204,13 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		}
 	}
 
-	var namespaceMsgs []storage.NamespaceMessage
+	var namespaceMsgs []*storage.NamespaceMessage
 	for i := range messages {
 		for j := range messages[i].Namespace {
 			if messages[i].Namespace[j].Id == 0 { // in case of duplication of writing to one namespace inside one messages
 				continue
 			}
-			namespaceMsgs = append(namespaceMsgs, storage.NamespaceMessage{
+			namespaceMsgs = append(namespaceMsgs, &storage.NamespaceMessage{
 				MsgId:       messages[i].Id,
 				NamespaceId: messages[i].Namespace[j].Id,
 				Time:        messages[i].Time,
@@ -226,10 +225,10 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 	}
 
 	var signers []storage.Signer
-	for _, transaction := range data.block.Txs {
-		for _, address := range transaction.Signers {
+	for i := range data.block.Txs {
+		for _, address := range data.block.Txs[i].Signers {
 			signers = append(signers, storage.Signer{
-				TxId:      transaction.Id,
+				TxId:      data.block.Txs[i].Id,
 				AddressId: address.Id,
 			})
 		}

@@ -6,7 +6,6 @@ package handle_test
 import (
 	"encoding/hex"
 	"testing"
-	"time"
 
 	"cosmossdk.io/x/feegrant"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -17,7 +16,7 @@ import (
 	codecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/fatih/structs"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // MsgGrantAllowance
@@ -38,46 +37,20 @@ func createMsgGrantAllowance() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 	m := createMsgGrantAllowance()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 4
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeGranter,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
-				Hash:       []byte{0x38, 0xf5, 0xc9, 0x8, 0x56, 0x46, 0xad, 0xc2, 0xc0, 0x71, 0x2c, 0xcc, 0x4a, 0x9e, 0xbe, 0x5, 0x41, 0x9e, 0xd2, 0xc8},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-		{
-			Type: storageTypes.MsgAddressTypeGrantee,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
-				Hash:       []byte{0x64, 0xd3, 0xfc, 0x6a, 0x2a, 0x52, 0x4e, 0x2f, 0x60, 0x3f, 0x51, 0xc7, 0xee, 0x4e, 0x8d, 0x35, 0xf7, 0x23, 0x22, 0xf8},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
-
-	expiration := time.Date(2123, 10, 13, 18, 47, 3, 0, time.UTC)
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  4,
 		Type:      storageTypes.MsgGrantAllowance,
@@ -85,36 +58,11 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 		Data:      structs.Map(m),
 		Size:      233,
 		Namespace: nil,
-		Addresses: addressesExpected,
-		Grants: []storage.Grant{
-			{
-				Height:        blob.Height,
-				Time:          blob.Block.Time,
-				Authorization: "fee",
-				Granter: &storage.Address{
-					Address: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
-				},
-				Grantee: &storage.Address{
-					Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
-				},
-				Expiration: &expiration,
-				Params: map[string]any{
-					"Allowance": feegrant.BasicAllowance{
-						SpendLimit: nil,
-						Expiration: &expiration,
-					},
-					"AllowedMessages": []string{
-						"/cosmos.authz.v1beta1.MsgExec",
-					},
-				},
-			},
-		},
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 // MsgRevokeAllowance
@@ -130,45 +78,20 @@ func createMsgRevokeAllowance() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgRevokeAllowance(t *testing.T) {
 	m := createMsgRevokeAllowance()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 4
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeGranter,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
-				Hash:       []byte{0x38, 0xf5, 0xc9, 0x8, 0x56, 0x46, 0xad, 0xc2, 0xc0, 0x71, 0x2c, 0xcc, 0x4a, 0x9e, 0xbe, 0x5, 0x41, 0x9e, 0xd2, 0xc8},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-		{
-			Type: storageTypes.MsgAddressTypeGrantee,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
-				Hash:       []byte{0x64, 0xd3, 0xfc, 0x6a, 0x2a, 0x52, 0x4e, 0x2f, 0x60, 0x3f, 0x51, 0xc7, 0xee, 0x4e, 0x8d, 0x35, 0xf7, 0x23, 0x22, 0xf8},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  4,
 		Type:      storageTypes.MsgRevokeAllowance,
@@ -176,24 +99,9 @@ func TestDecodeMsg_SuccessOnMsgRevokeAllowance(t *testing.T) {
 		Data:      structs.Map(m),
 		Size:      98,
 		Namespace: nil,
-		Addresses: addressesExpected,
-		Grants: []storage.Grant{
-			{
-				RevokeHeight:  &blob.Height,
-				Revoked:       true,
-				Authorization: "fee",
-				Granter: &storage.Address{
-					Address: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
-				},
-				Grantee: &storage.Address{
-					Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
-				},
-			},
-		},
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }

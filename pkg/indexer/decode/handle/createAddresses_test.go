@@ -6,11 +6,10 @@ package handle
 import (
 	"testing"
 
-	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCreateAddresses_SingleAddress(t *testing.T) {
@@ -20,23 +19,12 @@ func TestCreateAddresses_SingleAddress(t *testing.T) {
 	level := types.Level(235236)
 	ctx := context.NewContext()
 
-	addresses, err := createAddresses(ctx, data, level)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, addresses)
-	assert.Len(t, addresses, 1)
+	const msgId uint64 = 1
+	err := createAddresses(ctx, data, level, msgId)
+	require.NoError(t, err)
 
-	addr := addresses[0]
-	expectedAddr := storage.AddressWithType{
-		Type: storageTypes.MsgAddressTypeVoter,
-		Address: storage.Address{
-			Hash:       []byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
-			Height:     types.Level(235236),
-			LastHeight: types.Level(235236),
-			Address:    "celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
-			Balance:    storage.EmptyBalance(),
-		},
-	}
-	assert.Equal(t, expectedAddr, addr)
+	require.Equal(t, 1, ctx.Addresses.Len())
+	require.Equal(t, 1, ctx.AddressMessages.Len())
 }
 
 func TestCreateAddresses_ListOfAddresses(t *testing.T) {
@@ -47,36 +35,12 @@ func TestCreateAddresses_ListOfAddresses(t *testing.T) {
 	level := types.Level(235236)
 	ctx := context.NewContext()
 
-	addresses, err := createAddresses(ctx, data, level)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, addresses)
-	assert.Len(t, addresses, 2)
+	const msgId uint64 = 2
+	err := createAddresses(ctx, data, level, msgId)
+	require.NoError(t, err)
 
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeDelegator,
-			Address: storage.Address{
-				Id:         0,
-				Height:     types.Level(235236),
-				LastHeight: types.Level(235236),
-				Address:    "celestia1vysgwc9mykfz5249g9thjlffx6nha0kkwsvs37",
-				Hash:       []byte{0x61, 0x20, 0x87, 0x60, 0xbb, 0x25, 0x92, 0x2a, 0x2a, 0xa5, 0x41, 0x57, 0x79, 0x7d, 0x29, 0x36, 0xa7, 0x7e, 0xbe, 0xd6},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-		{
-			Type: storageTypes.MsgAddressTypeValidator,
-			Address: storage.Address{
-				Id:         0,
-				Height:     types.Level(235236),
-				LastHeight: types.Level(235236),
-				Address:    "celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym",
-				Hash:       []byte{0xf3, 0xc0, 0x5, 0x68, 0x19, 0x9b, 0xaa, 0xa7, 0xf1, 0x2d, 0xa0, 0x48, 0xf1, 0xd0, 0xb6, 0xa, 0x22, 0xb9, 0x2b, 0x7e},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
-	assert.Equal(t, addressesExpected, addresses)
+	require.Equal(t, 2, ctx.Addresses.Len())
+	require.Equal(t, 2, ctx.AddressMessages.Len())
 }
 
 func TestCreateAddresses_ErrorOnDecodingAddress(t *testing.T) {
@@ -86,7 +50,8 @@ func TestCreateAddresses_ErrorOnDecodingAddress(t *testing.T) {
 	level := types.Level(235236)
 	ctx := context.NewContext()
 
-	addresses, err := createAddresses(ctx, data, level)
-	assert.Error(t, err, "decoding bech32 failed: string not all lowercase or all uppercase")
-	assert.Empty(t, addresses)
+	const msgId uint64 = 3
+	err := createAddresses(ctx, data, level, msgId)
+	require.Error(t, err, "decoding bech32 failed: string not all lowercase or all uppercase")
+	require.Equal(t, 0, ctx.Addresses.Len())
 }

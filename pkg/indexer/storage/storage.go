@@ -291,39 +291,8 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	if err := tx.SaveEvents(ctx, block.Events...); err != nil {
+	if err := tx.SaveEvents(ctx, dCtx.Events...); err != nil {
 		return state, err
-	}
-
-	var (
-		messages   = make([]*storage.Message, 0)
-		namespaces = make(map[string]*storage.Namespace, 0)
-	)
-
-	events := make([]storage.Event, 0, 10000)
-	for i := range block.Txs {
-		for j := range block.Txs[i].Messages {
-			block.Txs[i].Messages[j].TxId = block.Txs[i].Id
-			messages = append(messages, &block.Txs[i].Messages[j])
-			setNamespacesFromMessage(block.Txs[i].Messages[j], namespaces)
-		}
-
-		for j := range block.Txs[i].Events {
-			block.Txs[i].Events[j].TxId = &block.Txs[i].Id
-		}
-
-		events = append(events, block.Txs[i].Events...)
-		if len(events) >= 10000 {
-			if err := tx.SaveEvents(ctx, events...); err != nil {
-				return state, err
-			}
-			events = events[:0]
-		}
-	}
-	if len(events) > 0 {
-		if err := tx.SaveEvents(ctx, events...); err != nil {
-			return state, err
-		}
 	}
 
 	addrToId, totalAccounts, err := saveAddresses(ctx, tx, dCtx.Addresses.Values())
@@ -335,9 +304,17 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	totalNamespaces, err := saveNamespaces(ctx, tx, namespaces)
-	if err != nil {
+	if err := saveAddressMessage(ctx, tx, dCtx.AddressMessages.Values(), addrToId); err != nil {
 		return state, err
+	}
+
+	totalNamespaces, err := tx.SaveNamespaces(ctx, dCtx.Namespaces.Values()...)
+	if err != nil {
+		return state, errors.Wrap(err, "save namespaces")
+	}
+
+	if err := saveNamespaceMessages(ctx, tx, dCtx.NamespaceMessages.Values()); err != nil {
+		return state, errors.Wrap(err, "save namespace messages")
 	}
 
 	totalValidators, err := module.saveValidators(ctx, tx, dCtx.Validators.Values(), dCtx.Jails)
@@ -345,8 +322,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	ibcClientsCount, err := module.saveMessages(ctx, tx, messages, addrToId, dCtx.Upgrades, state)
-	if err != nil {
+	if err := module.saveMessages(ctx, tx, dCtx.Messages); err != nil {
 		return state, err
 	}
 
@@ -358,12 +334,70 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
+	if err := saveBlobLogs(ctx, tx, dCtx.BlobLogs, addrToId); err != nil {
+		return state, err
+	}
+
 	totalProposals, err := module.saveProposals(ctx, tx, dCtx.Block.Height, dCtx.Proposals, dCtx.Votes, addrToId)
 	if err != nil {
 		return state, err
 	}
 
-	if err := module.saveIgps(ctx, tx, dCtx, addrToId); err != nil {
+	if err := saveVestings(ctx, tx, dCtx.VestingAccounts, addrToId); err != nil {
+		return state, err
+	}
+
+	if err := saveGrants(ctx, tx, dCtx.Grants.Values(), addrToId); err != nil {
+		return state, err
+	}
+
+	ibcClientsCount, err := saveIbcClients(ctx, tx, dCtx.IbcClients.Values(), addrToId)
+	if err != nil {
+		return state, err
+	}
+	if err := tx.SaveIbcConnections(ctx, dCtx.IbcConnections.Values()...); err != nil {
+		return state, err
+	}
+	if err := saveIbcChannels(ctx, tx, dCtx.IbcChannels.Values(), addrToId); err != nil {
+		return state, err
+	}
+	if err := saveIbcTransfers(ctx, tx, dCtx.IbcTransfers, addrToId); err != nil {
+		return state, err
+	}
+
+	if err := saveForwarding(ctx, tx, dCtx.Forwardings, addrToId); err != nil {
+		return state, err
+	}
+
+	if err := saveZkIsm(ctx, tx, dCtx.ZkISMs.Values(), addrToId); err != nil {
+		return state, err
+	}
+	if err := saveZkIsmUpdates(ctx, tx, dCtx.ZkISMs, dCtx.ZkIsmUpdates, addrToId); err != nil {
+		return state, err
+	}
+	if err := saveZkIsmMessages(ctx, tx, dCtx.ZkISMs, dCtx.ZkIsmMessages, addrToId); err != nil {
+		return state, err
+	}
+
+	if err := saveHlMailboxes(ctx, tx, dCtx.HlMailboxes.Values(), addrToId); err != nil {
+		return state, err
+	}
+	if err := saveHlTokens(ctx, tx, dCtx.HlTokens.Values(), addrToId); err != nil {
+		return state, err
+	}
+	if err := saveHlTransfers(ctx, tx, dCtx.HlTransfers, addrToId); err != nil {
+		return state, err
+	}
+
+	if err := saveIgps(ctx, tx, dCtx, addrToId); err != nil {
+		return state, err
+	}
+
+	if err := module.saveSignals(ctx, tx, dCtx.Signals, dCtx.Upgrades, addrToId, state); err != nil {
+		return state, err
+	}
+
+	if err := module.tryUpgrade(ctx, tx, dCtx.TryUpgrade, state); err != nil {
 		return state, err
 	}
 

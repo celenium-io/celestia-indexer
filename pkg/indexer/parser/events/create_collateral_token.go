@@ -61,15 +61,22 @@ func processCreateCollateralToken(ctx *context.Context, events []storage.Event, 
 				TokenId:  tokenId.Bytes(),
 				Received: decimal.Zero,
 				Sent:     decimal.Zero,
+				TxId:     msg.TxId,
 			}
 
 			if createToken.Owner != "" {
 				token.Owner = &storage.Address{
-					Address: createToken.Owner,
+					Address:    createToken.Owner,
+					Height:     msg.Height,
+					LastHeight: msg.Height,
+					Balance:    storage.EmptyBalance(),
+				}
+				if err := ctx.AddAddress(token.Owner); err != nil {
+					return errors.Wrap(err, "add address")
 				}
 			}
 
-			msg.HLToken = token
+			ctx.AddHlToken(token)
 			end = true
 		}
 

@@ -13,41 +13,27 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/x/group"
 	"github.com/fatih/structs"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDecodeMsg_SuccessOnMsgCreateGroup(t *testing.T) {
 	msg := &group.MsgCreateGroup{
 		Admin: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeAdmin,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgCreateGroup,
@@ -55,47 +41,31 @@ func TestDecodeMsg_SuccessOnMsgCreateGroup(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgUpdateGroupMembers(t *testing.T) {
 	msg := &group.MsgUpdateGroupMembers{
 		Admin: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeAdmin,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgUpdateGroupMembers,
@@ -103,13 +73,11 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupMembers(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgUpdateGroupAdmin(t *testing.T) {
@@ -117,44 +85,20 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupAdmin(t *testing.T) {
 		Admin:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 		NewAdmin: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeAdmin,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		}, {
-			Type: storageTypes.MsgAddressTypeNewAdmin,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
-				Hash:       []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x0, 0x2e, 0x81, 0xcb, 0x8b, 0x27, 0x27, 0xe1, 0x0, 0x68},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgUpdateGroupAdmin,
@@ -162,47 +106,31 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupAdmin(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      98,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgUpdateGroupMetadata(t *testing.T) {
 	msg := &group.MsgUpdateGroupMetadata{
 		Admin: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeAdmin,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgUpdateGroupMetadata,
@@ -210,47 +138,31 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupMetadata(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgCreateGroupPolicy(t *testing.T) {
 	msg := &group.MsgCreateGroupPolicy{
 		Admin: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeAdmin,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgCreateGroupPolicy,
@@ -258,47 +170,31 @@ func TestDecodeMsg_SuccessOnMsgCreateGroupPolicy(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyAdmin(t *testing.T) {
 	msg := &group.MsgUpdateGroupPolicyAdmin{
 		Admin: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeAdmin,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgUpdateGroupPolicyAdmin,
@@ -306,47 +202,31 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyAdmin(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgCreateGroupWithPolicy(t *testing.T) {
 	msg := &group.MsgCreateGroupWithPolicy{
 		Admin: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeAdmin,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgCreateGroupWithPolicy,
@@ -354,13 +234,11 @@ func TestDecodeMsg_SuccessOnMsgCreateGroupWithPolicy(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyDecisionPolicy(t *testing.T) {
@@ -368,43 +246,20 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyDecisionPolicy(t *testing.T) {
 		Admin:              "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 		GroupPolicyAddress: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeAdmin,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		}, {
-			Type: storageTypes.MsgAddressTypeGroupPolicyAddress,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
-				Hash:       []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x0, 0x2e, 0x81, 0xcb, 0x8b, 0x27, 0x27, 0xe1, 0x0, 0x68},
-				Balance:    storage.EmptyBalance(),
-			},
-		}}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgUpdateGroupPolicyDecisionPolicy,
@@ -412,13 +267,11 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyDecisionPolicy(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      98,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyMetadata(t *testing.T) {
@@ -426,43 +279,20 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyMetadata(t *testing.T) {
 		Admin:              "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 		GroupPolicyAddress: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeAdmin,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		}, {
-			Type: storageTypes.MsgAddressTypeGroupPolicyAddress,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
-				Hash:       []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x0, 0x2e, 0x81, 0xcb, 0x8b, 0x27, 0x27, 0xe1, 0x0, 0x68},
-				Balance:    storage.EmptyBalance(),
-			},
-		}}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgUpdateGroupPolicyMetadata,
@@ -470,46 +300,31 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyMetadata(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      98,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgSubmitProposalGroup(t *testing.T) {
 	msg := &group.MsgSubmitProposal{
 		GroupPolicyAddress: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeGroupPolicyAddress,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
-				Hash:       []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x0, 0x2e, 0x81, 0xcb, 0x8b, 0x27, 0x27, 0xe1, 0x0, 0x68},
-				Balance:    storage.EmptyBalance(),
-			},
-		}}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgSubmitProposalGroup,
@@ -517,47 +332,31 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposalGroup(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgWithdrawProposal(t *testing.T) {
 	msg := &group.MsgWithdrawProposal{
 		Address: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeAdmin,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgWithdrawProposal,
@@ -565,47 +364,31 @@ func TestDecodeMsg_SuccessOnMsgWithdrawProposal(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgVoteGroup(t *testing.T) {
 	msg := &group.MsgVote{
 		Voter: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeVoter,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgVoteGroup,
@@ -613,47 +396,31 @@ func TestDecodeMsg_SuccessOnMsgVoteGroup(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgExecGroup(t *testing.T) {
 	msg := &group.MsgExec{
 		Executor: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeExecutor,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgExecGroup,
@@ -661,47 +428,31 @@ func TestDecodeMsg_SuccessOnMsgExecGroup(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgLeaveGroup(t *testing.T) {
 	msg := &group.MsgLeaveGroup{
 		Address: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeGroupMember,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgLeaveGroup,
@@ -709,11 +460,9 @@ func TestDecodeMsg_SuccessOnMsgLeaveGroup(t *testing.T) {
 		Data:      structs.Map(msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }

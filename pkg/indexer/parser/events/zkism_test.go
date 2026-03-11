@@ -100,9 +100,10 @@ func Test_handleCreateZkISM_Success(t *testing.T) {
 
 	err := handleCreateZkISM(ctx, events, msg, &idx)
 	require.NoError(t, err)
-	require.NotNil(t, msg.ZkISM)
+	require.NotEmpty(t, ctx.ZkISMs.Len())
+	ism, ok := ctx.ZkISMs.Get("42")
+	require.True(t, ok)
 
-	ism := msg.ZkISM
 	require.EqualValues(t, []byte{0x42}, ism.ExternalId)
 	require.Equal(t, ctx.Block.Height, ism.Height)
 	require.Equal(t, ctx.Block.Time, ism.Time)
@@ -163,7 +164,9 @@ func Test_handleCreateZkISM_StopsAtNextAction(t *testing.T) {
 	msg := &storage.Message{Type: types.MsgCreateInterchainSecurityModule}
 	err := handleCreateZkISM(ctx, events, msg, idx)
 	require.NoError(t, err)
-	require.NotNil(t, msg.ZkISM)
+	require.NotEmpty(t, ctx.ZkISMs.Len())
+	_, ok := ctx.ZkISMs.Get("01")
+	require.True(t, ok)
 	require.Equal(t, 2, *idx, "index must stop before the next action event")
 }
 
@@ -208,7 +211,12 @@ func Test_handleUpdateZkISM_Success(t *testing.T) {
 
 	ctx := makeZkISMContext()
 	idx := 0
-	msg := &storage.Message{Type: types.MsgUpdateInterchainSecurityModule}
+	msg := &storage.Message{
+		Type: types.MsgUpdateInterchainSecurityModule,
+		Data: map[string]any{
+			"Signer": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+		},
+	}
 	events := []storage.Event{
 		{
 			Type: "message",
@@ -228,9 +236,9 @@ func Test_handleUpdateZkISM_Success(t *testing.T) {
 
 	err := handleUpdateZkISM(ctx, events, msg, &idx)
 	require.NoError(t, err)
-	require.NotNil(t, msg.ZkISMUpdate)
+	require.NotEmpty(t, ctx.ZkIsmUpdates)
 
-	upd := msg.ZkISMUpdate
+	upd := ctx.ZkIsmUpdates[0]
 	require.EqualValues(t, testsuite.MustHexDecode("07"), upd.ZkISMExternalId)
 	require.Equal(t, ctx.Block.Height, upd.Height)
 	require.Equal(t, ctx.Block.Time, upd.Time)
@@ -318,7 +326,12 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 
 	ctx := makeZkISMContext()
 	idx := 0
-	msg := &storage.Message{Type: types.MsgSubmitMessages}
+	msg := &storage.Message{
+		Type: types.MsgSubmitMessages,
+		Data: map[string]any{
+			"Signer": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+		},
+	}
 	events := []storage.Event{
 		{
 			Type: "message",
@@ -339,9 +352,9 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 
 	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
 	require.NoError(t, err)
-	require.Len(t, msg.ZkISMMessages, 1)
+	require.Len(t, ctx.ZkIsmMessages, 1)
 
-	m := msg.ZkISMMessages[0]
+	m := ctx.ZkIsmMessages[0]
 	require.EqualValues(t, []byte{0x03}, m.ZkISMExternalId)
 	require.Equal(t, ctx.Block.Height, m.Height)
 	require.Equal(t, ctx.Block.Time, m.Time)
@@ -354,7 +367,12 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 func Test_handleSubmitZkISMMessages_Real(t *testing.T) {
 	ctx := makeZkISMContext()
 	idx := 0
-	msg := &storage.Message{Type: types.MsgSubmitMessages}
+	msg := &storage.Message{
+		Type: types.MsgSubmitMessages,
+		Data: map[string]any{
+			"Signer": "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j",
+		},
+	}
 	events := []storage.Event{
 		{
 			Type: "message",
@@ -378,9 +396,9 @@ func Test_handleSubmitZkISMMessages_Real(t *testing.T) {
 
 	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
 	require.NoError(t, err)
-	require.Len(t, msg.ZkISMMessages, 1)
+	require.Len(t, ctx.ZkIsmMessages, 1)
 
-	m := msg.ZkISMMessages[0]
+	m := ctx.ZkIsmMessages[0]
 	require.NotEmpty(t, m.ZkISMExternalId)
 	require.Equal(t, ctx.Block.Height, m.Height)
 	require.Equal(t, ctx.Block.Time, m.Time)
@@ -399,7 +417,12 @@ func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 
 	ctx := makeZkISMContext()
 	idx := 0
-	msg := &storage.Message{Type: types.MsgSubmitMessages}
+	msg := &storage.Message{
+		Type: types.MsgSubmitMessages,
+		Data: map[string]any{
+			"Signer": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+		},
+	}
 	events := []storage.Event{
 		{
 			Type: "message",
@@ -420,16 +443,16 @@ func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 
 	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
 	require.NoError(t, err)
-	require.Len(t, msg.ZkISMMessages, 3)
+	require.Len(t, ctx.ZkIsmMessages, 3)
 
-	for _, m := range msg.ZkISMMessages {
+	for _, m := range ctx.ZkIsmMessages {
 		require.EqualValues(t, []byte{0x05}, m.ZkISMExternalId)
 		require.Equal(t, stateRoot, m.StateRoot)
 		require.NotNil(t, m.Signer)
 	}
-	require.Equal(t, msgId1, msg.ZkISMMessages[0].MessageId)
-	require.Equal(t, msgId2, msg.ZkISMMessages[1].MessageId)
-	require.Equal(t, msgId3, msg.ZkISMMessages[2].MessageId)
+	require.Equal(t, msgId1, ctx.ZkIsmMessages[0].MessageId)
+	require.Equal(t, msgId2, ctx.ZkIsmMessages[1].MessageId)
+	require.Equal(t, msgId3, ctx.ZkIsmMessages[2].MessageId)
 }
 
 func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
@@ -484,13 +507,13 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	require.Len(t, msgs[0].ZkISMMessages, 1)
-	require.EqualValues(t, []byte{0x01}, msgs[0].ZkISMMessages[0].ZkISMExternalId)
-	require.Equal(t, msgId1, msgs[0].ZkISMMessages[0].MessageId)
-	require.Equal(t, stateRoot1, msgs[0].ZkISMMessages[0].StateRoot)
+	require.Len(t, ctx.ZkIsmMessages, 2)
 
-	require.Len(t, msgs[1].ZkISMMessages, 1)
-	require.EqualValues(t, []byte{0x02}, msgs[1].ZkISMMessages[0].ZkISMExternalId)
-	require.Equal(t, msgId2, msgs[1].ZkISMMessages[0].MessageId)
-	require.Equal(t, stateRoot2, msgs[1].ZkISMMessages[0].StateRoot)
+	require.EqualValues(t, []byte{0x01}, ctx.ZkIsmMessages[0].ZkISMExternalId)
+	require.Equal(t, msgId1, ctx.ZkIsmMessages[0].MessageId)
+	require.Equal(t, stateRoot1, ctx.ZkIsmMessages[0].StateRoot)
+
+	require.EqualValues(t, []byte{0x02}, ctx.ZkIsmMessages[1].ZkISMExternalId)
+	require.Equal(t, msgId2, ctx.ZkIsmMessages[1].MessageId)
+	require.Equal(t, stateRoot2, ctx.ZkIsmMessages[1].StateRoot)
 }

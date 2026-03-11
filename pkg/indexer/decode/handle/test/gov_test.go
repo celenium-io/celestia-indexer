@@ -21,12 +21,11 @@ import (
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/fatih/structs"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func createExpectations(
-	blob nodeTypes.BlockData,
+	block nodeTypes.BlockData,
 	now time.Time,
 	m types.Msg,
 	position int,
@@ -35,24 +34,12 @@ func createExpectations(
 	hash []byte,
 	txType storageTypes.MsgType,
 	size int,
-) ([]storage.AddressWithType, storage.Message) {
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: addrType,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    address,
-				Hash:       hash,
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
-
+) storage.Message {
+	// In each test, a fresh context is used, so the msgCounter always starts at 0.
+	// SetId(0) with height=0 gives id=1.
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  int64(position),
 		Type:      txType,
@@ -60,9 +47,8 @@ func createExpectations(
 		Data:      structs.Map(m),
 		Size:      size,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
-	return addressesExpected, msgExpected
+	return msgExpected
 }
 
 // v1.MsgSubmitProposal
@@ -88,19 +74,19 @@ func createMsgSubmitProposalV1() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
 	m := createMsgSubmitProposalV1()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 7
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected, msgExpected := createExpectations(
-		blob, now, m, position,
+	msgExpected := createExpectations(
+		block, now, m, position,
 		storageTypes.MsgAddressTypeProposer,
 		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
@@ -109,8 +95,8 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
 	)
 
 	msgExpected.Proposal = &storage.Proposal{
-		Height:    blob.Height,
-		CreatedAt: blob.Block.Time,
+		Height:    block.Height,
+		CreatedAt: block.Block.Time,
 		Proposer: &storage.Address{
 			Address: "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		},
@@ -120,10 +106,9 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
 		Description: "Proposal contains messages:\r\n1. /cosmos.gov.v1beta1.MsgSubmitProposal\r\n",
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 // v1beta1.MsgSubmitProposal
@@ -146,19 +131,19 @@ func createMsgSubmitProposalV1Beta1() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1(t *testing.T) {
 	m := createMsgSubmitProposalV1Beta1()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 8
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected, msgExpected := createExpectations(
-		blob, now, m, position,
+	msgExpected := createExpectations(
+		block, now, m, position,
 		storageTypes.MsgAddressTypeProposer,
 		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
@@ -172,8 +157,8 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1(t *testing.T) {
 	msgExpected.Proposal = &storage.Proposal{
 		Title:       "💎Celestia Airdrop ✅ ",
 		Description: "Get 💎Celestia Airdrop ✅ visiting url: www.TerraPro.at\n\n- more info: www.TerraWeb.at",
-		Height:      blob.Height,
-		CreatedAt:   blob.Block.Time,
+		Height:      block.Height,
+		CreatedAt:   block.Block.Time,
 		Type:        storageTypes.ProposalTypeText,
 		Status:      storageTypes.ProposalStatusInactive,
 		Proposer: &storage.Address{
@@ -181,10 +166,9 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1(t *testing.T) {
 		},
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 // MsgExecLegacyContent
@@ -200,19 +184,19 @@ func createMsgExecLegacyContent() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgExecLegacyContent(t *testing.T) {
 	m := createMsgExecLegacyContent()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 9
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected, msgExpected := createExpectations(
-		blob, now, m, position,
+	msgExpected := createExpectations(
+		block, now, m, position,
 		storageTypes.MsgAddressTypeAuthority,
 		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
@@ -220,10 +204,9 @@ func TestDecodeMsg_SuccessOnMsgExecLegacyContent(t *testing.T) {
 		49,
 	)
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 // v1.MsgVote
@@ -242,19 +225,19 @@ func createMsgVoteV1() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgVote_V1(t *testing.T) {
 	m := createMsgVoteV1()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 7
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected, msgExpected := createExpectations(
-		blob, now, m, position,
+	msgExpected := createExpectations(
+		block, now, m, position,
 		storageTypes.MsgAddressTypeVoter,
 		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
 		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
@@ -262,10 +245,9 @@ func TestDecodeMsg_SuccessOnMsgVote_V1(t *testing.T) {
 		53,
 	)
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 // v1beta1.MsgVote
@@ -283,29 +265,28 @@ func createMsgVoteV1Beta1() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgVote_V1Beta1(t *testing.T) {
 	m := createMsgVoteV1Beta1()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 8
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected, msgExpected := createExpectations(
-		blob, now, m, position,
+	msgExpected := createExpectations(
+		block, now, m, position,
 		storageTypes.MsgAddressTypeVoter,
 		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
 		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgVote,
 		53,
 	)
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 // v1.MsgVoteWeighted
@@ -323,29 +304,28 @@ func createMsgVoteWeightedV1() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgVoteWeighted_V1(t *testing.T) {
 	m := createMsgVoteWeightedV1()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 7
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected, msgExpected := createExpectations(
-		blob, now, m, position,
+	msgExpected := createExpectations(
+		block, now, m, position,
 		storageTypes.MsgAddressTypeVoter,
 		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
 		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgVoteWeighted,
 		51,
 	)
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 // v1beta1.MsgVoteWeighted
@@ -362,19 +342,19 @@ func createMsgVoteWeightedV1Beta1() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgVoteWeighted_V1Beta1(t *testing.T) {
 	m := createMsgVoteWeightedV1Beta1()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 8
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected, msgExpected := createExpectations(
-		blob, now, m, position,
+	msgExpected := createExpectations(
+		block, now, m, position,
 		storageTypes.MsgAddressTypeVoter,
 		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
 		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
@@ -382,10 +362,9 @@ func TestDecodeMsg_SuccessOnMsgVoteWeighted_V1Beta1(t *testing.T) {
 		51,
 	)
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 // v1.MsgDeposit
@@ -402,29 +381,28 @@ func createMsgDepositV1() types.Msg {
 
 func TestDecodeMsg_SuccessMsgDeposit_V1(t *testing.T) {
 	m := createMsgDepositV1()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 7
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected, msgExpected := createExpectations(
-		blob, now, m, position,
+	msgExpected := createExpectations(
+		block, now, m, position,
 		storageTypes.MsgAddressTypeDepositor,
 		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
 		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgDeposit,
 		51,
 	)
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 // v1beta1.MsgDeposit
@@ -441,19 +419,19 @@ func createMsgDepositV1Beta1() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgDeposit_V1Beta1(t *testing.T) {
 	m := createMsgDepositV1Beta1()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 8
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected, msgExpected := createExpectations(
-		blob, now, m, position,
+	msgExpected := createExpectations(
+		block, now, m, position,
 		storageTypes.MsgAddressTypeDepositor,
 		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
 		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
@@ -461,10 +439,9 @@ func TestDecodeMsg_SuccessOnMsgDeposit_V1Beta1(t *testing.T) {
 		51,
 	)
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 // v1.MsgSubmitProposal
@@ -490,19 +467,19 @@ func createMsgSubmitProposalV1WithSlashingUpdates() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithSlashingUpdates(t *testing.T) {
 	m := createMsgSubmitProposalV1WithSlashingUpdates()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 7
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected, msgExpected := createExpectations(
-		blob, now, m, position,
+	msgExpected := createExpectations(
+		block, now, m, position,
 		storageTypes.MsgAddressTypeProposer,
 		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
@@ -511,8 +488,8 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithSlashingUpdates(t *testing.T
 	)
 
 	msgExpected.Proposal = &storage.Proposal{
-		Height:    blob.Height,
-		CreatedAt: blob.Block.Time,
+		Height:    block.Height,
+		CreatedAt: block.Block.Time,
 		Proposer: &storage.Address{
 			Address: "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		},
@@ -523,7 +500,6 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithSlashingUpdates(t *testing.T
 	}
 
 	require.NoError(t, err)
-	require.Equal(t, addressesExpected, dm.Addresses)
 	require.Equal(t, msgExpected.Proposal.Title, dm.Msg.Proposal.Title)
 	require.Equal(t, msgExpected.Proposal.Status, dm.Msg.Proposal.Status)
 	require.Equal(t, msgExpected.Proposal.Height, dm.Msg.Proposal.Height)
@@ -574,19 +550,19 @@ func createMsgSubmitProposalV1WithConsensusAndBlobUpdates() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithConsensusAndBlobsUpdates(t *testing.T) {
 	m := createMsgSubmitProposalV1WithConsensusAndBlobUpdates()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 7
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected, msgExpected := createExpectations(
-		blob, now, m, position,
+	msgExpected := createExpectations(
+		block, now, m, position,
 		storageTypes.MsgAddressTypeProposer,
 		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
@@ -595,8 +571,8 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithConsensusAndBlobsUpdates(t *
 	)
 
 	msgExpected.Proposal = &storage.Proposal{
-		Height:    blob.Height,
-		CreatedAt: blob.Block.Time,
+		Height:    block.Height,
+		CreatedAt: block.Block.Time,
 		Proposer: &storage.Address{
 			Address: "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 		},
@@ -607,7 +583,6 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithConsensusAndBlobsUpdates(t *
 	}
 
 	require.NoError(t, err)
-	require.Equal(t, addressesExpected, dm.Addresses)
 	require.Equal(t, msgExpected.Proposal.Title, dm.Msg.Proposal.Title)
 	require.Equal(t, msgExpected.Proposal.Status, dm.Msg.Proposal.Status)
 	require.Equal(t, msgExpected.Proposal.Height, dm.Msg.Proposal.Height)

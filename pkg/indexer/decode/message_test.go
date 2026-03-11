@@ -32,19 +32,19 @@ func createMsgUnknown() cosmosTypes.Msg {
 
 func TestDecodeMsg_MsgUnknown(t *testing.T) {
 	msgUnknown := createMsgUnknown()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := Message(decodeCtx, msgUnknown, position, storageTypes.StatusSuccess)
+	dm, err := Message(decodeCtx, msgUnknown, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgUnknown,

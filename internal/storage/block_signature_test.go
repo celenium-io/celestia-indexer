@@ -6,10 +6,10 @@ package storage
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTableName(t *testing.T) {
 	blockSignature := BlockSignature{}
-	assert.Equal(t, "block_signature", blockSignature.TableName())
+	require.Equal(t, "block_signature", blockSignature.TableName())
 }

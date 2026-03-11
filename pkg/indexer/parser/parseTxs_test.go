@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,8 +27,8 @@ func TestParseTxs_EmptyTxsResults(t *testing.T) {
 	decodeCtx := context.NewContext()
 	resultTxs, err := p.parseTxs(decodeCtx, block)
 
-	assert.NoError(t, err)
-	assert.Empty(t, resultTxs)
+	require.NoError(t, err)
+	require.Empty(t, resultTxs)
 }
 
 func mustDecodeBase64(s string) string {
@@ -271,16 +270,16 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 	p := NewModule(config.Indexer{})
 	resultTxs, err := p.parseTxs(decodeCtx, block)
 
-	assert.NoError(t, err)
-	assert.Len(t, resultTxs, 3)
+	require.NoError(t, err)
+	require.Len(t, resultTxs, 3)
 
 	f := resultTxs[0]
-	assert.Equal(t, now, f.Time)
-	assert.Equal(t, storageTypes.StatusSuccess, f.Status)
-	assert.Equal(t, "", f.Error)
-	assert.Equal(t, int64(12000), f.GasWanted)
-	assert.Equal(t, int64(1000), f.GasUsed)
-	assert.Equal(t, "celestia-explorer", f.Codespace)
+	require.Equal(t, now, f.Time)
+	require.Equal(t, storageTypes.StatusSuccess, f.Status)
+	require.Equal(t, "", f.Error)
+	require.Equal(t, int64(12000), f.GasWanted)
+	require.Equal(t, int64(1000), f.GasUsed)
+	require.Equal(t, "celestia-explorer", f.Codespace)
 }
 
 func TestParseTxs_FailedTx(t *testing.T) {
@@ -306,16 +305,16 @@ func TestParseTxs_FailedTx(t *testing.T) {
 	p := NewModule(config.Indexer{})
 	resultTxs, err := p.parseTxs(decodeCtx, block)
 
-	assert.NoError(t, err)
-	assert.Len(t, resultTxs, 1)
+	require.NoError(t, err)
+	require.Len(t, resultTxs, 1)
 
 	f := resultTxs[0]
-	assert.Equal(t, now, f.Time)
-	assert.Equal(t, storageTypes.StatusFailed, f.Status)
-	assert.Equal(t, "something weird happened", f.Error)
-	assert.Equal(t, int64(12000), f.GasWanted)
-	assert.Equal(t, int64(1000), f.GasUsed)
-	assert.Equal(t, "celestia-explorer", f.Codespace)
+	require.Equal(t, now, f.Time)
+	require.Equal(t, storageTypes.StatusFailed, f.Status)
+	require.Equal(t, "something weird happened", f.Error)
+	require.Equal(t, int64(12000), f.GasWanted)
+	require.Equal(t, int64(1000), f.GasUsed)
+	require.Equal(t, "celestia-explorer", f.Codespace)
 }
 
 func TestParseTxs_FailedTxWithNonstandardErrorCode(t *testing.T) {
@@ -341,16 +340,16 @@ func TestParseTxs_FailedTxWithNonstandardErrorCode(t *testing.T) {
 	p := NewModule(config.Indexer{})
 	resultTxs, err := p.parseTxs(decodeCtx, block)
 
-	assert.NoError(t, err)
-	assert.Len(t, resultTxs, 1)
+	require.NoError(t, err)
+	require.Len(t, resultTxs, 1)
 
 	f := resultTxs[0]
-	assert.Equal(t, now, f.Time)
-	assert.Equal(t, storageTypes.StatusFailed, f.Status)
-	assert.Equal(t, "something unusual happened", f.Error)
-	assert.Equal(t, int64(12000), f.GasWanted)
-	assert.Equal(t, int64(1000), f.GasUsed)
-	assert.Equal(t, "celestia-explorer", f.Codespace)
+	require.Equal(t, now, f.Time)
+	require.Equal(t, storageTypes.StatusFailed, f.Status)
+	require.Equal(t, "something unusual happened", f.Error)
+	require.Equal(t, int64(12000), f.GasWanted)
+	require.Equal(t, int64(1000), f.GasUsed)
+	require.Equal(t, "celestia-explorer", f.Codespace)
 }
 
 func TestParseTxs_PayForBlob(t *testing.T) {

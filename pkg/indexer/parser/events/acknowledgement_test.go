@@ -17,11 +17,12 @@ import (
 
 func Test_handleAcknowledgement(t *testing.T) {
 	tests := []struct {
-		name   string
-		ctx    *context.Context
-		events []storage.Event
-		msg    []*storage.Message
-		idx    *int
+		name     string
+		ctx      *context.Context
+		events   []storage.Event
+		transfer *storage.IbcTransfer
+		msg      []*storage.Message
+		idx      *int
 
 		isTransferNil bool
 	}{
@@ -82,6 +83,18 @@ func Test_handleAcknowledgement(t *testing.T) {
 					},
 				},
 			},
+			transfer: &storage.IbcTransfer{
+				Height:          2371609,
+				Amount:          decimal.RequireFromString("561801"),
+				Denom:           "utia",
+				ReceiverAddress: testsuite.Ptr("osmo1345fue0f2zwmfef4d48qfe38k0wfvca657jkm0"),
+				Sender: &storage.Address{
+					Address: "celestia1ycjgmkjvjkmdwvjeuutxf6vxmfw9yk5cava5xt",
+				},
+				ChannelId: "channel-2",
+				Port:      "transfer",
+				Sequence:  1004901,
+			},
 			msg: []*storage.Message{
 				{
 					Type:   types.MsgAcknowledgement,
@@ -112,18 +125,6 @@ func Test_handleAcknowledgement(t *testing.T) {
 							"RevisionNumber": 1,
 						},
 						"Signer": "celestia16p6lrlxf7f03c0ka8cv4sznr29rym27us7u4v6",
-					},
-					IbcTransfer: &storage.IbcTransfer{
-						Height:          2371609,
-						Amount:          decimal.RequireFromString("561801"),
-						Denom:           "utia",
-						ReceiverAddress: testsuite.Ptr("osmo1345fue0f2zwmfef4d48qfe38k0wfvca657jkm0"),
-						Sender: &storage.Address{
-							Address: "celestia1ycjgmkjvjkmdwvjeuutxf6vxmfw9yk5cava5xt",
-						},
-						ChannelId: "channel-2",
-						Port:      "transfer",
-						Sequence:  1004901,
 					},
 				},
 			},
@@ -179,6 +180,19 @@ func Test_handleAcknowledgement(t *testing.T) {
 					},
 				},
 			},
+			transfer: &storage.IbcTransfer{
+				Height:          2371609,
+				Amount:          decimal.RequireFromString("12000000"),
+				Denom:           "utia",
+				ReceiverAddress: testsuite.Ptr("osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv"),
+				Sender: &storage.Address{
+					Address: "celestia1nc44cmtgmp6cwch2ccfp6txdelu6qtz963ksrw",
+				},
+				ChannelId: "channel-6994",
+				Port:      "transfer",
+				Sequence:  1004900,
+				Memo:      "{\"wasm\":{\"contract\":\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\",\"msg\":{\"swap_and_action\":{\"user_swap\":{\"swap_exact_asset_in\":{\"swap_venue_name\":\"osmosis-poolmanager\",\"operations\":[{\"pool\":\"1247\",\"denom_in\":\"ibc/D79E7D83AB399BFFF93433E54FAA480C191248FC556924A2A8351AE2638B3877\",\"denom_out\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\"},{\"pool\":\"1319\",\"denom_in\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\",\"denom_out\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\"}]}},\"min_asset\":{\"native\":{\"denom\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\",\"amount\":\"3298454343374009626\"}},\"timeout_timestamp\":1726667021008444464,\"post_swap_action\":{\"ibc_transfer\":{\"ibc_info\":{\"source_channel\":\"channel-122\",\"receiver\":\"inj14amztqem07qvyyty8k4p6s2jp8ylsvlax0g42f\",\"memo\":\"\",\"recover_address\":\"osmo1nc44cmtgmp6cwch2ccfp6txdelu6qtz9rq5s03\"}}},\"affiliates\":[{\"basis_points_fee\":\"60\",\"address\":\"osmo1my4tk420gjmhggqwvvha6ey9390gqwfree2p4u\"},{\"basis_points_fee\":\"15\",\"address\":\"osmo1msjnal2glfz6ze8x9kduhg45xppx9sddawfx46\"}]}}}}",
+			},
 			msg: []*storage.Message{
 				{
 					Type:   types.MsgAcknowledgement,
@@ -210,19 +224,6 @@ func Test_handleAcknowledgement(t *testing.T) {
 							"RevisionNumber": 1,
 						},
 						"Signer": "celestia16p6lrlxf7f03c0ka8cv4sznr29rym27us7u4v6",
-					},
-					IbcTransfer: &storage.IbcTransfer{
-						Height:          2371609,
-						Amount:          decimal.RequireFromString("12000000"),
-						Denom:           "utia",
-						ReceiverAddress: testsuite.Ptr("osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv"),
-						Sender: &storage.Address{
-							Address: "celestia1nc44cmtgmp6cwch2ccfp6txdelu6qtz963ksrw",
-						},
-						ChannelId: "channel-6994",
-						Port:      "transfer",
-						Sequence:  1004900,
-						Memo:      "{\"wasm\":{\"contract\":\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\",\"msg\":{\"swap_and_action\":{\"user_swap\":{\"swap_exact_asset_in\":{\"swap_venue_name\":\"osmosis-poolmanager\",\"operations\":[{\"pool\":\"1247\",\"denom_in\":\"ibc/D79E7D83AB399BFFF93433E54FAA480C191248FC556924A2A8351AE2638B3877\",\"denom_out\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\"},{\"pool\":\"1319\",\"denom_in\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\",\"denom_out\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\"}]}},\"min_asset\":{\"native\":{\"denom\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\",\"amount\":\"3298454343374009626\"}},\"timeout_timestamp\":1726667021008444464,\"post_swap_action\":{\"ibc_transfer\":{\"ibc_info\":{\"source_channel\":\"channel-122\",\"receiver\":\"inj14amztqem07qvyyty8k4p6s2jp8ylsvlax0g42f\",\"memo\":\"\",\"recover_address\":\"osmo1nc44cmtgmp6cwch2ccfp6txdelu6qtz9rq5s03\"}}},\"affiliates\":[{\"basis_points_fee\":\"60\",\"address\":\"osmo1my4tk420gjmhggqwvvha6ey9390gqwfree2p4u\"},{\"basis_points_fee\":\"15\",\"address\":\"osmo1msjnal2glfz6ze8x9kduhg45xppx9sddawfx46\"}]}}}}",
 					},
 				},
 			},
@@ -322,6 +323,19 @@ func Test_handleAcknowledgement(t *testing.T) {
 					},
 				},
 			},
+			transfer: &storage.IbcTransfer{
+				Height:          2371609,
+				Amount:          decimal.RequireFromString("12000000"),
+				Denom:           "utia",
+				ReceiverAddress: testsuite.Ptr("osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv"),
+				Sender: &storage.Address{
+					Address: "celestia1nc44cmtgmp6cwch2ccfp6txdelu6qtz963ksrw",
+				},
+				ChannelId: "channel-6994",
+				Port:      "transfer",
+				Sequence:  1004900,
+				Memo:      "{\"wasm\":{\"contract\":\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\",\"msg\":{\"swap_and_action\":{\"user_swap\":{\"swap_exact_asset_in\":{\"swap_venue_name\":\"osmosis-poolmanager\",\"operations\":[{\"pool\":\"1247\",\"denom_in\":\"ibc/D79E7D83AB399BFFF93433E54FAA480C191248FC556924A2A8351AE2638B3877\",\"denom_out\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\"},{\"pool\":\"1319\",\"denom_in\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\",\"denom_out\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\"}]}},\"min_asset\":{\"native\":{\"denom\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\",\"amount\":\"3298454343374009626\"}},\"timeout_timestamp\":1726667021008444464,\"post_swap_action\":{\"ibc_transfer\":{\"ibc_info\":{\"source_channel\":\"channel-122\",\"receiver\":\"inj14amztqem07qvyyty8k4p6s2jp8ylsvlax0g42f\",\"memo\":\"\",\"recover_address\":\"osmo1nc44cmtgmp6cwch2ccfp6txdelu6qtz9rq5s03\"}}},\"affiliates\":[{\"basis_points_fee\":\"60\",\"address\":\"osmo1my4tk420gjmhggqwvvha6ey9390gqwfree2p4u\"},{\"basis_points_fee\":\"15\",\"address\":\"osmo1msjnal2glfz6ze8x9kduhg45xppx9sddawfx46\"}]}}}}",
+			},
 			msg: []*storage.Message{
 				{
 					Type:   types.MsgAcknowledgement,
@@ -354,19 +368,6 @@ func Test_handleAcknowledgement(t *testing.T) {
 						},
 						"Signer": "celestia16p6lrlxf7f03c0ka8cv4sznr29rym27us7u4v6",
 					},
-					IbcTransfer: &storage.IbcTransfer{
-						Height:          2371609,
-						Amount:          decimal.RequireFromString("12000000"),
-						Denom:           "utia",
-						ReceiverAddress: testsuite.Ptr("osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv"),
-						Sender: &storage.Address{
-							Address: "celestia1nc44cmtgmp6cwch2ccfp6txdelu6qtz963ksrw",
-						},
-						ChannelId: "channel-6994",
-						Port:      "transfer",
-						Sequence:  1004900,
-						Memo:      "{\"wasm\":{\"contract\":\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\",\"msg\":{\"swap_and_action\":{\"user_swap\":{\"swap_exact_asset_in\":{\"swap_venue_name\":\"osmosis-poolmanager\",\"operations\":[{\"pool\":\"1247\",\"denom_in\":\"ibc/D79E7D83AB399BFFF93433E54FAA480C191248FC556924A2A8351AE2638B3877\",\"denom_out\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\"},{\"pool\":\"1319\",\"denom_in\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\",\"denom_out\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\"}]}},\"min_asset\":{\"native\":{\"denom\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\",\"amount\":\"3298454343374009626\"}},\"timeout_timestamp\":1726667021008444464,\"post_swap_action\":{\"ibc_transfer\":{\"ibc_info\":{\"source_channel\":\"channel-122\",\"receiver\":\"inj14amztqem07qvyyty8k4p6s2jp8ylsvlax0g42f\",\"memo\":\"\",\"recover_address\":\"osmo1nc44cmtgmp6cwch2ccfp6txdelu6qtz9rq5s03\"}}},\"affiliates\":[{\"basis_points_fee\":\"60\",\"address\":\"osmo1my4tk420gjmhggqwvvha6ey9390gqwfree2p4u\"},{\"basis_points_fee\":\"15\",\"address\":\"osmo1msjnal2glfz6ze8x9kduhg45xppx9sddawfx46\"}]}}}}",
-					},
 				},
 			},
 			idx: testsuite.Ptr(0),
@@ -375,13 +376,14 @@ func Test_handleAcknowledgement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for i := range tt.msg {
+				tt.ctx.AddIbcTransfer(tt.transfer)
 				err := handleAcknowledgement(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
 				if tt.isTransferNil {
-					require.Nil(t, tt.msg[i].IbcTransfer)
+					require.Empty(t, tt.ctx.IbcTransfers)
 				} else {
-					require.NotNil(t, tt.msg[i].IbcTransfer)
-					require.NotEmpty(t, tt.msg[i].IbcTransfer.ConnectionId)
+					require.NotEmpty(t, tt.ctx.IbcTransfers)
+					require.NotEmpty(t, tt.ctx.IbcTransfers[0].ConnectionId)
 				}
 			}
 		})

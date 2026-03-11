@@ -113,8 +113,10 @@ func Test_handleHyperlaneProcessMessage(t *testing.T) {
 			for i := range tt.msg {
 				err := handleHyperlaneProcessMessage(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
-				require.NotNil(t, tt.msg[i].HLTransfer)
-				require.NotNil(t, tt.msg[i].HLTransfer.Address)
+				require.NotEmpty(t, tt.ctx.HlTransfers)
+
+				require.NotNil(t, tt.ctx.HlTransfers[0])
+				require.NotNil(t, tt.ctx.HlTransfers[0].Address)
 			}
 		})
 	}

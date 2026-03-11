@@ -15,32 +15,31 @@ import (
 )
 
 // MsgPayForBlobs pays for the inclusion of a blob in the block.
-func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []storage.AddressWithType, []storage.Namespace, []*storage.BlobLog, int64, error) {
+func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, msgId, txId uint64, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []*storage.BlobLog, int64, error) {
 	var blobsSize int64
-	uniqueNs := make(map[string]*storage.Namespace)
 	blobLogs := make([]*storage.BlobLog, 0)
 
 	for idx, ns := range m.Namespaces {
 		if len(m.BlobSizes) < idx {
-			return storageTypes.MsgUnknown, nil, nil, nil, 0, errors.Errorf(
+			return storageTypes.MsgUnknown, nil, 0, errors.Errorf(
 				"blob sizes length=%d is less then namespaces index=%d", len(m.BlobSizes), idx)
 		}
 		if len(m.ShareCommitments) < idx {
-			return storageTypes.MsgUnknown, nil, nil, nil, 0, errors.Errorf(
+			return storageTypes.MsgUnknown, nil, 0, errors.Errorf(
 				"share commitment length=%d is less then namespaces index=%d", len(m.ShareCommitments), idx)
 		}
 		if len(m.ShareVersions) < idx {
-			return storageTypes.MsgUnknown, nil, nil, nil, 0, errors.Errorf(
+			return storageTypes.MsgUnknown, nil, 0, errors.Errorf(
 				"share versions length=%d is less then namespaces index=%d", len(m.ShareVersions), idx)
 		}
 
 		appNS, err := nsPackage.NewNamespaceFromBytes(ns)
 		if err != nil {
-			return storageTypes.MsgUnknown, nil, nil, nil, 0, errors.Wrap(err, "NewNamespaceFromBytes")
+			return storageTypes.MsgUnknown, nil, 0, errors.Wrap(err, "NewNamespaceFromBytes")
 		}
 		size := int64(m.BlobSizes[idx])
 		blobsSize += size
-		namespace := storage.Namespace{
+		namespace := &storage.Namespace{
 			FirstHeight:     ctx.Block.Height,
 			Version:         appNS.Version(),
 			NamespaceID:     appNS.ID(),
@@ -54,45 +53,46 @@ func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, m *appBlob
 			namespace.BlobsCount = 1
 			namespace.Size = size
 
+			ns := ctx.AddNamespace(namespace)
+
 			blobLog := &storage.BlobLog{
 				Commitment: base64.StdEncoding.EncodeToString(m.ShareCommitments[idx]),
 				Size:       size,
-				Namespace:  &namespace,
+				Namespace:  ns,
 				Height:     ctx.Block.Height,
 				Time:       ctx.Block.Time,
 				Signer: &storage.Address{
 					Address: m.Signer,
 				},
 				ShareVersion: int(m.ShareVersions[idx]),
+				MsgId:        msgId,
+				TxId:         txId,
 			}
 			blobLogs = append(blobLogs, blobLog)
-		}
 
-		if n, ok := uniqueNs[namespace.String()]; ok {
-			n.Size += size
-			n.BlobsCount += namespace.BlobsCount
-		} else {
-			uniqueNs[namespace.String()] = namespace.Copy()
+			ctx.AddNamespaceMessage(&storage.NamespaceMessage{
+				MsgId:     msgId,
+				TxId:      txId,
+				Height:    ctx.Block.Height,
+				Time:      ctx.Block.Time,
+				Namespace: ns,
+				Size:      uint64(size),
+			})
 		}
 	}
 
-	namespaces := make([]storage.Namespace, 0, len(uniqueNs))
-	for _, namespace := range uniqueNs {
-		namespaces = append(namespaces, *namespace)
-	}
-
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 
-	return storageTypes.MsgPayForBlobs, addresses, namespaces, blobLogs, blobsSize, err
+	return storageTypes.MsgPayForBlobs, blobLogs, blobsSize, err
 }
 
 // MsgUpdateBlobParams defines the sdk.Msg type to update the client parameters.
-func MsgUpdateBlobParams(ctx *context.Context, status storageTypes.Status, m *appBlobTypes.MsgUpdateBlobParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateBlobParams(ctx *context.Context, status storageTypes.Status, msgId uint64, m *appBlobTypes.MsgUpdateBlobParams) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateBlobParams
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }

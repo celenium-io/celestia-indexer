@@ -12,11 +12,11 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
-func parseEvents(ctx *context.Context, b types.BlockData, events []types.Event) ([]storage.Event, error) {
+func parseEvents(ctx *context.Context, b types.BlockData, events []types.Event, txId uint64) ([]storage.Event, error) {
 	result := make([]storage.Event, len(events))
 
 	for i := range events {
-		if err := parseEvent(ctx, b, events[i], i, &result[i], false); err != nil {
+		if err := parseEvent(ctx, b, events[i], i, &result[i], &txId, false); err != nil {
 			return nil, err
 		}
 	}
@@ -39,7 +39,7 @@ func parseBlockEvents(ctx *context.Context, b types.BlockData, events []types.Ev
 		}
 		isDuplicated = isDuplicated && count <= ctx.TxEventsCount
 
-		if err := parseEvent(ctx, b, events[i], i, &result[i], isDuplicated); err != nil {
+		if err := parseEvent(ctx, b, events[i], i, &result[i], nil, isDuplicated); err != nil {
 			return nil, err
 		}
 	}
@@ -47,7 +47,7 @@ func parseBlockEvents(ctx *context.Context, b types.BlockData, events []types.Ev
 	return result, nil
 }
 
-func parseEvent(ctx *context.Context, b types.BlockData, eN types.Event, index int, resultEvent *storage.Event, duplicated bool) error {
+func parseEvent(ctx *context.Context, b types.BlockData, eN types.Event, index int, resultEvent *storage.Event, txId *uint64, duplicated bool) error {
 	eventType, err := storageTypes.ParseEventType(eN.Type)
 	if err != nil {
 		log.Err(err).Msgf("got type %v", eN.Type)
@@ -59,6 +59,7 @@ func parseEvent(ctx *context.Context, b types.BlockData, eN types.Event, index i
 	resultEvent.Position = int64(index)
 	resultEvent.Type = eventType
 	resultEvent.Data = make(map[string]any, len(eN.Attributes))
+	resultEvent.TxId = txId
 
 	for i := range eN.Attributes {
 		resultEvent.Data[eN.Attributes[i].Key] = eN.Attributes[i].Value
