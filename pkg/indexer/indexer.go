@@ -47,9 +47,8 @@ type Indexer struct {
 }
 
 func New(ctx context.Context, cfg config.Config, stopperModule modules.Module) (Indexer, error) {
-	// allow minimum connections for a long time for indexer
+	// restrict DB pool for sequential indexer workload: few connections, long lifetime
 	cfg.Database.MaxOpenConnections = 10
-	cfg.Database.MaxIdleConnections = 10
 	cfg.Database.MaxLifetimeConnections = 3600
 
 	pg, err := postgres.Create(ctx, cfg.Database, cfg.Indexer.ScriptsDir, true)

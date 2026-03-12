@@ -362,45 +362,6 @@ func (c *MockApiHeadCall) DoAndReturn(f func(context.Context) (types0.ResultBloc
 	return c
 }
 
-// Status mocks base method.
-func (m *MockApi) Status(ctx context.Context) (types.Status, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Status", ctx)
-	ret0, _ := ret[0].(types.Status)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Status indicates an expected call of Status.
-func (mr *MockApiMockRecorder) Status(ctx any) *MockApiStatusCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Status", reflect.TypeOf((*MockApi)(nil).Status), ctx)
-	return &MockApiStatusCall{Call: call}
-}
-
-// MockApiStatusCall wrap *gomock.Call
-type MockApiStatusCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockApiStatusCall) Return(arg0 types.Status, arg1 error) *MockApiStatusCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockApiStatusCall) Do(f func(context.Context) (types.Status, error)) *MockApiStatusCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockApiStatusCall) DoAndReturn(f func(context.Context) (types.Status, error)) *MockApiStatusCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // MockDalApi is a mock of DalApi interface.
 type MockDalApi struct {
 	ctrl     *gomock.Controller
