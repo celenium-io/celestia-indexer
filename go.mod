@@ -58,7 +58,7 @@ require (
 	cosmossdk.io/x/upgrade v0.1.4
 	github.com/bcp-innovations/hyperlane-cosmos v1.1.0
 	github.com/bytedance/sonic v1.15.0
-	github.com/celestiaorg/celestia-app/v7 v7.0.2-mocha
+	github.com/celestiaorg/celestia-app/v7 v7.0.3-arabica
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/gogoproto v1.7.2
 	github.com/dipdup-io/go-lib/config v1.0.0

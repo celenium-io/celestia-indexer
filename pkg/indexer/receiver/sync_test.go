@@ -9,7 +9,6 @@ import (
 	"time"
 
 	ic "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
-	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
 	"github.com/pkg/errors"
@@ -19,8 +18,8 @@ import (
 func (s *ModuleTestSuite) TestModule_SyncGracefullyStops() {
 	s.InitApi(func() {
 		s.api.EXPECT().
-			Status(gomock.Any()).
-			Return(nodeTypes.Status{}, errors.New("service is down")).
+			CurrentHead(gomock.Any()).
+			Return(0, errors.New("service is down")).
 			MaxTimes(1)
 	})
 
@@ -68,18 +67,8 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 	const blockCount = 5
 	s.InitApi(func() {
 		s.api.EXPECT().
-			Status(gomock.Any()).
-			Return(nodeTypes.Status{
-				NodeInfo: nodeTypes.NodeInfo{
-					ProtocolVersion: nodeTypes.ProtocolVersion{
-						App: 4,
-					},
-				},
-				SyncInfo: nodeTypes.SyncInfo{
-					LatestBlockHash:   nil,
-					LatestBlockHeight: 5,
-				},
-			}, nil).
+			CurrentHead(gomock.Any()).
+			Return(5, nil).
 			MaxTimes(1)
 
 		levels := make([]types.Level, blockCount)

@@ -13,7 +13,6 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type Api interface {
-	Status(ctx context.Context) (types.Status, error)
 	Head(ctx context.Context) (pkgTypes.ResultBlock, error)
 	Block(ctx context.Context, level pkgTypes.Level) (pkgTypes.ResultBlock, error)
 	BlockResults(ctx context.Context, level pkgTypes.Level) (pkgTypes.ResultBlockResults, error)
@@ -21,6 +20,7 @@ type Api interface {
 	BlockData(ctx context.Context, level pkgTypes.Level) (pkgTypes.BlockData, error)
 	BlockDataGet(ctx context.Context, level pkgTypes.Level) (pkgTypes.BlockData, error)
 	BlockBulkData(ctx context.Context, levels ...pkgTypes.Level) ([]pkgTypes.BlockData, error)
+	CurrentHead(ctx context.Context) (pkgTypes.Level, error)
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
