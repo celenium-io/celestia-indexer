@@ -29,6 +29,9 @@ func (MsgAddress) TableName() string {
 }
 
 func (m MsgAddress) String() string {
+	if m.Address != nil {
+		return fmt.Sprintf("%s_%d_%s", m.Address.Address, m.MsgId, m.Type)
+	}
 	return fmt.Sprintf("%d_%d_%s", m.AddressId, m.MsgId, m.Type)
 }
 

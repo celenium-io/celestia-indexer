@@ -28,6 +28,17 @@ func (module *Module) saveSignals(
 		return nil
 	}
 
+	votingPower, validators, err := module.totalVotingPower(ctx, tx)
+	if err != nil {
+		return errors.Wrapf(err, "receiving total voting power")
+	}
+	votingPower = math.Shares(votingPower)
+
+	validatorsMap := make(map[uint64]storage.Validator, len(validators))
+	for i := range validators {
+		validatorsMap[validators[i].Id] = validators[i]
+	}
+
 	for i := range signals {
 		if signals[i].Validator == nil {
 			return errors.Errorf("validator is nil in signal version")
@@ -37,9 +48,9 @@ func (module *Module) saveSignals(
 			return errors.Errorf("address: %s not found in validator map", signals[i].Validator.Address)
 		}
 
-		validator, err := tx.Validator(ctx, validatorId)
-		if err != nil {
-			return errors.Wrapf(err, "can't find validator for address: %s", signals[i].Validator.Address)
+		validator, ok := validatorsMap[validatorId]
+		if !ok {
+			return errors.Errorf("can't find validator by id: %d", validatorId)
 		}
 
 		signals[i].VotingPower = validator.Stake
@@ -51,11 +62,11 @@ func (module *Module) saveSignals(
 		return errors.Wrap(err, "saving signal version")
 	}
 
-	if err := module.postProcessingSignal(ctx, tx, signals, upgrades); err != nil {
+	if err := postProcessingSignal(ctx, tx, signals, upgrades, votingPower, validators); err != nil {
 		return errors.Wrap(err, "postProcessingSignal")
 	}
 
-	if err := module.saveUpgrades(ctx, tx, upgrades, addrToId, state); err != nil {
+	if err := saveUpgrades(ctx, tx, upgrades, addrToId, state, votingPower, validators); err != nil {
 		return errors.Wrap(err, "save upgrades")
 	}
 
@@ -93,24 +104,20 @@ func (module *Module) tryUpgrade(
 	return tx.SaveUpgrades(ctx, upgrade)
 }
 
-func (module *Module) saveUpgrades(
+func saveUpgrades(
 	ctx context.Context,
 	tx storage.Transaction,
 	upgrades *sync.Map[uint64, *storage.Upgrade],
 	addrToId map[string]uint64,
 	state storage.State,
+	votingPower decimal.Decimal,
+	validators []storage.Validator,
 ) error {
 	if upgrades.Len() == 0 {
 		return nil
 	}
 
-	vp, validators, err := module.totalVotingPower(ctx, tx)
-	if err != nil {
-		return errors.Wrapf(err, "receiving total voting power")
-	}
-	vp = math.Shares(vp)
-
-	err = upgrades.Range(func(version uint64, upgrade *storage.Upgrade) (error, bool) {
+	err := upgrades.Range(func(version uint64, upgrade *storage.Upgrade) (error, bool) {
 		if state.Version > 0 && state.Version >= version {
 			return nil, false
 		}
@@ -121,12 +128,12 @@ func (module *Module) saveUpgrades(
 		}
 		upgrade.SignerId = signerId
 
-		pass, voted, err := recalculateSignalsForUpgrade(ctx, tx, version, state, vp, validators)
+		pass, voted, err := recalculateSignalsForUpgrade(ctx, tx, version, state, votingPower, validators)
 		if err != nil {
 			return errors.Wrap(err, "recalculateSignalsForUpgrade"), true
 		}
 
-		upgrade.VotingPower = vp
+		upgrade.VotingPower = votingPower
 		upgrade.VotedPower = voted
 		if pass {
 			upgrade.Status = types.UpgradeStatusWaitingUpgrade
@@ -174,16 +181,17 @@ func recalculateSignalsForUpgrade(
 		}
 	}
 
-	if pass {
-		if err := tx.UpdateSignalsAfterUpgrade(ctx, version); err != nil {
-			return false, voted, errors.Wrap(err, "updating signals after upgrade")
-		}
-	}
-
 	return pass, voted, nil
 }
 
-func (module *Module) postProcessingSignal(ctx context.Context, tx storage.Transaction, signals []*storage.SignalVersion, upgrades *sync.Map[uint64, *storage.Upgrade]) error {
+func postProcessingSignal(
+	ctx context.Context,
+	tx storage.Transaction,
+	signals []*storage.SignalVersion,
+	upgrades *sync.Map[uint64, *storage.Upgrade],
+	votingPower decimal.Decimal,
+	validators []storage.Validator,
+) error {
 	if len(signals) == 0 {
 		return nil
 	}
@@ -192,12 +200,6 @@ func (module *Module) postProcessingSignal(ctx context.Context, tx storage.Trans
 	for i := range signals {
 		versions[signals[i].Version] = struct{}{}
 	}
-
-	vp, validators, err := module.totalVotingPower(ctx, tx)
-	if err != nil {
-		return errors.Wrapf(err, "receiving total voting power for upgrade version")
-	}
-	vp = math.Shares(vp)
 
 	for version := range versions {
 		var voted decimal.Decimal
@@ -210,7 +212,7 @@ func (module *Module) postProcessingSignal(ctx context.Context, tx storage.Trans
 
 		if val, ok := upgrades.Get(version); ok {
 			val.VotedPower = voted
-			val.VotingPower = vp
+			val.VotingPower = votingPower
 		} else {
 			return errors.Errorf("found signal without upgrade version %d", version)
 		}

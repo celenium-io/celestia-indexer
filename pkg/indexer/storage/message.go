@@ -18,6 +18,9 @@ func saveNamespaceMessages(
 	msgs []*storage.NamespaceMessage,
 ) error {
 	for i := range msgs {
+		if msgs[i].Namespace == nil {
+			return errors.New("nil namespace in namespace message")
+		}
 		msgs[i].NamespaceId = msgs[i].Namespace.Id
 	}
 	return tx.SaveNamespaceMessage(ctx, msgs...)

@@ -21,9 +21,12 @@ func saveVestings(
 	}
 
 	for i := range accounts {
+		if accounts[i].Address == nil {
+			return errors.Errorf("nil address in vesting account")
+		}
 		addrId, ok := addrToId[accounts[i].Address.Address]
 		if !ok {
-			continue
+			return errors.Wrap(errCantFindAddress, accounts[i].Address.Address)
 		}
 		accounts[i].AddressId = addrId
 	}

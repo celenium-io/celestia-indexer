@@ -24,8 +24,8 @@ func idFromHeightAndPosition(height types.Level, position int64) (uint64, error)
 		return uint64(height)<<24 | uint64(position), nil
 	}
 
-	if position-1 > maxPosition {
-		return 0, errors.Errorf("can't get id: overflow max position value %d", position)
+	if position+1 > maxPosition {
+		return 0, errors.Errorf("can't get id: overflow max position value %d", position+1)
 	}
 	// for genesis block for avoiding zero id
 	return uint64(height)<<24 | uint64(position+1), nil

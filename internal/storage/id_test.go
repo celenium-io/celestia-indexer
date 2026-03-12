@@ -52,7 +52,7 @@ func Test_idFromHeightAndPosition(t *testing.T) {
 			position: maxPosition,
 			want:     0xffffffffffffffff,
 		}, {
-			// position-1 = maxPosition+1 > maxPosition → error in the genesis branch
+			// // position+1 = maxPosition+3 > maxPosition → error
 			name:     "genesis position overflow",
 			height:   0,
 			position: maxPosition + 2,
@@ -67,6 +67,19 @@ func Test_idFromHeightAndPosition(t *testing.T) {
 			name:     "height overflow",
 			height:   maxHeight + 1,
 			position: 0,
+			wantErr:  true,
+		},
+		// position+1 = maxPosition+1 > maxPosition → error
+		{
+			name:     "genesis position overflow at boundary",
+			height:   0,
+			position: maxPosition,
+			wantErr:  true,
+		},
+		{
+			name:     "genesis position overflow at boundary+1",
+			height:   0,
+			position: maxPosition + 1,
 			wantErr:  true,
 		},
 	}

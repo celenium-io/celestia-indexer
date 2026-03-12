@@ -18,7 +18,7 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 )
 
-const copyThreashold = 20
+const copyThreshold = 20
 
 type Transaction struct {
 	storage.Transaction
@@ -61,7 +61,7 @@ func (tx Transaction) UpdateConstants(ctx context.Context, constants ...models.C
 }
 
 func (tx Transaction) SaveTransactions(ctx context.Context, txs ...models.Tx) error {
-	return pg.SaveBulkWithCopy(ctx, tx, txs, copyThreashold)
+	return pg.SaveBulkWithCopy(ctx, tx, txs, copyThreshold)
 }
 
 type addedNamespace struct {
@@ -158,11 +158,11 @@ func (tx Transaction) SaveBalances(ctx context.Context, balances ...models.Balan
 }
 
 func (tx Transaction) SaveEvents(ctx context.Context, events ...models.Event) error {
-	return pg.SaveBulkWithCopy(ctx, tx, events, copyThreashold)
+	return pg.SaveBulkWithCopy(ctx, tx, events, copyThreshold)
 }
 
 func (tx Transaction) SaveMessages(ctx context.Context, msgs ...*models.Message) error {
-	return pg.SaveBulkWithCopy(ctx, tx, msgs, copyThreashold)
+	return pg.SaveBulkWithCopy(ctx, tx, msgs, copyThreshold)
 }
 
 func (tx Transaction) SaveSigners(ctx context.Context, addresses ...models.Signer) error {
@@ -175,11 +175,11 @@ func (tx Transaction) SaveSigners(ctx context.Context, addresses ...models.Signe
 }
 
 func (tx Transaction) SaveBlobLogs(ctx context.Context, logs ...*models.BlobLog) error {
-	return pg.SaveBulkWithCopy(ctx, tx, logs, copyThreashold)
+	return pg.SaveBulkWithCopy(ctx, tx, logs, copyThreshold)
 }
 
 func (tx Transaction) SaveMsgAddresses(ctx context.Context, addresses ...*models.MsgAddress) error {
-	return pg.SaveBulkWithCopy(ctx, tx, addresses, copyThreashold)
+	return pg.SaveBulkWithCopy(ctx, tx, addresses, copyThreshold)
 }
 
 func (tx Transaction) SaveMsgValidator(ctx context.Context, valMsgs ...models.MsgValidator) error {
@@ -422,7 +422,7 @@ func (tx Transaction) SaveRedelegations(ctx context.Context, redelegations ...mo
 }
 
 func (tx Transaction) SaveStakingLogs(ctx context.Context, logs ...models.StakingLog) error {
-	return pg.SaveBulkWithCopy(ctx, tx, logs, copyThreashold)
+	return pg.SaveBulkWithCopy(ctx, tx, logs, copyThreshold)
 }
 
 func (tx Transaction) SaveDelegations(ctx context.Context, delegations ...models.Delegation) error {

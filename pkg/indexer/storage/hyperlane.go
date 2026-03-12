@@ -51,7 +51,7 @@ func saveHlTokens(
 		if tokens[i].Mailbox != nil {
 			mailbox, err := tx.HyperlaneMailbox(ctx, tokens[i].Mailbox.InternalId)
 			if err != nil {
-				return errors.Wrapf(err, "can't find mailbox for token: %x", tokens[i].Mailbox)
+				return errors.Wrapf(err, "can't find mailbox for token: %x", tokens[i].Mailbox.InternalId)
 			}
 			tokens[i].MailboxId = mailbox.Id
 		}
@@ -86,7 +86,7 @@ func saveHlTransfers(
 		if transfers[i].Mailbox != nil {
 			mailbox, err := tx.HyperlaneMailbox(ctx, transfers[i].Mailbox.InternalId)
 			if err != nil {
-				return errors.Wrapf(err, "can't find mailbox for token: %x", transfers[i].Mailbox)
+				return errors.Wrapf(err, "can't find mailbox for token: %x", transfers[i].Mailbox.InternalId)
 			}
 			transfers[i].MailboxId = mailbox.Id
 		}
