@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 )
 
@@ -23,4 +24,26 @@ func (api *API) Status(ctx context.Context) (types.Status, error) {
 	}
 
 	return sr.Result, nil
+}
+
+type syncInfoMinimal struct {
+	LatestBlockHeight pkgTypes.Level `json:"latest_block_height,string"`
+}
+type statusMinimal struct {
+	Result struct {
+		SyncInfo syncInfoMinimal `json:"sync_info"`
+	} `json:"result"`
+}
+
+func (api *API) CurrentHead(ctx context.Context) (pkgTypes.Level, error) {
+	var sr types.Response[statusMinimal]
+	if err := api.get(ctx, pathStatus, nil, &sr); err != nil {
+		return 0, errors.Wrap(err, "api.get")
+	}
+
+	if sr.Error != nil {
+		return 0, errors.Wrapf(types.ErrRequest, "current head request %d error: %s", sr.Id, sr.Error.Error())
+	}
+
+	return sr.Result.Result.SyncInfo.LatestBlockHeight, nil
 }

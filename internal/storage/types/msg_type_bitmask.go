@@ -977,7 +977,12 @@ func (mask MsgTypeBits) MarshalJSON() (data []byte, err error) {
 		data = []byte{'0'}
 		return
 	}
-	return json.Marshal(mask.value.String())
+	s := mask.value.String()
+	b := make([]byte, len(s)+2)
+	b[0] = '"'
+	copy(b[1:], s)
+	b[len(b)-1] = '"'
+	return b, nil
 }
 
 func (mask *MsgTypeBits) UnmarshalJSON(data []byte) error {

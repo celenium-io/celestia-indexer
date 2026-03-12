@@ -47,6 +47,11 @@ type Indexer struct {
 }
 
 func New(ctx context.Context, cfg config.Config, stopperModule modules.Module) (Indexer, error) {
+	// allow minimum connections for a long time for indexer
+	cfg.Database.MaxOpenConnections = 10
+	cfg.Database.MaxIdleConnections = 10
+	cfg.Database.MaxLifetimeConnections = 3600
+
 	pg, err := postgres.Create(ctx, cfg.Database, cfg.Indexer.ScriptsDir, true)
 	if err != nil {
 		return Indexer{}, errors.Wrap(err, "while creating pg context")
