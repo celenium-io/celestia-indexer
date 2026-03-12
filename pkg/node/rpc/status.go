@@ -30,9 +30,7 @@ type syncInfoMinimal struct {
 	LatestBlockHeight pkgTypes.Level `json:"latest_block_height,string"`
 }
 type statusMinimal struct {
-	Result struct {
-		SyncInfo syncInfoMinimal `json:"sync_info"`
-	} `json:"result"`
+	SyncInfo syncInfoMinimal `json:"sync_info"`
 }
 
 func (api *API) CurrentHead(ctx context.Context) (pkgTypes.Level, error) {
@@ -45,5 +43,5 @@ func (api *API) CurrentHead(ctx context.Context) (pkgTypes.Level, error) {
 		return 0, errors.Wrapf(types.ErrRequest, "current head request %d error: %s", sr.Id, sr.Error.Error())
 	}
 
-	return sr.Result.Result.SyncInfo.LatestBlockHeight, nil
+	return sr.Result.SyncInfo.LatestBlockHeight, nil
 }
