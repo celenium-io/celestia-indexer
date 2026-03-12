@@ -11,7 +11,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	ic "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/celenium-io/celestia-indexer/pkg/node/mock"
-	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
 	"go.uber.org/mock/gomock"
 
@@ -70,7 +69,7 @@ func (s *ModuleTestSuite) createModuleEmptyState(cfgOptional *ic.Indexer) Module
 
 func (s *ModuleTestSuite) TestModule_SuccessOnStop() {
 	s.InitApi(func() {
-		s.api.EXPECT().Status(gomock.Any()).Return(nodeTypes.Status{}, nil).MinTimes(0)
+		s.api.EXPECT().CurrentHead(gomock.Any()).Return(0, nil).MinTimes(0)
 	})
 
 	receiverModule := s.createModule()
