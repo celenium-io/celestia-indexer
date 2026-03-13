@@ -183,6 +183,9 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 				LastHeight: ctx.Block.Height,
 				Hash:       hash,
 			}
+			if err := ctx.AddAddress(transfer.Receiver); err != nil {
+				return msgType, errors.Wrap(err, "AddAddress receiver")
+			}
 			ctx.AddAddressMessage(&storage.MsgAddress{
 				MsgId:   msgId,
 				Type:    storageTypes.MsgAddressTypeReceiver,
@@ -203,6 +206,9 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 				Height:     ctx.Block.Height,
 				LastHeight: ctx.Block.Height,
 				Hash:       hash,
+			}
+			if err := ctx.AddAddress(transfer.Sender); err != nil {
+				return msgType, errors.Wrap(err, "AddAddress sender")
 			}
 			ctx.AddAddressMessage(&storage.MsgAddress{
 				MsgId:   msgId,
@@ -336,6 +342,9 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 				LastHeight: ctx.Block.Height,
 				Hash:       hash,
 			}
+			if err := ctx.AddAddress(transfer.Receiver); err != nil {
+				return msgType, errors.Wrap(err, "AddAddress receiver")
+			}
 			ctx.AddAddressMessage(&storage.MsgAddress{
 				MsgId:   msgId,
 				Type:    storageTypes.MsgAddressTypeReceiver,
@@ -356,6 +365,9 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 				Height:     ctx.Block.Height,
 				LastHeight: ctx.Block.Height,
 				Hash:       hash,
+			}
+			if err := ctx.AddAddress(transfer.Sender); err != nil {
+				return msgType, errors.Wrap(err, "AddAddress sender")
 			}
 			ctx.AddAddressMessage(&storage.MsgAddress{
 				MsgId:   msgId,

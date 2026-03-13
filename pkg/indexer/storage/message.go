@@ -37,9 +37,12 @@ func saveAddressMessage(
 	}
 
 	for i := range msgs {
+		if msgs[i].Address == nil {
+			return errors.New("nil address in msg_address")
+		}
 		id, ok := addrToId[msgs[i].Address.String()]
 		if !ok {
-			continue
+			return errors.Errorf("unknown address in msg_address: %s", msgs[i].Address.String())
 		}
 		msgs[i].AddressId = id
 	}
