@@ -31,7 +31,7 @@ func createAddresses(ctx *context.Context, data addressesData, level types.Level
 			Balance:    storage.EmptyBalance(),
 		}
 		if err := ctx.AddAddress(&address); err != nil {
-			return nil
+			return err
 		}
 
 		ctx.AddAddressMessage(&storage.MsgAddress{
