@@ -86,20 +86,19 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 			return data, errors.Wrapf(err, "expected TxWithTimeoutHeight, got %T", genTx)
 		}
 
-		tx := storage.Tx{
-			Height:        block.Height,
-			Time:          block.Time,
-			Position:      int64(index),
-			TimeoutHeight: txWithTimeoutHeight.GetTimeoutHeight(),
-			MessagesCount: int64(len(txDecoded.GetMsgs())),
-			Fee:           decimal.Zero,
-			Status:        storageTypes.StatusSuccess,
-			Memo:          memoTx.GetMemo(),
-			MessageTypes:  storageTypes.NewMsgTypeBitMask(),
+		tx := &block.Txs[index]
+		tx.Height = block.Height
+		tx.Time = block.Time
+		tx.Position = int64(index)
+		tx.TimeoutHeight = txWithTimeoutHeight.GetTimeoutHeight()
+		tx.MessagesCount = int64(len(txDecoded.GetMsgs()))
+		tx.Fee = decimal.Zero
+		tx.Status = storageTypes.StatusSuccess
+		tx.Memo = memoTx.GetMemo()
+		tx.MessageTypes = storageTypes.NewMsgTypeBitMask()
+		tx.Messages = make([]storage.Message, len(txDecoded.GetMsgs()))
+		tx.Events = nil
 
-			Messages: make([]storage.Message, len(txDecoded.GetMsgs())),
-			Events:   nil,
-		}
 		if err := tx.SetId(); err != nil {
 			return data, err
 		}
@@ -115,8 +114,6 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 			block.MessageTypes.SetByMsgType(decoded.Msg.Type)
 			tx.BlobsSize += decoded.BlobsSize
 		}
-
-		block.Txs = append(block.Txs, tx)
 	}
 
 	for _, addr := range decodeCtx.Addresses.Values() {
