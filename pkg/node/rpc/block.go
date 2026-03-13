@@ -9,6 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/pool"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/goccy/go-json"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/pkg/errors"
@@ -18,8 +19,11 @@ var (
 	requestsPool = pool.New(func() []types.Request {
 		return make([]types.Request, 0, 20)
 	})
-	responsesPool = pool.New(func() []any {
-		return make([]any, 0, 20)
+	blockResponsesPool = pool.New(func() []*types.Response[pkgTypes.ResultBlock] {
+		return make([]*types.Response[pkgTypes.ResultBlock], 0, 20)
+	})
+	resultsResponsesPool = pool.New(func() []*types.Response[pkgTypes.ResultBlockResults] {
+		return make([]*types.Response[pkgTypes.ResultBlockResults], 0, 20)
 	})
 )
 
@@ -43,83 +47,47 @@ func (api *API) Block(ctx context.Context, level pkgTypes.Level) (pkgTypes.Resul
 	return gbr.Result, nil
 }
 
-func (api *API) BlockData(ctx context.Context, level pkgTypes.Level) (pkgTypes.BlockData, error) {
-	block := types.Response[pkgTypes.ResultBlock]{}
-	results := types.Response[pkgTypes.ResultBlockResults]{}
-
-	responses := []any{
-		&block,
-		&results,
-	}
-
-	levelString := level.String()
-	requests := []types.Request{
-		{
-			Method:  pathBlock,
-			JsonRpc: "2.0",
-			Id:      -1,
-			Params: []any{
-				levelString,
-			},
-		}, {
-			Method:  pathBlockResults,
-			JsonRpc: "2.0",
-			Id:      -1,
-			Params: []any{
-				levelString,
-			},
-		},
-	}
-
-	var blockData pkgTypes.BlockData
-
-	if err := api.post(ctx, requests, &responses); err != nil {
-		return blockData, errors.Wrap(err, "api.post")
-	}
-
-	if block.Error != nil {
-		return blockData, errors.Wrapf(types.ErrRequest, "request error: %s", block.Error.Error())
-	}
-
-	if results.Error != nil {
-		return blockData, errors.Wrapf(types.ErrRequest, "request error: %s", results.Error.Error())
-	}
-
-	blockData.ResultBlock = block.Result
-	blockData.ResultBlockResults = results.Result
-	return blockData, nil
-}
-
 func (api *API) BlockBulkData(ctx context.Context, levels ...pkgTypes.Level) ([]pkgTypes.BlockData, error) {
 	if len(levels) == 0 {
 		return nil, nil
 	}
 
 	// Get slices from pools
-	responses := responsesPool.Get()
+	blockResponses := blockResponsesPool.Get()
+	resultResponses := resultsResponsesPool.Get()
 	requests := requestsPool.Get()
 
 	// Ensure proper capacity
-	neededSize := len(levels) * 2
-	if cap(responses) < neededSize {
-		responses = make([]any, 0, neededSize)
+	requestsSize := len(levels) * 2
+	if cap(blockResponses) < len(levels) {
+		blockResponses = make([]*types.Response[pkgTypes.ResultBlock], 0, len(levels))
 	}
-	if cap(requests) < neededSize {
-		requests = make([]types.Request, 0, neededSize)
+	if cap(resultResponses) < len(levels) {
+		resultResponses = make([]*types.Response[pkgTypes.ResultBlockResults], 0, len(levels))
+	}
+	if cap(requests) < requestsSize {
+		requests = make([]types.Request, 0, requestsSize)
 	}
 
 	// Reset and resize to needed length
-	responses = responses[:neededSize]
-	requests = requests[:neededSize]
+	blockResponses = blockResponses[:len(levels)]
+	resultResponses = resultResponses[:len(levels)]
+	requests = requests[:requestsSize]
 
 	// Defer cleanup and return to pool
 	defer func() {
 		// Clear references to prevent memory leaks
-		for i := range responses {
-			responses[i] = nil
+		for i := range blockResponses {
+			blockResponses[i] = nil
 		}
-		responses = responses[:0]
-		responsesPool.Put(responses)
+		blockResponses = blockResponses[:0]
+		blockResponsesPool.Put(blockResponses)
+
+		for i := range resultResponses {
+			resultResponses[i] = nil
+		}
+		resultResponses = resultResponses[:0]
+		resultsResponsesPool.Put(resultResponses)
 
 		// Clear request data
 		requests = requests[:0]
@@ -127,47 +95,57 @@ func (api *API) BlockBulkData(ctx context.Context, levels ...pkgTypes.Level) ([]
 	}()
 
 	for i := range levels {
-		responses[i*2] = &types.Response[pkgTypes.ResultBlock]{}
-		responses[i*2+1] = &types.Response[pkgTypes.ResultBlockResults]{}
+		blockResponses[i] = new(types.Response[pkgTypes.ResultBlock])
+		resultResponses[i] = new(types.Response[pkgTypes.ResultBlockResults])
 
 		levelString := levels[i].String()
 		requests[i*2] = types.Request{
 			Method:  pathBlock,
 			JsonRpc: "2.0",
-			Id:      -1,
+			Id:      int64(i) * 2,
 			Params: []any{
 				levelString,
 			},
 		}
+
 		requests[i*2+1] = types.Request{
 			Method:  pathBlockResults,
 			JsonRpc: "2.0",
-			Id:      -1,
+			Id:      int64(i)*2 + 1,
 			Params: []any{
 				levelString,
 			},
 		}
 	}
 
-	if err := api.post(ctx, requests, &responses); err != nil {
-		return nil, errors.Wrap(err, "api.post")
+	err := api.postStream(ctx, requests, func(dec *json.Decoder) error {
+		if _, err := dec.Token(); err != nil {
+			return err
+		}
+		for i := range levels {
+			if err := dec.Decode(blockResponses[i]); err != nil {
+				return err
+			}
+			if err := dec.Decode(resultResponses[i]); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "api.postStream")
 	}
 
-	var blockData = make([]pkgTypes.BlockData, len(levels))
-
-	for i := range responses {
-		switch typ := responses[i].(type) {
-		case *types.Response[pkgTypes.ResultBlock]:
-			if typ.Error != nil {
-				return nil, errors.Wrapf(types.ErrRequest, "request error: %s", typ.Error.Error())
-			}
-			blockData[i/2].ResultBlock = typ.Result
-		case *types.Response[pkgTypes.ResultBlockResults]:
-			if typ.Error != nil {
-				return nil, errors.Wrapf(types.ErrRequest, "request error: %s", typ.Error.Error())
-			}
-			blockData[i/2].ResultBlockResults = typ.Result
+	blockData := make([]pkgTypes.BlockData, len(levels))
+	for i := range levels {
+		if blockResponses[i].Error != nil {
+			return nil, errors.Wrapf(types.ErrRequest, "block error: %s", blockResponses[i].Error.Error())
 		}
+		if resultResponses[i].Error != nil {
+			return nil, errors.Wrapf(types.ErrRequest, "results error: %s", resultResponses[i].Error.Error())
+		}
+		blockData[i].ResultBlock = blockResponses[i].Result
+		blockData[i].ResultBlockResults = resultResponses[i].Result
 	}
 
 	return blockData, nil

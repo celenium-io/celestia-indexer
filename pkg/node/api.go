@@ -17,7 +17,6 @@ type Api interface {
 	Block(ctx context.Context, level pkgTypes.Level) (pkgTypes.ResultBlock, error)
 	BlockResults(ctx context.Context, level pkgTypes.Level) (pkgTypes.ResultBlockResults, error)
 	Genesis(ctx context.Context) (types.Genesis, error)
-	BlockData(ctx context.Context, level pkgTypes.Level) (pkgTypes.BlockData, error)
 	BlockDataGet(ctx context.Context, level pkgTypes.Level) (pkgTypes.BlockData, error)
 	BlockBulkData(ctx context.Context, levels ...pkgTypes.Level) ([]pkgTypes.BlockData, error)
 	CurrentHead(ctx context.Context) (pkgTypes.Level, error)

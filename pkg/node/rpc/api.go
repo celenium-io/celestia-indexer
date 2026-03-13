@@ -110,7 +110,7 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 	return err
 }
 
-func (api *API) post(ctx context.Context, requests []types.Request, output any) error {
+func (api *API) postStream(ctx context.Context, requests []types.Request, fn func(*json.Decoder) error) error {
 	u, err := url.Parse(api.cfg.URL)
 	if err != nil {
 		return err
@@ -128,7 +128,6 @@ func (api *API) post(ctx context.Context, requests []types.Request, output any) 
 	}
 
 	start := time.Now()
-
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), body)
 	if err != nil {
 		return err
@@ -150,8 +149,7 @@ func (api *API) post(ctx context.Context, requests []types.Request, output any) 
 		return errors.Errorf("invalid status: %d", response.StatusCode)
 	}
 
-	err = json.NewDecoder(response.Body).Decode(output)
-	return err
+	return fn(json.NewDecoder(response.Body))
 }
 
 func closeWithLogError(stream io.ReadCloser, log zerolog.Logger) {
