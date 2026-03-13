@@ -24,6 +24,8 @@ func saveHlMailboxes(
 		if mailboxes[i].Owner != nil {
 			if addrId, ok := addrToId[mailboxes[i].Owner.Address]; ok {
 				mailboxes[i].OwnerId = addrId
+			} else {
+				return errors.Wrap(errCantFindAddress, mailboxes[i].Owner.Address)
 			}
 		}
 	}
@@ -45,6 +47,8 @@ func saveHlTokens(
 		if tokens[i].Owner != nil {
 			if addrId, ok := addrToId[tokens[i].Owner.Address]; ok {
 				tokens[i].OwnerId = addrId
+			} else {
+				return errors.Wrap(errCantFindAddress, tokens[i].Owner.Address)
 			}
 		}
 
@@ -75,11 +79,15 @@ func saveHlTransfers(
 		if transfers[i].Relayer != nil {
 			if addrId, ok := addrToId[transfers[i].Relayer.Address]; ok {
 				transfers[i].RelayerId = addrId
+			} else {
+				return errors.Wrap(errCantFindAddress, transfers[i].Relayer.Address)
 			}
 		}
 		if transfers[i].Address != nil {
 			if addrId, ok := addrToId[transfers[i].Address.Address]; ok {
 				transfers[i].AddressId = addrId
+			} else {
+				return errors.Wrap(errCantFindAddress, transfers[i].Address.Address)
 			}
 		}
 

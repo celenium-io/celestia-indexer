@@ -42,7 +42,7 @@ func saveAddressMessage(
 		}
 		id, ok := addrToId[msgs[i].Address.String()]
 		if !ok {
-			return errors.Errorf("unknown address in msg_address: %s", msgs[i].Address.String())
+			return errors.Wrap(errCantFindAddress, msgs[i].Address.String())
 		}
 		msgs[i].AddressId = id
 	}

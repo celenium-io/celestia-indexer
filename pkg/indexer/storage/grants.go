@@ -11,11 +11,18 @@ import (
 )
 
 func processGrants(addrToId map[string]uint64, grant *storage.Grant) error {
+	if grant.Grantee == nil {
+		return errors.New("grantee is nil")
+	}
 	granteeId, ok := addrToId[grant.Grantee.Address]
 	if !ok {
 		return errors.Wrapf(errCantFindAddress, "grantee: %s", grant.Grantee.Address)
 	}
 	grant.GranteeId = granteeId
+
+	if grant.Granter == nil {
+		return errors.New("granter is nil")
+	}
 	granterId, ok := addrToId[grant.Granter.Address]
 	if !ok {
 		return errors.Wrapf(errCantFindAddress, "granter: %s", grant.Granter.Address)

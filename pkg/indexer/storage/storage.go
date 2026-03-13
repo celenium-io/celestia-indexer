@@ -255,6 +255,10 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		}
 	}
 
+	if block.Height != state.LastHeight+1 {
+		return state, errors.Errorf("invalid block height=%d  expected=%d", block.Height, state.LastHeight+1)
+	}
+
 	block.Stats.BlockTime = uint64(block.Time.Sub(state.LastTime).Milliseconds())
 
 	if len(module.validatorsByConsAddress) > 0 {
@@ -405,9 +409,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, errors.Wrap(err, "set upgrade applied")
 	}
 
-	if err := updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, dCtx.Block.VersionApp, &state); err != nil {
-		return state, err
-	}
+	updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, dCtx.Block.VersionApp, &state)
 
 	err = tx.Update(ctx, &state)
 	return state, err

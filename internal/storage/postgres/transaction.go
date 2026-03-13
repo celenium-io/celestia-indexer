@@ -861,7 +861,7 @@ func (tx Transaction) SaveHyperlaneTransfers(ctx context.Context, transfers ...*
 	if len(transfers) == 0 {
 		return nil
 	}
-	_, err := tx.Tx().NewInsert().Model(&transfers).Exec(ctx)
+	_, err := tx.Tx().NewInsert().Model(&transfers).Returning("id").Exec(ctx)
 	return err
 }
 

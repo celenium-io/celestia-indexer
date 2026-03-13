@@ -24,6 +24,8 @@ func saveIbcClients(
 		if clients[i].Creator != nil {
 			if addrId, ok := addrToId[clients[i].Creator.Address]; ok {
 				clients[i].CreatorId = addrId
+			} else {
+				return 0, errors.Wrap(errCantFindAddress, clients[i].Creator.Address)
 			}
 		}
 	}
@@ -53,6 +55,8 @@ func saveIbcChannels(
 		if channels[i].Creator != nil {
 			if addrId, ok := addrToId[channels[i].Creator.Address]; ok {
 				channels[i].CreatorId = addrId
+			} else {
+				return errors.Wrap(errCantFindAddress, channels[i].Creator.Address)
 			}
 		}
 	}
@@ -74,11 +78,15 @@ func saveIbcTransfers(
 		if transfers[i].Sender != nil {
 			if addrId, ok := addrToId[transfers[i].Sender.Address]; ok {
 				transfers[i].SenderId = &addrId
+			} else {
+				return errors.Wrap(errCantFindAddress, transfers[i].Sender.Address)
 			}
 		}
 		if transfers[i].Receiver != nil {
 			if addrId, ok := addrToId[transfers[i].Receiver.Address]; ok {
 				transfers[i].ReceiverId = &addrId
+			} else {
+				return errors.Wrap(errCantFindAddress, transfers[i].Receiver.Address)
 			}
 		}
 	}

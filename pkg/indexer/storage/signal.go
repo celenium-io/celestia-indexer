@@ -45,7 +45,7 @@ func (module *Module) saveSignals(
 		}
 		validatorId, ok := module.validatorsByAddress[signals[i].Validator.Address]
 		if !ok {
-			return errors.Errorf("address: %s not found in validator map", signals[i].Validator.Address)
+			return errors.Wrap(errCantFindAddress, signals[i].Validator.Address)
 		}
 
 		validator, ok := validatorsMap[validatorId]
@@ -122,9 +122,13 @@ func saveUpgrades(
 			return nil, false
 		}
 
+		if upgrade.Signer == nil {
+			return errors.New("upgrade's signer is nil"), false
+		}
+
 		signerId, ok := addrToId[upgrade.Signer.Address]
 		if !ok {
-			return errors.Errorf("address %s not found in addrToId map", upgrade.Signer.Address), true
+			return errors.Wrap(errCantFindAddress, upgrade.Signer.Address), true
 		}
 		upgrade.SignerId = signerId
 
