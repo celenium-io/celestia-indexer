@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
-	"github.com/goccy/go-json"
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -21,6 +21,8 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 const (
 	celeniumUserAgent = "Celenium Indexer"
@@ -110,7 +112,50 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 	return err
 }
 
-func (api *API) postStream(ctx context.Context, requests []types.Request, fn func(*json.Decoder) error) error {
+func (api *API) post(ctx context.Context, requests []types.Request, output any) error {
+	u, err := url.Parse(api.cfg.URL)
+	if err != nil {
+		return err
+	}
+
+	body := new(bytes.Buffer)
+	if err := json.NewEncoder(body).Encode(requests); err != nil {
+		return errors.Wrap(err, "invalid bulk post request")
+	}
+
+	if api.rateLimit != nil {
+		if err := api.rateLimit.Wait(ctx); err != nil {
+			return err
+		}
+	}
+
+	start := time.Now()
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), body)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("User-Agent", celeniumUserAgent)
+
+	response, err := api.client.Do(req) //nolint:gosec
+	if err != nil {
+		return err
+	}
+	defer closeWithLogError(response.Body, api.log)
+
+	api.log.Trace().
+		Int64("ms", time.Since(start).Milliseconds()).
+		Str("url", u.String()).
+		Msg("post request")
+
+	if response.StatusCode != http.StatusOK {
+		return errors.Errorf("invalid status: %d", response.StatusCode)
+	}
+
+	err = json.NewDecoder(response.Body).Decode(output)
+	return err
+}
+
+func (api *API) postStream(ctx context.Context, requests []types.Request, fn func(*jsoniter.Decoder) error) error {
 	u, err := url.Parse(api.cfg.URL)
 	if err != nil {
 		return err

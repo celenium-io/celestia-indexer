@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/pool"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/goccy/go-json"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/pkg/errors"
@@ -19,11 +18,8 @@ var (
 	requestsPool = pool.New(func() []types.Request {
 		return make([]types.Request, 0, 20)
 	})
-	blockResponsesPool = pool.New(func() []*types.Response[pkgTypes.ResultBlock] {
-		return make([]*types.Response[pkgTypes.ResultBlock], 0, 20)
-	})
-	resultsResponsesPool = pool.New(func() []*types.Response[pkgTypes.ResultBlockResults] {
-		return make([]*types.Response[pkgTypes.ResultBlockResults], 0, 20)
+	responsesPool = pool.New(func() []any {
+		return make([]any, 0, 20)
 	})
 )
 
@@ -53,41 +49,30 @@ func (api *API) BlockBulkData(ctx context.Context, levels ...pkgTypes.Level) ([]
 	}
 
 	// Get slices from pools
-	blockResponses := blockResponsesPool.Get()
-	resultResponses := resultsResponsesPool.Get()
+	responses := responsesPool.Get()
 	requests := requestsPool.Get()
 
 	// Ensure proper capacity
-	requestsSize := len(levels) * 2
-	if cap(blockResponses) < len(levels) {
-		blockResponses = make([]*types.Response[pkgTypes.ResultBlock], 0, len(levels))
+	neededSize := len(levels) * 2
+	if cap(responses) < neededSize {
+		responses = make([]any, 0, neededSize)
 	}
-	if cap(resultResponses) < len(levels) {
-		resultResponses = make([]*types.Response[pkgTypes.ResultBlockResults], 0, len(levels))
-	}
-	if cap(requests) < requestsSize {
-		requests = make([]types.Request, 0, requestsSize)
+	if cap(requests) < neededSize {
+		requests = make([]types.Request, 0, neededSize)
 	}
 
 	// Reset and resize to needed length
-	blockResponses = blockResponses[:len(levels)]
-	resultResponses = resultResponses[:len(levels)]
-	requests = requests[:requestsSize]
+	responses = responses[:neededSize]
+	requests = requests[:neededSize]
 
 	// Defer cleanup and return to pool
 	defer func() {
 		// Clear references to prevent memory leaks
-		for i := range blockResponses {
-			blockResponses[i] = nil
+		for i := range responses {
+			responses[i] = nil
 		}
-		blockResponses = blockResponses[:0]
-		blockResponsesPool.Put(blockResponses)
-
-		for i := range resultResponses {
-			resultResponses[i] = nil
-		}
-		resultResponses = resultResponses[:0]
-		resultsResponsesPool.Put(resultResponses)
+		responses = responses[:0]
+		responsesPool.Put(responses)
 
 		// Clear request data
 		requests = requests[:0]
@@ -95,57 +80,47 @@ func (api *API) BlockBulkData(ctx context.Context, levels ...pkgTypes.Level) ([]
 	}()
 
 	for i := range levels {
-		blockResponses[i] = new(types.Response[pkgTypes.ResultBlock])
-		resultResponses[i] = new(types.Response[pkgTypes.ResultBlockResults])
+		responses[i*2] = &types.Response[pkgTypes.ResultBlock]{}
+		responses[i*2+1] = &types.Response[pkgTypes.ResultBlockResults]{}
 
 		levelString := levels[i].String()
 		requests[i*2] = types.Request{
 			Method:  pathBlock,
 			JsonRpc: "2.0",
-			Id:      int64(i) * 2,
+			Id:      -1,
 			Params: []any{
 				levelString,
 			},
 		}
-
 		requests[i*2+1] = types.Request{
 			Method:  pathBlockResults,
 			JsonRpc: "2.0",
-			Id:      int64(i)*2 + 1,
+			Id:      -1,
 			Params: []any{
 				levelString,
 			},
 		}
 	}
 
-	err := api.postStream(ctx, requests, func(dec *json.Decoder) error {
-		if _, err := dec.Token(); err != nil {
-			return err
-		}
-		for i := range levels {
-			if err := dec.Decode(blockResponses[i]); err != nil {
-				return err
-			}
-			if err := dec.Decode(resultResponses[i]); err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "api.postStream")
+	if err := api.post(ctx, requests, &responses); err != nil {
+		return nil, errors.Wrap(err, "api.post")
 	}
 
-	blockData := make([]pkgTypes.BlockData, len(levels))
-	for i := range levels {
-		if blockResponses[i].Error != nil {
-			return nil, errors.Wrapf(types.ErrRequest, "block error: %s", blockResponses[i].Error.Error())
+	var blockData = make([]pkgTypes.BlockData, len(levels))
+
+	for i := range responses {
+		switch typ := responses[i].(type) {
+		case *types.Response[pkgTypes.ResultBlock]:
+			if typ.Error != nil {
+				return nil, errors.Wrapf(types.ErrRequest, "request error: %s", typ.Error.Error())
+			}
+			blockData[i/2].ResultBlock = typ.Result
+		case *types.Response[pkgTypes.ResultBlockResults]:
+			if typ.Error != nil {
+				return nil, errors.Wrapf(types.ErrRequest, "request error: %s", typ.Error.Error())
+			}
+			blockData[i/2].ResultBlockResults = typ.Result
 		}
-		if resultResponses[i].Error != nil {
-			return nil, errors.Wrapf(types.ErrRequest, "results error: %s", resultResponses[i].Error.Error())
-		}
-		blockData[i].ResultBlock = blockResponses[i].Result
-		blockData[i].ResultBlockResults = resultResponses[i].Result
 	}
 
 	return blockData, nil
