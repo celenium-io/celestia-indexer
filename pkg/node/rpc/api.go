@@ -155,6 +155,7 @@ func (api *API) post(ctx context.Context, requests []types.Request, output any) 
 	return err
 }
 
+// nolint
 func (api *API) postStream(ctx context.Context, requests []types.Request, fn func(*jsoniter.Decoder) error) error {
 	u, err := url.Parse(api.cfg.URL)
 	if err != nil {
