@@ -397,7 +397,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	if err := module.saveSignals(ctx, tx, dCtx.Signals, dCtx.Upgrades, addrToId, state); err != nil {
+	if err := module.saveSignals(ctx, tx, dCtx.Signals, dCtx.Upgrades, state); err != nil {
 		return state, err
 	}
 

@@ -21,7 +21,6 @@ func (module *Module) saveSignals(
 	tx storage.Transaction,
 	signals []*storage.SignalVersion,
 	upgrades *sync.Map[uint64, *storage.Upgrade],
-	addrToId map[string]uint64,
 	state storage.State,
 ) error {
 	if len(signals) == 0 {
@@ -50,7 +49,10 @@ func (module *Module) saveSignals(
 
 		validator, ok := validatorsMap[validatorId]
 		if !ok {
-			return errors.Errorf("can't find validator by id: %d", validatorId)
+			validator, err = tx.Validator(ctx, validatorId)
+			if err != nil {
+				return errors.Wrapf(err, "get validator by id: %d", validatorId)
+			}
 		}
 
 		signals[i].VotingPower = validator.Stake
@@ -66,7 +68,7 @@ func (module *Module) saveSignals(
 		return errors.Wrap(err, "postProcessingSignal")
 	}
 
-	if err := saveUpgrades(ctx, tx, upgrades, addrToId, state, votingPower, validators); err != nil {
+	if err := saveUpgrades(ctx, tx, upgrades, state, votingPower, validators); err != nil {
 		return errors.Wrap(err, "save upgrades")
 	}
 
@@ -108,7 +110,6 @@ func saveUpgrades(
 	ctx context.Context,
 	tx storage.Transaction,
 	upgrades *sync.Map[uint64, *storage.Upgrade],
-	addrToId map[string]uint64,
 	state storage.State,
 	votingPower decimal.Decimal,
 	validators []storage.Validator,
@@ -120,14 +121,6 @@ func saveUpgrades(
 	err := upgrades.Range(func(version uint64, upgrade *storage.Upgrade) (error, bool) {
 		if state.Version > 0 && state.Version >= version {
 			return nil, false
-		}
-
-		if upgrade.Signer != nil {
-			signerId, ok := addrToId[upgrade.Signer.Address]
-			if !ok {
-				return errors.Wrap(errCantFindAddress, upgrade.Signer.Address), true
-			}
-			upgrade.SignerId = signerId
 		}
 
 		pass, voted, err := recalculateSignalsForUpgrade(version, state, votingPower, validators)
