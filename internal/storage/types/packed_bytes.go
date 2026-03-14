@@ -10,10 +10,20 @@ import (
 
 	"github.com/andybalholm/brotli"
 	"github.com/bytedance/sonic"
+	"github.com/celenium-io/celestia-indexer/internal/pool"
 	"github.com/pkg/errors"
 )
 
 var json = sonic.ConfigFastest
+
+var (
+	brotliPool = pool.New(
+		func() *brotli.Writer { return brotli.NewWriterLevel(nil, brotli.BestSpeed) },
+	)
+	bufPool = pool.New(
+		func() *bytes.Buffer { return bytes.NewBuffer(make([]byte, 0, 512)) },
+	)
+)
 
 type PackedBytes map[string]any
 
@@ -43,8 +53,13 @@ func (pb PackedBytes) ToBytes() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	result := bytes.NewBuffer(nil)
-	writer := brotli.NewWriterLevel(result, brotli.BestSpeed)
+	buf := bufPool.Get()
+	buf.Reset()
+	defer bufPool.Put(buf)
+
+	writer := brotliPool.Get()
+	writer.Reset(buf)
+	defer brotliPool.Put(writer)
 
 	if _, err := writer.Write(b); err != nil {
 		return nil, err
@@ -52,5 +67,8 @@ func (pb PackedBytes) ToBytes() ([]byte, error) {
 	if err := writer.Close(); err != nil {
 		return nil, err
 	}
-	return result.Bytes(), nil
+
+	result := make([]byte, buf.Len())
+	copy(result, buf.Bytes())
+	return result, nil
 }

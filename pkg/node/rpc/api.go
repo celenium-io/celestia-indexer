@@ -155,8 +155,7 @@ func (api *API) post(ctx context.Context, requests []types.Request, output any) 
 	return err
 }
 
-// nolint
-func (api *API) postStream(ctx context.Context, requests []types.Request, fn func(*jsoniter.Decoder) error) error {
+func (api *API) postStream(ctx context.Context, requests []types.Request, fn func(*jsoniter.Iterator) error) error {
 	u, err := url.Parse(api.cfg.URL)
 	if err != nil {
 		return err
@@ -195,7 +194,8 @@ func (api *API) postStream(ctx context.Context, requests []types.Request, fn fun
 		return errors.Errorf("invalid status: %d", response.StatusCode)
 	}
 
-	return fn(json.NewDecoder(response.Body))
+	iter := jsoniter.Parse(json, response.Body, 32*1024)
+	return fn(iter)
 }
 
 func closeWithLogError(stream io.ReadCloser, log zerolog.Logger) {

@@ -54,7 +54,7 @@ type Module struct {
 	rollbackSync     *sync.WaitGroup
 	cancelReadBlocks context.CancelFunc
 
-	circuitBreaker *gobreaker.CircuitBreaker[[]types.BlockData]
+	circuitBreaker *gobreaker.CircuitBreaker[any]
 }
 
 var _ modules.Module = (*Module)(nil)
@@ -81,7 +81,7 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 		taskQueue:     sdkSync.NewMap[types.Level, struct{}](),
 		mx:            new(sync.RWMutex),
 		rollbackSync:  new(sync.WaitGroup),
-		circuitBreaker: gobreaker.NewCircuitBreaker[[]types.BlockData](gobreaker.Settings{
+		circuitBreaker: gobreaker.NewCircuitBreaker[any](gobreaker.Settings{
 			Name:        "BlockDataAPI",
 			MaxRequests: 2,
 			Interval:    time.Minute,

@@ -35,6 +35,7 @@ func New(baseUrl string) *Node {
 	t.MaxIdleConns = 10
 	t.MaxConnsPerHost = 10
 	t.MaxIdleConnsPerHost = 10
+	t.DisableCompression = true // disable due to blobs are already compressed
 
 	return &Node{
 		host: baseUrl,

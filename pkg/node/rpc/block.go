@@ -9,6 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/pool"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/pkg/errors"
@@ -142,4 +143,84 @@ func (api *API) BlockDataGet(ctx context.Context, level pkgTypes.Level) (pkgType
 	blockData.ResultBlock = block
 	blockData.ResultBlockResults = results
 	return blockData, nil
+}
+
+func (api *API) BlockBulkDataStream(
+	ctx context.Context,
+	fn func(pkgTypes.BlockData) error,
+	levels ...pkgTypes.Level,
+) error {
+	if len(levels) == 0 {
+		return nil
+	}
+	// Get slices from pools
+	requests := requestsPool.Get()
+
+	// Ensure proper capacity
+	neededSize := len(levels) * 2
+	if cap(requests) < neededSize {
+		requests = make([]types.Request, 0, neededSize)
+	}
+	// Reset and resize to needed length
+	requests = requests[:neededSize]
+
+	// Defer cleanup and return to pool
+	defer func() {
+		// Clear request data
+		requests = requests[:0]
+		requestsPool.Put(requests)
+	}()
+
+	for i := range levels {
+		levelString := levels[i].String()
+		requests[i*2] = types.Request{
+			Method:  pathBlock,
+			JsonRpc: "2.0",
+			Id:      -1,
+			Params: []any{
+				levelString,
+			},
+		}
+		requests[i*2+1] = types.Request{
+			Method:  pathBlockResults,
+			JsonRpc: "2.0",
+			Id:      -1,
+			Params: []any{
+				levelString,
+			},
+		}
+	}
+
+	return api.postStream(ctx, requests, func(iter *jsoniter.Iterator) error {
+		var current pkgTypes.BlockData
+		idx := 0
+
+		for iter.ReadArray() {
+			if iter.Error != nil {
+				return iter.Error
+			}
+			if idx%2 == 0 {
+				var resp types.Response[pkgTypes.ResultBlock]
+				iter.ReadVal(&resp)
+				if resp.Error != nil {
+					return errors.Wrapf(types.ErrRequest, "request error: %s", resp.Error.Error())
+				}
+				current.ResultBlock = resp.Result
+			} else {
+				var resp types.Response[pkgTypes.ResultBlockResults]
+				iter.ReadVal(&resp)
+				if resp.Error != nil {
+					return errors.Wrapf(types.ErrRequest, "request error: %s", resp.Error.Error())
+				}
+				current.ResultBlockResults = resp.Result
+
+				if err := fn(current); err != nil {
+					return err
+				}
+				current = pkgTypes.BlockData{} // reset for GC
+			}
+			idx++
+		}
+		return iter.Error
+	})
 }

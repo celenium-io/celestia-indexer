@@ -113,7 +113,7 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]any) error {
 		if err != nil {
 			return err
 		}
-		address.Balance.Unbonding = amount.Copy().Neg()
+		address.Balance.Unbonding = amount.Neg()
 		address.Balance.Currency = unbonding.Amount.GetDenom()
 
 		validator := storage.EmptyValidator()
@@ -125,7 +125,7 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]any) error {
 			Height:    ctx.Block.Height,
 			Address:   address,
 			Validator: &validator,
-			Change:    amount.Copy().Neg(),
+			Change:    amount.Neg(),
 			Type:      types.StakingLogTypeUnbonded,
 		})
 	}
@@ -164,7 +164,7 @@ func parseCompleteRedelegation(ctx *context.Context, data map[string]any) error 
 			Height:    ctx.Block.Height,
 			Address:   address,
 			Validator: &validator,
-			Change:    amount.Copy().Neg(),
+			Change:    amount.Neg(),
 			Type:      types.StakingLogTypeUnbonded,
 		})
 	}
@@ -185,14 +185,14 @@ func parseCommission(ctx *context.Context, data map[string]any) error {
 	validator.Address = commission.Validator
 
 	if !commission.Amount.IsZero() {
-		validator.Commissions = commission.Amount.Copy()
-		ctx.Block.Stats.Commissions = ctx.Block.Stats.Commissions.Add(commission.Amount.Copy())
+		validator.Commissions = commission.Amount
+		ctx.Block.Stats.Commissions = ctx.Block.Stats.Commissions.Add(commission.Amount)
 
 		ctx.AddStakingLog(storage.StakingLog{
 			Height:    ctx.Block.Height,
 			Time:      ctx.Block.Time,
 			Validator: &validator,
-			Change:    commission.Amount.Copy(),
+			Change:    commission.Amount,
 			Type:      types.StakingLogTypeCommissions,
 		})
 	}
@@ -215,14 +215,14 @@ func parseRewards(ctx *context.Context, data map[string]any) error {
 	validator.Address = rewards.Validator
 
 	if !rewards.Amount.IsZero() {
-		validator.Rewards = rewards.Amount.Copy()
+		validator.Rewards = rewards.Amount
 		ctx.Block.Stats.Rewards = ctx.Block.Stats.Rewards.Add(rewards.Amount)
 
 		ctx.AddStakingLog(storage.StakingLog{
 			Height:    ctx.Block.Height,
 			Time:      ctx.Block.Time,
 			Validator: &validator,
-			Change:    rewards.Amount.Copy(),
+			Change:    rewards.Amount,
 			Type:      types.StakingLogTypeRewards,
 		})
 	}
@@ -252,7 +252,7 @@ func parseSlash(ctx *context.Context, data map[string]any) error {
 			Burned: slash.BurnedCoins,
 			Validator: &storage.Validator{
 				ConsAddress: consAddress,
-				Stake:       slash.BurnedCoins.Copy(),
+				Stake:       slash.BurnedCoins,
 				Jailed:      &jailed,
 			},
 		})

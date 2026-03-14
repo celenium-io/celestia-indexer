@@ -19,6 +19,7 @@ type Api interface {
 	Genesis(ctx context.Context) (types.Genesis, error)
 	BlockDataGet(ctx context.Context, level pkgTypes.Level) (pkgTypes.BlockData, error)
 	BlockBulkData(ctx context.Context, levels ...pkgTypes.Level) ([]pkgTypes.BlockData, error)
+	BlockBulkDataStream(ctx context.Context, fn func(pkgTypes.BlockData) error, levels ...pkgTypes.Level) error
 	CurrentHead(ctx context.Context) (pkgTypes.Level, error)
 }
 

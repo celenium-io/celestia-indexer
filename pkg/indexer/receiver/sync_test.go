@@ -69,21 +69,6 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 		s.api.EXPECT().
 			CurrentHead(gomock.Any()).
 			Return(5, nil).
-			MaxTimes(1)
-
-		levels := make([]types.Level, blockCount)
-		bulkResult := make([]types.BlockData, blockCount)
-		for i := 0; i < blockCount; i++ {
-			levels[i] = types.Level(i + 1)
-			bulkResult[i] = types.BlockData{
-				ResultBlock:        getResultBlock(levels[i]),
-				ResultBlockResults: getResultBlockResults(levels[i]),
-			}
-		}
-
-		s.api.EXPECT().
-			BlockBulkData(gomock.Any(), gomock.Any()).
-			Return(bulkResult, nil).
 			Times(1)
 	})
 
@@ -92,6 +77,26 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 		BlockPeriod:     cfgDefault.BlockPeriod,
 		RequestBulkSize: 5,
 	})
+
+	levels := make([]types.Level, blockCount)
+	bulkResult := make([]types.BlockData, blockCount)
+	for i := 0; i < blockCount; i++ {
+		levels[i] = types.Level(i + 1)
+		bulkResult[i] = types.BlockData{
+			ResultBlock:        getResultBlock(levels[i]),
+			ResultBlockResults: getResultBlockResults(levels[i]),
+		}
+	}
+
+	s.api.EXPECT().
+		BlockBulkDataStream(gomock.Any(), gomock.Any(), gomock.Any()).
+		DoAndReturn(func(ctx context.Context, f func(types.BlockData) error, l ...types.Level) error {
+			for i := range bulkResult {
+				receiverModule.blocks <- bulkResult[i]
+			}
+			return nil
+		}).
+		Times(1)
 
 	ctx, cancelCtx := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer cancelCtx()
