@@ -441,7 +441,7 @@ func (module *Module) notify(ctx context.Context, state storage.State, block sto
 }
 
 func (module *Module) setUpgradeApplied(ctx context.Context, tx storage.Transaction, currentVersion uint64, block *storage.Block) error {
-	if currentVersion >= block.VersionApp {
+	if currentVersion >= block.VersionApp || block.VersionApp < 3 {
 		return nil
 	}
 
