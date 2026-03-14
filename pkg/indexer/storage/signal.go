@@ -89,7 +89,7 @@ func (module *Module) tryUpgrade(
 	}
 	votingPower = math.Shares(votingPower)
 
-	pass, voted, err := recalculateSignalsForUpgrade(ctx, tx, state.Version+1, state, votingPower, validators)
+	pass, voted, err := recalculateSignalsForUpgrade(state.Version+1, state, votingPower, validators)
 	if err != nil {
 		return errors.Wrap(err, "recalculateSignalsForUpgrade")
 	}
@@ -122,17 +122,15 @@ func saveUpgrades(
 			return nil, false
 		}
 
-		if upgrade.Signer == nil {
-			return errors.New("upgrade's signer is nil"), false
+		if upgrade.Signer != nil {
+			signerId, ok := addrToId[upgrade.Signer.Address]
+			if !ok {
+				return errors.Wrap(errCantFindAddress, upgrade.Signer.Address), true
+			}
+			upgrade.SignerId = signerId
 		}
 
-		signerId, ok := addrToId[upgrade.Signer.Address]
-		if !ok {
-			return errors.Wrap(errCantFindAddress, upgrade.Signer.Address), true
-		}
-		upgrade.SignerId = signerId
-
-		pass, voted, err := recalculateSignalsForUpgrade(ctx, tx, version, state, votingPower, validators)
+		pass, voted, err := recalculateSignalsForUpgrade(version, state, votingPower, validators)
 		if err != nil {
 			return errors.Wrap(err, "recalculateSignalsForUpgrade"), true
 		}
@@ -154,8 +152,6 @@ func saveUpgrades(
 }
 
 func recalculateSignalsForUpgrade(
-	ctx context.Context,
-	tx storage.Transaction,
 	version uint64,
 	state storage.State,
 	votingPower decimal.Decimal,
