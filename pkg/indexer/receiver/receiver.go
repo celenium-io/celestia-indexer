@@ -75,7 +75,7 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 		cosmosApi:     cosmosApi,
 		ws:            ws,
 		cfg:           cfg,
-		blocks:        make(chan types.BlockData, 128),
+		blocks:        make(chan types.BlockData, 512),
 		needGenesis:   state == nil,
 		level:         level,
 		receivedLevel: level,

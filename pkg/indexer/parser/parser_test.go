@@ -13,7 +13,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	dCtx "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -117,12 +116,11 @@ func getBlock() types.BlockData {
 				LastCommit: &types.Commit{
 					Height: 999,
 					Round:  1,
-					Signatures: []tmTypes.CommitSig{
+					Signatures: []types.CommitSig{
 						{
 							BlockIDFlag:      tmTypes.BlockIDFlagCommit,
 							ValidatorAddress: testHashAddress,
 							Timestamp:        time.Time{},
-							Signature:        testsuite.MustHexDecode("0011"),
 						},
 					},
 				},
