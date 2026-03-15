@@ -13,12 +13,14 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
-	"github.com/goccy/go-json"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type Node struct {
 	rateLimit      *rate.Limiter

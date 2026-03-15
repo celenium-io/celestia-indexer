@@ -48,7 +48,7 @@ func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txR
 	t.Fee = d.Fee
 	t.Status = storageTypes.StatusSuccess
 	t.Codespace = txRes.Codespace
-	t.Hash = b.Block.Txs[index].Hash()
+	t.Hash = d.Hash
 	t.Memo = d.Memo
 	t.MessageTypes = storageTypes.NewMsgTypeBitMask()
 	t.Messages = make([]storage.Message, len(d.Messages))

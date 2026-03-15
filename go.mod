@@ -23,7 +23,7 @@ require (
 	github.com/getsentry/sentry-go/echo v0.32.0
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/go-testfixtures/testfixtures/v3 v3.19.0
-	github.com/goccy/go-json v0.10.5
+	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/gorilla/websocket v1.5.3
 	github.com/gosimple/slug v1.15.0
 	github.com/grafana/pyroscope-go v1.2.7
@@ -67,6 +67,7 @@ require (
 	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/json-iterator/go v1.1.12
+	github.com/klauspost/compress v1.18.4
 	github.com/opus-domini/fast-shot v1.1.4
 	github.com/prometheus/client_golang v1.23.2
 	github.com/sony/gobreaker/v2 v2.3.0
@@ -106,7 +107,6 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.53.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProjectZKM/Ziren/crates/go-runtime/zkvm_runtime v0.0.0-20251001021608-1fe7b43fc4d6 // indirect
-	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/aws/aws-sdk-go v1.55.5 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.4 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.17 // indirect
@@ -242,7 +242,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jmhodges/levigo v1.0.0 // indirect
-	github.com/klauspost/compress v1.18.4 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/klauspost/reedsolomon v1.13.2 // indirect
 	github.com/kr/pretty v0.3.1 // indirect

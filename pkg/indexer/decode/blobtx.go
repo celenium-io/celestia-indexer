@@ -22,6 +22,8 @@ package decode
 // the generated Unmarshal.
 
 import (
+	"bytes"
+
 	"github.com/celestiaorg/go-square/v3/share"
 	squareTx "github.com/celestiaorg/go-square/v3/tx"
 	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
@@ -32,6 +34,14 @@ import (
 // blobDataSniffLen mirrors net/http.sniffLen — the maximum number of bytes
 // that http.DetectContentType will ever examine.
 const blobDataSniffLen = 512
+
+// protoTypeIDBytes are pre-converted []byte forms of the proto type-ID string
+// constants.  Using bytes.Equal avoids the string([]byte) allocation that would
+// occur on every call to parseIndexWrapperTxBytes / parseBlobTxShallow.
+// protoIndexWrapperTypeIDBytes is the pre-converted []byte form of
+// squareTx.ProtoIndexWrapperTypeID.  Using bytes.Equal in parseIndexWrapperTxBytes
+// avoids the string([]byte) allocation that would occur on every call.
+var protoIndexWrapperTypeIDBytes = []byte(squareTx.ProtoIndexWrapperTypeID)
 
 // UnmarshalBlobTxShallow parses a BlobTx from its wire-format bytes while
 // capping each Blob.Data at blobDataSniffLen bytes.
@@ -110,6 +120,59 @@ func parseBlobTxShallow(b []byte, out *blobTypes.BlobTx) error {
 		}
 	}
 	return nil
+}
+
+// parseIndexWrapperTxBytes extracts the inner Tx bytes from an IndexWrapper
+// using protowire, without allocating or unmarshalling to the full struct.
+//
+//	message IndexWrapper {
+//	  bytes           tx            = 1;
+//	  repeated uint32 share_indexes = 2;
+//	  string          type_id       = 3;
+//	}
+//
+// Returns a zero-copy subslice of b and true when type_id == ProtoIndexWrapperTypeID.
+// Matches the stripping semantics of celestia-core Tx.Hash() for IndexWrapper:
+// hash = tmhash.Sum(indexWrapper.Tx).
+func parseIndexWrapperTxBytes(b []byte) (txBytes []byte, ok bool) {
+	var typeId []byte
+	for len(b) > 0 {
+		num, typ, n := protowire.ConsumeTag(b)
+		if n < 0 {
+			return nil, false
+		}
+		b = b[n:]
+
+		switch {
+		case num == 1 && typ == protowire.BytesType: // tx bytes
+			v, n := protowire.ConsumeBytes(b)
+			if n < 0 {
+				return nil, false
+			}
+			txBytes = v // zero-copy subslice into the caller's buffer
+			b = b[n:]
+
+		case num == 3 && typ == protowire.BytesType: // type_id string
+			v, n := protowire.ConsumeBytes(b)
+			if n < 0 {
+				return nil, false
+			}
+			typeId = v
+			b = b[n:]
+
+		default: // share_indexes (field 2) and any unknown fields
+			n := protowire.ConsumeFieldValue(num, typ, b)
+			if n < 0 {
+				return nil, false
+			}
+			b = b[n:]
+		}
+	}
+
+	if len(txBytes) == 0 || !bytes.Equal(typeId, protoIndexWrapperTypeIDBytes) {
+		return nil, false
+	}
+	return txBytes, true
 }
 
 // parseBlobShallow decodes a Blob proto message:
