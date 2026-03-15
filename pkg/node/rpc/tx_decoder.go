@@ -13,7 +13,6 @@ package rpc
 //   3. dbuf             in base64.DecodeString                  [alloc: decoded bytes]
 //
 // For a 1 MB blob tx (≈1.33 MB base64) that is three allocations ≈ 4 MB.
-// Across all transactions in a block, this totals ~735 GB/hr in the alloc profile.
 //
 // ReadStringAsSlice() eliminates copies 1 and 2:
 //   - Fast path: string fits in the iterator's read buffer → zero-copy slice, no allocation.
@@ -37,8 +36,10 @@ import (
 )
 
 func init() {
-	t := reflect.TypeFor[tmTypes.Tx]()
-	jsoniter.RegisterTypeDecoder(t.PkgPath()+"."+t.Name(), &txJSONDecoder{})
+	jsoniter.RegisterTypeDecoder(
+		reflect.TypeOf((*tmTypes.Tx)(nil)).Elem().String(),
+		&txJSONDecoder{},
+	)
 }
 
 type txJSONDecoder struct{}
