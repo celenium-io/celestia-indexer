@@ -33,10 +33,6 @@ func DecimalFromMap(m map[string]any, key string) decimal.Decimal {
 	return dec
 }
 
-func Amount(m map[string]any) decimal.Decimal {
-	return DecimalFromMap(m, "amount")
-}
-
 func CoinFromMap(m map[string]any, key string) (cosmosTypes.Coin, error) {
 	str := StringFromMap(m, key)
 	if str == "" {
@@ -157,11 +153,15 @@ func Uint64(m map[string]any, key string) (uint64, error) {
 	if !ok {
 		return 0, errors.Errorf("can't find key: %s", key)
 	}
-	u, ok := val.(uint64)
-	if !ok {
-		return 0, errors.Errorf("key '%s' is not a uint64", key)
+	switch v := val.(type) {
+	case uint64:
+		return v, nil
+	case float64:
+		return uint64(v), nil
+	case string:
+		return strconv.ParseUint(v, 10, 64)
 	}
-	return u, nil
+	return 0, errors.Errorf("key '%s' is not a uint64", key)
 }
 
 func BoolFromMap(m map[string]any, key string) (bool, error) {
@@ -205,11 +205,18 @@ func ChannelOrderingFromMap(m map[string]any, key string) (bool, error) {
 	if !ok {
 		return false, errors.Errorf("can't find key: %s", key)
 	}
-	order, ok := val.(channelTypes.Order)
-	if !ok {
+	switch v := val.(type) {
+	case channelTypes.Order:
+		return v == channelTypes.ORDERED, nil
+	case string:
+		order, ok := channelTypes.Order_value[v]
+		if !ok {
+			return false, errors.Errorf("key '%s' has unknown Order value: %s", key, v)
+		}
+		return channelTypes.Order(order) == channelTypes.ORDERED, nil
+	default:
 		return false, errors.Errorf("key '%s' is not a Order", key)
 	}
-	return order == channelTypes.ORDERED, nil
 }
 
 func RevisionHeightFromMap(m map[string]any, key string) (uint64, uint64, error) {

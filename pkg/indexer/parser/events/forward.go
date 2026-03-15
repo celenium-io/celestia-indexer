@@ -32,6 +32,7 @@ func processForward(ctx *context.Context, events []storage.Event, msg *storage.M
 	var forwarding = storage.Forwarding{
 		Height: msg.Height,
 		Time:   msg.Time,
+		TxId:   msg.TxId,
 	}
 
 	var tokens = make([]map[string]string, 0)
@@ -81,12 +82,12 @@ func processForward(ctx *context.Context, events []storage.Event, msg *storage.M
 			forwarding.Transfers = transfers
 		default:
 			if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "" {
-				msg.Forwarding = &forwarding
+				ctx.AddForwarding(&forwarding)
 				return nil
 			}
 		}
 	}
 
-	msg.Forwarding = &forwarding
+	ctx.AddForwarding(&forwarding)
 	return nil
 }

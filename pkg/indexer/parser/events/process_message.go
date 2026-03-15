@@ -36,6 +36,7 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 	var transfer = &storage.HLTransfer{
 		Height: ctx.Block.Height,
 		Time:   ctx.Block.Time,
+		TxId:   msg.TxId,
 	}
 
 	for !end {
@@ -76,7 +77,7 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 					Address: relayer,
 				}
 			}
-			msg.HLTransfer = transfer
+			ctx.AddHlTransfer(transfer)
 		case types.EventTypeHyperlanewarpv1EventReceiveRemoteTransfer:
 			event, err := decode.NewHyperlaneReceiveTransferEvent(events[*idx].Data)
 			if err != nil {

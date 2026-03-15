@@ -97,7 +97,7 @@ func Test_handleCreateMailbox(t *testing.T) {
 			for i := range tt.msg {
 				err := handleCreateMailbox(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
-				require.NotNil(t, tt.msg[i].HLMailbox)
+				require.NotEmpty(t, tt.ctx.HlMailboxes.Len())
 			}
 		})
 	}

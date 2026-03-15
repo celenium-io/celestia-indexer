@@ -247,8 +247,9 @@ func (s *TransactionTestSuite) TestSaveMsgAddresses() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	addresses := make([]storage.MsgAddress, 5)
+	addresses := make([]*storage.MsgAddress, 5)
 	for i := 0; i < 5; i++ {
+		addresses[i] = new(storage.MsgAddress)
 		addresses[i].AddressId = uint64(i + 1)
 		addresses[i].MsgId = uint64(5 - i)
 		addresses[i].Type = types.MsgAddressTypeValues()[i]
@@ -289,8 +290,9 @@ func (s *TransactionTestSuite) TestSaveNamespaceMessages() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	nsMsgs := make([]storage.NamespaceMessage, 5)
+	nsMsgs := make([]*storage.NamespaceMessage, 5)
 	for i := 0; i < 5; i++ {
+		nsMsgs[i] = new(storage.NamespaceMessage)
 		nsMsgs[i].MsgId = uint64(i + 1)
 		nsMsgs[i].NamespaceId = uint64(5 - i)
 		nsMsgs[i].TxId = uint64((i + 1) * 2)
@@ -310,8 +312,9 @@ func (s *TransactionTestSuite) TestSaveBlobLogs() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	blobLogs := make([]storage.BlobLog, 5)
+	blobLogs := make([]*storage.BlobLog, 5)
 	for i := 0; i < 5; i++ {
+		blobLogs[i] = new(storage.BlobLog)
 		blobLogs[i].MsgId = uint64(i + 1)
 		blobLogs[i].NamespaceId = uint64(5 - i)
 		blobLogs[i].TxId = uint64((i + 1) * 2)
@@ -333,8 +336,9 @@ func (s *TransactionTestSuite) TestSaveBlobLogsWithCopy() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	blobLogs := make([]storage.BlobLog, 1000)
+	blobLogs := make([]*storage.BlobLog, 1000)
 	for i := 0; i < 1000; i++ {
+		blobLogs[i] = new(storage.BlobLog)
 		blobLogs[i].MsgId = uint64(i + 1)
 		blobLogs[i].NamespaceId = uint64(10000 - i)
 		blobLogs[i].TxId = uint64((i + 1) * 2)
@@ -358,6 +362,94 @@ func (s *TransactionTestSuite) TestSaveBlobLogsWithCopy() {
 	err = s.storage.Connection().DB().QueryRow("select count(*) from blob_log").Scan(&count)
 	s.Require().NoError(err)
 	s.Require().GreaterOrEqual(count, 1000)
+}
+
+func (s *TransactionTestSuite) TestSaveTransactionsWithCopy() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	txs := make([]storage.Tx, 1000)
+	for i := 0; i < 1000; i++ {
+		txs[i].Time = time.Now()
+		txs[i].Height = 1000
+		txs[i].Codespace = "codespace"
+		txs[i].Error = "no"
+		txs[i].EventsCount = 10
+		txs[i].MessagesCount = 12
+		txs[i].GasUsed = 127637
+		txs[i].GasWanted = 231233
+		txs[i].Hash = testsuite.RandomBytes(32)
+		txs[i].Memo = "memo"
+		txs[i].MessageTypes = types.NewMsgTypeBitMask(types.IBCTransfer, types.MsgAcknowledgement)
+		txs[i].Position = int64(i)
+		txs[i].Fee = decimal.NewFromInt(17263)
+		txs[i].Status = types.StatusSuccess
+		txs[i].TimeoutHeight = 1287361
+
+		err = txs[i].SetId()
+		s.Require().NoError(err)
+	}
+
+	err = tx.SaveTransactions(ctx, txs...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	var count int
+	err = s.storage.Connection().DB().QueryRow("select count(*) from tx").Scan(&count)
+	s.Require().NoError(err)
+	s.Require().GreaterOrEqual(count, 1000)
+
+	id := 1000<<24 | 10
+	item, err := s.storage.Tx.GetByID(ctx, uint64(id))
+	s.Require().NoError(err)
+	s.Require().NotEmpty(item.MessageTypes)
+	s.Require().EqualValues(types.StatusSuccess, item.Status)
+	s.Require().Len(item.Hash, 32)
+}
+
+func (s *TransactionTestSuite) TestSaveMessagesWithCopy() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	msgs := make([]*storage.Message, 1000)
+	for i := 0; i < 1000; i++ {
+		msgs[i] = &storage.Message{
+			Time:     time.Now(),
+			Height:   1000,
+			Position: int64(i),
+			Size:     167235,
+			Type:     types.IBCTransfer,
+			TxId:     uint64(i + 1200),
+		}
+
+		err = msgs[i].SetId(msgs[i].Position)
+		s.Require().NoError(err)
+	}
+
+	err = tx.SaveMessages(ctx, msgs...)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	var count int
+	err = s.storage.Connection().DB().QueryRow("select count(*) from message").Scan(&count)
+	s.Require().NoError(err)
+	s.Require().GreaterOrEqual(count, 1000)
+
+	id := 1000<<24 | 10
+	item, err := s.storage.Message.GetByID(ctx, uint64(id))
+	s.Require().NoError(err)
+	s.Require().EqualValues(types.IBCTransfer, item.Type)
+	s.Require().EqualValues(item.Position, 10)
 }
 
 func (s *TransactionTestSuite) TestSaveProposals() {

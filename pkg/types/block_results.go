@@ -21,7 +21,6 @@ type ResponseDeliverTx struct {
 	Code      uint32          `json:"code,omitempty"              protobuf:"varint,1,opt,name=code,proto3"`
 	Data      json.RawMessage `json:"data,omitempty"              protobuf:"bytes,2,opt,name=data,proto3"`
 	Log       string          `json:"log,omitempty"               protobuf:"bytes,3,opt,name=log,proto3"`
-	Info      string          `json:"info,omitempty"              protobuf:"bytes,4,opt,name=info,proto3"`
 	GasWanted int64           `json:"gas_wanted,omitempty,string" protobuf:"varint,5,opt,name=gas_wanted,proto3"`
 	GasUsed   int64           `json:"gas_used,omitempty,string"   protobuf:"varint,6,opt,name=gas_used,proto3"`
 	Events    []Event         `json:"events,omitempty"            protobuf:"bytes,7,rep,name=events,proto3"`
@@ -59,7 +58,6 @@ func (e Event) Compare(a Event) bool {
 type EventAttribute struct {
 	Key   string `json:"key,omitempty"   protobuf:"bytes,1,opt,name=key,proto3"`
 	Value string `json:"value,omitempty" protobuf:"bytes,2,opt,name=value,proto3"`
-	Index bool   `json:"index,omitempty" protobuf:"varint,3,opt,name=index,proto3"`
 }
 
 // ValidatorUpdate

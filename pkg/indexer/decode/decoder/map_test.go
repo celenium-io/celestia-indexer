@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	channelTypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -89,6 +90,84 @@ func TestUnixNanoFromMap(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := UnixNanoFromMap(tt.m, tt.key)
 			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestChannelOrderingFromMap(t *testing.T) {
+	tests := []struct {
+		name    string
+		m       map[string]any
+		key     string
+		want    bool
+		wantErr bool
+	}{
+		{
+			name:    "native type ORDERED",
+			m:       map[string]any{"Ordering": channelTypes.ORDERED},
+			key:     "Ordering",
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name:    "native type UNORDERED",
+			m:       map[string]any{"Ordering": channelTypes.UNORDERED},
+			key:     "Ordering",
+			want:    false,
+			wantErr: false,
+		},
+		{
+			name:    "string ORDER_ORDERED",
+			m:       map[string]any{"Ordering": "ORDER_ORDERED"},
+			key:     "Ordering",
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name:    "string ORDER_UNORDERED",
+			m:       map[string]any{"Ordering": "ORDER_UNORDERED"},
+			key:     "Ordering",
+			want:    false,
+			wantErr: false,
+		},
+		{
+			name:    "string ORDER_NONE_UNSPECIFIED",
+			m:       map[string]any{"Ordering": "ORDER_NONE_UNSPECIFIED"},
+			key:     "Ordering",
+			want:    false,
+			wantErr: false,
+		},
+		{
+			name:    "unknown string value",
+			m:       map[string]any{"Ordering": "INVALID"},
+			key:     "Ordering",
+			want:    false,
+			wantErr: true,
+		},
+		{
+			name:    "missing key",
+			m:       map[string]any{},
+			key:     "Ordering",
+			want:    false,
+			wantErr: true,
+		},
+		{
+			name:    "wrong type",
+			m:       map[string]any{"Ordering": 42},
+			key:     "Ordering",
+			want:    false,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ChannelOrderingFromMap(tt.m, tt.key)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tt.want, got)
+			}
 		})
 	}
 }

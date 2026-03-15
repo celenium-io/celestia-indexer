@@ -87,7 +87,7 @@ func Test_handleConnectionOpenInit(t *testing.T) {
 			for i := range tt.msg {
 				err := handleConnectionOpenInit(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
-				require.NotNil(t, tt.msg[i].IbcConnection)
+				require.NotEmpty(t, tt.ctx.IbcConnections.Len())
 			}
 		})
 	}

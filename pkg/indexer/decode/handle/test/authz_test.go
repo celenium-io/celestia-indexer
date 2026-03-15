@@ -14,8 +14,7 @@ import (
 	codecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	"github.com/fatih/structs"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // MsgGrant
@@ -37,74 +36,52 @@ func createMsgGrant() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgGrant(t *testing.T) {
 	m := createMsgGrant()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 4
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected := []storage.AddressWithType{
+	grants := []*storage.Grant{
 		{
-			Type: storageTypes.MsgAddressTypeGranter,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
-				Hash:       []byte{0x38, 0xf5, 0xc9, 0x8, 0x56, 0x46, 0xad, 0xc2, 0xc0, 0x71, 0x2c, 0xcc, 0x4a, 0x9e, 0xbe, 0x5, 0x41, 0x9e, 0xd2, 0xc8},
-				Balance:    storage.EmptyBalance(),
+			Height: block.Height,
+			Granter: &storage.Address{
+				Address: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
 			},
-		},
-		{
-			Type: storageTypes.MsgAddressTypeGrantee,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
-				Hash:       []byte{0x64, 0xd3, 0xfc, 0x6a, 0x2a, 0x52, 0x4e, 0x2f, 0x60, 0x3f, 0x51, 0xc7, 0xee, 0x4e, 0x8d, 0x35, 0xf7, 0x23, 0x22, 0xf8},
-				Balance:    storage.EmptyBalance(),
+			Grantee: &storage.Address{
+				Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
 			},
+			Authorization: "",
+			Params: map[string]any{
+				"Msg": "",
+			},
+			Time: block.Block.Time,
 		},
 	}
-
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  4,
 		Type:      storageTypes.MsgGrant,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      146,
 		Namespace: nil,
-		Addresses: addressesExpected,
-		Grants: []storage.Grant{
-			{
-				Height: blob.Height,
-				Granter: &storage.Address{
-					Address: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
-				},
-				Grantee: &storage.Address{
-					Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
-				},
-				Authorization: "",
-				Params: map[string]any{
-					"Msg": "",
-				},
-				Time: blob.Block.Time,
-			},
-		},
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.EqualValues(t, decodeCtx.Grants.Len(), 1)
+	_ = decodeCtx.Grants.Range(func(_ string, value *storage.Grant) (error, bool) {
+		require.Equal(t, value, grants[0])
+		return nil, false
+	})
 }
 
 // MsgExec
@@ -120,49 +97,33 @@ func createMsgExec() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgExec(t *testing.T) {
 	m := createMsgExec()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 4
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeGrantee,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
-				Hash:       []byte{0x64, 0xd3, 0xfc, 0x6a, 0x2a, 0x52, 0x4e, 0x2f, 0x60, 0x3f, 0x51, 0xc7, 0xee, 0x4e, 0x8d, 0x35, 0xf7, 0x23, 0x22, 0xf8},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:           0,
-		Height:       blob.Height,
+		Id:           1,
+		Height:       block.Height,
 		Time:         now,
 		Position:     4,
 		Type:         storageTypes.MsgExec,
 		TxId:         0,
-		Data:         structs.Map(m),
+		Data:         mustMsgToMap(t, m),
 		Namespace:    nil,
 		Size:         49,
-		Addresses:    addressesExpected,
 		InternalMsgs: make([]string, 0),
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 // MsgRevoke
@@ -179,72 +140,50 @@ func createMsgRevoke() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgRevoke(t *testing.T) {
 	m := createMsgRevoke()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 4
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected := []storage.AddressWithType{
+	grants := []*storage.Grant{
 		{
-			Type: storageTypes.MsgAddressTypeGranter,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
-				Hash:       []byte{0x38, 0xf5, 0xc9, 0x8, 0x56, 0x46, 0xad, 0xc2, 0xc0, 0x71, 0x2c, 0xcc, 0x4a, 0x9e, 0xbe, 0x5, 0x41, 0x9e, 0xd2, 0xc8},
-				Balance:    storage.EmptyBalance(),
+			RevokeHeight: &block.Height,
+			Granter: &storage.Address{
+				Address: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
 			},
-		},
-		{
-			Type: storageTypes.MsgAddressTypeGrantee,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
-				Hash:       []byte{0x64, 0xd3, 0xfc, 0x6a, 0x2a, 0x52, 0x4e, 0x2f, 0x60, 0x3f, 0x51, 0xc7, 0xee, 0x4e, 0x8d, 0x35, 0xf7, 0x23, 0x22, 0xf8},
-				Balance:    storage.EmptyBalance(),
+			Grantee: &storage.Address{
+				Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
 			},
+			Authorization: "msg_type",
+			Revoked:       true,
 		},
 	}
-
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  4,
 		Type:      storageTypes.MsgRevoke,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      108,
 		Namespace: nil,
-		Addresses: addressesExpected,
-		Grants: []storage.Grant{
-			{
-				RevokeHeight: &blob.Height,
-				Granter: &storage.Address{
-					Address: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
-				},
-				Grantee: &storage.Address{
-					Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
-				},
-				Authorization: "msg_type",
-				Revoked:       true,
-			},
-		},
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.EqualValues(t, decodeCtx.Grants.Len(), 1)
+	_ = decodeCtx.Grants.Range(func(_ string, value *storage.Grant) (error, bool) {
+		require.Equal(t, value, grants[0])
+		return nil, false
+	})
 }
 
 // MsgPruneExpiredGrants
@@ -262,36 +201,21 @@ func TestDecodeMsg_SuccessOnMsgPruneExpiredGrants(t *testing.T) {
 		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeExecutor,
-			Address: storage.Address{
-				Id:         0,
-				Height:     block.Height,
-				LastHeight: block.Height,
-				Address:    "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
-				Hash:       []byte{0x64, 0xd3, 0xfc, 0x6a, 0x2a, 0x52, 0x4e, 0x2f, 0x60, 0x3f, 0x51, 0xc7, 0xee, 0x4e, 0x8d, 0x35, 0xf7, 0x23, 0x22, 0xf8},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
+		Id:        1,
 		Height:    block.Height,
 		Time:      now,
 		Position:  4,
 		Type:      storageTypes.MsgPruneExpiredGrants,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }

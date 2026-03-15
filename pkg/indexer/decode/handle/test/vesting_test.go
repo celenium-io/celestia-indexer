@@ -15,9 +15,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
-	"github.com/fatih/structs"
 	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // MsgCreateVestingAccount
@@ -42,68 +41,45 @@ func createMsgCreateVestingAccount() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgCreateVestingAccount(t *testing.T) {
 	m := createMsgCreateVestingAccount()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
+	txId := uint64(1)
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, txId)
 
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeFromAddress,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
+	vestingAccount := &storage.VestingAccount{
+		Height: block.Height,
+		Time:   block.Block.Time,
+		Address: &storage.Address{
+			Address: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 		},
-		{
-			Type: storageTypes.MsgAddressTypeToAddress,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
-				Hash:       []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x0, 0x2e, 0x81, 0xcb, 0x8b, 0x27, 0x27, 0xe1, 0x0, 0x68},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
+		Amount: decimal.RequireFromString("1000"),
+		Type:   storageTypes.VestingTypeContinuous,
+		TxId:   testsuite.Ptr(txId),
 	}
-
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgCreateVestingAccount,
-		TxId:      0,
-		Data:      structs.Map(m),
+		TxId:      1,
+		Data:      mustMsgToMap(t, m),
 		Size:      112,
 		Namespace: nil,
-		Addresses: addressesExpected,
-		VestingAccount: &storage.VestingAccount{
-			Height: blob.Height,
-			Time:   blob.Block.Time,
-			Address: &storage.Address{
-				Address: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
-			},
-			Amount: decimal.RequireFromString("1000"),
-			Type:   storageTypes.VestingTypeContinuous,
-		},
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.Len(t, decodeCtx.VestingAccounts, 1)
+	require.Equal(t, vestingAccount, decodeCtx.VestingAccounts[0])
 }
 
 // MsgCreatePermanentLockedAccount
@@ -120,68 +96,45 @@ func createMsgCreatePermanentLockedAccount() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgCreatePermanentLockedAccount(t *testing.T) {
 	msgCreatePeriodicVestingAccount := createMsgCreatePermanentLockedAccount()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
+	txId := uint64(1)
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msgCreatePeriodicVestingAccount, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, msgCreatePeriodicVestingAccount, position, storageTypes.StatusSuccess, txId)
 
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeFromAddress,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
+	vestingAccount := &storage.VestingAccount{
+		Height: block.Height,
+		Time:   block.Block.Time,
+		Address: &storage.Address{
+			Address: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 		},
-		{
-			Type: storageTypes.MsgAddressTypeToAddress,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Hash:       []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x0, 0x2e, 0x81, 0xcb, 0x8b, 0x27, 0x27, 0xe1, 0x0, 0x68},
-				Address:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
-				Balance:    storage.EmptyBalance(),
-			},
-		},
+		Amount: decimal.RequireFromString("0"),
+		Type:   storageTypes.VestingTypePermanent,
+		TxId:   testsuite.Ptr(txId),
 	}
-
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgCreatePermanentLockedAccount,
-		TxId:      0,
-		Data:      structs.Map(msgCreatePeriodicVestingAccount),
+		TxId:      1,
+		Data:      mustMsgToMap(t, msgCreatePeriodicVestingAccount),
 		Size:      98,
 		Namespace: nil,
-		Addresses: addressesExpected,
-		VestingAccount: &storage.VestingAccount{
-			Height: blob.Height,
-			Time:   blob.Block.Time,
-			Address: &storage.Address{
-				Address: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
-			},
-			Amount: decimal.RequireFromString("0"),
-			Type:   storageTypes.VestingTypePermanent,
-		},
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.Len(t, decodeCtx.VestingAccounts, 1)
+	require.Equal(t, vestingAccount, decodeCtx.VestingAccounts[0])
 }
 
 // MsgCreatePeriodicVestingAccount
@@ -204,75 +157,53 @@ func createMsgCreatePeriodicVestingAccount() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 	msgCreatePeriodicVestingAccount := createMsgCreatePeriodicVestingAccount()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
+	txId := uint64(1)
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msgCreatePeriodicVestingAccount, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeFromAddress,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-		{
-			Type: storageTypes.MsgAddressTypeToAddress,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Hash:       []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x0, 0x2e, 0x81, 0xcb, 0x8b, 0x27, 0x27, 0xe1, 0x0, 0x68},
-				Address:    "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msgCreatePeriodicVestingAccount, position, storageTypes.StatusSuccess, txId)
 
 	startTime := time.Date(2024, 03, 13, 19, 21, 50, 0, time.UTC)
+	vestingAccount := &storage.VestingAccount{
+		Height: block.Height,
+		Time:   block.Block.Time,
+		Address: &storage.Address{
+			Address: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
+		},
+		Amount:    decimal.RequireFromString("1"),
+		Type:      storageTypes.VestingTypePeriodic,
+		StartTime: &startTime,
+		TxId:      testsuite.Ptr(txId),
+		VestingPeriods: []storage.VestingPeriod{
+			{
+				Height: block.Height,
+				Amount: decimal.RequireFromString("1"),
+				Time:   time.Date(2024, 03, 13, 19, 38, 30, 0, time.UTC),
+			},
+		},
+	}
+
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgCreatePeriodicVestingAccount,
-		TxId:      0,
-		Data:      structs.Map(msgCreatePeriodicVestingAccount),
+		TxId:      1,
+		Data:      mustMsgToMap(t, msgCreatePeriodicVestingAccount),
 		Size:      120,
 		Namespace: nil,
-		Addresses: addressesExpected,
-		VestingAccount: &storage.VestingAccount{
-			Height: blob.Height,
-			Time:   blob.Block.Time,
-			Address: &storage.Address{
-				Address: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
-			},
-			Amount:    decimal.RequireFromString("1"),
-			Type:      storageTypes.VestingTypePeriodic,
-			StartTime: &startTime,
-			VestingPeriods: []storage.VestingPeriod{
-				{
-					Height: blob.Height,
-					Amount: decimal.RequireFromString("1"),
-					Time:   time.Date(2024, 03, 13, 19, 38, 30, 0, time.UTC),
-				},
-			},
-		},
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
+	require.Len(t, decodeCtx.VestingAccounts, 1)
+	require.Equal(t, vestingAccount, decodeCtx.VestingAccounts[0])
 }

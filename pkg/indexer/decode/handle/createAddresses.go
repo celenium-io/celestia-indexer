@@ -17,28 +17,28 @@ type addressData struct {
 
 type addressesData []addressData
 
-func createAddresses(ctx *context.Context, data addressesData, level types.Level) ([]storage.AddressWithType, error) {
-	addresses := make([]storage.AddressWithType, len(data))
-	for i, d := range data {
-		_, hash, err := types.Address(d.address).Decode()
+func createAddresses(ctx *context.Context, data addressesData, level types.Level, msgId uint64) error {
+	for i := range data {
+		_, hash, err := types.Address(data[i].address).Decode()
 		if err != nil {
-			return nil, err
+			return err
 		}
 		address := storage.Address{
 			Hash:       hash,
 			Height:     level,
 			LastHeight: level,
-			Address:    d.address,
+			Address:    data[i].address,
 			Balance:    storage.EmptyBalance(),
 		}
 		if err := ctx.AddAddress(&address); err != nil {
-			return addresses, nil
+			return err
 		}
 
-		addresses[i] = storage.AddressWithType{
-			Type:    d.t,
-			Address: address,
-		}
+		ctx.AddAddressMessage(&storage.MsgAddress{
+			MsgId:   msgId,
+			Type:    data[i].t,
+			Address: &address,
+		})
 	}
-	return addresses, nil
+	return nil
 }

@@ -25,7 +25,7 @@ func handleUpdateClient(ctx *context.Context, events []storage.Event, msg *stora
 	return processUpdateClient(ctx, events, msg, idx)
 }
 
-func processUpdateClient(_ *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+func processUpdateClient(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	uc, err := decode.NewUpdateClient(events[*idx].Data)
 	if err != nil {
 		return errors.Wrap(err, "parse update client event")
@@ -36,13 +36,14 @@ func processUpdateClient(_ *context.Context, events []storage.Event, msg *storag
 		return errors.Wrap(err, "receiving Header from message")
 	}
 
-	msg.IbcClient = &storage.IbcClient{
+	ibcClient := &storage.IbcClient{
 		Id:                   uc.Id,
 		UpdatedAt:            msg.Time,
 		ChainId:              header.Header.ChainID,
 		LatestRevisionHeight: uc.ConsensusHeight,
 		LatestRevisionNumber: uc.Revision,
 	}
+	ctx.AddIbcClient(ibcClient)
 
 	*idx += 2
 	return nil

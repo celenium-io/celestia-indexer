@@ -16,6 +16,7 @@ import (
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/migrate"
 )
@@ -264,10 +265,24 @@ func migrateDatabase(ctx context.Context, db *database.Bun) error {
 	if err := migrator.Lock(ctx); err != nil {
 		return err
 	}
-	defer migrator.Unlock(ctx) //nolint:errcheck
+	defer func() {
+		if err := migrator.Unlock(ctx); err != nil {
+			log.Err(err).Msg("migrator.Unlock")
+		}
+	}()
 
-	_, err := migrator.Migrate(ctx)
-	return err
+	ms, err := migrator.MigrationsWithStatus(ctx)
+	if err != nil {
+		return errors.Wrap(err, "migrator.MigrationsWithStatus")
+	}
+	if len(ms.Unapplied()) == 0 {
+		return nil
+	}
+
+	if _, err := migrator.Migrate(ctx); err != nil {
+		return errors.Wrap(err, "migrator.Migrate")
+	}
+	return nil
 }
 
 func (s Storage) Close() error {

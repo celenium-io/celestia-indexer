@@ -6,10 +6,10 @@ package storage
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDenomMetadata_TableName(t *testing.T) {
 	denom_metadata := DenomMetadata{}
-	assert.Equal(t, "denom_metadata", denom_metadata.TableName())
+	require.Equal(t, "denom_metadata", denom_metadata.TableName())
 }

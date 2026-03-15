@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/pkg/errors"
 )
 
 func saveAddresses(
@@ -26,6 +27,9 @@ func saveAddresses(
 	addToId := make(map[string]uint64)
 	balances := make([]storage.Balance, len(addresses))
 	for i := range addresses {
+		if addresses[i].Id == 0 {
+			return addToId, totalAccounts, errors.Errorf("id for address %s equals 0", addresses[i].Address)
+		}
 		addToId[addresses[i].Address] = addresses[i].Id
 		addresses[i].Balance.Id = addresses[i].Id
 		balances[i] = addresses[i].Balance
@@ -47,12 +51,15 @@ func saveSigners(
 	var txAddresses []storage.Signer
 	for i := range txs {
 		for j := range txs[i].Signers {
-			if addrId, ok := addrToId[txs[i].Signers[j].Address]; ok {
-				txAddresses = append(txAddresses, storage.Signer{
-					TxId:      txs[i].Id,
-					AddressId: addrId,
-				})
+			addrId, ok := addrToId[txs[i].Signers[j].Address]
+			if !ok {
+				return errors.Errorf("unknown transaction signer: %s", txs[i].Signers[j].Address)
 			}
+
+			txAddresses = append(txAddresses, storage.Signer{
+				TxId:      txs[i].Id,
+				AddressId: addrId,
+			})
 		}
 	}
 	return tx.SaveSigners(ctx, txAddresses...)

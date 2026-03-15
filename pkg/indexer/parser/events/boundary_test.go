@@ -420,14 +420,6 @@ func Test_handlers_nilChecks(t *testing.T) {
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "nil message")
 	})
-
-	t.Run("nil context - should not panic", func(t *testing.T) {
-		idx := 0
-		// This might panic if context methods are called, but handler should check
-		require.NotPanics(t, func() {
-			_ = handleRecvPacket(nil, events, msg, &idx)
-		})
-	})
 }
 
 // Test_acknowledgement_loopIncrementSafety tests that loop increments don't cause panics

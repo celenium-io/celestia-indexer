@@ -9,9 +9,12 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
+
+var _ storage.Copiable = (*StakingLog)(nil)
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IStakingLog interface {
@@ -37,4 +40,25 @@ type StakingLog struct {
 // TableName -
 func (StakingLog) TableName() string {
 	return "staking_log"
+}
+
+func (log StakingLog) Flat() ([]any, error) {
+	var addressId any
+	if log.AddressId != nil {
+		addressId = int64(*log.AddressId)
+	}
+	return []any{
+		log.Time,
+		int64(log.Height),
+		addressId,
+		int64(log.ValidatorId),
+		pgtype.Numeric{Int: log.Change.Coefficient(), Exp: log.Change.Exponent(), Valid: true},
+		string(log.Type),
+	}, nil
+}
+
+func (StakingLog) Columns() []string {
+	return []string{
+		"time", "height", "address_id", "validator_id", "change", "type",
+	}
 }

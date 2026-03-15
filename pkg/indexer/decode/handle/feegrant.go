@@ -13,14 +13,14 @@ import (
 
 // MsgGrantAllowance adds permission for Grantee to spend up to Allowance
 // of fees from the account of Granter.
-func MsgGrantAllowance(ctx *context.Context, status storageTypes.Status, m *feegrant.MsgGrantAllowance) (storageTypes.MsgType, []storage.AddressWithType, []storage.Grant, error) {
+func MsgGrantAllowance(ctx *context.Context, status storageTypes.Status, msgId uint64, m *feegrant.MsgGrantAllowance) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgGrantAllowance
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeGranter, address: m.Granter},
 		{t: storageTypes.MsgAddressTypeGrantee, address: m.Grantee},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil || status == storageTypes.StatusFailed {
-		return msgType, addresses, nil, err
+		return msgType, err
 	}
 
 	grant := storage.Grant{
@@ -36,18 +36,19 @@ func MsgGrantAllowance(ctx *context.Context, status storageTypes.Status, m *feeg
 	}
 
 	err = parseGrantFee(m, &grant)
-	return msgType, addresses, []storage.Grant{grant}, err
+	ctx.AddGrants(&grant)
+	return msgType, err
 }
 
 // MsgRevokeAllowance removes any existing Allowance from Granter to Grantee.
-func MsgRevokeAllowance(ctx *context.Context, status storageTypes.Status, m *feegrant.MsgRevokeAllowance) (storageTypes.MsgType, []storage.AddressWithType, []storage.Grant, error) {
+func MsgRevokeAllowance(ctx *context.Context, status storageTypes.Status, msgId uint64, m *feegrant.MsgRevokeAllowance) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgRevokeAllowance
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeGranter, address: m.Granter},
 		{t: storageTypes.MsgAddressTypeGrantee, address: m.Grantee},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil || status == storageTypes.StatusFailed {
-		return msgType, addresses, nil, err
+		return msgType, err
 	}
 
 	grant := storage.Grant{
@@ -62,7 +63,8 @@ func MsgRevokeAllowance(ctx *context.Context, status storageTypes.Status, m *fee
 		RevokeHeight:  &ctx.Block.Height,
 	}
 
-	return msgType, addresses, []storage.Grant{grant}, nil
+	ctx.AddGrants(&grant)
+	return msgType, nil
 }
 
 func parseGrantFee(m *feegrant.MsgGrantAllowance, g *storage.Grant) error {

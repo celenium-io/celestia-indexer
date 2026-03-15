@@ -28,14 +28,14 @@ func handleConnectionOpenConfirm(ctx *context.Context, events []storage.Event, m
 	return processConnectionOpenConfirm(ctx, events, msg, idx)
 }
 
-func processConnectionOpenConfirm(_ *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+func processConnectionOpenConfirm(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	for i := *idx; i < len(events); i++ {
 		if events[i].Type != storageTypes.EventTypeConnectionOpenConfirm && events[i].Type != storageTypes.EventTypeConnectionOpenAck {
 			continue
 		}
 		cc := decode.NewConnectionOpen(events[i].Data)
 
-		msg.IbcConnection = &storage.IbcConnection{
+		conn := &storage.IbcConnection{
 			ConnectionHeight:         msg.Height,
 			ConnectedAt:              msg.Time,
 			ClientId:                 cc.ClientId,
@@ -43,12 +43,14 @@ func processConnectionOpenConfirm(_ *context.Context, events []storage.Event, ms
 			CounterpartyClientId:     cc.CounterpartyClientId,
 			CounterpartyConnectionId: cc.CounterpartyConnectionId,
 			ChannelsCount:            0,
+			ConnectionTxId:           msg.TxId,
 		}
+		ctx.AddIbcConnection(conn)
 
-		msg.IbcClient = &storage.IbcClient{
+		ctx.AddIbcClient(&storage.IbcClient{
 			Id:              cc.ClientId,
 			ConnectionCount: 1,
-		}
+		})
 		break
 	}
 

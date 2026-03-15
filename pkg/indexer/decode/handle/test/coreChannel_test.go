@@ -21,9 +21,6 @@ import (
 	icaTypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
 	transferTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	coreChannel "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	"github.com/fatih/structs"
-	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,288 +28,192 @@ func TestDecodeMsg_SuccessOnMsgChannelOpenInit(t *testing.T) {
 	msg := &coreChannel.MsgChannelOpenInit{
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgChannelOpenInit,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      53,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgChannelOpenTry(t *testing.T) {
 	msg := &coreChannel.MsgChannelOpenTry{
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgChannelOpenTry,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      55,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgChannelOpenAck(t *testing.T) {
 	msg := &coreChannel.MsgChannelOpenAck{
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgChannelOpenAck,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      51,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgChannelOpenConfirm(t *testing.T) {
 	msg := &coreChannel.MsgChannelOpenConfirm{
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgChannelOpenConfirm,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      51,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgChannelCloseInit(t *testing.T) {
 	msg := &coreChannel.MsgChannelCloseInit{
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgChannelCloseInit,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgChannelCloseConfirm(t *testing.T) {
 	msg := &coreChannel.MsgChannelCloseConfirm{
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgChannelCloseConfirm,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      51,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost(t *testing.T) {
@@ -334,23 +235,9 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost(t *testing.T) {
 		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     block.Height,
-				LastHeight: block.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
-
-	data := structs.Map(msg)
+	data := mustMsgToMap(t, msg)
 	packet, ok := data["Packet"].(map[string]any)
 	require.True(t, ok)
 	packet["Data"] = map[string]any{
@@ -373,7 +260,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost(t *testing.T) {
 	}
 
 	msgExpected := storage.Message{
-		Id:        0,
+		Id:        1,
 		Height:    block.Height,
 		Time:      now,
 		Position:  0,
@@ -382,13 +269,11 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost(t *testing.T) {
 		Data:      data,
 		Size:      426,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
 	require.NoError(t, err)
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
-	require.Equal(t, addressesExpected, dm.Addresses)
 }
 
 func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost2(t *testing.T) {
@@ -415,23 +300,9 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost2(t *testing.T) {
 		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     block.Height,
-				LastHeight: block.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
-
-	data := structs.Map(msg)
+	data := mustMsgToMap(t, msg)
 	packet, ok := data["Packet"].(map[string]any)
 	require.True(t, ok)
 	packet["Data"] = map[string]any{
@@ -447,7 +318,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost2(t *testing.T) {
 	}
 
 	msgExpected := storage.Message{
-		Id:        0,
+		Id:        1,
 		Height:    block.Height,
 		Time:      now,
 		Position:  0,
@@ -456,13 +327,11 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost2(t *testing.T) {
 		Data:      data,
 		Size:      544,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
 	require.NoError(t, err)
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
-	require.Equal(t, addressesExpected, dm.Addresses)
 }
 
 func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost3(t *testing.T) {
@@ -489,24 +358,10 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost3(t *testing.T) {
 		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 	require.NoError(t, err)
 
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     block.Height,
-				LastHeight: block.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
-
-	data := structs.Map(msg)
+	data := mustMsgToMap(t, msg)
 	packet, ok := data["Packet"].(map[string]any)
 	require.True(t, ok)
 
@@ -530,7 +385,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost3(t *testing.T) {
 	}
 
 	msgExpected := storage.Message{
-		Id:        0,
+		Id:        1,
 		Height:    block.Height,
 		Time:      now,
 		Position:  0,
@@ -539,7 +394,6 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost3(t *testing.T) {
 		Data:      data,
 		Size:      836,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
 	_, err = dm.Msg.Data.ToBytes()
@@ -547,7 +401,6 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost3(t *testing.T) {
 
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
-	require.Equal(t, addressesExpected, dm.Addresses)
 
 }
 
@@ -569,33 +422,9 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_Transfer(t *testing.T) {
 		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     block.Height,
-				LastHeight: block.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		}, {
-			Type: storageTypes.MsgAddressTypeReceiver,
-			Address: storage.Address{
-				Id:         0,
-				Height:     block.Height,
-				LastHeight: block.Height,
-				Address:    "celestia19863f6vse7qc8jegpmg8wzagdy7n0h6fwkzw3k",
-				Hash:       []byte{0x29, 0xf5, 0x14, 0xe9, 0x90, 0xcf, 0x81, 0x83, 0xcb, 0x28, 0x0e, 0xd0, 0x77, 0x0b, 0xa8, 0x69, 0x3d, 0x37, 0xdf, 0x49},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
-
-	data := structs.Map(msg)
+	data := mustMsgToMap(t, msg)
 	packet, ok := data["Packet"].(map[string]any)
 	require.True(t, ok)
 	packet["Data"] = transferTypes.FungibleTokenPacketData{
@@ -606,7 +435,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_Transfer(t *testing.T) {
 	}
 
 	msgExpected := storage.Message{
-		Id:        0,
+		Id:        1,
 		Height:    block.Height,
 		Time:      now,
 		Position:  0,
@@ -615,129 +444,75 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_Transfer(t *testing.T) {
 		Data:      data,
 		Size:      253,
 		Namespace: nil,
-		Addresses: addressesExpected,
-		IbcTransfer: &storage.IbcTransfer{
-			Time:   now,
-			Height: block.Height,
-			Receiver: &storage.Address{
-				Address: "celestia19863f6vse7qc8jegpmg8wzagdy7n0h6fwkzw3k",
-				Balance: storage.EmptyBalance(),
-				Hash:    []byte{0x29, 0xf5, 0x14, 0xe9, 0x90, 0xcf, 0x81, 0x83, 0xcb, 0x28, 0x0e, 0xd0, 0x77, 0x0b, 0xa8, 0x69, 0x3d, 0x37, 0xdf, 0x49},
-			},
-			SenderAddress: testsuite.Ptr("osmo19863f6vse7qc8jegpmg8wzagdy7n0h6fh8qwaf"),
-			Amount:        decimal.RequireFromString("2000000"),
-			Denom:         "utia",
-			ChannelId:     "channel-0",
-			Port:          "transfer",
-		},
-		IbcChannel: &storage.IbcChannel{
-			Id:             "channel-0",
-			TransfersCount: 1,
-			Received:       decimal.RequireFromString("2000000"),
-			Status:         storageTypes.IbcChannelStatusInitialization,
-		},
 	}
 
 	require.NoError(t, err)
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
-	require.Equal(t, addressesExpected, dm.Addresses)
 }
 
 func TestDecodeMsg_SuccessOnMsgTimeout(t *testing.T) {
 	msg := &coreChannel.MsgTimeout{
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgTimeout,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      55,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgTimeoutOnClose(t *testing.T) {
 	msg := &coreChannel.MsgTimeoutOnClose{
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgTimeoutOnClose,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      55,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }
 
 func TestDecodeMsg_SuccessOnMsgAcknowledgement(t *testing.T) {
@@ -749,42 +524,18 @@ func TestDecodeMsg_SuccessOnMsgAcknowledgement(t *testing.T) {
 			Data:          []byte(`{"amount":"1000000","denom":"utia","receiver":"osmo1gutppfxgmwcrm4ws796ma467reu4cj8qg0fxgn","sender":"celestia1gutppfxgmwcrm4ws796ma467reu4cj8q37txyv"}`),
 		},
 	}
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSigner,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		}, {
-			Type: storageTypes.MsgAddressTypeSender,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1gutppfxgmwcrm4ws796ma467reu4cj8q37txyv",
-				Hash:       []byte{0x47, 0x16, 0x10, 0xa4, 0xc8, 0xdb, 0xb0, 0x3d, 0xd5, 0xd0, 0xf1, 0x75, 0xbe, 0xd7, 0x5e, 0x1e, 0x79, 0x5c, 0x48, 0xe0},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
-
-	data := structs.Map(msg)
+	data := mustMsgToMap(t, msg)
 	packet, ok := data["Packet"].(map[string]any)
 	require.True(t, ok)
 	packet["Data"] = transferTypes.FungibleTokenPacketData{
@@ -795,8 +546,8 @@ func TestDecodeMsg_SuccessOnMsgAcknowledgement(t *testing.T) {
 	}
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgAcknowledgement,
@@ -804,31 +555,9 @@ func TestDecodeMsg_SuccessOnMsgAcknowledgement(t *testing.T) {
 		Data:      data,
 		Size:      231,
 		Namespace: nil,
-		Addresses: addressesExpected,
-		IbcChannel: &storage.IbcChannel{
-			Id:             "channel-0",
-			TransfersCount: 1,
-			Sent:           decimal.RequireFromString("1000000"),
-			Status:         storageTypes.IbcChannelStatusInitialization,
-		},
-		IbcTransfer: &storage.IbcTransfer{
-			Height:          blob.Height,
-			Time:            now,
-			Port:            "transfer",
-			ChannelId:       "channel-0",
-			ReceiverAddress: testsuite.Ptr("osmo1gutppfxgmwcrm4ws796ma467reu4cj8qg0fxgn"),
-			Sender: &storage.Address{
-				Address: "celestia1gutppfxgmwcrm4ws796ma467reu4cj8q37txyv",
-				Balance: storage.EmptyBalance(),
-				Hash:    []byte{0x47, 0x16, 0x10, 0xa4, 0xc8, 0xdb, 0xb0, 0x3d, 0xd5, 0xd0, 0xf1, 0x75, 0xbe, 0xd7, 0x5e, 0x1e, 0x79, 0x5c, 0x48, 0xe0},
-			},
-			Amount: decimal.RequireFromString("1000000"),
-			Denom:  "utia",
-		},
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }

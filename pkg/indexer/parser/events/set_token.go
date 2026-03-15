@@ -42,12 +42,19 @@ func processSetToken(ctx *context.Context, events []storage.Event, msg *storage.
 					return errors.Wrap(err, "decode token id")
 				}
 
-				msg.HLToken = &storage.HLToken{
+				token := &storage.HLToken{
 					TokenId: tokenId.Bytes(),
 					Owner: &storage.Address{
-						Address: setToken.NewOwner,
+						Address:    setToken.NewOwner,
+						Height:     msg.Height,
+						LastHeight: msg.Height,
+						Balance:    storage.EmptyBalance(),
 					},
 					Type: types.HLTokenTypeCollateral,
+				}
+				ctx.AddHlToken(token)
+				if err := ctx.AddAddress(token.Owner); err != nil {
+					return errors.Wrap(err, "add address")
 				}
 				end = true
 			}

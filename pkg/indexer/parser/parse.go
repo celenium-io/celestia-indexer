@@ -47,7 +47,7 @@ func (p *Module) parse(b types.BlockData) error {
 
 		ChainId: b.Block.ChainID,
 
-		Events: make([]storage.Event, 0, len(b.FinalizeBlockEvents)),
+		Events: nil,
 
 		Stats: storage.BlockStats{
 			Height:        b.Height,
@@ -77,10 +77,11 @@ func (p *Module) parse(b types.BlockData) error {
 	decodeCtx.Block.BlockSignatures = p.parseBlockSignatures(b.Block.LastCommit)
 	p.parseConsensusParamUpdates(decodeCtx, b.ConsensusParamUpdates)
 
-	decodeCtx.Block.Events, err = parseBlockEvents(decodeCtx, b, b.FinalizeBlockEvents, getFirstTxEvent(b.TxsResults))
+	blockEvents, err := parseBlockEvents(decodeCtx, b, b.FinalizeBlockEvents, getFirstTxEvent(b.TxsResults))
 	if err != nil {
 		return errors.Wrap(err, "parsing begin end events")
 	}
+	decodeCtx.AddEvents(blockEvents...)
 
 	p.Log.Info().
 		Uint64("height", uint64(decodeCtx.Block.Height)).

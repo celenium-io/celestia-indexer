@@ -11,8 +11,10 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/pool"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
-	"github.com/goccy/go-json"
+	jsoniter "github.com/json-iterator/go"
+	kgzip "github.com/klauspost/compress/gzip"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -21,6 +23,46 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
+// gzipPool reuses klauspost gzip readers to avoid per-request allocations.
+// klauspost/compress/gzip is significantly faster than stdlib compress/flate for
+// decompression, using SIMD and other optimisations.
+// Factory returns a zero-value Reader; Reset initialises all fields before use.
+var gzipPool = pool.New(func() *kgzip.Reader { return &kgzip.Reader{} })
+
+func acquireGzipReader(r io.Reader) (*kgzip.Reader, error) {
+	gz := gzipPool.Get()
+	if err := gz.Reset(r); err != nil {
+		gzipPool.Put(gz)
+		return nil, err
+	}
+	return gz, nil
+}
+
+func releaseGzipReader(gz *kgzip.Reader) {
+	_ = gz.Close()
+	gzipPool.Put(gz)
+}
+
+// openBody returns an io.Reader for the response body. If the server sent a
+// gzip-compressed response, the returned reader is a pooled klauspost gzip
+// reader; callers must call the returned cleanup function when done.
+// The underlying resp.Body is always closed separately via closeWithLogError.
+func (api *API) openBody(resp *http.Response) (io.Reader, func()) {
+	if resp.Header.Get("Content-Encoding") == "gzip" {
+		gz, err := acquireGzipReader(resp.Body)
+		if err != nil {
+			api.log.Warn().Err(err).
+				Str("url", resp.Request.URL.String()).
+				Msg("gzip reader init failed, reading raw body")
+			return resp.Body, nil
+		}
+		return gz, func() { releaseGzipReader(gz) }
+	}
+	return resp.Body, nil
+}
 
 const (
 	celeniumUserAgent = "Celenium Indexer"
@@ -48,6 +90,9 @@ func NewAPI(cfg config.DataSource) API {
 	t.MaxIdleConns = rps
 	t.MaxConnsPerHost = rps
 	t.MaxIdleConnsPerHost = rps
+	// Disable stdlib's transparent gzip decompression so we can use the
+	// faster klauspost/compress implementation instead.
+	t.DisableCompression = true
 
 	return API{
 		client: &http.Client{
@@ -90,6 +135,7 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 		return err
 	}
 	req.Header.Set("User-Agent", celeniumUserAgent)
+	req.Header.Set("Accept-Encoding", "gzip")
 
 	response, err := api.client.Do(req) //nolint:gosec
 	if err != nil {
@@ -106,7 +152,11 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 		return errors.Errorf("invalid status: %d", response.StatusCode)
 	}
 
-	err = json.NewDecoder(response.Body).Decode(output)
+	body, cleanup := api.openBody(response)
+	if cleanup != nil {
+		defer cleanup()
+	}
+	err = json.NewDecoder(body).Decode(output)
 	return err
 }
 
@@ -128,12 +178,12 @@ func (api *API) post(ctx context.Context, requests []types.Request, output any) 
 	}
 
 	start := time.Now()
-
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), body)
 	if err != nil {
 		return err
 	}
 	req.Header.Set("User-Agent", celeniumUserAgent)
+	req.Header.Set("Accept-Encoding", "gzip")
 
 	response, err := api.client.Do(req) //nolint:gosec
 	if err != nil {
@@ -150,8 +200,60 @@ func (api *API) post(ctx context.Context, requests []types.Request, output any) 
 		return errors.Errorf("invalid status: %d", response.StatusCode)
 	}
 
-	err = json.NewDecoder(response.Body).Decode(output)
+	respBody, cleanup := api.openBody(response)
+	if cleanup != nil {
+		defer cleanup()
+	}
+	err = json.NewDecoder(respBody).Decode(output)
 	return err
+}
+
+func (api *API) postStream(ctx context.Context, requests []types.Request, fn func(*jsoniter.Iterator) error) error {
+	u, err := url.Parse(api.cfg.URL)
+	if err != nil {
+		return err
+	}
+
+	body := new(bytes.Buffer)
+	if err := json.NewEncoder(body).Encode(requests); err != nil {
+		return errors.Wrap(err, "invalid bulk post request")
+	}
+
+	if api.rateLimit != nil {
+		if err := api.rateLimit.Wait(ctx); err != nil {
+			return err
+		}
+	}
+
+	start := time.Now()
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), body)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("User-Agent", celeniumUserAgent)
+	req.Header.Set("Accept-Encoding", "gzip")
+
+	response, err := api.client.Do(req) //nolint:gosec
+	if err != nil {
+		return err
+	}
+	defer closeWithLogError(response.Body, api.log)
+
+	api.log.Trace().
+		Int64("ms", time.Since(start).Milliseconds()).
+		Str("url", u.String()).
+		Msg("post request")
+
+	if response.StatusCode != http.StatusOK {
+		return errors.Errorf("invalid status: %d", response.StatusCode)
+	}
+
+	streamBody, cleanup := api.openBody(response)
+	if cleanup != nil {
+		defer cleanup()
+	}
+	iter := jsoniter.Parse(json, streamBody, 32*1024)
+	return fn(iter)
 }
 
 func closeWithLogError(stream io.ReadCloser, log zerolog.Logger) {

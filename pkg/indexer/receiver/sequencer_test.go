@@ -16,7 +16,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules/stopper"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type blockConciseData struct {
@@ -110,15 +110,15 @@ func Test_createBlock(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			blocks := createBlocks(tt.order, tt.blocksData...)
 
-			assert.Len(t, blocks, len(tt.blocksData))
+			require.Len(t, blocks, len(tt.blocksData))
 			if tt.order == random {
 				return
 			}
 
 			for i, b := range blocks {
-				assert.Equal(t, types.Level(tt.want[i].level), b.Height)
-				assert.Equal(t, tt.want[i].level, b.Block.Height)
-				assert.Equal(t, tt.want[i].hash, b.BlockID.Hash)
+				require.Equal(t, types.Level(tt.want[i].level), b.Height)
+				require.Equal(t, tt.want[i].level, b.Block.Height)
+				require.Equal(t, tt.want[i].hash, b.BlockID.Hash)
 			}
 		})
 	}

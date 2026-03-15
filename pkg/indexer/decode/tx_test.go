@@ -17,7 +17,6 @@ import (
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -26,7 +25,6 @@ func TestDecodeTx_TxWithMemo(t *testing.T) {
 		Code:      0,
 		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
 		Log:       `[{"msg_index":0,"events":[{"type":"coin_received","attributes":[{"key":"receiver","value":"celestia1h2kqw44hdq5dwlcvsw8f2l49lkehtf9wp95kth"},{"key":"amount","value":"1562utia"}]}]}]`,
-		Info:      "",
 		GasWanted: 200000,
 		GasUsed:   170049,
 		Events:    []nodeTypes.Event{},
@@ -37,12 +35,12 @@ func TestDecodeTx_TxWithMemo(t *testing.T) {
 
 	dTx, err := Tx(block, 0)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Equal(t, uint64(0), dTx.TimeoutHeight)
-	assert.Equal(t, "test ui redelegate tx ", dTx.Memo)
-	assert.Equal(t, 1, len(dTx.Messages))
-	assert.Equal(t, decimal.NewFromInt(72431), dTx.Fee)
+	require.Equal(t, uint64(0), dTx.TimeoutHeight)
+	require.Equal(t, "test ui redelegate tx ", dTx.Memo)
+	require.Equal(t, 1, len(dTx.Messages))
+	require.Equal(t, decimal.NewFromInt(72431), dTx.Fee)
 }
 
 func TestDecodeTx_TxV050Signer(t *testing.T) {
@@ -50,7 +48,6 @@ func TestDecodeTx_TxV050Signer(t *testing.T) {
 		Code:      0,
 		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
 		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"receiver\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"spender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.bank.v1beta1.MsgSend\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]}]}]`,
-		Info:      "",
 		GasWanted: 120000,
 		GasUsed:   91289,
 		Events:    []nodeTypes.Event{},
@@ -80,7 +77,6 @@ func TestDecodeTx_TxV050Signer2(t *testing.T) {
 		Code:      0,
 		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
 		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"receiver\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"spender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.bank.v1beta1.MsgSend\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]}]}]`,
-		Info:      "",
 		GasWanted: 120000,
 		GasUsed:   91289,
 		Events:    []nodeTypes.Event{},
@@ -108,7 +104,6 @@ func TestDecodeTx_Tx_PFB(t *testing.T) {
 		Code:      0,
 		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
 		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"celestia.blob.v1.EventPayForBlobs\",\"attributes\":[{\"key\":\"blob_sizes\",\"value\":\"[684]\"},{\"key\":\"namespaces\",\"value\":\"[\\\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ2Vyb0E=\\\"]\"},{\"key\":\"signer\",\"value\":\"\\\"celestia1rky9086t340m7rmkctuj4spxwv2gc62vlwx59v\\\"\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/celestia.blob.v1.MsgPayForBlobs\"}]}]}]`,
-		Info:      "",
 		GasWanted: 120000,
 		GasUsed:   91289,
 		Events:    []nodeTypes.Event{},
@@ -136,7 +131,6 @@ func TestDecodeTx_Exec_signal(t *testing.T) {
 		Code:      0,
 		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
 		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.authz.v1beta1.MsgExec\"}]}]}]`,
-		Info:      "",
 		GasWanted: 210000,
 		GasUsed:   68808,
 		Events:    []nodeTypes.Event{},
@@ -159,7 +153,6 @@ func TestDecodeTx_Tx_MsgRegisterEVMAddress(t *testing.T) {
 		Code:      0,
 		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
 		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"celestia.blob.v1.EventPayForBlobs\",\"attributes\":[{\"key\":\"blob_sizes\",\"value\":\"[684]\"},{\"key\":\"namespaces\",\"value\":\"[\\\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ2Vyb0E=\\\"]\"},{\"key\":\"signer\",\"value\":\"\\\"celestia1rky9086t340m7rmkctuj4spxwv2gc62vlwx59v\\\"\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/celestia.blob.v1.MsgPayForBlobs\"}]}]}]`,
-		Info:      "",
 		GasWanted: 120000,
 		GasUsed:   91289,
 		Events:    []nodeTypes.Event{},
@@ -188,9 +181,9 @@ func TestDecodeCosmosTx_DelegateMsg(t *testing.T) {
 
 	var d = NewDecodedTx()
 	err := decodeCosmosTx(txDecoder, rawTx, &d)
-	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), d.TimeoutHeight)
-	assert.Equal(t, "", d.Memo)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), d.TimeoutHeight)
+	require.Equal(t, "", d.Memo)
 
 	expectedMsgs := []types.Msg{
 		&cosmosStakingTypes.MsgDelegate{
@@ -202,8 +195,8 @@ func TestDecodeCosmosTx_DelegateMsg(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, expectedMsgs, d.Messages)
-	assert.Equal(t, "0", d.Fee.String())
+	require.Equal(t, expectedMsgs, d.Messages)
+	require.Equal(t, "0", d.Fee.String())
 }
 
 func TestDecodeCosmosTx_VoteMsg(t *testing.T) {
@@ -212,9 +205,9 @@ func TestDecodeCosmosTx_VoteMsg(t *testing.T) {
 
 	var d = NewDecodedTx()
 	err = decodeCosmosTx(txDecoder, rawTx, &d)
-	assert.NoError(t, err)
-	assert.Equal(t, uint64(0), d.TimeoutHeight)
-	assert.Equal(t, "", d.Memo)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), d.TimeoutHeight)
+	require.Equal(t, "", d.Memo)
 
 	expectedMsgs := []types.Msg{
 		&cosmosGovTypesV1.MsgVote{
@@ -223,8 +216,8 @@ func TestDecodeCosmosTx_VoteMsg(t *testing.T) {
 			Option:     cosmosGovTypesV1.OptionYes,
 		},
 	}
-	assert.Equal(t, expectedMsgs, d.Messages)
-	assert.Equal(t, "500000", d.Fee.String())
+	require.Equal(t, expectedMsgs, d.Messages)
+	require.Equal(t, "500000", d.Fee.String())
 }
 
 func TestDecodeCosmosTx_MsgSetToken(t *testing.T) {
@@ -308,11 +301,11 @@ func TestDecodeFee(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			fee, err := decodeFee(tc.amount)
 
-			assert.Equal(t, tc.expectedFee, fee)
+			require.Equal(t, tc.expectedFee, fee)
 			if err != nil {
-				assert.Equal(t, tc.expectedErr, err.Error())
+				require.Equal(t, tc.expectedErr, err.Error())
 			} else {
-				assert.Equal(t, tc.expectedErr, "")
+				require.Equal(t, tc.expectedErr, "")
 			}
 
 		})
@@ -360,8 +353,8 @@ func TestGetFeeInDenom(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			fee, ok := getFeeInDenom(tc.amount, tc.denom)
 
-			assert.Equal(t, tc.expectedFee, fee)
-			assert.Equal(t, tc.expectedOk, ok)
+			require.Equal(t, tc.expectedFee, fee)
+			require.Equal(t, tc.expectedOk, ok)
 		})
 	}
 }

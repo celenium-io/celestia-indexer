@@ -24,7 +24,7 @@ func TestParseEvents_EmptyEventsResults(t *testing.T) {
 	}
 
 	ctx := context.NewContext()
-	resultEvents, err := parseEvents(ctx, block, make([]types.Event, 0))
+	resultEvents, err := parseEvents(ctx, block, make([]types.Event, 0), 0)
 	require.NoError(t, err)
 
 	require.Empty(t, resultEvents)
@@ -54,7 +54,6 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 		Code:      0,
 		Data:      []byte{},
 		Log:       "[]",
-		Info:      "info",
 		GasWanted: 12000,
 		GasUsed:   1000,
 		Events:    events,
@@ -63,7 +62,7 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 	block, now := testsuite.CreateTestBlockWithAppVersion(txRes, 1, 4)
 
 	ctx := context.NewContext()
-	resultEvents, err := parseEvents(ctx, block, events)
+	resultEvents, err := parseEvents(ctx, block, events, 1)
 	require.NoError(t, err)
 
 	require.Len(t, resultEvents, 1)
@@ -73,7 +72,8 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 	require.Equal(t, now, e.Time)
 	require.Equal(t, int64(0), e.Position)
 	require.Equal(t, storageTypes.EventTypeCoinSpent, e.Type)
-	require.Nil(t, e.TxId)
+	require.NotNil(t, e.TxId)
+	require.EqualValues(t, 1, *e.TxId)
 
 	attrs := map[string]any{
 		"spender": "celestia1p330stapusykfss47qrhqlukjncvgyzf6gdufs",
@@ -118,7 +118,7 @@ func BenchmarkParseEvent(b *testing.B) {
 	ctx := context.NewContext()
 	b.Run("parse event", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			_ = parseEvent(ctx, block, event, 10, &resultEvent, false)
+			_ = parseEvent(ctx, block, event, 10, &resultEvent, nil, false)
 		}
 	})
 }

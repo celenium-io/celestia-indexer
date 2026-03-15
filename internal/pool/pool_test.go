@@ -7,7 +7,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type testStruct struct {
@@ -21,14 +21,14 @@ func TestPool_Basic(t *testing.T) {
 
 	// Get from pool (should create new)
 	val := intPool.Get()
-	assert.Equal(t, 0, val)
+	require.Equal(t, 0, val)
 
 	// Put modified value back
 	intPool.Put(42)
 
 	// Get from pool (should reuse)
 	val = intPool.Get()
-	assert.Equal(t, 42, val)
+	require.Equal(t, 42, val)
 }
 
 func TestPool_Struct(t *testing.T) {
@@ -39,9 +39,9 @@ func TestPool_Struct(t *testing.T) {
 
 	// Get from pool
 	obj := structPool.Get()
-	assert.NotNil(t, obj)
-	assert.Equal(t, 0, obj.value)
-	assert.Equal(t, "", obj.data)
+	require.NotNil(t, obj)
+	require.Equal(t, 0, obj.value)
+	require.Equal(t, "", obj.data)
 
 	// Modify and put back
 	obj.value = 100
@@ -50,8 +50,8 @@ func TestPool_Struct(t *testing.T) {
 
 	// Get again (should be same object with modified values)
 	obj2 := structPool.Get()
-	assert.Equal(t, 100, obj2.value)
-	assert.Equal(t, "test", obj2.data)
+	require.Equal(t, 100, obj2.value)
+	require.Equal(t, "test", obj2.data)
 }
 
 func TestPool_Pointer(t *testing.T) {
@@ -69,7 +69,7 @@ func TestPool_Pointer(t *testing.T) {
 	pool.Put(c1)
 
 	c2 := pool.Get()
-	assert.Equal(t, 10, c2.count)
+	require.Equal(t, 10, c2.count)
 }
 
 func TestPool_Slice(t *testing.T) {
@@ -79,20 +79,20 @@ func TestPool_Slice(t *testing.T) {
 	})
 
 	slice := slicePool.Get()
-	assert.NotNil(t, slice)
-	assert.Equal(t, 0, len(slice))
-	assert.GreaterOrEqual(t, cap(slice), 1024)
+	require.NotNil(t, slice)
+	require.Equal(t, 0, len(slice))
+	require.GreaterOrEqual(t, cap(slice), 1024)
 
 	// Use slice
 	slice = append(slice, 1, 2, 3)
-	assert.Equal(t, 3, len(slice))
+	require.Equal(t, 3, len(slice))
 
 	// Put back
 	slicePool.Put(slice)
 
 	// Get again
 	slice2 := slicePool.Get()
-	assert.Equal(t, 3, len(slice2))
+	require.Equal(t, 3, len(slice2))
 }
 
 func TestPool_Reset(t *testing.T) {
@@ -115,8 +115,8 @@ func TestPool_Reset(t *testing.T) {
 
 	// Get again, should have empty data but preserved capacity
 	buf2 := pool.Get()
-	assert.Equal(t, 0, len(buf2.data))
-	assert.GreaterOrEqual(t, cap(buf2.data), 1024)
+	require.Equal(t, 0, len(buf2.data))
+	require.GreaterOrEqual(t, cap(buf2.data), 1024)
 }
 
 func TestPool_Concurrent(t *testing.T) {
@@ -135,7 +135,7 @@ func TestPool_Concurrent(t *testing.T) {
 
 			// Get from pool
 			obj := pool.Get()
-			assert.NotNil(t, obj)
+			require.NotNil(t, obj)
 
 			// Modify
 			obj.value = id

@@ -29,13 +29,13 @@ func handleChannelOpenConfirm(ctx *context.Context, events []storage.Event, msg 
 	return processChannelOpenConfirm(ctx, events, msg, idx)
 }
 
-func processChannelOpenConfirm(_ *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+func processChannelOpenConfirm(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	if events[*idx].Type != storageTypes.EventTypeChannelOpenConfirm && events[*idx].Type != storageTypes.EventTypeChannelOpenAck {
 		return errors.Errorf("invalid event type: %s", events[*idx].Type)
 	}
 	cc := decode.NewChannelChange(events[*idx].Data)
 
-	msg.IbcChannel = &storage.IbcChannel{
+	ibcChannel := &storage.IbcChannel{
 		Id:                    cc.ChannelId,
 		ConfirmationHeight:    msg.Height,
 		ConfirmedAt:           msg.Time,
@@ -44,7 +44,9 @@ func processChannelOpenConfirm(_ *context.Context, events []storage.Event, msg *
 		CounterpartyPortId:    cc.CounterpartyPortId,
 		CounterpartyChannelId: cc.CounterpartyChannelId,
 		Status:                storageTypes.IbcChannelStatusOpened,
+		ConfirmationTxId:      msg.TxId,
 	}
+	ctx.AddIbcChannel(ibcChannel)
 
 	*idx += 2
 	return nil

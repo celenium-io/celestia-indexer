@@ -150,7 +150,10 @@ func Test_handleHyperlaneRemoteTransfer(t *testing.T) {
 			for i := range tt.msg {
 				err := handleHyperlaneRemoteTransfer(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
-				require.NotNil(t, tt.msg[i].HLTransfer)
+				require.NotEmpty(t, tt.ctx.HlTransfers)
+
+				require.NotNil(t, tt.ctx.HlTransfers[0])
+				require.NotNil(t, tt.ctx.HlTransfers[0].Address)
 			}
 		})
 	}

@@ -14,7 +14,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/cometbft/cometbft/rpc/client/http"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
-	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/rs/zerolog/log"
 	"github.com/sony/gobreaker/v2"
 )
@@ -49,12 +48,13 @@ type Module struct {
 	receivedLevel    types.Level
 	hash             []byte
 	needGenesis      bool
-	taskQueue        *sdkSync.Map[types.Level, struct{}]
 	mx               *sync.RWMutex
 	rollbackSync     *sync.WaitGroup
 	cancelReadBlocks context.CancelFunc
+	fetchWg          *sync.WaitGroup
+	fetchSem         chan struct{}
 
-	circuitBreaker *gobreaker.CircuitBreaker[[]types.BlockData]
+	circuitBreaker *gobreaker.CircuitBreaker[any]
 }
 
 var _ modules.Module = (*Module)(nil)
@@ -67,21 +67,24 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 		lastHash = state.LastHash
 	}
 
+	concurrency := max(1, cfg.FetchConcurrency)
+
 	receiver := Module{
 		BaseModule:    modules.New("receiver"),
 		api:           api,
 		cosmosApi:     cosmosApi,
 		ws:            ws,
 		cfg:           cfg,
-		blocks:        make(chan types.BlockData, 128),
+		blocks:        make(chan types.BlockData, 512),
 		needGenesis:   state == nil,
 		level:         level,
 		receivedLevel: level,
 		hash:          lastHash,
-		taskQueue:     sdkSync.NewMap[types.Level, struct{}](),
 		mx:            new(sync.RWMutex),
 		rollbackSync:  new(sync.WaitGroup),
-		circuitBreaker: gobreaker.NewCircuitBreaker[[]types.BlockData](gobreaker.Settings{
+		fetchWg:       new(sync.WaitGroup),
+		fetchSem:      make(chan struct{}, concurrency),
+		circuitBreaker: gobreaker.NewCircuitBreaker[any](gobreaker.Settings{
 			Name:        "BlockDataAPI",
 			MaxRequests: 2,
 			Interval:    time.Minute,
@@ -162,7 +165,7 @@ func (r *Module) rollback(ctx context.Context) {
 				continue
 			}
 
-			r.taskQueue.Clear()
+			r.receivedLevel = state.LastHeight
 			r.setLevel(state.LastHeight, state.LastHash)
 			r.Log.Info().Msgf("caught return from rollback to level=%d", state.LastHeight)
 			r.rollbackSync.Done()

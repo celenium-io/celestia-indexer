@@ -29,7 +29,7 @@ func handleChannelOpenInit(ctx *context.Context, events []storage.Event, msg *st
 	return processChannelOpenInit(ctx, events, msg, idx)
 }
 
-func processChannelOpenInit(_ *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+func processChannelOpenInit(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	if events[*idx].Type != storageTypes.EventTypeChannelOpenInit && events[*idx].Type != storageTypes.EventTypeChannelOpenTry {
 		return errors.Errorf("invalid event type: %s", events[*idx].Type)
 	}
@@ -51,7 +51,7 @@ func processChannelOpenInit(_ *context.Context, events []storage.Event, msg *sto
 
 	signer := decoder.StringFromMap(msg.Data, "Signer")
 
-	msg.IbcChannel = &storage.IbcChannel{
+	channel := &storage.IbcChannel{
 		Id:                    cc.ChannelId,
 		Height:                msg.Height,
 		CreatedAt:             msg.Time,
@@ -65,11 +65,14 @@ func processChannelOpenInit(_ *context.Context, events []storage.Event, msg *sto
 		Creator: &storage.Address{
 			Address: signer,
 		},
+		CreateTxId: msg.TxId,
 	}
+	ctx.AddIbcChannel(channel)
 
-	msg.IbcConnection = &storage.IbcConnection{
+	conn := &storage.IbcConnection{
 		ConnectionId:  cc.ConnectionId,
 		ChannelsCount: 1,
 	}
+	ctx.AddIbcConnection(conn)
 	return nil
 }

@@ -98,14 +98,14 @@ type Transaction interface {
 	SaveBalances(ctx context.Context, balances ...Balance) error
 	SaveMessages(ctx context.Context, msgs ...*Message) error
 	SaveSigners(ctx context.Context, addresses ...Signer) error
-	SaveMsgAddresses(ctx context.Context, addresses ...MsgAddress) error
+	SaveMsgAddresses(ctx context.Context, addresses ...*MsgAddress) error
 	SaveMsgValidator(ctx context.Context, validatorMsgs ...MsgValidator) error
-	SaveNamespaceMessage(ctx context.Context, nsMsgs ...NamespaceMessage) error
-	SaveBlobLogs(ctx context.Context, logs ...BlobLog) error
+	SaveNamespaceMessage(ctx context.Context, nsMsgs ...*NamespaceMessage) error
+	SaveBlobLogs(ctx context.Context, logs ...*BlobLog) error
 	SaveValidators(ctx context.Context, validators ...*Validator) (int, error)
 	SaveEvents(ctx context.Context, events ...Event) error
 	SaveRollup(ctx context.Context, rollup *Rollup) error
-	SaveGrants(ctx context.Context, grants ...Grant) error
+	SaveGrants(ctx context.Context, grants ...*Grant) error
 	UpdateRollup(ctx context.Context, rollup *Rollup) error
 	SaveProviders(ctx context.Context, providers ...RollupProvider) error
 	SaveUndelegations(ctx context.Context, undelegations ...Undelegation) error

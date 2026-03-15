@@ -49,6 +49,7 @@ type Event struct {
 func (Event) TableName() string {
 	return "event"
 }
+
 func (e Event) Flat() ([]any, error) {
 	var data []byte
 	if len(e.Data) > 0 {
