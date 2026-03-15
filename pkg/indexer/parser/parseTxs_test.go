@@ -44,7 +44,6 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 		Code:      0,
 		Data:      []byte{},
 		Log:       "[]",
-		Info:      "info",
 		GasWanted: 12000,
 		GasUsed:   1000,
 		Codespace: "celestia-explorer",
@@ -55,7 +54,6 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("YWN0aW9u"),
 						Value: mustDecodeBase64("L2Nvc21vcy5zdGFraW5nLnYxYmV0YTEuTXNnQmVnaW5SZWRlbGVnYXRl"),
-						Index: true,
 					},
 				},
 			},
@@ -65,11 +63,9 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("c3BlbmRlcg=="),
 						Value: mustDecodeBase64("Y2VsZXN0aWExanY2NXMzZ3JxZjZ2NmpsM2RwNHQ2Yzl0OXJrOTljZDhrNDR2bmo="),
-						Index: true,
 					}, {
 						Key:   mustDecodeBase64("YW1vdW50"),
 						Value: mustDecodeBase64("NDI3NzMxdXRpYQ=="),
-						Index: true,
 					},
 				},
 			},
@@ -79,11 +75,9 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("cmVjZWl2ZXI="),
 						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
-						Index: true,
 					}, {
 						Key:   mustDecodeBase64("YW1vdW50"),
 						Value: mustDecodeBase64("NDI3NzMxdXRpYQ=="),
-						Index: true,
 					},
 				},
 			},
@@ -93,17 +87,14 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("cmVjaXBpZW50"),
 						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("c2VuZGVy"),
 						Value: mustDecodeBase64("Y2VsZXN0aWExanY2NXMzZ3JxZjZ2NmpsM2RwNHQ2Yzl0OXJrOTljZDhrNDR2bmo="),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("YW1vdW50"),
 						Value: mustDecodeBase64("NDI3NzMxdXRpYQ=="),
-						Index: true,
 					},
 				},
 			},
@@ -113,7 +104,6 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("c2VuZGVy"),
 						Value: mustDecodeBase64("Y2VsZXN0aWExanY2NXMzZ3JxZjZ2NmpsM2RwNHQ2Yzl0OXJrOTljZDhrNDR2bmo="),
-						Index: true,
 					},
 				},
 			},
@@ -123,17 +113,14 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("YW1vdW50"),
 						Value: mustDecodeBase64("NDI3NzMxdXRpYQ=="),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("dmFsaWRhdG9y"),
 						Value: mustDecodeBase64("Y2VsZXN0aWF2YWxvcGVyMXY1aHJxbHY4ZHFnenZ5MHB3enF6ZzBneHk4OTlybTRrbHp4bTA3"),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("ZGVsZWdhdG9y"),
 						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
-						Index: true,
 					},
 				},
 			},
@@ -143,12 +130,10 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("c3BlbmRlcg=="),
 						Value: mustDecodeBase64("Y2VsZXN0aWExanY2NXMzZ3JxZjZ2NmpsM2RwNHQ2Yzl0OXJrOTljZDhrNDR2bmo="),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("YW1vdW50"),
 						Value: mustDecodeBase64("NHV0aWE="),
-						Index: true,
 					},
 				},
 			},
@@ -158,12 +143,10 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("cmVjZWl2ZXI="),
 						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("YW1vdW50"),
 						Value: mustDecodeBase64("NHV0aWE="),
-						Index: true,
 					},
 				},
 			},
@@ -173,17 +156,14 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("cmVjaXBpZW50"),
 						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("c2VuZGVy"),
 						Value: mustDecodeBase64("Y2VsZXN0aWExanY2NXMzZ3JxZjZ2NmpsM2RwNHQ2Yzl0OXJrOTljZDhrNDR2bmo="),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("YW1vdW50"),
 						Value: mustDecodeBase64("NHV0aWE="),
-						Index: true,
 					},
 				},
 			},
@@ -193,7 +173,6 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("c2VuZGVy"),
 						Value: mustDecodeBase64("Y2VsZXN0aWExanY2NXMzZ3JxZjZ2NmpsM2RwNHQ2Yzl0OXJrOTljZDhrNDR2bmo="),
-						Index: true,
 					},
 				},
 			},
@@ -203,17 +182,14 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("YW1vdW50"),
 						Value: mustDecodeBase64("NHV0aWE="),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("dmFsaWRhdG9y"),
 						Value: mustDecodeBase64("Y2VsZXN0aWF2YWxvcGVyMXU4MjVzcmxkaGV2N3Q0d25kM2hwbGhycGhhaGpmazdmZjN3ZmRy"),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("ZGVsZWdhdG9y"),
 						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
-						Index: true,
 					},
 				},
 			},
@@ -223,22 +199,18 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("c291cmNlX3ZhbGlkYXRvcg=="),
 						Value: mustDecodeBase64("Y2VsZXN0aWF2YWxvcGVyMXY1aHJxbHY4ZHFnenZ5MHB3enF6ZzBneHk4OTlybTRrbHp4bTA3"),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("ZGVzdGluYXRpb25fdmFsaWRhdG9y"),
 						Value: mustDecodeBase64("Y2VsZXN0aWF2YWxvcGVyMXU4MjVzcmxkaGV2N3Q0d25kM2hwbGhycGhhaGpmazdmZjN3ZmRy"),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("YW1vdW50"),
 						Value: mustDecodeBase64("MjYwMjAwMDB1dGlh"),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("Y29tcGxldGlvbl90aW1l"),
 						Value: mustDecodeBase64("MjAyNC0wMy0xN1QyMjoyMjoyM1o="),
-						Index: true,
 					},
 				},
 			},
@@ -248,12 +220,10 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 					{
 						Key:   mustDecodeBase64("bW9kdWxl"),
 						Value: mustDecodeBase64("c3Rha2luZw=="),
-						Index: true,
 					},
 					{
 						Key:   mustDecodeBase64("c2VuZGVy"),
 						Value: mustDecodeBase64("Y2VsZXN0aWExMjUzdmRsZGxmeGx3eXBuZGgzZnp6cXQ5ZG4wcjV3MGRldHY1dWg="),
-						Index: true,
 					},
 				},
 			},
@@ -287,7 +257,6 @@ func TestParseTxs_FailedTx(t *testing.T) {
 		Code:      1,
 		Data:      []byte{},
 		Log:       "something weird happened",
-		Info:      "info",
 		GasWanted: 12000,
 		GasUsed:   1000,
 		Events:    nil,
@@ -322,7 +291,6 @@ func TestParseTxs_FailedTxWithNonstandardErrorCode(t *testing.T) {
 		Code:      300,
 		Data:      []byte{},
 		Log:       "something unusual happened",
-		Info:      "info",
 		GasWanted: 12000,
 		GasUsed:   1000,
 		Events:    nil,
@@ -357,7 +325,6 @@ func TestParseTxs_PayForBlob(t *testing.T) {
 		Code:      0,
 		Data:      []byte{},
 		Log:       "[{\"msg_index\":0,\"events\":[{\"type\":\"celestia.blob.v1.EventPayForBlobs\",\"attributes\":[{\"key\":\"blob_sizes\",\"value\":\"[2]\"},{\"key\":\"namespaces\",\"value\":\"[\\\"AAAAAAAAAAAAAAAAAAAAAAAAAEJpDCBNOWAP3dM=\\\"]\"},{\"key\":\"signer\",\"value\":\"\\\"celestia1j52ntqu7l734fjpa9lvylmtekaq0xqzhc22l0w\\\"\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/celestia.blob.v1.MsgPayForBlobs\"}]}]}]",
-		Info:      "info",
 		GasWanted: 79796,
 		GasUsed:   65177,
 		Events: []types.Event{
@@ -367,12 +334,10 @@ func TestParseTxs_PayForBlob(t *testing.T) {
 					{
 						Key:   "spender",
 						Value: "celestia1j52ntqu7l734fjpa9lvylmtekaq0xqzhc22l0w",
-						Index: true,
 					},
 					{
 						Key:   "amount",
 						Value: "7980utia",
-						Index: true,
 					},
 				},
 			},
@@ -411,7 +376,6 @@ func TestParseTxs_ExecSignal(t *testing.T) {
 		Code:      0,
 		Data:      []byte{},
 		Log:       "[{\"msg_index\":0,\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.authz.v1beta1.MsgExec\"}]}]}]",
-		Info:      "info",
 		GasWanted: 79796,
 		GasUsed:   65177,
 		Events: []types.Event{
@@ -421,12 +385,10 @@ func TestParseTxs_ExecSignal(t *testing.T) {
 					{
 						Key:   "spender",
 						Value: "celestia1k2q8jtfyj2hrnndzshx6vdxqsazl7ll8xnctdx",
-						Index: true,
 					},
 					{
 						Key:   "amount",
 						Value: "21000utia",
-						Index: true,
 					},
 				},
 			}, {
@@ -435,12 +397,10 @@ func TestParseTxs_ExecSignal(t *testing.T) {
 					{
 						Key:   "receiver",
 						Value: "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
-						Index: true,
 					},
 					{
 						Key:   "amount",
 						Value: "21000utia",
-						Index: true,
 					},
 				},
 			}, {
@@ -449,16 +409,13 @@ func TestParseTxs_ExecSignal(t *testing.T) {
 					{
 						Key:   "recipient",
 						Value: "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
-						Index: true,
 					}, {
 						Key:   "sender",
 						Value: "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
-						Index: true,
 					},
 					{
 						Key:   "amount",
 						Value: "21000utia",
-						Index: true,
 					},
 				},
 			}, {
@@ -467,7 +424,6 @@ func TestParseTxs_ExecSignal(t *testing.T) {
 					{
 						Key:   "sender",
 						Value: "celestia1k2q8jtfyj2hrnndzshx6vdxqsazl7ll8xnctdx",
-						Index: true,
 					},
 				},
 			}, {
@@ -476,11 +432,9 @@ func TestParseTxs_ExecSignal(t *testing.T) {
 					{
 						Key:   "fee",
 						Value: "21000utia",
-						Index: true,
 					}, {
 						Key:   "fee_payer",
 						Value: "celestia1k2q8jtfyj2hrnndzshx6vdxqsazl7ll8xnctdx",
-						Index: true,
 					},
 				},
 			}, {
@@ -489,7 +443,6 @@ func TestParseTxs_ExecSignal(t *testing.T) {
 					{
 						Key:   "acc_seq",
 						Value: "celestia1k2q8jtfyj2hrnndzshx6vdxqsazl7ll8xnctdx/1",
-						Index: true,
 					},
 				},
 			}, {
@@ -498,7 +451,6 @@ func TestParseTxs_ExecSignal(t *testing.T) {
 					{
 						Key:   "signature",
 						Value: "OMevpi/bn2QUh2a3Eh7bA1yJWYMm8tFphaD92mKWXzoPqoNDDTHZ2njn9EDNjDfxHyTPG0oN+8rZ2t8jgGUVuA==",
-						Index: true,
 					},
 				},
 			}, {
@@ -507,7 +459,6 @@ func TestParseTxs_ExecSignal(t *testing.T) {
 					{
 						Key:   "action",
 						Value: "/cosmos.authz.v1beta1.MsgExec",
-						Index: true,
 					},
 				},
 			},

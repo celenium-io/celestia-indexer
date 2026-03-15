@@ -88,8 +88,6 @@ type Data struct {
 
 type Commit struct {
 	Height     int64       `json:"height,string"`
-	Round      int32       `json:"round"`
-	BlockID    BlockId     `json:"block_id"`
 	Signatures []CommitSig `json:"signatures"`
 }
 

@@ -9,6 +9,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
@@ -41,18 +42,18 @@ func (StakingLog) TableName() string {
 	return "staking_log"
 }
 
-func (m StakingLog) Flat() ([]any, error) {
+func (log StakingLog) Flat() ([]any, error) {
 	var addressId any
-	if m.AddressId != nil {
-		addressId = int64(*m.AddressId)
+	if log.AddressId != nil {
+		addressId = int64(*log.AddressId)
 	}
 	return []any{
-		m.Time,
-		int64(m.Height),
+		log.Time,
+		int64(log.Height),
 		addressId,
-		int64(m.ValidatorId),
-		m.Change.String(),
-		string(m.Type),
+		int64(log.ValidatorId),
+		pgtype.Numeric{Int: log.Change.Coefficient(), Exp: log.Change.Exponent(), Valid: true},
+		string(log.Type),
 	}, nil
 }
 

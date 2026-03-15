@@ -54,7 +54,6 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 		Code:      0,
 		Data:      []byte{},
 		Log:       "[]",
-		Info:      "info",
 		GasWanted: 12000,
 		GasUsed:   1000,
 		Events:    events,

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -109,28 +110,28 @@ func (tx *Tx) SetId() error {
 	return nil
 }
 
-func (e Tx) Flat() ([]any, error) {
+func (tx Tx) Flat() ([]any, error) {
 	return []any{
-		e.Id,
-		int64(e.Height),
-		e.Time,
-		e.Position,
-		e.GasWanted,
-		e.GasUsed,
-		e.TimeoutHeight,
-		e.EventsCount,
-		e.MessagesCount,
-		e.Fee.String(),
-		e.Status.String(),
-		e.Error,
-		e.Codespace,
-		e.Hash,
-		e.Memo,
-		e.MessageTypes.String(),
+		tx.Id,
+		int64(tx.Height),
+		tx.Time,
+		tx.Position,
+		tx.GasWanted,
+		tx.GasUsed,
+		tx.TimeoutHeight,
+		tx.EventsCount,
+		tx.MessagesCount,
+		pgtype.Numeric{Int: tx.Fee.Coefficient(), Exp: tx.Fee.Exponent(), Valid: true},
+		tx.Status.String(),
+		tx.Error,
+		tx.Codespace,
+		tx.Hash,
+		tx.Memo,
+		tx.MessageTypes.String(),
 	}, nil
 }
 
-func (e Tx) Columns() []string {
+func (tx Tx) Columns() []string {
 	return []string{
 		"id", "height", "time", "position", "gas_wanted", "gas_used", "timeout_height",
 		"events_count", "messages_count", "fee", "status", "error", "codespace",

@@ -45,7 +45,7 @@ func (m MsgAddress) Flat() ([]any, error) {
 	return []any{
 		int64(m.AddressId),
 		int64(m.MsgId),
-		string(m.Type),
+		m.Type.String(),
 	}, nil
 }
 
