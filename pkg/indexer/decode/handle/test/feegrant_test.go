@@ -15,7 +15,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	codecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -55,7 +54,7 @@ func TestDecodeMsg_SuccessOnMsgGrantAllowance(t *testing.T) {
 		Position:  4,
 		Type:      storageTypes.MsgGrantAllowance,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      233,
 		Namespace: nil,
 	}
@@ -96,7 +95,7 @@ func TestDecodeMsg_SuccessOnMsgRevokeAllowance(t *testing.T) {
 		Position:  4,
 		Type:      storageTypes.MsgRevokeAllowance,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      98,
 		Namespace: nil,
 	}

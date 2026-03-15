@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	interchainAccounts "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/types"
 	interchainAccountsHost "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -39,7 +38,7 @@ func TestDecodeMsg_SuccessOnMsgRegisterInterchainAccount(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgRegisterInterchainAccount,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -71,7 +70,7 @@ func TestDecodeMsg_SuccessOnMsgSendTx(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgSendTx,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      51,
 		Namespace: nil,
 	}
@@ -108,7 +107,7 @@ func TestDecodeMsg_SuccessOnMsgModuleQuerySafe(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgModuleQuerySafe,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      57,
 		Namespace: nil,
 	}

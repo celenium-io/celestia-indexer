@@ -15,7 +15,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
-	"github.com/fatih/structs"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
@@ -71,7 +70,7 @@ func TestDecodeMsg_SuccessOnMsgCreateVestingAccount(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgCreateVestingAccount,
 		TxId:      1,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      112,
 		Namespace: nil,
 	}
@@ -126,7 +125,7 @@ func TestDecodeMsg_SuccessOnMsgCreatePermanentLockedAccount(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgCreatePermanentLockedAccount,
 		TxId:      1,
-		Data:      structs.Map(msgCreatePeriodicVestingAccount),
+		Data:      mustMsgToMap(t, msgCreatePeriodicVestingAccount),
 		Size:      98,
 		Namespace: nil,
 	}
@@ -197,7 +196,7 @@ func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgCreatePeriodicVestingAccount,
 		TxId:      1,
-		Data:      structs.Map(msgCreatePeriodicVestingAccount),
+		Data:      mustMsgToMap(t, msgCreatePeriodicVestingAccount),
 		Size:      120,
 		Namespace: nil,
 	}

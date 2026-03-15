@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
 	crisisTypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -47,7 +46,7 @@ func TestDecodeMsg_SuccessOnMsgVerifyInvariant(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgVerifyInvariant,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}

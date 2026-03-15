@@ -28,7 +28,6 @@ package rpc
 
 import (
 	"encoding/base64"
-	"reflect"
 	"unsafe"
 
 	tmTypes "github.com/cometbft/cometbft/types"
@@ -36,10 +35,7 @@ import (
 )
 
 func init() {
-	jsoniter.RegisterTypeDecoder(
-		reflect.TypeOf((*tmTypes.Tx)(nil)).Elem().String(),
-		&txJSONDecoder{},
-	)
+	jsoniter.RegisterTypeDecoder("types.Tx", &txJSONDecoder{})
 }
 
 type txJSONDecoder struct{}

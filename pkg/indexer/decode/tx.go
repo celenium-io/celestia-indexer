@@ -38,7 +38,7 @@ var (
 
 func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
 	raw := b.Block.Txs[index]
-	if bTx, isBlob := tmTypes.UnmarshalBlobTx(raw); isBlob {
+	if bTx, isBlob := UnmarshalBlobTxShallow(raw); isBlob {
 		raw = bTx.Tx
 		d.Blobs = bTx.Blobs
 	}

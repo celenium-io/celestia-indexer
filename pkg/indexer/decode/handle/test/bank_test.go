@@ -14,7 +14,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -56,7 +55,7 @@ func TestDecodeMsg_SuccessOnMsgSend(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgSend,
 		TxId:      0,
-		Data:      structs.Map(msgSend),
+		Data:      mustMsgToMap(t, msgSend),
 		Size:      112,
 		Namespace: nil,
 	}
@@ -102,7 +101,7 @@ func TestDecodeMsg_SuccessOnMsgMultiSend(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgMultiSend,
 		TxId:      0,
-		Data:      structs.Map(msgMultiSend),
+		Data:      mustMsgToMap(t, msgMultiSend),
 		Size:      153,
 		Namespace: nil,
 	}
@@ -143,7 +142,7 @@ func TestDecodeMsg_SuccessOnMsgSetSendEnabled(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgSetSendEnabled,
 		TxId:      0,
-		Data:      structs.Map(msgMultiSend),
+		Data:      mustMsgToMap(t, msgMultiSend),
 		Size:      65,
 		Namespace: nil,
 	}

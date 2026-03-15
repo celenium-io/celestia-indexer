@@ -17,7 +17,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/fatih/structs"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
@@ -76,7 +75,7 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 		Position:   0,
 		Type:       storageTypes.MsgEditValidator,
 		TxId:       0,
-		Data:       structs.Map(m),
+		Data:       mustMsgToMap(t, m),
 		Size:       128,
 		Namespace:  nil,
 		Validators: []string{"celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x"},
@@ -127,7 +126,7 @@ func TestDecodeMsg_SuccessOnMsgBeginRedelegate(t *testing.T) {
 		Type:      storageTypes.MsgBeginRedelegate,
 		TxId:      0,
 		Size:      172,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Namespace: nil,
 	}
 
@@ -184,7 +183,7 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 		},
 	}
 
-	data := structs.Map(m)
+	data := mustMsgToMap(t, m)
 	data["Pubkey"] = map[string]any{
 		"key":  pk.PubKey().Bytes(),
 		"type": "ed25519",
@@ -248,7 +247,7 @@ func TestDecodeMsg_SuccessOnMsgDelegate(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgDelegate,
 		TxId:      0,
-		Data:      structs.Map(msgDelegate),
+		Data:      mustMsgToMap(t, msgDelegate),
 		Size:      119,
 		Namespace: nil,
 	}
@@ -293,7 +292,7 @@ func TestDecodeMsg_SuccessOnMsgUndelegate(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgUndelegate,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      119,
 		Namespace: nil,
 	}
@@ -339,7 +338,7 @@ func TestDecodeMsg_SuccessOnMsgCancelUnbondingDelegation(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgCancelUnbondingDelegation,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      121,
 		Namespace: nil,
 	}

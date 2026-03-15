@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
 	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -48,7 +47,7 @@ func TestDecodeMsg_SuccessOnMsgRegisterEvmAddress(t *testing.T) {
 		Position:  4,
 		Type:      storageTypes.MsgRegisterEVMAddress,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      100,
 		Namespace: nil,
 	}

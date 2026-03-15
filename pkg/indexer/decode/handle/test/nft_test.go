@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -48,7 +47,7 @@ func TestDecodeMsg_SuccessOnMsgSendNFT(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgSendNFT,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      98,
 		Namespace: nil,
 	}

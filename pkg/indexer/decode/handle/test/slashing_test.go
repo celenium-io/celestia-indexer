@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosSlashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -46,7 +45,7 @@ func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgUnjail,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      56,
 		Namespace: nil,
 	}

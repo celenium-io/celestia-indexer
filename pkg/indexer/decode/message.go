@@ -45,7 +45,6 @@ import (
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	cosmosSlashingTypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/fatih/structs"
 	"github.com/pkg/errors"
 )
 
@@ -67,7 +66,10 @@ func Message(
 	txId uint64,
 ) (d DecodedMsg, err error) {
 	d.Msg.Position = int64(position)
-	d.Msg.Data = structs.Map(msg)
+	d.Msg.Data, err = msgToMap(msg)
+	if err != nil {
+		return d, errors.Wrap(err, "msg to map")
+	}
 	d.Msg.Height = ctx.Block.Height
 	d.Msg.Time = ctx.Block.Time
 	d.Msg.TxId = txId
@@ -175,7 +177,11 @@ func Message(
 			if err := cfg.Codec.UnpackAny(typedMsg.Msgs[i], &msg); err != nil {
 				return d, err
 			}
-			msgs = append(msgs, structs.Map(msg))
+			m, mapErr := msgToMap(msg)
+			if mapErr != nil {
+				return d, errors.Wrap(mapErr, "msg to map")
+			}
+			msgs = append(msgs, map[string]any(m))
 		}
 		d.Msg.Data["Msgs"] = msgs
 

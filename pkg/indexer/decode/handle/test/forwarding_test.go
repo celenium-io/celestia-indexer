@@ -14,7 +14,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	fwdTypes "github.com/celestiaorg/celestia-app/v7/x/forwarding/types"
 	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -44,7 +43,7 @@ func TestMsgForward(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgForward,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      122,
 		Namespace: nil,
 	}

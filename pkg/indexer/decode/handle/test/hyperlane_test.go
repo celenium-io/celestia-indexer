@@ -16,7 +16,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -45,7 +44,7 @@ func TestDecodeMsg_SuccessOnMsgCreateMailbox(t *testing.T) {
 		Type:      storageTypes.MsgCreateMailbox,
 		TxId:      0,
 		Size:      119,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}
 
@@ -80,7 +79,7 @@ func TestDecodeMsg_SuccessOnMsgProcessMessage(t *testing.T) {
 		Type:      storageTypes.MsgProcessMessage,
 		TxId:      0,
 		Size:      136,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}
 
@@ -114,7 +113,7 @@ func TestDecodeMsg_SuccessOnMsgSetMailbox(t *testing.T) {
 		Type:      storageTypes.MsgSetMailbox,
 		TxId:      0,
 		Size:      166,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}
 
@@ -147,7 +146,7 @@ func TestDecodeMsg_SuccessOnMsgSetMailboxWithoutNewOwner(t *testing.T) {
 		Type:      storageTypes.MsgSetMailbox,
 		TxId:      0,
 		Size:      117,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}
 
@@ -181,7 +180,7 @@ func TestDecodeMsg_SuccessOnMsgCreateCollateralToken(t *testing.T) {
 		Type:      storageTypes.MsgCreateCollateralToken,
 		TxId:      0,
 		Size:      124,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}
 
@@ -214,7 +213,7 @@ func TestDecodeMsg_SuccessOnMsgCreateSyntheticToken(t *testing.T) {
 		Type:      storageTypes.MsgCreateSyntheticToken,
 		TxId:      0,
 		Size:      117,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}
 
@@ -248,7 +247,7 @@ func TestDecodeMsg_SuccessOnMsgSetToken(t *testing.T) {
 		Type:      storageTypes.MsgSetToken,
 		TxId:      0,
 		Size:      166,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}
 
@@ -282,7 +281,7 @@ func TestDecodeMsg_SuccessOnMsgSetTokenWithEmptyNewOwner(t *testing.T) {
 		Type:      storageTypes.MsgSetToken,
 		TxId:      0,
 		Size:      117,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}
 
@@ -320,7 +319,7 @@ func TestDecodeMsg_SuccessOnMsgEnrollRemoteRouter(t *testing.T) {
 		Type:      storageTypes.MsgEnrollRemoteRouter,
 		TxId:      0,
 		Size:      139,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}
 
@@ -354,7 +353,7 @@ func TestDecodeMsg_SuccessOnMsgUnrollRemoteRouter(t *testing.T) {
 		Type:      storageTypes.MsgUnrollRemoteRouter,
 		TxId:      0,
 		Size:      119,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}
 
@@ -393,7 +392,7 @@ func TestDecodeMsg_SuccessOnMsgRemoteTransfer(t *testing.T) {
 		Type:      storageTypes.MsgRemoteTransfer,
 		TxId:      0,
 		Size:      222,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}
 

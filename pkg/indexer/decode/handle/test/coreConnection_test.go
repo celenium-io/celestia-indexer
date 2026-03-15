@@ -12,7 +12,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	coreConnection "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -38,7 +37,7 @@ func TestDecodeMsg_SuccessOnMsgConnectionOpenInit(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgConnectionOpenInit,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      53,
 		Namespace: nil,
 	}
@@ -70,7 +69,7 @@ func TestDecodeMsg_SuccessOnMsgConnectionOpenTry(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgConnectionOpenTry,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      57,
 		Namespace: nil,
 	}
@@ -102,7 +101,7 @@ func TestDecodeMsg_SuccessOnMsgConnectionOpenAck(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgConnectionOpenAck,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      53,
 		Namespace: nil,
 	}
@@ -134,7 +133,7 @@ func TestDecodeMsg_SuccessOnMsgConnectionOpenConfirm(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgConnectionOpenConfirm,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      51,
 		Namespace: nil,
 	}

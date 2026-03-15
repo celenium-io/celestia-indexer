@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	minfeeTypes "github.com/celestiaorg/celestia-app/v7/x/minfee/types"
 	fee "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -40,7 +39,7 @@ func TestDecodeMsg_SuccessOnMsgRegisterPayee(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgRegisterPayee,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      98,
 		Namespace: nil,
 	}
@@ -73,7 +72,7 @@ func TestDecodeMsg_SuccessOnMsgRegisterCounterpartyPayee(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgRegisterCounterpartyPayee,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      98,
 		Namespace: nil,
 	}
@@ -105,7 +104,7 @@ func TestDecodeMsg_SuccessOnMsgPayPacketFee(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgPayPacketFee,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      51,
 		Namespace: nil,
 	}
@@ -135,7 +134,7 @@ func TestDecodeMsg_SuccessOnMsgPayPacketFeeAsync(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgPayPacketFeeAsync,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      6,
 		Namespace: nil,
 	}
@@ -168,7 +167,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateMinfeeParams(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgUpdateMinfeeParams,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      66,
 		Namespace: nil,
 	}

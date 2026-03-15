@@ -15,7 +15,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	coreClient "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	tmTypes "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -41,7 +40,7 @@ func TestDecodeMsg_SuccessOnMsgCreateClient(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgCreateClient,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -75,7 +74,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateClientV6(t *testing.T) {
 	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 	require.NoError(t, err)
 
-	data := structs.Map(msg)
+	data := mustMsgToMap(t, msg)
 	var header tmTypes.Header
 	err = header.Unmarshal(msg.ClientMessage.Value)
 	require.NoError(t, err)
@@ -121,7 +120,7 @@ func TestDecodeMsg_SuccessOnMsgUpgradeClient(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgUpgradeClient,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -133,9 +132,8 @@ func TestDecodeMsg_SuccessOnMsgUpgradeClient(t *testing.T) {
 
 func TestDecodeMsg_SuccessOnMsgUpdateClient(t *testing.T) {
 	msg := &coreClient.MsgUpdateClient{
-		Signer:        "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-		ClientId:      "client-1",
-		ClientMessage: &types.Any{},
+		Signer:   "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		ClientId: "client-1",
 	}
 	block, now := testsuite.EmptyBlock()
 	position := 0
@@ -149,18 +147,14 @@ func TestDecodeMsg_SuccessOnMsgUpdateClient(t *testing.T) {
 	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:       1,
-		Height:   block.Height,
-		Time:     now,
-		Position: 0,
-		Type:     storageTypes.MsgUpdateClient,
-		TxId:     0,
-		Data: map[string]any{
-			"Signer":   "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-			"ClientId": "client-1",
-			"Header":   tmTypes.Header{},
-		},
-		Size:      61,
+		Id:        1,
+		Height:    block.Height,
+		Time:      now,
+		Position:  0,
+		Type:      storageTypes.MsgUpdateClient,
+		TxId:      0,
+		Data:      mustMsgToMap(t, msg),
+		Size:      msg.Size(),
 		Namespace: nil,
 	}
 
@@ -191,7 +185,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitMisbehaviour(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgSubmitMisbehaviour,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -225,7 +219,7 @@ func TestDecodeMsg_SuccessOnMsgRecoverClient(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgRecoverClient,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      69,
 		Namespace: nil,
 	}
@@ -257,7 +251,7 @@ func TestDecodeMsg_SuccessOnMsgIBCSoftwareUpgrade(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgIBCSoftwareUpgrade,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      64,
 		Namespace: nil,
 	}
@@ -290,7 +284,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateParams(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgUpdateParams,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      54,
 		Namespace: nil,
 	}

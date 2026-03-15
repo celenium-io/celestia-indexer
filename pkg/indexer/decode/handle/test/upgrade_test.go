@@ -12,7 +12,6 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -38,7 +37,7 @@ func TestDecodeMsg_SuccessOnMsgSoftwareUpgrade(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgSoftwareUpgrade,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      64,
 		Namespace: nil,
 	}
@@ -70,7 +69,7 @@ func TestDecodeMsg_SuccessOnMsgCancelUpgrade(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgCancelUpgrade,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}

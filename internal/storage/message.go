@@ -9,7 +9,6 @@ import (
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
-	"github.com/vmihailenco/msgpack/v5"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -93,7 +92,7 @@ func (msg Message) Flat() ([]any, error) {
 	var data []byte
 	if len(msg.Data) > 0 {
 		var encErr error
-		data, encErr = msgpack.Marshal(msg.Data)
+		data, encErr = msg.Data.ToBytes()
 		if encErr != nil {
 			return nil, errors.Wrap(encErr, "msgpack marshal msg's data")
 		}

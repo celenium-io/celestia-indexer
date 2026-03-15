@@ -12,7 +12,6 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -42,7 +41,7 @@ func TestDecodeMsg_SuccessOnMsgAuthorizeCircuitBreaker(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgAuthorizeCircuitBreaker,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      102,
 		Namespace: nil,
 	}
@@ -74,7 +73,7 @@ func TestDecodeMsg_SuccessOnMsgResetCircuitBreaker(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgResetCircuitBreaker,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -106,7 +105,7 @@ func TestDecodeMsg_SuccessOnMsgTripCircuitBreaker(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgTripCircuitBreaker,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}

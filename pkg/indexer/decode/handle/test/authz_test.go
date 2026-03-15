@@ -14,7 +14,6 @@ import (
 	codecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -70,7 +69,7 @@ func TestDecodeMsg_SuccessOnMsgGrant(t *testing.T) {
 		Position:  4,
 		Type:      storageTypes.MsgGrant,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      146,
 		Namespace: nil,
 	}
@@ -116,7 +115,7 @@ func TestDecodeMsg_SuccessOnMsgExec(t *testing.T) {
 		Position:     4,
 		Type:         storageTypes.MsgExec,
 		TxId:         0,
-		Data:         structs.Map(m),
+		Data:         mustMsgToMap(t, m),
 		Namespace:    nil,
 		Size:         49,
 		InternalMsgs: make([]string, 0),
@@ -172,7 +171,7 @@ func TestDecodeMsg_SuccessOnMsgRevoke(t *testing.T) {
 		Position:  4,
 		Type:      storageTypes.MsgRevoke,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      108,
 		Namespace: nil,
 	}
@@ -211,7 +210,7 @@ func TestDecodeMsg_SuccessOnMsgPruneExpiredGrants(t *testing.T) {
 		Position:  4,
 		Type:      storageTypes.MsgPruneExpiredGrants,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      49,
 		Namespace: nil,
 	}

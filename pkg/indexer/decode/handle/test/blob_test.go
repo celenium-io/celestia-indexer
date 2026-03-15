@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	appBlobTypes "github.com/celestiaorg/celestia-app/v7/x/blob/types"
 	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -73,7 +72,7 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 		Position: 0,
 		Type:     storageTypes.MsgPayForBlobs,
 		TxId:     0,
-		Data:     structs.Map(msgPayForBlob),
+		Data:     mustMsgToMap(t, msgPayForBlob),
 		Size:     120,
 	}
 
@@ -185,7 +184,7 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 		Position: 0,
 		Type:     storageTypes.MsgPayForBlobs,
 		TxId:     0,
-		Data:     structs.Map(msgPayForBlob),
+		Data:     mustMsgToMap(t, msgPayForBlob),
 		Size:     254,
 	}
 
@@ -215,7 +214,7 @@ func TestDecodeMsg_FailedOnPayForBlob(t *testing.T) {
 		Position: 0,
 		Type:     storageTypes.MsgPayForBlobs,
 		TxId:     0,
-		Data:     structs.Map(msgPayForBlob),
+		Data:     mustMsgToMap(t, msgPayForBlob),
 		Size:     120,
 	}
 

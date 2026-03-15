@@ -8,8 +8,11 @@ import (
 	"database/sql/driver"
 	"fmt"
 
+	"github.com/bytedance/sonic"
 	"github.com/pkg/errors"
 )
+
+var json = sonic.ConfigFastest
 
 type MsgTypeBits struct {
 	Bits

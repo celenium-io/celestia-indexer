@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosDistributionTypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -48,7 +47,7 @@ func TestDecodeMsg_SuccessOnMsgSetWithdrawAddress(t *testing.T) {
 		Position:  4,
 		Type:      storageTypes.MsgSetWithdrawAddress,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      98,
 		Namespace: nil,
 	}
@@ -89,7 +88,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawDelegatorReward(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgWithdrawDelegatorReward,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      105,
 		Namespace: nil,
 	}
@@ -129,7 +128,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawValidatorCommission(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgWithdrawValidatorCommission,
 		TxId:      0,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Size:      56,
 		Namespace: nil,
 	}
@@ -171,7 +170,7 @@ func TestDecodeMsg_SuccessOnMsgFundCommunityPool(t *testing.T) {
 		Type:      storageTypes.MsgFundCommunityPool,
 		TxId:      0,
 		Size:      49,
-		Data:      structs.Map(m),
+		Data:      mustMsgToMap(t, m),
 		Namespace: nil,
 	}
 

@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -48,7 +47,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitEvidence(t *testing.T) {
 		Type:      storageTypes.MsgSubmitEvidence,
 		TxId:      0,
 		Size:      49,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}
 

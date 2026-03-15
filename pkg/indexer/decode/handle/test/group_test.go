@@ -12,7 +12,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/x/group"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -38,7 +37,7 @@ func TestDecodeMsg_SuccessOnMsgCreateGroup(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgCreateGroup,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -70,7 +69,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupMembers(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgUpdateGroupMembers,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -103,7 +102,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupAdmin(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgUpdateGroupAdmin,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      98,
 		Namespace: nil,
 	}
@@ -135,7 +134,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupMetadata(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgUpdateGroupMetadata,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -167,7 +166,7 @@ func TestDecodeMsg_SuccessOnMsgCreateGroupPolicy(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgCreateGroupPolicy,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -199,7 +198,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyAdmin(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgUpdateGroupPolicyAdmin,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -231,7 +230,7 @@ func TestDecodeMsg_SuccessOnMsgCreateGroupWithPolicy(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgCreateGroupWithPolicy,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -264,7 +263,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyDecisionPolicy(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgUpdateGroupPolicyDecisionPolicy,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      98,
 		Namespace: nil,
 	}
@@ -297,7 +296,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateGroupPolicyMetadata(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgUpdateGroupPolicyMetadata,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      98,
 		Namespace: nil,
 	}
@@ -329,7 +328,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposalGroup(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgSubmitProposalGroup,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -361,7 +360,7 @@ func TestDecodeMsg_SuccessOnMsgWithdrawProposal(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgWithdrawProposal,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -393,7 +392,7 @@ func TestDecodeMsg_SuccessOnMsgVoteGroup(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgVoteGroup,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -425,7 +424,7 @@ func TestDecodeMsg_SuccessOnMsgExecGroup(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgExecGroup,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -457,7 +456,7 @@ func TestDecodeMsg_SuccessOnMsgLeaveGroup(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgLeaveGroup,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}

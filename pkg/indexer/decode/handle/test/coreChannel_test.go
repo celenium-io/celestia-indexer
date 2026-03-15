@@ -21,7 +21,6 @@ import (
 	icaTypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
 	transferTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	coreChannel "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -47,7 +46,7 @@ func TestDecodeMsg_SuccessOnMsgChannelOpenInit(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgChannelOpenInit,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      53,
 		Namespace: nil,
 	}
@@ -79,7 +78,7 @@ func TestDecodeMsg_SuccessOnMsgChannelOpenTry(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgChannelOpenTry,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      55,
 		Namespace: nil,
 	}
@@ -111,7 +110,7 @@ func TestDecodeMsg_SuccessOnMsgChannelOpenAck(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgChannelOpenAck,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      51,
 		Namespace: nil,
 	}
@@ -143,7 +142,7 @@ func TestDecodeMsg_SuccessOnMsgChannelOpenConfirm(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgChannelOpenConfirm,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      51,
 		Namespace: nil,
 	}
@@ -175,7 +174,7 @@ func TestDecodeMsg_SuccessOnMsgChannelCloseInit(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgChannelCloseInit,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
 	}
@@ -207,7 +206,7 @@ func TestDecodeMsg_SuccessOnMsgChannelCloseConfirm(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgChannelCloseConfirm,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      51,
 		Namespace: nil,
 	}
@@ -238,7 +237,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
-	data := structs.Map(msg)
+	data := mustMsgToMap(t, msg)
 	packet, ok := data["Packet"].(map[string]any)
 	require.True(t, ok)
 	packet["Data"] = map[string]any{
@@ -303,7 +302,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost2(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
-	data := structs.Map(msg)
+	data := mustMsgToMap(t, msg)
 	packet, ok := data["Packet"].(map[string]any)
 	require.True(t, ok)
 	packet["Data"] = map[string]any{
@@ -362,7 +361,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_IcaHost3(t *testing.T) {
 	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 	require.NoError(t, err)
 
-	data := structs.Map(msg)
+	data := mustMsgToMap(t, msg)
 	packet, ok := data["Packet"].(map[string]any)
 	require.True(t, ok)
 
@@ -425,7 +424,7 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_Transfer(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
-	data := structs.Map(msg)
+	data := mustMsgToMap(t, msg)
 	packet, ok := data["Packet"].(map[string]any)
 	require.True(t, ok)
 	packet["Data"] = transferTypes.FungibleTokenPacketData{
@@ -474,7 +473,7 @@ func TestDecodeMsg_SuccessOnMsgTimeout(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgTimeout,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      55,
 		Namespace: nil,
 	}
@@ -506,7 +505,7 @@ func TestDecodeMsg_SuccessOnMsgTimeoutOnClose(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgTimeoutOnClose,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      55,
 		Namespace: nil,
 	}
@@ -536,7 +535,7 @@ func TestDecodeMsg_SuccessOnMsgAcknowledgement(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
-	data := structs.Map(msg)
+	data := mustMsgToMap(t, msg)
 	packet, ok := data["Packet"].(map[string]any)
 	require.True(t, ok)
 	packet["Data"] = transferTypes.FungibleTokenPacketData{

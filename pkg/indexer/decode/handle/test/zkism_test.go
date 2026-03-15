@@ -12,7 +12,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	zkismTypes "github.com/celestiaorg/celestia-app/v7/x/zkism/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -43,7 +42,7 @@ func TestZkism_MsgCreateInterchainSecurityModule(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgCreateInterchainSecurityModule,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      149,
 		Namespace: nil,
 	}
@@ -77,7 +76,7 @@ func TestZkism_MsgUpdateInterchainSecurityModule(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgUpdateInterchainSecurityModule,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      169,
 		Namespace: nil,
 	}
@@ -111,7 +110,7 @@ func TestZkism_MsgSubmitMessages(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgSubmitMessages,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      169,
 		Namespace: nil,
 	}

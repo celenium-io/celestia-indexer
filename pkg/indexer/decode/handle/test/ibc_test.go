@@ -14,7 +14,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types"
 	ibcTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	ibcCoreClientTypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -55,7 +54,7 @@ func TestDecodeMsg_SuccessOnIBCMsgTransfer(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.IBCTransfer,
 		TxId:      0,
-		Data:      structs.Map(msgSend),
+		Data:      mustMsgToMap(t, msgSend),
 		Size:      105,
 		Namespace: nil,
 	}

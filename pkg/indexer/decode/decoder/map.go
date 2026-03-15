@@ -33,10 +33,6 @@ func DecimalFromMap(m map[string]any, key string) decimal.Decimal {
 	return dec
 }
 
-func Amount(m map[string]any) decimal.Decimal {
-	return DecimalFromMap(m, "amount")
-}
-
 func CoinFromMap(m map[string]any, key string) (cosmosTypes.Coin, error) {
 	str := StringFromMap(m, key)
 	if str == "" {
@@ -157,11 +153,15 @@ func Uint64(m map[string]any, key string) (uint64, error) {
 	if !ok {
 		return 0, errors.Errorf("can't find key: %s", key)
 	}
-	u, ok := val.(uint64)
-	if !ok {
-		return 0, errors.Errorf("key '%s' is not a uint64", key)
+	switch v := val.(type) {
+	case uint64:
+		return v, nil
+	case float64:
+		return uint64(v), nil
+	case string:
+		return strconv.ParseUint(v, 10, 64)
 	}
-	return u, nil
+	return 0, errors.Errorf("key '%s' is not a uint64", key)
 }
 
 func BoolFromMap(m map[string]any, key string) (bool, error) {

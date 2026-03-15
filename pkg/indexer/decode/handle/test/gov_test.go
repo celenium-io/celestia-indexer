@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"testing"
-	"time"
 
 	paramsv1beta1 "cosmossdk.io/api/cosmos/params/v1beta1"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -15,41 +14,13 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	decodeTestutil "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/testutil"
 	codecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
-
-func createExpectations(
-	block nodeTypes.BlockData,
-	now time.Time,
-	m types.Msg,
-	position int,
-	addrType storageTypes.MsgAddressType,
-	address string,
-	hash []byte,
-	txType storageTypes.MsgType,
-	size int,
-) storage.Message {
-	// In each test, a fresh context is used, so the msgCounter always starts at 0.
-	// SetId(0) with height=0 gives id=1.
-	msgExpected := storage.Message{
-		Id:        1,
-		Height:    block.Height,
-		Time:      now,
-		Position:  int64(position),
-		Type:      txType,
-		TxId:      0,
-		Data:      structs.Map(m),
-		Size:      size,
-		Namespace: nil,
-	}
-	return msgExpected
-}
 
 // v1.MsgSubmitProposal
 
@@ -85,11 +56,9 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	msgExpected := createExpectations(
+	msgExpected := decodeTestutil.CreateExpectations(
+		t,
 		block, now, m, position,
-		storageTypes.MsgAddressTypeProposer,
-		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
-		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
 		storageTypes.MsgSubmitProposal,
 		266,
 	)
@@ -142,11 +111,9 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	msgExpected := createExpectations(
+	msgExpected := decodeTestutil.CreateExpectations(
+		t,
 		block, now, m, position,
-		storageTypes.MsgAddressTypeProposer,
-		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
-		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
 		storageTypes.MsgSubmitProposal,
 		205,
 	)
@@ -195,11 +162,9 @@ func TestDecodeMsg_SuccessOnMsgExecLegacyContent(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	msgExpected := createExpectations(
+	msgExpected := decodeTestutil.CreateExpectations(
+		t,
 		block, now, m, position,
-		storageTypes.MsgAddressTypeAuthority,
-		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
-		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
 		storageTypes.MsgExecLegacyContent,
 		49,
 	)
@@ -236,11 +201,9 @@ func TestDecodeMsg_SuccessOnMsgVote_V1(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	msgExpected := createExpectations(
+	msgExpected := decodeTestutil.CreateExpectations(
+		t,
 		block, now, m, position,
-		storageTypes.MsgAddressTypeVoter,
-		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
-		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgVote,
 		53,
 	)
@@ -276,11 +239,9 @@ func TestDecodeMsg_SuccessOnMsgVote_V1Beta1(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	msgExpected := createExpectations(
+	msgExpected := decodeTestutil.CreateExpectations(
+		t,
 		block, now, m, position,
-		storageTypes.MsgAddressTypeVoter,
-		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
-		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgVote,
 		53,
 	)
@@ -315,11 +276,9 @@ func TestDecodeMsg_SuccessOnMsgVoteWeighted_V1(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	msgExpected := createExpectations(
+	msgExpected := decodeTestutil.CreateExpectations(
+		t,
 		block, now, m, position,
-		storageTypes.MsgAddressTypeVoter,
-		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
-		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgVoteWeighted,
 		51,
 	)
@@ -353,11 +312,9 @@ func TestDecodeMsg_SuccessOnMsgVoteWeighted_V1Beta1(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	msgExpected := createExpectations(
+	msgExpected := decodeTestutil.CreateExpectations(
+		t,
 		block, now, m, position,
-		storageTypes.MsgAddressTypeVoter,
-		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
-		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgVoteWeighted,
 		51,
 	)
@@ -392,11 +349,9 @@ func TestDecodeMsg_SuccessMsgDeposit_V1(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	msgExpected := createExpectations(
+	msgExpected := decodeTestutil.CreateExpectations(
+		t,
 		block, now, m, position,
-		storageTypes.MsgAddressTypeDepositor,
-		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
-		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgDeposit,
 		51,
 	)
@@ -430,11 +385,9 @@ func TestDecodeMsg_SuccessOnMsgDeposit_V1Beta1(t *testing.T) {
 
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	msgExpected := createExpectations(
+	msgExpected := decodeTestutil.CreateExpectations(
+		t,
 		block, now, m, position,
-		storageTypes.MsgAddressTypeDepositor,
-		"celestia1prxtghtsjrdwdtkt82kye3a7yukmcay6x9uyts",
-		[]byte{8, 204, 180, 93, 112, 144, 218, 230, 174, 203, 58, 172, 76, 199, 190, 39, 45, 188, 116, 154},
 		storageTypes.MsgDeposit,
 		51,
 	)
@@ -478,11 +431,9 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithSlashingUpdates(t *testing.T
 
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	msgExpected := createExpectations(
+	msgExpected := decodeTestutil.CreateExpectations(
+		t,
 		block, now, m, position,
-		storageTypes.MsgAddressTypeProposer,
-		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
-		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
 		storageTypes.MsgSubmitProposal,
 		266,
 	)
@@ -561,11 +512,9 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithConsensusAndBlobsUpdates(t *
 
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
-	msgExpected := createExpectations(
+	msgExpected := decodeTestutil.CreateExpectations(
+		t,
 		block, now, m, position,
-		storageTypes.MsgAddressTypeProposer,
-		"celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
-		[]byte{123, 95, 226, 43, 84, 70, 247, 198, 46, 162, 123, 139, 215, 28, 239, 148, 224, 63, 61, 242},
 		storageTypes.MsgSubmitProposal,
 		266,
 	)
