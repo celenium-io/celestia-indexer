@@ -11,11 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r *Module) getBlocks(ctx context.Context) {
-	if r.taskQueue.Len() == 0 {
-		return
-	}
-
+func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 	start := time.Now()
 
 	for {
@@ -31,12 +27,13 @@ func (r *Module) getBlocks(ctx context.Context) {
 					Uint64("height", uint64(block.Height)).
 					Int64("ms", time.Since(start).Milliseconds()).
 					Msg("received block")
-				r.blocks <- block
-				if block.Height > r.receivedLevel {
-					r.receivedLevel = block.Height
+				select {
+				case r.blocks <- block:
+				case <-ctx.Done():
+					return ctx.Err()
 				}
 				return nil
-			}, r.taskQueue.Keys()...)
+			}, levels...)
 			return nil, err
 		})
 		if err != nil {
@@ -51,8 +48,6 @@ func (r *Module) getBlocks(ctx context.Context) {
 			continue
 		}
 
-		r.taskQueue.Clear()
 		return
 	}
-
 }

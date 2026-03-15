@@ -205,11 +205,18 @@ func ChannelOrderingFromMap(m map[string]any, key string) (bool, error) {
 	if !ok {
 		return false, errors.Errorf("can't find key: %s", key)
 	}
-	order, ok := val.(channelTypes.Order)
-	if !ok {
+	switch v := val.(type) {
+	case channelTypes.Order:
+		return v == channelTypes.ORDERED, nil
+	case string:
+		order, ok := channelTypes.Order_value[v]
+		if !ok {
+			return false, errors.Errorf("key '%s' has unknown Order value: %s", key, v)
+		}
+		return channelTypes.Order(order) == channelTypes.ORDERED, nil
+	default:
 		return false, errors.Errorf("key '%s' is not a Order", key)
 	}
-	return order == channelTypes.ORDERED, nil
 }
 
 func RevisionHeightFromMap(m map[string]any, key string) (uint64, uint64, error) {

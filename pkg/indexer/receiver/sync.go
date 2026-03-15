@@ -107,19 +107,52 @@ func (r *Module) readBlocks(ctx context.Context) error {
 }
 
 func (r *Module) passBlocks(ctx context.Context, head types.Level) {
+	fetchCtx, cancel := context.WithCancel(ctx)
+	r.cancelReadBlocks = cancel
+	defer cancel()
+
+	var (
+		batch    []types.Level
+		maxLevel types.Level
+	)
+
 	for level := r.receivedLevel + 1; level <= head; level++ {
 		select {
-		case <-ctx.Done():
+		case <-fetchCtx.Done():
+			r.fetchWg.Wait()
 			return
 		default:
-			if _, ok := r.taskQueue.Get(level); ok {
-				continue
+		}
+
+		batch = append(batch, level)
+		if len(batch) >= r.cfg.RequestBulkSize || level == head {
+			levels := batch
+			batch = nil
+
+			last := levels[len(levels)-1]
+			if last > maxLevel {
+				maxLevel = last
 			}
 
-			r.taskQueue.Set(level, struct{}{})
-			if r.taskQueue.Len() >= r.cfg.RequestBulkSize || level == head {
-				r.getBlocks(ctx)
+			// Acquire semaphore slot before spawning — blocks when at concurrency limit.
+			select {
+			case r.fetchSem <- struct{}{}:
+			case <-fetchCtx.Done():
+				r.fetchWg.Wait()
+				return
 			}
+
+			r.fetchWg.Add(1)
+			go func(lvls []types.Level) {
+				defer r.fetchWg.Done()
+				defer func() { <-r.fetchSem }()
+				r.fetchBatch(fetchCtx, lvls)
+			}(levels)
 		}
+	}
+
+	r.fetchWg.Wait()
+	if fetchCtx.Err() == nil && maxLevel > r.receivedLevel {
+		r.receivedLevel = maxLevel
 	}
 }
