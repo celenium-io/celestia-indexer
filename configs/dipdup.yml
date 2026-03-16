@@ -33,7 +33,7 @@ datasources:
     kind: celestia_node_api
     url: ${CELESTIA_NODE_API_URL}
     rps: ${CELESTIA_NODE_API_RPS:-50}
-    timeout: ${CELESTIA_NODE_API_TIMEOUT:-10}
+    timeout: ${CELESTIA_NODE_API_TIMEOUT:-60}
   node_ws:
     kind: celestia_node_ws
     url: ${CELESTIA_NODE_WS_URL}

@@ -4,9 +4,9 @@
 package parser
 
 import (
-	"bytes"
 	"encoding/hex"
 
+	json "github.com/bytedance/sonic"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -81,7 +81,9 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 
 	if txRes.IsFailed() {
 		t.Status = storageTypes.StatusFailed
-		t.Error = string(bytes.TrimLeft(bytes.TrimRight(txRes.Log, `"`), `"`))
+		if err := json.Unmarshal(txRes.Log, &t.Error); err != nil {
+			t.Error = string(txRes.Log)
+		}
 	}
 
 	txEvents, err := parseEvents(ctx, b, txRes.Events, t.Id)
