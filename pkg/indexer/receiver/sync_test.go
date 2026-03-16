@@ -86,7 +86,7 @@ func (s *ModuleTestSuite) TestPassBlocks_RollbackCancelsInFlightGoroutines() {
 	// blocks (no reader). This ensures the select in fetchBatch only has one
 	// ready case after cancellation: <-ctx.Done(). Without this, a buffered
 	// channel with free capacity would make the select nondeterministic.
-	receiverModule.blocks = make(chan types.BlockData)
+	receiverModule.blocks = make(chan *types.BlockData)
 
 	// fetchStarted is signalled by each goroutine once it is inside BlockBulkDataStream.
 	fetchStarted := make(chan struct{}, fetchConcurrency)
@@ -163,10 +163,10 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 	})
 
 	levels := make([]types.Level, blockCount)
-	bulkResult := make([]types.BlockData, blockCount)
+	bulkResult := make([]*types.BlockData, blockCount)
 	for i := 0; i < blockCount; i++ {
 		levels[i] = types.Level(i + 1)
-		bulkResult[i] = types.BlockData{
+		bulkResult[i] = &types.BlockData{
 			ResultBlock:        getResultBlock(levels[i]),
 			ResultBlockResults: getResultBlockResults(levels[i]),
 		}
@@ -189,7 +189,7 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 
 	defer close(receiverModule.blocks)
 
-	syncedBlockData := make([]types.BlockData, blockCount)
+	syncedBlockData := make([]*types.BlockData, blockCount)
 	index := 0
 	for b := range receiverModule.blocks {
 		syncedBlockData[index] = b

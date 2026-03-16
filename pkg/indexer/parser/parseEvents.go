@@ -12,7 +12,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
-func parseEvents(ctx *context.Context, b types.BlockData, events []types.Event, txId uint64) ([]storage.Event, error) {
+func parseEvents(ctx *context.Context, b *types.BlockData, events []types.Event, txId uint64) ([]storage.Event, error) {
 	result := make([]storage.Event, len(events))
 
 	for i := range events {
@@ -24,7 +24,7 @@ func parseEvents(ctx *context.Context, b types.BlockData, events []types.Event, 
 	return result, nil
 }
 
-func parseBlockEvents(ctx *context.Context, b types.BlockData, events []types.Event, firstTxEvent *types.Event) ([]storage.Event, error) {
+func parseBlockEvents(ctx *context.Context, b *types.BlockData, events []types.Event, firstTxEvent *types.Event) ([]storage.Event, error) {
 	result := make([]storage.Event, len(events))
 
 	var (
@@ -47,7 +47,7 @@ func parseBlockEvents(ctx *context.Context, b types.BlockData, events []types.Ev
 	return result, nil
 }
 
-func parseEvent(ctx *context.Context, b types.BlockData, eN types.Event, index int, resultEvent *storage.Event, txId *uint64, duplicated bool) error {
+func parseEvent(ctx *context.Context, b *types.BlockData, eN types.Event, index int, resultEvent *storage.Event, txId *uint64, duplicated bool) error {
 	eventType, err := storageTypes.ParseEventType(eN.Type)
 	if err != nil {
 		log.Err(err).Msgf("got type %v", eN.Type)

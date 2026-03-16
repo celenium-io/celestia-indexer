@@ -28,7 +28,7 @@ func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 					Int64("ms", time.Since(start).Milliseconds()).
 					Msg("received block")
 				select {
-				case r.blocks <- block:
+				case r.blocks <- &block:
 				case <-ctx.Done():
 					return ctx.Err()
 				}

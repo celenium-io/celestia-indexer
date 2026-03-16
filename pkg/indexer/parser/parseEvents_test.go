@@ -17,7 +17,7 @@ import (
 )
 
 func TestParseEvents_EmptyEventsResults(t *testing.T) {
-	block := types.BlockData{
+	block := &types.BlockData{
 		ResultBlockResults: types.ResultBlockResults{
 			TxsResults: make([]*types.ResponseDeliverTx, 0),
 		},
@@ -83,7 +83,7 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 }
 
 func BenchmarkParseEvent(b *testing.B) {
-	block := types.BlockData{
+	block := &types.BlockData{
 		ResultBlock: types.ResultBlock{
 			Block: &types.Block{
 				Header: types.Header{

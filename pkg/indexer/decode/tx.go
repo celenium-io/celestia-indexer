@@ -38,7 +38,7 @@ var (
 	cfg, txDecoder = createDecoder()
 )
 
-func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
+func Tx(b *types.BlockData, index int) (d DecodedTx, err error) {
 	raw := b.Block.Txs[index]
 	if bTx, isBlob := UnmarshalBlobTxShallow(raw); isBlob {
 		raw = bTx.Tx

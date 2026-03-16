@@ -43,7 +43,7 @@ type Module struct {
 	cosmosApi        node.CosmosApi
 	ws               *http.HTTP
 	cfg              config.Indexer
-	blocks           chan types.BlockData
+	blocks           chan *types.BlockData
 	level            types.Level
 	receivedLevel    types.Level
 	hash             []byte
@@ -75,7 +75,7 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 		cosmosApi:     cosmosApi,
 		ws:            ws,
 		cfg:           cfg,
-		blocks:        make(chan types.BlockData, 512),
+		blocks:        make(chan *types.BlockData, 512),
 		needGenesis:   state == nil,
 		level:         level,
 		receivedLevel: level,

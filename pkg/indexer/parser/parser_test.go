@@ -81,8 +81,8 @@ func getExpectedBlock() storage.Block {
 	}
 }
 
-func getBlock() types.BlockData {
-	return types.BlockData{
+func getBlock() *types.BlockData {
+	return &types.BlockData{
 		ResultBlock: types.ResultBlock{
 			BlockID: types.BlockId{
 				Hash: types.Hex{0x0, 0x0, 0x0, 0x2},

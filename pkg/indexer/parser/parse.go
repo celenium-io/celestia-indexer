@@ -17,7 +17,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func (p *Module) parse(b types.BlockData) error {
+func (p *Module) parse(b *types.BlockData) error {
 	start := time.Now()
 	p.Log.Info().
 		Int64("height", b.Block.Height).

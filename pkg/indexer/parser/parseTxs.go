@@ -19,7 +19,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func (p *Module) parseTxs(ctx *context.Context, b types.BlockData) ([]storage.Tx, error) {
+func (p *Module) parseTxs(ctx *context.Context, b *types.BlockData) ([]storage.Tx, error) {
 	txs := make([]storage.Tx, len(b.TxsResults))
 
 	for i := range b.TxsResults {
@@ -31,7 +31,7 @@ func (p *Module) parseTxs(ctx *context.Context, b types.BlockData) ([]storage.Tx
 	return txs, nil
 }
 
-func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txRes *types.ResponseDeliverTx, t *storage.Tx) error {
+func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, txRes *types.ResponseDeliverTx, t *storage.Tx) error {
 	d, err := decode.Tx(b, index)
 	if err != nil {
 		return errors.Wrapf(err, "while parsing Tx on index %d", index)

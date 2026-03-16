@@ -37,7 +37,7 @@ func testFromFile(t *testing.T, filename string) {
 	}
 
 	parser := NewModule(config.Indexer{})
-	if err := parser.parse(types.BlockData{
+	if err := parser.parse(&types.BlockData{
 		ResultBlock:        blockData,
 		ResultBlockResults: resultsData,
 	}); err != nil {

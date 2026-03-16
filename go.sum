@@ -947,8 +947,8 @@ github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 h1:fAjc9m62+UWV/WA
 github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13/go.mod h1:SqUrOPUnsFjfmXRMNPybcSiG0BgUW2AuFH8PAnS2iTw=
 github.com/dipdup-io/go-lib/config v1.0.0 h1:vXWN1TeD6VOcQm8KwGd/PPq3WauTVX78S5s0sITEEWc=
 github.com/dipdup-io/go-lib/config v1.0.0/go.mod h1:gAmAx1vU+q2Y3BWubw7cBu0t9mNgSoAzRx76Yw6wErI=
-github.com/dipdup-io/go-lib/database v1.0.1 h1:JouGx4cSKwlVVdoirajXdmvclogb84d7Xc/10VMWt0E=
-github.com/dipdup-io/go-lib/database v1.0.1/go.mod h1:Cl4IIWM05N4L/AqC8I4IshIQD4kWVdrE9d1vUTME6uU=
+github.com/dipdup-io/go-lib/database v1.0.2 h1:LjWTfGrmHGTZcexpLQouODZf7ZggcMPzbzYJ8OCHWMg=
+github.com/dipdup-io/go-lib/database v1.0.2/go.mod h1:6t3kGMtZupz1OVbsbeclVKCrGreXs89QIUh/tRJZuMs=
 github.com/dipdup-io/workerpool v0.0.4 h1:m58fuFY3VIPRc+trWpjw2Lsm4FvIgtjP/4VRe79r+/s=
 github.com/dipdup-io/workerpool v0.0.4/go.mod h1:m6YMqx7M+fORTyabHD/auKymBRpbDax0t1aPZ1i7GZA=
 github.com/dipdup-net/indexer-sdk v0.0.11 h1:qKnXBcb5LdDHm7JSWc3jSlsvvqIWtTzLtM6783Pf1Rs=
@@ -1358,6 +1358,8 @@ github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsI
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
 github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 h1:iCEnooe7UlwOQYpKFhBabPMi4aNAfoODPEFNiAnClxo=
 github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761/go.mod h1:5TJZWKEWniPve33vlWYSoGYefn3gLQRzjfDlhSJ9ZKM=
+github.com/jackc/pgx-shopspring-decimal v0.0.0-20220624020537-1d36b5a1853e h1:i3gQ/Zo7sk4LUVbsAjTNeC4gIjoPNIZVzs4EXstssV4=
+github.com/jackc/pgx-shopspring-decimal v0.0.0-20220624020537-1d36b5a1853e/go.mod h1:zUHglCZ4mpDUPgIwqEKoba6+tcUQzRdb1+DPTuYe9pI=
 github.com/jackc/pgx/v5 v5.8.0 h1:TYPDoleBBme0xGSAX3/+NujXXtpZn9HBONkQC7IEZSo=
 github.com/jackc/pgx/v5 v5.8.0/go.mod h1:QVeDInX2m9VyzvNeiCJVjCkNFqzsNb43204HshNSZKw=
 github.com/jackc/puddle/v2 v2.2.2 h1:PR8nw+E/1w0GLuRFSmiioY6UooMp6KJv0/61nB7icHo=

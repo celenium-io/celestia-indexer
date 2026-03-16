@@ -27,7 +27,7 @@ func MustMsgToMap(t *testing.T, msg cosmosTypes.Msg) storageTypes.PackedBytes {
 // SetId(0) with height=0 gives id=1.
 func CreateExpectations(
 	t *testing.T,
-	block nodeTypes.BlockData,
+	block *nodeTypes.BlockData,
 	now time.Time,
 	m cosmosTypes.Msg,
 	position int,

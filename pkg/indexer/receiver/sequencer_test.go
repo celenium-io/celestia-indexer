@@ -32,12 +32,13 @@ const (
 
 var hashOf1000Block, _ = types.HexFromString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
 
-func createBlocks(order int, data ...blockConciseData) []types.BlockData {
-	res := make([]types.BlockData, len(data))
+func createBlocks(order int, data ...blockConciseData) []*types.BlockData {
+	res := make([]*types.BlockData, len(data))
 
 	prevBlockHash := hashOf1000Block
 
 	for i, d := range data {
+		res[i] = new(types.BlockData)
 		res[i].Height = types.Level(d.level)
 		res[i].BlockID.Hash = d.hash
 		res[i].Block = &types.Block{
@@ -146,7 +147,7 @@ func (s *ModuleTestSuite) TestModule_SequencerOnEmptyState() {
 	tests := []struct {
 		name   string
 		order  int
-		blocks []types.BlockData
+		blocks []*types.BlockData
 		want   []blockConciseData
 	}{
 		{
@@ -186,7 +187,7 @@ func (s *ModuleTestSuite) TestModule_SequencerOnEmptyState() {
 					s.T().Error("stop by cancelled context")
 					return
 				case ob := <-blocksReaderModule.MustInput(orderedBlocksChannel).Listen():
-					orderedBlock := ob.(types.BlockData)
+					orderedBlock := ob.(*types.BlockData)
 					s.Require().EqualValues(blocksData[index].level, orderedBlock.Height)
 					s.Require().EqualValues(blocksData[index].level, orderedBlock.Block.Height)
 					s.Require().EqualValues(blocksData[index].hash, orderedBlock.BlockID.Hash)
@@ -227,7 +228,7 @@ func (s *ModuleTestSuite) TestModule_SequencerOnNonEmptyState() {
 	tests := []struct {
 		name   string
 		order  int
-		blocks []types.BlockData
+		blocks []*types.BlockData
 		want   []blockConciseData
 	}{
 		{
@@ -267,7 +268,7 @@ func (s *ModuleTestSuite) TestModule_SequencerOnNonEmptyState() {
 					s.T().Error("stop by cancelled context")
 					return
 				case ob := <-blocksReaderModule.MustInput(orderedBlocksChannel).Listen():
-					orderedBlock := ob.(types.BlockData)
+					orderedBlock := ob.(*types.BlockData)
 					s.Require().EqualValues(blocksData[index].level, orderedBlock.Height)
 					s.Require().EqualValues(blocksData[index].level, orderedBlock.Block.Height)
 					s.Require().EqualValues(blocksData[index].hash, orderedBlock.BlockID.Hash)
@@ -367,7 +368,7 @@ out:
 			s.T().Error("stop by cancelled context")
 			return
 		case ob := <-blocksReaderModule.MustInput(orderedBlocksChannel).Listen():
-			orderedBlock := ob.(types.BlockData)
+			orderedBlock := ob.(*types.BlockData)
 			s.Require().EqualValues(blocksData[index].level, orderedBlock.Height)
 			s.Require().EqualValues(blocksData[index].level, orderedBlock.Block.Height)
 			s.Require().EqualValues(blocksData[index].hash, orderedBlock.BlockID.Hash)
@@ -439,7 +440,7 @@ out:
 			s.T().Error("stop by cancelled context")
 			return
 		case ob := <-blocksReaderModule.MustInput(orderedBlocksChannel).Listen():
-			orderedBlock := ob.(types.BlockData)
+			orderedBlock := ob.(*types.BlockData)
 			s.Require().EqualValues(blocksData[index].level, orderedBlock.Height)
 			s.Require().EqualValues(blocksData[index].level, orderedBlock.Block.Height)
 			s.Require().EqualValues(blocksData[index].hash, orderedBlock.BlockID.Hash)

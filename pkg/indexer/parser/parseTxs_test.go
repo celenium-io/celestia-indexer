@@ -17,7 +17,7 @@ import (
 )
 
 func TestParseTxs_EmptyTxsResults(t *testing.T) {
-	block := types.BlockData{
+	block := &types.BlockData{
 		ResultBlockResults: types.ResultBlockResults{
 			TxsResults: make([]*types.ResponseDeliverTx, 0),
 		},

@@ -61,7 +61,7 @@ require (
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/gogoproto v1.7.2
 	github.com/dipdup-io/go-lib/config v1.0.0
-	github.com/dipdup-io/go-lib/database v1.0.1
+	github.com/dipdup-io/go-lib/database v1.0.2
 	github.com/ettle/strcase v0.2.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
@@ -238,6 +238,7 @@ require (
 	github.com/ingonyama-zk/icicle-gnark/v3 v3.2.2 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
+	github.com/jackc/pgx-shopspring-decimal v0.0.0-20220624020537-1d36b5a1853e // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
