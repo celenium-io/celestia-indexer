@@ -209,6 +209,14 @@ func (api *API) post(ctx context.Context, requests []types.Request, output any) 
 	return err
 }
 
+const iterBufSize = 1 << 20 // 1MB
+
+var iterPool = pool.New(
+	func() *jsoniter.Iterator {
+		return jsoniter.Parse(json, nil, iterBufSize)
+	},
+)
+
 func (api *API) postStream(ctx context.Context, requests []types.Request, fn func(*jsoniter.Iterator) error) error {
 	u, err := url.Parse(api.cfg.URL)
 	if err != nil {
@@ -253,7 +261,12 @@ func (api *API) postStream(ctx context.Context, requests []types.Request, fn fun
 	if cleanup != nil {
 		defer cleanup()
 	}
-	iter := jsoniter.Parse(json, streamBody, 32*1024)
+	iter := iterPool.Get()
+	iter.Reset(streamBody)
+	defer func() {
+		iter.Error = nil
+		iterPool.Put(iter)
+	}()
 	return fn(iter)
 }
 
