@@ -92,7 +92,6 @@ type Tx struct {
 
 	Signers    []Address `bun:"-"`
 	BlobsSize  int64     `bun:"-"`
-	BytesSize  int64     `bun:"-"`
 	BlobsCount int       `bun:"-"`
 }
 

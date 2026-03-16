@@ -93,6 +93,7 @@ func NewAPI(cfg config.DataSource) API {
 	// Disable stdlib's transparent gzip decompression so we can use the
 	// faster klauspost/compress implementation instead.
 	t.DisableCompression = true
+	t.ReadBufferSize = 256 * 1024
 
 	return API{
 		client: &http.Client{

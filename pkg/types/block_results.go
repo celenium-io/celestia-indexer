@@ -19,8 +19,7 @@ type ResultBlockResults struct {
 
 type ResponseDeliverTx struct {
 	Code      uint32          `json:"code,omitempty"              protobuf:"varint,1,opt,name=code,proto3"`
-	Data      json.RawMessage `json:"data,omitempty"              protobuf:"bytes,2,opt,name=data,proto3"`
-	Log       string          `json:"log,omitempty"               protobuf:"bytes,3,opt,name=log,proto3"`
+	Log       json.RawMessage `json:"log,omitempty"               protobuf:"bytes,3,opt,name=log,proto3"`
 	GasWanted int64           `json:"gas_wanted,omitempty,string" protobuf:"varint,5,opt,name=gas_wanted,proto3"`
 	GasUsed   int64           `json:"gas_used,omitempty,string"   protobuf:"varint,6,opt,name=gas_used,proto3"`
 	Events    []Event         `json:"events,omitempty"            protobuf:"bytes,7,rep,name=events,proto3"`

@@ -4,6 +4,7 @@
 package parser
 
 import (
+	"bytes"
 	"encoding/hex"
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
@@ -55,7 +56,6 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 	t.Events = nil
 	t.Signers = make([]storage.Address, 0, len(d.Signers))
 	t.BlobsSize = 0
-	t.BytesSize = int64(len(txRes.Data))
 	if err := t.SetId(); err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 
 	if txRes.IsFailed() {
 		t.Status = storageTypes.StatusFailed
-		t.Error = txRes.Log
+		t.Error = string(bytes.TrimLeft(bytes.TrimRight(txRes.Log, `"`), `"`))
 	}
 
 	txEvents, err := parseEvents(ctx, b, txRes.Events, t.Id)

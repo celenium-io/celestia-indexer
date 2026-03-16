@@ -232,8 +232,7 @@ func TestModule_OnParseError(t *testing.T) {
 	block.TxsResults = []*types.ResponseDeliverTx{
 		{
 			Code:      0,
-			Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97},
-			Log:       "",
+			Log:       nil,
 			GasWanted: 20,
 			GasUsed:   10,
 			Events:    nil,

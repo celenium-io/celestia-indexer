@@ -52,8 +52,7 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 
 	txRes := types.ResponseDeliverTx{
 		Code:      0,
-		Data:      []byte{},
-		Log:       "[]",
+		Log:       json.RawMessage("[]"),
 		GasWanted: 12000,
 		GasUsed:   1000,
 		Events:    events,

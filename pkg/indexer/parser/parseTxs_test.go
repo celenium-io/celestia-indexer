@@ -5,6 +5,7 @@ package parser
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -42,8 +43,7 @@ func mustDecodeBase64(s string) string {
 func TestParseTxs_SuccessTx(t *testing.T) {
 	txRes := types.ResponseDeliverTx{
 		Code:      0,
-		Data:      []byte{},
-		Log:       "[]",
+		Log:       json.RawMessage("[]"),
 		GasWanted: 12000,
 		GasUsed:   1000,
 		Codespace: "celestia-explorer",
@@ -255,8 +255,7 @@ func TestParseTxs_SuccessTx(t *testing.T) {
 func TestParseTxs_FailedTx(t *testing.T) {
 	txRes := types.ResponseDeliverTx{
 		Code:      1,
-		Data:      []byte{},
-		Log:       "something weird happened",
+		Log:       json.RawMessage("something weird happened"),
 		GasWanted: 12000,
 		GasUsed:   1000,
 		Events:    nil,
@@ -289,8 +288,7 @@ func TestParseTxs_FailedTx(t *testing.T) {
 func TestParseTxs_FailedTxWithNonstandardErrorCode(t *testing.T) {
 	txRes := types.ResponseDeliverTx{
 		Code:      300,
-		Data:      []byte{},
-		Log:       "something unusual happened",
+		Log:       json.RawMessage("something unusual happened"),
 		GasWanted: 12000,
 		GasUsed:   1000,
 		Events:    nil,
@@ -323,8 +321,7 @@ func TestParseTxs_FailedTxWithNonstandardErrorCode(t *testing.T) {
 func TestParseTxs_PayForBlob(t *testing.T) {
 	txRes := types.ResponseDeliverTx{
 		Code:      0,
-		Data:      []byte{},
-		Log:       "[{\"msg_index\":0,\"events\":[{\"type\":\"celestia.blob.v1.EventPayForBlobs\",\"attributes\":[{\"key\":\"blob_sizes\",\"value\":\"[2]\"},{\"key\":\"namespaces\",\"value\":\"[\\\"AAAAAAAAAAAAAAAAAAAAAAAAAEJpDCBNOWAP3dM=\\\"]\"},{\"key\":\"signer\",\"value\":\"\\\"celestia1j52ntqu7l734fjpa9lvylmtekaq0xqzhc22l0w\\\"\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/celestia.blob.v1.MsgPayForBlobs\"}]}]}]",
+		Log:       json.RawMessage("[{\"msg_index\":0,\"events\":[{\"type\":\"celestia.blob.v1.EventPayForBlobs\",\"attributes\":[{\"key\":\"blob_sizes\",\"value\":\"[2]\"},{\"key\":\"namespaces\",\"value\":\"[\\\"AAAAAAAAAAAAAAAAAAAAAAAAAEJpDCBNOWAP3dM=\\\"]\"},{\"key\":\"signer\",\"value\":\"\\\"celestia1j52ntqu7l734fjpa9lvylmtekaq0xqzhc22l0w\\\"\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/celestia.blob.v1.MsgPayForBlobs\"}]}]}]"),
 		GasWanted: 79796,
 		GasUsed:   65177,
 		Events: []types.Event{
@@ -374,8 +371,7 @@ func TestParseTxs_PayForBlob(t *testing.T) {
 func TestParseTxs_ExecSignal(t *testing.T) {
 	txRes := types.ResponseDeliverTx{
 		Code:      0,
-		Data:      []byte{},
-		Log:       "[{\"msg_index\":0,\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.authz.v1beta1.MsgExec\"}]}]}]",
+		Log:       json.RawMessage("[{\"msg_index\":0,\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.authz.v1beta1.MsgExec\"}]}]}]"),
 		GasWanted: 79796,
 		GasUsed:   65177,
 		Events: []types.Event{

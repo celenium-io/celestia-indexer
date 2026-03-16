@@ -5,6 +5,7 @@ package decode
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"testing"
 
 	"cosmossdk.io/math"
@@ -23,8 +24,7 @@ import (
 func TestDecodeTx_TxWithMemo(t *testing.T) {
 	deliverTx := nodeTypes.ResponseDeliverTx{
 		Code:      0,
-		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
-		Log:       `[{"msg_index":0,"events":[{"type":"coin_received","attributes":[{"key":"receiver","value":"celestia1h2kqw44hdq5dwlcvsw8f2l49lkehtf9wp95kth"},{"key":"amount","value":"1562utia"}]}]}]`,
+		Log:       json.RawMessage(`[{"msg_index":0,"events":[{"type":"coin_received","attributes":[{"key":"receiver","value":"celestia1h2kqw44hdq5dwlcvsw8f2l49lkehtf9wp95kth"},{"key":"amount","value":"1562utia"}]}]}]`),
 		GasWanted: 200000,
 		GasUsed:   170049,
 		Events:    []nodeTypes.Event{},
@@ -46,8 +46,7 @@ func TestDecodeTx_TxWithMemo(t *testing.T) {
 func TestDecodeTx_TxV050Signer(t *testing.T) {
 	deliverTx := nodeTypes.ResponseDeliverTx{
 		Code:      0,
-		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
-		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"receiver\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"spender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.bank.v1beta1.MsgSend\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]}]}]`,
+		Log:       json.RawMessage(`[{\"msg_index\":0,\"events\":[{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"receiver\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"spender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.bank.v1beta1.MsgSend\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]}]}]`),
 		GasWanted: 120000,
 		GasUsed:   91289,
 		Events:    []nodeTypes.Event{},
@@ -75,8 +74,7 @@ func TestDecodeTx_TxV050Signer(t *testing.T) {
 func TestDecodeTx_TxV050Signer2(t *testing.T) {
 	deliverTx := nodeTypes.ResponseDeliverTx{
 		Code:      0,
-		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
-		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"receiver\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"spender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.bank.v1beta1.MsgSend\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]}]}]`,
+		Log:       json.RawMessage(`[{\"msg_index\":0,\"events\":[{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"receiver\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"spender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.bank.v1beta1.MsgSend\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"celestia1q0xstyrqame6zl5puekza58jrv8629m5mne0rn\"},{\"key\":\"sender\",\"value\":\"celestia16etnwjxg6dsjuavjpr9tk822czfeylfm9f7x5g\"},{\"key\":\"amount\",\"value\":\"1000000utia\"}]}]}]`),
 		GasWanted: 120000,
 		GasUsed:   91289,
 		Events:    []nodeTypes.Event{},
@@ -102,8 +100,7 @@ func TestDecodeTx_TxV050Signer2(t *testing.T) {
 func TestDecodeTx_Tx_PFB(t *testing.T) {
 	deliverTx := nodeTypes.ResponseDeliverTx{
 		Code:      0,
-		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
-		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"celestia.blob.v1.EventPayForBlobs\",\"attributes\":[{\"key\":\"blob_sizes\",\"value\":\"[684]\"},{\"key\":\"namespaces\",\"value\":\"[\\\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ2Vyb0E=\\\"]\"},{\"key\":\"signer\",\"value\":\"\\\"celestia1rky9086t340m7rmkctuj4spxwv2gc62vlwx59v\\\"\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/celestia.blob.v1.MsgPayForBlobs\"}]}]}]`,
+		Log:       json.RawMessage(`[{\"msg_index\":0,\"events\":[{\"type\":\"celestia.blob.v1.EventPayForBlobs\",\"attributes\":[{\"key\":\"blob_sizes\",\"value\":\"[684]\"},{\"key\":\"namespaces\",\"value\":\"[\\\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ2Vyb0E=\\\"]\"},{\"key\":\"signer\",\"value\":\"\\\"celestia1rky9086t340m7rmkctuj4spxwv2gc62vlwx59v\\\"\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/celestia.blob.v1.MsgPayForBlobs\"}]}]}]`),
 		GasWanted: 120000,
 		GasUsed:   91289,
 		Events:    []nodeTypes.Event{},
@@ -129,8 +126,7 @@ func TestDecodeTx_Tx_PFB(t *testing.T) {
 func TestDecodeTx_Exec_signal(t *testing.T) {
 	deliverTx := nodeTypes.ResponseDeliverTx{
 		Code:      0,
-		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
-		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.authz.v1beta1.MsgExec\"}]}]}]`,
+		Log:       json.RawMessage(`[{\"msg_index\":0,\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.authz.v1beta1.MsgExec\"}]}]}]`),
 		GasWanted: 210000,
 		GasUsed:   68808,
 		Events:    []nodeTypes.Event{},
@@ -151,8 +147,7 @@ func TestDecodeTx_Exec_signal(t *testing.T) {
 func TestDecodeTx_Tx_MsgRegisterEVMAddress(t *testing.T) {
 	deliverTx := nodeTypes.ResponseDeliverTx{
 		Code:      0,
-		Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97, 49, 46, 77, 115, 103, 68, 101, 108, 101, 103, 97, 116, 101, 82, 101, 115, 112, 111, 110, 115, 101},
-		Log:       `[{\"msg_index\":0,\"events\":[{\"type\":\"celestia.blob.v1.EventPayForBlobs\",\"attributes\":[{\"key\":\"blob_sizes\",\"value\":\"[684]\"},{\"key\":\"namespaces\",\"value\":\"[\\\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ2Vyb0E=\\\"]\"},{\"key\":\"signer\",\"value\":\"\\\"celestia1rky9086t340m7rmkctuj4spxwv2gc62vlwx59v\\\"\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/celestia.blob.v1.MsgPayForBlobs\"}]}]}]`,
+		Log:       json.RawMessage(`[{\"msg_index\":0,\"events\":[{\"type\":\"celestia.blob.v1.EventPayForBlobs\",\"attributes\":[{\"key\":\"blob_sizes\",\"value\":\"[684]\"},{\"key\":\"namespaces\",\"value\":\"[\\\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ2Vyb0E=\\\"]\"},{\"key\":\"signer\",\"value\":\"\\\"celestia1rky9086t340m7rmkctuj4spxwv2gc62vlwx59v\\\"\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/celestia.blob.v1.MsgPayForBlobs\"}]}]}]`),
 		GasWanted: 120000,
 		GasUsed:   91289,
 		Events:    []nodeTypes.Event{},
