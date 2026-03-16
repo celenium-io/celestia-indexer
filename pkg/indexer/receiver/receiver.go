@@ -68,6 +68,7 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 	}
 
 	concurrency := max(1, cfg.FetchConcurrency)
+	chanBuf := max(64, (cfg.RequestBulkSize+1)*concurrency)
 
 	receiver := Module{
 		BaseModule:    modules.New("receiver"),
@@ -75,7 +76,7 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 		cosmosApi:     cosmosApi,
 		ws:            ws,
 		cfg:           cfg,
-		blocks:        make(chan *types.BlockData, 512),
+		blocks:        make(chan *types.BlockData, chanBuf),
 		needGenesis:   state == nil,
 		level:         level,
 		receivedLevel: level,

@@ -87,9 +87,9 @@ func NewAPI(cfg config.DataSource) API {
 	}
 
 	t := http.DefaultTransport.(*http.Transport).Clone()
-	t.MaxIdleConns = rps
-	t.MaxConnsPerHost = rps
-	t.MaxIdleConnsPerHost = rps
+	t.MaxIdleConns = 100
+	t.MaxConnsPerHost = 100
+	t.MaxIdleConnsPerHost = 100
 	// Disable stdlib's transparent gzip decompression so we can use the
 	// faster klauspost/compress implementation instead.
 	t.DisableCompression = true
