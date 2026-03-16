@@ -27,12 +27,12 @@ datasources:
   node_rpc:
     kind: celestia_node_rpc
     url: ${CELESTIA_NODE_URL}
-    rps: ${CELESTIA_NODE_RPS:-5}
+    rps: ${CELESTIA_NODE_RPS:-50}
     timeout: ${CELESTIA_NODE_TIMEOUT:-60}
   node_api:
     kind: celestia_node_api
     url: ${CELESTIA_NODE_API_URL}
-    rps: ${CELESTIA_NODE_API_RPS:-5}
+    rps: ${CELESTIA_NODE_API_RPS:-50}
     timeout: ${CELESTIA_NODE_API_TIMEOUT:-10}
   node_ws:
     kind: celestia_node_ws
@@ -40,17 +40,17 @@ datasources:
   dal_api:
     kind: celestia_api
     url: ${CELESTIA_DAL_API_URL}
-    rps: ${CELESTIA_DAL_API_RPS:-5}
+    rps: ${CELESTIA_DAL_API_RPS:-50}
     timeout: ${CELESTIA_DAL_API_TIMEOUT:-10}
   celestials:
     kind: celestials
     url: ${CELESTIALS_API_URL:-https://api.stage.celestials.id}
-    rps: ${CELESTIALS_API_RPS:-5}
+    rps: ${CELESTIALS_API_RPS:-50}
     timeout: ${CELESTIALS_API_TIMEOUT:-10}
   celenium_blobs:
     kind: celenium
     url: ${CELENIUM_BLOBS_API_URL}
-    rps: ${CELENIUM_BLOBS_API_RPS:-5}
+    rps: ${CELENIUM_BLOBS_API_RPS:-50}
     timeout: ${CELENIUM_BLOBS_API_TIMEOUT:-10}
 
 api:

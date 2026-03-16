@@ -12,7 +12,7 @@ import (
 )
 
 func (r *Module) sequencer(ctx context.Context) {
-	orderedBlocks := make(map[int64]*types.BlockData, 512)
+	orderedBlocks := make(map[int64]*types.BlockData, cap(r.blocks))
 	l, prevBlockHash := r.Level()
 	currentBlock := int64(l + 1)
 
@@ -33,7 +33,8 @@ func (r *Module) sequencer(ctx context.Context) {
 			for ok {
 				if prevBlockHash != nil {
 					if !bytes.Equal(b.Block.LastBlockID.Hash, prevBlockHash) {
-						prevBlockHash, currentBlock, orderedBlocks = r.startRollback(b, prevBlockHash)
+						prevBlockHash, currentBlock = r.startRollback(b, prevBlockHash)
+						clear(orderedBlocks)
 						break
 					}
 				}
@@ -57,7 +58,7 @@ func (r *Module) sequencer(ctx context.Context) {
 func (r *Module) startRollback(
 	b *types.BlockData,
 	prevBlockHash []byte,
-) ([]byte, int64, map[int64]*types.BlockData) {
+) ([]byte, int64) {
 	r.Log.Info().
 		Str("current.lastBlockHash", hex.EncodeToString(b.Block.LastBlockID.Hash)).
 		Str("prevBlockHash", hex.EncodeToString(prevBlockHash)).
@@ -84,9 +85,8 @@ func (r *Module) startRollback(
 	level, hash := r.Level()
 	currentBlock := int64(level)
 	prevBlockHash = hash
-	orderedBlocks := make(map[int64]*types.BlockData, 512)
 
-	return prevBlockHash, currentBlock, orderedBlocks
+	return prevBlockHash, currentBlock
 }
 
 func clearChannel(blocks <-chan *types.BlockData) {

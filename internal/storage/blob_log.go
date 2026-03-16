@@ -10,6 +10,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
@@ -102,7 +103,7 @@ func (b BlobLog) Flat() ([]any, error) {
 		b.ShareVersion,
 		b.Commitment,
 		b.ContentType,
-		b.Fee.String(),
+		pgtype.Numeric{Int: b.Fee.Coefficient(), Exp: b.Fee.Exponent(), Valid: true},
 		b.SignerId,
 		b.NamespaceId,
 		b.MsgId,
