@@ -125,7 +125,8 @@ func (r *Module) passBlocks(ctx context.Context, head types.Level) {
 		}
 
 		batch = append(batch, level)
-		if len(batch) >= r.cfg.RequestBulkSize || level == head {
+		bulkSize := int(r.bulkSize.Load())
+		if len(batch) >= bulkSize || level == head {
 			levels := batch
 			batch = nil
 

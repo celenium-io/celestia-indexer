@@ -159,7 +159,7 @@ func (s *ModuleTestSuite) TestModule_SyncReadsBlocks() {
 	receiverModule := s.createModuleEmptyState(&ic.Indexer{
 		Name:            cfgDefault.Name,
 		BlockPeriod:     cfgDefault.BlockPeriod,
-		RequestBulkSize: 5,
+		RequestBulkSize: 10,
 	})
 
 	levels := make([]types.Level, blockCount)

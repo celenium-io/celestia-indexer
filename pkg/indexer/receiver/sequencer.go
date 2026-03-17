@@ -29,6 +29,7 @@ func (r *Module) sequencer(ctx context.Context) {
 
 			orderedBlocks[block.Block.Height] = block
 
+			r.Log.Info().Int("blocks_count", len(orderedBlocks)).Msg("waiting for block")
 			b, ok := orderedBlocks[currentBlock]
 			for ok {
 				if prevBlockHash != nil {

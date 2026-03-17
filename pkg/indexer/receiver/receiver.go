@@ -6,6 +6,7 @@ package receiver
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -53,6 +54,10 @@ type Module struct {
 	cancelReadBlocks context.CancelFunc
 	fetchWg          *sync.WaitGroup
 	fetchSem         chan struct{}
+	bulkSize         *atomic.Int64
+	maxBulkSize      int64
+	ewma             float64
+	ewmaMu           *sync.Mutex
 
 	circuitBreaker *gobreaker.CircuitBreaker[any]
 }
@@ -68,7 +73,8 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 	}
 
 	concurrency := max(1, cfg.FetchConcurrency)
-	chanBuf := max(64, (cfg.RequestBulkSize+1)*concurrency)
+	maxBulkSize := max(1, cfg.RequestBulkSize)
+	chanBuf := max(64, (maxBulkSize+1)*concurrency)
 
 	receiver := Module{
 		BaseModule:    modules.New("receiver"),
@@ -95,7 +101,12 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 				return counts.Requests >= 10 && failureRatio >= 0.6
 			},
 		}),
+		ewma:        3000,
+		maxBulkSize: int64(maxBulkSize),
+		bulkSize:    new(atomic.Int64),
+		ewmaMu:      new(sync.Mutex),
 	}
+	receiver.bulkSize.Store(max(1, receiver.maxBulkSize/2))
 
 	receiver.CreateInput(RollbackInput)
 	receiver.CreateInput(GenesisDoneInput)

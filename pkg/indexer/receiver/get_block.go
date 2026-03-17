@@ -12,7 +12,10 @@ import (
 )
 
 func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
-	start := time.Now()
+	r.Log.Debug().
+		Int("batch_size", len(levels)).
+		Int64("bulk_size", r.bulkSize.Load()).
+		Msg("fetch batch started")
 
 	for {
 		select {
@@ -21,6 +24,7 @@ func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 		default:
 		}
 
+		start := time.Now()
 		_, err := r.circuitBreaker.Execute(func() (any, error) {
 			err := r.api.BlockBulkDataStream(ctx, func(block types.BlockData) error {
 				r.Log.Info().
@@ -48,6 +52,7 @@ func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 			continue
 		}
 
+		r.adjustBulkSize(len(levels), time.Since(start))
 		return
 	}
 }
