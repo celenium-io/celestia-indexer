@@ -219,7 +219,7 @@ func jxEventAttribute(d *jxpkg.Decoder) (pkgTypes.EventAttribute, error) {
 			if err != nil {
 				return err
 			}
-			a.Value = unsafe.String(unsafe.SliceData(s), len(s))
+			a.Value = string(s)
 		default:
 			return d.Skip()
 		}
