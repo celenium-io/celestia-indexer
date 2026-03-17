@@ -55,16 +55,18 @@ type Module struct {
 	fetchWg          *sync.WaitGroup
 	fetchSem         chan struct{}
 	bulkSize         *atomic.Int64
+	stepBulkSize     int64
 	maxBulkSize      int64
 	ewma             float64
-	ewmaMu           *sync.Mutex
+	ewmaMu           sync.Mutex
+	queueBlock       *atomic.Bool
 
 	circuitBreaker *gobreaker.CircuitBreaker[any]
 }
 
 var _ modules.Module = (*Module)(nil)
 
-func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *http.HTTP, state *storage.State) Module {
+func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *http.HTTP, state *storage.State) *Module {
 	level := types.Level(cfg.StartLevel)
 	var lastHash []byte
 	if state != nil {
@@ -101,12 +103,13 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 				return counts.Requests >= 10 && failureRatio >= 0.6
 			},
 		}),
-		ewma:        3000,
+		ewma:        (thresholdHigh + thresholdLow) / 2,
 		maxBulkSize: int64(maxBulkSize),
 		bulkSize:    new(atomic.Int64),
-		ewmaMu:      new(sync.Mutex),
+		queueBlock:  new(atomic.Bool),
 	}
 	receiver.bulkSize.Store(max(1, receiver.maxBulkSize/2))
+	receiver.stepBulkSize = getStepBulkSize(receiver.maxBulkSize)
 
 	receiver.CreateInput(RollbackInput)
 	receiver.CreateInput(GenesisDoneInput)
@@ -116,7 +119,7 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 	receiver.CreateOutput(GenesisOutput)
 	receiver.CreateOutput(StopOutput)
 
-	return receiver
+	return &receiver
 }
 
 func (r *Module) Start(ctx context.Context) {

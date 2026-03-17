@@ -28,6 +28,7 @@ func (r *Module) sequencer(ctx context.Context) {
 			}
 
 			orderedBlocks[block.Block.Height] = block
+			r.checkQueueSize(len(orderedBlocks))
 
 			r.Log.Info().Int("blocks_count", len(orderedBlocks)).Msg("waiting for block")
 			b, ok := orderedBlocks[currentBlock]
@@ -51,9 +52,14 @@ func (r *Module) sequencer(ctx context.Context) {
 				currentBlock += 1
 
 				b, ok = orderedBlocks[currentBlock]
+				r.checkQueueSize(len(orderedBlocks))
 			}
 		}
 	}
+}
+
+func (r *Module) checkQueueSize(length int) {
+	r.queueBlock.Store(length >= r.cfg.FetchConcurrency*r.cfg.RequestBulkSize)
 }
 
 func (r *Module) startRollback(

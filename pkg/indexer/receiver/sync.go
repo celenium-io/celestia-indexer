@@ -15,6 +15,7 @@ import (
 func (r *Module) sync(ctx context.Context) {
 	var blocksCtx context.Context
 	blocksCtx, r.cancelReadBlocks = context.WithCancel(ctx)
+
 	if err := r.readBlocks(blocksCtx); err != nil {
 		r.Log.Err(err).Msg("while reading blocks")
 		r.stopAll()
@@ -26,7 +27,7 @@ func (r *Module) sync(ctx context.Context) {
 	}
 
 	if r.ws != nil {
-		if err := r.live(ctx); err != nil {
+		if err := r.live(blocksCtx); err != nil {
 			r.Log.Err(err).Msg("while reading blocks")
 			r.stopAll()
 			return
@@ -108,7 +109,6 @@ func (r *Module) readBlocks(ctx context.Context) error {
 
 func (r *Module) passBlocks(ctx context.Context, head types.Level) {
 	fetchCtx, cancel := context.WithCancel(ctx)
-	r.cancelReadBlocks = cancel
 	defer cancel()
 
 	var (
@@ -117,11 +117,13 @@ func (r *Module) passBlocks(ctx context.Context, head types.Level) {
 	)
 
 	for level := r.receivedLevel + 1; level <= head; level++ {
-		select {
-		case <-fetchCtx.Done():
-			r.fetchWg.Wait()
-			return
-		default:
+		for r.queueBlock.Load() {
+			select {
+			case <-fetchCtx.Done():
+				r.fetchWg.Wait()
+				return
+			case <-time.After(100 * time.Millisecond):
+			}
 		}
 
 		batch = append(batch, level)

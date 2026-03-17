@@ -155,7 +155,7 @@ func createReceiver(ctx context.Context, cfg config.Config, pg postgres.Storage)
 	}
 
 	receiverModule := receiver.NewModule(cfg.Indexer, &nodeRpc, &nodeApi, ws, state)
-	return nodeRpc, &receiverModule, nil
+	return nodeRpc, receiverModule, nil
 }
 
 func createRollback(receiverModule modules.Module, pg postgres.Storage, api node.Api, cfg config.Indexer) (*rollback.Module, error) {

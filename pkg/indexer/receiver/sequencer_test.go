@@ -141,7 +141,7 @@ func (s *ModuleTestSuite) TestModule_SequencerOnEmptyState() {
 	blocksReaderModule := modules.New("ordered-blocks-reader")
 	const orderedBlocksChannel = "ordered-blocks"
 	blocksReaderModule.CreateInput(orderedBlocksChannel)
-	err := blocksReaderModule.AttachTo(&receiverModule, BlocksOutput, orderedBlocksChannel)
+	err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
 	s.Require().NoError(err)
 
 	tests := []struct {
@@ -214,7 +214,7 @@ func (s *ModuleTestSuite) TestModule_SequencerOnNonEmptyState() {
 	blocksReaderModule := modules.New("ordered-blocks-reader")
 	const orderedBlocksChannel = "ordered-blocks"
 	blocksReaderModule.CreateInput(orderedBlocksChannel)
-	err := blocksReaderModule.AttachTo(&receiverModule, BlocksOutput, orderedBlocksChannel)
+	err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
 	s.Require().NoError(err)
 
 	blocksData := []blockConciseData{
@@ -296,7 +296,7 @@ func (s *ModuleTestSuite) TestModule_SequencerGracefullyStops() {
 	defer cancelCtx()
 
 	stopperModule := stopper.NewModule(cancelCtx)
-	err := stopperModule.AttachTo(&receiverModule, StopOutput, stopper.InputName)
+	err := stopperModule.AttachTo(receiverModule, StopOutput, stopper.InputName)
 	s.Require().NoError(err)
 
 	stopperCtx, stopperCtxCancel := context.WithCancel(context.Background())
@@ -321,7 +321,7 @@ func (s *ModuleTestSuite) TestModule_SequencerCallsRollback() {
 	blocksReaderModule := modules.New("ordered-blocks-reader")
 	const orderedBlocksChannel = "ordered-blocks"
 	blocksReaderModule.CreateInput(orderedBlocksChannel)
-	err := blocksReaderModule.AttachTo(&receiverModule, BlocksOutput, orderedBlocksChannel)
+	err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
 	s.Require().NoError(err)
 
 	rollbackModule := modules.New("rollback")
@@ -329,7 +329,7 @@ func (s *ModuleTestSuite) TestModule_SequencerCallsRollback() {
 	rollbackModule.CreateOutput(rollback.OutputName)
 	err = receiverModule.AttachTo(&rollbackModule, rollback.OutputName, RollbackInput)
 	s.Require().NoError(err)
-	err = rollbackModule.AttachTo(&receiverModule, RollbackOutput, rollback.InputName)
+	err = rollbackModule.AttachTo(receiverModule, RollbackOutput, rollback.InputName)
 	s.Require().NoError(err)
 
 	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
@@ -393,7 +393,7 @@ func (s *ModuleTestSuite) TestModule_SequencerCallsRollbackWithinPreSavedBlocks(
 	blocksReaderModule := modules.New("ordered-blocks-reader")
 	const orderedBlocksChannel = "ordered-blocks"
 	blocksReaderModule.CreateInput(orderedBlocksChannel)
-	err := blocksReaderModule.AttachTo(&receiverModule, BlocksOutput, orderedBlocksChannel)
+	err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
 	s.Require().NoError(err)
 
 	rollbackModule := modules.New("rollback")
@@ -401,7 +401,7 @@ func (s *ModuleTestSuite) TestModule_SequencerCallsRollbackWithinPreSavedBlocks(
 	rollbackModule.CreateOutput(rollback.OutputName)
 	err = receiverModule.AttachTo(&rollbackModule, rollback.OutputName, RollbackInput)
 	s.Require().NoError(err)
-	err = rollbackModule.AttachTo(&receiverModule, RollbackOutput, rollback.InputName)
+	err = rollbackModule.AttachTo(receiverModule, RollbackOutput, rollback.InputName)
 	s.Require().NoError(err)
 
 	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)

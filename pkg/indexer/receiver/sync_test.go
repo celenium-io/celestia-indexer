@@ -29,7 +29,7 @@ func (s *ModuleTestSuite) TestModule_SyncGracefullyStops() {
 	defer cancelCtx()
 
 	stopperModule := stopper.NewModule(cancelCtx)
-	err := stopperModule.AttachTo(&receiverModule, StopOutput, stopper.InputName)
+	err := stopperModule.AttachTo(receiverModule, StopOutput, stopper.InputName)
 	s.Require().NoError(err)
 
 	stopperCtx, stopperCtxCancel := context.WithCancel(context.Background())
@@ -110,11 +110,15 @@ func (s *ModuleTestSuite) TestPassBlocks_RollbackCancelsInFlightGoroutines() {
 		}).
 		Times(fetchConcurrency)
 
-	// Simulate live() mode: passBlocks receives a never-cancelled parent ctx.
+	// Simulate live() mode: passBlocks receives a long-lived parent context,
+	// exactly as sync() sets up: blocksCtx + r.cancelReadBlocks = its cancel.
+	blocksCtx, blocksCancel := context.WithCancel(context.Background())
+	receiverModule.cancelReadBlocks = blocksCancel
+
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		receiverModule.passBlocks(context.Background(), head)
+		receiverModule.passBlocks(blocksCtx, head)
 	}()
 
 	// Wait until all goroutines are inside BlockBulkDataStream —
