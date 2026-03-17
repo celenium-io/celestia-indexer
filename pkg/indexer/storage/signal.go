@@ -47,12 +47,9 @@ func (module *Module) saveSignals(
 			return errors.Wrap(errCantFindAddress, signals[i].Validator.Address)
 		}
 
-		validator, ok := validatorsMap[validatorId]
-		if !ok {
-			validator, err = tx.Validator(ctx, validatorId)
-			if err != nil {
-				return errors.Wrapf(err, "get validator by id: %d", validatorId)
-			}
+		validator, err := tx.Validator(ctx, validatorId)
+		if err != nil {
+			return errors.Wrapf(err, "get validator by id: %d", validatorId)
 		}
 
 		signals[i].VotingPower = validator.Stake

@@ -32,7 +32,7 @@ func (p *Module) parseTxs(ctx *context.Context, b *types.BlockData) ([]storage.T
 	return txs, nil
 }
 
-func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, txRes *types.ResponseDeliverTx, t *storage.Tx) error {
+func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, txRes types.ResponseDeliverTx, t *storage.Tx) error {
 	d, err := decode.Tx(b, index)
 	if err != nil {
 		return errors.Wrapf(err, "while parsing Tx on index %d", index)

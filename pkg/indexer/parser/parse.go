@@ -119,7 +119,7 @@ func (p *Module) parseConsensusParamUpdates(ctx *dCtx.Context, params *types.Con
 	ctx.AddConstant(storageTypes.ModuleNameConsensus, "block_max_gas", strconv.FormatInt(params.Block.MaxGas, 10))
 }
 
-func getFirstTxEvent(results []*types.ResponseDeliverTx) *types.Event {
+func getFirstTxEvent(results []types.ResponseDeliverTx) *types.Event {
 	if len(results) == 0 {
 		return nil
 	}

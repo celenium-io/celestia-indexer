@@ -26,7 +26,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	nodeMock "github.com/celenium-io/celestia-indexer/pkg/node/mock"
 	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/node/types"
-	tendermintTypes "github.com/cometbft/cometbft/types"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -813,7 +812,7 @@ func (s *NamespaceTestSuite) TestBlobProofs() {
 		Return(pkgTypes.ResultBlock{
 			Block: &pkgTypes.Block{
 				Data: pkgTypes.Data{
-					Txs: tendermintTypes.ToTxs(txs),
+					Txs: txs,
 				},
 			},
 		}, nil)

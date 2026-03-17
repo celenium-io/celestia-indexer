@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	tmTypes "github.com/cometbft/cometbft/types"
 )
 
 func EmptyBlock() (*types.BlockData, time.Time) {
@@ -23,13 +22,13 @@ func CreateTestBlock(tx types.ResponseDeliverTx, count int) (*types.BlockData, t
 			Time: now,
 		},
 		Data: types.Data{
-			Txs: make(tmTypes.Txs, count),
+			Txs: make([][]byte, count),
 		},
 	}
 
-	var txResults = make([]*types.ResponseDeliverTx, count)
+	var txResults = make([]types.ResponseDeliverTx, count)
 	for i := 0; i < count; i++ {
-		txResults[i] = &tx
+		txResults[i] = tx
 		headerBlock.Txs[i] = txMsgBeginRedelegate
 	}
 
@@ -52,13 +51,13 @@ func CreateBlockWithTxs(tx types.ResponseDeliverTx, txData []byte, count int) (*
 			Time: now,
 		},
 		Data: types.Data{
-			Txs: make(tmTypes.Txs, count),
+			Txs: make([][]byte, count),
 		},
 	}
 
-	var txResults = make([]*types.ResponseDeliverTx, count)
+	var txResults = make([]types.ResponseDeliverTx, count)
 	for i := 0; i < count; i++ {
-		txResults[i] = &tx
+		txResults[i] = tx
 		headerBlock.Txs[i] = txData
 	}
 
@@ -81,13 +80,13 @@ func CreateTestBlockWithAppVersion(tx types.ResponseDeliverTx, count int, appVer
 			Time: now,
 		},
 		Data: types.Data{
-			Txs: make(tmTypes.Txs, count),
+			Txs: make([][]byte, count),
 		},
 	}
 
-	var txResults = make([]*types.ResponseDeliverTx, count)
+	var txResults = make([]types.ResponseDeliverTx, count)
 	for i := 0; i < count; i++ {
-		txResults[i] = &tx
+		txResults[i] = tx
 		headerBlock.Txs[i] = txMsgBeginRedelegate
 	}
 

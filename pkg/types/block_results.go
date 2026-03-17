@@ -10,10 +10,10 @@ import (
 
 // ResultBlockResults is an ABCI results from a block
 type ResultBlockResults struct {
-	Height                Level                `json:"height,string"`
-	TxsResults            []*ResponseDeliverTx `json:"txs_results"`
-	FinalizeBlockEvents   []Event              `json:"finalize_block_events"`
-	ConsensusParamUpdates *ConsensusParams     `json:"consensus_param_updates"`
+	Height                Level               `json:"height,string"`
+	TxsResults            []ResponseDeliverTx `json:"txs_results"`
+	FinalizeBlockEvents   []Event             `json:"finalize_block_events"`
+	ConsensusParamUpdates *ConsensusParams    `json:"consensus_param_updates"`
 	// ValidatorUpdates      []ValidatorUpdate    `json:"validator_updates"`
 }
 
@@ -80,7 +80,6 @@ type ConsensusParams struct {
 	Block     *BlockParams     `json:"block"     protobuf:"bytes,1,opt,name=block,proto3"`
 	Evidence  *EvidenceParams  `json:"evidence"  protobuf:"bytes,2,opt,name=evidence,proto3"`
 	Validator *ValidatorParams `json:"validator" protobuf:"bytes,3,opt,name=validator,proto3"`
-	Version   *VersionParams   `json:"version"   protobuf:"bytes,4,opt,name=version,proto3"`
 }
 
 // BlockParams contains limits on the block size.

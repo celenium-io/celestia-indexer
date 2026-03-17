@@ -728,7 +728,7 @@ func (handler *NamespaceHandler) BlobProofs(c echo.Context) error {
 	}
 
 	dataSquare, err := square.Construct(
-		block.Block.Txs.ToSliceOfBytes(),
+		block.Block.Txs,
 		appconsts.SquareSizeUpperBound,
 		appconsts.SubtreeRootThreshold,
 	)

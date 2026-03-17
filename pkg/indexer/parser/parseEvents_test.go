@@ -19,7 +19,7 @@ import (
 func TestParseEvents_EmptyEventsResults(t *testing.T) {
 	block := &types.BlockData{
 		ResultBlockResults: types.ResultBlockResults{
-			TxsResults: make([]*types.ResponseDeliverTx, 0),
+			TxsResults: make([]types.ResponseDeliverTx, 0),
 		},
 	}
 
