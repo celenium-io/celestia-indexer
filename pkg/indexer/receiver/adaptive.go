@@ -21,11 +21,9 @@ func (r *Module) adjustBulkSize(n int, elapsed time.Duration) {
 
 	current := r.bulkSize.Load()
 
-	r.bulkSize.Store(current - 1)
-
 	r.Log.Debug().
 		Float64("ema_ms", ema).
-		Int64("bulk_size", current-1).
+		Int64("bulk_size", current).
 		Msg("current ema")
 	switch {
 	case ema > thresholdHigh && current > 1:

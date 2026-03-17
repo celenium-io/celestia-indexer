@@ -215,11 +215,11 @@ func jxEventAttribute(d *jxpkg.Decoder) (pkgTypes.EventAttribute, error) {
 			}
 			a.Key = s
 		case "value":
-			s, err := d.Str()
+			s, err := d.StrBytes()
 			if err != nil {
 				return err
 			}
-			a.Value = s
+			a.Value = unsafe.String(unsafe.SliceData(s), len(s))
 		default:
 			return d.Skip()
 		}

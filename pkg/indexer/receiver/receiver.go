@@ -74,7 +74,7 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 
 	concurrency := max(1, cfg.FetchConcurrency)
 	maxBulkSize := max(1, cfg.RequestBulkSize)
-	chanBuf := max(64, (maxBulkSize+1)*concurrency)
+	chanBuf := max(64, maxBulkSize*concurrency)
 
 	receiver := Module{
 		BaseModule:    modules.New("receiver"),
