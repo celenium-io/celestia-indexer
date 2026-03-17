@@ -48,6 +48,10 @@ func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 
 			if os.IsTimeout(err) {
 				r.adjustBulkSize(len(levels), time.Since(start))
+				r.bulkSize.Store(1)
+				r.Log.Info().
+					Int64("bulk_size", 1).
+					Msg("reset bulk size due to timeout error")
 			}
 
 			r.Log.Err(err).

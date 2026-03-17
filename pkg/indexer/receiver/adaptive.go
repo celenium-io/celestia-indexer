@@ -4,7 +4,7 @@ import "time"
 
 const (
 	ewmaAlpha     = 0.3
-	thresholdHigh = 300.0
+	thresholdHigh = 200.0
 	thresholdLow  = 100.0
 )
 
@@ -33,12 +33,12 @@ func (r *Module) adjustBulkSize(n int, elapsed time.Duration) {
 		r.Log.Info().
 			Float64("ema_ms", ema).
 			Int64("bulk_size", current-1).
-			Msg("adaptive: decreased bulk_size")
+			Msg("decreased bulk_size")
 	case ema < thresholdLow && current < r.maxBulkSize:
 		r.bulkSize.Store(current + 1)
 		r.Log.Info().
 			Float64("ema_ms", ema).
 			Int64("bulk_size", current+1).
-			Msg("adaptive: increased bulk_size")
+			Msg("increased bulk_size")
 	}
 }
