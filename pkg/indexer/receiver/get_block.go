@@ -14,10 +14,7 @@ import (
 )
 
 func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
-	r.Log.Debug().
-		Int("batch_size", len(levels)).
-		Int64("bulk_size", r.bulkSize.Load()).
-		Msg("fetch batch started")
+	batchSize := len(levels)
 
 	for {
 		select {
@@ -26,12 +23,7 @@ func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 		default:
 		}
 
-		bulkSize := int(r.bulkSize.Load())
-		chunks := slices.Chunk(levels, len(levels))
-		if len(levels) > bulkSize {
-			chunkSize := len(levels) / max(1, bulkSize)
-			chunks = slices.Chunk(levels, chunkSize)
-		}
+		chunks := slices.Chunk(levels, batchSize)
 
 		start := time.Now()
 		for chunk := range chunks {
@@ -57,10 +49,7 @@ func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 
 				if os.IsTimeout(err) {
 					r.adjustBulkSize(len(levels), time.Since(start))
-					r.bulkSize.Store(1)
-					r.Log.Info().
-						Int64("bulk_size", 1).
-						Msg("reset bulk size due to timeout error")
+					batchSize = 1
 				}
 
 				r.Log.Err(err).
