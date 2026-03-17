@@ -5,6 +5,7 @@ package receiver
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -43,6 +44,10 @@ func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				return
+			}
+
+			if os.IsTimeout(err) {
+				r.adjustBulkSize(len(levels), time.Since(start))
 			}
 
 			r.Log.Err(err).

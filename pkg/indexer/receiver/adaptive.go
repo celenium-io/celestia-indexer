@@ -4,8 +4,8 @@ import "time"
 
 const (
 	ewmaAlpha     = 0.3
-	thresholdHigh = 3000.0
-	thresholdLow  = 500.0
+	thresholdHigh = 300.0
+	thresholdLow  = 100.0
 )
 
 func (r *Module) adjustBulkSize(n int, elapsed time.Duration) {
