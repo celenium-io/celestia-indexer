@@ -264,7 +264,7 @@ func jxTxResult(d *jxpkg.Decoder) (pkgTypes.ResponseDeliverTx, error) {
 			}
 			tx.Code = v
 		case "log":
-			raw, err := d.RawAppend(jxpkg.Raw(tx.Log[:0]))
+			raw, err := d.Raw()
 			if err != nil {
 				return err
 			}
