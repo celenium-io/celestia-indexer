@@ -5,12 +5,27 @@ package receiver
 
 import (
 	"context"
+	"io"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 )
+
+func isConnectionError(err error) bool {
+	if os.IsTimeout(err) {
+		return true
+	}
+	if errors.Is(err, io.ErrUnexpectedEOF) || errors.Is(err, io.EOF) {
+		return true
+	}
+	s := err.Error()
+	return strings.Contains(s, "EOF") ||
+		strings.Contains(s, "connection reset") ||
+		strings.Contains(s, "broken pipe")
+}
 
 func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 	remaining := levels
@@ -51,8 +66,8 @@ func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 			r.Log.Err(err).
 				Msg("while getting block data")
 
-			if os.IsTimeout(err) {
-				r.adjustBulkSize(len(chunk), time.Since(start))
+			if isConnectionError(err) {
+				r.connectionErrorDecrease()
 			}
 
 			time.Sleep(time.Second)

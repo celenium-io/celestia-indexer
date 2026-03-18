@@ -59,7 +59,8 @@ type Module struct {
 	maxBulkSize      int64
 	ewma             float64
 	ewmaMu           sync.Mutex
-	queueBlock       *atomic.Bool
+	lastDecreasedAt  atomic.Int64
+	orderedBlocksLen atomic.Int64
 
 	circuitBreaker *gobreaker.CircuitBreaker[any]
 }
@@ -106,7 +107,6 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 		ewma:        (thresholdHigh + thresholdLow) / 2,
 		maxBulkSize: int64(maxBulkSize),
 		bulkSize:    new(atomic.Int64),
-		queueBlock:  new(atomic.Bool),
 	}
 	receiver.bulkSize.Store(max(1, receiver.maxBulkSize/2))
 	receiver.stepBulkSize = getStepBulkSize(receiver.maxBulkSize)

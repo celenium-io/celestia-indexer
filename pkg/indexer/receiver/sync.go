@@ -117,13 +117,11 @@ func (r *Module) passBlocks(ctx context.Context, head types.Level) {
 	)
 
 	for level := r.receivedLevel + 1; level <= head; level++ {
-		for r.queueBlock.Load() {
-			select {
-			case <-fetchCtx.Done():
-				r.fetchWg.Wait()
-				return
-			case <-time.After(100 * time.Millisecond):
-			}
+		select {
+		case <-fetchCtx.Done():
+			r.fetchWg.Wait()
+			return
+		case <-time.After(100 * time.Millisecond):
 		}
 
 		batch = append(batch, level)
@@ -137,7 +135,16 @@ func (r *Module) passBlocks(ctx context.Context, head types.Level) {
 				maxLevel = last
 			}
 
-			// Acquire semaphore slot before spawning — blocks when at concurrency limit.
+			threshold := max(int64(10), int64(r.cfg.FetchConcurrency*r.cfg.RequestBulkSize/2))
+			for r.orderedBlocksLen.Load() >= threshold {
+				select {
+				case <-fetchCtx.Done():
+					r.fetchWg.Wait()
+					return
+				case <-time.After(100 * time.Millisecond):
+				}
+			}
+
 			select {
 			case r.fetchSem <- struct{}{}:
 			case <-fetchCtx.Done():

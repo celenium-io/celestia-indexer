@@ -351,6 +351,7 @@ func (s *ModuleTestSuite) TestModule_SequencerCallsRollback() {
 
 	receiverModule.setLevel(0, nil)
 	go receiverModule.sequencer(ctx)
+	go receiverModule.rollback(ctx)
 
 	blocks := createBlocks(asc, blocksData...)
 
@@ -383,6 +384,140 @@ out:
 	receiverLevel, receiverHash := receiverModule.Level()
 	s.Require().EqualValues(types.Level(4), receiverLevel)
 	s.Require().EqualValues([]byte{0x04}, receiverHash)
+}
+
+// TestModule_SequencerOrderedBlocksLenAccurate verifies that orderedBlocksLen
+// stays in sync with the actual orderedBlocks map: it grows when out-of-order
+// blocks arrive (sequencer can't advance) and reaches 0 once all blocks are
+// processed. This counter drives the backpressure in passBlocks.
+func (s *ModuleTestSuite) TestModule_SequencerOrderedBlocksLenAccurate() {
+	s.InitApi(nil)
+
+	receiverModule := s.createModule() // state at height 1000
+
+	const orderedBlocksChannel = "ordered-blocks"
+	blocksReaderModule := modules.New("ordered-blocks-reader")
+	blocksReaderModule.CreateInput(orderedBlocksChannel)
+	err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
+	s.Require().NoError(err)
+
+	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelCtx()
+
+	receiverModule.setLevel(1000, hashOf1000Block)
+	go receiverModule.sequencer(ctx)
+
+	bd := []blockConciseData{
+		{level: 1001, hash: []byte{0x01}},
+		{level: 1002, hash: []byte{0x02}},
+		{level: 1003, hash: []byte{0x03}},
+	}
+	blocks := createBlocks(asc, bd...)
+
+	// Send 1002 and 1003 first — sequencer buffers them waiting for 1001.
+	receiverModule.blocks <- blocks[1]
+	receiverModule.blocks <- blocks[2]
+
+	s.Require().Eventually(func() bool {
+		return receiverModule.orderedBlocksLen.Load() == 2
+	}, time.Second, 5*time.Millisecond, "orderedBlocksLen should reach 2 while 1001 is missing")
+
+	// Unblock sequencer by sending the missing block 1001.
+	receiverModule.blocks <- blocks[0]
+
+	// Drain all 3 ordered outputs.
+	for range 3 {
+		select {
+		case <-ctx.Done():
+			s.T().Error("timed out waiting for ordered blocks")
+			return
+		case <-blocksReaderModule.MustInput(orderedBlocksChannel).Listen():
+		}
+	}
+
+	s.Require().Eventually(func() bool {
+		return receiverModule.orderedBlocksLen.Load() == 0
+	}, time.Second, 5*time.Millisecond, "orderedBlocksLen should drop to 0 after all blocks are processed")
+}
+
+// TestModule_SequencerOrderedBlocksLenResetsOnRollback verifies that
+// orderedBlocksLen is reset to 0 when a rollback clears orderedBlocks,
+// so backpressure is correctly released after a chain reorganisation.
+func (s *ModuleTestSuite) TestModule_SequencerOrderedBlocksLenResetsOnRollback() {
+	s.InitApi(nil)
+
+	receiverModule := s.createModule()
+
+	blocksReaderModule := modules.New("ordered-blocks-reader")
+	const orderedBlocksChannel = "ordered-blocks"
+	blocksReaderModule.CreateInput(orderedBlocksChannel)
+	err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
+	s.Require().NoError(err)
+
+	rollbackModule := modules.New("rollback")
+	rollbackModule.CreateInput(rollback.InputName)
+	rollbackModule.CreateOutput(rollback.OutputName)
+	err = receiverModule.AttachTo(&rollbackModule, rollback.OutputName, RollbackInput)
+	s.Require().NoError(err)
+	err = rollbackModule.AttachTo(receiverModule, RollbackOutput, rollback.InputName)
+	s.Require().NoError(err)
+
+	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelCtx()
+
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-rollbackModule.MustInput(rollback.InputName).Listen():
+				rollbackModule.MustOutput(rollback.OutputName).Push(storage.State{
+					LastHeight: types.Level(1000),
+					LastHash:   hashOf1000Block,
+				})
+			}
+		}
+	}()
+
+	receiverModule.setLevel(1000, hashOf1000Block)
+	go receiverModule.sequencer(ctx)
+	go receiverModule.rollback(ctx) // needed so startRollback's rollbackSync.Wait() can unblock
+
+	bd := []blockConciseData{
+		{level: 1001, hash: []byte{0x01}},
+		{level: 1002, hash: []byte{0x02}},
+		{level: 1003, hash: []byte{0x03}},
+	}
+	blocks := createBlocks(asc, bd...)
+
+	// Buffer 1002 and 1003 so orderedBlocks grows to 2.
+	receiverModule.blocks <- blocks[1]
+	receiverModule.blocks <- blocks[2]
+
+	s.Require().Eventually(func() bool {
+		return receiverModule.orderedBlocksLen.Load() == 2
+	}, time.Second, 5*time.Millisecond, "orderedBlocksLen should be 2 before rollback")
+
+	// Send block 1001 with a wrong LastBlockID hash to trigger rollback.
+	badBlock := &types.BlockData{
+		ResultBlock: types.ResultBlock{
+			BlockID: types.BlockId{Hash: []byte{0x01}},
+			Block: &types.Block{
+				Header: types.Header{
+					Height: 1001,
+					LastBlockID: types.BlockId{
+						Hash: []byte{0xFF}, // does not match hashOf1000Block
+					},
+				},
+			},
+		},
+	}
+	receiverModule.blocks <- badBlock
+
+	// After rollback clear(orderedBlocks) + Store(0): counter must reach 0.
+	s.Require().Eventually(func() bool {
+		return receiverModule.orderedBlocksLen.Load() == 0
+	}, 2*time.Second, 10*time.Millisecond, "orderedBlocksLen should reset to 0 after rollback")
 }
 
 func (s *ModuleTestSuite) TestModule_SequencerCallsRollbackWithinPreSavedBlocks() {
@@ -423,6 +558,7 @@ func (s *ModuleTestSuite) TestModule_SequencerCallsRollbackWithinPreSavedBlocks(
 
 	receiverModule.setLevel(0, nil)
 	go receiverModule.sequencer(ctx)
+	go receiverModule.rollback(ctx)
 
 	blocks := createBlocks(desc, blocksData...)
 
