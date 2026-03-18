@@ -11,6 +11,10 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
+var (
+	errKeyNotFound = errors.New("key not found")
+)
+
 type PackedBytes map[string]any
 
 var _ sql.Scanner = (*PackedBytes)(nil)
@@ -34,4 +38,28 @@ func (pb PackedBytes) Value() (driver.Value, error) {
 
 func (pb PackedBytes) ToBytes() ([]byte, error) {
 	return msgpack.Marshal(pb)
+}
+
+func (pb PackedBytes) GetString(key string) (string, error) {
+	val, ok := pb[key]
+	if !ok {
+		return "", errors.Wrap(errKeyNotFound, key)
+	}
+	str, ok := val.(string)
+	if !ok {
+		return "", errors.Errorf("key is not a string type: %s", key)
+	}
+	return str, nil
+}
+
+func (pb PackedBytes) GetStringOrDefault(key string) string {
+	val, ok := pb[key]
+	if !ok {
+		return ""
+	}
+	str, ok := val.(string)
+	if !ok {
+		return ""
+	}
+	return str
 }

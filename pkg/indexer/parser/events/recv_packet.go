@@ -63,7 +63,7 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 		return err
 	}
 
-	port := decoder.StringFromMap(packet, "DestinationPort")
+	port := (storageTypes.PackedBytes)(packet).GetStringOrDefault("DestinationPort")
 
 	switch port {
 	case "icahost":

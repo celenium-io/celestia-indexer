@@ -8414,17 +8414,6 @@
         }
     },
     "definitions": {
-        "github_com_celenium-io_celestia-indexer_internal_storage_types.Status": {
-            "type": "string",
-            "enum": [
-                "success",
-                "failed"
-            ],
-            "x-enum-varnames": [
-                "StatusSuccess",
-                "StatusFailed"
-            ]
-        },
         "handler.Error": {
             "type": "object",
             "properties": {
@@ -9100,7 +9089,9 @@
             "properties": {
                 "data": {
                     "type": "object",
-                    "additionalProperties": {}
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 },
                 "height": {
                     "type": "integer",
@@ -11779,7 +11770,7 @@
                 "status": {
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_celenium-io_celestia-indexer_internal_storage_types.Status"
+                            "$ref": "#/definitions/types.Status"
                         }
                     ],
                     "example": "success"
@@ -11827,7 +11818,7 @@
                 "status": {
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_celenium-io_celestia-indexer_internal_storage_types.Status"
+                            "$ref": "#/definitions/types.Status"
                         }
                     ],
                     "example": "success"
@@ -12779,6 +12770,17 @@
                 "MsgCreateInterchainSecurityModule",
                 "MsgUpdateInterchainSecurityModule",
                 "MsgSubmitMessages"
+            ]
+        },
+        "types.Status": {
+            "type": "string",
+            "enum": [
+                "success",
+                "failed"
+            ],
+            "x-enum-varnames": [
+                "StatusSuccess",
+                "StatusFailed"
             ]
         }
     },

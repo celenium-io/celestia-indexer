@@ -74,7 +74,7 @@ func TestParseEvents_SuccessTx(t *testing.T) {
 	require.NotNil(t, e.TxId)
 	require.EqualValues(t, 1, *e.TxId)
 
-	attrs := map[string]any{
+	attrs := map[string]string{
 		"spender": "celestia1p330stapusykfss47qrhqlukjncvgyzf6gdufs",
 		"amount":  "40494utia",
 	}

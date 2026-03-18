@@ -58,13 +58,14 @@ func parseEvent(ctx *context.Context, b *types.BlockData, eN types.Event, index 
 	resultEvent.Time = b.Block.Time
 	resultEvent.Position = int64(index)
 	resultEvent.Type = eventType
-	resultEvent.Data = make(map[string]any, len(eN.Attributes))
 	resultEvent.TxId = txId
 
-	for i := range eN.Attributes {
-		resultEvent.Data[eN.Attributes[i].Key] = eN.Attributes[i].Value
+	if len(eN.Attributes) > 0 {
+		resultEvent.Data = make(map[string]string, len(eN.Attributes))
+		for i := range eN.Attributes {
+			resultEvent.Data[eN.Attributes[i].Key] = eN.Attributes[i].Value
+		}
 	}
-
 	if duplicated {
 		return nil
 	}

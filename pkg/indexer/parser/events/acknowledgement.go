@@ -38,7 +38,10 @@ func processAcknowledgement(ctx *context.Context, events []storage.Event, msg *s
 		return err
 	}
 
-	port := decoder.StringFromMap(packet, "SourcePort")
+	port, err := (storageTypes.PackedBytes)(packet).GetString("SourcePort")
+	if err != nil {
+		return err
+	}
 
 	switch port {
 	case "icahost":

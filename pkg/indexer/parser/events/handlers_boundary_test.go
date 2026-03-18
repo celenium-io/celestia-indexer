@@ -27,14 +27,14 @@ func Test_Handle_boundarySafety(t *testing.T) {
 				{
 					Height: 100,
 					Type:   types.EventTypeMessage,
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/unknown.msg.Type",
 					},
 				},
 				{
 					Height: 100,
 					Type:   "some_event",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/next.action",
 					},
 				},
@@ -64,7 +64,7 @@ func Test_Handle_boundarySafety(t *testing.T) {
 				{
 					Height: 100,
 					Type:   types.EventTypeMessage,
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/unknown.msg.Type",
 					},
 				},
@@ -83,19 +83,19 @@ func Test_Handle_boundarySafety(t *testing.T) {
 				{
 					Height: 100,
 					Type:   types.EventTypeMessage,
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/unknown.msg.Type",
 					},
 				},
 				{
 					Height: 100,
 					Type:   "some_event",
-					Data:   map[string]any{},
+					Data:   map[string]string{},
 				},
 				{
 					Height: 100,
 					Type:   types.EventTypeMessage,
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/another.action",
 					},
 				},
@@ -146,14 +146,14 @@ func Test_handle_sliceIterationSafety(t *testing.T) {
 				{
 					Height: 100,
 					Type:   types.EventTypeMessage,
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/test",
 					},
 				},
 				{
 					Height: 100,
 					Type:   "other_event",
-					Data:   map[string]any{},
+					Data:   map[string]string{},
 				},
 			},
 			msg: &storage.Message{
@@ -172,7 +172,7 @@ func Test_handle_sliceIterationSafety(t *testing.T) {
 				{
 					Height: 100,
 					Type:   types.EventTypeMessage,
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/test",
 					},
 				},
@@ -193,19 +193,19 @@ func Test_handle_sliceIterationSafety(t *testing.T) {
 				{
 					Height: 100,
 					Type:   types.EventTypeMessage,
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/test",
 					},
 				},
 				{
 					Height: 100,
 					Type:   "coin_spent",
-					Data:   map[string]any{},
+					Data:   map[string]string{},
 				},
 				{
 					Height: 100,
 					Type:   "transfer",
-					Data:   map[string]any{},
+					Data:   map[string]string{},
 				},
 			},
 			msg: &storage.Message{
@@ -258,7 +258,7 @@ func Test_toTheNextAction_incrementSafety(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
@@ -271,13 +271,13 @@ func Test_toTheNextAction_incrementSafety(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/some.action",
 					},
 				},
@@ -290,19 +290,19 @@ func Test_toTheNextAction_incrementSafety(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/action",
 					},
 				},
@@ -315,13 +315,13 @@ func Test_toTheNextAction_incrementSafety(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
@@ -356,19 +356,19 @@ func Test_recvPacket_incrementBy2Safety(t *testing.T) {
 				{
 					Height: 100,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgRecvPacket",
 					},
 				},
 				{
 					Height: 100,
 					Type:   types.EventTypeRecvPacket,
-					Data:   map[string]any{},
+					Data:   map[string]string{},
 				},
 				{
 					Height: 100,
 					Type:   "some_event",
-					Data:   map[string]any{},
+					Data:   map[string]string{},
 				},
 			},
 			msg: &storage.Message{
@@ -388,14 +388,14 @@ func Test_recvPacket_incrementBy2Safety(t *testing.T) {
 				{
 					Height: 100,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgRecvPacket",
 					},
 				},
 				{
 					Height: 100,
 					Type:   types.EventTypeRecvPacket,
-					Data:   map[string]any{},
+					Data:   map[string]string{},
 				},
 			},
 			msg: &storage.Message{

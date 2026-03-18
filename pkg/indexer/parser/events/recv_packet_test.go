@@ -37,13 +37,13 @@ func Test_handleRecvPacket(t *testing.T) {
 				{
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgRecvPacket",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "recv_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_channel_ordering":  "ORDER_ORDERED",
 						"packet_connection":        "connection-3",
 						"packet_data":              "{\"data\":\"CqIBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEoEBCkNjZWxlc3RpYTF4enNkbjY1aHlsamNtZW5seHlqbWRtdmdoaGQwdzR1dDI3azNmeDU2anAycDY5ZWg2c3JzOHAzcnNzEi9jZWxlc3RpYTFkc21ueno4cXZuMzQzbHhxMmV3NjczOXNkMDJnc3NweWVzYTRqdRoJCgR1dGlhEgEx\",\"memo\":\"rootulp\",\"type\":\"TYPE_EXECUTE_TX\"}",
@@ -59,27 +59,27 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "1utia",
 						"spender": "celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "1utia",
 						"receiver": "celestia1dsmnzz8qvn343lxq2ew6739sd02gsspyesa4ju",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "1utia",
 						"recipient": "celestia1dsmnzz8qvn343lxq2ew6739sd02gsspyesa4ju",
 						"sender":    "celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss",
@@ -87,19 +87,19 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "bank",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "ics27_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"host_channel_id": "channel-2",
 						"module":          "interchainaccounts",
 						"success":         "true",
@@ -107,7 +107,7 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "write_acknowledgement",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_ack":               "{\"result\":\"EiYKJC9jb3Ntb3MuYmFuay52MWJldGExLk1zZ1NlbmRSZXNwb25zZQ==\"}",
 						"packet_ack_hex":           "7b22726573756c74223a224569594b4a43396a62334e7462334d75596d4675617935324d574a6c644745784c6b317a5a314e6c626d52535a584e776232357a5a513d3d227d",
 						"packet_connection":        "connection-3",
@@ -168,13 +168,13 @@ func Test_handleRecvPacket(t *testing.T) {
 				{
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgRecvPacket",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "recv_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_channel_ordering":  "ORDER_UNORDERED",
 						"packet_connection":        "connection-7",
 						"packet_data":              "{\"amount\":\"4000000\",\"denom\":\"transfer/channel-35/utia\",\"memo\":\"{\\\"forward\\\":{\\\"receiver\\\":\\\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\\\",\\\"port\\\":\\\"transfer\\\",\\\"channel\\\":\\\"channel-2\\\",\\\"timeout\\\":0,\\\"retries\\\":2,\\\"next\\\":{\\\"wasm\\\":{\\\"contract\\\":\\\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\\\",\\\"msg\\\":{\\\"swap_and_action\\\":{\\\"user_swap\\\":{\\\"swap_exact_asset_in\\\":{\\\"swap_venue_name\\\":\\\"osmosis-poolmanager\\\",\\\"operations\\\":[{\\\"pool\\\":\\\"1475\\\",\\\"denom_in\\\":\\\"ibc/D79E7D83AB399BFFF93433E54FAA480C191248FC556924A2A8351AE2638B3877\\\",\\\"denom_out\\\":\\\"factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA\\\"},{\\\"pool\\\":\\\"1694\\\",\\\"denom_in\\\":\\\"factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA\\\",\\\"denom_out\\\":\\\"ibc/69110FF673D70B39904FF056CFDFD58A90BEC3194303F45C32CB91B8B0A738EA\\\"},{\\\"pool\\\":\\\"1698\\\",\\\"denom_in\\\":\\\"ibc/69110FF673D70B39904FF056CFDFD58A90BEC3194303F45C32CB91B8B0A738EA\\\",\\\"denom_out\\\":\\\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\\\"}]}},\\\"min_asset\\\":{\\\"native\\\":{\\\"denom\\\":\\\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\\\",\\\"amount\\\":\\\"1095116599248063092\\\"}},\\\"timeout_timestamp\\\":1726673962233433067,\\\"post_swap_action\\\":{\\\"ibc_transfer\\\":{\\\"ibc_info\\\":{\\\"source_channel\\\":\\\"channel-122\\\",\\\"receiver\\\":\\\"inj1syrdh2v2rwf8fhvs5gsmwr4ahcns3m4zvcukwc\\\",\\\"memo\\\":\\\"\\\",\\\"recover_address\\\":\\\"osmo1m84nh75hl474k5d83cunrqfxgmrl523u5q09xw\\\"}}},\\\"affiliates\\\":[{\\\"basis_points_fee\\\":\\\"60\\\",\\\"address\\\":\\\"osmo1my4tk420gjmhggqwvvha6ey9390gqwfree2p4u\\\"},{\\\"basis_points_fee\\\":\\\"15\\\",\\\"address\\\":\\\"osmo1msjnal2glfz6ze8x9kduhg45xppx9sddawfx46\\\"}]}}}}}}\",\"receiver\":\"celestia1m84nh75hl474k5d83cunrqfxgmrl523ud3d923\",\"sender\":\"neutron1m84nh75hl474k5d83cunrqfxgmrl523ucy4h2m\"}",
@@ -190,27 +190,27 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "4000000utia",
 						"spender": "celestia187dz9zlxc3zrltzx5756tu7zew6yu3v0smnfem",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "4000000utia",
 						"receiver": "celestia1wzpmvah0aqy7cq948tswayvvstty2djtjm88ee",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "4000000utia",
 						"recipient": "celestia1wzpmvah0aqy7cq948tswayvvstty2djtjm88ee",
 						"sender":    "celestia187dz9zlxc3zrltzx5756tu7zew6yu3v0smnfem",
@@ -218,13 +218,13 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia187dz9zlxc3zrltzx5756tu7zew6yu3v0smnfem",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "fungible_token_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "4000000",
 						"denom":    "transfer/channel-35/utia",
 						"memo":     "",
@@ -236,21 +236,21 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "4000000utia",
 						"spender": "celestia1wzpmvah0aqy7cq948tswayvvstty2djtjm88ee",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "4000000utia",
 						"receiver": "celestia12k2pyuylm9t7ugdvz67h9pg4gmmvhn5vwv5zte",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "4000000utia",
 						"recipient": "celestia12k2pyuylm9t7ugdvz67h9pg4gmmvhn5vwv5zte",
 						"sender":    "celestia1wzpmvah0aqy7cq948tswayvvstty2djtjm88ee",
@@ -258,13 +258,13 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1wzpmvah0aqy7cq948tswayvvstty2djtjm88ee",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "send_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_channel_ordering":  "ORDER_UNORDERED",
 						"packet_connection":        "connection-2",
 						"packet_data":              "{\"amount\":\"4000000\",\"denom\":\"utia\",\"memo\":\"{\\\"wasm\\\":{\\\"contract\\\":\\\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\\\",\\\"msg\\\":{\\\"swap_and_action\\\":{\\\"user_swap\\\":{\\\"swap_exact_asset_in\\\":{\\\"swap_venue_name\\\":\\\"osmosis-poolmanager\\\",\\\"operations\\\":[{\\\"pool\\\":\\\"1475\\\",\\\"denom_in\\\":\\\"ibc/D79E7D83AB399BFFF93433E54FAA480C191248FC556924A2A8351AE2638B3877\\\",\\\"denom_out\\\":\\\"factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA\\\"},{\\\"pool\\\":\\\"1694\\\",\\\"denom_in\\\":\\\"factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA\\\",\\\"denom_out\\\":\\\"ibc/69110FF673D70B39904FF056CFDFD58A90BEC3194303F45C32CB91B8B0A738EA\\\"},{\\\"pool\\\":\\\"1698\\\",\\\"denom_in\\\":\\\"ibc/69110FF673D70B39904FF056CFDFD58A90BEC3194303F45C32CB91B8B0A738EA\\\",\\\"denom_out\\\":\\\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\\\"}]}},\\\"min_asset\\\":{\\\"native\\\":{\\\"denom\\\":\\\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\\\",\\\"amount\\\":\\\"1095116599248063092\\\"}},\\\"timeout_timestamp\\\":1726673962233433000,\\\"post_swap_action\\\":{\\\"ibc_transfer\\\":{\\\"ibc_info\\\":{\\\"source_channel\\\":\\\"channel-122\\\",\\\"receiver\\\":\\\"inj1syrdh2v2rwf8fhvs5gsmwr4ahcns3m4zvcukwc\\\",\\\"memo\\\":\\\"\\\",\\\"recover_address\\\":\\\"osmo1m84nh75hl474k5d83cunrqfxgmrl523u5q09xw\\\"}}},\\\"affiliates\\\":[{\\\"basis_points_fee\\\":\\\"60\\\",\\\"address\\\":\\\"osmo1my4tk420gjmhggqwvvha6ey9390gqwfree2p4u\\\"},{\\\"basis_points_fee\\\":\\\"15\\\",\\\"address\\\":\\\"osmo1msjnal2glfz6ze8x9kduhg45xppx9sddawfx46\\\"}]}}}}\",\"receiver\":\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\",\"sender\":\"celestia1wzpmvah0aqy7cq948tswayvvstty2djtjm88ee\"}",
@@ -280,32 +280,32 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "ibc_transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"receiver": "osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv",
 						"sender":   "celestia1wzpmvah0aqy7cq948tswayvvstty2djtjm88ee",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "transfer",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgRecvPacket",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "recv_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_channel_ordering":  "ORDER_UNORDERED",
 						"packet_connection":        "connection-7",
 						"packet_data":              "{\"amount\":\"100\",\"denom\":\"transfer/channel-35/utia\",\"receiver\":\"celestia1nsxcgald2c3622hfwflps608tqrj9l3wdcmq9s\",\"sender\":\"neutron1upjaknf6lmnu3p4llldp8jx0whzsxlgetu9zjt\"}",
@@ -321,27 +321,27 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "100utia",
 						"spender": "celestia187dz9zlxc3zrltzx5756tu7zew6yu3v0smnfem",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "100utia",
 						"receiver": "celestia1nsxcgald2c3622hfwflps608tqrj9l3wdcmq9s",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "100utia",
 						"recipient": "celestia1nsxcgald2c3622hfwflps608tqrj9l3wdcmq9s",
 						"sender":    "celestia187dz9zlxc3zrltzx5756tu7zew6yu3v0smnfem",
@@ -349,13 +349,13 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia187dz9zlxc3zrltzx5756tu7zew6yu3v0smnfem",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "fungible_token_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "100",
 						"denom":    "transfer/channel-35/utia",
 						"memo":     "",
@@ -367,7 +367,7 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "write_acknowledgement",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_ack":               "{\"result\":\"AQ==\"}",
 						"packet_ack_hex":           "7b22726573756c74223a2241513d3d227d",
 						"packet_connection":        "connection-7",
@@ -384,7 +384,7 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				},
@@ -459,13 +459,13 @@ func Test_handleRecvPacket(t *testing.T) {
 				{
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgRecvPacket",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "recv_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_channel_ordering":  "ORDER_ORDERED",
 						"packet_connection":        "connection-99",
 						"packet_data":              "{\"data\":\"CrMBCiUvY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dVbmRlbGVnYXRlEokBCkNjZWxlc3RpYTFmM2h4N3JkejVxYXN5Z2ZnNTNsZms0cTZsaDRmcGFqdXZhcXNjZDc2MHV5dWM4bHd4OXhzanFsNnR2EjZjZWxlc3RpYXZhbG9wZXIxcmZsdXRrM2V1dzhkY3dhZWh4d3VnY205cGV3a2RuNTZ4amxoMjYaCgoEdXRpYRICMzMKswEKJS9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ1VuZGVsZWdhdGUSiQEKQ2NlbGVzdGlhMWYzaHg3cmR6NXFhc3lnZmc1M2xmazRxNmxoNGZwYWp1dmFxc2NkNzYwdXl1Yzhsd3g5eHNqcWw2dHYSNmNlbGVzdGlhdmFsb3BlcjF4enJ5OGEzc3MwOHRwd21mcmc0dTgyN3JxdDlqdXczMjBkMDBseBoKCgR1dGlhEgIzNAqzAQolL2Nvc21vcy5zdGFraW5nLnYxYmV0YTEuTXNnVW5kZWxlZ2F0ZRKJAQpDY2VsZXN0aWExZjNoeDdyZHo1cWFzeWdmZzUzbGZrNHE2bGg0ZnBhanV2YXFzY2Q3NjB1eXVjOGx3eDl4c2pxbDZ0dhI2Y2VsZXN0aWF2YWxvcGVyMTl1cmc5YXdqendxOGQ0MHZ3amR2djB5dzlrZ2Voc2NmMHp4M2dzGgoKBHV0aWESAjM0CrMBCiUvY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dVbmRlbGVnYXRlEokBCkNjZWxlc3RpYTFmM2h4N3JkejVxYXN5Z2ZnNTNsZms0cTZsaDRmcGFqdXZhcXNjZDc2MHV5dWM4bHd4OXhzanFsNnR2EjZjZWxlc3RpYXZhbG9wZXIxOWp5ZTc2YW51cTdxdHJoNDV1c3NkemZwODBsMzlhNDk4Y2g1MzIaCgoEdXRpYRICMzQKswEKJS9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ1VuZGVsZWdhdGUSiQEKQ2NlbGVzdGlhMWYzaHg3cmR6NXFhc3lnZmc1M2xmazRxNmxoNGZwYWp1dmFxc2NkNzYwdXl1Yzhsd3g5eHNqcWw2dHYSNmNlbGVzdGlhdmFsb3BlcjF6NGVreHc3Nnd0d2N6ZXhmbmp4OHA5dmNudDJwajdwNmpydndyMBoKCgR1dGlhEgIzNAqzAQolL2Nvc21vcy5zdGFraW5nLnYxYmV0YTEuTXNnVW5kZWxlZ2F0ZRKJAQpDY2VsZXN0aWExZjNoeDdyZHo1cWFzeWdmZzUzbGZrNHE2bGg0ZnBhanV2YXFzY2Q3NjB1eXVjOGx3eDl4c2pxbDZ0dhI2Y2VsZXN0aWF2YWxvcGVyMXpmN3Q4YWh5dDc1dnQwcGN0dWxhMjB2czc2bWw2eXByZjVkbTBjGgoKBHV0aWESAjM0CrMBCiUvY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dVbmRlbGVnYXRlEokBCkNjZWxlc3RpYTFmM2h4N3JkejVxYXN5Z2ZnNTNsZms0cTZsaDRmcGFqdXZhcXNjZDc2MHV5dWM4bHd4OXhzanFsNnR2EjZjZWxlc3RpYXZhbG9wZXIxenp4cnE3dGpsc3F2djBqdHF0bHQ4Z2phYTY4cmFjdWtmNW45eGgaCgoEdXRpYRICMjYKswEKJS9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ1VuZGVsZWdhdGUSiQEKQ2NlbGVzdGlhMWYzaHg3cmR6NXFhc3lnZmc1M2xmazRxNmxoNGZwYWp1dmFxc2NkNzYwdXl1Yzhsd3g5eHNqcWw2dHYSNmNlbGVzdGlhdmFsb3BlcjF5YWNkNGY4aDdtOGZwdXY1Nmh6ZnM0cWRzN2M0NnZqdzc1czd5ehoKCgR1dGlhEgIzNAqzAQolL2Nvc21vcy5zdGFraW5nLnYxYmV0YTEuTXNnVW5kZWxlZ2F0ZRKJAQpDY2VsZXN0aWExZjNoeDdyZHo1cWFzeWdmZzUzbGZrNHE2bGg0ZnBhanV2YXFzY2Q3NjB1eXVjOGx3eDl4c2pxbDZ0dhI2Y2VsZXN0aWF2YWxvcGVyMTl6bDgwNjA2d242aGo1NzVyMjB3eHlla3U3dGV0OXAzNHVmcG5zGgoKBHV0aWESAjMzCrMBCiUvY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dVbmRlbGVnYXRlEokBCkNjZWxlc3RpYTFmM2h4N3JkejVxYXN5Z2ZnNTNsZms0cTZsaDRmcGFqdXZhcXNjZDc2MHV5dWM4bHd4OXhzanFsNnR2EjZjZWxlc3RpYXZhbG9wZXIxcXl1d3FqMGN4ZTZobHpqcnU1ODdueWd3d21naDAzaGE5dmU5YWMaCgoEdXRpYRICMzMKswEKJS9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ1VuZGVsZWdhdGUSiQEKQ2NlbGVzdGlhMWYzaHg3cmR6NXFhc3lnZmc1M2xmazRxNmxoNGZwYWp1dmFxc2NkNzYwdXl1Yzhsd3g5eHNqcWw2dHYSNmNlbGVzdGlhdmFsb3BlcjF5NzRwdGE3Z2Z5YXB2ZmxhZDl6MHh6amQ5OGc5Y3N6MGs0ejdhNxoKCgR1dGlhEgIzNAqzAQolL2Nvc21vcy5zdGFraW5nLnYxYmV0YTEuTXNnVW5kZWxlZ2F0ZRKJAQpDY2VsZXN0aWExZjNoeDdyZHo1cWFzeWdmZzUzbGZrNHE2bGg0ZnBhanV2YXFzY2Q3NjB1eXVjOGx3eDl4c2pxbDZ0dhI2Y2VsZXN0aWF2YWxvcGVyMXljbDM3cXdxMjIzeHRsOTRjNGhncWtqbGZwejM1a2Y3ejM4dWhrGgoKBHV0aWESAjM0CrMBCiUvY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dVbmRlbGVnYXRlEokBCkNjZWxlc3RpYTFmM2h4N3JkejVxYXN5Z2ZnNTNsZms0cTZsaDRmcGFqdXZhcXNjZDc2MHV5dWM4bHd4OXhzanFsNnR2EjZjZWxlc3RpYXZhbG9wZXIxcTN2NWN1Z2M4Y2RwdWQ4N3U0end5MGE3NHV4a2s2dTRxNGd4NHAaCgoEdXRpYRICMzQKswEKJS9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ1VuZGVsZWdhdGUSiQEKQ2NlbGVzdGlhMWYzaHg3cmR6NXFhc3lnZmc1M2xmazRxNmxoNGZwYWp1dmFxc2NkNzYwdXl1Yzhsd3g5eHNqcWw2dHYSNmNlbGVzdGlhdmFsb3BlcjFwajdwdmhjZWQ3c25wdnlqa2FjbGU3NGZkbWhkd2xxZHdleGFsaxoKCgR1dGlhEgIzNAqzAQolL2Nvc21vcy5zdGFraW5nLnYxYmV0YTEuTXNnVW5kZWxlZ2F0ZRKJAQpDY2VsZXN0aWExZjNoeDdyZHo1cWFzeWdmZzUzbGZrNHE2bGg0ZnBhanV2YXFzY2Q3NjB1eXVjOGx3eDl4c2pxbDZ0dhI2Y2VsZXN0aWF2YWxvcGVyMXk5dzg1cWpnaGR0YzJocmwydjd2c3UzdWxhbHljMjdlOTN1bWp4GgoKBHV0aWESAjM0\",\"memo\":\"\",\"type\":\"TYPE_EXECUTE_TX\"}",
@@ -481,13 +481,13 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "0stake",
 						"delegator": "celestia1f3hx7rdz5qasygfg53lfk4q6lh4fpajuvaqscd760uyuc8lwx9xsjql6tv",
 						"validator": "celestiavaloper1rflutk3euw8dcwaehxwugcm9pewkdn56xjlh26",
@@ -495,21 +495,21 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "33utia",
 						"spender": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "33utia",
 						"receiver": "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "33utia",
 						"recipient": "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
 						"sender":    "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
@@ -517,13 +517,13 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "unbond",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "33utia",
 						"completion_time": "2024-11-13T06:36:18Z",
 						"validator":       "celestiavaloper1rflutk3euw8dcwaehxwugcm9pewkdn56xjlh26",
@@ -531,14 +531,14 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "staking",
 						"sender": "celestia1f3hx7rdz5qasygfg53lfk4q6lh4fpajuvaqscd760uyuc8lwx9xsjql6tv",
 					},
 				}, {
 					Height: 1866988,
 					Type:   "ics27_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"host_channel_id": "channel-166",
 						"module":          "interchainaccounts",
 						"success":         "true",
@@ -546,7 +546,7 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "write_acknowledgement",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_ack":               "{\"result\":\"Ej4KLS9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ1VuZGVsZWdhdGVSZXNwb25zZRINCgsI4pHRuQYQxL+MVBI+Ci0vY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dVbmRlbGVnYXRlUmVzcG9uc2USDQoLCOKR0bkGEMS/jFQSPgotL2Nvc21vcy5zdGFraW5nLnYxYmV0YTEuTXNnVW5kZWxlZ2F0ZVJlc3BvbnNlEg0KCwjikdG5BhDEv4xUEj4KLS9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ1VuZGVsZWdhdGVSZXNwb25zZRINCgsI4pHRuQYQxL+MVBI+Ci0vY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dVbmRlbGVnYXRlUmVzcG9uc2USDQoLCOKR0bkGEMS/jFQSPgotL2Nvc21vcy5zdGFraW5nLnYxYmV0YTEuTXNnVW5kZWxlZ2F0ZVJlc3BvbnNlEg0KCwjikdG5BhDEv4xUEj4KLS9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ1VuZGVsZWdhdGVSZXNwb25zZRINCgsI4pHRuQYQxL+MVBI+Ci0vY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dVbmRlbGVnYXRlUmVzcG9uc2USDQoLCOKR0bkGEMS/jFQSPgotL2Nvc21vcy5zdGFraW5nLnYxYmV0YTEuTXNnVW5kZWxlZ2F0ZVJlc3BvbnNlEg0KCwjikdG5BhDEv4xUEj4KLS9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ1VuZGVsZWdhdGVSZXNwb25zZRINCgsI4pHRuQYQxL+MVBI+Ci0vY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dVbmRlbGVnYXRlUmVzcG9uc2USDQoLCOKR0bkGEMS/jFQSPgotL2Nvc21vcy5zdGFraW5nLnYxYmV0YTEuTXNnVW5kZWxlZ2F0ZVJlc3BvbnNlEg0KCwjikdG5BhDEv4xUEj4KLS9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ1VuZGVsZWdhdGVSZXNwb25zZRINCgsI4pHRuQYQxL+MVBI+Ci0vY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dVbmRlbGVnYXRlUmVzcG9uc2USDQoLCOKR0bkGEMS/jFQSPgotL2Nvc21vcy5zdGFraW5nLnYxYmV0YTEuTXNnVW5kZWxlZ2F0ZVJlc3BvbnNlEg0KCwjikdG5BhDEv4xU\"}",
 						"packet_ack_hex":           "7b22726573756c74223a22456a344b4c53396a62334e7462334d756333526861326c755a7935324d574a6c644745784c6b317a5a3156755a4756735a576468644756535a584e776232357a5a52494e436773493470485275515951784c2b4d5642492b436930765932397a6257397a4c6e4e3059577470626d6375646a46695a5852684d53354e63326456626d526c6247566e5958526c556d567a634739756332555344516f4c434f4b5230626b47454d532f6a46515350676f744c324e76633231766379357a644746726157356e4c6e5978596d56305954457554584e6e5657356b5a57786c5a3246305a564a6c63334276626e4e6c4567304b43776a696b6447354268444576347855456a344b4c53396a62334e7462334d756333526861326c755a7935324d574a6c644745784c6b317a5a3156755a4756735a576468644756535a584e776232357a5a52494e436773493470485275515951784c2b4d5642492b436930765932397a6257397a4c6e4e3059577470626d6375646a46695a5852684d53354e63326456626d526c6247566e5958526c556d567a634739756332555344516f4c434f4b5230626b47454d532f6a46515350676f744c324e76633231766379357a644746726157356e4c6e5978596d56305954457554584e6e5657356b5a57786c5a3246305a564a6c63334276626e4e6c4567304b43776a696b6447354268444576347855456a344b4c53396a62334e7462334d756333526861326c755a7935324d574a6c644745784c6b317a5a3156755a4756735a576468644756535a584e776232357a5a52494e436773493470485275515951784c2b4d5642492b436930765932397a6257397a4c6e4e3059577470626d6375646a46695a5852684d53354e63326456626d526c6247566e5958526c556d567a634739756332555344516f4c434f4b5230626b47454d532f6a46515350676f744c324e76633231766379357a644746726157356e4c6e5978596d56305954457554584e6e5657356b5a57786c5a3246305a564a6c63334276626e4e6c4567304b43776a696b6447354268444576347855456a344b4c53396a62334e7462334d756333526861326c755a7935324d574a6c644745784c6b317a5a3156755a4756735a576468644756535a584e776232357a5a52494e436773493470485275515951784c2b4d5642492b436930765932397a6257397a4c6e4e3059577470626d6375646a46695a5852684d53354e63326456626d526c6247566e5958526c556d567a634739756332555344516f4c434f4b5230626b47454d532f6a46515350676f744c324e76633231766379357a644746726157356e4c6e5978596d56305954457554584e6e5657356b5a57786c5a3246305a564a6c63334276626e4e6c4567304b43776a696b6447354268444576347855456a344b4c53396a62334e7462334d756333526861326c755a7935324d574a6c644745784c6b317a5a3156755a4756735a576468644756535a584e776232357a5a52494e436773493470485275515951784c2b4d5642492b436930765932397a6257397a4c6e4e3059577470626d6375646a46695a5852684d53354e63326456626d526c6247566e5958526c556d567a634739756332555344516f4c434f4b5230626b47454d532f6a46515350676f744c324e76633231766379357a644746726157356e4c6e5978596d56305954457554584e6e5657356b5a57786c5a3246305a564a6c63334276626e4e6c4567304b43776a696b6447354268444576347855227d",
 						"packet_connection":        "connection-99",
@@ -563,7 +563,7 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 1866988,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				},
@@ -633,13 +633,13 @@ func Test_handleRecvPacket(t *testing.T) {
 				{
 					Height: 2432340,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgRecvPacket",
 					},
 				}, {
 					Height: 2432340,
 					Type:   "recv_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_channel_ordering":  "ORDER_ORDERED",
 						"packet_connection":        "connection-60",
 						"packet_data":              "{\"data\":\"CrQBCiMvY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dEZWxlZ2F0ZRKMAQpDY2VsZXN0aWExbHVtYWVtemV0Z3g3ZmE4Z2N3M3dhYWdldnM2cnFoZWpmd3hkdnN6enhsbmVzZWxzaHd4cW01cm14bhI2Y2VsZXN0aWF2YWxvcGVyMTMzdDRncHY0dmhwcWdmbjlncjhsNHU0MjN6cmdsZzhya3FldXByGg0KBHV0aWESBTEwMDAw\",\"memo\":\"perf/celestiavaloper133t4gpv4vhpqgfn9gr8l4u423zrglg8rkqeupr\",\"type\":\"TYPE_EXECUTE_TX\"}",
@@ -655,27 +655,27 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2432340,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				}, {
 					Height: 2432340,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "10000utia",
 						"spender": "celestia1lumaemzetgx7fa8gcw3waagevs6rqhejfwxdvszzxlneselshwxqm5rmxn",
 					},
 				}, {
 					Height: 2432340,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "10000utia",
 						"receiver": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
 				}, {
 					Height: 2432340,
 					Type:   "delegate",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":     "10000utia",
 						"new_shares": "10000.000000000000000000",
 						"validator":  "celestiavaloper133t4gpv4vhpqgfn9gr8l4u423zrglg8rkqeupr",
@@ -683,14 +683,14 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2432340,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "staking",
 						"sender": "celestia1lumaemzetgx7fa8gcw3waagevs6rqhejfwxdvszzxlneselshwxqm5rmxn",
 					},
 				}, {
 					Height: 2432340,
 					Type:   "ics27_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"host_channel_id": "channel-44",
 						"module":          "interchainaccounts",
 						"success":         "true",
@@ -698,7 +698,7 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2432340,
 					Type:   "write_acknowledgement",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_ack":               "{\"result\":\"Ei0KKy9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ0RlbGVnYXRlUmVzcG9uc2U=\"}",
 						"packet_ack_hex":           "7b22726573756c74223a224569304b4b79396a62334e7462334d756333526861326c755a7935324d574a6c644745784c6b317a5a30526c6247566e5958526c556d567a634739756332553d227d",
 						"packet_connection":        "connection-60",
@@ -715,19 +715,19 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2432340,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				}, {
 					Height: 2432340,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgRecvPacket",
 					},
 				}, {
 					Height: 2432340,
 					Type:   "recv_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_channel_ordering":  "ORDER_ORDERED",
 						"packet_connection":        "connection-60",
 						"packet_data":              "{\"data\":\"CrQBCiMvY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dEZWxlZ2F0ZRKMAQpDY2VsZXN0aWExbHVtYWVtemV0Z3g3ZmE4Z2N3M3dhYWdldnM2cnFoZWpmd3hkdnN6enhsbmVzZWxzaHd4cW01cm14bhI2Y2VsZXN0aWF2YWxvcGVyMWNzMzd0dm1haGF2dzh4Y256Y2d5ejM0MnNoMGFsMzdtYTR6cWF0Gg0KBHV0aWESBTEwMDAw\",\"memo\":\"perf/celestiavaloper1cs37tvmahavw8xcnzcgyz342sh0al37ma4zqat\",\"type\":\"TYPE_EXECUTE_TX\"}",
@@ -743,27 +743,27 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2432340,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				}, {
 					Height: 2432340,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "10000utia",
 						"spender": "celestia1lumaemzetgx7fa8gcw3waagevs6rqhejfwxdvszzxlneselshwxqm5rmxn",
 					},
 				}, {
 					Height: 2432340,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "10000utia",
 						"receiver": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
 				}, {
 					Height: 2432340,
 					Type:   "delegate",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":     "10000utia",
 						"new_shares": "10000.000000000000000000",
 						"validator":  "celestiavaloper1cs37tvmahavw8xcnzcgyz342sh0al37ma4zqat",
@@ -771,14 +771,14 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2432340,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "staking",
 						"sender": "celestia1lumaemzetgx7fa8gcw3waagevs6rqhejfwxdvszzxlneselshwxqm5rmxn",
 					},
 				}, {
 					Height: 2432340,
 					Type:   "ics27_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"host_channel_id": "channel-44",
 						"module":          "interchainaccounts",
 						"success":         "true",
@@ -786,7 +786,7 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2432340,
 					Type:   "write_acknowledgement",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_ack":               "{\"result\":\"Ei0KKy9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ0RlbGVnYXRlUmVzcG9uc2U=\"}",
 						"packet_ack_hex":           "7b22726573756c74223a224569304b4b79396a62334e7462334d756333526861326c755a7935324d574a6c644745784c6b317a5a30526c6247566e5958526c556d567a634739756332553d227d",
 						"packet_connection":        "connection-60",
@@ -803,7 +803,7 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2432340,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				},
@@ -885,13 +885,13 @@ func Test_handleRecvPacket(t *testing.T) {
 				{
 					Height: 2476842,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgRecvPacket",
 					},
 				}, {
 					Height: 2476842,
 					Type:   "recv_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_channel_ordering":  "ORDER_ORDERED",
 						"packet_connection":        "connection-57",
 						"packet_data":              "{\"data\":\"CrcBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEpYBCkNjZWxlc3RpYTFuNWp1OG5xNHQ0NHRrbWEyYW1lNnhkZnN4MnRjdG03eDR4dXd4MG1keXRjenJhNHJ0Z2hzbDVlczVkEkNjZWxlc3RpYTE2OXl1cDU2eWR4MmE0MHhrZDcydzJ5cHFqanpnbWw2MnIzMDJ4bWxlN3QwMjY0NGFyazZxN3kweGU1GgoKBHV0aWESAjEzCrgBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEpcBCkNjZWxlc3RpYTFuNWp1OG5xNHQ0NHRrbWEyYW1lNnhkZnN4MnRjdG03eDR4dXd4MG1keXRjenJhNHJ0Z2hzbDVlczVkEkNjZWxlc3RpYTEyN2RocGhuMHM5cXZxODZxM3dxOTVseXM3Zm1hanlod3RkbDNlcjB3MDk0aGpoc3NjNjJzOTQ3cXNrGgsKBHV0aWESAzExNw==\",\"memo\":\"\",\"type\":\"TYPE_EXECUTE_TX\"}",
@@ -907,27 +907,27 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2476842,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				}, {
 					Height: 2476842,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "13utia",
 						"spender": "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
 					},
 				}, {
 					Height: 2476842,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "13utia",
 						"receiver": "celestia169yup56ydx2a40xkd72w2ypqjjzgml62r302xmle7t02644ark6q7y0xe5",
 					},
 				}, {
 					Height: 2476842,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "13utia",
 						"recipient": "celestia169yup56ydx2a40xkd72w2ypqjjzgml62r302xmle7t02644ark6q7y0xe5",
 						"sender":    "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
@@ -935,33 +935,33 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2476842,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
 					},
 				}, {
 					Height: 2476842,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "bank",
 					},
 				}, {
 					Height: 2476842,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "117utia",
 						"spender": "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
 					},
 				}, {
 					Height: 2476842,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "117utia",
 						"receiver": "celestia127dhphn0s9qvq86q3wq95lys7fmajyhwtdl3er0w094hjhssc62s947qsk",
 					},
 				}, {
 					Height: 2476842,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "117utia",
 						"recipient": "celestia127dhphn0s9qvq86q3wq95lys7fmajyhwtdl3er0w094hjhssc62s947qsk",
 						"sender":    "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
@@ -969,19 +969,19 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2476842,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1n5ju8nq4t44tkma2ame6xdfsx2tctm7x4xuwx0mdytczra4rtghsl5es5d",
 					},
 				}, {
 					Height: 2476842,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "bank",
 					},
 				}, {
 					Height: 2476842,
 					Type:   "ics27_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"host_channel_id": "channel-46",
 						"module":          "interchainaccounts",
 						"success":         "true",
@@ -989,7 +989,7 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2476842,
 					Type:   "write_acknowledgement",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_ack":               "{\"result\":\"EiYKJC9jb3Ntb3MuYmFuay52MWJldGExLk1zZ1NlbmRSZXNwb25zZRImCiQvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kUmVzcG9uc2U=\"}",
 						"packet_ack_hex":           "7b22726573756c74223a224569594b4a43396a62334e7462334d75596d4675617935324d574a6c644745784c6b317a5a314e6c626d52535a584e776232357a5a52496d436951765932397a6257397a4c6d4a68626d7375646a46695a5852684d53354e633264545a57356b556d567a634739756332553d227d",
 						"packet_connection":        "connection-57",
@@ -1006,7 +1006,7 @@ func Test_handleRecvPacket(t *testing.T) {
 				}, {
 					Height: 2476842,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				},

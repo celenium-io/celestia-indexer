@@ -39,17 +39,23 @@ func processChannelOpenInit(ctx *context.Context, events []storage.Event, msg *s
 	if !ok {
 		return errors.Errorf("can't receive channel settings from %s", msg.Type)
 	}
-	settings, ok := channelSettings.(map[string]any)
+	settings, ok := channelSettings.(storageTypes.PackedBytes)
 	if !ok {
 		return errors.Errorf("can't cast channel settings to map: %##v", channelSettings)
 	}
-	version := decoder.StringFromMap(settings, "Version")
+	version, err := settings.GetString("Version")
+	if err != nil {
+		return errors.Wrap(err, "get string")
+	}
 	ordering, err := decoder.ChannelOrderingFromMap(settings, "Ordering")
 	if err != nil {
 		return errors.Wrap(err, "parse ordering")
 	}
 
-	signer := decoder.StringFromMap(msg.Data, "Signer")
+	signer, err := msg.Data.GetString("Signer")
+	if err != nil {
+		return errors.Wrap(err, "get string")
+	}
 
 	channel := &storage.IbcChannel{
 		Id:                    cc.ChannelId,

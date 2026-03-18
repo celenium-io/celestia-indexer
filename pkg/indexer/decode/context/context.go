@@ -182,7 +182,7 @@ func (ctx *Context) AddValidator(validator storage.Validator) {
 	}
 }
 
-func (ctx *Context) AddSupply(data map[string]any) {
+func (ctx *Context) AddSupply(data map[string]string) {
 	coin, err := decoder.CoinFromMap(data, "amount")
 	if err == nil {
 		if coin.GetDenom() == currency.DefaultCurrency {
@@ -195,7 +195,7 @@ func (ctx *Context) AddSupply(data map[string]any) {
 	}
 }
 
-func (ctx *Context) SubSupply(data map[string]any) {
+func (ctx *Context) SubSupply(data map[string]string) {
 	coin, err := decoder.CoinFromMap(data, "amount")
 	if err == nil {
 		if coin.GetDenom() == currency.DefaultCurrency {
@@ -208,7 +208,7 @@ func (ctx *Context) SubSupply(data map[string]any) {
 	}
 }
 
-func (ctx *Context) SetInflation(data map[string]any) {
+func (ctx *Context) SetInflation(data map[string]string) {
 	ctx.Block.Stats.InflationRate = decoder.DecimalFromMap(data, "inflation_rate")
 }
 

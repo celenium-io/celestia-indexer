@@ -18,7 +18,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func parseCoinSpent(ctx *context.Context, data map[string]any, height pkgTypes.Level) error {
+func parseCoinSpent(ctx *context.Context, data map[string]string, height pkgTypes.Level) error {
 	coinSpent, err := decode.NewCoinSpent(data)
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func parseCoinSpent(ctx *context.Context, data map[string]any, height pkgTypes.L
 	return ctx.AddAddress(address)
 }
 
-func parseCoinReceived(ctx *context.Context, data map[string]any, height pkgTypes.Level) error {
+func parseCoinReceived(ctx *context.Context, data map[string]string, height pkgTypes.Level) error {
 	coinReceived, err := decode.NewCoinReceived(data)
 	if err != nil {
 		return err
@@ -86,7 +86,7 @@ func parseCoinReceived(ctx *context.Context, data map[string]any, height pkgType
 	return ctx.AddAddress(address)
 }
 
-func parseCompleteUnbonding(ctx *context.Context, data map[string]any) error {
+func parseCompleteUnbonding(ctx *context.Context, data map[string]string) error {
 	unbonding, err := decode.NewCompleteUnbonding(data)
 	if err != nil {
 		return err
@@ -132,7 +132,7 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]any) error {
 	return ctx.AddAddress(address)
 }
 
-func parseCompleteRedelegation(ctx *context.Context, data map[string]any) error {
+func parseCompleteRedelegation(ctx *context.Context, data map[string]string) error {
 	redelegation, err := decode.NewCompleteRedelegation(data)
 	if err != nil {
 		return err
@@ -171,7 +171,7 @@ func parseCompleteRedelegation(ctx *context.Context, data map[string]any) error 
 	return ctx.AddAddress(address)
 }
 
-func parseCommission(ctx *context.Context, data map[string]any) error {
+func parseCommission(ctx *context.Context, data map[string]string) error {
 	commission, err := decode.NewCommission(data)
 	if err != nil {
 		return err
@@ -201,7 +201,7 @@ func parseCommission(ctx *context.Context, data map[string]any) error {
 	return nil
 }
 
-func parseRewards(ctx *context.Context, data map[string]any) error {
+func parseRewards(ctx *context.Context, data map[string]string) error {
 	rewards, err := decode.NewRewards(data)
 	if err != nil {
 		return err
@@ -231,7 +231,7 @@ func parseRewards(ctx *context.Context, data map[string]any) error {
 	return nil
 }
 
-func parseSlash(ctx *context.Context, data map[string]any) error {
+func parseSlash(ctx *context.Context, data map[string]string) error {
 	slash, err := decode.NewSlash(data)
 	if err != nil {
 		return err
@@ -261,7 +261,7 @@ func parseSlash(ctx *context.Context, data map[string]any) error {
 	return nil
 }
 
-func parseProposal(ctx *context.Context, data map[string]any) error {
+func parseProposal(ctx *context.Context, data map[string]string) error {
 	status, err := decode.NewProposalStatus(data)
 	if err != nil {
 		return err
@@ -291,7 +291,7 @@ func parseProposal(ctx *context.Context, data map[string]any) error {
 	return nil
 }
 
-func parseCreateIgp(ctx *context.Context, data map[string]any) error {
+func parseCreateIgp(ctx *context.Context, data map[string]string) error {
 	igp, err := decode.NewHyperlaneCreateIgpEvent(data)
 	if err != nil {
 		return err
@@ -320,7 +320,7 @@ func parseCreateIgp(ctx *context.Context, data map[string]any) error {
 	return nil
 }
 
-func parseSetDestinationGasConfig(ctx *context.Context, data map[string]any) error {
+func parseSetDestinationGasConfig(ctx *context.Context, data map[string]string) error {
 	igp, err := decode.NewHyperlaneSetDestinationGasConfig(data)
 	if err != nil {
 		return err
@@ -343,7 +343,7 @@ func parseSetDestinationGasConfig(ctx *context.Context, data map[string]any) err
 	return nil
 }
 
-func parseSetIgp(ctx *context.Context, data map[string]any) error {
+func parseSetIgp(ctx *context.Context, data map[string]string) error {
 	igp, err := decode.NewHyperlaneSetIgpEvent(data)
 	if err != nil {
 		return err

@@ -64,7 +64,7 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 			transfer.Body = processEvent.Message.Body
 			transfer.Type = types.HLTransferTypeReceive
 
-			if metadata := decoder.StringFromMap(msg.Data, "Metadata"); metadata != "" {
+			if metadata := msg.Data.GetStringOrDefault("Metadata"); metadata != "" {
 				decodedMetadata, err := util.DecodeEthHex(metadata)
 				if err != nil {
 					return errors.Wrap(err, "decode process message metadata")
@@ -72,9 +72,12 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 				transfer.Metadata = decodedMetadata
 			}
 
-			if relayer := decoder.StringFromMap(msg.Data, "Relayer"); relayer != "" {
+			if relayer := msg.Data.GetStringOrDefault("Relayer"); relayer != "" {
 				transfer.Relayer = &storage.Address{
-					Address: relayer,
+					Address:    relayer,
+					Height:     msg.Height,
+					LastHeight: msg.Height,
+					Balance:    storage.EmptyBalance(),
 				}
 			}
 			ctx.AddHlTransfer(transfer)

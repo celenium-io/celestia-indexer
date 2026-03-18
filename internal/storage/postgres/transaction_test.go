@@ -1191,7 +1191,7 @@ func (s *TransactionTestSuite) TestSaveEvents() {
 			Position: 0,
 			Type:     types.EventTypeBurn,
 			TxId:     testsuite.Ptr(uint64(1)),
-			Data: map[string]any{
+			Data: map[string]string{
 				"address": "address",
 				"value":   "value",
 			},
@@ -1200,7 +1200,7 @@ func (s *TransactionTestSuite) TestSaveEvents() {
 			Position: 1,
 			Type:     types.EventTypeCoinSpent,
 			TxId:     nil,
-			Data: map[string]any{
+			Data: map[string]string{
 				"address": "address",
 				"value":   "value",
 			},
@@ -1231,7 +1231,7 @@ func (s *TransactionTestSuite) TestSaveEventsWithCopy() {
 		events[i].Position = int64(i)
 		events[i].Type = types.EventTypeBurn
 		events[i].TxId = testsuite.Ptr(uint64(i))
-		events[i].Data = map[string]any{
+		events[i].Data = map[string]string{
 			"address": "address",
 			"value":   "value",
 		}

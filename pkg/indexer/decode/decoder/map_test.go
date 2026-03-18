@@ -14,48 +14,48 @@ import (
 func TestDecimalFromMap(t *testing.T) {
 	tests := []struct {
 		name string
-		m    map[string]any
+		m    map[string]string
 		key  string
 		want string
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"amount": "123utia",
 			},
 			key:  "amount",
 			want: "123",
 		}, {
 			name: "test 2",
-			m: map[string]any{
+			m: map[string]string{
 				"amount": "123utia",
 			},
 			key:  "invalid",
 			want: "0",
 		}, {
 			name: "test 3",
-			m: map[string]any{
+			m: map[string]string{
 				"amount": "123uta",
 			},
 			key:  "amount",
 			want: "123",
 		}, {
 			name: "test 4",
-			m: map[string]any{
-				"amount": 123,
+			m: map[string]string{
+				"amount": "",
 			},
 			key:  "amount",
 			want: "0",
 		}, {
 			name: "test 5",
-			m: map[string]any{
+			m: map[string]string{
 				"amount": "123test",
 			},
 			key:  "amount",
 			want: "123",
 		}, {
 			name: "test 6",
-			m: map[string]any{
+			m: map[string]string{
 				"amount": "1-23test",
 			},
 			key:  "amount",
@@ -73,13 +73,13 @@ func TestDecimalFromMap(t *testing.T) {
 func TestUnixNanoFromMap(t *testing.T) {
 	tests := []struct {
 		name string
-		m    map[string]any
+		m    map[string]string
 		key  string
 		want time.Time
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"packet_timeout_timestamp": "9439823803807825920",
 			},
 			key:  "packet_timeout_timestamp",
@@ -175,27 +175,27 @@ func TestChannelOrderingFromMap(t *testing.T) {
 func TestBytesFromMap(t *testing.T) {
 	tests := []struct {
 		name string
-		m    map[string]any
+		m    map[string]string
 		key  string
 		want []byte
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"hash": "0x641863cfc93b6f4e373002e81cb8b2727e100680",
 			},
 			key:  "hash",
 			want: []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x2, 0xe8, 0x1c, 0xb8, 0xb2, 0x72, 0x7e, 0x10, 0x6, 0x80},
 		}, {
 			name: "test 2",
-			m: map[string]any{
+			m: map[string]string{
 				"hash": "641863cfc93b6f4e373002e81cb8b2727e100680",
 			},
 			key:  "hash",
 			want: []byte{0x64, 0x18, 0x63, 0xcf, 0xc9, 0x3b, 0x6f, 0x4e, 0x37, 0x30, 0x2, 0xe8, 0x1c, 0xb8, 0xb2, 0x72, 0x7e, 0x10, 0x6, 0x80},
 		}, {
 			name: "test 3",
-			m: map[string]any{
+			m: map[string]string{
 				"hash": "\"0x641863cfc93b6f4e373002e81cb8b2727e100680\"",
 			},
 			key:  "hash",

@@ -21,7 +21,7 @@ type Event struct {
 
 	Type types.EventType `example:"commission" json:"type"`
 
-	Data map[string]any `json:"data"`
+	Data map[string]string `json:"data"`
 }
 
 func NewEvent(event storage.Event) Event {

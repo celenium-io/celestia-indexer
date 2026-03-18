@@ -28,27 +28,27 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				{
 					Height: 848613,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
 					},
 				}, {
 					Height: 848613,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "3003622utia",
 						"spender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 848613,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "3003622utia",
 						"receiver": "celestia1s0lankh33kprer2l22nank5rvsuh9ksa0e65uz",
 					},
 				}, {
 					Height: 848613,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "3003622utia",
 						"recipient": "celestia1s0lankh33kprer2l22nank5rvsuh9ksa0e65uz",
 						"sender":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -56,19 +56,19 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				}, {
 					Height: 848613,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 848613,
 					Type:   "withdraw_commission",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount": "3003622utia",
 					},
 				}, {
 					Height: 848613,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "distribution",
 						"sender": "celestiavaloper1s0lankh33kprer2l22nank5rvsuh9ksa2xcd2y",
 					},
@@ -91,7 +91,7 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				{
 					Height: 848613,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
 						"sender":    "celestiavaloper1s0lankh33kprer2l22nank5rvsuh9ksa2xcd2y",
 						"module":    "distribution",
@@ -100,21 +100,21 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				}, {
 					Height: 848613,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "3003622utia",
 						"spender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 848613,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "3003622utia",
 						"receiver": "celestia1s0lankh33kprer2l22nank5rvsuh9ksa0e65uz",
 					},
 				}, {
 					Height: 848613,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "3003622utia",
 						"recipient": "celestia1s0lankh33kprer2l22nank5rvsuh9ksa0e65uz",
 						"sender":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -122,13 +122,13 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				}, {
 					Height: 848613,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 848613,
 					Type:   "withdraw_commission",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount": "3003622utia",
 					},
 				},
@@ -150,7 +150,7 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				{
 					Height: 848613,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
 						"sender":    "celestia1emku8jrvf9dzu80n3sx7wx50chpgjhrw46yru6",
 						"module":    "distribution",
@@ -159,7 +159,7 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				}, {
 					Height: 848613,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "8124483956utia",
 						"msg_index": "1",
 						"spender":   "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -167,7 +167,7 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				}, {
 					Height: 848613,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "8124483956utia",
 						"msg_index": "1",
 						"receiver":  "celestia1aq57jhhq332emqwdv8a4pgeaukw84sg9nwje2h",
@@ -175,7 +175,7 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				}, {
 					Height: 848613,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "8124483956utia",
 						"msg_index": "1",
 						"recipient": "celestia1aq57jhhq332emqwdv8a4pgeaukw84sg9nwje2h",
@@ -184,14 +184,14 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 				}, {
 					Height: 848613,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"msg_index": "1",
 						"sender":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 848613,
 					Type:   "withdraw_commission",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "8124483956utia",
 						"msg_index": "1",
 					},

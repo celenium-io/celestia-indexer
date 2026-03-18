@@ -32,14 +32,14 @@ func Test_handleSetMailbox(t *testing.T) {
 					Height: 1036866,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/hyperlane.core.v1.MsgSetMailbox",
 					},
 				}, {
 					Height: 1036866,
 					Time:   ts,
 					Type:   "hyperlane.core.v1.EventSetMailbox",
-					Data: map[string]any{
+					Data: map[string]string{
 						"default_hook":       "\"0x726f757465725f706f73745f6469737061746368000000040000000000000001\"",
 						"default_ism":        "null",
 						"mailbox_id":         "\"0x68797065726c616e650000000000000000000000000000000000000000000000\"",
@@ -106,14 +106,14 @@ func Test_handleSetMailbox_newOwner(t *testing.T) {
 					Height: 1036866,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/hyperlane.core.v1.MsgSetMailbox",
 					},
 				}, {
 					Height: 1036866,
 					Time:   ts,
 					Type:   "hyperlane.core.v1.EventSetMailbox",
-					Data: map[string]any{
+					Data: map[string]string{
 						"default_hook":       "\"0x726f757465725f706f73745f6469737061746368000000040000000000000001\"",
 						"default_ism":        "null",
 						"mailbox_id":         "\"0x68797065726c616e650000000000000000000000000000000000000000000000\"",

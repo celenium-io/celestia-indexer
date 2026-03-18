@@ -19,13 +19,13 @@ import (
 func TestNewCoinSpent(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody CoinSpent
 		wantErr  bool
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"spender": "spender",
 				"amount":  "1utia",
 			},
@@ -35,7 +35,7 @@ func TestNewCoinSpent(t *testing.T) {
 			},
 		}, {
 			name: "test 2",
-			m: map[string]any{
+			m: map[string]string{
 				"invalid": "invalid",
 				"amount":  "1utia",
 			},
@@ -43,7 +43,7 @@ func TestNewCoinSpent(t *testing.T) {
 			wantBody: CoinSpent{},
 		}, {
 			name: "test 3",
-			m: map[string]any{
+			m: map[string]string{
 				"spender": "spender",
 				"amount":  "invalid",
 			},
@@ -65,13 +65,13 @@ func TestNewCoinSpent(t *testing.T) {
 func TestNewCoinReceived(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody CoinReceived
 		wantErr  bool
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"receiver": "receiver",
 				"amount":   "42utia",
 			},
@@ -81,7 +81,7 @@ func TestNewCoinReceived(t *testing.T) {
 			},
 		}, {
 			name: "test 2",
-			m: map[string]any{
+			m: map[string]string{
 				"invalid": "invalid",
 				"amount":  "13utia",
 			},
@@ -89,7 +89,7 @@ func TestNewCoinReceived(t *testing.T) {
 			wantBody: CoinReceived{},
 		}, {
 			name: "test 3",
-			m: map[string]any{
+			m: map[string]string{
 				"receiver": "receiver",
 				"amount":   "invalid",
 			},
@@ -111,13 +111,13 @@ func TestNewCoinReceived(t *testing.T) {
 func TestNewCompleteRedelegation(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody CompleteRedelegation
 		wantErr  bool
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"amount":                "51000000utia",
 				"delegator":             "celestia1jxmxxa04k2tpkwk5u00pj37lmg668ksvh0ydax",
 				"destination_validator": "celestiavaloper1clf3nqp89h97umhl4fmcqr642jz6rszcxegjc6",
@@ -144,13 +144,13 @@ func TestNewCompleteRedelegation(t *testing.T) {
 func TestNewCompleteUnbonding(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody CompleteUnbonding
 		wantErr  bool
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"amount":    "256000000utia",
 				"delegator": "celestia1g60teezwmfdj8xxpnd5kehvp25zfzt25pxxphv",
 				"validator": "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
@@ -175,13 +175,13 @@ func TestNewCompleteUnbonding(t *testing.T) {
 func TestNewCommission(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody Commission
 		wantErr  bool
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"amount":    "256000000utia",
 				"validator": "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
@@ -192,7 +192,7 @@ func TestNewCommission(t *testing.T) {
 			wantErr: false,
 		}, {
 			name: "test 2",
-			m: map[string]any{
+			m: map[string]string{
 				"amount":    "469.815871531603829656utia",
 				"validator": "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
 			},
@@ -203,7 +203,7 @@ func TestNewCommission(t *testing.T) {
 			wantErr: false,
 		}, {
 			name: "test 3",
-			m: map[string]any{
+			m: map[string]string{
 				"amount":    "",
 				"validator": "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
 			},
@@ -226,13 +226,13 @@ func TestNewCommission(t *testing.T) {
 func TestNewRewards(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody Rewards
 		wantErr  bool
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"amount":    "256000000utia",
 				"validator": "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
@@ -255,13 +255,13 @@ func TestNewRewards(t *testing.T) {
 func TestNewWithdrawReward(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody WithdrawRewards
 		wantErr  bool
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"amount":    "256000000utia",
 				"delegator": "celestia1g60teezwmfdj8xxpnd5kehvp25zfzt25pxxphv",
 				"validator": "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
@@ -286,13 +286,13 @@ func TestNewWithdrawReward(t *testing.T) {
 func TestNewRedelegate(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody Redelegate
 		wantErr  bool
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"amount":                "69989816utia",
 				"completion_time":       "2024-03-10T22:58:16Z",
 				"destination_validator": "celestiavaloper1u825srldhev7t4wnd3hplhrphahjfk7ff3wfdr",
@@ -319,13 +319,13 @@ func TestNewRedelegate(t *testing.T) {
 func TestNewUnbond(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody Unbond
 		wantErr  bool
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"amount":          "1000000utia",
 				"completion_time": "2024-03-10T23:08:39Z",
 				"validator":       "celestiavaloper1ej2es5fjztqjcd4pwa0zyvaevtjd2y5wh8xeg4",
@@ -350,13 +350,13 @@ func TestNewUnbond(t *testing.T) {
 func TestNewUpdateClient(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody UpdateClient
 		wantErr  bool
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"client_id":        "07-tendermint-145",
 				"client_type":      "07-tendermint",
 				"consensus_height": "3-884",
@@ -382,12 +382,12 @@ func TestNewUpdateClient(t *testing.T) {
 func TestNewConnectionChange(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody ConnectionChange
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"client_id":                  "07-tendermint-145",
 				"connection_id":              "connection-97",
 				"counterparty_client_id":     "07-tendermint-1",
@@ -412,12 +412,12 @@ func TestNewConnectionChange(t *testing.T) {
 func TestNewChannelChange(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody ChannelChange
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"channel_id":              "channel-112",
 				"connection_id":           "connection-97",
 				"counterparty_channel_id": "channel-1",
@@ -444,12 +444,12 @@ func TestNewChannelChange(t *testing.T) {
 func TestNewFungibleTokenPacket(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody FungibleTokenPacket
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"amount":   "699567",
 				"denom":    "transfer/channel-6994/utia",
 				"memo":     "",
@@ -469,7 +469,7 @@ func TestNewFungibleTokenPacket(t *testing.T) {
 			},
 		}, {
 			name: "test 2",
-			m: map[string]any{
+			m: map[string]string{
 				"acknowledgement": "result:\"\\001\" ",
 				"amount":          "4745268",
 				"denom":           "utia",
@@ -488,7 +488,7 @@ func TestNewFungibleTokenPacket(t *testing.T) {
 			},
 		}, {
 			name: "test 3",
-			m: map[string]any{
+			m: map[string]string{
 				"success": "\u0001",
 			},
 			wantBody: FungibleTokenPacket{
@@ -508,12 +508,12 @@ func TestNewFungibleTokenPacket(t *testing.T) {
 func TestNewRecvPacket(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody RecvPacket
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"packet_channel_ordering":  "ORDER_UNORDERED",
 				"packet_connection":        "connection-2",
 				"packet_data":              "{\"denom\":\"transfer/channel-6994/utia\",\"amount\":\"699567\",\"sender\":\"osmo1m8wg4vxkefhs374qxmmqpyusgz289wmulex5qdwpfx7jnrxzer5s9cv83q\",\"receiver\":\"celestia1j8qsd8f7mdcm5skfs50tv9nat9g00qh8y2zd39\"}",
@@ -552,12 +552,12 @@ func TestNewRecvPacket(t *testing.T) {
 func TestNewHyperlaneSendTransferEvent(t *testing.T) {
 	tests := []struct {
 		name     string
-		m        map[string]any
+		m        map[string]string
 		wantBody HyperlaneSendTransferEvent
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{ //nolint:gosec
+			m: map[string]string{ //nolint:gosec
 				"amount":             "\"10utia\"",
 				"destination_domain": "812",
 				"recipient":          "\"0x0000000000000000000000009b8ae55dccca7a842182cc023bd63d24d2692e0a\"",
@@ -595,12 +595,12 @@ func mustHexAddress(str string) util.HexAddress {
 func TestNewHyperlaneDispatchEvent(t *testing.T) {
 	tests := []struct {
 		name    string
-		m       map[string]any
+		m       map[string]string
 		wantHde HyperlaneDispatchEvent
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"destination":       "84532",
 				"message":           "\"0x03000000004d4f4348726f757465725f6170700000000000000000000000000001000000000000000000014a34000000000000000000000000c2455315f69696295b357428fe13970bb5b4effa0000000000000000000000009b8ae55dccca7a842182cc023bd63d24d2692e0a000000000000000000000000000000000000000000000000000000000000000a\"",
 				"origin_mailbox_id": "\"0x68797065726c616e650000000000000000000000000000000000000000000000\"",
@@ -637,12 +637,12 @@ func TestNewHyperlaneDispatchEvent(t *testing.T) {
 func TestNewAcknoledgementPacket(t *testing.T) {
 	tests := []struct {
 		name string
-		m    map[string]any
+		m    map[string]string
 		want AcknowledgementPacket
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"connection_id":            "connection-2",
 				"msg_index":                "1",
 				"packet_channel_ordering":  "ORDER_UNORDERED",
@@ -682,12 +682,12 @@ func TestNewAcknoledgementPacket(t *testing.T) {
 func TestNewHyperlaneReceiveTransferEvent(t *testing.T) {
 	tests := []struct {
 		name string
-		m    map[string]any
+		m    map[string]string
 		want HyperlaneReceiveTransferEvent
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{ //nolint:gosec
+			m: map[string]string{ //nolint:gosec
 				"amount":        "\"\"",
 				"origin_domain": "8453",
 				"recipient":     "\"celestia1z7ut79ds6h550925ehkxpwvkgcfq63y2vfk2e0\"",
@@ -717,12 +717,12 @@ func TestNewHyperlaneReceiveTransferEvent(t *testing.T) {
 func TestEventForwardingComplete(t *testing.T) {
 	tests := []struct {
 		name string
-		m    map[string]any
+		m    map[string]string
 		want EventForwardingComplete
 	}{
 		{
 			name: "test 1",
-			m: map[string]any{
+			m: map[string]string{
 				"dest_domain":      "84532",
 				"forward_addr":     "\"celestia1z7ut79ds6h550925ehkxpwvkgcfq63y2vfk2e0\"",
 				"dest_recipient":   "\"0x000000000000000000000000c2455315f69696295b357428fe13970bb5b4effa\"",
@@ -760,13 +760,13 @@ func TestNewZkISMCreateEvent(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		m       map[string]any
+		m       map[string]string
 		want    ZkISMCreateEvent
 		wantErr bool
 	}{
 		{
 			name: "valid event",
-			m: map[string]any{
+			m: map[string]string{
 				"id":                    "deadbeaf",
 				"owner":                 "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state":                 toHex(stateBytes),
@@ -787,7 +787,7 @@ func TestNewZkISMCreateEvent(t *testing.T) {
 		},
 		{
 			name: "missing id",
-			m: map[string]any{
+			m: map[string]string{
 				"owner":                 "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state":                 toHex(stateBytes),
 				"merkle_tree_address":   toHex(merkleTreeBytes),
@@ -799,7 +799,7 @@ func TestNewZkISMCreateEvent(t *testing.T) {
 		},
 		{
 			name: "invalid state hex",
-			m: map[string]any{
+			m: map[string]string{
 				"id":                    "1",
 				"owner":                 "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state":                 "not-hex",
@@ -833,13 +833,13 @@ func TestNewZkISMUpdateEvent(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		m       map[string]any
+		m       map[string]string
 		want    ZkISMUpdateEvent
 		wantErr bool
 	}{
 		{
 			name: "valid event",
-			m: map[string]any{
+			m: map[string]string{
 				"id":    "\"0xdeadbeaf\"",
 				"state": toHex(newStateBytes),
 			},
@@ -850,7 +850,7 @@ func TestNewZkISMUpdateEvent(t *testing.T) {
 		},
 		{
 			name: "missing id",
-			m: map[string]any{
+			m: map[string]string{
 				"signer": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 				"state":  toHex(newStateBytes),
 			},
@@ -881,13 +881,13 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		m       map[string]any
+		m       map[string]string
 		want    ZkISMSubmitMessagesEvent
 		wantErr bool
 	}{
 		{
 			name: "single message id",
-			m: map[string]any{
+			m: map[string]string{
 				"id":         "dcdb3f985ecd20c313c58c0f6b2a0d7e",
 				"state_root": toHex(stateRootBytes),
 				"messages":   `[` + toHex(msgId1) + `]`,
@@ -900,7 +900,7 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 		},
 		{
 			name: "multiple message ids comma-separated",
-			m: map[string]any{
+			m: map[string]string{
 				"id":         "0123",
 				"state_root": toHex(stateRootBytes),
 				"messages":   `[` + toHex(msgId1) + `,` + toHex(msgId2) + `]`,
@@ -913,7 +913,7 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 		},
 		{
 			name: "empty message_ids",
-			m: map[string]any{
+			m: map[string]string{
 				"id":         "00",
 				"state_root": toHex(stateRootBytes),
 				"messages":   "[]",
@@ -926,7 +926,7 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 		},
 		{
 			name: "missing id",
-			m: map[string]any{
+			m: map[string]string{
 				"signer":     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state_root": toHex(stateRootBytes),
 				"messages":   `[` + toHex(msgId1) + `]`,
@@ -935,7 +935,7 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 		},
 		{
 			name: "invalid message id hex",
-			m: map[string]any{
+			m: map[string]string{
 				"id":         "1",
 				"signer":     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state_root": toHex(stateRootBytes),

@@ -29,27 +29,27 @@ func Test_handleHyperlaneRemoteTransfer(t *testing.T) {
 				{
 					Height: 1036866,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/hyperlane.warp.v1.MsgRemoteTransfer",
 					},
 				}, {
 					Height: 841682,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "6745utia",
 						"spender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 841682,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "6745utia",
 						"spender": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 					},
 				}, {
 					Height: 841682,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "6745utia",
 						"recipient": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 						"sender":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -57,13 +57,13 @@ func Test_handleHyperlaneRemoteTransfer(t *testing.T) {
 				}, {
 					Height: 841682,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.warp.v1.EventSendRemoteTransfer",
-					Data: map[string]any{ //nolint:gosec
+					Data: map[string]string{ //nolint:gosec
 						"amount":             "6745utia",
 						"sender":             "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 						"token_id":           "0x726f757465725f61707000000000000000000000000000010000000000000000",
@@ -74,7 +74,7 @@ func Test_handleHyperlaneRemoteTransfer(t *testing.T) {
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.core.v1.EventDispatch",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender":            "0x726f757465725f61707000000000000000000000000000010000000000000000",
 						"message":           "0x03000000e86d696c6b726f757465725f61707000000000000000000000000000010000000000000000000000380000000000000000000000007b4bf9feccff207ef2cb7101ceb15b8516021acd000000000000000000000000e0f9f661f106d6da1974fdc12a904e936834b3f8000000000000000000000000000000000000000000000000000000000c939ac0",
 						"msg_index":         "0",
@@ -85,7 +85,7 @@ func Test_handleHyperlaneRemoteTransfer(t *testing.T) {
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.core.post_dispatch.v1.EventInsertedIntoTree",
-					Data: map[string]any{
+					Data: map[string]string{
 						"index":               "232",
 						"msg_index":           "0",
 						"message_id":          "0xdcdb3f985ecd20c313c58c0f6b2a0d7ea980349134ee4813f6bd53cfe5bf0a1e",
@@ -94,21 +94,21 @@ func Test_handleHyperlaneRemoteTransfer(t *testing.T) {
 				}, {
 					Height: 841682,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "4379232utia",
 						"spender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 841682,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "4379232utia",
 						"spender": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 					},
 				}, {
 					Height: 841682,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "4379232utia",
 						"recipient": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 						"sender":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -116,13 +116,13 @@ func Test_handleHyperlaneRemoteTransfer(t *testing.T) {
 				}, {
 					Height: 841682,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.core.post_dispatch.v1.EventGasPayment",
-					Data: map[string]any{
+					Data: map[string]string{
 						"igp_id":      "0x726f757465725f706f73745f6469737061746368000000040000000000000000",
 						"payment":     "4379232utia",
 						"msg_index":   "0",

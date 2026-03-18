@@ -537,7 +537,7 @@ func (s *TxTestSuite) TestGetEvents() {
 				Position: 2,
 				Type:     types.EventTypeBurn,
 				TxId:     testsuite.Ptr(uint64(1)),
-				Data: map[string]any{
+				Data: map[string]string{
 					"test": "value",
 				},
 			},

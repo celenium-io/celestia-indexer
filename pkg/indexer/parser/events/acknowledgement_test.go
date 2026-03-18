@@ -34,13 +34,13 @@ func Test_handleAcknowledgement(t *testing.T) {
 				{
 					Height: 2371609,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgAcknowledgement",
 					},
 				}, {
 					Height: 2371609,
 					Type:   "acknowledge_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_channel_ordering":  "ORDER_UNORDERED",
 						"packet_connection":        "connection-2",
 						"packet_dst_channel":       "channel-6994",
@@ -54,14 +54,14 @@ func Test_handleAcknowledgement(t *testing.T) {
 				}, {
 					Height: 2371609,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				},
 				{
 					Height: 2371609,
 					Type:   "write_acknowledgement",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_ack":               "{\"result\":\"AQ==\"}",
 						"packet_ack_hex":           "7b22726573756c74223a2241513d3d227d",
 						"packet_connection":        "connection-18",
@@ -78,7 +78,7 @@ func Test_handleAcknowledgement(t *testing.T) {
 				}, {
 					Height: 2371609,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				},
@@ -137,13 +137,13 @@ func Test_handleAcknowledgement(t *testing.T) {
 				{
 					Height: 2371609,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgAcknowledgement",
 					},
 				}, {
 					Height: 2371609,
 					Type:   "acknowledge_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_channel_ordering":  "ORDER_UNORDERED",
 						"packet_connection":        "connection-2",
 						"packet_dst_channel":       "channel-6994",
@@ -157,14 +157,14 @@ func Test_handleAcknowledgement(t *testing.T) {
 				}, {
 					Height: 2371609,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				},
 				{
 					Height: 2371609,
 					Type:   "fungible_token_packet",
-					Data: map[string]any{"acknowledgement": "result:\"{\\\"contract_result\\\":null,\\\"ibc_ack\\\":\\\"eyJyZXN1bHQiOiJBUT09In0=\\\"}\" ",
+					Data: map[string]string{"acknowledgement": "result:\"{\\\"contract_result\\\":null,\\\"ibc_ack\\\":\\\"eyJyZXN1bHQiOiJBUT09In0=\\\"}\" ",
 						"amount":   "12000000",
 						"denom":    "utia",
 						"memo":     "{\"wasm\":{\"contract\":\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\",\"msg\":{\"swap_and_action\":{\"user_swap\":{\"swap_exact_asset_in\":{\"swap_venue_name\":\"osmosis-poolmanager\",\"operations\":[{\"pool\":\"1247\",\"denom_in\":\"ibc/D79E7D83AB399BFFF93433E54FAA480C191248FC556924A2A8351AE2638B3877\",\"denom_out\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\"},{\"pool\":\"1319\",\"denom_in\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\",\"denom_out\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\"}]}},\"min_asset\":{\"native\":{\"denom\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\",\"amount\":\"3298454343374009626\"}},\"timeout_timestamp\":1726667021008444464,\"post_swap_action\":{\"ibc_transfer\":{\"ibc_info\":{\"source_channel\":\"channel-122\",\"receiver\":\"inj14amztqem07qvyyty8k4p6s2jp8ylsvlax0g42f\",\"memo\":\"\",\"recover_address\":\"osmo1nc44cmtgmp6cwch2ccfp6txdelu6qtz9rq5s03\"}}},\"affiliates\":[{\"basis_points_fee\":\"60\",\"address\":\"osmo1my4tk420gjmhggqwvvha6ey9390gqwfree2p4u\"},{\"basis_points_fee\":\"15\",\"address\":\"osmo1msjnal2glfz6ze8x9kduhg45xppx9sddawfx46\"}]}}}}",
@@ -175,7 +175,7 @@ func Test_handleAcknowledgement(t *testing.T) {
 				}, {
 					Height: 2371609,
 					Type:   "fungible_token_packet",
-					Data: map[string]any{"acknowledgement": "result:\"{\\\"contract_result\\\":null,\\\"ibc_ack\\\":\\\"eyJyZXN1bHQiOiJBUT09In0=\\\"}\" ",
+					Data: map[string]string{"acknowledgement": "result:\"{\\\"contract_result\\\":null,\\\"ibc_ack\\\":\\\"eyJyZXN1bHQiOiJBUT09In0=\\\"}\" ",
 						"success": "{\"contract_result\":null,\"ibc_ack\":\"eyJyZXN1bHQiOiJBUT09In0=\"}",
 					},
 				},
@@ -236,13 +236,13 @@ func Test_handleAcknowledgement(t *testing.T) {
 				{
 					Height: 2371609,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgAcknowledgement",
 					},
 				}, {
 					Height: 2371609,
 					Type:   "acknowledge_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_channel_ordering":  "ORDER_UNORDERED",
 						"packet_connection":        "connection-2",
 						"packet_dst_channel":       "channel-6994",
@@ -256,14 +256,14 @@ func Test_handleAcknowledgement(t *testing.T) {
 				}, {
 					Height: 2371609,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				},
 				{
 					Height: 2371609,
 					Type:   "fungible_token_packet",
-					Data: map[string]any{"acknowledgement": "result:\"{\\\"contract_result\\\":null,\\\"ibc_ack\\\":\\\"eyJyZXN1bHQiOiJBUT09In0=\\\"}\" ",
+					Data: map[string]string{"acknowledgement": "result:\"{\\\"contract_result\\\":null,\\\"ibc_ack\\\":\\\"eyJyZXN1bHQiOiJBUT09In0=\\\"}\" ",
 						"amount":   "12000000",
 						"denom":    "utia",
 						"memo":     "{\"wasm\":{\"contract\":\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\",\"msg\":{\"swap_and_action\":{\"user_swap\":{\"swap_exact_asset_in\":{\"swap_venue_name\":\"osmosis-poolmanager\",\"operations\":[{\"pool\":\"1247\",\"denom_in\":\"ibc/D79E7D83AB399BFFF93433E54FAA480C191248FC556924A2A8351AE2638B3877\",\"denom_out\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\"},{\"pool\":\"1319\",\"denom_in\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\",\"denom_out\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\"}]}},\"min_asset\":{\"native\":{\"denom\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\",\"amount\":\"3298454343374009626\"}},\"timeout_timestamp\":1726667021008444464,\"post_swap_action\":{\"ibc_transfer\":{\"ibc_info\":{\"source_channel\":\"channel-122\",\"receiver\":\"inj14amztqem07qvyyty8k4p6s2jp8ylsvlax0g42f\",\"memo\":\"\",\"recover_address\":\"osmo1nc44cmtgmp6cwch2ccfp6txdelu6qtz9rq5s03\"}}},\"affiliates\":[{\"basis_points_fee\":\"60\",\"address\":\"osmo1my4tk420gjmhggqwvvha6ey9390gqwfree2p4u\"},{\"basis_points_fee\":\"15\",\"address\":\"osmo1msjnal2glfz6ze8x9kduhg45xppx9sddawfx46\"}]}}}}",
@@ -274,19 +274,19 @@ func Test_handleAcknowledgement(t *testing.T) {
 				}, {
 					Height: 2371609,
 					Type:   "fungible_token_packet",
-					Data: map[string]any{"acknowledgement": "result:\"{\\\"contract_result\\\":null,\\\"ibc_ack\\\":\\\"eyJyZXN1bHQiOiJBUT09In0=\\\"}\" ",
+					Data: map[string]string{"acknowledgement": "result:\"{\\\"contract_result\\\":null,\\\"ibc_ack\\\":\\\"eyJyZXN1bHQiOiJBUT09In0=\\\"}\" ",
 						"success": "{\"contract_result\":null,\"ibc_ack\":\"eyJyZXN1bHQiOiJBUT09In0=\"}",
 					},
 				}, {
 					Height: 2371609,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgAcknowledgement",
 					},
 				}, {
 					Height: 2371609,
 					Type:   "acknowledge_packet",
-					Data: map[string]any{
+					Data: map[string]string{
 						"packet_channel_ordering":  "ORDER_UNORDERED",
 						"packet_connection":        "connection-2",
 						"packet_dst_channel":       "channel-6994",
@@ -300,14 +300,14 @@ func Test_handleAcknowledgement(t *testing.T) {
 				}, {
 					Height: 2371609,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				},
 				{
 					Height: 2371609,
 					Type:   "fungible_token_packet",
-					Data: map[string]any{"acknowledgement": "result:\"{\\\"contract_result\\\":null,\\\"ibc_ack\\\":\\\"eyJyZXN1bHQiOiJBUT09In0=\\\"}\" ",
+					Data: map[string]string{"acknowledgement": "result:\"{\\\"contract_result\\\":null,\\\"ibc_ack\\\":\\\"eyJyZXN1bHQiOiJBUT09In0=\\\"}\" ",
 						"amount":   "12000000",
 						"denom":    "utia",
 						"memo":     "{\"wasm\":{\"contract\":\"osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv\",\"msg\":{\"swap_and_action\":{\"user_swap\":{\"swap_exact_asset_in\":{\"swap_venue_name\":\"osmosis-poolmanager\",\"operations\":[{\"pool\":\"1247\",\"denom_in\":\"ibc/D79E7D83AB399BFFF93433E54FAA480C191248FC556924A2A8351AE2638B3877\",\"denom_out\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\"},{\"pool\":\"1319\",\"denom_in\":\"ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4\",\"denom_out\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\"}]}},\"min_asset\":{\"native\":{\"denom\":\"ibc/64BA6E31FE887D66C6F8F31C7B1A80C7CA179239677B4088BB55F5EA07DBE273\",\"amount\":\"3298454343374009626\"}},\"timeout_timestamp\":1726667021008444464,\"post_swap_action\":{\"ibc_transfer\":{\"ibc_info\":{\"source_channel\":\"channel-122\",\"receiver\":\"inj14amztqem07qvyyty8k4p6s2jp8ylsvlax0g42f\",\"memo\":\"\",\"recover_address\":\"osmo1nc44cmtgmp6cwch2ccfp6txdelu6qtz9rq5s03\"}}},\"affiliates\":[{\"basis_points_fee\":\"60\",\"address\":\"osmo1my4tk420gjmhggqwvvha6ey9390gqwfree2p4u\"},{\"basis_points_fee\":\"15\",\"address\":\"osmo1msjnal2glfz6ze8x9kduhg45xppx9sddawfx46\"}]}}}}",
@@ -318,7 +318,7 @@ func Test_handleAcknowledgement(t *testing.T) {
 				}, {
 					Height: 2371609,
 					Type:   "fungible_token_packet",
-					Data: map[string]any{"acknowledgement": "result:\"{\\\"contract_result\\\":null,\\\"ibc_ack\\\":\\\"eyJyZXN1bHQiOiJBUT09In0=\\\"}\" ",
+					Data: map[string]string{"acknowledgement": "result:\"{\\\"contract_result\\\":null,\\\"ibc_ack\\\":\\\"eyJyZXN1bHQiOiJBUT09In0=\\\"}\" ",
 						"success": "{\"contract_result\":null,\"ibc_ack\":\"eyJyZXN1bHQiOiJBUT09In0=\"}",
 					},
 				},

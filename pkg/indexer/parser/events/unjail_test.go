@@ -28,13 +28,13 @@ func Test_handleUnjail(t *testing.T) {
 				{
 					Height: 844287,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.slashing.v1beta1.MsgUnjail",
 					},
 				}, {
 					Height: 844287,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "slashing",
 						"sender": "celestiavaloper1qe8uuf5x69c526h4nzxwv4ltftr73v7q5qhs58",
 					},
@@ -52,7 +52,7 @@ func Test_handleUnjail(t *testing.T) {
 				{
 					Height: 6758141,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/cosmos.slashing.v1beta1.MsgUnjail",
 						"module":    "slashing",
 						"msg_index": "0",

@@ -36,7 +36,7 @@ func processCreateClient(ctx *context.Context, events []storage.Event, msg *stor
 		return errors.Wrap(err, "receiving ClientState from message")
 	}
 
-	signer := decoder.StringFromMap(msg.Data, "Signer")
+	signer := msg.Data.GetStringOrDefault("Signer")
 
 	ibcClient := &storage.IbcClient{
 		Height:                msg.Height,

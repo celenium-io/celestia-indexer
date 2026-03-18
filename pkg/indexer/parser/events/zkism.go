@@ -88,7 +88,7 @@ func processUpdateZkISM(ctx *context.Context, events []storage.Event, msg *stora
 			}
 
 			var addr *storage.Address
-			if signer := decoder.StringFromMap(msg.Data, "Signer"); signer != "" {
+			if signer := msg.Data.GetStringOrDefault("Signer"); signer != "" {
 				addr = &storage.Address{
 					Address:    signer,
 					Height:     msg.Height,
@@ -146,7 +146,7 @@ func processSubmitZkISMMessages(ctx *context.Context, events []storage.Event, ms
 			}
 
 			var addr *storage.Address
-			if signer := decoder.StringFromMap(msg.Data, "Signer"); signer != "" {
+			if signer := msg.Data.GetStringOrDefault("Signer"); signer != "" {
 				addr = &storage.Address{
 					Address:    signer,
 					Height:     msg.Height,

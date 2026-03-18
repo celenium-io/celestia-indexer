@@ -29,14 +29,14 @@ var (
 func Test_parseCoinSpent(t *testing.T) {
 	tests := []struct {
 		name    string
-		data    map[string]any
+		data    map[string]string
 		height  pkgTypes.Level
 		want    *storage.Address
 		wantErr bool
 	}{
 		{
 			name: "test 1",
-			data: map[string]any{
+			data: map[string]string{
 				"spender": testAddress,
 				"amount":  "123utia",
 			},
@@ -55,9 +55,9 @@ func Test_parseCoinSpent(t *testing.T) {
 			},
 		}, {
 			name: "test 2",
-			data: map[string]any{
+			data: map[string]string{
 				"spender": testAddress,
-				"amount":  nil,
+				"amount":  "",
 			},
 			height: pkgTypes.Level(58000),
 			want: &storage.Address{
@@ -89,13 +89,13 @@ func Test_parseCreateIgp(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		data    map[string]any
+		data    map[string]string
 		want    *storage.HLIGP
 		wantErr bool
 	}{
 		{
 			name: "test 1",
-			data: map[string]any{
+			data: map[string]string{
 				"denom":  "\"utia\"",
 				"igp_id": "\"0x726f757465725f706f73745f6469737061746368000000040000000000000001\"",
 				"owner":  testAddress,
@@ -130,13 +130,13 @@ func Test_parseSetDestinationGasConfig(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		data    map[string]any
+		data    map[string]string
 		want    *storage.HLIGPConfig
 		wantErr bool
 	}{
 		{
 			name: "test 1",
-			data: map[string]any{
+			data: map[string]string{
 				"gas_overhead":        "\"200000\"",
 				"gas_price":           "\"1\"",
 				"igp_id":              "\"0x726f757465725f706f73745f6469737061746368000000040000000000000001\"",
@@ -173,13 +173,13 @@ func Test_parseSetIgp(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		data    map[string]any
+		data    map[string]string
 		want    *storage.HLIGP
 		wantErr bool
 	}{
 		{
 			name: "test 1",
-			data: map[string]any{
+			data: map[string]string{
 				"igp_id":             "\"0x726f757465725f706f73745f6469737061746368000000040000000000000001\"",
 				"owner":              testAddress,
 				"new_owner":          "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w61",
@@ -214,13 +214,13 @@ func Test_parseCompleteUnbonding(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		data    map[string]any
+		data    map[string]string
 		want    storage.StakingLog
 		wantErr bool
 	}{
 		{
 			name: "test 1",
-			data: map[string]any{
+			data: map[string]string{
 				"amount":    "35570000utia",
 				"delegator": "celestia1nwm73xdjhdwfpw6uxc3pkcspw0kr5m06z067t3",
 				"mode":      "EndBlock",
@@ -285,13 +285,13 @@ func Test_parseCompleteRedelegation(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		data    map[string]any
+		data    map[string]string
 		want    storage.StakingLog
 		wantErr bool
 	}{
 		{
 			name: "test 1",
-			data: map[string]any{
+			data: map[string]string{
 				"amount":                "265636688utia",
 				"delegator":             "celestia1nwm73xdjhdwfpw6uxc3pkcspw0kr5m06z067t3",
 				"destination_validator": "celestiavaloper1snun9qqk9eussvyhkqm03lz6f265ekhnnlw043",

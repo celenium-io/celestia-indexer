@@ -29,13 +29,13 @@ func Test_handleExec(t *testing.T) {
 				{
 					Height: 844359,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.authz.v1beta1.MsgExec",
 					},
 				}, {
 					Height: 844359,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "101775utia",
 						"authz_msg_index": "0",
 						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -43,7 +43,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "101775utia",
 						"authz_msg_index": "0",
 						"receiver":        "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
@@ -51,7 +51,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "101775utia",
 						"authz_msg_index": "0",
 						"recipient":       "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
@@ -60,14 +60,14 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "0",
 						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 844359,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "101775utia",
 						"authz_msg_index": "0",
 						"delegator":       "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
@@ -76,7 +76,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "101774utia",
 						"authz_msg_index": "0",
 						"spender":         "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
@@ -84,7 +84,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "101774utia",
 						"authz_msg_index": "0",
 						"receiver":        "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
@@ -92,7 +92,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "delegate",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "101774utia",
 						"authz_msg_index": "0",
 						"new_shares":      "101774.000000000000000000",
@@ -101,7 +101,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "0",
 						"module":          "staking",
 						"sender":          "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
@@ -109,7 +109,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "191045utia",
 						"authz_msg_index": "1",
 						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -117,7 +117,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "191045utia",
 						"authz_msg_index": "1",
 						"receiver":        "celestia1gfvu3xpgze2jy20cy4lcfeq2qj3rww0a8cwuap",
@@ -125,7 +125,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "191045utia",
 						"authz_msg_index": "1",
 						"recipient":       "celestia1gfvu3xpgze2jy20cy4lcfeq2qj3rww0a8cwuap",
@@ -134,14 +134,14 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "1",
 						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 844359,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "191045utia",
 						"authz_msg_index": "1",
 						"delegator":       "celestia1gfvu3xpgze2jy20cy4lcfeq2qj3rww0a8cwuap",
@@ -150,7 +150,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "191018utia",
 						"authz_msg_index": "1",
 						"spender":         "celestia1gfvu3xpgze2jy20cy4lcfeq2qj3rww0a8cwuap",
@@ -158,7 +158,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "191018utia",
 						"authz_msg_index": "1",
 						"receiver":        "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
@@ -166,7 +166,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "delegate",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "191018utia",
 						"authz_msg_index": "1",
 						"new_shares":      "191018.000000000000000000",
@@ -175,7 +175,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "1",
 						"module":          "staking",
 						"sender":          "celestia1gfvu3xpgze2jy20cy4lcfeq2qj3rww0a8cwuap",
@@ -183,7 +183,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "106033utia",
 						"authz_msg_index": "2",
 						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -191,7 +191,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "106033utia",
 						"authz_msg_index": "2",
 						"receiver":        "celestia1ghwz05j5s52nyvzau08eg9rqvkzgq72r92k56d",
@@ -199,7 +199,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "106033utia",
 						"authz_msg_index": "2",
 						"recipient":       "celestia1ghwz05j5s52nyvzau08eg9rqvkzgq72r92k56d",
@@ -208,14 +208,14 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "2",
 						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 844359,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "106033utia",
 						"authz_msg_index": "2",
 						"delegator":       "celestia1ghwz05j5s52nyvzau08eg9rqvkzgq72r92k56d",
@@ -224,7 +224,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "106031utia",
 						"authz_msg_index": "2",
 						"spender":         "celestia1ghwz05j5s52nyvzau08eg9rqvkzgq72r92k56d",
@@ -232,7 +232,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "106031utia",
 						"authz_msg_index": "2",
 						"receiver":        "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
@@ -240,7 +240,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "delegate",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "106031utia",
 						"authz_msg_index": "2",
 						"new_shares":      "106031.000000000000000000",
@@ -249,7 +249,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "2",
 						"module":          "staking",
 						"sender":          "celestia1ghwz05j5s52nyvzau08eg9rqvkzgq72r92k56d",
@@ -257,7 +257,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "114972utia",
 						"authz_msg_index": "3",
 						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -265,7 +265,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "114972utia",
 						"authz_msg_index": "3",
 						"receiver":        "celestia1vx8nc79y47y7kuez8m9z8hxzjcu9sy8jyymfmn",
@@ -273,7 +273,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "114972utia",
 						"authz_msg_index": "3",
 						"recipient":       "celestia1vx8nc79y47y7kuez8m9z8hxzjcu9sy8jyymfmn",
@@ -282,14 +282,14 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "3",
 						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 844359,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "114972utia",
 						"authz_msg_index": "3",
 						"delegator":       "celestia1vx8nc79y47y7kuez8m9z8hxzjcu9sy8jyymfmn",
@@ -298,7 +298,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "114961utia",
 						"authz_msg_index": "3",
 						"spender":         "celestia1vx8nc79y47y7kuez8m9z8hxzjcu9sy8jyymfmn",
@@ -306,7 +306,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "114961utia",
 						"authz_msg_index": "3",
 						"receiver":        "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
@@ -314,7 +314,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "delegate",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "114961utia",
 						"authz_msg_index": "3",
 						"new_shares":      "114961.000000000000000000",
@@ -323,7 +323,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 844359,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "3",
 						"module":          "staking",
 						"sender":          "celestia1vx8nc79y47y7kuez8m9z8hxzjcu9sy8jyymfmn",
@@ -354,13 +354,13 @@ func Test_handleExec(t *testing.T) {
 				{
 					Height: 595997,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.authz.v1beta1.MsgExec",
 					},
 				}, {
 					Height: 595997,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "0stake",
 						"authz_msg_index": "0",
 						"delegator":       "celestia1um8q93lngf6hfvslqn2nph77f2xyeklppjlxlc",
@@ -369,7 +369,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "1000utia",
 						"authz_msg_index": "0",
 						"spender":         "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
@@ -377,7 +377,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "1000utia",
 						"authz_msg_index": "0",
 						"receiver":        "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
@@ -385,7 +385,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "1000utia",
 						"authz_msg_index": "0",
 						"recipient":       "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
@@ -394,14 +394,14 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "0",
 						"sender":          "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
 				}, {
 					Height: 595997,
 					Type:   "unbond",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "1000utia",
 						"authz_msg_index": "0",
 						"completion_time": "2023-12-18T18:38:51Z",
@@ -410,7 +410,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "0",
 						"module":          "staking",
 						"sender":          "celestia1um8q93lngf6hfvslqn2nph77f2xyeklppjlxlc",
@@ -418,7 +418,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "0stake",
 						"authz_msg_index": "1",
 						"delegator":       "celestia1um8q93lngf6hfvslqn2nph77f2xyeklppjlxlc",
@@ -427,7 +427,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "unbond",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "1000utia",
 						"authz_msg_index": "1",
 						"completion_time": "2023-12-18T18:38:51Z",
@@ -436,7 +436,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "1",
 						"module":          "staking",
 						"sender":          "celestia1um8q93lngf6hfvslqn2nph77f2xyeklppjlxlc",
@@ -444,7 +444,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "0stake",
 						"authz_msg_index": "2",
 						"delegator":       "celestia1um8q93lngf6hfvslqn2nph77f2xyeklppjlxlc",
@@ -453,7 +453,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "1000utia",
 						"authz_msg_index": "2",
 						"spender":         "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
@@ -461,7 +461,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "1000utia",
 						"authz_msg_index": "2",
 						"receiver":        "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
@@ -469,7 +469,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "1000utia",
 						"authz_msg_index": "2",
 						"recipient":       "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
@@ -478,14 +478,14 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "2",
 						"sender":          "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
 				}, {
 					Height: 595997,
 					Type:   "unbond",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "1000utia",
 						"authz_msg_index": "2",
 						"completion_time": "2023-12-18T18:38:51Z",
@@ -494,7 +494,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 595997,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "2",
 						"module":          "staking",
 						"sender":          "celestia1um8q93lngf6hfvslqn2nph77f2xyeklppjlxlc",
@@ -524,21 +524,21 @@ func Test_handleExec(t *testing.T) {
 				{
 					Height: 977944,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "57268utia",
 						"spender": "celestia1gsvxuzts55h70c4338cmypzphv7l0exwc33jmp",
 					},
 				}, {
 					Height: 977944,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "57268utia",
 						"receiver": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 					},
 				}, {
 					Height: 977944,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "57268utia",
 						"recipient": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 						"sender":    "celestia1gsvxuzts55h70c4338cmypzphv7l0exwc33jmp",
@@ -546,38 +546,38 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 977944,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1gsvxuzts55h70c4338cmypzphv7l0exwc33jmp",
 					},
 				}, {
 					Height: 977944,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"fee":       "57268utia",
 						"fee_payer": "celestia1gsvxuzts55h70c4338cmypzphv7l0exwc33jmp",
 					},
 				}, {
 					Height: 977944,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"acc_seq": "celestia1gsvxuzts55h70c4338cmypzphv7l0exwc33jmp/4",
 					},
 				}, {
 					Height: 977944,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"signature": "KwNCgyd6IKCxDzqwh2s8uwS88HbXBNt+gBrx3MJPsI91xY9UKZXJhPIYifMdUS/Fdo0R6EL91VRWc7RXMGK0yA==",
 					},
 				}, {
 					Height: 977944,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.authz.v1beta1.MsgExec",
 					},
 				}, {
 					Height: 977944,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "77utia",
 						"authz_msg_index": "0",
 						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -585,7 +585,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 977944,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "77utia",
 						"authz_msg_index": "0",
 						"receiver":        "celestia1zq2atge5df93w0l6xhm87r8uspjva632aqz4fe",
@@ -593,7 +593,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 977944,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "77utia",
 						"authz_msg_index": "0",
 						"recipient":       "celestia1zq2atge5df93w0l6xhm87r8uspjva632aqz4fe",
@@ -602,14 +602,14 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 977944,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "0",
 						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 977944,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "77utia",
 						"authz_msg_index": "0",
 						"delegator":       "celestia1zq2atge5df93w0l6xhm87r8uspjva632aqz4fe",
@@ -618,7 +618,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 977944,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "0",
 						"module":          "distribution",
 						"sender":          "celestia1zq2atge5df93w0l6xhm87r8uspjva632aqz4fe",
@@ -626,7 +626,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 977944,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "127utia",
 						"authz_msg_index": "1",
 						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -634,7 +634,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 977944,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "127utia",
 						"authz_msg_index": "1",
 						"receiver":        "celestia1zq2atge5df93w0l6xhm87r8uspjva632aqz4fe",
@@ -642,7 +642,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 977944,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "127utia",
 						"authz_msg_index": "1",
 						"recipient":       "celestia1zq2atge5df93w0l6xhm87r8uspjva632aqz4fe",
@@ -651,14 +651,14 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 977944,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "1",
 						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 977944,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "127utia",
 						"authz_msg_index": "1",
 						"delegator":       "celestia1zq2atge5df93w0l6xhm87r8uspjva632aqz4fe",
@@ -667,7 +667,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 977944,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "1",
 						"module":          "distribution",
 						"sender":          "celestia1zq2atge5df93w0l6xhm87r8uspjva632aqz4fe",
@@ -696,35 +696,35 @@ func Test_handleExec(t *testing.T) {
 				{
 					Height: 45631,
 					Type:   "use_feegrant",
-					Data: map[string]any{
+					Data: map[string]string{
 						"grantee": "celestia1js8h76lxsl92qpqmsgd04u52aaqp82pr9n4p8f",
 						"granter": "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
 					},
 				}, {
 					Height: 45631,
 					Type:   "update_feegrant",
-					Data: map[string]any{
+					Data: map[string]string{
 						"grantee": "celestia1js8h76lxsl92qpqmsgd04u52aaqp82pr9n4p8f",
 						"granter": "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
 					},
 				}, {
 					Height: 45631,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "20443utia",
 						"spender": "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
 					},
 				}, {
 					Height: 45631,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "20443utia",
 						"receiver": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 					},
 				}, {
 					Height: 45631,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "20443utia",
 						"recipient": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 						"sender":    "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
@@ -732,38 +732,38 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"fee":       "20443utia",
 						"fee_payer": "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"acc_seq": "celestia1js8h76lxsl92qpqmsgd04u52aaqp82pr9n4p8f/0",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"signature": "wLj4V9p4OMCoP3OZLQU6RohalGFSHXQWXZ/7pMN1/FUx9n3YWh3eWwXb1PAYgkajLM3kGehn3mR770lufT7f+w==",
 					},
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.authz.v1beta1.MsgExec",
 					},
 				}, {
 					Height: 45631,
 					Type:   "cosmos.authz.v1beta1.EventGrant",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "0",
 						"grantee":         "celestia10eykchznjdn8jdlwaj5v9wvlmdsp6kxx8ddhq6",
 						"granter":         "celestia1rcm7tth05klgkqpucdhm5hexnk49dfda5qnwts",
@@ -792,21 +792,21 @@ func Test_handleExec(t *testing.T) {
 				{
 					Height: 45631,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "210000utia",
 						"spender": "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
 					},
 				}, {
 					Height: 45631,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "210000utia",
 						"receiver": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 					},
 				}, {
 					Height: 45631,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "210000utia",
 						"recipient": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 						"sender":    "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
@@ -814,32 +814,32 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"fee":       "210000utia",
 						"fee_payer": "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"acc_seq": "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw/0",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"signature": "pRnJae6JayIR/V4E1fwTpMC8myY3jldBM6YNWtgcuRIqLib2O6Tu06Ki3Yx3QEyjKiZSA1hH0jPRa3G/+/1Lcw==",
 					},
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/cosmos.authz.v1beta1.MsgExec",
 						"module":    "authz",
 						"msg_index": "0",
@@ -848,7 +848,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "signal_version",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":            "/celestia.signal.v1.MsgSignalVersion",
 						"authz_msg_index":   "0",
 						"msg_index":         "0",
@@ -880,21 +880,21 @@ func Test_handleExec(t *testing.T) {
 				{
 					Height: 45631,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "2259utia",
 						"spender": "celestia1cnkaqutgx24kyrge8mpp5qq0pw6mll93572anj",
 					},
 				}, {
 					Height: 45631,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "2259utia",
 						"receiver": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 					},
 				}, {
 					Height: 45631,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "2259utia",
 						"recipient": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 						"sender":    "celestia1cnkaqutgx24kyrge8mpp5qq0pw6mll93572anj",
@@ -902,38 +902,38 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1cnkaqutgx24kyrge8mpp5qq0pw6mll93572anj",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"fee":       "2259utia",
 						"fee_payer": "celestia1cnkaqutgx24kyrge8mpp5qq0pw6mll93572anj",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"acc_seq": "celestia1cnkaqutgx24kyrge8mpp5qq0pw6mll93572anj/0",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"signature": "/FrbyKniUo9iKrZnIrb3czbur2Lewro/7l2aeDEHTMlG3QGdesQKHi2ILs54MOUWNTDsAdFMvD/xWMOQ4VNTPg==",
 					},
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.authz.v1beta1.MsgExec",
 					},
 				}, {
 					Height: 45631,
 					Type:   "proposal_vote",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "0",
 						"option":          "option:VOTE_OPTION_ABSTAIN weight:\"1.000000000000000000\"",
 						"proposal_id":     "2",
@@ -942,7 +942,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "0",
 						"module":          "governance",
 						"sender":          "celestia138jl42zlxue4wpvnugcdqhxjmyd2vpt69gjdfk",
@@ -974,21 +974,21 @@ func Test_handleExec(t *testing.T) {
 				{
 					Height: 45631,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "2000utia",
 						"spender": "celestia1eqj8gju6sldleq76auawrl58nwqcl6dyh9xdry",
 					},
 				}, {
 					Height: 45631,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "2000utia",
 						"receiver": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 					},
 				}, {
 					Height: 45631,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "2000utia",
 						"recipient": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 						"sender":    "celestia1eqj8gju6sldleq76auawrl58nwqcl6dyh9xdry",
@@ -996,32 +996,32 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1eqj8gju6sldleq76auawrl58nwqcl6dyh9xdry",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"fee":       "2000utia",
 						"fee_payer": "celestia1eqj8gju6sldleq76auawrl58nwqcl6dyh9xdry",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"acc_seq": "celestia1eqj8gju6sldleq76auawrl58nwqcl6dyh9xdry/8",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"signature": "I5CqepCwRdt5drYYFZGBaXJF4Idgr/CbRURa8zSOZD9WIfI61AlmHpfP1oiZQqwBVJQTUi1TT3NSbADUpZnqrA==",
 					},
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/cosmos.authz.v1beta1.MsgExec",
 						"module":    "authz",
 						"msg_index": "0",
@@ -1030,7 +1030,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "41419902utia",
 						"authz_msg_index": "0",
 						"msg_index":       "0",
@@ -1039,7 +1039,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "41419902utia",
 						"authz_msg_index": "0",
 						"msg_index":       "0",
@@ -1048,7 +1048,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "41419902utia",
 						"authz_msg_index": "0",
 						"msg_index":       "0",
@@ -1058,7 +1058,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "0",
 						"msg_index":       "0",
 						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -1066,7 +1066,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "41419902utia",
 						"authz_msg_index": "0",
 						"delegator":       "celestia1gl0rg3g0pkcpr8umj2hvlhha06ecjd65p58r5j",
@@ -1076,7 +1076,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "8323576892utia",
 						"authz_msg_index": "1",
 						"msg_index":       "0",
@@ -1085,7 +1085,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "8323576892utia",
 						"authz_msg_index": "1",
 						"msg_index":       "0",
@@ -1094,7 +1094,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "8323576892utia",
 						"authz_msg_index": "1",
 						"msg_index":       "0",
@@ -1104,7 +1104,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "1",
 						"msg_index":       "0",
 						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -1112,7 +1112,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "withdraw_commission",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "8323576892utia",
 						"authz_msg_index": "1",
 						"msg_index":       "0",
@@ -1147,21 +1147,21 @@ func Test_handleExec(t *testing.T) {
 				{
 					Height: 45631,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "46797utia",
 						"spender": "celestia1xvj465q8yu59uy78wtqs9fv6r9urlsa89q4s8f",
 					},
 				}, {
 					Height: 45631,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "46797utia",
 						"receiver": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 					},
 				}, {
 					Height: 45631,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "46797utia",
 						"recipient": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 						"sender":    "celestia1xvj465q8yu59uy78wtqs9fv6r9urlsa89q4s8f",
@@ -1169,38 +1169,38 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1xvj465q8yu59uy78wtqs9fv6r9urlsa89q4s8f",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"fee":       "46797utia",
 						"fee_payer": "celestia1xvj465q8yu59uy78wtqs9fv6r9urlsa89q4s8f",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"acc_seq": "celestia1xvj465q8yu59uy78wtqs9fv6r9urlsa89q4s8f/0",
 					},
 				}, {
 					Height: 45631,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"signature": "I5CqepCwRdt5drYYFZGBaXJF4Idgr/CbRURa8zSOZD9WIfI61AlmHpfP1oiZQqwBVJQTUi1TT3NSbADUpZnqrA==",
 					},
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.authz.v1beta1.MsgExec",
 					},
 				}, {
 					Height: 45631,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "164617964utia",
 						"authz_msg_index": "0",
 						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -1208,7 +1208,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "164617964utia",
 						"authz_msg_index": "0",
 						"receiver":        "celestia15urq2dtp9qce4fyc85m6upwm9xul3049d30meq",
@@ -1216,7 +1216,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "164617964utia",
 						"authz_msg_index": "0",
 						"recipient":       "celestia15urq2dtp9qce4fyc85m6upwm9xul3049d30meq",
@@ -1225,14 +1225,14 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "0",
 						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 45631,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "164617964utia",
 						"authz_msg_index": "0",
 						"delegator":       "celestia15urq2dtp9qce4fyc85m6upwm9xul3049d30meq",
@@ -1241,7 +1241,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "0",
 						"module":          "distribution",
 						"sender":          "celestia15urq2dtp9qce4fyc85m6upwm9xul3049d30meq",
@@ -1249,7 +1249,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "4174387254utia",
 						"authz_msg_index": "1",
 						"spender":         "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -1257,7 +1257,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "4174387254utia",
 						"authz_msg_index": "1",
 						"receiver":        "celestia15urq2dtp9qce4fyc85m6upwm9xul3049d30meq",
@@ -1265,7 +1265,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "4174387254utia",
 						"authz_msg_index": "1",
 						"recipient":       "celestia15urq2dtp9qce4fyc85m6upwm9xul3049d30meq",
@@ -1274,21 +1274,21 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "1",
 						"sender":          "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 45631,
 					Type:   "withdraw_commission",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "4174387254utia",
 						"authz_msg_index": "1",
 					},
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "1",
 						"module":          "distribution",
 						"sender":          "celestiavaloper15urq2dtp9qce4fyc85m6upwm9xul3049gwdz0x",
@@ -1296,7 +1296,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "0stake",
 						"authz_msg_index": "2",
 						"delegator":       "celestia15urq2dtp9qce4fyc85m6upwm9xul3049d30meq",
@@ -1305,7 +1305,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "4338363027utia",
 						"authz_msg_index": "2",
 						"spender":         "celestia15urq2dtp9qce4fyc85m6upwm9xul3049d30meq",
@@ -1313,7 +1313,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "4338363027utia",
 						"authz_msg_index": "2",
 						"receiver":        "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
@@ -1321,7 +1321,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "delegate",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "4338363027utia",
 						"authz_msg_index": "2",
 						"new_shares":      "4338363027.000000000000000000",
@@ -1330,7 +1330,7 @@ func Test_handleExec(t *testing.T) {
 				}, {
 					Height: 45631,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"authz_msg_index": "2",
 						"module":          "staking",
 						"sender":          "celestia15urq2dtp9qce4fyc85m6upwm9xul3049d30meq",

@@ -20,7 +20,7 @@ import (
 
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func DecimalFromMap(m map[string]any, key string) decimal.Decimal {
+func DecimalFromMap(m map[string]string, key string) decimal.Decimal {
 	str := StringFromMap(m, key)
 	if str == "" {
 		return decimal.Zero
@@ -33,7 +33,7 @@ func DecimalFromMap(m map[string]any, key string) decimal.Decimal {
 	return dec
 }
 
-func CoinFromMap(m map[string]any, key string) (cosmosTypes.Coin, error) {
+func CoinFromMap(m map[string]string, key string) (cosmosTypes.Coin, error) {
 	str := StringFromMap(m, key)
 	if str == "" {
 		return cosmosTypes.Coin{}, nil
@@ -53,19 +53,15 @@ func Map(m map[string]any, key string) (map[string]any, error) {
 	return result, nil
 }
 
-func StringFromMap(m map[string]any, key string) string {
+func StringFromMap(m map[string]string, key string) string {
 	val, ok := m[key]
 	if !ok {
 		return ""
 	}
-	str, ok := val.(string)
-	if !ok {
-		return ""
-	}
-	return str
+	return val
 }
 
-func BalanceFromMap(m map[string]any, key string) (*cosmosTypes.Coin, error) {
+func BalanceFromMap(m map[string]string, key string) (*cosmosTypes.Coin, error) {
 	str := StringFromMap(m, key)
 	if str == "" {
 		return nil, nil
@@ -77,7 +73,7 @@ func BalanceFromMap(m map[string]any, key string) (*cosmosTypes.Coin, error) {
 	return &coin, nil
 }
 
-func AmountFromMap(m map[string]any, key string) decimal.Decimal {
+func AmountFromMap(m map[string]string, key string) decimal.Decimal {
 	str := StringFromMap(m, key)
 	if str == "" {
 		return decimal.Zero
@@ -86,23 +82,19 @@ func AmountFromMap(m map[string]any, key string) decimal.Decimal {
 	return decimal.RequireFromString(str)
 }
 
-func TimeFromMap(m map[string]any, key string) (time.Time, error) {
+func TimeFromMap(m map[string]string, key string) (time.Time, error) {
 	val, ok := m[key]
 	if !ok {
 		return time.Time{}, errors.Errorf("can't find key: %s", key)
 	}
-	str, ok := val.(string)
-	if !ok {
-		return time.Time{}, errors.Errorf("key '%s' is not a string", key)
-	}
-	return time.Parse(time.RFC3339, str)
+	return time.Parse(time.RFC3339, val)
 }
 
 var (
 	nsDivider = decimal.NewFromInt(10).Pow(decimal.NewFromInt(9))
 )
 
-func UnixNanoFromMap(m map[string]any, key string) time.Time {
+func UnixNanoFromMap(m map[string]string, key string) time.Time {
 	value := DecimalFromMap(m, key)
 	if value.IsZero() {
 		return time.Time{}
@@ -111,41 +103,29 @@ func UnixNanoFromMap(m map[string]any, key string) time.Time {
 	return time.Unix(x.IntPart(), value.Mod(nsDivider).IntPart()).UTC()
 }
 
-func Int64FromMap(m map[string]any, key string) (int64, error) {
+func Int64FromMap(m map[string]string, key string) (int64, error) {
 	val, ok := m[key]
 	if !ok {
 		return 0, errors.Errorf("can't find key: %s", key)
 	}
-	str, ok := val.(string)
-	if !ok {
-		return 0, errors.Errorf("key '%s' is not a string", key)
-	}
-	return strconv.ParseInt(str, 10, 64)
+	return strconv.ParseInt(val, 10, 64)
 }
 
-func AuthMsgIndexFromMap(m map[string]any) (*int64, error) {
+func AuthMsgIndexFromMap(m map[string]string) (*int64, error) {
 	val, ok := m["authz_msg_index"]
 	if !ok {
 		return nil, nil
 	}
-	str, ok := val.(string)
-	if !ok {
-		return nil, errors.New("key 'auth_msg_index' is not a string")
-	}
-	i, err := strconv.ParseInt(str, 10, 64)
+	i, err := strconv.ParseInt(val, 10, 64)
 	return &i, err
 }
 
-func Uint64FromMap(m map[string]any, key string) (uint64, error) {
+func Uint64FromMap(m map[string]string, key string) (uint64, error) {
 	val, ok := m[key]
 	if !ok {
 		return 0, errors.Errorf("can't find key: %s", key)
 	}
-	str, ok := val.(string)
-	if !ok {
-		return 0, errors.Errorf("key '%s' is not a string", key)
-	}
-	return strconv.ParseUint(str, 10, 64)
+	return strconv.ParseUint(val, 10, 64)
 }
 
 func Uint64(m map[string]any, key string) (uint64, error) {
@@ -164,16 +144,12 @@ func Uint64(m map[string]any, key string) (uint64, error) {
 	return 0, errors.Errorf("key '%s' is not a uint64", key)
 }
 
-func BoolFromMap(m map[string]any, key string) (bool, error) {
+func BoolFromMap(m map[string]string, key string) (bool, error) {
 	val, ok := m[key]
 	if !ok {
 		return false, errors.Errorf("can't find key: %s", key)
 	}
-	b, ok := val.(string)
-	if !ok {
-		return false, errors.Errorf("key '%s' is not a string", key)
-	}
-	return strconv.ParseBool(b)
+	return strconv.ParseBool(val)
 }
 
 func ClientStateFromMap(m map[string]any, key string) (*tmTypes.ClientState, error) {
@@ -219,7 +195,7 @@ func ChannelOrderingFromMap(m map[string]any, key string) (bool, error) {
 	}
 }
 
-func RevisionHeightFromMap(m map[string]any, key string) (uint64, uint64, error) {
+func RevisionHeightFromMap(m map[string]string, key string) (uint64, uint64, error) {
 	ch := StringFromMap(m, key)
 	parts := strings.Split(ch, "-")
 	if len(parts) != 2 {
@@ -250,14 +226,10 @@ func MessagesFromMap(m map[string]any, key string) ([]cosmosTypes.Msg, error) {
 	return msgs, nil
 }
 
-func HyperlaneMessageFromMap(m map[string]any, key string) (*util.HyperlaneMessage, error) {
-	val, ok := m[key]
+func HyperlaneMessageFromMap(m map[string]string, key string) (*util.HyperlaneMessage, error) {
+	str, ok := m[key]
 	if !ok {
 		return nil, nil
-	}
-	str, ok := val.(string)
-	if !ok {
-		return nil, errors.Errorf("key '%s' is not a string", key)
 	}
 	if str == "" {
 		return nil, nil
@@ -284,16 +256,12 @@ func parseUnquoteOptional(s string) (string, error) {
 	return s, nil
 }
 
-func BytesFromMap(m map[string]any, key string) ([]byte, error) {
+func BytesFromMap(m map[string]string, key string) ([]byte, error) {
 	val, ok := m[key]
 	if !ok {
 		return nil, errors.Errorf("can't find key: %s", key)
 	}
-	str, ok := val.(string)
-	if !ok {
-		return nil, errors.Errorf("key '%s' is not a string", key)
-	}
-	str, err := parseUnquoteOptional(str)
+	str, err := parseUnquoteOptional(val)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to unquote string")
 	}

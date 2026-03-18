@@ -23,13 +23,13 @@ var (
 func Test_coinReceived(t *testing.T) {
 	tests := []struct {
 		name    string
-		data    map[string]any
+		data    map[string]string
 		want    *storage.Address
 		wantErr bool
 	}{
 		{
 			name: "test 1",
-			data: map[string]any{
+			data: map[string]string{
 				"receiver": testAddress,
 				"amount":   "123utia",
 			},
@@ -43,9 +43,9 @@ func Test_coinReceived(t *testing.T) {
 			},
 		}, {
 			name: "test 2",
-			data: map[string]any{
+			data: map[string]string{
 				"receiver": testAddress,
-				"amount":   nil,
+				"amount":   "",
 			},
 			want: &storage.Address{
 				Hash:    testHashAddress,
@@ -57,9 +57,9 @@ func Test_coinReceived(t *testing.T) {
 			},
 		}, {
 			name: "test 3",
-			data: map[string]any{
+			data: map[string]string{
 				"receiver": "invalid",
-				"amount":   nil,
+				"amount":   "",
 			},
 			wantErr: true,
 		}, {
@@ -68,9 +68,9 @@ func Test_coinReceived(t *testing.T) {
 			wantErr: true,
 		}, {
 			name: "test 5",
-			data: map[string]any{
+			data: map[string]string{
 				"receiver": "",
-				"amount":   nil,
+				"amount":   "",
 			},
 			wantErr: true,
 		},
@@ -89,13 +89,13 @@ func Test_coinReceived(t *testing.T) {
 func Test_coinSpent(t *testing.T) {
 	tests := []struct {
 		name    string
-		data    map[string]any
+		data    map[string]string
 		want    *storage.Address
 		wantErr bool
 	}{
 		{
 			name: "test 1",
-			data: map[string]any{
+			data: map[string]string{
 				"spender": testAddress,
 				"amount":  "123utia",
 			},
@@ -109,9 +109,9 @@ func Test_coinSpent(t *testing.T) {
 			},
 		}, {
 			name: "test 2",
-			data: map[string]any{
+			data: map[string]string{
 				"spender": testAddress,
-				"amount":  nil,
+				"amount":  "",
 			},
 			want: &storage.Address{
 				Hash:    testHashAddress,
@@ -123,9 +123,9 @@ func Test_coinSpent(t *testing.T) {
 			},
 		}, {
 			name: "test 3",
-			data: map[string]any{
+			data: map[string]string{
 				"spender": "invalid",
-				"amount":  nil,
+				"amount":  "",
 			},
 			wantErr: true,
 		}, {
@@ -134,9 +134,9 @@ func Test_coinSpent(t *testing.T) {
 			wantErr: true,
 		}, {
 			name: "test 5",
-			data: map[string]any{
+			data: map[string]string{
 				"spender": "",
-				"amount":  nil,
+				"amount":  "",
 			},
 			wantErr: true,
 		},
@@ -170,13 +170,13 @@ func Test_getBalanceUpdates(t *testing.T) {
 				deletedEvents: []storage.Event{
 					{
 						Type: types.EventTypeCoinSpent,
-						Data: map[string]any{
+						Data: map[string]string{
 							"spender": testAddress,
 							"amount":  "123utia",
 						},
 					}, {
 						Type: types.EventTypeCoinReceived,
-						Data: map[string]any{
+						Data: map[string]string{
 							"receiver": testAddress,
 							"amount":   "23utia",
 						},
@@ -203,13 +203,13 @@ func Test_getBalanceUpdates(t *testing.T) {
 				deletedEvents: []storage.Event{
 					{
 						Type: types.EventTypeCoinSpent,
-						Data: map[string]any{
+						Data: map[string]string{
 							"spender": testAddress,
 							"amount":  "123utia",
 						},
 					}, {
 						Type: types.EventTypeCoinReceived,
-						Data: map[string]any{
+						Data: map[string]string{
 							"receiver": testAddress,
 							"amount":   "23utia",
 						},

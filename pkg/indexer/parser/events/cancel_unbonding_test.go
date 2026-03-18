@@ -34,14 +34,14 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Height: 844287,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation",
 					},
 				}, {
 					Height: 844287,
 					Time:   ts,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "1314utia",
 						"spender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
@@ -49,7 +49,7 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Height: 844287,
 					Time:   ts,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "1314utia",
 						"receiver": "celestia1lkrd86urrmhmsvgzfygjsguv3cgv0036hrj0m9",
 					},
@@ -57,7 +57,7 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Height: 844287,
 					Time:   ts,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "1314utia",
 						"recipient": "celestia1lkrd86urrmhmsvgzfygjsguv3cgv0036hrj0m9",
 						"sender":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -66,14 +66,14 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Height: 844287,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 844287,
 					Time:   ts,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "1314utia",
 						"delegator": "celestia1lkrd86urrmhmsvgzfygjsguv3cgv0036hrj0m9",
 						"validator": "celestiavaloper1qe8uuf5x69c526h4nzxwv4ltftr73v7q5qhs58",
@@ -82,7 +82,7 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Height: 844287,
 					Time:   ts,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "45000000utia",
 						"spender": "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
 					},
@@ -90,7 +90,7 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Height: 844287,
 					Time:   ts,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "45000000utia",
 						"receiver": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
@@ -98,7 +98,7 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Height: 844287,
 					Time:   ts,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "45000000utia",
 						"recipient": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 						"sender":    "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
@@ -107,14 +107,14 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Height: 844287,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
 					},
 				}, {
 					Height: 844287,
 					Time:   ts,
 					Type:   "cancel_unbonding_delegation",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "45000000utia",
 						"creation_height": "842069",
 						"delegator":       "celestia1lkrd86urrmhmsvgzfygjsguv3cgv0036hrj0m9",

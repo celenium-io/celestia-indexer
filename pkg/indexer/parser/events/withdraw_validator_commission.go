@@ -32,7 +32,7 @@ func handleWithdrawValidatorCommission(ctx *context.Context, events []storage.Ev
 func processWithdrawValidatorCommission(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	var validator = storage.EmptyValidator()
 
-	if validatorAddress := decoder.StringFromMap(msg.Data, "ValidatorAddress"); validatorAddress != "" {
+	if validatorAddress := msg.Data.GetStringOrDefault("ValidatorAddress"); validatorAddress != "" {
 		prefix, hash, err := types.Address(validatorAddress).Decode()
 		if err != nil {
 			return errors.Wrap(err, "decoding sender in WithdrawValidatorCommission")

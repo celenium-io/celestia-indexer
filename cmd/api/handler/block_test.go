@@ -326,7 +326,7 @@ func (s *BlockTestSuite) TestGetEvents() {
 				Position: 2,
 				Type:     types.EventTypeBurn,
 				TxId:     nil,
-				Data: map[string]any{
+				Data: map[string]string{
 					"test": "value",
 				},
 			},

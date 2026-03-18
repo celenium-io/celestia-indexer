@@ -15,32 +15,32 @@ import (
 func Test_AddSupply(t *testing.T) {
 	tests := []struct {
 		name string
-		data map[string]any
+		data map[string]string
 		want decimal.Decimal
 	}{
 		{
 			name: "valid amount",
-			data: map[string]any{
+			data: map[string]string{
 				"amount": "1000000000000000000utia",
 			},
 			want: decimal.NewFromInt(1000000000000000000),
 		}, {
 			name: "valid amount but no utia",
-			data: map[string]any{
+			data: map[string]string{
 				"amount": "1000000000000000000test",
 			},
 			want: decimal.NewFromInt(0),
 		},
 		{
 			name: "invalid amount",
-			data: map[string]any{
+			data: map[string]string{
 				"amount": "invalid_amount",
 			},
 			want: decimal.Zero,
 		},
 		{
 			name: "amount without currency",
-			data: map[string]any{
+			data: map[string]string{
 				"amount": "123456",
 			},
 			want: decimal.RequireFromString("123456"),
@@ -65,32 +65,32 @@ func Test_AddSupply(t *testing.T) {
 func Test_SubSupply(t *testing.T) {
 	tests := []struct {
 		name string
-		data map[string]any
+		data map[string]string
 		want decimal.Decimal
 	}{
 		{
 			name: "valid amount",
-			data: map[string]any{
+			data: map[string]string{
 				"amount": "1000000000000000000utia",
 			},
 			want: decimal.NewFromInt(-1000000000000000000),
 		}, {
 			name: "valid amount but no utia",
-			data: map[string]any{
+			data: map[string]string{
 				"amount": "1000000000000000000test",
 			},
 			want: decimal.NewFromInt(0),
 		},
 		{
 			name: "invalid amount",
-			data: map[string]any{
+			data: map[string]string{
 				"amount": "invalid_amount",
 			},
 			want: decimal.Zero,
 		},
 		{
 			name: "amount without currency",
-			data: map[string]any{
+			data: map[string]string{
 				"amount": "123456",
 			},
 			want: decimal.RequireFromString("-123456"),

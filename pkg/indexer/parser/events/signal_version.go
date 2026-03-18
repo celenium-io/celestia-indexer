@@ -5,6 +5,7 @@ package events
 
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/pkg/errors"
@@ -17,7 +18,11 @@ func processSignalVersion(ctx *context.Context, _ []storage.Event, msg *storage.
 	}
 
 	val := storage.EmptyValidator()
-	val.Address = decoder.StringFromMap(data, "ValidatorAddress")
+	val.Address, err = (types.PackedBytes)(data).GetString("ValidatorAddress")
+	if err != nil {
+		return err
+	}
+
 	val.Version = version
 
 	signalVersion := &storage.SignalVersion{

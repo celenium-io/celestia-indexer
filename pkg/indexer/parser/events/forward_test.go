@@ -49,7 +49,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/cosmos.bank.v1beta1.MsgSend",
 				},
 			},
@@ -71,14 +71,14 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/celestia.forwarding.v1.MsgForward",
 				},
 			},
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"denom":        "utia",
 					"amount":       "1000",
@@ -90,7 +90,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"denom":        "uatom",
 					"amount":       "500",
@@ -102,7 +102,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventForwardingComplete,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr":     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"dest_domain":      "1",
 					"dest_recipient":   "0101",
@@ -137,14 +137,14 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/celestia.forwarding.v1.MsgForward",
 				},
 			},
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"denom":        "utia",
 					"amount":       "1000",
@@ -156,7 +156,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/cosmos.bank.v1beta1.MsgSend",
 				},
 			},
@@ -176,14 +176,14 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/celestia.forwarding.v1.MsgForward",
 				},
 			},
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"denom":        "utia",
 					"amount":       "1000",
@@ -195,7 +195,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventForwardingComplete,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr":     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"dest_domain":      "1",
 					"dest_recipient":   "AAEC",
@@ -206,14 +206,14 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/celestia.forwarding.v1.MsgForward",
 				},
 			},
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr": "celestia1ccqy2wlzf2zndn4vspmuksw5frqq0ufsgw4gmt",
 					"denom":        "uatom",
 					"amount":       "2000",
@@ -225,7 +225,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventForwardingComplete,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr":     "celestia1ccqy2wlzf2zndn4vspmuksw5frqq0ufsgw4gmt",
 					"dest_domain":      "2",
 					"dest_recipient":   "010203",
@@ -273,7 +273,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/celestia.forwarding.v1.MsgForward",
 				},
 			},
@@ -298,14 +298,14 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/celestia.forwarding.v1.MsgForward",
 				},
 			},
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"denom":        "utia",
 					"amount":       "1000",
@@ -317,7 +317,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventForwardingComplete,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr":     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"dest_domain":      "1",
 					"dest_recipient":   "AAEC",
