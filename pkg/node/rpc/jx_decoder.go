@@ -21,10 +21,17 @@ import (
 	jxpkg "github.com/go-faster/jx"
 	"github.com/pkg/errors"
 
+	"github.com/celenium-io/celestia-indexer/internal/pool"
 	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/node/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	cmtTypes "github.com/cometbft/cometbft/types"
 )
+
+// base64BufPool reuses scratch buffers for base64-encoded transaction strings.
+// StrAppend(buf) writes the JSON string content directly into the provided
+// buffer (never calls strSlow), so large blob transactions no longer cause
+// per-tx heap allocations.
+var base64BufPool = pool.New(func() []byte { return make([]byte, 0, 64*1024) })
 
 const keyHeight = "height"
 
@@ -584,11 +591,14 @@ func jxData(d *jxpkg.Decoder, data *pkgTypes.Data) error {
 		switch string(key) {
 		case "txs":
 			return d.Arr(func(d *jxpkg.Decoder) error {
-				raw, err := d.StrBytes()
+				buf := base64BufPool.Get()
+				buf, err := d.StrAppend(buf[:0])
 				if err != nil {
+					base64BufPool.Put(buf)
 					return err
 				}
-				decoded, err := base64.StdEncoding.AppendDecode(nil, raw)
+				decoded, err := base64.StdEncoding.AppendDecode(nil, buf)
+				base64BufPool.Put(buf)
 				if err != nil {
 					return errors.Wrap(err, "data base64 decode")
 				}

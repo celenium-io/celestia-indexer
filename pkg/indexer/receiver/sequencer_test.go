@@ -136,14 +136,6 @@ var blocksData = []blockConciseData{
 func (s *ModuleTestSuite) TestModule_SequencerOnEmptyState() {
 	s.InitApi(nil)
 
-	receiverModule := s.createModuleEmptyState(nil)
-
-	blocksReaderModule := modules.New("ordered-blocks-reader")
-	const orderedBlocksChannel = "ordered-blocks"
-	blocksReaderModule.CreateInput(orderedBlocksChannel)
-	err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
-	s.Require().NoError(err)
-
 	tests := []struct {
 		name   string
 		order  int
@@ -167,10 +159,18 @@ func (s *ModuleTestSuite) TestModule_SequencerOnEmptyState() {
 		},
 	}
 
+	const orderedBlocksChannel = "ordered-blocks"
+
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {
 			ctx, cancelCtx := context.WithTimeout(t.Context(), 5*time.Second)
 			defer cancelCtx()
+
+			receiverModule := s.createModuleEmptyState(nil)
+			blocksReaderModule := modules.New("ordered-blocks-reader")
+			blocksReaderModule.CreateInput(orderedBlocksChannel)
+			err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
+			s.Require().NoError(err)
 
 			receiverModule.setLevel(0, nil)
 			go receiverModule.sequencer(ctx)
@@ -209,14 +209,6 @@ func (s *ModuleTestSuite) TestModule_SequencerOnEmptyState() {
 func (s *ModuleTestSuite) TestModule_SequencerOnNonEmptyState() {
 	s.InitApi(nil)
 
-	receiverModule := s.createModule()
-
-	blocksReaderModule := modules.New("ordered-blocks-reader")
-	const orderedBlocksChannel = "ordered-blocks"
-	blocksReaderModule.CreateInput(orderedBlocksChannel)
-	err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
-	s.Require().NoError(err)
-
 	blocksData := []blockConciseData{
 		{level: 1001, hash: []byte{0x10, 0x10, 0x10, 0x01}},
 		{level: 1002, hash: []byte{0x10, 0x10, 0x10, 0x02}},
@@ -248,10 +240,18 @@ func (s *ModuleTestSuite) TestModule_SequencerOnNonEmptyState() {
 		},
 	}
 
+	const orderedBlocksChannel = "ordered-blocks"
+
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {
 			ctx, cancelCtx := context.WithTimeout(t.Context(), 5*time.Second)
 			defer cancelCtx()
+
+			receiverModule := s.createModule()
+			blocksReaderModule := modules.New("ordered-blocks-reader")
+			blocksReaderModule.CreateInput(orderedBlocksChannel)
+			err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
+			s.Require().NoError(err)
 
 			receiverModule.setLevel(1000, hashOf1000Block)
 			go receiverModule.sequencer(ctx)
