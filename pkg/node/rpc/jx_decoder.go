@@ -31,7 +31,7 @@ import (
 // StrAppend(buf) writes the JSON string content directly into the provided
 // buffer (never calls strSlow), so large blob transactions no longer cause
 // per-tx heap allocations.
-var base64BufPool = pool.New(func() []byte { return make([]byte, 0, 64*1024) })
+var base64BufPool = pool.New(func() []byte { return make([]byte, 0, 4*1024*1024) })
 
 const keyHeight = "height"
 

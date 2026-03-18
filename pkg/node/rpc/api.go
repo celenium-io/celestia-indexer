@@ -26,7 +26,7 @@ import (
 )
 
 var decoderPool = pool.New(
-	func() *jxpkg.Decoder { return jxpkg.Decode(nil, 4*1024*1024) }, // 4 МБ
+	func() *jxpkg.Decoder { return jxpkg.Decode(nil, 512*1024) }, // 512 KB — large strings handled via StrAppend+base64BufPool
 )
 
 // gzipPool reuses klauspost gzip readers to avoid per-request allocations.
