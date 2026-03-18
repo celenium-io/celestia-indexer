@@ -39,11 +39,11 @@ func processChannelOpenInit(ctx *context.Context, events []storage.Event, msg *s
 	if !ok {
 		return errors.Errorf("can't receive channel settings from %s", msg.Type)
 	}
-	settings, ok := channelSettings.(storageTypes.PackedBytes)
+	settings, ok := channelSettings.(map[string]any)
 	if !ok {
 		return errors.Errorf("can't cast channel settings to map: %##v", channelSettings)
 	}
-	version, err := settings.GetString("Version")
+	version, err := (storageTypes.PackedBytes)(settings).GetString("Version")
 	if err != nil {
 		return errors.Wrap(err, "get string")
 	}
