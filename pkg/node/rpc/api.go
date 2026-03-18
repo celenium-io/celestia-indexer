@@ -25,6 +25,10 @@ import (
 	"golang.org/x/time/rate"
 )
 
+var decoderPool = pool.New(
+	func() *jxpkg.Decoder { return jxpkg.Decode(nil, 4*1024*1024) }, // 4 МБ
+)
+
 // gzipPool reuses klauspost gzip readers to avoid per-request allocations.
 // klauspost/compress/gzip is significantly faster than stdlib compress/flate for
 // decompression, using SIMD and other optimisations.
@@ -156,9 +160,9 @@ func (api *API) getStream(ctx context.Context, path string, args map[string]stri
 	if cleanup != nil {
 		defer cleanup()
 	}
-	d := jxpkg.GetDecoder()
+	d := decoderPool.Get()
 	d.Reset(streamBody)
-	defer jxpkg.PutDecoder(d)
+	defer decoderPool.Put(d)
 	return fn(d)
 }
 
@@ -206,9 +210,10 @@ func (api *API) postStream(ctx context.Context, requests []types.Request, fn fun
 	if cleanup != nil {
 		defer cleanup()
 	}
-	d := jxpkg.GetDecoder()
+
+	d := decoderPool.Get()
 	d.Reset(streamBody)
-	defer jxpkg.PutDecoder(d)
+	defer decoderPool.Put(d)
 
 	return fn(d)
 }
