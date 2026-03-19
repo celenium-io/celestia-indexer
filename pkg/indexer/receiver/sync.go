@@ -121,7 +121,7 @@ func (r *Module) passBlocks(ctx context.Context, head types.Level) {
 		case <-fetchCtx.Done():
 			r.fetchWg.Wait()
 			return
-		case <-time.After(100 * time.Millisecond):
+		default:
 		}
 
 		batch = append(batch, level)
