@@ -5,6 +5,7 @@ package storage
 
 import (
 	"context"
+	"slices"
 
 	"github.com/celenium-io/celestia-indexer/internal/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -27,16 +28,11 @@ func (module *Module) saveSignals(
 		return nil
 	}
 
-	votingPower, validators, err := module.totalVotingPower(ctx, tx)
+	votingPower, _, err := module.totalVotingPower(ctx, tx)
 	if err != nil {
 		return errors.Wrapf(err, "receiving total voting power")
 	}
 	votingPower = math.Shares(votingPower)
-
-	validatorsMap := make(map[uint64]storage.Validator, len(validators))
-	for i := range validators {
-		validatorsMap[validators[i].Id] = validators[i]
-	}
 
 	for i := range signals {
 		if signals[i].Validator == nil {
@@ -61,11 +57,7 @@ func (module *Module) saveSignals(
 		return errors.Wrap(err, "saving signal version")
 	}
 
-	if err := postProcessingSignal(ctx, tx, signals, upgrades, votingPower, validators); err != nil {
-		return errors.Wrap(err, "postProcessingSignal")
-	}
-
-	if err := saveUpgrades(ctx, tx, upgrades, state, votingPower, validators); err != nil {
+	if err := saveUpgrades(ctx, tx, upgrades, state, votingPower); err != nil {
 		return errors.Wrap(err, "save upgrades")
 	}
 
@@ -87,20 +79,37 @@ func (module *Module) tryUpgrade(
 		return errors.Wrapf(err, "receiving total voting power")
 	}
 	votingPower = math.Shares(votingPower)
+	threshold := votingPower.Mul(signalsThreshold)
 
-	pass, voted, err := recalculateSignalsForUpgrade(state.Version+1, state, votingPower, validators)
-	if err != nil {
-		return errors.Wrap(err, "recalculateSignalsForUpgrade")
+	seen := make(map[uint64]struct{})
+	var versions []uint64
+	for i := range validators {
+		v := validators[i].Version
+		if v == 0 || v <= state.Version {
+			continue
+		}
+		if _, ok := seen[v]; !ok {
+			seen[v] = struct{}{}
+			versions = append(versions, v)
+		}
+	}
+	slices.Sort(versions)
+
+	for i := range versions {
+		voted, err := tx.UpdateSignalsAfterUpgrade(ctx, versions[i])
+		if err != nil {
+			return errors.Wrapf(err, "update signals for version %d", versions[i])
+		}
+		if math.Shares(voted).GreaterThan(threshold) {
+			upgrade.Version = versions[i]
+			upgrade.VotingPower = votingPower
+			upgrade.VotedPower = math.Shares(voted)
+			upgrade.Status = types.UpgradeStatusWaitingUpgrade
+			return tx.SaveUpgrades(ctx, upgrade)
+		}
 	}
 
-	upgrade.Version = state.Version + 1
-	upgrade.VotingPower = votingPower
-	upgrade.VotedPower = voted
-	if pass {
-		upgrade.Status = types.UpgradeStatusWaitingUpgrade
-	}
-
-	return tx.SaveUpgrades(ctx, upgrade)
+	return nil
 }
 
 func saveUpgrades(
@@ -109,110 +118,41 @@ func saveUpgrades(
 	upgrades *sync.Map[uint64, *storage.Upgrade],
 	state storage.State,
 	votingPower decimal.Decimal,
-	validators []storage.Validator,
 ) error {
 	if upgrades.Len() == 0 {
 		return nil
 	}
 
+	threshold := votingPower.Mul(signalsThreshold)
+
+	var toSave []*storage.Upgrade
 	err := upgrades.Range(func(version uint64, upgrade *storage.Upgrade) (error, bool) {
 		if state.Version > 0 && state.Version >= version {
 			return nil, false
 		}
 
-		pass, voted, err := recalculateSignalsForUpgrade(version, state, votingPower, validators)
+		voted, err := tx.UpdateSignalsAfterUpgrade(ctx, version)
 		if err != nil {
-			return errors.Wrap(err, "recalculateSignalsForUpgrade"), true
+			return errors.Wrapf(err, "update signals for version %d", version), true
 		}
 
 		upgrade.VotingPower = votingPower
-		upgrade.VotedPower = voted
-		if pass {
+		upgrade.VotedPower = math.Shares(voted)
+		if upgrade.VotedPower.GreaterThan(threshold) {
 			upgrade.Status = types.UpgradeStatusWaitingUpgrade
 		}
+		toSave = append(toSave, upgrade)
 
 		return nil, false
 	})
-
 	if err != nil {
 		return err
 	}
-
-	return tx.SaveUpgrades(ctx, upgrades.Values()...)
-}
-
-func recalculateSignalsForUpgrade(
-	version uint64,
-	state storage.State,
-	votingPower decimal.Decimal,
-	validators []storage.Validator,
-) (bool, decimal.Decimal, error) {
-	if version == 0 {
-		return false, decimal.Zero, errors.New("recalculate signals for 0 upgrade")
-	}
-
-	if state.Version > 0 && state.Version >= version {
-		return false, decimal.Zero, nil
-	}
-
-	var (
-		pass      bool
-		threshold = votingPower.Mul(signalsThreshold)
-		voted     = decimal.Zero
-	)
-
-	for i := range validators {
-		if validators[i].Version != version {
-			continue
-		}
-		voted = voted.Add(math.Shares(validators[i].Stake))
-		if voted.GreaterThan(threshold) {
-			pass = true
-		}
-	}
-
-	return pass, voted, nil
-}
-
-func postProcessingSignal(
-	ctx context.Context,
-	tx storage.Transaction,
-	signals []*storage.SignalVersion,
-	upgrades *sync.Map[uint64, *storage.Upgrade],
-	votingPower decimal.Decimal,
-	validators []storage.Validator,
-) error {
-	if len(signals) == 0 {
+	if len(toSave) == 0 {
 		return nil
 	}
 
-	versions := map[uint64]struct{}{}
-	for i := range signals {
-		versions[signals[i].Version] = struct{}{}
-	}
-
-	for version := range versions {
-		var voted decimal.Decimal
-		for i := range validators {
-			if validators[i].Version != version {
-				continue
-			}
-			voted = voted.Add(math.Shares(validators[i].Stake))
-		}
-
-		if val, ok := upgrades.Get(version); ok {
-			val.VotedPower = voted
-			val.VotingPower = votingPower
-		} else {
-			return errors.Errorf("found signal without upgrade version %d", version)
-		}
-
-		if err := tx.UpdateSignalsAfterUpgrade(ctx, version); err != nil {
-			return errors.Wrapf(err, "update signals for version %d", version)
-		}
-	}
-
-	return nil
+	return tx.SaveUpgrades(ctx, toSave...)
 }
 
 func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transaction) (decimal.Decimal, []storage.Validator, error) {

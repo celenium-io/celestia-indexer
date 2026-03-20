@@ -5100,11 +5100,12 @@ func (c *MockTransactionUpdateRollupCall) DoAndReturn(f func(context.Context, *s
 }
 
 // UpdateSignalsAfterUpgrade mocks base method.
-func (m *MockTransaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) error {
+func (m *MockTransaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (decimal.Decimal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateSignalsAfterUpgrade", ctx, version)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(decimal.Decimal)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // UpdateSignalsAfterUpgrade indicates an expected call of UpdateSignalsAfterUpgrade.
@@ -5120,19 +5121,19 @@ type MockTransactionUpdateSignalsAfterUpgradeCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Return(arg0 error) *MockTransactionUpdateSignalsAfterUpgradeCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Return(arg0 decimal.Decimal, arg1 error) *MockTransactionUpdateSignalsAfterUpgradeCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Do(f func(context.Context, uint64) error) *MockTransactionUpdateSignalsAfterUpgradeCall {
+func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Do(f func(context.Context, uint64) (decimal.Decimal, error)) *MockTransactionUpdateSignalsAfterUpgradeCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionUpdateSignalsAfterUpgradeCall) DoAndReturn(f func(context.Context, uint64) error) *MockTransactionUpdateSignalsAfterUpgradeCall {
+func (c *MockTransactionUpdateSignalsAfterUpgradeCall) DoAndReturn(f func(context.Context, uint64) (decimal.Decimal, error)) *MockTransactionUpdateSignalsAfterUpgradeCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

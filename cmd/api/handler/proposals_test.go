@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -77,7 +78,7 @@ func TestSuiteProposal_Run(t *testing.T) {
 }
 
 func (s *ProposalTestSuite) TestList() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/proposal")
@@ -106,7 +107,7 @@ func (s *ProposalTestSuite) TestList() {
 }
 
 func (s *ProposalTestSuite) TestGet() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/proposal/:id")
@@ -140,7 +141,7 @@ func (s *ProposalTestSuite) TestVotes() {
 	q.Set("limit", "10")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/proposal/:id/votes")
@@ -216,7 +217,7 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithVoter() {
 	q.Set("offset", "0")
 	q.Set("address", testAddress)
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/proposal/:id/votes")
@@ -296,7 +297,7 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithValidator() {
 	q.Set("offset", "0")
 	q.Set("validator", "celestiavaloper1qycj0ymu9fqvwgyw4xz93p3n4a83jjk7sm2wzh")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/proposal/:id/votes")

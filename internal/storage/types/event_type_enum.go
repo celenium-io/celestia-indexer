@@ -10,9 +10,10 @@ package types
 
 import (
 	"database/sql/driver"
-	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 const (
@@ -186,6 +187,8 @@ const (
 	EventTypeSignalVersion EventType = "signal_version"
 	// EventTypeIbccallbackerrorIcs27Packet is a EventType of type ibccallbackerror-ics27_packet.
 	EventTypeIbccallbackerrorIcs27Packet EventType = "ibccallbackerror-ics27_packet"
+	// EventTypeIbccallbackerrorFungibleTokenPacket is a EventType of type ibccallbackerror-fungible_token_packet.
+	EventTypeIbccallbackerrorFungibleTokenPacket EventType = "ibccallbackerror-fungible_token_packet"
 	// EventTypeCelestiaforwardingv1EventTokenForwarded is a EventType of type celestia.forwarding.v1.EventTokenForwarded.
 	EventTypeCelestiaforwardingv1EventTokenForwarded EventType = "celestia.forwarding.v1.EventTokenForwarded"
 	// EventTypeCelestiaforwardingv1EventForwardingComplete is a EventType of type celestia.forwarding.v1.EventForwardingComplete.
@@ -286,6 +289,7 @@ var _EventTypeNames = []string{
 	string(EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm),
 	string(EventTypeSignalVersion),
 	string(EventTypeIbccallbackerrorIcs27Packet),
+	string(EventTypeIbccallbackerrorFungibleTokenPacket),
 	string(EventTypeCelestiaforwardingv1EventTokenForwarded),
 	string(EventTypeCelestiaforwardingv1EventForwardingComplete),
 	string(EventTypeCelestiazkismv1EventCreateInterchainSecurityModule),
@@ -388,6 +392,7 @@ func EventTypeValues() []EventType {
 		EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm,
 		EventTypeSignalVersion,
 		EventTypeIbccallbackerrorIcs27Packet,
+		EventTypeIbccallbackerrorFungibleTokenPacket,
 		EventTypeCelestiaforwardingv1EventTokenForwarded,
 		EventTypeCelestiaforwardingv1EventForwardingComplete,
 		EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,
@@ -494,6 +499,7 @@ var _EventTypeValue = map[string]EventType{
 	"hyperlane.core.interchain_security.v1.EventCreateRoutingIsm":    EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm,
 	"signal_version":                                        EventTypeSignalVersion,
 	"ibccallbackerror-ics27_packet":                         EventTypeIbccallbackerrorIcs27Packet,
+	"ibccallbackerror-fungible_token_packet":                EventTypeIbccallbackerrorFungibleTokenPacket,
 	"celestia.forwarding.v1.EventTokenForwarded":            EventTypeCelestiaforwardingv1EventTokenForwarded,
 	"celestia.forwarding.v1.EventForwardingComplete":        EventTypeCelestiaforwardingv1EventForwardingComplete,
 	"celestia.zkism.v1.EventCreateInterchainSecurityModule": EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,

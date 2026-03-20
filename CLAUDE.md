@@ -124,6 +124,24 @@ CACHE_URL / CACHE_TTL
 INDEXER_START_LEVEL / INDEXER_SCRIPTS_DIR / NETWORK
 ```
 
+## Migrations
+
+Migrations live in `internal/storage/postgres/migrations/`, named by date (e.g. `20260320000001_description.go`). Each file registers exactly one migration via `init()`:
+
+```go
+func init() {
+    Migrations.MustRegister(upXxx, downXxx)
+}
+```
+
+**Both `up` and `down` functions are required.** Never leave `down` as a stub or `TODO`.
+
+- `up` — applies the change (e.g. `ALTER TYPE ... ADD VALUE`, `CREATE INDEX`, `ALTER TABLE ... ADD COLUMN`)
+- `down` — fully reverts it. PostgreSQL-specific notes:
+  - Removing an added enum value: `DELETE FROM pg_enum WHERE enumlabel = '...' AND enumtypid = (SELECT oid FROM pg_type WHERE typname = '...')` — only safe if no rows use that value
+  - Dropping a column: `ALTER TABLE ... DROP COLUMN IF EXISTS ...`
+  - Dropping an index: `DROP INDEX IF EXISTS ...`
+
 ## Storage Patterns
 
 All storage files in `internal/storage/postgres/`. Each entity has its own file (`address.go`, `block.go`, `tx.go`, etc.).

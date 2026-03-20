@@ -2182,8 +2182,9 @@ func (s *TransactionTestSuite) TestUpdateSignalsAfterUpgrade() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx.UpdateSignalsAfterUpgrade(ctx, 1488)
+	value, err := tx.UpdateSignalsAfterUpgrade(ctx, 1488)
 	s.Require().NoError(err)
+	s.Require().Equal("1000100", value.String())
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))

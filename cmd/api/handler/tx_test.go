@@ -101,7 +101,7 @@ func TestSuiteTx_Run(t *testing.T) {
 }
 
 func (s *TxTestSuite) TestGet() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx/:hash")
@@ -137,7 +137,7 @@ func (s *TxTestSuite) TestGet() {
 }
 
 func (s *TxTestSuite) TestGetInvalidTx() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx/:hash")
@@ -161,7 +161,7 @@ func (s *TxTestSuite) TestList() {
 	q.Set("status", "success")
 	q.Set("msg_type", "MsgUnjail,MsgSend")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
@@ -204,7 +204,7 @@ func (s *TxTestSuite) TestListWithHeight() {
 	q.Set("limit", "2")
 	q.Set("height", "100")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
@@ -234,7 +234,7 @@ func (s *TxTestSuite) TestListWithHeightAndFrom() {
 	q.Set("height", "100")
 	q.Set("from", "1690851660") // unix for testTime
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
@@ -263,7 +263,7 @@ func (s *TxTestSuite) TestListWithHeightNotFound() {
 	q := make(url.Values)
 	q.Set("height", "999999999")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
@@ -293,7 +293,7 @@ func (s *TxTestSuite) TestListValidationStatusError() {
 	q.Set("status", "invalid")
 	q.Set("msg_type", "MsgUnjail,MsgSend")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
@@ -315,7 +315,7 @@ func (s *TxTestSuite) TestListValidationMsgTypeError() {
 	q.Set("status", "success")
 	q.Set("msg_type", "invalid,MsgSend")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
@@ -339,7 +339,7 @@ func (s *TxTestSuite) TestListTime() {
 	q.Set("from", "1692880000")
 	q.Set("to", "1692890000")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
@@ -387,7 +387,7 @@ func (s *TxTestSuite) TestListHeight() {
 	q.Set("height", "1000")
 	q.Set("messages", "true")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
@@ -460,7 +460,7 @@ func (s *TxTestSuite) TestListExcludedMessages() {
 		Return(blockTime, nil).
 		Times(1)
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
@@ -516,7 +516,7 @@ func (s *TxTestSuite) TestGetEvents() {
 	q.Set("limit", "2")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx/:hash/events")
@@ -563,7 +563,7 @@ func (s *TxTestSuite) TestGetMessage() {
 	q.Set("limit", "2")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx/:hash/events")
@@ -606,7 +606,7 @@ func (s *TxTestSuite) TestGetMessage() {
 }
 
 func (s *TxTestSuite) TestCount() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx/count")
@@ -625,7 +625,7 @@ func (s *TxTestSuite) TestCount() {
 }
 
 func (s *TxTestSuite) TestGenesis() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx/genesis")
@@ -659,7 +659,7 @@ func (s *TxTestSuite) TestGenesis() {
 }
 
 func (s *TxTestSuite) TestBlobs() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx/:hash/blobs")
@@ -716,7 +716,7 @@ func (s *TxTestSuite) TestListWithCursorAsc() {
 	q.Set("cursor", "5")
 	q.Set("sort", "asc")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
@@ -747,7 +747,7 @@ func (s *TxTestSuite) TestListWithCursorDesc() {
 	q.Set("cursor", "3")
 	q.Set("sort", "desc")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
@@ -779,7 +779,7 @@ func (s *TxTestSuite) TestListWithCursorAndMsgType() {
 	q.Set("msg_type", "MsgSend")
 	q.Set("sort", "asc")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx")
@@ -806,7 +806,7 @@ func (s *TxTestSuite) TestListWithCursorAndMsgType() {
 }
 
 func (s *TxTestSuite) TestBlobsCount() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/tx/:hash/blobs/count")

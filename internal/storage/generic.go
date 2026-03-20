@@ -131,7 +131,7 @@ type Transaction interface {
 	Jail(ctx context.Context, validators ...*Validator) error
 	SaveSignals(ctx context.Context, signals ...*SignalVersion) error
 	SaveUpgrades(ctx context.Context, upgrades ...*Upgrade) error
-	UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) error
+	UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (decimal.Decimal, error)
 	SaveHyperlaneIgps(ctx context.Context, igps ...*HLIGP) error
 	SaveHyperlaneIgpConfigs(ctx context.Context, configs ...HLIGPConfig) error
 	SaveHyperlaneGasPayments(ctx context.Context, payments ...*HLGasPayment) error

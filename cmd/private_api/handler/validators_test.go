@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"context"
 	"database/sql"
 	"net/http"
 	"net/http/httptest"
@@ -89,7 +90,7 @@ func TestValidateRollupProvider(t *testing.T) {
 
 func TestKeyValidator_Validate(t *testing.T) {
 	t.Run("valid key", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 		rec := httptest.NewRecorder()
 		e := echo.New()
 		ctx := e.NewContext(req, rec)
@@ -115,7 +116,7 @@ func TestKeyValidator_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid key", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 		rec := httptest.NewRecorder()
 		e := echo.New()
 		ctx := e.NewContext(req, rec)
@@ -143,7 +144,7 @@ func TestKeyValidator_Validate(t *testing.T) {
 	})
 
 	t.Run("unexpected error", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 		rec := httptest.NewRecorder()
 		e := echo.New()
 		ctx := e.NewContext(req, rec)

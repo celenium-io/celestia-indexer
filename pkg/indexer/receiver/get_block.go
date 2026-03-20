@@ -41,6 +41,7 @@ func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 			batchSize = min(int(r.bulkSize.Load()), len(remaining))
 			chunk     = remaining[:batchSize]
 			start     = time.Now()
+			received  = make(map[types.Level]struct{}, batchSize)
 		)
 
 		_, err := r.circuitBreaker.Execute(func() (any, error) {
@@ -54,6 +55,7 @@ func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 				case <-ctx.Done():
 					return ctx.Err()
 				}
+				received[block.Height] = struct{}{}
 				return nil
 			}, chunk...)
 			return nil, err
@@ -74,7 +76,32 @@ func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 			continue
 		}
 
-		r.adjustBulkSize(len(chunk), time.Since(start))
-		remaining = remaining[batchSize:]
+		r.adjustBulkSize(len(received), time.Since(start))
+
+		if len(received) == batchSize {
+			remaining = remaining[batchSize:]
+			continue
+		}
+
+		// Stream completed without error but delivered fewer blocks than requested.
+		// Collect missing levels and retry them before processing the rest.
+		missing := make([]types.Level, 0, batchSize-len(received))
+		for i := range chunk {
+			if _, ok := received[chunk[i]]; !ok {
+				missing = append(missing, chunk[i])
+			}
+		}
+		r.Log.Warn().
+			Int("missing", len(missing)).
+			Int("received", len(received)).
+			Msg("partial stream response, retrying missing blocks")
+
+		rest := remaining[batchSize:]
+		newRemaining := make([]types.Level, 0, len(missing)+len(rest))
+		newRemaining = append(newRemaining, missing...)
+		newRemaining = append(newRemaining, rest...)
+		remaining = newRemaining
+
+		time.Sleep(time.Second)
 	}
 }

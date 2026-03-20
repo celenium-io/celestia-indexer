@@ -10,8 +10,9 @@ package types
 
 import (
 	"database/sql/driver"
-	"errors"
 	"fmt"
+
+	"github.com/pkg/errors"
 )
 
 const (

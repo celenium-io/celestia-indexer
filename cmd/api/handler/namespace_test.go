@@ -151,7 +151,7 @@ func TestSuiteNamespace_Run(t *testing.T) {
 }
 
 func (s *NamespaceTestSuite) TestGet() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace/:id")
@@ -178,7 +178,7 @@ func (s *NamespaceTestSuite) TestGet() {
 }
 
 func (s *NamespaceTestSuite) TestGetInvalidNamespaceHeight() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace/:id")
@@ -195,7 +195,7 @@ func (s *NamespaceTestSuite) TestGetInvalidNamespaceHeight() {
 }
 
 func (s *NamespaceTestSuite) TestList() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace")
@@ -247,7 +247,7 @@ func (s *NamespaceTestSuite) TestListWithSort() {
 		q.Set("sort", request.Sort)
 		q.Set("sort_by", request.SortBy)
 
-		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 		rec := httptest.NewRecorder()
 		c := s.echo.NewContext(req, rec)
 		c.SetPath("/namespace")
@@ -275,7 +275,7 @@ func (s *NamespaceTestSuite) TestListWithSort() {
 }
 
 func (s *NamespaceTestSuite) TestGetWithVersion() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace/:id/:version")
@@ -301,7 +301,7 @@ func (s *NamespaceTestSuite) TestGetWithVersion() {
 }
 
 func (s *NamespaceTestSuite) TestGetByHash() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace_by_hash/:hash")
@@ -327,7 +327,7 @@ func (s *NamespaceTestSuite) TestGetByHash() {
 }
 
 func (s *NamespaceTestSuite) TestGetBlobs() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace_by_hash/:hash/:height")
@@ -375,7 +375,7 @@ func (s *NamespaceTestSuite) TestGetBlobs() {
 }
 
 func (s *NamespaceTestSuite) TestGetMessages() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace/:id/:version/messages")
@@ -435,7 +435,7 @@ func (s *NamespaceTestSuite) TestBlob() {
 	err := json.NewEncoder(stream).Encode(blobReq)
 	s.Require().NoError(err)
 
-	req := httptest.NewRequest(http.MethodPost, "/", stream)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/", stream)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/blob")
@@ -474,7 +474,7 @@ func (s *NamespaceTestSuite) TestBlob() {
 }
 
 func (s *NamespaceTestSuite) TestGetLogs() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace/:id/:version/logs")
@@ -531,7 +531,7 @@ func (s *NamespaceTestSuite) TestGetLogsBySigner() {
 	args := make(url.Values)
 	args.Set("signers", "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r,celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+args.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+args.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace/:id/:version/logs")
@@ -600,7 +600,7 @@ func (s *NamespaceTestSuite) TestGetLogsWithCommitment() {
 	args := make(url.Values)
 	args.Set("commitment", cm)
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+args.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+args.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace/:id/:version/logs")
@@ -653,7 +653,7 @@ func (s *NamespaceTestSuite) TestGetLogsWithCommitment() {
 }
 
 func (s *NamespaceTestSuite) TestRollups() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/namespace/:id/:version/rollups")
@@ -695,7 +695,7 @@ func (s *NamespaceTestSuite) TestBlobMetadata() {
 	err := json.NewEncoder(stream).Encode(blobReq)
 	s.Require().NoError(err)
 
-	req := httptest.NewRequest(http.MethodPost, "/", stream)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/", stream)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/blob/metadata")
@@ -742,7 +742,7 @@ func (s *NamespaceTestSuite) TestBlobMetadata() {
 }
 
 func (s *NamespaceTestSuite) TestBlobs() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/blobs")
@@ -800,7 +800,7 @@ func (s *NamespaceTestSuite) TestBlobProofs() {
 	err := json.NewEncoder(stream).Encode(proofReq)
 	s.Require().NoError(err)
 
-	req := httptest.NewRequest(http.MethodPost, "/", stream)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/", stream)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/blob/proofs")

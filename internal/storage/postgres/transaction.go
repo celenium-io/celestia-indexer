@@ -1480,13 +1480,28 @@ func (tx Transaction) HyperlaneToken(ctx context.Context, id []byte) (token mode
 	return
 }
 
-func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) error {
+func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (decimal.Decimal, error) {
 	_, err := tx.Tx().NewUpdate().Table("signal_version", "validator").
 		SetColumn("voting_power", "validator.stake").
 		Where("signal_version.version = ?", version).
 		Where("validator.id = validator_id").
 		Exec(ctx)
-	return err
+	if err != nil {
+		return decimal.Zero, err
+	}
+
+	var sum decimal.Decimal
+	err = tx.Tx().NewSelect().
+		TableExpr("(?) AS latest",
+			tx.Tx().NewSelect().
+				Table("signal_version").
+				ColumnExpr("DISTINCT ON (validator_id) voting_power").
+				Where("version = ?", version).
+				OrderExpr("validator_id, height DESC"),
+		).
+		ColumnExpr("COALESCE(SUM(voting_power), 0)").
+		Scan(ctx, &sum)
+	return sum, err
 }
 
 func (tx Transaction) HyperlaneIgp(ctx context.Context, id []byte) (igp models.HLIGP, err error) {
