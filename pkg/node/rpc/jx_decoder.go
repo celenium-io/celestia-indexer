@@ -578,6 +578,23 @@ func jxHeader(d *jxpkg.Decoder, h *pkgTypes.Header) error {
 				return err
 			}
 			h.ProposerAddress = hx
+		case "version":
+			err := d.ObjBytes(func(d *jxpkg.Decoder, key []byte) error {
+				switch string(key) {
+				case "app":
+					version, err := jxUint64(d)
+					if err != nil {
+						return errors.Wrap(err, "app")
+					}
+					h.Version.App = version
+					return nil
+				default:
+					return d.Skip()
+				}
+			})
+			if err != nil {
+				return err
+			}
 		default:
 			return d.Skip()
 		}
