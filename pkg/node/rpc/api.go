@@ -111,14 +111,15 @@ const (
 )
 
 type API struct {
-	client    *http.Client
-	cfg       config.DataSource
-	rps       int
-	rateLimit *rate.Limiter
-	log       zerolog.Logger
+	client      *http.Client
+	cfg         config.DataSource
+	rps         int
+	rateLimit   *rate.Limiter
+	log         zerolog.Logger
+	disableGzip bool
 }
 
-func NewAPI(cfg config.DataSource) API {
+func NewAPI(cfg config.DataSource, opts ...ApiOption) API {
 	rps := cfg.RequestsPerSecond
 	if cfg.RequestsPerSecond < 1 || cfg.RequestsPerSecond > 100 {
 		rps = 10
@@ -137,7 +138,7 @@ func NewAPI(cfg config.DataSource) API {
 	t.DisableCompression = true
 	t.ReadBufferSize = 256 * 1024
 
-	return API{
+	a := API{
 		client: &http.Client{
 			Transport: t,
 			Timeout:   time.Second * time.Duration(timeout),
@@ -147,6 +148,10 @@ func NewAPI(cfg config.DataSource) API {
 		rateLimit: rate.NewLimiter(rate.Every(time.Second/time.Duration(rps)), rps),
 		log:       log.With().Str("module", "node rpc").Logger(),
 	}
+	for _, opt := range opts {
+		opt(&a)
+	}
+	return a
 }
 
 func (api *API) getStream(ctx context.Context, path string, args map[string]string, fn func(*jxpkg.Decoder) error) error {
@@ -178,7 +183,9 @@ func (api *API) getStream(ctx context.Context, path string, args map[string]stri
 		return err
 	}
 	req.Header.Set("User-Agent", celeniumUserAgent)
-	req.Header.Set("Accept-Encoding", "gzip")
+	if !api.disableGzip {
+		req.Header.Set("Accept-Encoding", "gzip")
+	}
 
 	response, err := api.client.Do(req) //nolint:gosec
 	if err != nil {
@@ -228,7 +235,9 @@ func (api *API) postStream(ctx context.Context, requests []types.Request, fn fun
 		return err
 	}
 	req.Header.Set("User-Agent", celeniumUserAgent)
-	req.Header.Set("Accept-Encoding", "gzip")
+	if !api.disableGzip {
+		req.Header.Set("Accept-Encoding", "gzip")
+	}
 
 	response, err := api.client.Do(req) //nolint:gosec
 	if err != nil {

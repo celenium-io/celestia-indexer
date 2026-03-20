@@ -22,6 +22,7 @@ type Indexer struct {
 	ScriptsDir       string `validate:"omitempty,dir"   yaml:"scripts_dir"`
 	RequestBulkSize  int    `validate:"omitempty,min=1" yaml:"request_bulk_size"`
 	FetchConcurrency int    `validate:"omitempty,min=1" yaml:"fetch_concurrency"`
+	DisableGzip      bool   `yaml:"disable_gzip"`
 }
 
 // Substitute -

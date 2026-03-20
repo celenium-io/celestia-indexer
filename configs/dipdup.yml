@@ -8,6 +8,7 @@ indexer:
   scripts_dir: ${INDEXER_SCRIPTS_DIR:-./database}
   request_bulk_size: ${INDEXER_REQUEST_BULK_SIZE:-10}
   fetch_concurrency: ${INDEXER_FETCH_CONCURRENCY:-1}
+  disable_gzip: ${INDEXER_DISABLE_GZIP:-false}
 
 celestials:
   chain_id: ${CELESTIALS_CHAIN_ID:-celestia-1}

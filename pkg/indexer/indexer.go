@@ -143,7 +143,11 @@ func createReceiver(ctx context.Context, cfg config.Config, pg postgres.Storage)
 		return rpc.API{}, nil, errors.Wrap(err, "while loading state")
 	}
 
-	nodeRpc := rpc.NewAPI(cfg.DataSources["node_rpc"])
+	rpcOpts := make([]rpc.ApiOption, 0)
+	if cfg.Indexer.DisableGzip {
+		rpcOpts = append(rpcOpts, rpc.WithDisableGzip())
+	}
+	nodeRpc := rpc.NewAPI(cfg.DataSources["node_rpc"], rpcOpts...)
 	nodeApi := api.NewAPI(cfg.DataSources["node_api"])
 
 	var ws *http.HTTP
