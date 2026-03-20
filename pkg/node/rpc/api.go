@@ -60,7 +60,9 @@ func releaseGzipReader(gz *kgzip.Reader) {
 // Keeping both steps in RAM eliminates the syscall-per-bufio-fill overhead that
 // dominates CPU when the flate decompressor reads directly from the network.
 // The returned cleanup function must be called when the reader is no longer needed.
-func (api *API) openBody(resp *http.Response) (io.Reader, func()) {
+// openBody reads the entire response body and optionally decompresses gzip.
+// Returns the reader, compressed byte count, uncompressed byte count, and cleanup func.
+func (api *API) openBody(resp *http.Response) (io.Reader, int64, int64, func()) {
 	compBuf := bodyBufPool.Get()
 	compBuf.Reset()
 	if _, err := io.Copy(compBuf, resp.Body); err != nil {
@@ -68,11 +70,13 @@ func (api *API) openBody(resp *http.Response) (io.Reader, func()) {
 		api.log.Warn().Err(err).
 			Str("url", resp.Request.URL.String()).
 			Msg("reading response body failed, streaming raw")
-		return resp.Body, nil
+		return resp.Body, 0, 0, nil
 	}
 
+	compressedBytes := int64(compBuf.Len())
+
 	if resp.Header.Get("Content-Encoding") != "gzip" {
-		return bytes.NewReader(compBuf.Bytes()), func() { bodyBufPool.Put(compBuf) }
+		return bytes.NewReader(compBuf.Bytes()), compressedBytes, compressedBytes, func() { bodyBufPool.Put(compBuf) }
 	}
 
 	gz, err := acquireGzipReader(bytes.NewReader(compBuf.Bytes()))
@@ -80,7 +84,7 @@ func (api *API) openBody(resp *http.Response) (io.Reader, func()) {
 		api.log.Warn().Err(err).
 			Str("url", resp.Request.URL.String()).
 			Msg("gzip reader init failed, reading raw body")
-		return bytes.NewReader(compBuf.Bytes()), func() { bodyBufPool.Put(compBuf) }
+		return bytes.NewReader(compBuf.Bytes()), compressedBytes, compressedBytes, func() { bodyBufPool.Put(compBuf) }
 	}
 
 	decompBuf := bodyBufPool.Get()
@@ -92,12 +96,14 @@ func (api *API) openBody(resp *http.Response) (io.Reader, func()) {
 		api.log.Warn().Err(err).
 			Str("url", resp.Request.URL.String()).
 			Msg("gzip decompression failed, streaming raw")
-		return resp.Body, nil
+		return resp.Body, 0, 0, nil
 	}
 	releaseGzipReader(gz)
+
+	uncompressedBytes := int64(decompBuf.Len())
 	bodyBufPool.Put(compBuf)
 
-	return bytes.NewReader(decompBuf.Bytes()), func() { bodyBufPool.Put(decompBuf) }
+	return bytes.NewReader(decompBuf.Bytes()), compressedBytes, uncompressedBytes, func() { bodyBufPool.Put(decompBuf) }
 }
 
 const (
@@ -189,7 +195,7 @@ func (api *API) getStream(ctx context.Context, path string, args map[string]stri
 		return errors.Errorf("invalid status: %d", response.StatusCode)
 	}
 
-	streamBody, cleanup := api.openBody(response)
+	streamBody, _, _, cleanup := api.openBody(response)
 	if cleanup != nil {
 		defer cleanup()
 	}
@@ -230,19 +236,24 @@ func (api *API) postStream(ctx context.Context, requests []types.Request, fn fun
 	}
 	defer closeWithLogError(response.Body, api.log)
 
-	api.log.Trace().
-		Int64("ms", time.Since(start).Milliseconds()).
-		Str("url", u.String()).
-		Msg("post request")
-
 	if response.StatusCode != http.StatusOK {
 		return errors.Errorf("invalid status: %d", response.StatusCode)
 	}
 
-	streamBody, cleanup := api.openBody(response)
+	streamBody, compressedBytes, uncompressedBytes, cleanup := api.openBody(response)
 	if cleanup != nil {
 		defer cleanup()
 	}
+
+	elapsed := time.Since(start)
+	mbps := float64(uncompressedBytes) / elapsed.Seconds() / (1024 * 1024)
+	api.log.Debug().
+		Int64("ms", elapsed.Milliseconds()).
+		Int64("compressed_kb", compressedBytes/1024).
+		Int64("uncompressed_kb", uncompressedBytes/1024).
+		Float64("mbps", mbps).
+		Str("url", u.String()).
+		Msg("post request")
 
 	d := decoderPool.Get()
 	d.Reset(streamBody)
