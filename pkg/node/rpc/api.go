@@ -30,10 +30,16 @@ var decoderPool = pool.New(
 )
 
 // gzipPool reuses klauspost gzip readers to avoid per-request allocations.
-// klauspost/compress/gzip is significantly faster than stdlib compress/flate for
-// decompression, using SIMD and other optimisations.
 // Factory returns a zero-value Reader; Reset initialises all fields before use.
 var gzipPool = pool.New(func() *kgzip.Reader { return &kgzip.Reader{} })
+
+// bodyBufPool reuses large byte buffers for reading compressed and decompressed
+// response bodies entirely into memory before parsing. This eliminates the
+// per-byte syscall pattern that occurs when the flate decompressor reads
+// directly from the network socket via bufio.ReadByte.
+var bodyBufPool = pool.New(func() *bytes.Buffer {
+	return bytes.NewBuffer(make([]byte, 0, 16*1024*1024)) // 16 MB initial
+})
 
 func acquireGzipReader(r io.Reader) (*kgzip.Reader, error) {
 	gz := gzipPool.Get()
@@ -49,22 +55,49 @@ func releaseGzipReader(gz *kgzip.Reader) {
 	gzipPool.Put(gz)
 }
 
-// openBody returns an io.Reader for the response body. If the server sent a
-// gzip-compressed response, the returned reader is a pooled klauspost gzip
-// reader; callers must call the returned cleanup function when done.
-// The underlying resp.Body is always closed separately via closeWithLogError.
+// openBody reads the entire response body into memory, then (if gzip-encoded)
+// decompresses it fully in-memory before returning a bytes.Reader to the caller.
+// Keeping both steps in RAM eliminates the syscall-per-bufio-fill overhead that
+// dominates CPU when the flate decompressor reads directly from the network.
+// The returned cleanup function must be called when the reader is no longer needed.
 func (api *API) openBody(resp *http.Response) (io.Reader, func()) {
-	if resp.Header.Get("Content-Encoding") == "gzip" {
-		gz, err := acquireGzipReader(resp.Body)
-		if err != nil {
-			api.log.Warn().Err(err).
-				Str("url", resp.Request.URL.String()).
-				Msg("gzip reader init failed, reading raw body")
-			return resp.Body, nil
-		}
-		return gz, func() { releaseGzipReader(gz) }
+	compBuf := bodyBufPool.Get()
+	compBuf.Reset()
+	if _, err := io.Copy(compBuf, resp.Body); err != nil {
+		bodyBufPool.Put(compBuf)
+		api.log.Warn().Err(err).
+			Str("url", resp.Request.URL.String()).
+			Msg("reading response body failed, streaming raw")
+		return resp.Body, nil
 	}
-	return resp.Body, nil
+
+	if resp.Header.Get("Content-Encoding") != "gzip" {
+		return bytes.NewReader(compBuf.Bytes()), func() { bodyBufPool.Put(compBuf) }
+	}
+
+	gz, err := acquireGzipReader(bytes.NewReader(compBuf.Bytes()))
+	if err != nil {
+		api.log.Warn().Err(err).
+			Str("url", resp.Request.URL.String()).
+			Msg("gzip reader init failed, reading raw body")
+		return bytes.NewReader(compBuf.Bytes()), func() { bodyBufPool.Put(compBuf) }
+	}
+
+	decompBuf := bodyBufPool.Get()
+	decompBuf.Reset()
+	if _, err := io.Copy(decompBuf, gz); err != nil {
+		releaseGzipReader(gz)
+		bodyBufPool.Put(compBuf)
+		bodyBufPool.Put(decompBuf)
+		api.log.Warn().Err(err).
+			Str("url", resp.Request.URL.String()).
+			Msg("gzip decompression failed, streaming raw")
+		return resp.Body, nil
+	}
+	releaseGzipReader(gz)
+	bodyBufPool.Put(compBuf)
+
+	return bytes.NewReader(decompBuf.Bytes()), func() { bodyBufPool.Put(decompBuf) }
 }
 
 const (
