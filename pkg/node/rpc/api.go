@@ -41,6 +41,19 @@ var bodyBufPool = pool.New(func() *bytes.Buffer {
 	return bytes.NewBuffer(make([]byte, 0, 16*1024*1024)) // 16 MB initial
 })
 
+// bodyBufMaxCap is the maximum buffer capacity to return to bodyBufPool.
+// Buffers that grew beyond this threshold are discarded so the pool does not
+// permanently hold memory from unusually large blocks.
+const bodyBufMaxCap = 64 * 1024 * 1024 // 64 MB
+
+func releaseBodyBuf(buf *bytes.Buffer) {
+	if buf.Cap() > bodyBufMaxCap {
+		return // let GC collect oversized buffers
+	}
+	buf.Reset()
+	bodyBufPool.Put(buf)
+}
+
 func acquireGzipReader(r io.Reader) (*kgzip.Reader, error) {
 	gz := gzipPool.Get()
 	if err := gz.Reset(r); err != nil {
@@ -66,7 +79,7 @@ func (api *API) openBody(resp *http.Response) (io.Reader, int64, int64, func()) 
 	compBuf := bodyBufPool.Get()
 	compBuf.Reset()
 	if _, err := io.Copy(compBuf, resp.Body); err != nil {
-		bodyBufPool.Put(compBuf)
+		releaseBodyBuf(compBuf)
 		api.log.Warn().Err(err).
 			Str("url", resp.Request.URL.String()).
 			Msg("reading response body failed, streaming raw")
@@ -76,7 +89,7 @@ func (api *API) openBody(resp *http.Response) (io.Reader, int64, int64, func()) 
 	compressedBytes := int64(compBuf.Len())
 
 	if resp.Header.Get("Content-Encoding") != "gzip" {
-		return bytes.NewReader(compBuf.Bytes()), compressedBytes, compressedBytes, func() { bodyBufPool.Put(compBuf) }
+		return bytes.NewReader(compBuf.Bytes()), compressedBytes, compressedBytes, func() { releaseBodyBuf(compBuf) }
 	}
 
 	gz, err := acquireGzipReader(bytes.NewReader(compBuf.Bytes()))
@@ -84,15 +97,15 @@ func (api *API) openBody(resp *http.Response) (io.Reader, int64, int64, func()) 
 		api.log.Warn().Err(err).
 			Str("url", resp.Request.URL.String()).
 			Msg("gzip reader init failed, reading raw body")
-		return bytes.NewReader(compBuf.Bytes()), compressedBytes, compressedBytes, func() { bodyBufPool.Put(compBuf) }
+		return bytes.NewReader(compBuf.Bytes()), compressedBytes, compressedBytes, func() { releaseBodyBuf(compBuf) }
 	}
 
 	decompBuf := bodyBufPool.Get()
 	decompBuf.Reset()
 	if _, err := io.Copy(decompBuf, gz); err != nil {
 		releaseGzipReader(gz)
-		bodyBufPool.Put(compBuf)
-		bodyBufPool.Put(decompBuf)
+		releaseBodyBuf(compBuf)
+		releaseBodyBuf(decompBuf)
 		api.log.Warn().Err(err).
 			Str("url", resp.Request.URL.String()).
 			Msg("gzip decompression failed, streaming raw")
@@ -101,9 +114,9 @@ func (api *API) openBody(resp *http.Response) (io.Reader, int64, int64, func()) 
 	releaseGzipReader(gz)
 
 	uncompressedBytes := int64(decompBuf.Len())
-	bodyBufPool.Put(compBuf)
+	releaseBodyBuf(compBuf)
 
-	return bytes.NewReader(decompBuf.Bytes()), compressedBytes, uncompressedBytes, func() { bodyBufPool.Put(decompBuf) }
+	return bytes.NewReader(decompBuf.Bytes()), compressedBytes, uncompressedBytes, func() { releaseBodyBuf(decompBuf) }
 }
 
 const (

@@ -54,11 +54,20 @@ func (Event) TableName() string {
 
 var msgpackBufPool = pool.New(func() *bytes.Buffer { return new(bytes.Buffer) })
 
+var msgpackEncoderPool = pool.New(func() *msgpack.Encoder {
+	return msgpack.NewEncoder(new(bytes.Buffer))
+})
+
 func msgPackEncode(data any) ([]byte, error) {
 	buf := msgpackBufPool.Get()
 	buf.Reset()
 	defer msgpackBufPool.Put(buf)
-	if err := msgpack.NewEncoder(buf).Encode(data); err != nil {
+
+	enc := msgpackEncoderPool.Get()
+	enc.Reset(buf)
+	defer msgpackEncoderPool.Put(enc)
+
+	if err := enc.Encode(data); err != nil {
 		return nil, errors.Wrap(err, "msgpack marshal event's data")
 	}
 	return bytes.Clone(buf.Bytes()), nil
