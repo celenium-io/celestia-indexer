@@ -117,7 +117,7 @@ func BenchmarkParseEvent(b *testing.B) {
 	ctx := context.NewContext()
 	b.Run("parse event", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			_ = parseEvent(ctx, block, event, 10, &resultEvent, nil, false)
+			_ = parseEvent(ctx, block, event, 10, &resultEvent, nil)
 		}
 	})
 }

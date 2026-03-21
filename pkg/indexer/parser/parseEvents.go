@@ -16,7 +16,7 @@ func parseEvents(ctx *context.Context, b *types.BlockData, events []types.Event,
 	result := make([]storage.Event, len(events))
 
 	for i := range events {
-		if err := parseEvent(ctx, b, events[i], i, &result[i], &txId, false); err != nil {
+		if err := parseEvent(ctx, b, events[i], i, &result[i], &txId); err != nil {
 			return nil, err
 		}
 	}
@@ -39,15 +39,17 @@ func parseBlockEvents(ctx *context.Context, b *types.BlockData, events []types.E
 		}
 		isDuplicated = isDuplicated && count <= ctx.TxEventsCount
 
-		if err := parseEvent(ctx, b, events[i], i, &result[i], nil, isDuplicated); err != nil {
-			return nil, err
+		if !isDuplicated {
+			if err := parseEvent(ctx, b, events[i], i, &result[i], nil); err != nil {
+				return nil, err
+			}
 		}
 	}
 
 	return result, nil
 }
 
-func parseEvent(ctx *context.Context, b *types.BlockData, eN types.Event, index int, resultEvent *storage.Event, txId *uint64, duplicated bool) error {
+func parseEvent(ctx *context.Context, b *types.BlockData, eN types.Event, index int, resultEvent *storage.Event, txId *uint64) error {
 	eventType, err := storageTypes.ParseEventType(eN.Type)
 	if err != nil {
 		log.Err(err).Msgf("got type %v", eN.Type)
@@ -66,9 +68,7 @@ func parseEvent(ctx *context.Context, b *types.BlockData, eN types.Event, index 
 			resultEvent.Data[eN.Attributes[i].Key] = eN.Attributes[i].Value
 		}
 	}
-	if duplicated {
-		return nil
-	}
+
 	return processEvent(ctx, resultEvent)
 }
 
