@@ -87,8 +87,12 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 				return errors.Wrap(err, "parse hyperlane receive transfer event")
 			}
 
-			makeHyperlaneTransferAddress(event.Sender, transfer, msg.Height)
-			makeHyperlaneTransferAddress(event.Recipient, transfer, msg.Height)
+			if err := makeHyperlaneTransferAddress(ctx, event.Sender, transfer, msg.Height); err != nil {
+				return errors.Wrap(err, "makeHyperlaneTransferAddress")
+			}
+			if err := makeHyperlaneTransferAddress(ctx, event.Recipient, transfer, msg.Height); err != nil {
+				return errors.Wrap(err, "makeHyperlaneTransferAddress")
+			}
 
 			transfer.Denom = event.Denom
 			transfer.Amount = event.Amount
@@ -131,7 +135,7 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 	return nil
 }
 
-func makeHyperlaneTransferAddress(str string, transfer *storage.HLTransfer, height pkgTypes.Level) {
+func makeHyperlaneTransferAddress(ctx *context.Context, str string, transfer *storage.HLTransfer, height pkgTypes.Level) error {
 	if prefix, hash, err := pkgTypes.Address(str).Decode(); err == nil && prefix == pkgTypes.AddressPrefixCelestia {
 		transfer.Address = &storage.Address{
 			Address:    str,
@@ -139,9 +143,10 @@ func makeHyperlaneTransferAddress(str string, transfer *storage.HLTransfer, heig
 			Height:     height,
 			LastHeight: height,
 		}
-	} else {
-		str = strings.TrimPrefix(str, "0x")
-		str = strings.TrimLeft(str, "0")
-		transfer.CounterpartyAddress = str
+		return ctx.AddAddress(transfer.Address)
 	}
+	str = strings.TrimPrefix(str, "0x")
+	str = strings.TrimLeft(str, "0")
+	transfer.CounterpartyAddress = str
+	return nil
 }

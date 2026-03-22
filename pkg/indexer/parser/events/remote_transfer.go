@@ -69,8 +69,12 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event
 				return errors.Wrap(err, "parse hyperlane send transfer event")
 			}
 
-			makeHyperlaneTransferAddress(event.Sender, transfer, msg.Height)
-			makeHyperlaneTransferAddress(event.Recipient, transfer, msg.Height)
+			if err := makeHyperlaneTransferAddress(ctx, event.Sender, transfer, msg.Height); err != nil {
+				return errors.Wrap(err, "makeHyperlaneTransferAddress")
+			}
+			if err := makeHyperlaneTransferAddress(ctx, event.Recipient, transfer, msg.Height); err != nil {
+				return errors.Wrap(err, "makeHyperlaneTransferAddress")
+			}
 
 			transfer.Denom = event.Denom
 			transfer.Amount = event.Amount
