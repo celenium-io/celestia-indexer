@@ -68,6 +68,11 @@ type bulkRequest struct {
 	Rollups []*updateRollupRequest `json:"rollups" validate:"required,max=10"`
 }
 
+type bulkResultItem struct {
+	Id    uint64 `json:"id,omitempty"`
+	Error string `json:"error,omitempty"`
+}
+
 func (handler RollupAuthHandler) Bulk(c echo.Context) error {
 	val := c.Get(ApiKeyName)
 	apiKey, ok := val.(storage.ApiKey)
@@ -80,39 +85,34 @@ func (handler RollupAuthHandler) Bulk(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 
-	var ids []uint64
-	err = handler.runTx(c.Request().Context(), func(ctx context.Context, tx storage.Transaction) error {
-		ids, err = handler.bulk(ctx, tx, req.Rollups, apiKey.Admin)
-		return err
-	})
-	if err != nil {
-		return handleError(c, err, handler.address)
-	}
+	ctx := c.Request().Context()
+	results := make([]bulkResultItem, len(req.Rollups))
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"ids": ids,
-	})
-}
-
-func (handler RollupAuthHandler) bulk(ctx context.Context, tx storage.Transaction, rollups []*updateRollupRequest, isAdmin bool) ([]uint64, error) {
-	ids := make([]uint64, 0)
-
-	for _, item := range rollups {
-		if item.Id == 0 {
-			rollupId, err := handler.createRollup(ctx, tx, item.toCreate(), isAdmin)
-			if err != nil {
-				return nil, err
+	for i, item := range req.Rollups {
+		var rollupId uint64
+		txErr := handler.runTx(ctx, func(ctx context.Context, tx storage.Transaction) error {
+			if item.Id == 0 {
+				id, err := handler.createRollup(ctx, tx, item.toCreate(), apiKey.Admin)
+				if err != nil {
+					return err
+				}
+				rollupId = id
+			} else {
+				if err := handler.updateRollup(ctx, tx, item, apiKey.Admin); err != nil {
+					return err
+				}
+				rollupId = item.Id
 			}
-			ids = append(ids, rollupId)
+			return nil
+		})
+		if txErr != nil {
+			results[i] = bulkResultItem{Error: txErr.Error()}
 		} else {
-			if err := handler.updateRollup(ctx, tx, item, isAdmin); err != nil {
-				return nil, err
-			}
-			ids = append(ids, item.Id)
+			results[i] = bulkResultItem{Id: rollupId}
 		}
 	}
 
-	return ids, nil
+	return c.JSON(http.StatusOK, results)
 }
 
 type createRollupRequest struct {
