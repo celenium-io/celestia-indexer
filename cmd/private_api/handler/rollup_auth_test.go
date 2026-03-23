@@ -82,24 +82,32 @@ func (s *AuthTestSuite) TestBulk() {
 	})
 	c.SetPath("/v1/bulk")
 
-	tx := mock.NewMockTransaction(s.ctrl)
+	txUpdate := mock.NewMockTransaction(s.ctrl)
+	txCreate := mock.NewMockTransaction(s.ctrl)
 
-	tx.EXPECT().
-		Flush(gomock.Any()).
-		Return(nil).
-		Times(2)
-
-	tx.EXPECT().
-		SaveProviders(gomock.Any(), gomock.Any()).
-		Return(nil).
-		Times(2)
-
-	tx.EXPECT().
+	// first rollup: update existing
+	txUpdate.EXPECT().
 		DeleteProviders(gomock.Any(), uint64(1)).
 		Return(nil).
 		Times(1)
 
-	tx.EXPECT().
+	txUpdate.EXPECT().
+		SaveProviders(gomock.Any(), gomock.Any()).
+		Return(nil).
+		Times(1)
+
+	txUpdate.EXPECT().
+		UpdateRollup(gomock.Any(), gomock.Any()).
+		Return(nil).
+		Times(1)
+
+	txUpdate.EXPECT().
+		Flush(gomock.Any()).
+		Return(nil).
+		Times(1)
+
+	// second rollup: create new
+	txCreate.EXPECT().
 		SaveRollup(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(ctx context.Context, r *storage.Rollup) error {
 			r.Id = 2
@@ -107,8 +115,13 @@ func (s *AuthTestSuite) TestBulk() {
 		}).
 		Times(1)
 
-	tx.EXPECT().
-		UpdateRollup(gomock.Any(), gomock.Any()).
+	txCreate.EXPECT().
+		SaveProviders(gomock.Any(), gomock.Any()).
+		Return(nil).
+		Times(1)
+
+	txCreate.EXPECT().
+		Flush(gomock.Any()).
 		Return(nil).
 		Times(1)
 
@@ -128,8 +141,13 @@ func (s *AuthTestSuite) TestBulk() {
 		}, nil).
 		Times(2)
 
+	callCount := 0
 	txBeginner := func(_ context.Context, _ sdk.Transactable) (storage.Transaction, error) {
-		return tx, nil
+		callCount++
+		if callCount == 1 {
+			return txUpdate, nil
+		}
+		return txCreate, nil
 	}
 	handler := NewRollupAuthHandler(s.rollups, s.address, s.namespace, nil, txBeginner)
 
