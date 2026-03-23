@@ -87,7 +87,7 @@ func (s *AuthTestSuite) TestBulk() {
 	tx.EXPECT().
 		Flush(gomock.Any()).
 		Return(nil).
-		Times(1)
+		Times(2)
 
 	tx.EXPECT().
 		SaveProviders(gomock.Any(), gomock.Any()).
@@ -136,26 +136,37 @@ func (s *AuthTestSuite) TestBulk() {
 	s.Require().NoError(handler.Bulk(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var ids struct {
-		Values []uint64 `json:"ids"`
-	}
-	err := json.NewDecoder(rec.Body).Decode(&ids)
+	var results []bulkResultItem
+	err := json.NewDecoder(rec.Body).Decode(&results)
 	s.Require().NoError(err)
-	s.Require().Len(ids.Values, 2)
-	s.Require().EqualValues(1, ids.Values[0])
-	s.Require().EqualValues(2, ids.Values[1])
+	s.Require().Len(results, 2)
+	s.Require().EqualValues(1, results[0].Id)
+	s.Require().Empty(results[0].Error)
+	s.Require().EqualValues(2, results[1].Id)
+	s.Require().Empty(results[1].Error)
 }
 
-func (s *AuthTestSuite) TestBulkError() {
+func (s *AuthTestSuite) TestBulkPartialError() {
 	body := `
 	{
 		"rollups": [
 			{
-				"name": "Test",
+				"name": "Good Rollup",
+				"description": "works fine",
+				"logo": "https://example.com/logo.png",
 				"providers": [{
 					"address": "celestia1kywuhlvslyt0qy8yr4p5lgkzz74qryujkjgprx"
 				}],
 				"vm": "svm"
+			},
+			{
+				"name": "Bad Rollup",
+				"description": "will fail",
+				"logo": "https://example.com/logo.png",
+				"providers": [{
+					"address": "celestia1kywuhlvslyt0qy8yr4p5lgkzz74qryujkjgprx"
+				}],
+				"vm": "evm"
 			}
 		]
 	}`
@@ -172,46 +183,66 @@ func (s *AuthTestSuite) TestBulkError() {
 	})
 	c.SetPath("/v1/bulk")
 
-	tx := mock.NewMockTransaction(s.ctrl)
+	txSuccess := mock.NewMockTransaction(s.ctrl)
+	txFail := mock.NewMockTransaction(s.ctrl)
 
-	tx.EXPECT().
+	// first rollup succeeds
+	txSuccess.EXPECT().
 		SaveRollup(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(ctx context.Context, r *storage.Rollup) error {
-			r.Id = 2
+			r.Id = 1
 			return nil
 		}).
 		Times(1)
 
-	tx.EXPECT().
+	txSuccess.EXPECT().
+		SaveProviders(gomock.Any(), gomock.Any()).
+		Return(nil).
+		Times(1)
+
+	txSuccess.EXPECT().
+		Flush(gomock.Any()).
+		Return(nil).
+		Times(1)
+
+	// second rollup fails on SaveRollup
+	txFail.EXPECT().
+		SaveRollup(gomock.Any(), gomock.Any()).
+		Return(errors.New("duplicate slug")).
+		Times(1)
+
+	txFail.EXPECT().
 		HandleError(gomock.Any(), gomock.Any()).
 		Return(nil).
 		Times(1)
 
 	s.address.EXPECT().
 		ByHash(gomock.Any(), []byte{177, 29, 203, 253, 144, 249, 22, 240, 16, 228, 29, 67, 79, 162, 194, 23, 170, 1, 147, 146}).
-		Return(storage.Address{}, errors.New("no rows")).
+		Return(storage.Address{
+			Id:      100,
+			Address: "celestia1kywuhlvslyt0qy8yr4p5lgkzz74qryujkjgprx",
+		}, nil).
 		Times(1)
 
-	s.address.EXPECT().
-		IsNoRows(gomock.Any()).
-		Return(true).
-		Times(1)
-
-	s.address.EXPECT().
-		IsNoRows(gomock.Any()).
-		Return(false).
-		Times(1)
-
+	callCount := 0
 	txBeginner := func(_ context.Context, _ sdk.Transactable) (storage.Transaction, error) {
-		return tx, nil
+		callCount++
+		if callCount == 1 {
+			return txSuccess, nil
+		}
+		return txFail, nil
 	}
 	handler := NewRollupAuthHandler(s.rollups, s.address, s.namespace, nil, txBeginner)
 
 	s.Require().NoError(handler.Bulk(c))
-	s.Require().Equal(http.StatusBadRequest, rec.Code)
+	s.Require().Equal(http.StatusOK, rec.Code)
 
-	var result Error
-	err := json.NewDecoder(rec.Body).Decode(&result)
+	var results []bulkResultItem
+	err := json.NewDecoder(rec.Body).Decode(&results)
 	s.Require().NoError(err)
-	s.Require().NotEmpty(result.Message)
+	s.Require().Len(results, 2)
+	s.Require().EqualValues(1, results[0].Id)
+	s.Require().Empty(results[0].Error)
+	s.Require().Zero(results[1].Id)
+	s.Require().Contains(results[1].Error, "duplicate slug")
 }
