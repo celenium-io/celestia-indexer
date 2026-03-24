@@ -13,8 +13,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
 	crisisTypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	"github.com/fatih/structs"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // MsgVerifyInvariant
@@ -29,46 +28,30 @@ func createMsgVerifyInvariant() types.Msg {
 
 func TestDecodeMsg_SuccessOnMsgVerifyInvariant(t *testing.T) {
 	msg := createMsgVerifyInvariant()
-	blob, now := testsuite.EmptyBlock()
+	block, now := testsuite.EmptyBlock()
 	position := 0
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
-		Height: blob.Height,
-		Time:   blob.Block.Time,
+		Height: block.Height,
+		Time:   block.Block.Time,
 	}
 
-	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess)
-
-	addressesExpected := []storage.AddressWithType{
-		{
-			Type: storageTypes.MsgAddressTypeSender,
-			Address: storage.Address{
-				Id:         0,
-				Height:     blob.Height,
-				LastHeight: blob.Height,
-				Address:    "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
-				Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
-				Balance:    storage.EmptyBalance(),
-			},
-		},
-	}
+	dm, err := decode.Message(decodeCtx, msg, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        0,
-		Height:    blob.Height,
+		Id:        1,
+		Height:    block.Height,
 		Time:      now,
 		Position:  0,
 		Type:      storageTypes.MsgVerifyInvariant,
 		TxId:      0,
-		Data:      structs.Map(msg),
+		Data:      mustMsgToMap(t, msg),
 		Size:      49,
 		Namespace: nil,
-		Addresses: addressesExpected,
 	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, int64(0), dm.BlobsSize)
-	assert.Equal(t, msgExpected, dm.Msg)
-	assert.Equal(t, addressesExpected, dm.Addresses)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Equal(t, msgExpected, dm.Msg)
 }

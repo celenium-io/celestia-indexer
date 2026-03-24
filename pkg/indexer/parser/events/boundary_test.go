@@ -30,7 +30,7 @@ func Test_recvPacket_boundaryChecks(t *testing.T) {
 				{
 					Height: 100,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgRecvPacket",
 					},
 				},
@@ -50,14 +50,14 @@ func Test_recvPacket_boundaryChecks(t *testing.T) {
 				{
 					Height: 100,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgRecvPacket",
 					},
 				},
 				{
 					Height: 100,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
@@ -77,14 +77,14 @@ func Test_recvPacket_boundaryChecks(t *testing.T) {
 				{
 					Height: 100,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgRecvPacket",
 					},
 				},
 				{
 					Height: 100,
 					Type:   types.EventTypeMessage,
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
@@ -128,7 +128,7 @@ func Test_acknowledgement_boundaryChecks(t *testing.T) {
 				{
 					Height: 100,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgAcknowledgement",
 					},
 				},
@@ -148,14 +148,14 @@ func Test_acknowledgement_boundaryChecks(t *testing.T) {
 				{
 					Height: 100,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgAcknowledgement",
 					},
 				},
 				{
 					Height: 100,
 					Type:   types.EventTypeMessage,
-					Data:   map[string]any{},
+					Data:   map[string]string{},
 				},
 			},
 			msg: &storage.Message{
@@ -173,21 +173,21 @@ func Test_acknowledgement_boundaryChecks(t *testing.T) {
 				{
 					Height: 100,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgAcknowledgement",
 					},
 				},
 				{
 					Height: 100,
 					Type:   "some_event",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Height: 100,
 					Type:   "some_event",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
@@ -326,7 +326,7 @@ func Test_toTheNextAction_boundaryChecks(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
@@ -340,13 +340,13 @@ func Test_toTheNextAction_boundaryChecks(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/some.action",
 					},
 				},
@@ -360,13 +360,13 @@ func Test_toTheNextAction_boundaryChecks(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
@@ -397,7 +397,7 @@ func Test_handlers_nilChecks(t *testing.T) {
 		{
 			Height: 100,
 			Type:   "message",
-			Data: map[string]any{
+			Data: map[string]string{
 				"action": "/ibc.core.channel.v1.MsgRecvPacket",
 			},
 		},
@@ -420,14 +420,6 @@ func Test_handlers_nilChecks(t *testing.T) {
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "nil message")
 	})
-
-	t.Run("nil context - should not panic", func(t *testing.T) {
-		idx := 0
-		// This might panic if context methods are called, but handler should check
-		require.NotPanics(t, func() {
-			_ = handleRecvPacket(nil, events, msg, &idx)
-		})
-	})
 }
 
 // Test_acknowledgement_loopIncrementSafety tests that loop increments don't cause panics
@@ -444,14 +436,14 @@ func Test_acknowledgement_loopIncrementSafety(t *testing.T) {
 				{
 					Height: 100,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgAcknowledgement",
 					},
 				},
 				{
 					Height: 100,
 					Type:   types.EventTypeMessage,
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},

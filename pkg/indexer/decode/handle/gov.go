@@ -27,17 +27,17 @@ import (
 )
 
 // MsgSubmitProposalV1
-func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storageTypes.Status, msg *v1.MsgSubmitProposal) (storageTypes.MsgType, []storage.AddressWithType, []any, *storage.Proposal, error) {
+func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storageTypes.Status, msgId uint64, msg *v1.MsgSubmitProposal) (storageTypes.MsgType, []any, *storage.Proposal, error) {
 	msgType := storageTypes.MsgSubmitProposal
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeProposer, address: msg.Proposer},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil {
-		return msgType, addresses, nil, nil, err
+		return msgType, nil, nil, err
 	}
 
 	if status != storageTypes.StatusSuccess {
-		return msgType, addresses, nil, nil, nil
+		return msgType, nil, nil, nil
 	}
 
 	prpsl := &storage.Proposal{
@@ -60,28 +60,28 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 	changes := make([]paramsV1Beta.ParamChange, 0)
 	var sb strings.Builder
 	if _, err := sb.WriteString("Proposal contains messages:\r\n"); err != nil {
-		return msgType, addresses, nil, nil, errors.Wrap(err, "building proposal description from messages")
+		return msgType, nil, nil, errors.Wrap(err, "building proposal description from messages")
 	}
 	for i := range msg.Messages {
 		switch msg.Messages[i].TypeUrl {
 		case "/cosmos.slashing.v1beta1.MsgUpdateParams":
 			var params slashingv1beta1.MsgUpdateParams
 			if err := codec.Unmarshal(msg.Messages[i].Value, &params); err != nil {
-				return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling proposal with slashing.v1beta1.MsgUpdateParams")
+				return msgType, nil, nil, errors.Wrap(err, "unmarshalling proposal with slashing.v1beta1.MsgUpdateParams")
 			}
 			if p := params.GetParams(); p != nil {
 				prpsl.Type = storageTypes.ProposalTypeParamChanged
 
 				var slashFractionDoubleSign math.LegacyDec
 				if err := slashFractionDoubleSign.Unmarshal(p.GetSlashFractionDoubleSign()); err != nil {
-					return msgType, addresses, nil, nil, errors.Wrap(err, "slash_fraction_double_sign")
+					return msgType, nil, nil, errors.Wrap(err, "slash_fraction_double_sign")
 				}
 				ctx.AddConstant(storageTypes.ModuleNameSlashing, "slash_fraction_double_sign", slashFractionDoubleSign.String())
 				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "slash_fraction_double_sign", slashFractionDoubleSign.String()))
 
 				var slashFractionDowntime math.LegacyDec
 				if err := slashFractionDowntime.Unmarshal(p.GetSlashFractionDowntime()); err != nil {
-					return msgType, addresses, nil, nil, errors.Wrap(err, "slash_fraction_downtime")
+					return msgType, nil, nil, errors.Wrap(err, "slash_fraction_downtime")
 				}
 				ctx.AddConstant(storageTypes.ModuleNameSlashing, "slash_fraction_downtime", slashFractionDowntime.String())
 				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "slash_fraction_downtime", slashFractionDowntime.String()))
@@ -92,7 +92,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 
 				var minSignedPerWindow math.LegacyDec
 				if err := minSignedPerWindow.Unmarshal(p.GetMinSignedPerWindow()); err != nil {
-					return msgType, addresses, nil, nil, errors.Wrap(err, "min_signed_per_window")
+					return msgType, nil, nil, errors.Wrap(err, "min_signed_per_window")
 				}
 				ctx.AddConstant(storageTypes.ModuleNameSlashing, "min_signed_per_window", minSignedPerWindow.String())
 				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "min_signed_per_window", minSignedPerWindow.String()))
@@ -105,7 +105,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 		case "/cosmos.distribution.v1beta1.MsgUpdateParams":
 			var params distributionTypes.MsgUpdateParams
 			if err := codec.Unmarshal(msg.Messages[i].Value, &params); err != nil {
-				return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling proposal with cosmos.distribution.v1beta1.MsgUpdateParams")
+				return msgType, nil, nil, errors.Wrap(err, "unmarshalling proposal with cosmos.distribution.v1beta1.MsgUpdateParams")
 			}
 
 			prpsl.Type = storageTypes.ProposalTypeParamChanged
@@ -129,7 +129,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 		case "/cosmos.gov.v1.MsgUpdateParams":
 			var params v1.MsgUpdateParams
 			if err := codec.Unmarshal(msg.Messages[i].Value, &params); err != nil {
-				return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling proposal with cosmos.gov.v1.MsgUpdateParams")
+				return msgType, nil, nil, errors.Wrap(err, "unmarshalling proposal with cosmos.gov.v1.MsgUpdateParams")
 			}
 
 			prpsl.Type = storageTypes.ProposalTypeParamChanged
@@ -166,7 +166,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 		case "/celestia.blob.v1.MsgUpdateBlobParams":
 			var params blobTypes.MsgUpdateBlobParams
 			if err := codec.Unmarshal(msg.Messages[i].Value, &params); err != nil {
-				return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling proposal with cosmos.gov.v1.MsgUpdateParams")
+				return msgType, nil, nil, errors.Wrap(err, "unmarshalling proposal with cosmos.gov.v1.MsgUpdateParams")
 			}
 			prpsl.Type = storageTypes.ProposalTypeParamChanged
 
@@ -181,7 +181,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 		case "/cosmos.consensus.v1.MsgUpdateParams":
 			var params consensusv1.MsgUpdateParams
 			if err := codec.Unmarshal(msg.Messages[i].Value, &params); err != nil {
-				return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling proposal with cosmos.gov.v1.MsgUpdateParams")
+				return msgType, nil, nil, errors.Wrap(err, "unmarshalling proposal with cosmos.gov.v1.MsgUpdateParams")
 			}
 
 			prpsl.Type = storageTypes.ProposalTypeParamChanged
@@ -214,7 +214,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 		}
 
 		if _, err := fmt.Fprintf(&sb, "%d. %s\r\n", i+1, msg.Messages[i].TypeUrl); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "building proposal description from messages")
+			return msgType, nil, nil, errors.Wrap(err, "building proposal description from messages")
 		}
 	}
 	if prpsl.Description == "" {
@@ -223,23 +223,23 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 	if len(changes) > 0 {
 		prpsl.Changes, err = json.Marshal(changes)
 		if err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "marshalling changes proposal v1")
+			return msgType, nil, nil, errors.Wrap(err, "marshalling changes proposal v1")
 		}
 	}
-	return msgType, addresses, nil, prpsl, nil
+	return msgType, nil, prpsl, nil
 }
 
 // MsgSubmitProposalV1Beta
-func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status storageTypes.Status, msg *cosmosGovTypesV1Beta1.MsgSubmitProposal) (storageTypes.MsgType, []storage.AddressWithType, any, *storage.Proposal, error) {
+func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status storageTypes.Status, msgId uint64, msg *cosmosGovTypesV1Beta1.MsgSubmitProposal) (storageTypes.MsgType, any, *storage.Proposal, error) {
 	msgType := storageTypes.MsgSubmitProposal
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeProposer, address: msg.Proposer},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil {
-		return msgType, addresses, nil, nil, err
+		return msgType, nil, nil, err
 	}
 	if status != storageTypes.StatusSuccess {
-		return msgType, addresses, nil, nil, nil
+		return msgType, nil, nil, nil
 	}
 
 	prpsl := &storage.Proposal{
@@ -255,29 +255,29 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 	case "/cosmos.gov.v1beta1.TextProposal":
 		var proposal cosmosGovTypesV1Beta1.TextProposal
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling text proposal for submit proposal content")
+			return msgType, nil, nil, errors.Wrap(err, "unmarshalling text proposal for submit proposal content")
 		}
 		prpsl.Title = proposal.Title
 		prpsl.Description = proposal.Description
 		prpsl.Type = storageTypes.ProposalTypeText
-		return msgType, addresses, proposal, prpsl, nil
+		return msgType, proposal, prpsl, nil
 	case "/cosmos.params.v1beta1.ParameterChangeProposal":
 		var proposal paramsV1Beta.ParameterChangeProposal
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling param change proposal for submit proposal content")
+			return msgType, nil, nil, errors.Wrap(err, "unmarshalling param change proposal for submit proposal content")
 		}
 		prpsl.Title = proposal.Title
 		prpsl.Description = proposal.Description
 		prpsl.Type = storageTypes.ProposalTypeParamChanged
 		prpsl.Changes, err = json.Marshal(proposal.Changes)
 		if err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "marshalling changes proposal for submit proposal content")
+			return msgType, nil, nil, errors.Wrap(err, "marshalling changes proposal for submit proposal content")
 		}
 
 		for i := range proposal.Changes {
 			moduleName, err := storageTypes.ParseModuleName(proposal.Changes[i].GetSubspace())
 			if err != nil {
-				return msgType, addresses, nil, nil, errors.Wrapf(err, "parsing module name in proposal changes: %s", proposal.Changes[i].GetSubspace())
+				return msgType, nil, nil, errors.Wrapf(err, "parsing module name in proposal changes: %s", proposal.Changes[i].GetSubspace())
 			}
 			key := proposal.Changes[i].GetKey()
 			value := proposal.Changes[i].GetValue()
@@ -288,22 +288,22 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 				switch key {
 				case "BlockParams":
 					if err := parseParamsToConstants(ctx, storageTypes.ModuleNameConsensus, "block_", value); err != nil {
-						return msgType, addresses, nil, nil, errors.Wrap(err, "parse block params")
+						return msgType, nil, nil, errors.Wrap(err, "parse block params")
 					}
 				case "EvidenceParams":
 					if err := parseParamsToConstants(ctx, storageTypes.ModuleNameConsensus, "evidence_", value); err != nil {
-						return msgType, addresses, nil, nil, errors.Wrap(err, "parse evidence params")
+						return msgType, nil, nil, errors.Wrap(err, "parse evidence params")
 					}
 				case "ValidatorParams":
 					if err := parseParamsToConstants(ctx, storageTypes.ModuleNameConsensus, "validator_", value); err != nil {
-						return msgType, addresses, nil, nil, errors.Wrap(err, "parse validator params")
+						return msgType, nil, nil, errors.Wrap(err, "parse validator params")
 					}
 				}
 
 			case storageTypes.ModuleNameGov:
 				if key == "votingparams" {
 					if err := parseParamsToConstants(ctx, moduleName, "", value); err != nil {
-						return msgType, addresses, nil, nil, errors.Wrap(err, "parse voting params")
+						return msgType, nil, nil, errors.Wrap(err, "parse voting params")
 					}
 				}
 
@@ -312,7 +312,7 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 				if key == "GovMaxSquareSize" {
 					val, err = strconv.Unquote(value)
 					if err != nil {
-						return msgType, addresses, nil, nil, errors.Wrap(err, value)
+						return msgType, nil, nil, errors.Wrap(err, value)
 					}
 				}
 				ctx.AddConstant(moduleName, strcase.SnakeCase(key), val)
@@ -323,11 +323,11 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 			}
 		}
 
-		return msgType, addresses, proposal, prpsl, nil
+		return msgType, proposal, prpsl, nil
 	case "/ibc.core.client.v1.ClientUpdateProposal":
 		var proposal ibcTypes.ClientUpdateProposal //nolint
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling client update proposal for submit proposal content")
+			return msgType, nil, nil, errors.Wrap(err, "unmarshalling client update proposal for submit proposal content")
 		}
 		prpsl.Title = proposal.Title
 		prpsl.Description = proposal.Description
@@ -337,14 +337,14 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 			"SubstituteClientId": proposal.SubstituteClientId,
 		})
 		if err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "marshalling changes proposal for submit proposal content")
+			return msgType, nil, nil, errors.Wrap(err, "marshalling changes proposal for submit proposal content")
 		}
-		return msgType, addresses, proposal, prpsl, nil
+		return msgType, proposal, prpsl, nil
 
 	case "/cosmos.distribution.v1beta1.CommunityPoolSpendProposal":
 		var proposal distributionTypes.CommunityPoolSpendProposal //nolint
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "unmarshalling community pool spend proposal for submit proposal content")
+			return msgType, nil, nil, errors.Wrap(err, "unmarshalling community pool spend proposal for submit proposal content")
 		}
 		prpsl.Title = proposal.Title
 		prpsl.Description = proposal.Description
@@ -354,60 +354,60 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 			"Amount":    proposal.Amount,
 		})
 		if err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "marshalling changes proposal for submit proposal content")
+			return msgType, nil, nil, errors.Wrap(err, "marshalling changes proposal for submit proposal content")
 		}
-		return msgType, addresses, proposal, prpsl, nil
+		return msgType, proposal, prpsl, nil
 
 	default:
-		return msgType, addresses, nil, nil, errors.Errorf("unknown content type in submit proposal: %s", msg.Content.TypeUrl)
+		return msgType, nil, nil, errors.Errorf("unknown content type in submit proposal: %s", msg.Content.TypeUrl)
 	}
 }
 
 // MsgExecLegacyContent is used to wrap the legacy content field into a message.
 // This ensures backwards compatibility with v1beta1.MsgSubmitProposal.
-func MsgExecLegacyContent(ctx *context.Context, m *v1.MsgExecLegacyContent) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgExecLegacyContent(ctx *context.Context, msgId uint64, m *v1.MsgExecLegacyContent) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgExecLegacyContent
-	addresses, err := createAddresses(
+	err := createAddresses(
 		ctx,
 		addressesData{
 			{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
-		}, ctx.Block.Height)
-	return msgType, addresses, err
+		}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgVote defines a message to cast a vote.
-func MsgVote(ctx *context.Context, voterAddress string) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgVote(ctx *context.Context, msgId uint64, voterAddress string) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgVote
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeVoter, address: voterAddress},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgVoteWeighted defines a message to cast a vote.
-func MsgVoteWeighted(ctx *context.Context, voterAddress string) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgVoteWeighted(ctx *context.Context, msgId uint64, voterAddress string) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgVoteWeighted
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeVoter, address: voterAddress},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgDeposit defines a message to submit a deposit to an existing proposal.
-func MsgDeposit(ctx *context.Context, depositorAddress string) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgDeposit(ctx *context.Context, msgId uint64, depositorAddress string) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgDeposit
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeDepositor, address: depositorAddress},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
-func MsgUpdateParamsGov(ctx *context.Context, m *v1.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateParamsGov(ctx *context.Context, msgId uint64, m *v1.MsgUpdateParams) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateParams
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 func parseParamsToConstants(ctx *context.Context, moduleName storageTypes.ModuleName, keyPrefix, value string) error {

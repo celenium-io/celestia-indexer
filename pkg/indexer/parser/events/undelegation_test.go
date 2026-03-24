@@ -34,14 +34,14 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 844186,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.staking.v1beta1.MsgUndelegate",
 					},
 				}, {
 					Height: 844186,
 					Time:   ts,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "3105utia",
 						"spender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
@@ -49,7 +49,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 844186,
 					Time:   ts,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "3105utia",
 						"receiver": "celestia144tkegx6vw9pr6tx0gg68zmy57vcjpapxgwn4q",
 					},
@@ -57,7 +57,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 844186,
 					Time:   ts,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "3105utia",
 						"recipient": "celestia144tkegx6vw9pr6tx0gg68zmy57vcjpapxgwn4q",
 						"sender":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -66,14 +66,14 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 844186,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 844186,
 					Time:   ts,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "3105utia",
 						"delegator": "celestia144tkegx6vw9pr6tx0gg68zmy57vcjpapxgwn4q",
 						"validator": "celestiavaloper1uqj5ul7jtpskk9ste9mfv6jvh0y3w34vtpz3gw",
@@ -82,7 +82,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 844186,
 					Time:   ts,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "144000000utia",
 						"spender": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
@@ -90,7 +90,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 844186,
 					Time:   ts,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "144000000utia",
 						"receiver": "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
 					},
@@ -98,7 +98,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 844186,
 					Time:   ts,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "144000000utia",
 						"recipient": "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
 						"sender":    "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
@@ -107,14 +107,14 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 844186,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
 				}, {
 					Height: 844186,
 					Time:   ts,
 					Type:   "unbond",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "144000000utia",
 						"completion_time": "2024-03-15T00:25:17Z",
 						"validator":       "celestiavaloper1uqj5ul7jtpskk9ste9mfv6jvh0y3w34vtpz3gw",
@@ -123,7 +123,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 844186,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "staking",
 						"sender": "celestia144tkegx6vw9pr6tx0gg68zmy57vcjpapxgwn4q",
 					},
@@ -184,14 +184,14 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.staking.v1beta1.MsgUndelegate",
 					},
 				}, {
 					Height: 75,
 					Time:   ts,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "0stake",
 						"delegator": "celestia15e9hkqujx0c8m464w6a35glc8vtqdrxnshcmwq",
 						"validator": "celestiavaloper15urq2dtp9qce4fyc85m6upwm9xul3049gwdz0x",
@@ -200,7 +200,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "30000utia",
 						"spender": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
@@ -208,7 +208,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "30000utia",
 						"receiver": "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
 					},
@@ -216,7 +216,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "30000utia",
 						"recipient": "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
 						"sender":    "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
@@ -225,14 +225,14 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
 				}, {
 					Height: 75,
 					Time:   ts,
 					Type:   "unbond",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "30000utia",
 						"completion_time": "2023-11-21T14:16:41Z",
 						"validator":       "celestiavaloper15urq2dtp9qce4fyc85m6upwm9xul3049gwdz0x",
@@ -241,7 +241,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "staking",
 						"sender": "celestia15e9hkqujx0c8m464w6a35glc8vtqdrxnshcmwq",
 					},
@@ -302,7 +302,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/cosmos.staking.v1beta1.MsgUndelegate",
 						"module":    "staking",
 						"msg_index": "0",
@@ -312,7 +312,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "0utia",
 						"delegator": "celestia1xs55snr6lxsalaqrwc63cxlmgn437zzv2gew35",
 						"msg_index": "0",
@@ -322,7 +322,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "1000000utia",
 						"msg_index": "0",
 						"spender":   "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
@@ -331,7 +331,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "1000000utia",
 						"msg_index": "0",
 						"receiver":  "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
@@ -340,7 +340,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "1000000utia",
 						"msg_index": "0",
 						"recipient": "celestia1tygms3xhhs3yv487phx3dw4a95jn7t7ls3yw4w",
@@ -350,7 +350,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"msg_index": "0",
 						"sender":    "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
@@ -358,7 +358,7 @@ func Test_handleUndelegate(t *testing.T) {
 					Height: 75,
 					Time:   ts,
 					Type:   "unbond",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":          "1000000utia",
 						"completion_time": "2025-07-23T11:56:30Z",
 						"delegator":       "celestia1xs55snr6lxsalaqrwc63cxlmgn437zzv2gew35",

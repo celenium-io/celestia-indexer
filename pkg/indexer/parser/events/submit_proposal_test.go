@@ -32,34 +32,34 @@ func Test_handleSubmitProposal(t *testing.T) {
 				{
 					Height: 3648325,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.gov.v1beta1.MsgSubmitProposal",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "submit_proposal",
-					Data: map[string]any{
+					Data: map[string]string{
 						"proposal_id":       "5",
 						"proposal_messages": ",/cosmos.gov.v1.MsgExecLegacyContent",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "10000000000utia",
 						"spender": "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "10000000000utia",
 						"receiver": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "10000000000utia",
 						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 						"sender":    "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
@@ -67,27 +67,27 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 3648325,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "proposal_deposit",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":      "10000000000utia",
 						"proposal_id": "5",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "governance",
 						"sender": "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "submit_proposal",
-					Data: map[string]any{
+					Data: map[string]string{
 						"voting_period_start": "5",
 					},
 				},
@@ -113,34 +113,34 @@ func Test_handleSubmitProposal(t *testing.T) {
 				{
 					Height: 3648325,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.gov.v1beta1.MsgSubmitProposal",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "submit_proposal",
-					Data: map[string]any{
+					Data: map[string]string{
 						"proposal_id":       "5",
 						"proposal_messages": ",/cosmos.gov.v1.MsgExecLegacyContent",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "10000000000utia",
 						"spender": "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "10000000000utia",
 						"receiver": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "10000000000utia",
 						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 						"sender":    "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
@@ -148,20 +148,20 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 3648325,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "proposal_deposit",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":      "10000000000utia",
 						"proposal_id": "5",
 					},
 				}, {
 					Height: 3648325,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "governance",
 						"sender": "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
 					},
@@ -187,14 +187,14 @@ func Test_handleSubmitProposal(t *testing.T) {
 				{
 					Height: 58507,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/cosmos.gov.v1.MsgSubmitProposal",
 						"msg_index": "0",
 					},
 				}, {
 					Height: 58507,
 					Type:   "submit_proposal",
-					Data: map[string]any{
+					Data: map[string]string{
 						"proposal_id":       "2",
 						"proposal_messages": ",/cosmos.gov.v1beta1.MsgSubmitProposal",
 						"msg_index":         "0",
@@ -202,7 +202,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 58507,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "",
 						"spender":   "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
 						"msg_index": "0",
@@ -210,7 +210,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 58507,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "",
 						"receiver":  "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 						"msg_index": "0",
@@ -218,7 +218,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 58507,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "",
 						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 						"sender":    "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
@@ -227,14 +227,14 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 58507,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender":    "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
 						"msg_index": "0",
 					},
 				}, {
 					Height: 58507,
 					Type:   "proposal_deposit",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":      "",
 						"proposal_id": "2",
 						"msg_index":   "0",
@@ -242,7 +242,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 58507,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module":    "governance",
 						"sender":    "celestia17adsjkuecgjheugrdrwdqv9uh3qkrfmj9xzawx",
 						"msg_index": "0",
@@ -269,7 +269,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 				{
 					Height: 8113801,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/cosmos.gov.v1.MsgSubmitProposal",
 						"module":    "gov",
 						"msg_index": "0",
@@ -278,7 +278,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 8113801,
 					Type:   "submit_proposal",
-					Data: map[string]any{
+					Data: map[string]string{
 						"msg_index":         "0",
 						"proposal_id":       "4",
 						"proposal_messages": ",/celestia.blob.v1.MsgUpdateBlobParams,/cosmos.consensus.v1.MsgUpdateParams",
@@ -287,7 +287,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 8113801,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "10000000000utia",
 						"msg_index": "0",
 						"spender":   "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
@@ -295,7 +295,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 8113801,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "10000000000utia",
 						"msg_index": "0",
 						"receiver":  "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
@@ -303,7 +303,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 8113801,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "10000000000utia",
 						"msg_index": "0",
 						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
@@ -312,14 +312,14 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 8113801,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"msg_index": "0",
 						"sender":    "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
 					},
 				}, {
 					Height: 8113801,
 					Type:   "proposal_deposit",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":      "10000000000utia",
 						"depositor":   "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
 						"msg_index":   "0",
@@ -328,7 +328,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 				}, {
 					Height: 8113801,
 					Type:   "submit_proposal",
-					Data: map[string]any{
+					Data: map[string]string{
 						"msg_index":           "0",
 						"voting_period_start": "4",
 					},

@@ -29,14 +29,14 @@ func handleConnectionOpenInit(ctx *context.Context, events []storage.Event, msg 
 	return processConnectionOpenInit(ctx, events, msg, idx)
 }
 
-func processConnectionOpenInit(_ *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+func processConnectionOpenInit(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	for i := *idx; i < len(events); i++ {
 		if events[i].Type != storageTypes.EventTypeConnectionOpenInit && events[i].Type != storageTypes.EventTypeConnectionOpenTry {
 			continue
 		}
 		cc := decode.NewConnectionOpen(events[i].Data)
 
-		msg.IbcConnection = &storage.IbcConnection{
+		conn := &storage.IbcConnection{
 			Height:                   msg.Height,
 			CreatedAt:                msg.Time,
 			ClientId:                 cc.ClientId,
@@ -44,8 +44,9 @@ func processConnectionOpenInit(_ *context.Context, events []storage.Event, msg *
 			CounterpartyClientId:     cc.CounterpartyClientId,
 			CounterpartyConnectionId: cc.CounterpartyConnectionId,
 			ChannelsCount:            0,
+			CreateTxId:               msg.TxId,
 		}
-
+		ctx.AddIbcConnection(conn)
 		break
 	}
 

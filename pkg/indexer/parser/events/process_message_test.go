@@ -29,27 +29,27 @@ func Test_handleHyperlaneProcessMessage(t *testing.T) {
 				{
 					Height: 1036866,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/hyperlane.core.v1.MsgProcessMessage",
 					},
 				}, {
 					Height: 841682,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "6745utia",
 						"spender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 841682,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "6745utia",
 						"spender": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 					},
 				}, {
 					Height: 841682,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "6745utia",
 						"recipient": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 						"sender":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -57,13 +57,13 @@ func Test_handleHyperlaneProcessMessage(t *testing.T) {
 				}, {
 					Height: 841682,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.warp.v1.EventReceiveRemoteTransfer",
-					Data: map[string]any{ //nolint:gosec
+					Data: map[string]string{ //nolint:gosec
 						"amount":        "6745utia",
 						"sender":        "0x0000000000000000000000007b4bf9feccff207ef2cb7101ceb15b8516021acd",
 						"token_id":      "0x726f757465725f61707000000000000000000000000000010000000000000000",
@@ -74,7 +74,7 @@ func Test_handleHyperlaneProcessMessage(t *testing.T) {
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.core.post_dispatch.v1.EventGasPayment",
-					Data: map[string]any{
+					Data: map[string]string{
 						"gas_amount": "350000",
 						"igp_id":     "0x726f757465725f706f73745f6469737061746368000000040000000000000001",
 						"message_id": "0x11b96db63570faa6deb0444ce3f07b0c12130fdf7704bca24d87bd8668016293",
@@ -84,7 +84,7 @@ func Test_handleHyperlaneProcessMessage(t *testing.T) {
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.core.v1.EventProcess",
-					Data: map[string]any{
+					Data: map[string]string{
 						"origin":            "56",
 						"sender":            "0x0000000000000000000000007b4bf9feccff207ef2cb7101ceb15b8516021acd",
 						"message":           "0x0300046a65000000380000000000000000000000007b4bf9feccff207ef2cb7101ceb15b8516021acd6d696c6b726f757465725f6170700000000000000000000000000001000000000000000000000000000000000000000056a3cc5141289679223bc85169141c7d454143900000000000000000000000000000000000000000000000000000000002faf080",
@@ -113,8 +113,10 @@ func Test_handleHyperlaneProcessMessage(t *testing.T) {
 			for i := range tt.msg {
 				err := handleHyperlaneProcessMessage(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
-				require.NotNil(t, tt.msg[i].HLTransfer)
-				require.NotNil(t, tt.msg[i].HLTransfer.Address)
+				require.NotEmpty(t, tt.ctx.HlTransfers)
+
+				require.NotNil(t, tt.ctx.HlTransfers[0])
+				require.NotNil(t, tt.ctx.HlTransfers[0].Address)
 			}
 		})
 	}

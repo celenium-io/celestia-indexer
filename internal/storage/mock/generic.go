@@ -3227,7 +3227,7 @@ func (c *MockTransactionSaveBalancesCall) DoAndReturn(f func(context.Context, ..
 }
 
 // SaveBlobLogs mocks base method.
-func (m *MockTransaction) SaveBlobLogs(ctx context.Context, logs ...storage.BlobLog) error {
+func (m *MockTransaction) SaveBlobLogs(ctx context.Context, logs ...*storage.BlobLog) error {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
 	for _, a := range logs {
@@ -3258,13 +3258,13 @@ func (c *MockTransactionSaveBlobLogsCall) Return(arg0 error) *MockTransactionSav
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionSaveBlobLogsCall) Do(f func(context.Context, ...storage.BlobLog) error) *MockTransactionSaveBlobLogsCall {
+func (c *MockTransactionSaveBlobLogsCall) Do(f func(context.Context, ...*storage.BlobLog) error) *MockTransactionSaveBlobLogsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionSaveBlobLogsCall) DoAndReturn(f func(context.Context, ...storage.BlobLog) error) *MockTransactionSaveBlobLogsCall {
+func (c *MockTransactionSaveBlobLogsCall) DoAndReturn(f func(context.Context, ...*storage.BlobLog) error) *MockTransactionSaveBlobLogsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -3485,7 +3485,7 @@ func (c *MockTransactionSaveForwardingsCall) DoAndReturn(f func(context.Context,
 }
 
 // SaveGrants mocks base method.
-func (m *MockTransaction) SaveGrants(ctx context.Context, grants ...storage.Grant) error {
+func (m *MockTransaction) SaveGrants(ctx context.Context, grants ...*storage.Grant) error {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
 	for _, a := range grants {
@@ -3516,13 +3516,13 @@ func (c *MockTransactionSaveGrantsCall) Return(arg0 error) *MockTransactionSaveG
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionSaveGrantsCall) Do(f func(context.Context, ...storage.Grant) error) *MockTransactionSaveGrantsCall {
+func (c *MockTransactionSaveGrantsCall) Do(f func(context.Context, ...*storage.Grant) error) *MockTransactionSaveGrantsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionSaveGrantsCall) DoAndReturn(f func(context.Context, ...storage.Grant) error) *MockTransactionSaveGrantsCall {
+func (c *MockTransactionSaveGrantsCall) DoAndReturn(f func(context.Context, ...*storage.Grant) error) *MockTransactionSaveGrantsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -4045,7 +4045,7 @@ func (c *MockTransactionSaveMessagesCall) DoAndReturn(f func(context.Context, ..
 }
 
 // SaveMsgAddresses mocks base method.
-func (m *MockTransaction) SaveMsgAddresses(ctx context.Context, addresses ...storage.MsgAddress) error {
+func (m *MockTransaction) SaveMsgAddresses(ctx context.Context, addresses ...*storage.MsgAddress) error {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
 	for _, a := range addresses {
@@ -4076,13 +4076,13 @@ func (c *MockTransactionSaveMsgAddressesCall) Return(arg0 error) *MockTransactio
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionSaveMsgAddressesCall) Do(f func(context.Context, ...storage.MsgAddress) error) *MockTransactionSaveMsgAddressesCall {
+func (c *MockTransactionSaveMsgAddressesCall) Do(f func(context.Context, ...*storage.MsgAddress) error) *MockTransactionSaveMsgAddressesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionSaveMsgAddressesCall) DoAndReturn(f func(context.Context, ...storage.MsgAddress) error) *MockTransactionSaveMsgAddressesCall {
+func (c *MockTransactionSaveMsgAddressesCall) DoAndReturn(f func(context.Context, ...*storage.MsgAddress) error) *MockTransactionSaveMsgAddressesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -4131,7 +4131,7 @@ func (c *MockTransactionSaveMsgValidatorCall) DoAndReturn(f func(context.Context
 }
 
 // SaveNamespaceMessage mocks base method.
-func (m *MockTransaction) SaveNamespaceMessage(ctx context.Context, nsMsgs ...storage.NamespaceMessage) error {
+func (m *MockTransaction) SaveNamespaceMessage(ctx context.Context, nsMsgs ...*storage.NamespaceMessage) error {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
 	for _, a := range nsMsgs {
@@ -4162,13 +4162,13 @@ func (c *MockTransactionSaveNamespaceMessageCall) Return(arg0 error) *MockTransa
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionSaveNamespaceMessageCall) Do(f func(context.Context, ...storage.NamespaceMessage) error) *MockTransactionSaveNamespaceMessageCall {
+func (c *MockTransactionSaveNamespaceMessageCall) Do(f func(context.Context, ...*storage.NamespaceMessage) error) *MockTransactionSaveNamespaceMessageCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionSaveNamespaceMessageCall) DoAndReturn(f func(context.Context, ...storage.NamespaceMessage) error) *MockTransactionSaveNamespaceMessageCall {
+func (c *MockTransactionSaveNamespaceMessageCall) DoAndReturn(f func(context.Context, ...*storage.NamespaceMessage) error) *MockTransactionSaveNamespaceMessageCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -5100,11 +5100,12 @@ func (c *MockTransactionUpdateRollupCall) DoAndReturn(f func(context.Context, *s
 }
 
 // UpdateSignalsAfterUpgrade mocks base method.
-func (m *MockTransaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) error {
+func (m *MockTransaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (decimal.Decimal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateSignalsAfterUpgrade", ctx, version)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(decimal.Decimal)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // UpdateSignalsAfterUpgrade indicates an expected call of UpdateSignalsAfterUpgrade.
@@ -5120,19 +5121,19 @@ type MockTransactionUpdateSignalsAfterUpgradeCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Return(arg0 error) *MockTransactionUpdateSignalsAfterUpgradeCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Return(arg0 decimal.Decimal, arg1 error) *MockTransactionUpdateSignalsAfterUpgradeCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Do(f func(context.Context, uint64) error) *MockTransactionUpdateSignalsAfterUpgradeCall {
+func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Do(f func(context.Context, uint64) (decimal.Decimal, error)) *MockTransactionUpdateSignalsAfterUpgradeCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionUpdateSignalsAfterUpgradeCall) DoAndReturn(f func(context.Context, uint64) error) *MockTransactionUpdateSignalsAfterUpgradeCall {
+func (c *MockTransactionUpdateSignalsAfterUpgradeCall) DoAndReturn(f func(context.Context, uint64) (decimal.Decimal, error)) *MockTransactionUpdateSignalsAfterUpgradeCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

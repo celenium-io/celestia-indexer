@@ -9,6 +9,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/celestiaorg/celestia-app/v7/app"
 	"github.com/celestiaorg/celestia-app/v7/app/encoding"
+	"github.com/cometbft/cometbft/crypto/tmhash"
 	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmTypes "github.com/cometbft/cometbft/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
@@ -24,6 +25,7 @@ type DecodedTx struct {
 	Fee           decimal.Decimal
 	Signers       map[types.Address][]byte
 	Blobs         []*blobTypes.Blob
+	Hash          []byte
 }
 
 func NewDecodedTx() DecodedTx {
@@ -36,11 +38,13 @@ var (
 	cfg, txDecoder = createDecoder()
 )
 
-func Tx(b types.BlockData, index int) (d DecodedTx, err error) {
+func Tx(b *types.BlockData, index int) (d DecodedTx, err error) {
 	raw := b.Block.Txs[index]
-	if bTx, isBlob := tmTypes.UnmarshalBlobTx(raw); isBlob {
+	if bTx, isBlob := UnmarshalBlobTxShallow(raw); isBlob {
 		raw = bTx.Tx
 		d.Blobs = bTx.Blobs
+	} else if iwTx, isWrapper := parseIndexWrapperTxBytes(raw); isWrapper {
+		raw = iwTx
 	}
 	d.Signers = make(map[types.Address][]byte)
 
@@ -94,8 +98,8 @@ func decodeCosmosTx(decoder cosmosTypes.TxDecoder, raw tmTypes.Tx, d *DecodedTx)
 		}
 	}
 
+	d.Hash = tmhash.Sum(raw)
 	d.Messages = txDecoded.GetMsgs()
-
 	return nil
 }
 

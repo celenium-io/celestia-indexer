@@ -87,7 +87,10 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 			dest.Stake = amount
 			ctx.AddValidator(dest)
 
-			delegator := decoder.StringFromMap(msg.Data, "DelegatorAddress")
+			delegator, err := msg.Data.GetString("DelegatorAddress")
+			if err != nil {
+				return err
+			}
 
 			address := &storage.Address{
 				Address:    delegator,

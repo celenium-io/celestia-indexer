@@ -6,6 +6,7 @@ package context
 import (
 	"encoding/hex"
 	"fmt"
+	"sync/atomic"
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -18,44 +19,87 @@ import (
 )
 
 type Context struct {
-	Validators  *sync.Map[string, *storage.Validator]
-	Addresses   *sync.Map[string, *storage.Address]
-	Delegations *sync.Map[string, *storage.Delegation]
-	Jails       *sync.Map[string, *storage.Jail]
-	Proposals   *sync.Map[uint64, *storage.Proposal]
-	Constants   *sync.Map[string, *storage.Constant]
-	Igps        *sync.Map[string, *storage.HLIGP]
-	IgpConfigs  *sync.Map[string, *storage.HLIGPConfig]
-	ZkISMs      *sync.Map[string, *storage.ZkISM]
-	Upgrades    *sync.Map[uint64, *storage.Upgrade]
+	Validators        *sync.Map[string, *storage.Validator]
+	Addresses         *sync.Map[string, *storage.Address]
+	Delegations       *sync.Map[string, *storage.Delegation]
+	Jails             *sync.Map[string, *storage.Jail]
+	Proposals         *sync.Map[uint64, *storage.Proposal]
+	Constants         *sync.Map[string, *storage.Constant]
+	Igps              *sync.Map[string, *storage.HLIGP]
+	IgpConfigs        *sync.Map[string, *storage.HLIGPConfig]
+	ZkISMs            *sync.Map[string, *storage.ZkISM]
+	Upgrades          *sync.Map[uint64, *storage.Upgrade]
+	Grants            *sync.Map[string, *storage.Grant]
+	IbcClients        *sync.Map[string, *storage.IbcClient]
+	IbcConnections    *sync.Map[string, *storage.IbcConnection]
+	IbcChannels       *sync.Map[string, *storage.IbcChannel]
+	HlMailboxes       *sync.Map[uint64, *storage.HLMailbox]
+	HlTokens          *sync.Map[string, *storage.HLToken]
+	Namespaces        *sync.Map[string, *storage.Namespace]
+	NamespaceMessages *sync.Map[string, *storage.NamespaceMessage]
+	AddressMessages   *sync.Map[string, *storage.MsgAddress]
 
+	Messages        []*storage.Message
+	Events          []storage.Event
 	Redelegations   []storage.Redelegation
 	Undelegations   []storage.Undelegation
 	CancelUnbonding []storage.Undelegation
 	StakingLogs     []storage.StakingLog
 	Votes           []*storage.Vote
+	VestingAccounts []*storage.VestingAccount
+	Forwardings     []*storage.Forwarding
+	ZkIsmUpdates    []*storage.ZkISMUpdate
+	ZkIsmMessages   []*storage.ZkISMMessage
+	HlTransfers     []*storage.HLTransfer
+	IbcTransfers    []*storage.IbcTransfer
+	BlobLogs        []*storage.BlobLog
+	Signals         []*storage.SignalVersion
 
 	Block         *storage.Block
+	TryUpgrade    *storage.Upgrade
 	TxEventsCount int
+
+	msgCounter *atomic.Int64
 }
 
 func NewContext() *Context {
 	return &Context{
-		Validators:      sync.NewMap[string, *storage.Validator](),
-		Addresses:       sync.NewMap[string, *storage.Address](),
-		Delegations:     sync.NewMap[string, *storage.Delegation](),
-		Jails:           sync.NewMap[string, *storage.Jail](),
-		Proposals:       sync.NewMap[uint64, *storage.Proposal](),
-		Constants:       sync.NewMap[string, *storage.Constant](),
-		Igps:            sync.NewMap[string, *storage.HLIGP](),
-		IgpConfigs:      sync.NewMap[string, *storage.HLIGPConfig](),
-		Upgrades:        sync.NewMap[uint64, *storage.Upgrade](),
-		ZkISMs:          sync.NewMap[string, *storage.ZkISM](),
+		Validators:        sync.NewMap[string, *storage.Validator](),
+		Addresses:         sync.NewMap[string, *storage.Address](),
+		Delegations:       sync.NewMap[string, *storage.Delegation](),
+		Jails:             sync.NewMap[string, *storage.Jail](),
+		Proposals:         sync.NewMap[uint64, *storage.Proposal](),
+		Constants:         sync.NewMap[string, *storage.Constant](),
+		Igps:              sync.NewMap[string, *storage.HLIGP](),
+		IgpConfigs:        sync.NewMap[string, *storage.HLIGPConfig](),
+		Upgrades:          sync.NewMap[uint64, *storage.Upgrade](),
+		ZkISMs:            sync.NewMap[string, *storage.ZkISM](),
+		Grants:            sync.NewMap[string, *storage.Grant](),
+		IbcClients:        sync.NewMap[string, *storage.IbcClient](),
+		IbcConnections:    sync.NewMap[string, *storage.IbcConnection](),
+		IbcChannels:       sync.NewMap[string, *storage.IbcChannel](),
+		HlMailboxes:       sync.NewMap[uint64, *storage.HLMailbox](),
+		HlTokens:          sync.NewMap[string, *storage.HLToken](),
+		Namespaces:        sync.NewMap[string, *storage.Namespace](),
+		NamespaceMessages: sync.NewMap[string, *storage.NamespaceMessage](),
+		AddressMessages:   sync.NewMap[string, *storage.MsgAddress](),
+
+		Messages:        make([]*storage.Message, 0, 100),
+		Events:          make([]storage.Event, 0, 1000),
 		Redelegations:   make([]storage.Redelegation, 0),
 		Undelegations:   make([]storage.Undelegation, 0),
 		CancelUnbonding: make([]storage.Undelegation, 0),
 		StakingLogs:     make([]storage.StakingLog, 0),
 		Votes:           make([]*storage.Vote, 0),
+		VestingAccounts: make([]*storage.VestingAccount, 0),
+		Forwardings:     make([]*storage.Forwarding, 0),
+		ZkIsmUpdates:    make([]*storage.ZkISMUpdate, 0),
+		ZkIsmMessages:   make([]*storage.ZkISMMessage, 0),
+		HlTransfers:     make([]*storage.HLTransfer, 0),
+		IbcTransfers:    make([]*storage.IbcTransfer, 0),
+		Signals:         make([]*storage.SignalVersion, 0),
+
+		msgCounter: new(atomic.Int64),
 	}
 }
 
@@ -138,7 +182,7 @@ func (ctx *Context) AddValidator(validator storage.Validator) {
 	}
 }
 
-func (ctx *Context) AddSupply(data map[string]any) {
+func (ctx *Context) AddSupply(data map[string]string) {
 	coin, err := decoder.CoinFromMap(data, "amount")
 	if err == nil {
 		if coin.GetDenom() == currency.DefaultCurrency {
@@ -151,7 +195,7 @@ func (ctx *Context) AddSupply(data map[string]any) {
 	}
 }
 
-func (ctx *Context) SubSupply(data map[string]any) {
+func (ctx *Context) SubSupply(data map[string]string) {
 	coin, err := decoder.CoinFromMap(data, "amount")
 	if err == nil {
 		if coin.GetDenom() == currency.DefaultCurrency {
@@ -164,7 +208,7 @@ func (ctx *Context) SubSupply(data map[string]any) {
 	}
 }
 
-func (ctx *Context) SetInflation(data map[string]any) {
+func (ctx *Context) SetInflation(data map[string]string) {
 	ctx.Block.Stats.InflationRate = decoder.DecimalFromMap(data, "inflation_rate")
 }
 
@@ -174,6 +218,14 @@ func (ctx *Context) AddDelegation(d storage.Delegation) {
 	} else {
 		ctx.Delegations.Set(d.String(), &d)
 	}
+}
+
+func (ctx *Context) AddMessage(msg *storage.Message) {
+	ctx.Messages = append(ctx.Messages, msg)
+}
+
+func (ctx *Context) AddEvents(events ...storage.Event) {
+	ctx.Events = append(ctx.Events, events...)
 }
 
 func (ctx *Context) AddRedelegation(r storage.Redelegation) {
@@ -262,6 +314,10 @@ func (ctx *Context) AddUpgrade(upgrade storage.Upgrade) {
 	}
 }
 
+func (ctx *Context) AddSignal(signal *storage.SignalVersion) {
+	ctx.Signals = append(ctx.Signals, signal)
+}
+
 func (ctx *Context) AddZkISM(ism *storage.ZkISM) {
 	key := hex.EncodeToString(ism.ExternalId)
 	if value, ok := ctx.ZkISMs.Get(key); ok {
@@ -269,4 +325,162 @@ func (ctx *Context) AddZkISM(ism *storage.ZkISM) {
 	} else {
 		ctx.ZkISMs.Set(key, ism)
 	}
+}
+
+func (ctx *Context) GetMsgPosition() int64 {
+	return ctx.msgCounter.Add(1) - 1
+}
+
+func (ctx *Context) AddVestingAccount(acc *storage.VestingAccount) {
+	ctx.VestingAccounts = append(ctx.VestingAccounts, acc)
+}
+
+func (ctx *Context) AddGrants(grants ...*storage.Grant) {
+	for i := range grants {
+		ctx.Grants.Set(grants[i].String(), grants[i])
+	}
+}
+
+func (ctx *Context) AddIbcClient(client *storage.IbcClient) {
+	if item, ok := ctx.IbcClients.Get(client.Id); ok {
+		item.ConnectionCount += client.ConnectionCount
+	} else {
+		ctx.IbcClients.Set(client.Id, client)
+	}
+}
+
+func (ctx *Context) AddIbcConnection(conn *storage.IbcConnection) {
+	if item, ok := ctx.IbcConnections.Get(conn.ConnectionId); ok {
+		item.ChannelsCount += conn.ChannelsCount
+	} else {
+		ctx.IbcConnections.Set(conn.ConnectionId, conn)
+	}
+}
+
+func (ctx *Context) AddIbcChannel(channel *storage.IbcChannel) {
+	if ch, ok := ctx.IbcChannels.Get(channel.Id); ok {
+		ch.Received = ch.Received.Add(channel.Received)
+		ch.Sent = ch.Sent.Add(channel.Sent)
+		ch.TransfersCount += channel.TransfersCount
+	} else {
+		ctx.IbcChannels.Set(channel.Id, channel)
+	}
+}
+
+func (ctx *Context) DeleteIbcChannel(chanId string) {
+	ctx.IbcChannels.Delete(chanId)
+}
+
+func (ctx *Context) AddIbcTransfer(transfer *storage.IbcTransfer) {
+	ctx.IbcTransfers = append(ctx.IbcTransfers, transfer)
+}
+
+func (ctx *Context) GetLastIbcTransfer() *storage.IbcTransfer {
+	if len(ctx.IbcTransfers) == 0 {
+		return nil
+	}
+	return ctx.IbcTransfers[len(ctx.IbcTransfers)-1]
+}
+
+func (ctx *Context) RemoveLastIbcTransfer() {
+	if len(ctx.IbcTransfers) == 0 {
+		return
+	}
+	ctx.IbcTransfers = ctx.IbcTransfers[:len(ctx.IbcTransfers)-1]
+}
+
+func (ctx *Context) AddForwarding(fwd *storage.Forwarding) {
+	ctx.Forwardings = append(ctx.Forwardings, fwd)
+}
+
+func (ctx *Context) AddZkIsmUpdate(upd *storage.ZkISMUpdate) {
+	ctx.ZkIsmUpdates = append(ctx.ZkIsmUpdates, upd)
+}
+
+func (ctx *Context) AddZkIsmMessage(msg *storage.ZkISMMessage) {
+	ctx.ZkIsmMessages = append(ctx.ZkIsmMessages, msg)
+}
+
+func (ctx *Context) AddHlMailbox(mailbox *storage.HLMailbox) {
+	if item, ok := ctx.HlMailboxes.Get(mailbox.InternalId); ok {
+		if mailbox.ReceivedMessages > 0 {
+			item.ReceivedMessages += mailbox.ReceivedMessages
+		}
+		if mailbox.SentMessages > 0 {
+			item.SentMessages += mailbox.SentMessages
+		}
+		if len(mailbox.DefaultHook) > 0 {
+			item.DefaultHook = mailbox.DefaultHook
+		}
+		if len(mailbox.RequiredHook) > 0 {
+			item.RequiredHook = mailbox.RequiredHook
+		}
+		if len(mailbox.DefaultIsm) > 0 {
+			item.DefaultIsm = mailbox.DefaultIsm
+		}
+		if mailbox.Owner != nil {
+			item.Owner = mailbox.Owner
+		}
+	} else {
+		ctx.HlMailboxes.Set(mailbox.InternalId, mailbox)
+	}
+}
+
+func (ctx *Context) AddHlToken(token *storage.HLToken) {
+	key := token.String()
+	if item, ok := ctx.HlTokens.Get(key); ok {
+		item.ReceiveTransfers += token.ReceiveTransfers
+		item.SentTransfers += token.SentTransfers
+		if !token.Sent.IsZero() {
+			item.Sent = item.Sent.Add(token.Sent)
+		}
+		if !token.Received.IsZero() {
+			item.Received = item.Received.Add(token.Received)
+		}
+	} else {
+		ctx.HlTokens.Set(key, token)
+	}
+}
+
+func (ctx *Context) AddHlTransfer(transfer *storage.HLTransfer) {
+	ctx.HlTransfers = append(ctx.HlTransfers, transfer)
+
+	if transfer.Token != nil {
+		if transfer.Mailbox != nil {
+			ctx.AddHlMailbox(&storage.HLMailbox{
+				InternalId:       transfer.Mailbox.InternalId,
+				ReceivedMessages: transfer.Token.ReceiveTransfers,
+				SentMessages:     transfer.Token.SentTransfers,
+			})
+		}
+		ctx.AddHlToken(transfer.Token)
+	}
+}
+
+func (ctx *Context) AddNamespace(namespace *storage.Namespace) *storage.Namespace {
+	key := namespace.String()
+	if ns, ok := ctx.Namespaces.Get(key); ok {
+		ns.PfbCount += namespace.PfbCount
+		ns.Size += namespace.Size
+		ns.BlobsCount += namespace.BlobsCount
+		return ns
+	}
+	ctx.Namespaces.Set(key, namespace)
+	return namespace
+}
+
+func (ctx *Context) AddNamespaceMessage(msg *storage.NamespaceMessage) {
+	if msg.Namespace == nil {
+		return
+	}
+	key := fmt.Sprintf("%d-%s", msg.MsgId, msg.Namespace.String())
+	ctx.NamespaceMessages.Set(key, msg)
+}
+
+func (ctx *Context) AddBlobLogs(logs ...*storage.BlobLog) {
+	ctx.BlobLogs = append(ctx.BlobLogs, logs...)
+}
+
+func (ctx *Context) AddAddressMessage(msg *storage.MsgAddress) {
+	ctx.AddressMessages.Set(msg.String(), msg)
 }

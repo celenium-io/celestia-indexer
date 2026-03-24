@@ -8,8 +8,8 @@ import (
 	"strconv"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	jxpkg "github.com/go-faster/jx"
 
-	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/pkg/errors"
 )
 
@@ -21,14 +21,13 @@ func (api *API) BlockResults(ctx context.Context, level pkgTypes.Level) (pkgType
 		args["height"] = strconv.FormatUint(uint64(level), 10)
 	}
 
-	var gbr types.Response[pkgTypes.ResultBlockResults]
-	if err := api.get(ctx, pathBlockResults, args, &gbr); err != nil {
-		return gbr.Result, errors.Wrap(err, "api.get")
-	}
-
-	if gbr.Error != nil {
-		return gbr.Result, errors.Wrapf(types.ErrRequest, "request %d error: %s", gbr.Id, gbr.Error.Error())
-	}
-
-	return gbr.Result, nil
+	var result pkgTypes.ResultBlockResults
+	err := api.getStream(ctx, pathBlockResults, args, func(d *jxpkg.Decoder) error {
+		return jxResponse(d, func(d *jxpkg.Decoder) error {
+			var err error
+			result, err = jxResultBlockResults(d)
+			return err
+		})
+	})
+	return result, errors.Wrap(err, "BlockResults")
 }

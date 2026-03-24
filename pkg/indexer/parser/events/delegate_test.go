@@ -34,14 +34,14 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 841682,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.staking.v1beta1.MsgDelegate",
 					},
 				}, {
 					Height: 841682,
 					Time:   ts,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "6745utia",
 						"spender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
@@ -49,7 +49,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 841682,
 					Time:   ts,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "6745utia",
 						"spender": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 					},
@@ -57,7 +57,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 841682,
 					Time:   ts,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "6745utia",
 						"recipient": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 						"sender":    "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
@@ -66,14 +66,14 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 841682,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 					},
 				}, {
 					Height: 841682,
 					Time:   ts,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "6745utia",
 						"delegator": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 						"validator": "celestiavaloper1uqj5ul7jtpskk9ste9mfv6jvh0y3w34vtpz3gw",
@@ -82,7 +82,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 841682,
 					Time:   ts,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "5690000utia",
 						"spender": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 					},
@@ -90,7 +90,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 841682,
 					Time:   ts,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "5690000utia",
 						"receiver": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
@@ -98,7 +98,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 841682,
 					Time:   ts,
 					Type:   "delegate",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":     "5690000utia",
 						"new_shares": "5690000.000000000000000000",
 						"validator":  "celestiavaloper1uqj5ul7jtpskk9ste9mfv6jvh0y3w34vtpz3gw",
@@ -107,7 +107,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 841682,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "staking",
 						"sender": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 					},
@@ -163,14 +163,14 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 841682,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.staking.v1beta1.MsgDelegate",
 					},
 				}, {
 					Height: 841682,
 					Time:   ts,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "5690000utia",
 						"spender": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 					},
@@ -178,7 +178,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 841682,
 					Time:   ts,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "5690000utia",
 						"receiver": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
@@ -186,7 +186,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 841682,
 					Time:   ts,
 					Type:   "delegate",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":     "5690000utia",
 						"new_shares": "5690000.000000000000000000",
 						"validator":  "celestiavaloper1uqj5ul7jtpskk9ste9mfv6jvh0y3w34vtpz3gw",
@@ -195,7 +195,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 841682,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "staking",
 						"sender": "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 					},
@@ -251,7 +251,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "24205utia",
 						"spender": "celestia19gc940vdsl9tp5kvkzec7m8njlup7ay0frlfu7",
 					},
@@ -259,7 +259,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "24205utia",
 						"receiver": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 					},
@@ -267,7 +267,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "24205utia",
 						"recipient": "celestia17xpfvakm2amg962yls6f84z3kell8c5lpnjs3s",
 						"sender":    "celestia19gc940vdsl9tp5kvkzec7m8njlup7ay0frlfu7",
@@ -276,14 +276,14 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia19gc940vdsl9tp5kvkzec7m8njlup7ay0frlfu7",
 					},
 				}, {
 					Height: 105,
 					Time:   ts,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"fee":       "24205utia",
 						"fee_payer": "celestia19gc940vdsl9tp5kvkzec7m8njlup7ay0frlfu7",
 					},
@@ -291,28 +291,28 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"acc_seq": "celestia19gc940vdsl9tp5kvkzec7m8njlup7ay0frlfu7/1",
 					},
 				}, {
 					Height: 105,
 					Time:   ts,
 					Type:   "tx",
-					Data: map[string]any{
+					Data: map[string]string{
 						"signature": "UWAiCoF5Kgyp2o1R/ud25/azKfk5OEkp3ynOJZ6V79o3kRNEtn8jxvYRs8UGuex2Gy4eP7abdkuMMn8SpWpOmg==",
 					},
 				}, {
 					Height: 105,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.staking.v1beta1.MsgDelegate",
 					},
 				}, {
 					Height: 105,
 					Time:   ts,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "0stake",
 						"delegator": "celestia19gc940vdsl9tp5kvkzec7m8njlup7ay0frlfu7",
 						"validator": "celestiavaloper1uqj5ul7jtpskk9ste9mfv6jvh0y3w34vtpz3gw",
@@ -321,7 +321,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "100000000utia",
 						"spender": "celestia19gc940vdsl9tp5kvkzec7m8njlup7ay0frlfu7",
 					},
@@ -329,7 +329,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "100000000utia",
 						"receiver": "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
 					},
@@ -337,7 +337,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "delegate",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":     "100000000utia",
 						"new_shares": "100000000.000000000000000000",
 						"validator":  "celestiavaloper1uqj5ul7jtpskk9ste9mfv6jvh0y3w34vtpz3gw",
@@ -346,7 +346,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "staking",
 						"sender": "celestia19gc940vdsl9tp5kvkzec7m8njlup7ay0frlfu7",
 					},
@@ -402,7 +402,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 
 						"action":    "/cosmos.staking.v1beta1.MsgDelegate",
 						"module":    "staking",
@@ -413,7 +413,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "45000000utia",
 						"msg_index": "0",
 						"spender":   "celestia1768fz9r2c4w86kvckxfhpvha054rkc7rzwl83x",
@@ -422,7 +422,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "45000000utia",
 						"msg_index": "0",
 						"receiver":  "celestia1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3y3clr6",
@@ -431,7 +431,7 @@ func Test_handleDelegate(t *testing.T) {
 					Height: 105,
 					Time:   ts,
 					Type:   "delegate",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":     "45000000utia",
 						"delegator":  "celestia1768fz9r2c4w86kvckxfhpvha054rkc7rzwl83x",
 						"msg_index":  "0",

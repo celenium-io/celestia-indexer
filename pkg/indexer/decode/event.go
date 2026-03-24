@@ -22,7 +22,7 @@ type CoinReceived struct {
 	Receiver string
 }
 
-func NewCoinReceived(m map[string]any) (body CoinReceived, err error) {
+func NewCoinReceived(m map[string]string) (body CoinReceived, err error) {
 	body.Receiver = decoder.StringFromMap(m, "receiver")
 	if body.Receiver == "" {
 		err = errors.Errorf("receiver key not found in %##v", m)
@@ -37,7 +37,7 @@ type CoinSpent struct {
 	Spender string
 }
 
-func NewCoinSpent(m map[string]any) (body CoinSpent, err error) {
+func NewCoinSpent(m map[string]string) (body CoinSpent, err error) {
 	body.Spender = decoder.StringFromMap(m, "spender")
 	if body.Spender == "" {
 		err = errors.Errorf("spender key not found in %##v", m)
@@ -54,7 +54,7 @@ type CompleteRedelegation struct {
 	SrcValidator  string
 }
 
-func NewCompleteRedelegation(m map[string]any) (body CompleteRedelegation, err error) {
+func NewCompleteRedelegation(m map[string]string) (body CompleteRedelegation, err error) {
 	body.Delegator = decoder.StringFromMap(m, "delegator")
 	if body.Delegator == "" {
 		err = errors.Errorf("delegator key not found in %##v", m)
@@ -80,7 +80,7 @@ type CompleteUnbonding struct {
 	Validator string
 }
 
-func NewCompleteUnbonding(m map[string]any) (body CompleteUnbonding, err error) {
+func NewCompleteUnbonding(m map[string]string) (body CompleteUnbonding, err error) {
 	body.Delegator = decoder.StringFromMap(m, "delegator")
 	if body.Delegator == "" {
 		err = errors.Errorf("delegator key not found in %##v", m)
@@ -100,7 +100,7 @@ type Commission struct {
 	Validator string
 }
 
-func NewCommission(m map[string]any) (body Commission, err error) {
+func NewCommission(m map[string]string) (body Commission, err error) {
 	body.Validator = decoder.StringFromMap(m, "validator")
 	if body.Validator == "" {
 		err = errors.Errorf("validator key not found in %##v", m)
@@ -115,7 +115,7 @@ type Rewards struct {
 	Validator string
 }
 
-func NewRewards(m map[string]any) (body Rewards, err error) {
+func NewRewards(m map[string]string) (body Rewards, err error) {
 	body.Validator = decoder.StringFromMap(m, "validator")
 	if body.Validator == "" {
 		err = errors.Errorf("validator key not found in %##v", m)
@@ -131,7 +131,7 @@ type WithdrawRewards struct {
 	Delegator string
 }
 
-func NewWithdrawRewards(m map[string]any) (body WithdrawRewards, err error) {
+func NewWithdrawRewards(m map[string]string) (body WithdrawRewards, err error) {
 	body.Delegator = decoder.StringFromMap(m, "delegator")
 	if body.Delegator == "" {
 		err = errors.Errorf("delegator key not found in %##v", m)
@@ -150,7 +150,7 @@ type WithdrawCommission struct {
 	Amount *types.Coin
 }
 
-func NewWithdrawCommission(m map[string]any) (body WithdrawCommission, err error) {
+func NewWithdrawCommission(m map[string]string) (body WithdrawCommission, err error) {
 	body.Amount, err = decoder.BalanceFromMap(m, "amount")
 	return
 }
@@ -162,7 +162,7 @@ type Redelegate struct {
 	CompletionTime time.Time
 }
 
-func NewRedelegate(m map[string]any) (body Redelegate, err error) {
+func NewRedelegate(m map[string]string) (body Redelegate, err error) {
 	body.CompletionTime, err = decoder.TimeFromMap(m, "completion_time")
 	if err != nil {
 		err = errors.Wrap(err, "completion_time")
@@ -188,7 +188,7 @@ type Unbond struct {
 	CompletionTime time.Time
 }
 
-func NewUnbond(m map[string]any) (body Unbond, err error) {
+func NewUnbond(m map[string]string) (body Unbond, err error) {
 	body.CompletionTime, err = decoder.TimeFromMap(m, "completion_time")
 	if err != nil {
 		err = errors.Wrap(err, "completion_time")
@@ -209,7 +209,7 @@ type Delegate struct {
 	Validator string
 }
 
-func NewDelegate(m map[string]any) (body Delegate, err error) {
+func NewDelegate(m map[string]string) (body Delegate, err error) {
 	body.Validator = decoder.StringFromMap(m, "validator")
 	if body.Validator == "" {
 		err = errors.Errorf("validator key not found in %##v", m)
@@ -227,7 +227,7 @@ type CancelUnbondingDelegation struct {
 	CreationHeight int64
 }
 
-func NewCancelUnbondingDelegation(m map[string]any) (body CancelUnbondingDelegation, err error) {
+func NewCancelUnbondingDelegation(m map[string]string) (body CancelUnbondingDelegation, err error) {
 	body.Validator = decoder.StringFromMap(m, "validator")
 	if body.Validator == "" {
 		err = errors.Errorf("validator key not found in %##v", m)
@@ -254,7 +254,7 @@ type Slash struct {
 	BurnedCoins decimal.Decimal
 }
 
-func NewSlash(m map[string]any) (body Slash, err error) {
+func NewSlash(m map[string]string) (body Slash, err error) {
 	body.Power = decoder.DecimalFromMap(m, "power")
 	body.BurnedCoins = decoder.DecimalFromMap(m, "burned_coins")
 	body.Reason = decoder.StringFromMap(m, "reason")
@@ -269,7 +269,7 @@ type ProposalStatus struct {
 	Log    string
 }
 
-func NewProposalStatus(m map[string]any) (body ProposalStatus, err error) {
+func NewProposalStatus(m map[string]string) (body ProposalStatus, err error) {
 	body.Result = decoder.StringFromMap(m, "proposal_result")
 	body.Log = decoder.StringFromMap(m, "proposal_log")
 	body.Id, err = decoder.Uint64FromMap(m, "proposal_id")
@@ -283,7 +283,7 @@ type UpdateClient struct {
 	Revision        uint64
 }
 
-func NewUpdateClient(m map[string]any) (cc UpdateClient, err error) {
+func NewUpdateClient(m map[string]string) (cc UpdateClient, err error) {
 	cc.Id = decoder.StringFromMap(m, "client_id")
 	cc.Type = decoder.StringFromMap(m, "client_type")
 	revision, height, err := decoder.RevisionHeightFromMap(m, "consensus_height")
@@ -302,7 +302,7 @@ type ConnectionChange struct {
 	CounterpartyConnectionId string
 }
 
-func NewConnectionOpen(m map[string]any) (cc ConnectionChange) {
+func NewConnectionOpen(m map[string]string) (cc ConnectionChange) {
 	cc.ClientId = decoder.StringFromMap(m, "client_id")
 	cc.ConnectionId = decoder.StringFromMap(m, "connection_id")
 	cc.CounterpartyClientId = decoder.StringFromMap(m, "counterparty_client_id")
@@ -318,7 +318,7 @@ type ChannelChange struct {
 	PortId                string
 }
 
-func NewChannelChange(m map[string]any) (cc ChannelChange) {
+func NewChannelChange(m map[string]string) (cc ChannelChange) {
 	cc.ChannelId = decoder.StringFromMap(m, "channel_id")
 	cc.ConnectionId = decoder.StringFromMap(m, "connection_id")
 	cc.CounterpartyChannelId = decoder.StringFromMap(m, "counterparty_channel_id")
@@ -338,7 +338,7 @@ type FungibleTokenPacket struct {
 	Error    string
 }
 
-func NewFungibleTokenPacket(m map[string]any) (ftp FungibleTokenPacket) {
+func NewFungibleTokenPacket(m map[string]string) (ftp FungibleTokenPacket) {
 	ftp.Amount = decoder.DecimalFromMap(m, "amount")
 	ftp.Denom = decoder.StringFromMap(m, "denom")
 	ftp.Memo = decoder.StringFromMap(m, "memo")
@@ -364,7 +364,7 @@ type AcknowledgementPacket struct {
 	TimeoutHeight         uint64
 }
 
-func NewAcknowledgementPacket(m map[string]any) (ap AcknowledgementPacket, err error) {
+func NewAcknowledgementPacket(m map[string]string) (ap AcknowledgementPacket, err error) {
 	ap.ConnectionID = decoder.StringFromMap(m, "connection_id")
 	ap.MsgIndex = decoder.StringFromMap(m, "msg_index")
 	ap.PacketChannelOrdering = decoder.StringFromMap(m, "packet_channel_ordering")
@@ -399,7 +399,7 @@ type RecvPacket struct {
 	TimeoutHeight uint64
 }
 
-func NewRecvPacket(m map[string]any) (rp RecvPacket, err error) {
+func NewRecvPacket(m map[string]string) (rp RecvPacket, err error) {
 	rp.Ordering = decoder.StringFromMap(m, "packet_channel_ordering")
 	rp.Connection = decoder.StringFromMap(m, "packet_connection")
 	rp.Data = decoder.StringFromMap(m, "packet_data")
@@ -436,7 +436,7 @@ type CreateMailbox struct {
 	LocalDomain  uint64
 }
 
-func NewCreateMailbox(m map[string]any) (cm CreateMailbox, err error) {
+func NewCreateMailbox(m map[string]string) (cm CreateMailbox, err error) {
 	cm.MailboxId, err = parseUnquoteOptional(decoder.StringFromMap(m, "mailbox_id"))
 	if err != nil {
 		return cm, errors.Wrap(err, "mailbox_id")
@@ -473,7 +473,7 @@ type SetMailbox struct {
 	RenounceOwnership bool
 }
 
-func NewSetMailbox(m map[string]any) (sm SetMailbox, err error) {
+func NewSetMailbox(m map[string]string) (sm SetMailbox, err error) {
 	sm.MailboxId, err = parseUnquoteOptional(decoder.StringFromMap(m, "mailbox_id"))
 	if err != nil {
 		return sm, errors.Wrap(err, "mailbox_id")
@@ -510,7 +510,7 @@ type HyperlaneProcessEvent struct {
 	Message         *util.HyperlaneMessage
 }
 
-func NewHyperlaneProcessEvent(m map[string]any) (hpe HyperlaneProcessEvent, err error) {
+func NewHyperlaneProcessEvent(m map[string]string) (hpe HyperlaneProcessEvent, err error) {
 	hpe.OriginMailboxId, err = parseUnquoteOptional(decoder.StringFromMap(m, "origin_mailbox_id"))
 	if err != nil {
 		return hpe, errors.Wrap(err, "origin_mailbox_id")
@@ -547,7 +547,7 @@ type HyperlaneDispatchEvent struct {
 	Message         *util.HyperlaneMessage
 }
 
-func NewHyperlaneDispatchEvent(m map[string]any) (hde HyperlaneDispatchEvent, err error) {
+func NewHyperlaneDispatchEvent(m map[string]string) (hde HyperlaneDispatchEvent, err error) {
 	hde.OriginMailboxId, err = parseUnquoteOptional(decoder.StringFromMap(m, "origin_mailbox_id"))
 	if err != nil {
 		return hde, errors.Wrap(err, "origin_mailbox_id")
@@ -579,7 +579,7 @@ type CreateCollateralToken struct {
 	Denom     string
 }
 
-func NewCreateCollateralToken(m map[string]any) (cct CreateCollateralToken, err error) {
+func NewCreateCollateralToken(m map[string]string) (cct CreateCollateralToken, err error) {
 	cct.MailboxId, err = parseUnquoteOptional(decoder.StringFromMap(m, "origin_mailbox"))
 	if err != nil {
 		return cct, errors.Wrap(err, "origin_mailbox_id")
@@ -606,7 +606,7 @@ type CreateSyntheticToken struct {
 	Denom     string
 }
 
-func NewCreateSyntheticToken(m map[string]any) (cst CreateSyntheticToken, err error) {
+func NewCreateSyntheticToken(m map[string]string) (cst CreateSyntheticToken, err error) {
 	cst.MailboxId, err = parseUnquoteOptional(decoder.StringFromMap(m, "origin_mailbox"))
 	if err != nil {
 		return cst, errors.Wrap(err, "origin_mailbox_id")
@@ -635,7 +635,7 @@ type HyperlaneReceiveTransferEvent struct {
 	TokenId      string
 }
 
-func NewHyperlaneReceiveTransferEvent(m map[string]any) (hrte HyperlaneReceiveTransferEvent, err error) {
+func NewHyperlaneReceiveTransferEvent(m map[string]string) (hrte HyperlaneReceiveTransferEvent, err error) {
 	hrte.Sender, err = parseUnquoteOptional(decoder.StringFromMap(m, "sender"))
 	if err != nil {
 		return hrte, errors.Wrap(err, "sender")
@@ -677,7 +677,7 @@ type HyperlaneSendTransferEvent struct {
 	TokenId           string
 }
 
-func NewHyperlaneSendTransferEvent(m map[string]any) (hste HyperlaneSendTransferEvent, err error) {
+func NewHyperlaneSendTransferEvent(m map[string]string) (hste HyperlaneSendTransferEvent, err error) {
 	hste.Sender, err = parseUnquoteOptional(decoder.StringFromMap(m, "sender"))
 	if err != nil {
 		return hste, errors.Wrap(err, "sender")
@@ -715,7 +715,7 @@ type SetToken struct {
 	RenounceOwnership bool
 }
 
-func NewSetToken(m map[string]any) (st SetToken, err error) {
+func NewSetToken(m map[string]string) (st SetToken, err error) {
 	st.NewOwner, err = parseUnquoteOptional(decoder.StringFromMap(m, "new_owner"))
 	if err != nil {
 		return st, errors.Wrap(err, "new_owner")
@@ -745,7 +745,7 @@ type HyperlaneCreateIgpEvent struct {
 	Denom string
 }
 
-func NewHyperlaneCreateIgpEvent(m map[string]any) (hcie HyperlaneCreateIgpEvent, err error) {
+func NewHyperlaneCreateIgpEvent(m map[string]string) (hcie HyperlaneCreateIgpEvent, err error) {
 	hcie.IgpId, err = parseUnquoteOptional(decoder.StringFromMap(m, "igp_id"))
 	if err != nil {
 		return hcie, errors.Wrap(err, "igp_id")
@@ -770,7 +770,7 @@ type HyperlaneSetDestinationGasConfig struct {
 	TokenExchangeRate string
 }
 
-func NewHyperlaneSetDestinationGasConfig(m map[string]any) (hsdgc HyperlaneSetDestinationGasConfig, err error) {
+func NewHyperlaneSetDestinationGasConfig(m map[string]string) (hsdgc HyperlaneSetDestinationGasConfig, err error) {
 	price, err := parseUnquoteOptional(decoder.StringFromMap(m, "gas_price"))
 	if err != nil {
 		return hsdgc, errors.Wrap(err, "gas_price")
@@ -807,7 +807,7 @@ type HyperlaneGasPaymentEvent struct {
 	IgpId     string
 }
 
-func NewHyperlaneGasPaymentEvent(m map[string]any) (hgpe HyperlaneGasPaymentEvent, err error) {
+func NewHyperlaneGasPaymentEvent(m map[string]string) (hgpe HyperlaneGasPaymentEvent, err error) {
 	gasAmount, err := parseUnquoteOptional(decoder.StringFromMap(m, "gas_amount"))
 	if err != nil {
 		return hgpe, errors.Wrap(err, "gas_amount")
@@ -839,7 +839,7 @@ type HyperlaneSetIgpEvent struct {
 	RenounceOwnership bool
 }
 
-func NewHyperlaneSetIgpEvent(m map[string]any) (hsie HyperlaneSetIgpEvent, err error) {
+func NewHyperlaneSetIgpEvent(m map[string]string) (hsie HyperlaneSetIgpEvent, err error) {
 	hsie.IgpId, err = parseUnquoteOptional(decoder.StringFromMap(m, "igp_id"))
 	if err != nil {
 		return hsie, errors.Wrap(err, "igp_id")
@@ -867,7 +867,7 @@ type EventForwardingComplete struct {
 	FailedCount          uint64
 }
 
-func NewEventForwardingComplete(m map[string]any) (efc EventForwardingComplete, err error) {
+func NewEventForwardingComplete(m map[string]string) (efc EventForwardingComplete, err error) {
 	efc.ForwardAddress, err = parseUnquoteOptional(decoder.StringFromMap(m, "forward_addr"))
 	if err != nil {
 		return efc, errors.Wrap(err, "forward_addr")
@@ -900,7 +900,7 @@ type EventTokenForwarded struct {
 	Error          string
 }
 
-func NewEventTokenForwarded(m map[string]any) (etf EventTokenForwarded, err error) {
+func NewEventTokenForwarded(m map[string]string) (etf EventTokenForwarded, err error) {
 	etf.ForwardAddress, err = parseUnquoteOptional(decoder.StringFromMap(m, "forward_addr"))
 	if err != nil {
 		return etf, errors.Wrap(err, "forward_addr")
@@ -938,7 +938,7 @@ type ZkISMCreateEvent struct {
 	StateMembershipVKey []byte
 }
 
-func NewZkISMCreateEvent(m map[string]any) (e ZkISMCreateEvent, err error) {
+func NewZkISMCreateEvent(m map[string]string) (e ZkISMCreateEvent, err error) {
 	e.Id, err = decoder.BytesFromMap(m, "id")
 	if err != nil {
 		return e, errors.Wrap(err, "id")
@@ -975,7 +975,7 @@ type ZkISMUpdateEvent struct {
 	NewState []byte
 }
 
-func NewZkISMUpdateEvent(m map[string]any) (e ZkISMUpdateEvent, err error) {
+func NewZkISMUpdateEvent(m map[string]string) (e ZkISMUpdateEvent, err error) {
 	e.Id, err = decoder.BytesFromMap(m, "id")
 	if err != nil {
 		return e, errors.Wrap(err, "id")
@@ -993,7 +993,7 @@ type ZkISMSubmitMessagesEvent struct {
 	MessageIds [][]byte
 }
 
-func NewZkISMSubmitMessagesEvent(m map[string]any) (e ZkISMSubmitMessagesEvent, err error) {
+func NewZkISMSubmitMessagesEvent(m map[string]string) (e ZkISMSubmitMessagesEvent, err error) {
 	e.Id, err = decoder.BytesFromMap(m, "id")
 	if err != nil {
 		return e, errors.Wrap(err, "id")

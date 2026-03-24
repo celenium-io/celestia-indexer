@@ -30,16 +30,19 @@ func handleRecvPacket(ctx *context.Context, events []storage.Event, msg *storage
 
 func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	if len(events)-1 < *idx || events[*idx].Type == storageTypes.EventTypeMessage {
-		msg.IbcTransfer = nil
-		msg.IbcChannel = nil
+		ctx.RemoveLastIbcTransfer()
 		return nil
 	}
-	if events[*idx].Type == storageTypes.EventTypeRecvPacket && msg.IbcTransfer != nil {
+
+	transfer := ctx.GetLastIbcTransfer()
+	var chanId string
+	if events[*idx].Type == storageTypes.EventTypeRecvPacket && transfer != nil {
 		rp, err := decode.NewRecvPacket(events[*idx].Data)
 		if err != nil {
 			return err
 		}
-		msg.IbcTransfer.ConnectionId = rp.Connection
+		transfer.ConnectionId = rp.Connection
+		chanId = rp.DstChannel
 	}
 
 	*idx += 2
@@ -50,8 +53,8 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 
 	if events[*idx].Type == storageTypes.EventTypeWriteAcknowledgement {
 		*idx += 2
-		msg.IbcTransfer = nil
-		msg.IbcChannel = nil
+		ctx.RemoveLastIbcTransfer()
+		ctx.DeleteIbcChannel(chanId)
 		return nil
 	}
 
@@ -60,7 +63,7 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 		return err
 	}
 
-	port := decoder.StringFromMap(packet, "DestinationPort")
+	port := (storageTypes.PackedBytes)(packet).GetStringOrDefault("DestinationPort")
 
 	switch port {
 	case "icahost":
@@ -75,7 +78,7 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 		}
 
 		for i := range msgs {
-			decodedMsg, err := decode.Message(ctx, msgs[i], i, storageTypes.StatusSuccess)
+			decodedMsg, err := decode.Message(ctx, msgs[i], i, storageTypes.StatusSuccess, 0)
 			if err != nil {
 				return errors.Wrap(err, "decode message in RecvPacket")
 			}
@@ -83,20 +86,19 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 			if err := handle(ctx, events, &decodedMsg.Msg, idx, ibcEventHandlers, "module"); err != nil {
 				return errors.Wrap(err, "handle IBC msg event")
 			}
-			msg.Addresses = append(msg.Addresses, decodedMsg.Addresses...)
 		}
 
 	case "transfer":
 		var action = decoder.StringFromMap(events[*idx].Data, "action")
 
-		if msg.IbcTransfer == nil {
+		if transfer == nil {
 			return nil
 		}
 
-		if err := ctx.AddAddress(msg.IbcTransfer.Sender); err != nil {
+		if err := ctx.AddAddress(transfer.Sender); err != nil {
 			return err
 		}
-		if err := ctx.AddAddress(msg.IbcTransfer.Receiver); err != nil {
+		if err := ctx.AddAddress(transfer.Receiver); err != nil {
 			return err
 		}
 
@@ -109,14 +111,14 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 				hasFtp = true
 				ftp := decode.NewFungibleTokenPacket(events[*idx].Data)
 				if ftp.Error != "" {
-					msg.IbcTransfer = nil
-					msg.IbcChannel = nil
+					ctx.RemoveLastIbcTransfer()
+					ctx.DeleteIbcChannel(chanId)
 				}
 			}
 		}
 		if !hasFtp {
-			msg.IbcTransfer = nil
-			msg.IbcChannel = nil
+			ctx.RemoveLastIbcTransfer()
+			ctx.DeleteIbcChannel(chanId)
 		}
 	}
 

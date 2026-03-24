@@ -49,7 +49,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/cosmos.bank.v1beta1.MsgSend",
 				},
 			},
@@ -71,14 +71,14 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/celestia.forwarding.v1.MsgForward",
 				},
 			},
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"denom":        "utia",
 					"amount":       "1000",
@@ -90,7 +90,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"denom":        "uatom",
 					"amount":       "500",
@@ -102,7 +102,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventForwardingComplete,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr":     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"dest_domain":      "1",
 					"dest_recipient":   "0101",
@@ -114,14 +114,15 @@ func Test_handleForward(t *testing.T) {
 
 		err := handleForward(ctx, events, msg, &idx)
 		require.NoError(t, err)
-		require.NotNil(t, msg.Forwarding)
-		require.Equal(t, uint64(1), msg.Forwarding.SuccessCount)
-		require.Equal(t, uint64(1), msg.Forwarding.FailedCount)
-		require.Equal(t, uint64(1), msg.Forwarding.DestDomain)
-		require.NotNil(t, msg.Forwarding.Address)
-		require.Equal(t, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", msg.Forwarding.Address.Address)
-		require.True(t, msg.Forwarding.Address.IsForwarding)
-		require.NotNil(t, msg.Forwarding.Transfers)
+		require.Len(t, ctx.Forwardings, 1)
+		require.NotNil(t, ctx.Forwardings[0])
+		require.Equal(t, uint64(1), ctx.Forwardings[0].SuccessCount)
+		require.Equal(t, uint64(1), ctx.Forwardings[0].FailedCount)
+		require.Equal(t, uint64(1), ctx.Forwardings[0].DestDomain)
+		require.NotNil(t, ctx.Forwardings[0].Address)
+		require.Equal(t, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", ctx.Forwardings[0].Address.Address)
+		require.True(t, ctx.Forwardings[0].Address.IsForwarding)
+		require.NotNil(t, ctx.Forwardings[0].Transfers)
 	})
 
 	t.Run("stops at next action event", func(t *testing.T) {
@@ -136,14 +137,14 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/celestia.forwarding.v1.MsgForward",
 				},
 			},
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"denom":        "utia",
 					"amount":       "1000",
@@ -155,7 +156,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/cosmos.bank.v1beta1.MsgSend",
 				},
 			},
@@ -163,7 +164,8 @@ func Test_handleForward(t *testing.T) {
 
 		err := handleForward(ctx, events, msg, &idx)
 		require.NoError(t, err)
-		require.NotNil(t, msg.Forwarding)
+		require.Len(t, ctx.Forwardings, 1)
+		require.NotNil(t, ctx.Forwardings[0])
 		require.Equal(t, 2, idx, "index should stop at next action event")
 	})
 
@@ -174,14 +176,14 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/celestia.forwarding.v1.MsgForward",
 				},
 			},
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"denom":        "utia",
 					"amount":       "1000",
@@ -193,7 +195,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventForwardingComplete,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr":     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"dest_domain":      "1",
 					"dest_recipient":   "AAEC",
@@ -204,14 +206,14 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/celestia.forwarding.v1.MsgForward",
 				},
 			},
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr": "celestia1ccqy2wlzf2zndn4vspmuksw5frqq0ufsgw4gmt",
 					"denom":        "uatom",
 					"amount":       "2000",
@@ -223,7 +225,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventForwardingComplete,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr":     "celestia1ccqy2wlzf2zndn4vspmuksw5frqq0ufsgw4gmt",
 					"dest_domain":      "2",
 					"dest_recipient":   "010203",
@@ -249,13 +251,14 @@ func Test_handleForward(t *testing.T) {
 		for i := range msgs {
 			err := handleForward(ctx, events, msgs[i], idx)
 			require.NoError(t, err)
-			require.NotNil(t, msgs[i].Forwarding)
 		}
 
-		require.Equal(t, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", msgs[0].Forwarding.Address.Address)
-		require.Equal(t, "celestia1ccqy2wlzf2zndn4vspmuksw5frqq0ufsgw4gmt", msgs[1].Forwarding.Address.Address)
-		require.Equal(t, uint64(1), msgs[0].Forwarding.DestDomain)
-		require.Equal(t, uint64(2), msgs[1].Forwarding.DestDomain)
+		require.Len(t, ctx.Forwardings, 2)
+		require.NotNil(t, ctx.Forwardings[0])
+		require.Equal(t, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", ctx.Forwardings[0].Address.Address)
+		require.Equal(t, "celestia1ccqy2wlzf2zndn4vspmuksw5frqq0ufsgw4gmt", ctx.Forwardings[1].Address.Address)
+		require.Equal(t, uint64(1), ctx.Forwardings[0].DestDomain)
+		require.Equal(t, uint64(2), ctx.Forwardings[1].DestDomain)
 	})
 
 	t.Run("no events after action", func(t *testing.T) {
@@ -270,7 +273,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/celestia.forwarding.v1.MsgForward",
 				},
 			},
@@ -278,8 +281,9 @@ func Test_handleForward(t *testing.T) {
 
 		err := handleForward(ctx, events, msg, &idx)
 		require.NoError(t, err)
-		require.NotNil(t, msg.Forwarding)
-		require.Nil(t, msg.Forwarding.Address)
+		require.Len(t, ctx.Forwardings, 1)
+		require.NotNil(t, ctx.Forwardings[0])
+		require.Nil(t, ctx.Forwardings[0].Address)
 	})
 
 	t.Run("token with error included in transfers", func(t *testing.T) {
@@ -294,14 +298,14 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   "message",
-				Data: map[string]any{
+				Data: map[string]string{
 					"action": "/celestia.forwarding.v1.MsgForward",
 				},
 			},
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"denom":        "utia",
 					"amount":       "1000",
@@ -313,7 +317,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 100,
 				Type:   types.EventTypeCelestiaforwardingv1EventForwardingComplete,
-				Data: map[string]any{
+				Data: map[string]string{
 					"forward_addr":     "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 					"dest_domain":      "1",
 					"dest_recipient":   "AAEC",
@@ -325,9 +329,10 @@ func Test_handleForward(t *testing.T) {
 
 		err := handleForward(ctx, events, msg, &idx)
 		require.NoError(t, err)
-		require.NotNil(t, msg.Forwarding)
-		require.Contains(t, string(msg.Forwarding.Transfers), `"error":"some error"`)
-		require.Contains(t, string(msg.Forwarding.Transfers), `"denom":"utia"`)
-		require.Contains(t, string(msg.Forwarding.Transfers), `"amount":"1000"`)
+		require.Len(t, ctx.Forwardings, 1)
+		require.NotNil(t, ctx.Forwardings[0])
+		require.Contains(t, string(ctx.Forwardings[0].Transfers), `"error":"some error"`)
+		require.Contains(t, string(ctx.Forwardings[0].Transfers), `"denom":"utia"`)
+		require.Contains(t, string(ctx.Forwardings[0].Transfers), `"amount":"1000"`)
 	})
 }

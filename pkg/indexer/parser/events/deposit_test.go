@@ -32,27 +32,27 @@ func Test_handleDeposit(t *testing.T) {
 				{
 					Height: 1745041,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.gov.v1.MsgDeposit",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "9990000000utia",
 						"spender": "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "9990000000utia",
 						"receiver": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "9990000000utia",
 						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 						"sender":    "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
@@ -60,27 +60,27 @@ func Test_handleDeposit(t *testing.T) {
 				}, {
 					Height: 1745041,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "proposal_deposit",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":      "9990000000utia",
 						"proposal_id": "2",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "governance",
 						"sender": "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "proposal_deposit",
-					Data: map[string]any{
+					Data: map[string]string{
 						"voting_period_start": "2",
 					},
 				},
@@ -103,27 +103,27 @@ func Test_handleDeposit(t *testing.T) {
 				{
 					Height: 1745041,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.gov.v1.MsgDeposit",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":  "9990000000utia",
 						"spender": "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":   "9990000000utia",
 						"receiver": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "9990000000utia",
 						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
 						"sender":    "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
@@ -131,20 +131,20 @@ func Test_handleDeposit(t *testing.T) {
 				}, {
 					Height: 1745041,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "proposal_deposit",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":      "9990000000utia",
 						"proposal_id": "2",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "governance",
 						"sender": "celestia1jkuw8rxxrsgn9pq009987kzelkp46cgcczuxp5",
 					},
@@ -167,13 +167,13 @@ func Test_handleDeposit(t *testing.T) {
 				{
 					Height: 1745041,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.gov.v1.MsgDeposit",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "9000000000utia",
 						"msg_index": "0",
 						"spender":   "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
@@ -181,7 +181,7 @@ func Test_handleDeposit(t *testing.T) {
 				}, {
 					Height: 1745041,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "9000000000utia",
 						"msg_index": "0",
 						"receiver":  "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
@@ -189,7 +189,7 @@ func Test_handleDeposit(t *testing.T) {
 				}, {
 					Height: 1745041,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "9000000000utia",
 						"msg_index": "0",
 						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
@@ -198,14 +198,14 @@ func Test_handleDeposit(t *testing.T) {
 				}, {
 					Height: 1745041,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"msg_index": "0",
 						"sender":    "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "proposal_deposit",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":      "9000000000utia",
 						"depositor":   "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
 						"msg_index":   "0",
@@ -214,7 +214,7 @@ func Test_handleDeposit(t *testing.T) {
 				}, {
 					Height: 1745041,
 					Type:   "proposal_deposit",
-					Data: map[string]any{
+					Data: map[string]string{
 						"msg_index":           "0",
 						"voting_period_start": "7",
 					},
@@ -238,13 +238,13 @@ func Test_handleDeposit(t *testing.T) {
 				{
 					Height: 1745041,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.gov.v1.MsgDeposit",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "coin_spent",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "100000000utia",
 						"msg_index": "0",
 						"spender":   "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
@@ -252,7 +252,7 @@ func Test_handleDeposit(t *testing.T) {
 				}, {
 					Height: 1745041,
 					Type:   "coin_received",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "100000000utia",
 						"msg_index": "0",
 						"receiver":  "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
@@ -260,7 +260,7 @@ func Test_handleDeposit(t *testing.T) {
 				}, {
 					Height: 1745041,
 					Type:   "transfer",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "100000000utia",
 						"msg_index": "0",
 						"recipient": "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
@@ -269,14 +269,14 @@ func Test_handleDeposit(t *testing.T) {
 				}, {
 					Height: 1745041,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"msg_index": "0",
 						"sender":    "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
 					},
 				}, {
 					Height: 1745041,
 					Type:   "proposal_deposit",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":      "100000000utia",
 						"depositor":   "celestia1j2jq259d3rrc24876gwxg0ksp0lhd8gys65rxd",
 						"msg_index":   "0",

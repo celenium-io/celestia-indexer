@@ -226,7 +226,7 @@ func TestSuiteHyperlane_Run(t *testing.T) {
 }
 
 func (s *HyperlaneTestSuite) TestGetMailbox() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/mailbox/:id")
@@ -261,7 +261,7 @@ func (s *HyperlaneTestSuite) TestGetMailbox() {
 }
 
 func (s *HyperlaneTestSuite) TestListMailboxes() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/mailbox")
@@ -296,7 +296,7 @@ func (s *HyperlaneTestSuite) TestListMailboxes() {
 }
 
 func (s *HyperlaneTestSuite) TestGetToken() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/token/:id")
@@ -332,7 +332,7 @@ func (s *HyperlaneTestSuite) TestGetToken() {
 }
 
 func (s *HyperlaneTestSuite) TestListToken() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/token")
@@ -368,7 +368,7 @@ func (s *HyperlaneTestSuite) TestListToken() {
 }
 
 func (s *HyperlaneTestSuite) TestGetTransfer() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/transfer/:id")
@@ -435,7 +435,7 @@ func (s *HyperlaneTestSuite) TestListTransferWithHash() {
 	q := make(url.Values)
 	q.Add("hash", testTxHash)
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/transfer")
@@ -505,7 +505,7 @@ func (s *HyperlaneTestSuite) TestListTransferWithHash() {
 }
 
 func (s *HyperlaneTestSuite) TestListTransfer() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/transfer")
@@ -604,7 +604,7 @@ func (s *HyperlaneTestSuite) TestListTransferWithoutChainStore() {
 	s.chainStore = nil
 	s.handler = NewHyperlaneHandler(s.mailbox, s.token, s.transfer, s.txs, s.address, s.igp, nil)
 
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/transfer")
@@ -652,7 +652,7 @@ func (s *HyperlaneTestSuite) TestListTransferWithoutChainStore() {
 }
 
 func (s *HyperlaneTestSuite) TestListDomains() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/domains")
@@ -699,7 +699,7 @@ func (s *HyperlaneTestSuite) TestListDomains() {
 }
 
 func (s *HyperlaneTestSuite) TestGetIgp() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/igp/:id")
@@ -755,7 +755,7 @@ func (s *HyperlaneTestSuite) TestGetIgp() {
 }
 
 func (s *HyperlaneTestSuite) TestListIgps() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/igp")

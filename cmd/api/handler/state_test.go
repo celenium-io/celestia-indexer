@@ -54,7 +54,7 @@ func TestSuiteState_Run(t *testing.T) {
 }
 
 func (s *StateTestSuite) TestHead() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/head")
@@ -111,7 +111,7 @@ func (s *StateTestSuite) TestHead() {
 }
 
 func (s *StateTestSuite) TestNoHead() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/head")

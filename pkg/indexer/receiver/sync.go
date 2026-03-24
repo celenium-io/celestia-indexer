@@ -15,6 +15,7 @@ import (
 func (r *Module) sync(ctx context.Context) {
 	var blocksCtx context.Context
 	blocksCtx, r.cancelReadBlocks = context.WithCancel(ctx)
+
 	if err := r.readBlocks(blocksCtx); err != nil {
 		r.Log.Err(err).Msg("while reading blocks")
 		r.stopAll()
@@ -26,7 +27,7 @@ func (r *Module) sync(ctx context.Context) {
 	}
 
 	if r.ws != nil {
-		if err := r.live(ctx); err != nil {
+		if err := r.live(blocksCtx); err != nil {
 			r.Log.Err(err).Msg("while reading blocks")
 			r.stopAll()
 			return
@@ -107,19 +108,61 @@ func (r *Module) readBlocks(ctx context.Context) error {
 }
 
 func (r *Module) passBlocks(ctx context.Context, head types.Level) {
+	fetchCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	var (
+		batch    []types.Level
+		maxLevel types.Level
+	)
+
 	for level := r.receivedLevel + 1; level <= head; level++ {
 		select {
-		case <-ctx.Done():
+		case <-fetchCtx.Done():
+			r.fetchWg.Wait()
 			return
 		default:
-			if _, ok := r.taskQueue.Get(level); ok {
-				continue
+		}
+
+		batch = append(batch, level)
+		bulkSize := int(r.bulkSize.Load())
+		if len(batch) >= bulkSize || level == head {
+			levels := batch
+			batch = nil
+
+			last := levels[len(levels)-1]
+			if last > maxLevel {
+				maxLevel = last
 			}
 
-			r.taskQueue.Set(level, struct{}{})
-			if r.taskQueue.Len() >= r.cfg.RequestBulkSize || level == head {
-				r.getBlocks(ctx)
+			threshold := max(int64(10), int64(r.cfg.FetchConcurrency*r.cfg.RequestBulkSize/2))
+			for r.orderedBlocksLen.Load() >= threshold {
+				select {
+				case <-fetchCtx.Done():
+					r.fetchWg.Wait()
+					return
+				case <-time.After(100 * time.Millisecond):
+				}
 			}
+
+			select {
+			case r.fetchSem <- struct{}{}:
+			case <-fetchCtx.Done():
+				r.fetchWg.Wait()
+				return
+			}
+
+			r.fetchWg.Add(1)
+			go func(lvls []types.Level) {
+				defer r.fetchWg.Done()
+				defer func() { <-r.fetchSem }()
+				r.fetchBatch(fetchCtx, lvls)
+			}(levels)
 		}
+	}
+
+	r.fetchWg.Wait()
+	if fetchCtx.Err() == nil && maxLevel > r.receivedLevel {
+		r.receivedLevel = maxLevel
 	}
 }

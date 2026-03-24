@@ -73,7 +73,7 @@ func (s *SearchTestSuite) TestSearchAddress() {
 	q := make(url.Values)
 	q.Set("query", testAddress)
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -107,7 +107,7 @@ func (s *SearchTestSuite) TestSearchBlock() {
 	q := make(url.Values)
 	q.Set("query", searchText)
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -145,7 +145,7 @@ func (s *SearchTestSuite) TestSearchBlockByHeight() {
 	q := make(url.Values)
 	q.Set("query", "100")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -183,7 +183,7 @@ func (s *SearchTestSuite) TestSearchBlockWith0x() {
 	q := make(url.Values)
 	q.Set("query", searchText)
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -221,7 +221,7 @@ func (s *SearchTestSuite) TestSearchBlockWithInvalidHash() {
 	q := make(url.Values)
 	q.Set("query", "EDBOFE1DAA9BB1FDA0879F1EB4F285399B6F74CB1B0C420600642682043EE41E")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -239,7 +239,7 @@ func (s *SearchTestSuite) TestSearchTx() {
 	q := make(url.Values)
 	q.Set("query", testTxHash)
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -277,7 +277,7 @@ func (s *SearchTestSuite) TestSearchNamespaceById() {
 	q := make(url.Values)
 	q.Set("query", "00"+testNamespaceId)
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -303,7 +303,7 @@ func (s *SearchTestSuite) TestSearchNamespaceByBase64() {
 	q := make(url.Values)
 	q.Set("query", testNamespaceBase64)
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -330,7 +330,7 @@ func (s *SearchTestSuite) TestSearchValidator() {
 	q := make(url.Values)
 	q.Set("query", "name")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -372,7 +372,7 @@ func (s *SearchTestSuite) TestSearchRollup() {
 	q := make(url.Values)
 	q.Set("query", "name")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -413,7 +413,7 @@ func (s *SearchTestSuite) TestSearchTextNamespace() {
 	q := make(url.Values)
 	q.Set("query", "5f45")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -455,7 +455,7 @@ func (s *SearchTestSuite) TestSearchCelestial() {
 	q := make(url.Values)
 	q.Set("query", "name")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -507,7 +507,7 @@ func (s *SearchTestSuite) TestSearchNoResult() {
 	q := make(url.Values)
 	q.Set("query", "unknown")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")
@@ -525,7 +525,7 @@ func (s *SearchTestSuite) TestSearchUnknownAddress() {
 	q := make(url.Values)
 	q.Set("query", testAddress)
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/search")

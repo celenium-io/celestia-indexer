@@ -25,7 +25,7 @@ func (p *Module) listen(ctx context.Context) {
 				return
 			}
 
-			block, ok := msg.(types.BlockData)
+			block, ok := msg.(*types.BlockData)
 			if !ok {
 				p.Log.Warn().Msgf("invalid message type: %T", msg)
 				continue

@@ -108,6 +108,7 @@ package types
 
 		signal_version,
 		ibccallbackerror-ics27_packet,
+		ibccallbackerror-fungible_token_packet,
 
 		celestia.forwarding.v1.EventTokenForwarded,
 		celestia.forwarding.v1.EventForwardingComplete,

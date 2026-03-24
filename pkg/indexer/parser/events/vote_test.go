@@ -32,13 +32,13 @@ func Test_handleVote(t *testing.T) {
 				{
 					Height: 3762606,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.gov.v1beta1.MsgVote",
 					},
 				}, {
 					Height: 3762606,
 					Type:   "proposal_vote",
-					Data: map[string]any{
+					Data: map[string]string{
 						"option":      "option:VOTE_OPTION_YES weight:\"1.000000000000000000\"",
 						"proposal_id": "5",
 						"voter":       "celestia1lha3l9w5sca8gv98t27n5rezex3vafp8qa7h69",
@@ -46,7 +46,7 @@ func Test_handleVote(t *testing.T) {
 				}, {
 					Height: 3762606,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "governance",
 						"sender": "celestia1lha3l9w5sca8gv98t27n5rezex3vafp8qa7h69",
 					},
@@ -80,13 +80,13 @@ func Test_handleVote(t *testing.T) {
 				{
 					Height: 871324,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.gov.v1.MsgVoteWeighted",
 					},
 				}, {
 					Height: 871324,
 					Type:   "proposal_vote",
-					Data: map[string]any{
+					Data: map[string]string{
 						"option":      "option:VOTE_OPTION_YES weight:\"1.000000000000000000\"",
 						"proposal_id": "3",
 						"voter":       "celestia1davz40kat93t49ljrkmkl5uqhqq45e0tedgf8a",
@@ -94,7 +94,7 @@ func Test_handleVote(t *testing.T) {
 				}, {
 					Height: 871324,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "governance",
 						"sender": "celestia1davz40kat93t49ljrkmkl5uqhqq45e0tedgf8a",
 					},
@@ -128,7 +128,7 @@ func Test_handleVote(t *testing.T) {
 				{
 					Height: 871324,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/cosmos.gov.v1.MsgVote",
 						"sender":    "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
 						"module":    "gov",
@@ -137,7 +137,7 @@ func Test_handleVote(t *testing.T) {
 				}, {
 					Height: 871324,
 					Type:   "proposal_vote",
-					Data: map[string]any{
+					Data: map[string]string{
 						"option":      "[{\"option\":1,\"weight\":\"1.000000000000000000\"}]",
 						"proposal_id": "4",
 						"voter":       "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
@@ -172,7 +172,7 @@ func Test_handleVote(t *testing.T) {
 				{
 					Height: 871324,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/cosmos.gov.v1.MsgVote",
 						"sender":    "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
 						"module":    "gov",
@@ -181,7 +181,7 @@ func Test_handleVote(t *testing.T) {
 				}, {
 					Height: 871324,
 					Type:   "proposal_vote",
-					Data: map[string]any{
+					Data: map[string]string{
 						"option":      "[{\"option\":1,\"weight\":\"0.500000000000000000\"},{\"option\":2,\"weight\":\"0.500000000000000000\"}]",
 						"proposal_id": "4",
 						"voter":       "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",

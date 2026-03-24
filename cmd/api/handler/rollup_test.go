@@ -113,7 +113,7 @@ func (s *RollupTestSuite) TestLeaderboard() {
 		q.Add("provider", "provider 1")
 		q.Add("is_active", "true")
 
-		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 		rec := httptest.NewRecorder()
 		c := s.echo.NewContext(req, rec)
 		c.SetPath("/rollup")
@@ -176,7 +176,7 @@ func (s *RollupTestSuite) TestLeaderboardDay() {
 		q.Add("stack", "stack 1,stack 2")
 		q.Add("provider", "provider 1")
 
-		req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 		rec := httptest.NewRecorder()
 		c := s.echo.NewContext(req, rec)
 		c.SetPath("/rollup/day")
@@ -227,7 +227,7 @@ func (s *RollupTestSuite) TestLeaderboardDay() {
 }
 
 func (s *RollupTestSuite) TestGet() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/rollup/:id")
@@ -260,7 +260,7 @@ func (s *RollupTestSuite) TestGet() {
 }
 
 func (s *RollupTestSuite) TestGetNamespaces() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/rollup/:id/namespaces")
@@ -293,7 +293,7 @@ func (s *RollupTestSuite) TestGetNamespaces() {
 }
 
 func (s *RollupTestSuite) TestGetProviders() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/rollup/:id/providers")
@@ -346,7 +346,7 @@ func (s *RollupTestSuite) TestGetProviders() {
 }
 
 func (s *RollupTestSuite) TestGetBlobs() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/rollup/:id/blobs")
@@ -409,7 +409,7 @@ func (s *RollupTestSuite) TestGetBlobs() {
 func (s *RollupTestSuite) TestStats() {
 	for _, name := range []string{"blobs_count", "size", "size_per_blob", "fee"} {
 		for _, tf := range []storage.Timeframe{storage.TimeframeHour, storage.TimeframeDay, storage.TimeframeMonth} {
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/rollup/:id/stats/:name/:timeframe")
@@ -439,7 +439,7 @@ func (s *RollupTestSuite) TestStats() {
 func (s *RollupTestSuite) TestDistribution() {
 	for _, name := range []string{"blobs_count", "size", "size_per_blob", "fee_per_blob"} {
 		for _, tf := range []storage.Timeframe{storage.TimeframeHour, storage.TimeframeDay} {
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/rollup/:id/distribution/:name/:timeframe")
@@ -467,7 +467,7 @@ func (s *RollupTestSuite) TestDistribution() {
 }
 
 func (s *RollupTestSuite) TestBySlug() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/rollup/slug/:slug")
@@ -499,7 +499,7 @@ func (s *RollupTestSuite) TestByExportBlobs() {
 	q.Set("from", "1")
 	q.Set("to", "2")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/rollup/:id/export")
@@ -538,7 +538,7 @@ func (s *RollupTestSuite) TestAllSeries() {
 		storage.TimeframeDay,
 		storage.TimeframeMonth,
 	} {
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 		rec := httptest.NewRecorder()
 		c := s.echo.NewContext(req, rec)
 		c.SetPath("/rollup/stats/series/:timeframe")
@@ -595,7 +595,7 @@ func (s *RollupTestSuite) TestRollupStatsGrouping() {
 			q.Add("func", funcName)
 			q.Add("column", groupName)
 
-			req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/rollup/group")

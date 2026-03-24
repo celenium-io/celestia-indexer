@@ -31,13 +31,15 @@ func (module *Module) saveProposals(
 			if votes[i].Voter != nil {
 				voterId, ok := addrToId[votes[i].Voter.Address]
 				if !ok {
-					return 0, errors.Errorf("unknown voter address: %s", votes[i].Voter.Address)
+					return 0, errors.Wrap(errCantFindAddress, votes[i].Voter.Address)
 				}
 				votes[i].VoterId = voterId
 
 				if validatorId, ok := module.validatorsByDelegator[votes[i].Voter.Address]; ok {
 					votes[i].ValidatorId = &validatorId
 				}
+			} else {
+				return 0, errors.Errorf("nil voter address")
 			}
 		}
 
@@ -80,7 +82,7 @@ func (module *Module) saveProposals(
 		if filled[i].Proposer != nil {
 			proposerId, ok := addrToId[filled[i].Proposer.Address]
 			if !ok {
-				return 0, errors.Errorf("unknown proposer address for proposal: %s", filled[i].Proposer.Address)
+				return 0, errors.Wrap(errCantFindAddress, filled[i].Proposer.Address)
 			}
 			filled[i].ProposerId = proposerId
 		}

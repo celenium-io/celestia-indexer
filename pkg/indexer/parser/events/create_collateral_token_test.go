@@ -33,7 +33,7 @@ func Test_handleCreateCollateralToken(t *testing.T) {
 					Height: 1036866,
 					Time:   ts,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/hyperlane.warp.v1.MsgCreateCollateralToken",
 						"module":    "warp",
 						"msg_index": "0",
@@ -43,7 +43,7 @@ func Test_handleCreateCollateralToken(t *testing.T) {
 					Height: 1036866,
 					Time:   ts,
 					Type:   "hyperlane.warp.v1.EventCreateCollateralToken",
-					Data: map[string]any{ //nolint:gosec
+					Data: map[string]string{ //nolint:gosec
 						"msg_index":      "0",
 						"origin_denom":   "\"utia\"",
 						"origin_mailbox": "\"0x68797065726c616e650000000000000000000000000000000000000000000000\"",
@@ -74,7 +74,11 @@ func Test_handleCreateCollateralToken(t *testing.T) {
 				Received:         decimal.Zero,
 				Sent:             decimal.Zero,
 				Owner: &storage.Address{
-					Address: "celestia1zvdlcmplx4gdh4hajwlsegnn2xzzfy470gjw4c",
+					Address:    "celestia1zvdlcmplx4gdh4hajwlsegnn2xzzfy470gjw4c",
+					Height:     1036866,
+					LastHeight: 1036866,
+					Balance:    storage.EmptyBalance(),
+					Hash:       []byte{0x13, 0x1b, 0xfc, 0x6c, 0x3f, 0x35, 0x50, 0xdb, 0xd6, 0xfd, 0x93, 0xbf, 0x0c, 0xa2, 0x73, 0x51, 0x84, 0x24, 0x92, 0xbe},
 				},
 				Mailbox: &storage.HLMailbox{
 					Height:     1036866,
@@ -93,8 +97,13 @@ func Test_handleCreateCollateralToken(t *testing.T) {
 			}
 			err := handleCreateCollateralToken(tt.ctx, tt.events, tt.msg, tt.idx)
 			require.NoError(t, err)
-			require.NotNil(t, tt.msg.HLToken)
-			require.Equal(t, tt.token, tt.msg.HLToken)
+			require.NotEmpty(t, tt.ctx.HlTokens.Len())
+
+			_ = tt.ctx.HlTokens.Range(func(_ string, value *storage.HLToken) (error, bool) {
+				require.NotNil(t, value)
+				require.Equal(t, tt.token, value)
+				return nil, false
+			})
 		})
 	}
 }

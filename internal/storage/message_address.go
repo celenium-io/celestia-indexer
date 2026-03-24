@@ -7,8 +7,11 @@ import (
 	"fmt"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
+
+var _ sdk.Copiable = (*MsgAddress)(nil)
 
 type MsgAddress struct {
 	bun.BaseModel `bun:"msg_address" comment:"Table with relation tx to address"`
@@ -26,6 +29,9 @@ func (MsgAddress) TableName() string {
 }
 
 func (m MsgAddress) String() string {
+	if m.Address != nil {
+		return fmt.Sprintf("%s_%d_%s", m.Address.Address, m.MsgId, m.Type)
+	}
 	return fmt.Sprintf("%d_%d_%s", m.AddressId, m.MsgId, m.Type)
 }
 
@@ -33,4 +39,18 @@ type AddressWithType struct {
 	Address
 
 	Type types.MsgAddressType
+}
+
+func (m MsgAddress) Flat() ([]any, error) {
+	return []any{
+		int64(m.AddressId),
+		int64(m.MsgId),
+		m.Type.String(),
+	}, nil
+}
+
+func (MsgAddress) Columns() []string {
+	return []string{
+		"address_id", "msg_id", "type",
+	}
 }

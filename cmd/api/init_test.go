@@ -4,6 +4,7 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -55,7 +56,7 @@ func Test_observableCacheSkipper(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest(tt.method, tt.path, nil)
+			req := httptest.NewRequestWithContext(context.Background(), tt.method, tt.path, nil)
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
 			c.SetPath(tt.path)

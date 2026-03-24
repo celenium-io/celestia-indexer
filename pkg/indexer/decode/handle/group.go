@@ -4,138 +4,137 @@
 package handle
 
 import (
-	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/x/group"
 )
 
 // MsgCreateGroup is the Msg/CreateGroup request type.
-func MsgCreateGroup(ctx *context.Context, m *group.MsgCreateGroup) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgCreateGroup(ctx *context.Context, msgId uint64, m *group.MsgCreateGroup) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgCreateGroup
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAdmin, address: m.Admin},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgUpdateGroupMembers is the Msg/UpdateGroupMembers request type.
-func MsgUpdateGroupMembers(ctx *context.Context, m *group.MsgUpdateGroupMembers) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateGroupMembers(ctx *context.Context, msgId uint64, m *group.MsgUpdateGroupMembers) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateGroupMembers
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAdmin, address: m.Admin},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgUpdateGroupAdmin is the Msg/UpdateGroupAdmin request type.
-func MsgUpdateGroupAdmin(ctx *context.Context, m *group.MsgUpdateGroupAdmin) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateGroupAdmin(ctx *context.Context, msgId uint64, m *group.MsgUpdateGroupAdmin) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateGroupAdmin
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAdmin, address: m.Admin},
 		{t: storageTypes.MsgAddressTypeNewAdmin, address: m.NewAdmin},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgUpdateGroupMetadata is the Msg/UpdateGroupMetadata request type.
-func MsgUpdateGroupMetadata(ctx *context.Context, m *group.MsgUpdateGroupMetadata) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateGroupMetadata(ctx *context.Context, msgId uint64, m *group.MsgUpdateGroupMetadata) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateGroupMetadata
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAdmin, address: m.Admin},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgCreateGroupPolicy is the Msg/CreateGroupPolicy request type.
-func MsgCreateGroupPolicy(ctx *context.Context, m *group.MsgCreateGroupPolicy) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgCreateGroupPolicy(ctx *context.Context, msgId uint64, m *group.MsgCreateGroupPolicy) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgCreateGroupPolicy
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAdmin, address: m.Admin},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgUpdateGroupPolicyAdmin is the Msg/UpdateGroupPolicyAdmin request type.
-func MsgUpdateGroupPolicyAdmin(ctx *context.Context, m *group.MsgUpdateGroupPolicyAdmin) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateGroupPolicyAdmin(ctx *context.Context, msgId uint64, m *group.MsgUpdateGroupPolicyAdmin) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateGroupPolicyAdmin
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAdmin, address: m.Admin},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgCreateGroupWithPolicy is the Msg/CreateGroupWithPolicy request type.
-func MsgCreateGroupWithPolicy(ctx *context.Context, m *group.MsgCreateGroupWithPolicy) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgCreateGroupWithPolicy(ctx *context.Context, msgId uint64, m *group.MsgCreateGroupWithPolicy) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgCreateGroupWithPolicy
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAdmin, address: m.Admin},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgUpdateGroupPolicyDecisionPolicy is the Msg/UpdateGroupPolicyDecisionPolicy request type.
-func MsgUpdateGroupPolicyDecisionPolicy(ctx *context.Context, m *group.MsgUpdateGroupPolicyDecisionPolicy) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateGroupPolicyDecisionPolicy(ctx *context.Context, msgId uint64, m *group.MsgUpdateGroupPolicyDecisionPolicy) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateGroupPolicyDecisionPolicy
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAdmin, address: m.Admin},
 		{t: storageTypes.MsgAddressTypeGroupPolicyAddress, address: m.GroupPolicyAddress},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgUpdateGroupPolicyMetadata is the Msg/UpdateGroupPolicyMetadata request type.
-func MsgUpdateGroupPolicyMetadata(ctx *context.Context, m *group.MsgUpdateGroupPolicyMetadata) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateGroupPolicyMetadata(ctx *context.Context, msgId uint64, m *group.MsgUpdateGroupPolicyMetadata) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateGroupPolicyMetadata
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAdmin, address: m.Admin},
 		{t: storageTypes.MsgAddressTypeGroupPolicyAddress, address: m.GroupPolicyAddress},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgSubmitProposal is the Msg/SubmitProposal request type.
-func MsgSubmitProposalGroup(ctx *context.Context, m *group.MsgSubmitProposal) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgSubmitProposalGroup(ctx *context.Context, msgId uint64, m *group.MsgSubmitProposal) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgSubmitProposalGroup
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeGroupPolicyAddress, address: m.GroupPolicyAddress},
 		// Proposers - list of proposer addresses
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgWithdrawProposal is the Msg/WithdrawProposal request type.
-func MsgWithdrawProposal(ctx *context.Context, m *group.MsgWithdrawProposal) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgWithdrawProposal(ctx *context.Context, msgId uint64, m *group.MsgWithdrawProposal) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgWithdrawProposal
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAdmin, address: m.Address}, // address is the admin of the group policy or one of the proposer of the proposal.
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgVote is the Msg/Vote request type.
-func MsgVoteGroup(ctx *context.Context, m *group.MsgVote) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgVoteGroup(ctx *context.Context, msgId uint64, m *group.MsgVote) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgVoteGroup
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeVoter, address: m.Voter},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgExec is the Msg/Exec request type.
-func MsgExecGroup(ctx *context.Context, m *group.MsgExec) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgExecGroup(ctx *context.Context, msgId uint64, m *group.MsgExec) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgExecGroup
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeExecutor, address: m.Executor},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgLeaveGroup is the Msg/LeaveGroup request type.
-func MsgLeaveGroup(ctx *context.Context, m *group.MsgLeaveGroup) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgLeaveGroup(ctx *context.Context, msgId uint64, m *group.MsgLeaveGroup) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgLeaveGroup
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeGroupMember, address: m.Address},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }

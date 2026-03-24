@@ -4,22 +4,22 @@
 package types
 
 import (
-	"bytes"
 	"database/sql"
 	"database/sql/driver"
 
-	"github.com/andybalholm/brotli"
-	"github.com/bytedance/sonic"
 	"github.com/pkg/errors"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
-var json = sonic.ConfigFastest
+var (
+	errKeyNotFound = errors.New("key not found")
+)
 
 type PackedBytes map[string]any
 
 var _ sql.Scanner = (*PackedBytes)(nil)
 
-func (pb *PackedBytes) Scan(src interface{}) error {
+func (pb *PackedBytes) Scan(src any) error {
 	if src == nil {
 		return nil
 	}
@@ -27,9 +27,7 @@ func (pb *PackedBytes) Scan(src interface{}) error {
 	if !ok {
 		return errors.Errorf("invalid packed bytes type: %T", src)
 	}
-
-	result := bytes.NewBuffer(b)
-	return json.NewDecoder(brotli.NewReader(result)).Decode(pb)
+	return msgpack.Unmarshal(b, pb)
 }
 
 var _ driver.Valuer = (*PackedBytes)(nil)
@@ -39,18 +37,29 @@ func (pb PackedBytes) Value() (driver.Value, error) {
 }
 
 func (pb PackedBytes) ToBytes() ([]byte, error) {
-	b, err := json.Marshal(pb)
-	if err != nil {
-		return nil, err
-	}
-	result := bytes.NewBuffer(nil)
-	writer := brotli.NewWriterLevel(result, brotli.BestSpeed)
+	return msgpack.Marshal(pb)
+}
 
-	if _, err := writer.Write(b); err != nil {
-		return nil, err
+func (pb PackedBytes) GetString(key string) (string, error) {
+	val, ok := pb[key]
+	if !ok {
+		return "", errors.Wrap(errKeyNotFound, key)
 	}
-	if err := writer.Close(); err != nil {
-		return nil, err
+	str, ok := val.(string)
+	if !ok {
+		return "", errors.Errorf("key is not a string type: %s", key)
 	}
-	return result.Bytes(), nil
+	return str, nil
+}
+
+func (pb PackedBytes) GetStringOrDefault(key string) string {
+	val, ok := pb[key]
+	if !ok {
+		return ""
+	}
+	str, ok := val.(string)
+	if !ok {
+		return ""
+	}
+	return str
 }

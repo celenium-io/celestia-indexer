@@ -18,7 +18,7 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 )
 
-const copyThreashold = 20
+const copyThreshold = 20
 
 type Transaction struct {
 	storage.Transaction
@@ -61,12 +61,7 @@ func (tx Transaction) UpdateConstants(ctx context.Context, constants ...models.C
 }
 
 func (tx Transaction) SaveTransactions(ctx context.Context, txs ...models.Tx) error {
-	if len(txs) == 0 {
-		return nil
-	}
-
-	_, err := tx.Tx().NewInsert().Model(&txs).Returning("id").Exec(ctx)
-	return err
+	return pg.SaveBulkWithCopy(ctx, tx, txs, copyThreshold)
 }
 
 type addedNamespace struct {
@@ -163,16 +158,11 @@ func (tx Transaction) SaveBalances(ctx context.Context, balances ...models.Balan
 }
 
 func (tx Transaction) SaveEvents(ctx context.Context, events ...models.Event) error {
-	return pg.SaveBulkWithCopy(ctx, tx, events, copyThreashold)
+	return pg.SaveBulkWithCopy(ctx, tx, events, copyThreshold)
 }
 
 func (tx Transaction) SaveMessages(ctx context.Context, msgs ...*models.Message) error {
-	if len(msgs) == 0 {
-		return nil
-	}
-
-	_, err := tx.Tx().NewInsert().Model(&msgs).Returning("id").Exec(ctx)
-	return err
+	return pg.SaveBulkWithCopy(ctx, tx, msgs, copyThreshold)
 }
 
 func (tx Transaction) SaveSigners(ctx context.Context, addresses ...models.Signer) error {
@@ -184,17 +174,12 @@ func (tx Transaction) SaveSigners(ctx context.Context, addresses ...models.Signe
 	return err
 }
 
-func (tx Transaction) SaveBlobLogs(ctx context.Context, logs ...models.BlobLog) error {
-	return pg.SaveBulkWithCopy(ctx, tx, logs, copyThreashold)
+func (tx Transaction) SaveBlobLogs(ctx context.Context, logs ...*models.BlobLog) error {
+	return pg.SaveBulkWithCopy(ctx, tx, logs, copyThreshold)
 }
 
-func (tx Transaction) SaveMsgAddresses(ctx context.Context, addresses ...models.MsgAddress) error {
-	if len(addresses) == 0 {
-		return nil
-	}
-
-	_, err := tx.Tx().NewInsert().Model(&addresses).Exec(ctx)
-	return err
+func (tx Transaction) SaveMsgAddresses(ctx context.Context, addresses ...*models.MsgAddress) error {
+	return pg.SaveBulkWithCopy(ctx, tx, addresses, copyThreshold)
 }
 
 func (tx Transaction) SaveMsgValidator(ctx context.Context, valMsgs ...models.MsgValidator) error {
@@ -206,7 +191,7 @@ func (tx Transaction) SaveMsgValidator(ctx context.Context, valMsgs ...models.Ms
 	return err
 }
 
-func (tx Transaction) SaveNamespaceMessage(ctx context.Context, nsMsgs ...models.NamespaceMessage) error {
+func (tx Transaction) SaveNamespaceMessage(ctx context.Context, nsMsgs ...*models.NamespaceMessage) error {
 	if len(nsMsgs) == 0 {
 		return nil
 	}
@@ -241,7 +226,7 @@ func (tx Transaction) SaveVestingPeriods(ctx context.Context, periods ...models.
 	return err
 }
 
-func (tx Transaction) SaveGrants(ctx context.Context, grants ...models.Grant) error {
+func (tx Transaction) SaveGrants(ctx context.Context, grants ...*models.Grant) error {
 	if len(grants) == 0 {
 		return nil
 	}
@@ -437,11 +422,7 @@ func (tx Transaction) SaveRedelegations(ctx context.Context, redelegations ...mo
 }
 
 func (tx Transaction) SaveStakingLogs(ctx context.Context, logs ...models.StakingLog) error {
-	if len(logs) == 0 {
-		return nil
-	}
-	_, err := tx.Tx().NewInsert().Model(&logs).Exec(ctx)
-	return err
+	return pg.SaveBulkWithCopy(ctx, tx, logs, copyThreshold)
 }
 
 func (tx Transaction) SaveDelegations(ctx context.Context, delegations ...models.Delegation) error {
@@ -880,7 +861,7 @@ func (tx Transaction) SaveHyperlaneTransfers(ctx context.Context, transfers ...*
 	if len(transfers) == 0 {
 		return nil
 	}
-	_, err := tx.Tx().NewInsert().Model(&transfers).Exec(ctx)
+	_, err := tx.Tx().NewInsert().Model(&transfers).Returning("id").Exec(ctx)
 	return err
 }
 
@@ -1499,13 +1480,28 @@ func (tx Transaction) HyperlaneToken(ctx context.Context, id []byte) (token mode
 	return
 }
 
-func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) error {
+func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (decimal.Decimal, error) {
 	_, err := tx.Tx().NewUpdate().Table("signal_version", "validator").
 		SetColumn("voting_power", "validator.stake").
 		Where("signal_version.version = ?", version).
 		Where("validator.id = validator_id").
 		Exec(ctx)
-	return err
+	if err != nil {
+		return decimal.Zero, err
+	}
+
+	var sum decimal.Decimal
+	err = tx.Tx().NewSelect().
+		TableExpr("(?) AS latest",
+			tx.Tx().NewSelect().
+				Table("signal_version").
+				ColumnExpr("DISTINCT ON (validator_id) voting_power").
+				Where("version = ?", version).
+				OrderExpr("validator_id, height DESC"),
+		).
+		ColumnExpr("COALESCE(SUM(voting_power), 0)").
+		Scan(ctx, &sum)
+	return sum, err
 }
 
 func (tx Transaction) HyperlaneIgp(ctx context.Context, id []byte) (igp models.HLIGP, err error) {

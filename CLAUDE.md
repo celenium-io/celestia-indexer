@@ -25,7 +25,7 @@ pkg/
     storage/            # Saves parsed data to DB in one DB transaction
     rollback/           # Handles chain reorganizations
     genesis/            # Handles genesis block separately
-    decode/context/     # Context object passed between parser → storage
+    decode/context/     # Context object accumulates all parsed entities (passed parser → storage)
     config/             # Indexer config structures
   node/
     rpc/                # CometBFT RPC client
@@ -34,10 +34,12 @@ pkg/
   types/                # pkg-level domain types (Level, etc.)
 internal/
   storage/              # Domain model structs + storage interfaces (IXxx)
+    id.go               # Deterministic ID generation (height<<24 | position)
     postgres/           # Bun ORM implementations of all interfaces
       scopes.go         # Reusable query filters and pagination helpers
       transaction.go    # DB transaction: save/rollback all entities
       core.go           # DB init, migrations, hypertables, enums, indexes
+      migrations/       # Bun migrations (named by date)
     types/              # Enums (MsgType, EventType, ModuleType, etc.)
   blob/                 # Blob handling utilities
   pool/                 # sync.Pool wrappers for reusing slices
@@ -122,6 +124,24 @@ CACHE_URL / CACHE_TTL
 INDEXER_START_LEVEL / INDEXER_SCRIPTS_DIR / NETWORK
 ```
 
+## Migrations
+
+Migrations live in `internal/storage/postgres/migrations/`, named by date (e.g. `20260320000001_description.go`). Each file registers exactly one migration via `init()`:
+
+```go
+func init() {
+    Migrations.MustRegister(upXxx, downXxx)
+}
+```
+
+**Both `up` and `down` functions are required.** Never leave `down` as a stub or `TODO`.
+
+- `up` — applies the change (e.g. `ALTER TYPE ... ADD VALUE`, `CREATE INDEX`, `ALTER TABLE ... ADD COLUMN`)
+- `down` — fully reverts it. PostgreSQL-specific notes:
+  - Removing an added enum value: `DELETE FROM pg_enum WHERE enumlabel = '...' AND enumtypid = (SELECT oid FROM pg_type WHERE typname = '...')` — only safe if no rows use that value
+  - Dropping a column: `ALTER TABLE ... DROP COLUMN IF EXISTS ...`
+  - Dropping an index: `DROP INDEX IF EXISTS ...`
+
 ## Storage Patterns
 
 All storage files in `internal/storage/postgres/`. Each entity has its own file (`address.go`, `block.go`, `tx.go`, etc.).
@@ -159,6 +179,14 @@ tx, _ := postgres.BeginTransaction(ctx, module.storage)
 defer tx.Close(ctx)
 // tx.Add(), tx.Update(), tx.Flush() — then tx.HandleError() on failure
 ```
+
+**Deterministic IDs** (`internal/storage/id.go`): `tx` and `message` IDs are computed at parse time as `height<<24 | position` (5 bytes height + 3 bytes position). This removes autoincrement sequences for those tables. Genesis block (height=0) uses `position+1` to avoid zero IDs. Use `idFromHeightAndPosition(height, position)` when assigning IDs in parsers.
+
+**Decode context** (`pkg/indexer/decode/context/`): All parsed entities (Messages, Events, Namespaces, AddressMessages, Grants, IbcClients, IbcChannels, HlMailboxes, BlobLogs, etc.) are accumulated into `*Context` during parsing. The storage module then reads from `dCtx.*` fields instead of reconstructing them. Use `ctx.AddMessage()`, `ctx.AddEvents()`, `ctx.AddSignal()`, etc.
+
+**Storage module split** (`pkg/indexer/storage/`): The monolithic `message.go` logic is now split into domain-specific files: `blob.go`, `forwarding.go`, `grants.go`, `hyperlane.go`, `ibc.go`, `signal.go`, `vesting.go`, `zkism.go`. Each file handles saving its respective entity type from the decode context.
+
+**Bulk COPY** (`transaction.go`): `SaveTransactions`, `SaveMessages`, `SaveBlobLogs`, `SaveMsgAddresses` now use `pg.SaveBulkWithCopy` (PostgreSQL COPY protocol) instead of INSERT with `RETURNING id`, since IDs are pre-computed.
 
 ## API Handler Pattern
 
@@ -268,8 +296,8 @@ stopperModule.AttachTo(r, receiver.StopOutput, stopper.InputName)
 4. `internal/storage/postgres/index.go` — add indexes
 5. `internal/storage/postgres/transaction.go` — add save/rollback methods
 6. Mock: add `//go:generate` directive, run `make generate`
-7. Parser/decode: add parsing logic, add to `decode/context/`
-8. `pkg/indexer/storage/storage.go` — call save in `processBlockInTransaction`
+7. Parser/decode: add parsing logic; assign deterministic ID via `idFromHeightAndPosition`; accumulate into `dCtx` via `ctx.AddXxx()` methods
+8. `pkg/indexer/storage/foo.go` — add `saveFoo(ctx, tx, dCtx.Foos, ...)` function; call it from `processBlockInTransaction` in `storage.go`
 9. `cmd/api/handler/foo.go` — handler with Swagger annotations
 10. Register routes in `cmd/api/main.go`
 11. Run `make api-docs`

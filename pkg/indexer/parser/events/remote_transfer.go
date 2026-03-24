@@ -33,6 +33,7 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event
 	var transfer = &storage.HLTransfer{
 		Height: ctx.Block.Height,
 		Time:   ctx.Block.Time,
+		TxId:   msg.TxId,
 	}
 
 	for !end {
@@ -61,15 +62,19 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event
 				SentMessages: 1,
 			}
 
-			msg.HLTransfer = transfer
+			ctx.AddHlTransfer(transfer)
 		case types.EventTypeHyperlanewarpv1EventSendRemoteTransfer:
 			event, err := decode.NewHyperlaneSendTransferEvent(events[*idx].Data)
 			if err != nil {
 				return errors.Wrap(err, "parse hyperlane send transfer event")
 			}
 
-			makeHyperlaneTransferAddress(event.Sender, transfer, msg.Height)
-			makeHyperlaneTransferAddress(event.Recipient, transfer, msg.Height)
+			if err := makeHyperlaneTransferAddress(ctx, event.Sender, transfer, msg.Height); err != nil {
+				return errors.Wrap(err, "makeHyperlaneTransferAddress")
+			}
+			if err := makeHyperlaneTransferAddress(ctx, event.Recipient, transfer, msg.Height); err != nil {
+				return errors.Wrap(err, "makeHyperlaneTransferAddress")
+			}
 
 			transfer.Denom = event.Denom
 			transfer.Amount = event.Amount

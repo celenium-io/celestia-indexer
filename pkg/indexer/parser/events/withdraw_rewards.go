@@ -13,7 +13,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func parseWithdrawRewards(ctx *context.Context, msg *storage.Message, data map[string]any) error {
+func parseWithdrawRewards(ctx *context.Context, msg *storage.Message, data map[string]string) error {
 	rewards, err := decode.NewWithdrawRewards(data)
 	if err != nil {
 		return err

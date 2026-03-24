@@ -6,6 +6,7 @@ package parser
 import (
 	"encoding/hex"
 
+	json "github.com/bytedance/sonic"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -19,7 +20,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func (p *Module) parseTxs(ctx *context.Context, b types.BlockData) ([]storage.Tx, error) {
+func (p *Module) parseTxs(ctx *context.Context, b *types.BlockData) ([]storage.Tx, error) {
 	txs := make([]storage.Tx, len(b.TxsResults))
 
 	for i := range b.TxsResults {
@@ -31,7 +32,7 @@ func (p *Module) parseTxs(ctx *context.Context, b types.BlockData) ([]storage.Tx
 	return txs, nil
 }
 
-func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txRes *types.ResponseDeliverTx, t *storage.Tx) error {
+func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, txRes types.ResponseDeliverTx, t *storage.Tx) error {
 	d, err := decode.Tx(b, index)
 	if err != nil {
 		return errors.Wrapf(err, "while parsing Tx on index %d", index)
@@ -48,14 +49,16 @@ func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txR
 	t.Fee = d.Fee
 	t.Status = storageTypes.StatusSuccess
 	t.Codespace = txRes.Codespace
-	t.Hash = b.Block.Txs[index].Hash()
+	t.Hash = d.Hash
 	t.Memo = d.Memo
 	t.MessageTypes = storageTypes.NewMsgTypeBitMask()
 	t.Messages = make([]storage.Message, len(d.Messages))
 	t.Events = nil
 	t.Signers = make([]storage.Address, 0, len(d.Signers))
 	t.BlobsSize = 0
-	t.BytesSize = int64(len(txRes.Data))
+	if err := t.SetId(); err != nil {
+		return err
+	}
 
 	for signer, signerBytes := range d.Signers {
 		address := storage.Address{
@@ -78,31 +81,34 @@ func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txR
 
 	if txRes.IsFailed() {
 		t.Status = storageTypes.StatusFailed
-		t.Error = txRes.Log
+		if err := json.Unmarshal(txRes.Log, &t.Error); err != nil {
+			t.Error = string(txRes.Log)
+		}
 	}
 
-	t.Events, err = parseEvents(ctx, b, txRes.Events)
+	txEvents, err := parseEvents(ctx, b, txRes.Events, t.Id)
 	if err != nil {
 		return errors.Wrap(err, "parsing events")
 	}
+	ctx.AddEvents(txEvents...)
 
 	ctx.TxEventsCount += int(t.EventsCount)
 
 	var eventsIdx int
 
 	// find first action
-	for i := range t.Events {
-		if t.Events[i].Type != storageTypes.EventTypeMessage {
+	for i := range txEvents {
+		if txEvents[i].Type != storageTypes.EventTypeMessage {
 			continue
 		}
-		if action := decoder.StringFromMap(t.Events[i].Data, "action"); action != "" {
+		if action := decoder.StringFromMap(txEvents[i].Data, "action"); action != "" {
 			eventsIdx = i
 			break
 		}
 	}
 
 	for i := range d.Messages {
-		dm, err := decode.Message(ctx, d.Messages[i], i, t.Status)
+		dm, err := decode.Message(ctx, d.Messages[i], i, t.Status, t.Id)
 		if err != nil {
 			if !txRes.IsFailed() {
 				return errors.Wrapf(err, "while parsing tx=%v on index=%d", hex.EncodeToString(t.Hash), t.Position)
@@ -111,35 +117,25 @@ func (p *Module) parseTx(ctx *context.Context, b types.BlockData, index int, txR
 			}
 		}
 
-		processBlob(dm.Msg.BlobLogs, d, t)
+		processBlob(dm.BlobLogs, d, t)
+		ctx.AddBlobLogs(dm.BlobLogs...)
 
 		if txRes.IsFailed() {
 			dm.Msg.Namespace = nil
 			dm.BlobsSize = 0
-			dm.Msg.IbcTransfer = nil
-			dm.Msg.IbcChannel = nil
-			dm.Msg.IbcClient = nil
-			dm.Msg.IbcConnection = nil
-			dm.Msg.HLMailbox = nil
-			dm.Msg.HLToken = nil
-			dm.Msg.HLTransfer = nil
-			dm.Msg.SignalVersion = nil
-			dm.Msg.Upgrade = nil
-			dm.Msg.Forwarding = nil
-			dm.Msg.ZkISM = nil
-			dm.Msg.ZkISMUpdate = nil
-			dm.Msg.ZkISMMessages = nil
 		}
 
-		t.Messages[i] = dm.Msg
 		t.MessageTypes.SetByMsgType(dm.Msg.Type)
 		t.BlobsSize += dm.BlobsSize
+		t.BlobsCount += len(dm.BlobLogs)
 
 		if !txRes.IsFailed() {
-			if err := events.Handle(ctx, t.Events, &t.Messages[i], &eventsIdx); err != nil {
+			if err := events.Handle(ctx, txEvents, &dm.Msg, &eventsIdx); err != nil {
 				return err
 			}
 		}
+
+		ctx.AddMessage(&dm.Msg)
 	}
 
 	ctx.Block.Stats.Fee = ctx.Block.Stats.Fee.Add(t.Fee)

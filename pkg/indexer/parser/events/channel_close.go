@@ -29,16 +29,17 @@ func handleChannelClose(ctx *context.Context, events []storage.Event, msg *stora
 	return processChannelClose(ctx, events, msg, idx)
 }
 
-func processChannelClose(_ *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+func processChannelClose(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	if events[*idx].Type != storageTypes.EventTypeChannelCloseConfirm {
 		return errors.Errorf("invalid event type: %s", events[*idx].Type)
 	}
 	cc := decode.NewChannelChange(events[*idx].Data)
 
-	msg.IbcChannel = &storage.IbcChannel{
+	ibcChannel := &storage.IbcChannel{
 		Id:     cc.ChannelId,
 		Status: storageTypes.IbcChannelStatusClosed,
 	}
+	ctx.AddIbcChannel(ibcChannel)
 
 	return nil
 }

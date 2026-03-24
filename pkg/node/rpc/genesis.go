@@ -7,9 +7,10 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/goccy/go-json"
+	"github.com/bytedance/sonic"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
+	jxpkg "github.com/go-faster/jx"
 	"github.com/pkg/errors"
 )
 
@@ -31,21 +32,22 @@ func (api *API) Genesis(ctx context.Context) (types.Genesis, error) {
 			"chunk": strconv.FormatInt(chunk, 10),
 		}
 
-		var gr types.Response[GenesisChunk]
-		if err := api.get(ctx, path, args, &gr); err != nil {
+		var gc GenesisChunk
+		err := api.getStream(ctx, path, args, func(d *jxpkg.Decoder) error {
+			return jxResponse(d, func(d *jxpkg.Decoder) error {
+				return jxGenesisChunk(d, &gc)
+			})
+		})
+		if err != nil {
 			return types.Genesis{}, errors.Wrap(err, "genesis block request")
 		}
 
-		if gr.Error != nil {
-			return types.Genesis{}, errors.Wrapf(types.ErrRequest, "request %d error: %s", gr.Id, gr.Error.Error())
-		}
-
-		chunk += 1
-		total = gr.Result.Total
-		genesisData = append(genesisData, gr.Result.Data...)
+		chunk++
+		total = gc.Total
+		genesisData = append(genesisData, gc.Data...)
 	}
 
 	var genesis types.Genesis
-	err := json.Unmarshal(genesisData, &genesis)
+	err := sonic.ConfigFastest.Unmarshal(genesisData, &genesis)
 	return genesis, err
 }

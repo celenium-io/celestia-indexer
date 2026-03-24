@@ -12,17 +12,17 @@ import (
 )
 
 // MsgSignalVersion -
-func MsgSignalVersion(ctx *context.Context, status storageTypes.Status, m *signalTypes.MsgSignalVersion) (storageTypes.MsgType, []storage.AddressWithType, *storage.SignalVersion, error) {
+func MsgSignalVersion(ctx *context.Context, status storageTypes.Status, txId, msgId uint64, m *signalTypes.MsgSignalVersion) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgSignalVersion
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil {
-		return msgType, addresses, nil, err
+		return msgType, err
 	}
 
 	if status != storageTypes.StatusSuccess {
-		return msgType, addresses, nil, nil
+		return msgType, nil
 	}
 
 	validator := storage.EmptyValidator()
@@ -34,32 +34,35 @@ func MsgSignalVersion(ctx *context.Context, status storageTypes.Status, m *signa
 		Validator: &validator,
 		Time:      ctx.Block.Time,
 		Version:   m.Version,
+		TxId:      txId,
+		MsgId:     msgId,
 	}
-	ctx.AddValidator(*signal.Validator)
+	ctx.AddSignal(signal)
+	ctx.AddValidator(validator)
 	ctx.AddUpgrade(storage.Upgrade{
 		Version:      m.Version,
 		SignalsCount: 1,
 		Height:       ctx.Block.Height,
 		Time:         ctx.Block.Time,
 	})
-	return msgType, addresses, signal, err
+	return msgType, err
 }
 
 // MsgTryUpgrade -
-func MsgTryUpgrade(ctx *context.Context, status storageTypes.Status, m *signalTypes.MsgTryUpgrade) (storageTypes.MsgType, []storage.AddressWithType, *storage.Upgrade, error) {
+func MsgTryUpgrade(ctx *context.Context, status storageTypes.Status, txId, msgId uint64, m *signalTypes.MsgTryUpgrade) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgTryUpgrade
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil {
-		return msgType, addresses, nil, err
+		return msgType, err
 	}
 
 	if status != storageTypes.StatusSuccess {
-		return msgType, addresses, nil, nil
+		return msgType, nil
 	}
 
-	upgrade := &storage.Upgrade{
+	ctx.TryUpgrade = &storage.Upgrade{
 		Height:    ctx.Block.Height,
 		Time:      ctx.Block.Time,
 		EndTime:   ctx.Block.Time,
@@ -67,6 +70,8 @@ func MsgTryUpgrade(ctx *context.Context, status storageTypes.Status, m *signalTy
 		Signer: &storage.Address{
 			Address: m.Signer,
 		},
+		TxId:  txId,
+		MsgId: msgId,
 	}
-	return msgType, addresses, upgrade, err
+	return msgType, err
 }

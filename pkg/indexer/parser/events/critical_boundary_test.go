@@ -24,13 +24,13 @@ func Test_toTheNextAction_criticalBoundary(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "", // empty action at len-1
 					},
 				},
@@ -43,19 +43,19 @@ func Test_toTheNextAction_criticalBoundary(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "first",
 					},
 				},
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "", // at index 1 (len-2)
 					},
 				},
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "", // at index 2 (len-1)
 					},
 				},
@@ -68,13 +68,13 @@ func Test_toTheNextAction_criticalBoundary(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Type: "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
@@ -119,13 +119,13 @@ func Test_acknowledgement_criticalLoop(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "some_event",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Type: "last_event",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
@@ -138,19 +138,19 @@ func Test_acknowledgement_criticalLoop(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "event1",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Type: "event2",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Type: "event3",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
@@ -170,7 +170,7 @@ func Test_acknowledgement_criticalLoop(t *testing.T) {
 				for action == "" && len(tt.events)-1 > idx {
 					idx += 1
 					// This line could panic if bounds check is wrong:
-					action = tt.events[idx].Data["action"].(string)
+					action = tt.events[idx].Data["action"]
 				}
 			}
 
@@ -197,13 +197,13 @@ func Test_recvPacket_criticalLoop(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "event1",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
 				{
 					Type: "event2",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
@@ -216,7 +216,7 @@ func Test_recvPacket_criticalLoop(t *testing.T) {
 			events: []storage.Event{
 				{
 					Type: "event",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "",
 					},
 				},
@@ -236,7 +236,7 @@ func Test_recvPacket_criticalLoop(t *testing.T) {
 				for action == "" && len(tt.events)-1 > idx {
 					idx += 1
 					// This line could cause panic if idx is out of bounds
-					action = tt.events[idx].Data["action"].(string)
+					action = tt.events[idx].Data["action"]
 				}
 			}
 

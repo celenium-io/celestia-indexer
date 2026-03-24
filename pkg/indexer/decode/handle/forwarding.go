@@ -4,18 +4,17 @@
 package handle
 
 import (
-	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	fwdTypes "github.com/celestiaorg/celestia-app/v7/x/forwarding/types"
 )
 
 // MsgForward
-func MsgForward(ctx *context.Context, m *fwdTypes.MsgForward) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgForward(ctx *context.Context, msgId uint64, m *fwdTypes.MsgForward) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgForward
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
 		{t: storageTypes.MsgAddressTypeReceiver, address: m.ForwardAddr},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }

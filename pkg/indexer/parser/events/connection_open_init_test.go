@@ -28,13 +28,13 @@ func Test_handleConnectionOpenInit(t *testing.T) {
 				{
 					Height: 1036866,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.connection.v1.MsgConnectionOpenTry",
 					},
 				}, {
 					Height: 1036866,
 					Type:   "connection_open_try",
-					Data: map[string]any{
+					Data: map[string]string{
 						"client_id":                  "07-tendermint-184",
 						"connection_id":              "connection-143",
 						"counterparty_client_id":     "07-tendermint-0",
@@ -43,20 +43,20 @@ func Test_handleConnectionOpenInit(t *testing.T) {
 				}, {
 					Height: 1036866,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_connection",
 					},
 				},
 				{
 					Height: 1036866,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.connection.v1.MsgConnectionOpenInit",
 					},
 				}, {
 					Height: 1036866,
 					Type:   "connection_open_init",
-					Data: map[string]any{
+					Data: map[string]string{
 						"client_id":                  "07-tendermint-184",
 						"connection_id":              "connection-144",
 						"counterparty_client_id":     "07-tendermint-0",
@@ -65,7 +65,7 @@ func Test_handleConnectionOpenInit(t *testing.T) {
 				}, {
 					Height: 1036866,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_connection",
 					},
 				},
@@ -87,7 +87,7 @@ func Test_handleConnectionOpenInit(t *testing.T) {
 			for i := range tt.msg {
 				err := handleConnectionOpenInit(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
-				require.NotNil(t, tt.msg[i].IbcConnection)
+				require.NotEmpty(t, tt.ctx.IbcConnections.Len())
 			}
 		})
 	}

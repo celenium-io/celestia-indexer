@@ -28,13 +28,13 @@ func Test_handleChannelOpenConfirm(t *testing.T) {
 				{
 					Height: 1163656,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgChannelOpenAck",
 					},
 				}, {
 					Height: 1163656,
 					Type:   "channel_open_ack",
-					Data: map[string]any{
+					Data: map[string]string{
 						"channel_id":              "channel-32",
 						"connection_id":           "connection-55",
 						"counterparty_channel_id": "channel-300",
@@ -44,20 +44,20 @@ func Test_handleChannelOpenConfirm(t *testing.T) {
 				}, {
 					Height: 1163656,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				},
 				{
 					Height: 1163656,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/ibc.core.channel.v1.MsgChannelOpenAck",
 					},
 				}, {
 					Height: 1163656,
 					Type:   "channel_open_ack",
-					Data: map[string]any{
+					Data: map[string]string{
 						"channel_id":              "channel-31",
 						"connection_id":           "connection-55",
 						"counterparty_channel_id": "channel-301",
@@ -67,7 +67,7 @@ func Test_handleChannelOpenConfirm(t *testing.T) {
 				}, {
 					Height: 1163656,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"module": "ibc_channel",
 					},
 				},
@@ -89,11 +89,15 @@ func Test_handleChannelOpenConfirm(t *testing.T) {
 			for i := range tt.msg {
 				err := handleChannelOpenConfirm(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
-				require.NotEmpty(t, tt.msg[i].IbcChannel.ConnectionId)
-				require.NotEmpty(t, tt.msg[i].IbcChannel.Id)
-				require.NotEmpty(t, tt.msg[i].IbcChannel.CounterpartyChannelId)
-				require.NotEmpty(t, tt.msg[i].IbcChannel.CounterpartyPortId)
-				require.NotEmpty(t, tt.msg[i].IbcChannel.PortId)
+
+				_ = tt.ctx.IbcChannels.Range(func(_ string, value *storage.IbcChannel) (error, bool) {
+					require.NotEmpty(t, value.ConnectionId)
+					require.NotEmpty(t, value.Id)
+					require.NotEmpty(t, value.CounterpartyChannelId)
+					require.NotEmpty(t, value.CounterpartyPortId)
+					require.NotEmpty(t, value.PortId)
+					return nil, false
+				})
 			}
 		})
 	}

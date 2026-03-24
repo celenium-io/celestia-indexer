@@ -28,7 +28,7 @@ func Test_handleWithdrawRewards(t *testing.T) {
 				{
 					Height: 848613,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
 						"sender":    "celestia1u5pshtqpexjmuudrvq6q335qym2zggzhp7kq0p",
 						"module":    "distribution",
@@ -37,7 +37,7 @@ func Test_handleWithdrawRewards(t *testing.T) {
 				}, {
 					Height: 848613,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "0utia",
 						"validator": "celestiavaloper1u5pshtqpexjmuudrvq6q335qym2zggzhyp5ee8",
 						"delegator": "celestia1u5pshtqpexjmuudrvq6q335qym2zggzhp7kq0p",
@@ -59,13 +59,13 @@ func Test_handleWithdrawRewards(t *testing.T) {
 				{
 					Height: 848613,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
 					},
 				}, {
 					Height: 848613,
 					Type:   "withdraw_rewards",
-					Data: map[string]any{
+					Data: map[string]string{
 						"amount":    "0utia",
 						"validator": "celestiavaloper1u5pshtqpexjmuudrvq6q335qym2zggzhyp5ee8",
 						"delegator": "celestia1u5pshtqpexjmuudrvq6q335qym2zggzhp7kq0p",
@@ -73,7 +73,7 @@ func Test_handleWithdrawRewards(t *testing.T) {
 				}, {
 					Height: 848613,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"sender": "celestia1u5pshtqpexjmuudrvq6q335qym2zggzhp7kq0p",
 						"module": "distribution",
 					},

@@ -29,13 +29,13 @@ func Test_handleCreateMailbox(t *testing.T) {
 				{
 					Height: 1036866,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action": "/hyperlane.core.v1.MsgCreateMailbox",
 					},
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.core.v1.EventCreateMailbox",
-					Data: map[string]any{
+					Data: map[string]string{
 						"owner":         "\"celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj\"",
 						"mailbox_id":    "\"0x68797065726c616e650000000000000000000000000000000000000000000000\"",
 						"default_ism":   "\"0x726f757465725f69736d00000000000000000000000000010000000000000000\"",
@@ -59,7 +59,7 @@ func Test_handleCreateMailbox(t *testing.T) {
 				{
 					Height: 1036866,
 					Type:   "message",
-					Data: map[string]any{
+					Data: map[string]string{
 						"action":    "/hyperlane.core.v1.MsgCreateMailbox",
 						"sender":    "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j",
 						"module":    "core",
@@ -68,7 +68,7 @@ func Test_handleCreateMailbox(t *testing.T) {
 				}, {
 					Height: 1036866,
 					Type:   "hyperlane.core.v1.EventCreateMailbox",
-					Data: map[string]any{
+					Data: map[string]string{
 						"owner":         "\"celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j\"",
 						"mailbox_id":    "\"0x68797065726c616e650000000000000000000000000000000000000000000003\"",
 						"default_ism":   "\"0x726f757465725f69736d00000000000000000000000000000000000000000004\"",
@@ -97,7 +97,7 @@ func Test_handleCreateMailbox(t *testing.T) {
 			for i := range tt.msg {
 				err := handleCreateMailbox(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
-				require.NotNil(t, tt.msg[i].HLMailbox)
+				require.NotEmpty(t, tt.ctx.HlMailboxes.Len())
 			}
 		})
 	}

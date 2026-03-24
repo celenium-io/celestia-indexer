@@ -65,7 +65,7 @@ func TestSuiteGas_Run(t *testing.T) {
 func (s *GasTestSuite) TestEstimateForPfb() {
 	q := make(url.Values)
 	q.Set("sizes", "12,34")
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/gas/estimate_for_pfb")
@@ -101,7 +101,7 @@ func (s *GasTestSuite) TestEstimateForPfbWithVersions() {
 	q := make(url.Values)
 	q.Set("sizes", "12,34")
 	q.Set("versions", "0,1")
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/gas/estimate_for_pfb")
@@ -137,7 +137,7 @@ func (s *GasTestSuite) TestEstimateForPfbWithInvalidVersion() {
 	q := make(url.Values)
 	q.Set("sizes", "12,34")
 	q.Set("versions", "0,132")
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/gas/estimate_for_pfb")
@@ -150,7 +150,7 @@ func (s *GasTestSuite) TestEstimateForPfbWithInvalidVersionLen() {
 	q := make(url.Values)
 	q.Set("sizes", "12,34")
 	q.Set("versions", "0")
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/gas/estimate_for_pfb")
@@ -160,7 +160,7 @@ func (s *GasTestSuite) TestEstimateForPfbWithInvalidVersionLen() {
 }
 
 func (s *GasTestSuite) TestEstimatePrice() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/gas/price")
@@ -183,7 +183,7 @@ func (s *GasTestSuite) TestEstimatePrice() {
 
 func (s *GasTestSuite) TestEstimatePriceWithPriority() {
 	for _, priority := range []string{"slow", "median", "fast"} {
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 		rec := httptest.NewRecorder()
 		c := s.echo.NewContext(req, rec)
 		c.SetPath("/gas/price/:priority")

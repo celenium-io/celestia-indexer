@@ -10,18 +10,16 @@ import (
 
 // ResultBlockResults is an ABCI results from a block
 type ResultBlockResults struct {
-	Height                Level                `json:"height,string"`
-	TxsResults            []*ResponseDeliverTx `json:"txs_results"`
-	FinalizeBlockEvents   []Event              `json:"finalize_block_events"`
-	ConsensusParamUpdates *ConsensusParams     `json:"consensus_param_updates"`
+	Height                Level               `json:"height,string"`
+	TxsResults            []ResponseDeliverTx `json:"txs_results"`
+	FinalizeBlockEvents   []Event             `json:"finalize_block_events"`
+	ConsensusParamUpdates *ConsensusParams    `json:"consensus_param_updates"`
 	// ValidatorUpdates      []ValidatorUpdate    `json:"validator_updates"`
 }
 
 type ResponseDeliverTx struct {
 	Code      uint32          `json:"code,omitempty"              protobuf:"varint,1,opt,name=code,proto3"`
-	Data      json.RawMessage `json:"data,omitempty"              protobuf:"bytes,2,opt,name=data,proto3"`
-	Log       string          `json:"log,omitempty"               protobuf:"bytes,3,opt,name=log,proto3"`
-	Info      string          `json:"info,omitempty"              protobuf:"bytes,4,opt,name=info,proto3"`
+	Log       json.RawMessage `json:"log,omitempty"               protobuf:"bytes,3,opt,name=log,proto3"`
 	GasWanted int64           `json:"gas_wanted,omitempty,string" protobuf:"varint,5,opt,name=gas_wanted,proto3"`
 	GasUsed   int64           `json:"gas_used,omitempty,string"   protobuf:"varint,6,opt,name=gas_used,proto3"`
 	Events    []Event         `json:"events,omitempty"            protobuf:"bytes,7,rep,name=events,proto3"`
@@ -59,7 +57,6 @@ func (e Event) Compare(a Event) bool {
 type EventAttribute struct {
 	Key   string `json:"key,omitempty"   protobuf:"bytes,1,opt,name=key,proto3"`
 	Value string `json:"value,omitempty" protobuf:"bytes,2,opt,name=value,proto3"`
-	Index bool   `json:"index,omitempty" protobuf:"varint,3,opt,name=index,proto3"`
 }
 
 // ValidatorUpdate
@@ -83,7 +80,6 @@ type ConsensusParams struct {
 	Block     *BlockParams     `json:"block"     protobuf:"bytes,1,opt,name=block,proto3"`
 	Evidence  *EvidenceParams  `json:"evidence"  protobuf:"bytes,2,opt,name=evidence,proto3"`
 	Validator *ValidatorParams `json:"validator" protobuf:"bytes,3,opt,name=validator,proto3"`
-	Version   *VersionParams   `json:"version"   protobuf:"bytes,4,opt,name=version,proto3"`
 }
 
 // BlockParams contains limits on the block size.

@@ -4,18 +4,17 @@
 package handle
 
 import (
-	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
 )
 
 // MsgRegisterEVMAddress registers an evm address to a validator.
-func MsgRegisterEVMAddress(ctx *context.Context, m *legacy.MsgRegisterEVMAddress) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgRegisterEVMAddress(ctx *context.Context, msgId uint64, m *legacy.MsgRegisterEVMAddress) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgRegisterEVMAddress
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 		// TODO: think about EVM addresses
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }

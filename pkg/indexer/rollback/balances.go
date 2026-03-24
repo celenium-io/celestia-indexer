@@ -99,7 +99,7 @@ func getBalanceUpdates(
 	return result, nil
 }
 
-func coinSpent(data map[string]any) (*storage.Address, error) {
+func coinSpent(data map[string]string) (*storage.Address, error) {
 	coinSpent, err := decode.NewCoinSpent(data)
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ func coinSpent(data map[string]any) (*storage.Address, error) {
 	}, nil
 }
 
-func coinReceived(data map[string]any) (*storage.Address, error) {
+func coinReceived(data map[string]string) (*storage.Address, error) {
 	coinReceived, err := decode.NewCoinReceived(data)
 	if err != nil {
 		return nil, err

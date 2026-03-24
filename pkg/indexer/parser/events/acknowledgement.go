@@ -30,8 +30,7 @@ func handleAcknowledgement(ctx *context.Context, events []storage.Event, msg *st
 
 func processAcknowledgement(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	if len(events)-1 < *idx || events[*idx].Type == storageTypes.EventTypeMessage {
-		msg.IbcTransfer = nil
-		msg.IbcChannel = nil
+		ctx.RemoveLastIbcTransfer()
 		return nil
 	}
 	packet, err := decoder.Map(msg.Data, "Packet")
@@ -39,7 +38,10 @@ func processAcknowledgement(ctx *context.Context, events []storage.Event, msg *s
 		return err
 	}
 
-	port := decoder.StringFromMap(packet, "SourcePort")
+	port, err := (storageTypes.PackedBytes)(packet).GetString("SourcePort")
+	if err != nil {
+		return err
+	}
 
 	switch port {
 	case "icahost":
@@ -54,30 +56,33 @@ func processAcknowledgement(ctx *context.Context, events []storage.Event, msg *s
 		}
 
 		for i := range msgs {
-			decodedMsg, err := decode.Message(ctx, msgs[i], i, storageTypes.StatusSuccess)
+			decodedMsg, err := decode.Message(ctx, msgs[i], i, storageTypes.StatusSuccess, 0)
 			if err != nil {
 				return errors.Wrap(err, "decode message in Acknowledgement")
 			}
 			if err := handle(ctx, events, &decodedMsg.Msg, idx, ibcEventHandlers, "module"); err != nil {
 				return errors.Wrap(err, "handle IBC msg event")
 			}
-			msg.Addresses = append(msg.Addresses, decodedMsg.Addresses...)
 		}
 
 	case "transfer":
 		var action = decoder.StringFromMap(events[*idx].Data, "action")
 
-		if msg.IbcTransfer == nil {
+		transfer := ctx.GetLastIbcTransfer()
+		if transfer == nil {
 			return nil
 		}
-		if err := ctx.AddAddress(msg.IbcTransfer.Sender); err != nil {
+		if err := ctx.AddAddress(transfer.Sender); err != nil {
 			return err
 		}
-		if err := ctx.AddAddress(msg.IbcTransfer.Receiver); err != nil {
+		if err := ctx.AddAddress(transfer.Receiver); err != nil {
 			return err
 		}
 
-		hasFtp := false
+		var (
+			hasFtp bool
+			chanId string
+		)
 		for action == "" && len(events)-1 > *idx {
 			switch events[*idx].Type {
 			case storageTypes.EventTypeAcknowledgePacket:
@@ -85,13 +90,14 @@ func processAcknowledgement(ctx *context.Context, events []storage.Event, msg *s
 				if err != nil {
 					return errors.Wrap(err, "ack packet")
 				}
-				msg.IbcTransfer.ConnectionId = ack.PacketConnection
+				transfer.ConnectionId = ack.PacketConnection
+				chanId = ack.PacketSrcChannel
 			case storageTypes.EventTypeFungibleTokenPacket:
 				hasFtp = true
 				ftp := decode.NewFungibleTokenPacket(events[*idx].Data)
 				if ftp.Error != "" {
-					msg.IbcTransfer = nil
-					msg.IbcChannel = nil
+					ctx.RemoveLastIbcTransfer()
+					ctx.DeleteIbcChannel(chanId)
 				}
 			}
 			*idx += 1
@@ -99,8 +105,8 @@ func processAcknowledgement(ctx *context.Context, events []storage.Event, msg *s
 		}
 
 		if !hasFtp {
-			msg.IbcTransfer = nil
-			msg.IbcChannel = nil
+			ctx.RemoveLastIbcTransfer()
+			ctx.DeleteIbcChannel(chanId)
 		}
 	}
 

@@ -24,85 +24,85 @@ import (
 
 // MsgChannelOpenInit defines an sdk.Msg to initialize a channel handshake. It
 // is called by a relayer on Chain A.
-func MsgChannelOpenInit(ctx *context.Context, m *coreChannel.MsgChannelOpenInit) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgChannelOpenInit(ctx *context.Context, msgId uint64, m *coreChannel.MsgChannelOpenInit) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgChannelOpenInit
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgChannelOpenTry defines a msg sent by a Relayer to try to open a channel
 // on Chain B. The version field within the Channel field has been deprecated. Its
 // value will be ignored by core IBC.
-func MsgChannelOpenTry(ctx *context.Context, m *coreChannel.MsgChannelOpenTry) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgChannelOpenTry(ctx *context.Context, msgId uint64, m *coreChannel.MsgChannelOpenTry) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgChannelOpenTry
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgChannelOpenAck defines a msg sent by a Relayer to Chain A to acknowledge
 // the change of channel state to TRYOPEN on Chain B.
-func MsgChannelOpenAck(ctx *context.Context, m *coreChannel.MsgChannelOpenAck) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgChannelOpenAck(ctx *context.Context, msgId uint64, m *coreChannel.MsgChannelOpenAck) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgChannelOpenAck
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgChannelOpenConfirm defines a msg sent by a Relayer to Chain B to
 // acknowledge the change of channel state to OPEN on Chain A.
-func MsgChannelOpenConfirm(ctx *context.Context, m *coreChannel.MsgChannelOpenConfirm) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgChannelOpenConfirm(ctx *context.Context, msgId uint64, m *coreChannel.MsgChannelOpenConfirm) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgChannelOpenConfirm
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgChannelCloseInit defines a msg sent by a Relayer to Chain A
 // to close a channel with Chain B.
-func MsgChannelCloseInit(ctx *context.Context, m *coreChannel.MsgChannelCloseInit) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgChannelCloseInit(ctx *context.Context, msgId uint64, m *coreChannel.MsgChannelCloseInit) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgChannelCloseInit
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgChannelCloseConfirm defines a msg sent by a Relayer to Chain B
 // to acknowledge the change of channel state to CLOSED on Chain A.
-func MsgChannelCloseConfirm(ctx *context.Context, m *coreChannel.MsgChannelCloseConfirm) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgChannelCloseConfirm(ctx *context.Context, msgId uint64, m *coreChannel.MsgChannelCloseConfirm) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgChannelCloseConfirm
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgRecvPacket receives an incoming IBC packet
-func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.PackedBytes, m *coreChannel.MsgRecvPacket) (storageTypes.MsgType, []storage.AddressWithType, *storage.IbcTransfer, *storage.IbcChannel, error) {
+func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec.Codec, data storageTypes.PackedBytes, txId, msgId uint64, m *coreChannel.MsgRecvPacket) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgRecvPacket
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	if err != nil {
-		return msgType, addresses, nil, nil, err
+	}, ctx.Block.Height, msgId)
+	if err != nil || status == storageTypes.StatusFailed {
+		return msgType, err
 	}
 
 	packetMap, ok := data["Packet"].(map[string]any)
 	if !ok {
-		return msgType, addresses, nil, nil, errors.Wrap(err, "Packet is not map")
+		return msgType, errors.Wrap(err, "Packet is not map")
 	}
 
 	switch m.Packet.DestinationPort {
 	case "icahost":
 		var packet icaTypes.InterchainAccountPacketData
 		if err := json.Unmarshal(m.Packet.Data, &packet); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "InterchainAccountPacketData")
+			return msgType, errors.Wrap(err, "InterchainAccountPacketData")
 		}
 
 		packetMapData := map[string]any{
@@ -115,7 +115,7 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.Pa
 			if err := codec.UnmarshalJSON(packet.Data, &tx); err != nil {
 				packetMapData["Data"] = []cosmosTypes.Msg{}
 				packetMap["Data"] = packetMapData
-				return msgType, addresses, nil, nil, nil
+				return msgType, nil
 			}
 		}
 
@@ -123,7 +123,7 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.Pa
 		for i, rawMsg := range tx.Messages {
 			var msg cosmosTypes.Msg
 			if err := codec.UnpackAny(rawMsg, &msg); err != nil {
-				return msgType, addresses, nil, nil, errors.Wrap(err, "cosmosTypes.Msg")
+				return msgType, errors.Wrap(err, "cosmosTypes.Msg")
 			}
 			if grant, ok := msg.(*authz.MsgGrant); ok {
 				grant.Grant.Authorization = nil // TODO: make more beautiful
@@ -132,12 +132,12 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.Pa
 		}
 		packetMapData["Data"] = msgs
 		packetMap["Data"] = packetMapData
-		return msgType, addresses, nil, nil, nil
+		return msgType, nil
 
 	case "transfer":
 		var packet transferTypes.FungibleTokenPacketData
 		if err := json.Unmarshal(m.Packet.Data, &packet); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "FungibleTokenPacketData")
+			return msgType, errors.Wrap(err, "FungibleTokenPacketData")
 		}
 		packetMap["Data"] = packet
 
@@ -150,6 +150,7 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.Pa
 			Denom:     packet.Denom,
 			Height:    ctx.Block.Height,
 			Time:      ctx.Block.Time,
+			TxId:      txId,
 		}
 
 		partsDenom := strings.Split(packet.Denom, "/")
@@ -172,7 +173,7 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.Pa
 		}
 		prefix, hash, err := pkgTypes.Address(packet.Receiver).Decode()
 		if err != nil {
-			return msgType, addresses, nil, nil, nil
+			return msgType, nil
 		}
 		if prefix == pkgTypes.AddressPrefixCelestia {
 			transfer.Receiver = &storage.Address{
@@ -182,9 +183,13 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.Pa
 				LastHeight: ctx.Block.Height,
 				Hash:       hash,
 			}
-			addresses = append(addresses, storage.AddressWithType{
-				Address: *transfer.Receiver,
+			if err := ctx.AddAddress(transfer.Receiver); err != nil {
+				return msgType, errors.Wrap(err, "AddAddress receiver")
+			}
+			ctx.AddAddressMessage(&storage.MsgAddress{
+				MsgId:   msgId,
 				Type:    storageTypes.MsgAddressTypeReceiver,
+				Address: transfer.Receiver,
 			})
 			channel.Received = channel.Received.Add(transfer.Amount)
 		} else {
@@ -192,7 +197,7 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.Pa
 		}
 		prefix, hash, err = pkgTypes.Address(packet.Sender).Decode()
 		if err != nil {
-			return msgType, addresses, nil, nil, nil
+			return msgType, nil
 		}
 		if prefix == pkgTypes.AddressPrefixCelestia {
 			transfer.Sender = &storage.Address{
@@ -202,56 +207,64 @@ func MsgRecvPacket(ctx *context.Context, codec codec.Codec, data storageTypes.Pa
 				LastHeight: ctx.Block.Height,
 				Hash:       hash,
 			}
-			addresses = append(addresses, storage.AddressWithType{
-				Address: *transfer.Sender,
+			if err := ctx.AddAddress(transfer.Sender); err != nil {
+				return msgType, errors.Wrap(err, "AddAddress sender")
+			}
+			ctx.AddAddressMessage(&storage.MsgAddress{
+				MsgId:   msgId,
 				Type:    storageTypes.MsgAddressTypeSender,
+				Address: transfer.Sender,
 			})
 			channel.Sent = channel.Sent.Add(transfer.Amount)
 		} else {
 			transfer.SenderAddress = &packet.Sender
 		}
-
-		return msgType, addresses, transfer, channel, nil
+		ctx.AddIbcChannel(channel)
+		ctx.AddIbcTransfer(transfer)
+		return msgType, nil
 	default:
-		return msgType, addresses, nil, nil, errors.Errorf("unknown destination port: %s", m.Packet.DestinationPort)
+		return msgType, errors.Errorf("unknown destination port: %s", m.Packet.DestinationPort)
 	}
 }
 
 // MsgTimeout receives a timed-out packet
-func MsgTimeout(ctx *context.Context, m *coreChannel.MsgTimeout) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgTimeout(ctx *context.Context, msgId uint64, m *coreChannel.MsgTimeout) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgTimeout
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgTimeoutOnClose timed-out packet upon counterparty channel closure
-func MsgTimeoutOnClose(ctx *context.Context, m *coreChannel.MsgTimeoutOnClose) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgTimeoutOnClose(ctx *context.Context, msgId uint64, m *coreChannel.MsgTimeoutOnClose) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgTimeoutOnClose
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgAcknowledgement receives incoming IBC acknowledgement
-func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTypes.PackedBytes, m *coreChannel.MsgAcknowledgement) (storageTypes.MsgType, []storage.AddressWithType, *storage.IbcTransfer, *storage.IbcChannel, error) {
+func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec codec.Codec, data storageTypes.PackedBytes, txId, msgId uint64, m *coreChannel.MsgAcknowledgement) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgAcknowledgement
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
+	if err != nil || status == storageTypes.StatusFailed {
+		return msgType, err
+	}
 
 	packetMap, ok := data["Packet"].(map[string]any)
 	if !ok {
-		return msgType, addresses, nil, nil, errors.Wrap(err, "Packet is not map")
+		return msgType, errors.Wrap(err, "Packet is not map")
 	}
 
 	switch m.Packet.SourcePort {
 	case "icahost":
 		var packet icaTypes.InterchainAccountPacketData
 		if err := json.Unmarshal(m.Packet.Data, &packet); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "InterchainAccountPacketData")
+			return msgType, errors.Wrap(err, "InterchainAccountPacketData")
 		}
 
 		packetMapData := map[string]any{
@@ -264,7 +277,7 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTyp
 			if err := codec.UnmarshalJSON(packet.Data, &tx); err != nil {
 				packetMapData["Data"] = []cosmosTypes.Msg{}
 				packetMap["Data"] = packetMapData
-				return msgType, addresses, nil, nil, nil
+				return msgType, nil
 			}
 		}
 
@@ -272,18 +285,18 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTyp
 		for i, rawMsg := range tx.Messages {
 			var msg cosmosTypes.Msg
 			if err := codec.UnpackAny(rawMsg, &msg); err != nil {
-				return msgType, addresses, nil, nil, errors.Wrap(err, "cosmosTypes.Msg")
+				return msgType, errors.Wrap(err, "cosmosTypes.Msg")
 			}
 			msgs[i] = msg
 		}
 		packetMapData["Data"] = msgs
 		packetMap["Data"] = packetMapData
-		return msgType, addresses, nil, nil, nil
+		return msgType, nil
 
 	case "transfer":
 		var packet transferTypes.FungibleTokenPacketData
 		if err := json.Unmarshal(m.Packet.Data, &packet); err != nil {
-			return msgType, addresses, nil, nil, errors.Wrap(err, "FungibleTokenPacketData")
+			return msgType, errors.Wrap(err, "FungibleTokenPacketData")
 		}
 		packetMap["Data"] = packet
 
@@ -296,6 +309,7 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTyp
 			Denom:     packet.Denom,
 			Height:    ctx.Block.Height,
 			Time:      ctx.Block.Time,
+			TxId:      txId,
 		}
 
 		partsDenom := strings.Split(packet.Denom, "/")
@@ -318,7 +332,7 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTyp
 		}
 		prefix, hash, err := pkgTypes.Address(packet.Receiver).Decode()
 		if err != nil {
-			return msgType, addresses, nil, nil, nil
+			return msgType, nil
 		}
 		if prefix == pkgTypes.AddressPrefixCelestia {
 			transfer.Receiver = &storage.Address{
@@ -328,9 +342,13 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTyp
 				LastHeight: ctx.Block.Height,
 				Hash:       hash,
 			}
-			addresses = append(addresses, storage.AddressWithType{
-				Address: *transfer.Receiver,
+			if err := ctx.AddAddress(transfer.Receiver); err != nil {
+				return msgType, errors.Wrap(err, "AddAddress receiver")
+			}
+			ctx.AddAddressMessage(&storage.MsgAddress{
+				MsgId:   msgId,
 				Type:    storageTypes.MsgAddressTypeReceiver,
+				Address: transfer.Receiver,
 			})
 			channel.Received = channel.Received.Add(transfer.Amount)
 		} else {
@@ -338,7 +356,7 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTyp
 		}
 		prefix, hash, err = pkgTypes.Address(packet.Sender).Decode()
 		if err != nil {
-			return msgType, addresses, nil, nil, nil
+			return msgType, nil
 		}
 		if prefix == pkgTypes.AddressPrefixCelestia {
 			transfer.Sender = &storage.Address{
@@ -348,25 +366,31 @@ func MsgAcknowledgement(ctx *context.Context, codec codec.Codec, data storageTyp
 				LastHeight: ctx.Block.Height,
 				Hash:       hash,
 			}
-			addresses = append(addresses, storage.AddressWithType{
-				Address: *transfer.Sender,
+			if err := ctx.AddAddress(transfer.Sender); err != nil {
+				return msgType, errors.Wrap(err, "AddAddress sender")
+			}
+			ctx.AddAddressMessage(&storage.MsgAddress{
+				MsgId:   msgId,
 				Type:    storageTypes.MsgAddressTypeSender,
+				Address: transfer.Sender,
 			})
 			channel.Sent = channel.Sent.Add(transfer.Amount)
 		} else {
 			transfer.SenderAddress = &packet.Sender
 		}
 
-		return msgType, addresses, transfer, channel, nil
+		ctx.AddIbcChannel(channel)
+		ctx.AddIbcTransfer(transfer)
+		return msgType, nil
 	default:
-		return msgType, addresses, nil, nil, errors.Errorf("unknown source port: %s", m.Packet.SourcePort)
+		return msgType, errors.Errorf("unknown source port: %s", m.Packet.SourcePort)
 	}
 }
 
-func MsgUpdateParamsChannel(ctx *context.Context, m *coreChannel.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateParamsChannel(ctx *context.Context, msgId uint64, m *coreChannel.MsgUpdateParams) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateParams
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }

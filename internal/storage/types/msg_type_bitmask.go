@@ -8,8 +8,11 @@ import (
 	"database/sql/driver"
 	"fmt"
 
+	"github.com/bytedance/sonic"
 	"github.com/pkg/errors"
 )
+
+var json = sonic.ConfigFastest
 
 type MsgTypeBits struct {
 	Bits
@@ -941,6 +944,13 @@ func (mask MsgTypeBits) HasOne(value MsgTypeBits) bool {
 	return mask.value.And(mask.value, value.value).Cmp(zero) > 0
 }
 
+func (mask MsgTypeBits) String() string {
+	if mask.value == nil {
+		return fmt.Sprintf("%0115b", 0)
+	}
+	return fmt.Sprintf("%0115b", mask.value)
+}
+
 var _ sql.Scanner = (*MsgTypeBits)(nil)
 
 func (mask *MsgTypeBits) Scan(src interface{}) (err error) {
@@ -966,10 +976,7 @@ func (mask *MsgTypeBits) Scan(src interface{}) (err error) {
 var _ driver.Valuer = (*MsgTypeBits)(nil)
 
 func (mask MsgTypeBits) Value() (driver.Value, error) {
-	if mask.value == nil {
-		return fmt.Sprintf("%0115b", 0), nil
-	}
-	return fmt.Sprintf("%0115b", mask.value), nil
+	return mask.String(), nil
 }
 
 func (mask MsgTypeBits) MarshalJSON() (data []byte, err error) {

@@ -52,7 +52,7 @@ func Test_handleCreateZkISM_WrongAction(t *testing.T) {
 		{
 			Height: 1_500_000,
 			Type:   "message",
-			Data: map[string]any{
+			Data: map[string]string{
 				"action": "/cosmos.bank.v1beta1.MsgSend",
 			},
 		},
@@ -78,7 +78,7 @@ func Test_handleCreateZkISM_Success(t *testing.T) {
 		{
 			Height: 1_500_000,
 			Type:   "message",
-			Data: map[string]any{
+			Data: map[string]string{
 				"action": "/celestia.zkism.v1.MsgCreateInterchainSecurityModule",
 				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 			},
@@ -86,7 +86,7 @@ func Test_handleCreateZkISM_Success(t *testing.T) {
 		{
 			Height: 1_500_000,
 			Type:   types.EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,
-			Data: map[string]any{
+			Data: map[string]string{
 				"id":                    "42",
 				"owner":                 "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state":                 toHex(state),
@@ -100,9 +100,10 @@ func Test_handleCreateZkISM_Success(t *testing.T) {
 
 	err := handleCreateZkISM(ctx, events, msg, &idx)
 	require.NoError(t, err)
-	require.NotNil(t, msg.ZkISM)
+	require.NotEmpty(t, ctx.ZkISMs.Len())
+	ism, ok := ctx.ZkISMs.Get("42")
+	require.True(t, ok)
 
-	ism := msg.ZkISM
 	require.EqualValues(t, []byte{0x42}, ism.ExternalId)
 	require.Equal(t, ctx.Block.Height, ism.Height)
 	require.Equal(t, ctx.Block.Time, ism.Time)
@@ -133,14 +134,14 @@ func Test_handleCreateZkISM_StopsAtNextAction(t *testing.T) {
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{
+			Data: map[string]string{
 				"action": "/celestia.zkism.v1.MsgCreateInterchainSecurityModule",
 				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,
-			Data: map[string]any{
+			Data: map[string]string{
 				"id":                    "01",
 				"owner":                 "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 				"state":                 toHex(state),
@@ -153,7 +154,7 @@ func Test_handleCreateZkISM_StopsAtNextAction(t *testing.T) {
 		{
 			// second message — should NOT be consumed
 			Type: "message",
-			Data: map[string]any{
+			Data: map[string]string{
 				"action": "/celestia.zkism.v1.MsgUpdateInterchainSecurityModule",
 				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 			},
@@ -163,7 +164,9 @@ func Test_handleCreateZkISM_StopsAtNextAction(t *testing.T) {
 	msg := &storage.Message{Type: types.MsgCreateInterchainSecurityModule}
 	err := handleCreateZkISM(ctx, events, msg, idx)
 	require.NoError(t, err)
-	require.NotNil(t, msg.ZkISM)
+	require.NotEmpty(t, ctx.ZkISMs.Len())
+	_, ok := ctx.ZkISMs.Get("01")
+	require.True(t, ok)
 	require.Equal(t, 2, *idx, "index must stop before the next action event")
 }
 
@@ -194,7 +197,7 @@ func Test_handleUpdateZkISM_WrongAction(t *testing.T) {
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{"action": "/cosmos.bank.v1beta1.MsgSend"},
+			Data: map[string]string{"action": "/cosmos.bank.v1beta1.MsgSend"},
 		},
 	}
 	err := handleUpdateZkISM(ctx, events, msg, &idx)
@@ -208,18 +211,23 @@ func Test_handleUpdateZkISM_Success(t *testing.T) {
 
 	ctx := makeZkISMContext()
 	idx := 0
-	msg := &storage.Message{Type: types.MsgUpdateInterchainSecurityModule}
+	msg := &storage.Message{
+		Type: types.MsgUpdateInterchainSecurityModule,
+		Data: map[string]any{
+			"Signer": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
+		},
+	}
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{
+			Data: map[string]string{
 				"action": "/celestia.zkism.v1.MsgUpdateInterchainSecurityModule",
 				"sender": "celestia1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8k44vnj",
 			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
-			Data: map[string]any{
+			Data: map[string]string{
 				"id":    "0x07",
 				"state": toHex(newState),
 			},
@@ -228,9 +236,9 @@ func Test_handleUpdateZkISM_Success(t *testing.T) {
 
 	err := handleUpdateZkISM(ctx, events, msg, &idx)
 	require.NoError(t, err)
-	require.NotNil(t, msg.ZkISMUpdate)
+	require.NotEmpty(t, ctx.ZkIsmUpdates)
 
-	upd := msg.ZkISMUpdate
+	upd := ctx.ZkIsmUpdates[0]
 	require.EqualValues(t, testsuite.MustHexDecode("07"), upd.ZkISMExternalId)
 	require.Equal(t, ctx.Block.Height, upd.Height)
 	require.Equal(t, ctx.Block.Time, upd.Time)
@@ -254,14 +262,14 @@ func Test_handleUpdateZkISM_UpdatesContextState(t *testing.T) {
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{
+			Data: map[string]string{
 				"action": "/celestia.zkism.v1.MsgUpdateInterchainSecurityModule",
 				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
-			Data: map[string]any{
+			Data: map[string]string{
 				"id":    "0x07",
 				"state": toHex(newState),
 			},
@@ -303,7 +311,7 @@ func Test_handleSubmitZkISMMessages_WrongAction(t *testing.T) {
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{"action": "/cosmos.bank.v1beta1.MsgSend"},
+			Data: map[string]string{"action": "/cosmos.bank.v1beta1.MsgSend"},
 		},
 	}
 	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
@@ -318,18 +326,23 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 
 	ctx := makeZkISMContext()
 	idx := 0
-	msg := &storage.Message{Type: types.MsgSubmitMessages}
+	msg := &storage.Message{
+		Type: types.MsgSubmitMessages,
+		Data: map[string]any{
+			"Signer": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+		},
+	}
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{
+			Data: map[string]string{
 				"action": "/celestia.zkism.v1.MsgSubmitMessages",
 				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
-			Data: map[string]any{
+			Data: map[string]string{
 				"id":         "0x03",
 				"state_root": toHex(stateRoot),
 				"messages":   `[` + toHex(msgId) + `]`,
@@ -339,9 +352,9 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 
 	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
 	require.NoError(t, err)
-	require.Len(t, msg.ZkISMMessages, 1)
+	require.Len(t, ctx.ZkIsmMessages, 1)
 
-	m := msg.ZkISMMessages[0]
+	m := ctx.ZkIsmMessages[0]
 	require.EqualValues(t, []byte{0x03}, m.ZkISMExternalId)
 	require.Equal(t, ctx.Block.Height, m.Height)
 	require.Equal(t, ctx.Block.Time, m.Time)
@@ -354,11 +367,16 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 func Test_handleSubmitZkISMMessages_Real(t *testing.T) {
 	ctx := makeZkISMContext()
 	idx := 0
-	msg := &storage.Message{Type: types.MsgSubmitMessages}
+	msg := &storage.Message{
+		Type: types.MsgSubmitMessages,
+		Data: map[string]any{
+			"Signer": "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j",
+		},
+	}
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{
+			Data: map[string]string{
 				"action":    "/celestia.zkism.v1.MsgSubmitMessages",
 				"sender":    "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j",
 				"msg_index": "0",
@@ -367,7 +385,7 @@ func Test_handleSubmitZkISMMessages_Real(t *testing.T) {
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
-			Data: map[string]any{
+			Data: map[string]string{
 				"id":         "\"0x726f757465725f69736d000000000000000000000000002a000000000000000f\"",
 				"state_root": "\"0xb1d302256aee21b0d2dc21d88612061d1c7bb5bd5a222d98bd29482e6ea33d33\"",
 				"messages":   "[\"0x8066fb378e24512ba445ac2f36b1a5b1d74b664d09df64b58226923a680990a6\"]",
@@ -378,9 +396,9 @@ func Test_handleSubmitZkISMMessages_Real(t *testing.T) {
 
 	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
 	require.NoError(t, err)
-	require.Len(t, msg.ZkISMMessages, 1)
+	require.Len(t, ctx.ZkIsmMessages, 1)
 
-	m := msg.ZkISMMessages[0]
+	m := ctx.ZkIsmMessages[0]
 	require.NotEmpty(t, m.ZkISMExternalId)
 	require.Equal(t, ctx.Block.Height, m.Height)
 	require.Equal(t, ctx.Block.Time, m.Time)
@@ -399,18 +417,23 @@ func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 
 	ctx := makeZkISMContext()
 	idx := 0
-	msg := &storage.Message{Type: types.MsgSubmitMessages}
+	msg := &storage.Message{
+		Type: types.MsgSubmitMessages,
+		Data: map[string]any{
+			"Signer": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+		},
+	}
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{
+			Data: map[string]string{
 				"action": "/celestia.zkism.v1.MsgSubmitMessages",
 				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
-			Data: map[string]any{
+			Data: map[string]string{
 				"id":         "0x05",
 				"state_root": toHex(stateRoot),
 				"messages":   `[` + toHex(msgId1) + `,` + toHex(msgId2) + `,` + toHex(msgId3) + `]`,
@@ -420,16 +443,16 @@ func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 
 	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
 	require.NoError(t, err)
-	require.Len(t, msg.ZkISMMessages, 3)
+	require.Len(t, ctx.ZkIsmMessages, 3)
 
-	for _, m := range msg.ZkISMMessages {
+	for _, m := range ctx.ZkIsmMessages {
 		require.EqualValues(t, []byte{0x05}, m.ZkISMExternalId)
 		require.Equal(t, stateRoot, m.StateRoot)
 		require.NotNil(t, m.Signer)
 	}
-	require.Equal(t, msgId1, msg.ZkISMMessages[0].MessageId)
-	require.Equal(t, msgId2, msg.ZkISMMessages[1].MessageId)
-	require.Equal(t, msgId3, msg.ZkISMMessages[2].MessageId)
+	require.Equal(t, msgId1, ctx.ZkIsmMessages[0].MessageId)
+	require.Equal(t, msgId2, ctx.ZkIsmMessages[1].MessageId)
+	require.Equal(t, msgId3, ctx.ZkIsmMessages[2].MessageId)
 }
 
 func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
@@ -444,14 +467,14 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 	events := []storage.Event{
 		{
 			Type: "message",
-			Data: map[string]any{
+			Data: map[string]string{
 				"action": "/celestia.zkism.v1.MsgSubmitMessages",
 				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
-			Data: map[string]any{
+			Data: map[string]string{
 				"id":         "0x01",
 				"state_root": toHex(stateRoot1),
 				"messages":   `[` + toHex(msgId1) + `]`,
@@ -459,14 +482,14 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 		},
 		{
 			Type: "message",
-			Data: map[string]any{
+			Data: map[string]string{
 				"action": "/celestia.zkism.v1.MsgSubmitMessages",
 				"sender": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
 			},
 		},
 		{
 			Type: types.EventTypeCelestiazkismv1EventSubmitMessages,
-			Data: map[string]any{
+			Data: map[string]string{
 				"id":         "0x02",
 				"state_root": toHex(stateRoot2),
 				"messages":   `[` + toHex(msgId2) + `]`,
@@ -484,13 +507,13 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	require.Len(t, msgs[0].ZkISMMessages, 1)
-	require.EqualValues(t, []byte{0x01}, msgs[0].ZkISMMessages[0].ZkISMExternalId)
-	require.Equal(t, msgId1, msgs[0].ZkISMMessages[0].MessageId)
-	require.Equal(t, stateRoot1, msgs[0].ZkISMMessages[0].StateRoot)
+	require.Len(t, ctx.ZkIsmMessages, 2)
 
-	require.Len(t, msgs[1].ZkISMMessages, 1)
-	require.EqualValues(t, []byte{0x02}, msgs[1].ZkISMMessages[0].ZkISMExternalId)
-	require.Equal(t, msgId2, msgs[1].ZkISMMessages[0].MessageId)
-	require.Equal(t, stateRoot2, msgs[1].ZkISMMessages[0].StateRoot)
+	require.EqualValues(t, []byte{0x01}, ctx.ZkIsmMessages[0].ZkISMExternalId)
+	require.Equal(t, msgId1, ctx.ZkIsmMessages[0].MessageId)
+	require.Equal(t, stateRoot1, ctx.ZkIsmMessages[0].StateRoot)
+
+	require.EqualValues(t, []byte{0x02}, ctx.ZkIsmMessages[1].ZkISMExternalId)
+	require.Equal(t, msgId2, ctx.ZkIsmMessages[1].MessageId)
+	require.Equal(t, stateRoot2, ctx.ZkIsmMessages[1].StateRoot)
 }

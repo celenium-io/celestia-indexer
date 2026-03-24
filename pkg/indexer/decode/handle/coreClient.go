@@ -4,7 +4,6 @@
 package handle
 
 import (
-	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	coreClient "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
@@ -12,23 +11,23 @@ import (
 )
 
 // MsgCreateClient defines a message to create an IBC client
-func MsgCreateClient(ctx *context.Context, status storageTypes.Status, data storageTypes.PackedBytes, m *coreClient.MsgCreateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgCreateClient(ctx *context.Context, status storageTypes.Status, data storageTypes.PackedBytes, msgId uint64, m *coreClient.MsgCreateClient) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgCreateClient
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil || status == storageTypes.StatusFailed {
-		return msgType, addresses, err
+		return msgType, err
 	}
 
 	if data == nil {
-		return msgType, addresses, nil
+		return msgType, nil
 	}
 
 	if m.ClientState != nil {
 		var clientState tmTypes.ClientState
 		if err := clientState.Unmarshal(m.ClientState.Value); err != nil {
-			return msgType, addresses, err
+			return msgType, err
 		}
 		data["ClientState"] = clientState
 	}
@@ -36,81 +35,81 @@ func MsgCreateClient(ctx *context.Context, status storageTypes.Status, data stor
 	if m.ConsensusState != nil {
 		var consensusState tmTypes.ConsensusState
 		if err := consensusState.Unmarshal(m.ConsensusState.Value); err != nil {
-			return msgType, addresses, err
+			return msgType, err
 		}
 		data["ConsensusState"] = consensusState
 	}
 
-	return msgType, addresses, nil
+	return msgType, nil
 }
 
 // MsgUpdateClient defines a sdk.Msg to update an IBC client state using the given header
-func MsgUpdateClient(ctx *context.Context, status storageTypes.Status, data storageTypes.PackedBytes, m *coreClient.MsgUpdateClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateClient(ctx *context.Context, status storageTypes.Status, data storageTypes.PackedBytes, msgId uint64, m *coreClient.MsgUpdateClient) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateClient
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil || status == storageTypes.StatusFailed {
-		return msgType, addresses, err
+		return msgType, err
 	}
 
 	if data == nil {
-		return msgType, addresses, nil
+		return msgType, nil
 	}
 
 	if m.ClientMessage != nil {
 		var header tmTypes.Header
 		if err := header.Unmarshal(m.ClientMessage.Value); err != nil {
-			return msgType, addresses, err
+			return msgType, err
 		}
 		data["Header"] = header
 		delete(data, "ClientMessage")
 	}
 
-	return msgType, addresses, err
+	return msgType, err
 }
 
 // MsgUpgradeClient defines a sdk.Msg to upgrade an IBC client to a new client state
-func MsgUpgradeClient(ctx *context.Context, m *coreClient.MsgUpgradeClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpgradeClient(ctx *context.Context, msgId uint64, m *coreClient.MsgUpgradeClient) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpgradeClient
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgSubmitMisbehaviour defines a sdk.Msg type that submits Evidence for light client misbehavior
-func MsgSubmitMisbehaviour(ctx *context.Context, m *coreClient.MsgSubmitMisbehaviour) (storageTypes.MsgType, []storage.AddressWithType, error) { //nolint
+func MsgSubmitMisbehaviour(ctx *context.Context, msgId uint64, m *coreClient.MsgSubmitMisbehaviour) (storageTypes.MsgType, error) { //nolint
 	msgType := storageTypes.MsgSubmitMisbehaviour
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgRecoverClient defines the message used to recover a frozen or expired client.
-func MsgRecoverClient(ctx *context.Context, m *coreClient.MsgRecoverClient) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgRecoverClient(ctx *context.Context, msgId uint64, m *coreClient.MsgRecoverClient) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgRecoverClient
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgIBCSoftwareUpgrade defines the message used to schedule an upgrade of an IBC client using a v1 governance proposal
-func MsgIBCSoftwareUpgrade(ctx *context.Context, m *coreClient.MsgIBCSoftwareUpgrade) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgIBCSoftwareUpgrade(ctx *context.Context, msgId uint64, m *coreClient.MsgIBCSoftwareUpgrade) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgIBCSoftwareUpgrade
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgUpdateParams defines the sdk.Msg type to update the client parameters.
-func MsgUpdateParams(ctx *context.Context, m *coreClient.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateParams(ctx *context.Context, msgId uint64, m *coreClient.MsgUpdateParams) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateParams
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }

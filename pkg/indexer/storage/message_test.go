@@ -11,9 +11,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
-	"github.com/dipdup-net/indexer-sdk/pkg/sync"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -21,7 +18,6 @@ import (
 func Test_saveMessages(t *testing.T) {
 	type args struct {
 		messages []*storage.Message
-		addrToId map[string]uint64
 	}
 
 	now := time.Now()
@@ -31,7 +27,6 @@ func Test_saveMessages(t *testing.T) {
 		args                      args
 		wantNamespaceMessageCount int
 		wantMsgAddress            int
-		wantIbcClientsCount       int64
 		wantErr                   bool
 	}{
 		{
@@ -62,10 +57,6 @@ func Test_saveMessages(t *testing.T) {
 							},
 						},
 					},
-				},
-				addrToId: map[string]uint64{
-					"address1": 1,
-					"address2": 2,
 				},
 			},
 			wantNamespaceMessageCount: 0,
@@ -135,11 +126,6 @@ func Test_saveMessages(t *testing.T) {
 						},
 					},
 				},
-				addrToId: map[string]uint64{
-					"address1": 1,
-					"address2": 2,
-					"address3": 3,
-				},
 			},
 			wantNamespaceMessageCount: 2,
 			wantMsgAddress:            3,
@@ -195,11 +181,6 @@ func Test_saveMessages(t *testing.T) {
 							},
 						},
 					},
-				},
-				addrToId: map[string]uint64{
-					"address1": 1,
-					"address2": 2,
-					"address3": 3,
 				},
 			},
 			wantNamespaceMessageCount: 0,
@@ -268,11 +249,6 @@ func Test_saveMessages(t *testing.T) {
 						},
 					},
 				},
-				addrToId: map[string]uint64{
-					"address1": 1,
-					"address2": 2,
-					"address3": 3,
-				},
 			},
 			wantNamespaceMessageCount: 1,
 			wantMsgAddress:            3,
@@ -306,52 +282,9 @@ func Test_saveMessages(t *testing.T) {
 						},
 					},
 				},
-				addrToId: map[string]uint64{
-					"address1": 1,
-				},
 			},
 			wantNamespaceMessageCount: 0,
 			wantMsgAddress:            1,
-			wantErr:                   false,
-		}, {
-			name: "test ibc clients saving",
-			args: args{
-				messages: []*storage.Message{
-					{
-						Height:   100,
-						Time:     now,
-						Position: 0,
-						Type:     types.MsgCreateClient,
-						TxId:     1,
-						Addresses: []storage.AddressWithType{
-							{
-								Type: types.MsgAddressTypeFromAddress,
-								Address: storage.Address{
-									Address:    "address1",
-									Height:     100,
-									LastHeight: 100,
-								},
-							},
-						},
-						IbcClient: &storage.IbcClient{
-							Id:        "client-1",
-							Height:    100,
-							CreatedAt: now,
-							Creator: &storage.Address{
-								Address:    "address1",
-								Height:     100,
-								LastHeight: 100,
-							},
-						},
-					},
-				},
-				addrToId: map[string]uint64{
-					"address1": 1,
-				},
-			},
-			wantNamespaceMessageCount: 0,
-			wantMsgAddress:            1,
-			wantIbcClientsCount:       1,
 			wantErr:                   false,
 		},
 	}
@@ -367,14 +300,6 @@ func Test_saveMessages(t *testing.T) {
 		tx := mock.NewMockTransaction(ctrl)
 
 		tx.EXPECT().
-			SaveNamespaceMessage(gomock.Any(), gomock.Any()).
-			Times(1).
-			DoAndReturn(func(_ context.Context, nsMsg ...storage.NamespaceMessage) error {
-				require.Equal(t, tt.wantNamespaceMessageCount, len(nsMsg))
-				return nil
-			})
-
-		tx.EXPECT().
 			SaveMessages(gomock.Any(), gomock.Any()).
 			Times(1).
 			DoAndReturn(func(_ context.Context, msgs ...*storage.Message) error {
@@ -383,175 +308,13 @@ func Test_saveMessages(t *testing.T) {
 			})
 
 		tx.EXPECT().
-			SaveMsgAddresses(gomock.Any(), gomock.Any()).
-			Times(1).
-			DoAndReturn(func(_ context.Context, msgAddr ...storage.MsgAddress) error {
-				require.Equal(t, tt.wantMsgAddress, len(msgAddr))
-				return nil
-			})
-
-		tx.EXPECT().
-			SaveBlobLogs(gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(nil)
-
-		tx.EXPECT().
 			SaveMsgValidator(gomock.Any(), gomock.Any()).
 			Times(1).
 			Return(nil)
 
-		tx.EXPECT().
-			SaveVestingAccounts(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveVestingPeriods(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveGrants(gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveIbcClients(gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(tt.wantIbcClientsCount, nil)
-
-		tx.EXPECT().
-			SaveIbcConnections(gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveIbcChannels(gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveIbcTransfers(gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveHyperlaneMailbox(gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveHyperlaneTokens(gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveHyperlaneTransfers(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveHyperlaneIgps(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveHyperlaneIgpConfigs(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveSignals(gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveUpgrades(gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveForwardings(gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveZkISMs(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveZkISMUpdates(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			Return(nil)
-
-		tx.EXPECT().
-			SaveZkISMMessages(gomock.Any(), gomock.Any()).
-			MaxTimes(1).
-			Return(nil)
-
 		t.Run(tt.name, func(t *testing.T) {
-			ibcClientsCount, err := module.saveMessages(t.Context(), tx, tt.args.messages, tt.args.addrToId, sync.NewMap[uint64, *storage.Upgrade](), storage.State{Version: 10})
+			err := module.saveMessages(t.Context(), tx, tt.args.messages)
 			require.Equal(t, tt.wantErr, err != nil)
-			if !tt.wantErr {
-				require.EqualValues(t, tt.wantIbcClientsCount, ibcClientsCount)
-			}
 		})
 	}
-}
-
-func TestPostProcessingSignal(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	tx := mock.NewMockTransaction(ctrl)
-	constants := mock.NewMockIConstant(ctrl)
-	validators := mock.NewMockIValidator(ctrl)
-
-	module := NewModule(nil, constants, validators, nil, config.Indexer{})
-
-	signals := []*storage.SignalVersion{
-		{
-			Height:      100,
-			Time:        time.Now(),
-			Version:     11,
-			TxId:        1,
-			MsgId:       1,
-			ValidatorId: 1,
-			VotingPower: decimal.RequireFromString("123456"),
-		},
-	}
-	upgrades := sync.NewMap[uint64, *storage.Upgrade]()
-	upgrades.Set(11, &storage.Upgrade{
-		Version: 11,
-	})
-
-	constants.
-		EXPECT().
-		Get(gomock.Any(), types.ModuleNameStaking, "max_validators").
-		Return(storage.Constant{
-			Value: "100",
-		}, nil).
-		Times(1)
-
-	tx.EXPECT().
-		BondedValidators(gomock.Any(), 100).
-		Return([]storage.Validator{
-			{
-				Id:      1,
-				Version: 11,
-				Stake:   decimal.RequireFromString("123456"),
-			},
-		}, nil).
-		Times(1)
-
-	tx.EXPECT().
-		UpdateSignalsAfterUpgrade(gomock.Any(), uint64(11)).
-		Return(nil).
-		Times(1)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	err := module.postProcessingSignal(ctx, tx, signals, upgrades)
-	require.NoError(t, err)
 }

@@ -36,6 +36,7 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 	var transfer = &storage.HLTransfer{
 		Height: ctx.Block.Height,
 		Time:   ctx.Block.Time,
+		TxId:   msg.TxId,
 	}
 
 	for !end {
@@ -63,7 +64,7 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 			transfer.Body = processEvent.Message.Body
 			transfer.Type = types.HLTransferTypeReceive
 
-			if metadata := decoder.StringFromMap(msg.Data, "Metadata"); metadata != "" {
+			if metadata := msg.Data.GetStringOrDefault("Metadata"); metadata != "" {
 				decodedMetadata, err := util.DecodeEthHex(metadata)
 				if err != nil {
 					return errors.Wrap(err, "decode process message metadata")
@@ -71,20 +72,27 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 				transfer.Metadata = decodedMetadata
 			}
 
-			if relayer := decoder.StringFromMap(msg.Data, "Relayer"); relayer != "" {
+			if relayer := msg.Data.GetStringOrDefault("Relayer"); relayer != "" {
 				transfer.Relayer = &storage.Address{
-					Address: relayer,
+					Address:    relayer,
+					Height:     msg.Height,
+					LastHeight: msg.Height,
+					Balance:    storage.EmptyBalance(),
 				}
 			}
-			msg.HLTransfer = transfer
+			ctx.AddHlTransfer(transfer)
 		case types.EventTypeHyperlanewarpv1EventReceiveRemoteTransfer:
 			event, err := decode.NewHyperlaneReceiveTransferEvent(events[*idx].Data)
 			if err != nil {
 				return errors.Wrap(err, "parse hyperlane receive transfer event")
 			}
 
-			makeHyperlaneTransferAddress(event.Sender, transfer, msg.Height)
-			makeHyperlaneTransferAddress(event.Recipient, transfer, msg.Height)
+			if err := makeHyperlaneTransferAddress(ctx, event.Sender, transfer, msg.Height); err != nil {
+				return errors.Wrap(err, "makeHyperlaneTransferAddress")
+			}
+			if err := makeHyperlaneTransferAddress(ctx, event.Recipient, transfer, msg.Height); err != nil {
+				return errors.Wrap(err, "makeHyperlaneTransferAddress")
+			}
 
 			transfer.Denom = event.Denom
 			transfer.Amount = event.Amount
@@ -127,7 +135,7 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 	return nil
 }
 
-func makeHyperlaneTransferAddress(str string, transfer *storage.HLTransfer, height pkgTypes.Level) {
+func makeHyperlaneTransferAddress(ctx *context.Context, str string, transfer *storage.HLTransfer, height pkgTypes.Level) error {
 	if prefix, hash, err := pkgTypes.Address(str).Decode(); err == nil && prefix == pkgTypes.AddressPrefixCelestia {
 		transfer.Address = &storage.Address{
 			Address:    str,
@@ -135,9 +143,10 @@ func makeHyperlaneTransferAddress(str string, transfer *storage.HLTransfer, heig
 			Height:     height,
 			LastHeight: height,
 		}
-	} else {
-		str = strings.TrimPrefix(str, "0x")
-		str = strings.TrimLeft(str, "0")
-		transfer.CounterpartyAddress = str
+		return ctx.AddAddress(transfer.Address)
 	}
+	str = strings.TrimPrefix(str, "0x")
+	str = strings.TrimLeft(str, "0")
+	transfer.CounterpartyAddress = str
+	return nil
 }

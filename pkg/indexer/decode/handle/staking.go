@@ -17,18 +17,18 @@ import (
 )
 
 // MsgCreateValidator defines an SDK message for creating a new validator.
-func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cosmosStakingTypes.MsgCreateValidator) (storageTypes.MsgType, []storage.AddressWithType, []string, error) {
+func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, msgId uint64, m *cosmosStakingTypes.MsgCreateValidator) (storageTypes.MsgType, []string, error) {
 	msgType := storageTypes.MsgCreateValidator
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil {
-		return msgType, addresses, nil, err
+		return msgType, nil, err
 	}
 
 	validators := []string{m.ValidatorAddress}
 	if status == storageTypes.StatusFailed {
-		return msgType, addresses, nil, nil
+		return msgType, nil, nil
 	}
 
 	var consAddress string
@@ -44,11 +44,11 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 	validatorAddress := types.Address(m.ValidatorAddress)
 	_, b, err := validatorAddress.Decode()
 	if err != nil {
-		return msgType, addresses, nil, errors.Wrap(err, m.ValidatorAddress)
+		return msgType, nil, errors.Wrap(err, m.ValidatorAddress)
 	}
 	addr, err := types.NewAddressFromBytes(b)
 	if err != nil {
-		return msgType, addresses, nil, errors.Wrap(err, m.ValidatorAddress)
+		return msgType, nil, errors.Wrap(err, m.ValidatorAddress)
 	}
 
 	jailed := false
@@ -86,9 +86,8 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 			},
 		}
 		if err := ctx.AddAddress(&address); err != nil {
-			return msgType, nil, validators, err
+			return msgType, validators, err
 		}
-		addresses[0].Balance = address.Balance
 
 		ctx.AddDelegation(storage.Delegation{
 			Address:   &address,
@@ -124,22 +123,22 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, m *cos
 
 	ctx.AddValidator(validator)
 
-	return msgType, addresses, validators, err
+	return msgType, validators, err
 }
 
 // MsgEditValidator defines a SDK message for editing an existing validator.
-func MsgEditValidator(ctx *context.Context, status storageTypes.Status, m *cosmosStakingTypes.MsgEditValidator) (storageTypes.MsgType, []storage.AddressWithType, []string, error) {
+func MsgEditValidator(ctx *context.Context, status storageTypes.Status, msgId uint64, m *cosmosStakingTypes.MsgEditValidator) (storageTypes.MsgType, []string, error) {
 	msgType := storageTypes.MsgEditValidator
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 	if err != nil {
-		return msgType, addresses, nil, err
+		return msgType, nil, err
 	}
 
 	validators := []string{m.ValidatorAddress}
 	if status == storageTypes.StatusFailed {
-		return msgType, addresses, nil, nil
+		return msgType, nil, nil
 	}
 
 	validator := storage.Validator{
@@ -163,60 +162,60 @@ func MsgEditValidator(ctx *context.Context, status storageTypes.Status, m *cosmo
 		validator.MinSelfDelegation = decimal.RequireFromString(m.MinSelfDelegation.String())
 	}
 	ctx.AddValidator(validator)
-	return msgType, addresses, validators, err
+	return msgType, validators, err
 }
 
 // MsgDelegate defines a SDK message for performing a delegation of coins
 // from a delegator to a validator.
-func MsgDelegate(ctx *context.Context, m *cosmosStakingTypes.MsgDelegate) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgDelegate(ctx *context.Context, msgId uint64, m *cosmosStakingTypes.MsgDelegate) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgDelegate
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
-	}, ctx.Block.Height)
+	}, ctx.Block.Height, msgId)
 
-	return msgType, addresses, err
+	return msgType, err
 }
 
 // MsgBeginRedelegate defines an SDK message for performing a redelegation
 // of coins from a delegator and source validator to a destination validator.
-func MsgBeginRedelegate(ctx *context.Context, m *cosmosStakingTypes.MsgBeginRedelegate) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgBeginRedelegate(ctx *context.Context, msgId uint64, m *cosmosStakingTypes.MsgBeginRedelegate) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgBeginRedelegate
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
 		{t: storageTypes.MsgAddressTypeValidatorSrc, address: m.ValidatorSrcAddress},
 		{t: storageTypes.MsgAddressTypeValidatorDst, address: m.ValidatorDstAddress},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgUndelegate defines a SDK message for performing an undelegation from a
 // delegate and a validator.
-func MsgUndelegate(ctx *context.Context, m *cosmosStakingTypes.MsgUndelegate) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUndelegate(ctx *context.Context, msgId uint64, m *cosmosStakingTypes.MsgUndelegate) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUndelegate
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgCancelUnbondingDelegation defines the SDK message for performing a cancel unbonding delegation for delegator
 //
 // Since: cosmos-sdk 0.46
-func MsgCancelUnbondingDelegation(ctx *context.Context, m *cosmosStakingTypes.MsgCancelUnbondingDelegation) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgCancelUnbondingDelegation(ctx *context.Context, msgId uint64, m *cosmosStakingTypes.MsgCancelUnbondingDelegation) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgCancelUnbondingDelegation
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeDelegator, address: m.DelegatorAddress},
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
-func MsgUpdateParamsStaking(ctx *context.Context, m *cosmosStakingTypes.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateParamsStaking(ctx *context.Context, msgId uint64, m *cosmosStakingTypes.MsgUpdateParams) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateParams
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }

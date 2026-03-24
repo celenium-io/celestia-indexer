@@ -6,6 +6,7 @@ package profiler
 import (
 	"fmt"
 	"runtime"
+	"time"
 
 	"github.com/grafana/pyroscope-go"
 )
@@ -30,7 +31,7 @@ func New(cfg *Config, service string) (*pyroscope.Profiler, error) {
 			"project": cfg.Project,
 			"service": service,
 		},
-
+		UploadRate: time.Minute,
 		ProfileTypes: []pyroscope.ProfileType{
 			pyroscope.ProfileCPU,
 			pyroscope.ProfileAllocObjects,
@@ -39,9 +40,7 @@ func New(cfg *Config, service string) (*pyroscope.Profiler, error) {
 			pyroscope.ProfileInuseSpace,
 			pyroscope.ProfileGoroutines,
 			pyroscope.ProfileMutexCount,
-			pyroscope.ProfileMutexDuration,
 			pyroscope.ProfileBlockCount,
-			pyroscope.ProfileBlockDuration,
 		},
 	})
 }

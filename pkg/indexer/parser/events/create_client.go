@@ -25,7 +25,7 @@ func handleCreateClient(ctx *context.Context, events []storage.Event, msg *stora
 	return processCreateClient(ctx, events, msg, idx)
 }
 
-func processCreateClient(_ *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+func processCreateClient(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	cc, err := decode.NewUpdateClient(events[*idx].Data)
 	if err != nil {
 		return errors.Wrap(err, "parsing CreateClient event")
@@ -36,9 +36,9 @@ func processCreateClient(_ *context.Context, events []storage.Event, msg *storag
 		return errors.Wrap(err, "receiving ClientState from message")
 	}
 
-	signer := decoder.StringFromMap(msg.Data, "Signer")
+	signer := msg.Data.GetStringOrDefault("Signer")
 
-	msg.IbcClient = &storage.IbcClient{
+	ibcClient := &storage.IbcClient{
 		Height:                msg.Height,
 		Type:                  cc.Type,
 		CreatedAt:             msg.Time,
@@ -57,7 +57,9 @@ func processCreateClient(_ *context.Context, events []storage.Event, msg *storag
 		Creator: &storage.Address{
 			Address: signer,
 		},
+		TxId: msg.TxId,
 	}
+	ctx.AddIbcClient(ibcClient)
 	*idx += 2
 	return nil
 }

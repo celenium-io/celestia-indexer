@@ -13,14 +13,12 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	dCtx "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	tmTypes "github.com/cometbft/cometbft/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,7 +29,7 @@ func createModules(t *testing.T) (modules.BaseModule, string, Module) {
 	parserModule := NewModule(config.Indexer{})
 
 	err := parserModule.AttachTo(&writerModule, outputName, InputName)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	return writerModule, outputName, parserModule
 }
@@ -57,7 +55,7 @@ func getExpectedBlock() storage.Block {
 		ProposerAddress:    types.Hex{0x0, 0x0, 0x1, 0x9}.String(),
 		ChainId:            "celestia-explorer-test",
 		Txs:                make([]storage.Tx, 0),
-		Events:             make([]storage.Event, 0),
+		Events:             nil,
 		BlockSignatures: []storage.BlockSignature{
 			{
 				Height: 999,
@@ -83,8 +81,8 @@ func getExpectedBlock() storage.Block {
 	}
 }
 
-func getBlock() types.BlockData {
-	return types.BlockData{
+func getBlock() *types.BlockData {
+	return &types.BlockData{
 		ResultBlock: types.ResultBlock{
 			BlockID: types.BlockId{
 				Hash: types.Hex{0x0, 0x0, 0x0, 0x2},
@@ -117,13 +115,11 @@ func getBlock() types.BlockData {
 				},
 				LastCommit: &types.Commit{
 					Height: 999,
-					Round:  1,
-					Signatures: []tmTypes.CommitSig{
+					Signatures: []types.CommitSig{
 						{
 							BlockIDFlag:      tmTypes.BlockIDFlagCommit,
 							ValidatorAddress: testHashAddress,
 							Timestamp:        time.Time{},
-							Signature:        testsuite.MustHexDecode("0011"),
 						},
 					},
 				},
@@ -156,7 +152,7 @@ func TestParserModule_Success(t *testing.T) {
 	readerModule.CreateInput(readerInputName)
 
 	err := readerModule.AttachTo(&parserModule, OutputName, readerInputName)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(t.Context(), time.Second*5)
 	defer cancel()
@@ -171,13 +167,13 @@ func TestParserModule_Success(t *testing.T) {
 		case <-ctx.Done():
 			t.Error("stop by cancelled context")
 		case msg, ok := <-readerModule.MustInput(readerInputName).Listen():
-			assert.True(t, ok, "received value should be delivered by successful send operation")
+			require.True(t, ok, "received value should be delivered by successful send operation")
 
 			received, ok := msg.(*dCtx.Context)
-			assert.Truef(t, ok, "invalid message type: %T", msg)
+			require.Truef(t, ok, "invalid message type: %T", msg)
 
 			expectedBlock := getExpectedBlock()
-			assert.Equal(t, expectedBlock, *received.Block)
+			require.Equal(t, expectedBlock, *received.Block)
 			return
 		}
 	}
@@ -191,7 +187,7 @@ func TestModule_OnClosedChannel(t *testing.T) {
 	stopperModule.CreateInput(stopInputName)
 
 	err := stopperModule.AttachTo(&parserModule, StopOutput, stopInputName)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(t.Context(), time.Second*1)
 	defer cancel()
@@ -199,14 +195,14 @@ func TestModule_OnClosedChannel(t *testing.T) {
 	parserModule.Start(ctx)
 
 	err = parserModule.MustInput(InputName).Close()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	for {
 		select {
 		case <-ctx.Done():
 			t.Error("stop by cancelled context")
 		case msg := <-stopperModule.MustInput(stopInputName).Listen():
-			assert.Equal(t, struct{}{}, msg)
+			require.Equal(t, struct{}{}, msg)
 			return
 		}
 	}
@@ -220,7 +216,7 @@ func TestModule_OnParseError(t *testing.T) {
 	stopperModule.CreateInput(stopInputName)
 
 	err := stopperModule.AttachTo(&parserModule, StopOutput, stopInputName)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(t.Context(), time.Second*1)
 	defer cancel()
@@ -228,17 +224,15 @@ func TestModule_OnParseError(t *testing.T) {
 	parserModule.Start(ctx)
 
 	block := getBlock()
-	block.Block.Txs = tmTypes.Txs{
+	block.Block.Txs = [][]byte{
 		// unfinished sequence of tx bytes
 		{10, 171, 1, 10, 168, 1, 10, 35, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98},
 	}
 	block.Block.SquareSize = 1
-	block.TxsResults = []*types.ResponseDeliverTx{
+	block.TxsResults = []types.ResponseDeliverTx{
 		{
 			Code:      0,
-			Data:      []byte{18, 45, 10, 43, 47, 99, 111, 115, 109, 111, 115, 46, 115, 116, 97, 107, 105, 110, 103, 46, 118, 49, 98, 101, 116, 97},
-			Log:       "",
-			Info:      "",
+			Log:       nil,
 			GasWanted: 20,
 			GasUsed:   10,
 			Events:    nil,
@@ -252,7 +246,7 @@ func TestModule_OnParseError(t *testing.T) {
 		case <-ctx.Done():
 			t.Error("stop by cancelled context")
 		case msg := <-stopperModule.MustInput(stopInputName).Listen():
-			assert.Equal(t, struct{}{}, msg)
+			require.Equal(t, struct{}{}, msg)
 			return
 		}
 	}

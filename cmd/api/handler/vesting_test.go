@@ -51,7 +51,7 @@ func (s *VestingTestSuite) TestPeriods() {
 	q := make(url.Values)
 	q.Set("limit", "5")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/vesting/:id/periods")

@@ -43,7 +43,7 @@ var cfgDefault = ic.Indexer{
 	RequestBulkSize: 5,
 }
 
-func (s *ModuleTestSuite) createModule() Module {
+func (s *ModuleTestSuite) createModule() *Module {
 	state := storage.State{
 		Id:         1,
 		Name:       testIndexerName,
@@ -57,7 +57,7 @@ func (s *ModuleTestSuite) createModule() Module {
 	return receiverModule
 }
 
-func (s *ModuleTestSuite) createModuleEmptyState(cfgOptional *ic.Indexer) Module {
+func (s *ModuleTestSuite) createModuleEmptyState(cfgOptional *ic.Indexer) *Module {
 	cfg := cfgDefault
 	if cfgOptional != nil {
 		cfg = *cfgOptional
@@ -78,7 +78,7 @@ func (s *ModuleTestSuite) TestModule_SuccessOnStop() {
 	defer cancelCtx()
 
 	stopperModule := stopper.NewModule(cancelCtx)
-	err := stopperModule.AttachTo(&receiverModule, StopOutput, stopper.InputName)
+	err := stopperModule.AttachTo(receiverModule, StopOutput, stopper.InputName)
 	s.Require().NoError(err)
 
 	stopperCtx, stopperCtxCancel := context.WithCancel(context.Background())

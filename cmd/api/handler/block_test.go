@@ -17,7 +17,6 @@ import (
 
 	nodeMock "github.com/celenium-io/celestia-indexer/pkg/node/mock"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	tmTypes "github.com/cometbft/cometbft/types"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -111,7 +110,7 @@ func TestSuiteBlock_Run(t *testing.T) {
 }
 
 func (s *BlockTestSuite) TestGet() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height")
@@ -139,7 +138,7 @@ func (s *BlockTestSuite) TestGet() {
 }
 
 func (s *BlockTestSuite) TestGetNoContent() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height")
@@ -162,7 +161,7 @@ func (s *BlockTestSuite) TestGetWithoutStats() {
 	q := make(url.Values)
 	q.Set("stats", "false")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height")
@@ -193,7 +192,7 @@ func (s *BlockTestSuite) TestGetWithStats() {
 	q := make(url.Values)
 	q.Set("stats", "true")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height")
@@ -223,7 +222,7 @@ func (s *BlockTestSuite) TestGetWithStats() {
 }
 
 func (s *BlockTestSuite) TestGetInvalidBlockHeight() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height")
@@ -240,7 +239,7 @@ func (s *BlockTestSuite) TestGetInvalidBlockHeight() {
 }
 
 func (s *BlockTestSuite) TestList() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block")
@@ -272,7 +271,7 @@ func (s *BlockTestSuite) TestListWithStats() {
 	q := make(url.Values)
 	q.Set("stats", "true")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block")
@@ -305,7 +304,7 @@ func (s *BlockTestSuite) TestGetEvents() {
 	q.Set("limit", "2")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/events")
@@ -327,7 +326,7 @@ func (s *BlockTestSuite) TestGetEvents() {
 				Position: 2,
 				Type:     types.EventTypeBurn,
 				TxId:     nil,
-				Data: map[string]any{
+				Data: map[string]string{
 					"test": "value",
 				},
 			},
@@ -349,7 +348,7 @@ func (s *BlockTestSuite) TestGetEvents() {
 }
 
 func (s *BlockTestSuite) TestGetStats() {
-	req := httptest.NewRequest(http.MethodGet, "/?", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/stats")
@@ -372,7 +371,7 @@ func (s *BlockTestSuite) TestGetStats() {
 }
 
 func (s *BlockTestSuite) TestBlobs() {
-	req := httptest.NewRequest(http.MethodGet, "/?", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/blobs")
@@ -414,7 +413,7 @@ func (s *BlockTestSuite) TestBlobs() {
 }
 
 func (s *BlockTestSuite) TestGetBlobsCount() {
-	req := httptest.NewRequest(http.MethodGet, "/?", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/blobs/count")
@@ -438,7 +437,7 @@ func (s *BlockTestSuite) TestGetBlobsCount() {
 }
 
 func (s *BlockTestSuite) TestCount() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/count")
@@ -462,7 +461,7 @@ func (s *BlockTestSuite) TestGetMessages() {
 	q.Set("offset", "0")
 	q.Set("msg_type", "MsgSend")
 
-	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/messages")
@@ -526,7 +525,7 @@ func (s *BlockTestSuite) TestGetMessages() {
 }
 
 func (s *BlockTestSuite) TestBlockODS() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/ods")
@@ -544,7 +543,7 @@ func (s *BlockTestSuite) TestBlockODS() {
 		"Cs0CCqABCp0BCiAvY2VsZXN0aWEuYmxvYi52MS5Nc2dQYXlGb3JCbG9icxJ5Ci9jZWxlc3RpYTF1bTlxdDB6dWVsMGY0a3JlenZ1ejRrYTQ0M2syaHc1cGd4NDJmbhIdAAAAAAAAAAAAAAAAAAAAAAAAAAAAY2NsYWJzMDEaAt4EIiABYhBkLI4ANqUrn22XSeofPm3//nJBIe4RSOk/3tm3RUIBABJmClAKRgofL2Nvc21vcy5jcnlwdG8uc2VjcDI1NmsxLlB1YktleRIjCiEDKvAge1/isZG9nUxUjNWtsjHf0t3EAIwrXEONbjGBiVYSBAoCCAEYBRISCgwKBHV0aWESBDgzOTAQtI8FGkCaSY/c4H0h2HOeNv7C5Uu8YiuRShagt02sn8DDgSQ2qiVEQhZ+/cyh101cU8B+fFvojCjJ41gFIqC5gmplAg27Ev8EChwAAAAAAAAAAAAAAAAAAAAAAAAAAGNjbGFiczAxEt4EewogICJuYW1lIjogIjUzMjk3ODY1MTQ1XzJhZTk1ODg4MzFfNmsuanBnIiwKICAibWltZVR5cGUiOiAiaW1hZ2UvanBlZyIsCiAgInNpemUiOiA0NjIxMDk2LAogICJjaHVua3MiOiBbCiAgICB7ICJibG9iIjogIjE4OTcyLzYzNjM2YzYxNjI3MzMwMzEvNzcwMmU5ZmJjYTFlYmQxYjViMDkzZTZiOTcyMTZhMDAyYTkyNjhiN2ZiODlhNzg0ODgxZWU4NTEwZGI2NTM1MiIsICJzaXplIjogMTUwMDAwMCB9LAogICAgeyAiYmxvYiI6ICIxODk3My82MzYzNmM2MTYyNzMzMDMxLzUzMDBhOWJkZTdiZGE4MTgwOGYxZjAyNTkyYzRlZDUxMWMwN2EyYTlhNjQzM2I5Zjc4YmM4OTMxM2NkOTU3YmUiLCAic2l6ZSI6IDE1MDAwMDAgfSwKICAgIHsgImJsb2IiOiAiMTg5NzQvNjM2MzZjNjE2MjczMzAzMS9lYTA0NmIxZmQ0ZGU2OTI3Yzg0MWViNjA3YjFmZjhmZGQ2ZWJlYTQxZWM0ZTk4Zjk4NTIwMjkzNTIyN2M2YmM4IiwgInNpemUiOiAxNTAwMDAwIH0sCiAgICB7ICJibG9iIjogIjE4OTc1LzYzNjM2YzYxNjI3MzMwMzEvODUwZjg5Y2M1MmM5ODI4NzM2MTRhYWQzYmQyOGM2MTEzNmE1MWY3NTAwNjcwZGEzODhiOTEzMzk0YzQwODM3OCIsICJzaXplIjogMTIxMDk2IH0KICBdCn0KGgRCTE9C",
 	}
 
-	txs := make(tmTypes.Txs, len(rawTxs))
+	txs := make([][]byte, len(rawTxs))
 	for i := range rawTxs {
 		t, err := base64.StdEncoding.DecodeString(rawTxs[i])
 		s.Require().NoError(err)
@@ -574,7 +573,7 @@ func (s *BlockTestSuite) TestBlockODS() {
 }
 
 func (s *BlockTestSuite) TestEmptyBlockODS() {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/ods")

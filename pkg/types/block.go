@@ -77,7 +77,7 @@ type Data struct {
 	// Txs that will be applied by state @ block.Height+1.
 	// NOTE: not all txs here are valid.  We're just agreeing on the order first.
 	// This means that block.AppHash does not include these txs.
-	Txs types.Txs `json:"txs"`
+	Txs [][]byte `json:"txs"`
 
 	// SquareSize is the size of the square after splitting all the block data
 	// into shares. The erasure data is discarded after generation, and keeping this
@@ -87,8 +87,12 @@ type Data struct {
 }
 
 type Commit struct {
-	Height     int64             `json:"height,string"`
-	Round      int32             `json:"round"`
-	BlockID    BlockId           `json:"block_id"`
-	Signatures []types.CommitSig `json:"signatures"`
+	Height     int64       `json:"height,string"`
+	Signatures []CommitSig `json:"signatures"`
+}
+
+type CommitSig struct {
+	BlockIDFlag      types.BlockIDFlag `json:"block_id_flag"`
+	ValidatorAddress Hex               `json:"validator_address"`
+	Timestamp        time.Time         `json:"timestamp"`
 }

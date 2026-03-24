@@ -4,7 +4,6 @@
 package handle
 
 import (
-	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	interchainAccounts "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/types"
@@ -12,43 +11,43 @@ import (
 )
 
 // MsgRegisterInterchainAccount defines the payload for Msg/MsgRegisterInterchainAccount
-func MsgRegisterInterchainAccount(ctx *context.Context, m *interchainAccounts.MsgRegisterInterchainAccount) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgRegisterInterchainAccount(ctx *context.Context, msgId uint64, m *interchainAccounts.MsgRegisterInterchainAccount) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgRegisterInterchainAccount
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeOwner, address: m.Owner},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
 // MsgSendTx defines the payload for Msg/SendTx
-func MsgSendTx(ctx *context.Context, m *interchainAccounts.MsgSendTx) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgSendTx(ctx *context.Context, msgId uint64, m *interchainAccounts.MsgSendTx) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgSendTx
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeOwner, address: m.Owner},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
-func MsgModuleQuerySafe(ctx *context.Context, m *interchainAccountsHost.MsgModuleQuerySafe) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgModuleQuerySafe(ctx *context.Context, msgId uint64, m *interchainAccountsHost.MsgModuleQuerySafe) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgModuleQuerySafe
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
-func MsgUpdateParamsIcaHost(ctx *context.Context, m *interchainAccountsHost.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateParamsIcaHost(ctx *context.Context, msgId uint64, m *interchainAccountsHost.MsgUpdateParams) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateParams
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }
 
-func MsgUpdateParamsIcaController(ctx *context.Context, m *interchainAccounts.MsgUpdateParams) (storageTypes.MsgType, []storage.AddressWithType, error) {
+func MsgUpdateParamsIcaController(ctx *context.Context, msgId uint64, m *interchainAccounts.MsgUpdateParams) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgUpdateParams
-	addresses, err := createAddresses(ctx, addressesData{
+	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
-	}, ctx.Block.Height)
-	return msgType, addresses, err
+	}, ctx.Block.Height, msgId)
+	return msgType, err
 }

@@ -6,6 +6,7 @@ package receiver
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -14,7 +15,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/cometbft/cometbft/rpc/client/http"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
-	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/rs/zerolog/log"
 	"github.com/sony/gobreaker/v2"
 )
@@ -44,22 +44,30 @@ type Module struct {
 	cosmosApi        node.CosmosApi
 	ws               *http.HTTP
 	cfg              config.Indexer
-	blocks           chan types.BlockData
+	blocks           chan *types.BlockData
 	level            types.Level
 	receivedLevel    types.Level
 	hash             []byte
 	needGenesis      bool
-	taskQueue        *sdkSync.Map[types.Level, struct{}]
 	mx               *sync.RWMutex
 	rollbackSync     *sync.WaitGroup
 	cancelReadBlocks context.CancelFunc
+	fetchWg          *sync.WaitGroup
+	fetchSem         chan struct{}
+	bulkSize         *atomic.Int64
+	stepBulkSize     int64
+	maxBulkSize      int64
+	ewma             float64
+	ewmaMu           sync.Mutex
+	lastDecreasedAt  atomic.Int64
+	orderedBlocksLen atomic.Int64
 
-	circuitBreaker *gobreaker.CircuitBreaker[[]types.BlockData]
+	circuitBreaker *gobreaker.CircuitBreaker[any]
 }
 
 var _ modules.Module = (*Module)(nil)
 
-func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *http.HTTP, state *storage.State) Module {
+func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *http.HTTP, state *storage.State) *Module {
 	level := types.Level(cfg.StartLevel)
 	var lastHash []byte
 	if state != nil {
@@ -67,21 +75,26 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 		lastHash = state.LastHash
 	}
 
+	concurrency := max(1, cfg.FetchConcurrency)
+	maxBulkSize := max(1, cfg.RequestBulkSize)
+	chanBuf := max(64, maxBulkSize*concurrency)
+
 	receiver := Module{
 		BaseModule:    modules.New("receiver"),
 		api:           api,
 		cosmosApi:     cosmosApi,
 		ws:            ws,
 		cfg:           cfg,
-		blocks:        make(chan types.BlockData, 128),
+		blocks:        make(chan *types.BlockData, chanBuf),
 		needGenesis:   state == nil,
 		level:         level,
 		receivedLevel: level,
 		hash:          lastHash,
-		taskQueue:     sdkSync.NewMap[types.Level, struct{}](),
 		mx:            new(sync.RWMutex),
 		rollbackSync:  new(sync.WaitGroup),
-		circuitBreaker: gobreaker.NewCircuitBreaker[[]types.BlockData](gobreaker.Settings{
+		fetchWg:       new(sync.WaitGroup),
+		fetchSem:      make(chan struct{}, concurrency),
+		circuitBreaker: gobreaker.NewCircuitBreaker[any](gobreaker.Settings{
 			Name:        "BlockDataAPI",
 			MaxRequests: 2,
 			Interval:    time.Minute,
@@ -91,7 +104,12 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 				return counts.Requests >= 10 && failureRatio >= 0.6
 			},
 		}),
+		ewma:        (thresholdHigh + thresholdLow) / 2,
+		maxBulkSize: int64(maxBulkSize),
+		bulkSize:    new(atomic.Int64),
 	}
+	receiver.bulkSize.Store(max(1, receiver.maxBulkSize/2))
+	receiver.stepBulkSize = getStepBulkSize(receiver.maxBulkSize)
 
 	receiver.CreateInput(RollbackInput)
 	receiver.CreateInput(GenesisDoneInput)
@@ -101,7 +119,7 @@ func NewModule(cfg config.Indexer, api node.Api, cosmosApi node.CosmosApi, ws *h
 	receiver.CreateOutput(GenesisOutput)
 	receiver.CreateOutput(StopOutput)
 
-	return receiver
+	return &receiver
 }
 
 func (r *Module) Start(ctx context.Context) {
@@ -162,7 +180,7 @@ func (r *Module) rollback(ctx context.Context) {
 				continue
 			}
 
-			r.taskQueue.Clear()
+			r.receivedLevel = state.LastHeight
 			r.setLevel(state.LastHeight, state.LastHash)
 			r.Log.Info().Msgf("caught return from rollback to level=%d", state.LastHeight)
 			r.rollbackSync.Done()
