@@ -12,6 +12,7 @@ import (
 type Config struct {
 	*config.Config `yaml:",inline"`
 	LogLevel       string                `validate:"omitempty,oneof=debug trace info warn error fatal panic" yaml:"log_level"`
+	Logger         string                `validate:"omitempty,oneof=console json"                            yaml:"logger"`
 	ApiConfig      ApiConfig             `validate:"required"                                                yaml:"api"`
 	Profiler       *profiler.Config      `validate:"omitempty"                                               yaml:"profiler"`
 	Indexer        indexerConfig.Indexer `validate:"required"                                                yaml:"indexer"`

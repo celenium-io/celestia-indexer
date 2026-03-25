@@ -53,7 +53,7 @@ func initConfig() (*Config, error) {
 	return &cfg, nil
 }
 
-func initLogger(level string) error {
+func initLogger(level, loggerType string) error {
 	logLevel, err := zerolog.ParseLevel(level)
 	if err != nil {
 		log.Panic().Err(err).Msg("parsing log level")
@@ -72,6 +72,15 @@ func initLogger(level string) error {
 		return file + ":" + strconv.Itoa(line)
 	}
 	log.Logger = log.Logger.With().Caller().Logger()
+
+	if loggerType == "json" {
+		log.Logger = zerolog.New(os.Stdout).With().Timestamp().Caller().Logger()
+	} else {
+		log.Logger = log.Output(zerolog.ConsoleWriter{
+			Out:        os.Stdout,
+			TimeFormat: "2006-01-02 15:04:05",
+		}).With().Caller().Logger()
+	}
 
 	return nil
 }
