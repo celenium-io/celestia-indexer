@@ -29,7 +29,7 @@ func main() {
 		return
 	}
 
-	if err = initLogger(cfg.LogLevel); err != nil {
+	if err = initLogger(cfg.LogLevel, cfg.Logger); err != nil {
 		return
 	}
 

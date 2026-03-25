@@ -1,6 +1,7 @@
 version: 0.0.1
 
 log_level: ${LOG_LEVEL:-info}
+logger: ${LOGGER:-console}
 
 indexer:
   name: ${INDEXER_NAME:-celestia_indexer}
