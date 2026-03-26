@@ -573,6 +573,24 @@ func TestNewHyperlaneSendTransferEvent(t *testing.T) {
 				Sender:            "celestia1zvdlcmplx4gdh4hajwlsegnn2xzzfy470gjw4c",
 				TokenId:           "0x726f757465725f61707000000000000000000000000000010000000000000000",
 			},
+		}, {
+			name: "test 2",
+			m: map[string]string{ //nolint:gosec
+				"amount":             "\"\"",
+				"destination_domain": "812",
+				"recipient":          "\"0x0000000000000000000000009b8ae55dccca7a842182cc023bd63d24d2692e0a\"",
+				"sender":             "\"celestia1zvdlcmplx4gdh4hajwlsegnn2xzzfy470gjw4c\"",
+				"token_id":           "\"0x726f757465725f61707000000000000000000000000000010000000000000000\"",
+				"msg_index":          "0",
+			},
+			wantBody: HyperlaneSendTransferEvent{ //nolint:gosec
+				Amount:            decimal.Zero,
+				Denom:             "utia",
+				DestinationDomain: 812,
+				Recipient:         "0x0000000000000000000000009b8ae55dccca7a842182cc023bd63d24d2692e0a",
+				Sender:            "celestia1zvdlcmplx4gdh4hajwlsegnn2xzzfy470gjw4c",
+				TokenId:           "0x726f757465725f61707000000000000000000000000000010000000000000000",
+			},
 		},
 	}
 	for _, tt := range tests {

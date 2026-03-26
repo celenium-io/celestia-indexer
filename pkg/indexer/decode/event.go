@@ -656,13 +656,16 @@ func NewHyperlaneReceiveTransferEvent(m map[string]string) (hrte HyperlaneReceiv
 	if err != nil {
 		return hrte, errors.Wrap(err, "amount")
 	}
-	coin, err := types.ParseCoinNormalized(amount)
-	if err != nil {
-		hrte.Amount = decimal.Zero
-		hrte.Denom = currency.Utia
-	} else {
+	if amount != "" {
+		coin, err := types.ParseCoinNormalized(amount)
+		if err != nil {
+			return hrte, errors.Wrap(err, amount)
+		}
 		hrte.Amount = decimal.RequireFromString(coin.Amount.String())
 		hrte.Denom = coin.GetDenom()
+	} else {
+		hrte.Amount = decimal.Zero
+		hrte.Denom = currency.Utia
 	}
 
 	return hrte, nil
@@ -698,12 +701,17 @@ func NewHyperlaneSendTransferEvent(m map[string]string) (hste HyperlaneSendTrans
 	if err != nil {
 		return hste, errors.Wrap(err, "amount")
 	}
-	coin, err := types.ParseCoinNormalized(amount)
-	if err != nil {
-		return hste, errors.Wrap(err, amount)
+	if amount != "" {
+		coin, err := types.ParseCoinNormalized(amount)
+		if err != nil {
+			return hste, errors.Wrap(err, amount)
+		}
+		hste.Amount = decimal.RequireFromString(coin.Amount.String())
+		hste.Denom = coin.GetDenom()
+	} else {
+		hste.Amount = decimal.Zero
+		hste.Denom = currency.Utia
 	}
-	hste.Amount = decimal.RequireFromString(coin.Amount.String())
-	hste.Denom = coin.GetDenom()
 	return
 }
 
