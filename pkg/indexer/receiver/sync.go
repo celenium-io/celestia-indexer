@@ -72,7 +72,10 @@ func (r *Module) live(ctx context.Context) error {
 		select {
 		case <-ctx.Done():
 			return nil
-		case block := <-ch:
+		case block, ok := <-ch:
+			if !ok {
+				return errors.New("websocket subscription channel closed")
+			}
 			if block.Data == nil {
 				continue
 			}
