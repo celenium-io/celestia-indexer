@@ -24,7 +24,8 @@ func isConnectionError(err error) bool {
 	s := err.Error()
 	return strings.Contains(s, "EOF") ||
 		strings.Contains(s, "connection reset") ||
-		strings.Contains(s, "broken pipe")
+		strings.Contains(s, "broken pipe") ||
+		strings.Contains(s, "GOAWAY")
 }
 
 func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
