@@ -599,7 +599,7 @@ func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) (map
 			ids := make([]uint64, len(existsVotes))
 			totalWeight := votes[i].Weight.Copy()
 			for j := range existsVotes {
-				totalWeight = totalWeight.Add(existsVotes[j].Weight)
+				totalWeight = totalWeight.Add(existsVotes[j].Weight.Decimal)
 				ids[j] = existsVotes[j].Id
 			}
 			if totalWeight.GreaterThan(one) {
@@ -865,7 +865,7 @@ func (tx Transaction) SaveHyperlaneTransfers(ctx context.Context, transfers ...*
 	return err
 }
 
-func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned decimal.Decimal) (balances []models.Balance, err error) {
+func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned storageTypes.Numeric) (balances []models.Balance, err error) {
 	if validatorId == 0 || !burned.IsPositive() {
 		return nil, nil
 	}
@@ -1480,17 +1480,17 @@ func (tx Transaction) HyperlaneToken(ctx context.Context, id []byte) (token mode
 	return
 }
 
-func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (decimal.Decimal, error) {
+func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (storageTypes.Numeric, error) {
 	_, err := tx.Tx().NewUpdate().Table("signal_version", "validator").
 		SetColumn("voting_power", "validator.stake").
 		Where("signal_version.version = ?", version).
 		Where("validator.id = validator_id").
 		Exec(ctx)
 	if err != nil {
-		return decimal.Zero, err
+		return storageTypes.Numeric{}, err
 	}
 
-	var sum decimal.Decimal
+	var sum storageTypes.Numeric
 	err = tx.Tx().NewSelect().
 		TableExpr("(?) AS latest",
 			tx.Tx().NewSelect().

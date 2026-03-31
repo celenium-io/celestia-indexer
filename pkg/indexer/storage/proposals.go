@@ -167,7 +167,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 	}
 	validatorsPower := make(map[uint64]decimal.Decimal)
 	for i := range validators {
-		validatorsPower[validators[i].Id] = validators[i].Stake
+		validatorsPower[validators[i].Id] = validators[i].Stake.Decimal
 	}
 
 	// 3. Compute voting results
@@ -238,7 +238,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 						continue
 					}
 
-					shares := delegations[j].Amount
+					shares := delegations[j].Amount.Decimal
 					if amount, ok := validatorMinus[delegations[j].ValidatorId]; ok {
 						validatorMinus[delegations[j].ValidatorId] = amount.Add(shares)
 					} else {

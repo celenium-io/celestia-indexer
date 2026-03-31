@@ -89,7 +89,7 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 			if err != nil {
 				return err
 			}
-			delegation.Amount = decimal.RequireFromString(delegate.Amount.Amount.String())
+			delegation.Amount = storageTypes.NewNumeric(decimal.RequireFromString(delegate.Amount.Amount.String()))
 			prefix, hash, err := types.Address(delegate.Validator).Decode()
 			if err != nil {
 				return errors.Wrap(err, "decode validator address")

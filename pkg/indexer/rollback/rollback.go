@@ -288,8 +288,8 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	state.TotalNamespaces -= totalNamespaces
 	state.TotalAccounts -= int64(len(addresses))
 	state.TotalValidators -= vals.count
-	state.TotalFee = state.TotalFee.Sub(blockStats.Fee)
-	state.TotalSupply = state.TotalSupply.Sub(blockStats.SupplyChange)
+	state.TotalFee = state.TotalFee.Sub(blockStats.Fee.Decimal)
+	state.TotalSupply = state.TotalSupply.Sub(blockStats.SupplyChange.Decimal)
 
 	if err := tx.Update(ctx, &state); err != nil {
 		return tx.HandleError(ctx, err)

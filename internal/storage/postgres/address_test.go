@@ -201,11 +201,11 @@ func (s *StorageTestSuite) TestAddressListWithSortAsc() {
 			var current decimal.Decimal
 			switch field {
 			case "delegated":
-				current = addresses[i].Balance.Delegated.Copy()
+				current = addresses[i].Balance.Delegated.Copy().Decimal
 			case "spendable":
-				current = addresses[i].Balance.Spendable.Copy()
+				current = addresses[i].Balance.Spendable.Copy().Decimal
 			case "unbonding":
-				current = addresses[i].Balance.Unbonding.Copy()
+				current = addresses[i].Balance.Unbonding.Copy().Decimal
 			}
 
 			if i != 0 {

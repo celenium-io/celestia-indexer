@@ -272,7 +272,7 @@ func (s *TransactionTestSuite) TestSaveBalances() {
 	balances := make([]storage.Balance, 5)
 	for i := 0; i < 5; i++ {
 		balances[i].Id = uint64(i + 1)
-		balances[i].Spendable = decimal.RequireFromString("1000")
+		balances[i].Spendable = types.NewNumeric(decimal.RequireFromString("1000"))
 		balances[i].Currency = "utia"
 	}
 
@@ -346,7 +346,7 @@ func (s *TransactionTestSuite) TestSaveBlobLogsWithCopy() {
 		blobLogs[i].Height = 1000
 		blobLogs[i].Commitment = testsuite.RandomText(16)
 		blobLogs[i].ContentType = "application/json"
-		blobLogs[i].Fee = decimal.NewFromInt(17263)
+		blobLogs[i].Fee = types.NewNumeric(decimal.NewFromInt(17263))
 		blobLogs[i].ShareVersion = 1
 		blobLogs[i].SignerId = uint64(i * 3)
 		blobLogs[i].Size = 123
@@ -385,7 +385,7 @@ func (s *TransactionTestSuite) TestSaveTransactionsWithCopy() {
 		txs[i].Memo = "memo"
 		txs[i].MessageTypes = types.NewMsgTypeBitMask(types.IBCTransfer, types.MsgAcknowledgement)
 		txs[i].Position = int64(i)
-		txs[i].Fee = decimal.NewFromInt(17263)
+		txs[i].Fee = types.NewNumeric(decimal.NewFromInt(17263))
 		txs[i].Status = types.StatusSuccess
 		txs[i].TimeoutHeight = 1287361
 
@@ -465,11 +465,11 @@ func (s *TransactionTestSuite) TestSaveProposals() {
 		Status:      types.ProposalStatusInactive,
 		Type:        types.ProposalTypeText,
 		CreatedAt:   time.Now(),
-		VotingPower: decimal.Zero,
+		VotingPower: types.NewNumeric(decimal.Zero),
 	}, &storage.Proposal{
 		Id:          1,
 		Status:      types.ProposalStatusActive,
-		VotingPower: decimal.Zero,
+		VotingPower: types.NewNumeric(decimal.Zero),
 	})
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, count)
@@ -520,7 +520,7 @@ func (s *TransactionTestSuite) TestSaveVotes() {
 		VoterId:    3,
 		Height:     1001,
 		Time:       time.Now(),
-		Weight:     decimal.RequireFromString("1.0"),
+		Weight:     types.NewNumeric(decimal.RequireFromString("1.0")),
 	}
 
 	count, err := tx.SaveVotes(ctx, vote)
@@ -561,14 +561,14 @@ func (s *TransactionTestSuite) TestSave2Votes() {
 			VoterId:    3,
 			Height:     1001,
 			Time:       time.Now(),
-			Weight:     decimal.RequireFromString("1.0"),
+			Weight:     types.NewNumeric(decimal.RequireFromString("1.0")),
 		}, {
 			Option:     types.VoteOptionAbstain,
 			ProposalId: 1,
 			VoterId:    5,
 			Height:     1001,
 			Time:       time.Now(),
-			Weight:     decimal.RequireFromString("1.0"),
+			Weight:     types.NewNumeric(decimal.RequireFromString("1.0")),
 		},
 	}
 
@@ -604,14 +604,14 @@ func (s *TransactionTestSuite) TestSaveWeightedVotes() {
 			VoterId:    5,
 			Height:     1001,
 			Time:       time.Now(),
-			Weight:     decimal.RequireFromString("0.5"),
+			Weight:     types.NewNumeric(decimal.RequireFromString("0.5")),
 		}, {
 			Option:     types.VoteOptionAbstain,
 			ProposalId: 1,
 			VoterId:    5,
 			Height:     1001,
 			Time:       time.Now(),
-			Weight:     decimal.RequireFromString("0.5"),
+			Weight:     types.NewNumeric(decimal.RequireFromString("0.5")),
 		},
 	}
 
@@ -649,7 +649,7 @@ func (s *TransactionTestSuite) TestSaveVotesValidatorIdDuplicate() {
 		ValidatorId: testsuite.Ptr(uint64(1)),
 		Height:      1001,
 		Time:        time.Now(),
-		Weight:      decimal.RequireFromString("1.0"),
+		Weight:      types.NewNumeric(decimal.RequireFromString("1.0")),
 	}
 
 	newCount, err := tx.SaveVotes(ctx, vote)
@@ -695,7 +695,7 @@ func (s *TransactionTestSuite) TestSaveVotesAddressIdDuplicate() {
 		VoterId:    1,
 		Height:     1001,
 		Time:       time.Now(),
-		Weight:     decimal.RequireFromString("1.0"),
+		Weight:     types.NewNumeric(decimal.RequireFromString("1.0")),
 	}
 
 	newCount, err := tx.SaveVotes(ctx, vote)
@@ -1370,7 +1370,7 @@ func (s *TransactionTestSuite) TestSaveRedelegations() {
 			SrcId:          2,
 			DestId:         3,
 			AddressId:      1,
-			Amount:         decimal.NewFromInt(10),
+			Amount:         types.NewNumeric(decimal.NewFromInt(10)),
 			CompletionTime: time.Now().Add(time.Hour),
 		},
 	}
@@ -1399,7 +1399,7 @@ func (s *TransactionTestSuite) TestSaveUndelegations() {
 			Time:           time.Now(),
 			ValidatorId:    2,
 			AddressId:      1,
-			Amount:         decimal.NewFromInt(10),
+			Amount:         types.NewNumeric(decimal.NewFromInt(10)),
 			CompletionTime: time.Now().Add(time.Hour),
 		},
 	}
@@ -1426,11 +1426,11 @@ func (s *TransactionTestSuite) TestSaveDelegations() {
 		{
 			ValidatorId: 2,
 			AddressId:   1,
-			Amount:      decimal.NewFromInt(10),
+			Amount:      types.NewNumeric(decimal.NewFromInt(10)),
 		}, {
 			ValidatorId: 1,
 			AddressId:   1,
-			Amount:      decimal.NewFromInt(10),
+			Amount:      types.NewNumeric(decimal.NewFromInt(10)),
 		},
 	}
 
@@ -1488,7 +1488,7 @@ func (s *TransactionTestSuite) TestJail() {
 
 	err = tx.Jail(ctx, &storage.Validator{
 		Id:    2,
-		Stake: decimal.NewFromInt(-10),
+		Stake: types.NewNumeric(decimal.NewFromInt(-10)),
 	})
 	s.Require().NoError(err)
 
@@ -1509,7 +1509,7 @@ func (s *TransactionTestSuite) TestUpdateSlashedDelegations() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	balances, err := tx.UpdateSlashedDelegations(ctx, 1, decimal.NewFromFloat(200))
+	balances, err := tx.UpdateSlashedDelegations(ctx, 1, types.NewNumeric(decimal.NewFromFloat(200)))
 	s.Require().NoError(err)
 	s.Require().Len(balances, 2)
 
@@ -1543,38 +1543,38 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 			Address:           "celestiavaloper1cj45qyagkujxgdgv8lgjur56zjxtrsy40g3pw3",
 			Delegator:         "celestia1cj45qyagkujxgdgv8lgjur56zjxtrsy42hncch",
 			ConsAddress:       "95764047BDFFB5CCADFA635DC63365EEB65F00C2",
-			Rate:              decimal.NewFromFloat32(0.2),
-			MaxRate:           decimal.NewFromFloat32(0.2),
-			MaxChangeRate:     decimal.Zero,
-			MinSelfDelegation: decimal.Zero,
+			Rate:              types.NewNumeric(decimal.NewFromFloat32(0.2)),
+			MaxRate:           types.NewNumeric(decimal.NewFromFloat32(0.2)),
+			MaxChangeRate:     types.NewNumeric(decimal.Zero),
+			MinSelfDelegation: types.NewNumeric(decimal.Zero),
 			Identity:          "0068ECE5E6EB5359",
-			Stake:             decimal.NewFromInt(100),
+			Stake:             types.NewNumeric(decimal.NewFromInt(100)),
 			Moniker:           "Polychain",
-			Commissions:       decimal.Zero,
-			Rewards:           decimal.Zero,
+			Commissions:       types.NewNumeric(decimal.Zero),
+			Rewards:           types.NewNumeric(decimal.Zero),
 			Height:            1001,
 			Jailed:            testsuite.Ptr(false),
 			CreationTime:      ct,
 		}, {
 			Address:     "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
 			Delegator:   "celestia189ecvq5avj0wehrcfnagpd5sd8pup9aq7j2xd9",
-			Rate:        decimal.NewFromFloat32(0.06),
-			Commissions: decimal.NewFromInt(100),
-			Rewards:     decimal.NewFromInt(200),
+			Rate:        types.NewNumeric(decimal.NewFromFloat32(0.06)),
+			Commissions: types.NewNumeric(decimal.NewFromInt(100)),
+			Rewards:     types.NewNumeric(decimal.NewFromInt(200)),
 			Website:     "test-website",
 			Identity:    storage.DoNotModify,
 			Contacts:    storage.DoNotModify,
 			Moniker:     storage.DoNotModify,
 			Details:     storage.DoNotModify,
-			Stake:       decimal.Zero,
+			Stake:       types.NewNumeric(decimal.Zero),
 			Height:      1001,
 			Jailed:      testsuite.Ptr(true),
 		}, {
 			Address:     "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw",
 			Delegator:   "celestia17vmk8m246t648hpmde2q7kp4ft9uwrayps85dg",
-			Commissions: decimal.NewFromInt(100),
-			Rewards:     decimal.NewFromInt(200),
-			Stake:       decimal.Zero,
+			Commissions: types.NewNumeric(decimal.NewFromInt(100)),
+			Rewards:     types.NewNumeric(decimal.NewFromInt(200)),
+			Stake:       types.NewNumeric(decimal.Zero),
 			Website:     storage.DoNotModify,
 			Identity:    storage.DoNotModify,
 			Contacts:    storage.DoNotModify,
@@ -1626,14 +1626,14 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 		{
 			Address:     "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
 			Delegator:   "celestia189ecvq5avj0wehrcfnagpd5sd8pup9aq7j2xd9",
-			Commissions: decimal.NewFromInt(100),
-			Rewards:     decimal.NewFromInt(200),
+			Commissions: types.NewNumeric(decimal.NewFromInt(100)),
+			Rewards:     types.NewNumeric(decimal.NewFromInt(200)),
 			Identity:    storage.DoNotModify,
 			Website:     storage.DoNotModify,
 			Contacts:    storage.DoNotModify,
 			Moniker:     storage.DoNotModify,
 			Details:     storage.DoNotModify,
-			Stake:       decimal.Zero,
+			Stake:       types.NewNumeric(decimal.Zero),
 		},
 	}
 
@@ -1848,7 +1848,7 @@ func (s *TransactionTestSuite) TestIbcChannels() {
 		CounterpartyChannelId: "channel-100",
 		Ordering:              true,
 		Status:                types.IbcChannelStatusClosed,
-		Sent:                  decimal.RequireFromString("100"),
+		Sent:                  types.NewNumeric(decimal.RequireFromString("100")),
 		TransfersCount:        10,
 	}, &storage.IbcChannel{
 		Id:                 "channel-1",
@@ -1856,8 +1856,8 @@ func (s *TransactionTestSuite) TestIbcChannels() {
 		ConfirmationHeight: 10000,
 		ConfirmationTxId:   100,
 		Status:             types.IbcChannelStatusInitialization,
-		Sent:               decimal.RequireFromString("100"),
-		Received:           decimal.RequireFromString("100"),
+		Sent:               types.NewNumeric(decimal.RequireFromString("100")),
+		Received:           types.NewNumeric(decimal.RequireFromString("100")),
 		TransfersCount:     12,
 	})
 	s.Require().NoError(err)
@@ -1888,7 +1888,7 @@ func (s *TransactionTestSuite) TestIbcTransfers() {
 		ChannelId:       "channel-1",
 		Height:          10000,
 		Time:            time.Now().UTC(),
-		Amount:          decimal.RequireFromString("12123123"),
+		Amount:          types.NewNumeric(decimal.RequireFromString("12123123")),
 		Denom:           currency.Utia,
 		SenderId:        testsuite.Ptr(uint64(1)),
 		ReceiverAddress: testsuite.Ptr("osmo1m8wg4vxkefhs374qxmmqpyusgz289wmulex5qdwpfx7jnrxzer5s9cv83q"),
@@ -1935,7 +1935,7 @@ func (s *TransactionTestSuite) TestHyperlaneTransfers() {
 		Id:                  123,
 		Height:              10000,
 		Time:                time.Now().UTC(),
-		Amount:              decimal.RequireFromString("12123123"),
+		Amount:              types.NewNumeric(decimal.RequireFromString("12123123")),
 		Denom:               currency.Utia,
 		TxId:                2,
 		MailboxId:           1,
@@ -1981,8 +1981,8 @@ func (s *TransactionTestSuite) TestHyperlaneTokens() {
 		Type:             types.HLTokenTypeCollateral,
 		SentTransfers:    1,
 		ReceiveTransfers: 1,
-		Sent:             decimal.RequireFromString("123"),
-		Received:         decimal.Zero,
+		Sent:             types.NewNumeric(decimal.RequireFromString("123")),
+		Received:         types.NewNumeric(decimal.Zero),
 	})
 	s.Require().NoError(err)
 
@@ -2076,15 +2076,15 @@ func (s *TransactionTestSuite) TestSaveSignals() {
 		Address:           "celestiavaloper1cj45qyagkujxgdgv8lgjur56zjxtrsy40g3pw3",
 		Delegator:         "celestia1cj45qyagkujxgdgv8lgjur56zjxtrsy42hncch",
 		ConsAddress:       "95764047BDFFB5CCADFA635DC63365EEB65F00C2",
-		Rate:              decimal.NewFromFloat32(0.2),
-		MaxRate:           decimal.NewFromFloat32(0.2),
-		MaxChangeRate:     decimal.Zero,
-		MinSelfDelegation: decimal.Zero,
+		Rate:              types.NewNumeric(decimal.NewFromFloat32(0.2)),
+		MaxRate:           types.NewNumeric(decimal.NewFromFloat32(0.2)),
+		MaxChangeRate:     types.NewNumeric(decimal.Zero),
+		MinSelfDelegation: types.NewNumeric(decimal.Zero),
 		Identity:          "0068ECE5E6EB5359",
-		Stake:             decimal.NewFromInt(100),
+		Stake:             types.NewNumeric(decimal.NewFromInt(100)),
 		Moniker:           "Polychain",
-		Commissions:       decimal.Zero,
-		Rewards:           decimal.Zero,
+		Commissions:       types.NewNumeric(decimal.Zero),
+		Rewards:           types.NewNumeric(decimal.Zero),
 		Height:            1001,
 		Jailed:            testsuite.Ptr(false),
 	}
@@ -2093,7 +2093,7 @@ func (s *TransactionTestSuite) TestSaveSignals() {
 		&storage.SignalVersion{
 			Id:          1,
 			Height:      1111,
-			VotingPower: decimal.RequireFromString("1000"),
+			VotingPower: types.NewNumeric(decimal.RequireFromString("1000")),
 			MsgId:       1,
 			TxId:        1,
 			Time:        time.Now().UTC(),
@@ -2103,7 +2103,7 @@ func (s *TransactionTestSuite) TestSaveSignals() {
 		}, &storage.SignalVersion{
 			Id:          2,
 			Height:      2222,
-			VotingPower: decimal.RequireFromString("2000"),
+			VotingPower: types.NewNumeric(decimal.RequireFromString("2000")),
 			MsgId:       2,
 			TxId:        2,
 			Time:        time.Now().UTC(),
@@ -2325,16 +2325,16 @@ func (s *TransactionTestSuite) TestSaveIgpConfig() {
 			Id:                1,
 			Height:            1111,
 			Time:              time.Now().UTC(),
-			GasOverhead:       decimal.RequireFromString("100000"),
-			GasPrice:          decimal.RequireFromString("1"),
+			GasOverhead:       types.NewNumeric(decimal.RequireFromString("100000")),
+			GasPrice:          types.NewNumeric(decimal.RequireFromString("1")),
 			RemoteDomain:      1488,
 			TokenExchangeRate: "1234567",
 		}, storage.HLIGPConfig{
 			Id:                1,
 			Height:            1112,
 			Time:              time.Now().UTC(),
-			GasOverhead:       decimal.RequireFromString("200000"),
-			GasPrice:          decimal.RequireFromString("2"),
+			GasOverhead:       types.NewNumeric(decimal.RequireFromString("200000")),
+			GasPrice:          types.NewNumeric(decimal.RequireFromString("2")),
 			RemoteDomain:      1489,
 			TokenExchangeRate: "87654321",
 		})
@@ -2375,8 +2375,8 @@ func (s *TransactionTestSuite) TestSaveHyperlaneGasPayments() {
 			Id:         1,
 			Height:     1111,
 			Time:       time.Now().UTC(),
-			GasAmount:  decimal.RequireFromString("1"),
-			Amount:     decimal.RequireFromString("1234"),
+			GasAmount:  types.NewNumeric(decimal.RequireFromString("1")),
+			Amount:     types.NewNumeric(decimal.RequireFromString("1234")),
 			IgpId:      1,
 			TransferId: 1,
 		})

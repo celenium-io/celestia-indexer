@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -28,9 +27,9 @@ type ListHyperlaneTransferFilters struct {
 }
 
 type DomainStats struct {
-	Domain  uint64          `bun:"domain_id"`
-	Amount  decimal.Decimal `bun:"amount"`
-	TxCount uint64          `bun:"tx_count"`
+	Domain  uint64        `bun:"domain_id"`
+	Amount  types.Numeric `bun:"amount"`
+	TxCount uint64        `bun:"tx_count"`
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -60,7 +59,7 @@ type HLTransfer struct {
 	Body                []byte               `bun:"body,type:bytea,nullzero"      comment:"Body"`
 	Metadata            []byte               `bun:"metadata,type:bytea,nullzero"  comment:"Metadata"`
 	Type                types.HLTransferType `bun:",type:hyperlane_transfer_type" comment:"Transfer type"`
-	Amount              decimal.Decimal      `bun:"amount,type:numeric"           comment:"Amount"`
+	Amount              types.Numeric        `bun:"amount,type:numeric"           comment:"Amount"`
 	Denom               string               `bun:"denom"                         comment:"Denom"`
 
 	Mailbox    *HLMailbox    `bun:"rel:belongs-to,join:mailbox_id=id"`

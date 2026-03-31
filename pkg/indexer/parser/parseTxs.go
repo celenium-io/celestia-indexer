@@ -46,7 +46,7 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 	t.TimeoutHeight = d.TimeoutHeight
 	t.EventsCount = int64(len(txRes.Events))
 	t.MessagesCount = int64(len(d.Messages))
-	t.Fee = d.Fee
+	t.Fee = storageTypes.NewNumeric(d.Fee)
 	t.Status = storageTypes.StatusSuccess
 	t.Codespace = txRes.Codespace
 	t.Hash = d.Hash
@@ -68,9 +68,9 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 			Hash:       signerBytes,
 			Balance: storage.Balance{
 				Currency:  currency.DefaultCurrency,
-				Spendable: decimal.Zero,
-				Delegated: decimal.Zero,
-				Unbonding: decimal.Zero,
+				Spendable: storageTypes.NewNumeric(decimal.Zero),
+				Delegated: storageTypes.NewNumeric(decimal.Zero),
+				Unbonding: storageTypes.NewNumeric(decimal.Zero),
 			},
 		}
 		t.Signers = append(t.Signers, address)
@@ -138,7 +138,7 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 		ctx.AddMessage(&dm.Msg)
 	}
 
-	ctx.Block.Stats.Fee = ctx.Block.Stats.Fee.Add(t.Fee)
+	ctx.Block.Stats.Fee = ctx.Block.Stats.Fee.Add(t.Fee.Decimal)
 	ctx.Block.MessageTypes.Set(t.MessageTypes.Bits)
 	ctx.Block.Stats.BlobsSize += t.BlobsSize
 	ctx.Block.Stats.GasLimit += t.GasWanted

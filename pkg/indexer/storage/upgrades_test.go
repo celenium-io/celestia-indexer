@@ -10,6 +10,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	indexerCfg "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/shopspring/decimal"
@@ -27,13 +28,13 @@ func TestUpgradeV7(t *testing.T) {
 		Return([]*storage.Validator{
 			{
 				Id:      1,
-				Rate:    decimal.RequireFromString("0.150000000000000000"),
-				MaxRate: decimal.RequireFromString("0.500000000000000000"),
+				Rate:    storageTypes.NewNumeric(decimal.RequireFromString("0.150000000000000000")),
+				MaxRate: storageTypes.NewNumeric(decimal.RequireFromString("0.500000000000000000")),
 			},
 			{
 				Id:      2,
-				Rate:    decimal.RequireFromString("0.250000000000000000"),
-				MaxRate: decimal.RequireFromString("0.700000000000000000"),
+				Rate:    storageTypes.NewNumeric(decimal.RequireFromString("0.250000000000000000")),
+				MaxRate: storageTypes.NewNumeric(decimal.RequireFromString("0.700000000000000000")),
 			},
 		}, nil).
 		Times(1)

@@ -142,7 +142,7 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 		packetMap["Data"] = packet
 
 		transfer := &storage.IbcTransfer{
-			Amount:    decimal.RequireFromString(packet.Amount),
+			Amount:    storageTypes.NewNumeric(decimal.RequireFromString(packet.Amount)),
 			Memo:      packet.Memo,
 			ChannelId: m.Packet.DestinationChannel,
 			Port:      m.Packet.DestinationPort,
@@ -191,7 +191,7 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 				Type:    storageTypes.MsgAddressTypeReceiver,
 				Address: transfer.Receiver,
 			})
-			channel.Received = channel.Received.Add(transfer.Amount)
+			channel.Received = channel.Received.Add(transfer.Amount.Decimal)
 		} else {
 			transfer.ReceiverAddress = &packet.Receiver
 		}
@@ -215,7 +215,7 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 				Type:    storageTypes.MsgAddressTypeSender,
 				Address: transfer.Sender,
 			})
-			channel.Sent = channel.Sent.Add(transfer.Amount)
+			channel.Sent = channel.Sent.Add(transfer.Amount.Decimal)
 		} else {
 			transfer.SenderAddress = &packet.Sender
 		}
@@ -301,7 +301,7 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 		packetMap["Data"] = packet
 
 		transfer := &storage.IbcTransfer{
-			Amount:    decimal.RequireFromString(packet.Amount),
+			Amount:    storageTypes.NewNumeric(decimal.RequireFromString(packet.Amount)),
 			Memo:      packet.Memo,
 			ChannelId: m.Packet.SourceChannel,
 			Port:      m.Packet.SourcePort,
@@ -350,7 +350,7 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 				Type:    storageTypes.MsgAddressTypeReceiver,
 				Address: transfer.Receiver,
 			})
-			channel.Received = channel.Received.Add(transfer.Amount)
+			channel.Received = channel.Received.Add(transfer.Amount.Decimal)
 		} else {
 			transfer.ReceiverAddress = &packet.Receiver
 		}
@@ -374,7 +374,7 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 				Type:    storageTypes.MsgAddressTypeSender,
 				Address: transfer.Sender,
 			})
-			channel.Sent = channel.Sent.Add(transfer.Amount)
+			channel.Sent = channel.Sent.Add(transfer.Amount.Decimal)
 		} else {
 			transfer.SenderAddress = &packet.Sender
 		}

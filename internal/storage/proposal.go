@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -34,7 +33,7 @@ type Proposal struct {
 	Type           types.ProposalType   `bun:"type,type:proposal_type"     comment:"Proposal type"`
 	Title          string               `bun:"title"                       comment:"Title"`
 	Description    string               `bun:"description"                 comment:"Proposal description"`
-	Deposit        decimal.Decimal      `bun:"deposit,type:numeric"        comment:"Deposit"`
+	Deposit        types.Numeric        `bun:"deposit,type:numeric"        comment:"Deposit"`
 	Metadata       string               `bun:"metadata"                    comment:"Metadata"`
 	Changes        []byte               `bun:"changes,type:bytea"          comment:"JSON object with proposal changes"`
 
@@ -54,12 +53,12 @@ type Proposal struct {
 	NoWithVetoAddress int64 `bun:"no_with_veto_addrs" comment:"Count of no votes with veto by addresses"`
 	AbstainAddress    int64 `bun:"abstain_addrs"      comment:"Count of abstain votes by addresses"`
 
-	VotingPower           decimal.Decimal `bun:"voting_power,type:numeric"              comment:"Summary voting power of all votes"`
-	YesVotingPower        decimal.Decimal `bun:"yes_voting_power,type:numeric"          comment:"Yes voting power"`
-	NoVotingPower         decimal.Decimal `bun:"no_voting_power,type:numeric"           comment:"No voting power"`
-	NoWithVetoVotingPower decimal.Decimal `bun:"no_with_veto_voting_power,type:numeric" comment:"No with veto voting power"`
-	AbstainVotingPower    decimal.Decimal `bun:"abstain_voting_power,type:numeric"      comment:"Abstain voting power"`
-	TotalVotingPower      decimal.Decimal `bun:"total_voting_power,type:numeric"        comment:"Total voting power in the network"`
+	VotingPower           types.Numeric `bun:"voting_power,type:numeric"              comment:"Summary voting power of all votes"`
+	YesVotingPower        types.Numeric `bun:"yes_voting_power,type:numeric"          comment:"Yes voting power"`
+	NoVotingPower         types.Numeric `bun:"no_voting_power,type:numeric"           comment:"No voting power"`
+	NoWithVetoVotingPower types.Numeric `bun:"no_with_veto_voting_power,type:numeric" comment:"No with veto voting power"`
+	AbstainVotingPower    types.Numeric `bun:"abstain_voting_power,type:numeric"      comment:"Abstain voting power"`
+	TotalVotingPower      types.Numeric `bun:"total_voting_power,type:numeric"        comment:"Total voting power in the network"`
 
 	Quorum     string `bun:"quorum"      comment:"The minimum percentage of voting power that needs to be cast on a proposal for the result to be valid"`
 	VetoQuorum string `bun:"veto_quorum" comment:"Minimum value of Veto votes to Total votes ratio for proposal to be vetoed"`

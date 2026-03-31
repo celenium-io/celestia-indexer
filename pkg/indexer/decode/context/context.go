@@ -109,9 +109,9 @@ func (ctx *Context) AddAddress(address *storage.Address) error {
 	}
 	if addr, ok := ctx.Addresses.Get(address.String()); ok {
 		if address.Balance.Currency == currency.DefaultCurrency { // hotfix for balance updates with non-default currency
-			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
-			addr.Balance.Delegated = addr.Balance.Delegated.Add(address.Balance.Delegated)
-			addr.Balance.Unbonding = addr.Balance.Unbonding.Add(address.Balance.Unbonding)
+			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable.Decimal)
+			addr.Balance.Delegated = addr.Balance.Delegated.Add(address.Balance.Delegated.Decimal)
+			addr.Balance.Unbonding = addr.Balance.Unbonding.Add(address.Balance.Unbonding.Decimal)
 		}
 
 		if address.IsForwarding {
@@ -133,13 +133,13 @@ func (ctx *Context) AddAddress(address *storage.Address) error {
 func (ctx *Context) AddValidator(validator storage.Validator) {
 	if val, ok := ctx.Validators.Get(validator.Address); ok {
 		if !validator.Stake.IsZero() {
-			val.Stake = val.Stake.Add(validator.Stake)
+			val.Stake = val.Stake.Add(validator.Stake.Decimal)
 		}
 		if !validator.Commissions.IsZero() {
-			val.Commissions = val.Commissions.Add(validator.Commissions)
+			val.Commissions = val.Commissions.Add(validator.Commissions.Decimal)
 		}
 		if !validator.Rewards.IsZero() {
-			val.Rewards = val.Rewards.Add(validator.Rewards)
+			val.Rewards = val.Rewards.Add(validator.Rewards.Decimal)
 		}
 		if !validator.MaxChangeRate.IsZero() {
 			val.MaxChangeRate = validator.MaxChangeRate.Copy()
@@ -209,12 +209,12 @@ func (ctx *Context) SubSupply(data map[string]string) {
 }
 
 func (ctx *Context) SetInflation(data map[string]string) {
-	ctx.Block.Stats.InflationRate = decoder.DecimalFromMap(data, "inflation_rate")
+	ctx.Block.Stats.InflationRate = types.NewNumeric(decoder.DecimalFromMap(data, "inflation_rate"))
 }
 
 func (ctx *Context) AddDelegation(d storage.Delegation) {
 	if val, ok := ctx.Delegations.Get(d.String()); ok {
-		val.Amount = val.Amount.Add(d.Amount)
+		val.Amount = val.Amount.Add(d.Amount.Decimal)
 	} else {
 		ctx.Delegations.Set(d.String(), &d)
 	}
@@ -246,8 +246,8 @@ func (ctx *Context) AddJail(jail storage.Jail) {
 			j.Reason = jail.Reason
 		}
 		if !jail.Burned.IsZero() {
-			j.Validator.Stake = j.Validator.Stake.Sub(jail.Burned)
-			j.Burned = j.Burned.Add(jail.Burned)
+			j.Validator.Stake = j.Validator.Stake.Sub(jail.Burned.Decimal)
+			j.Burned = j.Burned.Add(jail.Burned.Decimal)
 		}
 		if jail.Validator.Jailed != nil {
 			j.Validator.Jailed = jail.Validator.Jailed
@@ -270,7 +270,7 @@ func (ctx *Context) AddProposal(proposal *storage.Proposal) {
 			p.ActivationTime = proposal.ActivationTime
 		}
 		if proposal.Deposit.IsPositive() {
-			p.Deposit = p.Deposit.Add(proposal.Deposit)
+			p.Deposit = p.Deposit.Add(proposal.Deposit.Decimal)
 		}
 	} else {
 		ctx.Proposals.Set(proposal.Id, proposal)
@@ -359,8 +359,8 @@ func (ctx *Context) AddIbcConnection(conn *storage.IbcConnection) {
 
 func (ctx *Context) AddIbcChannel(channel *storage.IbcChannel) {
 	if ch, ok := ctx.IbcChannels.Get(channel.Id); ok {
-		ch.Received = ch.Received.Add(channel.Received)
-		ch.Sent = ch.Sent.Add(channel.Sent)
+		ch.Received = ch.Received.Add(channel.Received.Decimal)
+		ch.Sent = ch.Sent.Add(channel.Sent.Decimal)
 		ch.TransfersCount += channel.TransfersCount
 	} else {
 		ctx.IbcChannels.Set(channel.Id, channel)
@@ -432,10 +432,10 @@ func (ctx *Context) AddHlToken(token *storage.HLToken) {
 		item.ReceiveTransfers += token.ReceiveTransfers
 		item.SentTransfers += token.SentTransfers
 		if !token.Sent.IsZero() {
-			item.Sent = item.Sent.Add(token.Sent)
+			item.Sent = item.Sent.Add(token.Sent.Decimal)
 		}
 		if !token.Received.IsZero() {
-			item.Received = item.Received.Add(token.Received)
+			item.Received = item.Received.Add(token.Received.Decimal)
 		}
 	} else {
 		ctx.HlTokens.Set(key, token)

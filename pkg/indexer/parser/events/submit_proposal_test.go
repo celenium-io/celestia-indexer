@@ -104,7 +104,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 				Id:             5,
 				ActivationTime: &ts,
 				Status:         types.ProposalStatusActive,
-				Deposit:        decimal.RequireFromString("10000000000"),
+				Deposit:        types.NewNumeric(decimal.RequireFromString("10000000000")),
 			},
 		}, {
 			name: "submit_proposal test 2",
@@ -178,7 +178,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 			proposal: storage.Proposal{
 				Id:      5,
 				Status:  types.ProposalStatusInactive,
-				Deposit: decimal.RequireFromString("10000000000"),
+				Deposit: types.NewNumeric(decimal.RequireFromString("10000000000")),
 			},
 		}, {
 			name: "submit_proposal test 3",
@@ -260,7 +260,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 			proposal: storage.Proposal{
 				Id:      2,
 				Status:  types.ProposalStatusInactive,
-				Deposit: decimal.Zero,
+				Deposit: types.NewNumeric(decimal.Zero),
 			},
 		}, {
 			name: "submit_proposal test 4",
@@ -346,7 +346,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 			proposal: storage.Proposal{
 				Id:             4,
 				Status:         types.ProposalStatusActive,
-				Deposit:        decimal.RequireFromString("10000000000"),
+				Deposit:        types.NewNumeric(decimal.RequireFromString("10000000000")),
 				ActivationTime: &ts,
 			},
 		},

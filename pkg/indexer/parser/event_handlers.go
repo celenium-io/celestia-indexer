@@ -34,9 +34,9 @@ func parseCoinSpent(ctx *context.Context, data map[string]string, height pkgType
 		LastHeight: height,
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
-			Spendable: decimal.Zero,
-			Delegated: decimal.Zero,
-			Unbonding: decimal.Zero,
+			Spendable: types.NewNumeric(decimal.Zero),
+			Delegated: types.NewNumeric(decimal.Zero),
+			Unbonding: types.NewNumeric(decimal.Zero),
 		},
 	}
 
@@ -45,7 +45,7 @@ func parseCoinSpent(ctx *context.Context, data map[string]string, height pkgType
 		if err != nil {
 			return err
 		}
-		address.Balance.Spendable = amount.Neg()
+		address.Balance.Spendable = types.NewNumeric(amount.Neg())
 		address.Balance.Currency = coinSpent.Amount.GetDenom()
 	}
 
@@ -68,9 +68,9 @@ func parseCoinReceived(ctx *context.Context, data map[string]string, height pkgT
 		LastHeight: height,
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
-			Spendable: decimal.Zero,
-			Delegated: decimal.Zero,
-			Unbonding: decimal.Zero,
+			Spendable: types.NewNumeric(decimal.Zero),
+			Delegated: types.NewNumeric(decimal.Zero),
+			Unbonding: types.NewNumeric(decimal.Zero),
 		},
 	}
 
@@ -79,7 +79,7 @@ func parseCoinReceived(ctx *context.Context, data map[string]string, height pkgT
 		if err != nil {
 			return err
 		}
-		address.Balance.Spendable = amount
+		address.Balance.Spendable = types.NewNumeric(amount)
 		address.Balance.Currency = coinReceived.Amount.GetDenom()
 	}
 
@@ -102,9 +102,9 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]string) error 
 		LastHeight: ctx.Block.Height,
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
-			Spendable: decimal.Zero,
-			Delegated: decimal.Zero,
-			Unbonding: decimal.Zero,
+			Spendable: types.NewNumeric(decimal.Zero),
+			Delegated: types.NewNumeric(decimal.Zero),
+			Unbonding: types.NewNumeric(decimal.Zero),
 		},
 	}
 
@@ -113,7 +113,7 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]string) error 
 		if err != nil {
 			return err
 		}
-		address.Balance.Unbonding = amount.Neg()
+		address.Balance.Unbonding = types.NewNumeric(amount.Neg())
 		address.Balance.Currency = unbonding.Amount.GetDenom()
 
 		validator := storage.EmptyValidator()
@@ -125,7 +125,7 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]string) error 
 			Height:    ctx.Block.Height,
 			Address:   address,
 			Validator: &validator,
-			Change:    amount.Neg(),
+			Change:    types.NewNumeric(amount.Neg()),
 			Type:      types.StakingLogTypeUnbonded,
 		})
 	}
@@ -164,7 +164,7 @@ func parseCompleteRedelegation(ctx *context.Context, data map[string]string) err
 			Height:    ctx.Block.Height,
 			Address:   address,
 			Validator: &validator,
-			Change:    amount.Neg(),
+			Change:    types.NewNumeric(amount.Neg()),
 			Type:      types.StakingLogTypeUnbonded,
 		})
 	}
@@ -185,14 +185,14 @@ func parseCommission(ctx *context.Context, data map[string]string) error {
 	validator.Address = commission.Validator
 
 	if !commission.Amount.IsZero() {
-		validator.Commissions = commission.Amount
+		validator.Commissions = types.NewNumeric(commission.Amount)
 		ctx.Block.Stats.Commissions = ctx.Block.Stats.Commissions.Add(commission.Amount)
 
 		ctx.AddStakingLog(storage.StakingLog{
 			Height:    ctx.Block.Height,
 			Time:      ctx.Block.Time,
 			Validator: &validator,
-			Change:    commission.Amount,
+			Change:    types.NewNumeric(commission.Amount),
 			Type:      types.StakingLogTypeCommissions,
 		})
 	}
@@ -215,14 +215,14 @@ func parseRewards(ctx *context.Context, data map[string]string) error {
 	validator.Address = rewards.Validator
 
 	if !rewards.Amount.IsZero() {
-		validator.Rewards = rewards.Amount
+		validator.Rewards = types.NewNumeric(rewards.Amount)
 		ctx.Block.Stats.Rewards = ctx.Block.Stats.Rewards.Add(rewards.Amount)
 
 		ctx.AddStakingLog(storage.StakingLog{
 			Height:    ctx.Block.Height,
 			Time:      ctx.Block.Time,
 			Validator: &validator,
-			Change:    rewards.Amount,
+			Change:    types.NewNumeric(rewards.Amount),
 			Type:      types.StakingLogTypeRewards,
 		})
 	}
@@ -249,10 +249,10 @@ func parseSlash(ctx *context.Context, data map[string]string) error {
 			Height: ctx.Block.Height,
 			Time:   ctx.Block.Time,
 			Reason: slash.Reason,
-			Burned: slash.BurnedCoins,
+			Burned: types.NewNumeric(slash.BurnedCoins),
 			Validator: &storage.Validator{
 				ConsAddress: consAddress,
-				Stake:       slash.BurnedCoins,
+				Stake:       types.NewNumeric(slash.BurnedCoins),
 				Jailed:      &jailed,
 			},
 		})
@@ -333,8 +333,8 @@ func parseSetDestinationGasConfig(ctx *context.Context, data map[string]string) 
 	config := storage.HLIGPConfig{
 		Height:            ctx.Block.Height,
 		Time:              ctx.Block.Time,
-		GasPrice:          igp.GasPrice,
-		GasOverhead:       igp.GasOverhead,
+		GasPrice:          types.NewNumeric(igp.GasPrice),
+		GasOverhead:       types.NewNumeric(igp.GasOverhead),
 		RemoteDomain:      igp.RemoteDomain,
 		TokenExchangeRate: igp.TokenExchangeRate,
 	}

@@ -79,7 +79,7 @@ func getBalanceUpdates(
 		}
 
 		if addr, ok := updates[address.Address]; ok {
-			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
+			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable.Decimal)
 		} else {
 			lastHeight, err := tx.LastAddressAction(ctx, address.Hash)
 			if err != nil {
@@ -111,10 +111,10 @@ func coinSpent(data map[string]string) (*storage.Address, error) {
 	}
 	balance := storage.Balance{
 		Currency:  currency.DefaultCurrency,
-		Spendable: decimal.Zero,
+		Spendable: types.NewNumeric(decimal.Zero),
 	}
 	if coinSpent.Amount != nil {
-		balance.Spendable = decimal.NewFromBigInt(coinSpent.Amount.Amount.BigInt(), 0)
+		balance.Spendable = types.NewNumeric(decimal.NewFromBigInt(coinSpent.Amount.Amount.BigInt(), 0))
 		balance.Currency = coinSpent.Amount.Denom
 	}
 	return &storage.Address{
@@ -137,10 +137,10 @@ func coinReceived(data map[string]string) (*storage.Address, error) {
 
 	balance := storage.Balance{
 		Currency:  currency.DefaultCurrency,
-		Spendable: decimal.Zero,
+		Spendable: types.NewNumeric(decimal.Zero),
 	}
 	if coinReceived.Amount != nil {
-		balance.Spendable = decimal.NewFromBigInt(coinReceived.Amount.Amount.Neg().BigInt(), 0)
+		balance.Spendable = types.NewNumeric(decimal.NewFromBigInt(coinReceived.Amount.Amount.Neg().BigInt(), 0))
 		balance.Currency = coinReceived.Amount.Denom
 	}
 

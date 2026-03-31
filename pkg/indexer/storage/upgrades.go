@@ -8,7 +8,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/dipdup-net/indexer-sdk/pkg/storage"
+	sdkStorage "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
@@ -54,7 +54,7 @@ func (module *Module) upgradeV7(ctx context.Context, decodeContext *decodeContex
 	offset := uint64(0)
 	end := false
 	for !end {
-		validators, err := module.validators.List(ctx, limit, offset, storage.SortOrderAsc)
+		validators, err := module.validators.List(ctx, limit, offset, sdkStorage.SortOrderAsc)
 		if err != nil {
 			return errors.Wrap(err, "failed to list validators")
 		}
@@ -64,10 +64,10 @@ func (module *Module) upgradeV7(ctx context.Context, decodeContext *decodeContex
 
 		for i := range validators {
 			if validators[i].Rate.LessThan(minCommissionRate) {
-				validators[i].Rate = minCommissionRate
+				validators[i].Rate = types.NewNumeric(minCommissionRate)
 			}
 			if validators[i].MaxRate.GreaterThan(maxCommissionRate) {
-				validators[i].MaxRate = maxCommissionRate
+				validators[i].MaxRate = types.NewNumeric(maxCommissionRate)
 			}
 			decodeContext.AddValidator(*validators[i])
 		}

@@ -17,8 +17,8 @@ func updateState(block *storage.Block, totalAccounts, totalNamespaces, totalProp
 	state.TotalProposals += totalProposals
 	state.TotalBlobsSize += block.Stats.BlobsSize
 	state.TotalValidators += totalValidators
-	state.TotalFee = state.TotalFee.Add(block.Stats.Fee)
-	state.TotalSupply = state.TotalSupply.Add(block.Stats.SupplyChange)
+	state.TotalFee = state.TotalFee.Add(block.Stats.Fee.Decimal)
+	state.TotalSupply = state.TotalSupply.Add(block.Stats.SupplyChange.Decimal)
 	state.TotalIbcClients += ibcClientsCount
 	state.ChainId = block.ChainId
 	state.Version = version

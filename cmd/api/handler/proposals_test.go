@@ -29,7 +29,7 @@ var testProposal = storage.Proposal{
 	Height:      55555,
 	Title:       "test proposal",
 	Description: "test description",
-	Deposit:     decimal.NewFromFloat(1000000),
+	Deposit:     types.NewNumeric(decimal.NewFromFloat(1000000)),
 	Status:      types.ProposalStatusActive,
 	VotesCount:  123,
 	Yes:         123,
@@ -158,7 +158,7 @@ func (s *ProposalTestSuite) TestVotes() {
 			{
 				Id:          1,
 				Height:      66666,
-				Weight:      decimal.NewFromFloat(1),
+				Weight:      types.NewNumeric(decimal.NewFromFloat(1)),
 				Option:      types.VoteOptionYes,
 				ValidatorId: testsuite.Ptr(uint64(1)),
 				Validator:   &testValidator,
@@ -166,7 +166,7 @@ func (s *ProposalTestSuite) TestVotes() {
 			{
 				Id:          2,
 				Height:      66666,
-				Weight:      decimal.NewFromFloat(1),
+				Weight:      types.NewNumeric(decimal.NewFromFloat(1)),
 				Option:      types.VoteOptionYes,
 				ValidatorId: nil,
 				Voter: &storage.Address{
@@ -177,9 +177,9 @@ func (s *ProposalTestSuite) TestVotes() {
 					LastHeight: 333,
 					Balance: storage.Balance{
 						Currency:  "utia",
-						Spendable: decimal.RequireFromString("100"),
-						Delegated: decimal.RequireFromString("1"),
-						Unbonding: decimal.RequireFromString("2"),
+						Spendable: types.NewNumeric(decimal.RequireFromString("100")),
+						Delegated: types.NewNumeric(decimal.RequireFromString("1")),
+						Unbonding: types.NewNumeric(decimal.RequireFromString("2")),
 					},
 					Celestials: &celestials.Celestial{
 						Id:       "name",
@@ -239,7 +239,7 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithVoter() {
 			{
 				Id:          2,
 				Height:      121212,
-				Weight:      decimal.NewFromFloat(123),
+				Weight:      types.NewNumeric(decimal.NewFromFloat(123)),
 				Option:      types.VoteOptionNo,
 				ValidatorId: nil,
 				Voter: &storage.Address{
@@ -250,9 +250,9 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithVoter() {
 					LastHeight: 123,
 					Balance: storage.Balance{
 						Currency:  "utia",
-						Spendable: decimal.RequireFromString("100"),
-						Delegated: decimal.RequireFromString("1"),
-						Unbonding: decimal.RequireFromString("2"),
+						Spendable: types.NewNumeric(decimal.RequireFromString("100")),
+						Delegated: types.NewNumeric(decimal.RequireFromString("1")),
+						Unbonding: types.NewNumeric(decimal.RequireFromString("2")),
 					},
 					Celestials: &celestials.Celestial{
 						Id:       "test name",
@@ -319,7 +319,7 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithValidator() {
 			{
 				Id:          3,
 				Height:      131313,
-				Weight:      decimal.NewFromFloat(1234),
+				Weight:      types.NewNumeric(decimal.NewFromFloat(1234)),
 				Option:      types.VoteOptionYes,
 				ValidatorId: testsuite.Ptr(uint64(1)),
 				Validator:   &testValidator,

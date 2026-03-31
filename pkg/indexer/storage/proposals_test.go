@@ -87,17 +87,17 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Times(1)
 		validators.EXPECT().
 			TotalVotingPower(gomock.Any(), 100).
-			Return(decimal.RequireFromString("10000"), nil).
+			Return(types.NewNumeric(decimal.RequireFromString("10000")), nil).
 			Times(1)
 
 		tx.EXPECT().
 			BondedValidators(t.Context(), 100).
 			Return([]storage.Validator{{
 				Id:    1,
-				Stake: decimal.RequireFromString("100000000"),
+				Stake: types.NewNumeric(decimal.RequireFromString("100000000")),
 			}, {
 				Id:    2,
-				Stake: decimal.RequireFromString("200000000"),
+				Stake: types.NewNumeric(decimal.RequireFromString("200000000")),
 			}}, nil).
 			Times(1)
 
@@ -121,7 +121,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Return([]storage.Delegation{{
 				ValidatorId: 1,
 				AddressId:   1,
-				Amount:      decimal.RequireFromString("50000000"),
+				Amount:      types.NewNumeric(decimal.RequireFromString("50000000")),
 			}}, nil).
 			Times(1)
 
@@ -130,7 +130,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Return([]storage.Delegation{{
 				ValidatorId: 1,
 				AddressId:   1,
-				Amount:      decimal.RequireFromString("10000000"),
+				Amount:      types.NewNumeric(decimal.RequireFromString("10000000")),
 			}}, nil).
 			Times(1)
 
@@ -139,7 +139,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Return([]storage.Delegation{{
 				ValidatorId: 1,
 				AddressId:   1,
-				Amount:      decimal.RequireFromString("10000000"),
+				Amount:      types.NewNumeric(decimal.RequireFromString("10000000")),
 			}}, nil).
 			Times(1)
 

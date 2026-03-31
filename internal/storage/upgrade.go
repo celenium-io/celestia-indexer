@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -44,8 +43,8 @@ type Upgrade struct {
 	SignerId       uint64              `bun:"signer_id"                  comment:"Signer internal identity"`
 	MsgId          uint64              `bun:"msg_id,notnull"             comment:"Message internal identity"`
 	TxId           uint64              `bun:"tx_id,notnull"              comment:"Transaction internal identity"`
-	VotingPower    decimal.Decimal     `bun:"voting_power,type:numeric"  comment:"Total voting power on upgrade block"`
-	VotedPower     decimal.Decimal     `bun:"voted_power,type:numeric"   comment:"Total voting power of upgraded validators"`
+	VotingPower    types.Numeric       `bun:"voting_power,type:numeric"  comment:"Total voting power on upgrade block"`
+	VotedPower     types.Numeric       `bun:"voted_power,type:numeric"   comment:"Total voting power of upgraded validators"`
 	SignalsCount   int                 `bun:"signals_count"              comment:"Count of signals"`
 	Status         types.UpgradeStatus `bun:"status,type:upgrade_status" comment:"Upgrade status"`
 

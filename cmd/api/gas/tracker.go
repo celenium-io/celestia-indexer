@@ -139,7 +139,7 @@ func (tracker *Tracker) processBlock(ctx context.Context, blockStat storage.Bloc
 		TxCount:        blockStat.TxCount,
 		GasUsed:        blockStat.GasUsed,
 		GasWanted:      blockStat.GasLimit,
-		Fee:            blockStat.Fee,
+		Fee:            blockStat.Fee.Decimal,
 		GasUsedRatio:   decimal.New(0, 1),
 		Percentiles:    make([]decimal.Decimal, 0),
 		BlockOccupancy: float64(blockStat.BytesInBlock) / float64(maxBlockSize),
@@ -193,7 +193,7 @@ func (tracker *Tracker) compute(txs []storage.Gas, gasLimit int64, data *info) {
 			txIndex++
 			sumGas += txs[txIndex].GasWanted
 		}
-		data.Percentiles[i] = txs[txIndex].GasPrice.Copy()
+		data.Percentiles[i] = txs[txIndex].GasPrice.Copy().Decimal
 	}
 }
 

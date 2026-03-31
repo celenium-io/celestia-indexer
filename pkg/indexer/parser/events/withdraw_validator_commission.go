@@ -67,7 +67,7 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 			}
 
 			amount := decimal.RequireFromString(commission.Amount.Amount.String())
-			validator.Commissions = amount.Neg()
+			validator.Commissions = storageTypes.NewNumeric(amount.Neg())
 
 			ctx.AddValidator(validator)
 
@@ -75,7 +75,7 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 				Height:    msg.Height,
 				Time:      msg.Time,
 				Validator: &validator,
-				Change:    amount.Neg().Copy(),
+				Change:    storageTypes.NewNumeric(amount.Neg().Copy()),
 				Type:      storageTypes.StakingLogTypeCommissions,
 			})
 			break

@@ -72,11 +72,11 @@ func getExpectedBlock() storage.Block {
 			TxCount:       0,
 			EventsCount:   0,
 			BlobsSize:     0,
-			SupplyChange:  decimal.Zero,
-			InflationRate: decimal.Zero,
-			Fee:           decimal.Zero,
-			Rewards:       decimal.Zero,
-			Commissions:   decimal.Zero,
+			SupplyChange:  storageTypes.NewNumeric(decimal.Zero),
+			InflationRate: storageTypes.NewNumeric(decimal.Zero),
+			Fee:           storageTypes.NewNumeric(decimal.Zero),
+			Rewards:       storageTypes.NewNumeric(decimal.Zero),
+			Commissions:   storageTypes.NewNumeric(decimal.Zero),
 		},
 	}
 }

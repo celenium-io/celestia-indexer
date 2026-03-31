@@ -17,8 +17,8 @@ import (
 	reflect "reflect"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
+	types "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	decimal "github.com/shopspring/decimal"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -513,10 +513,10 @@ func (c *MockIValidatorTopNMetricsCall) DoAndReturn(f func(context.Context, int)
 }
 
 // TotalVotingPower mocks base method.
-func (m *MockIValidator) TotalVotingPower(ctx context.Context, maxVals int) (decimal.Decimal, error) {
+func (m *MockIValidator) TotalVotingPower(ctx context.Context, maxVals int) (types.Numeric, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TotalVotingPower", ctx, maxVals)
-	ret0, _ := ret[0].(decimal.Decimal)
+	ret0, _ := ret[0].(types.Numeric)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -534,19 +534,19 @@ type MockIValidatorTotalVotingPowerCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIValidatorTotalVotingPowerCall) Return(arg0 decimal.Decimal, arg1 error) *MockIValidatorTotalVotingPowerCall {
+func (c *MockIValidatorTotalVotingPowerCall) Return(arg0 types.Numeric, arg1 error) *MockIValidatorTotalVotingPowerCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIValidatorTotalVotingPowerCall) Do(f func(context.Context, int) (decimal.Decimal, error)) *MockIValidatorTotalVotingPowerCall {
+func (c *MockIValidatorTotalVotingPowerCall) Do(f func(context.Context, int) (types.Numeric, error)) *MockIValidatorTotalVotingPowerCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIValidatorTotalVotingPowerCall) DoAndReturn(f func(context.Context, int) (decimal.Decimal, error)) *MockIValidatorTotalVotingPowerCall {
+func (c *MockIValidatorTotalVotingPowerCall) DoAndReturn(f func(context.Context, int) (types.Numeric, error)) *MockIValidatorTotalVotingPowerCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

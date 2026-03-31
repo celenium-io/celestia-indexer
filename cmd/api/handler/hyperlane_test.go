@@ -70,8 +70,8 @@ var (
 		TokenId:          testsuite.RandomBytes(32),
 		SentTransfers:    10,
 		ReceiveTransfers: 10,
-		Sent:             decimal.RequireFromString("1000"),
-		Received:         decimal.RequireFromString("1000"),
+		Sent:             types.NewNumeric(decimal.RequireFromString("1000")),
+		Received:         types.NewNumeric(decimal.RequireFromString("1000")),
 	}
 
 	testChainMetadata = hl.ChainMetadata{
@@ -120,12 +120,12 @@ var (
 		Version:             1,
 		Body:                testsuite.RandomBytes(32),
 		Metadata:            testsuite.RandomBytes(32),
-		Amount:              decimal.RequireFromString("125678"),
+		Amount:              types.NewNumeric(decimal.RequireFromString("125678")),
 		Denom:               currency.Utia,
 		Type:                types.HLTransferTypeReceive,
 		GasPayment: &storage.HLGasPayment{
-			Amount:    decimal.RequireFromString("111"),
-			GasAmount: decimal.RequireFromString("11"),
+			Amount:    types.NewNumeric(decimal.RequireFromString("111")),
+			GasAmount: types.NewNumeric(decimal.RequireFromString("11")),
 			IgpId:     1,
 			Igp:       &storage.HLIGP{IgpId: []byte{1, 2, 3}},
 		},
@@ -144,7 +144,7 @@ var (
 		TimeoutHeight: 0,
 		EventsCount:   11,
 		MessagesCount: 3,
-		Fee:           decimal.RequireFromString("80410"),
+		Fee:           types.NewNumeric(decimal.RequireFromString("80410")),
 		Status:        types.StatusSuccess,
 		Codespace:     "sdk",
 		Memo:          "memo",
@@ -177,8 +177,8 @@ var (
 		},
 		Configs: []*storage.HLIGPConfig{
 			{
-				GasPrice:          decimal.RequireFromString("1"),
-				GasOverhead:       decimal.RequireFromString("100000"),
+				GasPrice:          types.NewNumeric(decimal.RequireFromString("1")),
+				GasOverhead:       types.NewNumeric(decimal.RequireFromString("100000")),
 				TokenExchangeRate: "1234",
 				RemoteDomain:      1,
 			},
@@ -536,7 +536,7 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 			Version:             1,
 			Body:                testsuite.RandomBytes(32),
 			Metadata:            testsuite.RandomBytes(32),
-			Amount:              decimal.RequireFromString("102030"),
+			Amount:              types.NewNumeric(decimal.RequireFromString("102030")),
 			Denom:               currency.Utia,
 			Type:                types.HLTransferTypeReceive,
 		},

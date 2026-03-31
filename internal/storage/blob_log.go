@@ -8,10 +8,9 @@ import (
 	"io"
 	"time"
 
-	"github.com/celenium-io/celestia-indexer/pkg/types"
+	types "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -26,7 +25,7 @@ type BlobLogFilters struct {
 	Joins      bool
 	Signers    []uint64
 	Cursor     uint64
-	Height     types.Level
+	Height     pkgTypes.Level
 }
 
 type ListBlobLogFilters struct {
@@ -40,7 +39,7 @@ type ListBlobLogFilters struct {
 	Signers    []uint64
 	Namespaces []uint64
 	Cursor     uint64
-	Height     types.Level
+	Height     pkgTypes.Level
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -51,10 +50,10 @@ type IBlobLog interface {
 	ByProviders(ctx context.Context, providers []RollupProvider, fltrs BlobLogFilters) ([]BlobLog, error)
 	BySigner(ctx context.Context, signerId uint64, fltrs BlobLogFilters) ([]BlobLog, error)
 	ByTxId(ctx context.Context, txId uint64, fltrs BlobLogFilters) ([]BlobLog, error)
-	ByHeight(ctx context.Context, height types.Level, fltrs BlobLogFilters) ([]BlobLog, error)
+	ByHeight(ctx context.Context, height pkgTypes.Level, fltrs BlobLogFilters) ([]BlobLog, error)
 	CountByTxId(ctx context.Context, txId uint64) (int, error)
 	ExportByProviders(ctx context.Context, providers []RollupProvider, from, to time.Time, stream io.Writer) (err error)
-	Blob(ctx context.Context, height types.Level, nsId uint64, commitment string) (BlobLog, error)
+	Blob(ctx context.Context, height pkgTypes.Level, nsId uint64, commitment string) (BlobLog, error)
 	ListBlobs(ctx context.Context, fltrs ListBlobLogFilters) ([]BlobLog, error)
 }
 
@@ -63,14 +62,14 @@ var _ sdk.Copiable = (*BlobLog)(nil)
 type BlobLog struct {
 	bun.BaseModel `bun:"blob_log" comment:"Table with flatted blob entities."`
 
-	Id           uint64          `bun:"id,pk,autoincrement" comment:"Unique internal identity"`
-	Time         time.Time       `bun:"time,notnull,pk"     comment:"Message time"`
-	Height       types.Level     `bun:"height"              comment:"Message block height"`
-	Size         int64           `bun:"size"                comment:"Blob size"`
-	ShareVersion int             `bun:"share_version"       comment:"Share version"`
-	Commitment   string          `bun:"commitment"          comment:"Blob commitment"`
-	ContentType  string          `bun:"content_type"        comment:"Blob content type"`
-	Fee          decimal.Decimal `bun:"fee,type:numeric"    comment:"Fee per blob"`
+	Id           uint64         `bun:"id,pk,autoincrement" comment:"Unique internal identity"`
+	Time         time.Time      `bun:"time,notnull,pk"     comment:"Message time"`
+	Height       pkgTypes.Level `bun:"height"              comment:"Message block height"`
+	Size         int64          `bun:"size"                comment:"Blob size"`
+	ShareVersion int            `bun:"share_version"       comment:"Share version"`
+	Commitment   string         `bun:"commitment"          comment:"Blob commitment"`
+	ContentType  string         `bun:"content_type"        comment:"Blob content type"`
+	Fee          types.Numeric  `bun:"fee,type:numeric"    comment:"Fee per blob"`
 
 	SignerId    uint64 `bun:"signer_id"    comment:"Blob signer identity"`
 	NamespaceId uint64 `bun:"namespace_id" comment:"Namespace internal id"`
@@ -103,7 +102,7 @@ func (b BlobLog) Flat() ([]any, error) {
 		b.ShareVersion,
 		b.Commitment,
 		b.ContentType,
-		pgtype.Numeric{Int: b.Fee.Coefficient(), Exp: b.Fee.Exponent(), Valid: true},
+		b.Fee,
 		b.SignerId,
 		b.NamespaceId,
 		b.MsgId,

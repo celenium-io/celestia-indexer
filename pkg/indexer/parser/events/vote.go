@@ -93,7 +93,7 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 			case int(cosmosGovTypesV1.OptionYes):
 				vote.Option = types.VoteOptionYes
 			}
-			vote.Weight = opts[i].Weight
+			vote.Weight = types.NewNumeric(opts[i].Weight)
 
 			ctx.AddVote(&vote)
 		}
@@ -140,7 +140,7 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 			if err != nil {
 				return errors.Errorf("unquote weight in vote option: %s", values[1])
 			}
-			vote.Weight = decimal.RequireFromString(value)
+			vote.Weight = types.NewNumeric(decimal.RequireFromString(value))
 		}
 	}
 

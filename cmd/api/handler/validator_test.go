@@ -266,7 +266,7 @@ func (s *ValidatorTestSuite) TestDelegators() {
 			{
 				AddressId:   1,
 				ValidatorId: 1,
-				Amount:      decimal.RequireFromString("100"),
+				Amount:      storageTypes.NewNumeric(decimal.RequireFromString("100")),
 				Validator:   &testValidator,
 				Address: &storage.Address{
 					Address: testAddress,
@@ -304,7 +304,7 @@ func (s *ValidatorTestSuite) TestJails() {
 		ByValidator(gomock.Any(), uint64(1), 10, 0).
 		Return([]storage.Jail{
 			{
-				Burned:      decimal.RequireFromString("100"),
+				Burned:      storageTypes.NewNumeric(decimal.RequireFromString("100")),
 				Reason:      "double_sign",
 				Height:      100,
 				Time:        testTime,
@@ -386,7 +386,7 @@ func (s *ValidatorTestSuite) TestVotes() {
 			{
 				Id:          2,
 				Height:      1000,
-				Weight:      decimal.NewFromFloat(1),
+				Weight:      storageTypes.NewNumeric(decimal.NewFromFloat(1)),
 				Option:      storageTypes.VoteOptionNoWithVeto,
 				ValidatorId: testsuite.Ptr(uint64(1)),
 				Validator:   &testValidator,
@@ -402,7 +402,7 @@ func (s *ValidatorTestSuite) TestVotes() {
 	s.Require().Len(votes, 1)
 	s.Require().EqualValues(2, votes[0].Id)
 	s.Require().EqualValues(1000, votes[0].Height)
-	s.Require().EqualValues(decimal.NewFromFloat(1), votes[0].Weight)
+	s.Require().EqualValues(storageTypes.NewNumeric(decimal.NewFromFloat(1)), votes[0].Weight)
 	s.Require().EqualValues(storageTypes.VoteOptionNoWithVeto, votes[0].Option)
 	s.Require().EqualValues(1, votes[0].Validator.Id)
 	s.Require().EqualValues("moniker", votes[0].Validator.Moniker)
@@ -472,19 +472,19 @@ func (s *ValidatorTestSuite) TestMetrics() {
 		Return(storage.ValidatorMetrics{
 			Id:                    1,
 			Moniker:               "moniker",
-			MaxRate:               decimal.RequireFromString("0.1"),
-			MaxChangeRate:         decimal.RequireFromString("0.01"),
-			Stake:                 decimal.RequireFromString("100"),
+			MaxRate:               storageTypes.NewNumeric(decimal.RequireFromString("0.1")),
+			MaxChangeRate:         storageTypes.NewNumeric(decimal.RequireFromString("0.01")),
+			Stake:                 storageTypes.NewNumeric(decimal.RequireFromString("100")),
 			CreationTime:          testTime,
-			SelfDelegationAmount:  decimal.RequireFromString("10"),
+			SelfDelegationAmount:  storageTypes.NewNumeric(decimal.RequireFromString("10")),
 			AppliedProposalsCount: 5,
 			VotesCount:            5,
 			BlockMissedCount:      2,
-			VotesMetric:           decimal.RequireFromString("1.0"),
-			CommissionMetric:      decimal.RequireFromString("0.9"),
-			OperationTimeMetric:   decimal.RequireFromString("0.85"),
-			SelfDelegationMetric:  decimal.RequireFromString("0.8"),
-			BlockMissedMetric:     decimal.RequireFromString("0.75"),
+			VotesMetric:           storageTypes.NewNumeric(decimal.RequireFromString("1.0")),
+			CommissionMetric:      storageTypes.NewNumeric(decimal.RequireFromString("0.9")),
+			OperationTimeMetric:   storageTypes.NewNumeric(decimal.RequireFromString("0.85")),
+			SelfDelegationMetric:  storageTypes.NewNumeric(decimal.RequireFromString("0.8")),
+			BlockMissedMetric:     storageTypes.NewNumeric(decimal.RequireFromString("0.75")),
 		}, nil).
 		Times(1)
 
@@ -521,11 +521,11 @@ func (s *ValidatorTestSuite) TestTopNMetrics() {
 	s.validators.EXPECT().
 		TopNMetrics(gomock.Any(), 25).
 		Return(storage.ValidatorMetrics{
-			VotesMetric:          decimal.RequireFromString("1.0"),
-			CommissionMetric:     decimal.RequireFromString("0.9"),
-			OperationTimeMetric:  decimal.RequireFromString("0.85"),
-			SelfDelegationMetric: decimal.RequireFromString("0.8"),
-			BlockMissedMetric:    decimal.RequireFromString("0.75"),
+			VotesMetric:          storageTypes.NewNumeric(decimal.RequireFromString("1.0")),
+			CommissionMetric:     storageTypes.NewNumeric(decimal.RequireFromString("0.9")),
+			OperationTimeMetric:  storageTypes.NewNumeric(decimal.RequireFromString("0.85")),
+			SelfDelegationMetric: storageTypes.NewNumeric(decimal.RequireFromString("0.8")),
+			BlockMissedMetric:    storageTypes.NewNumeric(decimal.RequireFromString("0.75")),
 		}, nil).
 		Times(1)
 

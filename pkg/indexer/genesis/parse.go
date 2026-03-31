@@ -57,9 +57,9 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 			Height:        pkgTypes.Level(genesis.InitialHeight - 1),
 			TxCount:       int64(len(genesis.AppState.Genutil.GenTxs)),
 			EventsCount:   0,
-			Fee:           decimal.Zero,
-			SupplyChange:  decimal.Zero,
-			InflationRate: decimal.Zero,
+			Fee:           storageTypes.NewNumeric(decimal.Zero),
+			SupplyChange:  storageTypes.NewNumeric(decimal.Zero),
+			InflationRate: storageTypes.NewNumeric(decimal.Zero),
 		},
 		MessageTypes: storageTypes.NewMsgTypeBits(),
 	}
@@ -92,7 +92,7 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 		tx.Position = int64(index)
 		tx.TimeoutHeight = txWithTimeoutHeight.GetTimeoutHeight()
 		tx.MessagesCount = int64(len(txDecoded.GetMsgs()))
-		tx.Fee = decimal.Zero
+		tx.Fee = storageTypes.NewNumeric(decimal.Zero)
 		tx.Status = storageTypes.StatusSuccess
 		tx.Memo = memoTx.GetMemo()
 		tx.MessageTypes = storageTypes.NewMsgTypeBitMask()
@@ -140,10 +140,10 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 	_ = decodeCtx.Delegations.Range(func(_ string, value *storage.Delegation) (error, bool) {
 		data.delegations = append(data.delegations, *value)
 		if data.bondedTokensPool != nil {
-			data.bondedTokensPool.Balance.Spendable = data.bondedTokensPool.Balance.Spendable.Add(value.Amount)
+			data.bondedTokensPool.Balance.Spendable = data.bondedTokensPool.Balance.Spendable.Add(value.Amount.Decimal)
 		}
 		if addr, ok := data.addresses[value.Address.Address]; ok {
-			addr.Balance.Spendable = addr.Balance.Spendable.Sub(value.Amount)
+			addr.Balance.Spendable = addr.Balance.Spendable.Sub(value.Amount.Decimal)
 		}
 		return nil, false
 	})
@@ -158,7 +158,7 @@ func (module *Module) parseTotalSupply(supply []types.Supply, block *storage.Blo
 	}
 
 	if totalSupply, err := decimal.NewFromString(supply[0].Amount); err == nil {
-		block.Stats.SupplyChange = totalSupply
+		block.Stats.SupplyChange = storageTypes.NewNumeric(totalSupply)
 	}
 }
 
@@ -173,9 +173,9 @@ func (module *Module) parseAccounts(accounts []types.Account, block storage.Bloc
 			Height:     block.Height,
 			LastHeight: block.Height,
 			Balance: storage.Balance{
-				Spendable: decimal.Zero,
-				Delegated: decimal.Zero,
-				Unbonding: decimal.Zero,
+				Spendable: storageTypes.NewNumeric(decimal.Zero),
+				Delegated: storageTypes.NewNumeric(decimal.Zero),
+				Unbonding: storageTypes.NewNumeric(decimal.Zero),
 				Currency:  currencyBase,
 			},
 		}
@@ -245,9 +245,9 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 			Height:     height,
 			LastHeight: height,
 			Balance: storage.Balance{
-				Spendable: decimal.Zero,
-				Delegated: decimal.Zero,
-				Unbonding: decimal.Zero,
+				Spendable: storageTypes.NewNumeric(decimal.Zero),
+				Delegated: storageTypes.NewNumeric(decimal.Zero),
+				Unbonding: storageTypes.NewNumeric(decimal.Zero),
 				Currency:  balances[i].Coins[0].Denom,
 			},
 		}
@@ -256,7 +256,7 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 		}
 
 		if addr, ok := data.addresses[address.String()]; ok {
-			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
+			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable.Decimal)
 		} else {
 			data.addresses[address.String()] = &address
 		}
@@ -292,7 +292,7 @@ func parseVesting(acc types.Account, block storage.Block, address string, typ st
 			Address: address,
 		},
 		Type:           typ,
-		Amount:         amount,
+		Amount:         storageTypes.NewNumeric(amount),
 		VestingPeriods: make([]storage.VestingPeriod, 0),
 	}
 
@@ -316,7 +316,7 @@ func parseVesting(acc types.Account, block storage.Block, address string, typ st
 		if err != nil {
 			return err
 		}
-		period.Amount = amount
+		period.Amount = storageTypes.NewNumeric(amount)
 		periodTime = periodTime.Add(time.Second * time.Duration(acc.VestingPeriods[i].Length))
 		period.Time = periodTime
 		v.VestingPeriods = append(v.VestingPeriods, period)

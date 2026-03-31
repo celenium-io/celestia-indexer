@@ -67,7 +67,7 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 			} else {
 				validator.Address = cancel.Validator
 			}
-			validator.Stake = amount.Copy()
+			validator.Stake = storageTypes.NewNumeric(amount.Copy())
 			ctx.AddValidator(validator)
 
 			address := &storage.Address{
@@ -76,8 +76,8 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 				LastHeight: msg.Height,
 				Balance: storage.Balance{
 					Currency:  currency.DefaultCurrency,
-					Delegated: amount.Copy(),
-					Unbonding: amount.Copy().Neg(),
+					Delegated: storageTypes.NewNumeric(amount.Copy()),
+					Unbonding: storageTypes.NewNumeric(amount.Copy().Neg()),
 				},
 			}
 			if err := ctx.AddAddress(address); err != nil {
@@ -87,7 +87,7 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 			ctx.AddDelegation(storage.Delegation{
 				Validator: &validator,
 				Address:   address,
-				Amount:    amount,
+				Amount:    storageTypes.NewNumeric(amount),
 			})
 
 			ctx.AddCancelUndelegation(storage.Undelegation{
@@ -95,7 +95,7 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 				Address:   address,
 				Height:    msg.Height,
 				Time:      msg.Time,
-				Amount:    amount,
+				Amount:    storageTypes.NewNumeric(amount),
 			})
 
 			ctx.AddStakingLog(storage.StakingLog{
@@ -103,7 +103,7 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 				Time:      msg.Time,
 				Address:   address,
 				Validator: &validator,
-				Change:    amount.Copy(),
+				Change:    storageTypes.NewNumeric(amount.Copy()),
 				Type:      storageTypes.StakingLogTypeUnbonding,
 			})
 

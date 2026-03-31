@@ -7,9 +7,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -23,11 +23,11 @@ type IVestingPeriod interface {
 type VestingPeriod struct {
 	bun.BaseModel `bun:"vesting_period" comment:"Table with vesting periods"`
 
-	Id               uint64          `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
-	Height           pkgTypes.Level  `bun:"height,notnull"              comment:"The number (height) of this block"`
-	VestingAccountId uint64          `bun:"vesting_account_id"          comment:"Vesting account internal identity"`
-	Time             time.Time       `bun:"time,notnull"                comment:"The time of periodic vesting"`
-	Amount           decimal.Decimal `bun:"amount,type:numeric"         comment:"Vested amount"`
+	Id               uint64         `bun:"id,pk,notnull,autoincrement" comment:"Unique internal identity"`
+	Height           pkgTypes.Level `bun:"height,notnull"              comment:"The number (height) of this block"`
+	VestingAccountId uint64         `bun:"vesting_account_id"          comment:"Vesting account internal identity"`
+	Time             time.Time      `bun:"time,notnull"                comment:"The time of periodic vesting"`
+	Amount           types.Numeric  `bun:"amount,type:numeric"         comment:"Vested amount"`
 }
 
 func (VestingPeriod) TableName() string {

@@ -9,8 +9,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -30,7 +28,7 @@ type StakingLog struct {
 	Height      pkgTypes.Level       `bun:"height,notnull"              comment:"The number (height) of this block" stats:"func:min max,filterable"`
 	AddressId   *uint64              `bun:"address_id"                  comment:"Internal address id"`
 	ValidatorId uint64               `bun:"validator_id"                comment:"Internal validator id"`
-	Change      decimal.Decimal      `bun:"change,type:numeric"         comment:"Change amount"`
+	Change      types.Numeric        `bun:"change,type:numeric"         comment:"Change amount"`
 	Type        types.StakingLogType `bun:"type,type:staking_log_type"  comment:"Staking log type"`
 
 	Address   *Address   `bun:"rel:belongs-to,join:address_id=id"`
@@ -52,7 +50,7 @@ func (log StakingLog) Flat() ([]any, error) {
 		int64(log.Height),
 		addressId,
 		int64(log.ValidatorId),
-		pgtype.Numeric{Int: log.Change.Coefficient(), Exp: log.Change.Exponent(), Valid: true},
+		log.Change,
 		string(log.Type),
 	}, nil
 }

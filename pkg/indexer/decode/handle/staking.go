@@ -62,26 +62,26 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, msgId 
 		Details:           m.Description.Details,
 		Contacts:          m.Description.SecurityContact,
 		Height:            ctx.Block.Height,
-		Rate:              decimal.Zero,
-		MaxRate:           decimal.Zero,
-		MaxChangeRate:     decimal.Zero,
-		MinSelfDelegation: decimal.Zero,
-		Stake:             decimal.Zero,
+		Rate:              storageTypes.NewNumeric(decimal.Zero),
+		MaxRate:           storageTypes.NewNumeric(decimal.Zero),
+		MaxChangeRate:     storageTypes.NewNumeric(decimal.Zero),
+		MinSelfDelegation: storageTypes.NewNumeric(decimal.Zero),
+		Stake:             storageTypes.NewNumeric(decimal.Zero),
 		Jailed:            &jailed,
 		MessagesCount:     1,
 		CreationTime:      ctx.Block.Time,
 	}
 
 	if !m.Value.IsNil() {
-		amount := decimal.RequireFromString(m.Value.Amount.String())
+		amount := storageTypes.NewNumeric(decimal.RequireFromString(m.Value.Amount.String()))
 		validator.Stake = amount
 
 		address := storage.Address{
 			Address: addr.String(),
 			Balance: storage.Balance{
 				Currency:  currency.DefaultCurrency,
-				Spendable: decimal.Zero,
-				Unbonding: decimal.Zero,
+				Spendable: storageTypes.NewNumeric(decimal.Zero),
+				Unbonding: storageTypes.NewNumeric(decimal.Zero),
 				Delegated: amount.Copy(),
 			},
 		}
@@ -106,19 +106,19 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, msgId 
 	}
 
 	if !m.Commission.Rate.IsNil() {
-		validator.Rate = decimal.RequireFromString(m.Commission.Rate.String())
+		validator.Rate = storageTypes.NewNumeric(decimal.RequireFromString(m.Commission.Rate.String()))
 	}
 
 	if !m.Commission.MaxRate.IsNil() {
-		validator.MaxRate = decimal.RequireFromString(m.Commission.MaxRate.String())
+		validator.MaxRate = storageTypes.NewNumeric(decimal.RequireFromString(m.Commission.MaxRate.String()))
 	}
 
 	if !m.Commission.MaxChangeRate.IsNil() {
-		validator.MaxChangeRate = decimal.RequireFromString(m.Commission.MaxChangeRate.String())
+		validator.MaxChangeRate = storageTypes.NewNumeric(decimal.RequireFromString(m.Commission.MaxChangeRate.String()))
 	}
 
 	if !m.MinSelfDelegation.IsNil() {
-		validator.MinSelfDelegation = decimal.RequireFromString(m.MinSelfDelegation.String())
+		validator.MinSelfDelegation = storageTypes.NewNumeric(decimal.RequireFromString(m.MinSelfDelegation.String()))
 	}
 
 	ctx.AddValidator(validator)
@@ -149,17 +149,17 @@ func MsgEditValidator(ctx *context.Context, status storageTypes.Status, msgId ui
 		Details:           m.Description.Details,
 		Contacts:          m.Description.SecurityContact,
 		Height:            ctx.Block.Height,
-		Rate:              decimal.Zero,
-		MinSelfDelegation: decimal.Zero,
-		Stake:             decimal.Zero,
+		Rate:              storageTypes.NewNumeric(decimal.Zero),
+		MinSelfDelegation: storageTypes.NewNumeric(decimal.Zero),
+		Stake:             storageTypes.NewNumeric(decimal.Zero),
 		MessagesCount:     1,
 	}
 
 	if m.CommissionRate != nil && !m.CommissionRate.IsNil() {
-		validator.Rate = decimal.RequireFromString(m.CommissionRate.String())
+		validator.Rate = storageTypes.NewNumeric(decimal.RequireFromString(m.CommissionRate.String()))
 	}
 	if m.MinSelfDelegation != nil && !m.MinSelfDelegation.IsNil() {
-		validator.MinSelfDelegation = decimal.RequireFromString(m.MinSelfDelegation.String())
+		validator.MinSelfDelegation = storageTypes.NewNumeric(decimal.RequireFromString(m.MinSelfDelegation.String()))
 	}
 	ctx.AddValidator(validator)
 	return msgType, validators, err

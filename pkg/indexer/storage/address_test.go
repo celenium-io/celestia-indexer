@@ -9,6 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -101,7 +102,7 @@ func Test_saveAddresses(t *testing.T) {
 					LastHeight: 100,
 					Balance: storage.Balance{
 						Currency:  "utia",
-						Spendable: decimal.RequireFromString("1"),
+						Spendable: storageTypes.NewNumeric(decimal.RequireFromString("1")),
 					},
 				},
 			},
@@ -119,7 +120,7 @@ func Test_saveAddresses(t *testing.T) {
 					LastHeight: 101,
 					Balance: storage.Balance{
 						Currency:  "utia",
-						Spendable: decimal.RequireFromString("1"),
+						Spendable: storageTypes.NewNumeric(decimal.RequireFromString("1")),
 					},
 				},
 			},

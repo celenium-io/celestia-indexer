@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-io/go-lib/config"
 	"github.com/dipdup-io/go-lib/database"
@@ -86,7 +87,7 @@ func (s *BlockStatsTestSuite) TestByHeight() {
 			want: storage.BlockStats{
 				Id:           2,
 				Height:       1000,
-				SupplyChange: decimal.NewFromInt(30930476),
+				SupplyChange: storageTypes.NewNumeric(decimal.NewFromInt(30930476)),
 			},
 		},
 		{
@@ -95,7 +96,7 @@ func (s *BlockStatsTestSuite) TestByHeight() {
 			want: storage.BlockStats{
 				Id:           1,
 				Height:       999,
-				SupplyChange: decimal.NewFromInt(20930476),
+				SupplyChange: storageTypes.NewNumeric(decimal.NewFromInt(20930476)),
 			},
 		},
 	}

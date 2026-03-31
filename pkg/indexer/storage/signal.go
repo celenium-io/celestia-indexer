@@ -100,10 +100,10 @@ func (module *Module) tryUpgrade(
 		if err != nil {
 			return errors.Wrapf(err, "update signals for version %d", versions[i])
 		}
-		if math.Shares(voted).GreaterThan(threshold) {
+		if math.Shares(voted.Decimal).GreaterThan(threshold) {
 			upgrade.Version = versions[i]
-			upgrade.VotingPower = votingPower
-			upgrade.VotedPower = math.Shares(voted)
+			upgrade.VotingPower = types.NewNumeric(votingPower)
+			upgrade.VotedPower = types.NewNumeric(math.Shares(voted.Decimal))
 			upgrade.Status = types.UpgradeStatusWaitingUpgrade
 			return tx.SaveUpgrades(ctx, upgrade)
 		}
@@ -136,8 +136,8 @@ func saveUpgrades(
 			return errors.Wrapf(err, "update signals for version %d", version), true
 		}
 
-		upgrade.VotingPower = votingPower
-		upgrade.VotedPower = math.Shares(voted)
+		upgrade.VotingPower = types.NewNumeric(votingPower)
+		upgrade.VotedPower = types.NewNumeric(math.Shares(voted.Decimal))
 		if upgrade.VotedPower.GreaterThan(threshold) {
 			upgrade.Status = types.UpgradeStatusWaitingUpgrade
 		}
@@ -167,7 +167,7 @@ func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transacti
 
 	power := decimal.Zero
 	for i := range validators {
-		power = power.Add(validators[i].Stake)
+		power = power.Add(validators[i].Stake.Decimal)
 	}
 	return power, validators, nil
 }

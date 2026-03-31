@@ -31,7 +31,7 @@ func parseWithdrawRewards(ctx *context.Context, msg *storage.Message, data map[s
 		if err != nil {
 			return err
 		}
-		validator.Rewards = amount.Neg()
+		validator.Rewards = storageTypes.NewNumeric(amount.Neg())
 	}
 
 	ctx.AddValidator(validator)

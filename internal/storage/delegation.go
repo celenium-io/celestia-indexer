@@ -7,8 +7,8 @@ import (
 	"context"
 	"strings"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -24,10 +24,10 @@ type IDelegation interface {
 type Delegation struct {
 	bun.BaseModel `bun:"delegation" comment:"Table with delegations"`
 
-	Id          uint64          `bun:"id,pk,notnull,autoincrement"         comment:"Unique internal id"`
-	AddressId   uint64          `bun:"address_id,unique:delegation_pair"   comment:"Internal address id"`
-	ValidatorId uint64          `bun:"validator_id,unique:delegation_pair" comment:"Internal validator id"`
-	Amount      decimal.Decimal `bun:"amount,type:numeric"                 comment:"Delegated amount"`
+	Id          uint64        `bun:"id,pk,notnull,autoincrement"         comment:"Unique internal id"`
+	AddressId   uint64        `bun:"address_id,unique:delegation_pair"   comment:"Internal address id"`
+	ValidatorId uint64        `bun:"validator_id,unique:delegation_pair" comment:"Internal validator id"`
+	Amount      types.Numeric `bun:"amount,type:numeric"                 comment:"Delegated amount"`
 
 	Address   *Address   `bun:"rel:belongs-to,join:address_id=id"`
 	Validator *Validator `bun:"rel:belongs-to,join:validator_id=id"`

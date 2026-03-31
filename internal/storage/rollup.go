@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -121,15 +120,15 @@ type DAChange struct {
 }
 
 type RollupStats struct {
-	Size            int64           `bun:"size"`
-	BlobsCount      int64           `bun:"blobs_count"`
-	LastActionTime  time.Time       `bun:"last_time"`
-	FirstActionTime time.Time       `bun:"first_time"`
-	Fee             decimal.Decimal `bun:"fee"`
-	SizePct         float64         `bun:"size_pct"`
-	FeePct          float64         `bun:"fee_pct"`
-	BlobsCountPct   float64         `bun:"blobs_count_pct"`
-	IsActive        bool            `bun:"is_active"`
+	Size            int64         `bun:"size"`
+	BlobsCount      int64         `bun:"blobs_count"`
+	LastActionTime  time.Time     `bun:"last_time"`
+	FirstActionTime time.Time     `bun:"first_time"`
+	Fee             types.Numeric `bun:"fee"`
+	SizePct         float64       `bun:"size_pct"`
+	FeePct          float64       `bun:"fee_pct"`
+	BlobsCountPct   float64       `bun:"blobs_count_pct"`
+	IsActive        bool          `bun:"is_active"`
 }
 
 type RollupWithDayStats struct {
@@ -138,14 +137,14 @@ type RollupWithDayStats struct {
 }
 
 type RolluDayStats struct {
-	AvgSize        float64         `bun:"avg_size"`
-	BlobsCount     int64           `bun:"blobs_count"`
-	TotalSize      int64           `bun:"total_size"`
-	Throghput      int64           `bun:"throughput"`
-	TotalFee       decimal.Decimal `bun:"total_fee"`
-	NamespaceCount int64           `bun:"namespace_count"`
-	PfbCount       int64           `bun:"pfb_count"`
-	MBPrice        decimal.Decimal `bun:"mb_price"`
+	AvgSize        float64       `bun:"avg_size"`
+	BlobsCount     int64         `bun:"blobs_count"`
+	TotalSize      int64         `bun:"total_size"`
+	Throghput      int64         `bun:"throughput"`
+	TotalFee       types.Numeric `bun:"total_fee"`
+	NamespaceCount int64         `bun:"namespace_count"`
+	PfbCount       int64         `bun:"pfb_count"`
+	MBPrice        types.Numeric `bun:"mb_price"`
 }
 
 type RollupHistogramItem struct {

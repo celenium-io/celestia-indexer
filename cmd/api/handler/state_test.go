@@ -61,7 +61,7 @@ func (s *StateTestSuite) TestHead() {
 
 	s.validators.EXPECT().
 		TotalVotingPower(gomock.Any(), 100).
-		Return(decimal.RequireFromString("100"), nil).
+		Return(types.NewNumeric(decimal.RequireFromString("100")), nil).
 		Times(1)
 
 	s.constants.EXPECT().
@@ -82,7 +82,7 @@ func (s *StateTestSuite) TestHead() {
 			LastTime:        testTime,
 			TotalTx:         1234,
 			TotalAccounts:   123,
-			TotalFee:        decimal.RequireFromString("2"),
+			TotalFee:        types.NewNumeric(decimal.RequireFromString("2")),
 			TotalBlobsSize:  30,
 			TotalValidators: 10,
 			TotalNamespaces: 100,

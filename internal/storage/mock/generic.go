@@ -19,10 +19,10 @@ import (
 	time "time"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
-	types "github.com/celenium-io/celestia-indexer/pkg/types"
+	types "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	types0 "github.com/celenium-io/celestia-indexer/pkg/types"
 	pgx "github.com/jackc/pgx/v5"
 	pgconn "github.com/jackc/pgx/v5/pgconn"
-	decimal "github.com/shopspring/decimal"
 	bun "github.com/uptrace/bun"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -1496,7 +1496,7 @@ func (c *MockTransactionRefreshLeaderboardCall) DoAndReturn(f func(context.Conte
 }
 
 // RetentionBlockSignatures mocks base method.
-func (m *MockTransaction) RetentionBlockSignatures(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RetentionBlockSignatures(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RetentionBlockSignatures", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -1522,13 +1522,13 @@ func (c *MockTransactionRetentionBlockSignaturesCall) Return(arg0 error) *MockTr
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRetentionBlockSignaturesCall) Do(f func(context.Context, types.Level) error) *MockTransactionRetentionBlockSignaturesCall {
+func (c *MockTransactionRetentionBlockSignaturesCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRetentionBlockSignaturesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRetentionBlockSignaturesCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRetentionBlockSignaturesCall {
+func (c *MockTransactionRetentionBlockSignaturesCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRetentionBlockSignaturesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1648,7 +1648,7 @@ func (c *MockTransactionRollbackCall) DoAndReturn(f func(context.Context) error)
 }
 
 // RollbackAddresses mocks base method.
-func (m *MockTransaction) RollbackAddresses(ctx context.Context, height types.Level) ([]storage.Address, error) {
+func (m *MockTransaction) RollbackAddresses(ctx context.Context, height types0.Level) ([]storage.Address, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackAddresses", ctx, height)
 	ret0, _ := ret[0].([]storage.Address)
@@ -1675,19 +1675,19 @@ func (c *MockTransactionRollbackAddressesCall) Return(address []storage.Address,
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackAddressesCall) Do(f func(context.Context, types.Level) ([]storage.Address, error)) *MockTransactionRollbackAddressesCall {
+func (c *MockTransactionRollbackAddressesCall) Do(f func(context.Context, types0.Level) ([]storage.Address, error)) *MockTransactionRollbackAddressesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackAddressesCall) DoAndReturn(f func(context.Context, types.Level) ([]storage.Address, error)) *MockTransactionRollbackAddressesCall {
+func (c *MockTransactionRollbackAddressesCall) DoAndReturn(f func(context.Context, types0.Level) ([]storage.Address, error)) *MockTransactionRollbackAddressesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackBlobLog mocks base method.
-func (m *MockTransaction) RollbackBlobLog(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackBlobLog(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackBlobLog", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -1713,19 +1713,19 @@ func (c *MockTransactionRollbackBlobLogCall) Return(arg0 error) *MockTransaction
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackBlobLogCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackBlobLogCall {
+func (c *MockTransactionRollbackBlobLogCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackBlobLogCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackBlobLogCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackBlobLogCall {
+func (c *MockTransactionRollbackBlobLogCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackBlobLogCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackBlock mocks base method.
-func (m *MockTransaction) RollbackBlock(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackBlock(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackBlock", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -1751,19 +1751,19 @@ func (c *MockTransactionRollbackBlockCall) Return(arg0 error) *MockTransactionRo
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackBlockCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackBlockCall {
+func (c *MockTransactionRollbackBlockCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackBlockCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackBlockCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackBlockCall {
+func (c *MockTransactionRollbackBlockCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackBlockCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackBlockSignatures mocks base method.
-func (m *MockTransaction) RollbackBlockSignatures(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackBlockSignatures(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackBlockSignatures", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -1789,19 +1789,19 @@ func (c *MockTransactionRollbackBlockSignaturesCall) Return(err error) *MockTran
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackBlockSignaturesCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackBlockSignaturesCall {
+func (c *MockTransactionRollbackBlockSignaturesCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackBlockSignaturesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackBlockSignaturesCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackBlockSignaturesCall {
+func (c *MockTransactionRollbackBlockSignaturesCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackBlockSignaturesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackBlockStats mocks base method.
-func (m *MockTransaction) RollbackBlockStats(ctx context.Context, height types.Level) (storage.BlockStats, error) {
+func (m *MockTransaction) RollbackBlockStats(ctx context.Context, height types0.Level) (storage.BlockStats, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackBlockStats", ctx, height)
 	ret0, _ := ret[0].(storage.BlockStats)
@@ -1828,19 +1828,19 @@ func (c *MockTransactionRollbackBlockStatsCall) Return(stats storage.BlockStats,
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackBlockStatsCall) Do(f func(context.Context, types.Level) (storage.BlockStats, error)) *MockTransactionRollbackBlockStatsCall {
+func (c *MockTransactionRollbackBlockStatsCall) Do(f func(context.Context, types0.Level) (storage.BlockStats, error)) *MockTransactionRollbackBlockStatsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackBlockStatsCall) DoAndReturn(f func(context.Context, types.Level) (storage.BlockStats, error)) *MockTransactionRollbackBlockStatsCall {
+func (c *MockTransactionRollbackBlockStatsCall) DoAndReturn(f func(context.Context, types0.Level) (storage.BlockStats, error)) *MockTransactionRollbackBlockStatsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackEvents mocks base method.
-func (m *MockTransaction) RollbackEvents(ctx context.Context, height types.Level) ([]storage.Event, error) {
+func (m *MockTransaction) RollbackEvents(ctx context.Context, height types0.Level) ([]storage.Event, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackEvents", ctx, height)
 	ret0, _ := ret[0].([]storage.Event)
@@ -1867,19 +1867,19 @@ func (c *MockTransactionRollbackEventsCall) Return(events []storage.Event, err e
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackEventsCall) Do(f func(context.Context, types.Level) ([]storage.Event, error)) *MockTransactionRollbackEventsCall {
+func (c *MockTransactionRollbackEventsCall) Do(f func(context.Context, types0.Level) ([]storage.Event, error)) *MockTransactionRollbackEventsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackEventsCall) DoAndReturn(f func(context.Context, types.Level) ([]storage.Event, error)) *MockTransactionRollbackEventsCall {
+func (c *MockTransactionRollbackEventsCall) DoAndReturn(f func(context.Context, types0.Level) ([]storage.Event, error)) *MockTransactionRollbackEventsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackForwardings mocks base method.
-func (m *MockTransaction) RollbackForwardings(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackForwardings(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackForwardings", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -1905,19 +1905,19 @@ func (c *MockTransactionRollbackForwardingsCall) Return(arg0 error) *MockTransac
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackForwardingsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackForwardingsCall {
+func (c *MockTransactionRollbackForwardingsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackForwardingsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackForwardingsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackForwardingsCall {
+func (c *MockTransactionRollbackForwardingsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackForwardingsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackGrants mocks base method.
-func (m *MockTransaction) RollbackGrants(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackGrants(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackGrants", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -1943,19 +1943,19 @@ func (c *MockTransactionRollbackGrantsCall) Return(arg0 error) *MockTransactionR
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackGrantsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackGrantsCall {
+func (c *MockTransactionRollbackGrantsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackGrantsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackGrantsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackGrantsCall {
+func (c *MockTransactionRollbackGrantsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackGrantsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackHyperlaneGasPayment mocks base method.
-func (m *MockTransaction) RollbackHyperlaneGasPayment(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackHyperlaneGasPayment(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackHyperlaneGasPayment", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -1981,19 +1981,19 @@ func (c *MockTransactionRollbackHyperlaneGasPaymentCall) Return(arg0 error) *Moc
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackHyperlaneGasPaymentCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneGasPaymentCall {
+func (c *MockTransactionRollbackHyperlaneGasPaymentCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackHyperlaneGasPaymentCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackHyperlaneGasPaymentCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneGasPaymentCall {
+func (c *MockTransactionRollbackHyperlaneGasPaymentCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackHyperlaneGasPaymentCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackHyperlaneIgpConfigs mocks base method.
-func (m *MockTransaction) RollbackHyperlaneIgpConfigs(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackHyperlaneIgpConfigs(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackHyperlaneIgpConfigs", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2019,19 +2019,19 @@ func (c *MockTransactionRollbackHyperlaneIgpConfigsCall) Return(arg0 error) *Moc
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackHyperlaneIgpConfigsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneIgpConfigsCall {
+func (c *MockTransactionRollbackHyperlaneIgpConfigsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackHyperlaneIgpConfigsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackHyperlaneIgpConfigsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneIgpConfigsCall {
+func (c *MockTransactionRollbackHyperlaneIgpConfigsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackHyperlaneIgpConfigsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackHyperlaneIgps mocks base method.
-func (m *MockTransaction) RollbackHyperlaneIgps(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackHyperlaneIgps(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackHyperlaneIgps", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2057,19 +2057,19 @@ func (c *MockTransactionRollbackHyperlaneIgpsCall) Return(arg0 error) *MockTrans
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackHyperlaneIgpsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneIgpsCall {
+func (c *MockTransactionRollbackHyperlaneIgpsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackHyperlaneIgpsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackHyperlaneIgpsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneIgpsCall {
+func (c *MockTransactionRollbackHyperlaneIgpsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackHyperlaneIgpsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackHyperlaneMailbox mocks base method.
-func (m *MockTransaction) RollbackHyperlaneMailbox(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackHyperlaneMailbox(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackHyperlaneMailbox", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2095,19 +2095,19 @@ func (c *MockTransactionRollbackHyperlaneMailboxCall) Return(arg0 error) *MockTr
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackHyperlaneMailboxCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneMailboxCall {
+func (c *MockTransactionRollbackHyperlaneMailboxCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackHyperlaneMailboxCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackHyperlaneMailboxCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneMailboxCall {
+func (c *MockTransactionRollbackHyperlaneMailboxCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackHyperlaneMailboxCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackHyperlaneTokens mocks base method.
-func (m *MockTransaction) RollbackHyperlaneTokens(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackHyperlaneTokens(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackHyperlaneTokens", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2133,19 +2133,19 @@ func (c *MockTransactionRollbackHyperlaneTokensCall) Return(arg0 error) *MockTra
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackHyperlaneTokensCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneTokensCall {
+func (c *MockTransactionRollbackHyperlaneTokensCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackHyperlaneTokensCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackHyperlaneTokensCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneTokensCall {
+func (c *MockTransactionRollbackHyperlaneTokensCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackHyperlaneTokensCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackHyperlaneTransfers mocks base method.
-func (m *MockTransaction) RollbackHyperlaneTransfers(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackHyperlaneTransfers(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackHyperlaneTransfers", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2171,19 +2171,19 @@ func (c *MockTransactionRollbackHyperlaneTransfersCall) Return(arg0 error) *Mock
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackHyperlaneTransfersCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneTransfersCall {
+func (c *MockTransactionRollbackHyperlaneTransfersCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackHyperlaneTransfersCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackHyperlaneTransfersCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackHyperlaneTransfersCall {
+func (c *MockTransactionRollbackHyperlaneTransfersCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackHyperlaneTransfersCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackIbcChannels mocks base method.
-func (m *MockTransaction) RollbackIbcChannels(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackIbcChannels(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackIbcChannels", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2209,19 +2209,19 @@ func (c *MockTransactionRollbackIbcChannelsCall) Return(arg0 error) *MockTransac
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackIbcChannelsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcChannelsCall {
+func (c *MockTransactionRollbackIbcChannelsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackIbcChannelsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackIbcChannelsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcChannelsCall {
+func (c *MockTransactionRollbackIbcChannelsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackIbcChannelsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackIbcClients mocks base method.
-func (m *MockTransaction) RollbackIbcClients(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackIbcClients(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackIbcClients", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2247,19 +2247,19 @@ func (c *MockTransactionRollbackIbcClientsCall) Return(arg0 error) *MockTransact
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackIbcClientsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcClientsCall {
+func (c *MockTransactionRollbackIbcClientsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackIbcClientsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackIbcClientsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcClientsCall {
+func (c *MockTransactionRollbackIbcClientsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackIbcClientsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackIbcConnections mocks base method.
-func (m *MockTransaction) RollbackIbcConnections(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackIbcConnections(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackIbcConnections", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2285,19 +2285,19 @@ func (c *MockTransactionRollbackIbcConnectionsCall) Return(arg0 error) *MockTran
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackIbcConnectionsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcConnectionsCall {
+func (c *MockTransactionRollbackIbcConnectionsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackIbcConnectionsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackIbcConnectionsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcConnectionsCall {
+func (c *MockTransactionRollbackIbcConnectionsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackIbcConnectionsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackIbcTransfers mocks base method.
-func (m *MockTransaction) RollbackIbcTransfers(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackIbcTransfers(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackIbcTransfers", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2323,19 +2323,19 @@ func (c *MockTransactionRollbackIbcTransfersCall) Return(arg0 error) *MockTransa
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackIbcTransfersCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcTransfersCall {
+func (c *MockTransactionRollbackIbcTransfersCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackIbcTransfersCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackIbcTransfersCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackIbcTransfersCall {
+func (c *MockTransactionRollbackIbcTransfersCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackIbcTransfersCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackJails mocks base method.
-func (m *MockTransaction) RollbackJails(ctx context.Context, height types.Level) ([]storage.Jail, error) {
+func (m *MockTransaction) RollbackJails(ctx context.Context, height types0.Level) ([]storage.Jail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackJails", ctx, height)
 	ret0, _ := ret[0].([]storage.Jail)
@@ -2362,13 +2362,13 @@ func (c *MockTransactionRollbackJailsCall) Return(arg0 []storage.Jail, arg1 erro
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackJailsCall) Do(f func(context.Context, types.Level) ([]storage.Jail, error)) *MockTransactionRollbackJailsCall {
+func (c *MockTransactionRollbackJailsCall) Do(f func(context.Context, types0.Level) ([]storage.Jail, error)) *MockTransactionRollbackJailsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackJailsCall) DoAndReturn(f func(context.Context, types.Level) ([]storage.Jail, error)) *MockTransactionRollbackJailsCall {
+func (c *MockTransactionRollbackJailsCall) DoAndReturn(f func(context.Context, types0.Level) ([]storage.Jail, error)) *MockTransactionRollbackJailsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -2412,7 +2412,7 @@ func (c *MockTransactionRollbackMessageAddressesCall) DoAndReturn(f func(context
 }
 
 // RollbackMessageValidators mocks base method.
-func (m *MockTransaction) RollbackMessageValidators(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackMessageValidators(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackMessageValidators", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2438,19 +2438,19 @@ func (c *MockTransactionRollbackMessageValidatorsCall) Return(err error) *MockTr
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackMessageValidatorsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackMessageValidatorsCall {
+func (c *MockTransactionRollbackMessageValidatorsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackMessageValidatorsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackMessageValidatorsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackMessageValidatorsCall {
+func (c *MockTransactionRollbackMessageValidatorsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackMessageValidatorsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackMessages mocks base method.
-func (m *MockTransaction) RollbackMessages(ctx context.Context, height types.Level) ([]storage.Message, error) {
+func (m *MockTransaction) RollbackMessages(ctx context.Context, height types0.Level) ([]storage.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackMessages", ctx, height)
 	ret0, _ := ret[0].([]storage.Message)
@@ -2477,19 +2477,19 @@ func (c *MockTransactionRollbackMessagesCall) Return(msgs []storage.Message, err
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackMessagesCall) Do(f func(context.Context, types.Level) ([]storage.Message, error)) *MockTransactionRollbackMessagesCall {
+func (c *MockTransactionRollbackMessagesCall) Do(f func(context.Context, types0.Level) ([]storage.Message, error)) *MockTransactionRollbackMessagesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackMessagesCall) DoAndReturn(f func(context.Context, types.Level) ([]storage.Message, error)) *MockTransactionRollbackMessagesCall {
+func (c *MockTransactionRollbackMessagesCall) DoAndReturn(f func(context.Context, types0.Level) ([]storage.Message, error)) *MockTransactionRollbackMessagesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackNamespaceMessages mocks base method.
-func (m *MockTransaction) RollbackNamespaceMessages(ctx context.Context, height types.Level) ([]storage.NamespaceMessage, error) {
+func (m *MockTransaction) RollbackNamespaceMessages(ctx context.Context, height types0.Level) ([]storage.NamespaceMessage, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackNamespaceMessages", ctx, height)
 	ret0, _ := ret[0].([]storage.NamespaceMessage)
@@ -2516,19 +2516,19 @@ func (c *MockTransactionRollbackNamespaceMessagesCall) Return(msgs []storage.Nam
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackNamespaceMessagesCall) Do(f func(context.Context, types.Level) ([]storage.NamespaceMessage, error)) *MockTransactionRollbackNamespaceMessagesCall {
+func (c *MockTransactionRollbackNamespaceMessagesCall) Do(f func(context.Context, types0.Level) ([]storage.NamespaceMessage, error)) *MockTransactionRollbackNamespaceMessagesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackNamespaceMessagesCall) DoAndReturn(f func(context.Context, types.Level) ([]storage.NamespaceMessage, error)) *MockTransactionRollbackNamespaceMessagesCall {
+func (c *MockTransactionRollbackNamespaceMessagesCall) DoAndReturn(f func(context.Context, types0.Level) ([]storage.NamespaceMessage, error)) *MockTransactionRollbackNamespaceMessagesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackNamespaces mocks base method.
-func (m *MockTransaction) RollbackNamespaces(ctx context.Context, height types.Level) ([]storage.Namespace, error) {
+func (m *MockTransaction) RollbackNamespaces(ctx context.Context, height types0.Level) ([]storage.Namespace, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackNamespaces", ctx, height)
 	ret0, _ := ret[0].([]storage.Namespace)
@@ -2555,19 +2555,19 @@ func (c *MockTransactionRollbackNamespacesCall) Return(ns []storage.Namespace, e
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackNamespacesCall) Do(f func(context.Context, types.Level) ([]storage.Namespace, error)) *MockTransactionRollbackNamespacesCall {
+func (c *MockTransactionRollbackNamespacesCall) Do(f func(context.Context, types0.Level) ([]storage.Namespace, error)) *MockTransactionRollbackNamespacesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackNamespacesCall) DoAndReturn(f func(context.Context, types.Level) ([]storage.Namespace, error)) *MockTransactionRollbackNamespacesCall {
+func (c *MockTransactionRollbackNamespacesCall) DoAndReturn(f func(context.Context, types0.Level) ([]storage.Namespace, error)) *MockTransactionRollbackNamespacesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackProposals mocks base method.
-func (m *MockTransaction) RollbackProposals(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackProposals(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackProposals", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2593,19 +2593,19 @@ func (c *MockTransactionRollbackProposalsCall) Return(arg0 error) *MockTransacti
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackProposalsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackProposalsCall {
+func (c *MockTransactionRollbackProposalsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackProposalsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackProposalsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackProposalsCall {
+func (c *MockTransactionRollbackProposalsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackProposalsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackRedelegations mocks base method.
-func (m *MockTransaction) RollbackRedelegations(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackRedelegations(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackRedelegations", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2631,19 +2631,19 @@ func (c *MockTransactionRollbackRedelegationsCall) Return(err error) *MockTransa
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackRedelegationsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackRedelegationsCall {
+func (c *MockTransactionRollbackRedelegationsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackRedelegationsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackRedelegationsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackRedelegationsCall {
+func (c *MockTransactionRollbackRedelegationsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackRedelegationsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackSignals mocks base method.
-func (m *MockTransaction) RollbackSignals(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackSignals(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackSignals", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2669,13 +2669,13 @@ func (c *MockTransactionRollbackSignalsCall) Return(arg0 error) *MockTransaction
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackSignalsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackSignalsCall {
+func (c *MockTransactionRollbackSignalsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackSignalsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackSignalsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackSignalsCall {
+func (c *MockTransactionRollbackSignalsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackSignalsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -2719,7 +2719,7 @@ func (c *MockTransactionRollbackSignersCall) DoAndReturn(f func(context.Context,
 }
 
 // RollbackStakingLogs mocks base method.
-func (m *MockTransaction) RollbackStakingLogs(ctx context.Context, height types.Level) ([]storage.StakingLog, error) {
+func (m *MockTransaction) RollbackStakingLogs(ctx context.Context, height types0.Level) ([]storage.StakingLog, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackStakingLogs", ctx, height)
 	ret0, _ := ret[0].([]storage.StakingLog)
@@ -2746,19 +2746,19 @@ func (c *MockTransactionRollbackStakingLogsCall) Return(arg0 []storage.StakingLo
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackStakingLogsCall) Do(f func(context.Context, types.Level) ([]storage.StakingLog, error)) *MockTransactionRollbackStakingLogsCall {
+func (c *MockTransactionRollbackStakingLogsCall) Do(f func(context.Context, types0.Level) ([]storage.StakingLog, error)) *MockTransactionRollbackStakingLogsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackStakingLogsCall) DoAndReturn(f func(context.Context, types.Level) ([]storage.StakingLog, error)) *MockTransactionRollbackStakingLogsCall {
+func (c *MockTransactionRollbackStakingLogsCall) DoAndReturn(f func(context.Context, types0.Level) ([]storage.StakingLog, error)) *MockTransactionRollbackStakingLogsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackTxs mocks base method.
-func (m *MockTransaction) RollbackTxs(ctx context.Context, height types.Level) ([]storage.Tx, error) {
+func (m *MockTransaction) RollbackTxs(ctx context.Context, height types0.Level) ([]storage.Tx, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackTxs", ctx, height)
 	ret0, _ := ret[0].([]storage.Tx)
@@ -2785,19 +2785,19 @@ func (c *MockTransactionRollbackTxsCall) Return(txs []storage.Tx, err error) *Mo
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackTxsCall) Do(f func(context.Context, types.Level) ([]storage.Tx, error)) *MockTransactionRollbackTxsCall {
+func (c *MockTransactionRollbackTxsCall) Do(f func(context.Context, types0.Level) ([]storage.Tx, error)) *MockTransactionRollbackTxsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackTxsCall) DoAndReturn(f func(context.Context, types.Level) ([]storage.Tx, error)) *MockTransactionRollbackTxsCall {
+func (c *MockTransactionRollbackTxsCall) DoAndReturn(f func(context.Context, types0.Level) ([]storage.Tx, error)) *MockTransactionRollbackTxsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackUndelegations mocks base method.
-func (m *MockTransaction) RollbackUndelegations(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackUndelegations(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackUndelegations", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2823,19 +2823,19 @@ func (c *MockTransactionRollbackUndelegationsCall) Return(err error) *MockTransa
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackUndelegationsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackUndelegationsCall {
+func (c *MockTransactionRollbackUndelegationsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackUndelegationsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackUndelegationsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackUndelegationsCall {
+func (c *MockTransactionRollbackUndelegationsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackUndelegationsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackUpgrades mocks base method.
-func (m *MockTransaction) RollbackUpgrades(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackUpgrades(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackUpgrades", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2861,19 +2861,19 @@ func (c *MockTransactionRollbackUpgradesCall) Return(arg0 error) *MockTransactio
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackUpgradesCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackUpgradesCall {
+func (c *MockTransactionRollbackUpgradesCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackUpgradesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackUpgradesCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackUpgradesCall {
+func (c *MockTransactionRollbackUpgradesCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackUpgradesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackValidators mocks base method.
-func (m *MockTransaction) RollbackValidators(ctx context.Context, height types.Level) ([]storage.Validator, error) {
+func (m *MockTransaction) RollbackValidators(ctx context.Context, height types0.Level) ([]storage.Validator, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackValidators", ctx, height)
 	ret0, _ := ret[0].([]storage.Validator)
@@ -2900,19 +2900,19 @@ func (c *MockTransactionRollbackValidatorsCall) Return(arg0 []storage.Validator,
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackValidatorsCall) Do(f func(context.Context, types.Level) ([]storage.Validator, error)) *MockTransactionRollbackValidatorsCall {
+func (c *MockTransactionRollbackValidatorsCall) Do(f func(context.Context, types0.Level) ([]storage.Validator, error)) *MockTransactionRollbackValidatorsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackValidatorsCall) DoAndReturn(f func(context.Context, types.Level) ([]storage.Validator, error)) *MockTransactionRollbackValidatorsCall {
+func (c *MockTransactionRollbackValidatorsCall) DoAndReturn(f func(context.Context, types0.Level) ([]storage.Validator, error)) *MockTransactionRollbackValidatorsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackVestingAccounts mocks base method.
-func (m *MockTransaction) RollbackVestingAccounts(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackVestingAccounts(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackVestingAccounts", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2938,19 +2938,19 @@ func (c *MockTransactionRollbackVestingAccountsCall) Return(arg0 error) *MockTra
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackVestingAccountsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackVestingAccountsCall {
+func (c *MockTransactionRollbackVestingAccountsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackVestingAccountsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackVestingAccountsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackVestingAccountsCall {
+func (c *MockTransactionRollbackVestingAccountsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackVestingAccountsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackVestingPeriods mocks base method.
-func (m *MockTransaction) RollbackVestingPeriods(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackVestingPeriods(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackVestingPeriods", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -2976,19 +2976,19 @@ func (c *MockTransactionRollbackVestingPeriodsCall) Return(arg0 error) *MockTran
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackVestingPeriodsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackVestingPeriodsCall {
+func (c *MockTransactionRollbackVestingPeriodsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackVestingPeriodsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackVestingPeriodsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackVestingPeriodsCall {
+func (c *MockTransactionRollbackVestingPeriodsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackVestingPeriodsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackVotes mocks base method.
-func (m *MockTransaction) RollbackVotes(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackVotes(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackVotes", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -3014,19 +3014,19 @@ func (c *MockTransactionRollbackVotesCall) Return(arg0 error) *MockTransactionRo
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackVotesCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackVotesCall {
+func (c *MockTransactionRollbackVotesCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackVotesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackVotesCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackVotesCall {
+func (c *MockTransactionRollbackVotesCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackVotesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackZkISMMessages mocks base method.
-func (m *MockTransaction) RollbackZkISMMessages(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackZkISMMessages(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackZkISMMessages", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -3052,19 +3052,19 @@ func (c *MockTransactionRollbackZkISMMessagesCall) Return(arg0 error) *MockTrans
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackZkISMMessagesCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackZkISMMessagesCall {
+func (c *MockTransactionRollbackZkISMMessagesCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackZkISMMessagesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackZkISMMessagesCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackZkISMMessagesCall {
+func (c *MockTransactionRollbackZkISMMessagesCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackZkISMMessagesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackZkISMUpdates mocks base method.
-func (m *MockTransaction) RollbackZkISMUpdates(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackZkISMUpdates(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackZkISMUpdates", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -3090,19 +3090,19 @@ func (c *MockTransactionRollbackZkISMUpdatesCall) Return(arg0 error) *MockTransa
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackZkISMUpdatesCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackZkISMUpdatesCall {
+func (c *MockTransactionRollbackZkISMUpdatesCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackZkISMUpdatesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackZkISMUpdatesCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackZkISMUpdatesCall {
+func (c *MockTransactionRollbackZkISMUpdatesCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackZkISMUpdatesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // RollbackZkISMs mocks base method.
-func (m *MockTransaction) RollbackZkISMs(ctx context.Context, height types.Level) error {
+func (m *MockTransaction) RollbackZkISMs(ctx context.Context, height types0.Level) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollbackZkISMs", ctx, height)
 	ret0, _ := ret[0].(error)
@@ -3128,13 +3128,13 @@ func (c *MockTransactionRollbackZkISMsCall) Return(arg0 error) *MockTransactionR
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionRollbackZkISMsCall) Do(f func(context.Context, types.Level) error) *MockTransactionRollbackZkISMsCall {
+func (c *MockTransactionRollbackZkISMsCall) Do(f func(context.Context, types0.Level) error) *MockTransactionRollbackZkISMsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionRollbackZkISMsCall) DoAndReturn(f func(context.Context, types.Level) error) *MockTransactionRollbackZkISMsCall {
+func (c *MockTransactionRollbackZkISMsCall) DoAndReturn(f func(context.Context, types0.Level) error) *MockTransactionRollbackZkISMsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -5100,10 +5100,10 @@ func (c *MockTransactionUpdateRollupCall) DoAndReturn(f func(context.Context, *s
 }
 
 // UpdateSignalsAfterUpgrade mocks base method.
-func (m *MockTransaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (decimal.Decimal, error) {
+func (m *MockTransaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (types.Numeric, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateSignalsAfterUpgrade", ctx, version)
-	ret0, _ := ret[0].(decimal.Decimal)
+	ret0, _ := ret[0].(types.Numeric)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -5121,25 +5121,25 @@ type MockTransactionUpdateSignalsAfterUpgradeCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Return(arg0 decimal.Decimal, arg1 error) *MockTransactionUpdateSignalsAfterUpgradeCall {
+func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Return(arg0 types.Numeric, arg1 error) *MockTransactionUpdateSignalsAfterUpgradeCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Do(f func(context.Context, uint64) (decimal.Decimal, error)) *MockTransactionUpdateSignalsAfterUpgradeCall {
+func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Do(f func(context.Context, uint64) (types.Numeric, error)) *MockTransactionUpdateSignalsAfterUpgradeCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionUpdateSignalsAfterUpgradeCall) DoAndReturn(f func(context.Context, uint64) (decimal.Decimal, error)) *MockTransactionUpdateSignalsAfterUpgradeCall {
+func (c *MockTransactionUpdateSignalsAfterUpgradeCall) DoAndReturn(f func(context.Context, uint64) (types.Numeric, error)) *MockTransactionUpdateSignalsAfterUpgradeCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // UpdateSlashedDelegations mocks base method.
-func (m *MockTransaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned decimal.Decimal) ([]storage.Balance, error) {
+func (m *MockTransaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned types.Numeric) ([]storage.Balance, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateSlashedDelegations", ctx, validatorId, burned)
 	ret0, _ := ret[0].([]storage.Balance)
@@ -5166,13 +5166,13 @@ func (c *MockTransactionUpdateSlashedDelegationsCall) Return(arg0 []storage.Bala
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionUpdateSlashedDelegationsCall) Do(f func(context.Context, uint64, decimal.Decimal) ([]storage.Balance, error)) *MockTransactionUpdateSlashedDelegationsCall {
+func (c *MockTransactionUpdateSlashedDelegationsCall) Do(f func(context.Context, uint64, types.Numeric) ([]storage.Balance, error)) *MockTransactionUpdateSlashedDelegationsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionUpdateSlashedDelegationsCall) DoAndReturn(f func(context.Context, uint64, decimal.Decimal) ([]storage.Balance, error)) *MockTransactionUpdateSlashedDelegationsCall {
+func (c *MockTransactionUpdateSlashedDelegationsCall) DoAndReturn(f func(context.Context, uint64, types.Numeric) ([]storage.Balance, error)) *MockTransactionUpdateSlashedDelegationsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -41,7 +41,7 @@ var (
 		TimeoutHeight: 0,
 		EventsCount:   10,
 		MessagesCount: 2,
-		Fee:           decimal.RequireFromString("80410"),
+		Fee:           types.NewNumeric(decimal.RequireFromString("80410")),
 		Status:        types.StatusSuccess,
 		Codespace:     "sdk",
 		Memo:          "memo",

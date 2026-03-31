@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -30,7 +29,7 @@ type VestingAccount struct {
 	TxId      *uint64           `bun:"tx_id"                       comment:"Transaction internal identity"`
 	AddressId uint64            `bun:"address_id,notnull"          comment:"Address internal id"`
 	Type      types.VestingType `bun:"type,type:vesting_type"      comment:"Type vesting account"`
-	Amount    decimal.Decimal   `bun:"amount,type:numeric"         comment:"Vested amount"`
+	Amount    types.Numeric     `bun:"amount,type:numeric"         comment:"Vested amount"`
 	StartTime *time.Time        `bun:"start_time"                  comment:"Start time of unlock value"`
 	EndTime   *time.Time        `bun:"end_time"                    comment:"End time of unlock value"`
 

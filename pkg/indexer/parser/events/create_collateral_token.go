@@ -59,8 +59,8 @@ func processCreateCollateralToken(ctx *context.Context, events []storage.Event, 
 					InternalId: originMailboxId.GetInternalId(),
 				},
 				TokenId:  tokenId.Bytes(),
-				Received: decimal.Zero,
-				Sent:     decimal.Zero,
+				Received: types.NewNumeric(decimal.Zero),
+				Sent:     types.NewNumeric(decimal.Zero),
 				TxId:     msg.TxId,
 			}
 

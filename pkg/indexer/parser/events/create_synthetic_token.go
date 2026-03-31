@@ -59,8 +59,8 @@ func processCreateSyntheticToken(ctx *context.Context, events []storage.Event, m
 					InternalId: originMailboxId.GetInternalId(),
 				},
 				TokenId:  tokenId.Bytes(),
-				Sent:     decimal.Zero,
-				Received: decimal.Zero,
+				Sent:     types.NewNumeric(decimal.Zero),
+				Received: types.NewNumeric(decimal.Zero),
 				TxId:     msg.TxId,
 			}
 

@@ -38,7 +38,7 @@ func processDeposit(ctx *context.Context, events []storage.Event, msg *storage.M
 	amount := decoder.AmountFromMap(events[*idx].Data, "amount")
 	msg.Proposal = &storage.Proposal{
 		Id:      proposalId,
-		Deposit: amount,
+		Deposit: types.NewNumeric(amount),
 		Status:  types.ProposalStatusInactive,
 	}
 

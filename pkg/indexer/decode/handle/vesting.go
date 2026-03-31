@@ -109,7 +109,7 @@ func MsgCreatePeriodicVestingAccount(ctx *context.Context, status storageTypes.S
 			Address: m.ToAddress,
 		},
 		Type:   storageTypes.VestingTypePeriodic,
-		Amount: decimal.Zero,
+		Amount: storageTypes.NewNumeric(decimal.Zero),
 		TxId:   &txId,
 	}
 
@@ -124,8 +124,8 @@ func MsgCreatePeriodicVestingAccount(ctx *context.Context, status storageTypes.S
 		period := storage.VestingPeriod{
 			Height: v.Height,
 		}
-		period.Amount = decimal.NewFromBigInt(m.VestingPeriods[i].Amount.AmountOf(currency.Utia).BigInt(), 0)
-		v.Amount = v.Amount.Add(period.Amount)
+		period.Amount = storageTypes.NewNumeric(decimal.NewFromBigInt(m.VestingPeriods[i].Amount.AmountOf(currency.Utia).BigInt(), 0))
+		v.Amount = v.Amount.Add(period.Amount.Decimal)
 		periodTime = periodTime.Add(time.Second * time.Duration(m.VestingPeriods[i].Length))
 		period.Time = periodTime
 		v.VestingPeriods = append(v.VestingPeriods, period)

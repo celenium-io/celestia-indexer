@@ -7,8 +7,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -20,13 +20,13 @@ type IHLGasPayment interface {
 type HLGasPayment struct {
 	bun.BaseModel `bun:"hl_gas_payment" comment:"Table with hyperlane gas payment"`
 
-	Id         uint64          `bun:"id,pk,autoincrement"     comment:"Internal identity"`
-	Height     pkgTypes.Level  `bun:"height,notnull"          comment:"The number (height) of this block"`
-	Time       time.Time       `bun:"time,pk,notnull"         comment:"The time of block"`
-	TransferId uint64          `bun:"transfer_id"             comment:"Transfer identity"`
-	GasAmount  decimal.Decimal `bun:"gas_amount,type:numeric" comment:"Gas amount"`
-	IgpId      uint64          `bun:"igp_id"                  comment:"IGP identity"`
-	Amount     decimal.Decimal `bun:"amount,type:numeric"     comment:"Amount"`
+	Id         uint64         `bun:"id,pk,autoincrement"     comment:"Internal identity"`
+	Height     pkgTypes.Level `bun:"height,notnull"          comment:"The number (height) of this block"`
+	Time       time.Time      `bun:"time,pk,notnull"         comment:"The time of block"`
+	TransferId uint64         `bun:"transfer_id"             comment:"Transfer identity"`
+	GasAmount  types.Numeric  `bun:"gas_amount,type:numeric" comment:"Gas amount"`
+	IgpId      uint64         `bun:"igp_id"                  comment:"IGP identity"`
+	Amount     types.Numeric  `bun:"amount,type:numeric"     comment:"Amount"`
 
 	Igp *HLIGP `bun:"rel:belongs-to,join:igp_id=id"`
 }
