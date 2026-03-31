@@ -362,6 +362,12 @@ func (s *TransactionTestSuite) TestSaveBlobLogsWithCopy() {
 	err = s.storage.Connection().DB().QueryRow("select count(*) from blob_log").Scan(&count)
 	s.Require().NoError(err)
 	s.Require().GreaterOrEqual(count, 1000)
+
+	// Verify Numeric round-trip via COPY protocol
+	var fee types.Numeric
+	err = s.storage.Connection().DB().QueryRow("select fee from blob_log limit 1").Scan(&fee)
+	s.Require().NoError(err)
+	s.Require().True(fee.Equal(decimal.NewFromInt(17263)), "Numeric round-trip via COPY: expected 17263, got %s", fee.String())
 }
 
 func (s *TransactionTestSuite) TestSaveTransactionsWithCopy() {
@@ -410,6 +416,7 @@ func (s *TransactionTestSuite) TestSaveTransactionsWithCopy() {
 	s.Require().NotEmpty(item.MessageTypes)
 	s.Require().EqualValues(types.StatusSuccess, item.Status)
 	s.Require().Len(item.Hash, 32)
+	s.Require().True(item.Fee.Equal(decimal.NewFromInt(17263)), "Numeric round-trip via COPY: expected 17263, got %s", item.Fee.String())
 }
 
 func (s *TransactionTestSuite) TestSaveMessagesWithCopy() {
