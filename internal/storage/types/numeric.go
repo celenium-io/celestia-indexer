@@ -60,6 +60,16 @@ func (n *Numeric) ScanNumeric(v pgtype.Numeric) error {
 	return nil
 }
 
+// MarshalJSON implements json.Marshaler.
+func (n Numeric) MarshalJSON() ([]byte, error) {
+	return n.Decimal.MarshalJSON()
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (n *Numeric) UnmarshalJSON(data []byte) error {
+	return n.Decimal.UnmarshalJSON(data)
+}
+
 // Arithmetic methods that return Numeric instead of decimal.Decimal.
 
 func (n Numeric) Add(d decimal.Decimal) Numeric {
