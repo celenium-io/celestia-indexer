@@ -52,7 +52,7 @@ func (s *StorageTestSuite) TestSignalVersionList() {
 		s.Require().EqualValues(3, signal.Id)
 		s.Require().EqualValues(103, signal.Height)
 		s.Require().EqualValues(1488, signal.Version)
-		s.Require().EqualValues(decimal.RequireFromString("8"), signal.VotingPower)
+		s.Require().True(signal.VotingPower.Equal(decimal.RequireFromString("8")), "VotingPower: expected 8, got %s", signal.VotingPower.String())
 		s.Require().EqualValues(3, signal.MsgId)
 		s.Require().EqualValues(3, signal.TxId)
 		s.Require().NotNil(signal.Validator)
