@@ -33,9 +33,21 @@ func (n Numeric) Value() (driver.Value, error) {
 
 // Scan implements sql.Scanner.
 func (n *Numeric) Scan(src any) error {
-	// pgtype.Numeric.Scan does not handle []byte; convert to string first.
-	if b, ok := src.([]byte); ok {
-		src = string(b)
+	if src == nil {
+		n.Decimal = decimal.Decimal{}
+		return nil
+	}
+	// pgtype.Numeric.Scan handles only string and nil.
+	// database/sql may deliver []byte, float64 or int64 depending on the column type.
+	switch v := src.(type) {
+	case []byte:
+		src = string(v)
+	case float64:
+		n.Decimal = decimal.NewFromFloat(v)
+		return nil
+	case int64:
+		n.Decimal = decimal.NewFromInt(v)
+		return nil
 	}
 	var pn pgtype.Numeric
 	if err := pn.Scan(src); err != nil {

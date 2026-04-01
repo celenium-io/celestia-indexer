@@ -79,6 +79,20 @@ func TestNumeric_ScanBytes(t *testing.T) {
 	require.True(t, n.Equal(decimal.NewFromInt(17263)))
 }
 
+func TestNumeric_ScanFloat64(t *testing.T) {
+	var n Numeric
+	err := n.Scan(float64(3.14))
+	require.NoError(t, err)
+	require.True(t, n.Equal(decimal.NewFromFloat(3.14)))
+}
+
+func TestNumeric_ScanInt64(t *testing.T) {
+	var n Numeric
+	err := n.Scan(int64(999))
+	require.NoError(t, err)
+	require.True(t, n.Equal(decimal.NewFromInt(999)))
+}
+
 func TestNumeric_ScanNil(t *testing.T) {
 	n := NewNumeric(decimal.NewFromInt(42))
 	err := n.Scan(nil)
