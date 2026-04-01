@@ -72,6 +72,13 @@ func TestNumeric_ScanString(t *testing.T) {
 	require.True(t, n.Equal(decimal.RequireFromString("123.456")))
 }
 
+func TestNumeric_ScanBytes(t *testing.T) {
+	var n Numeric
+	err := n.Scan([]byte("17263"))
+	require.NoError(t, err)
+	require.True(t, n.Equal(decimal.NewFromInt(17263)))
+}
+
 func TestNumeric_ScanNil(t *testing.T) {
 	n := NewNumeric(decimal.NewFromInt(42))
 	err := n.Scan(nil)

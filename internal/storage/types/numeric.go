@@ -33,6 +33,10 @@ func (n Numeric) Value() (driver.Value, error) {
 
 // Scan implements sql.Scanner.
 func (n *Numeric) Scan(src any) error {
+	// pgtype.Numeric.Scan does not handle []byte; convert to string first.
+	if b, ok := src.([]byte); ok {
+		src = string(b)
+	}
 	var pn pgtype.Numeric
 	if err := pn.Scan(src); err != nil {
 		return err
