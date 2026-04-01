@@ -365,7 +365,7 @@ func (s *TransactionTestSuite) TestSaveBlobLogsWithCopy() {
 
 	// Verify Numeric round-trip via COPY protocol
 	var fee types.Numeric
-	err = s.storage.Connection().DB().QueryRow("select fee from blob_log limit 1").Scan(&fee)
+	err = s.storage.Connection().DB().QueryRow("select fee from blob_log where fee = 17263 limit 1").Scan(&fee)
 	s.Require().NoError(err)
 	s.Require().True(fee.Equal(decimal.NewFromInt(17263)), "Numeric round-trip via COPY: expected 17263, got %s", fee.String())
 }
@@ -2362,8 +2362,8 @@ func (s *TransactionTestSuite) TestHyperlaneIgpConfig() {
 	s.Require().NoError(err)
 
 	s.Require().EqualValues(1488, igp.Height)
-	s.Require().EqualValues(decimal.RequireFromString("1"), igp.GasPrice)
-	s.Require().EqualValues(decimal.RequireFromString("100000"), igp.GasOverhead)
+	s.Require().True(igp.GasPrice.Equal(decimal.RequireFromString("1")), "GasPrice: expected 1, got %s", igp.GasPrice.String())
+	s.Require().True(igp.GasOverhead.Equal(decimal.RequireFromString("100000")), "GasOverhead: expected 100000, got %s", igp.GasOverhead.String())
 	s.Require().EqualValues(1234, igp.RemoteDomain)
 	s.Require().EqualValues("4321", igp.TokenExchangeRate)
 	s.Require().NoError(tx.Flush(ctx))
