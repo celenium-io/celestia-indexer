@@ -17,6 +17,11 @@ type Numeric struct {
 	decimal.Decimal
 }
 
+var (
+	_ pgtype.NumericValuer  = Numeric{}
+	_ pgtype.NumericScanner = (*Numeric)(nil)
+)
+
 func NewNumeric(d decimal.Decimal) Numeric {
 	return Numeric{d}
 }
