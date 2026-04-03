@@ -107,7 +107,7 @@ func processUndelegate(ctx *context.Context, events []storage.Event, msg *storag
 			}
 
 			completionTime = unbond.CompletionTime
-			amount = storageTypes.NewNumeric(decimal.RequireFromString(unbond.Amount.Amount.String()))
+			amount = storageTypes.NumericFromString(unbond.Amount.Amount.String())
 			prefix, hash, err := types.Address(unbond.Validator).Decode()
 			if err != nil {
 				return errors.Wrap(err, "decode validator address")

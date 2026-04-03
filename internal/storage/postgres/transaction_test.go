@@ -272,7 +272,7 @@ func (s *TransactionTestSuite) TestSaveBalances() {
 	balances := make([]storage.Balance, 5)
 	for i := 0; i < 5; i++ {
 		balances[i].Id = uint64(i + 1)
-		balances[i].Spendable = types.NewNumeric(decimal.RequireFromString("1000"))
+		balances[i].Spendable = types.NumericFromInt64(1000)
 		balances[i].Currency = "utia"
 	}
 
@@ -527,7 +527,7 @@ func (s *TransactionTestSuite) TestSaveVotes() {
 		VoterId:    3,
 		Height:     1001,
 		Time:       time.Now(),
-		Weight:     types.NewNumeric(decimal.RequireFromString("1.0")),
+		Weight:     types.NumericFromString("1.0"),
 	}
 
 	count, err := tx.SaveVotes(ctx, vote)
@@ -568,14 +568,14 @@ func (s *TransactionTestSuite) TestSave2Votes() {
 			VoterId:    3,
 			Height:     1001,
 			Time:       time.Now(),
-			Weight:     types.NewNumeric(decimal.RequireFromString("1.0")),
+			Weight:     types.NumericFromString("1.0"),
 		}, {
 			Option:     types.VoteOptionAbstain,
 			ProposalId: 1,
 			VoterId:    5,
 			Height:     1001,
 			Time:       time.Now(),
-			Weight:     types.NewNumeric(decimal.RequireFromString("1.0")),
+			Weight:     types.NumericFromString("1.0"),
 		},
 	}
 
@@ -611,14 +611,14 @@ func (s *TransactionTestSuite) TestSaveWeightedVotes() {
 			VoterId:    5,
 			Height:     1001,
 			Time:       time.Now(),
-			Weight:     types.NewNumeric(decimal.RequireFromString("0.5")),
+			Weight:     types.NumericFromString("0.5"),
 		}, {
 			Option:     types.VoteOptionAbstain,
 			ProposalId: 1,
 			VoterId:    5,
 			Height:     1001,
 			Time:       time.Now(),
-			Weight:     types.NewNumeric(decimal.RequireFromString("0.5")),
+			Weight:     types.NumericFromString("0.5"),
 		},
 	}
 
@@ -656,7 +656,7 @@ func (s *TransactionTestSuite) TestSaveVotesValidatorIdDuplicate() {
 		ValidatorId: testsuite.Ptr(uint64(1)),
 		Height:      1001,
 		Time:        time.Now(),
-		Weight:      types.NewNumeric(decimal.RequireFromString("1.0")),
+		Weight:      types.NumericFromString("1.0"),
 	}
 
 	newCount, err := tx.SaveVotes(ctx, vote)
@@ -702,7 +702,7 @@ func (s *TransactionTestSuite) TestSaveVotesAddressIdDuplicate() {
 		VoterId:    1,
 		Height:     1001,
 		Time:       time.Now(),
-		Weight:     types.NewNumeric(decimal.RequireFromString("1.0")),
+		Weight:     types.NumericFromString("1.0"),
 	}
 
 	newCount, err := tx.SaveVotes(ctx, vote)
@@ -1516,7 +1516,7 @@ func (s *TransactionTestSuite) TestUpdateSlashedDelegations() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	balances, err := tx.UpdateSlashedDelegations(ctx, 1, types.NewNumeric(decimal.NewFromFloat(200)))
+	balances, err := tx.UpdateSlashedDelegations(ctx, 1, types.NumericFromFloat64(200))
 	s.Require().NoError(err)
 	s.Require().Len(balances, 2)
 
@@ -1855,7 +1855,7 @@ func (s *TransactionTestSuite) TestIbcChannels() {
 		CounterpartyChannelId: "channel-100",
 		Ordering:              true,
 		Status:                types.IbcChannelStatusClosed,
-		Sent:                  types.NewNumeric(decimal.RequireFromString("100")),
+		Sent:                  types.NumericFromInt64(100),
 		TransfersCount:        10,
 	}, &storage.IbcChannel{
 		Id:                 "channel-1",
@@ -1863,8 +1863,8 @@ func (s *TransactionTestSuite) TestIbcChannels() {
 		ConfirmationHeight: 10000,
 		ConfirmationTxId:   100,
 		Status:             types.IbcChannelStatusInitialization,
-		Sent:               types.NewNumeric(decimal.RequireFromString("100")),
-		Received:           types.NewNumeric(decimal.RequireFromString("100")),
+		Sent:               types.NumericFromInt64(100),
+		Received:           types.NumericFromInt64(100),
 		TransfersCount:     12,
 	})
 	s.Require().NoError(err)
@@ -1895,7 +1895,7 @@ func (s *TransactionTestSuite) TestIbcTransfers() {
 		ChannelId:       "channel-1",
 		Height:          10000,
 		Time:            time.Now().UTC(),
-		Amount:          types.NewNumeric(decimal.RequireFromString("12123123")),
+		Amount:          types.NumericFromInt64(12123123),
 		Denom:           currency.Utia,
 		SenderId:        testsuite.Ptr(uint64(1)),
 		ReceiverAddress: testsuite.Ptr("osmo1m8wg4vxkefhs374qxmmqpyusgz289wmulex5qdwpfx7jnrxzer5s9cv83q"),
@@ -1942,7 +1942,7 @@ func (s *TransactionTestSuite) TestHyperlaneTransfers() {
 		Id:                  123,
 		Height:              10000,
 		Time:                time.Now().UTC(),
-		Amount:              types.NewNumeric(decimal.RequireFromString("12123123")),
+		Amount:              types.NumericFromInt64(12123123),
 		Denom:               currency.Utia,
 		TxId:                2,
 		MailboxId:           1,
@@ -1988,7 +1988,7 @@ func (s *TransactionTestSuite) TestHyperlaneTokens() {
 		Type:             types.HLTokenTypeCollateral,
 		SentTransfers:    1,
 		ReceiveTransfers: 1,
-		Sent:             types.NewNumeric(decimal.RequireFromString("123")),
+		Sent:             types.NumericFromInt64(123),
 		Received:         types.NewNumeric(decimal.Zero),
 	})
 	s.Require().NoError(err)
@@ -2100,7 +2100,7 @@ func (s *TransactionTestSuite) TestSaveSignals() {
 		&storage.SignalVersion{
 			Id:          1,
 			Height:      1111,
-			VotingPower: types.NewNumeric(decimal.RequireFromString("1000")),
+			VotingPower: types.NumericFromInt64(1000),
 			MsgId:       1,
 			TxId:        1,
 			Time:        time.Now().UTC(),
@@ -2110,7 +2110,7 @@ func (s *TransactionTestSuite) TestSaveSignals() {
 		}, &storage.SignalVersion{
 			Id:          2,
 			Height:      2222,
-			VotingPower: types.NewNumeric(decimal.RequireFromString("2000")),
+			VotingPower: types.NumericFromInt64(2000),
 			MsgId:       2,
 			TxId:        2,
 			Time:        time.Now().UTC(),
@@ -2332,16 +2332,16 @@ func (s *TransactionTestSuite) TestSaveIgpConfig() {
 			Id:                1,
 			Height:            1111,
 			Time:              time.Now().UTC(),
-			GasOverhead:       types.NewNumeric(decimal.RequireFromString("100000")),
-			GasPrice:          types.NewNumeric(decimal.RequireFromString("1")),
+			GasOverhead:       types.NumericFromInt64(100000),
+			GasPrice:          types.NumericFromInt64(1),
 			RemoteDomain:      1488,
 			TokenExchangeRate: "1234567",
 		}, storage.HLIGPConfig{
 			Id:                1,
 			Height:            1112,
 			Time:              time.Now().UTC(),
-			GasOverhead:       types.NewNumeric(decimal.RequireFromString("200000")),
-			GasPrice:          types.NewNumeric(decimal.RequireFromString("2")),
+			GasOverhead:       types.NumericFromInt64(200000),
+			GasPrice:          types.NumericFromInt64(2),
 			RemoteDomain:      1489,
 			TokenExchangeRate: "87654321",
 		})
@@ -2382,8 +2382,8 @@ func (s *TransactionTestSuite) TestSaveHyperlaneGasPayments() {
 			Id:         1,
 			Height:     1111,
 			Time:       time.Now().UTC(),
-			GasAmount:  types.NewNumeric(decimal.RequireFromString("1")),
-			Amount:     types.NewNumeric(decimal.RequireFromString("1234")),
+			GasAmount:  types.NumericFromInt64(1),
+			Amount:     types.NumericFromInt64(1234),
 			IgpId:      1,
 			TransferId: 1,
 		})

@@ -22,7 +22,6 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -41,7 +40,7 @@ var (
 		TimeoutHeight: 0,
 		EventsCount:   10,
 		MessagesCount: 2,
-		Fee:           types.NewNumeric(decimal.RequireFromString("80410")),
+		Fee:           types.NumericFromInt64(80410),
 		Status:        types.StatusSuccess,
 		Codespace:     "sdk",
 		Memo:          "memo",

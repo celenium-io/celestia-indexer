@@ -30,7 +30,7 @@ func Test_processBlob(t *testing.T) {
 			},
 		}
 		tx := &storage.Tx{
-			Fee:     storageTypes.NewNumeric(decimal.RequireFromString("100")),
+			Fee:     storageTypes.NumericFromInt64(100),
 			GasUsed: 1000,
 		}
 
@@ -56,7 +56,7 @@ func Test_processBlob(t *testing.T) {
 			},
 		}
 		tx := &storage.Tx{
-			Fee:     storageTypes.NewNumeric(decimal.RequireFromString("100")),
+			Fee:     storageTypes.NumericFromInt64(100),
 			GasUsed: 1000,
 		}
 
@@ -89,7 +89,7 @@ func Test_processBlob(t *testing.T) {
 			},
 		}
 		tx := &storage.Tx{
-			Fee:     storageTypes.NewNumeric(decimal.RequireFromString("100")),
+			Fee:     storageTypes.NumericFromInt64(100),
 			GasUsed: 1000,
 		}
 

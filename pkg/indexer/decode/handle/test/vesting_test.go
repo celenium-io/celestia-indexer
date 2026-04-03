@@ -15,7 +15,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -59,7 +58,7 @@ func TestDecodeMsg_SuccessOnMsgCreateVestingAccount(t *testing.T) {
 		Address: &storage.Address{
 			Address: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 		},
-		Amount: storageTypes.NewNumeric(decimal.RequireFromString("1000")),
+		Amount: storageTypes.NumericFromInt64(1000),
 		Type:   storageTypes.VestingTypeContinuous,
 		TxId:   testsuite.Ptr(txId),
 	}
@@ -114,7 +113,7 @@ func TestDecodeMsg_SuccessOnMsgCreatePermanentLockedAccount(t *testing.T) {
 		Address: &storage.Address{
 			Address: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 		},
-		Amount: storageTypes.NewNumeric(decimal.RequireFromString("0")),
+		Amount: storageTypes.NumericFromInt64(0),
 		Type:   storageTypes.VestingTypePermanent,
 		TxId:   testsuite.Ptr(txId),
 	}
@@ -176,14 +175,14 @@ func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 		Address: &storage.Address{
 			Address: "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
 		},
-		Amount:    storageTypes.NewNumeric(decimal.RequireFromString("1")),
+		Amount:    storageTypes.NumericFromInt64(1),
 		Type:      storageTypes.VestingTypePeriodic,
 		StartTime: &startTime,
 		TxId:      testsuite.Ptr(txId),
 		VestingPeriods: []storage.VestingPeriod{
 			{
 				Height: block.Height,
-				Amount: storageTypes.NewNumeric(decimal.RequireFromString("1")),
+				Amount: storageTypes.NumericFromInt64(1),
 				Time:   time.Date(2024, 03, 13, 19, 38, 30, 0, time.UTC),
 			},
 		},

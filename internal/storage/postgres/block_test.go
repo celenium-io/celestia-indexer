@@ -68,7 +68,7 @@ func (s *StorageTestSuite) TestBlockByHeightWithStats() {
 		BlobsCount:    4,
 		BlockTime:     11000,
 		SupplyChange:  storageTypes.NewNumeric(decimal.NewFromInt(30930476)),
-		InflationRate: storageTypes.NewNumeric(decimal.NewFromFloat(0.08)),
+		InflationRate: storageTypes.NumericFromFloat64(0.08),
 		Fee:           storageTypes.NewNumeric(decimal.NewFromInt(2873468273)),
 	}
 	s.Require().EqualValues(expectedStats.Id, block.Stats.Id)
@@ -106,7 +106,7 @@ func (s *StorageTestSuite) TestBlockByIdWithRelations() {
 		BlobsSize:     1234,
 		BlockTime:     11000,
 		SupplyChange:  storageTypes.NewNumeric(decimal.NewFromInt(30930476)),
-		InflationRate: storageTypes.NewNumeric(decimal.NewFromFloat(0.08)),
+		InflationRate: storageTypes.NumericFromFloat64(0.08),
 		Fee:           storageTypes.NewNumeric(decimal.NewFromInt(2873468273)),
 		BlobsCount:    4,
 	}

@@ -18,7 +18,6 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -266,7 +265,7 @@ func (s *ValidatorTestSuite) TestDelegators() {
 			{
 				AddressId:   1,
 				ValidatorId: 1,
-				Amount:      storageTypes.NewNumeric(decimal.RequireFromString("100")),
+				Amount:      storageTypes.NumericFromInt64(100),
 				Validator:   &testValidator,
 				Address: &storage.Address{
 					Address: testAddress,
@@ -304,7 +303,7 @@ func (s *ValidatorTestSuite) TestJails() {
 		ByValidator(gomock.Any(), uint64(1), 10, 0).
 		Return([]storage.Jail{
 			{
-				Burned:      storageTypes.NewNumeric(decimal.RequireFromString("100")),
+				Burned:      storageTypes.NumericFromInt64(100),
 				Reason:      "double_sign",
 				Height:      100,
 				Time:        testTime,
@@ -386,7 +385,7 @@ func (s *ValidatorTestSuite) TestVotes() {
 			{
 				Id:          2,
 				Height:      1000,
-				Weight:      storageTypes.NewNumeric(decimal.NewFromFloat(1)),
+				Weight:      storageTypes.NumericFromFloat64(1),
 				Option:      storageTypes.VoteOptionNoWithVeto,
 				ValidatorId: testsuite.Ptr(uint64(1)),
 				Validator:   &testValidator,
@@ -402,7 +401,7 @@ func (s *ValidatorTestSuite) TestVotes() {
 	s.Require().Len(votes, 1)
 	s.Require().EqualValues(2, votes[0].Id)
 	s.Require().EqualValues(1000, votes[0].Height)
-	s.Require().EqualValues(storageTypes.NewNumeric(decimal.NewFromFloat(1)), votes[0].Weight)
+	s.Require().EqualValues(storageTypes.NumericFromFloat64(1), votes[0].Weight)
 	s.Require().EqualValues(storageTypes.VoteOptionNoWithVeto, votes[0].Option)
 	s.Require().EqualValues(1, votes[0].Validator.Id)
 	s.Require().EqualValues("moniker", votes[0].Validator.Moniker)
@@ -472,19 +471,19 @@ func (s *ValidatorTestSuite) TestMetrics() {
 		Return(storage.ValidatorMetrics{
 			Id:                    1,
 			Moniker:               "moniker",
-			MaxRate:               storageTypes.NewNumeric(decimal.RequireFromString("0.1")),
-			MaxChangeRate:         storageTypes.NewNumeric(decimal.RequireFromString("0.01")),
-			Stake:                 storageTypes.NewNumeric(decimal.RequireFromString("100")),
+			MaxRate:               storageTypes.NumericFromString("0.1"),
+			MaxChangeRate:         storageTypes.NumericFromString("0.01"),
+			Stake:                 storageTypes.NumericFromInt64(100),
 			CreationTime:          testTime,
-			SelfDelegationAmount:  storageTypes.NewNumeric(decimal.RequireFromString("10")),
+			SelfDelegationAmount:  storageTypes.NumericFromInt64(10),
 			AppliedProposalsCount: 5,
 			VotesCount:            5,
 			BlockMissedCount:      2,
-			VotesMetric:           storageTypes.NewNumeric(decimal.RequireFromString("1.0")),
-			CommissionMetric:      storageTypes.NewNumeric(decimal.RequireFromString("0.9")),
-			OperationTimeMetric:   storageTypes.NewNumeric(decimal.RequireFromString("0.85")),
-			SelfDelegationMetric:  storageTypes.NewNumeric(decimal.RequireFromString("0.8")),
-			BlockMissedMetric:     storageTypes.NewNumeric(decimal.RequireFromString("0.75")),
+			VotesMetric:           storageTypes.NumericFromString("1.0"),
+			CommissionMetric:      storageTypes.NumericFromString("0.9"),
+			OperationTimeMetric:   storageTypes.NumericFromString("0.85"),
+			SelfDelegationMetric:  storageTypes.NumericFromString("0.8"),
+			BlockMissedMetric:     storageTypes.NumericFromString("0.75"),
 		}, nil).
 		Times(1)
 
@@ -521,11 +520,11 @@ func (s *ValidatorTestSuite) TestTopNMetrics() {
 	s.validators.EXPECT().
 		TopNMetrics(gomock.Any(), 25).
 		Return(storage.ValidatorMetrics{
-			VotesMetric:          storageTypes.NewNumeric(decimal.RequireFromString("1.0")),
-			CommissionMetric:     storageTypes.NewNumeric(decimal.RequireFromString("0.9")),
-			OperationTimeMetric:  storageTypes.NewNumeric(decimal.RequireFromString("0.85")),
-			SelfDelegationMetric: storageTypes.NewNumeric(decimal.RequireFromString("0.8")),
-			BlockMissedMetric:    storageTypes.NewNumeric(decimal.RequireFromString("0.75")),
+			VotesMetric:          storageTypes.NumericFromString("1.0"),
+			CommissionMetric:     storageTypes.NumericFromString("0.9"),
+			OperationTimeMetric:  storageTypes.NumericFromString("0.85"),
+			SelfDelegationMetric: storageTypes.NumericFromString("0.8"),
+			BlockMissedMetric:    storageTypes.NumericFromString("0.75"),
 		}, nil).
 		Times(1)
 

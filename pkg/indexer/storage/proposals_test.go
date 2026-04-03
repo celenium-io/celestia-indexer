@@ -13,7 +13,6 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -87,17 +86,17 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Times(1)
 		validators.EXPECT().
 			TotalVotingPower(gomock.Any(), 100).
-			Return(types.NewNumeric(decimal.RequireFromString("10000")), nil).
+			Return(types.NumericFromInt64(10000), nil).
 			Times(1)
 
 		tx.EXPECT().
 			BondedValidators(t.Context(), 100).
 			Return([]storage.Validator{{
 				Id:    1,
-				Stake: types.NewNumeric(decimal.RequireFromString("100000000")),
+				Stake: types.NumericFromInt64(100000000),
 			}, {
 				Id:    2,
-				Stake: types.NewNumeric(decimal.RequireFromString("200000000")),
+				Stake: types.NumericFromInt64(200000000),
 			}}, nil).
 			Times(1)
 
@@ -121,7 +120,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Return([]storage.Delegation{{
 				ValidatorId: 1,
 				AddressId:   1,
-				Amount:      types.NewNumeric(decimal.RequireFromString("50000000")),
+				Amount:      types.NumericFromInt64(50000000),
 			}}, nil).
 			Times(1)
 
@@ -130,7 +129,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Return([]storage.Delegation{{
 				ValidatorId: 1,
 				AddressId:   1,
-				Amount:      types.NewNumeric(decimal.RequireFromString("10000000")),
+				Amount:      types.NumericFromInt64(10000000),
 			}}, nil).
 			Times(1)
 
@@ -139,7 +138,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Return([]storage.Delegation{{
 				ValidatorId: 1,
 				AddressId:   1,
-				Amount:      types.NewNumeric(decimal.RequireFromString("10000000")),
+				Amount:      types.NumericFromInt64(10000000),
 			}}, nil).
 			Times(1)
 

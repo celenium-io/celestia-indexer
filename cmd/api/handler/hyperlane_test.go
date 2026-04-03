@@ -22,7 +22,6 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	hl "github.com/celenium-io/celestia-indexer/pkg/node/hyperlane"
 	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -70,8 +69,8 @@ var (
 		TokenId:          testsuite.RandomBytes(32),
 		SentTransfers:    10,
 		ReceiveTransfers: 10,
-		Sent:             types.NewNumeric(decimal.RequireFromString("1000")),
-		Received:         types.NewNumeric(decimal.RequireFromString("1000")),
+		Sent:             types.NumericFromInt64(1000),
+		Received:         types.NumericFromInt64(1000),
 	}
 
 	testChainMetadata = hl.ChainMetadata{
@@ -120,12 +119,12 @@ var (
 		Version:             1,
 		Body:                testsuite.RandomBytes(32),
 		Metadata:            testsuite.RandomBytes(32),
-		Amount:              types.NewNumeric(decimal.RequireFromString("125678")),
+		Amount:              types.NumericFromInt64(125678),
 		Denom:               currency.Utia,
 		Type:                types.HLTransferTypeReceive,
 		GasPayment: &storage.HLGasPayment{
-			Amount:    types.NewNumeric(decimal.RequireFromString("111")),
-			GasAmount: types.NewNumeric(decimal.RequireFromString("11")),
+			Amount:    types.NumericFromInt64(111),
+			GasAmount: types.NumericFromInt64(11),
 			IgpId:     1,
 			Igp:       &storage.HLIGP{IgpId: []byte{1, 2, 3}},
 		},
@@ -144,7 +143,7 @@ var (
 		TimeoutHeight: 0,
 		EventsCount:   11,
 		MessagesCount: 3,
-		Fee:           types.NewNumeric(decimal.RequireFromString("80410")),
+		Fee:           types.NumericFromInt64(80410),
 		Status:        types.StatusSuccess,
 		Codespace:     "sdk",
 		Memo:          "memo",
@@ -177,8 +176,8 @@ var (
 		},
 		Configs: []*storage.HLIGPConfig{
 			{
-				GasPrice:          types.NewNumeric(decimal.RequireFromString("1")),
-				GasOverhead:       types.NewNumeric(decimal.RequireFromString("100000")),
+				GasPrice:          types.NumericFromInt64(1),
+				GasOverhead:       types.NumericFromInt64(100000),
 				TokenExchangeRate: "1234",
 				RemoteDomain:      1,
 			},
@@ -536,7 +535,7 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 			Version:             1,
 			Body:                testsuite.RandomBytes(32),
 			Metadata:            testsuite.RandomBytes(32),
-			Amount:              types.NewNumeric(decimal.RequireFromString("102030")),
+			Amount:              types.NumericFromInt64(102030),
 			Denom:               currency.Utia,
 			Type:                types.HLTransferTypeReceive,
 		},

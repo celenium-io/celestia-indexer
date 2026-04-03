@@ -11,7 +11,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -94,7 +93,7 @@ func Test_handleDeposit(t *testing.T) {
 				Id:             2,
 				ActivationTime: &ts,
 				Status:         types.ProposalStatusActive,
-				Deposit:        types.NewNumeric(decimal.RequireFromString("9990000000")),
+				Deposit:        types.NumericFromInt64(9990000000),
 			},
 		}, {
 			name: "deposit test 2",
@@ -158,7 +157,7 @@ func Test_handleDeposit(t *testing.T) {
 			proposal: storage.Proposal{
 				Id:      2,
 				Status:  types.ProposalStatusInactive,
-				Deposit: types.NewNumeric(decimal.RequireFromString("9990000000")),
+				Deposit: types.NumericFromInt64(9990000000),
 			},
 		}, {
 			name: "deposit test 3",
@@ -229,7 +228,7 @@ func Test_handleDeposit(t *testing.T) {
 				Id:             7,
 				ActivationTime: &ts,
 				Status:         types.ProposalStatusActive,
-				Deposit:        types.NewNumeric(decimal.RequireFromString("9000000000")),
+				Deposit:        types.NumericFromInt64(9000000000),
 			},
 		}, {
 			name: "deposit test 4",
@@ -292,7 +291,7 @@ func Test_handleDeposit(t *testing.T) {
 			proposal: storage.Proposal{
 				Id:      7,
 				Status:  types.ProposalStatusInactive,
-				Deposit: types.NewNumeric(decimal.RequireFromString("100000000")),
+				Deposit: types.NumericFromInt64(100000000),
 			},
 		},
 	}

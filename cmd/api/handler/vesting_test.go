@@ -16,7 +16,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -64,7 +63,7 @@ func (s *VestingTestSuite) TestPeriods() {
 		Return([]storage.VestingPeriod{
 			{
 				Time:   testTime,
-				Amount: storageTypes.NewNumeric(decimal.RequireFromString("1000")),
+				Amount: storageTypes.NumericFromInt64(1000),
 			},
 		}, nil).
 		Times(1)

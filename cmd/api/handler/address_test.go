@@ -21,7 +21,6 @@ import (
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	celestialMock "github.com/celenium-io/celestial-module/pkg/storage/mock"
 	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -184,9 +183,9 @@ func (s *AddressTestSuite) TestList() {
 				LastHeight: 100,
 				Balance: storage.Balance{
 					Currency:  "utia",
-					Spendable: types.NewNumeric(decimal.RequireFromString("100")),
-					Delegated: types.NewNumeric(decimal.RequireFromString("1")),
-					Unbonding: types.NewNumeric(decimal.RequireFromString("2")),
+					Spendable: types.NumericFromInt64(100),
+					Delegated: types.NumericFromInt64(1),
+					Unbonding: types.NumericFromInt64(2),
 				},
 				Celestials: &celestials.Celestial{
 					Id:       "name",
@@ -427,7 +426,7 @@ func (s *AddressTestSuite) TestDelegations() {
 			{
 				AddressId:   1,
 				ValidatorId: 1,
-				Amount:      types.NewNumeric(decimal.RequireFromString("100")),
+				Amount:      types.NumericFromInt64(100),
 				Validator:   &testValidator,
 				Address: &storage.Address{
 					Address: testAddress,
@@ -476,7 +475,7 @@ func (s *AddressTestSuite) TestUndelegations() {
 				Height:      1000,
 				AddressId:   1,
 				ValidatorId: 1,
-				Amount:      types.NewNumeric(decimal.RequireFromString("100")),
+				Amount:      types.NumericFromInt64(100),
 				Validator:   &testValidator,
 				Address: &storage.Address{
 					Address: testAddress,
@@ -530,7 +529,7 @@ func (s *AddressTestSuite) TestRedelegations() {
 				AddressId:   1,
 				SrcId:       1,
 				DestId:      1,
-				Amount:      types.NewNumeric(decimal.RequireFromString("100")),
+				Amount:      types.NumericFromInt64(100),
 				Source:      &testValidator,
 				Destination: &testValidator,
 				Address: &storage.Address{
@@ -585,7 +584,7 @@ func (s *AddressTestSuite) TestVestings() {
 				Time:      testTime,
 				Height:    1000,
 				AddressId: 1,
-				Amount:    types.NewNumeric(decimal.RequireFromString("100")),
+				Amount:    types.NumericFromInt64(100),
 				Address: &storage.Address{
 					Address: testAddress,
 					Id:      1,
@@ -827,7 +826,7 @@ func (s *AddressTestSuite) TestVotes() {
 			{
 				Id:      1,
 				Height:  1000,
-				Weight:  types.NewNumeric(decimal.NewFromFloat(1)),
+				Weight:  types.NumericFromFloat64(1),
 				Option:  types.VoteOptionYes,
 				VoterId: 1,
 				Voter: &storage.Address{
@@ -838,9 +837,9 @@ func (s *AddressTestSuite) TestVotes() {
 					LastHeight: 333,
 					Balance: storage.Balance{
 						Currency:  "utia",
-						Spendable: types.NewNumeric(decimal.RequireFromString("100")),
-						Delegated: types.NewNumeric(decimal.RequireFromString("1")),
-						Unbonding: types.NewNumeric(decimal.RequireFromString("2")),
+						Spendable: types.NumericFromInt64(100),
+						Delegated: types.NumericFromInt64(1),
+						Unbonding: types.NumericFromInt64(2),
 					},
 					Celestials: &celestials.Celestial{
 						Id:       "name",
@@ -859,7 +858,7 @@ func (s *AddressTestSuite) TestVotes() {
 	s.Require().Len(votes, 1)
 	s.Require().EqualValues(1, votes[0].Id)
 	s.Require().EqualValues(1000, votes[0].Height)
-	s.Require().EqualValues(types.NewNumeric(decimal.NewFromFloat(1)), votes[0].Weight)
+	s.Require().EqualValues(types.NumericFromFloat64(1), votes[0].Weight)
 	s.Require().EqualValues(types.VoteOptionYes, votes[0].Option)
 	s.Require().EqualValues(1, votes[0].VoterId)
 	s.Require().Nil(votes[0].Validator)

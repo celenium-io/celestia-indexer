@@ -25,6 +25,14 @@ func NumericFromInt64(v int64) Numeric {
 	return Numeric{decimal.NewFromInt(v)}
 }
 
+func NumericFromString(s string) Numeric {
+	return Numeric{decimal.RequireFromString(s)}
+}
+
+func NumericFromFloat64(v float64) Numeric {
+	return Numeric{decimal.NewFromFloat(v)}
+}
+
 // Value implements driver.Valuer, returning pgtype.Numeric for pgx.
 func (n Numeric) Value() (driver.Value, error) {
 	pn := pgtype.Numeric{Int: n.Coefficient(), Exp: n.Exponent(), Valid: true}

@@ -20,7 +20,6 @@ import (
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -30,7 +29,7 @@ var testSignal = storage.SignalVersion{
 	Height:      12345,
 	ValidatorId: 1,
 	Time:        time.Now().UTC(),
-	VotingPower: storageTypes.NewNumeric(decimal.NewFromFloat(100)),
+	VotingPower: storageTypes.NumericFromFloat64(100),
 	Version:     1,
 	MsgId:       1,
 	TxId:        1,
@@ -46,8 +45,8 @@ var testUpgrade = storage.Upgrade{
 	MsgId:       1,
 	TxId:        1,
 	Tx:          &testTx,
-	VotingPower: storageTypes.NewNumeric(decimal.RequireFromString("1000")),
-	VotedPower:  storageTypes.NewNumeric(decimal.RequireFromString("900")),
+	VotingPower: storageTypes.NumericFromInt64(1000),
+	VotedPower:  storageTypes.NumericFromInt64(900),
 	Signer: &storage.Address{
 		Id:         2,
 		Hash:       testHashAddress,
@@ -56,9 +55,9 @@ var testUpgrade = storage.Upgrade{
 		LastHeight: 200,
 		Balance: storage.Balance{
 			Currency:  "utia",
-			Spendable: storageTypes.NewNumeric(decimal.RequireFromString("200")),
-			Delegated: storageTypes.NewNumeric(decimal.RequireFromString("0")),
-			Unbonding: storageTypes.NewNumeric(decimal.RequireFromString("0")),
+			Spendable: storageTypes.NumericFromInt64(200),
+			Delegated: storageTypes.NumericFromInt64(0),
+			Unbonding: storageTypes.NumericFromInt64(0),
 		},
 		Celestials: &celestials.Celestial{
 			Id:       "name_id",

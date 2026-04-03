@@ -141,7 +141,7 @@ func Test_handleCancelUnbonding(t *testing.T) {
 			cancel: &storage.Undelegation{
 				Height: 844287,
 				Time:   ts,
-				Amount: types.NewNumeric(decimal.RequireFromString("45000000")),
+				Amount: types.NumericFromInt64(45000000),
 				Address: &storage.Address{
 					Address:    "celestia1lkrd86urrmhmsvgzfygjsguv3cgv0036hrj0m9",
 					Height:     844287,
@@ -149,8 +149,8 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Hash:       []byte{0xfd, 0x86, 0xd3, 0xeb, 0x83, 0x1e, 0xef, 0xb8, 0x31, 0x02, 0x49, 0x11, 0x28, 0x23, 0x8c, 0x8e, 0x10, 0xc7, 0xbe, 0x3a},
 					Balance: storage.Balance{
 						Currency:  currency.Utia,
-						Delegated: types.NewNumeric(decimal.RequireFromString("45000000")),
-						Unbonding: types.NewNumeric(decimal.RequireFromString("-45000000")),
+						Delegated: types.NumericFromInt64(45000000),
+						Unbonding: types.NumericFromString("-45000000"),
 					},
 				},
 				Validator: &storage.Validator{
@@ -166,7 +166,7 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NewNumeric(decimal.RequireFromString("45000000")),
+					Stake:             types.NumericFromInt64(45000000),
 				},
 			},
 		},

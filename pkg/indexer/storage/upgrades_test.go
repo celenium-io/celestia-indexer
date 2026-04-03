@@ -28,13 +28,13 @@ func TestUpgradeV7(t *testing.T) {
 		Return([]*storage.Validator{
 			{
 				Id:      1,
-				Rate:    storageTypes.NewNumeric(decimal.RequireFromString("0.150000000000000000")),
-				MaxRate: storageTypes.NewNumeric(decimal.RequireFromString("0.500000000000000000")),
+				Rate:    storageTypes.NumericFromString("0.150000000000000000"),
+				MaxRate: storageTypes.NumericFromString("0.500000000000000000"),
 			},
 			{
 				Id:      2,
-				Rate:    storageTypes.NewNumeric(decimal.RequireFromString("0.250000000000000000")),
-				MaxRate: storageTypes.NewNumeric(decimal.RequireFromString("0.700000000000000000")),
+				Rate:    storageTypes.NumericFromString("0.250000000000000000"),
+				MaxRate: storageTypes.NumericFromString("0.700000000000000000"),
 			},
 		}, nil).
 		Times(1)

@@ -19,7 +19,6 @@ import (
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -29,7 +28,7 @@ var testProposal = storage.Proposal{
 	Height:      55555,
 	Title:       "test proposal",
 	Description: "test description",
-	Deposit:     types.NewNumeric(decimal.NewFromFloat(1000000)),
+	Deposit:     types.NumericFromFloat64(1000000),
 	Status:      types.ProposalStatusActive,
 	VotesCount:  123,
 	Yes:         123,
@@ -158,7 +157,7 @@ func (s *ProposalTestSuite) TestVotes() {
 			{
 				Id:          1,
 				Height:      66666,
-				Weight:      types.NewNumeric(decimal.NewFromFloat(1)),
+				Weight:      types.NumericFromFloat64(1),
 				Option:      types.VoteOptionYes,
 				ValidatorId: testsuite.Ptr(uint64(1)),
 				Validator:   &testValidator,
@@ -166,7 +165,7 @@ func (s *ProposalTestSuite) TestVotes() {
 			{
 				Id:          2,
 				Height:      66666,
-				Weight:      types.NewNumeric(decimal.NewFromFloat(1)),
+				Weight:      types.NumericFromFloat64(1),
 				Option:      types.VoteOptionYes,
 				ValidatorId: nil,
 				Voter: &storage.Address{
@@ -177,9 +176,9 @@ func (s *ProposalTestSuite) TestVotes() {
 					LastHeight: 333,
 					Balance: storage.Balance{
 						Currency:  "utia",
-						Spendable: types.NewNumeric(decimal.RequireFromString("100")),
-						Delegated: types.NewNumeric(decimal.RequireFromString("1")),
-						Unbonding: types.NewNumeric(decimal.RequireFromString("2")),
+						Spendable: types.NumericFromInt64(100),
+						Delegated: types.NumericFromInt64(1),
+						Unbonding: types.NumericFromInt64(2),
 					},
 					Celestials: &celestials.Celestial{
 						Id:       "name",
@@ -239,7 +238,7 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithVoter() {
 			{
 				Id:          2,
 				Height:      121212,
-				Weight:      types.NewNumeric(decimal.NewFromFloat(123)),
+				Weight:      types.NumericFromFloat64(123),
 				Option:      types.VoteOptionNo,
 				ValidatorId: nil,
 				Voter: &storage.Address{
@@ -250,9 +249,9 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithVoter() {
 					LastHeight: 123,
 					Balance: storage.Balance{
 						Currency:  "utia",
-						Spendable: types.NewNumeric(decimal.RequireFromString("100")),
-						Delegated: types.NewNumeric(decimal.RequireFromString("1")),
-						Unbonding: types.NewNumeric(decimal.RequireFromString("2")),
+						Spendable: types.NumericFromInt64(100),
+						Delegated: types.NumericFromInt64(1),
+						Unbonding: types.NumericFromInt64(2),
 					},
 					Celestials: &celestials.Celestial{
 						Id:       "test name",
@@ -319,7 +318,7 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithValidator() {
 			{
 				Id:          3,
 				Height:      131313,
-				Weight:      types.NewNumeric(decimal.NewFromFloat(1234)),
+				Weight:      types.NumericFromFloat64(1234),
 				Option:      types.VoteOptionYes,
 				ValidatorId: testsuite.Ptr(uint64(1)),
 				Validator:   &testValidator,

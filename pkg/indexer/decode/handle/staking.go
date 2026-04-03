@@ -73,7 +73,7 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, msgId 
 	}
 
 	if !m.Value.IsNil() {
-		amount := storageTypes.NewNumeric(decimal.RequireFromString(m.Value.Amount.String()))
+		amount := storageTypes.NumericFromString(m.Value.Amount.String())
 		validator.Stake = amount
 
 		address := storage.Address{
@@ -106,19 +106,19 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, msgId 
 	}
 
 	if !m.Commission.Rate.IsNil() {
-		validator.Rate = storageTypes.NewNumeric(decimal.RequireFromString(m.Commission.Rate.String()))
+		validator.Rate = storageTypes.NumericFromString(m.Commission.Rate.String())
 	}
 
 	if !m.Commission.MaxRate.IsNil() {
-		validator.MaxRate = storageTypes.NewNumeric(decimal.RequireFromString(m.Commission.MaxRate.String()))
+		validator.MaxRate = storageTypes.NumericFromString(m.Commission.MaxRate.String())
 	}
 
 	if !m.Commission.MaxChangeRate.IsNil() {
-		validator.MaxChangeRate = storageTypes.NewNumeric(decimal.RequireFromString(m.Commission.MaxChangeRate.String()))
+		validator.MaxChangeRate = storageTypes.NumericFromString(m.Commission.MaxChangeRate.String())
 	}
 
 	if !m.MinSelfDelegation.IsNil() {
-		validator.MinSelfDelegation = storageTypes.NewNumeric(decimal.RequireFromString(m.MinSelfDelegation.String()))
+		validator.MinSelfDelegation = storageTypes.NumericFromString(m.MinSelfDelegation.String())
 	}
 
 	ctx.AddValidator(validator)
@@ -156,10 +156,10 @@ func MsgEditValidator(ctx *context.Context, status storageTypes.Status, msgId ui
 	}
 
 	if m.CommissionRate != nil && !m.CommissionRate.IsNil() {
-		validator.Rate = storageTypes.NewNumeric(decimal.RequireFromString(m.CommissionRate.String()))
+		validator.Rate = storageTypes.NumericFromString(m.CommissionRate.String())
 	}
 	if m.MinSelfDelegation != nil && !m.MinSelfDelegation.IsNil() {
-		validator.MinSelfDelegation = storageTypes.NewNumeric(decimal.RequireFromString(m.MinSelfDelegation.String()))
+		validator.MinSelfDelegation = storageTypes.NumericFromString(m.MinSelfDelegation.String())
 	}
 	ctx.AddValidator(validator)
 	return msgType, validators, err

@@ -116,7 +116,7 @@ func Test_handleRedelegate(t *testing.T) {
 			redelegation: &storage.Redelegation{
 				Time:           ts,
 				Height:         841682,
-				Amount:         types.NewNumeric(decimal.RequireFromString("20000000")),
+				Amount:         types.NumericFromInt64(20000000),
 				CompletionTime: time.Date(2024, 3, 15, 0, 4, 38, 0, time.UTC),
 				Address: &storage.Address{
 					Address:    "celestia1kj4m7nhhcr5f5jpcdaec5ymhepc3x22yvtjh7j",
@@ -141,7 +141,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NewNumeric(decimal.RequireFromString("-20000000")),
+					Stake:             types.NumericFromString("-20000000"),
 				},
 				Destination: &storage.Validator{
 					Address:           "celestiavaloper107lwx458gy345ag2afx9a7e2kkl7x49y3433gj",
@@ -156,7 +156,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NewNumeric(decimal.RequireFromString("20000000")),
+					Stake:             types.NumericFromInt64(20000000),
 				},
 			},
 		}, {
@@ -217,7 +217,7 @@ func Test_handleRedelegate(t *testing.T) {
 			redelegation: &storage.Redelegation{
 				Time:           ts,
 				Height:         241,
-				Amount:         types.NewNumeric(decimal.RequireFromString("1000")),
+				Amount:         types.NumericFromInt64(1000),
 				CompletionTime: time.Date(2023, 11, 21, 14, 50, 46, 0, time.UTC),
 				Address: &storage.Address{
 					Address:    "celestia1ze2ye5u5k3qdlexvt2e0nn0508p04094r9atu2",
@@ -242,7 +242,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NewNumeric(decimal.RequireFromString("-1000")),
+					Stake:             types.NumericFromString("-1000"),
 				},
 				Destination: &storage.Validator{
 					Address:           "celestiavaloper15urq2dtp9qce4fyc85m6upwm9xul3049gwdz0x",
@@ -257,7 +257,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NewNumeric(decimal.RequireFromString("1000")),
+					Stake:             types.NumericFromInt64(1000),
 				},
 			},
 		}, {
@@ -391,7 +391,7 @@ func Test_handleRedelegate(t *testing.T) {
 			redelegation: &storage.Redelegation{
 				Time:           ts,
 				Height:         315,
-				Amount:         types.NewNumeric(decimal.RequireFromString("125000000")),
+				Amount:         types.NumericFromInt64(125000000),
 				CompletionTime: time.Date(2023, 11, 21, 15, 05, 39, 0, time.UTC),
 				Address: &storage.Address{
 					Address:    "celestia1mcrnf2n2vmmut5j7upluehstxh4yenztxhmhd0",
@@ -416,7 +416,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NewNumeric(decimal.RequireFromString("-125000000")),
+					Stake:             types.NumericFromString("-125000000"),
 				},
 				Destination: &storage.Validator{
 					Address:           "celestiavaloper19f0w9svr905fhefusyx4z8sf83j6et0g57nch8",
@@ -431,7 +431,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NewNumeric(decimal.RequireFromString("125000000")),
+					Stake:             types.NumericFromInt64(125000000),
 				},
 			},
 		}, {
@@ -524,7 +524,7 @@ func Test_handleRedelegate(t *testing.T) {
 			redelegation: &storage.Redelegation{
 				Time:           ts,
 				Height:         315,
-				Amount:         types.NewNumeric(decimal.RequireFromString("250000000")),
+				Amount:         types.NumericFromInt64(250000000),
 				CompletionTime: time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC),
 				Address: &storage.Address{
 					Address:    "celestia18ccg4scfdee9qvcnxxx4wutjt69sct2jshau9f",
@@ -549,7 +549,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NewNumeric(decimal.RequireFromString("-250000000")),
+					Stake:             types.NumericFromString("-250000000"),
 				},
 				Destination: &storage.Validator{
 					Address:           "celestiavaloper1yecxnyegvgm5dwsx0r3jsgr74ju6mlxdwkxx8g",
@@ -564,7 +564,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NewNumeric(decimal.RequireFromString("250000000")),
+					Stake:             types.NumericFromInt64(250000000),
 				},
 			},
 		}, {
@@ -658,7 +658,7 @@ func Test_handleRedelegate(t *testing.T) {
 			redelegation: &storage.Redelegation{
 				Time:           ts,
 				Height:         315,
-				Amount:         types.NewNumeric(decimal.RequireFromString("250000000")),
+				Amount:         types.NumericFromInt64(250000000),
 				CompletionTime: time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC),
 				Address: &storage.Address{
 					Address:    "celestia18ccg4scfdee9qvcnxxx4wutjt69sct2jshau9f",
@@ -683,7 +683,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NewNumeric(decimal.RequireFromString("-250000000")),
+					Stake:             types.NumericFromString("-250000000"),
 				},
 				Destination: &storage.Validator{
 					Address:           "celestiavaloper1yecxnyegvgm5dwsx0r3jsgr74ju6mlxdwkxx8g",
@@ -698,7 +698,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NewNumeric(decimal.RequireFromString("250000000")),
+					Stake:             types.NumericFromInt64(250000000),
 				},
 			},
 		},

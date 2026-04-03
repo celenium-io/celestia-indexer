@@ -11,7 +11,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -68,7 +67,7 @@ func Test_handleVote(t *testing.T) {
 						Hash:       []byte{0xfd, 0xfb, 0x1f, 0x95, 0xd4, 0x86, 0x3a, 0x74, 0x30, 0xa7, 0x5a, 0xbd, 0x3a, 0x0f, 0x22, 0xc9, 0xa2, 0xce, 0xa4, 0x27},
 					},
 					Option: types.VoteOptionYes,
-					Weight: types.NewNumeric(decimal.RequireFromString("1.000000000000000000")),
+					Weight: types.NumericFromString("1.000000000000000000"),
 					Height: 3762606,
 					Time:   ts,
 				},
@@ -116,7 +115,7 @@ func Test_handleVote(t *testing.T) {
 						Hash:       []byte{0x6f, 0x58, 0x2a, 0xbe, 0xdd, 0x59, 0x62, 0xba, 0x97, 0xf2, 0x1d, 0xb7, 0x6f, 0xd3, 0x80, 0xb8, 0x01, 0x5a, 0x65, 0xeb},
 					},
 					Option: types.VoteOptionYes,
-					Weight: types.NewNumeric(decimal.RequireFromString("1.000000000000000000")),
+					Weight: types.NumericFromString("1.000000000000000000"),
 					Height: 871324,
 					Time:   ts,
 				},
@@ -160,7 +159,7 @@ func Test_handleVote(t *testing.T) {
 						Hash:       []byte{0x50, 0xa1, 0xec, 0xc6, 0x67, 0x0c, 0x9a, 0x72, 0x1f, 0x26, 0x7e, 0x08, 0xcd, 0x7b, 0x2b, 0xbb, 0x22, 0xfd, 0xe6, 0xc8},
 					},
 					Option: types.VoteOptionYes,
-					Weight: types.NewNumeric(decimal.RequireFromString("1.000000000000000000")),
+					Weight: types.NumericFromString("1.000000000000000000"),
 					Height: 871324,
 					Time:   ts,
 				},
@@ -204,7 +203,7 @@ func Test_handleVote(t *testing.T) {
 						Hash:       []byte{0x50, 0xa1, 0xec, 0xc6, 0x67, 0x0c, 0x9a, 0x72, 0x1f, 0x26, 0x7e, 0x08, 0xcd, 0x7b, 0x2b, 0xbb, 0x22, 0xfd, 0xe6, 0xc8},
 					},
 					Option: types.VoteOptionYes,
-					Weight: types.NewNumeric(decimal.RequireFromString("0.500000000000000000")),
+					Weight: types.NumericFromString("0.500000000000000000"),
 					Height: 871324,
 					Time:   ts,
 				}, {
@@ -216,7 +215,7 @@ func Test_handleVote(t *testing.T) {
 						Balance:    storage.EmptyBalance(),
 					},
 					Option: types.VoteOptionAbstain,
-					Weight: types.NewNumeric(decimal.RequireFromString("0.500000000000000000")),
+					Weight: types.NumericFromString("0.500000000000000000"),
 					Height: 871324,
 					Time:   ts,
 				},

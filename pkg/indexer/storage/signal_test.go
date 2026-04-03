@@ -182,7 +182,7 @@ func TestSaveUpgrades_EmptyMap(t *testing.T) {
 	tx := mock.NewMockTransaction(ctrl)
 	// nothing should be called
 	err := saveUpgrades(context.Background(), tx, sync.NewMap[uint64, *storage.Upgrade](),
-		storage.State{Version: 3}, decimal.NewFromInt(3_000_000))
+		storage.State{Version: 3}, types.NewNumeric(decimal.NewFromInt(3_000_000)))
 	require.NoError(t, err)
 }
 
@@ -196,7 +196,7 @@ func TestSaveUpgrades_SkipsAlreadyAppliedVersion(t *testing.T) {
 	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 3})
 
 	err := saveUpgrades(context.Background(), tx, upgrades,
-		storage.State{Version: 3}, decimal.NewFromInt(3_000_000))
+		storage.State{Version: 3}, types.NewNumeric(decimal.NewFromInt(3_000_000)))
 	require.NoError(t, err)
 }
 
@@ -218,7 +218,7 @@ func TestSaveUpgrades_NoQuorum(t *testing.T) {
 	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 4})
 
 	err := saveUpgrades(context.Background(), tx, upgrades,
-		storage.State{Version: 3}, decimal.NewFromInt(3))
+		storage.State{Version: 3}, types.NewNumeric(decimal.NewFromInt(3)))
 	require.NoError(t, err)
 }
 
@@ -241,7 +241,7 @@ func TestSaveUpgrades_WithQuorum(t *testing.T) {
 	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 4})
 
 	err := saveUpgrades(context.Background(), tx, upgrades,
-		storage.State{Version: 3}, decimal.NewFromInt(6))
+		storage.State{Version: 3}, types.NewNumeric(decimal.NewFromInt(6)))
 	require.NoError(t, err)
 }
 

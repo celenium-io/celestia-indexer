@@ -32,7 +32,7 @@ func (module *Module) saveSignals(
 	if err != nil {
 		return errors.Wrapf(err, "receiving total voting power")
 	}
-	votingPower = math.Shares(votingPower)
+	votingPower = types.NewNumeric(math.Shares(votingPower.Decimal))
 
 	for i := range signals {
 		if signals[i].Validator == nil {
@@ -78,7 +78,7 @@ func (module *Module) tryUpgrade(
 	if err != nil {
 		return errors.Wrapf(err, "receiving total voting power")
 	}
-	votingPower = math.Shares(votingPower)
+	votingPower = types.NewNumeric(math.Shares(votingPower.Decimal))
 	threshold := votingPower.Mul(signalsThreshold)
 
 	seen := make(map[uint64]struct{})
@@ -100,10 +100,11 @@ func (module *Module) tryUpgrade(
 		if err != nil {
 			return errors.Wrapf(err, "update signals for version %d", versions[i])
 		}
-		if math.Shares(voted.Decimal).GreaterThan(threshold) {
+		votedShares := types.NewNumeric(math.Shares(voted.Decimal))
+		if votedShares.GreaterThan(threshold.Decimal) {
 			upgrade.Version = versions[i]
-			upgrade.VotingPower = types.NewNumeric(votingPower)
-			upgrade.VotedPower = types.NewNumeric(math.Shares(voted.Decimal))
+			upgrade.VotingPower = votingPower
+			upgrade.VotedPower = votedShares
 			upgrade.Status = types.UpgradeStatusWaitingUpgrade
 			return tx.SaveUpgrades(ctx, upgrade)
 		}
@@ -117,7 +118,7 @@ func saveUpgrades(
 	tx storage.Transaction,
 	upgrades *sync.Map[uint64, *storage.Upgrade],
 	state storage.State,
-	votingPower decimal.Decimal,
+	votingPower types.Numeric,
 ) error {
 	if upgrades.Len() == 0 {
 		return nil
@@ -136,9 +137,9 @@ func saveUpgrades(
 			return errors.Wrapf(err, "update signals for version %d", version), true
 		}
 
-		upgrade.VotingPower = types.NewNumeric(votingPower)
+		upgrade.VotingPower = votingPower
 		upgrade.VotedPower = types.NewNumeric(math.Shares(voted.Decimal))
-		if upgrade.VotedPower.GreaterThan(threshold) {
+		if upgrade.VotedPower.GreaterThan(threshold.Decimal) {
 			upgrade.Status = types.UpgradeStatusWaitingUpgrade
 		}
 		toSave = append(toSave, upgrade)
@@ -155,17 +156,17 @@ func saveUpgrades(
 	return tx.SaveUpgrades(ctx, toSave...)
 }
 
-func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transaction) (decimal.Decimal, []storage.Validator, error) {
+func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transaction) (types.Numeric, []storage.Validator, error) {
 	maxVals, err := module.constants.Get(ctx, types.ModuleNameStaking, "max_validators")
 	if err != nil {
-		return decimal.Zero, nil, errors.Wrap(err, "get max validators value")
+		return types.Numeric{}, nil, errors.Wrap(err, "get max validators value")
 	}
 	validators, err := tx.BondedValidators(ctx, maxVals.MustInt())
 	if err != nil {
-		return decimal.Zero, nil, errors.Wrap(err, "get validators")
+		return types.Numeric{}, nil, errors.Wrap(err, "get validators")
 	}
 
-	power := decimal.Zero
+	var power types.Numeric
 	for i := range validators {
 		power = power.Add(validators[i].Stake.Decimal)
 	}

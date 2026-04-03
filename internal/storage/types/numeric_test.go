@@ -158,7 +158,7 @@ func TestNumeric_NumericValueScanRoundTrip(t *testing.T) {
 
 	for _, v := range values {
 		t.Run(v, func(t *testing.T) {
-			original := NewNumeric(decimal.RequireFromString(v))
+			original := NumericFromString(v)
 
 			pn, err := original.NumericValue()
 			require.NoError(t, err)
@@ -173,7 +173,7 @@ func TestNumeric_NumericValueScanRoundTrip(t *testing.T) {
 }
 
 func TestNumeric_MarshalJSON(t *testing.T) {
-	n := NewNumeric(decimal.RequireFromString("123.456"))
+	n := NumericFromString("123.456")
 	data, err := json.Marshal(n)
 	require.NoError(t, err)
 	require.Equal(t, `"123.456"`, string(data))
@@ -191,7 +191,7 @@ func TestNumeric_JSONRoundTrip(t *testing.T) {
 		Amount Numeric `json:"amount"`
 	}
 
-	original := wrapper{Amount: NewNumeric(decimal.RequireFromString("-42.5"))}
+	original := wrapper{Amount: NumericFromString("-42.5")}
 	data, err := json.Marshal(original)
 	require.NoError(t, err)
 

@@ -38,7 +38,7 @@ func Test_coinReceived(t *testing.T) {
 				Address: testAddress,
 				Balance: storage.Balance{
 					Currency:  "utia",
-					Spendable: types.NewNumeric(decimal.RequireFromString("-123")),
+					Spendable: types.NumericFromString("-123"),
 				},
 			},
 		}, {
@@ -104,7 +104,7 @@ func Test_coinSpent(t *testing.T) {
 				Address: testAddress,
 				Balance: storage.Balance{
 					Currency:  "utia",
-					Spendable: types.NewNumeric(decimal.RequireFromString("123")),
+					Spendable: types.NumericFromInt64(123),
 				},
 			},
 		}, {
@@ -189,7 +189,7 @@ func Test_getBalanceUpdates(t *testing.T) {
 					Hash:    testHashAddress,
 					Balance: storage.Balance{
 						Currency:  currency.DefaultCurrency,
-						Spendable: types.NewNumeric(decimal.RequireFromString("100")),
+						Spendable: types.NumericFromInt64(100),
 					},
 					LastHeight: 100,
 				},
