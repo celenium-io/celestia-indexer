@@ -889,8 +889,6 @@ func TestJxBatchResponse_FnError(t *testing.T) {
 	d := jdec(batch)
 	defer jxpkg.PutDecoder(d)
 
-	sentinel := pkgTypes.Level(0) // use any sentinel
-	_ = sentinel
 	var fnErr = nodeTypes.ErrRequest
 	err := jxBatchResponse(d, func(bd pkgTypes.BlockData) error {
 		return fnErr
