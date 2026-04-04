@@ -898,6 +898,22 @@ func TestJxBatchResponse_FnError(t *testing.T) {
 	require.ErrorIs(t, err, nodeTypes.ErrRequest)
 }
 
+func TestJxBatchResponse_RPCErrorOnBlockResults(t *testing.T) {
+	batch := `[` +
+		`{"jsonrpc":"2.0","id":-1,"result":` + minimalBlockJSON + `},` +
+		`{"jsonrpc":"2.0","id":-1,"error":{"code":-32603,"message":"could not find results for height #10825944"}}` +
+		`]`
+	d := jdec(batch)
+	defer jxpkg.PutDecoder(d)
+
+	err := jxBatchResponse(d, func(bd pkgTypes.BlockData) error {
+		return nil
+	})
+	require.Error(t, err)
+	require.ErrorIs(t, err, nodeTypes.ErrRequest)
+	require.Contains(t, err.Error(), "could not find results for height #10825944")
+}
+
 // ── jxResponse ───────────────────────────────────────────────────────────────
 
 func TestJxResponse_ResultField(t *testing.T) {

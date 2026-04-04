@@ -852,14 +852,16 @@ func jxBatchResponse(d *jxpkg.Decoder, fn func(pkgTypes.BlockData) error) error 
 				if d.Next() == jxpkg.Null {
 					return d.Null()
 				}
-				return d.ObjBytes(func(d *jxpkg.Decoder, key []byte) error {
+				if err := d.ObjBytes(func(d *jxpkg.Decoder, key []byte) error {
 					if string(key) == "message" {
 						var err error
 						rpcErr, err = d.Str()
 						return err
 					}
 					return d.Skip()
-				})
+				}); err != nil {
+					return err
+				}
 			default:
 				return d.Skip()
 			}
