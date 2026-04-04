@@ -95,7 +95,7 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 
 	packetMap, ok := data["Packet"].(map[string]any)
 	if !ok {
-		return msgType, errors.Wrap(err, "Packet is not map")
+		return msgType, errors.Errorf("Packet is not map: %T", data["Packet"])
 	}
 
 	switch m.Packet.DestinationPort {
@@ -257,7 +257,7 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 
 	packetMap, ok := data["Packet"].(map[string]any)
 	if !ok {
-		return msgType, errors.Wrap(err, "Packet is not map")
+		return msgType, errors.Errorf("Packet is not map: %T", data["Packet"])
 	}
 
 	switch m.Packet.SourcePort {
