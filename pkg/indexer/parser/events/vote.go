@@ -140,7 +140,11 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 			if err != nil {
 				return errors.Errorf("unquote weight in vote option: %s", values[1])
 			}
-			vote.Weight = types.NumericFromString(value)
+			w, err := types.NumericFromString(value)
+			if err != nil {
+				return errors.Wrap(err, "parse vote weight")
+			}
+			vote.Weight = w
 		}
 	}
 

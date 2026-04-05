@@ -51,7 +51,10 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 			if err != nil {
 				return err
 			}
-			amount := storageTypes.NumericFromString(redelegate.Amount.Amount.String())
+			amount, err := storageTypes.NumericFromString(redelegate.Amount.Amount.String())
+			if err != nil {
+				return errors.Wrap(err, "parse redelegation amount")
+			}
 
 			source := storage.EmptyValidator()
 			prefix, hash, err := types.Address(redelegate.SrcValidator).Decode()

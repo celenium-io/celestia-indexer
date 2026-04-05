@@ -73,7 +73,10 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, msgId 
 	}
 
 	if !m.Value.IsNil() {
-		amount := storageTypes.NumericFromString(m.Value.Amount.String())
+		amount, err := storageTypes.NumericFromString(m.Value.Amount.String())
+		if err != nil {
+			return msgType, nil, errors.Wrap(err, "parse value amount")
+		}
 		validator.Stake = amount
 
 		address := storage.Address{
@@ -106,19 +109,27 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, msgId 
 	}
 
 	if !m.Commission.Rate.IsNil() {
-		validator.Rate = storageTypes.NumericFromString(m.Commission.Rate.String())
+		if v, err := storageTypes.NumericFromString(m.Commission.Rate.String()); err == nil {
+			validator.Rate = v
+		}
 	}
 
 	if !m.Commission.MaxRate.IsNil() {
-		validator.MaxRate = storageTypes.NumericFromString(m.Commission.MaxRate.String())
+		if v, err := storageTypes.NumericFromString(m.Commission.MaxRate.String()); err == nil {
+			validator.MaxRate = v
+		}
 	}
 
 	if !m.Commission.MaxChangeRate.IsNil() {
-		validator.MaxChangeRate = storageTypes.NumericFromString(m.Commission.MaxChangeRate.String())
+		if v, err := storageTypes.NumericFromString(m.Commission.MaxChangeRate.String()); err == nil {
+			validator.MaxChangeRate = v
+		}
 	}
 
 	if !m.MinSelfDelegation.IsNil() {
-		validator.MinSelfDelegation = storageTypes.NumericFromString(m.MinSelfDelegation.String())
+		if v, err := storageTypes.NumericFromString(m.MinSelfDelegation.String()); err == nil {
+			validator.MinSelfDelegation = v
+		}
 	}
 
 	ctx.AddValidator(validator)
@@ -156,10 +167,14 @@ func MsgEditValidator(ctx *context.Context, status storageTypes.Status, msgId ui
 	}
 
 	if m.CommissionRate != nil && !m.CommissionRate.IsNil() {
-		validator.Rate = storageTypes.NumericFromString(m.CommissionRate.String())
+		if v, err := storageTypes.NumericFromString(m.CommissionRate.String()); err == nil {
+			validator.Rate = v
+		}
 	}
 	if m.MinSelfDelegation != nil && !m.MinSelfDelegation.IsNil() {
-		validator.MinSelfDelegation = storageTypes.NumericFromString(m.MinSelfDelegation.String())
+		if v, err := storageTypes.NumericFromString(m.MinSelfDelegation.String()); err == nil {
+			validator.MinSelfDelegation = v
+		}
 	}
 	ctx.AddValidator(validator)
 	return msgType, validators, err

@@ -38,7 +38,7 @@ type ByGasPrice []Gas
 
 func (gp ByGasPrice) Len() int { return len(gp) }
 func (gp ByGasPrice) Less(i, j int) bool {
-	return gp[j].GasPrice.GreaterThan(gp[i].GasPrice.Decimal)
+	return gp[j].GasPrice.GreaterThan(gp[i].GasPrice)
 }
 func (gp ByGasPrice) Swap(i, j int) { gp[i], gp[j] = gp[j], gp[i] }
 

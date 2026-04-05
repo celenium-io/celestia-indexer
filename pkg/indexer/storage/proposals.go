@@ -15,7 +15,6 @@ import (
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func (module *Module) saveProposals(
@@ -165,9 +164,9 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 	if err != nil {
 		return nil, errors.Wrap(err, "get validators")
 	}
-	validatorsPower := make(map[uint64]decimal.Decimal)
+	validatorsPower := make(map[uint64]types.Numeric)
 	for i := range validators {
-		validatorsPower[validators[i].Id] = validators[i].Stake.Decimal
+		validatorsPower[validators[i].Id] = validators[i].Stake
 	}
 
 	// 3. Compute voting results
@@ -180,7 +179,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 	}
 
 	for _, proposal := range finished {
-		validatorMinus := make(map[uint64]decimal.Decimal)
+		validatorMinus := make(map[uint64]types.Numeric)
 		votedValidators := make(map[uint64]types.VoteOption)
 
 		if proposal.Finished() {
@@ -238,7 +237,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 						continue
 					}
 
-					shares := delegations[j].Amount.Decimal
+					shares := delegations[j].Amount
 					if amount, ok := validatorMinus[delegations[j].ValidatorId]; ok {
 						validatorMinus[delegations[j].ValidatorId] = amount.Add(shares)
 					} else {
@@ -263,7 +262,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 		for id, option := range votedValidators {
 			minus, ok := validatorMinus[id]
 			if !ok {
-				minus = decimal.Zero
+				minus = types.Numeric{}
 			}
 			if power, ok := validatorsPower[id]; ok {
 				proposal.VotingPower = proposal.VotingPower.Add(power).Sub(minus)

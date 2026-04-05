@@ -185,8 +185,9 @@ func parseCommission(ctx *context.Context, data map[string]string) error {
 	validator.Address = commission.Validator
 
 	if !commission.Amount.IsZero() {
-		validator.Commissions = types.NewNumeric(commission.Amount)
-		ctx.Block.Stats.Commissions = ctx.Block.Stats.Commissions.Add(commission.Amount)
+		commissionAmount := types.NewNumeric(commission.Amount)
+		validator.Commissions = commissionAmount
+		ctx.Block.Stats.Commissions = ctx.Block.Stats.Commissions.Add(commissionAmount)
 
 		ctx.AddStakingLog(storage.StakingLog{
 			Height:    ctx.Block.Height,
@@ -215,8 +216,9 @@ func parseRewards(ctx *context.Context, data map[string]string) error {
 	validator.Address = rewards.Validator
 
 	if !rewards.Amount.IsZero() {
-		validator.Rewards = types.NewNumeric(rewards.Amount)
-		ctx.Block.Stats.Rewards = ctx.Block.Stats.Rewards.Add(rewards.Amount)
+		rewardAmount := types.NewNumeric(rewards.Amount)
+		validator.Rewards = rewardAmount
+		ctx.Block.Stats.Rewards = ctx.Block.Stats.Rewards.Add(rewardAmount)
 
 		ctx.AddStakingLog(storage.StakingLog{
 			Height:    ctx.Block.Height,

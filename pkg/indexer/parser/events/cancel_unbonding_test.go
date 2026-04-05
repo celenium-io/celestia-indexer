@@ -150,7 +150,7 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Balance: storage.Balance{
 						Currency:  currency.Utia,
 						Delegated: types.NumericFromInt64(45000000),
-						Unbonding: types.NumericFromString("-45000000"),
+						Unbonding: types.MustNumericFromString("-45000000"),
 					},
 				},
 				Validator: &storage.Validator{

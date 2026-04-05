@@ -12,10 +12,9 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
-var signalsThreshold = decimal.NewFromFloat(5.0 / 6.0)
+var signalsThreshold = types.NumericFromFloat64(5.0 / 6.0)
 
 func (module *Module) saveSignals(
 	ctx context.Context,
@@ -32,7 +31,7 @@ func (module *Module) saveSignals(
 	if err != nil {
 		return errors.Wrapf(err, "receiving total voting power")
 	}
-	votingPower = types.NewNumeric(math.Shares(votingPower.Decimal))
+	votingPower = math.SharesNumeric(votingPower)
 
 	for i := range signals {
 		if signals[i].Validator == nil {
@@ -78,7 +77,7 @@ func (module *Module) tryUpgrade(
 	if err != nil {
 		return errors.Wrapf(err, "receiving total voting power")
 	}
-	votingPower = types.NewNumeric(math.Shares(votingPower.Decimal))
+	votingPower = math.SharesNumeric(votingPower)
 	threshold := votingPower.Mul(signalsThreshold)
 
 	seen := make(map[uint64]struct{})
@@ -100,8 +99,8 @@ func (module *Module) tryUpgrade(
 		if err != nil {
 			return errors.Wrapf(err, "update signals for version %d", versions[i])
 		}
-		votedShares := types.NewNumeric(math.Shares(voted.Decimal))
-		if votedShares.GreaterThan(threshold.Decimal) {
+		votedShares := math.SharesNumeric(voted)
+		if votedShares.GreaterThan(threshold) {
 			upgrade.Version = versions[i]
 			upgrade.VotingPower = votingPower
 			upgrade.VotedPower = votedShares
@@ -138,8 +137,8 @@ func saveUpgrades(
 		}
 
 		upgrade.VotingPower = votingPower
-		upgrade.VotedPower = types.NewNumeric(math.Shares(voted.Decimal))
-		if upgrade.VotedPower.GreaterThan(threshold.Decimal) {
+		upgrade.VotedPower = math.SharesNumeric(voted)
+		if upgrade.VotedPower.GreaterThan(threshold) {
 			upgrade.Status = types.UpgradeStatusWaitingUpgrade
 		}
 		toSave = append(toSave, upgrade)
@@ -168,7 +167,7 @@ func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transacti
 
 	var power types.Numeric
 	for i := range validators {
-		power = power.Add(validators[i].Stake.Decimal)
+		power = power.Add(validators[i].Stake)
 	}
 	return power, validators, nil
 }

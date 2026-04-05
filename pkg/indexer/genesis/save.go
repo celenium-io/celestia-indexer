@@ -75,7 +75,7 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 			if addr, ok := data.addresses[key]; !ok {
 				data.addresses[key] = &data.block.Txs[i].Signers[j]
 			} else {
-				addr.Balance.Spendable = addr.Balance.Spendable.Add(data.block.Txs[i].Signers[j].Balance.Spendable.Decimal)
+				addr.Balance.Spendable = addr.Balance.Spendable.Add(data.block.Txs[i].Signers[j].Balance.Spendable)
 			}
 		}
 	}

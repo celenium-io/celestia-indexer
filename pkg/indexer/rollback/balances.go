@@ -79,7 +79,7 @@ func getBalanceUpdates(
 		}
 
 		if addr, ok := updates[address.Address]; ok {
-			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable.Decimal)
+			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
 		} else {
 			lastHeight, err := tx.LastAddressAction(ctx, address.Hash)
 			if err != nil {

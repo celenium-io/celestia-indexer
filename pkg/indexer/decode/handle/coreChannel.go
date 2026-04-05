@@ -140,8 +140,12 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 		}
 		packetMap["Data"] = packet
 
+		amount, err := storageTypes.NumericFromString(packet.Amount)
+		if err != nil {
+			return msgType, errors.Wrap(err, "parse transfer amount")
+		}
 		transfer := &storage.IbcTransfer{
-			Amount:    storageTypes.NumericFromString(packet.Amount),
+			Amount:    amount,
 			Memo:      packet.Memo,
 			ChannelId: m.Packet.DestinationChannel,
 			Port:      m.Packet.DestinationPort,
@@ -190,7 +194,7 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 				Type:    storageTypes.MsgAddressTypeReceiver,
 				Address: transfer.Receiver,
 			})
-			channel.Received = channel.Received.Add(transfer.Amount.Decimal)
+			channel.Received = channel.Received.Add(transfer.Amount)
 		} else {
 			transfer.ReceiverAddress = &packet.Receiver
 		}
@@ -214,7 +218,7 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 				Type:    storageTypes.MsgAddressTypeSender,
 				Address: transfer.Sender,
 			})
-			channel.Sent = channel.Sent.Add(transfer.Amount.Decimal)
+			channel.Sent = channel.Sent.Add(transfer.Amount)
 		} else {
 			transfer.SenderAddress = &packet.Sender
 		}
@@ -299,8 +303,12 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 		}
 		packetMap["Data"] = packet
 
+		amount, err := storageTypes.NumericFromString(packet.Amount)
+		if err != nil {
+			return msgType, errors.Wrap(err, "parse transfer amount")
+		}
 		transfer := &storage.IbcTransfer{
-			Amount:    storageTypes.NumericFromString(packet.Amount),
+			Amount:    amount,
 			Memo:      packet.Memo,
 			ChannelId: m.Packet.SourceChannel,
 			Port:      m.Packet.SourcePort,
@@ -349,7 +357,7 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 				Type:    storageTypes.MsgAddressTypeReceiver,
 				Address: transfer.Receiver,
 			})
-			channel.Received = channel.Received.Add(transfer.Amount.Decimal)
+			channel.Received = channel.Received.Add(transfer.Amount)
 		} else {
 			transfer.ReceiverAddress = &packet.Receiver
 		}
@@ -373,7 +381,7 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 				Type:    storageTypes.MsgAddressTypeSender,
 				Address: transfer.Sender,
 			})
-			channel.Sent = channel.Sent.Add(transfer.Amount.Decimal)
+			channel.Sent = channel.Sent.Add(transfer.Amount)
 		} else {
 			transfer.SenderAddress = &packet.Sender
 		}

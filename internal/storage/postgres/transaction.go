@@ -13,7 +13,6 @@ import (
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	pg "github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 )
@@ -571,7 +570,7 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 	return count, nil
 }
 
-var one = decimal.NewFromInt(1)
+var one = storageTypes.NumericFromInt64(1)
 
 func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) (map[uint64]*models.VotesCount, error) {
 	if len(votes) == 0 {
@@ -599,7 +598,7 @@ func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) (map
 			ids := make([]uint64, len(existsVotes))
 			totalWeight := votes[i].Weight.Copy()
 			for j := range existsVotes {
-				totalWeight = totalWeight.Add(existsVotes[j].Weight.Decimal)
+				totalWeight = totalWeight.Add(existsVotes[j].Weight)
 				ids[j] = existsVotes[j].Id
 			}
 			if totalWeight.GreaterThan(one) {

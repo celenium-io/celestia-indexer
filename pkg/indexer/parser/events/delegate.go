@@ -88,7 +88,11 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 			if err != nil {
 				return err
 			}
-			delegation.Amount = storageTypes.NumericFromString(delegate.Amount.Amount.String())
+			amount, err := storageTypes.NumericFromString(delegate.Amount.Amount.String())
+			if err != nil {
+				return errors.Wrap(err, "parse delegation amount")
+			}
+			delegation.Amount = amount
 			prefix, hash, err := types.Address(delegate.Validator).Decode()
 			if err != nil {
 				return errors.Wrap(err, "decode validator address")

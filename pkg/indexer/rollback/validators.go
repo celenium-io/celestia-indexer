@@ -11,12 +11,11 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	st "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/shopspring/decimal"
 )
 
 type rollbackedValidators struct {
 	count int
-	stake decimal.Decimal
+	stake st.Numeric
 }
 
 func rollbackValidators(
@@ -78,7 +77,7 @@ func rollbackValidators(
 			if logs[i].AddressId != nil {
 				addressId := *logs[i].AddressId
 				if val, ok := balances[addressId]; ok {
-					val.Delegated = val.Delegated.Sub(logs[i].Change.Decimal)
+					val.Delegated = val.Delegated.Sub(logs[i].Change)
 				} else {
 					balances[addressId] = &storage.Balance{
 						Id:        addressId,
@@ -90,7 +89,7 @@ func rollbackValidators(
 				if !removed {
 					dId := delegationId(addressId, logs[i].ValidatorId)
 					if val, ok := delegations[dId]; ok {
-						val.Amount = val.Amount.Sub(logs[i].Change.Copy().Decimal)
+						val.Amount = val.Amount.Sub(logs[i].Change.Copy())
 					} else {
 						delegations[dId] = &storage.Delegation{
 							AddressId:   addressId,
@@ -103,7 +102,7 @@ func rollbackValidators(
 
 			if !removed {
 				if val, ok := updated[logs[i].ValidatorId]; ok {
-					val.Stake = val.Stake.Sub(logs[i].Change.Decimal)
+					val.Stake = val.Stake.Sub(logs[i].Change)
 				} else {
 					updated[logs[i].ValidatorId] = &storage.Validator{
 						Id:    logs[i].ValidatorId,
@@ -112,14 +111,14 @@ func rollbackValidators(
 				}
 			}
 
-			result.stake = result.stake.Sub(logs[i].Change.Decimal)
+			result.stake = result.stake.Sub(logs[i].Change)
 
 		case st.StakingLogTypeUnbonding:
 			if logs[i].AddressId != nil {
 				addressId := *logs[i].AddressId
 				if val, ok := balances[addressId]; ok {
-					val.Delegated = val.Delegated.Sub(logs[i].Change.Decimal)
-					val.Unbonding = val.Unbonding.Add(logs[i].Change.Decimal)
+					val.Delegated = val.Delegated.Sub(logs[i].Change)
+					val.Unbonding = val.Unbonding.Add(logs[i].Change)
 				} else {
 					balances[addressId] = &storage.Balance{
 						Id:        addressId,
@@ -132,7 +131,7 @@ func rollbackValidators(
 				if !removed {
 					dId := delegationId(addressId, logs[i].ValidatorId)
 					if val, ok := delegations[dId]; ok {
-						val.Amount = val.Amount.Sub(logs[i].Change.Copy().Decimal)
+						val.Amount = val.Amount.Sub(logs[i].Change.Copy())
 					} else {
 						delegations[dId] = &storage.Delegation{
 							AddressId:   addressId,
@@ -145,7 +144,7 @@ func rollbackValidators(
 
 			if !removed {
 				if val, ok := updated[logs[i].ValidatorId]; ok {
-					val.Stake = val.Stake.Add(logs[i].Change.Decimal)
+					val.Stake = val.Stake.Add(logs[i].Change)
 				} else {
 					updated[logs[i].ValidatorId] = &storage.Validator{
 						Id:    logs[i].ValidatorId,
@@ -154,14 +153,14 @@ func rollbackValidators(
 				}
 			}
 
-			result.stake = result.stake.Add(logs[i].Change.Decimal)
+			result.stake = result.stake.Add(logs[i].Change)
 
 		case st.StakingLogTypeCommissions:
 			if removed {
 				continue
 			}
 			if val, ok := updated[logs[i].ValidatorId]; ok {
-				val.Commissions = val.Commissions.Sub(logs[i].Change.Decimal)
+				val.Commissions = val.Commissions.Sub(logs[i].Change)
 			} else {
 				updated[logs[i].ValidatorId] = &storage.Validator{
 					Id:          logs[i].ValidatorId,
@@ -174,7 +173,7 @@ func rollbackValidators(
 				continue
 			}
 			if val, ok := updated[logs[i].ValidatorId]; ok {
-				val.Rewards = val.Rewards.Sub(logs[i].Change.Decimal)
+				val.Rewards = val.Rewards.Sub(logs[i].Change)
 			} else {
 				updated[logs[i].ValidatorId] = &storage.Validator{
 					Id:      logs[i].ValidatorId,

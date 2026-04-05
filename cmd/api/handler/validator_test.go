@@ -471,19 +471,19 @@ func (s *ValidatorTestSuite) TestMetrics() {
 		Return(storage.ValidatorMetrics{
 			Id:                    1,
 			Moniker:               "moniker",
-			MaxRate:               storageTypes.NumericFromString("0.1"),
-			MaxChangeRate:         storageTypes.NumericFromString("0.01"),
+			MaxRate:               storageTypes.MustNumericFromString("0.1"),
+			MaxChangeRate:         storageTypes.MustNumericFromString("0.01"),
 			Stake:                 storageTypes.NumericFromInt64(100),
 			CreationTime:          testTime,
 			SelfDelegationAmount:  storageTypes.NumericFromInt64(10),
 			AppliedProposalsCount: 5,
 			VotesCount:            5,
 			BlockMissedCount:      2,
-			VotesMetric:           storageTypes.NumericFromString("1.0"),
-			CommissionMetric:      storageTypes.NumericFromString("0.9"),
-			OperationTimeMetric:   storageTypes.NumericFromString("0.85"),
-			SelfDelegationMetric:  storageTypes.NumericFromString("0.8"),
-			BlockMissedMetric:     storageTypes.NumericFromString("0.75"),
+			VotesMetric:           storageTypes.MustNumericFromString("1.0"),
+			CommissionMetric:      storageTypes.MustNumericFromString("0.9"),
+			OperationTimeMetric:   storageTypes.MustNumericFromString("0.85"),
+			SelfDelegationMetric:  storageTypes.MustNumericFromString("0.8"),
+			BlockMissedMetric:     storageTypes.MustNumericFromString("0.75"),
 		}, nil).
 		Times(1)
 
@@ -520,11 +520,11 @@ func (s *ValidatorTestSuite) TestTopNMetrics() {
 	s.validators.EXPECT().
 		TopNMetrics(gomock.Any(), 25).
 		Return(storage.ValidatorMetrics{
-			VotesMetric:          storageTypes.NumericFromString("1.0"),
-			CommissionMetric:     storageTypes.NumericFromString("0.9"),
-			OperationTimeMetric:  storageTypes.NumericFromString("0.85"),
-			SelfDelegationMetric: storageTypes.NumericFromString("0.8"),
-			BlockMissedMetric:    storageTypes.NumericFromString("0.75"),
+			VotesMetric:          storageTypes.MustNumericFromString("1.0"),
+			CommissionMetric:     storageTypes.MustNumericFromString("0.9"),
+			OperationTimeMetric:  storageTypes.MustNumericFromString("0.85"),
+			SelfDelegationMetric: storageTypes.MustNumericFromString("0.8"),
+			BlockMissedMetric:    storageTypes.MustNumericFromString("0.75"),
 		}, nil).
 		Times(1)
 

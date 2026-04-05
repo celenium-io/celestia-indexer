@@ -35,7 +35,7 @@ func MsgCreateVestingAccount(ctx *context.Context, status storageTypes.Status, t
 		TxId: &txId,
 	}
 
-	amount := decimal.NewFromBigInt(m.Amount.AmountOf(currency.Utia).BigInt(), 0)
+	amount := storageTypes.NewNumeric(decimal.NewFromBigInt(m.Amount.AmountOf(currency.Utia).BigInt(), 0))
 	v.Amount = v.Amount.Add(amount)
 
 	if m.EndTime > 0 {
@@ -81,7 +81,7 @@ func MsgCreatePermanentLockedAccount(ctx *context.Context, status storageTypes.S
 		TxId: &txId,
 	}
 
-	amount := decimal.NewFromBigInt(m.Amount.AmountOf(currency.Utia).BigInt(), 0)
+	amount := storageTypes.NewNumeric(decimal.NewFromBigInt(m.Amount.AmountOf(currency.Utia).BigInt(), 0))
 	v.Amount = v.Amount.Add(amount)
 
 	ctx.AddVestingAccount(v)
@@ -125,7 +125,7 @@ func MsgCreatePeriodicVestingAccount(ctx *context.Context, status storageTypes.S
 			Height: v.Height,
 		}
 		period.Amount = storageTypes.NewNumeric(decimal.NewFromBigInt(m.VestingPeriods[i].Amount.AmountOf(currency.Utia).BigInt(), 0))
-		v.Amount = v.Amount.Add(period.Amount.Decimal)
+		v.Amount = v.Amount.Add(period.Amount)
 		periodTime = periodTime.Add(time.Second * time.Duration(m.VestingPeriods[i].Length))
 		period.Time = periodTime
 		v.VestingPeriods = append(v.VestingPeriods, period)

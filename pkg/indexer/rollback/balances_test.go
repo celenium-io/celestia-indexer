@@ -38,7 +38,7 @@ func Test_coinReceived(t *testing.T) {
 				Address: testAddress,
 				Balance: storage.Balance{
 					Currency:  "utia",
-					Spendable: types.NumericFromString("-123"),
+					Spendable: types.MustNumericFromString("-123"),
 				},
 			},
 		}, {

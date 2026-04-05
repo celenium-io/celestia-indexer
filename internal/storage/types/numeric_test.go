@@ -15,18 +15,18 @@ import (
 func TestNewNumeric(t *testing.T) {
 	d := decimal.RequireFromString("123.456")
 	n := NewNumeric(d)
-	require.True(t, n.Equal(d))
+	require.True(t, n.Equal(NewNumeric(d)))
 }
 
 func TestNumericFromInt64(t *testing.T) {
 	n := NumericFromInt64(42)
-	require.True(t, n.Equal(decimal.NewFromInt(42)))
+	require.True(t, n.Equal(NumericFromInt64(42)))
 }
 
 func TestNumeric_Decimal(t *testing.T) {
 	d := decimal.RequireFromString("-99.99")
 	n := NewNumeric(d)
-	require.True(t, n.Equal(d))
+	require.True(t, n.Equal(NewNumeric(d)))
 }
 
 func TestNumeric_Zero(t *testing.T) {
@@ -49,8 +49,7 @@ func TestNumeric_Value(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := decimal.RequireFromString(tt.val)
-			n := NewNumeric(d)
+			n := MustNumericFromString(tt.val)
 
 			v, err := n.Value()
 			require.NoError(t, err)
@@ -60,7 +59,7 @@ func TestNumeric_Value(t *testing.T) {
 			var restored Numeric
 			err = restored.Scan(v)
 			require.NoError(t, err)
-			require.True(t, restored.Equal(d), "expected %s, got %s", d, restored.String())
+			require.True(t, restored.Equal(n), "expected %s, got %s", n.String(), restored.String())
 		})
 	}
 }
@@ -69,32 +68,32 @@ func TestNumeric_ScanString(t *testing.T) {
 	var n Numeric
 	err := n.Scan("123.456")
 	require.NoError(t, err)
-	require.True(t, n.Equal(decimal.RequireFromString("123.456")))
+	require.True(t, n.Equal(MustNumericFromString("123.456")))
 }
 
 func TestNumeric_ScanBytes(t *testing.T) {
 	var n Numeric
 	err := n.Scan([]byte("17263"))
 	require.NoError(t, err)
-	require.True(t, n.Equal(decimal.NewFromInt(17263)))
+	require.True(t, n.Equal(NumericFromInt64(17263)))
 }
 
 func TestNumeric_ScanFloat64(t *testing.T) {
 	var n Numeric
 	err := n.Scan(float64(3.14))
 	require.NoError(t, err)
-	require.True(t, n.Equal(decimal.NewFromFloat(3.14)))
+	require.True(t, n.Equal(NumericFromFloat64(3.14)))
 }
 
 func TestNumeric_ScanInt64(t *testing.T) {
 	var n Numeric
 	err := n.Scan(int64(999))
 	require.NoError(t, err)
-	require.True(t, n.Equal(decimal.NewFromInt(999)))
+	require.True(t, n.Equal(NumericFromInt64(999)))
 }
 
 func TestNumeric_ScanNil(t *testing.T) {
-	n := NewNumeric(decimal.NewFromInt(42))
+	n := NumericFromInt64(42)
 	err := n.Scan(nil)
 	require.NoError(t, err)
 	require.True(t, n.IsZero())
@@ -130,7 +129,7 @@ func TestNumeric_ScanNumeric(t *testing.T) {
 		var n Numeric
 		err := n.ScanNumeric(pn)
 		require.NoError(t, err)
-		require.True(t, n.Equal(decimal.RequireFromString("123.456")))
+		require.True(t, n.Equal(MustNumericFromString("123.456")))
 	})
 
 	t.Run("invalid", func(t *testing.T) {
@@ -158,7 +157,7 @@ func TestNumeric_NumericValueScanRoundTrip(t *testing.T) {
 
 	for _, v := range values {
 		t.Run(v, func(t *testing.T) {
-			original := NumericFromString(v)
+			original := MustNumericFromString(v)
 
 			pn, err := original.NumericValue()
 			require.NoError(t, err)
@@ -166,14 +165,14 @@ func TestNumeric_NumericValueScanRoundTrip(t *testing.T) {
 			var restored Numeric
 			err = restored.ScanNumeric(pn)
 			require.NoError(t, err)
-			require.True(t, restored.Equal(original.Decimal),
+			require.True(t, restored.Equal(original),
 				"expected %s, got %s", original.String(), restored.String())
 		})
 	}
 }
 
 func TestNumeric_MarshalJSON(t *testing.T) {
-	n := NumericFromString("123.456")
+	n := MustNumericFromString("123.456")
 	data, err := json.Marshal(n)
 	require.NoError(t, err)
 	require.Equal(t, `"123.456"`, string(data))
@@ -183,7 +182,7 @@ func TestNumeric_UnmarshalJSON(t *testing.T) {
 	var n Numeric
 	err := json.Unmarshal([]byte(`"789.012"`), &n)
 	require.NoError(t, err)
-	require.True(t, n.Equal(decimal.RequireFromString("789.012")))
+	require.True(t, n.Equal(MustNumericFromString("789.012")))
 }
 
 func TestNumeric_JSONRoundTrip(t *testing.T) {
@@ -191,14 +190,14 @@ func TestNumeric_JSONRoundTrip(t *testing.T) {
 		Amount Numeric `json:"amount"`
 	}
 
-	original := wrapper{Amount: NumericFromString("-42.5")}
+	original := wrapper{Amount: MustNumericFromString("-42.5")}
 	data, err := json.Marshal(original)
 	require.NoError(t, err)
 
 	var restored wrapper
 	err = json.Unmarshal(data, &restored)
 	require.NoError(t, err)
-	require.True(t, restored.Amount.Equal(original.Amount.Decimal))
+	require.True(t, restored.Amount.Equal(original.Amount))
 }
 
 func TestNumeric_UnmarshalJSON_Invalid(t *testing.T) {

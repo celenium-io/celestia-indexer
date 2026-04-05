@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/shopspring/decimal"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 )
 
 type RollupWithStats struct {
@@ -219,13 +219,13 @@ func NewRollupWithDayStats(r storage.RollupWithDayStats) RollupWithDayStats {
 		PfbCount:       r.PfbCount,
 		TotalFee:       r.TotalFee.String(),
 		MBPrice:        r.MBPrice.String(),
-		FeePerPfb:      decimal.Zero.String(),
+		FeePerPfb:      "0",
 		Color:          r.Color,
 	}
 
 	if r.PfbCount > 0 {
 		response.BlobsPerPfb = float64(r.BlobsCount / r.PfbCount)
-		response.FeePerPfb = r.TotalFee.Div(decimal.NewFromInt(r.PfbCount)).String()
+		response.FeePerPfb = r.TotalFee.Div(types.NumericFromInt64(r.PfbCount)).String()
 	}
 
 	return response

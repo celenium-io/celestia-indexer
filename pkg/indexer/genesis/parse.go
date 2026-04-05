@@ -140,10 +140,10 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 	_ = decodeCtx.Delegations.Range(func(_ string, value *storage.Delegation) (error, bool) {
 		data.delegations = append(data.delegations, *value)
 		if data.bondedTokensPool != nil {
-			data.bondedTokensPool.Balance.Spendable = data.bondedTokensPool.Balance.Spendable.Add(value.Amount.Decimal)
+			data.bondedTokensPool.Balance.Spendable = data.bondedTokensPool.Balance.Spendable.Add(value.Amount)
 		}
 		if addr, ok := data.addresses[value.Address.Address]; ok {
-			addr.Balance.Spendable = addr.Balance.Spendable.Sub(value.Amount.Decimal)
+			addr.Balance.Spendable = addr.Balance.Spendable.Sub(value.Amount)
 		}
 		return nil, false
 	})
@@ -251,12 +251,12 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 				Currency:  balances[i].Coins[0].Denom,
 			},
 		}
-		if balance, err := decimal.NewFromString(balances[i].Coins[0].Amount); err == nil {
+		if balance, err := storageTypes.NumericFromString(balances[i].Coins[0].Amount); err == nil {
 			address.Balance.Spendable = address.Balance.Spendable.Add(balance)
 		}
 
 		if addr, ok := data.addresses[address.String()]; ok {
-			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable.Decimal)
+			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
 		} else {
 			data.addresses[address.String()] = &address
 		}

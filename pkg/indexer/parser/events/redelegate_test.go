@@ -141,7 +141,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NumericFromString("-20000000"),
+					Stake:             types.MustNumericFromString("-20000000"),
 				},
 				Destination: &storage.Validator{
 					Address:           "celestiavaloper107lwx458gy345ag2afx9a7e2kkl7x49y3433gj",
@@ -242,7 +242,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NumericFromString("-1000"),
+					Stake:             types.MustNumericFromString("-1000"),
 				},
 				Destination: &storage.Validator{
 					Address:           "celestiavaloper15urq2dtp9qce4fyc85m6upwm9xul3049gwdz0x",
@@ -416,7 +416,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NumericFromString("-125000000"),
+					Stake:             types.MustNumericFromString("-125000000"),
 				},
 				Destination: &storage.Validator{
 					Address:           "celestiavaloper19f0w9svr905fhefusyx4z8sf83j6et0g57nch8",
@@ -549,7 +549,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NumericFromString("-250000000"),
+					Stake:             types.MustNumericFromString("-250000000"),
 				},
 				Destination: &storage.Validator{
 					Address:           "celestiavaloper1yecxnyegvgm5dwsx0r3jsgr74ju6mlxdwkxx8g",
@@ -683,7 +683,7 @@ func Test_handleRedelegate(t *testing.T) {
 					MinSelfDelegation: types.NewNumeric(decimal.Zero),
 					Rewards:           types.NewNumeric(decimal.Zero),
 					Commissions:       types.NewNumeric(decimal.Zero),
-					Stake:             types.NumericFromString("-250000000"),
+					Stake:             types.MustNumericFromString("-250000000"),
 				},
 				Destination: &storage.Validator{
 					Address:           "celestiavaloper1yecxnyegvgm5dwsx0r3jsgr74ju6mlxdwkxx8g",

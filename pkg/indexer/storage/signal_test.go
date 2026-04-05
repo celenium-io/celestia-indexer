@@ -234,7 +234,7 @@ func TestSaveUpgrades_WithQuorum(t *testing.T) {
 		DoAndReturn(func(_ context.Context, upgrades ...*storage.Upgrade) error {
 			require.Len(t, upgrades, 1)
 			require.Equal(t, types.UpgradeStatusWaitingUpgrade, upgrades[0].Status)
-			require.True(t, upgrades[0].VotedPower.Equal(decimal.NewFromInt(6)))
+			require.True(t, upgrades[0].VotedPower.Equal(types.NumericFromInt64(6)))
 			return nil
 		})
 

@@ -707,7 +707,7 @@ func (s *StatsTestSuite) TestHlDomainStats() {
 		Return([]storage.DomainStats{
 			{
 				Domain:  1,
-				Amount:  storageTypes.NumericFromString("1010.101"),
+				Amount:  storageTypes.MustNumericFromString("1010.101"),
 				TxCount: 1488,
 			},
 		}, nil)
@@ -792,7 +792,7 @@ func (s *StatsTestSuite) TestHlDomainStatsWithoutChainStore() {
 		Return([]storage.DomainStats{
 			{
 				Domain:  1,
-				Amount:  storageTypes.NumericFromString("1010.101"),
+				Amount:  storageTypes.MustNumericFromString("1010.101"),
 				TxCount: 1488,
 			},
 		}, nil)
@@ -912,12 +912,12 @@ func (s *StatsTestSuite) TestSStakingDistribution() {
 			{
 				Moniker: "Test 1",
 				Value:   storageTypes.NumericFromInt64(100),
-				Percent: storageTypes.NumericFromString("0.5"),
+				Percent: storageTypes.MustNumericFromString("0.5"),
 				Time:    testTime,
 			}, {
 				Moniker: "Test 2",
 				Value:   storageTypes.NumericFromInt64(100),
-				Percent: storageTypes.NumericFromString("0.5"),
+				Percent: storageTypes.MustNumericFromString("0.5"),
 				Time:    testTime,
 			},
 		}, nil)

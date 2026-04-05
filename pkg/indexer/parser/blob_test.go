@@ -10,7 +10,6 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -62,9 +61,9 @@ func Test_processBlob(t *testing.T) {
 
 		processBlob(blobs, d, tx)
 
-		totalFee := decimal.Zero
+		var totalFee storageTypes.Numeric
 		for i := range blobs {
-			totalFee = totalFee.Add(blobs[i].Fee.Decimal)
+			totalFee = totalFee.Add(blobs[i].Fee)
 		}
 		require.Equal(t, tx.Fee.String(), totalFee.String())
 		require.Equal(t, "50", blobs[0].Fee.String())
@@ -95,9 +94,9 @@ func Test_processBlob(t *testing.T) {
 
 		processBlob(blobs, d, tx)
 
-		totalFee := decimal.Zero
+		var totalFee storageTypes.Numeric
 		for i := range blobs {
-			totalFee = totalFee.Add(blobs[i].Fee.Decimal)
+			totalFee = totalFee.Add(blobs[i].Fee)
 		}
 		require.Equal(t, tx.Fee.String(), totalFee.String())
 		require.Equal(t, "49.2", blobs[0].Fee.String())

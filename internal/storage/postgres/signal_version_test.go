@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 )
 
 func (s *StorageTestSuite) TestSignalVersionList() {
@@ -52,7 +52,7 @@ func (s *StorageTestSuite) TestSignalVersionList() {
 		s.Require().EqualValues(3, signal.Id)
 		s.Require().EqualValues(103, signal.Height)
 		s.Require().EqualValues(1488, signal.Version)
-		s.Require().True(signal.VotingPower.Equal(decimal.RequireFromString("8")), "VotingPower: expected 8, got %s", signal.VotingPower.String())
+		s.Require().True(signal.VotingPower.Equal(types.NumericFromInt64(8)), "VotingPower: expected 8, got %s", signal.VotingPower.String())
 		s.Require().EqualValues(3, signal.MsgId)
 		s.Require().EqualValues(3, signal.TxId)
 		s.Require().NotNil(signal.Validator)

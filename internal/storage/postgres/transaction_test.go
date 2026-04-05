@@ -367,7 +367,7 @@ func (s *TransactionTestSuite) TestSaveBlobLogsWithCopy() {
 	var fee types.Numeric
 	err = s.storage.Connection().DB().QueryRow("select fee from blob_log where fee = 17263 limit 1").Scan(&fee)
 	s.Require().NoError(err)
-	s.Require().True(fee.Equal(decimal.NewFromInt(17263)), "Numeric round-trip via COPY: expected 17263, got %s", fee.String())
+	s.Require().True(fee.Equal(types.NumericFromInt64(17263)), "Numeric round-trip via COPY: expected 17263, got %s", fee.String())
 }
 
 func (s *TransactionTestSuite) TestSaveTransactionsWithCopy() {
@@ -416,7 +416,7 @@ func (s *TransactionTestSuite) TestSaveTransactionsWithCopy() {
 	s.Require().NotEmpty(item.MessageTypes)
 	s.Require().EqualValues(types.StatusSuccess, item.Status)
 	s.Require().Len(item.Hash, 32)
-	s.Require().True(item.Fee.Equal(decimal.NewFromInt(17263)), "Numeric round-trip via COPY: expected 17263, got %s", item.Fee.String())
+	s.Require().True(item.Fee.Equal(types.NumericFromInt64(17263)), "Numeric round-trip via COPY: expected 17263, got %s", item.Fee.String())
 }
 
 func (s *TransactionTestSuite) TestSaveMessagesWithCopy() {
@@ -527,7 +527,7 @@ func (s *TransactionTestSuite) TestSaveVotes() {
 		VoterId:    3,
 		Height:     1001,
 		Time:       time.Now(),
-		Weight:     types.NumericFromString("1.0"),
+		Weight:     types.MustNumericFromString("1.0"),
 	}
 
 	count, err := tx.SaveVotes(ctx, vote)
@@ -568,14 +568,14 @@ func (s *TransactionTestSuite) TestSave2Votes() {
 			VoterId:    3,
 			Height:     1001,
 			Time:       time.Now(),
-			Weight:     types.NumericFromString("1.0"),
+			Weight:     types.MustNumericFromString("1.0"),
 		}, {
 			Option:     types.VoteOptionAbstain,
 			ProposalId: 1,
 			VoterId:    5,
 			Height:     1001,
 			Time:       time.Now(),
-			Weight:     types.NumericFromString("1.0"),
+			Weight:     types.MustNumericFromString("1.0"),
 		},
 	}
 
@@ -611,14 +611,14 @@ func (s *TransactionTestSuite) TestSaveWeightedVotes() {
 			VoterId:    5,
 			Height:     1001,
 			Time:       time.Now(),
-			Weight:     types.NumericFromString("0.5"),
+			Weight:     types.MustNumericFromString("0.5"),
 		}, {
 			Option:     types.VoteOptionAbstain,
 			ProposalId: 1,
 			VoterId:    5,
 			Height:     1001,
 			Time:       time.Now(),
-			Weight:     types.NumericFromString("0.5"),
+			Weight:     types.MustNumericFromString("0.5"),
 		},
 	}
 
@@ -656,7 +656,7 @@ func (s *TransactionTestSuite) TestSaveVotesValidatorIdDuplicate() {
 		ValidatorId: testsuite.Ptr(uint64(1)),
 		Height:      1001,
 		Time:        time.Now(),
-		Weight:      types.NumericFromString("1.0"),
+		Weight:      types.MustNumericFromString("1.0"),
 	}
 
 	newCount, err := tx.SaveVotes(ctx, vote)
@@ -702,7 +702,7 @@ func (s *TransactionTestSuite) TestSaveVotesAddressIdDuplicate() {
 		VoterId:    1,
 		Height:     1001,
 		Time:       time.Now(),
-		Weight:     types.NumericFromString("1.0"),
+		Weight:     types.MustNumericFromString("1.0"),
 	}
 
 	newCount, err := tx.SaveVotes(ctx, vote)
@@ -2362,8 +2362,8 @@ func (s *TransactionTestSuite) TestHyperlaneIgpConfig() {
 	s.Require().NoError(err)
 
 	s.Require().EqualValues(1488, igp.Height)
-	s.Require().True(igp.GasPrice.Equal(decimal.RequireFromString("1")), "GasPrice: expected 1, got %s", igp.GasPrice.String())
-	s.Require().True(igp.GasOverhead.Equal(decimal.RequireFromString("100000")), "GasOverhead: expected 100000, got %s", igp.GasOverhead.String())
+	s.Require().True(igp.GasPrice.Equal(types.MustNumericFromString("1")), "GasPrice: expected 1, got %s", igp.GasPrice.String())
+	s.Require().True(igp.GasOverhead.Equal(types.MustNumericFromString("100000")), "GasOverhead: expected 100000, got %s", igp.GasOverhead.String())
 	s.Require().EqualValues(1234, igp.RemoteDomain)
 	s.Require().EqualValues("4321", igp.TokenExchangeRate)
 	s.Require().NoError(tx.Flush(ctx))

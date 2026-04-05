@@ -10,7 +10,6 @@ import (
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	sdkStorage "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func (module *Module) upgrade(ctx context.Context, decodeContext *decodeContext.Context, currentVersion, targetVersion uint64) error {
@@ -48,8 +47,8 @@ func (module *Module) upgradeV7(ctx context.Context, decodeContext *decodeContex
 	decodeContext.AddConstant(types.ModuleNameStaking, "min_commission_rate", "0.200000000000000000")
 	decodeContext.AddConstant(types.ModuleNameStaking, "max_commission_rate", "0.600000000000000000")
 
-	minCommissionRate := decimal.RequireFromString("0.200000000000000000")
-	maxCommissionRate := decimal.RequireFromString("0.600000000000000000")
+	minCommissionRate := types.MustNumericFromString("0.200000000000000000")
+	maxCommissionRate := types.MustNumericFromString("0.600000000000000000")
 	limit := uint64(100)
 	offset := uint64(0)
 	end := false
@@ -64,10 +63,10 @@ func (module *Module) upgradeV7(ctx context.Context, decodeContext *decodeContex
 
 		for i := range validators {
 			if validators[i].Rate.LessThan(minCommissionRate) {
-				validators[i].Rate = types.NewNumeric(minCommissionRate)
+				validators[i].Rate = minCommissionRate
 			}
 			if validators[i].MaxRate.GreaterThan(maxCommissionRate) {
-				validators[i].MaxRate = types.NewNumeric(maxCommissionRate)
+				validators[i].MaxRate = maxCommissionRate
 			}
 			decodeContext.AddValidator(*validators[i])
 		}

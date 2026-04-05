@@ -30,7 +30,15 @@ func NumericFromInt64(v int64) Numeric {
 	return Numeric{decimal.NewFromInt(v)}
 }
 
-func NumericFromString(s string) Numeric {
+func NumericFromString(s string) (Numeric, error) {
+	d, err := decimal.NewFromString(s)
+	if err != nil {
+		return Numeric{}, err
+	}
+	return Numeric{d}, nil
+}
+
+func MustNumericFromString(s string) Numeric {
 	return Numeric{decimal.RequireFromString(s)}
 }
 
@@ -99,22 +107,22 @@ func (n *Numeric) UnmarshalJSON(data []byte) error {
 	return n.Decimal.UnmarshalJSON(data)
 }
 
-// Arithmetic methods that return Numeric instead of decimal.Decimal.
+// Arithmetic methods that accept Numeric and return Numeric.
 
-func (n Numeric) Add(d decimal.Decimal) Numeric {
-	return Numeric{n.Decimal.Add(d)}
+func (n Numeric) Add(d Numeric) Numeric {
+	return Numeric{n.Decimal.Add(d.Decimal)}
 }
 
-func (n Numeric) Sub(d decimal.Decimal) Numeric {
-	return Numeric{n.Decimal.Sub(d)}
+func (n Numeric) Sub(d Numeric) Numeric {
+	return Numeric{n.Decimal.Sub(d.Decimal)}
 }
 
-func (n Numeric) Mul(d decimal.Decimal) Numeric {
-	return Numeric{n.Decimal.Mul(d)}
+func (n Numeric) Mul(d Numeric) Numeric {
+	return Numeric{n.Decimal.Mul(d.Decimal)}
 }
 
-func (n Numeric) Div(d decimal.Decimal) Numeric {
-	return Numeric{n.Decimal.Div(d)}
+func (n Numeric) Div(d Numeric) Numeric {
+	return Numeric{n.Decimal.Div(d.Decimal)}
 }
 
 func (n Numeric) Neg() Numeric {
@@ -129,6 +137,28 @@ func (n Numeric) Floor() Numeric {
 	return Numeric{n.Decimal.Floor()}
 }
 
-func (n Numeric) Pow(d decimal.Decimal) Numeric {
-	return Numeric{n.Decimal.Pow(d)}
+func (n Numeric) Pow(d Numeric) Numeric {
+	return Numeric{n.Decimal.Pow(d.Decimal)}
+}
+
+// Comparison methods that accept Numeric.
+
+func (n Numeric) GreaterThan(d Numeric) bool {
+	return n.Decimal.GreaterThan(d.Decimal)
+}
+
+func (n Numeric) GreaterThanOrEqual(d Numeric) bool {
+	return n.Decimal.GreaterThanOrEqual(d.Decimal)
+}
+
+func (n Numeric) LessThan(d Numeric) bool {
+	return n.Decimal.LessThan(d.Decimal)
+}
+
+func (n Numeric) LessThanOrEqual(d Numeric) bool {
+	return n.Decimal.LessThanOrEqual(d.Decimal)
+}
+
+func (n Numeric) Equal(d Numeric) bool {
+	return n.Decimal.Equal(d.Decimal)
 }

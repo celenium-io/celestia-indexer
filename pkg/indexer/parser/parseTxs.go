@@ -138,7 +138,7 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 		ctx.AddMessage(&dm.Msg)
 	}
 
-	ctx.Block.Stats.Fee = ctx.Block.Stats.Fee.Add(t.Fee.Decimal)
+	ctx.Block.Stats.Fee = ctx.Block.Stats.Fee.Add(t.Fee)
 	ctx.Block.MessageTypes.Set(t.MessageTypes.Bits)
 	ctx.Block.Stats.BlobsSize += t.BlobsSize
 	ctx.Block.Stats.GasLimit += t.GasWanted
