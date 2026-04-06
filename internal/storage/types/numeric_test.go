@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"testing"
 
+	"cosmossdk.io/math"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
@@ -55,6 +56,26 @@ func TestNumericFromBigInt(t *testing.T) {
 	t.Run("negative", func(t *testing.T) {
 		n := NumericFromBigInt(big.NewInt(-500), -2)
 		require.True(t, n.Equal(MustNumericFromString("-5.00")))
+	})
+
+	t.Run("cosmos sdk math.Int", func(t *testing.T) {
+		coin := math.NewInt(1_000_000)
+		n := NumericFromBigInt(coin.BigInt(), 0)
+		require.True(t, n.Equal(NumericFromInt64(1_000_000)))
+		require.Equal(t, "1000000", n.String())
+	})
+
+	t.Run("cosmos sdk math.Int large", func(t *testing.T) {
+		coin, ok := math.NewIntFromString("123456789012345678901234")
+		require.True(t, ok)
+		n := NumericFromBigInt(coin.BigInt(), 0)
+		require.Equal(t, "123456789012345678901234", n.String())
+	})
+
+	t.Run("cosmos sdk math.Int zero", func(t *testing.T) {
+		coin := math.ZeroInt()
+		n := NumericFromBigInt(coin.BigInt(), 0)
+		require.True(t, n.IsZero())
 	})
 }
 

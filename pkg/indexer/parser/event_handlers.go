@@ -15,7 +15,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func parseCoinSpent(ctx *context.Context, data map[string]string, height pkgTypes.Level) error {
@@ -41,11 +40,8 @@ func parseCoinSpent(ctx *context.Context, data map[string]string, height pkgType
 	}
 
 	if coinSpent.Amount != nil {
-		amount, err := decimal.NewFromString(coinSpent.Amount.Amount.String())
-		if err != nil {
-			return err
-		}
-		address.Balance.Spendable = types.NewNumeric(amount.Neg())
+		amount := types.NumericFromBigInt(coinSpent.Amount.Amount.BigInt(), 0)
+		address.Balance.Spendable = amount.Neg()
 		address.Balance.Currency = coinSpent.Amount.GetDenom()
 	}
 
@@ -75,11 +71,7 @@ func parseCoinReceived(ctx *context.Context, data map[string]string, height pkgT
 	}
 
 	if coinReceived.Amount != nil {
-		amount, err := decimal.NewFromString(coinReceived.Amount.Amount.String())
-		if err != nil {
-			return err
-		}
-		address.Balance.Spendable = types.NewNumeric(amount)
+		address.Balance.Spendable = types.NumericFromBigInt(coinReceived.Amount.Amount.BigInt(), 0)
 		address.Balance.Currency = coinReceived.Amount.GetDenom()
 	}
 
@@ -109,11 +101,8 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]string) error 
 	}
 
 	if unbonding.Amount != nil {
-		amount, err := decimal.NewFromString(unbonding.Amount.Amount.String())
-		if err != nil {
-			return err
-		}
-		address.Balance.Unbonding = types.NewNumeric(amount.Neg())
+		amount := types.NumericFromBigInt(unbonding.Amount.Amount.BigInt(), 0)
+		address.Balance.Unbonding = amount.Neg()
 		address.Balance.Currency = unbonding.Amount.GetDenom()
 
 		validator := storage.EmptyValidator()
@@ -125,7 +114,7 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]string) error 
 			Height:    ctx.Block.Height,
 			Address:   address,
 			Validator: &validator,
-			Change:    types.NewNumeric(amount.Neg()),
+			Change:    amount.Neg(),
 			Type:      types.StakingLogTypeUnbonded,
 		})
 	}
@@ -150,10 +139,7 @@ func parseCompleteRedelegation(ctx *context.Context, data map[string]string) err
 	}
 
 	if redelegation.Amount != nil {
-		amount, err := decimal.NewFromString(redelegation.Amount.Amount.String())
-		if err != nil {
-			return err
-		}
+		amount := types.NumericFromBigInt(redelegation.Amount.Amount.BigInt(), 0)
 
 		validator := storage.EmptyValidator()
 		validator.Address = redelegation.SrcValidator
@@ -164,7 +150,7 @@ func parseCompleteRedelegation(ctx *context.Context, data map[string]string) err
 			Height:    ctx.Block.Height,
 			Address:   address,
 			Validator: &validator,
-			Change:    types.NewNumeric(amount.Neg()),
+			Change:    amount.Neg(),
 			Type:      types.StakingLogTypeUnbonded,
 		})
 	}

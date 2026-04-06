@@ -16,7 +16,6 @@ import (
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 type parsedData struct {
@@ -265,11 +264,11 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 	return nil
 }
 
-func getAmountFromOriginalVesting(vestings []types.Coins) (decimal.Decimal, error) {
-	var amount = decimal.Zero.Copy()
+func getAmountFromOriginalVesting(vestings []types.Coins) (storageTypes.Numeric, error) {
+	amount := storageTypes.NumericZero().Copy()
 
 	for i := range vestings {
-		val, err := decimal.NewFromString(vestings[i].Amount)
+		val, err := storageTypes.NumericFromString(vestings[i].Amount)
 		if err != nil {
 			return amount, err
 		}
@@ -292,7 +291,7 @@ func parseVesting(acc types.Account, block storage.Block, address string, typ st
 			Address: address,
 		},
 		Type:           typ,
-		Amount:         storageTypes.NewNumeric(amount),
+		Amount:         amount,
 		VestingPeriods: make([]storage.VestingPeriod, 0),
 	}
 
@@ -316,7 +315,7 @@ func parseVesting(acc types.Account, block storage.Block, address string, typ st
 		if err != nil {
 			return err
 		}
-		period.Amount = storageTypes.NewNumeric(amount)
+		period.Amount = amount
 		periodTime = periodTime.Add(time.Second * time.Duration(acc.VestingPeriods[i].Length))
 		period.Time = periodTime
 		v.VestingPeriods = append(v.VestingPeriods, period)
