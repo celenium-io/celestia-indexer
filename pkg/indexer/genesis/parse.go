@@ -16,7 +16,6 @@ import (
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 type parsedData struct {
@@ -57,9 +56,9 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 			Height:        pkgTypes.Level(genesis.InitialHeight - 1),
 			TxCount:       int64(len(genesis.AppState.Genutil.GenTxs)),
 			EventsCount:   0,
-			Fee:           decimal.Zero,
-			SupplyChange:  decimal.Zero,
-			InflationRate: decimal.Zero,
+			Fee:           storageTypes.NumericZero(),
+			SupplyChange:  storageTypes.NumericZero(),
+			InflationRate: storageTypes.NumericZero(),
 		},
 		MessageTypes: storageTypes.NewMsgTypeBits(),
 	}
@@ -92,7 +91,7 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 		tx.Position = int64(index)
 		tx.TimeoutHeight = txWithTimeoutHeight.GetTimeoutHeight()
 		tx.MessagesCount = int64(len(txDecoded.GetMsgs()))
-		tx.Fee = decimal.Zero
+		tx.Fee = storageTypes.NumericZero()
 		tx.Status = storageTypes.StatusSuccess
 		tx.Memo = memoTx.GetMemo()
 		tx.MessageTypes = storageTypes.NewMsgTypeBitMask()
@@ -157,7 +156,7 @@ func (module *Module) parseTotalSupply(supply []types.Supply, block *storage.Blo
 		return
 	}
 
-	if totalSupply, err := decimal.NewFromString(supply[0].Amount); err == nil {
+	if totalSupply, err := storageTypes.NumericFromString(supply[0].Amount); err == nil {
 		block.Stats.SupplyChange = totalSupply
 	}
 }
@@ -173,9 +172,9 @@ func (module *Module) parseAccounts(accounts []types.Account, block storage.Bloc
 			Height:     block.Height,
 			LastHeight: block.Height,
 			Balance: storage.Balance{
-				Spendable: decimal.Zero,
-				Delegated: decimal.Zero,
-				Unbonding: decimal.Zero,
+				Spendable: storageTypes.NumericZero(),
+				Delegated: storageTypes.NumericZero(),
+				Unbonding: storageTypes.NumericZero(),
 				Currency:  currencyBase,
 			},
 		}
@@ -245,13 +244,13 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 			Height:     height,
 			LastHeight: height,
 			Balance: storage.Balance{
-				Spendable: decimal.Zero,
-				Delegated: decimal.Zero,
-				Unbonding: decimal.Zero,
+				Spendable: storageTypes.NumericZero(),
+				Delegated: storageTypes.NumericZero(),
+				Unbonding: storageTypes.NumericZero(),
 				Currency:  balances[i].Coins[0].Denom,
 			},
 		}
-		if balance, err := decimal.NewFromString(balances[i].Coins[0].Amount); err == nil {
+		if balance, err := storageTypes.NumericFromString(balances[i].Coins[0].Amount); err == nil {
 			address.Balance.Spendable = address.Balance.Spendable.Add(balance)
 		}
 
@@ -265,11 +264,11 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 	return nil
 }
 
-func getAmountFromOriginalVesting(vestings []types.Coins) (decimal.Decimal, error) {
-	var amount = decimal.Zero.Copy()
+func getAmountFromOriginalVesting(vestings []types.Coins) (storageTypes.Numeric, error) {
+	amount := storageTypes.NumericZero().Copy()
 
 	for i := range vestings {
-		val, err := decimal.NewFromString(vestings[i].Amount)
+		val, err := storageTypes.NumericFromString(vestings[i].Amount)
 		if err != nil {
 			return amount, err
 		}

@@ -7,9 +7,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -43,23 +43,23 @@ type IIbcTransfer interface {
 type IbcTransfer struct {
 	bun.BaseModel `bun:"ibc_transfer" comment:"Table with IBC transfers."`
 
-	Id              uint64          `bun:"id,pk,autoincrement"     comment:"Transfer internal identity"`
-	Time            time.Time       `bun:"time,notnull,pk"         comment:"Message time"`
-	Height          pkgTypes.Level  `bun:"height"                  comment:"Block number"`
-	Amount          decimal.Decimal `bun:"amount,type:numeric"     comment:"Transferred amount"`
-	Denom           string          `bun:"denom"                   comment:"Currency"`
-	Memo            string          `bun:"memo"                    comment:"Memo"`
-	ReceiverAddress *string         `bun:"receiver_address"        comment:"Receiver string. It's not null if it's not celestia address."`
-	ReceiverId      *uint64         `bun:"receiver_id"             comment:"Receiver id. It's not null if it's celestia address."`
-	SenderAddress   *string         `bun:"sender_address"          comment:"Sender string. It's not null if it's not celestia address."`
-	SenderId        *uint64         `bun:"sender_id"               comment:"Sender id. It's not null if it's celestia address."`
-	ConnectionId    string          `bun:"connection_id"           comment:"Connection identity"`
-	ChannelId       string          `bun:"channel_id"              comment:"Channel identity"`
-	Port            string          `bun:"port"                    comment:"Port"`
-	Timeout         *time.Time      `bun:"timeout,nullzero"        comment:"Date-time timeout"`
-	HeightTimeout   uint64          `bun:"height_timeout,nullzero" comment:"Height timeout"`
-	Sequence        uint64          `bun:"sequence"                comment:"Sequence number of packet"`
-	TxId            uint64          `bun:"tx_id"                   comment:"Transaction id where transfer occurred"`
+	Id              uint64         `bun:"id,pk,autoincrement"     comment:"Transfer internal identity"`
+	Time            time.Time      `bun:"time,notnull,pk"         comment:"Message time"`
+	Height          pkgTypes.Level `bun:"height"                  comment:"Block number"`
+	Amount          types.Numeric  `bun:"amount,type:numeric"     comment:"Transferred amount"`
+	Denom           string         `bun:"denom"                   comment:"Currency"`
+	Memo            string         `bun:"memo"                    comment:"Memo"`
+	ReceiverAddress *string        `bun:"receiver_address"        comment:"Receiver string. It's not null if it's not celestia address."`
+	ReceiverId      *uint64        `bun:"receiver_id"             comment:"Receiver id. It's not null if it's celestia address."`
+	SenderAddress   *string        `bun:"sender_address"          comment:"Sender string. It's not null if it's not celestia address."`
+	SenderId        *uint64        `bun:"sender_id"               comment:"Sender id. It's not null if it's celestia address."`
+	ConnectionId    string         `bun:"connection_id"           comment:"Connection identity"`
+	ChannelId       string         `bun:"channel_id"              comment:"Channel identity"`
+	Port            string         `bun:"port"                    comment:"Port"`
+	Timeout         *time.Time     `bun:"timeout,nullzero"        comment:"Date-time timeout"`
+	HeightTimeout   uint64         `bun:"height_timeout,nullzero" comment:"Height timeout"`
+	Sequence        uint64         `bun:"sequence"                comment:"Sequence number of packet"`
+	TxId            uint64         `bun:"tx_id"                   comment:"Transaction id where transfer occurred"`
 
 	Tx         *Tx            `bun:"rel:belongs-to,join:tx_id=id"`
 	Receiver   *Address       `bun:"rel:belongs-to,join:receiver_id=id"`

@@ -11,12 +11,11 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	st "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/shopspring/decimal"
 )
 
 type rollbackedValidators struct {
 	count int
-	stake decimal.Decimal
+	stake st.Numeric
 }
 
 func rollbackValidators(

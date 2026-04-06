@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -38,7 +37,7 @@ func Test_coinReceived(t *testing.T) {
 				Address: testAddress,
 				Balance: storage.Balance{
 					Currency:  "utia",
-					Spendable: decimal.RequireFromString("-123"),
+					Spendable: types.MustNumericFromString("-123"),
 				},
 			},
 		}, {
@@ -52,7 +51,7 @@ func Test_coinReceived(t *testing.T) {
 				Address: testAddress,
 				Balance: storage.Balance{
 					Currency:  "utia",
-					Spendable: decimal.Zero,
+					Spendable: types.NumericZero(),
 				},
 			},
 		}, {
@@ -104,7 +103,7 @@ func Test_coinSpent(t *testing.T) {
 				Address: testAddress,
 				Balance: storage.Balance{
 					Currency:  "utia",
-					Spendable: decimal.RequireFromString("123"),
+					Spendable: types.NumericFromInt64(123),
 				},
 			},
 		}, {
@@ -118,7 +117,7 @@ func Test_coinSpent(t *testing.T) {
 				Address: testAddress,
 				Balance: storage.Balance{
 					Currency:  "utia",
-					Spendable: decimal.Zero,
+					Spendable: types.NumericZero(),
 				},
 			},
 		}, {
@@ -189,7 +188,7 @@ func Test_getBalanceUpdates(t *testing.T) {
 					Hash:    testHashAddress,
 					Balance: storage.Balance{
 						Currency:  currency.DefaultCurrency,
-						Spendable: decimal.RequireFromString("100"),
+						Spendable: types.NumericFromInt64(100),
 					},
 					LastHeight: 100,
 				},

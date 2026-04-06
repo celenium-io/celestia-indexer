@@ -13,7 +13,6 @@ import (
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	pg "github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 )
@@ -571,7 +570,7 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 	return count, nil
 }
 
-var one = decimal.NewFromInt(1)
+var one = storageTypes.NumericFromInt64(1)
 
 func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) (map[uint64]*models.VotesCount, error) {
 	if len(votes) == 0 {
@@ -865,7 +864,7 @@ func (tx Transaction) SaveHyperlaneTransfers(ctx context.Context, transfers ...*
 	return err
 }
 
-func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned decimal.Decimal) (balances []models.Balance, err error) {
+func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned storageTypes.Numeric) (balances []models.Balance, err error) {
 	if validatorId == 0 || !burned.IsPositive() {
 		return nil, nil
 	}
@@ -1480,17 +1479,17 @@ func (tx Transaction) HyperlaneToken(ctx context.Context, id []byte) (token mode
 	return
 }
 
-func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (decimal.Decimal, error) {
+func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (storageTypes.Numeric, error) {
 	_, err := tx.Tx().NewUpdate().Table("signal_version", "validator").
 		SetColumn("voting_power", "validator.stake").
 		Where("signal_version.version = ?", version).
 		Where("validator.id = validator_id").
 		Exec(ctx)
 	if err != nil {
-		return decimal.Zero, err
+		return storageTypes.NumericZero(), err
 	}
 
-	var sum decimal.Decimal
+	var sum storageTypes.Numeric
 	err = tx.Tx().NewSelect().
 		TableExpr("(?) AS latest",
 			tx.Tx().NewSelect().

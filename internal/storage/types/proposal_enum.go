@@ -105,14 +105,6 @@ func (x *ProposalStatus) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// AppendText appends the textual representation of itself to the end of b
-// (allocating a larger slice if necessary) and returns the updated slice.
-//
-// Implementations must not retain b, nor mutate any bytes within b[:len(b)].
-func (x *ProposalStatus) AppendText(b []byte) ([]byte, error) {
-	return append(b, x.String()...), nil
-}
-
 var errProposalStatusNilPtr = errors.New("value pointer is nil") // one per type for package clashes
 
 // Scan implements the Scanner interface.
@@ -230,14 +222,6 @@ func (x *ProposalType) UnmarshalText(text []byte) error {
 	}
 	*x = tmp
 	return nil
-}
-
-// AppendText appends the textual representation of itself to the end of b
-// (allocating a larger slice if necessary) and returns the updated slice.
-//
-// Implementations must not retain b, nor mutate any bytes within b[:len(b)].
-func (x *ProposalType) AppendText(b []byte) ([]byte, error) {
-	return append(b, x.String()...), nil
 }
 
 var errProposalTypeNilPtr = errors.New("value pointer is nil") // one per type for package clashes
@@ -359,14 +343,6 @@ func (x *VoteOption) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// AppendText appends the textual representation of itself to the end of b
-// (allocating a larger slice if necessary) and returns the updated slice.
-//
-// Implementations must not retain b, nor mutate any bytes within b[:len(b)].
-func (x *VoteOption) AppendText(b []byte) ([]byte, error) {
-	return append(b, x.String()...), nil
-}
-
 var errVoteOptionNilPtr = errors.New("value pointer is nil") // one per type for package clashes
 
 // Scan implements the Scanner interface.
@@ -474,14 +450,6 @@ func (x *VoterType) UnmarshalText(text []byte) error {
 	}
 	*x = tmp
 	return nil
-}
-
-// AppendText appends the textual representation of itself to the end of b
-// (allocating a larger slice if necessary) and returns the updated slice.
-//
-// Implementations must not retain b, nor mutate any bytes within b[:len(b)].
-func (x *VoterType) AppendText(b []byte) ([]byte, error) {
-	return append(b, x.String()...), nil
 }
 
 var errVoterTypeNilPtr = errors.New("value pointer is nil") // one per type for package clashes

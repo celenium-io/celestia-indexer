@@ -12,7 +12,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func handleCancelUnbonding(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
@@ -52,7 +51,10 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 				return err
 			}
 
-			amount := decimal.RequireFromString(cancel.Amount.Amount.String())
+			amount, err := storageTypes.NumericFromString(cancel.Amount.Amount.String())
+			if err != nil {
+				return errors.Wrap(err, "parse cancel unbonding amount")
+			}
 			validator := storage.EmptyValidator()
 			prefix, hash, err := types.Address(cancel.Validator).Decode()
 			if err != nil {

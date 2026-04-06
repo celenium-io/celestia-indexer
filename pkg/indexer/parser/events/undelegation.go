@@ -14,7 +14,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func handleUndelegate(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
@@ -33,7 +32,7 @@ func handleUndelegate(ctx *context.Context, events []storage.Event, msg *storage
 
 func processUndelegate(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	var (
-		amount         = decimal.Zero
+		amount         = storageTypes.NumericZero()
 		validator      = storage.EmptyValidator()
 		completionTime = time.Now()
 		msgIdx         = decoder.StringFromMap(events[*idx].Data, "msg_index")
@@ -50,7 +49,7 @@ func processUndelegate(ctx *context.Context, events []storage.Event, msg *storag
 					Currency:  currency.DefaultCurrency,
 					Delegated: amount.Copy().Neg(),
 					Unbonding: amount,
-					Spendable: decimal.Zero,
+					Spendable: storageTypes.NumericZero(),
 				},
 			}
 			if err := ctx.AddAddress(address); err != nil {
@@ -107,7 +106,11 @@ func processUndelegate(ctx *context.Context, events []storage.Event, msg *storag
 			}
 
 			completionTime = unbond.CompletionTime
-			amount = decimal.RequireFromString(unbond.Amount.Amount.String())
+			parsedAmount, err := storageTypes.NumericFromString(unbond.Amount.Amount.String())
+			if err != nil {
+				return errors.Wrap(err, "parse unbond amount")
+			}
+			amount = parsedAmount
 			prefix, hash, err := types.Address(unbond.Validator).Decode()
 			if err != nil {
 				return errors.Wrap(err, "decode validator address")

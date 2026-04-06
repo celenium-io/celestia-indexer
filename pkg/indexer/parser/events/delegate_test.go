@@ -12,7 +12,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -128,7 +127,7 @@ func Test_handleDelegate(t *testing.T) {
 			},
 			idx: testsuite.Ptr(0),
 			delegation: &storage.Delegation{
-				Amount: decimal.RequireFromString("5690000"),
+				Amount: types.NumericFromInt64(5690000),
 				Address: &storage.Address{
 					Height:     841682,
 					LastHeight: 841682,
@@ -136,7 +135,7 @@ func Test_handleDelegate(t *testing.T) {
 					Hash:       []byte{0xe7, 0xeb, 0x3b, 0x22, 0x85, 0x79, 0xa0, 0x93, 0xe0, 0x33, 0xd3, 0xc4, 0xf4, 0x6e, 0x46, 0xdb, 0xb8, 0x69, 0x97, 0xa9},
 					Balance: storage.Balance{
 						Currency:  currency.Utia,
-						Delegated: decimal.RequireFromString("5690000"),
+						Delegated: types.NumericFromInt64(5690000),
 					},
 				},
 				Validator: &storage.Validator{
@@ -146,13 +145,13 @@ func Test_handleDelegate(t *testing.T) {
 					Identity:          storage.DoNotModify,
 					Contacts:          storage.DoNotModify,
 					Details:           storage.DoNotModify,
-					Rate:              decimal.Zero,
-					MaxRate:           decimal.Zero,
-					MaxChangeRate:     decimal.Zero,
-					MinSelfDelegation: decimal.Zero,
-					Rewards:           decimal.Zero,
-					Commissions:       decimal.Zero,
-					Stake:             decimal.RequireFromString("5690000"),
+					Rate:              types.NumericZero(),
+					MaxRate:           types.NumericZero(),
+					MaxChangeRate:     types.NumericZero(),
+					MinSelfDelegation: types.NumericZero(),
+					Rewards:           types.NumericZero(),
+					Commissions:       types.NumericZero(),
+					Stake:             types.NumericFromInt64(5690000),
 				},
 			},
 		}, {
@@ -216,7 +215,7 @@ func Test_handleDelegate(t *testing.T) {
 			},
 			idx: testsuite.Ptr(0),
 			delegation: &storage.Delegation{
-				Amount: decimal.RequireFromString("5690000"),
+				Amount: types.NumericFromInt64(5690000),
 				Address: &storage.Address{
 					Height:     841682,
 					LastHeight: 841682,
@@ -224,7 +223,7 @@ func Test_handleDelegate(t *testing.T) {
 					Hash:       []byte{0xe7, 0xeb, 0x3b, 0x22, 0x85, 0x79, 0xa0, 0x93, 0xe0, 0x33, 0xd3, 0xc4, 0xf4, 0x6e, 0x46, 0xdb, 0xb8, 0x69, 0x97, 0xa9},
 					Balance: storage.Balance{
 						Currency:  currency.Utia,
-						Delegated: decimal.RequireFromString("5690000"),
+						Delegated: types.NumericFromInt64(5690000),
 					},
 				},
 				Validator: &storage.Validator{
@@ -234,13 +233,13 @@ func Test_handleDelegate(t *testing.T) {
 					Identity:          storage.DoNotModify,
 					Contacts:          storage.DoNotModify,
 					Details:           storage.DoNotModify,
-					Rate:              decimal.Zero,
-					MaxRate:           decimal.Zero,
-					MaxChangeRate:     decimal.Zero,
-					MinSelfDelegation: decimal.Zero,
-					Rewards:           decimal.Zero,
-					Commissions:       decimal.Zero,
-					Stake:             decimal.RequireFromString("5690000"),
+					Rate:              types.NumericZero(),
+					MaxRate:           types.NumericZero(),
+					MaxChangeRate:     types.NumericZero(),
+					MinSelfDelegation: types.NumericZero(),
+					Rewards:           types.NumericZero(),
+					Commissions:       types.NumericZero(),
+					Stake:             types.NumericFromInt64(5690000),
 				},
 			},
 		}, {
@@ -367,7 +366,7 @@ func Test_handleDelegate(t *testing.T) {
 			},
 			idx: testsuite.Ptr(7),
 			delegation: &storage.Delegation{
-				Amount: decimal.RequireFromString("100000000"),
+				Amount: types.NumericFromInt64(100000000),
 				Address: &storage.Address{
 					Height:     105,
 					LastHeight: 105,
@@ -375,7 +374,7 @@ func Test_handleDelegate(t *testing.T) {
 					Hash:       []byte{0x2a, 0x30, 0x5a, 0xbd, 0x8d, 0x87, 0xca, 0xb0, 0xd2, 0xcc, 0xb0, 0xb3, 0x8f, 0x6c, 0xf3, 0x97, 0xf8, 0x1f, 0x74, 0x8f},
 					Balance: storage.Balance{
 						Currency:  currency.Utia,
-						Delegated: decimal.RequireFromString("100000000"),
+						Delegated: types.NumericFromInt64(100000000),
 					},
 				},
 				Validator: &storage.Validator{
@@ -385,13 +384,13 @@ func Test_handleDelegate(t *testing.T) {
 					Identity:          storage.DoNotModify,
 					Contacts:          storage.DoNotModify,
 					Details:           storage.DoNotModify,
-					Rate:              decimal.Zero,
-					MaxRate:           decimal.Zero,
-					MaxChangeRate:     decimal.Zero,
-					MinSelfDelegation: decimal.Zero,
-					Rewards:           decimal.Zero,
-					Commissions:       decimal.Zero,
-					Stake:             decimal.RequireFromString("100000000"),
+					Rate:              types.NumericZero(),
+					MaxRate:           types.NumericZero(),
+					MaxChangeRate:     types.NumericZero(),
+					MinSelfDelegation: types.NumericZero(),
+					Rewards:           types.NumericZero(),
+					Commissions:       types.NumericZero(),
+					Stake:             types.NumericFromInt64(100000000),
 				},
 			},
 		}, {
@@ -455,7 +454,7 @@ func Test_handleDelegate(t *testing.T) {
 			},
 			idx: testsuite.Ptr(0),
 			delegation: &storage.Delegation{
-				Amount: decimal.RequireFromString("45000000"),
+				Amount: types.NumericFromInt64(45000000),
 				Address: &storage.Address{
 					Height:     105,
 					LastHeight: 105,
@@ -463,7 +462,7 @@ func Test_handleDelegate(t *testing.T) {
 					Hash:       []byte{0xf6, 0x8e, 0x91, 0x14, 0x6a, 0xc5, 0x5c, 0x7d, 0x59, 0x98, 0xb1, 0x93, 0x70, 0xb2, 0xfd, 0x7d, 0x2a, 0x3b, 0x63, 0xc3},
 					Balance: storage.Balance{
 						Currency:  currency.Utia,
-						Delegated: decimal.RequireFromString("45000000"),
+						Delegated: types.NumericFromInt64(45000000),
 					},
 				},
 				Validator: &storage.Validator{
@@ -473,13 +472,13 @@ func Test_handleDelegate(t *testing.T) {
 					Identity:          storage.DoNotModify,
 					Contacts:          storage.DoNotModify,
 					Details:           storage.DoNotModify,
-					Rate:              decimal.Zero,
-					MaxRate:           decimal.Zero,
-					MaxChangeRate:     decimal.Zero,
-					MinSelfDelegation: decimal.Zero,
-					Rewards:           decimal.Zero,
-					Commissions:       decimal.Zero,
-					Stake:             decimal.RequireFromString("45000000"),
+					Rate:              types.NumericZero(),
+					MaxRate:           types.NumericZero(),
+					MaxChangeRate:     types.NumericZero(),
+					MinSelfDelegation: types.NumericZero(),
+					Rewards:           types.NumericZero(),
+					Commissions:       types.NumericZero(),
+					Stake:             types.NumericFromInt64(45000000),
 				},
 			},
 		},

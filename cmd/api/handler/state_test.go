@@ -16,7 +16,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -61,7 +60,7 @@ func (s *StateTestSuite) TestHead() {
 
 	s.validators.EXPECT().
 		TotalVotingPower(gomock.Any(), 100).
-		Return(decimal.RequireFromString("100"), nil).
+		Return(types.NumericFromInt64(100), nil).
 		Times(1)
 
 	s.constants.EXPECT().
@@ -82,7 +81,7 @@ func (s *StateTestSuite) TestHead() {
 			LastTime:        testTime,
 			TotalTx:         1234,
 			TotalAccounts:   123,
-			TotalFee:        decimal.RequireFromString("2"),
+			TotalFee:        types.NumericFromInt64(2),
 			TotalBlobsSize:  30,
 			TotalValidators: 10,
 			TotalNamespaces: 100,

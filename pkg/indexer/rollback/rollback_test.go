@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	indexerCfg "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/celenium-io/celestia-indexer/pkg/node/mock"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -171,12 +172,12 @@ func (s *ModuleTestSuite) TestModule_SuccessOnRollbackTwoBlocks() {
 			expectedFee := decimal.NewFromInt(172635712635813).
 				Sub(decimal.NewFromInt(497012)).
 				Sub(decimal.NewFromInt(2873468273))
-			s.Require().Equal(expectedFee, state.TotalFee)
+			s.Require().Equal(storageTypes.NewNumeric(expectedFee), state.TotalFee)
 
 			expectedSupply := decimal.NewFromInt(263471253613).
 				Sub(decimal.NewFromInt(23590834)).
 				Sub(decimal.NewFromInt(30930476))
-			s.Require().Equal(expectedSupply, state.TotalSupply)
+			s.Require().Equal(storageTypes.NewNumeric(expectedSupply), state.TotalSupply)
 
 			return
 		}

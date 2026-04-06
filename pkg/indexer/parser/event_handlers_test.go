@@ -12,7 +12,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -48,9 +47,9 @@ func Test_parseCoinSpent(t *testing.T) {
 				Hash:       testHashAddress,
 				Balance: storage.Balance{
 					Currency:  currency.DefaultCurrency,
-					Spendable: decimal.RequireFromString("-123"),
-					Delegated: decimal.Zero,
-					Unbonding: decimal.Zero,
+					Spendable: types.MustNumericFromString("-123"),
+					Delegated: types.NumericZero(),
+					Unbonding: types.NumericZero(),
 				},
 			},
 		}, {
@@ -147,8 +146,8 @@ func Test_parseSetDestinationGasConfig(t *testing.T) {
 			want: &storage.HLIGPConfig{
 				Height:            pkgTypes.Level(123456),
 				Time:              testBlock.Time,
-				GasPrice:          decimal.RequireFromString("1"),
-				GasOverhead:       decimal.RequireFromString("200000"),
+				GasPrice:          types.NumericFromInt64(1),
+				GasOverhead:       types.NumericFromInt64(200000),
 				RemoteDomain:      84532,
 				TokenExchangeRate: "10000000000",
 			},
@@ -236,9 +235,9 @@ func Test_parseCompleteUnbonding(t *testing.T) {
 					Hash:       []byte{0x9b, 0xb7, 0xe8, 0x99, 0xb2, 0xbb, 0x5c, 0x90, 0xbb, 0x5c, 0x36, 0x22, 0x1b, 0x62, 0x01, 0x73, 0xec, 0x3a, 0x6d, 0xfa},
 					Balance: storage.Balance{
 						Currency:  currency.Utia,
-						Unbonding: decimal.RequireFromString("-35570000"),
-						Spendable: decimal.Zero,
-						Delegated: decimal.Zero,
+						Unbonding: types.MustNumericFromString("-35570000"),
+						Spendable: types.NumericZero(),
+						Delegated: types.NumericZero(),
 					},
 				},
 				Validator: &storage.Validator{
@@ -248,15 +247,15 @@ func Test_parseCompleteUnbonding(t *testing.T) {
 					Identity:          storage.DoNotModify,
 					Contacts:          storage.DoNotModify,
 					Details:           storage.DoNotModify,
-					Rate:              decimal.Zero,
-					MaxRate:           decimal.Zero,
-					MaxChangeRate:     decimal.Zero,
-					MinSelfDelegation: decimal.Zero,
-					Stake:             decimal.Zero,
-					Rewards:           decimal.Zero,
-					Commissions:       decimal.Zero,
+					Rate:              types.NumericZero(),
+					MaxRate:           types.NumericZero(),
+					MaxChangeRate:     types.NumericZero(),
+					MinSelfDelegation: types.NumericZero(),
+					Stake:             types.NumericZero(),
+					Rewards:           types.NumericZero(),
+					Commissions:       types.NumericZero(),
 				},
-				Change: decimal.RequireFromString("-35570000"),
+				Change: types.MustNumericFromString("-35570000"),
 				Type:   types.StakingLogTypeUnbonded,
 			},
 		},
@@ -315,15 +314,15 @@ func Test_parseCompleteRedelegation(t *testing.T) {
 					Identity:          storage.DoNotModify,
 					Contacts:          storage.DoNotModify,
 					Details:           storage.DoNotModify,
-					Rate:              decimal.Zero,
-					MaxRate:           decimal.Zero,
-					MaxChangeRate:     decimal.Zero,
-					MinSelfDelegation: decimal.Zero,
-					Stake:             decimal.Zero,
-					Rewards:           decimal.Zero,
-					Commissions:       decimal.Zero,
+					Rate:              types.NumericZero(),
+					MaxRate:           types.NumericZero(),
+					MaxChangeRate:     types.NumericZero(),
+					MinSelfDelegation: types.NumericZero(),
+					Stake:             types.NumericZero(),
+					Rewards:           types.NumericZero(),
+					Commissions:       types.NumericZero(),
 				},
-				Change: decimal.RequireFromString("-265636688"),
+				Change: types.MustNumericFromString("-265636688"),
 				Type:   types.StakingLogTypeUnbonded,
 			},
 		},

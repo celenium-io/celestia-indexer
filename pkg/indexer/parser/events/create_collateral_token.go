@@ -11,7 +11,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func handleCreateCollateralToken(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
@@ -59,8 +58,8 @@ func processCreateCollateralToken(ctx *context.Context, events []storage.Event, 
 					InternalId: originMailboxId.GetInternalId(),
 				},
 				TokenId:  tokenId.Bytes(),
-				Received: decimal.Zero,
-				Sent:     decimal.Zero,
+				Received: types.NumericZero(),
+				Sent:     types.NumericZero(),
 				TxId:     msg.TxId,
 			}
 

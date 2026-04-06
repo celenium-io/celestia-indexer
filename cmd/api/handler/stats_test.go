@@ -16,10 +16,10 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -605,9 +605,9 @@ func (s *StatsTestSuite) TestIbcChainStats() {
 		Return([]storage.ChainStats{
 			{
 				Chain:    "test",
-				Received: decimal.RequireFromString("101"),
-				Sent:     decimal.RequireFromString("99"),
-				Flow:     decimal.RequireFromString("200"),
+				Received: storageTypes.NumericFromInt64(101),
+				Sent:     storageTypes.NumericFromInt64(99),
+				Flow:     storageTypes.NumericFromInt64(200),
 			},
 		}, nil)
 
@@ -640,7 +640,7 @@ func (s *StatsTestSuite) TestIbcSummaryStats() {
 			Timeout:         &testTime,
 			ChannelId:       "channel-1",
 			ConnectionId:    "connection-1",
-			Amount:          decimal.RequireFromString("101"),
+			Amount:          storageTypes.NumericFromInt64(101),
 			Denom:           currency.Utia,
 			Memo:            "memo",
 			ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
@@ -707,7 +707,7 @@ func (s *StatsTestSuite) TestHlDomainStats() {
 		Return([]storage.DomainStats{
 			{
 				Domain:  1,
-				Amount:  decimal.RequireFromString("1010.101"),
+				Amount:  storageTypes.MustNumericFromString("1010.101"),
 				TxCount: 1488,
 			},
 		}, nil)
@@ -792,7 +792,7 @@ func (s *StatsTestSuite) TestHlDomainStatsWithoutChainStore() {
 		Return([]storage.DomainStats{
 			{
 				Domain:  1,
-				Amount:  decimal.RequireFromString("1010.101"),
+				Amount:  storageTypes.MustNumericFromString("1010.101"),
 				TxCount: 1488,
 			},
 		}, nil)
@@ -911,13 +911,13 @@ func (s *StatsTestSuite) TestSStakingDistribution() {
 		Return([]storage.StakingDistributionItem{
 			{
 				Moniker: "Test 1",
-				Value:   decimal.RequireFromString("100"),
-				Percent: decimal.RequireFromString("0.5"),
+				Value:   storageTypes.NumericFromInt64(100),
+				Percent: storageTypes.MustNumericFromString("0.5"),
 				Time:    testTime,
 			}, {
 				Moniker: "Test 2",
-				Value:   decimal.RequireFromString("100"),
-				Percent: decimal.RequireFromString("0.5"),
+				Value:   storageTypes.NumericFromInt64(100),
+				Percent: storageTypes.MustNumericFromString("0.5"),
 				Time:    testTime,
 			},
 		}, nil)

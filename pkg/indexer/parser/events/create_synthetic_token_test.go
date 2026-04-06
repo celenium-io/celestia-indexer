@@ -11,7 +11,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -69,8 +68,8 @@ func Test_handleCreateSyntheticToken(t *testing.T) {
 				TokenId:          []byte{0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x5f, 0x61, 0x70, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 				SentTransfers:    0,
 				ReceiveTransfers: 0,
-				Received:         decimal.Zero,
-				Sent:             decimal.Zero,
+				Received:         types.NumericZero(),
+				Sent:             types.NumericZero(),
 				Owner: &storage.Address{
 					Address:    "celestia1zvdlcmplx4gdh4hajwlsegnn2xzzfy470gjw4c",
 					Height:     1036866,

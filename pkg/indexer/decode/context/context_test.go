@@ -8,6 +8,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
@@ -52,7 +53,7 @@ func Test_AddSupply(t *testing.T) {
 			ctx := NewContext()
 			ctx.Block = &storage.Block{
 				Stats: storage.BlockStats{
-					SupplyChange: decimal.Zero,
+					SupplyChange: storageTypes.NumericZero(),
 				},
 			}
 
@@ -102,7 +103,7 @@ func Test_SubSupply(t *testing.T) {
 			ctx := NewContext()
 			ctx.Block = &storage.Block{
 				Stats: storage.BlockStats{
-					SupplyChange: decimal.Zero,
+					SupplyChange: storageTypes.NumericZero(),
 				},
 			}
 
@@ -121,9 +122,9 @@ func Test_AddAddress_New(t *testing.T) {
 		LastHeight: 1,
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
-			Spendable: decimal.NewFromInt(100),
-			Delegated: decimal.NewFromInt(50),
-			Unbonding: decimal.NewFromInt(20),
+			Spendable: storageTypes.NumericFromInt64(100),
+			Delegated: storageTypes.NumericFromInt64(50),
+			Unbonding: storageTypes.NumericFromInt64(20),
 		},
 	}
 
@@ -145,9 +146,9 @@ func Test_AddAddress_Existing(t *testing.T) {
 		LastHeight: 1,
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
-			Spendable: decimal.NewFromInt(100),
-			Delegated: decimal.NewFromInt(50),
-			Unbonding: decimal.NewFromInt(20),
+			Spendable: storageTypes.NumericFromInt64(100),
+			Delegated: storageTypes.NumericFromInt64(50),
+			Unbonding: storageTypes.NumericFromInt64(20),
 		},
 	}
 
@@ -160,9 +161,9 @@ func Test_AddAddress_Existing(t *testing.T) {
 		LastHeight: 1,
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
-			Spendable: decimal.NewFromInt(50),
-			Delegated: decimal.NewFromInt(25),
-			Unbonding: decimal.NewFromInt(10),
+			Spendable: storageTypes.NumericFromInt64(50),
+			Delegated: storageTypes.NumericFromInt64(25),
+			Unbonding: storageTypes.NumericFromInt64(10),
 		},
 	}
 
@@ -179,9 +180,9 @@ func Test_AddAddress_Existing(t *testing.T) {
 		Hash:       []byte{0x23, 0x51, 0x2f, 0x62, 0x1d, 0x76, 0x1f, 0x6a, 0xa7, 0xc0, 0x47, 0x09, 0xa1, 0x36, 0x8c, 0x87, 0x81, 0x4c, 0x00, 0xd4},
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
-			Spendable: decimal.NewFromInt(150),
-			Delegated: decimal.NewFromInt(75),
-			Unbonding: decimal.NewFromInt(30),
+			Spendable: storageTypes.NumericFromInt64(150),
+			Delegated: storageTypes.NumericFromInt64(75),
+			Unbonding: storageTypes.NumericFromInt64(30),
 		},
 	}, addr)
 }
@@ -195,9 +196,9 @@ func Test_AddAddress_ExistingWithInvalidCurrency(t *testing.T) {
 		LastHeight: 1,
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
-			Spendable: decimal.NewFromInt(100),
-			Delegated: decimal.NewFromInt(50),
-			Unbonding: decimal.NewFromInt(20),
+			Spendable: storageTypes.NumericFromInt64(100),
+			Delegated: storageTypes.NumericFromInt64(50),
+			Unbonding: storageTypes.NumericFromInt64(20),
 		},
 	}
 
@@ -210,9 +211,9 @@ func Test_AddAddress_ExistingWithInvalidCurrency(t *testing.T) {
 		LastHeight: 1,
 		Balance: storage.Balance{
 			Currency:  "invalid_currency",
-			Spendable: decimal.NewFromInt(50),
-			Delegated: decimal.NewFromInt(25),
-			Unbonding: decimal.NewFromInt(10),
+			Spendable: storageTypes.NumericFromInt64(50),
+			Delegated: storageTypes.NumericFromInt64(25),
+			Unbonding: storageTypes.NumericFromInt64(10),
 		},
 	}
 
@@ -229,9 +230,9 @@ func Test_AddAddress_ExistingWithInvalidCurrency(t *testing.T) {
 		Hash:       []byte{0x23, 0x51, 0x2f, 0x62, 0x1d, 0x76, 0x1f, 0x6a, 0xa7, 0xc0, 0x47, 0x09, 0xa1, 0x36, 0x8c, 0x87, 0x81, 0x4c, 0x00, 0xd4},
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
-			Spendable: decimal.NewFromInt(100),
-			Delegated: decimal.NewFromInt(50),
-			Unbonding: decimal.NewFromInt(20),
+			Spendable: storageTypes.NumericFromInt64(100),
+			Delegated: storageTypes.NumericFromInt64(50),
+			Unbonding: storageTypes.NumericFromInt64(20),
 		},
 	}, addr)
 }

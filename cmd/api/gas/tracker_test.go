@@ -10,6 +10,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
@@ -93,7 +94,7 @@ func TestTracker_processBlock(t *testing.T) {
 			TxCount:      0,
 			GasLimit:     0,
 			GasUsed:      0,
-			Fee:          decimal.New(0, 1),
+			Fee:          storageTypes.NewNumeric(decimal.New(0, 1)),
 			BytesInBlock: 0,
 		}
 
@@ -113,8 +114,8 @@ func TestTracker_processBlock(t *testing.T) {
 				{
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("2000"),
-					GasPrice:  decimal.RequireFromString("2"),
+					Fee:       storageTypes.NumericFromInt64(2000),
+					GasPrice:  storageTypes.NumericFromInt64(2),
 				},
 			}, nil).
 			Times(1)
@@ -126,7 +127,7 @@ func TestTracker_processBlock(t *testing.T) {
 			TxCount:      1,
 			GasLimit:     1000,
 			GasUsed:      500,
-			Fee:          decimal.RequireFromString("2000"),
+			Fee:          storageTypes.NumericFromInt64(2000),
 			BytesInBlock: maxBlockSize - 1000,
 		}
 
@@ -154,18 +155,18 @@ func TestTracker_processBlock(t *testing.T) {
 				{
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("1000"),
-					GasPrice:  decimal.RequireFromString("1"),
+					Fee:       storageTypes.NumericFromInt64(1000),
+					GasPrice:  storageTypes.NumericFromInt64(1),
 				}, {
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("2000"),
-					GasPrice:  decimal.RequireFromString("2"),
+					Fee:       storageTypes.NumericFromInt64(2000),
+					GasPrice:  storageTypes.NumericFromInt64(2),
 				}, {
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("3000"),
-					GasPrice:  decimal.RequireFromString("3"),
+					Fee:       storageTypes.NumericFromInt64(3000),
+					GasPrice:  storageTypes.NumericFromInt64(3),
 				},
 			}, nil).
 			Times(1)
@@ -177,7 +178,7 @@ func TestTracker_processBlock(t *testing.T) {
 			TxCount:      3,
 			GasLimit:     3000,
 			GasUsed:      1500,
-			Fee:          decimal.RequireFromString("6000"),
+			Fee:          storageTypes.NumericFromInt64(6000),
 			BytesInBlock: maxBlockSize - 1000,
 		}
 
@@ -205,18 +206,18 @@ func TestTracker_processBlock(t *testing.T) {
 				{
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("1000"),
-					GasPrice:  decimal.RequireFromString("1"),
+					Fee:       storageTypes.NumericFromInt64(1000),
+					GasPrice:  storageTypes.NumericFromInt64(1),
 				}, {
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("2000"),
-					GasPrice:  decimal.RequireFromString("2"),
+					Fee:       storageTypes.NumericFromInt64(2000),
+					GasPrice:  storageTypes.NumericFromInt64(2),
 				}, {
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("3000"),
-					GasPrice:  decimal.RequireFromString("3"),
+					Fee:       storageTypes.NumericFromInt64(3000),
+					GasPrice:  storageTypes.NumericFromInt64(3),
 				},
 			}, nil).
 			Times(1)
@@ -227,7 +228,7 @@ func TestTracker_processBlock(t *testing.T) {
 			TxCount:      3,
 			GasLimit:     3000,
 			GasUsed:      1500,
-			Fee:          decimal.RequireFromString("6000"),
+			Fee:          storageTypes.NumericFromInt64(6000),
 			BytesInBlock: 1000,
 		}
 
@@ -261,18 +262,18 @@ func TestTracker_compute(t *testing.T) {
 				{
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("1000"),
-					GasPrice:  decimal.RequireFromString("1"),
+					Fee:       storageTypes.NumericFromInt64(1000),
+					GasPrice:  storageTypes.NumericFromInt64(1),
 				}, {
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("2000"),
-					GasPrice:  decimal.RequireFromString("2"),
+					Fee:       storageTypes.NumericFromInt64(2000),
+					GasPrice:  storageTypes.NumericFromInt64(2),
 				}, {
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("3000"),
-					GasPrice:  decimal.RequireFromString("3"),
+					Fee:       storageTypes.NumericFromInt64(3000),
+					GasPrice:  storageTypes.NumericFromInt64(3),
 				},
 			},
 			gasLimit: 3000,
@@ -283,28 +284,28 @@ func TestTracker_compute(t *testing.T) {
 				{
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("1000"),
-					GasPrice:  decimal.RequireFromString("1"),
+					Fee:       storageTypes.NumericFromInt64(1000),
+					GasPrice:  storageTypes.NumericFromInt64(1),
 				}, {
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("1000"),
-					GasPrice:  decimal.RequireFromString("1"),
+					Fee:       storageTypes.NumericFromInt64(1000),
+					GasPrice:  storageTypes.NumericFromInt64(1),
 				}, {
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("1000"),
-					GasPrice:  decimal.RequireFromString("1"),
+					Fee:       storageTypes.NumericFromInt64(1000),
+					GasPrice:  storageTypes.NumericFromInt64(1),
 				}, {
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("1000"),
-					GasPrice:  decimal.RequireFromString("1"),
+					Fee:       storageTypes.NumericFromInt64(1000),
+					GasPrice:  storageTypes.NumericFromInt64(1),
 				}, {
 					GasWanted: 1000,
 					GasUsed:   500,
-					Fee:       decimal.RequireFromString("1000"),
-					GasPrice:  decimal.RequireFromString("1"),
+					Fee:       storageTypes.NumericFromInt64(1000),
+					GasPrice:  storageTypes.NumericFromInt64(1),
 				},
 			},
 			gasLimit: 8000000,

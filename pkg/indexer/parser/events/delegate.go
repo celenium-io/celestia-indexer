@@ -12,7 +12,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func handleDelegate(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
@@ -89,7 +88,11 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 			if err != nil {
 				return err
 			}
-			delegation.Amount = decimal.RequireFromString(delegate.Amount.Amount.String())
+			amount, err := storageTypes.NumericFromString(delegate.Amount.Amount.String())
+			if err != nil {
+				return errors.Wrap(err, "parse delegation amount")
+			}
+			delegation.Amount = amount
 			prefix, hash, err := types.Address(delegate.Validator).Decode()
 			if err != nil {
 				return errors.Wrap(err, "decode validator address")

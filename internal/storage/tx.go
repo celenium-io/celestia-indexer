@@ -8,11 +8,9 @@ import (
 	"time"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -30,17 +28,19 @@ type ITx interface {
 }
 
 type Gas struct {
-	GasWanted int64           `bun:"gas_wanted"`
-	GasUsed   int64           `bun:"gas_used"`
-	Fee       decimal.Decimal `bun:"fee"`
-	GasPrice  decimal.Decimal `bun:"gas_price"`
+	GasWanted int64         `bun:"gas_wanted"`
+	GasUsed   int64         `bun:"gas_used"`
+	Fee       types.Numeric `bun:"fee"`
+	GasPrice  types.Numeric `bun:"gas_price"`
 }
 
 type ByGasPrice []Gas
 
-func (gp ByGasPrice) Len() int           { return len(gp) }
-func (gp ByGasPrice) Less(i, j int) bool { return gp[j].GasPrice.GreaterThan(gp[i].GasPrice) }
-func (gp ByGasPrice) Swap(i, j int)      { gp[i], gp[j] = gp[j], gp[i] }
+func (gp ByGasPrice) Len() int { return len(gp) }
+func (gp ByGasPrice) Less(i, j int) bool {
+	return gp[j].GasPrice.GreaterThan(gp[i].GasPrice)
+}
+func (gp ByGasPrice) Swap(i, j int) { gp[i], gp[j] = gp[j], gp[i] }
 
 type TxFilter struct {
 	Limit                int
@@ -69,17 +69,17 @@ func (filter *TxFilter) IsEmpty() bool {
 type Tx struct {
 	bun.BaseModel `bun:"tx" comment:"Table with celestia transactions."`
 
-	Id            uint64          `bun:"id,pk,notnull"      comment:"Unique internal id"`
-	Height        pkgTypes.Level  `bun:",notnull"           comment:"The number (height) of this block"                 stats:"func:min max,filterable"`
-	Time          time.Time       `bun:"time,pk,notnull"    comment:"The time of block"                                 stats:"func:min max,filterable"`
-	Position      int64           `bun:"position"           comment:"Position in block"`
-	GasWanted     int64           `bun:"gas_wanted"         comment:"Gas wanted"                                        stats:"func:min max sum avg"`
-	GasUsed       int64           `bun:"gas_used"           comment:"Gas used"                                          stats:"func:min max sum avg"`
-	TimeoutHeight uint64          `bun:"timeout_height"     comment:"Block height until which the transaction is valid" stats:"func:min max avg"`
-	EventsCount   int64           `bun:"events_count"       comment:"Events count in transaction"                       stats:"func:min max sum avg"`
-	MessagesCount int64           `bun:"messages_count"     comment:"Messages count in transaction"                     stats:"func:min max sum avg"`
-	Fee           decimal.Decimal `bun:"fee,type:numeric"   comment:"Paid fee"                                          stats:"func:min max sum avg"`
-	Status        types.Status    `bun:"status,type:status" comment:"Transaction status"                                stats:"filterable"`
+	Id            uint64         `bun:"id,pk,notnull"      comment:"Unique internal id"`
+	Height        pkgTypes.Level `bun:",notnull"           comment:"The number (height) of this block"                 stats:"func:min max,filterable"`
+	Time          time.Time      `bun:"time,pk,notnull"    comment:"The time of block"                                 stats:"func:min max,filterable"`
+	Position      int64          `bun:"position"           comment:"Position in block"`
+	GasWanted     int64          `bun:"gas_wanted"         comment:"Gas wanted"                                        stats:"func:min max sum avg"`
+	GasUsed       int64          `bun:"gas_used"           comment:"Gas used"                                          stats:"func:min max sum avg"`
+	TimeoutHeight uint64         `bun:"timeout_height"     comment:"Block height until which the transaction is valid" stats:"func:min max avg"`
+	EventsCount   int64          `bun:"events_count"       comment:"Events count in transaction"                       stats:"func:min max sum avg"`
+	MessagesCount int64          `bun:"messages_count"     comment:"Messages count in transaction"                     stats:"func:min max sum avg"`
+	Fee           types.Numeric  `bun:"fee,type:numeric"   comment:"Paid fee"                                          stats:"func:min max sum avg"`
+	Status        types.Status   `bun:"status,type:status" comment:"Transaction status"                                stats:"filterable"`
 
 	Error        string            `bun:"error,type:text"             comment:"Error string if failed"`
 	Codespace    string            `bun:"codespace,type:text"         comment:"Codespace"                                    stats:"filterable"`
@@ -120,7 +120,7 @@ func (tx Tx) Flat() ([]any, error) {
 		tx.TimeoutHeight,
 		tx.EventsCount,
 		tx.MessagesCount,
-		pgtype.Numeric{Int: tx.Fee.Coefficient(), Exp: tx.Fee.Exponent(), Valid: true},
+		tx.Fee,
 		tx.Status.String(),
 		tx.Error,
 		tx.Codespace,

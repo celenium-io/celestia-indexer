@@ -7,9 +7,9 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
-	"github.com/shopspring/decimal"
 )
 
 // Validator -
@@ -31,7 +31,7 @@ func (v *Validator) ByAddress(ctx context.Context, address string) (validator st
 	return
 }
 
-func (v *Validator) TotalVotingPower(ctx context.Context, maxVals int) (decimal.Decimal, error) {
+func (v *Validator) TotalVotingPower(ctx context.Context, maxVals int) (storageTypes.Numeric, error) {
 	q := v.DB().NewSelect().
 		Model((*storage.Validator)(nil)).
 		Column("stake").
@@ -39,7 +39,7 @@ func (v *Validator) TotalVotingPower(ctx context.Context, maxVals int) (decimal.
 		Order("stake desc").
 		Limit(maxVals)
 
-	var power decimal.Decimal
+	var power storageTypes.Numeric
 	err := v.DB().NewSelect().
 		With("q", q).
 		Table("q").

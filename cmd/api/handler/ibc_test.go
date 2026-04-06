@@ -23,7 +23,6 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 )
@@ -400,7 +399,7 @@ func (s *IbcTestSuite) TestListTransfers() {
 					Timeout:         &testTime,
 					ChannelId:       "channel-1",
 					ConnectionId:    "connection-1",
-					Amount:          decimal.RequireFromString("101"),
+					Amount:          types.NumericFromInt64(101),
 					Denom:           currency.Utia,
 					Memo:            "memo",
 					ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
@@ -497,7 +496,7 @@ func (s *IbcTestSuite) TestListTransfersByChainId() {
 					Timeout:         &testTime,
 					ChannelId:       "channel-1",
 					ConnectionId:    "connection-1",
-					Amount:          decimal.RequireFromString("101"),
+					Amount:          types.NumericFromInt64(101),
 					Denom:           currency.Utia,
 					Memo:            "memo",
 					ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
@@ -596,7 +595,7 @@ func (s *IbcTestSuite) TestGetTransfer() {
 				Timeout:         &testTime,
 				ChannelId:       "channel-1",
 				ConnectionId:    "connection-1",
-				Amount:          decimal.RequireFromString("101"),
+				Amount:          types.NumericFromInt64(101),
 				Denom:           currency.Utia,
 				Memo:            "memo",
 				ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),
@@ -686,7 +685,7 @@ func (s *IbcTestSuite) TestListTransferWithHash() {
 					Timeout:         &testTime,
 					ChannelId:       "channel-1",
 					ConnectionId:    "connection-1",
-					Amount:          decimal.RequireFromString("101"),
+					Amount:          types.NumericFromInt64(101),
 					Denom:           currency.Utia,
 					Memo:            "memo",
 					ReceiverAddress: testsuite.Ptr("osmo1mj37s3mmv78tj0ke3yely7zwmzl5rkh9gx9ma2"),

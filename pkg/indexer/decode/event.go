@@ -11,10 +11,10 @@ import (
 
 	"github.com/bcp-innovations/hyperlane-cosmos/util"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 type CoinReceived struct {
@@ -96,7 +96,7 @@ func NewCompleteUnbonding(m map[string]string) (body CompleteUnbonding, err erro
 }
 
 type Commission struct {
-	Amount    decimal.Decimal
+	Amount    storageTypes.Numeric
 	Validator string
 }
 
@@ -106,12 +106,12 @@ func NewCommission(m map[string]string) (body Commission, err error) {
 		err = errors.Errorf("validator key not found in %##v", m)
 		return
 	}
-	body.Amount = decoder.AmountFromMap(m, "amount")
+	body.Amount, err = decoder.NumericAmountFromMap(m, "amount")
 	return
 }
 
 type Rewards struct {
-	Amount    decimal.Decimal
+	Amount    storageTypes.Numeric
 	Validator string
 }
 
@@ -121,7 +121,7 @@ func NewRewards(m map[string]string) (body Rewards, err error) {
 		err = errors.Errorf("validator key not found in %##v", m)
 		return
 	}
-	body.Amount = decoder.AmountFromMap(m, "amount")
+	body.Amount, err = decoder.NumericAmountFromMap(m, "amount")
 	return
 }
 
@@ -205,7 +205,7 @@ func NewUnbond(m map[string]string) (body Unbond, err error) {
 
 type Delegate struct {
 	Amount    *types.Coin
-	NewShares decimal.Decimal
+	NewShares storageTypes.Numeric
 	Validator string
 }
 
@@ -215,7 +215,7 @@ func NewDelegate(m map[string]string) (body Delegate, err error) {
 		err = errors.Errorf("validator key not found in %##v", m)
 		return
 	}
-	body.NewShares = decoder.DecimalFromMap(m, "new_shares")
+	body.NewShares = decoder.NumericFromMap(m, "new_shares")
 	body.Amount, err = decoder.BalanceFromMap(m, "amount")
 	return
 }
@@ -247,16 +247,16 @@ func NewCancelUnbondingDelegation(m map[string]string) (body CancelUnbondingDele
 }
 
 type Slash struct {
-	Power       decimal.Decimal
+	Power       storageTypes.Numeric
 	Jailed      string
 	Reason      string
 	Address     string
-	BurnedCoins decimal.Decimal
+	BurnedCoins storageTypes.Numeric
 }
 
 func NewSlash(m map[string]string) (body Slash, err error) {
-	body.Power = decoder.DecimalFromMap(m, "power")
-	body.BurnedCoins = decoder.DecimalFromMap(m, "burned_coins")
+	body.Power = decoder.NumericFromMap(m, "power")
+	body.BurnedCoins = decoder.NumericFromMap(m, "burned_coins")
 	body.Reason = decoder.StringFromMap(m, "reason")
 	body.Jailed = decoder.StringFromMap(m, "jailed")
 	body.Address = decoder.StringFromMap(m, "address")
@@ -328,7 +328,7 @@ func NewChannelChange(m map[string]string) (cc ChannelChange) {
 }
 
 type FungibleTokenPacket struct {
-	Amount   decimal.Decimal
+	Amount   storageTypes.Numeric
 	Denom    string
 	Memo     string
 	Module   string
@@ -339,7 +339,7 @@ type FungibleTokenPacket struct {
 }
 
 func NewFungibleTokenPacket(m map[string]string) (ftp FungibleTokenPacket) {
-	ftp.Amount = decoder.DecimalFromMap(m, "amount")
+	ftp.Amount = decoder.NumericFromMap(m, "amount")
 	ftp.Denom = decoder.StringFromMap(m, "denom")
 	ftp.Memo = decoder.StringFromMap(m, "memo")
 	ftp.Module = decoder.StringFromMap(m, "module")
@@ -627,7 +627,7 @@ func NewCreateSyntheticToken(m map[string]string) (cst CreateSyntheticToken, err
 }
 
 type HyperlaneReceiveTransferEvent struct {
-	Amount       decimal.Decimal
+	Amount       storageTypes.Numeric
 	Denom        string
 	OriginDomain uint64
 	Recipient    string
@@ -661,10 +661,10 @@ func NewHyperlaneReceiveTransferEvent(m map[string]string) (hrte HyperlaneReceiv
 		if err != nil {
 			return hrte, errors.Wrap(err, amount)
 		}
-		hrte.Amount = decimal.RequireFromString(coin.Amount.String())
+		hrte.Amount = storageTypes.NumericFromBigInt(coin.Amount.BigInt(), 0)
 		hrte.Denom = coin.GetDenom()
 	} else {
-		hrte.Amount = decimal.Zero
+		hrte.Amount = storageTypes.NumericZero()
 		hrte.Denom = currency.Utia
 	}
 
@@ -672,7 +672,7 @@ func NewHyperlaneReceiveTransferEvent(m map[string]string) (hrte HyperlaneReceiv
 }
 
 type HyperlaneSendTransferEvent struct {
-	Amount            decimal.Decimal
+	Amount            storageTypes.Numeric
 	Denom             string
 	DestinationDomain uint64
 	Recipient         string
@@ -706,10 +706,10 @@ func NewHyperlaneSendTransferEvent(m map[string]string) (hste HyperlaneSendTrans
 		if err != nil {
 			return hste, errors.Wrap(err, amount)
 		}
-		hste.Amount = decimal.RequireFromString(coin.Amount.String())
+		hste.Amount = storageTypes.NumericFromBigInt(coin.Amount.BigInt(), 0)
 		hste.Denom = coin.GetDenom()
 	} else {
-		hste.Amount = decimal.Zero
+		hste.Amount = storageTypes.NumericZero()
 		hste.Denom = currency.Utia
 	}
 	return
@@ -770,8 +770,8 @@ func NewHyperlaneCreateIgpEvent(m map[string]string) (hcie HyperlaneCreateIgpEve
 }
 
 type HyperlaneSetDestinationGasConfig struct {
-	GasOverhead       decimal.Decimal
-	GasPrice          decimal.Decimal
+	GasOverhead       storageTypes.Numeric
+	GasPrice          storageTypes.Numeric
 	IgpId             string
 	Owner             string
 	RemoteDomain      uint64
@@ -783,12 +783,18 @@ func NewHyperlaneSetDestinationGasConfig(m map[string]string) (hsdgc HyperlaneSe
 	if err != nil {
 		return hsdgc, errors.Wrap(err, "gas_price")
 	}
-	hsdgc.GasPrice = decimal.RequireFromString(price)
+	hsdgc.GasPrice, err = storageTypes.NumericFromString(price)
+	if err != nil {
+		return hsdgc, errors.Wrap(err, "parse gas_price")
+	}
 	overhead, err := parseUnquoteOptional(decoder.StringFromMap(m, "gas_overhead"))
 	if err != nil {
 		return hsdgc, errors.Wrap(err, "gas_overhead")
 	}
-	hsdgc.GasOverhead = decimal.RequireFromString(overhead)
+	hsdgc.GasOverhead, err = storageTypes.NumericFromString(overhead)
+	if err != nil {
+		return hsdgc, errors.Wrap(err, "parse gas_overhead")
+	}
 	hsdgc.IgpId, err = parseUnquoteOptional(decoder.StringFromMap(m, "igp_id"))
 	if err != nil {
 		return hsdgc, errors.Wrap(err, "igp_id")
@@ -810,8 +816,8 @@ func NewHyperlaneSetDestinationGasConfig(m map[string]string) (hsdgc HyperlaneSe
 }
 
 type HyperlaneGasPaymentEvent struct {
-	Amount    decimal.Decimal
-	GasAmount decimal.Decimal
+	Amount    storageTypes.Numeric
+	GasAmount storageTypes.Numeric
 	IgpId     string
 }
 
@@ -820,7 +826,10 @@ func NewHyperlaneGasPaymentEvent(m map[string]string) (hgpe HyperlaneGasPaymentE
 	if err != nil {
 		return hgpe, errors.Wrap(err, "gas_amount")
 	}
-	hgpe.GasAmount = decimal.RequireFromString(gasAmount)
+	hgpe.GasAmount, err = storageTypes.NumericFromString(gasAmount)
+	if err != nil {
+		return hgpe, errors.Wrap(err, "parse gas_amount")
+	}
 
 	payment, err := parseUnquoteOptional(decoder.StringFromMap(m, "payment"))
 	if err != nil {
@@ -830,7 +839,7 @@ func NewHyperlaneGasPaymentEvent(m map[string]string) (hgpe HyperlaneGasPaymentE
 	if err != nil {
 		return hgpe, errors.Wrap(err, payment)
 	}
-	hgpe.Amount = decimal.RequireFromString(coin.Amount.String())
+	hgpe.Amount = storageTypes.NumericFromBigInt(coin.Amount.BigInt(), 0)
 
 	hgpe.IgpId, err = parseUnquoteOptional(decoder.StringFromMap(m, "igp_id"))
 	if err != nil {

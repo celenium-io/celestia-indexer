@@ -17,7 +17,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -61,9 +60,9 @@ func TestDecodeMsg_SuccessOnMsgEditValidator(t *testing.T) {
 			Website:           "https://google.com",
 			Contacts:          "tryme@gmail.com",
 			Details:           "trust",
-			Rate:              decimal.Zero,
-			MinSelfDelegation: decimal.Zero,
-			Stake:             decimal.Zero,
+			Rate:              storageTypes.NumericZero(),
+			MinSelfDelegation: storageTypes.NumericZero(),
+			Stake:             storageTypes.NumericZero(),
 			MessagesCount:     1,
 		},
 	}
@@ -171,11 +170,11 @@ func TestDecodeMsg_SuccessOnMsgCreateValidator(t *testing.T) {
 			Delegator:         "celestia1fg9l3xvfuu9wxremv2229966zawysg4rss2hzq",
 			Address:           "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x",
 			ConsAddress:       "A8BEA00847066E6C765E7B064DD79265406D402B",
-			Rate:              decimal.Zero,
-			MaxRate:           decimal.Zero,
-			MaxChangeRate:     decimal.Zero,
-			Stake:             decimal.RequireFromString("1"),
-			MinSelfDelegation: decimal.RequireFromString("1"),
+			Rate:              storageTypes.NumericZero(),
+			MaxRate:           storageTypes.NumericZero(),
+			MaxChangeRate:     storageTypes.NumericZero(),
+			Stake:             storageTypes.NumericFromInt64(1),
+			MinSelfDelegation: storageTypes.NumericFromInt64(1),
 			Height:            block.Height,
 			Jailed:            testsuite.Ptr(false),
 			MessagesCount:     1,

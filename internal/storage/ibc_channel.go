@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -24,10 +23,10 @@ type ListChannelFilters struct {
 }
 
 type ChainStats struct {
-	Chain    string          `bun:"chain_id"`
-	Received decimal.Decimal `bun:"received"`
-	Sent     decimal.Decimal `bun:"sent"`
-	Flow     decimal.Decimal `bun:"flow"`
+	Chain    string        `bun:"chain_id"`
+	Received types.Numeric `bun:"received"`
+	Sent     types.Numeric `bun:"sent"`
+	Flow     types.Numeric `bun:"flow"`
 }
 
 type BusiestChannel struct {
@@ -63,8 +62,8 @@ type IbcChannel struct {
 	Ordering              bool                   `bun:"ordering"                       comment:"Ordered or unordered packets in the channel"`
 	CreatorId             uint64                 `bun:"creator_id"                     comment:"Internal creator identity"`
 	Status                types.IbcChannelStatus `bun:"status,type:ibc_channel_status" comment:"Channel status"`
-	Received              decimal.Decimal        `bun:"received,type:numeric"          comment:"Received value"`
-	Sent                  decimal.Decimal        `bun:"sent,type:numeric"              comment:"Sent value"`
+	Received              types.Numeric          `bun:"received,type:numeric"          comment:"Received value"`
+	Sent                  types.Numeric          `bun:"sent,type:numeric"              comment:"Sent value"`
 	TransfersCount        int64                  `bun:"transfers_count"                comment:"Count transfers"`
 
 	Connection     *IbcConnection `bun:"rel:belongs-to,join:connection_id=connection_id"`

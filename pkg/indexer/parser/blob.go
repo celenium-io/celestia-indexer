@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celestiaorg/celestia-app/v7/pkg/appconsts"
 	"github.com/celestiaorg/go-square/v3/share"
@@ -44,6 +45,6 @@ func processBlob(blobs []*storage.BlobLog, d decode.DecodedTx, t *storage.Tx) {
 	for i := range blobs {
 		// share_in_gas = (gas_consumed_on_blob + fix_gas_per_blob) / gas_used
 		share := gasConsumedPerBlob[i].Add(fix).Div(gasUsed)
-		blobs[i].Fee = t.Fee.Copy().Mul(share)
+		blobs[i].Fee = t.Fee.Copy().Mul(storageTypes.NewNumeric(share))
 	}
 }

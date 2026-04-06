@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -29,7 +29,7 @@ func Test_processBlob(t *testing.T) {
 			},
 		}
 		tx := &storage.Tx{
-			Fee:     decimal.RequireFromString("100"),
+			Fee:     storageTypes.NumericFromInt64(100),
 			GasUsed: 1000,
 		}
 
@@ -55,13 +55,13 @@ func Test_processBlob(t *testing.T) {
 			},
 		}
 		tx := &storage.Tx{
-			Fee:     decimal.RequireFromString("100"),
+			Fee:     storageTypes.NumericFromInt64(100),
 			GasUsed: 1000,
 		}
 
 		processBlob(blobs, d, tx)
 
-		totalFee := decimal.Zero
+		var totalFee storageTypes.Numeric
 		for i := range blobs {
 			totalFee = totalFee.Add(blobs[i].Fee)
 		}
@@ -88,13 +88,13 @@ func Test_processBlob(t *testing.T) {
 			},
 		}
 		tx := &storage.Tx{
-			Fee:     decimal.RequireFromString("100"),
+			Fee:     storageTypes.NumericFromInt64(100),
 			GasUsed: 1000,
 		}
 
 		processBlob(blobs, d, tx)
 
-		totalFee := decimal.Zero
+		var totalFee storageTypes.Numeric
 		for i := range blobs {
 			totalFee = totalFee.Add(blobs[i].Fee)
 		}

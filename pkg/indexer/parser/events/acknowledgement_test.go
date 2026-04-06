@@ -11,7 +11,6 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	transferTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -85,7 +84,7 @@ func Test_handleAcknowledgement(t *testing.T) {
 			},
 			transfer: &storage.IbcTransfer{
 				Height:          2371609,
-				Amount:          decimal.RequireFromString("561801"),
+				Amount:          types.NumericFromInt64(561801),
 				Denom:           "utia",
 				ReceiverAddress: testsuite.Ptr("osmo1345fue0f2zwmfef4d48qfe38k0wfvca657jkm0"),
 				Sender: &storage.Address{
@@ -182,7 +181,7 @@ func Test_handleAcknowledgement(t *testing.T) {
 			},
 			transfer: &storage.IbcTransfer{
 				Height:          2371609,
-				Amount:          decimal.RequireFromString("12000000"),
+				Amount:          types.NumericFromInt64(12000000),
 				Denom:           "utia",
 				ReceiverAddress: testsuite.Ptr("osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv"),
 				Sender: &storage.Address{
@@ -325,7 +324,7 @@ func Test_handleAcknowledgement(t *testing.T) {
 			},
 			transfer: &storage.IbcTransfer{
 				Height:          2371609,
-				Amount:          decimal.RequireFromString("12000000"),
+				Amount:          types.NumericFromInt64(12000000),
 				Denom:           "utia",
 				ReceiverAddress: testsuite.Ptr("osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv"),
 				Sender: &storage.Address{

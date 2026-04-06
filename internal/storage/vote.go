@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -30,7 +29,7 @@ type Vote struct {
 	Height      pkgTypes.Level   `bun:"height,notnull"          comment:"The number (height) of this block"`
 	Time        time.Time        `bun:"time,pk,notnull"         comment:"The time of block"`
 	Option      types.VoteOption `bun:"option,type:vote_option" comment:"Selected vote option"`
-	Weight      decimal.Decimal  `bun:"weight,type:numeric"     comment:"Vote's weight"`
+	Weight      types.Numeric    `bun:"weight,type:numeric"     comment:"Vote's weight"`
 	VoterId     uint64           `bun:"voter_id"                comment:"Voter internal identity"`
 	ProposalId  uint64           `bun:"proposal_id"             comment:"Proposal id"`
 	ValidatorId *uint64          `bun:"validator_id"            comment:"Validator id"`

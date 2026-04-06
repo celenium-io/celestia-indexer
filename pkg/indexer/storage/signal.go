@@ -12,10 +12,9 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
-var signalsThreshold = decimal.NewFromFloat(5.0 / 6.0)
+var signalsThreshold = types.NumericFromFloat64(5.0 / 6.0)
 
 func (module *Module) saveSignals(
 	ctx context.Context,
@@ -32,7 +31,7 @@ func (module *Module) saveSignals(
 	if err != nil {
 		return errors.Wrapf(err, "receiving total voting power")
 	}
-	votingPower = math.Shares(votingPower)
+	votingPower = math.SharesNumeric(votingPower)
 
 	for i := range signals {
 		if signals[i].Validator == nil {
@@ -78,7 +77,7 @@ func (module *Module) tryUpgrade(
 	if err != nil {
 		return errors.Wrapf(err, "receiving total voting power")
 	}
-	votingPower = math.Shares(votingPower)
+	votingPower = math.SharesNumeric(votingPower)
 	threshold := votingPower.Mul(signalsThreshold)
 
 	seen := make(map[uint64]struct{})
@@ -100,10 +99,11 @@ func (module *Module) tryUpgrade(
 		if err != nil {
 			return errors.Wrapf(err, "update signals for version %d", versions[i])
 		}
-		if math.Shares(voted).GreaterThan(threshold) {
+		votedShares := math.SharesNumeric(voted)
+		if votedShares.GreaterThan(threshold) {
 			upgrade.Version = versions[i]
 			upgrade.VotingPower = votingPower
-			upgrade.VotedPower = math.Shares(voted)
+			upgrade.VotedPower = votedShares
 			upgrade.Status = types.UpgradeStatusWaitingUpgrade
 			return tx.SaveUpgrades(ctx, upgrade)
 		}
@@ -117,7 +117,7 @@ func saveUpgrades(
 	tx storage.Transaction,
 	upgrades *sync.Map[uint64, *storage.Upgrade],
 	state storage.State,
-	votingPower decimal.Decimal,
+	votingPower types.Numeric,
 ) error {
 	if upgrades.Len() == 0 {
 		return nil
@@ -137,7 +137,7 @@ func saveUpgrades(
 		}
 
 		upgrade.VotingPower = votingPower
-		upgrade.VotedPower = math.Shares(voted)
+		upgrade.VotedPower = math.SharesNumeric(voted)
 		if upgrade.VotedPower.GreaterThan(threshold) {
 			upgrade.Status = types.UpgradeStatusWaitingUpgrade
 		}
@@ -155,17 +155,17 @@ func saveUpgrades(
 	return tx.SaveUpgrades(ctx, toSave...)
 }
 
-func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transaction) (decimal.Decimal, []storage.Validator, error) {
+func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transaction) (types.Numeric, []storage.Validator, error) {
 	maxVals, err := module.constants.Get(ctx, types.ModuleNameStaking, "max_validators")
 	if err != nil {
-		return decimal.Zero, nil, errors.Wrap(err, "get max validators value")
+		return types.NumericZero(), nil, errors.Wrap(err, "get max validators value")
 	}
 	validators, err := tx.BondedValidators(ctx, maxVals.MustInt())
 	if err != nil {
-		return decimal.Zero, nil, errors.Wrap(err, "get validators")
+		return types.NumericZero(), nil, errors.Wrap(err, "get validators")
 	}
 
-	power := decimal.Zero
+	power := types.NumericZero()
 	for i := range validators {
 		power = power.Add(validators[i].Stake)
 	}

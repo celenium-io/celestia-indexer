@@ -19,7 +19,6 @@ import (
 	transferTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	coreChannel "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 // MsgChannelOpenInit defines an sdk.Msg to initialize a channel handshake. It
@@ -141,8 +140,12 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 		}
 		packetMap["Data"] = packet
 
+		amount, err := storageTypes.NumericFromString(packet.Amount)
+		if err != nil {
+			return msgType, errors.Wrap(err, "parse transfer amount")
+		}
 		transfer := &storage.IbcTransfer{
-			Amount:    decimal.RequireFromString(packet.Amount),
+			Amount:    amount,
 			Memo:      packet.Memo,
 			ChannelId: m.Packet.DestinationChannel,
 			Port:      m.Packet.DestinationPort,
@@ -300,8 +303,12 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 		}
 		packetMap["Data"] = packet
 
+		amount, err := storageTypes.NumericFromString(packet.Amount)
+		if err != nil {
+			return msgType, errors.Wrap(err, "parse transfer amount")
+		}
 		transfer := &storage.IbcTransfer{
-			Amount:    decimal.RequireFromString(packet.Amount),
+			Amount:    amount,
 			Memo:      packet.Memo,
 			ChannelId: m.Packet.SourceChannel,
 			Port:      m.Packet.SourcePort,

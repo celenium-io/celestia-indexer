@@ -11,7 +11,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -44,8 +43,8 @@ type HLToken struct {
 	TokenId          []byte            `bun:"token_id,type:bytea,unique" comment:"Token id"`
 	SentTransfers    uint64            `bun:"sent_transfers"             comment:"Sent transfers"`
 	ReceiveTransfers uint64            `bun:"received_transfers"         comment:"Receive transfers"`
-	Sent             decimal.Decimal   `bun:"sent,type:numeric"          comment:"Sent tokens"`
-	Received         decimal.Decimal   `bun:"received,type:numeric"      comment:"Receive tokens"`
+	Sent             types.Numeric     `bun:"sent,type:numeric"          comment:"Sent tokens"`
+	Received         types.Numeric     `bun:"received,type:numeric"      comment:"Receive tokens"`
 
 	Owner   *Address   `bun:"rel:belongs-to,join:owner_id=id"`
 	Mailbox *HLMailbox `bun:"rel:belongs-to,join:mailbox_id=id"`

@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/stats"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 type CountRequest struct {
@@ -184,10 +184,10 @@ type SizeGroup struct {
 }
 
 type StakingDistributionItem struct {
-	Moniker string          `bun:"moniker"`
-	Value   decimal.Decimal `bun:"value"`
-	Percent decimal.Decimal `bun:"percent"`
-	Time    time.Time       `bun:"ts"`
+	Moniker string        `bun:"moniker"`
+	Value   types.Numeric `bun:"value"`
+	Percent types.Numeric `bun:"percent"`
+	Time    time.Time     `bun:"ts"`
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed

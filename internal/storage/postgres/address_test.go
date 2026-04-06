@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 )
 
 func (s *StorageTestSuite) TestAddressByHash() {
@@ -196,9 +195,9 @@ func (s *StorageTestSuite) TestAddressListWithSortAsc() {
 		s.Require().NoError(err)
 		s.Require().Len(addresses, 5)
 
-		var balance decimal.Decimal
+		var balance types.Numeric
 		for i := range addresses {
-			var current decimal.Decimal
+			var current types.Numeric
 			switch field {
 			case "delegated":
 				current = addresses[i].Balance.Delegated.Copy()

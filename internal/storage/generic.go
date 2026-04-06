@@ -8,11 +8,11 @@ import (
 	"io"
 	"time"
 
-	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/shopspring/decimal"
 )
 
 var Models = []any{
@@ -111,7 +111,7 @@ type Transaction interface {
 	SaveUndelegations(ctx context.Context, undelegations ...Undelegation) error
 	SaveRedelegations(ctx context.Context, redelegations ...Redelegation) error
 	SaveDelegations(ctx context.Context, delegations ...Delegation) error
-	UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned decimal.Decimal) ([]Balance, error)
+	UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned types.Numeric) ([]Balance, error)
 	SaveStakingLogs(ctx context.Context, logs ...StakingLog) error
 	SaveJails(ctx context.Context, jails ...Jail) error
 	SaveBlockSignatures(ctx context.Context, signs ...BlockSignature) error
@@ -124,14 +124,14 @@ type Transaction interface {
 	SaveHyperlaneMailbox(ctx context.Context, mailbox ...*HLMailbox) error
 	SaveHyperlaneTokens(ctx context.Context, tokens ...*HLToken) error
 	SaveHyperlaneTransfers(ctx context.Context, transfers ...*HLTransfer) error
-	RetentionBlockSignatures(ctx context.Context, height types.Level) error
+	RetentionBlockSignatures(ctx context.Context, height pkgTypes.Level) error
 	CancelUnbondings(ctx context.Context, cancellations ...Undelegation) error
 	RetentionCompletedUnbondings(ctx context.Context, blockTime time.Time) error
 	RetentionCompletedRedelegations(ctx context.Context, blockTime time.Time) error
 	Jail(ctx context.Context, validators ...*Validator) error
 	SaveSignals(ctx context.Context, signals ...*SignalVersion) error
 	SaveUpgrades(ctx context.Context, upgrades ...*Upgrade) error
-	UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (decimal.Decimal, error)
+	UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (types.Numeric, error)
 	SaveHyperlaneIgps(ctx context.Context, igps ...*HLIGP) error
 	SaveHyperlaneIgpConfigs(ctx context.Context, configs ...HLIGPConfig) error
 	SaveHyperlaneGasPayments(ctx context.Context, payments ...*HLGasPayment) error
@@ -140,45 +140,45 @@ type Transaction interface {
 	SaveZkISMUpdates(ctx context.Context, items ...*ZkISMUpdate) error
 	SaveZkISMMessages(ctx context.Context, items ...*ZkISMMessage) error
 
-	RollbackBlock(ctx context.Context, height types.Level) error
-	RollbackBlockStats(ctx context.Context, height types.Level) (stats BlockStats, err error)
-	RollbackAddresses(ctx context.Context, height types.Level) (address []Address, err error)
-	RollbackVestingAccounts(ctx context.Context, height types.Level) error
-	RollbackVestingPeriods(ctx context.Context, height types.Level) error
-	RollbackTxs(ctx context.Context, height types.Level) (txs []Tx, err error)
-	RollbackEvents(ctx context.Context, height types.Level) (events []Event, err error)
-	RollbackMessages(ctx context.Context, height types.Level) (msgs []Message, err error)
-	RollbackNamespaceMessages(ctx context.Context, height types.Level) (msgs []NamespaceMessage, err error)
-	RollbackNamespaces(ctx context.Context, height types.Level) (ns []Namespace, err error)
-	RollbackValidators(ctx context.Context, height types.Level) ([]Validator, error)
-	RollbackBlobLog(ctx context.Context, height types.Level) error
-	RollbackGrants(ctx context.Context, height types.Level) error
-	RollbackBlockSignatures(ctx context.Context, height types.Level) (err error)
+	RollbackBlock(ctx context.Context, height pkgTypes.Level) error
+	RollbackBlockStats(ctx context.Context, height pkgTypes.Level) (stats BlockStats, err error)
+	RollbackAddresses(ctx context.Context, height pkgTypes.Level) (address []Address, err error)
+	RollbackVestingAccounts(ctx context.Context, height pkgTypes.Level) error
+	RollbackVestingPeriods(ctx context.Context, height pkgTypes.Level) error
+	RollbackTxs(ctx context.Context, height pkgTypes.Level) (txs []Tx, err error)
+	RollbackEvents(ctx context.Context, height pkgTypes.Level) (events []Event, err error)
+	RollbackMessages(ctx context.Context, height pkgTypes.Level) (msgs []Message, err error)
+	RollbackNamespaceMessages(ctx context.Context, height pkgTypes.Level) (msgs []NamespaceMessage, err error)
+	RollbackNamespaces(ctx context.Context, height pkgTypes.Level) (ns []Namespace, err error)
+	RollbackValidators(ctx context.Context, height pkgTypes.Level) ([]Validator, error)
+	RollbackBlobLog(ctx context.Context, height pkgTypes.Level) error
+	RollbackGrants(ctx context.Context, height pkgTypes.Level) error
+	RollbackBlockSignatures(ctx context.Context, height pkgTypes.Level) (err error)
 	RollbackSigners(ctx context.Context, txIds []uint64) (err error)
 	RollbackMessageAddresses(ctx context.Context, msgIds []uint64) (err error)
-	RollbackMessageValidators(ctx context.Context, height types.Level) (err error)
-	RollbackUndelegations(ctx context.Context, height types.Level) (err error)
-	RollbackRedelegations(ctx context.Context, height types.Level) (err error)
-	RollbackStakingLogs(ctx context.Context, height types.Level) ([]StakingLog, error)
-	RollbackJails(ctx context.Context, height types.Level) ([]Jail, error)
-	RollbackProposals(ctx context.Context, height types.Level) error
-	RollbackVotes(ctx context.Context, height types.Level) error
-	RollbackIbcClients(ctx context.Context, height types.Level) error
-	RollbackIbcConnections(ctx context.Context, height types.Level) error
-	RollbackIbcChannels(ctx context.Context, height types.Level) error
-	RollbackIbcTransfers(ctx context.Context, height types.Level) error
-	RollbackHyperlaneMailbox(ctx context.Context, height types.Level) error
-	RollbackHyperlaneTokens(ctx context.Context, height types.Level) error
-	RollbackHyperlaneTransfers(ctx context.Context, height types.Level) error
-	RollbackSignals(ctx context.Context, height types.Level) error
-	RollbackUpgrades(ctx context.Context, height types.Level) error
-	RollbackHyperlaneIgps(ctx context.Context, height types.Level) error
-	RollbackHyperlaneIgpConfigs(ctx context.Context, height types.Level) error
-	RollbackHyperlaneGasPayment(ctx context.Context, height types.Level) error
-	RollbackForwardings(ctx context.Context, height types.Level) error
-	RollbackZkISMs(ctx context.Context, height types.Level) error
-	RollbackZkISMUpdates(ctx context.Context, height types.Level) error
-	RollbackZkISMMessages(ctx context.Context, height types.Level) error
+	RollbackMessageValidators(ctx context.Context, height pkgTypes.Level) (err error)
+	RollbackUndelegations(ctx context.Context, height pkgTypes.Level) (err error)
+	RollbackRedelegations(ctx context.Context, height pkgTypes.Level) (err error)
+	RollbackStakingLogs(ctx context.Context, height pkgTypes.Level) ([]StakingLog, error)
+	RollbackJails(ctx context.Context, height pkgTypes.Level) ([]Jail, error)
+	RollbackProposals(ctx context.Context, height pkgTypes.Level) error
+	RollbackVotes(ctx context.Context, height pkgTypes.Level) error
+	RollbackIbcClients(ctx context.Context, height pkgTypes.Level) error
+	RollbackIbcConnections(ctx context.Context, height pkgTypes.Level) error
+	RollbackIbcChannels(ctx context.Context, height pkgTypes.Level) error
+	RollbackIbcTransfers(ctx context.Context, height pkgTypes.Level) error
+	RollbackHyperlaneMailbox(ctx context.Context, height pkgTypes.Level) error
+	RollbackHyperlaneTokens(ctx context.Context, height pkgTypes.Level) error
+	RollbackHyperlaneTransfers(ctx context.Context, height pkgTypes.Level) error
+	RollbackSignals(ctx context.Context, height pkgTypes.Level) error
+	RollbackUpgrades(ctx context.Context, height pkgTypes.Level) error
+	RollbackHyperlaneIgps(ctx context.Context, height pkgTypes.Level) error
+	RollbackHyperlaneIgpConfigs(ctx context.Context, height pkgTypes.Level) error
+	RollbackHyperlaneGasPayment(ctx context.Context, height pkgTypes.Level) error
+	RollbackForwardings(ctx context.Context, height pkgTypes.Level) error
+	RollbackZkISMs(ctx context.Context, height pkgTypes.Level) error
+	RollbackZkISMUpdates(ctx context.Context, height pkgTypes.Level) error
+	RollbackZkISMMessages(ctx context.Context, height pkgTypes.Level) error
 	ZkISMById(ctx context.Context, id []byte) (ZkISM, error)
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	DeleteProviders(ctx context.Context, rollupId uint64) error
@@ -213,8 +213,8 @@ const (
 )
 
 type Signal struct {
-	VotingPower decimal.Decimal `bun:"voting_power"`
-	Version     uint64          `bun:"version"`
+	VotingPower types.Numeric `bun:"voting_power"`
+	Version     uint64        `bun:"version"`
 }
 
 type SearchResult struct {
