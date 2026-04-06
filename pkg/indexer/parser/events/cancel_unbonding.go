@@ -12,7 +12,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func handleCancelUnbonding(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
@@ -52,7 +51,10 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 				return err
 			}
 
-			amount := decimal.RequireFromString(cancel.Amount.Amount.String())
+			amount, err := storageTypes.NumericFromString(cancel.Amount.Amount.String())
+			if err != nil {
+				return errors.Wrap(err, "parse cancel unbonding amount")
+			}
 			validator := storage.EmptyValidator()
 			prefix, hash, err := types.Address(cancel.Validator).Decode()
 			if err != nil {
@@ -67,7 +69,7 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 			} else {
 				validator.Address = cancel.Validator
 			}
-			validator.Stake = storageTypes.NewNumeric(amount.Copy())
+			validator.Stake = amount.Copy()
 			ctx.AddValidator(validator)
 
 			address := &storage.Address{
@@ -76,8 +78,8 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 				LastHeight: msg.Height,
 				Balance: storage.Balance{
 					Currency:  currency.DefaultCurrency,
-					Delegated: storageTypes.NewNumeric(amount.Copy()),
-					Unbonding: storageTypes.NewNumeric(amount.Copy().Neg()),
+					Delegated: amount.Copy(),
+					Unbonding: amount.Copy().Neg(),
 				},
 			}
 			if err := ctx.AddAddress(address); err != nil {
@@ -87,7 +89,7 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 			ctx.AddDelegation(storage.Delegation{
 				Validator: &validator,
 				Address:   address,
-				Amount:    storageTypes.NewNumeric(amount),
+				Amount:    amount,
 			})
 
 			ctx.AddCancelUndelegation(storage.Undelegation{
@@ -95,7 +97,7 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 				Address:   address,
 				Height:    msg.Height,
 				Time:      msg.Time,
-				Amount:    storageTypes.NewNumeric(amount),
+				Amount:    amount,
 			})
 
 			ctx.AddStakingLog(storage.StakingLog{
@@ -103,7 +105,7 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 				Time:      msg.Time,
 				Address:   address,
 				Validator: &validator,
-				Change:    storageTypes.NewNumeric(amount.Copy()),
+				Change:    amount.Copy(),
 				Type:      storageTypes.StakingLogTypeUnbonding,
 			})
 

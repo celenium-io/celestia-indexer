@@ -11,7 +11,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 const msgWithdrawValidatorCommission = "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission"
@@ -66,8 +65,11 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 				continue
 			}
 
-			amount := decimal.RequireFromString(commission.Amount.Amount.String())
-			validator.Commissions = storageTypes.NewNumeric(amount.Neg())
+			amount, err := storageTypes.NumericFromString(commission.Amount.Amount.String())
+			if err != nil {
+				return errors.Wrap(err, "parse withdraw commission amount")
+			}
+			validator.Commissions = amount.Neg()
 
 			ctx.AddValidator(validator)
 
@@ -75,7 +77,7 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 				Height:    msg.Height,
 				Time:      msg.Time,
 				Validator: &validator,
-				Change:    storageTypes.NewNumeric(amount.Neg().Copy()),
+				Change:    amount.Neg().Copy(),
 				Type:      storageTypes.StakingLogTypeCommissions,
 			})
 			break
