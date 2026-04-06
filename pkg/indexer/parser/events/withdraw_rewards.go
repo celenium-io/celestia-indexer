@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func parseWithdrawRewards(ctx *context.Context, msg *storage.Message, data map[string]string) error {
@@ -27,11 +26,11 @@ func parseWithdrawRewards(ctx *context.Context, msg *storage.Message, data map[s
 	validator.Address = rewards.Validator
 
 	if rewards.Amount != nil {
-		amount, err := decimal.NewFromString(rewards.Amount.Amount.String())
+		amount, err := storageTypes.NumericFromString(rewards.Amount.Amount.String())
 		if err != nil {
-			return err
+			return errors.Wrap(err, "parse withdraw rewards amount")
 		}
-		validator.Rewards = storageTypes.NewNumeric(amount.Neg())
+		validator.Rewards = amount.Neg()
 	}
 
 	ctx.AddValidator(validator)

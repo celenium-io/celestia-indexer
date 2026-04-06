@@ -45,7 +45,11 @@ func processSubmitProposal(ctx *context.Context, events []storage.Event, msg *st
 	if events[*idx].Type != types.EventTypeProposalDeposit {
 		return errors.Errorf("submit proposal unexpected event type: %s", events[*idx].Type)
 	}
-	msg.Proposal.Deposit = decoder.NumericAmountFromMap(events[*idx].Data, "amount")
+	deposit, err := decoder.NumericAmountFromMap(events[*idx].Data, "amount")
+	if err != nil {
+		return errors.Wrap(err, "parse proposal deposit amount")
+	}
+	msg.Proposal.Deposit = deposit
 	if _, isV1 := events[*idx].Data["msg_index"]; isV1 {
 		*idx += 1
 	} else {

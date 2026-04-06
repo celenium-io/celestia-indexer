@@ -10,9 +10,9 @@ import (
 
 	"cosmossdk.io/math"
 	"github.com/bcp-innovations/hyperlane-cosmos/util"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -186,7 +186,7 @@ func TestNewCommission(t *testing.T) {
 				"validator": "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
 			wantBody: Commission{
-				Amount:    decimal.RequireFromString("256000000"),
+				Amount:    storageTypes.MustNumericFromString("256000000"),
 				Validator: "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
 			wantErr: false,
@@ -197,7 +197,7 @@ func TestNewCommission(t *testing.T) {
 				"validator": "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
 			},
 			wantBody: Commission{
-				Amount:    decimal.RequireFromString("469.815871531603829656"),
+				Amount:    storageTypes.MustNumericFromString("469.815871531603829656"),
 				Validator: "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
 			},
 			wantErr: false,
@@ -208,7 +208,7 @@ func TestNewCommission(t *testing.T) {
 				"validator": "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
 			},
 			wantBody: Commission{
-				Amount:    decimal.Zero,
+				Amount:    storageTypes.NumericZero(),
 				Validator: "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
 			},
 			wantErr: false,
@@ -237,7 +237,7 @@ func TestNewRewards(t *testing.T) {
 				"validator": "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
 			wantBody: Rewards{
-				Amount:    decimal.RequireFromString("256000000"),
+				Amount:    storageTypes.MustNumericFromString("256000000"),
 				Validator: "celestiavaloper1r5xt7twqmh39ky72f4txxjrhlt2z0qwwmdal8c",
 			},
 			wantErr: false,
@@ -459,7 +459,7 @@ func TestNewFungibleTokenPacket(t *testing.T) {
 				"success":  "true",
 			},
 			wantBody: FungibleTokenPacket{
-				Amount:   decimal.RequireFromString("699567"),
+				Amount:   storageTypes.MustNumericFromString("699567"),
 				Denom:    "transfer/channel-6994/utia",
 				Memo:     "",
 				Module:   "transfer",
@@ -479,7 +479,7 @@ func TestNewFungibleTokenPacket(t *testing.T) {
 				"sender":          "celestia13qe9fxcd63ym5gt4fc235ugdv9zzjejuwky7glqq8xtdc66r9g6sn4vfr6",
 			},
 			wantBody: FungibleTokenPacket{
-				Amount:   decimal.RequireFromString("4745268"),
+				Amount:   storageTypes.MustNumericFromString("4745268"),
 				Denom:    "utia",
 				Memo:     "",
 				Module:   "transfer",
@@ -493,7 +493,7 @@ func TestNewFungibleTokenPacket(t *testing.T) {
 			},
 			wantBody: FungibleTokenPacket{
 				Success: "\u0001",
-				Amount:  decimal.Zero,
+				Amount:  storageTypes.NumericZero(),
 			},
 		},
 	}
@@ -566,7 +566,7 @@ func TestNewHyperlaneSendTransferEvent(t *testing.T) {
 				"msg_index":          "0",
 			},
 			wantBody: HyperlaneSendTransferEvent{ //nolint:gosec
-				Amount:            decimal.RequireFromString("10"),
+				Amount:            storageTypes.MustNumericFromString("10"),
 				Denom:             "utia",
 				DestinationDomain: 812,
 				Recipient:         "0x0000000000000000000000009b8ae55dccca7a842182cc023bd63d24d2692e0a",
@@ -584,7 +584,7 @@ func TestNewHyperlaneSendTransferEvent(t *testing.T) {
 				"msg_index":          "0",
 			},
 			wantBody: HyperlaneSendTransferEvent{ //nolint:gosec
-				Amount:            decimal.Zero,
+				Amount:            storageTypes.NumericZero(),
 				Denom:             "utia",
 				DestinationDomain: 812,
 				Recipient:         "0x0000000000000000000000009b8ae55dccca7a842182cc023bd63d24d2692e0a",
@@ -714,7 +714,7 @@ func TestNewHyperlaneReceiveTransferEvent(t *testing.T) {
 				"msg_index":     "0",
 			},
 			want: HyperlaneReceiveTransferEvent{ //nolint:gosec
-				Amount:       decimal.Zero,
+				Amount:       storageTypes.NumericZero(),
 				OriginDomain: 8453,
 				Recipient:    "celestia1z7ut79ds6h550925ehkxpwvkgcfq63y2vfk2e0",
 				Sender:       "0x0000000000000000000000005d27225a5d8a756e5655617b22cc03616c3b26c3",

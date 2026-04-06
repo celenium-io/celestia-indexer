@@ -74,21 +74,25 @@ func BalanceFromMap(m map[string]string, key string) (*cosmosTypes.Coin, error) 
 	return &coin, nil
 }
 
-func AmountFromMap(m map[string]string, key string) decimal.Decimal {
+func AmountFromMap(m map[string]string, key string) (decimal.Decimal, error) {
 	str := StringFromMap(m, key)
 	if str == "" {
-		return decimal.Zero
+		return decimal.Zero, nil
 	}
 	str = strings.TrimSuffix(str, currency.DefaultCurrency)
-	return decimal.RequireFromString(str)
+	return decimal.NewFromString(str)
 }
 
 func NumericFromMap(m map[string]string, key string) storageTypes.Numeric {
 	return storageTypes.NewNumeric(DecimalFromMap(m, key))
 }
 
-func NumericAmountFromMap(m map[string]string, key string) storageTypes.Numeric {
-	return storageTypes.NewNumeric(AmountFromMap(m, key))
+func NumericAmountFromMap(m map[string]string, key string) (storageTypes.Numeric, error) {
+	d, err := AmountFromMap(m, key)
+	if err != nil {
+		return storageTypes.Numeric{}, err
+	}
+	return storageTypes.NewNumeric(d), nil
 }
 
 func TimeFromMap(m map[string]string, key string) (time.Time, error) {

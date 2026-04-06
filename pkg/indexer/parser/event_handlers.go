@@ -185,15 +185,14 @@ func parseCommission(ctx *context.Context, data map[string]string) error {
 	validator.Address = commission.Validator
 
 	if !commission.Amount.IsZero() {
-		commissionAmount := types.NewNumeric(commission.Amount)
-		validator.Commissions = commissionAmount
-		ctx.Block.Stats.Commissions = ctx.Block.Stats.Commissions.Add(commissionAmount)
+		validator.Commissions = commission.Amount
+		ctx.Block.Stats.Commissions = ctx.Block.Stats.Commissions.Add(commission.Amount)
 
 		ctx.AddStakingLog(storage.StakingLog{
 			Height:    ctx.Block.Height,
 			Time:      ctx.Block.Time,
 			Validator: &validator,
-			Change:    types.NewNumeric(commission.Amount),
+			Change:    commission.Amount,
 			Type:      types.StakingLogTypeCommissions,
 		})
 	}
@@ -216,15 +215,14 @@ func parseRewards(ctx *context.Context, data map[string]string) error {
 	validator.Address = rewards.Validator
 
 	if !rewards.Amount.IsZero() {
-		rewardAmount := types.NewNumeric(rewards.Amount)
-		validator.Rewards = rewardAmount
-		ctx.Block.Stats.Rewards = ctx.Block.Stats.Rewards.Add(rewardAmount)
+		validator.Rewards = rewards.Amount
+		ctx.Block.Stats.Rewards = ctx.Block.Stats.Rewards.Add(rewards.Amount)
 
 		ctx.AddStakingLog(storage.StakingLog{
 			Height:    ctx.Block.Height,
 			Time:      ctx.Block.Time,
 			Validator: &validator,
-			Change:    types.NewNumeric(rewards.Amount),
+			Change:    rewards.Amount,
 			Type:      types.StakingLogTypeRewards,
 		})
 	}
@@ -251,10 +249,10 @@ func parseSlash(ctx *context.Context, data map[string]string) error {
 			Height: ctx.Block.Height,
 			Time:   ctx.Block.Time,
 			Reason: slash.Reason,
-			Burned: types.NewNumeric(slash.BurnedCoins),
+			Burned: slash.BurnedCoins,
 			Validator: &storage.Validator{
 				ConsAddress: consAddress,
-				Stake:       types.NewNumeric(slash.BurnedCoins),
+				Stake:       slash.BurnedCoins,
 				Jailed:      &jailed,
 			},
 		})
@@ -335,8 +333,8 @@ func parseSetDestinationGasConfig(ctx *context.Context, data map[string]string) 
 	config := storage.HLIGPConfig{
 		Height:            ctx.Block.Height,
 		Time:              ctx.Block.Time,
-		GasPrice:          types.NewNumeric(igp.GasPrice),
-		GasOverhead:       types.NewNumeric(igp.GasOverhead),
+		GasPrice:          igp.GasPrice,
+		GasOverhead:       igp.GasOverhead,
 		RemoteDomain:      igp.RemoteDomain,
 		TokenExchangeRate: igp.TokenExchangeRate,
 	}

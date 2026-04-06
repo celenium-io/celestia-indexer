@@ -77,7 +77,7 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event
 			}
 
 			transfer.Denom = event.Denom
-			transfer.Amount = types.NewNumeric(event.Amount)
+			transfer.Amount = event.Amount
 			tokenId, err := util.DecodeHexAddress(event.TokenId)
 			if err != nil {
 				return errors.Wrap(err, "decode token id")
@@ -85,7 +85,7 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event
 			transfer.Token = &storage.HLToken{
 				TokenId:       tokenId.Bytes(),
 				SentTransfers: 1,
-				Sent:          types.NewNumeric(event.Amount),
+				Sent:          event.Amount,
 				Type:          types.HLTokenTypeCollateral,
 			}
 		case types.EventTypeHyperlanecorepostDispatchv1EventGasPayment:
@@ -101,8 +101,8 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event
 			transfer.GasPayment = &storage.HLGasPayment{
 				Height:    ctx.Block.Height,
 				Time:      ctx.Block.Time,
-				Amount:    types.NewNumeric(event.Amount),
-				GasAmount: types.NewNumeric(event.GasAmount),
+				Amount:    event.Amount,
+				GasAmount: event.GasAmount,
 				Igp: &storage.HLIGP{
 					IgpId: igpId.Bytes(),
 				},
