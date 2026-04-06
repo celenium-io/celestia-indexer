@@ -13,7 +13,6 @@ import (
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/shopspring/decimal"
 )
 
 // MsgCreateValidator defines an SDK message for creating a new validator.
@@ -62,11 +61,11 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, msgId 
 		Details:           m.Description.Details,
 		Contacts:          m.Description.SecurityContact,
 		Height:            ctx.Block.Height,
-		Rate:              storageTypes.NewNumeric(decimal.Zero),
-		MaxRate:           storageTypes.NewNumeric(decimal.Zero),
-		MaxChangeRate:     storageTypes.NewNumeric(decimal.Zero),
-		MinSelfDelegation: storageTypes.NewNumeric(decimal.Zero),
-		Stake:             storageTypes.NewNumeric(decimal.Zero),
+		Rate:              storageTypes.NumericZero(),
+		MaxRate:           storageTypes.NumericZero(),
+		MaxChangeRate:     storageTypes.NumericZero(),
+		MinSelfDelegation: storageTypes.NumericZero(),
+		Stake:             storageTypes.NumericZero(),
 		Jailed:            &jailed,
 		MessagesCount:     1,
 		CreationTime:      ctx.Block.Time,
@@ -83,8 +82,8 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, msgId 
 			Address: addr.String(),
 			Balance: storage.Balance{
 				Currency:  currency.DefaultCurrency,
-				Spendable: storageTypes.NewNumeric(decimal.Zero),
-				Unbonding: storageTypes.NewNumeric(decimal.Zero),
+				Spendable: storageTypes.NumericZero(),
+				Unbonding: storageTypes.NumericZero(),
 				Delegated: amount.Copy(),
 			},
 		}
@@ -160,9 +159,9 @@ func MsgEditValidator(ctx *context.Context, status storageTypes.Status, msgId ui
 		Details:           m.Description.Details,
 		Contacts:          m.Description.SecurityContact,
 		Height:            ctx.Block.Height,
-		Rate:              storageTypes.NewNumeric(decimal.Zero),
-		MinSelfDelegation: storageTypes.NewNumeric(decimal.Zero),
-		Stake:             storageTypes.NewNumeric(decimal.Zero),
+		Rate:              storageTypes.NumericZero(),
+		MinSelfDelegation: storageTypes.NumericZero(),
+		Stake:             storageTypes.NumericZero(),
 		MessagesCount:     1,
 	}
 

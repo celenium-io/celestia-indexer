@@ -13,7 +13,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	indexerCfg "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -64,8 +63,8 @@ func TestTryUpgrade_NoValidatorsSignaled(t *testing.T) {
 
 	// all validators signal version 0 (no version) or <= state.Version
 	tx.EXPECT().BondedValidators(gomock.Any(), 100).Return([]storage.Validator{
-		{Id: 1, Stake: types.NewNumeric(decimal.NewFromInt(1_000_000)), Version: 0},
-		{Id: 2, Stake: types.NewNumeric(decimal.NewFromInt(1_000_000)), Version: 3},
+		{Id: 1, Stake: types.NumericFromInt64(1_000_000), Version: 0},
+		{Id: 2, Stake: types.NumericFromInt64(1_000_000), Version: 3},
 	}, nil)
 	// UpdateSignalsAfterUpgrade must NOT be called
 
@@ -87,12 +86,12 @@ func TestTryUpgrade_NoQuorum(t *testing.T) {
 	// total stake = 3_000_000 → Shares = 3; threshold = 3 * 5/6 ≈ 2
 	// voted for v4 = 1_000_000 → Shares = 1 < threshold → no quorum
 	tx.EXPECT().BondedValidators(gomock.Any(), 100).Return([]storage.Validator{
-		{Id: 1, Stake: types.NewNumeric(decimal.NewFromInt(1_000_000)), Version: 4},
-		{Id: 2, Stake: types.NewNumeric(decimal.NewFromInt(1_000_000)), Version: 3},
-		{Id: 3, Stake: types.NewNumeric(decimal.NewFromInt(1_000_000)), Version: 3},
+		{Id: 1, Stake: types.NumericFromInt64(1_000_000), Version: 4},
+		{Id: 2, Stake: types.NumericFromInt64(1_000_000), Version: 3},
+		{Id: 3, Stake: types.NumericFromInt64(1_000_000), Version: 3},
 	}, nil)
 	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
-		Return(types.NewNumeric(decimal.NewFromInt(1_000_000)), nil)
+		Return(types.NumericFromInt64(1_000_000), nil)
 	// SaveUpgrades must NOT be called
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -113,12 +112,12 @@ func TestTryUpgrade_WithQuorum(t *testing.T) {
 	// total stake = 6_000_000 → Shares = 6; threshold = 6 * 5/6 = 5
 	// voted for v4 raw = 6_000_000 → Shares = 6 > 5 → quorum
 	tx.EXPECT().BondedValidators(gomock.Any(), 100).Return([]storage.Validator{
-		{Id: 1, Stake: types.NewNumeric(decimal.NewFromInt(2_000_000)), Version: 4},
-		{Id: 2, Stake: types.NewNumeric(decimal.NewFromInt(2_000_000)), Version: 4},
-		{Id: 3, Stake: types.NewNumeric(decimal.NewFromInt(2_000_000)), Version: 4},
+		{Id: 1, Stake: types.NumericFromInt64(2_000_000), Version: 4},
+		{Id: 2, Stake: types.NumericFromInt64(2_000_000), Version: 4},
+		{Id: 3, Stake: types.NumericFromInt64(2_000_000), Version: 4},
 	}, nil)
 	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
-		Return(types.NewNumeric(decimal.NewFromInt(6_000_000)), nil)
+		Return(types.NumericFromInt64(6_000_000), nil)
 	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(_ context.Context, upgrades ...*storage.Upgrade) error {
 			require.Len(t, upgrades, 1)
@@ -146,16 +145,16 @@ func TestTryUpgrade_PicksMinimumQuorumVersion(t *testing.T) {
 	// total stake = 12_000_000 → Shares = 12; threshold = 12 * 5/6 = 10
 	// voted raw = 12_000_000 → Shares = 12 > 10 → quorum for both
 	tx.EXPECT().BondedValidators(gomock.Any(), 100).Return([]storage.Validator{
-		{Id: 1, Stake: types.NewNumeric(decimal.NewFromInt(3_000_000)), Version: 4},
-		{Id: 2, Stake: types.NewNumeric(decimal.NewFromInt(3_000_000)), Version: 4},
-		{Id: 3, Stake: types.NewNumeric(decimal.NewFromInt(3_000_000)), Version: 4},
-		{Id: 4, Stake: types.NewNumeric(decimal.NewFromInt(3_000_000)), Version: 5},
+		{Id: 1, Stake: types.NumericFromInt64(3_000_000), Version: 4},
+		{Id: 2, Stake: types.NumericFromInt64(3_000_000), Version: 4},
+		{Id: 3, Stake: types.NumericFromInt64(3_000_000), Version: 4},
+		{Id: 4, Stake: types.NumericFromInt64(3_000_000), Version: 5},
 	}, nil)
 	// versions are sorted, v4 is checked first and has quorum → SaveUpgrades called, v5 skipped
 	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
-		Return(types.NewNumeric(decimal.NewFromInt(12_000_000)), nil).MaxTimes(1)
+		Return(types.NumericFromInt64(12_000_000), nil).MaxTimes(1)
 	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(5)).
-		Return(types.NewNumeric(decimal.NewFromInt(12_000_000)), nil).MaxTimes(1)
+		Return(types.NumericFromInt64(12_000_000), nil).MaxTimes(1)
 	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(_ context.Context, upgrades ...*storage.Upgrade) error {
 			require.Len(t, upgrades, 1)
@@ -182,7 +181,7 @@ func TestSaveUpgrades_EmptyMap(t *testing.T) {
 	tx := mock.NewMockTransaction(ctrl)
 	// nothing should be called
 	err := saveUpgrades(context.Background(), tx, sync.NewMap[uint64, *storage.Upgrade](),
-		storage.State{Version: 3}, types.NewNumeric(decimal.NewFromInt(3_000_000)))
+		storage.State{Version: 3}, types.NumericFromInt64(3_000_000))
 	require.NoError(t, err)
 }
 
@@ -196,7 +195,7 @@ func TestSaveUpgrades_SkipsAlreadyAppliedVersion(t *testing.T) {
 	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 3})
 
 	err := saveUpgrades(context.Background(), tx, upgrades,
-		storage.State{Version: 3}, types.NewNumeric(decimal.NewFromInt(3_000_000)))
+		storage.State{Version: 3}, types.NumericFromInt64(3_000_000))
 	require.NoError(t, err)
 }
 
@@ -207,7 +206,7 @@ func TestSaveUpgrades_NoQuorum(t *testing.T) {
 	tx := mock.NewMockTransaction(ctrl)
 	// total Shares = 3; threshold = 2; voted raw=1_000_000 → Shares=1 < 2
 	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
-		Return(types.NewNumeric(decimal.NewFromInt(1_000_000)), nil)
+		Return(types.NumericFromInt64(1_000_000), nil)
 	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(_ context.Context, upgrades ...*storage.Upgrade) error {
 			require.Len(t, upgrades, 1)
@@ -218,7 +217,7 @@ func TestSaveUpgrades_NoQuorum(t *testing.T) {
 	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 4})
 
 	err := saveUpgrades(context.Background(), tx, upgrades,
-		storage.State{Version: 3}, types.NewNumeric(decimal.NewFromInt(3)))
+		storage.State{Version: 3}, types.NumericFromInt64(3))
 	require.NoError(t, err)
 }
 
@@ -229,7 +228,7 @@ func TestSaveUpgrades_WithQuorum(t *testing.T) {
 	tx := mock.NewMockTransaction(ctrl)
 	// total Shares = 6; threshold = 5; voted raw=6_000_000 → Shares=6 > 5 → quorum
 	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
-		Return(types.NewNumeric(decimal.NewFromInt(6_000_000)), nil)
+		Return(types.NumericFromInt64(6_000_000), nil)
 	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(_ context.Context, upgrades ...*storage.Upgrade) error {
 			require.Len(t, upgrades, 1)
@@ -241,7 +240,7 @@ func TestSaveUpgrades_WithQuorum(t *testing.T) {
 	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 4})
 
 	err := saveUpgrades(context.Background(), tx, upgrades,
-		storage.State{Version: 3}, types.NewNumeric(decimal.NewFromInt(6)))
+		storage.State{Version: 3}, types.NumericFromInt64(6))
 	require.NoError(t, err)
 }
 
@@ -274,20 +273,20 @@ func TestSaveSignals_WithQuorum(t *testing.T) {
 
 	// total bonded stake
 	tx.EXPECT().BondedValidators(gomock.Any(), 100).Return([]storage.Validator{
-		{Id: 1, Stake: types.NewNumeric(decimal.NewFromInt(2_000_000))},
-		{Id: 2, Stake: types.NewNumeric(decimal.NewFromInt(1_000_000))},
+		{Id: 1, Stake: types.NumericFromInt64(2_000_000)},
+		{Id: 2, Stake: types.NumericFromInt64(1_000_000)},
 	}, nil)
 
 	// saveSignals resolves validator by address
 	tx.EXPECT().Validator(gomock.Any(), uint64(1)).Return(storage.Validator{
-		Id: 1, Stake: types.NewNumeric(decimal.NewFromInt(2_000_000)),
+		Id: 1, Stake: types.NumericFromInt64(2_000_000),
 	}, nil)
 
 	tx.EXPECT().SaveSignals(gomock.Any(), gomock.Any()).Return(nil)
 
 	// total Shares = 3; threshold = 2; voted raw=6_000_000 → Shares=6 > 2 → quorum
 	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
-		Return(types.NewNumeric(decimal.NewFromInt(6_000_000)), nil)
+		Return(types.NumericFromInt64(6_000_000), nil)
 	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(_ context.Context, upgrades ...*storage.Upgrade) error {
 			require.Len(t, upgrades, 1)

@@ -17,7 +17,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/shopspring/decimal"
 )
 
 func (p *Module) parseTxs(ctx *context.Context, b *types.BlockData) ([]storage.Tx, error) {
@@ -68,9 +67,9 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 			Hash:       signerBytes,
 			Balance: storage.Balance{
 				Currency:  currency.DefaultCurrency,
-				Spendable: storageTypes.NewNumeric(decimal.Zero),
-				Delegated: storageTypes.NewNumeric(decimal.Zero),
-				Unbonding: storageTypes.NewNumeric(decimal.Zero),
+				Spendable: storageTypes.NumericZero(),
+				Delegated: storageTypes.NumericZero(),
+				Unbonding: storageTypes.NumericZero(),
 			},
 		}
 		t.Signers = append(t.Signers, address)

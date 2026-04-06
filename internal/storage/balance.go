@@ -7,7 +7,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -37,8 +36,8 @@ func (b Balance) IsEmpty() bool {
 func EmptyBalance() Balance {
 	return Balance{
 		Currency:  currency.DefaultCurrency,
-		Spendable: types.NewNumeric(decimal.Zero),
-		Delegated: types.NewNumeric(decimal.Zero),
-		Unbonding: types.NewNumeric(decimal.Zero),
+		Spendable: types.NumericZero(),
+		Delegated: types.NumericZero(),
+		Unbonding: types.NumericZero(),
 	}
 }

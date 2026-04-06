@@ -12,7 +12,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func (module *Module) rollbackBalances(
@@ -111,10 +110,10 @@ func coinSpent(data map[string]string) (*storage.Address, error) {
 	}
 	balance := storage.Balance{
 		Currency:  currency.DefaultCurrency,
-		Spendable: types.NewNumeric(decimal.Zero),
+		Spendable: types.NumericZero(),
 	}
 	if coinSpent.Amount != nil {
-		balance.Spendable = types.NewNumeric(decimal.NewFromBigInt(coinSpent.Amount.Amount.BigInt(), 0))
+		balance.Spendable = types.NumericFromBigInt(coinSpent.Amount.Amount.BigInt(), 0)
 		balance.Currency = coinSpent.Amount.Denom
 	}
 	return &storage.Address{
@@ -137,10 +136,10 @@ func coinReceived(data map[string]string) (*storage.Address, error) {
 
 	balance := storage.Balance{
 		Currency:  currency.DefaultCurrency,
-		Spendable: types.NewNumeric(decimal.Zero),
+		Spendable: types.NumericZero(),
 	}
 	if coinReceived.Amount != nil {
-		balance.Spendable = types.NewNumeric(decimal.NewFromBigInt(coinReceived.Amount.Amount.Neg().BigInt(), 0))
+		balance.Spendable = types.NumericFromBigInt(coinReceived.Amount.Amount.Neg().BigInt(), 0)
 		balance.Currency = coinReceived.Amount.Denom
 	}
 

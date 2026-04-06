@@ -1486,7 +1486,7 @@ func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uin
 		Where("validator.id = validator_id").
 		Exec(ctx)
 	if err != nil {
-		return storageTypes.Numeric{}, err
+		return storageTypes.NumericZero(), err
 	}
 
 	var sum storageTypes.Numeric

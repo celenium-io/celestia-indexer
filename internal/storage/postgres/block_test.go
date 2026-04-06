@@ -11,7 +11,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 )
 
 func (s *StorageTestSuite) TestBlockLast() {
@@ -67,9 +66,9 @@ func (s *StorageTestSuite) TestBlockByHeightWithStats() {
 		BlobsSize:     1234,
 		BlobsCount:    4,
 		BlockTime:     11000,
-		SupplyChange:  storageTypes.NewNumeric(decimal.NewFromInt(30930476)),
+		SupplyChange:  storageTypes.NumericFromInt64(30930476),
 		InflationRate: storageTypes.NumericFromFloat64(0.08),
-		Fee:           storageTypes.NewNumeric(decimal.NewFromInt(2873468273)),
+		Fee:           storageTypes.NumericFromInt64(2873468273),
 	}
 	s.Require().EqualValues(expectedStats.Id, block.Stats.Id)
 	s.Require().EqualValues(expectedStats.Height, block.Stats.Height)
@@ -105,9 +104,9 @@ func (s *StorageTestSuite) TestBlockByIdWithRelations() {
 		EventsCount:   0,
 		BlobsSize:     1234,
 		BlockTime:     11000,
-		SupplyChange:  storageTypes.NewNumeric(decimal.NewFromInt(30930476)),
+		SupplyChange:  storageTypes.NumericFromInt64(30930476),
 		InflationRate: storageTypes.NumericFromFloat64(0.08),
-		Fee:           storageTypes.NewNumeric(decimal.NewFromInt(2873468273)),
+		Fee:           storageTypes.NumericFromInt64(2873468273),
 		BlobsCount:    4,
 	}
 	s.Require().EqualValues(expectedStats.Id, block.Stats.Id)

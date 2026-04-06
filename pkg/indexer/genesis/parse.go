@@ -57,9 +57,9 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 			Height:        pkgTypes.Level(genesis.InitialHeight - 1),
 			TxCount:       int64(len(genesis.AppState.Genutil.GenTxs)),
 			EventsCount:   0,
-			Fee:           storageTypes.NewNumeric(decimal.Zero),
-			SupplyChange:  storageTypes.NewNumeric(decimal.Zero),
-			InflationRate: storageTypes.NewNumeric(decimal.Zero),
+			Fee:           storageTypes.NumericZero(),
+			SupplyChange:  storageTypes.NumericZero(),
+			InflationRate: storageTypes.NumericZero(),
 		},
 		MessageTypes: storageTypes.NewMsgTypeBits(),
 	}
@@ -92,7 +92,7 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 		tx.Position = int64(index)
 		tx.TimeoutHeight = txWithTimeoutHeight.GetTimeoutHeight()
 		tx.MessagesCount = int64(len(txDecoded.GetMsgs()))
-		tx.Fee = storageTypes.NewNumeric(decimal.Zero)
+		tx.Fee = storageTypes.NumericZero()
 		tx.Status = storageTypes.StatusSuccess
 		tx.Memo = memoTx.GetMemo()
 		tx.MessageTypes = storageTypes.NewMsgTypeBitMask()
@@ -157,8 +157,8 @@ func (module *Module) parseTotalSupply(supply []types.Supply, block *storage.Blo
 		return
 	}
 
-	if totalSupply, err := decimal.NewFromString(supply[0].Amount); err == nil {
-		block.Stats.SupplyChange = storageTypes.NewNumeric(totalSupply)
+	if totalSupply, err := storageTypes.NumericFromString(supply[0].Amount); err == nil {
+		block.Stats.SupplyChange = totalSupply
 	}
 }
 
@@ -173,9 +173,9 @@ func (module *Module) parseAccounts(accounts []types.Account, block storage.Bloc
 			Height:     block.Height,
 			LastHeight: block.Height,
 			Balance: storage.Balance{
-				Spendable: storageTypes.NewNumeric(decimal.Zero),
-				Delegated: storageTypes.NewNumeric(decimal.Zero),
-				Unbonding: storageTypes.NewNumeric(decimal.Zero),
+				Spendable: storageTypes.NumericZero(),
+				Delegated: storageTypes.NumericZero(),
+				Unbonding: storageTypes.NumericZero(),
 				Currency:  currencyBase,
 			},
 		}
@@ -245,9 +245,9 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 			Height:     height,
 			LastHeight: height,
 			Balance: storage.Balance{
-				Spendable: storageTypes.NewNumeric(decimal.Zero),
-				Delegated: storageTypes.NewNumeric(decimal.Zero),
-				Unbonding: storageTypes.NewNumeric(decimal.Zero),
+				Spendable: storageTypes.NumericZero(),
+				Delegated: storageTypes.NumericZero(),
+				Unbonding: storageTypes.NumericZero(),
 				Currency:  balances[i].Coins[0].Denom,
 			},
 		}

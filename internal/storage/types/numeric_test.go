@@ -29,9 +29,33 @@ func TestNumeric_Decimal(t *testing.T) {
 	require.True(t, n.Equal(NewNumeric(d)))
 }
 
-func TestNumeric_Zero(t *testing.T) {
-	n := NewNumeric(decimal.Zero)
+func TestNumericZero(t *testing.T) {
+	n := NumericZero()
 	require.True(t, n.IsZero())
+	require.True(t, n.Equal(NewNumeric(decimal.Zero)))
+}
+
+func TestNumericFromBigInt(t *testing.T) {
+	t.Run("positive", func(t *testing.T) {
+		n := NumericFromBigInt(big.NewInt(123456), -3)
+		require.True(t, n.Equal(MustNumericFromString("123.456")))
+	})
+
+	t.Run("zero", func(t *testing.T) {
+		n := NumericFromBigInt(big.NewInt(0), 0)
+		require.True(t, n.IsZero())
+	})
+
+	t.Run("large value", func(t *testing.T) {
+		v, _ := new(big.Int).SetString("99999999999999999999", 10)
+		n := NumericFromBigInt(v, 0)
+		require.True(t, n.Equal(MustNumericFromString("99999999999999999999")))
+	})
+
+	t.Run("negative", func(t *testing.T) {
+		n := NumericFromBigInt(big.NewInt(-500), -2)
+		require.True(t, n.Equal(MustNumericFromString("-5.00")))
+	})
 }
 
 func TestNumeric_Value(t *testing.T) {

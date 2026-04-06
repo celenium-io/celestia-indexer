@@ -11,6 +11,7 @@ import (
 
 	"github.com/bcp-innovations/hyperlane-cosmos/util"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	channelTypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	tmTypes "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
@@ -80,6 +81,14 @@ func AmountFromMap(m map[string]string, key string) decimal.Decimal {
 	}
 	str = strings.TrimSuffix(str, currency.DefaultCurrency)
 	return decimal.RequireFromString(str)
+}
+
+func NumericFromMap(m map[string]string, key string) storageTypes.Numeric {
+	return storageTypes.NewNumeric(DecimalFromMap(m, key))
+}
+
+func NumericAmountFromMap(m map[string]string, key string) storageTypes.Numeric {
+	return storageTypes.NewNumeric(AmountFromMap(m, key))
 }
 
 func TimeFromMap(m map[string]string, key string) (time.Time, error) {

@@ -262,7 +262,7 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 		for id, option := range votedValidators {
 			minus, ok := validatorMinus[id]
 			if !ok {
-				minus = types.Numeric{}
+				minus = types.NumericZero()
 			}
 			if power, ok := validatorsPower[id]; ok {
 				proposal.VotingPower = proposal.VotingPower.Add(power).Sub(minus)

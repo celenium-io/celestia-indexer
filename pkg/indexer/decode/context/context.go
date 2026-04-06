@@ -15,7 +15,6 @@ import (
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 type Context struct {
@@ -186,11 +185,11 @@ func (ctx *Context) AddSupply(data map[string]string) {
 	coin, err := decoder.CoinFromMap(data, "amount")
 	if err == nil {
 		if coin.GetDenom() == currency.DefaultCurrency {
-			amount := types.NewNumeric(decimal.NewFromBigInt(coin.Amount.BigInt(), 0))
+			amount := types.NumericFromBigInt(coin.Amount.BigInt(), 0)
 			ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Add(amount)
 		}
 	} else {
-		amount := types.NewNumeric(decoder.DecimalFromMap(data, "amount"))
+		amount := decoder.NumericFromMap(data, "amount")
 		ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Add(amount)
 	}
 }
@@ -199,17 +198,17 @@ func (ctx *Context) SubSupply(data map[string]string) {
 	coin, err := decoder.CoinFromMap(data, "amount")
 	if err == nil {
 		if coin.GetDenom() == currency.DefaultCurrency {
-			amount := types.NewNumeric(decimal.NewFromBigInt(coin.Amount.BigInt(), 0))
+			amount := types.NumericFromBigInt(coin.Amount.BigInt(), 0)
 			ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Sub(amount)
 		}
 	} else {
-		amount := types.NewNumeric(decoder.DecimalFromMap(data, "amount"))
+		amount := decoder.NumericFromMap(data, "amount")
 		ctx.Block.Stats.SupplyChange = ctx.Block.Stats.SupplyChange.Sub(amount)
 	}
 }
 
 func (ctx *Context) SetInflation(data map[string]string) {
-	ctx.Block.Stats.InflationRate = types.NewNumeric(decoder.DecimalFromMap(data, "inflation_rate"))
+	ctx.Block.Stats.InflationRate = decoder.NumericFromMap(data, "inflation_rate")
 }
 
 func (ctx *Context) AddDelegation(d storage.Delegation) {

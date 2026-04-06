@@ -12,7 +12,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -160,12 +159,12 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Identity:          storage.DoNotModify,
 					Contacts:          storage.DoNotModify,
 					Details:           storage.DoNotModify,
-					Rate:              types.NewNumeric(decimal.Zero),
-					MaxRate:           types.NewNumeric(decimal.Zero),
-					MaxChangeRate:     types.NewNumeric(decimal.Zero),
-					MinSelfDelegation: types.NewNumeric(decimal.Zero),
-					Rewards:           types.NewNumeric(decimal.Zero),
-					Commissions:       types.NewNumeric(decimal.Zero),
+					Rate:              types.NumericZero(),
+					MaxRate:           types.NumericZero(),
+					MaxChangeRate:     types.NumericZero(),
+					MinSelfDelegation: types.NumericZero(),
+					Rewards:           types.NumericZero(),
+					Commissions:       types.NumericZero(),
 					Stake:             types.NumericFromInt64(45000000),
 				},
 			},

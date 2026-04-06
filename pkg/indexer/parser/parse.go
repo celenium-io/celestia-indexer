@@ -14,7 +14,6 @@ import (
 	dCtx "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func (p *Module) parse(b *types.BlockData) error {
@@ -55,11 +54,11 @@ func (p *Module) parse(b *types.BlockData) error {
 			TxCount:       int64(len(b.Block.Txs)),
 			EventsCount:   int64(len(b.FinalizeBlockEvents)),
 			BlobsSize:     0,
-			Fee:           storageTypes.NewNumeric(decimal.Zero),
-			SupplyChange:  storageTypes.NewNumeric(decimal.Zero),
-			InflationRate: storageTypes.NewNumeric(decimal.Zero),
-			Commissions:   storageTypes.NewNumeric(decimal.Zero),
-			Rewards:       storageTypes.NewNumeric(decimal.Zero),
+			Fee:           storageTypes.NumericZero(),
+			SupplyChange:  storageTypes.NumericZero(),
+			InflationRate: storageTypes.NumericZero(),
+			Commissions:   storageTypes.NumericZero(),
+			Rewards:       storageTypes.NumericZero(),
 			SquareSize:    b.Block.SquareSize,
 		},
 	}

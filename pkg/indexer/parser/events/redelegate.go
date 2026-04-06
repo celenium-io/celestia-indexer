@@ -12,7 +12,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 )
 
 func handleRedelegate(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
@@ -101,7 +100,7 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 				LastHeight: msg.Height,
 				Balance: storage.Balance{
 					Currency:  currency.DefaultCurrency,
-					Delegated: storageTypes.NewNumeric(decimal.Zero),
+					Delegated: storageTypes.NumericZero(),
 				},
 			}
 			if err := ctx.AddAddress(address); err != nil {

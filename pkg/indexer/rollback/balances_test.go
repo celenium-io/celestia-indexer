@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -52,7 +51,7 @@ func Test_coinReceived(t *testing.T) {
 				Address: testAddress,
 				Balance: storage.Balance{
 					Currency:  "utia",
-					Spendable: types.NewNumeric(decimal.Zero),
+					Spendable: types.NumericZero(),
 				},
 			},
 		}, {
@@ -118,7 +117,7 @@ func Test_coinSpent(t *testing.T) {
 				Address: testAddress,
 				Balance: storage.Balance{
 					Currency:  "utia",
-					Spendable: types.NewNumeric(decimal.Zero),
+					Spendable: types.NumericZero(),
 				},
 			},
 		}, {

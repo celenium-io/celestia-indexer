@@ -11,7 +11,6 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
-	"github.com/shopspring/decimal"
 )
 
 // MsgCreateVestingAccount defines a message that enables creating a vesting
@@ -35,7 +34,7 @@ func MsgCreateVestingAccount(ctx *context.Context, status storageTypes.Status, t
 		TxId: &txId,
 	}
 
-	amount := storageTypes.NewNumeric(decimal.NewFromBigInt(m.Amount.AmountOf(currency.Utia).BigInt(), 0))
+	amount := storageTypes.NumericFromBigInt(m.Amount.AmountOf(currency.Utia).BigInt(), 0)
 	v.Amount = v.Amount.Add(amount)
 
 	if m.EndTime > 0 {
@@ -81,7 +80,7 @@ func MsgCreatePermanentLockedAccount(ctx *context.Context, status storageTypes.S
 		TxId: &txId,
 	}
 
-	amount := storageTypes.NewNumeric(decimal.NewFromBigInt(m.Amount.AmountOf(currency.Utia).BigInt(), 0))
+	amount := storageTypes.NumericFromBigInt(m.Amount.AmountOf(currency.Utia).BigInt(), 0)
 	v.Amount = v.Amount.Add(amount)
 
 	ctx.AddVestingAccount(v)
@@ -109,7 +108,7 @@ func MsgCreatePeriodicVestingAccount(ctx *context.Context, status storageTypes.S
 			Address: m.ToAddress,
 		},
 		Type:   storageTypes.VestingTypePeriodic,
-		Amount: storageTypes.NewNumeric(decimal.Zero),
+		Amount: storageTypes.NumericZero(),
 		TxId:   &txId,
 	}
 
@@ -124,7 +123,7 @@ func MsgCreatePeriodicVestingAccount(ctx *context.Context, status storageTypes.S
 		period := storage.VestingPeriod{
 			Height: v.Height,
 		}
-		period.Amount = storageTypes.NewNumeric(decimal.NewFromBigInt(m.VestingPeriods[i].Amount.AmountOf(currency.Utia).BigInt(), 0))
+		period.Amount = storageTypes.NumericFromBigInt(m.VestingPeriods[i].Amount.AmountOf(currency.Utia).BigInt(), 0)
 		v.Amount = v.Amount.Add(period.Amount)
 		periodTime = periodTime.Add(time.Second * time.Duration(m.VestingPeriods[i].Length))
 		period.Time = periodTime

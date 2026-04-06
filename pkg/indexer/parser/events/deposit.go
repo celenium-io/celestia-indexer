@@ -35,10 +35,9 @@ func processDeposit(ctx *context.Context, events []storage.Event, msg *storage.M
 	if err != nil {
 		return errors.Errorf("submit proposal can't receive proposal id: %##v", events[*idx].Data)
 	}
-	amount := decoder.AmountFromMap(events[*idx].Data, "amount")
 	msg.Proposal = &storage.Proposal{
 		Id:      proposalId,
-		Deposit: types.NewNumeric(amount),
+		Deposit: decoder.NumericAmountFromMap(events[*idx].Data, "amount"),
 		Status:  types.ProposalStatusInactive,
 	}
 

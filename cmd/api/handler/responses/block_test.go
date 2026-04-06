@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -116,9 +115,9 @@ func TestNewBlock(t *testing.T) {
 						EventsCount:   10,
 						BlobsSize:     1234,
 						BlockTime:     11000,
-						SupplyChange:  storageTypes.NewNumeric(decimal.NewFromInt(123)),
+						SupplyChange:  storageTypes.NumericFromInt64(123),
 						InflationRate: storageTypes.NumericFromFloat64(0.08),
-						Fee:           storageTypes.NewNumeric(decimal.NewFromInt(125)),
+						Fee:           storageTypes.NumericFromInt64(125),
 						BytesInBlock:  10000,
 					},
 				},
@@ -190,9 +189,9 @@ func TestNewBlockStats(t *testing.T) {
 					EventsCount:   10,
 					BlobsSize:     1234,
 					BlockTime:     11000,
-					SupplyChange:  storageTypes.NewNumeric(decimal.NewFromInt(123)),
+					SupplyChange:  storageTypes.NumericFromInt64(123),
 					InflationRate: storageTypes.NumericFromFloat64(0.08),
-					Fee:           storageTypes.NewNumeric(decimal.NewFromInt(125)),
+					Fee:           storageTypes.NumericFromInt64(125),
 					BytesInBlock:  10000,
 				},
 			},

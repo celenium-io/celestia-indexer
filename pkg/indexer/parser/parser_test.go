@@ -18,7 +18,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	tmTypes "github.com/cometbft/cometbft/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -72,11 +71,11 @@ func getExpectedBlock() storage.Block {
 			TxCount:       0,
 			EventsCount:   0,
 			BlobsSize:     0,
-			SupplyChange:  storageTypes.NewNumeric(decimal.Zero),
-			InflationRate: storageTypes.NewNumeric(decimal.Zero),
-			Fee:           storageTypes.NewNumeric(decimal.Zero),
-			Rewards:       storageTypes.NewNumeric(decimal.Zero),
-			Commissions:   storageTypes.NewNumeric(decimal.Zero),
+			SupplyChange:  storageTypes.NumericZero(),
+			InflationRate: storageTypes.NumericZero(),
+			Fee:           storageTypes.NumericZero(),
+			Rewards:       storageTypes.NumericZero(),
+			Commissions:   storageTypes.NumericZero(),
 		},
 	}
 }

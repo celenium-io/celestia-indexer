@@ -26,6 +26,10 @@ func NewNumeric(d decimal.Decimal) Numeric {
 	return Numeric{d}
 }
 
+func NumericZero() Numeric {
+	return Numeric{decimal.Zero}
+}
+
 func NumericFromInt64(v int64) Numeric {
 	return Numeric{decimal.NewFromInt(v)}
 }
@@ -40,6 +44,10 @@ func NumericFromString(s string) (Numeric, error) {
 
 func MustNumericFromString(s string) Numeric {
 	return Numeric{decimal.RequireFromString(s)}
+}
+
+func NumericFromBigInt(v *big.Int, exp int32) Numeric {
+	return Numeric{decimal.NewFromBigInt(v, exp)}
 }
 
 func NumericFromFloat64(v float64) Numeric {

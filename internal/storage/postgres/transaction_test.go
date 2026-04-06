@@ -346,7 +346,7 @@ func (s *TransactionTestSuite) TestSaveBlobLogsWithCopy() {
 		blobLogs[i].Height = 1000
 		blobLogs[i].Commitment = testsuite.RandomText(16)
 		blobLogs[i].ContentType = "application/json"
-		blobLogs[i].Fee = types.NewNumeric(decimal.NewFromInt(17263))
+		blobLogs[i].Fee = types.NumericFromInt64(17263)
 		blobLogs[i].ShareVersion = 1
 		blobLogs[i].SignerId = uint64(i * 3)
 		blobLogs[i].Size = 123
@@ -391,7 +391,7 @@ func (s *TransactionTestSuite) TestSaveTransactionsWithCopy() {
 		txs[i].Memo = "memo"
 		txs[i].MessageTypes = types.NewMsgTypeBitMask(types.IBCTransfer, types.MsgAcknowledgement)
 		txs[i].Position = int64(i)
-		txs[i].Fee = types.NewNumeric(decimal.NewFromInt(17263))
+		txs[i].Fee = types.NumericFromInt64(17263)
 		txs[i].Status = types.StatusSuccess
 		txs[i].TimeoutHeight = 1287361
 
@@ -472,11 +472,11 @@ func (s *TransactionTestSuite) TestSaveProposals() {
 		Status:      types.ProposalStatusInactive,
 		Type:        types.ProposalTypeText,
 		CreatedAt:   time.Now(),
-		VotingPower: types.NewNumeric(decimal.Zero),
+		VotingPower: types.NumericZero(),
 	}, &storage.Proposal{
 		Id:          1,
 		Status:      types.ProposalStatusActive,
-		VotingPower: types.NewNumeric(decimal.Zero),
+		VotingPower: types.NumericZero(),
 	})
 	s.Require().NoError(err)
 	s.Require().EqualValues(1, count)
@@ -1377,7 +1377,7 @@ func (s *TransactionTestSuite) TestSaveRedelegations() {
 			SrcId:          2,
 			DestId:         3,
 			AddressId:      1,
-			Amount:         types.NewNumeric(decimal.NewFromInt(10)),
+			Amount:         types.NumericFromInt64(10),
 			CompletionTime: time.Now().Add(time.Hour),
 		},
 	}
@@ -1406,7 +1406,7 @@ func (s *TransactionTestSuite) TestSaveUndelegations() {
 			Time:           time.Now(),
 			ValidatorId:    2,
 			AddressId:      1,
-			Amount:         types.NewNumeric(decimal.NewFromInt(10)),
+			Amount:         types.NumericFromInt64(10),
 			CompletionTime: time.Now().Add(time.Hour),
 		},
 	}
@@ -1433,11 +1433,11 @@ func (s *TransactionTestSuite) TestSaveDelegations() {
 		{
 			ValidatorId: 2,
 			AddressId:   1,
-			Amount:      types.NewNumeric(decimal.NewFromInt(10)),
+			Amount:      types.NumericFromInt64(10),
 		}, {
 			ValidatorId: 1,
 			AddressId:   1,
-			Amount:      types.NewNumeric(decimal.NewFromInt(10)),
+			Amount:      types.NumericFromInt64(10),
 		},
 	}
 
@@ -1495,7 +1495,7 @@ func (s *TransactionTestSuite) TestJail() {
 
 	err = tx.Jail(ctx, &storage.Validator{
 		Id:    2,
-		Stake: types.NewNumeric(decimal.NewFromInt(-10)),
+		Stake: types.NumericFromInt64(-10),
 	})
 	s.Require().NoError(err)
 
@@ -1552,13 +1552,13 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 			ConsAddress:       "95764047BDFFB5CCADFA635DC63365EEB65F00C2",
 			Rate:              types.NewNumeric(decimal.NewFromFloat32(0.2)),
 			MaxRate:           types.NewNumeric(decimal.NewFromFloat32(0.2)),
-			MaxChangeRate:     types.NewNumeric(decimal.Zero),
-			MinSelfDelegation: types.NewNumeric(decimal.Zero),
+			MaxChangeRate:     types.NumericZero(),
+			MinSelfDelegation: types.NumericZero(),
 			Identity:          "0068ECE5E6EB5359",
-			Stake:             types.NewNumeric(decimal.NewFromInt(100)),
+			Stake:             types.NumericFromInt64(100),
 			Moniker:           "Polychain",
-			Commissions:       types.NewNumeric(decimal.Zero),
-			Rewards:           types.NewNumeric(decimal.Zero),
+			Commissions:       types.NumericZero(),
+			Rewards:           types.NumericZero(),
 			Height:            1001,
 			Jailed:            testsuite.Ptr(false),
 			CreationTime:      ct,
@@ -1566,22 +1566,22 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 			Address:     "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
 			Delegator:   "celestia189ecvq5avj0wehrcfnagpd5sd8pup9aq7j2xd9",
 			Rate:        types.NewNumeric(decimal.NewFromFloat32(0.06)),
-			Commissions: types.NewNumeric(decimal.NewFromInt(100)),
-			Rewards:     types.NewNumeric(decimal.NewFromInt(200)),
+			Commissions: types.NumericFromInt64(100),
+			Rewards:     types.NumericFromInt64(200),
 			Website:     "test-website",
 			Identity:    storage.DoNotModify,
 			Contacts:    storage.DoNotModify,
 			Moniker:     storage.DoNotModify,
 			Details:     storage.DoNotModify,
-			Stake:       types.NewNumeric(decimal.Zero),
+			Stake:       types.NumericZero(),
 			Height:      1001,
 			Jailed:      testsuite.Ptr(true),
 		}, {
 			Address:     "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw",
 			Delegator:   "celestia17vmk8m246t648hpmde2q7kp4ft9uwrayps85dg",
-			Commissions: types.NewNumeric(decimal.NewFromInt(100)),
-			Rewards:     types.NewNumeric(decimal.NewFromInt(200)),
-			Stake:       types.NewNumeric(decimal.Zero),
+			Commissions: types.NumericFromInt64(100),
+			Rewards:     types.NumericFromInt64(200),
+			Stake:       types.NumericZero(),
 			Website:     storage.DoNotModify,
 			Identity:    storage.DoNotModify,
 			Contacts:    storage.DoNotModify,
@@ -1633,14 +1633,14 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 		{
 			Address:     "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr",
 			Delegator:   "celestia189ecvq5avj0wehrcfnagpd5sd8pup9aq7j2xd9",
-			Commissions: types.NewNumeric(decimal.NewFromInt(100)),
-			Rewards:     types.NewNumeric(decimal.NewFromInt(200)),
+			Commissions: types.NumericFromInt64(100),
+			Rewards:     types.NumericFromInt64(200),
 			Identity:    storage.DoNotModify,
 			Website:     storage.DoNotModify,
 			Contacts:    storage.DoNotModify,
 			Moniker:     storage.DoNotModify,
 			Details:     storage.DoNotModify,
-			Stake:       types.NewNumeric(decimal.Zero),
+			Stake:       types.NumericZero(),
 		},
 	}
 
@@ -1989,7 +1989,7 @@ func (s *TransactionTestSuite) TestHyperlaneTokens() {
 		SentTransfers:    1,
 		ReceiveTransfers: 1,
 		Sent:             types.NumericFromInt64(123),
-		Received:         types.NewNumeric(decimal.Zero),
+		Received:         types.NumericZero(),
 	})
 	s.Require().NoError(err)
 
@@ -2085,13 +2085,13 @@ func (s *TransactionTestSuite) TestSaveSignals() {
 		ConsAddress:       "95764047BDFFB5CCADFA635DC63365EEB65F00C2",
 		Rate:              types.NewNumeric(decimal.NewFromFloat32(0.2)),
 		MaxRate:           types.NewNumeric(decimal.NewFromFloat32(0.2)),
-		MaxChangeRate:     types.NewNumeric(decimal.Zero),
-		MinSelfDelegation: types.NewNumeric(decimal.Zero),
+		MaxChangeRate:     types.NumericZero(),
+		MinSelfDelegation: types.NumericZero(),
 		Identity:          "0068ECE5E6EB5359",
-		Stake:             types.NewNumeric(decimal.NewFromInt(100)),
+		Stake:             types.NumericFromInt64(100),
 		Moniker:           "Polychain",
-		Commissions:       types.NewNumeric(decimal.Zero),
-		Rewards:           types.NewNumeric(decimal.Zero),
+		Commissions:       types.NumericZero(),
+		Rewards:           types.NumericZero(),
 		Height:            1001,
 		Jailed:            testsuite.Ptr(false),
 	}

@@ -11,7 +11,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -260,7 +259,7 @@ func Test_handleSubmitProposal(t *testing.T) {
 			proposal: storage.Proposal{
 				Id:      2,
 				Status:  types.ProposalStatusInactive,
-				Deposit: types.NewNumeric(decimal.Zero),
+				Deposit: types.NumericZero(),
 			},
 		}, {
 			name: "submit_proposal test 4",

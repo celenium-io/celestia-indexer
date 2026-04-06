@@ -10,7 +10,6 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -64,7 +63,7 @@ func TestNewValidatorUptime(t *testing.T) {
 
 func TestNewValidator(t *testing.T) {
 	t.Run("validator with nil jailed field", func(t *testing.T) {
-		dec := storageTypes.NewNumeric(decimal.NewFromInt(100))
+		dec := storageTypes.NumericFromInt64(100)
 		validator := storage.Validator{
 			Jailed:            nil,
 			Id:                1,
@@ -81,7 +80,7 @@ func TestNewValidator(t *testing.T) {
 	})
 
 	t.Run("validator with false jailed field", func(t *testing.T) {
-		dec := storageTypes.NewNumeric(decimal.NewFromInt(100))
+		dec := storageTypes.NumericFromInt64(100)
 		validator := storage.Validator{
 			Jailed:            testsuite.Ptr(false),
 			Id:                1,
@@ -98,7 +97,7 @@ func TestNewValidator(t *testing.T) {
 	})
 
 	t.Run("validator with true jailed field", func(t *testing.T) {
-		dec := storageTypes.NewNumeric(decimal.NewFromInt(100))
+		dec := storageTypes.NumericFromInt64(100)
 		validator := storage.Validator{
 			Jailed:            testsuite.Ptr(true),
 			Id:                1,

@@ -158,14 +158,14 @@ func saveUpgrades(
 func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transaction) (types.Numeric, []storage.Validator, error) {
 	maxVals, err := module.constants.Get(ctx, types.ModuleNameStaking, "max_validators")
 	if err != nil {
-		return types.Numeric{}, nil, errors.Wrap(err, "get max validators value")
+		return types.NumericZero(), nil, errors.Wrap(err, "get max validators value")
 	}
 	validators, err := tx.BondedValidators(ctx, maxVals.MustInt())
 	if err != nil {
-		return types.Numeric{}, nil, errors.Wrap(err, "get validators")
+		return types.NumericZero(), nil, errors.Wrap(err, "get validators")
 	}
 
-	var power types.Numeric
+	power := types.NumericZero()
 	for i := range validators {
 		power = power.Add(validators[i].Stake)
 	}

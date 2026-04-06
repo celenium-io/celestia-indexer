@@ -34,9 +34,9 @@ func parseCoinSpent(ctx *context.Context, data map[string]string, height pkgType
 		LastHeight: height,
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
-			Spendable: types.NewNumeric(decimal.Zero),
-			Delegated: types.NewNumeric(decimal.Zero),
-			Unbonding: types.NewNumeric(decimal.Zero),
+			Spendable: types.NumericZero(),
+			Delegated: types.NumericZero(),
+			Unbonding: types.NumericZero(),
 		},
 	}
 
@@ -68,9 +68,9 @@ func parseCoinReceived(ctx *context.Context, data map[string]string, height pkgT
 		LastHeight: height,
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
-			Spendable: types.NewNumeric(decimal.Zero),
-			Delegated: types.NewNumeric(decimal.Zero),
-			Unbonding: types.NewNumeric(decimal.Zero),
+			Spendable: types.NumericZero(),
+			Delegated: types.NumericZero(),
+			Unbonding: types.NumericZero(),
 		},
 	}
 
@@ -102,9 +102,9 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]string) error 
 		LastHeight: ctx.Block.Height,
 		Balance: storage.Balance{
 			Currency:  currency.DefaultCurrency,
-			Spendable: types.NewNumeric(decimal.Zero),
-			Delegated: types.NewNumeric(decimal.Zero),
-			Unbonding: types.NewNumeric(decimal.Zero),
+			Spendable: types.NumericZero(),
+			Delegated: types.NumericZero(),
+			Unbonding: types.NumericZero(),
 		},
 	}
 

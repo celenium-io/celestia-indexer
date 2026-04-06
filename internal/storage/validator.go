@@ -12,7 +12,6 @@ import (
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
-	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -92,13 +91,13 @@ const DoNotModify = "[do-not-modify]"
 
 func EmptyValidator() Validator {
 	return Validator{
-		Rate:              types.NewNumeric(decimal.Zero),
-		MaxRate:           types.NewNumeric(decimal.Zero),
-		MaxChangeRate:     types.NewNumeric(decimal.Zero),
-		MinSelfDelegation: types.NewNumeric(decimal.Zero),
-		Rewards:           types.NewNumeric(decimal.Zero),
-		Commissions:       types.NewNumeric(decimal.Zero),
-		Stake:             types.NewNumeric(decimal.Zero),
+		Rate:              types.NumericZero(),
+		MaxRate:           types.NumericZero(),
+		MaxChangeRate:     types.NumericZero(),
+		MinSelfDelegation: types.NumericZero(),
+		Rewards:           types.NumericZero(),
+		Commissions:       types.NumericZero(),
+		Stake:             types.NumericZero(),
 		Contacts:          DoNotModify,
 		Details:           DoNotModify,
 		Identity:          DoNotModify,
