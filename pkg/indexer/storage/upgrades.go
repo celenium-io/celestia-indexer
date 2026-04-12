@@ -18,7 +18,7 @@ func (module *Module) upgrade(ctx context.Context, decodeContext *decodeContext.
 	}
 
 	switch targetVersion {
-	case 1, 2, 3, 4, 5:
+	case 1, 2, 3, 4, 5, 8:
 		// No upgrade logic needed for these versions
 	case 6:
 		// CIP-037 Reduce the validator unbonding period from 21 days to 14 days and 1 hour to improve capital efficiency while maintaining network security (https://cips.celestia.org/cip-037.html)
