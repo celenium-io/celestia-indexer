@@ -6,7 +6,7 @@ package handle
 import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	zkismTypes "github.com/celestiaorg/celestia-app/v7/x/zkism/types"
+	zkismTypes "github.com/celestiaorg/celestia-app/v8/x/zkism/types"
 )
 
 // MsgCreateInterchainSecurityModule

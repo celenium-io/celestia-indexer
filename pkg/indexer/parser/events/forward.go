@@ -4,8 +4,7 @@
 package events
 
 import (
-	"encoding/json"
-
+	"github.com/bcp-innovations/hyperlane-cosmos/util"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
@@ -35,8 +34,6 @@ func processForward(ctx *context.Context, events []storage.Event, msg *storage.M
 		TxId:   msg.TxId,
 	}
 
-	var tokens = make([]map[string]string, 0)
-
 	for ; len(events) > *idx; *idx += 1 {
 		switch events[*idx].Type {
 		case types.EventTypeCelestiaforwardingv1EventTokenForwarded:
@@ -45,47 +42,67 @@ func processForward(ctx *context.Context, events []storage.Event, msg *storage.M
 				return errors.Wrap(err, "decoding token forwarded event")
 			}
 
-			token := map[string]string{
-				"denom":  forwarded.Denom,
-				"amount": forwarded.Amount,
+			// Pre-v8 format lacks token_id — drain remaining events for this
+			// message without creating a forwarding entity.
+			if forwarded.TokenId == "" {
+				for *idx += 1; len(events) > *idx; *idx += 1 {
+					if decoder.StringFromMap(events[*idx].Data, "action") != "" {
+						return nil
+					}
+				}
+				return nil
 			}
-			if forwarded.Error != "" {
-				token["error"] = forwarded.Error
-			}
-			tokens = append(tokens, token)
 
-		case types.EventTypeCelestiaforwardingv1EventForwardingComplete:
-			complete, err := decode.NewEventForwardingComplete(events[*idx].Data)
+			forwarding.Amount, err = types.NumericFromString(forwarded.Amount)
 			if err != nil {
-				return errors.Wrap(err, "decoding forwarding complete event")
+				return errors.Wrap(err, "parsing amount as numeric")
+			}
+			forwarding.Denom = forwarded.Denom
+			forwarding.MessageId = forwarded.MessageId
+
+			tokenId, err := util.DecodeHexAddress(forwarded.TokenId)
+			if err != nil {
+				return errors.Wrap(err, "decode token id")
+			}
+
+			forwarding.Token = &storage.HLToken{
+				TokenId: tokenId.Bytes(),
 			}
 			forwarding.Address = &storage.Address{
-				Address:      complete.ForwardAddress,
+				Address:      forwarded.ForwardAddress,
+				IsForwarding: true,
 				Height:       msg.Height,
 				LastHeight:   msg.Height,
-				IsForwarding: true,
 				Balance:      storage.EmptyBalance(),
 			}
-			if err := ctx.AddAddress(forwarding.Address); err != nil {
-				return errors.Wrap(err, "adding forwarding address to context")
+			if err = ctx.AddAddress(forwarding.Address); err != nil {
+				return errors.Wrap(err, "add forwarding address")
 			}
 
-			forwarding.SuccessCount = complete.SuccessfulCount
-			forwarding.FailedCount = complete.FailedCount
-			forwarding.DestDomain = complete.DestinationDomain
-			forwarding.DestRecipient = complete.DestinationRecipient
-
-			transfers, err := json.Marshal(tokens)
+		case types.EventTypeHyperlanewarpv1EventSendRemoteTransfer:
+			event, err := decode.NewHyperlaneSendTransferEvent(events[*idx].Data)
 			if err != nil {
-				return errors.Wrap(err, "json marshalling transfers")
+				return errors.Wrap(err, "parse hyperlane send transfer event")
 			}
-			forwarding.Transfers = transfers
+
+			recipient, err := util.DecodeHexAddress(event.Recipient)
+			if err != nil {
+				return errors.Wrap(err, "decode recipient address")
+			}
+			forwarding.DestDomain = event.DestinationDomain
+			forwarding.DestRecipient = recipient.Bytes()
+
 		default:
 			if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "" {
 				ctx.AddForwarding(&forwarding)
 				return nil
 			}
 		}
+	}
+
+	if forwarding.Token == nil {
+		// if token is absent in events, we can't process forwarding
+		return nil
 	}
 
 	ctx.AddForwarding(&forwarding)

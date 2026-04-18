@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"encoding/hex"
 	"time"
 
@@ -31,7 +32,8 @@ func (s *StorageTestSuite) TestForwardingById() {
 	s.Require().NotNil(fwd.Tx)
 	s.Require().EqualValues("d764fea03c8d8dbf0608d0e24ab0b600adb15149b465356cc73d78b2278e38d5", hex.EncodeToString(fwd.Tx.Hash))
 
-	s.Require().NotNil(fwd.Transfers)
+	s.Require().NotNil(fwd.Token)
+	s.Require().EqualValues([]byte("token"), fwd.Token.TokenId)
 }
 
 func (s *StorageTestSuite) TestForwardingByHeight() {
@@ -58,7 +60,8 @@ func (s *StorageTestSuite) TestForwardingByHeight() {
 	s.Require().NotNil(fwd.Tx)
 	s.Require().EqualValues("d764fea03c8d8dbf0608d0e24ab0b600adb15149b465356cc73d78b2278e38d5", hex.EncodeToString(fwd.Tx.Hash))
 
-	s.Require().NotNil(fwd.Transfers)
+	s.Require().NotNil(fwd.Token)
+	s.Require().EqualValues([]byte("token"), fwd.Token.TokenId)
 }
 
 func (s *StorageTestSuite) TestForwardingByTxId() {
@@ -85,7 +88,8 @@ func (s *StorageTestSuite) TestForwardingByTxId() {
 	s.Require().NotNil(fwd.Tx)
 	s.Require().EqualValues("d764fea03c8d8dbf0608d0e24ab0b600adb15149b465356cc73d78b2278e38d5", hex.EncodeToString(fwd.Tx.Hash))
 
-	s.Require().NotNil(fwd.Transfers)
+	s.Require().NotNil(fwd.Token)
+	s.Require().EqualValues([]byte("token"), fwd.Token.TokenId)
 }
 
 func (s *StorageTestSuite) TestForwardingByAddressId() {
@@ -112,7 +116,8 @@ func (s *StorageTestSuite) TestForwardingByAddressId() {
 	s.Require().NotNil(fwd.Tx)
 	s.Require().EqualValues("d764fea03c8d8dbf0608d0e24ab0b600adb15149b465356cc73d78b2278e38d5", hex.EncodeToString(fwd.Tx.Hash))
 
-	s.Require().NotNil(fwd.Transfers)
+	s.Require().NotNil(fwd.Token)
+	s.Require().EqualValues([]byte("token"), fwd.Token.TokenId)
 }
 
 func (s *StorageTestSuite) TestForwardingByFrom() {
@@ -139,7 +144,8 @@ func (s *StorageTestSuite) TestForwardingByFrom() {
 	s.Require().NotNil(fwd.Tx)
 	s.Require().EqualValues("d764fea03c8d8dbf0608d0e24ab0b600adb15149b465356cc73d78b2278e38d5", hex.EncodeToString(fwd.Tx.Hash))
 
-	s.Require().NotNil(fwd.Transfers)
+	s.Require().NotNil(fwd.Token)
+	s.Require().EqualValues([]byte("token"), fwd.Token.TokenId)
 }
 
 func (s *StorageTestSuite) TestForwardingByTo() {
@@ -166,7 +172,8 @@ func (s *StorageTestSuite) TestForwardingByTo() {
 	s.Require().NotNil(fwd.Tx)
 	s.Require().EqualValues("d764fea03c8d8dbf0608d0e24ab0b600adb15149b465356cc73d78b2278e38d5", hex.EncodeToString(fwd.Tx.Hash))
 
-	s.Require().NotNil(fwd.Transfers)
+	s.Require().NotNil(fwd.Token)
+	s.Require().EqualValues([]byte("token"), fwd.Token.TokenId)
 }
 
 func (s *StorageTestSuite) TestForwardingInputs() {
@@ -184,4 +191,58 @@ func (s *StorageTestSuite) TestForwardingInputs() {
 	s.Require().Equal("1000", input1.Amount)
 	s.Require().Equal("utia", input1.Denom)
 	s.Require().EqualValues(123450, input1.Counterparty)
+}
+
+// TestForwardingByIdCorrectRecord verifies that ById returns the record matching the
+// requested id even when it sits at a different time than the preceding records.
+// An incorrect ORDER BY in the outer query (using Order instead of OrderExpr) would
+// cause PostgreSQL to return rows in heap order, yielding id=2 instead of id=3.
+func (s *StorageTestSuite) TestForwardingByIdCorrectRecord() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	// id=3 is at '2024-07-04T03:07:00' — 7 minutes after ids 1 and 2.
+	// A broken ORDER BY would return id=2 here.
+	fwd, prevTime, err := s.storage.Forwardings.ById(ctx, 3)
+	s.Require().NoError(err)
+	s.Require().EqualValues(3, fwd.Id)
+	s.Require().EqualValues(10001, fwd.Height)
+	// prevTime must equal the time of the preceding forwarding (id=2)
+	s.Require().Equal(time.Date(2024, 7, 4, 3, 0, 0, 0, time.UTC), prevTime.UTC())
+}
+
+// TestForwardingByIdNotFound verifies that requesting a non-existent forwarding id
+// returns sql.ErrNoRows instead of silently returning a record with a lower id.
+func (s *StorageTestSuite) TestForwardingByIdNotFound() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	// id=4 does not exist in the forwarding fixture (only 1, 2, 3 exist).
+	// Without the fwds[0].Id != id guard the query would silently return id=3.
+	_, _, err := s.storage.Forwardings.ById(ctx, 4)
+	s.Require().ErrorIs(err, sql.ErrNoRows)
+}
+
+// TestForwardingInputsAtSameTime verifies that an HL receive transfer whose time
+// equals the upper bound is included in the inputs list.
+// This requires a non-strict (<=) comparison; a strict (<) would exclude it.
+func (s *StorageTestSuite) TestForwardingInputsAtSameTime() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	// hl_transfer fixture id=3: type=receive, address_id=5, time='2023-07-04T04:11:57', counterparty=123450.
+	// Passing that exact time as `to` should include the transfer with <=, but exclude it with <.
+	sameTime := time.Date(2023, 7, 4, 4, 11, 57, 0, time.UTC)
+	inputs, err := s.storage.Forwardings.Inputs(ctx, 5, time.Time{}, sameTime)
+	s.Require().NoError(err)
+
+	found := false
+	for _, inp := range inputs {
+		if inp.Counterparty == 123450 {
+			found = true
+			s.Require().Equal("1000", inp.Amount)
+			s.Require().Equal("utia", inp.Denom)
+		}
+	}
+	s.Require().True(found, "HL receive transfer with time == upper bound must appear in inputs")
 }

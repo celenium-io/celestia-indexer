@@ -12,7 +12,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	decodeTestutil "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/testutil"
-	signal "github.com/celestiaorg/celestia-app/v7/x/signal/types"
+	signal "github.com/celestiaorg/celestia-app/v8/x/signal/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )

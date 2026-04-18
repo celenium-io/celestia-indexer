@@ -62,7 +62,7 @@ configs/
 |---------|---------|
 | HTTP | `github.com/labstack/echo/v4` |
 | ORM | `github.com/uptrace/bun` + `github.com/jackc/pgx/v5` (via `pgx/v5/stdlib`) |
-| Blockchain | `github.com/celestiaorg/celestia-app/v7`, `github.com/cometbft/cometbft` |
+| Blockchain | `github.com/celestiaorg/celestia-app/v8`, `github.com/cometbft/cometbft` |
 | Cosmos | `github.com/cosmos/cosmos-sdk`, `github.com/cosmos/ibc-go/v8` |
 | Cache | `github.com/valkey-io/valkey-go` |
 | Logging | `github.com/rs/zerolog` |
@@ -336,7 +336,7 @@ Key entities indexed (57 total storage types):
 
 - Mocks are auto-generated in `mock/` subdirectories — never edit manually
 - DB integration tests spin up a real TimescaleDB Docker container via testcontainers — **Docker must be running**
-- `testfixtures` for DB integration tests (`test/` directory)
+- `testfixtures` for DB integration tests (`test/` directory); **avoid `0x`-prefixed strings in YAML fixtures** — testfixtures interprets them as hex-encoded bytea, causing invalid UTF-8 errors when inserting into `text` columns
 - Newman collection for API tests: `make test-api`
 - Run `make test` before committing
 - Coverage: `make cover`

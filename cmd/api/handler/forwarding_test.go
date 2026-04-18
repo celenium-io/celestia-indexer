@@ -17,6 +17,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -27,17 +28,21 @@ var testForwarding = storage.Forwarding{
 	Height:        100,
 	Time:          testTime,
 	AddressId:     1,
-	DestDomain:    123456789,
-	DestRecipient: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf1},
-	SuccessCount:  10,
-	FailedCount:   2,
+	DestDomain:    11155111,
+	DestRecipient: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd5, 0xe8, 0x5e, 0x86, 0xfc, 0x69, 0x2c, 0xed, 0xad, 0x6d, 0x69, 0x92, 0xf1, 0xf0, 0xcc, 0xf2, 0x73, 0xe3, 0x99, 0x13},
 	TxId:          1,
-	Transfers:     json.RawMessage(`[{"denom":"utia","amount":"1000"}]`),
+	TokenId:       1,
+	MessageId:     "ac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4",
+	Amount:        storageTypes.MustNumericFromString("1000000"),
+	Denom:         "hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024",
 	Address: &storage.Address{
 		Address: testAddress,
 	},
 	Tx: &storage.Tx{
 		Hash: testTxHashBytes,
+	},
+	Token: &storage.HLToken{
+		TokenId: []byte("token"),
 	},
 }
 
@@ -112,13 +117,15 @@ func (s *ForwardingTestSuite) TestList() {
 	s.Require().EqualValues(100, fwd.Height)
 	s.Require().Equal(testTime, fwd.Time)
 	s.Require().EqualValues(strings.ToLower(testTxHash), fwd.TxHash)
-	s.Require().EqualValues(123456789, fwd.DestDomain)
+	s.Require().EqualValues(11155111, fwd.DestDomain)
 	s.Require().NotNil(fwd.ForwardAddress)
 	s.Require().Equal(testAddress, fwd.ForwardAddress.Hash)
 	s.Require().NotNil(fwd.Chain)
 	s.Require().Equal(testChainMetadata.DisplayName, fwd.Chain.Name)
-	s.Require().EqualValues(10, fwd.SuccessCount)
-	s.Require().EqualValues(2, fwd.FailedCount)
+	s.Require().Equal("1000000", fwd.Amount)
+	s.Require().Equal("hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024", fwd.Denom)
+	s.Require().Equal("ac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4", fwd.MessageId)
+	s.Require().Equal("746f6b656e", fwd.TokenId)
 }
 
 func (s *ForwardingTestSuite) TestListDefaults() {
@@ -327,13 +334,14 @@ func (s *ForwardingTestSuite) TestGet() {
 	s.Require().EqualValues(100, response.Height)
 	s.Require().Equal(testTime, response.Time)
 	s.Require().EqualValues(strings.ToLower(testTxHash), response.TxHash)
-	s.Require().EqualValues(123456789, response.DestDomain)
+	s.Require().EqualValues(11155111, response.DestDomain)
 	s.Require().NotNil(response.ForwardAddress)
 	s.Require().Equal(testAddress, response.ForwardAddress.Hash)
 	s.Require().NotNil(response.Chain)
 	s.Require().Equal(testChainMetadata.DisplayName, response.Chain.Name)
-	s.Require().EqualValues(10, response.SuccessCount)
-	s.Require().EqualValues(2, response.FailedCount)
+	s.Require().Equal("1000000", response.Amount)
+	s.Require().Equal("hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024", response.Denom)
+	s.Require().Equal("ac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4", response.MessageId)
 	s.Require().Len(response.Inputs, 2)
 
 	input1 := response.Inputs[0]

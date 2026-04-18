@@ -12,7 +12,7 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	fwdTypes "github.com/celestiaorg/celestia-app/v7/x/forwarding/types"
+	fwdTypes "github.com/celestiaorg/celestia-app/v8/x/forwarding/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )
