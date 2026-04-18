@@ -22,6 +22,7 @@ type Forwarding struct {
 	Amount      string         `example:"1000000"                                                                      format:"string"    json:"amount"       swaggertype:"string"`
 	Denom       string         `example:"hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024" format:"string"    json:"denom"        swaggertype:"string"`
 	MessageId   string         `example:"0xac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4"           format:"string"    json:"message_id"   swaggertype:"string"`
+	TokenId     string         `example:"12652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF345"        format:"string"    json:"token_id"     swaggertype:"string"`
 
 	Chain          *ChainMetadata    `json:"chain,omitempty"`
 	ForwardAddress *ShortAddress     `json:"forward_address,omitempty"`
@@ -49,6 +50,10 @@ func NewForwarding(forwarding storage.Forwarding, store hyperlane.IChainStore) F
 
 	if len(forwarding.DestRecipient) > 0 {
 		response.DestAddress = hex.EncodeToString(forwarding.DestRecipient)
+	}
+
+	if forwarding.Token != nil {
+		response.TokenId = hex.EncodeToString(forwarding.Token.TokenId)
 	}
 
 	if store != nil {

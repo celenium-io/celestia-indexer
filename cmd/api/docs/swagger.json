@@ -9183,6 +9183,11 @@
                     "format": "date-time",
                     "example": "2023-07-04T03:10:57+00:00"
                 },
+                "token_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "12652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF345"
+                },
                 "tx_hash": {
                     "type": "string",
                     "format": "binary",

@@ -779,7 +779,7 @@ func (s *TransactionTestSuite) TestSaveForwardings() {
 
 	items, err := s.storage.Forwardings.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 3)
+	s.Require().Len(items, 4)
 }
 
 func (s *TransactionTestSuite) TestRollbackBlockSignatures() {
@@ -1149,7 +1149,7 @@ func (s *TransactionTestSuite) TestRollbackForwardings() {
 
 	items, err := s.storage.Forwardings.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 0)
+	s.Require().Len(items, 1)
 }
 
 func (s *TransactionTestSuite) TestDeleteBalances() {

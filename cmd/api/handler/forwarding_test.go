@@ -41,6 +41,9 @@ var testForwarding = storage.Forwarding{
 	Tx: &storage.Tx{
 		Hash: testTxHashBytes,
 	},
+	Token: &storage.HLToken{
+		TokenId: []byte("token"),
+	},
 }
 
 // ForwardingTestSuite -
@@ -122,6 +125,7 @@ func (s *ForwardingTestSuite) TestList() {
 	s.Require().Equal("1000000", fwd.Amount)
 	s.Require().Equal("hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024", fwd.Denom)
 	s.Require().Equal("ac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4", fwd.MessageId)
+	s.Require().Equal("746f6b656e", fwd.TokenId)
 }
 
 func (s *ForwardingTestSuite) TestListDefaults() {

@@ -45,13 +45,17 @@ func (f *Forwarding) ById(ctx context.Context, id uint64) (forwarding storage.Fo
 		Join("left join address on address.id = forwarding.address_id").
 		Join("left join tx on tx.id = forwarding.tx_id").
 		Join("left join hl_token on hl_token.id = forwarding.token_id").
-		Order("forwarding.time desc, forwarding.id desc").
+		OrderExpr("forwarding.id desc, forwarding.time desc").
 		Scan(ctx, &fwds)
 	if err != nil {
 		return forwarding, prevTime, err
 	}
 
 	if len(fwds) == 0 {
+		return forwarding, prevTime, sql.ErrNoRows
+	}
+
+	if fwds[0].Id != id {
 		return forwarding, prevTime, sql.ErrNoRows
 	}
 
@@ -119,10 +123,10 @@ func (f *Forwarding) Inputs(ctx context.Context, addressId uint64, from, to time
 		Where("address_id = ?", addressId).
 		Where("type = ?", types.HLTransferTypeReceive)
 	if !from.IsZero() {
-		transfersQuery = transfersQuery.Where("time > ?", from)
+		transfersQuery = transfersQuery.Where("time >= ?", from)
 	}
 	if !to.IsZero() {
-		transfersQuery = transfersQuery.Where("time < ?", to)
+		transfersQuery = transfersQuery.Where("time <= ?", to)
 	}
 
 	subQuery := f.DB().NewSelect().
@@ -133,10 +137,10 @@ func (f *Forwarding) Inputs(ctx context.Context, addressId uint64, from, to time
 		Where("message.type = ?", types.MsgSend)
 
 	if !from.IsZero() {
-		subQuery = subQuery.Where("message.time > ?", from)
+		subQuery = subQuery.Where("message.time >= ?", from)
 	}
 	if !to.IsZero() {
-		subQuery = subQuery.Where("message.time < ?", to)
+		subQuery = subQuery.Where("message.time <= ?", to)
 	}
 
 	subQuery = subQuery.UnionAll(
