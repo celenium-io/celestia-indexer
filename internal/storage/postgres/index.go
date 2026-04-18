@@ -1162,6 +1162,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Forwarding)(nil)).
+			Index("forwarding_token_id_idx").
+			Column("token_id").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// ZK ISM
 		if _, err := tx.NewCreateIndex().

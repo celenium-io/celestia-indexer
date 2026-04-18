@@ -5,7 +5,6 @@ package responses
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
@@ -14,15 +13,15 @@ import (
 )
 
 type Forwarding struct {
-	Id           uint64          `example:"321"                                                              format:"int64"     json:"id"            swaggertype:"integer"`
-	Height       pkgTypes.Level  `example:"100"                                                              format:"int64"     json:"height"        swaggertype:"integer"`
-	Time         time.Time       `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"          swaggertype:"string"`
-	TxHash       string          `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"       swaggertype:"string"`
-	DestDomain   uint64          `example:"123456789"                                                        format:"int64"     json:"dest_domain"   swaggertype:"integer"`
-	DestAddress  string          `example:"0x000000000000000000000000123456789abcdef123456789abcdef12345609" format:"binary"    json:"dest_address"  swaggertype:"string"`
-	SuccessCount uint64          `example:"100"                                                              format:"int64"     json:"success_count" swaggertype:"integer"`
-	FailedCount  uint64          `example:"10"                                                               format:"int64"     json:"failed_count"  swaggertype:"integer"`
-	Transfers    json.RawMessage `json:"transfers,omitempty"`
+	Id          uint64         `example:"321"                                                                          format:"int64"     json:"id"           swaggertype:"integer"`
+	Height      pkgTypes.Level `example:"100"                                                                          format:"int64"     json:"height"       swaggertype:"integer"`
+	Time        time.Time      `example:"2023-07-04T03:10:57+00:00"                                                    format:"date-time" json:"time"         swaggertype:"string"`
+	TxHash      string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"             format:"binary"    json:"tx_hash"      swaggertype:"string"`
+	DestDomain  uint64         `example:"11155111"                                                                     format:"int64"     json:"dest_domain"  swaggertype:"integer"`
+	DestAddress string         `example:"0x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913"           format:"binary"    json:"dest_address" swaggertype:"string"`
+	Amount      string         `example:"1000000"                                                                      format:"string"    json:"amount"       swaggertype:"string"`
+	Denom       string         `example:"hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024" format:"string"    json:"denom"        swaggertype:"string"`
+	MessageId   string         `example:"0xac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4"           format:"string"    json:"message_id"   swaggertype:"string"`
 
 	Chain          *ChainMetadata    `json:"chain,omitempty"`
 	ForwardAddress *ShortAddress     `json:"forward_address,omitempty"`
@@ -31,13 +30,13 @@ type Forwarding struct {
 
 func NewForwarding(forwarding storage.Forwarding, store hyperlane.IChainStore) Forwarding {
 	response := Forwarding{
-		Id:           forwarding.Id,
-		Time:         forwarding.Time,
-		Height:       forwarding.Height,
-		DestDomain:   forwarding.DestDomain,
-		SuccessCount: forwarding.SuccessCount,
-		FailedCount:  forwarding.FailedCount,
-		Transfers:    forwarding.Transfers,
+		Id:         forwarding.Id,
+		Time:       forwarding.Time,
+		Height:     forwarding.Height,
+		DestDomain: forwarding.DestDomain,
+		Amount:     forwarding.Amount.String(),
+		Denom:      forwarding.Denom,
+		MessageId:  forwarding.MessageId,
 	}
 
 	if forwarding.Tx != nil {

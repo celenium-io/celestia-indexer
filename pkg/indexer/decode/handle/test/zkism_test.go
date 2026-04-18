@@ -11,7 +11,7 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	zkismTypes "github.com/celestiaorg/celestia-app/v7/x/zkism/types"
+	zkismTypes "github.com/celestiaorg/celestia-app/v8/x/zkism/types"
 	"github.com/stretchr/testify/require"
 )
 

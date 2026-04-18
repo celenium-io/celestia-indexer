@@ -31,7 +31,8 @@ func (s *StorageTestSuite) TestForwardingById() {
 	s.Require().NotNil(fwd.Tx)
 	s.Require().EqualValues("d764fea03c8d8dbf0608d0e24ab0b600adb15149b465356cc73d78b2278e38d5", hex.EncodeToString(fwd.Tx.Hash))
 
-	s.Require().NotNil(fwd.Transfers)
+	s.Require().NotNil(fwd.Token)
+	s.Require().EqualValues([]byte("token"), fwd.Token.TokenId)
 }
 
 func (s *StorageTestSuite) TestForwardingByHeight() {
@@ -58,7 +59,8 @@ func (s *StorageTestSuite) TestForwardingByHeight() {
 	s.Require().NotNil(fwd.Tx)
 	s.Require().EqualValues("d764fea03c8d8dbf0608d0e24ab0b600adb15149b465356cc73d78b2278e38d5", hex.EncodeToString(fwd.Tx.Hash))
 
-	s.Require().NotNil(fwd.Transfers)
+	s.Require().NotNil(fwd.Token)
+	s.Require().EqualValues([]byte("token"), fwd.Token.TokenId)
 }
 
 func (s *StorageTestSuite) TestForwardingByTxId() {
@@ -85,7 +87,8 @@ func (s *StorageTestSuite) TestForwardingByTxId() {
 	s.Require().NotNil(fwd.Tx)
 	s.Require().EqualValues("d764fea03c8d8dbf0608d0e24ab0b600adb15149b465356cc73d78b2278e38d5", hex.EncodeToString(fwd.Tx.Hash))
 
-	s.Require().NotNil(fwd.Transfers)
+	s.Require().NotNil(fwd.Token)
+	s.Require().EqualValues([]byte("token"), fwd.Token.TokenId)
 }
 
 func (s *StorageTestSuite) TestForwardingByAddressId() {
@@ -112,7 +115,8 @@ func (s *StorageTestSuite) TestForwardingByAddressId() {
 	s.Require().NotNil(fwd.Tx)
 	s.Require().EqualValues("d764fea03c8d8dbf0608d0e24ab0b600adb15149b465356cc73d78b2278e38d5", hex.EncodeToString(fwd.Tx.Hash))
 
-	s.Require().NotNil(fwd.Transfers)
+	s.Require().NotNil(fwd.Token)
+	s.Require().EqualValues([]byte("token"), fwd.Token.TokenId)
 }
 
 func (s *StorageTestSuite) TestForwardingByFrom() {
@@ -139,7 +143,8 @@ func (s *StorageTestSuite) TestForwardingByFrom() {
 	s.Require().NotNil(fwd.Tx)
 	s.Require().EqualValues("d764fea03c8d8dbf0608d0e24ab0b600adb15149b465356cc73d78b2278e38d5", hex.EncodeToString(fwd.Tx.Hash))
 
-	s.Require().NotNil(fwd.Transfers)
+	s.Require().NotNil(fwd.Token)
+	s.Require().EqualValues([]byte("token"), fwd.Token.TokenId)
 }
 
 func (s *StorageTestSuite) TestForwardingByTo() {
@@ -166,7 +171,8 @@ func (s *StorageTestSuite) TestForwardingByTo() {
 	s.Require().NotNil(fwd.Tx)
 	s.Require().EqualValues("d764fea03c8d8dbf0608d0e24ab0b600adb15149b465356cc73d78b2278e38d5", hex.EncodeToString(fwd.Tx.Hash))
 
-	s.Require().NotNil(fwd.Transfers)
+	s.Require().NotNil(fwd.Token)
+	s.Require().EqualValues([]byte("token"), fwd.Token.TokenId)
 }
 
 func (s *StorageTestSuite) TestForwardingInputs() {

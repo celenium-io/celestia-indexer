@@ -9131,23 +9131,28 @@
         "responses.Forwarding": {
             "type": "object",
             "properties": {
+                "amount": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "1000000"
+                },
                 "chain": {
                     "$ref": "#/definitions/responses.ChainMetadata"
+                },
+                "denom": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024"
                 },
                 "dest_address": {
                     "type": "string",
                     "format": "binary",
-                    "example": "0x000000000000000000000000123456789abcdef123456789abcdef12345609"
+                    "example": "0x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913"
                 },
                 "dest_domain": {
                     "type": "integer",
                     "format": "int64",
-                    "example": 123456789
-                },
-                "failed_count": {
-                    "type": "integer",
-                    "format": "int64",
-                    "example": 10
+                    "example": 11155111
                 },
                 "forward_address": {
                     "$ref": "#/definitions/responses.ShortAddress"
@@ -9168,21 +9173,15 @@
                         "$ref": "#/definitions/responses.ForwardingInput"
                     }
                 },
-                "success_count": {
-                    "type": "integer",
-                    "format": "int64",
-                    "example": 100
+                "message_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "0xac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4"
                 },
                 "time": {
                     "type": "string",
                     "format": "date-time",
                     "example": "2023-07-04T03:10:57+00:00"
-                },
-                "transfers": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
                 },
                 "tx_hash": {
                     "type": "string",
@@ -12375,6 +12374,7 @@
                 "hyperlane.core.interchain_security.v1.EventCreateRoutingIsm",
                 "signal_version",
                 "ibccallbackerror-ics27_packet",
+                "ibccallbackerror-fungible_token_packet",
                 "celestia.forwarding.v1.EventTokenForwarded",
                 "celestia.forwarding.v1.EventForwardingComplete",
                 "celestia.zkism.v1.EventCreateInterchainSecurityModule",
@@ -12467,6 +12467,7 @@
                 "EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm",
                 "EventTypeSignalVersion",
                 "EventTypeIbccallbackerrorIcs27Packet",
+                "EventTypeIbccallbackerrorFungibleTokenPacket",
                 "EventTypeCelestiaforwardingv1EventTokenForwarded",
                 "EventTypeCelestiaforwardingv1EventForwardingComplete",
                 "EventTypeCelestiazkismv1EventCreateInterchainSecurityModule",

@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/pkg/errors"
 )
 
 func saveForwarding(
@@ -24,6 +25,15 @@ func saveForwarding(
 			if addrId, ok := addrToId[forwardings[i].Address.Address]; ok {
 				forwardings[i].AddressId = addrId
 			}
+		}
+		if forwardings[i].Token != nil {
+			token, err := tx.HyperlaneToken(ctx, forwardings[i].Token.TokenId)
+			if err != nil {
+				return errors.Wrapf(err, "can't find token for forwarding: %x", forwardings[i].Token.TokenId)
+			}
+			forwardings[i].TokenId = token.Id
+		} else {
+			return errors.Errorf("token is nil in forwarding")
 		}
 	}
 

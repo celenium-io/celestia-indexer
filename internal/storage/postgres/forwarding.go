@@ -41,8 +41,11 @@ func (f *Forwarding) ById(ctx context.Context, id uint64) (forwarding storage.Fo
 		ColumnExpr("forwarding.*").
 		ColumnExpr("address.id as address__id, address.address as address__address").
 		ColumnExpr("tx.hash as tx__hash").
+		ColumnExpr("hl_token.token_id as token__token_id").
 		Join("left join address on address.id = forwarding.address_id").
 		Join("left join tx on tx.id = forwarding.tx_id").
+		Join("left join hl_token on hl_token.id = forwarding.token_id").
+		Order("forwarding.time desc, forwarding.id desc").
 		Scan(ctx, &fwds)
 	if err != nil {
 		return forwarding, prevTime, err
@@ -95,8 +98,10 @@ func (f *Forwarding) Filter(ctx context.Context, filters storage.ForwardingFilte
 		ColumnExpr("forwarding.*").
 		ColumnExpr("address.id as address__id, address.address as address__address").
 		ColumnExpr("tx.hash as tx__hash").
+		ColumnExpr("hl_token.token_id as token__token_id").
 		Join("left join address on address.id = forwarding.address_id").
 		Join("left join tx on tx.id = forwarding.tx_id").
+		Join("left join hl_token on hl_token.id = forwarding.token_id").
 		OrderExpr("forwarding.time ?0, forwarding.id ?0", bun.Safe(filters.Sort)).
 		Scan(ctx, &forwardings)
 

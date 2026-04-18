@@ -770,9 +770,7 @@ func (s *TransactionTestSuite) TestSaveForwardings() {
 		DestRecipient: testsuite.RandomBytes(32),
 		AddressId:     1,
 		TxId:          1,
-		SuccessCount:  0,
-		FailedCount:   1,
-		Transfers:     []byte(`[{"amount":"1000","denom":"utia","error":"some error"}]`),
+		TokenId:       1,
 	})
 	s.Require().NoError(err)
 

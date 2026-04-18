@@ -3,30 +3,20 @@
   time: '2024-07-04T03:00:00+00:00'
   address_id: 5
   tx_id: 5
-  dest_domain: 123
-  dest_recipient: '0x0123456789'
-  success_count: 1
-  failed_count: 1
-  transfers:
-    - amount: 10
-      denom: eth
-      error:
-    - amount: 10
-      denom: usdt
-      error: failed due to some reason
+  dest_domain: 11155111
+  dest_recipient: '\x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913'
+  token_id: 1
+  message_id: 'ac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4'
+  amount: 1000000
+  denom: 'hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024'
 - id: 2
   height: 10000
   time: '2024-07-04T03:00:00+00:00'
   address_id: 5
   tx_id: 5
-  dest_domain: 123
-  dest_recipient: '0x0123456789'
-  success_count: 1
-  failed_count: 1
-  transfers:
-    - amount: 10
-      denom: eth
-      error:
-    - amount: 10
-      denom: usdt
-      error: failed due to some reason
+  dest_domain: 11155111
+  dest_recipient: '\x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913'
+  token_id: 1
+  message_id: 'bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4ac8852'
+  amount: 500000
+  denom: 'hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024'

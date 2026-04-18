@@ -876,45 +876,12 @@ func NewHyperlaneSetIgpEvent(m map[string]string) (hsie HyperlaneSetIgpEvent, er
 	return
 }
 
-type EventForwardingComplete struct {
-	ForwardAddress       string
-	DestinationDomain    uint64
-	DestinationRecipient []byte
-	SuccessfulCount      uint64
-	FailedCount          uint64
-}
-
-func NewEventForwardingComplete(m map[string]string) (efc EventForwardingComplete, err error) {
-	efc.ForwardAddress, err = parseUnquoteOptional(decoder.StringFromMap(m, "forward_addr"))
-	if err != nil {
-		return efc, errors.Wrap(err, "forward_addr")
-	}
-	efc.DestinationDomain, err = decoder.Uint64FromMap(m, "dest_domain")
-	if err != nil {
-		return efc, errors.Wrap(err, "dest_domain")
-	}
-	efc.DestinationRecipient, err = decoder.BytesFromMap(m, "dest_recipient")
-	if err != nil {
-		return efc, errors.Wrap(err, "dest_recipient")
-	}
-	efc.SuccessfulCount, err = decoder.Uint64FromMap(m, "tokens_forwarded")
-	if err != nil {
-		return efc, errors.Wrap(err, "tokens_forwarded")
-	}
-	efc.FailedCount, err = decoder.Uint64FromMap(m, "tokens_failed")
-	if err != nil {
-		return efc, errors.Wrap(err, "tokens_failed")
-	}
-	return
-}
-
 type EventTokenForwarded struct {
 	ForwardAddress string
 	Denom          string
 	Amount         string
 	MessageId      string
-	Success        bool
-	Error          string
+	TokenId        string
 }
 
 func NewEventTokenForwarded(m map[string]string) (etf EventTokenForwarded, err error) {
@@ -934,13 +901,9 @@ func NewEventTokenForwarded(m map[string]string) (etf EventTokenForwarded, err e
 	if err != nil {
 		return etf, errors.Wrap(err, "message_id")
 	}
-	etf.Success, err = decoder.BoolFromMap(m, "success")
+	etf.TokenId, err = parseUnquoteOptional(decoder.StringFromMap(m, "token_id"))
 	if err != nil {
-		return etf, errors.Wrap(err, "success")
-	}
-	etf.Error, err = parseUnquoteOptional(decoder.StringFromMap(m, "error"))
-	if err != nil {
-		return etf, errors.Wrap(err, "error")
+		return etf, errors.Wrap(err, "token_id")
 	}
 	return
 }

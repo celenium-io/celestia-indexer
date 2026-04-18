@@ -6,7 +6,7 @@ package handle
 import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	fwdTypes "github.com/celestiaorg/celestia-app/v7/x/forwarding/types"
+	fwdTypes "github.com/celestiaorg/celestia-app/v8/x/forwarding/types"
 )
 
 // MsgForward
