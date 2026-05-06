@@ -1053,6 +1053,228 @@ func Test_handleRecvPacket(t *testing.T) {
 				},
 			},
 			idx: testsuite.Ptr(0),
+		}, {
+			name: "failed ICA recv packet with ibccallbackerror followed by successful ICA recv packet",
+			ctx:  context.NewContext(),
+			events: []storage.Event{
+				{
+					Height: 10976211,
+					Type:   "message",
+					Data: map[string]string{
+						"action":    "/ibc.core.channel.v1.MsgRecvPacket",
+						"msg_index": "0",
+					},
+				}, {
+					Height: 10976211,
+					Type:   "recv_packet",
+					Data: map[string]string{
+						"packet_channel_ordering":  "ORDER_ORDERED",
+						"packet_connection":        "connection-4",
+						"packet_data":              "{\"data\":\"CrQBCiMvY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dEZWxlZ2F0ZRKMAQpDY2VsZXN0aWExbHVtYWVtemV0Z3g3ZmE4Z2N3M3dhYWdldnM2cnFoZWpmd3hkdnN6enhsbmVzZWxzaHd4cW01cm14bhI2Y2VsZXN0aWF2YWxvcGVyMTMzdDRncHY0dmhwcWdmbjlncjhsNHU0MjN6cmdsZzhya3FldXByGg0KBHV0aWESBTEwMDAw\",\"memo\":\"\",\"type\":\"TYPE_EXECUTE_TX\"}",
+						"packet_data_hex":          "",
+						"packet_dst_channel":       "channel-275",
+						"packet_dst_port":          "icahost",
+						"packet_sequence":          "91",
+						"packet_src_channel":       "channel-551",
+						"packet_src_port":          "icacontroller-celestia.DELEGATION",
+						"packet_timeout_height":    "0-0",
+						"packet_timeout_timestamp": "1778111280451745000",
+						"msg_index":                "0",
+					},
+				}, {
+					Height: 10976211,
+					Type:   "message",
+					Data: map[string]string{
+						"module":    "ibc_channel",
+						"msg_index": "0",
+					},
+				}, {
+					Height: 10976211,
+					Type:   types.EventTypeIbccallbackerrorIcs27Packet,
+					Data: map[string]string{
+						"ibccallbackerror-module":          "interchainaccounts",
+						"ibccallbackerror-host_channel_id": "channel-275",
+						"ibccallbackerror-success":         "false",
+						"ibccallbackerror-error":           "failed to execute interchain account transaction: failed to delegate; 718210utia is smaller than 975460utia: insufficient funds",
+						"msg_index":                        "0",
+					},
+				}, {
+					Height: 10976211,
+					Type:   "write_acknowledgement",
+					Data: map[string]string{
+						"packet_ack":               "{\"error\":\"ABCI code: 5: error handling packet: see events for details\"}",
+						"packet_ack_hex":           "",
+						"packet_connection":        "connection-4",
+						"packet_dst_channel":       "channel-275",
+						"packet_dst_port":          "icahost",
+						"packet_sequence":          "91",
+						"packet_src_channel":       "channel-551",
+						"packet_src_port":          "icacontroller-celestia.DELEGATION",
+						"packet_timeout_height":    "0-0",
+						"packet_timeout_timestamp": "1778111280451745000",
+						"msg_index":                "0",
+					},
+				}, {
+					Height: 10976211,
+					Type:   "message",
+					Data: map[string]string{
+						"module":    "ibc_channel",
+						"msg_index": "0",
+					},
+				},
+				{
+					Height: 10976211,
+					Type:   "message",
+					Data: map[string]string{
+						"action":    "/ibc.core.channel.v1.MsgRecvPacket",
+						"msg_index": "1",
+					},
+				}, {
+					Height: 10976211,
+					Type:   "recv_packet",
+					Data: map[string]string{
+						"packet_channel_ordering":  "ORDER_ORDERED",
+						"packet_connection":        "connection-4",
+						"packet_data":              "{\"data\":\"CrQBCiMvY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dEZWxlZ2F0ZRKMAQpDY2VsZXN0aWExbHVtYWVtemV0Z3g3ZmE4Z2N3M3dhYWdldnM2cnFoZWpmd3hkdnN6enhsbmVzZWxzaHd4cW01cm14bhI2Y2VsZXN0aWF2YWxvcGVyMTMzdDRncHY0dmhwcWdmbjlncjhsNHU0MjN6cmdsZzhya3FldXByGg0KBHV0aWESBTEwMDAw\",\"memo\":\"\",\"type\":\"TYPE_EXECUTE_TX\"}",
+						"packet_data_hex":          "",
+						"packet_dst_channel":       "channel-275",
+						"packet_dst_port":          "icahost",
+						"packet_sequence":          "92",
+						"packet_src_channel":       "channel-551",
+						"packet_src_port":          "icacontroller-celestia.DELEGATION",
+						"packet_timeout_height":    "0-0",
+						"packet_timeout_timestamp": "1778111280451745000",
+						"msg_index":                "1",
+					},
+				}, {
+					Height: 10976211,
+					Type:   "message",
+					Data: map[string]string{
+						"module":    "ibc_channel",
+						"msg_index": "1",
+					},
+				}, {
+					Height: 10976211,
+					Type:   "delegate",
+					Data: map[string]string{
+						"amount":     "10000utia",
+						"new_shares": "10000.000000000000000000",
+						"validator":  "celestiavaloper133t4gpv4vhpqgfn9gr8l4u423zrglg8rkqeupr",
+						"delegator":  "celestia1lumaemzetgx7fa8gcw3waagevs6rqhejfwxdvszzxlneselshwxqm5rmxn",
+						"msg_index":  "1",
+					},
+				}, {
+					Height: 10976211,
+					Type:   "message",
+					Data: map[string]string{
+						"module":    "staking",
+						"sender":    "celestia1lumaemzetgx7fa8gcw3waagevs6rqhejfwxdvszzxlneselshwxqm5rmxn",
+						"msg_index": "1",
+					},
+				}, {
+					Height: 10976211,
+					Type:   "ics27_packet",
+					Data: map[string]string{
+						"host_channel_id": "channel-275",
+						"module":          "interchainaccounts",
+						"success":         "true",
+						"msg_index":       "1",
+					},
+				}, {
+					Height: 10976211,
+					Type:   "write_acknowledgement",
+					Data: map[string]string{
+						"packet_ack":               "{\"result\":\"Ei0KKy9jb3Ntb3Muc3Rha2luZy52MWJldGExLk1zZ0RlbGVnYXRlUmVzcG9uc2U=\"}",
+						"packet_ack_hex":           "",
+						"packet_connection":        "connection-4",
+						"packet_dst_channel":       "channel-275",
+						"packet_dst_port":          "icahost",
+						"packet_sequence":          "92",
+						"packet_src_channel":       "channel-551",
+						"packet_src_port":          "icacontroller-celestia.DELEGATION",
+						"packet_timeout_height":    "0-0",
+						"packet_timeout_timestamp": "1778111280451745000",
+						"msg_index":                "1",
+					},
+				}, {
+					Height: 10976211,
+					Type:   "message",
+					Data: map[string]string{
+						"module":    "ibc_channel",
+						"msg_index": "1",
+					},
+				},
+			},
+			msg: []*storage.Message{
+				{
+					Type:   types.MsgRecvPacket,
+					Height: 10976211,
+					Data: map[string]any{
+						"Packet": map[string]any{
+							"Data": map[string]any{
+								"Memo": "",
+								"Type": icaTypes.EXECUTE_TX,
+								"Data": []cosmosTypes.Msg{
+									&cosmosStakingTypes.MsgDelegate{
+										DelegatorAddress: "celestia1lumaemzetgx7fa8gcw3waagevs6rqhejfwxdvszzxlneselshwxqm5rmxn",
+										ValidatorAddress: "celestiavaloper133t4gpv4vhpqgfn9gr8l4u423zrglg8rkqeupr",
+										Amount:           cosmosTypes.NewCoin("utia", math.NewInt(10000)),
+									},
+								},
+							},
+							"DestinationChannel": "channel-275",
+							"DestinationPort":    "icahost",
+							"Sequence":           91,
+							"SourceChannel":      "channel-551",
+							"SourcePort":         "icacontroller-celestia.DELEGATION",
+							"TimeoutHeight": map[string]any{
+								"RevisionHeight": 0,
+								"RevisionNumber": 0,
+							},
+							"TimeoutTimestamp": 1778111280451745000,
+						},
+						"ProofHeight": map[string]any{
+							"RevisionHeight": 34526941,
+							"RevisionNumber": 1,
+						},
+						"Signer": "celestia12neasydj5ttajshyt00wag94dzcd9suec64nfv",
+					},
+				}, {
+					Type:   types.MsgRecvPacket,
+					Height: 10976211,
+					Data: map[string]any{
+						"Packet": map[string]any{
+							"Data": map[string]any{
+								"Memo": "",
+								"Type": icaTypes.EXECUTE_TX,
+								"Data": []cosmosTypes.Msg{
+									&cosmosStakingTypes.MsgDelegate{
+										DelegatorAddress: "celestia1lumaemzetgx7fa8gcw3waagevs6rqhejfwxdvszzxlneselshwxqm5rmxn",
+										ValidatorAddress: "celestiavaloper133t4gpv4vhpqgfn9gr8l4u423zrglg8rkqeupr",
+										Amount:           cosmosTypes.NewCoin("utia", math.NewInt(10000)),
+									},
+								},
+							},
+							"DestinationChannel": "channel-275",
+							"DestinationPort":    "icahost",
+							"Sequence":           92,
+							"SourceChannel":      "channel-551",
+							"SourcePort":         "icacontroller-celestia.DELEGATION",
+							"TimeoutHeight": map[string]any{
+								"RevisionHeight": 0,
+								"RevisionNumber": 0,
+							},
+							"TimeoutTimestamp": 1778111280451745000,
+						},
+						"ProofHeight": map[string]any{
+							"RevisionHeight": 34526941,
+							"RevisionNumber": 1,
+						},
+						"Signer": "celestia12neasydj5ttajshyt00wag94dzcd9suec64nfv",
+					},
+				},
+			},
+			idx: testsuite.Ptr(0),
 		},
 	}
 	for _, tt := range tests {
