@@ -51,6 +51,10 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 		return nil
 	}
 
+	if events[*idx].Type == storageTypes.EventTypeIbccallbackerrorIcs27Packet {
+		*idx += 1
+	}
+
 	if events[*idx].Type == storageTypes.EventTypeWriteAcknowledgement {
 		*idx += 2
 		ctx.RemoveLastIbcTransfer()
