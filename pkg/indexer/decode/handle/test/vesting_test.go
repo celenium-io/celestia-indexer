@@ -4,10 +4,11 @@
 package handle_test
 
 import (
+	"math"
 	"testing"
 	"time"
 
-	"cosmossdk.io/math"
+	cosmosmath "cosmossdk.io/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
@@ -21,7 +22,7 @@ import (
 // MsgCreateVestingAccount
 
 func createMsgCreateVestingAccount() types.Msg {
-	amount, _ := math.NewIntFromString("1000")
+	amount, _ := cosmosmath.NewIntFromString("1000")
 	m := cosmosVestingTypes.MsgCreateVestingAccount{
 		FromAddress: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 		ToAddress:   "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
@@ -146,7 +147,7 @@ func createMsgCreatePeriodicVestingAccount() types.Msg {
 		VestingPeriods: []cosmosVestingTypes.Period{
 			{
 				Length: 1000,
-				Amount: types.NewCoins(types.NewCoin("utia", math.OneInt())),
+				Amount: types.NewCoins(types.NewCoin("utia", cosmosmath.OneInt())),
 			},
 		},
 	}
@@ -205,4 +206,109 @@ func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount(t *testing.T) {
 	require.Equal(t, msgExpected, dm.Msg)
 	require.Len(t, decodeCtx.VestingAccounts, 1)
 	require.Equal(t, vestingAccount, decodeCtx.VestingAccounts[0])
+}
+
+func TestDecodeMsg_SuccessOnMsgCreateVestingAccount_MaxInt64EndTime(t *testing.T) {
+	amount, _ := cosmosmath.NewIntFromString("1000")
+	m := &cosmosVestingTypes.MsgCreateVestingAccount{
+		FromAddress: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		ToAddress:   "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
+		Amount: types.Coins{
+			{Denom: "utia", Amount: amount},
+		},
+		EndTime: math.MaxInt64,
+		Delayed: false,
+	}
+
+	block, now := testsuite.EmptyBlock()
+	position := 0
+	txId := uint64(1)
+
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, txId)
+
+	require.NoError(t, err)
+	require.Equal(t, int64(0), dm.BlobsSize)
+	require.Len(t, decodeCtx.VestingAccounts, 1)
+
+	va := decodeCtx.VestingAccounts[0]
+	require.Nil(t, va.EndTime, "EndTime must be nil when MaxInt64 is passed")
+	require.Nil(t, va.StartTime)
+	require.Equal(t, storageTypes.VestingTypeContinuous, va.Type)
+	require.Equal(t, storageTypes.MsgCreateVestingAccount, dm.Msg.Type)
+	require.Equal(t, now, dm.Msg.Time)
+}
+
+func TestDecodeMsg_SuccessOnMsgCreateVestingAccount_MaxInt64StartTime(t *testing.T) {
+	amount, _ := cosmosmath.NewIntFromString("500")
+	m := &cosmosVestingTypes.MsgCreateVestingAccount{
+		FromAddress: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		ToAddress:   "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
+		Amount: types.Coins{
+			{Denom: "utia", Amount: amount},
+		},
+		StartTime: math.MaxInt64,
+		EndTime:   1710357710,
+		Delayed:   true,
+	}
+
+	block, _ := testsuite.EmptyBlock()
+	position := 0
+	txId := uint64(1)
+
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+
+	_, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, txId)
+
+	require.NoError(t, err)
+	require.Len(t, decodeCtx.VestingAccounts, 1)
+
+	va := decodeCtx.VestingAccounts[0]
+	require.Nil(t, va.StartTime, "StartTime must be nil when MaxInt64 is passed")
+	require.NotNil(t, va.EndTime)
+	require.Equal(t, storageTypes.VestingTypeDelayed, va.Type)
+}
+
+func TestDecodeMsg_SuccessOnMsgCreatePeriodicVestingAccount_MaxInt64StartTime(t *testing.T) {
+	m := &cosmosVestingTypes.MsgCreatePeriodicVestingAccount{
+		FromAddress: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		ToAddress:   "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l",
+		StartTime:   math.MaxInt64,
+		VestingPeriods: []cosmosVestingTypes.Period{
+			{
+				Length: 1000,
+				Amount: types.NewCoins(types.NewCoin("utia", cosmosmath.OneInt())),
+			},
+		},
+	}
+
+	block, _ := testsuite.EmptyBlock()
+	position := 0
+	txId := uint64(1)
+
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+
+	_, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, txId)
+
+	require.NoError(t, err)
+	require.Len(t, decodeCtx.VestingAccounts, 1)
+
+	va := decodeCtx.VestingAccounts[0]
+	require.Nil(t, va.StartTime, "StartTime must be nil when MaxInt64 is passed")
+	require.Equal(t, storageTypes.VestingTypePeriodic, va.Type)
+	// period time falls back to block time when StartTime is ignored
+	require.Equal(t, block.Block.Time.Add(1000*time.Second), va.VestingPeriods[0].Time)
 }

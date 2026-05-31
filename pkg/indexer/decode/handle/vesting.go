@@ -4,6 +4,7 @@
 package handle
 
 import (
+	"math"
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
@@ -37,11 +38,11 @@ func MsgCreateVestingAccount(ctx *context.Context, status storageTypes.Status, t
 	amount := storageTypes.NumericFromBigInt(m.Amount.AmountOf(currency.Utia).BigInt(), 0)
 	v.Amount = v.Amount.Add(amount)
 
-	if m.EndTime > 0 {
+	if m.EndTime > 0 && m.EndTime != math.MaxInt64 {
 		t := time.Unix(m.EndTime, 0).UTC()
 		v.EndTime = &t
 	}
-	if m.StartTime > 0 {
+	if m.StartTime > 0 && m.StartTime != math.MaxInt64 {
 		t := time.Unix(m.StartTime, 0).UTC()
 		v.StartTime = &t
 	}
@@ -113,7 +114,7 @@ func MsgCreatePeriodicVestingAccount(ctx *context.Context, status storageTypes.S
 	}
 
 	periodTime := v.Time
-	if m.StartTime > 0 {
+	if m.StartTime > 0 && m.StartTime != math.MaxInt64 {
 		t := time.Unix(m.StartTime, 0).UTC()
 		v.StartTime = &t
 		periodTime = t
