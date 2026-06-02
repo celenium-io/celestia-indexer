@@ -107,7 +107,7 @@ func (ctx *Context) AddAddress(address *storage.Address) error {
 		return nil
 	}
 	if addr, ok := ctx.Addresses.Get(address.String()); ok {
-		if address.Balance.Currency == currency.DefaultCurrency { // hotfix for balance updates with non-default currency
+		if address.Balance.Currency == currency.DefaultCurrency { // TODO: support other currencies. It's hotfix for balance updates with non-default currency
 			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
 			addr.Balance.Delegated = addr.Balance.Delegated.Add(address.Balance.Delegated)
 			addr.Balance.Unbonding = addr.Balance.Unbonding.Add(address.Balance.Unbonding)

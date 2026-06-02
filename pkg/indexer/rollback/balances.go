@@ -112,9 +112,15 @@ func coinSpent(data map[string]string) (*storage.Address, error) {
 		Currency:  currency.DefaultCurrency,
 		Spendable: types.NumericZero(),
 	}
-	if coinSpent.Amount != nil {
-		balance.Spendable = types.NumericFromBigInt(coinSpent.Amount.Amount.BigInt(), 0)
-		balance.Currency = coinSpent.Amount.Denom
+	for i := range coinSpent.Amount {
+		if coinSpent.Amount[i] == nil || coinSpent.Amount[i].IsZero() {
+			continue
+		}
+		if coinSpent.Amount[i].GetDenom() == currency.DefaultCurrency { // TODO: support other currencies
+			amount := types.NumericFromBigInt(coinSpent.Amount[i].Amount.BigInt(), 0)
+			balance.Spendable = amount
+			balance.Currency = coinSpent.Amount[i].GetDenom()
+		}
 	}
 	return &storage.Address{
 		Address: coinSpent.Spender,
@@ -138,9 +144,15 @@ func coinReceived(data map[string]string) (*storage.Address, error) {
 		Currency:  currency.DefaultCurrency,
 		Spendable: types.NumericZero(),
 	}
-	if coinReceived.Amount != nil {
-		balance.Spendable = types.NumericFromBigInt(coinReceived.Amount.Amount.Neg().BigInt(), 0)
-		balance.Currency = coinReceived.Amount.Denom
+	for i := range coinReceived.Amount {
+		if coinReceived.Amount[i] == nil || coinReceived.Amount[i].IsZero() {
+			continue
+		}
+		if coinReceived.Amount[i].GetDenom() == currency.DefaultCurrency { // TODO: support other currencies
+			amount := types.NumericFromBigInt(coinReceived.Amount[i].Amount.Neg().BigInt(), 0)
+			balance.Spendable = amount
+			balance.Currency = coinReceived.Amount[i].GetDenom()
+		}
 	}
 
 	return &storage.Address{

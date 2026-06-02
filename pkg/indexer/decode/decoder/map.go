@@ -74,6 +74,23 @@ func BalanceFromMap(m map[string]string, key string) (*cosmosTypes.Coin, error) 
 	return &coin, nil
 }
 
+func BalancesFromMap(m map[string]string, key string) ([]*cosmosTypes.Coin, error) {
+	str := StringFromMap(m, key)
+	if str == "" {
+		return nil, nil
+	}
+	strs := strings.Split(str, ",")
+	coins := make([]*cosmosTypes.Coin, len(strs))
+	for i, s := range strs {
+		coin, err := cosmosTypes.ParseCoinNormalized(s)
+		if err != nil {
+			return nil, errors.Wrapf(err, "parsing coin from '%s'", s)
+		}
+		coins[i] = &coin
+	}
+	return coins, nil
+}
+
 func AmountFromMap(m map[string]string, key string) (decimal.Decimal, error) {
 	str := StringFromMap(m, key)
 	if str == "" {

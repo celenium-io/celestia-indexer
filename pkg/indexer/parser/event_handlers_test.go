@@ -26,6 +26,7 @@ var (
 )
 
 func Test_parseCoinSpent(t *testing.T) {
+	ibcDenom := "ibc/93E113CD8DF31891647AE56271673AEFA7E125A686AEC6CAD8D5106FE9600892"
 	tests := []struct {
 		name    string
 		data    map[string]string
@@ -66,12 +67,136 @@ func Test_parseCoinSpent(t *testing.T) {
 				Hash:       testHashAddress,
 				Balance:    storage.EmptyBalance(),
 			},
+		}, {
+			name: "test 3 multi-coin IBC and utia",
+			data: map[string]string{
+				"spender": testAddress,
+				"amount":  "5000000" + ibcDenom + ",5000000utia",
+			},
+			height: pkgTypes.Level(58000),
+			want: &storage.Address{
+				Height:     pkgTypes.Level(58000),
+				LastHeight: pkgTypes.Level(58000),
+				Address:    testAddress,
+				Hash:       testHashAddress,
+				Balance: storage.Balance{
+					Currency:  currency.DefaultCurrency,
+					Spendable: types.MustNumericFromString("-5000000"),
+					Delegated: types.NumericZero(),
+					Unbonding: types.NumericZero(),
+				},
+			},
+		}, {
+			name: "test 4 IBC only",
+			data: map[string]string{
+				"spender": testAddress,
+				"amount":  "5000000" + ibcDenom,
+			},
+			height: pkgTypes.Level(58000),
+			want: &storage.Address{
+				Height:     pkgTypes.Level(58000),
+				LastHeight: pkgTypes.Level(58000),
+				Address:    testAddress,
+				Hash:       testHashAddress,
+				Balance:    storage.EmptyBalance(),
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.NewContext()
 			err := parseCoinSpent(ctx, tt.data, tt.height)
+			require.True(t, (err == nil) != tt.wantErr)
+			require.EqualValues(t, 1, ctx.Addresses.Len())
+			_ = ctx.Addresses.Range(func(_ string, value *storage.Address) (error, bool) {
+				require.Equal(t, tt.want, value)
+				return nil, false
+			})
+		})
+	}
+}
+
+func Test_parseCoinReceived(t *testing.T) {
+	ibcDenom := "ibc/93E113CD8DF31891647AE56271673AEFA7E125A686AEC6CAD8D5106FE9600892"
+	tests := []struct {
+		name    string
+		data    map[string]string
+		height  pkgTypes.Level
+		want    *storage.Address
+		wantErr bool
+	}{
+		{
+			name: "test 1",
+			data: map[string]string{
+				"receiver": testAddress,
+				"amount":   "123utia",
+			},
+			height: pkgTypes.Level(58000),
+			want: &storage.Address{
+				Height:     pkgTypes.Level(58000),
+				LastHeight: pkgTypes.Level(58000),
+				Address:    testAddress,
+				Hash:       testHashAddress,
+				Balance: storage.Balance{
+					Currency:  currency.DefaultCurrency,
+					Spendable: types.MustNumericFromString("123"),
+					Delegated: types.NumericZero(),
+					Unbonding: types.NumericZero(),
+				},
+			},
+		}, {
+			name: "test 2",
+			data: map[string]string{
+				"receiver": testAddress,
+				"amount":   "",
+			},
+			height: pkgTypes.Level(58000),
+			want: &storage.Address{
+				Height:     pkgTypes.Level(58000),
+				LastHeight: pkgTypes.Level(58000),
+				Address:    testAddress,
+				Hash:       testHashAddress,
+				Balance:    storage.EmptyBalance(),
+			},
+		}, {
+			name: "test 3 multi-coin IBC and utia",
+			data: map[string]string{
+				"receiver": testAddress,
+				"amount":   "5000000" + ibcDenom + ",5000000utia",
+			},
+			height: pkgTypes.Level(58000),
+			want: &storage.Address{
+				Height:     pkgTypes.Level(58000),
+				LastHeight: pkgTypes.Level(58000),
+				Address:    testAddress,
+				Hash:       testHashAddress,
+				Balance: storage.Balance{
+					Currency:  currency.DefaultCurrency,
+					Spendable: types.MustNumericFromString("5000000"),
+					Delegated: types.NumericZero(),
+					Unbonding: types.NumericZero(),
+				},
+			},
+		}, {
+			name: "test 4 IBC only",
+			data: map[string]string{
+				"receiver": testAddress,
+				"amount":   "5000000" + ibcDenom,
+			},
+			height: pkgTypes.Level(58000),
+			want: &storage.Address{
+				Height:     pkgTypes.Level(58000),
+				LastHeight: pkgTypes.Level(58000),
+				Address:    testAddress,
+				Hash:       testHashAddress,
+				Balance:    storage.EmptyBalance(),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.NewContext()
+			err := parseCoinReceived(ctx, tt.data, tt.height)
 			require.True(t, (err == nil) != tt.wantErr)
 			require.EqualValues(t, 1, ctx.Addresses.Len())
 			_ = ctx.Addresses.Range(func(_ string, value *storage.Address) (error, bool) {

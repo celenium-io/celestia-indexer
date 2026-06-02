@@ -17,6 +17,7 @@ import (
 )
 
 func TestNewCoinSpent(t *testing.T) {
+	ibcDenom := "ibc/93E113CD8DF31891647AE56271673AEFA7E125A686AEC6CAD8D5106FE9600892"
 	tests := []struct {
 		name     string
 		m        map[string]string
@@ -31,7 +32,7 @@ func TestNewCoinSpent(t *testing.T) {
 			},
 			wantBody: CoinSpent{
 				Spender: "spender",
-				Amount:  testsuite.Ptr(types.NewCoin("utia", math.OneInt())),
+				Amount:  []*types.Coin{testsuite.Ptr(types.NewCoin("utia", math.OneInt()))},
 			},
 		}, {
 			name: "test 2",
@@ -51,6 +52,19 @@ func TestNewCoinSpent(t *testing.T) {
 			wantBody: CoinSpent{
 				Spender: "spender",
 			},
+		}, {
+			name: "test 4 multi-coin",
+			m: map[string]string{
+				"spender": "spender",
+				"amount":  "5000000" + ibcDenom + ",5000000utia",
+			},
+			wantBody: CoinSpent{
+				Spender: "spender",
+				Amount: []*types.Coin{
+					testsuite.Ptr(types.NewCoin(ibcDenom, math.NewInt(5000000))),
+					testsuite.Ptr(types.NewCoin("utia", math.NewInt(5000000))),
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -63,6 +77,7 @@ func TestNewCoinSpent(t *testing.T) {
 }
 
 func TestNewCoinReceived(t *testing.T) {
+	ibcDenom := "ibc/93E113CD8DF31891647AE56271673AEFA7E125A686AEC6CAD8D5106FE9600892"
 	tests := []struct {
 		name     string
 		m        map[string]string
@@ -77,7 +92,7 @@ func TestNewCoinReceived(t *testing.T) {
 			},
 			wantBody: CoinReceived{
 				Receiver: "receiver",
-				Amount:   testsuite.Ptr(types.NewCoin("utia", math.NewInt(42))),
+				Amount:   []*types.Coin{testsuite.Ptr(types.NewCoin("utia", math.NewInt(42)))},
 			},
 		}, {
 			name: "test 2",
@@ -96,6 +111,19 @@ func TestNewCoinReceived(t *testing.T) {
 			wantErr: true,
 			wantBody: CoinReceived{
 				Receiver: "receiver",
+			},
+		}, {
+			name: "test 4 multi-coin",
+			m: map[string]string{
+				"receiver": "receiver",
+				"amount":   "5000000" + ibcDenom + ",5000000utia",
+			},
+			wantBody: CoinReceived{
+				Receiver: "receiver",
+				Amount: []*types.Coin{
+					testsuite.Ptr(types.NewCoin(ibcDenom, math.NewInt(5000000))),
+					testsuite.Ptr(types.NewCoin("utia", math.NewInt(5000000))),
+				},
 			},
 		},
 	}

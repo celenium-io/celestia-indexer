@@ -18,7 +18,7 @@ import (
 )
 
 type CoinReceived struct {
-	Amount   *types.Coin
+	Amount   []*types.Coin
 	Receiver string
 }
 
@@ -28,12 +28,12 @@ func NewCoinReceived(m map[string]string) (body CoinReceived, err error) {
 		err = errors.Errorf("receiver key not found in %##v", m)
 		return
 	}
-	body.Amount, err = decoder.BalanceFromMap(m, "amount")
+	body.Amount, err = decoder.BalancesFromMap(m, "amount")
 	return
 }
 
 type CoinSpent struct {
-	Amount  *types.Coin
+	Amount  []*types.Coin
 	Spender string
 }
 
@@ -43,7 +43,7 @@ func NewCoinSpent(m map[string]string) (body CoinSpent, err error) {
 		err = errors.Errorf("spender key not found in %##v", m)
 		return
 	}
-	body.Amount, err = decoder.BalanceFromMap(m, "amount")
+	body.Amount, err = decoder.BalancesFromMap(m, "amount")
 	return
 }
 
