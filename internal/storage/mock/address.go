@@ -45,6 +45,45 @@ func (m *MockIAddress) EXPECT() *MockIAddressMockRecorder {
 	return m.recorder
 }
 
+// Balances mocks base method.
+func (m *MockIAddress) Balances(ctx context.Context, addressId uint64, limit, offset int) ([]storage.Balance, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Balances", ctx, addressId, limit, offset)
+	ret0, _ := ret[0].([]storage.Balance)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Balances indicates an expected call of Balances.
+func (mr *MockIAddressMockRecorder) Balances(ctx, addressId, limit, offset any) *MockIAddressBalancesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Balances", reflect.TypeOf((*MockIAddress)(nil).Balances), ctx, addressId, limit, offset)
+	return &MockIAddressBalancesCall{Call: call}
+}
+
+// MockIAddressBalancesCall wrap *gomock.Call
+type MockIAddressBalancesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIAddressBalancesCall) Return(arg0 []storage.Balance, arg1 error) *MockIAddressBalancesCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIAddressBalancesCall) Do(f func(context.Context, uint64, int, int) ([]storage.Balance, error)) *MockIAddressBalancesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIAddressBalancesCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Balance, error)) *MockIAddressBalancesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // ByHash mocks base method.
 func (m *MockIAddress) ByHash(ctx context.Context, hash []byte) (storage.Address, error) {
 	m.ctrl.T.Helper()

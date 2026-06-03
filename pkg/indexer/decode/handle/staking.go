@@ -80,11 +80,13 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, msgId 
 
 		address := storage.Address{
 			Address: addr.String(),
-			Balance: storage.Balance{
-				Currency:  currency.DefaultCurrency,
-				Spendable: storageTypes.NumericZero(),
-				Unbonding: storageTypes.NumericZero(),
-				Delegated: amount.Copy(),
+			Balances: []storage.Balance{
+				{
+					Currency:  currency.DefaultCurrency,
+					Spendable: storageTypes.NumericZero(),
+					Unbonding: storageTypes.NumericZero(),
+					Delegated: amount.Copy(),
+				},
 			},
 		}
 		if err := ctx.AddAddress(&address); err != nil {

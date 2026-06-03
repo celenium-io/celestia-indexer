@@ -48,7 +48,7 @@ func processSetToken(ctx *context.Context, events []storage.Event, msg *storage.
 						Address:    setToken.NewOwner,
 						Height:     msg.Height,
 						LastHeight: msg.Height,
-						Balance:    storage.EmptyBalance(),
+						Balances:   []storage.Balance{storage.EmptyBalance()},
 					},
 					Type: types.HLTokenTypeCollateral,
 				}

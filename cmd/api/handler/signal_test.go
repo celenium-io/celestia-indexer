@@ -53,7 +53,7 @@ var testUpgrade = storage.Upgrade{
 		Address:    testAddress,
 		Height:     200,
 		LastHeight: 200,
-		Balance: storage.Balance{
+		DefaultBalance: &storage.Balance{
 			Currency:  "utia",
 			Spendable: storageTypes.NumericFromInt64(200),
 			Delegated: storageTypes.NumericFromInt64(0),

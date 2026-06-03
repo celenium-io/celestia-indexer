@@ -122,9 +122,11 @@ func Test_handleRedelegate(t *testing.T) {
 					Height:     841682,
 					LastHeight: 841682,
 					Hash:       []byte{0xb4, 0xab, 0xbf, 0x4e, 0xf7, 0xc0, 0xe8, 0x9a, 0x48, 0x38, 0x6f, 0x73, 0x8a, 0x13, 0x77, 0xc8, 0x71, 0x13, 0x29, 0x44},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.NumericZero(),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.NumericZero(),
+						},
 					},
 				},
 				Source: &storage.Validator{
@@ -223,9 +225,11 @@ func Test_handleRedelegate(t *testing.T) {
 					Height:     241,
 					LastHeight: 241,
 					Hash:       []byte{0x16, 0x54, 0x4c, 0xd3, 0x94, 0xb4, 0x40, 0xdf, 0xe4, 0xcc, 0x5a, 0xb2, 0xf9, 0xcd, 0xf4, 0x79, 0xc2, 0xfa, 0xbc, 0xb5},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.NumericZero(),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.NumericZero(),
+						},
 					},
 				},
 				Source: &storage.Validator{
@@ -397,9 +401,11 @@ func Test_handleRedelegate(t *testing.T) {
 					Height:     315,
 					LastHeight: 315,
 					Hash:       []byte{0xde, 0x07, 0x34, 0xaa, 0x6a, 0x66, 0xf7, 0xc5, 0xd2, 0x5e, 0xe0, 0x7f, 0xcc, 0xde, 0x0b, 0x35, 0xea, 0x4c, 0xcc, 0x4b},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.NumericZero(),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.NumericZero(),
+						},
 					},
 				},
 				Source: &storage.Validator{
@@ -530,9 +536,11 @@ func Test_handleRedelegate(t *testing.T) {
 					Height:     315,
 					LastHeight: 315,
 					Hash:       []byte{0x3e, 0x30, 0x8a, 0xc3, 0x09, 0x6e, 0x72, 0x50, 0x33, 0x13, 0x31, 0x8d, 0x57, 0x71, 0x72, 0x5e, 0x8b, 0x0c, 0x2d, 0x52},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.NumericZero(),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.NumericZero(),
+						},
 					},
 				},
 				Source: &storage.Validator{
@@ -664,9 +672,11 @@ func Test_handleRedelegate(t *testing.T) {
 					Height:     315,
 					LastHeight: 315,
 					Hash:       []byte{0x3e, 0x30, 0x8a, 0xc3, 0x09, 0x6e, 0x72, 0x50, 0x33, 0x13, 0x31, 0x8d, 0x57, 0x71, 0x72, 0x5e, 0x8b, 0x0c, 0x2d, 0x52},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.NumericZero(),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.NumericZero(),
+						},
 					},
 				},
 				Source: &storage.Validator{

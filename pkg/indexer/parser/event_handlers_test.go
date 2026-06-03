@@ -46,11 +46,13 @@ func Test_parseCoinSpent(t *testing.T) {
 				LastHeight: pkgTypes.Level(58000),
 				Address:    testAddress,
 				Hash:       testHashAddress,
-				Balance: storage.Balance{
-					Currency:  currency.DefaultCurrency,
-					Spendable: types.MustNumericFromString("-123"),
-					Delegated: types.NumericZero(),
-					Unbonding: types.NumericZero(),
+				Balances: []storage.Balance{
+					{
+						Currency:  currency.DefaultCurrency,
+						Spendable: types.MustNumericFromString("-123"),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
 				},
 			},
 		}, {
@@ -65,7 +67,7 @@ func Test_parseCoinSpent(t *testing.T) {
 				LastHeight: pkgTypes.Level(58000),
 				Address:    testAddress,
 				Hash:       testHashAddress,
-				Balance:    storage.EmptyBalance(),
+				Balances:   []storage.Balance{},
 			},
 		}, {
 			name: "test 3 multi-coin IBC and utia",
@@ -79,11 +81,19 @@ func Test_parseCoinSpent(t *testing.T) {
 				LastHeight: pkgTypes.Level(58000),
 				Address:    testAddress,
 				Hash:       testHashAddress,
-				Balance: storage.Balance{
-					Currency:  currency.DefaultCurrency,
-					Spendable: types.MustNumericFromString("-5000000"),
-					Delegated: types.NumericZero(),
-					Unbonding: types.NumericZero(),
+				Balances: []storage.Balance{
+					{
+						Currency:  ibcDenom,
+						Spendable: types.MustNumericFromString("-5000000"),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
+					{
+						Currency:  currency.DefaultCurrency,
+						Spendable: types.MustNumericFromString("-5000000"),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
 				},
 			},
 		}, {
@@ -98,7 +108,14 @@ func Test_parseCoinSpent(t *testing.T) {
 				LastHeight: pkgTypes.Level(58000),
 				Address:    testAddress,
 				Hash:       testHashAddress,
-				Balance:    storage.EmptyBalance(),
+				Balances: []storage.Balance{
+					{
+						Currency:  ibcDenom,
+						Spendable: types.MustNumericFromString("-5000000"),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
+				},
 			},
 		},
 	}
@@ -137,11 +154,13 @@ func Test_parseCoinReceived(t *testing.T) {
 				LastHeight: pkgTypes.Level(58000),
 				Address:    testAddress,
 				Hash:       testHashAddress,
-				Balance: storage.Balance{
-					Currency:  currency.DefaultCurrency,
-					Spendable: types.MustNumericFromString("123"),
-					Delegated: types.NumericZero(),
-					Unbonding: types.NumericZero(),
+				Balances: []storage.Balance{
+					{
+						Currency:  currency.DefaultCurrency,
+						Spendable: types.MustNumericFromString("123"),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
 				},
 			},
 		}, {
@@ -156,7 +175,7 @@ func Test_parseCoinReceived(t *testing.T) {
 				LastHeight: pkgTypes.Level(58000),
 				Address:    testAddress,
 				Hash:       testHashAddress,
-				Balance:    storage.EmptyBalance(),
+				Balances:   []storage.Balance{},
 			},
 		}, {
 			name: "test 3 multi-coin IBC and utia",
@@ -170,11 +189,19 @@ func Test_parseCoinReceived(t *testing.T) {
 				LastHeight: pkgTypes.Level(58000),
 				Address:    testAddress,
 				Hash:       testHashAddress,
-				Balance: storage.Balance{
-					Currency:  currency.DefaultCurrency,
-					Spendable: types.MustNumericFromString("5000000"),
-					Delegated: types.NumericZero(),
-					Unbonding: types.NumericZero(),
+				Balances: []storage.Balance{
+					{
+						Currency:  ibcDenom,
+						Spendable: types.MustNumericFromString("5000000"),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
+					{
+						Currency:  currency.DefaultCurrency,
+						Spendable: types.MustNumericFromString("5000000"),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
 				},
 			},
 		}, {
@@ -189,7 +216,14 @@ func Test_parseCoinReceived(t *testing.T) {
 				LastHeight: pkgTypes.Level(58000),
 				Address:    testAddress,
 				Hash:       testHashAddress,
-				Balance:    storage.EmptyBalance(),
+				Balances: []storage.Balance{
+					{
+						Currency:  ibcDenom,
+						Spendable: types.MustNumericFromString("5000000"),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
+				},
 			},
 		},
 	}
@@ -358,11 +392,13 @@ func Test_parseCompleteUnbonding(t *testing.T) {
 					Height:     pkgTypes.Level(123456),
 					LastHeight: pkgTypes.Level(123456),
 					Hash:       []byte{0x9b, 0xb7, 0xe8, 0x99, 0xb2, 0xbb, 0x5c, 0x90, 0xbb, 0x5c, 0x36, 0x22, 0x1b, 0x62, 0x01, 0x73, 0xec, 0x3a, 0x6d, 0xfa},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Unbonding: types.MustNumericFromString("-35570000"),
-						Spendable: types.NumericZero(),
-						Delegated: types.NumericZero(),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Unbonding: types.MustNumericFromString("-35570000"),
+							Spendable: types.NumericZero(),
+							Delegated: types.NumericZero(),
+						},
 					},
 				},
 				Validator: &storage.Validator{
@@ -430,7 +466,7 @@ func Test_parseCompleteRedelegation(t *testing.T) {
 					Height:     pkgTypes.Level(123456),
 					LastHeight: pkgTypes.Level(123456),
 					Hash:       []byte{0x9b, 0xb7, 0xe8, 0x99, 0xb2, 0xbb, 0x5c, 0x90, 0xbb, 0x5c, 0x36, 0x22, 0x1b, 0x62, 0x01, 0x73, 0xec, 0x3a, 0x6d, 0xfa},
-					Balance:    storage.EmptyBalance(),
+					Balances:   []storage.Balance{},
 				},
 				Validator: &storage.Validator{
 					Address:           "celestiavaloper140l6y2gp3gxvay6qtn70re7z2s0gn57zcvqd22",

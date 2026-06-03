@@ -174,7 +174,7 @@ func (s *ProposalTestSuite) TestVotes() {
 					Address:    testAddress,
 					Height:     333,
 					LastHeight: 333,
-					Balance: storage.Balance{
+					DefaultBalance: &storage.Balance{
 						Currency:  "utia",
 						Spendable: types.NumericFromInt64(100),
 						Delegated: types.NumericFromInt64(1),
@@ -247,7 +247,7 @@ func (s *ProposalTestSuite) TestVotesByProposalIdWithVoter() {
 					Address:    testAddress,
 					Height:     321,
 					LastHeight: 123,
-					Balance: storage.Balance{
+					DefaultBalance: &storage.Balance{
 						Currency:  "utia",
 						Spendable: types.NumericFromInt64(100),
 						Delegated: types.NumericFromInt64(1),

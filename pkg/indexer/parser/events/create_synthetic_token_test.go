@@ -74,7 +74,7 @@ func Test_handleCreateSyntheticToken(t *testing.T) {
 					Address:    "celestia1zvdlcmplx4gdh4hajwlsegnn2xzzfy470gjw4c",
 					Height:     1036866,
 					LastHeight: 1036866,
-					Balance:    storage.EmptyBalance(),
+					Balances:   []storage.Balance{storage.EmptyBalance()},
 					Hash:       []byte{0x13, 0x1b, 0xfc, 0x6c, 0x3f, 0x35, 0x50, 0xdb, 0xd6, 0xfd, 0x93, 0xbf, 0x0c, 0xa2, 0x73, 0x51, 0x84, 0x24, 0x92, 0xbe},
 				},
 				Mailbox: &storage.HLMailbox{

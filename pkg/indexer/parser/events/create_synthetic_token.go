@@ -68,7 +68,7 @@ func processCreateSyntheticToken(ctx *context.Context, events []storage.Event, m
 					Address:    createToken.Owner,
 					Height:     msg.Height,
 					LastHeight: msg.Height,
-					Balance:    storage.EmptyBalance(),
+					Balances:   []storage.Balance{storage.EmptyBalance()},
 				}
 				if err := ctx.AddAddress(token.Owner); err != nil {
 					return errors.Wrap(err, "add address")

@@ -146,10 +146,12 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Height:     844287,
 					LastHeight: 844287,
 					Hash:       []byte{0xfd, 0x86, 0xd3, 0xeb, 0x83, 0x1e, 0xef, 0xb8, 0x31, 0x02, 0x49, 0x11, 0x28, 0x23, 0x8c, 0x8e, 0x10, 0xc7, 0xbe, 0x3a},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.NumericFromInt64(45000000),
-						Unbonding: types.MustNumericFromString("-45000000"),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.NumericFromInt64(45000000),
+							Unbonding: types.MustNumericFromString("-45000000"),
+						},
 					},
 				},
 				Validator: &storage.Validator{

@@ -29,6 +29,7 @@ type IAddress interface {
 	Series(ctx context.Context, addressId uint64, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
 	IdByHash(ctx context.Context, hash ...[]byte) ([]uint64, error)
 	IdByAddress(ctx context.Context, address string, ids ...uint64) (uint64, error)
+	Balances(ctx context.Context, addressId uint64, limit, offset int) ([]Balance, error)
 }
 
 // Address -
@@ -43,8 +44,9 @@ type Address struct {
 	Name         string      `bun:"name,nullzero"               comment:"Cosmos address name"`
 	IsForwarding bool        `bun:"is_forwarding,default:false" comment:"Is the address used for forwarding."`
 
-	Balance    Balance               `bun:"rel:has-one,join:id=id"`
-	Celestials *celestials.Celestial `bun:"rel:has-one,join:id=address_id"`
+	Balances       []Balance             `bun:"rel:has-many,join:id=id"`
+	DefaultBalance *Balance              `bun:"rel:has-one,join:id=id"`
+	Celestials     *celestials.Celestial `bun:"rel:has-one,join:id=address_id"`
 }
 
 // TableName -

@@ -93,7 +93,7 @@ func processUpdateZkISM(ctx *context.Context, events []storage.Event, msg *stora
 					Address:    signer,
 					Height:     msg.Height,
 					LastHeight: msg.Height,
-					Balance:    storage.EmptyBalance(),
+					Balances:   []storage.Balance{storage.EmptyBalance()},
 				}
 			}
 
@@ -151,7 +151,7 @@ func processSubmitZkISMMessages(ctx *context.Context, events []storage.Event, ms
 					Address:    signer,
 					Height:     msg.Height,
 					LastHeight: msg.Height,
-					Balance:    storage.EmptyBalance(),
+					Balances:   []storage.Balance{storage.EmptyBalance()},
 				}
 			}
 

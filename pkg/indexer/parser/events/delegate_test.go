@@ -133,9 +133,11 @@ func Test_handleDelegate(t *testing.T) {
 					LastHeight: 841682,
 					Address:    "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 					Hash:       []byte{0xe7, 0xeb, 0x3b, 0x22, 0x85, 0x79, 0xa0, 0x93, 0xe0, 0x33, 0xd3, 0xc4, 0xf4, 0x6e, 0x46, 0xdb, 0xb8, 0x69, 0x97, 0xa9},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.NumericFromInt64(5690000),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.NumericFromInt64(5690000),
+						},
 					},
 				},
 				Validator: &storage.Validator{
@@ -221,9 +223,11 @@ func Test_handleDelegate(t *testing.T) {
 					LastHeight: 841682,
 					Address:    "celestia1ul4nkg590xsf8cpn60z0gmjxmwuxn9afzar42t",
 					Hash:       []byte{0xe7, 0xeb, 0x3b, 0x22, 0x85, 0x79, 0xa0, 0x93, 0xe0, 0x33, 0xd3, 0xc4, 0xf4, 0x6e, 0x46, 0xdb, 0xb8, 0x69, 0x97, 0xa9},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.NumericFromInt64(5690000),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.NumericFromInt64(5690000),
+						},
 					},
 				},
 				Validator: &storage.Validator{
@@ -372,9 +376,11 @@ func Test_handleDelegate(t *testing.T) {
 					LastHeight: 105,
 					Address:    "celestia19gc940vdsl9tp5kvkzec7m8njlup7ay0frlfu7",
 					Hash:       []byte{0x2a, 0x30, 0x5a, 0xbd, 0x8d, 0x87, 0xca, 0xb0, 0xd2, 0xcc, 0xb0, 0xb3, 0x8f, 0x6c, 0xf3, 0x97, 0xf8, 0x1f, 0x74, 0x8f},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.NumericFromInt64(100000000),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.NumericFromInt64(100000000),
+						},
 					},
 				},
 				Validator: &storage.Validator{
@@ -460,9 +466,11 @@ func Test_handleDelegate(t *testing.T) {
 					LastHeight: 105,
 					Address:    "celestia1768fz9r2c4w86kvckxfhpvha054rkc7rzwl83x",
 					Hash:       []byte{0xf6, 0x8e, 0x91, 0x14, 0x6a, 0xc5, 0x5c, 0x7d, 0x59, 0x98, 0xb1, 0x93, 0x70, 0xb2, 0xfd, 0x7d, 0x2a, 0x3b, 0x63, 0xc3},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.NumericFromInt64(45000000),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.NumericFromInt64(45000000),
+						},
 					},
 				},
 				Validator: &storage.Validator{

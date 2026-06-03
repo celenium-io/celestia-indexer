@@ -77,7 +77,7 @@ func processHyperlaneProcessMessage(ctx *context.Context, events []storage.Event
 					Address:    relayer,
 					Height:     msg.Height,
 					LastHeight: msg.Height,
-					Balance:    storage.EmptyBalance(),
+					Balances:   []storage.Balance{storage.EmptyBalance()},
 				}
 			}
 			ctx.AddHlTransfer(transfer)

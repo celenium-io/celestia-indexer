@@ -74,8 +74,8 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 			key := data.block.Txs[i].Signers[j].String()
 			if addr, ok := data.addresses[key]; !ok {
 				data.addresses[key] = &data.block.Txs[i].Signers[j]
-			} else {
-				addr.Balance.Spendable = addr.Balance.Spendable.Add(data.block.Txs[i].Signers[j].Balance.Spendable)
+			} else if len(addr.Balances) > 0 && len(data.block.Txs[i].Signers[j].Balances) > 0 {
+				addr.Balances[0].Spendable = addr.Balances[0].Spendable.Add(data.block.Txs[i].Signers[j].Balances[0].Spendable)
 			}
 		}
 	}
@@ -92,9 +92,9 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 			return tx.HandleError(ctx, err)
 		}
 
-		balances := make([]storage.Balance, len(entities))
+		balances := make([]storage.Balance, 0, len(entities))
 		for i := range entities {
-			balances[i] = entities[i].Balance
+			balances = append(balances, entities[i].Balances...)
 		}
 		if err := tx.SaveBalances(ctx, balances...); err != nil {
 			return tx.HandleError(ctx, err)

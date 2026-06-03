@@ -32,12 +32,9 @@ func NewAddress(addr storage.Address) Address {
 		Hash:         addr.Address,
 		Name:         addr.Name,
 		IsForwarding: addr.IsForwarding,
-		Balance: Balance{
-			Currency:  addr.Balance.Currency,
-			Spendable: addr.Balance.Spendable.String(),
-			Delegated: addr.Balance.Delegated.String(),
-			Unbonding: addr.Balance.Unbonding.String(),
-		},
+	}
+	if addr.DefaultBalance != nil {
+		address.Balance = NewBalance(*addr.DefaultBalance)
 	}
 	address.AddCelestails(addr.Celestials)
 	return address
@@ -57,6 +54,15 @@ type Balance struct {
 	Spendable string `example:"10000000000" json:"spendable" swaggertype:"string"`
 	Delegated string `example:"10000000000" json:"delegated" swaggertype:"string"`
 	Unbonding string `example:"10000000000" json:"unbonding" swaggertype:"string"`
+}
+
+func NewBalance(balance storage.Balance) Balance {
+	return Balance{
+		Currency:  balance.Currency,
+		Spendable: balance.Spendable.String(),
+		Delegated: balance.Delegated.String(),
+		Unbonding: balance.Unbonding.String(),
+	}
 }
 
 // Celestial ID

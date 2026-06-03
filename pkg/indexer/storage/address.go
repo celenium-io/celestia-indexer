@@ -25,14 +25,16 @@ func saveAddresses(
 	}
 
 	addToId := make(map[string]uint64)
-	balances := make([]storage.Balance, len(addresses))
+	balances := make([]storage.Balance, 0, len(addresses))
 	for i := range addresses {
 		if addresses[i].Id == 0 {
 			return addToId, totalAccounts, errors.Errorf("id for address %s equals 0", addresses[i].Address)
 		}
 		addToId[addresses[i].Address] = addresses[i].Id
-		addresses[i].Balance.Id = addresses[i].Id
-		balances[i] = addresses[i].Balance
+		for j := range addresses[i].Balances {
+			addresses[i].Balances[j].Id = addresses[i].Id
+		}
+		balances = append(balances, addresses[i].Balances...)
 	}
 	err = tx.SaveBalances(ctx, balances...)
 	return addToId, totalAccounts, err

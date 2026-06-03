@@ -107,12 +107,27 @@ func (ctx *Context) AddAddress(address *storage.Address) error {
 		return nil
 	}
 	if addr, ok := ctx.Addresses.Get(address.String()); ok {
-		if address.Balance.Currency == currency.DefaultCurrency { // TODO: support other currencies. It's hotfix for balance updates with non-default currency
-			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
-			addr.Balance.Delegated = addr.Balance.Delegated.Add(address.Balance.Delegated)
-			addr.Balance.Unbonding = addr.Balance.Unbonding.Add(address.Balance.Unbonding)
+		for i := range address.Balances {
+			found := false
+			for j := range addr.Balances {
+				if addr.Balances[j].Currency == address.Balances[i].Currency {
+					if !address.Balances[i].Spendable.IsZero() {
+						addr.Balances[j].Spendable = addr.Balances[j].Spendable.Add(address.Balances[i].Spendable)
+					}
+					if !address.Balances[i].Delegated.IsZero() {
+						addr.Balances[j].Delegated = addr.Balances[j].Delegated.Add(address.Balances[i].Delegated)
+					}
+					if !address.Balances[i].Unbonding.IsZero() {
+						addr.Balances[j].Unbonding = addr.Balances[j].Unbonding.Add(address.Balances[i].Unbonding)
+					}
+					found = true
+					break
+				}
+			}
+			if !found {
+				addr.Balances = append(addr.Balances, address.Balances[i])
+			}
 		}
-
 		if address.IsForwarding {
 			addr.IsForwarding = true
 		}
