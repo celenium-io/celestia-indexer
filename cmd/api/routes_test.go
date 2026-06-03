@@ -71,6 +71,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/namespace GET":                                   {},
 		"/v1/address/count GET":                               {},
 		"/v1/address/:hash/blobs GET":                         {},
+		"/v1/address/:hash/balances GET":                      {},
 		"/v1/block/:height/blobs/count GET":                   {},
 		"/v1/namespace/:id GET":                               {},
 		"/v1/stats/summary/:table/:function GET":              {},

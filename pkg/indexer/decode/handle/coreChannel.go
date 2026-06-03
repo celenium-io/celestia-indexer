@@ -181,7 +181,7 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 		if prefix == pkgTypes.AddressPrefixCelestia {
 			transfer.Receiver = &storage.Address{
 				Address:    packet.Receiver,
-				Balance:    storage.EmptyBalance(),
+				Balances:   []storage.Balance{storage.EmptyBalance()},
 				Height:     ctx.Block.Height,
 				LastHeight: ctx.Block.Height,
 				Hash:       hash,
@@ -205,7 +205,7 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 		if prefix == pkgTypes.AddressPrefixCelestia {
 			transfer.Sender = &storage.Address{
 				Address:    packet.Sender,
-				Balance:    storage.EmptyBalance(),
+				Balances:   []storage.Balance{storage.EmptyBalance()},
 				Height:     ctx.Block.Height,
 				LastHeight: ctx.Block.Height,
 				Hash:       hash,
@@ -344,7 +344,7 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 		if prefix == pkgTypes.AddressPrefixCelestia {
 			transfer.Receiver = &storage.Address{
 				Address:    packet.Receiver,
-				Balance:    storage.EmptyBalance(),
+				Balances:   []storage.Balance{storage.EmptyBalance()},
 				Height:     ctx.Block.Height,
 				LastHeight: ctx.Block.Height,
 				Hash:       hash,
@@ -368,7 +368,7 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 		if prefix == pkgTypes.AddressPrefixCelestia {
 			transfer.Sender = &storage.Address{
 				Address:    packet.Sender,
-				Balance:    storage.EmptyBalance(),
+				Balances:   []storage.Balance{storage.EmptyBalance()},
 				Height:     ctx.Block.Height,
 				LastHeight: ctx.Block.Height,
 				Hash:       hash,

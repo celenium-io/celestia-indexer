@@ -24,6 +24,8 @@ func (s *StorageTestSuite) TestAddressByHash() {
 	s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", address.Address)
 	s.Require().NotNil(address.Celestials)
 	s.Require().EqualValues("name 1", address.Celestials.Id)
+	s.Require().NotNil(address.DefaultBalance)
+	s.Require().EqualValues("432", address.DefaultBalance.Spendable.String())
 }
 
 func (s *StorageTestSuite) TestIcaAddressByHash() {
@@ -38,6 +40,8 @@ func (s *StorageTestSuite) TestIcaAddressByHash() {
 	s.Require().Equal("celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss", address.Address)
 	s.Require().NotNil(address.Celestials)
 	s.Require().EqualValues("name 4", address.Celestials.Id)
+	s.Require().NotNil(address.DefaultBalance)
+	s.Require().EqualValues("210", address.DefaultBalance.Spendable.String())
 }
 
 func (s *StorageTestSuite) TestAddressByHashWithoutCelestials() {
@@ -68,22 +72,25 @@ func (s *StorageTestSuite) TestAddressList() {
 	s.Require().EqualValues(1, addresses[0].Id)
 	s.Require().EqualValues(100, addresses[0].Height)
 	s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", addresses[0].Address)
-	s.Require().Equal("432", addresses[0].Balance.Spendable.String())
-	s.Require().Equal("utia", addresses[0].Balance.Currency)
+	s.Require().NotNil(addresses[0].DefaultBalance)
+	s.Require().Equal("432", addresses[0].DefaultBalance.Spendable.String())
+	s.Require().Equal("utia", addresses[0].DefaultBalance.Currency)
 	s.Require().NotNil(addresses[0].Celestials)
 
 	s.Require().EqualValues(2, addresses[1].Id)
 	s.Require().EqualValues(101, addresses[1].Height)
 	s.Require().Equal("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", addresses[1].Address)
-	s.Require().Equal("321", addresses[1].Balance.Spendable.String())
-	s.Require().Equal("utia", addresses[1].Balance.Currency)
+	s.Require().NotNil(addresses[1].DefaultBalance)
+	s.Require().Equal("321", addresses[1].DefaultBalance.Spendable.String())
+	s.Require().Equal("utia", addresses[1].DefaultBalance.Currency)
 	s.Require().NotNil(addresses[1].Celestials)
 
 	s.Require().EqualValues(3, addresses[2].Id)
 	s.Require().EqualValues(102, addresses[2].Height)
 	s.Require().Equal("celestia1cr2t0y5zu9sya67t9sp0vt9cxum408yuphkhex", addresses[2].Address)
-	s.Require().Equal("555", addresses[2].Balance.Spendable.String())
-	s.Require().Equal("utia", addresses[2].Balance.Currency)
+	s.Require().NotNil(addresses[2].DefaultBalance)
+	s.Require().Equal("555", addresses[2].DefaultBalance.Spendable.String())
+	s.Require().Equal("utia", addresses[2].DefaultBalance.Currency)
 	s.Require().Nil(addresses[2].Celestials)
 }
 
@@ -104,14 +111,16 @@ func (s *StorageTestSuite) TestAddressListWithSortAscHeight() {
 		s.Require().EqualValues(1, addresses[0].Id)
 		s.Require().EqualValues(100, addresses[0].Height)
 		s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", addresses[0].Address)
-		s.Require().Equal("432", addresses[0].Balance.Spendable.String())
-		s.Require().Equal("utia", addresses[0].Balance.Currency)
+		s.Require().NotNil(addresses[0].DefaultBalance)
+		s.Require().Equal("432", addresses[0].DefaultBalance.Spendable.String())
+		s.Require().Equal("utia", addresses[0].DefaultBalance.Currency)
 
 		s.Require().EqualValues(2, addresses[1].Id)
 		s.Require().EqualValues(101, addresses[1].Height)
 		s.Require().Equal("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", addresses[1].Address)
-		s.Require().Equal("321", addresses[1].Balance.Spendable.String())
-		s.Require().Equal("utia", addresses[1].Balance.Currency)
+		s.Require().NotNil(addresses[1].DefaultBalance)
+		s.Require().Equal("321", addresses[1].DefaultBalance.Spendable.String())
+		s.Require().Equal("utia", addresses[1].DefaultBalance.Currency)
 	}
 }
 
@@ -132,8 +141,9 @@ func (s *StorageTestSuite) TestAddressListWithSortDescHeight() {
 		s.Require().EqualValues(3, addresses[0].Id, field)
 		s.Require().EqualValues(102, addresses[0].Height, field)
 		s.Require().Equal("celestia1cr2t0y5zu9sya67t9sp0vt9cxum408yuphkhex", addresses[0].Address, field)
-		s.Require().Equal("555", addresses[0].Balance.Spendable.String(), field)
-		s.Require().Equal("utia", addresses[0].Balance.Currency, field)
+		s.Require().NotNil(addresses[0].DefaultBalance, field)
+		s.Require().Equal("555", addresses[0].DefaultBalance.Spendable.String(), field)
+		s.Require().Equal("utia", addresses[0].DefaultBalance.Currency, field)
 	}
 }
 
@@ -154,29 +164,33 @@ func (s *StorageTestSuite) TestAddressListWithSortDesc() {
 		s.Require().EqualValues(3, addresses[0].Id)
 		s.Require().EqualValues(102, addresses[0].Height)
 		s.Require().Equal("celestia1cr2t0y5zu9sya67t9sp0vt9cxum408yuphkhex", addresses[0].Address)
-		s.Require().Equal("555", addresses[0].Balance.Spendable.String())
-		s.Require().Equal("utia", addresses[0].Balance.Currency)
+		s.Require().NotNil(addresses[0].DefaultBalance)
+		s.Require().Equal("555", addresses[0].DefaultBalance.Spendable.String())
+		s.Require().Equal("utia", addresses[0].DefaultBalance.Currency)
 		s.Require().Nil(addresses[0].Celestials)
 
 		s.Require().EqualValues(1, addresses[1].Id)
 		s.Require().EqualValues(100, addresses[1].Height)
 		s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", addresses[1].Address)
-		s.Require().Equal("432", addresses[1].Balance.Spendable.String())
-		s.Require().Equal("utia", addresses[1].Balance.Currency)
+		s.Require().NotNil(addresses[1].DefaultBalance)
+		s.Require().Equal("432", addresses[1].DefaultBalance.Spendable.String())
+		s.Require().Equal("utia", addresses[1].DefaultBalance.Currency)
 		s.Require().NotNil(addresses[1].Celestials)
 
 		s.Require().EqualValues(2, addresses[2].Id)
 		s.Require().EqualValues(101, addresses[2].Height)
 		s.Require().Equal("celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", addresses[2].Address)
-		s.Require().Equal("321", addresses[2].Balance.Spendable.String())
-		s.Require().Equal("utia", addresses[2].Balance.Currency)
+		s.Require().NotNil(addresses[2].DefaultBalance)
+		s.Require().Equal("321", addresses[2].DefaultBalance.Spendable.String())
+		s.Require().Equal("utia", addresses[2].DefaultBalance.Currency)
 		s.Require().NotNil(addresses[2].Celestials)
 
 		s.Require().EqualValues(4, addresses[3].Id)
 		s.Require().EqualValues(101, addresses[3].Height)
 		s.Require().Equal("celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss", addresses[3].Address)
-		s.Require().Equal("210", addresses[3].Balance.Spendable.String())
-		s.Require().Equal("utia", addresses[3].Balance.Currency)
+		s.Require().NotNil(addresses[3].DefaultBalance)
+		s.Require().Equal("210", addresses[3].DefaultBalance.Spendable.String())
+		s.Require().Equal("utia", addresses[3].DefaultBalance.Currency)
 		s.Require().NotNil(addresses[3].Celestials)
 	}
 }
@@ -197,14 +211,16 @@ func (s *StorageTestSuite) TestAddressListWithSortAsc() {
 
 		var balance types.Numeric
 		for i := range addresses {
+			s.Require().NotNil(addresses[i].DefaultBalance)
+
 			var current types.Numeric
 			switch field {
 			case "delegated":
-				current = addresses[i].Balance.Delegated.Copy()
+				current = addresses[i].DefaultBalance.Delegated.Copy()
 			case "spendable":
-				current = addresses[i].Balance.Spendable.Copy()
+				current = addresses[i].DefaultBalance.Spendable.Copy()
 			case "unbonding":
-				current = addresses[i].Balance.Unbonding.Copy()
+				current = addresses[i].DefaultBalance.Unbonding.Copy()
 			}
 
 			if i != 0 {
@@ -304,4 +320,19 @@ func (s *StorageTestSuite) TestAddressIdByAddress() {
 	id, err := s.storage.Address.IdByAddress(ctx, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", 2, 3, 4)
 	s.Require().NoError(err)
 	s.Require().EqualValues(2, id)
+}
+
+func (s *StorageTestSuite) TestBalances() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	balances, err := s.storage.Address.Balances(ctx, 5, 10, 0)
+	s.Require().NoError(err)
+	s.Require().Len(balances, 2)
+
+	s.Require().Equal("0", balances[1].Spendable.String())
+	s.Require().Equal("utia", balances[1].Currency)
+
+	s.Require().Equal("1", balances[0].Spendable.String())
+	s.Require().Equal("ibc/testtoken", balances[0].Currency)
 }

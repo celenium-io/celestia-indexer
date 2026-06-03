@@ -76,10 +76,12 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 				Address:    cancel.Delegator,
 				Height:     msg.Height,
 				LastHeight: msg.Height,
-				Balance: storage.Balance{
-					Currency:  currency.DefaultCurrency,
-					Delegated: amount.Copy(),
-					Unbonding: amount.Copy().Neg(),
+				Balances: []storage.Balance{
+					{
+						Currency:  currency.DefaultCurrency,
+						Delegated: amount.Copy(),
+						Unbonding: amount.Copy().Neg(),
+					},
 				},
 			}
 			if err := ctx.AddAddress(address); err != nil {

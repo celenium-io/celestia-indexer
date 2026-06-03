@@ -138,11 +138,11 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 
 	_ = decodeCtx.Delegations.Range(func(_ string, value *storage.Delegation) (error, bool) {
 		data.delegations = append(data.delegations, *value)
-		if data.bondedTokensPool != nil {
-			data.bondedTokensPool.Balance.Spendable = data.bondedTokensPool.Balance.Spendable.Add(value.Amount)
+		if data.bondedTokensPool != nil && len(data.bondedTokensPool.Balances) > 0 {
+			data.bondedTokensPool.Balances[0].Spendable = data.bondedTokensPool.Balances[0].Spendable.Add(value.Amount)
 		}
-		if addr, ok := data.addresses[value.Address.Address]; ok {
-			addr.Balance.Spendable = addr.Balance.Spendable.Sub(value.Amount)
+		if addr, ok := data.addresses[value.Address.Address]; ok && len(addr.Balances) > 0 {
+			addr.Balances[0].Spendable = addr.Balances[0].Spendable.Sub(value.Amount)
 		}
 		return nil, false
 	})
@@ -171,11 +171,13 @@ func (module *Module) parseAccounts(accounts []types.Account, block storage.Bloc
 		address := storage.Address{
 			Height:     block.Height,
 			LastHeight: block.Height,
-			Balance: storage.Balance{
-				Spendable: storageTypes.NumericZero(),
-				Delegated: storageTypes.NumericZero(),
-				Unbonding: storageTypes.NumericZero(),
-				Currency:  currencyBase,
+			Balances: []storage.Balance{
+				{
+					Spendable: storageTypes.NumericZero(),
+					Delegated: storageTypes.NumericZero(),
+					Unbonding: storageTypes.NumericZero(),
+					Currency:  currencyBase,
+				},
 			},
 		}
 
@@ -243,19 +245,21 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 			Address:    balances[i].Address,
 			Height:     height,
 			LastHeight: height,
-			Balance: storage.Balance{
-				Spendable: storageTypes.NumericZero(),
-				Delegated: storageTypes.NumericZero(),
-				Unbonding: storageTypes.NumericZero(),
-				Currency:  balances[i].Coins[0].Denom,
+			Balances: []storage.Balance{
+				{
+					Spendable: storageTypes.NumericZero(),
+					Delegated: storageTypes.NumericZero(),
+					Unbonding: storageTypes.NumericZero(),
+					Currency:  balances[i].Coins[0].Denom,
+				},
 			},
 		}
 		if balance, err := storageTypes.NumericFromString(balances[i].Coins[0].Amount); err == nil {
-			address.Balance.Spendable = address.Balance.Spendable.Add(balance)
+			address.Balances[0].Spendable = address.Balances[0].Spendable.Add(balance)
 		}
 
 		if addr, ok := data.addresses[address.String()]; ok {
-			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
+			addr.Balances[0].Spendable = addr.Balances[0].Spendable.Add(address.Balances[0].Spendable)
 		} else {
 			data.addresses[address.String()] = &address
 		}

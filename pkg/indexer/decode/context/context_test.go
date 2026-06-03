@@ -120,11 +120,13 @@ func Test_AddAddress_New(t *testing.T) {
 		Address:    "celestia1ydgj7csawc0k4f7qguy6zd5vs7q5cqx5cepy5e",
 		Height:     1,
 		LastHeight: 1,
-		Balance: storage.Balance{
-			Currency:  currency.DefaultCurrency,
-			Spendable: storageTypes.NumericFromInt64(100),
-			Delegated: storageTypes.NumericFromInt64(50),
-			Unbonding: storageTypes.NumericFromInt64(20),
+		Balances: []storage.Balance{
+			{
+				Currency:  currency.DefaultCurrency,
+				Spendable: storageTypes.NumericFromInt64(100),
+				Delegated: storageTypes.NumericFromInt64(50),
+				Unbonding: storageTypes.NumericFromInt64(20),
+			},
 		},
 	}
 
@@ -144,11 +146,13 @@ func Test_AddAddress_Existing(t *testing.T) {
 		Address:    "celestia1ydgj7csawc0k4f7qguy6zd5vs7q5cqx5cepy5e",
 		Height:     1,
 		LastHeight: 1,
-		Balance: storage.Balance{
-			Currency:  currency.DefaultCurrency,
-			Spendable: storageTypes.NumericFromInt64(100),
-			Delegated: storageTypes.NumericFromInt64(50),
-			Unbonding: storageTypes.NumericFromInt64(20),
+		Balances: []storage.Balance{
+			{
+				Currency:  currency.DefaultCurrency,
+				Spendable: storageTypes.NumericFromInt64(100),
+				Delegated: storageTypes.NumericFromInt64(50),
+				Unbonding: storageTypes.NumericFromInt64(20),
+			},
 		},
 	}
 
@@ -159,11 +163,13 @@ func Test_AddAddress_Existing(t *testing.T) {
 		Address:    "celestia1ydgj7csawc0k4f7qguy6zd5vs7q5cqx5cepy5e",
 		Height:     1,
 		LastHeight: 1,
-		Balance: storage.Balance{
-			Currency:  currency.DefaultCurrency,
-			Spendable: storageTypes.NumericFromInt64(50),
-			Delegated: storageTypes.NumericFromInt64(25),
-			Unbonding: storageTypes.NumericFromInt64(10),
+		Balances: []storage.Balance{
+			{
+				Currency:  currency.DefaultCurrency,
+				Spendable: storageTypes.NumericFromInt64(50),
+				Delegated: storageTypes.NumericFromInt64(25),
+				Unbonding: storageTypes.NumericFromInt64(10),
+			},
 		},
 	}
 
@@ -178,11 +184,13 @@ func Test_AddAddress_Existing(t *testing.T) {
 		Height:     1,
 		LastHeight: 1,
 		Hash:       []byte{0x23, 0x51, 0x2f, 0x62, 0x1d, 0x76, 0x1f, 0x6a, 0xa7, 0xc0, 0x47, 0x09, 0xa1, 0x36, 0x8c, 0x87, 0x81, 0x4c, 0x00, 0xd4},
-		Balance: storage.Balance{
-			Currency:  currency.DefaultCurrency,
-			Spendable: storageTypes.NumericFromInt64(150),
-			Delegated: storageTypes.NumericFromInt64(75),
-			Unbonding: storageTypes.NumericFromInt64(30),
+		Balances: []storage.Balance{
+			{
+				Currency:  currency.DefaultCurrency,
+				Spendable: storageTypes.NumericFromInt64(150),
+				Delegated: storageTypes.NumericFromInt64(75),
+				Unbonding: storageTypes.NumericFromInt64(30),
+			},
 		},
 	}, addr)
 }
@@ -194,11 +202,13 @@ func Test_AddAddress_ExistingWithInvalidCurrency(t *testing.T) {
 		Address:    "celestia1ydgj7csawc0k4f7qguy6zd5vs7q5cqx5cepy5e",
 		Height:     1,
 		LastHeight: 1,
-		Balance: storage.Balance{
-			Currency:  currency.DefaultCurrency,
-			Spendable: storageTypes.NumericFromInt64(100),
-			Delegated: storageTypes.NumericFromInt64(50),
-			Unbonding: storageTypes.NumericFromInt64(20),
+		Balances: []storage.Balance{
+			{
+				Currency:  currency.DefaultCurrency,
+				Spendable: storageTypes.NumericFromInt64(100),
+				Delegated: storageTypes.NumericFromInt64(50),
+				Unbonding: storageTypes.NumericFromInt64(20),
+			},
 		},
 	}
 
@@ -209,11 +219,13 @@ func Test_AddAddress_ExistingWithInvalidCurrency(t *testing.T) {
 		Address:    "celestia1ydgj7csawc0k4f7qguy6zd5vs7q5cqx5cepy5e",
 		Height:     1,
 		LastHeight: 1,
-		Balance: storage.Balance{
-			Currency:  "invalid_currency",
-			Spendable: storageTypes.NumericFromInt64(50),
-			Delegated: storageTypes.NumericFromInt64(25),
-			Unbonding: storageTypes.NumericFromInt64(10),
+		Balances: []storage.Balance{
+			{
+				Currency:  "invalid_currency",
+				Spendable: storageTypes.NumericFromInt64(50),
+				Delegated: storageTypes.NumericFromInt64(25),
+				Unbonding: storageTypes.NumericFromInt64(10),
+			},
 		},
 	}
 
@@ -228,11 +240,19 @@ func Test_AddAddress_ExistingWithInvalidCurrency(t *testing.T) {
 		Height:     1,
 		LastHeight: 1,
 		Hash:       []byte{0x23, 0x51, 0x2f, 0x62, 0x1d, 0x76, 0x1f, 0x6a, 0xa7, 0xc0, 0x47, 0x09, 0xa1, 0x36, 0x8c, 0x87, 0x81, 0x4c, 0x00, 0xd4},
-		Balance: storage.Balance{
-			Currency:  currency.DefaultCurrency,
-			Spendable: storageTypes.NumericFromInt64(100),
-			Delegated: storageTypes.NumericFromInt64(50),
-			Unbonding: storageTypes.NumericFromInt64(20),
+		Balances: []storage.Balance{
+			{
+				Currency:  currency.DefaultCurrency,
+				Spendable: storageTypes.NumericFromInt64(100),
+				Delegated: storageTypes.NumericFromInt64(50),
+				Unbonding: storageTypes.NumericFromInt64(20),
+			},
+			{
+				Currency:  "invalid_currency",
+				Spendable: storageTypes.NumericFromInt64(50),
+				Delegated: storageTypes.NumericFromInt64(25),
+				Unbonding: storageTypes.NumericFromInt64(10),
+			},
 		},
 	}, addr)
 }

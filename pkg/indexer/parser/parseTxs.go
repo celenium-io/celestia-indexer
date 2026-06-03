@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 
 	json "github.com/bytedance/sonic"
-	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
@@ -65,11 +64,8 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 			Height:     t.Height,
 			LastHeight: t.Height,
 			Hash:       signerBytes,
-			Balance: storage.Balance{
-				Currency:  currency.DefaultCurrency,
-				Spendable: storageTypes.NumericZero(),
-				Delegated: storageTypes.NumericZero(),
-				Unbonding: storageTypes.NumericZero(),
+			Balances: []storage.Balance{
+				storage.EmptyBalance(),
 			},
 		}
 		t.Signers = append(t.Signers, address)

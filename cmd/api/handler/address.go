@@ -895,3 +895,38 @@ func (handler *AddressHandler) Votes(c echo.Context) error {
 	}
 	return returnArray(c, response)
 }
+
+// @Summary		Get list of balances for address
+// @Description	Returns a paginated list of all token balances held by the given address, including native and IBC tokens. Results are ordered by currency name.
+// @Tags			address
+// @ID				address-balances
+// @Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
+// @Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
+// @Param			offset	query	integer	false	"Offset"						minimum(1)
+// @Produce		json
+// @Success		200	{array}		responses.Balance
+// @Failure		400	{object}	Error
+// @Failure		404	{object}	Error
+// @Failure		500	{object}	Error
+// @Router			/address/{hash}/balances [get]
+func (h *AddressHandler) Balances(c echo.Context) error {
+	req, err := bindAndValidate[getAddressPageable](c)
+	if err != nil {
+		return badRequestError(c, err)
+	}
+
+	addressId, err := h.address.IdByAddress(c.Request().Context(), req.Hash)
+	if err != nil {
+		return handleError(c, err, h.address)
+	}
+
+	balances, err := h.address.Balances(c.Request().Context(), addressId, req.Limit, req.Offset)
+	if err != nil {
+		return handleError(c, err, h.address)
+	}
+	response := make([]responses.Balance, len(balances))
+	for i := range balances {
+		response[i] = responses.NewBalance(balances[i])
+	}
+	return returnArray(c, response)
+}

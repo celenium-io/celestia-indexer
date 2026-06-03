@@ -337,6 +337,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			addressGroup.GET("/granters", addressHandlers.Grantee)
 			addressGroup.GET("/celestials", addressHandlers.Celestials)
 			addressGroup.GET("/votes", addressHandlers.Votes)
+			addressGroup.GET("/balances", addressHandlers.Balances)
 			addressGroup.GET("/stats/:name/:timeframe", addressHandlers.Stats, statsMiddlewareCache)
 		}
 	}

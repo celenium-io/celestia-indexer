@@ -152,11 +152,13 @@ func Test_handleUndelegate(t *testing.T) {
 					LastHeight: 844186,
 					Address:    "celestia144tkegx6vw9pr6tx0gg68zmy57vcjpapxgwn4q",
 					Hash:       []byte{0xad, 0x57, 0x6c, 0xa0, 0xda, 0x63, 0x8a, 0x11, 0xe9, 0x66, 0x7a, 0x11, 0xa3, 0x8b, 0x64, 0xa7, 0x99, 0x89, 0x07, 0xa1},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.MustNumericFromString("-144000000"),
-						Spendable: types.NumericZero(),
-						Unbonding: types.NumericFromInt64(144000000),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.MustNumericFromString("-144000000"),
+							Spendable: types.NumericZero(),
+							Unbonding: types.NumericFromInt64(144000000),
+						},
 					},
 				},
 				Validator: &storage.Validator{
@@ -270,11 +272,13 @@ func Test_handleUndelegate(t *testing.T) {
 					LastHeight: 75,
 					Address:    "celestia15e9hkqujx0c8m464w6a35glc8vtqdrxnshcmwq",
 					Hash:       []byte{0xa6, 0x4b, 0x7b, 0x03, 0x92, 0x33, 0xf0, 0x7d, 0xd7, 0x55, 0x76, 0xbb, 0x1a, 0x23, 0xf8, 0x3b, 0x16, 0x06, 0x8c, 0xd3},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.MustNumericFromString("-30000"),
-						Spendable: types.NumericZero(),
-						Unbonding: types.NumericFromInt64(30000),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.MustNumericFromString("-30000"),
+							Spendable: types.NumericZero(),
+							Unbonding: types.NumericFromInt64(30000),
+						},
 					},
 				},
 				Validator: &storage.Validator{
@@ -390,11 +394,13 @@ func Test_handleUndelegate(t *testing.T) {
 					LastHeight: 75,
 					Address:    "celestia1xs55snr6lxsalaqrwc63cxlmgn437zzv2gew35",
 					Hash:       []byte{0x34, 0x29, 0x48, 0x4c, 0x7a, 0xf9, 0xa1, 0xdf, 0xf4, 0x03, 0x76, 0x35, 0x1c, 0x1b, 0xfb, 0x44, 0xeb, 0x1f, 0x08, 0x4c},
-					Balance: storage.Balance{
-						Currency:  currency.Utia,
-						Delegated: types.MustNumericFromString("-1000000"),
-						Spendable: types.NumericZero(),
-						Unbonding: types.NumericFromInt64(1000000),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.Utia,
+							Delegated: types.MustNumericFromString("-1000000"),
+							Spendable: types.NumericZero(),
+							Unbonding: types.NumericFromInt64(1000000),
+						},
 					},
 				},
 				Validator: &storage.Validator{

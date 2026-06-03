@@ -76,7 +76,7 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 					Height:     ctx.Block.Height,
 					LastHeight: ctx.Block.Height,
 					Address:    voter,
-					Balance:    storage.EmptyBalance(),
+					Balances:   []storage.Balance{storage.EmptyBalance()},
 				},
 			}
 			if err := ctx.AddAddress(vote.Voter); err != nil {
@@ -109,7 +109,7 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 			Height:     ctx.Block.Height,
 			LastHeight: ctx.Block.Height,
 			Address:    voter,
-			Balance:    storage.EmptyBalance(),
+			Balances:   []storage.Balance{storage.EmptyBalance()},
 		},
 	}
 

@@ -73,7 +73,7 @@ func processForward(ctx *context.Context, events []storage.Event, msg *storage.M
 				IsForwarding: true,
 				Height:       msg.Height,
 				LastHeight:   msg.Height,
-				Balance:      storage.EmptyBalance(),
+				Balances:     []storage.Balance{storage.EmptyBalance()},
 			}
 			if err = ctx.AddAddress(forwarding.Address); err != nil {
 				return errors.Wrap(err, "add forwarding address")

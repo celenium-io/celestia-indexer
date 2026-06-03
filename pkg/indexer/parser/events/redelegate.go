@@ -98,9 +98,11 @@ func processRedelegate(ctx *context.Context, events []storage.Event, msg *storag
 				Address:    delegator,
 				Height:     msg.Height,
 				LastHeight: msg.Height,
-				Balance: storage.Balance{
-					Currency:  currency.DefaultCurrency,
-					Delegated: storageTypes.NumericZero(),
+				Balances: []storage.Balance{
+					{
+						Currency:  currency.DefaultCurrency,
+						Delegated: storageTypes.NumericZero(),
+					},
 				},
 			}
 			if err := ctx.AddAddress(address); err != nil {

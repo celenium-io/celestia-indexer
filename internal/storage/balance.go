@@ -41,3 +41,30 @@ func EmptyBalance() Balance {
 		Unbonding: types.NumericZero(),
 	}
 }
+
+func SpendableBalance(denom string, spendable types.Numeric) Balance {
+	return Balance{
+		Currency:  denom,
+		Spendable: spendable,
+		Delegated: types.NumericZero(),
+		Unbonding: types.NumericZero(),
+	}
+}
+
+func UnbondingBalance(denom string, unbonding types.Numeric) Balance {
+	return Balance{
+		Currency:  denom,
+		Spendable: types.NumericZero(),
+		Delegated: types.NumericZero(),
+		Unbonding: unbonding,
+	}
+}
+
+func DelegatedBalance(denom string, delegated types.Numeric) Balance {
+	return Balance{
+		Currency:  denom,
+		Spendable: types.NumericZero(),
+		Delegated: delegated,
+		Unbonding: types.NumericZero(),
+	}
+}

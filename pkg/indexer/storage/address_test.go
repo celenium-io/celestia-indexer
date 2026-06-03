@@ -99,9 +99,11 @@ func Test_saveAddresses(t *testing.T) {
 					Address:    "address1",
 					Height:     100,
 					LastHeight: 100,
-					Balance: storage.Balance{
-						Currency:  "utia",
-						Spendable: storageTypes.NumericFromInt64(1),
+					Balances: []storage.Balance{
+						{
+							Currency:  "utia",
+							Spendable: storageTypes.NumericFromInt64(1),
+						},
 					},
 				},
 			},
@@ -117,9 +119,11 @@ func Test_saveAddresses(t *testing.T) {
 					Address:    "address1",
 					Height:     100,
 					LastHeight: 101,
-					Balance: storage.Balance{
-						Currency:  "utia",
-						Spendable: storageTypes.NumericFromInt64(1),
+					Balances: []storage.Balance{
+						{
+							Currency:  "utia",
+							Spendable: storageTypes.NumericFromInt64(1),
+						},
 					},
 				},
 			},

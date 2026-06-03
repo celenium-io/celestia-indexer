@@ -44,9 +44,11 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 				Address:    delegator,
 				Height:     msg.Height,
 				LastHeight: msg.Height,
-				Balance: storage.Balance{
-					Currency:  currency.DefaultCurrency,
-					Delegated: delegation.Amount,
+				Balances: []storage.Balance{
+					{
+						Currency:  currency.DefaultCurrency,
+						Delegated: delegation.Amount,
+					},
 				},
 			}
 

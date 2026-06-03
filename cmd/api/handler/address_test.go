@@ -181,7 +181,7 @@ func (s *AddressTestSuite) TestList() {
 				Address:    testAddress,
 				Height:     100,
 				LastHeight: 100,
-				Balance: storage.Balance{
+				DefaultBalance: &storage.Balance{
 					Currency:  "utia",
 					Spendable: types.NumericFromInt64(100),
 					Delegated: types.NumericFromInt64(1),
@@ -835,7 +835,7 @@ func (s *AddressTestSuite) TestVotes() {
 					Address:    testAddress,
 					Height:     333,
 					LastHeight: 333,
-					Balance: storage.Balance{
+					DefaultBalance: &storage.Balance{
 						Currency:  "utia",
 						Spendable: types.NumericFromInt64(100),
 						Delegated: types.NumericFromInt64(1),
@@ -865,4 +865,54 @@ func (s *AddressTestSuite) TestVotes() {
 	s.Require().NotNil(votes[0].Voter)
 	s.Require().NotNil(votes[0].Voter.Celestials)
 	s.Require().EqualValues("image", votes[0].Voter.Celestials.ImageUrl)
+}
+
+func (s *AddressTestSuite) TestBalances() {
+	q := make(url.Values)
+	q.Set("limit", "10")
+	q.Set("offset", "0")
+
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/address/:hash/balances")
+	c.SetParamNames("hash")
+	c.SetParamValues(testAddress)
+
+	s.address.EXPECT().
+		IdByAddress(gomock.Any(), testAddress).
+		Return(1, nil).
+		Times(1)
+
+	s.address.EXPECT().
+		Balances(gomock.Any(), uint64(1), 10, 0).
+		Return([]storage.Balance{
+			{
+				Currency:  "utia",
+				Spendable: types.NumericFromInt64(100),
+				Delegated: types.NumericFromInt64(1),
+				Unbonding: types.NumericFromInt64(2),
+			}, {
+				Currency:  "test",
+				Spendable: types.NumericFromInt64(200),
+				Delegated: types.NumericFromInt64(3),
+				Unbonding: types.NumericFromInt64(4),
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.Balances(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var balances []responses.Balance
+	err := json.NewDecoder(rec.Body).Decode(&balances)
+	s.Require().NoError(err)
+	s.Require().Len(balances, 2)
+	s.Require().Equal("utia", balances[0].Currency)
+	s.Require().Equal("100", balances[0].Spendable)
+	s.Require().Equal("1", balances[0].Delegated)
+	s.Require().Equal("2", balances[0].Unbonding)
+	s.Require().Equal("test", balances[1].Currency)
+	s.Require().Equal("200", balances[1].Spendable)
+	s.Require().Equal("3", balances[1].Delegated)
+	s.Require().Equal("4", balances[1].Unbonding)
 }

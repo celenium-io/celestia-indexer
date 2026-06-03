@@ -28,7 +28,7 @@ func createAddresses(ctx *context.Context, data addressesData, level types.Level
 			Height:     level,
 			LastHeight: level,
 			Address:    data[i].address,
-			Balance:    storage.EmptyBalance(),
+			Balances:   []storage.Balance{storage.EmptyBalance()},
 		}
 		if err := ctx.AddAddress(&address); err != nil {
 			return err

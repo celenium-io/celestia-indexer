@@ -50,7 +50,7 @@ func processSetMailbox(ctx *context.Context, events []storage.Event, msg *storag
 					Address:    setMailbox.Owner,
 					Height:     msg.Height,
 					LastHeight: msg.Height,
-					Balance:    storage.EmptyBalance(),
+					Balances:   []storage.Balance{storage.EmptyBalance()},
 				},
 			}
 			if err := ctx.AddAddress(mailbox.Owner); err != nil {
@@ -76,7 +76,7 @@ func processSetMailbox(ctx *context.Context, events []storage.Event, msg *storag
 			if len(setMailbox.NewOwner) > 0 && setMailbox.NewOwner != setMailbox.Owner {
 				newOwner := &storage.Address{
 					Address:    setMailbox.NewOwner,
-					Balance:    storage.EmptyBalance(),
+					Balances:   []storage.Balance{storage.EmptyBalance()},
 					Height:     msg.Height,
 					LastHeight: msg.Height,
 				}

@@ -6,7 +6,6 @@ package rollback
 import (
 	"context"
 
-	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
@@ -78,7 +77,19 @@ func getBalanceUpdates(
 		}
 
 		if addr, ok := updates[address.Address]; ok {
-			addr.Balance.Spendable = addr.Balance.Spendable.Add(address.Balance.Spendable)
+			for i := range address.Balances {
+				found := false
+				for j := range addr.Balances {
+					if addr.Balances[j].Currency == address.Balances[i].Currency {
+						found = true
+						addr.Balances[j].Spendable = addr.Balances[j].Spendable.Add(address.Balances[i].Spendable)
+						break
+					}
+				}
+				if !found {
+					addr.Balances = append(addr.Balances, address.Balances[i])
+				}
+			}
 		} else {
 			lastHeight, err := tx.LastAddressAction(ctx, address.Hash)
 			if err != nil {
@@ -108,25 +119,20 @@ func coinSpent(data map[string]string) (*storage.Address, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "decode spender: %s", coinSpent.Spender)
 	}
-	balance := storage.Balance{
-		Currency:  currency.DefaultCurrency,
-		Spendable: types.NumericZero(),
+	address := &storage.Address{
+		Address:  coinSpent.Spender,
+		Hash:     hash,
+		Balances: make([]storage.Balance, 0, len(coinSpent.Amount)),
 	}
 	for i := range coinSpent.Amount {
 		if coinSpent.Amount[i] == nil || coinSpent.Amount[i].IsZero() {
 			continue
 		}
-		if coinSpent.Amount[i].GetDenom() == currency.DefaultCurrency { // TODO: support other currencies
-			amount := types.NumericFromBigInt(coinSpent.Amount[i].Amount.BigInt(), 0)
-			balance.Spendable = amount
-			balance.Currency = coinSpent.Amount[i].GetDenom()
-		}
+
+		amount := types.NumericFromBigInt(coinSpent.Amount[i].Amount.BigInt(), 0)
+		address.Balances = append(address.Balances, storage.SpendableBalance(coinSpent.Amount[i].GetDenom(), amount))
 	}
-	return &storage.Address{
-		Address: coinSpent.Spender,
-		Hash:    hash,
-		Balance: balance,
-	}, nil
+	return address, nil
 }
 
 func coinReceived(data map[string]string) (*storage.Address, error) {
@@ -139,25 +145,18 @@ func coinReceived(data map[string]string) (*storage.Address, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "decode receiver: %s", coinReceived.Receiver)
 	}
-
-	balance := storage.Balance{
-		Currency:  currency.DefaultCurrency,
-		Spendable: types.NumericZero(),
+	address := &storage.Address{
+		Address:  coinReceived.Receiver,
+		Hash:     hash,
+		Balances: make([]storage.Balance, 0, len(coinReceived.Amount)),
 	}
 	for i := range coinReceived.Amount {
 		if coinReceived.Amount[i] == nil || coinReceived.Amount[i].IsZero() {
 			continue
 		}
-		if coinReceived.Amount[i].GetDenom() == currency.DefaultCurrency { // TODO: support other currencies
-			amount := types.NumericFromBigInt(coinReceived.Amount[i].Amount.Neg().BigInt(), 0)
-			balance.Spendable = amount
-			balance.Currency = coinReceived.Amount[i].GetDenom()
-		}
+		amount := types.NumericFromBigInt(coinReceived.Amount[i].Amount.Neg().BigInt(), 0)
+		address.Balances = append(address.Balances, storage.SpendableBalance(coinReceived.Amount[i].GetDenom(), amount))
 	}
 
-	return &storage.Address{
-		Address: coinReceived.Receiver,
-		Hash:    hash,
-		Balance: balance,
-	}, nil
+	return address, nil
 }

@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/bcp-innovations/hyperlane-cosmos/util"
-	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
@@ -31,23 +30,15 @@ func parseCoinSpent(ctx *context.Context, data map[string]string, height pkgType
 		Address:    coinSpent.Spender,
 		Height:     height,
 		LastHeight: height,
-		Balance: storage.Balance{
-			Currency:  currency.DefaultCurrency,
-			Spendable: types.NumericZero(),
-			Delegated: types.NumericZero(),
-			Unbonding: types.NumericZero(),
-		},
+		Balances:   make([]storage.Balance, 0),
 	}
 
 	for i := range coinSpent.Amount {
 		if coinSpent.Amount[i] == nil || coinSpent.Amount[i].IsZero() {
 			continue
 		}
-		if coinSpent.Amount[i].GetDenom() == currency.DefaultCurrency { // TODO: support other currencies
-			amount := types.NumericFromBigInt(coinSpent.Amount[i].Amount.BigInt(), 0)
-			address.Balance.Spendable = amount.Neg()
-			address.Balance.Currency = coinSpent.Amount[i].GetDenom()
-		}
+		amount := types.NumericFromBigInt(coinSpent.Amount[i].Amount.BigInt(), 0)
+		address.Balances = append(address.Balances, storage.SpendableBalance(coinSpent.Amount[i].GetDenom(), amount.Neg()))
 	}
 
 	return ctx.AddAddress(address)
@@ -67,23 +58,16 @@ func parseCoinReceived(ctx *context.Context, data map[string]string, height pkgT
 		Address:    coinReceived.Receiver,
 		Height:     height,
 		LastHeight: height,
-		Balance: storage.Balance{
-			Currency:  currency.DefaultCurrency,
-			Spendable: types.NumericZero(),
-			Delegated: types.NumericZero(),
-			Unbonding: types.NumericZero(),
-		},
+		Balances:   make([]storage.Balance, 0),
 	}
 
 	for i := range coinReceived.Amount {
 		if coinReceived.Amount[i] == nil || coinReceived.Amount[i].IsZero() {
 			continue
 		}
-		if coinReceived.Amount[i].GetDenom() == currency.DefaultCurrency { // TODO: support other currencies
-			amount := types.NumericFromBigInt(coinReceived.Amount[i].Amount.BigInt(), 0)
-			address.Balance.Spendable = amount
-			address.Balance.Currency = coinReceived.Amount[i].GetDenom()
-		}
+
+		amount := types.NumericFromBigInt(coinReceived.Amount[i].Amount.BigInt(), 0)
+		address.Balances = append(address.Balances, storage.SpendableBalance(coinReceived.Amount[i].GetDenom(), amount))
 	}
 
 	return ctx.AddAddress(address)
@@ -103,18 +87,12 @@ func parseCompleteUnbonding(ctx *context.Context, data map[string]string) error 
 		Address:    unbonding.Delegator,
 		Height:     ctx.Block.Height,
 		LastHeight: ctx.Block.Height,
-		Balance: storage.Balance{
-			Currency:  currency.DefaultCurrency,
-			Spendable: types.NumericZero(),
-			Delegated: types.NumericZero(),
-			Unbonding: types.NumericZero(),
-		},
+		Balances:   make([]storage.Balance, 0),
 	}
 
 	if unbonding.Amount != nil {
 		amount := types.NumericFromBigInt(unbonding.Amount.Amount.BigInt(), 0)
-		address.Balance.Unbonding = amount.Neg()
-		address.Balance.Currency = unbonding.Amount.GetDenom()
+		address.Balances = append(address.Balances, storage.UnbondingBalance(unbonding.Amount.GetDenom(), amount.Neg()))
 
 		validator := storage.EmptyValidator()
 		validator.Address = unbonding.Validator
@@ -146,7 +124,7 @@ func parseCompleteRedelegation(ctx *context.Context, data map[string]string) err
 		Address:    redelegation.Delegator,
 		Height:     ctx.Block.Height,
 		LastHeight: ctx.Block.Height,
-		Balance:    storage.EmptyBalance(),
+		Balances:   make([]storage.Balance, 0),
 	}
 
 	if redelegation.Amount != nil {

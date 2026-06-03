@@ -39,7 +39,7 @@ func parseWithdrawRewards(ctx *context.Context, msg *storage.Message, data map[s
 		Address:    rewards.Delegator,
 		Height:     ctx.Block.Height,
 		LastHeight: ctx.Block.Height,
-		Balance:    storage.EmptyBalance(),
+		Balances:   []storage.Balance{storage.EmptyBalance()},
 	}
 	ctx.AddStakingLog(storage.StakingLog{
 		Height:    msg.Height,

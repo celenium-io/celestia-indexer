@@ -36,9 +36,13 @@ func Test_coinReceived(t *testing.T) {
 			want: &storage.Address{
 				Hash:    testHashAddress,
 				Address: testAddress,
-				Balance: storage.Balance{
-					Currency:  "utia",
-					Spendable: types.MustNumericFromString("-123"),
+				Balances: []storage.Balance{
+					{
+						Currency:  "utia",
+						Spendable: types.MustNumericFromString("-123"),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
 				},
 			},
 		}, {
@@ -48,12 +52,9 @@ func Test_coinReceived(t *testing.T) {
 				"amount":   "",
 			},
 			want: &storage.Address{
-				Hash:    testHashAddress,
-				Address: testAddress,
-				Balance: storage.Balance{
-					Currency:  "utia",
-					Spendable: types.NumericZero(),
-				},
+				Hash:     testHashAddress,
+				Address:  testAddress,
+				Balances: []storage.Balance{},
 			},
 		}, {
 			name: "test 3",
@@ -82,9 +83,19 @@ func Test_coinReceived(t *testing.T) {
 			want: &storage.Address{
 				Hash:    testHashAddress,
 				Address: testAddress,
-				Balance: storage.Balance{
-					Currency:  "utia",
-					Spendable: types.MustNumericFromString("-5000000"),
+				Balances: []storage.Balance{
+					{
+						Currency:  ibcDenom,
+						Spendable: types.MustNumericFromString("-5000000"),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
+					{
+						Currency:  "utia",
+						Spendable: types.MustNumericFromString("-5000000"),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
 				},
 			},
 		}, {
@@ -96,9 +107,13 @@ func Test_coinReceived(t *testing.T) {
 			want: &storage.Address{
 				Hash:    testHashAddress,
 				Address: testAddress,
-				Balance: storage.Balance{
-					Currency:  "utia",
-					Spendable: types.NumericZero(),
+				Balances: []storage.Balance{
+					{
+						Currency:  ibcDenom,
+						Spendable: types.MustNumericFromString("-5000000"),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
 				},
 			},
 		},
@@ -131,9 +146,13 @@ func Test_coinSpent(t *testing.T) {
 			want: &storage.Address{
 				Hash:    testHashAddress,
 				Address: testAddress,
-				Balance: storage.Balance{
-					Currency:  "utia",
-					Spendable: types.NumericFromInt64(123),
+				Balances: []storage.Balance{
+					{
+						Currency:  "utia",
+						Spendable: types.NumericFromInt64(123),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
 				},
 			},
 		}, {
@@ -143,12 +162,9 @@ func Test_coinSpent(t *testing.T) {
 				"amount":  "",
 			},
 			want: &storage.Address{
-				Hash:    testHashAddress,
-				Address: testAddress,
-				Balance: storage.Balance{
-					Currency:  "utia",
-					Spendable: types.NumericZero(),
-				},
+				Hash:     testHashAddress,
+				Address:  testAddress,
+				Balances: []storage.Balance{},
 			},
 		}, {
 			name: "test 3",
@@ -177,9 +193,19 @@ func Test_coinSpent(t *testing.T) {
 			want: &storage.Address{
 				Hash:    testHashAddress,
 				Address: testAddress,
-				Balance: storage.Balance{
-					Currency:  "utia",
-					Spendable: types.NumericFromInt64(5000000),
+				Balances: []storage.Balance{
+					{
+						Currency:  ibcDenom,
+						Spendable: types.NumericFromInt64(5000000),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
+					{
+						Currency:  "utia",
+						Spendable: types.NumericFromInt64(5000000),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
 				},
 			},
 		}, {
@@ -191,9 +217,13 @@ func Test_coinSpent(t *testing.T) {
 			want: &storage.Address{
 				Hash:    testHashAddress,
 				Address: testAddress,
-				Balance: storage.Balance{
-					Currency:  "utia",
-					Spendable: types.NumericZero(),
+				Balances: []storage.Balance{
+					{
+						Currency:  ibcDenom,
+						Spendable: types.NumericFromInt64(5000000),
+						Delegated: types.NumericZero(),
+						Unbonding: types.NumericZero(),
+					},
 				},
 			},
 		},
@@ -244,9 +274,13 @@ func Test_getBalanceUpdates(t *testing.T) {
 				{
 					Address: testAddress,
 					Hash:    testHashAddress,
-					Balance: storage.Balance{
-						Currency:  currency.DefaultCurrency,
-						Spendable: types.NumericFromInt64(100),
+					Balances: []storage.Balance{
+						{
+							Currency:  currency.DefaultCurrency,
+							Spendable: types.NumericFromInt64(100),
+							Delegated: types.NumericZero(),
+							Unbonding: types.NumericZero(),
+						},
 					},
 					LastHeight: 100,
 				},

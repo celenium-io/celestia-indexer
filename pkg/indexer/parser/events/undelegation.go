@@ -45,11 +45,13 @@ func processUndelegate(ctx *context.Context, events []storage.Event, msg *storag
 				Address:    delegator,
 				Height:     msg.Height,
 				LastHeight: msg.Height,
-				Balance: storage.Balance{
-					Currency:  currency.DefaultCurrency,
-					Delegated: amount.Copy().Neg(),
-					Unbonding: amount,
-					Spendable: storageTypes.NumericZero(),
+				Balances: []storage.Balance{
+					{
+						Currency:  currency.DefaultCurrency,
+						Delegated: amount.Copy().Neg(),
+						Unbonding: amount,
+						Spendable: storageTypes.NumericZero(),
+					},
 				},
 			}
 			if err := ctx.AddAddress(address); err != nil {
