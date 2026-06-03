@@ -39,10 +39,15 @@ func parseCoinSpent(ctx *context.Context, data map[string]string, height pkgType
 		},
 	}
 
-	if coinSpent.Amount != nil {
-		amount := types.NumericFromBigInt(coinSpent.Amount.Amount.BigInt(), 0)
-		address.Balance.Spendable = amount.Neg()
-		address.Balance.Currency = coinSpent.Amount.GetDenom()
+	for i := range coinSpent.Amount {
+		if coinSpent.Amount[i] == nil || coinSpent.Amount[i].IsZero() {
+			continue
+		}
+		if coinSpent.Amount[i].GetDenom() == currency.DefaultCurrency { // TODO: support other currencies
+			amount := types.NumericFromBigInt(coinSpent.Amount[i].Amount.BigInt(), 0)
+			address.Balance.Spendable = amount.Neg()
+			address.Balance.Currency = coinSpent.Amount[i].GetDenom()
+		}
 	}
 
 	return ctx.AddAddress(address)
@@ -70,9 +75,15 @@ func parseCoinReceived(ctx *context.Context, data map[string]string, height pkgT
 		},
 	}
 
-	if coinReceived.Amount != nil {
-		address.Balance.Spendable = types.NumericFromBigInt(coinReceived.Amount.Amount.BigInt(), 0)
-		address.Balance.Currency = coinReceived.Amount.GetDenom()
+	for i := range coinReceived.Amount {
+		if coinReceived.Amount[i] == nil || coinReceived.Amount[i].IsZero() {
+			continue
+		}
+		if coinReceived.Amount[i].GetDenom() == currency.DefaultCurrency { // TODO: support other currencies
+			amount := types.NumericFromBigInt(coinReceived.Amount[i].Amount.BigInt(), 0)
+			address.Balance.Spendable = amount
+			address.Balance.Currency = coinReceived.Amount[i].GetDenom()
+		}
 	}
 
 	return ctx.AddAddress(address)

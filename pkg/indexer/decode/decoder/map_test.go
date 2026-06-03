@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"cosmossdk.io/math"
+	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	channelTypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	"github.com/stretchr/testify/require"
 )
@@ -206,6 +208,52 @@ func TestBytesFromMap(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := BytesFromMap(tt.m, tt.key)
 			require.NoError(t, err)
+			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestBalancesFromMap(t *testing.T) {
+	ibcDenom := "ibc/93E113CD8DF31891647AE56271673AEFA7E125A686AEC6CAD8D5106FE9600892"
+	tests := []struct {
+		name    string
+		m       map[string]string
+		key     string
+		want    []*cosmosTypes.Coin
+		wantErr bool
+	}{
+		{
+			name: "single utia coin",
+			m:    map[string]string{"amount": "5000000utia"},
+			key:  "amount",
+			want: []*cosmosTypes.Coin{
+				{Denom: "utia", Amount: math.NewInt(5000000)},
+			},
+		}, {
+			name: "multi coin IBC and utia",
+			m:    map[string]string{"amount": "5000000" + ibcDenom + ",5000000utia"},
+			key:  "amount",
+			want: []*cosmosTypes.Coin{
+				{Denom: ibcDenom, Amount: math.NewInt(5000000)},
+				{Denom: "utia", Amount: math.NewInt(5000000)},
+			},
+		}, {
+			name: "empty string",
+			m:    map[string]string{"amount": ""},
+			key:  "amount",
+			want: nil,
+		}, {
+			name:    "invalid coin",
+			m:       map[string]string{"amount": "notacoin"},
+			key:     "amount",
+			wantErr: true,
+			want:    nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := BalancesFromMap(tt.m, tt.key)
+			require.Equal(t, tt.wantErr, err != nil)
 			require.Equal(t, tt.want, got)
 		})
 	}

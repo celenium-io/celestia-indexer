@@ -20,6 +20,7 @@ var (
 )
 
 func Test_coinReceived(t *testing.T) {
+	ibcDenom := "ibc/93E113CD8DF31891647AE56271673AEFA7E125A686AEC6CAD8D5106FE9600892"
 	tests := []struct {
 		name    string
 		data    map[string]string
@@ -72,6 +73,34 @@ func Test_coinReceived(t *testing.T) {
 				"amount":   "",
 			},
 			wantErr: true,
+		}, {
+			name: "test 6 multi-coin IBC and utia",
+			data: map[string]string{
+				"receiver": testAddress,
+				"amount":   "5000000" + ibcDenom + ",5000000utia",
+			},
+			want: &storage.Address{
+				Hash:    testHashAddress,
+				Address: testAddress,
+				Balance: storage.Balance{
+					Currency:  "utia",
+					Spendable: types.MustNumericFromString("-5000000"),
+				},
+			},
+		}, {
+			name: "test 7 IBC only",
+			data: map[string]string{
+				"receiver": testAddress,
+				"amount":   "5000000" + ibcDenom,
+			},
+			want: &storage.Address{
+				Hash:    testHashAddress,
+				Address: testAddress,
+				Balance: storage.Balance{
+					Currency:  "utia",
+					Spendable: types.NumericZero(),
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -86,6 +115,7 @@ func Test_coinReceived(t *testing.T) {
 }
 
 func Test_coinSpent(t *testing.T) {
+	ibcDenom := "ibc/93E113CD8DF31891647AE56271673AEFA7E125A686AEC6CAD8D5106FE9600892"
 	tests := []struct {
 		name    string
 		data    map[string]string
@@ -138,6 +168,34 @@ func Test_coinSpent(t *testing.T) {
 				"amount":  "",
 			},
 			wantErr: true,
+		}, {
+			name: "test 6 multi-coin IBC and utia",
+			data: map[string]string{
+				"spender": testAddress,
+				"amount":  "5000000" + ibcDenom + ",5000000utia",
+			},
+			want: &storage.Address{
+				Hash:    testHashAddress,
+				Address: testAddress,
+				Balance: storage.Balance{
+					Currency:  "utia",
+					Spendable: types.NumericFromInt64(5000000),
+				},
+			},
+		}, {
+			name: "test 7 IBC only",
+			data: map[string]string{
+				"spender": testAddress,
+				"amount":  "5000000" + ibcDenom,
+			},
+			want: &storage.Address{
+				Hash:    testHashAddress,
+				Address: testAddress,
+				Balance: storage.Balance{
+					Currency:  "utia",
+					Spendable: types.NumericZero(),
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
