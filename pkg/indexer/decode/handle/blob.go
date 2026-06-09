@@ -20,15 +20,15 @@ func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, msgId, txI
 	blobLogs := make([]*storage.BlobLog, 0)
 
 	for idx, ns := range m.Namespaces {
-		if len(m.BlobSizes) < idx {
+		if len(m.BlobSizes) <= idx {
 			return storageTypes.MsgUnknown, nil, 0, errors.Errorf(
 				"blob sizes length=%d is less than namespaces index=%d", len(m.BlobSizes), idx)
 		}
-		if len(m.ShareCommitments) < idx {
+		if len(m.ShareCommitments) <= idx {
 			return storageTypes.MsgUnknown, nil, 0, errors.Errorf(
 				"share commitment length=%d is less than namespaces index=%d", len(m.ShareCommitments), idx)
 		}
-		if len(m.ShareVersions) < idx {
+		if len(m.ShareVersions) <= idx {
 			return storageTypes.MsgUnknown, nil, 0, errors.Errorf(
 				"share versions length=%d is less than namespaces index=%d", len(m.ShareVersions), idx)
 		}

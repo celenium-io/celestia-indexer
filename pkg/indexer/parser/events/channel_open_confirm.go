@@ -30,6 +30,9 @@ func handleChannelOpenConfirm(ctx *context.Context, events []storage.Event, msg 
 }
 
 func processChannelOpenConfirm(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+	if len(events) <= *idx {
+		return errors.New("not enough events for channel confirm")
+	}
 	if events[*idx].Type != storageTypes.EventTypeChannelOpenConfirm && events[*idx].Type != storageTypes.EventTypeChannelOpenAck {
 		return errors.Errorf("invalid event type: %s", events[*idx].Type)
 	}

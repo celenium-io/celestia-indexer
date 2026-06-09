@@ -30,6 +30,9 @@ func handleChannelClose(ctx *context.Context, events []storage.Event, msg *stora
 }
 
 func processChannelClose(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+	if len(events) <= *idx {
+		return errors.New("not enough events for channel close")
+	}
 	if events[*idx].Type != storageTypes.EventTypeChannelCloseConfirm {
 		return errors.Errorf("invalid event type: %s", events[*idx].Type)
 	}

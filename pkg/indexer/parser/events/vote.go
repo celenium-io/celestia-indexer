@@ -34,6 +34,9 @@ func handleVote(ctx *context.Context, events []storage.Event, msg *storage.Messa
 }
 
 func processVote(ctx *context.Context, events []storage.Event, _ *storage.Message, idx *int) error {
+	if len(events) <= *idx {
+		return errors.New("not enough events for vote")
+	}
 	if events[*idx].Type != types.EventTypeProposalVote {
 		return errors.Errorf("vote unexpected event type: %s", events[*idx].Type)
 	}

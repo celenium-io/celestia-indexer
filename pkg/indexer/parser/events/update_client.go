@@ -26,6 +26,9 @@ func handleUpdateClient(ctx *context.Context, events []storage.Event, msg *stora
 }
 
 func processUpdateClient(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+	if len(events) <= *idx {
+		return errors.New("not enough events for update client")
+	}
 	uc, err := decode.NewUpdateClient(events[*idx].Data)
 	if err != nil {
 		return errors.Wrap(err, "parse update client event")

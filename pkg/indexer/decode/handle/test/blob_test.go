@@ -223,3 +223,24 @@ func TestDecodeMsg_FailedOnPayForBlob(t *testing.T) {
 	require.Equal(t, msgExpected, dm.Msg)
 	require.Len(t, dm.BlobLogs, 0)
 }
+
+func TestDecodeMsg_IndexOutOfRangePayForBlob(t *testing.T) {
+	msgPayForBlob := &appBlobTypes.MsgPayForBlobs{
+		Signer:           "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
+		Namespaces:       [][]byte{{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22}},
+		BlobSizes:        []uint32{},
+		ShareCommitments: [][]byte{{176, 28, 134, 119, 32, 117, 87, 107, 231, 67, 121, 255, 209, 106, 52, 99, 88, 183, 85, 36, 67, 137, 98, 199, 144, 159, 13, 178, 111, 190, 121, 36}},
+		ShareVersions:    []uint32{0},
+	}
+	block, _ := testsuite.EmptyBlock()
+	position := 0
+
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+
+	_, err := decode.Message(decodeCtx, msgPayForBlob, position, storageTypes.StatusFailed, 0)
+	require.Error(t, err)
+}
