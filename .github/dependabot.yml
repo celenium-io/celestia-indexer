@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: docker
+    directories:
+      - /build/indexer
+      - /build/api
+      - /build/private_api
+      - /build/celestials
+    schedule:
+      interval: weekly
