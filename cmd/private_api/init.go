@@ -139,7 +139,6 @@ func initEcho(cfg ApiConfig) *echo.Echo {
 		},
 	}))
 	e.Use(middleware.BodyLimit("2M"))
-	e.Use(middleware.CORS())
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
 	e.Pre(middleware.RemoveTrailingSlash())
