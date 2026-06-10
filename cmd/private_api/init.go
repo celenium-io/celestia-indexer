@@ -88,6 +88,9 @@ func initLogger(level, loggerType string) error {
 func initEcho(cfg ApiConfig) *echo.Echo {
 	e := echo.New()
 	e.Validator = handler.NewCelestiaApiValidator()
+
+	e.IPExtractor = echo.ExtractIPDirect()
+
 	timeout := 30 * time.Second
 
 	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
