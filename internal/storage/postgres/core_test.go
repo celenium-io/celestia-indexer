@@ -10,6 +10,7 @@ import (
 
 	"github.com/dipdup-io/go-lib/config"
 	"github.com/dipdup-io/go-lib/database"
+	"github.com/dipdup-io/go-lib/testhelpers"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,7 +18,7 @@ func TestCheckDatabaseExists(t *testing.T) {
 	ctx, ctxCancel := context.WithTimeout(t.Context(), 180*time.Second)
 	defer ctxCancel()
 
-	containerCfg := database.PostgreSQLContainerConfig{
+	containerCfg := testhelpers.PostgreSQLContainerConfig{
 		User:     "user",
 		Password: "password",
 		Database: "db_test",
@@ -25,7 +26,7 @@ func TestCheckDatabaseExists(t *testing.T) {
 		Image:    "timescale/timescaledb-ha:pg15.8-ts2.17.0-all",
 	}
 
-	psqlContainer, err := database.NewPostgreSQLContainer(ctx, containerCfg)
+	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, containerCfg)
 	require.NoError(t, err)
 
 	cfg := config.Database{

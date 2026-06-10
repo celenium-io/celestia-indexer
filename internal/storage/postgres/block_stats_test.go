@@ -13,7 +13,7 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-io/go-lib/config"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/dipdup-io/go-lib/testhelpers"
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/stretchr/testify/suite"
 )
@@ -21,7 +21,7 @@ import (
 // BlockStatsTestSuite -
 type BlockStatsTestSuite struct {
 	suite.Suite
-	psqlContainer *database.PostgreSQLContainer
+	psqlContainer *testhelpers.PostgreSQLContainer
 	storage       Storage
 }
 
@@ -30,7 +30,7 @@ func (s *BlockStatsTestSuite) SetupSuite() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 180*time.Second)
 	defer ctxCancel()
 
-	psqlContainer, err := database.NewPostgreSQLContainer(ctx, database.PostgreSQLContainerConfig{
+	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, testhelpers.PostgreSQLContainerConfig{
 		User:     "user",
 		Password: "password",
 		Database: "db_test",
