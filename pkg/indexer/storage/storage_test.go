@@ -15,7 +15,7 @@ import (
 	indexerCfg "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/dipdup-io/go-lib/config"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/dipdup-io/go-lib/testhelpers"
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/stretchr/testify/suite"
 )
@@ -25,7 +25,7 @@ const testIndexerName = "test_indexer"
 // ModuleTestSuite -
 type ModuleTestSuite struct {
 	suite.Suite
-	psqlContainer *database.PostgreSQLContainer
+	psqlContainer *testhelpers.PostgreSQLContainer
 	storage       postgres.Storage
 }
 
@@ -34,7 +34,7 @@ func (s *ModuleTestSuite) SetupSuite() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 180*time.Second)
 	defer ctxCancel()
 
-	psqlContainer, err := database.NewPostgreSQLContainer(ctx, database.PostgreSQLContainerConfig{
+	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, testhelpers.PostgreSQLContainerConfig{
 		User:     "user",
 		Password: "password",
 		Database: "db_test",

@@ -17,7 +17,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/dipdup-io/go-lib/config"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/dipdup-io/go-lib/testhelpers"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/shopspring/decimal"
@@ -27,7 +27,7 @@ import (
 // TransactionTestSuite -
 type TransactionTestSuite struct {
 	suite.Suite
-	psqlContainer *database.PostgreSQLContainer
+	psqlContainer *testhelpers.PostgreSQLContainer
 	storage       Storage
 }
 
@@ -36,7 +36,7 @@ func (s *TransactionTestSuite) SetupSuite() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 180*time.Second)
 	defer ctxCancel()
 
-	psqlContainer, err := database.NewPostgreSQLContainer(ctx, database.PostgreSQLContainerConfig{
+	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, testhelpers.PostgreSQLContainerConfig{
 		User:     "user",
 		Password: "password",
 		Database: "db_test",
