@@ -27,6 +27,9 @@ func handleDeposit(ctx *context.Context, events []storage.Event, msg *storage.Me
 
 func processDeposit(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
 	*idx += 4
+	if len(events) <= *idx {
+		return errors.Errorf("proposal deposit unexpected events length: %d", len(events))
+	}
 	if events[*idx].Type != types.EventTypeProposalDeposit {
 		return errors.Errorf("proposal deposit unexpected event type: %s", events[*idx].Type)
 	}

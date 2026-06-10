@@ -15,10 +15,11 @@ import (
 )
 
 var (
-	errInvalidAddress   = errors.New("invalid address")
-	errUnknownAddress   = errors.New("unknown address")
-	errUnknownNamespace = errors.New("unknown namespace")
-	errInvalidApiKey    = errors.New("invalid api key")
+	errInvalidAddress      = errors.New("invalid address")
+	errUnknownAddress      = errors.New("unknown address")
+	errUnknownNamespace    = errors.New("unknown namespace")
+	errInvalidApiKey       = errors.New("invalid api key")
+	errInternalServerError = "Internal Server Error"
 )
 
 type NoRows interface {
@@ -60,7 +61,7 @@ func internalServerError(c echo.Context, err error) error {
 		hub.CaptureMessage(err.Error())
 	}
 	return c.JSON(http.StatusInternalServerError, Error{
-		Message: err.Error(),
+		Message: errInternalServerError,
 	})
 }
 

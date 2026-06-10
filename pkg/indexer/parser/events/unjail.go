@@ -26,6 +26,9 @@ func handleUnjail(ctx *context.Context, events []storage.Event, msg *storage.Mes
 }
 
 func processUnjail(ctx *context.Context, events []storage.Event, _ *storage.Message, idx *int) error {
+	if len(events) <= *idx {
+		return errors.New("not enough events for unjail")
+	}
 	if events[*idx].Type != types.EventTypeMessage {
 		return errors.Errorf("slashing unexpected event type: %s", events[*idx].Type)
 	}
@@ -33,6 +36,9 @@ func processUnjail(ctx *context.Context, events []storage.Event, _ *storage.Mess
 	module := decoder.StringFromMap(events[*idx].Data, "module")
 	if module == "" {
 		*idx += 1
+		if len(events) <= *idx {
+			return errors.New("not enough events for unjail after parsing module name")
+		}
 		module = decoder.StringFromMap(events[*idx].Data, "module")
 	}
 	if module != types.ModuleNameSlashing.String() {

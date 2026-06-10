@@ -19,6 +19,9 @@ go install go.uber.org/mock/mockgen@v0.5.2
 # for checking licenses used by project and deps
 go install github.com/google/go-licenses@latest
 
+# for checking known vulnerabilities in deps
+go install golang.org/x/vuln/cmd/govulncheck@latest
+
 # for api test, should have npm installed
 npm install -g newman
 

@@ -34,6 +34,9 @@ lint:
 test:
 	go test -p 8 -timeout 120s ./...
 
+vulncheck:
+	govulncheck ./...
+
 ## Make green comment
 gc:
 	make lint && make test
@@ -83,4 +86,4 @@ cover:
 license-header:
 	update-license -path=./ -license=./HEADER
 
-.PHONY: init indexer api build clean compose lint test adr mock api-docs check-licenses cover license-header celestials
+.PHONY: init indexer api build clean compose lint test vulncheck adr mock api-docs check-licenses cover license-header celestials

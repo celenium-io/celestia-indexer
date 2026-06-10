@@ -27,6 +27,9 @@ func handleSend(ctx *context.Context, events []storage.Event, msg *storage.Messa
 }
 
 func processSend(_ *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+	if len(events) <= *idx {
+		return errors.New("not enough events for send")
+	}
 	msgIdx := decoder.StringFromMap(events[*idx].Data, "msg_index")
 	newFormat := msgIdx != ""
 

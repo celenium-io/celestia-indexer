@@ -31,6 +31,9 @@ func handleSubmitProposal(ctx *context.Context, events []storage.Event, msg *sto
 }
 
 func processSubmitProposal(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+	if len(events) <= *idx {
+		return errors.New("not enough events for submit proposal")
+	}
 	if events[*idx].Type != types.EventTypeSubmitProposal {
 		return errors.Errorf("submit proposal unexpected event type: %s", events[*idx].Type)
 	}
@@ -41,6 +44,9 @@ func processSubmitProposal(ctx *context.Context, events []storage.Event, msg *st
 	}
 	msg.Proposal.Id = proposalId
 	*idx += 5
+	if len(events) <= *idx {
+		return errors.New("not enough events for submit proposal after parsing proposal id")
+	}
 
 	if events[*idx].Type != types.EventTypeProposalDeposit {
 		return errors.Errorf("submit proposal unexpected event type: %s", events[*idx].Type)

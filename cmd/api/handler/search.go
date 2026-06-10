@@ -217,6 +217,9 @@ func (handler SearchHandler) searchNamespaceByBase64(ctx context.Context, search
 }
 
 func (handler SearchHandler) getNamespace(ctx context.Context, data []byte) ([]responses.SearchItem, error) {
+	if len(data) == 0 {
+		return nil, errors.Errorf("invalid namespace length: %d", len(data))
+	}
 	version := data[0]
 	namespaceId := data[1:]
 	ns, err := handler.namespace.ByNamespaceIdAndVersion(ctx, namespaceId, version)

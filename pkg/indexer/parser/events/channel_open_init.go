@@ -30,6 +30,9 @@ func handleChannelOpenInit(ctx *context.Context, events []storage.Event, msg *st
 }
 
 func processChannelOpenInit(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+	if len(events) <= *idx {
+		return errors.New("not enough events for channel open init")
+	}
 	if events[*idx].Type != storageTypes.EventTypeChannelOpenInit && events[*idx].Type != storageTypes.EventTypeChannelOpenTry {
 		return errors.Errorf("invalid event type: %s", events[*idx].Type)
 	}
