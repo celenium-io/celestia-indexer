@@ -31,4 +31,5 @@ type ApiConfig struct {
 	DefaultCacheTTL       int     `validate:"omitempty,min=1"        yaml:"default_cache_ttl"`
 	HyperlaneNodeUrl      string  `validate:"omitempty,url"          yaml:"hyperlane_node"`
 	WebscoketClientsPerIp int     `validate:"omitempty,min=1"        yaml:"websocket_clients_per_ip"`
+	TrustedProxies        string  `validate:"omitempty"              yaml:"trusted_proxies"`
 }

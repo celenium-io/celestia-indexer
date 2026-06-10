@@ -21,6 +21,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/ibc_relayer"
 	"github.com/celenium-io/celestia-indexer/internal/blob"
 	"github.com/celenium-io/celestia-indexer/internal/profiler"
+	"github.com/celenium-io/celestia-indexer/internal/realip"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	"github.com/celenium-io/celestia-indexer/pkg/node"
@@ -167,6 +168,12 @@ func observableCacheSkipper(c echo.Context) bool {
 func initEcho(cfg ApiConfig, env string) *echo.Echo {
 	e := echo.New()
 	e.Validator = handler.NewCelestiaApiValidator()
+
+	extractor, err := realip.Extractor(cfg.TrustedProxies)
+	if err != nil {
+		log.Panic().Err(err).Msg("parsing trusted proxies")
+	}
+	e.IPExtractor = extractor
 
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogURI:       true,
