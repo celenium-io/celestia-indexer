@@ -9,14 +9,14 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.12 // indirect
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.97.3 // indirect
 	github.com/aws/smithy-go v1.24.2 // indirect
-	github.com/celenium-io/celestial-module v0.0.10
+	github.com/celenium-io/celestial-module v0.0.11
 	github.com/celestiaorg/go-square/v3 v3.0.2
 	github.com/celestiaorg/rsmt2d v0.15.2
 	github.com/cometbft/cometbft v0.38.17
 	github.com/cosmos/cosmos-sdk v0.53.0
 	github.com/cosmos/ibc-go/v8 v8.7.0
 	github.com/dipdup-io/workerpool v0.0.4
-	github.com/dipdup-net/indexer-sdk v0.0.11
+	github.com/dipdup-net/indexer-sdk v0.0.12
 	github.com/fatih/structs v1.1.0
 	github.com/gabriel-vasile/mimetype v1.4.12
 	github.com/getsentry/sentry-go v0.42.0
