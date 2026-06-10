@@ -5425,7 +5425,7 @@ func (m *MockExport) EXPECT() *MockExportMockRecorder {
 }
 
 // ToCsv mocks base method.
-func (m *MockExport) ToCsv(ctx context.Context, writer io.Writer, query string) error {
+func (m *MockExport) ToCsv(ctx context.Context, writer io.Writer, query *bun.SelectQuery) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ToCsv", ctx, writer, query)
 	ret0, _ := ret[0].(error)
@@ -5451,13 +5451,13 @@ func (c *MockExportToCsvCall) Return(arg0 error) *MockExportToCsvCall {
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockExportToCsvCall) Do(f func(context.Context, io.Writer, string) error) *MockExportToCsvCall {
+func (c *MockExportToCsvCall) Do(f func(context.Context, io.Writer, *bun.SelectQuery) error) *MockExportToCsvCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockExportToCsvCall) DoAndReturn(f func(context.Context, io.Writer, string) error) *MockExportToCsvCall {
+func (c *MockExportToCsvCall) DoAndReturn(f func(context.Context, io.Writer, *bun.SelectQuery) error) *MockExportToCsvCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

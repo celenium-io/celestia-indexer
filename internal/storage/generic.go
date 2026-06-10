@@ -13,6 +13,7 @@ import (
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/uptrace/bun"
 )
 
 var Models = []any{
@@ -231,5 +232,5 @@ type ISearch interface {
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type Export interface {
-	ToCsv(ctx context.Context, writer io.Writer, query string) error
+	ToCsv(ctx context.Context, writer io.Writer, query *bun.SelectQuery) error
 }
