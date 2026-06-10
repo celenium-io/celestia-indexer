@@ -21,7 +21,7 @@ func NewExport(db *database.Bun) *Export {
 	return &Export{db}
 }
 
-func (e *Export) ToCsv(ctx context.Context, writer io.Writer, query string) error {
+func (e *Export) ToCsv(ctx context.Context, writer io.Writer, query *bun.SelectQuery) error {
 	pool := e.Pool()
 	if pool == nil {
 		return errors.New("pool is nil")
@@ -32,7 +32,7 @@ func (e *Export) ToCsv(ctx context.Context, writer io.Writer, query string) erro
 	}
 	defer conn.Release()
 
-	rawQuery := fmt.Sprintf("COPY (%s) TO STDOUT WITH CSV HEADER", bun.Safe(query))
+	rawQuery := fmt.Sprintf("COPY (%s) TO STDOUT WITH CSV HEADER", query.String())
 	_, err = conn.Conn().PgConn().CopyTo(ctx, writer, rawQuery)
 	return err
 }
