@@ -20,6 +20,7 @@ import (
 
 type AddressHandler struct {
 	address       storage.IAddress
+	blocks        storage.IBlock
 	txs           storage.ITx
 	blobLogs      storage.IBlobLog
 	messages      storage.IMessage
@@ -36,6 +37,7 @@ type AddressHandler struct {
 
 func NewAddressHandler(
 	address storage.IAddress,
+	blocks storage.IBlock,
 	txs storage.ITx,
 	blobLogs storage.IBlobLog,
 	messages storage.IMessage,
@@ -51,6 +53,7 @@ func NewAddressHandler(
 ) *AddressHandler {
 	return &AddressHandler{
 		address:       address,
+		blocks:        blocks,
 		txs:           txs,
 		blobLogs:      blobLogs,
 		messages:      messages,
@@ -187,12 +190,7 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 	}
 	req.SetDefault()
 
-	_, hash, err := types.Address(req.Hash).Decode()
-	if err != nil {
-		return badRequestError(c, err)
-	}
-
-	addressId, err := handler.getIdByHash(c.Request().Context(), hash, req.Hash)
+	address, err := handler.address.AddressByString(c.Request().Context(), req.Hash)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}
@@ -205,6 +203,23 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 		Height:       req.Height,
 		MessageTypes: storageTypes.NewMsgTypeBitMask(),
 	}
+
+	if req.Height == nil {
+		fltrs.WindowFrom, err = handler.blocks.Time(c.Request().Context(), address.Height)
+		if err != nil {
+			return handleError(c, err, handler.blocks)
+		}
+		fltrs.WindowTo, err = handler.blocks.Time(c.Request().Context(), address.LastHeight)
+		if err != nil {
+			return handleError(c, err, handler.blocks)
+		}
+	} else {
+		fltrs.WindowFrom, err = handler.blocks.Time(c.Request().Context(), types.Level(*req.Height))
+		if err != nil {
+			return handleError(c, err, handler.blocks)
+		}
+		fltrs.WindowTo = fltrs.WindowFrom
+	}
 	if req.From > 0 {
 		fltrs.TimeFrom = time.Unix(req.From, 0).UTC()
 	}
@@ -215,7 +230,7 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 		fltrs.MessageTypes.SetByMsgType(storageTypes.MsgType(req.MsgType[i]))
 	}
 
-	txs, err := handler.txs.ByAddress(c.Request().Context(), addressId, fltrs)
+	txs, err := handler.txs.ByAddress(c.Request().Context(), address.Id, fltrs)
 	if err != nil {
 		return handleError(c, err, handler.address)
 	}

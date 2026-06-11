@@ -54,6 +54,9 @@ type TxFilter struct {
 	TimeTo               time.Time
 	WithMessages         bool
 	Cursor               uint64
+
+	WindowFrom time.Time
+	WindowTo   time.Time
 }
 
 func (filter *TxFilter) IsEmpty() bool {

@@ -44,6 +44,19 @@ func (s *StorageTestSuite) TestIcaAddressByHash() {
 	s.Require().EqualValues("210", address.DefaultBalance.Spendable.String())
 }
 
+func (s *StorageTestSuite) TestAddressByString() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	hash := []byte{48, 160, 217, 234, 151, 39, 229, 141, 230, 127, 49, 37, 182, 237, 136, 189, 218, 247, 87, 139, 87, 173, 20, 154, 154, 144, 84, 29, 23, 55, 212, 7}
+	address, err := s.storage.Address.AddressByString(ctx, "celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss")
+	s.Require().NoError(err)
+	s.Require().EqualValues(4, address.Id)
+	s.Require().EqualValues(101, address.Height)
+	s.Require().Equal("celestia1xzsdn65hyljcmenlxyjmdmvghhd0w4ut27k3fx56jp2p69eh6srs8p3rss", address.Address)
+	s.Require().Equal(hash, address.Hash)
+}
+
 func (s *StorageTestSuite) TestAddressByHashWithoutCelestials() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()

@@ -30,6 +30,7 @@ type IAddress interface {
 	IdByHash(ctx context.Context, hash ...[]byte) ([]uint64, error)
 	IdByAddress(ctx context.Context, address string, ids ...uint64) (uint64, error)
 	Balances(ctx context.Context, addressId uint64, limit, offset int) ([]Balance, error)
+	AddressByString(ctx context.Context, readableHash string) (Address, error)
 }
 
 // Address -
