@@ -27,7 +27,7 @@ type Manager struct {
 	clients  *sync.Map[uint64, *Client]
 	observer *bus.Observer
 
-	ips                   *sync.Map[string, int]
+	ips                   *Ips
 	websocketClientsPerIp int
 
 	blocks   *Channel[storage.Block, *responses.Block]
@@ -50,7 +50,6 @@ func NewManager(observer *bus.Observer, opts ...ManagerOption) *Manager {
 		clientId:              new(atomic.Uint64),
 		clients:               sync.NewMap[uint64, *Client](),
 		g:                     workerpool.NewGroup(),
-		ips:                   sync.NewMap[string, int](),
 		websocketClientsPerIp: 10,
 	}
 
@@ -72,6 +71,11 @@ func NewManager(observer *bus.Observer, opts ...ManagerOption) *Manager {
 	for _, opt := range opts {
 		opt(manager)
 	}
+
+	if manager.websocketClientsPerIp <= 0 {
+		manager.websocketClientsPerIp = 10
+	}
+	manager.ips = NewIps(manager.websocketClientsPerIp)
 
 	return manager
 }
@@ -102,18 +106,6 @@ func (manager *Manager) listenHead(ctx context.Context) {
 	}
 }
 
-func (manager *Manager) countClientsByIp(ip string, value int) error {
-	if count, ok := manager.ips.Get(ip); ok {
-		if count >= manager.websocketClientsPerIp {
-			return ErrTooManyClients
-		}
-		manager.ips.Set(ip, count+value)
-	} else {
-		manager.ips.Set(ip, value)
-	}
-	return nil
-}
-
 // Handle godoc
 //
 //	@Summary				Websocket API
@@ -124,22 +116,19 @@ func (manager *Manager) countClientsByIp(ip string, value int) error {
 //	@Produce				json
 //	@Router					/ws [get]
 func (manager *Manager) Handle(c echo.Context) error {
+	ip := c.RealIP()
+	if err := manager.ips.CheckAndSet(ip); err != nil {
+		wsConnectionsTotal.WithLabelValues("rejected").Inc()
+		return err
+	}
+	defer manager.ips.Decrement(ip)
+
 	ws, err := manager.upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		wsErrors.WithLabelValues("upgrade").Inc()
 		return err
 	}
 	ws.SetReadLimit(1024 * 10) // 10KB
-
-	if err := manager.countClientsByIp(c.RealIP(), 1); err != nil {
-		wsConnectionsTotal.WithLabelValues("rejected").Inc()
-		return err
-	}
-	defer func() {
-		if err := manager.countClientsByIp(c.RealIP(), -1); err != nil {
-			log.Err(err).Msg("decrease client count by ip")
-		}
-	}()
 
 	wsConnectionsTotal.WithLabelValues("accepted").Inc()
 	wsActiveConnections.Inc()

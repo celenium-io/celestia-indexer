@@ -57,7 +57,7 @@ func newClient(id uint64, subscribeHandler, unsubscribeHandler ClientHandler) *C
 	closed.Store(false)
 	return &Client{
 		id:                 id,
-		ch:                 make(chan any, 1024),
+		ch:                 make(chan any, 64),
 		g:                  workerpool.NewGroup(),
 		subscribeHandler:   subscribeHandler,
 		unsubscribeHandler: unsubscribeHandler,

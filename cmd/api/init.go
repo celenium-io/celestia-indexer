@@ -223,7 +223,8 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 	e.Use(RequestTimeout(timeout, websocketSkipper))
 
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
-		Skipper: gzipSkipper,
+		Skipper:   gzipSkipper,
+		MinLength: 1024,
 	}))
 	e.Use(middleware.DecompressWithConfig(middleware.DecompressConfig{
 		Skipper: websocketSkipper,
@@ -242,8 +243,9 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 
 	if cfg.Prometheus {
 		e.Use(echoprometheus.NewMiddlewareWithConfig(echoprometheus.MiddlewareConfig{
-			Namespace: "celestia_api",
-			Skipper:   websocketSkipper,
+			Namespace:                 "celestia_api",
+			Skipper:                   websocketSkipper,
+			DoNotUseRequestPathFor404: true,
 		}))
 	}
 	if cfg.RateLimit > 0 {

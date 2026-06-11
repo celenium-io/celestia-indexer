@@ -93,7 +93,7 @@ func initEcho(cfg ApiConfig) *echo.Echo {
 
 	timeout := 30 * time.Second
 
-	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
+	e.Use(middleware.ContextTimeoutWithConfig(middleware.ContextTimeoutConfig{
 		Skipper: middleware.DefaultSkipper,
 		Timeout: timeout,
 	}))
