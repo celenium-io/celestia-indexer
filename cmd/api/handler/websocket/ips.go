@@ -7,7 +7,7 @@ import "sync"
 
 type Ips struct {
 	ips map[string]int
-	mx  sync.Mutex
+	mx  sync.RWMutex
 	max int
 }
 
@@ -19,8 +19,8 @@ func NewIps(max int) *Ips {
 }
 
 func (ips *Ips) Get(ip string) (int, bool) {
-	ips.mx.Lock()
-	defer ips.mx.Unlock()
+	ips.mx.RLock()
+	defer ips.mx.RUnlock()
 	if count, ok := ips.ips[ip]; ok {
 		return count, true
 	}
