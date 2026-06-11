@@ -45,6 +45,45 @@ func (m *MockIAddress) EXPECT() *MockIAddressMockRecorder {
 	return m.recorder
 }
 
+// AddressByString mocks base method.
+func (m *MockIAddress) AddressByString(ctx context.Context, readableHash string) (storage.Address, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddressByString", ctx, readableHash)
+	ret0, _ := ret[0].(storage.Address)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddressByString indicates an expected call of AddressByString.
+func (mr *MockIAddressMockRecorder) AddressByString(ctx, readableHash any) *MockIAddressAddressByStringCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddressByString", reflect.TypeOf((*MockIAddress)(nil).AddressByString), ctx, readableHash)
+	return &MockIAddressAddressByStringCall{Call: call}
+}
+
+// MockIAddressAddressByStringCall wrap *gomock.Call
+type MockIAddressAddressByStringCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIAddressAddressByStringCall) Return(arg0 storage.Address, arg1 error) *MockIAddressAddressByStringCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIAddressAddressByStringCall) Do(f func(context.Context, string) (storage.Address, error)) *MockIAddressAddressByStringCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIAddressAddressByStringCall) DoAndReturn(f func(context.Context, string) (storage.Address, error)) *MockIAddressAddressByStringCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Balances mocks base method.
 func (m *MockIAddress) Balances(ctx context.Context, addressId uint64, limit, offset int) ([]storage.Balance, error) {
 	m.ctrl.T.Helper()

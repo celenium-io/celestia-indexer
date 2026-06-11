@@ -18,6 +18,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 	celestialMock "github.com/celenium-io/celestial-module/pkg/storage/mock"
 	"github.com/labstack/echo/v4"
@@ -44,6 +45,7 @@ var (
 type AddressTestSuite struct {
 	suite.Suite
 	address       *mock.MockIAddress
+	blocks        *mock.MockIBlock
 	txs           *mock.MockITx
 	blobLogs      *mock.MockIBlobLog
 	messages      *mock.MockIMessage
@@ -66,6 +68,7 @@ func (s *AddressTestSuite) SetupSuite() {
 	s.echo.Validator = NewCelestiaApiValidator()
 	s.ctrl = gomock.NewController(s.T())
 	s.address = mock.NewMockIAddress(s.ctrl)
+	s.blocks = mock.NewMockIBlock(s.ctrl)
 	s.txs = mock.NewMockITx(s.ctrl)
 	s.blobLogs = mock.NewMockIBlobLog(s.ctrl)
 	s.messages = mock.NewMockIMessage(s.ctrl)
@@ -77,7 +80,8 @@ func (s *AddressTestSuite) SetupSuite() {
 	s.celestials = celestialMock.NewMockICelestial(s.ctrl)
 	s.votes = mock.NewMockIVote(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewAddressHandler(s.address, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.vestings, s.grants, s.celestials, s.votes, s.state, testIndexerName)
+	s.blocks = mock.NewMockIBlock(s.ctrl)
+	s.handler = NewAddressHandler(s.address, s.blocks, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.vestings, s.grants, s.celestials, s.votes, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -231,8 +235,19 @@ func (s *AddressTestSuite) TestTransactions() {
 	c.SetParamValues(testAddress)
 
 	s.address.EXPECT().
-		IdByHash(gomock.Any(), testHashAddress).
-		Return([]uint64{1}, nil).
+		AddressByString(gomock.Any(), testAddress).
+		Return(storage.Address{
+			Id:         1,
+			Hash:       testHashAddress,
+			Address:    testAddress,
+			Height:     0,
+			LastHeight: 101,
+		}, nil).
+		Times(1)
+
+	s.blocks.EXPECT().
+		Time(gomock.Any(), pkgTypes.Level(1000)).
+		Return(testTime, nil).
 		Times(1)
 
 	s.txs.EXPECT().

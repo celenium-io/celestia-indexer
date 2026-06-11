@@ -144,6 +144,15 @@ func (a *Address) IdByAddress(ctx context.Context, address string, ids ...uint64
 	return
 }
 
+// AddressByString -
+func (a *Address) AddressByString(ctx context.Context, readableHash string) (address storage.Address, err error) {
+	err = a.DB().NewSelect().
+		Model(&address).
+		Where("address = ?", readableHash).
+		Scan(ctx)
+	return
+}
+
 // Balances -
 func (a *Address) Balances(ctx context.Context, addressId uint64, limit, offset int) (balances []storage.Balance, err error) {
 	query := a.DB().NewSelect().

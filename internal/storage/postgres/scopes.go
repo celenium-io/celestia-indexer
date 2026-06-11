@@ -84,6 +84,13 @@ func txFilterWithoutLimit(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.S
 	if fltrs.WithMessages {
 		query = query.Relation("Messages")
 	}
+
+	if !fltrs.WindowFrom.IsZero() {
+		query = query.Where("time >= ?", fltrs.WindowFrom)
+	}
+	if !fltrs.WindowTo.IsZero() {
+		query = query.Where("time <= ?", fltrs.WindowTo)
+	}
 	return query
 }
 
