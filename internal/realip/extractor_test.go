@@ -89,8 +89,16 @@ func TestExtractor(t *testing.T) {
 }
 
 func TestExtractorInvalid(t *testing.T) {
-	for _, value := range []string{"not-an-ip", "10.0.0.0/99", "1.2.3.4;5.6.7.8"} {
-		_, err := Extractor(value)
-		require.Error(t, err, value)
+	tests := []struct {
+		invalidTrustedProxy string
+		wantErr             string
+	}{
+		{"not-an-ip", "invalid trusted proxy address: not-an-ip"},
+		{"10.0.0.0/99", "invalid trusted proxy range: 10.0.0.0/99"},
+		{"1.2.3.4;5.6.7.8", "invalid trusted proxy address: 1.2.3.4;5.6.7.8"},
+	}
+	for _, tt := range tests {
+		_, err := Extractor(tt.invalidTrustedProxy)
+		require.ErrorContains(t, err, tt.wantErr)
 	}
 }

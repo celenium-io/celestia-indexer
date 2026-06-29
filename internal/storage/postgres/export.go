@@ -34,5 +34,5 @@ func (e *Export) ToCsv(ctx context.Context, writer io.Writer, query *bun.SelectQ
 
 	rawQuery := fmt.Sprintf("COPY (%s) TO STDOUT WITH CSV HEADER", query.String())
 	_, err = conn.Conn().PgConn().CopyTo(ctx, writer, rawQuery)
-	return err
+	return errors.Wrap(err, "export query results to csv")
 }
