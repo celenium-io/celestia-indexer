@@ -42,10 +42,9 @@ func (m *CacheMiddleware) Handler(next echo.HandlerFunc) echo.HandlerFunc {
 		key := strings.ReplaceAll(strings.TrimPrefix(path, "/"), "/", ":")
 		if data, ok := m.cache.Get(c.Request().Context(), key); ok {
 			entry := new(CacheEntry)
-			if err := entry.Decode(data); err != nil {
-				return err
+			if err := entry.Decode(data); err == nil {
+				return entry.Replay(c.Response())
 			}
-			return entry.Replay(c.Response())
 		}
 
 		recorder := NewResponseRecorder(c.Response().Writer)
