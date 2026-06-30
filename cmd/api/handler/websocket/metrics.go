@@ -51,13 +51,13 @@ var (
 	wsUnsubscribeRequests = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "websocket_unsubscribe_requests_total",
 		Help: "Total number of unsubscribe requests",
-	}, []string{"channel"})
+	}, []string{"channel", "status"}) // status: success, error
 
 	// Error metrics
 	wsErrors = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "websocket_errors_total",
 		Help: "Total number of WebSocket errors",
-	}, []string{"type"}) // type: read, write, upgrade, unknown_method, unknown_channel
+	}, []string{"type"}) // type: read, decode, write, upgrade, unknown_method, unknown_channel
 
 	// Connection duration
 	wsConnectionDuration = promauto.NewHistogram(prometheus.HistogramOpts{

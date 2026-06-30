@@ -185,43 +185,61 @@ func (c *Client) ReadMessages(ctx context.Context, ws *websocket.Conn, log echo.
 		return ws.SetReadDeadline(time.Now().Add(pongWait))
 	})
 
+	defer func() {
+		if c.unsubscribeHandler != nil && c.filters != nil {
+			if c.filters.head {
+				c.unsubscribeHandler(ChannelHead, c)
+			}
+			if c.filters.blocks {
+				c.unsubscribeHandler(ChannelBlocks, c)
+			}
+			if c.filters.gasPrice {
+				c.unsubscribeHandler(ChannelGasPrice, c)
+			}
+		}
+	}()
+
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		default:
-			if err := c.read(ws); err != nil {
-				timeoutErr, ok := err.(net.Error)
-
-				switch {
-				case err == io.EOF:
-					return
-				case errors.Is(err, websocket.ErrCloseSent):
-					return
-				case ok && timeoutErr.Timeout():
-					return
-				case websocket.IsCloseError(err,
-					websocket.CloseNormalClosure,
-					websocket.CloseAbnormalClosure,
-					websocket.CloseNoStatusReceived,
-					websocket.CloseGoingAway):
-					if c.unsubscribeHandler != nil {
-						c.unsubscribeHandler(ChannelHead, c)
-						c.unsubscribeHandler(ChannelBlocks, c)
-						c.unsubscribeHandler(ChannelGasPrice, c)
-					}
-					return
+			_, data, err := ws.ReadMessage()
+			if err != nil {
+				wsErrors.WithLabelValues("read").Inc()
+				if !isExpectedDisconnect(err) {
+					log.Errorf("read websocket message: %s", err.Error())
 				}
-				log.Errorf("read websocket message: %s", err.Error())
+				return
+			}
+
+			if err := c.handle(data); err != nil {
+				log.Errorf("handle websocket message: %s", err.Error())
+				c.Notify(errorMessage(err))
 			}
 		}
 	}
 }
 
-func (c *Client) read(ws *websocket.Conn) error {
+func isExpectedDisconnect(err error) bool {
+	if err == nil {
+		return false
+	}
+	timeoutErr, ok := err.(net.Error)
+	return err == io.EOF ||
+		errors.Is(err, websocket.ErrCloseSent) ||
+		(ok && timeoutErr.Timeout()) ||
+		websocket.IsCloseError(err,
+			websocket.CloseNormalClosure,
+			websocket.CloseAbnormalClosure,
+			websocket.CloseNoStatusReceived,
+			websocket.CloseGoingAway)
+}
+
+func (c *Client) handle(data []byte) error {
 	var msg Message
-	if err := ws.ReadJSON(&msg); err != nil {
-		wsErrors.WithLabelValues("read").Inc()
+	if err := json.Unmarshal(data, &msg); err != nil {
+		wsErrors.WithLabelValues("decode").Inc()
 		return err
 	}
 
@@ -239,7 +257,7 @@ func (c *Client) read(ws *websocket.Conn) error {
 func (c *Client) handleSubscribeMessage(msg Message) error {
 	var subscribeMsg Subscribe
 	if err := json.Unmarshal(msg.Body, &subscribeMsg); err != nil {
-		wsSubscribeRequests.WithLabelValues(subscribeMsg.Channel, "error").Inc()
+		wsSubscribeRequests.WithLabelValues("decode", "error").Inc()
 		return err
 	}
 
@@ -258,14 +276,16 @@ func (c *Client) handleSubscribeMessage(msg Message) error {
 func (c *Client) handleUnsubscribeMessage(msg Message) error {
 	var unsubscribeMsg Unsubscribe
 	if err := json.Unmarshal(msg.Body, &unsubscribeMsg); err != nil {
+		wsUnsubscribeRequests.WithLabelValues("decode", "error").Inc()
 		return err
 	}
 	if err := c.DetachFilters(unsubscribeMsg); err != nil {
+		wsUnsubscribeRequests.WithLabelValues(unsubscribeMsg.Channel, "error").Inc()
 		return err
 	}
 	if c.unsubscribeHandler != nil {
 		c.unsubscribeHandler(unsubscribeMsg.Channel, c)
 	}
-	wsUnsubscribeRequests.WithLabelValues(unsubscribeMsg.Channel).Inc()
+	wsUnsubscribeRequests.WithLabelValues(unsubscribeMsg.Channel, "success").Inc()
 	return nil
 }
