@@ -5,9 +5,9 @@ package cache
 
 import (
 	"bytes"
-	"encoding/gob"
 	"net/http"
-	"strings"
+
+	"github.com/bytedance/sonic"
 )
 
 type ResponseRecorder struct {
@@ -77,17 +77,11 @@ type CacheEntry struct {
 }
 
 func (c *CacheEntry) Encode() (string, error) {
-	var buf bytes.Buffer
-	if err := gob.NewEncoder(&buf).Encode(c); err != nil {
-		return "", err
-	}
-
-	return buf.String(), nil
+	return sonic.MarshalString(c)
 }
 
 func (c *CacheEntry) Decode(b string) error {
-	dec := gob.NewDecoder(strings.NewReader(b))
-	return dec.Decode(c)
+	return sonic.UnmarshalString(b, c)
 }
 
 func (c *CacheEntry) Replay(w http.ResponseWriter) error {
