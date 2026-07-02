@@ -59,9 +59,9 @@ This document describes the Prometheus metrics exposed by the WebSocket implemen
 
 #### `websocket_unsubscribe_requests_total`
 - **Type**: Counter
-- **Labels**: `channel` (head, blocks, gas_price)
+- **Labels**: `channel` (head, blocks, gas_price), `status` (success, error)
 - **Description**: Total unsubscribe requests
-- **Use**: Track unsubscribe activity
+- **Use**: Track unsubscribe activity and success/error rate
 
 ### Error Metrics
 

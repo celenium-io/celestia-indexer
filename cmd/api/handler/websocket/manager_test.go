@@ -5,6 +5,7 @@ package websocket
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -14,10 +15,193 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
+	"github.com/prometheus/client_golang/prometheus/testutil"
 	"github.com/stretchr/testify/require"
 )
 
 const testIp = "10.0.0.1"
+
+func dialWS(t *testing.T, srv *httptest.Server) *websocket.Conn {
+	t.Helper()
+	wsUrl := "ws" + strings.TrimPrefix(srv.URL, "http") + "/ws"
+	conn, resp, err := websocket.DefaultDialer.Dial(wsUrl, nil)
+	if resp != nil && resp.Body != nil {
+		resp.Body.Close()
+	}
+	require.NoError(t, err)
+	return conn
+}
+
+func subscribe(t *testing.T, conn *websocket.Conn, channel string) {
+	t.Helper()
+	require.NoError(t, conn.WriteJSON(Message{
+		Method: MethodSubscribe,
+		Body:   json.RawMessage(`{"channel":"` + channel + `","filters":{}}`),
+	}))
+}
+
+func unsubscribe(t *testing.T, conn *websocket.Conn, channel string) {
+	t.Helper()
+	require.NoError(t, conn.WriteJSON(Message{
+		Method: MethodUnsubscribe,
+		Body:   json.RawMessage(`{"channel":"` + channel + `"}`),
+	}))
+}
+
+// TestHandleUnsubscribeMetrics verifies that unsubscribe requests are accounted
+// with success/error status symmetrically with subscribe.
+func TestHandleUnsubscribeMetrics(t *testing.T) {
+	manager := NewManager(nil)
+	e := echo.New()
+	e.GET("/ws", manager.Handle)
+
+	srv := httptest.NewServer(e)
+	defer srv.Close()
+
+	successBase := testutil.ToFloat64(wsUnsubscribeRequests.WithLabelValues(ChannelHead, "success"))
+	unknownBase := testutil.ToFloat64(wsUnsubscribeRequests.WithLabelValues("unknown", "error"))
+
+	conn := dialWS(t, srv)
+	defer conn.Close()
+
+	subscribe(t, conn, ChannelHead)
+	require.Eventually(t, func() bool {
+		return manager.head.clients.Len() == 1
+	}, time.Second, 10*time.Millisecond)
+
+	// valid unsubscribe -> success
+	unsubscribe(t, conn, ChannelHead)
+	require.Eventually(t, func() bool {
+		return manager.head.clients.Len() == 0
+	}, time.Second, 10*time.Millisecond, "client must be removed from the head channel")
+
+	require.Eventually(t, func() bool {
+		return testutil.ToFloat64(wsUnsubscribeRequests.WithLabelValues(ChannelHead, "success")) == successBase+1
+	}, time.Second, 10*time.Millisecond, "successful unsubscribe must be counted with status=success")
+
+	// unknown channel -> error, the client is notified and the connection stays open
+	unsubscribe(t, conn, "unknown")
+	var errMsg ErrorMessage
+	require.NoError(t, conn.SetReadDeadline(time.Now().Add(time.Second)))
+	require.NoError(t, conn.ReadJSON(&errMsg))
+	require.Equal(t, ChannelError, errMsg.Channel)
+	require.Equal(t, ErrCodeUnknownChannel, errMsg.Body.Code)
+
+	require.Eventually(t, func() bool {
+		return testutil.ToFloat64(wsUnsubscribeRequests.WithLabelValues("unknown", "error")) == unknownBase+1
+	}, time.Second, 10*time.Millisecond, "unsubscribe from unknown channel must be counted with status=error")
+}
+
+// TestHandleCleansUpSubscriptionsOnAbruptDisconnect verifies that an abrupt
+// connection drop (no close handshake) terminates the read loop and releases the
+// client from both the manager and the channels it was subscribed to. Before the
+// fix such errors fell through the switch and the loop span until gorilla panicked
+// with "repeated read on failed websocket connection".
+func TestHandleCleansUpSubscriptionsOnAbruptDisconnect(t *testing.T) {
+	manager := NewManager(nil)
+	e := echo.New()
+	e.GET("/ws", manager.Handle)
+
+	srv := httptest.NewServer(e)
+	defer srv.Close()
+
+	conn := dialWS(t, srv)
+	subscribe(t, conn, ChannelHead)
+
+	require.Eventually(t, func() bool {
+		return manager.head.clients.Len() == 1 && manager.clients.Len() == 1
+	}, time.Second, 10*time.Millisecond, "client must be registered in the head channel")
+
+	// drop the underlying tcp connection without a websocket close handshake
+	require.NoError(t, conn.UnderlyingConn().Close())
+
+	require.Eventually(t, func() bool {
+		return manager.head.clients.Len() == 0 && manager.clients.Len() == 0
+	}, 2*time.Second, 10*time.Millisecond, "subscriptions must be cleaned up after an abrupt disconnect")
+}
+
+// TestHandleDoesNotTouchUnsubscribedChannels verifies that disconnecting only
+// releases the channels the client actually subscribed to: the subscription gauge
+// of channels the client never subscribed to must stay untouched.
+func TestHandleDoesNotTouchUnsubscribedChannels(t *testing.T) {
+	manager := NewManager(nil)
+	e := echo.New()
+	e.GET("/ws", manager.Handle)
+
+	srv := httptest.NewServer(e)
+	defer srv.Close()
+
+	// wsSubscriptions is a package-global gauge, capture baselines and assert deltas
+	headBase := testutil.ToFloat64(wsSubscriptions.WithLabelValues(ChannelHead))
+	blocksBase := testutil.ToFloat64(wsSubscriptions.WithLabelValues(ChannelBlocks))
+	gasBase := testutil.ToFloat64(wsSubscriptions.WithLabelValues(ChannelGasPrice))
+
+	conn := dialWS(t, srv)
+	subscribe(t, conn, ChannelHead)
+
+	require.Eventually(t, func() bool {
+		return manager.head.clients.Len() == 1
+	}, time.Second, 10*time.Millisecond)
+
+	require.Equal(t, 0, manager.blocks.clients.Len(), "client never subscribed to blocks")
+	require.Equal(t, 0, manager.gasPrice.clients.Len(), "client never subscribed to gas price")
+
+	require.NoError(t, conn.UnderlyingConn().Close())
+
+	require.Eventually(t, func() bool {
+		return manager.head.clients.Len() == 0
+	}, 2*time.Second, 10*time.Millisecond, "head subscription must be released after disconnect")
+
+	// the head gauge must return to baseline (inc on subscribe, dec on disconnect)
+	require.Equal(t, headBase, testutil.ToFloat64(wsSubscriptions.WithLabelValues(ChannelHead)))
+	// gauges of channels the client never subscribed to must be untouched
+	require.Equal(t, blocksBase, testutil.ToFloat64(wsSubscriptions.WithLabelValues(ChannelBlocks)), "blocks subscription gauge must not drift")
+	require.Equal(t, gasBase, testutil.ToFloat64(wsSubscriptions.WithLabelValues(ChannelGasPrice)), "gas price subscription gauge must not drift")
+}
+
+// TestHandleSurvivesApplicationLevelErrors verifies that malformed payloads and
+// unknown methods are logged but keep the connection alive: a subsequent valid
+// subscribe must still take effect.
+func TestHandleSurvivesApplicationLevelErrors(t *testing.T) {
+	manager := NewManager(nil)
+	e := echo.New()
+	e.GET("/ws", manager.Handle)
+
+	srv := httptest.NewServer(e)
+	defer srv.Close()
+
+	conn := dialWS(t, srv)
+	defer conn.Close()
+
+	readError := func(wantCode int) {
+		t.Helper()
+		var errMsg ErrorMessage
+		require.NoError(t, conn.SetReadDeadline(time.Now().Add(time.Second)))
+		require.NoError(t, conn.ReadJSON(&errMsg))
+		require.Equal(t, ChannelError, errMsg.Channel)
+		require.Equal(t, wantCode, errMsg.Body.Code)
+		require.NotEmpty(t, errMsg.Body.Message)
+	}
+
+	// malformed json: handle fails to decode, must not break the connection
+	require.NoError(t, conn.WriteMessage(websocket.TextMessage, []byte("{not a json")))
+	readError(ErrCodeInvalidMessage)
+
+	// unknown method: handle returns an error, but the connection must stay open
+	require.NoError(t, conn.WriteJSON(Message{Method: "unknown", Body: json.RawMessage(`{}`)}))
+	readError(ErrCodeUnknownMethod)
+
+	// unknown channel: handle returns an error, but the connection must stay open
+	require.NoError(t, conn.WriteJSON(Message{Method: MethodSubscribe, Body: json.RawMessage(`{"channel":"unknown","filters":{}}`)}))
+	readError(ErrCodeUnknownChannel)
+
+	// the connection must still be usable
+	subscribe(t, conn, ChannelHead)
+
+	require.Eventually(t, func() bool {
+		return manager.head.clients.Len() == 1
+	}, time.Second, 10*time.Millisecond, "connection must survive application-level errors")
+}
 
 func TestIpsCheckAndSetLimit(t *testing.T) {
 	ips := NewIps(3)
