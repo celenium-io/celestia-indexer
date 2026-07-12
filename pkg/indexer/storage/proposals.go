@@ -13,7 +13,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/dipdup-net/indexer-sdk/pkg/sync"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 )
 
@@ -21,7 +21,7 @@ func (module *Module) saveProposals(
 	ctx context.Context,
 	tx storage.Transaction,
 	height pkgTypes.Level,
-	proposals *sync.Map[uint64, *storage.Proposal],
+	proposals *sdkSync.Map[uint64, *storage.Proposal],
 	votes []*storage.Vote,
 	addrToId map[string]uint64,
 ) (int64, error) {
@@ -119,19 +119,22 @@ func (module *Module) getConstantDuration(ctx context.Context, moduleName types.
 	return time.Duration(intValue), nil
 }
 
-func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.Transaction, height pkgTypes.Level, proposals *sync.Map[uint64, *storage.Proposal]) ([]*storage.Proposal, error) {
+func (module *Module) fillProposalsVotingPower(
+	ctx context.Context,
+	tx storage.Transaction,
+	height pkgTypes.Level,
+	proposals *sdkSync.Map[uint64, *storage.Proposal],
+) ([]*storage.Proposal, error) {
 	// 1. Receive all active or just completed proposals
 
 	// 1.1 Return if we don't have proposal updates and it's not certain block height (one block in hour)
 
 	finished := make(map[uint64]*storage.Proposal)
-	if err := proposals.Range(func(key uint64, value *storage.Proposal) (error, bool) {
+
+	for value := range proposals.AllValues() {
 		if value.Finished() {
 			finished[value.Id] = value
 		}
-		return nil, false
-	}); err != nil {
-		return nil, errors.Wrap(err, "proposals range")
 	}
 
 	if len(finished) == 0 && height%600 > 0 {
@@ -210,51 +213,50 @@ func (module *Module) fillProposalsVotingPower(ctx context.Context, tx storage.T
 			proposal.VetoQuorum = veto.Value
 		}
 
-		var offset int
-		var end bool
+		paginate := sdkSync.Paginate(
+			ctx, limit,
+			func(ctx context.Context, limit, offset int) ([]storage.Vote, error) {
+				return tx.ProposalVotes(ctx, proposal.Id, limit, offset)
+			},
+		)
 
-		for !end {
-			votes, err := tx.ProposalVotes(ctx, proposal.Id, limit, offset)
+		for vote, err := range paginate {
 			if err != nil {
 				return nil, errors.Wrapf(err, "get proposal votes: proposal_id=%d", proposal.Id)
 			}
-			offset += limit
-			end = len(votes) < limit
 
-			for i := range votes {
-				if votes[i].ValidatorId != nil {
-					votedValidators[*votes[i].ValidatorId] = votes[i].Option
+			if vote.ValidatorId != nil {
+				votedValidators[*vote.ValidatorId] = vote.Option
+			}
+
+			delegations, err := tx.AddressDelegations(ctx, vote.VoterId)
+			if err != nil {
+				return nil, errors.Wrapf(err, "can't receive address delegations: %d", vote.VoterId)
+			}
+
+			for j := range delegations {
+				if vote.ValidatorId != nil && delegations[j].ValidatorId == *vote.ValidatorId && delegations[j].AddressId == vote.VoterId {
+					// skip self delegation
+					continue
 				}
 
-				delegations, err := tx.AddressDelegations(ctx, votes[i].VoterId)
-				if err != nil {
-					return nil, errors.Wrapf(err, "can't receive address delegations: %d", votes[i].VoterId)
+				shares := delegations[j].Amount
+				if amount, ok := validatorMinus[delegations[j].ValidatorId]; ok {
+					validatorMinus[delegations[j].ValidatorId] = amount.Add(shares)
+				} else {
+					validatorMinus[delegations[j].ValidatorId] = shares
 				}
+				proposal.VotingPower = proposal.VotingPower.Add(shares)
 
-				for j := range delegations {
-					if votes[i].ValidatorId != nil && delegations[j].ValidatorId == *votes[i].ValidatorId && delegations[j].AddressId == votes[i].VoterId {
-						// skip self delegation
-						continue
-					}
-
-					shares := delegations[j].Amount
-					if amount, ok := validatorMinus[delegations[j].ValidatorId]; ok {
-						validatorMinus[delegations[j].ValidatorId] = amount.Add(shares)
-					} else {
-						validatorMinus[delegations[j].ValidatorId] = shares
-					}
-					proposal.VotingPower = proposal.VotingPower.Add(shares)
-
-					switch votes[i].Option {
-					case types.VoteOptionAbstain:
-						proposal.AbstainVotingPower = proposal.AbstainVotingPower.Add(shares)
-					case types.VoteOptionNo:
-						proposal.NoVotingPower = proposal.NoVotingPower.Add(shares)
-					case types.VoteOptionNoWithVeto:
-						proposal.NoWithVetoVotingPower = proposal.NoWithVetoVotingPower.Add(shares)
-					case types.VoteOptionYes:
-						proposal.YesVotingPower = proposal.YesVotingPower.Add(shares)
-					}
+				switch vote.Option {
+				case types.VoteOptionAbstain:
+					proposal.AbstainVotingPower = proposal.AbstainVotingPower.Add(shares)
+				case types.VoteOptionNo:
+					proposal.NoVotingPower = proposal.NoVotingPower.Add(shares)
+				case types.VoteOptionNoWithVeto:
+					proposal.NoWithVetoVotingPower = proposal.NoWithVetoVotingPower.Add(shares)
+				case types.VoteOptionYes:
+					proposal.YesVotingPower = proposal.YesVotingPower.Add(shares)
 				}
 			}
 		}

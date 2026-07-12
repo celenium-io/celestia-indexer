@@ -109,8 +109,7 @@ func BenchmarkProcessingMessage(b *testing.B) {
 
 	cancel()
 
-	err := channel.clients.Range(func(_ uint64, value client) (error, bool) {
-		return value.Close(), false
-	})
-	require.NoError(b, err)
+	for _, clnt := range channel.clients.All() {
+		require.NoError(b, clnt.Close())
+	}
 }

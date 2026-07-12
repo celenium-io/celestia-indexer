@@ -4,6 +4,7 @@
 package gas
 
 import (
+	"iter"
 	"sync"
 
 	"github.com/shopspring/decimal"
@@ -74,4 +75,17 @@ func (q *queue) Size() int {
 	defer q.mx.RUnlock()
 
 	return len(q.data)
+}
+
+func (q *queue) All() iter.Seq[info] {
+	return func(yield func(info) bool) {
+		q.mx.RLock()
+		defer q.mx.RUnlock()
+
+		for i := range q.data {
+			if !yield(q.data[i]) {
+				return
+			}
+		}
+	}
 }

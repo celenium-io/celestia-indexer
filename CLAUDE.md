@@ -62,7 +62,7 @@ configs/
 |---------|---------|
 | HTTP | `github.com/labstack/echo/v4` |
 | ORM | `github.com/uptrace/bun` + `github.com/jackc/pgx/v5` (via `pgx/v5/stdlib`) |
-| Blockchain | `github.com/celestiaorg/celestia-app/v8`, `github.com/cometbft/cometbft` |
+| Blockchain | `github.com/celestiaorg/celestia-app/v9`, `github.com/cometbft/cometbft` |
 | Cosmos | `github.com/cosmos/cosmos-sdk`, `github.com/cosmos/ibc-go/v8` |
 | Cache | `github.com/valkey-io/valkey-go` |
 | Logging | `github.com/rs/zerolog` |

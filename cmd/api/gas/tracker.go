@@ -11,7 +11,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/celestiaorg/celestia-app/v8/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v9/pkg/appconsts"
 	coreTypes "github.com/cometbft/cometbft/types"
 	"github.com/dipdup-io/workerpool"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -96,9 +96,8 @@ func (tracker *Tracker) listen(ctx context.Context) {
 				log.Err(err).Msg("new block processing")
 				continue
 			}
-			if err := tracker.computeMetrics(); err != nil {
-				log.Err(err).Msg("compute metrics")
-			}
+
+			tracker.computeMetrics()
 
 			if tracker.computeHandler != nil {
 				tracker.g.GoCtx(ctx, func(ctx context.Context) {
@@ -130,7 +129,8 @@ func (tracker *Tracker) Init(ctx context.Context) error {
 		}
 	}
 
-	return tracker.computeMetrics()
+	tracker.computeMetrics()
+	return nil
 }
 
 func (tracker *Tracker) processBlock(ctx context.Context, blockStat storage.BlockStats) error {
@@ -206,22 +206,18 @@ func (tracker *Tracker) State() GasPrice {
 
 var minGasPrice = decimal.NewFromFloat(appconsts.DefaultMinGasPrice)
 
-func (tracker *Tracker) computeMetrics() error {
+func (tracker *Tracker) computeMetrics() {
 	slow := decimal.New(0, 1)
 	median := decimal.New(0, 1)
 	fast := decimal.New(0, 1)
 
-	err := tracker.q.Range(func(item info) (bool, error) {
+	for item := range tracker.q.All() {
 		if len(item.Percentiles) < 3 {
-			return false, nil
+			continue
 		}
 		slow = slow.Add(item.Percentiles[0])
 		median = median.Add(item.Percentiles[1])
 		fast = fast.Add(item.Percentiles[2])
-		return false, nil
-	})
-	if err != nil {
-		return err
 	}
 	count := int64(tracker.q.Size())
 
@@ -246,6 +242,4 @@ func (tracker *Tracker) computeMetrics() error {
 		tracker.gasState.Fast = currency.StringTia(fast)
 	}
 	tracker.mx.Unlock()
-
-	return nil
 }

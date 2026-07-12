@@ -12,13 +12,13 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	indexerCfg "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
-	"github.com/dipdup-net/indexer-sdk/pkg/sync"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
 
-func makeUpgradesMap(upgrades ...*storage.Upgrade) *sync.Map[uint64, *storage.Upgrade] {
-	m := sync.NewMap[uint64, *storage.Upgrade]()
+func makeUpgradesMap(upgrades ...*storage.Upgrade) *sdkSync.Map[uint64, *storage.Upgrade] {
+	m := sdkSync.NewMap[uint64, *storage.Upgrade]()
 	for _, u := range upgrades {
 		m.Set(u.Version, u)
 	}
@@ -180,7 +180,7 @@ func TestSaveUpgrades_EmptyMap(t *testing.T) {
 
 	tx := mock.NewMockTransaction(ctrl)
 	// nothing should be called
-	err := saveUpgrades(context.Background(), tx, sync.NewMap[uint64, *storage.Upgrade](),
+	err := saveUpgrades(context.Background(), tx, sdkSync.NewMap[uint64, *storage.Upgrade](),
 		storage.State{Version: 3}, types.NumericFromInt64(3_000_000))
 	require.NoError(t, err)
 }
@@ -256,7 +256,7 @@ func TestSaveSignals_Empty(t *testing.T) {
 	module := NewModule(nil, constants, nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 
 	err := module.saveSignals(context.Background(), nil, nil,
-		sync.NewMap[uint64, *storage.Upgrade](), storage.State{})
+		sdkSync.NewMap[uint64, *storage.Upgrade](), storage.State{})
 	require.NoError(t, err)
 }
 
@@ -340,6 +340,6 @@ func TestSaveSignals_UnknownValidator(t *testing.T) {
 	defer cancel()
 
 	err := module.saveSignals(ctx, tx, signals,
-		sync.NewMap[uint64, *storage.Upgrade](), storage.State{Version: 3})
+		sdkSync.NewMap[uint64, *storage.Upgrade](), storage.State{Version: 3})
 	require.Error(t, err)
 }

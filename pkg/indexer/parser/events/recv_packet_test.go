@@ -1292,11 +1292,10 @@ func Test_handleRecvPacket(t *testing.T) {
 
 				channelsCount := tt.ctx.IbcChannels.Len()
 				if channelsCount > 0 {
-					_ = tt.ctx.IbcChannels.Range(func(_ string, value *storage.IbcChannel) (error, bool) {
+					for _, value := range tt.ctx.IbcChannels.All() {
 						require.NotEmpty(t, value.TransfersCount)
 						require.NotEmpty(t, value.Id)
-						return nil, false
-					})
+					}
 				}
 
 				toTheNextAction(tt.events, tt.idx)

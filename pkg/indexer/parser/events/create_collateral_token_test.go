@@ -98,11 +98,10 @@ func Test_handleCreateCollateralToken(t *testing.T) {
 			require.NoError(t, err)
 			require.NotEmpty(t, tt.ctx.HlTokens.Len())
 
-			_ = tt.ctx.HlTokens.Range(func(_ string, value *storage.HLToken) (error, bool) {
+			for _, value := range tt.ctx.HlTokens.All() {
 				require.NotNil(t, value)
 				require.Equal(t, tt.token, value)
-				return nil, false
-			})
+			}
 		})
 	}
 }

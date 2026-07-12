@@ -136,16 +136,15 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 	data.validators = decodeCtx.Validators.Values()
 	data.stakingLogs = decodeCtx.StakingLogs
 
-	_ = decodeCtx.Delegations.Range(func(_ string, value *storage.Delegation) (error, bool) {
-		data.delegations = append(data.delegations, *value)
+	for _, delegation := range decodeCtx.Delegations.All() {
+		data.delegations = append(data.delegations, *delegation)
 		if data.bondedTokensPool != nil && len(data.bondedTokensPool.Balances) > 0 {
-			data.bondedTokensPool.Balances[0].Spendable = data.bondedTokensPool.Balances[0].Spendable.Add(value.Amount)
+			data.bondedTokensPool.Balances[0].Spendable = data.bondedTokensPool.Balances[0].Spendable.Add(delegation.Amount)
 		}
-		if addr, ok := data.addresses[value.Address.Address]; ok && len(addr.Balances) > 0 {
-			addr.Balances[0].Spendable = addr.Balances[0].Spendable.Sub(value.Amount)
+		if addr, ok := data.addresses[delegation.Address.Address]; ok && len(addr.Balances) > 0 {
+			addr.Balances[0].Spendable = addr.Balances[0].Spendable.Sub(delegation.Amount)
 		}
-		return nil, false
-	})
+	}
 
 	data.block = block
 	return data, nil

@@ -20,10 +20,8 @@ func TestQueue(t *testing.T) {
 	}
 
 	var totalTx int64
-	err := q.Range(func(item info) (bool, error) {
+	for item := range q.All() {
 		totalTx += item.TxCount
-		return false, nil
-	})
-	require.NoError(t, err)
+	}
 	require.EqualValues(t, 20, totalTx)
 }

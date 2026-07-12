@@ -52,23 +52,19 @@ func TestUpgradeV7(t *testing.T) {
 	minCommissionRate := storageTypes.MustNumericFromString("0.200000000000000000")
 	maxCommissionRate := storageTypes.MustNumericFromString("0.600000000000000000")
 
-	err = dCtx.Validators.Range(func(key string, value *storage.Validator) (error, bool) {
+	for value := range dCtx.Validators.AllValues() {
 		require.True(t, value.Rate.GreaterThanOrEqual(minCommissionRate))
 		require.True(t, value.MaxRate.LessThanOrEqual(maxCommissionRate))
-		return nil, true
-	})
-	require.NoError(t, err)
+	}
 
-	err = dCtx.Constants.Range(func(_ string, value *storage.Constant) (error, bool) {
+	for value := range dCtx.Constants.AllValues() {
 		if value.Name == "min_commission_rate" {
 			require.Equal(t, "0.200000000000000000", value.Value)
 		}
 		if value.Name == "max_commission_rate" {
 			require.Equal(t, "0.600000000000000000", value.Value)
 		}
-		return nil, true
-	})
-	require.NoError(t, err)
+	}
 }
 
 // TestUpgrade_V8WithoutPriorV7 checks that upgrading to v8 when v7 was never applied
@@ -95,15 +91,13 @@ func TestUpgrade_V8WithoutPriorV7(t *testing.T) {
 	minCommissionRate := storageTypes.MustNumericFromString("0.200000000000000000")
 	maxCommissionRate := storageTypes.MustNumericFromString("0.600000000000000000")
 
-	err = dCtx.Validators.Range(func(_ string, v *storage.Validator) (error, bool) {
+	for v := range dCtx.Validators.AllValues() {
 		require.True(t, v.Rate.GreaterThanOrEqual(minCommissionRate))
 		require.True(t, v.MaxRate.LessThanOrEqual(maxCommissionRate))
-		return nil, false
-	})
-	require.NoError(t, err)
+	}
 
 	var foundMin, foundMax bool
-	err = dCtx.Constants.Range(func(_ string, c *storage.Constant) (error, bool) {
+	for c := range dCtx.Constants.AllValues() {
 		if c.Name == "min_commission_rate" {
 			require.Equal(t, "0.200000000000000000", c.Value)
 			foundMin = true
@@ -112,9 +106,7 @@ func TestUpgrade_V8WithoutPriorV7(t *testing.T) {
 			require.Equal(t, "0.600000000000000000", c.Value)
 			foundMax = true
 		}
-		return nil, false
-	})
-	require.NoError(t, err)
+	}
 	require.True(t, foundMin, "min_commission_rate constant must be set by v7 upgrade")
 	require.True(t, foundMax, "max_commission_rate constant must be set by v7 upgrade")
 }
@@ -140,12 +132,7 @@ func TestUpgrade_V8WithPriorV7(t *testing.T) {
 	err := module.upgrade(ctx, dCtx, 7, 8)
 	require.NoError(t, err)
 
-	count := 0
-	_ = dCtx.Validators.Range(func(_ string, _ *storage.Validator) (error, bool) {
-		count++
-		return nil, true
-	})
-	require.Zero(t, count, "no validators should be modified when v7 was already applied")
+	require.Zero(t, dCtx.Validators.Len(), "no validators should be modified when v7 was already applied")
 }
 
 // TestUpgrade_NoOpWhenCurrentGTE checks the early-return guard.
