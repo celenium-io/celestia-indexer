@@ -13,30 +13,30 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/dipdup-net/indexer-sdk/pkg/sync"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 )
 
 type Context struct {
-	Validators        *sync.Map[string, *storage.Validator]
-	Addresses         *sync.Map[string, *storage.Address]
-	Delegations       *sync.Map[string, *storage.Delegation]
-	Jails             *sync.Map[string, *storage.Jail]
-	Proposals         *sync.Map[uint64, *storage.Proposal]
-	Constants         *sync.Map[string, *storage.Constant]
-	Igps              *sync.Map[string, *storage.HLIGP]
-	IgpConfigs        *sync.Map[string, *storage.HLIGPConfig]
-	ZkISMs            *sync.Map[string, *storage.ZkISM]
-	Upgrades          *sync.Map[uint64, *storage.Upgrade]
-	Grants            *sync.Map[string, *storage.Grant]
-	IbcClients        *sync.Map[string, *storage.IbcClient]
-	IbcConnections    *sync.Map[string, *storage.IbcConnection]
-	IbcChannels       *sync.Map[string, *storage.IbcChannel]
-	HlMailboxes       *sync.Map[uint64, *storage.HLMailbox]
-	HlTokens          *sync.Map[string, *storage.HLToken]
-	Namespaces        *sync.Map[string, *storage.Namespace]
-	NamespaceMessages *sync.Map[string, *storage.NamespaceMessage]
-	AddressMessages   *sync.Map[string, *storage.MsgAddress]
+	Validators        *sdkSync.Map[string, *storage.Validator]
+	Addresses         *sdkSync.Map[string, *storage.Address]
+	Delegations       *sdkSync.Map[string, *storage.Delegation]
+	Jails             *sdkSync.Map[string, *storage.Jail]
+	Proposals         *sdkSync.Map[uint64, *storage.Proposal]
+	Constants         *sdkSync.Map[string, *storage.Constant]
+	Igps              *sdkSync.Map[string, *storage.HLIGP]
+	IgpConfigs        *sdkSync.Map[string, *storage.HLIGPConfig]
+	ZkISMs            *sdkSync.Map[string, *storage.ZkISM]
+	Upgrades          *sdkSync.Map[uint64, *storage.Upgrade]
+	Grants            *sdkSync.Map[string, *storage.Grant]
+	IbcClients        *sdkSync.Map[string, *storage.IbcClient]
+	IbcConnections    *sdkSync.Map[string, *storage.IbcConnection]
+	IbcChannels       *sdkSync.Map[string, *storage.IbcChannel]
+	HlMailboxes       *sdkSync.Map[uint64, *storage.HLMailbox]
+	HlTokens          *sdkSync.Map[string, *storage.HLToken]
+	Namespaces        *sdkSync.Map[string, *storage.Namespace]
+	NamespaceMessages *sdkSync.Map[string, *storage.NamespaceMessage]
+	AddressMessages   *sdkSync.Map[string, *storage.MsgAddress]
 
 	Messages        []*storage.Message
 	Events          []storage.Event
@@ -63,25 +63,25 @@ type Context struct {
 
 func NewContext() *Context {
 	return &Context{
-		Validators:        sync.NewMap[string, *storage.Validator](),
-		Addresses:         sync.NewMap[string, *storage.Address](),
-		Delegations:       sync.NewMap[string, *storage.Delegation](),
-		Jails:             sync.NewMap[string, *storage.Jail](),
-		Proposals:         sync.NewMap[uint64, *storage.Proposal](),
-		Constants:         sync.NewMap[string, *storage.Constant](),
-		Igps:              sync.NewMap[string, *storage.HLIGP](),
-		IgpConfigs:        sync.NewMap[string, *storage.HLIGPConfig](),
-		Upgrades:          sync.NewMap[uint64, *storage.Upgrade](),
-		ZkISMs:            sync.NewMap[string, *storage.ZkISM](),
-		Grants:            sync.NewMap[string, *storage.Grant](),
-		IbcClients:        sync.NewMap[string, *storage.IbcClient](),
-		IbcConnections:    sync.NewMap[string, *storage.IbcConnection](),
-		IbcChannels:       sync.NewMap[string, *storage.IbcChannel](),
-		HlMailboxes:       sync.NewMap[uint64, *storage.HLMailbox](),
-		HlTokens:          sync.NewMap[string, *storage.HLToken](),
-		Namespaces:        sync.NewMap[string, *storage.Namespace](),
-		NamespaceMessages: sync.NewMap[string, *storage.NamespaceMessage](),
-		AddressMessages:   sync.NewMap[string, *storage.MsgAddress](),
+		Validators:        sdkSync.NewMap[string, *storage.Validator](),
+		Addresses:         sdkSync.NewMap[string, *storage.Address](),
+		Delegations:       sdkSync.NewMap[string, *storage.Delegation](),
+		Jails:             sdkSync.NewMap[string, *storage.Jail](),
+		Proposals:         sdkSync.NewMap[uint64, *storage.Proposal](),
+		Constants:         sdkSync.NewMap[string, *storage.Constant](),
+		Igps:              sdkSync.NewMap[string, *storage.HLIGP](),
+		IgpConfigs:        sdkSync.NewMap[string, *storage.HLIGPConfig](),
+		Upgrades:          sdkSync.NewMap[uint64, *storage.Upgrade](),
+		ZkISMs:            sdkSync.NewMap[string, *storage.ZkISM](),
+		Grants:            sdkSync.NewMap[string, *storage.Grant](),
+		IbcClients:        sdkSync.NewMap[string, *storage.IbcClient](),
+		IbcConnections:    sdkSync.NewMap[string, *storage.IbcConnection](),
+		IbcChannels:       sdkSync.NewMap[string, *storage.IbcChannel](),
+		HlMailboxes:       sdkSync.NewMap[uint64, *storage.HLMailbox](),
+		HlTokens:          sdkSync.NewMap[string, *storage.HLToken](),
+		Namespaces:        sdkSync.NewMap[string, *storage.Namespace](),
+		NamespaceMessages: sdkSync.NewMap[string, *storage.NamespaceMessage](),
+		AddressMessages:   sdkSync.NewMap[string, *storage.MsgAddress](),
 
 		Messages:        make([]*storage.Message, 0, 100),
 		Events:          make([]storage.Event, 0, 1000),

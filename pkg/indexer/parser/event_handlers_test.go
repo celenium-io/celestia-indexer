@@ -125,10 +125,9 @@ func Test_parseCoinSpent(t *testing.T) {
 			err := parseCoinSpent(ctx, tt.data, tt.height)
 			require.True(t, (err == nil) != tt.wantErr)
 			require.EqualValues(t, 1, ctx.Addresses.Len())
-			_ = ctx.Addresses.Range(func(_ string, value *storage.Address) (error, bool) {
+			for _, value := range ctx.Addresses.All() {
 				require.Equal(t, tt.want, value)
-				return nil, false
-			})
+			}
 		})
 	}
 }
@@ -233,10 +232,9 @@ func Test_parseCoinReceived(t *testing.T) {
 			err := parseCoinReceived(ctx, tt.data, tt.height)
 			require.True(t, (err == nil) != tt.wantErr)
 			require.EqualValues(t, 1, ctx.Addresses.Len())
-			_ = ctx.Addresses.Range(func(_ string, value *storage.Address) (error, bool) {
+			for _, value := range ctx.Addresses.All() {
 				require.Equal(t, tt.want, value)
-				return nil, false
-			})
+			}
 		})
 	}
 }
@@ -274,10 +272,9 @@ func Test_parseCreateIgp(t *testing.T) {
 			err := parseCreateIgp(ctx, tt.data)
 			require.True(t, (err == nil) != tt.wantErr)
 			require.EqualValues(t, 1, ctx.Igps.Len())
-			_ = ctx.Igps.Range(func(_ string, value *storage.HLIGP) (error, bool) {
+			for _, value := range ctx.Igps.All() {
 				require.Equal(t, tt.want, value)
-				return nil, false
-			})
+			}
 		})
 	}
 }
@@ -317,10 +314,9 @@ func Test_parseSetDestinationGasConfig(t *testing.T) {
 			err := parseSetDestinationGasConfig(ctx, tt.data)
 			require.True(t, (err == nil) != tt.wantErr)
 			require.EqualValues(t, 1, ctx.IgpConfigs.Len())
-			_ = ctx.IgpConfigs.Range(func(_ string, value *storage.HLIGPConfig) (error, bool) {
+			for _, value := range ctx.IgpConfigs.All() {
 				require.Equal(t, tt.want, value)
-				return nil, false
-			})
+			}
 		})
 	}
 }
@@ -358,10 +354,9 @@ func Test_parseSetIgp(t *testing.T) {
 			err := parseSetIgp(ctx, tt.data)
 			require.True(t, (err == nil) != tt.wantErr)
 			require.EqualValues(t, 1, ctx.Igps.Len())
-			_ = ctx.Igps.Range(func(_ string, value *storage.HLIGP) (error, bool) {
+			for _, value := range ctx.Igps.All() {
 				require.Equal(t, tt.want, value)
-				return nil, false
-			})
+			}
 		})
 	}
 }

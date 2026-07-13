@@ -78,10 +78,10 @@ func TestDecodeMsg_SuccessOnMsgGrant(t *testing.T) {
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
 	require.EqualValues(t, decodeCtx.Grants.Len(), 1)
-	_ = decodeCtx.Grants.Range(func(_ string, value *storage.Grant) (error, bool) {
+
+	for _, value := range decodeCtx.Grants.All() {
 		require.Equal(t, value, grants[0])
-		return nil, false
-	})
+	}
 }
 
 // MsgExec
@@ -180,10 +180,9 @@ func TestDecodeMsg_SuccessOnMsgRevoke(t *testing.T) {
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
 	require.EqualValues(t, decodeCtx.Grants.Len(), 1)
-	_ = decodeCtx.Grants.Range(func(_ string, value *storage.Grant) (error, bool) {
+	for _, value := range decodeCtx.Grants.All() {
 		require.Equal(t, value, grants[0])
-		return nil, false
-	})
+	}
 }
 
 // MsgPruneExpiredGrants

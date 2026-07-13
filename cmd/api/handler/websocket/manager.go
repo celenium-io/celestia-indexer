@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/dipdup-io/workerpool"
-	"github.com/dipdup-net/indexer-sdk/pkg/sync"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
@@ -24,7 +24,7 @@ import (
 type Manager struct {
 	upgrader websocket.Upgrader
 	clientId *atomic.Uint64
-	clients  *sync.Map[uint64, *Client]
+	clients  *sdkSync.Map[uint64, *Client]
 	observer *bus.Observer
 
 	ips                   *Ips
@@ -48,7 +48,7 @@ func NewManager(observer *bus.Observer, opts ...ManagerOption) *Manager {
 		},
 		observer:              observer,
 		clientId:              new(atomic.Uint64),
-		clients:               sync.NewMap[uint64, *Client](),
+		clients:               sdkSync.NewMap[uint64, *Client](),
 		g:                     workerpool.NewGroup(),
 		websocketClientsPerIp: 10,
 	}
@@ -165,12 +165,13 @@ func (manager *Manager) Start(ctx context.Context) {
 func (manager *Manager) Close() error {
 	manager.g.Wait()
 
-	return manager.clients.Range(func(_ uint64, value *Client) (error, bool) {
-		if err := value.Close(); err != nil {
-			return err, false
+	for _, client := range manager.clients.All() {
+		if err := client.Close(); err != nil {
+			log.Err(err).Msg("websocket client close")
 		}
-		return nil, false
-	})
+	}
+
+	return nil
 }
 
 func (manager *Manager) AddClientToChannel(channel string, client *Client) {

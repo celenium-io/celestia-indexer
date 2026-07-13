@@ -4,7 +4,7 @@
 package responses
 
 import (
-	"github.com/celestiaorg/celestia-app/v8/pkg/proof"
+	"github.com/celestiaorg/celestia-app/v9/pkg/proof"
 )
 
 type BlobProof struct {

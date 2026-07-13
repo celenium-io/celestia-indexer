@@ -7,8 +7,6 @@ import (
 	"time"
 
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
-
-	"github.com/pkg/errors"
 )
 
 type processor[I any, M INotification] func(data I) Notification[M]
@@ -45,13 +43,10 @@ func (channel *Channel[I, M]) processMessage(msg I) error {
 
 	channelName := data.Channel
 
-	if err := channel.clients.Range(func(_ uint64, value client) (error, bool) {
-		if channel.filters.Filter(value, data) {
-			value.Notify(data)
+	for _, clnt := range channel.clients.All() {
+		if channel.filters.Filter(clnt, data) {
+			clnt.Notify(data)
 		}
-		return nil, false
-	}); err != nil {
-		return errors.Wrap(err, "write message to client")
 	}
 
 	wsMessageLatency.WithLabelValues(channelName).Observe(time.Since(startTime).Seconds())

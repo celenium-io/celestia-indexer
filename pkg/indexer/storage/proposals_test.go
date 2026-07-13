@@ -12,7 +12,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
-	"github.com/dipdup-net/indexer-sdk/pkg/sync"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -29,7 +29,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 	t.Run("not fill", func(t *testing.T) {
 		tx := mock.NewMockTransaction(ctrl)
 
-		proposals := sync.NewMap[uint64, *storage.Proposal]()
+		proposals := sdkSync.NewMap[uint64, *storage.Proposal]()
 		proposals.Set(1, &storage.Proposal{
 			Id:     1,
 			Status: types.ProposalStatusActive,
@@ -48,7 +48,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Return([]storage.Proposal{}, nil).
 			Times(1)
 
-		proposals := sync.NewMap[uint64, *storage.Proposal]()
+		proposals := sdkSync.NewMap[uint64, *storage.Proposal]()
 		proposals.Set(1, &storage.Proposal{
 			Id:         1,
 			Status:     types.ProposalStatusActive,
@@ -142,7 +142,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 			}}, nil).
 			Times(1)
 
-		proposals := sync.NewMap[uint64, *storage.Proposal]()
+		proposals := sdkSync.NewMap[uint64, *storage.Proposal]()
 		proposals.Set(1, &storage.Proposal{
 			Id:         1,
 			Status:     types.ProposalStatusActive,

@@ -33,22 +33,20 @@ func saveIgps(
 
 	if dCtx.IgpConfigs.Len() > 0 {
 		configs := make([]storage.HLIGPConfig, 0, dCtx.IgpConfigs.Len())
-		if err := dCtx.IgpConfigs.Range(func(igpAddress string, value *storage.HLIGPConfig) (error, bool) {
+
+		for igpAddress, value := range dCtx.IgpConfigs.All() {
 			hexAddress, err := util.DecodeHexAddress(igpAddress)
 			if err != nil {
-				return errors.Wrap(err, "decode igp address"), false
+				return errors.Wrap(err, "decode igp address")
 			}
 
 			igp, err := tx.HyperlaneIgp(ctx, hexAddress.Bytes())
 			if err != nil {
-				return errors.Wrapf(err, "can't find igp with this address %s", hexAddress), false
+				return errors.Wrapf(err, "can't find igp with this address %s", hexAddress)
 			}
 			value.Id = igp.Id
 
 			configs = append(configs, *value)
-			return nil, false
-		}); err != nil {
-			return err
 		}
 
 		if err := tx.SaveHyperlaneIgpConfigs(ctx, configs...); err != nil {

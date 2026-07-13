@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-net/indexer-sdk/pkg/sync"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 )
 
@@ -35,7 +35,7 @@ func saveZkIsm(
 func saveZkIsmUpdates(
 	ctx context.Context,
 	tx storage.Transaction,
-	zkism *sync.Map[string, *storage.ZkISM],
+	zkism *sdkSync.Map[string, *storage.ZkISM],
 	updates []*storage.ZkISMUpdate,
 	addrToId map[string]uint64,
 ) error {
@@ -68,7 +68,7 @@ func saveZkIsmUpdates(
 func saveZkIsmMessages(
 	ctx context.Context,
 	tx storage.Transaction,
-	zkism *sync.Map[string, *storage.ZkISM],
+	zkism *sdkSync.Map[string, *storage.ZkISM],
 	msgs []*storage.ZkISMMessage,
 	addrToId map[string]uint64,
 ) error {

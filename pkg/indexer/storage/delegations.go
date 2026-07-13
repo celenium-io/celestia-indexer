@@ -41,23 +41,21 @@ func (module *Module) saveDelegations(
 
 	if dCtx.Delegations.Len() > 0 {
 		delegations := make([]storage.Delegation, 0)
-		if err := dCtx.Delegations.Range(func(_ string, value *storage.Delegation) (error, bool) {
+
+		for value := range dCtx.Delegations.AllValues() {
 			addressId, ok := addrToId[value.Address.Address]
 			if !ok {
-				return errors.Wrapf(errCantFindAddress, "delegation address %s", value.Address.Address), false
+				return errors.Wrapf(errCantFindAddress, "delegation address %s", value.Address.Address)
 			}
 			value.AddressId = addressId
 
 			validatorId, ok := module.validatorsByAddress[value.Validator.Address]
 			if !ok {
-				return errors.Wrapf(errCantFindAddress, "delegation validator address %s", value.Validator.Address), false
+				return errors.Wrapf(errCantFindAddress, "delegation validator address %s", value.Validator.Address)
 			}
 			value.ValidatorId = validatorId
 
 			delegations = append(delegations, *value)
-			return nil, false
-		}); err != nil {
-			return err
 		}
 
 		if err := tx.SaveDelegations(ctx, delegations...); err != nil {

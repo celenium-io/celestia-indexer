@@ -18,6 +18,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 )
 
 const (
@@ -90,24 +91,18 @@ func (module *Module) Start(ctx context.Context) {
 }
 
 func (module *Module) init(ctx context.Context) error {
-	var (
-		limit  = 100
-		offset = 0
-		end    = false
-	)
+	paginate := sdkSync.Paginate(ctx, 100, func(ctx context.Context, limit, offset int) ([]*storage.Validator, error) {
+		return module.validators.List(ctx, uint64(limit), uint64(offset), sdk.SortOrderDesc)
+	})
 
-	for !end {
-		validators, err := module.validators.List(ctx, uint64(limit), uint64(offset), sdk.SortOrderDesc)
+	for validator, err := range paginate {
 		if err != nil {
-			return err
+			return errors.Wrap(err, "list validators on init")
 		}
-		for i := range validators {
-			module.validatorsByConsAddress[validators[i].ConsAddress] = validators[i].Id
-			module.validatorsByAddress[validators[i].Address] = validators[i].Id
-			module.validatorsByDelegator[validators[i].Delegator] = validators[i].Id
-		}
-		offset += len(validators)
-		end = limit > len(validators)
+
+		module.validatorsByConsAddress[validator.ConsAddress] = validator.Id
+		module.validatorsByAddress[validator.Address] = validator.Id
+		module.validatorsByDelegator[validator.Delegator] = validator.Id
 	}
 
 	return module.initConstants(ctx)

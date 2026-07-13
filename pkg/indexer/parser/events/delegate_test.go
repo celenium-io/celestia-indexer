@@ -496,11 +496,9 @@ func Test_handleDelegate(t *testing.T) {
 			err := handleDelegate(tt.ctx, tt.events, tt.msg, tt.idx)
 			require.NoError(t, err)
 			require.EqualValues(t, 1, tt.ctx.Delegations.Len())
-			err = tt.ctx.Delegations.Range(func(_ string, value *storage.Delegation) (error, bool) {
+			for _, value := range tt.ctx.Delegations.All() {
 				require.Equal(t, tt.delegation, value)
-				return nil, true
-			})
-			require.NoError(t, err)
+			}
 		})
 	}
 }

@@ -6,9 +6,11 @@ package storage
 import (
 	"context"
 
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	sdkStorage "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 )
 
@@ -55,29 +57,25 @@ func (module *Module) upgradeV7(ctx context.Context, decodeContext *decodeContex
 
 	minCommissionRate := types.MustNumericFromString("0.200000000000000000")
 	maxCommissionRate := types.MustNumericFromString("0.600000000000000000")
-	limit := uint64(100)
-	offset := uint64(0)
-	end := false
-	for !end {
-		validators, err := module.validators.List(ctx, limit, offset, sdkStorage.SortOrderAsc)
-		if err != nil {
-			return errors.Wrap(err, "failed to list validators")
-		}
-		if len(validators) == 0 {
-			break
-		}
 
-		for i := range validators {
-			if validators[i].Rate.LessThan(minCommissionRate) {
-				validators[i].Rate = minCommissionRate
-			}
-			if validators[i].MaxRate.GreaterThan(maxCommissionRate) {
-				validators[i].MaxRate = maxCommissionRate
-			}
-			decodeContext.AddValidator(*validators[i])
+	paginate := sdkSync.Paginate(
+		ctx, 100,
+		func(ctx context.Context, limit, offset int) ([]*storage.Validator, error) {
+			return module.validators.List(ctx, uint64(limit), uint64(offset), sdkStorage.SortOrderAsc)
+		},
+	)
+
+	for validator, err := range paginate {
+		if err != nil {
+			return errors.Wrap(err, "list validators in upgrade v7")
 		}
-		offset += limit
-		end = len(validators) < int(limit)
+		if validator.Rate.LessThan(minCommissionRate) {
+			validator.Rate = minCommissionRate
+		}
+		if validator.MaxRate.GreaterThan(maxCommissionRate) {
+			validator.MaxRate = maxCommissionRate
+		}
+		decodeContext.AddValidator(*validator)
 	}
 	return nil
 }

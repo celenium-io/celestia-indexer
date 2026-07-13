@@ -90,14 +90,13 @@ func Test_handleChannelOpenConfirm(t *testing.T) {
 				err := handleChannelOpenConfirm(tt.ctx, tt.events, tt.msg[i], tt.idx)
 				require.NoError(t, err)
 
-				_ = tt.ctx.IbcChannels.Range(func(_ string, value *storage.IbcChannel) (error, bool) {
+				for _, value := range tt.ctx.IbcChannels.All() {
 					require.NotEmpty(t, value.ConnectionId)
 					require.NotEmpty(t, value.Id)
 					require.NotEmpty(t, value.CounterpartyChannelId)
 					require.NotEmpty(t, value.CounterpartyPortId)
 					require.NotEmpty(t, value.PortId)
-					return nil, false
-				})
+				}
 			}
 		})
 	}

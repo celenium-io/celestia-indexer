@@ -10,7 +10,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-net/indexer-sdk/pkg/sync"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 )
 
@@ -20,7 +20,7 @@ func (module *Module) saveSignals(
 	ctx context.Context,
 	tx storage.Transaction,
 	signals []*storage.SignalVersion,
-	upgrades *sync.Map[uint64, *storage.Upgrade],
+	upgrades *sdkSync.Map[uint64, *storage.Upgrade],
 	state storage.State,
 ) error {
 	if len(signals) == 0 {
@@ -115,7 +115,7 @@ func (module *Module) tryUpgrade(
 func saveUpgrades(
 	ctx context.Context,
 	tx storage.Transaction,
-	upgrades *sync.Map[uint64, *storage.Upgrade],
+	upgrades *sdkSync.Map[uint64, *storage.Upgrade],
 	state storage.State,
 	votingPower types.Numeric,
 ) error {
@@ -126,14 +126,14 @@ func saveUpgrades(
 	threshold := votingPower.Mul(signalsThreshold)
 
 	var toSave []*storage.Upgrade
-	err := upgrades.Range(func(version uint64, upgrade *storage.Upgrade) (error, bool) {
+	for version, upgrade := range upgrades.All() {
 		if state.Version > 0 && state.Version >= version {
-			return nil, false
+			continue
 		}
 
 		voted, err := tx.UpdateSignalsAfterUpgrade(ctx, version)
 		if err != nil {
-			return errors.Wrapf(err, "update signals for version %d", version), true
+			return errors.Wrapf(err, "update signals for version %d", version)
 		}
 
 		upgrade.VotingPower = votingPower
@@ -142,12 +142,8 @@ func saveUpgrades(
 			upgrade.Status = types.UpgradeStatusWaitingUpgrade
 		}
 		toSave = append(toSave, upgrade)
-
-		return nil, false
-	})
-	if err != nil {
-		return err
 	}
+
 	if len(toSave) == 0 {
 		return nil
 	}

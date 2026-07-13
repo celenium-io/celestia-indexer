@@ -46,8 +46,7 @@ func TestTracker_computeMetrics(t *testing.T) {
 			},
 		})
 
-		err := tracker.computeMetrics()
-		require.NoError(t, err)
+		tracker.computeMetrics()
 		state := tracker.State()
 		require.Equal(t, "2.000000", state.Slow)
 		require.Equal(t, "3.000000", state.Median)
@@ -70,8 +69,7 @@ func TestTracker_computeMetrics(t *testing.T) {
 			Percentiles: []decimal.Decimal{},
 		})
 
-		err := tracker.computeMetrics()
-		require.NoError(t, err)
+		tracker.computeMetrics()
 		state := tracker.State()
 		require.Equal(t, "0.004000", state.Slow)
 		require.Equal(t, "0.004000", state.Median)
