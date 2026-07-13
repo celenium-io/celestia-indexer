@@ -354,7 +354,7 @@ func Test_parseSetIgp(t *testing.T) {
 			err := parseSetIgp(ctx, tt.data)
 			require.True(t, (err == nil) != tt.wantErr)
 			require.EqualValues(t, 1, ctx.Igps.Len())
-			for _, value := range ctx.IgpConfigs.All() {
+			for _, value := range ctx.Igps.All() {
 				require.Equal(t, tt.want, value)
 			}
 		})
