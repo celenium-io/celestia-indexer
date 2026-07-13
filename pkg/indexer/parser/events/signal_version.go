@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func processSignalVersion(ctx *context.Context, _ []storage.Event, msg *storage.Message, data map[string]any, idx *int) error {
+func processSignalVersion(ctx *context.Context, c *Cursor, msg *storage.Message, data map[string]any) error {
 	version, err := decoder.Uint64(data, "Version")
 	if err != nil {
 		return errors.Wrap(err, "get signal version in exec")
@@ -41,6 +41,6 @@ func processSignalVersion(ctx *context.Context, _ []storage.Event, msg *storage.
 		Height:       msg.Height,
 		Time:         msg.Time,
 	})
-	*idx += 1
+	c.Skip(1)
 	return nil
 }

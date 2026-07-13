@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -20,7 +19,7 @@ func Test_handleExec(t *testing.T) {
 		ctx    *context.Context
 		events []storage.Event
 		msg    *storage.Message
-		idx    *int
+		idx    int
 	}{
 		{
 			name: "multiple delegations",
@@ -346,7 +345,7 @@ func Test_handleExec(t *testing.T) {
 					"/cosmos.staking.v1beta1.MsgDelegate",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		}, {
 			name: "multiple undelegations",
 			ctx:  context.NewContext(),
@@ -516,7 +515,7 @@ func Test_handleExec(t *testing.T) {
 					"/cosmos.staking.v1beta1.MsgUndelegate",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		}, {
 			name: "MsgWithdrawDelegatorReward",
 			ctx:  context.NewContext(),
@@ -688,7 +687,7 @@ func Test_handleExec(t *testing.T) {
 					"/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
 				},
 			},
-			idx: testsuite.Ptr(7),
+			idx: 7,
 		}, {
 			name: "unknown message",
 			ctx:  context.NewContext(),
@@ -784,7 +783,7 @@ func Test_handleExec(t *testing.T) {
 					"/cosmos.authz.v1beta1.MsgGrant",
 				},
 			},
-			idx: testsuite.Ptr(9),
+			idx: 9,
 		}, {
 			name: "signal version",
 			ctx:  context.NewContext(),
@@ -872,7 +871,7 @@ func Test_handleExec(t *testing.T) {
 					"/celestia.signal.v1.Msg/SignalVersion",
 				},
 			},
-			idx: testsuite.Ptr(7),
+			idx: 7,
 		}, {
 			name: "vote",
 			ctx:  context.NewContext(),
@@ -966,7 +965,7 @@ func Test_handleExec(t *testing.T) {
 					"/cosmos.gov.v1.MsgVoteWeighted",
 				},
 			},
-			idx: testsuite.Ptr(7),
+			idx: 7,
 		}, {
 			name: "withdraw commissions and delegator rewards",
 			ctx:  context.NewContext(),
@@ -1139,7 +1138,7 @@ func Test_handleExec(t *testing.T) {
 					"/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
 				},
 			},
-			idx: testsuite.Ptr(7),
+			idx: 7,
 		}, {
 			name: "withdraw commissions, delegator rewards and delegate",
 			ctx:  context.NewContext(),
@@ -1366,7 +1365,7 @@ func Test_handleExec(t *testing.T) {
 					"/cosmos.staking.v1beta1.MsgDelegate",
 				},
 			},
-			idx: testsuite.Ptr(7),
+			idx: 7,
 		},
 	}
 	for _, tt := range tests {
@@ -1375,7 +1374,9 @@ func Test_handleExec(t *testing.T) {
 			Height: tt.msg.Height,
 		}
 		t.Run(tt.name, func(t *testing.T) {
-			err := handleExec(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			c.Skip(tt.idx)
+			err := handleExec(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
 		})
 	}

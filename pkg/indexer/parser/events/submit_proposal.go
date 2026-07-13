@@ -11,9 +11,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleSubmitProposal(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleSubmitProposal(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
@@ -21,49 +21,52 @@ func handleSubmitProposal(ctx *context.Context, events []storage.Event, msg *sto
 	if msg.Proposal == nil {
 		return nil
 	}
-	action := decoder.StringFromMap(events[*idx].Data, "action")
+	event, _ := c.Peek()
+	action := decoder.StringFromMap(event.Data, "action")
 	isValid := action == "/cosmos.gov.v1beta1.MsgSubmitProposal" || action == "/cosmos.gov.v1.MsgSubmitProposal"
 	if !isValid {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processSubmitProposal(ctx, events, msg, idx)
+	c.Next()
+	return processSubmitProposal(ctx, c, msg)
 }
 
-func processSubmitProposal(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if len(events) <= *idx {
+func processSubmitProposal(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	event, ok := c.Peek()
+	if !ok {
 		return errors.New("not enough events for submit proposal")
 	}
-	if events[*idx].Type != types.EventTypeSubmitProposal {
-		return errors.Errorf("submit proposal unexpected event type: %s", events[*idx].Type)
+	if event.Type != types.EventTypeSubmitProposal {
+		return errors.Errorf("submit proposal unexpected event type: %s", event.Type)
 	}
 
-	proposalId, err := decoder.Uint64FromMap(events[*idx].Data, "proposal_id")
+	proposalId, err := decoder.Uint64FromMap(event.Data, "proposal_id")
 	if err != nil {
-		return errors.Errorf("submit proposal can't receive proposal id: %##v", events[*idx].Data)
+		return errors.Errorf("submit proposal can't receive proposal id: %##v", event.Data)
 	}
 	msg.Proposal.Id = proposalId
-	*idx += 5
-	if len(events) <= *idx {
+	c.Skip(5)
+	event, ok = c.Peek()
+	if !ok {
 		return errors.New("not enough events for submit proposal after parsing proposal id")
 	}
 
-	if events[*idx].Type != types.EventTypeProposalDeposit {
-		return errors.Errorf("submit proposal unexpected event type: %s", events[*idx].Type)
+	if event.Type != types.EventTypeProposalDeposit {
+		return errors.Errorf("submit proposal unexpected event type: %s", event.Type)
 	}
-	deposit, err := decoder.NumericAmountFromMap(events[*idx].Data, "amount")
+	deposit, err := decoder.NumericAmountFromMap(event.Data, "amount")
 	if err != nil {
 		return errors.Wrap(err, "parse proposal deposit amount")
 	}
 	msg.Proposal.Deposit = deposit
-	if _, isV1 := events[*idx].Data["msg_index"]; isV1 {
-		*idx += 1
+	if _, isV1 := event.Data["msg_index"]; isV1 {
+		c.Skip(1)
 	} else {
-		*idx += 2
+		c.Skip(2)
 	}
 
-	if len(events) > *idx {
-		if events[*idx].Type == types.EventTypeSubmitProposal {
+	if event, ok := c.Peek(); ok {
+		if event.Type == types.EventTypeSubmitProposal {
 			msg.Proposal.Status = types.ProposalStatusActive
 			msg.Proposal.ActivationTime = &ctx.Block.Time
 		}

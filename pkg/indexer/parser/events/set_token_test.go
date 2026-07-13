@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -21,7 +20,7 @@ func Test_handleSetToken(t *testing.T) {
 		events    []storage.Event
 		msg       []*storage.Message
 		wantEmpty bool
-		idx       *int
+		idx       int
 	}{
 		{
 			name: "test 1",
@@ -52,7 +51,8 @@ func Test_handleSetToken(t *testing.T) {
 					Height: 1036866,
 				},
 			},
-			idx:       testsuite.Ptr(0),
+			idx: 0,
+
 			wantEmpty: false,
 		}, {
 			name: "test 2: empty new owner",
@@ -83,7 +83,8 @@ func Test_handleSetToken(t *testing.T) {
 					Height: 1036866,
 				},
 			},
-			idx:       testsuite.Ptr(0),
+			idx: 0,
+
 			wantEmpty: true,
 		},
 	}
@@ -94,7 +95,9 @@ func Test_handleSetToken(t *testing.T) {
 				Time:   time.Now(),
 			}
 			for i := range tt.msg {
-				err := handleSetToken(tt.ctx, tt.events, tt.msg[i], tt.idx)
+				c := NewCursor(tt.events)
+				c.Skip(tt.idx)
+				err := handleSetToken(tt.ctx, c, tt.msg[i])
 				require.NoError(t, err)
 				if !tt.wantEmpty {
 					require.NotEmpty(t, tt.ctx.HlTokens.Len())

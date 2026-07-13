@@ -12,31 +12,33 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleChannelClose(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleChannelClose(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	action := decoder.StringFromMap(events[*idx].Data, "action")
+	event, _ := c.Peek()
+	action := decoder.StringFromMap(event.Data, "action")
 	isValidMsg := action == "/ibc.core.channel.v1.MsgChannelCloseConfirm" || action == "/ibc.core.channel.v1.MsgChannelCloseInit"
 
 	if !isValidMsg {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processChannelClose(ctx, events, msg, idx)
+	c.Next()
+	return processChannelClose(ctx, c, msg)
 }
 
-func processChannelClose(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if len(events) <= *idx {
+func processChannelClose(ctx *context.Context, c *Cursor, _ *storage.Message) error {
+	event, ok := c.Peek()
+	if !ok {
 		return errors.New("not enough events for channel close")
 	}
-	if events[*idx].Type != storageTypes.EventTypeChannelCloseConfirm {
-		return errors.Errorf("invalid event type: %s", events[*idx].Type)
+	if event.Type != storageTypes.EventTypeChannelCloseConfirm {
+		return errors.Errorf("invalid event type: %s", event.Type)
 	}
-	cc := decode.NewChannelChange(events[*idx].Data)
+	cc := decode.NewChannelChange(event.Data)
 
 	ibcChannel := &storage.IbcChannel{
 		Id:     cc.ChannelId,

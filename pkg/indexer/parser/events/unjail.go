@@ -12,40 +12,42 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleUnjail(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleUnjail(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.slashing.v1beta1.MsgUnjail" {
+	event, _ := c.Peek()
+	if action := decoder.StringFromMap(event.Data, "action"); action != "/cosmos.slashing.v1beta1.MsgUnjail" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	return processUnjail(ctx, events, msg, idx)
+	return processUnjail(ctx, c, msg)
 }
 
-func processUnjail(ctx *context.Context, events []storage.Event, _ *storage.Message, idx *int) error {
-	if len(events) <= *idx {
+func processUnjail(ctx *context.Context, c *Cursor, _ *storage.Message) error {
+	event, ok := c.Next()
+	if !ok {
 		return errors.New("not enough events for unjail")
 	}
-	if events[*idx].Type != types.EventTypeMessage {
-		return errors.Errorf("slashing unexpected event type: %s", events[*idx].Type)
+	if event.Type != types.EventTypeMessage {
+		return errors.Errorf("slashing unexpected event type: %s", event.Type)
 	}
 
-	module := decoder.StringFromMap(events[*idx].Data, "module")
+	module := decoder.StringFromMap(event.Data, "module")
 	if module == "" {
-		*idx += 1
-		if len(events) <= *idx {
+		event, ok = c.Next()
+		if !ok {
 			return errors.New("not enough events for unjail after parsing module name")
 		}
-		module = decoder.StringFromMap(events[*idx].Data, "module")
+		module = decoder.StringFromMap(event.Data, "module")
 	}
 	if module != types.ModuleNameSlashing.String() {
 		return errors.Errorf("slashing unexpected module name: %s", module)
 	}
 
-	sender := decoder.StringFromMap(events[*idx].Data, "sender")
+	sender := decoder.StringFromMap(event.Data, "sender")
 	if sender == "" {
 		return errors.Errorf("slashing unexpected sender value: %s", sender)
 	}
@@ -71,6 +73,5 @@ func processUnjail(ctx *context.Context, events []storage.Event, _ *storage.Mess
 	v.Jailed = &jailed
 	ctx.AddValidator(v)
 
-	*idx += 1
 	return nil
 }

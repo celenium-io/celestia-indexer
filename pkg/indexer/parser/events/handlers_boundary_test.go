@@ -18,7 +18,6 @@ func Test_Handle_boundarySafety(t *testing.T) {
 		name        string
 		events      []storage.Event
 		msg         *storage.Message
-		idx         int
 		expectError bool
 	}{
 		{
@@ -44,19 +43,16 @@ func Test_Handle_boundarySafety(t *testing.T) {
 				Height: 100,
 				Data:   map[string]any{},
 			},
-			idx:         0,
 			expectError: false,
 		},
 		{
-			name:   "empty events array",
-			events: []storage.Event{},
-			msg: &storage.Message{
-				Type:   types.MsgSend,
-				Height: 100,
-				Data:   map[string]any{},
-			},
-			idx:         0,
-			expectError: true, // will fail because events[0] doesn't exist
+			// Previously this panicked: handleSend indexed events[0] directly on
+			// an empty slice. Cursor.Peek() can't go out of bounds, so this is
+			// now a graceful "unexpected event action" error, not a crash.
+			name:        "empty events array",
+			events:      []storage.Event{},
+			msg:         &storage.Message{Type: types.MsgSend, Height: 100, Data: map[string]any{}},
+			expectError: true,
 		},
 		{
 			name: "unhandled message type at end of events",
@@ -74,7 +70,6 @@ func Test_Handle_boundarySafety(t *testing.T) {
 				Height: 100,
 				Data:   map[string]any{},
 			},
-			idx:         0,
 			expectError: false,
 		},
 		{
@@ -105,7 +100,6 @@ func Test_Handle_boundarySafety(t *testing.T) {
 				Height: 100,
 				Data:   map[string]any{},
 			},
-			idx:         0,
 			expectError: false,
 		},
 	}
@@ -113,17 +107,16 @@ func Test_Handle_boundarySafety(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.NewContext()
-			idx := tt.idx
+			c := NewCursor(tt.events)
 
+			var err error
+			require.NotPanics(t, func() {
+				err = Handle(ctx, c, tt.msg)
+			})
 			if tt.expectError {
-				require.Panics(t, func() {
-					_ = Handle(ctx, tt.events, tt.msg, &idx)
-				})
+				require.Error(t, err)
 			} else {
-				require.NotPanics(t, func() {
-					err := Handle(ctx, tt.events, tt.msg, &idx)
-					require.NoError(t, err)
-				})
+				require.NoError(t, err)
 			}
 		})
 	}
@@ -132,13 +125,11 @@ func Test_Handle_boundarySafety(t *testing.T) {
 // Test_handle_sliceIterationSafety tests the internal handle function for slice iteration safety
 func Test_handle_sliceIterationSafety(t *testing.T) {
 	tests := []struct {
-		name        string
-		events      []storage.Event
-		msg         *storage.Message
-		idx         int
-		handlers    map[types.MsgType]EventHandler
-		stopKey     string
-		expectPanic bool
+		name     string
+		events   []storage.Event
+		msg      *storage.Message
+		handlers map[types.MsgType]EventHandler
+		stopKey  string
 	}{
 		{
 			name: "iteration reaches end safely",
@@ -161,10 +152,8 @@ func Test_handle_sliceIterationSafety(t *testing.T) {
 				Height: 100,
 				Data:   map[string]any{},
 			},
-			idx:         0,
-			handlers:    map[types.MsgType]EventHandler{},
-			stopKey:     "action",
-			expectPanic: false,
+			handlers: map[types.MsgType]EventHandler{},
+			stopKey:  "action",
 		},
 		{
 			name: "starts at last element",
@@ -182,10 +171,8 @@ func Test_handle_sliceIterationSafety(t *testing.T) {
 				Height: 100,
 				Data:   map[string]any{},
 			},
-			idx:         0,
-			handlers:    map[types.MsgType]EventHandler{},
-			stopKey:     "action",
-			expectPanic: false,
+			handlers: map[types.MsgType]EventHandler{},
+			stopKey:  "action",
 		},
 		{
 			name: "no message events to stop at",
@@ -213,47 +200,45 @@ func Test_handle_sliceIterationSafety(t *testing.T) {
 				Height: 100,
 				Data:   map[string]any{},
 			},
-			idx:         0,
-			handlers:    map[types.MsgType]EventHandler{},
-			stopKey:     "action",
-			expectPanic: false,
+			handlers: map[types.MsgType]EventHandler{},
+			stopKey:  "action",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.NewContext()
-			idx := tt.idx
+			c := NewCursor(tt.events)
 
-			if tt.expectPanic {
-				require.Panics(t, func() {
-					_ = handle(ctx, tt.events, tt.msg, &idx, tt.handlers, tt.stopKey)
-				})
-			} else {
-				require.NotPanics(t, func() {
-					err := handle(ctx, tt.events, tt.msg, &idx, tt.handlers, tt.stopKey)
-					require.NoError(t, err)
-				})
-			}
+			require.NotPanics(t, func() {
+				err := handle(ctx, c, tt.msg, tt.handlers, tt.stopKey)
+				require.NoError(t, err)
+			})
 		})
 	}
 }
 
-// Test_toTheNextAction_incrementSafety ensures toTheNextAction doesn't cause index out of bounds
+// Test_toTheNextAction_incrementSafety ensures Cursor.SkipToNext("action")
+// doesn't cause index out of bounds (this used to test the standalone
+// toTheNextAction helper, which SkipToNext replaced).
 func Test_toTheNextAction_incrementSafety(t *testing.T) {
 	tests := []struct {
-		name      string
-		events    []storage.Event
-		startIdx  int
-		expectIdx int
+		name           string
+		events         []storage.Event
+		startIdx       int
+		wantAtEnd      bool
+		wantActionData string
 	}{
 		{
 			name:      "empty slice",
 			events:    []storage.Event{},
 			startIdx:  0,
-			expectIdx: 0, // should not increment
+			wantAtEnd: true,
 		},
 		{
+			// SkipToNext drains an event with an empty action (it isn't a
+			// boundary) instead of stopping short of it, so the cursor lands
+			// at the true end here rather than staying put.
 			name: "single element with empty action",
 			events: []storage.Event{
 				{
@@ -264,7 +249,7 @@ func Test_toTheNextAction_incrementSafety(t *testing.T) {
 				},
 			},
 			startIdx:  0,
-			expectIdx: 0, // at boundary, should not increment
+			wantAtEnd: true,
 		},
 		{
 			name: "two elements, start at first",
@@ -282,8 +267,8 @@ func Test_toTheNextAction_incrementSafety(t *testing.T) {
 					},
 				},
 			},
-			startIdx:  0,
-			expectIdx: 1,
+			startIdx:       0,
+			wantActionData: "/some.action",
 		},
 		{
 			name: "start at penultimate position with empty action",
@@ -307,10 +292,13 @@ func Test_toTheNextAction_incrementSafety(t *testing.T) {
 					},
 				},
 			},
-			startIdx:  1,
-			expectIdx: 2,
+			startIdx:       1,
+			wantActionData: "/action",
 		},
 		{
+			// Same canonicalization as the "single element" case above: both
+			// remaining events have an empty action, so SkipToNext drains
+			// them all and lands at the true end.
 			name: "all empty actions",
 			events: []storage.Event{
 				{
@@ -327,17 +315,26 @@ func Test_toTheNextAction_incrementSafety(t *testing.T) {
 				},
 			},
 			startIdx:  0,
-			expectIdx: 1, // stops at last element
+			wantAtEnd: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			idx := tt.startIdx
+			c := NewCursor(tt.events)
+			c.Skip(tt.startIdx)
+
 			require.NotPanics(t, func() {
-				toTheNextAction(tt.events, &idx)
+				c.SkipToNext("action")
 			})
-			require.Equal(t, tt.expectIdx, idx, "index should match expected value")
+
+			event, ok := c.Peek()
+			if tt.wantAtEnd {
+				require.False(t, ok, "cursor should have reached the end")
+				return
+			}
+			require.True(t, ok)
+			require.Equal(t, tt.wantActionData, event.Data["action"])
 		})
 	}
 }
@@ -348,7 +345,6 @@ func Test_recvPacket_incrementBy2Safety(t *testing.T) {
 		name   string
 		events []storage.Event
 		msg    *storage.Message
-		idx    int
 	}{
 		{
 			name: "exactly 2 elements after current",
@@ -380,7 +376,6 @@ func Test_recvPacket_incrementBy2Safety(t *testing.T) {
 					},
 				},
 			},
-			idx: 0,
 		},
 		{
 			name: "only 1 element after increment",
@@ -407,16 +402,15 @@ func Test_recvPacket_incrementBy2Safety(t *testing.T) {
 					},
 				},
 			},
-			idx: 0,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.NewContext()
-			idx := tt.idx
+			c := NewCursor(tt.events)
 			require.NotPanics(t, func() {
-				err := handleRecvPacket(ctx, tt.events, tt.msg, &idx)
+				err := handleRecvPacket(ctx, c, tt.msg)
 				require.NoError(t, err)
 			})
 		})

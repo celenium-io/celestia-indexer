@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -20,29 +19,28 @@ import (
 func Test_handleForward(t *testing.T) {
 	ts := time.Now()
 
-	t.Run("nil event index", func(t *testing.T) {
+	t.Run("nil event cursor", func(t *testing.T) {
 		ctx := context.NewContext()
 		msg := &storage.Message{
 			Type:   types.MsgForward,
 			Height: 100,
 			Time:   ts,
 		}
-		err := handleForward(ctx, nil, msg, nil)
+		err := handleForward(ctx, nil, msg)
 		require.Error(t, err)
-		require.Contains(t, err.Error(), "nil event index")
+		require.Contains(t, err.Error(), "nil event cursor")
 	})
 
 	t.Run("nil message", func(t *testing.T) {
 		ctx := context.NewContext()
-		idx := 0
-		err := handleForward(ctx, nil, nil, &idx)
+		c := NewCursor(nil)
+		err := handleForward(ctx, c, nil)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "nil message")
 	})
 
 	t.Run("unexpected action", func(t *testing.T) {
 		ctx := context.NewContext()
-		idx := 0
 		msg := &storage.Message{
 			Type:   types.MsgForward,
 			Height: 100,
@@ -57,7 +55,8 @@ func Test_handleForward(t *testing.T) {
 				},
 			},
 		}
-		err := handleForward(ctx, events, msg, &idx)
+		c := NewCursor(events)
+		err := handleForward(ctx, c, msg)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "unexpected event action")
 	})
@@ -65,7 +64,6 @@ func Test_handleForward(t *testing.T) {
 	// Mirrors real tx 0A5524EE...: EventSendRemoteTransfer precedes EventTokenForwarded.
 	t.Run("success: send remote transfer then token forwarded", func(t *testing.T) {
 		ctx := context.NewContext()
-		idx := 0
 		msg := &storage.Message{
 			Type:   types.MsgForward,
 			Height: 10955535,
@@ -102,7 +100,8 @@ func Test_handleForward(t *testing.T) {
 			},
 		}
 
-		err := handleForward(ctx, events, msg, &idx)
+		c := NewCursor(events)
+		err := handleForward(ctx, c, msg)
 		require.NoError(t, err)
 		require.Len(t, ctx.Forwardings, 1)
 
@@ -121,7 +120,6 @@ func Test_handleForward(t *testing.T) {
 	// Intermediate non-forwarding events (coin_spent, coin_received, etc.) are skipped.
 	t.Run("skips intermediate events without action key", func(t *testing.T) {
 		ctx := context.NewContext()
-		idx := 0
 		msg := &storage.Message{
 			Type:   types.MsgForward,
 			Height: 100,
@@ -170,7 +168,8 @@ func Test_handleForward(t *testing.T) {
 			},
 		}
 
-		err := handleForward(ctx, events, msg, &idx)
+		c := NewCursor(events)
+		err := handleForward(ctx, c, msg)
 		require.NoError(t, err)
 		require.Len(t, ctx.Forwardings, 1)
 		require.Equal(t, uint64(1), ctx.Forwardings[0].DestDomain)
@@ -179,7 +178,6 @@ func Test_handleForward(t *testing.T) {
 
 	t.Run("stops at next action event", func(t *testing.T) {
 		ctx := context.NewContext()
-		idx := 0
 		msg := &storage.Message{
 			Type:   types.MsgForward,
 			Height: 100,
@@ -209,15 +207,18 @@ func Test_handleForward(t *testing.T) {
 			},
 		}
 
-		err := handleForward(ctx, events, msg, &idx)
+		c := NewCursor(events)
+		err := handleForward(ctx, c, msg)
 		require.NoError(t, err)
 		require.Len(t, ctx.Forwardings, 1)
-		require.Equal(t, 2, idx, "index should stop at next action event")
+
+		next, ok := c.Peek()
+		require.True(t, ok, "cursor should stop at the next action event, not consume it")
+		require.Equal(t, "/cosmos.bank.v1beta1.MsgSend", next.Data["action"])
 	})
 
 	t.Run("multiple messages in sequence", func(t *testing.T) {
 		ctx := context.NewContext()
-		idx := testsuite.Ptr(0)
 		events := []storage.Event{
 			// First MsgForward
 			{
@@ -278,8 +279,9 @@ func Test_handleForward(t *testing.T) {
 			{Type: types.MsgForward, Height: 100, Time: ts},
 		}
 
+		c := NewCursor(events)
 		for i := range msgs {
-			err := handleForward(ctx, events, msgs[i], idx)
+			err := handleForward(ctx, c, msgs[i])
 			require.NoError(t, err)
 		}
 
@@ -297,7 +299,6 @@ func Test_handleForward(t *testing.T) {
 	// still saved; DestDomain and DestRecipient remain zero/nil.
 	t.Run("token forwarded without send remote transfer", func(t *testing.T) {
 		ctx := context.NewContext()
-		idx := 0
 		msg := &storage.Message{
 			Type:   types.MsgForward,
 			Height: 100,
@@ -322,7 +323,8 @@ func Test_handleForward(t *testing.T) {
 			},
 		}
 
-		err := handleForward(ctx, events, msg, &idx)
+		c := NewCursor(events)
+		err := handleForward(ctx, c, msg)
 		require.NoError(t, err)
 		require.Len(t, ctx.Forwardings, 1)
 
@@ -337,7 +339,6 @@ func Test_handleForward(t *testing.T) {
 
 	t.Run("no events after action", func(t *testing.T) {
 		ctx := context.NewContext()
-		idx := 0
 		msg := &storage.Message{
 			Type:   types.MsgForward,
 			Height: 100,
@@ -351,7 +352,8 @@ func Test_handleForward(t *testing.T) {
 			},
 		}
 
-		err := handleForward(ctx, events, msg, &idx)
+		c := NewCursor(events)
+		err := handleForward(ctx, c, msg)
 		require.NoError(t, err)
 		require.Empty(t, ctx.Forwardings)
 	})
@@ -361,7 +363,6 @@ func Test_handleForward(t *testing.T) {
 	// is still emitted. The parser must return an error because token_id is absent.
 	t.Run("pre-v8 format: missing token_id returns error", func(t *testing.T) {
 		ctx := context.NewContext()
-		idx := 0
 		msg := &storage.Message{
 			Type:   types.MsgForward,
 			Height: 10727934,
@@ -409,7 +410,8 @@ func Test_handleForward(t *testing.T) {
 			},
 		}
 
-		err := handleForward(ctx, events, msg, &idx)
+		c := NewCursor(events)
+		err := handleForward(ctx, c, msg)
 		require.NoError(t, err)
 		require.Empty(t, ctx.Forwardings)
 	})

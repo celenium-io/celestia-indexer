@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -20,7 +19,7 @@ func Test_handleHyperlaneProcessMessage(t *testing.T) {
 		ctx    *context.Context
 		events []storage.Event
 		msg    []*storage.Message
-		idx    *int
+		idx    int
 	}{
 		{
 			name: "test 1",
@@ -101,7 +100,7 @@ func Test_handleHyperlaneProcessMessage(t *testing.T) {
 					Height: 1036866,
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		},
 	}
 	for _, tt := range tests {
@@ -111,7 +110,9 @@ func Test_handleHyperlaneProcessMessage(t *testing.T) {
 				Time:   time.Now(),
 			}
 			for i := range tt.msg {
-				err := handleHyperlaneProcessMessage(tt.ctx, tt.events, tt.msg[i], tt.idx)
+				c := NewCursor(tt.events)
+				c.Skip(tt.idx)
+				err := handleHyperlaneProcessMessage(tt.ctx, c, tt.msg[i])
 				require.NoError(t, err)
 				require.NotEmpty(t, tt.ctx.HlTransfers)
 

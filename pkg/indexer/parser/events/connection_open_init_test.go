@@ -8,7 +8,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -19,7 +18,7 @@ func Test_handleConnectionOpenInit(t *testing.T) {
 		ctx    *context.Context
 		events []storage.Event
 		msg    []*storage.Message
-		idx    *int
+		idx    int
 	}{
 		{
 			name: "test 1",
@@ -79,13 +78,15 @@ func Test_handleConnectionOpenInit(t *testing.T) {
 					Height: 1036866,
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for i := range tt.msg {
-				err := handleConnectionOpenInit(tt.ctx, tt.events, tt.msg[i], tt.idx)
+				c := NewCursor(tt.events)
+				c.Skip(tt.idx)
+				err := handleConnectionOpenInit(tt.ctx, c, tt.msg[i])
 				require.NoError(t, err)
 				require.NotEmpty(t, tt.ctx.IbcConnections.Len())
 			}

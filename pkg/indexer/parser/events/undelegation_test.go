@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -18,11 +17,12 @@ import (
 func Test_handleUndelegate(t *testing.T) {
 	ts := time.Now()
 	tests := []struct {
-		name         string
-		ctx          *context.Context
-		events       []storage.Event
-		msg          *storage.Message
-		idx          *int
+		name   string
+		ctx    *context.Context
+		events []storage.Event
+		msg    *storage.Message
+		idx    int
+
 		undelegation *storage.Undelegation
 	}{
 		{
@@ -141,7 +141,8 @@ func Test_handleUndelegate(t *testing.T) {
 					"ValidatorAddress": "celestiavaloper1uqj5ul7jtpskk9ste9mfv6jvh0y3w34vtpz3gw",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			undelegation: &storage.Undelegation{
 				Height:         844186,
 				Time:           ts,
@@ -261,7 +262,8 @@ func Test_handleUndelegate(t *testing.T) {
 					"ValidatorAddress": "celestiavaloper15urq2dtp9qce4fyc85m6upwm9xul3049gwdz0x",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			undelegation: &storage.Undelegation{
 				Height:         75,
 				Time:           ts,
@@ -383,7 +385,8 @@ func Test_handleUndelegate(t *testing.T) {
 					"ValidatorAddress": "celestiavaloper109nzhf6fvqvfan3tayzc8cywcsk6a5q45lmk5s",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			undelegation: &storage.Undelegation{
 				Height:         75,
 				Time:           ts,
@@ -426,7 +429,9 @@ func Test_handleUndelegate(t *testing.T) {
 			tt.ctx.Block = &storage.Block{
 				Time: ts,
 			}
-			err := handleUndelegate(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			c.Skip(tt.idx)
+			err := handleUndelegate(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
 			require.Len(t, tt.ctx.Undelegations, 1)
 			require.Equal(t, *tt.undelegation, tt.ctx.Undelegations[0])

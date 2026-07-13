@@ -57,42 +57,45 @@ func parseWithdrawRewards(ctx *context.Context, msg *storage.Message, data map[s
 	return nil
 }
 
-func handleWithdrawDelegatorRewards(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleWithdrawDelegatorRewards(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward" {
+	event, _ := c.Peek()
+	if action := decoder.StringFromMap(event.Data, "action"); action != "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	return processWithdrawDelegatorRewards(ctx, events, msg, idx)
+	return processWithdrawDelegatorRewards(ctx, c, msg)
 }
 
-func processWithdrawDelegatorRewards(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	msgIdx := decoder.StringFromMap(events[*idx].Data, "msg_index")
+func processWithdrawDelegatorRewards(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	first, _ := c.Peek()
+	msgIdx := decoder.StringFromMap(first.Data, "msg_index")
 	newFormat := msgIdx != ""
 
-	for i := *idx; i < len(events); i++ {
-		switch events[i].Type {
+	for {
+		event, ok := c.Next()
+		if !ok {
+			return nil
+		}
+		switch event.Type {
 		case storageTypes.EventTypeMessage:
 			if newFormat {
 				continue
 			}
-			if module := decoder.StringFromMap(events[i].Data, "module"); module == storageTypes.ModuleNameDistribution.String() {
-				*idx = i + 1
+			if module := decoder.StringFromMap(event.Data, "module"); module == storageTypes.ModuleNameDistribution.String() {
 				return nil
 			}
 		case storageTypes.EventTypeWithdrawRewards:
-			if err := parseWithdrawRewards(ctx, msg, events[i].Data); err != nil {
+			if err := parseWithdrawRewards(ctx, msg, event.Data); err != nil {
 				return err
 			}
 			if newFormat {
-				*idx = i + 1
 				return nil
 			}
 		}
 	}
-	return nil
 }

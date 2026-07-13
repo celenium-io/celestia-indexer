@@ -13,56 +13,56 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleSetToken(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleSetToken(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/hyperlane.warp.v1.MsgSetToken" {
+	event, _ := c.Peek()
+	if action := decoder.StringFromMap(event.Data, "action"); action != "/hyperlane.warp.v1.MsgSetToken" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processSetToken(ctx, events, msg, idx)
+	c.Next()
+	return processSetToken(ctx, c, msg)
 }
 
-func processSetToken(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	end := false
-	for !end {
-		if events[*idx].Type == types.EventTypeHyperlanewarpv1EventSetToken {
-			setToken, err := decode.NewSetToken(events[*idx].Data)
-			if err != nil {
-				return err
-			}
-
-			if setToken.NewOwner != "" {
-				tokenId, err := util.DecodeHexAddress(setToken.TokenId)
-				if err != nil {
-					return errors.Wrap(err, "decode token id")
-				}
-
-				token := &storage.HLToken{
-					TokenId: tokenId.Bytes(),
-					Owner: &storage.Address{
-						Address:    setToken.NewOwner,
-						Height:     msg.Height,
-						LastHeight: msg.Height,
-						Balances:   []storage.Balance{storage.EmptyBalance()},
-					},
-					Type: types.HLTokenTypeCollateral,
-				}
-				ctx.AddHlToken(token)
-				if err := ctx.AddAddress(token.Owner); err != nil {
-					return errors.Wrap(err, "add address")
-				}
-				end = true
-			}
+func processSetToken(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	for event := range c.MsgEvents("action") {
+		if event.Type != types.EventTypeHyperlanewarpv1EventSetToken {
+			continue
 		}
 
-		action := decoder.StringFromMap(events[*idx].Data, "action")
-		end = len(events)-1 == *idx || action != "" || end
-		*idx += 1
+		setToken, err := decode.NewSetToken(event.Data)
+		if err != nil {
+			return err
+		}
+
+		if setToken.NewOwner == "" {
+			continue
+		}
+
+		tokenId, err := util.DecodeHexAddress(setToken.TokenId)
+		if err != nil {
+			return errors.Wrap(err, "decode token id")
+		}
+
+		token := &storage.HLToken{
+			TokenId: tokenId.Bytes(),
+			Owner: &storage.Address{
+				Address:    setToken.NewOwner,
+				Height:     msg.Height,
+				LastHeight: msg.Height,
+				Balances:   []storage.Balance{storage.EmptyBalance()},
+			},
+			Type: types.HLTokenTypeCollateral,
+		}
+		ctx.AddHlToken(token)
+		if err := ctx.AddAddress(token.Owner); err != nil {
+			return errors.Wrap(err, "add address")
+		}
+		break
 	}
 
 	return nil

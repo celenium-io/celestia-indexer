@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -21,8 +20,9 @@ func Test_handleVote(t *testing.T) {
 		ctx    *context.Context
 		events []storage.Event
 		msg    *storage.Message
-		idx    *int
-		votes  []*storage.Vote
+		idx    int
+
+		votes []*storage.Vote
 	}{
 		{
 			name: "vote test 1",
@@ -55,7 +55,8 @@ func Test_handleVote(t *testing.T) {
 				Type:   types.MsgVote,
 				Height: 3762606,
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			votes: []*storage.Vote{
 				{
 					ProposalId: 5,
@@ -103,7 +104,8 @@ func Test_handleVote(t *testing.T) {
 				Type:   types.MsgVoteWeighted,
 				Height: 871324,
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			votes: []*storage.Vote{
 				{
 					ProposalId: 3,
@@ -147,7 +149,8 @@ func Test_handleVote(t *testing.T) {
 				Type:   types.MsgVote,
 				Height: 871324,
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			votes: []*storage.Vote{
 				{
 					ProposalId: 4,
@@ -191,7 +194,8 @@ func Test_handleVote(t *testing.T) {
 				Type:   types.MsgVote,
 				Height: 871324,
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			votes: []*storage.Vote{
 				{
 					ProposalId: 4,
@@ -228,7 +232,9 @@ func Test_handleVote(t *testing.T) {
 				Time:   ts,
 				Height: tt.msg.Height,
 			}
-			err := handleVote(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			c.Skip(tt.idx)
+			err := handleVote(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
 			require.Len(t, tt.ctx.Votes, len(tt.votes))
 			require.Equal(t, tt.votes, tt.ctx.Votes)

@@ -21,7 +21,7 @@ func Test_handleAcknowledgement(t *testing.T) {
 		events   []storage.Event
 		transfer *storage.IbcTransfer
 		msg      []*storage.Message
-		idx      *int
+		idx      int
 
 		isTransferNil bool
 	}{
@@ -127,7 +127,7 @@ func Test_handleAcknowledgement(t *testing.T) {
 					},
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		}, {
 			name:          "test 2",
 			ctx:           context.NewContext(),
@@ -226,7 +226,7 @@ func Test_handleAcknowledgement(t *testing.T) {
 					},
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		}, {
 			name:          "test 3",
 			ctx:           context.NewContext(),
@@ -369,14 +369,16 @@ func Test_handleAcknowledgement(t *testing.T) {
 					},
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for i := range tt.msg {
 				tt.ctx.AddIbcTransfer(tt.transfer)
-				err := handleAcknowledgement(tt.ctx, tt.events, tt.msg[i], tt.idx)
+				c := NewCursor(tt.events)
+				c.Skip(tt.idx)
+				err := handleAcknowledgement(tt.ctx, c, tt.msg[i])
 				require.NoError(t, err)
 				if tt.isTransferNil {
 					require.Empty(t, tt.ctx.IbcTransfers)

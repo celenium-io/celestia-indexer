@@ -11,7 +11,6 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/parser/events"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
@@ -89,18 +88,8 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 
 	ctx.TxEventsCount += int(t.EventsCount)
 
-	var eventsIdx int
-
-	// find first action
-	for i := range txEvents {
-		if txEvents[i].Type != storageTypes.EventTypeMessage {
-			continue
-		}
-		if action := decoder.StringFromMap(txEvents[i].Data, "action"); action != "" {
-			eventsIdx = i
-			break
-		}
-	}
+	c := events.NewCursor(txEvents)
+	c.SkipToNext("action")
 
 	for i := range d.Messages {
 		dm, err := decode.Message(ctx, d.Messages[i], i, t.Status, t.Id)
@@ -125,7 +114,7 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 		t.BlobsCount += len(dm.BlobLogs)
 
 		if !txRes.IsFailed() {
-			if err := events.Handle(ctx, txEvents, &dm.Msg, &eventsIdx); err != nil {
+			if err := events.Handle(ctx, c, &dm.Msg); err != nil {
 				return err
 			}
 		}

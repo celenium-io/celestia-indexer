@@ -10,22 +10,23 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleExec(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleExec(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.authz.v1beta1.MsgExec" {
+	event, _ := c.Peek()
+	if action := decoder.StringFromMap(event.Data, "action"); action != "/cosmos.authz.v1beta1.MsgExec" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
+	c.Next()
 
-	return processExec(ctx, events, msg, idx)
+	return processExec(ctx, c, msg)
 }
 
-func processExec(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+func processExec(ctx *context.Context, c *Cursor, msg *storage.Message) error {
 	for i := range msg.InternalMsgs {
 		msgs, err := getInternalDataForExec(msg.Data, i)
 		if err != nil {
@@ -40,31 +41,31 @@ func processExec(ctx *context.Context, events []storage.Event, msg *storage.Mess
 
 		switch msg.InternalMsgs[i] {
 		case "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation":
-			if err := processCancelUnbonding(ctx, events, internalMessage, idx); err != nil {
+			if err := processCancelUnbonding(ctx, c, internalMessage); err != nil {
 				return err
 			}
 		case "/cosmos.staking.v1beta1.MsgDelegate":
-			if err := processDelegate(ctx, events, internalMessage, idx); err != nil {
+			if err := processDelegate(ctx, c, internalMessage); err != nil {
 				return err
 			}
 		case "/cosmos.staking.v1beta1.MsgBeginRedelegate":
-			if err := processRedelegate(ctx, events, internalMessage, idx); err != nil {
+			if err := processRedelegate(ctx, c, internalMessage); err != nil {
 				return err
 			}
 		case "/cosmos.staking.v1beta1.MsgUndelegate":
-			if err := processUndelegate(ctx, events, internalMessage, idx); err != nil {
+			if err := processUndelegate(ctx, c, internalMessage); err != nil {
 				return err
 			}
 		case msgWithdrawValidatorCommission:
-			if err := processWithdrawValidatorCommission(ctx, events, internalMessage, idx); err != nil {
+			if err := processWithdrawValidatorCommission(ctx, c, internalMessage); err != nil {
 				return err
 			}
 		case "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward":
-			if err := processWithdrawDelegatorRewards(ctx, events, internalMessage, idx); err != nil {
+			if err := processWithdrawDelegatorRewards(ctx, c, internalMessage); err != nil {
 				return err
 			}
 		case "/cosmos.slashing.v1beta1.MsgUnjail":
-			if err := processUnjail(ctx, events, internalMessage, idx); err != nil {
+			if err := processUnjail(ctx, c, internalMessage); err != nil {
 				return err
 			}
 		case "/celestia.signal.v1.MsgSignalVersion":
@@ -72,34 +73,35 @@ func processExec(ctx *context.Context, events []storage.Event, msg *storage.Mess
 			if err != nil {
 				return err
 			}
-			if err := processSignalVersion(ctx, events, msg, data, idx); err != nil {
+			if err := processSignalVersion(ctx, c, msg, data); err != nil {
 				return err
 			}
 		case "/cosmos.gov.v1beta1.MsgVote", "/cosmos.gov.v1.MsgVote", "/cosmos.gov.v1.MsgVoteWeighted", "/cosmos.gov.v1beta1.MsgVoteWeighted":
-			if err := processVote(ctx, events, internalMessage, idx); err != nil {
+			if err := processVote(ctx, c, internalMessage); err != nil {
 				return err
 			}
 		case "/celestia.forwarding.v1.MsgForward":
-			if err := processForward(ctx, events, internalMessage, idx); err != nil {
+			if err := processForward(ctx, c, internalMessage); err != nil {
 				return err
 			}
 		default:
-			for j := *idx; j < len(events); j++ {
-				authMsgIdxPtr, err := decoder.AuthMsgIndexFromMap(events[*idx].Data)
+			for {
+				event, ok := c.Peek()
+				if !ok {
+					break
+				}
+				authMsgIdxPtr, err := decoder.AuthMsgIndexFromMap(event.Data)
 				if err != nil {
 					return err
 				}
 				if authMsgIdxPtr == nil {
 					break
 				}
-
 				if *authMsgIdxPtr != int64(i) {
 					break
 				}
-
-				*idx = j + 1
+				c.Next()
 			}
-
 		}
 	}
 

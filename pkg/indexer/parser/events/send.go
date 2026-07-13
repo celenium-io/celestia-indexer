@@ -10,33 +10,35 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleSend(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleSend(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	action := decoder.StringFromMap(events[*idx].Data, "action")
+	event, _ := c.Peek()
+	action := decoder.StringFromMap(event.Data, "action")
 	isValidMsg := action == "/cosmos.bank.v1beta1.MsgSend"
 	if !isValidMsg {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processSend(ctx, events, msg, idx)
+	c.Next()
+	return processSend(ctx, c, msg)
 }
 
-func processSend(_ *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if len(events) <= *idx {
+func processSend(_ *context.Context, c *Cursor, _ *storage.Message) error {
+	event, ok := c.Peek()
+	if !ok {
 		return errors.New("not enough events for send")
 	}
-	msgIdx := decoder.StringFromMap(events[*idx].Data, "msg_index")
+	msgIdx := decoder.StringFromMap(event.Data, "msg_index")
 	newFormat := msgIdx != ""
 
 	if newFormat {
-		*idx += 4
+		c.Skip(4)
 	} else {
-		*idx += 5
+		c.Skip(5)
 	}
 
 	return nil

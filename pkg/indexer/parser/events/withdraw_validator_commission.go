@@ -15,20 +15,21 @@ import (
 
 const msgWithdrawValidatorCommission = "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission"
 
-func handleWithdrawValidatorCommission(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleWithdrawValidatorCommission(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != msgWithdrawValidatorCommission {
+	event, _ := c.Peek()
+	if action := decoder.StringFromMap(event.Data, "action"); action != msgWithdrawValidatorCommission {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	return processWithdrawValidatorCommission(ctx, events, msg, idx)
+	return processWithdrawValidatorCommission(ctx, c, msg)
 }
 
-func processWithdrawValidatorCommission(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+func processWithdrawValidatorCommission(ctx *context.Context, c *Cursor, msg *storage.Message) error {
 	var validator = storage.EmptyValidator()
 
 	if validatorAddress := msg.Data.GetStringOrDefault("ValidatorAddress"); validatorAddress != "" {
@@ -55,33 +56,41 @@ func processWithdrawValidatorCommission(ctx *context.Context, events []storage.E
 		return errors.Errorf("empty validator address in WithdrawValidatorCommission: %##v", msg.Data)
 	}
 
-	for ; *idx < len(events); *idx++ {
-		if events[*idx].Type == storageTypes.EventTypeWithdrawCommission {
-			commission, err := decode.NewWithdrawCommission(events[*idx].Data)
-			if err != nil {
-				return err
-			}
-			if commission.Amount == nil {
-				continue
-			}
-
-			amount, err := storageTypes.NumericFromString(commission.Amount.Amount.String())
-			if err != nil {
-				return errors.Wrap(err, "parse withdraw commission amount")
-			}
-			validator.Commissions = amount.Neg()
-
-			ctx.AddValidator(validator)
-
-			ctx.AddStakingLog(storage.StakingLog{
-				Height:    msg.Height,
-				Time:      msg.Time,
-				Validator: &validator,
-				Change:    amount.Neg().Copy(),
-				Type:      storageTypes.StakingLogTypeCommissions,
-			})
+	for {
+		event, ok := c.Peek()
+		if !ok {
 			break
 		}
+		if event.Type != storageTypes.EventTypeWithdrawCommission {
+			c.Next()
+			continue
+		}
+
+		commission, err := decode.NewWithdrawCommission(event.Data)
+		if err != nil {
+			return err
+		}
+		if commission.Amount == nil {
+			c.Next()
+			continue
+		}
+
+		amount, err := storageTypes.NumericFromString(commission.Amount.Amount.String())
+		if err != nil {
+			return errors.Wrap(err, "parse withdraw commission amount")
+		}
+		validator.Commissions = amount.Neg()
+
+		ctx.AddValidator(validator)
+
+		ctx.AddStakingLog(storage.StakingLog{
+			Height:    msg.Height,
+			Time:      msg.Time,
+			Validator: &validator,
+			Change:    amount.Neg().Copy(),
+			Type:      storageTypes.StakingLogTypeCommissions,
+		})
+		break
 	}
 	return nil
 }

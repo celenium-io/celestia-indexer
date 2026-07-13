@@ -21,7 +21,7 @@ func msgEvent(action string) storage.Event {
 	}
 }
 
-type guardHandlerFn func(*context.Context, []storage.Event, *storage.Message, *int) error
+type guardHandlerFn func(*context.Context, *Cursor, *storage.Message) error
 
 // Test_eventHandlers_truncatedEvents_returnErrorNotPanic verifies that every
 // event handler which advances *idx by a fixed offset guards the subsequent
@@ -102,9 +102,9 @@ func Test_eventHandlers_truncatedEvents_returnErrorNotPanic(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			idx := 0
+			c := NewCursor(tt.events)
 			require.NotPanics(t, func() {
-				err := tt.handler(context.NewContext(), tt.events, tt.msg, &idx)
+				err := tt.handler(context.NewContext(), c, tt.msg)
 				require.Error(t, err)
 			})
 		})
@@ -127,9 +127,9 @@ func Test_submitProposal_secondGuard_returnErrorNotPanic(t *testing.T) {
 	}
 	msg := &storage.Message{Type: types.MsgUnknown, Proposal: &storage.Proposal{}}
 
-	idx := 0
+	c := NewCursor(events)
 	require.NotPanics(t, func() {
-		err := handleSubmitProposal(context.NewContext(), events, msg, &idx)
+		err := handleSubmitProposal(context.NewContext(), c, msg)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "after parsing proposal id")
 	})
