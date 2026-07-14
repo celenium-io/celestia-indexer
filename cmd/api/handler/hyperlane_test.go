@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"maps"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -662,13 +663,8 @@ func (s *HyperlaneTestSuite) TestListDomains() {
 
 	s.chainStore.EXPECT().
 		All().
-		Return(testChainStore).
+		Return(maps.All(testChainStore)).
 		Times(1)
-
-	s.chainStore.EXPECT().
-		Get(gomock.Any()).
-		Return(testChainMetadata, true).
-		Times(len(testChainStore))
 
 	s.chainStore.Set(testChainStore)
 	s.Require().NoError(s.handler.ListDomains(c))

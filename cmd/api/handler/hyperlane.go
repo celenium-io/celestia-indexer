@@ -436,11 +436,9 @@ func (handler *HyperlaneHandler) GetTransfer(c echo.Context) error {
 //	@Failure		500	{object}	Error
 //	@Router			/hyperlane/domains [get]
 func (handler *HyperlaneHandler) ListDomains(c echo.Context) error {
-	data := handler.chainStore.All()
-
-	response := make(map[uint64]*responses.DomainMetadata, len(data))
-	for i := range data {
-		response[i] = responses.NewDomainMetadata(data[i].DomainId, handler.chainStore)
+	response := make(map[uint64]*responses.DomainMetadata)
+	for id, item := range handler.chainStore.All() {
+		response[id] = responses.NewDomainMetadata(id, item)
 	}
 
 	return c.JSON(http.StatusOK, response)

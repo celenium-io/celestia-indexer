@@ -693,11 +693,6 @@ func (s *StatsTestSuite) TestHlDomainStats() {
 		Times(1)
 
 	s.chainStore.EXPECT().
-		All().
-		Return(testChainStore).
-		Times(1)
-
-	s.chainStore.EXPECT().
 		Get(gomock.Any()).
 		Return(testChainMetadata, true).
 		Times(len(testChainStore))
@@ -713,7 +708,6 @@ func (s *StatsTestSuite) TestHlDomainStats() {
 		}, nil)
 
 	s.chainStore.Set(testChainStore)
-	s.chainStore.All()
 	s.Require().NoError(s.handler.HlByDomain(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
