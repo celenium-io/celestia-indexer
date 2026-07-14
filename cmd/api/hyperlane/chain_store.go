@@ -5,6 +5,7 @@ package hyperlane
 
 import (
 	"context"
+	"iter"
 	"sync"
 	"time"
 
@@ -56,15 +57,20 @@ func (cs *ChainStore) Set(metadata map[uint64]hyperlane.ChainMetadata) {
 	cs.mx.Unlock()
 }
 
-func (cs *ChainStore) All() map[uint64]hyperlane.ChainMetadata {
-	cs.mx.RLock()
-	defer cs.mx.RUnlock()
-
-	s := make(map[uint64]hyperlane.ChainMetadata, len(cs.data))
-	for k, v := range cs.data {
-		s[k] = v
+// All returns an iterator over the stored chain metadata. The read lock is held
+// for the full iteration, so callers must not call Get/Set/All on the same store
+// from within the loop body — doing so recursively RLocks and can deadlock against
+// a pending Set() writer.
+func (cs *ChainStore) All() iter.Seq2[uint64, hyperlane.ChainMetadata] {
+	return func(yield func(uint64, hyperlane.ChainMetadata) bool) {
+		cs.mx.RLock()
+		defer cs.mx.RUnlock()
+		for k, v := range cs.data {
+			if !yield(k, v) {
+				return
+			}
+		}
 	}
-	return s
 }
 
 func (cs *ChainStore) sync(ctx context.Context) {

@@ -14,6 +14,7 @@ package hyperlane
 
 import (
 	context "context"
+	iter "iter"
 	reflect "reflect"
 
 	hyperlane "github.com/celenium-io/celestia-indexer/pkg/node/hyperlane"
@@ -45,10 +46,10 @@ func (m *MockIChainStore) EXPECT() *MockIChainStoreMockRecorder {
 }
 
 // All mocks base method.
-func (m *MockIChainStore) All() map[uint64]hyperlane.ChainMetadata {
+func (m *MockIChainStore) All() iter.Seq2[uint64, hyperlane.ChainMetadata] {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "All")
-	ret0, _ := ret[0].(map[uint64]hyperlane.ChainMetadata)
+	ret0, _ := ret[0].(iter.Seq2[uint64, hyperlane.ChainMetadata])
 	return ret0
 }
 
@@ -65,19 +66,19 @@ type MockIChainStoreAllCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIChainStoreAllCall) Return(arg0 map[uint64]hyperlane.ChainMetadata) *MockIChainStoreAllCall {
+func (c *MockIChainStoreAllCall) Return(arg0 iter.Seq2[uint64, hyperlane.ChainMetadata]) *MockIChainStoreAllCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIChainStoreAllCall) Do(f func() map[uint64]hyperlane.ChainMetadata) *MockIChainStoreAllCall {
+func (c *MockIChainStoreAllCall) Do(f func() iter.Seq2[uint64, hyperlane.ChainMetadata]) *MockIChainStoreAllCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIChainStoreAllCall) DoAndReturn(f func() map[uint64]hyperlane.ChainMetadata) *MockIChainStoreAllCall {
+func (c *MockIChainStoreAllCall) DoAndReturn(f func() iter.Seq2[uint64, hyperlane.ChainMetadata]) *MockIChainStoreAllCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

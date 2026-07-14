@@ -9,6 +9,7 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	pkgHyperlane "github.com/celenium-io/celestia-indexer/pkg/node/hyperlane"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
@@ -230,25 +231,21 @@ type DomainMetadata struct {
 	NativeToken    NativeToken     `json:"native_token"`
 }
 
-func NewDomainMetadata(domainId uint64, store hyperlane.IChainStore) *DomainMetadata {
-	if metadata, ok := store.Get(domainId); ok {
-		explorers := make([]BlockExplorer, len(metadata.BlockExplorers))
-		for i := range explorers {
-			explorers[i] = BlockExplorer(metadata.BlockExplorers[i])
-		}
-		return &DomainMetadata{
-			Domain:         domainId,
-			Name:           metadata.DisplayName,
-			BlockExplorers: explorers,
-			NativeToken: NativeToken{
-				Decimals: metadata.NativeToken.Decimals,
-				Name:     metadata.NativeToken.Name,
-				Symbol:   metadata.NativeToken.Symbol,
-			},
-		}
+func NewDomainMetadata(domainId uint64, metadata pkgHyperlane.ChainMetadata) *DomainMetadata {
+	explorers := make([]BlockExplorer, len(metadata.BlockExplorers))
+	for i := range explorers {
+		explorers[i] = BlockExplorer(metadata.BlockExplorers[i])
 	}
-
-	return nil
+	return &DomainMetadata{
+		Domain:         domainId,
+		Name:           metadata.DisplayName,
+		BlockExplorers: explorers,
+		NativeToken: NativeToken{
+			Decimals: metadata.NativeToken.Decimals,
+			Name:     metadata.NativeToken.Name,
+			Symbol:   metadata.NativeToken.Symbol,
+		},
+	}
 }
 
 type HlDomainStats struct {
