@@ -8,19 +8,16 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
 
 func TestSendHandler(t *testing.T) {
 	tests := []struct {
-		name       string
-		ctx        *context.Context
-		events     []storage.Event
-		msg        *storage.Message
-		idx        *int
-		requireIdx int
+		name   string
+		ctx    *context.Context
+		events []storage.Event
+		msg    *storage.Message
 	}{
 		{
 			name: "send test 1",
@@ -72,8 +69,6 @@ func TestSendHandler(t *testing.T) {
 				Type:   types.MsgSend,
 				Height: 1745041,
 			},
-			idx:        testsuite.Ptr(0),
-			requireIdx: 6,
 		}, {
 			name: "send test 2",
 			ctx:  context.NewContext(),
@@ -123,15 +118,18 @@ func TestSendHandler(t *testing.T) {
 				Type:   types.MsgSend,
 				Height: 1745041,
 			},
-			idx:        testsuite.Ptr(0),
-			requireIdx: 5,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := handleSend(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			err := handleSend(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
-			require.Equal(t, tt.requireIdx, *tt.idx)
+
+			// Both fixtures are exactly consumed: the handler skips straight
+			// to the end of the message's own events.
+			_, ok := c.Peek()
+			require.False(t, ok, "cursor should be exhausted after handling send")
 		})
 	}
 }

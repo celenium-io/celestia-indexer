@@ -13,31 +13,37 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleForward(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleForward(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/celestia.forwarding.v1.MsgForward" {
+	event, _ := c.Peek()
+	if action := decoder.StringFromMap(event.Data, "action"); action != "/celestia.forwarding.v1.MsgForward" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processForward(ctx, events, msg, idx)
+	c.Next()
+	return processForward(ctx, c, msg)
 }
 
-func processForward(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+func processForward(ctx *context.Context, c *Cursor, msg *storage.Message) error {
 	var forwarding = storage.Forwarding{
 		Height: msg.Height,
 		Time:   msg.Time,
 		TxId:   msg.TxId,
 	}
 
-	for ; len(events) > *idx; *idx += 1 {
-		switch events[*idx].Type {
+	for {
+		event, ok := c.Peek()
+		if !ok {
+			break
+		}
+
+		switch event.Type {
 		case types.EventTypeCelestiaforwardingv1EventTokenForwarded:
-			forwarded, err := decode.NewEventTokenForwarded(events[*idx].Data)
+			forwarded, err := decode.NewEventTokenForwarded(event.Data)
 			if err != nil {
 				return errors.Wrap(err, "decoding token forwarded event")
 			}
@@ -45,11 +51,8 @@ func processForward(ctx *context.Context, events []storage.Event, msg *storage.M
 			// Pre-v8 format lacks token_id — drain remaining events for this
 			// message without creating a forwarding entity.
 			if forwarded.TokenId == "" {
-				for *idx += 1; len(events) > *idx; *idx += 1 {
-					if decoder.StringFromMap(events[*idx].Data, "action") != "" {
-						return nil
-					}
-				}
+				c.Next()
+				c.SkipToNext("action")
 				return nil
 			}
 
@@ -78,25 +81,28 @@ func processForward(ctx *context.Context, events []storage.Event, msg *storage.M
 			if err = ctx.AddAddress(forwarding.Address); err != nil {
 				return errors.Wrap(err, "add forwarding address")
 			}
+			c.Next()
 
 		case types.EventTypeHyperlanewarpv1EventSendRemoteTransfer:
-			event, err := decode.NewHyperlaneSendTransferEvent(events[*idx].Data)
+			transferEvent, err := decode.NewHyperlaneSendTransferEvent(event.Data)
 			if err != nil {
 				return errors.Wrap(err, "parse hyperlane send transfer event")
 			}
 
-			recipient, err := util.DecodeHexAddress(event.Recipient)
+			recipient, err := util.DecodeHexAddress(transferEvent.Recipient)
 			if err != nil {
 				return errors.Wrap(err, "decode recipient address")
 			}
-			forwarding.DestDomain = event.DestinationDomain
+			forwarding.DestDomain = transferEvent.DestinationDomain
 			forwarding.DestRecipient = recipient.Bytes()
+			c.Next()
 
 		default:
-			if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "" {
+			if action := decoder.StringFromMap(event.Data, "action"); action != "" {
 				ctx.AddForwarding(&forwarding)
 				return nil
 			}
+			c.Next()
 		}
 	}
 

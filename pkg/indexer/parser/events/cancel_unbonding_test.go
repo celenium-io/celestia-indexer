@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -22,7 +21,8 @@ func Test_handleCancelUnbonding(t *testing.T) {
 		ctx    *context.Context
 		events []storage.Event
 		msg    *storage.Message
-		idx    *int
+		idx    int
+
 		cancel *storage.Undelegation
 	}{
 		{
@@ -136,7 +136,8 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					"ValidatorAddress": "celestiavaloper1qe8uuf5x69c526h4nzxwv4ltftr73v7q5qhs58",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			cancel: &storage.Undelegation{
 				Height: 844287,
 				Time:   ts,
@@ -174,7 +175,9 @@ func Test_handleCancelUnbonding(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := handleCancelUnbonding(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			c.Skip(tt.idx)
+			err := handleCancelUnbonding(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
 			require.Len(t, tt.ctx.CancelUnbonding, 1)
 			require.Equal(t, *tt.cancel, tt.ctx.CancelUnbonding[0])

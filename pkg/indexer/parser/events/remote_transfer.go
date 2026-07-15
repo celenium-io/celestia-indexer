@@ -13,34 +13,32 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleHyperlaneRemoteTransfer(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/hyperlane.warp.v1.MsgRemoteTransfer" {
+	event, _ := c.Peek()
+	if action := decoder.StringFromMap(event.Data, "action"); action != "/hyperlane.warp.v1.MsgRemoteTransfer" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processHyperlaneRemoteTransfer(ctx, events, msg, idx)
+	c.Next()
+	return processHyperlaneRemoteTransfer(ctx, c, msg)
 }
 
-func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	end := false
-
+func processHyperlaneRemoteTransfer(ctx *context.Context, c *Cursor, msg *storage.Message) error {
 	var transfer = &storage.HLTransfer{
 		Height: ctx.Block.Height,
 		Time:   ctx.Block.Time,
 		TxId:   msg.TxId,
 	}
 
-	for !end {
-
-		switch events[*idx].Type {
+	for event := range c.MsgEvents("action") {
+		switch event.Type {
 		case types.EventTypeHyperlanecorev1EventDispatch:
-			dispatchEvent, err := decode.NewHyperlaneDispatchEvent(events[*idx].Data)
+			dispatchEvent, err := decode.NewHyperlaneDispatchEvent(event.Data)
 			if err != nil {
 				return errors.Wrap(err, "parse hyperlane dispatch event")
 			}
@@ -64,54 +62,50 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, events []storage.Event
 
 			ctx.AddHlTransfer(transfer)
 		case types.EventTypeHyperlanewarpv1EventSendRemoteTransfer:
-			event, err := decode.NewHyperlaneSendTransferEvent(events[*idx].Data)
+			sendEvent, err := decode.NewHyperlaneSendTransferEvent(event.Data)
 			if err != nil {
 				return errors.Wrap(err, "parse hyperlane send transfer event")
 			}
 
-			if err := makeHyperlaneTransferAddress(ctx, event.Sender, transfer, msg.Height); err != nil {
+			if err := makeHyperlaneTransferAddress(ctx, sendEvent.Sender, transfer, msg.Height); err != nil {
 				return errors.Wrap(err, "makeHyperlaneTransferAddress")
 			}
-			if err := makeHyperlaneTransferAddress(ctx, event.Recipient, transfer, msg.Height); err != nil {
+			if err := makeHyperlaneTransferAddress(ctx, sendEvent.Recipient, transfer, msg.Height); err != nil {
 				return errors.Wrap(err, "makeHyperlaneTransferAddress")
 			}
 
-			transfer.Denom = event.Denom
-			transfer.Amount = event.Amount
-			tokenId, err := util.DecodeHexAddress(event.TokenId)
+			transfer.Denom = sendEvent.Denom
+			transfer.Amount = sendEvent.Amount
+			tokenId, err := util.DecodeHexAddress(sendEvent.TokenId)
 			if err != nil {
 				return errors.Wrap(err, "decode token id")
 			}
 			transfer.Token = &storage.HLToken{
 				TokenId:       tokenId.Bytes(),
 				SentTransfers: 1,
-				Sent:          event.Amount,
+				Sent:          sendEvent.Amount,
 				Type:          types.HLTokenTypeCollateral,
 			}
 		case types.EventTypeHyperlanecorepostDispatchv1EventGasPayment:
-			event, err := decode.NewHyperlaneGasPaymentEvent(events[*idx].Data)
+			gasEvent, err := decode.NewHyperlaneGasPaymentEvent(event.Data)
 			if err != nil {
 				return errors.Wrap(err, "parse hyperlane gas payment event")
 			}
 
-			igpId, err := util.DecodeHexAddress(event.IgpId)
+			igpId, err := util.DecodeHexAddress(gasEvent.IgpId)
 			if err != nil {
 				return errors.Wrap(err, "decode igp id")
 			}
 			transfer.GasPayment = &storage.HLGasPayment{
 				Height:    ctx.Block.Height,
 				Time:      ctx.Block.Time,
-				Amount:    event.Amount,
-				GasAmount: event.GasAmount,
+				Amount:    gasEvent.Amount,
+				GasAmount: gasEvent.GasAmount,
 				Igp: &storage.HLIGP{
 					IgpId: igpId.Bytes(),
 				},
 			}
 		}
-
-		action := decoder.StringFromMap(events[*idx].Data, "action")
-		end = len(events)-1 == *idx || action != "" || end
-		*idx += 1
 	}
 
 	return nil

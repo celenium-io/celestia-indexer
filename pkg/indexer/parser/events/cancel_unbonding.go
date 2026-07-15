@@ -14,39 +14,42 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleCancelUnbonding(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleCancelUnbonding(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation" {
+	event, _ := c.Peek()
+	if action := decoder.StringFromMap(event.Data, "action"); action != "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processCancelUnbonding(ctx, events, msg, idx)
+	c.Next()
+	return processCancelUnbonding(ctx, c, msg)
 }
 
-func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	var (
-		msgIdx    = decoder.StringFromMap(events[*idx].Data, "msg_index")
-		newFormat = msgIdx != ""
-	)
+func processCancelUnbonding(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	first, _ := c.Peek()
+	msgIdx := decoder.StringFromMap(first.Data, "msg_index")
+	newFormat := msgIdx != ""
 
-	for i := *idx; i < len(events); i++ {
-		switch events[i].Type {
+	for {
+		event, ok := c.Next()
+		if !ok {
+			return nil
+		}
+		switch event.Type {
 		case storageTypes.EventTypeMessage:
-			if module := decoder.StringFromMap(events[i].Data, "module"); module == storageTypes.ModuleNameStaking.String() {
-				*idx = i + 1
+			if module := decoder.StringFromMap(event.Data, "module"); module == storageTypes.ModuleNameStaking.String() {
 				return nil
 			}
 		case storageTypes.EventTypeWithdrawRewards:
-			if err := parseWithdrawRewards(ctx, msg, events[i].Data); err != nil {
+			if err := parseWithdrawRewards(ctx, msg, event.Data); err != nil {
 				return err
 			}
 		case storageTypes.EventTypeCancelUnbondingDelegation:
-			cancel, err := decode.NewCancelUnbondingDelegation(events[i].Data)
+			cancel, err := decode.NewCancelUnbondingDelegation(event.Data)
 			if err != nil {
 				return err
 			}
@@ -112,11 +115,8 @@ func processCancelUnbonding(ctx *context.Context, events []storage.Event, msg *s
 			})
 
 			if newFormat {
-				*idx = i + 1
 				return nil
 			}
 		}
 	}
-
-	return nil
 }

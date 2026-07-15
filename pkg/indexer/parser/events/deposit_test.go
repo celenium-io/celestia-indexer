@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -17,11 +16,12 @@ import (
 func Test_handleDeposit(t *testing.T) {
 	ts := time.Now()
 	tests := []struct {
-		name     string
-		ctx      *context.Context
-		events   []storage.Event
-		msg      *storage.Message
-		idx      *int
+		name   string
+		ctx    *context.Context
+		events []storage.Event
+		msg    *storage.Message
+		idx    int
+
 		proposal storage.Proposal
 	}{
 		{
@@ -88,7 +88,8 @@ func Test_handleDeposit(t *testing.T) {
 				Type:   types.MsgDeposit,
 				Height: 1745041,
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			proposal: storage.Proposal{
 				Id:             2,
 				ActivationTime: &ts,
@@ -153,7 +154,8 @@ func Test_handleDeposit(t *testing.T) {
 				Type:   types.MsgDeposit,
 				Height: 1745041,
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			proposal: storage.Proposal{
 				Id:      2,
 				Status:  types.ProposalStatusInactive,
@@ -223,7 +225,8 @@ func Test_handleDeposit(t *testing.T) {
 				Type:   types.MsgDeposit,
 				Height: 1745041,
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			proposal: storage.Proposal{
 				Id:             7,
 				ActivationTime: &ts,
@@ -287,7 +290,8 @@ func Test_handleDeposit(t *testing.T) {
 				Type:   types.MsgDeposit,
 				Height: 1745041,
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			proposal: storage.Proposal{
 				Id:      7,
 				Status:  types.ProposalStatusInactive,
@@ -300,7 +304,9 @@ func Test_handleDeposit(t *testing.T) {
 			tt.ctx.Block = &storage.Block{
 				Time: ts,
 			}
-			err := handleDeposit(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			c.Skip(tt.idx)
+			err := handleDeposit(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
 			require.NotNil(t, tt.msg.Proposal)
 			require.Equal(t, tt.proposal, *tt.msg.Proposal)

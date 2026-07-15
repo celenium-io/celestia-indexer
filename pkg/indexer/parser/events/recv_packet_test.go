@@ -10,7 +10,6 @@ import (
 	"cosmossdk.io/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 
@@ -28,7 +27,7 @@ func Test_handleRecvPacket(t *testing.T) {
 		ctx    *context.Context
 		events []storage.Event
 		msg    []*storage.Message
-		idx    *int
+		idx    int
 	}{
 		{
 			name: "recv packet test 1",
@@ -160,7 +159,7 @@ func Test_handleRecvPacket(t *testing.T) {
 					},
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		}, {
 			name: "recv packet test 2",
 			ctx:  context.NewContext(),
@@ -451,7 +450,7 @@ func Test_handleRecvPacket(t *testing.T) {
 					},
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		}, {
 			name: "recv packet test 3",
 			ctx:  context.NewContext(),
@@ -625,7 +624,7 @@ func Test_handleRecvPacket(t *testing.T) {
 					},
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		}, {
 			name: "recv packet test 4",
 			ctx:  context.NewContext(),
@@ -877,7 +876,7 @@ func Test_handleRecvPacket(t *testing.T) {
 					},
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		}, {
 			name: "recv packet test 5",
 			ctx:  context.NewContext(),
@@ -1052,7 +1051,7 @@ func Test_handleRecvPacket(t *testing.T) {
 					},
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		}, {
 			name: "failed ICA recv packet with ibccallbackerror followed by successful ICA recv packet",
 			ctx:  context.NewContext(),
@@ -1274,7 +1273,7 @@ func Test_handleRecvPacket(t *testing.T) {
 					},
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		},
 	}
 	for _, tt := range tests {
@@ -1283,8 +1282,10 @@ func Test_handleRecvPacket(t *testing.T) {
 				Height: tt.events[0].Height,
 				Time:   time.Now().UTC(),
 			}
+			c := NewCursor(tt.events)
+			c.Skip(tt.idx)
 			for i := range tt.msg {
-				err := handleRecvPacket(tt.ctx, tt.events, tt.msg[i], tt.idx)
+				err := handleRecvPacket(tt.ctx, c, tt.msg[i])
 				require.NoError(t, err)
 				if len(tt.ctx.IbcTransfers) > 0 {
 					require.NotEmpty(t, tt.ctx.IbcTransfers[0].ConnectionId)
@@ -1298,8 +1299,7 @@ func Test_handleRecvPacket(t *testing.T) {
 					}
 				}
 
-				toTheNextAction(tt.events, tt.idx)
-
+				c.SkipToNext("action")
 			}
 		})
 	}

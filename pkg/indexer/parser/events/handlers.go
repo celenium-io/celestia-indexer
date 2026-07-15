@@ -10,7 +10,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 )
 
-type EventHandler func(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error
+type EventHandler func(ctx *context.Context, c *Cursor, msg *storage.Message) error
 
 var eventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgDelegate:                       handleDelegate,
@@ -53,35 +53,38 @@ var eventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgSubmitMessages:                 handleSubmitZkISMMessages,
 }
 
-func handle(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int, eventHandlers map[storageTypes.MsgType]EventHandler, stopKey string) error {
+func handle(ctx *context.Context, c *Cursor, msg *storage.Message, eventHandlers map[storageTypes.MsgType]EventHandler, stopKey string) error {
 	if handler, ok := eventHandlers[msg.Type]; ok {
-		return handler(ctx, events, msg, idx)
+		return handler(ctx, c, msg)
 	}
 
-	// if event handler is not found list events to another action
-	*idx++
-
-	startIndex := *idx
-	for _, event := range events[startIndex:] {
-		if event.Type != storageTypes.EventTypeMessage {
-			*idx++
-			continue
+	// if event handler is not found, skip events up to the next message
+	// carrying an event of type "message" whose Data has a non-empty
+	// stopKey (mirrors MsgEvents' boundary check, but additionally
+	// requires EventTypeMessage — a plain stopKey match on some other
+	// event type does not end the scan here).
+	c.Next()
+	for {
+		event, ok := c.Peek()
+		if !ok {
+			return nil
 		}
-		if action := decoder.StringFromMap(event.Data, stopKey); action == "" {
-			*idx++
-			continue
+		if event.Type == storageTypes.EventTypeMessage && decoder.StringFromMap(event.Data, stopKey) != "" {
+			return nil
 		}
-		break
+		c.Next()
 	}
-
-	return nil
 }
 
-func Handle(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if err := handle(ctx, events, msg, idx, eventHandlers, "action"); err != nil {
+// Handle dispatches msg to the registered top-level handler for its type
+// (or skips its events if none is registered), then advances c to the
+// "action" boundary event that starts the next message in the
+// transaction, ready for the next call to Handle.
+func Handle(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if err := handle(ctx, c, msg, eventHandlers, "action"); err != nil {
 		return err
 	}
-	toTheNextAction(events, idx)
+	c.SkipToNext("action")
 	return nil
 }
 
@@ -122,15 +125,4 @@ var ibcEventHandlers = map[storageTypes.MsgType]EventHandler{
 	storageTypes.MsgCreateInterchainSecurityModule: processCreateZkISM,
 	storageTypes.MsgUpdateInterchainSecurityModule: processUpdateZkISM,
 	storageTypes.MsgSubmitMessages:                 processSubmitZkISMMessages,
-}
-
-func toTheNextAction(events []storage.Event, idx *int) {
-	if len(events)-1 <= *idx {
-		return
-	}
-	var action = decoder.StringFromMap(events[*idx].Data, "action")
-	for action == "" && len(events)-1 > *idx {
-		*idx += 1
-		action = decoder.StringFromMap(events[*idx].Data, "action")
-	}
 }

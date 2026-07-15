@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -17,11 +16,12 @@ import (
 func Test_handleSetMailbox(t *testing.T) {
 	ts := time.Now()
 	tests := []struct {
-		name    string
-		ctx     *context.Context
-		events  []storage.Event
-		msg     *storage.Message
-		idx     *int
+		name   string
+		ctx    *context.Context
+		events []storage.Event
+		msg    *storage.Message
+		idx    int
+
 		mailbox *storage.HLMailbox
 	}{
 		{
@@ -55,7 +55,8 @@ func Test_handleSetMailbox(t *testing.T) {
 				Height: 1036866,
 				Time:   ts,
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			mailbox: &storage.HLMailbox{
 				Height:      1036866,
 				Time:        ts,
@@ -77,7 +78,9 @@ func Test_handleSetMailbox(t *testing.T) {
 				Height: 1036866,
 				Time:   ts,
 			}
-			err := handleSetMailbox(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			c.Skip(tt.idx)
+			err := handleSetMailbox(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
 			require.NotEmpty(t, tt.ctx.HlMailboxes.Len())
 
@@ -91,11 +94,12 @@ func Test_handleSetMailbox(t *testing.T) {
 func Test_handleSetMailbox_newOwner(t *testing.T) {
 	ts := time.Now()
 	tests := []struct {
-		name    string
-		ctx     *context.Context
-		events  []storage.Event
-		msg     *storage.Message
-		idx     *int
+		name   string
+		ctx    *context.Context
+		events []storage.Event
+		msg    *storage.Message
+		idx    int
+
 		mailbox *storage.HLMailbox
 	}{
 		{
@@ -129,7 +133,8 @@ func Test_handleSetMailbox_newOwner(t *testing.T) {
 				Height: 1036866,
 				Time:   ts,
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			mailbox: &storage.HLMailbox{
 				Height:      1036866,
 				Time:        ts,
@@ -151,7 +156,9 @@ func Test_handleSetMailbox_newOwner(t *testing.T) {
 				Height: 1036866,
 				Time:   ts,
 			}
-			err := handleSetMailbox(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			c.Skip(tt.idx)
+			err := handleSetMailbox(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
 			require.NotEmpty(t, tt.ctx.HlMailboxes.Len())
 

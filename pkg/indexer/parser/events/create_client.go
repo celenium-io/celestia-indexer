@@ -11,25 +11,27 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleCreateClient(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleCreateClient(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/ibc.core.client.v1.MsgCreateClient" {
+	event, _ := c.Peek()
+	if action := decoder.StringFromMap(event.Data, "action"); action != "/ibc.core.client.v1.MsgCreateClient" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processCreateClient(ctx, events, msg, idx)
+	c.Next()
+	return processCreateClient(ctx, c, msg)
 }
 
-func processCreateClient(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if len(events) <= *idx {
+func processCreateClient(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	event, ok := c.Peek()
+	if !ok {
 		return errors.New("not enough events for create client")
 	}
-	cc, err := decode.NewUpdateClient(events[*idx].Data)
+	cc, err := decode.NewUpdateClient(event.Data)
 	if err != nil {
 		return errors.Wrap(err, "parsing CreateClient event")
 	}
@@ -63,6 +65,6 @@ func processCreateClient(ctx *context.Context, events []storage.Event, msg *stor
 		TxId: msg.TxId,
 	}
 	ctx.AddIbcClient(ibcClient)
-	*idx += 2
+	c.Skip(2)
 	return nil
 }

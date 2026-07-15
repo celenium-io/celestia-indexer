@@ -8,7 +8,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -19,7 +18,7 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 		ctx    *context.Context
 		events []storage.Event
 		msgs   []*storage.Message
-		idx    *int
+		idx    int
 	}{
 		{
 			name: "test 1",
@@ -83,7 +82,7 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 					},
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		}, {
 			name: "test 2",
 			ctx:  context.NewContext(),
@@ -142,7 +141,7 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 					},
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		}, {
 			name: "test 3",
 			ctx:  context.NewContext(),
@@ -206,13 +205,15 @@ func Test_handleWithdrawValidatorCommission(t *testing.T) {
 					},
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for i := range tt.msgs {
-				err := handleWithdrawValidatorCommission(tt.ctx, tt.events, tt.msgs[i], tt.idx)
+				c := NewCursor(tt.events)
+				c.Skip(tt.idx)
+				err := handleWithdrawValidatorCommission(tt.ctx, c, tt.msgs[i])
 				require.NoError(t, err)
 			}
 		})

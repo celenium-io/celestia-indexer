@@ -28,25 +28,24 @@ func makeZkISMContext() *context.Context {
 // handleCreateZkISM
 // ──────────────────────────────────────────────────────────
 
-func Test_handleCreateZkISM_NilIndex(t *testing.T) {
+func Test_handleCreateZkISM_NilCursor(t *testing.T) {
 	ctx := makeZkISMContext()
 	msg := &storage.Message{Type: types.MsgCreateInterchainSecurityModule}
-	err := handleCreateZkISM(ctx, nil, msg, nil)
+	err := handleCreateZkISM(ctx, nil, msg)
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "nil event index")
+	require.Contains(t, err.Error(), "nil event cursor")
 }
 
 func Test_handleCreateZkISM_NilMessage(t *testing.T) {
 	ctx := makeZkISMContext()
-	idx := 0
-	err := handleCreateZkISM(ctx, nil, nil, &idx)
+	c := NewCursor(nil)
+	err := handleCreateZkISM(ctx, c, nil)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "nil message")
 }
 
 func Test_handleCreateZkISM_WrongAction(t *testing.T) {
 	ctx := makeZkISMContext()
-	idx := 0
 	msg := &storage.Message{Type: types.MsgCreateInterchainSecurityModule}
 	events := []storage.Event{
 		{
@@ -57,7 +56,8 @@ func Test_handleCreateZkISM_WrongAction(t *testing.T) {
 			},
 		},
 	}
-	err := handleCreateZkISM(ctx, events, msg, &idx)
+	c := NewCursor(events)
+	err := handleCreateZkISM(ctx, c, msg)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "unexpected event action")
 }
@@ -72,7 +72,6 @@ func Test_handleCreateZkISM_Success(t *testing.T) {
 	toHex := func(b []byte) string { return "0x" + hex.EncodeToString(b) }
 
 	ctx := makeZkISMContext()
-	idx := 0
 	msg := &storage.Message{Type: types.MsgCreateInterchainSecurityModule}
 	events := []storage.Event{
 		{
@@ -98,7 +97,8 @@ func Test_handleCreateZkISM_Success(t *testing.T) {
 		},
 	}
 
-	err := handleCreateZkISM(ctx, events, msg, &idx)
+	c := NewCursor(events)
+	err := handleCreateZkISM(ctx, c, msg)
 	require.NoError(t, err)
 	require.NotEmpty(t, ctx.ZkISMs.Len())
 	ism, ok := ctx.ZkISMs.Get("42")
@@ -130,7 +130,6 @@ func Test_handleCreateZkISM_StopsAtNextAction(t *testing.T) {
 	toHex := func(b []byte) string { return "0x" + hex.EncodeToString(b) }
 
 	ctx := makeZkISMContext()
-	idx := testsuite.Ptr(0)
 	events := []storage.Event{
 		{
 			Type: "message",
@@ -162,37 +161,40 @@ func Test_handleCreateZkISM_StopsAtNextAction(t *testing.T) {
 	}
 
 	msg := &storage.Message{Type: types.MsgCreateInterchainSecurityModule}
-	err := handleCreateZkISM(ctx, events, msg, idx)
+	c := NewCursor(events)
+	err := handleCreateZkISM(ctx, c, msg)
 	require.NoError(t, err)
 	require.NotEmpty(t, ctx.ZkISMs.Len())
 	_, ok := ctx.ZkISMs.Get("01")
 	require.True(t, ok)
-	require.Equal(t, 2, *idx, "index must stop before the next action event")
+
+	next, ok := c.Peek()
+	require.True(t, ok, "cursor must stop before the next action event")
+	require.Equal(t, "/celestia.zkism.v1.MsgUpdateInterchainSecurityModule", next.Data["action"])
 }
 
 // ──────────────────────────────────────────────────────────
 // handleUpdateZkISM
 // ──────────────────────────────────────────────────────────
 
-func Test_handleUpdateZkISM_NilIndex(t *testing.T) {
+func Test_handleUpdateZkISM_NilCursor(t *testing.T) {
 	ctx := makeZkISMContext()
 	msg := &storage.Message{Type: types.MsgUpdateInterchainSecurityModule}
-	err := handleUpdateZkISM(ctx, nil, msg, nil)
+	err := handleUpdateZkISM(ctx, nil, msg)
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "nil event index")
+	require.Contains(t, err.Error(), "nil event cursor")
 }
 
 func Test_handleUpdateZkISM_NilMessage(t *testing.T) {
 	ctx := makeZkISMContext()
-	idx := 0
-	err := handleUpdateZkISM(ctx, nil, nil, &idx)
+	c := NewCursor(nil)
+	err := handleUpdateZkISM(ctx, c, nil)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "nil message")
 }
 
 func Test_handleUpdateZkISM_WrongAction(t *testing.T) {
 	ctx := makeZkISMContext()
-	idx := 0
 	msg := &storage.Message{Type: types.MsgUpdateInterchainSecurityModule}
 	events := []storage.Event{
 		{
@@ -200,7 +202,8 @@ func Test_handleUpdateZkISM_WrongAction(t *testing.T) {
 			Data: map[string]string{"action": "/cosmos.bank.v1beta1.MsgSend"},
 		},
 	}
-	err := handleUpdateZkISM(ctx, events, msg, &idx)
+	c := NewCursor(events)
+	err := handleUpdateZkISM(ctx, c, msg)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "unexpected event action")
 }
@@ -210,7 +213,6 @@ func Test_handleUpdateZkISM_Success(t *testing.T) {
 	toHex := func(b []byte) string { return "0x" + hex.EncodeToString(b) }
 
 	ctx := makeZkISMContext()
-	idx := 0
 	msg := &storage.Message{
 		Type: types.MsgUpdateInterchainSecurityModule,
 		Data: map[string]any{
@@ -234,7 +236,8 @@ func Test_handleUpdateZkISM_Success(t *testing.T) {
 		},
 	}
 
-	err := handleUpdateZkISM(ctx, events, msg, &idx)
+	c := NewCursor(events)
+	err := handleUpdateZkISM(ctx, c, msg)
 	require.NoError(t, err)
 	require.NotEmpty(t, ctx.ZkIsmUpdates)
 
@@ -257,7 +260,6 @@ func Test_handleUpdateZkISM_UpdatesContextState(t *testing.T) {
 	// Simulate ISM created earlier in this block
 	ctx.ZkISMs.Set("0x07", &storage.ZkISM{ExternalId: testsuite.MustHexDecode("07"), State: oldState})
 
-	idx := 0
 	msg := &storage.Message{Type: types.MsgUpdateInterchainSecurityModule}
 	events := []storage.Event{
 		{
@@ -276,7 +278,8 @@ func Test_handleUpdateZkISM_UpdatesContextState(t *testing.T) {
 		},
 	}
 
-	err := handleUpdateZkISM(ctx, events, msg, &idx)
+	c := NewCursor(events)
+	err := handleUpdateZkISM(ctx, c, msg)
 	require.NoError(t, err)
 
 	stored, ok := ctx.ZkISMs.Get("07")
@@ -288,25 +291,24 @@ func Test_handleUpdateZkISM_UpdatesContextState(t *testing.T) {
 // handleSubmitZkISMMessages
 // ──────────────────────────────────────────────────────────
 
-func Test_handleSubmitZkISMMessages_NilIndex(t *testing.T) {
+func Test_handleSubmitZkISMMessages_NilCursor(t *testing.T) {
 	ctx := makeZkISMContext()
 	msg := &storage.Message{Type: types.MsgSubmitMessages}
-	err := handleSubmitZkISMMessages(ctx, nil, msg, nil)
+	err := handleSubmitZkISMMessages(ctx, nil, msg)
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "nil event index")
+	require.Contains(t, err.Error(), "nil event cursor")
 }
 
 func Test_handleSubmitZkISMMessages_NilMessage(t *testing.T) {
 	ctx := makeZkISMContext()
-	idx := 0
-	err := handleSubmitZkISMMessages(ctx, nil, nil, &idx)
+	c := NewCursor(nil)
+	err := handleSubmitZkISMMessages(ctx, c, nil)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "nil message")
 }
 
 func Test_handleSubmitZkISMMessages_WrongAction(t *testing.T) {
 	ctx := makeZkISMContext()
-	idx := 0
 	msg := &storage.Message{Type: types.MsgSubmitMessages}
 	events := []storage.Event{
 		{
@@ -314,7 +316,8 @@ func Test_handleSubmitZkISMMessages_WrongAction(t *testing.T) {
 			Data: map[string]string{"action": "/cosmos.bank.v1beta1.MsgSend"},
 		},
 	}
-	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
+	c := NewCursor(events)
+	err := handleSubmitZkISMMessages(ctx, c, msg)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "unexpected event action")
 }
@@ -325,7 +328,6 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 	toHex := func(b []byte) string { return "\"0x" + hex.EncodeToString(b) + "\"" }
 
 	ctx := makeZkISMContext()
-	idx := 0
 	msg := &storage.Message{
 		Type: types.MsgSubmitMessages,
 		Data: map[string]any{
@@ -350,7 +352,8 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 		},
 	}
 
-	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
+	c := NewCursor(events)
+	err := handleSubmitZkISMMessages(ctx, c, msg)
 	require.NoError(t, err)
 	require.Len(t, ctx.ZkIsmMessages, 1)
 
@@ -366,7 +369,6 @@ func Test_handleSubmitZkISMMessages_SingleMessage(t *testing.T) {
 
 func Test_handleSubmitZkISMMessages_Real(t *testing.T) {
 	ctx := makeZkISMContext()
-	idx := 0
 	msg := &storage.Message{
 		Type: types.MsgSubmitMessages,
 		Data: map[string]any{
@@ -394,7 +396,8 @@ func Test_handleSubmitZkISMMessages_Real(t *testing.T) {
 		},
 	}
 
-	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
+	c := NewCursor(events)
+	err := handleSubmitZkISMMessages(ctx, c, msg)
 	require.NoError(t, err)
 	require.Len(t, ctx.ZkIsmMessages, 1)
 
@@ -416,7 +419,6 @@ func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 	toHex := func(b []byte) string { return "\"0x" + hex.EncodeToString(b) + "\"" }
 
 	ctx := makeZkISMContext()
-	idx := 0
 	msg := &storage.Message{
 		Type: types.MsgSubmitMessages,
 		Data: map[string]any{
@@ -441,7 +443,8 @@ func Test_handleSubmitZkISMMessages_MultipleMessages(t *testing.T) {
 		},
 	}
 
-	err := handleSubmitZkISMMessages(ctx, events, msg, &idx)
+	c := NewCursor(events)
+	err := handleSubmitZkISMMessages(ctx, c, msg)
 	require.NoError(t, err)
 	require.Len(t, ctx.ZkIsmMessages, 3)
 
@@ -463,7 +466,6 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 	toHex := func(b []byte) string { return "\"0x" + hex.EncodeToString(b) + "\"" }
 
 	ctx := makeZkISMContext()
-	idx := testsuite.Ptr(0)
 	events := []storage.Event{
 		{
 			Type: "message",
@@ -502,8 +504,9 @@ func Test_handleSubmitZkISMMessages_SequentialMessages(t *testing.T) {
 		{Type: types.MsgSubmitMessages},
 	}
 
+	c := NewCursor(events)
 	for i := range msgs {
-		err := handleSubmitZkISMMessages(ctx, events, msgs[i], idx)
+		err := handleSubmitZkISMMessages(ctx, c, msgs[i])
 		require.NoError(t, err)
 	}
 

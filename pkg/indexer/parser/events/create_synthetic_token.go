@@ -13,75 +13,73 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleCreateSyntheticToken(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleCreateSyntheticToken(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/hyperlane.warp.v1.MsgCreateSyntheticToken" {
+	event, _ := c.Peek()
+	if action := decoder.StringFromMap(event.Data, "action"); action != "/hyperlane.warp.v1.MsgCreateSyntheticToken" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processCreateSyntheticToken(ctx, events, msg, idx)
+	c.Next()
+	return processCreateSyntheticToken(ctx, c, msg)
 }
 
-func processCreateSyntheticToken(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	end := false
-	for !end {
-		if events[*idx].Type == types.EventTypeHyperlanewarpv1EventCreateSyntheticToken {
-			createToken, err := decode.NewCreateSyntheticToken(events[*idx].Data)
-			if err != nil {
-				return errors.Wrap(err, "parsing create synthetic token event")
-			}
-
-			originMailboxId, err := util.DecodeHexAddress(createToken.MailboxId)
-			if err != nil {
-				return errors.Wrap(err, "decode mailbox id")
-			}
-
-			tokenId, err := util.DecodeHexAddress(createToken.TokenId)
-			if err != nil {
-				return errors.Wrap(err, "decode token id")
-			}
-
-			token := &storage.HLToken{
-				Height: ctx.Block.Height,
-				Time:   ctx.Block.Time,
-				Denom:  createToken.Denom,
-				Type:   types.HLTokenTypeSynthetic,
-				Mailbox: &storage.HLMailbox{
-					Height:     ctx.Block.Height,
-					Time:       ctx.Block.Time,
-					Mailbox:    originMailboxId.Bytes(),
-					InternalId: originMailboxId.GetInternalId(),
-				},
-				TokenId:  tokenId.Bytes(),
-				Sent:     types.NumericZero(),
-				Received: types.NumericZero(),
-				TxId:     msg.TxId,
-			}
-
-			if createToken.Owner != "" {
-				token.Owner = &storage.Address{
-					Address:    createToken.Owner,
-					Height:     msg.Height,
-					LastHeight: msg.Height,
-					Balances:   []storage.Balance{storage.EmptyBalance()},
-				}
-				if err := ctx.AddAddress(token.Owner); err != nil {
-					return errors.Wrap(err, "add address")
-				}
-			}
-
-			ctx.AddHlToken(token)
-			end = true
+func processCreateSyntheticToken(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	for event := range c.MsgEvents("action") {
+		if event.Type != types.EventTypeHyperlanewarpv1EventCreateSyntheticToken {
+			continue
 		}
 
-		action := decoder.StringFromMap(events[*idx].Data, "action")
-		end = len(events)-1 == *idx || action != "" || end
-		*idx += 1
+		createToken, err := decode.NewCreateSyntheticToken(event.Data)
+		if err != nil {
+			return errors.Wrap(err, "parsing create synthetic token event")
+		}
+
+		originMailboxId, err := util.DecodeHexAddress(createToken.MailboxId)
+		if err != nil {
+			return errors.Wrap(err, "decode mailbox id")
+		}
+
+		tokenId, err := util.DecodeHexAddress(createToken.TokenId)
+		if err != nil {
+			return errors.Wrap(err, "decode token id")
+		}
+
+		token := &storage.HLToken{
+			Height: ctx.Block.Height,
+			Time:   ctx.Block.Time,
+			Denom:  createToken.Denom,
+			Type:   types.HLTokenTypeSynthetic,
+			Mailbox: &storage.HLMailbox{
+				Height:     ctx.Block.Height,
+				Time:       ctx.Block.Time,
+				Mailbox:    originMailboxId.Bytes(),
+				InternalId: originMailboxId.GetInternalId(),
+			},
+			TokenId:  tokenId.Bytes(),
+			Sent:     types.NumericZero(),
+			Received: types.NumericZero(),
+			TxId:     msg.TxId,
+		}
+
+		if createToken.Owner != "" {
+			token.Owner = &storage.Address{
+				Address:    createToken.Owner,
+				Height:     msg.Height,
+				LastHeight: msg.Height,
+				Balances:   []storage.Balance{storage.EmptyBalance()},
+			}
+			if err := ctx.AddAddress(token.Owner); err != nil {
+				return errors.Wrap(err, "add address")
+			}
+		}
+
+		ctx.AddHlToken(token)
+		break
 	}
 	return nil
 }

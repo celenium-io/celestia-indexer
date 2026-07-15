@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -18,11 +17,12 @@ import (
 func Test_handleRedelegate(t *testing.T) {
 	ts := time.Now()
 	tests := []struct {
-		name         string
-		ctx          *context.Context
-		events       []storage.Event
-		msg          *storage.Message
-		idx          *int
+		name   string
+		ctx    *context.Context
+		events []storage.Event
+		msg    *storage.Message
+		idx    int
+
 		redelegation *storage.Redelegation
 	}{
 		{
@@ -111,7 +111,8 @@ func Test_handleRedelegate(t *testing.T) {
 					"ValidatorSrcAddress": "celestiavaloper1uqj5ul7jtpskk9ste9mfv6jvh0y3w34vtpz3gw",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			redelegation: &storage.Redelegation{
 				Time:           ts,
 				Height:         841682,
@@ -214,7 +215,8 @@ func Test_handleRedelegate(t *testing.T) {
 					"ValidatorSrcAddress": "celestiavaloper1e2p4u5vqwgum7pm9vhp0yjvl58gvhfc6yfatw4",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			redelegation: &storage.Redelegation{
 				Time:           ts,
 				Height:         241,
@@ -390,7 +392,8 @@ func Test_handleRedelegate(t *testing.T) {
 					"ValidatorSrcAddress": "celestiavaloper1uwmf03ke52vld2sa9khs0nslpgzwsm5xs5e4pn",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			redelegation: &storage.Redelegation{
 				Time:           ts,
 				Height:         315,
@@ -525,7 +528,8 @@ func Test_handleRedelegate(t *testing.T) {
 					"ValidatorSrcAddress": "celestiavaloper19mm3s0y676453w3ja58d376ysd84wlf6hq8ae3",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			redelegation: &storage.Redelegation{
 				Time:           ts,
 				Height:         315,
@@ -661,7 +665,8 @@ func Test_handleRedelegate(t *testing.T) {
 					"ValidatorSrcAddress": "celestiavaloper19mm3s0y676453w3ja58d376ysd84wlf6hq8ae3",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			redelegation: &storage.Redelegation{
 				Time:           ts,
 				Height:         315,
@@ -714,7 +719,9 @@ func Test_handleRedelegate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := handleRedelegate(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			c.Skip(tt.idx)
+			err := handleRedelegate(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
 			require.Len(t, tt.ctx.Redelegations, 1)
 			require.Equal(t, *tt.redelegation, tt.ctx.Redelegations[0])

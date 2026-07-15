@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -22,8 +21,9 @@ func Test_handleCreateSyntheticToken(t *testing.T) {
 		ctx    *context.Context
 		events []storage.Event
 		msg    *storage.Message
-		idx    *int
-		token  *storage.HLToken
+		idx    int
+
+		token *storage.HLToken
 	}{
 		{
 			name: "test 1",
@@ -59,7 +59,8 @@ func Test_handleCreateSyntheticToken(t *testing.T) {
 					"Owner":         "celestia1zvdlcmplx4gdh4hajwlsegnn2xzzfy470gjw4c",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			token: &storage.HLToken{
 				Height:           1036866,
 				Time:             ts,
@@ -92,7 +93,9 @@ func Test_handleCreateSyntheticToken(t *testing.T) {
 				Height: 1036866,
 				Time:   ts,
 			}
-			err := handleCreateSyntheticToken(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			c.Skip(tt.idx)
+			err := handleCreateSyntheticToken(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
 			require.NotEmpty(t, tt.ctx.HlTokens.Len())
 

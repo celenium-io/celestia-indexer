@@ -12,31 +12,33 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleChannelOpenInit(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleChannelOpenInit(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	action := decoder.StringFromMap(events[*idx].Data, "action")
+	event, _ := c.Peek()
+	action := decoder.StringFromMap(event.Data, "action")
 	isValidMsg := action == "/ibc.core.channel.v1.MsgChannelOpenInit" || action == "/ibc.core.channel.v1.MsgChannelOpenTry"
 
 	if !isValidMsg {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processChannelOpenInit(ctx, events, msg, idx)
+	c.Next()
+	return processChannelOpenInit(ctx, c, msg)
 }
 
-func processChannelOpenInit(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if len(events) <= *idx {
+func processChannelOpenInit(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	event, ok := c.Peek()
+	if !ok {
 		return errors.New("not enough events for channel open init")
 	}
-	if events[*idx].Type != storageTypes.EventTypeChannelOpenInit && events[*idx].Type != storageTypes.EventTypeChannelOpenTry {
-		return errors.Errorf("invalid event type: %s", events[*idx].Type)
+	if event.Type != storageTypes.EventTypeChannelOpenInit && event.Type != storageTypes.EventTypeChannelOpenTry {
+		return errors.Errorf("invalid event type: %s", event.Type)
 	}
-	cc := decode.NewChannelChange(events[*idx].Data)
+	cc := decode.NewChannelChange(event.Data)
 
 	channelSettings, ok := msg.Data["Channel"]
 	if !ok {

@@ -12,29 +12,30 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleConnectionOpenInit(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleConnectionOpenInit(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	action := decoder.StringFromMap(events[*idx].Data, "action")
+	event, _ := c.Peek()
+	action := decoder.StringFromMap(event.Data, "action")
 	isValidMsg := action == "/ibc.core.connection.v1.MsgConnectionOpenInit" || action == "/ibc.core.connection.v1.MsgConnectionOpenTry"
 
 	if !isValidMsg {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processConnectionOpenInit(ctx, events, msg, idx)
+	c.Next()
+	return processConnectionOpenInit(ctx, c, msg)
 }
 
-func processConnectionOpenInit(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	for i := *idx; i < len(events); i++ {
-		if events[i].Type != storageTypes.EventTypeConnectionOpenInit && events[i].Type != storageTypes.EventTypeConnectionOpenTry {
+func processConnectionOpenInit(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	for _, event := range c.Remaining() {
+		if event.Type != storageTypes.EventTypeConnectionOpenInit && event.Type != storageTypes.EventTypeConnectionOpenTry {
 			continue
 		}
-		cc := decode.NewConnectionOpen(events[i].Data)
+		cc := decode.NewConnectionOpen(event.Data)
 
 		conn := &storage.IbcConnection{
 			Height:                   msg.Height,
@@ -50,6 +51,6 @@ func processConnectionOpenInit(ctx *context.Context, events []storage.Event, msg
 		break
 	}
 
-	*idx += 2
+	c.Skip(2)
 	return nil
 }

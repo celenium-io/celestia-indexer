@@ -17,38 +17,40 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func handleVote(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleVote(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	action := decoder.StringFromMap(events[*idx].Data, "action")
+	event, _ := c.Peek()
+	action := decoder.StringFromMap(event.Data, "action")
 	isValid := action == "/cosmos.gov.v1beta1.MsgVote" || action == "/cosmos.gov.v1.MsgVote" || action == "/cosmos.gov.v1.MsgVoteWeighted" || action == "/cosmos.gov.v1beta1.MsgVoteWeighted"
 	if !isValid {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processVote(ctx, events, msg, idx)
+	c.Next()
+	return processVote(ctx, c, msg)
 }
 
-func processVote(ctx *context.Context, events []storage.Event, _ *storage.Message, idx *int) error {
-	if len(events) <= *idx {
+func processVote(ctx *context.Context, c *Cursor, _ *storage.Message) error {
+	event, ok := c.Peek()
+	if !ok {
 		return errors.New("not enough events for vote")
 	}
-	if events[*idx].Type != types.EventTypeProposalVote {
-		return errors.Errorf("vote unexpected event type: %s", events[*idx].Type)
+	if event.Type != types.EventTypeProposalVote {
+		return errors.Errorf("vote unexpected event type: %s", event.Type)
 	}
 
-	proposalId, err := decoder.Uint64FromMap(events[*idx].Data, "proposal_id")
+	proposalId, err := decoder.Uint64FromMap(event.Data, "proposal_id")
 	if err != nil {
-		return errors.Errorf("vote can't receive proposal id: %##v", events[*idx].Data)
+		return errors.Errorf("vote can't receive proposal id: %##v", event.Data)
 	}
-	voter := decoder.StringFromMap(events[*idx].Data, "voter")
-	option := decoder.StringFromMap(events[*idx].Data, "option")
+	voter := decoder.StringFromMap(event.Data, "voter")
+	option := decoder.StringFromMap(event.Data, "option")
 
-	if err := parseOption(ctx, proposalId, voter, option, idx); err != nil {
+	if err := parseOption(ctx, proposalId, voter, option, c); err != nil {
 		return errors.Wrap(err, "parse option")
 	}
 
@@ -63,7 +65,7 @@ type optionType struct {
 	Weight decimal.Decimal `json:"weight"`
 }
 
-func parseOption(ctx *context.Context, proposalId uint64, voter, option string, idx *int) error {
+func parseOption(ctx *context.Context, proposalId uint64, voter, option string, c *Cursor) error {
 	var opts []optionType
 	if err := json.Unmarshal([]byte(option), &opts); err == nil {
 		if len(opts) == 0 {
@@ -100,7 +102,7 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 
 			ctx.AddVote(&vote)
 		}
-		*idx += 1
+		c.Skip(1)
 		return nil
 	}
 
@@ -152,6 +154,6 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 	}
 
 	ctx.AddVote(&vote)
-	*idx += 2
+	c.Skip(2)
 	return nil
 }

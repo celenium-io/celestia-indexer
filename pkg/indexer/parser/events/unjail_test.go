@@ -8,7 +8,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -19,7 +18,7 @@ func Test_handleUnjail(t *testing.T) {
 		ctx    *context.Context
 		events []storage.Event
 		msg    *storage.Message
-		idx    *int
+		idx    int
 	}{
 		{
 			name: "test 1",
@@ -44,7 +43,7 @@ func Test_handleUnjail(t *testing.T) {
 				Type:   types.MsgUnjail,
 				Height: 844287,
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		}, {
 			name: "test 2",
 			ctx:  context.NewContext(),
@@ -64,12 +63,14 @@ func Test_handleUnjail(t *testing.T) {
 				Type:   types.MsgUnjail,
 				Height: 6758141,
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := handleUnjail(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			c.Skip(tt.idx)
+			err := handleUnjail(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
 		})
 	}

@@ -8,7 +8,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -20,7 +19,6 @@ func Test_recvPacket_boundaryChecks(t *testing.T) {
 		ctx         *context.Context
 		events      []storage.Event
 		msg         *storage.Message
-		idx         *int
 		expectError bool
 	}{
 		{
@@ -40,7 +38,6 @@ func Test_recvPacket_boundaryChecks(t *testing.T) {
 				Height: 100,
 				Data:   map[string]any{},
 			},
-			idx:         testsuite.Ptr(0),
 			expectError: false, // should handle gracefully
 		},
 		{
@@ -67,7 +64,6 @@ func Test_recvPacket_boundaryChecks(t *testing.T) {
 				Height: 100,
 				Data:   map[string]any{},
 			},
-			idx:         testsuite.Ptr(0),
 			expectError: false,
 		},
 		{
@@ -94,14 +90,14 @@ func Test_recvPacket_boundaryChecks(t *testing.T) {
 				Height: 100,
 				Data:   map[string]any{},
 			},
-			idx:         testsuite.Ptr(0),
 			expectError: false, // should not panic on boundary
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := handleRecvPacket(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			err := handleRecvPacket(tt.ctx, c, tt.msg)
 			if tt.expectError {
 				require.Error(t, err)
 			} else {
@@ -118,7 +114,6 @@ func Test_acknowledgement_boundaryChecks(t *testing.T) {
 		ctx         *context.Context
 		events      []storage.Event
 		msg         *storage.Message
-		idx         *int
 		expectError bool
 	}{
 		{
@@ -138,7 +133,6 @@ func Test_acknowledgement_boundaryChecks(t *testing.T) {
 				Height: 100,
 				Data:   map[string]any{},
 			},
-			idx:         testsuite.Ptr(0),
 			expectError: false,
 		},
 		{
@@ -163,7 +157,6 @@ func Test_acknowledgement_boundaryChecks(t *testing.T) {
 				Height: 100,
 				Data:   map[string]any{},
 			},
-			idx:         testsuite.Ptr(0),
 			expectError: false,
 		},
 		{
@@ -202,14 +195,14 @@ func Test_acknowledgement_boundaryChecks(t *testing.T) {
 					},
 				},
 			},
-			idx:         testsuite.Ptr(0),
 			expectError: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := handleAcknowledgement(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			err := handleAcknowledgement(tt.ctx, c, tt.msg)
 			if tt.expectError {
 				require.Error(t, err)
 			} else {
@@ -305,24 +298,23 @@ func Test_exec_outOfBounds(t *testing.T) {
 	}
 }
 
-// Test_toTheNextAction_boundaryChecks tests toTheNextAction boundary conditions
+// Test_toTheNextAction_boundaryChecks tests Cursor.SkipToNext("action") boundary
+// conditions (this used to test the standalone toTheNextAction helper, which
+// SkipToNext replaced).
 func Test_toTheNextAction_boundaryChecks(t *testing.T) {
 	tests := []struct {
 		name           string
 		events         []storage.Event
-		initialIdx     int
-		expectedIdx    int
-		shouldNotPanic bool
+		wantAtEnd      bool // Peek() should report false after SkipToNext
+		wantActionData string
 	}{
 		{
-			name:           "index at end of array",
-			events:         []storage.Event{},
-			initialIdx:     0,
-			expectedIdx:    0,
-			shouldNotPanic: true,
+			name:      "index at end of array",
+			events:    []storage.Event{},
+			wantAtEnd: true,
 		},
 		{
-			name: "index one before end",
+			name: "single event with empty action is drained, cursor ends at EOF",
 			events: []storage.Event{
 				{
 					Type: "message",
@@ -331,12 +323,10 @@ func Test_toTheNextAction_boundaryChecks(t *testing.T) {
 					},
 				},
 			},
-			initialIdx:     0,
-			expectedIdx:    0,
-			shouldNotPanic: true,
+			wantAtEnd: true,
 		},
 		{
-			name: "normal progression",
+			name: "normal progression stops at the boundary event, unconsumed",
 			events: []storage.Event{
 				{
 					Type: "message",
@@ -351,12 +341,11 @@ func Test_toTheNextAction_boundaryChecks(t *testing.T) {
 					},
 				},
 			},
-			initialIdx:     0,
-			expectedIdx:    1,
-			shouldNotPanic: true,
+			wantAtEnd:      false,
+			wantActionData: "/some.action",
 		},
 		{
-			name: "all empty actions until end",
+			name: "all empty actions until end drains everything",
 			events: []storage.Event{
 				{
 					Type: "message",
@@ -371,21 +360,24 @@ func Test_toTheNextAction_boundaryChecks(t *testing.T) {
 					},
 				},
 			},
-			initialIdx:     0,
-			expectedIdx:    1,
-			shouldNotPanic: true,
+			wantAtEnd: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			idx := tt.initialIdx
+			c := NewCursor(tt.events)
 			require.NotPanics(t, func() {
-				toTheNextAction(tt.events, &idx)
+				c.SkipToNext("action")
 			})
-			if tt.shouldNotPanic {
-				require.Equal(t, tt.expectedIdx, idx)
+
+			event, ok := c.Peek()
+			if tt.wantAtEnd {
+				require.False(t, ok, "cursor should have reached the end")
+				return
 			}
+			require.True(t, ok)
+			require.Equal(t, tt.wantActionData, event.Data["action"])
 		})
 	}
 }
@@ -408,15 +400,15 @@ func Test_handlers_nilChecks(t *testing.T) {
 		Data:   map[string]any{},
 	}
 
-	t.Run("nil index pointer", func(t *testing.T) {
-		err := handleRecvPacket(ctx, events, msg, nil)
+	t.Run("nil cursor", func(t *testing.T) {
+		err := handleRecvPacket(ctx, nil, msg)
 		require.Error(t, err)
-		require.Contains(t, err.Error(), "nil event index")
+		require.Contains(t, err.Error(), "nil event cursor")
 	})
 
 	t.Run("nil message pointer", func(t *testing.T) {
-		idx := 0
-		err := handleRecvPacket(ctx, events, nil, &idx)
+		c := NewCursor(events)
+		err := handleRecvPacket(ctx, c, nil)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "nil message")
 	})
@@ -428,7 +420,6 @@ func Test_acknowledgement_loopIncrementSafety(t *testing.T) {
 		name   string
 		events []storage.Event
 		msg    *storage.Message
-		idx    int
 	}{
 		{
 			name: "increment at exact boundary",
@@ -457,16 +448,15 @@ func Test_acknowledgement_loopIncrementSafety(t *testing.T) {
 					},
 				},
 			},
-			idx: 0,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.NewContext()
-			idx := tt.idx
+			c := NewCursor(tt.events)
 			require.NotPanics(t, func() {
-				err := handleAcknowledgement(ctx, tt.events, tt.msg, &idx)
+				err := handleAcknowledgement(ctx, c, tt.msg)
 				require.NoError(t, err)
 			})
 		})

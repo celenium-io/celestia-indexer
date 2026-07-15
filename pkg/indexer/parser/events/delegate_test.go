@@ -10,7 +10,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 )
@@ -18,11 +17,12 @@ import (
 func Test_handleDelegate(t *testing.T) {
 	ts := time.Now()
 	tests := []struct {
-		name       string
-		ctx        *context.Context
-		events     []storage.Event
-		msg        *storage.Message
-		idx        *int
+		name   string
+		ctx    *context.Context
+		events []storage.Event
+		msg    *storage.Message
+		idx    int
+
 		delegation *storage.Delegation
 	}{
 		{
@@ -125,7 +125,8 @@ func Test_handleDelegate(t *testing.T) {
 					"ValidatorAddress": "celestiavaloper1uqj5ul7jtpskk9ste9mfv6jvh0y3w34vtpz3gw",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			delegation: &storage.Delegation{
 				Amount: types.NumericFromInt64(5690000),
 				Address: &storage.Address{
@@ -215,7 +216,8 @@ func Test_handleDelegate(t *testing.T) {
 					"ValidatorAddress": "celestiavaloper1uqj5ul7jtpskk9ste9mfv6jvh0y3w34vtpz3gw",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			delegation: &storage.Delegation{
 				Amount: types.NumericFromInt64(5690000),
 				Address: &storage.Address{
@@ -368,7 +370,8 @@ func Test_handleDelegate(t *testing.T) {
 					"ValidatorAddress": "celestiavaloper1uqj5ul7jtpskk9ste9mfv6jvh0y3w34vtpz3gw",
 				},
 			},
-			idx: testsuite.Ptr(7),
+			idx: 7,
+
 			delegation: &storage.Delegation{
 				Amount: types.NumericFromInt64(100000000),
 				Address: &storage.Address{
@@ -458,7 +461,8 @@ func Test_handleDelegate(t *testing.T) {
 					"ValidatorAddress": "celestiavaloper1jt9w26mpxxjsk63mvd4m2ynj0af09cslh5d096",
 				},
 			},
-			idx: testsuite.Ptr(0),
+			idx: 0,
+
 			delegation: &storage.Delegation{
 				Amount: types.NumericFromInt64(45000000),
 				Address: &storage.Address{
@@ -493,7 +497,9 @@ func Test_handleDelegate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := handleDelegate(tt.ctx, tt.events, tt.msg, tt.idx)
+			c := NewCursor(tt.events)
+			c.Skip(tt.idx)
+			err := handleDelegate(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
 			require.EqualValues(t, 1, tt.ctx.Delegations.Len())
 			for _, value := range tt.ctx.Delegations.All() {

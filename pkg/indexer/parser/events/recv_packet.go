@@ -12,32 +12,34 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleRecvPacket(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleRecvPacket(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	action := decoder.StringFromMap(events[*idx].Data, "action")
+	event, _ := c.Peek()
+	action := decoder.StringFromMap(event.Data, "action")
 	isValidMsg := action == "/ibc.core.channel.v1.MsgRecvPacket"
 	if !isValidMsg {
-		return errors.Errorf("unexpected event action %s for message type %s (idx=%d, event=%s)", action, msg.Type.String(), *idx, events[*idx].Type)
+		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processRecvPacket(ctx, events, msg, idx)
+	c.Next()
+	return processRecvPacket(ctx, c, msg)
 }
 
-func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if len(events)-1 < *idx || events[*idx].Type == storageTypes.EventTypeMessage {
+func processRecvPacket(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	event, ok := c.Peek()
+	if !ok || event.Type == storageTypes.EventTypeMessage {
 		ctx.RemoveLastIbcTransfer()
 		return nil
 	}
 
 	transfer := ctx.GetLastIbcTransfer()
 	var chanId string
-	if events[*idx].Type == storageTypes.EventTypeRecvPacket && transfer != nil {
-		rp, err := decode.NewRecvPacket(events[*idx].Data)
+	if event.Type == storageTypes.EventTypeRecvPacket && transfer != nil {
+		rp, err := decode.NewRecvPacket(event.Data)
 		if err != nil {
 			return err
 		}
@@ -45,23 +47,25 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 		chanId = rp.DstChannel
 	}
 
-	*idx += 2
+	c.Skip(2)
 
-	if len(events)-1 < *idx {
+	event, ok = c.Peek()
+	if !ok {
 		return nil
 	}
 
-	if events[*idx].Type == storageTypes.EventTypeIbccallbackerrorIcs27Packet {
-		*idx += 1
-		if len(events)-1 < *idx {
+	if event.Type == storageTypes.EventTypeIbccallbackerrorIcs27Packet {
+		c.Next()
+		if _, ok := c.Peek(); !ok {
 			ctx.RemoveLastIbcTransfer()
 			ctx.DeleteIbcChannel(chanId)
 			return nil
 		}
+		event, _ = c.Peek()
 	}
 
-	if events[*idx].Type == storageTypes.EventTypeWriteAcknowledgement {
-		*idx += 2
+	if event.Type == storageTypes.EventTypeWriteAcknowledgement {
+		c.Skip(2)
 		ctx.RemoveLastIbcTransfer()
 		ctx.DeleteIbcChannel(chanId)
 		return nil
@@ -92,18 +96,18 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 				return errors.Wrap(err, "decode message in RecvPacket")
 			}
 
-			if err := handle(ctx, events, &decodedMsg.Msg, idx, ibcEventHandlers, "module"); err != nil {
+			if err := handle(ctx, c, &decodedMsg.Msg, ibcEventHandlers, "module"); err != nil {
 				return errors.Wrap(err, "handle IBC msg event")
 			}
 		}
 
 	case "transfer":
-		var action = decoder.StringFromMap(events[*idx].Data, "action")
+		current, _ := c.Peek()
+		action := decoder.StringFromMap(current.Data, "action")
 
 		if transfer == nil {
 			return nil
 		}
-
 		if err := ctx.AddAddress(transfer.Sender); err != nil {
 			return err
 		}
@@ -112,19 +116,24 @@ func processRecvPacket(ctx *context.Context, events []storage.Event, msg *storag
 		}
 
 		hasFtp := false
-		for action == "" && len(events)-1 > *idx {
-			*idx += 1
-			action = decoder.StringFromMap(events[*idx].Data, "action")
+		for action == "" {
+			if len(c.Remaining()) <= 1 {
+				break
+			}
+			c.Next()
+			next, _ := c.Peek()
+			action = decoder.StringFromMap(next.Data, "action")
 
-			if events[*idx].Type == storageTypes.EventTypeFungibleTokenPacket {
+			if next.Type == storageTypes.EventTypeFungibleTokenPacket {
 				hasFtp = true
-				ftp := decode.NewFungibleTokenPacket(events[*idx].Data)
+				ftp := decode.NewFungibleTokenPacket(next.Data)
 				if ftp.Error != "" {
 					ctx.RemoveLastIbcTransfer()
 					ctx.DeleteIbcChannel(chanId)
 				}
 			}
 		}
+
 		if !hasFtp {
 			ctx.RemoveLastIbcTransfer()
 			ctx.DeleteIbcChannel(chanId)

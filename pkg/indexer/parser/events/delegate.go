@@ -14,27 +14,29 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleDelegate(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleDelegate(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.staking.v1beta1.MsgDelegate" {
+	event, _ := c.Peek()
+	if action := decoder.StringFromMap(event.Data, "action"); action != "/cosmos.staking.v1beta1.MsgDelegate" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processDelegate(ctx, events, msg, idx)
+	c.Next()
+	return processDelegate(ctx, c, msg)
 }
 
-func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
+func processDelegate(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	first, _ := c.Peek()
 	var (
 		validator  = storage.EmptyValidator()
 		delegation = storage.Delegation{
 			Validator: &validator,
 		}
-		msgIdx    = decoder.StringFromMap(events[*idx].Data, "msg_index")
+		msgIdx    = decoder.StringFromMap(first.Data, "msg_index")
 		newFormat = msgIdx != ""
 
 		endDelegation = func(event storage.Event, key string) error {
@@ -71,22 +73,22 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 		}
 	)
 
-	for i := *idx; i < len(events); i++ {
-		switch events[i].Type {
+	for {
+		event, ok := c.Next()
+		if !ok {
+			return nil
+		}
+		switch event.Type {
 		case storageTypes.EventTypeMessage:
-			if module := decoder.StringFromMap(events[i].Data, "module"); module == storageTypes.ModuleNameStaking.String() {
-				if err := endDelegation(events[i], "sender"); err != nil {
-					return errors.Wrap(err, "end delegation")
-				}
-				*idx = i + 1
-				return nil
+			if module := decoder.StringFromMap(event.Data, "module"); module == storageTypes.ModuleNameStaking.String() {
+				return errors.Wrap(endDelegation(event, "sender"), "end delegation")
 			}
 		case storageTypes.EventTypeWithdrawRewards:
-			if err := parseWithdrawRewards(ctx, msg, events[i].Data); err != nil {
+			if err := parseWithdrawRewards(ctx, msg, event.Data); err != nil {
 				return err
 			}
 		case storageTypes.EventTypeDelegate:
-			delegate, err := decode.NewDelegate(events[i].Data)
+			delegate, err := decode.NewDelegate(event.Data)
 			if err != nil {
 				return err
 			}
@@ -112,15 +114,8 @@ func processDelegate(ctx *context.Context, events []storage.Event, msg *storage.
 			ctx.AddValidator(*delegation.Validator)
 
 			if newFormat {
-				if err := endDelegation(events[i], "delegator"); err != nil {
-					return errors.Wrap(err, "end delegation")
-				}
-				*idx = i + 1
-				return nil
+				return errors.Wrap(endDelegation(event, "delegator"), "end delegation")
 			}
 		}
-
 	}
-
-	return nil
 }

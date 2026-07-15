@@ -11,34 +11,36 @@ import (
 	"github.com/pkg/errors"
 )
 
-func handleDeposit(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	if idx == nil {
-		return errors.New("nil event index")
+func handleDeposit(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	if c == nil {
+		return errors.New("nil event cursor")
 	}
 	if msg == nil {
 		return errors.New("nil message in events handler")
 	}
-	if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "/cosmos.gov.v1.MsgDeposit" {
+	event, _ := c.Peek()
+	if action := decoder.StringFromMap(event.Data, "action"); action != "/cosmos.gov.v1.MsgDeposit" {
 		return errors.Errorf("unexpected event action %s for message type %s", action, msg.Type.String())
 	}
-	*idx += 1
-	return processDeposit(ctx, events, msg, idx)
+	c.Next()
+	return processDeposit(ctx, c, msg)
 }
 
-func processDeposit(ctx *context.Context, events []storage.Event, msg *storage.Message, idx *int) error {
-	*idx += 4
-	if len(events) <= *idx {
-		return errors.Errorf("proposal deposit unexpected events length: %d", len(events))
+func processDeposit(ctx *context.Context, c *Cursor, msg *storage.Message) error {
+	c.Skip(4)
+	event, ok := c.Peek()
+	if !ok {
+		return errors.New("proposal deposit unexpected events length")
 	}
-	if events[*idx].Type != types.EventTypeProposalDeposit {
-		return errors.Errorf("proposal deposit unexpected event type: %s", events[*idx].Type)
+	if event.Type != types.EventTypeProposalDeposit {
+		return errors.Errorf("proposal deposit unexpected event type: %s", event.Type)
 	}
 
-	proposalId, err := decoder.Uint64FromMap(events[*idx].Data, "proposal_id")
+	proposalId, err := decoder.Uint64FromMap(event.Data, "proposal_id")
 	if err != nil {
-		return errors.Errorf("submit proposal can't receive proposal id: %##v", events[*idx].Data)
+		return errors.Errorf("submit proposal can't receive proposal id: %##v", event.Data)
 	}
-	depositAmount, err := decoder.NumericAmountFromMap(events[*idx].Data, "amount")
+	depositAmount, err := decoder.NumericAmountFromMap(event.Data, "amount")
 	if err != nil {
 		return errors.Wrap(err, "parse deposit amount")
 	}
@@ -48,12 +50,16 @@ func processDeposit(ctx *context.Context, events []storage.Event, msg *storage.M
 		Status:  types.ProposalStatusInactive,
 	}
 
-	*idx += 1
-	for ; len(events) > *idx; *idx += 1 {
-		if events[*idx].Type == types.EventTypeProposalDeposit {
-			votingPeriodStart, err := decoder.Uint64FromMap(events[*idx].Data, "voting_period_start")
+	c.Next()
+	for {
+		event, ok := c.Peek()
+		if !ok {
+			break
+		}
+		if event.Type == types.EventTypeProposalDeposit {
+			votingPeriodStart, err := decoder.Uint64FromMap(event.Data, "voting_period_start")
 			if err != nil {
-				return errors.Errorf("submit proposal can't receive voting_period_start: %##v", events[*idx].Data)
+				return errors.Errorf("submit proposal can't receive voting_period_start: %##v", event.Data)
 			}
 			if votingPeriodStart == proposalId {
 				msg.Proposal.Status = types.ProposalStatusActive
@@ -62,9 +68,10 @@ func processDeposit(ctx *context.Context, events []storage.Event, msg *storage.M
 			break
 		}
 
-		if action := decoder.StringFromMap(events[*idx].Data, "action"); action != "" {
+		if action := decoder.StringFromMap(event.Data, "action"); action != "" {
 			break
 		}
+		c.Next()
 	}
 	ctx.AddProposal(msg.Proposal)
 
