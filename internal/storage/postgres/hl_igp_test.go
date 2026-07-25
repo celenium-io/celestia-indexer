@@ -9,7 +9,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestHyperlaneIgpByHash() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	igp, err := s.storage.HLIGP.ByHash(ctx, []byte("igp_1"))
@@ -28,7 +28,7 @@ func (s *StorageTestSuite) TestHyperlaneIgpByHash() {
 }
 
 func (s *StorageTestSuite) TestHyperlaneIgpList() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.HLIGP.List(ctx, 10, 0)

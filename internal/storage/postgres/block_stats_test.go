@@ -27,7 +27,7 @@ type BlockStatsTestSuite struct {
 
 // SetupSuite -
 func (s *BlockStatsTestSuite) SetupSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 180*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 180*time.Second)
 	defer ctxCancel()
 
 	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, testhelpers.PostgreSQLContainerConfig{
@@ -39,6 +39,11 @@ func (s *BlockStatsTestSuite) SetupSuite() {
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
+	s.T().Cleanup(func() {
+		ctx, ctxCancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer ctxCancel()
+		s.Require().NoError(s.psqlContainer.Terminate(ctx))
+	})
 
 	strg, err := Create(ctx, config.Database{
 		Kind:     config.DBKindPostgres,
@@ -50,6 +55,9 @@ func (s *BlockStatsTestSuite) SetupSuite() {
 	}, "../../../database", false)
 	s.Require().NoError(err)
 	s.storage = strg
+	s.T().Cleanup(func() {
+		s.Require().NoError(s.storage.Close())
+	})
 
 	db, err := sql.Open("pgx", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
@@ -63,15 +71,6 @@ func (s *BlockStatsTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().NoError(fixtures.Load())
 	s.Require().NoError(db.Close())
-}
-
-// TearDownSuite -
-func (s *BlockStatsTestSuite) TearDownSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer ctxCancel()
-
-	s.Require().NoError(s.storage.Close())
-	s.Require().NoError(s.psqlContainer.Terminate(ctx))
 }
 
 func (s *BlockStatsTestSuite) TestByHeight() {
@@ -100,7 +99,7 @@ func (s *BlockStatsTestSuite) TestByHeight() {
 		},
 	}
 
-	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancelCtx := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer cancelCtx()
 
 	for _, tt := range tests {
@@ -115,7 +114,7 @@ func (s *BlockStatsTestSuite) TestByHeight() {
 }
 
 func (s *BlockStatsTestSuite) TestLastFrom() {
-	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancelCtx := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer cancelCtx()
 
 	got, err := s.storage.BlockStats.LastFrom(ctx, 999, 1)

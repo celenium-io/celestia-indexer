@@ -14,7 +14,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestHyperlaneTokenByHash() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	token, err := s.storage.HLToken.ByHash(ctx, []byte("token"))
@@ -44,7 +44,7 @@ func (s *StorageTestSuite) TestHyperlaneTokenByHash() {
 }
 
 func (s *StorageTestSuite) TestHyperlaneTokenList() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tokens, err := s.storage.HLToken.List(ctx, storage.ListHyperlaneTokens{

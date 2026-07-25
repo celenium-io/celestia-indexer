@@ -10,7 +10,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestHyperlaneMailboxByHash() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	mailbox, err := s.storage.HLMailbox.ByHash(ctx, []byte("mailbox"))
@@ -37,7 +37,7 @@ func (s *StorageTestSuite) TestHyperlaneMailboxByHash() {
 }
 
 func (s *StorageTestSuite) TestHyperlaneMailboxList() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.HLMailbox.List(ctx, 1, 0)

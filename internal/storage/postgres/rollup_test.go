@@ -13,7 +13,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestRollupLeaderboard() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
@@ -50,7 +50,7 @@ func (s *StorageTestSuite) TestRollupLeaderboard() {
 }
 
 func (s *StorageTestSuite) TestRollupLeaderboardWithCategory() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
@@ -90,7 +90,7 @@ func (s *StorageTestSuite) TestRollupLeaderboardWithCategory() {
 }
 
 func (s *StorageTestSuite) TestRollupLeaderboardWithTags() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
@@ -130,7 +130,7 @@ func (s *StorageTestSuite) TestRollupLeaderboardWithTags() {
 }
 
 func (s *StorageTestSuite) TestRollupLeaderboardWithType() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
@@ -168,7 +168,7 @@ func (s *StorageTestSuite) TestRollupLeaderboardWithType() {
 }
 
 func (s *StorageTestSuite) TestRollupLeaderboardWithStack() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
@@ -205,7 +205,7 @@ func (s *StorageTestSuite) TestRollupLeaderboardWithStack() {
 }
 
 func (s *StorageTestSuite) TestRollupLeaderboardWithProvider() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
@@ -242,7 +242,7 @@ func (s *StorageTestSuite) TestRollupLeaderboardWithProvider() {
 }
 
 func (s *StorageTestSuite) TestRollupLeaderboardDay() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard_day;")
@@ -264,7 +264,7 @@ func (s *StorageTestSuite) TestRollupLeaderboardDay() {
 }
 
 func (s *StorageTestSuite) TestRollupNamespaces() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	nsIds, err := s.storage.Rollup.Namespaces(ctx, 1, 10, 0)
@@ -273,7 +273,7 @@ func (s *StorageTestSuite) TestRollupNamespaces() {
 }
 
 func (s *StorageTestSuite) TestRollupProviders() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	providers, err := s.storage.Rollup.Providers(ctx, 1)
@@ -282,7 +282,7 @@ func (s *StorageTestSuite) TestRollupProviders() {
 }
 
 func (s *StorageTestSuite) TestRollupSeries() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, tf := range []storage.Timeframe{
@@ -302,7 +302,7 @@ func (s *StorageTestSuite) TestRollupSeries() {
 }
 
 func (s *StorageTestSuite) TestRollupBySlug() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
@@ -327,7 +327,7 @@ func (s *StorageTestSuite) TestRollupBySlug() {
 }
 
 func (s *StorageTestSuite) TestRollupById() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
@@ -352,7 +352,7 @@ func (s *StorageTestSuite) TestRollupById() {
 }
 
 func (s *StorageTestSuite) TestRollupsByNamespace() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	rollups, err := s.storage.Rollup.RollupsByNamespace(ctx, 2, 10, 0)
@@ -365,7 +365,7 @@ func (s *StorageTestSuite) TestRollupsByNamespace() {
 }
 
 func (s *StorageTestSuite) TestRollupDistribution() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, groupBy := range []storage.Timeframe{
@@ -383,7 +383,7 @@ func (s *StorageTestSuite) TestRollupDistribution() {
 }
 
 func (s *StorageTestSuite) TestRollupAllSeries() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, tf := range []storage.Timeframe{
@@ -395,7 +395,7 @@ func (s *StorageTestSuite) TestRollupAllSeries() {
 }
 
 func (s *StorageTestSuite) TestRollupStatsGrouping() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW leaderboard;")
@@ -417,7 +417,7 @@ func (s *StorageTestSuite) TestRollupStatsGrouping() {
 }
 
 func (s *StorageTestSuite) TestRollupTags() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tags, err := s.storage.Rollup.Tags(ctx)
@@ -428,7 +428,7 @@ func (s *StorageTestSuite) TestRollupTags() {
 }
 
 func (s *StorageTestSuite) TestCount() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	count, err := s.storage.Rollup.Count(ctx)
@@ -437,7 +437,7 @@ func (s *StorageTestSuite) TestCount() {
 }
 
 func (s *StorageTestSuite) TestUnverified() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	rollups, err := s.storage.Rollup.Unverified(ctx)

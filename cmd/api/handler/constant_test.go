@@ -4,7 +4,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -41,8 +40,7 @@ func (s *ConstantTestSuite) SetupSuite() {
 
 // TearDownSuite -
 func (s *ConstantTestSuite) TearDownSuite() {
-	s.ctrl.Finish()
-	s.Require().NoError(s.echo.Shutdown(context.Background()))
+	s.Require().NoError(s.echo.Shutdown(s.T().Context()))
 }
 
 func TestSuiteConstant_Run(t *testing.T) {
@@ -50,7 +48,7 @@ func TestSuiteConstant_Run(t *testing.T) {
 }
 
 func (s *ConstantTestSuite) TestEnums() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/enums")

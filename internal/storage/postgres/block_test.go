@@ -14,7 +14,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestBlockLast() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	block, err := s.storage.Blocks.Last(ctx)
@@ -31,7 +31,7 @@ func (s *StorageTestSuite) TestBlockLast() {
 }
 
 func (s *StorageTestSuite) TestBlockByHeight() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	block, err := s.storage.Blocks.ByHeight(ctx, 1000)
@@ -48,7 +48,7 @@ func (s *StorageTestSuite) TestBlockByHeight() {
 }
 
 func (s *StorageTestSuite) TestBlockByHeightWithStats() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	block, err := s.storage.Blocks.ByHeightWithStats(ctx, 1000)
@@ -87,7 +87,7 @@ func (s *StorageTestSuite) TestBlockByHeightWithStats() {
 }
 
 func (s *StorageTestSuite) TestBlockByIdWithRelations() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	block, err := s.storage.Blocks.ByIdWithRelations(ctx, 2)
@@ -126,7 +126,7 @@ func (s *StorageTestSuite) TestBlockByIdWithRelations() {
 }
 
 func (s *StorageTestSuite) TestBlockByHash() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	hash, err := hex.DecodeString("6A30C94091DA7C436D64E62111D6890D772E351823C41496B4E52F28F5B000BF")
@@ -143,7 +143,7 @@ func (s *StorageTestSuite) TestBlockByHash() {
 }
 
 func (s *StorageTestSuite) TestBlockListWithStats() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	blocks, err := s.storage.Blocks.ListWithStats(ctx, 10, 0, sdk.SortOrderDesc)
@@ -161,7 +161,7 @@ func (s *StorageTestSuite) TestBlockListWithStats() {
 }
 
 func (s *StorageTestSuite) TestBlockListWithStatsAsc() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	blocks, err := s.storage.Blocks.ListWithStats(ctx, 10, 0, sdk.SortOrderAsc)
@@ -179,7 +179,7 @@ func (s *StorageTestSuite) TestBlockListWithStatsAsc() {
 }
 
 func (s *StorageTestSuite) TestBlockByProposer() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	blocks, err := s.storage.Blocks.ByProposer(ctx, 1, 10, 0)
@@ -197,7 +197,7 @@ func (s *StorageTestSuite) TestBlockByProposer() {
 }
 
 func (s *StorageTestSuite) TestBlockTime() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	expected, err := time.Parse(time.RFC3339, "2023-07-04T03:10:57Z")

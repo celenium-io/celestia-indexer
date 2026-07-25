@@ -4,7 +4,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -56,8 +55,7 @@ func (s *ValidatorTestSuite) SetupSuite() {
 
 // TearDownSuite -
 func (s *ValidatorTestSuite) TearDownSuite() {
-	s.ctrl.Finish()
-	s.Require().NoError(s.echo.Shutdown(context.Background()))
+	s.Require().NoError(s.echo.Shutdown(s.T().Context()))
 }
 
 func TestSuiteValidator_Run(t *testing.T) {
@@ -65,7 +63,7 @@ func TestSuiteValidator_Run(t *testing.T) {
 }
 
 func (s *ValidatorTestSuite) TestGet() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validators/:id")
@@ -88,7 +86,7 @@ func (s *ValidatorTestSuite) TestGet() {
 }
 
 func (s *ValidatorTestSuite) TestList() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validator")
@@ -117,7 +115,7 @@ func (s *ValidatorTestSuite) TestListWithVersion() {
 	q := make(url.Values)
 	q.Add("version", "4")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validator")
@@ -145,7 +143,7 @@ func (s *ValidatorTestSuite) TestListWithVersion() {
 }
 
 func (s *ValidatorTestSuite) TestByProposer() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validator/:id")
@@ -180,7 +178,7 @@ func (s *ValidatorTestSuite) TestUptime() {
 	q := make(url.Values)
 	q.Add("limit", "4")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validators/:id/uptime")
@@ -215,7 +213,7 @@ func (s *ValidatorTestSuite) TestUptimeUnusual() {
 	q := make(url.Values)
 	q.Add("limit", "10")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validators/:id/uptime")
@@ -252,7 +250,7 @@ func (s *ValidatorTestSuite) TestDelegators() {
 	q.Set("offset", "0")
 	q.Set("show_zero", "true")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validators/:id/delegators")
@@ -292,7 +290,7 @@ func (s *ValidatorTestSuite) TestJails() {
 	q.Set("limit", "10")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validators/:id/jails")
@@ -326,7 +324,7 @@ func (s *ValidatorTestSuite) TestJails() {
 }
 
 func (s *ValidatorTestSuite) TestCount() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validators/count")
@@ -369,7 +367,7 @@ func (s *ValidatorTestSuite) TestVotes() {
 	q.Set("limit", "10")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validators/:id/votes")
@@ -413,7 +411,7 @@ func (s *ValidatorTestSuite) TestMessages() {
 	q.Set("limit", "10")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validators/:id/messages")
@@ -459,7 +457,7 @@ func (s *ValidatorTestSuite) TestMessages() {
 }
 
 func (s *ValidatorTestSuite) TestMetrics() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validators/:id/metrics")
@@ -512,7 +510,7 @@ func (s *ValidatorTestSuite) TestMetrics() {
 }
 
 func (s *ValidatorTestSuite) TestTopNMetrics() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validators/metrics")

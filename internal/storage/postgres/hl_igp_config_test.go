@@ -9,7 +9,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestHyperlaneIgpConfigList() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.HLIGPConfig.List(ctx, 10, 0)

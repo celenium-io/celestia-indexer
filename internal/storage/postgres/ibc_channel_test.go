@@ -14,7 +14,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestIbcChannelById() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	channel, err := s.storage.IbcChannels.ById(ctx, "channel-1")
@@ -52,7 +52,7 @@ func (s *StorageTestSuite) TestIbcChannelById() {
 }
 
 func (s *StorageTestSuite) TestIbcChannelList() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, fltrs := range []storage.ListChannelFilters{
@@ -122,7 +122,7 @@ func (s *StorageTestSuite) TestIbcChannelList() {
 }
 
 func (s *StorageTestSuite) TestIbcChannelStatsByChainId() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	stats, err := s.storage.IbcChannels.StatsByChain(ctx, 10, 0)
@@ -135,7 +135,7 @@ func (s *StorageTestSuite) TestIbcChannelStatsByChainId() {
 }
 
 func (s *StorageTestSuite) TestIbcBusiestChannel1m() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	channel, err := s.storage.IbcChannels.BusiestChannel1m(ctx)

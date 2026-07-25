@@ -9,7 +9,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestVestingAccountByAddress() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	vestings, err := s.storage.VestingAccounts.ByAddress(ctx, 1, 1, 0, true)

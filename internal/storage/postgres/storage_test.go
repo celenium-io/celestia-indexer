@@ -31,7 +31,7 @@ type StorageTestSuite struct {
 
 // SetupSuite -
 func (s *StorageTestSuite) SetupSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 180*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 180*time.Second)
 	defer ctxCancel()
 
 	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, testhelpers.PostgreSQLContainerConfig{
@@ -43,6 +43,11 @@ func (s *StorageTestSuite) SetupSuite() {
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
+	s.T().Cleanup(func() {
+		ctx, ctxCancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer ctxCancel()
+		s.Require().NoError(s.psqlContainer.Terminate(ctx))
+	})
 
 	strg, err := Create(ctx, config.Database{
 		Kind:     config.DBKindPostgres,
@@ -54,6 +59,9 @@ func (s *StorageTestSuite) SetupSuite() {
 	}, "../../../database", false)
 	s.Require().NoError(err)
 	s.storage = strg
+	s.T().Cleanup(func() {
+		s.Require().NoError(s.storage.Close())
+	})
 
 	db, err := sql.Open("pgx", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
@@ -69,17 +77,8 @@ func (s *StorageTestSuite) SetupSuite() {
 	s.Require().NoError(db.Close())
 }
 
-// TearDownSuite -
-func (s *StorageTestSuite) TearDownSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer ctxCancel()
-
-	s.Require().NoError(s.storage.Close())
-	s.Require().NoError(s.psqlContainer.Terminate(ctx))
-}
-
 func (s *StorageTestSuite) TestStateGetByName() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	state, err := s.storage.State.ByName(ctx, testIndexerName)
@@ -94,7 +93,7 @@ func (s *StorageTestSuite) TestStateGetByName() {
 }
 
 func (s *StorageTestSuite) TestStateGetByNameFailed() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.State.ByName(ctx, "unknown")
@@ -102,7 +101,7 @@ func (s *StorageTestSuite) TestStateGetByNameFailed() {
 }
 
 func (s *StorageTestSuite) TestMessageByTxId() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	msgs, err := s.storage.Message.ByTxId(ctx, 1, 1, 0)
@@ -115,7 +114,7 @@ func (s *StorageTestSuite) TestMessageByTxId() {
 }
 
 func (s *StorageTestSuite) TestMessageListWithTx() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	msgs, err := s.storage.Message.ListWithTx(ctx, storage.MessageListWithTxFilters{
@@ -155,7 +154,7 @@ func (s *StorageTestSuite) TestMessageListWithTx() {
 }
 
 func (s *StorageTestSuite) TestNamespaceId() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	namespaceId, err := hex.DecodeString("5F7A8DDFE6136FE76B65B9066D4F816D707F")
@@ -177,7 +176,7 @@ func (s *StorageTestSuite) TestNamespaceId() {
 }
 
 func (s *StorageTestSuite) TestNamespaceIdAndVersion() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	namespaceId, err := hex.DecodeString("5F7A8DDFE6136FE76B65B9066D4F816D707F")
@@ -193,7 +192,7 @@ func (s *StorageTestSuite) TestNamespaceIdAndVersion() {
 }
 
 func (s *StorageTestSuite) TestNamespaceMessages() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	msgs, err := s.storage.Namespace.Messages(ctx, 2, 10, 0)
@@ -211,7 +210,7 @@ func (s *StorageTestSuite) TestNamespaceMessages() {
 }
 
 func (s *StorageTestSuite) TestNamespaceActive() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	ns, err := s.storage.Namespace.ListWithSort(ctx, "", sdk.SortOrderDesc, 2, 0)
@@ -225,7 +224,7 @@ func (s *StorageTestSuite) TestNamespaceActive() {
 }
 
 func (s *StorageTestSuite) TestNamespaceActiveByPfbCount() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	ns, err := s.storage.Namespace.ListWithSort(ctx, pfbCountColumn, sdk.SortOrderDesc, 2, 0)
@@ -239,7 +238,7 @@ func (s *StorageTestSuite) TestNamespaceActiveByPfbCount() {
 }
 
 func (s *StorageTestSuite) TestNamespaceActiveBySize() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	ns, err := s.storage.Namespace.ListWithSort(ctx, "size", sdk.SortOrderDesc, 2, 0)
@@ -253,7 +252,7 @@ func (s *StorageTestSuite) TestNamespaceActiveBySize() {
 }
 
 func (s *StorageTestSuite) TestNamespaceGetByIds() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	ns, err := s.storage.Namespace.GetByIds(ctx, 1, 2, 3)
@@ -262,7 +261,7 @@ func (s *StorageTestSuite) TestNamespaceGetByIds() {
 }
 
 func (s *StorageTestSuite) TestConstantGet() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	c, err := s.storage.Constants.Get(ctx, types.ModuleNameBlob, "gas_per_blob_byte")
@@ -272,7 +271,7 @@ func (s *StorageTestSuite) TestConstantGet() {
 }
 
 func (s *StorageTestSuite) TestConstantByModule() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	c, err := s.storage.Constants.ByModule(ctx, types.ModuleNameAuth)
@@ -284,7 +283,7 @@ func (s *StorageTestSuite) TestConstantByModule() {
 }
 
 func (s *StorageTestSuite) TestDenomMetadata() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	metadata, err := s.storage.DenomMetadata.All(ctx)
@@ -301,7 +300,7 @@ func (s *StorageTestSuite) TestDenomMetadata() {
 }
 
 func (s *StorageTestSuite) TestNotify() {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer cancel()
 
 	err := s.storage.Notificator.Subscribe(ctx, "test")

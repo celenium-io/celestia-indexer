@@ -9,7 +9,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestUndelegationByAddress() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	undelegations, err := s.storage.Undelegation.ByAddress(ctx, 1, 10, 0)

@@ -12,7 +12,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestEventByTxId() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	events, err := s.storage.Event.ByTxId(ctx, 1, storage.EventFilter{
@@ -27,7 +27,7 @@ func (s *StorageTestSuite) TestEventByTxId() {
 }
 
 func (s *StorageTestSuite) TestEventByBlock() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	events, err := s.storage.Event.ByBlock(ctx, 1000, storage.EventFilter{

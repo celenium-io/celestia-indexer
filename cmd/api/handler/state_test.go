@@ -4,7 +4,6 @@
 package handler
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
 	"net/http"
@@ -44,8 +43,7 @@ func (s *StateTestSuite) SetupSuite() {
 
 // TearDownSuite -
 func (s *StateTestSuite) TearDownSuite() {
-	s.ctrl.Finish()
-	s.Require().NoError(s.echo.Shutdown(context.Background()))
+	s.Require().NoError(s.echo.Shutdown(s.T().Context()))
 }
 
 func TestSuiteState_Run(t *testing.T) {
@@ -53,7 +51,7 @@ func TestSuiteState_Run(t *testing.T) {
 }
 
 func (s *StateTestSuite) TestHead() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/head")
@@ -110,7 +108,7 @@ func (s *StateTestSuite) TestHead() {
 }
 
 func (s *StateTestSuite) TestNoHead() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/head")

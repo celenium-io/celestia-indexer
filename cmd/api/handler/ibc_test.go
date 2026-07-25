@@ -4,7 +4,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -147,7 +146,7 @@ func (s *IbcTestSuite) SetupSuite() {
 
 // TearDownSuite -
 func (s *IbcTestSuite) TearDownSuite() {
-	s.Require().NoError(s.echo.Shutdown(context.Background()))
+	s.Require().NoError(s.echo.Shutdown(s.T().Context()))
 }
 
 func TestSuiteIbc_Run(t *testing.T) {
@@ -155,7 +154,7 @@ func TestSuiteIbc_Run(t *testing.T) {
 }
 
 func (s *IbcTestSuite) TestGet() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/client/:id")
@@ -191,7 +190,7 @@ func (s *IbcTestSuite) TestGet() {
 }
 
 func (s *IbcTestSuite) TestList() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/client")
@@ -231,7 +230,7 @@ func (s *IbcTestSuite) TestList() {
 }
 
 func (s *IbcTestSuite) TestGetConnection() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/connection/:id")
@@ -264,7 +263,7 @@ func (s *IbcTestSuite) TestGetConnection() {
 }
 
 func (s *IbcTestSuite) TestListConnection() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/connection")
@@ -300,7 +299,7 @@ func (s *IbcTestSuite) TestListConnection() {
 }
 
 func (s *IbcTestSuite) TestGetChannel() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/channel/:id")
@@ -336,7 +335,7 @@ func (s *IbcTestSuite) TestGetChannel() {
 }
 
 func (s *IbcTestSuite) TestListChannels() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/channel")
@@ -375,7 +374,7 @@ func (s *IbcTestSuite) TestListChannels() {
 }
 
 func (s *IbcTestSuite) TestListTransfers() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/transfer")
@@ -461,7 +460,7 @@ func (s *IbcTestSuite) TestListTransfersByChainId() {
 	q := make(url.Values)
 	q.Set("chain_id", "test")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/transfer")
@@ -558,7 +557,7 @@ func (s *IbcTestSuite) TestListTransfersByChainIdUnknownChain() {
 	q := make(url.Values)
 	q.Set("chain_id", "test")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/transfer")
@@ -578,7 +577,7 @@ func (s *IbcTestSuite) TestListTransfersByChainIdUnknownChain() {
 }
 
 func (s *IbcTestSuite) TestGetTransfer() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/transfer/:id")
@@ -660,7 +659,7 @@ func (s *IbcTestSuite) TestListTransferWithHash() {
 	q := make(url.Values)
 	q.Add("hash", testTxHash)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/transfer")
@@ -745,7 +744,7 @@ func (s *IbcTestSuite) TestListTransferWithHash() {
 }
 
 func (s *IbcTestSuite) TestAllRelayers() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/ibc/relayers")

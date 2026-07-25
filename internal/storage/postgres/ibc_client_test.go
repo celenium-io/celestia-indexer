@@ -13,7 +13,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestIbcClientById() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	client, err := s.storage.IbcClients.ById(ctx, "client-1")
@@ -34,7 +34,7 @@ func (s *StorageTestSuite) TestIbcClientById() {
 }
 
 func (s *StorageTestSuite) TestIbcClientList() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	clients, err := s.storage.IbcClients.List(ctx, storage.ListIbcClientsFilters{
@@ -62,7 +62,7 @@ func (s *StorageTestSuite) TestIbcClientList() {
 }
 
 func (s *StorageTestSuite) TestIbcClientByChainId() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	clients, err := s.storage.IbcClients.ByChainId(ctx, "osmosis-1")

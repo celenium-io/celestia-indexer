@@ -4,7 +4,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -86,8 +85,7 @@ func (s *AddressTestSuite) SetupSuite() {
 
 // TearDownSuite -
 func (s *AddressTestSuite) TearDownSuite() {
-	s.ctrl.Finish()
-	s.Require().NoError(s.echo.Shutdown(context.Background()))
+	s.Require().NoError(s.echo.Shutdown(s.T().Context()))
 }
 
 func TestSuiteAddress_Run(t *testing.T) {
@@ -95,7 +93,7 @@ func TestSuiteAddress_Run(t *testing.T) {
 }
 
 func (s *AddressTestSuite) TestGet() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash")
@@ -133,7 +131,7 @@ func (s *AddressTestSuite) TestGet() {
 }
 
 func (s *AddressTestSuite) TestGetInvalidAddress() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash")
@@ -150,7 +148,7 @@ func (s *AddressTestSuite) TestGetInvalidAddress() {
 }
 
 func (s *AddressTestSuite) TestGetBadAddress() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash")
@@ -167,7 +165,7 @@ func (s *AddressTestSuite) TestGetBadAddress() {
 }
 
 func (s *AddressTestSuite) TestList() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address")
@@ -227,7 +225,7 @@ func (s *AddressTestSuite) TestTransactions() {
 	q.Set("msg_type", "MsgSend")
 	q.Set("height", "1000")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash/txs")
@@ -287,7 +285,7 @@ func (s *AddressTestSuite) TestMessages() {
 	q.Set("offset", "0")
 	q.Set("sort", "desc")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash/messages")
@@ -347,7 +345,7 @@ func (s *AddressTestSuite) TestBlobs() {
 	q.Set("offset", "0")
 	q.Set("sort", "desc")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash/blobs")
@@ -399,7 +397,7 @@ func (s *AddressTestSuite) TestBlobs() {
 }
 
 func (s *AddressTestSuite) TestCount() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/count")
@@ -423,7 +421,7 @@ func (s *AddressTestSuite) TestDelegations() {
 	q.Set("offset", "0")
 	q.Set("show_zero", "true")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash/delegations")
@@ -470,7 +468,7 @@ func (s *AddressTestSuite) TestUndelegations() {
 	q.Set("limit", "10")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash/undelegations")
@@ -523,7 +521,7 @@ func (s *AddressTestSuite) TestRedelegations() {
 	q.Set("limit", "10")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash/redelegations")
@@ -580,7 +578,7 @@ func (s *AddressTestSuite) TestVestings() {
 	q.Set("limit", "10")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash/vestings")
@@ -632,7 +630,7 @@ func (s *AddressTestSuite) TestGrants() {
 	q.Set("limit", "10")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash/grants")
@@ -684,7 +682,7 @@ func (s *AddressTestSuite) TestGrantee() {
 	q.Set("limit", "10")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash/grantee")
@@ -734,7 +732,7 @@ func (s *AddressTestSuite) TestGrantee() {
 func (s *AddressTestSuite) TestStats() {
 	for _, name := range []string{"tx_count", "fee", "gas_used", "gas_wanted"} {
 		for _, tf := range []string{"hour", "day", "month"} {
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/address/:hash/stats/:name/:timeframe")
@@ -776,7 +774,7 @@ func (s *AddressTestSuite) TestCelestials() {
 	q.Set("limit", "10")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash/celestials")
@@ -821,7 +819,7 @@ func (s *AddressTestSuite) TestVotes() {
 	q.Set("limit", "10")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash/votes")
@@ -887,7 +885,7 @@ func (s *AddressTestSuite) TestBalances() {
 	q.Set("limit", "10")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/:hash/balances")

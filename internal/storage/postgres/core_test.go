@@ -28,6 +28,11 @@ func TestCheckDatabaseExists(t *testing.T) {
 
 	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, containerCfg)
 	require.NoError(t, err)
+	t.Cleanup(func() {
+		ctx, ctxCancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer ctxCancel()
+		require.NoError(t, psqlContainer.Terminate(ctx))
+	})
 
 	cfg := config.Database{
 		Kind:     config.DBKindPostgres,
@@ -41,19 +46,21 @@ func TestCheckDatabaseExists(t *testing.T) {
 	db := database.NewBun()
 	err = db.Connect(ctx, cfg)
 	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, db.Close())
+	})
 
 	exists, err := checkTablesExists(ctx, db)
 	require.NoError(t, err)
 	require.False(t, exists)
-	require.NoError(t, db.Close())
 
 	strg, err := Create(ctx, cfg, "../../../database", false)
 	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, strg.Close())
+	})
 
 	exists, err = checkTablesExists(ctx, strg.Connection())
 	require.NoError(t, err)
 	require.True(t, exists)
-
-	require.NoError(t, strg.Close())
-	require.NoError(t, psqlContainer.Terminate(ctx))
 }
