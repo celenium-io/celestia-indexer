@@ -44,7 +44,11 @@ func NewAPI(cfg config.DataSource) API {
 		timeout = 10
 	}
 
-	t := http.DefaultTransport.(*http.Transport).Clone()
+	httpTransport, ok := http.DefaultTransport.(*http.Transport)
+	if !ok {
+		panic("invalid default transport type")
+	}
+	t := httpTransport.Clone()
 	t.MaxIdleConns = rps
 	t.MaxConnsPerHost = rps
 	t.MaxIdleConnsPerHost = rps
@@ -91,7 +95,7 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 	}
 	req.Header.Set("User-Agent", celeniumUserAgent)
 
-	response, err := api.client.Do(req) //nolint:gosec
+	response, err := api.client.Do(req) //nolint:gosec,bodyclose
 	if err != nil {
 		return err
 	}

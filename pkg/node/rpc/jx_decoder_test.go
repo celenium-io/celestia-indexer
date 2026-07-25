@@ -175,8 +175,7 @@ func TestJxDuration(t *testing.T) {
 	d := jdec(`"172800000000000"`)
 	defer jxpkg.PutDecoder(d)
 
-	got, err := jxDuration(d)
-	require.NoError(t, err)
+	got := jxDuration(d)
 	require.Equal(t, 48*time.Hour, got)
 }
 
@@ -184,8 +183,7 @@ func TestJxDuration_Zero(t *testing.T) {
 	d := jdec(`"0"`)
 	defer jxpkg.PutDecoder(d)
 
-	got, err := jxDuration(d)
-	require.NoError(t, err)
+	got := jxDuration(d)
 	require.Equal(t, time.Duration(0), got)
 }
 

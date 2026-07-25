@@ -195,12 +195,12 @@ func jxUint64(d *jxpkg.Decoder) (uint64, error) {
 	return strconv.ParseUint(unsafe.String(unsafe.SliceData(raw), len(raw)), 10, 64)
 }
 
-func jxDuration(d *jxpkg.Decoder) (time.Duration, error) {
+func jxDuration(d *jxpkg.Decoder) time.Duration {
 	v, err := jxInt64(d)
 	if err != nil {
-		return 0, nil
+		return 0
 	}
-	return time.Duration(v), nil
+	return time.Duration(v)
 }
 
 func jxTime(d *jxpkg.Decoder) (time.Time, error) {
@@ -443,10 +443,7 @@ func jxConsensusParamsEvidence(d *jxpkg.Decoder) (params pkgTypes.EvidenceParams
 			}
 			params.MaxAgeNumBlocks = v
 		case "max_age_duration":
-			v, err := jxDuration(d)
-			if err != nil {
-				return errors.Wrap(err, "max_age_duration")
-			}
+			v := jxDuration(d)
 			params.MaxAgeDuration = v
 		case "max_bytes":
 			v, err := jxInt64(d)

@@ -50,7 +50,8 @@ func handleError(c echo.Context, err error, noRows NoRows) error {
 	if err == nil {
 		return nil
 	}
-	if errPg, ok := err.(pgdriver.Error); ok && errPg.Field('C') == pgerrcode.QueryCanceled {
+	var errPg pgdriver.Error
+	if errors.As(err, errPg) && errPg.Field('C') == pgerrcode.QueryCanceled {
 		return nil
 	}
 	if errors.Is(err, context.DeadlineExceeded) {

@@ -187,7 +187,8 @@ func (s *ModuleTestSuite) TestModule_SequencerOnEmptyState() {
 					s.T().Error("stop by cancelled context")
 					return
 				case ob := <-blocksReaderModule.MustInput(orderedBlocksChannel).Listen():
-					orderedBlock := ob.(*types.BlockData)
+					orderedBlock, ok := ob.(*types.BlockData)
+					s.Require().True(ok)
 					s.Require().EqualValues(blocksData[index].level, orderedBlock.Height)
 					s.Require().EqualValues(blocksData[index].level, orderedBlock.Block.Height)
 					s.Require().EqualValues(blocksData[index].hash, orderedBlock.BlockID.Hash)
@@ -268,7 +269,8 @@ func (s *ModuleTestSuite) TestModule_SequencerOnNonEmptyState() {
 					s.T().Error("stop by cancelled context")
 					return
 				case ob := <-blocksReaderModule.MustInput(orderedBlocksChannel).Listen():
-					orderedBlock := ob.(*types.BlockData)
+					orderedBlock, ok := ob.(*types.BlockData)
+					s.Require().True(ok)
 					s.Require().EqualValues(blocksData[index].level, orderedBlock.Height)
 					s.Require().EqualValues(blocksData[index].level, orderedBlock.Block.Height)
 					s.Require().EqualValues(blocksData[index].hash, orderedBlock.BlockID.Hash)
@@ -369,7 +371,8 @@ out:
 			s.T().Error("stop by cancelled context")
 			return
 		case ob := <-blocksReaderModule.MustInput(orderedBlocksChannel).Listen():
-			orderedBlock := ob.(*types.BlockData)
+			orderedBlock, ok := ob.(*types.BlockData)
+			s.Require().True(ok)
 			s.Require().EqualValues(blocksData[index].level, orderedBlock.Height)
 			s.Require().EqualValues(blocksData[index].level, orderedBlock.Block.Height)
 			s.Require().EqualValues(blocksData[index].hash, orderedBlock.BlockID.Hash)
@@ -576,7 +579,8 @@ out:
 			s.T().Error("stop by cancelled context")
 			return
 		case ob := <-blocksReaderModule.MustInput(orderedBlocksChannel).Listen():
-			orderedBlock := ob.(*types.BlockData)
+			orderedBlock, ok := ob.(*types.BlockData)
+			s.Require().True(ok)
 			s.Require().EqualValues(blocksData[index].level, orderedBlock.Height)
 			s.Require().EqualValues(blocksData[index].level, orderedBlock.Block.Height)
 			s.Require().EqualValues(blocksData[index].hash, orderedBlock.BlockID.Hash)

@@ -26,7 +26,11 @@ func New[T any](factory func() T) *Pool[T] {
 // Get retrieves an object from the pool.
 // If the pool is empty, it uses the factory function to create a new object.
 func (p *Pool[T]) Get() T {
-	return p.pool.Get().(T)
+	if val, ok := p.pool.Get().(T); ok {
+		return val
+	}
+	var t T
+	return t
 }
 
 // Put adds an object back to the pool.

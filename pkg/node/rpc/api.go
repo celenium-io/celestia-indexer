@@ -142,7 +142,11 @@ func NewAPI(cfg config.DataSource, opts ...ApiOption) API {
 		timeout = 10
 	}
 
-	t := http.DefaultTransport.(*http.Transport).Clone()
+	httpTransport, ok := http.DefaultTransport.(*http.Transport)
+	if !ok {
+		panic("invalid default transport type")
+	}
+	t := httpTransport.Clone()
 	t.MaxIdleConns = 100
 	t.MaxConnsPerHost = 100
 	t.MaxIdleConnsPerHost = 100
@@ -200,7 +204,7 @@ func (api *API) getStream(ctx context.Context, path string, args map[string]stri
 		req.Header.Set("Accept-Encoding", "gzip")
 	}
 
-	response, err := api.client.Do(req) //nolint:gosec
+	response, err := api.client.Do(req) //nolint:gosec,bodyclose
 	if err != nil {
 		return err
 	}
@@ -252,7 +256,7 @@ func (api *API) postStream(ctx context.Context, requests []types.Request, fn fun
 		req.Header.Set("Accept-Encoding", "gzip")
 	}
 
-	response, err := api.client.Do(req) //nolint:gosec
+	response, err := api.client.Do(req) //nolint:gosec,bodyclose
 	if err != nil {
 		return err
 	}

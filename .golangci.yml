@@ -17,6 +17,18 @@ linters:
     - unconvert
     - usetesting
     - zerologlint
+    - govet
+    - staticcheck
+    - unused
+    - ineffassign
+    - unparam
+    - asciicheck
+    - bodyclose
+    - dogsled
+    - errcheck
+    - errorlint
+    - forcetypeassert
+    - goprintffuncname
   settings:
     gosec:
       excludes:

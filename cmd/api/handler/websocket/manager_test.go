@@ -32,11 +32,11 @@ func dialWS(t *testing.T, srv *httptest.Server) *websocket.Conn {
 	return conn
 }
 
-func subscribe(t *testing.T, conn *websocket.Conn, channel string) {
+func subscribeToHead(t *testing.T, conn *websocket.Conn) {
 	t.Helper()
 	require.NoError(t, conn.WriteJSON(Message{
 		Method: MethodSubscribe,
-		Body:   json.RawMessage(`{"channel":"` + channel + `","filters":{}}`),
+		Body:   json.RawMessage(`{"channel":"` + ChannelHead + `","filters":{}}`),
 	}))
 }
 
@@ -64,7 +64,7 @@ func TestHandleUnsubscribeMetrics(t *testing.T) {
 	conn := dialWS(t, srv)
 	defer conn.Close()
 
-	subscribe(t, conn, ChannelHead)
+	subscribeToHead(t, conn)
 	require.Eventually(t, func() bool {
 		return manager.head.clients.Len() == 1
 	}, time.Second, 10*time.Millisecond)
@@ -106,7 +106,7 @@ func TestHandleCleansUpSubscriptionsOnAbruptDisconnect(t *testing.T) {
 	defer srv.Close()
 
 	conn := dialWS(t, srv)
-	subscribe(t, conn, ChannelHead)
+	subscribeToHead(t, conn)
 
 	require.Eventually(t, func() bool {
 		return manager.head.clients.Len() == 1 && manager.clients.Len() == 1
@@ -137,7 +137,7 @@ func TestHandleDoesNotTouchUnsubscribedChannels(t *testing.T) {
 	gasBase := testutil.ToFloat64(wsSubscriptions.WithLabelValues(ChannelGasPrice))
 
 	conn := dialWS(t, srv)
-	subscribe(t, conn, ChannelHead)
+	subscribeToHead(t, conn)
 
 	require.Eventually(t, func() bool {
 		return manager.head.clients.Len() == 1
@@ -196,7 +196,7 @@ func TestHandleSurvivesApplicationLevelErrors(t *testing.T) {
 	readError(ErrCodeUnknownChannel)
 
 	// the connection must still be usable
-	subscribe(t, conn, ChannelHead)
+	subscribeToHead(t, conn)
 
 	require.Eventually(t, func() bool {
 		return manager.head.clients.Len() == 1
