@@ -10,7 +10,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestSearchText() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	results, err := s.storage.Search.SearchText(ctx, "con")
@@ -24,7 +24,7 @@ func (s *StorageTestSuite) TestSearchText() {
 }
 
 func (s *StorageTestSuite) TestSearchTextNamespace() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	results, err := s.storage.Search.SearchText(ctx, "5F7A8DDFE6136FE76B65B9066D4F816D707F")
@@ -38,7 +38,7 @@ func (s *StorageTestSuite) TestSearchTextNamespace() {
 }
 
 func (s *StorageTestSuite) TestSearch() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	hash, err := hex.DecodeString("5F7A8DDFE6136FE76B65B9066D4F816D707F28C05B3362D66084664C5B39BA98")
@@ -55,7 +55,7 @@ func (s *StorageTestSuite) TestSearch() {
 }
 
 func (s *StorageTestSuite) TestSearchByDataHash() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	hash, err := hex.DecodeString("3D96B7D238E7E0456F6AF8E7CDF0A67BD6CF9C2089ECB559C659DCAA1F880353")
@@ -72,7 +72,7 @@ func (s *StorageTestSuite) TestSearchByDataHash() {
 }
 
 func (s *StorageTestSuite) TestSearchByTextByCelestials() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	results, err := s.storage.Search.SearchText(ctx, "me 1")

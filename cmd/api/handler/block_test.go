@@ -4,7 +4,6 @@
 package handler
 
 import (
-	"context"
 	"database/sql"
 	"encoding/base64"
 	"encoding/json"
@@ -101,8 +100,7 @@ func (s *BlockTestSuite) SetupSuite() {
 
 // TearDownSuite -
 func (s *BlockTestSuite) TearDownSuite() {
-	s.ctrl.Finish()
-	s.Require().NoError(s.echo.Shutdown(context.Background()))
+	s.Require().NoError(s.echo.Shutdown(s.T().Context()))
 }
 
 func TestSuiteBlock_Run(t *testing.T) {
@@ -110,7 +108,7 @@ func TestSuiteBlock_Run(t *testing.T) {
 }
 
 func (s *BlockTestSuite) TestGet() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height")
@@ -138,7 +136,7 @@ func (s *BlockTestSuite) TestGet() {
 }
 
 func (s *BlockTestSuite) TestGetNoContent() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height")
@@ -161,7 +159,7 @@ func (s *BlockTestSuite) TestGetWithoutStats() {
 	q := make(url.Values)
 	q.Set("stats", "false")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height")
@@ -192,7 +190,7 @@ func (s *BlockTestSuite) TestGetWithStats() {
 	q := make(url.Values)
 	q.Set("stats", "true")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height")
@@ -222,7 +220,7 @@ func (s *BlockTestSuite) TestGetWithStats() {
 }
 
 func (s *BlockTestSuite) TestGetInvalidBlockHeight() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height")
@@ -239,7 +237,7 @@ func (s *BlockTestSuite) TestGetInvalidBlockHeight() {
 }
 
 func (s *BlockTestSuite) TestList() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block")
@@ -271,7 +269,7 @@ func (s *BlockTestSuite) TestListWithStats() {
 	q := make(url.Values)
 	q.Set("stats", "true")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block")
@@ -304,7 +302,7 @@ func (s *BlockTestSuite) TestGetEvents() {
 	q.Set("limit", "2")
 	q.Set("offset", "0")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/events")
@@ -348,7 +346,7 @@ func (s *BlockTestSuite) TestGetEvents() {
 }
 
 func (s *BlockTestSuite) TestGetStats() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/stats")
@@ -371,7 +369,7 @@ func (s *BlockTestSuite) TestGetStats() {
 }
 
 func (s *BlockTestSuite) TestBlobs() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/blobs")
@@ -413,7 +411,7 @@ func (s *BlockTestSuite) TestBlobs() {
 }
 
 func (s *BlockTestSuite) TestGetBlobsCount() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/blobs/count")
@@ -437,7 +435,7 @@ func (s *BlockTestSuite) TestGetBlobsCount() {
 }
 
 func (s *BlockTestSuite) TestCount() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/address/count")
@@ -461,7 +459,7 @@ func (s *BlockTestSuite) TestGetMessages() {
 	q.Set("offset", "0")
 	q.Set("msg_type", "MsgSend")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/messages")
@@ -525,7 +523,7 @@ func (s *BlockTestSuite) TestGetMessages() {
 }
 
 func (s *BlockTestSuite) TestBlockODS() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/ods")
@@ -573,7 +571,7 @@ func (s *BlockTestSuite) TestBlockODS() {
 }
 
 func (s *BlockTestSuite) TestEmptyBlockODS() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/block/:height/ods")

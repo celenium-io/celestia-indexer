@@ -22,6 +22,8 @@ import (
 )
 
 func createModules(t *testing.T) (modules.BaseModule, string, Module) {
+	t.Helper()
+
 	writerModule := modules.New("writer-module")
 	outputName := "write"
 	writerModule.CreateOutput(outputName)

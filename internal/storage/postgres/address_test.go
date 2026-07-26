@@ -13,7 +13,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestAddressByHash() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	hash := []byte{0xde, 0xce, 0x42, 0x5b, 0x75, 0xd6, 0x71, 0x15, 0xbd, 0xa8, 0x77, 0xe1, 0xe7, 0xa1, 0xf2, 0x62, 0xf6, 0xfa, 0x51, 0xd6}
@@ -29,7 +29,7 @@ func (s *StorageTestSuite) TestAddressByHash() {
 }
 
 func (s *StorageTestSuite) TestIcaAddressByHash() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	hash := []byte{48, 160, 217, 234, 151, 39, 229, 141, 230, 127, 49, 37, 182, 237, 136, 189, 218, 247, 87, 139, 87, 173, 20, 154, 154, 144, 84, 29, 23, 55, 212, 7}
@@ -45,7 +45,7 @@ func (s *StorageTestSuite) TestIcaAddressByHash() {
 }
 
 func (s *StorageTestSuite) TestAddressByString() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	hash := []byte{48, 160, 217, 234, 151, 39, 229, 141, 230, 127, 49, 37, 182, 237, 136, 189, 218, 247, 87, 139, 87, 173, 20, 154, 154, 144, 84, 29, 23, 55, 212, 7}
@@ -58,7 +58,7 @@ func (s *StorageTestSuite) TestAddressByString() {
 }
 
 func (s *StorageTestSuite) TestAddressByHashWithoutCelestials() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	hash := []byte{0xC0, 0xD4, 0xB7, 0x92, 0x82, 0xE1, 0x60, 0x4E, 0xEB, 0xCB, 0x2C, 0x02, 0xF6, 0x2C, 0xB8, 0x37, 0x37, 0x57, 0x9C, 0x9C}
@@ -71,7 +71,7 @@ func (s *StorageTestSuite) TestAddressByHashWithoutCelestials() {
 }
 
 func (s *StorageTestSuite) TestAddressList() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	addresses, err := s.storage.Address.ListWithBalance(ctx, storage.AddressListFilter{
@@ -108,7 +108,7 @@ func (s *StorageTestSuite) TestAddressList() {
 }
 
 func (s *StorageTestSuite) TestAddressListWithSortAscHeight() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, field := range []string{"first_height", "last_height"} {
@@ -138,7 +138,7 @@ func (s *StorageTestSuite) TestAddressListWithSortAscHeight() {
 }
 
 func (s *StorageTestSuite) TestAddressListWithSortDescHeight() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, field := range []string{"first_height", "last_height"} {
@@ -161,7 +161,7 @@ func (s *StorageTestSuite) TestAddressListWithSortDescHeight() {
 }
 
 func (s *StorageTestSuite) TestAddressListWithSortDesc() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, field := range []string{"delegated", "spendable", "unbonding"} {
@@ -209,7 +209,7 @@ func (s *StorageTestSuite) TestAddressListWithSortDesc() {
 }
 
 func (s *StorageTestSuite) TestAddressListWithSortAsc() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, field := range []string{"delegated", "spendable", "unbonding"} {
@@ -245,7 +245,7 @@ func (s *StorageTestSuite) TestAddressListWithSortAsc() {
 }
 
 func (s *StorageTestSuite) TestAddressMessages() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	messages, err := s.storage.Message.ByAddress(ctx, 1, storage.AddressMsgsFilter{
@@ -267,7 +267,7 @@ func (s *StorageTestSuite) TestAddressMessages() {
 }
 
 func (s *StorageTestSuite) TestAddressMessagesWithType() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	messages, err := s.storage.Message.ByAddress(ctx, 1, storage.AddressMsgsFilter{
@@ -289,7 +289,7 @@ func (s *StorageTestSuite) TestAddressMessagesWithType() {
 }
 
 func (s *StorageTestSuite) TestAddressStats() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, name := range []string{"tx_count", "fee", "gas_wanted", "gas_used"} {
@@ -305,7 +305,7 @@ func (s *StorageTestSuite) TestAddressStats() {
 }
 
 func (s *StorageTestSuite) TestAddressStatsError() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Address.Series(ctx, 1, storage.TimeframeDay, "invalid", storage.NewSeriesRequest(0, 0))
@@ -316,7 +316,7 @@ func (s *StorageTestSuite) TestAddressStatsError() {
 }
 
 func (s *StorageTestSuite) TestAddressIdByHash() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	hash := []byte{0xde, 0xce, 0x42, 0x5b, 0x75, 0xd6, 0x71, 0x15, 0xbd, 0xa8, 0x77, 0xe1, 0xe7, 0xa1, 0xf2, 0x62, 0xf6, 0xfa, 0x51, 0xd6}
@@ -327,7 +327,7 @@ func (s *StorageTestSuite) TestAddressIdByHash() {
 }
 
 func (s *StorageTestSuite) TestAddressIdByAddress() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	id, err := s.storage.Address.IdByAddress(ctx, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", 2, 3, 4)
@@ -336,7 +336,7 @@ func (s *StorageTestSuite) TestAddressIdByAddress() {
 }
 
 func (s *StorageTestSuite) TestBalances() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	balances, err := s.storage.Address.Balances(ctx, 5, 10, 0)

@@ -4,7 +4,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -72,7 +71,7 @@ func (s *ForwardingTestSuite) SetupSuite() {
 
 // TearDownSuite -
 func (s *ForwardingTestSuite) TearDownSuite() {
-	s.Require().NoError(s.echo.Shutdown(context.Background()))
+	s.Require().NoError(s.echo.Shutdown(s.T().Context()))
 }
 
 func TestSuiteForwarding_Run(t *testing.T) {
@@ -85,7 +84,7 @@ func (s *ForwardingTestSuite) TestList() {
 	q.Set("offset", "0")
 	q.Set("sort", "desc")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/forwarding")
@@ -129,7 +128,7 @@ func (s *ForwardingTestSuite) TestList() {
 }
 
 func (s *ForwardingTestSuite) TestListDefaults() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/forwarding")
@@ -157,7 +156,7 @@ func (s *ForwardingTestSuite) TestListWithTxHash() {
 	q.Set("limit", "10")
 	q.Set("tx_hash", testTxHash)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/forwarding")
@@ -199,7 +198,7 @@ func (s *ForwardingTestSuite) TestListWithAddress() {
 	q.Set("limit", "10")
 	q.Set("address", testAddress)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/forwarding")
@@ -240,7 +239,7 @@ func (s *ForwardingTestSuite) TestListWithHeight() {
 	q.Set("limit", "10")
 	q.Set("height", "100")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/forwarding")
@@ -275,7 +274,7 @@ func (s *ForwardingTestSuite) TestListValidationError() {
 	q := make(url.Values)
 	q.Set("limit", "101")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/forwarding")
@@ -285,7 +284,7 @@ func (s *ForwardingTestSuite) TestListValidationError() {
 }
 
 func (s *ForwardingTestSuite) TestGet() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/forwarding/:id")
@@ -365,7 +364,7 @@ func (s *ForwardingTestSuite) TestGet() {
 }
 
 func (s *ForwardingTestSuite) TestGetValidationError() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/forwarding/:id")

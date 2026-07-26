@@ -4,7 +4,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/hex"
 	"encoding/json"
 	"net/http"
@@ -94,7 +93,6 @@ func (s *SignalTestSuite) SetupSuite() {
 
 // TearDownSuite -
 func (s *SignalTestSuite) TearDownSuite() {
-	s.ctrl.Finish()
 	s.Require().NoError(s.echo.Shutdown(s.T().Context()))
 }
 
@@ -108,7 +106,7 @@ func (s *SignalTestSuite) TestList() {
 	q.Set("offset", "0")
 	q.Set("validator_id", "1")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/signal")
@@ -151,7 +149,7 @@ func (s *SignalTestSuite) TestUpgrades() {
 	q.Set("offset", "0")
 	q.Set("height", "101")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/signal/upgrade")
@@ -189,7 +187,7 @@ func (s *SignalTestSuite) TestUpgrades() {
 }
 
 func (s *SignalTestSuite) TestUpgrade() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/signal/upgrade/:version")

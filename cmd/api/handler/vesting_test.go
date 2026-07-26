@@ -4,7 +4,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -40,7 +39,7 @@ func (s *VestingTestSuite) SetupSuite() {
 
 // TearDownSuite -
 func (s *VestingTestSuite) TearDownSuite() {
-	s.Require().NoError(s.echo.Shutdown(context.Background()))
+	s.Require().NoError(s.echo.Shutdown(s.T().Context()))
 }
 
 func TestSuiteVesting_Run(t *testing.T) {
@@ -51,7 +50,7 @@ func (s *VestingTestSuite) TestPeriods() {
 	q := make(url.Values)
 	q.Set("limit", "5")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/vesting/:id/periods")

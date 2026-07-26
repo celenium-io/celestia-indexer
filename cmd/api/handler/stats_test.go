@@ -4,7 +4,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -56,8 +55,7 @@ func (s *StatsTestSuite) SetupSuite() {
 
 // TearDownSuite -
 func (s *StatsTestSuite) TearDownSuite() {
-	s.ctrl.Finish()
-	s.Require().NoError(s.echo.Shutdown(context.Background()))
+	s.Require().NoError(s.echo.Shutdown(s.T().Context()))
 }
 
 func TestSuiteStats_Run(t *testing.T) {
@@ -65,7 +63,7 @@ func TestSuiteStats_Run(t *testing.T) {
 }
 
 func (s *StatsTestSuite) TestCountBlocks() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/summary/:table/:function")
@@ -91,7 +89,7 @@ func (s *StatsTestSuite) TestSumFeeBlocks() {
 	q := make(url.Values)
 	q.Set("column", "fee")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/summary/:table/:function")
@@ -118,7 +116,7 @@ func (s *StatsTestSuite) TestSumFeeBlocks() {
 }
 
 func (s *StatsTestSuite) TestCountBlocksBadRequest() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/summary/:table/:function")
@@ -130,7 +128,7 @@ func (s *StatsTestSuite) TestCountBlocksBadRequest() {
 }
 
 func (s *StatsTestSuite) TestTPS() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/tps")
@@ -158,7 +156,7 @@ func (s *StatsTestSuite) TestTPS() {
 }
 
 func (s *StatsTestSuite) TestChanges24hBlockStats() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/changes_24h")
@@ -189,7 +187,7 @@ func (s *StatsTestSuite) TestNamespaceUsage() {
 	q := make(url.Values)
 	q.Set("top", "1")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/namespace/usage")
@@ -252,7 +250,7 @@ func (s *StatsTestSuite) TestBlockStatsHistogram() {
 			storage.TimeframeMonth,
 			storage.TimeframeYear,
 		} {
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/v1/stats/series/:name/:timeframe")
@@ -303,7 +301,7 @@ func (s *StatsTestSuite) TestBlockCumulativeStatsHistogram() {
 			storage.TimeframeMonth,
 			storage.TimeframeYear,
 		} {
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/v1/stats/series/:name/:timeframe/cumulative")
@@ -346,7 +344,7 @@ func (s *StatsTestSuite) TestNamespaceStatsHistogram() {
 			storage.TimeframeMonth,
 			storage.TimeframeYear,
 		} {
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/v1/stats/namespace/series/:id/:name/:timeframe")
@@ -383,7 +381,7 @@ func (s *StatsTestSuite) TestNamespaceStatsHistogram() {
 }
 
 func (s *StatsTestSuite) TestSquareSize() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/square_size")
@@ -429,7 +427,7 @@ func (s *StatsTestSuite) TestCumulativeSeries() {
 			storage.TimeframeMonth,
 			storage.TimeframeYear,
 		} {
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/v1/stats/series/:name/:timeframe")
@@ -460,7 +458,7 @@ func (s *StatsTestSuite) TestCumulativeSeries() {
 }
 
 func (s *StatsTestSuite) TestRollupStats24h() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/rollup_stats_24h")
@@ -496,7 +494,7 @@ func (s *StatsTestSuite) TestRollupStats24h() {
 }
 
 func (s *StatsTestSuite) TestMessgaesCount24h() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/messages_count_24h")
@@ -523,7 +521,7 @@ func (s *StatsTestSuite) TestMessgaesCount24h() {
 }
 
 func (s *StatsTestSuite) TestSizeGroups() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/size_groups")
@@ -564,7 +562,7 @@ func (s *StatsTestSuite) TestIbcSeries() {
 			storage.TimeframeDay,
 			storage.TimeframeMonth,
 		} {
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/v1/stats/ibc/series/:id/:name/:timeframe")
@@ -595,7 +593,7 @@ func (s *StatsTestSuite) TestIbcSeries() {
 }
 
 func (s *StatsTestSuite) TestIbcChainStats() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/ibc/chains")
@@ -626,7 +624,7 @@ func (s *StatsTestSuite) TestIbcChainStats() {
 }
 
 func (s *StatsTestSuite) TestIbcSummaryStats() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/ibc/summary")
@@ -683,7 +681,7 @@ func (s *StatsTestSuite) TestIbcSummaryStats() {
 }
 
 func (s *StatsTestSuite) TestHlDomainStats() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/hyperlane/chains")
@@ -742,7 +740,7 @@ func (s *StatsTestSuite) TestHlSeries() {
 			storage.TimeframeDay,
 			storage.TimeframeMonth,
 		} {
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/v1/stats/hyperlane/series/:id/:name/:timeframe")
@@ -776,7 +774,7 @@ func (s *StatsTestSuite) TestHlDomainStatsWithoutChainStore() {
 	s.chainStore = nil
 	s.handler = NewStatsHandler(s.stats, s.ns, s.ibc, s.channels, s.hyperlane, nil, s.state)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/hyperlane/chains")
@@ -817,7 +815,7 @@ func (s *StatsTestSuite) TestHlTotalSeries() {
 			storage.TimeframeDay,
 			storage.TimeframeMonth,
 		} {
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/v1/stats/hyperlane/chains/:name/:timeframe")
@@ -864,7 +862,7 @@ func (s *StatsTestSuite) TestStakingSeries() {
 			storage.TimeframeDay,
 			storage.TimeframeMonth,
 		} {
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 			c := s.echo.NewContext(req, rec)
 			c.SetPath("/v1/stats/staking/series/:id/:name/:timeframe")
@@ -895,7 +893,7 @@ func (s *StatsTestSuite) TestStakingSeries() {
 }
 
 func (s *StatsTestSuite) TestSStakingDistribution() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/v1/stats/staking/distribution")

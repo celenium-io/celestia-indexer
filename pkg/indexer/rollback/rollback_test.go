@@ -50,6 +50,11 @@ func (s *ModuleTestSuite) SetupSuite() {
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
+	s.T().Cleanup(func() {
+		ctx, ctxCancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer ctxCancel()
+		s.Require().NoError(s.psqlContainer.Terminate(ctx))
+	})
 
 	st, err := postgres.Create(ctx, config.Database{
 		Kind:     config.DBKindPostgres,
@@ -61,15 +66,9 @@ func (s *ModuleTestSuite) SetupSuite() {
 	}, "../../../database", false)
 	s.Require().NoError(err)
 	s.storage = st
-}
-
-// TearDownSuite -
-func (s *ModuleTestSuite) TearDownSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer ctxCancel()
-
-	s.Require().NoError(s.storage.Close())
-	s.Require().NoError(s.psqlContainer.Terminate(ctx))
+	s.T().Cleanup(func() {
+		s.Require().NoError(s.storage.Close())
+	})
 }
 
 func (s *ModuleTestSuite) InitDb(path string) {

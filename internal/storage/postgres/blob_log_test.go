@@ -15,7 +15,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestBlobLogsByNamespace() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	logs, err := s.storage.BlobLogs.ByNamespace(ctx, 2, storage.BlobLogFilters{
@@ -50,7 +50,7 @@ func (s *StorageTestSuite) TestBlobLogsByNamespace() {
 }
 
 func (s *StorageTestSuite) TestBlobLogsByNamespaceWithoutJoins() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	logs, err := s.storage.BlobLogs.ByNamespace(ctx, 2, storage.BlobLogFilters{
@@ -79,7 +79,7 @@ func (s *StorageTestSuite) TestBlobLogsByNamespaceWithoutJoins() {
 }
 
 func (s *StorageTestSuite) TestBlobLogsByNamespaceAndCommitment() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	logs, err := s.storage.BlobLogs.ByNamespace(ctx, 2, storage.BlobLogFilters{
@@ -110,7 +110,7 @@ func (s *StorageTestSuite) TestBlobLogsByNamespaceAndCommitment() {
 }
 
 func (s *StorageTestSuite) TestBlobLogsByNamespaceAndTime() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	logs, err := s.storage.BlobLogs.ByNamespace(ctx, 2, storage.BlobLogFilters{
@@ -141,7 +141,7 @@ func (s *StorageTestSuite) TestBlobLogsByNamespaceAndTime() {
 }
 
 func (s *StorageTestSuite) TestBlobLogsByNamespaceAndHeight() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	logs, err := s.storage.BlobLogs.ByNamespace(ctx, 2, storage.BlobLogFilters{
@@ -172,7 +172,7 @@ func (s *StorageTestSuite) TestBlobLogsByNamespaceAndHeight() {
 }
 
 func (s *StorageTestSuite) TestBlobLogsByNamespaceAndToTime() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	logs, err := s.storage.BlobLogs.ByNamespace(ctx, 2, storage.BlobLogFilters{
@@ -203,7 +203,7 @@ func (s *StorageTestSuite) TestBlobLogsByNamespaceAndToTime() {
 }
 
 func (s *StorageTestSuite) TestBlobLogsSigner() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	logs, err := s.storage.BlobLogs.BySigner(ctx, 1, storage.BlobLogFilters{
@@ -230,7 +230,7 @@ func (s *StorageTestSuite) TestBlobLogsSigner() {
 }
 
 func (s *StorageTestSuite) TestBlobLogsSignerWithoutJoins() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	logs, err := s.storage.BlobLogs.BySigner(ctx, 1, storage.BlobLogFilters{
@@ -257,7 +257,7 @@ func (s *StorageTestSuite) TestBlobLogsSignerWithoutJoins() {
 }
 
 func (s *StorageTestSuite) TestBlobLogsTx() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	logs, err := s.storage.BlobLogs.ByTxId(ctx, 4, storage.BlobLogFilters{
@@ -287,7 +287,7 @@ func (s *StorageTestSuite) TestBlobLogsTx() {
 }
 
 func (s *StorageTestSuite) TestCountBlobLogsTx() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	count, err := s.storage.BlobLogs.CountByTxId(ctx, 4)
@@ -296,7 +296,7 @@ func (s *StorageTestSuite) TestCountBlobLogsTx() {
 }
 
 func (s *StorageTestSuite) TestBlobLogsByHeight() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	logs, err := s.storage.BlobLogs.ByHeight(ctx, 1000, storage.BlobLogFilters{
@@ -326,7 +326,7 @@ func (s *StorageTestSuite) TestBlobLogsByHeight() {
 }
 
 func (s *StorageTestSuite) TestBlobLogsByProviders() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, sortBy := range []string{"", "time", "size"} {
@@ -351,7 +351,7 @@ func (s *StorageTestSuite) TestBlobLogsByProviders() {
 }
 
 func (s *StorageTestSuite) TestBlobLogsByProvidersWithoutJoins() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, sortBy := range []string{"", "time", "size"} {
@@ -376,7 +376,7 @@ func (s *StorageTestSuite) TestBlobLogsByProvidersWithoutJoins() {
 }
 
 func (s *StorageTestSuite) TestBlobLogsExportByProviders() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	buf := new(bytes.Buffer)
@@ -403,7 +403,7 @@ func (s *StorageTestSuite) TestBlobLogsExportByProviders() {
 }
 
 func (s *StorageTestSuite) TestBlob() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	log, err := s.storage.BlobLogs.Blob(ctx, 0, 2, "RWW7eaKKXasSGK/DS8PlpErARbl5iFs1vQIycYEAlk0=")
@@ -427,7 +427,7 @@ func (s *StorageTestSuite) TestBlob() {
 }
 
 func (s *StorageTestSuite) TestListBlob() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	logs, err := s.storage.BlobLogs.ListBlobs(ctx, storage.ListBlobLogFilters{

@@ -4,7 +4,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/hex"
 	"encoding/json"
 	"net/http"
@@ -102,7 +101,7 @@ func (s *ZkISMTestSuite) SetupSuite() {
 }
 
 func (s *ZkISMTestSuite) TearDownSuite() {
-	s.Require().NoError(s.echo.Shutdown(context.Background()))
+	s.Require().NoError(s.echo.Shutdown(s.T().Context()))
 }
 
 func TestSuiteZkISM_Run(t *testing.T) {
@@ -114,7 +113,7 @@ func TestSuiteZkISM_Run(t *testing.T) {
 // ──────────────────────────────────────────────────────────
 
 func (s *ZkISMTestSuite) TestList() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism")
@@ -149,7 +148,7 @@ func (s *ZkISMTestSuite) TestList() {
 }
 
 func (s *ZkISMTestSuite) TestListEmpty() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism")
@@ -176,7 +175,7 @@ func (s *ZkISMTestSuite) TestListWithLimitOffset() {
 	q.Set("limit", "5")
 	q.Set("offset", "10")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism")
@@ -202,7 +201,7 @@ func (s *ZkISMTestSuite) TestListWithAddress() {
 	q := make(url.Values)
 	q.Set("address", testAddress)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism")
@@ -235,7 +234,7 @@ func (s *ZkISMTestSuite) TestListWithTxHash() {
 	q := make(url.Values)
 	q.Set("tx_hash", strings.ToLower(testTxHash))
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism")
@@ -268,7 +267,7 @@ func (s *ZkISMTestSuite) TestListValidationError() {
 	q := make(url.Values)
 	q.Set("limit", "200")
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism")
@@ -282,7 +281,7 @@ func (s *ZkISMTestSuite) TestListValidationError() {
 // ──────────────────────────────────────────────────────────
 
 func (s *ZkISMTestSuite) TestGet() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism/:id")
@@ -313,7 +312,7 @@ func (s *ZkISMTestSuite) TestGet() {
 }
 
 func (s *ZkISMTestSuite) TestGetValidationError() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism/:id")
@@ -329,7 +328,7 @@ func (s *ZkISMTestSuite) TestGetValidationError() {
 // ──────────────────────────────────────────────────────────
 
 func (s *ZkISMTestSuite) TestGetUpdates() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism/:id/updates")
@@ -362,7 +361,7 @@ func (s *ZkISMTestSuite) TestGetUpdates() {
 }
 
 func (s *ZkISMTestSuite) TestGetUpdatesEmpty() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism/:id/updates")
@@ -390,7 +389,7 @@ func (s *ZkISMTestSuite) TestGetUpdatesWithAddress() {
 	q := make(url.Values)
 	q.Set("address", testAddress)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism/:id/updates")
@@ -422,7 +421,7 @@ func (s *ZkISMTestSuite) TestGetUpdatesWithAddress() {
 }
 
 func (s *ZkISMTestSuite) TestGetUpdatesValidationError() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism/:id/updates")
@@ -438,7 +437,7 @@ func (s *ZkISMTestSuite) TestGetUpdatesValidationError() {
 // ──────────────────────────────────────────────────────────
 
 func (s *ZkISMTestSuite) TestGetMessages() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism/:id/messages")
@@ -473,7 +472,7 @@ func (s *ZkISMTestSuite) TestGetMessages() {
 }
 
 func (s *ZkISMTestSuite) TestGetMessagesEmpty() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism/:id/messages")
@@ -501,7 +500,7 @@ func (s *ZkISMTestSuite) TestGetMessagesWithAddress() {
 	q := make(url.Values)
 	q.Set("address", testAddress)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism/:id/messages")
@@ -536,7 +535,7 @@ func (s *ZkISMTestSuite) TestGetMessagesWithTxHash() {
 	q := make(url.Values)
 	q.Set("tx_hash", strings.ToLower(testTxHash))
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/?"+q.Encode(), nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism/:id/messages")
@@ -568,7 +567,7 @@ func (s *ZkISMTestSuite) TestGetMessagesWithTxHash() {
 }
 
 func (s *ZkISMTestSuite) TestGetMessagesValidationError() {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/hyperlane/zkism/:id/messages")

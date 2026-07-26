@@ -9,7 +9,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestGrantByGrantee() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	grants, err := s.storage.Grants.ByGrantee(ctx, 1, 10, 0)
@@ -28,7 +28,7 @@ func (s *StorageTestSuite) TestGrantByGrantee() {
 }
 
 func (s *StorageTestSuite) TestGrantByGranter() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	grants, err := s.storage.Grants.ByGranter(ctx, 2, 10, 0)

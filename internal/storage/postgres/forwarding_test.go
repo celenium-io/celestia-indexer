@@ -15,7 +15,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestForwardingById() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	fwd, prevTime, err := s.storage.Forwardings.ById(ctx, 2)
@@ -37,7 +37,7 @@ func (s *StorageTestSuite) TestForwardingById() {
 }
 
 func (s *StorageTestSuite) TestForwardingByHeight() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	forwards, err := s.storage.Forwardings.Filter(ctx, storage.ForwardingFilter{
@@ -65,7 +65,7 @@ func (s *StorageTestSuite) TestForwardingByHeight() {
 }
 
 func (s *StorageTestSuite) TestForwardingByTxId() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	forwards, err := s.storage.Forwardings.Filter(ctx, storage.ForwardingFilter{
@@ -93,7 +93,7 @@ func (s *StorageTestSuite) TestForwardingByTxId() {
 }
 
 func (s *StorageTestSuite) TestForwardingByAddressId() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	forwards, err := s.storage.Forwardings.Filter(ctx, storage.ForwardingFilter{
@@ -121,7 +121,7 @@ func (s *StorageTestSuite) TestForwardingByAddressId() {
 }
 
 func (s *StorageTestSuite) TestForwardingByFrom() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	forwards, err := s.storage.Forwardings.Filter(ctx, storage.ForwardingFilter{
@@ -149,7 +149,7 @@ func (s *StorageTestSuite) TestForwardingByFrom() {
 }
 
 func (s *StorageTestSuite) TestForwardingByTo() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	forwards, err := s.storage.Forwardings.Filter(ctx, storage.ForwardingFilter{
@@ -177,7 +177,7 @@ func (s *StorageTestSuite) TestForwardingByTo() {
 }
 
 func (s *StorageTestSuite) TestForwardingInputs() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	inputs, err := s.storage.Forwardings.Inputs(ctx, 5, time.Unix(1600000000, 0), time.Unix(1771334044, 0))
@@ -198,7 +198,7 @@ func (s *StorageTestSuite) TestForwardingInputs() {
 // An incorrect ORDER BY in the outer query (using Order instead of OrderExpr) would
 // cause PostgreSQL to return rows in heap order, yielding id=2 instead of id=3.
 func (s *StorageTestSuite) TestForwardingByIdCorrectRecord() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	// id=3 is at '2024-07-04T03:07:00' — 7 minutes after ids 1 and 2.
@@ -214,7 +214,7 @@ func (s *StorageTestSuite) TestForwardingByIdCorrectRecord() {
 // TestForwardingByIdNotFound verifies that requesting a non-existent forwarding id
 // returns sql.ErrNoRows instead of silently returning a record with a lower id.
 func (s *StorageTestSuite) TestForwardingByIdNotFound() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	// id=4 does not exist in the forwarding fixture (only 1, 2, 3 exist).
@@ -227,7 +227,7 @@ func (s *StorageTestSuite) TestForwardingByIdNotFound() {
 // equals the upper bound is included in the inputs list.
 // This requires a non-strict (<=) comparison; a strict (<) would exclude it.
 func (s *StorageTestSuite) TestForwardingInputsAtSameTime() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	// hl_transfer fixture id=3: type=receive, address_id=5, time='2023-07-04T04:11:57', counterparty=123450.

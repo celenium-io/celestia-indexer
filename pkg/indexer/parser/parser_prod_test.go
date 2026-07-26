@@ -14,6 +14,8 @@ import (
 )
 
 func testFromFile(t *testing.T, filename string) {
+	t.Helper()
+
 	blockFile, err := os.Open(fmt.Sprintf("../../../test/json/block_%s.json", filename))
 	if err != nil {
 		t.Fatal(err)

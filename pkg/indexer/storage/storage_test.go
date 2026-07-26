@@ -43,6 +43,11 @@ func (s *ModuleTestSuite) SetupSuite() {
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
+	s.T().Cleanup(func() {
+		ctx, ctxCancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer ctxCancel()
+		s.Require().NoError(s.psqlContainer.Terminate(ctx))
+	})
 
 	strg, err := postgres.Create(ctx, config.Database{
 		Kind:     config.DBKindPostgres,
@@ -54,6 +59,9 @@ func (s *ModuleTestSuite) SetupSuite() {
 	}, "../../../database", false)
 	s.Require().NoError(err)
 	s.storage = strg
+	s.T().Cleanup(func() {
+		s.Require().NoError(s.storage.Close())
+	})
 
 	fixtures, err := testfixtures.New(
 		testfixtures.Database(strg.Connection().DB().DB),
@@ -63,15 +71,6 @@ func (s *ModuleTestSuite) SetupSuite() {
 	)
 	s.Require().NoError(err)
 	s.Require().NoError(fixtures.Load())
-}
-
-// TearDownSuite -
-func (s *ModuleTestSuite) TearDownSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer ctxCancel()
-
-	s.Require().NoError(s.storage.Close())
-	s.Require().NoError(s.psqlContainer.Terminate(ctx))
 }
 
 func (s *ModuleTestSuite) TestBlockLast() {

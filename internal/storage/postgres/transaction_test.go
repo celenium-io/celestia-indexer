@@ -33,7 +33,7 @@ type TransactionTestSuite struct {
 
 // SetupSuite -
 func (s *TransactionTestSuite) SetupSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 180*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 180*time.Second)
 	defer ctxCancel()
 
 	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, testhelpers.PostgreSQLContainerConfig{
@@ -45,6 +45,11 @@ func (s *TransactionTestSuite) SetupSuite() {
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
+	s.T().Cleanup(func() {
+		ctx, ctxCancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer ctxCancel()
+		s.Require().NoError(s.psqlContainer.Terminate(ctx))
+	})
 
 	strg, err := Create(ctx, config.Database{
 		Kind:     config.DBKindPostgres,
@@ -56,15 +61,9 @@ func (s *TransactionTestSuite) SetupSuite() {
 	}, "../../../database", false)
 	s.Require().NoError(err)
 	s.storage = strg
-}
-
-// TearDownSuite -
-func (s *TransactionTestSuite) TearDownSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer ctxCancel()
-
-	s.Require().NoError(s.storage.Close())
-	s.Require().NoError(s.psqlContainer.Terminate(ctx))
+	s.T().Cleanup(func() {
+		s.Require().NoError(s.storage.Close())
+	})
 }
 
 func (s *TransactionTestSuite) BeforeTest(suiteName, testName string) {
@@ -83,7 +82,7 @@ func (s *TransactionTestSuite) BeforeTest(suiteName, testName string) {
 }
 
 func (s *TransactionTestSuite) TestSaveNamespaces() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -163,7 +162,7 @@ func (s *TransactionTestSuite) TestSaveNamespaces() {
 }
 
 func (s *TransactionTestSuite) TestSaveAddresses() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -221,7 +220,7 @@ func (s *TransactionTestSuite) TestSaveAddresses() {
 }
 
 func (s *TransactionTestSuite) TestSaveTxAddresses() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -241,7 +240,7 @@ func (s *TransactionTestSuite) TestSaveTxAddresses() {
 }
 
 func (s *TransactionTestSuite) TestSaveMsgAddresses() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -263,7 +262,7 @@ func (s *TransactionTestSuite) TestSaveMsgAddresses() {
 }
 
 func (s *TransactionTestSuite) TestSaveBalances() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -284,7 +283,7 @@ func (s *TransactionTestSuite) TestSaveBalances() {
 }
 
 func (s *TransactionTestSuite) TestSaveNamespaceMessages() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -306,7 +305,7 @@ func (s *TransactionTestSuite) TestSaveNamespaceMessages() {
 }
 
 func (s *TransactionTestSuite) TestSaveBlobLogs() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -330,7 +329,7 @@ func (s *TransactionTestSuite) TestSaveBlobLogs() {
 }
 
 func (s *TransactionTestSuite) TestSaveBlobLogsWithCopy() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -371,7 +370,7 @@ func (s *TransactionTestSuite) TestSaveBlobLogsWithCopy() {
 }
 
 func (s *TransactionTestSuite) TestSaveTransactionsWithCopy() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -420,7 +419,7 @@ func (s *TransactionTestSuite) TestSaveTransactionsWithCopy() {
 }
 
 func (s *TransactionTestSuite) TestSaveMessagesWithCopy() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -460,7 +459,7 @@ func (s *TransactionTestSuite) TestSaveMessagesWithCopy() {
 }
 
 func (s *TransactionTestSuite) TestSaveProposals() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -493,7 +492,7 @@ func (s *TransactionTestSuite) TestSaveProposals() {
 }
 
 func (s *TransactionTestSuite) TestSaveEmptyProposalDuplicate() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -515,7 +514,7 @@ func (s *TransactionTestSuite) TestSaveEmptyProposalDuplicate() {
 }
 
 func (s *TransactionTestSuite) TestSaveVotes() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -555,7 +554,7 @@ func (s *TransactionTestSuite) TestSaveVotes() {
 }
 
 func (s *TransactionTestSuite) TestSave2Votes() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -598,7 +597,7 @@ func (s *TransactionTestSuite) TestSave2Votes() {
 }
 
 func (s *TransactionTestSuite) TestSaveWeightedVotes() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -644,7 +643,7 @@ func (s *TransactionTestSuite) TestSaveWeightedVotes() {
 }
 
 func (s *TransactionTestSuite) TestSaveVotesValidatorIdDuplicate() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -690,7 +689,7 @@ func (s *TransactionTestSuite) TestSaveVotesValidatorIdDuplicate() {
 }
 
 func (s *TransactionTestSuite) TestSaveVotesAddressIdDuplicate() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -736,7 +735,7 @@ func (s *TransactionTestSuite) TestSaveVotesAddressIdDuplicate() {
 }
 
 func (s *TransactionTestSuite) TestSaveBlockSignatures() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -757,7 +756,7 @@ func (s *TransactionTestSuite) TestSaveBlockSignatures() {
 }
 
 func (s *TransactionTestSuite) TestSaveForwardings() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -783,7 +782,7 @@ func (s *TransactionTestSuite) TestSaveForwardings() {
 }
 
 func (s *TransactionTestSuite) TestRollbackBlockSignatures() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -797,7 +796,7 @@ func (s *TransactionTestSuite) TestRollbackBlockSignatures() {
 }
 
 func (s *TransactionTestSuite) TestRollbackBlock() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -816,7 +815,7 @@ func (s *TransactionTestSuite) TestRollbackBlock() {
 }
 
 func (s *TransactionTestSuite) TestRollbackBlockStats() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -832,7 +831,7 @@ func (s *TransactionTestSuite) TestRollbackBlockStats() {
 }
 
 func (s *TransactionTestSuite) TestRollbackAddress() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -851,7 +850,7 @@ func (s *TransactionTestSuite) TestRollbackAddress() {
 }
 
 func (s *TransactionTestSuite) TestRollbackTxs() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -872,7 +871,7 @@ func (s *TransactionTestSuite) TestRollbackTxs() {
 }
 
 func (s *TransactionTestSuite) TestRollbackEvents() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -894,7 +893,7 @@ func (s *TransactionTestSuite) TestRollbackEvents() {
 }
 
 func (s *TransactionTestSuite) TestRollbackMessages() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -917,7 +916,7 @@ func (s *TransactionTestSuite) TestRollbackMessages() {
 }
 
 func (s *TransactionTestSuite) TestRollbackBlobLogs() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -935,7 +934,7 @@ func (s *TransactionTestSuite) TestRollbackBlobLogs() {
 }
 
 func (s *TransactionTestSuite) TestRollbackValidators() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -954,7 +953,7 @@ func (s *TransactionTestSuite) TestRollbackValidators() {
 }
 
 func (s *TransactionTestSuite) TestRollbackNamespaces() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -976,7 +975,7 @@ func (s *TransactionTestSuite) TestRollbackNamespaces() {
 }
 
 func (s *TransactionTestSuite) TestRollbackUndelegations() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -994,7 +993,7 @@ func (s *TransactionTestSuite) TestRollbackUndelegations() {
 }
 
 func (s *TransactionTestSuite) TestRollbackRedelegations() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1012,7 +1011,7 @@ func (s *TransactionTestSuite) TestRollbackRedelegations() {
 }
 
 func (s *TransactionTestSuite) TestRollbackNamespaceMessages() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1042,7 +1041,7 @@ func (s *TransactionTestSuite) TestRollbackNamespaceMessages() {
 }
 
 func (s *TransactionTestSuite) TestRollbackProposals() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1063,7 +1062,7 @@ func (s *TransactionTestSuite) TestRollbackProposals() {
 }
 
 func (s *TransactionTestSuite) TestRollbackVotes() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1081,7 +1080,7 @@ func (s *TransactionTestSuite) TestRollbackVotes() {
 }
 
 func (s *TransactionTestSuite) TestRollbackHyperlaneIgps() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1099,7 +1098,7 @@ func (s *TransactionTestSuite) TestRollbackHyperlaneIgps() {
 }
 
 func (s *TransactionTestSuite) TestRollbackHyperlaneIgpConfigs() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1117,7 +1116,7 @@ func (s *TransactionTestSuite) TestRollbackHyperlaneIgpConfigs() {
 }
 
 func (s *TransactionTestSuite) TestRollbackHyperlaneGasPayment() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1135,7 +1134,7 @@ func (s *TransactionTestSuite) TestRollbackHyperlaneGasPayment() {
 }
 
 func (s *TransactionTestSuite) TestRollbackForwardings() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1153,7 +1152,7 @@ func (s *TransactionTestSuite) TestRollbackForwardings() {
 }
 
 func (s *TransactionTestSuite) TestDeleteBalances() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1167,7 +1166,7 @@ func (s *TransactionTestSuite) TestDeleteBalances() {
 }
 
 func (s *TransactionTestSuite) TestLastAddressAction() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1184,7 +1183,7 @@ func (s *TransactionTestSuite) TestLastAddressAction() {
 }
 
 func (s *TransactionTestSuite) TestSaveEvents() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1224,7 +1223,7 @@ func (s *TransactionTestSuite) TestSaveEvents() {
 }
 
 func (s *TransactionTestSuite) TestSaveEventsWithCopy() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1263,7 +1262,7 @@ func (s *TransactionTestSuite) TestSaveEventsWithCopy() {
 }
 
 func (s *TransactionTestSuite) TestGetProposerId() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1280,7 +1279,7 @@ func (s *TransactionTestSuite) TestGetProposerId() {
 const testLink = "test_link"
 
 func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1344,7 +1343,7 @@ func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 }
 
 func (s *TransactionTestSuite) TestRetentionBlockSignatures() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1362,7 +1361,7 @@ func (s *TransactionTestSuite) TestRetentionBlockSignatures() {
 }
 
 func (s *TransactionTestSuite) TestSaveRedelegations() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1392,7 +1391,7 @@ func (s *TransactionTestSuite) TestSaveRedelegations() {
 }
 
 func (s *TransactionTestSuite) TestSaveUndelegations() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1421,7 +1420,7 @@ func (s *TransactionTestSuite) TestSaveUndelegations() {
 }
 
 func (s *TransactionTestSuite) TestSaveDelegations() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1451,7 +1450,7 @@ func (s *TransactionTestSuite) TestSaveDelegations() {
 }
 
 func (s *TransactionTestSuite) TestRetentionCompletedUnbondings() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1468,7 +1467,7 @@ func (s *TransactionTestSuite) TestRetentionCompletedUnbondings() {
 }
 
 func (s *TransactionTestSuite) TestRetentionCompletedRedelegations() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1485,7 +1484,7 @@ func (s *TransactionTestSuite) TestRetentionCompletedRedelegations() {
 }
 
 func (s *TransactionTestSuite) TestJail() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1508,7 +1507,7 @@ func (s *TransactionTestSuite) TestJail() {
 }
 
 func (s *TransactionTestSuite) TestUpdateSlashedDelegations() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1536,7 +1535,7 @@ func (s *TransactionTestSuite) TestUpdateSlashedDelegations() {
 }
 
 func (s *TransactionTestSuite) TestSaveValidators() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1656,7 +1655,7 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 }
 
 func (s *TransactionTestSuite) TestValidators() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1678,7 +1677,7 @@ func (s *TransactionTestSuite) TestValidators() {
 }
 
 func (s *TransactionTestSuite) TestProposalVotes() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1694,7 +1693,7 @@ func (s *TransactionTestSuite) TestProposalVotes() {
 }
 
 func (s *TransactionTestSuite) TestAddressDelegations() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1710,7 +1709,7 @@ func (s *TransactionTestSuite) TestAddressDelegations() {
 }
 
 func (s *TransactionTestSuite) TestUpdateConstants() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1732,7 +1731,7 @@ func (s *TransactionTestSuite) TestUpdateConstants() {
 }
 
 func (s *TransactionTestSuite) TestProposal() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1750,7 +1749,7 @@ func (s *TransactionTestSuite) TestProposal() {
 }
 
 func (s *TransactionTestSuite) TestActiveProposal() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1769,7 +1768,7 @@ func (s *TransactionTestSuite) TestActiveProposal() {
 }
 
 func (s *TransactionTestSuite) TestIbcClients() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1802,7 +1801,7 @@ func (s *TransactionTestSuite) TestIbcClients() {
 }
 
 func (s *TransactionTestSuite) TestIbcConnections() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1837,7 +1836,7 @@ func (s *TransactionTestSuite) TestIbcConnections() {
 }
 
 func (s *TransactionTestSuite) TestIbcChannels() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1881,7 +1880,7 @@ func (s *TransactionTestSuite) TestIbcChannels() {
 }
 
 func (s *TransactionTestSuite) TestIbcTransfers() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1915,7 +1914,7 @@ func (s *TransactionTestSuite) TestIbcTransfers() {
 }
 
 func (s *TransactionTestSuite) TestIbcConnection() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1930,7 +1929,7 @@ func (s *TransactionTestSuite) TestIbcConnection() {
 }
 
 func (s *TransactionTestSuite) TestHyperlaneTransfers() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -1969,7 +1968,7 @@ func (s *TransactionTestSuite) TestHyperlaneTransfers() {
 }
 
 func (s *TransactionTestSuite) TestHyperlaneTokens() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2005,7 +2004,7 @@ func (s *TransactionTestSuite) TestHyperlaneTokens() {
 }
 
 func (s *TransactionTestSuite) TestHyperlaneMailbox() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2041,7 +2040,7 @@ func (s *TransactionTestSuite) TestHyperlaneMailbox() {
 }
 
 func (s *TransactionTestSuite) TestGetHyperlaneMailbox() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2056,7 +2055,7 @@ func (s *TransactionTestSuite) TestGetHyperlaneMailbox() {
 }
 
 func (s *TransactionTestSuite) TestGetHyperlaneToken() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2071,7 +2070,7 @@ func (s *TransactionTestSuite) TestGetHyperlaneToken() {
 }
 
 func (s *TransactionTestSuite) TestSaveSignals() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2122,7 +2121,7 @@ func (s *TransactionTestSuite) TestSaveSignals() {
 }
 
 func (s *TransactionTestSuite) TestSaveUpgrades() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2181,7 +2180,7 @@ func (s *TransactionTestSuite) TestSaveUpgrades() {
 }
 
 func (s *TransactionTestSuite) TestUpdateSignalsAfterUpgrade() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2206,7 +2205,7 @@ func (s *TransactionTestSuite) TestUpdateSignalsAfterUpgrade() {
 }
 
 func (s *TransactionTestSuite) TestRollbackUpgrade() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2226,7 +2225,7 @@ func (s *TransactionTestSuite) TestRollbackUpgrade() {
 }
 
 func (s *TransactionTestSuite) TestRollbackSignalVersions() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2246,7 +2245,7 @@ func (s *TransactionTestSuite) TestRollbackSignalVersions() {
 }
 
 func (s *TransactionTestSuite) TestMsgValidator() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2274,7 +2273,7 @@ func (s *TransactionTestSuite) TestMsgValidator() {
 }
 
 func (s *TransactionTestSuite) TestSaveHyperlaneIgps() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2303,7 +2302,7 @@ func (s *TransactionTestSuite) TestSaveHyperlaneIgps() {
 }
 
 func (s *TransactionTestSuite) TestHyperlaneIgp() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2319,7 +2318,7 @@ func (s *TransactionTestSuite) TestHyperlaneIgp() {
 }
 
 func (s *TransactionTestSuite) TestSaveIgpConfig() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2350,7 +2349,7 @@ func (s *TransactionTestSuite) TestSaveIgpConfig() {
 }
 
 func (s *TransactionTestSuite) TestHyperlaneIgpConfig() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
@@ -2369,7 +2368,7 @@ func (s *TransactionTestSuite) TestHyperlaneIgpConfig() {
 }
 
 func (s *TransactionTestSuite) TestSaveHyperlaneGasPayments() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)

@@ -15,7 +15,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestSignalVersionList() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, fltrs := range []storage.ListSignalsFilter{

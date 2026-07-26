@@ -17,7 +17,7 @@ import (
 // ---------------------------------------------------------------------------
 
 func (s *StorageTestSuite) TestZkISMList() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.ZkISM.List(ctx, storage.ZkISMFilter{
@@ -47,7 +47,7 @@ func (s *StorageTestSuite) TestZkISMList() {
 }
 
 func (s *StorageTestSuite) TestZkISMListByCreator() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	creatorId := uint64(1)
@@ -67,7 +67,7 @@ func (s *StorageTestSuite) TestZkISMListByCreator() {
 }
 
 func (s *StorageTestSuite) TestZkISMListByTx() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txId := uint64(2)
@@ -89,7 +89,7 @@ func (s *StorageTestSuite) TestZkISMListByTx() {
 }
 
 func (s *StorageTestSuite) TestZkISMListOffset() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.ZkISM.List(ctx, storage.ZkISMFilter{
@@ -104,7 +104,7 @@ func (s *StorageTestSuite) TestZkISMListOffset() {
 }
 
 func (s *StorageTestSuite) TestZkISMListAsc() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.ZkISM.List(ctx, storage.ZkISMFilter{
@@ -124,7 +124,7 @@ func (s *StorageTestSuite) TestZkISMListAsc() {
 // ---------------------------------------------------------------------------
 
 func (s *StorageTestSuite) TestZkISMById() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	ism, err := s.storage.ZkISM.ById(ctx, 1)
@@ -149,7 +149,7 @@ func (s *StorageTestSuite) TestZkISMById() {
 }
 
 func (s *StorageTestSuite) TestZkISMByIdNotFound() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.ZkISM.ById(ctx, 999)
@@ -161,7 +161,7 @@ func (s *StorageTestSuite) TestZkISMByIdNotFound() {
 // ---------------------------------------------------------------------------
 
 func (s *StorageTestSuite) TestZkISMUpdates() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.ZkISM.Updates(ctx, 1, storage.ZkISMUpdatesFilter{
@@ -187,7 +187,7 @@ func (s *StorageTestSuite) TestZkISMUpdates() {
 }
 
 func (s *StorageTestSuite) TestZkISMUpdatesBySigner() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	signerId := uint64(1)
@@ -207,7 +207,7 @@ func (s *StorageTestSuite) TestZkISMUpdatesBySigner() {
 }
 
 func (s *StorageTestSuite) TestZkISMUpdatesByTx() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txId := uint64(2)
@@ -228,7 +228,7 @@ func (s *StorageTestSuite) TestZkISMUpdatesByTx() {
 }
 
 func (s *StorageTestSuite) TestZkISMUpdatesFrom() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	// Row 1 is at 04:11:57, Row 2 is at 05:12:57.
@@ -244,7 +244,7 @@ func (s *StorageTestSuite) TestZkISMUpdatesFrom() {
 }
 
 func (s *StorageTestSuite) TestZkISMUpdatesTo() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	// To 05:00:00 should include only Row 1 (04:11:57 < 05:00:00).
@@ -259,7 +259,7 @@ func (s *StorageTestSuite) TestZkISMUpdatesTo() {
 }
 
 func (s *StorageTestSuite) TestZkISMUpdatesUnknownISM() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.ZkISM.Updates(ctx, 999, storage.ZkISMUpdatesFilter{
@@ -274,7 +274,7 @@ func (s *StorageTestSuite) TestZkISMUpdatesUnknownISM() {
 // ---------------------------------------------------------------------------
 
 func (s *StorageTestSuite) TestZkISMMessages() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.ZkISM.Messages(ctx, 1, storage.ZkISMUpdatesFilter{
@@ -301,7 +301,7 @@ func (s *StorageTestSuite) TestZkISMMessages() {
 }
 
 func (s *StorageTestSuite) TestZkISMMessagesBySigner() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	signerId := uint64(1)
@@ -321,7 +321,7 @@ func (s *StorageTestSuite) TestZkISMMessagesBySigner() {
 }
 
 func (s *StorageTestSuite) TestZkISMMessagesByTx() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txId := uint64(1)
@@ -342,7 +342,7 @@ func (s *StorageTestSuite) TestZkISMMessagesByTx() {
 }
 
 func (s *StorageTestSuite) TestZkISMMessagesFrom() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	from := time.Date(2023, 7, 4, 5, 0, 0, 0, time.UTC)
@@ -356,7 +356,7 @@ func (s *StorageTestSuite) TestZkISMMessagesFrom() {
 }
 
 func (s *StorageTestSuite) TestZkISMMessagesUnknownISM() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.ZkISM.Messages(ctx, 999, storage.ZkISMUpdatesFilter{

@@ -26,7 +26,7 @@ type StatsTestSuite struct {
 
 // SetupSuite -
 func (s *StatsTestSuite) SetupSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 180*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 180*time.Second)
 	defer ctxCancel()
 
 	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, testhelpers.PostgreSQLContainerConfig{
@@ -38,6 +38,11 @@ func (s *StatsTestSuite) SetupSuite() {
 	})
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
+	s.T().Cleanup(func() {
+		ctx, ctxCancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer ctxCancel()
+		s.Require().NoError(s.psqlContainer.Terminate(ctx))
+	})
 
 	strg, err := Create(ctx, config.Database{
 		Kind:     config.DBKindPostgres,
@@ -49,6 +54,9 @@ func (s *StatsTestSuite) SetupSuite() {
 	}, "../../../database", false)
 	s.Require().NoError(err)
 	s.storage = strg
+	s.T().Cleanup(func() {
+		s.Require().NoError(s.storage.Close())
+	})
 
 	db, err := sql.Open("pgx", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
@@ -62,15 +70,6 @@ func (s *StatsTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.Require().NoError(fixtures.Load())
 	s.Require().NoError(db.Close())
-}
-
-// TearDownSuite -
-func (s *StatsTestSuite) TearDownSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer ctxCancel()
-
-	s.Require().NoError(s.storage.Close())
-	s.Require().NoError(s.psqlContainer.Terminate(ctx))
 }
 
 func (s *StatsTestSuite) TestCount() {
@@ -96,7 +95,7 @@ func (s *StatsTestSuite) TestCount() {
 	}
 
 	for i := range tests {
-		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 
 		count, err := s.storage.Stats.Count(ctx, storage.CountRequest{
 			Table: tests[i].table,
@@ -127,7 +126,7 @@ func (s *StatsTestSuite) TestCountNoData() {
 	}
 
 	for i := range tests {
-		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 
 		count, err := s.storage.Stats.Count(ctx, storage.CountRequest{
 			Table: tests[i].table,
@@ -196,7 +195,7 @@ func (s *StatsTestSuite) TestSummaryBlock() {
 	}
 
 	for i := range tests {
-		ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 
 		summary, err := s.storage.Stats.Summary(ctx, storage.SummaryRequest{
 			CountRequest: storage.CountRequest{
@@ -216,7 +215,7 @@ func (s *StatsTestSuite) TestSummaryBlock() {
 }
 
 func (s *StatsTestSuite) TestTPS() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tps, err := s.storage.Stats.TPS(ctx)
@@ -229,7 +228,7 @@ func (s *StatsTestSuite) TestTPS() {
 }
 
 func (s *StatsTestSuite) TestSeries() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.Stats.Series(ctx, storage.TimeframeHour, storage.SeriesBlobsSize, storage.SeriesRequest{})
@@ -238,7 +237,7 @@ func (s *StatsTestSuite) TestSeries() {
 }
 
 func (s *StatsTestSuite) TestSeriesWithFrom() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.Stats.Series(ctx, storage.TimeframeDay, storage.SeriesBlobsSize, storage.SeriesRequest{
@@ -249,7 +248,7 @@ func (s *StatsTestSuite) TestSeriesWithFrom() {
 }
 
 func (s *StatsTestSuite) TestCumulativeSeries() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.Stats.CumulativeSeries(ctx, storage.TimeframeDay, storage.SeriesBlobsSize, storage.SeriesRequest{})
@@ -258,7 +257,7 @@ func (s *StatsTestSuite) TestCumulativeSeries() {
 }
 
 func (s *StatsTestSuite) TestCumulativeSeriesWithFrom() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.Stats.CumulativeSeries(ctx, storage.TimeframeDay, storage.SeriesBlobsSize, storage.SeriesRequest{
@@ -269,7 +268,7 @@ func (s *StatsTestSuite) TestCumulativeSeriesWithFrom() {
 }
 
 func (s *StatsTestSuite) TestNamespaceSeries() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.Stats.NamespaceSeries(ctx, storage.TimeframeHour, storage.SeriesNsSize, 1, storage.SeriesRequest{})
@@ -278,7 +277,7 @@ func (s *StatsTestSuite) TestNamespaceSeries() {
 }
 
 func (s *StatsTestSuite) TestSquareSize() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	from := time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC)
@@ -288,7 +287,7 @@ func (s *StatsTestSuite) TestSquareSize() {
 }
 
 func (s *StatsTestSuite) TestRollupStats24h() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	stats, err := s.storage.Stats.RollupStats24h(ctx)
@@ -297,7 +296,7 @@ func (s *StatsTestSuite) TestRollupStats24h() {
 }
 
 func (s *StatsTestSuite) TestMessagesCount24h() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.Stats.MessagesCount24h(ctx)
@@ -306,7 +305,7 @@ func (s *StatsTestSuite) TestMessagesCount24h() {
 }
 
 func (s *StatsTestSuite) TestChange24hBlockStats() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	stats, err := s.storage.Stats.Change24hBlockStats(ctx)
@@ -318,7 +317,7 @@ func (s *StatsTestSuite) TestChange24hBlockStats() {
 }
 
 func (s *StatsTestSuite) TestSizeGroups() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tf := time.Now().UTC().AddDate(-25, 0, 0)
@@ -349,7 +348,7 @@ func (s *StatsTestSuite) TestStakingSeries() {
 			storage.SeriesFlow,
 			storage.SeriesCumulativeFlow,
 		} {
-			ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+			ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 			defer ctxCancel()
 
 			items, err := s.storage.Stats.StakingSeries(ctx, tf, series, 1, storage.NewSeriesRequest(0, 0))
@@ -360,7 +359,7 @@ func (s *StatsTestSuite) TestStakingSeries() {
 }
 
 func (s *StatsTestSuite) TestStakingDistribution() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	items, err := s.storage.Stats.StakingDistribution(ctx, storage.NewSeriesRequest(0, 0))

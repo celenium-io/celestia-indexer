@@ -14,7 +14,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestIbcTransferList() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, fltrs := range []storage.ListIbcTransferFilters{
@@ -80,7 +80,7 @@ func (s *StorageTestSuite) TestIbcTransferList() {
 }
 
 func (s *StorageTestSuite) TestIbcTransferSeries() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	type args struct {
@@ -151,7 +151,7 @@ func (s *StorageTestSuite) TestIbcTransferSeries() {
 }
 
 func (s *StorageTestSuite) TestIbcLargestTransfer24h() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	transfer, err := s.storage.IbcTransfers.LargestTransfer24h(ctx)
@@ -170,7 +170,7 @@ func (s *StorageTestSuite) TestIbcLargestTransfer24h() {
 }
 
 func (s *StorageTestSuite) TestIbcTransferById() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	transfer, err := s.storage.IbcTransfers.ById(ctx, 3)
@@ -190,7 +190,7 @@ func (s *StorageTestSuite) TestIbcTransferById() {
 }
 
 func (s *StorageTestSuite) TestIbcTransferByIdNotFound() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.IbcTransfers.ById(ctx, 100000)

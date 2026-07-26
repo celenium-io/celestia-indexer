@@ -13,7 +13,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestIbcConnectionById() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	conn, err := s.storage.IbcConnections.ById(ctx, "connection-1")
@@ -45,7 +45,7 @@ func (s *StorageTestSuite) TestIbcConnectionById() {
 }
 
 func (s *StorageTestSuite) TestIbcConnectionIdsByClients() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	conn, err := s.storage.IbcConnections.IdsByClients(ctx, "client-1")
@@ -55,7 +55,7 @@ func (s *StorageTestSuite) TestIbcConnectionIdsByClients() {
 }
 
 func (s *StorageTestSuite) TestIbcConnectionList() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, fltrs := range []storage.ListConnectionFilters{

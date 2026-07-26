@@ -9,7 +9,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestApiKeyValid() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	key, err := s.storage.ApiKeys.Get(ctx, "test_key")
@@ -19,7 +19,7 @@ func (s *StorageTestSuite) TestApiKeyValid() {
 }
 
 func (s *StorageTestSuite) TestApiKeyInvalid() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.ApiKeys.Get(ctx, "invalid")

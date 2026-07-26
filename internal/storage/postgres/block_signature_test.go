@@ -11,7 +11,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestBlockSignatureLevels() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	levels, err := s.storage.BlockSignatures.LevelsByValidator(ctx, 1, 998)

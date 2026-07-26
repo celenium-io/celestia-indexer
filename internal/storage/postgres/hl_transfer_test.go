@@ -14,7 +14,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestHyperlaneTransferList() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	for _, fltrs := range []storage.ListHyperlaneTransferFilters{
@@ -107,7 +107,7 @@ func (s *StorageTestSuite) TestHyperlaneTransferList() {
 }
 
 func (s *StorageTestSuite) TestHyperlaneTransferById() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	transfer, err := s.storage.HLTransfer.ById(ctx, 1)
@@ -128,7 +128,7 @@ func (s *StorageTestSuite) TestHyperlaneTransferById() {
 }
 
 func (s *StorageTestSuite) TestHyperlaneTransferByIdNotFound() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.HLTransfer.ById(ctx, 100000)
@@ -136,7 +136,7 @@ func (s *StorageTestSuite) TestHyperlaneTransferByIdNotFound() {
 }
 
 func (s *StorageTestSuite) TestHlTransferSeries() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	type args struct {
@@ -207,7 +207,7 @@ func (s *StorageTestSuite) TestHlTransferSeries() {
 }
 
 func (s *StorageTestSuite) TestStatsByDomain() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	stats, err := s.storage.HLTransfer.StatsByDomain(ctx, 10, 0)
@@ -220,7 +220,7 @@ func (s *StorageTestSuite) TestStatsByDomain() {
 }
 
 func (s *StorageTestSuite) TestHlTotalSeries() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	type args struct {

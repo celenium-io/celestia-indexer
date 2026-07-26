@@ -12,7 +12,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestValidatorByAddress() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	validator, err := s.storage.Validator.ByAddress(ctx, "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw")
@@ -29,7 +29,7 @@ func (s *StorageTestSuite) TestValidatorByAddress() {
 }
 
 func (s *StorageTestSuite) TestTotalPower() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	power, err := s.storage.Validator.TotalVotingPower(ctx, 100)
@@ -38,7 +38,7 @@ func (s *StorageTestSuite) TestTotalPower() {
 }
 
 func (s *StorageTestSuite) TestListByPower() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	validators, err := s.storage.Validator.ListByPower(ctx, storage.ValidatorFilters{
@@ -49,7 +49,7 @@ func (s *StorageTestSuite) TestListByPower() {
 }
 
 func (s *StorageTestSuite) TestListByPowerWithVersion() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	validators, err := s.storage.Validator.ListByPower(ctx, storage.ValidatorFilters{
@@ -63,7 +63,7 @@ func (s *StorageTestSuite) TestListByPowerWithVersion() {
 }
 
 func (s *StorageTestSuite) TestJailedCount() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	count, err := s.storage.Validator.JailedCount(ctx)
@@ -72,7 +72,7 @@ func (s *StorageTestSuite) TestJailedCount() {
 }
 
 func (s *StorageTestSuite) TestMessages() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	msgs, err := s.storage.Validator.Messages(ctx, 1, storage.ValidatorMessagesFilters{})
@@ -82,7 +82,7 @@ func (s *StorageTestSuite) TestMessages() {
 }
 
 func (s *StorageTestSuite) TestMetrics() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW validator_metrics;")
@@ -99,7 +99,7 @@ func (s *StorageTestSuite) TestMetrics() {
 }
 
 func (s *StorageTestSuite) TestTopNMetrics() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	_, err := s.storage.Connection().Exec(ctx, "REFRESH MATERIALIZED VIEW validator_metrics;")
