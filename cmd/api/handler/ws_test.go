@@ -123,7 +123,7 @@ func TestWebsocket(t *testing.T) {
 	defer server.Close()
 
 	wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/ws"
-	dialed, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	dialed, _, err := websocket.DefaultDialer.Dial(wsURL, nil) //nolint:bodyclose
 	require.NoError(t, err, "dial")
 
 	body, err := json.Marshal(ws.Subscribe{

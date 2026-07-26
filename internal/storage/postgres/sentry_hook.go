@@ -6,6 +6,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -69,8 +70,10 @@ func (h *SentryHook) AfterQuery(ctx context.Context, event *bun.QueryEvent) {
 		}
 	}
 
-	switch event.Err {
-	case nil, sql.ErrNoRows, sql.ErrTxDone:
+	switch {
+	case event.Err == nil,
+		errors.Is(event.Err, sql.ErrNoRows),
+		errors.Is(event.Err, sql.ErrTxDone):
 		// ignore
 	default:
 		span.SetTag("exception.message", event.Err.Error())

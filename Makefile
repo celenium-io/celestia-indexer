@@ -29,7 +29,7 @@ compose:
 	docker-compose up -d --build
 
 lint:
-	golangci-lint run
+	golangci-lint run --max-issues-per-linter=0
 
 test:
 	go test -p 8 -timeout 120s ./...

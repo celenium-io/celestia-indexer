@@ -33,7 +33,11 @@ type Node struct {
 }
 
 func New(baseUrl string) *Node {
-	t := http.DefaultTransport.(*http.Transport).Clone()
+	httpTransport, ok := http.DefaultTransport.(*http.Transport)
+	if !ok {
+		panic("invalid default transport type")
+	}
+	t := httpTransport.Clone()
 	t.MaxIdleConns = 10
 	t.MaxConnsPerHost = 10
 	t.MaxIdleConnsPerHost = 10
@@ -105,7 +109,7 @@ func (node *Node) post(ctx context.Context, method string, params []any, output 
 
 	start := time.Now()
 
-	response, err := node.client.Do(request) //nolint:gosec
+	response, err := node.client.Do(request) //nolint:gosec,bodyclose
 	if err != nil {
 		return err
 	}

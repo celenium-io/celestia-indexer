@@ -225,8 +225,9 @@ func isExpectedDisconnect(err error) bool {
 	if err == nil {
 		return false
 	}
-	timeoutErr, ok := err.(net.Error)
-	return err == io.EOF ||
+	var timeoutErr net.Error
+	ok := errors.As(err, &timeoutErr)
+	return errors.Is(err, io.EOF) ||
 		errors.Is(err, websocket.ErrCloseSent) ||
 		(ok && timeoutErr.Timeout()) ||
 		websocket.IsCloseError(err,
