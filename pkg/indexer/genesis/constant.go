@@ -117,15 +117,16 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 	})
 
 	// gov
-	if len(appState.Gov.DepositParams.MinDeposit) > 0 {
+	govDepositParams := appState.Gov.GetDepositParams()
+	if len(govDepositParams.MinDeposit) > 0 {
 		data.constants = append(data.constants, storage.Constant{
 			Module: storageTypes.ModuleNameGov,
 			Name:   "min_deposit",
-			Value:  appState.Gov.DepositParams.MinDeposit[0].String(),
+			Value:  govDepositParams.MinDeposit[0].String(),
 		})
 	}
 
-	maxDepositPeriod, err := time.ParseDuration(appState.Gov.DepositParams.MaxDepositPeriod)
+	maxDepositPeriod, err := time.ParseDuration(govDepositParams.MaxDepositPeriod)
 	if err != nil {
 		return errors.Wrap(err, "max deposit period")
 	}
@@ -136,7 +137,7 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 		Value:  strconv.FormatInt(maxDepositPeriod.Nanoseconds(), 10),
 	})
 
-	votingPower, err := time.ParseDuration(appState.Gov.VotingParams.VotingPeriod)
+	votingPeriod, err := time.ParseDuration(appState.Gov.GetVotingParams().VotingPeriod)
 	if err != nil {
 		return errors.Wrap(err, "voting power")
 	}
@@ -144,22 +145,24 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameGov,
 		Name:   "voting_period",
-		Value:  strconv.FormatInt(votingPower.Nanoseconds(), 10),
+		Value:  strconv.FormatInt(votingPeriod.Nanoseconds(), 10),
 	})
+
+	tallyParams := appState.Gov.GetTallyParams()
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameGov,
 		Name:   "quorum",
-		Value:  appState.Gov.TallyParams.Quorum,
+		Value:  tallyParams.Quorum,
 	})
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameGov,
 		Name:   "threshold",
-		Value:  appState.Gov.TallyParams.Threshold,
+		Value:  tallyParams.Threshold,
 	})
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameGov,
 		Name:   "veto_threshold",
-		Value:  appState.Gov.TallyParams.VetoThreshold,
+		Value:  tallyParams.VetoThreshold,
 	})
 
 	// slashing

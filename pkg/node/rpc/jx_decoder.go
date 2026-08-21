@@ -347,6 +347,9 @@ func jxResultBlockResults(d *jxpkg.Decoder) (pkgTypes.ResultBlockResults, error)
 				return nil
 			})
 		case "finalize_block_events":
+			if d.Next() == jxpkg.Null {
+				return d.Null()
+			}
 			return d.Arr(func(d *jxpkg.Decoder) error {
 				ev, err := jxEvent(d)
 				if err != nil {
