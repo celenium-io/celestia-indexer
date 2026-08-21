@@ -53,8 +53,8 @@ type estimatePfbGas struct {
 //	@Description	Returns the estimated gas required to submit a MsgPayForBlobs transaction for the given blob sizes and share versions, using current on-chain gas parameters.
 //	@Tags			gas
 //	@ID				gas-estimate-for-pfb
-//	@Param			sizes	  query	string	true	"Comma-separated array of blob sizes"
-//	 @Param         versions  query string  false   "Comma-separated array of share versions. Default is 0"
+//	@Param			sizes	  query	string	true	"Comma-separated array of blob sizes"	example(100,200)
+//	 @Param         versions  query string  false   "Comma-separated array of share versions. Default is 0"	example(1,2)
 //	@Produce		json
 //	@Success		200	{object}	uint64
 //	@Failure		400	{object}	Error
@@ -143,7 +143,7 @@ type estimatePricePriorityRequest struct {
 //	@Description	Returns a single estimated gas price string for the selected priority level (slow, median, or fast) based on recent transaction history.
 //	@Tags			gas
 //	@ID				gas-price-priority
-//	@Param			priority	path	string	true	"Priority"	Enums(slow, median, fast)
+//	@Param			priority	path	string	true	"Priority"	Enums(slow, median, fast)	example(median)
 //	@Produce		json
 //	@Success		200	{string} string
 //	@Router			/gas/price/{priority} [get]

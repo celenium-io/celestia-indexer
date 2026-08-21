@@ -81,11 +81,11 @@ func (req *listZkISMRequest) toFilter(ctx context.Context, address storage.IAddr
 //	@Description	chains. Results can be filtered by transaction hash or creator address.
 //	@Tags			hyperlane
 //	@ID				list-zkism
-//	@Param			limit	 query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)
-//	@Param			offset	 query	integer	false	"Offset for pagination"						minimum(0)
-//	@Param			sort	 query	string	false	"Sort order. Default: desc"					Enums(asc, desc)
-//	@Param			tx_hash	 query	string	false	"Filter by transaction hash (hex)"			minlength(64)	maxlength(64)
-//	@Param			address	 query	string	false	"Filter by creator Celestia address"		minlength(47)	maxlength(47)
+//	@Param			limit	 query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)	example(10)
+//	@Param			offset	 query	integer	false	"Offset for pagination"						minimum(0)	example(10)
+//	@Param			sort	 query	string	false	"Sort order. Default: desc"					Enums(asc, desc)	example(asc)
+//	@Param			tx_hash	 query	string	false	"Filter by transaction hash (hex)"			minlength(64)	maxlength(64)	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
+//	@Param			address	 query	string	false	"Filter by creator Celestia address"		minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Produce		json
 //	@Success		200	{array}		responses.ZkISM
 //	@Success		204
@@ -127,7 +127,7 @@ type getZkISMRequest struct {
 //	@Description	used for ZK proof verification.
 //	@Tags			hyperlane
 //	@ID				get-zkism
-//	@Param			id	path	integer	true	"Internal ZK ISM identity"	minimum(1)
+//	@Param			id	path	integer	true	"Internal ZK ISM identity"	minimum(1)	example(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.ZkISM
 //	@Success		204
@@ -210,14 +210,14 @@ func (req *listZkISMHistoryRequest) toFilter(ctx context.Context, address storag
 //	@Description	transaction hash, or time range.
 //	@Tags			hyperlane
 //	@ID				get-zkism-updates
-//	@Param			id		 path	integer	true	"Internal ZK ISM identity"					minimum(1)
-//	@Param			limit	 query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)
-//	@Param			offset	 query	integer	false	"Offset for pagination"						minimum(0)
-//	@Param			sort	 query	string	false	"Sort order. Default: desc"					Enums(asc, desc)
-//	@Param			tx_hash	 query	string	false	"Filter by transaction hash (hex)"			minlength(64)	maxlength(64)
-//	@Param			address	 query	string	false	"Filter by signer Celestia address"			minlength(47)	maxlength(47)
-//	@Param			from	 query	integer	false	"Filter by start time (Unix timestamp)"		minimum(1)
-//	@Param			to		 query	integer	false	"Filter by end time (Unix timestamp)"		minimum(1)
+//	@Param			id		 path	integer	true	"Internal ZK ISM identity"					minimum(1)	example(1)
+//	@Param			limit	 query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)	example(10)
+//	@Param			offset	 query	integer	false	"Offset for pagination"						minimum(0)	example(10)
+//	@Param			sort	 query	string	false	"Sort order. Default: desc"					Enums(asc, desc)	example(asc)
+//	@Param			tx_hash	 query	string	false	"Filter by transaction hash (hex)"			minlength(64)	maxlength(64)	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
+//	@Param			address	 query	string	false	"Filter by signer Celestia address"			minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			from	 query	integer	false	"Filter by start time (Unix timestamp)"		minimum(1)	example(1690000000)
+//	@Param			to		 query	integer	false	"Filter by end time (Unix timestamp)"		minimum(1)	example(1720000000)
 //	@Produce		json
 //	@Success		200	{array}		responses.ZkISMUpdate
 //	@Success		204
@@ -256,14 +256,14 @@ func (h *ZkISMHandler) GetUpdates(c echo.Context) error {
 //	@Description	filtered by signer address, transaction hash, or time range.
 //	@Tags			hyperlane
 //	@ID				get-zkism-messages
-//	@Param			id		 path	integer	true	"Internal ZK ISM identity"					minimum(1)
-//	@Param			limit	 query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)
-//	@Param			offset	 query	integer	false	"Offset for pagination"						minimum(0)
-//	@Param			sort	 query	string	false	"Sort order. Default: desc"					Enums(asc, desc)
-//	@Param			tx_hash	 query	string	false	"Filter by transaction hash (hex)"			minlength(64)	maxlength(64)
-//	@Param			address	 query	string	false	"Filter by signer Celestia address"			minlength(47)	maxlength(47)
-//	@Param			from	 query	integer	false	"Filter by start time (Unix timestamp)"		minimum(1)
-//	@Param			to		 query	integer	false	"Filter by end time (Unix timestamp)"		minimum(1)
+//	@Param			id		 path	integer	true	"Internal ZK ISM identity"					minimum(1)	example(1)
+//	@Param			limit	 query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)	example(10)
+//	@Param			offset	 query	integer	false	"Offset for pagination"						minimum(0)	example(10)
+//	@Param			sort	 query	string	false	"Sort order. Default: desc"					Enums(asc, desc)	example(asc)
+//	@Param			tx_hash	 query	string	false	"Filter by transaction hash (hex)"			minlength(64)	maxlength(64)	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
+//	@Param			address	 query	string	false	"Filter by signer Celestia address"			minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			from	 query	integer	false	"Filter by start time (Unix timestamp)"		minimum(1)	example(1690000000)
+//	@Param			to		 query	integer	false	"Filter by end time (Unix timestamp)"		minimum(1)	example(1720000000)
 //	@Produce		json
 //	@Success		200	{array}		responses.ZkISMMessage
 //	@Success		204

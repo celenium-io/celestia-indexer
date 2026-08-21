@@ -79,12 +79,12 @@ func (req *listProposalsRequest) toFilters(proposerId uint64) storage.ListPropos
 //		@Description	Returns a paginated list of governance proposals. Supports filtering by proposer address, status, and type.
 //		@Tags			proposal
 //		@ID				list-proposal
-//		@Param			limit	    query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
-//		@Param			offset	    query	integer	false	"Offset"										minimum(1)
-//		@Param			sort	    query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	    @Param			proposer	query	string	false	"Proposer celestia address"	                    minlength(47)	maxlength(47)
-//		@Param          status      query   string  false   "Comma-separated proposal status list"
-//		@Param          type        query   string  false   "Comma-separated proposal type list"
+//		@Param			limit	    query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
+//		@Param			offset	    query	integer	false	"Offset"										minimum(1)	example(10)
+//		@Param			sort	    query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
+//	    @Param			proposer	query	string	false	"Proposer celestia address"	                    minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//		@Param          status      query   string  false   "Comma-separated proposal status list"	example(active)
+//		@Param          type        query   string  false   "Comma-separated proposal type list"	example(param_changed)
 //		@Produce		json
 //		@Success		200	{array}		responses.Proposal
 //		@Failure		400	{object}	Error
@@ -131,7 +131,7 @@ func (handler *ProposalsHandler) List(c echo.Context) error {
 //	@Description	Returns detailed information about a single governance proposal by its internal ID, including proposer, status, votes summary, and deposit information.
 //	@Tags			proposal
 //	@ID				get-proposal
-//	@Param			id	path	integer	true	"Internal identity"	minimum(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.Proposal
 //	@Success		204
@@ -174,14 +174,14 @@ func (p *listVotesRequest) SetDefault() {
 //	@Description	Returns a paginated list of governance votes for the given proposal. Can be filtered by vote option (yes/no/no_with_veto/abstain), voter type (address or validator), and specific voter address.
 //	@Tags			proposal
 //	@ID				proposal-votes
-//	@Param			id	path	integer	true	"Internal identity"	minimum(1)
-//	@Param			limit	    query	integer	false	"Count of requested entities"		minimum(1)	maximum(100)
-//	@Param			offset	    query	integer	false	"Offset"							minimum(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)
+//	@Param			limit	    query	integer	false	"Count of requested entities"		minimum(1)	maximum(100)	example(10)
+//	@Param			offset	    query	integer	false	"Offset"							minimum(1)	example(10)
 //
-// @Param			option	    query	string	false	"Option"		Enums(yes, no, no_with_veto, abstain)
-// @Param			voter	    query	string	false	"Voter type"	Enums(address, validator)
-// @Param			address		query	string	false	"Voter address"		minlength(47)	maxlength(47)
-// @Param			validator	query	string	false	"Voter address"	    minlength(54)	maxlength(54)
+// @Param			option	    query	string	false	"Option"		Enums(yes, no, no_with_veto, abstain)	example(yes)
+// @Param			voter	    query	string	false	"Voter type"	Enums(address, validator)	example(address)
+// @Param			address		query	string	false	"Voter address"		minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+// @Param			validator	query	string	false	"Voter address"	    minlength(54)	maxlength(54)	example(celestiavaloper1qycj0ymu9fqvwgyw4xz93p3n4a83jjk7sm2wzh)
 //
 //	@Produce		json
 //	@Success		200	{array}		responses.Vote

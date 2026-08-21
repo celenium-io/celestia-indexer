@@ -68,7 +68,7 @@ type getNamespaceRequest struct {
 //	@Description	Returns all versions of the namespace identified by the given 28-byte hex namespace id. Each namespace version is returned as a separate entry.
 //	@Tags			namespace
 //	@ID				get-namespace
-//	@Param			id	path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
+//	@Param			id	path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)	example(4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02)
 //	@Produce		json
 //	@Success		200	{array}		responses.Namespace
 //	@Failure		400	{object}	Error
@@ -108,7 +108,7 @@ type getNamespaceByHashRequest struct {
 //	@Description	Returns namespace details for the given base64-encoded namespace identity (version byte + namespace id). Returns 204 if the namespace is not found.
 //	@Tags			namespace
 //	@ID				get-namespace-base64
-//	@Param			hash	path	string	true	"Base64-encoded namespace id and version"
+//	@Param			hash	path	string	true	"Base64-encoded namespace id and version"	example(AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0=)
 //	@Produce		json
 //	@Success		200	{object}	responses.Namespace
 //	@Success		204
@@ -147,8 +147,8 @@ type getNamespaceWithVersionRequest struct {
 //	@Description	Returns namespace details for the specific combination of namespace id (28 hex bytes) and version byte. Returns 204 if the namespace is not found.
 //	@Tags			namespace
 //	@ID				get-namespace-by-version-and-id
-//	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
-//	@Param			version	path	integer	true	"Version of namespace"
+//	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)	example(4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02)
+//	@Param			version	path	integer	true	"Version of namespace"	example(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.Namespace
 //	@Success		204
@@ -196,10 +196,10 @@ func (p *namespaceList) SetDefault() {
 //	@Description	Returns a paginated list of namespaces. Supports sorting by creation time, PayForBlobs count, or total blob size.
 //	@Tags			namespace
 //	@ID				list-namespace
-//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"										minimum(1)
-//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, pfb_count, size)
+//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, pfb_count, size)	example(time)
 //	@Produce		json
 //	@Success		200	{array}		responses.Namespace
 //	@Failure		400	{object}	Error
@@ -234,8 +234,8 @@ type getBlobsRequest struct {
 //	@Description	Returns all blobs submitted to the given namespace (identified by base64-encoded hash) at the specified block height, fetched directly from the DA node.
 //	@Tags			namespace
 //	@ID				get-namespace-blobs
-//	@Param			hash	path	string	true	"Base64-encoded namespace id and version"
-//	@Param			height	path	integer	true	"Block height"	minimum(1)
+//	@Param			hash	path	string	true	"Base64-encoded namespace id and version"	example(AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0=)
+//	@Param			height	path	integer	true	"Block height"	minimum(1)	example(123)
 //	@Produce		json
 //	@Success		200	{array}		responses.Blob
 //	@Failure		400	{object}	Error
@@ -273,10 +273,10 @@ func (req *listByNamespace) SetDefault() {
 //	@Description	Returns a paginated list of Cosmos SDK messages (e.g. MsgPayForBlobs) that referenced this namespace, identified by version byte and namespace id.
 //	@Tags			namespace
 //	@ID				get-namespace-messages
-//	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
-//	@Param			version	path	integer	true	"Version of namespace"
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)	example(4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02)
+//	@Param			version	path	integer	true	"Version of namespace"	example(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}	responses.NamespaceMessage
 //	@Success		204
@@ -396,16 +396,16 @@ func (req listBlobsRequest) toDbRequest(ctx context.Context, ns storage.INamespa
 //	@Description	Returns a paginated list of blob log entries across all namespaces. Supports filtering by commitment, time range, signer addresses, and namespace identifiers. Cursor-based pagination is available via the cursor parameter.
 //	@Tags			namespace
 //	@ID				get-blobs
-//	@Param			limit		query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"										minimum(1)
-//	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			sort_by		query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
-//	@Param			commitment	query	string	false	"Commitment value in URLbase64 format"
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
-//	@Param			signers		query	string	false	"Comma-separated celestia addresses"
-//	@Param			namespaces	query	string	false	"Comma-separated celestia namespaces"
-//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	minimum(1)
+//	@Param			limit		query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
+//	@Param			offset		query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
+//	@Param			sort_by		query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
+//	@Param			commitment	query	string	false	"Commitment value in URLbase64 format"	example(vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg=)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			signers		query	string	false	"Comma-separated celestia addresses"	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			namespaces	query	string	false	"Comma-separated celestia namespaces"	example(AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0=)
+//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	minimum(1)	example(100)
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{array}		responses.LightBlobLog
@@ -563,18 +563,18 @@ func (req *getBlobLogsForNamespace) SetDefault() {
 //	@Description	Returns a paginated list of blob log entries for the specified namespace version. Supports filtering by commitment, time range, signer addresses, and cursor-based pagination.
 //	@Tags			namespace
 //	@ID				get-blob-logs
-//	@Param			id			path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
-//	@Param			version		path	integer	true	"Version of namespace"
-//	@Param			limit		query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"										minimum(1)
-//	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			sort_by		query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
-//	@Param			commitment	query	string	false	"Commitment value in URLbase64 format"
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
-//	@Param			joins		query	boolean	false	"Flag indicating whether entities of rollup, transaction and signer should be attached or not. Default: true"
-//	@Param			signers		query	string	false	"Comma-separated celestia addresses"
-//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	minimum(1)
+//	@Param			id			path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)	example(4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02)
+//	@Param			version		path	integer	true	"Version of namespace"	example(1)
+//	@Param			limit		query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
+//	@Param			offset		query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
+//	@Param			sort_by		query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
+//	@Param			commitment	query	string	false	"Commitment value in URLbase64 format"	example(vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg=)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			joins		query	boolean	false	"Flag indicating whether entities of rollup, transaction and signer should be attached or not. Default: true"	example(true)
+//	@Param			signers		query	string	false	"Comma-separated celestia addresses"	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	minimum(1)	example(100)
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
@@ -660,10 +660,10 @@ func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 //	@Description	Returns a paginated list of rollups that have submitted blobs to the given namespace (identified by hex id and version).
 //	@Tags			namespace
 //	@ID				get-namespace-rollups
-//	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)
-//	@Param			version	path	integer	true	"Version of namespace"
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)	example(4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02)
+//	@Param			version	path	integer	true	"Version of namespace"	example(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Rollup
 //	@Failure		400	{object}	Error

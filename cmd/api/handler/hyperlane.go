@@ -57,7 +57,7 @@ type getHyperlaneMailboxRequest struct {
 //	@Description	Returns detailed information about a Hyperlane mailbox identified by its hexadecimal identity, including its domain, owner, and linked token/ISM counts.
 //	@Tags			hyperlane
 //	@ID				get-hyperlane-mailbox
-//	@Param			id	path	string	true	"Hyperlane mailbox id"
+//	@Param			id	path	string	true	"Hyperlane mailbox id"	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Produce		json
 //	@Success		200	{object}	responses.HyperlaneMailbox
 //	@Success		204
@@ -100,8 +100,8 @@ func (req *listHyperlaneMailboxRequest) SetDefault() {
 //	@Description	Returns a paginated list of all Hyperlane mailboxes indexed on Celestia, each identified by a hexadecimal identity.
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-mailbox
-//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"										minimum(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}	responses.HyperlaneMailbox
 //	@Success		204
@@ -137,7 +137,7 @@ type getHyperlaneTokenRequest struct {
 //	@Description	Returns detailed information about a Hyperlane token (synthetic or collateral) identified by its hexadecimal identity, including owner, mailbox, and token type.
 //	@Tags			hyperlane
 //	@ID				get-hyperlane-token
-//	@Param			id	path	string	true	"Hyperlane token id"
+//	@Param			id	path	string	true	"Hyperlane token id"	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Produce		json
 //	@Success		200	{object}	responses.HyperlaneToken
 //	@Success		204
@@ -223,12 +223,12 @@ func (req *listHyperlaneTokenRequest) ToFilters(ctx context.Context, address sto
 //	@Description	Returns a paginated list of Hyperlane tokens indexed on Celestia. Supports filtering by owner address, mailbox identity, and token type (synthetic or collateral).
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-tokens
-//	@Param			limit	query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"									minimum(1)
-//	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)
-//	@Param			owner	query	string	false	"Owner celestia address"					minlength(47)	maxlength(47)
-//	@Param			mailbox	query	string	false	"Mailbox hexademical identity"
-//	@Param			type    query	string	false	"Comma-separated string of tokens type"		Enums(synthetic, collateral)
+//	@Param			limit	query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"									minimum(1)	example(10)
+//	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)	example(asc)
+//	@Param			owner	query	string	false	"Owner celestia address"					minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			mailbox	query	string	false	"Mailbox hexademical identity"	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
+//	@Param			type    query	string	false	"Comma-separated string of tokens type"		Enums(synthetic, collateral)	example(synthetic)
 //	@Produce		json
 //	@Success		200	{array}	responses.HyperlaneToken
 //	@Success		204
@@ -355,16 +355,16 @@ func (req *listHyperlaneTransferRequest) ToFilters(ctx context.Context, address 
 //	@Description	Returns a paginated list of Hyperlane cross-chain token transfers. Supports filtering by sender/receiver address, relayer, mailbox, token, transfer type (send/receive), domain, and transaction hash.
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-transfers
-//	@Param			limit	query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"									minimum(1)
-//	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)
-//	@Param			address	query	string	false	"Celestia address"				         	minlength(47)	maxlength(47)
-//	@Param			relayer	query	string	false	"Celestia address of relayer"				minlength(47)	maxlength(47)
-//	@Param			mailbox	query	string	false	"Mailbox hexademical identity"
-//	@Param			token	query	string	false	"Token hexademical identity"
-//	@Param			type    query	string	false	"Comma-separated string of transfer type"	Enums(send, receive)
-//	@Param			domain	query	integer	false	"Domain of counterparty chain"				minimum(1)
-//	@Param			hash	query	string	false	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)
+//	@Param			limit	query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"									minimum(1)	example(10)
+//	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)	example(asc)
+//	@Param			address	query	string	false	"Celestia address"				         	minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			relayer	query	string	false	"Celestia address of relayer"				minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			mailbox	query	string	false	"Mailbox hexademical identity"	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
+//	@Param			token	query	string	false	"Token hexademical identity"	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
+//	@Param			type    query	string	false	"Comma-separated string of transfer type"	Enums(send, receive)	example(send)
+//	@Param			domain	query	integer	false	"Domain of counterparty chain"				minimum(1)	example(1)
+//	@Param			hash	query	string	false	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Produce		json
 //	@Success		200	{array}	responses.HyperlaneTransfer
 //	@Success		204
@@ -402,7 +402,7 @@ func (handler *HyperlaneHandler) ListTransfers(c echo.Context) error {
 //	@Description	Returns a single Hyperlane cross-chain token transfer by its internal id, including source/destination domain, amount, and associated transaction.
 //	@Tags			hyperlane
 //	@ID				get-hyperlane-transfer
-//	@Param			id	path	integer	true	"Internal identity"	minimum(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.HyperlaneTransfer
 //	@Success		204
@@ -450,9 +450,9 @@ func (handler *HyperlaneHandler) ListDomains(c echo.Context) error {
 //	@Description	Returns a paginated list of Hyperlane Interchain Gas Paymasters (IGPs) indexed on Celestia. IGPs allow message senders to pay for destination chain gas fees from the origin chain.
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-igps
-//	@Param			limit	query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"									minimum(1)
-//	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)
+//	@Param			limit	query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"									minimum(1)	example(10)
+//	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)	example(asc)
 //	@Produce		json
 //	@Success		200	{array}	responses.HyperlaneIgp
 //	@Success		204
@@ -488,7 +488,7 @@ type getHyperlaneIgpRequest struct {
 //	@Description	Returns a single Hyperlane Interchain Gas Paymaster (IGP) by its hexadecimal identity, including its owner and destination gas configs.
 //	@Tags			hyperlane
 //	@ID				get-hyperlane-igp
-//	@Param			id	path	integer	true	"Internal identity"	minimum(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.HyperlaneIgp
 //	@Success		204

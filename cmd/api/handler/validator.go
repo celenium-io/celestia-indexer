@@ -62,7 +62,7 @@ type validatorRequest struct {
 //	@Description	Returns detailed information about a validator by internal id, including moniker, consensus address, voting power, commission rates, and current status.
 //	@Tags			validator
 //	@ID				get-validator
-//	@Param			id	path	integer	true	"Internal validator id"
+//	@Param			id	path	integer	true	"Internal validator id"	example(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.Validator
 //	@Success		204
@@ -102,10 +102,10 @@ func (req *validatorsPagination) SetDefault() {
 //	@Description	Returns a paginated list of validators ordered by voting power. Supports filtering by jailed status and app version.
 //	@Tags			validator
 //	@ID				list-validator
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(0)
-//	@Param			jailed	query	boolean	false	"Return only jailed validators"
-//	@Param			version	query	integer	false	"Current validator app version"	minimum(0)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
+//	@Param			jailed	query	boolean	false	"Return only jailed validators"	example(false)
+//	@Param			version	query	integer	false	"Current validator app version"	minimum(0)	example(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.Validator
 //	@Failure		400	{object}	Error
@@ -154,9 +154,9 @@ func (p *validatorPageableRequest) SetDefault() {
 //	@Description	Returns a paginated list of blocks proposed by the given validator.
 //	@Tags			validator
 //	@ID				get-validator-blocks
-//	@Param			id		path	integer	true	"Internal validator id"
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			id		path	integer	true	"Internal validator id"	example(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Block
 //	@Failure		400	{object}	Error
@@ -199,8 +199,8 @@ func (r *validatorUptimeRequest) SetDefault() {
 //	@Description	Returns the validator's uptime percentage and a history of the last N blocks indicating whether each was signed.
 //	@Tags			validator
 //	@ID				get-validator-uptime
-//	@Param			id		path	integer	true	"Internal validator id"
-//	@Param			limit	query	integer	false	"Count of requested blocks"	minimum(1)	maximum(100)
+//	@Param			id		path	integer	true	"Internal validator id"	example(1)
+//	@Param			limit	query	integer	false	"Count of requested blocks"	minimum(1)	maximum(100)	example(10)
 //	@Produce		json
 //	@Success		200	{object}	responses.ValidatorUptime
 //	@Success		204
@@ -248,10 +248,10 @@ func (p *validatorDelegationsRequest) SetDefault() {
 //	@Description	Returns a paginated list of delegators staking with this validator, including their delegated amounts. Pass show_zero=true to include delegators with zero balance.
 //	@Tags			validator
 //	@ID				validator-delegators
-//	@Param			id			path	integer	true	"Internal validator id"
-//	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"						minimum(1)
-//	@Param			show_zero	query	boolean	false	"Show zero delegations"
+//	@Param			id			path	integer	true	"Internal validator id"	example(1)
+//	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
+//	@Param			offset		query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			show_zero	query	boolean	false	"Show zero delegations"	example(false)
 //	@Produce		json
 //	@Success		200	{array}		responses.Delegation
 //	@Failure		400	{object}	Error
@@ -289,9 +289,9 @@ func (handler *ValidatorHandler) Delegators(c echo.Context) error {
 //	@Description	Returns a paginated list of jail events for this validator, including the jail reason and block height at which each jail occurred.
 //	@Tags			validator
 //	@ID				validator-jails
-//	@Param			id		path	integer	true	"Internal validator id"
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			id		path	integer	true	"Internal validator id"	example(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Jail
 //	@Failure		400	{object}	Error
@@ -367,9 +367,9 @@ func (handler *ValidatorHandler) Count(c echo.Context) error {
 //	@Description	Returns a paginated list of governance votes cast by this validator on on-chain proposals.
 //	@Tags			validator
 //	@ID				validator-votes
-//	@Param			id		path	integer	true	"Internal validator id"
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			id		path	integer	true	"Internal validator id"	example(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Vote
 //	@Failure		400	{object}	Error
@@ -439,12 +439,12 @@ func (req getValidatorMessages) ToFilters() storage.ValidatorMessagesFilters {
 //	@Description	Returns a paginated list of messages submitted by the validator's operator address, filterable by time range.
 //	@Tags			validator
 //	@ID				validator-messages
-//	@Param			id			path	integer		true	"Internal validator id"
-//	@Param			limit		query	integer		false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset		query	integer		false	"Offset"						minimum(1)
-//	@Param			sort		query	string		false	"Sort order"					Enums(asc, desc)
-//	@Param			from		query	integer		false	"Time from in unix timestamp"	minimum(1)
-//	@Param			to			query	integer		false	"Time to in unix timestamp"		minimum(1)
+//	@Param			id			path	integer		true	"Internal validator id"	example(1)
+//	@Param			limit		query	integer		false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
+//	@Param			offset		query	integer		false	"Offset"						minimum(1)	example(10)
+//	@Param			sort		query	string		false	"Sort order"					Enums(asc, desc)	example(asc)
+//	@Param			from		query	integer		false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
+//	@Param			to			query	integer		false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
 //	@Produce		json
 //	@Success		200	{array}		responses.Message
 //	@Failure		400	{object}	Error
@@ -476,7 +476,7 @@ func (handler *ValidatorHandler) Messages(c echo.Context) error {
 //	@Description	Returns performance metrics for a single validator including uptime, missed blocks, and block signing efficiency.
 //	@Tags			validator
 //	@ID				validator-metrics
-//	@Param			id			path	integer	true	"Internal validator id"
+//	@Param			id			path	integer	true	"Internal validator id"	example(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.Metrics
 //	@Failure		400	{object}	Error
@@ -512,7 +512,7 @@ func (req *getTopNValidatorMetrics) SetDefault() {
 //	@Description	Returns aggregated performance metrics for the top N validators by voting power, useful for comparing signing efficiency across the active set.
 //	@Tags			validator
 //	@ID				validators-metrics
-//	@Param			count		query	integer	false	"Count of aggregated entities"
+//	@Param			count		query	integer	false	"Count of aggregated entities"	example(10)
 //	@Produce		json
 //	@Success		200	{object}	responses.TopNMetrics
 //	@Failure		400	{object}	Error
