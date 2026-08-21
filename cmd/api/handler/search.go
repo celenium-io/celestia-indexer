@@ -19,6 +19,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	searchTypeAddress   = "address"
+	searchTypeValidator = "validator"
+	searchTypeNamespace = "namespace"
+)
+
 type SearchHandler struct {
 	search     storage.ISearch
 	address    storage.IAddress
@@ -130,7 +136,7 @@ func (handler SearchHandler) searchAddress(ctx context.Context, search string) (
 	}
 
 	result := responses.SearchItem{
-		Type:   "address",
+		Type:   searchTypeAddress,
 		Result: responses.NewAddress(address),
 	}
 	return []responses.SearchItem{result}, nil
@@ -153,10 +159,10 @@ func (handler SearchHandler) searchValoperAddress(ctx context.Context, search st
 
 	return []responses.SearchItem{
 		{
-			Type:   "validator",
+			Type:   searchTypeValidator,
 			Result: responses.NewValidator(validator),
 		}, {
-			Type:   "address",
+			Type:   searchTypeAddress,
 			Result: responses.NewAddress(address),
 		},
 	}, nil
@@ -227,7 +233,7 @@ func (handler SearchHandler) getNamespace(ctx context.Context, data []byte) ([]r
 		return nil, err
 	}
 	result := responses.SearchItem{
-		Type:   "namespace",
+		Type:   searchTypeNamespace,
 		Result: responses.NewNamespace(ns),
 	}
 	return []responses.SearchItem{result}, nil
@@ -243,7 +249,7 @@ func (handler SearchHandler) searchText(ctx context.Context, text string) ([]res
 	for i := range result {
 		response[i].Type = result[i].Type
 		switch response[i].Type {
-		case "validator":
+		case searchTypeValidator:
 			validator, err := handler.validator.GetByID(ctx, result[i].Id)
 			if err != nil {
 				return nil, err
@@ -255,7 +261,7 @@ func (handler SearchHandler) searchText(ctx context.Context, text string) ([]res
 				return nil, err
 			}
 			response[i].Result = responses.NewRollup(rollup)
-		case "namespace":
+		case searchTypeNamespace:
 			namespace, err := handler.namespace.GetByID(ctx, result[i].Id)
 			if err != nil {
 				return nil, err

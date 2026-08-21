@@ -51,6 +51,6 @@ func (m MsgAddress) Flat() ([]any, error) {
 
 func (MsgAddress) Columns() []string {
 	return []string{
-		"address_id", "msg_id", "type",
+		"address_id", "msg_id", columnNameType,
 	}
 }

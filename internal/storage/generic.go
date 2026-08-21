@@ -16,6 +16,14 @@ import (
 	"github.com/uptrace/bun"
 )
 
+const (
+	columnNameHeight   = "height"
+	columnNameTime     = "time"
+	columnNamePosition = "position"
+	columnNameTxId     = "tx_id"
+	columnNameType     = "type"
+)
+
 var Models = []any{
 	&State{},
 	&Constant{},

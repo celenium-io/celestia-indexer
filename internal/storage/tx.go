@@ -135,8 +135,8 @@ func (tx Tx) Flat() ([]any, error) {
 
 func (tx Tx) Columns() []string {
 	return []string{
-		"id", "height", "time", "position", "gas_wanted", "gas_used", "timeout_height",
-		"events_count", "messages_count", "fee", "status", "error", "codespace",
+		"id", columnNameHeight, columnNameTime, columnNamePosition, "gas_wanted", "gas_used",
+		"timeout_height", "events_count", "messages_count", "fee", "status", "error", "codespace",
 		"hash", "memo", "message_types",
 	}
 }

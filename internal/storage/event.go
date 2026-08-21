@@ -101,6 +101,6 @@ func (e Event) Flat() ([]any, error) {
 
 func (e Event) Columns() []string {
 	return []string{
-		"height", "time", "position", "type", "tx_id", "data",
+		columnNameHeight, columnNameTime, columnNamePosition, columnNameType, columnNameTxId, "data",
 	}
 }

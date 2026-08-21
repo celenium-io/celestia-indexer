@@ -38,7 +38,7 @@ node/
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/engine/install/) and Docker Compose
-- [Go 1.26+](https://go.dev/doc/install) (for local development and testing)
+- [Go 1.27+](https://go.dev/doc/install) (for local development and testing)
 
 ## Quick Start
 

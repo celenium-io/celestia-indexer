@@ -27,6 +27,11 @@ import (
 	cmtTypes "github.com/cometbft/cometbft/types"
 )
 
+const (
+	fieldMessage = "message"
+	fieldError   = "error"
+)
+
 // base64BufPool reuses scratch buffers for base64-encoded transaction strings.
 // StrAppend(buf) writes the JSON string content directly into the provided
 // buffer (never calls strSlow), so large blob transactions no longer cause
@@ -43,7 +48,7 @@ var knownEventStrings = func() map[string]string {
 		// event types — sourced from internal/storage/types/event_type.go
 		// base Cosmos / staking
 		"coin_received", "coinbase", "coin_spent", "burn", "mint",
-		"message", "proposer_reward", "rewards", "commission",
+		fieldMessage, "proposer_reward", "rewards", "commission",
 		"liveness", "transfer",
 		"redelegate", "AttestationRequest",
 		"withdraw_rewards", "withdraw_commission", "set_withdraw_address",
@@ -114,7 +119,7 @@ var knownEventStrings = func() map[string]string {
 		"packet_timeout_height", "packet_timeout_timestamp",
 		"packet_connection", "connection_id", "channel_id",
 		"port_id", "counterparty_channel_id", "counterparty_port_id",
-		"acc_seq", "fee", "tip", "success", "error",
+		"acc_seq", "fee", "tip", "success", fieldError,
 		"denom", "new_shares", "completion_time",
 		"withdraw_address", "validator_address",
 		// new plain keys found in 9232135 / other blocks
@@ -742,13 +747,13 @@ func jxResponse(d *jxpkg.Decoder, fn func(*jxpkg.Decoder) error) error {
 		switch string(key) {
 		case "result":
 			return fn(d)
-		case "error":
+		case fieldError:
 			if d.Next() == jxpkg.Null {
 				return d.Null()
 			}
 			var msg string
 			if err := d.ObjBytes(func(d *jxpkg.Decoder, key []byte) error {
-				if string(key) == "message" {
+				if string(key) == fieldMessage {
 					var err error
 					msg, err = d.Str()
 					return err
@@ -848,12 +853,12 @@ func jxBatchResponse(d *jxpkg.Decoder, fn func(pkgTypes.BlockData) error) error 
 					current = pkgTypes.BlockData{}
 				}
 				idx++
-			case "error":
+			case fieldError:
 				if d.Next() == jxpkg.Null {
 					return d.Null()
 				}
 				if err := d.ObjBytes(func(d *jxpkg.Decoder, key []byte) error {
-					if string(key) == "message" {
+					if string(key) == fieldMessage {
 						var err error
 						rpcErr, err = d.Str()
 						return err

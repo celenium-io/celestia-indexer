@@ -112,6 +112,6 @@ func (msg Message) Flat() ([]any, error) {
 
 func (msg Message) Columns() []string {
 	return []string{
-		"id", "height", "time", "position", "type", "tx_id", "size", "data",
+		"id", columnNameHeight, columnNameTime, columnNamePosition, columnNameType, columnNameTxId, "size", "data",
 	}
 }
