@@ -214,7 +214,7 @@ func (module *Module) parseAccounts(accounts []types.Account, block storage.Bloc
 
 		case strings.Contains(accounts[i].Type, "PermanentLockedAccount"):
 			readableAddress = accounts[i].BaseVestingAccount.BaseAccount.Address
-			if err := parseVesting(accounts[i], block, readableAddress, storageTypes.VestingTypeDelayed, data); err != nil {
+			if err := parseVesting(accounts[i], block, readableAddress, storageTypes.VestingTypePermanent, data); err != nil {
 				return err
 			}
 
