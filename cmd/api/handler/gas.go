@@ -54,7 +54,7 @@ type estimatePfbGas struct {
 //	@Tags			gas
 //	@ID				gas-estimate-for-pfb
 //	@Param			sizes	  query	string	true	"Comma-separated array of blob sizes"	example(100,200)
-//	 @Param         versions  query string  false   "Comma-separated array of share versions. Default is 0"	example(1,2)
+//	 @Param         versions  query string  false   "Comma-separated array of share versions. Default is 0"	example(0,1)
 //	@Produce		json
 //	@Success		200	{object}	uint64
 //	@Failure		400	{object}	Error

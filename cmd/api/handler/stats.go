@@ -60,7 +60,7 @@ type summaryRequest struct {
 //	@Description.markdown	summary
 //	@Tags					stats
 //	@ID						stats-summary
-//	@Param					table		path	string	true	"Table name"	Enums(block, block_stats, tx, event, message, validator)	example(block)
+//	@Param					table		path	string	true	"Table name"	Enums(block, block_stats, tx, event, message, validator)	example(block_stats)
 //	@Param					function	path	string	true	"Function name"	Enums(min, max, avg, sum, count)	example(avg)
 //	@Param					column		query	string	false	"Column name which will be used for computation. Optional for count."	example(fee)
 //	@Param					from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
@@ -359,7 +359,7 @@ type stakingSeriesRequest struct {
 //	@Description	Returns a time-series histogram of staking metrics (rewards, commissions, delegation flows, etc.) for the specified validator and timeframe.
 //	@Tags			stats
 //	@ID				stats-staking-series
-//	@Param			id			path	string	true	"Validator id"					minlength(56)	maxlength(56)	example(4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02)
+//	@Param			id			path	string	true	"Internal validator id"			minimum(1)	example(1)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)	example(day)
 //	@Param			name		path	string	true	"Series name"					Enums(rewards, commissions, flow, delegations, unbondings, delegations_count, unbondings_count, cumulative_flow)	example(rewards)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
