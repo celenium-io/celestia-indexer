@@ -79,7 +79,7 @@ type getAddressRequest struct {
 //	@Description	Returns detailed information about a Celestia address including balances, delegation amounts, and linked Celestial identity. Returns 204 if the address is not found.
 //	@Tags			address
 //	@ID				get-address
-//	@Param			hash	path	string	true	"Hash"	minlength(47)	maxlength(128)
+//	@Param			hash	path	string	true	"Hash"	minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Produce		json
 //	@Success		200	{object}	responses.Address
 //	@Success		204
@@ -127,10 +127,10 @@ func (p *addressListRequest) SetDefault() {
 //	@Description	Returns a paginated list of Celestia addresses with their balances. Supports sorting by balance fields, delegation amounts, and block activity.
 //	@Tags			address
 //	@ID				list-address
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
-//	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field"					Enums(id, delegated, spendable, unbonding, first_height, last_height)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)	example(asc)
+//	@Param			sort_by	query	string	false	"Sort field"					Enums(id, delegated, spendable, unbonding, first_height, last_height)	example(id)
 //	@Produce		json
 //	@Success		200	{array}		responses.Address
 //	@Failure		400	{object}	Error
@@ -169,15 +169,15 @@ func (handler *AddressHandler) List(c echo.Context) error {
 //	@Description	Returns a paginated list of transactions sent or signed by the given address. Supports filtering by status, message type, time range, and block height.
 //	@Tags			address
 //	@ID				address-transactions
-//	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(128)
-//	@Param			limit		query	integer					false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset		query	integer					false	"Offset"						minimum(1)
-//	@Param			sort		query	string					false	"Sort order"					Enums(asc, desc)
-//	@Param			status		query	storageTypes.Status		false	"Comma-separated status list"
-//	@Param			msg_type	query	storageTypes.MsgType	false	"Comma-separated message types list"
-//	@Param			from		query	integer					false	"Time from in unix timestamp"	minimum(1)
-//	@Param			to			query	integer					false	"Time to in unix timestamp"		minimum(1)
-//	@Param			height		query	integer					false	"Block number"					minimum(1)
+//	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			limit		query	integer					false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
+//	@Param			offset		query	integer					false	"Offset"						minimum(1)	example(10)
+//	@Param			sort		query	string					false	"Sort order"					Enums(asc, desc)	example(asc)
+//	@Param			status		query	storageTypes.Status		false	"Comma-separated status list"	example(success)
+//	@Param			msg_type	query	storageTypes.MsgType	false	"Comma-separated message types list"	example(MsgSend)
+//	@Param			from		query	integer					false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
+//	@Param			to			query	integer					false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			height		query	integer					false	"Block number"					minimum(1)	example(123)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
@@ -276,11 +276,11 @@ func (p *getAddressMessages) ToFilters() storage.AddressMsgsFilter {
 //	@Description	Returns a paginated list of Cosmos SDK messages associated with the given address. Supports filtering by message type.
 //	@Tags			address
 //	@ID				address-messages
-//	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(128)
-//	@Param			limit		query	integer					false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset		query	integer					false	"Offset"						minimum(1)
-//	@Param			sort		query	string					false	"Sort order"					Enums(asc, desc)
-//	@Param			msg_type	query	storageTypes.MsgType	false	"Comma-separated message types list"
+//	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			limit		query	integer					false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
+//	@Param			offset		query	integer					false	"Offset"						minimum(1)	example(10)
+//	@Param			sort		query	string					false	"Sort order"					Enums(asc, desc)	example(asc)
+//	@Param			msg_type	query	storageTypes.MsgType	false	"Comma-separated message types list"	example(MsgSend)
 //	@Produce		json
 //	@Success		200	{array}		responses.MessageForAddress
 //	@Failure		400	{object}	Error
@@ -345,12 +345,12 @@ func (req *getBlobLogsForAddress) SetDefault() {
 //	@Description	Returns a paginated list of blobs submitted via PayForBlobs transactions from the given address. Supports sorting by time or size, and optional join of transaction and namespace entities.
 //	@Tags			address
 //	@ID				address-blobs
-//	@Param			hash	path	string	true	"Hash"											minlength(47)	maxlength(128)
-//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)		maximum(100)
-//	@Param			offset	query	integer	false	"Offset"										minimum(1)
-//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
-//	@Param			joins	query	boolean	false	"Flag indicating whether entities of transaction and namespace should be attached or not. Default: true"
+//	@Param			hash	path	string	true	"Hash"											minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)		maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
+//	@Param			joins	query	boolean	false	"Flag indicating whether entities of transaction and namespace should be attached or not. Default: true"	example(true)
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
@@ -433,10 +433,10 @@ func (req *getAddressDelegations) SetDefault() {
 //	@Description	Returns a paginated list of active staking delegations from the given address to validators. Use show_zero=true to include delegations with zero amount.
 //	@Tags			address
 //	@ID				address-delegations
-//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)
-//	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset		query	integer	false	"Offset"						minimum(1)
-//	@Param			show_zero	query	boolean	false	"Show zero delegations"
+//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
+//	@Param			offset		query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			show_zero	query	boolean	false	"Show zero delegations"	example(false)
 //	@Produce		json
 //	@Success		200	{array}		responses.Delegation
 //	@Failure		400	{object}	Error
@@ -496,9 +496,9 @@ func (req *getAddressPageable) SetDefault() {
 //	@Description	Returns a paginated list of pending unbonding (undelegation) records for the given address. Tokens are locked during the unbonding period before they become available.
 //	@Tags			address
 //	@ID				address-undelegations
-//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Undelegation
 //	@Failure		400	{object}	Error
@@ -545,9 +545,9 @@ func (handler *AddressHandler) Undelegations(c echo.Context) error {
 //	@Description	Returns a paginated list of redelegation records where the given address moved stake from one validator to another.
 //	@Tags			address
 //	@ID				address-redelegations
-//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Redelegation
 //	@Failure		400	{object}	Error
@@ -607,10 +607,10 @@ func (req *getAddressVestings) SetDefault() {
 //	@Description	Returns a paginated list of vesting accounts associated with the given address. Use show_ended=true to also include vestings whose end time has already passed.
 //	@Tags			address
 //	@ID				address-vesting
-//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)
-//	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset		query	integer	false	"Offset"						minimum(1)
-//	@Param			show_ended	query	boolean	false	"Show finished vestings delegations"
+//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
+//	@Param			offset		query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			show_ended	query	boolean	false	"Show finished vestings delegations"	example(false)
 //	@Produce		json
 //	@Success		200	{array}		responses.Vesting
 //	@Failure		400	{object}	Error
@@ -657,9 +657,9 @@ func (handler *AddressHandler) Vestings(c echo.Context) error {
 //	@Description	Returns a paginated list of authz grants where the given address is the granter — i.e., grants that this address has authorized to other accounts.
 //	@Tags			address
 //	@ID				address-grants
-//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Grant
 //	@Failure		400	{object}	Error
@@ -705,9 +705,9 @@ func (handler *AddressHandler) Grants(c echo.Context) error {
 //	@Description	Returns a paginated list of authz grants where the given address is the grantee — i.e., grants that other accounts have authorized to this address.
 //	@Tags			address
 //	@ID				address-grantee
-//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Grant
 //	@Failure		400	{object}	Error
@@ -760,11 +760,11 @@ type addressStatsRequest struct {
 //	@Description	Returns a time-series histogram of per-address statistics for the selected metric (gas_used, gas_wanted, fee, or tx_count) aggregated by the given timeframe.
 //	@Tags			address
 //	@ID				address-stats
-//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)
-//	@Param			name		path	string	true	"Series name"					Enums(gas_used, gas_wanted, fee, tx_count)
-//	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
+//	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			name		path	string	true	"Series name"					Enums(gas_used, gas_wanted, fee, tx_count)	example(gas_used)
+//	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)	example(day)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
 //	@Produce		json
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
@@ -826,9 +826,9 @@ func (handler *AddressHandler) getIdByHash(ctx context.Context, hash []byte, add
 //	@Description	Returns a paginated list of Celestials NFT identities linked to the given address, including image URLs and associated metadata.
 //	@Tags			address
 //	@ID				address-celestials
-//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Celestial
 //	@Failure		400	{object}	Error
@@ -873,9 +873,9 @@ func (handler *AddressHandler) Celestials(c echo.Context) error {
 //	@Description	Returns a paginated list of governance votes cast by the given address on on-chain proposals.
 //	@Tags			address
 //	@ID				address-votes
-//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Vote
 //	@Failure		400	{object}	Error
@@ -915,9 +915,9 @@ func (handler *AddressHandler) Votes(c echo.Context) error {
 // @Description	Returns a paginated list of all token balances held by the given address, including native and IBC tokens. Results are ordered by currency name.
 // @Tags			address
 // @ID				address-balances
-// @Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)
-// @Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)
-// @Param			offset	query	integer	false	"Offset"						minimum(1)
+// @Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+// @Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
+// @Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 // @Produce		json
 // @Success		200	{array}		responses.Balance
 // @Failure		400	{object}	Error

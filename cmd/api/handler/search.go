@@ -67,7 +67,7 @@ var (
 //	@Description.markdown	search
 //	@Tags					search
 //	@ID						search
-//	@Param					query	query	string	true	"Search string"
+//	@Param					query	query	string	true	"Search string"	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Produce				json
 //	@Success				200	{array}	responses.SearchItem
 //	@Success				204

@@ -66,15 +66,15 @@ func (p *rollupList) SetDefault() {
 //		@Description	Returns a paginated leaderboard of rollups with their cumulative statistics. Supports filtering by category, tags, stack, and provider. Sorting by blob count, total size, or fee.
 //		@Tags			rollup
 //		@ID				list-rollup
-//		@Param			limit	 query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
-//		@Param			offset	 query	integer	false	"Offset"						minimum(1)
-//		@Param			sort	 query	string	false	"Sort order. Default: desc"		Enums(asc, desc)
-//		@Param			sort_by	 query	string	false	"Sort field. Default: size"		Enums(time, blobs_count, size, fee)
-//	    @Param          category query  string  false   "Comma-separated rollup category list"
-//	    @Param          tags     query  string  false   "Comma-separated rollup tags list"
-//	    @Param          stack    query  string  false   "Comma-separated rollup stack list"
-//	    @Param          provider query  string  false   "Comma-separated rollup provider list"
-//		@Param			is_active query	boolean	false	"If true, shows rollups with activity over the last month"
+//		@Param			limit	 query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
+//		@Param			offset	 query	integer	false	"Offset"						minimum(1)	example(10)
+//		@Param			sort	 query	string	false	"Sort order. Default: desc"		Enums(asc, desc)	example(asc)
+//		@Param			sort_by	 query	string	false	"Sort field. Default: size"		Enums(time, blobs_count, size, fee)	example(time)
+//	    @Param          category query  string  false   "Comma-separated rollup category list"	example(nft)
+//	    @Param          tags     query  string  false   "Comma-separated rollup tags list"	example(gaming)
+//	    @Param          stack    query  string  false   "Comma-separated rollup stack list"	example(op_stack)
+//	    @Param          provider query  string  false   "Comma-separated rollup provider list"	example(name)
+//		@Param			is_active query	boolean	false	"If true, shows rollups with activity over the last month"	example(true)
 //		@Produce		json
 //		@Success		200	{array}		responses.RollupWithStats
 //		@Failure		400	{object}	Error
@@ -149,14 +149,14 @@ func (p *rollupDayList) SetDefault() {
 //	@Description	Returns a paginated leaderboard of rollups with statistics aggregated over the previous 24 hours. Useful for ranking rollups by recent activity such as throughput, blob count, or fee.
 //	@Tags			rollup
 //	@ID				list-rollup-24h
-//	@Param			limit	 query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
-//	@Param			offset	 query	integer	false	"Offset"						minimum(1)
-//	@Param			sort	 query	string	false	"Sort order. Default: desc"		Enums(asc, desc)
-//	@Param			sort_by	 query	string	false	"Sort field. Default: mb_price"	Enums(avg_size, blobs_count, total_size, total_fee, throughput, namespace_count, pfb_count, mb_price)
-//	@Param          category query  string  false   "Comma-separated rollup category list"
-//	@Param          tags     query  string  false   "Comma-separated rollup tags list"
-//	@Param          stack    query  string  false   "Comma-separated rollup stack list"
-//	@Param          provider query  string  false   "Comma-separated rollup provider list"
+//	@Param			limit	 query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
+//	@Param			offset	 query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			sort	 query	string	false	"Sort order. Default: desc"		Enums(asc, desc)	example(asc)
+//	@Param			sort_by	 query	string	false	"Sort field. Default: mb_price"	Enums(avg_size, blobs_count, total_size, total_fee, throughput, namespace_count, pfb_count, mb_price)	example(avg_size)
+//	@Param          category query  string  false   "Comma-separated rollup category list"	example(nft)
+//	@Param          tags     query  string  false   "Comma-separated rollup tags list"	example(gaming)
+//	@Param          stack    query  string  false   "Comma-separated rollup stack list"	example(op_stack)
+//	@Param          provider query  string  false   "Comma-separated rollup provider list"	example(name)
 //	@Produce		json
 //	@Success		200	{array}		responses.RollupWithDayStats
 //	@Failure		400	{object}	Error
@@ -206,7 +206,7 @@ func (handler RollupHandler) LeaderboardDay(c echo.Context) error {
 //	@Description	Returns detailed information and cumulative statistics for the rollup identified by its internal id, including name, description, social links, namespaces, and providers.
 //	@Tags			rollup
 //	@ID				get-rollup
-//	@Param			id	path	integer	true	"Internal identity"	minimum(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.Rollup
 //	@Success		204
@@ -245,9 +245,9 @@ func (req *getRollupPages) SetDefault() {
 //	@Description	Returns a paginated list of namespaces that the rollup has submitted blobs to.
 //	@Tags			rollup
 //	@ID				get-rollup-namespaces
-//	@Param			id		path	integer	true	"Internal identity"				minimum(1)
-//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)
+//	@Param			id		path	integer	true	"Internal identity"				minimum(1)	example(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Namespace
 //	@Failure		400	{object}	Error
@@ -286,7 +286,7 @@ func (handler RollupHandler) GetNamespaces(c echo.Context) error {
 //	@Description	Returns a list of data availability providers associated with the rollup (e.g. Celestia addresses used for blob submission).
 //	@Tags			rollup
 //	@ID				get-rollup-providers
-//	@Param			id		path	integer	true	"Internal identity"				minimum(1)
+//	@Param			id		path	integer	true	"Internal identity"				minimum(1)	example(1)
 //	@Produce		json
 //	@Success		200	{array}		responses.RollupProvider
 //	@Failure		400	{object}	Error
@@ -339,12 +339,12 @@ func (p *getRollupPagesWithSort) SetDefault() {
 //	@Description	Returns a paginated list of blobs submitted by the rollup. Supports sorting by time or size and optionally joining transaction and signer entities.
 //	@Tags			rollup
 //	@ID				get-rollup-blobs
-//	@Param			id		path	integer	true	"Internal identity"								minimum(1)
-//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
-//	@Param			offset	query	integer	false	"Offset"										minimum(1)
-//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)
-//	@Param			joins	query	boolean	false	"Flag indicating whether entities of transaction and signer should be attached or not. Default: true"
+//	@Param			id		path	integer	true	"Internal identity"								minimum(1)	example(1)
+//	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
+//	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
+//	@Param			joins	query	boolean	false	"Flag indicating whether entities of transaction and signer should be attached or not. Default: true"	example(true)
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
@@ -403,11 +403,11 @@ type rollupStatsRequest struct {
 //	@Description	Returns a time-series histogram for the rollup with the selected metric (blobs_count, size, size_per_blob, or fee) aggregated by the given timeframe.
 //	@Tags			rollup
 //	@ID				get-rollup-stats
-//	@Param			id			path	integer	true	"Internal identity"				minimum(1)
-//	@Param			name		path	string	true	"Series name"					Enums(blobs_count, size, size_per_blob, fee)
-//	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)
+//	@Param			id			path	integer	true	"Internal identity"				minimum(1)	example(1)
+//	@Param			name		path	string	true	"Series name"					Enums(blobs_count, size, size_per_blob, fee)	example(blobs_count)
+//	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)	example(day)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
 //	@Produce		json
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
@@ -448,7 +448,7 @@ type rollupAllSeriesRequest struct {
 //	@Description	Returns time-series data for all rollups combined, grouped by the selected timeframe. Useful for rendering aggregate charts showing total DA usage across all indexed rollups.
 //	@Tags			rollup
 //	@ID				get-rollup-all-series
-//	@Param			timeframe	path	string	true	"Timeframe"		Enums(hour, day, month)
+//	@Param			timeframe	path	string	true	"Timeframe"		Enums(hour, day, month)	example(day)
 //	@Produce		json
 //	@Success		200	{array}		responses.RollupAllSeriesResponse
 //	@Failure		400	{object}	Error
@@ -519,7 +519,7 @@ type rollupBySlugRequest struct {
 //	@Description	Returns rollup information by its human-readable slug identifier (e.g. "eclipse"). Returns 204 if no rollup with the given slug is found.
 //	@Tags			rollup
 //	@ID				get-rollup-by-slug
-//	@Param			slug	path	string	true	"Slug"
+//	@Param			slug	path	string	true	"Slug"	example(rollup_slug)
 //	@Produce		json
 //	@Success		200	{object}	responses.Rollup
 //	@Success		204
@@ -552,9 +552,9 @@ type rollupDistributionRequest struct {
 //	@Description	Returns the intra-timeframe distribution (e.g. by hour-of-day) for the selected rollup metric, useful for identifying activity patterns.
 //	@Tags			rollup
 //	@ID				get-rollup-distribution
-//	@Param			id			path	integer	true	"Internal identity"	minimum(1)
-//	@Param			name		path	string	true	"Series name"		Enums(blobs_count, size, size_per_blob, fee_per_blob)
-//	@Param			timeframe	path	string	true	"Timeframe"			Enums(hour, day)
+//	@Param			id			path	integer	true	"Internal identity"	minimum(1)	example(1)
+//	@Param			name		path	string	true	"Series name"		Enums(blobs_count, size, size_per_blob, fee_per_blob)	example(blobs_count)
+//	@Param			timeframe	path	string	true	"Timeframe"			Enums(hour, day)	example(day)
 //	@Produce		json
 //	@Success		200	{array}		responses.DistributionItem
 //	@Failure		400	{object}	Error
@@ -595,9 +595,9 @@ type exportBlobsRequest struct {
 //	@Description	Streams a plain-text export of blob metadata submitted by the rollup, optionally filtered by a time range. The response is streamed line by line.
 //	@Tags			rollup
 //	@ID				rollup-export
-//	@Param			id		path	integer	true	"Internal identity"				minimum(1)
-//	@Param			from	query	integer	false	"Time from in unix timestamp"	minimum(1)
-//	@Param			to		query	integer	false	"Time to in unix timestamp"		minimum(1)
+//	@Param			id		path	integer	true	"Internal identity"				minimum(1)	example(1)
+//	@Param			from	query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
+//	@Param			to		query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
 //	@Success		200
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
@@ -654,8 +654,8 @@ type rollupGroupStats struct {
 //	@Description	Returns rollup statistics aggregated by the selected column (stack, type, category, vm, or provider), using the chosen aggregate function (sum or avg).
 //	@Tags			rollup
 //	@ID				rollup-grouped-statistics
-//	@Param			func	query	string	false	"Aggregate function"	Enums(sum, avg)
-//	@Param			column	query	string	false	"Group column"	Enums(stack, type, category, vm, provider)
+//	@Param			func	query	string	false	"Aggregate function"	Enums(sum, avg)	example(sum)
+//	@Param			column	query	string	false	"Group column"	Enums(stack, type, category, vm, provider)	example(stack)
 //	@Produce		json
 //	@Success		200	{array}		responses.RollupGroupedStats
 //	@Failure		400	{object}	Error

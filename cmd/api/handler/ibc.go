@@ -55,7 +55,7 @@ type getIbcClientRequest struct {
 //	@Description	Returns information about an IBC light client identified by its client ID, including the counterparty chain ID, client state type, and trusting period.
 //	@Tags			ibc
 //	@ID				get-ibc-client
-//	@Param			id	path	string	true	"IBC client id"
+//	@Param			id	path	string	true	"IBC client id"	example(client-1)
 //	@Produce		json
 //	@Success		200	{object}	responses.IbcClient
 //	@Success		204
@@ -115,11 +115,11 @@ func (req *getIbcClientsRequest) ToFilters(ctx context.Context, address storage.
 //	@Description	Returns a paginated list of IBC light clients. Supports filtering by chain ID and creator address.
 //	@Tags			ibc
 //	@ID				get-ibc-clients
-//	@Param			limit		query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
-//	@Param			offset		query	integer	false	"Offset"										minimum(1)
-//	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			chain_id	query	string	false	"Chain id"
-//	@Param			creator		query	string	false	"Creator address"						    	minlength(47)	maxlength(47)
+//	@Param			limit		query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
+//	@Param			offset		query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
+//	@Param			chain_id	query	string	false	"Chain id"	example(celestia)
+//	@Param			creator		query	string	false	"Creator address"						    	minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Produce		json
 //	@Success		200	{array}	responses.IbcClient
 //	@Success		204
@@ -158,7 +158,7 @@ type getIbcConnectionRequest struct {
 //	@Description	Returns information about an IBC connection identified by its connection ID, including linked client ID and counterparty connection details.
 //	@Tags			ibc
 //	@ID				get-ibc-conn
-//	@Param			id	path	string	true	"IBC connection id"
+//	@Param			id	path	string	true	"IBC connection id"	example(connection-1)
 //	@Produce		json
 //	@Success		200	{object}	responses.IbcConnection
 //	@Success		204
@@ -201,10 +201,10 @@ func (req *getIbcConnsRequest) SetDefault() {
 //	@Description	Returns a paginated list of IBC connections. Supports filtering by client ID.
 //	@Tags			ibc
 //	@ID				get-ibc-conns
-//	@Param			limit	    query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
-//	@Param			offset	    query	integer	false	"Offset"										minimum(1)
-//	@Param			sort	    query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			client_id	query	string	false	"Client id"
+//	@Param			limit	    query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
+//	@Param			offset	    query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			sort	    query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
+//	@Param			client_id	query	string	false	"Client id"	example(client-1)
 //	@Produce		json
 //	@Success		200	{array}	responses.IbcConnection
 //	@Success		204
@@ -245,7 +245,7 @@ type getIbcChannelRequest struct {
 //	@Description	Returns information about an IBC channel by its channel ID, including ordering, state, connection, and counterparty port/channel.
 //	@Tags			ibc
 //	@ID				get-ibc-channel
-//	@Param			id	path	string	true	"IBC channel id"
+//	@Param			id	path	string	true	"IBC channel id"	example(channel-1)
 //	@Produce		json
 //	@Success		200	{object}	responses.IbcChannel
 //	@Success		204
@@ -290,12 +290,12 @@ func (req *getIbcChannelsRequest) SetDefault() {
 //	@Description	Returns a paginated list of IBC channels. Supports filtering by client ID, connection ID, and channel status (initialization, opened, closed).
 //	@Tags			ibc
 //	@ID				get-ibc-channels
-//	@Param			limit	        query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
-//	@Param			offset	        query	integer	false	"Offset"										minimum(1)
-//	@Param			sort	        query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			client_id	    query	string	false	"Client id"
-//	@Param			connection_id	query	string	false	"Connection id"
-//	@Param			status	        query	string	false	"Channel status"					        	Enums(initialization, opened, closed)
+//	@Param			limit	        query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
+//	@Param			offset	        query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			sort	        query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
+//	@Param			client_id	    query	string	false	"Client id"	example(client-1)
+//	@Param			connection_id	query	string	false	"Connection id"	example(connection-1)
+//	@Param			status	        query	string	false	"Channel status"					        	Enums(initialization, opened, closed)	example(opened)
 //	@Produce		json
 //	@Success		200	{array}	responses.IbcChannel
 //	@Success		204
@@ -355,15 +355,15 @@ func (req *getIbcTransfersRequest) SetDefault() {
 //	@Description	Returns a paginated list of IBC token transfers. Supports filtering by channel, chain ID, sender, receiver, either-party address, and transaction hash.
 //	@Tags			ibc
 //	@ID				get-ibc-transfers
-//	@Param			limit	    	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)
-//	@Param			offset	    	query	integer	false	"Offset"										minimum(1)
-//	@Param			sort	   		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)
-//	@Param			channel_id		query	string	false	"Channel id"
-//	@Param			chain_id		query	string	false	"Chain id"
-//	@Param			receiver		query	string	false	"Receiver address"								minlength(47)	maxlength(47)
-//	@Param			sender			query	string	false	"Sender address"								minlength(47)	maxlength(47)
-//	@Param			address			query	string	false	"Address: receiver or sender"					minlength(47)	maxlength(47)
-//	@Param			hash	        query	string	false	"Transaction hash in hexadecimal"	            minlength(64)	maxlength(64)
+//	@Param			limit	    	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
+//	@Param			offset	    	query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			sort	   		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
+//	@Param			channel_id		query	string	false	"Channel id"	example(channel-1)
+//	@Param			chain_id		query	string	false	"Chain id"	example(celestia)
+//	@Param			receiver		query	string	false	"Receiver address"								minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			sender			query	string	false	"Sender address"								minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			address			query	string	false	"Address: receiver or sender"					minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
+//	@Param			hash	        query	string	false	"Transaction hash in hexadecimal"	            minlength(64)	maxlength(64)	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Produce		json
 //	@Success		200	{array}	responses.IbcTransfer
 //	@Success		204
@@ -452,7 +452,7 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 //	@Description	Returns a single IBC token transfer by its internal id, including sender, receiver, amount, denom, and transaction reference.
 //	@Tags			ibc
 //	@ID				get-ibc-transfer
-//	@Param			id	path	integer	true	"Internal identity"	minimum(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)
 //	@Produce		json
 //	@Success		200	{object}	responses.IbcTransfer
 //	@Success		204
