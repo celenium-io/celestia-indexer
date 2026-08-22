@@ -9,19 +9,16 @@ import (
 	"cosmossdk.io/x/feegrant"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/handle"
-	"github.com/celestiaorg/celestia-app/v9/app"
-	"github.com/celestiaorg/celestia-app/v9/app/encoding"
 	"github.com/cosmos/cosmos-sdk/codec"
 )
-
-var cfg = encoding.MakeConfig(app.ModuleEncodingRegisters...)
 
 func (module *Module) parseFeeGrants(
 	feeGrantsRaw []json.RawMessage, block storage.Block, data *parsedData,
 ) error {
-	cdc := codec.NewProtoCodec(cfg.InterfaceRegistry)
+	cdc := codec.NewProtoCodec(decode.Config.InterfaceRegistry)
 
 	ctx := decodeContext.NewContext()
 	ctx.Block = &block

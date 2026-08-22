@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
-	"github.com/celenium-io/celestia-indexer/internal/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	st "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -352,7 +351,7 @@ func (handler *ValidatorHandler) Count(c echo.Context) error {
 		return handleError(c, err, handler.validators)
 	}
 
-	active := math.Min(int(max), state.TotalValidators-jailed)
+	active := min(int(max), state.TotalValidators-jailed)
 	return c.JSON(http.StatusOK, responses.ValidatorCount{
 		Total:    state.TotalValidators,
 		Jailed:   jailed,

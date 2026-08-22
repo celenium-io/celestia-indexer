@@ -292,7 +292,7 @@ type Gov struct {
 }
 
 func (gov Gov) GetDepositParams() (DepositParams, error) {
-	if gov.DepositParams != nil {
+	if gov.DepositParams != nil && gov.DepositParams.MaxDepositPeriod != "" {
 		return *gov.DepositParams, nil
 	}
 	if gov.Params != nil {
@@ -305,7 +305,7 @@ func (gov Gov) GetDepositParams() (DepositParams, error) {
 }
 
 func (gov Gov) GetVotingParams() (VotingParams, error) {
-	if gov.VotingParams != nil {
+	if gov.VotingParams != nil && gov.VotingParams.VotingPeriod != "" {
 		return *gov.VotingParams, nil
 	}
 	if gov.Params != nil {
@@ -317,7 +317,7 @@ func (gov Gov) GetVotingParams() (VotingParams, error) {
 }
 
 func (gov Gov) GetTallyParams() (TallyParams, error) {
-	if gov.TallyParams != nil {
+	if gov.TallyParams != nil && gov.TallyParams.Quorum != "" {
 		return *gov.TallyParams, nil
 	}
 	if gov.Params != nil {

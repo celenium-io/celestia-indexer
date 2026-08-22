@@ -9,6 +9,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
 
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
@@ -57,4 +58,17 @@ func (Address) TableName() string {
 
 func (address Address) String() string {
 	return address.Address
+}
+
+func (address *Address) AddSpendableBalance(currency string, value storageTypes.Numeric) {
+	for i := range address.Balances {
+		if address.Balances[i].Currency == currency {
+			address.Balances[i].Spendable = address.Balances[i].Spendable.Add(value)
+			return
+		}
+	}
+	balance := EmptyBalance()
+	balance.Spendable = balance.Spendable.Add(value)
+	balance.Currency = currency
+	address.Balances = append(address.Balances, balance)
 }

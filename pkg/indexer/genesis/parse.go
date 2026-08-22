@@ -15,6 +15,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/pkg/errors"
 )
 
@@ -65,9 +66,11 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 		},
 		MessageTypes: storageTypes.NewMsgTypeBits(),
 	}
+	module.parseDenomMetadata(genesis.AppState.Bank.DenomMetadata, &data)
 
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &block
+	currencyBase := getBaseCurrency(data.denomMetadata)
 
 	if err := module.parseAccounts(genesis.ModuleAccs, block, &data); err != nil {
 		return data, errors.Wrap(err, "parse genesis accounts")
@@ -118,24 +121,65 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 		}
 
 		if t, ok := txDecoded.(cosmosTypes.FeeTx); ok {
-			if coins := t.GetFee(); len(coins) == 1 {
-				coin := coins[0]
-				tx.Fee, err = storageTypes.NumericFromString(coin.Amount.String())
+			value, err := decode.DecodeFee(t.GetFee())
+			if err != nil {
+				return data, errors.Wrap(err, "fee decoding")
+			}
+			tx.Fee = storageTypes.NewNumeric(value)
+			block.Stats.Fee = block.Stats.Fee.Add(tx.Fee)
+			if data.feeCollector != nil {
+				data.feeCollector.AddSpendableBalance(currencyBase, tx.Fee)
+			}
+		}
+
+		if t, ok := txDecoded.(signing.Tx); ok {
+			signers, err := t.GetSigners()
+			if payer := t.FeePayer(); len(payer) > 0 {
+				addr, err := addEmptyAddress(payer, currencyBase, block.Height, &data)
 				if err != nil {
-					return data, errors.Wrap(err, "fee decoding")
+					return data, errors.Wrap(err, "add signer")
 				}
-				if data.feeCollector != nil {
-					setBalance(coin.GetDenom(), tx.Fee, data.feeCollector)
+				addr.AddSpendableBalance(currencyBase, tx.Fee.Neg())
+			}
+
+			if err != nil {
+				pubKeys, err := t.GetPubKeys()
+				if err != nil {
+					return data, errors.Wrap(err, "get pub keys")
+				}
+				for _, pk := range pubKeys {
+					if _, err := addEmptyAddress(pk.Address().Bytes(), currencyBase, block.Height, &data); err != nil {
+						return data, errors.Wrap(err, "add signer")
+					}
+				}
+			} else {
+				for i := range signers {
+					if _, err := addEmptyAddress(signers[i], currencyBase, block.Height, &data); err != nil {
+						return data, errors.Wrap(err, "add signer")
+					}
 				}
 			}
 		}
+
 	}
 
 	for _, addr := range decodeCtx.Addresses.Values() {
-		data.addresses[addr.String()] = addr
+		if a, ok := data.addresses[addr.String()]; ok {
+			for i := range addr.Balances {
+				for j := range a.Balances {
+					if a.Balances[j].Currency == addr.Balances[i].Currency {
+						a.Balances[j].Spendable = a.Balances[j].Spendable.Add(addr.Balances[i].Spendable)
+						a.Balances[j].Delegated = a.Balances[j].Delegated.Add(addr.Balances[i].Delegated)
+						a.Balances[j].Unbonding = a.Balances[j].Unbonding.Add(addr.Balances[i].Unbonding)
+						break
+					}
+				}
+			}
+		} else {
+			data.addresses[addr.String()] = addr
+		}
 	}
 
-	module.parseDenomMetadata(genesis.AppState.Bank.DenomMetadata, &data)
 	if err := module.parseConstants(genesis.AppState, genesis.ConsensusParams, &data); err != nil {
 		return data, errors.Wrap(err, "parse constants")
 	}
@@ -170,6 +214,33 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 	return data, nil
 }
 
+func addEmptyAddress(pk []byte, denom string, height pkgTypes.Level, data *parsedData) (*storage.Address, error) {
+	address, err := pkgTypes.NewAddressFromBytes(pk)
+	if err != nil {
+		return nil, errors.Wrap(err, "NewAddressFromBytes")
+	}
+
+	readableAddress := address.String()
+	if addr, ok := data.addresses[readableAddress]; ok {
+		return addr, nil
+	}
+	data.addresses[readableAddress] = &storage.Address{
+		Address:    readableAddress,
+		Hash:       pk,
+		Height:     height,
+		LastHeight: height,
+		Balances: []storage.Balance{
+			{
+				Spendable: storageTypes.NumericZero(),
+				Delegated: storageTypes.NumericZero(),
+				Unbonding: storageTypes.NumericZero(),
+				Currency:  denom,
+			},
+		},
+	}
+	return data.addresses[readableAddress], nil
+}
+
 func (module *Module) parseTotalSupply(supply []types.Supply, block *storage.Block) {
 	if len(supply) == 0 {
 		return
@@ -180,11 +251,16 @@ func (module *Module) parseTotalSupply(supply []types.Supply, block *storage.Blo
 	}
 }
 
-func (module *Module) parseAccounts(accounts []types.Account, block storage.Block, data *parsedData) error {
+func getBaseCurrency(denomMetadata []storage.DenomMetadata) string {
 	currencyBase := currency.DefaultCurrency
-	if len(data.denomMetadata) > 0 {
-		currencyBase = data.denomMetadata[0].Base
+	if len(denomMetadata) > 0 {
+		currencyBase = denomMetadata[0].Base
 	}
+	return currencyBase
+}
+
+func (module *Module) parseAccounts(accounts []types.Account, block storage.Block, data *parsedData) error {
+	currencyBase := getBaseCurrency(data.denomMetadata)
 
 	for i := range accounts {
 		address := storage.Address{
@@ -262,6 +338,7 @@ func addAddress(data *parsedData, block storage.Block, address string) error {
 	if _, ok := data.addresses[address]; ok {
 		return nil
 	}
+	currencyBase := getBaseCurrency(data.denomMetadata)
 
 	addr := &storage.Address{
 		Address:    address,
@@ -272,7 +349,7 @@ func addAddress(data *parsedData, block storage.Block, address string) error {
 				Spendable: storageTypes.NumericZero(),
 				Delegated: storageTypes.NumericZero(),
 				Unbonding: storageTypes.NumericZero(),
-				Currency:  currency.Utia,
+				Currency:  currencyBase,
 			},
 		},
 	}
@@ -312,27 +389,11 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 			if err != nil {
 				continue
 			}
-			setBalance(coin.Denom, value, addr)
+			addr.AddSpendableBalance(coin.Denom, value)
 		}
 	}
 
 	return nil
-}
-
-func setBalance(denom string, value storageTypes.Numeric, address *storage.Address) {
-	for i := range address.Balances {
-		if address.Balances[i].Currency == denom {
-			address.Balances[i].Spendable = address.Balances[i].Spendable.Add(value)
-			return
-		}
-	}
-
-	address.Balances = append(address.Balances, storage.Balance{
-		Spendable: value,
-		Delegated: storageTypes.NumericZero(),
-		Unbonding: storageTypes.NumericZero(),
-		Currency:  denom,
-	})
 }
 
 func getAmountFromOriginalVesting(vestings []types.Coins) (storageTypes.Numeric, error) {

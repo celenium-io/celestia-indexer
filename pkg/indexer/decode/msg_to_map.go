@@ -19,7 +19,7 @@ func MsgToMap(msg cosmosTypes.Msg) (storageTypes.PackedBytes, error) {
 }
 
 func msgToMap(msg cosmosTypes.Msg) (storageTypes.PackedBytes, error) {
-	b, err := cfg.Codec.MarshalJSON(msg)
+	b, err := Config.Codec.MarshalJSON(msg)
 	if err != nil {
 		// Fallback for messages containing unresolvable Any types (e.g. empty TypeUrl).
 		b, err = jsonApi.Marshal(msg)

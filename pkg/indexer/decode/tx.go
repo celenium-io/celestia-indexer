@@ -35,7 +35,8 @@ func NewDecodedTx() DecodedTx {
 }
 
 var (
-	cfg, txDecoder = createDecoder()
+	Config    = createConfig()
+	txDecoder = createDecoder()
 )
 
 func Tx(b *types.BlockData, index int) (d DecodedTx, err error) {
@@ -68,7 +69,7 @@ func decodeCosmosTx(decoder cosmosTypes.TxDecoder, raw tmTypes.Tx, d *DecodedTx)
 		d.Memo = t.GetMemo()
 	}
 	if t, ok := txDecoded.(cosmosTypes.FeeTx); ok {
-		d.Fee, err = decodeFee(t.GetFee())
+		d.Fee, err = DecodeFee(t.GetFee())
 		if err != nil {
 			return errors.Wrap(err, "decode fee")
 		}
@@ -103,7 +104,7 @@ func decodeCosmosTx(decoder cosmosTypes.TxDecoder, raw tmTypes.Tx, d *DecodedTx)
 	return nil
 }
 
-func decodeFee(amount cosmosTypes.Coins) (decimal.Decimal, error) {
+func DecodeFee(amount cosmosTypes.Coins) (decimal.Decimal, error) {
 	if amount == nil {
 		return decimal.Zero, nil
 	}
@@ -142,12 +143,16 @@ func getFeeInDenom(amount cosmosTypes.Coins, denom string) (decimal.Decimal, boo
 	}
 }
 
-func createDecoder() (encoding.Config, cosmosTypes.TxDecoder) {
+func createConfig() encoding.Config {
 	cfg := encoding.MakeConfig(app.ModuleEncodingRegisters...)
 	cfg.InterfaceRegistry.RegisterImplementations((*cosmosTypes.Msg)(nil), &legacy.MsgRegisterEVMAddress{})
-	return cfg, cfg.TxConfig.TxDecoder()
+	return cfg
+}
+
+func createDecoder() cosmosTypes.TxDecoder {
+	return Config.TxConfig.TxDecoder()
 }
 
 func JsonTx(raw []byte) (cosmosTypes.Tx, error) {
-	return cfg.TxConfig.TxJSONDecoder()(raw)
+	return Config.TxConfig.TxJSONDecoder()(raw)
 }

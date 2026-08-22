@@ -170,11 +170,11 @@ func Message(
 
 		msgs := make([]any, 0)
 		for i := range typedMsg.Msgs {
-			msg, err := cosmosTypes.GetMsgFromTypeURL(cfg.Codec, typedMsg.Msgs[i].TypeUrl)
+			msg, err := cosmosTypes.GetMsgFromTypeURL(Config.Codec, typedMsg.Msgs[i].TypeUrl)
 			if err != nil {
 				return d, err
 			}
-			if err := cfg.Codec.UnpackAny(typedMsg.Msgs[i], &msg); err != nil {
+			if err := Config.Codec.UnpackAny(typedMsg.Msgs[i], &msg); err != nil {
 				return d, err
 			}
 			m, mapErr := msgToMap(msg)
@@ -191,7 +191,7 @@ func Message(
 	// gov module
 	case *cosmosGovTypesV1.MsgSubmitProposal:
 		var msgs []any
-		d.Msg.Type, msgs, d.Msg.Proposal, err = handle.MsgSubmitProposalV1(ctx, cfg.Codec, status, d.Msg.Id, typedMsg)
+		d.Msg.Type, msgs, d.Msg.Proposal, err = handle.MsgSubmitProposalV1(ctx, Config.Codec, status, d.Msg.Id, typedMsg)
 		if err != nil {
 			return d, err
 		}
@@ -200,7 +200,7 @@ func Message(
 		}
 	case *cosmosGovTypesV1Beta1.MsgSubmitProposal:
 		var content any
-		d.Msg.Type, content, d.Msg.Proposal, err = handle.MsgSubmitProposalV1Beta(ctx, cfg.Codec, status, d.Msg.Id, typedMsg)
+		d.Msg.Type, content, d.Msg.Proposal, err = handle.MsgSubmitProposalV1Beta(ctx, Config.Codec, status, d.Msg.Id, typedMsg)
 		if err != nil {
 			return d, err
 		}
@@ -340,13 +340,13 @@ func Message(
 	case *coreChannel.MsgChannelCloseConfirm:
 		d.Msg.Type, err = handle.MsgChannelCloseConfirm(ctx, d.Msg.Id, typedMsg)
 	case *coreChannel.MsgRecvPacket:
-		d.Msg.Type, err = handle.MsgRecvPacket(ctx, status, cfg.Codec, d.Msg.Data, txId, d.Msg.Id, typedMsg)
+		d.Msg.Type, err = handle.MsgRecvPacket(ctx, status, Config.Codec, d.Msg.Data, txId, d.Msg.Id, typedMsg)
 	case *coreChannel.MsgTimeout:
 		d.Msg.Type, err = handle.MsgTimeout(ctx, d.Msg.Id, typedMsg)
 	case *coreChannel.MsgTimeoutOnClose:
 		d.Msg.Type, err = handle.MsgTimeoutOnClose(ctx, d.Msg.Id, typedMsg)
 	case *coreChannel.MsgAcknowledgement:
-		d.Msg.Type, err = handle.MsgAcknowledgement(ctx, status, cfg.Codec, d.Msg.Data, txId, d.Msg.Id, typedMsg)
+		d.Msg.Type, err = handle.MsgAcknowledgement(ctx, status, Config.Codec, d.Msg.Data, txId, d.Msg.Id, typedMsg)
 	case *coreChannel.MsgUpdateParams:
 		d.Msg.Type, err = handle.MsgUpdateParamsChannel(ctx, d.Msg.Id, typedMsg)
 
