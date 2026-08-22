@@ -11,10 +11,13 @@ import (
 	json "github.com/bytedance/sonic"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	"github.com/stretchr/testify/require"
 )
+
+const permanentLockedAccountAddress = "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6"
 
 func TestParseAccounts(t *testing.T) {
 	f, err := os.Open("../../../test/json/genesis.json")
@@ -74,7 +77,27 @@ func TestParseAccounts(t *testing.T) {
 			Hash:       []byte{0xce, 0xb7, 0x0, 0xd9, 0x20, 0x41, 0x78, 0xd8, 0xc7, 0x75, 0xcd, 0xa3, 0x2c, 0xbd, 0x1f, 0x10, 0xff, 0x82, 0xa5, 0xe1},
 			Balances:   []storage.Balance{storage.EmptyBalance()},
 		},
+		permanentLockedAccountAddress: {
+			Address:    permanentLockedAccountAddress,
+			Height:     1,
+			LastHeight: 1,
+			Hash:       []byte{0x94, 0x63, 0x42, 0xc7, 0x73, 0x2f, 0x6, 0x22, 0x37, 0xb6, 0x73, 0xf5, 0x26, 0xf2, 0x67, 0x4c, 0x7d, 0xb, 0xff, 0x98},
+			Balances:   []storage.Balance{storage.EmptyBalance()},
+		},
 	}
 	require.Equal(t, want, data.addresses)
-	require.Len(t, data.vestings, 3)
+	require.Len(t, data.vestings, 4)
+
+	var permanent *storage.VestingAccount
+	for _, v := range data.vestings {
+		if v.Address.Address == permanentLockedAccountAddress {
+			permanent = v
+			break
+		}
+	}
+	require.NotNil(t, permanent, "expected a vesting entry for the permanent locked account")
+	require.Equal(t, storageTypes.VestingTypePermanent, permanent.Type)
+	require.Nil(t, permanent.EndTime)
+	require.Nil(t, permanent.StartTime)
+	require.Empty(t, permanent.VestingPeriods)
 }

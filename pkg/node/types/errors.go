@@ -7,5 +7,6 @@ import "errors"
 
 // errors
 var (
-	ErrRequest = errors.New("request error")
+	ErrRequest        = errors.New("request error")
+	ErrParamsNotFound = errors.New("params not found")
 )

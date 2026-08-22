@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/pkg/errors"
 )
 
 type GenesisOutput struct {
@@ -290,43 +291,43 @@ type Gov struct {
 	TallyParams        *TallyParams   `json:"tally_params"`
 }
 
-func (gov Gov) GetDepositParams() DepositParams {
+func (gov Gov) GetDepositParams() (DepositParams, error) {
 	if gov.DepositParams != nil {
-		return *gov.DepositParams
+		return *gov.DepositParams, nil
 	}
 	if gov.Params != nil {
 		return DepositParams{
 			MinDeposit:       gov.Params.MinDeposit,
 			MaxDepositPeriod: gov.Params.MaxDepositPeriod,
-		}
+		}, nil
 	}
-	return DepositParams{}
+	return DepositParams{}, errors.Wrap(ErrParamsNotFound, "deposit params")
 }
 
-func (gov Gov) GetVotingParams() VotingParams {
+func (gov Gov) GetVotingParams() (VotingParams, error) {
 	if gov.VotingParams != nil {
-		return *gov.VotingParams
+		return *gov.VotingParams, nil
 	}
 	if gov.Params != nil {
 		return VotingParams{
 			VotingPeriod: gov.Params.VotingPeriod,
-		}
+		}, nil
 	}
-	return VotingParams{}
+	return VotingParams{}, errors.Wrap(ErrParamsNotFound, "voting params")
 }
 
-func (gov Gov) GetTallyParams() TallyParams {
+func (gov Gov) GetTallyParams() (TallyParams, error) {
 	if gov.TallyParams != nil {
-		return *gov.TallyParams
+		return *gov.TallyParams, nil
 	}
 	if gov.Params != nil {
 		return TallyParams{
 			Quorum:        gov.Params.Quorum,
 			Threshold:     gov.Params.Threshold,
 			VetoThreshold: gov.Params.VetoThreshold,
-		}
+		}, nil
 	}
-	return TallyParams{}
+	return TallyParams{}, errors.Wrap(ErrParamsNotFound, "tally params")
 }
 
 type ClientGenesisParams struct {

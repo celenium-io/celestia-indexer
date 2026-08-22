@@ -117,7 +117,11 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 	})
 
 	// gov
-	govDepositParams := appState.Gov.GetDepositParams()
+	govDepositParams, err := appState.Gov.GetDepositParams()
+	if err != nil {
+		return err
+	}
+
 	if len(govDepositParams.MinDeposit) > 0 {
 		data.constants = append(data.constants, storage.Constant{
 			Module: storageTypes.ModuleNameGov,
@@ -137,9 +141,13 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 		Value:  strconv.FormatInt(maxDepositPeriod.Nanoseconds(), 10),
 	})
 
-	votingPeriod, err := time.ParseDuration(appState.Gov.GetVotingParams().VotingPeriod)
+	votingParams, err := appState.Gov.GetVotingParams()
 	if err != nil {
-		return errors.Wrap(err, "voting power")
+		return err
+	}
+	votingPeriod, err := time.ParseDuration(votingParams.VotingPeriod)
+	if err != nil {
+		return errors.Wrap(err, "voting period")
 	}
 
 	data.constants = append(data.constants, storage.Constant{
@@ -148,7 +156,10 @@ func (module *Module) parseConstants(appState types.AppState, consensus pkgTypes
 		Value:  strconv.FormatInt(votingPeriod.Nanoseconds(), 10),
 	})
 
-	tallyParams := appState.Gov.GetTallyParams()
+	tallyParams, err := appState.Gov.GetTallyParams()
+	if err != nil {
+		return err
+	}
 	data.constants = append(data.constants, storage.Constant{
 		Module: storageTypes.ModuleNameGov,
 		Name:   "quorum",
