@@ -241,32 +241,44 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 			continue
 		}
 
-		_, hash, err := pkgTypes.Address(balances[i].Address).Decode()
-		if err != nil {
-			return err
-		}
-		address := storage.Address{
-			Hash:       hash,
-			Address:    balances[i].Address,
-			Height:     height,
-			LastHeight: height,
-			Balances: []storage.Balance{
-				{
-					Spendable: storageTypes.NumericZero(),
-					Delegated: storageTypes.NumericZero(),
-					Unbonding: storageTypes.NumericZero(),
-					Currency:  balances[i].Coins[0].Denom,
-				},
-			},
-		}
-		if balance, err := storageTypes.NumericFromString(balances[i].Coins[0].Amount); err == nil {
-			address.Balances[0].Spendable = address.Balances[0].Spendable.Add(balance)
+		addr, ok := data.addresses[balances[i].Address]
+		if !ok {
+			_, hash, err := pkgTypes.Address(balances[i].Address).Decode()
+			if err != nil {
+				return err
+			}
+			addr = &storage.Address{
+				Hash:       hash,
+				Address:    balances[i].Address,
+				Height:     height,
+				LastHeight: height,
+				Balances:   make([]storage.Balance, 0, len(balances[i].Coins)),
+			}
+			data.addresses[addr.String()] = addr
 		}
 
-		if addr, ok := data.addresses[address.String()]; ok {
-			addr.Balances[0].Spendable = addr.Balances[0].Spendable.Add(address.Balances[0].Spendable)
-		} else {
-			data.addresses[address.String()] = &address
+		for _, coin := range balances[i].Coins {
+			value, err := storageTypes.NumericFromString(coin.Amount)
+			if err != nil {
+				continue
+			}
+
+			found := false
+			for j := range addr.Balances {
+				if addr.Balances[j].Currency == coin.Denom {
+					addr.Balances[j].Spendable = addr.Balances[j].Spendable.Add(value)
+					found = true
+					break
+				}
+			}
+			if !found {
+				addr.Balances = append(addr.Balances, storage.Balance{
+					Spendable: value,
+					Delegated: storageTypes.NumericZero(),
+					Unbonding: storageTypes.NumericZero(),
+					Currency:  coin.Denom,
+				})
+			}
 		}
 	}
 

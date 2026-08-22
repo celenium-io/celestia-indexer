@@ -101,3 +101,69 @@ func TestParseAccounts(t *testing.T) {
 	require.Nil(t, permanent.StartTime)
 	require.Empty(t, permanent.VestingPeriods)
 }
+
+func TestParseBalances_NewAddressMultiCoin(t *testing.T) {
+	data := newParsedData()
+	module := NewModule(postgres.Storage{}, config.Indexer{})
+
+	const addr = "celestia1qqqpkhsnpyvtzx4knu53zsdfn7l88czztlp8tt"
+	balances := []types.Balances{
+		{
+			Address: addr,
+			Coins: []types.Coins{
+				{Denom: "utia", Amount: "100"},
+				{Denom: "ibc/AAA", Amount: "50"},
+			},
+		},
+	}
+
+	err := module.parseBalances(balances, 1, &data)
+	require.NoError(t, err)
+
+	require.Contains(t, data.addresses, addr)
+	got := data.addresses[addr]
+	require.Len(t, got.Balances, 2)
+
+	byCurrency := make(map[string]storageTypes.Numeric)
+	for _, b := range got.Balances {
+		byCurrency[b.Currency] = b.Spendable
+	}
+	require.Equal(t, storageTypes.NumericFromInt64(100), byCurrency["utia"])
+	require.Equal(t, storageTypes.NumericFromInt64(50), byCurrency["ibc/AAA"])
+}
+
+func TestParseBalances_ExistingAddressNewCurrency(t *testing.T) {
+	data := newParsedData()
+	module := NewModule(postgres.Storage{}, config.Indexer{})
+
+	const addr = "celestia1qqqpkhsnpyvtzx4knu53zsdfn7l88czztlp8tt"
+	data.addresses[addr] = &storage.Address{
+		Address:    addr,
+		Height:     1,
+		LastHeight: 1,
+		Balances:   []storage.Balance{storage.EmptyBalance()},
+	}
+
+	balances := []types.Balances{
+		{
+			Address: addr,
+			Coins: []types.Coins{
+				{Denom: "utia", Amount: "100"},
+				{Denom: "ibc/AAA", Amount: "50"},
+			},
+		},
+	}
+
+	err := module.parseBalances(balances, 1, &data)
+	require.NoError(t, err)
+
+	got := data.addresses[addr]
+	require.Len(t, got.Balances, 2)
+
+	byCurrency := make(map[string]storageTypes.Numeric)
+	for _, b := range got.Balances {
+		byCurrency[b.Currency] = b.Spendable
+	}
+	require.Equal(t, storageTypes.NumericFromInt64(100), byCurrency["utia"])
+	require.Equal(t, storageTypes.NumericFromInt64(50), byCurrency["ibc/AAA"])
+}

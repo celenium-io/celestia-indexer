@@ -41,8 +41,18 @@ func (module *Module) rollbackBalances(
 		return err
 	}
 
-	_, err = tx.SaveAddresses(ctx, updates...)
-	return err
+	if _, err = tx.SaveAddresses(ctx, updates...); err != nil {
+		return errors.Wrap(err, "save addresses")
+	}
+
+	balances := make([]storage.Balance, 0, len(updates))
+	for i := range updates {
+		for j := range updates[i].Balances {
+			updates[i].Balances[j].Id = updates[i].Id
+		}
+		balances = append(balances, updates[i].Balances...)
+	}
+	return tx.SaveBalances(ctx, balances...)
 }
 
 func getBalanceUpdates(
