@@ -1453,7 +1453,7 @@
                     },
                     {
                         "type": "string",
-                        "example": "vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg=",
+                        "example": "vbGakK59-Non81TE3ULg5Ve5ufT9SFm_bCyY-WLR3gg=",
                         "description": "Commitment value in URLbase64 format",
                         "name": "commitment",
                         "in": "query"
@@ -2614,7 +2614,7 @@
                     },
                     {
                         "type": "string",
-                        "example": "1,2",
+                        "example": "0,1",
                         "description": "Comma-separated array of share versions. Default is 0",
                         "name": "versions",
                         "in": "query"
@@ -4520,7 +4520,7 @@
                     },
                     {
                         "type": "string",
-                        "example": "vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg=",
+                        "example": "vbGakK59-Non81TE3ULg5Ve5ufT9SFm_bCyY-WLR3gg=",
                         "description": "Commitment value in URLbase64 format",
                         "name": "commitment",
                         "in": "query"
@@ -7194,11 +7194,10 @@
                 "operationId": "stats-staking-series",
                 "parameters": [
                     {
-                        "maxLength": 56,
-                        "minLength": 56,
-                        "type": "string",
-                        "example": "4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02",
-                        "description": "Validator id",
+                        "minimum": 1,
+                        "type": "integer",
+                        "example": 1,
+                        "description": "Internal validator id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -7298,7 +7297,7 @@
                             "validator"
                         ],
                         "type": "string",
-                        "example": "block",
+                        "example": "block_stats",
                         "description": "Table name",
                         "name": "table",
                         "in": "path",

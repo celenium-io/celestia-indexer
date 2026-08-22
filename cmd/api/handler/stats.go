@@ -359,7 +359,7 @@ type stakingSeriesRequest struct {
 //	@Description	Returns a time-series histogram of staking metrics (rewards, commissions, delegation flows, etc.) for the specified validator and timeframe.
 //	@Tags			stats
 //	@ID				stats-staking-series
-//	@Param			id			path	string	true	"Internal validator id"			minimum(1)	example(1)
+//	@Param			id			path	integer	true	"Internal validator id"			minimum(1)	example(1)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)	example(day)
 //	@Param			name		path	string	true	"Series name"					Enums(rewards, commissions, flow, delegations, unbondings, delegations_count, unbondings_count, cumulative_flow)	example(rewards)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
