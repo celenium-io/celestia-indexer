@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/pkg/errors"
 )
 
 type GenesisOutput struct {
@@ -166,7 +167,7 @@ type Evidence struct {
 }
 
 type Feegrant struct {
-	Allowances []interface{} `json:"allowances"`
+	FeeGrants []json.RawMessage `json:"allowances"`
 }
 
 type Description struct {
@@ -245,6 +246,25 @@ type Genutil struct {
 	GenTxs []json.RawMessage `json:"gen_txs"`
 }
 
+type GovParams struct {
+	MinDeposit                 []Coins `json:"min_deposit"`
+	MaxDepositPeriod           string  `json:"max_deposit_period"`
+	VotingPeriod               string  `json:"voting_period"`
+	Quorum                     string  `json:"quorum"`
+	Threshold                  string  `json:"threshold"`
+	VetoThreshold              string  `json:"veto_threshold"`
+	MinInitialDepositRatio     string  `json:"min_initial_deposit_ratio"`
+	ProposalCancelRatio        string  `json:"proposal_cancel_ratio"`
+	ProposalCancelDest         string  `json:"proposal_cancel_dest"`
+	ExpeditedVotingPeriod      string  `json:"expedited_voting_period"`
+	ExpeditedThreshold         string  `json:"expedited_threshold"`
+	ExpeditedMinDeposit        []Coins `json:"expedited_min_deposit"`
+	BurnVoteQuorum             bool    `json:"burn_vote_quorum"`
+	BurnProposalDepositPrevote bool    `json:"burn_proposal_deposit_prevote"`
+	BurnVoteVeto               bool    `json:"burn_vote_veto"`
+	MinDepositRatio            string  `json:"min_deposit_ratio"`
+}
+
 type DepositParams struct {
 	MinDeposit       []Coins `json:"min_deposit"`
 	MaxDepositPeriod string  `json:"max_deposit_period"`
@@ -261,13 +281,53 @@ type TallyParams struct {
 }
 
 type Gov struct {
-	StartingProposalID string        `json:"starting_proposal_id"`
-	Deposits           []interface{} `json:"deposits"`
-	Votes              []interface{} `json:"votes"`
-	Proposals          []interface{} `json:"proposals"`
-	DepositParams      DepositParams `json:"deposit_params"`
-	VotingParams       VotingParams  `json:"voting_params"`
-	TallyParams        TallyParams   `json:"tally_params"`
+	StartingProposalID string         `json:"starting_proposal_id"`
+	Deposits           []interface{}  `json:"deposits"`
+	Votes              []interface{}  `json:"votes"`
+	Proposals          []interface{}  `json:"proposals"`
+	DepositParams      *DepositParams `json:"deposit_params"`
+	Params             *GovParams     `json:"params"`
+	VotingParams       *VotingParams  `json:"voting_params"`
+	TallyParams        *TallyParams   `json:"tally_params"`
+}
+
+func (gov Gov) GetDepositParams() (DepositParams, error) {
+	if gov.DepositParams != nil && gov.DepositParams.MaxDepositPeriod != "" {
+		return *gov.DepositParams, nil
+	}
+	if gov.Params != nil {
+		return DepositParams{
+			MinDeposit:       gov.Params.MinDeposit,
+			MaxDepositPeriod: gov.Params.MaxDepositPeriod,
+		}, nil
+	}
+	return DepositParams{}, errors.Wrap(ErrParamsNotFound, "deposit params")
+}
+
+func (gov Gov) GetVotingParams() (VotingParams, error) {
+	if gov.VotingParams != nil && gov.VotingParams.VotingPeriod != "" {
+		return *gov.VotingParams, nil
+	}
+	if gov.Params != nil {
+		return VotingParams{
+			VotingPeriod: gov.Params.VotingPeriod,
+		}, nil
+	}
+	return VotingParams{}, errors.Wrap(ErrParamsNotFound, "voting params")
+}
+
+func (gov Gov) GetTallyParams() (TallyParams, error) {
+	if gov.TallyParams != nil && gov.TallyParams.Quorum != "" {
+		return *gov.TallyParams, nil
+	}
+	if gov.Params != nil {
+		return TallyParams{
+			Quorum:        gov.Params.Quorum,
+			Threshold:     gov.Params.Threshold,
+			VetoThreshold: gov.Params.VetoThreshold,
+		}, nil
+	}
+	return TallyParams{}, errors.Wrap(ErrParamsNotFound, "tally params")
 }
 
 type ClientGenesisParams struct {

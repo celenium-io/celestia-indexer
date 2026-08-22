@@ -479,6 +479,17 @@ func TestJxResultBlockResults_NullTxsResults(t *testing.T) {
 	require.Empty(t, got.FinalizeBlockEvents)
 }
 
+func TestJxResultBlockResults_NullFinalizeBlockEvents(t *testing.T) {
+	d := jdec(`{"height":"8880520","txs_results":null,"finalize_block_events":null}`)
+	defer jxpkg.PutDecoder(d)
+
+	got, err := jxResultBlockResults(d)
+	require.NoError(t, err)
+	require.Equal(t, pkgTypes.Level(8880520), got.Height)
+	require.Nil(t, got.TxsResults)
+	require.Nil(t, got.FinalizeBlockEvents)
+}
+
 func TestJxResultBlockResults_WithTxsResults(t *testing.T) {
 	const input = `{
 		"height": "1234",

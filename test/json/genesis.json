@@ -171,6 +171,25 @@
                         ],
                         "end_time": "1691913280"
                     }
+                },
+                {
+                    "@type": "/cosmos.vesting.v1beta1.PermanentLockedAccount",
+                    "base_vesting_account": {
+                        "base_account": {
+                            "address": "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+                            "pub_key": null,
+                            "account_number": "57002",
+                            "sequence": "0"
+                        },
+                        "original_vesting": [
+                            {
+                                "denom": "utia",
+                                "amount": "1000000"
+                            }
+                        ],
+                        "delegated_free": [],
+                        "delegated_vesting": []
+                    }
                 }
             ]
         },

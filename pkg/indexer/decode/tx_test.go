@@ -294,7 +294,7 @@ func TestDecodeFee(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			fee, err := decodeFee(tc.amount)
+			fee, err := DecodeFee(tc.amount)
 
 			require.Equal(t, tc.expectedFee, fee)
 			if err != nil {
