@@ -48,6 +48,10 @@ func newParsedData() parsedData {
 }
 
 func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
+	if genesis.AppState.Staking.Exported {
+		return parsedData{}, errors.New("genesis was produced by state export (app_state.staking.exported=true): validators and delegations are not read from gen_txs in this case and parsing them is not supported")
+	}
+
 	data := newParsedData()
 	block := storage.Block{
 		Time:    genesis.GenesisTime,

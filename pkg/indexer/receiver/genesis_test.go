@@ -46,11 +46,7 @@ func (s *ModuleTestSuite) runReceiveGenesis(cfg *ic.Indexer, initialHeight int64
 	return receiverModule
 }
 
-// TestReceiveGenesis_DefaultStartLevel verifies that with the default (unset)
-// start_level and the network's usual initial_height=1, the receiver still
-// begins fetching from block 1 (level=0, receivedLevel=0), exactly as before
-// genesis.InitialHeight was taken into account. A regression here would
-// silently skip the chain's first block.
+// Default start_level + initial_height=1 must still start at block 1 (level=receivedLevel=0).
 func (s *ModuleTestSuite) TestReceiveGenesis_DefaultStartLevel() {
 	receiverModule := s.runReceiveGenesis(&ic.Indexer{Name: testIndexerName}, 1)
 
@@ -60,10 +56,7 @@ func (s *ModuleTestSuite) TestReceiveGenesis_DefaultStartLevel() {
 		"level and receivedLevel must stay in sync or the sequencer will skip the first block")
 }
 
-// TestReceiveGenesis_InitialHeightAboveOne verifies that when a chain's
-// genesis declares initial_height > 1 (e.g. a re-genesis that continues
-// height numbering), the receiver starts fetching from initial_height
-// instead of from block 1, which doesn't exist on such a chain.
+// initial_height > 1 (re-genesis) must start fetching from initial_height, not block 1.
 func (s *ModuleTestSuite) TestReceiveGenesis_InitialHeightAboveOne() {
 	receiverModule := s.runReceiveGenesis(&ic.Indexer{Name: testIndexerName}, 1000)
 
@@ -71,9 +64,7 @@ func (s *ModuleTestSuite) TestReceiveGenesis_InitialHeightAboveOne() {
 	s.Require().EqualValues(999, receiverModule.receivedLevel)
 }
 
-// TestReceiveGenesis_ExplicitStartLevelOverride verifies that an operator's
-// explicit start_level (used to skip ahead in a re-sync) is preserved when
-// it is already past the chain's initial_height.
+// An explicit start_level past initial_height (skip-ahead re-sync) must be preserved.
 func (s *ModuleTestSuite) TestReceiveGenesis_ExplicitStartLevelOverride() {
 	receiverModule := s.runReceiveGenesis(&ic.Indexer{Name: testIndexerName, StartLevel: 500_000}, 1)
 
@@ -81,9 +72,7 @@ func (s *ModuleTestSuite) TestReceiveGenesis_ExplicitStartLevelOverride() {
 	s.Require().EqualValues(500_000, receiverModule.receivedLevel)
 }
 
-// TestReceiveGenesis_StartLevelBelowInitialHeight verifies that a start_level
-// lower than the chain's initial_height-1 is clamped up, since blocks below
-// initial_height don't exist on the node.
+// A start_level below initial_height-1 must be clamped up: blocks below initial_height don't exist.
 func (s *ModuleTestSuite) TestReceiveGenesis_StartLevelBelowInitialHeight() {
 	receiverModule := s.runReceiveGenesis(&ic.Indexer{Name: testIndexerName, StartLevel: 500}, 1000)
 
