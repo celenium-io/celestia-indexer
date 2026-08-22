@@ -3,9 +3,9 @@
 
 package math
 
-import "golang.org/x/exp/constraints"
+import "cmp"
 
-func Min[T constraints.Ordered](x, y T) T {
+func Min[T cmp.Ordered](x, y T) T {
 	if x < y {
 		return x
 	}

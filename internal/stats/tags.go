@@ -49,7 +49,7 @@ const (
 
 func InitModel(model any) error {
 	typ := reflect.TypeOf(model)
-	for typ.Kind() == reflect.Ptr {
+	for typ.Kind() == reflect.Pointer {
 		typ = typ.Elem()
 	}
 

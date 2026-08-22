@@ -167,7 +167,7 @@ type Evidence struct {
 }
 
 type Feegrant struct {
-	Allowances []interface{} `json:"allowances"`
+	FeeGrants []json.RawMessage `json:"allowances"`
 }
 
 type Description struct {

@@ -27,8 +27,10 @@ type parsedData struct {
 	constants     []storage.Constant
 	denomMetadata []storage.DenomMetadata
 	vestings      []*storage.VestingAccount
+	grants        []*storage.Grant
 
 	bondedTokensPool *storage.Address
+	feeCollector     *storage.Address
 }
 
 func newParsedData() parsedData {
@@ -40,6 +42,7 @@ func newParsedData() parsedData {
 		constants:     make([]storage.Constant, 0),
 		denomMetadata: make([]storage.DenomMetadata, 0),
 		vestings:      make([]*storage.VestingAccount, 0),
+		grants:        make([]*storage.Grant, 0),
 	}
 }
 
@@ -113,6 +116,19 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 			block.MessageTypes.SetByMsgType(decoded.Msg.Type)
 			tx.BlobsSize += decoded.BlobsSize
 		}
+
+		if t, ok := txDecoded.(cosmosTypes.FeeTx); ok {
+			if coins := t.GetFee(); len(coins) == 1 {
+				coin := coins[0]
+				tx.Fee, err = storageTypes.NumericFromString(coin.Amount.String())
+				if err != nil {
+					return data, errors.Wrap(err, "fee decoding")
+				}
+				if data.feeCollector != nil {
+					setBalance(coin.GetDenom(), tx.Fee, data.feeCollector)
+				}
+			}
+		}
 	}
 
 	for _, addr := range decodeCtx.Addresses.Values() {
@@ -126,13 +142,6 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 
 	module.parseTotalSupply(genesis.AppState.Bank.Supply, &block)
 
-	if err := module.parseAccounts(genesis.AppState.Auth.Accounts, block, &data); err != nil {
-		return data, errors.Wrap(err, "parse genesis accounts")
-	}
-	if err := module.parseBalances(genesis.AppState.Bank.Balances, block.Height, &data); err != nil {
-		return data, errors.Wrap(err, "parse genesis account balances")
-	}
-
 	data.validators = decodeCtx.Validators.Values()
 	data.stakingLogs = decodeCtx.StakingLogs
 
@@ -144,6 +153,17 @@ func (module *Module) parse(genesis types.GenesisOutput) (parsedData, error) {
 		if addr, ok := data.addresses[delegation.Address.Address]; ok && len(addr.Balances) > 0 {
 			addr.Balances[0].Spendable = addr.Balances[0].Spendable.Sub(delegation.Amount)
 		}
+	}
+
+	if err := module.parseFeeGrants(genesis.AppState.Feegrant.FeeGrants, block, &data); err != nil {
+		return data, errors.Wrap(err, "parse genesis fee grants")
+	}
+
+	if err := module.parseAccounts(genesis.AppState.Auth.Accounts, block, &data); err != nil {
+		return data, errors.Wrap(err, "parse genesis accounts")
+	}
+	if err := module.parseBalances(genesis.AppState.Bank.Balances, block.Height, &data); err != nil {
+		return data, errors.Wrap(err, "parse genesis account balances")
 	}
 
 	data.block = block
@@ -193,8 +213,11 @@ func (module *Module) parseAccounts(accounts []types.Account, block storage.Bloc
 			readableAddress = accounts[i].BaseAccount.Address
 			address.Name = accounts[i].Name
 
-			if address.Name == "bonded_tokens_pool" {
+			switch address.Name {
+			case "bonded_tokens_pool":
 				data.bondedTokensPool = &address
+			case "fee_collector":
+				data.feeCollector = &address
 			}
 
 		case strings.Contains(accounts[i].Type, "BaseAccount"):
@@ -235,6 +258,33 @@ func (module *Module) parseAccounts(accounts []types.Account, block storage.Bloc
 	return nil
 }
 
+func addAddress(data *parsedData, block storage.Block, address string) error {
+	if _, ok := data.addresses[address]; ok {
+		return nil
+	}
+
+	addr := &storage.Address{
+		Address:    address,
+		Height:     block.Height,
+		LastHeight: block.Height,
+		Balances: []storage.Balance{
+			{
+				Spendable: storageTypes.NumericZero(),
+				Delegated: storageTypes.NumericZero(),
+				Unbonding: storageTypes.NumericZero(),
+				Currency:  currency.Utia,
+			},
+		},
+	}
+	_, hash, err := pkgTypes.Address(address).Decode()
+	if err != nil {
+		return err
+	}
+	addr.Hash = hash
+	data.addresses[address] = addr
+	return nil
+}
+
 func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.Level, data *parsedData) error {
 	for i := range balances {
 		if len(balances[i].Coins) == 0 {
@@ -262,27 +312,27 @@ func (module *Module) parseBalances(balances []types.Balances, height pkgTypes.L
 			if err != nil {
 				continue
 			}
-
-			found := false
-			for j := range addr.Balances {
-				if addr.Balances[j].Currency == coin.Denom {
-					addr.Balances[j].Spendable = addr.Balances[j].Spendable.Add(value)
-					found = true
-					break
-				}
-			}
-			if !found {
-				addr.Balances = append(addr.Balances, storage.Balance{
-					Spendable: value,
-					Delegated: storageTypes.NumericZero(),
-					Unbonding: storageTypes.NumericZero(),
-					Currency:  coin.Denom,
-				})
-			}
+			setBalance(coin.Denom, value, addr)
 		}
 	}
 
 	return nil
+}
+
+func setBalance(denom string, value storageTypes.Numeric, address *storage.Address) {
+	for i := range address.Balances {
+		if address.Balances[i].Currency == denom {
+			address.Balances[i].Spendable = address.Balances[i].Spendable.Add(value)
+			return
+		}
+	}
+
+	address.Balances = append(address.Balances, storage.Balance{
+		Spendable: value,
+		Delegated: storageTypes.NumericZero(),
+		Unbonding: storageTypes.NumericZero(),
+		Currency:  denom,
+	})
 }
 
 func getAmountFromOriginalVesting(vestings []types.Coins) (storageTypes.Numeric, error) {

@@ -255,6 +255,19 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		return tx.HandleError(ctx, err)
 	}
 
+	for i := range data.grants {
+		if address, ok := data.addresses[data.grants[i].Grantee.Address]; ok {
+			data.grants[i].GranteeId = address.Id
+		}
+		if address, ok := data.addresses[data.grants[i].Granter.Address]; ok {
+			data.grants[i].GranterId = address.Id
+		}
+	}
+
+	if err := tx.SaveGrants(ctx, data.grants...); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
 	if err := tx.Flush(ctx); err != nil {
 		return tx.HandleError(ctx, err)
 	}

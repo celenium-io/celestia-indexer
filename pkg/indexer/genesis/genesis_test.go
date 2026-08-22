@@ -9,6 +9,7 @@ import (
 	"time"
 
 	json "github.com/bytedance/sonic"
+	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -111,7 +112,7 @@ func TestParseBalances_NewAddressMultiCoin(t *testing.T) {
 		{
 			Address: addr,
 			Coins: []types.Coins{
-				{Denom: "utia", Amount: "100"},
+				{Denom: currency.Utia, Amount: "100"},
 				{Denom: "ibc/AAA", Amount: "50"},
 			},
 		},
@@ -128,7 +129,7 @@ func TestParseBalances_NewAddressMultiCoin(t *testing.T) {
 	for _, b := range got.Balances {
 		byCurrency[b.Currency] = b.Spendable
 	}
-	require.Equal(t, storageTypes.NumericFromInt64(100), byCurrency["utia"])
+	require.Equal(t, storageTypes.NumericFromInt64(100), byCurrency[currency.Utia])
 	require.Equal(t, storageTypes.NumericFromInt64(50), byCurrency["ibc/AAA"])
 }
 
@@ -148,7 +149,7 @@ func TestParseBalances_ExistingAddressNewCurrency(t *testing.T) {
 		{
 			Address: addr,
 			Coins: []types.Coins{
-				{Denom: "utia", Amount: "100"},
+				{Denom: currency.Utia, Amount: "100"},
 				{Denom: "ibc/AAA", Amount: "50"},
 			},
 		},
