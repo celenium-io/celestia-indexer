@@ -164,6 +164,9 @@ func (module *Module) save(ctx context.Context, decodeCtx *decodeContext.Context
 	}
 
 	for i := range decodeCtx.VestingAccounts {
+		if decodeCtx.VestingAccounts[i] == nil || decodeCtx.VestingAccounts[i].Address == nil {
+			return tx.HandleError(ctx, errors.New("nil pointer for vesting"))
+		}
 		if address, ok := decodeCtx.Addresses.Get(decodeCtx.VestingAccounts[i].Address.Address); ok {
 			decodeCtx.VestingAccounts[i].AddressId = address.Id
 		} else {

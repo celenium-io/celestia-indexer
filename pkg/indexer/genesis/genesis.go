@@ -83,12 +83,14 @@ func (module *Module) listen(ctx context.Context) {
 			decodeContext, err := module.parse(genesis)
 			if err != nil {
 				module.Log.Err(err).Msgf("parsing genesis block")
+				module.MustOutput(StopOutput).Push(struct{}{})
 				return
 			}
 			module.Log.Info().Msg("parsed genesis message")
 
 			if err := module.save(ctx, decodeContext); err != nil {
 				module.Log.Err(err).Msg("saving genesis block error")
+				module.MustOutput(StopOutput).Push(struct{}{})
 				return
 			}
 			module.Log.Info().Msg("saved genesis message")

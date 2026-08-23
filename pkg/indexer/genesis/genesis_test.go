@@ -4,6 +4,7 @@
 package genesis
 
 import (
+	"context"
 	encjson "encoding/json"
 	"os"
 	"testing"
@@ -17,6 +18,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
+	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/stretchr/testify/require"
 )
 
@@ -251,4 +253,43 @@ func TestParse_FeegrantAndAuthzGrants_NoDuplication(t *testing.T) {
 	}
 	require.True(t, haveFee, "feegrant entry must be present exactly once")
 	require.True(t, haveAuthz, "authz entry must be present exactly once")
+}
+
+// Regression guard: listen() used to swallow parse errors by just logging and
+// returning, leaving the pipeline stuck instead of unblocking downstream modules
+// (e.g. the stopper) via StopOutput.
+func TestModule_OnParseError_PushesStopOutput(t *testing.T) {
+	writerModule := modules.New("writer-module")
+	outputName := "write"
+	writerModule.CreateOutput(outputName)
+
+	genesisModule := NewModule(postgres.Storage{}, config.Indexer{})
+	err := genesisModule.AttachTo(&writerModule, outputName, InputName)
+	require.NoError(t, err)
+
+	stopperModule := modules.New("stopper-module")
+	stopInputName := "stop-signal"
+	stopperModule.CreateInput(stopInputName)
+	err = stopperModule.AttachTo(&genesisModule, StopOutput, stopInputName)
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	genesisModule.Start(ctx)
+
+	// an account with an unrecognized type makes module.parse fail immediately.
+	genesisOutput := types.GenesisOutput{
+		ModuleAccs: []types.Account{
+			{Type: "unknown-account-type"},
+		},
+	}
+	writerModule.MustOutput(outputName).Push(genesisOutput)
+
+	select {
+	case <-ctx.Done():
+		t.Error("stop by cancelled context")
+	case msg := <-stopperModule.MustInput(stopInputName).Listen():
+		require.Equal(t, struct{}{}, msg)
+	}
 }

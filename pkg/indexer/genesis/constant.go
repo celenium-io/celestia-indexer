@@ -248,7 +248,7 @@ func (module *Module) parseConstants(ctx *decodeContext.Context, appState types.
 	ctx.AddConstant(
 		storageTypes.ModuleNameMinfee,
 		"network_min_gas_price",
-		appState.MinFee.NetworkMinGasPrice,
+		appState.MinFee.GetNetworkMinGasPrice(),
 	)
 
 	return nil

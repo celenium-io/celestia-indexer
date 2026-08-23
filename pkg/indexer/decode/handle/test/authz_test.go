@@ -55,7 +55,7 @@ func TestDecodeMsg_SuccessOnMsgGrant(t *testing.T) {
 			Grantee: &storage.Address{
 				Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
 			},
-			Authorization: "/cosmos.authz.v1beta1.GenericAuthorization",
+			Authorization: "unknown_type_url",
 			Params: map[string]any{
 				"Msg": "",
 			},
@@ -85,7 +85,7 @@ func TestDecodeMsg_SuccessOnMsgGrant(t *testing.T) {
 }
 
 // An authorization type outside the known switch falls back to a generic grant
-// (raw type URL, no decoded Params) instead of being dropped or erroring out.
+// (unknown_type_url, no decoded Params) instead of being dropped or erroring out.
 func TestDecodeMsg_SuccessOnMsgGrant_UnrecognizedAuthorization(t *testing.T) {
 	m := &authz.MsgGrant{
 		Granter: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
@@ -109,7 +109,7 @@ func TestDecodeMsg_SuccessOnMsgGrant_UnrecognizedAuthorization(t *testing.T) {
 	require.EqualValues(t, 1, decodeCtx.Grants.Len())
 
 	for _, grant := range decodeCtx.Grants.All() {
-		require.Equal(t, "/ibc.applications.transfer.v1.TransferAuthorization", grant.Authorization)
+		require.Equal(t, "unknown_type_url", grant.Authorization)
 		require.Nil(t, grant.Params)
 		require.Equal(t, m.Granter, grant.Granter.Address)
 		require.Equal(t, m.Grantee, grant.Grantee.Address)

@@ -165,9 +165,11 @@ func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]*st
 	}
 }
 
+const unknownTypeURL = "unknown_type_url"
+
 func makeGrant(msg *authz.MsgGrant, typ string, t time.Time, height pkgTypes.Level, params map[string]any) *storage.Grant {
 	if typ == "" {
-		typ = msg.Grant.Authorization.TypeUrl
+		typ = unknownTypeURL
 	}
 	return &storage.Grant{
 		Params:        params,

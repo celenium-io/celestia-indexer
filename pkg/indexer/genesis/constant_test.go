@@ -229,6 +229,17 @@ func TestParseConstants_InvalidDuration(t *testing.T) {
 	}
 }
 
+func TestParseConstants_MinFeeNewParamsFormatTakesPriority(t *testing.T) {
+	module := NewModule(postgres.Storage{}, config.Indexer{})
+	ctx := decodeContext.NewContext()
+	appState := testAppState()
+	appState.MinFee.Params.NetworkMinGasPrice = "0.00002"
+
+	err := module.parseConstants(ctx, appState, testConsensusParams())
+	require.NoError(t, err)
+	require.Equal(t, "0.00002", constantsMap(ctx)["minfee.network_min_gas_price"])
+}
+
 func TestParseConstants_MissingGovParams(t *testing.T) {
 	module := NewModule(postgres.Storage{}, config.Indexer{})
 	ctx := decodeContext.NewContext()

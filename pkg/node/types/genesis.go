@@ -467,3 +467,10 @@ type MinFee struct {
 		NetworkMinGasPrice string `json:"network_min_gas_price"`
 	} `json:"params"`
 }
+
+func (fee MinFee) GetNetworkMinGasPrice() string {
+	if fee.Params.NetworkMinGasPrice != "" {
+		return fee.Params.NetworkMinGasPrice
+	}
+	return fee.NetworkMinGasPrice
+}

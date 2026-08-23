@@ -391,7 +391,7 @@ func TestParseAuthzGrants_NilAuthorization(t *testing.T) {
 	require.Error(t, err)
 }
 
-// An unrecognized authorization type falls back to a generic grant (raw type URL,
+// An unrecognized authorization type falls back to a generic grant (unknown_type_url,
 // no decoded Params) rather than being skipped or erroring out.
 func TestParseAuthzGrants_UnrecognizedType(t *testing.T) {
 	module := NewModule(postgres.Storage{}, config.Indexer{})
@@ -406,7 +406,7 @@ func TestParseAuthzGrants_UnrecognizedType(t *testing.T) {
 	grants := ctx.Grants.Values()
 	require.Len(t, grants, 1)
 	grant := grants[0]
-	require.Equal(t, "/ibc.applications.transfer.v1.TransferAuthorization", grant.Authorization)
+	require.Equal(t, "unknown_type_url", grant.Authorization)
 	require.Nil(t, grant.Params)
 	require.Equal(t, "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv", grant.Granter.Address)
 	require.Equal(t, "celestia1llx8v3hhw06cmtmv7q7uq4ztgyvd33nmk7mrfh", grant.Grantee.Address)
