@@ -20,6 +20,10 @@ import (
 )
 
 func (module *Module) parse(genesis types.GenesisOutput) (*context.Context, error) {
+	if genesis.AppState.Staking.Exported {
+		return nil, errors.New("genesis was produced by state export (app_state.staking.exported=true): validators and delegations are not read from gen_txs in this case and parsing them is not supported")
+	}
+
 	decodeCtx := context.NewContext()
 	decodeCtx.Block = &storage.Block{
 		Time:    genesis.GenesisTime,
