@@ -5,10 +5,11 @@ package genesis
 
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 )
 
-func (module *Module) parseDenomMetadata(raw []types.DenomMetadata, data *parsedData) {
+func (module *Module) parseDenomMetadata(decodeCtx *context.Context, raw []types.DenomMetadata) {
 	for i := range raw {
 		dm := storage.DenomMetadata{
 			Description: raw[i].Description,
@@ -19,6 +20,6 @@ func (module *Module) parseDenomMetadata(raw []types.DenomMetadata, data *parsed
 			Uri:         raw[i].URI,
 			Units:       raw[i].DenomUnits,
 		}
-		data.denomMetadata = append(data.denomMetadata, dm)
+		decodeCtx.AddDenomMetadata(dm)
 	}
 }

@@ -38,6 +38,8 @@ const (
 	ModuleNameBaseapp ModuleName = "baseapp"
 	// ModuleNameIcahost is a ModuleName of type icahost.
 	ModuleNameIcahost ModuleName = "icahost"
+	// ModuleNameMinfee is a ModuleName of type minfee.
+	ModuleNameMinfee ModuleName = "minfee"
 )
 
 var ErrInvalidModuleName = errors.New("not a valid ModuleName")
@@ -56,6 +58,7 @@ func ModuleNameValues() []ModuleName {
 		ModuleNameConsensus,
 		ModuleNameBaseapp,
 		ModuleNameIcahost,
+		ModuleNameMinfee,
 	}
 }
 
@@ -83,6 +86,7 @@ var _ModuleNameValue = map[string]ModuleName{
 	"consensus":    ModuleNameConsensus,
 	"baseapp":      ModuleNameBaseapp,
 	"icahost":      ModuleNameIcahost,
+	"minfee":       ModuleNameMinfee,
 }
 
 // ParseModuleName attempts to convert a string to a ModuleName.

@@ -314,6 +314,7 @@ stopperModule.AttachTo(r, receiver.StopOutput, stopper.InputName)
 - Active linters to watch: `zerologlint`, `musttag`, `gosec`, `containedctx`
 - SPDX license headers required on all new files: `// SPDX-FileCopyrightText: 2025 Bb Strategy Pte. Ltd. <celenium@baking-bad.org>` + `// SPDX-License-Identifier: MIT` (run `make license-header` to apply automatically)
 - JSON marshaling uses `github.com/bytedance/sonic` (faster than `encoding/json`)
+- Keep comments short — 1-2 lines max. No multi-paragraph doc comments; explain the non-obvious "why" tersely, not the "what"
 
 ## Entity Types Overview
 

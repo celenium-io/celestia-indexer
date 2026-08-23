@@ -9,83 +9,79 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
+	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	"github.com/pkg/errors"
 )
 
-func (module *Module) save(ctx context.Context, data parsedData) error {
+var errCantFindAddressInContext = errors.New("can't find address in context")
+
+func (module *Module) save(ctx context.Context, decodeCtx *decodeContext.Context) error {
 	start := time.Now()
-	module.Log.Info().Uint64("height", uint64(data.block.Height)).Msg("saving block...")
+	module.Log.Info().Uint64("height", uint64(decodeCtx.Block.Height)).Msg("saving block...")
 	tx, err := postgres.BeginTransaction(ctx, module.storage.Transactable)
 	if err != nil {
 		return err
 	}
 	defer tx.Close(ctx)
 
-	if err := tx.SaveConstants(ctx, data.constants...); err != nil {
+	newConstants := make([]storage.Constant, 0, decodeCtx.Constants.Len())
+	for constant := range decodeCtx.Constants.AllValues() {
+		newConstants = append(newConstants, *constant)
+	}
+	if err := tx.SaveConstants(ctx, newConstants...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
-	for i := range data.denomMetadata {
-		if err := tx.Add(ctx, &data.denomMetadata[i]); err != nil {
+	for i := range decodeCtx.DenomMetadata {
+		if err := tx.Add(ctx, &decodeCtx.DenomMetadata[i]); err != nil {
 			return tx.HandleError(ctx, err)
 		}
 	}
 
-	if err := tx.Add(ctx, &data.block); err != nil {
+	if err := tx.Add(ctx, decodeCtx.Block); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
-	if err := tx.Add(ctx, &data.block.Stats); err != nil {
+	if err := tx.Add(ctx, &decodeCtx.Block.Stats); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
-	if err := tx.SaveTransactions(ctx, data.block.Txs...); err != nil {
+	if err := tx.SaveTransactions(ctx, decodeCtx.Block.Txs...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
 	var (
 		messages   = make([]*storage.Message, 0, 1000)
-		events     = make([]any, len(data.block.Events))
+		events     = make([]any, len(decodeCtx.Block.Events))
 		namespaces = make(map[string]*storage.Namespace, 0)
 	)
 
-	for i := range data.block.Events {
-		events[i] = &data.block.Events[i]
+	for i := range decodeCtx.Block.Events {
+		events[i] = &decodeCtx.Block.Events[i]
 	}
 
-	for i := range data.block.Txs {
-		for j := range data.block.Txs[i].Messages {
-			messages = append(messages, &data.block.Txs[i].Messages[j])
+	for i := range decodeCtx.Block.Txs {
+		for j := range decodeCtx.Block.Txs[i].Messages {
+			messages = append(messages, &decodeCtx.Block.Txs[i].Messages[j])
 
-			for k := range data.block.Txs[i].Messages[j].Namespace {
-				key := data.block.Txs[i].Messages[j].Namespace[k].String()
+			for k := range decodeCtx.Block.Txs[i].Messages[j].Namespace {
+				key := decodeCtx.Block.Txs[i].Messages[j].Namespace[k].String()
 				if _, ok := namespaces[key]; !ok {
-					data.block.Txs[i].Messages[j].Namespace[k].PfbCount = 1
-					namespaces[key] = &data.block.Txs[i].Messages[j].Namespace[k]
+					decodeCtx.Block.Txs[i].Messages[j].Namespace[k].PfbCount = 1
+					namespaces[key] = &decodeCtx.Block.Txs[i].Messages[j].Namespace[k]
 				}
 			}
 		}
 
-		for j := range data.block.Txs[i].Events {
-			data.block.Txs[i].Events[j].TxId = &data.block.Txs[i].Id
-			events = append(events, &data.block.Txs[i].Events[j])
-		}
-
-		for j := range data.block.Txs[i].Signers {
-			key := data.block.Txs[i].Signers[j].String()
-			if addr, ok := data.addresses[key]; !ok {
-				data.addresses[key] = &data.block.Txs[i].Signers[j]
-			} else if len(addr.Balances) > 0 && len(data.block.Txs[i].Signers[j].Balances) > 0 {
-				addr.Balances[0].Spendable = addr.Balances[0].Spendable.Add(data.block.Txs[i].Signers[j].Balances[0].Spendable)
-			}
+		for j := range decodeCtx.Block.Txs[i].Events {
+			decodeCtx.Block.Txs[i].Events[j].TxId = &decodeCtx.Block.Txs[i].Id
+			events = append(events, &decodeCtx.Block.Txs[i].Events[j])
 		}
 	}
 
 	var totalAccounts int64
-	if len(data.addresses) > 0 {
-		entities := make([]*storage.Address, 0, len(data.addresses))
-		for key := range data.addresses {
-			entities = append(entities, data.addresses[key])
-		}
+	if decodeCtx.Addresses.Len() > 0 {
+		entities := decodeCtx.Addresses.Values()
 
 		totalAccounts, err = tx.SaveAddresses(ctx, entities...)
 		if err != nil {
@@ -117,7 +113,8 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		}
 	}
 
-	totalValidators, err := tx.SaveValidators(ctx, data.validators...)
+	validators := decodeCtx.Validators.Values()
+	totalValidators, err := tx.SaveValidators(ctx, validators...)
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
@@ -129,13 +126,13 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 	var msgVals []storage.MsgValidator
 	for i := range messages {
 		for _, val := range messages[i].Validators {
-			for j := range data.validators {
-				if data.validators[j].Address == val {
+			for j := range validators {
+				if validators[j].Address == val {
 					msgVals = append(msgVals, storage.MsgValidator{
 						Height:      0,
-						Time:        data.block.Time,
+						Time:        decodeCtx.Block.Time,
 						MsgId:       messages[i].Id,
-						ValidatorId: data.validators[j].Id,
+						ValidatorId: validators[j].Id,
 					})
 					break
 				}
@@ -147,57 +144,66 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		return tx.HandleError(ctx, err)
 	}
 
-	for i := range data.stakingLogs {
-		if address, ok := data.addresses[data.stakingLogs[i].Address.Address]; ok {
-			data.stakingLogs[i].AddressId = &address.Id
+	for i := range decodeCtx.StakingLogs {
+		if address, ok := decodeCtx.Addresses.Get(decodeCtx.StakingLogs[i].Address.Address); ok {
+			decodeCtx.StakingLogs[i].AddressId = &address.Id
+		} else {
+			return tx.HandleError(ctx, errors.Wrap(errCantFindAddressInContext, decodeCtx.StakingLogs[i].Address.Address))
 		}
 
-		for j := range data.validators {
-			if data.validators[j].Address == data.stakingLogs[i].Validator.Address {
-				data.stakingLogs[i].ValidatorId = data.validators[j].Id
+		for j := range validators {
+			if validators[j].Address == decodeCtx.StakingLogs[i].Validator.Address {
+				decodeCtx.StakingLogs[i].ValidatorId = validators[j].Id
 				break
 			}
 		}
 	}
 
-	if err := tx.SaveStakingLogs(ctx, data.stakingLogs...); err != nil {
+	if err := tx.SaveStakingLogs(ctx, decodeCtx.StakingLogs...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
-	for i := range data.vestings {
-		if address, ok := data.addresses[data.vestings[i].Address.Address]; ok {
-			data.vestings[i].AddressId = address.Id
+	for i := range decodeCtx.VestingAccounts {
+		if address, ok := decodeCtx.Addresses.Get(decodeCtx.VestingAccounts[i].Address.Address); ok {
+			decodeCtx.VestingAccounts[i].AddressId = address.Id
+		} else {
+			return tx.HandleError(ctx, errors.Wrap(errCantFindAddressInContext, decodeCtx.VestingAccounts[i].Address.Address))
 		}
 	}
 
-	if err := tx.SaveVestingAccounts(ctx, data.vestings...); err != nil {
+	if err := tx.SaveVestingAccounts(ctx, decodeCtx.VestingAccounts...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
 	periods := make([]storage.VestingPeriod, 0)
-	for i := range data.vestings {
-		for j := range data.vestings[i].VestingPeriods {
-			data.vestings[i].VestingPeriods[j].VestingAccountId = data.vestings[i].Id
+	for i := range decodeCtx.VestingAccounts {
+		for j := range decodeCtx.VestingAccounts[i].VestingPeriods {
+			decodeCtx.VestingAccounts[i].VestingPeriods[j].VestingAccountId = decodeCtx.VestingAccounts[i].Id
 		}
-		periods = append(periods, data.vestings[i].VestingPeriods...)
+		periods = append(periods, decodeCtx.VestingAccounts[i].VestingPeriods...)
 	}
 	if err := tx.SaveVestingPeriods(ctx, periods...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
-	for i := range data.delegations {
-		if address, ok := data.addresses[data.delegations[i].Address.Address]; ok {
-			data.delegations[i].AddressId = address.Id
+	delegations := make([]storage.Delegation, 0, decodeCtx.Delegations.Len())
+	for delegation := range decodeCtx.Delegations.AllValues() {
+		if address, ok := decodeCtx.Addresses.Get(delegation.Address.Address); ok {
+			delegation.AddressId = address.Id
+		} else {
+			return tx.HandleError(ctx, errors.Wrap(errCantFindAddressInContext, delegation.Address.Address))
 		}
 
-		for j := range data.validators {
-			if data.validators[j].Address == data.delegations[i].Validator.Address {
-				data.delegations[i].ValidatorId = data.validators[j].Id
+		for j := range validators {
+			if validators[j].Address == delegation.Validator.Address {
+				delegation.ValidatorId = validators[j].Id
 				break
 			}
 		}
+
+		delegations = append(delegations, *delegation)
 	}
-	if err := tx.SaveDelegations(ctx, data.delegations...); err != nil {
+	if err := tx.SaveDelegations(ctx, delegations...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
@@ -228,11 +234,15 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 	}
 
 	var signers []storage.Signer
-	for i := range data.block.Txs {
-		for _, address := range data.block.Txs[i].Signers {
+	for i := range decodeCtx.Block.Txs {
+		for _, address := range decodeCtx.Block.Txs[i].Signers {
+			signer, ok := decodeCtx.Addresses.Get(address.Address)
+			if !ok {
+				return tx.HandleError(ctx, errors.Wrap(errCantFindAddressInContext, address.Address))
+			}
 			signers = append(signers, storage.Signer{
-				TxId:      data.block.Txs[i].Id,
-				AddressId: address.Id,
+				TxId:      decodeCtx.Block.Txs[i].Id,
+				AddressId: signer.Id,
 			})
 		}
 	}
@@ -243,14 +253,14 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 
 	if err := tx.Add(ctx, &storage.State{
 		Name:            module.indexerName,
-		LastHeight:      data.block.Height,
-		LastTime:        data.block.Time,
-		LastHash:        data.block.Hash,
-		ChainId:         data.block.ChainId,
-		TotalTx:         data.block.Stats.TxCount,
-		TotalSupply:     data.block.Stats.SupplyChange,
-		TotalFee:        data.block.Stats.Fee,
-		TotalBlobsSize:  data.block.Stats.BlobsSize,
+		LastHeight:      decodeCtx.Block.Height,
+		LastTime:        decodeCtx.Block.Time,
+		LastHash:        decodeCtx.Block.Hash,
+		ChainId:         decodeCtx.Block.ChainId,
+		TotalTx:         decodeCtx.Block.Stats.TxCount,
+		TotalSupply:     decodeCtx.Block.Stats.SupplyChange,
+		TotalFee:        decodeCtx.Block.Stats.Fee,
+		TotalBlobsSize:  decodeCtx.Block.Stats.BlobsSize,
 		TotalAccounts:   totalAccounts,
 		TotalNamespaces: totalNamespaces,
 		TotalValidators: totalValidators,
@@ -258,16 +268,22 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		return tx.HandleError(ctx, err)
 	}
 
-	for i := range data.grants {
-		if address, ok := data.addresses[data.grants[i].Grantee.Address]; ok {
-			data.grants[i].GranteeId = address.Id
+	grants := make([]*storage.Grant, 0, decodeCtx.Grants.Len())
+	for grant := range decodeCtx.Grants.AllValues() {
+		if address, ok := decodeCtx.Addresses.Get(grant.Grantee.Address); ok {
+			grant.GranteeId = address.Id
+		} else {
+			return tx.HandleError(ctx, errors.Wrap(errCantFindAddressInContext, grant.Grantee.Address))
 		}
-		if address, ok := data.addresses[data.grants[i].Granter.Address]; ok {
-			data.grants[i].GranterId = address.Id
+		if address, ok := decodeCtx.Addresses.Get(grant.Granter.Address); ok {
+			grant.GranterId = address.Id
+		} else {
+			return tx.HandleError(ctx, errors.Wrap(errCantFindAddressInContext, grant.Granter.Address))
 		}
+		grants = append(grants, grant)
 	}
 
-	if err := tx.SaveGrants(ctx, data.grants...); err != nil {
+	if err := tx.SaveGrants(ctx, grants...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
@@ -275,9 +291,9 @@ func (module *Module) save(ctx context.Context, data parsedData) error {
 		return tx.HandleError(ctx, err)
 	}
 	module.Log.Info().
-		Uint64("height", data.block.Id).
-		Int64("block_ns_size", data.block.Stats.BlobsSize).
-		Str("block_fee", data.block.Stats.Fee.String()).
+		Uint64("height", decodeCtx.Block.Id).
+		Int64("block_ns_size", decodeCtx.Block.Stats.BlobsSize).
+		Str("block_fee", decodeCtx.Block.Stats.Fee.String()).
 		Int64("ms", time.Since(start).Milliseconds()).
 		Msg("block saved")
 	return nil
