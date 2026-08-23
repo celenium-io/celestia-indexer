@@ -168,3 +168,36 @@ func TestParseBalances_ExistingAddressNewCurrency(t *testing.T) {
 	require.Equal(t, storageTypes.NumericFromInt64(100), byCurrency["utia"])
 	require.Equal(t, storageTypes.NumericFromInt64(50), byCurrency["ibc/AAA"])
 }
+
+func loadGenesisFixture(t *testing.T) types.Genesis {
+	f, err := os.Open("../../../test/json/genesis.json")
+	require.NoError(t, err)
+	defer f.Close()
+
+	var g types.Genesis
+	err = json.ConfigFastest.NewDecoder(f).Decode(&g)
+	require.NoError(t, err)
+	return g
+}
+
+// Exported genesis has validators/delegations in app_state.staking.*, not gen_txs — must fail, not index an empty set.
+func TestParse_ExportedGenesisFailsFast(t *testing.T) {
+	g := loadGenesisFixture(t)
+	g.AppState.Staking.Exported = true
+
+	module := NewModule(postgres.Storage{}, config.Indexer{})
+	_, err := module.parse(types.GenesisOutput{Genesis: g})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "exported")
+}
+
+// gen_txs cleared: the fixture's gen_tx has an empty fee amount, which DecodeFee rejects unrelatedly.
+func TestParse_NonExportedGenesisSucceeds(t *testing.T) {
+	g := loadGenesisFixture(t)
+	require.False(t, g.AppState.Staking.Exported, "fixture is expected to represent a fresh, non-exported genesis")
+	g.AppState.Genutil.GenTxs = nil
+
+	module := NewModule(postgres.Storage{}, config.Indexer{})
+	_, err := module.parse(types.GenesisOutput{Genesis: g})
+	require.NoError(t, err)
+}

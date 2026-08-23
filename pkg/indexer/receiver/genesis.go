@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 )
 
@@ -23,6 +24,10 @@ func (r *Module) receiveGenesis(ctx context.Context) error {
 	}
 
 	r.Log.Info().Msgf("got initial height of genesis block: %d", genesis.InitialHeight)
+	startLevel := pkgTypes.Level(max(genesis.InitialHeight-1, r.cfg.StartLevel))
+	r.level = startLevel
+	r.receivedLevel = startLevel
+
 	r.MustOutput(GenesisOutput).Push(types.GenesisOutput{
 		Genesis:    genesis,
 		ModuleAccs: moduleAccounts,
