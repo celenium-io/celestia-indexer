@@ -114,7 +114,7 @@ func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]*st
 			return nil, err
 		}
 		return []*storage.Grant{
-			makeGrant(msg, "", t, height, structs.Map(typ)),
+			makeGrant(msg, typ.MsgTypeURL(), t, height, structs.Map(typ)),
 		}, nil
 	case "/cosmos.bank.v1beta1.SendAuthorization":
 		var typ bankTypes.SendAuthorization
