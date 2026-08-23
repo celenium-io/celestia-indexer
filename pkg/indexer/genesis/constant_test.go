@@ -17,6 +17,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const notADuration = "not-a-duration"
+
 func mustNanos(t *testing.T, s string) string {
 	t.Helper()
 	d, err := time.ParseDuration(s)
@@ -191,25 +193,25 @@ func TestParseConstants_InvalidDuration(t *testing.T) {
 		{
 			name: "max_deposit_period",
 			mutate: func(a *types.AppState) {
-				a.Gov.Params.MaxDepositPeriod = "not-a-duration"
+				a.Gov.Params.MaxDepositPeriod = notADuration
 			},
 		},
 		{
 			name: "voting_period",
 			mutate: func(a *types.AppState) {
-				a.Gov.Params.VotingPeriod = "not-a-duration"
+				a.Gov.Params.VotingPeriod = notADuration
 			},
 		},
 		{
 			name: "downtime_jail_duration",
 			mutate: func(a *types.AppState) {
-				a.Slashing.Params.DowntimeJailDuration = "not-a-duration"
+				a.Slashing.Params.DowntimeJailDuration = notADuration
 			},
 		},
 		{
 			name: "unbonding_time",
 			mutate: func(a *types.AppState) {
-				a.Staking.Params.UnbondingTime = "not-a-duration"
+				a.Staking.Params.UnbondingTime = notADuration
 			},
 		},
 	}
