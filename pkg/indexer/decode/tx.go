@@ -105,7 +105,7 @@ func decodeCosmosTx(decoder cosmosTypes.TxDecoder, raw tmTypes.Tx, d *DecodedTx)
 }
 
 func DecodeFee(amount cosmosTypes.Coins) (decimal.Decimal, error) {
-	if amount == nil {
+	if len(amount) == 0 {
 		return decimal.Zero, nil
 	}
 

@@ -55,7 +55,7 @@ func TestDecodeMsg_SuccessOnMsgGrant(t *testing.T) {
 			Grantee: &storage.Address{
 				Address: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
 			},
-			Authorization: "",
+			Authorization: "unknown_type_url",
 			Params: map[string]any{
 				"Msg": "",
 			},
@@ -79,8 +79,41 @@ func TestDecodeMsg_SuccessOnMsgGrant(t *testing.T) {
 	require.Equal(t, msgExpected, dm.Msg)
 	require.EqualValues(t, decodeCtx.Grants.Len(), 1)
 
-	for _, value := range decodeCtx.Grants.All() {
-		require.Equal(t, value, grants[0])
+	for grant := range decodeCtx.Grants.AllValues() {
+		require.Equal(t, grants[0], grant)
+	}
+}
+
+// An authorization type outside the known switch falls back to a generic grant
+// (unknown_type_url, no decoded Params) instead of being dropped or erroring out.
+func TestDecodeMsg_SuccessOnMsgGrant_UnrecognizedAuthorization(t *testing.T) {
+	m := &authz.MsgGrant{
+		Granter: "celestia18r6ujzzkg6ku9sr39nxy4847q4qea5kg4a8pxv",
+		Grantee: "celestia1vnflc6322f8z7cpl28r7un5dxhmjxghc20aydq",
+		Grant: authz.Grant{
+			Authorization: &codecTypes.Any{
+				TypeUrl: "/ibc.applications.transfer.v1.TransferAuthorization",
+			},
+			Expiration: nil,
+		},
+	}
+	block, _ := testsuite.EmptyBlock()
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+
+	_, err := decode.Message(decodeCtx, m, 4, storageTypes.StatusSuccess, 0)
+	require.NoError(t, err)
+	require.EqualValues(t, 1, decodeCtx.Grants.Len())
+
+	for _, grant := range decodeCtx.Grants.All() {
+		require.Equal(t, "unknown_type_url", grant.Authorization)
+		require.Nil(t, grant.Params)
+		require.Equal(t, m.Granter, grant.Granter.Address)
+		require.Equal(t, m.Grantee, grant.Grantee.Address)
+		require.Equal(t, block.Height, grant.Height)
 	}
 }
 

@@ -114,19 +114,7 @@ func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]*st
 			return nil, err
 		}
 		return []*storage.Grant{
-			{
-				Params:        structs.Map(typ),
-				Authorization: typ.MsgTypeURL(),
-				Granter: &storage.Address{
-					Address: msg.Granter,
-				},
-				Grantee: &storage.Address{
-					Address: msg.Grantee,
-				},
-				Height:     height,
-				Expiration: msg.Grant.Expiration,
-				Time:       t,
-			},
+			makeGrant(msg, typ.MsgTypeURL(), t, height, structs.Map(typ)),
 		}, nil
 	case "/cosmos.bank.v1beta1.SendAuthorization":
 		var typ bankTypes.SendAuthorization
@@ -134,19 +122,7 @@ func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]*st
 			return nil, err
 		}
 		return []*storage.Grant{
-			{
-				Params:        structs.Map(typ),
-				Authorization: "/cosmos.bank.v1beta1.MsgSend",
-				Granter: &storage.Address{
-					Address: msg.Granter,
-				},
-				Grantee: &storage.Address{
-					Address: msg.Grantee,
-				},
-				Height:     height,
-				Expiration: msg.Grant.Expiration,
-				Time:       t,
-			},
+			makeGrant(msg, "/cosmos.bank.v1beta1.MsgSend", t, height, structs.Map(typ)),
 		}, nil
 	case "/cosmos.staking.v1beta1.StakeAuthorization":
 		var typ stakingTypes.StakeAuthorization
@@ -156,93 +132,56 @@ func parseGrants(msg *authz.MsgGrant, t time.Time, height pkgTypes.Level) ([]*st
 		switch typ.AuthorizationType {
 		case stakingTypes.AuthorizationType_AUTHORIZATION_TYPE_DELEGATE:
 			return []*storage.Grant{
-				{
-					Params:        structs.Map(typ),
-					Authorization: "/cosmos.staking.v1beta1.MsgDelegate",
-					Granter: &storage.Address{
-						Address: msg.Granter,
-					},
-					Grantee: &storage.Address{
-						Address: msg.Grantee,
-					},
-					Height:     height,
-					Expiration: msg.Grant.Expiration,
-					Time:       t,
-				},
+				makeGrant(msg, "/cosmos.staking.v1beta1.MsgDelegate", t, height, structs.Map(typ)),
 			}, nil
 		case stakingTypes.AuthorizationType_AUTHORIZATION_TYPE_REDELEGATE:
 			return []*storage.Grant{
-				{
-					Params:        structs.Map(typ),
-					Authorization: "/cosmos.staking.v1beta1.MsgRedelegate",
-					Granter: &storage.Address{
-						Address: msg.Granter,
-					},
-					Grantee: &storage.Address{
-						Address: msg.Grantee,
-					},
-					Height:     height,
-					Expiration: msg.Grant.Expiration,
-					Time:       t,
-				},
+				makeGrant(msg, "/cosmos.staking.v1beta1.MsgRedelegate", t, height, structs.Map(typ)),
 			}, nil
 		case stakingTypes.AuthorizationType_AUTHORIZATION_TYPE_UNDELEGATE:
 			return []*storage.Grant{
-				{
-					Params:        structs.Map(typ),
-					Authorization: "/cosmos.staking.v1beta1.MsgUndelegate",
-					Granter: &storage.Address{
-						Address: msg.Granter,
-					},
-					Grantee: &storage.Address{
-						Address: msg.Grantee,
-					},
-					Height:     height,
-					Expiration: msg.Grant.Expiration,
-					Time:       t,
-				},
+				makeGrant(msg, "/cosmos.staking.v1beta1.MsgUndelegate", t, height, structs.Map(typ)),
+			}, nil
+		case stakingTypes.AuthorizationType_AUTHORIZATION_TYPE_CANCEL_UNBONDING_DELEGATION:
+			return []*storage.Grant{
+				makeGrant(msg, "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation", t, height, structs.Map(typ)),
 			}, nil
 		case stakingTypes.AuthorizationType_AUTHORIZATION_TYPE_UNSPECIFIED:
 			return []*storage.Grant{
-				{
-					Params:        structs.Map(typ),
-					Authorization: "/cosmos.staking.v1beta1.MsgDelegate",
-					Granter: &storage.Address{
-						Address: msg.Granter,
-					},
-					Grantee: &storage.Address{
-						Address: msg.Grantee,
-					},
-					Height:     height,
-					Expiration: msg.Grant.Expiration,
-					Time:       t,
-				}, {
-					Params:        structs.Map(typ),
-					Authorization: "/cosmos.staking.v1beta1.MsgRedelegate",
-					Granter: &storage.Address{
-						Address: msg.Granter,
-					},
-					Grantee: &storage.Address{
-						Address: msg.Grantee,
-					},
-					Height:     height,
-					Expiration: msg.Grant.Expiration,
-					Time:       t,
-				}, {
-					Params:        structs.Map(typ),
-					Authorization: "/cosmos.staking.v1beta1.MsgUndelegate",
-					Granter: &storage.Address{
-						Address: msg.Granter,
-					},
-					Grantee: &storage.Address{
-						Address: msg.Grantee,
-					},
-					Height:     height,
-					Expiration: msg.Grant.Expiration,
-					Time:       t,
-				},
+				makeGrant(msg, "/cosmos.staking.v1beta1.MsgDelegate", t, height, structs.Map(typ)),
+				makeGrant(msg, "/cosmos.staking.v1beta1.MsgRedelegate", t, height, structs.Map(typ)),
+				makeGrant(msg, "/cosmos.staking.v1beta1.MsgUndelegate", t, height, structs.Map(typ)),
+				makeGrant(msg, "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation", t, height, structs.Map(typ)),
+			}, nil
+		default:
+			return []*storage.Grant{
+				makeGrant(msg, "", t, height, structs.Map(typ)),
 			}, nil
 		}
+	default:
+		return []*storage.Grant{
+			makeGrant(msg, "", t, height, nil),
+		}, nil
 	}
-	return nil, nil
+}
+
+const unknownTypeURL = "unknown_type_url"
+
+func makeGrant(msg *authz.MsgGrant, typ string, t time.Time, height pkgTypes.Level, params map[string]any) *storage.Grant {
+	if typ == "" {
+		typ = unknownTypeURL
+	}
+	return &storage.Grant{
+		Params:        params,
+		Authorization: typ,
+		Granter: &storage.Address{
+			Address: msg.Granter,
+		},
+		Grantee: &storage.Address{
+			Address: msg.Grantee,
+		},
+		Height:     height,
+		Expiration: msg.Grant.Expiration,
+		Time:       t,
+	}
 }

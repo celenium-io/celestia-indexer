@@ -125,3 +125,24 @@ func TestGov_GetTallyParams(t *testing.T) {
 		require.Zero(t, got)
 	})
 }
+
+func TestMinFee_GetNetworkMinGasPrice(t *testing.T) {
+	t.Run("new params format takes priority", func(t *testing.T) {
+		fee := MinFee{
+			NetworkMinGasPrice: "0.000001",
+		}
+		fee.Params.NetworkMinGasPrice = "0.00002"
+		require.Equal(t, "0.00002", fee.GetNetworkMinGasPrice())
+	})
+
+	t.Run("legacy format", func(t *testing.T) {
+		fee := MinFee{
+			NetworkMinGasPrice: "0.000001",
+		}
+		require.Equal(t, "0.000001", fee.GetNetworkMinGasPrice())
+	})
+
+	t.Run("no value", func(t *testing.T) {
+		require.Equal(t, "", MinFee{}.GetNetworkMinGasPrice())
+	})
+}

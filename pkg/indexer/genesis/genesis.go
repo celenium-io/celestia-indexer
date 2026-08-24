@@ -8,7 +8,9 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 )
 
@@ -28,7 +30,9 @@ const (
 //	                     |----------------|
 type Module struct {
 	modules.BaseModule
-	storage     postgres.Storage
+	storage postgres.Storage
+	codec   *codec.ProtoCodec
+
 	indexerName string
 }
 
@@ -40,6 +44,7 @@ func NewModule(pg postgres.Storage, cfg config.Indexer) Module {
 		BaseModule:  modules.New("genesis"),
 		storage:     pg,
 		indexerName: cfg.Name,
+		codec:       codec.NewProtoCodec(decode.Config.InterfaceRegistry),
 	}
 
 	m.CreateInput(InputName)
@@ -75,15 +80,17 @@ func (module *Module) listen(ctx context.Context) {
 
 			module.Log.Info().Msg("received genesis message")
 
-			block, err := module.parse(genesis)
+			decodeContext, err := module.parse(genesis)
 			if err != nil {
 				module.Log.Err(err).Msgf("parsing genesis block")
+				module.MustOutput(StopOutput).Push(struct{}{})
 				return
 			}
 			module.Log.Info().Msg("parsed genesis message")
 
-			if err := module.save(ctx, block); err != nil {
+			if err := module.save(ctx, decodeContext); err != nil {
 				module.Log.Err(err).Msg("saving genesis block error")
+				module.MustOutput(StopOutput).Push(struct{}{})
 				return
 			}
 			module.Log.Info().Msg("saved genesis message")

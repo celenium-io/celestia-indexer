@@ -53,6 +53,7 @@ type Context struct {
 	IbcTransfers    []*storage.IbcTransfer
 	BlobLogs        []*storage.BlobLog
 	Signals         []*storage.SignalVersion
+	DenomMetadata   []storage.DenomMetadata
 
 	Block         *storage.Block
 	TryUpgrade    *storage.Upgrade
@@ -97,6 +98,7 @@ func NewContext() *Context {
 		HlTransfers:     make([]*storage.HLTransfer, 0),
 		IbcTransfers:    make([]*storage.IbcTransfer, 0),
 		Signals:         make([]*storage.SignalVersion, 0),
+		DenomMetadata:   make([]storage.DenomMetadata, 0),
 
 		msgCounter: new(atomic.Int64),
 	}
@@ -497,4 +499,8 @@ func (ctx *Context) AddBlobLogs(logs ...*storage.BlobLog) {
 
 func (ctx *Context) AddAddressMessage(msg *storage.MsgAddress) {
 	ctx.AddressMessages.Set(msg.String(), msg)
+}
+
+func (ctx *Context) AddDenomMetadata(metadata ...storage.DenomMetadata) {
+	ctx.DenomMetadata = append(ctx.DenomMetadata, metadata...)
 }

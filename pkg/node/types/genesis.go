@@ -75,7 +75,7 @@ type Auth struct {
 }
 
 type Authz struct {
-	Authorization []interface{} `json:"authorization"`
+	Authorization []json.RawMessage `json:"authorization"`
 }
 
 type BankParams struct {
@@ -452,10 +452,25 @@ type AppState struct {
 	Gov          Gov          `json:"gov"`
 	Ibc          Ibc          `json:"ibc"`
 	Mint         Mint         `json:"mint"`
+	MinFee       MinFee       `json:"minfee"`
 	Params       interface{}  `json:"params"`
 	Qgb          Qgb          `json:"qgb"`
 	Slashing     Slashing     `json:"slashing"`
 	Staking      Staking      `json:"staking"`
 	Transfer     Transfer     `json:"transfer"`
 	Vesting      Vesting      `json:"vesting"`
+}
+
+type MinFee struct {
+	NetworkMinGasPrice string `json:"network_min_gas_price"`
+	Params             struct {
+		NetworkMinGasPrice string `json:"network_min_gas_price"`
+	} `json:"params"`
+}
+
+func (fee MinFee) GetNetworkMinGasPrice() string {
+	if fee.Params.NetworkMinGasPrice != "" {
+		return fee.Params.NetworkMinGasPrice
+	}
+	return fee.NetworkMinGasPrice
 }

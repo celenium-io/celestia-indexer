@@ -258,6 +258,12 @@ func TestDecodeFee(t *testing.T) {
 			expectedErr: "",
 		},
 		{
+			desc:        "Empty but non-nil fee",
+			amount:      types.Coins{},
+			expectedFee: decimal.Zero,
+			expectedErr: "",
+		},
+		{
 			desc: "Valid UTIA fee",
 			amount: types.Coins{
 				types.NewCoin("utia", math.NewInt(1000)),

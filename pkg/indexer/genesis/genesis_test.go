@@ -4,6 +4,8 @@
 package genesis
 
 import (
+	"context"
+	encjson "encoding/json"
 	"os"
 	"testing"
 	"time"
@@ -14,11 +16,23 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
+	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
+	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	"github.com/stretchr/testify/require"
 )
 
 const permanentLockedAccountAddress = "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6"
+
+// addressesMap materializes ctx.Addresses (a sync map) into a plain map so it can be
+// compared with require.Equal.
+func addressesMap(ctx *decodeContext.Context) map[string]*storage.Address {
+	got := make(map[string]*storage.Address, ctx.Addresses.Len())
+	for key, addr := range ctx.Addresses.All() {
+		got[key] = addr
+	}
+	return got
+}
 
 func TestParseAccounts(t *testing.T) {
 	f, err := os.Open("../../../test/json/genesis.json")
@@ -29,16 +43,19 @@ func TestParseAccounts(t *testing.T) {
 	err = json.ConfigFastest.NewDecoder(f).Decode(&g)
 	require.NoError(t, err)
 
-	data := newParsedData()
-
 	module := NewModule(postgres.Storage{}, config.Indexer{})
 
-	module.parseDenomMetadata(g.AppState.Bank.DenomMetadata, &data)
-
-	err = module.parseAccounts(g.AppState.Auth.Accounts, storage.Block{
+	ctx := decodeContext.NewContext()
+	block := storage.Block{
 		Height: 1,
 		Time:   time.Now(),
-	}, &data)
+	}
+	ctx.Block = &block
+
+	module.parseDenomMetadata(ctx, g.AppState.Bank.DenomMetadata)
+	denom := getBaseCurrency(ctx.DenomMetadata)
+
+	err = module.parseAccounts(ctx, denom, g.AppState.Auth.Accounts)
 	require.NoError(t, err)
 
 	want := map[string]*storage.Address{
@@ -86,11 +103,11 @@ func TestParseAccounts(t *testing.T) {
 			Balances:   []storage.Balance{storage.EmptyBalance()},
 		},
 	}
-	require.Equal(t, want, data.addresses)
-	require.Len(t, data.vestings, 4)
+	require.Equal(t, want, addressesMap(ctx))
+	require.Len(t, ctx.VestingAccounts, 4)
 
 	var permanent *storage.VestingAccount
-	for _, v := range data.vestings {
+	for _, v := range ctx.VestingAccounts {
 		if v.Address.Address == permanentLockedAccountAddress {
 			permanent = v
 			break
@@ -104,8 +121,11 @@ func TestParseAccounts(t *testing.T) {
 }
 
 func TestParseBalances_NewAddressMultiCoin(t *testing.T) {
-	data := newParsedData()
 	module := NewModule(postgres.Storage{}, config.Indexer{})
+
+	ctx := decodeContext.NewContext()
+	block := storage.Block{Height: 1}
+	ctx.Block = &block
 
 	const addr = "celestia1qqqpkhsnpyvtzx4knu53zsdfn7l88czztlp8tt"
 	balances := []types.Balances{
@@ -118,11 +138,11 @@ func TestParseBalances_NewAddressMultiCoin(t *testing.T) {
 		},
 	}
 
-	err := module.parseBalances(balances, 1, &data)
+	err := module.parseBalances(ctx, balances)
 	require.NoError(t, err)
 
-	require.Contains(t, data.addresses, addr)
-	got := data.addresses[addr]
+	got, ok := ctx.Addresses.Get(addr)
+	require.True(t, ok)
 	require.Len(t, got.Balances, 2)
 
 	byCurrency := make(map[string]storageTypes.Numeric)
@@ -133,17 +153,22 @@ func TestParseBalances_NewAddressMultiCoin(t *testing.T) {
 	require.Equal(t, storageTypes.NumericFromInt64(50), byCurrency["ibc/AAA"])
 }
 
+// Regression guard: parseBalances must mutate an existing address in place, not
+// re-run it through ctx.AddAddress, which would double every balance it just set.
 func TestParseBalances_ExistingAddressNewCurrency(t *testing.T) {
-	data := newParsedData()
 	module := NewModule(postgres.Storage{}, config.Indexer{})
 
+	ctx := decodeContext.NewContext()
+	block := storage.Block{Height: 1}
+	ctx.Block = &block
+
 	const addr = "celestia1qqqpkhsnpyvtzx4knu53zsdfn7l88czztlp8tt"
-	data.addresses[addr] = &storage.Address{
+	ctx.Addresses.Set(addr, &storage.Address{
 		Address:    addr,
 		Height:     1,
 		LastHeight: 1,
 		Balances:   []storage.Balance{storage.EmptyBalance()},
-	}
+	})
 
 	balances := []types.Balances{
 		{
@@ -155,10 +180,11 @@ func TestParseBalances_ExistingAddressNewCurrency(t *testing.T) {
 		},
 	}
 
-	err := module.parseBalances(balances, 1, &data)
+	err := module.parseBalances(ctx, balances)
 	require.NoError(t, err)
 
-	got := data.addresses[addr]
+	got, ok := ctx.Addresses.Get(addr)
+	require.True(t, ok)
 	require.Len(t, got.Balances, 2)
 
 	byCurrency := make(map[string]storageTypes.Numeric)
@@ -200,4 +226,70 @@ func TestParse_NonExportedGenesisSucceeds(t *testing.T) {
 	module := NewModule(postgres.Storage{}, config.Indexer{})
 	_, err := module.parse(types.GenesisOutput{Genesis: g})
 	require.NoError(t, err)
+}
+
+// Regression guard: an earlier version had parseFeeGrants/parseAuthzGrants each
+// snapshot the shared ctx.Grants into data.grants, duplicating entries from the first call.
+func TestParse_FeegrantAndAuthzGrants_NoDuplication(t *testing.T) {
+	g := loadGenesisFixture(t)
+	g.AppState.Genutil.GenTxs = nil
+	g.AppState.Feegrant.FeeGrants = []encjson.RawMessage{encjson.RawMessage(basicAllowanceGrantJSON)}
+	g.AppState.Authz.Authorization = []encjson.RawMessage{encjson.RawMessage(sendAuthzGrantJSON)}
+
+	module := NewModule(postgres.Storage{}, config.Indexer{})
+	dCtx, err := module.parse(types.GenesisOutput{Genesis: g})
+	require.NoError(t, err)
+
+	grants := dCtx.Grants.Values()
+	require.Len(t, grants, 2)
+	var haveFee, haveAuthz bool
+	for _, grant := range grants {
+		switch grant.Authorization {
+		case "fee":
+			haveFee = true
+		case "/cosmos.bank.v1beta1.MsgSend":
+			haveAuthz = true
+		}
+	}
+	require.True(t, haveFee, "feegrant entry must be present exactly once")
+	require.True(t, haveAuthz, "authz entry must be present exactly once")
+}
+
+// Regression guard: listen() used to swallow parse errors by just logging and
+// returning, leaving the pipeline stuck instead of unblocking downstream modules
+// (e.g. the stopper) via StopOutput.
+func TestModule_OnParseError_PushesStopOutput(t *testing.T) {
+	writerModule := modules.New("writer-module")
+	outputName := "write"
+	writerModule.CreateOutput(outputName)
+
+	genesisModule := NewModule(postgres.Storage{}, config.Indexer{})
+	err := genesisModule.AttachTo(&writerModule, outputName, InputName)
+	require.NoError(t, err)
+
+	stopperModule := modules.New("stopper-module")
+	stopInputName := "stop-signal"
+	stopperModule.CreateInput(stopInputName)
+	err = stopperModule.AttachTo(&genesisModule, StopOutput, stopInputName)
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	genesisModule.Start(ctx)
+
+	// an account with an unrecognized type makes module.parse fail immediately.
+	genesisOutput := types.GenesisOutput{
+		ModuleAccs: []types.Account{
+			{Type: "unknown-account-type"},
+		},
+	}
+	writerModule.MustOutput(outputName).Push(genesisOutput)
+
+	select {
+	case <-ctx.Done():
+		t.Error("stop by cancelled context")
+	case msg := <-stopperModule.MustInput(stopInputName).Listen():
+		require.Equal(t, struct{}{}, msg)
+	}
 }

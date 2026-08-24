@@ -16,7 +16,8 @@ package types
 		staking,
 		consensus,
 		baseapp,
-		icahost
+		icahost,
+		minfee
 	)
 */
 //go:generate go-enum --marshal --sql --values
