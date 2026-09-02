@@ -251,5 +251,14 @@ func (module *Module) parseConstants(ctx *decodeContext.Context, appState types.
 		appState.MinFee.GetNetworkMinGasPrice(),
 	)
 
+	// interchain accounts
+	if len(appState.InterchainAccounts.HostGenesisState.Params.AllowMessages) > 0 {
+		ctx.AddConstant(
+			storageTypes.ModuleNameIcahost,
+			"allow_messages",
+			string(appState.InterchainAccounts.HostGenesisState.Params.AllowMessages),
+		)
+	}
+
 	return nil
 }

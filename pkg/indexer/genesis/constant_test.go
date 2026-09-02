@@ -4,6 +4,7 @@
 package genesis
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"testing"
@@ -89,6 +90,18 @@ func testAppState() types.AppState {
 	}
 }
 
+// testAppStateWithIcahost returns testAppState with the interchain accounts
+// host genesis state populated, mirroring a real chain export.
+func testAppStateWithIcahost(allowMessages string) types.AppState {
+	appState := testAppState()
+	appState.InterchainAccounts.HostGenesisState.Port = "icahost"
+	appState.InterchainAccounts.HostGenesisState.Params.HostEnabled = true
+	if allowMessages != "" {
+		appState.InterchainAccounts.HostGenesisState.Params.AllowMessages = json.RawMessage(allowMessages)
+	}
+	return appState
+}
+
 func testConsensusParams() pkgTypes.ConsensusParams {
 	return pkgTypes.ConsensusParams{
 		Block: &pkgTypes.BlockParams{
@@ -118,7 +131,7 @@ func constantsMap(ctx *decodeContext.Context) map[string]string {
 func TestParseConstants(t *testing.T) {
 	module := NewModule(postgres.Storage{}, config.Indexer{})
 	ctx := decodeContext.NewContext()
-	appState := testAppState()
+	appState := testAppStateWithIcahost(`["*"]`)
 	consensus := testConsensusParams()
 
 	err := module.parseConstants(ctx, appState, consensus)
@@ -169,9 +182,52 @@ func TestParseConstants(t *testing.T) {
 		"staking.min_commission_rate": "0.05",
 
 		"minfee.network_min_gas_price": "0.000001",
+
+		"icahost.allow_messages": `["*"]`,
 	}
 
 	require.Equal(t, want, constantsMap(ctx))
+}
+
+func TestParseConstants_IcahostAllowMessages(t *testing.T) {
+	cases := []struct {
+		name          string
+		allowMessages string
+		want          string
+	}{
+		{
+			name:          "wildcard allows every message type",
+			allowMessages: `["*"]`,
+			want:          `["*"]`,
+		},
+		{
+			name:          "explicit list of allowed message types",
+			allowMessages: `["/cosmos.bank.v1beta1.MsgSend","/cosmos.staking.v1beta1.MsgDelegate"]`,
+			want:          `["/cosmos.bank.v1beta1.MsgSend","/cosmos.staking.v1beta1.MsgDelegate"]`,
+		},
+		{
+			name:          "empty list disallows every message type",
+			allowMessages: `[]`,
+			want:          `[]`,
+		},
+		{
+			name:          "field absent from genesis",
+			allowMessages: "",
+			want:          "",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			module := NewModule(postgres.Storage{}, config.Indexer{})
+			ctx := decodeContext.NewContext()
+			appState := testAppStateWithIcahost(tc.allowMessages)
+
+			err := module.parseConstants(ctx, appState, testConsensusParams())
+			require.NoError(t, err)
+			require.Equal(t, tc.want, constantsMap(ctx)["icahost.allow_messages"])
+		})
+	}
 }
 
 func TestParseConstants_ZeroMinDepositOmitted(t *testing.T) {
