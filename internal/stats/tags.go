@@ -60,9 +60,7 @@ func InitModel(model any) error {
 		}
 	)
 
-	for i := 0; i < typ.NumField(); i++ {
-		field := typ.Field(i)
-
+	for field := range typ.Fields() {
 		bunTag := field.Tag.Get(bunTagName)
 		if bunTag == "" || bunTag == "-" {
 			continue

@@ -89,8 +89,8 @@ func (BlobLog) TableName() string {
 
 func (BlobLog) Columns() []string {
 	return []string{
-		"time", "height", "size", "share_version", "commitment", "content_type",
-		"fee", "signer_id", "namespace_id", "msg_id", "tx_id",
+		columnNameTime, columnNameHeight, "size", "share_version", "commitment", "content_type",
+		"fee", "signer_id", "namespace_id", "msg_id", columnNameTxId,
 	}
 }
 

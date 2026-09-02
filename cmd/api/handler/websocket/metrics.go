@@ -8,6 +8,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
+const (
+	promChannelLabel = "channel"
+	promStatusLabel  = "status"
+)
+
 var (
 	// WebSocket connection metrics
 	wsActiveConnections = promauto.NewGauge(prometheus.GaugeOpts{
@@ -18,40 +23,40 @@ var (
 	wsConnectionsTotal = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "websocket_connections_total",
 		Help: "Total number of WebSocket connections",
-	}, []string{"status"}) // status: accepted, rejected
+	}, []string{promStatusLabel}) // status: accepted, rejected
 
 	// Message metrics
 	wsMessagesSent = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "websocket_messages_sent_total",
 		Help: "Total number of messages sent to clients",
-	}, []string{"channel"}) // channel: head, blocks, gas_price
+	}, []string{promChannelLabel}) // channel: head, blocks, gas_price
 
 	wsMessagesDropped = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "websocket_messages_dropped_total",
 		Help: "Total number of messages dropped due to full client buffer",
-	}, []string{"channel"})
+	}, []string{promChannelLabel})
 
 	wsMessageLatency = promauto.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "websocket_message_broadcast_seconds",
 		Help:    "Time taken to broadcast message to all clients",
 		Buckets: prometheus.DefBuckets,
-	}, []string{"channel"})
+	}, []string{promChannelLabel})
 
 	// Subscription metrics
 	wsSubscriptions = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "websocket_subscriptions",
 		Help: "Current number of active subscriptions per channel",
-	}, []string{"channel"})
+	}, []string{promChannelLabel})
 
 	wsSubscribeRequests = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "websocket_subscribe_requests_total",
 		Help: "Total number of subscribe requests",
-	}, []string{"channel", "status"}) // status: success, error
+	}, []string{promChannelLabel, promStatusLabel}) // status: success, error
 
 	wsUnsubscribeRequests = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "websocket_unsubscribe_requests_total",
 		Help: "Total number of unsubscribe requests",
-	}, []string{"channel", "status"}) // status: success, error
+	}, []string{promChannelLabel, promStatusLabel}) // status: success, error
 
 	// Error metrics
 	wsErrors = promauto.NewCounterVec(prometheus.CounterOpts{

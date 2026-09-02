@@ -56,8 +56,8 @@ func (api *API) BlockBulkData(ctx context.Context, levels ...pkgTypes.Level) ([]
 
 	for i := range levels {
 		levelString := levels[i].String()
-		requests[i*2] = types.Request{Method: pathBlock, JsonRpc: "2.0", Id: -1, Params: []any{levelString}}
-		requests[i*2+1] = types.Request{Method: pathBlockResults, JsonRpc: "2.0", Id: -1, Params: []any{levelString}}
+		requests[i*2] = types.Request{Method: pathBlock, JsonRpc: jsonRpcVersion, Id: -1, Params: []any{levelString}}
+		requests[i*2+1] = types.Request{Method: pathBlockResults, JsonRpc: jsonRpcVersion, Id: -1, Params: []any{levelString}}
 	}
 
 	result := make([]pkgTypes.BlockData, 0, len(levels))
@@ -118,7 +118,7 @@ func (api *API) BlockBulkDataStream(
 		levelString := levels[i].String()
 		requests[i*2] = types.Request{
 			Method:  pathBlock,
-			JsonRpc: "2.0",
+			JsonRpc: jsonRpcVersion,
 			Id:      -1,
 			Params: []any{
 				levelString,
@@ -126,7 +126,7 @@ func (api *API) BlockBulkDataStream(
 		}
 		requests[i*2+1] = types.Request{
 			Method:  pathBlockResults,
-			JsonRpc: "2.0",
+			JsonRpc: jsonRpcVersion,
 			Id:      -1,
 			Params: []any{
 				levelString,

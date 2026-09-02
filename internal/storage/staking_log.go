@@ -57,6 +57,6 @@ func (log StakingLog) Flat() ([]any, error) {
 
 func (StakingLog) Columns() []string {
 	return []string{
-		"time", "height", "address_id", "validator_id", "change", "type",
+		columnNameTime, columnNameHeight, "address_id", "validator_id", "change", columnNameType,
 	}
 }
