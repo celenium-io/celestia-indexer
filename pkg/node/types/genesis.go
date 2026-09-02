@@ -439,26 +439,27 @@ type Vesting struct {
 }
 
 type AppState struct {
-	Auth         Auth         `json:"auth"`
-	Authz        Authz        `json:"authz"`
-	Bank         Bank         `json:"bank"`
-	Blob         BlobState    `json:"blob"`
-	Capability   Capability   `json:"capability"`
-	Crisis       Crisis       `json:"crisis"`
-	Distribution Distribution `json:"distribution"`
-	Evidence     Evidence     `json:"evidence"`
-	Feegrant     Feegrant     `json:"feegrant"`
-	Genutil      Genutil      `json:"genutil"`
-	Gov          Gov          `json:"gov"`
-	Ibc          Ibc          `json:"ibc"`
-	Mint         Mint         `json:"mint"`
-	MinFee       MinFee       `json:"minfee"`
-	Params       interface{}  `json:"params"`
-	Qgb          Qgb          `json:"qgb"`
-	Slashing     Slashing     `json:"slashing"`
-	Staking      Staking      `json:"staking"`
-	Transfer     Transfer     `json:"transfer"`
-	Vesting      Vesting      `json:"vesting"`
+	Auth               Auth               `json:"auth"`
+	Authz              Authz              `json:"authz"`
+	Bank               Bank               `json:"bank"`
+	Blob               BlobState          `json:"blob"`
+	Capability         Capability         `json:"capability"`
+	Crisis             Crisis             `json:"crisis"`
+	Distribution       Distribution       `json:"distribution"`
+	Evidence           Evidence           `json:"evidence"`
+	Feegrant           Feegrant           `json:"feegrant"`
+	Genutil            Genutil            `json:"genutil"`
+	Gov                Gov                `json:"gov"`
+	Ibc                Ibc                `json:"ibc"`
+	InterchainAccounts InterchainAccounts `json:"interchainaccounts"`
+	Mint               Mint               `json:"mint"`
+	MinFee             MinFee             `json:"minfee"`
+	Params             interface{}        `json:"params"`
+	Qgb                Qgb                `json:"qgb"`
+	Slashing           Slashing           `json:"slashing"`
+	Staking            Staking            `json:"staking"`
+	Transfer           Transfer           `json:"transfer"`
+	Vesting            Vesting            `json:"vesting"`
 }
 
 type MinFee struct {
@@ -473,4 +474,16 @@ func (fee MinFee) GetNetworkMinGasPrice() string {
 		return fee.Params.NetworkMinGasPrice
 	}
 	return fee.NetworkMinGasPrice
+}
+
+type InterchainAccounts struct {
+	HostGenesisState struct {
+		Port   string                   `json:"port"`
+		Params InterchainAccountsParams `json:"params"`
+	} `json:"host_genesis_state"`
+}
+
+type InterchainAccountsParams struct {
+	HostEnabled   bool            `json:"host_enabled"`
+	AllowMessages json.RawMessage `json:"allow_messages"`
 }

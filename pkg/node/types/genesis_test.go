@@ -4,6 +4,7 @@
 package types
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
@@ -144,5 +145,47 @@ func TestMinFee_GetNetworkMinGasPrice(t *testing.T) {
 
 	t.Run("no value", func(t *testing.T) {
 		require.Equal(t, "", MinFee{}.GetNetworkMinGasPrice())
+	})
+}
+
+func TestAppState_UnmarshalInterchainAccounts(t *testing.T) {
+	t.Run("host genesis state", func(t *testing.T) {
+		raw := `{
+			"interchainaccounts": {
+				"controller_genesis_state": {
+					"active_channels": [],
+					"interchain_accounts": [],
+					"ports": [],
+					"params": {}
+				},
+				"host_genesis_state": {
+					"active_channels": [],
+					"interchain_accounts": [],
+					"port": "icahost",
+					"params": {
+						"host_enabled": true,
+						"allow_messages": ["*"]
+					}
+				}
+			}
+		}`
+
+		var appState AppState
+		err := json.Unmarshal([]byte(raw), &appState)
+		require.NoError(t, err)
+
+		host := appState.InterchainAccounts.HostGenesisState
+		require.Equal(t, "icahost", host.Port)
+		require.True(t, host.Params.HostEnabled)
+		require.JSONEq(t, `["*"]`, string(host.Params.AllowMessages))
+	})
+
+	t.Run("missing interchainaccounts key", func(t *testing.T) {
+		var appState AppState
+		err := json.Unmarshal([]byte(`{}`), &appState)
+		require.NoError(t, err)
+		require.Empty(t, appState.InterchainAccounts.HostGenesisState.Port)
+		require.False(t, appState.InterchainAccounts.HostGenesisState.Params.HostEnabled)
+		require.Nil(t, appState.InterchainAccounts.HostGenesisState.Params.AllowMessages)
 	})
 }
