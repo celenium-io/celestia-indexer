@@ -62,37 +62,7 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	go.opentelemetry.io/otel/trace v1.44.0
 	go.uber.org/mock v0.6.0
-	golang.org/x/exp v0.0.0-20260820142414-ca536658362e // indirect
 	golang.org/x/time v0.15.0
-)
-
-require (
-	cosmossdk.io/api v1.0.0
-	cosmossdk.io/math v1.5.3
-	cosmossdk.io/x/circuit v0.1.1
-	cosmossdk.io/x/evidence v0.1.1
-	cosmossdk.io/x/feegrant v0.1.1
-	cosmossdk.io/x/nft v0.2.0-rc.2
-	cosmossdk.io/x/upgrade v0.1.4
-	github.com/bcp-innovations/hyperlane-cosmos v1.1.0
-	github.com/bytedance/sonic v1.15.0
-	github.com/celestiaorg/celestia-app/v9 v9.0.4
-	github.com/celestiaorg/go-square/v3 v3.0.2
-	github.com/cosmos/cosmos-proto v1.0.0-beta.5
-	github.com/cosmos/gogoproto v1.7.2
-	github.com/dipdup-io/go-lib/config v1.0.1
-	github.com/dipdup-io/go-lib/database v1.0.4
-	github.com/dipdup-io/go-lib/testhelpers v1.0.0
-	github.com/ettle/strcase v0.2.0
-	github.com/go-faster/jx v1.2.0
-	github.com/gogo/protobuf v1.3.3
-	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
-	github.com/jackc/pgx/v5 v5.10.0
-	github.com/json-iterator/go v1.1.12
-	github.com/klauspost/compress v1.19.0
-	github.com/opus-domini/fast-shot v1.1.4
-	github.com/prometheus/client_golang v1.23.2
-	github.com/sony/gobreaker/v2 v2.3.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa
 	google.golang.org/grpc v1.83.1
 	google.golang.org/protobuf v1.36.11
@@ -370,7 +340,7 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/arch v0.21.0 // indirect
 	golang.org/x/crypto v0.55.0 // indirect
-	golang.org/x/exp v0.0.0-20260112195511-716be5621a96 // indirect
+	golang.org/x/exp v0.0.0-20260820142414-ca536658362e // indirect
 	golang.org/x/net v0.57.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
