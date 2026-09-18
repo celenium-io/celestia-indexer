@@ -36,7 +36,7 @@ const (
 
 	// fibreChunk is the paid upload step: a promise's blob_size is always a
 	// multiple of it (4096 rows x 64 byte minimum row size).
-	fibreChunk = uint32(appconsts.PFBFibreChunkSize)
+	fibreChunk = appconsts.PFBFibreChunkSize
 )
 
 // fibreNamespace is a valid non-reserved blob namespace: version byte 0 plus a

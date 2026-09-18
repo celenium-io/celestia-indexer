@@ -180,18 +180,18 @@ type RollupWithDayStats struct {
 	SettledOn      string `example:"Ethereum"                                  format:"string"  json:"settled_on,omitempty"  swaggertype:"string"`
 	Color          string `example:"#123456"                                   format:"string"  json:"color,omitempty"       swaggertype:"string"`
 
-	AvgSize         int64   `example:"100" format:"integer" json:"avg_size"        swaggertype:"integer"`
-	BlobsCount      int64   `example:"100" format:"integer" json:"blobs_count"     swaggertype:"integer"`
+	AvgSize         int64   `example:"100" format:"integer" json:"avg_size"          swaggertype:"integer"`
+	BlobsCount      int64   `example:"100" format:"integer" json:"blobs_count"       swaggertype:"integer"`
 	FibreBlobsCount int64   `example:"100" format:"integer" json:"fibre_blobs_count" swaggertype:"integer"`
-	TotalSize       int64   `example:"100" format:"integer" json:"total_size"      swaggertype:"integer"`
-	Throghput       int64   `example:"100" format:"integer" json:"throughput"      swaggertype:"integer"`
-	NamespaceCount  int64   `example:"100" format:"integer" json:"namespace_count" swaggertype:"integer"`
-	PfbCount        int64   `example:"100" format:"integer" json:"pfb_count"       swaggertype:"integer"`
-	PffCount        int64   `example:"100" format:"integer" json:"pff_count"       swaggertype:"integer"`
-	TotalFee        string  `example:"100" format:"string"  json:"total_fee"       swaggertype:"string"`
-	MBPrice         string  `example:"100" format:"string"  json:"mb_price"        swaggertype:"string"`
-	FeePerPfb       string  `example:"100" format:"string"  json:"fee_per_pfb"     swaggertype:"string"`
-	BlobsPerPfb     float64 `example:"100" format:"float"   json:"blobs_per_pfb"   swaggertype:"number"`
+	TotalSize       int64   `example:"100" format:"integer" json:"total_size"        swaggertype:"integer"`
+	Throghput       int64   `example:"100" format:"integer" json:"throughput"        swaggertype:"integer"`
+	NamespaceCount  int64   `example:"100" format:"integer" json:"namespace_count"   swaggertype:"integer"`
+	PfbCount        int64   `example:"100" format:"integer" json:"pfb_count"         swaggertype:"integer"`
+	PffCount        int64   `example:"100" format:"integer" json:"pff_count"         swaggertype:"integer"`
+	TotalFee        string  `example:"100" format:"string"  json:"total_fee"         swaggertype:"string"`
+	MBPrice         string  `example:"100" format:"string"  json:"mb_price"          swaggertype:"string"`
+	FeePerPfb       string  `example:"100" format:"string"  json:"fee_per_pfb"       swaggertype:"string"`
+	BlobsPerPfb     float64 `example:"100" format:"float"   json:"blobs_per_pfb"     swaggertype:"number"`
 }
 
 func NewRollupWithDayStats(r storage.RollupWithDayStats) RollupWithDayStats {
