@@ -9,6 +9,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/celestiaorg/celestia-app/v10/pkg/appconsts"
 	fibreTypes "github.com/celestiaorg/celestia-app/v10/x/fibre/types"
 	"github.com/celestiaorg/go-square/v4/inclusion"
@@ -81,8 +82,13 @@ func MsgPayForFibre(
 
 		ns := ctx.AddNamespace(namespace)
 
+		owner, err := pkgTypes.NewAddressFromBytes(m.PaymentPromise.SignerPublicKey.Address().Bytes())
+		if err != nil {
+			return msgType, nil, err
+		}
+
 		signer := &storage.Address{
-			Address:    m.Signer,
+			Address:    owner.String(),
 			Height:     ctx.Block.Height,
 			LastHeight: ctx.Block.Height,
 		}

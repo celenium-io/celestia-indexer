@@ -26,9 +26,10 @@ import (
 )
 
 const (
-	fibreSigner    = "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l"
-	fibreAuthority = "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6"
-	fibreValidator = "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x"
+	fibreSigner     = "celestia1vsvx8n7f8dh5udesqqhgrjutyun7zqrgehdq2l"
+	fibreBlobSender = "celestia1mrkyc6nn3uamgf87kx7zpgnv4lly4mq4y3q3c0"
+	fibreAuthority  = "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6"
+	fibreValidator  = "celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x"
 
 	// fibreTxId is deliberately different from the message id the decoder
 	// assigns (it counts from 1) so a swap of the two shows up in assertions.
@@ -180,7 +181,7 @@ func TestFibre_MsgPayForFibre(t *testing.T) {
 	require.EqualValues(t, fibreChunk, blob.Size)
 	require.EqualValues(t, 1, blob.MsgId)
 	require.EqualValues(t, fibreTxId, blob.TxId)
-	require.Equal(t, fibreSigner, blob.Signer.Address)
+	require.Equal(t, fibreBlobSender, blob.Signer.Address)
 	require.Equal(t, ns, blob.Namespace)
 	require.Equal(t, block.Height, blob.Height)
 	require.Equal(t, now, blob.Time)
@@ -453,6 +454,9 @@ func newMsgPayForFibre(t *testing.T, blobSize uint32) *fibreTypes.MsgPayForFibre
 func testPaymentPromise(t *testing.T, blobSize uint32) fibreTypes.PaymentPromise {
 	t.Helper()
 
+	signerKey := []byte{99, 171, 47, 239, 91, 33, 7, 75, 84, 84, 251,
+		83, 208, 25, 194, 108, 53, 235, 125, 2, 218, 63, 151, 231, 21, 118, 15, 2, 38, 36, 57, 91, 65}
+
 	promise := fibreTypes.PaymentPromise{
 		ChainId:           "mocha-4",
 		Height:            100,
@@ -461,7 +465,7 @@ func testPaymentPromise(t *testing.T, blobSize uint32) fibreTypes.PaymentPromise
 		BlobVersion:       fibreTypes.BlobVersionZero,
 		Commitment:        testsuite.RandomBytes(32),
 		CreationTimestamp: time.Unix(1757000000, 0).UTC(),
-		SignerPublicKey:   secp256k1.PubKey{Key: testsuite.RandomBytes(33)},
+		SignerPublicKey:   secp256k1.PubKey{Key: signerKey},
 		Signature:         testsuite.RandomBytes(64),
 	}
 	// The fixture must be a promise the chain would actually accept.
