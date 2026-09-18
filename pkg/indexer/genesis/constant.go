@@ -12,6 +12,7 @@ import (
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	fibreTypes "github.com/celestiaorg/celestia-app/v10/x/fibre/types"
 	"github.com/pkg/errors"
 )
 
@@ -251,6 +252,15 @@ func (module *Module) parseConstants(ctx *decodeContext.Context, appState types.
 		appState.MinFee.GetNetworkMinGasPrice(),
 	)
 
+	// fibre: only chains launched at app version 10 or later carry it
+	if appState.Fibre != nil {
+		params, err := parseFibreParams(appState.Fibre.Params)
+		if err != nil {
+			return err
+		}
+		ctx.AddFibreParams(params)
+	}
+
 	// interchain accounts
 	if len(appState.InterchainAccounts.HostGenesisState.Params.AllowMessages) > 0 {
 		ctx.AddConstant(
@@ -261,4 +271,37 @@ func (module *Module) parseConstants(ctx *decodeContext.Context, appState types.
 	}
 
 	return nil
+}
+
+// parseFibreParams converts the genesis representation of the fibre params into
+// the app type, so both the genesis and the upgrade path store them identically.
+func parseFibreParams(raw types.FibreParams) (fibreTypes.Params, error) {
+	withdrawalDelay, err := time.ParseDuration(raw.WithdrawalDelay)
+	if err != nil {
+		return fibreTypes.Params{}, errors.Wrap(err, "fibre withdrawal delay")
+	}
+	paymentPromiseTimeout, err := time.ParseDuration(raw.PaymentPromiseTimeout)
+	if err != nil {
+		return fibreTypes.Params{}, errors.Wrap(err, "fibre payment promise timeout")
+	}
+	shardRetention, err := time.ParseDuration(raw.ShardRetention)
+	if err != nil {
+		return fibreTypes.Params{}, errors.Wrap(err, "fibre shard retention")
+	}
+	heightWindow, err := strconv.ParseUint(raw.PaymentPromiseHeightWindow, 10, 64)
+	if err != nil {
+		return fibreTypes.Params{}, errors.Wrap(err, "fibre payment promise height window")
+	}
+	storageBudget, err := strconv.ParseUint(raw.FullStakeStorageBudget, 10, 64)
+	if err != nil {
+		return fibreTypes.Params{}, errors.Wrap(err, "fibre full stake storage budget")
+	}
+
+	return fibreTypes.NewParams(
+		withdrawalDelay,
+		paymentPromiseTimeout,
+		heightWindow,
+		shardRetention,
+		storageBudget,
+	), nil
 }

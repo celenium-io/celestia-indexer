@@ -82,7 +82,7 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 
 func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFilters) (rollups []storage.RollupWithDayStats, err error) {
 	switch fltrs.SortField {
-	case "avg_size", blobsCountColumn, "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price":
+	case "avg_size", blobsCountColumn, "fibre_blobs_count", "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "pff_count", "mb_price":
 	case "":
 		fltrs.SortField = "throughput"
 	default:
@@ -91,7 +91,7 @@ func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFi
 
 	query := r.DB().NewSelect().
 		Table(storage.ViewLeaderboardDay).
-		Column("avg_size", blobsCountColumn, "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price").
+		Column("avg_size", blobsCountColumn, "fibre_blobs_count", "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "pff_count", "mb_price").
 		ColumnExpr("rollup.*").
 		Offset(fltrs.Offset).
 		Join("left join rollup on rollup.id = rollup_id AND rollup.verified = true")
@@ -240,7 +240,7 @@ func (r *Rollup) Count(ctx context.Context) (int64, error) {
 
 func (r *Rollup) Stats(ctx context.Context, rollupId uint64) (stats storage.RollupStats, err error) {
 	err = r.DB().NewSelect().Table(storage.ViewLeaderboard).
-		Column("blobs_count", "size", "last_time", "first_time", "fee", "size_pct", "fee_pct", "blobs_count_pct").
+		Column("blobs_count", "fibre_blobs_count", "size", "last_time", "first_time", "fee", "size_pct", "fee_pct", "blobs_count_pct").
 		Where("id = ?", rollupId).Scan(ctx, &stats)
 	return
 }

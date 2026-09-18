@@ -91,6 +91,7 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 	c := events.NewCursor(txEvents)
 	c.SkipToNext("action")
 
+	txBlobs := make([]*storage.BlobLog, 0)
 	for i := range d.Messages {
 		dm, err := decode.Message(ctx, d.Messages[i], i, t.Status, t.Id)
 		if err != nil {
@@ -101,8 +102,7 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 			}
 		}
 
-		processBlob(dm.BlobLogs, d, t)
-		ctx.AddBlobLogs(dm.BlobLogs...)
+		txBlobs = append(txBlobs, dm.BlobLogs...)
 
 		if txRes.IsFailed() {
 			dm.Msg.Namespace = nil
@@ -120,6 +120,12 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 		}
 
 		ctx.AddMessage(&dm.Msg)
+	}
+	if !txRes.IsFailed() {
+		if err := processBlobs(txBlobs, d, t); err != nil {
+			return err
+		}
+		ctx.AddBlobLogs(txBlobs...)
 	}
 
 	ctx.Block.Stats.Fee = ctx.Block.Stats.Fee.Add(t.Fee)

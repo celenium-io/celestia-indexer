@@ -189,6 +189,16 @@ func createTypes(ctx context.Context, conn *database.Bun) error {
 		); err != nil {
 			return err
 		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			createTypeQuery,
+			"blob_source",
+			bun.Safe("blob_source"),
+			bun.Tuple(types.BlobSourceValues()),
+		); err != nil {
+			return err
+		}
 		return nil
 	})
 }

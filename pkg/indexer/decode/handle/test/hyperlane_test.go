@@ -296,7 +296,7 @@ func TestDecodeMsg_SuccessOnMsgEnrollRemoteRouter(t *testing.T) {
 		TokenId: util.CreateMockHexAddress("test", 123),
 		RemoteRouter: &hyperlaneWarp.RemoteRouter{
 			ReceiverDomain:   23,
-			ReceiverContract: "contract",
+			ReceiverContract: util.CreateMockHexAddress("contract", 0),
 			Gas:              math.NewInt(123456),
 		},
 	}
@@ -318,7 +318,7 @@ func TestDecodeMsg_SuccessOnMsgEnrollRemoteRouter(t *testing.T) {
 		Position:  0,
 		Type:      storageTypes.MsgEnrollRemoteRouter,
 		TxId:      0,
-		Size:      139,
+		Size:      197,
 		Data:      mustMsgToMap(t, msg),
 		Namespace: nil,
 	}

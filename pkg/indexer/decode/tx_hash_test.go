@@ -11,7 +11,7 @@ import (
 
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	nodeTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	squareTx "github.com/celestiaorg/go-square/v3/tx"
+	squareTx "github.com/celestiaorg/go-square/v4/tx"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	blobProto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmTypes "github.com/cometbft/cometbft/types"

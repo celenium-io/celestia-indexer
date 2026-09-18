@@ -4,6 +4,7 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
 		time_bucket('1 week'::interval, nm.ts) AS ts,
 		nm.namespace_id,
 		sum(pfb_count) as pfb_count,
+		sum(pff_count) as pff_count,
 		sum(size) as size		
 	from namespace_stats_by_day as nm
 	group by 1, 2

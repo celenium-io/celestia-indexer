@@ -337,6 +337,7 @@ type getBlobsForTx struct {
 	Offset int    `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string `query:"sort_by" validate:"omitempty,oneof=time size"`
+	Source string `query:"source"  validate:"omitempty,blob_source"`
 }
 
 func (req *getBlobsForTx) SetDefault() {
@@ -351,7 +352,7 @@ func (req *getBlobsForTx) SetDefault() {
 // Blobs godoc
 //
 //	@Summary		List blobs which was pushed by transaction
-//	@Description	Returns a paginated list of blobs submitted via the PayForBlobs message in the given transaction. Supports sorting by time or blob size.
+//	@Description	Returns a paginated list of blobs submitted via the PayForBlobs or PayForFibre message in the given transaction. Supports sorting by time or blob size.
 //	@Tags			transactions
 //	@ID				list-transaction-blobs
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"				minlength(64)	maxlength(64)	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
@@ -359,6 +360,7 @@ func (req *getBlobsForTx) SetDefault() {
 //	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
+//	@Param			source	query	string	false	"Blob source. If it's empty both sources are returned"	Enums(pfb, fibre)	example(fibre)
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
@@ -389,6 +391,7 @@ func (handler *TxHandler) Blobs(c echo.Context) error {
 			Offset: req.Offset,
 			Sort:   pgSort(req.Sort),
 			SortBy: req.SortBy,
+			Source: req.Source,
 		},
 	)
 	if err != nil {

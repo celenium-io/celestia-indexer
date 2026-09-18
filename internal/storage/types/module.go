@@ -17,7 +17,8 @@ package types
 		consensus,
 		baseapp,
 		icahost,
-		minfee
+		minfee,
+		fibre
 	)
 */
 //go:generate go-enum --marshal --sql --values

@@ -123,7 +123,7 @@ type rollupDayList struct {
 	Limit    int         `query:"limit"    validate:"omitempty,min=1,max=100"`
 	Offset   int         `query:"offset"   validate:"omitempty,min=0"`
 	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
-	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=avg_size blobs_count total_size total_fee throughput namespace_count pfb_count mb_price"`
+	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=avg_size blobs_count fibre_blobs_count total_size total_fee throughput namespace_count pfb_count pff_count mb_price"`
 	Stack    StringArray `query:"stack"    validate:"omitempty"`
 	Provider StringArray `query:"provider" validate:"omitempty"`
 	Category StringArray `query:"category" validate:"omitempty,dive,category"`
@@ -152,7 +152,7 @@ func (p *rollupDayList) SetDefault() {
 //	@Param			limit	 query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
 //	@Param			offset	 query	integer	false	"Offset"						minimum(1)	example(10)
 //	@Param			sort	 query	string	false	"Sort order. Default: desc"		Enums(asc, desc)	example(asc)
-//	@Param			sort_by	 query	string	false	"Sort field. Default: mb_price"	Enums(avg_size, blobs_count, total_size, total_fee, throughput, namespace_count, pfb_count, mb_price)	example(avg_size)
+//	@Param			sort_by	 query	string	false	"Sort field. Default: mb_price"	Enums(avg_size, blobs_count, fibre_blobs_count, total_size, total_fee, throughput, namespace_count, pfb_count, pff_count, mb_price)	example(avg_size)
 //	@Param          category query  string  false   "Comma-separated rollup category list"	example(nft)
 //	@Param          tags     query  string  false   "Comma-separated rollup tags list"	example(gaming)
 //	@Param          stack    query  string  false   "Comma-separated rollup stack list"	example(op_stack)

@@ -9,10 +9,10 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/pkg/node"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/celestiaorg/celestia-app/v9/pkg/appconsts"
-	"github.com/celestiaorg/celestia-app/v9/pkg/da"
-	square "github.com/celestiaorg/go-square/v3"
-	"github.com/celestiaorg/go-square/v3/share"
+	"github.com/celestiaorg/celestia-app/v10/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v10/pkg/da"
+	square "github.com/celestiaorg/go-square/v4"
+	"github.com/celestiaorg/go-square/v4/share"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -309,6 +309,7 @@ type getBlobsForBlock struct {
 	Offset int         `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string      `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string      `query:"sort_by" validate:"omitempty,oneof=time size"`
+	Source string      `query:"source"  validate:"omitempty,blob_source"`
 }
 
 func (req *getBlobsForBlock) SetDefault() {
@@ -323,7 +324,7 @@ func (req *getBlobsForBlock) SetDefault() {
 // Blobs godoc
 //
 //	@Summary		List blobs which was pushed in the block
-//	@Description	Returns a paginated list of blobs submitted via PayForBlobs transactions included in the block at the given height. Supports sorting by time or size.
+//	@Description	Returns a paginated list of blobs submitted via PayForBlobs or PayForFibre transactions included in the block at the given height. Supports sorting by time or size.
 //	@Tags			block
 //	@ID				get-block-blobs
 //	@Param			height	path	integer	true	"Block height"									minimum(1)	example(123)
@@ -331,6 +332,7 @@ func (req *getBlobsForBlock) SetDefault() {
 //	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
+//	@Param			source	query	string	false	"Blob source. If it's empty both sources are returned"	Enums(pfb, fibre)	example(fibre)
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
@@ -360,8 +362,9 @@ func (handler *BlockHandler) Blobs(c echo.Context) error {
 			Sort:   pgSort(req.Sort),
 			SortBy: req.SortBy,
 			// using time filters to take certain partition
-			From: blockTime,
-			To:   blockTime.Add(time.Minute),
+			From:   blockTime,
+			To:     blockTime.Add(time.Minute),
+			Source: req.Source,
 		},
 	)
 	if err != nil {
@@ -444,8 +447,12 @@ func (handler *BlockHandler) BlockODS(c echo.Context) error {
 		return handleError(c, err, handler.block)
 	}
 
+	classifiedTxs := make([]square.ClassifiedTx, len(block.Block.Txs))
+	for i := range block.Block.Txs {
+		classifiedTxs[i] = square.NewClassifiedTx(block.Block.Txs[i])
+	}
 	dataSquare, err := square.Construct(
-		block.Block.Txs,
+		classifiedTxs,
 		appconsts.SquareSizeUpperBound,
 		appconsts.SubtreeRootThreshold,
 	)

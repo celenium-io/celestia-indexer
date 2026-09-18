@@ -17,10 +17,12 @@ type Namespace struct {
 	ID              uint64         `example:"321"                                                      format:"integer"   json:"id"                swaggertype:"integer"`
 	Size            int64          `example:"12345"                                                    format:"integer"   json:"size"              swaggertype:"integer"`
 	BlobsCount      int64          `example:"10000"                                                    format:"integer"   json:"blobs_count"       swaggertype:"integer"`
+	FibreSize       int64          `example:"12345"                                                    format:"integer"   json:"fibre_size"        swaggertype:"integer"`
 	Version         byte           `examle:"1"                                                         format:"byte"      json:"version"           swaggertype:"integer"`
 	NamespaceID     string         `example:"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02" format:"binary"    json:"namespace_id"      swaggertype:"string"`
 	Hash            string         `example:"U3dhZ2dlciByb2Nrcw=="                                     format:"base64"    json:"hash"              swaggertype:"string"`
 	PfbCount        int64          `example:"12"                                                       format:"integer"   json:"pfb_count"         swaggertype:"integer"`
+	PffCount        int64          `example:"10000"                                                    format:"integer"   json:"pff_count"         swaggertype:"integer"`
 	LastHeight      pkgTypes.Level `example:"100"                                                      format:"int64"     json:"last_height"       swaggertype:"integer"`
 	LastMessageTime time.Time      `example:"2023-07-04T03:10:57+00:00"                                format:"date-time" json:"last_message_time" swaggertype:"string"`
 	Name            string         `example:"name"                                                     format:"string"    json:"name"              swaggertype:"string"`
@@ -32,12 +34,14 @@ func NewNamespace(ns storage.Namespace) Namespace {
 		ID:              ns.Id,
 		Size:            ns.Size,
 		BlobsCount:      ns.BlobsCount,
+		FibreSize:       ns.FibreSize,
 		Version:         ns.Version,
 		NamespaceID:     hex.EncodeToString(ns.NamespaceID),
 		Name:            decodeName(ns.NamespaceID),
 		Hash:            ns.Hash(),
 		Reserved:        ns.Reserved,
 		PfbCount:        ns.PfbCount,
+		PffCount:        ns.PffCount,
 		LastHeight:      ns.LastHeight,
 		LastMessageTime: ns.LastMessageTime,
 	}

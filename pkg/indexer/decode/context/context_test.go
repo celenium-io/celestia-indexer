@@ -256,3 +256,89 @@ func Test_AddAddress_ExistingWithInvalidCurrency(t *testing.T) {
 		},
 	}, addr)
 }
+
+// Test_AddNamespace_Merge covers the accumulator every namespace counter relies
+// on: several blobs to one namespace inside one block must add up, and fibre
+// traffic must be counted apart from PFB traffic.
+func Test_AddNamespace_Merge(t *testing.T) {
+	nsID := []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 189, 44, 204, 197, 144, 206, 197, 121, 37, 22}
+
+	newNs := func() *storage.Namespace {
+		return &storage.Namespace{Version: 0, NamespaceID: nsID}
+	}
+
+	tests := []struct {
+		name string
+		add  []*storage.Namespace
+		want storage.Namespace
+	}{
+		{
+			name: "two pfb blobs",
+			add: []*storage.Namespace{
+				{Version: 0, NamespaceID: nsID, PfbCount: 1, Size: 10, BlobsCount: 1},
+				{Version: 0, NamespaceID: nsID, PfbCount: 1, Size: 20, BlobsCount: 1},
+			},
+			want: storage.Namespace{Version: 0, NamespaceID: nsID, PfbCount: 2, Size: 30, BlobsCount: 2},
+		}, {
+			name: "two fibre blobs",
+			add: []*storage.Namespace{
+				{Version: 0, NamespaceID: nsID, PffCount: 1, FibreSize: 262144, BlobsCount: 1},
+				{Version: 0, NamespaceID: nsID, PffCount: 1, FibreSize: 262144, BlobsCount: 1},
+			},
+			want: storage.Namespace{Version: 0, NamespaceID: nsID, PffCount: 2, FibreSize: 524288, BlobsCount: 2},
+		}, {
+			// The order matters: a PFB seen first must not swallow the fibre
+			// counters of a PFF that lands later in the same block.
+			name: "pfb then fibre",
+			add: []*storage.Namespace{
+				{Version: 0, NamespaceID: nsID, PfbCount: 1, Size: 10, BlobsCount: 1},
+				{Version: 0, NamespaceID: nsID, PffCount: 1, FibreSize: 262144, BlobsCount: 1},
+			},
+			want: storage.Namespace{
+				Version: 0, NamespaceID: nsID,
+				PfbCount: 1, Size: 10,
+				PffCount: 1, FibreSize: 262144,
+				BlobsCount: 2,
+			},
+		}, {
+			name: "fibre then pfb",
+			add: []*storage.Namespace{
+				{Version: 0, NamespaceID: nsID, PffCount: 1, FibreSize: 262144, BlobsCount: 1},
+				{Version: 0, NamespaceID: nsID, PfbCount: 1, Size: 10, BlobsCount: 1},
+			},
+			want: storage.Namespace{
+				Version: 0, NamespaceID: nsID,
+				PfbCount: 1, Size: 10,
+				PffCount: 1, FibreSize: 262144,
+				BlobsCount: 2,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := NewContext()
+
+			var last *storage.Namespace
+			for _, ns := range tt.add {
+				last = ctx.AddNamespace(ns)
+			}
+
+			require.Len(t, ctx.Namespaces.Values(), 1)
+			// AddNamespace returns the shared instance, so blob logs of both
+			// messages point at the same accumulated row.
+			require.Same(t, ctx.Namespaces.Values()[0], last)
+			require.Equal(t, tt.want, *last)
+		})
+	}
+
+	t.Run("different namespaces stay apart", func(t *testing.T) {
+		ctx := NewContext()
+		other := newNs()
+		other.NamespaceID = append([]byte{1}, nsID[1:]...)
+
+		ctx.AddNamespace(newNs())
+		ctx.AddNamespace(other)
+		require.Len(t, ctx.Namespaces.Values(), 2)
+	})
+}

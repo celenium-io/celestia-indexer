@@ -39,7 +39,7 @@ func (module *Module) rollbackMessages(ctx context.Context, tx storage.Transacti
 		return 0, err
 	}
 
-	if err := module.rollbackNamespaces(ctx, tx, nsMsgs, ns, msgs); err != nil {
+	if err := module.rollbackNamespaces(ctx, tx, nsMsgs, ns); err != nil {
 		return 0, errors.Wrap(err, "namespace rollback")
 	}
 

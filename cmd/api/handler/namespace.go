@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/celestiaorg/celestia-app/v9/pkg/appconsts"
-	"github.com/celestiaorg/celestia-app/v9/pkg/da"
+	"github.com/celestiaorg/celestia-app/v10/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v10/pkg/da"
 	"github.com/celestiaorg/go-square/v4/share"
 
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -21,7 +21,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/node"
-	"github.com/celestiaorg/celestia-app/v9/pkg/proof"
+	"github.com/celestiaorg/celestia-app/v10/pkg/proof"
 	"github.com/labstack/echo/v4"
 )
 
@@ -178,7 +178,7 @@ type namespaceList struct {
 	Limit  int    `query:"limit"   validate:"omitempty,min=1,max=100"`
 	Offset int    `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
-	SortBy string `query:"sort_by" validate:"omitempty,oneof=time pfb_count size"`
+	SortBy string `query:"sort_by" validate:"omitempty,oneof=time pfb_count pff_count size"`
 }
 
 func (p *namespaceList) SetDefault() {
@@ -199,7 +199,7 @@ func (p *namespaceList) SetDefault() {
 //	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
 //	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
-//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, pfb_count, size)	example(time)
+//	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, pfb_count, pff_count, size)	example(time)
 //	@Produce		json
 //	@Success		200	{array}		responses.Namespace
 //	@Failure		400	{object}	Error
@@ -326,6 +326,7 @@ type listBlobsRequest struct {
 	Signers    StringArray `query:"signers"    validate:"omitempty,dive,address"`
 	Namespaces StringArray `query:"namespaces" validate:"omitempty,dive,namespace"`
 	Cursor     uint64      `query:"cursor"     validate:"omitempty,min=0"`
+	Source     string      `query:"source"     validate:"omitempty,blob_source"`
 
 	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
 	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
@@ -349,6 +350,7 @@ func (req listBlobsRequest) toDbRequest(ctx context.Context, ns storage.INamespa
 		Commitment: req.Commitment,
 		Cursor:     req.Cursor,
 		Namespaces: make([]uint64, len(req.Namespaces)),
+		Source:     req.Source,
 	}
 	if req.From > 0 {
 		fltrs.From = time.Unix(req.From, 0).UTC()
@@ -406,6 +408,7 @@ func (req listBlobsRequest) toDbRequest(ctx context.Context, ns storage.INamespa
 //	@Param			signers		query	string	false	"Comma-separated celestia addresses"	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			namespaces	query	string	false	"Comma-separated celestia namespaces"	example(AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0=)
 //	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	minimum(1)	example(100)
+//	@Param			source	query	string	false	"Blob source. If it's empty both sources are returned"	Enums(pfb, fibre)	example(fibre)
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{array}		responses.LightBlobLog
@@ -529,6 +532,7 @@ type getBlobLogsForNamespace struct {
 	Joins      *bool       `query:"joins"      validate:"omitempty"`
 	Signers    StringArray `query:"signers"    validate:"omitempty,dive,address"`
 	Cursor     uint64      `query:"cursor"     validate:"omitempty,min=0"`
+	Source     string      `query:"source"     validate:"omitempty,blob_source"`
 
 	From int64 `example:"1692892095" query:"from" swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
 	To   int64 `example:"1692892095" query:"to"   swaggertype:"integer" validate:"omitempty,min=1,max=16725214800"`
@@ -575,6 +579,7 @@ func (req *getBlobLogsForNamespace) SetDefault() {
 //	@Param			joins		query	boolean	false	"Flag indicating whether entities of rollup, transaction and signer should be attached or not. Default: true"	example(true)
 //	@Param			signers		query	string	false	"Comma-separated celestia addresses"	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	minimum(1)	example(100)
+//	@Param			source	query	string	false	"Blob source. If it's empty both sources are returned"	Enums(pfb, fibre)	example(fibre)
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
@@ -727,8 +732,12 @@ func (handler *NamespaceHandler) BlobProofs(c echo.Context) error {
 		return handleError(c, err, handler.namespace)
 	}
 
+	txs := make([]square.ClassifiedTx, len(block.Block.Txs))
+	for i := range block.Block.Txs {
+		txs[i] = square.NewClassifiedTx(block.Block.Txs[i])
+	}
 	dataSquare, err := square.Construct(
-		block.Block.Txs,
+		txs,
 		appconsts.SquareSizeUpperBound,
 		appconsts.SubtreeRootThreshold,
 	)

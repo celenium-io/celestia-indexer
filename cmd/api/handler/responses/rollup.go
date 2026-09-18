@@ -32,16 +32,17 @@ type RollupWithStats struct {
 	Color          string `example:"#123456"                                   format:"string"  json:"color,omitempty"       swaggertype:"string"`
 	Compression    string `example:"zip"                                       format:"string"  json:"compression,omitempty" swaggertype:"string"`
 
-	BlobsCount    int64     `example:"2"                         format:"integer"   json:"blobs_count"        swaggertype:"integer"`
-	Size          int64     `example:"1000"                      format:"integer"   json:"size"               swaggertype:"integer"`
-	LastAction    time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"last_message_time"  swaggertype:"string"`
-	FirstAction   time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"first_message_time" swaggertype:"string"`
-	Fee           string    `example:"123.456789"                format:"string"    json:"fee"                swaggertype:"string"`
-	SizePct       float64   `example:"0.9876"                    format:"float"     json:"size_pct"           swaggertype:"number"`
-	FeePct        float64   `example:"0.9876"                    format:"float"     json:"fee_pct"            swaggertype:"number"`
-	BlobsCountPct float64   `example:"0.9876"                    format:"float"     json:"blobs_count_pct"    swaggertype:"number"`
-	DAPct         float64   `example:"0.9876"                    format:"float"     json:"da_pct"             swaggertype:"number"`
-	IsActive      bool      `example:"true"                      format:"boolean"   json:"is_active"          swaggertype:"boolean"`
+	BlobsCount      int64     `example:"2"                         format:"integer"   json:"blobs_count"        swaggertype:"integer"`
+	FibreBlobsCount int64     `example:"2"                         format:"integer"   json:"fibre_blobs_count"  swaggertype:"integer"`
+	Size            int64     `example:"1000"                      format:"integer"   json:"size"               swaggertype:"integer"`
+	LastAction      time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"last_message_time"  swaggertype:"string"`
+	FirstAction     time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"first_message_time" swaggertype:"string"`
+	Fee             string    `example:"123.456789"                format:"string"    json:"fee"                swaggertype:"string"`
+	SizePct         float64   `example:"0.9876"                    format:"float"     json:"size_pct"           swaggertype:"number"`
+	FeePct          float64   `example:"0.9876"                    format:"float"     json:"fee_pct"            swaggertype:"number"`
+	BlobsCountPct   float64   `example:"0.9876"                    format:"float"     json:"blobs_count_pct"    swaggertype:"number"`
+	DAPct           float64   `example:"0.9876"                    format:"float"     json:"da_pct"             swaggertype:"number"`
+	IsActive        bool      `example:"true"                      format:"boolean"   json:"is_active"          swaggertype:"boolean"`
 
 	Tags  []string `json:"tags,omitempty"`
 	Links []string `json:"links,omitempty"`
@@ -49,38 +50,39 @@ type RollupWithStats struct {
 
 func NewRollupWithStats(r storage.RollupWithStats) RollupWithStats {
 	return RollupWithStats{
-		Id:             r.Id,
-		Name:           r.Name,
-		Description:    r.Description,
-		Github:         r.GitHub,
-		Twitter:        r.Twitter,
-		Website:        r.Website,
-		Logo:           r.Logo,
-		L2Beat:         r.L2Beat,
-		DeFiLama:       r.DeFiLama,
-		Explorer:       r.Explorer,
-		BridgeContract: r.BridgeContract,
-		Links:          r.Links,
-		Stack:          r.Stack,
-		Slug:           r.Slug,
-		BlobsCount:     r.BlobsCount,
-		Size:           r.Size,
-		SizePct:        r.SizePct,
-		BlobsCountPct:  r.BlobsCountPct,
-		DAPct:          r.DAPct,
-		FeePct:         r.FeePct,
-		LastAction:     r.LastActionTime,
-		FirstAction:    r.FirstActionTime,
-		Compression:    r.Compression,
-		SettledOn:      r.SettledOn,
-		Category:       r.Category.String(),
-		Type:           r.Type.String(),
-		Provider:       r.Provider,
-		VM:             r.VM,
-		Fee:            r.Fee.StringFixed(0),
-		Tags:           r.Tags,
-		Color:          r.Color,
-		IsActive:       r.IsActive,
+		Id:              r.Id,
+		Name:            r.Name,
+		Description:     r.Description,
+		Github:          r.GitHub,
+		Twitter:         r.Twitter,
+		Website:         r.Website,
+		Logo:            r.Logo,
+		L2Beat:          r.L2Beat,
+		DeFiLama:        r.DeFiLama,
+		Explorer:        r.Explorer,
+		BridgeContract:  r.BridgeContract,
+		Links:           r.Links,
+		Stack:           r.Stack,
+		Slug:            r.Slug,
+		BlobsCount:      r.BlobsCount,
+		FibreBlobsCount: r.FibreBlobsCount,
+		Size:            r.Size,
+		SizePct:         r.SizePct,
+		BlobsCountPct:   r.BlobsCountPct,
+		DAPct:           r.DAPct,
+		FeePct:          r.FeePct,
+		LastAction:      r.LastActionTime,
+		FirstAction:     r.FirstActionTime,
+		Compression:     r.Compression,
+		SettledOn:       r.SettledOn,
+		Category:        r.Category.String(),
+		Type:            r.Type.String(),
+		Provider:        r.Provider,
+		VM:              r.VM,
+		Fee:             r.Fee.StringFixed(0),
+		Tags:            r.Tags,
+		Color:           r.Color,
+		IsActive:        r.IsActive,
 	}
 }
 
@@ -178,54 +180,62 @@ type RollupWithDayStats struct {
 	SettledOn      string `example:"Ethereum"                                  format:"string"  json:"settled_on,omitempty"  swaggertype:"string"`
 	Color          string `example:"#123456"                                   format:"string"  json:"color,omitempty"       swaggertype:"string"`
 
-	AvgSize        int64   `example:"100" format:"integer" json:"avg_size"        swaggertype:"integer"`
-	BlobsCount     int64   `example:"100" format:"integer" json:"blobs_count"     swaggertype:"integer"`
-	TotalSize      int64   `example:"100" format:"integer" json:"total_size"      swaggertype:"integer"`
-	Throghput      int64   `example:"100" format:"integer" json:"throughput"      swaggertype:"integer"`
-	NamespaceCount int64   `example:"100" format:"integer" json:"namespace_count" swaggertype:"integer"`
-	PfbCount       int64   `example:"100" format:"integer" json:"pfb_count"       swaggertype:"integer"`
-	TotalFee       string  `example:"100" format:"string"  json:"total_fee"       swaggertype:"string"`
-	MBPrice        string  `example:"100" format:"string"  json:"mb_price"        swaggertype:"string"`
-	FeePerPfb      string  `example:"100" format:"string"  json:"fee_per_pfb"     swaggertype:"string"`
-	BlobsPerPfb    float64 `example:"100" format:"float"   json:"blobs_per_pfb"   swaggertype:"number"`
+	AvgSize         int64   `example:"100" format:"integer" json:"avg_size"        swaggertype:"integer"`
+	BlobsCount      int64   `example:"100" format:"integer" json:"blobs_count"     swaggertype:"integer"`
+	FibreBlobsCount int64   `example:"100" format:"integer" json:"fibre_blobs_count" swaggertype:"integer"`
+	TotalSize       int64   `example:"100" format:"integer" json:"total_size"      swaggertype:"integer"`
+	Throghput       int64   `example:"100" format:"integer" json:"throughput"      swaggertype:"integer"`
+	NamespaceCount  int64   `example:"100" format:"integer" json:"namespace_count" swaggertype:"integer"`
+	PfbCount        int64   `example:"100" format:"integer" json:"pfb_count"       swaggertype:"integer"`
+	PffCount        int64   `example:"100" format:"integer" json:"pff_count"       swaggertype:"integer"`
+	TotalFee        string  `example:"100" format:"string"  json:"total_fee"       swaggertype:"string"`
+	MBPrice         string  `example:"100" format:"string"  json:"mb_price"        swaggertype:"string"`
+	FeePerPfb       string  `example:"100" format:"string"  json:"fee_per_pfb"     swaggertype:"string"`
+	BlobsPerPfb     float64 `example:"100" format:"float"   json:"blobs_per_pfb"   swaggertype:"number"`
 }
 
 func NewRollupWithDayStats(r storage.RollupWithDayStats) RollupWithDayStats {
 	response := RollupWithDayStats{
-		Id:             r.Id,
-		Name:           r.Name,
-		Description:    r.Description,
-		Github:         r.GitHub,
-		Twitter:        r.Twitter,
-		Website:        r.Website,
-		Logo:           r.Logo,
-		L2Beat:         r.L2Beat,
-		DeFiLama:       r.DeFiLama,
-		Explorer:       r.Explorer,
-		BridgeContract: r.BridgeContract,
-		Stack:          r.Stack,
-		Compression:    r.Compression,
-		Category:       r.Category.String(),
-		Type:           r.Type.String(),
-		Provider:       r.Provider,
-		VM:             r.VM,
-		SettledOn:      r.SettledOn,
-		Slug:           r.Slug,
-		BlobsCount:     r.BlobsCount,
-		AvgSize:        int64(r.AvgSize),
-		TotalSize:      r.TotalSize,
-		Throghput:      r.Throghput,
-		NamespaceCount: r.NamespaceCount,
-		PfbCount:       r.PfbCount,
-		TotalFee:       r.TotalFee.String(),
-		MBPrice:        r.MBPrice.String(),
-		FeePerPfb:      "0",
-		Color:          r.Color,
+		Id:              r.Id,
+		Name:            r.Name,
+		Description:     r.Description,
+		Github:          r.GitHub,
+		Twitter:         r.Twitter,
+		Website:         r.Website,
+		Logo:            r.Logo,
+		L2Beat:          r.L2Beat,
+		DeFiLama:        r.DeFiLama,
+		Explorer:        r.Explorer,
+		BridgeContract:  r.BridgeContract,
+		Stack:           r.Stack,
+		Compression:     r.Compression,
+		Category:        r.Category.String(),
+		Type:            r.Type.String(),
+		Provider:        r.Provider,
+		VM:              r.VM,
+		SettledOn:       r.SettledOn,
+		Slug:            r.Slug,
+		BlobsCount:      r.BlobsCount,
+		FibreBlobsCount: r.FibreBlobsCount,
+		AvgSize:         int64(r.AvgSize),
+		TotalSize:       r.TotalSize,
+		Throghput:       r.Throghput,
+		NamespaceCount:  r.NamespaceCount,
+		PfbCount:        r.PfbCount,
+		PffCount:        r.PffCount,
+		TotalFee:        r.TotalFee.String(),
+		MBPrice:         r.MBPrice.String(),
+		FeePerPfb:       "0",
+		Color:           r.Color,
 	}
 
 	if r.PfbCount > 0 {
 		response.BlobsPerPfb = float64(r.BlobsCount / r.PfbCount)
-		response.FeePerPfb = r.TotalFee.Div(types.NumericFromInt64(r.PfbCount)).String()
+	}
+
+	// Fee is accumulated over both sources, so it is divided by the total number of paying messages.
+	if msgCount := r.PfbCount + r.PffCount; msgCount > 0 {
+		response.FeePerPfb = r.TotalFee.Div(types.NumericFromInt64(msgCount)).String()
 	}
 
 	return response

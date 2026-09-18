@@ -155,3 +155,73 @@ func TestUpgrade_NoOpWhenCurrentGTE(t *testing.T) {
 	err = module.upgrade(ctx, dCtx, 9, 8)
 	require.NoError(t, err)
 }
+
+// TestUpgrade_V10SeedsFibreParams covers a v9 -> v10 upgrade: the chain writes
+// nothing on chain for the new module, so the app defaults are seeded.
+func TestUpgrade_V10SeedsFibreParams(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	validators := mock.NewMockIValidator(ctrl)
+	validators.EXPECT().List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+
+	constants := mock.NewMockIConstant(ctrl)
+	constants.EXPECT().
+		ByModule(gomock.Any(), storageTypes.ModuleNameFibre).
+		Return(nil, nil).
+		Times(1)
+
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer ctxCancel()
+
+	module := NewModule(nil, constants, validators, nil, indexerCfg.Indexer{Name: testIndexerName})
+	dCtx := decodeContext.NewContext()
+
+	err := module.upgrade(ctx, dCtx, 9, 10)
+	require.NoError(t, err)
+
+	got := make(map[string]string)
+	for c := range dCtx.Constants.AllValues() {
+		require.Equal(t, storageTypes.ModuleNameFibre, c.Module)
+		got[c.Name] = c.Value
+	}
+
+	// Durations are in nanoseconds: 24h, 1h and 4h from the app defaults.
+	require.Equal(t, map[string]string{
+		"withdrawal_delay":              "86400000000000",
+		"payment_promise_timeout":       "3600000000000",
+		"payment_promise_height_window": "1000",
+		"shard_retention":               "14400000000000",
+		"full_stake_storage_budget":     "2199023255552",
+	}, got)
+}
+
+// TestUpgrade_V10KeepsGenesisFibreParams covers a chain launched at v10: genesis
+// already recorded the real params, so the defaults must not clobber them.
+func TestUpgrade_V10KeepsGenesisFibreParams(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	validators := mock.NewMockIValidator(ctrl)
+	validators.EXPECT().List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+
+	constants := mock.NewMockIConstant(ctrl)
+	constants.EXPECT().
+		ByModule(gomock.Any(), storageTypes.ModuleNameFibre).
+		Return([]storage.Constant{{
+			Module: storageTypes.ModuleNameFibre,
+			Name:   "withdrawal_delay",
+			Value:  "129600000000000",
+		}}, nil).
+		Times(1)
+
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer ctxCancel()
+
+	module := NewModule(nil, constants, validators, nil, indexerCfg.Indexer{Name: testIndexerName})
+	dCtx := decodeContext.NewContext()
+
+	err := module.upgrade(ctx, dCtx, 0, 10)
+	require.NoError(t, err)
+	require.Zero(t, dCtx.Constants.Len(), "genesis params must be left alone")
+}

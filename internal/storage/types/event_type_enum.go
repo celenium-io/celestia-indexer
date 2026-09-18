@@ -199,6 +199,22 @@ const (
 	EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule EventType = "celestia.zkism.v1.EventUpdateInterchainSecurityModule"
 	// EventTypeCelestiazkismv1EventSubmitMessages is a EventType of type celestia.zkism.v1.EventSubmitMessages.
 	EventTypeCelestiazkismv1EventSubmitMessages EventType = "celestia.zkism.v1.EventSubmitMessages"
+	// EventTypeCelestiafibrev1EventDepositToEscrow is a EventType of type celestia.fibre.v1.EventDepositToEscrow.
+	EventTypeCelestiafibrev1EventDepositToEscrow EventType = "celestia.fibre.v1.EventDepositToEscrow"
+	// EventTypeCelestiafibrev1EventWithdrawFromEscrowRequest is a EventType of type celestia.fibre.v1.EventWithdrawFromEscrowRequest.
+	EventTypeCelestiafibrev1EventWithdrawFromEscrowRequest EventType = "celestia.fibre.v1.EventWithdrawFromEscrowRequest"
+	// EventTypeCelestiafibrev1EventWithdrawFromEscrowExecuted is a EventType of type celestia.fibre.v1.EventWithdrawFromEscrowExecuted.
+	EventTypeCelestiafibrev1EventWithdrawFromEscrowExecuted EventType = "celestia.fibre.v1.EventWithdrawFromEscrowExecuted"
+	// EventTypeCelestiafibrev1EventPayForFibre is a EventType of type celestia.fibre.v1.EventPayForFibre.
+	EventTypeCelestiafibrev1EventPayForFibre EventType = "celestia.fibre.v1.EventPayForFibre"
+	// EventTypeCelestiafibrev1EventPaymentPromiseTimeout is a EventType of type celestia.fibre.v1.EventPaymentPromiseTimeout.
+	EventTypeCelestiafibrev1EventPaymentPromiseTimeout EventType = "celestia.fibre.v1.EventPaymentPromiseTimeout"
+	// EventTypeCelestiafibrev1EventUpdateFibreParams is a EventType of type celestia.fibre.v1.EventUpdateFibreParams.
+	EventTypeCelestiafibrev1EventUpdateFibreParams EventType = "celestia.fibre.v1.EventUpdateFibreParams"
+	// EventTypeCelestiafibrev1EventProcessedPaymentPruned is a EventType of type celestia.fibre.v1.EventProcessedPaymentPruned.
+	EventTypeCelestiafibrev1EventProcessedPaymentPruned EventType = "celestia.fibre.v1.EventProcessedPaymentPruned"
+	// EventTypeSetFibreProviderInfo is a EventType of type set_fibre_provider_info.
+	EventTypeSetFibreProviderInfo EventType = "set_fibre_provider_info"
 )
 
 var ErrInvalidEventType = fmt.Errorf("not a valid EventType, try [%s]", strings.Join(_EventTypeNames, ", "))
@@ -295,6 +311,14 @@ var _EventTypeNames = []string{
 	string(EventTypeCelestiazkismv1EventCreateInterchainSecurityModule),
 	string(EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule),
 	string(EventTypeCelestiazkismv1EventSubmitMessages),
+	string(EventTypeCelestiafibrev1EventDepositToEscrow),
+	string(EventTypeCelestiafibrev1EventWithdrawFromEscrowRequest),
+	string(EventTypeCelestiafibrev1EventWithdrawFromEscrowExecuted),
+	string(EventTypeCelestiafibrev1EventPayForFibre),
+	string(EventTypeCelestiafibrev1EventPaymentPromiseTimeout),
+	string(EventTypeCelestiafibrev1EventUpdateFibreParams),
+	string(EventTypeCelestiafibrev1EventProcessedPaymentPruned),
+	string(EventTypeSetFibreProviderInfo),
 }
 
 // EventTypeNames returns a list of possible string values of EventType.
@@ -398,6 +422,14 @@ func EventTypeValues() []EventType {
 		EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,
 		EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
 		EventTypeCelestiazkismv1EventSubmitMessages,
+		EventTypeCelestiafibrev1EventDepositToEscrow,
+		EventTypeCelestiafibrev1EventWithdrawFromEscrowRequest,
+		EventTypeCelestiafibrev1EventWithdrawFromEscrowExecuted,
+		EventTypeCelestiafibrev1EventPayForFibre,
+		EventTypeCelestiafibrev1EventPaymentPromiseTimeout,
+		EventTypeCelestiafibrev1EventUpdateFibreParams,
+		EventTypeCelestiafibrev1EventProcessedPaymentPruned,
+		EventTypeSetFibreProviderInfo,
 	}
 }
 
@@ -505,6 +537,14 @@ var _EventTypeValue = map[string]EventType{
 	"celestia.zkism.v1.EventCreateInterchainSecurityModule": EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,
 	"celestia.zkism.v1.EventUpdateInterchainSecurityModule": EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
 	"celestia.zkism.v1.EventSubmitMessages":                 EventTypeCelestiazkismv1EventSubmitMessages,
+	"celestia.fibre.v1.EventDepositToEscrow":                EventTypeCelestiafibrev1EventDepositToEscrow,
+	"celestia.fibre.v1.EventWithdrawFromEscrowRequest":      EventTypeCelestiafibrev1EventWithdrawFromEscrowRequest,
+	"celestia.fibre.v1.EventWithdrawFromEscrowExecuted":     EventTypeCelestiafibrev1EventWithdrawFromEscrowExecuted,
+	"celestia.fibre.v1.EventPayForFibre":                    EventTypeCelestiafibrev1EventPayForFibre,
+	"celestia.fibre.v1.EventPaymentPromiseTimeout":          EventTypeCelestiafibrev1EventPaymentPromiseTimeout,
+	"celestia.fibre.v1.EventUpdateFibreParams":              EventTypeCelestiafibrev1EventUpdateFibreParams,
+	"celestia.fibre.v1.EventProcessedPaymentPruned":         EventTypeCelestiafibrev1EventProcessedPaymentPruned,
+	"set_fibre_provider_info":                               EventTypeSetFibreProviderInfo,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

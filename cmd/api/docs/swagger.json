@@ -245,7 +245,7 @@
         },
         "/address/{hash}/blobs": {
             "get": {
-                "description": "Returns a paginated list of blobs submitted via PayForBlobs transactions from the given address. Supports sorting by time or size, and optional join of transaction and namespace entities.",
+                "description": "Returns a paginated list of blobs submitted via PayForBlobs or PayForFibre transactions from the given address. Supports sorting by time or size, and optional join of transaction and namespace entities.",
                 "produces": [
                     "application/json"
                 ],
@@ -309,6 +309,17 @@
                         "example": true,
                         "description": "Flag indicating whether entities of transaction and namespace should be attached or not. Default: true",
                         "name": "joins",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "pfb",
+                            "fibre"
+                        ],
+                        "type": "string",
+                        "example": "fibre",
+                        "description": "Blob source. If it's empty both sources are returned",
+                        "name": "source",
                         "in": "query"
                     }
                 ],
@@ -770,7 +781,13 @@
                             "MsgForward",
                             "MsgCreateInterchainSecurityModule",
                             "MsgUpdateInterchainSecurityModule",
-                            "MsgSubmitMessages"
+                            "MsgSubmitMessages",
+                            "MsgDepositToEscrow",
+                            "MsgRequestWithdrawal",
+                            "MsgPayForFibre",
+                            "MsgPaymentPromiseTimeout",
+                            "MsgUpdateFibreParams",
+                            "MsgSetFibreProviderInfo"
                         ],
                         "type": "string",
                         "example": "MsgSend",
@@ -1137,7 +1154,13 @@
                             "MsgForward",
                             "MsgCreateInterchainSecurityModule",
                             "MsgUpdateInterchainSecurityModule",
-                            "MsgSubmitMessages"
+                            "MsgSubmitMessages",
+                            "MsgDepositToEscrow",
+                            "MsgRequestWithdrawal",
+                            "MsgPayForFibre",
+                            "MsgPaymentPromiseTimeout",
+                            "MsgUpdateFibreParams",
+                            "MsgSetFibreProviderInfo"
                         ],
                         "type": "string",
                         "example": "MsgSend",
@@ -1495,6 +1518,17 @@
                         "description": "Last entity id which is used for cursor pagination",
                         "name": "cursor",
                         "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "pfb",
+                            "fibre"
+                        ],
+                        "type": "string",
+                        "example": "fibre",
+                        "description": "Blob source. If it's empty both sources are returned",
+                        "name": "source",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1793,7 +1827,7 @@
         },
         "/block/{height}/blobs": {
             "get": {
-                "description": "Returns a paginated list of blobs submitted via PayForBlobs transactions included in the block at the given height. Supports sorting by time or size.",
+                "description": "Returns a paginated list of blobs submitted via PayForBlobs or PayForFibre transactions included in the block at the given height. Supports sorting by time or size.",
                 "produces": [
                     "application/json"
                 ],
@@ -1849,6 +1883,17 @@
                         "example": "time",
                         "description": "Sort field. If it's empty internal id is used",
                         "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "pfb",
+                            "fibre"
+                        ],
+                        "type": "string",
+                        "example": "fibre",
+                        "description": "Blob source. If it's empty both sources are returned",
+                        "name": "source",
                         "in": "query"
                     }
                 ],
@@ -2139,7 +2184,13 @@
                             "MsgForward",
                             "MsgCreateInterchainSecurityModule",
                             "MsgUpdateInterchainSecurityModule",
-                            "MsgSubmitMessages"
+                            "MsgSubmitMessages",
+                            "MsgDepositToEscrow",
+                            "MsgRequestWithdrawal",
+                            "MsgPayForFibre",
+                            "MsgPaymentPromiseTimeout",
+                            "MsgUpdateFibreParams",
+                            "MsgSetFibreProviderInfo"
                         ],
                         "type": "string",
                         "example": "MsgSend",
@@ -2263,7 +2314,13 @@
                             "MsgForward",
                             "MsgCreateInterchainSecurityModule",
                             "MsgUpdateInterchainSecurityModule",
-                            "MsgSubmitMessages"
+                            "MsgSubmitMessages",
+                            "MsgDepositToEscrow",
+                            "MsgRequestWithdrawal",
+                            "MsgPayForFibre",
+                            "MsgPaymentPromiseTimeout",
+                            "MsgUpdateFibreParams",
+                            "MsgSetFibreProviderInfo"
                         ],
                         "type": "string",
                         "example": "MsgSend",
@@ -4311,6 +4368,7 @@
                         "enum": [
                             "time",
                             "pfb_count",
+                            "pff_count",
                             "size"
                         ],
                         "type": "string",
@@ -4561,6 +4619,17 @@
                         "example": 100,
                         "description": "Last entity id which is used for cursor pagination",
                         "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "pfb",
+                            "fibre"
+                        ],
+                        "type": "string",
+                        "example": "fibre",
+                        "description": "Blob source. If it's empty both sources are returned",
+                        "name": "source",
                         "in": "query"
                     }
                 ],
@@ -5260,11 +5329,13 @@
                         "enum": [
                             "avg_size",
                             "blobs_count",
+                            "fibre_blobs_count",
                             "total_size",
                             "total_fee",
                             "throughput",
                             "namespace_count",
                             "pfb_count",
+                            "pff_count",
                             "mb_price"
                         ],
                         "type": "string",
@@ -6698,7 +6769,7 @@
         },
         "/stats/namespace/series/{id}/{name}/{timeframe}": {
             "get": {
-                "description": "Returns a time-series histogram of precomputed blob statistics (pfb_count or size) for the specified namespace, filtered by timeframe and optional time range.",
+                "description": "Returns a time-series histogram of precomputed blob statistics (pfb_count, pff_count or size) for the specified namespace, filtered by timeframe and optional time range.",
                 "produces": [
                     "application/json"
                 ],
@@ -6736,6 +6807,7 @@
                     {
                         "enum": [
                             "pfb_count",
+                            "pff_count",
                             "size"
                         ],
                         "type": "string",
@@ -7559,7 +7631,13 @@
                             "MsgForward",
                             "MsgCreateInterchainSecurityModule",
                             "MsgUpdateInterchainSecurityModule",
-                            "MsgSubmitMessages"
+                            "MsgSubmitMessages",
+                            "MsgDepositToEscrow",
+                            "MsgRequestWithdrawal",
+                            "MsgPayForFibre",
+                            "MsgPaymentPromiseTimeout",
+                            "MsgUpdateFibreParams",
+                            "MsgSetFibreProviderInfo"
                         ],
                         "type": "string",
                         "example": "MsgSend",
@@ -7683,7 +7761,13 @@
                             "MsgForward",
                             "MsgCreateInterchainSecurityModule",
                             "MsgUpdateInterchainSecurityModule",
-                            "MsgSubmitMessages"
+                            "MsgSubmitMessages",
+                            "MsgDepositToEscrow",
+                            "MsgRequestWithdrawal",
+                            "MsgPayForFibre",
+                            "MsgPaymentPromiseTimeout",
+                            "MsgUpdateFibreParams",
+                            "MsgSetFibreProviderInfo"
                         ],
                         "type": "string",
                         "example": "MsgSend",
@@ -7891,7 +7975,7 @@
         },
         "/tx/{hash}/blobs": {
             "get": {
-                "description": "Returns a paginated list of blobs submitted via the PayForBlobs message in the given transaction. Supports sorting by time or blob size.",
+                "description": "Returns a paginated list of blobs submitted via the PayForBlobs or PayForFibre message in the given transaction. Supports sorting by time or blob size.",
                 "produces": [
                     "application/json"
                 ],
@@ -7948,6 +8032,17 @@
                         "example": "time",
                         "description": "Sort field. If it's empty internal id is used",
                         "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "pfb",
+                            "fibre"
+                        ],
+                        "type": "string",
+                        "example": "fibre",
+                        "description": "Blob source. If it's empty both sources are returned",
+                        "name": "source",
                         "in": "query"
                     }
                 ],
@@ -9027,6 +9122,11 @@
                     "format": "integer",
                     "example": 10
                 },
+                "source": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "fibre"
+                },
                 "time": {
                     "type": "string",
                     "format": "date-time",
@@ -9444,6 +9544,12 @@
         "responses.Enums": {
             "type": "object",
             "properties": {
+                "blob_source": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "categories": {
                     "type": "array",
                     "items": {
@@ -9577,6 +9683,19 @@
                         }
                     ],
                     "example": "commission"
+                }
+            }
+        },
+        "responses.Fibre": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "host": {
+                    "type": "string",
+                    "example": "100.100.100.100:12345"
                 }
             }
         },
@@ -10529,6 +10648,11 @@
                     "format": "integer",
                     "example": 10
                 },
+                "source": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "fibre"
+                },
                 "time": {
                     "type": "string",
                     "format": "date-time",
@@ -10723,6 +10847,11 @@
                     "format": "integer",
                     "example": 10000
                 },
+                "fibre_size": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 12345
+                },
                 "hash": {
                     "type": "string",
                     "format": "base64",
@@ -10757,6 +10886,11 @@
                     "type": "integer",
                     "format": "integer",
                     "example": 12
+                },
+                "pff_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 10000
                 },
                 "reserved": {
                     "type": "boolean",
@@ -10816,6 +10950,11 @@
                     "type": "integer",
                     "format": "int64",
                     "example": 2
+                },
+                "source": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "fibre"
                 },
                 "time": {
                     "type": "string",
@@ -11463,6 +11602,11 @@
                     "format": "string",
                     "example": "100"
                 },
+                "fibre_blobs_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
                 "github": {
                     "type": "string",
                     "format": "string",
@@ -11499,6 +11643,11 @@
                     "example": 100
                 },
                 "pfb_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 100
+                },
+                "pff_count": {
                     "type": "integer",
                     "format": "integer",
                     "example": 100
@@ -11622,6 +11771,11 @@
                     "type": "number",
                     "format": "float",
                     "example": 0.9876
+                },
+                "fibre_blobs_count": {
+                    "type": "integer",
+                    "format": "integer",
+                    "example": 2
                 },
                 "first_message_time": {
                     "type": "string",
@@ -12411,6 +12565,9 @@
                     "type": "string",
                     "example": "Some long text about validator"
                 },
+                "fibre": {
+                    "$ref": "#/definitions/responses.Fibre"
+                },
                 "id": {
                     "type": "integer",
                     "example": 321
@@ -12836,7 +12993,15 @@
                 "celestia.forwarding.v1.EventForwardingComplete",
                 "celestia.zkism.v1.EventCreateInterchainSecurityModule",
                 "celestia.zkism.v1.EventUpdateInterchainSecurityModule",
-                "celestia.zkism.v1.EventSubmitMessages"
+                "celestia.zkism.v1.EventSubmitMessages",
+                "celestia.fibre.v1.EventDepositToEscrow",
+                "celestia.fibre.v1.EventWithdrawFromEscrowRequest",
+                "celestia.fibre.v1.EventWithdrawFromEscrowExecuted",
+                "celestia.fibre.v1.EventPayForFibre",
+                "celestia.fibre.v1.EventPaymentPromiseTimeout",
+                "celestia.fibre.v1.EventUpdateFibreParams",
+                "celestia.fibre.v1.EventProcessedPaymentPruned",
+                "set_fibre_provider_info"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -12929,7 +13094,15 @@
                 "EventTypeCelestiaforwardingv1EventForwardingComplete",
                 "EventTypeCelestiazkismv1EventCreateInterchainSecurityModule",
                 "EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule",
-                "EventTypeCelestiazkismv1EventSubmitMessages"
+                "EventTypeCelestiazkismv1EventSubmitMessages",
+                "EventTypeCelestiafibrev1EventDepositToEscrow",
+                "EventTypeCelestiafibrev1EventWithdrawFromEscrowRequest",
+                "EventTypeCelestiafibrev1EventWithdrawFromEscrowExecuted",
+                "EventTypeCelestiafibrev1EventPayForFibre",
+                "EventTypeCelestiafibrev1EventPaymentPromiseTimeout",
+                "EventTypeCelestiafibrev1EventUpdateFibreParams",
+                "EventTypeCelestiafibrev1EventProcessedPaymentPruned",
+                "EventTypeSetFibreProviderInfo"
             ]
         },
         "types.MsgAddressType": {
@@ -13110,7 +13283,13 @@
                 "MsgForward",
                 "MsgCreateInterchainSecurityModule",
                 "MsgUpdateInterchainSecurityModule",
-                "MsgSubmitMessages"
+                "MsgSubmitMessages",
+                "MsgDepositToEscrow",
+                "MsgRequestWithdrawal",
+                "MsgPayForFibre",
+                "MsgPaymentPromiseTimeout",
+                "MsgUpdateFibreParams",
+                "MsgSetFibreProviderInfo"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -13227,7 +13406,13 @@
                 "MsgForward",
                 "MsgCreateInterchainSecurityModule",
                 "MsgUpdateInterchainSecurityModule",
-                "MsgSubmitMessages"
+                "MsgSubmitMessages",
+                "MsgDepositToEscrow",
+                "MsgRequestWithdrawal",
+                "MsgPayForFibre",
+                "MsgPaymentPromiseTimeout",
+                "MsgUpdateFibreParams",
+                "MsgSetFibreProviderInfo"
             ]
         },
         "types.Status": {

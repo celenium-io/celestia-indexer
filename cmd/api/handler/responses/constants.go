@@ -83,6 +83,7 @@ type Enums struct {
 	HLTokenType        []string `json:"hyperlane_token_type"`
 	HLTransferType     []string `json:"hyperlane_transfer_type"`
 	UpgradeStatus      []string `json:"upgrade_status"`
+	BlobSource         []string `json:"blob_source"`
 }
 
 func NewEnums(tags []string) Enums {
@@ -102,5 +103,6 @@ func NewEnums(tags []string) Enums {
 		HLTokenType:        types.HLTokenTypeNames(),
 		HLTransferType:     types.HLTransferTypeNames(),
 		UpgradeStatus:      types.UpgradeStatusNames(),
+		BlobSource:         types.BlobSourceNames(),
 	}
 }

@@ -5,7 +5,8 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
         logs.namespace_id, 
         logs.signer_id, 
         sum(logs.size) as size, 
-        count(*) as blobs_count, 
+        count(*) filter (where source = 'pfb') as blobs_count, 
+        count(*) filter (where source = 'fibre') as fibre_blobs_count, 
         max(logs.time) as last_time,
         min(logs.time) as first_time,
         sum(logs.fee) as fee

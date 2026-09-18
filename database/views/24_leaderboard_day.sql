@@ -17,12 +17,14 @@ rollup_data AS (
 )
 SELECT
     avg(size)                    AS avg_size,
-    count(*)                     AS blobs_count,
+    count(*) filter (where source = 'pfb')   AS blobs_count,
+    count(*) filter (where source = 'fibre') AS fibre_blobs_count,
     sum(size)                    AS total_size,
     sum(rollup_data.fee)         AS total_fee,
     ceil(sum(size) / 86400)      AS throughput,
     count(DISTINCT rollup_data.namespace_id) AS namespace_count,
-    count(DISTINCT rollup_data.msg_id)       AS pfb_count,
+    count(DISTINCT rollup_data.msg_id) filter (where source = 'pfb')  AS pfb_count,
+    count(DISTINCT rollup_data.msg_id) filter (where source = 'fibre')  AS pff_count,
     (CASE WHEN sum(size) > 0
         THEN ceil(sum(rollup_data.fee) * 1024 * 1024 / sum(size))
         ELSE 0 END)              AS mb_price,

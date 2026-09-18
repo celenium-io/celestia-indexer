@@ -81,10 +81,12 @@ func (tx Transaction) SaveNamespaces(ctx context.Context, namespaces ...*models.
 	}
 
 	_, err := tx.Tx().NewInsert().Model(&addedNamespaces).
-		Column("version", "namespace_id", "pfb_count", "size", "first_height", "last_height", "last_message_time", "blobs_count").
+		Column("version", "namespace_id", "pfb_count", "pff_count", "size", "fibre_size", "first_height", "last_height", "last_message_time", "blobs_count").
 		On("CONFLICT ON CONSTRAINT namespace_id_version_idx DO UPDATE").
 		Set("size = EXCLUDED.size + added_namespace.size").
+		Set("fibre_size = EXCLUDED.fibre_size + added_namespace.fibre_size").
 		Set("pfb_count = EXCLUDED.pfb_count + added_namespace.pfb_count").
+		Set("pff_count = EXCLUDED.pff_count + added_namespace.pff_count").
 		Set("last_height = EXCLUDED.last_height").
 		Set("last_message_time = EXCLUDED.last_message_time").
 		Set("blobs_count = EXCLUDED.blobs_count + added_namespace.blobs_count").
@@ -373,7 +375,9 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 	}
 
 	query := tx.Tx().NewInsert().Model(&arr).
-		Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate", "max_change_rate", "min_self_delegation", "stake", "jailed", "commissions", "rewards", "height", "version", "messages_count", "creation_time").
+		Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate",
+			"max_change_rate", "min_self_delegation", "stake", "jailed", "commissions", "rewards", "height", "version",
+			"messages_count", "creation_time", "fibre_host", "fibre_host_height").
 		On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
 		Set("rate = CASE WHEN EXCLUDED.rate > 0 THEN EXCLUDED.rate ELSE added_validator.rate END").
 		Set("min_self_delegation = CASE WHEN EXCLUDED.min_self_delegation > 0 THEN EXCLUDED.min_self_delegation ELSE added_validator.min_self_delegation END").
@@ -388,6 +392,8 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 		Set("details = CASE WHEN EXCLUDED.details != '[do-not-modify]' THEN EXCLUDED.details ELSE added_validator.details END").
 		Set("jailed = CASE WHEN EXCLUDED.jailed IS NOT NULL THEN EXCLUDED.jailed ELSE added_validator.jailed END").
 		Set("version = CASE WHEN EXCLUDED.version > 0 THEN EXCLUDED.version ELSE added_validator.version END").
+		Set("fibre_host = COALESCE(EXCLUDED.fibre_host, added_validator.fibre_host)").
+		Set("fibre_host_height = COALESCE(EXCLUDED.fibre_host_height, added_validator.fibre_host_height)").
 		Returning("xmax, id")
 
 	if _, err := query.Exec(ctx); err != nil {

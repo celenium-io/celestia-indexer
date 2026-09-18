@@ -32,11 +32,13 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
-	appBlobTypes "github.com/celestiaorg/celestia-app/v9/x/blob/types"
-	fwdTypes "github.com/celestiaorg/celestia-app/v9/x/forwarding/types"
-	minfeeTypes "github.com/celestiaorg/celestia-app/v9/x/minfee/types"
-	appSignalTypes "github.com/celestiaorg/celestia-app/v9/x/signal/types"
-	zkismTypes "github.com/celestiaorg/celestia-app/v9/x/zkism/types"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v10/x/blob/types"
+	fibreTypes "github.com/celestiaorg/celestia-app/v10/x/fibre/types"
+	fwdTypes "github.com/celestiaorg/celestia-app/v10/x/forwarding/types"
+	minfeeTypes "github.com/celestiaorg/celestia-app/v10/x/minfee/types"
+	appSignalTypes "github.com/celestiaorg/celestia-app/v10/x/signal/types"
+	valaddrTypes "github.com/celestiaorg/celestia-app/v10/x/valaddr/types"
+	zkismTypes "github.com/celestiaorg/celestia-app/v10/x/zkism/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	cosmosVestingTypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	cosmosBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -422,6 +424,22 @@ func Message(
 		d.Msg.Type, err = handle.MsgUpdateInterchainSecurityModule(ctx, d.Msg.Id, typedMsg)
 	case *zkismTypes.MsgSubmitMessages:
 		d.Msg.Type, err = handle.MsgSubmitMessages(ctx, d.Msg.Id, typedMsg)
+
+	// fibre
+	case *fibreTypes.MsgDepositToEscrow:
+		d.Msg.Type, err = handle.MsgDepositToEscrow(ctx, d.Msg.Id, typedMsg)
+	case *fibreTypes.MsgRequestWithdrawal:
+		d.Msg.Type, err = handle.MsgRequestWithdrawal(ctx, d.Msg.Id, typedMsg)
+	case *fibreTypes.MsgPayForFibre:
+		d.Msg.Type, d.BlobLogs, err = handle.MsgPayForFibre(ctx, status, txId, d.Msg.Id, typedMsg)
+	case *fibreTypes.MsgPaymentPromiseTimeout:
+		d.Msg.Type, err = handle.MsgPaymentPromiseTimeout(ctx, d.Msg.Id, typedMsg)
+	case *fibreTypes.MsgUpdateFibreParams:
+		d.Msg.Type, err = handle.MsgUpdateFibreParams(ctx, d.Msg.Id, typedMsg)
+
+	// valaddr
+	case *valaddrTypes.MsgSetFibreProviderInfo:
+		d.Msg.Type, d.Msg.Validators, err = handle.MsgSetFibreProviderInfo(ctx, status, d.Msg.Id, typedMsg)
 
 	default:
 		log.Err(errors.New("unknown message type")).Msgf("got type %T", msg)

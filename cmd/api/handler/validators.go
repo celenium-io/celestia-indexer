@@ -59,6 +59,9 @@ func NewCelestiaApiValidator() *CelestiaApiValidator {
 	if err := v.RegisterValidation("hl_transfer_type", hyperlaneTransferTypeValidator()); err != nil {
 		panic(err)
 	}
+	if err := v.RegisterValidation("blob_source", blobSourceTypeValidator()); err != nil {
+		panic(err)
+	}
 	return &CelestiaApiValidator{validator: v}
 }
 
@@ -197,6 +200,13 @@ func hyperlaneTokenTypeValidator() validator.Func {
 func hyperlaneTransferTypeValidator() validator.Func {
 	return func(fl validator.FieldLevel) bool {
 		_, err := types.ParseHLTransferType(fl.Field().String())
+		return err == nil
+	}
+}
+
+func blobSourceTypeValidator() validator.Func {
+	return func(fl validator.FieldLevel) bool {
+		_, err := types.ParseBlobSource(fl.Field().String())
 		return err == nil
 	}
 }

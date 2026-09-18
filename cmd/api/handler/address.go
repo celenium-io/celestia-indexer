@@ -325,6 +325,7 @@ type getBlobLogsForAddress struct {
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string `query:"sort_by" validate:"omitempty,oneof=time size"`
 	Joins  *bool  `query:"joins"   validate:"omitempty"`
+	Source string `query:"source"  validate:"omitempty,blob_source"`
 }
 
 func (req *getBlobLogsForAddress) SetDefault() {
@@ -342,7 +343,7 @@ func (req *getBlobLogsForAddress) SetDefault() {
 // Blobs godoc
 //
 //	@Summary		Get blobs pushed by address
-//	@Description	Returns a paginated list of blobs submitted via PayForBlobs transactions from the given address. Supports sorting by time or size, and optional join of transaction and namespace entities.
+//	@Description	Returns a paginated list of blobs submitted via PayForBlobs or PayForFibre transactions from the given address. Supports sorting by time or size, and optional join of transaction and namespace entities.
 //	@Tags			address
 //	@ID				address-blobs
 //	@Param			hash	path	string	true	"Hash"											minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
@@ -351,6 +352,7 @@ func (req *getBlobLogsForAddress) SetDefault() {
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
 //	@Param			joins	query	boolean	false	"Flag indicating whether entities of transaction and namespace should be attached or not. Default: true"	example(true)
+//	@Param			source	query	string	false	"Blob source. If it's empty both sources are returned"	Enums(pfb, fibre)	example(fibre)
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
 //	@Failure		400	{object}	Error
@@ -382,6 +384,7 @@ func (handler *AddressHandler) Blobs(c echo.Context) error {
 			Sort:   pgSort(req.Sort),
 			SortBy: req.SortBy,
 			Joins:  *req.Joins,
+			Source: req.Source,
 		},
 	)
 	if err != nil {

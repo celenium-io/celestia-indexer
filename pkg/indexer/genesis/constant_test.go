@@ -305,3 +305,106 @@ func TestParseConstants_MissingGovParams(t *testing.T) {
 	err := module.parseConstants(ctx, appState, testConsensusParams())
 	require.Error(t, err)
 }
+
+// TestParseConstants_FibreAbsent covers a chain that upgraded into v10: its
+// genesis predates the module, so nothing is recorded at height 0.
+func TestParseConstants_FibreAbsent(t *testing.T) {
+	module := NewModule(postgres.Storage{}, config.Indexer{})
+	ctx := decodeContext.NewContext()
+	appState := testAppState()
+	require.Nil(t, appState.Fibre)
+
+	err := module.parseConstants(ctx, appState, testConsensusParams())
+	require.NoError(t, err)
+
+	for name := range constantsMap(ctx) {
+		require.NotContains(t, name, "fibre.")
+	}
+}
+
+// TestParseConstants_Fibre uses the app_state the SDK codec produces: durations
+// as protobuf duration strings, uint64 as decimal strings.
+func TestParseConstants_Fibre(t *testing.T) {
+	module := NewModule(postgres.Storage{}, config.Indexer{})
+	ctx := decodeContext.NewContext()
+	appState := testAppState()
+	appState.Fibre = &types.Fibre{
+		Params: types.FibreParams{
+			WithdrawalDelay:            "86400s",
+			PaymentPromiseTimeout:      "3600s",
+			PaymentPromiseHeightWindow: "1000",
+			ShardRetention:             "14400s",
+			FullStakeStorageBudget:     "2199023255552",
+		},
+	}
+
+	err := module.parseConstants(ctx, appState, testConsensusParams())
+	require.NoError(t, err)
+
+	constants := constantsMap(ctx)
+	require.Equal(t, mustNanos(t, "86400s"), constants["fibre.withdrawal_delay"])
+	require.Equal(t, mustNanos(t, "3600s"), constants["fibre.payment_promise_timeout"])
+	require.Equal(t, "1000", constants["fibre.payment_promise_height_window"])
+	require.Equal(t, mustNanos(t, "14400s"), constants["fibre.shard_retention"])
+	require.Equal(t, "2199023255552", constants["fibre.full_stake_storage_budget"])
+}
+
+// TestParseConstants_FibreNonDefaultParams checks a chain launching at v10 with
+// params of its own: genesis, not the app defaults, is what gets stored.
+func TestParseConstants_FibreNonDefaultParams(t *testing.T) {
+	module := NewModule(postgres.Storage{}, config.Indexer{})
+	ctx := decodeContext.NewContext()
+	appState := testAppState()
+	appState.Fibre = &types.Fibre{
+		Params: types.FibreParams{
+			WithdrawalDelay:            "129600s",
+			PaymentPromiseTimeout:      "7200s",
+			PaymentPromiseHeightWindow: "2500",
+			ShardRetention:             "21600s",
+			FullStakeStorageBudget:     "1099511627776",
+		},
+	}
+
+	err := module.parseConstants(ctx, appState, testConsensusParams())
+	require.NoError(t, err)
+
+	constants := constantsMap(ctx)
+	require.Equal(t, mustNanos(t, "129600s"), constants["fibre.withdrawal_delay"])
+	require.Equal(t, "2500", constants["fibre.payment_promise_height_window"])
+	require.Equal(t, "1099511627776", constants["fibre.full_stake_storage_budget"])
+}
+
+func TestParseConstants_FibreInvalidParams(t *testing.T) {
+	valid := types.FibreParams{
+		WithdrawalDelay:            "86400s",
+		PaymentPromiseTimeout:      "3600s",
+		PaymentPromiseHeightWindow: "1000",
+		ShardRetention:             "14400s",
+		FullStakeStorageBudget:     "2199023255552",
+	}
+
+	cases := []struct {
+		name   string
+		mutate func(*types.FibreParams)
+	}{
+		{"withdrawal delay", func(p *types.FibreParams) { p.WithdrawalDelay = notADuration }},
+		{"payment promise timeout", func(p *types.FibreParams) { p.PaymentPromiseTimeout = notADuration }},
+		{"shard retention", func(p *types.FibreParams) { p.ShardRetention = notADuration }},
+		{"height window", func(p *types.FibreParams) { p.PaymentPromiseHeightWindow = "many" }},
+		{"storage budget", func(p *types.FibreParams) { p.FullStakeStorageBudget = "-1" }},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			params := valid
+			tc.mutate(&params)
+
+			module := NewModule(postgres.Storage{}, config.Indexer{})
+			appState := testAppState()
+			appState.Fibre = &types.Fibre{Params: params}
+
+			err := module.parseConstants(decodeContext.NewContext(), appState, testConsensusParams())
+			require.Error(t, err)
+		})
+	}
+}

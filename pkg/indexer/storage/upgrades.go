@@ -9,6 +9,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	fibreTypes "github.com/celestiaorg/celestia-app/v10/x/fibre/types"
 	sdkStorage "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
@@ -39,10 +40,31 @@ func (module *Module) upgrade(ctx context.Context, decodeContext *decodeContext.
 				return errors.Wrap(err, "failed to upgrade to version 7")
 			}
 		}
+	case 10:
+		if err := module.seedFibreParams(ctx, decodeContext); err != nil {
+			return errors.Wrap(err, "failed to seed fibre params")
+		}
 	default:
 		return errors.Errorf("unsupported upgrade version: %d", targetVersion)
 	}
 
+	return nil
+}
+
+// seedFibreParams records the fibre params activated by v10. The upgrade writes
+// nothing on chain and emits no event -- the keeper just starts answering with
+// DefaultParams -- so the app defaults are the only source. A chain launched at
+// v10 already got them from genesis, so existing values are never overwritten.
+func (module *Module) seedFibreParams(ctx context.Context, decodeContext *decodeContext.Context) error {
+	existing, err := module.constants.ByModule(ctx, types.ModuleNameFibre)
+	if err != nil {
+		return errors.Wrap(err, "get fibre constants")
+	}
+	if len(existing) > 0 {
+		return nil
+	}
+
+	decodeContext.AddFibreParams(fibreTypes.DefaultParams())
 	return nil
 }
 

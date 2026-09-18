@@ -24,8 +24,8 @@ package decode
 import (
 	"bytes"
 
-	"github.com/celestiaorg/go-square/v3/share"
-	squareTx "github.com/celestiaorg/go-square/v3/tx"
+	"github.com/celestiaorg/go-square/v4/share"
+	squareTx "github.com/celestiaorg/go-square/v4/tx"
 	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmTypes "github.com/cometbft/cometbft/types"
 	"google.golang.org/protobuf/encoding/protowire"
