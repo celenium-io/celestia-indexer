@@ -20,32 +20,28 @@ func (module *Module) upgrade(ctx context.Context, decodeContext *decodeContext.
 		return nil
 	}
 
-	switch targetVersion {
-	case 1, 2, 3, 4, 5, 9:
-		// No upgrade logic needed for these versions
-	case 6:
-		// CIP-037 Reduce the validator unbonding period from 21 days to 14 days and 1 hour to improve capital efficiency while maintaining network security (https://cips.celestia.org/cip-037.html)
-		decodeContext.AddConstant(types.ModuleNameStaking, "unbonding_time", "1213200000000000")
+	for version := currentVersion + 1; version <= targetVersion; version++ {
+		switch version {
+		case 1, 2, 3, 4, 5, 8, 9:
+			// No upgrade logic needed for these versions
+		case 6:
+			// CIP-037 Reduce the validator unbonding period from 21 days to 14 days and 1 hour to improve capital efficiency while maintaining network security (https://cips.celestia.org/cip-037.html)
+			decodeContext.AddConstant(types.ModuleNameStaking, "unbonding_time", "1213200000000000")
 
-		// CIP-041:Reduce inflation to 2.5% and increase minimum validator commission to 10% to improve TIA’s suitability for financial applications (https://cips.celestia.org/cip-041.html)
-		decodeContext.AddConstant(types.ModuleNameStaking, "min_commission_rate", "0.100000000000000000")
+			// CIP-041:Reduce inflation to 2.5% and increase minimum validator commission to 10% to improve TIA’s suitability for financial applications (https://cips.celestia.org/cip-041.html)
+			decodeContext.AddConstant(types.ModuleNameStaking, "min_commission_rate", "0.100000000000000000")
 
-	case 7:
-		if err := module.upgradeV7(ctx, decodeContext, targetVersion); err != nil {
-			return errors.Wrap(err, "failed to upgrade to version 7")
-		}
-	case 8:
-		if currentVersion < 7 {
-			if err := module.upgradeV7(ctx, decodeContext, 7); err != nil {
+		case 7:
+			if err := module.upgradeV7(ctx, decodeContext, version); err != nil {
 				return errors.Wrap(err, "failed to upgrade to version 7")
 			}
+		case 10:
+			if err := module.seedFibreParams(ctx, decodeContext); err != nil {
+				return errors.Wrap(err, "failed to seed fibre params")
+			}
+		default:
+			return errors.Errorf("unsupported upgrade version: %d", version)
 		}
-	case 10:
-		if err := module.seedFibreParams(ctx, decodeContext); err != nil {
-			return errors.Wrap(err, "failed to seed fibre params")
-		}
-	default:
-		return errors.Errorf("unsupported upgrade version: %d", targetVersion)
 	}
 
 	return nil

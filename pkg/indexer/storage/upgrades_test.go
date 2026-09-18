@@ -198,6 +198,12 @@ func TestUpgrade_V10SeedsFibreParams(t *testing.T) {
 
 // TestUpgrade_V10KeepsGenesisFibreParams covers a chain launched at v10: genesis
 // already recorded the real params, so the defaults must not clobber them.
+//
+// currentVersion is 9 here, not 0: since the upgrade() fix (case 10 must chain
+// through every earlier version), starting from 0 would also cascade through
+// v6/v7 and add their staking constants + touch validators, which would
+// muddy this test's one job of checking the fibre-params genesis guard. That
+// cascading behavior is covered on its own by TestUpgrade_V8WithoutPriorV7.
 func TestUpgrade_V10KeepsGenesisFibreParams(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -221,7 +227,56 @@ func TestUpgrade_V10KeepsGenesisFibreParams(t *testing.T) {
 	module := NewModule(nil, constants, validators, nil, indexerCfg.Indexer{Name: testIndexerName})
 	dCtx := decodeContext.NewContext()
 
-	err := module.upgrade(ctx, dCtx, 0, 10)
+	err := module.upgrade(ctx, dCtx, 9, 10)
 	require.NoError(t, err)
 	require.Zero(t, dCtx.Constants.Len(), "genesis params must be left alone")
+}
+
+// TestUpgrade_V10ChainsThroughEarlierVersions covers a devnet/private-network
+// jump straight from below v7 to v10 (e.g. an indexer started fresh after the
+// chain already upgraded past v10): every intermediate upgrade must still run,
+// not just the v10 one, matching the per-version loop in upgrade().
+func TestUpgrade_V10ChainsThroughEarlierVersions(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	validators := mock.NewMockIValidator(ctrl)
+	validators.EXPECT().
+		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Return(testValidators, nil).
+		Times(1)
+
+	constants := mock.NewMockIConstant(ctrl)
+	constants.EXPECT().
+		ByModule(gomock.Any(), storageTypes.ModuleNameFibre).
+		Return(nil, nil).
+		Times(1)
+
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer ctxCancel()
+
+	module := NewModule(nil, constants, validators, nil, indexerCfg.Indexer{Name: testIndexerName})
+	dCtx := decodeContext.NewContext()
+
+	err := module.upgrade(ctx, dCtx, 6, 10)
+	require.NoError(t, err)
+
+	// v7's validator commission adjustment ran. testValidators share the
+	// same (empty) Address, so AddValidator folds them into one entry.
+	minCommissionRate := storageTypes.MustNumericFromString("0.200000000000000000")
+	maxCommissionRate := storageTypes.MustNumericFromString("0.600000000000000000")
+	require.NotZero(t, dCtx.Validators.Len())
+	for v := range dCtx.Validators.AllValues() {
+		require.True(t, v.Rate.GreaterThanOrEqual(minCommissionRate))
+		require.True(t, v.MaxRate.LessThanOrEqual(maxCommissionRate))
+	}
+
+	// v7's staking constants and v10's fibre params both landed.
+	got := make(map[string]string)
+	for c := range dCtx.Constants.AllValues() {
+		got[c.Name] = c.Value
+	}
+	require.Equal(t, "0.200000000000000000", got["min_commission_rate"])
+	require.Equal(t, "0.600000000000000000", got["max_commission_rate"])
+	require.Contains(t, got, "withdrawal_delay")
 }

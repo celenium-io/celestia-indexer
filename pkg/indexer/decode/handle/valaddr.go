@@ -28,12 +28,12 @@ func MsgSetFibreProviderInfo(
 	}
 
 	validatorAddress := m.GetSigner()
-	validator := storage.Validator{
-		Address:         validatorAddress,
-		MessagesCount:   1,
-		FibreHost:       &m.Host,
-		FibreHostHeight: &ctx.Block.Height,
-	}
+	validator := storage.EmptyValidator()
+	validator.Address = validatorAddress
+	validator.MessagesCount = 1
+	validator.FibreHost = &m.Host
+	validator.FibreHostHeight = &ctx.Block.Height
+
 	ctx.AddValidator(validator)
 
 	return msgType, []string{validatorAddress}, nil

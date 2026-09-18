@@ -38,6 +38,12 @@ func (module *Module) rollbackNamespaces(
 			if err != nil {
 				return err
 			}
+			// SaveNamespaces upserts by adding onto the stored row
+			// (size = EXCLUDED.size + added_namespace.size), so diff must carry
+			// only the negative delta this rollback removes, not the namespace's
+			// post-rollback absolute totals. Keep everything but the counters,
+			// which are needed only for the ON CONFLICT match (namespace_id, version).
+			ns.PfbCount, ns.Size, ns.PffCount, ns.FibreSize, ns.BlobsCount = 0, 0, 0, 0, 0
 			diff = &ns
 			diffs[nsId] = diff
 		}
@@ -45,11 +51,11 @@ func (module *Module) rollbackNamespaces(
 		// The deleted namespace_message row carries both the size it added and
 		// the source it came from, so the message payload is never parsed here.
 		size := int64(nsMsgs[i].Size) //nolint:gosec // sizes are bounded by the max blob size
+		diff.BlobsCount -= 1
 		switch nsMsgs[i].Source {
 		case storageTypes.BlobSourceFibre:
 			diff.PffCount -= 1
 			diff.FibreSize -= size
-			diff.BlobsCount -= 1
 		default:
 			diff.PfbCount -= 1
 			diff.Size -= size

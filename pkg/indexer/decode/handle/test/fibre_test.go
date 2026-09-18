@@ -340,6 +340,26 @@ func TestValaddr_MsgSetFibreProviderInfo(t *testing.T) {
 	require.Equal(t, "fibre.example.com:443", *validators[0].FibreHost)
 	require.NotNil(t, validators[0].FibreHostHeight)
 	require.Equal(t, block.Height, *validators[0].FibreHostHeight)
+	require.EqualValues(t, 1, validators[0].MessagesCount)
+
+	// The handler builds on storage.EmptyValidator(), so an upsert of this
+	// row never blanks out a validator's existing profile fields: they carry
+	// the "do not modify" sentinel rather than an empty string.
+	require.Equal(t, storage.DoNotModify, validators[0].Moniker)
+	require.Equal(t, storage.DoNotModify, validators[0].Website)
+	require.Equal(t, storage.DoNotModify, validators[0].Identity)
+	require.Equal(t, storage.DoNotModify, validators[0].Contacts)
+	require.Equal(t, storage.DoNotModify, validators[0].Details)
+
+	// Numeric fields must be a real zero decimal, not a nil-backed zero
+	// value, since they get summed on later messages for this validator.
+	require.True(t, validators[0].Rate.IsZero())
+	require.True(t, validators[0].MaxRate.IsZero())
+	require.True(t, validators[0].MaxChangeRate.IsZero())
+	require.True(t, validators[0].MinSelfDelegation.IsZero())
+	require.True(t, validators[0].Stake.IsZero())
+	require.True(t, validators[0].Rewards.IsZero())
+	require.True(t, validators[0].Commissions.IsZero())
 }
 
 // TestValaddr_MsgSetFibreProviderInfoUpdates covers the "or update" half of the

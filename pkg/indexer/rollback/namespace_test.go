@@ -31,6 +31,11 @@ func storedNamespaces() map[uint64]storage.Namespace {
 	}
 }
 
+// Test_rollbackNamespaces checks the diff rollbackNamespaces passes to
+// SaveNamespaces, which is a negative delta, not the namespace's post-rollback
+// absolute totals: SaveNamespaces upserts by adding onto the stored row
+// (size = EXCLUDED.size + added_namespace.size), so handing it an absolute
+// value would double count against whatever is already persisted.
 func Test_rollbackNamespaces(t *testing.T) {
 	lastTime := time.Date(2026, 9, 18, 3, 10, 57, 0, time.UTC)
 
@@ -46,7 +51,7 @@ func Test_rollbackNamespaces(t *testing.T) {
 				{NamespaceId: 1, MsgId: 10, Size: 120, Source: types.BlobSourcePfb},
 			},
 			want: map[uint64]storage.Namespace{
-				1: {PfbCount: 4, Size: 380, PffCount: 2, FibreSize: 524288, BlobsCount: 7},
+				1: {PfbCount: -1, Size: -120, BlobsCount: -1},
 			},
 		}, {
 			// A fibre blob moves pff_count, fibre_size and blobs_count, and must
@@ -56,7 +61,7 @@ func Test_rollbackNamespaces(t *testing.T) {
 				{NamespaceId: 1, MsgId: 10, Size: 262144, Source: types.BlobSourceFibre},
 			},
 			want: map[uint64]storage.Namespace{
-				1: {PfbCount: 5, Size: 500, PffCount: 1, FibreSize: 262144, BlobsCount: 6},
+				1: {PffCount: -1, FibreSize: -262144, BlobsCount: -1},
 			},
 		}, {
 			// Rows written before the source column existed read as pfb, which
@@ -66,7 +71,7 @@ func Test_rollbackNamespaces(t *testing.T) {
 				{NamespaceId: 1, MsgId: 10, Size: 120},
 			},
 			want: map[uint64]storage.Namespace{
-				1: {PfbCount: 4, Size: 380, PffCount: 2, FibreSize: 524288, BlobsCount: 7},
+				1: {PfbCount: -1, Size: -120, BlobsCount: -1},
 			},
 		}, {
 			name: "several messages into one namespace accumulate",
@@ -76,7 +81,7 @@ func Test_rollbackNamespaces(t *testing.T) {
 				{NamespaceId: 1, MsgId: 12, Size: 80, Source: types.BlobSourcePfb},
 			},
 			want: map[uint64]storage.Namespace{
-				1: {PfbCount: 3, Size: 300, PffCount: 1, FibreSize: 262144, BlobsCount: 6},
+				1: {PfbCount: -2, Size: -200, PffCount: -1, FibreSize: -262144, BlobsCount: -3},
 			},
 		}, {
 			name: "several namespaces stay apart",
@@ -85,8 +90,8 @@ func Test_rollbackNamespaces(t *testing.T) {
 				{NamespaceId: 2, MsgId: 10, Size: 40, Source: types.BlobSourcePfb},
 			},
 			want: map[uint64]storage.Namespace{
-				1: {PfbCount: 4, Size: 380, PffCount: 2, FibreSize: 524288, BlobsCount: 7},
-				2: {PfbCount: 0, Size: 60, BlobsCount: 1},
+				1: {PfbCount: -1, Size: -120, BlobsCount: -1},
+				2: {PfbCount: -1, Size: -40, BlobsCount: -1},
 			},
 		}, {
 			// A namespace deleted wholesale by the rollback needs no diff.
@@ -97,7 +102,7 @@ func Test_rollbackNamespaces(t *testing.T) {
 			},
 			deletedNs: []storage.Namespace{{Id: 2}},
 			want: map[uint64]storage.Namespace{
-				1: {PfbCount: 4, Size: 380, PffCount: 2, FibreSize: 524288, BlobsCount: 7},
+				1: {PfbCount: -1, Size: -120, BlobsCount: -1},
 			},
 		},
 	}

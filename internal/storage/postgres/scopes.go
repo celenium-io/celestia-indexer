@@ -17,6 +17,7 @@ const (
 	sizeColumn       = "size"
 	timeColumn       = "time"
 	pfbCountColumn   = "pfb_count"
+	pffCountColumn   = "pff_count"
 	blobsCountColumn = "blobs_count"
 	feeColumn        = "fee"
 )

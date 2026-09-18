@@ -123,7 +123,7 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 	}
 	if !txRes.IsFailed() {
 		if err := processBlobs(txBlobs, d, t); err != nil {
-			return err
+			p.Log.Err(err).Msg("processBlobs")
 		}
 		ctx.AddBlobLogs(txBlobs...)
 	}

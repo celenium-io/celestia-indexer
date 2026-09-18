@@ -633,6 +633,7 @@ func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 		Signers:    ids,
 		Cursor:     req.Cursor,
 		To:         ns.LastMessageTime.Add(time.Second),
+		Source:     req.Source,
 	}
 
 	if req.From > 0 {

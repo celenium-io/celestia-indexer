@@ -220,7 +220,7 @@ func (s Stats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe,
 	case storage.SeriesNsPfbCount:
 		query.ColumnExpr("ts, pfb_count as value")
 	case storage.SeriesNsPffCount:
-		query.ColumnExpr("ts, pfb_count as value")
+		query.ColumnExpr("ts, pff_count as value")
 	case storage.SeriesNsSize:
 		query.ColumnExpr("ts, size as value")
 	default:
