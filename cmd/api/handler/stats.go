@@ -287,7 +287,7 @@ func (sh StatsHandler) SeriesCumulative(c echo.Context) error {
 type namespaceSeriesRequest struct {
 	Id         string `example:"0011223344" param:"id"        swaggertype:"string"  validate:"required,hexadecimal,len=56"`
 	Timeframe  string `example:"hour"       param:"timeframe" swaggertype:"string"  validate:"required,oneof=hour day week month year"`
-	SeriesName string `example:"size"       param:"name"      swaggertype:"string"  validate:"required,oneof=pfb_count size"`
+	SeriesName string `example:"size"       param:"name"      swaggertype:"string"  validate:"required,oneof=pfb_count pff_count size"`
 	From       int64  `example:"1692892095" query:"from"      swaggertype:"integer" validate:"omitempty,min=1"`
 	To         int64  `example:"1692892095" query:"to"        swaggertype:"integer" validate:"omitempty,min=1"`
 }
@@ -295,12 +295,12 @@ type namespaceSeriesRequest struct {
 // NamespaceSeries godoc
 //
 //	@Summary		Get histogram for namespace with precomputed stats
-//	@Description	Returns a time-series histogram of precomputed blob statistics (pfb_count or size) for the specified namespace, filtered by timeframe and optional time range.
+//	@Description	Returns a time-series histogram of precomputed blob statistics (pfb_count, pff_count or size) for the specified namespace, filtered by timeframe and optional time range.
 //	@Tags			stats
 //	@ID				stats-ns-series
 //	@Param			id			path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)	example(4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, week, month, year)	example(day)
-//	@Param			name		path	string	true	"Series name"					Enums(pfb_count, size)	example(pfb_count)
+//	@Param			name		path	string	true	"Series name"					Enums(pfb_count, pff_count, size)	example(pfb_count)
 //	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
 //	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
 //	@Produce		json

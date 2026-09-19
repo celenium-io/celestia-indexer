@@ -7,7 +7,7 @@ import (
 	"bytes"
 	"testing"
 
-	squareTx "github.com/celestiaorg/go-square/v3/tx"
+	squareTx "github.com/celestiaorg/go-square/v4/tx"
 	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmTypes "github.com/cometbft/cometbft/types"
 	"github.com/stretchr/testify/require"

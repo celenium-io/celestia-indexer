@@ -150,7 +150,15 @@ package types
 
 		MsgCreateInterchainSecurityModule,
 		MsgUpdateInterchainSecurityModule,
-		MsgSubmitMessages
+		MsgSubmitMessages,
+
+		MsgDepositToEscrow,
+		MsgRequestWithdrawal,
+		MsgPayForFibre,
+		MsgPaymentPromiseTimeout,
+		MsgUpdateFibreParams,
+
+		MsgSetFibreProviderInfo
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix --names

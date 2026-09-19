@@ -6,6 +6,7 @@ package context
 import (
 	"encoding/hex"
 	"fmt"
+	"strconv"
 	"sync/atomic"
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
@@ -13,6 +14,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	fibreTypes "github.com/celestiaorg/celestia-app/v10/x/fibre/types"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 )
@@ -193,6 +195,12 @@ func (ctx *Context) AddValidator(validator storage.Validator) {
 		if validator.MessagesCount > 0 {
 			val.MessagesCount += validator.MessagesCount
 		}
+		if validator.FibreHost != nil {
+			val.FibreHost = validator.FibreHost
+		}
+		if validator.FibreHostHeight != nil {
+			val.FibreHostHeight = validator.FibreHostHeight
+		}
 	} else {
 		ctx.Validators.Set(validator.Address, &validator)
 	}
@@ -304,6 +312,16 @@ func (ctx *Context) AddConstant(module types.ModuleName, name, value string) {
 		Name:   name,
 		Value:  value,
 	})
+}
+
+// AddFibreParams records the fibre module params as constants. Durations are
+// stored in nanoseconds, like the other duration constants.
+func (ctx *Context) AddFibreParams(params fibreTypes.Params) {
+	ctx.AddConstant(types.ModuleNameFibre, "withdrawal_delay", strconv.FormatInt(params.WithdrawalDelay.Nanoseconds(), 10))
+	ctx.AddConstant(types.ModuleNameFibre, "payment_promise_timeout", strconv.FormatInt(params.PaymentPromiseTimeout.Nanoseconds(), 10))
+	ctx.AddConstant(types.ModuleNameFibre, "payment_promise_height_window", strconv.FormatUint(params.PaymentPromiseHeightWindow, 10))
+	ctx.AddConstant(types.ModuleNameFibre, "shard_retention", strconv.FormatInt(params.ShardRetention.Nanoseconds(), 10))
+	ctx.AddConstant(types.ModuleNameFibre, "full_stake_storage_budget", strconv.FormatUint(params.FullStakeStorageBudget, 10))
 }
 
 func (ctx *Context) AddIgp(igpId string, igp *storage.HLIGP) {
@@ -479,6 +497,8 @@ func (ctx *Context) AddNamespace(namespace *storage.Namespace) *storage.Namespac
 		ns.PfbCount += namespace.PfbCount
 		ns.Size += namespace.Size
 		ns.BlobsCount += namespace.BlobsCount
+		ns.FibreSize += namespace.FibreSize
+		ns.PffCount += namespace.PffCount
 		return ns
 	}
 	ctx.Namespaces.Set(key, namespace)

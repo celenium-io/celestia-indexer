@@ -161,6 +161,7 @@ const (
 	SeriesGasLimit         = "gas_limit"
 	SeriesGasEfficiency    = "gas_efficiency"
 	SeriesNsPfbCount       = "pfb_count"
+	SeriesNsPffCount       = "pff_count"
 	SeriesNsSize           = "size"
 	SeriesBytesInBlock     = "bytes_in_block"
 	SeriesRewards          = "rewards"

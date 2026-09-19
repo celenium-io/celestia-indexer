@@ -13,3 +13,17 @@
   time: '2023-06-04T03:10:57+00:00'
   tx_id: 4
   height: 0
+- msg_id: 4
+  namespace_id: 1
+  time: '2023-07-04T03:10:57+00:00'
+  tx_id: 1
+  height: 999
+  size: 500
+  source: fibre
+- msg_id: 5
+  namespace_id: 1
+  time: '2023-07-04T03:20:57+00:00'
+  tx_id: 5
+  height: 999
+  size: 300
+  source: fibre

@@ -9,6 +9,7 @@
   signer_id: 1
   fee: 1000
   share_version: 0
+  source: pfb
 - id: 2
   namespace_id: 1
   tx_id: 3
@@ -20,6 +21,7 @@
   signer_id: 1
   fee: 1000
   share_version: 0
+  source: pfb
 - id: 3
   namespace_id: 2
   tx_id: 2
@@ -31,6 +33,7 @@
   signer_id: 2
   fee: 1000
   share_version: 0
+  source: pfb
 - id: 4
   namespace_id: 3
   tx_id: 2
@@ -42,6 +45,7 @@
   signer_id: 2
   fee: 5000
   share_version: 0
+  source: pfb
 - id: 5
   namespace_id: 2
   tx_id: 4
@@ -53,3 +57,4 @@
   signer_id: 2
   fee: 1000
   share_version: 0
+  source: pfb

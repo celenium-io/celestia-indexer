@@ -11,10 +11,16 @@ import (
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	appBlobTypes "github.com/celestiaorg/celestia-app/v9/x/blob/types"
+	"github.com/celestiaorg/celestia-app/v10/pkg/appconsts"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v10/x/blob/types"
 	"github.com/cosmos/cosmos-sdk/types"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
+
+// oneShareGas is the blob gas of a payload that fits in a single share, which
+// is the case for every blob in this file.
+var oneShareGas = decimal.NewFromInt(int64(appconsts.GasPerBlobByte))
 
 // MsgPayForBlob
 
@@ -62,7 +68,9 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 			Signer: &storage.Address{
 				Address: "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
 			},
-			MsgId: 1,
+			MsgId:       1,
+			Source:      storageTypes.BlobSourcePfb,
+			GasConsumed: oneShareGas,
 		},
 	}
 	msgExpected := storage.Message{
@@ -134,7 +142,9 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 			Signer: &storage.Address{
 				Address: "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
 			},
-			MsgId: 1,
+			MsgId:       1,
+			Source:      storageTypes.BlobSourcePfb,
+			GasConsumed: oneShareGas,
 		}, {
 			Height:     block.Height,
 			Time:       now,
@@ -154,7 +164,9 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 			Signer: &storage.Address{
 				Address: "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
 			},
-			MsgId: 1,
+			MsgId:       1,
+			Source:      storageTypes.BlobSourcePfb,
+			GasConsumed: oneShareGas,
 		}, {
 			Height:     block.Height,
 			Time:       now,
@@ -174,7 +186,9 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 			Signer: &storage.Address{
 				Address: "celestia1zefjxuq43xmjq9x4hhw23wkvvz6st5uhv40tys",
 			},
-			MsgId: 1,
+			MsgId:       1,
+			Source:      storageTypes.BlobSourcePfb,
+			GasConsumed: oneShareGas,
 		},
 	}
 	msgExpected := storage.Message{

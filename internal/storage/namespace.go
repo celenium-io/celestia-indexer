@@ -36,7 +36,9 @@ type Namespace struct {
 	Version         byte        `bun:"version,unique:namespace_id_version_idx"      comment:"Namespace version"`
 	NamespaceID     []byte      `bun:"namespace_id,unique:namespace_id_version_idx" comment:"Namespace identity"`
 	Size            int64       `bun:"size"                                         comment:"Blobs size"`
+	FibreSize       int64       `bun:"fibre_size"                                   comment:"Blobs size passing through fibre"`
 	PfbCount        int64       `bun:"pfb_count"                                    comment:"Count of pay for blobs messages for the namespace"`
+	PffCount        int64       `bun:"pff_count"                                    comment:"Count of pay for fibre messages for the namespace"`
 	BlobsCount      int64       `bun:"blobs_count"                                  comment:"Count of blobs sent to namespace"`
 	Reserved        bool        `bun:"reserved,default:false"                       comment:"If namespace is reserved flag is true"`
 	LastMessageTime time.Time   `bun:"last_message_time"                            comment:"Time when last pay for blob was sent"`

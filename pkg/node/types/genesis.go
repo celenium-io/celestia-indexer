@@ -454,12 +454,29 @@ type AppState struct {
 	InterchainAccounts InterchainAccounts `json:"interchainaccounts"`
 	Mint               Mint               `json:"mint"`
 	MinFee             MinFee             `json:"minfee"`
+	Fibre              *Fibre             `json:"fibre"`
 	Params             interface{}        `json:"params"`
 	Qgb                Qgb                `json:"qgb"`
 	Slashing           Slashing           `json:"slashing"`
 	Staking            Staking            `json:"staking"`
 	Transfer           Transfer           `json:"transfer"`
 	Vesting            Vesting            `json:"vesting"`
+}
+
+// Fibre is present only in genesis of chains launched at app version 10 or
+// later: a chain that upgraded into v10 never had the module at genesis.
+type Fibre struct {
+	Params FibreParams `json:"params"`
+}
+
+// FibreParams holds the params as the SDK codec renders them: durations as
+// protobuf duration strings ("86400s") and uint64 as decimal strings.
+type FibreParams struct {
+	WithdrawalDelay            string `json:"withdrawal_delay"`
+	PaymentPromiseTimeout      string `json:"payment_promise_timeout"`
+	PaymentPromiseHeightWindow string `json:"payment_promise_height_window"`
+	ShardRetention             string `json:"shard_retention"`
+	FullStakeStorageBudget     string `json:"full_stake_storage_budget"`
 }
 
 type MinFee struct {

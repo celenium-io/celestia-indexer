@@ -46,6 +46,7 @@ type BlobLog struct {
 	Height       pkgTypes.Level `example:"100"                                          format:"integer"   json:"height"        swaggertype:"integer"`
 	Time         time.Time      `example:"2023-07-04T03:10:57+00:00"                    format:"date-time" json:"time"          swaggertype:"string"`
 	ContentType  string         `example:"image/png"                                    format:"string"    json:"content_type"  swaggertype:"string"`
+	Source       string         `example:"fibre"                                        format:"string"    json:"source"        swaggertype:"string"`
 	Namespace    *Namespace     `json:"namespace,omitempty"`
 	Tx           *Tx            `json:"tx,omitempty"`
 	Rollup       *ShortRollup   `json:"rollup,omitempty"`
@@ -61,6 +62,7 @@ func NewBlobLog(blob storage.BlobLog) BlobLog {
 		Height:       blob.Height,
 		Time:         blob.Time,
 		ContentType:  blob.ContentType,
+		Source:       blob.Source.String(),
 		Rollup:       NewShortRollup(blob.Rollup),
 		Signer:       NewShortAddress(blob.Signer),
 	}
@@ -87,6 +89,7 @@ type LightBlobLog struct {
 	ContentType  string         `example:"image/png"                                                        format:"string"    json:"content_type"  swaggertype:"string"`
 	Namespace    string         `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="                         format:"base64"    json:"namespace"     swaggertype:"string"`
 	TxHash       string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"       swaggertype:"string"`
+	Source       string         `example:"fibre"                                                            format:"string"    json:"source"        swaggertype:"string"`
 
 	Signer *ShortAddress `json:"signer,omitempty"`
 }
@@ -101,6 +104,7 @@ func NewLightBlobLog(blob storage.BlobLog) LightBlobLog {
 		Time:         blob.Time,
 		ContentType:  blob.ContentType,
 		Signer:       NewShortAddress(blob.Signer),
+		Source:       blob.Source.String(),
 	}
 
 	if blob.Namespace != nil {

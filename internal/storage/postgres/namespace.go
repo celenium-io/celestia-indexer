@@ -77,6 +77,8 @@ func (n *Namespace) ListWithSort(ctx context.Context, sortField string, sort sdk
 		field = pfbCountColumn
 	case sizeColumn:
 		field = sizeColumn
+	case pffCountColumn:
+		field = pffCountColumn
 	default:
 		field = "id"
 	}

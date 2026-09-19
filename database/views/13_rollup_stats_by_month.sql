@@ -6,6 +6,7 @@ WITH (timescaledb.continuous, timescaledb.materialized_only=false) AS
         logs.signer_id, 
         sum(logs.size) as size, 
         sum(logs.blobs_count) as blobs_count, 
+        sum(logs.fibre_blobs_count) as fibre_blobs_count, 
         max(logs.last_time) as last_time,
         min(logs.first_time) as first_time,
         sum(fee) as fee

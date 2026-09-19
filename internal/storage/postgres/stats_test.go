@@ -276,6 +276,26 @@ func (s *StatsTestSuite) TestNamespaceSeries() {
 	s.Require().Len(items, 1)
 }
 
+// TestNamespaceSeriesPffCount pins pfb_count and pff_count series to distinct
+// values (namespace 1: 1 pfb message + 2 fibre messages in the fixtures) so a
+// regression that reads the wrong column, like the pff_count series once
+// silently returning pfb_count's data, fails loudly instead of both series
+// coincidentally matching.
+func (s *StatsTestSuite) TestNamespaceSeriesPffCount() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	pfb, err := s.storage.Stats.NamespaceSeries(ctx, storage.TimeframeHour, storage.SeriesNsPfbCount, 1, storage.SeriesRequest{})
+	s.Require().NoError(err)
+	s.Require().Len(pfb, 1)
+	s.Require().Equal("1", pfb[0].Value)
+
+	pff, err := s.storage.Stats.NamespaceSeries(ctx, storage.TimeframeHour, storage.SeriesNsPffCount, 1, storage.SeriesRequest{})
+	s.Require().NoError(err)
+	s.Require().Len(pff, 1)
+	s.Require().Equal("2", pff[0].Value)
+}
+
 func (s *StatsTestSuite) TestSquareSize() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()

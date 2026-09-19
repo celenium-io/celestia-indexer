@@ -25,11 +25,11 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, msgId 
 		return msgType, nil, err
 	}
 
-	validators := []string{m.ValidatorAddress}
 	if status == storageTypes.StatusFailed {
 		return msgType, nil, nil
 	}
 
+	validators := []string{m.ValidatorAddress}
 	var consAddress string
 	if m.Pubkey != nil {
 		pk, ok := m.Pubkey.GetCachedValue().(cryptotypes.PubKey)
@@ -147,12 +147,11 @@ func MsgEditValidator(ctx *context.Context, status storageTypes.Status, msgId ui
 	if err != nil {
 		return msgType, nil, err
 	}
-
-	validators := []string{m.ValidatorAddress}
 	if status == storageTypes.StatusFailed {
 		return msgType, nil, nil
 	}
 
+	validators := []string{m.ValidatorAddress}
 	validator := storage.Validator{
 		Address:           m.ValidatorAddress,
 		Moniker:           m.Description.Moniker,

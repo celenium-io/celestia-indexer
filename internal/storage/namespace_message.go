@@ -6,6 +6,7 @@ package storage
 import (
 	"time"
 
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 
 	"github.com/uptrace/bun"
@@ -21,6 +22,8 @@ type NamespaceMessage struct {
 	Time   time.Time   `bun:"time,notnull,pk" comment:"Message time"`
 	Height types.Level `bun:"height"          comment:"Message block height"`
 	Size   uint64      `bun:"size"            comment:"Total namespace size change due to message"`
+
+	Source storageTypes.BlobSource `bun:"source,type:blob_source,default:'pfb',nullzero" comment:"Blob source: pfb or fibre"`
 
 	Message   *Message   `bun:"rel:belongs-to,join:msg_id=id"`
 	Namespace *Namespace `bun:"rel:belongs-to,join:namespace_id=id"`

@@ -82,7 +82,7 @@ func (r *Rollup) Leaderboard(ctx context.Context, fltrs storage.LeaderboardFilte
 
 func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFilters) (rollups []storage.RollupWithDayStats, err error) {
 	switch fltrs.SortField {
-	case "avg_size", blobsCountColumn, "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price":
+	case "avg_size", blobsCountColumn, "fibre_blobs_count", "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "pff_count", "mb_price":
 	case "":
 		fltrs.SortField = "throughput"
 	default:
@@ -91,7 +91,7 @@ func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFi
 
 	query := r.DB().NewSelect().
 		Table(storage.ViewLeaderboardDay).
-		Column("avg_size", blobsCountColumn, "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "mb_price").
+		Column("avg_size", blobsCountColumn, "fibre_blobs_count", "total_size", "total_fee", "throughput", "namespace_count", "pfb_count", "pff_count", "mb_price").
 		ColumnExpr("rollup.*").
 		Offset(fltrs.Offset).
 		Join("left join rollup on rollup.id = rollup_id AND rollup.verified = true")
@@ -198,7 +198,7 @@ func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe storage.
 	case "size":
 		query = query.ColumnExpr("sum(size) as value, time as bucket")
 	case "size_per_blob":
-		query = query.ColumnExpr("(sum(size) / sum(blobs_count)) as value, time as bucket")
+		query = query.ColumnExpr("case when sum(blobs_count+fibre_blobs_count) > 0 then (sum(size) / sum(blobs_count+fibre_blobs_count)) else 0 end as value, time as bucket")
 	case "fee":
 		query = query.ColumnExpr("sum(fee) as value, time as bucket")
 	default:
@@ -240,7 +240,7 @@ func (r *Rollup) Count(ctx context.Context) (int64, error) {
 
 func (r *Rollup) Stats(ctx context.Context, rollupId uint64) (stats storage.RollupStats, err error) {
 	err = r.DB().NewSelect().Table(storage.ViewLeaderboard).
-		Column("blobs_count", "size", "last_time", "first_time", "fee", "size_pct", "fee_pct", "blobs_count_pct").
+		Column("blobs_count", "fibre_blobs_count", "size", "last_time", "first_time", "fee", "size_pct", "fee_pct", "blobs_count_pct").
 		Where("id = ?", rollupId).Scan(ctx, &stats)
 	return
 }
@@ -312,9 +312,9 @@ func (r *Rollup) Distribution(ctx context.Context, rollupId uint64, series strin
 	case "blobs_count":
 		cte = cte.ColumnExpr("blobs_count as value")
 	case "size_per_blob":
-		cte = cte.ColumnExpr("(size / blobs_count) as value")
+		cte = cte.ColumnExpr("case when blobs_count+fibre_blobs_count > 0 then (size / (blobs_count+fibre_blobs_count)) else 0 end as value")
 	case "fee_per_blob":
-		cte = cte.ColumnExpr("(fee / blobs_count) as value")
+		cte = cte.ColumnExpr("case when blobs_count+fibre_blobs_count > 0 then (fee / (blobs_count+fibre_blobs_count)) else 0 end as value")
 	default:
 		err = errors.Errorf("invalid distribution rollup series: %s", groupBy)
 		return

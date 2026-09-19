@@ -168,7 +168,18 @@ const (
 	MsgTypeBitsCreateInterchainSecurityModule
 	MsgTypeBitsUpdateInterchainSecurityModule
 	MsgTypeBitsSubmitMessages
+
+	MsgTypeBitsDepositToEscrow
+	MsgTypeBitsRequestWithdrawal
+	MsgTypeBitsPayForFibre
+	MsgTypeBitsPaymentPromiseTimeout
+	MsgTypeBitsUpdateFibreParams
+
+	MsgTypeBitsSetFibreProviderInfo
 )
+
+// MsgTypeBitsCount is the mask width: the number of bits declared above.
+const MsgTypeBitsCount = 121
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
 	mask := NewMsgTypeBits()
@@ -431,6 +442,19 @@ func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 		mask.SetBit(MsgTypeBitsUpdateInterchainSecurityModule)
 	case MsgSubmitMessages:
 		mask.SetBit(MsgTypeBitsSubmitMessages)
+
+	case MsgDepositToEscrow:
+		mask.SetBit(MsgTypeBitsDepositToEscrow)
+	case MsgRequestWithdrawal:
+		mask.SetBit(MsgTypeBitsRequestWithdrawal)
+	case MsgPayForFibre:
+		mask.SetBit(MsgTypeBitsPayForFibre)
+	case MsgPaymentPromiseTimeout:
+		mask.SetBit(MsgTypeBitsPaymentPromiseTimeout)
+	case MsgUpdateFibreParams:
+		mask.SetBit(MsgTypeBitsUpdateFibreParams)
+	case MsgSetFibreProviderInfo:
+		mask.SetBit(MsgTypeBitsSetFibreProviderInfo)
 	}
 }
 
@@ -934,6 +958,32 @@ func (mask MsgTypeBits) Names() []MsgType {
 	}
 	if mask.HasBit(MsgTypeBitsSubmitMessages) {
 		names[i] = MsgSubmitMessages
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsDepositToEscrow) {
+		names[i] = MsgDepositToEscrow
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsRequestWithdrawal) {
+		names[i] = MsgRequestWithdrawal
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsPayForFibre) {
+		names[i] = MsgPayForFibre
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsPaymentPromiseTimeout) {
+		names[i] = MsgPaymentPromiseTimeout
+		i++
+	}
+	if mask.HasBit(MsgTypeBitsUpdateFibreParams) {
+		names[i] = MsgUpdateFibreParams
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsSetFibreProviderInfo) {
+		names[i] = MsgSetFibreProviderInfo
 		// i++
 	}
 
@@ -944,11 +994,14 @@ func (mask MsgTypeBits) HasOne(value MsgTypeBits) bool {
 	return mask.value.And(mask.value, value.value).Cmp(zero) > 0
 }
 
+// String renders the mask as a fixed-width binary literal for the
+// bit(MsgTypeBitsCount) columns; padding is mandatory since Postgres rejects
+// shorter literals.
 func (mask MsgTypeBits) String() string {
 	if mask.value == nil {
-		return fmt.Sprintf("%0115b", 0)
+		return fmt.Sprintf("%0*b", MsgTypeBitsCount, 0)
 	}
-	return fmt.Sprintf("%0115b", mask.value)
+	return fmt.Sprintf("%0*b", MsgTypeBitsCount, mask.value)
 }
 
 var _ sql.Scanner = (*MsgTypeBits)(nil)

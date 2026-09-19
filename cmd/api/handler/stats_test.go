@@ -334,6 +334,7 @@ func (s *StatsTestSuite) TestBlockCumulativeStatsHistogram() {
 func (s *StatsTestSuite) TestNamespaceStatsHistogram() {
 	for _, name := range []string{
 		storage.SeriesNsPfbCount,
+		storage.SeriesNsPffCount,
 		storage.SeriesNsSize,
 	} {
 

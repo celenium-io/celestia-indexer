@@ -9,13 +9,19 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	appBlobTypes "github.com/celestiaorg/celestia-app/v9/x/blob/types"
-	nsPackage "github.com/celestiaorg/go-square/v3/share"
+	"github.com/celestiaorg/celestia-app/v10/pkg/appconsts"
+	appBlobTypes "github.com/celestiaorg/celestia-app/v10/x/blob/types"
+	"github.com/celestiaorg/go-square/v4/share"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 )
 
+var gasPerBlobByte = decimal.NewFromInt(int64(appconsts.GasPerBlobByte))
+
 // MsgPayForBlobs pays for the inclusion of a blob in the block.
-func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, msgId, txId uint64, m *appBlobTypes.MsgPayForBlobs) (storageTypes.MsgType, []*storage.BlobLog, int64, error) {
+func MsgPayForBlobs(
+	ctx *context.Context, status storageTypes.Status, msgId, txId uint64, m *appBlobTypes.MsgPayForBlobs,
+) (storageTypes.MsgType, []*storage.BlobLog, int64, error) {
 	var blobsSize int64
 	blobLogs := make([]*storage.BlobLog, 0)
 
@@ -33,7 +39,7 @@ func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, msgId, txI
 				"share versions length=%d is less than namespaces index=%d", len(m.ShareVersions), idx)
 		}
 
-		appNS, err := nsPackage.NewNamespaceFromBytes(ns)
+		appNS, err := share.NewNamespaceFromBytes(ns)
 		if err != nil {
 			return storageTypes.MsgUnknown, nil, 0, errors.Wrap(err, "NewNamespaceFromBytes")
 		}
@@ -55,6 +61,9 @@ func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, msgId, txI
 
 			ns := ctx.AddNamespace(namespace)
 
+			sharesUsed := share.SparseSharesNeeded(m.BlobSizes[idx], m.ShareVersions[idx] == uint32(share.ShareVersionOne))
+			gas := decimal.NewFromInt(int64(sharesUsed)).Mul(gasPerBlobByte)
+
 			blobLog := &storage.BlobLog{
 				Commitment: base64.StdEncoding.EncodeToString(m.ShareCommitments[idx]),
 				Size:       size,
@@ -67,6 +76,8 @@ func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, msgId, txI
 				ShareVersion: int(m.ShareVersions[idx]),
 				MsgId:        msgId,
 				TxId:         txId,
+				Source:       storageTypes.BlobSourcePfb,
+				GasConsumed:  gas,
 			}
 			blobLogs = append(blobLogs, blobLog)
 
@@ -77,6 +88,7 @@ func MsgPayForBlobs(ctx *context.Context, status storageTypes.Status, msgId, txI
 				Time:      ctx.Block.Time,
 				Namespace: ns,
 				Size:      uint64(size),
+				Source:    blobLog.Source,
 			})
 		}
 	}

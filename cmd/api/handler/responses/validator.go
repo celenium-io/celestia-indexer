@@ -39,6 +39,7 @@ type Validator struct {
 
 	Address   *ShortAddress `json:"address"`
 	Delegator *ShortAddress `json:"delegator"`
+	Fibre     *Fibre        `json:"fibre"`
 }
 
 func NewValidator(val storage.Validator) *Validator {
@@ -75,6 +76,7 @@ func NewValidator(val storage.Validator) *Validator {
 		VotingPower:       val.VotingPower().String(),
 		MessagesCount:     val.MessagesCount,
 		CreationTime:      val.CreationTime,
+		Fibre:             NewFibreForValidator(val),
 	}
 }
 
@@ -219,5 +221,20 @@ func NewTopNMetrics(value storage.ValidatorMetrics) TopNMetrics {
 		OperationTimeMetric:  value.OperationTimeMetric.String(),
 		SelfDelegationMetric: value.SelfDelegationMetric.String(),
 		BlockMissedMetric:    value.BlockMissedMetric.String(),
+	}
+}
+
+type Fibre struct {
+	Host   string      `example:"100.100.100.100:12345" json:"host"   swaggertype:"string"`
+	Height types.Level `example:"100"                   json:"height" swaggertype:"integer"`
+}
+
+func NewFibreForValidator(val storage.Validator) *Fibre {
+	if val.FibreHost == nil || val.FibreHostHeight == nil {
+		return nil
+	}
+	return &Fibre{
+		Host:   *val.FibreHost,
+		Height: *val.FibreHostHeight,
 	}
 }

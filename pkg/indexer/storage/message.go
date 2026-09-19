@@ -63,9 +63,7 @@ func (module *Module) saveMessages(
 		return err
 	}
 
-	var (
-		valMsgs []storage.MsgValidator
-	)
+	var valMsgs []storage.MsgValidator
 	for i := range messages {
 		if len(messages[i].Validators) > 0 {
 			for _, val := range messages[i].Validators {

@@ -11,6 +11,7 @@ import (
 	types "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	"github.com/shopspring/decimal"
 	"github.com/uptrace/bun"
 )
 
@@ -26,6 +27,7 @@ type BlobLogFilters struct {
 	Signers    []uint64
 	Cursor     uint64
 	Height     pkgTypes.Level
+	Source     string
 }
 
 type ListBlobLogFilters struct {
@@ -40,6 +42,7 @@ type ListBlobLogFilters struct {
 	Namespaces []uint64
 	Cursor     uint64
 	Height     pkgTypes.Level
+	Source     string
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -76,11 +79,15 @@ type BlobLog struct {
 	MsgId       uint64 `bun:"msg_id"       comment:"Message id"`
 	TxId        uint64 `bun:"tx_id"        comment:"Transaction id"`
 
+	Source types.BlobSource `bun:"source,type:blob_source,default:'pfb',nullzero" comment:"Blob source: pfb or fibre"`
+
 	Message   *Message   `bun:"rel:belongs-to,join:msg_id=id"`
 	Namespace *Namespace `bun:"rel:belongs-to,join:namespace_id=id"`
 	Tx        *Tx        `bun:"rel:belongs-to,join:tx_id=id"`
 	Signer    *Address   `bun:"rel:belongs-to,join:signer_id=id"`
 	Rollup    *Rollup    `bun:"rel:belongs-to"`
+
+	GasConsumed decimal.Decimal `bun:"-"`
 }
 
 func (BlobLog) TableName() string {
@@ -90,11 +97,15 @@ func (BlobLog) TableName() string {
 func (BlobLog) Columns() []string {
 	return []string{
 		columnNameTime, columnNameHeight, "size", "share_version", "commitment", "content_type",
-		"fee", "signer_id", "namespace_id", "msg_id", columnNameTxId,
+		"fee", "signer_id", "namespace_id", "msg_id", columnNameTxId, "source",
 	}
 }
 
 func (b BlobLog) Flat() ([]any, error) {
+	source := b.Source
+	if b.Source == "" {
+		source = types.BlobSourcePfb
+	}
 	return []any{
 		b.Time,
 		int64(b.Height),
@@ -107,5 +118,6 @@ func (b BlobLog) Flat() ([]any, error) {
 		b.NamespaceId,
 		b.MsgId,
 		b.TxId,
+		source,
 	}, nil
 }

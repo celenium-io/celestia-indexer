@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/celestiaorg/celestia-app/v9/pkg/proof"
+	"github.com/celestiaorg/celestia-app/v10/pkg/proof"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -523,6 +523,55 @@ func (s *NamespaceTestSuite) TestGetLogs() {
 	s.Require().EqualValues(1000, l.Size)
 	s.Require().Nil(l.Namespace)
 	s.Require().NotNil(l.Rollup)
+}
+
+func (s *NamespaceTestSuite) TestGetLogsWithSource() {
+	args := make(url.Values)
+	args.Set("source", "fibre")
+
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+args.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/namespace/:id/:version/logs")
+	c.SetParamNames("id", "version")
+	c.SetParamValues(testNamespaceId, "0")
+
+	s.namespaces.EXPECT().
+		ByNamespaceIdAndVersion(gomock.Any(), testNamespace.NamespaceID, byte(0)).
+		Return(testNamespace, nil)
+
+	s.blobLogs.EXPECT().
+		ByNamespace(gomock.Any(), testNamespace.Id, storage.BlobLogFilters{
+			Limit:  10,
+			Sort:   "desc",
+			Joins:  true,
+			Source: "fibre",
+			To:     testNamespace.LastMessageTime.Add(time.Second),
+		}).
+		Return([]storage.BlobLog{
+			{
+				NamespaceId: testNamespace.Id,
+				MsgId:       1,
+				TxId:        1,
+				SignerId:    1,
+				Signer: &storage.Address{
+					Address: testAddress,
+				},
+				Commitment: "test_commitment",
+				Size:       1000,
+				Height:     10000,
+				Time:       testTime,
+				Rollup:     &testRollup,
+			},
+		}, nil)
+
+	s.Require().NoError(s.handler.GetBlobLogs(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var logs []responses.BlobLog
+	err := json.NewDecoder(rec.Body).Decode(&logs)
+	s.Require().NoError(err)
+	s.Require().Len(logs, 1)
 }
 
 func (s *NamespaceTestSuite) TestGetLogsBySigner() {

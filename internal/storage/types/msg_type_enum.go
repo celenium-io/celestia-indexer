@@ -247,6 +247,18 @@ const (
 	MsgUpdateInterchainSecurityModule MsgType = "MsgUpdateInterchainSecurityModule"
 	// MsgSubmitMessages is a MsgType of type MsgSubmitMessages.
 	MsgSubmitMessages MsgType = "MsgSubmitMessages"
+	// MsgDepositToEscrow is a MsgType of type MsgDepositToEscrow.
+	MsgDepositToEscrow MsgType = "MsgDepositToEscrow"
+	// MsgRequestWithdrawal is a MsgType of type MsgRequestWithdrawal.
+	MsgRequestWithdrawal MsgType = "MsgRequestWithdrawal"
+	// MsgPayForFibre is a MsgType of type MsgPayForFibre.
+	MsgPayForFibre MsgType = "MsgPayForFibre"
+	// MsgPaymentPromiseTimeout is a MsgType of type MsgPaymentPromiseTimeout.
+	MsgPaymentPromiseTimeout MsgType = "MsgPaymentPromiseTimeout"
+	// MsgUpdateFibreParams is a MsgType of type MsgUpdateFibreParams.
+	MsgUpdateFibreParams MsgType = "MsgUpdateFibreParams"
+	// MsgSetFibreProviderInfo is a MsgType of type MsgSetFibreProviderInfo.
+	MsgSetFibreProviderInfo MsgType = "MsgSetFibreProviderInfo"
 )
 
 var ErrInvalidMsgType = fmt.Errorf("not a valid MsgType, try [%s]", strings.Join(_MsgTypeNames, ", "))
@@ -367,6 +379,12 @@ var _MsgTypeNames = []string{
 	string(MsgCreateInterchainSecurityModule),
 	string(MsgUpdateInterchainSecurityModule),
 	string(MsgSubmitMessages),
+	string(MsgDepositToEscrow),
+	string(MsgRequestWithdrawal),
+	string(MsgPayForFibre),
+	string(MsgPaymentPromiseTimeout),
+	string(MsgUpdateFibreParams),
+	string(MsgSetFibreProviderInfo),
 }
 
 // MsgTypeNames returns a list of possible string values of MsgType.
@@ -494,6 +512,12 @@ func MsgTypeValues() []MsgType {
 		MsgCreateInterchainSecurityModule,
 		MsgUpdateInterchainSecurityModule,
 		MsgSubmitMessages,
+		MsgDepositToEscrow,
+		MsgRequestWithdrawal,
+		MsgPayForFibre,
+		MsgPaymentPromiseTimeout,
+		MsgUpdateFibreParams,
+		MsgSetFibreProviderInfo,
 	}
 }
 
@@ -625,6 +649,12 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgCreateInterchainSecurityModule":  MsgCreateInterchainSecurityModule,
 	"MsgUpdateInterchainSecurityModule":  MsgUpdateInterchainSecurityModule,
 	"MsgSubmitMessages":                  MsgSubmitMessages,
+	"MsgDepositToEscrow":                 MsgDepositToEscrow,
+	"MsgRequestWithdrawal":               MsgRequestWithdrawal,
+	"MsgPayForFibre":                     MsgPayForFibre,
+	"MsgPaymentPromiseTimeout":           MsgPaymentPromiseTimeout,
+	"MsgUpdateFibreParams":               MsgUpdateFibreParams,
+	"MsgSetFibreProviderInfo":            MsgSetFibreProviderInfo,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.

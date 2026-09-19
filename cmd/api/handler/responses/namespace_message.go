@@ -15,6 +15,7 @@ type NamespaceMessage struct {
 	Height   int64     `example:"100"                       format:"int64"     json:"height"   swaggertype:"integer"`
 	Time     time.Time `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"     swaggertype:"string"`
 	Position int64     `example:"2"                         format:"int64"     json:"position" swaggertype:"integer"`
+	Source   string    `example:"fibre"                     format:"string"    json:"source"   swaggertype:"string"`
 
 	Type string `enums:"MsgWithdrawValidatorCommission,MsgWithdrawDelegatorReward,MsgEditValidator,MsgBeginRedelegate,MsgCreateValidator,MsgDelegate,MsgUndelegate,MsgUnjail,MsgSend,MsgCreateVestingAccount,MsgCreatePeriodicVestingAccount,MsgPayForBlobs,MsgGrantAllowance" example:"MsgCreatePeriodicVestingAccount" format:"string" json:"type" swaggertype:"string"`
 
@@ -39,7 +40,8 @@ func NewNamespaceMessage(msg storage.NamespaceMessage) (NamespaceMessage, error)
 		Height:    int64(msg.Message.Height),
 		Time:      msg.Message.Time,
 		Position:  msg.Message.Position,
-		Type:      string(msg.Message.Type),
+		Source:    msg.Source.String(),
+		Type:      msg.Message.Type.String(),
 		Data:      msg.Message.Data,
 		Tx:        NewTx(*msg.Tx),
 		Namespace: NewNamespace(*msg.Namespace),

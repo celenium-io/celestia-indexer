@@ -77,6 +77,9 @@ type Validator struct {
 	MessagesCount uint64 `bun:"messages_count" comment:"Count of validator messages" json:"-"`
 
 	CreationTime time.Time `bun:"creation_time" comment:"Creation time"`
+
+	FibreHost       *string         `bun:"fibre_host,type:text" comment:"Fibre host"`
+	FibreHostHeight *pkgTypes.Level `bun:"fibre_host_height"    comment:"Fibre host height"`
 }
 
 func (Validator) TableName() string {

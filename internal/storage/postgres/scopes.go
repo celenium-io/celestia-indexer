@@ -4,7 +4,11 @@
 package postgres
 
 import (
+	"fmt"
+	"slices"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
@@ -13,8 +17,16 @@ const (
 	sizeColumn       = "size"
 	timeColumn       = "time"
 	pfbCountColumn   = "pfb_count"
+	pffCountColumn   = "pff_count"
 	blobsCountColumn = "blobs_count"
 	feeColumn        = "fee"
+)
+
+// Bitwise AND needs both operands at the mask width, so the cast is derived
+// from MsgTypeBitsCount instead of being hardcoded.
+var (
+	msgTypesFilter         = fmt.Sprintf("bit_count(message_types & ?::bit(%d)) > 0", types.MsgTypeBitsCount)
+	excludedMsgTypesFilter = fmt.Sprintf("bit_count(message_types & ~(?::bit(%d))) > 0", types.MsgTypeBitsCount)
 )
 
 func limitScope(q *bun.SelectQuery, limit int) *bun.SelectQuery {
@@ -56,11 +68,11 @@ func txFilterWithoutLimit(query *bun.SelectQuery, fltrs storage.TxFilter) *bun.S
 	query = query.OrderExpr("time ?0, id ?0", bun.Safe(fltrs.Sort))
 
 	if !fltrs.MessageTypes.Empty() {
-		query = query.Where("bit_count(message_types & ?::bit(115)) > 0", fltrs.MessageTypes)
+		query = query.Where(msgTypesFilter, fltrs.MessageTypes)
 	}
 
 	if !fltrs.ExcludedMessageTypes.Empty() {
-		query = query.Where("bit_count(message_types & ~(?::bit(115))) > 0", fltrs.ExcludedMessageTypes)
+		query = query.Where(excludedMsgTypesFilter, fltrs.ExcludedMessageTypes)
 	}
 
 	if len(fltrs.Status) > 0 {
@@ -148,6 +160,11 @@ func blobByProviderFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters)
 	if fltrs.Height > 0 {
 		query = query.Where("height = ?", fltrs.Height)
 	}
+	if fltrs.Source != "" {
+		if slices.Contains(types.BlobSourceNames(), fltrs.Source) {
+			query = query.Where("source = ?", fltrs.Source)
+		}
+	}
 	if fltrs.Limit+fltrs.Offset > 0 {
 		query = query.Limit(fltrs.Limit + fltrs.Offset)
 	} else {
@@ -171,6 +188,11 @@ func blobLogFilters(query *bun.SelectQuery, fltrs storage.BlobLogFilters) *bun.S
 	}
 	if fltrs.Height > 0 {
 		query = query.Where("height = ?", fltrs.Height)
+	}
+	if fltrs.Source != "" {
+		if slices.Contains(types.BlobSourceNames(), fltrs.Source) {
+			query = query.Where("source = ?", fltrs.Source)
+		}
 	}
 
 	if fltrs.Cursor > 0 {
@@ -205,6 +227,11 @@ func listBlobLogFilters(query *bun.SelectQuery, fltrs storage.ListBlobLogFilters
 	}
 	if fltrs.Height > 0 {
 		query = query.Where("height = ?", fltrs.Height)
+	}
+	if fltrs.Source != "" {
+		if slices.Contains(types.BlobSourceNames(), fltrs.Source) {
+			query = query.Where("source = ?", fltrs.Source)
+		}
 	}
 
 	if fltrs.Cursor > 0 {

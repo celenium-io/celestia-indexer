@@ -115,7 +115,17 @@ package types
 
 		celestia.zkism.v1.EventCreateInterchainSecurityModule,
 		celestia.zkism.v1.EventUpdateInterchainSecurityModule,
-		celestia.zkism.v1.EventSubmitMessages
+		celestia.zkism.v1.EventSubmitMessages,
+
+		celestia.fibre.v1.EventDepositToEscrow,
+		celestia.fibre.v1.EventWithdrawFromEscrowRequest,
+		celestia.fibre.v1.EventWithdrawFromEscrowExecuted,
+		celestia.fibre.v1.EventPayForFibre,
+		celestia.fibre.v1.EventPaymentPromiseTimeout,
+		celestia.fibre.v1.EventUpdateFibreParams,
+		celestia.fibre.v1.EventProcessedPaymentPruned,
+
+		set_fibre_provider_info
 	)
 */
 //go:generate go-enum --marshal --sql --values --names

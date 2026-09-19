@@ -476,6 +476,34 @@ func TestMsgTypeBits_Names(t *testing.T) {
 			name:    string(MsgSubmitMessages),
 			msgType: []int{MsgTypeBitsSubmitMessages},
 			want:    []MsgType{MsgSubmitMessages},
+		}, {
+			name:    string(MsgDepositToEscrow),
+			msgType: []int{MsgTypeBitsDepositToEscrow},
+			want:    []MsgType{MsgDepositToEscrow},
+		}, {
+			name:    string(MsgRequestWithdrawal),
+			msgType: []int{MsgTypeBitsRequestWithdrawal},
+			want:    []MsgType{MsgRequestWithdrawal},
+		}, {
+			name:    string(MsgPayForFibre),
+			msgType: []int{MsgTypeBitsPayForFibre},
+			want:    []MsgType{MsgPayForFibre},
+		}, {
+			name:    string(MsgPaymentPromiseTimeout),
+			msgType: []int{MsgTypeBitsPaymentPromiseTimeout},
+			want:    []MsgType{MsgPaymentPromiseTimeout},
+		}, {
+			name:    string(MsgUpdateFibreParams),
+			msgType: []int{MsgTypeBitsUpdateFibreParams},
+			want:    []MsgType{MsgUpdateFibreParams},
+		}, {
+			name:    string(MsgSetFibreProviderInfo),
+			msgType: []int{MsgTypeBitsSetFibreProviderInfo},
+			want:    []MsgType{MsgSetFibreProviderInfo},
+		}, {
+			name:    "fibre types together with an older one",
+			msgType: []int{MsgTypeBitsPayForBlobs, MsgTypeBitsPayForFibre, MsgTypeBitsSetFibreProviderInfo},
+			want:    []MsgType{MsgPayForBlobs, MsgPayForFibre, MsgSetFibreProviderInfo},
 		},
 	}
 	for _, tt := range tests {
@@ -1021,4 +1049,32 @@ func TestMarshall(t *testing.T) {
 			require.Equal(t, tt.mask, newMask)
 		})
 	}
+}
+
+// TestMsgTypeBitsCount guards the invariant the bit mask relies on: one bit per
+// MsgType value, and MsgTypeBitsCount as the width of both the mask literal and
+// the message_types columns.
+func TestMsgTypeBitsCount(t *testing.T) {
+	values := MsgTypeValues()
+	require.Len(t, values, MsgTypeBitsCount, "every MsgType needs its own bit")
+
+	for i, value := range values {
+		mask := NewMsgTypeBitMask(value)
+		require.Truef(t, mask.HasBit(i), "%s is expected at bit %d", value, i)
+		require.Equalf(t, 1, mask.CountBits(), "%s must set exactly one bit", value)
+		require.Equalf(t, []MsgType{value}, mask.Names(), "%s does not round-trip through Names", value)
+	}
+}
+
+// TestMsgTypeBitsStringWidth pins the literal width: bit(MsgTypeBitsCount)
+// rejects anything shorter, so padding must not depend on the bits that are set.
+func TestMsgTypeBitsStringWidth(t *testing.T) {
+	var zeroValue MsgTypeBits
+	require.Len(t, zeroValue.String(), MsgTypeBitsCount)
+	require.Len(t, NewMsgTypeBitMask().String(), MsgTypeBitsCount)
+
+	for _, value := range MsgTypeValues() {
+		require.Lenf(t, NewMsgTypeBitMask(value).String(), MsgTypeBitsCount, "wrong width for %s", value)
+	}
+	require.Len(t, NewMsgTypeBitMask(MsgTypeValues()...).String(), MsgTypeBitsCount)
 }

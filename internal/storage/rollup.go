@@ -122,6 +122,7 @@ type DAChange struct {
 type RollupStats struct {
 	Size            int64         `bun:"size"`
 	BlobsCount      int64         `bun:"blobs_count"`
+	FibreBlobsCount int64         `bun:"fibre_blobs_count"`
 	LastActionTime  time.Time     `bun:"last_time"`
 	FirstActionTime time.Time     `bun:"first_time"`
 	Fee             types.Numeric `bun:"fee"`
@@ -137,14 +138,16 @@ type RollupWithDayStats struct {
 }
 
 type RolluDayStats struct {
-	AvgSize        float64       `bun:"avg_size"`
-	BlobsCount     int64         `bun:"blobs_count"`
-	TotalSize      int64         `bun:"total_size"`
-	Throghput      int64         `bun:"throughput"`
-	TotalFee       types.Numeric `bun:"total_fee"`
-	NamespaceCount int64         `bun:"namespace_count"`
-	PfbCount       int64         `bun:"pfb_count"`
-	MBPrice        types.Numeric `bun:"mb_price"`
+	AvgSize         float64       `bun:"avg_size"`
+	BlobsCount      int64         `bun:"blobs_count"`
+	FibreBlobsCount int64         `bun:"fibre_blobs_count"`
+	TotalSize       int64         `bun:"total_size"`
+	Throghput       int64         `bun:"throughput"`
+	TotalFee        types.Numeric `bun:"total_fee"`
+	NamespaceCount  int64         `bun:"namespace_count"`
+	PfbCount        int64         `bun:"pfb_count"`
+	PffCount        int64         `bun:"pff_count"`
+	MBPrice         types.Numeric `bun:"mb_price"`
 }
 
 type RollupHistogramItem struct {

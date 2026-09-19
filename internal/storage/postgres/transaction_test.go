@@ -6,6 +6,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"testing"
 	"time"
 
@@ -319,6 +320,7 @@ func (s *TransactionTestSuite) TestSaveBlobLogs() {
 		blobLogs[i].TxId = uint64((i + 1) * 2)
 		blobLogs[i].Time = time.Now()
 		blobLogs[i].Height = 1000
+		blobLogs[i].Source = types.BlobSourcePfb
 	}
 
 	err = tx.SaveBlobLogs(ctx, blobLogs...)
@@ -326,6 +328,80 @@ func (s *TransactionTestSuite) TestSaveBlobLogs() {
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
+}
+
+// TestSaveBlobLogsSource round-trips the blob_source enum through both write
+// paths: bun INSERT below copyThreshold and the COPY protocol above it.
+func (s *TransactionTestSuite) TestSaveBlobLogsSource() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	newLog := func(i int, source types.BlobSource) *storage.BlobLog {
+		return &storage.BlobLog{
+			MsgId:        uint64(i + 1),
+			NamespaceId:  1,
+			TxId:         uint64(i + 1),
+			SignerId:     1,
+			Time:         time.Date(2023, 7, 4, 3, 10, 57, 0, time.UTC),
+			Height:       1000,
+			Commitment:   fmt.Sprintf("commitment-%d-%s", i, source),
+			Size:         262144,
+			ShareVersion: 2,
+			Fee:          types.NumericFromInt64(695000),
+			Source:       source,
+		}
+	}
+
+	for _, count := range []int{2, copyThreshold + 1} {
+		s.Run(fmt.Sprintf("%d logs", count), func() {
+			logs := make([]*storage.BlobLog, count)
+			for i := range logs {
+				source := types.BlobSourcePfb
+				if i%2 == 1 {
+					source = types.BlobSourceFibre
+				}
+				logs[i] = newLog(i, source)
+			}
+
+			tx, err := BeginTransaction(ctx, s.storage.Transactable)
+			s.Require().NoError(err)
+			s.Require().NoError(tx.SaveBlobLogs(ctx, logs...))
+			s.Require().NoError(tx.Flush(ctx))
+			s.Require().NoError(tx.Close(ctx))
+
+			stored, err := s.storage.BlobLogs.ByHeight(ctx, 1000, storage.BlobLogFilters{Limit: count + 10})
+			s.Require().NoError(err)
+
+			bySource := make(map[string]types.BlobSource, len(stored))
+			for i := range stored {
+				bySource[stored[i].Commitment] = stored[i].Source
+			}
+			for i := range logs {
+				s.Require().Equalf(logs[i].Source, bySource[logs[i].Commitment], "commitment %s", logs[i].Commitment)
+			}
+
+			// The source filter must narrow the very same rows.
+			for _, source := range []types.BlobSource{types.BlobSourcePfb, types.BlobSourceFibre} {
+				filtered, err := s.storage.BlobLogs.ByHeight(ctx, 1000, storage.BlobLogFilters{
+					Limit:  count + 10,
+					Source: source.String(),
+				})
+				s.Require().NoError(err)
+				s.Require().NotEmptyf(filtered, "no %s blobs came back", source)
+				for i := range filtered {
+					s.Require().Equalf(source, filtered[i].Source, "commitment %s", filtered[i].Commitment)
+				}
+			}
+
+			// An unknown source is ignored rather than returning nothing.
+			all, err := s.storage.BlobLogs.ByHeight(ctx, 1000, storage.BlobLogFilters{
+				Limit:  count + 10,
+				Source: "nonsense",
+			})
+			s.Require().NoError(err)
+			s.Require().Len(all, len(stored))
+		})
+	}
 }
 
 func (s *TransactionTestSuite) TestSaveBlobLogsWithCopy() {
@@ -349,6 +425,7 @@ func (s *TransactionTestSuite) TestSaveBlobLogsWithCopy() {
 		blobLogs[i].ShareVersion = 1
 		blobLogs[i].SignerId = uint64(i * 3)
 		blobLogs[i].Size = 123
+		blobLogs[i].Source = types.BlobSourcePfb
 	}
 
 	err = tx.SaveBlobLogs(ctx, blobLogs...)
@@ -1652,6 +1729,82 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 	s.Require().NoError(err)
 	s.Require().NotNil(v.Jailed)
 	s.Require().True(*v.Jailed)
+}
+
+// TestSaveValidatorsFibreHost covers the x/valaddr registry upsert: a validator
+// may set its fibre host and later move it, and an unrelated validator update
+// must not wipe the host that is already stored.
+func (s *TransactionTestSuite) TestSaveValidatorsFibreHost() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	const address = "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw"
+
+	save := func(v *storage.Validator) {
+		s.T().Helper()
+		tx, err := BeginTransaction(ctx, s.storage.Transactable)
+		s.Require().NoError(err)
+		_, err = tx.SaveValidators(ctx, v)
+		s.Require().NoError(err)
+		s.Require().NoError(tx.Flush(ctx))
+		s.Require().NoError(tx.Close(ctx))
+	}
+
+	untouched := func() *storage.Validator {
+		return &storage.Validator{
+			Address:   address,
+			Delegator: "celestia17vmk8m246t648hpmde2q7kp4ft9uwrayps85dg",
+			Stake:     types.NumericZero(),
+			Website:   storage.DoNotModify,
+			Identity:  storage.DoNotModify,
+			Contacts:  storage.DoNotModify,
+			Moniker:   storage.DoNotModify,
+			Details:   storage.DoNotModify,
+		}
+	}
+
+	// Nothing registered yet.
+	v, err := s.storage.Validator.ByAddress(ctx, address)
+	s.Require().NoError(err)
+	s.Require().Nil(v.FibreHost)
+	s.Require().Nil(v.FibreHostHeight)
+
+	// First MsgSetFibreProviderInfo.
+	first := untouched()
+	first.FibreHost = testsuite.Ptr("old.example.com:443")
+	first.FibreHostHeight = testsuite.Ptr(pkgTypes.Level(1001))
+	save(first)
+
+	v, err = s.storage.Validator.ByAddress(ctx, address)
+	s.Require().NoError(err)
+	s.Require().NotNil(v.FibreHost)
+	s.Require().EqualValues("old.example.com:443", *v.FibreHost)
+	s.Require().NotNil(v.FibreHostHeight)
+	s.Require().EqualValues(1001, *v.FibreHostHeight)
+
+	// The validator moves its fibre server: the newest host must win.
+	second := untouched()
+	second.FibreHost = testsuite.Ptr("new.example.com:8443")
+	second.FibreHostHeight = testsuite.Ptr(pkgTypes.Level(1002))
+	save(second)
+
+	v, err = s.storage.Validator.ByAddress(ctx, address)
+	s.Require().NoError(err)
+	s.Require().NotNil(v.FibreHost)
+	s.Require().EqualValues("new.example.com:8443", *v.FibreHost)
+	s.Require().NotNil(v.FibreHostHeight)
+	s.Require().EqualValues(1002, *v.FibreHostHeight)
+
+	// An unrelated update (a reward, a jailing, ...) carries no host and must
+	// leave the registered one alone.
+	save(untouched())
+
+	v, err = s.storage.Validator.ByAddress(ctx, address)
+	s.Require().NoError(err)
+	s.Require().NotNil(v.FibreHost)
+	s.Require().EqualValues("new.example.com:8443", *v.FibreHost)
+	s.Require().NotNil(v.FibreHostHeight)
+	s.Require().EqualValues(1002, *v.FibreHostHeight)
 }
 
 func (s *TransactionTestSuite) TestValidators() {
