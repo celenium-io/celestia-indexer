@@ -51,6 +51,10 @@ func processChannelOpenConfirm(ctx *context.Context, c *Cursor, msg *storage.Mes
 		Status:                storageTypes.IbcChannelStatusOpened,
 		ConfirmationTxId:      msg.TxId,
 	}
+	// OpenAck sets the counterparty version and its event has no version attribute
+	if msg.Type == storageTypes.MsgChannelOpenAck {
+		ibcChannel.Version = msg.Data.GetStringOrDefault("CounterpartyVersion")
+	}
 	ctx.AddIbcChannel(ibcChannel)
 
 	c.Skip(2)

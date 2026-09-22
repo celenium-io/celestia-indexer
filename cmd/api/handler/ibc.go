@@ -416,6 +416,9 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 		if err != nil {
 			return handleError(c, err, handler.address)
 		}
+		if len(conns) == 0 {
+			return returnArray(c, []any{})
+		}
 		fltrs.ConnectionIds = conns
 	}
 	if req.Hash != "" {

@@ -310,3 +310,35 @@ func TestCursor_Remaining_EmptyAtEnd(t *testing.T) {
 
 	require.Empty(t, c.Remaining())
 }
+
+func TestCursor_Sub_BoundedByStopKeyAndAdvancesParent(t *testing.T) {
+	c := NewCursor([]storage.Event{
+		event("a", "", ""),
+		event("b", "module", "bank"),
+		event("boundary", "action", "/some.Msg"),
+		event("d", "", ""),
+	})
+
+	sub := c.Sub("action")
+	require.Equal(t, []string{"a", "b"}, labels(collect(sub.MsgEvents("unused"))))
+	_, ok := sub.Next()
+	require.False(t, ok)
+
+	next, ok := c.Peek()
+	require.True(t, ok)
+	require.Equal(t, "boundary", next.Data["label"])
+}
+
+func TestCursor_Sub_AtBoundaryIsEmpty(t *testing.T) {
+	c := NewCursor([]storage.Event{
+		event("boundary", "action", "/some.Msg"),
+	})
+
+	sub := c.Sub("action")
+	_, ok := sub.Peek()
+	require.False(t, ok)
+
+	next, ok := c.Peek()
+	require.True(t, ok)
+	require.Equal(t, "boundary", next.Data["label"])
+}

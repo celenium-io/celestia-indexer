@@ -561,3 +561,46 @@ func TestDecodeMsg_SuccessOnMsgAcknowledgement(t *testing.T) {
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
 }
+
+func TestDecodeMsg_InvalidPacketDataIsSkipped(t *testing.T) {
+	tests := []struct {
+		name string
+		port string
+		data []byte
+	}{
+		{name: "transfer invalid json", port: "transfer", data: []byte(`{"amount":`)},
+		{name: "transfer invalid amount", port: "transfer", data: []byte(`{"amount":"abc","denom":"utia","receiver":"osmo1gutppfxgmwcrm4ws796ma467reu4cj8qg0fxgn","sender":"celestia1gutppfxgmwcrm4ws796ma467reu4cj8q37txyv"}`)},
+		{name: "icahost invalid json", port: "icahost", data: []byte(`not json`)},
+		{name: "unknown port", port: "oracle", data: []byte(`{}`)},
+	}
+
+	for _, tt := range tests {
+		packet := coreChannel.Packet{
+			SourcePort:         tt.port,
+			SourceChannel:      "channel-100",
+			DestinationPort:    tt.port,
+			DestinationChannel: "channel-100",
+			Data:               tt.data,
+		}
+		msgs := map[string]cosmosTypes.Msg{
+			"recv": &coreChannel.MsgRecvPacket{Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6", Packet: packet},
+			"ack":  &coreChannel.MsgAcknowledgement{Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6", Packet: packet},
+		}
+		for kind, msg := range msgs {
+			t.Run(tt.name+" "+kind, func(t *testing.T) {
+				block, _ := testsuite.EmptyBlock()
+				decodeCtx := context.NewContext()
+				decodeCtx.Block = &storage.Block{
+					Height: block.Height,
+					Time:   block.Block.Time,
+				}
+
+				dm, err := decode.Message(decodeCtx, msg, 0, storageTypes.StatusSuccess, 0)
+				require.NoError(t, err)
+				require.NotNil(t, dm.Msg.Data)
+				require.Empty(t, decodeCtx.IbcTransfers)
+				require.Equal(t, 1, decodeCtx.AddressMessages.Len())
+			})
+		}
+	}
+}

@@ -19,6 +19,7 @@ import (
 	transferTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	coreChannel "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 // MsgChannelOpenInit defines an sdk.Msg to initialize a channel handshake. It
@@ -83,7 +84,15 @@ func MsgChannelCloseConfirm(ctx *context.Context, msgId uint64, m *coreChannel.M
 }
 
 // MsgRecvPacket receives an incoming IBC packet
-func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec.Codec, data storageTypes.PackedBytes, txId, msgId uint64, m *coreChannel.MsgRecvPacket) (storageTypes.MsgType, error) {
+func MsgRecvPacket(
+	ctx *context.Context,
+	status storageTypes.Status,
+	codec codec.Codec,
+	data storageTypes.PackedBytes,
+	txId, msgId uint64,
+	m *coreChannel.MsgRecvPacket,
+
+) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgRecvPacket
 	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},
@@ -97,137 +106,8 @@ func MsgRecvPacket(ctx *context.Context, status storageTypes.Status, codec codec
 		return msgType, errors.Errorf("Packet is not map: %T", data["Packet"])
 	}
 
-	switch m.Packet.DestinationPort {
-	case "icahost":
-		var packet icaTypes.InterchainAccountPacketData
-		if err := json.Unmarshal(m.Packet.Data, &packet); err != nil {
-			return msgType, errors.Wrap(err, "InterchainAccountPacketData")
-		}
-
-		packetMapData := map[string]any{
-			"Type": packet.Type,
-			"Memo": packet.Memo,
-		}
-
-		var tx icaTypes.CosmosTx
-		if err := codec.Unmarshal(packet.Data, &tx); err != nil {
-			if err := codec.UnmarshalJSON(packet.Data, &tx); err != nil {
-				packetMapData["Data"] = []cosmosTypes.Msg{}
-				packetMap["Data"] = packetMapData
-				return msgType, nil
-			}
-		}
-
-		msgs := make([]cosmosTypes.Msg, len(tx.Messages))
-		for i, rawMsg := range tx.Messages {
-			var msg cosmosTypes.Msg
-			if err := codec.UnpackAny(rawMsg, &msg); err != nil {
-				return msgType, errors.Wrap(err, "cosmosTypes.Msg")
-			}
-			if grant, ok := msg.(*authz.MsgGrant); ok {
-				grant.Grant.Authorization = nil // TODO: make more beautiful
-			}
-			msgs[i] = msg
-		}
-		packetMapData["Data"] = msgs
-		packetMap["Data"] = packetMapData
-		return msgType, nil
-
-	case "transfer":
-		var packet transferTypes.FungibleTokenPacketData
-		if err := json.Unmarshal(m.Packet.Data, &packet); err != nil {
-			return msgType, errors.Wrap(err, "FungibleTokenPacketData")
-		}
-		packetMap["Data"] = packet
-
-		amount, err := storageTypes.NumericFromString(packet.Amount)
-		if err != nil {
-			return msgType, errors.Wrap(err, "parse transfer amount")
-		}
-		transfer := &storage.IbcTransfer{
-			Amount:    amount,
-			Memo:      packet.Memo,
-			ChannelId: m.Packet.DestinationChannel,
-			Port:      m.Packet.DestinationPort,
-			Sequence:  m.Packet.Sequence,
-			Denom:     packet.Denom,
-			Height:    ctx.Block.Height,
-			Time:      ctx.Block.Time,
-			TxId:      txId,
-		}
-
-		partsDenom := strings.Split(packet.Denom, "/")
-		if len(partsDenom) == 3 {
-			transfer.Denom = partsDenom[2]
-		}
-
-		if m.Packet.TimeoutHeight.RevisionHeight > 0 {
-			transfer.HeightTimeout = m.Packet.TimeoutHeight.RevisionHeight
-		}
-		if m.Packet.TimeoutTimestamp > 0 {
-			ts := math.TimeFromNano(m.Packet.TimeoutTimestamp)
-			transfer.Timeout = &ts
-		}
-
-		channel := &storage.IbcChannel{
-			Id:             m.Packet.DestinationChannel,
-			TransfersCount: 1,
-			Status:         storageTypes.IbcChannelStatusInitialization,
-		}
-		prefix, hash, err := pkgTypes.Address(packet.Receiver).Decode()
-		if err != nil {
-			return msgType, nil
-		}
-		if prefix == pkgTypes.AddressPrefixCelestia {
-			transfer.Receiver = &storage.Address{
-				Address:    packet.Receiver,
-				Balances:   []storage.Balance{storage.EmptyBalance()},
-				Height:     ctx.Block.Height,
-				LastHeight: ctx.Block.Height,
-				Hash:       hash,
-			}
-			if err := ctx.AddAddress(transfer.Receiver); err != nil {
-				return msgType, errors.Wrap(err, "AddAddress receiver")
-			}
-			ctx.AddAddressMessage(&storage.MsgAddress{
-				MsgId:   msgId,
-				Type:    storageTypes.MsgAddressTypeReceiver,
-				Address: transfer.Receiver,
-			})
-			channel.Received = channel.Received.Add(transfer.Amount)
-		} else {
-			transfer.ReceiverAddress = &packet.Receiver
-		}
-		prefix, hash, err = pkgTypes.Address(packet.Sender).Decode()
-		if err != nil {
-			return msgType, nil
-		}
-		if prefix == pkgTypes.AddressPrefixCelestia {
-			transfer.Sender = &storage.Address{
-				Address:    packet.Sender,
-				Balances:   []storage.Balance{storage.EmptyBalance()},
-				Height:     ctx.Block.Height,
-				LastHeight: ctx.Block.Height,
-				Hash:       hash,
-			}
-			if err := ctx.AddAddress(transfer.Sender); err != nil {
-				return msgType, errors.Wrap(err, "AddAddress sender")
-			}
-			ctx.AddAddressMessage(&storage.MsgAddress{
-				MsgId:   msgId,
-				Type:    storageTypes.MsgAddressTypeSender,
-				Address: transfer.Sender,
-			})
-			channel.Sent = channel.Sent.Add(transfer.Amount)
-		} else {
-			transfer.SenderAddress = &packet.Sender
-		}
-		ctx.AddIbcChannel(channel)
-		ctx.AddIbcTransfer(transfer)
-		return msgType, nil
-	default:
-		return msgType, errors.Errorf("unknown destination port: %s", m.Packet.DestinationPort)
-	}
+	err = handlePacketData(ctx, codec, packetMap, m.Packet, m.Packet.DestinationPort, m.Packet.DestinationChannel, txId, msgId)
+	return msgType, err
 }
 
 // MsgTimeout receives a timed-out packet
@@ -263,135 +143,8 @@ func MsgAcknowledgement(ctx *context.Context, status storageTypes.Status, codec 
 		return msgType, errors.Errorf("Packet is not map: %T", data["Packet"])
 	}
 
-	switch m.Packet.SourcePort {
-	case "icahost":
-		var packet icaTypes.InterchainAccountPacketData
-		if err := json.Unmarshal(m.Packet.Data, &packet); err != nil {
-			return msgType, errors.Wrap(err, "InterchainAccountPacketData")
-		}
-
-		packetMapData := map[string]any{
-			"Type": packet.Type,
-			"Memo": packet.Memo,
-		}
-
-		var tx icaTypes.CosmosTx
-		if err := codec.Unmarshal(packet.Data, &tx); err != nil {
-			if err := codec.UnmarshalJSON(packet.Data, &tx); err != nil {
-				packetMapData["Data"] = []cosmosTypes.Msg{}
-				packetMap["Data"] = packetMapData
-				return msgType, nil
-			}
-		}
-
-		msgs := make([]cosmosTypes.Msg, len(tx.Messages))
-		for i, rawMsg := range tx.Messages {
-			var msg cosmosTypes.Msg
-			if err := codec.UnpackAny(rawMsg, &msg); err != nil {
-				return msgType, errors.Wrap(err, "cosmosTypes.Msg")
-			}
-			msgs[i] = msg
-		}
-		packetMapData["Data"] = msgs
-		packetMap["Data"] = packetMapData
-		return msgType, nil
-
-	case "transfer":
-		var packet transferTypes.FungibleTokenPacketData
-		if err := json.Unmarshal(m.Packet.Data, &packet); err != nil {
-			return msgType, errors.Wrap(err, "FungibleTokenPacketData")
-		}
-		packetMap["Data"] = packet
-
-		amount, err := storageTypes.NumericFromString(packet.Amount)
-		if err != nil {
-			return msgType, errors.Wrap(err, "parse transfer amount")
-		}
-		transfer := &storage.IbcTransfer{
-			Amount:    amount,
-			Memo:      packet.Memo,
-			ChannelId: m.Packet.SourceChannel,
-			Port:      m.Packet.SourcePort,
-			Sequence:  m.Packet.Sequence,
-			Denom:     packet.Denom,
-			Height:    ctx.Block.Height,
-			Time:      ctx.Block.Time,
-			TxId:      txId,
-		}
-
-		partsDenom := strings.Split(packet.Denom, "/")
-		if len(partsDenom) == 3 {
-			transfer.Denom = partsDenom[2]
-		}
-
-		if m.Packet.TimeoutHeight.RevisionHeight > 0 {
-			transfer.HeightTimeout = m.Packet.TimeoutHeight.RevisionHeight
-		}
-		if m.Packet.TimeoutTimestamp > 0 {
-			ts := math.TimeFromNano(m.Packet.TimeoutTimestamp)
-			transfer.Timeout = &ts
-		}
-
-		channel := &storage.IbcChannel{
-			Id:             m.Packet.SourceChannel,
-			TransfersCount: 1,
-			Status:         storageTypes.IbcChannelStatusInitialization,
-		}
-		prefix, hash, err := pkgTypes.Address(packet.Receiver).Decode()
-		if err != nil {
-			return msgType, nil
-		}
-		if prefix == pkgTypes.AddressPrefixCelestia {
-			transfer.Receiver = &storage.Address{
-				Address:    packet.Receiver,
-				Balances:   []storage.Balance{storage.EmptyBalance()},
-				Height:     ctx.Block.Height,
-				LastHeight: ctx.Block.Height,
-				Hash:       hash,
-			}
-			if err := ctx.AddAddress(transfer.Receiver); err != nil {
-				return msgType, errors.Wrap(err, "AddAddress receiver")
-			}
-			ctx.AddAddressMessage(&storage.MsgAddress{
-				MsgId:   msgId,
-				Type:    storageTypes.MsgAddressTypeReceiver,
-				Address: transfer.Receiver,
-			})
-			channel.Received = channel.Received.Add(transfer.Amount)
-		} else {
-			transfer.ReceiverAddress = &packet.Receiver
-		}
-		prefix, hash, err = pkgTypes.Address(packet.Sender).Decode()
-		if err != nil {
-			return msgType, nil
-		}
-		if prefix == pkgTypes.AddressPrefixCelestia {
-			transfer.Sender = &storage.Address{
-				Address:    packet.Sender,
-				Balances:   []storage.Balance{storage.EmptyBalance()},
-				Height:     ctx.Block.Height,
-				LastHeight: ctx.Block.Height,
-				Hash:       hash,
-			}
-			if err := ctx.AddAddress(transfer.Sender); err != nil {
-				return msgType, errors.Wrap(err, "AddAddress sender")
-			}
-			ctx.AddAddressMessage(&storage.MsgAddress{
-				MsgId:   msgId,
-				Type:    storageTypes.MsgAddressTypeSender,
-				Address: transfer.Sender,
-			})
-			channel.Sent = channel.Sent.Add(transfer.Amount)
-		} else {
-			transfer.SenderAddress = &packet.Sender
-		}
-
-		ctx.AddIbcChannel(channel)
-		ctx.AddIbcTransfer(transfer)
-		return msgType, nil
-	default:
-		return msgType, errors.Errorf("unknown source port: %s", m.Packet.SourcePort)
-	}
+	err = handlePacketData(ctx, codec, packetMap, m.Packet, m.Packet.SourcePort, m.Packet.SourceChannel, txId, msgId)
+	return msgType, err
 }
 
 func MsgUpdateParamsChannel(ctx *context.Context, msgId uint64, m *coreChannel.MsgUpdateParams) (storageTypes.MsgType, error) {
@@ -400,4 +153,160 @@ func MsgUpdateParamsChannel(ctx *context.Context, msgId uint64, m *coreChannel.M
 		{t: storageTypes.MsgAddressTypeAuthority, address: m.Authority},
 	}, ctx.Block.Height, msgId)
 	return msgType, err
+}
+
+// handlePacketData decodes relayer-supplied packet payload. Malformed data or unknown ports are
+// accepted on-chain with an error ack, so they are logged and skipped instead of halting the indexer.
+func handlePacketData(
+	ctx *context.Context,
+	codec codec.Codec,
+	packetMap map[string]any,
+	packet coreChannel.Packet,
+	port, channel string,
+	txId, msgId uint64,
+) error {
+	switch port {
+	case "icahost":
+		handleIcaPacketData(ctx, codec, packetMap, packet, port, channel, msgId)
+		return nil
+	case "transfer":
+		return handleTransferPacketData(ctx, packetMap, packet, port, channel, txId, msgId)
+	default:
+		logSkippedPacket(ctx, packet, port, channel, msgId, errors.New("unknown port"))
+		return nil
+	}
+}
+
+func handleIcaPacketData(
+	ctx *context.Context,
+	codec codec.Codec,
+	packetMap map[string]any,
+	packet coreChannel.Packet,
+	port, channel string,
+	msgId uint64,
+) {
+	var data icaTypes.InterchainAccountPacketData
+	if err := json.Unmarshal(packet.Data, &data); err != nil {
+		logSkippedPacket(ctx, packet, port, channel, msgId, errors.Wrap(err, "InterchainAccountPacketData"))
+		return
+	}
+
+	packetMapData := map[string]any{
+		"Type": data.Type,
+		"Memo": data.Memo,
+		"Data": []cosmosTypes.Msg{},
+	}
+	packetMap["Data"] = packetMapData
+
+	var tx icaTypes.CosmosTx
+	if err := codec.Unmarshal(data.Data, &tx); err != nil {
+		if err := codec.UnmarshalJSON(data.Data, &tx); err != nil {
+			return
+		}
+	}
+
+	msgs := make([]cosmosTypes.Msg, len(tx.Messages))
+	for i, rawMsg := range tx.Messages {
+		var msg cosmosTypes.Msg
+		if err := codec.UnpackAny(rawMsg, &msg); err != nil {
+			logSkippedPacket(ctx, packet, port, channel, msgId, errors.Wrap(err, "cosmosTypes.Msg"))
+			return
+		}
+		if grant, ok := msg.(*authz.MsgGrant); ok {
+			grant.Grant.Authorization = nil // TODO: make more beautiful
+		}
+		msgs[i] = msg
+	}
+	packetMapData["Data"] = msgs
+}
+
+func handleTransferPacketData(
+	ctx *context.Context,
+	packetMap map[string]any,
+	packet coreChannel.Packet,
+	port, channel string,
+	txId, msgId uint64,
+) error {
+	var data transferTypes.FungibleTokenPacketData
+	if err := json.Unmarshal(packet.Data, &data); err != nil {
+		logSkippedPacket(ctx, packet, port, channel, msgId, errors.Wrap(err, "FungibleTokenPacketData"))
+		return nil
+	}
+	packetMap["Data"] = data
+
+	amount, err := storageTypes.NumericFromString(data.Amount)
+	if err != nil {
+		logSkippedPacket(ctx, packet, port, channel, msgId, errors.Wrap(err, "parse transfer amount"))
+		return nil
+	}
+	transfer := &storage.IbcTransfer{
+		Amount:    amount,
+		Memo:      data.Memo,
+		ChannelId: channel,
+		Port:      port,
+		Sequence:  packet.Sequence,
+		Denom:     data.Denom,
+		Height:    ctx.Block.Height,
+		Time:      ctx.Block.Time,
+		TxId:      txId,
+	}
+
+	partsDenom := strings.Split(data.Denom, "/")
+	if len(partsDenom) == 3 {
+		transfer.Denom = partsDenom[2]
+	}
+
+	if packet.TimeoutHeight.RevisionHeight > 0 {
+		transfer.HeightTimeout = packet.TimeoutHeight.RevisionHeight
+	}
+	if packet.TimeoutTimestamp > 0 {
+		ts := math.TimeFromNano(packet.TimeoutTimestamp)
+		transfer.Timeout = &ts
+	}
+
+	transfer.Receiver, transfer.ReceiverAddress, err = ibcTransferParty(ctx, data.Receiver, msgId, storageTypes.MsgAddressTypeReceiver)
+	if err != nil {
+		return errors.Wrap(err, "receiver")
+	}
+	transfer.Sender, transfer.SenderAddress, err = ibcTransferParty(ctx, data.Sender, msgId, storageTypes.MsgAddressTypeSender)
+	if err != nil {
+		return errors.Wrap(err, "sender")
+	}
+	ctx.AddIbcTransfer(msgId, transfer)
+	return nil
+}
+
+func logSkippedPacket(ctx *context.Context, packet coreChannel.Packet, port, channel string, msgId uint64, err error) {
+	log.Warn().
+		Err(err).
+		Int64("height", int64(ctx.Block.Height)).
+		Uint64("msg_id", msgId).
+		Str("port", port).
+		Str("channel", channel).
+		Uint64("sequence", packet.Sequence).
+		Msg("skip invalid IBC packet data")
+}
+
+// ibcTransferParty indexes a celestia address; any other one, including non-bech32 (e.g. 0x...), is kept as a raw string
+func ibcTransferParty(ctx *context.Context, address string, msgId uint64, typ storageTypes.MsgAddressType) (*storage.Address, *string, error) {
+	prefix, hash, err := pkgTypes.Address(address).Decode()
+	if err != nil || prefix != pkgTypes.AddressPrefixCelestia {
+		return nil, &address, nil
+	}
+	addr := &storage.Address{
+		Address:    address,
+		Balances:   []storage.Balance{storage.EmptyBalance()},
+		Height:     ctx.Block.Height,
+		LastHeight: ctx.Block.Height,
+		Hash:       hash,
+	}
+	if err := ctx.AddAddress(addr); err != nil {
+		return nil, nil, errors.Wrap(err, "AddAddress")
+	}
+	ctx.AddAddressMessage(&storage.MsgAddress{
+		MsgId:   msgId,
+		Type:    typ,
+		Address: addr,
+	})
+	return addr, nil, nil
 }

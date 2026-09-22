@@ -354,6 +354,10 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 	if err != nil {
 		return state, err
 	}
+	// after saving clients: a substitute updated in this block must be read with its new state
+	if err := module.recoverIbcClients(ctx, tx, dCtx.RecoveredIbcClients, dCtx.Proposals, dCtx.Block.Time); err != nil {
+		return state, err
+	}
 	if err := tx.SaveIbcConnections(ctx, dCtx.IbcConnections.Values()...); err != nil {
 		return state, err
 	}

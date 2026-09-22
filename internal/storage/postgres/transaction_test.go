@@ -1946,11 +1946,134 @@ func (s *TransactionTestSuite) TestIbcClients() {
 	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx2.RollbackIbcClients(ctx, 10000)
+	removed, err := tx2.RollbackIbcClients(ctx, 10000)
 	s.Require().NoError(err)
+	s.Require().Greater(removed, int64(0))
 
 	s.Require().NoError(tx2.Flush(ctx))
 	s.Require().NoError(tx2.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestIbcClientsLatestHeightOnlyGrows() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	// fixture: client-1 is at 1-1000
+	tests := []struct {
+		name       string
+		number     uint64
+		height     uint64
+		wantNumber uint64
+		wantHeight uint64
+	}{
+		{"lower height is ignored", 1, 900, 1, 1000},
+		{"higher height is applied", 1, 1100, 1, 1100},
+		{"new revision resets height", 2, 5, 2, 5},
+		{"old revision is ignored", 1, 5000, 2, 5},
+	}
+	for _, tt := range tests {
+		tx, err := BeginTransaction(ctx, s.storage.Transactable)
+		s.Require().NoError(err, tt.name)
+
+		_, err = tx.SaveIbcClients(ctx, &storage.IbcClient{
+			Id:                   "client-1",
+			LatestRevisionNumber: tt.number,
+			LatestRevisionHeight: tt.height,
+		})
+		s.Require().NoError(err, tt.name)
+		s.Require().NoError(tx.Flush(ctx), tt.name)
+		s.Require().NoError(tx.Close(ctx), tt.name)
+
+		client, err := s.storage.IbcClients.ById(ctx, "client-1")
+		s.Require().NoError(err, tt.name)
+		s.Require().Equal(tt.wantNumber, client.LatestRevisionNumber, tt.name)
+		s.Require().Equal(tt.wantHeight, client.LatestRevisionHeight, tt.name)
+	}
+}
+
+func (s *TransactionTestSuite) TestRecoverIbcClient() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	recoveredAt := time.Date(2026, 9, 22, 0, 0, 0, 0, time.UTC)
+
+	// fixture: client-1 is osmosis-1 at 1-1000, trusting period 20000000
+	tests := []struct {
+		name         string
+		substitute   *storage.IbcClient
+		wantChainId  string
+		wantTrusting time.Duration
+		wantHeight   uint64
+	}{
+		{
+			name: "copies substitute state",
+			substitute: &storage.IbcClient{
+				Id:                   "client-substitute",
+				ChainId:              "osmosis-1b",
+				TrustingPeriod:       30000000,
+				LatestRevisionNumber: 1,
+				LatestRevisionHeight: 2000,
+			},
+			wantChainId:  "osmosis-1b",
+			wantTrusting: 30000000,
+			wantHeight:   2000,
+		}, {
+			// substitute never updated (no chain id yet) or solomachine (no trusting period)
+			name: "keeps own chain id and trusting period",
+			substitute: &storage.IbcClient{
+				Id:                   "client-substitute",
+				LatestRevisionNumber: 1,
+				LatestRevisionHeight: 2000,
+			},
+			wantChainId:  "osmosis-1",
+			wantTrusting: 20000000,
+			wantHeight:   2000,
+		}, {
+			name:         "unknown substitute: only unfrozen",
+			wantChainId:  "osmosis-1",
+			wantTrusting: 20000000,
+			wantHeight:   1000,
+		},
+	}
+	for _, tt := range tests {
+		s.Run(tt.name, func() {
+			s.BeforeTest("", "")
+
+			tx, err := BeginTransaction(ctx, s.storage.Transactable)
+			s.Require().NoError(err)
+
+			clients := []*storage.IbcClient{{Id: "client-1", FrozenRevisionHeight: 1}}
+			if tt.substitute != nil {
+				clients = append(clients, tt.substitute)
+			}
+			_, err = tx.SaveIbcClients(ctx, clients...)
+			s.Require().NoError(err)
+
+			substituteId := ""
+			if tt.substitute != nil {
+				substituteId = tt.substitute.Id
+			}
+			s.Require().NoError(tx.RecoverIbcClient(ctx, "client-1", substituteId, recoveredAt))
+			s.Require().NoError(tx.Flush(ctx))
+			s.Require().NoError(tx.Close(ctx))
+
+			client, err := s.storage.IbcClients.ById(ctx, "client-1")
+			s.Require().NoError(err)
+			s.Require().Zero(client.FrozenRevisionHeight)
+			s.Require().Zero(client.FrozenRevisionNumber)
+			s.Require().Equal(tt.wantChainId, client.ChainId)
+			s.Require().Equal(tt.wantTrusting, client.TrustingPeriod)
+			s.Require().EqualValues(1, client.LatestRevisionNumber)
+			s.Require().Equal(tt.wantHeight, client.LatestRevisionHeight)
+			s.Require().True(recoveredAt.Equal(client.UpdatedAt))
+
+			if tt.substitute != nil {
+				substitute, err := s.storage.IbcClients.ById(ctx, tt.substitute.Id)
+				s.Require().NoError(err)
+				s.Require().Equal(tt.substitute.LatestRevisionHeight, substitute.LatestRevisionHeight)
+			}
+		})
+	}
 }
 
 func (s *TransactionTestSuite) TestIbcConnections() {
@@ -1981,8 +2104,9 @@ func (s *TransactionTestSuite) TestIbcConnections() {
 	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx2.RollbackIbcClients(ctx, 10000)
+	removed, err := tx2.RollbackIbcConnections(ctx, 10000)
 	s.Require().NoError(err)
+	s.Require().Greater(removed, int64(0))
 
 	s.Require().NoError(tx2.Flush(ctx))
 	s.Require().NoError(tx2.Close(ctx))
@@ -2025,8 +2149,9 @@ func (s *TransactionTestSuite) TestIbcChannels() {
 	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx2.RollbackIbcClients(ctx, 10000)
+	count, err := tx2.RollbackIbcChannels(ctx, 10000)
 	s.Require().NoError(err)
+	s.Require().Greater(count, int64(0))
 
 	s.Require().NoError(tx2.Flush(ctx))
 	s.Require().NoError(tx2.Close(ctx))
@@ -2035,6 +2160,11 @@ func (s *TransactionTestSuite) TestIbcChannels() {
 func (s *TransactionTestSuite) TestIbcTransfers() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
+
+	countBefore, err := s.storage.Connection().DB().NewSelect().
+		Model(&storage.IbcTransfer{}).
+		Count(ctx)
+	s.Require().NoError(err)
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
@@ -2064,6 +2194,13 @@ func (s *TransactionTestSuite) TestIbcTransfers() {
 
 	s.Require().NoError(tx2.Flush(ctx))
 	s.Require().NoError(tx2.Close(ctx))
+
+	countAfter, err := s.storage.Connection().DB().NewSelect().
+		Model(&storage.IbcTransfer{}).
+		Count(ctx)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(countBefore, countAfter)
 }
 
 func (s *TransactionTestSuite) TestIbcConnection() {

@@ -215,6 +215,44 @@ const (
 	EventTypeCelestiafibrev1EventProcessedPaymentPruned EventType = "celestia.fibre.v1.EventProcessedPaymentPruned"
 	// EventTypeSetFibreProviderInfo is a EventType of type set_fibre_provider_info.
 	EventTypeSetFibreProviderInfo EventType = "set_fibre_provider_info"
+	// EventTypeClientMisbehaviour is a EventType of type client_misbehaviour.
+	EventTypeClientMisbehaviour EventType = "client_misbehaviour"
+	// EventTypeUpgradeClient is a EventType of type upgrade_client.
+	EventTypeUpgradeClient EventType = "upgrade_client"
+	// EventTypeRecoverClient is a EventType of type recover_client.
+	EventTypeRecoverClient EventType = "recover_client"
+	// EventTypeScheduleIbcSoftwareUpgrade is a EventType of type schedule_ibc_software_upgrade.
+	EventTypeScheduleIbcSoftwareUpgrade EventType = "schedule_ibc_software_upgrade"
+	// EventTypeUpgradeChain is a EventType of type upgrade_chain.
+	EventTypeUpgradeChain EventType = "upgrade_chain"
+	// EventTypeChannelCloseInit is a EventType of type channel_close_init.
+	EventTypeChannelCloseInit EventType = "channel_close_init"
+	// EventTypeChannelClose is a EventType of type channel_close.
+	EventTypeChannelClose EventType = "channel_close"
+	// EventTypeChannelUpgradeInit is a EventType of type channel_upgrade_init.
+	EventTypeChannelUpgradeInit EventType = "channel_upgrade_init"
+	// EventTypeChannelUpgradeTry is a EventType of type channel_upgrade_try.
+	EventTypeChannelUpgradeTry EventType = "channel_upgrade_try"
+	// EventTypeChannelUpgradeAck is a EventType of type channel_upgrade_ack.
+	EventTypeChannelUpgradeAck EventType = "channel_upgrade_ack"
+	// EventTypeChannelUpgradeConfirm is a EventType of type channel_upgrade_confirm.
+	EventTypeChannelUpgradeConfirm EventType = "channel_upgrade_confirm"
+	// EventTypeChannelUpgradeOpen is a EventType of type channel_upgrade_open.
+	EventTypeChannelUpgradeOpen EventType = "channel_upgrade_open"
+	// EventTypeChannelUpgradeTimeout is a EventType of type channel_upgrade_timeout.
+	EventTypeChannelUpgradeTimeout EventType = "channel_upgrade_timeout"
+	// EventTypeChannelUpgradeCancelled is a EventType of type channel_upgrade_cancelled.
+	EventTypeChannelUpgradeCancelled EventType = "channel_upgrade_cancelled"
+	// EventTypeChannelUpgradeError is a EventType of type channel_upgrade_error.
+	EventTypeChannelUpgradeError EventType = "channel_upgrade_error"
+	// EventTypeChannelFlushComplete is a EventType of type channel_flush_complete.
+	EventTypeChannelFlushComplete EventType = "channel_flush_complete"
+	// EventTypeChannelClosed is a EventType of type channel_closed.
+	EventTypeChannelClosed EventType = "channel_closed"
+	// EventTypeDenominationTrace is a EventType of type denomination_trace.
+	EventTypeDenominationTrace EventType = "denomination_trace"
+	// EventTypeIbccallbackerrorDenominationTrace is a EventType of type ibccallbackerror-denomination_trace.
+	EventTypeIbccallbackerrorDenominationTrace EventType = "ibccallbackerror-denomination_trace"
 )
 
 var ErrInvalidEventType = fmt.Errorf("not a valid EventType, try [%s]", strings.Join(_EventTypeNames, ", "))
@@ -319,6 +357,25 @@ var _EventTypeNames = []string{
 	string(EventTypeCelestiafibrev1EventUpdateFibreParams),
 	string(EventTypeCelestiafibrev1EventProcessedPaymentPruned),
 	string(EventTypeSetFibreProviderInfo),
+	string(EventTypeClientMisbehaviour),
+	string(EventTypeUpgradeClient),
+	string(EventTypeRecoverClient),
+	string(EventTypeScheduleIbcSoftwareUpgrade),
+	string(EventTypeUpgradeChain),
+	string(EventTypeChannelCloseInit),
+	string(EventTypeChannelClose),
+	string(EventTypeChannelUpgradeInit),
+	string(EventTypeChannelUpgradeTry),
+	string(EventTypeChannelUpgradeAck),
+	string(EventTypeChannelUpgradeConfirm),
+	string(EventTypeChannelUpgradeOpen),
+	string(EventTypeChannelUpgradeTimeout),
+	string(EventTypeChannelUpgradeCancelled),
+	string(EventTypeChannelUpgradeError),
+	string(EventTypeChannelFlushComplete),
+	string(EventTypeChannelClosed),
+	string(EventTypeDenominationTrace),
+	string(EventTypeIbccallbackerrorDenominationTrace),
 }
 
 // EventTypeNames returns a list of possible string values of EventType.
@@ -430,6 +487,25 @@ func EventTypeValues() []EventType {
 		EventTypeCelestiafibrev1EventUpdateFibreParams,
 		EventTypeCelestiafibrev1EventProcessedPaymentPruned,
 		EventTypeSetFibreProviderInfo,
+		EventTypeClientMisbehaviour,
+		EventTypeUpgradeClient,
+		EventTypeRecoverClient,
+		EventTypeScheduleIbcSoftwareUpgrade,
+		EventTypeUpgradeChain,
+		EventTypeChannelCloseInit,
+		EventTypeChannelClose,
+		EventTypeChannelUpgradeInit,
+		EventTypeChannelUpgradeTry,
+		EventTypeChannelUpgradeAck,
+		EventTypeChannelUpgradeConfirm,
+		EventTypeChannelUpgradeOpen,
+		EventTypeChannelUpgradeTimeout,
+		EventTypeChannelUpgradeCancelled,
+		EventTypeChannelUpgradeError,
+		EventTypeChannelFlushComplete,
+		EventTypeChannelClosed,
+		EventTypeDenominationTrace,
+		EventTypeIbccallbackerrorDenominationTrace,
 	}
 }
 
@@ -545,6 +621,25 @@ var _EventTypeValue = map[string]EventType{
 	"celestia.fibre.v1.EventUpdateFibreParams":              EventTypeCelestiafibrev1EventUpdateFibreParams,
 	"celestia.fibre.v1.EventProcessedPaymentPruned":         EventTypeCelestiafibrev1EventProcessedPaymentPruned,
 	"set_fibre_provider_info":                               EventTypeSetFibreProviderInfo,
+	"client_misbehaviour":                                   EventTypeClientMisbehaviour,
+	"upgrade_client":                                        EventTypeUpgradeClient,
+	"recover_client":                                        EventTypeRecoverClient,
+	"schedule_ibc_software_upgrade":                         EventTypeScheduleIbcSoftwareUpgrade,
+	"upgrade_chain":                                         EventTypeUpgradeChain,
+	"channel_close_init":                                    EventTypeChannelCloseInit,
+	"channel_close":                                         EventTypeChannelClose,
+	"channel_upgrade_init":                                  EventTypeChannelUpgradeInit,
+	"channel_upgrade_try":                                   EventTypeChannelUpgradeTry,
+	"channel_upgrade_ack":                                   EventTypeChannelUpgradeAck,
+	"channel_upgrade_confirm":                               EventTypeChannelUpgradeConfirm,
+	"channel_upgrade_open":                                  EventTypeChannelUpgradeOpen,
+	"channel_upgrade_timeout":                               EventTypeChannelUpgradeTimeout,
+	"channel_upgrade_cancelled":                             EventTypeChannelUpgradeCancelled,
+	"channel_upgrade_error":                                 EventTypeChannelUpgradeError,
+	"channel_flush_complete":                                EventTypeChannelFlushComplete,
+	"channel_closed":                                        EventTypeChannelClosed,
+	"denomination_trace":                                    EventTypeDenominationTrace,
+	"ibccallbackerror-denomination_trace":                   EventTypeIbccallbackerrorDenominationTrace,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

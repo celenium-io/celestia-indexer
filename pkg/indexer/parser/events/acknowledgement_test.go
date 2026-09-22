@@ -4,6 +4,7 @@
 package events
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -375,7 +376,7 @@ func Test_handleAcknowledgement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for i := range tt.msg {
-				tt.ctx.AddIbcTransfer(tt.transfer)
+				tt.ctx.AddIbcTransfer(tt.msg[i].Id, tt.transfer)
 				c := NewCursor(tt.events)
 				c.Skip(tt.idx)
 				err := handleAcknowledgement(tt.ctx, c, tt.msg[i])
@@ -389,4 +390,151 @@ func Test_handleAcknowledgement(t *testing.T) {
 			}
 		})
 	}
+}
+
+func ackTransferEvents(seq, result string) []storage.Event {
+	return []storage.Event{
+		{Type: "message", Data: map[string]string{"action": "/ibc.core.channel.v1.MsgAcknowledgement"}},
+		{Type: "acknowledge_packet", Data: map[string]string{
+			"packet_connection":  "connection-2",
+			"packet_src_channel": "channel-2",
+			"packet_src_port":    "transfer",
+			"packet_sequence":    seq,
+		}},
+		{Type: "message", Data: map[string]string{"module": "ibc_channel"}},
+		{Type: "fungible_token_packet", Data: map[string]string{
+			"module":   "transfer",
+			"sender":   "celestia1nc44cmtgmp6cwch2ccfp6txdelu6qtz963ksrw",
+			"receiver": "osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv",
+			"amount":   "1000",
+			"denom":    "utia",
+		}},
+		{Type: "fungible_token_packet", Data: map[string]string{result: "ABCI code: 1: error handling packet"}},
+	}
+}
+
+func ackTransferMsg(id uint64) *storage.Message {
+	return &storage.Message{
+		Id:   id,
+		Type: types.MsgAcknowledgement,
+		Data: types.PackedBytes{
+			"Packet": map[string]any{
+				"Data": transferTypes.FungibleTokenPacketData{
+					Amount:   "1000",
+					Denom:    "utia",
+					Sender:   "celestia1nc44cmtgmp6cwch2ccfp6txdelu6qtz963ksrw",
+					Receiver: "osmo1vkdakqqg5htq5c3wy2kj2geq536q665xdexrtjuwqckpads2c2nsvhhcyv",
+				},
+				"SourceChannel": "channel-2",
+				"SourcePort":    "transfer",
+			},
+		},
+	}
+}
+
+func ackTransfer(seq uint64) *storage.IbcTransfer {
+	return &storage.IbcTransfer{
+		Port:      "transfer",
+		ChannelId: "channel-2",
+		Sequence:  seq,
+		Amount:    types.NumericFromInt64(1000),
+		Sender:    &storage.Address{Address: "celestia1nc44cmtgmp6cwch2ccfp6txdelu6qtz963ksrw"},
+	}
+}
+
+func Test_handleAcknowledgement_LastEventInTx(t *testing.T) {
+	tests := []struct {
+		name          string
+		result        string
+		withNextMsg   bool
+		wantTransfers int
+	}{
+		{name: "error ack is last event in tx", result: "error", wantTransfers: 0},
+		{name: "error ack followed by next message", result: "error", withNextMsg: true, wantTransfers: 0},
+		{name: "success ack is last event in tx", result: "success", wantTransfers: 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			events := ackTransferEvents("1", tt.result)
+			if tt.withNextMsg {
+				events = append(events, storage.Event{Type: "message", Data: map[string]string{"action": "/cosmos.bank.v1beta1.MsgSend"}})
+			}
+
+			ctx := context.NewContext()
+			ctx.AddIbcTransfer(1, ackTransfer(1))
+
+			c := NewCursor(events)
+			require.NoError(t, handleAcknowledgement(ctx, c, ackTransferMsg(1)))
+			require.Len(t, ctx.IbcTransfers, tt.wantTransfers)
+			// channel stats follow confirmed transfers only
+			require.Equal(t, tt.wantTransfers, ctx.IbcChannels.Len())
+
+			if tt.withNextMsg {
+				next, ok := c.Peek()
+				require.True(t, ok)
+				require.Equal(t, "/cosmos.bank.v1beta1.MsgSend", next.Data["action"])
+			} else {
+				require.Empty(t, c.Remaining())
+			}
+		})
+	}
+}
+
+func Test_handleAcknowledgement_RelayerBatch(t *testing.T) {
+	// relayer batch [UpdateClient, Ack(success), Ack(error)]: only the error ack's transfer is dropped
+	events := slices.Concat(
+		[]storage.Event{
+			{Type: "message", Data: map[string]string{"action": "/ibc.core.client.v1.MsgUpdateClient"}},
+			{Type: "update_client", Data: map[string]string{"client_id": "07-tendermint-0"}},
+		},
+		ackTransferEvents("1", "success"),
+		ackTransferEvents("2", "error"),
+	)
+
+	ctx := context.NewContext()
+	c := NewCursor(events)
+	c.Skip(2)
+
+	ctx.AddIbcTransfer(1, ackTransfer(1))
+	require.NoError(t, handleAcknowledgement(ctx, c, ackTransferMsg(1)))
+
+	next, ok := c.Peek()
+	require.True(t, ok)
+	require.Equal(t, "/ibc.core.channel.v1.MsgAcknowledgement", next.Data["action"])
+
+	ctx.AddIbcTransfer(2, ackTransfer(2))
+	require.NoError(t, handleAcknowledgement(ctx, c, ackTransferMsg(2)))
+	require.Empty(t, c.Remaining())
+
+	require.Len(t, ctx.IbcTransfers, 1)
+	require.EqualValues(t, 1, ctx.IbcTransfers[0].Sequence)
+	require.Equal(t, "connection-2", ctx.IbcTransfers[0].ConnectionId)
+
+	// the failed ack must not wipe the successful one's channel stats
+	ch, ok := ctx.IbcChannels.Get("channel-2")
+	require.True(t, ok)
+	require.EqualValues(t, 1, ch.TransfersCount)
+	require.Equal(t, "1000", ch.Sent.String())
+}
+
+func Test_handleAcknowledgement_Redelivered(t *testing.T) {
+	// ibc-go treats an already acknowledged packet as NOOP and emits no events for it
+	events := ackTransferEvents("1", "success")
+	events = append(events, storage.Event{Type: "message", Data: map[string]string{"action": "/ibc.core.channel.v1.MsgAcknowledgement"}})
+
+	ctx := context.NewContext()
+	c := NewCursor(events)
+
+	ctx.AddIbcTransfer(1, ackTransfer(1))
+	require.NoError(t, handleAcknowledgement(ctx, c, ackTransferMsg(1)))
+
+	ctx.AddIbcTransfer(2, ackTransfer(1))
+	require.NoError(t, handleAcknowledgement(ctx, c, ackTransferMsg(2)))
+
+	require.Len(t, ctx.IbcTransfers, 1)
+	ch, ok := ctx.IbcChannels.Get("channel-2")
+	require.True(t, ok)
+	require.EqualValues(t, 1, ch.TransfersCount)
+	require.Equal(t, "1000", ch.Sent.String())
 }

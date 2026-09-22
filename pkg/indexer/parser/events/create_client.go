@@ -8,6 +8,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
+	solomachine "github.com/cosmos/ibc-go/v8/modules/light-clients/06-solomachine"
+	tendermint "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/pkg/errors"
 )
 
@@ -36,35 +38,57 @@ func processCreateClient(ctx *context.Context, c *Cursor, msg *storage.Message) 
 		return errors.Wrap(err, "parsing CreateClient event")
 	}
 
-	state, err := decoder.ClientStateFromMap(msg.Data, "ClientState")
-	if err != nil {
-		return errors.Wrap(err, "receiving ClientState from message")
+	clientStateData, ok := msg.Data["ClientState"]
+	if !ok {
+		return errors.Errorf("can't find 'ClientState' field in message data")
 	}
 
-	signer := msg.Data.GetStringOrDefault("Signer")
+	switch state := clientStateData.(type) {
+	case tendermint.ClientState:
+		ibcClient := newIbcClientForTendermint(state, msg, cc)
+		ctx.AddIbcClient(ibcClient)
+	case solomachine.ClientState:
+		ibcClient := newIbcClientForSolomachine(state, msg, cc)
+		ctx.AddIbcClient(ibcClient)
+	}
 
-	ibcClient := &storage.IbcClient{
-		Height:                msg.Height,
-		Type:                  cc.Type,
-		CreatedAt:             msg.Time,
-		UpdatedAt:             msg.Time,
-		Id:                    cc.Id,
-		TrustingPeriod:        state.TrustingPeriod,
-		UnbondingPeriod:       state.UnbondingPeriod,
-		MaxClockDrift:         state.MaxClockDrift,
-		LatestRevisionHeight:  state.LatestHeight.RevisionHeight,
-		LatestRevisionNumber:  state.LatestHeight.RevisionNumber,
-		FrozenRevisionHeight:  state.FrozenHeight.RevisionHeight,
-		FrozenRevisionNumber:  state.FrozenHeight.RevisionNumber,
-		TrustLevelDenominator: state.TrustLevel.Denominator,
-		TrustLevelNumerator:   state.TrustLevel.Numerator,
-		ConnectionCount:       0,
+	c.Skip(2)
+	return nil
+}
+
+func newIbcClientForTendermint(state tendermint.ClientState, msg *storage.Message, cc decode.UpdateClient) *storage.IbcClient {
+	ibcClient := newIbcClientForDefault(msg, cc)
+	ibcClient.TrustingPeriod = state.TrustingPeriod
+	ibcClient.UnbondingPeriod = state.UnbondingPeriod
+	ibcClient.MaxClockDrift = state.MaxClockDrift
+	ibcClient.LatestRevisionHeight = state.LatestHeight.RevisionHeight
+	ibcClient.LatestRevisionNumber = state.LatestHeight.RevisionNumber
+	ibcClient.FrozenRevisionHeight = state.FrozenHeight.RevisionHeight
+	ibcClient.FrozenRevisionNumber = state.FrozenHeight.RevisionNumber
+	ibcClient.TrustLevelDenominator = state.TrustLevel.Denominator
+	ibcClient.TrustLevelNumerator = state.TrustLevel.Numerator
+	ibcClient.ChainId = state.ChainId
+	return ibcClient
+}
+
+func newIbcClientForSolomachine(state solomachine.ClientState, msg *storage.Message, cc decode.UpdateClient) *storage.IbcClient {
+	ibcClient := newIbcClientForDefault(msg, cc)
+	ibcClient.LatestRevisionHeight = state.Sequence
+	return ibcClient
+}
+
+func newIbcClientForDefault(msg *storage.Message, cc decode.UpdateClient) *storage.IbcClient {
+	signer := msg.Data.GetStringOrDefault("Signer")
+	return &storage.IbcClient{
+		Height:          msg.Height,
+		Type:            cc.Type,
+		CreatedAt:       msg.Time,
+		UpdatedAt:       msg.Time,
+		Id:              cc.Id,
+		ConnectionCount: 0,
 		Creator: &storage.Address{
 			Address: signer,
 		},
 		TxId: msg.TxId,
 	}
-	ctx.AddIbcClient(ibcClient)
-	c.Skip(2)
-	return nil
 }

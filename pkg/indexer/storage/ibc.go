@@ -5,8 +5,13 @@ package storage
 
 import (
 	"context"
+	"slices"
+	"time"
 
+	json "github.com/bytedance/sonic"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 )
 
@@ -31,6 +36,74 @@ func saveIbcClients(
 	}
 
 	return tx.SaveIbcClients(ctx, clients...)
+}
+
+type clientRecovery struct {
+	SubjectClientId    string
+	SubstituteClientId string
+}
+
+// parseClientRecoveries reads client_update proposal changes: a list of subject/substitute pairs
+func parseClientRecoveries(changes []byte) ([]clientRecovery, error) {
+	if len(changes) == 0 {
+		return nil, nil
+	}
+	var list []clientRecovery
+	if err := json.Unmarshal(changes, &list); err != nil {
+		return nil, err
+	}
+	// other shapes, such as param changes of a mixed proposal, carry no subject
+	return slices.DeleteFunc(list, func(r clientRecovery) bool {
+		return r.SubjectClientId == ""
+	}), nil
+}
+
+// recoverIbcClients applies governance client recoveries: the substitute comes from the applied proposal
+func (module *Module) recoverIbcClients(
+	ctx context.Context,
+	tx storage.Transaction,
+	subjects []string,
+	proposals *sdkSync.Map[uint64, *storage.Proposal],
+	blockTime time.Time,
+) error {
+	if len(subjects) == 0 {
+		return nil
+	}
+
+	substitutes := make(map[string]string)
+	for _, p := range proposals.Values() {
+		if p.Status != types.ProposalStatusApplied {
+			continue
+		}
+		proposal, err := tx.Proposal(ctx, p.Id)
+		if err != nil {
+			return errors.Wrapf(err, "receiving proposal %d", p.Id)
+		}
+		if proposal.Type != types.ProposalTypeClientUpdate {
+			continue
+		}
+		recoveries, err := parseClientRecoveries(proposal.Changes)
+		if err != nil {
+			// not worth halting the indexer: subjects of this proposal are still unfrozen below
+			module.Log.Warn().Err(err).Uint64("proposal_id", p.Id).Msg("can't parse client recoveries")
+			continue
+		}
+		for _, r := range recoveries {
+			substitutes[r.SubjectClientId] = r.SubstituteClientId
+		}
+	}
+
+	for _, subject := range subjects {
+		substitute, ok := substitutes[subject]
+		if !ok {
+			// e.g. proposal submitted before recoveries were stored: at least unfreeze
+			module.Log.Warn().Str("client_id", subject).Msg("substitute of recovered IBC client not found")
+		}
+		if err := tx.RecoverIbcClient(ctx, subject, substitute, blockTime); err != nil {
+			return errors.Wrapf(err, "recovering IBC client %s", subject)
+		}
+	}
+	return nil
 }
 
 func saveIbcChannels(

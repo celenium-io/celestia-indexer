@@ -4,6 +4,7 @@
 package storage
 
 import (
+	"cmp"
 	"context"
 	"time"
 
@@ -55,4 +56,13 @@ type IbcClient struct {
 
 func (IbcClient) TableName() string {
 	return "ibc_client"
+}
+
+// LatestRevisionCompare compares latest heights as (revision, height), like ibc-go Height.Compare.
+// Returns -1, 0 or 1.
+func (client *IbcClient) LatestRevisionCompare(second *IbcClient) int {
+	if c := cmp.Compare(client.LatestRevisionNumber, second.LatestRevisionNumber); c != 0 {
+		return c
+	}
+	return cmp.Compare(client.LatestRevisionHeight, second.LatestRevisionHeight)
 }

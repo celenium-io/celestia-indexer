@@ -222,13 +222,16 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	if err := tx.RollbackIbcTransfers(ctx, height); err != nil {
 		return err
 	}
-	if err := tx.RollbackIbcChannels(ctx, height); err != nil {
+
+	if _, err := tx.RollbackIbcChannels(ctx, height); err != nil {
 		return err
 	}
-	if err := tx.RollbackIbcConnections(ctx, height); err != nil {
+
+	if _, err := tx.RollbackIbcConnections(ctx, height); err != nil {
 		return err
 	}
-	if err := tx.RollbackIbcClients(ctx, height); err != nil {
+	removedIbcClients, err := tx.RollbackIbcClients(ctx, height)
+	if err != nil {
 		return err
 	}
 	if err := tx.RollbackHyperlaneTransfers(ctx, height); err != nil {
@@ -290,6 +293,7 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	state.TotalValidators -= vals.count
 	state.TotalFee = state.TotalFee.Sub(blockStats.Fee)
 	state.TotalSupply = state.TotalSupply.Sub(blockStats.SupplyChange)
+	state.TotalIbcClients -= removedIbcClients
 
 	if err := tx.Update(ctx, &state); err != nil {
 		return tx.HandleError(ctx, err)

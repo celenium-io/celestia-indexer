@@ -67,6 +67,12 @@ func Test_eventHandlers_truncatedEvents_returnErrorNotPanic(t *testing.T) {
 			msg:     &storage.Message{Type: types.MsgUnknown},
 		},
 		{
+			name:    "upgrade_client",
+			handler: handleUpgradeClient,
+			events:  []storage.Event{msgEvent("/ibc.core.client.v1.MsgUpgradeClient")},
+			msg:     &storage.Message{Type: types.MsgUnknown},
+		},
+		{
 			name:    "send",
 			handler: handleSend,
 			events:  []storage.Event{msgEvent("/cosmos.bank.v1beta1.MsgSend")},

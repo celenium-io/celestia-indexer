@@ -19,6 +19,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types"
 	cosmosGovTypesV1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	ibcClientTypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -539,4 +540,88 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithConsensusAndBlobsUpdates(t *
 	require.Equal(t, msgExpected.Proposal.Proposer.Address, dm.Msg.Proposal.Proposer.Address)
 	require.NotNil(t, dm.Msg.Proposal.Changes)
 	require.EqualValues(t, 7, decodeCtx.Constants.Len())
+}
+
+func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithRecoverClient(t *testing.T) {
+	const authority = "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7"
+
+	recover1, err := (&ibcClientTypes.MsgRecoverClient{
+		SubjectClientId:    "07-tendermint-1",
+		SubstituteClientId: "07-tendermint-5",
+		Signer:             authority,
+	}).Marshal()
+	require.NoError(t, err)
+	recover2, err := (&ibcClientTypes.MsgRecoverClient{
+		SubjectClientId:    "06-solomachine-2",
+		SubstituteClientId: "06-solomachine-3",
+		Signer:             authority,
+	}).Marshal()
+	require.NoError(t, err)
+
+	m := &cosmosGovTypesV1.MsgSubmitProposal{
+		Messages: []*codecTypes.Any{
+			{TypeUrl: "/ibc.core.client.v1.MsgRecoverClient", Value: recover1},
+			{TypeUrl: "/ibc.core.client.v1.MsgRecoverClient", Value: recover2},
+		},
+		InitialDeposit: make([]types.Coin, 0),
+		Proposer:       authority,
+	}
+
+	block, _ := testsuite.EmptyBlock()
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, 0, storageTypes.StatusSuccess, 0)
+	require.NoError(t, err)
+	require.NotNil(t, dm.Msg.Proposal)
+	require.Equal(t, storageTypes.ProposalTypeClientUpdate, dm.Msg.Proposal.Type)
+
+	// always a list for v1, even with one recovery
+	var changes []map[string]string
+	require.NoError(t, json.Unmarshal(dm.Msg.Proposal.Changes, &changes))
+	require.Equal(t, []map[string]string{
+		{"SubjectClientId": "07-tendermint-1", "SubstituteClientId": "07-tendermint-5"},
+		{"SubjectClientId": "06-solomachine-2", "SubstituteClientId": "06-solomachine-3"},
+	}, changes)
+}
+
+func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1ClientUpdate(t *testing.T) {
+	content, err := (&ibcClientTypes.ClientUpdateProposal{ //nolint
+		Title:              "Recover client",
+		Description:        "Recover expired client",
+		SubjectClientId:    "07-tendermint-1",
+		SubstituteClientId: "07-tendermint-5",
+	}).Marshal()
+	require.NoError(t, err)
+
+	m := &cosmosGovTypesV1Beta1.MsgSubmitProposal{
+		Content: &codecTypes.Any{
+			TypeUrl: "/ibc.core.client.v1.ClientUpdateProposal",
+			Value:   content,
+		},
+		InitialDeposit: make([]types.Coin, 0),
+		Proposer:       "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+	}
+
+	block, _ := testsuite.EmptyBlock()
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+
+	dm, err := decode.Message(decodeCtx, m, 0, storageTypes.StatusSuccess, 0)
+	require.NoError(t, err)
+	require.NotNil(t, dm.Msg.Proposal)
+	require.Equal(t, storageTypes.ProposalTypeClientUpdate, dm.Msg.Proposal.Type)
+
+	// same list shape as v1 MsgRecoverClient
+	var changes []map[string]string
+	require.NoError(t, json.Unmarshal(dm.Msg.Proposal.Changes, &changes))
+	require.Equal(t, []map[string]string{
+		{"SubjectClientId": "07-tendermint-1", "SubstituteClientId": "07-tendermint-5"},
+	}, changes)
 }

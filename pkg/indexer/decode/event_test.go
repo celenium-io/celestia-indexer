@@ -407,6 +407,26 @@ func TestNewUpdateClient(t *testing.T) {
 	}
 }
 
+func TestNewUpdateClient_EmptyConsensusHeight(t *testing.T) {
+	// update_client after an invalid tm Misbehaviour carries no heights
+	got, err := NewUpdateClient(map[string]string{
+		"client_id":        "07-tendermint-145",
+		"client_type":      "07-tendermint",
+		"consensus_height": "",
+	})
+	require.NoError(t, err)
+	require.Equal(t, UpdateClient{Id: "07-tendermint-145", Type: "07-tendermint"}, got)
+}
+
+func TestNewClientMisbehaviour(t *testing.T) {
+	got, err := NewClientMisbehaviour(map[string]string{
+		"client_id":   "06-solomachine-3",
+		"client_type": "06-solomachine",
+	})
+	require.NoError(t, err)
+	require.Equal(t, UpdateClient{Id: "06-solomachine-3", Type: "06-solomachine"}, got)
+}
+
 func TestNewConnectionChange(t *testing.T) {
 	tests := []struct {
 		name     string

@@ -125,7 +125,26 @@ package types
 		celestia.fibre.v1.EventUpdateFibreParams,
 		celestia.fibre.v1.EventProcessedPaymentPruned,
 
-		set_fibre_provider_info
+		set_fibre_provider_info,
+		client_misbehaviour,
+		upgrade_client,
+		recover_client,
+		schedule_ibc_software_upgrade,
+		upgrade_chain,
+		channel_close_init,
+		channel_close,
+		channel_upgrade_init,
+		channel_upgrade_try,
+		channel_upgrade_ack,
+		channel_upgrade_confirm,
+		channel_upgrade_open,
+		channel_upgrade_timeout,
+		channel_upgrade_cancelled,
+		channel_upgrade_error,
+		channel_flush_complete,
+		channel_closed,
+		denomination_trace,
+		ibccallbackerror-denomination_trace
 	)
 */
 //go:generate go-enum --marshal --sql --values --names

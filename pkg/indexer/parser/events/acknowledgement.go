@@ -32,7 +32,7 @@ func handleAcknowledgement(ctx *context.Context, c *Cursor, msg *storage.Message
 func processAcknowledgement(ctx *context.Context, c *Cursor, msg *storage.Message) error {
 	event, ok := c.Peek()
 	if !ok || event.Type == storageTypes.EventTypeMessage {
-		ctx.RemoveLastIbcTransfer()
+		ctx.RemoveIbcTransfer(msg.Id)
 		return nil
 	}
 	packet, err := decoder.Map(msg.Data, "Packet")
@@ -57,21 +57,20 @@ func processAcknowledgement(ctx *context.Context, c *Cursor, msg *storage.Messag
 			return errors.Wrap(err, "get messages from data map")
 		}
 
+		// nested handlers must not reach the next top-level message's events
+		nested := c.Sub("action")
 		for i := range msgs {
-			decodedMsg, err := decode.Message(ctx, msgs[i], i, storageTypes.StatusSuccess, 0)
+			decodedMsg, err := decode.NestedMessage(ctx, msgs[i], i, storageTypes.StatusSuccess, 0, msg.Id)
 			if err != nil {
 				return errors.Wrap(err, "decode message in Acknowledgement")
 			}
-			if err := handle(ctx, c, &decodedMsg.Msg, ibcEventHandlers, "module"); err != nil {
+			if err := handle(ctx, nested, &decodedMsg.Msg, ibcEventHandlers, "module"); err != nil {
 				return errors.Wrap(err, "handle IBC msg event")
 			}
 		}
 
 	case "transfer":
-		current, _ := c.Peek()
-		action := decoder.StringFromMap(current.Data, "action")
-
-		transfer := ctx.GetLastIbcTransfer()
+		transfer := ctx.IbcTransferByMsg(msg.Id)
 		if transfer == nil {
 			return nil
 		}
@@ -82,16 +81,9 @@ func processAcknowledgement(ctx *context.Context, c *Cursor, msg *storage.Messag
 			return err
 		}
 
-		var (
-			hasFtp bool
-			chanId string
-		)
-		for action == "" {
-			if len(c.Remaining()) <= 1 {
-				break
-			}
-
-			event, _ := c.Peek()
+		var hasFtp, failed bool
+		// MsgEvents also yields the tx's last event, where the error ack sits in relayer batches
+		for event := range c.MsgEvents("action") {
 			switch event.Type {
 			case storageTypes.EventTypeAcknowledgePacket:
 				ack, err := decode.NewAcknowledgementPacket(event.Data)
@@ -99,25 +91,19 @@ func processAcknowledgement(ctx *context.Context, c *Cursor, msg *storage.Messag
 					return errors.Wrap(err, "ack packet")
 				}
 				transfer.ConnectionId = ack.PacketConnection
-				chanId = ack.PacketSrcChannel
 			case storageTypes.EventTypeFungibleTokenPacket:
 				hasFtp = true
-				ftp := decode.NewFungibleTokenPacket(event.Data)
-				if ftp.Error != "" {
-					ctx.RemoveLastIbcTransfer()
-					ctx.DeleteIbcChannel(chanId)
+				if decode.NewFungibleTokenPacket(event.Data).Error != "" {
+					failed = true
 				}
 			}
-
-			c.Next()
-			next, _ := c.Peek()
-			action = decoder.StringFromMap(next.Data, "action")
 		}
 
-		if !hasFtp {
-			ctx.RemoveLastIbcTransfer()
-			ctx.DeleteIbcChannel(chanId)
+		if !hasFtp || failed {
+			ctx.RemoveIbcTransfer(msg.Id)
+			return nil
 		}
+		ctx.AddIbcChannelTransfer(transfer)
 	}
 
 	return nil
