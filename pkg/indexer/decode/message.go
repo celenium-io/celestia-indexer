@@ -60,12 +60,15 @@ type measurable interface {
 	Size() int
 }
 
-func Message(
+// NestedMessage decodes a message executed inside another one (e.g. ICA) and
+// attributes its side effects to msgId without allocating a new message id.
+func NestedMessage(
 	ctx *context.Context,
 	msg cosmosTypes.Msg,
 	position int,
 	status storageTypes.Status,
 	txId uint64,
+	msgId uint64,
 ) (d DecodedMsg, err error) {
 	d.Msg.Position = int64(position)
 	d.Msg.Data, err = msgToMap(msg)
@@ -75,10 +78,7 @@ func Message(
 	d.Msg.Height = ctx.Block.Height
 	d.Msg.Time = ctx.Block.Time
 	d.Msg.TxId = txId
-
-	if err := d.Msg.SetId(ctx.GetMsgPosition()); err != nil {
-		return d, err
-	}
+	d.Msg.Id = msgId
 
 	switch typedMsg := msg.(type) {
 
@@ -306,7 +306,7 @@ func Message(
 	case *coreClient.MsgUpdateClient:
 		d.Msg.Type, err = handle.MsgUpdateClient(ctx, status, d.Msg.Data, d.Msg.Id, typedMsg)
 	case *coreClient.MsgUpgradeClient:
-		d.Msg.Type, err = handle.MsgUpgradeClient(ctx, d.Msg.Id, typedMsg)
+		d.Msg.Type, err = handle.MsgUpgradeClient(ctx, status, d.Msg.Data, d.Msg.Id, typedMsg)
 	case *coreClient.MsgRecoverClient:
 		d.Msg.Type, err = handle.MsgRecoverClient(ctx, d.Msg.Id, typedMsg)
 	case *coreClient.MsgIBCSoftwareUpgrade:
@@ -459,4 +459,18 @@ func Message(
 	}
 
 	return
+}
+
+func Message(
+	ctx *context.Context,
+	msg cosmosTypes.Msg,
+	position int,
+	status storageTypes.Status,
+	txId uint64,
+) (d DecodedMsg, err error) {
+	m := storage.Message{Height: ctx.Block.Height}
+	if err = m.SetId(ctx.GetMsgPosition()); err != nil {
+		return
+	}
+	return NestedMessage(ctx, msg, position, status, txId, m.Id)
 }

@@ -295,6 +295,12 @@ func NewUpdateClient(m map[string]string) (cc UpdateClient, err error) {
 	return
 }
 
+func NewClientMisbehaviour(m map[string]string) (cc UpdateClient, err error) {
+	cc.Id = decoder.StringFromMap(m, "client_id")
+	cc.Type = decoder.StringFromMap(m, "client_type")
+	return
+}
+
 type ConnectionChange struct {
 	ClientId                 string
 	ConnectionId             string
@@ -316,6 +322,7 @@ type ChannelChange struct {
 	CounterpartyChannelId string
 	CounterpartyPortId    string
 	PortId                string
+	Version               string
 }
 
 func NewChannelChange(m map[string]string) (cc ChannelChange) {
@@ -324,6 +331,7 @@ func NewChannelChange(m map[string]string) (cc ChannelChange) {
 	cc.CounterpartyChannelId = decoder.StringFromMap(m, "counterparty_channel_id")
 	cc.CounterpartyPortId = decoder.StringFromMap(m, "counterparty_port_id")
 	cc.PortId = decoder.StringFromMap(m, "port_id")
+	cc.Version = decoder.StringFromMap(m, "version")
 	return
 }
 

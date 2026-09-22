@@ -6,6 +6,7 @@ package handle
 import (
 	"encoding/base64"
 	"testing"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -13,7 +14,9 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/cosmos/cosmos-sdk/codec/types"
+	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	coreClient "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
+	solomachine "github.com/cosmos/ibc-go/v8/modules/light-clients/06-solomachine"
 	tmTypes "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/stretchr/testify/require"
 )
@@ -292,4 +295,179 @@ func TestDecodeMsg_SuccessOnMsgUpdateParams(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
+}
+
+func decodeClientMsg(t *testing.T, msg cosmosTypes.Msg) storage.Message {
+	t.Helper()
+	block, _ := testsuite.EmptyBlock()
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+	dm, err := decode.Message(decodeCtx, msg, 0, storageTypes.StatusSuccess, 0)
+	require.NoError(t, err)
+	return dm.Msg
+}
+
+func mustAny(t *testing.T, typeUrl string, m interface{ Marshal() ([]byte, error) }) *types.Any {
+	t.Helper()
+	value, err := m.Marshal()
+	require.NoError(t, err)
+	return &types.Any{TypeUrl: typeUrl, Value: value}
+}
+
+func TestDecodeMsg_MsgCreateClient_Tendermint(t *testing.T) {
+	cs := tmTypes.ClientState{
+		ChainId:         "osmosis-1",
+		TrustLevel:      tmTypes.Fraction{Numerator: 1, Denominator: 3},
+		TrustingPeriod:  time.Hour,
+		UnbondingPeriod: 2 * time.Hour,
+		MaxClockDrift:   time.Second,
+		LatestHeight:    coreClient.NewHeight(1, 100),
+	}
+	cons := tmTypes.ConsensusState{
+		Timestamp:          time.Unix(1700000000, 0).UTC(),
+		NextValidatorsHash: []byte{1, 2, 3},
+	}
+	msg := &coreClient.MsgCreateClient{
+		Signer:         "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		ClientState:    mustAny(t, "/ibc.lightclients.tendermint.v1.ClientState", &cs),
+		ConsensusState: mustAny(t, "/ibc.lightclients.tendermint.v1.ConsensusState", &cons),
+	}
+
+	got := decodeClientMsg(t, msg)
+	require.Equal(t, storageTypes.MsgCreateClient, got.Type)
+	gotState, ok := got.Data["ClientState"].(tmTypes.ClientState)
+	require.True(t, ok)
+	require.Equal(t, "osmosis-1", gotState.ChainId)
+	require.IsType(t, tmTypes.ConsensusState{}, got.Data["ConsensusState"])
+}
+
+func TestDecodeMsg_MsgCreateClient_Solomachine(t *testing.T) {
+	cons := solomachine.ConsensusState{Diversifier: "div", Timestamp: 10}
+	cs := solomachine.ClientState{Sequence: 7, ConsensusState: &cons}
+	msg := &coreClient.MsgCreateClient{
+		Signer:         "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		ClientState:    mustAny(t, "/ibc.lightclients.solomachine.v3.ClientState", &cs),
+		ConsensusState: mustAny(t, "/ibc.lightclients.solomachine.v3.ConsensusState", &cons),
+	}
+
+	got := decodeClientMsg(t, msg)
+	require.Equal(t, storageTypes.MsgCreateClient, got.Type)
+	gotState, ok := got.Data["ClientState"].(solomachine.ClientState)
+	require.True(t, ok)
+	require.EqualValues(t, 7, gotState.Sequence)
+	gotCons, ok := got.Data["ConsensusState"].(solomachine.ConsensusState)
+	require.True(t, ok)
+	require.Equal(t, "div", gotCons.Diversifier)
+}
+
+func TestDecodeMsg_MsgCreateClient_OnlyConsensusState(t *testing.T) {
+	cons := solomachine.ConsensusState{Diversifier: "div", Timestamp: 10}
+	msg := &coreClient.MsgCreateClient{
+		Signer:         "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		ConsensusState: mustAny(t, "/ibc.lightclients.solomachine.v3.ConsensusState", &cons),
+	}
+
+	got := decodeClientMsg(t, msg)
+	require.IsType(t, solomachine.ConsensusState{}, got.Data["ConsensusState"])
+}
+
+func TestDecodeMsg_MsgUpdateClient_ClientMessageTypes(t *testing.T) {
+	smHeader := solomachine.Header{Timestamp: 11, Signature: []byte{1}, NewDiversifier: "new"}
+	smMisbehaviour := solomachine.Misbehaviour{
+		Sequence:     5,
+		SignatureOne: &solomachine.SignatureAndData{Signature: []byte{1}, Path: []byte("p"), Data: []byte{1}, Timestamp: 1},
+		SignatureTwo: &solomachine.SignatureAndData{Signature: []byte{2}, Path: []byte("p"), Data: []byte{2}, Timestamp: 1},
+	}
+	tmMisbehaviour := tmTypes.Misbehaviour{
+		Header1: &tmTypes.Header{TrustedHeight: coreClient.NewHeight(1, 10)},
+		Header2: &tmTypes.Header{TrustedHeight: coreClient.NewHeight(1, 9)},
+	}
+
+	tests := []struct {
+		name    string
+		any     *types.Any
+		key     string
+		wantTyp any
+	}{
+		{
+			name:    "solomachine header",
+			any:     mustAny(t, "/ibc.lightclients.solomachine.v3.Header", &smHeader),
+			key:     "Header",
+			wantTyp: solomachine.Header{},
+		}, {
+			name:    "solomachine misbehaviour",
+			any:     mustAny(t, "/ibc.lightclients.solomachine.v3.Misbehaviour", &smMisbehaviour),
+			key:     "Misbehaviour",
+			wantTyp: solomachine.Misbehaviour{},
+		}, {
+			name:    "tendermint misbehaviour",
+			any:     mustAny(t, "/ibc.lightclients.tendermint.v1.Misbehaviour", &tmMisbehaviour),
+			key:     "Misbehaviour",
+			wantTyp: tmTypes.Misbehaviour{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			msg := &coreClient.MsgUpdateClient{
+				Signer:        "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+				ClientId:      "06-solomachine-1",
+				ClientMessage: tt.any,
+			}
+			got := decodeClientMsg(t, msg)
+			require.Equal(t, storageTypes.MsgUpdateClient, got.Type)
+			require.IsType(t, tt.wantTyp, got.Data[tt.key])
+			require.NotContains(t, got.Data, "ClientMessage")
+		})
+	}
+}
+
+func TestDecodeMsg_MsgUpgradeClient_Tendermint(t *testing.T) {
+	cs := tmTypes.ClientState{
+		ChainId:         "osmosis-2",
+		UnbondingPeriod: 3 * time.Hour,
+		LatestHeight:    coreClient.NewHeight(2, 1),
+	}
+	cons := tmTypes.ConsensusState{
+		Timestamp:          time.Unix(1700000000, 0).UTC(),
+		NextValidatorsHash: []byte{1, 2, 3},
+	}
+	msg := &coreClient.MsgUpgradeClient{
+		Signer:         "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		ClientId:       "07-tendermint-1",
+		ClientState:    mustAny(t, "/ibc.lightclients.tendermint.v1.ClientState", &cs),
+		ConsensusState: mustAny(t, "/ibc.lightclients.tendermint.v1.ConsensusState", &cons),
+	}
+
+	got := decodeClientMsg(t, msg)
+	require.Equal(t, storageTypes.MsgUpgradeClient, got.Type)
+	gotState, ok := got.Data["ClientState"].(tmTypes.ClientState)
+	require.True(t, ok)
+	require.Equal(t, "osmosis-2", gotState.ChainId)
+	require.Equal(t, 3*time.Hour, gotState.UnbondingPeriod)
+	require.IsType(t, tmTypes.ConsensusState{}, got.Data["ConsensusState"])
+}
+
+func TestDecodeMsg_MsgUpgradeClient_Failed(t *testing.T) {
+	cs := tmTypes.ClientState{ChainId: "osmosis-2"}
+	msg := &coreClient.MsgUpgradeClient{
+		Signer:      "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		ClientId:    "07-tendermint-1",
+		ClientState: mustAny(t, "/ibc.lightclients.tendermint.v1.ClientState", &cs),
+	}
+
+	block, _ := testsuite.EmptyBlock()
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+	dm, err := decode.Message(decodeCtx, msg, 0, storageTypes.StatusFailed, 0)
+	require.NoError(t, err)
+	// failed tx keeps the raw message
+	require.Nil(t, dm.Msg.Data["ConsensusState"])
+	_, isTm := dm.Msg.Data["ClientState"].(tmTypes.ClientState)
+	require.False(t, isTm)
 }

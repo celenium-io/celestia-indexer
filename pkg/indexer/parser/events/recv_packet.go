@@ -32,33 +32,32 @@ func handleRecvPacket(ctx *context.Context, c *Cursor, msg *storage.Message) err
 func processRecvPacket(ctx *context.Context, c *Cursor, msg *storage.Message) error {
 	event, ok := c.Peek()
 	if !ok || event.Type == storageTypes.EventTypeMessage {
-		ctx.RemoveLastIbcTransfer()
+		ctx.RemoveIbcTransfer(msg.Id)
 		return nil
 	}
 
-	transfer := ctx.GetLastIbcTransfer()
-	var chanId string
+	transfer := ctx.IbcTransferByMsg(msg.Id)
 	if event.Type == storageTypes.EventTypeRecvPacket && transfer != nil {
 		rp, err := decode.NewRecvPacket(event.Data)
 		if err != nil {
 			return err
 		}
 		transfer.ConnectionId = rp.Connection
-		chanId = rp.DstChannel
 	}
 
 	c.Skip(2)
 
 	event, ok = c.Peek()
 	if !ok {
+		// no fungible_token_packet event: the transfer isn't confirmed
+		ctx.RemoveIbcTransfer(msg.Id)
 		return nil
 	}
 
 	if event.Type == storageTypes.EventTypeIbccallbackerrorIcs27Packet {
 		c.Next()
 		if _, ok := c.Peek(); !ok {
-			ctx.RemoveLastIbcTransfer()
-			ctx.DeleteIbcChannel(chanId)
+			ctx.RemoveIbcTransfer(msg.Id)
 			return nil
 		}
 		event, _ = c.Peek()
@@ -66,8 +65,7 @@ func processRecvPacket(ctx *context.Context, c *Cursor, msg *storage.Message) er
 
 	if event.Type == storageTypes.EventTypeWriteAcknowledgement {
 		c.Skip(2)
-		ctx.RemoveLastIbcTransfer()
-		ctx.DeleteIbcChannel(chanId)
+		ctx.RemoveIbcTransfer(msg.Id)
 		return nil
 	}
 
@@ -90,21 +88,20 @@ func processRecvPacket(ctx *context.Context, c *Cursor, msg *storage.Message) er
 			return errors.Wrap(err, "get messages from data map")
 		}
 
+		// nested handlers must not reach the next top-level message's events
+		nested := c.Sub("action")
 		for i := range msgs {
-			decodedMsg, err := decode.Message(ctx, msgs[i], i, storageTypes.StatusSuccess, 0)
+			decodedMsg, err := decode.NestedMessage(ctx, msgs[i], i, storageTypes.StatusSuccess, 0, msg.Id)
 			if err != nil {
 				return errors.Wrap(err, "decode message in RecvPacket")
 			}
 
-			if err := handle(ctx, c, &decodedMsg.Msg, ibcEventHandlers, "module"); err != nil {
+			if err := handle(ctx, nested, &decodedMsg.Msg, ibcEventHandlers, "module"); err != nil {
 				return errors.Wrap(err, "handle IBC msg event")
 			}
 		}
 
 	case "transfer":
-		current, _ := c.Peek()
-		action := decoder.StringFromMap(current.Data, "action")
-
 		if transfer == nil {
 			return nil
 		}
@@ -115,29 +112,21 @@ func processRecvPacket(ctx *context.Context, c *Cursor, msg *storage.Message) er
 			return err
 		}
 
-		hasFtp := false
-		for action == "" {
-			if len(c.Remaining()) <= 1 {
-				break
-			}
-			c.Next()
-			next, _ := c.Peek()
-			action = decoder.StringFromMap(next.Data, "action")
-
-			if next.Type == storageTypes.EventTypeFungibleTokenPacket {
+		var hasFtp, failed bool
+		for event := range c.MsgEvents("action") {
+			if event.Type == storageTypes.EventTypeFungibleTokenPacket {
 				hasFtp = true
-				ftp := decode.NewFungibleTokenPacket(next.Data)
-				if ftp.Error != "" {
-					ctx.RemoveLastIbcTransfer()
-					ctx.DeleteIbcChannel(chanId)
+				if decode.NewFungibleTokenPacket(event.Data).Error != "" {
+					failed = true
 				}
 			}
 		}
 
-		if !hasFtp {
-			ctx.RemoveLastIbcTransfer()
-			ctx.DeleteIbcChannel(chanId)
+		if !hasFtp || failed {
+			ctx.RemoveIbcTransfer(msg.Id)
+			return nil
 		}
+		ctx.AddIbcChannelTransfer(transfer)
 	}
 
 	return nil

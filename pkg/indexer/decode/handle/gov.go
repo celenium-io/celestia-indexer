@@ -58,6 +58,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 	}
 
 	changes := make([]paramsV1Beta.ParamChange, 0)
+	recoveries := make([]map[string]any, 0)
 	var sb strings.Builder
 	if _, err := sb.WriteString("Proposal contains messages:\r\n"); err != nil {
 		return msgType, nil, nil, errors.Wrap(err, "building proposal description from messages")
@@ -178,6 +179,19 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 			ctx.AddConstant(storageTypes.ModuleNameBlob, "gov_max_square_size", maxSquareSize)
 			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameBlob.String(), "gov_max_square_size", maxSquareSize))
 
+		case "/ibc.core.client.v1.MsgRecoverClient":
+			var recoverMsg ibcTypes.MsgRecoverClient
+			if err := codec.Unmarshal(msg.Messages[i].Value, &recoverMsg); err != nil {
+				return msgType, nil, nil, errors.Wrap(err, "unmarshalling proposal with ibc.core.client.v1.MsgRecoverClient")
+			}
+
+			prpsl.Type = storageTypes.ProposalTypeClientUpdate
+			// the storage module reads them on execution to find the substitute
+			recoveries = append(recoveries, map[string]any{
+				"SubjectClientId":    recoverMsg.SubjectClientId,
+				"SubstituteClientId": recoverMsg.SubstituteClientId,
+			})
+
 		case "/cosmos.consensus.v1.MsgUpdateParams":
 			var params consensusv1.MsgUpdateParams
 			if err := codec.Unmarshal(msg.Messages[i].Value, &params); err != nil {
@@ -220,10 +234,16 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 	if prpsl.Description == "" {
 		prpsl.Description = sb.String()
 	}
-	if len(changes) > 0 {
+	switch {
+	case len(changes) > 0:
 		prpsl.Changes, err = json.Marshal(changes)
 		if err != nil {
 			return msgType, nil, nil, errors.Wrap(err, "marshalling changes proposal v1")
+		}
+	case len(recoveries) > 0:
+		prpsl.Changes, err = json.Marshal(recoveries)
+		if err != nil {
+			return msgType, nil, nil, errors.Wrap(err, "marshalling client recoveries proposal v1")
 		}
 	}
 	return msgType, nil, prpsl, nil
@@ -332,10 +352,11 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 		prpsl.Title = proposal.Title
 		prpsl.Description = proposal.Description
 		prpsl.Type = storageTypes.ProposalTypeClientUpdate
-		prpsl.Changes, err = json.Marshal(map[string]any{
+		// a list, like v1 MsgRecoverClient proposals
+		prpsl.Changes, err = json.Marshal([]map[string]any{{
 			"SubjectClientId":    proposal.SubjectClientId,
 			"SubstituteClientId": proposal.SubstituteClientId,
-		})
+		}})
 		if err != nil {
 			return msgType, nil, nil, errors.Wrap(err, "marshalling changes proposal for submit proposal content")
 		}

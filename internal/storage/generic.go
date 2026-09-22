@@ -127,6 +127,7 @@ type Transaction interface {
 	SaveProposals(ctx context.Context, proposals ...*Proposal) (int64, error)
 	SaveVotes(ctx context.Context, votes ...*Vote) (map[uint64]*VotesCount, error)
 	SaveIbcClients(ctx context.Context, clients ...*IbcClient) (int64, error)
+	RecoverIbcClient(ctx context.Context, subjectId, substituteId string, updatedAt time.Time) error
 	SaveIbcConnections(ctx context.Context, connections ...*IbcConnection) error
 	SaveIbcChannels(ctx context.Context, channels ...*IbcChannel) error
 	SaveIbcTransfers(ctx context.Context, transfers ...*IbcTransfer) error
@@ -172,9 +173,9 @@ type Transaction interface {
 	RollbackJails(ctx context.Context, height pkgTypes.Level) ([]Jail, error)
 	RollbackProposals(ctx context.Context, height pkgTypes.Level) error
 	RollbackVotes(ctx context.Context, height pkgTypes.Level) error
-	RollbackIbcClients(ctx context.Context, height pkgTypes.Level) error
-	RollbackIbcConnections(ctx context.Context, height pkgTypes.Level) error
-	RollbackIbcChannels(ctx context.Context, height pkgTypes.Level) error
+	RollbackIbcClients(ctx context.Context, height pkgTypes.Level) (int64, error)
+	RollbackIbcConnections(ctx context.Context, height pkgTypes.Level) (int64, error)
+	RollbackIbcChannels(ctx context.Context, height pkgTypes.Level) (int64, error)
 	RollbackIbcTransfers(ctx context.Context, height pkgTypes.Level) error
 	RollbackHyperlaneMailbox(ctx context.Context, height pkgTypes.Level) error
 	RollbackHyperlaneTokens(ctx context.Context, height pkgTypes.Level) error

@@ -48,10 +48,6 @@ func processChannelOpenInit(ctx *context.Context, c *Cursor, msg *storage.Messag
 	if !ok {
 		return errors.Errorf("can't cast channel settings to map: %##v", channelSettings)
 	}
-	version, err := (storageTypes.PackedBytes)(settings).GetString("Version")
-	if err != nil {
-		return errors.Wrap(err, "get string")
-	}
 	ordering, err := decoder.ChannelOrderingFromMap(settings, "Ordering")
 	if err != nil {
 		return errors.Wrap(err, "parse ordering")
@@ -60,6 +56,12 @@ func processChannelOpenInit(ctx *context.Context, c *Cursor, msg *storage.Messag
 	signer, err := msg.Data.GetString("Signer")
 	if err != nil {
 		return errors.Wrap(err, "get string")
+	}
+
+	// event carries the version negotiated by the app; msg.Channel.Version is deprecated for OpenTry
+	version := cc.Version
+	if version == "" {
+		version = (storageTypes.PackedBytes)(settings).GetStringOrDefault("Version")
 	}
 
 	channel := &storage.IbcChannel{

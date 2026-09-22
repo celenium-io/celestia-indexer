@@ -14,7 +14,6 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	channelTypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	tmTypes "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
@@ -182,30 +181,6 @@ func BoolFromMap(m map[string]string, key string) (bool, error) {
 	return strconv.ParseBool(val)
 }
 
-func ClientStateFromMap(m map[string]any, key string) (*tmTypes.ClientState, error) {
-	val, ok := m[key]
-	if !ok {
-		return nil, errors.Errorf("can't find key: %s", key)
-	}
-	cs, ok := val.(tmTypes.ClientState)
-	if !ok {
-		return nil, errors.Errorf("key '%s' is not a client state", key)
-	}
-	return &cs, nil
-}
-
-func HeaderFromMap(m map[string]any, key string) (*tmTypes.Header, error) {
-	val, ok := m[key]
-	if !ok {
-		return nil, errors.Errorf("can't find key: %s", key)
-	}
-	header, ok := val.(tmTypes.Header)
-	if !ok {
-		return nil, errors.Errorf("key '%s' is not a header", key)
-	}
-	return &header, nil
-}
-
 func ChannelOrderingFromMap(m map[string]any, key string) (bool, error) {
 	val, ok := m[key]
 	if !ok {
@@ -227,6 +202,9 @@ func ChannelOrderingFromMap(m map[string]any, key string) (bool, error) {
 
 func RevisionHeightFromMap(m map[string]string, key string) (uint64, uint64, error) {
 	ch := StringFromMap(m, key)
+	if ch == "" {
+		return 0, 0, nil
+	}
 	parts := strings.Split(ch, "-")
 	if len(parts) != 2 {
 		return 0, 0, errors.Errorf("invalid revision height: %s", ch)

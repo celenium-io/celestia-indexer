@@ -86,6 +86,14 @@ func (c *Cursor) SkipToNext(stopKey string) {
 	}
 }
 
+// Sub returns a cursor over the events up to the next stopKey boundary and
+// advances c past them, so handlers working on the sub-cursor can't overrun it.
+func (c *Cursor) Sub(stopKey string) *Cursor {
+	start := c.pos
+	c.SkipToNext(stopKey)
+	return NewCursor(c.events[start:c.pos])
+}
+
 // Skip advances the cursor by n events without inspecting or reporting
 // them, for handlers that unconditionally jump a fixed number of events.
 // n must be non-negative. If fewer than n events remain, the cursor is

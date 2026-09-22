@@ -5,9 +5,12 @@ package events
 
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
+	solomachine "github.com/cosmos/ibc-go/v8/modules/light-clients/06-solomachine"
+	tendermint "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/pkg/errors"
 )
 
@@ -31,25 +34,58 @@ func processUpdateClient(ctx *context.Context, c *Cursor, msg *storage.Message) 
 	if !ok {
 		return errors.New("not enough events for update client")
 	}
-	uc, err := decode.NewUpdateClient(event.Data)
+
+	switch event.Type {
+	case types.EventTypeClientMisbehaviour:
+		if err := handleMisbehaviour(ctx, event, msg); err != nil {
+			return errors.Wrap(err, "handle Misbehaviour")
+		}
+	case types.EventTypeUpdateClient:
+		uc, err := decode.NewUpdateClient(event.Data)
+		if err != nil {
+			return errors.Wrap(err, "parse update client event")
+		}
+		switch header := msg.Data["Header"].(type) {
+		case tendermint.Header:
+			ctx.AddIbcClient(&storage.IbcClient{
+				Id:                   uc.Id,
+				UpdatedAt:            msg.Time,
+				ChainId:              header.Header.ChainID,
+				LatestRevisionHeight: uc.ConsensusHeight,
+				LatestRevisionNumber: uc.Revision,
+			})
+		case solomachine.Header:
+			ctx.AddIbcClient(&storage.IbcClient{
+				Id:                   uc.Id,
+				UpdatedAt:            msg.Time,
+				LatestRevisionHeight: uc.ConsensusHeight,
+				LatestRevisionNumber: uc.Revision,
+			})
+		default:
+			// invalid Misbehaviour: update_client without heights, client is not frozen
+			ctx.AddIbcClient(&storage.IbcClient{
+				Id:        uc.Id,
+				UpdatedAt: msg.Time,
+			})
+		}
+	default:
+		return errors.Errorf("unexpected event %s for MsgUpdateClient", event.Type)
+	}
+
+	c.Skip(2)
+
+	return nil
+}
+
+func handleMisbehaviour(ctx *context.Context, event storage.Event, msg *storage.Message) error {
+	uc, err := decode.NewClientMisbehaviour(event.Data)
 	if err != nil {
 		return errors.Wrap(err, "parse update client event")
 	}
-
-	header, err := decoder.HeaderFromMap(msg.Data, "Header")
-	if err != nil {
-		return errors.Wrap(err, "receiving Header from message")
-	}
-
-	ibcClient := &storage.IbcClient{
+	ctx.AddIbcClient(&storage.IbcClient{
 		Id:                   uc.Id,
 		UpdatedAt:            msg.Time,
-		ChainId:              header.Header.ChainID,
-		LatestRevisionHeight: uc.ConsensusHeight,
-		LatestRevisionNumber: uc.Revision,
-	}
-	ctx.AddIbcClient(ibcClient)
-
-	c.Skip(2)
+		FrozenRevisionHeight: 1,
+	})
 	return nil
 }

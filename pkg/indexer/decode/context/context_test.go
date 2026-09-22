@@ -5,6 +5,7 @@ package context
 
 import (
 	"testing"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -341,4 +342,111 @@ func Test_AddNamespace_Merge(t *testing.T) {
 		ctx.AddNamespace(other)
 		require.Len(t, ctx.Namespaces.Values(), 2)
 	})
+}
+
+func Test_AddIbcClient_Merge(t *testing.T) {
+	t0 := time.Date(2026, 9, 22, 0, 0, 0, 0, time.UTC)
+	t1 := t0.Add(time.Second)
+
+	ctx := NewContext()
+	ctx.AddIbcClient(&storage.IbcClient{
+		Id:                   "07-tendermint-1",
+		Type:                 "07-tendermint",
+		CreatedAt:            t0,
+		UpdatedAt:            t0,
+		TrustingPeriod:       time.Hour,
+		LatestRevisionHeight: 100,
+		LatestRevisionNumber: 1,
+		Creator:              &storage.Address{Address: "celestia1signer"},
+	})
+	ctx.AddIbcClient(&storage.IbcClient{
+		Id:                   "07-tendermint-1",
+		UpdatedAt:            t1,
+		ChainId:              "osmosis-1",
+		LatestRevisionHeight: 150,
+		LatestRevisionNumber: 1,
+	})
+	ctx.AddIbcClient(&storage.IbcClient{
+		Id:                   "07-tendermint-1",
+		UpdatedAt:            t1,
+		FrozenRevisionHeight: 1,
+	})
+	ctx.AddIbcClient(&storage.IbcClient{
+		Id:              "07-tendermint-1",
+		ConnectionCount: 2,
+	})
+
+	require.Equal(t, 1, ctx.IbcClients.Len())
+	client, ok := ctx.IbcClients.Get("07-tendermint-1")
+	require.True(t, ok)
+	require.Equal(t, "07-tendermint", client.Type)
+	require.Equal(t, t0, client.CreatedAt)
+	require.Equal(t, t1, client.UpdatedAt)
+	require.Equal(t, time.Hour, client.TrustingPeriod)
+	require.Equal(t, "osmosis-1", client.ChainId)
+	require.EqualValues(t, 150, client.LatestRevisionHeight)
+	require.EqualValues(t, 1, client.LatestRevisionNumber)
+	require.EqualValues(t, 1, client.FrozenRevisionHeight)
+	require.EqualValues(t, 2, client.ConnectionCount)
+	require.Equal(t, "celestia1signer", client.Creator.Address)
+}
+
+// Chain keeps max(LatestHeight): a later update to a lower height must not move it back.
+func Test_AddIbcClient_LatestHeightIsMax(t *testing.T) {
+	ctx := NewContext()
+	ctx.AddIbcClient(&storage.IbcClient{Id: "07-tendermint-1", LatestRevisionHeight: 150, LatestRevisionNumber: 1})
+	ctx.AddIbcClient(&storage.IbcClient{Id: "07-tendermint-1", LatestRevisionHeight: 120, LatestRevisionNumber: 1})
+
+	client, ok := ctx.IbcClients.Get("07-tendermint-1")
+	require.True(t, ok)
+	require.EqualValues(t, 150, client.LatestRevisionHeight)
+}
+
+func Test_AddIbcClient_NewRevisionResetsHeight(t *testing.T) {
+	ctx := NewContext()
+	ctx.AddIbcClient(&storage.IbcClient{Id: "07-tendermint-1", LatestRevisionHeight: 1000, LatestRevisionNumber: 1})
+	ctx.AddIbcClient(&storage.IbcClient{Id: "07-tendermint-1", LatestRevisionHeight: 5, LatestRevisionNumber: 2})
+	ctx.AddIbcClient(&storage.IbcClient{Id: "07-tendermint-1", LatestRevisionHeight: 2000, LatestRevisionNumber: 1})
+
+	client, ok := ctx.IbcClients.Get("07-tendermint-1")
+	require.True(t, ok)
+	require.EqualValues(t, 2, client.LatestRevisionNumber)
+	require.EqualValues(t, 5, client.LatestRevisionHeight)
+}
+
+func Test_AddIbcChannelTransfer(t *testing.T) {
+	ctx := NewContext()
+
+	// outgoing from celestia: counted as sent
+	ctx.AddIbcChannelTransfer(&storage.IbcTransfer{
+		ChannelId: "channel-2",
+		Amount:    storageTypes.NumericFromInt64(100),
+		Sender:    &storage.Address{Address: "celestia1sender"},
+	})
+	// incoming to celestia: counted as received
+	ctx.AddIbcChannelTransfer(&storage.IbcTransfer{
+		ChannelId: "channel-2",
+		Amount:    storageTypes.NumericFromInt64(30),
+		Receiver:  &storage.Address{Address: "celestia1receiver"},
+	})
+	ctx.AddIbcChannelTransfer(&storage.IbcTransfer{
+		ChannelId: "channel-3",
+		Amount:    storageTypes.NumericFromInt64(7),
+		Receiver:  &storage.Address{Address: "celestia1receiver"},
+	})
+
+	require.Equal(t, 2, ctx.IbcChannels.Len())
+
+	ch, ok := ctx.IbcChannels.Get("channel-2")
+	require.True(t, ok)
+	require.EqualValues(t, 2, ch.TransfersCount)
+	require.Equal(t, "100", ch.Sent.String())
+	require.Equal(t, "30", ch.Received.String())
+	require.Equal(t, storageTypes.IbcChannelStatusInitialization, ch.Status)
+
+	ch, ok = ctx.IbcChannels.Get("channel-3")
+	require.True(t, ok)
+	require.EqualValues(t, 1, ch.TransfersCount)
+	require.True(t, ch.Sent.IsZero())
+	require.Equal(t, "7", ch.Received.String())
 }

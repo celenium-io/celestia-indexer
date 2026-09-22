@@ -680,11 +680,11 @@ func (tx Transaction) SaveIbcClients(ctx context.Context, clients ...*models.Ibc
 		if clients[i].TrustLevelNumerator > 0 {
 			query.Set("trust_level_numerator = EXCLUDED.trust_level_numerator")
 		}
-		if clients[i].LatestRevisionHeight > 0 {
-			query.Set("latest_revision_height = EXCLUDED.latest_revision_height")
-		}
-		if clients[i].LatestRevisionNumber > 0 {
-			query.Set("latest_revision_number = EXCLUDED.latest_revision_number")
+		if clients[i].LatestRevisionHeight > 0 || clients[i].LatestRevisionNumber > 0 {
+			// latest height only grows, compared as (revision, height)
+			const isHigher = "(EXCLUDED.latest_revision_number, EXCLUDED.latest_revision_height) > (added_ibc_client.latest_revision_number, added_ibc_client.latest_revision_height)"
+			query.Set("latest_revision_height = CASE WHEN " + isHigher + " THEN EXCLUDED.latest_revision_height ELSE added_ibc_client.latest_revision_height END")
+			query.Set("latest_revision_number = CASE WHEN " + isHigher + " THEN EXCLUDED.latest_revision_number ELSE added_ibc_client.latest_revision_number END")
 		}
 		if clients[i].FrozenRevisionHeight > 0 {
 			query.Set("frozen_revision_height = EXCLUDED.frozen_revision_height")
@@ -709,6 +709,37 @@ func (tx Transaction) SaveIbcClients(ctx context.Context, clients ...*models.Ibc
 	}
 
 	return count, nil
+}
+
+// RecoverIbcClient mirrors ibc-go RecoverClient: the subject is unfrozen and takes the substitute's
+// latest height, chain id and trusting period. Without a known substitute it is only unfrozen.
+func (tx Transaction) RecoverIbcClient(ctx context.Context, subjectId, substituteId string, updatedAt time.Time) error {
+	if substituteId == "" {
+		_, err := tx.Tx().NewUpdate().
+			Model((*models.IbcClient)(nil)).
+			Set("frozen_revision_height = 0").
+			Set("frozen_revision_number = 0").
+			Set("updated_at = ?", updatedAt).
+			Where("id = ?", subjectId).
+			Exec(ctx)
+		return err
+	}
+
+	_, err := tx.Tx().NewUpdate().
+		TableExpr("ibc_client AS subject").
+		TableExpr("ibc_client AS substitute").
+		Set("frozen_revision_height = 0").
+		Set("frozen_revision_number = 0").
+		Set("latest_revision_height = substitute.latest_revision_height").
+		Set("latest_revision_number = substitute.latest_revision_number").
+		// chain id is known only after the first update_client, solomachine has no trusting period
+		Set("chain_id = COALESCE(NULLIF(substitute.chain_id, ''), subject.chain_id)").
+		Set("trusting_period = CASE WHEN substitute.trusting_period > 0 THEN substitute.trusting_period ELSE subject.trusting_period END").
+		Set("updated_at = ?", updatedAt).
+		Where("subject.id = ?", subjectId).
+		Where("substitute.id = ?", substituteId).
+		Exec(ctx)
+	return err
 }
 
 func (tx Transaction) SaveIbcConnections(ctx context.Context, conns ...*models.IbcConnection) error {
@@ -780,6 +811,9 @@ func (tx Transaction) SaveIbcChannels(ctx context.Context, channels ...*models.I
 		}
 		if channels[i].TransfersCount > 0 {
 			query.Set("transfers_count = ibc_channel.transfers_count + EXCLUDED.transfers_count")
+		}
+		if channels[i].Version != "" {
+			query.Set("version = EXCLUDED.version")
 		}
 
 		if _, err := query.Exec(ctx); err != nil {
@@ -912,6 +946,16 @@ func (tx Transaction) State(ctx context.Context, name string) (state models.Stat
 func (tx Transaction) Namespace(ctx context.Context, id uint64) (ns models.Namespace, err error) {
 	err = tx.Tx().NewSelect().Model(&ns).Where("id = ?", id).Scan(ctx)
 	return
+}
+
+func (tx Transaction) rollback[T storage.Model](ctx context.Context, height types.Level, model T) (int64, error) {
+	result, err := tx.Tx().NewDelete().Model(model).
+		Where("height = ?", height).
+		Exec(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 func (tx Transaction) RollbackBlock(ctx context.Context, height types.Level) error {
@@ -1062,29 +1106,20 @@ func (tx Transaction) RollbackVotes(ctx context.Context, height types.Level) (er
 	return
 }
 
-func (tx Transaction) RollbackIbcClients(ctx context.Context, height types.Level) (err error) {
-	_, err = tx.Tx().NewDelete().Model((*models.IbcClient)(nil)).
-		Where("height = ?", height).
-		Exec(ctx)
-	return
+func (tx Transaction) RollbackIbcClients(ctx context.Context, height types.Level) (int64, error) {
+	return tx.rollback(ctx, height, (*models.IbcClient)(nil))
 }
 
-func (tx Transaction) RollbackIbcConnections(ctx context.Context, height types.Level) (err error) {
-	_, err = tx.Tx().NewDelete().Model((*models.IbcConnection)(nil)).
-		Where("height = ?", height).
-		Exec(ctx)
-	return
+func (tx Transaction) RollbackIbcConnections(ctx context.Context, height types.Level) (int64, error) {
+	return tx.rollback(ctx, height, (*models.IbcConnection)(nil))
 }
 
-func (tx Transaction) RollbackIbcChannels(ctx context.Context, height types.Level) (err error) {
-	_, err = tx.Tx().NewDelete().Model((*models.IbcChannel)(nil)).
-		Where("height = ?", height).
-		Exec(ctx)
-	return
+func (tx Transaction) RollbackIbcChannels(ctx context.Context, height types.Level) (int64, error) {
+	return tx.rollback(ctx, height, (*models.IbcChannel)(nil))
 }
 
 func (tx Transaction) RollbackIbcTransfers(ctx context.Context, height types.Level) (err error) {
-	_, err = tx.Tx().NewDelete().Model((*models.IbcChannel)(nil)).
+	_, err = tx.Tx().NewDelete().Model((*models.IbcTransfer)(nil)).
 		Where("height = ?", height).
 		Exec(ctx)
 	return

@@ -6,6 +6,7 @@ package context
 import (
 	"encoding/hex"
 	"fmt"
+	"slices"
 	"strconv"
 	"sync/atomic"
 
@@ -40,28 +41,30 @@ type Context struct {
 	NamespaceMessages *sdkSync.Map[string, *storage.NamespaceMessage]
 	AddressMessages   *sdkSync.Map[string, *storage.MsgAddress]
 
-	Messages        []*storage.Message
-	Events          []storage.Event
-	Redelegations   []storage.Redelegation
-	Undelegations   []storage.Undelegation
-	CancelUnbonding []storage.Undelegation
-	StakingLogs     []storage.StakingLog
-	Votes           []*storage.Vote
-	VestingAccounts []*storage.VestingAccount
-	Forwardings     []*storage.Forwarding
-	ZkIsmUpdates    []*storage.ZkISMUpdate
-	ZkIsmMessages   []*storage.ZkISMMessage
-	HlTransfers     []*storage.HLTransfer
-	IbcTransfers    []*storage.IbcTransfer
-	BlobLogs        []*storage.BlobLog
-	Signals         []*storage.SignalVersion
-	DenomMetadata   []storage.DenomMetadata
+	Messages            []*storage.Message
+	Events              []storage.Event
+	Redelegations       []storage.Redelegation
+	Undelegations       []storage.Undelegation
+	CancelUnbonding     []storage.Undelegation
+	StakingLogs         []storage.StakingLog
+	Votes               []*storage.Vote
+	VestingAccounts     []*storage.VestingAccount
+	Forwardings         []*storage.Forwarding
+	ZkIsmUpdates        []*storage.ZkISMUpdate
+	ZkIsmMessages       []*storage.ZkISMMessage
+	HlTransfers         []*storage.HLTransfer
+	IbcTransfers        []*storage.IbcTransfer
+	RecoveredIbcClients []string
+	BlobLogs            []*storage.BlobLog
+	Signals             []*storage.SignalVersion
+	DenomMetadata       []storage.DenomMetadata
 
 	Block         *storage.Block
 	TryUpgrade    *storage.Upgrade
 	TxEventsCount int
 
-	msgCounter *atomic.Int64
+	msgCounter       *atomic.Int64
+	ibcTransferByMsg map[uint64]*storage.IbcTransfer
 }
 
 func NewContext() *Context {
@@ -86,23 +89,25 @@ func NewContext() *Context {
 		NamespaceMessages: sdkSync.NewMap[string, *storage.NamespaceMessage](),
 		AddressMessages:   sdkSync.NewMap[string, *storage.MsgAddress](),
 
-		Messages:        make([]*storage.Message, 0, 100),
-		Events:          make([]storage.Event, 0, 1000),
-		Redelegations:   make([]storage.Redelegation, 0),
-		Undelegations:   make([]storage.Undelegation, 0),
-		CancelUnbonding: make([]storage.Undelegation, 0),
-		StakingLogs:     make([]storage.StakingLog, 0),
-		Votes:           make([]*storage.Vote, 0),
-		VestingAccounts: make([]*storage.VestingAccount, 0),
-		Forwardings:     make([]*storage.Forwarding, 0),
-		ZkIsmUpdates:    make([]*storage.ZkISMUpdate, 0),
-		ZkIsmMessages:   make([]*storage.ZkISMMessage, 0),
-		HlTransfers:     make([]*storage.HLTransfer, 0),
-		IbcTransfers:    make([]*storage.IbcTransfer, 0),
-		Signals:         make([]*storage.SignalVersion, 0),
-		DenomMetadata:   make([]storage.DenomMetadata, 0),
+		Messages:            make([]*storage.Message, 0, 100),
+		Events:              make([]storage.Event, 0, 1000),
+		Redelegations:       make([]storage.Redelegation, 0),
+		Undelegations:       make([]storage.Undelegation, 0),
+		CancelUnbonding:     make([]storage.Undelegation, 0),
+		StakingLogs:         make([]storage.StakingLog, 0),
+		Votes:               make([]*storage.Vote, 0),
+		VestingAccounts:     make([]*storage.VestingAccount, 0),
+		Forwardings:         make([]*storage.Forwarding, 0),
+		ZkIsmUpdates:        make([]*storage.ZkISMUpdate, 0),
+		ZkIsmMessages:       make([]*storage.ZkISMMessage, 0),
+		HlTransfers:         make([]*storage.HLTransfer, 0),
+		IbcTransfers:        make([]*storage.IbcTransfer, 0),
+		RecoveredIbcClients: make([]string, 0),
+		Signals:             make([]*storage.SignalVersion, 0),
+		DenomMetadata:       make([]storage.DenomMetadata, 0),
 
-		msgCounter: new(atomic.Int64),
+		msgCounter:       new(atomic.Int64),
+		ibcTransferByMsg: make(map[uint64]*storage.IbcTransfer),
 	}
 }
 
@@ -378,6 +383,26 @@ func (ctx *Context) AddGrants(grants ...*storage.Grant) {
 func (ctx *Context) AddIbcClient(client *storage.IbcClient) {
 	if item, ok := ctx.IbcClients.Get(client.Id); ok {
 		item.ConnectionCount += client.ConnectionCount
+		if client.FrozenRevisionHeight > 0 {
+			item.FrozenRevisionHeight = client.FrozenRevisionHeight
+		}
+		if client.FrozenRevisionNumber > 0 {
+			item.FrozenRevisionNumber = client.FrozenRevisionNumber
+		}
+		// chain keeps max(LatestHeight) compared as (revision, height): lower updates don't move it back
+		if client.LatestRevisionCompare(item) == 1 {
+			item.LatestRevisionHeight = client.LatestRevisionHeight
+			item.LatestRevisionNumber = client.LatestRevisionNumber
+		}
+		if !client.UpdatedAt.IsZero() {
+			item.UpdatedAt = client.UpdatedAt
+		}
+		if client.ChainId != "" {
+			item.ChainId = client.ChainId
+		}
+		if client.UnbondingPeriod > 0 {
+			item.UnbondingPeriod = client.UnbondingPeriod
+		}
 	} else {
 		ctx.IbcClients.Set(client.Id, client)
 	}
@@ -401,26 +426,52 @@ func (ctx *Context) AddIbcChannel(channel *storage.IbcChannel) {
 	}
 }
 
-func (ctx *Context) DeleteIbcChannel(chanId string) {
-	ctx.IbcChannels.Delete(chanId)
+// AddIbcChannelTransfer counts a transfer in its channel stats; call only once the transfer's success is confirmed by events
+func (ctx *Context) AddIbcChannelTransfer(transfer *storage.IbcTransfer) {
+	channel := &storage.IbcChannel{
+		Id:             transfer.ChannelId,
+		TransfersCount: 1,
+		Status:         types.IbcChannelStatusInitialization,
+	}
+	if transfer.Receiver != nil {
+		channel.Received = channel.Received.Add(transfer.Amount)
+	}
+	if transfer.Sender != nil {
+		channel.Sent = channel.Sent.Add(transfer.Amount)
+	}
+	ctx.AddIbcChannel(channel)
 }
 
-func (ctx *Context) AddIbcTransfer(transfer *storage.IbcTransfer) {
+// AddRecoveredIbcClient marks a subject client recovered by governance: unfrozen and replaced by its substitute
+func (ctx *Context) AddRecoveredIbcClient(id string) {
+	if id == "" || slices.Contains(ctx.RecoveredIbcClients, id) {
+		return
+	}
+	ctx.RecoveredIbcClients = append(ctx.RecoveredIbcClients, id)
+}
+
+// AddIbcTransfer binds the transfer to its message so event handlers never touch another message's transfer
+func (ctx *Context) AddIbcTransfer(msgId uint64, transfer *storage.IbcTransfer) {
+	if ctx.ibcTransferByMsg == nil {
+		ctx.ibcTransferByMsg = make(map[uint64]*storage.IbcTransfer)
+	}
+	ctx.ibcTransferByMsg[msgId] = transfer
 	ctx.IbcTransfers = append(ctx.IbcTransfers, transfer)
 }
 
-func (ctx *Context) GetLastIbcTransfer() *storage.IbcTransfer {
-	if len(ctx.IbcTransfers) == 0 {
-		return nil
-	}
-	return ctx.IbcTransfers[len(ctx.IbcTransfers)-1]
+func (ctx *Context) IbcTransferByMsg(msgId uint64) *storage.IbcTransfer {
+	return ctx.ibcTransferByMsg[msgId]
 }
 
-func (ctx *Context) RemoveLastIbcTransfer() {
-	if len(ctx.IbcTransfers) == 0 {
+func (ctx *Context) RemoveIbcTransfer(msgId uint64) {
+	transfer, ok := ctx.ibcTransferByMsg[msgId]
+	if !ok {
 		return
 	}
-	ctx.IbcTransfers = ctx.IbcTransfers[:len(ctx.IbcTransfers)-1]
+	delete(ctx.ibcTransferByMsg, msgId)
+	ctx.IbcTransfers = slices.DeleteFunc(ctx.IbcTransfers, func(t *storage.IbcTransfer) bool {
+		return t == transfer
+	})
 }
 
 func (ctx *Context) AddForwarding(fwd *storage.Forwarding) {

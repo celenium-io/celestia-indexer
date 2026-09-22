@@ -99,6 +99,14 @@ func processEvent(ctx *context.Context, event *storage.Event) error {
 		return parseProposal(ctx, event.Data)
 	case storageTypes.EventTypeInactiveProposal:
 		return parseProposal(ctx, event.Data)
+	case storageTypes.EventTypeRecoverClient:
+		ctx.AddRecoveredIbcClient(event.Data["subject_client_id"])
+	case storageTypes.EventTypeUpdateClientProposal:
+		id := event.Data["subject_client_id"]
+		if id == "" {
+			id = event.Data["client_id"]
+		}
+		ctx.AddRecoveredIbcClient(id)
 	case storageTypes.EventTypeHyperlanecorepostDispatchv1EventCreateIgp:
 		return parseCreateIgp(ctx, event.Data)
 	case storageTypes.EventTypeHyperlanecorepostDispatchv1EventSetIgp:

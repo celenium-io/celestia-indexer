@@ -121,3 +121,29 @@ func BenchmarkParseEvent(b *testing.B) {
 		}
 	})
 }
+
+func TestProcessEvent_RecoveredIbcClients(t *testing.T) {
+	ctx := context.NewContext()
+	events := []storage.Event{
+		{Type: storageTypes.EventTypeRecoverClient, Data: map[string]string{
+			"subject_client_id": "07-tendermint-1",
+			"client_type":       "07-tendermint",
+		}},
+		// legacy ClientUpdateProposal, both attribute keys seen across ibc-go versions
+		{Type: storageTypes.EventTypeUpdateClientProposal, Data: map[string]string{
+			"client_id": "07-tendermint-2",
+		}},
+		{Type: storageTypes.EventTypeUpdateClientProposal, Data: map[string]string{
+			"subject_client_id": "07-tendermint-3",
+		}},
+		// duplicates and empty ids are ignored
+		{Type: storageTypes.EventTypeRecoverClient, Data: map[string]string{
+			"subject_client_id": "07-tendermint-1",
+		}},
+		{Type: storageTypes.EventTypeRecoverClient, Data: map[string]string{}},
+	}
+	for i := range events {
+		require.NoError(t, processEvent(ctx, &events[i]))
+	}
+	require.Equal(t, []string{"07-tendermint-1", "07-tendermint-2", "07-tendermint-3"}, ctx.RecoveredIbcClients)
+}

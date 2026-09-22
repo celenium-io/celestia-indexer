@@ -84,15 +84,8 @@ func TestCursorGolden(t *testing.T) {
 		require.Emptyf(t, msg.InternalMsgs, "message %d must not have internal msgs", i)
 	}
 
-	// The eight MsgRecvPacket handlers converge on a single IBC channel
-	// derived from the packets' shared destination channel.
-	require.Equal(t, 1, decodeCtx.IbcChannels.Len())
-	channel, ok := decodeCtx.IbcChannels.Get("channel-4")
-	require.True(t, ok)
-	require.Equal(t, storageTypes.IbcChannelStatusInitialization, channel.Status)
-	require.Equal(t, "200176", channel.Received.String())
-	require.True(t, channel.Sent.IsZero())
-	require.EqualValues(t, 1, channel.TransfersCount)
+	// None of the eight MsgRecvPacket transfers is confirmed by events, so no channel stats are counted.
+	require.Equal(t, 0, decodeCtx.IbcChannels.Len())
 
 	// Every in-flight transfer opened during processing was resolved
 	// (matched to a fungible-token-packet event or explicitly discarded) by
