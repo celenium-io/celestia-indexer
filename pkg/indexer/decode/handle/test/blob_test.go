@@ -13,14 +13,13 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celestiaorg/celestia-app/v10/pkg/appconsts"
 	appBlobTypes "github.com/celestiaorg/celestia-app/v10/x/blob/types"
+	"github.com/celestiaorg/go-square/v4/share"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
-// oneShareGas is the blob gas of a payload that fits in a single share, which
-// is the case for every blob in this file.
-var oneShareGas = decimal.NewFromInt(int64(appconsts.GasPerBlobByte))
+var shareGas = decimal.NewFromInt(int64(appconsts.GasPerBlobByte * share.ShareSize))
 
 // MsgPayForBlob
 
@@ -70,7 +69,7 @@ func TestDecodeMsg_SuccessOnPayForBlob(t *testing.T) {
 			},
 			MsgId:       1,
 			Source:      storageTypes.BlobSourcePfb,
-			GasConsumed: oneShareGas,
+			GasConsumed: shareGas,
 		},
 	}
 	msgExpected := storage.Message{
@@ -144,7 +143,7 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 			},
 			MsgId:       1,
 			Source:      storageTypes.BlobSourcePfb,
-			GasConsumed: oneShareGas,
+			GasConsumed: shareGas,
 		}, {
 			Height:     block.Height,
 			Time:       now,
@@ -166,7 +165,7 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 			},
 			MsgId:       1,
 			Source:      storageTypes.BlobSourcePfb,
-			GasConsumed: oneShareGas,
+			GasConsumed: shareGas,
 		}, {
 			Height:     block.Height,
 			Time:       now,
@@ -188,7 +187,7 @@ func TestDecodeMsg_ManyUpdatesInOnePayForBlob(t *testing.T) {
 			},
 			MsgId:       1,
 			Source:      storageTypes.BlobSourcePfb,
-			GasConsumed: oneShareGas,
+			GasConsumed: shareGas,
 		},
 	}
 	msgExpected := storage.Message{

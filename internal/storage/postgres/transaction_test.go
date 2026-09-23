@@ -1069,6 +1069,49 @@ func (s *TransactionTestSuite) TestRollbackUndelegations() {
 	s.Require().Len(items, 0)
 }
 
+func (s *TransactionTestSuite) TestCancelUnbondings() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	// one cancellation per unbonding entry: several cancels of one entry within a block are
+	// summed by the decode context, see Test_AddCancelUndelegation_SameEntrySums
+	cancel := func(creationHeight pkgTypes.Level, amount int64) {
+		tx, err := BeginTransaction(ctx, s.storage.Transactable)
+		s.Require().NoError(err)
+
+		s.Require().NoError(tx.CancelUnbondings(ctx, &storage.Undelegation{
+			Height:         2000,
+			CreationHeight: creationHeight,
+			AddressId:      1,
+			ValidatorId:    1,
+			Amount:         types.NumericFromInt64(amount),
+		}))
+		s.Require().NoError(tx.Flush(ctx))
+		s.Require().NoError(tx.Close(ctx))
+	}
+
+	// the entry is found by the height it was created at, not by the height of the cancel
+	cancel(1001, 400)
+	items, err := s.storage.Undelegation.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+	s.Require().EqualValues("1000", items[0].Amount.String())
+
+	// partial cancel decreases amount
+	cancel(1000, 400)
+	items, err = s.storage.Undelegation.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+	s.Require().EqualValues("600", items[0].Amount.String())
+	s.Require().EqualValues(1000, items[0].Height)
+
+	// cancel of the rest removes the entry
+	cancel(1000, 600)
+	items, err = s.storage.Undelegation.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
+}
+
 func (s *TransactionTestSuite) TestRollbackRedelegations() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
@@ -1583,6 +1626,86 @@ func (s *TransactionTestSuite) TestJail() {
 	s.Require().Equal("1000090", val.Stake.String())
 }
 
+// Rollback collects validators from the staking logs of the block, and the rewards and
+// commissions logs of the whole active set carry no jailed flag. Such an update must keep
+// the stored flag instead of erasing it: a null jailed drops the validator out of both
+// `jailed = false` and `jailed = true` filters.
+func (s *TransactionTestSuite) TestUpdateValidatorsKeepsJailed() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	const (
+		jailedAddress    = "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr" // id = 2
+		notJailedAddress = "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw" // id = 1
+	)
+
+	update := func(validators ...*storage.Validator) {
+		tx, err := BeginTransaction(ctx, s.storage.Transactable)
+		s.Require().NoError(err)
+		s.Require().NoError(tx.UpdateValidators(ctx, validators...))
+		s.Require().NoError(tx.Flush(ctx))
+		s.Require().NoError(tx.Close(ctx))
+	}
+
+	// a slash puts the validator in jail
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+	s.Require().NoError(tx.Jail(ctx, &storage.Validator{Id: 2, Stake: types.NumericFromInt64(-100)}))
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	// rollback of a later block: rewards and commissions are reverted, the flag is not touched
+	update(
+		&storage.Validator{
+			Id:          1,
+			Stake:       types.NumericFromInt64(-10),
+			Rewards:     types.NumericFromInt64(-1),
+			Commissions: types.NumericFromInt64(-1),
+		},
+		// only rewards are known here: the other deltas stay at their zero value
+		&storage.Validator{Id: 2, Rewards: types.NumericFromInt64(-1)},
+	)
+
+	jailed, err := s.storage.Validator.ByAddress(ctx, jailedAddress)
+	s.Require().NoError(err)
+	s.Require().NotNil(jailed.Jailed)
+	s.Require().True(*jailed.Jailed)
+	s.Require().Equal("1000000", jailed.Stake.String())
+	s.Require().Equal("0", jailed.Rewards.String())
+	s.Require().Equal("1", jailed.Commissions.String())
+
+	notJailed, err := s.storage.Validator.ByAddress(ctx, notJailedAddress)
+	s.Require().NoError(err)
+	s.Require().NotNil(notJailed.Jailed)
+	s.Require().False(*notJailed.Jailed)
+	s.Require().Equal("1000090", notJailed.Stake.String())
+	s.Require().Equal("0", notJailed.Rewards.String())
+	s.Require().Equal("0", notJailed.Commissions.String())
+
+	// the filters still see both validators
+	jailedCount, err := s.storage.Validator.JailedCount(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal(1, jailedCount)
+
+	all, err := s.storage.Validator.ListByPower(ctx, storage.ValidatorFilters{Limit: 10, Jailed: testsuite.Ptr(false)})
+	s.Require().NoError(err)
+	s.Require().Len(all, 1)
+	s.Require().Equal(notJailedAddress, all[0].Address)
+
+	// rollback of the jail itself passes the flag explicitly and must apply it
+	update(&storage.Validator{Id: 2, Jailed: testsuite.Ptr(false)})
+
+	unjailed, err := s.storage.Validator.ByAddress(ctx, jailedAddress)
+	s.Require().NoError(err)
+	s.Require().NotNil(unjailed.Jailed)
+	s.Require().False(*unjailed.Jailed)
+	s.Require().Equal("1000000", unjailed.Stake.String())
+
+	jailedCount, err = s.storage.Validator.JailedCount(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal(0, jailedCount)
+}
+
 func (s *TransactionTestSuite) TestUpdateSlashedDelegations() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
@@ -1729,6 +1852,54 @@ func (s *TransactionTestSuite) TestSaveValidators() {
 	s.Require().NoError(err)
 	s.Require().NotNil(v.Jailed)
 	s.Require().True(*v.Jailed)
+}
+
+// TestSaveValidatorsCommissionRates covers the shape upgradeV7 sends: an empty validator
+// carrying nothing but the new rates. Both rates have to land, and the totals the upsert
+// adds up must stay where they were.
+func (s *TransactionTestSuite) TestSaveValidatorsCommissionRates() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	const address = "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw"
+
+	save := func(v *storage.Validator) {
+		s.T().Helper()
+		tx, err := BeginTransaction(ctx, s.storage.Transactable)
+		s.Require().NoError(err)
+		count, err := tx.SaveValidators(ctx, v)
+		s.Require().NoError(err)
+		s.Require().Zero(count)
+		s.Require().NoError(tx.Flush(ctx))
+		s.Require().NoError(tx.Close(ctx))
+	}
+
+	raised := storage.EmptyValidator()
+	raised.Address = address
+	raised.Rate = types.MustNumericFromString("0.2")
+	raised.MaxRate = types.MustNumericFromString("0.6")
+	save(&raised)
+
+	val, err := s.storage.Validator.ByAddress(ctx, address)
+	s.Require().NoError(err)
+	s.Require().Equal("0.2", val.Rate.String())
+	s.Require().Equal("0.6", val.MaxRate.String())
+	s.Require().Equal("1000100", val.Stake.String())
+	s.Require().Equal("1", val.Rewards.String())
+	s.Require().Equal("1", val.Commissions.String())
+	s.Require().EqualValues(1, val.MessagesCount)
+
+	// an update without rates, a rewards event for instance, keeps the stored ones
+	rewards := storage.EmptyValidator()
+	rewards.Address = address
+	rewards.Rewards = types.NumericFromInt64(5)
+	save(&rewards)
+
+	val, err = s.storage.Validator.ByAddress(ctx, address)
+	s.Require().NoError(err)
+	s.Require().Equal("0.2", val.Rate.String())
+	s.Require().Equal("0.6", val.MaxRate.String())
+	s.Require().Equal("6", val.Rewards.String())
 }
 
 // TestSaveValidatorsFibreHost covers the x/valaddr registry upsert: a validator

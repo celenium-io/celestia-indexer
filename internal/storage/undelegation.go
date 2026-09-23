@@ -34,6 +34,8 @@ type Undelegation struct {
 
 	Address   *Address   `bun:"rel:belongs-to,join:address_id=id"`
 	Validator *Validator `bun:"rel:belongs-to,join:validator_id=id"`
+
+	CreationHeight pkgTypes.Level `bun:"-"`
 }
 
 // TableName -

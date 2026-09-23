@@ -135,7 +135,7 @@ type Transaction interface {
 	SaveHyperlaneTokens(ctx context.Context, tokens ...*HLToken) error
 	SaveHyperlaneTransfers(ctx context.Context, transfers ...*HLTransfer) error
 	RetentionBlockSignatures(ctx context.Context, height pkgTypes.Level) error
-	CancelUnbondings(ctx context.Context, cancellations ...Undelegation) error
+	CancelUnbondings(ctx context.Context, cancellations ...*Undelegation) error
 	RetentionCompletedUnbondings(ctx context.Context, blockTime time.Time) error
 	RetentionCompletedRedelegations(ctx context.Context, blockTime time.Time) error
 	Jail(ctx context.Context, validators ...*Validator) error

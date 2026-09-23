@@ -227,7 +227,7 @@ func parseSlash(ctx *context.Context, data map[string]string) error {
 			Burned: slash.BurnedCoins,
 			Validator: &storage.Validator{
 				ConsAddress: consAddress,
-				Stake:       slash.BurnedCoins,
+				Stake:       slash.BurnedCoins.Neg(),
 				Jailed:      &jailed,
 			},
 		})

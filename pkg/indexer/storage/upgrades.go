@@ -90,10 +90,18 @@ func (module *Module) upgradeV7(ctx context.Context, decodeContext *decodeContex
 		if validator.Rate.LessThan(minCommissionRate) {
 			validator.Rate = minCommissionRate
 		}
-		if validator.MaxRate.GreaterThan(maxCommissionRate) {
+		if validator.MaxRate.LessThan(maxCommissionRate) {
 			validator.MaxRate = maxCommissionRate
 		}
-		decodeContext.AddValidator(*validator)
+
+		// only the rates go into the context: SaveValidators adds up stake, rewards,
+		// commissions and messages_count, so the listed values would be counted twice
+		newValidator := storage.EmptyValidator()
+		newValidator.Address = validator.Address
+		newValidator.Rate = validator.Rate
+		newValidator.MaxRate = validator.MaxRate
+
+		decodeContext.AddValidator(newValidator)
 	}
 	return nil
 }

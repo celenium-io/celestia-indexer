@@ -380,6 +380,7 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 			"messages_count", "creation_time", "fibre_host", "fibre_host_height").
 		On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
 		Set("rate = CASE WHEN EXCLUDED.rate > 0 THEN EXCLUDED.rate ELSE added_validator.rate END").
+		Set("max_rate = CASE WHEN EXCLUDED.max_rate > 0 THEN EXCLUDED.max_rate ELSE added_validator.max_rate END").
 		Set("min_self_delegation = CASE WHEN EXCLUDED.min_self_delegation > 0 THEN EXCLUDED.min_self_delegation ELSE added_validator.min_self_delegation END").
 		Set("stake = added_validator.stake + EXCLUDED.stake").
 		Set("commissions = added_validator.commissions + EXCLUDED.commissions").
@@ -916,7 +917,7 @@ func (tx Transaction) UpdateSlashedDelegations(ctx context.Context, validatorId 
 
 	burnedParts := tx.Tx().NewSelect().
 		Table("total", "delegation").
-		ColumnExpr("(delegation.amount * ? / total.amount) as amount", burned.String()).
+		ColumnExpr("case when total.amount > 0 then (delegation.amount * ? / total.amount) else 0 end as amount", burned.String()).
 		ColumnExpr("delegation.address_id as address_id").
 		Where("validator_id = ?", validatorId)
 
@@ -1372,24 +1373,54 @@ func (tx Transaction) RetentionBlockSignatures(ctx context.Context, height types
 	return err
 }
 
-func (tx Transaction) CancelUnbondings(ctx context.Context, cancellations ...models.Undelegation) error {
+func (tx Transaction) CancelUnbondings(ctx context.Context, cancellations ...*models.Undelegation) error {
 	if len(cancellations) == 0 {
 		return nil
 	}
 
+	// one row per unbonding entry: cancellations of the same entry are summed by the decode
+	// context, and the update below joins _data, so several matching rows would apply once
+	data := make([]cancelUnbonding, len(cancellations))
 	for i := range cancellations {
-		if _, err := tx.Tx().NewDelete().
-			Model(&cancellations[i]).
-			Where("height = ?height").
-			Where("amount = ?amount").
-			Where("validator_id = ?validator_id").
-			Where("address_id = ?address_id").
-			Exec(ctx); err != nil {
-			return err
+		data[i] = cancelUnbonding{
+			Height:      cancellations[i].CreationHeight,
+			ValidatorId: cancellations[i].ValidatorId,
+			AddressId:   cancellations[i].AddressId,
+			Amount:      cancellations[i].Amount,
 		}
 	}
 
-	return nil
+	// the delete runs even though nothing selects from it: a data-modifying CTE
+	// is always executed, and its snapshot does not see the update's own changes
+	deleted := tx.Tx().NewDelete().
+		Model((*models.Undelegation)(nil)).
+		TableExpr("_data").
+		Where("undelegation.height = _data.height").
+		Where("undelegation.validator_id = _data.validator_id").
+		Where("undelegation.address_id = _data.address_id").
+		Where("undelegation.amount <= _data.amount")
+
+	_, err := tx.Tx().NewUpdate().
+		With("_data", tx.Tx().NewValues(&data)).
+		With("_deleted", deleted).
+		Model((*models.Undelegation)(nil)).
+		TableExpr("_data").
+		Set("amount = undelegation.amount - _data.amount").
+		Where("undelegation.height = _data.height").
+		Where("undelegation.validator_id = _data.validator_id").
+		Where("undelegation.address_id = _data.address_id").
+		Where("undelegation.amount > _data.amount").
+		Exec(ctx)
+	return err
+}
+
+type cancelUnbonding struct {
+	bun.BaseModel `bun:"_data"`
+
+	Height      types.Level          `bun:"height"`
+	ValidatorId uint64               `bun:"validator_id"`
+	AddressId   uint64               `bun:"address_id"`
+	Amount      storageTypes.Numeric `bun:"amount,type:numeric"`
 }
 
 func (tx Transaction) RetentionCompletedUnbondings(ctx context.Context, blockTime time.Time) error {
@@ -1418,7 +1449,7 @@ func (tx Transaction) UpdateValidators(ctx context.Context, validators ...*model
 		Model((*models.Validator)(nil)).
 		TableExpr("_data").
 		Set("stake = validator.stake + _data.stake").
-		Set("jailed = _data.jailed").
+		Set("jailed = COALESCE(_data.jailed, validator.jailed)").
 		Set("commissions = validator.commissions + _data.commissions").
 		Set("rewards = validator.rewards + _data.rewards").
 		Where("validator.id = _data.id").

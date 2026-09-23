@@ -50,7 +50,7 @@ func (v *Validator) TotalVotingPower(ctx context.Context, maxVals int) (storageT
 
 func (v *Validator) ListByPower(ctx context.Context, fltrs storage.ValidatorFilters) (validators []storage.Validator, err error) {
 	query := v.DB().NewSelect().Model(&validators).
-		OrderExpr("(not jailed)::int * stake desc")
+		OrderExpr("(jailed IS NOT TRUE) DESC, stake DESC, id DESC")
 
 	query = limitScope(query, fltrs.Limit)
 	if fltrs.Offset > 0 {

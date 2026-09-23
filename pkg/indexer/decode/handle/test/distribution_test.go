@@ -122,15 +122,16 @@ func TestDecodeMsg_SuccessOnMsgWithdrawValidatorCommission(t *testing.T) {
 	dm, err := decode.Message(decodeCtx, m, position, storageTypes.StatusSuccess, 0)
 
 	msgExpected := storage.Message{
-		Id:        1,
-		Height:    block.Height,
-		Time:      now,
-		Position:  0,
-		Type:      storageTypes.MsgWithdrawValidatorCommission,
-		TxId:      0,
-		Data:      mustMsgToMap(t, m),
-		Size:      56,
-		Namespace: nil,
+		Id:         1,
+		Height:     block.Height,
+		Time:       now,
+		Position:   0,
+		Type:       storageTypes.MsgWithdrawValidatorCommission,
+		TxId:       0,
+		Data:       mustMsgToMap(t, m),
+		Size:       56,
+		Namespace:  nil,
+		Validators: []string{"celestiavaloper1fg9l3xvfuu9wxremv2229966zawysg4r40gw5x"},
 	}
 
 	require.NoError(t, err)
