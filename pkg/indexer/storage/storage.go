@@ -225,8 +225,6 @@ func (module *Module) saveBlock(ctx context.Context, dCtx *decodeContext.Context
 		return state, tx.HandleError(ctx, err)
 	}
 
-	module.fillValidatorsCache(dCtx.Validators.Values())
-
 	module.Log.Info().
 		Uint64("height", uint64(dCtx.Block.Height)).
 		Time("block_time", dCtx.Block.Time).

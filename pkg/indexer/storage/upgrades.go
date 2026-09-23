@@ -87,12 +87,8 @@ func (module *Module) upgradeV7(ctx context.Context, decodeContext *decodeContex
 		if err != nil {
 			return errors.Wrap(err, "list validators in upgrade v7")
 		}
-		if validator.Rate.LessThan(minCommissionRate) {
-			validator.Rate = minCommissionRate
-		}
-		if validator.MaxRate.LessThan(maxCommissionRate) {
-			validator.MaxRate = maxCommissionRate
-		}
+		validator.Rate = getMax(validator.Rate, minCommissionRate)
+		validator.MaxRate = getMax(validator.MaxRate, maxCommissionRate)
 
 		// only the rates go into the context: SaveValidators adds up stake, rewards,
 		// commissions and messages_count, so the listed values would be counted twice
@@ -104,4 +100,11 @@ func (module *Module) upgradeV7(ctx context.Context, decodeContext *decodeContex
 		decodeContext.AddValidator(newValidator)
 	}
 	return nil
+}
+
+func getMax(a, b types.Numeric) types.Numeric {
+	if a.GreaterThan(b) {
+		return a
+	}
+	return b
 }

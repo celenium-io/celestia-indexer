@@ -67,6 +67,8 @@ func (module *Module) saveValidators(
 		return 0, nil
 	}
 
+	module.fillValidatorsCache(validators)
+
 	return count, nil
 }
 
