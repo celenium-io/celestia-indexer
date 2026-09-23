@@ -40,12 +40,12 @@ type Context struct {
 	Namespaces        *sdkSync.Map[string, *storage.Namespace]
 	NamespaceMessages *sdkSync.Map[string, *storage.NamespaceMessage]
 	AddressMessages   *sdkSync.Map[string, *storage.MsgAddress]
+	CancelUnbonding   *sdkSync.Map[cancelKey, *storage.Undelegation]
 
 	Messages            []*storage.Message
 	Events              []storage.Event
 	Redelegations       []storage.Redelegation
 	Undelegations       []storage.Undelegation
-	CancelUnbonding     []storage.Undelegation
 	StakingLogs         []storage.StakingLog
 	Votes               []*storage.Vote
 	VestingAccounts     []*storage.VestingAccount
@@ -88,12 +88,12 @@ func NewContext() *Context {
 		Namespaces:        sdkSync.NewMap[string, *storage.Namespace](),
 		NamespaceMessages: sdkSync.NewMap[string, *storage.NamespaceMessage](),
 		AddressMessages:   sdkSync.NewMap[string, *storage.MsgAddress](),
+		CancelUnbonding:   sdkSync.NewMap[cancelKey, *storage.Undelegation](),
 
 		Messages:            make([]*storage.Message, 0, 100),
 		Events:              make([]storage.Event, 0, 1000),
 		Redelegations:       make([]storage.Redelegation, 0),
 		Undelegations:       make([]storage.Undelegation, 0),
-		CancelUnbonding:     make([]storage.Undelegation, 0),
 		StakingLogs:         make([]storage.StakingLog, 0),
 		Votes:               make([]*storage.Vote, 0),
 		VestingAccounts:     make([]*storage.VestingAccount, 0),
@@ -114,6 +114,13 @@ func NewContext() *Context {
 func (ctx *Context) AddAddress(address *storage.Address) error {
 	if address == nil {
 		return nil
+	}
+	if len(address.Hash) == 0 {
+		_, hash, err := pkgTypes.Address(address.Address).Decode()
+		if err != nil {
+			return errors.Wrap(err, address.Address)
+		}
+		address.Hash = hash
 	}
 	if addr, ok := ctx.Addresses.Get(address.String()); ok {
 		for i := range address.Balances {
@@ -141,13 +148,6 @@ func (ctx *Context) AddAddress(address *storage.Address) error {
 			addr.IsForwarding = true
 		}
 	} else {
-		if len(address.Hash) == 0 {
-			_, hash, err := pkgTypes.Address(address.Address).Decode()
-			if err != nil {
-				return errors.Wrap(err, address.Address)
-			}
-			address.Hash = hash
-		}
 		ctx.Addresses.Set(address.String(), address)
 	}
 	return nil
@@ -205,6 +205,9 @@ func (ctx *Context) AddValidator(validator storage.Validator) {
 		}
 		if validator.FibreHostHeight != nil {
 			val.FibreHostHeight = validator.FibreHostHeight
+		}
+		if validator.Jailed != nil {
+			val.Jailed = validator.Jailed
 		}
 	} else {
 		ctx.Validators.Set(validator.Address, &validator)
@@ -265,8 +268,31 @@ func (ctx *Context) AddUndelegation(u storage.Undelegation) {
 	ctx.Undelegations = append(ctx.Undelegations, u)
 }
 
-func (ctx *Context) AddCancelUndelegation(u storage.Undelegation) {
-	ctx.CancelUnbonding = append(ctx.CancelUnbonding, u)
+type cancelKey struct {
+	height    pkgTypes.Level
+	validator string
+	address   string
+}
+
+func (ctx *Context) AddCancelUndelegation(u storage.Undelegation) error {
+	if u.Validator == nil {
+		return errors.New("nil validator pointer in cancel unbonding")
+	}
+	if u.Address == nil {
+		return errors.New("nil address pointer in cancel unbonding")
+	}
+	key := cancelKey{
+		height:    u.CreationHeight,
+		validator: u.Validator.Address,
+		address:   u.Address.Address,
+	}
+
+	if val, ok := ctx.CancelUnbonding.Get(key); ok {
+		val.Amount = val.Amount.Add(u.Amount)
+	} else {
+		ctx.CancelUnbonding.Set(key, &u)
+	}
+	return nil
 }
 
 func (ctx *Context) AddJail(jail storage.Jail) {
@@ -274,9 +300,11 @@ func (ctx *Context) AddJail(jail storage.Jail) {
 		if jail.Reason != "" {
 			j.Reason = jail.Reason
 		}
+		// Burned is the magnitude written to the jail row, Validator.Stake is the delta
+		// the storage module adds to the stored stake, so the same burn goes in negated
 		if !jail.Burned.IsZero() {
-			j.Validator.Stake = j.Validator.Stake.Sub(jail.Burned)
 			j.Burned = j.Burned.Add(jail.Burned)
+			j.Validator.Stake = j.Validator.Stake.Sub(jail.Burned)
 		}
 		if jail.Validator.Jailed != nil {
 			j.Validator.Jailed = jail.Validator.Jailed

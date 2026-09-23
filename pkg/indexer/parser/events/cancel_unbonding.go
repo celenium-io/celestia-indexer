@@ -97,13 +97,16 @@ func processCancelUnbonding(ctx *context.Context, c *Cursor, msg *storage.Messag
 				Amount:    amount,
 			})
 
-			ctx.AddCancelUndelegation(storage.Undelegation{
-				Validator: &validator,
-				Address:   address,
-				Height:    msg.Height,
-				Time:      msg.Time,
-				Amount:    amount,
-			})
+			if err := ctx.AddCancelUndelegation(storage.Undelegation{
+				Validator:      &validator,
+				Address:        address,
+				Height:         msg.Height,
+				Time:           msg.Time,
+				Amount:         amount,
+				CreationHeight: types.Level(cancel.CreationHeight),
+			}); err != nil {
+				return err
+			}
 
 			ctx.AddStakingLog(storage.StakingLog{
 				Height:    msg.Height,

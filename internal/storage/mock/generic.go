@@ -512,7 +512,7 @@ func (c *MockTransactionBulkSaveCall) DoAndReturn(f func(context.Context, []any)
 }
 
 // CancelUnbondings mocks base method.
-func (m *MockTransaction) CancelUnbondings(ctx context.Context, cancellations ...storage.Undelegation) error {
+func (m *MockTransaction) CancelUnbondings(ctx context.Context, cancellations ...*storage.Undelegation) error {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx}
 	for _, a := range cancellations {
@@ -543,13 +543,13 @@ func (c *MockTransactionCancelUnbondingsCall) Return(arg0 error) *MockTransactio
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionCancelUnbondingsCall) Do(f func(context.Context, ...storage.Undelegation) error) *MockTransactionCancelUnbondingsCall {
+func (c *MockTransactionCancelUnbondingsCall) Do(f func(context.Context, ...*storage.Undelegation) error) *MockTransactionCancelUnbondingsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionCancelUnbondingsCall) DoAndReturn(f func(context.Context, ...storage.Undelegation) error) *MockTransactionCancelUnbondingsCall {
+func (c *MockTransactionCancelUnbondingsCall) DoAndReturn(f func(context.Context, ...*storage.Undelegation) error) *MockTransactionCancelUnbondingsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

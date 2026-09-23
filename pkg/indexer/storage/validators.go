@@ -30,11 +30,11 @@ func (module *Module) saveValidators(
 				return 0, errors.Errorf("unknown jailed validator: %s", address)
 			}
 
+			jailsArr = append(jailsArr, *j)
+
 			if j.Burned.IsZero() {
 				continue
 			}
-
-			jailsArr = append(jailsArr, *j)
 
 			balanceUpdates, err := tx.UpdateSlashedDelegations(ctx, j.ValidatorId, j.Burned)
 			if err != nil {
@@ -67,6 +67,12 @@ func (module *Module) saveValidators(
 		return 0, nil
 	}
 
+	module.fillValidatorsCache(validators)
+
+	return count, nil
+}
+
+func (module *Module) fillValidatorsCache(validators []*storage.Validator) {
 	for i := range validators {
 		if validators[i].ConsAddress != "" {
 			module.validatorsByConsAddress[validators[i].ConsAddress] = validators[i].Id
@@ -78,6 +84,4 @@ func (module *Module) saveValidators(
 			module.validatorsByDelegator[validators[i].Delegator] = validators[i].Id
 		}
 	}
-
-	return count, nil
 }

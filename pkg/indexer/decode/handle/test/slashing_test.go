@@ -48,6 +48,8 @@ func TestDecodeMsg_SuccessOnMsgUnjail(t *testing.T) {
 		Data:      mustMsgToMap(t, m),
 		Size:      56,
 		Namespace: nil,
+		// the message is linked to the validator it unjails
+		Validators: []string{"celestiavaloper170qq26qenw420ufd5py0r59kpg3tj2m7dqkpym"},
 	}
 	require.NoError(t, err)
 	require.Equal(t, int64(0), dm.BlobsSize)

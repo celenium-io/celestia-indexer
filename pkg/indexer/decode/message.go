@@ -88,7 +88,7 @@ func NestedMessage(
 	case *cosmosDistributionTypes.MsgWithdrawDelegatorReward:
 		d.Msg.Type, err = handle.MsgWithdrawDelegatorReward(ctx, d.Msg.Id, typedMsg)
 	case *cosmosDistributionTypes.MsgWithdrawValidatorCommission:
-		d.Msg.Type, err = handle.MsgWithdrawValidatorCommission(ctx, d.Msg.Id, typedMsg)
+		d.Msg.Type, d.Msg.Validators, err = handle.MsgWithdrawValidatorCommission(ctx, status, d.Msg.Id, typedMsg)
 	case *cosmosDistributionTypes.MsgFundCommunityPool:
 		d.Msg.Type, err = handle.MsgFundCommunityPool(ctx, d.Msg.Id, typedMsg)
 	case *cosmosDistributionTypes.MsgUpdateParams:
@@ -121,7 +121,7 @@ func NestedMessage(
 
 	// slashing module
 	case *cosmosSlashingTypes.MsgUnjail:
-		d.Msg.Type, err = handle.MsgUnjail(ctx, d.Msg.Id, typedMsg)
+		d.Msg.Type, d.Msg.Validators, err = handle.MsgUnjail(ctx, status, d.Msg.Id, typedMsg)
 	case *cosmosSlashingTypes.MsgUpdateParams:
 		d.Msg.Type, err = handle.MsgUpdateParamsSlashing(ctx, d.Msg.Id, typedMsg)
 

@@ -109,22 +109,22 @@ func (module *Module) saveDelegations(
 		}
 	}
 
-	if len(dCtx.CancelUnbonding) > 0 {
-		for i := range dCtx.CancelUnbonding {
-			validatorId, ok := module.validatorsByAddress[dCtx.CancelUnbonding[i].Validator.Address]
+	if dCtx.CancelUnbonding.Len() > 0 {
+		for unbonding := range dCtx.CancelUnbonding.AllValues() {
+			validatorId, ok := module.validatorsByAddress[unbonding.Validator.Address]
 			if !ok {
-				return errors.Wrapf(errCantFindAddress, "cancel undelegation validator address %s", dCtx.CancelUnbonding[i].Validator.Address)
+				return errors.Wrapf(errCantFindAddress, "cancel undelegation validator address %s", unbonding.Validator.Address)
 			}
-			dCtx.CancelUnbonding[i].ValidatorId = validatorId
+			unbonding.ValidatorId = validatorId
 
-			addressId, ok := addrToId[dCtx.CancelUnbonding[i].Address.Address]
+			addressId, ok := addrToId[unbonding.Address.Address]
 			if !ok {
-				return errors.Wrapf(errCantFindAddress, "cancel undelegation address %s", dCtx.CancelUnbonding[i].Address.Address)
+				return errors.Wrapf(errCantFindAddress, "cancel undelegation address %s", unbonding.Address.Address)
 			}
-			dCtx.CancelUnbonding[i].AddressId = addressId
+			unbonding.AddressId = addressId
 		}
 
-		if err := tx.CancelUnbondings(ctx, dCtx.CancelUnbonding...); err != nil {
+		if err := tx.CancelUnbondings(ctx, dCtx.CancelUnbonding.Values()...); err != nil {
 			return err
 		}
 	}

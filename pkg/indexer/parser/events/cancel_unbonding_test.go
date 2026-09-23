@@ -170,6 +170,7 @@ func Test_handleCancelUnbonding(t *testing.T) {
 					Commissions:       types.NumericZero(),
 					Stake:             types.NumericFromInt64(45000000),
 				},
+				CreationHeight: 842069,
 			},
 		},
 	}
@@ -179,8 +180,17 @@ func Test_handleCancelUnbonding(t *testing.T) {
 			c.Skip(tt.idx)
 			err := handleCancelUnbonding(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
-			require.Len(t, tt.ctx.CancelUnbonding, 1)
-			require.Equal(t, *tt.cancel, tt.ctx.CancelUnbonding[0])
+			data := tt.ctx.CancelUnbonding.Values()
+			require.Len(t, data, 1)
+			require.NotNil(t, data[0])
+			require.Equal(t, *tt.cancel, *data[0])
+
+			addr, ok := tt.ctx.Addresses.Get(tt.cancel.Address.Address)
+			require.True(t, ok)
+			require.NotEmpty(t, addr.Hash)
+			require.Len(t, addr.Balances, 1)
+			require.Equal(t, "45000000", addr.Balances[0].Delegated.String())
+			require.Equal(t, "-45000000", addr.Balances[0].Unbonding.String())
 		})
 	}
 }

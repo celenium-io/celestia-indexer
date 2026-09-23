@@ -567,6 +567,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Redelegation)(nil)).
+			Index("redelegation_completion_time_idx").
+			Column("completion_time").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Undelegation
 		if _, err := tx.NewCreateIndex().
@@ -599,6 +607,14 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Index("undelegation_height_idx").
 			Column("height").
 			Using("BRIN").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Undelegation)(nil)).
+			Index("undelegation_completion_time_idx").
+			Column("completion_time").
 			Exec(ctx); err != nil {
 			return err
 		}

@@ -10,6 +10,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
@@ -449,4 +450,171 @@ func Test_AddIbcChannelTransfer(t *testing.T) {
 	require.EqualValues(t, 1, ch.TransfersCount)
 	require.True(t, ch.Sent.IsZero())
 	require.Equal(t, "7", ch.Received.String())
+}
+
+// Jail carries two numbers taken from the same `burned_coins` attribute: Burned is the
+// magnitude written to the jail row, Validator.Stake is the delta the storage module adds
+// to the stored stake. So a burn of 1000 arrives as Burned=1000 and Stake=-1000.
+func jailOf(consAddress, reason string, burned int64) storage.Jail {
+	jailed := true
+	return storage.Jail{
+		Reason: reason,
+		Burned: storageTypes.NumericFromInt64(burned),
+		Validator: &storage.Validator{
+			ConsAddress: consAddress,
+			Stake:       storageTypes.NumericFromInt64(-burned),
+			Jailed:      &jailed,
+		},
+	}
+}
+
+func Test_AddJail_New(t *testing.T) {
+	ctx := NewContext()
+	ctx.AddJail(jailOf("A5B3", "double_sign", 1000))
+
+	require.Equal(t, 1, ctx.Jails.Len())
+	jail, ok := ctx.Jails.Get("A5B3")
+	require.True(t, ok)
+	require.Equal(t, "double_sign", jail.Reason)
+	require.Equal(t, "1000", jail.Burned.String())
+	require.Equal(t, "-1000", jail.Validator.Stake.String())
+	require.NotNil(t, jail.Validator.Jailed)
+	require.True(t, *jail.Validator.Jailed)
+}
+
+// Two slashes of the same validator in one block accumulate: the burned magnitudes are
+// summed, the stake deltas are summed as well and stay negative.
+func Test_AddJail_MergeTwoBurns(t *testing.T) {
+	ctx := NewContext()
+	ctx.AddJail(jailOf("A5B3", "double_sign", 1000))
+	ctx.AddJail(jailOf("A5B3", "double_sign", 500))
+
+	require.Equal(t, 1, ctx.Jails.Len())
+	jail, ok := ctx.Jails.Get("A5B3")
+	require.True(t, ok)
+	require.Equal(t, "1500", jail.Burned.String())
+	require.Equal(t, "-1500", jail.Validator.Stake.String())
+}
+
+// A downtime jail burns nothing on Celestia, so a later double sign in the same block must
+// still bring its own burn and reason through.
+func Test_AddJail_MergeZeroBurnThenSlash(t *testing.T) {
+	ctx := NewContext()
+	ctx.AddJail(jailOf("A5B3", "missing_signature", 0))
+	ctx.AddJail(jailOf("A5B3", "double_sign", 1000))
+
+	require.Equal(t, 1, ctx.Jails.Len())
+	jail, ok := ctx.Jails.Get("A5B3")
+	require.True(t, ok)
+	require.Equal(t, "double_sign", jail.Reason)
+	require.Equal(t, "1000", jail.Burned.String())
+	require.Equal(t, "-1000", jail.Validator.Stake.String())
+}
+
+// A zero burn must leave what the previous slash accumulated untouched.
+func Test_AddJail_MergeSlashThenZeroBurn(t *testing.T) {
+	ctx := NewContext()
+	ctx.AddJail(jailOf("A5B3", "double_sign", 1000))
+	ctx.AddJail(jailOf("A5B3", "missing_signature", 0))
+
+	jail, ok := ctx.Jails.Get("A5B3")
+	require.True(t, ok)
+	require.Equal(t, "1000", jail.Burned.String())
+	require.Equal(t, "-1000", jail.Validator.Stake.String())
+}
+
+func Test_AddJail_DifferentValidators(t *testing.T) {
+	ctx := NewContext()
+	ctx.AddJail(jailOf("A5B3", "double_sign", 1000))
+	ctx.AddJail(jailOf("1122", "double_sign", 500))
+
+	require.Equal(t, 2, ctx.Jails.Len())
+	first, ok := ctx.Jails.Get("A5B3")
+	require.True(t, ok)
+	require.Equal(t, "-1000", first.Validator.Stake.String())
+	second, ok := ctx.Jails.Get("1122")
+	require.True(t, ok)
+	require.Equal(t, "-500", second.Validator.Stake.String())
+}
+
+func cancelOf(validator, delegator string, creationHeight pkgTypes.Level, amount int64) storage.Undelegation {
+	return storage.Undelegation{
+		Height:         2000,
+		CreationHeight: creationHeight,
+		Amount:         storageTypes.NumericFromInt64(amount),
+		Validator:      &storage.Validator{Address: validator},
+		Address:        &storage.Address{Address: delegator},
+	}
+}
+
+func Test_AddCancelUndelegation_SameEntrySums(t *testing.T) {
+	ctx := NewContext()
+	require.NoError(t, ctx.AddCancelUndelegation(cancelOf("valoper1", "celestia1", 1000, 200)))
+	require.NoError(t, ctx.AddCancelUndelegation(cancelOf("valoper1", "celestia1", 1000, 400)))
+
+	values := ctx.CancelUnbonding.Values()
+	require.Len(t, values, 1)
+	require.Equal(t, "600", values[0].Amount.String())
+	require.EqualValues(t, 1000, values[0].CreationHeight)
+	require.Equal(t, "valoper1", values[0].Validator.Address)
+	require.Equal(t, "celestia1", values[0].Address.Address)
+}
+
+// Validator is built by EmptyValidator with only the operator address set, so the key must use it
+func Test_AddCancelUndelegation_DifferentValidators(t *testing.T) {
+	ctx := NewContext()
+	require.NoError(t, ctx.AddCancelUndelegation(cancelOf("valoper1", "celestia1", 1000, 200)))
+	require.NoError(t, ctx.AddCancelUndelegation(cancelOf("valoper2", "celestia1", 1000, 400)))
+
+	require.Equal(t, 2, ctx.CancelUnbonding.Len())
+	amounts := make(map[string]string)
+	for u := range ctx.CancelUnbonding.AllValues() {
+		amounts[u.Validator.Address] = u.Amount.String()
+	}
+	require.Equal(t, map[string]string{"valoper1": "200", "valoper2": "400"}, amounts)
+}
+
+func Test_AddCancelUndelegation_DifferentKeys(t *testing.T) {
+	ctx := NewContext()
+	require.NoError(t, ctx.AddCancelUndelegation(cancelOf("valoper1", "celestia1", 1000, 200)))
+	require.NoError(t, ctx.AddCancelUndelegation(cancelOf("valoper1", "celestia1", 1001, 300)))
+	require.NoError(t, ctx.AddCancelUndelegation(cancelOf("valoper1", "celestia2", 1000, 400)))
+
+	require.Equal(t, 3, ctx.CancelUnbonding.Len())
+	for u := range ctx.CancelUnbonding.AllValues() {
+		switch {
+		case u.Address.Address == "celestia2":
+			require.Equal(t, "400", u.Amount.String())
+		case u.CreationHeight == 1001:
+			require.Equal(t, "300", u.Amount.String())
+		default:
+			require.Equal(t, "200", u.Amount.String())
+		}
+	}
+}
+
+// Merging must not mutate the amount of the event that was added second
+func Test_AddCancelUndelegation_DoesNotMutateInput(t *testing.T) {
+	ctx := NewContext()
+	first := cancelOf("valoper1", "celestia1", 1000, 200)
+	second := cancelOf("valoper1", "celestia1", 1000, 400)
+	require.NoError(t, ctx.AddCancelUndelegation(first))
+	require.NoError(t, ctx.AddCancelUndelegation(second))
+
+	require.Equal(t, "200", first.Amount.String())
+	require.Equal(t, "400", second.Amount.String())
+}
+
+func Test_AddCancelUndelegation_NilPointers(t *testing.T) {
+	ctx := NewContext()
+
+	noValidator := cancelOf("valoper1", "celestia1", 1000, 200)
+	noValidator.Validator = nil
+	require.Error(t, ctx.AddCancelUndelegation(noValidator))
+
+	noAddress := cancelOf("valoper1", "celestia1", 1000, 200)
+	noAddress.Address = nil
+	require.Error(t, ctx.AddCancelUndelegation(noAddress))
+
+	require.Equal(t, 0, ctx.CancelUnbonding.Len())
 }

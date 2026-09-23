@@ -17,17 +17,60 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-var testValidators = []*storage.Validator{
-	{
-		Id:      1,
-		Rate:    storageTypes.MustNumericFromString("0.150000000000000000"),
-		MaxRate: storageTypes.MustNumericFromString("0.500000000000000000"),
-	},
-	{
-		Id:      2,
-		Rate:    storageTypes.MustNumericFromString("0.250000000000000000"),
-		MaxRate: storageTypes.MustNumericFromString("0.700000000000000000"),
-	},
+const (
+	testValidatorBelowRates = "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw"
+	testValidatorAboveRates = "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr"
+)
+
+// upgradeV7 edits the listed validators in place, so every test gets its own copies.
+func testValidators() []*storage.Validator {
+	return []*storage.Validator{
+		{
+			Id:            1,
+			Address:       testValidatorBelowRates,
+			Rate:          storageTypes.MustNumericFromString("0.150000000000000000"),
+			MaxRate:       storageTypes.MustNumericFromString("0.500000000000000000"),
+			Stake:         storageTypes.NumericFromInt64(1000),
+			Rewards:       storageTypes.NumericFromInt64(20),
+			Commissions:   storageTypes.NumericFromInt64(3),
+			MessagesCount: 4,
+		},
+		{
+			Id:            2,
+			Address:       testValidatorAboveRates,
+			Rate:          storageTypes.MustNumericFromString("0.250000000000000000"),
+			MaxRate:       storageTypes.MustNumericFromString("0.700000000000000000"),
+			Stake:         storageTypes.NumericFromInt64(2000),
+			Rewards:       storageTypes.NumericFromInt64(30),
+			Commissions:   storageTypes.NumericFromInt64(5),
+			MessagesCount: 6,
+		},
+	}
+}
+
+// celestia-app v7 only raises the rates to the new minimums: what already sits above them,
+// including a max rate above 60%, is left alone.
+func requireV7CommissionRates(t *testing.T, dCtx *decodeContext.Context) {
+	t.Helper()
+	require.Equal(t, 2, dCtx.Validators.Len())
+
+	raised, ok := dCtx.Validators.Get(testValidatorBelowRates)
+	require.True(t, ok)
+	require.Equal(t, "0.2", raised.Rate.String())
+	require.Equal(t, "0.6", raised.MaxRate.String())
+
+	untouched, ok := dCtx.Validators.Get(testValidatorAboveRates)
+	require.True(t, ok)
+	require.Equal(t, "0.25", untouched.Rate.String())
+	require.Equal(t, "0.7", untouched.MaxRate.String())
+
+	// SaveValidators adds these up, so the upgrade may not carry the listed values along
+	for _, v := range []*storage.Validator{raised, untouched} {
+		require.True(t, v.Stake.IsZero(), "stake")
+		require.True(t, v.Rewards.IsZero(), "rewards")
+		require.True(t, v.Commissions.IsZero(), "commissions")
+		require.Zero(t, v.MessagesCount, "messages count")
+	}
 }
 
 func TestUpgradeV7(t *testing.T) {
@@ -37,7 +80,7 @@ func TestUpgradeV7(t *testing.T) {
 	validators := mock.NewMockIValidator(ctrl)
 	validators.EXPECT().
 		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return(testValidators, nil).
+		Return(testValidators(), nil).
 		Times(1)
 
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -49,13 +92,7 @@ func TestUpgradeV7(t *testing.T) {
 	err := module.upgradeV7(ctx, dCtx, 7)
 	require.NoError(t, err)
 
-	minCommissionRate := storageTypes.MustNumericFromString("0.200000000000000000")
-	maxCommissionRate := storageTypes.MustNumericFromString("0.600000000000000000")
-
-	for value := range dCtx.Validators.AllValues() {
-		require.True(t, value.Rate.GreaterThanOrEqual(minCommissionRate))
-		require.True(t, value.MaxRate.LessThanOrEqual(maxCommissionRate))
-	}
+	requireV7CommissionRates(t, dCtx)
 
 	for value := range dCtx.Constants.AllValues() {
 		if value.Name == "min_commission_rate" {
@@ -76,7 +113,7 @@ func TestUpgrade_V8WithoutPriorV7(t *testing.T) {
 	validators := mock.NewMockIValidator(ctrl)
 	validators.EXPECT().
 		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return(testValidators, nil).
+		Return(testValidators(), nil).
 		Times(1)
 
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -88,13 +125,7 @@ func TestUpgrade_V8WithoutPriorV7(t *testing.T) {
 	err := module.upgrade(ctx, dCtx, 6, 8)
 	require.NoError(t, err)
 
-	minCommissionRate := storageTypes.MustNumericFromString("0.200000000000000000")
-	maxCommissionRate := storageTypes.MustNumericFromString("0.600000000000000000")
-
-	for v := range dCtx.Validators.AllValues() {
-		require.True(t, v.Rate.GreaterThanOrEqual(minCommissionRate))
-		require.True(t, v.MaxRate.LessThanOrEqual(maxCommissionRate))
-	}
+	requireV7CommissionRates(t, dCtx)
 
 	var foundMin, foundMax bool
 	for c := range dCtx.Constants.AllValues() {
@@ -243,7 +274,7 @@ func TestUpgrade_V10ChainsThroughEarlierVersions(t *testing.T) {
 	validators := mock.NewMockIValidator(ctrl)
 	validators.EXPECT().
 		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return(testValidators, nil).
+		Return(testValidators(), nil).
 		Times(1)
 
 	constants := mock.NewMockIConstant(ctrl)
@@ -261,15 +292,8 @@ func TestUpgrade_V10ChainsThroughEarlierVersions(t *testing.T) {
 	err := module.upgrade(ctx, dCtx, 6, 10)
 	require.NoError(t, err)
 
-	// v7's validator commission adjustment ran. testValidators share the
-	// same (empty) Address, so AddValidator folds them into one entry.
-	minCommissionRate := storageTypes.MustNumericFromString("0.200000000000000000")
-	maxCommissionRate := storageTypes.MustNumericFromString("0.600000000000000000")
-	require.NotZero(t, dCtx.Validators.Len())
-	for v := range dCtx.Validators.AllValues() {
-		require.True(t, v.Rate.GreaterThanOrEqual(minCommissionRate))
-		require.True(t, v.MaxRate.LessThanOrEqual(maxCommissionRate))
-	}
+	// v7's validator commission adjustment ran
+	requireV7CommissionRates(t, dCtx)
 
 	// v7's staking constants and v10's fibre params both landed.
 	got := make(map[string]string)

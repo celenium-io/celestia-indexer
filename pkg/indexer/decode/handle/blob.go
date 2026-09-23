@@ -62,7 +62,7 @@ func MsgPayForBlobs(
 			ns := ctx.AddNamespace(namespace)
 
 			sharesUsed := share.SparseSharesNeeded(m.BlobSizes[idx], m.ShareVersions[idx] == uint32(share.ShareVersionOne))
-			gas := decimal.NewFromInt(int64(sharesUsed)).Mul(gasPerBlobByte)
+			gas := decimal.NewFromInt(int64(sharesUsed * share.ShareSize)).Mul(gasPerBlobByte)
 
 			blobLog := &storage.BlobLog{
 				Commitment: base64.StdEncoding.EncodeToString(m.ShareCommitments[idx]),

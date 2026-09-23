@@ -4,6 +4,7 @@
 package handle
 
 import (
+	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	cosmosDistributionTypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
@@ -34,12 +35,24 @@ func MsgWithdrawDelegatorReward(ctx *context.Context, msgId uint64, m *cosmosDis
 
 // MsgWithdrawValidatorCommission withdraws the full commission to the validator
 // address.
-func MsgWithdrawValidatorCommission(ctx *context.Context, msgId uint64, m *cosmosDistributionTypes.MsgWithdrawValidatorCommission) (storageTypes.MsgType, error) {
+func MsgWithdrawValidatorCommission(
+	ctx *context.Context, status storageTypes.Status, msgId uint64, m *cosmosDistributionTypes.MsgWithdrawValidatorCommission,
+) (storageTypes.MsgType, []string, error) {
 	msgType := storageTypes.MsgWithdrawValidatorCommission
 	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeValidator, address: m.ValidatorAddress},
 	}, ctx.Block.Height, msgId)
-	return msgType, err
+	if err != nil {
+		return msgType, nil, err
+	}
+	if status == storageTypes.StatusFailed {
+		return msgType, nil, nil
+	}
+	validator := storage.EmptyValidator()
+	validator.Address = m.ValidatorAddress
+	validator.MessagesCount += 1
+	ctx.AddValidator(validator)
+	return msgType, []string{m.ValidatorAddress}, nil
 }
 
 // MsgFundCommunityPool allows an account to directly

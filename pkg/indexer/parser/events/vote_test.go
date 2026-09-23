@@ -217,6 +217,7 @@ func Test_handleVote(t *testing.T) {
 						Height:     871324,
 						LastHeight: 871324,
 						Balances:   []storage.Balance{storage.EmptyBalance()},
+						Hash:       []byte{0x50, 0xa1, 0xec, 0xc6, 0x67, 0x0c, 0x9a, 0x72, 0x1f, 0x26, 0x7e, 0x08, 0xcd, 0x7b, 0x2b, 0xbb, 0x22, 0xfd, 0xe6, 0xc8},
 					},
 					Option: types.VoteOptionAbstain,
 					Weight: types.MustNumericFromString("0.500000000000000000"),

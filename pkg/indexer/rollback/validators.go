@@ -144,16 +144,16 @@ func rollbackValidators(
 
 			if !removed {
 				if val, ok := updated[logs[i].ValidatorId]; ok {
-					val.Stake = val.Stake.Add(logs[i].Change)
+					val.Stake = val.Stake.Add(logs[i].Change.Copy().Neg())
 				} else {
 					updated[logs[i].ValidatorId] = &storage.Validator{
 						Id:    logs[i].ValidatorId,
-						Stake: logs[i].Change.Copy(),
+						Stake: logs[i].Change.Copy().Neg(),
 					}
 				}
 			}
 
-			result.stake = result.stake.Add(logs[i].Change)
+			result.stake = result.stake.Add(logs[i].Change.Copy().Neg())
 
 		case st.StakingLogTypeCommissions:
 			if removed {

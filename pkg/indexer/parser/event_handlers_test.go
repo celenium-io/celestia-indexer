@@ -500,3 +500,107 @@ func Test_parseCompleteRedelegation(t *testing.T) {
 		})
 	}
 }
+
+func Test_parseSlash(t *testing.T) {
+	// the event carries a bech32 consensus address, the context is keyed by its uppercase hex
+	const (
+		valcons    = "celestiavalcons15keu050z7sy3ydzk0zgpydzk0zg2hn00835r7k"
+		valconsHex = "A5B3C7D1E2F40912345678901234567890ABCDEF"
+	)
+
+	t.Run("double sign", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+
+		err := parseSlash(ctx, map[string]string{
+			"address":      valcons,
+			"power":        "100",
+			"reason":       "double_sign",
+			"burned_coins": "1000",
+		})
+		require.NoError(t, err)
+		require.EqualValues(t, 1, ctx.Jails.Len())
+
+		jail, ok := ctx.Jails.Get(valconsHex)
+		require.True(t, ok)
+		require.Equal(t, testBlock.Height, jail.Height)
+		require.Equal(t, testBlock.Time, jail.Time)
+		require.Equal(t, "double_sign", jail.Reason)
+		require.Equal(t, "1000", jail.Burned.String())
+		require.Equal(t, valconsHex, jail.Validator.ConsAddress)
+		// stake is a delta: the burn must arrive negated or the jail would raise the stake
+		require.Equal(t, "-1000", jail.Validator.Stake.String())
+		require.NotNil(t, jail.Validator.Jailed)
+		require.True(t, *jail.Validator.Jailed)
+	})
+
+	// Celestia runs with slash_fraction_downtime = 0, so a downtime jail burns nothing
+	t.Run("downtime burns nothing", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+
+		err := parseSlash(ctx, map[string]string{
+			"address":      valcons,
+			"power":        "100",
+			"reason":       "missing_signature",
+			"jailed":       valcons,
+			"burned_coins": "0",
+		})
+		require.NoError(t, err)
+		require.EqualValues(t, 1, ctx.Jails.Len())
+
+		jail, ok := ctx.Jails.Get(valconsHex)
+		require.True(t, ok)
+		require.Equal(t, "missing_signature", jail.Reason)
+		require.True(t, jail.Burned.IsZero())
+		require.True(t, jail.Validator.Stake.IsZero())
+		require.NotNil(t, jail.Validator.Jailed)
+		require.True(t, *jail.Validator.Jailed)
+	})
+
+	// the second event of the evidence path carries only `jailed` and must be skipped
+	t.Run("jail only event is ignored", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+
+		err := parseSlash(ctx, map[string]string{
+			"jailed": valcons,
+		})
+		require.NoError(t, err)
+		require.EqualValues(t, 0, ctx.Jails.Len())
+	})
+
+	t.Run("two slashes in one block accumulate", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+
+		for _, burned := range []string{"1000", "500"} {
+			err := parseSlash(ctx, map[string]string{
+				"address":      valcons,
+				"power":        "100",
+				"reason":       "double_sign",
+				"burned_coins": burned,
+			})
+			require.NoError(t, err)
+		}
+		require.EqualValues(t, 1, ctx.Jails.Len())
+
+		jail, ok := ctx.Jails.Get(valconsHex)
+		require.True(t, ok)
+		require.Equal(t, "1500", jail.Burned.String())
+		require.Equal(t, "-1500", jail.Validator.Stake.String())
+	})
+
+	t.Run("invalid address", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+
+		err := parseSlash(ctx, map[string]string{
+			"address":      "invalid",
+			"reason":       "double_sign",
+			"burned_coins": "1000",
+		})
+		require.Error(t, err)
+		require.EqualValues(t, 0, ctx.Jails.Len())
+	})
+}
