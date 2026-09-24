@@ -275,6 +275,10 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, errors.Wrap(err, "upgrade failed")
 	}
 
+	if err := module.processValidatorBondUpdates(ctx, tx, dCtx); err != nil {
+		return state, errors.Wrap(err, "process validator bond updates")
+	}
+
 	if err := module.saveConstantUpdates(ctx, tx, dCtx.Constants); err != nil {
 		return state, errors.Wrap(err, "can't save constant updates")
 	}
@@ -320,6 +324,9 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 	totalValidators, err := module.saveValidators(ctx, tx, dCtx.Validators.Values(), dCtx.Jails)
 	if err != nil {
 		return state, err
+	}
+	if err := module.saveValidatorBondUpdates(ctx, tx, dCtx.ValidatorUpdates); err != nil {
+		return state, errors.Wrap(err, "save validator bond updates")
 	}
 
 	if err := module.saveMessages(ctx, tx, dCtx.Messages); err != nil {

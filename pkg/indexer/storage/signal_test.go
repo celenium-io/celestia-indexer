@@ -62,7 +62,7 @@ func TestTryUpgrade_NoValidatorsSignaled(t *testing.T) {
 	module, tx := makeModule(ctrl, constants)
 
 	// all validators signal version 0 (no version) or <= state.Version
-	tx.EXPECT().BondedValidators(gomock.Any(), 100).Return([]storage.Validator{
+	tx.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
 		{Id: 1, Stake: types.NumericFromInt64(1_000_000), Version: 0},
 		{Id: 2, Stake: types.NumericFromInt64(1_000_000), Version: 3},
 	}, nil)
@@ -85,7 +85,7 @@ func TestTryUpgrade_NoQuorum(t *testing.T) {
 
 	// total stake = 3_000_000 → Shares = 3; threshold = 3 * 5/6 ≈ 2
 	// voted for v4 = 1_000_000 → Shares = 1 < threshold → no quorum
-	tx.EXPECT().BondedValidators(gomock.Any(), 100).Return([]storage.Validator{
+	tx.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
 		{Id: 1, Stake: types.NumericFromInt64(1_000_000), Version: 4},
 		{Id: 2, Stake: types.NumericFromInt64(1_000_000), Version: 3},
 		{Id: 3, Stake: types.NumericFromInt64(1_000_000), Version: 3},
@@ -111,7 +111,7 @@ func TestTryUpgrade_WithQuorum(t *testing.T) {
 
 	// total stake = 6_000_000 → Shares = 6; threshold = 6 * 5/6 = 5
 	// voted for v4 raw = 6_000_000 → Shares = 6 > 5 → quorum
-	tx.EXPECT().BondedValidators(gomock.Any(), 100).Return([]storage.Validator{
+	tx.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
 		{Id: 1, Stake: types.NumericFromInt64(2_000_000), Version: 4},
 		{Id: 2, Stake: types.NumericFromInt64(2_000_000), Version: 4},
 		{Id: 3, Stake: types.NumericFromInt64(2_000_000), Version: 4},
@@ -144,7 +144,7 @@ func TestTryUpgrade_PicksMinimumQuorumVersion(t *testing.T) {
 	// two versions both have quorum; should pick v4 (minimum), not v5
 	// total stake = 12_000_000 → Shares = 12; threshold = 12 * 5/6 = 10
 	// voted raw = 12_000_000 → Shares = 12 > 10 → quorum for both
-	tx.EXPECT().BondedValidators(gomock.Any(), 100).Return([]storage.Validator{
+	tx.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
 		{Id: 1, Stake: types.NumericFromInt64(3_000_000), Version: 4},
 		{Id: 2, Stake: types.NumericFromInt64(3_000_000), Version: 4},
 		{Id: 3, Stake: types.NumericFromInt64(3_000_000), Version: 4},
@@ -264,15 +264,10 @@ func TestSaveSignals_WithQuorum(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	constants := mock.NewMockIConstant(ctrl)
-	constants.EXPECT().
-		Get(gomock.Any(), types.ModuleNameStaking, "max_validators").
-		Return(storage.Constant{Value: "100"}, nil)
-
 	tx := mock.NewMockTransaction(ctrl)
 
 	// total bonded stake
-	tx.EXPECT().BondedValidators(gomock.Any(), 100).Return([]storage.Validator{
+	tx.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
 		{Id: 1, Stake: types.NumericFromInt64(2_000_000)},
 		{Id: 2, Stake: types.NumericFromInt64(1_000_000)},
 	}, nil)
@@ -294,7 +289,7 @@ func TestSaveSignals_WithQuorum(t *testing.T) {
 			return nil
 		})
 
-	module := NewModule(nil, constants, nil, nil, indexerCfg.Indexer{Name: testIndexerName})
+	module := NewModule(nil, nil, nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	module.validatorsByAddress["val1address"] = 1
 
 	signals := []*storage.SignalVersion{
@@ -317,15 +312,10 @@ func TestSaveSignals_UnknownValidator(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	constants := mock.NewMockIConstant(ctrl)
-	constants.EXPECT().
-		Get(gomock.Any(), types.ModuleNameStaking, "max_validators").
-		Return(storage.Constant{Value: "100"}, nil)
-
 	tx := mock.NewMockTransaction(ctrl)
-	tx.EXPECT().BondedValidators(gomock.Any(), 100).Return([]storage.Validator{}, nil)
+	tx.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{}, nil)
 
-	module := NewModule(nil, constants, nil, nil, indexerCfg.Indexer{Name: testIndexerName})
+	module := NewModule(nil, nil, nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	// validatorsByAddress intentionally empty
 
 	signals := []*storage.SignalVersion{

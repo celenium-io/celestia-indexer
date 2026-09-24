@@ -544,6 +544,109 @@ func TestJxResultBlockResults_NullConsensusParams(t *testing.T) {
 	require.Nil(t, got.ConsensusParamUpdates)
 }
 
+// ── validator_updates ────────────────────────────────────────────────────────
+
+const (
+	testValPubKey1 = "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA="
+	testValPubKey2 = "AgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4fICE="
+)
+
+// Shape produced by cmtjson for abci.ValidatorUpdate; power 0 is omitted.
+const testValidatorUpdates = `{
+	"height": "100",
+	"txs_results": null,
+	"finalize_block_events": [],
+	"validator_updates": [
+		{"pub_key":{"Sum":{"type":"tendermint.crypto.PublicKey_Ed25519","value":{"ed25519":"` + testValPubKey1 + `"}}},"power":"1234"},
+		{"pub_key":{"Sum":{"type":"tendermint.crypto.PublicKey_Ed25519","value":{"ed25519":"` + testValPubKey2 + `"}}}}
+	]
+}`
+
+func TestJxResultBlockResults_ValidatorUpdates(t *testing.T) {
+	d := jdec(testValidatorUpdates)
+	defer jxpkg.PutDecoder(d)
+
+	got, err := jxResultBlockResults(d)
+	require.NoError(t, err)
+	require.Len(t, got.ValidatorUpdates, 2)
+
+	require.Equal(t, "tendermint.crypto.PublicKey_Ed25519", got.ValidatorUpdates[0].PubKey.Sum.Type)
+	require.Equal(t, mustDecodeB64(t, testValPubKey1), got.ValidatorUpdates[0].PubKey.Sum.Value.Ed25519)
+	require.NotNil(t, got.ValidatorUpdates[0].Power)
+	require.Equal(t, "1234", *got.ValidatorUpdates[0].Power)
+
+	require.Equal(t, mustDecodeB64(t, testValPubKey2), got.ValidatorUpdates[1].PubKey.Sum.Value.Ed25519)
+	require.Nil(t, got.ValidatorUpdates[1].Power)
+}
+
+func TestJxResultBlockResults_ValidatorUpdatesMatchStdJSON(t *testing.T) {
+	d := jdec(testValidatorUpdates)
+	defer jxpkg.PutDecoder(d)
+
+	got, err := jxResultBlockResults(d)
+	require.NoError(t, err)
+
+	var want pkgTypes.ResultBlockResults
+	require.NoError(t, stdjson.Unmarshal([]byte(testValidatorUpdates), &want))
+	require.Equal(t, want.ValidatorUpdates, got.ValidatorUpdates)
+}
+
+func TestJxResultBlockResults_NullValidatorUpdates(t *testing.T) {
+	d := jdec(`{"height":"1","txs_results":null,"finalize_block_events":[],"validator_updates":null}`)
+	defer jxpkg.PutDecoder(d)
+
+	got, err := jxResultBlockResults(d)
+	require.NoError(t, err)
+	require.Nil(t, got.ValidatorUpdates)
+}
+
+func TestJxResultBlockResults_EmptyValidatorUpdates(t *testing.T) {
+	d := jdec(`{"height":"1","txs_results":null,"finalize_block_events":[],"validator_updates":[]}`)
+	defer jxpkg.PutDecoder(d)
+
+	got, err := jxResultBlockResults(d)
+	require.NoError(t, err)
+	require.Empty(t, got.ValidatorUpdates)
+}
+
+func TestJxValidatorUpdate_NullPower(t *testing.T) {
+	d := jdec(`{"pub_key":{"Sum":{"type":"t","value":{"ed25519":"` + testValPubKey1 + `"}}},"power":null}`)
+	defer jxpkg.PutDecoder(d)
+
+	got, err := jxValidatorUpdate(d)
+	require.NoError(t, err)
+	require.Nil(t, got.Power)
+}
+
+func TestJxValidatorUpdate_UnknownFieldsSkipped(t *testing.T) {
+	d := jdec(`{"extra":{"a":1},"pub_key":{"Sum":{"type":"t","value":{"ed25519":"` + testValPubKey1 + `"}}},"power":"7","tail":[1,2]}`)
+	defer jxpkg.PutDecoder(d)
+
+	got, err := jxValidatorUpdate(d)
+	require.NoError(t, err)
+	require.NotNil(t, got.Power)
+	require.Equal(t, "7", *got.Power)
+	require.Equal(t, mustDecodeB64(t, testValPubKey1), got.PubKey.Sum.Value.Ed25519)
+}
+
+func TestJxPubKey_Secp256k1Skipped(t *testing.T) {
+	d := jdec(`{"Sum":{"type":"tendermint.crypto.PublicKey_Secp256K1","value":{"secp256k1":"A1Bf"}}}`)
+	defer jxpkg.PutDecoder(d)
+
+	got, err := jxPubKey(d)
+	require.NoError(t, err)
+	require.Equal(t, "tendermint.crypto.PublicKey_Secp256K1", got.Sum.Type)
+	require.Nil(t, got.Sum.Value.Ed25519)
+}
+
+func TestJxPubKey_InvalidBase64(t *testing.T) {
+	d := jdec(`{"Sum":{"type":"t","value":{"ed25519":"!!!"}}}`)
+	defer jxpkg.PutDecoder(d)
+
+	_, err := jxPubKey(d)
+	require.Error(t, err)
+}
+
 // ── jxHeader ─────────────────────────────────────────────────────────────────
 
 const testHashHex = "ABCDEF1234567890ABCDEF1234567890ABCDEF12"

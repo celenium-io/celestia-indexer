@@ -14,7 +14,7 @@ type ResultBlockResults struct {
 	TxsResults            []ResponseDeliverTx `json:"txs_results"`
 	FinalizeBlockEvents   []Event             `json:"finalize_block_events"`
 	ConsensusParamUpdates *ConsensusParams    `json:"consensus_param_updates"`
-	// ValidatorUpdates      []ValidatorUpdate    `json:"validator_updates"`
+	ValidatorUpdates      []ValidatorUpdate   `json:"validator_updates"`
 }
 
 type ResponseDeliverTx struct {
@@ -61,8 +61,8 @@ type EventAttribute struct {
 
 // ValidatorUpdate
 type ValidatorUpdate struct {
-	PubKey PubKey `json:"pub_key"`
-	Power  *int64 `json:"power,omitempty,string"`
+	PubKey PubKey  `json:"pub_key"`
+	Power  *string `json:"power,omitempty"`
 }
 
 type PubKey struct {

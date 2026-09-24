@@ -12,6 +12,8 @@
   contacts: https://t.me/DasRasyo || conqueror.prime
   details: Stake with me
   stake: 4
+  power: 0
+  bond_updates_count: 0
   commissions: 1
   rewards: 1
   height: 999
@@ -32,6 +34,8 @@
   contacts: contact@vitwit.com
   details: Witval is the validator arm from Vitwit. We are a web3 technology consulting, services and infrastructure company. We are validating across 20+ production networks, majorly focusing on Cosmos ecosystem
   stake: 4
+  power: 0
+  bond_updates_count: 0
   commissions: 1
   rewards: 1
   height: 1000

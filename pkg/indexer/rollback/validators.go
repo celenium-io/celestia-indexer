@@ -5,12 +5,14 @@ package rollback
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	st "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/pkg/errors"
 )
 
 type rollbackedValidators struct {
@@ -40,6 +42,39 @@ func rollbackValidators(
 	for i := range removedValidators {
 		removedIds[i] = removedValidators[i].Id
 		mapRemovedIds[removedValidators[i].Id] = struct{}{}
+	}
+
+	bondUpdates, err := tx.RollbackBondUpdates(ctx, height)
+	if err != nil {
+		return result, errors.Wrap(err, "rollback bond updates")
+	}
+	for i := range bondUpdates {
+		id := bondUpdates[i].ValidatorId
+		if _, removed := mapRemovedIds[id]; removed {
+			continue
+		}
+		if val, ok := updated[id]; ok {
+			val.BondUpdatesCount -= 1
+			continue
+		}
+
+		// no earlier update means the validator was out of the active set
+		power := st.NumericZero()
+		lastUpdate, err := tx.LastBondUpdate(ctx, id)
+		switch {
+		case err == nil:
+			if lastUpdate.Power != nil {
+				power = *lastUpdate.Power
+			}
+		case errors.Is(err, sql.ErrNoRows):
+		default:
+			return result, errors.Wrap(err, "get last bond update")
+		}
+		updated[id] = &storage.Validator{
+			Id:               id,
+			Power:            &power,
+			BondUpdatesCount: -1,
+		}
 	}
 
 	if err := tx.RollbackUndelegations(ctx, height); err != nil {

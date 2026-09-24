@@ -32,7 +32,7 @@ func (s *StorageTestSuite) TestTotalPower() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
-	power, err := s.storage.Validator.TotalVotingPower(ctx, 100)
+	power, err := s.storage.Validator.TotalVotingPower(ctx)
 	s.Require().NoError(err)
 	s.Require().Equal("2", power.String())
 }
@@ -66,9 +66,9 @@ func (s *StorageTestSuite) TestJailedCount() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
-	count, err := s.storage.Validator.JailedCount(ctx)
+	count, err := s.storage.Validator.CountByStatus(ctx)
 	s.Require().NoError(err)
-	s.Require().EqualValues(0, count)
+	s.Require().EqualValues(0, count.Jailed)
 }
 
 func (s *StorageTestSuite) TestMessages() {
@@ -112,4 +112,30 @@ func (s *StorageTestSuite) TestTopNMetrics() {
 	s.Require().NotEmpty(metrics.OperationTimeMetric.String())
 	s.Require().NotEmpty(metrics.CommissionMetric.String())
 	s.Require().NotEmpty(metrics.SelfDelegationMetric.String())
+}
+
+// Validators outside the active set (power 0 or null) add nothing to the total.
+func (s *StorageTestSuite) TestTotalPowerSkipsUnbonded() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	// fixtures are loaded once per suite
+	defer func() {
+		_, err := s.storage.Connection().DB().ExecContext(ctx, `UPDATE validator SET power = 1 WHERE id = 2`)
+		s.Require().NoError(err)
+	}()
+
+	_, err := s.storage.Connection().DB().ExecContext(ctx, `UPDATE validator SET power = NULL WHERE id = 2`)
+	s.Require().NoError(err)
+
+	power, err := s.storage.Validator.TotalVotingPower(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal("1", power.String())
+
+	_, err = s.storage.Connection().DB().ExecContext(ctx, `UPDATE validator SET power = 0 WHERE id = 2`)
+	s.Require().NoError(err)
+
+	power, err = s.storage.Validator.TotalVotingPower(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal("1", power.String())
 }

@@ -38,7 +38,7 @@ func (s *StateTestSuite) SetupSuite() {
 	s.state = mock.NewMockIState(s.ctrl)
 	s.validators = mock.NewMockIValidator(s.ctrl)
 	s.constants = mock.NewMockIConstant(s.ctrl)
-	s.handler = NewStateHandler(s.state, s.validators, s.constants, testIndexerName)
+	s.handler = NewStateHandler(s.state, s.validators, testIndexerName)
 }
 
 // TearDownSuite -
@@ -57,17 +57,8 @@ func (s *StateTestSuite) TestHead() {
 	c.SetPath("/head")
 
 	s.validators.EXPECT().
-		TotalVotingPower(gomock.Any(), 100).
+		TotalVotingPower(gomock.Any()).
 		Return(types.NumericFromInt64(100), nil).
-		Times(1)
-
-	s.constants.EXPECT().
-		Get(gomock.Any(), types.ModuleNameStaking, "max_validators").
-		Return(storage.Constant{
-			Module: types.ModuleNameStaking,
-			Name:   "max_validators",
-			Value:  "100",
-		}, nil).
 		Times(1)
 
 	s.state.EXPECT().

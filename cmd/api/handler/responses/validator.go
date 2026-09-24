@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
@@ -22,18 +23,20 @@ type Validator struct {
 	Contacts string `example:"security@0xfury.com"            json:"contacts" swaggertype:"string"`
 	Details  string `example:"Some long text about validator" json:"details"  swaggertype:"string"`
 
-	Rate              string `example:"0.03" json:"rate"                swaggertype:"string"`
-	MaxRate           string `example:"0.1"  json:"max_rate"            swaggertype:"string"`
-	MaxChangeRate     string `example:"0.01" json:"max_change_rate"     swaggertype:"string"`
-	MinSelfDelegation string `example:"1"    json:"min_self_delegation" swaggertype:"string"`
-	Stake             string `example:"1"    json:"stake"               swaggertype:"string"`
-	Rewards           string `example:"1"    json:"rewards"             swaggertype:"string"`
-	Commissions       string `example:"1"    json:"commissions"         swaggertype:"string"`
-	VotingPower       string `example:"1"    json:"voting_power"        swaggertype:"string"`
+	Rate              string `example:"0.03" json:"rate"                   swaggertype:"string"`
+	MaxRate           string `example:"0.1"  json:"max_rate"               swaggertype:"string"`
+	MaxChangeRate     string `example:"0.01" json:"max_change_rate"        swaggertype:"string"`
+	MinSelfDelegation string `example:"1"    json:"min_self_delegation"    swaggertype:"string"`
+	Stake             string `example:"1"    json:"stake"                  swaggertype:"string"`
+	Rewards           string `example:"1"    json:"rewards"                swaggertype:"string"`
+	Commissions       string `example:"1"    json:"commissions"            swaggertype:"string"`
+	VotingPower       string `example:"1"    json:"voting_power,omitempty" swaggertype:"string"`
 
-	Jailed bool `example:"false" json:"jailed" swaggertype:"boolean"`
+	Status string `example:"active" json:"status" swaggertype:"string"`
+	Jailed bool   `example:"false"  json:"jailed" swaggertype:"boolean"`
 
-	MessagesCount uint64 `example:"1" json:"messages_count" swaggertype:"integer"`
+	MessagesCount    uint64 `example:"1" json:"messages_count"     swaggertype:"integer"`
+	BondUpdatesCount int64  `example:"1" json:"bond_updates_count" swaggertype:"integer"`
 
 	CreationTime time.Time `example:"2025-07-04T03:10:57+00:00" format:"date-time" json:"creation_time" swaggertype:"string"`
 
@@ -46,10 +49,25 @@ func NewValidator(val storage.Validator) *Validator {
 	if val.Id == 0 { // for genesis block
 		return nil
 	}
-	jailed := false
+	var (
+		status      = storageTypes.ValidatorStatusActive
+		votingPower string
+		jailed      bool
+	)
+	if val.Power != nil {
+		votingPower = val.Power.String()
+	}
+	// power 0 comes from a validator update that removed the validator from the active set
+	if val.Power == nil || !val.Power.IsPositive() {
+		status = storageTypes.ValidatorStatusNotActive
+	}
 	if val.Jailed != nil {
 		jailed = *val.Jailed
+		if jailed {
+			status = storageTypes.ValidatorStatusJailed
+		}
 	}
+
 	return &Validator{
 		Id:      val.Id,
 		Version: val.Version,
@@ -73,10 +91,12 @@ func NewValidator(val storage.Validator) *Validator {
 		Rewards:           val.Rewards.Floor().String(),
 		Commissions:       val.Commissions.Floor().String(),
 		Jailed:            jailed,
-		VotingPower:       val.VotingPower().String(),
+		VotingPower:       votingPower,
 		MessagesCount:     val.MessagesCount,
+		BondUpdatesCount:  val.BondUpdatesCount,
 		CreationTime:      val.CreationTime,
 		Fibre:             NewFibreForValidator(val),
+		Status:            status.String(),
 	}
 }
 
@@ -237,4 +257,22 @@ func NewFibreForValidator(val storage.Validator) *Fibre {
 		Host:   *val.FibreHost,
 		Height: *val.FibreHostHeight,
 	}
+}
+
+type BondUpdate struct {
+	Height types.Level `example:"100"                       json:"height"          swaggertype:"integer"`
+	Time   time.Time   `example:"2023-07-04T03:10:57+00:00" format:"date-time"     json:"time"           swaggertype:"string"`
+	Power  *string     `example:"123123"                    json:"power,omitempty" swaggertype:"string"`
+}
+
+func NewBondUpdate(data storage.ValidatorBondUpdate) BondUpdate {
+	update := BondUpdate{
+		Height: data.Height,
+		Time:   data.Time,
+	}
+	if data.Power != nil {
+		power := data.Power.String()
+		update.Power = &power
+	}
+	return update
 }

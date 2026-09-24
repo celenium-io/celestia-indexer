@@ -299,6 +299,16 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		// bonded set: BondedValidators and the active status filter
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Validator)(nil)).
+			Index("validator_power_idx").
+			ColumnExpr("power DESC").
+			Where("power > 0").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Blob log
 		if _, err := tx.NewCreateIndex().
@@ -1291,6 +1301,25 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Model((*storage.ZkISMMessage)(nil)).
 			Index("zk_ism_message_tx_id_idx").
 			Column("tx_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		// ValidatorBondUpdate
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ValidatorBondUpdate)(nil)).
+			Index("validator_bond_update_validator_id_idx").
+			Column("validator_id").
+			Exec(ctx); err != nil {
+			return err
+		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.ValidatorBondUpdate)(nil)).
+			Index("validator_bond_update_height_idx").
+			Column("height").
+			Using("BRIN").
 			Exec(ctx); err != nil {
 			return err
 		}

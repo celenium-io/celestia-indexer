@@ -5,9 +5,11 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
@@ -16,6 +18,7 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -25,6 +28,7 @@ import (
 type ValidatorTestSuite struct {
 	suite.Suite
 	validators      *mock.MockIValidator
+	bondUpdates     *mock.MockIValidatorBondUpdate
 	blocks          *mock.MockIBlock
 	blockSignatures *mock.MockIBlockSignature
 	delegations     *mock.MockIDelegation
@@ -43,6 +47,7 @@ func (s *ValidatorTestSuite) SetupSuite() {
 	s.echo.Validator = NewCelestiaApiValidator()
 	s.ctrl = gomock.NewController(s.T())
 	s.validators = mock.NewMockIValidator(s.ctrl)
+	s.bondUpdates = mock.NewMockIValidatorBondUpdate(s.ctrl)
 	s.blocks = mock.NewMockIBlock(s.ctrl)
 	s.blockSignatures = mock.NewMockIBlockSignature(s.ctrl)
 	s.delegations = mock.NewMockIDelegation(s.ctrl)
@@ -50,7 +55,7 @@ func (s *ValidatorTestSuite) SetupSuite() {
 	s.jails = mock.NewMockIJail(s.ctrl)
 	s.votes = mock.NewMockIVote(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewValidatorHandler(s.validators, s.blocks, s.blockSignatures, s.delegations, s.constants, s.jails, s.votes, s.state, testIndexerName)
+	s.handler = NewValidatorHandler(s.validators, s.bondUpdates, s.blocks, s.blockSignatures, s.delegations, s.constants, s.jails, s.votes, s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -140,6 +145,42 @@ func (s *ValidatorTestSuite) TestListWithVersion() {
 	s.Require().EqualValues("moniker", validators[0].Moniker)
 	s.Require().EqualValues("012345", validators[0].ConsAddress)
 	s.Require().EqualValues(4, validators[0].Version)
+}
+
+func (s *ValidatorTestSuite) TestListWithStatus() {
+	for _, status := range storageTypes.ValidatorStatusValues() {
+		q := make(url.Values)
+		q.Add("status", status.String())
+
+		req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
+		rec := httptest.NewRecorder()
+		c := s.echo.NewContext(req, rec)
+		c.SetPath("/validator")
+
+		s.validators.EXPECT().
+			ListByPower(gomock.Any(), storage.ValidatorFilters{
+				Limit:  10,
+				Status: status,
+			}).
+			Return([]storage.Validator{testValidator}, nil).
+			Times(1)
+
+		s.Require().NoError(s.handler.List(c), status)
+		s.Require().Equal(http.StatusOK, rec.Code, status)
+	}
+}
+
+func (s *ValidatorTestSuite) TestListWithInvalidStatus() {
+	q := make(url.Values)
+	q.Add("status", "unbonding")
+
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/validator")
+
+	s.Require().NoError(s.handler.List(c))
+	s.Require().Equal(http.StatusBadRequest, rec.Code)
 }
 
 func (s *ValidatorTestSuite) TestByProposer() {
@@ -329,23 +370,13 @@ func (s *ValidatorTestSuite) TestCount() {
 	c := s.echo.NewContext(req, rec)
 	c.SetPath("/validators/count")
 
-	s.state.EXPECT().
-		ByName(gomock.Any(), testIndexerName).
-		Return(storage.State{
-			LastHeight:      4,
-			TotalValidators: 10,
-		}, nil).
-		Times(1)
-
 	s.validators.EXPECT().
-		JailedCount(gomock.Any()).
-		Return(2, nil).
-		Times(1)
-
-	s.constants.EXPECT().
-		Get(gomock.Any(), storageTypes.ModuleNameStaking, "max_validators").
-		Return(storage.Constant{
-			Value: "6",
+		CountByStatus(gomock.Any()).
+		Return(storage.CountByStatus{
+			Total:     10,
+			Jailed:    1,
+			Active:    6,
+			NotActive: 3,
 		}, nil).
 		Times(1)
 
@@ -357,9 +388,9 @@ func (s *ValidatorTestSuite) TestCount() {
 	s.Require().NoError(err)
 
 	s.Require().EqualValues(10, count.Total)
-	s.Require().EqualValues(2, count.Jailed)
+	s.Require().EqualValues(1, count.Jailed)
 	s.Require().EqualValues(6, count.Active)
-	s.Require().EqualValues(2, count.Inactive)
+	s.Require().EqualValues(3, count.Inactive)
 }
 
 func (s *ValidatorTestSuite) TestVotes() {
@@ -538,4 +569,102 @@ func (s *ValidatorTestSuite) TestTopNMetrics() {
 	s.Require().EqualValues("0.85", metrics.OperationTimeMetric)
 	s.Require().EqualValues("0.8", metrics.SelfDelegationMetric)
 	s.Require().EqualValues("0.75", metrics.BlockMissedMetric)
+}
+
+func (s *ValidatorTestSuite) bondUpdatesContext(q url.Values, id string) (echo.Context, *httptest.ResponseRecorder) {
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/validators/:id/bond_updates")
+	c.SetParamNames("id")
+	c.SetParamValues(id)
+	return c, rec
+}
+
+func (s *ValidatorTestSuite) TestBondUpdates() {
+	q := make(url.Values)
+	q.Set("limit", "5")
+	q.Set("offset", "2")
+	q.Set("sort", "desc")
+	c, rec := s.bondUpdatesContext(q, "1")
+
+	power := storageTypes.NumericFromInt64(1234)
+	zero := storageTypes.NumericZero()
+	s.bondUpdates.EXPECT().
+		ListByValidator(gomock.Any(), uint64(1), storage.FilterBondUpdatesListByValidator{
+			Limit:  5,
+			Offset: 2,
+			Sort:   sdk.SortOrderDesc,
+		}).
+		Return([]storage.ValidatorBondUpdate{
+			{Id: 2, Height: 200, Time: testTime, ValidatorId: 1, Power: &zero},
+			{Id: 1, Height: 100, Time: testTime, ValidatorId: 1, Power: &power},
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.BondUpdates(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var updates []responses.BondUpdate
+	s.Require().NoError(json.NewDecoder(rec.Body).Decode(&updates))
+	s.Require().Len(updates, 2)
+
+	s.Require().EqualValues(200, updates[0].Height)
+	s.Require().True(testTime.Equal(updates[0].Time))
+	s.Require().NotNil(updates[0].Power)
+	s.Require().Equal("0", *updates[0].Power)
+
+	s.Require().EqualValues(100, updates[1].Height)
+	s.Require().NotNil(updates[1].Power)
+	s.Require().Equal("1234", *updates[1].Power)
+}
+
+func (s *ValidatorTestSuite) TestBondUpdatesDefaults() {
+	c, rec := s.bondUpdatesContext(make(url.Values), "1")
+
+	s.bondUpdates.EXPECT().
+		ListByValidator(gomock.Any(), uint64(1), storage.FilterBondUpdatesListByValidator{
+			Limit: 10,
+			Sort:  sdk.SortOrderAsc,
+		}).
+		Return(nil, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.BondUpdates(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+	s.Require().Equal("[]", strings.TrimSpace(rec.Body.String()))
+}
+
+func (s *ValidatorTestSuite) TestBondUpdatesBadRequest() {
+	for name, tc := range map[string]struct {
+		id    string
+		query url.Values
+	}{
+		"zero id":         {id: "0"},
+		"invalid id":      {id: "abc"},
+		"limit too big":   {id: "1", query: url.Values{"limit": {"101"}}},
+		"negative offset": {id: "1", query: url.Values{"offset": {"-1"}}},
+		"invalid sort":    {id: "1", query: url.Values{"sort": {"up"}}},
+	} {
+		query := tc.query
+		if query == nil {
+			query = make(url.Values)
+		}
+		c, rec := s.bondUpdatesContext(query, tc.id)
+		s.Require().NoError(s.handler.BondUpdates(c), name)
+		s.Require().Equal(http.StatusBadRequest, rec.Code, name)
+	}
+}
+
+func (s *ValidatorTestSuite) TestBondUpdatesInternalError() {
+	c, rec := s.bondUpdatesContext(make(url.Values), "1")
+
+	s.bondUpdates.EXPECT().
+		ListByValidator(gomock.Any(), uint64(1), gomock.Any()).
+		Return(nil, errors.New("db is down")).
+		Times(1)
+	s.validators.EXPECT().IsNoRows(gomock.Any()).Return(false).AnyTimes()
+
+	s.Require().NoError(s.handler.BondUpdates(c))
+	s.Require().Equal(http.StatusInternalServerError, rec.Code)
 }

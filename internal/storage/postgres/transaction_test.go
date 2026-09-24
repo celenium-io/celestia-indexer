@@ -1683,9 +1683,9 @@ func (s *TransactionTestSuite) TestUpdateValidatorsKeepsJailed() {
 	s.Require().Equal("0", notJailed.Commissions.String())
 
 	// the filters still see both validators
-	jailedCount, err := s.storage.Validator.JailedCount(ctx)
+	countByStatus, err := s.storage.Validator.CountByStatus(ctx)
 	s.Require().NoError(err)
-	s.Require().Equal(1, jailedCount)
+	s.Require().Equal(1, countByStatus.Jailed)
 
 	all, err := s.storage.Validator.ListByPower(ctx, storage.ValidatorFilters{Limit: 10, Jailed: testsuite.Ptr(false)})
 	s.Require().NoError(err)
@@ -1701,9 +1701,9 @@ func (s *TransactionTestSuite) TestUpdateValidatorsKeepsJailed() {
 	s.Require().False(*unjailed.Jailed)
 	s.Require().Equal("1000000", unjailed.Stake.String())
 
-	jailedCount, err = s.storage.Validator.JailedCount(ctx)
+	countByStatus, err = s.storage.Validator.CountByStatus(ctx)
 	s.Require().NoError(err)
-	s.Require().Equal(0, jailedCount)
+	s.Require().Equal(0, countByStatus.Jailed)
 }
 
 func (s *TransactionTestSuite) TestUpdateSlashedDelegations() {
@@ -1985,19 +1985,133 @@ func (s *TransactionTestSuite) TestValidators() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	validators, err := tx.BondedValidators(ctx, 100)
+	validators, err := tx.BondedValidators(ctx)
 	s.Require().NoError(err)
 
 	s.Require().Len(validators, 2)
 
 	for i := range validators {
 		s.Require().NotEmpty(validators[i].Id)
-		s.Require().NotEmpty(validators[i].Stake.IntPart())
+		s.Require().NotEmpty(validators[i].Power.IntPart())
 		s.Require().Empty(validators[i].Address)
 	}
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
+}
+
+// Signals and proposals weigh each bonded validator by Stake.
+func (s *TransactionTestSuite) TestBondedValidatorsReturnStake() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+	defer func() { s.Require().NoError(tx.Close(ctx)) }()
+
+	validators, err := tx.BondedValidators(ctx)
+	s.Require().NoError(err)
+	s.Require().NotEmpty(validators)
+
+	for i := range validators {
+		s.Require().Equal("1000100", validators[i].Stake.String())
+	}
+}
+
+// A validator removed from the active set (power 0) or never in it (null) is not bonded.
+func (s *TransactionTestSuite) TestBondedValidatorsSkipUnbonded() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	_, err := s.storage.Connection().DB().ExecContext(ctx, `UPDATE validator SET power = 0 WHERE id = 2`)
+	s.Require().NoError(err)
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+	defer func() { s.Require().NoError(tx.Close(ctx)) }()
+
+	validators, err := tx.BondedValidators(ctx)
+	s.Require().NoError(err)
+	s.Require().Len(validators, 1)
+	s.Require().EqualValues(1, validators[0].Id)
+
+	_, err = s.storage.Connection().DB().ExecContext(ctx, `UPDATE validator SET power = NULL WHERE id = 2`)
+	s.Require().NoError(err)
+
+	validators, err = tx.BondedValidators(ctx)
+	s.Require().NoError(err)
+	s.Require().Len(validators, 1)
+}
+
+// A power update from validator_updates must reach the stored row; a missing power keeps it.
+func (s *TransactionTestSuite) TestSaveValidatorsPower() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	const address = "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw"
+
+	save := func(power *types.Numeric) {
+		s.T().Helper()
+		v := storage.EmptyValidator()
+		v.Address = address
+		v.Delegator = "celestia17vmk8m246t648hpmde2q7kp4ft9uwrayps85dg"
+		v.Power = power
+
+		tx, err := BeginTransaction(ctx, s.storage.Transactable)
+		s.Require().NoError(err)
+		_, err = tx.SaveValidators(ctx, &v)
+		s.Require().NoError(err)
+		s.Require().NoError(tx.Flush(ctx))
+		s.Require().NoError(tx.Close(ctx))
+	}
+
+	storedPower := func() string {
+		s.T().Helper()
+		v, err := s.storage.Validator.GetByID(ctx, 1)
+		s.Require().NoError(err)
+		s.Require().NotNil(v.Power)
+		return v.Power.String()
+	}
+
+	power := types.NumericFromInt64(5)
+	save(&power)
+	s.Require().Equal("5", storedPower())
+
+	save(nil)
+	s.Require().Equal("5", storedPower())
+
+	zero := types.NumericZero()
+	save(&zero)
+	s.Require().Equal("0", storedPower())
+}
+
+// processValidatorUpdates sends id, operator and consensus address and power only.
+func (s *TransactionTestSuite) TestSaveValidatorsPowerUpdate() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	v := storage.EmptyValidator()
+	v.Id = 1
+	v.Address = "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw"
+	v.ConsAddress = "81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8"
+	power := types.NumericFromInt64(5)
+	v.Power = &power
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+	_, err = tx.SaveValidators(ctx, &v)
+	s.Require().NoError(err)
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	stored, err := s.storage.Validator.GetByID(ctx, 1)
+	s.Require().NoError(err)
+	s.Require().NotNil(stored.Power)
+	s.Require().Equal("5", stored.Power.String())
+	s.Require().Equal("celestia17vmk8m246t648hpmde2q7kp4ft9uwrayps85dg", stored.Delegator)
+	s.Require().Equal("Conqueror", stored.Moniker)
+	s.Require().Equal("1000100", stored.Stake.String())
+	s.Require().EqualValues(999, stored.Height)
 }
 
 func (s *TransactionTestSuite) TestProposalVotes() {
@@ -2853,4 +2967,195 @@ func (s *TransactionTestSuite) TestSaveHyperlaneGasPayments() {
 
 func TestSuiteTransaction_Run(t *testing.T) {
 	suite.Run(t, new(TransactionTestSuite))
+}
+
+func (s *TransactionTestSuite) TestSaveBondUpdates() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	power := types.NumericFromInt64(9)
+	zero := types.NumericZero()
+	blockTime := time.Date(2023, 7, 4, 3, 11, 26, 0, time.UTC)
+	s.Require().NoError(tx.SaveBondUpdates(ctx,
+		&storage.ValidatorBondUpdate{Height: 1001, Time: blockTime, ValidatorId: 1, Power: &power},
+		&storage.ValidatorBondUpdate{Height: 1001, Time: blockTime, ValidatorId: 2, Power: &zero},
+	))
+	s.Require().NoError(tx.SaveBondUpdates(ctx))
+
+	last, err := tx.LastBondUpdate(ctx, 1)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1001, last.Height)
+	s.Require().Equal("9", last.Power.String())
+	s.Require().Positive(last.Id)
+
+	last, err = tx.LastBondUpdate(ctx, 2)
+	s.Require().NoError(err)
+	s.Require().True(last.Power.IsZero())
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	updates, err := s.storage.ValidatorBondUpdates.ListByValidator(ctx, 1, storage.FilterBondUpdatesListByValidator{Limit: 10})
+	s.Require().NoError(err)
+	s.Require().Len(updates, 3)
+}
+
+func (s *TransactionTestSuite) TestRollbackBondUpdates() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	removed, err := tx.RollbackBondUpdates(ctx, 1000)
+	s.Require().NoError(err)
+	s.Require().Len(removed, 2)
+	ids := make(map[uint64]string)
+	for i := range removed {
+		s.Require().EqualValues(1000, removed[i].Height)
+		ids[removed[i].ValidatorId] = removed[i].Power.String()
+	}
+	s.Require().Equal(map[uint64]string{1: "1", 2: "1"}, ids)
+
+	// the earlier update of validator 1 survives, validator 2 has none left
+	last, err := tx.LastBondUpdate(ctx, 1)
+	s.Require().NoError(err)
+	s.Require().EqualValues(999, last.Height)
+	s.Require().Equal("2", last.Power.String())
+
+	_, err = tx.LastBondUpdate(ctx, 2)
+	s.Require().ErrorIs(err, sql.ErrNoRows)
+
+	removed, err = tx.RollbackBondUpdates(ctx, 1000)
+	s.Require().NoError(err)
+	s.Require().Empty(removed)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+// Rollback writes the restored power and the counter delta through UpdateValidators.
+func (s *TransactionTestSuite) TestUpdateValidatorsPowerAndBondUpdates() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	power := types.NumericFromInt64(2)
+	restored := storage.EmptyValidator()
+	restored.Id = 1
+	restored.Power = &power
+	restored.BondUpdatesCount = -1
+
+	// power is kept when rollback has nothing to restore
+	untouched := storage.EmptyValidator()
+	untouched.Id = 2
+	untouched.Stake = types.NumericFromInt64(-100)
+
+	s.Require().NoError(tx.UpdateValidators(ctx, &restored, &untouched))
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	val, err := s.storage.Validator.GetByID(ctx, 1)
+	s.Require().NoError(err)
+	s.Require().Equal("2", val.Power.String())
+	s.Require().EqualValues(1, val.BondUpdatesCount)
+	s.Require().Equal("1000100", val.Stake.String())
+
+	val, err = s.storage.Validator.GetByID(ctx, 2)
+	s.Require().NoError(err)
+	s.Require().Equal("1", val.Power.String())
+	s.Require().EqualValues(1, val.BondUpdatesCount)
+	s.Require().Equal("1000000", val.Stake.String())
+}
+
+// The counter from a bond update adds up with the stored one.
+func (s *TransactionTestSuite) TestSaveValidatorsBondUpdatesCount() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	power := types.NumericZero()
+	v := storage.EmptyValidator()
+	v.Id = 1
+	v.Address = "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw"
+	v.Power = &power
+	v.BondUpdatesCount = 1
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+	count, err := tx.SaveValidators(ctx, &v)
+	s.Require().NoError(err)
+	s.Require().Zero(count)
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	stored, err := s.storage.Validator.GetByID(ctx, 1)
+	s.Require().NoError(err)
+	s.Require().EqualValues(3, stored.BondUpdatesCount)
+	s.Require().True(stored.Power.IsZero())
+}
+
+// active: power > 0, not_active: power 0 or null, jailed wins over both.
+func (s *TransactionTestSuite) TestValidatorStatuses() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	count, err := s.storage.Validator.CountByStatus(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal(storage.CountByStatus{Total: 2, Active: 2}, count)
+
+	_, err = s.storage.Connection().DB().ExecContext(ctx, `UPDATE validator SET power = 0 WHERE id = 2`)
+	s.Require().NoError(err)
+
+	count, err = s.storage.Validator.CountByStatus(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal(storage.CountByStatus{Total: 2, Active: 1, NotActive: 1}, count)
+	s.requireStatusIds(types.ValidatorStatusActive, 1)
+	s.requireStatusIds(types.ValidatorStatusNotActive, 2)
+
+	_, err = s.storage.Connection().DB().ExecContext(ctx, `UPDATE validator SET power = NULL WHERE id = 2`)
+	s.Require().NoError(err)
+	count, err = s.storage.Validator.CountByStatus(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal(storage.CountByStatus{Total: 2, Active: 1, NotActive: 1}, count)
+	s.requireStatusIds(types.ValidatorStatusNotActive, 2)
+
+	_, err = s.storage.Connection().DB().ExecContext(ctx, `UPDATE validator SET jailed = true WHERE id = 2`)
+	s.Require().NoError(err)
+	count, err = s.storage.Validator.CountByStatus(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal(storage.CountByStatus{Total: 2, Active: 1, Jailed: 1}, count)
+	s.requireStatusIds(types.ValidatorStatusJailed, 2)
+	s.requireStatusIds(types.ValidatorStatusNotActive)
+
+	all, err := s.storage.Validator.ListByPower(ctx, storage.ValidatorFilters{Limit: 10})
+	s.Require().NoError(err)
+	s.Require().Len(all, 2)
+}
+
+func (s *TransactionTestSuite) requireStatusIds(status types.ValidatorStatus, ids ...uint64) {
+	s.T().Helper()
+	validators, err := s.storage.Validator.ListByPower(s.T().Context(), storage.ValidatorFilters{Limit: 10, Status: status})
+	s.Require().NoError(err)
+	got := make([]uint64, len(validators))
+	for i := range validators {
+		got[i] = validators[i].Id
+	}
+	s.Require().ElementsMatch(ids, got, status)
+}
+
+func (s *TransactionTestSuite) TestTotalVotingPowerWithoutBondedValidators() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	_, err := s.storage.Connection().DB().ExecContext(ctx, `UPDATE validator SET power = NULL`)
+	s.Require().NoError(err)
+
+	power, err := s.storage.Validator.TotalVotingPower(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal("0", power.String())
 }
