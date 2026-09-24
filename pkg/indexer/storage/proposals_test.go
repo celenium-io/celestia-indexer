@@ -21,10 +21,9 @@ func TestFillProposalVotingPower(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	constants := mock.NewMockIConstant(ctrl)
 	validators := mock.NewMockIValidator(ctrl)
 
-	module := NewModule(nil, constants, validators, nil, config.Indexer{})
+	module := NewModule(nil, nil, validators, nil, config.Indexer{})
 
 	t.Run("not fill", func(t *testing.T) {
 		tx := mock.NewMockTransaction(ctrl)
@@ -67,15 +66,6 @@ func TestFillProposalVotingPower(t *testing.T) {
 	t.Run("active and no finished", func(t *testing.T) {
 		tx := mock.NewMockTransaction(ctrl)
 
-		constants.EXPECT().
-			Get(gomock.Any(), types.ModuleNameStaking, "max_validators").
-			Return(storage.Constant{
-				Name:   "max_validators",
-				Module: types.ModuleNameStaking,
-				Value:  "100",
-			}, nil).
-			Times(1)
-
 		tx.EXPECT().
 			ActiveProposals(t.Context()).
 			Return([]storage.Proposal{{
@@ -85,12 +75,12 @@ func TestFillProposalVotingPower(t *testing.T) {
 			}}, nil).
 			Times(1)
 		validators.EXPECT().
-			TotalVotingPower(gomock.Any(), 100).
+			TotalVotingPower(gomock.Any()).
 			Return(types.NumericFromInt64(10000), nil).
 			Times(1)
 
 		tx.EXPECT().
-			BondedValidators(t.Context(), 100).
+			BondedValidators(t.Context()).
 			Return([]storage.Validator{{
 				Id:    1,
 				Stake: types.NumericFromInt64(100000000),

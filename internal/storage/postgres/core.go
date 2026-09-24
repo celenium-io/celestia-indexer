@@ -28,51 +28,52 @@ type Storage struct {
 	cfg        config.Database
 	scriptsDir string
 
-	Blocks          models.IBlock
-	BlockStats      models.IBlockStats
-	BlockSignatures models.IBlockSignature
-	BlobLogs        models.IBlobLog
-	Constants       models.IConstant
-	DenomMetadata   models.IDenomMetadata
-	Tx              models.ITx
-	Message         models.IMessage
-	Event           models.IEvent
-	Address         models.IAddress
-	VestingAccounts models.IVestingAccount
-	VestingPeriods  models.IVestingPeriod
-	Namespace       models.INamespace
-	State           models.IState
-	Stats           models.IStats
-	Search          models.ISearch
-	Validator       models.IValidator
-	StakingLogs     models.IStakingLog
-	Delegation      models.IDelegation
-	Redelegation    models.IRedelegation
-	Undelegation    models.IUndelegation
-	Jails           models.IJail
-	Rollup          models.IRollup
-	RollupProvider  models.IRollupProvider
-	Grants          models.IGrant
-	ApiKeys         models.IApiKey
-	Proposals       models.IProposal
-	Votes           models.IVote
-	IbcClients      models.IIbcClient
-	IbcConnections  models.IIbcConnection
-	IbcChannels     models.IIbcChannel
-	IbcTransfers    models.IIbcTransfer
-	HLMailbox       models.IHLMailbox
-	HLTransfer      models.IHLTransfer
-	HLToken         models.IHLToken
-	HLIGP           models.IHLIGP
-	HLIGPConfig     models.IHLIGPConfig
-	HLGasPayment    models.IHLGasPayment
-	SignalVersion   models.ISignalVersion
-	Upgrade         models.IUpgrade
-	Forwardings     models.IForwarding
-	ZkISM           models.IZkISM
-	Celestials      celestials.ICelestial
-	CelestialState  celestials.ICelestialState
-	Notificator     *Notificator
+	Blocks               models.IBlock
+	BlockStats           models.IBlockStats
+	BlockSignatures      models.IBlockSignature
+	BlobLogs             models.IBlobLog
+	Constants            models.IConstant
+	DenomMetadata        models.IDenomMetadata
+	Tx                   models.ITx
+	Message              models.IMessage
+	Event                models.IEvent
+	Address              models.IAddress
+	VestingAccounts      models.IVestingAccount
+	VestingPeriods       models.IVestingPeriod
+	Namespace            models.INamespace
+	State                models.IState
+	Stats                models.IStats
+	Search               models.ISearch
+	Validator            models.IValidator
+	ValidatorBondUpdates models.IValidatorBondUpdate
+	StakingLogs          models.IStakingLog
+	Delegation           models.IDelegation
+	Redelegation         models.IRedelegation
+	Undelegation         models.IUndelegation
+	Jails                models.IJail
+	Rollup               models.IRollup
+	RollupProvider       models.IRollupProvider
+	Grants               models.IGrant
+	ApiKeys              models.IApiKey
+	Proposals            models.IProposal
+	Votes                models.IVote
+	IbcClients           models.IIbcClient
+	IbcConnections       models.IIbcConnection
+	IbcChannels          models.IIbcChannel
+	IbcTransfers         models.IIbcTransfer
+	HLMailbox            models.IHLMailbox
+	HLTransfer           models.IHLTransfer
+	HLToken              models.IHLToken
+	HLIGP                models.IHLIGP
+	HLIGPConfig          models.IHLIGPConfig
+	HLGasPayment         models.IHLGasPayment
+	SignalVersion        models.ISignalVersion
+	Upgrade              models.IUpgrade
+	Forwardings          models.IForwarding
+	ZkISM                models.IZkISM
+	Celestials           celestials.ICelestial
+	CelestialState       celestials.ICelestialState
+	Notificator          *Notificator
 
 	export models.Export
 }
@@ -91,54 +92,55 @@ func Create(ctx context.Context, cfg config.Database, scriptsDir string, withMig
 	export := NewExport(strg.Connection())
 
 	s := Storage{
-		cfg:             cfg,
-		scriptsDir:      scriptsDir,
-		Storage:         strg,
-		Blocks:          NewBlocks(strg.Connection()),
-		BlockStats:      NewBlockStats(strg.Connection()),
-		BlockSignatures: NewBlockSignature(strg.Connection()),
-		BlobLogs:        NewBlobLog(strg.Connection(), export),
-		Constants:       NewConstant(strg.Connection()),
-		DenomMetadata:   NewDenomMetadata(strg.Connection()),
-		Message:         NewMessage(strg.Connection()),
-		Event:           NewEvent(strg.Connection()),
-		Address:         NewAddress(strg.Connection()),
-		VestingAccounts: NewVestingAccount(strg.Connection()),
-		VestingPeriods:  NewVestingPeriod(strg.Connection()),
-		Tx:              NewTx(strg.Connection()),
-		State:           NewState(strg.Connection()),
-		Namespace:       NewNamespace(strg.Connection()),
-		Stats:           NewStats(strg.Connection()),
-		Search:          NewSearch(strg.Connection()),
-		Validator:       NewValidator(strg.Connection()),
-		StakingLogs:     NewStakingLog(strg.Connection()),
-		Delegation:      NewDelegation(strg.Connection()),
-		Redelegation:    NewRedelegation(strg.Connection()),
-		Undelegation:    NewUndelegation(strg.Connection()),
-		Jails:           NewJail(strg.Connection()),
-		Rollup:          NewRollup(strg.Connection()),
-		RollupProvider:  NewRollupProvider(strg.Connection()),
-		Grants:          NewGrant(strg.Connection()),
-		ApiKeys:         NewApiKey(strg.Connection()),
-		Proposals:       NewProposal(strg.Connection()),
-		Votes:           NewVote(strg.Connection()),
-		IbcClients:      NewIbcClient(strg.Connection()),
-		IbcConnections:  NewIbcConnection(strg.Connection()),
-		IbcChannels:     NewIbcChannel(strg.Connection()),
-		IbcTransfers:    NewIbcTransfer(strg.Connection()),
-		HLMailbox:       NewHLMailbox(strg.Connection()),
-		HLTransfer:      NewHLTransfer(strg.Connection()),
-		HLToken:         NewHLToken(strg.Connection()),
-		HLIGP:           NewHLIGP(strg.Connection()),
-		HLIGPConfig:     NewHLIGPConfig(strg.Connection()),
-		HLGasPayment:    NewHLGasPayment(strg.Connection()),
-		SignalVersion:   NewSignalVersion(strg.Connection()),
-		Upgrade:         NewUpgrade(strg.Connection()),
-		Forwardings:     NewForwarding(strg.Connection()),
-		ZkISM:           NewZkISM(strg.Connection()),
-		Celestials:      celestialsPg.NewCelestials(strg.Connection()),
-		CelestialState:  celestialsPg.NewCelestialState(strg.Connection()),
-		Notificator:     NewNotificator(strg.Connection().Pool()),
+		cfg:                  cfg,
+		scriptsDir:           scriptsDir,
+		Storage:              strg,
+		Blocks:               NewBlocks(strg.Connection()),
+		BlockStats:           NewBlockStats(strg.Connection()),
+		BlockSignatures:      NewBlockSignature(strg.Connection()),
+		BlobLogs:             NewBlobLog(strg.Connection(), export),
+		Constants:            NewConstant(strg.Connection()),
+		DenomMetadata:        NewDenomMetadata(strg.Connection()),
+		Message:              NewMessage(strg.Connection()),
+		Event:                NewEvent(strg.Connection()),
+		Address:              NewAddress(strg.Connection()),
+		VestingAccounts:      NewVestingAccount(strg.Connection()),
+		VestingPeriods:       NewVestingPeriod(strg.Connection()),
+		Tx:                   NewTx(strg.Connection()),
+		State:                NewState(strg.Connection()),
+		Namespace:            NewNamespace(strg.Connection()),
+		Stats:                NewStats(strg.Connection()),
+		Search:               NewSearch(strg.Connection()),
+		Validator:            NewValidator(strg.Connection()),
+		ValidatorBondUpdates: NewValidatorBondUpdate(strg.Connection()),
+		StakingLogs:          NewStakingLog(strg.Connection()),
+		Delegation:           NewDelegation(strg.Connection()),
+		Redelegation:         NewRedelegation(strg.Connection()),
+		Undelegation:         NewUndelegation(strg.Connection()),
+		Jails:                NewJail(strg.Connection()),
+		Rollup:               NewRollup(strg.Connection()),
+		RollupProvider:       NewRollupProvider(strg.Connection()),
+		Grants:               NewGrant(strg.Connection()),
+		ApiKeys:              NewApiKey(strg.Connection()),
+		Proposals:            NewProposal(strg.Connection()),
+		Votes:                NewVote(strg.Connection()),
+		IbcClients:           NewIbcClient(strg.Connection()),
+		IbcConnections:       NewIbcConnection(strg.Connection()),
+		IbcChannels:          NewIbcChannel(strg.Connection()),
+		IbcTransfers:         NewIbcTransfer(strg.Connection()),
+		HLMailbox:            NewHLMailbox(strg.Connection()),
+		HLTransfer:           NewHLTransfer(strg.Connection()),
+		HLToken:              NewHLToken(strg.Connection()),
+		HLIGP:                NewHLIGP(strg.Connection()),
+		HLIGPConfig:          NewHLIGPConfig(strg.Connection()),
+		HLGasPayment:         NewHLGasPayment(strg.Connection()),
+		SignalVersion:        NewSignalVersion(strg.Connection()),
+		Upgrade:              NewUpgrade(strg.Connection()),
+		Forwardings:          NewForwarding(strg.Connection()),
+		ZkISM:                NewZkISM(strg.Connection()),
+		Celestials:           celestialsPg.NewCelestials(strg.Connection()),
+		CelestialState:       celestialsPg.NewCelestialState(strg.Connection()),
+		Notificator:          NewNotificator(strg.Connection().Pool()),
 
 		export: export,
 	}
@@ -230,6 +232,7 @@ func createHypertables(ctx context.Context, conn *database.Bun) error {
 			&models.Forwarding{},
 			&models.ZkISMUpdate{},
 			&models.ZkISMMessage{},
+			&models.ValidatorBondUpdate{},
 		} {
 			if _, err := tx.ExecContext(ctx,
 				`SELECT create_hypertable(?, 'time', chunk_time_interval => INTERVAL '1 month', if_not_exists => TRUE);`,

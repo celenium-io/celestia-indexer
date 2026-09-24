@@ -13,6 +13,8 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	dCtx "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/pkg/errors"
 )
 
@@ -75,6 +77,9 @@ func (p *Module) parse(b *types.BlockData) error {
 
 	decodeCtx.Block.BlockSignatures = p.parseBlockSignatures(b.Block.LastCommit)
 	p.parseConsensusParamUpdates(decodeCtx, b.ConsensusParamUpdates)
+	if err := p.parseValidatorUpdates(decodeCtx, b.ValidatorUpdates); err != nil {
+		return errors.Wrap(err, "parseValidatorUpdates")
+	}
 
 	blockEvents, err := parseBlockEvents(decodeCtx, b, b.FinalizeBlockEvents, getFirstTxEvent(b.TxsResults))
 	if err != nil {
@@ -133,5 +138,46 @@ func getFirstTxEvent(results []types.ResponseDeliverTx) *types.Event {
 		}
 	}
 
+	return nil
+}
+
+func (p *Module) parseValidatorUpdates(ctx *dCtx.Context, updates []types.ValidatorUpdate) error {
+	for i := range updates {
+		if updates[i].PubKey.Sum.Type != "tendermint.crypto.PublicKey_Ed25519" {
+			p.Log.Warn().Str("typ", updates[i].PubKey.Sum.Type).Msg("unknown pubkey validator type")
+			continue
+		}
+		if len(updates[i].PubKey.Sum.Value.Ed25519) != 32 {
+			p.Log.Warn().
+				Int("length", len(updates[i].PubKey.Sum.Value.Ed25519)).
+				Msg("invalid length of ed25519 pub key")
+			continue
+		}
+		pk := ed25519.PubKey{Key: updates[i].PubKey.Sum.Value.Ed25519}
+		consAddr := sdk.ConsAddress(pk.Address())
+		hexAddr := strings.ToUpper(hex.EncodeToString(consAddr))
+		// cmtjson omits power 0: the validator left the active set
+		power := storageTypes.NumericZero()
+		if updates[i].Power != nil {
+			p, err := storageTypes.NumericFromString(*updates[i].Power)
+			if err != nil {
+				return errors.Wrapf(err, "validator update power: %s", *updates[i].Power)
+			}
+			power = p
+		}
+
+		// operator address and id are resolved by the storage module
+		validator := storage.EmptyValidator()
+		validator.ConsAddress = hexAddr
+		validator.Power = &power
+		validator.BondUpdatesCount = 1
+
+		ctx.AddValidatorUpdate(storage.ValidatorBondUpdate{
+			Height:    ctx.Block.Height,
+			Time:      ctx.Block.Time,
+			Power:     &power,
+			Validator: &validator,
+		})
+	}
 	return nil
 }

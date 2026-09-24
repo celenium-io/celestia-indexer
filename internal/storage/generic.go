@@ -74,6 +74,7 @@ var Models = []any{
 	&ZkISM{},
 	&ZkISMUpdate{},
 	&ZkISMMessage{},
+	&ValidatorBondUpdate{},
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
@@ -149,6 +150,7 @@ type Transaction interface {
 	SaveZkISMs(ctx context.Context, items ...*ZkISM) error
 	SaveZkISMUpdates(ctx context.Context, items ...*ZkISMUpdate) error
 	SaveZkISMMessages(ctx context.Context, items ...*ZkISMMessage) error
+	SaveBondUpdates(ctx context.Context, items ...*ValidatorBondUpdate) error
 
 	RollbackBlock(ctx context.Context, height pkgTypes.Level) error
 	RollbackBlockStats(ctx context.Context, height pkgTypes.Level) (stats BlockStats, err error)
@@ -189,6 +191,7 @@ type Transaction interface {
 	RollbackZkISMs(ctx context.Context, height pkgTypes.Level) error
 	RollbackZkISMUpdates(ctx context.Context, height pkgTypes.Level) error
 	RollbackZkISMMessages(ctx context.Context, height pkgTypes.Level) error
+	RollbackBondUpdates(ctx context.Context, height pkgTypes.Level) ([]ValidatorBondUpdate, error)
 	ZkISMById(ctx context.Context, id []byte) (ZkISM, error)
 	DeleteBalances(ctx context.Context, ids []uint64) error
 	DeleteProviders(ctx context.Context, rollupId uint64) error
@@ -203,7 +206,7 @@ type Transaction interface {
 	LastAddressAction(ctx context.Context, address []byte) (uint64, error)
 	GetProposerId(ctx context.Context, address string) (uint64, error)
 	Validator(ctx context.Context, id uint64) (val Validator, err error)
-	BondedValidators(ctx context.Context, limit int) ([]Validator, error)
+	BondedValidators(ctx context.Context) ([]Validator, error)
 	Delegation(ctx context.Context, validatorId, addressId uint64) (val Delegation, err error)
 	AddressDelegations(ctx context.Context, addressId uint64) (val []Delegation, err error)
 	ActiveProposals(ctx context.Context) ([]Proposal, error)
@@ -215,6 +218,7 @@ type Transaction interface {
 	HyperlaneToken(ctx context.Context, id []byte) (HLToken, error)
 	HyperlaneIgp(ctx context.Context, id []byte) (HLIGP, error)
 	HyperlaneIgpConfig(ctx context.Context, id uint64) (HLIGPConfig, error)
+	LastBondUpdate(ctx context.Context, validatorId uint64) (ValidatorBondUpdate, error)
 }
 
 const (

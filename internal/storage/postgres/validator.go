@@ -31,26 +31,18 @@ func (v *Validator) ByAddress(ctx context.Context, address string) (validator st
 	return
 }
 
-func (v *Validator) TotalVotingPower(ctx context.Context, maxVals int) (storageTypes.Numeric, error) {
-	q := v.DB().NewSelect().
-		Model((*storage.Validator)(nil)).
-		Column("stake").
-		Where("jailed = false").
-		Order("stake desc").
-		Limit(maxVals)
-
+func (v *Validator) TotalVotingPower(ctx context.Context) (storageTypes.Numeric, error) {
 	var power storageTypes.Numeric
 	err := v.DB().NewSelect().
-		With("q", q).
-		Table("q").
-		ColumnExpr("sum(floor(stake / 1000000))").
+		Model((*storage.Validator)(nil)).
+		ColumnExpr("coalesce(sum(power), 0)").
 		Scan(ctx, &power)
 	return power, err
 }
 
 func (v *Validator) ListByPower(ctx context.Context, fltrs storage.ValidatorFilters) (validators []storage.Validator, err error) {
 	query := v.DB().NewSelect().Model(&validators).
-		OrderExpr("(jailed IS NOT TRUE) DESC, stake DESC, id DESC")
+		OrderExpr("(jailed IS NOT TRUE) DESC, power DESC NULLS LAST, id DESC")
 
 	query = limitScope(query, fltrs.Limit)
 	if fltrs.Offset > 0 {
@@ -66,16 +58,17 @@ func (v *Validator) ListByPower(ctx context.Context, fltrs storage.ValidatorFilt
 	if fltrs.Version != nil {
 		query = query.Where("version = ?", *fltrs.Version)
 	}
+	switch fltrs.Status {
+	case storageTypes.ValidatorStatusActive:
+		query = query.Where("power > 0 AND jailed IS NOT TRUE")
+	case storageTypes.ValidatorStatusJailed:
+		query = query.Where("jailed IS TRUE")
+	case storageTypes.ValidatorStatusNotActive:
+		query = query.Where("COALESCE(power, 0) = 0 AND jailed IS NOT TRUE")
+	}
 
 	err = query.Scan(ctx)
 	return
-}
-
-func (v *Validator) JailedCount(ctx context.Context) (int, error) {
-	return v.DB().NewSelect().
-		Model((*storage.Validator)(nil)).
-		Where("jailed = true").
-		Count(ctx)
 }
 
 func (v *Validator) Messages(ctx context.Context, id uint64, fltrs storage.ValidatorMessagesFilters) ([]storage.MsgValidator, error) {
@@ -128,5 +121,16 @@ func (v *Validator) TopNMetrics(ctx context.Context, n int) (metrics storage.Val
 		ColumnExpr("avg(self_delegation_metric) as self_delegation_metric").
 		ColumnExpr("avg(block_missed_metric) as block_missed_metric").
 		Scan(ctx, &metrics)
+	return
+}
+
+func (v *Validator) CountByStatus(ctx context.Context) (response storage.CountByStatus, err error) {
+	err = v.DB().NewSelect().
+		Model((*storage.Validator)(nil)).
+		ColumnExpr("count(*) AS total").
+		ColumnExpr("count(*) FILTER (WHERE jailed IS TRUE) AS jailed").
+		ColumnExpr("count(*) FILTER (WHERE jailed IS NOT TRUE AND COALESCE(power, 0) = 0) AS not_active").
+		ColumnExpr("count(*) FILTER (WHERE jailed IS NOT TRUE AND power > 0) AS active").
+		Scan(ctx, &response)
 	return
 }

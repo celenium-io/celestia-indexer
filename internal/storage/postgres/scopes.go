@@ -260,3 +260,10 @@ func blobLogSort(query *bun.SelectQuery, sortBy string, sort sdk.SortOrder) *bun
 	}
 	return query
 }
+
+func timeAndIdSort(query *bun.SelectQuery, sort sdk.SortOrder) *bun.SelectQuery {
+	if sort != sdk.SortOrderAsc && sort != sdk.SortOrderDesc {
+		sort = sdk.SortOrderAsc
+	}
+	return query.OrderExpr("time ?0, id ?0", bun.Safe(sort))
+}

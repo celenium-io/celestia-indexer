@@ -372,11 +372,113 @@ func jxResultBlockResults(d *jxpkg.Decoder) (pkgTypes.ResultBlockResults, error)
 				return errors.Wrap(err, "consensus params update")
 			}
 			r.ConsensusParamUpdates = &params
+		case "validator_updates":
+			if d.Next() == jxpkg.Null {
+				return d.Null()
+			}
+			updates, err := jxValidatorUpdates(d)
+			if err != nil {
+				return errors.Wrap(err, "validator updates")
+			}
+			r.ValidatorUpdates = updates
 		default:
 			return d.Skip()
 		}
 		return nil
 	})
+}
+
+func jxValidatorUpdates(d *jxpkg.Decoder) (updates []pkgTypes.ValidatorUpdate, err error) {
+	err = d.Arr(func(d *jxpkg.Decoder) error {
+		update, err := jxValidatorUpdate(d)
+		if err != nil {
+			return err
+		}
+		updates = append(updates, update)
+		return nil
+	})
+	return
+}
+
+func jxValidatorUpdate(d *jxpkg.Decoder) (update pkgTypes.ValidatorUpdate, err error) {
+	err = d.ObjBytes(func(d *jxpkg.Decoder, key []byte) error {
+		switch string(key) {
+		case "pub_key":
+			pk, err := jxPubKey(d)
+			if err != nil {
+				return errors.Wrap(err, "pub_key")
+			}
+			update.PubKey = pk
+		case "power":
+			if d.Next() == jxpkg.Null {
+				return d.Null()
+			}
+			power, err := d.Str()
+			if err != nil {
+				return err
+			}
+			update.Power = &power
+
+		default:
+			return d.Skip()
+		}
+		return nil
+	})
+	return
+}
+
+func jxPubKey(d *jxpkg.Decoder) (pk pkgTypes.PubKey, err error) {
+	err = d.ObjBytes(func(d *jxpkg.Decoder, key []byte) error {
+		switch string(key) {
+		case "Sum":
+			err := d.ObjBytes(func(d *jxpkg.Decoder, key []byte) error {
+				switch string(key) {
+				case "type":
+					typ, err := d.Str()
+					if err != nil {
+						return err
+					}
+					pk.Sum.Type = typ
+				case "value":
+					err := d.ObjBytes(func(d *jxpkg.Decoder, key []byte) error {
+						switch string(key) {
+						case "ed25519":
+							if d.Next() == jxpkg.Null {
+								return d.Null()
+							}
+							raw, err := d.StrBytes()
+							if err != nil {
+								return err
+							}
+							buf := make([]byte, base64.StdEncoding.DecodedLen(len(raw)))
+							n, err := base64.StdEncoding.Decode(buf, raw)
+							if err != nil {
+								return errors.Wrap(err, "ed25519")
+							}
+							pk.Sum.Value.Ed25519 = buf[:n]
+						default:
+							return d.Skip()
+						}
+						return nil
+					})
+					if err != nil {
+						return err
+					}
+				default:
+					return d.Skip()
+				}
+				return nil
+			})
+			if err != nil {
+				return errors.Wrap(err, "Sum")
+			}
+			return nil
+
+		default:
+			return d.Skip()
+		}
+	})
+	return
 }
 
 func jxConsensusParams(d *jxpkg.Decoder) (params pkgTypes.ConsensusParams, err error) {

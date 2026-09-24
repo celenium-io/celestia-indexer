@@ -8289,6 +8289,18 @@
                         "description": "Current validator app version",
                         "name": "version",
                         "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "active",
+                            "not_active",
+                            "jailed"
+                        ],
+                        "type": "string",
+                        "example": "active",
+                        "description": "Validator status",
+                        "name": "status",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -8482,6 +8494,80 @@
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/responses.Block"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/validators/{id}/bond_updates": {
+            "get": {
+                "description": "Returns a paginated history of validator's voting power changes taken from validator_updates of block results. Power 0 means the validator left the active set.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "validator"
+                ],
+                "summary": "Get validator's bond updates",
+                "operationId": "validator-bond-updates",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "description": "Internal validator id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Count of requested entities",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "default": "asc",
+                        "description": "Sort order by time",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.BondUpdate"
                             }
                         }
                     },
@@ -9305,6 +9391,24 @@
                 "tx_count": {
                     "type": "integer",
                     "example": 12
+                }
+            }
+        },
+        "responses.BondUpdate": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "power": {
+                    "type": "string",
+                    "example": "123123"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-04T03:10:57+00:00"
                 }
             }
         },
@@ -12541,6 +12645,10 @@
                 "address": {
                     "$ref": "#/definitions/responses.ShortAddress"
                 },
+                "bond_updates_count": {
+                    "type": "integer",
+                    "example": 1
+                },
                 "commissions": {
                     "type": "string",
                     "example": "1"
@@ -12611,6 +12719,10 @@
                 "stake": {
                     "type": "string",
                     "example": "1"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "active"
                 },
                 "version": {
                     "type": "integer",

@@ -158,12 +158,7 @@ func (module *Module) fillProposalsVotingPower(
 
 	// 2. Get all validators
 
-	maxVals, err := getMaxValidatorsCount(ctx, module.constants)
-	if err != nil {
-		return nil, errors.Wrapf(err, "receiving max validators count")
-	}
-
-	validators, err := tx.BondedValidators(ctx, maxVals)
+	validators, err := tx.BondedValidators(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "get validators")
 	}
@@ -176,7 +171,7 @@ func (module *Module) fillProposalsVotingPower(
 
 	const limit = 1000
 
-	totalVotingPower, err := module.validators.TotalVotingPower(ctx, maxVals)
+	totalVotingPower, err := module.validators.TotalVotingPower(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "get total voting power")
 	}

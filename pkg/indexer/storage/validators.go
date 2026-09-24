@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 )
@@ -84,4 +85,68 @@ func (module *Module) fillValidatorsCache(validators []*storage.Validator) {
 			module.validatorsByDelegator[validators[i].Delegator] = validators[i].Id
 		}
 	}
+}
+
+// processValidatorBondUpdates resolves the operator address of every bond update and merges its power into dCtx.Validators.
+func (module *Module) processValidatorBondUpdates(ctx *decodeContext.Context) error {
+	if ctx.ValidatorUpdates.Len() == 0 {
+		return nil
+	}
+
+	for consAddress, update := range ctx.ValidatorUpdates.All() {
+		if update.Validator == nil {
+			continue
+		}
+		validator := *update.Validator
+
+		// a validator created in this block is not in the cache yet
+		for v := range ctx.Validators.AllValues() {
+			if v.ConsAddress == consAddress {
+				validator.Address = v.Address
+				break
+			}
+		}
+
+		if validator.Address == "" {
+			id, ok := module.validatorsByConsAddress[consAddress]
+			if !ok {
+				return errors.Errorf("unknown validator in bond update: %s", consAddress)
+			}
+			for address, validatorId := range module.validatorsByAddress {
+				if validatorId == id {
+					validator.Address = address
+					break
+				}
+			}
+			if validator.Address == "" {
+				return errors.Errorf("can't find operator address of validator %d", id)
+			}
+			validator.Id = id
+		}
+
+		ctx.AddValidator(validator)
+	}
+	return nil
+}
+
+// saveValidatorBondUpdates must run after saveValidators, which caches ids of validators created in this block.
+func (module *Module) saveValidatorBondUpdates(
+	ctx context.Context,
+	tx storage.Transaction,
+	updates *sdkSync.Map[string, *storage.ValidatorBondUpdate],
+) error {
+	if updates.Len() == 0 {
+		return nil
+	}
+
+	data := make([]*storage.ValidatorBondUpdate, 0, updates.Len())
+	for consAddress, update := range updates.All() {
+		id, ok := module.validatorsByConsAddress[consAddress]
+		if !ok {
+			return errors.Errorf("unknown validator in bond update: %s", consAddress)
+		}
+		update.ValidatorId = id
+		data = append(data, update)
+	}
+	return tx.SaveBondUpdates(ctx, data...)
 }

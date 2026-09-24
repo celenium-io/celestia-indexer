@@ -377,15 +377,17 @@ func (tx Transaction) SaveValidators(ctx context.Context, validators ...*models.
 	query := tx.Tx().NewInsert().Model(&arr).
 		Column("id", "delegator", "address", "cons_address", "moniker", "website", "identity", "contacts", "details", "rate", "max_rate",
 			"max_change_rate", "min_self_delegation", "stake", "jailed", "commissions", "rewards", "height", "version",
-			"messages_count", "creation_time", "fibre_host", "fibre_host_height").
+			"messages_count", "creation_time", "fibre_host", "fibre_host_height", "power", "bond_updates_count").
 		On("CONFLICT ON CONSTRAINT address_validator DO UPDATE").
 		Set("rate = CASE WHEN EXCLUDED.rate > 0 THEN EXCLUDED.rate ELSE added_validator.rate END").
 		Set("max_rate = CASE WHEN EXCLUDED.max_rate > 0 THEN EXCLUDED.max_rate ELSE added_validator.max_rate END").
 		Set("min_self_delegation = CASE WHEN EXCLUDED.min_self_delegation > 0 THEN EXCLUDED.min_self_delegation ELSE added_validator.min_self_delegation END").
 		Set("stake = added_validator.stake + EXCLUDED.stake").
+		Set("power = COALESCE(EXCLUDED.power, added_validator.power)").
 		Set("commissions = added_validator.commissions + EXCLUDED.commissions").
 		Set("rewards = added_validator.rewards + EXCLUDED.rewards").
 		Set("messages_count = added_validator.messages_count + EXCLUDED.messages_count").
+		Set("bond_updates_count = added_validator.bond_updates_count + EXCLUDED.bond_updates_count").
 		Set("moniker = CASE WHEN EXCLUDED.moniker != '[do-not-modify]' THEN EXCLUDED.moniker ELSE added_validator.moniker END").
 		Set("website = CASE WHEN EXCLUDED.website != '[do-not-modify]' THEN EXCLUDED.website ELSE added_validator.website END").
 		Set("identity = CASE WHEN EXCLUDED.identity != '[do-not-modify]' THEN EXCLUDED.identity ELSE added_validator.identity END").
@@ -833,6 +835,14 @@ func (tx Transaction) SaveIbcTransfers(ctx context.Context, transfers ...*models
 	return err
 }
 
+func (tx Transaction) SaveBondUpdates(ctx context.Context, items ...*models.ValidatorBondUpdate) error {
+	if len(items) == 0 {
+		return nil
+	}
+	_, err := tx.Tx().NewInsert().Model(&items).Exec(ctx)
+	return err
+}
+
 func (tx Transaction) SaveHyperlaneMailbox(ctx context.Context, mailbox ...*models.HLMailbox) error {
 	if len(mailbox) == 0 {
 		return nil
@@ -1189,6 +1199,14 @@ func (tx Transaction) RollbackForwardings(ctx context.Context, height types.Leve
 	return
 }
 
+func (tx Transaction) RollbackBondUpdates(ctx context.Context, height types.Level) (updates []models.ValidatorBondUpdate, err error) {
+	_, err = tx.Tx().NewDelete().Model(&updates).
+		Where("height = ?", height).
+		Returning("*").
+		Exec(ctx)
+	return
+}
+
 func (tx Transaction) DeleteBalances(ctx context.Context, ids []uint64) error {
 	if len(ids) == 0 {
 		return nil
@@ -1452,6 +1470,8 @@ func (tx Transaction) UpdateValidators(ctx context.Context, validators ...*model
 		Set("jailed = COALESCE(_data.jailed, validator.jailed)").
 		Set("commissions = validator.commissions + _data.commissions").
 		Set("rewards = validator.rewards + _data.rewards").
+		Set("power = COALESCE(_data.power, validator.power)").
+		Set("bond_updates_count = validator.bond_updates_count + _data.bond_updates_count").
 		Where("validator.id = _data.id").
 		Exec(ctx)
 	return err
@@ -1484,12 +1504,11 @@ func (tx Transaction) ActiveProposals(ctx context.Context) (proposals []models.P
 	return
 }
 
-func (tx Transaction) BondedValidators(ctx context.Context, limit int) (validators []models.Validator, err error) {
+func (tx Transaction) BondedValidators(ctx context.Context) (validators []models.Validator, err error) {
 	err = tx.Tx().NewSelect().Model(&validators).
-		Column("id", "stake", "version").
-		OrderExpr("stake desc").
-		Where("jailed = false").
-		Limit(limit).
+		Column("id", "power", "version", "stake").
+		Where("power > 0").
+		OrderExpr("power desc").
 		Scan(ctx)
 	return
 }
@@ -1642,6 +1661,15 @@ func (tx Transaction) ZkISMById(ctx context.Context, externalId []byte) (item mo
 	err = tx.Tx().NewSelect().Model(&item).
 		Where("external_id = ?", externalId).
 		Column("id").
+		Scan(ctx)
+	return
+}
+
+func (tx Transaction) LastBondUpdate(ctx context.Context, validatorId uint64) (update models.ValidatorBondUpdate, err error) {
+	err = tx.Tx().NewSelect().Model(&update).
+		Where("validator_id = ?", validatorId).
+		OrderExpr("time desc, id desc").
+		Limit(1).
 		Scan(ctx)
 	return
 }

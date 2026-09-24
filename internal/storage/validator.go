@@ -7,7 +7,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/celenium-io/celestia-indexer/internal/math"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 
@@ -34,14 +33,21 @@ type ValidatorMetrics struct {
 	BlockMissedMetric    types.Numeric `bun:"block_missed_metric"`
 }
 
+type CountByStatus struct {
+	Active    int `bun:"active"`
+	NotActive int `bun:"not_active"`
+	Jailed    int `bun:"jailed"`
+	Total     int `bun:"total"`
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IValidator interface {
 	storage.Table[*Validator]
 
 	ByAddress(ctx context.Context, address string) (Validator, error)
-	TotalVotingPower(ctx context.Context, maxVals int) (types.Numeric, error)
+	TotalVotingPower(ctx context.Context) (types.Numeric, error)
 	ListByPower(ctx context.Context, fltrs ValidatorFilters) ([]Validator, error)
-	JailedCount(ctx context.Context) (int, error)
+	CountByStatus(ctx context.Context) (CountByStatus, error)
 	Messages(ctx context.Context, id uint64, fltrs ValidatorMessagesFilters) ([]MsgValidator, error)
 	Metrics(ctx context.Context, id uint64) (ValidatorMetrics, error)
 	TopNMetrics(ctx context.Context, n int) (ValidatorMetrics, error)
@@ -67,6 +73,7 @@ type Validator struct {
 	MinSelfDelegation types.Numeric `bun:"min_self_delegation,type:numeric" comment:""                                                                       json:"-"`
 
 	Stake       types.Numeric  `bun:"stake,type:numeric"       comment:"Validator's stake"                 json:"-"`
+	Power       *types.Numeric `bun:"power,type:numeric"       comment:"Validator's power"                 json:"-"`
 	Rewards     types.Numeric  `bun:"rewards,type:numeric"     comment:"Validator's rewards"               json:"-"`
 	Commissions types.Numeric  `bun:"commissions,type:numeric" comment:"Commissions"                       json:"-"`
 	Height      pkgTypes.Level `bun:"height"                   comment:"Height when validator was created" json:"-"`
@@ -74,7 +81,8 @@ type Validator struct {
 
 	Jailed *bool `bun:"jailed" comment:"True if validator was punished" json:"-"`
 
-	MessagesCount uint64 `bun:"messages_count" comment:"Count of validator messages" json:"-"`
+	MessagesCount    uint64 `bun:"messages_count,default:0,notnull"     comment:"Count of validator messages"       json:"-"`
+	BondUpdatesCount int64  `bun:"bond_updates_count,default:0,notnull" comment:"Count of validator's bond updates" json:"-"`
 
 	CreationTime time.Time `bun:"creation_time" comment:"Creation time"`
 
@@ -84,10 +92,6 @@ type Validator struct {
 
 func (Validator) TableName() string {
 	return "validator"
-}
-
-func (v Validator) VotingPower() types.Numeric {
-	return math.SharesNumeric(v.Stake)
 }
 
 const DoNotModify = "[do-not-modify]"
@@ -114,6 +118,7 @@ type ValidatorFilters struct {
 	Offset  int
 	Jailed  *bool
 	Version *int
+	Status  types.ValidatorStatus
 }
 
 type ValidatorMessagesFilters struct {

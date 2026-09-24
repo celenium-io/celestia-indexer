@@ -32,6 +32,7 @@ func TestRoutes(t *testing.T) {
 		"/v1/validators/metrics GET":                          {},
 		"/v1/validators/:id GET":                              {},
 		"/v1/validators/:id/metrics GET":                      {},
+		"/v1/validators/:id/bond_updates GET":                 {},
 		"/v1/stats/tps GET":                                   {},
 		"/v1/stats/namespace/series/:id/:name/:timeframe GET": {},
 		"/v1/stats/series/:name/:timeframe GET":               {},

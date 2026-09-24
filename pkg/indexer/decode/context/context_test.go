@@ -618,3 +618,96 @@ func Test_AddCancelUndelegation_NilPointers(t *testing.T) {
 
 	require.Equal(t, 0, ctx.CancelUnbonding.Len())
 }
+
+func Test_AddValidator_PowerMerge(t *testing.T) {
+	ctx := NewContext()
+
+	power := storageTypes.NumericFromInt64(10)
+	first := storage.EmptyValidator()
+	first.Address = "celestiavaloper1a"
+	first.Power = &power
+	ctx.AddValidator(first)
+
+	// no power in the second update keeps the first one
+	second := storage.EmptyValidator()
+	second.Address = "celestiavaloper1a"
+	ctx.AddValidator(second)
+
+	val, ok := ctx.Validators.Get("celestiavaloper1a")
+	require.True(t, ok)
+	require.NotNil(t, val.Power)
+	require.Equal(t, "10", val.Power.String())
+
+	newPower := storageTypes.NumericZero()
+	third := storage.EmptyValidator()
+	third.Address = "celestiavaloper1a"
+	third.Power = &newPower
+	ctx.AddValidator(third)
+
+	val, ok = ctx.Validators.Get("celestiavaloper1a")
+	require.True(t, ok)
+	require.True(t, val.Power.IsZero())
+}
+
+func bondUpdate(consAddress string, power *storageTypes.Numeric) storage.ValidatorBondUpdate {
+	return storage.ValidatorBondUpdate{
+		Power:     power,
+		Validator: &storage.Validator{ConsAddress: consAddress, Power: power, BondUpdatesCount: 1},
+	}
+}
+
+// One row per consensus address per block; the last known power wins.
+func Test_AddValidatorUpdate_Merge(t *testing.T) {
+	ctx := NewContext()
+
+	power := storageTypes.NumericFromInt64(10)
+	ctx.AddValidatorUpdate(bondUpdate("A", &power))
+	ctx.AddValidatorUpdate(bondUpdate("A", nil))
+
+	val, ok := ctx.ValidatorUpdates.Get("A")
+	require.True(t, ok)
+	require.Equal(t, "10", val.Power.String())
+
+	zero := storageTypes.NumericZero()
+	ctx.AddValidatorUpdate(bondUpdate("A", &zero))
+	ctx.AddValidatorUpdate(bondUpdate("B", &power))
+
+	require.Equal(t, 2, ctx.ValidatorUpdates.Len())
+	val, _ = ctx.ValidatorUpdates.Get("A")
+	require.True(t, val.Power.IsZero())
+	require.True(t, val.Validator.Power.IsZero(), "validator power must follow the update")
+	require.EqualValues(t, 1, val.Validator.BondUpdatesCount)
+
+	val, _ = ctx.ValidatorUpdates.Get("B")
+	require.Equal(t, "10", val.Power.String())
+
+	require.Equal(t, 0, ctx.Validators.Len())
+}
+
+func Test_AddValidatorUpdate_NoConsAddress(t *testing.T) {
+	ctx := NewContext()
+	power := storageTypes.NumericFromInt64(1)
+
+	ctx.AddValidatorUpdate(storage.ValidatorBondUpdate{Power: &power})
+	ctx.AddValidatorUpdate(bondUpdate("", &power))
+
+	require.Equal(t, 0, ctx.ValidatorUpdates.Len())
+}
+
+func Test_AddValidator_BondUpdatesCountMerge(t *testing.T) {
+	ctx := NewContext()
+
+	first := storage.EmptyValidator()
+	first.Address = "celestiavaloper1a"
+	ctx.AddValidator(first)
+
+	second := storage.EmptyValidator()
+	second.Address = "celestiavaloper1a"
+	second.BondUpdatesCount = 1
+	ctx.AddValidator(second)
+
+	val, ok := ctx.Validators.Get("celestiavaloper1a")
+	require.True(t, ok)
+	require.EqualValues(t, 1, val.BondUpdatesCount)
+	require.Nil(t, val.Power)
+}

@@ -85,6 +85,45 @@ func (c *MockIValidatorByAddressCall) DoAndReturn(f func(context.Context, string
 	return c
 }
 
+// CountByStatus mocks base method.
+func (m *MockIValidator) CountByStatus(ctx context.Context) (storage.CountByStatus, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountByStatus", ctx)
+	ret0, _ := ret[0].(storage.CountByStatus)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountByStatus indicates an expected call of CountByStatus.
+func (mr *MockIValidatorMockRecorder) CountByStatus(ctx any) *MockIValidatorCountByStatusCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountByStatus", reflect.TypeOf((*MockIValidator)(nil).CountByStatus), ctx)
+	return &MockIValidatorCountByStatusCall{Call: call}
+}
+
+// MockIValidatorCountByStatusCall wrap *gomock.Call
+type MockIValidatorCountByStatusCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIValidatorCountByStatusCall) Return(arg0 storage.CountByStatus, arg1 error) *MockIValidatorCountByStatusCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIValidatorCountByStatusCall) Do(f func(context.Context) (storage.CountByStatus, error)) *MockIValidatorCountByStatusCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIValidatorCountByStatusCall) DoAndReturn(f func(context.Context) (storage.CountByStatus, error)) *MockIValidatorCountByStatusCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // CursorList mocks base method.
 func (m *MockIValidator) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Validator, error) {
 	m.ctrl.T.Helper()
@@ -197,45 +236,6 @@ func (c *MockIValidatorIsNoRowsCall) Do(f func(error) bool) *MockIValidatorIsNoR
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIValidatorIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIValidatorIsNoRowsCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// JailedCount mocks base method.
-func (m *MockIValidator) JailedCount(ctx context.Context) (int, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "JailedCount", ctx)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// JailedCount indicates an expected call of JailedCount.
-func (mr *MockIValidatorMockRecorder) JailedCount(ctx any) *MockIValidatorJailedCountCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JailedCount", reflect.TypeOf((*MockIValidator)(nil).JailedCount), ctx)
-	return &MockIValidatorJailedCountCall{Call: call}
-}
-
-// MockIValidatorJailedCountCall wrap *gomock.Call
-type MockIValidatorJailedCountCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockIValidatorJailedCountCall) Return(arg0 int, arg1 error) *MockIValidatorJailedCountCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockIValidatorJailedCountCall) Do(f func(context.Context) (int, error)) *MockIValidatorJailedCountCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIValidatorJailedCountCall) DoAndReturn(f func(context.Context) (int, error)) *MockIValidatorJailedCountCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -513,18 +513,18 @@ func (c *MockIValidatorTopNMetricsCall) DoAndReturn(f func(context.Context, int)
 }
 
 // TotalVotingPower mocks base method.
-func (m *MockIValidator) TotalVotingPower(ctx context.Context, maxVals int) (types.Numeric, error) {
+func (m *MockIValidator) TotalVotingPower(ctx context.Context) (types.Numeric, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TotalVotingPower", ctx, maxVals)
+	ret := m.ctrl.Call(m, "TotalVotingPower", ctx)
 	ret0, _ := ret[0].(types.Numeric)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // TotalVotingPower indicates an expected call of TotalVotingPower.
-func (mr *MockIValidatorMockRecorder) TotalVotingPower(ctx, maxVals any) *MockIValidatorTotalVotingPowerCall {
+func (mr *MockIValidatorMockRecorder) TotalVotingPower(ctx any) *MockIValidatorTotalVotingPowerCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TotalVotingPower", reflect.TypeOf((*MockIValidator)(nil).TotalVotingPower), ctx, maxVals)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TotalVotingPower", reflect.TypeOf((*MockIValidator)(nil).TotalVotingPower), ctx)
 	return &MockIValidatorTotalVotingPowerCall{Call: call}
 }
 
@@ -540,13 +540,13 @@ func (c *MockIValidatorTotalVotingPowerCall) Return(arg0 types.Numeric, arg1 err
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIValidatorTotalVotingPowerCall) Do(f func(context.Context, int) (types.Numeric, error)) *MockIValidatorTotalVotingPowerCall {
+func (c *MockIValidatorTotalVotingPowerCall) Do(f func(context.Context) (types.Numeric, error)) *MockIValidatorTotalVotingPowerCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIValidatorTotalVotingPowerCall) DoAndReturn(f func(context.Context, int) (types.Numeric, error)) *MockIValidatorTotalVotingPowerCall {
+func (c *MockIValidatorTotalVotingPowerCall) DoAndReturn(f func(context.Context) (types.Numeric, error)) *MockIValidatorTotalVotingPowerCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

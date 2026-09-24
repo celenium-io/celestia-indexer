@@ -5,6 +5,8 @@ package rollback
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"testing"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -24,11 +26,22 @@ type rollbackTx struct {
 }
 
 func newRollbackTx(t *testing.T, jails []storage.Jail, logs []storage.StakingLog) *rollbackTx {
+	return newRollbackTxWithBondUpdates(t, nil, nil, jails, logs)
+}
+
+func newRollbackTxWithBondUpdates(
+	t *testing.T,
+	removed []storage.Validator,
+	bondUpdates []storage.ValidatorBondUpdate,
+	jails []storage.Jail,
+	logs []storage.StakingLog,
+) *rollbackTx {
 	ctrl := gomock.NewController(t)
 	tx := mock.NewMockTransaction(ctrl)
 	captured := &rollbackTx{tx: tx}
 
-	tx.EXPECT().RollbackValidators(gomock.Any(), gomock.Any()).Return(nil, nil)
+	tx.EXPECT().RollbackValidators(gomock.Any(), gomock.Any()).Return(removed, nil)
+	tx.EXPECT().RollbackBondUpdates(gomock.Any(), gomock.Any()).Return(bondUpdates, nil)
 	tx.EXPECT().RollbackUndelegations(gomock.Any(), gomock.Any()).Return(nil)
 	tx.EXPECT().RollbackRedelegations(gomock.Any(), gomock.Any()).Return(nil)
 	tx.EXPECT().RollbackJails(gomock.Any(), gomock.Any()).Return(jails, nil)
@@ -143,4 +156,95 @@ func Test_rollbackValidators_JailedFlagOnlyFromJails(t *testing.T) {
 	require.Nil(t, fromLogs.Jailed)
 	require.Equal(t, "-20", fromLogs.Rewards.String())
 	require.Equal(t, "-3", fromLogs.Commissions.String())
+}
+
+func numericPtr(v int64) *st.Numeric {
+	n := st.NumericFromInt64(v)
+	return &n
+}
+
+// Rolling back a bond update restores the power of the previous one and decrements the counter.
+func Test_rollbackValidators_BondUpdateRestoresPower(t *testing.T) {
+	captured := newRollbackTxWithBondUpdates(t, nil,
+		[]storage.ValidatorBondUpdate{{ValidatorId: 5, Height: 100, Power: numericPtr(0)}},
+		nil, nil)
+	captured.tx.EXPECT().LastBondUpdate(gomock.Any(), uint64(5)).
+		Return(storage.ValidatorBondUpdate{ValidatorId: 5, Height: 90, Power: numericPtr(42)}, nil).
+		Times(1)
+
+	_, err := rollbackValidators(t.Context(), captured.tx, types.Level(100))
+	require.NoError(t, err)
+
+	val := captured.validator(t, 5)
+	require.NotNil(t, val.Power)
+	require.Equal(t, "42", val.Power.String())
+	require.EqualValues(t, -1, val.BondUpdatesCount)
+	require.Nil(t, val.Jailed)
+}
+
+// Without an earlier update the validator was outside the active set.
+func Test_rollbackValidators_FirstBondUpdateResetsPower(t *testing.T) {
+	captured := newRollbackTxWithBondUpdates(t, nil,
+		[]storage.ValidatorBondUpdate{{ValidatorId: 5, Height: 100, Power: numericPtr(10)}},
+		nil, nil)
+	captured.tx.EXPECT().LastBondUpdate(gomock.Any(), uint64(5)).
+		Return(storage.ValidatorBondUpdate{}, sql.ErrNoRows).
+		Times(1)
+
+	_, err := rollbackValidators(t.Context(), captured.tx, types.Level(100))
+	require.NoError(t, err)
+
+	val := captured.validator(t, 5)
+	require.NotNil(t, val.Power)
+	require.True(t, val.Power.IsZero())
+	require.EqualValues(t, -1, val.BondUpdatesCount)
+}
+
+func Test_rollbackValidators_LastBondUpdateError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	tx := mock.NewMockTransaction(ctrl)
+	tx.EXPECT().RollbackValidators(gomock.Any(), gomock.Any()).Return(nil, nil)
+	tx.EXPECT().RollbackBondUpdates(gomock.Any(), gomock.Any()).
+		Return([]storage.ValidatorBondUpdate{{ValidatorId: 5, Power: numericPtr(1)}}, nil)
+	tx.EXPECT().LastBondUpdate(gomock.Any(), uint64(5)).
+		Return(storage.ValidatorBondUpdate{}, errors.New("db is down"))
+
+	_, err := rollbackValidators(t.Context(), tx, types.Level(100))
+	require.Error(t, err)
+}
+
+// A validator created at the rolled back height is deleted, so its power is not restored.
+func Test_rollbackValidators_BondUpdateOfRemovedValidator(t *testing.T) {
+	captured := newRollbackTxWithBondUpdates(t,
+		[]storage.Validator{{Id: 5}},
+		[]storage.ValidatorBondUpdate{{ValidatorId: 5, Height: 100, Power: numericPtr(10)}},
+		nil, nil)
+	captured.tx.EXPECT().DeleteDelegationsByValidator(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+	captured.tx.EXPECT().DeleteBalances(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+
+	_, err := rollbackValidators(t.Context(), captured.tx, types.Level(100))
+	require.NoError(t, err)
+
+	for i := range captured.validators {
+		require.NotEqualValues(t, 5, captured.validators[i].Id)
+	}
+}
+
+// Jail rollback and bond update rollback of one validator land in one row.
+func Test_rollbackValidators_BondUpdateWithJail(t *testing.T) {
+	captured := newRollbackTxWithBondUpdates(t, nil,
+		[]storage.ValidatorBondUpdate{{ValidatorId: 5, Height: 100, Power: numericPtr(0)}},
+		[]storage.Jail{{ValidatorId: 5, Height: 100}},
+		nil)
+	captured.tx.EXPECT().LastBondUpdate(gomock.Any(), uint64(5)).
+		Return(storage.ValidatorBondUpdate{ValidatorId: 5, Power: numericPtr(7)}, nil)
+
+	_, err := rollbackValidators(t.Context(), captured.tx, types.Level(100))
+	require.NoError(t, err)
+
+	require.Len(t, captured.validators, 1)
+	val := captured.validator(t, 5)
+	require.Equal(t, "7", val.Power.String())
+	require.NotNil(t, val.Jailed)
+	require.False(t, *val.Jailed)
 }

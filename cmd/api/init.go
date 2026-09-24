@@ -267,7 +267,7 @@ func initEcho(cfg ApiConfig, env string) *echo.Echo {
 var dispatcher *bus.Dispatcher
 
 func initDispatcher(ctx context.Context, db postgres.Storage) {
-	d, err := bus.NewDispatcher(db, db.Validator, db.Constants)
+	d, err := bus.NewDispatcher(db, db.Validator)
 	if err != nil {
 		panic(err)
 	}
@@ -307,7 +307,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 
 	v1 := e.Group("v1")
 
-	stateHandlers := handler.NewStateHandler(db.State, db.Validator, db.Constants, cfg.Indexer.Name)
+	stateHandlers := handler.NewStateHandler(db.State, db.Validator, cfg.Indexer.Name)
 	v1.GET("/head", stateHandlers.Head)
 
 	defaultMiddlewareCache := cache.Middleware(ttlCache, nil, nil)
@@ -429,7 +429,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		namespaceByHash.GET("/:hash/:height", namespaceHandlers.GetBlobs)
 	}
 
-	validatorsHandler := handler.NewValidatorHandler(db.Validator, db.Blocks, db.BlockSignatures, db.Delegation, db.Constants, db.Jails, db.Votes, db.State, cfg.Indexer.Name)
+	validatorsHandler := handler.NewValidatorHandler(db.Validator, db.ValidatorBondUpdates, db.Blocks, db.BlockSignatures, db.Delegation, db.Constants, db.Jails, db.Votes, db.State, cfg.Indexer.Name)
 	validators := v1.Group("/validators")
 	{
 		validators.GET("", validatorsHandler.List)
@@ -445,6 +445,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 			validator.GET("/votes", validatorsHandler.Votes)
 			validator.GET("/messages", validatorsHandler.Messages)
 			validator.GET("/metrics", validatorsHandler.Metrics)
+			validator.GET("/bond_updates", validatorsHandler.BondUpdates)
 		}
 	}
 

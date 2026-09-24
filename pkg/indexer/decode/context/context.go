@@ -40,6 +40,7 @@ type Context struct {
 	Namespaces        *sdkSync.Map[string, *storage.Namespace]
 	NamespaceMessages *sdkSync.Map[string, *storage.NamespaceMessage]
 	AddressMessages   *sdkSync.Map[string, *storage.MsgAddress]
+	ValidatorUpdates  *sdkSync.Map[string, *storage.ValidatorBondUpdate]
 	CancelUnbonding   *sdkSync.Map[cancelKey, *storage.Undelegation]
 
 	Messages            []*storage.Message
@@ -89,6 +90,7 @@ func NewContext() *Context {
 		NamespaceMessages: sdkSync.NewMap[string, *storage.NamespaceMessage](),
 		AddressMessages:   sdkSync.NewMap[string, *storage.MsgAddress](),
 		CancelUnbonding:   sdkSync.NewMap[cancelKey, *storage.Undelegation](),
+		ValidatorUpdates:  sdkSync.NewMap[string, *storage.ValidatorBondUpdate](),
 
 		Messages:            make([]*storage.Message, 0, 100),
 		Events:              make([]storage.Event, 0, 1000),
@@ -208,6 +210,12 @@ func (ctx *Context) AddValidator(validator storage.Validator) {
 		}
 		if validator.Jailed != nil {
 			val.Jailed = validator.Jailed
+		}
+		if validator.Power != nil {
+			val.Power = validator.Power
+		}
+		if validator.BondUpdatesCount > 0 {
+			val.BondUpdatesCount += validator.BondUpdatesCount
 		}
 	} else {
 		ctx.Validators.Set(validator.Address, &validator)
@@ -602,4 +610,19 @@ func (ctx *Context) AddAddressMessage(msg *storage.MsgAddress) {
 
 func (ctx *Context) AddDenomMetadata(metadata ...storage.DenomMetadata) {
 	ctx.DenomMetadata = append(ctx.DenomMetadata, metadata...)
+}
+
+// AddValidatorUpdate keeps one update per consensus address; the last power wins.
+func (ctx *Context) AddValidatorUpdate(update storage.ValidatorBondUpdate) {
+	if update.Validator == nil || update.Validator.ConsAddress == "" {
+		return
+	}
+	if v, ok := ctx.ValidatorUpdates.Get(update.Validator.ConsAddress); ok {
+		if update.Power != nil {
+			v.Power = update.Power
+			v.Validator.Power = update.Power
+		}
+	} else {
+		ctx.ValidatorUpdates.Set(update.Validator.ConsAddress, &update)
+	}
 }

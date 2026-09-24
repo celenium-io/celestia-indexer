@@ -182,6 +182,7 @@ func (module *Module) parse(genesis types.GenesisOutput) (*context.Context, erro
 	if err := module.parseBalances(decodeCtx, genesis.AppState.Bank.Balances); err != nil {
 		return decodeCtx, errors.Wrap(err, "parse genesis account balances")
 	}
+	parseValidatorsPower(decodeCtx, genesis.AppState.Staking.Params.MaxValidators)
 
 	return decodeCtx, nil
 }
