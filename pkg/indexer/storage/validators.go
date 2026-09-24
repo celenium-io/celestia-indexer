@@ -88,19 +88,23 @@ func (module *Module) fillValidatorsCache(validators []*storage.Validator) {
 }
 
 // processValidatorBondUpdates resolves the operator address of every bond update and merges its power into dCtx.Validators.
-func (module *Module) processValidatorBondUpdates(ctx *decodeContext.Context) error {
-	if ctx.ValidatorUpdates.Len() == 0 {
+func (module *Module) processValidatorBondUpdates(
+	ctx context.Context,
+	tx storage.Transaction,
+	dCtx *decodeContext.Context,
+) error {
+	if dCtx.ValidatorUpdates.Len() == 0 {
 		return nil
 	}
 
-	for consAddress, update := range ctx.ValidatorUpdates.All() {
+	for consAddress, update := range dCtx.ValidatorUpdates.All() {
 		if update.Validator == nil {
 			continue
 		}
 		validator := *update.Validator
 
 		// a validator created in this block is not in the cache yet
-		for v := range ctx.Validators.AllValues() {
+		for v := range dCtx.Validators.AllValues() {
 			if v.ConsAddress == consAddress {
 				validator.Address = v.Address
 				break
@@ -109,24 +113,43 @@ func (module *Module) processValidatorBondUpdates(ctx *decodeContext.Context) er
 
 		if validator.Address == "" {
 			id, ok := module.validatorsByConsAddress[consAddress]
-			if !ok {
-				return errors.Errorf("unknown validator in bond update: %s", consAddress)
-			}
-			for address, validatorId := range module.validatorsByAddress {
-				if validatorId == id {
-					validator.Address = address
-					break
+			if ok {
+				for address, validatorId := range module.validatorsByAddress {
+					if validatorId == id {
+						validator.Address = address
+						break
+					}
 				}
 			}
 			if validator.Address == "" {
-				return errors.Errorf("can't find operator address of validator %d", id)
+				// genesis validators are not cached on a sync from scratch
+				stored, err := module.validatorByConsAddress(ctx, tx, consAddress)
+				if err != nil {
+					return err
+				}
+				id = stored.Id
+				validator.Address = stored.Address
 			}
 			validator.Id = id
 		}
 
-		ctx.AddValidator(validator)
+		dCtx.AddValidator(validator)
 	}
 	return nil
+}
+
+// validatorByConsAddress loads the validator from the DB and caches it for saveValidatorBondUpdates.
+func (module *Module) validatorByConsAddress(ctx context.Context, tx storage.Transaction, consAddress string) (storage.Validator, error) {
+	id, err := tx.GetProposerId(ctx, consAddress)
+	if err != nil {
+		return storage.Validator{}, errors.Wrapf(err, "unknown validator in bond update: %s", consAddress)
+	}
+	validator, err := tx.Validator(ctx, id)
+	if err != nil {
+		return storage.Validator{}, errors.Wrapf(err, "receiving validator %d", id)
+	}
+	module.fillValidatorsCache([]*storage.Validator{&validator})
+	return validator, nil
 }
 
 // saveValidatorBondUpdates must run after saveValidators, which caches ids of validators created in this block.

@@ -275,7 +275,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, errors.Wrap(err, "upgrade failed")
 	}
 
-	if err := module.processValidatorBondUpdates(dCtx); err != nil {
+	if err := module.processValidatorBondUpdates(ctx, tx, dCtx); err != nil {
 		return state, errors.Wrap(err, "process validator bond updates")
 	}
 

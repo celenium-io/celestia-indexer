@@ -5,6 +5,7 @@ package storage
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 	"time"
 
@@ -144,12 +145,13 @@ func newPowerModule(ctrl *gomock.Controller) Module {
 // A power update carries only the consensus address; id and operator address come from the cache.
 func Test_processValidatorUpdates_ResolvesValidator(t *testing.T) {
 	ctrl := gomock.NewController(t)
+	tx := mock.NewMockTransaction(ctrl)
 	module := newPowerModule(ctrl)
 
 	dCtx := decodeContext.NewContext()
 	dCtx.AddValidatorUpdate(powerUpdate(testConsAddress, 42))
 
-	require.NoError(t, module.processValidatorBondUpdates(dCtx))
+	require.NoError(t, module.processValidatorBondUpdates(t.Context(), tx, dCtx))
 
 	val, ok := dCtx.Validators.Get(testValAddress)
 	require.True(t, ok)
@@ -162,6 +164,7 @@ func Test_processValidatorUpdates_ResolvesValidator(t *testing.T) {
 // The update merges into the validator already touched in this block instead of replacing it.
 func Test_processValidatorUpdates_MergesWithBlockValidator(t *testing.T) {
 	ctrl := gomock.NewController(t)
+	tx := mock.NewMockTransaction(ctrl)
 	module := newPowerModule(ctrl)
 
 	dCtx := decodeContext.NewContext()
@@ -171,7 +174,7 @@ func Test_processValidatorUpdates_MergesWithBlockValidator(t *testing.T) {
 	dCtx.AddValidator(touched)
 	dCtx.AddValidatorUpdate(powerUpdate(testConsAddress, 3))
 
-	require.NoError(t, module.processValidatorBondUpdates(dCtx))
+	require.NoError(t, module.processValidatorBondUpdates(t.Context(), tx, dCtx))
 
 	require.Equal(t, 1, dCtx.Validators.Len())
 	val, ok := dCtx.Validators.Get(testValAddress)
@@ -183,6 +186,7 @@ func Test_processValidatorUpdates_MergesWithBlockValidator(t *testing.T) {
 // MsgCreateValidator with enough stake bonds the validator in the same block's EndBlock.
 func Test_processValidatorUpdates_ValidatorCreatedInBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
+	tx := mock.NewMockTransaction(ctrl)
 	module := newStorageModule(ctrl)
 
 	const newConsAddress = "AE216C2EF5247A3782C135EFA279A3E4CDC61094"
@@ -195,7 +199,7 @@ func Test_processValidatorUpdates_ValidatorCreatedInBlock(t *testing.T) {
 	dCtx.AddValidator(created)
 	dCtx.AddValidatorUpdate(powerUpdate(newConsAddress, 5))
 
-	require.NoError(t, module.processValidatorBondUpdates(dCtx))
+	require.NoError(t, module.processValidatorBondUpdates(t.Context(), tx, dCtx))
 
 	require.Equal(t, 1, dCtx.Validators.Len())
 	val, ok := dCtx.Validators.Get(newAddress)
@@ -206,33 +210,38 @@ func Test_processValidatorUpdates_ValidatorCreatedInBlock(t *testing.T) {
 
 func Test_processValidatorUpdates_UnknownValidator(t *testing.T) {
 	ctrl := gomock.NewController(t)
+	tx := mock.NewMockTransaction(ctrl)
 	module := newPowerModule(ctrl)
+
+	tx.EXPECT().GetProposerId(gomock.Any(), "DEAD").Return(uint64(0), sql.ErrNoRows).Times(1)
 
 	dCtx := decodeContext.NewContext()
 	dCtx.AddValidatorUpdate(powerUpdate("DEAD", 5))
 
-	require.Error(t, module.processValidatorBondUpdates(dCtx))
+	require.Error(t, module.processValidatorBondUpdates(t.Context(), tx, dCtx))
 }
 
 func Test_processValidatorUpdates_Empty(t *testing.T) {
 	ctrl := gomock.NewController(t)
+	tx := mock.NewMockTransaction(ctrl)
 	module := newPowerModule(ctrl)
 
 	dCtx := decodeContext.NewContext()
-	require.NoError(t, module.processValidatorBondUpdates(dCtx))
+	require.NoError(t, module.processValidatorBondUpdates(t.Context(), tx, dCtx))
 	require.Equal(t, 0, dCtx.Validators.Len())
 }
 
 // The bond update counter reaches the validator row only once per block.
 func Test_processValidatorUpdates_BondUpdatesCount(t *testing.T) {
 	ctrl := gomock.NewController(t)
+	tx := mock.NewMockTransaction(ctrl)
 	module := newPowerModule(ctrl)
 
 	dCtx := decodeContext.NewContext()
 	dCtx.AddValidatorUpdate(powerUpdate(testConsAddress, 3))
 	dCtx.AddValidatorUpdate(powerUpdate(testConsAddress, 0))
 
-	require.NoError(t, module.processValidatorBondUpdates(dCtx))
+	require.NoError(t, module.processValidatorBondUpdates(t.Context(), tx, dCtx))
 
 	val, ok := dCtx.Validators.Get(testValAddress)
 	require.True(t, ok)
@@ -240,15 +249,67 @@ func Test_processValidatorUpdates_BondUpdatesCount(t *testing.T) {
 	require.True(t, val.Power.IsZero())
 }
 
-// The cache knows the consensus address but lost the operator address.
+// The cache knows the consensus address but lost the operator address: it is loaded from the DB.
 func Test_processValidatorUpdates_NoOperatorAddress(t *testing.T) {
 	ctrl := gomock.NewController(t)
+	tx := mock.NewMockTransaction(ctrl)
 	module := newStorageModule(ctrl)
+
+	tx.EXPECT().GetProposerId(gomock.Any(), testConsAddress).Return(uint64(7), nil).Times(1)
+	tx.EXPECT().Validator(gomock.Any(), uint64(7)).Return(storage.Validator{
+		Id:          7,
+		Address:     testValAddress,
+		ConsAddress: testConsAddress,
+	}, nil).Times(1)
 
 	dCtx := decodeContext.NewContext()
 	dCtx.AddValidatorUpdate(powerUpdate(testConsAddress, 5))
 
-	require.Error(t, module.processValidatorBondUpdates(dCtx))
+	require.NoError(t, module.processValidatorBondUpdates(t.Context(), tx, dCtx))
+
+	val, ok := dCtx.Validators.Get(testValAddress)
+	require.True(t, ok)
+	require.EqualValues(t, 7, val.Id)
+	require.Equal(t, "5", val.Power.String())
+}
+
+// On a sync from scratch genesis validators are not cached; a delegation in the same block
+// puts the validator into the context without a consensus address.
+func Test_processValidatorUpdates_GenesisValidatorNotCached(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	tx := mock.NewMockTransaction(ctrl)
+	module := NewModule(nil, mock.NewMockIConstant(ctrl), mock.NewMockIValidator(ctrl), nil, config.Indexer{})
+
+	tx.EXPECT().GetProposerId(gomock.Any(), testConsAddress).Return(uint64(7), nil).Times(1)
+	tx.EXPECT().Validator(gomock.Any(), uint64(7)).Return(storage.Validator{
+		Id:          7,
+		Address:     testValAddress,
+		ConsAddress: testConsAddress,
+	}, nil).Times(1)
+
+	dCtx := decodeContext.NewContext()
+	delegated := storage.EmptyValidator()
+	delegated.Address = testValAddress
+	delegated.Stake = types.NumericFromInt64(1000)
+	dCtx.AddValidator(delegated)
+	dCtx.AddValidatorUpdate(powerUpdate(testConsAddress, 5))
+
+	require.NoError(t, module.processValidatorBondUpdates(t.Context(), tx, dCtx))
+
+	require.Equal(t, 1, dCtx.Validators.Len())
+	val, ok := dCtx.Validators.Get(testValAddress)
+	require.True(t, ok)
+	require.Equal(t, "1000", val.Stake.String())
+	require.Equal(t, "5", val.Power.String())
+
+	// the loaded validator is cached, so the bond update is saved without a second lookup
+	tx.EXPECT().SaveBondUpdates(gomock.Any(), gomock.Any()).DoAndReturn(
+		func(_ context.Context, items ...*storage.ValidatorBondUpdate) error {
+			require.Len(t, items, 1)
+			require.EqualValues(t, 7, items[0].ValidatorId)
+			return nil
+		}).Times(1)
+	require.NoError(t, module.saveValidatorBondUpdates(t.Context(), tx, dCtx.ValidatorUpdates))
 }
 
 func bondUpdatesWith(updates ...storage.ValidatorBondUpdate) *sdkSync.Map[string, *storage.ValidatorBondUpdate] {
@@ -313,7 +374,7 @@ func Test_saveValidatorBondUpdates_ValidatorCreatedInBlock(t *testing.T) {
 	created.ConsAddress = newConsAddress
 	dCtx.AddValidator(created)
 	dCtx.AddValidatorUpdate(powerUpdate(newConsAddress, 5))
-	require.NoError(t, module.processValidatorBondUpdates(dCtx))
+	require.NoError(t, module.processValidatorBondUpdates(t.Context(), tx, dCtx))
 
 	tx.EXPECT().SaveValidators(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(_ context.Context, validators ...*storage.Validator) (int, error) {

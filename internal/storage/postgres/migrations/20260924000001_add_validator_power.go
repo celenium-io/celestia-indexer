@@ -44,7 +44,7 @@ func upAddValidatorPower(ctx context.Context, db *bun.DB) error {
 				SELECT id FROM validator
 				WHERE jailed = false
 				ORDER BY stake DESC
-				LIMIT (SELECT value::int FROM constant WHERE module = 'staking' AND name = 'max_validators')
+				LIMIT COALESCE((SELECT value::int FROM constant WHERE module = 'staking' AND name = 'max_validators'), 100)
 			)
 			UPDATE validator SET power = CASE
 				WHEN validator.id IN (SELECT id FROM bonded) THEN trunc(validator.stake / 1000000)
