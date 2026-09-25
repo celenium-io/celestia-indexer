@@ -66,14 +66,16 @@ func processUndelegate(ctx *context.Context, c *Cursor, msg *storage.Message) er
 				Amount:    amount.Copy().Neg(),
 			})
 
-			ctx.AddUndelegation(storage.Undelegation{
+			if err := ctx.AddUndelegation(storage.Undelegation{
 				Validator:      &validator,
 				Address:        address,
 				Amount:         amount,
 				Time:           msg.Time,
 				Height:         msg.Height,
 				CompletionTime: completionTime,
-			})
+			}); err != nil {
+				return err
+			}
 
 			ctx.AddStakingLog(storage.StakingLog{
 				Height:    msg.Height,

@@ -41,12 +41,13 @@ type Context struct {
 	NamespaceMessages *sdkSync.Map[string, *storage.NamespaceMessage]
 	AddressMessages   *sdkSync.Map[string, *storage.MsgAddress]
 	ValidatorUpdates  *sdkSync.Map[string, *storage.ValidatorBondUpdate]
-	CancelUnbonding   *sdkSync.Map[cancelKey, *storage.Undelegation]
+	Undelegations     *sdkSync.Map[unbondingKey, *storage.Undelegation]
+	CancelUnbonding   *sdkSync.Map[unbondingKey, *storage.Undelegation]
 
-	Messages            []*storage.Message
-	Events              []storage.Event
-	Redelegations       []storage.Redelegation
-	Undelegations       []storage.Undelegation
+	Messages      []*storage.Message
+	Events        []storage.Event
+	Redelegations []storage.Redelegation
+
 	StakingLogs         []storage.StakingLog
 	Votes               []*storage.Vote
 	VestingAccounts     []*storage.VestingAccount
@@ -89,13 +90,13 @@ func NewContext() *Context {
 		Namespaces:        sdkSync.NewMap[string, *storage.Namespace](),
 		NamespaceMessages: sdkSync.NewMap[string, *storage.NamespaceMessage](),
 		AddressMessages:   sdkSync.NewMap[string, *storage.MsgAddress](),
-		CancelUnbonding:   sdkSync.NewMap[cancelKey, *storage.Undelegation](),
+		Undelegations:     sdkSync.NewMap[unbondingKey, *storage.Undelegation](),
+		CancelUnbonding:   sdkSync.NewMap[unbondingKey, *storage.Undelegation](),
 		ValidatorUpdates:  sdkSync.NewMap[string, *storage.ValidatorBondUpdate](),
 
 		Messages:            make([]*storage.Message, 0, 100),
 		Events:              make([]storage.Event, 0, 1000),
 		Redelegations:       make([]storage.Redelegation, 0),
-		Undelegations:       make([]storage.Undelegation, 0),
 		StakingLogs:         make([]storage.StakingLog, 0),
 		Votes:               make([]*storage.Vote, 0),
 		VestingAccounts:     make([]*storage.VestingAccount, 0),
@@ -272,35 +273,40 @@ func (ctx *Context) AddRedelegation(r storage.Redelegation) {
 	ctx.Redelegations = append(ctx.Redelegations, r)
 }
 
-func (ctx *Context) AddUndelegation(u storage.Undelegation) {
-	ctx.Undelegations = append(ctx.Undelegations, u)
-}
-
-type cancelKey struct {
+type unbondingKey struct {
 	height    pkgTypes.Level
 	validator string
 	address   string
 }
 
-func (ctx *Context) AddCancelUndelegation(u storage.Undelegation) error {
+func addUnbondingToMap(m *sdkSync.Map[unbondingKey, *storage.Undelegation], height pkgTypes.Level, u storage.Undelegation) error {
 	if u.Validator == nil {
-		return errors.New("nil validator pointer in cancel unbonding")
+		return errors.New("nil validator pointer")
 	}
 	if u.Address == nil {
-		return errors.New("nil address pointer in cancel unbonding")
+		return errors.New("nil address pointer")
 	}
-	key := cancelKey{
-		height:    u.CreationHeight,
+	key := unbondingKey{
+		height:    height,
 		validator: u.Validator.Address,
 		address:   u.Address.Address,
 	}
 
-	if val, ok := ctx.CancelUnbonding.Get(key); ok {
+	if val, ok := m.Get(key); ok {
 		val.Amount = val.Amount.Add(u.Amount)
 	} else {
-		ctx.CancelUnbonding.Set(key, &u)
+		m.Set(key, &u)
 	}
 	return nil
+}
+
+// Entries of one block share creation height and completion time, so the SDK merges them into one
+func (ctx *Context) AddUndelegation(u storage.Undelegation) error {
+	return errors.Wrap(addUnbondingToMap(ctx.Undelegations, u.Height, u), "undelegation")
+}
+
+func (ctx *Context) AddCancelUndelegation(u storage.Undelegation) error {
+	return errors.Wrap(addUnbondingToMap(ctx.CancelUnbonding, u.CreationHeight, u), "cancel unbonding")
 }
 
 func (ctx *Context) AddJail(jail storage.Jail) {

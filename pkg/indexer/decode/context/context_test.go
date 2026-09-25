@@ -619,6 +619,97 @@ func Test_AddCancelUndelegation_NilPointers(t *testing.T) {
 	require.Equal(t, 0, ctx.CancelUnbonding.Len())
 }
 
+func undelegationOf(validator, delegator string, height pkgTypes.Level, amount int64) storage.Undelegation {
+	return storage.Undelegation{
+		Height:    height,
+		Amount:    storageTypes.NumericFromInt64(amount),
+		Validator: &storage.Validator{Address: validator},
+		Address:   &storage.Address{Address: delegator},
+	}
+}
+
+// The SDK merges unbonding entries with the same creation height into one
+func Test_AddUndelegation_SameEntrySums(t *testing.T) {
+	ctx := NewContext()
+	require.NoError(t, ctx.AddUndelegation(undelegationOf("valoper1", "celestia1", 1000, 100)))
+	require.NoError(t, ctx.AddUndelegation(undelegationOf("valoper1", "celestia1", 1000, 250)))
+
+	values := ctx.Undelegations.Values()
+	require.Len(t, values, 1)
+	require.Equal(t, "350", values[0].Amount.String())
+	require.EqualValues(t, 1000, values[0].Height)
+	require.Equal(t, "valoper1", values[0].Validator.Address)
+	require.Equal(t, "celestia1", values[0].Address.Address)
+	require.Equal(t, 0, ctx.CancelUnbonding.Len())
+}
+
+func Test_AddUndelegation_DifferentKeys(t *testing.T) {
+	ctx := NewContext()
+	require.NoError(t, ctx.AddUndelegation(undelegationOf("valoper1", "celestia1", 1000, 100)))
+	require.NoError(t, ctx.AddUndelegation(undelegationOf("valoper2", "celestia1", 1000, 200)))
+	require.NoError(t, ctx.AddUndelegation(undelegationOf("valoper1", "celestia2", 1000, 300)))
+
+	require.Equal(t, 3, ctx.Undelegations.Len())
+	amounts := make(map[string]string)
+	for u := range ctx.Undelegations.AllValues() {
+		amounts[u.Validator.Address+"/"+u.Address.Address] = u.Amount.String()
+	}
+	require.Equal(t, map[string]string{
+		"valoper1/celestia1": "100",
+		"valoper2/celestia1": "200",
+		"valoper1/celestia2": "300",
+	}, amounts)
+}
+
+// Undelegations are keyed by Height: the parser does not set CreationHeight for them
+func Test_AddUndelegation_KeyedByHeight(t *testing.T) {
+	ctx := NewContext()
+	require.NoError(t, ctx.AddUndelegation(undelegationOf("valoper1", "celestia1", 1000, 100)))
+	require.NoError(t, ctx.AddUndelegation(undelegationOf("valoper1", "celestia1", 1001, 200)))
+
+	require.Equal(t, 2, ctx.Undelegations.Len())
+}
+
+func Test_AddUndelegation_DoesNotMutateInput(t *testing.T) {
+	ctx := NewContext()
+	first := undelegationOf("valoper1", "celestia1", 1000, 100)
+	second := undelegationOf("valoper1", "celestia1", 1000, 250)
+	require.NoError(t, ctx.AddUndelegation(first))
+	require.NoError(t, ctx.AddUndelegation(second))
+
+	require.Equal(t, "100", first.Amount.String())
+	require.Equal(t, "250", second.Amount.String())
+}
+
+func Test_AddUndelegation_NilPointers(t *testing.T) {
+	ctx := NewContext()
+
+	noValidator := undelegationOf("valoper1", "celestia1", 1000, 100)
+	noValidator.Validator = nil
+	require.Error(t, ctx.AddUndelegation(noValidator))
+
+	noAddress := undelegationOf("valoper1", "celestia1", 1000, 100)
+	noAddress.Address = nil
+	require.Error(t, ctx.AddUndelegation(noAddress))
+
+	require.Equal(t, 0, ctx.Undelegations.Len())
+}
+
+// Undelegations and cancellations with the same key must not end up in each other's map
+func Test_AddUndelegation_SeparateFromCancel(t *testing.T) {
+	ctx := NewContext()
+	require.NoError(t, ctx.AddUndelegation(undelegationOf("valoper1", "celestia1", 1000, 100)))
+	require.NoError(t, ctx.AddCancelUndelegation(cancelOf("valoper1", "celestia1", 1000, 40)))
+
+	undelegations := ctx.Undelegations.Values()
+	require.Len(t, undelegations, 1)
+	require.Equal(t, "100", undelegations[0].Amount.String())
+
+	cancels := ctx.CancelUnbonding.Values()
+	require.Len(t, cancels, 1)
+	require.Equal(t, "40", cancels[0].Amount.String())
+}
+
 func Test_AddValidator_PowerMerge(t *testing.T) {
 	ctx := NewContext()
 
