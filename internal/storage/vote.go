@@ -20,6 +20,8 @@ type IVote interface {
 	ByProposalId(ctx context.Context, proposalId uint64, fltrs VoteFilters) ([]Vote, error)
 	ByVoterId(ctx context.Context, voterId uint64, fltrs VoteFilters) ([]Vote, error)
 	ByValidatorId(ctx context.Context, validatorId uint64, fltrs VoteFilters) ([]Vote, error)
+	// ListByProposal pages raw votes by id without the API limit clamp; used for tallying.
+	ListByProposal(ctx context.Context, proposalId uint64, limit, offset int) ([]Vote, error)
 }
 
 type Vote struct {

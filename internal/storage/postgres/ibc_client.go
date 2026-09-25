@@ -7,24 +7,24 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/uptrace/bun"
 )
 
 type IbcClient struct {
-	*database.Bun
+	db bun.IDB
 }
 
-func NewIbcClient(conn *database.Bun) *IbcClient {
-	return &IbcClient{conn}
+func NewIbcClient(db bun.IDB) storage.IIbcClient {
+	return &IbcClient{db}
 }
 
 func (c *IbcClient) ById(ctx context.Context, id string) (client storage.IbcClient, err error) {
-	query := c.DB().NewSelect().
+	query := c.db.NewSelect().
 		Model((*storage.IbcClient)(nil)).
 		Where("id = ?", id).
 		Limit(1)
 
-	err = c.DB().NewSelect().
+	err = c.db.NewSelect().
 		TableExpr("(?) as ibc_client", query).
 		ColumnExpr("ibc_client.*").
 		ColumnExpr("tx.hash as tx__hash").
@@ -38,7 +38,7 @@ func (c *IbcClient) ById(ctx context.Context, id string) (client storage.IbcClie
 }
 
 func (c *IbcClient) List(ctx context.Context, filters storage.ListIbcClientsFilters) (clients []storage.IbcClient, err error) {
-	query := c.DB().NewSelect().
+	query := c.db.NewSelect().
 		Model(&clients)
 
 	if filters.Offset > 0 {
@@ -56,7 +56,7 @@ func (c *IbcClient) List(ctx context.Context, filters storage.ListIbcClientsFilt
 		query = query.Where("chain_id = ?", filters.ChainId)
 	}
 
-	err = c.DB().NewSelect().
+	err = c.db.NewSelect().
 		TableExpr("(?) as ibc_client", query).
 		ColumnExpr("ibc_client.*").
 		ColumnExpr("tx.hash as tx__hash").
@@ -70,7 +70,7 @@ func (c *IbcClient) List(ctx context.Context, filters storage.ListIbcClientsFilt
 }
 
 func (c *IbcClient) ByChainId(ctx context.Context, chainId string) (res []string, err error) {
-	err = c.DB().NewSelect().
+	err = c.db.NewSelect().
 		Column("id").
 		Model((*storage.IbcClient)(nil)).
 		Where("chain_id = ?", chainId).

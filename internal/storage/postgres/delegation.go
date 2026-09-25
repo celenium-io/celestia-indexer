@@ -7,8 +7,8 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 )
 
 // Delegation -
@@ -17,7 +17,7 @@ type Delegation struct {
 }
 
 // NewDelegation -
-func NewDelegation(db *database.Bun) *Delegation {
+func NewDelegation(db bun.IDB) storage.IDelegation {
 	return &Delegation{
 		Table: postgres.NewTable[*storage.Delegation](db),
 	}
@@ -68,5 +68,13 @@ func (d *Delegation) ByValidator(ctx context.Context, validatorId uint64, limit,
 		Join("left join celestial on celestial.address_id = delegation.address_id and celestial.status = 'PRIMARY'").
 		Scan(ctx, &delegations)
 
+	return
+}
+
+func (d *Delegation) AddressDelegations(ctx context.Context, addressId uint64) (val []storage.Delegation, err error) {
+	err = d.DB().NewSelect().Model(&val).
+		Where("address_id = ?", addressId).
+		Where("amount > 0").
+		Scan(ctx)
 	return
 }

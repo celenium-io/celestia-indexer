@@ -44,6 +44,45 @@ func (m *MockIValidatorBondUpdate) EXPECT() *MockIValidatorBondUpdateMockRecorde
 	return m.recorder
 }
 
+// LastBondUpdate mocks base method.
+func (m *MockIValidatorBondUpdate) LastBondUpdate(ctx context.Context, validatorId uint64) (storage.ValidatorBondUpdate, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LastBondUpdate", ctx, validatorId)
+	ret0, _ := ret[0].(storage.ValidatorBondUpdate)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LastBondUpdate indicates an expected call of LastBondUpdate.
+func (mr *MockIValidatorBondUpdateMockRecorder) LastBondUpdate(ctx, validatorId any) *MockIValidatorBondUpdateLastBondUpdateCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastBondUpdate", reflect.TypeOf((*MockIValidatorBondUpdate)(nil).LastBondUpdate), ctx, validatorId)
+	return &MockIValidatorBondUpdateLastBondUpdateCall{Call: call}
+}
+
+// MockIValidatorBondUpdateLastBondUpdateCall wrap *gomock.Call
+type MockIValidatorBondUpdateLastBondUpdateCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIValidatorBondUpdateLastBondUpdateCall) Return(arg0 storage.ValidatorBondUpdate, arg1 error) *MockIValidatorBondUpdateLastBondUpdateCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIValidatorBondUpdateLastBondUpdateCall) Do(f func(context.Context, uint64) (storage.ValidatorBondUpdate, error)) *MockIValidatorBondUpdateLastBondUpdateCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIValidatorBondUpdateLastBondUpdateCall) DoAndReturn(f func(context.Context, uint64) (storage.ValidatorBondUpdate, error)) *MockIValidatorBondUpdateLastBondUpdateCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // ListByValidator mocks base method.
 func (m *MockIValidatorBondUpdate) ListByValidator(ctx context.Context, validatorId uint64, filters storage.FilterBondUpdatesListByValidator) ([]storage.ValidatorBondUpdate, error) {
 	m.ctrl.T.Helper()

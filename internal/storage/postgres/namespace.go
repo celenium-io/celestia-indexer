@@ -9,7 +9,6 @@ import (
 	"github.com/uptrace/bun"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 )
@@ -20,7 +19,7 @@ type Namespace struct {
 }
 
 // NewNamespace -
-func NewNamespace(db *database.Bun) *Namespace {
+func NewNamespace(db bun.IDB) storage.INamespace {
 	return &Namespace{
 		Table: postgres.NewTable[*storage.Namespace](db),
 	}
@@ -101,5 +100,15 @@ func (n *Namespace) GetByIds(ctx context.Context, ids ...uint64) (ns []storage.N
 	}
 
 	err = n.DB().NewSelect().Model(&ns).Where("id IN ?", bun.Tuple(ids)).Scan(ctx)
+	return
+}
+
+func (n *Namespace) LastNamespaceMessage(ctx context.Context, nsId uint64) (msg storage.NamespaceMessage, err error) {
+	err = n.DB().NewSelect().
+		Model(&msg).
+		Where("namespace_id = ?", nsId).
+		Order("msg_id desc").
+		Limit(1).
+		Scan(ctx)
 	return
 }

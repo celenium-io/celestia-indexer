@@ -16,6 +16,7 @@ import (
 type IHLIGP interface {
 	List(ctx context.Context, limit, offset int) ([]HLIGP, error)
 	ByHash(ctx context.Context, hash []byte) (HLIGP, error)
+	IdByHash(ctx context.Context, hash []byte) (uint64, error)
 }
 
 type HLIGP struct {

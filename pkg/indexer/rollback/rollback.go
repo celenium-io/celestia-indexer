@@ -35,11 +35,12 @@ const (
 //	                |----------------|
 type Module struct {
 	modules.BaseModule
-	tx        sdk.Transactable
-	state     storage.IState
-	blocks    storage.IBlock
-	node      node.Api
-	indexName string
+	tx           sdk.Transactable
+	state        storage.IState
+	blocks       storage.IBlock
+	reposFactory storage.TxReposFactory
+	node         node.Api
+	indexName    string
 }
 
 var _ modules.Module = (*Module)(nil)
@@ -52,12 +53,13 @@ func NewModule(
 	cfg config.Indexer,
 ) Module {
 	module := Module{
-		BaseModule: modules.New("rollback"),
-		tx:         tx,
-		state:      state,
-		blocks:     blocks,
-		node:       node,
-		indexName:  cfg.Name,
+		BaseModule:   modules.New("rollback"),
+		tx:           tx,
+		state:        state,
+		blocks:       blocks,
+		reposFactory: postgres.NewTxRepos,
+		node:         node,
+		indexName:    cfg.Name,
 	}
 
 	module.CreateInput(InputName)
@@ -160,7 +162,38 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	}
 	defer tx.Close(ctx)
 
-	if err := tx.RollbackBlock(ctx, height); err != nil {
+	repos := module.reposFactory(tx)
+
+	if err := tx.RollbackByHeight(
+		ctx,
+		height,
+		(*storage.Block)(nil),
+		(*storage.BlockSignature)(nil),
+		(*storage.BlobLog)(nil),
+		(*storage.VestingPeriod)(nil),
+		(*storage.VestingAccount)(nil),
+		(*storage.Proposal)(nil),
+		(*storage.Vote)(nil),
+		(*storage.IbcTransfer)(nil),
+		(*storage.HLTransfer)(nil),
+		(*storage.HLToken)(nil),
+		(*storage.HLMailbox)(nil),
+		(*storage.HLIGP)(nil),
+		(*storage.HLIGPConfig)(nil),
+		(*storage.HLGasPayment)(nil),
+		(*storage.Upgrade)(nil),
+		(*storage.SignalVersion)(nil),
+		(*storage.MsgValidator)(nil),
+		(*storage.Forwarding)(nil),
+		(*storage.ZkISMMessage)(nil),
+		(*storage.ZkISMUpdate)(nil),
+		(*storage.ZkISM)(nil),
+		(*storage.Undelegation)(nil),
+		(*storage.Redelegation)(nil),
+	); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+	if err := tx.RollbackGrants(ctx, height); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 	blockStats, err := tx.RollbackBlockStats(ctx, height)
@@ -176,7 +209,7 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 		return tx.HandleError(ctx, err)
 	}
 
-	totalNamespaces, err := module.rollbackMessages(ctx, tx, height)
+	totalNamespaces, err := module.rollbackMessages(ctx, tx, repos, height)
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
@@ -186,99 +219,32 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 		return tx.HandleError(ctx, err)
 	}
 
-	if err := module.rollbackBalances(ctx, tx, events, addresses); err != nil {
+	if err := module.rollbackBalances(ctx, tx, repos.Address, events, addresses); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
-	vals, err := rollbackValidators(ctx, tx, height)
+	vals, err := rollbackValidators(ctx, tx, repos.BondUpdates, height)
 	if err != nil {
 		return tx.HandleError(ctx, err)
-	}
-
-	if err := tx.RollbackBlockSignatures(ctx, height); err != nil {
-		return err
-	}
-
-	if err := tx.RollbackBlobLog(ctx, height); err != nil {
-		return tx.HandleError(ctx, err)
-	}
-	if err := tx.RollbackGrants(ctx, height); err != nil {
-		return tx.HandleError(ctx, err)
-	}
-
-	if err := tx.RollbackVestingPeriods(ctx, height); err != nil {
-		return tx.HandleError(ctx, err)
-	}
-	if err := tx.RollbackVestingAccounts(ctx, height); err != nil {
-		return tx.HandleError(ctx, err)
-	}
-
-	if err := tx.RollbackVotes(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackProposals(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackIbcTransfers(ctx, height); err != nil {
-		return err
 	}
 
 	if _, err := tx.RollbackIbcChannels(ctx, height); err != nil {
-		return err
+		return tx.HandleError(ctx, err)
 	}
 
 	if _, err := tx.RollbackIbcConnections(ctx, height); err != nil {
-		return err
+		return tx.HandleError(ctx, err)
 	}
 	removedIbcClients, err := tx.RollbackIbcClients(ctx, height)
 	if err != nil {
-		return err
-	}
-	if err := tx.RollbackHyperlaneTransfers(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackHyperlaneTokens(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackHyperlaneMailbox(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackUpgrades(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackSignals(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackMessageValidators(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackHyperlaneIgps(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackHyperlaneIgpConfigs(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackHyperlaneGasPayment(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackForwardings(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackZkISMMessages(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackZkISMUpdates(ctx, height); err != nil {
-		return err
-	}
-	if err := tx.RollbackZkISMs(ctx, height); err != nil {
-		return err
+		return tx.HandleError(ctx, err)
 	}
 
-	newBlock, err := tx.LastBlock(ctx)
+	newBlock, err := repos.Blocks.Last(ctx)
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}
-	state, err := tx.State(ctx, module.indexName)
+	state, err := repos.State.ByName(ctx, module.indexName)
 	if err != nil {
 		return tx.HandleError(ctx, err)
 	}

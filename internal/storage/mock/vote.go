@@ -356,6 +356,45 @@ func (c *MockIVoteListCall) DoAndReturn(f func(context.Context, uint64, uint64, 
 	return c
 }
 
+// ListByProposal mocks base method.
+func (m *MockIVote) ListByProposal(ctx context.Context, proposalId uint64, limit, offset int) ([]storage.Vote, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListByProposal", ctx, proposalId, limit, offset)
+	ret0, _ := ret[0].([]storage.Vote)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListByProposal indicates an expected call of ListByProposal.
+func (mr *MockIVoteMockRecorder) ListByProposal(ctx, proposalId, limit, offset any) *MockIVoteListByProposalCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListByProposal", reflect.TypeOf((*MockIVote)(nil).ListByProposal), ctx, proposalId, limit, offset)
+	return &MockIVoteListByProposalCall{Call: call}
+}
+
+// MockIVoteListByProposalCall wrap *gomock.Call
+type MockIVoteListByProposalCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIVoteListByProposalCall) Return(arg0 []storage.Vote, arg1 error) *MockIVoteListByProposalCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIVoteListByProposalCall) Do(f func(context.Context, uint64, int, int) ([]storage.Vote, error)) *MockIVoteListByProposalCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIVoteListByProposalCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Vote, error)) *MockIVoteListByProposalCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Save mocks base method.
 func (m_2 *MockIVote) Save(ctx context.Context, m *storage.Vote) error {
 	m_2.ctrl.T.Helper()

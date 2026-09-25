@@ -366,6 +366,45 @@ func (c *MockIAddressIsNoRowsCall) DoAndReturn(f func(error) bool) *MockIAddress
 	return c
 }
 
+// LastAddressAction mocks base method.
+func (m *MockIAddress) LastAddressAction(ctx context.Context, address []byte) (uint64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LastAddressAction", ctx, address)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LastAddressAction indicates an expected call of LastAddressAction.
+func (mr *MockIAddressMockRecorder) LastAddressAction(ctx, address any) *MockIAddressLastAddressActionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastAddressAction", reflect.TypeOf((*MockIAddress)(nil).LastAddressAction), ctx, address)
+	return &MockIAddressLastAddressActionCall{Call: call}
+}
+
+// MockIAddressLastAddressActionCall wrap *gomock.Call
+type MockIAddressLastAddressActionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIAddressLastAddressActionCall) Return(arg0 uint64, arg1 error) *MockIAddressLastAddressActionCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIAddressLastAddressActionCall) Do(f func(context.Context, []byte) (uint64, error)) *MockIAddressLastAddressActionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIAddressLastAddressActionCall) DoAndReturn(f func(context.Context, []byte) (uint64, error)) *MockIAddressLastAddressActionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // LastID mocks base method.
 func (m *MockIAddress) LastID(ctx context.Context) (uint64, error) {
 	m.ctrl.T.Helper()

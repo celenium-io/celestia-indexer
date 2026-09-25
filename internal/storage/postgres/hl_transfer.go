@@ -7,25 +7,24 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 )
 
 // HLTransfer -
 type HLTransfer struct {
-	*database.Bun
+	db bun.IDB
 }
 
 // NewHLTransfer -
-func NewHLTransfer(db *database.Bun) *HLTransfer {
+func NewHLTransfer(db bun.IDB) storage.IHLTransfer {
 	return &HLTransfer{
-		Bun: db,
+		db: db,
 	}
 }
 
 func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTransferFilters) (transfers []storage.HLTransfer, err error) {
-	query := t.DB().NewSelect().
+	query := t.db.NewSelect().
 		Model((*storage.HLTransfer)(nil))
 
 	if filters.Offset > 0 {
@@ -57,7 +56,7 @@ func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTran
 		query = query.Where("type IN ?", bun.Tuple(filters.Type))
 	}
 
-	err = t.DB().NewSelect().
+	err = t.db.NewSelect().
 		TableExpr("(?) as transfer", query).
 		ColumnExpr("transfer.*").
 		ColumnExpr("hl_mailbox.mailbox as mailbox__mailbox").
@@ -84,11 +83,11 @@ func (t *HLTransfer) List(ctx context.Context, filters storage.ListHyperlaneTran
 }
 
 func (t *HLTransfer) ById(ctx context.Context, id uint64) (transfer storage.HLTransfer, err error) {
-	query := t.DB().NewSelect().
+	query := t.db.NewSelect().
 		Model((*storage.HLTransfer)(nil)).
 		Where("id = ?", id)
 
-	err = t.DB().NewSelect().
+	err = t.db.NewSelect().
 		TableExpr("(?) as transfer", query).
 		ColumnExpr("transfer.*").
 		ColumnExpr("hl_mailbox.mailbox as mailbox__mailbox").
@@ -114,7 +113,7 @@ func (t *HLTransfer) ById(ctx context.Context, id uint64) (transfer storage.HLTr
 }
 
 func (t *HLTransfer) Series(ctx context.Context, domainId uint64, timeframe storage.Timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
-	query := t.DB().NewSelect().
+	query := t.db.NewSelect().
 		Order("time desc").
 		Where("counterparty = ?", domainId)
 
@@ -150,7 +149,7 @@ func (t *HLTransfer) Series(ctx context.Context, domainId uint64, timeframe stor
 }
 
 func (t *HLTransfer) TotalSeries(ctx context.Context, timeframe storage.Timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
-	query := t.DB().NewSelect().
+	query := t.db.NewSelect().
 		Group("time").
 		Order("time desc")
 
@@ -186,7 +185,7 @@ func (t *HLTransfer) TotalSeries(ctx context.Context, timeframe storage.Timefram
 }
 
 func (t *HLTransfer) StatsByDomain(ctx context.Context, limit, offset int) (stats []storage.DomainStats, err error) {
-	query := t.DB().NewSelect().
+	query := t.db.NewSelect().
 		Table(storage.ViewHlTransfersByMonth).
 		ColumnExpr("counterparty as domain_id, sum(count) as tx_count, sum(amount) as amount").
 		Group("domain_id").

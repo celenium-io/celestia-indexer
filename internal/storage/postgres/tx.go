@@ -9,9 +9,9 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/dipdup-io/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 )
 
@@ -21,7 +21,7 @@ type Tx struct {
 }
 
 // NewTx -
-func NewTx(db *database.Bun) *Tx {
+func NewTx(db bun.IDB) storage.ITx {
 	return &Tx{
 		Table: postgres.NewTable[*storage.Tx](db),
 	}

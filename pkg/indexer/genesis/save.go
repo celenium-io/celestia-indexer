@@ -140,7 +140,7 @@ func (module *Module) save(ctx context.Context, decodeCtx *decodeContext.Context
 		}
 	}
 
-	if err := tx.SaveMsgValidator(ctx, msgVals...); err != nil {
+	if err := storage.Insert(ctx, tx, msgVals...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
@@ -185,7 +185,7 @@ func (module *Module) save(ctx context.Context, decodeCtx *decodeContext.Context
 		}
 		periods = append(periods, decodeCtx.VestingAccounts[i].VestingPeriods...)
 	}
-	if err := tx.SaveVestingPeriods(ctx, periods...); err != nil {
+	if err := storage.Insert(ctx, tx, periods...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
@@ -232,7 +232,7 @@ func (module *Module) save(ctx context.Context, decodeCtx *decodeContext.Context
 			})
 		}
 	}
-	if err := tx.SaveNamespaceMessage(ctx, namespaceMsgs...); err != nil {
+	if err := storage.Insert(ctx, tx, namespaceMsgs...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 
@@ -250,7 +250,7 @@ func (module *Module) save(ctx context.Context, decodeCtx *decodeContext.Context
 		}
 	}
 
-	if err := tx.SaveSigners(ctx, signers...); err != nil {
+	if err := storage.Insert(ctx, tx, signers...); err != nil {
 		return tx.HandleError(ctx, err)
 	}
 

@@ -7,24 +7,24 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/uptrace/bun"
 )
 
 type IbcChannel struct {
-	*database.Bun
+	db bun.IDB
 }
 
-func NewIbcChannel(conn *database.Bun) *IbcChannel {
-	return &IbcChannel{conn}
+func NewIbcChannel(db bun.IDB) storage.IIbcChannel {
+	return &IbcChannel{db}
 }
 
 func (c *IbcChannel) ById(ctx context.Context, id string) (channel storage.IbcChannel, err error) {
-	query := c.DB().NewSelect().
+	query := c.db.NewSelect().
 		Model((*storage.IbcChannel)(nil)).
 		Where("id = ?", id).
 		Limit(1)
 
-	err = c.DB().NewSelect().
+	err = c.db.NewSelect().
 		TableExpr("(?) as ibc_channel", query).
 		ColumnExpr("ibc_channel.*").
 		ColumnExpr("create_tx.hash as create_tx__hash").
@@ -42,7 +42,7 @@ func (c *IbcChannel) ById(ctx context.Context, id string) (channel storage.IbcCh
 }
 
 func (c *IbcChannel) List(ctx context.Context, fltrs storage.ListChannelFilters) (channels []storage.IbcChannel, err error) {
-	query := c.DB().NewSelect().
+	query := c.db.NewSelect().
 		Model((*storage.IbcChannel)(nil))
 
 	if fltrs.Offset > 0 {
@@ -63,7 +63,7 @@ func (c *IbcChannel) List(ctx context.Context, fltrs storage.ListChannelFilters)
 		query = query.Where("status = ?", fltrs.Status)
 	}
 
-	err = c.DB().NewSelect().
+	err = c.db.NewSelect().
 		TableExpr("(?) as ibc_channel", query).
 		ColumnExpr("ibc_channel.*").
 		ColumnExpr("create_tx.hash as create_tx__hash").
@@ -81,7 +81,7 @@ func (c *IbcChannel) List(ctx context.Context, fltrs storage.ListChannelFilters)
 }
 
 func (c *IbcChannel) StatsByChain(ctx context.Context, limit, offset int) (stats []storage.ChainStats, err error) {
-	query := c.DB().NewSelect().
+	query := c.db.NewSelect().
 		Model((*storage.IbcChannel)(nil)).
 		ColumnExpr("ibc_client.chain_id as chain_id").
 		ColumnExpr("sum(received) as received").
@@ -90,7 +90,7 @@ func (c *IbcChannel) StatsByChain(ctx context.Context, limit, offset int) (stats
 		Join("left join ibc_client on ibc_client.id = ibc_channel.client_id").
 		Group("chain_id")
 
-	q := c.DB().NewSelect().
+	q := c.db.NewSelect().
 		With("stats", query).
 		Table("stats").
 		OrderExpr("flow desc").
@@ -103,7 +103,7 @@ func (c *IbcChannel) StatsByChain(ctx context.Context, limit, offset int) (stats
 }
 
 func (c *IbcChannel) BusiestChannel1m(ctx context.Context) (channel storage.BusiestChannel, err error) {
-	query := c.DB().NewSelect().
+	query := c.db.NewSelect().
 		Table(storage.ViewIbcTransfersByDay).
 		ColumnExpr("channel_id, sum(count) as count").
 		Where("time >= NOW() - INTERVAL '1 month'").
@@ -111,7 +111,7 @@ func (c *IbcChannel) BusiestChannel1m(ctx context.Context) (channel storage.Busi
 		Order("count DESC").
 		Limit(1)
 
-	err = c.DB().NewSelect().
+	err = c.db.NewSelect().
 		TableExpr("(?) as channel", query).
 		ColumnExpr("channel.channel_id as channel_id, channel.count as count, ibc_client.chain_id as chain_id").
 		Join("left join ibc_channel on ibc_channel.id = channel.channel_id").

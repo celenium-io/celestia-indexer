@@ -13,7 +13,7 @@ import (
 
 func (module *Module) saveDelegations(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.StakingTx,
 	dCtx *decodeContext.Context,
 	addrToId map[string]uint64,
 ) error {
@@ -84,7 +84,7 @@ func (module *Module) saveDelegations(
 			dCtx.Redelegations[i].DestId = destId
 		}
 
-		if err := tx.SaveRedelegations(ctx, dCtx.Redelegations...); err != nil {
+		if err := storage.Insert(ctx, tx, dCtx.Redelegations...); err != nil {
 			return err
 		}
 	}
@@ -109,7 +109,7 @@ func (module *Module) saveDelegations(
 			data = append(data, *undelegation)
 		}
 
-		if err := tx.SaveUndelegations(ctx, data...); err != nil {
+		if err := storage.Insert(ctx, tx, data...); err != nil {
 			return err
 		}
 	}

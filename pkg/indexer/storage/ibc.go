@@ -17,7 +17,7 @@ import (
 
 func saveIbcClients(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.IbcTx,
 	clients []*storage.IbcClient,
 	addrToId map[string]uint64,
 ) (int64, error) {
@@ -62,6 +62,7 @@ func parseClientRecoveries(changes []byte) ([]clientRecovery, error) {
 func (module *Module) recoverIbcClients(
 	ctx context.Context,
 	tx storage.Transaction,
+	proposalsRepo storage.IProposal,
 	subjects []string,
 	proposals *sdkSync.Map[uint64, *storage.Proposal],
 	blockTime time.Time,
@@ -75,7 +76,7 @@ func (module *Module) recoverIbcClients(
 		if p.Status != types.ProposalStatusApplied {
 			continue
 		}
-		proposal, err := tx.Proposal(ctx, p.Id)
+		proposal, err := proposalsRepo.GetByID(ctx, p.Id)
 		if err != nil {
 			return errors.Wrapf(err, "receiving proposal %d", p.Id)
 		}
@@ -108,7 +109,8 @@ func (module *Module) recoverIbcClients(
 
 func saveIbcChannels(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.IbcTx,
+	conns storage.IIbcConnection,
 	channels []*storage.IbcChannel,
 	addrToId map[string]uint64,
 ) error {
@@ -116,13 +118,14 @@ func saveIbcChannels(
 		return nil
 	}
 
+	connIds := make([]string, 0, len(channels))
+	seen := make(map[string]struct{}, len(channels))
 	for i := range channels {
 		if channels[i].ConnectionId != "" {
-			conn, err := tx.IbcConnection(ctx, channels[i].ConnectionId)
-			if err != nil {
-				return errors.Wrap(err, "receiving connection for channel")
+			if _, ok := seen[channels[i].ConnectionId]; !ok {
+				seen[channels[i].ConnectionId] = struct{}{}
+				connIds = append(connIds, channels[i].ConnectionId)
 			}
-			channels[i].ClientId = conn.ClientId
 		}
 
 		if channels[i].Creator != nil {
@@ -134,12 +137,35 @@ func saveIbcChannels(
 		}
 	}
 
+	clientIds, err := conns.ByIds(ctx, connIds...)
+	if err != nil {
+		return errors.Wrap(err, "receiving connection for channel")
+	}
+
+	m := make(map[string]string, len(clientIds))
+	for i := range clientIds {
+		if clientIds[i].ClientId == "" {
+			return errors.Errorf("empty client_id for connection: %s", clientIds[i].ConnectionId)
+		}
+		m[clientIds[i].ConnectionId] = clientIds[i].ClientId
+	}
+	for i := range channels {
+		if channels[i].ConnectionId == "" {
+			continue
+		}
+		clientId, ok := m[channels[i].ConnectionId]
+		if !ok {
+			return errors.Errorf("unknown connection for channel %s: %s", channels[i].Id, channels[i].ConnectionId)
+		}
+		channels[i].ClientId = clientId
+	}
+
 	return tx.SaveIbcChannels(ctx, channels...)
 }
 
 func saveIbcTransfers(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.IbcTx,
 	transfers []*storage.IbcTransfer,
 	addrToId map[string]uint64,
 ) error {
@@ -164,5 +190,5 @@ func saveIbcTransfers(
 		}
 	}
 
-	return tx.SaveIbcTransfers(ctx, transfers...)
+	return storage.Insert(ctx, tx, transfers...)
 }

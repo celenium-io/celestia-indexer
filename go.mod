@@ -1,6 +1,6 @@
 module github.com/celenium-io/celestia-indexer
 
-go 1.27.0
+go 1.27.1
 
 require (
 	cosmossdk.io/api v1.0.0
@@ -27,7 +27,7 @@ require (
 	github.com/dipdup-io/go-lib/database v1.0.4
 	github.com/dipdup-io/go-lib/testhelpers v1.0.0
 	github.com/dipdup-io/workerpool v0.0.4
-	github.com/dipdup-net/indexer-sdk v0.0.13
+	github.com/dipdup-net/indexer-sdk v0.1.0
 	github.com/ettle/strcase v0.2.0
 	github.com/fatih/structs v1.1.0
 	github.com/gabriel-vasile/mimetype v1.4.13

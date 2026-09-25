@@ -7,8 +7,8 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 )
 
 // VestingPeriod -
@@ -17,7 +17,7 @@ type VestingPeriod struct {
 }
 
 // NewVestingPeriod -
-func NewVestingPeriod(db *database.Bun) *VestingPeriod {
+func NewVestingPeriod(db bun.IDB) storage.IVestingPeriod {
 	return &VestingPeriod{
 		Table: postgres.NewTable[*storage.VestingPeriod](db),
 	}

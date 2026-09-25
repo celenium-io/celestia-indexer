@@ -170,7 +170,7 @@ func (handler RollupAuthHandler) Create(c echo.Context) error {
 	})
 }
 
-func (handler RollupAuthHandler) createRollup(ctx context.Context, tx storage.Transaction, req *createRollupRequest, isAdmin bool) (uint64, error) {
+func (handler RollupAuthHandler) createRollup(ctx context.Context, tx storage.RollupTx, req *createRollupRequest, isAdmin bool) (uint64, error) {
 	rollup := storage.Rollup{
 		Name:           req.Name,
 		Description:    req.Description,
@@ -203,7 +203,7 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, tx storage.Tr
 		rollup.Category = enums.RollupCategoryUncategorized
 	}
 
-	if err := tx.SaveRollup(ctx, &rollup); err != nil {
+	if err := storage.Insert(ctx, tx, &rollup); err != nil {
 		return 0, err
 	}
 
@@ -212,7 +212,7 @@ func (handler RollupAuthHandler) createRollup(ctx context.Context, tx storage.Tr
 		return 0, err
 	}
 
-	if err := tx.SaveProviders(ctx, providers...); err != nil {
+	if err := storage.Insert(ctx, tx, providers...); err != nil {
 		return 0, err
 	}
 
@@ -328,7 +328,7 @@ func (handler RollupAuthHandler) Update(c echo.Context) error {
 	return success(c)
 }
 
-func (handler RollupAuthHandler) updateRollup(ctx context.Context, tx storage.Transaction, req *updateRollupRequest, isAdmin bool) error {
+func (handler RollupAuthHandler) updateRollup(ctx context.Context, tx storage.RollupTx, req *updateRollupRequest, isAdmin bool) error {
 	if _, err := handler.rollups.GetByID(ctx, req.Id); err != nil {
 		return err
 	}
@@ -373,7 +373,7 @@ func (handler RollupAuthHandler) updateRollup(ctx context.Context, tx storage.Tr
 			return err
 		}
 
-		if err := tx.SaveProviders(ctx, providers...); err != nil {
+		if err := storage.Insert(ctx, tx, providers...); err != nil {
 			return err
 		}
 	}

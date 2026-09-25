@@ -7,21 +7,20 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 )
 
 type IbcTransfer struct {
-	*database.Bun
+	db bun.IDB
 }
 
-func NewIbcTransfer(conn *database.Bun) *IbcTransfer {
-	return &IbcTransfer{conn}
+func NewIbcTransfer(db bun.IDB) storage.IIbcTransfer {
+	return &IbcTransfer{db}
 }
 
 func (c *IbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFilters) (transfers []storage.IbcTransferWithSigner, err error) {
-	query := c.DB().NewSelect().
+	query := c.db.NewSelect().
 		Model((*storage.IbcTransfer)(nil))
 
 	if fltrs.Offset > 0 {
@@ -53,7 +52,7 @@ func (c *IbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFil
 		query = query.Where("connection_id IN ?", bun.Tuple(fltrs.ConnectionIds))
 	}
 
-	err = c.DB().NewSelect().
+	err = c.db.NewSelect().
 		TableExpr("(?) as ibc_transfer", query).
 		ColumnExpr("ibc_transfer.*").
 		ColumnExpr("tx.hash as tx__hash").
@@ -78,7 +77,7 @@ func (c *IbcTransfer) List(ctx context.Context, fltrs storage.ListIbcTransferFil
 }
 
 func (c *IbcTransfer) Series(ctx context.Context, channelId string, timeframe storage.Timeframe, column string, req storage.SeriesRequest) (items []storage.HistogramItem, err error) {
-	query := c.DB().NewSelect().
+	query := c.db.NewSelect().
 		Order("time desc").
 		Where("channel_id = ?", channelId)
 
@@ -114,13 +113,13 @@ func (c *IbcTransfer) Series(ctx context.Context, channelId string, timeframe st
 }
 
 func (c *IbcTransfer) LargestTransfer24h(ctx context.Context) (transfer storage.IbcTransfer, err error) {
-	query := c.DB().NewSelect().
+	query := c.db.NewSelect().
 		Model((*storage.IbcTransfer)(nil)).
 		Where("time >= NOW() - INTERVAL '24 hours'").
 		Order("amount DESC").
 		Limit(1)
 
-	err = c.DB().NewSelect().
+	err = c.db.NewSelect().
 		TableExpr("(?) as ibc_transfer", query).
 		ColumnExpr("ibc_transfer.*").
 		ColumnExpr("tx.hash as tx__hash").
@@ -141,11 +140,11 @@ func (c *IbcTransfer) LargestTransfer24h(ctx context.Context) (transfer storage.
 }
 
 func (c *IbcTransfer) ById(ctx context.Context, id uint64) (transfer storage.IbcTransferWithSigner, err error) {
-	query := c.DB().NewSelect().
+	query := c.db.NewSelect().
 		Model((*storage.IbcTransfer)(nil)).
 		Where("id = ?", id)
 
-	err = c.DB().NewSelect().
+	err = c.db.NewSelect().
 		TableExpr("(?) as ibc_transfer", query).
 		ColumnExpr("ibc_transfer.*").
 		ColumnExpr("tx.hash as tx__hash").

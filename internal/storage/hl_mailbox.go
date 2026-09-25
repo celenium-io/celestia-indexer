@@ -16,6 +16,7 @@ import (
 type IHLMailbox interface {
 	List(ctx context.Context, limit, offset int) ([]HLMailbox, error)
 	ByHash(ctx context.Context, hash []byte) (HLMailbox, error)
+	ByInternalId(ctx context.Context, internalId uint64) (HLMailbox, error)
 }
 
 type HLMailbox struct {

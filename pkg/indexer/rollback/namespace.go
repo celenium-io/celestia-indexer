@@ -13,7 +13,8 @@ import (
 
 func (module *Module) rollbackNamespaces(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.NamespaceTx,
+	namespaceRepo storage.INamespace,
 	nsMsgs []storage.NamespaceMessage,
 	deletedNs []storage.Namespace,
 ) error {
@@ -34,7 +35,7 @@ func (module *Module) rollbackNamespaces(
 
 		diff, ok := diffs[nsId]
 		if !ok {
-			ns, err := tx.Namespace(ctx, nsId)
+			ns, err := namespaceRepo.GetByID(ctx, nsId)
 			if err != nil {
 				return err
 			}
@@ -44,7 +45,7 @@ func (module *Module) rollbackNamespaces(
 			// post-rollback absolute totals. Keep everything but the counters,
 			// which are needed only for the ON CONFLICT match (namespace_id, version).
 			ns.PfbCount, ns.Size, ns.PffCount, ns.FibreSize, ns.BlobsCount = 0, 0, 0, 0, 0
-			diff = &ns
+			diff = ns
 			diffs[nsId] = diff
 		}
 
@@ -64,7 +65,7 @@ func (module *Module) rollbackNamespaces(
 
 	namespaces := make([]*storage.Namespace, 0, len(diffs))
 	for key := range diffs {
-		last, err := tx.LastNamespaceMessage(ctx, diffs[key].Id)
+		last, err := namespaceRepo.LastNamespaceMessage(ctx, diffs[key].Id)
 		if err != nil {
 			return errors.Wrap(err, "receiving last namespace message")
 		}

@@ -12,7 +12,7 @@ import (
 
 func saveVestings(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.AccountTx,
 	accounts []*storage.VestingAccount,
 	addrToId map[string]uint64,
 ) error {
@@ -43,7 +43,7 @@ func saveVestings(
 		vestingPeriods = append(vestingPeriods, accounts[i].VestingPeriods...)
 	}
 
-	if err := tx.SaveVestingPeriods(ctx, vestingPeriods...); err != nil {
+	if err := storage.Insert(ctx, tx, vestingPeriods...); err != nil {
 		return errors.Wrap(err, "saving vesting periods")
 	}
 

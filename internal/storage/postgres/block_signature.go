@@ -8,8 +8,8 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 )
 
 // BlockSignature -
@@ -18,7 +18,7 @@ type BlockSignature struct {
 }
 
 // NewBlockSignature -
-func NewBlockSignature(db *database.Bun) *BlockSignature {
+func NewBlockSignature(db bun.IDB) storage.IBlockSignature {
 	return &BlockSignature{
 		Table: postgres.NewTable[*storage.BlockSignature](db),
 	}

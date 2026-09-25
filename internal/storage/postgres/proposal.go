@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/uptrace/bun"
 )
@@ -18,7 +18,7 @@ type Proposal struct {
 }
 
 // NewProposal -
-func NewProposal(db *database.Bun) *Proposal {
+func NewProposal(db bun.IDB) storage.IProposal {
 	return &Proposal{
 		Table: postgres.NewTable[*storage.Proposal](db),
 	}
@@ -63,6 +63,16 @@ func (p *Proposal) ById(ctx context.Context, id uint64) (proposal storage.Propos
 		Where("proposal.id = ?", id).
 		Join("left join address as proposer ON proposal.proposer_id = proposer.id").
 		Join("left join celestial on celestial.address_id = proposal.proposer_id and celestial.status = 'PRIMARY'").
+		Scan(ctx)
+	return
+}
+
+func (p *Proposal) Active(ctx context.Context) (proposals []storage.Proposal, err error) {
+	err = p.DB().NewSelect().Model(&proposals).
+		Column("id", "proposer_id", "height", "created_at", "deposit_time").
+		Column("activation_time", "status", "type", "title", "description", "metadata", "changes").
+		Column("quorum", "veto_quorum", "threshold", "min_deposit", "end_time", "error").
+		Where("status = ?", types.ProposalStatusActive).
 		Scan(ctx)
 	return
 }

@@ -7,19 +7,19 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/uptrace/bun"
 )
 
 type HLIGPConfig struct {
-	*database.Bun
+	db bun.IDB
 }
 
-func NewHLIGPConfig(conn *database.Bun) *HLIGPConfig {
-	return &HLIGPConfig{conn}
+func NewHLIGPConfig(db bun.IDB) storage.IHLIGPConfig {
+	return &HLIGPConfig{db}
 }
 
 func (hl *HLIGPConfig) List(ctx context.Context, limit, offset int) (config []storage.HLIGPConfig, err error) {
-	query := hl.DB().NewSelect().
+	query := hl.db.NewSelect().
 		Model((*storage.HLIGPConfig)(nil))
 
 	query = limitScope(query, limit)

@@ -83,6 +83,45 @@ func (c *MockIHLMailboxByHashCall) DoAndReturn(f func(context.Context, []byte) (
 	return c
 }
 
+// ByInternalId mocks base method.
+func (m *MockIHLMailbox) ByInternalId(ctx context.Context, internalId uint64) (storage.HLMailbox, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ByInternalId", ctx, internalId)
+	ret0, _ := ret[0].(storage.HLMailbox)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ByInternalId indicates an expected call of ByInternalId.
+func (mr *MockIHLMailboxMockRecorder) ByInternalId(ctx, internalId any) *MockIHLMailboxByInternalIdCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByInternalId", reflect.TypeOf((*MockIHLMailbox)(nil).ByInternalId), ctx, internalId)
+	return &MockIHLMailboxByInternalIdCall{Call: call}
+}
+
+// MockIHLMailboxByInternalIdCall wrap *gomock.Call
+type MockIHLMailboxByInternalIdCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIHLMailboxByInternalIdCall) Return(arg0 storage.HLMailbox, arg1 error) *MockIHLMailboxByInternalIdCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIHLMailboxByInternalIdCall) Do(f func(context.Context, uint64) (storage.HLMailbox, error)) *MockIHLMailboxByInternalIdCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIHLMailboxByInternalIdCall) DoAndReturn(f func(context.Context, uint64) (storage.HLMailbox, error)) *MockIHLMailboxByInternalIdCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // List mocks base method.
 func (m *MockIHLMailbox) List(ctx context.Context, limit, offset int) ([]storage.HLMailbox, error) {
 	m.ctrl.T.Helper()

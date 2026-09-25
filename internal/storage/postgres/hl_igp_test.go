@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"time"
 )
 
@@ -25,6 +26,18 @@ func (s *StorageTestSuite) TestHyperlaneIgpByHash() {
 	s.Require().EqualValues("4321", config.TokenExchangeRate)
 	s.Require().EqualValues("100000", config.GasOverhead.String())
 	s.Require().EqualValues("1", config.GasPrice.String())
+}
+
+func (s *StorageTestSuite) TestHyperlaneIgpIdByHash() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	id, err := s.storage.HLIGP.IdByHash(ctx, []byte("igp_1"))
+	s.Require().NoError(err)
+	s.Require().EqualValues(1, id)
+
+	_, err = s.storage.HLIGP.IdByHash(ctx, []byte("unknown"))
+	s.Require().ErrorIs(err, sql.ErrNoRows)
 }
 
 func (s *StorageTestSuite) TestHyperlaneIgpList() {

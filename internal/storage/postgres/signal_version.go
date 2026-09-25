@@ -7,23 +7,23 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/uptrace/bun"
 )
 
 // SignalVersion -
 type SignalVersion struct {
-	*database.Bun
+	db bun.IDB
 }
 
 // NewSignalVersion -
-func NewSignalVersion(db *database.Bun) *SignalVersion {
+func NewSignalVersion(db bun.IDB) storage.ISignalVersion {
 	return &SignalVersion{
-		Bun: db,
+		db: db,
 	}
 }
 
 func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFilter) (signals []storage.SignalVersion, err error) {
-	query := t.DB().NewSelect().
+	query := t.db.NewSelect().
 		Model((*storage.SignalVersion)(nil))
 
 	if filters.Offset > 0 {
@@ -50,7 +50,7 @@ func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFil
 		query = query.Where("version = ?", filters.Version)
 	}
 
-	q := t.DB().NewSelect().
+	q := t.db.NewSelect().
 		TableExpr("(?) as signal_version", query).
 		ColumnExpr("signal_version.*").
 		ColumnExpr("validator.cons_address as validator__cons_address, validator.moniker as validator__moniker, validator.id as validator__id").

@@ -14,7 +14,7 @@ var errCantFindAddress = errors.New("can't find address")
 
 func saveNamespaceMessages(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.NamespaceTx,
 	msgs []*storage.NamespaceMessage,
 ) error {
 	for i := range msgs {
@@ -23,12 +23,12 @@ func saveNamespaceMessages(
 		}
 		msgs[i].NamespaceId = msgs[i].Namespace.Id
 	}
-	return tx.SaveNamespaceMessage(ctx, msgs...)
+	return storage.Insert(ctx, tx, msgs...)
 }
 
 func saveAddressMessage(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.BlockTx,
 	msgs []*storage.MsgAddress,
 	addrToId map[string]uint64,
 ) error {
@@ -52,7 +52,7 @@ func saveAddressMessage(
 
 func (module *Module) saveMessages(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.BlockTx,
 	messages []*storage.Message,
 ) error {
 	if len(messages) == 0 {
@@ -81,7 +81,7 @@ func (module *Module) saveMessages(
 			}
 		}
 	}
-	if err := tx.SaveMsgValidator(ctx, valMsgs...); err != nil {
+	if err := storage.Insert(ctx, tx, valMsgs...); err != nil {
 		return errors.Wrap(err, "saving message validators")
 	}
 

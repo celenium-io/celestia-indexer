@@ -7,8 +7,8 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 )
 
 // Grant -
@@ -17,7 +17,7 @@ type Grant struct {
 }
 
 // NewGrant -
-func NewGrant(db *database.Bun) *Grant {
+func NewGrant(db bun.IDB) storage.IGrant {
 	return &Grant{
 		Table: postgres.NewTable[*storage.Grant](db),
 	}

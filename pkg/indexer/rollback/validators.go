@@ -23,6 +23,7 @@ type rollbackedValidators struct {
 func rollbackValidators(
 	ctx context.Context,
 	tx storage.Transaction,
+	bondUpdateRepo storage.IValidatorBondUpdate,
 	height types.Level,
 ) (result rollbackedValidators, err error) {
 	removedValidators, err := tx.RollbackValidators(ctx, height)
@@ -60,7 +61,7 @@ func rollbackValidators(
 
 		// no earlier update means the validator was out of the active set
 		power := st.NumericZero()
-		lastUpdate, err := tx.LastBondUpdate(ctx, id)
+		lastUpdate, err := bondUpdateRepo.LastBondUpdate(ctx, id)
 		switch {
 		case err == nil:
 			if lastUpdate.Power != nil {
@@ -77,12 +78,6 @@ func rollbackValidators(
 		}
 	}
 
-	if err := tx.RollbackUndelegations(ctx, height); err != nil {
-		return result, err
-	}
-	if err := tx.RollbackRedelegations(ctx, height); err != nil {
-		return result, err
-	}
 	jails, err := tx.RollbackJails(ctx, height)
 	if err != nil {
 		return result, err

@@ -27,6 +27,7 @@ type ListHyperlaneTokens struct {
 type IHLToken interface {
 	ByHash(ctx context.Context, id []byte) (HLToken, error)
 	List(ctx context.Context, fltrs ListHyperlaneTokens) ([]HLToken, error)
+	IdByTokenId(ctx context.Context, tokenId []byte) (uint64, error)
 }
 
 type HLToken struct {

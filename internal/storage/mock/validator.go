@@ -46,6 +46,45 @@ func (m *MockIValidator) EXPECT() *MockIValidatorMockRecorder {
 	return m.recorder
 }
 
+// BondedValidators mocks base method.
+func (m *MockIValidator) BondedValidators(ctx context.Context) ([]storage.Validator, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BondedValidators", ctx)
+	ret0, _ := ret[0].([]storage.Validator)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BondedValidators indicates an expected call of BondedValidators.
+func (mr *MockIValidatorMockRecorder) BondedValidators(ctx any) *MockIValidatorBondedValidatorsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BondedValidators", reflect.TypeOf((*MockIValidator)(nil).BondedValidators), ctx)
+	return &MockIValidatorBondedValidatorsCall{Call: call}
+}
+
+// MockIValidatorBondedValidatorsCall wrap *gomock.Call
+type MockIValidatorBondedValidatorsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIValidatorBondedValidatorsCall) Return(arg0 []storage.Validator, arg1 error) *MockIValidatorBondedValidatorsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIValidatorBondedValidatorsCall) Do(f func(context.Context) ([]storage.Validator, error)) *MockIValidatorBondedValidatorsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIValidatorBondedValidatorsCall) DoAndReturn(f func(context.Context) ([]storage.Validator, error)) *MockIValidatorBondedValidatorsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // ByAddress mocks base method.
 func (m *MockIValidator) ByAddress(ctx context.Context, address string) (storage.Validator, error) {
 	m.ctrl.T.Helper()
@@ -81,6 +120,45 @@ func (c *MockIValidatorByAddressCall) Do(f func(context.Context, string) (storag
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIValidatorByAddressCall) DoAndReturn(f func(context.Context, string) (storage.Validator, error)) *MockIValidatorByAddressCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// ByConsAddress mocks base method.
+func (m *MockIValidator) ByConsAddress(ctx context.Context, address string) (storage.Validator, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ByConsAddress", ctx, address)
+	ret0, _ := ret[0].(storage.Validator)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ByConsAddress indicates an expected call of ByConsAddress.
+func (mr *MockIValidatorMockRecorder) ByConsAddress(ctx, address any) *MockIValidatorByConsAddressCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByConsAddress", reflect.TypeOf((*MockIValidator)(nil).ByConsAddress), ctx, address)
+	return &MockIValidatorByConsAddressCall{Call: call}
+}
+
+// MockIValidatorByConsAddressCall wrap *gomock.Call
+type MockIValidatorByConsAddressCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIValidatorByConsAddressCall) Return(arg0 storage.Validator, arg1 error) *MockIValidatorByConsAddressCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIValidatorByConsAddressCall) Do(f func(context.Context, string) (storage.Validator, error)) *MockIValidatorByConsAddressCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIValidatorByConsAddressCall) DoAndReturn(f func(context.Context, string) (storage.Validator, error)) *MockIValidatorByConsAddressCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

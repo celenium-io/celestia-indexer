@@ -6,12 +6,9 @@ package storage
 import (
 	"context"
 	"io"
-	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
-	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/uptrace/bun"
 )
@@ -93,132 +90,6 @@ type Listener interface {
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type ListenerFactory interface {
 	CreateListener() Listener
-}
-
-//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
-type Transaction interface {
-	sdk.Transaction
-
-	SaveConstants(ctx context.Context, constants ...Constant) error
-	SaveTransactions(ctx context.Context, txs ...Tx) error
-	SaveNamespaces(ctx context.Context, namespaces ...*Namespace) (int64, error)
-	SaveAddresses(ctx context.Context, addresses ...*Address) (int64, error)
-	SaveVestingAccounts(ctx context.Context, accounts ...*VestingAccount) error
-	SaveVestingPeriods(ctx context.Context, periods ...VestingPeriod) error
-	SaveBalances(ctx context.Context, balances ...Balance) error
-	SaveMessages(ctx context.Context, msgs ...*Message) error
-	SaveSigners(ctx context.Context, addresses ...Signer) error
-	SaveMsgAddresses(ctx context.Context, addresses ...*MsgAddress) error
-	SaveMsgValidator(ctx context.Context, validatorMsgs ...MsgValidator) error
-	SaveNamespaceMessage(ctx context.Context, nsMsgs ...*NamespaceMessage) error
-	SaveBlobLogs(ctx context.Context, logs ...*BlobLog) error
-	SaveValidators(ctx context.Context, validators ...*Validator) (int, error)
-	SaveEvents(ctx context.Context, events ...Event) error
-	SaveRollup(ctx context.Context, rollup *Rollup) error
-	SaveGrants(ctx context.Context, grants ...*Grant) error
-	UpdateRollup(ctx context.Context, rollup *Rollup) error
-	SaveProviders(ctx context.Context, providers ...RollupProvider) error
-	SaveUndelegations(ctx context.Context, undelegations ...Undelegation) error
-	SaveRedelegations(ctx context.Context, redelegations ...Redelegation) error
-	SaveDelegations(ctx context.Context, delegations ...Delegation) error
-	UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned types.Numeric) ([]Balance, error)
-	SaveStakingLogs(ctx context.Context, logs ...StakingLog) error
-	SaveJails(ctx context.Context, jails ...Jail) error
-	SaveBlockSignatures(ctx context.Context, signs ...BlockSignature) error
-	SaveProposals(ctx context.Context, proposals ...*Proposal) (int64, error)
-	SaveVotes(ctx context.Context, votes ...*Vote) (map[uint64]*VotesCount, error)
-	SaveIbcClients(ctx context.Context, clients ...*IbcClient) (int64, error)
-	RecoverIbcClient(ctx context.Context, subjectId, substituteId string, updatedAt time.Time) error
-	SaveIbcConnections(ctx context.Context, connections ...*IbcConnection) error
-	SaveIbcChannels(ctx context.Context, channels ...*IbcChannel) error
-	SaveIbcTransfers(ctx context.Context, transfers ...*IbcTransfer) error
-	SaveHyperlaneMailbox(ctx context.Context, mailbox ...*HLMailbox) error
-	SaveHyperlaneTokens(ctx context.Context, tokens ...*HLToken) error
-	SaveHyperlaneTransfers(ctx context.Context, transfers ...*HLTransfer) error
-	RetentionBlockSignatures(ctx context.Context, height pkgTypes.Level) error
-	CancelUnbondings(ctx context.Context, cancellations ...*Undelegation) error
-	RetentionCompletedUnbondings(ctx context.Context, blockTime time.Time) error
-	RetentionCompletedRedelegations(ctx context.Context, blockTime time.Time) error
-	Jail(ctx context.Context, validators ...*Validator) error
-	SaveSignals(ctx context.Context, signals ...*SignalVersion) error
-	SaveUpgrades(ctx context.Context, upgrades ...*Upgrade) error
-	UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (types.Numeric, error)
-	SaveHyperlaneIgps(ctx context.Context, igps ...*HLIGP) error
-	SaveHyperlaneIgpConfigs(ctx context.Context, configs ...HLIGPConfig) error
-	SaveHyperlaneGasPayments(ctx context.Context, payments ...*HLGasPayment) error
-	SaveForwardings(ctx context.Context, forwardings ...*Forwarding) error
-	SaveZkISMs(ctx context.Context, items ...*ZkISM) error
-	SaveZkISMUpdates(ctx context.Context, items ...*ZkISMUpdate) error
-	SaveZkISMMessages(ctx context.Context, items ...*ZkISMMessage) error
-	SaveBondUpdates(ctx context.Context, items ...*ValidatorBondUpdate) error
-
-	RollbackBlock(ctx context.Context, height pkgTypes.Level) error
-	RollbackBlockStats(ctx context.Context, height pkgTypes.Level) (stats BlockStats, err error)
-	RollbackAddresses(ctx context.Context, height pkgTypes.Level) (address []Address, err error)
-	RollbackVestingAccounts(ctx context.Context, height pkgTypes.Level) error
-	RollbackVestingPeriods(ctx context.Context, height pkgTypes.Level) error
-	RollbackTxs(ctx context.Context, height pkgTypes.Level) (txs []Tx, err error)
-	RollbackEvents(ctx context.Context, height pkgTypes.Level) (events []Event, err error)
-	RollbackMessages(ctx context.Context, height pkgTypes.Level) (msgs []Message, err error)
-	RollbackNamespaceMessages(ctx context.Context, height pkgTypes.Level) (msgs []NamespaceMessage, err error)
-	RollbackNamespaces(ctx context.Context, height pkgTypes.Level) (ns []Namespace, err error)
-	RollbackValidators(ctx context.Context, height pkgTypes.Level) ([]Validator, error)
-	RollbackBlobLog(ctx context.Context, height pkgTypes.Level) error
-	RollbackGrants(ctx context.Context, height pkgTypes.Level) error
-	RollbackBlockSignatures(ctx context.Context, height pkgTypes.Level) (err error)
-	RollbackSigners(ctx context.Context, txIds []uint64) (err error)
-	RollbackMessageAddresses(ctx context.Context, msgIds []uint64) (err error)
-	RollbackMessageValidators(ctx context.Context, height pkgTypes.Level) (err error)
-	RollbackUndelegations(ctx context.Context, height pkgTypes.Level) (err error)
-	RollbackRedelegations(ctx context.Context, height pkgTypes.Level) (err error)
-	RollbackStakingLogs(ctx context.Context, height pkgTypes.Level) ([]StakingLog, error)
-	RollbackJails(ctx context.Context, height pkgTypes.Level) ([]Jail, error)
-	RollbackProposals(ctx context.Context, height pkgTypes.Level) error
-	RollbackVotes(ctx context.Context, height pkgTypes.Level) error
-	RollbackIbcClients(ctx context.Context, height pkgTypes.Level) (int64, error)
-	RollbackIbcConnections(ctx context.Context, height pkgTypes.Level) (int64, error)
-	RollbackIbcChannels(ctx context.Context, height pkgTypes.Level) (int64, error)
-	RollbackIbcTransfers(ctx context.Context, height pkgTypes.Level) error
-	RollbackHyperlaneMailbox(ctx context.Context, height pkgTypes.Level) error
-	RollbackHyperlaneTokens(ctx context.Context, height pkgTypes.Level) error
-	RollbackHyperlaneTransfers(ctx context.Context, height pkgTypes.Level) error
-	RollbackSignals(ctx context.Context, height pkgTypes.Level) error
-	RollbackUpgrades(ctx context.Context, height pkgTypes.Level) error
-	RollbackHyperlaneIgps(ctx context.Context, height pkgTypes.Level) error
-	RollbackHyperlaneIgpConfigs(ctx context.Context, height pkgTypes.Level) error
-	RollbackHyperlaneGasPayment(ctx context.Context, height pkgTypes.Level) error
-	RollbackForwardings(ctx context.Context, height pkgTypes.Level) error
-	RollbackZkISMs(ctx context.Context, height pkgTypes.Level) error
-	RollbackZkISMUpdates(ctx context.Context, height pkgTypes.Level) error
-	RollbackZkISMMessages(ctx context.Context, height pkgTypes.Level) error
-	RollbackBondUpdates(ctx context.Context, height pkgTypes.Level) ([]ValidatorBondUpdate, error)
-	ZkISMById(ctx context.Context, id []byte) (ZkISM, error)
-	DeleteBalances(ctx context.Context, ids []uint64) error
-	DeleteProviders(ctx context.Context, rollupId uint64) error
-	DeleteRollup(ctx context.Context, rollupId uint64) error
-	DeleteDelegationsByValidator(ctx context.Context, ids ...uint64) error
-	UpdateValidators(ctx context.Context, validators ...*Validator) error
-
-	State(ctx context.Context, name string) (state State, err error)
-	LastBlock(ctx context.Context) (block Block, err error)
-	Namespace(ctx context.Context, id uint64) (ns Namespace, err error)
-	LastNamespaceMessage(ctx context.Context, nsId uint64) (msg NamespaceMessage, err error)
-	LastAddressAction(ctx context.Context, address []byte) (uint64, error)
-	GetProposerId(ctx context.Context, address string) (uint64, error)
-	Validator(ctx context.Context, id uint64) (val Validator, err error)
-	BondedValidators(ctx context.Context) ([]Validator, error)
-	Delegation(ctx context.Context, validatorId, addressId uint64) (val Delegation, err error)
-	AddressDelegations(ctx context.Context, addressId uint64) (val []Delegation, err error)
-	ActiveProposals(ctx context.Context) ([]Proposal, error)
-	ProposalVotes(ctx context.Context, proposalId uint64, limit, offset int) ([]Vote, error)
-	Proposal(ctx context.Context, id uint64) (Proposal, error)
-	RefreshLeaderboard(ctx context.Context) error
-	IbcConnection(ctx context.Context, id string) (IbcConnection, error)
-	HyperlaneMailbox(ctx context.Context, internalId uint64) (HLMailbox, error)
-	HyperlaneToken(ctx context.Context, id []byte) (HLToken, error)
-	HyperlaneIgp(ctx context.Context, id []byte) (HLIGP, error)
-	HyperlaneIgpConfig(ctx context.Context, id uint64) (HLIGPConfig, error)
-	LastBondUpdate(ctx context.Context, validatorId uint64) (ValidatorBondUpdate, error)
 }
 
 const (

@@ -12,7 +12,7 @@ import (
 
 func saveAddresses(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.AccountTx,
 	addresses []*storage.Address,
 ) (map[string]uint64, int64, error) {
 	if len(addresses) == 0 {
@@ -42,7 +42,7 @@ func saveAddresses(
 
 func saveSigners(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.BlockTx,
 	addrToId map[string]uint64,
 	txs []storage.Tx,
 ) error {
@@ -64,5 +64,5 @@ func saveSigners(
 			})
 		}
 	}
-	return tx.SaveSigners(ctx, txAddresses...)
+	return storage.Insert(ctx, tx, txAddresses...)
 }

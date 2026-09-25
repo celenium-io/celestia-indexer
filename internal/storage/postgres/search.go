@@ -10,35 +10,35 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/uptrace/bun"
 )
 
 // Search -
 type Search struct {
-	db *database.Bun
+	db bun.IDB
 }
 
 // NewSearch -
-func NewSearch(db *database.Bun) *Search {
+func NewSearch(db bun.IDB) storage.ISearch {
 	return &Search{
 		db: db,
 	}
 }
 
 func (s *Search) Search(ctx context.Context, query []byte) (results []storage.SearchResult, err error) {
-	blockQuery := s.db.DB().NewSelect().
+	blockQuery := s.db.NewSelect().
 		Model((*storage.Block)(nil)).
 		ColumnExpr("id, ? as value, 'block' as type", hex.EncodeToString(query)).
 		Where("hash = ?", query).
 		WhereOr("data_hash = ?", query)
-	txQuery := s.db.DB().NewSelect().
+	txQuery := s.db.NewSelect().
 		Model((*storage.Tx)(nil)).
 		ColumnExpr("id, encode(hash, 'hex') as value, 'tx' as type").
 		Where("hash = ?", query)
 
 	union := blockQuery.UnionAll(txQuery)
 
-	err = s.db.DB().NewSelect().
+	err = s.db.NewSelect().
 		TableExpr("(?) as search", union).
 		Limit(10).
 		Offset(0).
@@ -50,19 +50,19 @@ func (s *Search) Search(ctx context.Context, query []byte) (results []storage.Se
 func (s *Search) SearchText(ctx context.Context, text string) (results []storage.SearchResult, err error) {
 	text = strings.ToUpper(text)
 	text = "%" + text + "%"
-	validatorQuery := s.db.DB().NewSelect().
+	validatorQuery := s.db.NewSelect().
 		Model((*storage.Validator)(nil)).
 		ColumnExpr("id, moniker as value, 'validator' as type").
 		Where("moniker ILIKE ?", text)
-	rollupQuery := s.db.DB().NewSelect().
+	rollupQuery := s.db.NewSelect().
 		Model((*storage.Rollup)(nil)).
 		ColumnExpr("id, name as value, 'rollup' as type").
 		Where("name ILIKE ?", text)
-	namespaceQuery := s.db.DB().NewSelect().
+	namespaceQuery := s.db.NewSelect().
 		Model((*storage.Namespace)(nil)).
 		ColumnExpr("id, encode(namespace_id, 'hex') as value, 'namespace' as type").
 		Where("encode(namespace_id, 'hex') ILIKE ?", text)
-	celestialsQuery := s.db.DB().NewSelect().
+	celestialsQuery := s.db.NewSelect().
 		Model((*celestials.Celestial)(nil)).
 		ColumnExpr("address_id as id, id as value, 'celestial' as type").
 		Where("id ILIKE ?", text)
@@ -72,7 +72,7 @@ func (s *Search) SearchText(ctx context.Context, text string) (results []storage
 		UnionAll(validatorQuery).
 		UnionAll(celestialsQuery)
 
-	err = s.db.DB().NewSelect().
+	err = s.db.NewSelect().
 		TableExpr("(?) as search", union).
 		Limit(10).
 		Offset(0).

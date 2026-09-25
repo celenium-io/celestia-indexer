@@ -7,16 +7,16 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/uptrace/bun"
 )
 
 // ApiKey -
 type ApiKey struct {
-	db *database.Bun
+	db bun.IDB
 }
 
 // NewApiKey -
-func NewApiKey(db *database.Bun) *ApiKey {
+func NewApiKey(db bun.IDB) storage.IApiKey {
 	return &ApiKey{
 		db: db,
 	}
@@ -24,6 +24,6 @@ func NewApiKey(db *database.Bun) *ApiKey {
 
 func (ak *ApiKey) Get(ctx context.Context, key string) (apikey storage.ApiKey, err error) {
 	apikey.Key = key
-	err = ak.db.DB().NewSelect().Model(&apikey).WherePK().Scan(ctx)
+	err = ak.db.NewSelect().Model(&apikey).WherePK().Scan(ctx)
 	return
 }

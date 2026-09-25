@@ -44,6 +44,45 @@ func (m *MockIZkISM) EXPECT() *MockIZkISMMockRecorder {
 	return m.recorder
 }
 
+// ByExternalId mocks base method.
+func (m *MockIZkISM) ByExternalId(ctx context.Context, externalId []byte) (storage.ZkISM, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ByExternalId", ctx, externalId)
+	ret0, _ := ret[0].(storage.ZkISM)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ByExternalId indicates an expected call of ByExternalId.
+func (mr *MockIZkISMMockRecorder) ByExternalId(ctx, externalId any) *MockIZkISMByExternalIdCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ByExternalId", reflect.TypeOf((*MockIZkISM)(nil).ByExternalId), ctx, externalId)
+	return &MockIZkISMByExternalIdCall{Call: call}
+}
+
+// MockIZkISMByExternalIdCall wrap *gomock.Call
+type MockIZkISMByExternalIdCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIZkISMByExternalIdCall) Return(arg0 storage.ZkISM, arg1 error) *MockIZkISMByExternalIdCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIZkISMByExternalIdCall) Do(f func(context.Context, []byte) (storage.ZkISM, error)) *MockIZkISMByExternalIdCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIZkISMByExternalIdCall) DoAndReturn(f func(context.Context, []byte) (storage.ZkISM, error)) *MockIZkISMByExternalIdCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // ById mocks base method.
 func (m *MockIZkISM) ById(ctx context.Context, id uint64) (storage.ZkISM, error) {
 	m.ctrl.T.Helper()

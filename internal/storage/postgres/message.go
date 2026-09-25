@@ -7,7 +7,6 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/uptrace/bun"
 )
@@ -18,7 +17,7 @@ type Message struct {
 }
 
 // NewMessage -
-func NewMessage(db *database.Bun) *Message {
+func NewMessage(db bun.IDB) storage.IMessage {
 	return &Message{
 		Table: postgres.NewTable[*storage.Message](db),
 	}

@@ -8,17 +8,16 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 )
 
 type Stats struct {
-	db *database.Bun
+	db bun.IDB
 }
 
-func NewStats(conn *database.Bun) Stats {
-	return Stats{conn}
+func NewStats(db bun.IDB) Stats {
+	return Stats{db}
 }
 
 func (s Stats) Count(ctx context.Context, req storage.CountRequest) (string, error) {
@@ -26,7 +25,7 @@ func (s Stats) Count(ctx context.Context, req storage.CountRequest) (string, err
 		return "", err
 	}
 
-	query := s.db.DB().NewSelect().Table(req.Table).
+	query := s.db.NewSelect().Table(req.Table).
 		ColumnExpr("COUNT(*)")
 
 	if req.From > 0 {
@@ -46,7 +45,7 @@ func (s Stats) Summary(ctx context.Context, req storage.SummaryRequest) (string,
 		return "", err
 	}
 
-	query := s.db.DB().NewSelect().Table(req.Table).
+	query := s.db.NewSelect().Table(req.Table).
 		ColumnExpr(`? (?)`, bun.Safe(req.Function), bun.Safe(req.Column))
 
 	if req.From > 0 {
@@ -62,7 +61,7 @@ func (s Stats) Summary(ctx context.Context, req storage.SummaryRequest) (string,
 }
 
 func (s Stats) TPS(ctx context.Context) (response storage.TPS, err error) {
-	if err = s.db.DB().NewSelect().Table(storage.ViewBlockStatsByHour).
+	if err = s.db.NewSelect().Table(storage.ViewBlockStatsByHour).
 		ColumnExpr("max(tps) as high, min(tps) as low").
 		Where("ts > date_trunc('hour', now()) - '1 week'::interval").
 		Where("ts < date_trunc('hour', now())").
@@ -70,14 +69,14 @@ func (s Stats) TPS(ctx context.Context) (response storage.TPS, err error) {
 		return
 	}
 
-	if err = s.db.DB().NewSelect().Model((*storage.BlockStats)(nil)).
+	if err = s.db.NewSelect().Model((*storage.BlockStats)(nil)).
 		ColumnExpr("sum(tx_count)/3600.0").
 		Where("time > now() - '1 hour'::interval").
 		Scan(ctx, &response.Current); err != nil {
 		return
 	}
 	var prev float64
-	if err = s.db.DB().NewSelect().Model((*storage.BlockStats)(nil)).
+	if err = s.db.NewSelect().Model((*storage.BlockStats)(nil)).
 		ColumnExpr("sum(tx_count)/3600.0").
 		Where("time > now() - '2 hour'::interval").
 		Where("time <= now() - '1 hour'::interval").
@@ -98,7 +97,7 @@ func (s Stats) TPS(ctx context.Context) (response storage.TPS, err error) {
 }
 
 func (s Stats) Change24hBlockStats(ctx context.Context) (response storage.Change24hBlockStats, err error) {
-	first := s.db.DB().NewSelect().
+	first := s.db.NewSelect().
 		Table(storage.ViewBlockStatsByHour).
 		ColumnExpr(`
 			sum(tx_count) as tx_count,
@@ -106,7 +105,7 @@ func (s Stats) Change24hBlockStats(ctx context.Context) (response storage.Change
 			sum(blobs_size) as blobs_size,
 			sum(fee) as fee`).
 		Where("ts > NOW() - '1 day':: interval")
-	second := s.db.DB().NewSelect().
+	second := s.db.NewSelect().
 		Table(storage.ViewBlockStatsByHour).
 		ColumnExpr(`
 			sum(tx_count) as tx_count,
@@ -116,7 +115,7 @@ func (s Stats) Change24hBlockStats(ctx context.Context) (response storage.Change
 		Where("ts <= NOW() - '1 day':: interval").
 		Where("ts > NOW() - '2 days':: interval")
 
-	err = s.db.DB().NewSelect().
+	err = s.db.NewSelect().
 		With("f", first).
 		With("s", second).
 		TableExpr("f, s").
@@ -147,7 +146,7 @@ func (s Stats) Series(ctx context.Context, timeframe storage.Timeframe, name str
 		return nil, errors.Errorf("unexpected timeframe %s", timeframe)
 	}
 
-	query := s.db.DB().NewSelect().Table(view)
+	query := s.db.NewSelect().Table(view)
 
 	switch name {
 	case storage.SeriesBlobsSize:
@@ -214,7 +213,7 @@ func (s Stats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe,
 		return nil, errors.Errorf("unexpected timeframe %s", timeframe)
 	}
 
-	query := s.db.DB().NewSelect().Table(view).Where("namespace_id = ?", nsId)
+	query := s.db.NewSelect().Table(view).Where("namespace_id = ?", nsId)
 
 	switch name {
 	case storage.SeriesNsPfbCount:
@@ -239,7 +238,7 @@ func (s Stats) NamespaceSeries(ctx context.Context, timeframe storage.Timeframe,
 }
 
 func (s Stats) CumulativeSeries(ctx context.Context, timeframe storage.Timeframe, name string, req storage.SeriesRequest) (response []storage.SeriesItem, err error) {
-	query := s.db.DB().NewSelect()
+	query := s.db.NewSelect()
 	switch timeframe {
 	case storage.TimeframeHour:
 		query.Table(storage.ViewBlockStatsByHour)
@@ -278,7 +277,7 @@ func (s Stats) CumulativeSeries(ctx context.Context, timeframe storage.Timeframe
 
 	withQuery := query.Group("ts")
 
-	q := s.db.DB().
+	q := s.db.
 		NewSelect().
 		With("q", withQuery).
 		Table("q")
@@ -307,7 +306,7 @@ func (s Stats) StakingSeries(ctx context.Context, timeframe storage.Timeframe, n
 		return nil, errors.Errorf("unexpected timeframe %s", timeframe)
 	}
 
-	query := s.db.DB().NewSelect().Table(view).Where("validator_id = ?", validatorId)
+	query := s.db.NewSelect().Table(view).Where("validator_id = ?", validatorId)
 
 	switch name {
 	case storage.SeriesRewards:
@@ -325,13 +324,13 @@ func (s Stats) StakingSeries(ctx context.Context, timeframe storage.Timeframe, n
 	case storage.SeriesUnbondingsCount:
 		query.ColumnExpr("ts, unbondings_count as value")
 	case storage.SeriesCumulativeFlow:
-		subQuery := s.db.DB().NewSelect().
+		subQuery := s.db.NewSelect().
 			Table(view).
 			Where("validator_id = ?", validatorId).
 			ColumnExpr("ts, sum(sum(flow)) OVER(ORDER BY ts) as value").
 			Group("ts")
 
-		query = s.db.DB().NewSelect().With("q", subQuery).Table("q").Column("ts", "value")
+		query = s.db.NewSelect().With("q", subQuery).Table("q").Column("ts", "value")
 
 	default:
 		return nil, errors.Errorf("unexpected series name: %s", name)
@@ -355,7 +354,7 @@ type squareSize struct {
 }
 
 func (s Stats) SquareSize(ctx context.Context, from, to *time.Time) (result map[int][]storage.SeriesItem, err error) {
-	query := s.db.DB().NewSelect().
+	query := s.db.NewSelect().
 		Table(storage.ViewSquareSize).
 		OrderExpr("ts desc, square_size desc")
 
@@ -401,18 +400,18 @@ func (s Stats) SquareSize(ctx context.Context, from, to *time.Time) (result map[
 }
 
 func (s Stats) RollupStats24h(ctx context.Context) (response []storage.RollupStats24h, err error) {
-	inner := s.db.DB().NewSelect().
+	inner := s.db.NewSelect().
 		Table(storage.ViewRollupStatsByHour).
 		Column("namespace_id", "signer_id", "size", "fee", "blobs_count").
 		Where("time > now() - '1 day'::interval")
 
-	joined := s.db.DB().NewSelect().
+	joined := s.db.NewSelect().
 		TableExpr("(?) as data", inner).
 		ColumnExpr("rollup_id, sum(data.size) as size, sum(data.fee) as fee, sum(data.blobs_count) as blobs_count").
 		Join("left join rollup_provider as rp on (rp.address_id = data.signer_id OR rp.address_id = 0) AND (rp.namespace_id = data.namespace_id OR rp.namespace_id = 0)").
 		Group("rollup_id")
 
-	err = s.db.DB().NewSelect().
+	err = s.db.NewSelect().
 		TableExpr("(?) as grouped", joined).
 		ColumnExpr("grouped.*, r.name, r.logo").
 		Join("left join rollup as r on r.id = grouped.rollup_id").
@@ -422,7 +421,7 @@ func (s Stats) RollupStats24h(ctx context.Context) (response []storage.RollupSta
 }
 
 func (s Stats) MessagesCount24h(ctx context.Context) (response []storage.CountItem, err error) {
-	err = s.db.DB().NewSelect().
+	err = s.db.NewSelect().
 		Model((*storage.Message)(nil)).
 		ColumnExpr("count(*) as value, type as name").
 		Where("time > now() - '1 day'::interval").
@@ -433,7 +432,7 @@ func (s Stats) MessagesCount24h(ctx context.Context) (response []storage.CountIt
 }
 
 func (s Stats) SizeGroups(ctx context.Context, timeFilter *time.Time) (groups []storage.SizeGroup, err error) {
-	rangeQuery := s.db.DB().NewRaw(`SELECT *
+	rangeQuery := s.db.NewRaw(`SELECT *
       FROM ( VALUES 
 		  (1, 1000, '<1Kb'),
 		  (1001, 10000, '1-10Kb'),
@@ -447,7 +446,7 @@ func (s Stats) SizeGroups(ctx context.Context, timeFilter *time.Time) (groups []
 		timeFilter = &tf
 	}
 
-	err = s.db.DB().NewSelect().
+	err = s.db.NewSelect().
 		With("ranges", rangeQuery).
 		Table("ranges").
 		ColumnExpr("ranges.name as name, min(ranges.min_val) as min_val, count(blob_log.*), coalesce(sum(blob_log.size), 0) as size, coalesce(ceil(avg(blob_log.size)), 0) as avg_size").
@@ -460,21 +459,21 @@ func (s Stats) SizeGroups(ctx context.Context, timeFilter *time.Time) (groups []
 }
 
 func (s Stats) StakingDistribution(ctx context.Context, req storage.SeriesRequest) (response []storage.StakingDistributionItem, err error) {
-	dataQuery := s.db.DB().NewSelect().
+	dataQuery := s.db.NewSelect().
 		ColumnExpr("time_bucket_gapfill('1 month', ts) as month, validator_id, sum(sum(flow)) OVER(PARTITION BY validator_id ORDER BY 1) as value").
 		Table(storage.ViewStakingByMonth).
 		Where("ts >= '2023-10-01T00:00:00Z'").
 		Where("ts <= NOW()").
 		GroupExpr("1, 2")
 
-	summaryQuery := s.db.DB().NewSelect().
+	summaryQuery := s.db.NewSelect().
 		ColumnExpr("time_bucket_gapfill('1 month', ts) as ts, sum(sum(flow)) OVER(ORDER BY 1) as value").
 		Table(storage.ViewStakingByMonth).
 		Where("ts >= '2023-10-01T00:00:00Z'").
 		Where("ts <= NOW()").
 		GroupExpr("1")
 
-	query := s.db.DB().NewSelect().
+	query := s.db.NewSelect().
 		With("data", dataQuery).
 		With("summary", summaryQuery).
 		Table("data").

@@ -5,8 +5,8 @@ package postgres
 
 import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 )
 
 // StakingLog -
@@ -15,7 +15,7 @@ type StakingLog struct {
 }
 
 // NewStakingLog -
-func NewStakingLog(db *database.Bun) *StakingLog {
+func NewStakingLog(db bun.IDB) storage.IStakingLog {
 	return &StakingLog{
 		Table: postgres.NewTable[*storage.StakingLog](db),
 	}

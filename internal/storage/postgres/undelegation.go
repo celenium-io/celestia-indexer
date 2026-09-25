@@ -7,8 +7,8 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 )
 
 // Undelegation -
@@ -17,7 +17,7 @@ type Undelegation struct {
 }
 
 // NewUndelegation -
-func NewUndelegation(db *database.Bun) *Undelegation {
+func NewUndelegation(db bun.IDB) storage.IUndelegation {
 	return &Undelegation{
 		Table: postgres.NewTable[*storage.Undelegation](db),
 	}

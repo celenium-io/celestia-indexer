@@ -189,7 +189,7 @@ func createParser(cfg config.Indexer, receiverModule modules.Module) (*parser.Mo
 }
 
 func createStorage(pg postgres.Storage, cfg config.Config, parserModule modules.Module) (*storage.Module, error) {
-	storageModule := storage.NewModule(pg.Transactable, pg.Constants, pg.Validator, pg.Notificator, cfg.Indexer)
+	storageModule := storage.NewModule(pg.Transactable, pg.Notificator, cfg.Indexer)
 
 	if err := storageModule.AttachTo(parserModule, parser.OutputName, storage.InputName); err != nil {
 		return nil, errors.Wrap(err, "while attaching storage to parser")

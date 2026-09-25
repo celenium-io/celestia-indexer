@@ -307,11 +307,6 @@ func Test_saveMessages(t *testing.T) {
 				return nil
 			})
 
-		tx.EXPECT().
-			SaveMsgValidator(gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(nil)
-
 		t.Run(tt.name, func(t *testing.T) {
 			err := module.saveMessages(t.Context(), tx, tt.args.messages)
 			require.Equal(t, tt.wantErr, err != nil)

@@ -7,29 +7,28 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/uptrace/bun"
 )
 
 // HLToken -
 type HLToken struct {
-	*database.Bun
+	db bun.IDB
 }
 
 // NewHLToken -
-func NewHLToken(db *database.Bun) *HLToken {
+func NewHLToken(db bun.IDB) storage.IHLToken {
 	return &HLToken{
-		Bun: db,
+		db: db,
 	}
 }
 
 func (t *HLToken) ByHash(ctx context.Context, id []byte) (token storage.HLToken, err error) {
-	query := t.DB().NewSelect().
+	query := t.db.NewSelect().
 		Model((*storage.HLToken)(nil)).
 		Where("token_id = ?", id).
 		Limit(1)
 
-	err = t.DB().NewSelect().
+	err = t.db.NewSelect().
 		TableExpr("(?) as token", query).
 		ColumnExpr("token.*").
 		ColumnExpr("hl_mailbox.mailbox as mailbox__mailbox").
@@ -45,7 +44,7 @@ func (t *HLToken) ByHash(ctx context.Context, id []byte) (token storage.HLToken,
 }
 
 func (t *HLToken) List(ctx context.Context, filters storage.ListHyperlaneTokens) (tokens []storage.HLToken, err error) {
-	query := t.DB().NewSelect().
+	query := t.db.NewSelect().
 		Model((*storage.HLToken)(nil))
 
 	query = limitScope(query, filters.Limit)
@@ -65,7 +64,7 @@ func (t *HLToken) List(ctx context.Context, filters storage.ListHyperlaneTokens)
 		query = query.Where("type IN ?", bun.Tuple(filters.Type))
 	}
 
-	err = t.DB().NewSelect().
+	err = t.db.NewSelect().
 		TableExpr("(?) as token", query).
 		ColumnExpr("token.*").
 		ColumnExpr("hl_mailbox.mailbox as mailbox__mailbox").
@@ -77,5 +76,13 @@ func (t *HLToken) List(ctx context.Context, filters storage.ListHyperlaneTokens)
 		Join("left join address on address.id = token.owner_id").
 		Join("left join celestial on celestial.address_id = token.owner_id and celestial.status = 'PRIMARY'").
 		Scan(ctx, &tokens)
+	return
+}
+
+func (t *HLToken) IdByTokenId(ctx context.Context, tokenId []byte) (id uint64, err error) {
+	err = t.db.NewSelect().Model((*storage.HLToken)(nil)).
+		Where("token_id = ?", tokenId).
+		Column("id").
+		Scan(ctx, &id)
 	return
 }

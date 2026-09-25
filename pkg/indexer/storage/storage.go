@@ -36,9 +36,8 @@ const (
 type Module struct {
 	modules.BaseModule
 	storage                 sdk.Transactable
-	constants               storage.IConstant
-	validators              storage.IValidator
 	notificator             storage.Notificator
+	reposFactory            storage.TxReposFactory
 	validatorsByConsAddress map[string]uint64
 	validatorsByAddress     map[string]uint64
 	validatorsByDelegator   map[string]uint64
@@ -55,16 +54,13 @@ var _ modules.Module = (*Module)(nil)
 // NewModule -
 func NewModule(
 	tx sdk.Transactable,
-	constants storage.IConstant,
-	validators storage.IValidator,
 	notificator storage.Notificator,
 	cfg config.Indexer,
 ) Module {
 	m := Module{
 		BaseModule:              modules.New("storage"),
+		reposFactory:            postgres.NewTxRepos,
 		storage:                 tx,
-		constants:               constants,
-		validators:              validators,
 		notificator:             notificator,
 		validatorsByConsAddress: make(map[string]uint64),
 		validatorsByAddress:     make(map[string]uint64),
@@ -84,15 +80,26 @@ func NewModule(
 
 // Start -
 func (module *Module) Start(ctx context.Context) {
-	if err := module.init(ctx); err != nil {
+	tx, err := postgres.BeginTransaction(ctx, module.storage)
+	if err != nil {
 		panic(err)
 	}
+	defer tx.Close(ctx)
+
+	repos := module.reposFactory(tx)
+	if err := module.init(ctx, repos); err != nil {
+		panic(err)
+	}
+	if err := tx.Flush(ctx); err != nil {
+		panic(err)
+	}
+
 	module.G.GoCtx(ctx, module.listen)
 }
 
-func (module *Module) init(ctx context.Context) error {
+func (module *Module) init(ctx context.Context, repos storage.TxRepos) error {
 	paginate := sdkSync.Paginate(ctx, 100, func(ctx context.Context, limit, offset int) ([]*storage.Validator, error) {
-		return module.validators.List(ctx, uint64(limit), uint64(offset), sdk.SortOrderDesc)
+		return repos.Validators.List(ctx, uint64(limit), uint64(offset), sdk.SortOrderDesc)
 	})
 
 	for validator, err := range paginate {
@@ -105,17 +112,17 @@ func (module *Module) init(ctx context.Context) error {
 		module.validatorsByDelegator[validator.Delegator] = validator.Id
 	}
 
-	return module.initConstants(ctx)
+	return module.initConstants(ctx, repos)
 }
 
 func (module *Module) isConstantsEmpty() bool {
 	return module.slashingForDoubleSign.IsZero() || module.slashingForDowntime.IsZero()
 }
 
-func (module *Module) initConstants(ctx context.Context) error {
-	doubleSign, err := module.constants.Get(ctx, types.ModuleNameSlashing, "slash_fraction_double_sign")
+func (module *Module) initConstants(ctx context.Context, repos storage.TxRepos) error {
+	doubleSign, err := repos.Constants.Get(ctx, types.ModuleNameSlashing, "slash_fraction_double_sign")
 	if err != nil {
-		if module.validators.IsNoRows(err) {
+		if repos.Validators.IsNoRows(err) {
 			return nil
 		}
 		return err
@@ -125,9 +132,9 @@ func (module *Module) initConstants(ctx context.Context) error {
 		return err
 	}
 
-	downtime, err := module.constants.Get(ctx, types.ModuleNameSlashing, "slash_fraction_downtime")
+	downtime, err := repos.Constants.Get(ctx, types.ModuleNameSlashing, "slash_fraction_downtime")
 	if err != nil {
-		if module.validators.IsNoRows(err) {
+		if repos.Validators.IsNoRows(err) {
 			return nil
 		}
 		return err
@@ -137,18 +144,18 @@ func (module *Module) initConstants(ctx context.Context) error {
 		return err
 	}
 
-	maxAgeNumBlocks, err := module.constants.Get(ctx, types.ModuleNameConsensus, "evidence_max_age_num_blocks")
+	maxAgeNumBlocks, err := repos.Constants.Get(ctx, types.ModuleNameConsensus, "evidence_max_age_num_blocks")
 	if err != nil {
-		if module.validators.IsNoRows(err) {
+		if repos.Validators.IsNoRows(err) {
 			return nil
 		}
 		return err
 	}
 	module.maxAgeNumBlocks = maxAgeNumBlocks.Value
 
-	maxAgeDuration, err := module.constants.Get(ctx, types.ModuleNameConsensus, "evidence_max_age_duration")
+	maxAgeDuration, err := repos.Constants.Get(ctx, types.ModuleNameConsensus, "evidence_max_age_duration")
 	if err != nil {
-		if module.validators.IsNoRows(err) {
+		if repos.Validators.IsNoRows(err) {
 			return nil
 		}
 		return err
@@ -175,13 +182,6 @@ func (module *Module) listen(ctx context.Context) {
 			if !ok {
 				module.Log.Warn().Msgf("invalid message type: %T", msg)
 				continue
-			}
-
-			if module.isConstantsEmpty() {
-				if err := module.initConstants(ctx); err != nil {
-					module.Log.Warn().Err(err).Msgf("constant initialization error")
-					continue
-				}
 			}
 
 			state, err := module.saveBlock(ctx, decodedContext)
@@ -216,7 +216,15 @@ func (module *Module) saveBlock(ctx context.Context, dCtx *decodeContext.Context
 	}
 	defer tx.Close(ctx)
 
-	state, err := module.processBlockInTransaction(ctx, tx, dCtx)
+	repos := module.reposFactory(tx)
+
+	if module.isConstantsEmpty() {
+		if err := module.initConstants(ctx, repos); err != nil {
+			return storage.State{}, tx.HandleError(ctx, err)
+		}
+	}
+
+	state, err := module.processBlockInTransaction(ctx, tx, repos, dCtx)
 	if err != nil {
 		return state, tx.HandleError(ctx, err)
 	}
@@ -236,17 +244,22 @@ func (module *Module) saveBlock(ctx context.Context, dCtx *decodeContext.Context
 	return state, nil
 }
 
-func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.Transaction, dCtx *decodeContext.Context) (storage.State, error) {
+func (module *Module) processBlockInTransaction(
+	ctx context.Context,
+	tx storage.Transaction,
+	repos storage.TxRepos,
+	dCtx *decodeContext.Context,
+) (storage.State, error) {
 	block := dCtx.Block
 
-	state, err := tx.State(ctx, module.indexerName)
+	state, err := repos.State.ByName(ctx, module.indexerName)
 	if err != nil {
 		return state, err
 	}
 
 	if block.Height == 1 {
 		// init after genesis block
-		if err := module.init(ctx); err != nil {
+		if err := module.init(ctx, repos); err != nil {
 			return state, err
 		}
 	}
@@ -264,18 +277,18 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 			return state, errors.Errorf("unknown block proposer: %s", block.ProposerAddress)
 		}
 	} else {
-		proposerId, err := tx.GetProposerId(ctx, block.ProposerAddress)
+		proposer, err := repos.Validators.ByConsAddress(ctx, block.ProposerAddress)
 		if err != nil {
 			return state, errors.Wrap(err, "can't find block proposer")
 		}
-		block.ProposerId = proposerId
+		block.ProposerId = proposer.Id
 	}
 
-	if err := module.upgrade(ctx, dCtx, state.Version, block.VersionApp); err != nil {
+	if err := module.upgrade(ctx, repos, dCtx, state.Version, block.VersionApp); err != nil {
 		return state, errors.Wrap(err, "upgrade failed")
 	}
 
-	if err := module.processValidatorBondUpdates(ctx, tx, dCtx); err != nil {
+	if err := module.processValidatorBondUpdates(ctx, repos.Validators, dCtx); err != nil {
 		return state, errors.Wrap(err, "process validator bond updates")
 	}
 
@@ -345,7 +358,7 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 
-	totalProposals, err := module.saveProposals(ctx, tx, dCtx.Block.Height, dCtx.Proposals, dCtx.Votes, addrToId)
+	totalProposals, err := module.saveProposals(ctx, tx, repos, dCtx.Block.Height, dCtx.Proposals, dCtx.Votes, addrToId)
 	if err != nil {
 		return state, err
 	}
@@ -363,52 +376,52 @@ func (module *Module) processBlockInTransaction(ctx context.Context, tx storage.
 		return state, err
 	}
 	// after saving clients: a substitute updated in this block must be read with its new state
-	if err := module.recoverIbcClients(ctx, tx, dCtx.RecoveredIbcClients, dCtx.Proposals, dCtx.Block.Time); err != nil {
+	if err := module.recoverIbcClients(ctx, tx, repos.Proposals, dCtx.RecoveredIbcClients, dCtx.Proposals, dCtx.Block.Time); err != nil {
 		return state, err
 	}
 	if err := tx.SaveIbcConnections(ctx, dCtx.IbcConnections.Values()...); err != nil {
 		return state, err
 	}
-	if err := saveIbcChannels(ctx, tx, dCtx.IbcChannels.Values(), addrToId); err != nil {
+	if err := saveIbcChannels(ctx, tx, repos.IbcConnections, dCtx.IbcChannels.Values(), addrToId); err != nil {
 		return state, err
 	}
 	if err := saveIbcTransfers(ctx, tx, dCtx.IbcTransfers, addrToId); err != nil {
 		return state, err
 	}
 
-	if err := saveForwarding(ctx, tx, dCtx.Forwardings, addrToId); err != nil {
+	if err := saveForwarding(ctx, tx, repos.HyperlaneToken, dCtx.Forwardings, addrToId); err != nil {
 		return state, err
 	}
 
 	if err := saveZkIsm(ctx, tx, dCtx.ZkISMs.Values(), addrToId); err != nil {
 		return state, err
 	}
-	if err := saveZkIsmUpdates(ctx, tx, dCtx.ZkISMs, dCtx.ZkIsmUpdates, addrToId); err != nil {
+	if err := saveZkIsmUpdates(ctx, tx, repos.ZkIsm, dCtx.ZkISMs, dCtx.ZkIsmUpdates, addrToId); err != nil {
 		return state, err
 	}
-	if err := saveZkIsmMessages(ctx, tx, dCtx.ZkISMs, dCtx.ZkIsmMessages, addrToId); err != nil {
+	if err := saveZkIsmMessages(ctx, tx, repos.ZkIsm, dCtx.ZkISMs, dCtx.ZkIsmMessages, addrToId); err != nil {
 		return state, err
 	}
 
 	if err := saveHlMailboxes(ctx, tx, dCtx.HlMailboxes.Values(), addrToId); err != nil {
 		return state, err
 	}
-	if err := saveHlTokens(ctx, tx, dCtx.HlTokens.Values(), addrToId); err != nil {
+	if err := saveHlTokens(ctx, tx, repos.HyperlaneMailbox, dCtx.HlTokens.Values(), addrToId); err != nil {
 		return state, err
 	}
-	if err := saveHlTransfers(ctx, tx, dCtx.HlTransfers, addrToId); err != nil {
-		return state, err
-	}
-
-	if err := saveIgps(ctx, tx, dCtx, addrToId); err != nil {
+	if err := saveHlTransfers(ctx, tx, repos.HyperlaneMailbox, repos.HyperlaneToken, repos.HyperlaneIgp, dCtx.HlTransfers, addrToId); err != nil {
 		return state, err
 	}
 
-	if err := module.saveSignals(ctx, tx, dCtx.Signals, dCtx.Upgrades, state); err != nil {
+	if err := saveIgps(ctx, tx, repos.HyperlaneIgp, dCtx, addrToId); err != nil {
 		return state, err
 	}
 
-	if err := module.tryUpgrade(ctx, tx, dCtx.TryUpgrade, state); err != nil {
+	if err := module.saveSignals(ctx, tx, repos.Validators, dCtx.Signals, dCtx.Upgrades, state); err != nil {
+		return state, err
+	}
+
+	if err := module.tryUpgrade(ctx, tx, repos.Validators, dCtx.TryUpgrade, state); err != nil {
 		return state, err
 	}
 
@@ -447,7 +460,7 @@ func (module *Module) notify(ctx context.Context, state storage.State, block sto
 	return nil
 }
 
-func (module *Module) setUpgradeApplied(ctx context.Context, tx storage.Transaction, currentVersion uint64, block *storage.Block) error {
+func (module *Module) setUpgradeApplied(ctx context.Context, tx storage.GovTx, currentVersion uint64, block *storage.Block) error {
 	if currentVersion >= block.VersionApp || block.VersionApp < 3 {
 		return nil
 	}
