@@ -433,8 +433,63 @@ func Test_handleUndelegate(t *testing.T) {
 			c.Skip(tt.idx)
 			err := handleUndelegate(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
-			require.Len(t, tt.ctx.Undelegations, 1)
-			require.Equal(t, *tt.undelegation, tt.ctx.Undelegations[0])
+
+			values := tt.ctx.Undelegations.Values()
+			require.Len(t, values, 1)
+			require.NotNil(t, values[0])
+			require.Equal(t, *tt.undelegation, *values[0])
 		})
 	}
+}
+
+func undelegateV4Events(ts time.Time, amount string) []storage.Event {
+	return []storage.Event{
+		{
+			Height: 75,
+			Time:   ts,
+			Type:   "message",
+			Data: map[string]string{
+				"action":    "/cosmos.staking.v1beta1.MsgUndelegate",
+				"module":    "staking",
+				"msg_index": "0",
+				"sender":    "celestia1xs55snr6lxsalaqrwc63cxlmgn437zzv2gew35",
+			},
+		}, {
+			Height: 75,
+			Time:   ts,
+			Type:   "unbond",
+			Data: map[string]string{
+				"amount":          amount + "utia",
+				"completion_time": "2025-07-23T11:56:30Z",
+				"delegator":       "celestia1xs55snr6lxsalaqrwc63cxlmgn437zzv2gew35",
+				"msg_index":       "0",
+				"validator":       "celestiavaloper109nzhf6fvqvfan3tayzc8cywcsk6a5q45lmk5s",
+			},
+		},
+	}
+}
+
+// Two undelegations of one delegator from one validator in a block become one entry, as in the SDK
+func Test_handleUndelegate_SameBlockMerged(t *testing.T) {
+	ts := time.Now()
+	ctx := context.NewContext()
+	ctx.Block = &storage.Block{Time: ts}
+
+	for _, amount := range []string{"1000000", "250000"} {
+		msg := &storage.Message{
+			Type:   types.MsgUndelegate,
+			Height: 75,
+			Time:   ts,
+		}
+		require.NoError(t, handleUndelegate(ctx, NewCursor(undelegateV4Events(ts, amount)), msg))
+	}
+
+	values := ctx.Undelegations.Values()
+	require.Len(t, values, 1)
+	require.Equal(t, "1250000", values[0].Amount.String())
+	require.EqualValues(t, 75, values[0].Height)
+	require.Equal(t, time.Date(2025, 7, 23, 11, 56, 30, 0, time.UTC), values[0].CompletionTime)
+	require.Equal(t, "celestia1xs55snr6lxsalaqrwc63cxlmgn437zzv2gew35", values[0].Address.Address)
+	require.Equal(t, "celestiavaloper109nzhf6fvqvfan3tayzc8cywcsk6a5q45lmk5s", values[0].Validator.Address)
+	require.Equal(t, 0, ctx.CancelUnbonding.Len())
 }

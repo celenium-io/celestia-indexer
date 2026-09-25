@@ -628,6 +628,15 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Undelegation)(nil)).
+			Index("undelegation_unique_idx").
+			Unique().
+			Column("height", "validator_id", "address_id").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// Jail
 		if _, err := tx.NewCreateIndex().

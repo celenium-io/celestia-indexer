@@ -89,22 +89,27 @@ func (module *Module) saveDelegations(
 		}
 	}
 
-	if len(dCtx.Undelegations) > 0 {
-		for i := range dCtx.Undelegations {
-			addressId, ok := addrToId[dCtx.Undelegations[i].Address.Address]
-			if !ok {
-				return errors.Wrapf(errCantFindAddress, "delegation address %s", dCtx.Undelegations[i].Address.Address)
+	if dCtx.Undelegations.Len() > 0 {
+		data := make([]storage.Undelegation, 0, dCtx.Undelegations.Len())
+		for undelegation := range dCtx.Undelegations.AllValues() {
+			if undelegation == nil {
+				continue
 			}
-			dCtx.Undelegations[i].AddressId = addressId
+			addressId, ok := addrToId[undelegation.Address.Address]
+			if !ok {
+				return errors.Wrapf(errCantFindAddress, "delegation address %s", undelegation.Address.Address)
+			}
+			undelegation.AddressId = addressId
 
-			validatorId, ok := module.validatorsByAddress[dCtx.Undelegations[i].Validator.Address]
+			validatorId, ok := module.validatorsByAddress[undelegation.Validator.Address]
 			if !ok {
-				return errors.Wrapf(errCantFindAddress, "validator address %s", dCtx.Undelegations[i].Validator.Address)
+				return errors.Wrapf(errCantFindAddress, "validator address %s", undelegation.Validator.Address)
 			}
-			dCtx.Undelegations[i].ValidatorId = validatorId
+			undelegation.ValidatorId = validatorId
+			data = append(data, *undelegation)
 		}
 
-		if err := tx.SaveUndelegations(ctx, dCtx.Undelegations...); err != nil {
+		if err := tx.SaveUndelegations(ctx, data...); err != nil {
 			return err
 		}
 	}
