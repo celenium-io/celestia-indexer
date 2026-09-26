@@ -27,8 +27,11 @@ func (r *Module) sequencer(ctx context.Context) {
 				return
 			}
 
+			if block.Block.Height < currentBlock {
+				continue
+			}
 			orderedBlocks[block.Block.Height] = block
-			r.orderedBlocksLen.Add(1)
+			r.orderedBlocksLen.Store(int64(len(orderedBlocks)))
 
 			r.Log.Info().Int("blocks_count", len(orderedBlocks)).Msg("waiting for block")
 			b, ok := orderedBlocks[currentBlock]
@@ -50,7 +53,7 @@ func (r *Module) sequencer(ctx context.Context) {
 
 				prevBlockHash = b.BlockID.Hash
 				delete(orderedBlocks, currentBlock)
-				r.orderedBlocksLen.Add(-1)
+				r.orderedBlocksLen.Store(int64(len(orderedBlocks)))
 				currentBlock += 1
 
 				b, ok = orderedBlocks[currentBlock]
@@ -87,7 +90,7 @@ func (r *Module) startRollback(
 
 	// Reset empty state
 	level, hash := r.Level()
-	currentBlock := int64(level)
+	currentBlock := int64(level + 1)
 	prevBlockHash = hash
 
 	return prevBlockHash, currentBlock
