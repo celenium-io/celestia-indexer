@@ -337,6 +337,7 @@ func (s *ModuleTestSuite) TestModule_SequencerCallsRollback() {
 	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelCtx()
 
+	rolledBack := make(chan struct{}, 1)
 	go func() {
 		for {
 			select {
@@ -347,6 +348,7 @@ func (s *ModuleTestSuite) TestModule_SequencerCallsRollback() {
 					LastHeight: types.Level(4),
 					LastHash:   []byte{0x04},
 				})
+				rolledBack <- struct{}{}
 			}
 		}
 	}()
@@ -384,10 +386,13 @@ out:
 		}
 	}
 
-	s.Require().Eventually(func() bool {
-		l, _ := receiverModule.Level()
-		return l == 4
-	}, time.Second, 5*time.Millisecond)
+	// Level is already 4 before rollback starts, so wait for rollback itself:
+	// otherwise the refetched block can be drained by clearChannel.
+	select {
+	case <-ctx.Done():
+		s.T().Fatal("rollback was not triggered")
+	case <-rolledBack:
+	}
 
 	// After rollback to 4 the sequencer must accept the refetched block 5.
 	fixed := createBlocks(asc, blocksData...)[4]
