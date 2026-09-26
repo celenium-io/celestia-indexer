@@ -5,6 +5,7 @@ package handle
 
 import (
 	"encoding/base64"
+	stdMath "math"
 	"testing"
 	"time"
 
@@ -20,6 +21,7 @@ import (
 	distributionTypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	icaTypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
 	transferTypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	clientTypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	coreChannel "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	"github.com/stretchr/testify/require"
 )
@@ -449,6 +451,36 @@ func TestDecodeMsg_SuccessOnMsgRecvPacket_Transfer(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
+}
+
+func TestDecodeMsg_MsgRecvPacket_TransferHeightTimeoutOverflow(t *testing.T) {
+	msg := &coreChannel.MsgRecvPacket{
+		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
+		Packet: coreChannel.Packet{
+			Data:               []byte(`{"amount":"80000","denom":"transfer/channel-0/utia","receiver":"celestia1zener9kgsvzsdyvr8l0fjf8weqt2m8zkyqy65w","sender":"astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p"}`),
+			SourcePort:         "transfer",
+			SourceChannel:      "channel-0",
+			DestinationPort:    "transfer",
+			DestinationChannel: "channel-48",
+			TimeoutHeight: clientTypes.Height{
+				RevisionNumber: stdMath.MaxUint64,
+				RevisionHeight: stdMath.MaxUint64,
+			},
+			TimeoutTimestamp: 1730075376914760308,
+		},
+	}
+	block, _ := testsuite.EmptyBlock()
+	decodeCtx := context.NewContext()
+	decodeCtx.Block = &storage.Block{
+		Height: block.Height,
+		Time:   block.Block.Time,
+	}
+
+	_, err := decode.Message(decodeCtx, msg, 0, storageTypes.StatusSuccess, 0)
+	require.NoError(t, err)
+	require.Len(t, decodeCtx.IbcTransfers, 1)
+	require.Zero(t, decodeCtx.IbcTransfers[0].HeightTimeout)
+	require.NotNil(t, decodeCtx.IbcTransfers[0].Timeout)
 }
 
 func TestDecodeMsg_SuccessOnMsgTimeout(t *testing.T) {

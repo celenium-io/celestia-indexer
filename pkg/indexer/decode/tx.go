@@ -4,6 +4,8 @@
 package decode
 
 import (
+	stdMath "math"
+
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/legacy"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -62,7 +64,8 @@ func decodeCosmosTx(decoder cosmosTypes.TxDecoder, raw tmTypes.Tx, d *DecodedTx)
 		return errors.Wrap(err, "decoding tx error")
 	}
 
-	if t, ok := txDecoded.(cosmosTypes.TxWithTimeoutHeight); ok {
+	// timeout_height is bigint; values above MaxInt64 are unreachable, treat them as no timeout
+	if t, ok := txDecoded.(cosmosTypes.TxWithTimeoutHeight); ok && t.GetTimeoutHeight() <= stdMath.MaxInt64 {
 		d.TimeoutHeight = t.GetTimeoutHeight()
 	}
 	if t, ok := txDecoded.(cosmosTypes.TxWithMemo); ok {
