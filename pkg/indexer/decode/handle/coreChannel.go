@@ -4,6 +4,7 @@
 package handle
 
 import (
+	stdMath "math"
 	"strings"
 
 	json "github.com/bytedance/sonic"
@@ -256,7 +257,8 @@ func handleTransferPacketData(
 		transfer.Denom = partsDenom[2]
 	}
 
-	if packet.TimeoutHeight.RevisionHeight > 0 {
+	// height_timeout is bigint; values above MaxInt64 (e.g. MaxUint64 from Astria) mean no height timeout
+	if packet.TimeoutHeight.RevisionHeight > 0 && packet.TimeoutHeight.RevisionHeight <= stdMath.MaxInt64 {
 		transfer.HeightTimeout = packet.TimeoutHeight.RevisionHeight
 	}
 	if packet.TimeoutTimestamp > 0 {
