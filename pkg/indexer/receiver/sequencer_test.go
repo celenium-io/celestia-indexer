@@ -337,6 +337,7 @@ func (s *ModuleTestSuite) TestModule_SequencerCallsRollback() {
 	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelCtx()
 
+	rolledBack := make(chan struct{}, 1)
 	go func() {
 		for {
 			select {
@@ -347,6 +348,7 @@ func (s *ModuleTestSuite) TestModule_SequencerCallsRollback() {
 					LastHeight: types.Level(4),
 					LastHash:   []byte{0x04},
 				})
+				rolledBack <- struct{}{}
 			}
 		}
 	}()
@@ -384,9 +386,30 @@ out:
 		}
 	}
 
+	// Level is already 4 before rollback starts, so wait for rollback itself:
+	// otherwise the refetched block can be drained by clearChannel.
+	select {
+	case <-ctx.Done():
+		s.T().Fatal("rollback was not triggered")
+	case <-rolledBack:
+	}
+
+	// After rollback to 4 the sequencer must accept the refetched block 5.
+	fixed := createBlocks(asc, blocksData...)[4]
+	receiverModule.blocks <- fixed
+
+	select {
+	case <-ctx.Done():
+		s.T().Fatal("sequencer stalled after rollback")
+	case ob := <-blocksReaderModule.MustInput(orderedBlocksChannel).Listen():
+		orderedBlock, ok := ob.(*types.BlockData)
+		s.Require().True(ok)
+		s.Require().EqualValues(5, orderedBlock.Height)
+	}
+
 	receiverLevel, receiverHash := receiverModule.Level()
-	s.Require().EqualValues(types.Level(4), receiverLevel)
-	s.Require().EqualValues([]byte{0x04}, receiverHash)
+	s.Require().EqualValues(types.Level(5), receiverLevel)
+	s.Require().EqualValues([]byte{0x05}, receiverHash)
 }
 
 // TestModule_SequencerOrderedBlocksLenAccurate verifies that orderedBlocksLen
@@ -595,4 +618,58 @@ out:
 	receiverLevel, receiverHash := receiverModule.Level()
 	s.Require().EqualValues(types.Level(3), receiverLevel)
 	s.Require().EqualValues([]byte{0x03}, receiverHash)
+}
+
+// Stale and duplicate blocks from retried fetches must not leak into orderedBlocksLen.
+func (s *ModuleTestSuite) TestModule_SequencerIgnoresStaleAndDuplicateBlocks() {
+	s.InitApi(nil)
+
+	receiverModule := s.createModule()
+
+	const orderedBlocksChannel = "ordered-blocks"
+	blocksReaderModule := modules.New("ordered-blocks-reader")
+	blocksReaderModule.CreateInput(orderedBlocksChannel)
+	err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
+	s.Require().NoError(err)
+
+	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelCtx()
+
+	receiverModule.setLevel(1000, hashOf1000Block)
+	go receiverModule.sequencer(ctx)
+
+	blocks := createBlocks(asc,
+		blockConciseData{level: 1001, hash: []byte{0x01}},
+		blockConciseData{level: 1002, hash: []byte{0x02}},
+		blockConciseData{level: 1003, hash: []byte{0x03}},
+	)
+
+	receiverModule.blocks <- blocks[0]
+	select {
+	case <-ctx.Done():
+		s.T().Fatal("timed out waiting for block 1001")
+	case <-blocksReaderModule.MustInput(orderedBlocksChannel).Listen():
+	}
+
+	// Re-delivered 1001 (already processed) and a duplicated 1003 (still buffered).
+	receiverModule.blocks <- blocks[0]
+	receiverModule.blocks <- blocks[2]
+	receiverModule.blocks <- blocks[2]
+
+	s.Require().Eventually(func() bool {
+		return len(receiverModule.blocks) == 0 && receiverModule.orderedBlocksLen.Load() == 1
+	}, time.Second, 5*time.Millisecond, "orderedBlocksLen should count only buffered 1003")
+
+	receiverModule.blocks <- blocks[1]
+	for range 2 {
+		select {
+		case <-ctx.Done():
+			s.T().Fatal("timed out waiting for ordered blocks")
+		case <-blocksReaderModule.MustInput(orderedBlocksChannel).Listen():
+		}
+	}
+
+	s.Require().Eventually(func() bool {
+		return receiverModule.orderedBlocksLen.Load() == 0
+	}, time.Second, 5*time.Millisecond)
 }

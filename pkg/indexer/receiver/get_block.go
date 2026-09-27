@@ -73,6 +73,17 @@ func (r *Module) fetchBatch(ctx context.Context, levels []types.Level) {
 				r.connectionErrorDecrease()
 			}
 
+			// Don't refetch blocks already pushed before the stream broke.
+			if len(received) > 0 {
+				rest := make([]types.Level, 0, len(remaining)-len(received))
+				for i := range remaining {
+					if _, ok := received[remaining[i]]; !ok {
+						rest = append(rest, remaining[i])
+					}
+				}
+				remaining = rest
+			}
+
 			time.Sleep(time.Second)
 			continue
 		}
