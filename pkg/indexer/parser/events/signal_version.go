@@ -44,3 +44,32 @@ func processSignalVersion(ctx *context.Context, c *Cursor, msg *storage.Message,
 	c.Skip(1)
 	return nil
 }
+
+func processTryUpgrade(ctx *context.Context, c *Cursor, msg *storage.Message, data map[string]any) error {
+	signer, err := (types.PackedBytes)(data).GetString("Signer")
+	if err != nil {
+		return errors.Wrap(err, "get try upgrade signer in exec")
+	}
+
+	// the signer of an inner message is the granter, which MsgExec does not register
+	address := &storage.Address{
+		Address:    signer,
+		Height:     msg.Height,
+		LastHeight: msg.Height,
+	}
+	if err := ctx.AddAddress(address); err != nil {
+		return err
+	}
+
+	ctx.TryUpgrade = &storage.Upgrade{
+		Height:    msg.Height,
+		Time:      msg.Time,
+		EndTime:   msg.Time,
+		EndHeight: msg.Height,
+		Signer:    address,
+		TxId:      msg.TxId,
+		MsgId:     msg.Id,
+	}
+	c.Skip(1)
+	return nil
+}

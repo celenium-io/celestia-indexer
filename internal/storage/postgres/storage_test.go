@@ -44,6 +44,7 @@ func (s *StorageTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
 	s.T().Cleanup(func() {
+		// not t.Context(): it is canceled before cleanup runs
 		ctx, ctxCancel := context.WithTimeout(context.Background(), 20*time.Second)
 		defer ctxCancel()
 		s.Require().NoError(s.psqlContainer.Terminate(ctx))

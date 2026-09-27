@@ -29,7 +29,7 @@ type SaveTestSuite struct {
 }
 
 func (s *SaveTestSuite) SetupSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 180*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 180*time.Second)
 	defer ctxCancel()
 
 	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, testhelpers.PostgreSQLContainerConfig{
@@ -42,6 +42,7 @@ func (s *SaveTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
 	s.T().Cleanup(func() {
+		// not t.Context(): it is canceled before cleanup runs
 		ctx, ctxCancel := context.WithTimeout(context.Background(), 20*time.Second)
 		defer ctxCancel()
 		s.Require().NoError(s.psqlContainer.Terminate(ctx))
@@ -87,7 +88,7 @@ func (s *SaveTestSuite) TestSave_NilVestingAccountReturnsErrorInsteadOfPanicking
 
 	dCtx.VestingAccounts = append(dCtx.VestingAccounts, nil)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(s.T().Context(), 30*time.Second)
 	defer cancel()
 
 	s.Require().NotPanics(func() {

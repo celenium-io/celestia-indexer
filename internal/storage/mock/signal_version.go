@@ -17,6 +17,7 @@ import (
 	reflect "reflect"
 
 	storage "github.com/celenium-io/celestia-indexer/internal/storage"
+	types "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -79,6 +80,45 @@ func (c *MockISignalVersionListCall) Do(f func(context.Context, storage.ListSign
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockISignalVersionListCall) DoAndReturn(f func(context.Context, storage.ListSignalsFilter) ([]storage.SignalVersion, error)) *MockISignalVersionListCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Tally mocks base method.
+func (m *MockISignalVersion) Tally(ctx context.Context, version uint64) (types.Numeric, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Tally", ctx, version)
+	ret0, _ := ret[0].(types.Numeric)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Tally indicates an expected call of Tally.
+func (mr *MockISignalVersionMockRecorder) Tally(ctx, version any) *MockISignalVersionTallyCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Tally", reflect.TypeOf((*MockISignalVersion)(nil).Tally), ctx, version)
+	return &MockISignalVersionTallyCall{Call: call}
+}
+
+// MockISignalVersionTallyCall wrap *gomock.Call
+type MockISignalVersionTallyCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockISignalVersionTallyCall) Return(arg0 types.Numeric, arg1 error) *MockISignalVersionTallyCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockISignalVersionTallyCall) Do(f func(context.Context, uint64) (types.Numeric, error)) *MockISignalVersionTallyCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockISignalVersionTallyCall) DoAndReturn(f func(context.Context, uint64) (types.Numeric, error)) *MockISignalVersionTallyCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

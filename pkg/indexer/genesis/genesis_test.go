@@ -273,7 +273,7 @@ func TestModule_OnParseError_PushesStopOutput(t *testing.T) {
 	err = stopperModule.AttachTo(&genesisModule, StopOutput, stopInputName)
 	require.NoError(t, err)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second*5)
 	defer cancel()
 
 	genesisModule.Start(ctx)

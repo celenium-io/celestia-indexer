@@ -4,7 +4,6 @@
 package websocket
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -30,7 +29,7 @@ func BenchmarkHandle(b *testing.B) {
 	e := echo.New()
 	manager := NewManager(nil)
 	for i := 0; i < b.N; i++ {
-		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+		req := httptest.NewRequestWithContext(b.Context(), http.MethodGet, "/", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 

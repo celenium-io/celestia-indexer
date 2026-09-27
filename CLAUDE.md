@@ -200,6 +200,20 @@ state, _ := repos.State.ByName(ctx, name) // reads see the tx's own writes
 
 **Bulk COPY** (`transaction.go`): `SaveTransactions`, `SaveMessages`, `SaveBlobLogs`, `SaveMsgAddresses` now use `pg.SaveBulkWithCopy` (PostgreSQL COPY protocol) instead of INSERT with `RETURNING id`, since IDs are pre-computed.
 
+## Signals and Upgrades (x/signal)
+
+The tally mirrors `celestia-app/x/signal`. It is built only from chain data, with no node queries. Code: `pkg/indexer/storage/signal.go`, `SignalVersion.Tally`, `FixSignalsPower`.
+
+- **Tally** (`ISignalVersion.Tally`): each validator's latest signal since the last applied upgrade (`ResetTally` wipes older ones), counting only bonded validators (`validator.power > 0`), summed as `validator.power`. Total power comes from `IValidator.TotalVotingPower`. The threshold is `signalThreshold` = `ceil(signal.Threshold(v) × total)`, compared with `>=`.
+- **Current version** is `block.VersionApp`, the header version x/signal uses, not `state.Version`, which belongs to the previous block.
+- **Order in `processBlockInTransaction`**: `FixSignalsPower` (upgrade applied) → `setUpgradeApplied` → `saveSignals` → `recountUpgrades` → `tryUpgrade`.
+- **`recountUpgrades` runs on every block** for `IUpgrade.PendingVersions(currentVersion)`: versions above the current one, not applied, with no `MsgTryUpgrade` (`end_height = 0`). It writes through `UpdateUpgradeTally`. `SaveUpgrades` skips zero fields, so it cannot record a lost quorum.
+- **`waiting_upgrade`** means the quorum is reached. It goes back to `processing` if the quorum is lost before `MsgTryUpgrade`.
+- **`signal_version.voting_power`**: `NULL` while the round is open (the API shows the current `validator.power`), the counted power after `FixSignalsPower`, or `0` if the signal was not counted. The API multiplies signal power by 10^6, because the field has always been in utia. Upgrade `voting_power`/`voted_power` are consensus power, with no multiplication.
+- **`validator.version`** is the version of the validator's latest signal, not the max. `tryUpgrade` takes its candidates from it.
+- **`expected_upgrade_height`** = `end_height + appconsts.GetUpgradeHeightDelay(chainID)`, set on `MsgTryUpgrade`. The actual switch is `applied_at_level` (scheduled height + 1).
+- **`MsgSignalVersion` / `MsgTryUpgrade` inside `MsgExec`** are parsed from events in `pkg/indexer/parser/events/exec.go`.
+
 ## API Handler Pattern
 
 ```go
@@ -347,6 +361,8 @@ Key entities indexed (57 total storage types):
 
 ## Testing
 
+- **Contexts in tests: prefer `t.Context()`** (`s.T().Context()` in suites, `b.Context()` in benchmarks) over `context.Background()`, including helpers (pass `t` in). The one exception is `t.Cleanup` / `s.T().Cleanup`: the test context is already canceled when cleanup runs, so use `context.Background()` there (e.g. `psqlContainer.Terminate`). A transaction begun on a canceled context is rolled back by `database/sql`, so defer `tx.Rollback`/`tx.Close` inside the test instead of registering them as cleanup.
+- Do not run `golangci-lint --fix`: even with `--enable-only`, it applies `usetesting` rewrites across the repo, cleanup contexts included.
 - Mocks are auto-generated in `mock/` subdirectories — never edit manually. Exceptions:
   - `internal/storage/transaction.go` uses mockgen package mode (`. Transaction`), so only `MockTransaction` is generated, not the domain `*Tx` interfaces.
   - `internal/storage/mock/tx_repos.go` is hand-written: `mock.NewTxRepos(ctrl)` returns typed repository mocks (`repos.Validators.EXPECT()`), `repos.Repos()` returns `storage.TxRepos`. Keep it in sync with `storage.TxRepos`.

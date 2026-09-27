@@ -121,3 +121,42 @@ func (c *MockIUpgradeListCall) DoAndReturn(f func(context.Context, storage.ListU
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
+
+// PendingVersions mocks base method.
+func (m *MockIUpgrade) PendingVersions(ctx context.Context, currentVersion uint64) ([]uint64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PendingVersions", ctx, currentVersion)
+	ret0, _ := ret[0].([]uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PendingVersions indicates an expected call of PendingVersions.
+func (mr *MockIUpgradeMockRecorder) PendingVersions(ctx, currentVersion any) *MockIUpgradePendingVersionsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PendingVersions", reflect.TypeOf((*MockIUpgrade)(nil).PendingVersions), ctx, currentVersion)
+	return &MockIUpgradePendingVersionsCall{Call: call}
+}
+
+// MockIUpgradePendingVersionsCall wrap *gomock.Call
+type MockIUpgradePendingVersionsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIUpgradePendingVersionsCall) Return(arg0 []uint64, arg1 error) *MockIUpgradePendingVersionsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIUpgradePendingVersionsCall) Do(f func(context.Context, uint64) ([]uint64, error)) *MockIUpgradePendingVersionsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIUpgradePendingVersionsCall) DoAndReturn(f func(context.Context, uint64) ([]uint64, error)) *MockIUpgradePendingVersionsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}

@@ -25,17 +25,6 @@ func makeUpgradesMap(upgrades ...*storage.Upgrade) *sdkSync.Map[uint64, *storage
 	return m
 }
 
-func makeModule(ctrl *gomock.Controller, constants *mock.MockIConstant) (Module, *mock.MockTransaction) {
-	tx := mock.NewMockTransaction(ctrl)
-	constants.EXPECT().
-		Get(gomock.Any(), types.ModuleNameStaking, "max_validators").
-		Return(storage.Constant{Value: "100"}, nil).
-		AnyTimes()
-
-	m := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
-	return m, tx
-}
-
 // ---------------------------------------------------------------------------
 // tryUpgrade
 // ---------------------------------------------------------------------------
@@ -44,13 +33,10 @@ func TestTryUpgrade_NilUpgrade(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	constants := mock.NewMockIConstant(ctrl)
-	module, tx := makeModule(ctrl, constants)
+	tx := mock.NewMockTransaction(ctrl)
+	repos := mock.NewTxRepos(ctrl)
 
-	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
-	defer cancel()
-
-	err := module.tryUpgrade(ctx, tx, nil, nil, storage.State{Version: 3})
+	err := tryUpgrade(t.Context(), tx, repos.Repos(), nil, 3, "", nil)
 	require.NoError(t, err)
 }
 
@@ -58,23 +44,17 @@ func TestTryUpgrade_NoValidatorsSignaled(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	constants := mock.NewMockIConstant(ctrl)
-	module, tx := makeModule(ctrl, constants)
+	tx := mock.NewMockTransaction(ctrl)
 	repos := mock.NewTxRepos(ctrl)
 
-	// all validators signal version 0 (no version) or <= state.Version
-	repos.Validators.
-		EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
-		{Id: 1, Stake: types.NumericFromInt64(1_000_000), Version: 0},
-		{Id: 2, Stake: types.NumericFromInt64(1_000_000), Version: 3},
+	// all validators signal version 0 (no version) or <= current version: nothing is tallied
+	repos.Validators.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
+		{Id: 1, Version: 0},
+		{Id: 2, Version: 3},
 	}, nil)
-	// UpdateSignalsAfterUpgrade must NOT be called
-
-	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
-	defer cancel()
 
 	upgrade := &storage.Upgrade{Height: 100, Time: time.Now()}
-	err := module.tryUpgrade(ctx, tx, repos.Validators, upgrade, storage.State{Version: 3})
+	err := tryUpgrade(t.Context(), tx, repos.Repos(), upgrade, 3, "", nil)
 	require.NoError(t, err)
 }
 
@@ -82,27 +62,21 @@ func TestTryUpgrade_NoQuorum(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	constants := mock.NewMockIConstant(ctrl)
-	module, tx := makeModule(ctrl, constants)
+	tx := mock.NewMockTransaction(ctrl)
 	repos := mock.NewTxRepos(ctrl)
 
-	// total stake = 3_000_000 → Shares = 3; threshold = 3 * 5/6 ≈ 2
-	// voted for v4 = 1_000_000 → Shares = 1 < threshold → no quorum
-	repos.Validators.
-		EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
-		{Id: 1, Stake: types.NumericFromInt64(1_000_000), Version: 4},
-		{Id: 2, Stake: types.NumericFromInt64(1_000_000), Version: 3},
-		{Id: 3, Stake: types.NumericFromInt64(1_000_000), Version: 3},
+	repos.Validators.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
+		{Id: 1, Version: 4},
+		{Id: 2, Version: 3},
+		{Id: 3, Version: 3},
 	}, nil)
-	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
-		Return(types.NumericFromInt64(1_000_000), nil)
+	// total power = 3; threshold = ceil(3 * 5/6) = 3; voted power 1 < 3
+	repos.Validators.EXPECT().TotalVotingPower(gomock.Any()).Return(types.NumericFromInt64(3), nil)
+	repos.SignalVersion.EXPECT().Tally(gomock.Any(), uint64(4)).Return(types.NumericFromInt64(1), nil)
 	// SaveUpgrades must NOT be called
 
-	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
-	defer cancel()
-
 	upgrade := &storage.Upgrade{Height: 100, Time: time.Now()}
-	err := module.tryUpgrade(ctx, tx, repos.Validators, upgrade, storage.State{Version: 3})
+	err := tryUpgrade(t.Context(), tx, repos.Repos(), upgrade, 3, "", nil)
 	require.NoError(t, err)
 }
 
@@ -110,33 +84,32 @@ func TestTryUpgrade_WithQuorum(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	constants := mock.NewMockIConstant(ctrl)
-	module, tx := makeModule(ctrl, constants)
+	tx := mock.NewMockTransaction(ctrl)
 	repos := mock.NewTxRepos(ctrl)
 
-	// total stake = 6_000_000 → Shares = 6; threshold = 6 * 5/6 = 5
-	// voted for v4 raw = 6_000_000 → Shares = 6 > 5 → quorum
-	repos.Validators.
-		EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
-		{Id: 1, Stake: types.NumericFromInt64(2_000_000), Version: 4},
-		{Id: 2, Stake: types.NumericFromInt64(2_000_000), Version: 4},
-		{Id: 3, Stake: types.NumericFromInt64(2_000_000), Version: 4},
+	repos.Validators.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
+		{Id: 1, Version: 4},
+		{Id: 2, Version: 4},
+		{Id: 3, Version: 4},
 	}, nil)
-	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
-		Return(types.NumericFromInt64(6_000_000), nil)
+	// total power = 6; threshold = 5; voted power 6 → quorum
+	repos.Validators.EXPECT().TotalVotingPower(gomock.Any()).Return(types.NumericFromInt64(6), nil)
+	repos.SignalVersion.EXPECT().Tally(gomock.Any(), uint64(4)).Return(types.NumericFromInt64(6), nil)
 	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(_ context.Context, upgrades ...*storage.Upgrade) error {
 			require.Len(t, upgrades, 1)
 			require.EqualValues(t, 4, upgrades[0].Version)
+			require.Equal(t, "6", upgrades[0].VotingPower.String())
+			require.Equal(t, "6", upgrades[0].VotedPower.String())
 			require.Equal(t, types.UpgradeStatusWaitingUpgrade, upgrades[0].Status)
+			// MsgTryUpgrade height plus the Mocha delay
+			require.EqualValues(t, 100+66_462, upgrades[0].ExpectedHeight)
 			return nil
 		})
+	tx.EXPECT().FixSignalsPower(gomock.Any(), uint64(4)).Return(nil)
 
-	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
-	defer cancel()
-
-	upgrade := &storage.Upgrade{Height: 100, Time: time.Now()}
-	err := module.tryUpgrade(ctx, tx, repos.Validators, upgrade, storage.State{Version: 3})
+	upgrade := &storage.Upgrade{Height: 100, EndHeight: 100, Time: time.Now()}
+	err := tryUpgrade(t.Context(), tx, repos.Repos(), upgrade, 3, "mocha-5", nil)
 	require.NoError(t, err)
 }
 
@@ -144,111 +117,162 @@ func TestTryUpgrade_PicksMinimumQuorumVersion(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	constants := mock.NewMockIConstant(ctrl)
-	module, tx := makeModule(ctrl, constants)
+	tx := mock.NewMockTransaction(ctrl)
 	repos := mock.NewTxRepos(ctrl)
 
-	// two versions both have quorum; should pick v4 (minimum), not v5
-	// total stake = 12_000_000 → Shares = 12; threshold = 12 * 5/6 = 10
-	// voted raw = 12_000_000 → Shares = 12 > 10 → quorum for both
-	repos.Validators.
-		EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
-		{Id: 1, Stake: types.NumericFromInt64(3_000_000), Version: 4},
-		{Id: 2, Stake: types.NumericFromInt64(3_000_000), Version: 4},
-		{Id: 3, Stake: types.NumericFromInt64(3_000_000), Version: 4},
-		{Id: 4, Stake: types.NumericFromInt64(3_000_000), Version: 5},
+	repos.Validators.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
+		{Id: 1, Version: 5},
+		{Id: 2, Version: 4},
+		{Id: 3, Version: 4},
+		{Id: 4, Version: 4},
 	}, nil)
-	// versions are sorted, v4 is checked first and has quorum → SaveUpgrades called, v5 skipped
-	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
-		Return(types.NumericFromInt64(12_000_000), nil).MaxTimes(1)
-	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(5)).
-		Return(types.NumericFromInt64(12_000_000), nil).MaxTimes(1)
+	repos.Validators.EXPECT().TotalVotingPower(gomock.Any()).Return(types.NumericFromInt64(12), nil)
+	// versions are sorted: v4 has quorum, v5 is never tallied
+	repos.SignalVersion.EXPECT().Tally(gomock.Any(), uint64(4)).Return(types.NumericFromInt64(12), nil)
 	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(_ context.Context, upgrades ...*storage.Upgrade) error {
 			require.Len(t, upgrades, 1)
 			require.EqualValues(t, 4, upgrades[0].Version)
 			return nil
 		})
-
-	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
-	defer cancel()
+	tx.EXPECT().FixSignalsPower(gomock.Any(), uint64(4)).Return(nil)
 
 	upgrade := &storage.Upgrade{Height: 100, Time: time.Now()}
-	err := module.tryUpgrade(ctx, tx, repos.Validators, upgrade, storage.State{Version: 3})
+	err := tryUpgrade(t.Context(), tx, repos.Repos(), upgrade, 3, "", nil)
 	require.NoError(t, err)
+}
+
+func TestTryUpgrade_ResolvesSigner(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	tx := mock.NewMockTransaction(ctrl)
+	repos := mock.NewTxRepos(ctrl)
+
+	repos.Validators.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{{Id: 1, Version: 4}}, nil)
+	repos.Validators.EXPECT().TotalVotingPower(gomock.Any()).Return(types.NumericFromInt64(1), nil)
+	repos.SignalVersion.EXPECT().Tally(gomock.Any(), uint64(4)).Return(types.NumericFromInt64(1), nil)
+	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, upgrades ...*storage.Upgrade) error {
+			require.EqualValues(t, 42, upgrades[0].SignerId)
+			return nil
+		})
+	tx.EXPECT().FixSignalsPower(gomock.Any(), uint64(4)).Return(nil)
+
+	upgrade := &storage.Upgrade{Height: 100, Signer: &storage.Address{Address: "signer"}}
+	err := tryUpgrade(t.Context(), tx, repos.Repos(), upgrade, 3, "", map[string]uint64{"signer": 42})
+	require.NoError(t, err)
+}
+
+func TestTryUpgrade_UnknownSigner(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	tx := mock.NewMockTransaction(ctrl)
+	repos := mock.NewTxRepos(ctrl)
+
+	upgrade := &storage.Upgrade{Height: 100, Signer: &storage.Address{Address: "signer"}}
+	err := tryUpgrade(t.Context(), tx, repos.Repos(), upgrade, 3, "", map[string]uint64{})
+	require.Error(t, err)
+}
+
+func TestSignalThreshold(t *testing.T) {
+	tests := []struct {
+		total int64
+		want  string
+	}{
+		{0, "0"},
+		{3, "3"},    // 2.5 → ceil
+		{6, "5"},    // exact
+		{7, "6"},    // 5.83 → ceil
+		{100, "84"}, // 83.33 → ceil
+	}
+	for _, tt := range tests {
+		got := signalThreshold(10, types.NumericFromInt64(tt.total))
+		require.Equal(t, tt.want, got.String(), "total=%d", tt.total)
+	}
 }
 
 // ---------------------------------------------------------------------------
-// saveUpgrades
+// recountUpgrades
 // ---------------------------------------------------------------------------
 
-func TestSaveUpgrades_EmptyMap(t *testing.T) {
+func TestRecountUpgrades_SavesOnlyFutureVersions(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	tx := mock.NewMockTransaction(ctrl)
-	// nothing should be called
-	err := saveUpgrades(t.Context(), tx, sdkSync.NewMap[uint64, *storage.Upgrade](),
-		storage.State{Version: 3}, types.NumericFromInt64(3_000_000))
-	require.NoError(t, err)
-}
+	repos := mock.NewTxRepos(ctrl)
 
-func TestSaveUpgrades_SkipsAlreadyAppliedVersion(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	tx := mock.NewMockTransaction(ctrl)
-	// version 3 <= state.Version 3 → skipped; UpdateSignalsAfterUpgrade must NOT be called
-
-	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 3})
-
-	err := saveUpgrades(t.Context(), tx, upgrades,
-		storage.State{Version: 3}, types.NumericFromInt64(3_000_000))
-	require.NoError(t, err)
-}
-
-func TestSaveUpgrades_NoQuorum(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	tx := mock.NewMockTransaction(ctrl)
-	// total Shares = 3; threshold = 2; voted raw=1_000_000 → Shares=1 < 2
-	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
-		Return(types.NumericFromInt64(1_000_000), nil)
+	// a signal for the current version 3 withdraws a vote and creates no upgrade row
 	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(_ context.Context, upgrades ...*storage.Upgrade) error {
 			require.Len(t, upgrades, 1)
-			require.NotEqual(t, types.UpgradeStatusWaitingUpgrade, upgrades[0].Status)
+			require.EqualValues(t, 4, upgrades[0].Version)
 			return nil
 		})
+	repos.Upgrades.EXPECT().PendingVersions(gomock.Any(), uint64(3)).Return(nil, nil)
 
-	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 4})
-
-	err := saveUpgrades(t.Context(), tx, upgrades,
-		storage.State{Version: 3}, types.NumericFromInt64(3))
+	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 3}, &storage.Upgrade{Version: 4})
+	err := recountUpgrades(t.Context(), tx, repos.Repos(), upgrades, 3)
 	require.NoError(t, err)
 }
 
-func TestSaveUpgrades_WithQuorum(t *testing.T) {
+func TestRecountUpgrades_RecountsVersionsNotInBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	tx := mock.NewMockTransaction(ctrl)
-	// total Shares = 6; threshold = 5; voted raw=6_000_000 → Shares=6 > 5 → quorum
-	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
-		Return(types.NumericFromInt64(6_000_000), nil)
-	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, upgrades ...*storage.Upgrade) error {
-			require.Len(t, upgrades, 1)
-			require.Equal(t, types.UpgradeStatusWaitingUpgrade, upgrades[0].Status)
-			require.True(t, upgrades[0].VotedPower.Equal(types.NumericFromInt64(6)))
-			return nil
-		})
+	repos := mock.NewTxRepos(ctrl)
 
-	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 4})
+	// a validator switched from v4 to v5: v4 must be recounted although nobody signaled it in this block
+	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).Return(nil)
+	repos.Upgrades.EXPECT().PendingVersions(gomock.Any(), uint64(3)).Return([]uint64{4, 5}, nil)
+	// total power = 6; threshold = 5
+	repos.Validators.EXPECT().TotalVotingPower(gomock.Any()).Return(types.NumericFromInt64(6), nil)
+	repos.SignalVersion.EXPECT().Tally(gomock.Any(), uint64(4)).Return(types.NumericFromInt64(4), nil)
+	repos.SignalVersion.EXPECT().Tally(gomock.Any(), uint64(5)).Return(types.NumericFromInt64(2), nil)
+	tx.EXPECT().UpdateUpgradeTally(gomock.Any(), uint64(4), types.NumericFromInt64(6), types.NumericFromInt64(4), types.UpgradeStatusProcessing).Return(nil)
+	tx.EXPECT().UpdateUpgradeTally(gomock.Any(), uint64(5), types.NumericFromInt64(6), types.NumericFromInt64(2), types.UpgradeStatusProcessing).Return(nil)
 
-	err := saveUpgrades(t.Context(), tx, upgrades,
-		storage.State{Version: 3}, types.NumericFromInt64(6))
+	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 5})
+	err := recountUpgrades(t.Context(), tx, repos.Repos(), upgrades, 3)
+	require.NoError(t, err)
+}
+
+func TestRecountUpgrades_Quorum(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	tx := mock.NewMockTransaction(ctrl)
+	repos := mock.NewTxRepos(ctrl)
+
+	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).Return(nil)
+	repos.Upgrades.EXPECT().PendingVersions(gomock.Any(), uint64(3)).Return([]uint64{4}, nil)
+	// total power = 6; threshold = 5; voted = 5 → quorum
+	repos.Validators.EXPECT().TotalVotingPower(gomock.Any()).Return(types.NumericFromInt64(6), nil)
+	repos.SignalVersion.EXPECT().Tally(gomock.Any(), uint64(4)).Return(types.NumericFromInt64(5), nil)
+	tx.EXPECT().UpdateUpgradeTally(gomock.Any(), uint64(4), types.NumericFromInt64(6), types.NumericFromInt64(5), types.UpgradeStatusWaitingUpgrade).Return(nil)
+
+	err := recountUpgrades(t.Context(), tx, repos.Repos(), makeUpgradesMap(&storage.Upgrade{Version: 4}), 3)
+	require.NoError(t, err)
+}
+
+func TestRecountUpgrades_ZeroTallyAfterReset(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	tx := mock.NewMockTransaction(ctrl)
+	repos := mock.NewTxRepos(ctrl)
+
+	// v4 was applied, v5 was voted before it: the chain wiped those votes, the row goes back to zero
+	tx.EXPECT().SaveUpgrades(gomock.Any()).Return(nil)
+	repos.Upgrades.EXPECT().PendingVersions(gomock.Any(), uint64(4)).Return([]uint64{5}, nil)
+	repos.Validators.EXPECT().TotalVotingPower(gomock.Any()).Return(types.NumericFromInt64(6), nil)
+	repos.SignalVersion.EXPECT().Tally(gomock.Any(), uint64(5)).Return(types.NumericZero(), nil)
+	tx.EXPECT().UpdateUpgradeTally(gomock.Any(), uint64(5), types.NumericFromInt64(6), types.NumericZero(), types.UpgradeStatusProcessing).Return(nil)
+
+	err := recountUpgrades(t.Context(), tx, repos.Repos(), sdkSync.NewMap[uint64, *storage.Upgrade](), 4)
 	require.NoError(t, err)
 }
 
@@ -257,66 +281,30 @@ func TestSaveUpgrades_WithQuorum(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestSaveSignals_Empty(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
 	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 
-	err := module.saveSignals(t.Context(), nil, nil, nil,
-		sdkSync.NewMap[uint64, *storage.Upgrade](), storage.State{})
+	err := module.saveSignals(t.Context(), nil, nil)
 	require.NoError(t, err)
 }
 
-func TestSaveSignals_WithQuorum(t *testing.T) {
+func TestSaveSignals_PowerNotFixed(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	tx := mock.NewMockTransaction(ctrl)
-	repos := mock.NewTxRepos(ctrl)
-
-	// total bonded stake
-	repos.Validators.
-		EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
-		{Id: 1, Stake: types.NumericFromInt64(2_000_000)},
-		{Id: 2, Stake: types.NumericFromInt64(1_000_000)},
-	}, nil)
-
-	repos.Validators.
-		EXPECT().
-		GetByID(gomock.Any(), uint64(1)).
-		Return(&storage.Validator{
-			Id: 1, Stake: types.NumericFromInt64(2_000_000),
-		}, nil)
-
 	tx.EXPECT().Insert(gomock.Any(), gomock.AssignableToTypeOf(&[]*storage.SignalVersion{})).Return(nil)
-
-	// total Shares = 3; threshold = 2; voted raw=6_000_000 → Shares=6 > 2 → quorum
-	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
-		Return(types.NumericFromInt64(6_000_000), nil)
-	tx.EXPECT().SaveUpgrades(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, upgrades ...*storage.Upgrade) error {
-			require.Len(t, upgrades, 1)
-			require.Equal(t, types.UpgradeStatusWaitingUpgrade, upgrades[0].Status)
-			return nil
-		})
 
 	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	module.validatorsByAddress["val1address"] = 1
 
 	signals := []*storage.SignalVersion{
-		{
-			Version:   4,
-			Height:    100,
-			Validator: &storage.Validator{Address: "val1address"},
-		},
+		{Version: 4, Height: 100, Validator: &storage.Validator{Address: "val1address"}},
 	}
-	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 4})
 
-	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
-	defer cancel()
-
-	err := module.saveSignals(ctx, tx, repos.Validators, signals, upgrades, storage.State{Version: 3})
+	err := module.saveSignals(t.Context(), tx, signals)
 	require.NoError(t, err)
+	require.EqualValues(t, 1, signals[0].ValidatorId)
+	require.True(t, signals[0].VotingPower.IsZero())
 }
 
 func TestSaveSignals_UnknownValidator(t *testing.T) {
@@ -324,26 +312,14 @@ func TestSaveSignals_UnknownValidator(t *testing.T) {
 	defer ctrl.Finish()
 
 	tx := mock.NewMockTransaction(ctrl)
-	repos := mock.NewTxRepos(ctrl)
-
-	repos.Validators.
-		EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{}, nil)
 
 	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	// validatorsByAddress intentionally empty
 
 	signals := []*storage.SignalVersion{
-		{
-			Version:   4,
-			Height:    100,
-			Validator: &storage.Validator{Address: "unknown_address"},
-		},
+		{Version: 4, Height: 100, Validator: &storage.Validator{Address: "unknown_address"}},
 	}
 
-	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
-	defer cancel()
-
-	err := module.saveSignals(ctx, tx, repos.Validators, signals,
-		sdkSync.NewMap[uint64, *storage.Upgrade](), storage.State{Version: 3})
+	err := module.saveSignals(t.Context(), tx, signals)
 	require.Error(t, err)
 }

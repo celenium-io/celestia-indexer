@@ -28,6 +28,7 @@ type ListUpgradesFilter struct {
 type IUpgrade interface {
 	List(ctx context.Context, flts ListUpgradesFilter) ([]Upgrade, error)
 	ByVersion(ctx context.Context, version uint64) (Upgrade, error)
+	PendingVersions(ctx context.Context, currentVersion uint64) ([]uint64, error)
 }
 
 type Upgrade struct {
@@ -40,6 +41,7 @@ type Upgrade struct {
 	Height         pkgTypes.Level      `bun:"height"                     comment:"The number (height) of first signal block"`
 	EndHeight      pkgTypes.Level      `bun:"end_height"                 comment:"The number (height) of upgrade block"`
 	AppliedAtLevel pkgTypes.Level      `bun:"applied_at_level"           comment:"The level when upgrade was applied"`
+	ExpectedHeight pkgTypes.Level      `bun:"expected_upgrade_height"    comment:"The height x/signal scheduled the upgrade at: MsgTryUpgrade height plus the chain delay"`
 	SignerId       uint64              `bun:"signer_id"                  comment:"Signer internal identity"`
 	MsgId          uint64              `bun:"msg_id,notnull"             comment:"Message internal identity"`
 	TxId           uint64              `bun:"tx_id,notnull"              comment:"Transaction internal identity"`

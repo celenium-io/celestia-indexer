@@ -4,7 +4,6 @@
 package realip
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,8 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newRequest(remoteAddr, xff string) *http.Request {
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+func newRequest(t *testing.T, remoteAddr, xff string) *http.Request {
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/", nil)
 	req.RemoteAddr = remoteAddr
 	if xff != "" {
 		req.Header.Set("X-Forwarded-For", xff)
@@ -83,7 +82,7 @@ func TestExtractor(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			extractor, err := Extractor(tt.trustedProxies)
 			require.NoError(t, err)
-			require.Equal(t, tt.want, extractor(newRequest(tt.remoteAddr, tt.xff)))
+			require.Equal(t, tt.want, extractor(newRequest(t, tt.remoteAddr, tt.xff)))
 		})
 	}
 }

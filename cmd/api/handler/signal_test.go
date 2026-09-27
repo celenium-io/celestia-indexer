@@ -37,15 +37,17 @@ var testSignal = storage.SignalVersion{
 }
 
 var testUpgrade = storage.Upgrade{
-	Height:      101,
-	SignerId:    2,
-	Time:        time.Now().UTC(),
-	Version:     1,
-	MsgId:       1,
-	TxId:        1,
-	Tx:          &testTx,
-	VotingPower: storageTypes.NumericFromInt64(1000),
-	VotedPower:  storageTypes.NumericFromInt64(900),
+	Height:         101,
+	SignerId:       2,
+	Time:           time.Now().UTC(),
+	Version:        1,
+	MsgId:          1,
+	TxId:           1,
+	Tx:             &testTx,
+	VotingPower:    storageTypes.NumericFromInt64(1000),
+	VotedPower:     storageTypes.NumericFromInt64(900),
+	EndHeight:      150,
+	ExpectedHeight: 232_766,
 	Signer: &storage.Address{
 		Id:         2,
 		Hash:       testHashAddress,
@@ -132,6 +134,7 @@ func (s *SignalTestSuite) TestList() {
 	s.Require().EqualValues(testSignal.Id, signals[0].Id)
 	s.Require().EqualValues(testSignal.Height, signals[0].Height)
 	s.Require().EqualValues(testSignal.Version, signals[0].Version)
+	s.Require().Equal("100000000", signals[0].VotingPower)
 
 	txHash, err := hex.DecodeString(signals[0].TxHash)
 	s.Require().NoError(err)
@@ -175,6 +178,7 @@ func (s *SignalTestSuite) TestUpgrades() {
 	s.Require().EqualValues(testUpgrade.Version, upgrades[0].Version)
 	s.Require().EqualValues(testUpgrade.VotedPower.String(), upgrades[0].VotedPower)
 	s.Require().EqualValues(testUpgrade.VotingPower.String(), upgrades[0].VotingPower)
+	s.Require().EqualValues(testUpgrade.ExpectedHeight, upgrades[0].ExpectedHeight)
 
 	txHash, err := hex.DecodeString(upgrades[0].TxHash)
 	s.Require().NoError(err)

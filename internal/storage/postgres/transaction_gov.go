@@ -23,7 +23,7 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 		}
 
 		query := tx.Tx().NewInsert().Model(upgrades[i]).
-			Column("version", "height", "time", "end_height", "end_time", "applied_at_level", "applied_at", "signer_id", "msg_id", "tx_id", "voting_power", "voted_power", "signals_count", "status").
+			Column("version", "height", "time", "end_height", "end_time", "applied_at_level", "applied_at", "expected_upgrade_height", "signer_id", "msg_id", "tx_id", "voting_power", "voted_power", "signals_count", "status").
 			On("CONFLICT (version) DO UPDATE")
 
 		if upgrades[i].EndHeight > 0 {
@@ -37,6 +37,9 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 		}
 		if !upgrades[i].AppliedAt.IsZero() {
 			query = query.Set("applied_at = EXCLUDED.applied_at")
+		}
+		if upgrades[i].ExpectedHeight > 0 {
+			query = query.Set("expected_upgrade_height = EXCLUDED.expected_upgrade_height")
 		}
 		if upgrades[i].SignerId > 0 {
 			query = query.Set("signer_id = EXCLUDED.signer_id")
@@ -246,26 +249,44 @@ func (tx Transaction) Proposal(ctx context.Context, id uint64) (proposal models.
 	return
 }
 
-func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (storageTypes.Numeric, error) {
-	_, err := tx.Tx().NewUpdate().Table("signal_version", "validator").
-		SetColumn("voting_power", "validator.stake").
-		Where("signal_version.version = ?", version).
-		Where("validator.id = validator_id").
-		Exec(ctx)
-	if err != nil {
-		return storageTypes.NumericZero(), err
+// FixSignalsPower closes the voting round of version: counted signals get the power they were counted with,
+// the other signals of the round get 0.
+func (tx Transaction) FixSignalsPower(ctx context.Context, version uint64) error {
+	latest := latestSignals(tx.Tx())
+
+	if _, err := tx.Tx().NewUpdate().
+		TableExpr("signal_version").
+		TableExpr("(?) AS latest", latest).
+		TableExpr("validator").
+		Set("voting_power = validator.power").
+		Where("signal_version.id = latest.id").
+		Where("signal_version.voting_power IS NULL").
+		Where("latest.version = ?", version).
+		Where("validator.id = latest.validator_id").
+		Where("validator.power > 0").
+		Exec(ctx); err != nil {
+		return errors.Wrap(err, "fix counted signals")
 	}
 
-	var sum storageTypes.Numeric
-	err = tx.Tx().NewSelect().
-		TableExpr("(?) AS latest",
-			tx.Tx().NewSelect().
-				Table("signal_version").
-				ColumnExpr("DISTINCT ON (validator_id) voting_power").
-				Where("version = ?", version).
-				OrderExpr("validator_id, height DESC"),
-		).
-		ColumnExpr("COALESCE(SUM(voting_power), 0)").
-		Scan(ctx, &sum)
-	return sum, err
+	// the round is every signal still open; older rounds are closed already
+	if _, err := tx.Tx().NewUpdate().
+		Table("signal_version").
+		Set("voting_power = 0").
+		Where("voting_power IS NULL").
+		Exec(ctx); err != nil {
+		return errors.Wrap(err, "zero not counted signals")
+	}
+	return nil
+}
+
+// UpdateUpgradeTally writes a recounted tally; unlike SaveUpgrades it stores zero power and lowers the status back.
+func (tx Transaction) UpdateUpgradeTally(ctx context.Context, version uint64, votingPower, votedPower storageTypes.Numeric, status storageTypes.UpgradeStatus) error {
+	_, err := tx.Tx().NewUpdate().
+		Model((*models.Upgrade)(nil)).
+		Set("voting_power = ?", votingPower).
+		Set("voted_power = ?", votedPower).
+		Set("status = ?", status).
+		Where("version = ?", version).
+		Exec(ctx)
+	return err
 }

@@ -408,6 +408,44 @@ func (c *MockTransactionExecCall) DoAndReturn(f func(context.Context, string, ..
 	return c
 }
 
+// FixSignalsPower mocks base method.
+func (m *MockTransaction) FixSignalsPower(ctx context.Context, version uint64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FixSignalsPower", ctx, version)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// FixSignalsPower indicates an expected call of FixSignalsPower.
+func (mr *MockTransactionMockRecorder) FixSignalsPower(ctx, version any) *MockTransactionFixSignalsPowerCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FixSignalsPower", reflect.TypeOf((*MockTransaction)(nil).FixSignalsPower), ctx, version)
+	return &MockTransactionFixSignalsPowerCall{Call: call}
+}
+
+// MockTransactionFixSignalsPowerCall wrap *gomock.Call
+type MockTransactionFixSignalsPowerCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionFixSignalsPowerCall) Return(arg0 error) *MockTransactionFixSignalsPowerCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionFixSignalsPowerCall) Do(f func(context.Context, uint64) error) *MockTransactionFixSignalsPowerCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionFixSignalsPowerCall) DoAndReturn(f func(context.Context, uint64) error) *MockTransactionFixSignalsPowerCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Flush mocks base method.
 func (m *MockTransaction) Flush(ctx context.Context) error {
 	m.ctrl.T.Helper()
@@ -2734,45 +2772,6 @@ func (c *MockTransactionUpdateRollupCall) DoAndReturn(f func(context.Context, *s
 	return c
 }
 
-// UpdateSignalsAfterUpgrade mocks base method.
-func (m *MockTransaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (types.Numeric, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateSignalsAfterUpgrade", ctx, version)
-	ret0, _ := ret[0].(types.Numeric)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateSignalsAfterUpgrade indicates an expected call of UpdateSignalsAfterUpgrade.
-func (mr *MockTransactionMockRecorder) UpdateSignalsAfterUpgrade(ctx, version any) *MockTransactionUpdateSignalsAfterUpgradeCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSignalsAfterUpgrade", reflect.TypeOf((*MockTransaction)(nil).UpdateSignalsAfterUpgrade), ctx, version)
-	return &MockTransactionUpdateSignalsAfterUpgradeCall{Call: call}
-}
-
-// MockTransactionUpdateSignalsAfterUpgradeCall wrap *gomock.Call
-type MockTransactionUpdateSignalsAfterUpgradeCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Return(arg0 types.Numeric, arg1 error) *MockTransactionUpdateSignalsAfterUpgradeCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockTransactionUpdateSignalsAfterUpgradeCall) Do(f func(context.Context, uint64) (types.Numeric, error)) *MockTransactionUpdateSignalsAfterUpgradeCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionUpdateSignalsAfterUpgradeCall) DoAndReturn(f func(context.Context, uint64) (types.Numeric, error)) *MockTransactionUpdateSignalsAfterUpgradeCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // UpdateSlashedDelegations mocks base method.
 func (m *MockTransaction) UpdateSlashedDelegations(ctx context.Context, validatorId uint64, burned types.Numeric) ([]storage.Balance, error) {
 	m.ctrl.T.Helper()
@@ -2808,6 +2807,44 @@ func (c *MockTransactionUpdateSlashedDelegationsCall) Do(f func(context.Context,
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockTransactionUpdateSlashedDelegationsCall) DoAndReturn(f func(context.Context, uint64, types.Numeric) ([]storage.Balance, error)) *MockTransactionUpdateSlashedDelegationsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// UpdateUpgradeTally mocks base method.
+func (m *MockTransaction) UpdateUpgradeTally(ctx context.Context, version uint64, votingPower, votedPower types.Numeric, status types.UpgradeStatus) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUpgradeTally", ctx, version, votingPower, votedPower, status)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUpgradeTally indicates an expected call of UpdateUpgradeTally.
+func (mr *MockTransactionMockRecorder) UpdateUpgradeTally(ctx, version, votingPower, votedPower, status any) *MockTransactionUpdateUpgradeTallyCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUpgradeTally", reflect.TypeOf((*MockTransaction)(nil).UpdateUpgradeTally), ctx, version, votingPower, votedPower, status)
+	return &MockTransactionUpdateUpgradeTallyCall{Call: call}
+}
+
+// MockTransactionUpdateUpgradeTallyCall wrap *gomock.Call
+type MockTransactionUpdateUpgradeTallyCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionUpdateUpgradeTallyCall) Return(arg0 error) *MockTransactionUpdateUpgradeTallyCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionUpdateUpgradeTallyCall) Do(f func(context.Context, uint64, types.Numeric, types.Numeric, types.UpgradeStatus) error) *MockTransactionUpdateUpgradeTallyCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionUpdateUpgradeTallyCall) DoAndReturn(f func(context.Context, uint64, types.Numeric, types.Numeric, types.UpgradeStatus) error) *MockTransactionUpdateUpgradeTallyCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

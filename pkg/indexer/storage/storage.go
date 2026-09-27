@@ -417,16 +417,28 @@ func (module *Module) processBlockInTransaction(
 		return state, err
 	}
 
-	if err := module.saveSignals(ctx, tx, repos.Validators, dCtx.Signals, dCtx.Upgrades, state); err != nil {
-		return state, err
+	// closes the round if MsgTryUpgrade was not seen (e.g. sent via authz); a no-op otherwise
+	if state.Version < block.VersionApp {
+		if err := tx.FixSignalsPower(ctx, block.VersionApp); err != nil {
+			return state, errors.Wrap(err, "fix signals power")
+		}
 	}
 
-	if err := module.tryUpgrade(ctx, tx, repos.Validators, dCtx.TryUpgrade, state); err != nil {
-		return state, err
-	}
-
+	// before signals: the tally only counts signals since the last applied upgrade
 	if err := module.setUpgradeApplied(ctx, tx, state.Version, dCtx.Block); err != nil {
 		return state, errors.Wrap(err, "set upgrade applied")
+	}
+
+	if err := module.saveSignals(ctx, tx, dCtx.Signals); err != nil {
+		return state, err
+	}
+
+	if err := recountUpgrades(ctx, tx, repos, dCtx.Upgrades, block.VersionApp); err != nil {
+		return state, errors.Wrap(err, "recount upgrades")
+	}
+
+	if err := tryUpgrade(ctx, tx, repos, dCtx.TryUpgrade, block.VersionApp, block.ChainId, addrToId); err != nil {
+		return state, err
 	}
 
 	updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, dCtx.Block.VersionApp, &state)

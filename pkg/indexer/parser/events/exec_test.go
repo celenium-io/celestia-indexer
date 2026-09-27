@@ -1381,3 +1381,73 @@ func Test_handleExec(t *testing.T) {
 		})
 	}
 }
+
+func Test_handleExec_TryUpgrade(t *testing.T) {
+	const granter = "celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8"
+
+	ctx := context.NewContext()
+	ctx.Block = &storage.Block{Time: time.Now(), Height: 45631}
+
+	events := []storage.Event{
+		{
+			Height: 45631,
+			Type:   "message",
+			Data: map[string]string{
+				"action":    "/cosmos.authz.v1beta1.MsgExec",
+				"module":    "authz",
+				"msg_index": "0",
+				"sender":    "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
+			},
+		}, {
+			Height: 45631,
+			Type:   "signal_try_upgrade",
+			Data: map[string]string{
+				"action":          "/celestia.signal.v1.MsgTryUpgrade",
+				"authz_msg_index": "0",
+				"msg_index":       "0",
+				"signer":          granter,
+			},
+		}, {
+			Height: 45631,
+			Type:   "message",
+			Data: map[string]string{
+				"action":    "/cosmos.bank.v1beta1.MsgSend",
+				"msg_index": "1",
+			},
+		},
+	}
+	msg := &storage.Message{
+		Id:     10,
+		TxId:   5,
+		Type:   types.MsgExec,
+		Height: 45631,
+		Time:   ctx.Block.Time,
+		Data: map[string]any{
+			"Grantee": "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
+			"Msgs": []any{
+				map[string]any{"Signer": granter},
+			},
+		},
+		InternalMsgs: []string{"/celestia.signal.v1.MsgTryUpgrade"},
+	}
+
+	c := NewCursor(events)
+	require.NoError(t, handleExec(ctx, c, msg))
+
+	require.NotNil(t, ctx.TryUpgrade)
+	require.EqualValues(t, 45631, ctx.TryUpgrade.Height)
+	require.EqualValues(t, 45631, ctx.TryUpgrade.EndHeight)
+	require.EqualValues(t, 5, ctx.TryUpgrade.TxId)
+	require.EqualValues(t, 10, ctx.TryUpgrade.MsgId)
+	require.NotNil(t, ctx.TryUpgrade.Signer)
+	require.Equal(t, granter, ctx.TryUpgrade.Signer.Address)
+
+	// the granter is registered, so storage can resolve signer_id
+	_, ok := ctx.Addresses.Get(ctx.TryUpgrade.Signer.String())
+	require.True(t, ok)
+
+	// the event of the next message is left for its handler
+	next, ok := c.Peek()
+	require.True(t, ok)
+	require.Equal(t, "1", next.Data["msg_index"])
+}

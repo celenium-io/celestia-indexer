@@ -38,7 +38,7 @@ type ModuleTestSuite struct {
 
 // SetupSuite -
 func (s *ModuleTestSuite) SetupSuite() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 180*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 180*time.Second)
 	defer ctxCancel()
 
 	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, testhelpers.PostgreSQLContainerConfig{
@@ -51,6 +51,7 @@ func (s *ModuleTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
 	s.T().Cleanup(func() {
+		// not t.Context(): it is canceled before cleanup runs
 		ctx, ctxCancel := context.WithTimeout(context.Background(), 20*time.Second)
 		defer ctxCancel()
 		s.Require().NoError(s.psqlContainer.Terminate(ctx))
@@ -133,7 +134,7 @@ func (s *ModuleTestSuite) TestModule_SuccessOnRollbackTwoBlocks() {
 		indexerCfg.Indexer{Name: testIndexerName},
 	)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 
 	stateListener := modules.New("state-listener")
 	stateListener.CreateInput("state")
@@ -201,7 +202,7 @@ func (s *ModuleTestSuite) TestModule_OnClosedInput() {
 		indexerCfg.Indexer{Name: testIndexerName},
 	)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 
 	stopperListener := modules.New("stopper-listener")
 	stopperListener.CreateInput("stop")

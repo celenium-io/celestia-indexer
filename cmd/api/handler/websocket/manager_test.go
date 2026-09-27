@@ -4,7 +4,6 @@
 package websocket
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -326,7 +325,7 @@ func TestHandleRejectionDoesNotDecrement(t *testing.T) {
 
 	require.NoError(t, manager.ips.CheckAndSet(testIp))
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/", nil)
 	req.Header.Set(echo.HeaderXRealIP, testIp)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -344,7 +343,7 @@ func TestHandleDecrementsAfterFailedUpgrade(t *testing.T) {
 	e := echo.New()
 
 	// plain GET without websocket headers: passes the ip limit check, fails on upgrade
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/", nil)
 	req.Header.Set(echo.HeaderXRealIP, testIp)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)

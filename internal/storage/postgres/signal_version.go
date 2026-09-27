@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/uptrace/bun"
 )
 
@@ -52,7 +53,8 @@ func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFil
 
 	q := t.db.NewSelect().
 		TableExpr("(?) as signal_version", query).
-		ColumnExpr("signal_version.*").
+		ColumnExpr("signal_version.id, signal_version.height, signal_version.validator_id, signal_version.time, signal_version.version, signal_version.msg_id, signal_version.tx_id").
+		ColumnExpr("COALESCE(signal_version.voting_power, validator.power, 0) AS voting_power").
 		ColumnExpr("validator.cons_address as validator__cons_address, validator.moniker as validator__moniker, validator.id as validator__id").
 		ColumnExpr("tx.hash as tx__hash").
 		Join("left join validator as validator on validator.id = validator_id").
@@ -62,4 +64,32 @@ func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFil
 	err = q.Scan(ctx, &signals)
 
 	return
+}
+
+// latestSignals selects the signal each validator counts with in x/signal:
+// its latest one since the last applied upgrade (ResetTally wipes older ones).
+func latestSignals(db bun.IDB) *bun.SelectQuery {
+	lastApplied := db.NewSelect().
+		Table("upgrade").
+		ColumnExpr("COALESCE(MAX(applied_at_level), 0)").
+		Where("status = ?", storageTypes.UpgradeStatusApplied)
+
+	return db.NewSelect().
+		Model((*storage.SignalVersion)(nil)).
+		ColumnExpr("DISTINCT ON (validator_id) id, validator_id, version").
+		Where("height >= (?)", lastApplied).
+		OrderExpr("validator_id, height DESC")
+}
+
+// Tally mirrors x/signal TallyVotingPower: the consensus power of bonded validators whose latest signal is version.
+func (t *SignalVersion) Tally(ctx context.Context, version uint64) (storageTypes.Numeric, error) {
+	var sum storageTypes.Numeric
+	err := t.db.NewSelect().
+		TableExpr("(?) AS latest", latestSignals(t.db)).
+		ColumnExpr("COALESCE(SUM(validator.power), 0)").
+		Join("JOIN validator ON validator.id = latest.validator_id").
+		Where("latest.version = ?", version).
+		Where("validator.power > 0").
+		Scan(ctx, &sum)
+	return sum, err
 }

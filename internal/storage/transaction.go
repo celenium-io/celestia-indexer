@@ -104,7 +104,8 @@ type GovTx interface {
 	SaveProposals(ctx context.Context, proposals ...*Proposal) (int64, error)
 	SaveVotes(ctx context.Context, votes ...*Vote) (map[uint64]*VotesCount, error)
 	SaveUpgrades(ctx context.Context, upgrades ...*Upgrade) error
-	UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (types.Numeric, error)
+	UpdateUpgradeTally(ctx context.Context, version uint64, votingPower, votedPower types.Numeric, status types.UpgradeStatus) error
+	FixSignalsPower(ctx context.Context, version uint64) error
 }
 
 // IbcTx covers IBC clients, connections and channels.
@@ -167,7 +168,9 @@ type TxRepos struct {
 	IbcConnections   IIbcConnection
 	Namespace        INamespace
 	Proposals        IProposal
+	SignalVersion    ISignalVersion
 	State            IState
+	Upgrades         IUpgrade
 	Validators       IValidator
 	Votes            IVote
 	ZkIsm            IZkISM

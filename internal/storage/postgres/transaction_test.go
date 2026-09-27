@@ -47,6 +47,7 @@ func (s *TransactionTestSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.psqlContainer = psqlContainer
 	s.T().Cleanup(func() {
+		// not t.Context(): it is canceled before cleanup runs
 		ctx, ctxCancel := context.WithTimeout(context.Background(), 20*time.Second)
 		defer ctxCancel()
 		s.Require().NoError(s.psqlContainer.Terminate(ctx))
@@ -2205,29 +2206,172 @@ func (s *TransactionTestSuite) TestSaveUpgrades() {
 	s.Require().EqualValues(types.UpgradeStatusWaitingUpgrade, upgrades[0].Status)
 }
 
-func (s *TransactionTestSuite) TestUpdateSignalsAfterUpgrade() {
+// beginRolledBack returns a transaction and its rollback, to be deferred while ctx is alive.
+func (s *TransactionTestSuite) beginRolledBack(ctx context.Context) (storage.Transaction, func()) {
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+	return tx, func() {
+		s.Require().NoError(tx.Rollback(ctx))
+		s.Require().NoError(tx.Close(ctx))
+	}
+}
+
+func (s *TransactionTestSuite) insertSignals(ctx context.Context, tx storage.Transaction, signals ...*storage.SignalVersion) {
+	for i := range signals {
+		signals[i].Time = time.Now().UTC()
+		signals[i].MsgId = uint64(100 + i)
+		signals[i].TxId = uint64(100 + i)
+	}
+	s.Require().NoError(storage.Insert(ctx, tx, signals...))
+}
+
+func (s *TransactionTestSuite) TestSignalTally() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	// fixture signals (heights 101-103) precede the upgrade applied at 1014
+	value, err := NewTxRepos(tx).SignalVersion.Tally(ctx, 1488)
+	s.Require().NoError(err)
+	s.Require().Equal("0", value.String())
+}
+
+func (s *TransactionTestSuite) TestSignalTallyResetByUpgrade() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	// the last upgrade in fixtures is applied at 1014: earlier signals are wiped
+	s.insertSignals(ctx, tx,
+		&storage.SignalVersion{Height: 1013, ValidatorId: 1, Version: 1600},
+		&storage.SignalVersion{Height: 1014, ValidatorId: 2, Version: 1600},
+	)
+
+	value, err := NewTxRepos(tx).SignalVersion.Tally(ctx, 1600)
+	s.Require().NoError(err)
+	s.Require().Equal("1", value.String())
+}
+
+func (s *TransactionTestSuite) TestSignalTallyLatestSignalWins() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	// validator 2 re-signals: its vote for 1600 no longer counts
+	s.insertSignals(ctx, tx,
+		&storage.SignalVersion{Height: 1020, ValidatorId: 1, Version: 1600},
+		&storage.SignalVersion{Height: 1021, ValidatorId: 2, Version: 1600},
+		&storage.SignalVersion{Height: 1030, ValidatorId: 2, Version: 1601},
+	)
+
+	repos := NewTxRepos(tx)
+	value, err := repos.SignalVersion.Tally(ctx, 1600)
+	s.Require().NoError(err)
+	s.Require().Equal("1", value.String())
+
+	value, err = repos.SignalVersion.Tally(ctx, 1601)
+	s.Require().NoError(err)
+	s.Require().Equal("1", value.String())
+}
+
+func (s *TransactionTestSuite) TestSignalTallySkipsUnbonded() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	s.insertSignals(ctx, tx,
+		&storage.SignalVersion{Height: 1020, ValidatorId: 1, Version: 1600},
+		&storage.SignalVersion{Height: 1021, ValidatorId: 2, Version: 1600},
+	)
+	_, err := tx.Tx().NewUpdate().Table("validator").Set("power = 0").Where("id = 2").Exec(ctx)
 	s.Require().NoError(err)
 
-	value, err := tx.UpdateSignalsAfterUpgrade(ctx, 1488)
+	value, err := NewTxRepos(tx).SignalVersion.Tally(ctx, 1600)
 	s.Require().NoError(err)
-	s.Require().Equal("1000100", value.String())
+	s.Require().Equal("1", value.String())
+}
 
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
+func (s *TransactionTestSuite) TestSignalTallyUsesCurrentPower() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
 
-	signals, err := s.storage.SignalVersion.List(ctx, storage.ListSignalsFilter{
-		Limit:   1,
-		Sort:    sdk.SortOrderAsc,
-		Version: 1488,
-	})
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	s.insertSignals(ctx, tx,
+		&storage.SignalVersion{Height: 1020, ValidatorId: 1, Version: 1600, VotingPower: types.NumericFromInt64(123)},
+		&storage.SignalVersion{Height: 1021, ValidatorId: 2, Version: 1600, VotingPower: types.NumericFromInt64(123)},
+	)
+	_, err := tx.Tx().NewUpdate().Table("validator").Set("power = 5").Where("id = 1").Exec(ctx)
 	s.Require().NoError(err)
 
-	s.Require().EqualValues(1488, signals[0].Version)
-	s.Require().EqualValues("1000100", signals[0].VotingPower.String())
+	// power of the validators now, not the stake stored in signals
+	value, err := NewTxRepos(tx).SignalVersion.Tally(ctx, 1600)
+	s.Require().NoError(err)
+	s.Require().Equal("6", value.String())
+
+	var stored []string
+	err = tx.Tx().NewSelect().Table("signal_version").ColumnExpr("voting_power::text").Where("version = 1600").Scan(ctx, &stored)
+	s.Require().NoError(err)
+	s.Require().Equal([]string{"123", "123"}, stored)
+}
+
+func (s *TransactionTestSuite) TestUpdateUpgradeTally() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	s.Require().NoError(tx.SaveUpgrades(ctx, &storage.Upgrade{
+		Version:      1600,
+		Height:       1020,
+		Time:         time.Now().UTC(),
+		VotingPower:  types.NumericFromInt64(6),
+		VotedPower:   types.NumericFromInt64(5),
+		SignalsCount: 3,
+		Status:       types.UpgradeStatusWaitingUpgrade,
+	}))
+
+	// the quorum is lost: zero power and the lower status are written, unlike SaveUpgrades
+	s.Require().NoError(tx.UpdateUpgradeTally(ctx, 1600, types.NumericFromInt64(7), types.NumericZero(), types.UpgradeStatusProcessing))
+
+	upgrade, err := NewTxRepos(tx).Upgrades.ByVersion(ctx, 1600)
+	s.Require().NoError(err)
+	s.Require().Equal("7", upgrade.VotingPower.String())
+	s.Require().Equal("0", upgrade.VotedPower.String())
+	s.Require().Equal(types.UpgradeStatusProcessing, upgrade.Status)
+	s.Require().EqualValues(3, upgrade.SignalsCount)
+}
+
+func (s *TransactionTestSuite) TestPendingUpgradeVersions() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	s.Require().NoError(tx.SaveUpgrades(ctx,
+		// below the current version
+		&storage.Upgrade{Version: 1590, Height: 1015, Time: time.Now().UTC()},
+		&storage.Upgrade{Version: 1600, Height: 1020, Time: time.Now().UTC()},
+		&storage.Upgrade{Version: 1601, Height: 1021, Time: time.Now().UTC(), Status: types.UpgradeStatusWaitingUpgrade},
+		// locked by MsgTryUpgrade
+		&storage.Upgrade{Version: 1602, Height: 1022, EndHeight: 1030, Time: time.Now().UTC(), Status: types.UpgradeStatusWaitingUpgrade},
+	))
+
+	// fixture upgrades 1499 and 1500 are applied
+	versions, err := NewTxRepos(tx).Upgrades.PendingVersions(ctx, 1595)
+	s.Require().NoError(err)
+	s.Require().Equal([]uint64{1600, 1601}, versions)
 }
 
 func (s *TransactionTestSuite) TestSaveHyperlaneIgps() {
@@ -3064,4 +3208,82 @@ func (s *TransactionTestSuite) TestVotesListByProposal() {
 
 	s.Require().NoError(tx.Rollback(ctx))
 	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestFixSignalsPower() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	// validator 2 moved its vote to 1601, so only validator 1 counts for 1600
+	s.insertSignals(ctx, tx,
+		&storage.SignalVersion{Height: 1020, ValidatorId: 1, Version: 1600, VotingPower: types.NumericZero()},
+		&storage.SignalVersion{Height: 1021, ValidatorId: 2, Version: 1600, VotingPower: types.NumericZero()},
+		&storage.SignalVersion{Height: 1030, ValidatorId: 2, Version: 1601, VotingPower: types.NumericZero()},
+	)
+	_, err := tx.Tx().NewUpdate().Table("validator").Set("power = 5").Where("id = 1").Exec(ctx)
+	s.Require().NoError(err)
+
+	var open int
+	err = tx.Tx().NewSelect().Table("signal_version").ColumnExpr("count(*)").Where("voting_power IS NULL").Scan(ctx, &open)
+	s.Require().NoError(err)
+	s.Require().Equal(3, open)
+
+	s.Require().NoError(tx.FixSignalsPower(ctx, 1600))
+
+	type row struct {
+		ValidatorId uint64        `bun:"validator_id"`
+		Version     uint64        `bun:"version"`
+		VotingPower types.Numeric `bun:"voting_power"`
+	}
+	var rows []row
+	err = tx.Tx().NewSelect().Table("signal_version").
+		Column("validator_id", "version", "voting_power").
+		Where("height >= 1020").
+		Order("height").
+		Scan(ctx, &rows)
+	s.Require().NoError(err)
+	s.Require().Len(rows, 3)
+	s.Require().Equal("5", rows[0].VotingPower.String())
+	s.Require().Equal("0", rows[1].VotingPower.String())
+	s.Require().Equal("0", rows[2].VotingPower.String())
+}
+
+func (s *TransactionTestSuite) TestSignalListShowsCurrentPowerUntilFixed() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	// zero is stored as null: the round is open
+	s.insertSignals(ctx, tx,
+		&storage.SignalVersion{Height: 1020, ValidatorId: 1, Version: 1600, VotingPower: types.NumericZero()},
+		&storage.SignalVersion{Height: 1021, ValidatorId: 2, Version: 1600, VotingPower: types.NumericFromInt64(9)},
+		&storage.SignalVersion{Height: 1022, ValidatorId: 2, Version: 1600, VotingPower: types.NumericZero()},
+	)
+	_, err := tx.Tx().NewUpdate().Table("validator").Set("power = 5").Where("id IN (1, 2)").Exec(ctx)
+	s.Require().NoError(err)
+	// closed round, not counted
+	_, err = tx.Tx().NewUpdate().Table("signal_version").Set("voting_power = 0").Where("height = 1022").Exec(ctx)
+	s.Require().NoError(err)
+
+	signals, err := NewTxRepos(tx).SignalVersion.List(ctx, storage.ListSignalsFilter{
+		Version: 1600,
+		Sort:    sdk.SortOrderAsc,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(signals, 3)
+	// not fixed: the current power
+	s.Require().Equal("5", signals[0].VotingPower.String())
+	s.Require().EqualValues(1, signals[0].ValidatorId)
+	s.Require().EqualValues(1020, signals[0].Height)
+	s.Require().NotNil(signals[0].Validator)
+	s.Require().Equal("Conqueror", signals[0].Validator.Moniker)
+	// counted by an upgrade: the stored power
+	s.Require().Equal("9", signals[1].VotingPower.String())
+	// not counted by an upgrade: zero, not the current power
+	s.Require().Equal("0", signals[2].VotingPower.String())
 }
